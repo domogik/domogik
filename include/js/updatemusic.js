@@ -34,17 +34,17 @@ var update = function(transport) {
 
 
 var updateMusic= function() {
-    new Ajax.Request('http://localhost/index.php/piece/update_audio/'+$('idpiece').getAttribute('value'), { onSuccess:update });
+    new Ajax.Request(BASE_URL+'index.php/piece/update_audio/'+$('idpiece').getAttribute('value'), { onSuccess:update });
 }
 
 var playMusic = function() {
-    new Ajax.Request('http://localhost/index.php/piece/play/'+$('idpiece').getAttribute('value'), { onSuccess:update });
+    new Ajax.Request(BASE_URL+'index.php/piece/play/'+$('idpiece').getAttribute('value'), { onSuccess:update });
 }
 
 var pauseMusic = function() {
-    new Ajax.Request('http://localhost/index.php/piece/pause/'+$('idpiece').getAttribute('value'), { onSuccess:update });
+    new Ajax.Request(BASE_URL+'index.php/piece/pause/'+$('idpiece').getAttribute('value'), { onSuccess:update });
 }
 
 var stopMusic = function() {
-    new Ajax.Request('http://localhost/index.php/piece/stop/'+$('idpiece').getAttribute('value'), { onSuccess:update});
+    new Ajax.Request(BASE_URL+'index.php/piece/stop/'+$('idpiece').getAttribute('value'), { onSuccess:update});
 }

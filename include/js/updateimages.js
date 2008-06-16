@@ -2,7 +2,7 @@
  * Met en place la page en récupérant les éléments de la pièce
  */
 var load = function(idpiece){
-	new Ajax.Request('http://localhost/index.php/lights/piece/'+idpiece, { 
+	new Ajax.Request(BASE_URL+'index.php/lights/piece/'+idpiece, { 
 		onSuccess:function(transport) {
 			var _json = transport.responseJSON;
 			var nb = 0;
@@ -41,7 +41,7 @@ var load = function(idpiece){
  * et demande la mise à jour de l'item en retour
  */
 var off = function(item) {
-	new Ajax.Request('http://localhost/index.php/lights/off/' + item, {
+	new Ajax.Request(BASE_URL+'index.php/lights/off/' + item, {
 		onSuccess: updateItems
 	})
 }
@@ -51,7 +51,7 @@ var off = function(item) {
  * et demande la mise à jour de l'item en retour
  */
 var on = function(item) {
-	new Ajax.Request('http://localhost/index.php/lights/on/' + item, {
+	new Ajax.Request(BASE_URL+'index.php/lights/on/' + item, {
 		onSuccess: updateItems
 	})
 }
@@ -80,7 +80,7 @@ var updateItems = function(transport) {
         };
 		
 var getRemoteContent = function(){
-	new Ajax.Request('http://localhost/index.php/lights/piece/' + $('idpiece').getAttribute('value'), {
+	new Ajax.Request(BASE_URL+'index.php/lights/piece/' + $('idpiece').getAttribute('value'), {
 		onSuccess: updateItems
 	})
 }

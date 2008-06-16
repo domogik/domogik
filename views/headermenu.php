@@ -12,7 +12,7 @@
         <?
             foreach($menu as $id=>$nom)
             {
-                echo "<li><a href=\"http://localhost/index.php/piece/lookup/".$id."\">".$nom."</a></li>";
+                echo "<li><a href=\"".$this->config->item('base_url')."index.php/piece/lookup/".$id."\">".$nom."</a></li>";
             }
         ?>
      </ul>
@@ -24,7 +24,7 @@
         $cap = $this->config->item('CAPACITIES');
         foreach($capacites as $c)
         {
-            echo "<li><a href=\"http://localhost/index.php/piece/".$cap[$c]."/".$piece."\">".$c."</a></li>";
+            echo "<li><a href=\"".$this->config->item('base_url')."index.php/piece/".$cap[$c]."/".$piece."\">".$c."</a></li>";
         }
         ?>
         </ul>
