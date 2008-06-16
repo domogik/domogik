@@ -32,10 +32,10 @@
 		var defaultOptions = {
 			animate		: true,										// Animate the progress? - default: true
 			showText	: true,										// show text with percentage in next to the progressbar? - default : true
-			width		: 120,										// Width of the progressbar - don't forget to adjust your image too!!!
-			boxImage	: '/include/progress/images/bramus/percentImage.png',			// boxImage : image around the progress bar
-			barImage	: '/include/progress/images/bramus/percentImage_back.png',	// Image to use in the progressbar. Can be an array of images too.
-			height		: 12										// Height of the progressbar - don't forget to adjust your image too!!!
+			width		: 220,										// Width of the progressbar - don't forget to adjust your image too!!!
+			boxImage	: JS_DIR+'progress/images/bramus/percentImage.png',			// boxImage : image around the progress bar
+			barImage	: JS_DIR+'progress/images/bramus/percentImage_back1.png',	// Image to use in the progressbar. Can be an array of images too.
+			height		: 16										// Height of the progressbar - don't forget to adjust your image too!!!
 		}
 		
  /**
@@ -116,7 +116,7 @@
 					
 					// create the progressBar
 					this.el.update(
-						'<img id="' + this.id + '_percentImage" src="' + this.options.boxImage + '" alt="0%" style="width: ' + this.options.width + 'px; height: ' + this.options.height + 'px; background-position: ' + this.initialPos + 'px 50%; background-image: url(' + this.options.barImage[this.backIndex] + '); padding: 0; margin: 0;"/>' + 
+						'<img id="' + this.id + '_percentImage" src="' + this.options.boxImage + '" alt="0%" style="width: ' + this.options.width + 'px; height: ' + this.options.height + 'px; background-position: ' + this.initialPos + 'px 50%; background-image: url(' + this.options.barImage[this.backIndex] + '); padding: 0;"/>' + 
 						((this.options.showText == true)?'<span id="' + this.id + '_percentText">0%</span>':''));
 				
 					// set initial percentage

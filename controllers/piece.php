@@ -61,6 +61,7 @@ class Piece extends Controller {
         $this->load->view('head',$data);
         $this->load->view('configjs');
         $this->load->view('headerjs',$data);
+        $this->load->view('headermenu',$data);
         $this->load->view('body', $data);
         $this->load->view('footer');
     }
@@ -76,6 +77,7 @@ class Piece extends Controller {
         $this->load->view('head',$data);
         $this->load->view('configjs');
         $this->load->view('headerjs2',$data);
+        $this->load->view('headermenu',$data);
         $this->load->view("temper");
         $this->load->view('footer');
      }
@@ -90,6 +92,7 @@ class Piece extends Controller {
         $this->load->view('head',$data);
         $this->load->view('configjs');
         $this->load->view('headerjs3',$data);
+        $this->load->view('headermenu',$data);
         $this->load->view('music');
         $this->load->view('footer');
      }
@@ -195,7 +198,11 @@ class Piece extends Controller {
         $d1 = $hour * 3600 + $minutes * 60 + $seconds;
         $d2 = $ahour * 3600 + $aminutes * 60 + $aseconds;
         $d = ((int) ($d2 / ($d1 / 100)));
-        $data["temps"] = $d;
+        $data["temps_percent"] = $d;
+        $data["temps_min"] = $r->temps;
+        $data["titre"] = $r->titre;
+        $data["duree"] = $r->temps_actuel;
+        $data["etat"] = $r->etat;
         $this->__musique__($data);
     }
 
@@ -213,8 +220,24 @@ class Piece extends Controller {
         $d2 = $ahour * 3600 + $aminutes * 60 + $aseconds;
         $d = ((int) ($d2 / ($d1 / 100)));
         $root = array();
-        $root["temps"] = $d;
+        $root["temps_percent"] = $d;
+        $root["temps_min"] = $r->temps;
+        $root["titre"] = $r->titre;
+        $root["duree"] = $r->temps_actuel;
+        $root["etat"] = $r->etat;
 
         $this->load->view("json",array("data"  => json_encode(array("root" => $root))));
+    }
+
+    function playMusic($idpiece)
+    {
+    }
+
+    function pauseMusic($idpiece)
+    {
+    }
+
+    function stopMusic($idpiece)
+    {
     }
 }
