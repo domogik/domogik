@@ -1,0 +1,2886 @@
+2008-03-09 18:42  ljp
+
+	* gd_image.inc.php, jpgraph_pie.php: PR#455 - Startangle is ignored
+	  if only one slice in a Pie is !=0
+
+2008-03-09 15:30  ljp
+
+	* jpgraph_errhandler.inc.php: PR#454 - Localized error message can
+	  only be shown once
+
+2008-02-14 19:38  ljp
+
+	* pdf417_backends.inc.php: Added options to specify font for PDF417
+
+2008-02-11 21:18  ljp
+
+	* datamatrix/encodation-200.inc.php: Fix evil typo in BASE256
+	  datamatrix with more than 256 binary data entities
+
+2008-02-11 12:50  ljp
+
+	* pdf417_backends.inc.php: Renamed PDF417 backend to make it
+	  possible to use in same script as linear barcodes without causing
+	  a name clash
+
+2008-01-19 13:40  ljp
+
+	* gd_image.inc.php: Modified Wu-algorithm for better handling of
+	  start-end points of line when multiple line segments are
+	  concatenated which is often the case when using antialiased lines
+	  for line drawing in graphs.
+
+2008-01-19 10:04  ljp
+
+	* jpgraph.php: CR#453 - Add style option for plot lines also add
+	  default directory for Japanese Fonts
+
+2007-12-29 15:34  ljp
+
+	* gd_image.inc.php: Initialize output parameters to headers_sent()
+	  method call to avoid a warning about variables not being
+	  initialized
+
+2007-12-08 11:42  ljp
+
+	* jpgraph_line.php: Remove one uneccessary call to StrokeDataVal for
+	  markers on linegraphs
+
+2007-11-17 11:41  ljp
+
+	* jpgraph.php, jpgraph_bar.php, jpgraph_gantt.php, jpgraph_line.php,
+	  jpgraph_pie.php, jpgraph_pie3d.php, jpgraph_plotmark.inc.php,
+	  jpgraph_scatter.php, jpgraph_table.php: Feature request #450 - Add
+	  option to specify window target for CSIM
+
+2007-11-14 20:58  ljp
+
+	* gd_image.inc.php: PR#449 - Adding text to rotated graphs gets
+	  wrong angle for box
+
+2007-11-07 22:20  ljp
+
+	* jpgraph_barcode.php: Corrected wrong error message and
+	  uninitialized variable
+
+2007-11-07 22:16  ljp
+
+	* gd_image.inc.php: PR#448 - Bug in PHP 4.4.7 (Affects Pie)
+
+2007-10-19 22:14  ljp
+
+	* jpgraph_gradient.php: FS#250 - Off by one - rounding error for
+	  filled gradients
+
+2007-10-19 21:54  ljp
+
+	* Examples/backgroundex02.php: FS#445 - Example code:
+	  Image::SetAntiAliasing() expects boolean
+
+2007-10-18 16:56  ljp
+
+	* datamatrix_release/bit-placement-140.inc.php,
+	  datamatrix_release/bit-placement-200.inc.php,
+	  datamatrix_release/encodation-200-debug.inc.php: Clean up release
+	  directory for datamatrix
+
+2007-10-18 16:52  ljp
+
+	* pdf417_examples/pdf417_ex7.php, pdf417_examples/pdf417_ex8.php,
+	  pdf417_examples/pdf417_ex9.php: Add more PDF417 examples with non
+	  printable characters
+
+2007-10-18 16:48  ljp
+
+	* datamatrix_release/README.txt,
+	  datamatrix_release/bit-placement-140.inc.php,
+	  datamatrix_release/bit-placement-200.inc.php,
+	  datamatrix_release/conv-140.inc.php,
+	  datamatrix_release/crc-ccitt.inc.php,
+	  datamatrix_release/reed-solomon.inc.php: Remove unit test code
+	  from release branch of datamatrix
+
+2007-10-18 16:40  ljp
+
+	* datamatrix_release/beta_test, datamatrix_release/docs: Clean up
+	  release directory for datamatrix
+
+2007-10-18 16:40  ljp
+
+	* datamatrix_release/internal: Clean up release directory for
+	  datamatrix
+
+2007-10-18 16:39  ljp
+
+	* datamatrix_release: Create datamatrix release diectory
+
+2007-10-18 16:35  ljp
+
+	* datamatrix/datamatrix_demoapp,
+	  datamatrix/datamatrix_demoapp/datamatrix_image.php,
+	  datamatrix/datamatrix_demoapp/datamatrix_menu.php: Renamed
+	  datamatrix demoapp
+
+2007-10-18 16:34  ljp
+
+	* datamatrix/utils: Folder restructure
+
+2007-10-18 16:34  ljp
+
+	* datamatrix/tests: 
+
+2007-10-18 16:31  ljp
+
+	* datamatrix/internal/beta_test,
+	  datamatrix/internal/beta_test/beta_test-2006-09-02.pdf,
+	  datamatrix/internal/beta_test/beta_test.php,
+	  datamatrix/internal/beta_test/beta_test_140-2006-09-02.pdf,
+	  datamatrix/internal/beta_test/beta_test_140.php,
+	  datamatrix/internal/beta_test/dm_tst0.png,
+	  datamatrix/internal/beta_test/dm_tst1.png,
+	  datamatrix/internal/beta_test/dm_tst2.png,
+	  datamatrix/internal/beta_test/dm_tst3.png,
+	  datamatrix/internal/beta_test/dm_tst4.png,
+	  datamatrix/internal/beta_test/dm_tst5.png,
+	  datamatrix/internal/beta_test/dm_tst6.png,
+	  datamatrix/internal/beta_test/dm_tst7.png,
+	  datamatrix/internal/beta_test/dm_tst8.png,
+	  datamatrix/internal/beta_test/dm_tst9.png,
+	  datamatrix/internal/beta_test/dm_tst_1400.png,
+	  datamatrix/internal/beta_test/dm_tst_1401.png,
+	  datamatrix/internal/beta_test/dm_tst_1402.png,
+	  datamatrix/internal/beta_test/dm_tst_1403.png,
+	  datamatrix/internal/beta_test/dm_tst_140_0.png,
+	  datamatrix/internal/beta_test/dm_tst_140_1.png,
+	  datamatrix/internal/beta_test/dm_tst_140_2.png,
+	  datamatrix/internal/beta_test/dm_tst_140_3.png,
+	  datamatrix/internal/beta_test/dm_tst_140_4.png,
+	  datamatrix/internal/beta_test/index.html,
+	  datamatrix/internal/tests, datamatrix/internal/tests/crc,
+	  datamatrix/internal/tests/crc/conv.php,
+	  datamatrix/internal/tests/crc/crc-itu.inc.php,
+	  datamatrix/internal/tests/crc/crc_test.c: Folder restructure
+
+2007-10-18 16:29  ljp
+
+	* datamatrix/internal, datamatrix/internal/utils: Reorder folder
+
+2007-10-18 16:23  ljp
+
+	* datamatrix/demoapp: Removed demoapp
+
+2007-10-18 16:16  ljp
+
+	* Examples/ledex1.php, Examples/ledex2.php, Examples/ledex3.php,
+	  Examples/ledex4.php: Updated LED examples with new API for
+	  Stroke()
+
+2007-10-17 21:32  ljp
+
+	* gd_image.inc.php: PR#447 - Add workaround for bug in PHP 4.4.7
+	  function imagefilledarc()
+
+2007-10-13 18:22  ljp
+
+	* flags.dat, flags_thumb100x100.dat, flags_thumb35x35.dat,
+	  flags_thumb60x60.dat, jpgraph_flags.php: Added flags for
+	  Bangladesh and Republic of Serbia
+
+2007-10-13 10:12  ljp
+
+	* gd_image.inc.php: Add format testing for wbmp and xpm iagte
+	  formats
+
+2007-10-13 10:07  ljp
+
+	* Examples/bar_csimex1.php, Examples/bar_csimex2.php,
+	  Examples/bar_csimex3.php, Examples/barline_csimex1.php,
+	  Examples/barlinefreq_csimex1.php, Examples/boxstockcsimex1.php,
+	  Examples/ganttcsimex01.php, Examples/ganttcsimex02.php,
+	  Examples/imgmarkercsimex1.php, Examples/mulyaxiscsimex1.php,
+	  Examples/pie3d_csimex1.php, Examples/pie_csimex1.php,
+	  Examples/piec_csimex1.php, Examples/scatter_csimex1.php,
+	  Examples/titlecsimex01.php: Updated CSIM examples to not include
+	  the filename in the StrokeCSIM() call since this is no longer
+	  strictly necessary
+
+2007-10-11 21:22  ljp
+
+	* utils/wizard/subtype_error.php, utils/wizard/subtype_gantt.php:
+	  Add empty subtypes to avoid not-found-page error
+
+2007-10-10 18:57  ljp
+
+	* datamatrix/conv-140.inc.php: Correctly comment out unit test code
+
+2007-09-26 21:05  ljp
+
+	* jpgraph.php: Added support for XPM and WBMP. Fixed a potential
+	  divide by zero error in tick calculations
+
+2007-09-26 21:00  ljp
+
+	* jpgraph_date.php: PR#-444 Divide by zero in certain date scale
+	  ranges
+
+2007-09-14 19:40  ljp
+
+	* jpgraph_led.php: CR#443 - Add support for russian LED characters
+
+2007-08-31 22:47  ljp
+
+	* jpgraph_stock.php: PR#442 - Fixed possible undefined sval for CSIM
+	  when no alt titles are given
+
+2007-06-13 21:45  ljp
+
+	* gd_image.inc.php: Make minimum automatic margin smaller
+
+2007-05-14 21:07  ljp
+
+	* jpgraph_table.php: FR#433 - Make it possible to add images to
+	  tables without constrains
+
+2007-05-08 03:34  ljp
+
+	* lang/de.inc.php, lang/en.inc.php: PR#432 - Unquoted % sign in
+	  error message 22001
+
+2007-05-02 07:59  ljp
+
+	* jpgraph_barcode.php: FR#431 - Make it possible to add an alternate
+	  text to linear barcodes
+
+2007-04-18 21:26  ljp
+
+	* jpgraph_utils.inc.php: Wrong unicode value for TM
+
+2007-04-17 19:32  ljp
+
+	* jpgraph_utils.inc.php: FR#427 - Feature request to add trademark
+	  symbol to SymChar class
+
+2007-04-08 08:52  ljp
+
+	* datamatrix/rgb_colors.inc.php: Some Datamatrix code cleanup
+
+2007-04-08 08:35  ljp
+
+	* datamatrix/encodation-200-debug.inc.php,
+	  datamatrix/encodation-200.inc.php: Fixed spelling of constant in
+	  Datamatrix
+
+2007-03-31 13:03  ljp
+
+	* jpgraph_pdf417.php, pdf417_backends.inc, pdf417_backends.inc.php,
+	  pdf417_clusters.inc, pdf417_clusters.inc.php,
+	  pdf417_compressors.inc, pdf417_compressors.inc.php,
+	  pdf417_demoapp/debug_collector.inc,
+	  pdf417_demoapp/debug_collector.inc.php,
+	  pdf417_demoapp/pdf417_demo_debug.php, pdf417_error.inc,
+	  pdf417_error.inc.php: Updated *.inc file name for PDF417 to
+	  *.inc.php
+
+2007-03-28 15:41  ljp
+
+	* jpgraph_gantt.php: Handle NULL text input data for Gantt charts
+	  more gracefully
+
+2007-03-25 18:32  ljp
+
+	* Examples/backgroundex01.php: Removed deprecated method call in
+	  example
+
+2007-03-25 10:53  ljp
+
+	* jpgraph.php: Correct wrong usage of in static context
+
+2007-03-25 10:28  ljp
+
+	* Examples/bargradex5.php, Examples/combgraphex1.php,
+	  Examples/dupyaxisex1.php, Examples/funcex1.php,
+	  Examples/funcex2.php, Examples/funcex3.php, Examples/funcex4.php,
+	  Examples/ledex1.php, Examples/ledex2.php, Examples/ledex3.php,
+	  Examples/ledex4.php, Examples/manualtickex1.php,
+	  Examples/manualtickex2.php: Updated examples with new name for
+	  jpgraph_utils.inc.php
+
+2007-03-24 11:19  ljp
+
+	* jpgraph_polar.php: Removed AdjustSatBrigthess() method call to
+	  framework since that has been removed for performance reasons
+
+2007-03-24 11:17  ljp
+
+	* jpgraph_bar.php: PR#423 - Gradient specified as a RGB triple for
+	  bars does not work
+
+2007-03-23 19:38  ljp
+
+	* jpgraph_barcode.php: Fix potential array overrun error for
+	  Barcode128 with erronous indata
+
+2007-03-23 19:18  ljp
+
+	* jpgraph_plotmark.inc.php: Updated imgdata file names
+
+2007-03-23 19:12  ljp
+
+	* imgdata_balls.inc, imgdata_balls.inc.php, imgdata_bevels.inc,
+	  imgdata_bevels.inc.php, imgdata_diamonds.inc,
+	  imgdata_diamonds.inc.php, imgdata_pushpins.inc,
+	  imgdata_pushpins.inc.php, imgdata_squares.inc,
+	  imgdata_squares.inc.php, imgdata_stars.inc, imgdata_stars.inc.php,
+	  jpgraph_utils.inc, jpgraph_utils.inc.php: Renamed *.inc to
+	  *.inc.php
+
+2007-03-23 19:03  ljp
+
+	* jpgraph_scatter.php: Changed name of jpgraph_plotmark.inc to
+	  jpgraph_plotmark.inc.php
+
+2007-03-23 19:03  ljp
+
+	* jpgraph_gantt.php, jpgraph_line.php, jpgraph_plotmark.inc,
+	  jpgraph_plotmark.inc.php, jpgraph_polar.php, jpgraph_radar.php:
+	  Changed name of jpgraph_plotmark.inc to jpgraph_plotmark.inc.php
+
+2007-03-23 07:16  ljp
+
+	* jpgraph_errhandler.inc.php: Improved error message for locale not
+	  found
+
+2007-03-18 20:03  ljp
+
+	* jpgraph_led.php: Correct name of Stroke() method for LED digits
+
+2007-03-18 18:18  ljp
+
+	* jpg-config.inc: Update config file name from jpg-config.inc to
+	  jpg-cnfig.inc.php
+
+2007-03-18 18:18  ljp
+
+	* jpg-config.inc.php, jpgraph.php: Update config file name from
+	  jpg-config.inc to jpg-cnfig.inc.php
+
+2007-03-16 20:26  ljp
+
+	* jpgraph.php: CR#421 - Add API to set Alt text for IMG in generated
+	  HTML for CSIM.
+
+2007-03-10 10:36  ljp
+
+	* jpgraph_pie.php: PR#371 - Problem with 3D Pie and mannual colors
+
+2007-02-22 19:14  ljp
+
+	* datamatrix/docs, datamatrix/docs/datamatrix.css,
+	  datamatrix/docs/datamatrix_demoapp.png,
+	  datamatrix/docs/datamatrix_manual.php,
+	  datamatrix/docs/datamatrx_titleimg.png, datamatrix/docs/img,
+	  datamatrix/docs/img/datamatrix_demoapp.png,
+	  datamatrix/docs/img/datamatrix_img1.png,
+	  datamatrix/docs/img/datamatrix_img2.png,
+	  datamatrix/docs/img/datamatrix_img3.png,
+	  datamatrix/docs/img/datamatrix_rect.png,
+	  datamatrix/docs/img/datamatrix_square.png,
+	  datamatrix/docs/img/datamatrx_titleimg.png,
+	  datamatrix/docs/img/manual_ex2.png,
+	  datamatrix/docs/img/manual_quickstart_ex0.png,
+	  datamatrix/docs/jpgtutlib.inc, datamatrix/docs/title.html: Added
+	  docs/ directory to datamatrix
+
+2007-01-31 22:14  ljp
+
+	* tests/test_acclineplot.php, tests/test_baraccnofill.php,
+	  tests/test_barbug.php, tests/test_bargrad4.php,
+	  tests/test_barnofill.php, tests/test_barsimplexlabels.php,
+	  tests/test_bug372.php, tests/test_createfascia.php,
+	  tests/test_createled.php, tests/test_date_summertime_issue.php,
+	  tests/test_dateaccbar.php, tests/test_dateaxis4.php,
+	  tests/test_datebar.php, tests/test_ganttprogress.php,
+	  tests/test_ganttprogress2.php, tests/test_gridcolor.php,
+	  tests/test_hebrew.php, tests/test_imgsmoothcircle.php,
+	  tests/test_line3.php, tests/test_linemarkcsim.php,
+	  tests/test_linesmallscale.php, tests/test_lineutf8.php,
+	  tests/test_monthname.php, tests/test_mr1.php,
+	  tests/test_nullcallback.php, tests/test_numeric.php,
+	  tests/test_odolabel.php, tests/test_pieabsval.php,
+	  tests/test_plotline.php, tests/test_prosupport1.php,
+	  tests/test_radarbug381.php, tests/test_scattermark2.php,
+	  tests/test_setdateformat.php, tests/test_smootharc.php,
+	  tests/test_spamstat.php, tests/test_speedo.php,
+	  tests/test_windroseicon.php, tests/test_xaxisrev.php,
+	  tests/tests_strucapp.php: Added more module test scripts
+
+2007-01-24 22:09  ljp
+
+	* jpgraph_barcode.php: Changed PS-Adobe to PS-Adobe-3.0 as header
+	  string for Postscript abckend for barcodes
+
+2007-01-22 21:01  ljp
+
+	* jpgraph_iconplot.php, jpgraph_windrose.php, lang/de.inc.php,
+	  lang/en.inc.php: FR#417 - Add possibility to use Icon with
+	  Windrose plots
+
+2007-01-21 16:29  ljp
+
+	* jpgraph_barcode.php: Synchronized v2 and v1 1D barcodes so that
+	  internal API and handling of margins are exactly the same. This
+	  also fixes the problem of using TTF fonts for the human eadable
+	  version of the data and adds a user selectable margin between the
+	  barcode and the human readable string
+
+2007-01-15 18:57  ljp
+
+	* gd_image.inc.php: FS#416 - When using the fast drawing routines
+	  polygons are not rotated, FS#415 - Potential 1 pixel difference
+	  due to rounding for polygon/filled polygon
+
+2007-01-11 07:01  ljp
+
+	* jpgraph_barcode.php: Added Tilde procesing for EAN128
+
+2007-01-10 22:39  ljp
+
+	* jpgraph_barcode.php: Correctly translate EA_FUNC1 to FUNC1 for
+	  extended EAN-128 codes
+
+2007-01-09 21:30  ljp
+
+	* Examples/balloonex2.php, Examples/example21.php,
+	  datamatrix/examples/datamatrix_ex0.php, jpgraph_bar.php,
+	  jpgraph_errhandler.inc.php, lang/en.inc.php,
+	  tests/test_barsimple2.php, tests/test_linesimple.php: PR#413 -
+	  SetNoFill() does not work with AccBarPlot (Just BarPlot)
+
+2006-12-30 11:05  ljp
+
+	* Examples/plotlineex1.php, jpgraph.php: FS#412 - Add legends to
+	  PlotLine
+
+2006-12-30 10:16  ljp
+
+	* jpgraph.php: FS#411 - Ignore minor grid for text scale
+
+2006-12-30 10:12  ljp
+
+	* jpgraph_speedfascia.php: Updated Speed fascia to properly initiate
+	  cache
+
+2006-12-14 01:04  ljp
+
+	* jpgraph_log.php: FR#410 - Add SetAutoMin/max functionality for
+	  logarithmic scale
+
+2006-12-13 22:41  ljp
+
+	* Examples/balloonex2.php: Added balloonex2.php
+
+2006-12-13 22:40  ljp
+
+	* jpgraph.php, jpgraph_scatter.php: PR#408 - Plotmark user callback
+	  should not be called for Legend marks
+
+2006-12-12 19:51  ljp
+
+	* jpgraph_bar.php: PR#407 - Add possibility to specify individual
+	  gradients for each bar
+
+2006-12-08 20:56  ljp
+
+	* jpgraph_gantt.php: PR#406 - Progress bar for gantt chart outside
+	  end date
+
+2006-12-07 05:58  ljp
+
+	* datamatrix/backend.inc.php, datamatrix/datamatrix.inc.php,
+	  datamatrix/dm-utils.inc.php: Updated structured append tilde
+	  processing for Datamatrix to make it more easy to use. Updated
+	  some error messages also n Datamatrix
+
+2006-12-03 23:50  ljp
+
+	* jpgraph_flags.php: FS#405 &#8212; Romania flag is missing
+
+2006-11-28 07:51  ljp
+
+	* jpgraph_ttf.inc.php: Added iso2uni conversion for Hebrew fonts
+
+2006-11-26 20:16  ljp
+
+	* Examples/ledex1.php, Examples/ledex2.php, Examples/ledex3.php,
+	  Examples/ledex4.php, jpgraph_led.php: Added LED examples and
+	  changed default margins in LED
+
+2006-11-26 20:03  ljp
+
+	* jpg-config.inc, jpgraph_ttf.inc.php: Changed LANGAGE_CHARSET name
+	  to CYRILLIC_LANGAGE_CHARSET since this constant is only use to
+	  discreminate charset when using Cyrillic
+
+2006-11-26 19:54  ljp
+
+	* gd_image.inc.php, jpgraph_led.php: FR#402 - Add module to create
+	  LED digits and alphabeth
+
+2006-11-22 22:22  ljp
+
+	* gd_image.inc.php, jpgraph.php, jpgraph_ttf.inc.php: Refactored TTF
+	  font handling into a separate module jpgraph_ttf.inc.php
+
+2006-11-19 22:36  ljp
+
+	* gd_image.inc.php, jpgraph.php: Added defined for additional local
+	  TTF fonts, SPEEDO, DIGITAL and COMPUTER
+
+2006-11-19 07:57  ljp
+
+	* jpgraph_speedfascia.php: Updated fascia graph module. Removed
+	  extra debugging and made fascia parameterized
+
+2006-11-18 23:06  ljp
+
+	* jpgraph_speedfascia.php: Added new speedometer fascia module
+
+2006-10-19 18:52  ljp
+
+	* jpgraph_gantt.php: Progress bar might be one pixel too wide in
+	  limit case
+
+2006-10-15 21:19  ljp
+
+	* datamatrix/encodation-200-debug.inc.php: Added debug version of
+	  encodation-200
+
+2006-10-15 21:19  ljp
+
+	* datamatrix/backend.inc.php, datamatrix/rgb_colors.inc.php: Proper
+	  color allocation in Datamatrix
+
+2006-10-15 21:07  ljp
+
+	* datamatrix/backend.inc.php, datamatrix/bit-placement-140.inc.php,
+	  datamatrix/bit-placement-200.inc.php,
+	  datamatrix/bit-placement-bin-140.inc.php,
+	  datamatrix/bit-placement-bin-200.inc.php,
+	  datamatrix/datamatrix-140.inc.php, datamatrix/datamatrix.inc.php,
+	  datamatrix/demoapp/datamatrix_image.php,
+	  datamatrix/demoapp/datamatrix_menu.php,
+	  datamatrix/encodation-140.inc.php,
+	  datamatrix/encodation-200.inc.php,
+	  datamatrix/master-rnd-140.inc.php,
+	  datamatrix/reed-solomon.inc.php, datamatrix/rgb_colors.inc.php:
+	  Unify error handling in Datamatrix encoding
+
+2006-10-15 20:17  ljp
+
+	* datamatrix/master-rnd-140.inc.php: Removed UnitTest() from master
+	  random sequence for 140 matrice
+
+2006-10-15 19:59  ljp
+
+	* datamatrix/encodation-140.inc.php: Removed UnitTest() from
+	  production encodation file for Datamatrix 140
+
+2006-10-08 20:14  ljp
+
+	* gd_image.inc.php, jpg-config.inc, jpgraph.php, jpgraph_mgraph.php:
+	  FR#398 - Remove support for (very) old GD 1.x library
+
+2006-10-08 08:09  ljp
+
+	* flags_full.inc, gd_image.inc.php, imgdata_balls.inc,
+	  imgdata_bevels.inc, imgdata_diamonds.inc, imgdata_pushpins.inc,
+	  imgdata_squares.inc, imgdata_stars.inc, jpg-config.inc,
+	  jpgraph_antispam-digits.php, jpgraph_antispam.php,
+	  jpgraph_bar.php, jpgraph_barcode.php, jpgraph_canvas.php,
+	  jpgraph_canvtools.php, jpgraph_date.php, jpgraph_error.php,
+	  jpgraph_flags.php, jpgraph_gantt.php, jpgraph_gb2312.php,
+	  jpgraph_gradient.php, jpgraph_iconplot.php, jpgraph_imgtrans.php,
+	  jpgraph_line.php, jpgraph_log.php, jpgraph_mgraph.php,
+	  jpgraph_odo.php, jpgraph_pdf417.php, jpgraph_pie.php,
+	  jpgraph_pie3d.php, jpgraph_plotband.php, jpgraph_plotmark.inc,
+	  jpgraph_polar.php, jpgraph_radar.php, jpgraph_regstat.php,
+	  jpgraph_scatter.php, jpgraph_stock.php, jpgraph_table.php,
+	  jpgraph_utils.inc, jpgraph_windrose.php, lang/en.inc.php,
+	  lang/prod.inc.php, pdf417_backends.inc, pdf417_clusters.inc,
+	  pdf417_compressors.inc, pdf417_error.inc, svg_image.inc.php,
+	  tests/test_barsingle.php, tests/test_datesimple.php,
+	  tests/test_mgraph.php, tests/test_mgraph2.php,
+	  tests/test_mulyaxisbug.php, tests/test_piesimple.php: Updated
+	  source headers
+
+2006-10-08 08:05  ljp
+
+	* Examples/alphabarex1.php, Examples/bkgimgflagex1.php,
+	  Examples/bkgimgflagex2.php, Examples/bkgimgflagex3.php,
+	  Examples/bkgimgflagex4.php, Examples/dbschemaex1.php,
+	  Examples/horizbarex6.php, Examples/nullvalueex01.php,
+	  Examples/piebkgex1.php, Examples/piec_csimex1.php,
+	  Examples/piecex1.php, Examples/piecex2.php, Examples/testsuit.php:
+	  Changed COMIC to ARIAL font in Examples
+
+2006-10-07 12:10  ljp
+
+	* jpgraph.php, jpgraph_date.php: FR#397 - Make DST user configurable
+
+2006-09-28 21:42  ljp
+
+	* jpgraph.php: FR#394 - Make it possible to submit an array of
+	  locales
+
+2006-09-27 18:58  ljp
+
+	* datamatrix/dm-utils.inc.php, datamatrix/encodation-200.inc.php:
+	  Default encodation for ECC-200 will be to follow the standard and
+	  not use the workaround that is required by some scanners. Add a
+	  guard around str_split() so the file can be used with PHP5 as well
+
+2006-09-27 18:47  ljp
+
+	* datamatrix/backend.inc.php, datamatrix/rgb_colors.inc.php: Don't
+	  call JpGraphError::Raise() for errors in Datamatrix. Rename RGB
+	  class to avoid name collision with JpGraph RGB class
+
+2006-09-24 20:17  ljp
+
+	* jpgraph.php, jpgraph_errhandler.inc.php: Refactor error handling
+
+2006-09-24 20:10  ljp
+
+	* jpgraph_pie.php: Ignore 0 slices
+
+2006-09-24 14:32  ljp
+
+	* datamatrix/backend.inc.php, datamatrix/bit-placement-140.inc.php,
+	  datamatrix/bit-placement-200.inc.php,
+	  datamatrix/bit-placement-bin-140.inc.php,
+	  datamatrix/bit-placement-bin-200.inc.php,
+	  datamatrix/conv-140.inc.php, datamatrix/crc-ccitt.inc.php,
+	  datamatrix/datamatrix-140.inc.php,
+	  datamatrix/datamatrix-200.inc.php, datamatrix/datamatrix.inc.php,
+	  datamatrix/decode-200.inc.php, datamatrix/dm-utils.inc.php,
+	  datamatrix/encodation-140.inc.php,
+	  datamatrix/encodation-200.inc.php,
+	  datamatrix/examples/datamatrix_ex0.php,
+	  datamatrix/master-rnd-140.inc.php, datamatrix/printspec.inc.php,
+	  datamatrix/reed-solomon.inc.php, datamatrix/rgb_colors.inc.php:
+	  Updated header and error handling for Datamatrix
+
+2006-09-24 14:31  ljp
+
+	* datamatrix/tests/dm-200-tst-driver.php,
+	  datamatrix/tests/dm-tst-driver.php: Updated test drivers
+
+2006-09-23 18:23  ljp
+
+	* datamatrix/backend.inc.php,
+	  datamatrix/bit-placement-bin-200.inc.php: Fix w/h swap in
+	  Datamatrix
+
+2006-09-23 12:58  ljp
+
+	* jpgraph.php: PR#392 - The last label is sometimes omitted on the
+	  axis
+
+2006-09-21 20:54  ljp
+
+	* datamatrix/demoapp, datamatrix/demoapp/datamatrix_image.php,
+	  datamatrix/demoapp/datamatrix_menu.php,
+	  datamatrix/demoapp/demoapp.css, datamatrix/demoapp/index.html:
+	  Added Datamatrix demo WEB-aplication
+
+2006-09-21 20:53  ljp
+
+	* datamatrix/encodation-200.inc.php: Make sure autosizing is always
+	  safe rather than sorry and selects the absolute minimum symbol
+	  size
+
+2006-09-21 20:47  ljp
+
+	* datamatrix/backend.inc.php: Add error check for headers already
+	  sent problems and give infomative end user message for Datamatrix
+	  barcodes
+
+2006-09-21 20:46  ljp
+
+	* datamatrix/encodation-200.inc.php: Optimize autosizing. Diable
+	  EDIFACT as an automatic encoding choice, enable use of auto
+	  encoding but fixed size all for ECC-200
+
+2006-09-21 03:58  ljp
+
+	* jpgraph_bar.php: Avoid potential divide-by-zero for AccBarPlot and
+	  GroupBarPlot
+
+2006-09-20 15:17  ljp
+
+	* jpgraph_radar.php: PR#381 - Trimming of axis titles for radar
+	  graphs
+
+2006-09-19 21:40  ljp
+
+	* jpgraph.php: PR#361 - Data rejected due to incompatible type
+
+2006-09-19 21:20  ljp
+
+	* jpgraph_plotmark.inc: PR#390 - Undefined variable
+
+2006-09-17 19:49  ljp
+
+	* datamatrix/backend.inc.php: Initialize the canvas with white
+	  background for datamatrx
+
+2006-09-17 19:10  ljp
+
+	* datamatrix/datamatrix-200.inc.php: Make sure tilde processing is
+	  done before data is plit
+
+2006-09-17 19:10  ljp
+
+	* datamatrix/backend.inc.php: Restructurede error handling in
+	  backend
+
+2006-09-17 19:09  ljp
+
+	* datamatrix/encodation-200.inc.php: Restructurede error handling in
+	  ECC 200 encodation
+
+2006-09-16 11:08  ljp
+
+	* datamatrix/datamatrix-200.inc.php, datamatrix/datamatrix.inc.php:
+	  Changed name of ECC200 to plaing Datamatrix
+
+2006-09-16 10:36  ljp
+
+	* datamatrix/examples/datamatrix_ex1.php,
+	  datamatrix/examples/datamatrix_ex2.php,
+	  datamatrix/examples/datamatrix_ex3.php,
+	  datamatrix/examples/datamatrix_ex4.php,
+	  datamatrix/examples/datamatrix_ex5.php: Added error checking for
+	  all datamatrix examples
+
+2006-09-16 10:36  ljp
+
+	* datamatrix/examples/datamatrix_ex0.php: Added datamatrix example 0
+
+2006-09-14 21:06  ljp
+
+	* datamatrix/tests/unit_test.php: Added unit test automatic test
+	  script
+
+2006-09-14 19:51  ljp
+
+	* datamatrix/encodation-200.inc.php: Guard a lookahead test against
+	  end of data in auto encodation
+
+2006-09-14 05:44  ljp
+
+	* datamatrix/encodation-200.inc.php: Fixed a C40 encoding issue and
+	  reformatting
+
+2006-09-14 05:43  ljp
+
+	* datamatrix/decode-200.inc.php: Fixed a C40 encoding issue and
+	  reformatting
+
+2006-09-10 21:42  ljp
+
+	* datamatrix/encodation-200.inc.php: Added missing codes in X12
+	  encoder
+
+2006-09-10 21:39  ljp
+
+	* datamatrix/decode-200.inc.php: Added initial decode class for
+	  datamatrix barcodes
+
+2006-09-07 19:30  ljp
+
+	* datamatrix/datamatrix.inc.php, datamatrix/encodation-200.inc.php:
+	  Removed trace call from ECC 200 encodation and added sybolic
+	  constant for AUTO encoding
+
+2006-09-07 18:48  ljp
+
+	* jpgraph_odo.php: Add possibility to have text objects on the
+	  Odometer graph
+
+2006-09-07 18:03  ljp
+
+	* datamatrix/encodation-200.inc.php: Added optimal automatic
+	  encoding for ECC 200
+
+2006-09-03 11:19  ljp
+
+	* datamatrix/encodation-140.inc.php: Corrected ECC140 encodation to
+	  righly handle a perfect character count match against the selected
+	  encodation method
+
+2006-09-03 10:36  ljp
+
+	* datamatrix/utils, datamatrix/utils/bit-200,
+	  datamatrix/utils/bit-200.c, datamatrix/utils/tmp132x132.txt,
+	  datamatrix/utils/wbp_datfiles-200.php,
+	  datamatrix/utils/wbp_datfiles.php: Added utils directory with
+	  utilities to create the binary bit-placement data files
+
+2006-09-03 10:34  ljp
+
+	* datamatrix/beta_test/index.php: Removed index.php from beta test
+
+2006-09-03 10:33  ljp
+
+	* datamatrix/beta_test/beta_test.php: Update beta test for new file
+	  structure
+
+2006-09-03 10:32  ljp
+
+	* datamatrix/examples/datamatrix_ex1.php,
+	  datamatrix/examples/datamatrix_ex2.php,
+	  datamatrix/examples/datamatrix_ex3.php,
+	  datamatrix/examples/datamatrix_ex4.php,
+	  datamatrix/examples/datamatrix_ex5.php: Update examples for new
+	  file structure
+
+2006-09-03 10:32  ljp
+
+	* datamatrix/bit-placement-140.inc.php,
+	  datamatrix/bit-placement-bin-140.inc.php,
+	  datamatrix/conv-140.inc.php, datamatrix/crc-ccitt.inc.php,
+	  datamatrix/datamatrix-140.inc.php,
+	  datamatrix/datamatrix-200.inc.php, datamatrix/datamatrix.inc.php,
+	  datamatrix/encodation-140.inc.php,
+	  datamatrix/encodation-200.inc.php: Restructured include files to
+	  allow less files to be loaded in the normal case
+
+2006-09-02 11:00  ljp
+
+	* datamatrix/beta_test/beta_test.php: Updated beta test script
+
+2006-09-02 10:47  ljp
+
+	* datamatrix/beta_test, datamatrix/beta_test/beta_test.php,
+	  datamatrix/beta_test/dm_tst0.png,
+	  datamatrix/beta_test/dm_tst1.png,
+	  datamatrix/beta_test/dm_tst2.png,
+	  datamatrix/beta_test/dm_tst3.png,
+	  datamatrix/beta_test/dm_tst4.png,
+	  datamatrix/beta_test/dm_tst5.png,
+	  datamatrix/beta_test/dm_tst6.png, datamatrix/beta_test/index.php:
+	  Added beta test directory and script
+
+2006-09-02 10:26  ljp
+
+	* datamatrix/datamatrix.inc.php: Add symbolic constants for
+	  datamatrix auto size
+
+2006-09-02 10:26  ljp
+
+	* datamatrix/datamatrix-140.inc.php: Add API to allow symbol size to
+	  be modified after the class instance have been created
+
+2006-09-02 10:25  ljp
+
+	* datamatrix/datamatrix-200.inc.php: Add API to allow symbol size to
+	  be modified after the class instance have been created
+
+2006-09-02 10:24  ljp
+
+	* datamatrix/backend.inc.php: Make sure PHP class references are
+	  passed as references to allow them to be externally modified
+
+2006-09-02 09:20  ljp
+
+	* datamatrix/backend.inc.php, datamatrix/rgb_colors.inc.php: Added
+	  RGB symbolic color handling
+
+2006-09-02 09:17  ljp
+
+	* datamatrix/examples/datamatrix_ex4.php,
+	  datamatrix/examples/datamatrix_ex5.php: Added example 5
+
+2006-09-01 21:26  ljp
+
+	* datamatrix/tests/dm-200-tst-driver.php: Updated test driver for
+	  new factory class
+
+2006-09-01 21:25  ljp
+
+	* datamatrix/datamatrix-140.inc.php, datamatrix/datamatrix.inc.php,
+	  datamatrix/examples, datamatrix/examples/datamatrix_ex1.php,
+	  datamatrix/examples/datamatrix_ex2.php,
+	  datamatrix/examples/datamatrix_ex3.php,
+	  datamatrix/examples/datamatrix_ex4.php: Added some examples and
+	  made the overall Datamatrix include file which holds the factory
+	  class that encapsulates the two types of datamatrix codes
+
+2006-09-01 20:32  ljp
+
+	* datamatrix/encodation-200.inc.php: Fixed typo - that translated to
+	  a classic off-by-on bug
+
+2006-09-01 20:13  ljp
+
+	* datamatrix/backend.inc.php: Changed parameter order for backend
+	  factory method to minimize number of parameters that needs to be
+	  specified by a client
+
+2006-09-01 20:11  ljp
+
+	* datamatrix/datamatrix-140.inc.php: Refactored Matrix 140 to have
+	  the same API as Matrix 200
+
+2006-09-01 20:08  ljp
+
+	* datamatrix/datamatrix-200.inc.php: Added debug option for printing
+	  encoded codewords
+
+2006-09-01 19:58  ljp
+
+	* datamatrix/encodation-200.inc.php: Keep track of the current
+	  running encodation schema for datamatrix
+
+2006-08-31 20:03  ljp
+
+	* datamatrix/backend.inc.php, datamatrix/datamatrix-140.inc.php,
+	  datamatrix/datamatrix-200.inc.php, datamatrix/dm-utils.inc.php,
+	  datamatrix/encodation-200.inc.php,
+	  datamatrix/tests/dm-200-tst-driver.php: Added full industry
+	  standard Tilde pre processing for encoding
+
+2006-08-30 23:59  ljp
+
+	* datamatrix/tests/dm-200-tst-driver.php: Updated test driver for
+	  datamatrix
+
+2006-08-30 23:35  ljp
+
+	* datamatrix/datamatrix-200.inc.php: Removed some debug/unit test
+	  code
+
+2006-08-30 23:35  ljp
+
+	* datamatrix/reed-solomon.inc.php: Unset unused word so that the
+	  length count will be correct
+
+2006-08-30 23:34  ljp
+
+	* datamatrix/backend.inc.php: Made white default background color
+	  for Image backend for datamatrix
+
+2006-08-30 23:34  ljp
+
+	* datamatrix/bit-placement-200.inc.php,
+	  datamatrix/bit-placement-bin-200.inc.php: Synchronized both the
+	  binary and text version of the bit-placement algorithm
+
+2006-08-30 23:33  ljp
+
+	* datamatrix/encodation-200.inc.php: Correct RS with interleaving
+	  for 144x144 which is WRONG in the ISO/EEC specs. Wasted a lot of
+	  times due to this critical error in the specs
+
+2006-08-27 19:56  ljp
+
+	* datamatrix/tests/dm-200-tst-driver.php,
+	  datamatrix/tests/dm-tst-driver.php: Updated test drivers
+
+2006-08-27 19:56  ljp
+
+	* datamatrix/encodation-200.inc.php: Fixed type in 200 Encodation
+
+2006-08-27 19:54  ljp
+
+	* datamatrix/datamatrix-200.inc.php: Changed debigging handling
+
+2006-08-27 19:54  ljp
+
+	* datamatrix/encodation-200.inc.php: Removed debugging information
+	  from 200 Encodation
+
+2006-08-27 19:51  ljp
+
+	* datamatrix/backend.inc.php: Initial version of IMAGE backend for
+	  Datamatrix
+
+2006-08-27 17:26  ljp
+
+	* datamatrix/bit-placement-bin-200.inc.php: Added handling of
+	  alignment patterns to reactangular shaped symbols
+
+2006-08-27 15:35  ljp
+
+	* datamatrix/bit-placement-bin-200.inc.php: Added alignment pattern
+	  for bit placement when there are multiple data regions
+
+2006-08-27 15:21  ljp
+
+	* datamatrix/datamatrix-200.inc.php: Added debug output as an option
+
+2006-08-27 15:19  ljp
+
+	* datamatrix/encodation-200.inc.php: Added interleaving of RS error
+	  correcting coding for datasizes > 255
+
+2006-08-26 11:04  ljp
+
+	* datamatrix/bit-placement-bin-200.inc.php,
+	  datamatrix/encodation-200.inc.php: Some minor code refactoring
+
+2006-08-25 21:58  ljp
+
+	* datamatrix/backend.inc.php,
+	  datamatrix/bit-placement-bin-200.inc.php,
+	  datamatrix/datamatrix-140.inc.php,
+	  datamatrix/datamatrix-200.inc.php,
+	  datamatrix/encodation-200.inc.php: Corrected BASE256
+	  255-Randomization, Added inverse bit placement plus some
+	  enhancement for the ASCII backend.
+
+2006-08-24 11:19  ljp
+
+	* datamatrix/tests/dm-200-tst-driver.php,
+	  datamatrix/tests/dm-tst-driver.php: Test drivers for 140 and 200
+
+2006-08-24 11:18  ljp
+
+	* datamatrix/datamatrix-140.inc.php: Refactored common classes so
+	  they are nbo longer inherent within the datamatrix 140
+
+2006-08-24 11:17  ljp
+
+	* datamatrix/backend.inc.php, datamatrix/datamatrix-200.inc.php,
+	  datamatrix/printspec.inc.php: Refactored backend classes and added
+	  Datamatrix 200 main driver class
+
+2006-08-23 20:49  ljp
+
+	* datamatrix/bit-placement-200.inc.php,
+	  datamatrix/bit-placement-bin-200.inc.php,
+	  datamatrix/encodation-200.inc.php: Handle bit placement of
+	  rectangular matrice as well. Commented out unit test code
+
+2006-08-23 20:31  ljp
+
+	* datamatrix/encodation-200.inc.php: Improved decoding state machine
+	  and a small fix for ASCII encodation for ECC 200
+
+2006-08-23 20:31  ljp
+
+	* datamatrix/reed-solomon.inc.php: Fixed index problem for
+	  ReedSolomon encoding Galois Field off by on
+
+2006-08-23 13:36  ljp
+
+	* datamatrix/crc-ccitt.inc.php, datamatrix/datamatrix-140.inc.php,
+	  datamatrix/dm-utils.inc.php, datamatrix/encodation-140.inc.php,
+	  datamatrix/encodation-200.inc.php: Renamed internal functions and
+	  added decoding state machine to add in verification of Datamatrix
+
+2006-08-23 10:54  ljp
+
+	* datamatrix/encodation-200.inc.php: More improvement to autosizing
+	  for ECC 200
+
+2006-08-23 10:27  ljp
+
+	* datamatrix/encodation-200.inc.php: Added automatic size
+	  determination for ECC 200 Datamatrix encodatation
+
+2006-08-23 02:15  ljp
+
+	* datamatrix/bit-placement-200.inc.php,
+	  datamatrix/bit-placement-bin-200.inc.php: Added Id keyword for ECC
+	  200 bit placement files
+
+2006-08-23 02:12  ljp
+
+	* datamatrix/bindata/bitplacement_ECC200-108x108.dat,
+	  datamatrix/bindata/bitplacement_ECC200-10x10.dat,
+	  datamatrix/bindata/bitplacement_ECC200-10x24.dat,
+	  datamatrix/bindata/bitplacement_ECC200-10x32.dat,
+	  datamatrix/bindata/bitplacement_ECC200-120x120.dat,
+	  datamatrix/bindata/bitplacement_ECC200-12x12.dat,
+	  datamatrix/bindata/bitplacement_ECC200-132x132.dat,
+	  datamatrix/bindata/bitplacement_ECC200-14x14.dat,
+	  datamatrix/bindata/bitplacement_ECC200-14x32.dat,
+	  datamatrix/bindata/bitplacement_ECC200-14x44.dat,
+	  datamatrix/bindata/bitplacement_ECC200-16x16.dat,
+	  datamatrix/bindata/bitplacement_ECC200-18x18.dat,
+	  datamatrix/bindata/bitplacement_ECC200-20x20.dat,
+	  datamatrix/bindata/bitplacement_ECC200-22x22.dat,
+	  datamatrix/bindata/bitplacement_ECC200-24x24.dat,
+	  datamatrix/bindata/bitplacement_ECC200-28x28.dat,
+	  datamatrix/bindata/bitplacement_ECC200-32x32.dat,
+	  datamatrix/bindata/bitplacement_ECC200-36x36.dat,
+	  datamatrix/bindata/bitplacement_ECC200-40x40.dat,
+	  datamatrix/bindata/bitplacement_ECC200-44x44.dat,
+	  datamatrix/bindata/bitplacement_ECC200-48x48.dat,
+	  datamatrix/bindata/bitplacement_ECC200-56x56.dat,
+	  datamatrix/bindata/bitplacement_ECC200-64x64.dat,
+	  datamatrix/bindata/bitplacement_ECC200-6x16.dat,
+	  datamatrix/bindata/bitplacement_ECC200-6x28.dat,
+	  datamatrix/bindata/bitplacement_ECC200-72x72.dat,
+	  datamatrix/bindata/bitplacement_ECC200-80x80.dat,
+	  datamatrix/bindata/bitplacement_ECC200-88x88.dat,
+	  datamatrix/bindata/bitplacement_ECC200-8x8.dat,
+	  datamatrix/bindata/bitplacement_ECC200-96x96.dat,
+	  datamatrix/bit-placement-200.inc.php,
+	  datamatrix/bit-placement-bin-200.inc.php: Added Datamatrix ECC 200
+	  Bitplacement algorithm
+
+2006-08-23 02:12  ljp
+
+	* datamatrix/encodation-200.inc.php: Initialize all variables
+	  correctly for ECC 200 Encodation
+
+2006-08-22 20:03  ljp
+
+	* datamatrix/encodation-200.inc.php: Added initial version of
+	  Datamatrix 200 Encodation schema
+
+2006-08-21 21:02  ljp
+
+	* datamatrix/bindata, datamatrix/bindata/bitplacement-11.dat,
+	  datamatrix/bindata/bitplacement-13.dat,
+	  datamatrix/bindata/bitplacement-15.dat,
+	  datamatrix/bindata/bitplacement-17.dat,
+	  datamatrix/bindata/bitplacement-19.dat,
+	  datamatrix/bindata/bitplacement-21.dat,
+	  datamatrix/bindata/bitplacement-23.dat,
+	  datamatrix/bindata/bitplacement-25.dat,
+	  datamatrix/bindata/bitplacement-27.dat,
+	  datamatrix/bindata/bitplacement-29.dat,
+	  datamatrix/bindata/bitplacement-31.dat,
+	  datamatrix/bindata/bitplacement-33.dat,
+	  datamatrix/bindata/bitplacement-35.dat,
+	  datamatrix/bindata/bitplacement-37.dat,
+	  datamatrix/bindata/bitplacement-39.dat,
+	  datamatrix/bindata/bitplacement-41.dat,
+	  datamatrix/bindata/bitplacement-43.dat,
+	  datamatrix/bindata/bitplacement-45.dat,
+	  datamatrix/bindata/bitplacement-47.dat,
+	  datamatrix/bindata/bitplacement-7.dat,
+	  datamatrix/bindata/bitplacement-9.dat,
+	  datamatrix/bit-placement-bin-140.inc.php,
+	  datamatrix/datamatrix-140.inc.php: Added binary versions of bit
+	  placement matrices for ECC 000-140 Datamatrix to reduce PHP parse
+	  time.
+
+2006-08-21 03:27  ljp
+
+	* datamatrix/tests/bit-placement-140.inc.php,
+	  datamatrix/tests/dm-tst-driver.php: Added test driver for
+	  Datamatrix
+
+2006-08-21 03:22  ljp
+
+	* datamatrix/datamatrix-140.inc.php: Tidying up API for Datamatrix
+	  encode and backend
+
+2006-08-21 03:21  ljp
+
+	* datamatrix/master-rnd-140.inc.php: Random bits should ne 8 times
+	  the number of master random bytes (of course...)
+
+2006-08-21 03:21  ljp
+
+	* datamatrix/conv-140.inc.php: Added automix calculation of pad bits
+	  for convolutional encoder
+
+2006-08-21 01:21  ljp
+
+	* datamatrix/bit-placement-140.inc.php, datamatrix/conv-140.inc.php,
+	  datamatrix/crc-ccitt.inc.php, datamatrix/datamatrix-140.inc.php,
+	  datamatrix/dm-utils.inc.php, datamatrix/encodation-140.inc.php,
+	  datamatrix/master-rnd-140.inc.php: Initial version of datamatrix
+	  2D Barcode that passes unit test print specification
+
+2006-08-20 20:38  ljp
+
+	* datamatrix/conv-140.inc.php, datamatrix/conv.inc.php: Renamed
+	  conv.inc.php to conv-140.inc.php
+
+2006-08-20 20:38  ljp
+
+	* datamatrix/conv.inc.php, datamatrix/crc-ccitt.inc.php,
+	  datamatrix/reed-solomon.inc.php: Removed unit test calls
+
+2006-08-20 20:07  ljp
+
+	* datamatrix/master-rnd-ecc140.inc.php: Renamed master random file
+	  for 140
+
+2006-08-20 20:07  ljp
+
+	* datamatrix/encodation-140.inc.php,
+	  datamatrix/master-rnd-140.inc.php: Added 000 140 base11,27,37 and
+	  41 encodation schemas for datamatrix codes
+
+2006-08-20 16:11  ljp
+
+	* datamatrix/bit-placement-140.inc.php,
+	  datamatrix/reed-solomon.inc.php: Added ECC 000 140 Bit placement
+	  algorithm for Datamatrix 2D Barcode
+
+2006-08-20 16:10  ljp
+
+	* datamatrix/tests/bit-placement-140.inc.php: Added ECC 000 140 Bit
+	  placement algorithm for Datamatrix 2D Barcode
+
+2006-08-20 09:03  ljp
+
+	* datamatrix/master-rnd-ecc140.inc.php: Added master random bit
+	  handling for Datamatrix 0000 140 according to ISO 16022:2000(E)
+
+2006-08-20 09:02  ljp
+
+	* datamatrix/master-rnd-ecc140.inc.php: Added master random bit
+	  handling for Datamatrix 0000 140 according to ISO 16022:2000(E)
+
+2006-08-19 21:38  ljp
+
+	* datamatrix/reed-solomon.inc.php: Added Galois field arithmic and
+	  full support for generic Reed-Solomon encoding for use with Aztek,
+	  Datamatrix and QR 2D Barcodes
+
+2006-08-19 20:00  ljp
+
+	* datamatrix/conv.inc.php: Added ECC 140 Convolutional coding for
+	  Datamatrix ECC 000 - 140 together with unit test framework
+
+2006-08-19 11:41  ljp
+
+	* datamatrix/conv.inc.php: Added ECC 080 Convolutional coding for
+	  Datamatrix
+
+2006-08-19 10:54  ljp
+
+	* datamatrix/conv.inc.php: Added convolution coding class for
+	  Datamatrix implementation
+
+2006-08-18 17:42  ljp
+
+	* datamatrix/crc-ccitt.inc.php: Optimizing CRC-CCITT computaion for
+	  Datamatrix encoding
+
+2006-08-18 12:09  ljp
+
+	* datamatrix/crc-ccitt.inc.php: CRC Optimization
+
+2006-08-18 12:06  ljp
+
+	* datamatrix/crc-ccitt.inc.php: CRC Optimization
+
+2006-08-18 11:56  ljp
+
+	* datamatrix/crc-ccitt.inc.php: Updated CRC formatting
+
+2006-08-18 11:47  ljp
+
+	* datamatrix/crc-ccitt.inc.php: Added Id keyword
+
+2006-08-18 11:46  ljp
+
+	* datamatrix, datamatrix/crc-ccitt.inc.php, datamatrix/tests,
+	  datamatrix/tests/crc, datamatrix/tests/crc/conv.php,
+	  datamatrix/tests/crc/crc-itu.inc.php,
+	  datamatrix/tests/crc/crc_test.c: Added datamatrix directory
+
+2006-07-30 19:26  ljp
+
+	* jpgraph.php: PR#372 - Background image does not properly rotate
+	  when using Set90AndMargin
+
+2006-07-11 19:09  ljp
+
+	* jpgraph.php: PR#362 - CSIM cache filename includes invalid
+	  characters
+
+2006-06-29 03:48  ljp
+
+	* jpgraph_bar.php: Feature request: Do not optimize away drawing of
+	  0 value bars
+
+2006-06-28 21:39  ljp
+
+	* jpgraph_odo.php: Small layout update
+
+2006-05-27 22:38  ljp
+
+	* doenscript: Added enscript PDF script
+
+2006-05-27 22:36  ljp
+
+	* tests/aspam.html, tests/tst2.svg: Added more tests
+
+2006-05-27 22:35  ljp
+
+	* tests/csimcache: Removed csimcache
+
+2006-05-27 22:32  ljp
+
+	* tests/test_accbartable.php~, tests/test_accbartable_csim.php~,
+	  tests/test_antispam.php~, tests/test_barcsim.php~,
+	  tests/test_barcsim_form.php~, tests/test_bargrad3.php~,
+	  tests/test_barperc.php~, tests/test_bkgimage.php~,
+	  tests/test_bug223.php~, tests/test_bug235.php~,
+	  tests/test_bug260.php~, tests/test_bug261.php~,
+	  tests/test_bug293.php~, tests/test_bug297.php~,
+	  tests/test_bug312.php~, tests/test_bug313.php~,
+	  tests/test_bug314.php~, tests/test_bug316.php~,
+	  tests/test_bug319.php~, tests/test_bug320.php~,
+	  tests/test_bug326.php~, tests/test_bug330.php~,
+	  tests/test_bug338.php~, tests/test_bug347.php~,
+	  tests/test_dategetticks.php~, tests/test_ffbug.php~,
+	  tests/test_groupbar2.php~, tests/test_labelangle.php~,
+	  tests/test_linefillnull.php~, tests/test_linelargeval.php~,
+	  tests/test_linesimple.php~, tests/test_linetable.php~,
+	  tests/test_pie3d.php~, tests/test_pieaa.php~,
+	  tests/test_piecolorbug.php~, tests/test_pielegend.php~,
+	  tests/test_piesimple.php~, tests/test_radaraxistitle2.php~,
+	  tests/test_radarformatting.php~, tests/test_radarticks.php~,
+	  tests/test_radarticks4.php~, tests/test_table2.php~,
+	  tests/test_table_flagex1.php~, tests/test_table_howto1.php~,
+	  tests/test_table_howto2.php~, tests/test_table_howto3.php~,
+	  tests/test_table_howto4.php~, tests/test_table_howto5.php~,
+	  tests/test_table_howto6.php~, tests/test_table_howto7.php~,
+	  tests/test_table_howto8.php~, tests/test_table_howto9.php~,
+	  tests/test_table_iconex1.php~, tests/test_table_mex0.php~,
+	  tests/test_table_mex00.php~, tests/test_table_mex1.php~,
+	  tests/test_table_mex2.php~, tests/test_table_mex3.php~,
+	  tests/test_y2grouobar.php~, tests/test_y2groupbar.php~,
+	  tests/test_ygridfill.php~: Removed backup files
+
+2006-05-27 22:17  ljp
+
+	* tests/ajax, tests/ajax/ibm-src, tests/ajax/ibm-src/Sajax.php,
+	  tests/ajax/ibm-src/ajax-app.php,
+	  tests/ajax/ibm-src/between-link.html, tests/ajax/ibm-src/content,
+	  tests/ajax/ibm-src/content/fig02.jpg,
+	  tests/ajax/ibm-src/content/fig03.jpg,
+	  tests/ajax/ibm-src/content/fig04.jpg,
+	  tests/ajax/ibm-src/content/fig05.jpg,
+	  tests/ajax/ibm-src/content/fig06.jpg,
+	  tests/ajax/ibm-src/footer.html, tests/ajax/ibm-src/header.html,
+	  tests/ajax/ibm-src/panel-0.html, tests/ajax/ibm-src/panel-1.html,
+	  tests/ajax/ibm-src/panel-2.html, tests/ajax/ibm-src/panel-3.html,
+	  tests/ajax/ibm-src/panel-4.html, tests/ajax/ibm-src/panel-5.html,
+	  tests/ajax/ibm-src/panel-6.html, tests/ajax/ibm-src/panel-7.html,
+	  tests/ajax/ibm-src/panel-8.html, tests/ajax/ibm-src/panel-9.html,
+	  tests/ajax/ibm-src/panels-ajax.php,
+	  tests/ajax/ibm-src/panels-sajax.php,
+	  tests/ajax/ibm-src/pre-content.html,
+	  tests/ajax/ibm-src/sajax-app.php, tests/ajax/icon_error.gif,
+	  tests/ajax/img, tests/ajax/img/pieaa0.png,
+	  tests/ajax/img/pieaa10.png, tests/ajax/img/pieaa100.png,
+	  tests/ajax/img/pieaa105.png, tests/ajax/img/pieaa110.png,
+	  tests/ajax/img/pieaa115.png, tests/ajax/img/pieaa120.png,
+	  tests/ajax/img/pieaa125.png, tests/ajax/img/pieaa130.png,
+	  tests/ajax/img/pieaa135.png, tests/ajax/img/pieaa140.png,
+	  tests/ajax/img/pieaa145.png, tests/ajax/img/pieaa15.png,
+	  tests/ajax/img/pieaa150.png, tests/ajax/img/pieaa155.png,
+	  tests/ajax/img/pieaa160.png, tests/ajax/img/pieaa165.png,
+	  tests/ajax/img/pieaa170.png, tests/ajax/img/pieaa175.png,
+	  tests/ajax/img/pieaa180.png, tests/ajax/img/pieaa185.png,
+	  tests/ajax/img/pieaa190.png, tests/ajax/img/pieaa195.png,
+	  tests/ajax/img/pieaa20.png, tests/ajax/img/pieaa200.png,
+	  tests/ajax/img/pieaa205.png, tests/ajax/img/pieaa210.png,
+	  tests/ajax/img/pieaa215.png, tests/ajax/img/pieaa220.png,
+	  tests/ajax/img/pieaa225.png, tests/ajax/img/pieaa230.png,
+	  tests/ajax/img/pieaa235.png, tests/ajax/img/pieaa240.png,
+	  tests/ajax/img/pieaa245.png, tests/ajax/img/pieaa25.png,
+	  tests/ajax/img/pieaa250.png, tests/ajax/img/pieaa255.png,
+	  tests/ajax/img/pieaa260.png, tests/ajax/img/pieaa265.png,
+	  tests/ajax/img/pieaa270.png, tests/ajax/img/pieaa275.png,
+	  tests/ajax/img/pieaa280.png, tests/ajax/img/pieaa285.png,
+	  tests/ajax/img/pieaa290.png, tests/ajax/img/pieaa295.png,
+	  tests/ajax/img/pieaa30.png, tests/ajax/img/pieaa300.png,
+	  tests/ajax/img/pieaa305.png, tests/ajax/img/pieaa310.png,
+	  tests/ajax/img/pieaa315.png, tests/ajax/img/pieaa320.png,
+	  tests/ajax/img/pieaa325.png, tests/ajax/img/pieaa330.png,
+	  tests/ajax/img/pieaa335.png, tests/ajax/img/pieaa340.png,
+	  tests/ajax/img/pieaa345.png, tests/ajax/img/pieaa35.png,
+	  tests/ajax/img/pieaa350.png, tests/ajax/img/pieaa355.png,
+	  tests/ajax/img/pieaa40.png, tests/ajax/img/pieaa45.png,
+	  tests/ajax/img/pieaa5.png, tests/ajax/img/pieaa50.png,
+	  tests/ajax/img/pieaa55.png, tests/ajax/img/pieaa60.png,
+	  tests/ajax/img/pieaa65.png, tests/ajax/img/pieaa70.png,
+	  tests/ajax/img/pieaa75.png, tests/ajax/img/pieaa80.png,
+	  tests/ajax/img/pieaa85.png, tests/ajax/img/pieaa90.png,
+	  tests/ajax/img/pieaa95.png, tests/ajax/janprog,
+	  tests/ajax/janprog/createimage.php, tests/ajax/janprog/image.php,
+	  tests/ajax/janprog/janprogajax.html,
+	  tests/ajax/janprog/janprogajax.tar.gz,
+	  tests/ajax/janprog/jpajax.js, tests/ajax/janprog/wordmunge.php,
+	  tests/ajax/sajax, tests/ajax/sajax-0.12,
+	  tests/ajax/sajax-0.12/Changes.txt,
+	  tests/ajax/sajax-0.12/Readme.txt, tests/ajax/sajax-0.12/Todo.txt,
+	  tests/ajax/sajax-0.12/asp, tests/ajax/sajax-0.12/asp/Readme.txt,
+	  tests/ajax/sajax-0.12/coldfusion,
+	  tests/ajax/sajax-0.12/coldfusion/Readme.txt,
+	  tests/ajax/sajax-0.12/coldfusion/example_multiply.cfm,
+	  tests/ajax/sajax-0.12/coldfusion/sajax.cfm,
+	  tests/ajax/sajax-0.12/coldfusion/test_sajax.cfm,
+	  tests/ajax/sajax-0.12/io, tests/ajax/sajax-0.12/io/Sajax.io,
+	  tests/ajax/sajax-0.12/io/example_multiply.io,
+	  tests/ajax/sajax-0.12/lua, tests/ajax/sajax-0.12/lua/Readme.txt,
+	  tests/ajax/sajax-0.12/lua/calculator.lp,
+	  tests/ajax/sajax-0.12/lua/sajax.lua, tests/ajax/sajax-0.12/perl,
+	  tests/ajax/sajax-0.12/perl/Readme.txt,
+	  tests/ajax/sajax-0.12/perl/Sajax.pm,
+	  tests/ajax/sajax-0.12/perl/example_multiply.cgi,
+	  tests/ajax/sajax-0.12/php, tests/ajax/sajax-0.12/php/Readme.txt,
+	  tests/ajax/sajax-0.12/php/Sajax.php,
+	  tests/ajax/sajax-0.12/php/example_date.php,
+	  tests/ajax/sajax-0.12/php/example_multiply.php,
+	  tests/ajax/sajax-0.12/php/example_options.php,
+	  tests/ajax/sajax-0.12/php/example_types.php,
+	  tests/ajax/sajax-0.12/php/example_wall.php,
+	  tests/ajax/sajax-0.12/python,
+	  tests/ajax/sajax-0.12/python/License.txt,
+	  tests/ajax/sajax-0.12/python/Readme.txt,
+	  tests/ajax/sajax-0.12/python/multiply.py,
+	  tests/ajax/sajax-0.12/python/sajax1.py,
+	  tests/ajax/sajax-0.12/python/wall.py, tests/ajax/sajax-0.12/ruby,
+	  tests/ajax/sajax-0.12/ruby/Readme.txt,
+	  tests/ajax/sajax-0.12/ruby/Sajax.rb,
+	  tests/ajax/sajax/sajax-0.12.tgz, tests/ajax/server.php,
+	  tests/ajax/test_pieaa.png, tests/ajax/tst.html,
+	  tests/ajax/tst2.html: Added Ajax tests
+
+2006-05-27 22:15  ljp
+
+	* tests/test_accbartable.php~, tests/test_accbartable_csim.php~,
+	  tests/test_antispam.php~, tests/test_barcsim.php~,
+	  tests/test_barcsim_form.php, tests/test_barcsim_form.php~,
+	  tests/test_bargrad3.php, tests/test_bargrad3.php~,
+	  tests/test_barperc.php, tests/test_barperc.php~,
+	  tests/test_bkgimage.php~, tests/test_bug223.php,
+	  tests/test_bug223.php~, tests/test_bug235.php~,
+	  tests/test_bug260.php, tests/test_bug260.php~,
+	  tests/test_bug261.php~, tests/test_bug293.php~,
+	  tests/test_bug297.php~, tests/test_bug312.php,
+	  tests/test_bug312.php~, tests/test_bug313.php,
+	  tests/test_bug313.php~, tests/test_bug314.php~,
+	  tests/test_bug316.php, tests/test_bug316.php~,
+	  tests/test_bug319.php, tests/test_bug319.php~,
+	  tests/test_bug320.php, tests/test_bug320.php~,
+	  tests/test_bug326.php, tests/test_bug326.php~,
+	  tests/test_bug330.php, tests/test_bug330.php~,
+	  tests/test_bug338.php, tests/test_bug338.php~,
+	  tests/test_bug347.php, tests/test_bug347.php~,
+	  tests/test_dategetticks.php, tests/test_dategetticks.php~,
+	  tests/test_ffbug.php, tests/test_ffbug.php~,
+	  tests/test_groupbar2.php, tests/test_groupbar2.php~,
+	  tests/test_labelangle.php, tests/test_labelangle.php~,
+	  tests/test_linefillnull.php~, tests/test_linelargeval.php~,
+	  tests/test_linesimple.php~, tests/test_linetable.php~,
+	  tests/test_pie3d.php~, tests/test_pieaa.php,
+	  tests/test_pieaa.php~, tests/test_piecolorbug-ph,
+	  tests/test_piecolorbug.php, tests/test_piecolorbug.php~,
+	  tests/test_pielegend.php~, tests/test_piesimple.php~,
+	  tests/test_radaraxistitle2.php, tests/test_radaraxistitle2.php~,
+	  tests/test_radarformatting.php, tests/test_radarformatting.php~,
+	  tests/test_radarticks.php~, tests/test_radarticks4.php,
+	  tests/test_radarticks4.php~, tests/test_table2.php~,
+	  tests/test_table_flagex1.php~, tests/test_table_howto1.php~,
+	  tests/test_table_howto2.php~, tests/test_table_howto3.php~,
+	  tests/test_table_howto4.php~, tests/test_table_howto5.php~,
+	  tests/test_table_howto6.php~, tests/test_table_howto7.php~,
+	  tests/test_table_howto8.php~, tests/test_table_howto9.php~,
+	  tests/test_table_iconex1.php~, tests/test_table_mex0.php~,
+	  tests/test_table_mex00.php~, tests/test_table_mex1.php~,
+	  tests/test_table_mex2.php~, tests/test_table_mex3.php~,
+	  tests/test_y2grouobar.php~, tests/test_y2groupbar.php~,
+	  tests/test_ygridfill.php, tests/test_ygridfill.php~: Updated tests
+
+2006-05-27 22:15  ljp
+
+	* tests/csimcache/test_bug261.png,
+	  tests/csimcache/test_bug261_csim_.html, tests/test_barcsim.php,
+	  tests/test_bug261.php, tests/test_linesimple.php,
+	  tests/test_pie3d.php: Updated tests
+
+2006-05-26 14:31  ljp
+
+	* jpgraph.php: PR#334 - Labels shown behind the bars instead of
+	  upfront
+
+2006-05-26 13:21  ljp
+
+	* jpg-config.inc, jpgraph.php: FR#358 - Add support for greek
+	  character conversion
+
+2006-05-26 09:34  ljp
+
+	* jpgraph.php: PR#275 - CSIM Cache Ignores URL parameters
+
+2006-05-26 00:51  ljp
+
+	* jpgraph.php, jpgraph_bar.php, jpgraph_plotmark.inc,
+	  lang/de.inc.php, lang/en.inc.php: PR#342 - XHTML Clean up
+
+2006-05-26 00:23  ljp
+
+	* jpgraph.php: PR#349 - Legend::Stroke casting problem
+
+2006-05-26 00:09  ljp
+
+	* jpgraph_gradient.php: PR335 - Fix to to/from ordering in GRAD_DIAG
+
+2006-05-08 19:37  ljp
+
+	* table_examples/tablebarex1_csim.php,
+	  table_examples/tableex01_csim.php: Added CSIM table examples
+
+2006-05-08 19:00  ljp
+
+	* jpgraph_canvas.php: FR#354 - Add support for CSIM in canvas graphs
+
+2006-05-07 10:47  ljp
+
+	* jpgraph.php, jpgraph_bar.php, jpgraph_pie.php, jpgraph_pie3d.php,
+	  svg_image.inc.php: Make sure image class is passed as reference to
+	  adjust for SVG version of image class. Optimize SVG ath generation
+
+2006-05-07 10:03  ljp
+
+	* svg_image.inc.php: Updated svg_image class to force locale to
+	  always use a dot as decimal separator regardless of locale used
+
+2006-05-07 09:59  ljp
+
+	* Examples/example23.php: Removed local setting in example
+
+2006-05-07 02:09  ljp
+
+	* Examples/combgraphex1.php, Examples/manualtickex1.php: Update for
+	  new version of DateScaleUtils which cannot be called statically
+
+2006-05-07 02:08  ljp
+
+	* jpgraph.php: Make sure gd is used by defaylt and not SVG
+
+2006-05-07 01:56  ljp
+
+	* gd_image.inc.php: Moved class Image to its own file
+
+2006-05-07 01:54  ljp
+
+	* Examples/example26.1.php, jpg-config.inc, jpgraph.php,
+	  svg_image.inc.php, tests/test_antispam.php,
+	  tests/test_bkgimage.php, tests/test_linesimple.php,
+	  tests/test_linetable.php, tests/test_pie3d.php,
+	  tests/test_pielegend.php, tests/test_piesimple.php,
+	  tests/test_table2.php: Added first experiemental version of SVG
+	  output for Image class with new svg_image.inc.php file
+
+2006-04-19 19:35  ljp
+
+	* jpgraph_regstat.php: FS#346 - Bezier interpolation broken for
+	  attraction_factor != 1
+
+2006-04-03 19:30  ljp
+
+	* jpgraph.php: FS#341 - Take daylight savings into account for date
+	  scale
+
+2006-03-29 19:15  ljp
+
+	* jpgraph_bar.php: FS#339 - Make sure there are no error messages
+	  when cliesnts forget to set Alt texts in conjunction with CSIM
+
+2006-03-26 10:47  ljp
+
+	* jpgraph.php: Add small 'w' to differentiate weeks in the scale as
+	  compared to dates. Don't encode entire <img> CSIM script tag with
+	  htmlentities
+
+2006-03-23 18:37  ljp
+
+	* jpgraph_radar.php: FR#336 - Make it possible to use auto-tcks on a
+	  manually specified radar scale
+
+2006-03-21 19:40  ljp
+
+	* jpgraph_gradient.php: FR#331 - Add new diagonal gradient type
+
+2006-03-21 17:34  ljp
+
+	* lang/de.inc.php: Set ID property of new German language file
+
+2006-03-21 17:32  ljp
+
+	* lang/de.inc.php: Added German translation of error messages
+
+2006-03-13 19:56  ljp
+
+	* jpgraph_utils.inc: Add possibility to create semi-auto scaled date
+	  ticks in DateScaleUtils
+
+2006-03-12 19:15  ljp
+
+	* jpg-config.inc, jpgraph.php: FR#328 - Auto detect cyrillic
+	  conversion
+
+2006-03-12 09:55  ljp
+
+	* jpgraph_utils.inc: FR#329 - Add additional date tick intervals in
+	  DateScaleUtils
+
+2006-03-12 09:49  ljp
+
+	* jpgraph.php: Removed un-neccesary exit() callse
+
+2006-03-11 09:50  ljp
+
+	* jpgraph.php: Additional error checking for client trying to pass
+	  strings as X-coordinates
+
+2006-03-11 09:44  ljp
+
+	* jpgraph_table.php, lang/en.inc.php, lang/prod.inc.php: PR#327 -
+	  Duplicate internal error numbers for tables and utils
+
+2006-03-04 18:55  ljp
+
+	* jpgraph_gantt.php, tests/test_bug314.php: FS#314 - Graph width
+	  incompatible with additional columns in Gantt chart
+
+2006-03-04 15:18  ljp
+
+	* jpgraph_bar.php, tests/test_bug235.php: FS235 - SetWidth() does
+	  not work for GroupBarPlot.
+
+2006-03-04 14:36  ljp
+
+	* jpg-config.inc, jpgraph.php: Make default error locale
+	  customizable
+
+2006-03-04 13:48  ljp
+
+	* jpg-config.inc, jpgraph.php, lang/en.inc.php, lang/prod.inc.php:
+	  FS#323 - Add automatic EUC-JP to UTF8 Japanes encoding
+
+2006-03-04 12:13  ljp
+
+	* jpgraph_bar.php: Bar Enhancement: Interpret a width > 1 in
+	  SetWidth() as absolute pixel width
+
+2006-03-04 11:04  ljp
+
+	* jpgraph_pie.php, tests/test_bug297.php: FS#297 - Wrong positioning
+	  of icon using antialiasing and pieplot
+
+2006-03-04 10:41  ljp
+
+	* jpgraph_date.php: FS#316 - Manually scaled x-date-scale doesn't
+	  use date format
+
+2006-03-04 10:26  ljp
+
+	* jpgraph_pie3d.php, tests/test_bug293.php: CR#293 - Add label
+	  adjustments to 3D Pie
+
+2006-03-01 21:34  ljp
+
+	* jpgraph.php, lang/en.inc.php, lang/prod.inc.php: CR#318 - Add
+	  check for minimum required PHP version
+
+2006-02-19 10:49  ljp
+
+	* jpgraph_utils.inc: FR#305 - Handling of endpoints for
+	  DateScaleUtils
+
+2006-02-19 10:33  ljp
+
+	* jpgraph.php: Make sure locale is marked as GLOBAL
+
+2006-02-19 10:33  ljp
+
+	* lang/en.inc.php: Set property Id for locale file
+
+2006-02-19 09:02  ljp
+
+	* jpgraph.php, lang/en.inc.php, lang/prod.inc.php: Added prod error
+	  locale and method to control locale
+
+2006-02-18 07:45  ljp
+
+	* jpgraph.php: Bumped version string to 1.20.3
+
+2006-02-18 07:37  ljp
+
+	* Examples/combgraphex1.php, Examples/tableex00.php,
+	  Examples/tableex01.php, Examples/tableex02.php,
+	  Examples/tableex03.php, table_examples,
+	  table_examples/tablebarex1.php, table_examples/tableex00.php,
+	  table_examples/tableex01.php, table_examples/tableex02.php,
+	  table_examples/tableex03.php, table_examples/tableex04.php,
+	  table_examples/tableex05.php: Moved table examples to its own
+	  directory
+
+2006-02-18 07:31  ljp
+
+	* tests/test_0bar.php, tests/test_accbartable.php,
+	  tests/test_accbartable_csim.php, tests/test_barlinecenter.php,
+	  tests/test_dateinty2.php, tests/test_flag.php,
+	  tests/test_linefillnull.php, tests/test_linelargeval.php,
+	  tests/test_linesimple.php, tests/test_linetable.php,
+	  tests/test_php5date.php, tests/test_radaraxistitle.php,
+	  tests/test_table1.php, tests/test_table2.php,
+	  tests/test_table3.php, tests/test_table_flagex1.php,
+	  tests/test_table_howto1.php, tests/test_table_howto2.php,
+	  tests/test_table_howto3.php, tests/test_table_howto4.php,
+	  tests/test_table_howto5.php, tests/test_table_howto6.php,
+	  tests/test_table_howto7.php, tests/test_table_howto8.php,
+	  tests/test_table_howto9.php, tests/test_table_iconex1.php,
+	  tests/test_table_mex0.php, tests/test_table_mex00.php,
+	  tests/test_table_mex1.php, tests/test_table_mex2.php,
+	  tests/test_table_mex3.php, tests/test_y2grouobar.php,
+	  tests/test_y2groupbar.php, tests/test_y2synch.php,
+	  tests/test_y2synch2.php: Added some more test cases
+
+2006-02-14 20:10  ljp
+
+	* jpgraph_gantt.php: FS#308 - Make JpGraph classes extendable by
+	  using is_a() instead of get_class()
+
+2006-02-14 20:10  ljp
+
+	* jpgraph.php, jpgraph_bar.php, jpgraph_pie.php,
+	  jpgraph_windrose.php: FS#308 - Make JpGraph classes extendable by
+	  using is_a() instead of get_class()
+
+2006-02-14 17:27  ljp
+
+	* jpgraph_table.php: Some minor code layout changes
+
+2006-02-14 06:51  ljp
+
+	* jpgraph_bar.php, lang/en.inc.php: Added error check for number of
+	  data points in each in AccBar
+
+2006-02-13 06:42  ljp
+
+	* lang/en.inc.php: Removed HTML formatting in error message
+
+2006-02-12 08:56  ljp
+
+	* lang/en.inc.php: Added new error message for GTextTable constrains
+
+2006-02-12 08:27  ljp
+
+	* jpgraph.php, jpgraph_table.php: Added SetScalePos(),
+	  SetAnchorPos() and CSIM capabilities to tables
+
+2006-02-11 10:32  ljp
+
+	* utils/jpdocgen/de_utils.php, utils/jpdocgen/jpgendb.php,
+	  utils/jpdocgen/jplintphp.php: Fixed buffer overflow for long
+	  lines, prper mysql escaping of strings
+
+2006-02-11 08:33  ljp
+
+	* jpgraph_table.php: Updated table image API to follow the table
+	  setting pattern
+
+2006-02-11 08:07  ljp
+
+	* jpgraph_table.php: Added possibility to use current scale to
+	  position GTextTable
+
+2006-02-09 16:34  ljp
+
+	* jpgraph_table.php: Make sure padding API follow the general API
+	  design for GTextTable
+
+2006-02-08 21:29  ljp
+
+	* jpgraph_table.php: Height and width calculation whould use max of
+	  value and image for table cell size
+
+2006-02-08 21:22  ljp
+
+	* jpgraph_iconplot.php, jpgraph_table.php: Added background images
+	  in individual cells for GTextTable
+
+2006-02-06 06:21  ljp
+
+	* jpgraph_table.php, lang/en.inc.php: Some more error checking for
+	  GTextTable and generalization of the SetNumberFormat() method to
+	  follow the practice of range setting
+
+2006-02-05 20:48  ljp
+
+	* jpgraph_table.php, lang/en.inc.php: Added additional error check
+	  and default values for Tables
+
+2006-02-05 16:46  ljp
+
+	* jpgraph.php, jpgraph_table.php, lang/en.inc.php: Update GTextTable
+	  SetAlign with new error message. Added check for invalid error
+	  message index.
+
+2006-02-05 10:00  ljp
+
+	* Examples/tableex03.php: Updated table example
+
+2006-02-05 09:53  ljp
+
+	* jpgraph.php: Make sure comparison is type safe for handling of
+	  parameterized error messages
+
+2006-02-05 09:48  ljp
+
+	* lang/en.inc.php: Updated localized error messages for table
+
+2006-02-05 09:44  ljp
+
+	* jpgraph_table.php: Added NumberFormat option for table formatting,
+
+2006-02-04 15:53  ljp
+
+	* tests/.xvpics: Directory cleanup
+
+2006-02-04 15:51  ljp
+
+	* jpgraph_mgraph.php, jpgraph_pdf417.php, jpgraph_table.php,
+	  jpgraph_utils.inc, pdf417_backends.inc, pdf417_clusters.inc,
+	  pdf417_compressors.inc, pdf417_error.inc: Propset Id
+
+2006-02-04 12:46  ljp
+
+	* jpgraph.php: Removed extra exit()
+
+2006-02-04 12:45  ljp
+
+	* jpgraph_gradient.php: Localized jpgraph_gradient
+
+2006-02-04 12:44  ljp
+
+	* jpgraph_barcode.php: Localized Linear Barcode error messages
+
+2006-02-04 12:33  ljp
+
+	* jpgraph_pdf417.php, pdf417_backends.inc, pdf417_clusters.inc,
+	  pdf417_compressors.inc, pdf417_error.inc: Localized PDF417
+
+2006-02-04 12:31  ljp
+
+	* jpgraph_utils.inc: Localized error messages in jpgraph_utils.php
+
+2006-02-04 12:29  ljp
+
+	* jpgraph_stock.php: Localized error messages in jpgraph_stock.php
+
+2006-02-04 12:28  ljp
+
+	* jpgraph_scatter.php: Localized error messages in
+	  jpgraph_scatter.php
+
+2006-02-04 12:26  ljp
+
+	* jpgraph_radar.php: Localized error messages in jpgraph_radar.php
+
+2006-02-04 12:25  ljp
+
+	* jpgraph_polar.php: Localized error messages in jpgraph_polar.php
+
+2006-02-04 12:20  ljp
+
+	* jpgraph_plotmark.inc: Localized error messages in
+	  jpgraph_plotmark.inc
+
+2006-02-04 12:19  ljp
+
+	* jpgraph_plotband.php: Localized error messages in
+	  jpgraph_plotband.php
+
+2006-02-04 12:18  ljp
+
+	* jpgraph_mgraph.php: Localized error messages in jpgraph_mgraph.php
+
+2006-02-04 12:17  ljp
+
+	* jpgraph_log.php: Localized error messages in jpgraph_log.php
+
+2006-02-04 12:16  ljp
+
+	* jpgraph_imgtrans.php: Localized error messages in
+	  jpgraph_imgtrans.php
+
+2006-02-04 12:15  ljp
+
+	* jpgraph_iconplot.php: Localized error messages in
+	  jpgraph_iconplot.php
+
+2006-02-04 12:14  ljp
+
+	* jpgraph_gantt.php: Localized error messages in jpgraph_gantt.php
+
+2006-02-04 12:12  ljp
+
+	* jpgraph_flags.php: Localized error messages in jpgraph_flags.php
+
+2006-02-04 12:11  ljp
+
+	* jpgraph_date.php: Localized error messages in jpgraph_date.php
+
+2006-02-04 12:10  ljp
+
+	* jpgraph_windrose.php: Localized error messages in
+	  jpgraph_windrose.php
+
+2006-02-04 12:09  ljp
+
+	* jpgraph_odo.php: Localized error messages in jpgraph_odo.php
+
+2006-02-04 12:07  ljp
+
+	* jpgraph_regstat.php: Localized error messages in
+	  jpgraph_regstat.php
+
+2006-02-04 12:06  ljp
+
+	* jpgraph_error.php: Localized error messages in jpgraph_error.php
+
+2006-02-04 12:05  ljp
+
+	* jpgraph_pie3d.php: Localized error messages in jpgraph_pie3d.php
+
+2006-02-04 12:04  ljp
+
+	* jpgraph_pie.php: Localized error messages in jpgraph_pie.php
+
+2006-02-04 12:01  ljp
+
+	* jpgraph_line.php: Localized error messages in main
+	  jpgraph_line.php
+
+2006-02-04 11:40  ljp
+
+	* jpgraph.php: Localized error messages in main jpgraph.php
+
+2006-02-04 11:31  ljp
+
+	* lang/en.inc.php: Further english resource file update
+
+2006-02-04 10:06  ljp
+
+	* jpgraph_bar.php: Added localized error messages to jpgraph_bar.php
+
+2006-02-04 10:03  ljp
+
+	* lang/en.inc.php: Updated english resource file
+
+2006-02-04 10:03  ljp
+
+	* jpgraph_table.php: Added localized error messages to
+	  jpgraph_table.php
+
+2006-02-04 09:29  ljp
+
+	* lang/en.inc.php.backup, lang/en.inc.php.backup2: Removed backup
+	  versions of english language resource files
+
+2006-02-04 09:28  ljp
+
+	* lang, lang/en.inc.php, lang/en.inc.php.backup,
+	  lang/en.inc.php.backup2: Added language resource files
+
+2006-02-02 18:03  ljp
+
+	* jpgraph_table.php: Added align arguments for Merge() methods
+
+2006-02-02 06:35  ljp
+
+	* jpgraph_table.php: Added error checking when merging table cells
+
+2006-01-30 22:35  ljp
+
+	* jpgraph.php: Fix spelling error in error message
+
+2006-01-30 21:52  ljp
+
+	* jpgraph_table.php: API restructuring in the GTextTable to make it
+	  easier to use ranges
+
+2006-01-29 21:36  ljp
+
+	* Examples/tableex00.php, Examples/tableex01.php,
+	  Examples/tableex02.php, Examples/tableex03.php: Added examples on
+	  the use of GTextTable
+
+2006-01-29 21:26  ljp
+
+	* jpgraph.php: PR#306 - Icons are not added as references
+
+2006-01-29 20:42  ljp
+
+	* jpgraph_table.php: Fixed typos and a problem with the width
+	  calculation of merged cells
+
+2006-01-29 19:17  ljp
+
+	* jpgraph_table.php: Adjusted vertical position calculation to avoid
+	  issue with baselining of TTF fonts
+
+2006-01-29 16:10  ljp
+
+	* jpgraph_table.php: Added API in table handling so that all major
+	  settings now has the same structure, entire table, specific row,
+	  specific column or specific cell
+
+2006-01-29 12:26  ljp
+
+	* jpgraph_table.php: GTextTable: Added API for table row and column
+	  font color setting
+
+2006-01-29 09:10  ljp
+
+	* jpgraph_table.php: Major ovehaul of GTextTable. Added possibility
+	  to merge cells, Added range error check for all methods, Major
+	  refactoring of grid line drawing for tables (this is now the
+	  responsibility of the individual cells)
+
+2006-01-26 21:45  ljp
+
+	* jpgraph_table.php: Changed column width/height handling so that
+	  the specification is interpretated as a min height/width
+
+2006-01-26 21:22  ljp
+
+	* jpgraph_table.php: Added possibility to use different grid styles
+	  on graphic tables
+
+2006-01-26 07:44  ljp
+
+	* jpgraph.php, jpgraph_canvas.php, jpgraph_table.php,
+	  tests/test_flag.php, tests/test_ttf.php: CR#160 - Data tables on
+	  the graphs. Added jpgraph_table.php that implements GTextTable
+	  class that will allow text tables to be created as graphical
+	  objects and added to teh graphs. The tables have basic formatting
+	  capabilities as well as auto-sizing depending on the data in each
+	  cell.
+
+2006-01-21 17:34  ljp
+
+	* Examples/gantthourex1.php, Examples/gantthourminex1.php: Adjust
+	  date format to comply with newer versions of PHP
+
+2006-01-18 19:06  ljp
+
+	* jpgraph_flags.php: Fix PR#304 - Flag index for Replublic of Peru
+	  missing
+
+2006-01-18 18:42  ljp
+
+	* jpgraph.php: Fix PR#303 - E_STRICT not available in PHP4
+
+2006-01-15 20:25  ljp
+
+	* jpgraph.php: Small modification to error checking when streaming
+	  image to a file
+
+2006-01-15 20:24  ljp
+
+	* tests/data.csv~, tests/test_automin.php~,
+	  tests/test_barcode128.php~, tests/test_bargrad.php~,
+	  tests/test_bargrad2.php~, tests/test_barpattern.php~,
+	  tests/test_barsimple2.php~, tests/test_barsimple3.php~,
+	  tests/test_barsimple4.php~, tests/test_bug123.php~,
+	  tests/test_bug130.php~, tests/test_bug168.php~,
+	  tests/test_bug208.php~, tests/test_bug210.php~,
+	  tests/test_bug214.php~, tests/test_bug229.php~,
+	  tests/test_bug231.php~, tests/test_bug233.php~,
+	  tests/test_bug238.php~, tests/test_bug239.php~,
+	  tests/test_bug246.php~, tests/test_bug252.php~,
+	  tests/test_bug253.php~, tests/test_bug254.php~,
+	  tests/test_bug261.php~, tests/test_bug270.php~,
+	  tests/test_bug272.php~, tests/test_bug275.php~,
+	  tests/test_bug279.php~, tests/test_bug283.php~,
+	  tests/test_bug287.php~, tests/test_bug289.php~,
+	  tests/test_bug298.php~, tests/test_bug68.php~,
+	  tests/test_datetickposbug.php~, tests/test_dateweight.php~,
+	  tests/test_ganttpro.php~, tests/test_ganttweekbug.php~,
+	  tests/test_line.php~, tests/test_lineiconstring.php~,
+	  tests/test_logscale.php~, tests/test_manualticks5.php~,
+	  tests/test_markcsim.php~, tests/test_mgraph.php~,
+	  tests/test_mgraph2.php~, tests/test_mgraph3.php~,
+	  tests/test_mulyaxis.php~, tests/test_mulycsim.php~,
+	  tests/test_odo2.php~, tests/test_pie3d.php~,
+	  tests/test_pie3d_1.php~, tests/test_radarbug248.php~,
+	  tests/test_radarticks3.php~, tests/test_readcsv.php~,
+	  tests/test_symchar.php~, tests/test_text90.php~,
+	  tests/test_texttick.php~: Removed a number of backup files that
+	  was acidentely comitted
+
+2006-01-15 20:23  ljp
+
+	* tests/bigredtigerfront.jpg, tests/csimcache,
+	  tests/csimcache/test_bug261.png,
+	  tests/csimcache/test_bug261_csim_.html, tests/data.csv,
+	  tests/data.csv~, tests/dataforbug253.txt, tests/test_automin.php,
+	  tests/test_automin.php~, tests/test_barcode128.php,
+	  tests/test_barcode128.php~, tests/test_bargrad.php,
+	  tests/test_bargrad.php~, tests/test_bargrad2.php,
+	  tests/test_bargrad2.php~, tests/test_barpattern.php,
+	  tests/test_barpattern.php~, tests/test_barsimple2.php,
+	  tests/test_barsimple2.php~, tests/test_barsimple3.php,
+	  tests/test_barsimple3.php~, tests/test_barsimple4.php,
+	  tests/test_barsimple4.php~, tests/test_bug123.php,
+	  tests/test_bug123.php~, tests/test_bug130.php,
+	  tests/test_bug130.php~, tests/test_bug168.php,
+	  tests/test_bug168.php~, tests/test_bug208.php,
+	  tests/test_bug208.php~, tests/test_bug210.php,
+	  tests/test_bug210.php~, tests/test_bug214.php,
+	  tests/test_bug214.php~, tests/test_bug229.php,
+	  tests/test_bug229.php~, tests/test_bug231.php,
+	  tests/test_bug231.php~, tests/test_bug233.php,
+	  tests/test_bug233.php~, tests/test_bug238.php,
+	  tests/test_bug238.php~, tests/test_bug238b.php,
+	  tests/test_bug239.php, tests/test_bug239.php~,
+	  tests/test_bug246.php, tests/test_bug246.php~,
+	  tests/test_bug252.php, tests/test_bug252.php~,
+	  tests/test_bug253.php, tests/test_bug253.php~,
+	  tests/test_bug254.php, tests/test_bug254.php~,
+	  tests/test_bug261.php, tests/test_bug261.php~,
+	  tests/test_bug270.php, tests/test_bug270.php~,
+	  tests/test_bug272.php, tests/test_bug272.php~,
+	  tests/test_bug275.php, tests/test_bug275.php~,
+	  tests/test_bug279.php, tests/test_bug279.php~,
+	  tests/test_bug283.php, tests/test_bug283.php~,
+	  tests/test_bug287.php, tests/test_bug287.php~,
+	  tests/test_bug289.php, tests/test_bug289.php~,
+	  tests/test_bug298.php, tests/test_bug298.php~,
+	  tests/test_bug68.php, tests/test_bug68.php~,
+	  tests/test_datetickposbug.php, tests/test_datetickposbug.php~,
+	  tests/test_dateweight.php, tests/test_dateweight.php~,
+	  tests/test_ganttpro.php, tests/test_ganttpro.php~,
+	  tests/test_ganttweekbug.php, tests/test_ganttweekbug.php~,
+	  tests/test_line.php, tests/test_line.php~,
+	  tests/test_lineiconstring.php~, tests/test_logscale.php,
+	  tests/test_logscale.php~, tests/test_manualticks.php,
+	  tests/test_manualticks2.php, tests/test_manualticks3.php,
+	  tests/test_manualticks4.php, tests/test_manualticks5.php,
+	  tests/test_manualticks5.php~, tests/test_markcsim.php,
+	  tests/test_markcsim.php~, tests/test_mgraph.php,
+	  tests/test_mgraph.php~, tests/test_mgraph2.php,
+	  tests/test_mgraph2.php~, tests/test_mgraph3.php,
+	  tests/test_mgraph3.php~, tests/test_mulyaxis.php,
+	  tests/test_mulyaxis.php~, tests/test_mulycsim.php,
+	  tests/test_mulycsim.php~, tests/test_odo2.php,
+	  tests/test_odo2.php~, tests/test_pie3d.php, tests/test_pie3d.php~,
+	  tests/test_pie3d_1.php, tests/test_pie3d_1.php~,
+	  tests/test_radarbug248.php, tests/test_radarbug248.php~,
+	  tests/test_radarticks3.php, tests/test_radarticks3.php~,
+	  tests/test_readcsv.php, tests/test_readcsv.php~,
+	  tests/test_symchar.php, tests/test_symchar.php~,
+	  tests/test_text90.php, tests/test_text90.php~,
+	  tests/test_texttick.php, tests/test_texttick.php~,
+	  tests/tiger1.jpg: Comitted a number of test scripts to make a
+	  cleaner status message
+
+2006-01-15 20:21  ljp
+
+	* jpgraph_mgraph.php, jpgraph_utils.inc: Moved MGraph from utils to
+	  it's own file. Added Utility class to read CSV file of data
+
+2006-01-14 11:26  ljp
+
+	* jpgraph_radar.php: Fix PR#302 - Individual colors for labels and
+	  axis on radar plots
+
+2006-01-13 18:29  ljp
+
+	* jpgraph_polar.php: Fix PR#298 - Multiple plots for polar graphs
+
+2006-01-13 18:20  ljp
+
+	* jpgraph.php: Add CR#299 - File and line number information for
+	  headers sent error
+
+2006-01-09 18:19  ljp
+
+	* jpgraph_barcode.php: Fix PR#296 - Wrong stop character for I25
+
+2006-01-06 03:54  ljp
+
+	* jpgraph.php: Fix PR#294- Function name misspelled in startup
+	  php_errormsg check
+
+2006-01-05 07:03  ljp
+
+	* jpgraph_bar.php: Copy and paste mistake in fix for #292
+
+2006-01-05 07:00  ljp
+
+	* jpgraph_bar.php: Fix PR#292 - Incorrect calculation of Min value
+	  for AccBarPlot in some cases
+
+2005-12-31 10:08  ljp
+
+	* Examples/filledlineex03.php, Examples/piebkgex1.php: Added
+	  filledlineex03.php - Example with filled line and NULL values
+
+2005-12-31 10:00  ljp
+
+	* jpgraph_line.php: Fix CR#283 - Gaps should be displayed for NULL
+	  values in filled line graphs
+
+2005-12-30 20:59  ljp
+
+	* jpgraph.php: Fix CR#290 - Make it possible to use StrokeCSIM()
+	  without argument
+
+2005-12-30 18:08  ljp
+
+	* jpgraph.php: Properly Fix PR#123 - Background gradient for rotated
+	  bar plots
+
+2005-12-30 17:36  ljp
+
+	* jpgraph.php: Fix PR#123 - Background gradient for rotated bar
+	  plots
+
+2005-12-30 17:22  ljp
+
+	* jpgraph_pie.php: Fix CR#130 - Add option to use background
+	  gradient to Pie plots
+
+2005-12-30 16:26  ljp
+
+	* jpgraph.php: Fix PR#68 - Setting title side for X-axis title was
+	  not implemented
+
+2005-12-30 14:31  ljp
+
+	* jpgraph.php, jpgraph_plotmark.inc: Fix PR#289 and improve
+	  performance by reducing the number of internal copies of class
+	  Image by using more references
+
+2005-12-30 14:31  ljp
+
+	* jpgraph_gantt.php, jpgraph_gradient.php, jpgraph_iconplot.php,
+	  jpgraph_odo.php, jpgraph_polar.php, jpgraph_scatter.php,
+	  jpgraph_stock.php, jpgraph_windrose.php: Fix PR#289 and improve
+	  performance by reducing the number of internal copies of class
+	  Image by using more references
+
+2005-12-29 09:32  ljp
+
+	* odo_examples, odometer_examples: Renamed odo_examples
+	  odometer_examples
+
+2005-12-29 06:56  ljp
+
+	* jpgraph_pie3d.php: Make ShowBorder() show a deprecated function
+	  error for 3D Pies
+
+2005-12-29 06:51  ljp
+
+	* jpgraph_regstat.php: Added additional error check to spline and
+	  bezier interpolation
+
+2005-12-29 06:44  ljp
+
+	* Examples/combgraphex1.php, Examples/mulyaxiscsimex1.php,
+	  Examples/mulyaxisex1.php: Comitted multiple y-axis and combined
+	  graph examples
+
+2005-12-29 06:43  ljp
+
+	* Examples/bezierex1.php: Added bezier example
+
+2005-12-28 11:05  ljp
+
+	* jpgraph.php: PR #288. Dateline scale is not properly formatted
+
+2005-12-15 22:34  ljp
+
+	* jpgraph_bar.php: Remove HTML entitites encoding in CSIM targets
+	  for barplots
+
+2005-12-14 18:21  ljp
+
+	* jpgraph_pie3d.php: Fix PR#280 - Wrong legends in some cases for 3D
+	  Pies
+
+2005-12-10 08:28  ljp
+
+	* jpgraph.php: Merged 328:329. Add possibility to use CSIM on multi
+	  Y-axes. Made it possibly to use 'auto' as special filename for
+	  CSIM to avoid having to supply file name.
+
+2005-12-10 08:24  ljp
+
+	* jpgraph_regstat.php: Added Bezier interpolation class
+
+2005-12-07 18:43  ljp
+
+	* jpgraph_barcode.php: Removed extra check for UPC-A barcodes. Allow
+	  10 number systems (0-9) as the first specification.
+
+2005-12-06 19:13  ljp
+
+	* jpgraph.php: Really Fixded PR #271. SetDateFormat()
+
+2005-12-06 19:09  ljp
+
+	* jpgraph.php: Fixded PR #271. Problem with SetDateFormat()
+
+2005-12-05 10:54  ljp
+
+	* jpgraph_bar.php: Added error check for empty plots when client
+	  constructs group or acc bars
+
+2005-12-03 08:56  ljp
+
+	* jpgraph_utils.inc: Fixed lost startyear variable in DateScaleUtils
+
+2005-11-30 22:12  ljp
+
+	* jpgraph.php: Rounding problem fixing. It turns out that according
+	  to PHP (a < b)==TRUE assuming a:INT and b:float. This could cause
+	  the last tick on an axis to not be shown in some rare cases
+
+2005-11-30 19:55  ljp
+
+	* jpgraph.php: Fix PR #269. Make sure that the title of the axis is
+	  only stroken once
+
+2005-11-28 22:12  ljp
+
+	* Examples/gantthourminex1.php: Fixed gantthourminex1.php example to
+	  be compatible with PHP 5.1.0
+
+2005-11-28 22:09  ljp
+
+	* jpgraph_gantt.php: Added error check for too large width caused by
+	  a faulty input date
+
+2005-11-27 20:34  ljp
+
+	* Examples/dupyaxisex1.php, Examples/funcex1.php,
+	  Examples/funcex2.php, Examples/funcex3.php, Examples/funcex4.php:
+	  Updated math function examples to include jpgraph_utils.inc
+
+2005-11-27 11:13  ljp
+
+	* jpgraph_utils.inc: Added option to put the background image for
+	  MGraph at a specific x,y location
+
+2005-11-27 11:12  ljp
+
+	* Examples/manualtickex1.php, Examples/manualtickex2.php: Updated
+	  and added manual tick examples
+
+2005-11-26 15:42  ljp
+
+	* jpgraph.php, jpgraph_utils.inc: Moved class FuncGenerator from
+	  jpgraph.php to jpgraph_utility.inc
+
+2005-11-26 14:42  ljp
+
+	* jpgraph_utils.inc: Simplified DateScaleUtils interface
+
+2005-11-26 14:26  ljp
+
+	* jpgraph.php: Various minor adjustments in jpgraph.php * Added
+	  maj_tick_label as instance variable. That had always been missing
+	  !! * Adjusted the default margin fox X-axis labels slightly,
+	  slightly larger * Adjusted the left/right default graph margin
+	  (They were unecessarily large). * Added error checking when client
+	  specifies to few manual major ticks
+
+2005-11-25 16:35  ljp
+
+	* jpgraph_utils.inc: Added option to use background images in MGraph
+	  (combined graphs)
+
+2005-11-25 16:23  ljp
+
+	* jpgraph.php: Added Graph proxy method for Image::SetImgFormat()
+
+2005-11-25 11:00  ljp
+
+	* jpgraph_utils.inc: Modified the MGraph::Add() method to accept
+	  Graph argument instead of just an image handler. Much more elegant
+	  and user friendly. Allso added the possibility for the
+	  MGraph::Stroke() method to return an image handler as well. This
+	  will allow MGraph to have MGraph as objects.
+
+2005-11-24 06:51  ljp
+
+	* jpgraph_utils.inc: Borrowed some methods from class Graph to class
+	  MGraph in ordedr to avoid having to instantiate class Graph when
+	  using the MGraph functionality to save some memory. Added Class
+	  DateScaleUtils to jpgraph_utils.inc to make it easy to manually
+	  work with month scale where the tick positions are manually set
+
+2005-11-23 19:52  ljp
+
+	* jpgraph.php: Added CR#266 "Add option to set a background fill for
+	  Axis labels" by adding a new method
+	  Graph::SetAxisLabelBackground() which will allow a client to
+	  specify a number of different variants of background for the
+	  labels on the primary X and Y axis.
+
+2005-11-23 16:25  ljp
+
+	* jpgraph_utils.inc: Added Class MGraph in jpgraph_utils.inc. This
+	  is a utility class that can be used to easily combine several
+	  graphs into one image
+
+2005-11-23 16:04  ljp
+
+	* Examples/manualtickex1.php: Updated manual tick example to show
+	  X-grid as well to better illustrate the differenc between major
+	  and minor tick marks
+
+2005-11-23 05:38  ljp
+
+	* Examples/manualtickex1.php: Updated the manual tick example to
+	  also make use of minor tick marks (without a label)
+
+2005-11-22 19:49  ljp
+
+	* jpgraph.php: Extended the manual tick positioning
+	  Axis::SetTickPosition() to also include the setting of the minor
+	  tick marks, i.e. tick marks without labels.
+
+2005-11-21 19:35  ljp
+
+	* Examples/manualtickex1.php: Added example for how to set manual
+	  tick positions
+
+2005-11-21 19:33  ljp
+
+	* jpgraph_utils.inc: Removed double entry in code table for greek
+	  characters
+
+2005-11-20 12:11  ljp
+
+	* jpgraph_utils.inc: Adapted jpgraph_utils.inc for use in v1.x
+	  branch (for PHP4)
+
+2005-11-20 12:07  ljp
+
+	* jpgraph_utils.inc: Copied jpgraph_utils to v1.x branch
+
+2005-11-20 11:41  ljp
+
+	* jpgraph.php: Added CR#263. Possibility to have completely manual
+	  tick positions. One new method
+	  Axis::SetTickPositions($aTickPos,$aTickLabel) can be used to
+	  manually specify the exact positions for the ticks as well as an
+	  optional specified label. If no label array is specified then the
+	  labels will be determined by the scale value and any set
+	  formatting strings.
+
+2005-11-20 11:34  ljp
+
+	* jpg-config.inc: Removed newline at end of jpg-config.inc file
+	  since some Windows setups have problems with newlines
+
+2005-11-04 04:37  ljp
+
+	* jpgraph.php: Added parameter to SetTextLabelInterval()
+
+2005-11-04 04:31  ljp
+
+	* jpgraph_line.php: Fix #253 Gradient in legends. Micro speeed
+	  improvement in min/max methods
+
+2005-10-15 16:53  ljp
+
+	* jpgraph_date.php: Fix for issue #229. Special case when only
+	  having a single data point in date scale
+
+2005-10-15 10:52  ljp
+
+	* jpgraph_gantt.php: Fix for issue #247 boundary check in while loop
+
+2005-10-15 10:29  ljp
+
+	* jpgraph.php: Fix for feature request #243. Allow 1.x branch to be
+	  used in compatibility mode in PHP5
+
+2005-10-14 17:39  ljp
+
+	* jpgraph.php: Fix for #251 where the ID attribute in the MAP tag
+	  makes it hard to save an CSIM image
+
+2005-10-11 18:22  ljp
+
+	* jpgraph_radar.php: Fix axis title positioning issue #248
+
+2005-10-06 16:29  ljp
+
+	* jpgraph_bar.php: Fix for #244. Missing ALT value for CSIM for Bars
+
+2005-09-26 17:23  ljp
+
+	* jpgraph_plotmark.inc: Fix #231. Image markers are not rotated
+
+2005-09-04 15:25  ljp
+
+	* jpgraph.php: PHP Bug workaround (#226)
+
+2005-09-03 09:39  ljp
+
+	* barcode, jpgraph_gantt.php, pdf417, windrose: Moved old
+	  directories up to dust
+
+2005-09-01 05:03  ljp
+
+	* jpgraph_gantt.php: Fixed #222 Gantt day header too small in some
+	  circumstances
+
+2005-08-31 19:23  ljp
+
+	* windrose/windrose.doc: Moved windrose word-doc to docs main
+	  directory
+
+2005-08-31 19:22  ljp
+
+	* windrose/html: Removed html dir in windrose
+
+2005-08-31 19:21  ljp
+
+	* windrose/utf8: UTF8 directory from windrose and moved it to
+	  asian_lang instead
+
+2005-08-31 19:19  ljp
+
+	* windrose/utf8/Examples, windrose/utf8/jpgraph.php,
+	  windrose/utf8/jpgraph_gradient.php,
+	  windrose/utf8/jpgraph_plotmark.inc,
+	  windrose/utf8/jpgraph_windrose.php: Moved Example in UTF8 windrose
+	  to asian_lang
+
+2005-08-31 19:06  ljp
+
+	* windrose/img: Moved windrose img to main docs directory
+
+2005-08-31 19:06  ljp
+
+	* windrose/manual.book, windrose/manualpdf.book,
+	  windrose/polar_function_3.gif, windrose/windrose.png,
+	  windrose/windrose_html_manual, windrose/windrose_manual.php: Moved
+	  windrose docs to main docs directory
+
+2005-08-31 16:17  ljp
+
+	* jpgraph.php, jpgraph_iconplot.php, tests/test_lineiconstring.php:
+	  Added possibility to create icons and backgrounds from strings
+
+2005-08-29 23:25  ljp
+
+	* windrose/contour.gif, windrose/contour.png, windrose/dust,
+	  windrose/dust/contour.gif, windrose/dust/contour.png,
+	  windrose/dust/jpgraph_windrose-1.0.php,
+	  windrose/dust/jpgraph_windrose-1.05.php,
+	  windrose/dust/jpgraph_windrose-1.0beta.php,
+	  windrose/dust/mockup_ex1.png, windrose/dust/windchart_3.gif,
+	  windrose/dust/windrose-1.1.tar.gz,
+	  windrose/dust/windrose_manual-1.0.php,
+	  windrose/dust/windrose_manual-1.0beta.php,
+	  windrose/jpgraph_windrose-1.0.php,
+	  windrose/jpgraph_windrose-1.05.php,
+	  windrose/jpgraph_windrose-1.0beta.php, windrose/mockup_ex1.png,
+	  windrose/windchart_3.gif, windrose/windrose-1.0.tar.gz,
+	  windrose/windrose-1.1, windrose/windrose-1.1.tar.gz,
+	  windrose/windrose_manual-1.0.php,
+	  windrose/windrose_manual-1.0beta.php: Cleaned up windrose
+	  directory
+
+2005-08-29 23:18  ljp
+
+	* windrose/jpgtutlib.inc: Removed wrong jpgtutlib link
+
+2005-08-29 23:13  ljp
+
+	* barcode/jpgraph.php, barcode/jpgraph_canvas.php: Removed old sym
+	  links to jpgraph.php etc
+
+2005-08-29 23:12  ljp
+
+	* barcode/barcode_demoapp: Removed wrong barcode demoapp directory
+
+2005-08-29 23:12  ljp
+
+	* barcode/barcode_ex0.php, barcode/barcode_ex1.php,
+	  barcode/barcode_ex2.php, barcode/barcode_ex3.php,
+	  barcode/barcode_ex4.php: Removed barcode examples from it's old
+	  location
+
+2005-08-29 23:08  ljp
+
+	* windrose_examples/windrose_ex0.php,
+	  windrose_examples/windrose_ex1.php,
+	  windrose_examples/windrose_ex1b.php,
+	  windrose_examples/windrose_ex2.php,
+	  windrose_examples/windrose_ex3.php,
+	  windrose_examples/windrose_ex4.php,
+	  windrose_examples/windrose_ex5.php,
+	  windrose_examples/windrose_ex6.php,
+	  windrose_examples/windrose_ex7.php,
+	  windrose_examples/windrose_ex8.php,
+	  windrose_examples/windrose_ex9.php: Changed path for windrose
+	  examples
+
+2005-08-29 23:05  ljp
+
+	* pdf417_examples/pdf417_ex1.php, pdf417_examples/pdf417_ex2.php,
+	  pdf417_examples/pdf417_ex3.php, pdf417_examples/pdf417_ex4.php,
+	  pdf417_examples/pdf417_ex5.php, pdf417_examples/pdf417_ex6.php:
+	  Changed path for all PDF417 examples
+
+2005-08-29 22:50  ljp
+
+	* windrose_examples/.directory: Removed .directory
+
+2005-08-29 22:46  ljp
+
+	* barcode/barcode_demoapp, barcode/barcode_image.php,
+	  barcode/barcode_menu.php, barcode/index.html,
+	  barcode/jpgraph_barcode.php, barcode_demoapp,
+	  barcode_demoapp/barcode_image.php,
+	  barcode_demoapp/barcode_menu.php, barcode_demoapp/index.html,
+	  barcode_examples, barcode_examples/barcode_ex0.php,
+	  barcode_examples/barcode_ex1.php,
+	  barcode_examples/barcode_ex2.php,
+	  barcode_examples/barcode_ex3.php,
+	  barcode_examples/barcode_ex4.php, jpgraph_barcode.php,
+	  jpgraph_pdf417.php, odo_examples, odoexamples, pdf417/Examples,
+	  pdf417/demoapp, pdf417/jpgraph_pdf417.php,
+	  pdf417/pdf417_backends.inc, pdf417/pdf417_clusters.inc,
+	  pdf417/pdf417_compressors.inc, pdf417/pdf417_error.inc,
+	  pdf417_backends.inc, pdf417_clusters.inc, pdf417_compressors.inc,
+	  pdf417_demoapp, pdf417_demoapp/pdf417_demo_image.php,
+	  pdf417_error.inc, pdf417_examples, windrose/examples,
+	  windrose_examples: Updated directory structure to match release
+	  structure
+
+2005-08-29 22:41  ljp
+
+	* jpgraph.php: Made Y2 axis default always at the right end of X
+
+2005-08-29 22:35  ljp
+
+	* pdf417/demoapp/pdf417_demo_image.php: Changed include path for
+	  pdf417 demo app
+
+2005-08-27 23:03  ljp
+
+	* utils/jpdocgen/jpgendb.php: Updted jpdocgen to skip returning
+	  object with &
+
+2005-08-27 23:02  ljp
+
+	* tests/bug_axisy2title.php, tests/gdtest.php,
+	  tests/test_axisy2.php, tests/test_baraccint.php,
+	  tests/test_baraccnull.php, tests/test_bb2671.php,
+	  tests/test_bug144.php, tests/test_bug148.php,
+	  tests/test_bug189.php, tests/test_bug190.php,
+	  tests/test_bug191.php, tests/test_bug197.php,
+	  tests/test_bug203.php, tests/test_bug3.php, tests/test_bug58.php,
+	  tests/test_bug9.php, tests/test_dateaxis3.php,
+	  tests/test_dateaxisy2.php, tests/test_datesparse.php,
+	  tests/test_datesparsebug.php, tests/test_datprobug.php,
+	  tests/test_fieldrot.php, tests/test_gantt.php,
+	  tests/test_ganttcsim.php, tests/test_horizbarcsim.php,
+	  tests/test_legendbox.php, tests/test_line.php,
+	  tests/test_linebug-104.php, tests/test_linesimple.php,
+	  tests/test_logline.php, tests/test_multiline.php,
+	  tests/test_patternbug.php, tests/test_piecsim.php,
+	  tests/test_pietheme.php, tests/test_scattermark.php,
+	  tests/test_scatternulls.php, tests/test_textalign.php,
+	  tests/test_ttf.php, tests/test_ttfread.php: Added more test
+	  scripts
+
+2005-08-07 17:18  ljp
+
+	* jpgraph.php, jpgraph_date.php, jpgraph_error.php,
+	  jpgraph_gantt.php, jpgraph_pie.php, jpgraph_radar.php: Chnaged
+	  some count() in for loop to a variable instead. Minor formatting
+	  change to date class
+
+2005-07-12 17:55  ljp
+
+	* jpgraph_windrose.php, windrose/examples/windrose_ex1b.php: Feature
+	  #208. Added WindrosePlot::SetRangeStyle()
+
+2005-07-10 18:22  ljp
+
+	* jpgraph.php: Added debug lines in legend and fine-tuned
+	  calculation of legend height
+
+2005-07-09 21:23  ljp
+
+	* jpgraph.php: Fixed #196 - Better layout for legend box
+
+2005-06-25 21:59  ljp
+
+	* jpgraph_bar.php: Final fix for bug #191 by commenting out some
+	  strange adjustment Stroke() for accbar plot
+
+2005-06-25 21:59  ljp
+
+	* jpgraph.php: Fix for possible undefined CSIM alt tag. Bumbped
+	  version number to 1.19dev
+
+2005-06-25 11:16  ljp
+
+	* jpgraph_pie.php: Make sure pie csim center coordinates are
+	  integers
+
+2005-06-22 21:28  ljp
+
+	* jpgraph_line.php: Added zero option to line interpolation
+
+2005-06-17 19:46  ljp
+
+	* jpgraph_line.php: Added linear interpolation for acc lines (#189)
+
+2005-06-16 21:29  ljp
+
+	* barcode/jpgraph_barcode.php: Propset Id
+
+2005-06-16 21:24  ljp
+
+	* barcode/jpgraph_barcode.php: Added Id tag
+
+2005-06-16 21:18  ljp
+
+	* barcode/jpgraph_barcode.php: Implemented multipe data chunks for
+	  EAN128
+
+2005-06-10 04:55  ljp
+
+	* jpgraph.php: Added individual legend mark size for horiz/vert
+	  (#144)
+
+2005-06-08 11:04  ljp
+
+	* jpgraph.php, jpgraph_bar.php: Better handling of bars with an
+	  Absolute Width (#190)
+
+2005-06-08 09:21  ljp
+
+	* jpgraph.php: Compensation for handling of barcenter number of data
+	  points (#190)
+
+2005-06-06 20:14  ljp
+
+	* jpgraph_log.php: Fixed HideTicks for log scale (#90)
+
+2005-06-06 18:12  ljp
+
+	* jpgraph_scatter.php: Fix so that 'x' and '-' are interpretated as
+	  null in ScatterPlot
+
+2005-06-06 16:08  ljp
+
+	* jpgraph_pie.php: Fix for #188 CSIM for Titles in PieGraphs
+
+2005-06-06 14:46  ljp
+
+	* jpgraph.php: Fixed wrong parameter to imagefilledarc() in
+	  CakeSlice() #66
+
+2005-06-06 13:59  ljp
+
+	* jpgraph_windrose.php: Fixed rounding problem #164
+
+2005-06-06 13:48  ljp
+
+	* jpgraph_bar.php: Fixed problem with AccBar PreStrokeAdjust #103
+
+2005-06-06 13:08  ljp
+
+	* jpgraph_pie.php: Fixed remaining problem with single slice Pie and
+	  CSIM (#107)
+
+2005-06-06 10:46  ljp
+
+	* jpgraph.php, jpgraph_bar.php, jpgraph_gantt.php, jpgraph_pie.php,
+	  jpgraph_pie3d.php, jpgraph_plotmark.inc, jpgraph_stock.php: Better
+	  (X)HTML compliance for generated CSIM HTML
+
+2005-06-06 10:12  ljp
+
+	* jpgraph_radar.php: Added formatting callback #172
+
+2005-06-06 10:03  ljp
+
+	* jpgraph_pie.php: Fixed anti-alias pie problem #71
+
+2005-06-05 23:05  ljp
+
+	* tests/test_barscaleicon.php: Test scale positioned icon
+
+2005-06-05 16:36  ljp
+
+	* Examples/dateaxisex2.php, Examples/dateaxisex3.php,
+	  Examples/dateaxisex4.php, Examples/pielabelsex1.php,
+	  Examples/pielabelsex4.php, jpgraph_date.php,
+	  tests/test_barpattern.php, tests/test_ganttsimple.php,
+	  tests/test_pienewlabels.php: More example for guide-lines and date
+	  axis
+
+2005-06-05 15:33  ljp
+
+	* jpgraph_date.php: Added SetTimeAlign() and adjusted constants
+
+2005-06-05 11:51  ljp
+
+	* jpgraph_pie.php: Some small backporting from v2 branch to handle
+	  arrays in Add()
+
+2005-06-05 11:31  ljp
+
+	* Examples/pielabelsex1.php, Examples/pielabelsex2.php,
+	  Examples/pielabelsex3.php: Added pie guide line examples
+
+2005-05-30 20:35  ljp
+
+	* Todo, flags_full.inc, imgdata_balls.inc, imgdata_bevels.inc,
+	  imgdata_diamonds.inc, imgdata_pushpins.inc, imgdata_squares.inc,
+	  imgdata_stars.inc, jpg-config.inc, jpgraph.php,
+	  jpgraph_antispam-digits.php, jpgraph_antispam.php,
+	  jpgraph_bar.php, jpgraph_canvas.php, jpgraph_canvtools.php,
+	  jpgraph_date.php, jpgraph_error.php, jpgraph_flags.php,
+	  jpgraph_gantt.php, jpgraph_gb2312.php, jpgraph_gradient.php,
+	  jpgraph_iconplot.php, jpgraph_imgtrans.php, jpgraph_line.php,
+	  jpgraph_log.php, jpgraph_odo.php, jpgraph_pie.php,
+	  jpgraph_pie3d.php, jpgraph_plotband.php, jpgraph_plotmark.inc,
+	  jpgraph_polar.php, jpgraph_radar.php, jpgraph_regstat.php,
+	  jpgraph_scatter.php, jpgraph_stock.php, jpgraph_windrose.php:
+	  Added Id keyword property
+
+2005-05-29 18:16  ljp
+
+	* jpgraph_gantt.php: Adaption for icon plot new behaviour in
+	  jpgraph.php
+
+2005-05-29 15:30  ljp
+
+	* jpgraph.php, jpgraph_iconplot.php: Fix icon positioning
+
+2005-05-29 10:40  ljp
+
+	* tests/test_barsmallicon.php, tests/test_radarticks2.php: Added
+	  test_barsmallicon test_radarticks2
+
+2005-05-29 10:11  ljp
+
+	* jpgraph.php, jpgraph_iconplot.php: Fixed #181, #182 Scale
+	  positions for icon plots and also add rotation of icons
+

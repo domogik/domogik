@@ -58,6 +58,8 @@ class Piece extends Controller {
     {
         $data["menu"] = $this->manager->getPieces();
         $data["capacites"] = $this->manager->getCapacites($data["piece"]);
+        $this->load->view('head',$data);
+        $this->load->view('configjs');
         $this->load->view('headerjs',$data);
         $this->load->view('body', $data);
         $this->load->view('footer');
@@ -71,6 +73,8 @@ class Piece extends Controller {
      {
         $data["menu"] = $this->manager->getPieces();
         $data["capacites"] = $this->manager->getCapacites($data["piece"]);
+        $this->load->view('head',$data);
+        $this->load->view('configjs');
         $this->load->view('headerjs2',$data);
         $this->load->view("temper");
         $this->load->view('footer');
@@ -83,6 +87,8 @@ class Piece extends Controller {
      {
         $data["menu"] = $this->manager->getPieces();
         $data["capacites"] = $this->manager->getCapacites($data["piece"]);
+        $this->load->view('head',$data);
+        $this->load->view('configjs');
         $this->load->view('headerjs3',$data);
         $this->load->view('music');
         $this->load->view('footer');

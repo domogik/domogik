@@ -16,10 +16,10 @@ var load = function(idpiece){
 				}
 				
 				if (_json.root[item].value == 1) {
-				  	couleur = "/vert2.png";
+				  	couleur = IMAGES_DIR+"vert2.png";
 					callback = "off(\"" + name + "\")";
 			    } else {
-			    	couleur = "/red.png";
+			    	couleur = IMAGES_DIR+"red.png";
 					callback = "on(\"" + name + "\")";
 		        }
 				var td = "<td><p>" +

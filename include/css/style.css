@@ -4,7 +4,7 @@ font-family:Verdana, Arial, Helvetica, sans-serif;
 font-size: 0.8em;
 margin: 0;
 padding: 0;
-background: url("bg.png");
+background: url("/include/images/bg.png");
 }
 p {
 margin: 0 0 10px 0;

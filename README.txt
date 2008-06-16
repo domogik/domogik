@@ -6,7 +6,7 @@ Les répertoires :
 * views/
 * models/
 doivent être mis dans le répertoire system/application de CodeIgniter
-Le reste des fichiers doit (à l'heure actuelle) être mis à la racine du répertoire web (à changer).
+Le répertoire include/ doit être mis à la racine du répertoire web (avec la config actuelle)
 
 Maxence (maxence@dunnewind.net)
 
