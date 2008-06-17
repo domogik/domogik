@@ -7,6 +7,6 @@ Les répertoires :
 * models/
 doivent être mis dans le répertoire system/application de CodeIgniter
 Le répertoire include/ doit être mis à la racine du répertoire web (avec la config actuelle)
-
+ 
 Maxence (maxence@dunnewind.net)
 
