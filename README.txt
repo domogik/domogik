@@ -11,5 +11,7 @@ Le répertoire include/ doit être mis à la racine du répertoire web (avec la 
 
 De plus, la librairie 'database' doit êter ajoutée dans les préchargement (fichier system/application/config/autoload.php de l'installation CI).
 
+Test UTF-8 : àéù£€
+
 Maxence (maxence@dunnewind.net)
 
