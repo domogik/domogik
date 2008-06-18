@@ -1,4 +1,9 @@
 <?php
+/**
+ * Cette classe est le point central de l'application.
+ * Elle fournit l'ensemble des fonctions relative à la structuration 
+ * d'une page pour une piece (détection capacités, etc ...)
+ */
 class Piece extends Controller {
 
 	function Piece()
@@ -111,65 +116,6 @@ class Piece extends Controller {
 		$this->__piece__($data);
 	}
 
-    function update($idpiece) 
-    {
-        $nom = $this->items->get_name_from_id($idpiece);
-        $releves = array();
-        $this->db->select('date, thermometre, temperature');
-        $date= getdate();
-        $d = strftime("%Y-%m-%d %H:%M:%S",$date[0]-86400);
-        $this->db->where("date >", $d);
-        $this->db->where("nom", $nom);
-        $q = $this->db->get("VRelevesSalles");
-        //,array("date > " => $d,"nom" => $this->items->get_name_from_id($idpiece))); 
-        $i = 0;
-         foreach ($q->result() as $row)
-         {
-//             if (array_key_exists($row->thermometre, $releves))
-  //           {
-                $releves[$row->thermometre][$i]= array(strtotime($row->date),$row->temperature);
-    /*         }
-             else
-             {
-                $releves[$i] = array(strtotime($row->date),$row->temperature);
-             }*/
-        $i++;
-         }
-        $series = array();
-            $data = array("data" => json_encode(array(
-                "series" => array($releves[$row->thermometre]),
-                "options" => array(
-                        "xaxis" => array(
-                            "noTicks"=> 0, 
-                            "lines" => array(
-                                "show"=>'true'
-                            )
-                        ),
-                        "yaxis" => array(
-                            "min"=> 10,
-                            "max" => 40,
-                            "noTicks" => 3
-                        ),
-                        "points" => array(
-                            "show" => false
-                        ),
-                        "lines" => array(
-                            "fill" => true 
-                        ),
-                        "mouse" =>array(
-                            "track" => true,
-                            "position" => "se",
-                            "trackFormatter" => "defaultTrackFormatter",
-                            "margin" => 3,
-                            "color" => "#FF0000",
-                            "trackDecimals" => 1,
-                            "sensibility" => 2,
-                            "radius" => 3
-                        )
-                )
-            )));
-        $this->load->view("json",$data);
-    }
 
     function temperature($idpiece)
     {
@@ -184,60 +130,12 @@ class Piece extends Controller {
       * sur la musique en cours dans la piece
       * @param id de la piece
       */
-
-    function audio($idpiece)
+    function musique($idpiece)
     {
         $data["piece"] = $idpiece;
         $data["title"] = $this->items->get_name_from_id($idpiece);
         $data["name_piece"] = $this->items->get_name_from_id($idpiece);
         
-        $q = $this->db->get_where("musique",array("id_piece"=>$idpiece));
-        $r = $q->first_row();
-        list($hour, $minutes, $seconds) = explode(":", $r->temps);
-        list($ahour, $aminutes, $aseconds) = explode(":", $r->temps_actuel);
-        $d1 = $hour * 3600 + $minutes * 60 + $seconds;
-        $d2 = $ahour * 3600 + $aminutes * 60 + $aseconds;
-        $d = ((int) ($d2 / ($d1 / 100)));
-        $data["temps_percent"] = $d;
-        $data["temps_min"] = $r->temps;
-        $data["titre"] = $r->titre;
-        $data["duree"] = $r->temps_actuel;
-        $data["etat"] = $r->etat;
         $this->__musique__($data);
-    }
-
-    function update_audio($idpiece)
-    {
-        $data["piece"] = $idpiece;
-        $data["title"] = $this->items->get_name_from_id($idpiece);
-        $data["name_piece"] = $this->items->get_name_from_id($idpiece);
-        
-        $q = $this->db->get_where("musique",array("id_piece"=>$idpiece));
-        $r = $q->first_row();
-        list($hour, $minutes, $seconds) = explode(":", $r->temps);
-        list($ahour, $aminutes, $aseconds) = explode(":", $r->temps_actuel);
-        $d1 = $hour * 3600 + $minutes * 60 + $seconds;
-        $d2 = $ahour * 3600 + $aminutes * 60 + $aseconds;
-        $d = ((int) ($d2 / ($d1 / 100)));
-        $root = array();
-        $root["temps_percent"] = $d;
-        $root["temps_min"] = $r->temps;
-        $root["titre"] = $r->titre;
-        $root["duree"] = $r->temps_actuel;
-        $root["etat"] = $r->etat;
-
-        $this->load->view("json",array("data"  => json_encode(array("root" => $root))));
-    }
-
-    function playMusic($idpiece)
-    {
-    }
-
-    function pauseMusic($idpiece)
-    {
-    }
-
-    function stopMusic($idpiece)
-    {
     }
 }
