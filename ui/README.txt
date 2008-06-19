@@ -9,7 +9,7 @@ doivent être mis dans le répertoire system/application de CodeIgniter
 
 Le répertoire include/ doit être mis à la racine du répertoire web (avec la config actuelle)
 
-De plus, la librairie 'database' doit êter ajoutée dans les préchargement (fichier system/application/config/autoload.php de l'installation CI).
+De plus, la librairie 'database' doit être ajoutée dans les préchargements (fichier system/application/config/autoload.php de l'installation CI).
 
 Fonctionnement :
 
@@ -32,7 +32,7 @@ et un item rouge ou vert est alors affiché.
 Température :
 
 La table 'Treleves' Permet de stocker des enregistrements contenant l'identifiant d'un thermomètre, la date/heure de relevé et la valeur du relevé.
-Chaque pièce peut posséder un certain nombre de thermomètre. Les appartenances sont définies dans la table RThermometreSalles.
+Chaque pièce peut posséder un certain nombre de thermomètres. Les appartenances sont définies dans la table RThermometreSalles.
 La table RThermometreNom permet également de donner un nom/descriptif pour chaque thermomètre.
 La page température de l'interace récupère la liste des relevés des dernières 24heures pour la pièce courante, et génère un graphique à 
 l'aide de la librairie jsgraph.
