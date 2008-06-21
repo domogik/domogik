@@ -28,7 +28,7 @@ De plus, la librairie 'database' doit être ajoutée dans les préchargements (f
 
 4) Paramétrage
 
-Editer config/routes.php et mettre dans 'default_controller' tu mets 'piece'
+Editer config/routes.php et mettre dans 'default_controller', mettre 'piece'
 
 
 * Fonctionnement :
