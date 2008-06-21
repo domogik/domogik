@@ -1,0 +1,4 @@
+TODO file (highest priority first)
+
+* UI
+	* Add sample data to the (sql) initialization script (rooms and so on)
