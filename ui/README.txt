@@ -1,5 +1,14 @@
 === Informations sur la version actuelle de l'interface ===
+
+* Installation
+
 L'interface est programmée en php5 avec le framework CodeIgniter.
+
+1) CodeIgniter
+
+* Télécharger CodeIgniter et le décompacter à la racine du répertoire Web et le renommmer 'domogik' par exemple
+
+2) Copie des répertoires
 Les répertoires :
 * config/
 * controllers/
@@ -11,7 +20,18 @@ Le répertoire include/ doit être mis à la racine du répertoire web (avec la 
 
 De plus, la librairie 'database' doit être ajoutée dans les préchargements (fichier system/application/config/autoload.php de l'installation CI).
 
-Fonctionnement :
+3) Base de données
+
+* Créer une base de données nommée 'domogik' (en mode UTF8)
+* Aller dans system/application/config/database.php du répertoire web et préciser les paramètres de connexions à la base
+* Exécuter dans cette base le script base.sql
+
+4) Paramétrage
+
+Editer config/routes.php et mettre dans 'default_controller' tu mets 'piece'
+
+
+* Fonctionnement :
 
 L'interface permet de visualiser des pièces, affichées dans le menu gauche. Ces pièces sont définies dans la table 'salle'⋅
 Chaque pièce possède un certain nombre de capacités (ou fonctionnalités). Les capacités possibles (à l'heure actuelle) sont 
