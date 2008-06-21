@@ -7,7 +7,7 @@
 -- Version du serveur: 5.0.38
 -- Version de PHP: 5.2.1
 -- 
--- Base de données: `domotique`
+-- Base de données: `domogik`
 -- 
 
 -- --------------------------------------------------------
@@ -226,7 +226,7 @@ INSERT INTO `salles` (`id`, `nom`) VALUES
 -- Structure de la table `VEtatsElements`
 -- 
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `domotique`.`VEtatsElements` AS select `EL`.`nom` AS `nom`,`ET`.`etat` AS `etat`,`ET`.`date` AS `date`,`EL`.`description` AS `description` from (`domotique`.`etats` `ET` join `domotique`.`elements` `EL`) where (`ET`.`element` = `EL`.`id`);
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `domogik`.`VEtatsElements` AS select `EL`.`nom` AS `nom`,`ET`.`etat` AS `etat`,`ET`.`date` AS `date`,`EL`.`description` AS `description` from (`domogik`.`etats` `ET` join `domogik`.`elements` `EL`) where (`ET`.`element` = `EL`.`id`);
 
 -- --------------------------------------------------------
 
@@ -234,7 +234,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 -- Structure de la table `VRelevesSalles`
 -- 
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`domotique`@`%` SQL SECURITY DEFINER VIEW `domotique`.`VRelevesSalles` AS select `TR`.`thermometre` AS `thermometre`,`TR`.`temperature` AS `temperature`,`TR`.`date` AS `date`,`S`.`nom` AS `nom` from ((`domotique`.`Treleves` `TR` join `domotique`.`RThermometreSalles` `TS`) join `domotique`.`salles` `S`) where ((`TR`.`thermometre` = `TS`.`thermometre`) and (`TS`.`id_salle` = `S`.`id`));
+CREATE ALGORITHM=UNDEFINED DEFINER=`domogik`@`%` SQL SECURITY DEFINER VIEW `domogik`.`VRelevesSalles` AS select `TR`.`thermometre` AS `thermometre`,`TR`.`temperature` AS `temperature`,`TR`.`date` AS `date`,`S`.`nom` AS `nom` from ((`domogik`.`Treleves` `TR` join `domogik`.`RThermometreSalles` `TS`) join `domogik`.`salles` `S`) where ((`TR`.`thermometre` = `TS`.`thermometre`) and (`TS`.`id_salle` = `S`.`id`));
 
 -- --------------------------------------------------------
 
@@ -242,7 +242,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`domotique`@`%` SQL SECURITY DEFINER VIEW `do
 -- Structure de la table `vue`
 -- 
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `domotique`.`vue` AS select `domotique`.`elements`.`nom` AS `nomE`,`domotique`.`salles`.`nom` AS `nomS` from ((`domotique`.`elements` join `domotique`.`salles`) join `domotique`.`RElementsSalles`) where ((`domotique`.`elements`.`id` = `domotique`.`RElementsSalles`.`element`) and (`domotique`.`RElementsSalles`.`salle` = `domotique`.`salles`.`id`));
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `domogik`.`vue` AS select `domogik`.`elements`.`nom` AS `nomE`,`domogik`.`salles`.`nom` AS `nomS` from ((`domogik`.`elements` join `domogik`.`salles`) join `domogik`.`RElementsSalles`) where ((`domogik`.`elements`.`id` = `domogik`.`RElementsSalles`.`element`) and (`domogik`.`RElementsSalles`.`salle` = `domogik`.`salles`.`id`));
 
 -- 
 -- Contraintes pour les tables exportées
