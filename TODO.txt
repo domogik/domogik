@@ -1,4 +1,7 @@
 TODO file (highest priority first)
 
+* General
+	* Translate the app into English language (variables, table names, ...)
+
 * UI
 	* Add sample data to the (sql) initialization script (rooms and so on)
