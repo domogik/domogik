@@ -12,16 +12,16 @@ class Musique extends Model
 
     /**
 	 * Gets the information about the music of a given room
-     * @param idpiece : Id of the room
+     * @param roomId : Id of the room
      * @return : Information about the player of the room (JSON format)
      */
-    function update($idpiece)
+    function update($roomId)
     {
-        $data["piece"] = $idpiece;
-        $data["title"] = $this->items->get_name_from_id($idpiece);
-        $data["name_piece"] = $this->items->get_name_from_id($idpiece);
+        $data["piece"] = $roomId;
+        $data["title"] = $this->items->get_name_from_id($roomId);
+        $data["name_piece"] = $this->items->get_name_from_id($roomId);
         
-        $q = $this->db->get_where("musique",array("id_piece"=>$idpiece));
+        $q = $this->db->get_where("musique",array("id_piece"=>$roomId));
         $r = $q->first_row();
         list($hour, $minutes, $seconds) = explode(":", $r->temps);
         list($ahour, $aminutes, $aseconds) = explode(":", $r->temps_actuel);
@@ -40,25 +40,25 @@ class Musique extends Model
 
     /**
 	 * External call to start playing
-     * @param idpiece : Id of the room
+     * @param roomId : Id of the room
      */
-    function playMusic($idpiece)
+    function playMusic($roomId)
     {
     }
 
     /**
-     * External call for Pause
-     * @param idpiece : Id of the room
+     * External call for Pause function
+     * @param roomId : Id of the room
      */
-    function pauseMusic($idpiece)
+    function pauseMusic($roomId)
     {
     }
 
     /**
-     * External call for Stop
-     * @param idpiece : Id of the room
+     * External call for stop playing music
+     * @param roomId : Id of the room
      */
-    function stopMusic($idpiece)
+    function stopMusic($roomId)
     {
     }
 }

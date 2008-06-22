@@ -25,9 +25,9 @@ class Manager extends Model {
       * @param ipdiece : Id of the room
       * @return : an array with the capacities of a room
       */
-      public function getCapacites($idpiece)
+      public function getCapacites($roomId)
       {
-          $query = $this->db->get_where('capacites',array('id_piece' => $idpiece));
+          $query = $this->db->get_where('capacites',array('id_piece' => $roomId));
           $res = array();
           foreach($query->result() as $row)
           {

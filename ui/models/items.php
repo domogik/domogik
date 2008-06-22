@@ -23,14 +23,14 @@ class Items extends Model {
 	 * Gets the list of the entries corresponding to the place
      * using the 'localisation' table
 	 */
-	function get_items($lieu) {
-		$query = $this->db->get_where("vue",array("nomS" => $lieu));
-		$liste = array();
+	function get_items($place) {
+		$query = $this->db->get_where("vue",array("nomS" => $place));
+		$list = array();
 		foreach ($query->result() as $row)
 	    {
-		    $liste[count($liste)] = $row->nomE;
+		    $list[count($list)] = $row->nomE;
 	    }
-	    return $liste;
+	    return $list;
 	}
 
 	/*

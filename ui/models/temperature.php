@@ -12,12 +12,12 @@ class Temperature extends Model
 
     /**
      * Gets the temperatures values of a room
-     * @param idpiece : Id of the room
+     * @param roomId : Id of the room
      * @return : values in JSON format
      */
-    function update($idpiece) 
+    function update($roomId) 
     {
-        $nom = $this->items->get_name_from_id($idpiece);
+        $nom = $this->items->get_name_from_id($roomId);
         $releves = array();
         $this->db->select('date, thermometre, temperature');
         $date= getdate();
@@ -25,7 +25,7 @@ class Temperature extends Model
         $this->db->where("date >", $d);
         $this->db->where("nom", $nom);
         $q = $this->db->get("VRelevesSalles");
-        //,array("date > " => $d,"nom" => $this->items->get_name_from_id($idpiece))); 
+        //,array("date > " => $d,"nom" => $this->items->get_name_from_id($roomId))); 
         $i = 0;
          foreach ($q->result() as $row)
          {
