@@ -28,11 +28,11 @@
       </div>
       <div id="droite">
         <p>
-          menu droit
+          Right menu
         </p>
         <p>
 
-          largeur fixe : 150px 
+          Fixed length : 150px 
         </p>
       </div>
       <div id="centre">
