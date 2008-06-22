@@ -27,13 +27,13 @@ class Piece extends Controller {
 	 * Gets the list of capacities of the given room and loads the first capacity
      * @param idpiece : Id of the room
      */
-	function lookup($idpiece)
+	function lookup($roomId)
 	{
         $data = Array();
-        $data["piece"] = $idpiece;
-        $data["title"] = $this->items->get_name_from_id($idpiece);
-        $data["name_piece"] = $this->items->get_name_from_id($idpiece);
-        $capa = $this->manager->getCapacites($idpiece);
+        $data["piece"] = $roomId;
+        $data["title"] = $this->items->get_name_from_id($roomId);
+        $data["name_piece"] = $this->items->get_name_from_id($roomId);
+        $capa = $this->manager->getCapacites($roomId);
         if (sizeof($capa) != 0)
         {
             switch($capa[0])
@@ -107,21 +107,21 @@ class Piece extends Controller {
 	 * Loads the data for the given room and calls __piece__ to change the views
      * @param idpiece : Id of the room
      */
-    function lumiere($idpiece)
+    function lumiere($roomId)
     {
         $data = Array();
-        $data["piece"] = $idpiece;   
-        $data["title"] = $this->items->get_name_from_id($idpiece);
-        $data["name_piece"] = $this->items->get_name_from_id($idpiece);
+        $data["piece"] = $roomId;   
+        $data["title"] = $this->items->get_name_from_id($roomId);
+        $data["name_piece"] = $this->items->get_name_from_id($roomId);
 		$this->__piece__($data);
 	}
 
 
-    function temperature($idpiece)
+    function temperature($roomId)
     {
-        $data["piece"] = $idpiece;   
-        $data["title"] = $this->items->get_name_from_id($idpiece);
-        $data["name_piece"] = $this->items->get_name_from_id($idpiece);
+        $data["piece"] = $roomId;   
+        $data["title"] = $this->items->get_name_from_id($roomId);
+        $data["name_piece"] = $this->items->get_name_from_id($roomId);
         $this->__temperature__($data);         
     }
 
@@ -129,11 +129,11 @@ class Piece extends Controller {
 	  * Returns the view displaying information about the music played in the room
       * @param idpiece : Id of the room
       */
-    function musique($idpiece)
+    function musique($roomId)
     {
-        $data["piece"] = $idpiece;
-        $data["title"] = $this->items->get_name_from_id($idpiece);
-        $data["name_piece"] = $this->items->get_name_from_id($idpiece);
+        $data["piece"] = $roomId;
+        $data["title"] = $this->items->get_name_from_id($roomId);
+        $data["name_piece"] = $this->items->get_name_from_id($roomId);
         
         $this->__musique__($data);
     }

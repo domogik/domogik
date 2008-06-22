@@ -9,10 +9,10 @@ class Update extends Controller
         parent::Controller();
     }
 
-    function musique($idpiece)
+    function musique($roomId)
     {
         $this->load->model('musique');
-        $this->musique->update($idpiece);
+        $this->musique->update($roomId);
     }
 }
 

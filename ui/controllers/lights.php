@@ -29,9 +29,9 @@ class Lights extends Controller {
 	 * 			}
 	 * }
 	 */
-	function getJSONState($lieu) {
+	function getJSONState($place) {
 		//Start with getting all items in the place
-		$elements = $this->items->get_items($this->items->get_name_from_id($lieu));
+		$elements = $this->items->get_items($this->items->get_name_from_id($place));
 		//Then get the state of the items
 		return $this->items->getState($elements);
 		
