@@ -1,6 +1,6 @@
 <?php
 /**
- * Classe permettant de gérer les appels relatifs à la température
+ * Class for information relative to the temperature
  */
 class Temperature extends Model 
 {
@@ -11,9 +11,9 @@ class Temperature extends Model
     }
 
     /**
-     * Récupération des relevés des thermomètres de la pièce
-     * @param idpiece : ID de la piece
-     * @return données des relevés au format JSON
+     * Gets the temperatures values of a room
+     * @param idpiece : Id of the room
+     * @return : values in JSON format
      */
     function update($idpiece) 
     {

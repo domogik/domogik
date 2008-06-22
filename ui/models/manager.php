@@ -7,8 +7,8 @@ class Manager extends Model {
     }
 
     /**
-     * Retourne la liste des pièces 
-     * @return un tableau tab[id] = 'nom' avec toutes les pièces
+     * Returns the list of the rooms
+     * @return : an array array[id] = 'name' with all the rooms
      */
      public function getPieces()
      {
@@ -22,9 +22,8 @@ class Manager extends Model {
      }
 
      /**
-      * Retourne la liste des capacités d'une piece
-      * @param ipdiece : ID de la piece
-      * @return un tableau contenant les capacités de la piece
+      * @param ipdiece : Id of the room
+      * @return : an array with the capacities of a room
       */
       public function getCapacites($idpiece)
       {

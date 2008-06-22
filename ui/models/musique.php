@@ -1,6 +1,6 @@
 <?php
 /**
- * Classe gérant les informations relatives à la musique
+ * Class for information relative to the music
  */
 class Musique extends Model
 {
@@ -11,9 +11,9 @@ class Musique extends Model
     }
 
     /**
-     * Récupère les informations relative à la musique de la pièce concernée
-     * @param idpiece : ID de la pièce
-     * @return : Informations sur le lecteur de la piece format JSON
+	 * Gets the information about the music of a given room
+     * @param idpiece : Id of the room
+     * @return : Information about the player of the room (JSON format)
      */
     function update($idpiece)
     {
@@ -39,24 +39,24 @@ class Musique extends Model
     }
 
     /**
-     * Appel externe pour déclencher la lecture
-     * @param idpiece : ID de la piece dans laquelle déclencher la lecture
+	 * External call to start playing
+     * @param idpiece : Id of the room
      */
     function playMusic($idpiece)
     {
     }
 
     /**
-     * Appel externe pour déclencher la lecture
-     * @param idpiece : ID de la piece dans laquelle déclencher la pause 
+     * External call for Pause
+     * @param idpiece : Id of the room
      */
     function pauseMusic($idpiece)
     {
     }
 
     /**
-     * Appel externe pour déclencher la lecture
-     * @param idpiece : ID de la piece dans laquelle arrêter la lecture
+     * External call for Stop
+     * @param idpiece : Id of the room
      */
     function stopMusic($idpiece)
     {

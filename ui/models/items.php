@@ -6,18 +6,12 @@ class Items extends Model {
         parent::Model();
     }
 
-	/*
-	 * Retourne le nom de la piece en fonction de l'id
-	 */
 	function get_name_from_id($id) {
 		$query = $this->db->get_where("salles",array("id" => $id));
 		$row = $query->first_row();
 		return $row->nom;
 	}
 
-	/*
-	 * Retourne la description de l'item en fonction du nom
-	 */
 	function get_desc_from_name($name) {
 		$query = $this->db->get_where("elements",array("nom" => $name));
 		$row = $query->first_row();
@@ -25,9 +19,9 @@ class Items extends Model {
 	}
 
 	/*
-	 * Renvoie la liste des éléments d'une pièce
-	 * Va chercher la liste des entrées correspondant au lieu
-	 * dans la table localisation
+     * Returns all the items of a room
+	 * Gets the list of the entries corresponding to the place
+     * using the 'localisation' table
 	 */
 	function get_items($lieu) {
 		$query = $this->db->get_where("vue",array("nomS" => $lieu));
@@ -40,8 +34,7 @@ class Items extends Model {
 	}
 
 	/*
-	 * Récupère les valeurs des éléments du tableau $items
-	 * et recherche leur état dans la base
+	 * Returns the states of a list of items
 	 */
 	function getState($items) {
 		$result = array("root" => array());
