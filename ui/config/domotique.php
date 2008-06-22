@@ -2,27 +2,26 @@
 $config = array();
 
 /*******************************/
-/*  Temps de rafraîchissement  */
+/*  Refresh times (in seconds) */
 /*******************************/
 
-//Page des lumières & prises
-$config['LIGHT_REFRESH'] = 3; //3 secondes
+//Page for lights and power points
+$config['LIGHT_REFRESH'] = 3;
 
-//Page des températures
-$config['TEMP_REFRESH'] = 300; //5 minutes
+//Page for temperature
+$config['TEMP_REFRESH'] = 300;
 
-//Page pour la musique
-$config['AUDIO_REFRESH'] = 2; //2 secondes
+//Page for music
+$config['AUDIO_REFRESH'] = 2;
 
 /******************************/
-/*       Capacités            */
+/*       Capacities           */
 /******************************/
 /*
- * Les capacités permettent de décrire quelle fonctionnalité
- * est présente dans chaque pièce.
- * Elles sont décrites dans la table 'capacites'
- * Ce tableau défini quelle fonction doit être appelée pour chaque capacités
- * La fonction doit être présente dans le controlleur Piece
+ * Capacities describe which functionnalities are present in each room
+ * They are stored in the table 'capacities'
+ * This array defines which function will be called for each capacity
+ * The function must be declared in the 'Room' controller
  */
 $config['CAPACITIES'] = array(
 "temperature" => "temperature",
