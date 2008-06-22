@@ -1,6 +1,6 @@
 <?php
 /**
- * Classe permettant juste d'appeler les bonnes fonctions d'update dans le modèle correspondant
+ * Class used to call update functions of the corresponding model
  */
 class Update extends Controller
 {

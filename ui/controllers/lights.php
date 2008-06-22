@@ -13,26 +13,26 @@ class Lights extends Controller {
 	}
 	
 	/*
-	 * Renvoie un tableau de tableaux contenant des paires avec le nom et la valeur
+	 * Return an array of arrays containing pairs (name, value)
 	 * Ex :
 	 * {"root" : 
 	 * 			{ "item1" : 
 	 * 					{ 	"name" : "A1",
-	 * 						"description" : "Lampe chambre",
+	 * 						"description" : "Bedroom Light",
 	 * 						"value" : 0
 	 * 					},
 	 * 			{ "item2" : 
 	 * 					{ 	"name" : "A2",
-	 * 						"description" : "Radio Cuisine",
+	 * 						"description" : "Kitchen Radio",
 	 * 						"value" : 1
 	 * 					}
 	 * 			}
 	 * }
 	 */
 	function getJSONState($lieu) {
-		//On commence par récupérer tous les éléments du lieu
+		//Start with getting all items in the place
 		$elements = $this->items->get_items($this->items->get_name_from_id($lieu));
-		//Ensuite on récupère l'état des éléments
+		//Then get the state of the items
 		return $this->items->getState($elements);
 		
 	}
@@ -44,9 +44,9 @@ class Lights extends Controller {
 	}
 	
 	/*
-	 * Allume un item
-	 * La mise à jour de la base n'est *PAS* effectué par le script
-	 * Elle devra être faite par le controleur effectuant l'opération
+	 * Switch on an item
+	 * The script *DOESN'T* update the database
+	 * It must be done by the controller triggering the action
 	 */
 	function on($item) {
 		$r = array("root" => array());
@@ -59,9 +59,9 @@ class Lights extends Controller {
 	}
 	
 	/*
-	 * Eteint un item
-	 * La mise à jour de la base n'est *PAS* effectué par le script
-	 * Elle devra être faite par le controleur effectuant l'opération
+	 * Switch off an item
+	 * The script *DOESN'T* update the database
+	 * It must be done by the controller triggering the action
 	 */
 	function off($item) {
 		$r = array("root" => array());

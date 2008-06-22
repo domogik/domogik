@@ -1,8 +1,8 @@
 <?php
 /**
- * Cette classe est le point central de l'application.
- * Elle fournit l'ensemble des fonctions relative à la structuration 
- * d'une page pour une piece (détection capacités, etc ...)
+ * This class is the central point of the application
+ * It supplies all the functions relative to the structure 
+ * of a page for a room (detection of capacities...)
  */
 class Piece extends Controller {
 
@@ -14,8 +14,8 @@ class Piece extends Controller {
 	}
 
     /**
-     * Fonction d'index
-     * Appelera lookup sur la première piece
+     * Index function
+     * Calls lookup for the 1st room
      */
      function index()
      {
@@ -23,9 +23,9 @@ class Piece extends Controller {
      }
     
     /**
-     * Fonction par defaut
-     * Récupère la liste des capacités de la piece concernée et charge la premiere capacite
-     * @param idpiece : l'id de la piece concernee
+     * Default function
+	 * Gets the list of capacities of the given room and loads the first capacity
+     * @param idpiece : Id of the room
      */
 	function lookup($idpiece)
 	{
@@ -56,8 +56,8 @@ class Piece extends Controller {
 	}
 
     /**
-     * Appel générique pour le chargement des vues pour une piece (pour les lumières et les prises)
-     * @param data : le tableau de paramètre à passer aux vues
+	 * Generic call for views loading of a room (for lights and power points)
+     * @param data : array of parameters to supply to the views
      */
     private function __piece__($data)
     {
@@ -72,7 +72,7 @@ class Piece extends Controller {
     }
 
     /**
-     * Appel générique pour la température
+     * Generic call for temperature
      * @param data
      **/
      private function __temperature__($data)
@@ -88,7 +88,7 @@ class Piece extends Controller {
      }
 
     /**
-     * Appel générique pour la musique
+     * Generic call for music
      */
      private function __musique__($data)
      {
@@ -103,9 +103,9 @@ class Piece extends Controller {
      }
 
     /**
-     * Appel externe pour l'electricite
-     * Charge les données pour la piece concernée et appel __piece__ pour charger les vues
-     * @param idpiece : Id de la pièce
+     * Extenal call for electricity
+	 * Loads the data for the given room and calls __piece__ to change the views
+     * @param idpiece : Id of the room
      */
     function lumiere($idpiece)
     {
@@ -126,9 +126,8 @@ class Piece extends Controller {
     }
 
     /**
-      * Renvoie la vue permettant d'afficher des informations 
-      * sur la musique en cours dans la piece
-      * @param id de la piece
+	  * Returns the view displaying information about the music played in the room
+      * @param idpiece : Id of the room
       */
     function musique($idpiece)
     {

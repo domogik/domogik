@@ -1,6 +1,6 @@
 <?php
 /**
- * Classe proposant des fonctions d'exécution de commandes pour la musique
+ * Class for music control
  */
 class Musique extends Controller
 {
