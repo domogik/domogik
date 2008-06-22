@@ -1,7 +1,5 @@
 <table id="images">
-				<tbody>
-					
-				</tbody>
-			</table>
-
-
+	<tbody>
+	
+	</tbody>
+</table>
