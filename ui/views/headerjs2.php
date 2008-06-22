@@ -31,7 +31,7 @@ var load = function(){
   	<script type="text/javascript" charset="utf-8">
 
 	/*
-	 * Chargement de la page
+	 * Page loading
 	 */
 	(function() {
       Event.observe(document, 'dom:loaded', function() {
