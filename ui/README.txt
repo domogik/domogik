@@ -1,73 +1,76 @@
-=== Informations sur la version actuelle de l'interface ===
+=== Information about the current version of the interface ===
+
+* Requirements
+- php5, mysql
 
 * Installation
 
-L'interface est programmée en php5 avec le framework CodeIgniter.
+The interface is coded in php5 with the CodeIgniter framework.
 
 1) CodeIgniter
 
-* Télécharger CodeIgniter et le décompacter à la racine du répertoire Web et le renommmer 'domogik' par exemple
+* Download CodeIgniter and uncompress it where your web sites are stored. Rename it 'domogik'.
 
-2) Copie des répertoires
-Les répertoires :
+2) Directories copy
+The directories :
 * config/
 * controllers/
 * views/
 * models/
-doivent être mis dans le répertoire system/application de CodeIgniter
+must be copied into the system/application directory of CodeIgniter.
 
-Le répertoire include/ doit être mis à la racine du répertoire web (avec la config actuelle)
+The include directory must be copied at the root of the web site you created above (with the current configuration).
 
-De plus, la librairie 'database' doit être ajoutée dans les préchargements (fichier system/application/config/autoload.php de l'installation CI).
+The last step is to add the 'database' library in the file system/application/config/autoload.php of CodeIgniter.
 
-3) Base de données
+3) Database
 
-* Créer une base de données nommée 'domogik' (en mode UTF8)
-* Aller dans system/application/config/database.php du répertoire web et préciser les paramètres de connexions à la base
-* Exécuter dans cette base le script base.sql
+* In mysql create a database 'domogik' (use UTF-8 mode).
+* Go to the file system/application/config/database.php and adapt the settings for the database connection.
+* Execute in this database the base.sql script.
 
-4) Paramétrage
+4) Setup
 
-Editer config/routes.php et mettre dans 'default_controller', mettre 'piece'
+Edit config/routes.php and put 'piece' in 'default_controller'.
 
 
-* Fonctionnement :
+* Working :
 
-L'interface permet de visualiser des pièces, affichées dans le menu gauche. Ces pièces sont définies dans la table 'salle'⋅
-Chaque pièce possède un certain nombre de capacités (ou fonctionnalités). Les capacités possibles (à l'heure actuelle) sont 
-'temperature', 'lumiere', 'musique'. La liste des capacités de chaque pièce est définie dans la table 'capacites'. 
-Les capacités d'une pièce sont affichées à droite de l'interface.
+With the interface you can see the rooms which are displayed in the left menu. These rooms are defined in the 'salle' table.
+Each room contains some capacities (also called functionnalities). Up to now the capacities are : temperature, light, music.
+The list of capacities for each room are defined in the 'capacites' table. The capacities of a room are displayed on the right
+side of the interface.
 
-Détail des capacités :
+Details of the capacities :
 
-Lumière :
+Light :
 
-La capacité 'lumière' a pour but de récupérer l'état d'éléments électriques d'une pièce (lumière, prise).
-La liste des éléments associés à une pièce est définie dans la table 'element'. 
-Les relations element <=> salle sont définies dans la table RElementsSalles.
-L'état d'un élément est défini dans la table "etats".
-L'état d'un élément est donc récupéré régulièrement par l'interface (par défaut toutes les 3 secondes),
-et un item rouge ou vert est alors affiché.
+The function of the 'light' capacity is to get the status of electrical items in a room (light, power points).
+The list of items bound to a room are defined in the 'element' table.
 
-Température :
+The relationship between items and rooms are defined in the 'RElementsSalles' table.
+The status of an item is defined in the "etats" table.
+The status of an item is regularly read by the interface (default all 3 seconds) and red or green light is displayed.
 
-La table 'Treleves' Permet de stocker des enregistrements contenant l'identifiant d'un thermomètre, la date/heure de relevé et la valeur du relevé.
-Chaque pièce peut posséder un certain nombre de thermomètres. Les appartenances sont définies dans la table RThermometreSalles.
-La table RThermometreNom permet également de donner un nom/descriptif pour chaque thermomètre.
-La page température de l'interace récupère la liste des relevés des dernières 24heures pour la pièce courante, et génère un graphique à 
-l'aide de la librairie jsgraph.
-Ce graphique est actualisé toutes les 5 minutes (par défaut).
+Temperature :
 
-Musique :
+The 'Treleves' table contains the thermometer id, date / time of the reading and its value.
+Each room can have several thermometers. The relationships are defined in the 'RThermometreSalles' table.
+In the 'RThermometreNom' you have the name and a description of each thermometer.
 
-La page Musique permet de controler un éventuel lecteur audio. Elle utilise la table 'musique' pour déterminer des informations sur le morceau lu, 
-à savoir :
-- le titre
-- le temps total
-- le temps courant
-- l'état de la lecture (play, pause, stop).
+The 'temperature' page of the interface displays all the readings of the last 24 hours in the current room and generates a graph (with the jsgraph library).
+It is updated each 5 minutes (by default).
 
-Les données sont rafraichies toutes les 2 secondes. Les boutons Play, Pause, Stop sont activés ou désactivés suivant l'état de la lecture.
+Music :
+
+With the 'music' page you eventually can control an audio player. This page uses the 'musique' table to get information about the song played, that is to
+say :
+- Title
+- Global time
+- Current time
+- Play status (play, pause, stop).
+
+The data is reloaded each 2 seconds. The Play, Pause and Stop buttons are enabled / disabled according to the play status.
 
 Maxence (maxence@dunnewind.net)
 
