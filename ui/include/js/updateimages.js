@@ -18,10 +18,11 @@ var load = function(idpiece){
 				if (_json.root[item].value == 1) {
 				  	couleur = IMAGES_DIR+"vert2.png";
 					callback = "off(\"" + name + "\")";
-			    } else {
+				} else {
 			    	couleur = IMAGES_DIR+"red.png";
 					callback = "on(\"" + name + "\")";
-		        }
+				}
+
 				var td = "<td><p>" +
 					"<span  id='Text"+name+"'>"+_json.root[item].description+"</span>" +
 				    "</p>" +
