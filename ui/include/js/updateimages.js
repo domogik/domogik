@@ -1,5 +1,5 @@
 /*
- * Met en place la page en récupérant les éléments de la pièce
+ * Build the HTML page with the items of the room
  */
 var load = function(idpiece){
 	new Ajax.Request(BASE_URL+'index.php/lights/piece/'+idpiece, { 
@@ -37,8 +37,7 @@ var load = function(idpiece){
 };
 
 /*
- * Envoie une requête pour éteindre un item
- * et demande la mise à jour de l'item en retour
+ * Send a request to switch off an item and ask for the item update
  */
 var off = function(item) {
 	new Ajax.Request(BASE_URL+'index.php/lights/off/' + item, {
@@ -47,8 +46,7 @@ var off = function(item) {
 }
 
 /*
- * Envoie une requête pour éteindre un item
- * et demande la mise à jour de l'item en retour
+ * Send a request to switch on an item and ask for the item update
  */
 var on = function(item) {
 	new Ajax.Request(BASE_URL+'index.php/lights/on/' + item, {
@@ -57,7 +55,7 @@ var on = function(item) {
 }
 
 /*
- * Met à jour les images lors de la réception d'un message JSON
+ * Update images when getting a JSON message
  */
 var updateItems = function(transport) {
           var _json = transport.responseJSON;
