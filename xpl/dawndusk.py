@@ -18,30 +18,30 @@ class DawnDusk:
         pi = 3.141593
         dr = pi / 180
         hr = pi / 12
-        #Hauteur du soleil au lever et coucher
+        # Sunrise and sunset sun height
         ht = (-50 / 60) * dr
-        #Longitude et Latitude
+        # Longitude and Latitude
         lo = long * dr
         la = lat * dr
-        #Recuperation du jour et du mois courant
+        # Getting the current day of month
         today = datetime.date.today()
         jo = today.day
         mo = today.month
         if mo < 3:
             mo = mo + 12
         h = 12 + lo / hr
-        #Nombre de jours depuis le premier mars 0
+		# Number of days since 0,march,1
         j = int(30.61 * (mo + 1)) + jo + h / 24 - 123
-        #Anomalie et longitude moyenne
+        # Anomaly and average longitude
         m = k * (j - jm)
         l = k * (j - jl)
-        #Longitude réelle
+        # Real Longitude
         s = l + 2 * e * math.sin(m) + 1.25 * e * e * math.sin(2 * m)
-        #Coordonnees rectangulaires
+        # Cartesian coordinates
         x = math.cos(s)
         y = math.cos(ob) * math.sin(s)
         z = math.sin(ob) * math.sin(s)
-        #Equation du temps et declinaison
+        # Time's equation and variation
         r = l
         rx = math.cos(r) * x + math.sin(r) * y
         ry = -1 * math.sin(r) * x + math.cos(r) * y
@@ -49,14 +49,14 @@ class DawnDusk:
         y = ry
         et = math.atan( y  / x)
         dc = math.atan(z / math.sqrt(1 - z * z))
-        #Heure de passage au meridien
+        # Hour crossing the Meridien
         pm = h + fh + et / hr
         hs = int(pm)
         pm = 60 * (pm - hs)
         ms = int(pm)
         pm = 60 * (pm - ms)
         midi = (hs, ms, pm)
-        #Angle horaire au lever et coucher du soleil
+        # Sunrise and sunset clockwise sun angle
         cs = (math.sin(ht) - math.sin(la) * math.sin(dc)) / math.cos(la) / math.cos(dc)
         if cs > 1 or cs < -1:
             ah = None
@@ -67,14 +67,14 @@ class DawnDusk:
                 ah = math.atan(math.sqrt(1 - cs * cs) / cs)
             if cs < 0:
                 ah = ah + pi
-        #Lever du soleil
+        # Sunrise
         pm = h + fh + (et - ah) / hr
         if pm < 0:
             pm = pm + 24
         hs = int(pm)
         pm = 60 * (pm - hs)
         lever = (hs, pm)
-        #Coucher du soleil
+        # Sunset
         pm = h + fh + (et + ah) / hr
         if pm > 24:
             pm = pm - 24
