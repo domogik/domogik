@@ -1,7 +1,11 @@
 TODO file (highest priority first)
 
 * General
-	* Translate the app into English language (variables, table names, ...)
+	* @Maxence : use english words for Database objects
+	* @Loiz : translate Python files in the XPL directory
 
 * UI
 	* Add sample data to the (sql) initialization script (rooms and so on)
+
+* mpris
+	* @Marc : create mpris API in Python
