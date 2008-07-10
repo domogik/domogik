@@ -1,6 +1,6 @@
 <body>
     <div id="conteneur">
-    	<input type="hidden" id="idpiece" value="<?=$piece?>"/>
+    	<input type="hidden" id="roomId" value="<?=$room?>"/>
 
       <div id="header">
         Mon Header
@@ -10,9 +10,9 @@
       <div id="gauche">
         <ul id="menuhaut">
         <?
-            foreach($menu as $id=>$nom)
+            foreach($menu as $id=>$name)
             {
-                echo "<li><a href=\"".$this->config->item('base_url')."index.php/piece/lookup/".$id."\">".$nom."</a></li>";
+                echo "<li><a href=\"".$this->config->item('base_url')."index.php/piece/lookup/".$id."\">".$name."</a></li>";
             }
         ?>
      </ul>
@@ -20,11 +20,11 @@
       <div id="droite">
         
       <ul id="menudroit">
-        <? 
+        <?
         $cap = $this->config->item('CAPACITIES');
         foreach($capacites as $c)
         {
-            echo "<li><a href=\"".$this->config->item('base_url')."index.php/piece/".$cap[$c]."/".$piece."\">".$c."</a></li>";
+            echo "<li><a href=\"".$this->config->item('base_url')."index.php/piece/".$cap[$c]."/".$room."\">".$c."</a></li>";
         }
         ?>
         </ul>
@@ -33,7 +33,7 @@
       	<div id="titre">
       		<h2>
       			<center>
-      			<?=$name_piece?>	
+      			<?=$name_room?>	
 				</center>
       		</h2>
 			

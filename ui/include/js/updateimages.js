@@ -1,32 +1,32 @@
 /*
  * Build the HTML page with the items of the room
  */
-var load = function(idpiece){
-	new Ajax.Request(BASE_URL+'index.php/lights/piece/'+idpiece, { 
+var load = function(idroom){
+	new Ajax.Request(BASE_URL+'index.php/lights/room/'+idroom, { 
 		onSuccess:function(transport) {
 			var _json = transport.responseJSON;
 			var nb = 0;
 			for (item in _json.root) {
 				var name = _json.root[item].name;
 				console.log("Name : " + name);
-				var couleur;
+				var color;
 				var callback;
 				if (Math.floor(nb % 4) == 0) {
 					$('images').firstDescendant().insert("<tr></tr>");
 				}
 				
 				if (_json.root[item].value == 1) {
-				  	couleur = IMAGES_DIR+"vert2.png";
+				  	color = IMAGES_DIR+"vert2.png";
 					callback = "off(\"" + name + "\")";
 				} else {
-			    	couleur = IMAGES_DIR+"red.png";
+			    	color = IMAGES_DIR+"red.png";
 					callback = "on(\"" + name + "\")";
 				}
 
 				var td = "<td><p>" +
 					"<span  id='Text"+name+"'>"+_json.root[item].description+"</span>" +
 				    "</p>" +
-					"<img id='"+name+"' onClick='"+callback+"' class='reflect rheight80 ropacity66' alt='' src='"+couleur+"' />" +
+					"<img id='"+name+"' onClick='"+callback+"' class='reflect rheight80 ropacity66' alt='' src='"+color+"' />" +
 				"</td>";
 				
 				$('images').firstDescendant().childElements()[Math.floor(nb / 4)].insert(td);
@@ -60,26 +60,23 @@ var on = function(item) {
  */
 var updateItems = function(transport) {
           var _json = transport.responseJSON;
-		  var couleur;
+		  var color;
 		 // $("comment").update("Setting " + _json.name + " with " + _json.value);
 		  for (item in _json.root) {
 //		  	$("comment").update("Setting " + _json.root[item].name + " with " + _json.root[item].value);
-		  
-		  
 		  if (_json.root[item].value == 1) {
-		  	couleur = "/vert2.png";
+		  	color = "/vert2.png";
 		  } else {
-		  	couleur = "/red.png";
+		  	color = "/red.png";
 		  }
-	          $(_json.root[item].name).setAttribute("src",couleur);
+	          $(_json.root[item].name).setAttribute("src",color);
 			  $("Text" + _json.root[item].name).update(_json.root[item].description);
 			  Reflection.add($(_json.root[item].name),{ height: 0.8, opacity: 2/3 });
-			  
 		  }
         };
 		
 var getRemoteContent = function(){
-	new Ajax.Request(BASE_URL+'index.php/lights/piece/' + $('idpiece').getAttribute('value'), {
+	new Ajax.Request(BASE_URL+'index.php/lights/room/' + $('idroom').getAttribute('value'), {
 		onSuccess: updateItems
 	})
 }

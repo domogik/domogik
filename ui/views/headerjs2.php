@@ -5,7 +5,7 @@
 <script>
 var f = null;       
 var load = function(){
-    new Ajax.Request(BASE_URL+'index.php/temperature/update/'+$('idpiece').getAttribute('value'), {
+    new Ajax.Request(BASE_URL+'index.php/temperature/update/'+$('roomId').getAttribute('value'), {
         onSuccess: function(transport){
             /**
              * Parse (eval) the JSON from the server.

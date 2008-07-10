@@ -10,9 +10,9 @@ class Manager extends Model {
      * Returns the list of the rooms
      * @return : an array array[id] = 'name' with all the rooms
      */
-     public function getPieces()
+     public function getRooms()
      {
-         $query = $this->db->get("salles");
+         $query = $this->db->get("ROOMS");
          $res = array();
          foreach ($query->result() as $row)
          {
@@ -27,7 +27,7 @@ class Manager extends Model {
       */
       public function getCapacites($roomId)
       {
-          $query = $this->db->get_where('capacites',array('id_piece' => $roomId));
+          $query = $this->db->get_where('CAPACITIES',array('id_room' => $roomId));
           $res = array();
           foreach($query->result() as $row)
           {

@@ -1,7 +1,7 @@
 </head>
 <body>
     <div id="conteneur">
-    	<input type="hidden" id="idpiece" value="<?=$piece?>"/>
+    	<input type="hidden" id="roomId" value="<?=$room?>"/>
 
       <div id="header">
         Mon Header
@@ -39,7 +39,7 @@
       	<div id="titre">
       		<h2>
       			<center>
-      			<?=$name_piece?>	
+      			<?=$name_room?>	
 				</center>
       		</h2>
 			

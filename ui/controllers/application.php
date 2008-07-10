@@ -8,8 +8,8 @@ class Application extends Controller {
 
     function makeMenu()
     {
-        $this->load->model("piece");
-        $pieces = $this->piece->getPieces();
+        $this->load->model("room");
+        $pieces = $this->room->getRooms();
     }
 
 }

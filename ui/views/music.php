@@ -1,6 +1,6 @@
 <div id="music">
     <div id="container">
-        <h3 id="musictitle"><?=$titre?></h3>
+        <h3 id="musictitle"><?=$title?></h3>
         <p id="duree"><p>
         <span class="progressBar" id="progress"></span>
         <br />

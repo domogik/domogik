@@ -7,13 +7,13 @@ class Items extends Model {
     }
 
 	function get_name_from_id($id) {
-		$query = $this->db->get_where("salles",array("id" => $id));
+		$query = $this->db->get_where("ROOMS",array("id" => $id));
 		$row = $query->first_row();
 		return $row->nom;
 	}
 
 	function get_desc_from_name($name) {
-		$query = $this->db->get_where("elements",array("nom" => $name));
+		$query = $this->db->get_where("ITEMS",array("name" => $name));
 		$row = $query->first_row();
 		return $row->description;
 	}
@@ -24,7 +24,7 @@ class Items extends Model {
      * using the 'localisation' table
 	 */
 	function get_items($place) {
-		$query = $this->db->get_where("vue",array("nomS" => $place));
+		$query = $this->db->get_where("V_ITEMS_ROOMS",array("nameR" => $place));
 		$list = array();
 		foreach ($query->result() as $row)
 	    {
@@ -40,7 +40,7 @@ class Items extends Model {
 		$result = array("root" => array());
 		$nb = 0;
 		foreach ($items as $i) {
-			$query = $this->db->get_where("VEtatsElements",array("nom" => $i));
+			$query = $this->db->get_where("V_STATES_ITEMS",array("name" => $i));
 			foreach($query->result() as $row) {
 				$result["root"]["item".$nb]["name"] = $row->nom;
 				$result["root"]["item".$nb]["value"] = intval($row->etat);

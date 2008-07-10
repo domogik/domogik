@@ -11,8 +11,8 @@ class Update extends Controller
 
     function musique($roomId)
     {
-        $this->load->model('musique');
-        $this->musique->update($roomId);
+        $this->load->model('music');
+        $this->music->update($roomId);
     }
 }
 

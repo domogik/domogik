@@ -19,19 +19,19 @@ class Temperature extends Model
     {
         $nom = $this->items->get_name_from_id($roomId);
         $releves = array();
-        $this->db->select('date, thermometre, temperature');
+        $this->db->select('date, thermometer, temperature');
         $date= getdate();
         $d = strftime("%Y-%m-%d %H:%M:%S",$date[0]-86400);
         $this->db->where("date >", $d);
-        $this->db->where("nom", $nom);
-        $q = $this->db->get("VRelevesSalles");
+        $this->db->where("name", $nom);
+        $q = $this->db->get("V_STATEMENTS_ROOMS");
         //,array("date > " => $d,"nom" => $this->items->get_name_from_id($roomId))); 
         $i = 0;
          foreach ($q->result() as $row)
          {
 //             if (array_key_exists($row->thermometre, $releves))
   //           {
-                $releves[$row->thermometre][$i]= array(strtotime($row->date),$row->temperature);
+                $releves[$row->thermometer][$i]= array(strtotime($row->date),$row->temperature);
     /*         }
              else
              {
@@ -41,7 +41,7 @@ class Temperature extends Model
          }
         $series = array();
             $data = array("data" => json_encode(array(
-                "series" => array($releves[$row->thermometre]),
+                "series" => array($releves[$row->thermometer]),
                 "options" => array(
                         "xaxis" => array(
                             "noTicks"=> 0, 

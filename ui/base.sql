@@ -112,17 +112,17 @@ INSERT INTO `T_STATEMENTS` (`id`, `date`, `thermometer`, `temperature`) VALUES
 
 CREATE TABLE `CAPACITIES` (
   `id` int(11) NOT NULL auto_increment,
-  `id_piece` int(11) NOT NULL,
+  `id_rooms` int(11) NOT NULL,
   `capacity` enum('temperature','light','music') NOT NULL,
   PRIMARY KEY  (`id`),
-  KEY `FK_PIECE` (`id_piece`)
+  KEY `FK_PIECE` (`id_room`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
 
 -- 
 -- Contenu de la table `capacities`
 -- 
 
-INSERT INTO `CAPACITIES` (`id`, `id_piece`, `capacity`) VALUES 
+INSERT INTO `CAPACITIES` (`id`, `id_room`, `capacity`) VALUES 
 (2, 1, 'temperature'),
 (3, 2, 'light'),
 (4, 1, 'music');
@@ -185,10 +185,10 @@ INSERT INTO `STATES` (`id`, `item`, `state`, `date`) VALUES
 
 CREATE TABLE `MUSIC` (
   `id` int(11) NOT NULL auto_increment,
-  `id_piece` int(11) NOT NULL,
-  `titre` varchar(150) NOT NULL,
-  `temps` time NOT NULL,
-  `temps_actuel` time NOT NULL,
+  `id_room` int(11) NOT NULL,
+  `title` varchar(150) NOT NULL,
+  `time` time NOT NULL,
+  `current_time` time NOT NULL,
   `state` enum('play','pause','stop') NOT NULL,
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
@@ -197,7 +197,7 @@ CREATE TABLE `MUSIC` (
 -- Contenu de la table `music`
 -- 
 
-INSERT INTO `MUSIC` (`id`, `id_piece`, `titre`, `temps`, `temps_actuel`, `state`) VALUES 
+INSERT INTO `MUSIC` (`id`, `id_room`, `title`, `time`, `current_time`, `state`) VALUES 
 (1, 1, 'Ma zoulie chanson', '00:03:17', '00:01:05', 'stop');
 
 -- --------------------------------------------------------
@@ -259,7 +259,7 @@ ALTER TABLE `R_ITEMS_ROOMS`
 -- Contraintes pour la table `capacities`
 -- 
 ALTER TABLE `CAPACITIES`
-  ADD CONSTRAINT `CAPACITIES_ibfk_1` FOREIGN KEY (`id_piece`) REFERENCES `ROOMS` (`id`);
+  ADD CONSTRAINT `CAPACITIES_ibfk_1` FOREIGN KEY (`id_room`) REFERENCES `ROOMS` (`id`);
 
 -- 
 -- Contraintes pour la table `states`

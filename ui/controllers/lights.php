@@ -34,20 +34,24 @@ class Lights extends Controller {
 		$elements = $this->items->get_items($this->items->get_name_from_id($place));
 		//Then get the state of the items
 		return $this->items->getState($elements);
-		
+
 	}
-	
-	function piece($id) {
+
+    /*
+     * Get State of all items from a room
+     */
+	function room($id) {
 		$r = $this->getJSONState($id);
 		$j = json_encode($r);
 		$this->load->view('json', array("data" => $j));
 	}
-	
+
 	/*
 	 * Switch on an item
 	 * The script *DOESN'T* update the database
 	 * It must be done by the controller triggering the action
 	 */
+     //TODO : Call a function to send xPL message
 	function on($item) {
 		$r = array("root" => array());
 		$r["root"]["item"] = array();
@@ -57,12 +61,13 @@ class Lights extends Controller {
 		$j = json_encode($r);
 		$this->load->view('json', array("data" => $j));
 	}
-	
+
 	/*
 	 * Switch off an item
 	 * The script *DOESN'T* update the database
 	 * It must be done by the controller triggering the action
 	 */
+     //TODO : Call a function to send xPL message
 	function off($item) {
 		$r = array("root" => array());
 		$r["root"]["item"] = array();
@@ -72,7 +77,8 @@ class Lights extends Controller {
 		$j = json_encode($r);
 		$this->load->view('json', array("data" => $j));
 	}
-	
+
+    //Deprecated ?
 	function chambre()
 	{
 		$r = $this->getJSONState("chambre");

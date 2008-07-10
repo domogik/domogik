@@ -4,9 +4,9 @@
  * It supplies all the functions relative to the structure 
  * of a page for a room (detection of capacities...)
  */
-class Piece extends Controller {
+class room extends Controller {
 
-	function Piece()
+	function Room()
 	{
 		parent::Controller();
         $this->load->model('items');
@@ -17,6 +17,7 @@ class Piece extends Controller {
      * Index function
      * Calls lookup for the 1st room
      */
+     //TODO call some model functions to get the first entry in database, in case of 1 doesn't exist
      function index()
      {
          $this->lookup("1");
@@ -25,33 +26,33 @@ class Piece extends Controller {
     /**
      * Default function
 	 * Gets the list of capacities of the given room and loads the first capacity
-     * @param idpiece : Id of the room
+     * @param roomId : Id of the room
      */
 	function lookup($roomId)
 	{
         $data = Array();
-        $data["piece"] = $roomId;
+        $data["room"] = $roomId;
         $data["title"] = $this->items->get_name_from_id($roomId);
-        $data["name_piece"] = $this->items->get_name_from_id($roomId);
+        $data["name_room"] = $this->items->get_name_from_id($roomId);
         $capa = $this->manager->getCapacites($roomId);
         if (sizeof($capa) != 0)
         {
             switch($capa[0])
             {
-                case "lumiere":
-                    $this->__piece__($data);
+                case "light":
+                    $this->__room__($data);
                     break;
                 case "temperature":
                     $this->__temperature__($data);
                     break;
-                case "musique":
+                case "music":
                     $this->__musique__($data);
                     break;
             }
         }
         else
         {
-		    $this->__piece__($data);
+		    $this->__room__($data);
         }
 	}
 
@@ -59,10 +60,10 @@ class Piece extends Controller {
 	 * Generic call for views loading of a room (for lights and power points)
      * @param data : array of parameters to supply to the views
      */
-    private function __piece__($data)
+    private function __room__($data)
     {
         $data["menu"] = $this->manager->getPieces();
-        $data["capacites"] = $this->manager->getCapacites($data["piece"]);
+        $data["capacities"] = $this->manager->getCapacites($data["room"]);
         $this->load->view('head',$data);
         $this->load->view('configjs');
         $this->load->view('headerjs',$data);
@@ -78,7 +79,7 @@ class Piece extends Controller {
      private function __temperature__($data)
      {
         $data["menu"] = $this->manager->getPieces();
-        $data["capacites"] = $this->manager->getCapacites($data["piece"]);
+        $data["capacities"] = $this->manager->getCapacites($data["room"]);
         $this->load->view('head',$data);
         $this->load->view('configjs');
         $this->load->view('headerjs2',$data);
@@ -93,7 +94,7 @@ class Piece extends Controller {
      private function __musique__($data)
      {
         $data["menu"] = $this->manager->getPieces();
-        $data["capacites"] = $this->manager->getCapacites($data["piece"]);
+        $data["capacities"] = $this->manager->getCapacites($data["room"]);
         $this->load->view('head',$data);
         $this->load->view('configjs');
         $this->load->view('headerjs3',$data);
@@ -104,37 +105,36 @@ class Piece extends Controller {
 
     /**
      * Extenal call for electricity
-	 * Loads the data for the given room and calls __piece__ to change the views
-     * @param idpiece : Id of the room
+	 * Loads the data for the given room and calls __room__ to change the views
+     * @param idroom : Id of the room
      */
-    function lumiere($roomId)
+    function light($roomId)
     {
         $data = Array();
-        $data["piece"] = $roomId;   
+        $data["room"] = $roomId;   
         $data["title"] = $this->items->get_name_from_id($roomId);
-        $data["name_piece"] = $this->items->get_name_from_id($roomId);
-		$this->__piece__($data);
+        $data["name_room"] = $this->items->get_name_from_id($roomId);
+		$this->__room__($data);
 	}
 
 
     function temperature($roomId)
     {
-        $data["piece"] = $roomId;   
+        $data["room"] = $roomId;   
         $data["title"] = $this->items->get_name_from_id($roomId);
-        $data["name_piece"] = $this->items->get_name_from_id($roomId);
+        $data["name_room"] = $this->items->get_name_from_id($roomId);
         $this->__temperature__($data);         
     }
 
     /**
 	  * Returns the view displaying information about the music played in the room
-      * @param idpiece : Id of the room
+      * @param roomId : Id of the room
       */
-    function musique($roomId)
+    function music($roomId)
     {
-        $data["piece"] = $roomId;
+        $data["room"] = $roomId;
         $data["title"] = $this->items->get_name_from_id($roomId);
-        $data["name_piece"] = $this->items->get_name_from_id($roomId);
-        
+        $data["name_room"] = $this->items->get_name_from_id($roomId); 
         $this->__musique__($data);
     }
 }
