@@ -1,7 +1,7 @@
 TODO file (highest priority first)
 
 * General
-	* @Maxence : use english words for Database objects
+	* @Maxence : use english words for Database objects (made, must be test)
 	* @Loiz : translate Python files in the XPL directory
 
 * UI
@@ -9,3 +9,4 @@ TODO file (highest priority first)
 
 * mpris
 	* @Marc : create mpris API in Python
+    * @Maxence : create Mpris support to MPD (using python dbus/mpd libs)
