@@ -1,4 +1,9 @@
-TODO file (highest priority first)
+# TODO file (highest priority first)
+#
+# $LastChangedBy: mschneider $
+# $LastChangedDate: 2008-07-17 10:56:30 +0200 (jeu. 17 juil. 2008) $
+# $LastChangedRevision: 45 $
+#
 
 * General
 	* @Maxence : use english words for Database objects (made, must be tested)
