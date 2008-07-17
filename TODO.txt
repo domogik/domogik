@@ -1,9 +1,15 @@
 TODO file (highest priority first)
 
 * General
-	* @Maxence : use english words for Database objects (made, must be test)
+	* @Maxence : use english words for Database objects (made, must be tested)
 	* @Loiz : translate Python files in the XPL directory
-
+	* @? : create web site of the project with following sections :
+		* Overview of the project
+		* News
+		* Screenshots
+		* Technical overview : technical requirements, technologies used...
+		* Help / Collaborate : mailing-lists, IRC...
+		
 * UI
 	* Add sample data to the (sql) initialization script (rooms and so on)
 
