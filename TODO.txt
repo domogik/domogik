@@ -1,13 +1,19 @@
 # TODO file (highest priority first)
 #
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-07-17 10:56:30 +0200 (jeu. 17 juil. 2008) $
-# $LastChangedRevision: 45 $
+# $LastChangedDate: 2008-07-18 09:54:55 +0200 (ven. 18 juil. 2008) $
+# $LastChangedRevision: 48 $
 #
 
 * General
 	* @Maxence : use english words for Database objects (made, must be tested)
 	* @Loiz : translate Python files in the XPL directory
+	* @Marc : make sure all files have a SVN header
+
+			$LastChangedBy: mschneider $
+			$LastChangedDate: 2008-07-18 09:54:55 +0200 (ven. 18 juil. 2008) $
+			$LastChangedRevision: 48 $
+
 	* @? : create web site of the project with following sections :
 		* Overview of the project
 		* News
