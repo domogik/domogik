@@ -8,6 +8,9 @@
 
 # Core dbus stuff
 import dbus
+import dbus.service
+from dbus.mainloop.glib import DBusGMainLoop
+
 
 # Core MPD stuff
 import mpd
@@ -15,10 +18,11 @@ import mpd
 
 class Root(dbus.service.Object):
 
-    def __init__(self, object_path):
-        self.__mpd = mpd.MPDClient()
-        dbus.service.Object.__init__(self, dbus.SessionBus(), '/')
-        
+#    def __init__(self, object_path):
+#        self.__mpd = mpd.MPDClient()
+#        DBusGMainLoop(set_as_default=True)
+#        dbus.service.Object.__init__(self, dbus.SessionBus(), '/')
+
     @dbus.service.method(dbus_interface='org.freedesktop.MediaPlayer')
     def Identity(self):
         """
@@ -26,7 +30,7 @@ class Root(dbus.service.Object):
         """
         return "MPD %s" % (self.__mpd.mpd_version)
 
-    
+
     @dbus.service.method(dbus_interface='org.freedesktop.MediaPlayer')
     def Quit(self):
         """
@@ -46,11 +50,12 @@ class Root(dbus.service.Object):
 
 class TrackList(dbus.service.Object):
 
-    def __init__(self, object_path):
-        self.__mpd = mpd.MPDClient()
-        dbus.service.Object.__init__(self, dbus.SessionBus(), '/TrackList')
- 
-    @dbus.service.method(dbus_interface='org.freedesktop.MediaPlayer')    
+#    def __init__(self, object_path):
+#        self.__mpd = mpd.MPDClient()
+#        DBusGMainLoop(set_as_default=True)
+#        dbus.service.Object.__init__(self, dbus.SessionBus(), '/TrackList')
+
+    @dbus.service.method(dbus_interface='org.freedesktop.MediaPlayer')
     def GetMetadata(self, position):
         """
         Gives all meta data available for element at given position in the TrackList, counting from 0. 
@@ -119,9 +124,10 @@ class TrackList(dbus.service.Object):
 
 class Player(dbus.service.Object):
 
-    def __init__(self, object_path):
-        __mpd = mpd.MPDClient()
-        dbus.service.Object.__init__(self, dbus.SessionBus(), '/Player')
+#    def __init__(self, object_path):
+#        __mpd = mpd.MPDClient()
+#        DBusGMainLoop(set_as_default=True)
+#        dbus.service.Object.__init__(self, dbus.SessionBus(), '/Player')
 
     @dbus.service.method(dbus_interface='org.freedesktop.MediaPlayer')
     def Next(self):
@@ -207,7 +213,7 @@ class Player(dbus.service.Object):
         if ( int(self.__mpd.currentsong()['pos']) < int(self.__mpd.status()['playlistlength']) - 1 ) or ( self.__mpd.status()['repeat'] == 1 ) :
             res += 2
         #CAN_GO_PREV
-        if ( int(self.__mpd.currentsong()['pos']) > 0 or ( self.__mpd.status()['repeat'] == 1 ) :
+        if ( int(self.__mpd.currentsong()['pos']) > 0) or ( self.__mpd.status()['repeat'] == 1 ) :
             res += 4
         #CAN_PAUSE
         if ( self.__mpd.status['state'] != 'stop' ):
@@ -295,3 +301,33 @@ class Player(dbus.service.Object):
         The argument is the number of elements in the TrackList after the change happened. 
         """
         pass
+
+import gobject
+import gobject
+
+from dbus import glib
+
+import gtk
+if __name__ == "__main__":
+    dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+
+    session_bus = dbus.SessionBus()
+    name = dbus.service.BusName("org.freedesktop.MediaPlayer", session_bus)
+    root = Root(session_bus, '/')
+    player = Player(session_bus, '/Player')
+    tracklist = TrackList(session_bus, '/TrackList')
+
+    mainloop = gobject.MainLoop()
+    print "Running example service."
+    mainloop.run()
+
+#    gobject.threads_init()
+#    glib.init_threads()
+#    #loop = gobject.MainLoop()
+#    #loop.run()
+#    gtk.main()
+#    r = Root('')
+#    p = Player('/Player')
+#    t = TrackList('/TrackList')
+
+
