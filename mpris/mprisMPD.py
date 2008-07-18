@@ -8,20 +8,98 @@
 
 # Core dbus stuff
 import dbus
+from dbus import glib
 import dbus.service
 from dbus.mainloop.glib import DBusGMainLoop
-
+import gobject
 
 # Core MPD stuff
 import mpd
 
+# Mpd
+global client
+
+#Threading
+import time
+import threading
+
+
+class Trigger(threading.Thread):
+    """
+    Use a independant connection to mpd to check status very often and run 
+    signals
+    """
+    def __init__(self, cbtrack, cbstatus, cbcaps, cbtracklist, client, die):
+        self.__mpd = client
+        self.__track = cbtrack
+        self.__tracklist = cbtracklist
+        self.__caps = cbcaps
+        self.__status = cbstatus
+        self.__die = die
+        self.__oldres = None
+        self.__res = None
+
+    def run(self):
+        prev = None
+        while not self.die.isSet():
+            cur = self.__mpd.status()
+            if prev != cur:
+                self.check(prev, cur)
+                prev = cur
+            sleep(10)
+
+    def check(self, prev, cur):
+        #Check for track change
+        if cur.has_key('songid') and prev.has_key('song_id'):
+            if cur['songid'] != prev['songid']:
+                self.__track(self.__mpd.currentsong().keys(), self.__mpd.currentsong().values())
+        #Check for status change
+        state = cur['state']
+        random = cur['random']
+        repeat = cur['repeat']
+        if (state != prev['state'] or random != prev['random'] or repeat != prev['repeat']):
+            self.__status(state, random, repeat, 0)
+        #Check for tracklist change
+        if (cur.playlist() != prev.playlist()):
+            #Just pass tracklist length
+            self.__tracklist(cur.playlist().__len__())
+
+        #Check for capacities
+        #TODO : Find a way to check for change before calculating all capacities
+        self.__oldres = self.__res
+        res = 0
+        #CAN_GO_NEXT
+        if ( int(self.__mpd.currentsong()['pos']) < int(self.__mpd.status()['playlistlength']) - 1 ) or ( self.__mpd.status()['repeat'] == 1 ) :
+            res += 2
+        #CAN_GO_PREV
+        if ( int(self.__mpd.currentsong()['pos']) > 0) or ( self.__mpd.status()['repeat'] == 1 ) :
+            res += 4
+        #CAN_PAUSE
+        if ( self.__mpd.status['state'] != 'stop' ):
+            res += 8
+        #CAN_PLAY
+        if ( self.__mpd.status['playlistlength'] != 0 ):
+            res += 16
+        #CAN_SEEK
+        #Can't find why we couldn't seek, except if there is no current song
+        if ( self.__mpd.currentsong() != {} ):
+            res += 32
+        #CAN_PROVIDE_METADATA
+        #Why couldn't we provide this ?
+            res += 64
+        #CAN_HAS_TRACKLIST
+        #Why couldn't we provide this ?
+            res += 128
+        self.__res = res
+        if self.__res != self.__oldres:
+            self.__caps(self.__res)
 
 class Root(dbus.service.Object):
 
-#    def __init__(self, object_path):
-#        self.__mpd = mpd.MPDClient()
-#        DBusGMainLoop(set_as_default=True)
-#        dbus.service.Object.__init__(self, dbus.SessionBus(), '/')
+    def __init__(self,session_bus, object_path):
+        global client
+        self.__mpd = client
+        dbus.service.Object.__init__(self, session_bus, object_path)
 
     @dbus.service.method(dbus_interface='org.freedesktop.MediaPlayer')
     def Identity(self):
@@ -49,6 +127,11 @@ class Root(dbus.service.Object):
         pass
 
 class TrackList(dbus.service.Object):
+    
+    def __init__(self,session_bus, object_path):
+        global client
+        self.__mpd = client
+        dbus.service.Object.__init__(self, session_bus, object_path)
 
 #    def __init__(self, object_path):
 #        self.__mpd = mpd.MPDClient()
@@ -124,6 +207,11 @@ class TrackList(dbus.service.Object):
 
 class Player(dbus.service.Object):
 
+    def __init__(self, session_bus, object_path):
+        global client
+        self.__mpd = client
+        dbus.service.Object.__init__(self, session_bus, object_path)
+
 #    def __init__(self, object_path):
 #        __mpd = mpd.MPDClient()
 #        DBusGMainLoop(set_as_default=True)
@@ -162,6 +250,7 @@ class Player(dbus.service.Object):
         """
         If playing : rewind to the beginning of current track, else : start playing
         """
+        print "PLAY"
         self.__mpd.play()
     
     @dbus.service.method(dbus_interface='org.freedesktop.MediaPlayer')
@@ -302,14 +391,10 @@ class Player(dbus.service.Object):
         """
         pass
 
-import gobject
-import gobject
 
-from dbus import glib
-
-import gtk
 if __name__ == "__main__":
     dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+    client = mpd.MPDClient().connect("localhost",6600)
 
     session_bus = dbus.SessionBus()
     name = dbus.service.BusName("org.freedesktop.MediaPlayer", session_bus)
