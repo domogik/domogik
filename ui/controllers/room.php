@@ -1,4 +1,10 @@
 <?php
+/*
+	$LastChangedBy: mschneider $
+	$LastChangedDate: 2008-07-19 18:37:38 +0200 (sam. 19 juil. 2008) $
+	$LastChangedRevision: 74 $
+*/
+
 /**
  * This class is the central point of the application
  * It supplies all the functions relative to the structure 
@@ -91,8 +97,9 @@ class room extends Controller {
     /**
      * Generic call for music
      */
-     private function __musique__($data)
-     {
+	// TODO rename this function to '__music__'
+    private function __musique__($data)
+    {
         $data["menu"] = $this->manager->getRooms();
         $data["capacities"] = $this->manager->getCapacites($data["room"]);
         $this->load->view('head',$data);
@@ -101,7 +108,7 @@ class room extends Controller {
         $this->load->view('headermenu',$data);
         $this->load->view('music');
         $this->load->view('footer');
-     }
+    }
 
     /**
      * Extenal call for electricity
@@ -116,7 +123,6 @@ class room extends Controller {
         $data["name_room"] = $this->items->get_name_from_id($roomId);
 		$this->__room__($data);
 	}
-
 
     function temperature($roomId)
     {
