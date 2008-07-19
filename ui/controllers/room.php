@@ -62,7 +62,7 @@ class room extends Controller {
      */
     private function __room__($data)
     {
-        $data["menu"] = $this->manager->getPieces();
+        $data["menu"] = $this->manager->getRooms();
         $data["capacities"] = $this->manager->getCapacites($data["room"]);
         $this->load->view('head',$data);
         $this->load->view('configjs');
@@ -78,7 +78,7 @@ class room extends Controller {
      **/
      private function __temperature__($data)
      {
-        $data["menu"] = $this->manager->getPieces();
+        $data["menu"] = $this->manager->getRooms();
         $data["capacities"] = $this->manager->getCapacites($data["room"]);
         $this->load->view('head',$data);
         $this->load->view('configjs');
@@ -93,7 +93,7 @@ class room extends Controller {
      */
      private function __musique__($data)
      {
-        $data["menu"] = $this->manager->getPieces();
+        $data["menu"] = $this->manager->getRooms();
         $data["capacities"] = $this->manager->getCapacites($data["room"]);
         $this->load->view('head',$data);
         $this->load->view('configjs');
