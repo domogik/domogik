@@ -1,3 +1,8 @@
+-- $Author$
+-- $LastChangedBy$
+-- $LastChangedDate$
+-- $LastChangedRevision$
+
 -- phpMyAdmin SQL Dump
 -- version 2.9.1.1-Debian-2ubuntu1.2
 -- http://www.phpmyadmin.net
@@ -145,10 +150,10 @@ CREATE TABLE `ITEMS` (
 -- 
 
 INSERT INTO `ITEMS` (`id`, `name`, `description`) VALUES 
-(1, 'A1', 'lampe'),
-(2, 'A2', 'chambre'),
-(3, 'A3', 'guirlande'),
-(4, 'A4', 'cafetière'),
+(1, 'A1', 'lamp'),
+(2, 'A2', 'bedroom'),
+(3, 'A3', 'garland'),
+(4, 'A4', 'coffee pot'),
 (5, 'A5', 'music');
 
 -- --------------------------------------------------------
@@ -198,7 +203,7 @@ CREATE TABLE `MUSIC` (
 -- 
 
 INSERT INTO `MUSIC` (`id`, `id_room`, `title`, `time`, `current_time`, `state`) VALUES 
-(1, 1, 'Ma zoulie chanson', '00:03:17', '00:01:05', 'stop');
+(1, 1, 'My nice song', '00:03:17', '00:01:05', 'stop');
 
 -- --------------------------------------------------------
 
@@ -217,8 +222,8 @@ CREATE TABLE `ROOMS` (
 -- 
 
 INSERT INTO `ROOMS` (`id`, `name`) VALUES 
-(1, 'chambre'),
-(2, 'room de bain');
+(1, 'bedroom'),
+(2, 'bathroom');
 
 -- --------------------------------------------------------
 
