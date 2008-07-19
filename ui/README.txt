@@ -1,7 +1,7 @@
-# $Author$
-# $LastChangedBy$
-# $LastChangedDate$
-# $LastChangedRevision$
+# $Author: $
+# $LastChangedBy: $
+# $LastChangedDate: $
+# $LastChangedRevision: $
 
 =====================================
 === INSTALLATION FROM SVN SOURCES ===
