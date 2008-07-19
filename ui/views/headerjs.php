@@ -1,4 +1,10 @@
-	
+<?php
+/*
+	$LastChangedBy: mschneider $
+	$LastChangedDate: 2008-07-19 18:55:17 +0200 (sam. 19 juil. 2008) $
+	$LastChangedRevision: 76 $
+*/
+?>	
     <script src="<?=$this->config->item('JS_DIR')?>prototype.js" language="JavaScript" ></script>
 	<script src="<?=$this->config->item('JS_DIR')?>reflection.js" type="text/javascript" ></script>
     
