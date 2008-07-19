@@ -1,8 +1,8 @@
 # TODO file (highest priority first)
 #
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-07-19 16:11:15 +0200 (sam. 19 juil. 2008) $
-# $LastChangedRevision: 64 $
+# $LastChangedDate: 2008-07-19 16:33:53 +0200 (sam. 19 juil. 2008) $
+# $LastChangedRevision: 70 $
 #
 
 * General
@@ -11,10 +11,11 @@
 	* @Marc : make sure all files have a SVN header
 
 			$LastChangedBy: mschneider $
-			$LastChangedDate: 2008-07-19 16:11:15 +0200 (sam. 19 juil. 2008) $
-			$LastChangedRevision: 64 $
+			$LastChangedDate: 2008-07-19 16:33:53 +0200 (sam. 19 juil. 2008) $
+			$LastChangedRevision: 70 $
 
 	* @Marc : include in each file the GNU/GPL license
+	* ? : set up internationalization for messages
 		
 * UI
 	* Add sample data to the (sql) initialization script (rooms and so on)
