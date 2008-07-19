@@ -1,3 +1,7 @@
+# $LastChangedBy: $
+# $LastChangedDate: $
+# $LastChangedRevision: $
+
 #!/usr/bin/python
 #-*- encoding:utf-8 *-*
 
