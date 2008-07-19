@@ -1,8 +1,8 @@
 # TODO file (highest priority first)
 #
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-07-18 09:54:55 +0200 (ven. 18 juil. 2008) $
-# $LastChangedRevision: 48 $
+# $LastChangedDate: 2008-07-19 11:23:49 +0200 (sam. 19 juil. 2008) $
+# $LastChangedRevision: 52 $
 #
 
 * General
@@ -11,15 +11,10 @@
 	* @Marc : make sure all files have a SVN header
 
 			$LastChangedBy: mschneider $
-			$LastChangedDate: 2008-07-18 09:54:55 +0200 (ven. 18 juil. 2008) $
-			$LastChangedRevision: 48 $
+			$LastChangedDate: 2008-07-19 11:23:49 +0200 (sam. 19 juil. 2008) $
+			$LastChangedRevision: 52 $
 
-	* @? : create web site of the project with following sections :
-		* Overview of the project
-		* News
-		* Screenshots
-		* Technical overview : technical requirements, technologies used...
-		* Help / Collaborate : mailing-lists, IRC...
+	* @Marc : include in each file the GNU/GPL license
 		
 * UI
 	* Add sample data to the (sql) initialization script (rooms and so on)
@@ -27,3 +22,8 @@
 * mpris
 	* @Marc : create mpris API in Python
     * @Maxence : create Mpris support to MPD (using python dbus/mpd libs)
+
+* Website
+	* @Maxence : complete technical section
+	* @René : display on the home page the three latest news
+	* @? : set up a customized design (Logo, css...)
