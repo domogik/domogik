@@ -31,6 +31,7 @@ class Trigger(threading.Thread):
     """
     def __init__(self, cbtrack, cbstatus, cbcaps, cbtracklist, client, die):
         self.__mpd = client
+        self.__mpd.connect("localhost",6600)
         self.__track = cbtrack
         self.__tracklist = cbtracklist
         self.__caps = cbcaps
@@ -38,15 +39,17 @@ class Trigger(threading.Thread):
         self.__die = die
         self.__oldres = None
         self.__res = None
+        threading.Thread.__init__(self)
 
+        
     def run(self):
         prev = None
-        while not self.die.isSet():
+        while not self.__die.isSet():
             cur = self.__mpd.status()
-            if prev != cur:
+            if prev != cur and prev != None:
                 self.check(prev, cur)
                 prev = cur
-            sleep(10)
+            time.sleep(10)
 
     def check(self, prev, cur):
         #Check for track change
@@ -93,6 +96,7 @@ class Trigger(threading.Thread):
         self.__res = res
         if self.__res != self.__oldres:
             self.__caps(self.__res)
+        print self.__res
 
 class Root(dbus.service.Object):
 
@@ -397,13 +401,17 @@ if __name__ == "__main__":
     client = mpd.MPDClient().connect("localhost",6600)
 
     session_bus = dbus.SessionBus()
-    name = dbus.service.BusName("org.freedesktop.MediaPlayer", session_bus)
+    name = dbus.service.BusName("org.mpris.mpd", session_bus)
     root = Root(session_bus, '/')
     player = Player(session_bus, '/Player')
     tracklist = TrackList(session_bus, '/TrackList')
+    #Start trigger thread
+    die = threading.Event()
+    trigger = Trigger(player.TrackChange, player.StatusChange, player.CapsChange, player.TrackListChange, mpd.MPDClient(), die)
+    trigger.start()
 
     mainloop = gobject.MainLoop()
-    print "Running example service."
+    print "Running service."
     mainloop.run()
 
 #    gobject.threads_init()
