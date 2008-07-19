@@ -1,6 +1,11 @@
 #!/usr/bin/python
 # -*- encoding:utf-8 -*-
 
+# $Author$
+# $LastChangedBy$
+# $LastChangedDate$
+# $LastChangedRevision$
+
 from dawndusk import DawnDusk
 from xPLAPI import *
 import datetime
