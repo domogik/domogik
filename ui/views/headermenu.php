@@ -22,7 +22,7 @@
       <ul id="menudroit">
         <?
         $cap = $this->config->item('CAPACITIES');
-        foreach($capacites as $c)
+        foreach($capacities as $c)
         {
             echo "<li><a href=\"".$this->config->item('base_url')."index.php/piece/".$cap[$c]."/".$room."\">".$c."</a></li>";
         }
