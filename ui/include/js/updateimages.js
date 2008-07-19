@@ -1,4 +1,10 @@
 /*
+	$LastChangedBy: mschneider $
+	$LastChangedDate: 2008-07-19 18:48:04 +0200 (sam. 19 juil. 2008) $
+	$LastChangedRevision: 75 $
+*/
+
+/*
  * Build the HTML page with the items of the room
  */
 var load = function(idroom){

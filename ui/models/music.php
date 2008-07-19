@@ -1,6 +1,12 @@
 <?php
+/*
+	$LastChangedBy: mschneider $
+	$LastChangedDate: 2008-07-19 18:48:04 +0200 (sam. 19 juil. 2008) $
+	$LastChangedRevision: 75 $
+*/
+
 /**
- * Classe gérant les informations relatives à la musique
+ * Class for information relative to the music
  */
 class Musique extends Model
 {
@@ -11,9 +17,9 @@ class Musique extends Model
     }
 
     /**
-     * Récupère les informations relative à la musique de la pièce concernée
-     * @param roomId : ID de la pièce
-     * @return : Informations sur le lecteur de la piece format JSON
+	 * Gets the information about the music of a given room
+     * @param roomId : Id of the room
+     * @return : Information about the player of the room (JSON format)
      */
     function update($roomId)
     {
@@ -39,24 +45,24 @@ class Musique extends Model
     }
 
     /**
-     * Appel externe pour déclencher la lecture
-     * @param roomId : ID de la piece dans laquelle déclencher la lecture
+	 * External call to start playing
+     * @param roomId : Id of the room
      */
     function playMusic($roomId)
     {
     }
 
     /**
-     * Appel externe pour déclencher la lecture
-     * @param roomId : ID de la piece dans laquelle déclencher la pause 
+     * External call for Pause function
+     * @param roomId : Id of the room
      */
     function pauseMusic($roomId)
     {
     }
 
     /**
-     * Appel externe pour déclencher la lecture
-     * @param roomId : ID de la piece dans laquelle arrêter la lecture
+     * External call for stop playing music
+     * @param roomId : Id of the room
      */
     function stopMusic($roomId)
     {
