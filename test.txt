@@ -1,0 +1,6 @@
+# Just a test
+
+# $Author: mschneider $
+# $LastChangedBy: mschneider $
+# $LastChangedDate: 2008-07-19 15:40:12 +0200 (sam. 19 juil. 2008) $
+# $LastChangedRevision: 58 $
