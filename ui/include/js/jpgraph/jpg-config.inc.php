@@ -3,7 +3,7 @@
 // File:	JPG-CONFIG.INC
 // Description:	Configuration file for JpGraph library
 // Created: 	2004-03-27
-// Ver:		$Id: jpg-config.inc.php 852 2007-03-18 18:18:35Z ljp $
+// Ver:		$Id: jpg-config.inc.php 64 2008-07-19 14:11:15Z mschneider $
 //
 // Copyright (c) Aditus Consulting. All rights reserved.
 //========================================================================

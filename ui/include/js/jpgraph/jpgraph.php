@@ -3,7 +3,7 @@
 // File:	JPGRAPH.PHP
 // Description:	PHP Graph Plotting library. Base module.
 // Created: 	2001-01-08
-// Ver:		$Id: jpgraph.php 964 2008-01-19 10:04:57Z ljp $
+// Ver:		$Id: jpgraph.php 64 2008-07-19 14:11:15Z mschneider $
 //
 // Copyright 2006 (c) Aditus Consulting. All rights reserved.
 //========================================================================

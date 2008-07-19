@@ -2,9 +2,9 @@
 #-*- encoding:utf-8 *-*
 
 # Author : Marc Schneider
-# $LastChangedBy: $
-# $LastChangedDate: $
-# $LastChangedRevision: $
+# $LastChangedBy: mschneider $
+# $LastChangedDate: 2008-07-19 16:11:15 +0200 (sam. 19 juil. 2008) $
+# $LastChangedRevision: 64 $
 
 # This is the mpris API
 # See http://wiki.xmms2.xmms.se/wiki/Media_Player_Interfaces

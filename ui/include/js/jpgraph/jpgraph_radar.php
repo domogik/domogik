@@ -3,7 +3,7 @@
 // File:	JPGRAPH_RADAR.PHP
 // Description: Radar plot extension for JpGraph
 // Created: 	2001-02-04
-// Ver:		$Id: jpgraph_radar.php 857 2007-03-23 19:03:13Z ljp $
+// Ver:		$Id: jpgraph_radar.php 64 2008-07-19 14:11:15Z mschneider $
 //
 // Copyright (c) Aditus Consulting. All rights reserved.
 //========================================================================

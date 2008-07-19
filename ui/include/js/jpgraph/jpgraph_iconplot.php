@@ -3,7 +3,7 @@
 // File:	JPGRAPH_ICONPLOT.PHP
 // Description:	PHP4 Graph Plotting library. Extension module.
 // Created: 	2004-02-18
-// Ver:		$Id: jpgraph_iconplot.php 838 2007-01-22 21:01:22Z ljp $
+// Ver:		$Id: jpgraph_iconplot.php 64 2008-07-19 14:11:15Z mschneider $
 //
 // Copyright (c) Aditus Consulting. All rights reserved.
 //========================================================================

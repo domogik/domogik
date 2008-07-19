@@ -1,7 +1,7 @@
--- $Author$
--- $LastChangedBy$
--- $LastChangedDate$
--- $LastChangedRevision$
+-- $Author: mschneider $
+-- $LastChangedBy: mschneider $
+-- $LastChangedDate: 2008-07-19 16:11:15 +0200 (sam. 19 juil. 2008) $
+-- $LastChangedRevision: 64 $
 
 -- phpMyAdmin SQL Dump
 -- version 2.9.1.1-Debian-2ubuntu1.2

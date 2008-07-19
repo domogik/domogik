@@ -3,7 +3,7 @@
 // File: 	JPGRAPH_UTILS.INC
 // Description: Collection of non-essential "nice to have" utilities 
 // Created: 	2005-11-20
-// Ver:		$Id: jpgraph_utils.inc.php 894 2007-04-18 21:26:50Z ljp $
+// Ver:		$Id: jpgraph_utils.inc.php 64 2008-07-19 14:11:15Z mschneider $
 //
 // Copyright (c) Aditus Consulting. All rights reserved.
 //========================================================================

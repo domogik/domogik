@@ -3,7 +3,7 @@
 // File:	jpgraph_ttf.inc.php
 // Description:	Handling of TTF fonts
 // Created: 	2006-11-19
-// Ver:		$Id: jpgraph_ttf.inc.php 806 2006-11-28 07:51:57Z ljp $
+// Ver:		$Id: jpgraph_ttf.inc.php 64 2008-07-19 14:11:15Z mschneider $
 //
 // Copyright (c) Aditus Consulting. All rights reserved.
 //========================================================================

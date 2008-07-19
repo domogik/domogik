@@ -3,7 +3,7 @@
 // File:	JPGRAPH_ANTISPAM.PHP
 // Description:	Genarate anti-spam challenge
 // Created: 	2004-10-07
-// Ver:		$Id: jpgraph_antispam-digits.php 782 2006-10-08 08:09:02Z ljp $
+// Ver:		$Id: jpgraph_antispam-digits.php 64 2008-07-19 14:11:15Z mschneider $
 //
 // Copyright (c) Aditus Consulting. All rights reserved.
 //========================================================================

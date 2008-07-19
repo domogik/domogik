@@ -4,7 +4,7 @@
 // Description: Special localization file with the same error messages 
 //              for all errors.
 // Created: 	2006-02-18
-// Ver:		$Id: prod.inc.php 782 2006-10-08 08:09:02Z ljp $
+// Ver:		$Id: prod.inc.php 64 2008-07-19 14:11:15Z mschneider $
 //
 // Copyright (c) Aditus Consulting. All rights reserved.
 //========================================================================

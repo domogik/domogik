@@ -3,7 +3,7 @@
 // File:	GD_IMAGE.INC.PHP
 // Description:	GD Instance of Image class
 // Created: 	2006-05-06
-// Ver:		$Id: gd_image.inc.php 976 2008-03-09 18:42:44Z ljp $
+// Ver:		$Id: gd_image.inc.php 64 2008-07-19 14:11:15Z mschneider $
 //
 // Copyright (c) Aditus Consulting. All rights reserved.
 //========================================================================
