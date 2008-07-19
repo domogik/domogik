@@ -1,8 +1,8 @@
 <?php
 /*
 	$LastChangedBy: mschneider $
-	$LastChangedDate: 2008-07-19 16:14:26 +0200 (sam. 19 juil. 2008) $
-	$LastChangedRevision: 66 $
+	$LastChangedDate: 2008-07-19 16:17:23 +0200 (sam. 19 juil. 2008) $
+	$LastChangedRevision: 67 $
 */
 class Manager extends Model {
 
@@ -21,7 +21,7 @@ class Manager extends Model {
          $res = array();
          foreach ($query->result() as $row)
          {
-             $res[$row->id] = $row->nom;
+             $res[$row->id] = $row->name;
          }
          return $res;
      }
@@ -36,7 +36,7 @@ class Manager extends Model {
           $res = array();
           foreach($query->result() as $row)
           {
-              $res[] = $row->capacite;
+              $res[] = $row->capacity;
           }
           return $res;
       }
