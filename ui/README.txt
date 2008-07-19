@@ -1,6 +1,6 @@
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-07-19 16:14:26 +0200 (sam. 19 juil. 2008) $
-# $LastChangedRevision: 66 $
+# $LastChangedDate: 2008-07-19 19:03:10 +0200 (sam. 19 juil. 2008) $
+# $LastChangedRevision: 77 $
 
 =====================================
 === INSTALLATION FROM SVN SOURCES ===
@@ -51,7 +51,12 @@ b) Copy the ui/include directory at the root of the web site directory.
 
 5) Setup
 
-In the web site directory edit 'system/application/config/routes.php' and put 'room' in 'default_controller'.
+* In the web site directory :
+	* edit 'system/application/config/routes.php' and change $route['default_controller'] to :
+		$route['default_controller'] = "room";
+
+	* edit 'system/application/config/config.php' and change $config['base_url'] to :
+		$config['base_url']	= "http://127.0.0.1/domogik/";
 
 * Working :
 
