@@ -112,7 +112,7 @@ INSERT INTO `T_STATEMENTS` (`id`, `date`, `thermometer`, `temperature`) VALUES
 
 CREATE TABLE `CAPACITIES` (
   `id` int(11) NOT NULL auto_increment,
-  `id_rooms` int(11) NOT NULL,
+  `id_room` int(11) NOT NULL,
   `capacity` enum('temperature','light','music') NOT NULL,
   PRIMARY KEY  (`id`),
   KEY `FK_PIECE` (`id_room`)
