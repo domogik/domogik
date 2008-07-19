@@ -1,4 +1,10 @@
 <?php
+/*
+	$Author$
+	$LastChangedBy$
+	$LastChangedDate$
+	$LastChangedRevision$
+*/
 class Items extends Model {
     
     function Items() 
@@ -9,7 +15,7 @@ class Items extends Model {
 	function get_name_from_id($id) {
 		$query = $this->db->get_where("ROOMS",array("id" => $id));
 		$row = $query->first_row();
-		return $row->nom;
+		return $row->name;
 	}
 
 	function get_desc_from_name($name) {

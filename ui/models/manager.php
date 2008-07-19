@@ -1,4 +1,10 @@
 <?php
+/*
+	$Author$
+	$LastChangedBy$
+	$LastChangedDate$
+	$LastChangedRevision$
+*/
 class Manager extends Model {
 
     function Manager()
