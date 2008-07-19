@@ -1,7 +1,6 @@
-# $Author: mschneider $
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-07-19 16:11:15 +0200 (sam. 19 juil. 2008) $
-# $LastChangedRevision: 64 $
+# $LastChangedDate: 2008-07-19 16:14:26 +0200 (sam. 19 juil. 2008) $
+# $LastChangedRevision: 66 $
 
 =====================================
 === INSTALLATION FROM SVN SOURCES ===
