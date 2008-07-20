@@ -1,8 +1,8 @@
 # TODO file (highest priority first)
 #
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-07-20 16:44:52 +0200 (dim. 20 juil. 2008) $
-# $LastChangedRevision: 81 $
+# $LastChangedDate: 2008-07-20 17:00:36 +0200 (dim. 20 juil. 2008) $
+# $LastChangedRevision: 82 $
 #
 
 * General
@@ -25,3 +25,4 @@
 	* @? : see how multi-languages sites work in Drupal
 	* @? : set up a customized design (Logo, css...)
 		Marc : I think my sister could design a logo for Domogik
+	* @? : write a "About us" section listing the main people managing / contributing to the project (this is not urgent)
