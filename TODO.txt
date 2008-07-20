@@ -1,20 +1,15 @@
 # TODO file (highest priority first)
 #
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-07-19 16:33:53 +0200 (sam. 19 juil. 2008) $
-# $LastChangedRevision: 70 $
+# $LastChangedDate: 2008-07-20 16:18:55 +0200 (dim. 20 juil. 2008) $
+# $LastChangedRevision: 80 $
 #
 
 * General
 	* @Maxence : use english words for Database objects (made, must be tested)
-	* @Loiz : translate Python files in the XPL directory
-	* @Marc : make sure all files have a SVN header
-
-			$LastChangedBy: mschneider $
-			$LastChangedDate: 2008-07-19 16:33:53 +0200 (sam. 19 juil. 2008) $
-			$LastChangedRevision: 70 $
-
-	* @Marc : include in each file the GNU/GPL license
+	* @Loiz : translate Python files in the XPL directory	
+	* ? : choose a license for the project e.g. GNU/GPL v2 or GNU/GPL v3
+	* @Marc : include in each file the project license
 	* ? : set up internationalization for messages
 		
 * UI
