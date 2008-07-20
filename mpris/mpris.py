@@ -1,10 +1,11 @@
 #!/usr/bin/python
 #-*- encoding:utf-8 *-*
 
-# Author : Marc Schneider
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-07-19 16:11:15 +0200 (sam. 19 juil. 2008) $
-# $LastChangedRevision: 64 $
+# $LastChangedDate: 2008-07-20 17:18:40 +0200 (dim. 20 juil. 2008) $
+# $LastChangedRevision: 84 $
+
+# Author : Marc Schneider (marc@mirelsol.org)
 
 # This is the mpris API
 # See http://wiki.xmms2.xmms.se/wiki/Media_Player_Interfaces
