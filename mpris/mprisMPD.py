@@ -1,6 +1,10 @@
 #!/usr/bin/python
 #-*- encoding:utf-8 *-*
 
+# $LastChangedBy: mschneider $
+# $LastChangedDate: 2008-07-20 17:17:30 +0200 (dim. 20 juil. 2008) $
+# $LastChangedRevision: 83 $
+
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 #
 # This is the MPD support for MPRIS
