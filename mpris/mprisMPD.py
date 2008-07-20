@@ -2,8 +2,8 @@
 #-*- encoding:utf-8 *-*
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-07-20 17:17:30 +0200 (dim. 20 juil. 2008) $
-# $LastChangedRevision: 83 $
+# $LastChangedDate: 2008-07-20 17:39:55 +0200 (dim. 20 juil. 2008) $
+# $LastChangedRevision: 86 $
 
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 #
@@ -23,7 +23,7 @@ import mpd
 # Mpd
 global client
 
-#Threading
+# Threading
 import time
 import threading
 
@@ -56,46 +56,46 @@ class Trigger(threading.Thread):
             time.sleep(10)
 
     def check(self, prev, cur):
-        #Check for track change
+        # Check for track change
         if cur.has_key('songid') and prev.has_key('song_id'):
             if cur['songid'] != prev['songid']:
                 self.__track(self.__mpd.currentsong().keys(), self.__mpd.currentsong().values())
-        #Check for status change
+        # Check for status change
         state = cur['state']
         random = cur['random']
         repeat = cur['repeat']
         if (state != prev['state'] or random != prev['random'] or repeat != prev['repeat']):
             self.__status(state, random, repeat, 0)
-        #Check for tracklist change
+        # Check for tracklist change
         if (cur.playlist() != prev.playlist()):
             #Just pass tracklist length
             self.__tracklist(cur.playlist().__len__())
 
-        #Check for capacities
-        #TODO : Find a way to check for change before calculating all capacities
+        # Check for capacities
+        # TODO : Find a way to check for change before calculating all capacities
         self.__oldres = self.__res
         res = 0
-        #CAN_GO_NEXT
+        # CAN_GO_NEXT
         if ( int(self.__mpd.currentsong()['pos']) < int(self.__mpd.status()['playlistlength']) - 1 ) or ( self.__mpd.status()['repeat'] == 1 ) :
             res += 2
-        #CAN_GO_PREV
+        # CAN_GO_PREV
         if ( int(self.__mpd.currentsong()['pos']) > 0) or ( self.__mpd.status()['repeat'] == 1 ) :
             res += 4
-        #CAN_PAUSE
+        # CAN_PAUSE
         if ( self.__mpd.status['state'] != 'stop' ):
             res += 8
-        #CAN_PLAY
+        # CAN_PLAY
         if ( self.__mpd.status['playlistlength'] != 0 ):
             res += 16
-        #CAN_SEEK
-        #Can't find why we couldn't seek, except if there is no current song
+        # CAN_SEEK
+        # Can't find why we couldn't seek, except if there is no current song
         if ( self.__mpd.currentsong() != {} ):
             res += 32
-        #CAN_PROVIDE_METADATA
-        #Why couldn't we provide this ?
+        # CAN_PROVIDE_METADATA
+        # Why couldn't we provide this ?
             res += 64
-        #CAN_HAS_TRACKLIST
-        #Why couldn't we provide this ?
+        # CAN_HAS_TRACKLIST
+        # Why couldn't we provide this ?
             res += 128
         self.__res = res
         if self.__res != self.__oldres:
@@ -306,27 +306,27 @@ class Player(dbus.service.Object):
             	Whether the media player can hold a list of several items 
         """
         res = 0
-        #CAN_GO_NEXT
+        # CAN_GO_NEXT
         if ( int(self.__mpd.currentsong()['pos']) < int(self.__mpd.status()['playlistlength']) - 1 ) or ( self.__mpd.status()['repeat'] == 1 ) :
             res += 2
-        #CAN_GO_PREV
+        # CAN_GO_PREV
         if ( int(self.__mpd.currentsong()['pos']) > 0) or ( self.__mpd.status()['repeat'] == 1 ) :
             res += 4
-        #CAN_PAUSE
+        # CAN_PAUSE
         if ( self.__mpd.status['state'] != 'stop' ):
             res += 8
-        #CAN_PLAY
+        # CAN_PLAY
         if ( self.__mpd.status['playlistlength'] != 0 ):
             res += 16
-        #CAN_SEEK
-        #Can't find why we couldn't seek, except if there is no current song
+        # CAN_SEEK
+        # Can't find why we couldn't seek, except if there is no current song
         if ( self.__mpd.currentsong() != {} ):
             res += 32
-        #CAN_PROVIDE_METADATA
-        #Why couldn't we provide this ?
+        # CAN_PROVIDE_METADATA
+        # Why couldn't we provide this ?
             res += 64
-        #CAN_HAS_TRACKLIST
-        #Why couldn't we provide this ?
+        # CAN_HAS_TRACKLIST
+        # Why couldn't we provide this ?
             res += 128
         return res
     
@@ -409,7 +409,7 @@ if __name__ == "__main__":
     root = Root(session_bus, '/')
     player = Player(session_bus, '/Player')
     tracklist = TrackList(session_bus, '/TrackList')
-    #Start trigger thread
+    # Start trigger thread
     die = threading.Event()
     trigger = Trigger(player.TrackChange, player.StatusChange, player.CapsChange, player.TrackListChange, mpd.MPDClient(), die)
     trigger.start()
