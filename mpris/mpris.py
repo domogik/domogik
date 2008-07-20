@@ -2,8 +2,8 @@
 #-*- encoding:utf-8 *-*
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-07-20 18:49:00 +0200 (dim. 20 juil. 2008) $
-# $LastChangedRevision: 87 $
+# $LastChangedDate: 2008-07-20 18:52:14 +0200 (dim. 20 juil. 2008) $
+# $LastChangedRevision: 88 $
 
 # Author : Marc Schneider <marc@mirelsol.org>
 
@@ -174,7 +174,7 @@ class Mpris:
     # Arguments :
     # * a user defined function with argument that is the metadata attached to the new "Track" 
     def trackChange(self, metaData):#userDefinedTrackChange(metaData)):
-    	self.__userDefinedTrackChange(metaData) <=== ca
+    	self.__userDefinedTrackChange(metaData)
     
     # Signal is emitted when the status of the "Media Player" change. The argument 
     # has the same meaning as the value returned by GetStatus
