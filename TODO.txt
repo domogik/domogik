@@ -1,8 +1,8 @@
 # TODO file (highest priority first)
 #
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-07-20 16:18:55 +0200 (dim. 20 juil. 2008) $
-# $LastChangedRevision: 80 $
+# $LastChangedDate: 2008-07-20 16:44:52 +0200 (dim. 20 juil. 2008) $
+# $LastChangedRevision: 81 $
 #
 
 * General
@@ -16,10 +16,12 @@
 	* Add sample data to the (sql) initialization script (rooms and so on)
 
 * mpris
-	* @Marc : create mpris API in Python
+	* @Marc : create Mpris API in Python
     * @Maxence : create Mpris support to MPD (using python dbus/mpd libs)
 
 * Website
 	* @Maxence : complete technical section
 	* @René : display on the home page the three latest news
+	* @? : see how multi-languages sites work in Drupal
 	* @? : set up a customized design (Logo, css...)
+		Marc : I think my sister could design a logo for Domogik
