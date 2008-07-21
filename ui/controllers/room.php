@@ -1,8 +1,8 @@
 <?php
 /*
 	$LastChangedBy: mschneider $
-	$LastChangedDate: 2008-07-19 18:37:38 +0200 (sam. 19 juil. 2008) $
-	$LastChangedRevision: 74 $
+	$LastChangedDate: 2008-07-21 11:33:24 +0200 (lun. 21 juil. 2008) $
+	$LastChangedRevision: 92 $
 */
 
 /**
@@ -98,7 +98,7 @@ class room extends Controller {
      * Generic call for music
      */
 	// TODO rename this function to '__music__'
-    private function __musique__($data)
+    private function __music__($data)
     {
         $data["menu"] = $this->manager->getRooms();
         $data["capacities"] = $this->manager->getCapacites($data["room"]);
@@ -141,6 +141,6 @@ class room extends Controller {
         $data["room"] = $roomId;
         $data["title"] = $this->items->get_name_from_id($roomId);
         $data["name_room"] = $this->items->get_name_from_id($roomId); 
-        $this->__musique__($data);
+        $this->__music__($data);
     }
 }
