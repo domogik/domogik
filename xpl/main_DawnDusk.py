@@ -1,9 +1,9 @@
 #!/usr/bin/python
 # -*- encoding:utf-8 -*-
 
-# $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-07-21 09:37:17 +0200 (lun. 21 juil. 2008) $
-# $LastChangedRevision: 90 $
+# $LastChangedBy: bz8 $
+# $LastChangedDate: 2008-07-21 20:25:43 +0200 (lun. 21 juil. 2008) $
+# $LastChangedRevision: 96 $
 
 from dawndusk import DawnDusk
 from xPLAPI import *
@@ -12,22 +12,22 @@ import datetime
 myxpl = Manager(ip = "192.168.1.20",port = 5037, source="xpl-dawndusk.python")
 mydawndusk = DawnDusk()
 
-#Definition des paramètres
+#Parameters definitions
 long = -1.59
 lat = 48.07
 fh = 1
-#Attend la réception d'un message de type DAWNDUSK.REQUEST
-#ATTENTION : Ce script ne respecte pas le schema DAWNDUSK.REQUEST
-#Le script attend un message contenant query=day ou query=night
-#Et renvoi un message du type DATETIME.BASIC avec l'heure de lever ou coucher du soleil
+#Waiting for the reception of a message of the type DAWNDUSK.REQUEST
+#CAUTION : This script does not respect  DAWNDUSK.REQUEST scheme
+#This script is waiting for a messgage wich contains query=day or query=night
+#And return a message of the type DATETIME.BASIC with sunrise or sunset hour
 
 def dateFromTuple(tuple):
     """
-    Tranforme le résultat de get_dawn_dusk en string de la forme 'yyyymmddhhmmss'
+    Tranforme the result from get_dawn_dusk to string with  “yyyymmddhhmmss” form
     """
-    h = "%.2i" % (tuple[0] + 1) #1h en plus car en heure d'ete .TO FIX
+    h = "%.2i" % (tuple[0] + 1) #1h more because summer time TO FIX
     m = "%.2i" % (int(tuple[1]))
-    s = "%.2i" % ((tuple[1] - int(tuple[1])) *  60) #Passage en seconde
+    s = "%.2i" % ((tuple[1] - int(tuple[1])) *  60) #Passage in second
     today = datetime.date.today()
     y = today.year
     mo = "%.2i" % today.month
@@ -38,7 +38,7 @@ def dateFromTuple(tuple):
     
 def getDawn(message):
     """
-    Envoie un message xPL de type DATETIME.BASIC avec l'heure de lever du soleil
+    Send a xPL message of the type DATETIME.BASIC with sunrise hour
     """
     dawn, dusk = mydawndusk.get_dawn_dusk(long, lat, fh)
     date = dateFromTuple(dawn)
@@ -51,7 +51,7 @@ def getDawn(message):
 
 def getDusk(message):
     """
-    Envoie un message xPL de type DATETIME.BASIC avec l'heure de coucher du soleil
+    Send a xPL message of the type DATETIME.BASIC with sunset hour
     """
     dawn, dusk = mydawndusk.get_dawn_dusk(long, lat, fh)
     date = dateFromTuple(dusk)
@@ -61,7 +61,7 @@ def getDusk(message):
     mess.set_data_key("status",date)
     myxpl.send(mess)
    
-#Listener pour le dawn
+#Listener for the dawn
 dawnL = Listener(getDawn, myxpl, {'schema':'dawndusk.request','type':'xpl-cmnd','command':'status','query':'day'})
-#Listener pour le dusk
+#Listener for the dusk
 duskL = Listener(getDusk, myxpl, {'schema':'dawndusk.request','type':'xpl-cmnd','command':'status','query':'night'})
