@@ -1,8 +1,8 @@
 <?php
 /*
 	$LastChangedBy: mschneider $
-	$LastChangedDate: 2008-07-19 18:48:04 +0200 (sam. 19 juil. 2008) $
-	$LastChangedRevision: 75 $
+	$LastChangedDate: 2008-07-21 11:41:41 +0200 (lun. 21 juil. 2008) $
+	$LastChangedRevision: 94 $
 */
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
@@ -32,8 +32,8 @@ $config['AUDIO_REFRESH'] = 2;
  */
 $config['CAPACITIES'] = array(
 "temperature" => "temperature",
-"musique" => "audio",
-"lumiere" => "lumiere"
+"music" => "audio",
+"light" => "lumiere"
 );
 
 ?>
