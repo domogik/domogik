@@ -1,10 +1,9 @@
 #!/usr/bin/python
 # -*- encoding:utf-8 -*-
 
-# $Author: mschneider $
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-07-19 16:11:15 +0200 (sam. 19 juil. 2008) $
-# $LastChangedRevision: 64 $
+# $LastChangedDate: 2008-07-21 09:37:17 +0200 (lun. 21 juil. 2008) $
+# $LastChangedRevision: 90 $
 
 from dawndusk import DawnDusk
 from xPLAPI import *
