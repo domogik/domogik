@@ -1,6 +1,10 @@
 #!/usr/bin/python
 # -*- encoding:utf-8 -*-
 
+# $LastChangedBy: mschneider $
+# $LastChangedDate: 2008-07-21 09:38:29 +0200 (lun. 21 juil. 2008) $
+# $LastChangedRevision: 91 $
+
 from x10API import *
 from xPLAPI import *
 from datetime import datetime
