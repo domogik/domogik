@@ -1,18 +1,18 @@
 # TODO file (highest priority first)
 #
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-07-22 09:31:18 +0200 (mar. 22 juil. 2008) $
-# $LastChangedRevision: 97 $
+# $LastChangedDate: 2008-07-22 13:15:08 +0200 (mar. 22 juil. 2008) $
+# $LastChangedRevision: 99 $
 #
 
 * General
 	* @Maxence : use english words for Database objects (made, must be tested)
-	* @Loiz : translate Python files in the XPL directory
 	* @Marc : include in each file the project license GNU/GPL v3
-	* ? : set up internationalization for messages
+	* @Loiz : set up internationalization for messages
 		
 * UI
-	* Add sample data to the (sql) initialization script (rooms and so on)
+	* @Maxence : refactor include files organization (avoid having ugly headerjs.php, headerjs2.php, headerjs3.php...)
+	* (@?) Add sample data to the (sql) initialization script (rooms and so on)
 
 * mpris
 	* @Marc : create Mpris API in Python
