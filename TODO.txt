@@ -1,15 +1,14 @@
 # TODO file (highest priority first)
 #
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-07-20 17:00:36 +0200 (dim. 20 juil. 2008) $
-# $LastChangedRevision: 82 $
+# $LastChangedDate: 2008-07-22 09:31:18 +0200 (mar. 22 juil. 2008) $
+# $LastChangedRevision: 97 $
 #
 
 * General
 	* @Maxence : use english words for Database objects (made, must be tested)
-	* @Loiz : translate Python files in the XPL directory	
-	* ? : choose a license for the project e.g. GNU/GPL v2 or GNU/GPL v3
-	* @Marc : include in each file the project license
+	* @Loiz : translate Python files in the XPL directory
+	* @Marc : include in each file the project license GNU/GPL v3
 	* ? : set up internationalization for messages
 		
 * UI
@@ -21,7 +20,6 @@
 
 * Website
 	* @Maxence : complete technical section
-	* @René : display on the home page the three latest news
 	* @? : see how multi-languages sites work in Drupal
 	* @? : set up a customized design (Logo, css...)
 		Marc : I think my sister could design a logo for Domogik
