@@ -2,9 +2,9 @@
 # -*- encoding:utf-8 -*-
 
 # Author : Maxence Dunnewind <maxence@dunnewind.net>
-# $LastChangedBy: $
-# $LastChangedDate: $
-# $LastChangedRevision: $
+# $LastChangedBy: mschneider $
+# $LastChangedDate: 2008-07-22 09:33:08 +0200 (mar. 22 juil. 2008) $
+# $LastChangedRevision: 98 $
 
 # This is for sending xPL messages on an xPL network
 # The messages are serialized (put in some list) and
