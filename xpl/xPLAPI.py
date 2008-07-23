@@ -1,33 +1,28 @@
 #!/usr/bin/python
 # -*- encoding:utf-8 -*-
 
+# Copyright 2008 Domogik project
+
+# This file is part of Domogik.
+# Domogik is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Domogik is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+
+# Author: Maxence Dunnewind <maxence@dunnewind.net>
+
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-07-21 09:38:29 +0200 (lun. 21 juil. 2008) $
-# $LastChangedRevision: 91 $
+# $LastChangedDate: 2008-07-23 21:42:29 +0200 (mer. 23 juil. 2008) $
+# $LastChangedRevision: 100 $
 
-"""
-xPL API for python
-
- Version 0.1
-
- Copyright (C) 2008 by Maxence DUNNEWIND
- http://www.dunnewind.net
-
- This program is free software; you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation; either version 2 of the License, or
- (at your option) any later version.
- 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
- 
- You should have received a copy of the GNU General Public License along
- with this program; if not, write to the Free Software Foundation, Inc.,
- 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- 
-  """
 import sys 
 import sys, string, select, threading
 from socket import *

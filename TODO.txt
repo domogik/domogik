@@ -1,13 +1,12 @@
 # TODO file (highest priority first)
 #
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-07-22 13:15:08 +0200 (mar. 22 juil. 2008) $
-# $LastChangedRevision: 99 $
+# $LastChangedDate: 2008-07-23 21:42:29 +0200 (mer. 23 juil. 2008) $
+# $LastChangedRevision: 100 $
 #
 
 * General
 	* @Maxence : use english words for Database objects (made, must be tested)
-	* @Marc : include in each file the project license GNU/GPL v3
 	* @Loiz : set up internationalization for messages
 		
 * UI
