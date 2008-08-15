@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-07-23 21:42:29 +0200 (mer. 23 juil. 2008) $
-# $LastChangedRevision: 100 $
+# $LastChangedDate: 2008-08-15 21:55:12 +0200 (ven. 15 août 2008) $
+# $LastChangedRevision: 103 $
 
 # This is the MPD support for MPRIS
 # See mpris.py and http://wiki.xmms2.xmms.se/wiki/Media_Player_Interfaces
@@ -61,7 +61,6 @@ class Trigger(threading.Thread):
         self.__res = None
         threading.Thread.__init__(self)
 
-        
     def run(self):
         prev = None
         while not self.__die.isSet():
@@ -133,7 +132,6 @@ class Root(dbus.service.Object):
         Returns a string containing the media player identification
         """
         return "MPD %s" % (self.__mpd.mpd_version)
-
 
     @dbus.service.method(dbus_interface='org.freedesktop.MediaPlayer',in_signature='', out_signature='')
     def Quit(self):
@@ -362,7 +360,6 @@ class Player(dbus.service.Object):
         """
         return int(self.__mpd.status()['volume'])
         
-    
     @dbus.service.method(dbus_interface='org.freedesktop.MediaPlayer',in_signature='i', out_signature='')    
     def PositionSet(self, position):
         """
@@ -387,7 +384,6 @@ class Player(dbus.service.Object):
         for i in range(items.__len__()):
             res[items[i]] = values[i]
         return res
-
 
     @dbus.service.signal(dbus_interface='org.freedesktop.MediaPlayer')
     def StatusChange(self, state, random, repeat, loop):
@@ -416,7 +412,7 @@ class Player(dbus.service.Object):
             * When the ordering of elements has changed
         The argument is the number of elements in the TrackList after the change happened. 
         """
-        print "TrckListChange"
+        print "TrackListChange"
 
 
 if __name__ == "__main__":
