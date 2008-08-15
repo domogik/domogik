@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@mirelsol.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-08-15 10:49:53 +0200 (ven. 15 août 2008) $
-# $LastChangedRevision: 101 $
+# $LastChangedDate: 2008-08-15 17:42:07 +0200 (ven. 15 août 2008) $
+# $LastChangedRevision: 102 $
 
 # This is the mpris API
 # See http://wiki.xmms2.xmms.se/wiki/Media_Player_Interfaces
@@ -36,27 +36,7 @@ import gobject
 # File loading
 import os
 
-class Mpris:
-    "mpris API"
-    
-    def __init__(self):
-        # See getStatus method for more information
-        self.__status = [0, 0, 0, 0]
-        self.__volume = 0
-        self.__position = 0
-        self.__bus = dbus.SessionBus()
-    
-    def Connect(self):
-	    # First we connect to the objects
-	    root_o = self.__bus.get_object(name, "/")
-	    player_o = self.__bus.get_object(name, "/Player")
-	    tracklist_o = self.__bus.get_object(name, "/TrackList")
-	
- 	    self.__root = dbus.Interface(root_o, "org.freedesktop.MediaPlayer")
-	    self.__tracklist  = dbus.Interface(tracklist_o, "org.freedesktop.MediaPlayer")
-	    self.__player = dbus.Interface(player_o, "org.freedesktop.MediaPlayer")
-    
-    ### ROOT methods
+class Root:
     
     # Identify the "media player" as in "VLC 0.9.0", "bmpx 0.34.9", "Audacious 1.4.0" ... 
     def GetIdentity(self):
@@ -70,13 +50,13 @@ class Mpris:
     def GetMprisVersion(self):
     	pass
     
-    ### Tracklist methods
+class TrackList:
     
     # Gives all meta data available for element at given position in the TrackList, counting from 0
     # Arguments
     # * Position in the TrackList of the item of which the metadata is requested : int
     # Return value : the metadata : string
-    def GetTracklistMetaData(self, position):
+    def GetMetaData(self, position):
     	pass
     
     # Returns the position of current URI in the TrackList The return value is zero-based, so the position of the first URI in the TrackList is 0. 
@@ -116,7 +96,7 @@ class Mpris:
     def SetRandom(self, isRandom):
     	pass
     
-    ### Player object methods
+class Player:
     
     # Goes to the next element
     def Next(self):
@@ -153,7 +133,7 @@ class Mpris:
     	return self.__status
     
     # Gives all meta data available for the currently played element
-    def GetElementMetaData(self):
+    def GetMetaData(self):
     	pass
     
     # Returns the "media player"'s current capabilities
@@ -204,5 +184,17 @@ class Mpris:
     ### User setters
     def SetTrackChangeCb(self, cb):
         self.__userDefinedTrackChange = cb
-    
+
+if __name__ == "__main__":
+ 	session_bus = dbus.SessionBus()
+ 
+    # First we connect to the objects
+
+#    root = session_bus.get_object(name, "/")
+#    player_o = self.__bus.get_object(name, "/Player")
+#    tracklist_o = self.__bus.get_object(name, "/TrackList")
+
+#    self.__root = dbus.Interface(root_o, "org.freedesktop.MediaPlayer")
+#    self.__tracklist  = dbus.Interface(tracklist_o, "org.freedesktop.MediaPlayer")
+#    self.__player = dbus.Interface(player_o, "org.freedesktop.MediaPlayer")
 
