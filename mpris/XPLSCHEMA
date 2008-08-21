@@ -1,0 +1,69 @@
+# Copyright 2008 Domogik project
+
+# This file is part of Domogik.
+# Domogik is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Domogik is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+
+# Author : Maxence Dunnewind <maxence@dunnewind.net>
+
+# $LastChangedBy: $
+# $LastChangedDate: $
+# $LastChangedRevision: $
+
+#This document aims to define a new xPL Schema mapping MPRIS spec
+#This schema isn't official yet, check
+# http://www.xpl-home.org/forums/viewtopic.php?t=621 to discuss about it
+
+AUDIO.MPRIS Message Specification
+Class = AUDIO
+Type = MPRIS
+
+This schema provides an easy way of interacting with MPRIS capable audio
+players. Each command corresponds to one of the MPRIS method.
+
+XPL-CMND Structure
+
+XPL-CMND messages will be used to send command request. All commands are
+defined to correspond to one MPRIS method name.
+
+AUDIO.MPRIS
+{
+	COMMAND=<command>[<parameters>]
+}
+
+Where commands are :
+NAME 			MPRIS relation 			Arguments
+=================================================
+IDENTITY 		Identity 				No
+QUIT 			Quit 					No
+VERSION 		MprisVersion 			No
+LISTMETADATA 	Tracklist.GetMetadata	Item position
+CURRENTTRACK 	GetCurrentTrack 		No
+ADDTRACK 		AddTrack 				Track uri, should be played immediately
+DELTRACK 		DelTrack 				Track position
+SETLOOP 		SetLoop 				True/False
+SETRANDOM 		SetRandom 				True/False
+NEXT 			Next 					No
+PREVIOUS 		Prev 					No
+PAUSE 			Pause 					No
+STOP 			Stop 					No
+PLAY 			Play 					No
+REPEAT 			Repeat 					True/False
+STATUS   		Status 					No
+PLAYERMETADATA  Player.GetMetadata 		No
+CAPACITIES 		GetCaps 				No
+SETVOLUME 		VolumeSet 				Volume level [0;100]
+VOLUME 			VolumeGet 				No
+SETPOSITION 	PositionSet 			Position in the track in milliseconds
+POSITION 		PositionGet 			No
+
