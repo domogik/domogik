@@ -19,16 +19,16 @@
 
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
-# $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-08-15 21:55:12 +0200 (ven. 15 août 2008) $
-# $LastChangedRevision: 103 $
+# $LastChangedBy: maxence $
+# $LastChangedDate: 2008-08-21 16:28:03 +0200 (jeu. 21 août 2008) $
+# $LastChangedRevision: 105 $
 
 # This is the MPD support for MPRIS
 # See mpris.py and http://wiki.xmms2.xmms.se/wiki/Media_Player_Interfaces
 
 # Core dbus stuff
 import dbus
-from dbus import glib
+#from dbus import glib
 import dbus.service
 from dbus.mainloop.glib import DBusGMainLoop
 import gobject

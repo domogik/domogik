@@ -1,8 +1,8 @@
 # TODO file (highest priority first)
 #
-# $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-07-23 21:42:29 +0200 (mer. 23 juil. 2008) $
-# $LastChangedRevision: 100 $
+# $LastChangedBy: maxence $
+# $LastChangedDate: 2008-08-21 16:28:03 +0200 (jeu. 21 août 2008) $
+# $LastChangedRevision: 105 $
 #
 
 * General
@@ -12,6 +12,7 @@
 * UI
 	* @Maxence : refactor include files organization (avoid having ugly headerjs.php, headerjs2.php, headerjs3.php...)
 	* (@?) Add sample data to the (sql) initialization script (rooms and so on)
+    * @? : Define clean php structure to allow easy inclusion of future capacities
 
 * mpris
 	* @Marc : create Mpris API in Python
