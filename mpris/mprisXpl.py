@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@mirelsol.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-08-15 17:42:07 +0200 (ven. 15 août 2008) $
-# $LastChangedRevision: 102 $
+# $LastChangedDate: 2008-08-21 10:26:52 +0200 (jeu. 21 août 2008) $
+# $LastChangedRevision: 104 $
 
 # This is the mpris API
 # See http://wiki.xmms2.xmms.se/wiki/Media_Player_Interfaces
@@ -36,8 +36,16 @@ import gobject
 # File loading
 import os
 
+global client
+
 class Root:
-    
+
+    def __init__(self,session_bus, object_path, mainloop):
+        global client
+        self.__mplayer = client
+        self.__mainloop = mainloop
+        dbus.service.Object.__init__(self, session_bus, object_path)
+
     # Identify the "media player" as in "VLC 0.9.0", "bmpx 0.34.9", "Audacious 1.4.0" ... 
     def GetIdentity(self):
     	return self.__root.Identity()
@@ -187,12 +195,31 @@ class Player:
 
 if __name__ == "__main__":
  	session_bus = dbus.SessionBus()
- 
-    # First we connect to the objects
+	dbus_names = session_bus.get_object( "org.freedesktop.DBus", "/org/freedesktop/DBus" )
 
-#    root = session_bus.get_object(name, "/")
-#    player_o = self.__bus.get_object(name, "/Player")
-#    tracklist_o = self.__bus.get_object(name, "/TrackList")
+	dbus_o = session_bus.get_object("org.freedesktop.DBus", "/")
+	dbus_intf = dbus.Interface(dbus_o, "org.freedesktop.DBus")
+	name_list = dbus_intf.ListNames()
+
+	# Connect to the first Media Player found
+	for name in name_list:
+		print name
+		if "org.mpris." in name:
+			print "Found : ",name
+			playerName = name
+			break
+
+    # first we connect to the objects
+    root_o = bus.get_object(playerName, "/")
+    player_o = bus.get_object(playerName, "/Player")
+    tracklist_o = bus.get_object(playerName, "/TrackList")
+
+    # there is only 1 interface per object
+    root = dbus.Interface(root_o, "org.freedesktop.MediaPlayer")
+    tracklist  = dbus.Interface(tracklist_o, "org.freedesktop.MediaPlayer")
+    player = dbus.Interface(player_o, "org.freedesktop.MediaPlayer")
+
+
 
 #    self.__root = dbus.Interface(root_o, "org.freedesktop.MediaPlayer")
 #    self.__tracklist  = dbus.Interface(tracklist_o, "org.freedesktop.MediaPlayer")
