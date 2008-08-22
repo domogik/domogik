@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@mirelsol.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-08-21 10:26:52 +0200 (jeu. 21 août 2008) $
-# $LastChangedRevision: 104 $
+# $LastChangedDate: 2008-08-22 22:58:38 +0200 (ven. 22 août 2008) $
+# $LastChangedRevision: 109 $
 
 # This is the mpris API
 # See http://wiki.xmms2.xmms.se/wiki/Media_Player_Interfaces
