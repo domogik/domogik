@@ -1,8 +1,8 @@
 # TODO file (highest priority first)
 #
-# $LastChangedBy: maxence $
-# $LastChangedDate: 2008-08-21 16:28:03 +0200 (jeu. 21 août 2008) $
-# $LastChangedRevision: 105 $
+# $LastChangedBy: mschneider $
+# $LastChangedDate: 2008-08-22 14:14:08 +0200 (ven. 22 août 2008) $
+# $LastChangedRevision: 108 $
 #
 
 * General
@@ -19,6 +19,7 @@
     * @Maxence : create Mpris support to MPD (using python dbus/mpd libs)
 
 * Website
+	* @Marc : add webstats using Piwik
 	* @Maxence : complete technical section
 	* @? : see how multi-languages sites work in Drupal
 	* @? : set up a customized design (Logo, css...)
