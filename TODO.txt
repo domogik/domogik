@@ -1,8 +1,8 @@
 # TODO file (highest priority first)
 #
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-08-22 14:14:08 +0200 (ven. 22 août 2008) $
-# $LastChangedRevision: 108 $
+# $LastChangedDate: 2008-08-23 07:21:06 +0200 (sam. 23 août 2008) $
+# $LastChangedRevision: 110 $
 #
 
 * General
@@ -19,9 +19,11 @@
     * @Maxence : create Mpris support to MPD (using python dbus/mpd libs)
 
 * Website
-	* @Marc : add webstats using Piwik
-	* @Maxence : complete technical section
 	* @? : see how multi-languages sites work in Drupal
+		This is highest priority as it will allow to reference pages (especially in french)
+	* @Marc : add webstats using Piwik
+		DONE : needs to be checked
+	* @Maxence : complete technical section
 	* @? : set up a customized design (Logo, css...)
 		Marc : I think my sister could design a logo for Domogik
 	* @? : write a "About us" section listing the main people managing / contributing to the project (this is not urgent)
