@@ -1,8 +1,8 @@
 # TODO file (highest priority first)
 #
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-08-25 13:04:26 +0200 (lun. 25 août 2008) $
-# $LastChangedRevision: 111 $
+# $LastChangedDate: 2008-08-27 13:22:14 +0200 (mer. 27 août 2008) $
+# $LastChangedRevision: 112 $
 #
 
 * General
@@ -10,18 +10,17 @@
 	* @Loiz : set up internationalization for messages
 		
 * UI
-	* @Maxence : refactor include files organization (avoid having ugly headerjs.php, headerjs2.php, headerjs3.php...)
-	* (@?) Add sample data to the (sql) initialization script (rooms and so on)
-    * @? : Define clean php structure to allow easy inclusion of future capacities
+	* @Epy, @Yoven : create a prototype using HTML / CSS
+	* @Loiz ? : completely refactor web interface using Python and the Django framework
+		structure should allow easy inclusion of future capacities
+	* @? : Add sample data to the (sql) initialization script (rooms and so on)
 
 * mpris
 	* @Marc : create Mpris API in Python
     * @Maxence : create Mpris support to MPD (using python dbus/mpd libs)
 
 * Website
-	* @? : see how multi-languages sites work in Drupal
-		This is highest priority as it will allow to reference pages (especially in french)
 	* @Maxence : complete technical section
-	* @? : set up a customized design (Logo, css...)
-		Marc : I think my sister could design a logo for Domogik
+	* @Marisa, Yoven : propose a Domogik logo and a header
+	* @Yoven : set up a customized design (Logo, css...)
 	* @? : write a "About us" section listing the main people managing / contributing to the project (this is not urgent)
