@@ -1,8 +1,8 @@
 # TODO file (highest priority first)
 #
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-08-27 13:22:14 +0200 (mer. 27 août 2008) $
-# $LastChangedRevision: 112 $
+# $LastChangedDate: 2008-08-28 09:24:34 +0200 (jeu. 28 août 2008) $
+# $LastChangedRevision: 113 $
 #
 
 * General
@@ -18,6 +18,10 @@
 * mpris
 	* @Marc : create Mpris API in Python
     * @Maxence : create Mpris support to MPD (using python dbus/mpd libs)
+
+* xPL
+	* @Maxence : create fake components that simulate a real home automation network
+		(useful to test the app without having any home automation installation)
 
 * Website
 	* @Maxence : complete technical section
