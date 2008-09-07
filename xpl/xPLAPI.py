@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-07-23 21:42:29 +0200 (mer. 23 juil. 2008) $
-# $LastChangedRevision: 100 $
+# $LastChangedDate: 2008-09-07 18:35:35 +0200 (dim. 07 sept. 2008) $
+# $LastChangedRevision: 114 $
 
 import sys 
 import sys, string, select, threading
@@ -101,6 +101,7 @@ class Manager:
         Send heartbeat message in broadcast on the network, on the bus port (3865)
         This make the application able to be discovered by the hub
         """
+	# TODO remove hard coded IP value : guess it ?
         msg = "xpl-stat\n{\nhop=1\nsource=" + self._source + "\ntarget=*\n}\nhbeat.app\n{\ninterval=5\nport=" + str(self._port) + "\nremote-ip=192.168.1.20\n}\n"
         self.send(msg)
 
