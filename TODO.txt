@@ -1,8 +1,8 @@
 # TODO file (highest priority first)
 #
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-08-28 09:24:34 +0200 (jeu. 28 août 2008) $
-# $LastChangedRevision: 113 $
+# $LastChangedDate: 2008-09-26 09:55:29 +0200 (ven. 26 sept. 2008) $
+# $LastChangedRevision: 115 $
 #
 
 * General
@@ -11,12 +11,12 @@
 		
 * UI
 	* @Epy, @Yoven : create a prototype using HTML / CSS
-	* @Loiz ? : completely refactor web interface using Python and the Django framework
+	* @Marc, @Loiz : completely refactor web interface using Python and the Django framework
 		structure should allow easy inclusion of future capacities
 	* @? : Add sample data to the (sql) initialization script (rooms and so on)
 
 * mpris
-	* @Marc : create Mpris API in Python
+	* @Maxence : create Mpris API in Python
     * @Maxence : create Mpris support to MPD (using python dbus/mpd libs)
 
 * xPL
