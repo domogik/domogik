@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-09-07 18:35:35 +0200 (dim. 07 sept. 2008) $
-# $LastChangedRevision: 114 $
+# $LastChangedDate: 2008-09-27 14:12:43 +0200 (sam. 27 sept. 2008) $
+# $LastChangedRevision: 116 $
 
 import sys 
 import sys, string, select, threading
@@ -78,7 +78,6 @@ class Manager:
         This function allows you to send an xPL message on the Bus
         Be carreful, there is no check on message correctness
         """
-        
         try:
             if not message.has_conf_key("hop"):
                 message.set_conf_key("hop","1")
@@ -202,8 +201,6 @@ class Listener:
         """
         return self._filter
 
-
-
 class XPLException(Exception):
     """
     xPL exception
@@ -307,7 +304,6 @@ class Message:
         If you set order, be sure to list all the keys !
         """
         self._data_order = order
-
 
     def set_conf_order(self, order):
         """
