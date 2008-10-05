@@ -20,9 +20,36 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-04 18:34:00 +0200 (sam. 04 oct. 2008) $
-# $LastChangedRevision: 118 $
+# $LastChangedDate: 2008-10-05 11:27:19 +0200 (dim. 05 oct. 2008) $
+# $LastChangedRevision: 119 $
 
 from django.db import models
 
-# Here are defined the models
+class Rooms(models.Model):
+    name = models.CharField(max_length=30)
+
+class Capacities(models.Model):
+    CAPACITY_CHOICES = (
+		('temperature', 'Temperature'),
+		('light', 'Light'),
+		('music', 'Music')
+    )
+    room = models.ForeignKey(Rooms)
+    capacity = models.CharField(max_length=30, choices = CAPACITY_CHOICES)
+
+class Items(models.Model):
+    name = models.CharField(max_length=30)
+    description = models.CharField(max_length=30)
+
+class Music(models.Model):
+    STATE_CHOICES = (
+		('play', 'Play'),
+		('pause', 'Pause'),
+		('stop', 'Stop')
+    )
+    room = models.ForeignKey(Rooms)
+    title = models.CharField(max_length=150)
+    time = models.TimeField()
+    current_time = models.TimeField()
+    state = models.CharField(max_length=10, choices = STATE_CHOICES)
+

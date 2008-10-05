@@ -17,8 +17,8 @@
 # Author: Marc Schneider <marc@mirelsol.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-04 18:34:00 +0200 (sam. 04 oct. 2008) $
-# $LastChangedRevision: 118 $
+# $LastChangedDate: 2008-10-05 11:27:19 +0200 (dim. 05 oct. 2008) $
+# $LastChangedRevision: 119 $
 
 # Django settings for domogik project.
 
@@ -98,4 +98,5 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
+	'domogik.control',
 )

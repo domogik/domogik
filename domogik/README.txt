@@ -17,8 +17,13 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-04 18:34:00 +0200 (sam. 04 oct. 2008) $
-# $LastChangedRevision: 118 $
+# $LastChangedDate: 2008-10-05 11:27:19 +0200 (dim. 05 oct. 2008) $
+# $LastChangedRevision: 119 $
+
+Note
+====
+To learn using Django, there is an excellent tutorial here :
+http://docs.djangoproject.com/en/dev/intro/tutorial01/#intro-tutorial01
 
 Requirements
 ============
@@ -42,3 +47,8 @@ Install the database
 
 * Create initial tables for the framework
 	python manage.py syncdb
+
+* Create tables for the app
+	python manage.py sql control
+	python manage.py syncdb
+	
