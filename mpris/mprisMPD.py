@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2008-08-21 16:28:03 +0200 (jeu. 21 août 2008) $
-# $LastChangedRevision: 105 $
+# $LastChangedDate: 2008-10-05 22:02:29 +0200 (dim. 05 oct. 2008) $
+# $LastChangedRevision: 122 $
 
 # This is the MPD support for MPRIS
 # See mpris.py and http://wiki.xmms2.xmms.se/wiki/Media_Player_Interfaces
@@ -33,16 +33,10 @@ import dbus.service
 from dbus.mainloop.glib import DBusGMainLoop
 import gobject
 
-# Core MPD stuff
-import mpd
-
-# Mpd
-global client
-
-# Threading
 import time
 import threading
 
+import sys
 
 class Trigger(threading.Thread):
     """
@@ -121,7 +115,6 @@ class Trigger(threading.Thread):
 class Root(dbus.service.Object):
 
     def __init__(self,session_bus, object_path, mainloop):
-        global client
         self.__mpd = client
         self.__mainloop = mainloop
         dbus.service.Object.__init__(self, session_bus, object_path)
@@ -153,7 +146,6 @@ class Root(dbus.service.Object):
 class TrackList(dbus.service.Object):
     
     def __init__(self,session_bus, object_path):
-        global client
         self.__mpd = client
         dbus.service.Object.__init__(self, session_bus, object_path)
 
@@ -233,7 +225,6 @@ class TrackList(dbus.service.Object):
 class Player(dbus.service.Object):
 
     def __init__(self, session_bus, object_path):
-        global client
         self.__mpd = client
         dbus.service.Object.__init__(self, session_bus, object_path)
 
@@ -416,9 +407,8 @@ class Player(dbus.service.Object):
 
 
 if __name__ == "__main__":
+    sys.path.append('controlers/')
     dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
-    client = mpd.MPDClient()
-    client.connect("localhost",6600)
     session_bus = dbus.SessionBus()
     name = dbus.service.BusName("org.mpris.mpd", session_bus)
     mainloop = gobject.MainLoop()
