@@ -20,26 +20,32 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-05 11:27:19 +0200 (dim. 05 oct. 2008) $
-# $LastChangedRevision: 119 $
+# $LastChangedDate: 2008-10-05 16:38:05 +0200 (dim. 05 oct. 2008) $
+# $LastChangedRevision: 120 $
 
 from django.db import models
 
-class Rooms(models.Model):
+class Item(models.Model):
     name = models.CharField(max_length=30)
+    description = models.CharField(max_length=30)
 
-class Capacities(models.Model):
+class Thermometer(models.Model):
+    thermometer = models.CharField(max_length=16)
+    label = models.CharField(max_length=50)
+
+class Room(models.Model):
+    name = models.CharField(max_length=30)
+    items = models.ManyToManyField(Item) 
+    thermometers = models.ManyToManyField(Thermometer) 
+
+class Capacity(models.Model):
     CAPACITY_CHOICES = (
 		('temperature', 'Temperature'),
 		('light', 'Light'),
 		('music', 'Music')
     )
-    room = models.ForeignKey(Rooms)
+    room = models.ForeignKey(Room)
     capacity = models.CharField(max_length=30, choices = CAPACITY_CHOICES)
-
-class Items(models.Model):
-    name = models.CharField(max_length=30)
-    description = models.CharField(max_length=30)
 
 class Music(models.Model):
     STATE_CHOICES = (
@@ -47,9 +53,18 @@ class Music(models.Model):
 		('pause', 'Pause'),
 		('stop', 'Stop')
     )
-    room = models.ForeignKey(Rooms)
+    room = models.ForeignKey(Room)
     title = models.CharField(max_length=150)
     time = models.TimeField()
     current_time = models.TimeField()
     state = models.CharField(max_length=10, choices = STATE_CHOICES)
 
+class Statement(models.Model):
+    date = models.DateTimeField()
+    thermometer = models.ForeignKey(Thermometer)
+    temperature = models.FloatField()
+
+class State(models.Model):
+    item = models.ForeignKey(Item)
+    state = models.SmallIntegerField() 
+    date = models.DateTimeField()
