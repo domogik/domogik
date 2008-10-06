@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-05 16:40:21 +0200 (dim. 05 oct. 2008) $
-# $LastChangedRevision: 121 $
+# $LastChangedDate: 2008-10-06 22:28:39 +0200 (lun. 06 oct. 2008) $
+# $LastChangedRevision: 126 $
 
 from django.db import models
 
@@ -29,14 +29,26 @@ class Item(models.Model):
 	name = models.CharField(max_length=30)
 	description = models.CharField(max_length=30)
 
+	# This is the representation of the object
+	def __unicode__(self):
+		return self.name
+
 class Thermometer(models.Model):
 	thermometer = models.CharField(max_length=16)
 	label = models.CharField(max_length=50)
 
+	# This is the representation of the object
+	def __unicode__(self):
+		return self.thermometer + " (" + self.label +")"
+
 class Room(models.Model):
 	name = models.CharField(max_length=30)
 	items = models.ManyToManyField(Item) 
-	thermometers = models.ManyToManyField(Thermometer) 
+	thermometers = models.ManyToManyField(Thermometer)
+
+	# This is the representation of the object
+	def __unicode__(self):
+		return self.name
 
 class Capacity(models.Model):
 	CAPACITY_CHOICES = (
@@ -46,6 +58,11 @@ class Capacity(models.Model):
 	)
 	room = models.ForeignKey(Room)
 	capacity = models.CharField(max_length=30, choices = CAPACITY_CHOICES)
+
+	# This is the representation of the object
+	def __unicode__(self):
+		# Improve this and add the room description
+		return self.capacity
 
 class Music(models.Model):
 	STATE_CHOICES = (
