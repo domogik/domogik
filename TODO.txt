@@ -1,8 +1,8 @@
 # TODO file (highest priority first)
 #
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-06 13:37:14 +0200 (lun. 06 oct. 2008) $
-# $LastChangedRevision: 124 $
+# $LastChangedDate: 2008-10-06 22:31:33 +0200 (lun. 06 oct. 2008) $
+# $LastChangedRevision: 127 $
 #
 
 * General
@@ -10,8 +10,12 @@
 
 * UI
 	* @Yoven : create a prototype using HTML / CSS
-	* @Marc, @Loiz : completely refactor web interface using Python and the Django framework
-		structure should allow easy inclusion of future capacities
+	* @Marc : create following views :
+		* List rooms
+		* For each room, list capacities
+		* For each capacity, list items
+		* Eventually create a global view that can switch off all the lights for example
+
 	* @? : find a way to switch between pure links and icons for the clickable areas (menus, functions...)
 	* @? : Add sample data to the (sql) initialization script (rooms and so on)
 
