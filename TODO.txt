@@ -1,18 +1,18 @@
 # TODO file (highest priority first)
 #
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-09-26 09:55:29 +0200 (ven. 26 sept. 2008) $
-# $LastChangedRevision: 115 $
+# $LastChangedDate: 2008-10-06 13:37:14 +0200 (lun. 06 oct. 2008) $
+# $LastChangedRevision: 124 $
 #
 
 * General
-	* @Maxence : use english words for Database objects (made, must be tested)
 	* @Loiz : set up internationalization for messages
-		
+
 * UI
-	* @Epy, @Yoven : create a prototype using HTML / CSS
+	* @Yoven : create a prototype using HTML / CSS
 	* @Marc, @Loiz : completely refactor web interface using Python and the Django framework
 		structure should allow easy inclusion of future capacities
+	* @? : find a way to switch between pure links and icons for the clickable areas (menus, functions...)
 	* @? : Add sample data to the (sql) initialization script (rooms and so on)
 
 * mpris
@@ -27,4 +27,7 @@
 	* @Maxence : complete technical section
 	* @Marisa, Yoven : propose a Domogik logo and a header
 	* @Yoven : set up a customized design (Logo, css...)
+	* @? : Display dates for articles in correct format according to the language
+			(currently the date is displayed using US format which may lead to confusion for french readers)
+	* @? : find a way to display a limited number of articles on the front page with a link to the rest of all entries
 	* @? : write a "About us" section listing the main people managing / contributing to the project (this is not urgent)
