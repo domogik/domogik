@@ -1,6 +1,4 @@
-#!/usr/bin/python
-#-*- encoding:utf-8 *-*
-
+<!--
 # Copyright 2008 Domogik project
 
 # This file is part of Domogik.
@@ -22,21 +20,12 @@
 # $LastChangedBy: mschneider $
 # $LastChangedDate: 2008-10-08 23:16:00 +0200 (mer. 08 oct. 2008) $
 # $LastChangedRevision: 128 $
-
-from django.shortcuts import render_to_response
-
-def index(request):
-	pageTitle = "Main page of Domogik"
-	return render_to_response('index.html', {'pageTitle': pageTitle})
-
-def rooms(request):
-	pageTitle = "List of the rooms"
-	return render_to_response('rooms.html', {'pageTitle': pageTitle})
-
-def capacities(request, roomId):
-	pageTitle = "List of the capacities for room " + roomId
-	return render_to_response('capacities.html', {'pageTitle': pageTitle})
-
-def items(request, capacityId):
-	pageTitle = "List of the items for the capacity " + capacityId
-	return render_to_response('items.html', {'pageTitle': pageTitle})
+-->
+<html>
+<head>
+	<title>{{ pageTitle }}</title>
+<head>
+</body>
+	<h1>{{ pageTitle }}</h1>
+</body>
+</html>

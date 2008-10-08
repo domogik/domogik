@@ -23,20 +23,11 @@
 # $LastChangedDate: 2008-10-08 23:16:00 +0200 (mer. 08 oct. 2008) $
 # $LastChangedRevision: 128 $
 
-from django.shortcuts import render_to_response
+from django.conf.urls.defaults import *
 
-def index(request):
-	pageTitle = "Main page of Domogik"
-	return render_to_response('index.html', {'pageTitle': pageTitle})
-
-def rooms(request):
-	pageTitle = "List of the rooms"
-	return render_to_response('rooms.html', {'pageTitle': pageTitle})
-
-def capacities(request, roomId):
-	pageTitle = "List of the capacities for room " + roomId
-	return render_to_response('capacities.html', {'pageTitle': pageTitle})
-
-def items(request, capacityId):
-	pageTitle = "List of the items for the capacity " + capacityId
-	return render_to_response('items.html', {'pageTitle': pageTitle})
+urlpatterns = patterns('domogik.control.views',
+	(r'^$', 'index'),
+	(r'rooms/$', 'rooms'),
+	(r'capacities/(?P<roomId>\d+)/$', 'capacities'),
+	(r'items/(?P<capacityId>\d+)/$', 'items'),
+)
