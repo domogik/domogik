@@ -20,10 +20,13 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-08 23:16:00 +0200 (mer. 08 oct. 2008) $
-# $LastChangedRevision: 128 $
+# $LastChangedDate: 2008-10-09 23:07:15 +0200 (jeu. 09 oct. 2008) $
+# $LastChangedRevision: 131 $
 
 from django.shortcuts import render_to_response
+from domogik.control.models import Room
+from domogik.control.models import Capacity
+from domogik.control.models import Item
 
 def index(request):
 	pageTitle = "Main page of Domogik"
@@ -31,12 +34,37 @@ def index(request):
 
 def rooms(request):
 	pageTitle = "List of the rooms"
-	return render_to_response('rooms.html', {'pageTitle': pageTitle})
+	roomList = Room.objects.all()
+	return render_to_response(
+		'rooms.html',
+		{
+			'pageTitle'	: pageTitle,
+			'roomList'	: roomList
+		}
+	)
 
 def capacities(request, roomId):
-	pageTitle = "List of the capacities for room " + roomId
-	return render_to_response('capacities.html', {'pageTitle': pageTitle})
+	room = Room.objects.get(pk=roomId)
+	capacityList = Capacity.objects.filter(room__id=roomId)
+	pageTitle = "List of the capacities for : " + room.name
+	return render_to_response(
+		'capacities.html',
+		{
+			'pageTitle'		: pageTitle,
+			'roomName' 		: room.name,
+			'capacityList' 	: capacityList
+		}
+	)
 
 def items(request, capacityId):
-	pageTitle = "List of the items for the capacity " + capacityId
-	return render_to_response('items.html', {'pageTitle': pageTitle})
+	capacity = Capacity.objects.get(pk=capacityId)
+	room = Room.objects.get(capacity__id=capacity.id)
+	# itemList = Item.objects.filter(capacity__id=capacityId)
+	pageTitle = "List of the items for the capacity  : " + capacity.capacity + " (" + room.name + ")"
+	return render_to_response(
+		'items.html',
+		{
+			'pageTitle': pageTitle,
+			'capacityName' : capacity.capacity
+		}
+	)
