@@ -17,8 +17,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-05 11:27:19 +0200 (dim. 05 oct. 2008) $
-# $LastChangedRevision: 119 $
+# $LastChangedDate: 2008-10-09 12:56:30 +0200 (jeu. 09 oct. 2008) $
+# $LastChangedRevision: 129 $
 
 Note
 ====
@@ -43,7 +43,9 @@ python manage.py runserver [port] # Default is 8000
 Install the database
 ====================
 
-* Edit settings.py and adapt DB parameters to your environment
+* Edit settings.py and :
+	* Adapt DB parameters to your environment
+	* Set TEMPLATE_DIRS to your path
 
 * Create initial tables for the framework
 	python manage.py syncdb
