@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-06 22:28:39 +0200 (lun. 06 oct. 2008) $
-# $LastChangedRevision: 126 $
+# $LastChangedDate: 2008-10-09 22:30:02 +0200 (jeu. 09 oct. 2008) $
+# $LastChangedRevision: 130 $
 
 from django.db import models
 
@@ -57,6 +57,7 @@ class Capacity(models.Model):
 		('music', 'Music')
 	)
 	room = models.ForeignKey(Room)
+	# TODO : rename 'capacity' to 'name'
 	capacity = models.CharField(max_length=30, choices = CAPACITY_CHOICES)
 
 	# This is the representation of the object
