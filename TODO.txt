@@ -1,8 +1,8 @@
 # TODO file (highest priority first)
 #
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-06 22:31:33 +0200 (lun. 06 oct. 2008) $
-# $LastChangedRevision: 127 $
+# $LastChangedDate: 2008-10-11 18:44:44 +0200 (sam. 11 oct. 2008) $
+# $LastChangedRevision: 144 $
 #
 
 * General
@@ -10,10 +10,8 @@
 
 * UI
 	* @Yoven : create a prototype using HTML / CSS
+	* @Maxence : review model structure
 	* @Marc : create following views :
-		* List rooms
-		* For each room, list capacities
-		* For each capacity, list items
 		* Eventually create a global view that can switch off all the lights for example
 
 	* @? : find a way to switch between pure links and icons for the clickable areas (menus, functions...)
