@@ -18,15 +18,15 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-11 17:53:14 +0200 (sam. 11 oct. 2008) $
-# $LastChangedRevision: 136 $
+# $LastChangedDate: 2008-10-11 18:30:20 +0200 (sam. 11 oct. 2008) $
+# $LastChangedRevision: 141 $
 -->
 <html>
 <head>
 	<title>{{ pageTitle }}</title>
 	<script language="javascript">
 	function clearData() {
-		if(confirm("Are you sure you want to clear all data in the database")) {
+		if(confirm("This is your last chance to keep your data. Are you sure to want to do that ?")) {
 			document.forms[0].action="clear_data"
 			document.forms[0].submit()
 		}
@@ -45,10 +45,10 @@
 		<h2>Main page</h2>
 		<table>
 			<tr>
-				<td>Load sample data</td><td><input type="button" value="Go !" onclick="loadSampleData()"></td>
+				<td>Load sample data (will delete previous data)</td><td><input type="button" value="Load !" onclick="loadSampleData()"></td>
 			</tr>
 			<tr>
-				<td>Clear all data</td><td><input type="button" value="Go !" onclick="clearData()"></td>
+				<td>Clear all data</td><td><input type="button" value="Clear !" onclick="clearData()"></td>
 			</tr>
 		</table>
 		<p><a href="/domogik">Control page</a></p>
