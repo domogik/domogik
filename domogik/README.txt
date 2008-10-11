@@ -17,8 +17,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-11 18:43:30 +0200 (sam. 11 oct. 2008) $
-# $LastChangedRevision: 143 $
+# $LastChangedDate: 2008-10-11 23:06:32 +0200 (sam. 11 oct. 2008) $
+# $LastChangedRevision: 146 $
 
 Note
 ====
@@ -43,8 +43,10 @@ python manage.py runserver [port] # Default is 8000
 Install the application
 =======================
 
+* Create a database named 'domogik'
+
 * Edit settings.py and :
-	* Adapt DB parameters to your environment
+	* Adapt DB parameters to your environment (user, password...)
 	* Set TEMPLATE_DIRS to your path
 
 * Create tables for the app
