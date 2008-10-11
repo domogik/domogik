@@ -20,18 +20,10 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-09 22:30:02 +0200 (jeu. 09 oct. 2008) $
-# $LastChangedRevision: 130 $
+# $LastChangedDate: 2008-10-11 15:23:09 +0200 (sam. 11 oct. 2008) $
+# $LastChangedRevision: 132 $
 
 from django.db import models
-
-class Item(models.Model):
-	name = models.CharField(max_length=30)
-	description = models.CharField(max_length=30)
-
-	# This is the representation of the object
-	def __unicode__(self):
-		return self.name
 
 class Thermometer(models.Model):
 	thermometer = models.CharField(max_length=16)
@@ -41,22 +33,12 @@ class Thermometer(models.Model):
 	def __unicode__(self):
 		return self.thermometer + " (" + self.label +")"
 
-class Room(models.Model):
-	name = models.CharField(max_length=30)
-	items = models.ManyToManyField(Item) 
-	thermometers = models.ManyToManyField(Thermometer)
-
-	# This is the representation of the object
-	def __unicode__(self):
-		return self.name
-
 class Capacity(models.Model):
 	CAPACITY_CHOICES = (
 		('temperature', 'Temperature'),
 		('light', 'Light'),
 		('music', 'Music')
 	)
-	room = models.ForeignKey(Room)
 	# TODO : rename 'capacity' to 'name'
 	capacity = models.CharField(max_length=30, choices = CAPACITY_CHOICES)
 
@@ -64,6 +46,24 @@ class Capacity(models.Model):
 	def __unicode__(self):
 		# Improve this and add the room description
 		return self.capacity
+
+class Room(models.Model):
+	name = models.CharField(max_length=30)
+	capacities = models.ManyToManyField(Capacity) 
+	thermometers = models.ManyToManyField(Thermometer)
+
+	# This is the representation of the object
+	def __unicode__(self):
+		return self.name
+
+class Item(models.Model):
+	name = models.CharField(max_length=30)
+	description = models.CharField(max_length=30)
+	room = models.ForeignKey(Room)
+	capacity = models.ForeignKey(Capacity)
+	# This is the representation of the object
+	def __unicode__(self):
+		return self.name
 
 class Music(models.Model):
 	STATE_CHOICES = (
