@@ -17,8 +17,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-11 18:23:34 +0200 (sam. 11 oct. 2008) $
-# $LastChangedRevision: 139 $
+# $LastChangedDate: 2008-10-11 18:43:30 +0200 (sam. 11 oct. 2008) $
+# $LastChangedRevision: 143 $
 
 Note
 ====
@@ -50,6 +50,7 @@ Install the application
 * Create tables for the app
 	# Go to the 'domogik' directory
 	python manage.py syncdb
+	# Enter a username / password (this is for the admin part of Django [not the Domogik one])
 
 * Initialize the app
 	* Point your browser to : http://localhost:8000/domogik/admin
@@ -57,4 +58,9 @@ Install the application
 	* Click to the link to go back to the admin main page
 	* Click to the ling to go to the main page of the app
 	* Enjoy !
-	
+
+* Manage data
+	* You can easily add / update / remove data in the app, using the Django's
+	admin interface.
+	* Point your browser to : http://127.0.0.1:8000/admin
+	* Username / password is the one you entered when you run 'python manage.py syncdb'
