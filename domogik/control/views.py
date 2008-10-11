@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-11 18:11:59 +0200 (sam. 11 oct. 2008) $
-# $LastChangedRevision: 138 $
+# $LastChangedDate: 2008-10-11 18:30:31 +0200 (sam. 11 oct. 2008) $
+# $LastChangedRevision: 142 $
 
 from django.shortcuts import render_to_response
 from domogik.control.models import Room
@@ -63,9 +63,9 @@ def items(request, roomId, capacityId):
 	return render_to_response(
 		'items.html',
 		{
-			'pageTitle': pageTitle,
-			'capacityName': capacity.name,
-			'itemList': itemList
+			'pageTitle'		: pageTitle,
+			'capacityName'	: capacity.name,
+			'itemList'		: itemList
 		}
 	)
 
@@ -77,8 +77,8 @@ def adminIndex(request):
 	return render_to_response(
 		'admin_index.html',
 		{
-			'pageTitle': pageTitle,
-			'action': action
+			'pageTitle'	: pageTitle,
+			'action'	: action
 		}
 	)
 
@@ -123,11 +123,11 @@ def loadSampleData(request):
 	return render_to_response(
 		'admin_index.html',
 		{
-			'pageTitle': pageTitle,
-			'action': action,
-			'roomList': roomList,
-			'capacityList': capacityList,
-			'itemList': itemList,
+			'pageTitle'		: pageTitle,
+			'action'		: action,
+			'roomList'		: roomList,
+			'capacityList'	: capacityList,
+			'itemList'		: itemList,
 		}
 	)
 
@@ -139,8 +139,8 @@ def clearData(request):
 	return render_to_response(
 		'admin_index.html',
 		{
-			'pageTitle': pageTitle,
-			'action': action
+			'pageTitle'	: pageTitle,
+			'action'	: action
 		}
 	)
 
