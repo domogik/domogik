@@ -17,8 +17,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-09 12:56:30 +0200 (jeu. 09 oct. 2008) $
-# $LastChangedRevision: 129 $
+# $LastChangedDate: 2008-10-11 18:23:34 +0200 (sam. 11 oct. 2008) $
+# $LastChangedRevision: 139 $
 
 Note
 ====
@@ -40,17 +40,21 @@ Run Django development embedded-server
 ======================================
 python manage.py runserver [port] # Default is 8000
 
-Install the database
-====================
+Install the application
+=======================
 
 * Edit settings.py and :
 	* Adapt DB parameters to your environment
 	* Set TEMPLATE_DIRS to your path
 
-* Create initial tables for the framework
+* Create tables for the app
+	# Go to the 'domogik' directory
 	python manage.py syncdb
 
-* Create tables for the app
-	python manage.py sql control
-	python manage.py syncdb
+* Initialize the app
+	* Point your browser to : http://localhost:8000/domogik/admin
+	* Click on the button to load sample data
+	* Click to the link to go back to the admin main page
+	* Click to the ling to go to the main page of the app
+	* Enjoy !
 	
