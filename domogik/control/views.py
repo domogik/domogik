@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-09 23:07:15 +0200 (jeu. 09 oct. 2008) $
-# $LastChangedRevision: 131 $
+# $LastChangedDate: 2008-10-11 15:28:12 +0200 (sam. 11 oct. 2008) $
+# $LastChangedRevision: 133 $
 
 from django.shortcuts import render_to_response
 from domogik.control.models import Room
@@ -60,11 +60,11 @@ def items(request, capacityId):
 	capacity = Capacity.objects.get(pk=capacityId)
 	room = Room.objects.get(capacity__id=capacity.id)
 	# itemList = Item.objects.filter(capacity__id=capacityId)
-	pageTitle = "List of the items for the capacity  : " + capacity.capacity + " (" + room.name + ")"
+	pageTitle = "List of the items for the capacity  : " + capacity.name + " (" + room.name + ")"
 	return render_to_response(
 		'items.html',
 		{
 			'pageTitle': pageTitle,
-			'capacityName' : capacity.capacity
+			'capacityName' : capacity.name
 		}
 	)

@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-11 15:23:09 +0200 (sam. 11 oct. 2008) $
-# $LastChangedRevision: 132 $
+# $LastChangedDate: 2008-10-11 15:28:12 +0200 (sam. 11 oct. 2008) $
+# $LastChangedRevision: 133 $
 
 from django.db import models
 
@@ -39,13 +39,11 @@ class Capacity(models.Model):
 		('light', 'Light'),
 		('music', 'Music')
 	)
-	# TODO : rename 'capacity' to 'name'
-	capacity = models.CharField(max_length=30, choices = CAPACITY_CHOICES)
+	name = models.CharField(max_length=30, choices = CAPACITY_CHOICES)
 
 	# This is the representation of the object
 	def __unicode__(self):
-		# Improve this and add the room description
-		return self.capacity
+		return self.name
 
 class Room(models.Model):
 	name = models.CharField(max_length=30)
