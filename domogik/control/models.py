@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-11 17:01:28 +0200 (sam. 11 oct. 2008) $
-# $LastChangedRevision: 135 $
+# $LastChangedDate: 2008-10-11 19:46:35 +0200 (sam. 11 oct. 2008) $
+# $LastChangedRevision: 145 $
 
 from django.db import models
 
@@ -45,6 +45,9 @@ class Capacity(models.Model):
 	# This is the representation of the object
 	def __unicode__(self):
 		return self.name
+
+	class Meta:
+		verbose_name_plural = "capacities"
 
 class Room(models.Model):
 	name = models.CharField(max_length=30)
