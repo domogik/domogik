@@ -17,8 +17,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-11 23:06:32 +0200 (sam. 11 oct. 2008) $
-# $LastChangedRevision: 146 $
+# $LastChangedDate: 2008-10-12 10:19:17 +0200 (dim. 12 oct. 2008) $
+# $LastChangedRevision: 150 $
 
 Note
 ====
@@ -27,8 +27,9 @@ http://docs.djangoproject.com/en/dev/intro/tutorial01/#intro-tutorial01
 
 Requirements
 ============
+* Make sure you have a database installed (mySql, PostgreSQL, ...)
 * Make sure you have Python installed
-* Make sure you have Python MySql package installed
+* Make sure you have Python MySql package installed (or the package relative to your DB)
 
 Installing Django
 =================
