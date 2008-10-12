@@ -17,8 +17,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-12 11:57:31 +0200 (dim. 12 oct. 2008) $
-# $LastChangedRevision: 151 $
+# $LastChangedDate: 2008-10-12 14:16:49 +0200 (dim. 12 oct. 2008) $
+# $LastChangedRevision: 154 $
 
 Note
 ====
@@ -52,6 +52,9 @@ Install the application
 * Edit settings.py and :
 	* Adapt DB parameters to your environment (DB type, user, password...)
 	* Set TEMPLATE_DIRS to your path
+
+* Edit urls.py (in the 'domogik' directory)
+	Go to django.views.static.serve and set path to yours
 
 * Create tables for the app
 	# Go to the 'domogik' directory

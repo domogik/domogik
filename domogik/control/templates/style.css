@@ -18,6 +18,39 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-12 09:55:22 +0200 (dim. 12 oct. 2008) $
-# $LastChangedRevision: 148 $
+# $LastChangedDate: 2008-10-12 14:16:49 +0200 (dim. 12 oct. 2008) $
+# $LastChangedRevision: 154 $
 */
+
+#container {
+	margin:auto;
+	width: 760px; 
+	background: #ffffff;
+}
+
+#top {
+	background: #DDDDDD;
+}
+
+#leftBar {
+	float: left;
+	width: 150px;
+	background: #EBEBEB;
+}
+
+#content {
+	float:left;
+	width:450px;
+	background-color: #cdcde6;
+}
+
+#rightBar {
+	float:right;
+	width: 160px;
+	background: #EBEBEB;
+}
+
+#bottom {
+	clear:both;
+	background:#DDDDDD;
+}
