@@ -1,15 +1,16 @@
 # TODO file (highest priority first)
 #
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-11 18:44:44 +0200 (sam. 11 oct. 2008) $
-# $LastChangedRevision: 144 $
+# $LastChangedDate: 2008-10-12 10:17:53 +0200 (dim. 12 oct. 2008) $
+# $LastChangedRevision: 149 $
 #
 
 * General
 	* @Loiz : set up internationalization for messages
 
 * UI
-	* @Yoven : create a prototype using HTML / CSS
+	* @Epy : create a prototype using HTML / CSS
+		Only two files to edit : base.html and style.css !
 	* @Maxence : review model structure
 	* @Marc : create following views :
 		* Eventually create a global view that can switch off all the lights for example
@@ -27,8 +28,8 @@
 
 * Website
 	* @Maxence : complete technical section
-	* @Marisa, Yoven : propose a Domogik logo and a header
-	* @Yoven : set up a customized design (Logo, css...)
+	* @Marisa, Epy : propose a Domogik logo and a header
+	* @Epy : set up a customized design (Logo, css...)
 	* @? : Display dates for articles in correct format according to the language
 			(currently the date is displayed using US format which may lead to confusion for french readers)
 	* @? : find a way to display a limited number of articles on the front page with a link to the rest of all entries
