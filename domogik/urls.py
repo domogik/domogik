@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-12 14:16:49 +0200 (dim. 12 oct. 2008) $
-# $LastChangedRevision: 154 $
+# $LastChangedDate: 2008-10-12 15:24:05 +0200 (dim. 12 oct. 2008) $
+# $LastChangedRevision: 159 $
 
 from django.conf.urls.defaults import *
 
@@ -40,5 +40,5 @@ urlpatterns = patterns('',
 	(r'^admin/(.*)', admin.site.root),
 	# TODO : change this, only used in development environment
 	# See : http://docs.djangoproject.com/en/dev/howto/static-files/
-	(r'^design/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/home/mschneider/prj/domogik/appli/domogik/control'}),
+	(r'^design/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/home/mschneider/prj/domogik/appli/domogik/control/templates/design'}),
 )
