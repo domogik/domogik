@@ -1,12 +1,13 @@
 # TODO file (highest priority first)
 #
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-12 10:17:53 +0200 (dim. 12 oct. 2008) $
-# $LastChangedRevision: 149 $
+# $LastChangedDate: 2008-10-12 14:42:13 +0200 (dim. 12 oct. 2008) $
+# $LastChangedRevision: 155 $
 #
 
 * General
 	* @Loiz : set up internationalization for messages
+		For Django, see : http://docs.djangoproject.com/en/dev/topics/i18n/#topics-i18n
 
 * UI
 	* @Epy : create a prototype using HTML / CSS
