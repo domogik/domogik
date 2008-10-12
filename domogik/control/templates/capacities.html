@@ -18,15 +18,14 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-11 18:11:59 +0200 (sam. 11 oct. 2008) $
-# $LastChangedRevision: 138 $
+# $LastChangedDate: 2008-10-12 09:55:22 +0200 (dim. 12 oct. 2008) $
+# $LastChangedRevision: 148 $
 -->
-<html>
-<head>
-	<title>{{ pageTitle }}</title>
-<head>
-<body>
-	<h1>{{ pageTitle }}</h1>
+{% extends "base.html" %}
+
+{% block title %}{{ pageTitle }}{% endblock %}
+
+{% block content %}
 	{% if capacityList %}
 		<ul>
 		{% for capacity in capacityList %}
@@ -36,6 +35,4 @@
 	{% else %}
 		<p>No capacity found</p>
 	{% endif %}
-	<p><a href="/domogik">Go to the main page</a></p>
-</body>
-</html>
+{% endblock %}

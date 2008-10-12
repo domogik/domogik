@@ -18,13 +18,12 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-11 18:30:20 +0200 (sam. 11 oct. 2008) $
-# $LastChangedRevision: 141 $
+# $LastChangedDate: 2008-10-12 09:55:22 +0200 (dim. 12 oct. 2008) $
+# $LastChangedRevision: 148 $
 -->
-<html>
-<head>
-	<title>{{ pageTitle }}</title>
-	<script language="javascript">
+{% extends "base.html" %}
+
+{% block script %}
 	function clearData() {
 		if(confirm("This is your last chance to keep your data. Are you sure to want to do that ?")) {
 			document.forms[0].action="clear_data"
@@ -36,13 +35,13 @@
 		document.forms[0].action="load_sample_data"
 		document.forms[0].submit()
 	}
-	</script>
-<head>
-<body>
+{% endblock %}
+
+{% block title %}{{ pageTitle }}{% endblock %}
+
+{% block content %}
 	<form name="adminForm" action="">
-	<h1>{{ pageTitle }}</h1>
 	{% ifequal action "index" %}
-		<h2>Main page</h2>
 		<table>
 			<tr>
 				<td>Load sample data (will delete previous data)</td><td><input type="button" value="Load !" onclick="loadSampleData()"></td>
@@ -51,11 +50,9 @@
 				<td>Clear all data</td><td><input type="button" value="Clear !" onclick="clearData()"></td>
 			</tr>
 		</table>
-		<p><a href="/domogik">Control page</a></p>
 	{% endifequal %}
 
 	{% ifequal action "loadSampleData" %}
-		<h2>Load sample data</h2>
 		<p>Done !</p>
 		<p>Following objects were created :</p>
 		<p>&nbsp;</p>
@@ -94,14 +91,10 @@
 		{% else %}
 			<p>No data</p>
 		{% endif %}
-		<p><a href=".">Back to the main page</a></p>
 	{% endifequal %}
 
 	{% ifequal action "clearData" %}
-		<h2>Clear data</h2>
 		<p>Done !</p>
-		<p><a href=".">Back to the main page</a></p>
 	{% endifequal %}
 	</form>
-</body>
-</html>
+{% endblock %}

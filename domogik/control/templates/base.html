@@ -21,18 +21,36 @@
 # $LastChangedDate: 2008-10-12 09:55:22 +0200 (dim. 12 oct. 2008) $
 # $LastChangedRevision: 148 $
 -->
-{% extends "base.html" %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<link rel="stylesheet" href="style.css" />
+	<script>{% block script %}{% endblock %}</script>
+	<title>{% block title %}Domogik{% endblock %}</title>
+</head>
 
-{% block title %}{{ pageTitle }}{% endblock %}
+<body>
+	<div id="top">
+		<h1>{{ pageTitle }}
+	</div>
 
-{% block content %}
-	{% if itemList %}
+	<div id="sidebar">
+	{% block sidebar %}
 		<ul>
-		{% for item in itemList %}
-			<li><a href="#">{{ item.name }}</a></li>
-		{% endfor %}
+			<li><a href="/domogik">Main page</a></li>
+			<li><a href="admin/">Admin page</a></li>
 		</ul>
-	{% else %}
-		<p>No item found</p>
-	{% endif %}
-{% endblock %}
+	{% endblock %}
+	</div>
+
+	<div id="content">
+		{% block content %}{% endblock %}
+	</div>
+
+	<div id="bottom">
+		<hr/>The Domogik project
+	</div>
+</body>
+</html>
+

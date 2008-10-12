@@ -1,4 +1,4 @@
-<!--
+/*
 # Copyright 2008 Domogik project
 
 # This file is part of Domogik.
@@ -20,19 +20,4 @@
 # $LastChangedBy: mschneider $
 # $LastChangedDate: 2008-10-12 09:55:22 +0200 (dim. 12 oct. 2008) $
 # $LastChangedRevision: 148 $
--->
-{% extends "base.html" %}
-
-{% block title %}{{ pageTitle }}{% endblock %}
-
-{% block content %}
-	{% if itemList %}
-		<ul>
-		{% for item in itemList %}
-			<li><a href="#">{{ item.name }}</a></li>
-		{% endfor %}
-		</ul>
-	{% else %}
-		<p>No item found</p>
-	{% endif %}
-{% endblock %}
+*/

@@ -18,16 +18,13 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-11 18:25:35 +0200 (sam. 11 oct. 2008) $
-# $LastChangedRevision: 140 $
+# $LastChangedDate: 2008-10-12 09:55:22 +0200 (dim. 12 oct. 2008) $
+# $LastChangedRevision: 148 $
 -->
-<html>
-<head>
-	<title>{{ pageTitle }}</title>
-<head>
-<body>
-	<h1>{{ pageTitle }}</h1>
+{% extends "base.html" %}
+
+{% block title %}{{ pageTitle }}{% endblock %}
+
+{% block content %}
 	<p><a href="rooms/">Go to the rooms</a></p>
-	<p><a href="admin/">Admin page</a></p>
-</body>
-</html>
+{% endblock %}

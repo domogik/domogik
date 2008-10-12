@@ -18,15 +18,14 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-11 18:02:08 +0200 (sam. 11 oct. 2008) $
-# $LastChangedRevision: 137 $
+# $LastChangedDate: 2008-10-12 09:55:22 +0200 (dim. 12 oct. 2008) $
+# $LastChangedRevision: 148 $
 -->
-<html>
-<head>
-	<title>{{ pageTitle }}</title>
-<head>
-<body>
-	<h1>{{ pageTitle }}</h1>
+{% extends "base.html" %}
+
+{% block title %}{{ pageTitle }}{% endblock %}
+
+{% block content %}
 	{% if roomList %}
 		<ul>
 		{% for room in roomList %}
@@ -36,6 +35,4 @@
 	{% else %}
 		<p>No room found</p>
 	{% endif %}
-	<p><a href="/domogik">Go to the main page</a></p>
-</body>
-</html>
+{% endblock %}
