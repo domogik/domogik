@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-12 09:21:47 +0200 (dim. 12 oct. 2008) $
-# $LastChangedRevision: 147 $
+# $LastChangedDate: 2008-10-12 16:03:52 +0200 (dim. 12 oct. 2008) $
+# $LastChangedRevision: 161 $
 
 from django.shortcuts import render_to_response
 from domogik.control.models import Room
@@ -29,7 +29,7 @@ from domogik.control.models import Capacity
 from domogik.control.models import Item
 
 def index(request):
-	pageTitle = "Main page of Domogik"
+	pageTitle = "Domogik Home"
 	return render_to_response('index.html', {'pageTitle': pageTitle})
 
 def rooms(request):
