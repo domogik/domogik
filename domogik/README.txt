@@ -17,8 +17,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-12 10:19:17 +0200 (dim. 12 oct. 2008) $
-# $LastChangedRevision: 150 $
+# $LastChangedDate: 2008-10-12 11:57:31 +0200 (dim. 12 oct. 2008) $
+# $LastChangedRevision: 151 $
 
 Note
 ====
@@ -30,6 +30,9 @@ Requirements
 * Make sure you have a database installed (mySql, PostgreSQL, ...)
 * Make sure you have Python installed
 * Make sure you have Python MySql package installed (or the package relative to your DB)
+	For Debian / Ubuntu :
+		* mySql 		: python-mysqldb
+		* PostgreSQL 	: python-pgsql,  python-psycopg
 
 Installing Django
 =================
@@ -47,7 +50,7 @@ Install the application
 * Create a database named 'domogik'
 
 * Edit settings.py and :
-	* Adapt DB parameters to your environment (user, password...)
+	* Adapt DB parameters to your environment (DB type, user, password...)
 	* Set TEMPLATE_DIRS to your path
 
 * Create tables for the app
