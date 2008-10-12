@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-11 18:30:31 +0200 (sam. 11 oct. 2008) $
-# $LastChangedRevision: 142 $
+# $LastChangedDate: 2008-10-12 09:21:47 +0200 (dim. 12 oct. 2008) $
+# $LastChangedRevision: 147 $
 
 from django.shortcuts import render_to_response
 from domogik.control.models import Room
@@ -105,15 +105,15 @@ def loadSampleData(request):
 	kitchen.capacities.add(light)
 	kitchen.capacities.add(powerPoint)
 
-	bedroomBedsideLamp = Item.objects.create(name="bedroomBedsideLamp", room=bedroom, capacity=light)
-	bedroomLamp = Item.objects.create(name="bedroomLamp", room=bedroom, capacity=light)
-	bedroomMusic = Item.objects.create(name="bedroomMusic", room=bedroom, capacity=music)
+	bedroomBedsideLamp = Item.objects.create(name="Beside lamp", room=bedroom, capacity=light)
+	bedroomLamp = Item.objects.create(name="Lamp in the bedroom", room=bedroom, capacity=light)
+	bedroomMusic = Item.objects.create(name="Music in the bedroom", room=bedroom, capacity=music)
 
-	loungeLamp = Item.objects.create(name="loungeLamp", room=lounge, capacity=light)
-	loungeMusic = Item.objects.create(name="loungeMusic", room=lounge, capacity=music)
+	loungeLamp = Item.objects.create(name="Lamp in the lounge", room=lounge, capacity=light)
+	loungeMusic = Item.objects.create(name="Music in the lounge", room=lounge, capacity=music)
 
-	kitchenLamp = Item.objects.create(name="kitchenLamp", room=kitchen, capacity=light)
-	kitchenCoffeeMachine = Item.objects.create(name="kitchenCoffeeMachine", room=kitchen, capacity=powerPoint)
+	kitchenLamp = Item.objects.create(name="Lamp in the kitchen", room=kitchen, capacity=light)
+	kitchenCoffeeMachine = Item.objects.create(name="Coffee machine", room=kitchen, capacity=powerPoint)
 
 	roomList = Room.objects.all()
 	capacityList = Capacity.objects.all()
