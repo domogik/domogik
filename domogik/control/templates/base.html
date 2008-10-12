@@ -18,8 +18,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-12 14:16:49 +0200 (dim. 12 oct. 2008) $
-# $LastChangedRevision: 154 $
+# $LastChangedDate: 2008-10-12 15:09:24 +0200 (dim. 12 oct. 2008) $
+# $LastChangedRevision: 156 $
 -->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -33,14 +33,15 @@
 <body>
 <div id="container">
 	<div id="top">
-		<h1>{{ pageTitle }}
+		<center><h1>{{ pageTitle }}</h1></center>
 	</div>
 
 	<div id="leftBar">
 	{% block leftBar %}
 		<ul>
-			<li><a href="/domogik">Main page</a></li>
-			<li><a href="admin/">Admin page</a></li>
+			<li><a href="/domogik">Home</a></li>
+			<li><a href="admin">Admin</a></li>
+			<li><a href="/admin">Django Admin</a></li>
 		</ul>
 	{% endblock %}
 	</div>
@@ -54,7 +55,7 @@
 	</div>
 
 	<div id="bottom">
-		<hr/>The Domogik project
+		<hr/><center>Copyright 2008 Domogik project - GNU/GPL v3 license</center>
 	</div>
 </div>
 </body>
