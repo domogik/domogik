@@ -1,8 +1,8 @@
 # TODO file (highest priority first)
 #
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-12 14:42:13 +0200 (dim. 12 oct. 2008) $
-# $LastChangedRevision: 155 $
+# $LastChangedDate: 2008-10-13 09:24:13 +0200 (lun. 13 oct. 2008) $
+# $LastChangedRevision: 162 $
 #
 
 * General
@@ -17,7 +17,6 @@
 		* Eventually create a global view that can switch off all the lights for example
 
 	* @? : find a way to switch between pure links and icons for the clickable areas (menus, functions...)
-	* @? : Add sample data to the (sql) initialization script (rooms and so on)
 
 * mpris
 	* @Maxence : create Mpris API in Python
