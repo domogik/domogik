@@ -1,8 +1,8 @@
 # TODO file (highest priority first)
 #
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-13 09:24:13 +0200 (lun. 13 oct. 2008) $
-# $LastChangedRevision: 162 $
+# $LastChangedDate: 2008-10-14 14:06:47 +0200 (mar. 14 oct. 2008) $
+# $LastChangedRevision: 163 $
 #
 
 * General
@@ -13,8 +13,9 @@
 	* @Epy : create a prototype using HTML / CSS
 		Only two files to edit : base.html and style.css !
 	* @Maxence : review model structure
-	* @Marc : create following views :
+	* @Marc
 		* Eventually create a global view that can switch off all the lights for example
+		* Add Interface to configure the system (add devices)
 
 	* @? : find a way to switch between pure links and icons for the clickable areas (menus, functions...)
 
