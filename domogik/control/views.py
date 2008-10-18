@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-12 16:03:52 +0200 (dim. 12 oct. 2008) $
-# $LastChangedRevision: 161 $
+# $LastChangedDate: 2008-10-18 15:07:31 +0200 (sam. 18 oct. 2008) $
+# $LastChangedRevision: 164 $
 
 from django.shortcuts import render_to_response
 from domogik.control.models import Room
@@ -30,7 +30,12 @@ from domogik.control.models import Item
 
 def index(request):
 	pageTitle = "Domogik Home"
-	return render_to_response('index.html', {'pageTitle': pageTitle})
+	return render_to_response(
+		'index.html',
+		{
+			'pageTitle': pageTitle
+		}
+	)
 
 def rooms(request):
 	pageTitle = "List of the rooms"
