@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-11 19:46:35 +0200 (sam. 11 oct. 2008) $
-# $LastChangedRevision: 145 $
+# $LastChangedDate: 2008-10-18 19:03:47 +0200 (sam. 18 oct. 2008) $
+# $LastChangedRevision: 166 $
 
 from django.db import models
 
@@ -88,3 +88,6 @@ class State(models.Model):
 	item = models.ForeignKey(Item)
 	state = models.SmallIntegerField() 
 	date = models.DateTimeField()
+
+class ApplicationSetting(models.Model):
+	simulation_mode = models.BooleanField()

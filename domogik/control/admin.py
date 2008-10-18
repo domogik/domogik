@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-06 21:54:35 +0200 (lun. 06 oct. 2008) $
-# $LastChangedRevision: 125 $
+# $LastChangedDate: 2008-10-18 19:03:47 +0200 (sam. 18 oct. 2008) $
+# $LastChangedRevision: 166 $
 
 # This is the admin part of Domogik
 
@@ -30,8 +30,10 @@ from domogik.control.models import Room
 from domogik.control.models import Item
 from domogik.control.models import Thermometer
 from domogik.control.models import Capacity
+from domogik.control.models import ApplicationSetting
 
 admin.site.register(Room)
 admin.site.register(Item)
 admin.site.register(Thermometer)
 admin.site.register(Capacity)
+admin.site.register(ApplicationSetting)
