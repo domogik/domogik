@@ -18,38 +18,42 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-12 09:55:22 +0200 (dim. 12 oct. 2008) $
-# $LastChangedRevision: 148 $
+# $LastChangedDate: 2008-10-18 19:02:58 +0200 (sam. 18 oct. 2008) $
+# $LastChangedRevision: 165 $
 -->
 {% extends "base.html" %}
 
 {% block script %}
 	function clearData() {
 		if(confirm("This is your last chance to keep your data. Are you sure to want to do that ?")) {
-			document.forms[0].action="clear_data"
-			document.forms[0].submit()
+			document.forms['dataForm'].action="clear_data"
+			document.forms['dataForm'].submit()
 		}
 	}
 
 	function loadSampleData() {
-		document.forms[0].action="load_sample_data"
-		document.forms[0].submit()
+		document.forms['dataForm'].action="load_sample_data"
+		document.forms['dataForm'].submit()
 	}
 {% endblock %}
 
 {% block title %}{{ pageTitle }}{% endblock %}
 
 {% block content %}
-	<form name="adminForm" action="">
 	{% ifequal action "index" %}
-		<table>
-			<tr>
-				<td>Load sample data (will delete previous data)</td><td><input type="button" value="Load !" onclick="loadSampleData()"></td>
-			</tr>
-			<tr>
-				<td>Clear all data</td><td><input type="button" value="Clear !" onclick="clearData()"></td>
-			</tr>
-		</table>
+	<form name="dataForm" action="" method="POST">
+		<fieldset>
+			<legend>Data</legend>
+			<table>
+				<tr>
+					<td>Load sample data (will delete previous data)</td><td><input type="button" value="Load" onclick="loadSampleData()"></td>
+				</tr>
+				<tr>
+					<td>Clear all data</td><td><input type="button" value="Clear" onclick="clearData()"></td>
+				</tr>
+			</table>
+		</fieldset>
+	</form>
 	{% endifequal %}
 
 	{% ifequal action "loadSampleData" %}
@@ -96,5 +100,4 @@
 	{% ifequal action "clearData" %}
 		<p>Done !</p>
 	{% endifequal %}
-	</form>
 {% endblock %}
