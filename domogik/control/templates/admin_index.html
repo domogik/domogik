@@ -18,21 +18,21 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-18 19:02:58 +0200 (sam. 18 oct. 2008) $
-# $LastChangedRevision: 165 $
+# $LastChangedDate: 2008-10-18 19:37:47 +0200 (sam. 18 oct. 2008) $
+# $LastChangedRevision: 167 $
 -->
 {% extends "base.html" %}
 
 {% block script %}
 	function clearData() {
 		if(confirm("This is your last chance to keep your data. Are you sure to want to do that ?")) {
-			document.forms['dataForm'].action="clear_data"
+			document.forms['dataForm'].action="{% url domogik.control.views.clearData %}"
 			document.forms['dataForm'].submit()
 		}
 	}
 
 	function loadSampleData() {
-		document.forms['dataForm'].action="load_sample_data"
+		document.forms['dataForm'].action="{% url domogik.control.views.loadSampleData %}"
 		document.forms['dataForm'].submit()
 	}
 {% endblock %}
