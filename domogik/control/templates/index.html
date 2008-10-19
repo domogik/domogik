@@ -18,13 +18,13 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-18 19:37:47 +0200 (sam. 18 oct. 2008) $
-# $LastChangedRevision: 167 $
+# $LastChangedDate: 2008-10-19 17:10:10 +0200 (dim. 19 oct. 2008) $
+# $LastChangedRevision: 168 $
 -->
 {% extends "base.html" %}
 
 {% block title %}{{ pageTitle }}{% endblock %}
 
 {% block content %}
-	<p><a href="{% url domogik.control.views.rooms %}">Go to the rooms</a></p>
+	<p><a href="{% url roomsView %}">Go to the rooms</a></p>
 {% endblock %}

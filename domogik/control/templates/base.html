@@ -18,8 +18,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-18 19:37:47 +0200 (sam. 18 oct. 2008) $
-# $LastChangedRevision: 167 $
+# $LastChangedDate: 2008-10-19 17:10:10 +0200 (dim. 19 oct. 2008) $
+# $LastChangedRevision: 168 $
 -->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -40,8 +40,8 @@
 	<div id="leftBar">
 	{% block leftBar %}
 		<ul>
-			<li><a href="{% url domogik.control.views.index %}">Home</a></li>
-			<li><a href="{% url domogik.control.views.adminIndex %}">Admin</a></li>
+			<li><a href="{% url mainView %}">Home</a></li>
+			<li><a href="{% url adminView %}">Admin</a></li>
 			<li><a href="/admin">Django Admin</a></li>
 		</ul>
 	{% endblock %}

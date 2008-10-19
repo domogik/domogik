@@ -20,17 +20,17 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-11 18:11:59 +0200 (sam. 11 oct. 2008) $
-# $LastChangedRevision: 138 $
+# $LastChangedDate: 2008-10-19 17:10:10 +0200 (dim. 19 oct. 2008) $
+# $LastChangedRevision: 168 $
 
 from django.conf.urls.defaults import *
 
 urlpatterns = patterns('domogik.control.views',
-	(r'^$', 'index'),
-	(r'rooms/$', 'rooms'),
-	(r'capacities/(?P<roomId>\d+)/$', 'capacities'),
-	(r'items/(?P<roomId>\d+),(?P<capacityId>\d+)/$', 'items'),
-	(r'admin/$', 'adminIndex'),
-	(r'admin/load_sample_data$', 'loadSampleData'),
-	(r'admin/clear_data$', 'clearData'),
+	url(r'^$', 'index', name="mainView"),
+	url(r'rooms/$', 'rooms', name="roomsView"),
+	url(r'capacities/(?P<roomId>\d+)/$', 'capacities', name="capacitiesView"),
+	url(r'items/(?P<roomId>\d+),(?P<capacityId>\d+)/$', 'items', name="itemsView"),
+	url(r'admin/$', 'adminIndex', name="adminView"),
+	url(r'admin/load_sample_data$', 'loadSampleData', name="loadSampleDataView"),
+	url(r'admin/clear_data$', 'clearData', name="clearDataView"),
 )

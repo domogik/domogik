@@ -18,8 +18,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-18 19:37:47 +0200 (sam. 18 oct. 2008) $
-# $LastChangedRevision: 167 $
+# $LastChangedDate: 2008-10-19 17:10:10 +0200 (dim. 19 oct. 2008) $
+# $LastChangedRevision: 168 $
 -->
 {% extends "base.html" %}
 
@@ -29,7 +29,7 @@
 	{% if capacityList %}
 		<ul>
 		{% for capacity in capacityList %}
-			<li><a href="{% url domogik.control.views.items roomId capacity.id %}">{{ capacity.name }}</a></li>
+			<li><a href="{% url itemsView roomId capacity.id %}">{{ capacity.name }}</a></li>
 		{% endfor %}
 		</ul>
 	{% else %}
