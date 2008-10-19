@@ -1,6 +1,4 @@
-#!/usr/bin/python
-#-*- encoding:utf-8 *-*
-
+<!--
 # Copyright 2008 Domogik project
 
 # This file is part of Domogik.
@@ -22,16 +20,34 @@
 # $LastChangedBy: mschneider $
 # $LastChangedDate: 2008-10-19 17:30:51 +0200 (dim. 19 oct. 2008) $
 # $LastChangedRevision: 170 $
+-->
+{% extends "base.html" %}
 
-from django.conf.urls.defaults import *
+{% block script %}
+	function go() {
+		if(confirm("Are you sure ?")) {
+			document.forms['globalControlForm'].action="{% url globalControlView %}"
+			document.forms['globalControlForm'].submit()
+		}
+	}
+{% endblock %}
 
-urlpatterns = patterns('domogik.control.views',
-	url(r'^$', 'index', name="mainView"),
-	url(r'global_control/$', 'globalControl', name="globalControlView"),
-	url(r'rooms/$', 'rooms', name="roomsView"),
-	url(r'capacities/(?P<roomId>\d+)/$', 'capacities', name="capacitiesView"),
-	url(r'items/(?P<roomId>\d+),(?P<capacityId>\d+)/$', 'items', name="itemsView"),
-	url(r'admin/$', 'adminIndex', name="adminView"),
-	url(r'admin/load_sample_data$', 'loadSampleData', name="loadSampleDataView"),
-	url(r'admin/clear_data$', 'clearData', name="clearDataView"),
-)
+{% block title %}{{ pageTitle }}{% endblock %}
+
+{% block content %}
+	<form name="globalControlForm" method="POST" action="">
+		<table>
+			<tr>
+				<td><label for="switchOffLights">Switch off all the lights</label></td>
+				<td><input id="switchOffLights" name="switchOffLights" type="checkbox"/>
+			</tr>
+			<tr>
+				<td><label for="closeDoors">Close all the doors</label></td>
+				<td><input id="closeDoors" name="closeDoors" type="checkbox"/>
+			</tr>
+			<tr>
+				<td colspan="2"><input type="button" value="Go !" onclick="go()"></td>
+			</tr>
+		</table>
+	</form>
+{% endblock %}

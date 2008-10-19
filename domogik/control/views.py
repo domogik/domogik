@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-18 15:07:31 +0200 (sam. 18 oct. 2008) $
-# $LastChangedRevision: 164 $
+# $LastChangedDate: 2008-10-19 17:30:51 +0200 (dim. 19 oct. 2008) $
+# $LastChangedRevision: 170 $
 
 from django.shortcuts import render_to_response
 from domogik.control.models import Room
@@ -34,6 +34,15 @@ def index(request):
 		'index.html',
 		{
 			'pageTitle': pageTitle
+		}
+	)
+
+def globalControl(request):
+	pageTitle = "Global control of your system"
+	return render_to_response(
+		'global_control.html',
+		{
+			'pageTitle'	: pageTitle,
 		}
 	)
 
