@@ -1,12 +1,13 @@
 # TODO file (highest priority first)
 #
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-14 14:06:47 +0200 (mar. 14 oct. 2008) $
-# $LastChangedRevision: 163 $
+# $LastChangedDate: 2008-10-19 17:11:46 +0200 (dim. 19 oct. 2008) $
+# $LastChangedRevision: 169 $
 #
 
 * General
-	* @Loiz : set up internationalization for messages
+	* @Loiz : set up internationalization for messages (see also how to translate data
+		stored in the DB)
 		For Django, see : http://docs.djangoproject.com/en/dev/topics/i18n/#topics-i18n
 
 * UI
