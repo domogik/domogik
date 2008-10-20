@@ -1,8 +1,8 @@
 # TODO file (highest priority first)
 #
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-19 17:11:46 +0200 (dim. 19 oct. 2008) $
-# $LastChangedRevision: 169 $
+# $LastChangedDate: 2008-10-20 10:48:16 +0200 (lun. 20 oct. 2008) $
+# $LastChangedRevision: 173 $
 #
 
 * General
@@ -19,6 +19,7 @@
 		* Add Interface to configure the system (add devices)
 
 	* @? : find a way to switch between pure links and icons for the clickable areas (menus, functions...)
+	* @? : Add a function to schedule a task (eg. switch on/off the heating at a given time)
 
 * mpris
 	* @Maxence : create Mpris API in Python
