@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-21 22:17:54 +0200 (mar. 21 oct. 2008) $
-# $LastChangedRevision: 176 $
+# $LastChangedDate: 2008-10-21 22:29:00 +0200 (mar. 21 oct. 2008) $
+# $LastChangedRevision: 177 $
 
 from django.db import models
 
@@ -71,6 +71,7 @@ class Item(models.Model):
 	name = models.CharField(max_length=30)
 	description = models.CharField(max_length=30)
 	comm_technology = models.ForeignKey(Comm_technology, null=True)
+	address = models.CharField(max_length=10, null=True)
 	room = models.ForeignKey(Room)
 	capacity = models.ForeignKey(Capacity)
 	# This is the representation of the object
