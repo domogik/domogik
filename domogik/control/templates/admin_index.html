@@ -18,8 +18,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-19 17:10:10 +0200 (dim. 19 oct. 2008) $
-# $LastChangedRevision: 168 $
+# $LastChangedDate: 2008-10-21 22:17:11 +0200 (mar. 21 oct. 2008) $
+# $LastChangedRevision: 175 $
 -->
 {% extends "base.html" %}
 
@@ -90,6 +90,18 @@
 			<ul>
 			{% for item in itemList %}
 				<li>{{ item.name }}</li>
+			{% endfor %}
+			</ul>
+		{% else %}
+			<p>No data</p>
+		{% endif %}
+
+		<p><strong>Technologies</strong></p>
+		<hr/>
+		{% if techList %}
+			<ul>
+			{% for tech in techList %}
+				<li>{{ tech.name }}</li>
 			{% endfor %}
 			</ul>
 		{% else %}

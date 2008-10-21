@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-18 19:03:47 +0200 (sam. 18 oct. 2008) $
-# $LastChangedRevision: 166 $
+# $LastChangedDate: 2008-10-21 22:17:11 +0200 (mar. 21 oct. 2008) $
+# $LastChangedRevision: 175 $
 
 from django.db import models
 
@@ -58,9 +58,19 @@ class Room(models.Model):
 	def __unicode__(self):
 		return self.name
 
+class Comm_technology(models.Model):
+	TECHNOLOGY_CHOICES = (
+		('X10', 'X10'),
+		('OneWire', 'OneWire'),
+		('IR', 'IR'),
+	)
+	name =  models.CharField(max_length=20, choices = TECHNOLOGY_CHOICES)
+	description = models.CharField(max_length=255)
+
 class Item(models.Model):
 	name = models.CharField(max_length=30)
 	description = models.CharField(max_length=30)
+	comm_technology = models.ForeignKey(Comm_technology, null=True)
 	room = models.ForeignKey(Room)
 	capacity = models.ForeignKey(Capacity)
 	# This is the representation of the object
