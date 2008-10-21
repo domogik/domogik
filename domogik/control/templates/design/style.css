@@ -18,8 +18,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-19 17:40:26 +0200 (dim. 19 oct. 2008) $
-# $LastChangedRevision: 172 $
+# $LastChangedDate: 2008-10-21 21:43:30 +0200 (mar. 21 oct. 2008) $
+# $LastChangedRevision: 174 $
 */
 
 body {
@@ -49,10 +49,12 @@ body {
 #leftBar a {
 	color: #00D2B1;
 	font-weight: bold;
+	text-decoration: none;
 }
 
 #leftBar a:hover {
 	color: #AF030A;
+	text-decoration: none;
 }
 
 #leftBar li {
