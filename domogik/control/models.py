@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-21 22:17:11 +0200 (mar. 21 oct. 2008) $
-# $LastChangedRevision: 175 $
+# $LastChangedDate: 2008-10-21 22:17:54 +0200 (mar. 21 oct. 2008) $
+# $LastChangedRevision: 176 $
 
 from django.db import models
 
@@ -40,7 +40,7 @@ class Capacity(models.Model):
 		('Music', 'Music'),
 		('Power point','Power point')
 	)
-	name = models.CharField(max_length=30, choices = CAPACITY_CHOICES)
+	name = models.CharField(max_length=30, choices=CAPACITY_CHOICES)
 
 	# This is the representation of the object
 	def __unicode__(self):
@@ -64,7 +64,7 @@ class Comm_technology(models.Model):
 		('OneWire', 'OneWire'),
 		('IR', 'IR'),
 	)
-	name =  models.CharField(max_length=20, choices = TECHNOLOGY_CHOICES)
+	name =  models.CharField(max_length=20, choices=TECHNOLOGY_CHOICES)
 	description = models.CharField(max_length=255)
 
 class Item(models.Model):
@@ -87,7 +87,7 @@ class Music(models.Model):
 	title = models.CharField(max_length=150)
 	time = models.TimeField()
 	current_time = models.TimeField()
-	state = models.CharField(max_length=10, choices = STATE_CHOICES)
+	state = models.CharField(max_length=10, choices=STATE_CHOICES)
 
 class Statement(models.Model):
 	date = models.DateTimeField()
