@@ -1,8 +1,8 @@
 # TODO file (highest priority first)
 #
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-20 10:48:16 +0200 (lun. 20 oct. 2008) $
-# $LastChangedRevision: 173 $
+# $LastChangedDate: 2008-10-23 11:56:39 +0200 (jeu. 23 oct. 2008) $
+# $LastChangedRevision: 178 $
 #
 
 * General
@@ -20,6 +20,7 @@
 
 	* @? : find a way to switch between pure links and icons for the clickable areas (menus, functions...)
 	* @? : Add a function to schedule a task (eg. switch on/off the heating at a given time)
+	* @? : Add facility to save / load scenes 
 
 * mpris
 	* @Maxence : create Mpris API in Python
