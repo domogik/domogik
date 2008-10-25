@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-25 16:14:00 +0200 (sam. 25 oct. 2008) $
-# $LastChangedRevision: 182 $
+# $LastChangedDate: 2008-10-25 16:18:42 +0200 (sam. 25 oct. 2008) $
+# $LastChangedRevision: 183 $
 
 from django.db import models
 
@@ -52,7 +52,7 @@ class Capacity(models.Model):
 class Room(models.Model):
 	name = models.CharField(max_length=30)
 	capacities = models.ManyToManyField(Capacity) 
-	thermometers = models.ManyToManyField(Thermometer)
+	thermometers = models.ManyToManyField(Thermometer, null=True)
 
 	# This is the representation of the object
 	def __unicode__(self):
@@ -66,7 +66,7 @@ class CommTechnology(models.Model):
 		('ZigBee', 'ZigBee')
 	)
 	name =  models.CharField(max_length=20, choices=TECHNOLOGY_CHOICES)
-	description = models.CharField(max_length=255)
+	description = models.CharField(max_length=255, null=True, blank=True)
 
 	class Meta:
 		verbose_name_plural = "Comm technologies"
