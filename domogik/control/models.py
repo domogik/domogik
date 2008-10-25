@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-25 16:12:01 +0200 (sam. 25 oct. 2008) $
-# $LastChangedRevision: 181 $
+# $LastChangedDate: 2008-10-25 16:14:00 +0200 (sam. 25 oct. 2008) $
+# $LastChangedRevision: 182 $
 
 from django.db import models
 
@@ -63,6 +63,7 @@ class CommTechnology(models.Model):
 		('X10', 'X10'),
 		('OneWire', 'OneWire'),
 		('IR', 'IR'),
+		('ZigBee', 'ZigBee')
 	)
 	name =  models.CharField(max_length=20, choices=TECHNOLOGY_CHOICES)
 	description = models.CharField(max_length=255)

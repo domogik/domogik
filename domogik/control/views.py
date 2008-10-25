@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-25 16:12:01 +0200 (sam. 25 oct. 2008) $
-# $LastChangedRevision: 181 $
+# $LastChangedDate: 2008-10-25 16:14:00 +0200 (sam. 25 oct. 2008) $
+# $LastChangedRevision: 182 $
 
 from django.shortcuts import render_to_response
 from domogik.control.models import CommTechnology
@@ -123,6 +123,7 @@ def loadSampleData(request):
 	x10 = CommTechnology.objects.create(name="X10")
 	oneWire = CommTechnology.objects.create(name="OneWire")
 	ir = CommTechnology.objects.create(name="IR")
+	zigBee = CommTechnology.objects.create(name="ZigBee")
 
 	bedroomBedsideLamp = Item.objects.create(name="Beside lamp", room=bedroom, capacity=light, commTechnology=x10)
 	bedroomLamp = Item.objects.create(name="Lamp in the bedroom", room=bedroom, capacity=light, commTechnology=x10)
