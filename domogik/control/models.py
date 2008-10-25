@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-21 22:29:00 +0200 (mar. 21 oct. 2008) $
-# $LastChangedRevision: 177 $
+# $LastChangedDate: 2008-10-25 14:35:45 +0200 (sam. 25 oct. 2008) $
+# $LastChangedRevision: 180 $
 
 from django.db import models
 
@@ -66,6 +66,10 @@ class Comm_technology(models.Model):
 	)
 	name =  models.CharField(max_length=20, choices=TECHNOLOGY_CHOICES)
 	description = models.CharField(max_length=255)
+
+	# This is the representation of the object
+	def __unicode__(self):
+		return self.name
 
 class Item(models.Model):
 	name = models.CharField(max_length=30)
