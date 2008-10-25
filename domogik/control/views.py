@@ -20,11 +20,11 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-21 22:17:11 +0200 (mar. 21 oct. 2008) $
-# $LastChangedRevision: 175 $
+# $LastChangedDate: 2008-10-25 16:12:01 +0200 (sam. 25 oct. 2008) $
+# $LastChangedRevision: 181 $
 
 from django.shortcuts import render_to_response
-from domogik.control.models import Comm_technology
+from domogik.control.models import CommTechnology
 from domogik.control.models import Room
 from domogik.control.models import Capacity
 from domogik.control.models import Item
@@ -120,24 +120,24 @@ def loadSampleData(request):
 	kitchen.capacities.add(light)
 	kitchen.capacities.add(powerPoint)
 
-	x10 = Comm_technology.objects.create(name="X10")
-	oneWire = Comm_technology.objects.create(name="OneWire")
-	ir = Comm_technology.objects.create(name="IR")
+	x10 = CommTechnology.objects.create(name="X10")
+	oneWire = CommTechnology.objects.create(name="OneWire")
+	ir = CommTechnology.objects.create(name="IR")
 
-	bedroomBedsideLamp = Item.objects.create(name="Beside lamp", room=bedroom, capacity=light, comm_technology=x10)
-	bedroomLamp = Item.objects.create(name="Lamp in the bedroom", room=bedroom, capacity=light, comm_technology=x10)
+	bedroomBedsideLamp = Item.objects.create(name="Beside lamp", room=bedroom, capacity=light, commTechnology=x10)
+	bedroomLamp = Item.objects.create(name="Lamp in the bedroom", room=bedroom, capacity=light, commTechnology=x10)
 	bedroomMusic = Item.objects.create(name="Music in the bedroom", room=bedroom, capacity=music)
 
-	loungeLamp = Item.objects.create(name="Lamp in the lounge", room=lounge, capacity=light, comm_technology=x10)
+	loungeLamp = Item.objects.create(name="Lamp in the lounge", room=lounge, capacity=light, commTechnology=x10)
 	loungeMusic = Item.objects.create(name="Music in the lounge", room=lounge, capacity=music)
 
-	kitchenLamp = Item.objects.create(name="Lamp in the kitchen", room=kitchen, capacity=light, comm_technology=x10)
-	kitchenCoffeeMachine = Item.objects.create(name="Coffee machine", room=kitchen, capacity=powerPoint, comm_technology=x10)
+	kitchenLamp = Item.objects.create(name="Lamp in the kitchen", room=kitchen, capacity=light, commTechnology=x10)
+	kitchenCoffeeMachine = Item.objects.create(name="Coffee machine", room=kitchen, capacity=powerPoint, commTechnology=x10)
 
 	roomList = Room.objects.all()
 	capacityList = Capacity.objects.all()
 	itemList = Item.objects.all()
-	techList = Comm_technology.objects.all()
+	techList = CommTechnology.objects.all()
 	pageTitle = "Load sample data"
 	action = "loadSampleData"
 	return render_to_response(
@@ -179,6 +179,6 @@ def __removeAllData():
 	for room in roomList:
 		room.delete()
 
-	techList = Comm_technology.objects.all()
+	techList = CommTechnology.objects.all()
 	for tech in techList:
 		tech.delete()
