@@ -17,8 +17,8 @@
 # Author: Marc Schneider <marc@mirelsol.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-12 14:05:48 +0200 (dim. 12 oct. 2008) $
-# $LastChangedRevision: 153 $
+# $LastChangedDate: 2008-11-05 13:19:40 +0100 (mer. 05 nov. 2008) $
+# $LastChangedRevision: 184 $
 
 # Django settings for domogik project.
 
@@ -103,3 +103,8 @@ INSTALLED_APPS = (
 	'django.contrib.admin',
 	'domogik.control',
 )
+
+try:
+	from settings_local import *
+except ImportError:
+	pass 

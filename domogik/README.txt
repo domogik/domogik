@@ -17,8 +17,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-12 14:16:49 +0200 (dim. 12 oct. 2008) $
-# $LastChangedRevision: 154 $
+# $LastChangedDate: 2008-11-05 13:19:40 +0100 (mer. 05 nov. 2008) $
+# $LastChangedRevision: 184 $
 
 Note
 ====
@@ -49,11 +49,11 @@ Install the application
 
 * Create a database named 'domogik'
 
-* Edit settings.py and :
-	* Adapt DB parameters to your environment (DB type, user, password...)
-	* Set TEMPLATE_DIRS to your path
+* Create settings_local.py and override values defined in settings.py if they
+don't match your local configuration (DB type, DB user, DB password, TEMPLATE_DIRS...)
 
 * Edit urls.py (in the 'domogik' directory)
+	# TODO : this should be changed : find a way to put this in settings_local.py (see above)
 	Go to django.views.static.serve and set path to yours
 
 * Create tables for the app
