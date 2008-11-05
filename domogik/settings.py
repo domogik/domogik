@@ -17,8 +17,8 @@
 # Author: Marc Schneider <marc@mirelsol.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-11-05 13:19:40 +0100 (mer. 05 nov. 2008) $
-# $LastChangedRevision: 184 $
+# $LastChangedDate: 2008-11-05 13:23:28 +0100 (mer. 05 nov. 2008) $
+# $LastChangedRevision: 185 $
 
 # Django settings for domogik project.
 
@@ -92,7 +92,7 @@ TEMPLATE_DIRS = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
 	# TODO : find a way NOT to hard-code this path
-	'~/prj/domogik/appli/domogik/control/templates'
+	'~/domogik/control/templates'
 )
 
 INSTALLED_APPS = (
