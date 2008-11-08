@@ -17,8 +17,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-11-05 13:19:40 +0100 (mer. 05 nov. 2008) $
-# $LastChangedRevision: 184 $
+# $LastChangedDate: 2008-11-08 09:44:24 +0100 (sam. 08 nov. 2008) $
+# $LastChangedRevision: 188 $
 
 Note
 ====
@@ -32,13 +32,15 @@ Requirements
 * Make sure you have Python MySql package installed (or the package relative to your DB)
 	For Debian / Ubuntu :
 		* mySql 		: python-mysqldb
-		* PostgreSQL 	: python-pgsql,  python-psycopg
+		* PostgreSQL 	: python-pgsql python-psycopg
 
 Installing Django
 =================
 
-* Download the latest version of django and uncompress the archive
-* Install it by running : sudo python setup.py install
+* Download the latest version of django and uncompress the archive :
+	Go to http://www.djangoproject.com/download/
+* Install it by running :
+	python setup.py install
 
 Run Django development embedded-server
 ======================================
