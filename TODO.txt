@@ -1,8 +1,8 @@
 # TODO file (highest priority first)
 #
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-23 11:56:39 +0200 (jeu. 23 oct. 2008) $
-# $LastChangedRevision: 178 $
+# $LastChangedDate: 2008-11-20 15:52:17 +0100 (jeu. 20 nov. 2008) $
+# $LastChangedRevision: 189 $
 #
 
 * General
@@ -31,10 +31,6 @@
 		(useful to test the app without having any home automation installation)
 
 * Website
+	* @Alban : change hyperlink style. Currently it is difficult to see in an article that there are links.
 	* @Maxence : complete technical section
-	* @Marisa, Epy : propose a Domogik logo and a header
-	* @Epy : set up a customized design (Logo, css...)
-	* @? : Display dates for articles in correct format according to the language
-			(currently the date is displayed using US format which may lead to confusion for french readers)
-	* @? : find a way to display a limited number of articles on the front page with a link to the rest of all entries
 	* @? : write a "About us" section listing the main people managing / contributing to the project (this is not urgent)
