@@ -1,8 +1,8 @@
 # TODO file (highest priority first)
 #
-# $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-11-24 22:22:52 +0100 (lun. 24 nov. 2008) $
-# $LastChangedRevision: 190 $
+# $LastChangedBy: albinoz $
+# $LastChangedDate: 2008-11-24 22:43:49 +0100 (lun. 24 nov. 2008) $
+# $LastChangedRevision: 191 $
 #
 
 * General
@@ -31,7 +31,5 @@
 		(useful to test the app without having any home automation installation)
 
 * Website
-	* @Alban : change hyperlink style. Currently it is difficult to see in an article that there are links.
-	* @Alban : make sure "last article published" match the language selected by the user.
 	* @Maxence : complete technical section
-	* @? : write a "About us" section listing the main people managing / contributing to the project (this is not urgent)
+	* @Alban or @Marc : complete the "About us" section listing the main people managing / contributing to the project, and create other membrers profile
