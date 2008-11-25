@@ -1,8 +1,8 @@
 # TODO file (highest priority first)
 #
-# $LastChangedBy: albinoz $
-# $LastChangedDate: 2008-11-24 22:43:49 +0100 (lun. 24 nov. 2008) $
-# $LastChangedRevision: 191 $
+# $LastChangedBy: mschneider $
+# $LastChangedDate: 2008-11-25 22:16:33 +0100 (mar. 25 nov. 2008) $
+# $LastChangedRevision: 192 $
 #
 
 * General
@@ -33,3 +33,5 @@
 * Website
 	* @Maxence : complete technical section
 	* @Alban or @Marc : complete the "About us" section listing the main people managing / contributing to the project, and create other membrers profile
+	* @? : create a page to explain how to get the sources from Subversion and to be able to commit
+		May be this should be only accessible to members
