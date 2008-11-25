@@ -1,8 +1,8 @@
 # TODO file (highest priority first)
 #
-# $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-11-25 22:16:33 +0100 (mar. 25 nov. 2008) $
-# $LastChangedRevision: 192 $
+# $LastChangedBy: albinoz $
+# $LastChangedDate: 2008-11-25 22:30:30 +0100 (mar. 25 nov. 2008) $
+# $LastChangedRevision: 194 $
 #
 
 * General
@@ -35,3 +35,7 @@
 	* @Alban or @Marc : complete the "About us" section listing the main people managing / contributing to the project, and create other membrers profile
 	* @? : create a page to explain how to get the sources from Subversion and to be able to commit
 		May be this should be only accessible to members
+	* @Alban : bluid navigation menu with roller images and background
+	* @Alban : create "general" background such as the example
+	* @Alban : modify the header's logo
+	* @Alban : modify background of "contexte1 & 2"
