@@ -1,8 +1,8 @@
 # TODO file (highest priority first)
 #
-# $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-11-27 09:39:54 +0100 (jeu. 27 nov. 2008) $
-# $LastChangedRevision: 196 $
+# $LastChangedBy: albinoz $
+# $LastChangedDate: 2008-11-27 22:41:21 +0100 (jeu. 27 nov. 2008) $
+# $LastChangedRevision: 197 $
 #
 
 * General
@@ -34,7 +34,6 @@
 	* @Maxence : complete technical section
 	* @Alban or @Marc : complete the "About us" section listing the main people managing / contributing to the project, and create other membrers profile
 	* @? Translate into english the page explaining how to join the developper community (subversion)
-	* @Alban : remove grey area on the top right of articles
 	* @Alban : add a favicon
 	* @Alban : bluid navigation menu with roller images and background
 	* @Alban : create "general" background such as the example
