@@ -20,67 +20,56 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-25 16:14:00 +0200 (sam. 25 oct. 2008) $
-# $LastChangedRevision: 182 $
+# $LastChangedDate: 2008-11-29 19:34:08 +0100 (sam. 29 nov. 2008) $
+# $LastChangedRevision: 201 $
 
+from django.db.models import Q
+from django.http import QueryDict
 from django.shortcuts import render_to_response
-from domogik.control.models import CommTechnology
+from domogik.control.models import DeviceTechnology
+from domogik.control.models import Area
 from domogik.control.models import Room
-from domogik.control.models import Capacity
-from domogik.control.models import Item
+from domogik.control.models import DeviceCapacity
+from domogik.control.models import DeviceProperty
+from domogik.control.models import Device
+from domogik.control.models import StateReading
+from domogik.control.models import ApplicationSetting
+from domogik.control.forms import ApplicationSettingForm
 
 def index(request):
+	adminMode = ""
 	pageTitle = "Domogik Home"
+
+	qList = Q()
+	if request.method == 'POST': # A search was submitted
+		for room in QueryDict.getlist(request.POST, "room"):
+			qList = qList | Q(room__id = room)
+		for area in QueryDict.getlist(request.POST, "area"):
+			qList = qList | Q(room__area__id = area)
+		for capacity in QueryDict.getlist(request.POST, "capacity"):
+			qList = qList | Q(capacity__id = capacity)
+
+	deviceList = Device.objects.filter(qList)
+
+	areaList = Area.objects.all()
+	roomList = Room.objects.all()
+	capacityList = DeviceCapacity.objects.all()
+	techList = DeviceTechnology.objects.all()
+
+	appSetting = __readApplicationSetting()
+
+	if appSetting.adminMode == True:
+		adminMode = "True"
 	return render_to_response(
 		'index.html',
 		{
-			'pageTitle': pageTitle
-		}
-	)
-
-def globalControl(request):
-	pageTitle = "Global control of your system"
-	return render_to_response(
-		'global_control.html',
-		{
-			'pageTitle'	: pageTitle,
-		}
-	)
-
-def rooms(request):
-	pageTitle = "List of the rooms"
-	roomList = Room.objects.all()
-	return render_to_response(
-		'rooms.html',
-		{
-			'pageTitle'	: pageTitle,
-			'roomList'	: roomList
-		}
-	)
-
-def capacities(request, roomId):
-	room = Room.objects.get(pk=roomId)
-	capacityList = Capacity.objects.filter(room__id=roomId)
-	pageTitle = "List of the capacities for : " + room.name
-	return render_to_response(
-		'capacities.html',
-		{
-			'pageTitle'		: pageTitle,
-			'roomId' 		: room.id,
-			'capacityList' 	: capacityList
-		}
-	)
-
-def items(request, roomId, capacityId):
-	capacity = Capacity.objects.get(pk=capacityId)
-	itemList = Item.objects.filter(room__id=roomId, capacity__id=capacityId)
-	pageTitle = "List of the items for the capacity  : " + capacity.name
-	return render_to_response(
-		'items.html',
-		{
-			'pageTitle'		: pageTitle,
-			'capacityName'	: capacity.name,
-			'itemList'		: itemList
+			'areaList'		: areaList,
+			'roomList'		: roomList,
+			'capacityList'	: capacityList,
+			'deviceList'	: deviceList,
+			'techList'		: techList,
+			'adminMode'		: adminMode,
+			'pageTitle'		: pageTitle
 		}
 	)
 
@@ -89,56 +78,33 @@ def items(request, roomId, capacityId):
 def adminIndex(request):
 	pageTitle = "Admin page"
 	action = "index"
+
+	appSettingForm = ApplicationSettingForm(instance=__readApplicationSetting())
 	return render_to_response(
 		'admin_index.html',
 		{
-			'pageTitle'	: pageTitle,
-			'action'	: action
+			'appSettingForm'	: appSettingForm,
+			'pageTitle'			: pageTitle,
+			'action'			: action
 		}
 	)
 
+def saveSettings(request):
+	if request.method == 'POST':
+		form = ApplicationSettingForm(request.POST, instance=__readApplicationSetting())
+		if form.is_valid():
+			form.save()
+
+	return adminIndex(request)
+
 def loadSampleData(request):
-	__removeAllData()
-	# Create sample objects
-	temperature = Capacity.objects.create(name="Temperature")
-	light = Capacity.objects.create(name="Light")
-	music = Capacity.objects.create(name="Music")
-	powerPoint = Capacity.objects.create(name="Power point")
+	__createSampleData()
 
-	bedroom = Room.objects.create(name="Bedroom")
-	bedroom.capacities.add(temperature)
-	bedroom.capacities.add(light)
-	bedroom.capacities.add(music)
-	bedroom.capacities.add(powerPoint)
-	lounge = Room.objects.create(name="Lounge")
-	lounge.capacities.add(temperature)
-	lounge.capacities.add(light)
-	lounge.capacities.add(music)
-	lounge.capacities.add(powerPoint)
-	kitchen = Room.objects.create(name="Kitchen")
-	kitchen.capacities.add(temperature)
-	kitchen.capacities.add(light)
-	kitchen.capacities.add(powerPoint)
-
-	x10 = CommTechnology.objects.create(name="X10")
-	oneWire = CommTechnology.objects.create(name="OneWire")
-	ir = CommTechnology.objects.create(name="IR")
-	zigBee = CommTechnology.objects.create(name="ZigBee")
-
-	bedroomBedsideLamp = Item.objects.create(name="Beside lamp", room=bedroom, capacity=light, commTechnology=x10)
-	bedroomLamp = Item.objects.create(name="Lamp in the bedroom", room=bedroom, capacity=light, commTechnology=x10)
-	bedroomMusic = Item.objects.create(name="Music in the bedroom", room=bedroom, capacity=music)
-
-	loungeLamp = Item.objects.create(name="Lamp in the lounge", room=lounge, capacity=light, commTechnology=x10)
-	loungeMusic = Item.objects.create(name="Music in the lounge", room=lounge, capacity=music)
-
-	kitchenLamp = Item.objects.create(name="Lamp in the kitchen", room=kitchen, capacity=light, commTechnology=x10)
-	kitchenCoffeeMachine = Item.objects.create(name="Coffee machine", room=kitchen, capacity=powerPoint, commTechnology=x10)
-
+	areaList = Area.objects.all()
 	roomList = Room.objects.all()
-	capacityList = Capacity.objects.all()
-	itemList = Item.objects.all()
-	techList = CommTechnology.objects.all()
+	capacityList = DeviceCapacity.objects.all()
+	deviceList = Device.objects.all()
+	techList = DeviceTechnology.objects.all()
 	pageTitle = "Load sample data"
 	action = "loadSampleData"
 	return render_to_response(
@@ -146,9 +112,10 @@ def loadSampleData(request):
 		{
 			'pageTitle'		: pageTitle,
 			'action'		: action,
+			'areaList'		: areaList,
 			'roomList'		: roomList,
 			'capacityList'	: capacityList,
-			'itemList'		: itemList,
+			'deviceList'	: deviceList,
 			'techList'		: techList,
 		}
 	)
@@ -166,20 +133,84 @@ def clearData(request):
 		}
 	)
 
-# Remove all objects in the database
-def __removeAllData():
-	itemList = Item.objects.all()
-	for item in itemList:
-		item.delete()
+### Private methods
 
-	capacityList = Capacity.objects.all()
-	for capacity in capacityList:
-		capacity.delete()
+def __readApplicationSetting():
+	if ApplicationSetting.objects.all().count() == 1:
+		return ApplicationSetting.objects.all()[0]
+	else:
+		return ApplicationSetting()
+
+def __createSampleData():
+	# TODO : don't do anything if we are *NOT* in simulation mode
+
+	__removeAllData()
+
+	ApplicationSetting.objects.create(simulationMode=True, adminMode=True, debugMode=True)
+
+	# Create sample objects
+	basement = Area.objects.create(name="Basement")
+	groundFloor = Area.objects.create(name="Ground floor")
+	firstFloor = Area.objects.create(name="First floor")
+
+	bedroom1 = Room.objects.create(name="Bedroom 1", area=firstFloor)
+	bedroom2 = Room.objects.create(name="Bedroom 2", area=firstFloor)
+	lounge = Room.objects.create(name="Lounge", area=groundFloor)
+	kitchen = Room.objects.create(name="Kitchen", area=groundFloor)
+	bathroom = Room.objects.create(name="Bathroom", area=firstFloor)
+	cellar = Room.objects.create(name="Cellar", area=basement)
+
+	x10 = DeviceTechnology.objects.create(name="X10")
+	oneWire = DeviceTechnology.objects.create(name="OneWire")
+	ir = DeviceTechnology.objects.create(name="IR")
+	plcBus = DeviceTechnology.objects.create(name="IR")
+
+	lightingCap = DeviceCapacity.objects.create(name="Lighting")
+	powerPointCap = DeviceCapacity.objects.create(name="Power point")
+
+	bedroom1BedsideLamp = Device.objects.create(name="Beside lamp", technology=x10, capacity=lightingCap, reference="AM12", address="A1", room=bedroom1)
+	bedroom1Lamp = Device.objects.create(name="Lamp", technology=x10, capacity=lightingCap, reference="LM12", address="A2", room=bedroom1)
+	bedroom2BedsideLamp = Device.objects.create(name="Beside lamp", technology=x10, capacity=lightingCap, reference="AM12", address="B1", room=bedroom2)
+	bedroom2Lamp = Device.objects.create(name="Lamp", technology=x10, capacity=lightingCap, reference="LM12", address="B2", room=bedroom2)
+	#bedroomMusic = Item.objects.create(name="Music in the bedroom", room=bedroom, capacity=music)
+
+	loungeLamp = Device.objects.create(name="Lamp", technology=x10, capacity=lightingCap, reference="LM12", address="C1", room=lounge)
+	#loungeMusic = Item.objects.create(name="Music in the lounge", room=lounge, capacity=music)
+
+	kitchenLamp = Device.objects.create(name="Lamp", technology=x10, capacity=lightingCap, reference="LM12", address="D1", room=kitchen)
+	kitchenCoffeeMachine = Device.objects.create(name="Coffee machine", technology=x10, capacity=powerPointCap, reference="AM12", address="D2", room=kitchen)
+
+def __removeAllData():
+	# Normally the list should contain only one row
+	appSettingList = ApplicationSetting.objects.all()
+	for appSetting in appSettingList:
+		appSetting.delete()
+
+	stateReadingList = StateReading.objects.all()
+	for stateReading in stateReadingList:
+		stateReading.delete()
+
+	devicePropertyList = DeviceProperty.objects.all()
+	for deviceProperty in devicePropertyList:
+		deviceProperty.delete()
+
+	deviceList = Device.objects.all()
+	for device in deviceList:
+		device.delete()
+
+	deviceCapacityList = DeviceCapacity.objects.all()
+	for deviceCapacity in deviceCapacityList:
+		deviceCapacity.delete()
+
+	deviceTechnologyList = DeviceTechnology.objects.all()
+	for deviceTechnology in deviceTechnologyList:
+		deviceTechnology.delete()
 
 	roomList = Room.objects.all()
 	for room in roomList:
 		room.delete()
 
-	techList = CommTechnology.objects.all()
-	for tech in techList:
-		tech.delete()
+	areaList = Area.objects.all()
+	for area in areaList:
+		area.delete()
+

@@ -18,13 +18,96 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-19 17:33:28 +0200 (dim. 19 oct. 2008) $
-# $LastChangedRevision: 171 $
+# $LastChangedDate: 2008-11-29 19:34:08 +0100 (sam. 29 nov. 2008) $
+# $LastChangedRevision: 201 $
 -->
 {% extends "base.html" %}
 
 {% block title %}{{ pageTitle }}{% endblock %}
 
 {% block content %}
-	<p>Welcome to Domogik !</p>
+	<p><h1>Control overview</h1></p>
+	<form name="filterForm" method="POST"/>
+	<fieldset>
+		<legend>Search</legend>
+		<table>
+			<tr valign="top">
+				<td>
+					<table>
+						<tr>
+							<th>Area</th>
+						</tr>
+						{% for area in areaList %}
+							<tr>
+								<td>{{ area.name }}</td><td><input type="checkbox" name="area" value="{{ area.id }}"/></td>
+							</tr>
+						{% endfor %}
+					</table>
+				</td>
+				<td>
+					<table>
+						<tr>
+							<th>Room</th>
+						</tr>
+						{% for room in roomList %}
+							<tr>
+								<td>{{ room.name }}</td><td><input type="checkbox" name="room" value="{{ room.id }}"/></td>
+							</tr>
+						{% endfor %}
+					</table>
+				</td>
+				<td>
+					<table>
+						<tr>
+							<th>Capacity</th>
+						</tr>
+						{% for capacity in capacityList %}
+							<tr>
+								<td>{{ capacity.name }}</td><td><input type="checkbox" name="capacity" value="{{ capacity.id }}"/></td>
+							</tr>
+						{% endfor %}
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2"><input type="submit" value="Filter"/></td>
+			</tr>
+
+		</table>
+	</fieldset>
+	</form>
+
+	<hr/>
+	{% if deviceList %}
+		<table>
+			<tr>
+				<th>Device name</th>
+				{% if adminMode %}
+					<th>Capacity</th>
+					<th>Address</th>
+					<th>Reference</th>
+					<th>Technology</th>
+				{% endif %}
+				<th>Room</th>
+				<th>Area</th>
+			</tr>
+
+			{% for device in deviceList %}
+				<tr>
+					<td>{{ device.name }}</td>
+					{% if adminMode %}
+						<td>{{ device.capacity.name }}</td>
+						<td>{{ device.address }}</td>
+						<td>{{ device.reference }}</td>
+						<td>{{ device.technology.name }}</td>
+					{% endif %}
+					<td>{{ device.room.name }}</td>
+					<td>{{ device.room.area.name }}</td>
+				</tr>
+			{% endfor %}
+		</table>
+	{% else %}
+		<p>No device found !</p>
+	{% endif %}
+
 {% endblock %}

@@ -1,4 +1,6 @@
-<!--
+#!/usr/bin/python
+#-*- encoding:utf-8 *-*
+
 # Copyright 2008 Domogik project
 
 # This file is part of Domogik.
@@ -18,21 +20,16 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-19 17:10:10 +0200 (dim. 19 oct. 2008) $
-# $LastChangedRevision: 168 $
--->
-{% extends "base.html" %}
+# $LastChangedDate: 2008-11-29 19:34:08 +0100 (sam. 29 nov. 2008) $
+# $LastChangedRevision: 201 $
 
-{% block title %}{{ pageTitle }}{% endblock %}
+from django import forms
+from django.forms import ModelForm
+from domogik.control.models import ApplicationSetting
 
-{% block content %}
-	{% if roomList %}
-		<ul>
-		{% for room in roomList %}
-			<li><a href="{% url capacitiesView room.id %}">{{ room.name }}</a></li>
-		{% endfor %}
-		</ul>
-	{% else %}
-		<p>No room found</p>
-	{% endif %}
-{% endblock %}
+#class ApplicationSettingForm(forms.Form):
+#	name = forms.CharField(max_length=100)
+
+class ApplicationSettingForm(ModelForm):
+	class Meta:
+		model = ApplicationSetting

@@ -20,23 +20,16 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-25 16:18:42 +0200 (sam. 25 oct. 2008) $
-# $LastChangedRevision: 183 $
+# $LastChangedDate: 2008-11-29 19:34:08 +0100 (sam. 29 nov. 2008) $
+# $LastChangedRevision: 201 $
 
 from django.db import models
 
-class Thermometer(models.Model):
-	thermometer = models.CharField(max_length=16)
-	label = models.CharField(max_length=50)
-
-	# This is the representation of the object
-	def __unicode__(self):
-		return self.thermometer + " (" + self.label +")"
-
-class Capacity(models.Model):
+class DeviceCapacity(models.Model):
 	CAPACITY_CHOICES = (
 		('Temperature', 'Temperature'),
-		('Light', 'Light'),
+		('Heating', 'Heating'),
+		('Lighting', 'Lighting'),
 		('Music', 'Music'),
 		('Power point','Power point')
 	)
@@ -46,45 +39,74 @@ class Capacity(models.Model):
 	def __unicode__(self):
 		return self.name
 
-	class Meta:
-		verbose_name_plural = "capacities"
+class Area(models.Model):
+	name = models.CharField(max_length=30)
+
+	# This is the representation of the object
+	def __unicode__(self):
+		return self.name
 
 class Room(models.Model):
 	name = models.CharField(max_length=30)
-	capacities = models.ManyToManyField(Capacity) 
-	thermometers = models.ManyToManyField(Thermometer, null=True)
+	area = models.ForeignKey(Area)
 
 	# This is the representation of the object
 	def __unicode__(self):
 		return self.name
 
-class CommTechnology(models.Model):
+class DeviceTechnology(models.Model):
 	TECHNOLOGY_CHOICES = (
 		('X10', 'X10'),
-		('OneWire', 'OneWire'),
+		('One-Wire', 'One-Wire'),
+		('PLCBus', 'PLCBus'),
 		('IR', 'IR'),
-		('ZigBee', 'ZigBee')
 	)
 	name =  models.CharField(max_length=20, choices=TECHNOLOGY_CHOICES)
-	description = models.CharField(max_length=255, null=True, blank=True)
+	description = models.TextField(max_length=255, null=True, blank=True)
 
 	class Meta:
-		verbose_name_plural = "Comm technologies"
+		verbose_name_plural = "Devices technologies"
 
 	# This is the representation of the object
 	def __unicode__(self):
 		return self.name
 
-class Item(models.Model):
+class Device(models.Model):
 	name = models.CharField(max_length=30)
-	description = models.CharField(max_length=30)
-	commTechnology = models.ForeignKey(CommTechnology, null=True)
-	address = models.CharField(max_length=10, null=True)
+	serialNb = models.CharField(max_length=30, null=True, blank=True)
+	reference = models.CharField(max_length=30, null=True, blank=True)
+	address = models.CharField(max_length=30)
+	description = models.TextField(max_length=80, null=True, blank=True)
+	technology = models.ForeignKey(DeviceTechnology)
+	capacity = models.ForeignKey(DeviceCapacity)
 	room = models.ForeignKey(Room)
-	capacity = models.ForeignKey(Capacity)
+	canGiveFeedback = models.BooleanField(default=False)
+
 	# This is the representation of the object
 	def __unicode__(self):
 		return self.name
+
+class DeviceProperty(models.Model):
+	key = models.CharField(max_length=30)
+	device = models.ForeignKey(Device)
+	value = models.CharField(max_length=80)
+
+	class Meta:
+		unique_together = ("key", "device")
+
+	# This is the representation of the object
+	def __unicode__(self):
+		return self.key + "=" + self.value
+
+class StateReading(models.Model):
+	device = models.ForeignKey(Device)
+	value = models.FloatField()
+	date = models.DateTimeField()
+
+class ApplicationSetting(models.Model):
+	simulationMode = models.BooleanField("Simulation mode", default=True)
+	adminMode = models.BooleanField("Administrator mode", default=True)
+	debugMode = models.BooleanField("Debug mode", default=True)
 
 class Music(models.Model):
 	STATE_CHOICES = (
@@ -97,16 +119,3 @@ class Music(models.Model):
 	time = models.TimeField()
 	current_time = models.TimeField()
 	state = models.CharField(max_length=10, choices=STATE_CHOICES)
-
-class Statement(models.Model):
-	date = models.DateTimeField()
-	thermometer = models.ForeignKey(Thermometer)
-	temperature = models.FloatField()
-
-class State(models.Model):
-	item = models.ForeignKey(Item)
-	state = models.SmallIntegerField() 
-	date = models.DateTimeField()
-
-class ApplicationSetting(models.Model):
-	simulation_mode = models.BooleanField()

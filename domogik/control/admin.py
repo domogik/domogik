@@ -20,22 +20,22 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-25 16:12:01 +0200 (sam. 25 oct. 2008) $
-# $LastChangedRevision: 181 $
+# $LastChangedDate: 2008-11-29 19:34:08 +0100 (sam. 29 nov. 2008) $
+# $LastChangedRevision: 201 $
 
 # This is the admin part of Domogik
 
 from django.contrib import admin
+from domogik.control.models import Area
 from domogik.control.models import Room
-from domogik.control.models import Item
-from domogik.control.models import Thermometer
-from domogik.control.models import Capacity
-from domogik.control.models import CommTechnology
+from domogik.control.models import Device
+from domogik.control.models import DeviceCapacity
+from domogik.control.models import DeviceTechnology
 from domogik.control.models import ApplicationSetting
 
+admin.site.register(Area)
 admin.site.register(Room)
-admin.site.register(Item)
-admin.site.register(Thermometer)
-admin.site.register(Capacity)
-admin.site.register(CommTechnology)
+admin.site.register(Device)
+admin.site.register(DeviceCapacity)
+admin.site.register(DeviceTechnology)
 admin.site.register(ApplicationSetting)

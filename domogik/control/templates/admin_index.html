@@ -18,12 +18,17 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-10-21 22:17:11 +0200 (mar. 21 oct. 2008) $
-# $LastChangedRevision: 175 $
+# $LastChangedDate: 2008-11-29 19:34:08 +0100 (sam. 29 nov. 2008) $
+# $LastChangedRevision: 201 $
 -->
 {% extends "base.html" %}
 
 {% block script %}
+	function saveSettings() {
+		document.forms['settingsForm'].action="{% url saveSettingsView %}"
+		document.forms['settingsForm'].submit()
+	}
+
 	function clearData() {
 		if(confirm("This is your last chance to keep your data. Are you sure to want to do that ?")) {
 			document.forms['dataForm'].action="{% url clearDataView %}"
@@ -41,6 +46,20 @@
 
 {% block content %}
 	{% ifequal action "index" %}
+	<form name="settingsForm" action="" method="POST">
+		<fieldset>
+			<legend>Settings</legend>
+			<table>
+				<tr>
+					<td>{{ appSettingForm.as_table }}</td>
+				</tr>
+				<tr>
+					<td><input type="button" value="Submit" onclick="saveSettings()"></td>
+				</tr>
+			</table>
+		</fieldset>
+	</form>
+
 	<form name="dataForm" action="" method="POST">
 		<fieldset>
 			<legend>Data</legend>
@@ -52,7 +71,7 @@
 					<td>Clear all data</td><td><input type="button" value="Clear" onclick="clearData()"></td>
 				</tr>
 			</table>
-		</fieldset>
+		</fieldset>		
 	</form>
 	{% endifequal %}
 
@@ -84,12 +103,12 @@
 			<p>No data</p>
 		{% endif %}
 
-		<p><strong>Items</strong></p>
+		<p><strong>Devices</strong></p>
 		<hr/>
-		{% if itemList %}
+		{% if deviceList %}
 			<ul>
-			{% for item in itemList %}
-				<li>{{ item.name }}</li>
+			{% for device in deviceList %}
+				<li>{{ device.name }} ({{ device.room.name }})</li>
 			{% endfor %}
 			</ul>
 		{% else %}
