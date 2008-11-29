@@ -1,8 +1,8 @@
 # TODO file (highest priority first)
 #
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-11-29 10:26:35 +0100 (sam. 29 nov. 2008) $
-# $LastChangedRevision: 198 $
+# $LastChangedDate: 2008-11-29 16:02:41 +0100 (sam. 29 nov. 2008) $
+# $LastChangedRevision: 199 $
 #
 
 * General
@@ -34,6 +34,8 @@
 	* @? : complete technical section
 		* Write articles presenting the different technologies that can be used in home automation (X10, 1-Wire, PLCBus, IR, RFXCom, ...).
 			The aim is just to give an overview and not an exhaustive documentation.
+	* @? : move README.txt content (installation process) on the web site, and translate it into french
+	* @Marc : make sure articles are displayed in the right order
 	* @Alban or @Marc : complete the "About us" section listing the main people managing / contributing to the project, and create other membrers profile
 	* @? Translate into english the page explaining how to join the developper community (subversion)
 	* @Alban : add a favicon
