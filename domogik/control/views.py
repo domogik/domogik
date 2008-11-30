@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-11-29 19:34:08 +0100 (sam. 29 nov. 2008) $
-# $LastChangedRevision: 201 $
+# $LastChangedDate: 2008-11-30 09:56:09 +0100 (dim. 30 nov. 2008) $
+# $LastChangedRevision: 202 $
 
 from django.db.models import Q
 from django.http import QueryDict
@@ -40,16 +40,18 @@ def index(request):
 	adminMode = ""
 	pageTitle = "Domogik Home"
 
-	qList = Q()
+	qListArea = Q()
+	qListRoom = Q()
+	qListCapacity = Q()
 	if request.method == 'POST': # A search was submitted
-		for room in QueryDict.getlist(request.POST, "room"):
-			qList = qList | Q(room__id = room)
 		for area in QueryDict.getlist(request.POST, "area"):
-			qList = qList | Q(room__area__id = area)
+			qListArea = qListArea | Q(room__area__id = area)
+		for room in QueryDict.getlist(request.POST, "room"):
+			qListRoom = qListRoom | Q(room__id = room)
 		for capacity in QueryDict.getlist(request.POST, "capacity"):
-			qList = qList | Q(capacity__id = capacity)
+			qListCapacity = qListCapacity | Q(capacity__id = capacity)
 
-	deviceList = Device.objects.filter(qList)
+	deviceList = Device.objects.filter(qListArea).filter(qListRoom).filter(qListCapacity)
 
 	areaList = Area.objects.all()
 	roomList = Room.objects.all()
