@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-11-30 09:56:09 +0100 (dim. 30 nov. 2008) $
-# $LastChangedRevision: 202 $
+# $LastChangedDate: 2008-12-01 22:43:58 +0100 (lun. 01 déc. 2008) $
+# $LastChangedRevision: 205 $
 
 from django.db.models import Q
 from django.http import QueryDict
@@ -93,6 +93,7 @@ def adminIndex(request):
 
 def saveSettings(request):
 	if request.method == 'POST':
+		# Update existing applicationSetting instance with POST values
 		form = ApplicationSettingForm(request.POST, instance=__readApplicationSetting())
 		if form.is_valid():
 			form.save()
@@ -100,6 +101,21 @@ def saveSettings(request):
 	return adminIndex(request)
 
 def loadSampleData(request):
+	pageTitle = "Load sample data"
+	action = "loadSampleData"
+
+	appSetting = __readApplicationSetting()
+	if appSetting.simulationMode != True:
+		errorMsg = "The application is not running in simulation mode : can't load sample data"
+		return render_to_response(
+			'admin_index.html',
+			{
+				'pageTitle'		: pageTitle,
+				'action'		: action,
+				'errorMsg'		: errorMsg
+			}
+		)
+
 	__createSampleData()
 
 	areaList = Area.objects.all()
@@ -107,8 +123,7 @@ def loadSampleData(request):
 	capacityList = DeviceCapacity.objects.all()
 	deviceList = Device.objects.all()
 	techList = DeviceTechnology.objects.all()
-	pageTitle = "Load sample data"
-	action = "loadSampleData"
+
 	return render_to_response(
 		'admin_index.html',
 		{
@@ -123,10 +138,23 @@ def loadSampleData(request):
 	)
 
 def clearData(request):
-	__removeAllData()
-
 	pageTitle = "Remove all data"
 	action = "clearData"
+
+	appSetting = __readApplicationSetting()
+	if appSetting.simulationMode != True:
+		errorMsg = "The application is not running in simulation mode : can't clear data"
+		return render_to_response(
+			'admin_index.html',
+			{
+				'pageTitle'		: pageTitle,
+				'action'		: action,
+				'errorMsg'		: errorMsg
+			}
+		)
+
+	__removeAllData()
+
 	return render_to_response(
 		'admin_index.html',
 		{
@@ -144,8 +172,6 @@ def __readApplicationSetting():
 		return ApplicationSetting()
 
 def __createSampleData():
-	# TODO : don't do anything if we are *NOT* in simulation mode
-
 	__removeAllData()
 
 	ApplicationSetting.objects.create(simulationMode=True, adminMode=True, debugMode=True)
