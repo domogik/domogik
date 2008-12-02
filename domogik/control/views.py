@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-02 21:51:30 +0100 (mar. 02 déc. 2008) $
-# $LastChangedRevision: 208 $
+# $LastChangedDate: 2008-12-02 22:45:46 +0100 (mar. 02 déc. 2008) $
+# $LastChangedRevision: 211 $
 
 from django.db.models import Q
 from django.http import QueryDict
@@ -38,7 +38,7 @@ from domogik.control.forms import ApplicationSettingForm
 
 def index(request):
 	adminMode = ""
-	pageTitle = "Domogik Home"
+	pageTitle = "Control overview"
 
 	qListArea = Q()
 	qListRoom = Q()

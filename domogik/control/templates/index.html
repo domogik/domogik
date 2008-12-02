@@ -18,66 +18,67 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-02 21:51:30 +0100 (mar. 02 déc. 2008) $
-# $LastChangedRevision: 208 $
+# $LastChangedDate: 2008-12-02 22:45:46 +0100 (mar. 02 déc. 2008) $
+# $LastChangedRevision: 211 $
 -->
 {% extends "base.html" %}
 
 {% block title %}{{ pageTitle }}{% endblock %}
 
 {% block content %}
-	<p><h1>Control overview</h1></p>
 	<form name="filterForm" method="POST"/>
-	<fieldset>
-		<legend>Search</legend>
-		<table>
-			<tr valign="top">
-				<td>
-					<table>
-						<tr>
-							<th>Area</th>
-						</tr>
-						{% for area in areaList %}
+	<div id="search">
+		<fieldset>
+			<legend>Search</legend>
+			<table>
+				<tr valign="top">
+					<td>
+						<table>
 							<tr>
-								<td>{{ area.name }}</td><td><input type="checkbox" name="area" value="{{ area.id }}"/></td>
+								<th>Area</th>
 							</tr>
-						{% endfor %}
-					</table>
-				</td>
-				<td>
-					<table>
-						<tr>
-							<th>Room</th>
-						</tr>
-						{% for room in roomList %}
+							{% for area in areaList %}
+								<tr>
+									<td>{{ area.name }}</td><td><input type="checkbox" name="area" value="{{ area.id }}"/></td>
+								</tr>
+							{% endfor %}
+						</table>
+					</td>
+					<td>
+						<table>
 							<tr>
-								<td>{{ room.name }}</td><td><input type="checkbox" name="room" value="{{ room.id }}"/></td>
+								<th>Room</th>
 							</tr>
-						{% endfor %}
-					</table>
-				</td>
-				<td>
-					<table>
-						<tr>
-							<th>Capacity</th>
-						</tr>
-						{% for capacity in capacityList %}
+							{% for room in roomList %}
+								<tr>
+									<td>{{ room.name }}</td><td><input type="checkbox" name="room" value="{{ room.id }}"/></td>
+								</tr>
+							{% endfor %}
+						</table>
+					</td>
+					<td>
+						<table>
 							<tr>
-								<td>{{ capacity.name }}</td><td><input type="checkbox" name="capacity" value="{{ capacity.id }}"/></td>
+								<th>Capacity</th>
 							</tr>
-						{% endfor %}
-					</table>
-				</td>
-			</tr>
-			<tr>
-				<td colspan="2"><input type="submit" value="Filter"/></td>
-			</tr>
+							{% for capacity in capacityList %}
+								<tr>
+									<td>{{ capacity.name }}</td><td><input type="checkbox" name="capacity" value="{{ capacity.id }}"/></td>
+								</tr>
+							{% endfor %}
+						</table>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2"><input type="submit" value="Filter"/></td>
+				</tr>
 
-		</table>
-	</fieldset>
+			</table>
+		</fieldset>
+	</div>
 	</form>
 
-	<hr/>
+	<div id="list">
 	{% if deviceList %}
 		<table>
 			<tr>
@@ -105,7 +106,7 @@
 					<td>{{ device.room.name }}</td>
 					<td>{{ device.room.area.name }}</td>
 					<td>
-						<table>
+						<table id="listValue">
 							<tr>
 								{% for property in device.deviceproperty_set.all %}
 									<td>{{ property.key }}: {{ property.value }}</td>
@@ -119,5 +120,6 @@
 	{% else %}
 		<p>No device found !</p>
 	{% endif %}
+	</div>
 
 {% endblock %}

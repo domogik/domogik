@@ -18,8 +18,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-02 21:50:23 +0100 (mar. 02 déc. 2008) $
-# $LastChangedRevision: 207 $
+# $LastChangedDate: 2008-12-02 22:45:46 +0100 (mar. 02 déc. 2008) $
+# $LastChangedRevision: 211 $
 */
 
 body {
@@ -67,6 +67,10 @@ body {
 	background-color: #333333;
 }
 
+#content h1 {
+	color: #00D2B1;
+}
+
 #content a {
 	color: #668cc7;
 }
@@ -76,11 +80,45 @@ body {
 	font-weight: bold;
 }
 
-#rightBar {
-#	float: right;
-#	width: 200px;
-#	background: #333333;
-#}
+#search fieldset legend {
+	color: yellow;
+}
+
+#search th {
+	color: yellow;
+}
+
+#list table {
+	border-collapse:collapse;
+	border-style:solid;
+	width: 100%;
+}
+
+#list th {
+	color: yellow;
+	border:1px solid #DDDDDD;
+}
+
+#list td {
+	padding: 4px;
+	vertical-align:middle;
+	border:1px solid #DDDDDD;
+}
+
+table#listValue {
+	border: none;
+}
+#listValue td {
+	border: none;
+}
+
+/*
+rightBar {
+	float: right;
+	width: 200px;
+	background: #333333;
+}
+*/
 
 #bottom {
 	clear: both;
