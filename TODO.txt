@@ -1,8 +1,8 @@
 # TODO file (highest priority first)
 #
-# $LastChangedBy: albinoz $
-# $LastChangedDate: 2008-11-30 14:36:49 +0100 (dim. 30 nov. 2008) $
-# $LastChangedRevision: 203 $
+# $LastChangedBy: mschneider $
+# $LastChangedDate: 2008-12-02 22:22:50 +0100 (mar. 02 déc. 2008) $
+# $LastChangedRevision: 210 $
 #
 
 * General
@@ -16,7 +16,7 @@
 	* @Maxence : review model structure
 	* @Marc
 		* Eventually create a global view that can switch off all the lights for example
-		* Add Interface to configure the system (add devices)
+		* In Django's admin interface, make possible to enter values for the device
 
 	* @? : find a way to switch between pure links and icons for the clickable areas (menus, functions...)
 	* @? : Add a function to schedule a task (eg. switch on/off the heating at a given time)
