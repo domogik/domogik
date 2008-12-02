@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-11-29 19:34:08 +0100 (sam. 29 nov. 2008) $
-# $LastChangedRevision: 201 $
+# $LastChangedDate: 2008-12-02 21:26:51 +0100 (mar. 02 déc. 2008) $
+# $LastChangedRevision: 206 $
 
 from django.db import models
 
@@ -88,8 +88,8 @@ class Device(models.Model):
 
 class DeviceProperty(models.Model):
 	key = models.CharField(max_length=30)
-	device = models.ForeignKey(Device)
 	value = models.CharField(max_length=80)
+	device = models.ForeignKey(Device)
 
 	class Meta:
 		unique_together = ("key", "device")
