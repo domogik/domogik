@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-01 22:43:58 +0100 (lun. 01 déc. 2008) $
-# $LastChangedRevision: 205 $
+# $LastChangedDate: 2008-12-02 21:51:30 +0100 (mar. 02 déc. 2008) $
+# $LastChangedRevision: 208 $
 
 from django.db.models import Q
 from django.http import QueryDict
@@ -51,7 +51,8 @@ def index(request):
 		for capacity in QueryDict.getlist(request.POST, "capacity"):
 			qListCapacity = qListCapacity | Q(capacity__id = capacity)
 
-	deviceList = Device.objects.filter(qListArea).filter(qListRoom).filter(qListCapacity)
+	# select_related() should avoid one extra db query per property
+	deviceList = Device.objects.filter(qListArea).filter(qListRoom).filter(qListCapacity).select_related()
 
 	areaList = Area.objects.all()
 	roomList = Room.objects.all()
@@ -197,16 +198,27 @@ def __createSampleData():
 	powerPointCap = DeviceCapacity.objects.create(name="Power point")
 
 	bedroom1BedsideLamp = Device.objects.create(name="Beside lamp", technology=x10, capacity=lightingCap, reference="AM12", address="A1", room=bedroom1)
+	DeviceProperty.objects.create(key="value", value="1", device=bedroom1BedsideLamp) # On (static)
+
 	bedroom1Lamp = Device.objects.create(name="Lamp", technology=x10, capacity=lightingCap, reference="LM12", address="A2", room=bedroom1)
+	DeviceProperty.objects.create(key="value", value="75", device=bedroom1Lamp) # Variable value (dimmer)
+
 	bedroom2BedsideLamp = Device.objects.create(name="Beside lamp", technology=x10, capacity=lightingCap, reference="AM12", address="B1", room=bedroom2)
+	DeviceProperty.objects.create(key="value", value="0", device=bedroom2BedsideLamp) # Off (static)
+
 	bedroom2Lamp = Device.objects.create(name="Lamp", technology=x10, capacity=lightingCap, reference="LM12", address="B2", room=bedroom2)
+	DeviceProperty.objects.create(key="value", value="30", device=bedroom2Lamp) # Variable value (dimmer)
 	#bedroomMusic = Item.objects.create(name="Music in the bedroom", room=bedroom, capacity=music)
 
 	loungeLamp = Device.objects.create(name="Lamp", technology=x10, capacity=lightingCap, reference="LM12", address="C1", room=lounge)
+	DeviceProperty.objects.create(key="value", value="50", device=loungeLamp) # Variable value (dimmer)
 	#loungeMusic = Item.objects.create(name="Music in the lounge", room=lounge, capacity=music)
 
 	kitchenLamp = Device.objects.create(name="Lamp", technology=x10, capacity=lightingCap, reference="LM12", address="D1", room=kitchen)
+	DeviceProperty.objects.create(key="value", value="50", device=kitchenLamp) # Variable value (dimmer)
+
 	kitchenCoffeeMachine = Device.objects.create(name="Coffee machine", technology=x10, capacity=powerPointCap, reference="AM12", address="D2", room=kitchen)
+	DeviceProperty.objects.create(key="value", value="1", device=kitchenCoffeeMachine) # On (static)
 
 def __removeAllData():
 	# Normally the list should contain only one row

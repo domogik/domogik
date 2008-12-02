@@ -18,8 +18,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-11-29 19:34:08 +0100 (sam. 29 nov. 2008) $
-# $LastChangedRevision: 201 $
+# $LastChangedDate: 2008-12-02 21:51:30 +0100 (mar. 02 déc. 2008) $
+# $LastChangedRevision: 208 $
 -->
 {% extends "base.html" %}
 
@@ -90,6 +90,7 @@
 				{% endif %}
 				<th>Room</th>
 				<th>Area</th>
+				<th>Status</th>
 			</tr>
 
 			{% for device in deviceList %}
@@ -103,6 +104,15 @@
 					{% endif %}
 					<td>{{ device.room.name }}</td>
 					<td>{{ device.room.area.name }}</td>
+					<td>
+						<table>
+							<tr>
+								{% for property in device.deviceproperty_set.all %}
+									<td>{{ property.key }}: {{ property.value }}</td>
+								{% endfor %}
+							</tr>
+						</table>
+					</td>
 				</tr>
 			{% endfor %}
 		</table>
