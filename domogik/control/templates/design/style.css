@@ -18,8 +18,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-01 22:42:09 +0100 (lun. 01 déc. 2008) $
-# $LastChangedRevision: 204 $
+# $LastChangedDate: 2008-12-02 21:50:23 +0100 (mar. 02 déc. 2008) $
+# $LastChangedRevision: 207 $
 */
 
 body {
@@ -63,7 +63,7 @@ body {
 
 #content {
 	float:left;
-	width: 620px;
+	width: 820px;
 	background-color: #333333;
 }
 
@@ -77,10 +77,10 @@ body {
 }
 
 #rightBar {
-	float: right;
-	width: 200px;
-	background: #333333;
-}
+#	float: right;
+#	width: 200px;
+#	background: #333333;
+#}
 
 #bottom {
 	clear: both;
