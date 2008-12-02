@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-02 21:26:51 +0100 (mar. 02 déc. 2008) $
-# $LastChangedRevision: 206 $
+# $LastChangedDate: 2008-12-02 22:19:16 +0100 (mar. 02 déc. 2008) $
+# $LastChangedRevision: 209 $
 
 from django.db import models
 
@@ -84,7 +84,7 @@ class Device(models.Model):
 
 	# This is the representation of the object
 	def __unicode__(self):
-		return self.name
+		return self.name + " - " + self.address + " (" + self.reference + ")"
 
 class DeviceProperty(models.Model):
 	key = models.CharField(max_length=30)
