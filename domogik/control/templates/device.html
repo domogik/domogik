@@ -1,0 +1,71 @@
+<!--
+# Copyright 2008 Domogik project
+
+# This file is part of Domogik.
+# Domogik is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Domogik is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+
+# Author : Marc Schneider <marc@domogik.org>
+
+# $LastChangedBy: mschneider $
+# $LastChangedDate: 2008-12-03 23:59:38 +0100 (mer. 03 déc. 2008) $
+# $LastChangedRevision: 215 $
+-->
+{% extends "base.html" %}
+
+{% block title %}{{ pageTitle }}{% endblock %}
+
+{% block content %}
+	<form name="deviceForm" method="POST"/>
+	<div id="device">
+		<table>
+			<tr>
+				<td class="label">Device</td><td class="value">{{ device.name }}</td>
+			</tr>
+			{% if adminMode %}
+				<tr>
+					<td class="label">Address</td><td class="value">{{ device.capacity.name }}</td>
+				</tr>
+				<tr>
+					<td class="label">Reference</td><td class="value">{{ device.reference }}</td>
+				</tr>
+				<tr>
+					<td class="label">Technology</td><td class="value">{{ device.technology.name }}</td>
+				</tr>
+				<tr>
+					<td class="label">Capacity</td><td class="value">{{ device.capacity.name }}</td>
+				</tr>
+			{% endif %}
+			<tr>
+				<td class="label">Room</td><td class="value">{{ device.room.name }}</td>
+			</tr>
+			<tr>
+				<td class="label">Area</td><td class="value">{{ device.room.area.name }}</td>
+			</tr>
+			<tr>
+				<td class="label">Value</td>
+				<td class="value">
+					<table>
+						<tr>
+							{% for property in device.deviceproperty_set.all %}
+								<td>{{ property.key }}: {{ property.value }}</td>
+							{% endfor %}
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+		<p>&raquo; <a href="#">View logs</a> &raquo; <a href="#">View readings history</a>
+	</div>
+	</form>
+{% endblock %}
