@@ -18,8 +18,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-02 22:45:46 +0100 (mar. 02 déc. 2008) $
-# $LastChangedRevision: 211 $
+# $LastChangedDate: 2008-12-03 22:33:25 +0100 (mer. 03 déc. 2008) $
+# $LastChangedRevision: 214 $
 -->
 {% extends "base.html" %}
 
@@ -96,7 +96,7 @@
 
 			{% for device in deviceList %}
 				<tr>
-					<td>{{ device.name }}</td>
+					<td><a href="{% url deviceView device.id %}">{{ device.name }}</a></td>
 					{% if adminMode %}
 						<td>{{ device.capacity.name }}</td>
 						<td>{{ device.address }}</td>

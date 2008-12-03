@@ -20,13 +20,14 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-11-29 19:34:08 +0100 (sam. 29 nov. 2008) $
-# $LastChangedRevision: 201 $
+# $LastChangedDate: 2008-12-03 22:33:25 +0100 (mer. 03 déc. 2008) $
+# $LastChangedRevision: 214 $
 
 from django.conf.urls.defaults import *
 
 urlpatterns = patterns('domogik.control.views',
 	url(r'^$', 'index', name="mainView"),
+	url(r'device/(?P<deviceId>\d+)/$', 'device', name="deviceView"),
 #	url(r'global_control/$', 'globalControl', name="globalControlView"),
 #	url(r'rooms/$', 'rooms', name="roomsView"),
 #	url(r'capacities/(?P<roomId>\d+)/$', 'capacities', name="capacitiesView"),

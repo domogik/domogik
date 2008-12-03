@@ -18,8 +18,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-02 22:45:46 +0100 (mar. 02 déc. 2008) $
-# $LastChangedRevision: 211 $
+# $LastChangedDate: 2008-12-03 22:33:25 +0100 (mer. 03 déc. 2008) $
+# $LastChangedRevision: 214 $
 */
 
 body {
@@ -110,6 +110,17 @@ table#listValue {
 }
 #listValue td {
 	border: none;
+}
+
+#device {
+}
+#device .label {
+	color: yellow;
+	font-weight: bold;
+	padding-right: 30px;
+}
+#device .value {
+	font-weight: normal;
 }
 
 /*

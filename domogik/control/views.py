@@ -20,12 +20,14 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-02 22:45:46 +0100 (mar. 02 déc. 2008) $
-# $LastChangedRevision: 211 $
+# $LastChangedDate: 2008-12-03 22:33:25 +0100 (mer. 03 déc. 2008) $
+# $LastChangedRevision: 214 $
 
 from django.db.models import Q
+from django.http import Http404
 from django.http import QueryDict
 from django.shortcuts import render_to_response
+
 from domogik.control.models import DeviceTechnology
 from domogik.control.models import Area
 from domogik.control.models import Room
@@ -71,6 +73,29 @@ def index(request):
 			'capacityList'	: capacityList,
 			'deviceList'	: deviceList,
 			'techList'		: techList,
+			'adminMode'		: adminMode,
+			'pageTitle'		: pageTitle
+		}
+	)
+
+def device(request, deviceId):
+	adminMode = ""
+	pageTitle = "Device details"
+
+	appSetting = __readApplicationSetting()
+	if appSetting.adminMode == True:
+		adminMode = "True"
+
+	# Read device information
+	try:
+		device = Device.objects.get(pk=deviceId)
+	except Device.DoesNotExist:
+		raise Http404
+
+	return render_to_response(
+		'device.html',
+		{
+			'device'		: device,
 			'adminMode'		: adminMode,
 			'pageTitle'		: pageTitle
 		}
