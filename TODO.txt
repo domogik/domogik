@@ -1,8 +1,8 @@
 # TODO file (highest priority first)
 #
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-03 21:08:45 +0100 (mer. 03 déc. 2008) $
-# $LastChangedRevision: 212 $
+# $LastChangedDate: 2008-12-03 22:33:00 +0100 (mer. 03 déc. 2008) $
+# $LastChangedRevision: 213 $
 #
 
 * General
@@ -14,12 +14,17 @@
 	* @Epy : create a prototype using HTML / CSS
 		Only two files to edit : base.html and style.css !
 	* @Maxence : review model structure
-	* @Marc
-		* Eventually create a global view that can switch off all the lights for example
-		* In Django's admin interface, make possible to enter values for the device
+	
+	* Control
+		* @Marc : Eventually create a global view that can switch off all the lights for example
+		* @Marc : Display history of readings (essentially for sensors)
+		* @? : Add a function to schedule a task (eg. switch on/off the heating at a given time)
+
+	* Admin
+		* @Marc : In *Django's admin* interface, make possible to enter values for the device
+		* @Marc : Display logs (commands sent to the automation system). Have a global view and view per device.
 
 	* @? : find a way to switch between pure links and icons for the clickable areas (menus, functions...)
-	* @? : Add a function to schedule a task (eg. switch on/off the heating at a given time)
 	* @? : Add facility to save / load scenes 
 
 * mpris
@@ -38,3 +43,4 @@
 	* @Marc : make sure articles are displayed in the right order
 	* @Alban or @Marc : complete the "About us" section listing the main people managing / contributing to the project, and create other membrers profile
 	* @Cyril : Translate into english the page explaining how to join the developper community (subversion)
+	@ ? : Add screenshots of the new UI
