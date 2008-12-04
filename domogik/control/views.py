@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-04 22:29:20 +0100 (jeu. 04 déc. 2008) $
-# $LastChangedRevision: 221 $
+# $LastChangedDate: 2008-12-04 22:46:00 +0100 (jeu. 04 déc. 2008) $
+# $LastChangedRevision: 224 $
 
 from django.db.models import Q
 from django.http import Http404
@@ -81,6 +81,17 @@ def index(request):
 			'pageTitle'		: pageTitle
 		}
 	)
+
+def updateDeviceValues(request):
+	"""
+	Update device values (main control page)
+	"""
+	print "Updating values..."
+	# Get all values posted over the form
+	# For each device :
+	#	Check if value was changed
+	#	If yes, try to send new value to the device
+	#	Log the result
 
 def device(request, deviceId):
 	"""
