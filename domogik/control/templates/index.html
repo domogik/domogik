@@ -18,8 +18,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-03 22:33:25 +0100 (mer. 03 déc. 2008) $
-# $LastChangedRevision: 214 $
+# $LastChangedDate: 2008-12-04 22:39:23 +0100 (jeu. 04 déc. 2008) $
+# $LastChangedRevision: 223 $
 -->
 {% extends "base.html" %}
 
@@ -78,6 +78,7 @@
 	</div>
 	</form>
 
+	<form name="deviceListForm" method="POST"/>
 	<div id="list">
 	{% if deviceList %}
 		<table>
@@ -117,9 +118,15 @@
 				</tr>
 			{% endfor %}
 		</table>
+
+		<table>
+			<tr>
+				<td><input type="submit" value="Update values"/></td>
+			</tr>
+		</table>
 	{% else %}
 		<p>No device found !</p>
 	{% endif %}
 	</div>
-
+	</form>
 {% endblock %}
