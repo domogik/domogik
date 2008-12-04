@@ -18,8 +18,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-04 22:17:19 +0100 (jeu. 04 déc. 2008) $
-# $LastChangedRevision: 218 $
+# $LastChangedDate: 2008-12-04 22:24:51 +0100 (jeu. 04 déc. 2008) $
+# $LastChangedRevision: 220 $
 -->
 {% extends "base.html" %}
 
@@ -46,44 +46,46 @@
 
 {% block content %}
 	{% ifequal action "index" %}
-	<form name="settingsForm" action="" method="POST">
-		<fieldset>
-			<legend>Settings</legend>
-			<table>
-				<tr>
-					<td>{{ appSettingForm.as_table }}</td>
-				</tr>
-				<tr>
-					<td><input type="button" value="Submit" onclick="saveSettings()"></td>
-				</tr>
-			</table>
-		</fieldset>
-	</form>
+	<div id="adminMain">
+		<form name="settingsForm" action="" method="POST">
+			<fieldset>
+				<legend>Settings</legend>
+				<table>
+					<tr>
+						<td>{{ appSettingForm.as_table }}</td>
+					</tr>
+					<tr>
+						<td><input type="button" value="Submit" onclick="saveSettings()"></td>
+					</tr>
+				</table>
+			</fieldset>
+		</form>
 
-	<form name="dataForm" action="" method="POST">
-		<fieldset>
-			<legend>Data</legend>
-			<table>
-				<tr>
-					<td>&raquo;&nbsp;<a href="{% url deviceLogsView 0 %}">View logs</a></td>
-				</tr>
-			</table>
-		</fieldset>		
-	</form>
+		<form name="dataForm" action="" method="POST">
+			<fieldset>
+				<legend>Data</legend>
+				<table>
+					<tr>
+						<td>&raquo;&nbsp;<a href="{% url deviceLogsView 0 %}">View logs</a></td>
+					</tr>
+				</table>
+			</fieldset>		
+		</form>
 
-	<form name="simulationForm" action="" method="POST">
-		<fieldset>
-			<legend>Simulation</legend>
-			<table>
-				<tr>
-					<td>Load sample data (will delete previous data)</td><td><input type="button" value="Load" onclick="loadSampleData()"></td>
-				</tr>
-				<tr>
-					<td>Clear all data</td><td><input type="button" value="Clear" onclick="clearData()"></td>
-				</tr>
-			</table>
-		</fieldset>		
-	</form>
+		<form name="simulationForm" action="" method="POST">
+			<fieldset>
+				<legend>Simulation</legend>
+				<table>
+					<tr>
+						<td>Load sample data (will delete previous data)</td><td><input type="button" value="Load" onclick="loadSampleData()"></td>
+					</tr>
+					<tr>
+						<td>Clear all data</td><td><input type="button" value="Clear" onclick="clearData()"></td>
+					</tr>
+				</table>
+			</fieldset>		
+		</form>
+	</div>
 	{% endifequal %}
 
 	{% ifequal action "loadSampleData" %}
