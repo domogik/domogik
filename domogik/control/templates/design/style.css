@@ -18,8 +18,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-04 22:16:47 +0100 (jeu. 04 déc. 2008) $
-# $LastChangedRevision: 217 $
+# $LastChangedDate: 2008-12-04 22:24:30 +0100 (jeu. 04 déc. 2008) $
+# $LastChangedRevision: 219 $
 */
 
 body {
@@ -82,6 +82,7 @@ body {
 
 #search fieldset legend {
 	color: yellow;
+	font-size:14px;
 }
 
 #search th {
@@ -123,8 +124,11 @@ table#listValue {
 	font-weight: normal;
 }
 
-#admin fieldset legend {
-	color: yellow;
+#adminMain fieldset legend {
+	padding: 0.2em 0.5em;
+	color:green;
+	font-size:14px;
+	font-weight: bold;
 }
 
 /*
