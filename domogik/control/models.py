@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-04 22:17:19 +0100 (jeu. 04 déc. 2008) $
-# $LastChangedRevision: 218 $
+# $LastChangedDate: 2008-12-04 22:39:00 +0100 (jeu. 04 déc. 2008) $
+# $LastChangedRevision: 222 $
 
 from django.db import models
 
@@ -73,14 +73,14 @@ class DeviceTechnology(models.Model):
 
 class Device(models.Model):
 	name = models.CharField(max_length=30)
-	serialNb = models.CharField(max_length=30, null=True, blank=True)
+	serialNb = models.CharField("Serial Nb", max_length=30, null=True, blank=True)
 	reference = models.CharField(max_length=30, null=True, blank=True)
 	address = models.CharField(max_length=30)
 	description = models.TextField(max_length=80, null=True, blank=True)
 	technology = models.ForeignKey(DeviceTechnology)
 	capacity = models.ForeignKey(DeviceCapacity)
 	room = models.ForeignKey(Room)
-	canGiveFeedback = models.BooleanField(default=False)
+	canGiveFeedback = models.BooleanField("Can give feedback", default=False)
 
 	# This is the representation of the object
 	def __unicode__(self):
