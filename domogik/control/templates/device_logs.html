@@ -1,6 +1,4 @@
-#!/usr/bin/python
-#-*- encoding:utf-8 *-*
-
+<!--
 # Copyright 2008 Domogik project
 
 # This file is part of Domogik.
@@ -22,19 +20,35 @@
 # $LastChangedBy: mschneider $
 # $LastChangedDate: 2008-12-04 22:17:19 +0100 (jeu. 04 déc. 2008) $
 # $LastChangedRevision: 218 $
+-->
+{% extends "base.html" %}
 
-from django.conf.urls.defaults import *
+{% block title %}{{ pageTitle }}{% endblock %}
 
-urlpatterns = patterns('domogik.control.views',
-	url(r'^$', 'index', name="mainView"),
-	url(r'device/(?P<deviceId>\d+)/$', 'device', name="deviceView"),
-	url(r'device_logs/(?P<deviceId>\d+)/$', 'deviceLogs', name="deviceLogsView"),
-#	url(r'global_control/$', 'globalControl', name="globalControlView"),
-#	url(r'rooms/$', 'rooms', name="roomsView"),
-#	url(r'capacities/(?P<roomId>\d+)/$', 'capacities', name="capacitiesView"),
-#	url(r'items/(?P<roomId>\d+),(?P<capacityId>\d+)/$', 'items', name="itemsView"),
-	url(r'admin/$', 'adminIndex', name="adminView"),
-	url(r'admin/load_sample_data$', 'loadSampleData', name="loadSampleDataView"),
-	url(r'admin/clear_data$', 'clearData', name="clearDataView"),
-	url(r'admin/save_settings$', 'saveSettings', name="saveSettingsView"),
-)
+{% block content %}
+	<form name="deviceLogsForm" method="POST"/>
+	<div id="list">
+	{% if deviceList %}
+		<table>
+			<tr>
+				<th>Date</th>
+				<th>Device</th>
+				<th>Value</th>
+				<th>Comment</th>
+			</tr>
+
+			{% for deviceLog in deviceLogList %}
+				<tr>
+					<td>{{ deviceLog.date }}</td>
+					<td>{{ deviceLog.device.name }}</td>
+					<td>{{ deviceLog.value }}</td>
+					<td>{{ deviceLog.comment }}</td>
+				</tr>
+			{% endfor %}
+		</table>
+	{% else %}
+		<p>No logs found !</p>
+	{% endif %}
+	</div>
+
+{% endblock %}

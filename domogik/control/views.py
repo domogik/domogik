@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-03 22:33:25 +0100 (mer. 03 déc. 2008) $
-# $LastChangedRevision: 214 $
+# $LastChangedDate: 2008-12-04 22:17:19 +0100 (jeu. 04 déc. 2008) $
+# $LastChangedRevision: 218 $
 
 from django.db.models import Q
 from django.http import Http404
@@ -33,6 +33,7 @@ from domogik.control.models import Area
 from domogik.control.models import Room
 from domogik.control.models import DeviceCapacity
 from domogik.control.models import DeviceProperty
+from domogik.control.models import DeviceLog
 from domogik.control.models import Device
 from domogik.control.models import StateReading
 from domogik.control.models import ApplicationSetting
@@ -79,6 +80,7 @@ def index(request):
 	)
 
 def device(request, deviceId):
+	hasLogs = ""
 	adminMode = ""
 	pageTitle = "Device details"
 
@@ -92,11 +94,38 @@ def device(request, deviceId):
 	except Device.DoesNotExist:
 		raise Http404
 
+	if DeviceLog.objects.filter(device__id=device.id).count() > 0:
+		hasLogs = "True"
+
 	return render_to_response(
 		'device.html',
 		{
 			'device'		: device,
+			'hasLogs'		: hasLogs,
 			'adminMode'		: adminMode,
+			'pageTitle'		: pageTitle
+		}
+	)
+
+def deviceLogs(request, deviceId):
+	deviceAll = ""
+	pageTitle = "Device logs"
+
+	# Read device logs
+	if deviceId == "0": # Display all logs
+		deviceAll = "True"
+		deviceLogList = DeviceLog.objects.all()
+	else:
+		try:
+			deviceLogList = DeviceLog.objects.filter(device__id=deviceId)
+		except DeviceLog.DoesNotExist:
+			raise Http404
+
+	return render_to_response(
+		'device_logs.html',
+		{
+			'deviceLogList'	: deviceLogList,
+			'deviceAll'		: deviceAll,
 			'pageTitle'		: pageTitle
 		}
 	)
@@ -258,6 +287,10 @@ def __removeAllData():
 	devicePropertyList = DeviceProperty.objects.all()
 	for deviceProperty in devicePropertyList:
 		deviceProperty.delete()
+
+	deviceLogList = DeviceLog.objects.all()
+	for deviceLog in deviceLogList:
+		deviceLog.delete()
 
 	deviceList = Device.objects.all()
 	for device in deviceList:

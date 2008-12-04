@@ -1,8 +1,8 @@
 # TODO file (highest priority first)
 #
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-03 22:33:00 +0100 (mer. 03 déc. 2008) $
-# $LastChangedRevision: 213 $
+# $LastChangedDate: 2008-12-04 22:17:19 +0100 (jeu. 04 déc. 2008) $
+# $LastChangedRevision: 218 $
 #
 
 * General
@@ -22,7 +22,6 @@
 
 	* Admin
 		* @Marc : In *Django's admin* interface, make possible to enter values for the device
-		* @Marc : Display logs (commands sent to the automation system). Have a global view and view per device.
 
 	* @? : find a way to switch between pure links and icons for the clickable areas (menus, functions...)
 	* @? : Add facility to save / load scenes 

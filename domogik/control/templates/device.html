@@ -18,8 +18,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-03 23:59:38 +0100 (mer. 03 déc. 2008) $
-# $LastChangedRevision: 215 $
+# $LastChangedDate: 2008-12-04 22:17:19 +0100 (jeu. 04 déc. 2008) $
+# $LastChangedRevision: 218 $
 -->
 {% extends "base.html" %}
 
@@ -65,7 +65,9 @@
 				</td>
 			</tr>
 		</table>
-		<p>&raquo; <a href="#">View logs</a> &raquo; <a href="#">View readings history</a>
+		<p>
+			&raquo;&nbsp;{% if hasLogs %}<a href="{% url deviceLogsView device.id %}">View logs</a>{% else %}No logs{% endif %}&nbsp;
+			&raquo;&nbsp;<a href="#">View readings history</a>
 	</div>
 	</form>
 {% endblock %}

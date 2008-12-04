@@ -18,8 +18,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-01 22:43:58 +0100 (lun. 01 déc. 2008) $
-# $LastChangedRevision: 205 $
+# $LastChangedDate: 2008-12-04 22:17:19 +0100 (jeu. 04 déc. 2008) $
+# $LastChangedRevision: 218 $
 -->
 {% extends "base.html" %}
 
@@ -31,14 +31,14 @@
 
 	function clearData() {
 		if(confirm("This is your last chance to keep your data. Are you sure to want to do that ?")) {
-			document.forms['dataForm'].action="{% url clearDataView %}"
-			document.forms['dataForm'].submit()
+			document.forms['simulationForm'].action="{% url clearDataView %}"
+			document.forms['simulationForm'].submit()
 		}
 	}
 
 	function loadSampleData() {
-		document.forms['dataForm'].action="{% url loadSampleDataView %}"
-		document.forms['dataForm'].submit()
+		document.forms['simulationForm'].action="{% url loadSampleDataView %}"
+		document.forms['simulationForm'].submit()
 	}
 {% endblock %}
 
@@ -63,6 +63,17 @@
 	<form name="dataForm" action="" method="POST">
 		<fieldset>
 			<legend>Data</legend>
+			<table>
+				<tr>
+					<td>&raquo;&nbsp;<a href="{% url deviceLogsView 0 %}">View logs</a></td>
+				</tr>
+			</table>
+		</fieldset>		
+	</form>
+
+	<form name="simulationForm" action="" method="POST">
+		<fieldset>
+			<legend>Simulation</legend>
 			<table>
 				<tr>
 					<td>Load sample data (will delete previous data)</td><td><input type="button" value="Load" onclick="loadSampleData()"></td>

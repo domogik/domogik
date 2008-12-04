@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-02 22:19:16 +0100 (mar. 02 déc. 2008) $
-# $LastChangedRevision: 209 $
+# $LastChangedDate: 2008-12-04 22:17:19 +0100 (jeu. 04 déc. 2008) $
+# $LastChangedRevision: 218 $
 
 from django.db import models
 
@@ -97,6 +97,16 @@ class DeviceProperty(models.Model):
 	# This is the representation of the object
 	def __unicode__(self):
 		return self.key + "=" + self.value
+
+class DeviceLog(models.Model):
+	date = models.DateTimeField()
+	value = models.CharField(max_length=80)
+	comment = models.CharField(max_length=80, null=True, blank=True)
+	device = models.ForeignKey(Device)
+
+	# This is the representation of the object
+	def __unicode__(self):
+		return self.date + ":" + self.value
 
 class StateReading(models.Model):
 	device = models.ForeignKey(Device)
