@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-04 22:17:19 +0100 (jeu. 04 déc. 2008) $
-# $LastChangedRevision: 218 $
+# $LastChangedDate: 2008-12-04 22:29:20 +0100 (jeu. 04 déc. 2008) $
+# $LastChangedRevision: 221 $
 
 from django.db.models import Q
 from django.http import Http404
@@ -40,6 +40,9 @@ from domogik.control.models import ApplicationSetting
 from domogik.control.forms import ApplicationSettingForm
 
 def index(request):
+	"""
+	Main page
+	"""
 	adminMode = ""
 	pageTitle = "Control overview"
 
@@ -80,6 +83,9 @@ def index(request):
 	)
 
 def device(request, deviceId):
+	"""
+	Details of a device
+	"""
 	hasLogs = ""
 	adminMode = ""
 	pageTitle = "Device details"
@@ -108,6 +114,9 @@ def device(request, deviceId):
 	)
 
 def deviceLogs(request, deviceId):
+	"""
+	Logs of a device or for all devices
+	"""
 	deviceAll = ""
 	pageTitle = "Device logs"
 
@@ -133,6 +142,9 @@ def deviceLogs(request, deviceId):
 # Views for the admin part
 
 def adminIndex(request):
+	"""
+	Main page of the admin part
+	"""
 	pageTitle = "Admin page"
 	action = "index"
 
