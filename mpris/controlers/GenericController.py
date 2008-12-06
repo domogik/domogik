@@ -18,9 +18,9 @@
 
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
-# $LastChangedBy: maxence $
-# $LastChangedDate: 2008-08-21 16:28:03 +0200 (jeu, 21 aoû 2008) $
-# $LastChangedRevision: 105 $
+# $LastChangedBy: mschneider $
+# $LastChangedDate: 2008-12-06 16:30:18 +0100 (sam. 06 déc. 2008) $
+# $LastChangedRevision: 234 $
 
 #Interface for mpris support
 #All controllers should extends this class
