@@ -1,6 +1,6 @@
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-06 17:00:00 +0100 (sam. 06 déc. 2008) $
-# $LastChangedRevision: 237 $
+# $LastChangedDate: 2008-12-06 18:48:53 +0100 (sam. 06 déc. 2008) $
+# $LastChangedRevision: 244 $
 
 * General
 	* @Loiz : set up internationalization for messages (see also how to translate data
@@ -23,12 +23,6 @@
 		* @Marc : Add localization of the installation (Zip, City, Country) : useful for wheather forecasts
 
 	* General coding
-		* @Marc :
-			* rename "design" folder in "skins"
-			* in "skins" folder, create "css" and "img" folders
-		 	* under "templates", create "lang" and "js" folders
-		 	* with this, the application could be multilingual and skinnable (more simple too for developping UI interface).
-
 			* @? : find a way to switch between pure links and icons for the clickable areas (menus, functions...)
 			* @? : Add facility to save / load scenes 
 
