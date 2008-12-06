@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-04 22:46:00 +0100 (jeu. 04 déc. 2008) $
-# $LastChangedRevision: 224 $
+# $LastChangedDate: 2008-12-06 12:06:55 +0100 (sam. 06 déc. 2008) $
+# $LastChangedRevision: 226 $
 
 from django.db.models import Q
 from django.http import Http404
@@ -33,7 +33,7 @@ from domogik.control.models import Area
 from domogik.control.models import Room
 from domogik.control.models import DeviceCapacity
 from domogik.control.models import DeviceProperty
-from domogik.control.models import DeviceLog
+from domogik.control.models import DeviceCmdLog
 from domogik.control.models import Device
 from domogik.control.models import StateReading
 from domogik.control.models import ApplicationSetting
@@ -97,7 +97,7 @@ def device(request, deviceId):
 	"""
 	Details of a device
 	"""
-	hasLogs = ""
+	hasCmdLogs = ""
 	adminMode = ""
 	pageTitle = "Device details"
 
@@ -111,20 +111,20 @@ def device(request, deviceId):
 	except Device.DoesNotExist:
 		raise Http404
 
-	if DeviceLog.objects.filter(device__id=device.id).count() > 0:
-		hasLogs = "True"
+	if DeviceCmdLog.objects.filter(device__id=device.id).count() > 0:
+		hasCmdLogs = "True"
 
 	return render_to_response(
 		'device.html',
 		{
 			'device'		: device,
-			'hasLogs'		: hasLogs,
+			'hasLogs'		: hasCmdLogs,
 			'adminMode'		: adminMode,
 			'pageTitle'		: pageTitle
 		}
 	)
 
-def deviceLogs(request, deviceId):
+def deviceCmdLogs(request, deviceId):
 	"""
 	Logs of a device or for all devices
 	"""
@@ -134,17 +134,17 @@ def deviceLogs(request, deviceId):
 	# Read device logs
 	if deviceId == "0": # Display all logs
 		deviceAll = "True"
-		deviceLogList = DeviceLog.objects.all()
+		deviceCmdLogList = DeviceCmdLog.objects.all()
 	else:
 		try:
-			deviceLogList = DeviceLog.objects.filter(device__id=deviceId)
-		except DeviceLog.DoesNotExist:
+			deviceCmdLogList = DeviceCmdLog.objects.filter(device__id=deviceId)
+		except DeviceCmdLog.DoesNotExist:
 			raise Http404
 
 	return render_to_response(
-		'device_logs.html',
+		'device_cmd_logs.html',
 		{
-			'deviceLogList'	: deviceLogList,
+			'deviceLogList'	: deviceCmdLogList,
 			'deviceAll'		: deviceAll,
 			'pageTitle'		: pageTitle
 		}
@@ -311,9 +311,9 @@ def __removeAllData():
 	for deviceProperty in devicePropertyList:
 		deviceProperty.delete()
 
-	deviceLogList = DeviceLog.objects.all()
-	for deviceLog in deviceLogList:
-		deviceLog.delete()
+	deviceCmdLogList = DeviceCmdLog.objects.all()
+	for deviceCmdLog in deviceCmdLogList:
+		deviceCmdLog.delete()
 
 	deviceList = Device.objects.all()
 	for device in deviceList:

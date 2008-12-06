@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-04 22:39:00 +0100 (jeu. 04 déc. 2008) $
-# $LastChangedRevision: 222 $
+# $LastChangedDate: 2008-12-06 12:06:55 +0100 (sam. 06 déc. 2008) $
+# $LastChangedRevision: 226 $
 
 from django.db import models
 
@@ -98,7 +98,7 @@ class DeviceProperty(models.Model):
 	def __unicode__(self):
 		return self.key + "=" + self.value
 
-class DeviceLog(models.Model):
+class DeviceCmdLog(models.Model):
 	date = models.DateTimeField()
 	value = models.CharField(max_length=80)
 	comment = models.CharField(max_length=80, null=True, blank=True)

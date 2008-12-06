@@ -18,8 +18,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-04 22:17:19 +0100 (jeu. 04 déc. 2008) $
-# $LastChangedRevision: 218 $
+# $LastChangedDate: 2008-12-06 12:06:55 +0100 (sam. 06 déc. 2008) $
+# $LastChangedRevision: 226 $
 -->
 {% extends "base.html" %}
 
@@ -37,12 +37,12 @@
 				<th>Comment</th>
 			</tr>
 
-			{% for deviceLog in deviceLogList %}
+			{% for deviceCmdLog in deviceCmdLogList %}
 				<tr>
-					<td>{{ deviceLog.date }}</td>
-					<td>{{ deviceLog.device.name }}</td>
-					<td>{{ deviceLog.value }}</td>
-					<td>{{ deviceLog.comment }}</td>
+					<td>{{ deviceCmdLog.date }}</td>
+					<td>{{ deviceCmdLog.device.name }}</td>
+					<td>{{ deviceCmdLog.value }}</td>
+					<td>{{ deviceCmdLog.comment }}</td>
 				</tr>
 			{% endfor %}
 		</table>
