@@ -18,15 +18,25 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-06 12:26:10 +0100 (sam. 06 déc. 2008) $
-# $LastChangedRevision: 227 $
+# $LastChangedDate: 2008-12-06 18:15:38 +0100 (sam. 06 déc. 2008) $
+# $LastChangedRevision: 241 $
 -->
 {% extends "base.html" %}
+
+{% block script %}
+	function clearLogs() {
+		if (confirm("Are you sure you want to clear logs ?")) {
+			document.forms['deviceLogsForm'].cmd.value = "clearLogs"
+			document.forms['deviceLogsForm'].action = "{% url deviceCmdLogsView deviceId %}"
+			document.forms['deviceLogsForm'].submit()
+		}
+	}
+{% endblock %}
 
 {% block title %}{{ pageTitle }}{% endblock %}
 
 {% block content %}
-	<form name="deviceLogsForm" method="POST"/>
+	<form name="deviceLogsForm" method="POST" action="">
 	<div id="list">
 	{% if deviceList %}
 		<table>
@@ -48,9 +58,18 @@
 				</tr>
 			{% endfor %}
 		</table>
+		{% if adminMode %}
+			<table>
+				<tr>
+					<td><input type="button" name="clearLogsButton" onclick="clearLogs()" value="Clear logs"/>
+				</tr>
+			</table>
+		{% endif %}
 	{% else %}
 		<p>No logs found !</p>
 	{% endif %}
 	</div>
 
+	<input type="hidden" name="cmd" value=""/>
+	</form>
 {% endblock %}

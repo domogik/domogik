@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-06 14:09:58 +0100 (sam. 06 déc. 2008) $
-# $LastChangedRevision: 229 $
+# $LastChangedDate: 2008-12-06 18:15:38 +0100 (sam. 06 déc. 2008) $
+# $LastChangedRevision: 241 $
 
 from django.db.models import Q
 from django.http import Http404
@@ -126,10 +126,21 @@ def device(request, deviceId):
 
 def deviceCmdLogs(request, deviceId):
 	"""
-	Display logs of a device or all devices
+	View for logs of a device or all devices
 	"""
 	deviceAll = ""
 	pageTitle = "Device logs"
+	adminMode = ""
+
+	appSetting = __readApplicationSetting()
+	if appSetting.adminMode == True:
+		adminMode = "True"
+
+	print request.POST
+
+	cmd = QueryDict.get(request.POST, "cmd", "")
+	if cmd == "clearLogs" and appSetting.adminMode:
+		__clearDeviceCmdLogs(request, deviceId, appSetting.adminMode)
 
 	# Read device logs
 	if deviceId == "0": # For all devices
@@ -144,11 +155,26 @@ def deviceCmdLogs(request, deviceId):
 	return render_to_response(
 		'device_cmd_logs.html',
 		{
+			'deviceId'		: deviceId,
+			'adminMode'		: adminMode,
 			'deviceLogList'	: deviceCmdLogList,
 			'deviceAll'		: deviceAll,
 			'pageTitle'		: pageTitle
 		}
 	)
+
+def __clearDeviceCmdLogs(request, deviceId, isAdminMode):
+	"""
+	Clear logs of a device or all devices
+	"""
+	if deviceId == "0": # For all devices
+		DeviceCmdLog.objects.all().delete()
+	else:
+		try:
+			DeviceCmdLog.objects.filter(device__id=deviceId).delete()
+		except DeviceCmdLog.DoesNotExist:
+			raise Http404
+
 
 # Views for the admin part
 
