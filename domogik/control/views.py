@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-06 13:59:12 +0100 (sam. 06 déc. 2008) $
-# $LastChangedRevision: 228 $
+# $LastChangedDate: 2008-12-06 14:09:58 +0100 (sam. 06 déc. 2008) $
+# $LastChangedRevision: 229 $
 
 from django.db.models import Q
 from django.http import Http404
@@ -298,40 +298,12 @@ def __createSampleData():
 	DeviceProperty.objects.create(key="value", value="1", device=kitchenCoffeeMachine) # On (static)
 
 def __removeAllData():
-	# Normally the list should contain only one row
-	appSettingList = ApplicationSetting.objects.all()
-	for appSetting in appSettingList:
-		appSetting.delete()
-
-	stateReadingList = StateReading.objects.all()
-	for stateReading in stateReadingList:
-		stateReading.delete()
-
-	devicePropertyList = DeviceProperty.objects.all()
-	for deviceProperty in devicePropertyList:
-		deviceProperty.delete()
-
-	deviceCmdLogList = DeviceCmdLog.objects.all()
-	for deviceCmdLog in deviceCmdLogList:
-		deviceCmdLog.delete()
-
-	deviceList = Device.objects.all()
-	for device in deviceList:
-		device.delete()
-
-	deviceCapacityList = DeviceCapacity.objects.all()
-	for deviceCapacity in deviceCapacityList:
-		deviceCapacity.delete()
-
-	deviceTechnologyList = DeviceTechnology.objects.all()
-	for deviceTechnology in deviceTechnologyList:
-		deviceTechnology.delete()
-
-	roomList = Room.objects.all()
-	for room in roomList:
-		room.delete()
-
-	areaList = Area.objects.all()
-	for area in areaList:
-		area.delete()
-
+	ApplicationSetting.objects.all().delete()
+	StateReading.objects.all().delete()
+	DeviceProperty.objects.all().delete()
+	DeviceCmdLog.objects.all().delete()
+	Device.objects.all().delete()
+	DeviceCapacity.objects.all().delete()
+	DeviceTechnology.objects.all().delete()
+	Room.objects.all().delete()
+	Area.objects.all().delete()
