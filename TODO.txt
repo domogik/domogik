@@ -1,8 +1,3 @@
-* Proposistion : rename "design" folder in "skins"
-		 in "skins" folder, create "css" and "img" folders
-		 under "templates", create "lang" and "js" folders
-		 whith this, the application could be multilingual and skinnable (more simple too for developping UI interface).	
-
 * General
 	* @Loiz : set up internationalization for messages (see also how to translate data
 		stored in the DB)
@@ -11,7 +6,7 @@
 * UI		
 	* @Epy : create a prototype using HTML / CSS
 		Only two files to edit : base.html and style.css !
-	* @Maxence : review model structure
+
 	
 	* Control
 		* @Marc : Eventually create a global view that can switch off all the lights for example
@@ -23,8 +18,17 @@
 		* @Marc : In *Django's admin* interface, make possible to enter values for the device
 		* @Marc : Add localization of the installation (Zip, City, Country) : useful for wheather forecasts
 
-	* @? : find a way to switch between pure links and icons for the clickable areas (menus, functions...)
-	* @? : Add facility to save / load scenes 
+	* General coding
+		* @Marc :
+			* rename "design" folder in "skins"
+			* in "skins" folder, create "css" and "img" folders
+		 	* under "templates", create "lang" and "js" folders
+		 	* with this, the application could be multilingual and skinnable (more simple too for developping UI interface).
+
+			* @? : find a way to switch between pure links and icons for the clickable areas (menus, functions...)
+			* @? : Add facility to save / load scenes 
+
+		* @Maxence : review model structure
 
 * mpris
 	* @Maxence : create Mpris API in Python
