@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-06 12:06:55 +0100 (sam. 06 déc. 2008) $
-# $LastChangedRevision: 226 $
+# $LastChangedDate: 2008-12-06 13:59:12 +0100 (sam. 06 déc. 2008) $
+# $LastChangedRevision: 228 $
 
 from django.db.models import Q
 from django.http import Http404
@@ -126,13 +126,13 @@ def device(request, deviceId):
 
 def deviceCmdLogs(request, deviceId):
 	"""
-	Logs of a device or for all devices
+	Display logs of a device or all devices
 	"""
 	deviceAll = ""
 	pageTitle = "Device logs"
 
 	# Read device logs
-	if deviceId == "0": # Display all logs
+	if deviceId == "0": # For all devices
 		deviceAll = "True"
 		deviceCmdLogList = DeviceCmdLog.objects.all()
 	else:
