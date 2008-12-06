@@ -1,16 +1,14 @@
-# TODO file (highest priority first)
-#
-# $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-05 13:06:27 +0100 (ven. 05 déc. 2008) $
-# $LastChangedRevision: 225 $
-#
+* Proposistion : rename "design" folder in "skins"
+		 in "skins" folder, create "css" and "img" folders
+		 under "templates", create "lang" and "js" folders
+		 whith this, the application could be multilingual and skinnable (more simple too for developping UI interface).	
 
 * General
 	* @Loiz : set up internationalization for messages (see also how to translate data
 		stored in the DB)
 		For Django, see : http://docs.djangoproject.com/en/dev/topics/i18n/#topics-i18n
 
-* UI
+* UI		
 	* @Epy : create a prototype using HTML / CSS
 		Only two files to edit : base.html and style.css !
 	* @Maxence : review model structure
