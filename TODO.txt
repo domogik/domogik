@@ -16,6 +16,7 @@
 	* Control
 		* @Marc : Eventually create a global view that can switch off all the lights for example
 		* @Marc : Display history of readings (essentially for sensors)
+			Seems to be a good idea to use the powerful rrdtools : http://oss.oetiker.ch/rrdtool/gallery/index.en.html
 		* @? : Add a function to schedule a task (eg. switch on/off the heating at a given time)
 
 	* Admin
