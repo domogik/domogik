@@ -1,6 +1,6 @@
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-06 16:29:53 +0100 (sam. 06 déc. 2008) $
-# $LastChangedRevision: 233 $
+# $LastChangedDate: 2008-12-06 16:53:20 +0100 (sam. 06 déc. 2008) $
+# $LastChangedRevision: 236 $
 
 * General
 	* @Loiz : set up internationalization for messages (see also how to translate data
@@ -24,6 +24,9 @@
 
 	* General coding
 		* @Marc :
+			* Put 'isAdminMode' variable in a session value 
+				(avoid reading it each time from the db, having to put it in a request variable each time)
+
 			* rename "design" folder in "skins"
 			* in "skins" folder, create "css" and "img" folders
 		 	* under "templates", create "lang" and "js" folders
