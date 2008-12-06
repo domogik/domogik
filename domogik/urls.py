@@ -19,11 +19,12 @@
 
 # Author : Marc Schneider <marc@domogik.org>
 
-# $LastChangedBy: albinoz $
-# $LastChangedDate: 2008-12-06 14:50:12 +0100 (sam. 06 déc. 2008) $
-# $LastChangedRevision: 230 $
+# $LastChangedBy: mschneider $
+# $LastChangedDate: 2008-12-06 18:44:48 +0100 (sam. 06 déc. 2008) $
+# $LastChangedRevision: 243 $
 
 from django.conf.urls.defaults import *
+from django.conf import settings
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -40,5 +41,7 @@ urlpatterns = patterns('',
 	(r'^admin/(.*)', admin.site.root),
 	# TODO : change this, only used in development environment
 	# See : http://docs.djangoproject.com/en/dev/howto/static-files/
-	(r'^design/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/home/hades/Projets/Domogik/domogik/domogik/control/templates/design'}),
+	(r'^skins/(?P<path>.*)$', 'django.views.static.serve', 
+		{'document_root': settings.STATIC_DOC_ROOT}
+	),
 )
