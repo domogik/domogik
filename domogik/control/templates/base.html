@@ -18,14 +18,14 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-06 17:35:54 +0100 (sam. 06 déc. 2008) $
-# $LastChangedRevision: 240 $
+# $LastChangedDate: 2008-12-06 18:43:48 +0100 (sam. 06 déc. 2008) $
+# $LastChangedRevision: 242 $
 -->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-	<link rel="stylesheet" href="/design/css/style.css"/>
+	<link rel="stylesheet" href="/skins/css/style.css"/>
 	<script language="javascript">{% block script %}{% endblock %}</script>
 	<title>{% block title %}Domogik{% endblock %}</title>
 </head>
@@ -33,7 +33,7 @@
 <body>
 <div id="container">
 	<div id="top">
-		<center><img width="184px" height="79px" src="/design/img/logo_domogik.png" alt="Domogik"/></center>
+		<center><img width="184px" height="79px" src="/skins/img/logo_domogik.png" alt="Domogik"/></center>
 		<center><h1>&raquo; {{ pageTitle }} &laquo;</h1></center>
 	</div>
 	<div id="title">
@@ -44,9 +44,9 @@
 	<div id="leftBar">
 	{% block leftBar %}
 		<ul>
-			<li><a href="{% url mainView %}"><img src="/design/img/home.png"><span>Home</span></a></li>
-			<li><a href="{% url adminView %}"><img src="/design/img/admin.png">Admin</a></li>
-			<li><a href="/admin"><img src="/design/img/config.png">Configuration</a></li>
+			<li><a href="{% url mainView %}"><img src="/skins/img/home.png"><span>Home</span></a></li>
+			<li><a href="{% url adminView %}"><img src="/skins/img/admin.png">Admin</a></li>
+			<li><a href="/admin"><img src="/skins/img/config.png">Configuration</a></li>
 		</ul>
 	{% endblock %}
 	</div>
