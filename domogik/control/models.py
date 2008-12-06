@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-06 12:06:55 +0100 (sam. 06 déc. 2008) $
-# $LastChangedRevision: 226 $
+# $LastChangedDate: 2008-12-06 12:26:10 +0100 (sam. 06 déc. 2008) $
+# $LastChangedRevision: 227 $
 
 from django.db import models
 
@@ -102,11 +102,12 @@ class DeviceCmdLog(models.Model):
 	date = models.DateTimeField()
 	value = models.CharField(max_length=80)
 	comment = models.CharField(max_length=80, null=True, blank=True)
+	isSuccessful = models.BooleanField("Successful")
 	device = models.ForeignKey(Device)
 
 	# This is the representation of the object
 	def __unicode__(self):
-		return self.date + ":" + self.value
+		return self.date + ":" + self.value + " (success=" + self.isSuccessful + ")"
 
 class StateReading(models.Model):
 	device = models.ForeignKey(Device)

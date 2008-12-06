@@ -18,8 +18,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-06 12:06:55 +0100 (sam. 06 déc. 2008) $
-# $LastChangedRevision: 226 $
+# $LastChangedDate: 2008-12-06 12:26:10 +0100 (sam. 06 déc. 2008) $
+# $LastChangedRevision: 227 $
 -->
 {% extends "base.html" %}
 
@@ -34,6 +34,7 @@
 				<th>Date</th>
 				<th>Device</th>
 				<th>Value</th>
+				<th>Successful</th>
 				<th>Comment</th>
 			</tr>
 
@@ -42,6 +43,7 @@
 					<td>{{ deviceCmdLog.date }}</td>
 					<td>{{ deviceCmdLog.device.name }}</td>
 					<td>{{ deviceCmdLog.value }}</td>
+					<td>{{ deviceCmdLog.isSuccessful }}</td>
 					<td>{{ deviceCmdLog.comment }}</td>
 				</tr>
 			{% endfor %}
