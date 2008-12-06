@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-06 12:06:55 +0100 (sam. 06 déc. 2008) $
-# $LastChangedRevision: 226 $
+# $LastChangedDate: 2008-12-06 16:48:26 +0100 (sam. 06 déc. 2008) $
+# $LastChangedRevision: 235 $
 
 from django.conf.urls.defaults import *
 
@@ -29,10 +29,6 @@ urlpatterns = patterns('domogik.control.views',
 	url(r'^$', 'index', name="mainView"),
 	url(r'device/(?P<deviceId>\d+)/$', 'device', name="deviceView"),
 	url(r'device_cmd_logs/(?P<deviceId>\d+)/$', 'deviceCmdLogs', name="deviceCmdLogsView"),
-#	url(r'global_control/$', 'globalControl', name="globalControlView"),
-#	url(r'rooms/$', 'rooms', name="roomsView"),
-#	url(r'capacities/(?P<roomId>\d+)/$', 'capacities', name="capacitiesView"),
-#	url(r'items/(?P<roomId>\d+),(?P<capacityId>\d+)/$', 'items', name="itemsView"),
 	url(r'admin/$', 'adminIndex', name="adminView"),
 	url(r'admin/load_sample_data$', 'loadSampleData', name="loadSampleDataView"),
 	url(r'admin/clear_data$', 'clearData', name="clearDataView"),
