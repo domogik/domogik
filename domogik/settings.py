@@ -17,8 +17,7 @@
 # Author: Marc Schneider <marc@mirelsol.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-06 18:44:48 +0100 (sam. 06 déc. 2008) $
-# $LastChangedRevision: 243 $
+# $LastChangedRevision: 246 $
 
 # Django settings for domogik project.
 
