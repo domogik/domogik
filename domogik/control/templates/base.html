@@ -18,8 +18,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-06 19:16:37 +0100 (sam. 06 déc. 2008) $
-# $LastChangedRevision: 248 $
+# $LastChangedDate: 2008-12-09 20:30:20 +0100 (mar. 09 déc. 2008) $
+# $LastChangedRevision: 251 $
 -->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -40,9 +40,21 @@
 	<div id="leftBar">
 	{% block leftBar %}
 		<ul>
-			<li><a href="{% url mainView %}"><img src="/skins/img/home.png"><span>Home</span></a></li>
-			<li><a href="{% url adminView %}"><img src="/skins/img/admin.png">Admin</a></li>
-			<li><a href="/admin"><img src="/skins/img/config.png">Configuration</a></li>
+			<li><a href="{% url mainView %}">
+					<div align="center"><img src="/skins/img/home.png" alt="Home" border="0"></div>
+					<div align="center">Home</div></a></li>
+			<li>
+				<a href="{% url adminView %}">
+					<div align="center"><img src="/skins/img/admin.png" alt="Admin" border="0"/></div>
+					<div align="center">Admin</div>
+				</a>
+			</li>
+			<li>
+				<a href="/admin">
+					<div align="center"><img src="/skins/img/config.png" alt="Configuration" border="0"/></div>
+					<div align="center">Configuration</div>
+				</a>
+			</li>
 		</ul>
 	{% endblock %}
 	</div>

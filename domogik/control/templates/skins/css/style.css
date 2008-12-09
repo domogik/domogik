@@ -18,8 +18,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-06 18:43:48 +0100 (sam. 06 déc. 2008) $
-# $LastChangedRevision: 242 $
+# $LastChangedDate: 2008-12-09 20:30:20 +0100 (mar. 09 déc. 2008) $
+# $LastChangedRevision: 251 $
 */
 
 body {
@@ -57,8 +57,14 @@ body {
 	text-decoration: none;
 }
 
+#leftBar ul {
+	margin-left: 0px;
+	padding-left: 0px;
+}
+
 #leftBar li {
 	padding: 5px;
+	list-style-type:none;
 }
 
 #content {
