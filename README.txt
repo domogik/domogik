@@ -17,7 +17,7 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-09 22:51:45 +0100 (mar. 09 déc. 2008) $
-# $LastChangedRevision: 252 $
+# $LastChangedDate: 2008-12-09 22:52:53 +0100 (mar. 09 déc. 2008) $
+# $LastChangedRevision: 253 $
 
 See the web site on http://www.domogik.org to get the latest documentation.
