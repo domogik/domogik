@@ -1,6 +1,6 @@
-# $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-06 18:54:05 +0100 (sam. 06 déc. 2008) $
-# $LastChangedRevision: 245 $
+# $LastChangedBy: icaunais $
+# $LastChangedDate: 2008-12-09 13:05:07 +0100 (mar. 09 déc. 2008) $
+# $LastChangedRevision: 250 $
 
 * General
 	* @Loiz : set up internationalization for messages (see also how to translate data
@@ -24,7 +24,7 @@
 
 	* General coding
 		* @Marc : in settings.py, fix this encoding pb for 'LastChangedDate' :
-			If I have this value for example : # $LastChangedDate: 2008-12-06 18:54:05 +0100 (sam. 06 déc. 2008) $, I get this error :
+			If I have this value for example : # $LastChangedDate: 2008-12-09 13:05:07 +0100 (mar. 09 déc. 2008) $, I get this error :
 			SyntaxError: Non-ASCII character '\xc3' in file /home/mschneider/data/pro/projets/domogik/appli/domogik/settings.py 
 			on line 20, but no encoding declared; see http://www.python.org/peps/pep-0263.html for details
 
@@ -53,8 +53,6 @@
 	* @? : complete technical section
 		* Write articles presenting the different technologies that can be used in home automation (X10, 1-Wire, PLCBus, IR, RFXCom, ...).
 			The aim is just to give an overview and not an exhaustive documentation.
-	* @Cyril : move README.txt content (installation process) on the web site, and translate it into french
 	* @Marc : make sure articles are displayed in the right order
 	* @Alban or @Marc : complete the "About us" section listing the main people managing / contributing to the project, and create other membrers profile
-	* @Cyril : Translate into english the page explaining how to join the developper community (subversion)
 	@ ? : Add screenshots of the new UI
