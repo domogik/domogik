@@ -1,6 +1,6 @@
-# $LastChangedBy: icaunais $
-# $LastChangedDate: 2008-12-09 13:05:07 +0100 (mar. 09 déc. 2008) $
-# $LastChangedRevision: 250 $
+# $LastChangedBy: mschneider $
+# $LastChangedDate: 2008-12-13 19:05:26 +0100 (sam. 13 déc. 2008) $
+# $LastChangedRevision: 268 $
 
 * General
 	* @Loiz : set up internationalization for messages (see also how to translate data
@@ -24,7 +24,7 @@
 
 	* General coding
 		* @Marc : in settings.py, fix this encoding pb for 'LastChangedDate' :
-			If I have this value for example : # $LastChangedDate: 2008-12-09 13:05:07 +0100 (mar. 09 déc. 2008) $, I get this error :
+			If I have this value for example : # $LastChangedDate: 2008-12-13 19:05:26 +0100 (sam. 13 déc. 2008) $, I get this error :
 			SyntaxError: Non-ASCII character '\xc3' in file /home/mschneider/data/pro/projets/domogik/appli/domogik/settings.py 
 			on line 20, but no encoding declared; see http://www.python.org/peps/pep-0263.html for details
 
@@ -39,7 +39,8 @@
 			* Use paginator to display items on a page (devices, logs, ...).
 				See : http://docs.djangoproject.com/en/dev/topics/pagination/#topics-pagination
 
-		* @Maxence : review model structure
+		* @? :
+			* Add integration tests (See : http://docs.djangoproject.com/en/dev/topics/testing/#topics-testing)
 
 * mpris
 	* @Maxence : create Mpris API in Python
