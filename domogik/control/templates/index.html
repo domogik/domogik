@@ -18,8 +18,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-13 19:30:49 +0100 (sam. 13 déc. 2008) $
-# $LastChangedRevision: 275 $
+# $LastChangedDate: 2008-12-13 19:41:34 +0100 (sam. 13 déc. 2008) $
+# $LastChangedRevision: 277 $
 -->
 {% extends "base.html" %}
 
@@ -82,7 +82,7 @@
 
 	<div id="list">
 	{% if deviceList %}
-		
+		<form name="deviceListForm" method="POST"/>
 		<table>
 			<tr>
 				<th>Device name</th>
