@@ -20,10 +20,9 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-13 18:12:22 +0100 (sam. 13 déc. 2008) $
-# $LastChangedRevision: 266 $
+# $LastChangedDate: 2008-12-13 19:08:31 +0100 (sam. 13 déc. 2008) $
+# $LastChangedRevision: 270 $
 
-import time
 import datetime
 
 from django.db.models import Q
