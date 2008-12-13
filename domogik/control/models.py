@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-13 15:14:22 +0100 (sam. 13 déc. 2008) $
-# $LastChangedRevision: 260 $
+# $LastChangedDate: 2008-12-13 19:24:28 +0100 (sam. 13 déc. 2008) $
+# $LastChangedRevision: 273 $
 
 from django.db import models
 
@@ -91,9 +91,14 @@ class DeviceProperty(models.Model):
 		('BOOLEAN', 'BOOLEAN'),
 		('ALPHANUM', 'ALPHANUM'),
 	)
+	VALUE_UNIT_CHOICES = (
+		('%', '%'),
+	)
+
 	key = models.CharField(max_length=30)
 	value = models.CharField(max_length=80)
 	valueType = models.CharField(max_length=20, choices=VALUETYPE_CHOICES)
+	valueUnit = models.CharField(max_length=30, choices=VALUE_UNIT_CHOICES)
 	device = models.ForeignKey(Device)
 
 	class Meta:
