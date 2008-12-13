@@ -18,8 +18,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-13 13:27:20 +0100 (sam. 13 déc. 2008) $
-# $LastChangedRevision: 259 $
+# $LastChangedDate: 2008-12-13 19:06:59 +0100 (sam. 13 déc. 2008) $
+# $LastChangedRevision: 269 $
 */
 
 body {
@@ -133,12 +133,18 @@ body {
 }
 
 #device .label {
-	color: yellow;
+	color: #AF030A;
+	background-color: #DDDDDD;
 	font-weight: bold;
-	padding-right: 30px;
+	padding-left: 10px;
+	padding-right: 10px;
 }
 #device .value {
 	font-weight: normal;
+	background-color: #7798BD;
+	color: #333333;
+	padding-left: 10px;
+	padding-right: 10px;
 }
 
 #adminMain fieldset legend {
