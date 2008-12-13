@@ -19,22 +19,26 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-13 15:47:02 +0100 (sam. 13 déc. 2008) $
-# $LastChangedRevision: 263 $
+# $LastChangedDate: 2008-12-13 18:11:20 +0100 (sam. 13 déc. 2008) $
+# $LastChangedRevision: 265 $
 -->
 {% endcomment %}
 
 {% for property in device.deviceproperty_set.all %}
-	<input id="id_key" type="hidden" name="key" value="{{ property.key }}"/>
+	<input id="id_key{{ device.id }}" type="hidden" name="key{{ device.id }}" value="{{ property.key }}"/>
 	{% ifequal property.valueType "BOOLEAN" %}
+		<select id="id_value{{ device.id }}" name="value{{ device.id }}">
 		{% ifequal property.value "1" %}
-			<input id="id_value" type="checkbox" name="value" value="{{ property.value }}" checked="checked"/>
+			<option value="1" selected="selected">ON</option>
+			<option value="0">OFF</option>
 		{% endifequal %}
 		{% ifnotequal property.value "1" %}
-			<input id="id_value" type="checkbox" name="value" value="{{ property.value }}"/>
+			<option value="1">ON</option>
+			<option value="0" selected="selected">OFF</option>
 		{% endifnotequal %}
+		</select>
 	{% endifequal %}
 	{% ifequal property.valueType "ALPHANUM" %}
-		<input id="id_value" type="text" name="value" value="{{ property.value }}" size="3"/>
+		<input id="id_value{{ device.id }}" type="text" name="value{{ device.id }}" value="{{ property.value }}" size="3"/>
 	{% endifequal %}
 {% endfor %}
