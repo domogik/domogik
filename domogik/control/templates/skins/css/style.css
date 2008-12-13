@@ -18,8 +18,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-09 20:30:20 +0100 (mar. 09 déc. 2008) $
-# $LastChangedRevision: 251 $
+# $LastChangedDate: 2008-12-13 12:02:48 +0100 (sam. 13 déc. 2008) $
+# $LastChangedRevision: 256 $
 */
 
 body {
@@ -47,13 +47,13 @@ body {
 }
 
 #leftBar a {
-	color: #00D2B1;
+	color: #3AB17B;
 	font-weight: bold;
 	text-decoration: none;
 }
 
 #leftBar a:hover {
-	color: #AF030A;
+	color: #FFFFFF;
 	text-decoration: none;
 }
 
@@ -78,7 +78,7 @@ body {
 }
 
 #content a {
-	color: #668cc7;
+	color: #668CC7;
 }
 
 #content .error {
@@ -87,40 +87,51 @@ body {
 }
 
 #search fieldset legend {
-	color: yellow;
+	color: #7798BD;
 	font-size:14px;
 }
 
 #search th {
-	color: yellow;
+	color: #7798BD;
 }
 
 #list table {
-	border-collapse:collapse;
-	border-style:solid;
+	border-style: none;
 	width: 100%;
+	border-spacing: 0px;
 }
 
 #list th {
-	color: yellow;
-	border:1px solid #DDDDDD;
+	background-color: #dddddd;
+	color: #AF030A;
+	text-align: left;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+#list a {
+	color: #333333;
+	font-weight: bold;
+	font-style: italic;
+	text-decoration: none;
+}
+#list a:hover {
+	color: #FFFFFF;
+}
+
+#list .oddRow {
+	background-color: #7798BD;
+	color: #333333;
+}
+#list .evenRow {
+	background-color: #ABAFBD;
+	color: #333333;
 }
 
 #list td {
-	padding: 4px;
 	vertical-align:middle;
-	border:1px solid #DDDDDD;
 }
 
-table#listValue {
-	border: none;
-}
-#listValue td {
-	border: none;
-}
-
-#device {
-}
 #device .label {
 	color: yellow;
 	font-weight: bold;
@@ -132,7 +143,7 @@ table#listValue {
 
 #adminMain fieldset legend {
 	padding: 0.2em 0.5em;
-	color:green;
+	color:#7798BD;
 	font-size:14px;
 	font-weight: bold;
 }
