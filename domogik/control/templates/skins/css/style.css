@@ -18,8 +18,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-13 12:02:48 +0100 (sam. 13 déc. 2008) $
-# $LastChangedRevision: 256 $
+# $LastChangedDate: 2008-12-13 13:27:20 +0100 (sam. 13 déc. 2008) $
+# $LastChangedRevision: 259 $
 */
 
 body {
@@ -64,7 +64,7 @@ body {
 
 #leftBar li {
 	padding: 5px;
-	list-style-type:none;
+	list-style-type: none;
 }
 
 #content {
@@ -143,8 +143,8 @@ body {
 
 #adminMain fieldset legend {
 	padding: 0.2em 0.5em;
-	color:#7798BD;
-	font-size:14px;
+	color: #7798BD;
+	font-size: 14px;
 	font-weight: bold;
 }
 
