@@ -18,11 +18,12 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-13 15:32:07 +0100 (sam. 13 déc. 2008) $
-# $LastChangedRevision: 261 $
+# $LastChangedDate: 2008-12-13 15:43:10 +0100 (sam. 13 déc. 2008) $
+# $LastChangedRevision: 262 $
 -->
 
 {% for property in device.deviceproperty_set.all %}
+	<input id="id_key" type="hidden" name="key" value="{{ property.key }}"/>
 	{% ifequal property.valueType "BOOLEAN" %}
 		{% ifequal property.value "1" %}
 			<input id="id_value" type="checkbox" name="value" value="{{ property.value }}" checked="checked"/>
