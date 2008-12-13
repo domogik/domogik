@@ -18,8 +18,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-13 19:06:59 +0100 (sam. 13 déc. 2008) $
-# $LastChangedRevision: 269 $
+# $LastChangedDate: 2008-12-13 19:35:43 +0100 (sam. 13 déc. 2008) $
+# $LastChangedRevision: 276 $
 */
 
 body {
@@ -71,6 +71,7 @@ body {
 	float:left;
 	width: 820px;
 	background-color: #333333;
+	margin-bottom: 20px;
 }
 
 #content h1 {
@@ -105,8 +106,14 @@ body {
 	background-color: #dddddd;
 	color: #AF030A;
 	text-align: left;
+	padding-left: 7px;
 	padding-top: 5px;
 	padding-bottom: 5px;
+}
+
+#list td {
+	padding-left: 7px;
+	color: #333333;
 }
 
 #list a {
@@ -121,11 +128,9 @@ body {
 
 #list .oddRow {
 	background-color: #7798BD;
-	color: #333333;
 }
 #list .evenRow {
 	background-color: #ABAFBD;
-	color: #333333;
 }
 
 #list td {
