@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-06 12:26:10 +0100 (sam. 06 déc. 2008) $
-# $LastChangedRevision: 227 $
+# $LastChangedDate: 2008-12-13 11:05:10 +0100 (sam. 13 déc. 2008) $
+# $LastChangedRevision: 255 $
 
 from django.db import models
 
@@ -87,8 +87,13 @@ class Device(models.Model):
 		return self.name + " - " + self.address + " (" + self.reference + ")"
 
 class DeviceProperty(models.Model):
+	VALUETYPE_CHOICES = (
+		('BOOLEAN', 'BOOLEAN'),
+		('NUMBER', 'NUMERIC'),
+	)
 	key = models.CharField(max_length=30)
 	value = models.CharField(max_length=80)
+	valueType = models.CharField(max_length=20, choices=VALUETYPE_CHOICES)
 	device = models.ForeignKey(Device)
 
 	class Meta:
