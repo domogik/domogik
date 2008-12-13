@@ -20,15 +20,12 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-11-29 19:34:08 +0100 (sam. 29 nov. 2008) $
-# $LastChangedRevision: 201 $
+# $LastChangedDate: 2008-12-13 10:57:14 +0100 (sam. 13 déc. 2008) $
+# $LastChangedRevision: 254 $
 
 from django import forms
 from django.forms import ModelForm
 from domogik.control.models import ApplicationSetting
-
-#class ApplicationSettingForm(forms.Form):
-#	name = forms.CharField(max_length=100)
 
 class ApplicationSettingForm(ModelForm):
 	class Meta:
