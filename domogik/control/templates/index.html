@@ -18,17 +18,17 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-13 19:28:11 +0100 (sam. 13 déc. 2008) $
-# $LastChangedRevision: 274 $
+# $LastChangedDate: 2008-12-13 19:30:49 +0100 (sam. 13 déc. 2008) $
+# $LastChangedRevision: 275 $
 -->
 {% extends "base.html" %}
 
 {% block title %}{{ pageTitle }}{% endblock %}
 
 {% block content %}
+	<div id="search">
 	{% if deviceList %}
 		<form name="filterForm" method="POST"/>
-		<div id="search">
 			<fieldset>
 				<legend>Search</legend>
 				<table>
@@ -76,13 +76,13 @@
 					</tr>
 				</table>
 			</fieldset>
-		</div>
 		</form>
 	{% endif %}
+	</div>
 
-	<form name="deviceListForm" method="POST"/>
 	<div id="list">
 	{% if deviceList %}
+		
 		<table>
 			<tr>
 				<th>Device name</th>
@@ -126,9 +126,9 @@
 				<td><input type="submit" value="Update"/></td>
 			</tr>
 		</table>
+		</form>
 	{% else %}
 		<p>No device found !</p>
 	{% endif %}
 	</div>
-	</form>
 {% endblock %}
