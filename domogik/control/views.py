@@ -20,8 +20,11 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-13 15:14:22 +0100 (sam. 13 déc. 2008) $
-# $LastChangedRevision: 260 $
+# $LastChangedDate: 2008-12-13 18:12:22 +0100 (sam. 13 déc. 2008) $
+# $LastChangedRevision: 266 $
+
+import time
+import datetime
 
 from django.db.models import Q
 from django.http import Http404
@@ -49,13 +52,17 @@ def index(request):
 	qListArea = Q()
 	qListRoom = Q()
 	qListCapacity = Q()
-	if request.method == 'POST': # A search was submitted
-		for area in QueryDict.getlist(request.POST, "area"):
-			qListArea = qListArea | Q(room__area__id = area)
-		for room in QueryDict.getlist(request.POST, "room"):
-			qListRoom = qListRoom | Q(room__id = room)
-		for capacity in QueryDict.getlist(request.POST, "capacity"):
-			qListCapacity = qListCapacity | Q(capacity__id = capacity)
+	if request.method == 'POST': # An action was submitted
+		cmd = QueryDict.get(request.POST, "cmd", "")
+		if cmd == "filter":
+			for area in QueryDict.getlist(request.POST, "area"):
+				qListArea = qListArea | Q(room__area__id = area)
+			for room in QueryDict.getlist(request.POST, "room"):
+				qListRoom = qListRoom | Q(room__id = room)
+			for capacity in QueryDict.getlist(request.POST, "capacity"):
+				qListCapacity = qListCapacity | Q(capacity__id = capacity)
+		elif cmd == "updateValues":
+			__updateDeviceValues(request)
 
 	# select_related() should avoid one extra db query per property
 	deviceList = Device.objects.filter(qListArea).filter(qListRoom).filter(qListCapacity).select_related()
@@ -66,9 +73,9 @@ def index(request):
 	techList = DeviceTechnology.objects.all()
 
 	appSetting = __readApplicationSetting()
-
 	if appSetting.adminMode == True:
 		adminMode = "True"
+
 	return render_to_response(
 		'index.html',
 		{
@@ -82,16 +89,49 @@ def index(request):
 		}
 	)
 
-def updateDeviceValues(request):
+def __updateDeviceValues(request):
 	"""
 	Update device values (main control page)
 	"""
-	print "Updating values..."
+	for deviceId in QueryDict.getlist(request.POST, "deviceId"):
+		keyList = QueryDict.getlist(request.POST, "key" + deviceId)
+		valueList = QueryDict.getlist(request.POST, "value" + deviceId)
+		for i in range(len(keyList)):
+			__sendValueToDevice(deviceId, keyList[i], valueList[i])
+
 	# Get all values posted over the form
 	# For each device :
 	#	Check if value was changed
 	#	If yes, try to send new value to the device
 	#	Log the result
+
+def __sendValueToDevice(deviceId, propertyKey, propertyValue):
+	"""
+	Send a value to a device
+	"""
+	# Read previous value, and update it if necessary
+	deviceProperty = DeviceProperty.objects.get(device__id=deviceId, key=propertyKey)
+	if deviceProperty.value != propertyValue:
+		#################################
+		# TODO : Send value to device !!!
+		#################################
+		deviceProperty.value = propertyValue
+		deviceProperty.save()
+		__writeDeviceCmdLog(deviceId, deviceProperty.value, "Nothing special", True)
+
+def __writeDeviceCmdLog(deviceId, newValue, newComment, newIsSuccessful):
+	"""
+	Write device command log
+	"""
+	newDevice = Device.objects.get(id=deviceId)
+	deviceCmdLog = DeviceCmdLog (
+						date = datetime.datetime.now(),
+						device = newDevice,
+						value = newValue, 
+						comment = newComment,
+						isSuccessful = newIsSuccessful
+	)
+	deviceCmdLog.save()
 
 def device(request, deviceId):
 	"""
@@ -100,6 +140,9 @@ def device(request, deviceId):
 	hasCmdLogs = ""
 	adminMode = ""
 	pageTitle = "Device details"
+
+	if request.method == 'POST': # An action was submitted
+		__updateDeviceValues(request)
 
 	appSetting = __readApplicationSetting()
 	if appSetting.adminMode == True:
@@ -118,7 +161,7 @@ def device(request, deviceId):
 		'device.html',
 		{
 			'device'		: device,
-			'hasLogs'		: hasCmdLogs,
+			'hasCmdLogs'	: hasCmdLogs,
 			'adminMode'		: adminMode,
 			'pageTitle'		: pageTitle
 		}
@@ -135,8 +178,6 @@ def deviceCmdLogs(request, deviceId):
 	appSetting = __readApplicationSetting()
 	if appSetting.adminMode == True:
 		adminMode = "True"
-
-	print request.POST
 
 	cmd = QueryDict.get(request.POST, "cmd", "")
 	if cmd == "clearLogs" and appSetting.adminMode:
@@ -155,11 +196,11 @@ def deviceCmdLogs(request, deviceId):
 	return render_to_response(
 		'device_cmd_logs.html',
 		{
-			'deviceId'		: deviceId,
-			'adminMode'		: adminMode,
-			'deviceLogList'	: deviceCmdLogList,
-			'deviceAll'		: deviceAll,
-			'pageTitle'		: pageTitle
+			'deviceId'			: deviceId,
+			'adminMode'			: adminMode,
+			'deviceCmdLogList'	: deviceCmdLogList,
+			'deviceAll'			: deviceAll,
+			'pageTitle'			: pageTitle
 		}
 	)
 

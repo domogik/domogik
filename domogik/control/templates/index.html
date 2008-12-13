@@ -18,8 +18,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-13 15:32:07 +0100 (sam. 13 déc. 2008) $
-# $LastChangedRevision: 261 $
+# $LastChangedDate: 2008-12-13 18:12:22 +0100 (sam. 13 déc. 2008) $
+# $LastChangedRevision: 266 $
 -->
 {% extends "base.html" %}
 
@@ -70,9 +70,9 @@
 					</td>
 				</tr>
 				<tr>
+					<input type="hidden" id="id_cmd" name="cmd" value="filter"/>
 					<td colspan="2"><input type="submit" value="Filter"/></td>
 				</tr>
-
 			</table>
 		</fieldset>
 	</div>
@@ -96,6 +96,7 @@
 			</tr>
 
 			{% for device in deviceList %}
+				<input type="hidden" id="id_deviceId" name="deviceId" value="{{ device.id }}"/>
 				<tr class="{% cycle 'oddRow' 'evenRow' %}">
 					<td><a href="{% url deviceView device.id %}">{{ device.name }}</a></td>
 					{% if adminMode %}
@@ -119,7 +120,8 @@
 
 		<table>
 			<tr>
-				<td><input type="submit" value="Update values"/></td>
+				<input type="hidden" id="id_cmd" name="cmd" value="updateValues"/>
+				<td><input type="submit" value="Update"/></td>
 			</tr>
 		</table>
 	{% else %}

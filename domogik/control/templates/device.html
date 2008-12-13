@@ -18,8 +18,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-13 17:51:47 +0100 (sam. 13 déc. 2008) $
-# $LastChangedRevision: 264 $
+# $LastChangedDate: 2008-12-13 18:12:22 +0100 (sam. 13 déc. 2008) $
+# $LastChangedRevision: 266 $
 -->
 {% extends "base.html" %}
 
@@ -30,6 +30,7 @@
 	<div id="device">
 		<table>
 			<tr>
+				<input type="hidden" id="id_deviceId" name="deviceId" value="{{ device.id }}"/>
 				<td class="label">Device</td><td class="value">{{ device.name }}</td>
 			</tr>
 			{% if adminMode %}
@@ -63,6 +64,12 @@
 				</td>
 			</tr>
 		</table>
+		<table>
+			<tr>
+				<td><input type="submit" value="Update"/></td>
+			</tr>
+		</table>
+
 		<p>
 			&raquo;&nbsp;{% if hasCmdLogs %}<a href="{% url deviceCmdLogsView device.id %}">View logs</a>{% else %}No logs{% endif %}&nbsp;
 			&raquo;&nbsp;<a href="#">View readings history</a>

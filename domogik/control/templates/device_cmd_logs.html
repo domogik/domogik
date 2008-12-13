@@ -18,8 +18,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-13 13:26:19 +0100 (sam. 13 déc. 2008) $
-# $LastChangedRevision: 258 $
+# $LastChangedDate: 2008-12-13 18:12:22 +0100 (sam. 13 déc. 2008) $
+# $LastChangedRevision: 266 $
 -->
 {% extends "base.html" %}
 
@@ -38,7 +38,7 @@
 {% block content %}
 	<form name="deviceLogsForm" method="POST" action="">
 	<div id="list">
-	{% if deviceList %}
+	{% if deviceCmdLogList %}
 		<table>
 			<tr>
 				<th>Date</th>
