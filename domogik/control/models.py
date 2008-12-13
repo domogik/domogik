@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-13 11:05:10 +0100 (sam. 13 déc. 2008) $
-# $LastChangedRevision: 255 $
+# $LastChangedDate: 2008-12-13 15:14:22 +0100 (sam. 13 déc. 2008) $
+# $LastChangedRevision: 260 $
 
 from django.db import models
 
@@ -89,7 +89,7 @@ class Device(models.Model):
 class DeviceProperty(models.Model):
 	VALUETYPE_CHOICES = (
 		('BOOLEAN', 'BOOLEAN'),
-		('NUMBER', 'NUMERIC'),
+		('ALPHANUM', 'ALPHANUM'),
 	)
 	key = models.CharField(max_length=30)
 	value = models.CharField(max_length=80)
