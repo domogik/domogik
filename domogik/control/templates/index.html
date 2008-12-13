@@ -18,8 +18,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-04 22:39:23 +0100 (jeu. 04 déc. 2008) $
-# $LastChangedRevision: 223 $
+# $LastChangedDate: 2008-12-13 12:03:22 +0100 (sam. 13 déc. 2008) $
+# $LastChangedRevision: 257 $
 -->
 {% extends "base.html" %}
 
@@ -96,7 +96,7 @@
 			</tr>
 
 			{% for device in deviceList %}
-				<tr>
+				<tr class="{% cycle 'oddRow' 'evenRow' %}">
 					<td><a href="{% url deviceView device.id %}">{{ device.name }}</a></td>
 					{% if adminMode %}
 						<td>{{ device.capacity.name }}</td>
