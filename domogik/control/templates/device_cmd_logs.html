@@ -18,8 +18,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-13 18:12:22 +0100 (sam. 13 déc. 2008) $
-# $LastChangedRevision: 266 $
+# $LastChangedDate: 2008-12-13 19:11:10 +0100 (sam. 13 déc. 2008) $
+# $LastChangedRevision: 271 $
 -->
 {% extends "base.html" %}
 
@@ -59,6 +59,7 @@
 			{% endfor %}
 		</table>
 		{% if adminMode %}
+			<p></p>
 			<table>
 				<tr>
 					<td><input type="button" name="clearLogsButton" onclick="clearLogs()" value="Clear logs"/>
