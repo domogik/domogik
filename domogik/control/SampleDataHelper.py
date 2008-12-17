@@ -19,9 +19,9 @@
 
 # Author : Marc Schneider <marc@domogik.org>
 
-# $LastChangedBy$
-# $LastChangedDate$
-# $LastChangedRevision$
+# $LastChangedBy: mschneider $
+# $LastChangedDate: 2008-12-17 14:25:46 +0100 (mer. 17 déc. 2008) $
+# $LastChangedRevision: 279 $
 
 from domogik.control.models import DeviceTechnology
 from domogik.control.models import Area
