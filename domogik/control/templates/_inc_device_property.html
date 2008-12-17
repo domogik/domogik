@@ -19,8 +19,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-13 19:24:28 +0100 (sam. 13 déc. 2008) $
-# $LastChangedRevision: 273 $
+# $LastChangedDate: 2008-12-17 22:04:24 +0100 (mer. 17 déc. 2008) $
+# $LastChangedRevision: 280 $
 -->
 {% endcomment %}
 
@@ -31,11 +31,10 @@
 		{% ifequal property.value "1" %}
 			<option value="1" selected="selected">ON</option>
 			<option value="0">OFF</option>
-		{% endifequal %}
-		{% ifnotequal property.value "1" %}
+		{% else %}
 			<option value="1">ON</option>
 			<option value="0" selected="selected">OFF</option>
-		{% endifnotequal %}
+		{% endifequal %}
 		</select>
 	{% endifequal %}
 	{% ifequal property.valueType "ALPHANUM" %}
