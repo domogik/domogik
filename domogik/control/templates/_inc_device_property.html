@@ -19,25 +19,29 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-17 22:04:24 +0100 (mer. 17 déc. 2008) $
-# $LastChangedRevision: 280 $
+# $LastChangedDate: 2008-12-17 22:12:54 +0100 (mer. 17 déc. 2008) $
+# $LastChangedRevision: 281 $
 -->
 {% endcomment %}
 
 {% for property in device.deviceproperty_set.all %}
-	<input id="id_key{{ device.id }}" type="hidden" name="key{{ device.id }}" value="{{ property.key }}"/>
-	{% ifequal property.valueType "BOOLEAN" %}
-		<select id="id_value{{ device.id }}" name="value{{ device.id }}">
-		{% ifequal property.value "1" %}
-			<option value="1" selected="selected">ON</option>
-			<option value="0">OFF</option>
-		{% else %}
-			<option value="1">ON</option>
-			<option value="0" selected="selected">OFF</option>
+	{% if property.isChangeableByUser %}
+		<input id="id_key{{ device.id }}" type="hidden" name="key{{ device.id }}" value="{{ property.key }}"/>
+		{% ifequal property.valueType "BOOLEAN" %}
+			<select id="id_value{{ device.id }}" name="value{{ device.id }}">
+			{% ifequal property.value "1" %}
+				<option value="1" selected="selected">ON</option>
+				<option value="0">OFF</option>
+			{% else %}
+				<option value="1">ON</option>
+				<option value="0" selected="selected">OFF</option>
+			{% endifequal %}
+			</select>
 		{% endifequal %}
-		</select>
-	{% endifequal %}
-	{% ifequal property.valueType "ALPHANUM" %}
-		<input id="id_value{{ device.id }}" type="text" name="value{{ device.id }}" value="{{ property.value }}" size="3"/>&nbsp;{{ property.valueUnit }}
-	{% endifequal %}
+		{% ifequal property.valueType "ALPHANUM" %}
+			<input id="id_value{{ device.id }}" type="text" name="value{{ device.id }}" value="{{ property.value }}" size="3"/>&nbsp;{{ property.valueUnit }}
+		{% endifequal %}
+	{% else %}
+		{{ property.value }}&nbsp;{{ property.valueUnit }}
+	{% endif %}
 {% endfor %}
