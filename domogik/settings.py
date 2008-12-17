@@ -1,3 +1,5 @@
+#-*- encoding:utf-8 *-*
+
 # Copyright 2008 Domogik project
 
 # This file is part of Domogik.
@@ -17,7 +19,8 @@
 # Author: Marc Schneider <marc@mirelsol.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedRevision: 267 $
+# $LastChangedDate: 2008-12-17 22:19:45 +0100 (mer. 17 déc. 2008) $
+# $LastChangedRevision: 282 $
 
 # Django settings for domogik project.
 

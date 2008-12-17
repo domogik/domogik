@@ -1,6 +1,6 @@
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-13 19:05:26 +0100 (sam. 13 déc. 2008) $
-# $LastChangedRevision: 268 $
+# $LastChangedDate: 2008-12-17 22:19:45 +0100 (mer. 17 déc. 2008) $
+# $LastChangedRevision: 282 $
 
 * General
 	* @Loiz : set up internationalization for messages (see also how to translate data
@@ -23,10 +23,6 @@
 		* @Marc : Add localization of the installation (Zip, City, Country) : useful for wheather forecasts
 
 	* General coding
-		* @Marc : in settings.py, fix this encoding pb for 'LastChangedDate' :
-			If I have this value for example : # $LastChangedDate: 2008-12-13 19:05:26 +0100 (sam. 13 déc. 2008) $, I get this error :
-			SyntaxError: Non-ASCII character '\xc3' in file /home/mschneider/data/pro/projets/domogik/appli/domogik/settings.py 
-			on line 20, but no encoding declared; see http://www.python.org/peps/pep-0263.html for details
 
 		* @? : find a way to switch between pure links and icons for the clickable areas (menus, functions...)
 		* @? : Add facility to save / load scenes 
