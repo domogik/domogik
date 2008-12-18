@@ -19,10 +19,14 @@
 # Author: Marc Schneider <marc@mirelsol.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-17 22:19:45 +0100 (mer. 17 déc. 2008) $
-# $LastChangedRevision: 282 $
+# $LastChangedDate: 2008-12-18 20:37:56 +0100 (jeu. 18 déc. 2008) $
+# $LastChangedRevision: 283 $
 
 # Django settings for domogik project.
+
+import os
+
+PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -93,8 +97,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-	# TODO : find a way NOT to hard-code this path
-	'~/domogik/control/templates'
+	PROJECT_PATH + '/templates/'
 )
 
 INSTALLED_APPS = (
