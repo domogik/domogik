@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-11-29 19:34:08 +0100 (sam. 29 nov. 2008) $
-# $LastChangedRevision: 201 $
+# $LastChangedDate: 2008-12-21 11:19:33 +0100 (dim. 21 déc. 2008) $
+# $LastChangedRevision: 289 $
 
 # This is the admin part of Domogik
 
@@ -30,12 +30,20 @@ from domogik.control.models import Area
 from domogik.control.models import Room
 from domogik.control.models import Device
 from domogik.control.models import DeviceCapacity
+from domogik.control.models import DeviceProperty
 from domogik.control.models import DeviceTechnology
 from domogik.control.models import ApplicationSetting
 
+class DevicePropertyInline(admin.TabularInline):
+	model = DeviceProperty
+	extra = 1
+
+class DeviceAdmin(admin.ModelAdmin):
+	inlines = [DevicePropertyInline]
+
 admin.site.register(Area)
 admin.site.register(Room)
-admin.site.register(Device)
+admin.site.register(Device, DeviceAdmin)
 admin.site.register(DeviceCapacity)
 admin.site.register(DeviceTechnology)
 admin.site.register(ApplicationSetting)
