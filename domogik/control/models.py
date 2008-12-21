@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-21 11:14:52 +0100 (dim. 21 déc. 2008) $
-# $LastChangedRevision: 287 $
+# $LastChangedDate: 2008-12-21 11:17:26 +0100 (dim. 21 déc. 2008) $
+# $LastChangedRevision: 288 $
 
 from django.db import models
 
@@ -100,8 +100,8 @@ class DeviceProperty(models.Model):
 
 	key = models.CharField(max_length=30)
 	value = models.CharField(max_length=80)
-	valueType = models.CharField(max_length=20, choices=VALUETYPE_CHOICES)
-	valueUnit = models.CharField(max_length=30, choices=VALUE_UNIT_CHOICES)
+	valueType = models.CharField("Value type", max_length=20, choices=VALUETYPE_CHOICES)
+	valueUnit = models.CharField("Value unit", max_length=30, choices=VALUE_UNIT_CHOICES)
 	isChangeableByUser = models.BooleanField("Can be changed by user")
 	device = models.ForeignKey(Device)
 
