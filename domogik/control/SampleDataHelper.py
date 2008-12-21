@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-17 22:12:54 +0100 (mer. 17 déc. 2008) $
-# $LastChangedRevision: 281 $
+# $LastChangedDate: 2008-12-21 11:02:48 +0100 (dim. 21 déc. 2008) $
+# $LastChangedRevision: 285 $
 
 from domogik.control.models import DeviceTechnology
 from domogik.control.models import Area
@@ -69,7 +69,7 @@ class SampleDataHelper:
 		x10 = DeviceTechnology.objects.create(name="X10")
 		oneWire = DeviceTechnology.objects.create(name="OneWire")
 		ir = DeviceTechnology.objects.create(name="IR")
-		plcBus = DeviceTechnology.objects.create(name="IR")
+		plcBus = DeviceTechnology.objects.create(name="PLCBus")
 
 		lightingCap = DeviceCapacity.objects.create(name="Lighting")
 		powerPointCap = DeviceCapacity.objects.create(name="Power point")
