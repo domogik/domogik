@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-21 10:52:22 +0100 (dim. 21 déc. 2008) $
-# $LastChangedRevision: 284 $
+# $LastChangedDate: 2008-12-21 11:09:12 +0100 (dim. 21 déc. 2008) $
+# $LastChangedRevision: 286 $
 
 from django.db import models
 
@@ -34,6 +34,9 @@ class DeviceCapacity(models.Model):
 		('Power point','Power point')
 	)
 	name = models.CharField(max_length=30, choices=CAPACITY_CHOICES)
+
+	class Meta:
+		verbose_name_plural = "Device capacities"
 
 	# This is the representation of the object
 	def __unicode__(self):
@@ -65,7 +68,7 @@ class DeviceTechnology(models.Model):
 	description = models.TextField(max_length=255, null=True, blank=True)
 
 	class Meta:
-		verbose_name_plural = "Devices technologies"
+		verbose_name_plural = "Device technologies"
 
 	# This is the representation of the object
 	def __unicode__(self):
