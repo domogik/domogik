@@ -1,6 +1,6 @@
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-17 22:19:45 +0100 (mer. 17 déc. 2008) $
-# $LastChangedRevision: 282 $
+# $LastChangedDate: 2008-12-21 11:21:47 +0100 (dim. 21 déc. 2008) $
+# $LastChangedRevision: 290 $
 
 * General
 	* @Loiz : set up internationalization for messages (see also how to translate data
@@ -19,7 +19,7 @@
 		* @? : Add a function to schedule a task (eg. switch on/off the heating at a given time)
 
 	* Admin
-		* @Marc : In *Django's admin* interface, make possible to enter values for the device
+		* @Marc : Add inline help to explain what are device properties)
 		* @Marc : Add localization of the installation (Zip, City, Country) : useful for wheather forecasts
 
 	* General coding
