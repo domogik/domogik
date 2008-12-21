@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-21 11:09:12 +0100 (dim. 21 déc. 2008) $
-# $LastChangedRevision: 286 $
+# $LastChangedDate: 2008-12-21 11:14:52 +0100 (dim. 21 déc. 2008) $
+# $LastChangedRevision: 287 $
 
 from django.db import models
 
@@ -107,6 +107,7 @@ class DeviceProperty(models.Model):
 
 	class Meta:
 		unique_together = ("key", "device")
+		verbose_name_plural = "Device properties"
 
 	# This is the representation of the object
 	def __unicode__(self):
