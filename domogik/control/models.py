@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-17 22:12:54 +0100 (mer. 17 déc. 2008) $
-# $LastChangedRevision: 281 $
+# $LastChangedDate: 2008-12-21 10:52:22 +0100 (dim. 21 déc. 2008) $
+# $LastChangedRevision: 284 $
 
 from django.db import models
 
@@ -126,6 +126,9 @@ class StateReading(models.Model):
 	date = models.DateTimeField()
 
 class ApplicationSetting(models.Model):
+	# TODO : make sure there is only one line for this model
+	# See : http://groups.google.com/group/django-users/browse_thread/thread/d44a9417a81c4860?hl=en
+	# Or : http://docs.djangoproject.com/en/dev/ref/models/instances/#ref-models-instances
 	simulationMode = models.BooleanField("Simulation mode", default=True)
 	adminMode = models.BooleanField("Administrator mode", default=True)
 	debugMode = models.BooleanField("Debug mode", default=True)
