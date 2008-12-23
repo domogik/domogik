@@ -19,8 +19,8 @@
 # Author: Marc Schneider <marc@mirelsol.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-18 20:37:56 +0100 (jeu. 18 déc. 2008) $
-# $LastChangedRevision: 283 $
+# $LastChangedDate: 2008-12-23 13:42:51 +0100 (mar. 23 déc. 2008) $
+# $LastChangedRevision: 291 $
 
 # Django settings for domogik project.
 
@@ -109,8 +109,7 @@ INSTALLED_APPS = (
 	'domogik.control',
 )
 
-# Adapt this variable in your settings_local.py file
-#STATIC_DOC_ROOT = '/home/mschneider/prj/domogik/appli/domogik/control/templates/skins'
+STATIC_DOC_ROOT = PROJECT_PATH + '/control/templates/skins'
 
 try:
 	from settings_local import *
