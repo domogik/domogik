@@ -1,6 +1,6 @@
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-21 11:21:47 +0100 (dim. 21 déc. 2008) $
-# $LastChangedRevision: 290 $
+# $LastChangedDate: 2008-12-23 13:47:40 +0100 (mar. 23 déc. 2008) $
+# $LastChangedRevision: 292 $
 
 * General
 	* @Loiz : set up internationalization for messages (see also how to translate data
@@ -11,9 +11,8 @@
 	* @Epy : create a prototype using HTML / CSS
 		Only two files to edit : base.html and style.css !
 
-	
 	* Control
-		* @Marc : Eventually create a global view that can switch off all the lights for example
+		* @Maxence : integrate code to send commands over the xPL network (in views.py)
 		* @Marc : Display history of readings (essentially for sensors)
 			Seems to be a good idea to use the powerful rrdtools : http://oss.oetiker.ch/rrdtool/gallery/index.en.html
 		* @? : Add a function to schedule a task (eg. switch on/off the heating at a given time)
