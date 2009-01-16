@@ -1,6 +1,6 @@
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-01-16 09:53:02 +0100 (ven. 16 janv. 2009) $
-# $LastChangedRevision: 293 $
+# $LastChangedDate: 2009-01-16 13:16:56 +0100 (ven. 16 janv. 2009) $
+# $LastChangedRevision: 294 $
 
 * General
 	* @Loiz : set up internationalization for messages (see also how to translate data
@@ -21,9 +21,18 @@
 		* @Marc : Add inline help to explain what are device properties)
 		* @Marc : Add localization of the installation (Zip, City, Country) : useful for wheather forecasts
 
+	* Model
+		* @Marc : no need to have tables for capacities and technologies, simply use a static list instead
+			If you add a technology for example, you'll have to change the code...
+		* @Marc : in the technology list, add a "script" type : it will allow us to use a technology that is not part of Domogik yet.
+			The address of the device would contain in this case the path to the script.
+
 	* General coding
-		* @Marc : check that the app is working with sqlite DB. Somebody reported this error :
+		* @Marc : check that the app is working with sqlite DB
+		* @?	: check that the app is working properly with either mod_python or Django's embedded server
+		* @?	: Using iso8859-15 on his machine, somebody reported this error :
 			UnicodeDecodeError at /domogik/
+			The string that could not be encoded/decoded was:  13 d�c 2008)
 		* @? : find a way to switch between pure links and icons for the clickable areas (menus, functions...)
 		* @? : Add facility to save / load scenes 
 
