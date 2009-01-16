@@ -1,13 +1,13 @@
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-23 13:47:40 +0100 (mar. 23 déc. 2008) $
-# $LastChangedRevision: 292 $
+# $LastChangedDate: 2009-01-16 09:53:02 +0100 (ven. 16 janv. 2009) $
+# $LastChangedRevision: 293 $
 
 * General
 	* @Loiz : set up internationalization for messages (see also how to translate data
 		stored in the DB)
 		For Django, see : http://docs.djangoproject.com/en/dev/topics/i18n/#topics-i18n
 
-* UI		
+* UI
 	* @Epy : create a prototype using HTML / CSS
 		Only two files to edit : base.html and style.css !
 
@@ -22,7 +22,8 @@
 		* @Marc : Add localization of the installation (Zip, City, Country) : useful for wheather forecasts
 
 	* General coding
-
+		* @Marc : check that the app is working with sqlite DB. Somebody reported this error :
+			UnicodeDecodeError at /domogik/
 		* @? : find a way to switch between pure links and icons for the clickable areas (menus, functions...)
 		* @? : Add facility to save / load scenes 
 
