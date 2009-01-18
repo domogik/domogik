@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-16 22:50:46 +0100 (mar. 16 déc. 2008) $
-# $LastChangedRevision: 278 $
+# $LastChangedDate: 2009-01-18 12:34:24 +0100 (dim. 18 janv. 2009) $
+# $LastChangedRevision: 295 $
 
 import datetime
 
@@ -30,10 +30,8 @@ from django.http import Http404
 from django.http import QueryDict
 from django.shortcuts import render_to_response
 
-from domogik.control.models import DeviceTechnology
 from domogik.control.models import Area
 from domogik.control.models import Room
-from domogik.control.models import DeviceCapacity
 from domogik.control.models import DeviceProperty
 from domogik.control.models import DeviceCmdLog
 from domogik.control.models import Device
@@ -61,7 +59,7 @@ def index(request):
 			for room in QueryDict.getlist(request.POST, "room"):
 				qListRoom = qListRoom | Q(room__id = room)
 			for capacity in QueryDict.getlist(request.POST, "capacity"):
-				qListCapacity = qListCapacity | Q(capacity__id = capacity)
+				qListCapacity = qListCapacity | Q(capacity = capacity)
 		elif cmd == "updateValues":
 			__updateDeviceValues(request)
 
@@ -70,8 +68,8 @@ def index(request):
 
 	areaList = Area.objects.all()
 	roomList = Room.objects.all()
-	capacityList = DeviceCapacity.objects.all()
-	techList = DeviceTechnology.objects.all()
+	capacityList = Device.CAPACITY_CHOICES
+	techList = Device.TECHNOLOGY_CHOICES
 
 	appSetting = __readApplicationSetting()
 	if appSetting.adminMode == True:
@@ -267,9 +265,9 @@ def loadSampleData(request):
 
 	areaList = Area.objects.all()
 	roomList = Room.objects.all()
-	capacityList = DeviceCapacity.objects.all()
+	capacityList = Device.CAPACITY_CHOICES
 	deviceList = Device.objects.all()
-	techList = DeviceTechnology.objects.all()
+	techList = Device.TECHNOLOGY_CHOICES
 
 	return render_to_response(
 		'admin_index.html',

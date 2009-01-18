@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-21 11:19:33 +0100 (dim. 21 déc. 2008) $
-# $LastChangedRevision: 289 $
+# $LastChangedDate: 2009-01-18 12:34:24 +0100 (dim. 18 janv. 2009) $
+# $LastChangedRevision: 295 $
 
 # This is the admin part of Domogik
 
@@ -29,9 +29,7 @@ from django.contrib import admin
 from domogik.control.models import Area
 from domogik.control.models import Room
 from domogik.control.models import Device
-from domogik.control.models import DeviceCapacity
 from domogik.control.models import DeviceProperty
-from domogik.control.models import DeviceTechnology
 from domogik.control.models import ApplicationSetting
 
 class DevicePropertyInline(admin.TabularInline):
@@ -44,6 +42,4 @@ class DeviceAdmin(admin.ModelAdmin):
 admin.site.register(Area)
 admin.site.register(Room)
 admin.site.register(Device, DeviceAdmin)
-admin.site.register(DeviceCapacity)
-admin.site.register(DeviceTechnology)
 admin.site.register(ApplicationSetting)

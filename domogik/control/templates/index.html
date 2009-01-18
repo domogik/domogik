@@ -18,8 +18,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-13 19:41:34 +0100 (sam. 13 déc. 2008) $
-# $LastChangedRevision: 277 $
+# $LastChangedDate: 2009-01-18 12:34:24 +0100 (dim. 18 janv. 2009) $
+# $LastChangedRevision: 295 $
 -->
 {% extends "base.html" %}
 
@@ -62,9 +62,9 @@
 								<tr>
 									<th>Capacity</th>
 								</tr>
-								{% for capacity in capacityList %}
+								{% for key,value in capacityList %}
 									<tr>
-										<td>{{ capacity.name }}</td><td><input type="checkbox" name="capacity" value="{{ capacity.id }}"/></td>
+										<td>{{ value }}</td><td><input type="checkbox" name="capacity" value="{{ key }}"/></td>
 									</tr>
 								{% endfor %}
 							</table>
@@ -102,10 +102,10 @@
 				<tr class="{% cycle 'oddRow' 'evenRow' %}">
 					<td><a href="{% url deviceView device.id %}">{{ device.name }}</a></td>
 					{% if adminMode %}
-						<td>{{ device.capacity.name }}</td>
+						<td>{{ device.capacity }}</td>
 						<td>{{ device.address }}</td>
 						<td>{{ device.reference }}</td>
-						<td>{{ device.technology.name }}</td>
+						<td>{{ device.technology }}</td>
 					{% endif %}
 					<td>{{ device.room.name }}</td>
 					<td>{{ device.room.area.name }}</td>

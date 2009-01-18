@@ -18,8 +18,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-13 19:24:01 +0100 (sam. 13 déc. 2008) $
-# $LastChangedRevision: 272 $
+# $LastChangedDate: 2009-01-18 12:34:24 +0100 (dim. 18 janv. 2009) $
+# $LastChangedRevision: 295 $
 -->
 {% extends "base.html" %}
 
@@ -111,8 +111,8 @@
 			<hr/>
 			{% if capacityList %}
 				<ul>
-				{% for capacity in capacityList %}
-					<li>{{ capacity.name }}</li>
+				{% for key,value in capacityList %}
+					<li>{{ value }}</li>
 				{% endfor %}
 				</ul>
 			{% else %}
@@ -135,8 +135,8 @@
 			<hr/>
 			{% if techList %}
 				<ul>
-				{% for tech in techList %}
-					<li>{{ tech.name }}</li>
+				{% for key,value in techList %}
+					<li>{{ value }}</li>
 				{% endfor %}
 				</ul>
 			{% else %}

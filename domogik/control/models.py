@@ -20,27 +20,10 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-21 11:17:26 +0100 (dim. 21 déc. 2008) $
-# $LastChangedRevision: 288 $
+# $LastChangedDate: 2009-01-18 12:34:24 +0100 (dim. 18 janv. 2009) $
+# $LastChangedRevision: 295 $
 
 from django.db import models
-
-class DeviceCapacity(models.Model):
-	CAPACITY_CHOICES = (
-		('Temperature', 'Temperature'),
-		('Heating', 'Heating'),
-		('Lighting', 'Lighting'),
-		('Music', 'Music'),
-		('Power point','Power point')
-	)
-	name = models.CharField(max_length=30, choices=CAPACITY_CHOICES)
-
-	class Meta:
-		verbose_name_plural = "Device capacities"
-
-	# This is the representation of the object
-	def __unicode__(self):
-		return self.name
 
 class Area(models.Model):
 	name = models.CharField(max_length=30)
@@ -57,31 +40,29 @@ class Room(models.Model):
 	def __unicode__(self):
 		return self.name
 
-class DeviceTechnology(models.Model):
-	TECHNOLOGY_CHOICES = (
-		('X10', 'X10'),
-		('One-Wire', 'One-Wire'),
-		('PLCBus', 'PLCBus'),
-		('IR', 'IR'),
-	)
-	name =  models.CharField(max_length=20, choices=TECHNOLOGY_CHOICES)
-	description = models.TextField(max_length=255, null=True, blank=True)
-
-	class Meta:
-		verbose_name_plural = "Device technologies"
-
-	# This is the representation of the object
-	def __unicode__(self):
-		return self.name
-
 class Device(models.Model):
+	TECHNOLOGY_CHOICES = (
+		('x10', 'X10'),
+		('onewire', 'One-Wire'),
+		('plcbus', 'PLCBus'),
+		('ir', 'IR'),
+	)
+
+	CAPACITY_CHOICES = (
+		('temperature', 'Temperature'),
+		('heating', 'Heating'),
+		('lighting', 'Lighting'),
+		('music', 'Music'),
+		('powerpoint','Power point')
+	)
+
 	name = models.CharField(max_length=30)
 	serialNb = models.CharField("Serial Nb", max_length=30, null=True, blank=True)
 	reference = models.CharField(max_length=30, null=True, blank=True)
 	address = models.CharField(max_length=30)
 	description = models.TextField(max_length=80, null=True, blank=True)
-	technology = models.ForeignKey(DeviceTechnology)
-	capacity = models.ForeignKey(DeviceCapacity)
+	technology = models.CharField(max_length=20, choices=TECHNOLOGY_CHOICES)
+	capacity = models.CharField(max_length=30, choices=CAPACITY_CHOICES)
 	room = models.ForeignKey(Room)
 	canGiveFeedback = models.BooleanField("Can give feedback", default=False)
 
