@@ -19,9 +19,9 @@
 
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
-# $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-09-27 14:12:43 +0200 (sam. 27 sept. 2008) $
-# $LastChangedRevision: 116 $
+# $LastChangedBy: maxence $
+# $LastChangedDate: 2009-01-31 16:58:48 +0100 (sam. 31 janv. 2009) $
+# $LastChangedRevision: 297 $
 
 import sys 
 import sys, string, select, threading
@@ -66,12 +66,21 @@ class Manager:
         else:
             #All is good, we start sending Heartbeat every 5 minutes using xPLTimer
             self._SendHeartbeat()
-            h_timer = xPLTimer(300,self._SendHeartbeat)
-            h_timer.start()
+            self._h_timer = xPLTimer(300,self._SendHeartbeat)
+            self._h_timer.start()
             #And finally we start network listener in a thread
+            self._stop_thread = False
             self._network = threading.Thread(None, self._run_thread_monitor, None, (), {})
             self._network.start()
             print "Lancement du Thread"
+
+    def leave(self):
+        """
+        Stop threads and leave the Manager
+        """
+        self._h_timer.stop()
+        self._stop_thread = True
+        exit(0)
 
     def send(self, message):
         """
@@ -110,7 +119,7 @@ class Manager:
         them to see if the target is the application.
         If it is, call all listeners
         """
-        while 1==1 :
+        while not self._stop_thread :
             readable, writeable, errored = select.select([self._UDPSock],[],[],10)
             if len(readable) == 1 :
                 data,addr = self._UDPSock.recvfrom(self._buff)
@@ -400,11 +409,6 @@ class xPLTimer:
         """
         self._timer.cancel()
 
-def boo(m):
-    print m
-
-def p():
-    print "TIMER"
 
 if __name__ == "__main__":
     m = Manager(ip = "192.168.1.20", port = 5123)

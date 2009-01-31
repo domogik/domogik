@@ -23,3 +23,66 @@
 # $LastChangedDate: 2008-07-23 21:42:29 +0200 (mer 23 jui 2008) $
 # $LastChangedRevision: 100 $
 
+#This script use arguments from command line to forge & send a message
+from xPLAPI import *
+import optparse
+
+class Sender:
+
+    supported_schemas = ["datetime.basic","dawndusk.request","x10.basic","sensor.basic"]
+
+    def __init__(self):
+        self.parse_parameters()
+        print "Create Manager"
+        self.__myxpl = Manager(ip = "192.168.1.24", port  = 5037)
+        print "Forge message"
+        mess = self.forge_message()
+        print "send message"
+        self.__myxpl.send(mess)
+        print "leave"
+        self.__myxpl.leave()
+        exit(0)
+
+    def parse_parameters(self):
+        '''
+        Read parameters from command line and parse them
+        '''
+        parser = optparse.OptionParser()
+        parser.add_option("-d","--dest",type="string",dest="message_dest", default="broadcast")
+        (self._options, self._args) = parser.parse_args()
+
+        #Parsing of args
+        if len(self._args) != 2:
+            self.usage()
+            exit(1)
+
+        if self._args[0] not in self.supported_schemas:
+            print "Schema not supported"
+            self.usage()
+            exit(2)
+
+    def forge_message(self):
+        '''
+        Create the message based on script arguments
+        '''
+        message = Message()
+        message.set_type("xpl-cmnd")
+        message.set_schema(self._args[0])
+        datas = self._args[1].split(',')
+        for data in datas:
+            if "=" not in data:
+                print "Bad formatted commands\n Must be key=value"
+                self.usage()
+                exit(4)
+            else:
+                message.set_data_key(data.split("=")[0], data.split("=")[1])
+        return message
+
+    def usage(self):
+        print "usage : send.py message_type message_contents"
+        print "\tmessage_type : Type of the message, must correpond to one of the supported schemas"
+        print "\tmessage_contents : comma separated pairs key=value that will be put in message"
+
+if __name__ == "__main__":
+    s = Sender()
+    s.parse_parameters()
