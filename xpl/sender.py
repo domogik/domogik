@@ -19,9 +19,9 @@
 
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
-# $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-07-23 21:42:29 +0200 (mer. 23 juil. 2008) $
-# $LastChangedRevision: 100 $
+# $LastChangedBy: maxence $
+# $LastChangedDate: 2009-01-31 13:42:51 +0100 (sam. 31 janv. 2009) $
+# $LastChangedRevision: 296 $
 
 # This is for sending xPL messages on an xPL network
 # The messages are serialized (put in some list) and
@@ -49,6 +49,7 @@ class Sender(threading.Thread):
         @param xplsource : Source to send message from, default 'domogik-ui.sender'
         @param list : list to take message from
         @param lock : 
+		"""
         #Create our xPL link
         #This may raise some exception in case of network problem
         self.__xpl = Manager(ip = xplhost, port = xplport, source = xplsource)
