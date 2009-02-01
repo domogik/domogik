@@ -20,64 +20,35 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-01 11:32:09 +0100 (dim. 01 févr. 2009) $
+# $LastChangedDate: 2009-02-01 11:32:09 +0100 (dim 01 fév 2009) $
 # $LastChangedRevision: 304 $
 
 from x10API import *
 from xPLAPI import *
-from datetime import datetime
 
-myx10 = X10API()
-myxpl = Manager(ip = "192.168.1.20",port = 5036)
-guirlande = ['A2','A3']
-lampe = ['A1']
-diff_nuit = 0 #Temps en minute avant le coucher du soleil
-diff_jour = 0 #Temps en minute avant le lever du soleil
-updated = False
+class x10Main():
 
-def dawndusk(message):
-    """
-    Appelé à la réception d'un message de type datetime.basic
-    """
-    datetime = message.get_key_value(status)
-    hour = datetime[8:10]
-    d = datetime.today()
-    da = "%.4i%.2i%.2i%.2i%.2i%.2i" % (d.year, d.month, d.day, d.hour, a.minute, a.second)
-    if hour < 12:
-        diff_jour = datetime - da
-    else:
-        diff_nuit = datetime - da
-    updated = True
+    def __init__(self):
+        '''
+        Create the X10Main class
+        This class is used to connect x10 (throw heyu) to the xPL Network
+        '''
+        self.__myx10 = X10API()
+        self.__myxpl = Manager(ip = "192.168.1.20", port  = 5036)
+        #Create listeners
+        Listener(x10_cmnd_cb, self.__myxpl, {'schema':'x10.basic','type':'xpl-cmnd'})
 
-def x10_cb(message):
-    cmd = message.get_key_value('command')
-    dev = message.get_key_value('device')
-    print "CMD : %s - DEV : %s" % (cmd, dev)
-    if cmd.lower() == 'on':
-        print myx10.on(dev)
-    if cmd.lower() == 'off':
-        print myx10.off(dev)
-
-def x10_cb_porte(message):
-    """
-    Fonction appelée lors de l'ouverture de la porte
-    """
-    #TODO Ajouter un test jour / nuit
-    #On demande la mise à jour des heures de lever et coucher du soleil
-
-    if True:
-        print "Ouverture détectée"
-        [myx10.on(device) for device in guirlande]
-        [myx10.on(device) for device in lampe]
-
-def askUpdate():
-    """
-    Envoi un message pour la mise à jour des dawn & dusk time
-    """
-    #TODO
-
-#Ajout du listener sur les commandes x10 classiques
-general = Listener(x10_cb, myxpl, {'schema':'x10.basic','type':'xpl-cmnd'})
-#Ajout du listener pour le capteur de la porte
-#porte = Listener(x10_cb_porte, myxpl, {'schema':'x10.security','type':'xpl-trig','command':'alert','device':'192'})
-porte = Listener(x10_cb_porte, myxpl, {'schema':'security.zone','type':'xpl-trig','zone':'x10secc0','state':'true'})
+    def x10_cmnd_cb(self):
+        '''
+        General callback for all command messages
+        '''
+        cmd = message.get_key_value('command')
+        dev = message.get_key_value('device')
+        print "CMD : %s - DEV : %s" % (cmd, dev)
+        if cmd.lower() == 'on':
+            print self.__myx10.on(dev)
+        if cmd.lower() == 'off':
+            print self.__myx10.off(dev)
+        
+if __name__ == "__main__":
+    x = x10Main()

@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-01 10:26:36 +0100 (dim. 01 févr. 2009) $
-# $LastChangedRevision: 301 $
+# $LastChangedDate: 2009-02-01 13:29:09 +0100 (dim. 01 févr. 2009) $
+# $LastChangedRevision: 308 $
 
 import sys 
 import sys, string, select, threading
@@ -79,8 +79,9 @@ class Manager:
         Stop threads and leave the Manager
         """
         self._h_timer.stop()
+        print "stop thread"
         self._stop_thread = True
-        exit(0)
+        #exit(0)
 
     def send(self, message):
         """

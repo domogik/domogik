@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-01 10:26:36 +0100 (dim. 01 févr. 2009) $
-# $LastChangedRevision: 301 $
+# $LastChangedDate: 2009-02-01 13:29:09 +0100 (dim. 01 févr. 2009) $
+# $LastChangedRevision: 308 $
 
 #This script use arguments from command line to forge & send a message
 from xPLAPI import *
@@ -41,7 +41,7 @@ class Sender:
         self.__myxpl.send(mess)
         print "leave"
         self.__myxpl.leave()
-        exit(0)
+        #exit(0)
 
     def parse_parameters(self):
         '''
@@ -85,4 +85,4 @@ class Sender:
 
 if __name__ == "__main__":
     s = Sender()
-    s.parse_parameters()
+    #s.parse_parameters()
