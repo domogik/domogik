@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-07-23 21:42:29 +0200 (mer. 23 juil. 2008) $
-# $LastChangedRevision: 100 $
+# $LastChangedDate: 2009-02-01 11:29:14 +0100 (dim. 01 févr. 2009) $
+# $LastChangedRevision: 303 $
 
 from x10API import *
 from xPLAPI import *
@@ -77,7 +77,7 @@ def askUpdate():
     #TODO
 
 #Ajout du listener sur les commandes x10 classiques
-general = Listener(x10_cb, myxpl, {'schema':'x10.basic','type':'xpl-trig'})
+general = Listener(x10_cb, myxpl, {'schema':'x10.basic','type':'xpl-cmnd'})
 #Ajout du listener pour le capteur de la porte
 #porte = Listener(x10_cb_porte, myxpl, {'schema':'x10.security','type':'xpl-trig','command':'alert','device':'192'})
 porte = Listener(x10_cb_porte, myxpl, {'schema':'security.zone','type':'xpl-trig','zone':'x10secc0','state':'true'})
