@@ -34,9 +34,9 @@ class x10Main():
         This class is used to connect x10 (throw heyu) to the xPL Network
         '''
         self.__myx10 = X10API()
-        self.__myxpl = Manager(ip = "192.168.1.20", port  = 5036)
+        self.__myxpl = Manager(ip = "192.168.1.24", port  = 5036)
         #Create listeners
-        Listener(x10_cmnd_cb, self.__myxpl, {'schema':'x10.basic','type':'xpl-cmnd'})
+        Listener(self.x10_cmnd_cb, self.__myxpl, {'schema':'x10.basic','type':'xpl-cmnd'})
 
     def x10_cmnd_cb(self):
         '''
