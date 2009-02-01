@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-01-31 16:58:48 +0100 (sam. 31 janv. 2009) $
-# $LastChangedRevision: 297 $
+# $LastChangedDate: 2009-02-01 10:26:36 +0100 (dim. 01 févr. 2009) $
+# $LastChangedRevision: 301 $
 
 import sys 
 import sys, string, select, threading

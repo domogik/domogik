@@ -18,9 +18,9 @@
 
 # Author: Marc Schneider <marc@mirelsol.org>
 
-# $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-23 13:42:51 +0100 (mar. 23 déc. 2008) $
-# $LastChangedRevision: 291 $
+# $LastChangedBy: maxence $
+# $LastChangedDate: 2009-02-01 10:26:36 +0100 (dim. 01 févr. 2009) $
+# $LastChangedRevision: 301 $
 
 # Django settings for domogik project.
 
@@ -40,7 +40,7 @@ MANAGERS = ADMINS
 DATABASE_ENGINE = 'mysql'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
 DATABASE_NAME = 'domogik'             # Or path to database file if using sqlite3.
 DATABASE_USER = 'domogik'             # Not used with sqlite3.
-DATABASE_PASSWORD = 'domo2008'         # Not used with sqlite3.
+DATABASE_PASSWORD = ''         # Not used with sqlite3.
 DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
 DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
 

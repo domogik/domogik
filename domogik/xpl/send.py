@@ -19,9 +19,9 @@
 
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
-# $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-01 10:21:50 +0100 (dim. 01 févr. 2009) $
-# $LastChangedRevision: 300 $
+# $LastChangedBy: maxence $
+# $LastChangedDate: 2009-02-01 10:26:36 +0100 (dim. 01 févr. 2009) $
+# $LastChangedRevision: 301 $
 
 #This script use arguments from command line to forge & send a message
 from xPLAPI import *
