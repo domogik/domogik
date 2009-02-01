@@ -19,9 +19,9 @@
 
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
-# $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-07-23 21:42:29 +0200 (mer. 23 juil. 2008) $
-# $LastChangedRevision: 100 $
+# $LastChangedBy: maxence $
+# $LastChangedDate: 2009-02-01 12:07:00 +0100 (dim. 01 févr. 2009) $
+# $LastChangedRevision: 306 $
 
 from subprocess import *
 class X10Exception:
@@ -83,7 +83,7 @@ class X10API:
         output = res.stderr.read()
         res.stderr.close()
         if output:
-            raise X10Exception, "Error during send of command"
+            raise X10Exception, "Error during send of command : %s " % output
  
     def on(self, item):
         """
