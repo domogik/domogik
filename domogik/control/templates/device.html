@@ -18,8 +18,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-13 19:06:59 +0100 (sam. 13 déc. 2008) $
-# $LastChangedRevision: 269 $
+# $LastChangedDate: 2009-02-01 14:01:10 +0100 (dim. 01 févr. 2009) $
+# $LastChangedRevision: 310 $
 -->
 {% extends "base.html" %}
 
@@ -35,16 +35,16 @@
 			</tr>
 			{% if adminMode %}
 				<tr>
-					<td class="label">Address</td><td class="value">{{ device.capacity.name }}</td>
+					<td class="label">Address</td><td class="value">{{ device.address }}</td>
 				</tr>
 				<tr>
 					<td class="label">Reference</td><td class="value">{{ device.reference }}</td>
 				</tr>
 				<tr>
-					<td class="label">Technology</td><td class="value">{{ device.technology.name }}</td>
+					<td class="label">Technology</td><td class="value">{{ device.technology }}</td>
 				</tr>
 				<tr>
-					<td class="label">Capacity</td><td class="value">{{ device.capacity.name }}</td>
+					<td class="label">Capacity</td><td class="value">{{ device.capacity }}</td>
 				</tr>
 			{% endif %}
 			<tr>
