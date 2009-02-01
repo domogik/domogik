@@ -19,9 +19,9 @@
 
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
-# $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-01 11:29:14 +0100 (dim. 01 févr. 2009) $
-# $LastChangedRevision: 303 $
+# $LastChangedBy: maxence $
+# $LastChangedDate: 2009-02-01 11:32:09 +0100 (dim. 01 févr. 2009) $
+# $LastChangedRevision: 304 $
 
 from x10API import *
 from xPLAPI import *
@@ -53,9 +53,9 @@ def x10_cb(message):
     cmd = message.get_key_value('command')
     dev = message.get_key_value('device')
     print "CMD : %s - DEV : %s" % (cmd, dev)
-    if cmd == 'on':
+    if cmd.lower() == 'on':
         print myx10.on(dev)
-    if cmd == 'off':
+    if cmd.lower() == 'off':
         print myx10.off(dev)
 
 def x10_cb_porte(message):
