@@ -38,7 +38,7 @@ class x10Main():
         #Create listeners
         Listener(self.x10_cmnd_cb, self.__myxpl, {'schema':'x10.basic','type':'xpl-cmnd'})
 
-    def x10_cmnd_cb(self):
+    def x10_cmnd_cb(self, message):
         '''
         General callback for all command messages
         '''
