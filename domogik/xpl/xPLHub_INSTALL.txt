@@ -58,6 +58,9 @@ script
 
 /usr/local/bin/xPL_Hub
 
+If you want to debug (have details about messages sent), run :
+/usr/local/bin/xPL_Hub -nodaemon -xpldebug
+
 That's it -- it'll bind to your primary network interface and run.
 
 
