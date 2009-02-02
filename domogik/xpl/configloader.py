@@ -19,9 +19,9 @@
 
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
-# $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-01 10:26:36 +0100 (dim 01 fév 2009) $
-# $LastChangedRevision: 301 $
+# $LastChangedBy: mschneider $
+# $LastChangedDate: 2009-02-02 23:03:03 +0100 (lun. 02 févr. 2009) $
+# $LastChangedRevision: 320 $
 
 
 #Path to the configuration directory 
