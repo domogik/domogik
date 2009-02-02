@@ -25,7 +25,7 @@
 
 from x10API import *
 from xPLAPI import *
-import configloader
+from configloader import Loader
 
 class x10Main():
 
