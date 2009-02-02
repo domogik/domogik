@@ -32,7 +32,7 @@ class x10Main():
     def __init__(self):
         '''
         Create the X10Main class
-        This class is used to connect x10 (throw heyu) to the xPL Network
+        This class is used to connect x10 (through heyu) to the xPL Network
         '''
         self.__myx10 = X10API()
         cfgloader = Loader('x10')
