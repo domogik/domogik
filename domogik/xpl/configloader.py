@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-02 23:03:03 +0100 (lun. 02 févr. 2009) $
-# $LastChangedRevision: 320 $
+# $LastChangedDate: 2009-02-02 23:07:23 +0100 (lun. 02 févr. 2009) $
+# $LastChangedRevision: 321 $
 
 
 #Path to the configuration directory 
@@ -51,8 +51,10 @@ class Loader():
             config_path += "/"
 
         #Check the main conf file
-        if not exists(config_path + self.main_conf_name):
+        file_with_full_path = config_path + self.main_conf_name
+        if not exists(file_with_full_path):
             print "The main config file can't be found !"
+            print "Make sure %s exists." %file_with_full_path
             exit(1)
 
         self.module_name = module_name
