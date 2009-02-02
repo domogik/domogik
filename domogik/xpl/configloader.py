@@ -86,6 +86,9 @@ class Loader():
                 if plugin_config.has_key(self.module_name):
                     return (main_result, plugin_config[self.module_name])
 
+        #If we're here, there is no plugin config
+        return (main_result, None)
+
 if __name__ == "__main__":
     l = Loader('x10')
     print l.load()

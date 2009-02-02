@@ -19,15 +19,19 @@
 
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
-# $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-07-23 21:42:29 +0200 (mer. 23 juil. 2008) $
-# $LastChangedRevision: 100 $
+# $LastChangedBy: maxence $
+# $LastChangedDate: 2009-02-02 16:51:53 +0100 (lun. 02 févr. 2009) $
+# $LastChangedRevision: 316 $
 
 from dawndusk import DawnDusk
 from xPLAPI import *
 import datetime
+import configloader
 
-myxpl = Manager(ip = "192.168.1.20",port = 5037, source="xpl-dawndusk.python")
+cfgloader = Loader('dawndusk')
+config = cfgloader.load()
+
+myxpl = Manager(config["address"],port = config["port"], source = config["source"])
 mydawndusk = DawnDusk()
 
 #Parameters definitions

@@ -20,12 +20,13 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-01 13:29:09 +0100 (dim. 01 févr. 2009) $
-# $LastChangedRevision: 308 $
+# $LastChangedDate: 2009-02-02 16:51:53 +0100 (lun. 02 févr. 2009) $
+# $LastChangedRevision: 316 $
 
 #This script use arguments from command line to forge & send a message
 from xPLAPI import *
 import optparse
+from configloader import Loader
 
 class Sender:
 
@@ -33,8 +34,11 @@ class Sender:
 
     def __init__(self):
         self.parse_parameters()
+        cfgloader = Loader('send')
+        config = cfgloader.load()
         print "Create Manager"
-        self.__myxpl = Manager(ip = "192.168.1.24", port  = 5037)
+        print config
+        self.__myxpl = Manager(config[1]["address"],port = int(config[1]["port"]), source = config[1]["source"])
         print "Forge message"
         mess = self.forge_message()
         print "send message"

@@ -25,6 +25,7 @@
 
 from x10API import *
 from xPLAPI import *
+import configloader
 
 class x10Main():
 
@@ -34,7 +35,9 @@ class x10Main():
         This class is used to connect x10 (throw heyu) to the xPL Network
         '''
         self.__myx10 = X10API()
-        self.__myxpl = Manager(ip = "192.168.1.24", port  = 5036)
+        cfgloader = Loader('x10')
+        config = cfgloader.load()
+        self.__myxpl = Manager(config["address"],port = config["port"], source = config["source"])
         #Create listeners
         Listener(self.x10_cmnd_cb, self.__myxpl, {'schema':'x10.basic','type':'xpl-cmnd'})
 

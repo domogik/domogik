@@ -19,16 +19,20 @@
 
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
-# $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-07-23 21:42:29 +0200 (mer. 23 juil. 2008) $
-# $LastChangedRevision: 100 $
+# $LastChangedBy: maxence $
+# $LastChangedDate: 2009-02-02 16:51:53 +0100 (lun. 02 févr. 2009) $
+# $LastChangedRevision: 316 $
 
 from xPLAPI import *
 from onewire import *
+import configloader
+
+cfgloader = Loader('onewire')
+config = cfgloader.load()
 
 myow = OneWire()
 myow.set_cache_use(False)
-myxpl = Manager(ip = "192.168.1.22",port = 5034)
+myxpl = Manager(config["address"],port = config["port"], source = config["source"])
 my_temp_message = Message()
 my_temp_message.set_type("xpl-trig")
 my_temp_message.set_schema("sensor.basic")

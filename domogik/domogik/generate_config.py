@@ -125,7 +125,7 @@ class generalConfig():
         '''
         informations = [ 
         ('hub_address','What is the IP address the xPL system must bind ?',r"^([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])$",None),
-        ('hub_port','What is the port the xPL system must bind ?',r"^[1-9][0-9]+$",None)
+        ('hub_port','What is the port the xPL system must bind ?',r"^[1-9][0-9]+$",[3865])
         ]
         file = "domogik.cfg"
         section = "domogik"
@@ -137,28 +137,47 @@ class genericPluginConfig():
     '''
     Generic list for plugins
     '''
-    informations = [
-    ('address','What is the IP address the plugin must use ?',r"^([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])$",None),
-    ('port','What is the port the plugin must bind ?',r"^[1-9][0-9]+", None),
-    ('hub_address','What is the IP address the plugin must connect to ?',r"^([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])$",None),
-    ('hub_port','What is the port the plugin must connect to ?',r"^[1-9][0-9]+", [3865])
-    ]
-    def __init__():
-        raise NotImplementedException
+    def __init__(self):
+        self.informations = [
+        ('address','What is the IP address the plugin must use ?',r"^([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])$",None),
+#    ('port','What is the port the plugin must bind ?',r"^[1-9][0-9]+", None),
+        ('hub_address','What is the IP address the plugin must connect to ?',r"^([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])$",None),
+        ('hub_port','What is the port the plugin must connect to ?',r"^[1-9][0-9]+", [3865])
+        ]
+    
+    def askandwrite(self, file, section):
+        config = ConfigManager(self.informations,section)
+        result = config.ask()
+        config.write(file, result, section)
 
 class x10Config(genericPluginConfig):
     '''
     Ask the user for specific config for X10 xPL module
     '''
     def __init__(self):
-        self.informations.extend([('heyu_cfg_file','What is the full path to Heyu config file ?', None, ['/etc/heyu/x10.cfg','/usr/local/etc/heyu/x10.cfg'])
+        genericPluginConfig.__init__(self)
+        self.informations.extend([
+        ('port','What is the port the plugin must bind ?',r"^[1-9][0-9]+", [5000]),
+        ('source','What is the xPL plugin name ?', None,['xpl-x10.domogik']),
+        ('heyu_cfg_file','What is the full path to Heyu config file ?', None, ['/etc/heyu/x10.cfg','/usr/local/etc/heyu/x10.cfg'])
         ])
         file = "conf.d/x10.cfg"
         section = "x10"
-        config = ConfigManager(self.informations,section)
-        result = config.ask()
-        config.write(file, result, section)
+        self.askandwrite(file, section)
 
+class senderConfig(genericPluginConfig):
+    '''
+    Ask the user for specific config for the xPL sender
+    '''
+    def __init__(self):
+        genericPluginConfig.__init__(self)
+        self.informations.extend([
+        ('port','What is the port the plugin must bind ?',r"^[1-9][0-9]+", [5001]),
+        ('source','What is the xPL plugin name ?', None,['xpl-send.domogik']),
+        ])
+        file = "conf.d/send.cfg"
+        section = "send"
+        self.askandwrite(file, section)
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
@@ -166,14 +185,19 @@ if __name__ == "__main__":
     else:
         print "usage : generate_config.py config"
         print " - config : name of the section to reconfigure"
-        print "            Can be one of : all, plugins, x10, 1wire"
+        print "            Can be one of : all, plugins, x10, 1wire, send"
         exit(1)
 
     if choice == 'all':
         generalConfig()
         x10Config()
+        senderConfig()
     elif choice == 'plugins':
         x10Config() 
+        senderConfig()
     elif choice == 'x10':
-        x10Config() 
+        x10Config()
+    elif choice == 'send':
+        senderConfig()
+
 
