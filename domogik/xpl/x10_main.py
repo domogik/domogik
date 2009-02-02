@@ -49,6 +49,6 @@ class x10Main():
             print self.__myx10.on(dev)
         if cmd.lower() == 'off':
             print self.__myx10.off(dev)
-        
+
 if __name__ == "__main__":
     x = x10Main()
