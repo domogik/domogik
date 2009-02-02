@@ -19,9 +19,9 @@
 
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
-# $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-02 16:51:53 +0100 (lun. 02 févr. 2009) $
-# $LastChangedRevision: 316 $
+# $LastChangedBy: mschneider $
+# $LastChangedDate: 2009-02-02 23:10:32 +0100 (lun. 02 févr. 2009) $
+# $LastChangedRevision: 322 $
 
 #This script use arguments from command line to forge & send a message
 from xPLAPI import *
@@ -86,6 +86,7 @@ class Sender:
         print "usage : send.py message_type message_contents"
         print "\tmessage_type : Type of the message, must correpond to one of the supported schemas"
         print "\tmessage_contents : comma separated pairs key=value that will be put in message"
+        print "\tExample (x10) : ./send.py x10.basic \"device=a1,command=on\""
 
 if __name__ == "__main__":
     s = Sender()
