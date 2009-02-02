@@ -1,6 +1,6 @@
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-01-18 12:34:24 +0100 (dim. 18 janv. 2009) $
-# $LastChangedRevision: 295 $
+# $LastChangedDate: 2009-02-02 22:52:52 +0100 (lun. 02 févr. 2009) $
+# $LastChangedRevision: 317 $
 
 * General
 	* @Loiz : set up internationalization for messages (see also how to translate data
@@ -12,7 +12,8 @@
 		Only two files to edit : base.html and style.css !
 
 	* Control
-		* @Maxence : integrate code to send commands over the xPL network (in views.py)
+		* @Marc : integrate code to send commands over the xPL network (in views.py)
+		* @Marc : add command to erase x10 device
 		* @Marc : Display history of readings (essentially for sensors)
 			Seems to be a good idea to use the powerful rrdtools : http://oss.oetiker.ch/rrdtool/gallery/index.en.html
 		* @? : Add a function to schedule a task (eg. switch on/off the heating at a given time)
