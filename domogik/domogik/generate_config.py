@@ -192,6 +192,8 @@ if __name__ == "__main__":
         generalConfig()
         x10Config()
         senderConfig()
+    elif choice == 'main':
+        generalConfig()
     elif choice == 'plugins':
         x10Config() 
         senderConfig()
