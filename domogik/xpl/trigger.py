@@ -97,7 +97,10 @@ class stateCond(Condition):
         self.value = value
         
     def run(self, statedic):
-        return eval("%s %s %s" % (statedic[self.technology][self.item_name], self.operator, self.value))     
+        if (isinstance(self.value, int):
+            return eval("%s %s %s" % (int(statedic[self.technology][self.item_name]), self.operator, self.value))
+        else
+            return eval("'%s' %s '%s'" % (statedic[self.technology][self.item_name], self.operator, self.value))
     
     def parse(self, listelem):
         if not listelem.has_key(self.technology):
@@ -110,11 +113,12 @@ class stateCond(Condition):
 ####
 class ListenerBuilder():
     
-    def __init__(self, listitems):
+    def __init__(self, listitems, expr):
         self.listitems = listitems
         loader = Loader('trigger')
         config = loader.load()[1]
         self.__myxpl = Manager(config["address"],port = config["port"], source = config["source"])
+        self.__expr = expr
 
         #We should try/catch this bloc in case of undefined method
         #Anyway, if they're not defined, needed value will never be updated,
@@ -129,6 +133,9 @@ class ListenerBuilder():
             for j in self.listitems[k]:
                 if self.listitems[k][j] == None:
                     all = False
+        if all:
+            r = eval(self.__expr+".run(self.listitems)")
+            print "Result evaluated to : " + str(r)
 
     def updateList(self, k1, k2, v):
         self.listitems[k1][k2] = v
@@ -142,7 +149,7 @@ if __name__ == "__main__":
     #Petits tests
     state1 = "stateCond('x10','a1','==','on')"
     state2 = "stateCond('1wire','X23329500234','<','20')"
-    state3 = "stateCond('x10','c3','>','50')"
+    state3 = "stateCond('x10','c3','==','off')"
     time1 = "timeCond(2008,'*',[25-30],2,00,10)"
     expr1 = "AND(%s, OR(%s, %s))" % (state1, time1, state2)
 
@@ -157,5 +164,5 @@ if __name__ == "__main__":
     liste = {}
     parsing =  eval(expr2+".parse(liste)")
     print parsing
-    l = ListenerBuilder(parsing)
+    l = ListenerBuilder(parsing, expr2)
 
