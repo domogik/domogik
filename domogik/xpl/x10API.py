@@ -19,9 +19,9 @@
 
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
-# $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-03 21:22:59 +0100 (mar. 03 févr. 2009) $
-# $LastChangedRevision: 327 $
+# $LastChangedBy: mschneider $
+# $LastChangedDate: 2009-02-03 23:13:33 +0100 (mar. 03 févr. 2009) $
+# $LastChangedRevision: 328 $
 
 from subprocess import *
 class X10Exception:
@@ -45,7 +45,9 @@ class X10API:
         output = res.stderr.read()
         res.stderr.close()
         if output:
-            raise X10Exception, "Error during Heyu init"
+            print "Output was : %s" % output
+            print "Heyu conf : %s" % heyuconf
+            raise X10Exception, "Error during Heyu init" 
         self._housecodes = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P']
         self._unitcodes = [ i+1 for i in range(16) ]
         self._heyuconf = heyuconf
