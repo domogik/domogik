@@ -19,9 +19,9 @@
 
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
-# $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-02 23:03:03 +0100 (lun. 02 févr. 2009) $
-# $LastChangedRevision: 320 $
+# $LastChangedBy: maxence $
+# $LastChangedDate: 2009-02-03 16:58:56 +0100 (mar. 03 févr. 2009) $
+# $LastChangedRevision: 326 $
 
 from x10API import *
 from xPLAPI import *

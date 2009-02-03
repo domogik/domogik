@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-01 13:29:09 +0100 (dim. 01 févr. 2009) $
-# $LastChangedRevision: 308 $
+# $LastChangedDate: 2009-02-03 16:58:56 +0100 (mar. 03 févr. 2009) $
+# $LastChangedRevision: 326 $
 
 import sys 
 import sys, string, select, threading
@@ -50,7 +50,7 @@ class Manager:
         # Define maximum xPL message size
         self._buff = 1500
         # Define xPL base port
-        self._port = port
+        self._port = int(port)
         self._ip = ip
         self._source = source
         self._listeners = []
@@ -110,8 +110,7 @@ class Manager:
         Send heartbeat message in broadcast on the network, on the bus port (3865)
         This make the application able to be discovered by the hub
         """
-	# TODO remove hard coded IP value : guess it ?
-        msg = "xpl-stat\n{\nhop=1\nsource=" + self._source + "\ntarget=*\n}\nhbeat.app\n{\ninterval=5\nport=" + str(self._port) + "\nremote-ip=192.168.1.20\n}\n"
+        msg = "xpl-stat\n{\nhop=1\nsource=" + self._source + "\ntarget=*\n}\nhbeat.app\n{\ninterval=5\nport=" + str(self._port) + "\nremote-ip="+self._ip+"\n}\n"
         self.send(msg)
 
     def _run_thread_monitor(self):
@@ -160,6 +159,12 @@ class Listener:
         self._filter = filter
         manager.add_listener(self)
 
+    def getFilter(self):
+        return self._filter
+
+    def getCb(self):
+        return self._callback
+
     def new_message(self, message):
         """
         This is the function which is called by the manager when a message arrives
@@ -186,7 +191,6 @@ class Listener:
             if not message.has_key(key) and not message.has_conf_key(key) and key != "type" and key != "schema":
                 ok = False
         #The message match the filter, we can call  the callback function
-        print ok
         if ok:
             self._callback(message)
 
@@ -412,7 +416,7 @@ class xPLTimer:
 
 
 if __name__ == "__main__":
-    m = Manager(ip = "192.168.1.20", port = 5123)
+    m = Manager(ip = "192.168.1.24", port = 5123)
     l = Listener(cb = boo, manager = m)
     l.add_filter("source","cdp1802-dblogger.000001161j8ris")
     l.del_filter("source")
