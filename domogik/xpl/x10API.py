@@ -19,9 +19,9 @@
 
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
-# $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-03 23:17:30 +0100 (mar. 03 févr. 2009) $
-# $LastChangedRevision: 329 $
+# $LastChangedBy: mschneider $
+# $LastChangedDate: 2009-02-03 23:21:52 +0100 (mar. 03 févr. 2009) $
+# $LastChangedRevision: 330 $
 
 from subprocess import *
 class X10Exception:
@@ -41,7 +41,7 @@ class X10API:
     and heyu binaries must be in your PATH
     """
     def __init__(self, heyuconf):
-        res = Popen("heyu -c " + heyuconf, shell=True, stderr=PIPE)
+        res = Popen("heyu -c " + heyuconf + " start", shell=True, stderr=PIPE)
         output = res.stderr.read()
         res.stderr.close()
         if output:
