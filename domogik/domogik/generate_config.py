@@ -19,9 +19,9 @@
 
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
-# $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-01 10:26:36 +0100 (dim 01 fév 2009) $
-# $LastChangedRevision: 301 $
+# $LastChangedBy: mschneider $
+# $LastChangedDate: 2009-02-03 16:38:09 +0100 (mar. 03 févr. 2009) $
+# $LastChangedRevision: 325 $
 
 import re
 import sys
@@ -36,7 +36,7 @@ class ConfigManager():
         Constructor 
         @param settings List of tuples defining parameters to ask user for : {'name','question','check_regex',['proposed_val1','proposed_val2']}
         check_regex can be None
-        Proposed value list can be None. If it isn't, the first value is took as default choice
+        Proposed value list can be None. If it isn't, the first value is taken as default choice
         '''
         self._settings = settings
         self._session = session
@@ -102,7 +102,7 @@ class ConfigManager():
 
     def write(self, filename, datas, section=None ):
         '''
-        Write datas in a filename. May define a section
+        Write data in a filename. May define a section
         '''
         config = ConfigObj(filename)
         if section:
