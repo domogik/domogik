@@ -20,13 +20,13 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-02 23:07:23 +0100 (lun. 02 févr. 2009) $
-# $LastChangedRevision: 321 $
+# $LastChangedDate: 2009-02-03 23:30:27 +0100 (mar. 03 févr. 2009) $
+# $LastChangedRevision: 331 $
 
 
 #Path to the configuration directory 
 global config_path
-config_path = "/home/maxence/dev/domogik/domogik/domogik/domogik/"
+config_path = "../domogik"
 
 ####################################################
 #       DON'T CHANGE ANYTHING AFTER THIS LINE      #
@@ -51,10 +51,10 @@ class Loader():
             config_path += "/"
 
         #Check the main conf file
-        file_with_full_path = config_path + self.main_conf_name
-        if not exists(file_with_full_path):
+        file_with_path = config_path + self.main_conf_name
+        if not exists(file_with_path):
             print "The main config file can't be found !"
-            print "Make sure %s exists." %file_with_full_path
+            print "Make sure %s exists." %file_with_path
             exit(1)
 
         self.module_name = module_name
