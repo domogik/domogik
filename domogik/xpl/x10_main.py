@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-03 16:58:56 +0100 (mar. 03 févr. 2009) $
-# $LastChangedRevision: 326 $
+# $LastChangedDate: 2009-02-03 21:22:59 +0100 (mar. 03 févr. 2009) $
+# $LastChangedRevision: 327 $
 
 from x10API import *
 from xPLAPI import *
@@ -34,9 +34,9 @@ class x10Main():
         Create the X10Main class
         This class is used to connect x10 (through heyu) to the xPL Network
         '''
-        self.__myx10 = X10API()
         cfgloader = Loader('x10')
-        config = cfgloader.load()
+        config = cfgloader.load()[1]
+        self.__myx10 = X10API(config["heyu_cfg_file"])
         self.__myxpl = Manager(config["address"],port = config["port"], source = config["source"])
         #Create listeners
         Listener(self.x10_cmnd_cb, self.__myxpl, {'schema':'x10.basic','type':'xpl-cmnd'})

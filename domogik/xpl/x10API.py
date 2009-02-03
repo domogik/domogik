@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-01 12:07:00 +0100 (dim. 01 févr. 2009) $
-# $LastChangedRevision: 306 $
+# $LastChangedDate: 2009-02-03 21:22:59 +0100 (mar. 03 févr. 2009) $
+# $LastChangedRevision: 327 $
 
 from subprocess import *
 class X10Exception:
@@ -40,14 +40,15 @@ class X10API:
     It's based on heyu software, you need to have it installed
     and heyu binaries must be in your PATH
     """
-    def __init__(self):
-        res = Popen("heyu -c /etc/heyu/x10.conf start", shell=True, stderr=PIPE)
+    def __init__(self, heyuconf):
+        res = Popen("heyu -c %s " % heyuconf, shell=True, stderr=PIPE)
         output = res.stderr.read()
         res.stderr.close()
         if output:
             raise X10Exception, "Error during Heyu init"
         self._housecodes = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P']
         self._unitcodes = [ i+1 for i in range(16) ]
+        self._heyuconf = heyuconf
 
     def _valid_item(self, item):
         """
@@ -77,7 +78,7 @@ class X10API:
         @param cmd : Command to send ('ON','OFF', etc)
         @param item : Item to send order to (Can be HU or H form)
         """
-        heyucmd = "heyu -c /etc/heyu/x10.conf %s %s" % (cmd, item)
+        heyucmd = "heyu -c %s %s %s" % (self._heyuconf, cmd, item)
         print heyucmd
         res = Popen(heyucmd, shell=True, stderr=PIPE)
         output = res.stderr.read()
