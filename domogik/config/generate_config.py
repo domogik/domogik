@@ -19,9 +19,9 @@
 
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
-# $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-03 16:38:09 +0100 (mar. 03 févr. 2009) $
-# $LastChangedRevision: 325 $
+# $LastChangedBy: maxence $
+# $LastChangedDate: 2009-02-04 11:55:52 +0100 (mer. 04 févr. 2009) $
+# $LastChangedRevision: 334 $
 
 import re
 import sys
@@ -141,8 +141,9 @@ class genericPluginConfig():
         self.informations = [
         ('address','What is the IP address the plugin must use ?',r"^([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])$",None),
 #    ('port','What is the port the plugin must bind ?',r"^[1-9][0-9]+", None),
-        ('hub_address','What is the IP address the plugin must connect to ?',r"^([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])$",None),
-        ('hub_port','What is the port the plugin must connect to ?',r"^[1-9][0-9]+", [3865])
+# No need of thyat atm, we'll use the main config parameters
+#        ('hub_address','What is the IP address the plugin must connect to ?',r"^([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])$",None),
+#        ('hub_port','What is the port the plugin must connect to ?',r"^[1-9][0-9]+", [3865])
         ]
     
     def askandwrite(self, file, section):
@@ -179,27 +180,62 @@ class senderConfig(genericPluginConfig):
         section = "send"
         self.askandwrite(file, section)
 
+class triggerConfig(genericPluginConfig):
+    '''
+    Ask the user for specific config for the xPL sender
+    '''
+    def __init__(self):
+        genericPluginConfig.__init__(self)
+        self.informations.extend([
+        ('port','What is the port the plugin must bind ?',r"^[1-9][0-9]+", [5002]),
+        ('source','What is the xPL plugin name ?', None,['xpl-trigger.domogik']),
+        ])
+        file = "conf.d/trigger.cfg"
+        section = "trigger"
+        self.askandwrite(file, section)
+
+class datetimeConfig(genericPluginConfig):
+    '''
+    Ask the user for specific config for the xPL datetime module
+    '''
+    def __init__(self):
+        genericPluginConfig.__init__(self)
+        self.informations.extend([
+        ('port','What is the port the plugin must bind ?',r"^[1-9][0-9]+", [5003]),
+        ('source','What is the xPL plugin name ?', None,['xpl-send.domogik']),
+        ])
+        file = "conf.d/datetime.cfg"
+        section = "datetime"
+        self.askandwrite(file, section)
+
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         choice = sys.argv[1]
     else:
         print "usage : generate_config.py config"
         print " - config : name of the section to reconfigure"
-        print "            Can be one of : all, plugins, x10, 1wire, send"
+        print "            Can be one of : all, plugins, x10, 1wire, send, trigger, datetime"
         exit(1)
 
     if choice == 'all':
         generalConfig()
         x10Config()
         senderConfig()
+        triggerConfig()
+        datetimeConfig()
     elif choice == 'main':
         generalConfig()
     elif choice == 'plugins':
         x10Config() 
         senderConfig()
+        triggerConfig()
+        datetimeConfig()
     elif choice == 'x10':
         x10Config()
     elif choice == 'send':
         senderConfig()
-
+    elif choice == 'trigger':
+        triggerConfig()
+    elif choice == 'datetime':
+        datetimeConfig()
 
