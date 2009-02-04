@@ -19,9 +19,9 @@
 
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
-# $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-02 23:07:23 +0100 (lun 02 fév 2009) $
-# $LastChangedRevision: 321 $
+# $LastChangedBy:$
+# $LastChangedDate:$
+# $LastChangedRevision:$
 
 from xPLAPI import *
 from configloader import Loader
@@ -78,12 +78,60 @@ class timeCond(Condition):
         self.month = month
         #...
         self.minute = minute
-        
+
+    def _check_time(self, timeunit, value):
+        '''
+            Check the timeunit value
+            @param timeunit Can be one of 'year','month','day','daynumber','jour','minute'
+        '''
+        if timeunit not in ['year','month','day','daynumber','jour','minute']:
+            raise ValueError
+
+        this_unit = eval("self."+timeunit)
+        return eval("self._check_time_" + timeunit.__class__+"(%s, %s)" % (timeunit, this_unit))
+
+    ### Functions to check 'time equality' for each used type
+
+    #Int 
+    def _check_time_int(self, unit, value):
+        return unit == value
+
+    #tuple : represent an interval
+    def _check_time_tuple(self, unit, value):
+        return value in range(unit[0], unit[1] + 1)
+
+    #list
+    def _check_time_list(self, unit, value):
+        '''
+        unit can be : a list of int => check if value is in the list
+        a list of tuple => expand each tuple to a list
+        '''
+        if isinstance(unit[0], tuple):
+            return any([ _check_time_tuple(u, value) for u in unit ])
+        else
+            return value in unit
+
+    #string
+    def _check_time_str(self, unit, value):
+        '''
+        unit can be '*' or '*/x'
+        '*' => always true
+        '*/x' => value % x == 0
+        '''
+        if unit == '*':
+            return True
+        elif unit.startswith('*/'):
+            return (value % int(unit.split('/')[1])) == 0
+        else:
+            raise ValueError
+
+    ### And of functions for evaluation
+
     def run(self, statedic):
-        pass
-        #long à coder :p
-        #TODO : chaque variable peut etre un entier, un interval (liste), une liste d'intervales ou la chaine '*'
-    
+        #chaque variable peut etre un entier, un interval (tuple), une liste d'intervales ou la chaine '*' ou '*/x'
+        return all([ self._check_time(t, statedic['time'][t]) for t in  ['year','month','day','daynumber','jour','minute'])
+
+
     def parse(self, listelem):
         res = {'year':None, 'month':None, 'day':None, 'daynumber':None, 'hour':None, 'minute':None}
         listelem['time'] = res
@@ -95,13 +143,13 @@ class stateCond(Condition):
         self.item_name = item_name
         self.operator = operator
         self.value = value
-        
+
     def run(self, statedic):
         if (isinstance(self.value, int):
             return eval("%s %s %s" % (int(statedic[self.technology][self.item_name]), self.operator, self.value))
         else
             return eval("'%s' %s '%s'" % (statedic[self.technology][self.item_name], self.operator, self.value))
-    
+
     def parse(self, listelem):
         if not listelem.has_key(self.technology):
             listelem[self.technology] = {}
@@ -150,7 +198,7 @@ if __name__ == "__main__":
     state1 = "stateCond('x10','a1','==','on')"
     state2 = "stateCond('1wire','X23329500234','<','20')"
     state3 = "stateCond('x10','c3','==','off')"
-    time1 = "timeCond(2008,'*',[25-30],2,00,10)"
+    time1 = "timeCond(2008,'*',(25,30),2,00,10)"
     expr1 = "AND(%s, OR(%s, %s))" % (state1, time1, state2)
 
     liste = {}
@@ -159,7 +207,7 @@ if __name__ == "__main__":
     print eval(expr1+".parse(liste)")
 
     print "**************** Test des listeners *******************"
-    expr2 = "AND(%s, %s)" % (state1, state3)
+    expr2 = "AND(%s, %s)" % (state1, time1)
     print "Parsing de l'expression : %s" % expr2
     liste = {}
     parsing =  eval(expr2+".parse(liste)")
