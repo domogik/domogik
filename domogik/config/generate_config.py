@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-04 11:55:52 +0100 (mer. 04 févr. 2009) $
-# $LastChangedRevision: 334 $
+# $LastChangedDate: 2009-02-04 11:57:23 +0100 (mer. 04 févr. 2009) $
+# $LastChangedRevision: 335 $
 
 import re
 import sys
@@ -202,7 +202,7 @@ class datetimeConfig(genericPluginConfig):
         genericPluginConfig.__init__(self)
         self.informations.extend([
         ('port','What is the port the plugin must bind ?',r"^[1-9][0-9]+", [5003]),
-        ('source','What is the xPL plugin name ?', None,['xpl-send.domogik']),
+        ('source','What is the xPL plugin name ?', None,['xpl-datetime.domogik']),
         ])
         file = "conf.d/datetime.cfg"
         section = "datetime"
