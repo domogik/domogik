@@ -1,0 +1,85 @@
+\hypertarget{classgenerate__config_1_1ConfigManager}{
+\section{generate\_\-config::ConfigManager Class Reference}
+\label{classgenerate__config_1_1ConfigManager}\index{generate\_\-config::ConfigManager@{generate\_\-config::ConfigManager}}
+}
+\subsection*{Public Member Functions}
+\begin{CompactItemize}
+\item 
+def \hyperlink{classgenerate__config_1_1ConfigManager_9d306a6d2e086a1dd9175423ad415798}{\_\-\_\-init\_\-\_\-}
+\item 
+def \hyperlink{classgenerate__config_1_1ConfigManager_277e7238684d6750957bf2981e0eec14}{ask}
+\item 
+def \hyperlink{classgenerate__config_1_1ConfigManager_50916dd9f4420c45c85048c3448dfd9e}{write}
+\end{CompactItemize}
+\subsection*{Private Attributes}
+\begin{CompactItemize}
+\item 
+\hypertarget{classgenerate__config_1_1ConfigManager_c7cc7bdff5ea3be7296ab6400ad0f61f}{
+\textbf{\_\-settings}}
+\label{classgenerate__config_1_1ConfigManager_c7cc7bdff5ea3be7296ab6400ad0f61f}
+
+\item 
+\hypertarget{classgenerate__config_1_1ConfigManager_4df37a3c3f5e0d781cf0344774e1eff0}{
+\textbf{\_\-session}}
+\label{classgenerate__config_1_1ConfigManager_4df37a3c3f5e0d781cf0344774e1eff0}
+
+\end{CompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+\footnotesize\begin{verbatim}
+General config manager which can ask user about config settings, check results and write config file
+\end{verbatim}
+\normalsize
+ 
+
+\subsection{Member Function Documentation}
+\hypertarget{classgenerate__config_1_1ConfigManager_9d306a6d2e086a1dd9175423ad415798}{
+\index{generate\_\-config::ConfigManager@{generate\_\-config::ConfigManager}!\_\-\_\-init\_\-\_\-@{\_\-\_\-init\_\-\_\-}}
+\index{\_\-\_\-init\_\-\_\-@{\_\-\_\-init\_\-\_\-}!generate_config::ConfigManager@{generate\_\-config::ConfigManager}}
+\subsubsection[\_\-\_\-init\_\-\_\-]{\setlength{\rightskip}{0pt plus 5cm}def generate\_\-config::ConfigManager::\_\-\_\-init\_\-\_\- ( {\em self}, \/   {\em settings} = {\tt \mbox{[}\mbox{]}}, \/   {\em session} = {\tt None})}}
+\label{classgenerate__config_1_1ConfigManager_9d306a6d2e086a1dd9175423ad415798}
+
+
+
+
+\footnotesize\begin{verbatim}
+Constructor 
+@param settings List of tuples defining parameters to ask user for : {'name','question','check_regex',['proposed_val1','proposed_val2']}
+check_regex can be None
+Proposed value list can be None. If it isn't, the first value is taken as default choice
+\end{verbatim}
+\normalsize
+ \hypertarget{classgenerate__config_1_1ConfigManager_277e7238684d6750957bf2981e0eec14}{
+\index{generate\_\-config::ConfigManager@{generate\_\-config::ConfigManager}!ask@{ask}}
+\index{ask@{ask}!generate_config::ConfigManager@{generate\_\-config::ConfigManager}}
+\subsubsection[ask]{\setlength{\rightskip}{0pt plus 5cm}def generate\_\-config::ConfigManager::ask ( {\em self})}}
+\label{classgenerate__config_1_1ConfigManager_277e7238684d6750957bf2981e0eec14}
+
+
+
+
+\footnotesize\begin{verbatim}
+Ask the user for each entry of self._settings
+\end{verbatim}
+\normalsize
+ \hypertarget{classgenerate__config_1_1ConfigManager_50916dd9f4420c45c85048c3448dfd9e}{
+\index{generate\_\-config::ConfigManager@{generate\_\-config::ConfigManager}!write@{write}}
+\index{write@{write}!generate_config::ConfigManager@{generate\_\-config::ConfigManager}}
+\subsubsection[write]{\setlength{\rightskip}{0pt plus 5cm}def generate\_\-config::ConfigManager::write ( {\em self}, \/   {\em filename}, \/   {\em datas}, \/   {\em section} = {\tt None})}}
+\label{classgenerate__config_1_1ConfigManager_50916dd9f4420c45c85048c3448dfd9e}
+
+
+
+
+\footnotesize\begin{verbatim}
+Write data in a filename. May define a section
+\end{verbatim}
+\normalsize
+ 
+
+The documentation for this class was generated from the following file:\begin{CompactItemize}
+\item 
+config/generate\_\-config.py\end{CompactItemize}
