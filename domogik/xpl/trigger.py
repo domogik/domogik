@@ -76,29 +76,36 @@ class timeCond(Condition):
     def __init__(self,year, month, day, daynumber, hour, minute):
         self.year = year
         self.month = month
-        #...
+        self.day = day
+        self.hour = hour
         self.minute = minute
+        self.daynumber = daynumber
 
     def _check_time(self, timeunit, value):
         '''
             Check the timeunit value
-            @param timeunit Can be one of 'year','month','day','daynumber','jour','minute'
+            @param timeunit Can be one of 'year','month','day','daynumber','hour','minute'
         '''
-        if timeunit not in ['year','month','day','daynumber','jour','minute']:
+        if timeunit not in ['year','month','day','daynumber','hour','minute']:
             raise ValueError
 
         this_unit = eval("self."+timeunit)
-        return eval("self._check_time_" + timeunit.__class__+"(%s, %s)" % (timeunit, this_unit))
+        clas = str(this_unit.__class__).split("'")[1]
+        value = clas+"('%s')" %value if clas == "int" or clas == "str" else value
+        this_unit = clas+"('%s')"% this_unit if clas == "int" or clas == "str" else this_unit
+        call = ("self._check_time_" + clas +"(%s,%s)"% (this_unit, value))
+        print call
+        return eval(call)
 
     ### Functions to check 'time equality' for each used type
 
     #Int 
     def _check_time_int(self, unit, value):
-        return unit == value
+        return unit == int(value)
 
     #tuple : represent an interval
     def _check_time_tuple(self, unit, value):
-        return value in range(unit[0], unit[1] + 1)
+        return int(value) in range(unit[0], unit[1] + 1)
 
     #list
     def _check_time_list(self, unit, value):
@@ -108,7 +115,7 @@ class timeCond(Condition):
         '''
         if isinstance(unit[0], tuple):
             return any([ _check_time_tuple(u, value) for u in unit ])
-        else
+        else:
             return value in unit
 
     #string
@@ -121,15 +128,16 @@ class timeCond(Condition):
         if unit == '*':
             return True
         elif unit.startswith('*/'):
-            return (value % int(unit.split('/')[1])) == 0
+            return (int(value) % int(unit.split('/')[1])) == 0
         else:
+            print "Unit : " + unit
             raise ValueError
 
     ### And of functions for evaluation
 
     def run(self, statedic):
         #chaque variable peut etre un entier, un interval (tuple), une liste d'intervales ou la chaine '*' ou '*/x'
-        return all([ self._check_time(t, statedic['time'][t]) for t in  ['year','month','day','daynumber','jour','minute'])
+        return all([ self._check_time(t, statedic['time'][t]) for t in  ['year','month','day','daynumber','hour','minute']])
 
 
     def parse(self, listelem):
@@ -145,9 +153,9 @@ class stateCond(Condition):
         self.value = value
 
     def run(self, statedic):
-        if (isinstance(self.value, int):
+        if isinstance(self.value, int):
             return eval("%s %s %s" % (int(statedic[self.technology][self.item_name]), self.operator, self.value))
-        else
+        else:
             return eval("'%s' %s '%s'" % (statedic[self.technology][self.item_name], self.operator, self.value))
 
     def parse(self, listelem):
@@ -180,10 +188,13 @@ class ListenerBuilder():
         for k in self.listitems:
             for j in self.listitems[k]:
                 if self.listitems[k][j] == None:
+                    print "WARN : %s %s is None" % (k,j)
                     all = False
         if all:
             r = eval(self.__expr+".run(self.listitems)")
             print "Result evaluated to : " + str(r)
+        else:
+            print self.listitems
 
     def updateList(self, k1, k2, v):
         self.listitems[k1][k2] = v
@@ -193,12 +204,21 @@ class ListenerBuilder():
         for i in items:
             Listener(lambda mess: self.updateList('x10',mess.get_key_value('device'), mess.get_key_value('command')) , self.__myxpl, {'schema':'x10.basic','device':i,'type':'xpl-cmnd'})
 
+    def buildtimelistener(self, items):
+        Listener(self._parsetimeupdate , self.__myxpl, {'schema':'datetime.basic','type':'xpl-trig'})
+
+    def _parsetimeupdate(self, mess):
+        dt = mess.get_key_value('format1')
+        pars = {'year':dt[0:4],'month':dt[4:6],'day':dt[6:8],'daynumber':dt[11],'hour':dt[8:10],'minute':dt[10:12]}
+        for p in pars:
+            self.updateList('time', p, pars[p])
+
 if __name__ == "__main__":
     #Petits tests
     state1 = "stateCond('x10','a1','==','on')"
     state2 = "stateCond('1wire','X23329500234','<','20')"
     state3 = "stateCond('x10','c3','==','off')"
-    time1 = "timeCond(2008,'*',(25,30),2,00,10)"
+    time1 = "timeCond(2009, 02,(2,15),'*',9,'*/3')"
     expr1 = "AND(%s, OR(%s, %s))" % (state1, time1, state2)
 
     liste = {}
