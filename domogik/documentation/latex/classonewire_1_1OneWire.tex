@@ -2,23 +2,38 @@
 \section{onewire::OneWire Class Reference}
 \label{classonewire_1_1OneWire}\index{onewire::OneWire@{onewire::OneWire}}
 }
+Manage \hyperlink{classonewire_1_1OneWire}{OneWire}.  
+
+
 \subsection*{Public Member Functions}
 \begin{CompactItemize}
 \item 
 def \hyperlink{classonewire_1_1OneWire_effc317af881a97edf6d7dd77c63b88c}{\_\-\_\-init\_\-\_\-}
-\item 
+\begin{CompactList}\small\item\em Create \hyperlink{classonewire_1_1OneWire}{OneWire} instance, allowing to use \hyperlink{classonewire_1_1OneWire}{OneWire} Network. \item\end{CompactList}\item 
 def \hyperlink{classonewire_1_1OneWire_41228b6b8c1562f02d0b40c8e40d96b4}{set\_\-cache\_\-use}
-\item 
-def \hyperlink{classonewire_1_1OneWire_8c52e866328b82976eb9f799f891f487}{exec\_\-type}
-\item 
-def \hyperlink{classonewire_1_1OneWire_db399d215bf72b5084d5cbbefbdd62a9}{exec\_\-name}
-\item 
-def \hyperlink{classonewire_1_1OneWire_23324150ab22b72b6c32054003b400fd}{exec\_\-family}
-\item 
+\begin{CompactList}\small\item\em Define use of cache. \item\end{CompactList}\item 
+\hypertarget{classonewire_1_1OneWire_8c52e866328b82976eb9f799f891f487}{
+def \hyperlink{classonewire_1_1OneWire_8c52e866328b82976eb9f799f891f487}{exec\_\-type}}
+\label{classonewire_1_1OneWire_8c52e866328b82976eb9f799f891f487}
+
+\begin{CompactList}\small\item\em Find all sensors matching a type. \item\end{CompactList}\item 
+\hypertarget{classonewire_1_1OneWire_db399d215bf72b5084d5cbbefbdd62a9}{
+def \hyperlink{classonewire_1_1OneWire_db399d215bf72b5084d5cbbefbdd62a9}{exec\_\-name}}
+\label{classonewire_1_1OneWire_db399d215bf72b5084d5cbbefbdd62a9}
+
+\begin{CompactList}\small\item\em Find all sensors matching a name. \item\end{CompactList}\item 
+\hypertarget{classonewire_1_1OneWire_23324150ab22b72b6c32054003b400fd}{
+def \hyperlink{classonewire_1_1OneWire_23324150ab22b72b6c32054003b400fd}{exec\_\-family}}
+\label{classonewire_1_1OneWire_23324150ab22b72b6c32054003b400fd}
+
+\begin{CompactList}\small\item\em Find all sensors matching a family. \item\end{CompactList}\item 
 def \hyperlink{classonewire_1_1OneWire_ece120e9964b38335bf23a7028d45083}{get\_\-temperature}
-\item 
-def \hyperlink{classonewire_1_1OneWire_a39fa5e62e0d65e62a915eb334d54fed}{is\_\-present}
-\end{CompactItemize}
+\begin{CompactList}\small\item\em Return list of all temperature indicated by DS18B20 and DS18S20 sensors. \item\end{CompactList}\item 
+\hypertarget{classonewire_1_1OneWire_a39fa5e62e0d65e62a915eb334d54fed}{
+def \hyperlink{classonewire_1_1OneWire_a39fa5e62e0d65e62a915eb334d54fed}{is\_\-present}}
+\label{classonewire_1_1OneWire_a39fa5e62e0d65e62a915eb334d54fed}
+
+\begin{CompactList}\small\item\em Check if an item is on the network, and if it is, check if the present property is set to 1. \item\end{CompactList}\end{CompactItemize}
 \subsection*{Private Attributes}
 \begin{CompactItemize}
 \item 
@@ -45,13 +60,7 @@ def \hyperlink{classonewire_1_1OneWire_a39fa5e62e0d65e62a915eb334d54fed}{is\_\-p
 
 
 \subsection{Detailed Description}
-
-
-\footnotesize\begin{verbatim}
-Manage OneWire 
-\end{verbatim}
-\normalsize
- 
+Manage \hyperlink{classonewire_1_1OneWire}{OneWire}. 
 
 \subsection{Member Function Documentation}
 \hypertarget{classonewire_1_1OneWire_effc317af881a97edf6d7dd77c63b88c}{
@@ -61,95 +70,34 @@ Manage OneWire
 \label{classonewire_1_1OneWire_effc317af881a97edf6d7dd77c63b88c}
 
 
+Create \hyperlink{classonewire_1_1OneWire}{OneWire} instance, allowing to use \hyperlink{classonewire_1_1OneWire}{OneWire} Network. 
 
-
-\footnotesize\begin{verbatim}
-Create OneWire instance, allowing to use OneWire Network
-@param dev : device where the interface is connected to, default 'u' for USB
-\end{verbatim}
-\normalsize
- \hypertarget{classonewire_1_1OneWire_41228b6b8c1562f02d0b40c8e40d96b4}{
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em dev}]: device where the interface is connected to, default 'u' for USB \end{description}
+\end{Desc}
+\hypertarget{classonewire_1_1OneWire_41228b6b8c1562f02d0b40c8e40d96b4}{
 \index{onewire::OneWire@{onewire::OneWire}!set\_\-cache\_\-use@{set\_\-cache\_\-use}}
 \index{set\_\-cache\_\-use@{set\_\-cache\_\-use}!onewire::OneWire@{onewire::OneWire}}
 \subsubsection[set\_\-cache\_\-use]{\setlength{\rightskip}{0pt plus 5cm}def onewire::OneWire::set\_\-cache\_\-use ( {\em self}, \/   {\em use})}}
 \label{classonewire_1_1OneWire_41228b6b8c1562f02d0b40c8e40d96b4}
 
 
+Define use of cache. 
 
-
-\footnotesize\begin{verbatim}
-Define use of cache.
-If it's set to False, information will be reactualised each time a request is done
-If it's true, the OWFS cache will be used (from 15s to 2 minutes of cache)
-\end{verbatim}
-\normalsize
- \hypertarget{classonewire_1_1OneWire_8c52e866328b82976eb9f799f891f487}{
-\index{onewire::OneWire@{onewire::OneWire}!exec\_\-type@{exec\_\-type}}
-\index{exec\_\-type@{exec\_\-type}!onewire::OneWire@{onewire::OneWire}}
-\subsubsection[exec\_\-type]{\setlength{\rightskip}{0pt plus 5cm}def onewire::OneWire::exec\_\-type ( {\em self}, \/   {\em t} = {\tt ''})}}
-\label{classonewire_1_1OneWire_8c52e866328b82976eb9f799f891f487}
-
-
-
-
-\footnotesize\begin{verbatim}
-Find all sensors matching a type
-\end{verbatim}
-\normalsize
- \hypertarget{classonewire_1_1OneWire_db399d215bf72b5084d5cbbefbdd62a9}{
-\index{onewire::OneWire@{onewire::OneWire}!exec\_\-name@{exec\_\-name}}
-\index{exec\_\-name@{exec\_\-name}!onewire::OneWire@{onewire::OneWire}}
-\subsubsection[exec\_\-name]{\setlength{\rightskip}{0pt plus 5cm}def onewire::OneWire::exec\_\-name ( {\em self}, \/   {\em n} = {\tt ''})}}
-\label{classonewire_1_1OneWire_db399d215bf72b5084d5cbbefbdd62a9}
-
-
-
-
-\footnotesize\begin{verbatim}
-Find all sensors matching a name
-\end{verbatim}
-\normalsize
- \hypertarget{classonewire_1_1OneWire_23324150ab22b72b6c32054003b400fd}{
-\index{onewire::OneWire@{onewire::OneWire}!exec\_\-family@{exec\_\-family}}
-\index{exec\_\-family@{exec\_\-family}!onewire::OneWire@{onewire::OneWire}}
-\subsubsection[exec\_\-family]{\setlength{\rightskip}{0pt plus 5cm}def onewire::OneWire::exec\_\-family ( {\em self}, \/   {\em f} = {\tt ''})}}
-\label{classonewire_1_1OneWire_23324150ab22b72b6c32054003b400fd}
-
-
-
-
-\footnotesize\begin{verbatim}
-Find all sensors matching a family
-\end{verbatim}
-\normalsize
- \hypertarget{classonewire_1_1OneWire_ece120e9964b38335bf23a7028d45083}{
+If it's set to False, information will be reactualised each time a request is done If it's true, the OWFS cache will be used (from 15s to 2 minutes of cache) \hypertarget{classonewire_1_1OneWire_ece120e9964b38335bf23a7028d45083}{
 \index{onewire::OneWire@{onewire::OneWire}!get\_\-temperature@{get\_\-temperature}}
 \index{get\_\-temperature@{get\_\-temperature}!onewire::OneWire@{onewire::OneWire}}
 \subsubsection[get\_\-temperature]{\setlength{\rightskip}{0pt plus 5cm}def onewire::OneWire::get\_\-temperature ( {\em self})}}
 \label{classonewire_1_1OneWire_ece120e9964b38335bf23a7028d45083}
 
 
+Return list of all temperature indicated by DS18B20 and DS18S20 sensors. 
 
+\begin{Desc}
+\item[Returns:]list of (id, temperature) \end{Desc}
 
-\footnotesize\begin{verbatim}
-Return list of all temperature indicated by DS18B20 and DS18S20 sensors
-@return list of (id, temperature)
-\end{verbatim}
-\normalsize
- \hypertarget{classonewire_1_1OneWire_a39fa5e62e0d65e62a915eb334d54fed}{
-\index{onewire::OneWire@{onewire::OneWire}!is\_\-present@{is\_\-present}}
-\index{is\_\-present@{is\_\-present}!onewire::OneWire@{onewire::OneWire}}
-\subsubsection[is\_\-present]{\setlength{\rightskip}{0pt plus 5cm}def onewire::OneWire::is\_\-present ( {\em self}, \/   {\em item})}}
-\label{classonewire_1_1OneWire_a39fa5e62e0d65e62a915eb334d54fed}
-
-
-
-
-\footnotesize\begin{verbatim}
-Check if an item is on the network, and if it is, check if the present property is set to 1
-\end{verbatim}
-\normalsize
- 
 
 The documentation for this class was generated from the following file:\begin{CompactItemize}
 \item 

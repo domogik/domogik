@@ -27,14 +27,26 @@ from xPLAPI import *
 from configloader import Loader
 
 class Condition():
+    '''
+    Parent class for each condition
+    A condition can be a node : it store 1 or 2 other conditions, or a final node :
+    it just implements some eval of the condition
+    '''
     def __init__(self, cond1=None, cond2=None):
         self.cond1 = cond1
         self.cond2 = cond2
         
     def run(self, statedic):
+        '''
+        Eval the condition
+        @raise NotImplementedException
+        '''
         raise NotImplementedException
         
     def parse(self,listelem):
+        '''
+        Parse the expression to find item and store them
+        '''
         res1 = self.cond1.parse(listelem)
         res2 = self.cond2.parse(listelem)
         for k in res2:
@@ -45,22 +57,41 @@ class Condition():
 # Classes représentants les conditions (noeuds de l'arbre)
 #####
 class OR(Condition):
+    '''
+    Implementation for the OR operator
+    '''
     def __init__(self, cond1, cond2):
+        '''
+        @param cond1 : first condition of the OR
+        @param cond2 : secondcondition of the OR
+        '''
         Condition.__init__(self, cond1, cond2)
     
     def run(self, statedic):
         return self.cond1.run(statedic) or self.cond2.run(statedic)
         
-        
 class AND(Condition):
+    '''
+    Implementation for the AND operator
+    '''
     def __init__(self, cond1, cond2):
+        '''
+        @param cond1 : first condition of the AND
+        @param cond2 : secondcondition of the AND
+        '''
         Condition.__init__(self, cond1, cond2)
     
     def run(self, statedic):
         return self.cond1.run(statedic) and self.cond2.run(statedic)
         
 class NOT(Condition):
+    '''
+    Implementation for the NOT operator
+    '''
     def __init__(self, cond1):
+        '''
+        @param cond1 : condition to use for negation
+        '''
         Condition.__init__(self, cond1)
     
     def run(self, statedic):
@@ -73,7 +104,26 @@ class NOT(Condition):
 # Classes représentant les feuilles (conditions de temps ou d'état)
 #####
 class timeCond(Condition):
+    '''
+    Implementation of the time condition
+    This allows user to describe time periods like cron
+    '''
     def __init__(self,year, month, day, daynumber, hour, minute):
+        '''
+        Create a time condition
+        Each param can be :
+        * an integer (eg : 6, 9, 12)
+        * a tuple (eg : (3,9)) : repesents an interval (here between 3 and 9)
+        * a list (eg : [4,6,9])
+        * a list of tuple (eg : [(4,9),(18,22)] : union of intervals
+        * a string (eg : '*', '*/8') : '*' = always, '*/X' = every X time unit
+        @param year
+        @param month
+        @param day
+        @param daynumber : 0 - 6 for Monday - Sunday
+        @param hour
+        @param minute
+        '''
         self.year = year
         self.month = month
         self.day = day
@@ -85,6 +135,7 @@ class timeCond(Condition):
         '''
             Check the timeunit value
             @param timeunit Can be one of 'year','month','day','daynumber','hour','minute'
+            @param value : the value to check
         '''
         if timeunit not in ['year','month','day','daynumber','hour','minute']:
             raise ValueError
@@ -94,24 +145,34 @@ class timeCond(Condition):
         value = clas+"('%s')" %value if clas == "int" or clas == "str" else value
         this_unit = clas+"('%s')"% this_unit if clas == "int" or clas == "str" else this_unit
         call = ("self._check_time_" + clas +"(%s,%s)"% (this_unit, value))
-        print call
         return eval(call)
 
     ### Functions to check 'time equality' for each used type
 
     #Int 
     def _check_time_int(self, unit, value):
+        '''
+        Check time equality between to integers
+        @param unit : 'value' of the item in the condition
+        @param value : value catched by the system
+        '''
         return unit == int(value)
 
     #tuple : represent an interval
     def _check_time_tuple(self, unit, value):
+        '''
+        Check if value is in the interval described by the tuple
+        @param unit : 'value' of the item in the condition (a tuple)
+        @param value : value catched by the system
+        '''
         return int(value) in range(unit[0], unit[1] + 1)
 
     #list
     def _check_time_list(self, unit, value):
         '''
-        unit can be : a list of int => check if value is in the list
-        a list of tuple => expand each tuple to a list
+        @param unit can be : a list of int => check if value is in the list
+                             a list of tuple => expand each tuple to a list
+        @param value : value catched by the system
         '''
         if isinstance(unit[0], tuple):
             return any([ _check_time_tuple(u, value) for u in unit ])
@@ -121,9 +182,11 @@ class timeCond(Condition):
     #string
     def _check_time_str(self, unit, value):
         '''
-        unit can be '*' or '*/x'
-        '*' => always true
-        '*/x' => value % x == 0
+        @param unit can be  '*' or '*/x'
+                            '*' => always true
+                            '*/x' => value % x == 0
+        @param value : value catched by the system
+        @raise ValueError if unit is misformated
         '''
         if unit == '*':
             return True
@@ -146,7 +209,17 @@ class timeCond(Condition):
         return listelem
 
 class stateCond(Condition):
+    '''
+    Implementation of the state condition
+    This allows user to describe a condition on any item of the system
+    '''
     def __init__(self, technology, item_name, operator, value):
+        '''
+        @param technology : technolgy of the item (eg : x10, 1wire, etc ...)
+        @param item_name : name of the item (eg: A1 for x10, 10B037A5010800DC for 1wire)
+        @param operator : any comparison operator that python recognize (==, <, <=, =>, >, !=)
+        @param value : the value to test
+        '''
         self.technology = technology
         self.item_name = item_name
         self.operator = operator
@@ -165,11 +238,17 @@ class stateCond(Condition):
         return listelem
 
 ####
-# methodes gérant la récup des infos
+# Methods to catch informations
 ####
 class ListenerBuilder():
-    
+    '''
+    Class to parse an expression and create appropriated listener
+    '''
     def __init__(self, listitems, expr):
+        '''
+        @param listitems a dictionnary discribing items used in the condition
+        @param expr : the condition
+        '''
         self.listitems = listitems
         loader = Loader('trigger')
         config = loader.load()[1]
@@ -184,6 +263,9 @@ class ListenerBuilder():
             eval(call)
 
     def hasAllNeededValue(self):
+        '''
+        Check if all the value used in the condition have been catched by listeners, then evaluate the expression
+        '''
         all = True
         for k in self.listitems:
             for j in self.listitems[k]:
@@ -197,17 +279,33 @@ class ListenerBuilder():
             print self.listitems
 
     def updateList(self, k1, k2, v):
+        '''
+        Update the list of items with provided value
+        @param k1 : technology
+        @param k2 : name of the item
+        @param v : new value of the item
+        '''
         self.listitems[k1][k2] = v
         self.hasAllNeededValue()
 
     def buildx10listener(self, items):
+        '''
+        Create listener for x10 elements
+        @param items : items to add listener for
+        '''
         for i in items:
             Listener(lambda mess: self.updateList('x10',mess.get_key_value('device'), mess.get_key_value('command')) , self.__myxpl, {'schema':'x10.basic','device':i,'type':'xpl-cmnd'})
 
     def buildtimelistener(self, items):
+        '''
+        Create listener for time conditions
+        '''
         Listener(self._parsetimeupdate , self.__myxpl, {'schema':'datetime.basic','type':'xpl-trig'})
 
     def _parsetimeupdate(self, mess):
+        '''
+        Parse the time received in a message and call updateList()
+        '''
         dt = mess.get_key_value('format1')
         pars = {'year':dt[0:4],'month':dt[4:6],'day':dt[6:8],'daynumber':dt[11],'hour':dt[8:10],'minute':dt[10:12]}
         for p in pars:
@@ -218,7 +316,7 @@ if __name__ == "__main__":
     state1 = "stateCond('x10','a1','==','on')"
     state2 = "stateCond('1wire','X23329500234','<','20')"
     state3 = "stateCond('x10','c3','==','off')"
-    time1 = "timeCond(2009, 02,(2,15),'*',9,'*/3')"
+    time1 = "timeCond(2009, 02,(2,15),'*',10,'*/3')"
     expr1 = "AND(%s, OR(%s, %s))" % (state1, time1, state2)
 
     liste = {}
@@ -228,6 +326,7 @@ if __name__ == "__main__":
 
     print "**************** Test des listeners *******************"
     expr2 = "AND(%s, %s)" % (state1, time1)
+    #expr2 = "AND(%s, OR(%s, %s))" % (state1, time1, state3)
     print "Parsing de l'expression : %s" % expr2
     liste = {}
     parsing =  eval(expr2+".parse(liste)")

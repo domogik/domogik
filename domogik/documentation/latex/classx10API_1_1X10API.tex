@@ -2,6 +2,9 @@
 \section{x10API::X10API Class Reference}
 \label{classx10API_1_1X10API}\index{x10API::X10API@{x10API::X10API}}
 }
+This class define some facilities to use X10.  
+
+
 \subsection*{Public Member Functions}
 \begin{CompactItemize}
 \item 
@@ -11,22 +14,28 @@ def \textbf{\_\-\_\-init\_\-\_\-}}
 
 \item 
 def \hyperlink{classx10API_1_1X10API_b23095bb54aa45e75857beaa59a7deed}{on}
-\item 
+\begin{CompactList}\small\item\em Send an ON order to the item element. \item\end{CompactList}\item 
 def \hyperlink{classx10API_1_1X10API_37be53c20aaa39f5770a5085b80984bc}{off}
-\item 
+\begin{CompactList}\small\item\em Send an OFF order to the item element. \item\end{CompactList}\item 
 def \hyperlink{classx10API_1_1X10API_d1e63a9dd573eb16a7d1009c72fac15e}{house\_\-on}
-\item 
+\begin{CompactList}\small\item\em Send an ALLON order to the item element. \item\end{CompactList}\item 
 def \hyperlink{classx10API_1_1X10API_b04c7647aa5d80c462f0df36afaff4ec}{house\_\-off}
-\end{CompactItemize}
+\begin{CompactList}\small\item\em Send an ALLOFF order to the item element. \item\end{CompactList}\end{CompactItemize}
 \subsection*{Private Member Functions}
 \begin{CompactItemize}
 \item 
-def \hyperlink{classx10API_1_1X10API_398d98e0674a6cefaef1154eafe94a15}{\_\-valid\_\-item}
-\item 
-def \hyperlink{classx10API_1_1X10API_e9639dcec52e0f507fcc224a6c377c7d}{\_\-valid\_\-house}
-\item 
+\hypertarget{classx10API_1_1X10API_398d98e0674a6cefaef1154eafe94a15}{
+def \hyperlink{classx10API_1_1X10API_398d98e0674a6cefaef1154eafe94a15}{\_\-valid\_\-item}}
+\label{classx10API_1_1X10API_398d98e0674a6cefaef1154eafe94a15}
+
+\begin{CompactList}\small\item\em Check an item to have good 'HU' syntax Raise exception if it is not. \item\end{CompactList}\item 
+\hypertarget{classx10API_1_1X10API_e9639dcec52e0f507fcc224a6c377c7d}{
+def \hyperlink{classx10API_1_1X10API_e9639dcec52e0f507fcc224a6c377c7d}{\_\-valid\_\-house}}
+\label{classx10API_1_1X10API_e9639dcec52e0f507fcc224a6c377c7d}
+
+\begin{CompactList}\small\item\em Check an house to have good 'H' syntax Raise exception if it is not. \item\end{CompactList}\item 
 def \hyperlink{classx10API_1_1X10API_268f590bc14835490b1ea823c86e4dcb}{\_\-send}
-\end{CompactItemize}
+\begin{CompactList}\small\item\em Send a command trought heyu. \item\end{CompactList}\end{CompactItemize}
 \subsection*{Private Attributes}
 \begin{CompactItemize}
 \item 
@@ -48,121 +57,82 @@ def \hyperlink{classx10API_1_1X10API_268f590bc14835490b1ea823c86e4dcb}{\_\-send}
 
 
 \subsection{Detailed Description}
+This class define some facilities to use X10. 
 
-
-\footnotesize\begin{verbatim}
-This class define some facilities to use X10.
-It's based on heyu software, you need to have it installed
-and heyu binaries must be in your PATH
-\end{verbatim}
-\normalsize
- 
+It's based on heyu software, you need to have it installed and heyu binaries must be in your PATH 
 
 \subsection{Member Function Documentation}
-\hypertarget{classx10API_1_1X10API_398d98e0674a6cefaef1154eafe94a15}{
-\index{x10API::X10API@{x10API::X10API}!\_\-valid\_\-item@{\_\-valid\_\-item}}
-\index{\_\-valid\_\-item@{\_\-valid\_\-item}!x10API::X10API@{x10API::X10API}}
-\subsubsection[\_\-valid\_\-item]{\setlength{\rightskip}{0pt plus 5cm}def x10API::X10API::\_\-valid\_\-item ( {\em self}, \/   {\em item})\hspace{0.3cm}{\tt  \mbox{[}private\mbox{]}}}}
-\label{classx10API_1_1X10API_398d98e0674a6cefaef1154eafe94a15}
-
-
-
-
-\footnotesize\begin{verbatim}
-Check an item to have good 'HU' syntax
-Raise exception if it is not
-\end{verbatim}
-\normalsize
- \hypertarget{classx10API_1_1X10API_e9639dcec52e0f507fcc224a6c377c7d}{
-\index{x10API::X10API@{x10API::X10API}!\_\-valid\_\-house@{\_\-valid\_\-house}}
-\index{\_\-valid\_\-house@{\_\-valid\_\-house}!x10API::X10API@{x10API::X10API}}
-\subsubsection[\_\-valid\_\-house]{\setlength{\rightskip}{0pt plus 5cm}def x10API::X10API::\_\-valid\_\-house ( {\em self}, \/   {\em house})\hspace{0.3cm}{\tt  \mbox{[}private\mbox{]}}}}
-\label{classx10API_1_1X10API_e9639dcec52e0f507fcc224a6c377c7d}
-
-
-
-
-\footnotesize\begin{verbatim}
-Check an house to have good 'H' syntax
-Raise exception if it is not
-\end{verbatim}
-\normalsize
- \hypertarget{classx10API_1_1X10API_268f590bc14835490b1ea823c86e4dcb}{
+\hypertarget{classx10API_1_1X10API_268f590bc14835490b1ea823c86e4dcb}{
 \index{x10API::X10API@{x10API::X10API}!\_\-send@{\_\-send}}
 \index{\_\-send@{\_\-send}!x10API::X10API@{x10API::X10API}}
 \subsubsection[\_\-send]{\setlength{\rightskip}{0pt plus 5cm}def x10API::X10API::\_\-send ( {\em self}, \/   {\em cmd}, \/   {\em item})\hspace{0.3cm}{\tt  \mbox{[}private\mbox{]}}}}
 \label{classx10API_1_1X10API_268f590bc14835490b1ea823c86e4dcb}
 
 
+Send a command trought heyu. 
 
-
-\footnotesize\begin{verbatim}
-Send a command trought heyu
-@param cmd : Command to send ('ON','OFF', etc)
-@param item : Item to send order to (Can be HU or H form)
-\end{verbatim}
-\normalsize
- \hypertarget{classx10API_1_1X10API_b23095bb54aa45e75857beaa59a7deed}{
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em cmd}]: Command to send ('ON','OFF', etc) \item[{\em item}]: Item to send order to (Can be HU or H form) \end{description}
+\end{Desc}
+\hypertarget{classx10API_1_1X10API_b23095bb54aa45e75857beaa59a7deed}{
 \index{x10API::X10API@{x10API::X10API}!on@{on}}
 \index{on@{on}!x10API::X10API@{x10API::X10API}}
 \subsubsection[on]{\setlength{\rightskip}{0pt plus 5cm}def x10API::X10API::on ( {\em self}, \/   {\em item})}}
 \label{classx10API_1_1X10API_b23095bb54aa45e75857beaa59a7deed}
 
 
+Send an ON order to the item element. 
 
-
-\footnotesize\begin{verbatim}
-Send an ON order to the item element
-@param item : the item to send the ON order to
-@Return True if order was sent, False in case of errors
-\end{verbatim}
-\normalsize
- \hypertarget{classx10API_1_1X10API_37be53c20aaa39f5770a5085b80984bc}{
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em item}]: the item to send the ON order to  True if order was sent, False in case of errors \end{description}
+\end{Desc}
+\hypertarget{classx10API_1_1X10API_37be53c20aaa39f5770a5085b80984bc}{
 \index{x10API::X10API@{x10API::X10API}!off@{off}}
 \index{off@{off}!x10API::X10API@{x10API::X10API}}
 \subsubsection[off]{\setlength{\rightskip}{0pt plus 5cm}def x10API::X10API::off ( {\em self}, \/   {\em item})}}
 \label{classx10API_1_1X10API_37be53c20aaa39f5770a5085b80984bc}
 
 
+Send an OFF order to the item element. 
 
-
-\footnotesize\begin{verbatim}
-Send an OFF order to the item element
-@param item : the item to send the OFF order to
-@Return True if order was sent, False in case of errors
-\end{verbatim}
-\normalsize
- \hypertarget{classx10API_1_1X10API_d1e63a9dd573eb16a7d1009c72fac15e}{
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em item}]: the item to send the OFF order to  True if order was sent, False in case of errors \end{description}
+\end{Desc}
+\hypertarget{classx10API_1_1X10API_d1e63a9dd573eb16a7d1009c72fac15e}{
 \index{x10API::X10API@{x10API::X10API}!house\_\-on@{house\_\-on}}
 \index{house\_\-on@{house\_\-on}!x10API::X10API@{x10API::X10API}}
 \subsubsection[house\_\-on]{\setlength{\rightskip}{0pt plus 5cm}def x10API::X10API::house\_\-on ( {\em self}, \/   {\em house})}}
 \label{classx10API_1_1X10API_d1e63a9dd573eb16a7d1009c72fac15e}
 
 
+Send an ALLON order to the item element. 
 
-
-\footnotesize\begin{verbatim}
-Send an ALLON order to the item element
-@param item : the item to send the ALLON order to
-@Return True if order was sent, False in case of errors
-\end{verbatim}
-\normalsize
- \hypertarget{classx10API_1_1X10API_b04c7647aa5d80c462f0df36afaff4ec}{
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em item}]: the item to send the ALLON order to  True if order was sent, False in case of errors \end{description}
+\end{Desc}
+\hypertarget{classx10API_1_1X10API_b04c7647aa5d80c462f0df36afaff4ec}{
 \index{x10API::X10API@{x10API::X10API}!house\_\-off@{house\_\-off}}
 \index{house\_\-off@{house\_\-off}!x10API::X10API@{x10API::X10API}}
 \subsubsection[house\_\-off]{\setlength{\rightskip}{0pt plus 5cm}def x10API::X10API::house\_\-off ( {\em self}, \/   {\em house})}}
 \label{classx10API_1_1X10API_b04c7647aa5d80c462f0df36afaff4ec}
 
 
+Send an ALLOFF order to the item element. 
 
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em item}]: the item to send the ALLOFF order to  True if order was sent, False in case of errors \end{description}
+\end{Desc}
 
-\footnotesize\begin{verbatim}
-Send an ALLOFF order to the item element
-@param item : the item to send the ALLOFF order to
-@Return True if order was sent, False in case of errors
-\end{verbatim}
-\normalsize
- 
 
 The documentation for this class was generated from the following file:\begin{CompactItemize}
 \item 

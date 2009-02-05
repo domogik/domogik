@@ -24,144 +24,17 @@
   </div>
 </div>
 <div class="contents">
-<h1>xPLAPI::xPLTimer Class Reference</h1><!-- doxytag: class="xPLAPI::xPLTimer" -->
+<h1>xPLAPI::xPLTimer Class Reference</h1><!-- doxytag: class="xPLAPI::xPLTimer" --><a class="el" href="classxPLAPI_1_1xPLTimer.html" title="xPLTimer will call a callback function each n seconds">xPLTimer</a> will call a callback function each n seconds  
+<a href="#_details">More...</a>
 <p>
-<a href="classxPLAPI_1_1xPLTimer-members.html">List of all members.</a><table border="0" cellpadding="0" cellspacing="0">
+<table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
-<tr><td colspan="2"><br><h2>Public Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">def&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classxPLAPI_1_1xPLTimer.html#e651d6889d77aabd9227e622d5821d14">__init__</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">def&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classxPLAPI_1_1xPLTimer.html#f9e579ecf5a8e2b2ed86ce78c5029a0e">start</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">def&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classxPLAPI_1_1xPLTimer.html#2a04504c8d29908bc6601879fe63aa23">stop</a></td></tr>
-
-<tr><td colspan="2"><br><h2>Private Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">def&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classxPLAPI_1_1xPLTimer.html#59ac53c691fadf44bf28fb74a226251f">_run</a></td></tr>
-
-<tr><td colspan="2"><br><h2>Private Attributes</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="anchor" name="cf45a98a98a98ce25ae50665771d1e92"></a><!-- doxytag: member="xPLAPI::xPLTimer::_callback" ref="cf45a98a98a98ce25ae50665771d1e92" args="" -->
-&nbsp;</td><td class="memItemRight" valign="bottom"><b>_callback</b></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="anchor" name="a5189f41b3d558ccef9411af7c563796"></a><!-- doxytag: member="xPLAPI::xPLTimer::_time" ref="a5189f41b3d558ccef9411af7c563796" args="" -->
-&nbsp;</td><td class="memItemRight" valign="bottom"><b>_time</b></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="anchor" name="f2a85e94f12015c68fb34b4461476cc3"></a><!-- doxytag: member="xPLAPI::xPLTimer::_timer" ref="f2a85e94f12015c68fb34b4461476cc3" args="" -->
-&nbsp;</td><td class="memItemRight" valign="bottom"><b>_timer</b></td></tr>
-
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-<div class="fragment"><pre class="fragment">
-xPLTimer will call a callback function each n seconds
-</pre></div> <hr><h2>Member Function Documentation</h2>
-<a class="anchor" name="e651d6889d77aabd9227e622d5821d14"></a><!-- doxytag: member="xPLAPI::xPLTimer::__init__" ref="e651d6889d77aabd9227e622d5821d14" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">def xPLAPI::xPLTimer::__init__           </td>
-          <td>(</td>
-          <td class="paramtype">&nbsp;</td>
-          <td class="paramname"> <em>self</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&nbsp;</td>
-          <td class="paramname"> <em>time</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&nbsp;</td>
-          <td class="paramname"> <em>cb</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-<div class="fragment"><pre class="fragment">
-Constructor : create the internal timer
-@param time : time of loop in second
-@param cb : callback function which will be call eact 'time' seconds
-</pre></div> 
-</div>
-</div><p>
-<a class="anchor" name="59ac53c691fadf44bf28fb74a226251f"></a><!-- doxytag: member="xPLAPI::xPLTimer::_run" ref="59ac53c691fadf44bf28fb74a226251f" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">def xPLAPI::xPLTimer::_run           </td>
-          <td>(</td>
-          <td class="paramtype">&nbsp;</td>
-          <td class="paramname"> <em>self</em>          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td><code> [private]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-<div class="fragment"><pre class="fragment">
-internal timer loopback function
-</pre></div> 
-</div>
-</div><p>
-<a class="anchor" name="f9e579ecf5a8e2b2ed86ce78c5029a0e"></a><!-- doxytag: member="xPLAPI::xPLTimer::start" ref="f9e579ecf5a8e2b2ed86ce78c5029a0e" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">def xPLAPI::xPLTimer::start           </td>
-          <td>(</td>
-          <td class="paramtype">&nbsp;</td>
-          <td class="paramname"> <em>self</em>          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-<div class="fragment"><pre class="fragment">
-Start the timer
-</pre></div> 
-</div>
-</div><p>
-<a class="anchor" name="2a04504c8d29908bc6601879fe63aa23"></a><!-- doxytag: member="xPLAPI::xPLTimer::stop" ref="2a04504c8d29908bc6601879fe63aa23" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">def xPLAPI::xPLTimer::stop           </td>
-          <td>(</td>
-          <td class="paramtype">&nbsp;</td>
-          <td class="paramname"> <em>self</em>          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-<div class="fragment"><pre class="fragment">
-Stop the timer
-</pre></div> 
-</div>
-</div><p>
-<hr>The documentation for this class was generated from the following file:<ul>
+<a class="el" href="classxPLAPI_1_1xPLTimer.html" title="xPLTimer will call a callback function each n seconds">xPLTimer</a> will call a callback function each n seconds <hr>The documentation for this class was generated from the following file:<ul>
 <li>xpl/xPLAPI.py</ul>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Feb 4 13:54:19 2009 for Domogik by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Thu Feb 5 11:25:06 2009 for Domogik by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.6 </small></address>
 </body>

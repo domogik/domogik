@@ -621,7 +621,7 @@ IMAGE_PATH             =
 # to standard output.  If FILTER_PATTERNS is specified, this tag will be 
 # ignored.
 
-INPUT_FILTER           = 
+INPUT_FILTER           = "python doxypy.py"
 
 # The FILTER_PATTERNS tag can be used to specify filters on a per file pattern 
 # basis.  Doxygen will compare the file name with each pattern and apply the 
@@ -636,7 +636,7 @@ FILTER_PATTERNS        =
 # INPUT_FILTER) will be used to filter the input files when producing source 
 # files to browse (i.e. when SOURCE_BROWSER is set to YES).
 
-FILTER_SOURCE_FILES    = NO
+FILTER_SOURCE_FILES    = YES
 
 #---------------------------------------------------------------------------
 # configuration options related to source browsing
@@ -1124,7 +1124,7 @@ ENABLE_PREPROCESSING   = YES
 # compilation will be performed. Macro expansion can be done in a controlled 
 # way by setting EXPAND_ONLY_PREDEF to YES.
 
-MACRO_EXPANSION        = NO
+MACRO_EXPANSION        = YES
 
 # If the EXPAND_ONLY_PREDEF and MACRO_EXPANSION tags are both set to YES 
 # then the macro expansion is limited to the macros specified with the 

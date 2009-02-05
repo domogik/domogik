@@ -2,130 +2,13 @@
 \section{xPLAPI::Listener Class Reference}
 \label{classxPLAPI_1_1Listener}\index{xPLAPI::Listener@{xPLAPI::Listener}}
 }
-\subsection*{Public Member Functions}
-\begin{CompactItemize}
-\item 
-def \hyperlink{classxPLAPI_1_1Listener_31c68a5ad76d56eff1b78dd646a18e58}{\_\-\_\-init\_\-\_\-}
-\item 
-\hypertarget{classxPLAPI_1_1Listener_f61ad8e3de5cfd5c8d69aee1cbddaedd}{
-def \textbf{getFilter}}
-\label{classxPLAPI_1_1Listener_f61ad8e3de5cfd5c8d69aee1cbddaedd}
+\hyperlink{classxPLAPI_1_1Listener}{Listener} are objects which are able to check if a message match some filter and to call a function if they do.  
 
-\item 
-\hypertarget{classxPLAPI_1_1Listener_0b3088bf2df0f408d0f2c15989386cca}{
-def \textbf{getCb}}
-\label{classxPLAPI_1_1Listener_0b3088bf2df0f408d0f2c15989386cca}
 
-\item 
-def \hyperlink{classxPLAPI_1_1Listener_a6e3c6a481054d9ff921507b784b0f12}{new\_\-message}
-\item 
-def \hyperlink{classxPLAPI_1_1Listener_ff3b74767e27828d084af4d34e3fd20e}{add\_\-filter}
-\item 
-def \hyperlink{classxPLAPI_1_1Listener_babc7a4d6a30876fda2fc593942069b0}{del\_\-filter}
-\item 
-def \hyperlink{classxPLAPI_1_1Listener_e719472458dd324763b91364a3991df1}{get\_\-filter\_\-list}
-\end{CompactItemize}
-\subsection*{Private Attributes}
-\begin{CompactItemize}
-\item 
-\hypertarget{classxPLAPI_1_1Listener_64bd36ca836cbd2d56417dc17b83f8cf}{
-\textbf{\_\-callback}}
-\label{classxPLAPI_1_1Listener_64bd36ca836cbd2d56417dc17b83f8cf}
-
-\item 
-\hypertarget{classxPLAPI_1_1Listener_daa53232362ca9b704223184d9ef612f}{
-\textbf{\_\-filter}}
-\label{classxPLAPI_1_1Listener_daa53232362ca9b704223184d9ef612f}
-
-\end{CompactItemize}
 
 
 \subsection{Detailed Description}
-
-
-\footnotesize\begin{verbatim}
-Listener are objects which are able to check if a message
-match some filter and to call a function if they do
-\end{verbatim}
-\normalsize
- 
-
-\subsection{Member Function Documentation}
-\hypertarget{classxPLAPI_1_1Listener_31c68a5ad76d56eff1b78dd646a18e58}{
-\index{xPLAPI::Listener@{xPLAPI::Listener}!\_\-\_\-init\_\-\_\-@{\_\-\_\-init\_\-\_\-}}
-\index{\_\-\_\-init\_\-\_\-@{\_\-\_\-init\_\-\_\-}!xPLAPI::Listener@{xPLAPI::Listener}}
-\subsubsection[\_\-\_\-init\_\-\_\-]{\setlength{\rightskip}{0pt plus 5cm}def xPLAPI::Listener::\_\-\_\-init\_\-\_\- ( {\em self}, \/   {\em cb}, \/   {\em manager}, \/   {\em filter} = {\tt \{\}})}}
-\label{classxPLAPI_1_1Listener_31c68a5ad76d56eff1b78dd646a18e58}
-
-
-
-
-\footnotesize\begin{verbatim}
-The listener will get all messages from the manager and parse them.
-If a message match the filter, then the callback function will be called
-with the message as parameter
-@param cb : the callback function
-@param manager : the manager instance
-@param filter : dictionnary { key : value } 
-\end{verbatim}
-\normalsize
- \hypertarget{classxPLAPI_1_1Listener_a6e3c6a481054d9ff921507b784b0f12}{
-\index{xPLAPI::Listener@{xPLAPI::Listener}!new\_\-message@{new\_\-message}}
-\index{new\_\-message@{new\_\-message}!xPLAPI::Listener@{xPLAPI::Listener}}
-\subsubsection[new\_\-message]{\setlength{\rightskip}{0pt plus 5cm}def xPLAPI::Listener::new\_\-message ( {\em self}, \/   {\em message})}}
-\label{classxPLAPI_1_1Listener_a6e3c6a481054d9ff921507b784b0f12}
-
-
-
-
-\footnotesize\begin{verbatim}
-This is the function which is called by the manager when a message arrives
-The goal of this function is to check if message match filter rules, and to
-call the callback function if it does
-\end{verbatim}
-\normalsize
- \hypertarget{classxPLAPI_1_1Listener_ff3b74767e27828d084af4d34e3fd20e}{
-\index{xPLAPI::Listener@{xPLAPI::Listener}!add\_\-filter@{add\_\-filter}}
-\index{add\_\-filter@{add\_\-filter}!xPLAPI::Listener@{xPLAPI::Listener}}
-\subsubsection[add\_\-filter]{\setlength{\rightskip}{0pt plus 5cm}def xPLAPI::Listener::add\_\-filter ( {\em self}, \/   {\em key}, \/   {\em value})}}
-\label{classxPLAPI_1_1Listener_ff3b74767e27828d084af4d34e3fd20e}
-
-
-
-
-\footnotesize\begin{verbatim}
-Add a filter rule. No distinction between conf and data
-If the key already exists, the new value is used
-\end{verbatim}
-\normalsize
- \hypertarget{classxPLAPI_1_1Listener_babc7a4d6a30876fda2fc593942069b0}{
-\index{xPLAPI::Listener@{xPLAPI::Listener}!del\_\-filter@{del\_\-filter}}
-\index{del\_\-filter@{del\_\-filter}!xPLAPI::Listener@{xPLAPI::Listener}}
-\subsubsection[del\_\-filter]{\setlength{\rightskip}{0pt plus 5cm}def xPLAPI::Listener::del\_\-filter ( {\em self}, \/   {\em key})}}
-\label{classxPLAPI_1_1Listener_babc7a4d6a30876fda2fc593942069b0}
-
-
-
-
-\footnotesize\begin{verbatim}
-Remove a rule from filter list
-If the key isn't in the list, do nothing
-\end{verbatim}
-\normalsize
- \hypertarget{classxPLAPI_1_1Listener_e719472458dd324763b91364a3991df1}{
-\index{xPLAPI::Listener@{xPLAPI::Listener}!get\_\-filter\_\-list@{get\_\-filter\_\-list}}
-\index{get\_\-filter\_\-list@{get\_\-filter\_\-list}!xPLAPI::Listener@{xPLAPI::Listener}}
-\subsubsection[get\_\-filter\_\-list]{\setlength{\rightskip}{0pt plus 5cm}def xPLAPI::Listener::get\_\-filter\_\-list ( {\em self})}}
-\label{classxPLAPI_1_1Listener_e719472458dd324763b91364a3991df1}
-
-
-
-
-\footnotesize\begin{verbatim}
-Get all the filter items
-\end{verbatim}
-\normalsize
- 
+\hyperlink{classxPLAPI_1_1Listener}{Listener} are objects which are able to check if a message match some filter and to call a function if they do. 
 
 The documentation for this class was generated from the following file:\begin{CompactItemize}
 \item 

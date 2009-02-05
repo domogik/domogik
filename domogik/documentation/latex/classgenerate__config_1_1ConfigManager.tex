@@ -2,15 +2,21 @@
 \section{generate\_\-config::ConfigManager Class Reference}
 \label{classgenerate__config_1_1ConfigManager}\index{generate\_\-config::ConfigManager@{generate\_\-config::ConfigManager}}
 }
+General config manager which can ask user about config settings, check results and write config file.  
+
+
 \subsection*{Public Member Functions}
 \begin{CompactItemize}
 \item 
 def \hyperlink{classgenerate__config_1_1ConfigManager_9d306a6d2e086a1dd9175423ad415798}{\_\-\_\-init\_\-\_\-}
-\item 
-def \hyperlink{classgenerate__config_1_1ConfigManager_277e7238684d6750957bf2981e0eec14}{ask}
-\item 
+\begin{CompactList}\small\item\em Constructor. \item\end{CompactList}\item 
+\hypertarget{classgenerate__config_1_1ConfigManager_277e7238684d6750957bf2981e0eec14}{
+def \hyperlink{classgenerate__config_1_1ConfigManager_277e7238684d6750957bf2981e0eec14}{ask}}
+\label{classgenerate__config_1_1ConfigManager_277e7238684d6750957bf2981e0eec14}
+
+\begin{CompactList}\small\item\em Ask the user for each entry of self.\_\-settings. \item\end{CompactList}\item 
 def \hyperlink{classgenerate__config_1_1ConfigManager_50916dd9f4420c45c85048c3448dfd9e}{write}
-\end{CompactItemize}
+\begin{CompactList}\small\item\em Write data in a filename. \item\end{CompactList}\end{CompactItemize}
 \subsection*{Private Attributes}
 \begin{CompactItemize}
 \item 
@@ -27,13 +33,7 @@ def \hyperlink{classgenerate__config_1_1ConfigManager_50916dd9f4420c45c85048c344
 
 
 \subsection{Detailed Description}
-
-
-\footnotesize\begin{verbatim}
-General config manager which can ask user about config settings, check results and write config file
-\end{verbatim}
-\normalsize
- 
+General config manager which can ask user about config settings, check results and write config file. 
 
 \subsection{Member Function Documentation}
 \hypertarget{classgenerate__config_1_1ConfigManager_9d306a6d2e086a1dd9175423ad415798}{
@@ -43,42 +43,23 @@ General config manager which can ask user about config settings, check results a
 \label{classgenerate__config_1_1ConfigManager_9d306a6d2e086a1dd9175423ad415798}
 
 
+Constructor. 
 
-
-\footnotesize\begin{verbatim}
-Constructor 
-@param settings List of tuples defining parameters to ask user for : {'name','question','check_regex',['proposed_val1','proposed_val2']}
-check_regex can be None
-Proposed value list can be None. If it isn't, the first value is taken as default choice
-\end{verbatim}
-\normalsize
- \hypertarget{classgenerate__config_1_1ConfigManager_277e7238684d6750957bf2981e0eec14}{
-\index{generate\_\-config::ConfigManager@{generate\_\-config::ConfigManager}!ask@{ask}}
-\index{ask@{ask}!generate_config::ConfigManager@{generate\_\-config::ConfigManager}}
-\subsubsection[ask]{\setlength{\rightskip}{0pt plus 5cm}def generate\_\-config::ConfigManager::ask ( {\em self})}}
-\label{classgenerate__config_1_1ConfigManager_277e7238684d6750957bf2981e0eec14}
-
-
-
-
-\footnotesize\begin{verbatim}
-Ask the user for each entry of self._settings
-\end{verbatim}
-\normalsize
- \hypertarget{classgenerate__config_1_1ConfigManager_50916dd9f4420c45c85048c3448dfd9e}{
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em settings}]List of tuples defining parameters to ask user for : \{'name','question','check\_\-regex',\mbox{[}'proposed\_\-val1','proposed\_\-val2'\mbox{]}\} check\_\-regex can be None Proposed value list can be None. If it isn't, the first value is taken as default choice \end{description}
+\end{Desc}
+\hypertarget{classgenerate__config_1_1ConfigManager_50916dd9f4420c45c85048c3448dfd9e}{
 \index{generate\_\-config::ConfigManager@{generate\_\-config::ConfigManager}!write@{write}}
 \index{write@{write}!generate_config::ConfigManager@{generate\_\-config::ConfigManager}}
 \subsubsection[write]{\setlength{\rightskip}{0pt plus 5cm}def generate\_\-config::ConfigManager::write ( {\em self}, \/   {\em filename}, \/   {\em datas}, \/   {\em section} = {\tt None})}}
 \label{classgenerate__config_1_1ConfigManager_50916dd9f4420c45c85048c3448dfd9e}
 
 
+Write data in a filename. 
 
-
-\footnotesize\begin{verbatim}
-Write data in a filename. May define a section
-\end{verbatim}
-\normalsize
- 
+May define a section 
 
 The documentation for this class was generated from the following file:\begin{CompactItemize}
 \item 

@@ -23,28 +23,36 @@
 </div>
 <div class="contents">
 <h1>Class List</h1>Here are the classes, structs, unions and interfaces with brief descriptions:<table>
-  <tr><td class="indexkey"><a class="el" href="classgenerate__config_1_1ConfigManager.html">generate_config::ConfigManager</a></td><td class="indexvalue"></td></tr>
-  <tr><td class="indexkey"><a class="el" href="classgenerate__config_1_1datetimeConfig.html">generate_config::datetimeConfig</a></td><td class="indexvalue"></td></tr>
-  <tr><td class="indexkey"><a class="el" href="classgenerate__config_1_1generalConfig.html">generate_config::generalConfig</a></td><td class="indexvalue"></td></tr>
-  <tr><td class="indexkey"><a class="el" href="classgenerate__config_1_1genericPluginConfig.html">generate_config::genericPluginConfig</a></td><td class="indexvalue"></td></tr>
-  <tr><td class="indexkey"><a class="el" href="classxPLAPI_1_1Listener.html">xPLAPI::Listener</a></td><td class="indexvalue"></td></tr>
-  <tr><td class="indexkey"><a class="el" href="classconfigloader_1_1Loader.html">configloader::Loader</a></td><td class="indexvalue"></td></tr>
-  <tr><td class="indexkey"><a class="el" href="classxPLAPI_1_1Manager.html">xPLAPI::Manager</a></td><td class="indexvalue"></td></tr>
-  <tr><td class="indexkey"><a class="el" href="classxPLAPI_1_1Message.html">xPLAPI::Message</a></td><td class="indexvalue"></td></tr>
-  <tr><td class="indexkey"><a class="el" href="classonewire_1_1OneWire.html">onewire::OneWire</a></td><td class="indexvalue"></td></tr>
-  <tr><td class="indexkey"><a class="el" href="classonewire_1_1OneWireException.html">onewire::OneWireException</a></td><td class="indexvalue"></td></tr>
-  <tr><td class="indexkey"><a class="el" href="classdomogik_1_1control_1_1SampleDataHelper_1_1SampleDataHelper.html">domogik::control::SampleDataHelper::SampleDataHelper</a></td><td class="indexvalue"></td></tr>
-  <tr><td class="indexkey"><a class="el" href="classgenerate__config_1_1senderConfig.html">generate_config::senderConfig</a></td><td class="indexvalue"></td></tr>
-  <tr><td class="indexkey"><a class="el" href="classgenerate__config_1_1triggerConfig.html">generate_config::triggerConfig</a></td><td class="indexvalue"></td></tr>
-  <tr><td class="indexkey"><a class="el" href="classx10API_1_1X10API.html">x10API::X10API</a></td><td class="indexvalue"></td></tr>
-  <tr><td class="indexkey"><a class="el" href="classgenerate__config_1_1x10Config.html">generate_config::x10Config</a></td><td class="indexvalue"></td></tr>
-  <tr><td class="indexkey"><a class="el" href="classx10API_1_1X10Exception.html">x10API::X10Exception</a></td><td class="indexvalue"></td></tr>
-  <tr><td class="indexkey"><a class="el" href="classdatetime_1_1xPLDateTime.html">datetime::xPLDateTime</a></td><td class="indexvalue"></td></tr>
-  <tr><td class="indexkey"><a class="el" href="classxPLAPI_1_1XPLException.html">xPLAPI::XPLException</a></td><td class="indexvalue"></td></tr>
-  <tr><td class="indexkey"><a class="el" href="classxPLAPI_1_1xPLTimer.html">xPLAPI::xPLTimer</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey"><a class="el" href="classtrigger_1_1AND.html">trigger::AND</a></td><td class="indexvalue">Implementation for the <a class="el" href="classtrigger_1_1AND.html" title="Implementation for the AND operator.">AND</a> operator </td></tr>
+  <tr><td class="indexkey"><a class="el" href="classtrigger_1_1Condition.html">trigger::Condition</a></td><td class="indexvalue">Parent class for each condition A condition can be a node : it store 1 or 2 other conditions, or a final node : it just implements some eval of the condition </td></tr>
+  <tr><td class="indexkey"><a class="el" href="classgenerate__config_1_1ConfigManager.html">generate_config::ConfigManager</a></td><td class="indexvalue">General config manager which can ask user about config settings, check results and write config file </td></tr>
+  <tr><td class="indexkey"><a class="el" href="classgenerate__config_1_1datetimeConfig.html">generate_config::datetimeConfig</a></td><td class="indexvalue">Ask the user for specific config for the xPL datetime module </td></tr>
+  <tr><td class="indexkey"><a class="el" href="classdomogik_1_1doxypy_1_1FSM.html">domogik::doxypy::FSM</a></td><td class="indexvalue">Implements a finite state machine </td></tr>
+  <tr><td class="indexkey"><a class="el" href="classgenerate__config_1_1generalConfig.html">generate_config::generalConfig</a></td><td class="indexvalue">Ask the user for general configuration and write results </td></tr>
+  <tr><td class="indexkey"><a class="el" href="classgenerate__config_1_1genericPluginConfig.html">generate_config::genericPluginConfig</a></td><td class="indexvalue">Generic list for plugins </td></tr>
+  <tr><td class="indexkey"><a class="el" href="classxPLAPI_1_1Listener.html">xPLAPI::Listener</a></td><td class="indexvalue"><a class="el" href="classxPLAPI_1_1Listener.html" title="Listener are objects which are able to check if a message match some filter and to...">Listener</a> are objects which are able to check if a message match some filter and to call a function if they do </td></tr>
+  <tr><td class="indexkey"><a class="el" href="classtrigger_1_1ListenerBuilder.html">trigger::ListenerBuilder</a></td><td class="indexvalue">Class to parse an expression and create appropriated listener </td></tr>
+  <tr><td class="indexkey"><a class="el" href="classconfigloader_1_1Loader.html">configloader::Loader</a></td><td class="indexvalue">Parse Domogik config files </td></tr>
+  <tr><td class="indexkey"><a class="el" href="classxPLAPI_1_1Manager.html">xPLAPI::Manager</a></td><td class="indexvalue"><a class="el" href="classxPLAPI_1_1Manager.html" title="Manager is the main component of the system You can run many managers on different...">Manager</a> is the main component of the system You can run many managers on different port Each manager will send an heartbeat message on broadcast on port 3865 to announce itself to the xPL Hub </td></tr>
+  <tr><td class="indexkey"><a class="el" href="classxPLAPI_1_1Message.html">xPLAPI::Message</a></td><td class="indexvalue"><a class="el" href="classxPLAPI_1_1Message.html" title="Message is the object for all data received form the network.">Message</a> is the object for all data received form the network </td></tr>
+  <tr><td class="indexkey"><a class="el" href="classtrigger_1_1NOT.html">trigger::NOT</a></td><td class="indexvalue">Implementation for the <a class="el" href="classtrigger_1_1NOT.html" title="Implementation for the NOT operator.">NOT</a> operator </td></tr>
+  <tr><td class="indexkey"><a class="el" href="classonewire_1_1OneWire.html">onewire::OneWire</a></td><td class="indexvalue">Manage <a class="el" href="classonewire_1_1OneWire.html" title="Manage OneWire.">OneWire</a> </td></tr>
+  <tr><td class="indexkey"><a class="el" href="classonewire_1_1OneWireException.html">onewire::OneWireException</a></td><td class="indexvalue"><a class="el" href="classonewire_1_1OneWire.html" title="Manage OneWire.">OneWire</a> exception </td></tr>
+  <tr><td class="indexkey"><a class="el" href="classtrigger_1_1OR.html">trigger::OR</a></td><td class="indexvalue">Implementation for the <a class="el" href="classtrigger_1_1OR.html" title="Implementation for the OR operator.">OR</a> operator </td></tr>
+  <tr><td class="indexkey"><a class="el" href="classdomogik_1_1control_1_1SampleDataHelper_1_1SampleDataHelper.html">domogik::control::SampleDataHelper::SampleDataHelper</a></td><td class="indexvalue">Class to load / clear sample data </td></tr>
+  <tr><td class="indexkey"><a class="el" href="classgenerate__config_1_1senderConfig.html">generate_config::senderConfig</a></td><td class="indexvalue">Ask the user for specific config for the xPL sender </td></tr>
+  <tr><td class="indexkey"><a class="el" href="classtrigger_1_1stateCond.html">trigger::stateCond</a></td><td class="indexvalue">Implementation of the state condition This allows user to describe a condition on any item of the system </td></tr>
+  <tr><td class="indexkey"><a class="el" href="classtrigger_1_1timeCond.html">trigger::timeCond</a></td><td class="indexvalue">Implementation of the time condition This allows user to describe time periods like cron </td></tr>
+  <tr><td class="indexkey"><a class="el" href="classgenerate__config_1_1triggerConfig.html">generate_config::triggerConfig</a></td><td class="indexvalue">Ask the user for specific config for the xPL sender </td></tr>
+  <tr><td class="indexkey"><a class="el" href="classx10API_1_1X10API.html">x10API::X10API</a></td><td class="indexvalue">This class define some facilities to use X10 </td></tr>
+  <tr><td class="indexkey"><a class="el" href="classgenerate__config_1_1x10Config.html">generate_config::x10Config</a></td><td class="indexvalue">Ask the user for specific config for X10 xPL module </td></tr>
+  <tr><td class="indexkey"><a class="el" href="classx10API_1_1X10Exception.html">x10API::X10Exception</a></td><td class="indexvalue">X10 exception </td></tr>
+  <tr><td class="indexkey"><a class="el" href="classdatetime_1_1xPLDateTime.html">datetime::xPLDateTime</a></td><td class="indexvalue">Send date and time on the xPL network every minute </td></tr>
+  <tr><td class="indexkey"><a class="el" href="classxPLAPI_1_1XPLException.html">xPLAPI::XPLException</a></td><td class="indexvalue">XPL exception </td></tr>
+  <tr><td class="indexkey"><a class="el" href="classxPLAPI_1_1xPLTimer.html">xPLAPI::xPLTimer</a></td><td class="indexvalue">XPLTimer will call a callback function each n seconds </td></tr>
 </table>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Feb 4 13:54:18 2009 for Domogik by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Thu Feb 5 11:25:05 2009 for Domogik by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.6 </small></address>
 </body>
