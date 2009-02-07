@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-07 18:23:57 +0100 (sam. 07 févr. 2009) $
-# $LastChangedRevision: 342 $
+# $LastChangedDate: 2009-02-07 19:19:54 +0100 (sam. 07 févr. 2009) $
+# $LastChangedRevision: 343 $
 
 from domogik.control.models import Area
 from domogik.control.models import Room
@@ -73,7 +73,7 @@ class SampleDataHelper:
 		)
 		DeviceProperty.objects.create(
 								key="value",
-								value="0",  # Off (static)
+								value="off",
 								valueType="BOOLEAN",
 								isChangeableByUser=True,
 								device=bedroom1BedsideLamp
@@ -107,8 +107,8 @@ class SampleDataHelper:
 		)
 		DeviceProperty.objects.create(
 								key="value",
-								value="0", # Off (static)
-								valueType="ALPHANUM",
+								value="off",
+								valueType="BOOLEAN",
 								valueUnit="%",
 								isChangeableByUser=True,
 								device=bedroom2BedsideLamp
@@ -179,7 +179,7 @@ class SampleDataHelper:
 		)
 		DeviceProperty.objects.create(
 								key="value",
-								value="0", # Off (static)
+								value="off",
 								valueType="BOOLEAN",
 								isChangeableByUser=True,
 								device=kitchenCoffeeMachine

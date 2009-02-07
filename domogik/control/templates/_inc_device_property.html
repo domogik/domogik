@@ -19,8 +19,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-17 22:12:54 +0100 (mer. 17 déc. 2008) $
-# $LastChangedRevision: 281 $
+# $LastChangedDate: 2009-02-07 19:19:54 +0100 (sam. 07 févr. 2009) $
+# $LastChangedRevision: 343 $
 -->
 {% endcomment %}
 
@@ -29,12 +29,12 @@
 		<input id="id_key{{ device.id }}" type="hidden" name="key{{ device.id }}" value="{{ property.key }}"/>
 		{% ifequal property.valueType "BOOLEAN" %}
 			<select id="id_value{{ device.id }}" name="value{{ device.id }}">
-			{% ifequal property.value "1" %}
-				<option value="1" selected="selected">ON</option>
-				<option value="0">OFF</option>
+			{% ifequal property.value "on" %}
+				<option value="on" selected="selected">ON</option>
+				<option value="off">OFF</option>
 			{% else %}
-				<option value="1">ON</option>
-				<option value="0" selected="selected">OFF</option>
+				<option value="on">ON</option>
+				<option value="off" selected="selected">OFF</option>
 			{% endifequal %}
 			</select>
 		{% endifequal %}
