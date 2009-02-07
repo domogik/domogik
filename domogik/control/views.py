@@ -20,10 +20,12 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-07 17:52:13 +0100 (sam. 07 févr. 2009) $
-# $LastChangedRevision: 341 $
+# $LastChangedDate: 2009-02-07 22:05:47 +0100 (sam. 07 févr. 2009) $
+# $LastChangedRevision: 345 $
 
 import datetime
+import os
+from subprocess import *
 
 from django.db.models import Q
 from django.http import Http404
@@ -111,12 +113,35 @@ def __sendValueToDevice(deviceId, propertyKey, propertyValue):
 	# Read previous value, and update it if necessary
 	deviceProperty = DeviceProperty.objects.get(device__id=deviceId, key=propertyKey)
 	if deviceProperty.value != propertyValue:
-		#################################
-		# TODO : Send value to device !!!
-		#################################
 		deviceProperty.value = propertyValue
-		deviceProperty.save()
-		__writeDeviceCmdLog(deviceId, deviceProperty.value, "Nothing special", True)
+		device = Device.objects.get(pk=deviceId)
+		if device.technology.lower() == 'x10':
+			error = __sendX10Cmd(device, deviceProperty)
+
+		if error == "":
+			deviceProperty.save()
+			__writeDeviceCmdLog(deviceId, deviceProperty.value, "Nothing special", True)
+
+def __sendX10Cmd(device, deviceProperty):
+	"""
+	Send x10 cmd
+	"""
+	xplSchema = "x10.basic"
+	if deviceProperty.valueType.lower() == "boolean":
+		xplParam = "device="+device.address+","+"command="+deviceProperty.value
+
+	scriptCmd = "python send.py " + xplSchema + " \"device=" + device.address +",command=" + deviceProperty.value + "\""
+	print scriptCmd
+	curPath = os.getcwd()
+	# TODO : chdir is fishy, please change me!
+	os.chdir("xpl")
+	res = Popen(scriptCmd, shell=True, stderr=PIPE)
+	os.chdir(curPath)
+	output = res.stderr.read()
+	res.stderr.close()
+	print "output = %s" % output
+	# python send.py x10.basic "device=a1,command=off"
+	return output
 
 def __writeDeviceCmdLog(deviceId, newValue, newComment, newIsSuccessful):
 	"""
