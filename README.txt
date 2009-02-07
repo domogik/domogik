@@ -17,7 +17,35 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-09 22:52:53 +0100 (mar. 09 déc. 2008) $
-# $LastChangedRevision: 253 $
+# $LastChangedDate: 2009-02-07 22:06:10 +0100 (sam. 07 févr. 2009) $
+# $LastChangedRevision: 346 $
 
 See the web site on http://www.domogik.org to get the latest documentation.
+
+***********************************************************
+*	Temporarily doc
+*	This won't be necessary as soon as we have an installer
+***********************************************************
+
+* Install all required components (see http://www.domogik.org)
+
+X10
+***
+
+* Install heyu (for x10 technology and make sure it is running properly, running
+	manual commands. Then stop heyu.
+
+* Go to the 'config' directory and run :
+	python generate_config all
+* Go to the 'xPL' directory and start xPL hub :
+	./xPL_Hub
+	# or if you want to have more output
+	./xPL_Hub -nodaemon -xpldebug
+
+* Go to the 'xPL' directory and run x10
+	python x10_main.py
+
+* Point your browser to your domogik installation
+* Click on the "config" link and set up your devices
+	(to have examples, you can first go to the admin section and load sample data)
+* You should be able to send x10 commands!
