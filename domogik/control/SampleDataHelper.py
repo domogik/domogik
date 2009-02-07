@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-07 17:52:13 +0100 (sam. 07 févr. 2009) $
-# $LastChangedRevision: 341 $
+# $LastChangedDate: 2009-02-07 18:23:57 +0100 (sam. 07 févr. 2009) $
+# $LastChangedRevision: 342 $
 
 from domogik.control.models import Area
 from domogik.control.models import Room
@@ -73,7 +73,7 @@ class SampleDataHelper:
 		)
 		DeviceProperty.objects.create(
 								key="value",
-								value="1",  # On (static)
+								value="0",  # Off (static)
 								valueType="BOOLEAN",
 								isChangeableByUser=True,
 								device=bedroom1BedsideLamp
@@ -89,7 +89,7 @@ class SampleDataHelper:
 		)
 		DeviceProperty.objects.create(
 								key="value",
-								value="75", # Variable value (dimmer)
+								value="0", # Variable value (dimmer)
 								valueType="ALPHANUM",
 								valueUnit="%",
 								isChangeableByUser=True,
@@ -124,7 +124,7 @@ class SampleDataHelper:
 		)
 		DeviceProperty.objects.create(
 								key="value",
-								value="30", # Variable value (dimmer)
+								value="0", # Variable value (dimmer)
 								valueType="ALPHANUM",
 								valueUnit="%",
 								isChangeableByUser=True,
@@ -143,7 +143,7 @@ class SampleDataHelper:
 		)
 		DeviceProperty.objects.create(
 								key="value",
-								value="50", # Variable value (dimmer)
+								value="0", # Variable value (dimmer)
 								valueType="ALPHANUM",
 								valueUnit="%",
 								isChangeableByUser=True,
@@ -162,7 +162,7 @@ class SampleDataHelper:
 		)
 		DeviceProperty.objects.create(
 								key="value",
-								value="50", # Variable value (dimmer)
+								value="0", # Variable value (dimmer)
 								valueType="ALPHANUM",
 								valueUnit="%",
 								isChangeableByUser=True,
@@ -179,7 +179,7 @@ class SampleDataHelper:
 		)
 		DeviceProperty.objects.create(
 								key="value",
-								value="1", # On (static)
+								value="0", # Off (static)
 								valueType="BOOLEAN",
 								isChangeableByUser=True,
 								device=kitchenCoffeeMachine
