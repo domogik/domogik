@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-01-18 12:34:24 +0100 (dim. 18 janv. 2009) $
-# $LastChangedRevision: 295 $
+# $LastChangedDate: 2009-02-07 17:13:55 +0100 (sam. 07 févr. 2009) $
+# $LastChangedRevision: 340 $
 
 from domogik.control.models import Area
 from domogik.control.models import Room
@@ -62,25 +62,118 @@ class SampleDataHelper:
 		bathroom = Room.objects.create(name="Bathroom", area=firstFloor)
 		cellar = Room.objects.create(name="Cellar", area=basement)
 
-		bedroom1BedsideLamp = Device.objects.create(name="Beside lamp", technology="x10", capacity="lighting", reference="AM12", address="A1", room=bedroom1)
-		DeviceProperty.objects.create(key="value", value="1", valueType="BOOLEAN", isChangeableByUser=True, device=bedroom1BedsideLamp) # On (static)
+		bedroom1BedsideLamp = Device.objects.create(
+								name="Beside lamp",
+								technology="x10",
+								capacity="lighting",
+								reference="AM12",
+								address="A1",
+								room=bedroom1
+		)
+		DeviceProperty.objects.create(
+								key="value",
+								value="1",  # On (static)
+								valueType="BOOLEAN",
+								isChangeableByUser=True,
+								device=bedroom1BedsideLamp
+		)
+		bedroom1Lamp = Device.objects.create(
+								name="Lamp",
+								technology="x10",
+								capacity="lighting",
+								reference="LM12",
+								address="A2",
+								room=bedroom1
+		)
+		DeviceProperty.objects.create(
+								key="value",
+								value="75", # Variable value (dimmer)
+								valueType="ALPHANUM",
+								valueUnit="%",
+								isChangeableByUser=True,
+								device=bedroom1Lamp
+		)
 
-		bedroom1Lamp = Device.objects.create(name="Lamp", technology="x10", capacity="lighting", reference="LM12", address="A2", room=bedroom1)
-		DeviceProperty.objects.create(key="value", value="75", valueType="ALPHANUM", valueUnit="%", isChangeableByUser=True, device=bedroom1Lamp) # Variable value (dimmer)
-
-		bedroom2BedsideLamp = Device.objects.create(name="Beside lamp", technology="x10", capacity="lighting", reference="AM12", address="B1", room=bedroom2)
-		DeviceProperty.objects.create(key="value", value="0", valueType="ALPHANUM", valueUnit="%", isChangeableByUser=True, device=bedroom2BedsideLamp) # Off (static)
-
-		bedroom2Lamp = Device.objects.create(name="Lamp", technology="x10", capacity="lighting", reference="LM12", address="B2", room=bedroom2)
-		DeviceProperty.objects.create(key="value", value="30", valueType="ALPHANUM", valueUnit="%", isChangeableByUser=True, device=bedroom2Lamp) # Variable value (dimmer)
+		bedroom2BedsideLamp = Device.objects.create(
+								name="Beside lamp",
+								technology="x10",
+								capacity="lighting",
+								reference="AM12",
+								address="B1",
+								room=bedroom2
+		)
+		DeviceProperty.objects.create(
+								key="value",
+								value="0", # Off (static)
+								valueType="ALPHANUM",
+								valueUnit="%",
+								isChangeableByUser=True,
+								device=bedroom2BedsideLamp
+		)
+		bedroom2Lamp = Device.objects.create(
+								name="Lamp",
+								technology="x10",
+								capacity="lighting",
+								reference="LM12",
+								address="B2",
+								room=bedroom2
+		)
+		DeviceProperty.objects.create(
+								key="value",
+								value="30", # Variable value (dimmer)
+								valueType="ALPHANUM",
+								valueUnit="%",
+								isChangeableByUser=True,
+								device=bedroom2Lamp
+		)
 		#bedroomMusic = Item.objects.create(name="Music in the bedroom", room=bedroom, capacity=music)
 
-		loungeLamp = Device.objects.create(name="Lamp", technology="x10", capacity="lighting", reference="LM12", address="C1", room=lounge)
-		DeviceProperty.objects.create(key="value", value="50", valueType="ALPHANUM", valueUnit="%", isChangeableByUser=True, device=loungeLamp) # Variable value (dimmer)
+		loungeLamp = Device.objects.create(
+								name="Lamp",
+								technology="x10",
+								capacity="lighting",
+								reference="LM12",
+								address="C1",
+								room=lounge
+		)
+		DeviceProperty.objects.create(
+								key="value",
+								value="50", # Variable value (dimmer)
+								valueType="ALPHANUM",
+								valueUnit="%",
+								isChangeableByUser=True,
+								device=loungeLamp
+		)
 		#loungeMusic = Item.objects.create(name="Music in the lounge", room=lounge, capacity=music)
 
-		kitchenLamp = Device.objects.create(name="Lamp", technology="x10", capacity="lighting", reference="LM12", address="D1", room=kitchen)
-		DeviceProperty.objects.create(key="value", value="50", valueType="ALPHANUM", valueUnit="%", isChangeableByUser=True, device=kitchenLamp) # Variable value (dimmer)
-
-		kitchenCoffeeMachine = Device.objects.create(name="Coffee machine", technology="x10", capacity="powerpoint", reference="AM12", address="D2", room=kitchen)
-		DeviceProperty.objects.create(key="value", value="1", valueType="BOOLEAN", isChangeableByUser=True, device=kitchenCoffeeMachine) # On (static)
+		kitchenLamp = Device.objects.create(
+								name="Lamp",
+								technology="x10",
+								capacity="lighting",
+								reference="LM12",
+								address="D1",
+								room=kitchen
+		)
+		DeviceProperty.objects.create(
+								key="value",
+								value="50", # Variable value (dimmer)
+								valueType="ALPHANUM",
+								valueUnit="%",
+								isChangeableByUser=True,
+								device=kitchenLamp
+		)
+		kitchenCoffeeMachine = Device.objects.create(
+								name="Coffee machine",
+								technology="x10",
+								capacity="powerpoint",
+								reference="AM12",
+								address="D2",
+								room=kitchen
+		)
+		DeviceProperty.objects.create(
+								key="value",
+								value="1", # On (static)
+								valueType="BOOLEAN",
+								isChangeableByUser=True,
+								device=kitchenCoffeeMachine
+		)
