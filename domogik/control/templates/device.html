@@ -18,8 +18,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-01 14:01:10 +0100 (dim. 01 févr. 2009) $
-# $LastChangedRevision: 310 $
+# $LastChangedDate: 2009-02-07 17:52:13 +0100 (sam. 07 févr. 2009) $
+# $LastChangedRevision: 341 $
 -->
 {% extends "base.html" %}
 
@@ -67,7 +67,10 @@
 		<p></p>
 		<table>
 			<tr>
-				<td><input type="submit" value="Update"/></td>
+				<td><input name="update" type="submit" value="Update"/></td>
+				{% if device.isResetable %}
+					<td><input name="reset" type="submit" value="Reset device"/></td>
+				{% endif %}
 			</tr>
 		</table>
 

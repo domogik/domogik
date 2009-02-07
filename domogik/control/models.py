@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-01-18 12:34:24 +0100 (dim. 18 janv. 2009) $
-# $LastChangedRevision: 295 $
+# $LastChangedDate: 2009-02-07 17:52:13 +0100 (sam. 07 févr. 2009) $
+# $LastChangedRevision: 341 $
 
 from django.db import models
 
@@ -65,6 +65,7 @@ class Device(models.Model):
 	capacity = models.CharField(max_length=30, choices=CAPACITY_CHOICES)
 	room = models.ForeignKey(Room)
 	canGiveFeedback = models.BooleanField("Can give feedback", default=False)
+	isResetable = models.BooleanField("Is resetable", default=False)
 
 	# This is the representation of the object
 	def __unicode__(self):

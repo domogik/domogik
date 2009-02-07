@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-01-18 12:34:24 +0100 (dim. 18 janv. 2009) $
-# $LastChangedRevision: 295 $
+# $LastChangedDate: 2009-02-07 17:52:13 +0100 (sam. 07 févr. 2009) $
+# $LastChangedRevision: 341 $
 
 import datetime
 
@@ -141,6 +141,7 @@ def device(request, deviceId):
 	pageTitle = "Device details"
 
 	if request.method == 'POST': # An action was submitted
+		# TODO check the value of the button (reset or update value)
 		__updateDeviceValues(request)
 
 	appSetting = __readApplicationSetting()

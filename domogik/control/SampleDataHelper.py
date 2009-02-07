@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-07 17:13:55 +0100 (sam. 07 févr. 2009) $
-# $LastChangedRevision: 340 $
+# $LastChangedDate: 2009-02-07 17:52:13 +0100 (sam. 07 févr. 2009) $
+# $LastChangedRevision: 341 $
 
 from domogik.control.models import Area
 from domogik.control.models import Room
@@ -68,7 +68,8 @@ class SampleDataHelper:
 								capacity="lighting",
 								reference="AM12",
 								address="A1",
-								room=bedroom1
+								room=bedroom1,
+								isResetable=True
 		)
 		DeviceProperty.objects.create(
 								key="value",
@@ -83,7 +84,8 @@ class SampleDataHelper:
 								capacity="lighting",
 								reference="LM12",
 								address="A2",
-								room=bedroom1
+								room=bedroom1,
+								isResetable=True
 		)
 		DeviceProperty.objects.create(
 								key="value",
@@ -100,7 +102,8 @@ class SampleDataHelper:
 								capacity="lighting",
 								reference="AM12",
 								address="B1",
-								room=bedroom2
+								room=bedroom2,
+								isResetable=True
 		)
 		DeviceProperty.objects.create(
 								key="value",
@@ -116,7 +119,8 @@ class SampleDataHelper:
 								capacity="lighting",
 								reference="LM12",
 								address="B2",
-								room=bedroom2
+								room=bedroom2,
+								isResetable=True
 		)
 		DeviceProperty.objects.create(
 								key="value",
@@ -134,7 +138,8 @@ class SampleDataHelper:
 								capacity="lighting",
 								reference="LM12",
 								address="C1",
-								room=lounge
+								room=lounge,
+								isResetable=True
 		)
 		DeviceProperty.objects.create(
 								key="value",
@@ -152,7 +157,8 @@ class SampleDataHelper:
 								capacity="lighting",
 								reference="LM12",
 								address="D1",
-								room=kitchen
+								room=kitchen,
+								isResetable=True
 		)
 		DeviceProperty.objects.create(
 								key="value",
@@ -168,7 +174,8 @@ class SampleDataHelper:
 								capacity="powerpoint",
 								reference="AM12",
 								address="D2",
-								room=kitchen
+								room=kitchen,
+								isResetable=True
 		)
 		DeviceProperty.objects.create(
 								key="value",
