@@ -19,9 +19,9 @@
 
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
-# $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-04 11:57:23 +0100 (mer. 04 févr. 2009) $
-# $LastChangedRevision: 335 $
+# $LastChangedBy: mschneider $
+# $LastChangedDate: 2009-02-07 21:24:27 +0100 (sam. 07 févr. 2009) $
+# $LastChangedRevision: 344 $
 
 import re
 import sys
@@ -208,14 +208,20 @@ class datetimeConfig(genericPluginConfig):
         section = "datetime"
         self.askandwrite(file, section)
 
+def usage():
+    print "usage : generate_config.py config"
+    print "   config : name of the section to reconfigure"
+    print "            Can be one of : all, plugins, x10, 1wire, send, trigger, datetime"
+    exit(1)
+
 if __name__ == "__main__":
+
     if len(sys.argv) > 1:
         choice = sys.argv[1]
+        if choice == "--help":
+            usage()
     else:
-        print "usage : generate_config.py config"
-        print " - config : name of the section to reconfigure"
-        print "            Can be one of : all, plugins, x10, 1wire, send, trigger, datetime"
-        exit(1)
+        usage()
 
     if choice == 'all':
         generalConfig()
