@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-07 17:52:13 +0100 (sam. 07 févr. 2009) $
-# $LastChangedRevision: 341 $
+# $LastChangedDate: 2009-02-08 16:33:23 +0100 (dim. 08 févr. 2009) $
+# $LastChangedRevision: 347 $
 
 from django.db import models
 
@@ -40,6 +40,15 @@ class Room(models.Model):
 	def __unicode__(self):
 		return self.name
 
+class DeviceCategory(models.Model):
+	"""
+	Examples : temperature, heating, lighting, music, ...
+	"""
+	name = models.CharField(max_length=30)
+
+	class Meta:
+		verbose_name_plural = "Device categories"
+
 class Device(models.Model):
 	TECHNOLOGY_CHOICES = (
 		('x10', 'X10'),
@@ -48,21 +57,13 @@ class Device(models.Model):
 		('ir', 'IR'),
 	)
 
-	CAPACITY_CHOICES = (
-		('temperature', 'Temperature'),
-		('heating', 'Heating'),
-		('lighting', 'Lighting'),
-		('music', 'Music'),
-		('powerpoint','Power point')
-	)
-
 	name = models.CharField(max_length=30)
 	serialNb = models.CharField("Serial Nb", max_length=30, null=True, blank=True)
 	reference = models.CharField(max_length=30, null=True, blank=True)
 	address = models.CharField(max_length=30)
 	description = models.TextField(max_length=80, null=True, blank=True)
 	technology = models.CharField(max_length=20, choices=TECHNOLOGY_CHOICES)
-	capacity = models.CharField(max_length=30, choices=CAPACITY_CHOICES)
+	deviceCategory = models.ForeignKey(DeviceCategory)
 	room = models.ForeignKey(Room)
 	canGiveFeedback = models.BooleanField("Can give feedback", default=False)
 	isResetable = models.BooleanField("Is resetable", default=False)

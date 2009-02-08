@@ -20,11 +20,12 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-07 19:19:54 +0100 (sam. 07 févr. 2009) $
-# $LastChangedRevision: 343 $
+# $LastChangedDate: 2009-02-08 16:33:23 +0100 (dim. 08 févr. 2009) $
+# $LastChangedRevision: 347 $
 
 from domogik.control.models import Area
 from domogik.control.models import Room
+from domogik.control.models import DeviceCategory
 from domogik.control.models import DeviceProperty
 from domogik.control.models import DeviceCmdLog
 from domogik.control.models import Device
@@ -39,6 +40,7 @@ class SampleDataHelper:
 	def remove(self):
 		ApplicationSetting.objects.all().delete()
 		StateReading.objects.all().delete()
+		DeviceCategory.objects.all().delete()
 		DeviceProperty.objects.all().delete()
 		DeviceCmdLog.objects.all().delete()
 		Device.objects.all().delete()
@@ -51,6 +53,13 @@ class SampleDataHelper:
 		ApplicationSetting.objects.create(simulationMode=True, adminMode=True, debugMode=True)
 
 		# Create sample objects
+
+		temperatureCat = DeviceCategory.objects.create(name="Temperature")
+		heatingCat = DeviceCategory.objects.create(name="Heating")
+		lightingCat = DeviceCategory.objects.create(name="Lighting")
+		musicCat = DeviceCategory.objects.create(name="Music")
+		applianceCat = DeviceCategory.objects.create(name="Appliance")
+
 		basement = Area.objects.create(name="Basement")
 		groundFloor = Area.objects.create(name="Ground floor")
 		firstFloor = Area.objects.create(name="First floor")
@@ -65,10 +74,10 @@ class SampleDataHelper:
 		bedroom1BedsideLamp = Device.objects.create(
 								name="Beside lamp",
 								technology="x10",
-								capacity="lighting",
 								reference="AM12",
 								address="A1",
 								room=bedroom1,
+								deviceCategory=lightingCat,
 								isResetable=True
 		)
 		DeviceProperty.objects.create(
@@ -81,10 +90,10 @@ class SampleDataHelper:
 		bedroom1Lamp = Device.objects.create(
 								name="Lamp",
 								technology="x10",
-								capacity="lighting",
 								reference="LM12",
 								address="A2",
 								room=bedroom1,
+								deviceCategory=lightingCat,
 								isResetable=True
 		)
 		DeviceProperty.objects.create(
@@ -99,10 +108,10 @@ class SampleDataHelper:
 		bedroom2BedsideLamp = Device.objects.create(
 								name="Beside lamp",
 								technology="x10",
-								capacity="lighting",
 								reference="AM12",
 								address="B1",
 								room=bedroom2,
+								deviceCategory=lightingCat,
 								isResetable=True
 		)
 		DeviceProperty.objects.create(
@@ -113,13 +122,14 @@ class SampleDataHelper:
 								isChangeableByUser=True,
 								device=bedroom2BedsideLamp
 		)
+
 		bedroom2Lamp = Device.objects.create(
 								name="Lamp",
 								technology="x10",
-								capacity="lighting",
 								reference="LM12",
 								address="B2",
 								room=bedroom2,
+								deviceCategory=lightingCat,
 								isResetable=True
 		)
 		DeviceProperty.objects.create(
@@ -130,15 +140,14 @@ class SampleDataHelper:
 								isChangeableByUser=True,
 								device=bedroom2Lamp
 		)
-		#bedroomMusic = Item.objects.create(name="Music in the bedroom", room=bedroom, capacity=music)
 
 		loungeLamp = Device.objects.create(
 								name="Lamp",
 								technology="x10",
-								capacity="lighting",
 								reference="LM12",
 								address="C1",
 								room=lounge,
+								deviceCategory=lightingCat,
 								isResetable=True
 		)
 		DeviceProperty.objects.create(
@@ -149,15 +158,14 @@ class SampleDataHelper:
 								isChangeableByUser=True,
 								device=loungeLamp
 		)
-		#loungeMusic = Item.objects.create(name="Music in the lounge", room=lounge, capacity=music)
 
 		kitchenLamp = Device.objects.create(
 								name="Lamp",
 								technology="x10",
-								capacity="lighting",
 								reference="LM12",
 								address="D1",
 								room=kitchen,
+								deviceCategory=lightingCat,
 								isResetable=True
 		)
 		DeviceProperty.objects.create(
@@ -168,13 +176,14 @@ class SampleDataHelper:
 								isChangeableByUser=True,
 								device=kitchenLamp
 		)
+
 		kitchenCoffeeMachine = Device.objects.create(
 								name="Coffee machine",
 								technology="x10",
-								capacity="powerpoint",
 								reference="AM12",
 								address="D2",
 								room=kitchen,
+								deviceCategory=applianceCat,
 								isResetable=True
 		)
 		DeviceProperty.objects.create(

@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-07 22:05:47 +0100 (sam. 07 févr. 2009) $
-# $LastChangedRevision: 345 $
+# $LastChangedDate: 2009-02-08 16:33:23 +0100 (dim. 08 févr. 2009) $
+# $LastChangedRevision: 347 $
 
 import datetime
 import os
@@ -34,6 +34,7 @@ from django.shortcuts import render_to_response
 
 from domogik.control.models import Area
 from domogik.control.models import Room
+from domogik.control.models import DeviceCategory
 from domogik.control.models import DeviceProperty
 from domogik.control.models import DeviceCmdLog
 from domogik.control.models import Device
@@ -52,7 +53,7 @@ def index(request):
 
 	qListArea = Q()
 	qListRoom = Q()
-	qListCapacity = Q()
+	qListDeviceCategory = Q()
 	if request.method == 'POST': # An action was submitted
 		cmd = QueryDict.get(request.POST, "cmd", "")
 		if cmd == "filter":
@@ -60,17 +61,17 @@ def index(request):
 				qListArea = qListArea | Q(room__area__id = area)
 			for room in QueryDict.getlist(request.POST, "room"):
 				qListRoom = qListRoom | Q(room__id = room)
-			for capacity in QueryDict.getlist(request.POST, "capacity"):
-				qListCapacity = qListCapacity | Q(capacity = capacity)
+			for deviceCategory in QueryDict.getlist(request.POST, "deviceCategory"):
+				qListDeviceCategory = qListDeviceCategory | Q(deviceCategory__id = deviceCategory)
 		elif cmd == "updateValues":
 			__updateDeviceValues(request)
 
 	# select_related() should avoid one extra db query per property
-	deviceList = Device.objects.filter(qListArea).filter(qListRoom).filter(qListCapacity).select_related()
+	deviceList = Device.objects.filter(qListArea).filter(qListRoom).filter(qListDeviceCategory).select_related()
 
 	areaList = Area.objects.all()
 	roomList = Room.objects.all()
-	capacityList = Device.CAPACITY_CHOICES
+	deviceCategoryList = DeviceCategory.objects.all()
 	techList = Device.TECHNOLOGY_CHOICES
 
 	appSetting = __readApplicationSetting()
@@ -80,13 +81,13 @@ def index(request):
 	return render_to_response(
 		'index.html',
 		{
-			'areaList'		: areaList,
-			'roomList'		: roomList,
-			'capacityList'	: capacityList,
-			'deviceList'	: deviceList,
-			'techList'		: techList,
-			'adminMode'		: adminMode,
-			'pageTitle'		: pageTitle
+			'areaList'				: areaList,
+			'roomList'				: roomList,
+			'deviceCategoryList'	: deviceCategoryList,
+			'deviceList'			: deviceList,
+			'techList'				: techList,
+			'adminMode'				: adminMode,
+			'pageTitle'				: pageTitle
 		}
 	)
 
@@ -291,20 +292,20 @@ def loadSampleData(request):
 
 	areaList = Area.objects.all()
 	roomList = Room.objects.all()
-	capacityList = Device.CAPACITY_CHOICES
+	deviceCategoryList = DeviceCategory.objects.all()
 	deviceList = Device.objects.all()
 	techList = Device.TECHNOLOGY_CHOICES
 
 	return render_to_response(
 		'admin_index.html',
 		{
-			'pageTitle'		: pageTitle,
-			'action'		: action,
-			'areaList'		: areaList,
-			'roomList'		: roomList,
-			'capacityList'	: capacityList,
-			'deviceList'	: deviceList,
-			'techList'		: techList,
+			'pageTitle'				: pageTitle,
+			'action'				: action,
+			'areaList'				: areaList,
+			'roomList'				: roomList,
+			'deviceCategoryList'	: deviceCategoryList,
+			'deviceList'			: deviceList,
+			'techList'				: techList,
 		}
 	)
 

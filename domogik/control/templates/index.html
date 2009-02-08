@@ -18,8 +18,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-01-18 12:34:24 +0100 (dim. 18 janv. 2009) $
-# $LastChangedRevision: 295 $
+# $LastChangedDate: 2009-02-08 16:33:23 +0100 (dim. 08 févr. 2009) $
+# $LastChangedRevision: 347 $
 -->
 {% extends "base.html" %}
 
@@ -60,11 +60,11 @@
 						<td>
 							<table>
 								<tr>
-									<th>Capacity</th>
+									<th>Category</th>
 								</tr>
-								{% for key,value in capacityList %}
+								{% for deviceCategory in deviceCategoryList %}
 									<tr>
-										<td>{{ value }}</td><td><input type="checkbox" name="capacity" value="{{ key }}"/></td>
+										<td>{{ deviceCategory.name }}</td><td><input type="checkbox" name="deviceCategory" value="{{ deviceCategory.id }}"/></td>
 									</tr>
 								{% endfor %}
 							</table>
@@ -87,7 +87,7 @@
 			<tr>
 				<th>Device name</th>
 				{% if adminMode %}
-					<th>Capacity</th>
+					<th>Category</th>
 					<th>Address</th>
 					<th>Reference</th>
 					<th>Technology</th>
@@ -101,8 +101,8 @@
 				<input type="hidden" id="id_deviceId" name="deviceId" value="{{ device.id }}"/>
 				<tr class="{% cycle 'oddRow' 'evenRow' %}">
 					<td><a href="{% url deviceView device.id %}">{{ device.name }}</a></td>
+					<td>{{ device.deviceCategory.name }}</td>
 					{% if adminMode %}
-						<td>{{ device.capacity }}</td>
 						<td>{{ device.address }}</td>
 						<td>{{ device.reference }}</td>
 						<td>{{ device.technology }}</td>

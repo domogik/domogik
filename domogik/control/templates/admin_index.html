@@ -18,8 +18,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-01-18 12:34:24 +0100 (dim. 18 janv. 2009) $
-# $LastChangedRevision: 295 $
+# $LastChangedDate: 2009-02-08 16:33:23 +0100 (dim. 08 févr. 2009) $
+# $LastChangedRevision: 347 $
 -->
 {% extends "base.html" %}
 
@@ -107,12 +107,12 @@
 				<p>No data</p>
 			{% endif %}
 
-			<p><strong>Capacities</strong></p>
+			<p><strong>Categories</strong></p>
 			<hr/>
-			{% if capacityList %}
+			{% if deviceCategoryList %}
 				<ul>
-				{% for key,value in capacityList %}
-					<li>{{ value }}</li>
+				{% for deviceCategory in deviceCategoryList %}
+					<li>{{ deviceCategory.name }}</li>
 				{% endfor %}
 				</ul>
 			{% else %}
