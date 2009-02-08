@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-08 16:33:23 +0100 (dim. 08 févr. 2009) $
-# $LastChangedRevision: 347 $
+# $LastChangedDate: 2009-02-08 18:10:37 +0100 (dim. 08 févr. 2009) $
+# $LastChangedRevision: 348 $
 
 import datetime
 import os
@@ -43,6 +43,7 @@ from domogik.control.models import ApplicationSetting
 from domogik.control.forms import ApplicationSettingForm
 
 from domogik.control.SampleDataHelper import SampleDataHelper
+from domogik.control.XPLHelper import XPLHelper
 
 def index(request):
 	"""
@@ -127,21 +128,11 @@ def __sendX10Cmd(device, deviceProperty):
 	"""
 	Send x10 cmd
 	"""
-	xplSchema = "x10.basic"
+	xPLSchema = "x10.basic"
 	if deviceProperty.valueType.lower() == "boolean":
-		xplParam = "device="+device.address+","+"command="+deviceProperty.value
+		xPLParam = "device="+device.address+","+"command="+deviceProperty.value
 
-	scriptCmd = "python send.py " + xplSchema + " \"device=" + device.address +",command=" + deviceProperty.value + "\""
-	print scriptCmd
-	curPath = os.getcwd()
-	# TODO : chdir is fishy, please change me!
-	os.chdir("xpl")
-	res = Popen(scriptCmd, shell=True, stderr=PIPE)
-	os.chdir(curPath)
-	output = res.stderr.read()
-	res.stderr.close()
-	print "output = %s" % output
-	# python send.py x10.basic "device=a1,command=off"
+	output = XPLHelper().send(xPLSchema, xPLParam)
 	return output
 
 def __writeDeviceCmdLog(deviceId, newValue, newComment, newIsSuccessful):
