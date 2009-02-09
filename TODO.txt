@@ -1,6 +1,6 @@
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-02 22:52:52 +0100 (lun. 02 févr. 2009) $
-# $LastChangedRevision: 317 $
+# $LastChangedDate: 2009-02-09 09:41:07 +0100 (lun. 09 févr. 2009) $
+# $LastChangedRevision: 350 $
 
 * General
 	* @Loiz : set up internationalization for messages (see also how to translate data
@@ -13,6 +13,7 @@
 
 	* Control
 		* @Marc : integrate code to send commands over the xPL network (in views.py)
+		* @Marc : add possibility to simply switch on / off dimmers
 		* @Marc : add command to erase x10 device
 		* @Marc : Display history of readings (essentially for sensors)
 			Seems to be a good idea to use the powerful rrdtools : http://oss.oetiker.ch/rrdtool/gallery/index.en.html
