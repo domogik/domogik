@@ -19,16 +19,16 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-07 19:19:54 +0100 (sam. 07 févr. 2009) $
-# $LastChangedRevision: 343 $
+# $LastChangedDate: 2009-02-12 11:42:26 +0100 (jeu. 12 févr. 2009) $
+# $LastChangedRevision: 355 $
 -->
 {% endcomment %}
 
 {% for property in device.deviceproperty_set.all %}
 	{% if property.isChangeableByUser %}
 		<input id="id_key{{ device.id }}" type="hidden" name="key{{ device.id }}" value="{{ property.key }}"/>
-		{% ifequal property.valueType "BOOLEAN" %}
-			<select id="id_value{{ device.id }}" name="value{{ device.id }}">
+		{% if device.isAppliance  %}
+			<select id="id_value{{ device.id }}SelectBox" name="value{{ device.id }}">
 			{% ifequal property.value "on" %}
 				<option value="on" selected="selected">ON</option>
 				<option value="off">OFF</option>
@@ -37,10 +37,10 @@
 				<option value="off" selected="selected">OFF</option>
 			{% endifequal %}
 			</select>
-		{% endifequal %}
-		{% ifequal property.valueType "ALPHANUM" %}
-			<input id="id_value{{ device.id }}" type="text" name="value{{ device.id }}" value="{{ property.value }}" size="3"/>&nbsp;{{ property.valueUnit }}
-		{% endifequal %}
+		{% endif %}
+		{% if device.isLamp %}
+			<input id="id_value{{ device.id }}InputBox" type="text" name="value{{ device.id }}" value="{{ property.value }}" size="3"/>&nbsp;{{ property.valueUnit }}
+		{% endif %}
 	{% else %}
 		{{ property.value }}&nbsp;{{ property.valueUnit }}
 	{% endif %}
