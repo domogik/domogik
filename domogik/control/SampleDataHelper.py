@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-08 16:33:23 +0100 (dim. 08 févr. 2009) $
-# $LastChangedRevision: 347 $
+# $LastChangedDate: 2009-02-12 10:35:39 +0100 (jeu. 12 févr. 2009) $
+# $LastChangedRevision: 351 $
 
 from domogik.control.models import Area
 from domogik.control.models import Room
@@ -77,6 +77,7 @@ class SampleDataHelper:
 								reference="AM12",
 								address="A1",
 								room=bedroom1,
+								deviceType="lamp",
 								deviceCategory=lightingCat,
 								isResetable=True
 		)
@@ -93,6 +94,7 @@ class SampleDataHelper:
 								reference="LM12",
 								address="A2",
 								room=bedroom1,
+								deviceType="lamp",
 								deviceCategory=lightingCat,
 								isResetable=True
 		)
@@ -111,6 +113,7 @@ class SampleDataHelper:
 								reference="AM12",
 								address="B1",
 								room=bedroom2,
+								deviceType="lamp",
 								deviceCategory=lightingCat,
 								isResetable=True
 		)
@@ -129,6 +132,7 @@ class SampleDataHelper:
 								reference="LM12",
 								address="B2",
 								room=bedroom2,
+								deviceType="lamp",
 								deviceCategory=lightingCat,
 								isResetable=True
 		)
@@ -147,6 +151,7 @@ class SampleDataHelper:
 								reference="LM12",
 								address="C1",
 								room=lounge,
+								deviceType="lamp",
 								deviceCategory=lightingCat,
 								isResetable=True
 		)
@@ -165,6 +170,7 @@ class SampleDataHelper:
 								reference="LM12",
 								address="D1",
 								room=kitchen,
+								deviceType="lamp",
 								deviceCategory=lightingCat,
 								isResetable=True
 		)
@@ -183,6 +189,7 @@ class SampleDataHelper:
 								reference="AM12",
 								address="D2",
 								room=kitchen,
+								deviceType="appliance",
 								deviceCategory=applianceCat,
 								isResetable=True
 		)

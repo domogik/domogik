@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-08 16:33:23 +0100 (dim. 08 févr. 2009) $
-# $LastChangedRevision: 347 $
+# $LastChangedDate: 2009-02-12 10:35:39 +0100 (jeu. 12 févr. 2009) $
+# $LastChangedRevision: 351 $
 
 from django.db import models
 
@@ -57,16 +57,32 @@ class Device(models.Model):
 		('ir', 'IR'),
 	)
 
+	DEVICETYPE_CHOICES = (
+		('appliance','Appliance'),
+		('lamp','Lamp'),
+		('music','Music'),
+	)
+
 	name = models.CharField(max_length=30)
 	serialNb = models.CharField("Serial Nb", max_length=30, null=True, blank=True)
 	reference = models.CharField(max_length=30, null=True, blank=True)
 	address = models.CharField(max_length=30)
 	description = models.TextField(max_length=80, null=True, blank=True)
 	technology = models.CharField(max_length=20, choices=TECHNOLOGY_CHOICES)
+	# This is NOT user-defined
+	deviceType = models.CharField(max_length=20, choices=DEVICETYPE_CHOICES)
+	# This is user-defined
 	deviceCategory = models.ForeignKey(DeviceCategory)
 	room = models.ForeignKey(Room)
 	canGiveFeedback = models.BooleanField("Can give feedback", default=False)
 	isResetable = models.BooleanField("Is resetable", default=False)
+
+	def canBeSwitchedOnOff(self):
+		return self.deviceType.lower() == 'appliance' or self.deviceType.lower() == 'lamp'
+
+	def canHaveInputValue(self):
+		# TODO : Add here supported devices
+		return self.deviceType.lower() == 'lamp'
 
 	# This is the representation of the object
 	def __unicode__(self):

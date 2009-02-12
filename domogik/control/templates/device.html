@@ -18,8 +18,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-08 16:33:23 +0100 (dim. 08 févr. 2009) $
-# $LastChangedRevision: 347 $
+# $LastChangedDate: 2009-02-12 10:35:39 +0100 (jeu. 12 févr. 2009) $
+# $LastChangedRevision: 351 $
 -->
 {% extends "base.html" %}
 
@@ -42,6 +42,9 @@
 				</tr>
 				<tr>
 					<td class="label">Technology</td><td class="value">{{ device.technology }}</td>
+				</tr>
+				<tr>
+					<td class="label">Type</td><td class="value">{{ device.deviceType }}</td>
 				</tr>
 			{% endif %}
 			<tr>
