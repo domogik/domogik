@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-12 10:35:39 +0100 (jeu. 12 févr. 2009) $
-# $LastChangedRevision: 351 $
+# $LastChangedDate: 2009-02-12 11:41:12 +0100 (jeu. 12 févr. 2009) $
+# $LastChangedRevision: 354 $
 
 from domogik.control.models import Area
 from domogik.control.models import Room
@@ -77,7 +77,7 @@ class SampleDataHelper:
 								reference="AM12",
 								address="A1",
 								room=bedroom1,
-								deviceType="lamp",
+								deviceType="appliance",
 								deviceCategory=lightingCat,
 								isResetable=True
 		)
@@ -113,7 +113,7 @@ class SampleDataHelper:
 								reference="AM12",
 								address="B1",
 								room=bedroom2,
-								deviceType="lamp",
+								deviceType="appliance",
 								deviceCategory=lightingCat,
 								isResetable=True
 		)
