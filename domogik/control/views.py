@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-09 09:26:48 +0100 (lun. 09 févr. 2009) $
-# $LastChangedRevision: 349 $
+# $LastChangedDate: 2009-02-12 11:24:37 +0100 (jeu. 12 févr. 2009) $
+# $LastChangedRevision: 352 $
 
 import datetime
 import os
@@ -130,7 +130,7 @@ def __sendX10Cmd(device, deviceProperty):
 	"""
 	xPLSchema = "x10.basic"
 	xPLParam = ""
-	if deviceProperty.valueType.lower() == "boolean":
+	if device.canBeSwitchedOnOff():
 		xPLParam = "device="+device.address+","+"command="+deviceProperty.value
 
 	output = XPLHelper().send(xPLSchema, xPLParam)
