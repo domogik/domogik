@@ -18,8 +18,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-12 10:35:39 +0100 (jeu. 12 févr. 2009) $
-# $LastChangedRevision: 351 $
+# $LastChangedDate: 2009-02-12 11:52:36 +0100 (jeu. 12 févr. 2009) $
+# $LastChangedRevision: 356 $
 -->
 {% extends "base.html" %}
 
@@ -44,11 +44,11 @@
 					<td class="label">Technology</td><td class="value">{{ device.technology }}</td>
 				</tr>
 				<tr>
-					<td class="label">Type</td><td class="value">{{ device.deviceType }}</td>
+					<td class="label">Type</td><td class="value">{{ device.type }}</td>
 				</tr>
 			{% endif %}
 			<tr>
-				<td class="label">Category</td><td class="value">{{ device.deviceCategory.name }}</td>
+				<td class="label">Category</td><td class="value">{{ device.category.name }}</td>
 			</tr>
 			<tr>
 				<td class="label">Room</td><td class="value">{{ device.room.name }}</td>

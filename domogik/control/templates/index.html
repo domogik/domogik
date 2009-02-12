@@ -18,8 +18,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-08 16:33:23 +0100 (dim. 08 févr. 2009) $
-# $LastChangedRevision: 347 $
+# $LastChangedDate: 2009-02-12 11:52:36 +0100 (jeu. 12 févr. 2009) $
+# $LastChangedRevision: 356 $
 -->
 {% extends "base.html" %}
 
@@ -101,7 +101,7 @@
 				<input type="hidden" id="id_deviceId" name="deviceId" value="{{ device.id }}"/>
 				<tr class="{% cycle 'oddRow' 'evenRow' %}">
 					<td><a href="{% url deviceView device.id %}">{{ device.name }}</a></td>
-					<td>{{ device.deviceCategory.name }}</td>
+					<td>{{ device.category.name }}</td>
 					{% if adminMode %}
 						<td>{{ device.address }}</td>
 						<td>{{ device.reference }}</td>

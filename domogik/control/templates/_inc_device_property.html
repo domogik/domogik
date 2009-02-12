@@ -19,8 +19,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-12 11:42:26 +0100 (jeu. 12 févr. 2009) $
-# $LastChangedRevision: 355 $
+# $LastChangedDate: 2009-02-12 11:52:36 +0100 (jeu. 12 févr. 2009) $
+# $LastChangedRevision: 356 $
 -->
 {% endcomment %}
 
@@ -28,7 +28,7 @@
 	{% if property.isChangeableByUser %}
 		<input id="id_key{{ device.id }}" type="hidden" name="key{{ device.id }}" value="{{ property.key }}"/>
 		{% if device.isAppliance  %}
-			<select id="id_value{{ device.id }}SelectBox" name="value{{ device.id }}">
+			<select id="id_value{{ device.id }}" name="value{{ device.id }}">
 			{% ifequal property.value "on" %}
 				<option value="on" selected="selected">ON</option>
 				<option value="off">OFF</option>
@@ -39,7 +39,7 @@
 			</select>
 		{% endif %}
 		{% if device.isLamp %}
-			<input id="id_value{{ device.id }}InputBox" type="text" name="value{{ device.id }}" value="{{ property.value }}" size="3"/>&nbsp;{{ property.valueUnit }}
+			<input id="id_value{{ device.id }}" type="text" name="value{{ device.id }}" value="{{ property.value }}" size="3"/>&nbsp;{{ property.valueUnit }}
 		{% endif %}
 	{% else %}
 		{{ property.value }}&nbsp;{{ property.valueUnit }}

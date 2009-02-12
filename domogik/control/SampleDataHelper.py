@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-12 11:41:12 +0100 (jeu. 12 févr. 2009) $
-# $LastChangedRevision: 354 $
+# $LastChangedDate: 2009-02-12 11:52:36 +0100 (jeu. 12 févr. 2009) $
+# $LastChangedRevision: 356 $
 
 from domogik.control.models import Area
 from domogik.control.models import Room
@@ -77,8 +77,8 @@ class SampleDataHelper:
 								reference="AM12",
 								address="A1",
 								room=bedroom1,
-								deviceType="appliance",
-								deviceCategory=lightingCat,
+								type="appliance",
+								category=lightingCat,
 								isResetable=True
 		)
 		DeviceProperty.objects.create(
@@ -94,8 +94,8 @@ class SampleDataHelper:
 								reference="LM12",
 								address="A2",
 								room=bedroom1,
-								deviceType="lamp",
-								deviceCategory=lightingCat,
+								type="lamp",
+								category=lightingCat,
 								isResetable=True
 		)
 		DeviceProperty.objects.create(
@@ -113,8 +113,8 @@ class SampleDataHelper:
 								reference="AM12",
 								address="B1",
 								room=bedroom2,
-								deviceType="appliance",
-								deviceCategory=lightingCat,
+								type="appliance",
+								category=lightingCat,
 								isResetable=True
 		)
 		DeviceProperty.objects.create(
@@ -132,8 +132,8 @@ class SampleDataHelper:
 								reference="LM12",
 								address="B2",
 								room=bedroom2,
-								deviceType="lamp",
-								deviceCategory=lightingCat,
+								type="lamp",
+								category=lightingCat,
 								isResetable=True
 		)
 		DeviceProperty.objects.create(
@@ -151,8 +151,8 @@ class SampleDataHelper:
 								reference="LM12",
 								address="C1",
 								room=lounge,
-								deviceType="lamp",
-								deviceCategory=lightingCat,
+								type="lamp",
+								category=lightingCat,
 								isResetable=True
 		)
 		DeviceProperty.objects.create(
@@ -170,8 +170,8 @@ class SampleDataHelper:
 								reference="LM12",
 								address="D1",
 								room=kitchen,
-								deviceType="lamp",
-								deviceCategory=lightingCat,
+								type="lamp",
+								category=lightingCat,
 								isResetable=True
 		)
 		DeviceProperty.objects.create(
@@ -189,8 +189,8 @@ class SampleDataHelper:
 								reference="AM12",
 								address="D2",
 								room=kitchen,
-								deviceType="appliance",
-								deviceCategory=applianceCat,
+								type="appliance",
+								category=applianceCat,
 								isResetable=True
 		)
 		DeviceProperty.objects.create(

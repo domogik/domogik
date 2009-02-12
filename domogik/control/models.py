@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-12 11:38:31 +0100 (jeu. 12 févr. 2009) $
-# $LastChangedRevision: 353 $
+# $LastChangedDate: 2009-02-12 11:52:36 +0100 (jeu. 12 févr. 2009) $
+# $LastChangedRevision: 356 $
 
 from django.db import models
 
@@ -57,7 +57,7 @@ class Device(models.Model):
 		('ir', 'IR'),
 	)
 
-	DEVICETYPE_CHOICES = (
+	TYPE_CHOICES = (
 		('appliance','Appliance'),
 		('lamp','Lamp'),
 		('music','Music'),
@@ -70,25 +70,25 @@ class Device(models.Model):
 	description = models.TextField(max_length=80, null=True, blank=True)
 	technology = models.CharField(max_length=20, choices=TECHNOLOGY_CHOICES)
 	# This is NOT user-defined
-	deviceType = models.CharField(max_length=20, choices=DEVICETYPE_CHOICES)
+	type = models.CharField(max_length=20, choices=TYPE_CHOICES)
 	# This is user-defined
-	deviceCategory = models.ForeignKey(DeviceCategory)
+	category = models.ForeignKey(DeviceCategory)
 	room = models.ForeignKey(Room)
 	canGiveFeedback = models.BooleanField("Can give feedback", default=False)
 	isResetable = models.BooleanField("Is resetable", default=False)
 
 	def isLamp(self):
-		return self.deviceType.lower() == 'lamp'
+		return self.type.lower() == 'lamp'
 
 	def isAppliance(self):
-		return self.deviceType.lower() == 'appliance'
+		return self.type.lower() == 'appliance'
 
 	def canBeSwitchedOnOff(self):
-		return self.deviceType.lower() == 'appliance' or self.deviceType.lower() == 'lamp'
+		return self.type.lower() == 'appliance' or self.deviceType.lower() == 'lamp'
 
 	def canHaveInputValue(self):
 		# TODO : Add here supported devices
-		return self.deviceType.lower() == 'lamp'
+		return self.type.lower() == 'lamp'
 
 	# This is the representation of the object
 	def __unicode__(self):

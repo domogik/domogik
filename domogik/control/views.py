@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-12 11:24:37 +0100 (jeu. 12 févr. 2009) $
-# $LastChangedRevision: 352 $
+# $LastChangedDate: 2009-02-12 11:52:36 +0100 (jeu. 12 févr. 2009) $
+# $LastChangedRevision: 356 $
 
 import datetime
 import os
@@ -63,7 +63,7 @@ def index(request):
 			for room in QueryDict.getlist(request.POST, "room"):
 				qListRoom = qListRoom | Q(room__id = room)
 			for deviceCategory in QueryDict.getlist(request.POST, "deviceCategory"):
-				qListDeviceCategory = qListDeviceCategory | Q(deviceCategory__id = deviceCategory)
+				qListDeviceCategory = qListDeviceCategory | Q(category__id = deviceCategory)
 		elif cmd == "updateValues":
 			__updateDeviceValues(request)
 
