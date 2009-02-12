@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-12 10:35:39 +0100 (jeu. 12 févr. 2009) $
-# $LastChangedRevision: 351 $
+# $LastChangedDate: 2009-02-12 11:38:31 +0100 (jeu. 12 févr. 2009) $
+# $LastChangedRevision: 353 $
 
 from django.db import models
 
@@ -76,6 +76,12 @@ class Device(models.Model):
 	room = models.ForeignKey(Room)
 	canGiveFeedback = models.BooleanField("Can give feedback", default=False)
 	isResetable = models.BooleanField("Is resetable", default=False)
+
+	def isLamp(self):
+		return self.deviceType.lower() == 'lamp'
+
+	def isAppliance(self):
+		return self.deviceType.lower() == 'appliance'
 
 	def canBeSwitchedOnOff(self):
 		return self.deviceType.lower() == 'appliance' or self.deviceType.lower() == 'lamp'
