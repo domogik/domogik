@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-12 11:52:36 +0100 (jeu. 12 févr. 2009) $
-# $LastChangedRevision: 356 $
+# $LastChangedDate: 2009-02-13 09:20:19 +0100 (ven. 13 févr. 2009) $
+# $LastChangedRevision: 357 $
 
 from django.db import models
 
@@ -84,7 +84,7 @@ class Device(models.Model):
 		return self.type.lower() == 'appliance'
 
 	def canBeSwitchedOnOff(self):
-		return self.type.lower() == 'appliance' or self.deviceType.lower() == 'lamp'
+		return self.type.lower() == 'appliance' or self.type.lower() == 'lamp'
 
 	def canHaveInputValue(self):
 		# TODO : Add here supported devices
