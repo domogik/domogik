@@ -19,9 +19,9 @@
 
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
-# $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-03 23:21:52 +0100 (mar. 03 févr. 2009) $
-# $LastChangedRevision: 330 $
+# $LastChangedBy: maxence $
+# $LastChangedDate: 2009-02-14 15:23:09 +0100 (sam. 14 févr. 2009) $
+# $LastChangedRevision: 360 $
 
 from subprocess import *
 class X10Exception:
@@ -87,7 +87,7 @@ class X10API:
         res.stderr.close()
         if output:
             raise X10Exception, "Error during send of command : %s " % output
- 
+
     def on(self, item):
         """
         Send an ON order to the item element
@@ -108,13 +108,13 @@ class X10API:
         @param item : the item to send the OFF order to
         @Return True if order was sent, False in case of errors
         """
-#        try:
-        self._valid_item(item)
-        self._send("off", item)
-#        except:
-#            return False
-#        else:
-#            return True
+        try:
+                self._valid_item(item)
+                self._send("off", item)
+        except:
+            return False
+        else:
+            return True
 
     def house_on(self, house):
         """
@@ -133,12 +133,112 @@ class X10API:
     def house_off(self, house):
         """
         Send an ALLOFF order to the item element
-        @param item : the item to send the ALLOFF order to
+        @param house: the item to send the ALLOFF order to
         @Return True if order was sent, False in case of errors
         """
         try:
             self._valid_house(house)
             self._send("alloff", house)
+        except:
+            return False
+        else:
+            return True
+
+    def bright(self, item, lvl):
+        '''
+        Send bright command
+        @param item : item to send brigth order
+        @param lvl : bright level in percent
+        @Return True if order was sent, False in case of errors
+        '''
+        try:
+            self._valid_item(item)
+            level = int(lvl * 0.22)
+            if level = 0:
+                level = 1
+            self._send("bright %s" % level, item)
+        except:
+            return False
+        else:
+            return True
+
+    def brightb(self, item, lvl):
+        '''
+        Send bright command after full brigth
+        @param item : item to send bright order
+        @param lvl : bright level in percent
+        @Return True if order was sent, False in case of errors
+        '''
+        try:
+            self._valid_item(item)
+            level = int(lvl * 0.22)
+            if level = 0:
+                level = 1
+            self._send("brightb %s" % level, item)
+        except:
+            return False
+        else:
+            return True
+
+    def dim(self, item, lvl):
+        '''
+        Send dim command
+        @param item : item to send brigth order
+        @param lvl : dim level in percent
+        @Return True if order was sent, False in case of errors
+        '''
+        try:
+            self._valid_item(item)
+            level = int(lvl * 0.22)
+            if level = 0:
+                level = 1
+            self._send("dim %s" % level, item)
+        except:
+            return False
+        else:
+            return True
+
+    def dimb(self, item, lvl):
+        '''
+        Send dim command after full brigth
+        @param item : item to send dim order
+        @param lvl : dim level in percent
+        @Return True if order was sent, False in case of errors
+        '''
+        try:
+            self._valid_item(item)
+            level = int(lvl * 0.22)
+            if level = 0:
+                level = 1
+            self._send("dimb %s" % level, item)
+        except:
+            return False
+        else:
+            return True
+
+    def lights_on(self, house):
+        """
+        Send an lights_on order to the item element
+        @param item : the house to send the lights_on order to
+        @Return True if order was sent, False in case of errors
+        """
+        try:
+            self._valid_house(house)
+            self._send("lightson", house)
+        except:
+            return False
+        else:
+            return True
+
+    def lights_off(self, house):
+        """
+        Send an lightsoff order to the item element
+        @param house: the house to send the lightsoff order to
+        @Return True if order was sent, False in case of errors
+        """
+        try:
+            self._valid_house(house)
+            self._send("lightson", house)
         except:
             return False
         else:
