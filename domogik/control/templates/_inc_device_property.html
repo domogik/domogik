@@ -19,8 +19,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-12 11:52:36 +0100 (jeu. 12 févr. 2009) $
-# $LastChangedRevision: 356 $
+# $LastChangedDate: 2009-02-14 11:43:03 +0100 (sam. 14 févr. 2009) $
+# $LastChangedRevision: 359 $
 -->
 {% endcomment %}
 
@@ -28,15 +28,13 @@
 	{% if property.isChangeableByUser %}
 		<input id="id_key{{ device.id }}" type="hidden" name="key{{ device.id }}" value="{{ property.key }}"/>
 		{% if device.isAppliance  %}
-			<select id="id_value{{ device.id }}" name="value{{ device.id }}">
 			{% ifequal property.value "on" %}
-				<option value="on" selected="selected">ON</option>
-				<option value="off">OFF</option>
+				<input type="radio" name="value{{ device.id }}" value="on" checked/>On
+				<input type="radio" name="value{{ device.id }}" value="off"/>Off
 			{% else %}
-				<option value="on">ON</option>
-				<option value="off" selected="selected">OFF</option>
+				<input type="radio" name="value{{ device.id }}" value="on"/>On
+				<input type="radio" name="value{{ device.id }}" value="off" checked/>Off
 			{% endifequal %}
-			</select>
 		{% endif %}
 		{% if device.isLamp %}
 			<input id="id_value{{ device.id }}" type="text" name="value{{ device.id }}" value="{{ property.value }}" size="3"/>&nbsp;{{ property.valueUnit }}
