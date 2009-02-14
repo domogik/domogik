@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-12 11:52:36 +0100 (jeu. 12 févr. 2009) $
-# $LastChangedRevision: 356 $
+# $LastChangedDate: 2009-02-14 11:36:34 +0100 (sam. 14 févr. 2009) $
+# $LastChangedRevision: 358 $
 
 import datetime
 import os
@@ -52,6 +52,8 @@ def index(request):
 	adminMode = ""
 	pageTitle = "Control overview"
 
+	appSetting = __readApplicationSetting()
+
 	qListArea = Q()
 	qListRoom = Q()
 	qListDeviceCategory = Q()
@@ -65,7 +67,7 @@ def index(request):
 			for deviceCategory in QueryDict.getlist(request.POST, "deviceCategory"):
 				qListDeviceCategory = qListDeviceCategory | Q(category__id = deviceCategory)
 		elif cmd == "updateValues":
-			__updateDeviceValues(request)
+			__updateDeviceValues(request, appSetting)
 
 	# select_related() should avoid one extra db query per property
 	deviceList = Device.objects.filter(qListArea).filter(qListRoom).filter(qListDeviceCategory).select_related()
@@ -75,7 +77,6 @@ def index(request):
 	deviceCategoryList = DeviceCategory.objects.all()
 	techList = Device.TECHNOLOGY_CHOICES
 
-	appSetting = __readApplicationSetting()
 	if appSetting.adminMode == True:
 		adminMode = "True"
 
@@ -92,7 +93,7 @@ def index(request):
 		}
 	)
 
-def __updateDeviceValues(request):
+def __updateDeviceValues(request, appSetting):
 	"""
 	Update device values (main control page)
 	"""
@@ -100,7 +101,7 @@ def __updateDeviceValues(request):
 		keyList = QueryDict.getlist(request.POST, "key" + deviceId)
 		valueList = QueryDict.getlist(request.POST, "value" + deviceId)
 		for i in range(len(keyList)):
-			__sendValueToDevice(deviceId, keyList[i], valueList[i])
+			__sendValueToDevice(deviceId, keyList[i], valueList[i], appSetting)
 
 	# Get all values posted over the form
 	# For each device :
@@ -108,16 +109,17 @@ def __updateDeviceValues(request):
 	#	If yes, try to send new value to the device
 	#	Log the result
 
-def __sendValueToDevice(deviceId, propertyKey, propertyValue):
+def __sendValueToDevice(deviceId, propertyKey, propertyValue, appSetting):
 	"""
 	Send a value to a device
 	"""
+	error = ""
 	# Read previous value, and update it if necessary
 	deviceProperty = DeviceProperty.objects.get(device__id=deviceId, key=propertyKey)
 	if deviceProperty.value != propertyValue:
 		deviceProperty.value = propertyValue
 		device = Device.objects.get(pk=deviceId)
-		if device.technology.lower() == 'x10':
+		if device.technology.lower() == 'x10' and not appSetting.simulationMode:
 			error = __sendX10Cmd(device, deviceProperty)
 
 		if error == "":
