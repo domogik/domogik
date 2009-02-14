@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-03 21:22:59 +0100 (mar. 03 févr. 2009) $
-# $LastChangedRevision: 327 $
+# $LastChangedDate: 2009-02-14 16:14:51 +0100 (sam. 14 févr. 2009) $
+# $LastChangedRevision: 361 $
 
 from x10API import *
 from xPLAPI import *
@@ -45,13 +45,29 @@ class x10Main():
         '''
         General callback for all command messages
         '''
-        cmd = message.get_key_value('command')
-        dev = message.get_key_value('device')
-        print "CMD : %s - DEV : %s" % (cmd, dev)
-        if cmd.lower() == 'on':
-            print self.__myx10.on(dev)
-        if cmd.lower() == 'off':
-            print self.__myx10.off(dev)
+        commands = {
+            'on': lambda d,h,l:self.__myx10.on(d),
+            'off': lambda d,h,l:self.__myx10.off(d),
+            'all_units_on': lambda d,h,l:self.__myx10.house_on(h),
+            'all_units_off': lambda d,h,l:self.__myx10.house_off(h),
+            'all_lights_on': lambda d,h,l:self.__myx10.lights_on(h),
+            'all_lights_off': lambda d,h,l:self.__myx10.lights_off(h),
+            'bright': lambda d,h,l:self.__myx10.bright(d,l),
+            'dim': lambda d,h,l:self.__myx10.dim(d,l)
+        }
+        cmd = None
+        dev = None
+        house = None
+        level = None
+        if message.has_key('command'):
+            cmd = message.get_key_value('command')
+        if message.has_key('device'):
+            dev = message.get_key_value('device')
+        if message.has_key('house'):
+            house = message.get_key_value('house')
+        if message.has_key('level'):
+            level = message.get_key_value('level')
+        commands[cmd](dev, house, level)
 
 if __name__ == "__main__":
     x = x10Main()

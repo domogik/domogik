@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-14 15:23:09 +0100 (sam. 14 févr. 2009) $
-# $LastChangedRevision: 360 $
+# $LastChangedDate: 2009-02-14 16:14:51 +0100 (sam. 14 févr. 2009) $
+# $LastChangedRevision: 361 $
 
 from subprocess import *
 class X10Exception:
@@ -154,7 +154,7 @@ class X10API:
         try:
             self._valid_item(item)
             level = int(lvl * 0.22)
-            if level = 0:
+            if level == 0:
                 level = 1
             self._send("bright %s" % level, item)
         except:
@@ -172,7 +172,7 @@ class X10API:
         try:
             self._valid_item(item)
             level = int(lvl * 0.22)
-            if level = 0:
+            if level == 0:
                 level = 1
             self._send("brightb %s" % level, item)
         except:
@@ -190,7 +190,7 @@ class X10API:
         try:
             self._valid_item(item)
             level = int(lvl * 0.22)
-            if level = 0:
+            if level == 0:
                 level = 1
             self._send("dim %s" % level, item)
         except:
@@ -208,7 +208,7 @@ class X10API:
         try:
             self._valid_item(item)
             level = int(lvl * 0.22)
-            if level = 0:
+            if level == 0:
                 level = 1
             self._send("dimb %s" % level, item)
         except:
