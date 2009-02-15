@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-03 16:58:56 +0100 (mar. 03 févr. 2009) $
-# $LastChangedRevision: 326 $
+# $LastChangedDate: 2009-02-15 12:24:46 +0100 (dim. 15 févr. 2009) $
+# $LastChangedRevision: 363 $
 
 import sys 
 import sys, string, select, threading
@@ -62,7 +62,8 @@ class Manager:
             self._UDPSock.bind(addr)
         except :
             # Smthg is already running on this port
-            raise XPLException, "Can't bind to the port %i" % self._port
+            print "Port %s can't be binded" % self._port
+            raise XPLException, "Can't bind to the port "
         else:
             #All is good, we start sending Heartbeat every 5 minutes using xPLTimer
             self._SendHeartbeat()
