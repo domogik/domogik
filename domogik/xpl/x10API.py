@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-14 16:14:51 +0100 (sam. 14 févr. 2009) $
-# $LastChangedRevision: 361 $
+# $LastChangedDate: 2009-02-15 13:00:14 +0100 (dim. 15 févr. 2009) $
+# $LastChangedRevision: 364 $
 
 from subprocess import *
 class X10Exception:
@@ -81,6 +81,20 @@ class X10API:
         @param item : Item to send order to (Can be HU or H form)
         """
         heyucmd = "heyu -c %s %s %s" % (self._heyuconf, cmd, item)
+        print heyucmd
+        res = Popen(heyucmd, shell=True, stderr=PIPE)
+        output = res.stderr.read()
+        res.stderr.close()
+        if output:
+            raise X10Exception, "Error during send of command : %s " % output
+
+    def _send_lvl(self, cmd, item, lvl):
+        """
+        Send a command trought heyu
+        @param cmd : Command to send ('ON','OFF', etc)
+        @param item : Item to send order to (Can be HU or H form)
+        """
+        heyucmd = "heyu -c %s %s %s %s" % (self._heyuconf, cmd, item, lvl)
         print heyucmd
         res = Popen(heyucmd, shell=True, stderr=PIPE)
         output = res.stderr.read()
@@ -156,7 +170,7 @@ class X10API:
             level = int(lvl * 0.22)
             if level == 0:
                 level = 1
-            self._send("bright %s" % level, item)
+            self._send_lvl("bright", item, level)
         except:
             return False
         else:
@@ -174,7 +188,7 @@ class X10API:
             level = int(lvl * 0.22)
             if level == 0:
                 level = 1
-            self._send("brightb %s" % level, item)
+            self._send_lvl("brightb", item, level)
         except:
             return False
         else:
@@ -192,7 +206,7 @@ class X10API:
             level = int(lvl * 0.22)
             if level == 0:
                 level = 1
-            self._send("dim %s" % level, item)
+            self._send_lvl("dim", item, level)
         except:
             return False
         else:
@@ -210,7 +224,7 @@ class X10API:
             level = int(lvl * 0.22)
             if level == 0:
                 level = 1
-            self._send("dimb %s" % level, item)
+            self._send_lvl("dimb", item, level)
         except:
             return False
         else:
