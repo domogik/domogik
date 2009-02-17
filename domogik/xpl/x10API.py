@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-15 13:00:14 +0100 (dim. 15 févr. 2009) $
-# $LastChangedRevision: 364 $
+# $LastChangedDate: 2009-02-17 14:23:34 +0100 (mar. 17 févr. 2009) $
+# $LastChangedRevision: 365 $
 
 from subprocess import *
 class X10Exception:
@@ -201,16 +201,17 @@ class X10API:
         @param lvl : dim level in percent
         @Return True if order was sent, False in case of errors
         '''
-        try:
-            self._valid_item(item)
-            level = int(lvl * 0.22)
-            if level == 0:
-                level = 1
-            self._send_lvl("dim", item, level)
-        except:
-            return False
-        else:
-            return True
+#        try:
+        self._valid_item(item)
+        level = int(lvl * 0.22)
+        if level == 0:
+            level = 1
+        self._send_lvl("dim", item, level)
+#        except:
+#            print "Exception lors de l'envoi de dim"
+#            return False
+#        else:
+#            return True
 
     def dimb(self, item, lvl):
         '''
