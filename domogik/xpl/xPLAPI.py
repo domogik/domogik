@@ -20,12 +20,12 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-15 12:24:46 +0100 (dim. 15 févr. 2009) $
-# $LastChangedRevision: 363 $
+# $LastChangedDate: 2009-02-18 11:54:55 +0100 (mer. 18 févr. 2009) $
+# $LastChangedRevision: 366 $
 
-import sys 
 import sys, string, select, threading
 from socket import *
+import logger
 
 class Manager:
     """
@@ -40,7 +40,7 @@ class Manager:
 #    _listeners = [] # List of listeners to brodacast message
 #    _network = None
 #    _UDPSock = None
-    def __init__(self, ip = "0.0.0.0", source = "xpl-monitor.python", port = 3865):
+    def __init__(self, ip = "0.0.0.0", source = "xpl-monitor.python", port = 3865, logging_file = None, logging_level = 'debug', module_name = None):
         """
         Create a new manager instance
         @param ip : IP to listen to (default 0.0.0.0)
@@ -57,13 +57,15 @@ class Manager:
         # Initialise the socket
         self._UDPSock = socket(AF_INET,SOCK_DGRAM)
         addr = (ip, self._port)
+        l = logger.Logger(logging_file, logging_level, module_name)
+        self._log = l
+
         # Try and bind to the base port
         try :
             self._UDPSock.bind(addr)
         except :
             # Smthg is already running on this port
-            print "Port %s can't be binded" % self._port
-            raise XPLException, "Can't bind to the port "
+            self._log.error("Can't bind to the port %i" % self._port)
         else:
             #All is good, we start sending Heartbeat every 5 minutes using xPLTimer
             self._SendHeartbeat()
@@ -73,14 +75,14 @@ class Manager:
             self._stop_thread = False
             self._network = threading.Thread(None, self._run_thread_monitor, None, (), {})
             self._network.start()
-            print "Lancement du Thread"
+            self._log.debug("xPL thread started")
 
     def leave(self):
         """
         Stop threads and leave the Manager
         """
         self._h_timer.stop()
-        print "stop thread"
+        self._log.debug("xPL thread stopped")
         self._stop_thread = True
         #exit(0)
 
@@ -102,7 +104,6 @@ class Manager:
             hbSock = socket(AF_INET,SOCK_DGRAM)
             hbSock.setsockopt(SOL_SOCKET,SO_BROADCAST,1)
             hbSock.sendto(message.__str__(),("255.255.255.255",3865))
-        
 
 
     # Sub routine for sending a heartbeat
@@ -254,7 +255,7 @@ class Message:
             return
         m = mess.split("\n")
         if not m[0] in self._mess_types:
-            raise XPLException, "Packet type not existing"
+            self._log.warning("Packet type not existing")
         else:
             self._type = m[0]
             try:
@@ -270,7 +271,7 @@ class Message:
                     (key, value) = line.split('=')
                     self._data[string.lower(key)] = value
             except:
-                raise XPLException, "Bad package format"
+                self._log.warning("Bad message format, won't be sent")
 
     def set_type(self, type):
         """
@@ -279,7 +280,7 @@ class Message:
         if type in self._mess_types:
             self._type = type
         else:
-            raise XPLException, "Bad type"
+            self._log.warning("Bad message type")
 
     def get_type(self):
         """
@@ -357,8 +358,8 @@ class Message:
         if key in self._conf:
             return self._conf[key]
         else:
-            raise XPLException, "Key not existing"
- 
+            self._log.warning("Key %s does not exist" % key)
+
     def __str__(self):
         str = "%s\n{\n" % self._type
         if (not self._conf_order):
