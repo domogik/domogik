@@ -25,6 +25,7 @@
 
 from xPLAPI import *
 from configloader import Loader
+import logger
 
 class Condition():
     '''
@@ -186,15 +187,13 @@ class timeCond(Condition):
                             '*' => always true
                             '*/x' => value % x == 0
         @param value : value catched by the system
-        @raise ValueError if unit is misformated
         '''
         if unit == '*':
             return True
         elif unit.startswith('*/'):
             return (int(value) % int(unit.split('/')[1])) == 0
         else:
-            print "Unit : " + unit
-            raise ValueError
+            self._log.error('Bad time format %s' % unit)
 
     ### And of functions for evaluation
 
@@ -270,13 +269,9 @@ class ListenerBuilder():
         for k in self.listitems:
             for j in self.listitems[k]:
                 if self.listitems[k][j] == None:
-                    print "WARN : %s %s is None" % (k,j)
                     all = False
         if all:
             r = eval(self.__expr+".run(self.listitems)")
-            print "Result evaluated to : " + str(r)
-        else:
-            print self.listitems
 
     def updateList(self, k1, k2, v):
         '''

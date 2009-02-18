@@ -20,13 +20,14 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-18 14:06:46 +0100 (mer. 18 févr. 2009) $
-# $LastChangedRevision: 368 $
+# $LastChangedDate: 2009-02-18 16:08:56 +0100 (mer. 18 févr. 2009) $
+# $LastChangedRevision: 370 $
 
 #This script use arguments from command line to forge & send a message
 from xPLAPI import *
 import optparse
 from configloader import Loader
+import logger
 
 class Sender:
 
@@ -36,14 +37,12 @@ class Sender:
         self.parse_parameters()
         cfgloader = Loader('send')
         config = cfgloader.load()
-        print "Create Manager"
-        print config
         self.__myxpl = Manager(config[1]["address"],port = int(config[1]["port"]), source = config[1]["source"], 'send')
-        print "Forge message"
         mess = self.forge_message()
-        print "send message"
+        l = logger.Logger(module_name)
+        self._log = l
+        self._log.debug("Send message : %s" % mess)
         self.__myxpl.send(mess)
-        print "leave"
         self.__myxpl.leave()
         #exit(0)
 
@@ -61,7 +60,7 @@ class Sender:
             exit(1)
 
         if self._args[0] not in self.supported_schemas:
-            print "Schema not supported"
+            self._log.error("Schema %s not supported" %s self._args[0])
             self.usage()
             exit(2)
 
@@ -75,7 +74,7 @@ class Sender:
         datas = self._args[1].split(',')
         for data in datas:
             if "=" not in data:
-                print "Bad formatted commands\n Must be key=value"
+                self._log.error("Bad formatted commands. Must be key=value")
                 self.usage()
                 exit(4)
             else:

@@ -20,12 +20,13 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-18 14:06:46 +0100 (mer. 18 févr. 2009) $
-# $LastChangedRevision: 368 $
+# $LastChangedDate: 2009-02-18 16:08:56 +0100 (mer. 18 févr. 2009) $
+# $LastChangedRevision: 370 $
 
 from x10API import *
 from xPLAPI import *
 from configloader import Loader
+import logger
 
 class x10Main():
 
@@ -40,6 +41,8 @@ class x10Main():
         self.__myxpl = Manager(config["address"],port = config["port"], source = config["source"], 'x10')
         #Create listeners
         Listener(self.x10_cmnd_cb, self.__myxpl, {'schema':'x10.basic','type':'xpl-cmnd'})
+        l = logger.Logger(module_name)
+        self._log = l
 
     def x10_cmnd_cb(self, message):
         '''
@@ -67,6 +70,7 @@ class x10Main():
             house = message.get_key_value('house')
         if message.has_key('level'):
             level = message.get_key_value('level')
+        self._log.debug("%s received : device = %s, house = %s, level = %s" % (cmd, dev, house, level))
         commands[cmd](dev, house, level)
 
 if __name__ == "__main__":

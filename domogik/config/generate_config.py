@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-18 13:34:30 +0100 (mer. 18 févr. 2009) $
-# $LastChangedRevision: 367 $
+# $LastChangedDate: 2009-02-18 16:08:56 +0100 (mer. 18 févr. 2009) $
+# $LastChangedRevision: 370 $
 
 import re
 import sys
@@ -127,7 +127,7 @@ class generalConfig():
         ('hub_address','What is the IP address the xPL system must bind ?',r"^([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])$",None),
         ('hub_port','What is the port the xPL system must bind ?',r"^[1-9][0-9]+$",[3865]),
         ('log_dir_path','What is the path of the log directory ?\nThe directory must exists with good permissions.', None, ['/tmp/']),
-        ('debug_level','What is the debug level for logging you want ?', None, ['debug','info','warning','error','critical'])
+        ('log_level','What is the debug level for logging you want ?', None, ['debug','info','warning','error','critical'])
         ]
         file = "domogik.cfg"
         section = "domogik"

@@ -20,10 +20,11 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-17 14:23:34 +0100 (mar. 17 févr. 2009) $
-# $LastChangedRevision: 365 $
+# $LastChangedDate: 2009-02-18 16:08:56 +0100 (mer. 18 févr. 2009) $
+# $LastChangedRevision: 370 $
 
 from subprocess import *
+import logger
 class X10Exception:
     """
     X10 exception
@@ -41,13 +42,14 @@ class X10API:
     and heyu binaries must be in your PATH
     """
     def __init__(self, heyuconf):
+        l = logger.Logger('x10API')
+        self._log = l
+
         res = Popen("heyu -c " + heyuconf + " start", shell=True, stderr=PIPE)
         output = res.stderr.read()
         res.stderr.close()
         if output:
-            print "Output was : %s" % output
-            print "Heyu conf : %s" % heyuconf
-            raise X10Exception, "Error during Heyu init" 
+            self._log.error("Output was : %s\nHeyu config file path is : %s" % (output, heyuconf)
         self._housecodes = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P']
         self._unitcodes = [ i+1 for i in range(16) ]
         self._heyuconf = heyuconf
@@ -59,9 +61,9 @@ class X10API:
         """
         try:
             if ( item[0].upper() not in self._housecodes ) or ( int(item[1]) not in self._unitcodes ):
-                raise X10Exception, "Invalid item, must be 'HU'"
+                self._log.warning("Invalid item %s%s, must be 'HU'" % (item[0].upper(),item[1]))
         except:
-            raise X10Exception, "Invalid item, must be 'HU'"
+            self._log.warning("Invalid item %s%s, must be 'HU'" % (item[0].upper(),item[1]))
 
     def _valid_house(self, house):
         """
@@ -70,9 +72,9 @@ class X10API:
         """
         try:
             if house[0] not in self._housecodes:
-                raise X10Exception, "Invalid house, must be 'H' format, between A and P"
+                self._log.warning("Invalid house %s, must be 'H' format, between A and P" % (house[0].upper()))
         except:
-            raise X10Exception, "Invalid house, must be 'H' format, between A and P"
+            self._log.warning("Invalid house %s, must be 'H' format, between A and P" % (house[0].upper()))
 
     def _send(self, cmd, item):
         """
@@ -81,12 +83,12 @@ class X10API:
         @param item : Item to send order to (Can be HU or H form)
         """
         heyucmd = "heyu -c %s %s %s" % (self._heyuconf, cmd, item)
-        print heyucmd
+        self._log.debug("Heyu command : %s" % heyucmd)
         res = Popen(heyucmd, shell=True, stderr=PIPE)
         output = res.stderr.read()
         res.stderr.close()
         if output:
-            raise X10Exception, "Error during send of command : %s " % output
+            self._log.error("Error during send of command : %s " % output)
 
     def _send_lvl(self, cmd, item, lvl):
         """
@@ -95,12 +97,12 @@ class X10API:
         @param item : Item to send order to (Can be HU or H form)
         """
         heyucmd = "heyu -c %s %s %s %s" % (self._heyuconf, cmd, item, lvl)
-        print heyucmd
+        self._log.debug("Heyu command : %s" % heyucmd)
         res = Popen(heyucmd, shell=True, stderr=PIPE)
         output = res.stderr.read()
         res.stderr.close()
         if output:
-            raise X10Exception, "Error during send of command : %s " % output
+            self._log.error("Error during send of command : %s " % output)
 
     def on(self, item):
         """

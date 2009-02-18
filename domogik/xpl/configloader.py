@@ -19,9 +19,9 @@
 
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
-# $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-03 23:35:21 +0100 (mar. 03 févr. 2009) $
-# $LastChangedRevision: 332 $
+# $LastChangedBy: maxence $
+# $LastChangedDate: 2009-02-18 16:08:56 +0100 (mer. 18 févr. 2009) $
+# $LastChangedRevision: 370 $
 
 
 #Path to the configuration directory 
@@ -34,6 +34,7 @@ config_path = "../config"
 from os.path import *
 import os
 from configobj import ConfigObj
+import logger
 
 class Loader():
     '''
@@ -46,6 +47,8 @@ class Loader():
         '''
         global config_path
         self.main_conf_name = "domogik.cfg"
+        l = logger.Logger(module_name)
+        self._log = l
         #Format the path
         if config_path[-1] != "/":
             config_path += "/"
@@ -53,8 +56,7 @@ class Loader():
         #Check the main conf file
         file_with_path = config_path + self.main_conf_name
         if not exists(file_with_path):
-            print "The main config file can't be found !"
-            print "Make sure %s exists." %file_with_path
+            self._log.error("The main config file can't be found !\nMake sure %s exists." %file_with_path)
             exit(1)
 
         self.module_name = module_name
