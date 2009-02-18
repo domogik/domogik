@@ -1,6 +1,6 @@
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-09 09:41:07 +0100 (lun. 09 févr. 2009) $
-# $LastChangedRevision: 350 $
+# $LastChangedDate: 2009-02-18 14:17:20 +0100 (mer. 18 févr. 2009) $
+# $LastChangedRevision: 369 $
 
 * General
 	* @Loiz : set up internationalization for messages (see also how to translate data
@@ -11,7 +11,8 @@
 	* @Epy : create a prototype using HTML / CSS
 		Only two files to edit : base.html and style.css !
 
-	* Control
+	* Django
+		* @Marc : rename 'control' directory to 'django'
 		* @Marc : integrate code to send commands over the xPL network (in views.py)
 		* @Marc : add possibility to simply switch on / off dimmers
 		* @Marc : add command to erase x10 device
