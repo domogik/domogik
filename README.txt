@@ -17,8 +17,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-07 22:06:10 +0100 (sam. 07 févr. 2009) $
-# $LastChangedRevision: 346 $
+# $LastChangedDate: 2009-02-18 20:00:39 +0100 (mer. 18 févr. 2009) $
+# $LastChangedRevision: 373 $
 
 See the web site on http://www.domogik.org to get the latest documentation.
 
@@ -32,7 +32,7 @@ See the web site on http://www.domogik.org to get the latest documentation.
 X10
 ***
 
-* Install heyu (for x10 technology and make sure it is running properly, running
+* Install heyu (for x10 technology) and make sure it is running properly, running
 	manual commands. Then stop heyu.
 
 * Go to the 'config' directory and run :
