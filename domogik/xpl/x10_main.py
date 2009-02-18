@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-14 16:14:51 +0100 (sam. 14 févr. 2009) $
-# $LastChangedRevision: 361 $
+# $LastChangedDate: 2009-02-18 14:06:46 +0100 (mer. 18 févr. 2009) $
+# $LastChangedRevision: 368 $
 
 from x10API import *
 from xPLAPI import *
@@ -37,7 +37,7 @@ class x10Main():
         cfgloader = Loader('x10')
         config = cfgloader.load()[1]
         self.__myx10 = X10API(config["heyu_cfg_file"])
-        self.__myxpl = Manager(config["address"],port = config["port"], source = config["source"])
+        self.__myxpl = Manager(config["address"],port = config["port"], source = config["source"], 'x10')
         #Create listeners
         Listener(self.x10_cmnd_cb, self.__myxpl, {'schema':'x10.basic','type':'xpl-cmnd'})
 

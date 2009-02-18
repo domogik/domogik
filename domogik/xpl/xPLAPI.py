@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-18 11:54:55 +0100 (mer. 18 févr. 2009) $
-# $LastChangedRevision: 366 $
+# $LastChangedDate: 2009-02-18 14:06:46 +0100 (mer. 18 févr. 2009) $
+# $LastChangedRevision: 368 $
 
 import sys, string, select, threading
 from socket import *
@@ -40,7 +40,7 @@ class Manager:
 #    _listeners = [] # List of listeners to brodacast message
 #    _network = None
 #    _UDPSock = None
-    def __init__(self, ip = "0.0.0.0", source = "xpl-monitor.python", port = 3865, logging_file = None, logging_level = 'debug', module_name = None):
+    def __init__(self, ip = "0.0.0.0", source = "xpl-monitor.python", port = 3865, module_name = None):
         """
         Create a new manager instance
         @param ip : IP to listen to (default 0.0.0.0)
@@ -57,7 +57,8 @@ class Manager:
         # Initialise the socket
         self._UDPSock = socket(AF_INET,SOCK_DGRAM)
         addr = (ip, self._port)
-        l = logger.Logger(logging_file, logging_level, module_name)
+
+        l = logger.Logger(module_name)
         self._log = l
 
         # Try and bind to the base port

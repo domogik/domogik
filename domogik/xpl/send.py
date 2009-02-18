@@ -19,9 +19,9 @@
 
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
-# $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-02 23:10:32 +0100 (lun. 02 févr. 2009) $
-# $LastChangedRevision: 322 $
+# $LastChangedBy: maxence $
+# $LastChangedDate: 2009-02-18 14:06:46 +0100 (mer. 18 févr. 2009) $
+# $LastChangedRevision: 368 $
 
 #This script use arguments from command line to forge & send a message
 from xPLAPI import *
@@ -38,7 +38,7 @@ class Sender:
         config = cfgloader.load()
         print "Create Manager"
         print config
-        self.__myxpl = Manager(config[1]["address"],port = int(config[1]["port"]), source = config[1]["source"])
+        self.__myxpl = Manager(config[1]["address"],port = int(config[1]["port"]), source = config[1]["source"], 'send')
         print "Forge message"
         mess = self.forge_message()
         print "send message"

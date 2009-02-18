@@ -252,7 +252,7 @@ class ListenerBuilder():
         self.listitems = listitems
         loader = Loader('trigger')
         config = loader.load()[1]
-        self.__myxpl = Manager(config["address"],port = config["port"], source = config["source"])
+        self.__myxpl = Manager(config["address"],port = config["port"], source = config["source"], 'trigger')
         self.__expr = expr
 
         #We should try/catch this bloc in case of undefined method

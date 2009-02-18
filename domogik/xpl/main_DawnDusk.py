@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-02 16:51:53 +0100 (lun. 02 févr. 2009) $
-# $LastChangedRevision: 316 $
+# $LastChangedDate: 2009-02-18 14:06:46 +0100 (mer. 18 févr. 2009) $
+# $LastChangedRevision: 368 $
 
 from dawndusk import DawnDusk
 from xPLAPI import *
@@ -31,7 +31,7 @@ import configloader
 cfgloader = Loader('dawndusk')
 config = cfgloader.load()
 
-myxpl = Manager(config["address"],port = config["port"], source = config["source"])
+myxpl = Manager(config["address"],port = config["port"], source = config["source"],'dawndusk')
 mydawndusk = DawnDusk()
 
 #Parameters definitions

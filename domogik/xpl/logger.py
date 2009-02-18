@@ -24,6 +24,7 @@
 # $LastChangedRevision: 326 $
 
 import logging
+from configloader import Loader
 
 class Logger():
     '''
@@ -31,7 +32,7 @@ class Logger():
     Define main config parameters to help scripts to use logging facilities with a minimum of config
     '''
 
-    def __init__(self, file = None, level = None, module_name = 'domogik'):
+    def __init__(self, module_name = 'domogik'):
     '''
     Get a logger with provided parameters and set config
     @param file : the file to record logs into with the path
@@ -43,10 +44,13 @@ class Logger():
           'error': logging.ERROR,
           'critical': logging.CRITICAL}
 
+    cfg = Loader()
+    config = cfgloader.load()[0]
+    file = "%s/%s.log" % (config['log_dir_path'], module_name)
+    level = config['log_level']
+
     if not LEVELS.has_key[level]:
-        raise ValueError, "level must be one of  'debug','info','warning','error','critical'"
-    if file == None:
-        raise ValueError, "Filename not defined"
+        raise ValueError, "level must be one of  'debug','info','warning','error','critical'. Check your config."
 
     logger = logging.getLogger('domogik-%s' % module_name)
     hdlr = logging.FileHandler(file)
@@ -62,7 +66,3 @@ class Logger():
     returns the configured logger instance
     '''
     return self.logger
-
-    
-
-
