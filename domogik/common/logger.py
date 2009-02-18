@@ -24,7 +24,7 @@
 # $LastChangedRevision: 326 $
 
 import logging
-from configloader import Loader
+from domogik.common.configloader import Loader
 
 class Logger():
     '''

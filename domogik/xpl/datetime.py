@@ -25,7 +25,7 @@
 
 from time import localtime
 from xPLAPI import *
-from configloader import *
+from domogik.common.configloader import *
 
 class xPLDateTime():
     '''

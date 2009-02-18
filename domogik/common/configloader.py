@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-18 18:43:39 +0100 (mer. 18 févr. 2009) $
-# $LastChangedRevision: 372 $
+# $LastChangedDate: 2009-02-18 21:57:42 +0100 (mer. 18 févr. 2009) $
+# $LastChangedRevision: 375 $
 
 
 #Path to the configuration directory 
@@ -34,7 +34,6 @@ config_path = "../config"
 from os.path import *
 import os
 from configobj import ConfigObj
-import logger
 
 class Loader():
     '''
