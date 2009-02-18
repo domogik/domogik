@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-18 18:43:39 +0100 (mer. 18 févr. 2009) $
-# $LastChangedRevision: 372 $
+# $LastChangedDate: 2009-02-18 20:08:19 +0100 (mer. 18 févr. 2009) $
+# $LastChangedRevision: 374 $
 
 from subprocess import *
 import logger
@@ -169,7 +169,7 @@ class X10API:
         '''
         try:
             self._valid_item(item)
-            level = int(lvl * 0.22)
+            level = int(int(lvl) * 0.22)
             if level == 0:
                 level = 1
             self._send_lvl("bright", item, level)
@@ -187,7 +187,7 @@ class X10API:
         '''
         try:
             self._valid_item(item)
-            level = int(lvl * 0.22)
+            level = int(int(lvl) * 0.22)
             if level == 0:
                 level = 1
             self._send_lvl("brightb", item, level)
@@ -205,7 +205,7 @@ class X10API:
         '''
 #        try:
         self._valid_item(item)
-        level = int(lvl * 0.22)
+        level = int(int(lvl) * 0.22)
         if level == 0:
             level = 1
         self._send_lvl("dim", item, level)
@@ -224,7 +224,7 @@ class X10API:
         '''
         try:
             self._valid_item(item)
-            level = int(lvl * 0.22)
+            level = int(int(lvl) * 0.22)
             if level == 0:
                 level = 1
             self._send_lvl("dimb", item, level)
