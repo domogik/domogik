@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-18 16:08:56 +0100 (mer. 18 févr. 2009) $
-# $LastChangedRevision: 370 $
+# $LastChangedDate: 2009-02-18 18:43:39 +0100 (mer. 18 févr. 2009) $
+# $LastChangedRevision: 372 $
 
 #This script use arguments from command line to forge & send a message
 from xPLAPI import *
@@ -37,10 +37,10 @@ class Sender:
         self.parse_parameters()
         cfgloader = Loader('send')
         config = cfgloader.load()
-        self.__myxpl = Manager(config[1]["address"],port = int(config[1]["port"]), source = config[1]["source"], 'send')
+        self.__myxpl = Manager(config[1]["address"],port = int(config[1]["port"]), source = config[1]["source"], module_name = 'send')
         mess = self.forge_message()
-        l = logger.Logger(module_name)
-        self._log = l
+        l = logger.Logger('send')
+        self._log = l.get_logger()
         self._log.debug("Send message : %s" % mess)
         self.__myxpl.send(mess)
         self.__myxpl.leave()
@@ -60,7 +60,7 @@ class Sender:
             exit(1)
 
         if self._args[0] not in self.supported_schemas:
-            self._log.error("Schema %s not supported" %s self._args[0])
+            self._log.error("Schema %s not supported" % self._args[0])
             self.usage()
             exit(2)
 

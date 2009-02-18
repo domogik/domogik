@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-18 14:06:46 +0100 (mer. 18 févr. 2009) $
-# $LastChangedRevision: 368 $
+# $LastChangedDate: 2009-02-18 18:43:39 +0100 (mer. 18 févr. 2009) $
+# $LastChangedRevision: 372 $
 
 import sys, string, select, threading
 from socket import *
@@ -59,7 +59,7 @@ class Manager:
         addr = (ip, self._port)
 
         l = logger.Logger(module_name)
-        self._log = l
+        self._log = l.get_logger()
 
         # Try and bind to the base port
         try :
@@ -67,6 +67,7 @@ class Manager:
         except :
             # Smthg is already running on this port
             self._log.error("Can't bind to the port %i" % self._port)
+            exit(1)
         else:
             #All is good, we start sending Heartbeat every 5 minutes using xPLTimer
             self._SendHeartbeat()

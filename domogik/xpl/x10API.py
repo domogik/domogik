@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-18 16:08:56 +0100 (mer. 18 févr. 2009) $
-# $LastChangedRevision: 370 $
+# $LastChangedDate: 2009-02-18 18:43:39 +0100 (mer. 18 févr. 2009) $
+# $LastChangedRevision: 372 $
 
 from subprocess import *
 import logger
@@ -43,13 +43,13 @@ class X10API:
     """
     def __init__(self, heyuconf):
         l = logger.Logger('x10API')
-        self._log = l
+        self._log = l.get_logger()
 
         res = Popen("heyu -c " + heyuconf + " start", shell=True, stderr=PIPE)
         output = res.stderr.read()
         res.stderr.close()
         if output:
-            self._log.error("Output was : %s\nHeyu config file path is : %s" % (output, heyuconf)
+            self._log.error("Output was : %s\nHeyu config file path is : %s" % (output, heyuconf))
         self._housecodes = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P']
         self._unitcodes = [ i+1 for i in range(16) ]
         self._heyuconf = heyuconf

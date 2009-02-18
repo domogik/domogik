@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-18 14:06:46 +0100 (mer. 18 févr. 2009) $
-# $LastChangedRevision: 368 $
+# $LastChangedDate: 2009-02-18 18:43:39 +0100 (mer. 18 févr. 2009) $
+# $LastChangedRevision: 372 $
 
 from dawndusk import DawnDusk
 from xPLAPI import *
@@ -31,7 +31,7 @@ import configloader
 cfgloader = Loader('dawndusk')
 config = cfgloader.load()
 
-myxpl = Manager(config["address"],port = config["port"], source = config["source"],'dawndusk')
+myxpl = Manager(config["address"],port = config["port"], source = config["source"],module_name = 'dawndusk')
 mydawndusk = DawnDusk()
 
 #Parameters definitions
@@ -55,7 +55,6 @@ def dateFromTuple(tuple):
     mo = "%.2i" % today.month
     d = "%.2i" % today.day
     date = "%s%s%s%s%s%s" % (y, mo, d, h, m, s)
-    print date
     return date
     
 def getDawn(message):

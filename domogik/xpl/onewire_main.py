@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-18 14:06:46 +0100 (mer. 18 févr. 2009) $
-# $LastChangedRevision: 368 $
+# $LastChangedDate: 2009-02-18 18:43:39 +0100 (mer. 18 févr. 2009) $
+# $LastChangedRevision: 372 $
 
 from xPLAPI import *
 from onewire import *
@@ -32,7 +32,7 @@ config = cfgloader.load()
 
 myow = OneWire()
 myow.set_cache_use(False)
-myxpl = Manager(config["address"],port = config["port"], source = config["source"], 'onewire')
+myxpl = Manager(config["address"],port = config["port"], source = config["source"], module_name='onewire')
 my_temp_message = Message()
 my_temp_message.set_type("xpl-trig")
 my_temp_message.set_schema("sensor.basic")

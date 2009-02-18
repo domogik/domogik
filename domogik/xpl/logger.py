@@ -33,36 +33,36 @@ class Logger():
     '''
 
     def __init__(self, module_name = 'domogik'):
-    '''
-    Get a logger with provided parameters and set config
-    @param file : the file to record logs into with the path
-    @param level : min level of the message to record, can be one of 'debug','info','warning','error','critical'
-    '''
-    LEVELS = {'debug': logging.DEBUG,
-          'info': logging.INFO,
-          'warning': logging.WARNING,
-          'error': logging.ERROR,
-          'critical': logging.CRITICAL}
+        '''
+        Get a logger with provided parameters and set config
+        @param file : the file to record logs into with the path
+        @param level : min level of the message to record, can be one of 'debug','info','warning','error','critical'
+        '''
+        LEVELS = {'debug': logging.DEBUG,
+              'info': logging.INFO,
+              'warning': logging.WARNING,
+              'error': logging.ERROR,
+              'critical': logging.CRITICAL}
 
-    cfg = Loader()
-    config = cfgloader.load()[0]
-    file = "%s/%s.log" % (config['log_dir_path'], module_name)
-    level = config['log_level']
+        cfg = Loader()
+        config = cfg.load()[0]
+        file = "%s/%s.log" % (config['log_dir_path'], module_name)
+        level = config['log_level']
 
-    if not LEVELS.has_key[level]:
-        raise ValueError, "level must be one of  'debug','info','warning','error','critical'. Check your config."
+        if not LEVELS.has_key(level):
+            raise ValueError, "level must be one of  'debug','info','warning','error','critical'. Check your config."
 
-    logger = logging.getLogger('domogik-%s' % module_name)
-    hdlr = logging.FileHandler(file)
-    formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s')
-    hdlr.setFormatter(formatter)
-    logger.addHandler(hdlr)
-    logger.setLevel(LEVELS[level])
-    
-    self.logger = logger
+        logger = logging.getLogger('domogik-%s' % module_name)
+        hdlr = logging.FileHandler(file)
+        formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s')
+        hdlr.setFormatter(formatter)
+        logger.addHandler(hdlr)
+        logger.setLevel(LEVELS[level])
+        
+        self.logger = logger
     
     def get_logger(self):
-    '''
-    returns the configured logger instance
-    '''
-    return self.logger
+        '''
+        returns the configured logger instance
+        '''
+        return self.logger

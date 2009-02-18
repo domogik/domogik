@@ -131,6 +131,8 @@ class timeCond(Condition):
         self.hour = hour
         self.minute = minute
         self.daynumber = daynumber
+        l = logger.Logger('trigger')
+        self._log = l.get_logger()
 
     def _check_time(self, timeunit, value):
         '''
@@ -251,7 +253,7 @@ class ListenerBuilder():
         self.listitems = listitems
         loader = Loader('trigger')
         config = loader.load()[1]
-        self.__myxpl = Manager(config["address"],port = config["port"], source = config["source"], 'trigger')
+        self.__myxpl = Manager(config["address"],port = config["port"], source = config["source"], module_name = 'trigger')
         self.__expr = expr
 
         #We should try/catch this bloc in case of undefined method
