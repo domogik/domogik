@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-18 16:08:56 +0100 (mer. 18 févr. 2009) $
-# $LastChangedRevision: 370 $
+# $LastChangedDate: 2009-02-18 17:42:18 +0100 (mer. 18 févr. 2009) $
+# $LastChangedRevision: 371 $
 
 import re
 import sys
@@ -114,34 +114,14 @@ class ConfigManager():
                 config[k] = datas[k]
         config.write()
 
-class generalConfig():
-    '''
-    Ask the user for general configuration and write results
-    '''
-
-    def __init__(self):
-        '''
-        Ask user for general parameters of Domogik to create the main config file
-        '''
-        informations = [
-        ('hub_address','What is the IP address the xPL system must bind ?',r"^([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])$",None),
-        ('hub_port','What is the port the xPL system must bind ?',r"^[1-9][0-9]+$",[3865]),
-        ('log_dir_path','What is the path of the log directory ?\nThe directory must exists with good permissions.', None, ['/tmp/']),
-        ('log_level','What is the debug level for logging you want ?', None, ['debug','info','warning','error','critical'])
-        ]
-        file = "domogik.cfg"
-        section = "domogik"
-        config = ConfigManager(informations,section)
-        result = config.ask()
-        config.write(file, result, section)
 
 class genericPluginConfig():
     '''
     Generic list for plugins
     '''
-    def __init__(self):
+    def __init__(self, ip):
         self.informations = [
-        ('address','What is the IP address the plugin must use ?',r"^([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])$",None),
+        ('address','What is the IP address the plugin must use ?',r"^([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])$",[ip]),
 #    ('port','What is the port the plugin must bind ?',r"^[1-9][0-9]+", None),
 # No need of thyat atm, we'll use the main config parameters
 #        ('hub_address','What is the IP address the plugin must connect to ?',r"^([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])$",None),
@@ -150,15 +130,40 @@ class genericPluginConfig():
     
     def askandwrite(self, file, section):
         config = ConfigManager(self.informations,section)
-        result = config.ask()
-        config.write(file, result, section)
+        self.result = config.ask()
+        config.write(file, self.result, section)
+
+    def getvalue(self, value):
+        if self.result.has_key(value):
+            return self.result[value]
+        else:
+            return None
+
+class generalConfig(genericPluginConfig):
+    '''
+    Ask the user for general configuration and write results
+    '''
+
+    def __init__(self):
+        '''
+        Ask user for general parameters of Domogik to create the main config file
+        '''
+        self.informations = [
+        ('hub_address','What is the IP address the xPL system must bind ?',r"^([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])$",None),
+        ('hub_port','What is the port the xPL system must bind ?',r"^[1-9][0-9]+$",[3865]),
+        ('log_dir_path','What is the path of the log directory ?\nThe directory must exists with good permissions.', None, ['/tmp/']),
+        ('log_level','What is the debug level for logging you want ?', None, ['debug','info','warning','error','critical'])
+        ]
+        file = "domogik.cfg"
+        section = "domogik"
+        self.askandwrite(file, section)
 
 class x10Config(genericPluginConfig):
     '''
     Ask the user for specific config for X10 xPL module
     '''
-    def __init__(self):
-        genericPluginConfig.__init__(self)
+    def __init__(self, ip):
+        genericPluginConfig.__init__(self, ip)
         self.informations.extend([
         ('port','What is the port the plugin must bind ?',r"^[1-9][0-9]+", [5000]),
         ('source','What is the xPL plugin name ?', None,['xpl-x10.domogik']),
@@ -172,8 +177,8 @@ class senderConfig(genericPluginConfig):
     '''
     Ask the user for specific config for the xPL sender
     '''
-    def __init__(self):
-        genericPluginConfig.__init__(self)
+    def __init__(self, ip):
+        genericPluginConfig.__init__(self, ip)
         self.informations.extend([
         ('port','What is the port the plugin must bind ?',r"^[1-9][0-9]+", [5001]),
         ('source','What is the xPL plugin name ?', None,['xpl-send.domogik']),
@@ -186,8 +191,8 @@ class triggerConfig(genericPluginConfig):
     '''
     Ask the user for specific config for the xPL sender
     '''
-    def __init__(self):
-        genericPluginConfig.__init__(self)
+    def __init__(self, ip):
+        genericPluginConfig.__init__(self, ip)
         self.informations.extend([
         ('port','What is the port the plugin must bind ?',r"^[1-9][0-9]+", [5002]),
         ('source','What is the xPL plugin name ?', None,['xpl-trigger.domogik']),
@@ -200,8 +205,8 @@ class datetimeConfig(genericPluginConfig):
     '''
     Ask the user for specific config for the xPL datetime module
     '''
-    def __init__(self):
-        genericPluginConfig.__init__(self)
+    def __init__(self, ip):
+        genericPluginConfig.__init__(self, ip)
         self.informations.extend([
         ('port','What is the port the plugin must bind ?',r"^[1-9][0-9]+", [5003]),
         ('source','What is the xPL plugin name ?', None,['xpl-datetime.domogik']),
@@ -226,11 +231,11 @@ if __name__ == "__main__":
         usage()
 
     if choice == 'all':
-        generalConfig()
-        x10Config()
-        senderConfig()
-        triggerConfig()
-        datetimeConfig()
+        ip = generalConfig().getvalue('hub_address')
+        x10Config(ip)
+        senderConfig(ip)
+        triggerConfig(ip)
+        datetimeConfig(ip)
     elif choice == 'main':
         generalConfig()
     elif choice == 'plugins':
