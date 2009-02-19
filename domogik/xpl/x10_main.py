@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-19 09:51:35 +0100 (jeu. 19 févr. 2009) $
-# $LastChangedRevision: 376 $
+# $LastChangedDate: 2009-02-19 13:56:04 +0100 (jeu. 19 févr. 2009) $
+# $LastChangedRevision: 378 $
 
 from domogik.xpl.x10API import *
 from domogik.xpl.xPLAPI import *
@@ -56,7 +56,9 @@ class x10Main():
             'all_lights_on': lambda d,h,l:self.__myx10.lights_on(h),
             'all_lights_off': lambda d,h,l:self.__myx10.lights_off(h),
             'bright': lambda d,h,l:self.__myx10.bright(d,l),
-            'dim': lambda d,h,l:self.__myx10.dim(d,l)
+            'dim': lambda d,h,l:self.__myx10.dim(d,l),
+            'brightb': lambda d,h,l:self.__myx10.bright(d,l),
+            'dimb': lambda d,h,l:self.__myx10.dim(d,l)
         }
         cmd = None
         dev = None
