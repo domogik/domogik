@@ -23,9 +23,9 @@
 # $LastChangedDate:$
 # $LastChangedRevision:$
 
-from xPLAPI import *
-from configloader import Loader
-import logger
+from domogik.xpl.xPLAPI import *
+from domogik.common.configloader import Loader
+from domogik.common import logger
 
 class Condition():
     '''

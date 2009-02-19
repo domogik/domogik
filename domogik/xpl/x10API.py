@@ -20,11 +20,11 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-18 20:08:19 +0100 (mer. 18 févr. 2009) $
-# $LastChangedRevision: 374 $
+# $LastChangedDate: 2009-02-19 09:51:35 +0100 (jeu. 19 févr. 2009) $
+# $LastChangedRevision: 376 $
 
 from subprocess import *
-import logger
+from domogik.common import logger
 class X10Exception:
     """
     X10 exception

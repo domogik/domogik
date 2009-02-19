@@ -20,13 +20,13 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-18 18:43:39 +0100 (mer. 18 févr. 2009) $
-# $LastChangedRevision: 372 $
+# $LastChangedDate: 2009-02-19 09:51:35 +0100 (jeu. 19 févr. 2009) $
+# $LastChangedRevision: 376 $
 
-from dawndusk import DawnDusk
-from xPLAPI import *
+from domogik.xpl.dawndusk import DawnDusk
+from domogik.xpl.xPLAPI import *
 import datetime
-import configloader
+from domogik.common import configloader
 
 cfgloader = Loader('dawndusk')
 config = cfgloader.load()

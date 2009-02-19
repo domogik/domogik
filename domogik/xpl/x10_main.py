@@ -20,13 +20,13 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-18 18:43:39 +0100 (mer. 18 févr. 2009) $
-# $LastChangedRevision: 372 $
+# $LastChangedDate: 2009-02-19 09:51:35 +0100 (jeu. 19 févr. 2009) $
+# $LastChangedRevision: 376 $
 
-from x10API import *
-from xPLAPI import *
-from configloader import Loader
-import logger
+from domogik.xpl.x10API import *
+from domogik.xpl.xPLAPI import *
+from domogik.common.configloader import Loader
+from domogik.common import logger
 
 class x10Main():
 
