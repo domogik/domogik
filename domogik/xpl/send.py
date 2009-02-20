@@ -20,13 +20,13 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-18 21:57:42 +0100 (mer. 18 févr. 2009) $
-# $LastChangedRevision: 375 $
+# $LastChangedDate: 2009-02-20 19:05:31 +0100 (ven. 20 févr. 2009) $
+# $LastChangedRevision: 379 $
 
 #This script use arguments from command line to forge & send a message
 from domogik.xpl.xPLAPI import *
 import optparse
-from configloader import Loader
+from domogik.common.configloader import Loader
 from domogik.common import logger
 
 class Sender:

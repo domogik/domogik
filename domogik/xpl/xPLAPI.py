@@ -20,14 +20,15 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-19 09:51:35 +0100 (jeu. 19 févr. 2009) $
-# $LastChangedRevision: 376 $
+# $LastChangedDate: 2009-02-20 19:05:31 +0100 (ven. 20 févr. 2009) $
+# $LastChangedRevision: 379 $
 
 import sys, string, select, threading
 from socket import *
 from domogik.common import logger
+from domogik.xpl.module import xPLModule
 
-class Manager:
+class Manager(xPLModule):
     """
     Manager is the main component of the system
     You can run many managers on different port
@@ -47,6 +48,7 @@ class Manager:
         @param source : source name of the application
         @param port : port to listen to (default 3865)
         """
+        xPLModule.__init__(self)
         # Define maximum xPL message size
         self._buff = 1500
         # Define xPL base port
@@ -76,6 +78,7 @@ class Manager:
             #And finally we start network listener in a thread
             self._stop_thread = False
             self._network = threading.Thread(None, self._run_thread_monitor, None, (), {})
+            self.register_thread(self._network)
             self._network.start()
             self._log.debug("xPL thread started")
 
@@ -85,7 +88,6 @@ class Manager:
         """
         self._h_timer.stop()
         self._log.debug("xPL thread stopped")
-        self._stop_thread = True
         #exit(0)
 
     def send(self, message):
@@ -123,7 +125,7 @@ class Manager:
         them to see if the target is the application.
         If it is, call all listeners
         """
-        while not self._stop_thread :
+        while not self.should_stop() :
             readable, writeable, errored = select.select([self._UDPSock],[],[],10)
             if len(readable) == 1 :
                 data,addr = self._UDPSock.recvfrom(self._buff)
@@ -133,6 +135,7 @@ class Manager:
                         [ l.new_message(mess) for l in self._listeners ]
                 except XPLException:
                     pass
+        self.unregister_thread(self._network)
  
     def add_listener(self, listener):
         """
@@ -380,7 +383,7 @@ class Message:
         str += "}\n"
         return str
 
-class xPLTimer:
+class xPLTimer(xPLModule):
     """
     xPLTimer will call a callback function each n seconds
     """
@@ -394,17 +397,23 @@ class xPLTimer:
         @param time : time of loop in second
         @param cb : callback function which will be call eact 'time' seconds
         """
+        xPLModule.__init__(self)
         self._callback = cb
         self._time = time
         self._timer = threading.Timer(self._time, self._run)
+        self.register_timer(self._timer)
 
     def _run(self):
         """
         internal timer loopback function
         """
         self._timer = threading.Timer(self._time, self._run)
-        self._callback()
-        self._timer.start()
+        if self.should_stop():
+            self.unregister_timer(self._timer)
+            self._timer.cancel()
+        else:
+            self._callback()
+            self._timer.start()
 
     def start(self):
         """
