@@ -17,8 +17,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-20 20:25:46 +0100 (ven. 20 févr. 2009) $
-# $LastChangedRevision: 380 $
+# $LastChangedDate: 2009-02-20 20:28:15 +0100 (ven. 20 févr. 2009) $
+# $LastChangedRevision: 381 $
 
 See the web site on http://www.domogik.org to get the latest documentation.
 
@@ -40,7 +40,7 @@ X10
 	manual commands. Then stop heyu.
 
 * Go to the 'config' directory and run :
-	python generate_config all
+	python generate_config.py all
 * Go to the 'xPL' directory and start xPL hub :
 	./xPL_Hub
 	# or if you want to have more output
