@@ -16,9 +16,9 @@
 
 # Author : Marc Schneider <marc@domogik.org>
 
-# $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-18 20:00:39 +0100 (mer. 18 févr. 2009) $
-# $LastChangedRevision: 373 $
+# $LastChangedBy: maxence $
+# $LastChangedDate: 2009-02-20 20:25:46 +0100 (ven. 20 févr. 2009) $
+# $LastChangedRevision: 380 $
 
 See the web site on http://www.domogik.org to get the latest documentation.
 
@@ -28,6 +28,10 @@ See the web site on http://www.domogik.org to get the latest documentation.
 ***********************************************************
 
 * Install all required components (see http://www.domogik.org)
+* You need to add the domogik directory to python path. One way 
+  to doing that is to create a file /usr/lib/python2.5/site-packages/domogik.pth
+  which will contains the absolute path to the directory which contains the xpl/, 
+  common/ and others directory (should be <your_dir_for_svn_co>/domogik)
 
 X10
 ***
