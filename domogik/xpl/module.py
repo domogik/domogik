@@ -26,6 +26,7 @@
 import signal
 import threading
 import time
+from domogik.common import logger
 
 class xPLModule():
     '''
