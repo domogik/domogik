@@ -40,12 +40,13 @@ class xPLModule():
         '''
         self._threads = []
         self._timers = []
-        self._stop = threading.Event()
 
         l = logger.Logger('signal')
         self._log = l.get_logger()
+        self._log.debug("new signal manager instance")
 
-        signal.signal(signal.SIGTERM, self.should_stop)
+        self._stop = threading.Event()
+        signal.signal(signal.SIGTERM, self.hand_leave)
 
     def register_thread(self, thread):
         '''
@@ -100,6 +101,12 @@ class xPLModule():
         then force threads to stop after 5 seconds.
         '''
         self._log.debug('Signal SIGTERM catched')
+        self.force_leave()
+
+    def force_leave(self):
+        '''
+        Leave threads & timers
+        '''
         self._stop.set()
         time.sleep(5)
         for t in self._threads:

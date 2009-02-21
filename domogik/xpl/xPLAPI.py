@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-21 13:14:41 +0100 (sam. 21 févr. 2009) $
-# $LastChangedRevision: 387 $
+# $LastChangedDate: 2009-02-21 13:47:10 +0100 (sam. 21 févr. 2009) $
+# $LastChangedRevision: 388 $
 
 import sys, string, select, threading
 from socket import *
@@ -87,6 +87,7 @@ class Manager(xPLModule):
         Stop threads and leave the Manager
         """
         self._h_timer.stop()
+        self.force_leave()
         self._log.debug("xPL thread stopped")
         #exit(0)
 
@@ -108,6 +109,8 @@ class Manager(xPLModule):
             hbSock = socket(AF_INET,SOCK_DGRAM)
             hbSock.setsockopt(SOL_SOCKET,SO_BROADCAST,1)
             hbSock.sendto(message.__str__(),("255.255.255.255",3865))
+            hbSock.close()
+            self._log.debug("xPL Message sent")
 
 
     # Sub routine for sending a heartbeat
@@ -425,6 +428,7 @@ class xPLTimer(xPLModule):
         """
         Stop the timer
         """
+        self.unregister_timer(self._timer)
         self._timer.cancel()
 
 
