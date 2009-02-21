@@ -108,7 +108,7 @@ class xPLModule():
         Leave threads & timers
         '''
         self._stop.set()
-        time.sleep(5)
+        time.sleep(2)
         for t in self._threads:
             t._Thread__stop()
         for t in self._timers:
