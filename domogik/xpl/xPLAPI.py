@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-20 19:05:31 +0100 (ven. 20 févr. 2009) $
-# $LastChangedRevision: 379 $
+# $LastChangedDate: 2009-02-21 13:11:10 +0100 (sam. 21 févr. 2009) $
+# $LastChangedRevision: 385 $
 
 import sys, string, select, threading
 from socket import *
@@ -74,6 +74,7 @@ class Manager(xPLModule):
             #All is good, we start sending Heartbeat every 5 minutes using xPLTimer
             self._SendHeartbeat()
             self._h_timer = xPLTimer(300,self._SendHeartbeat)
+            self.register_timer(self._h_timer)
             self._h_timer.start()
             #And finally we start network listener in a thread
             self._stop_thread = False
@@ -86,7 +87,8 @@ class Manager(xPLModule):
         """
         Stop threads and leave the Manager
         """
-        self._h_timer.stop()
+        self._h_timer.cancel()
+        self.unregister_timer(self._h_timer)
         self._log.debug("xPL thread stopped")
         #exit(0)
 

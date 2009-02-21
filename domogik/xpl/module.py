@@ -40,6 +40,10 @@ class xPLModule():
         self._threads = []
         self._timers = []
         self._stop = threading.Event()
+
+        l = logger.Logger('signal')
+        self._log = l.get_logger()
+
         signal.signal(signal.SIGTERM, self.should_stop)
 
     def register_thread(self, thread):
@@ -48,6 +52,7 @@ class xPLModule():
         Should be called by each thread at start
         @param thread : the thread to add
         '''
+        self._log.debug('New thread registered')
         self._threads.append(thread)
 
     def unregister_thread(self, thread):
@@ -57,6 +62,7 @@ class xPLModule():
         @param thread : the thread to remove
         '''
         if thread in self._threads:
+            self._log.debug('Unregister thread')
             self._threads.remove(thread)
 
     def register_timer(self, timer):
@@ -65,6 +71,7 @@ class xPLModule():
         Should be called by each timer
         @param timer : the timer to add
         '''
+        self._log.debug('New timer registered')
         self._timers.append(timer)
 
     def unregister_timer(self, timer):
@@ -75,6 +82,7 @@ class xPLModule():
         @param timer : the timer to remove
         '''
         if timer in self._timers:
+            self._log.debug('Unregister timer')
             self._timers.remove(timer)
 
     def should_stop(self):
@@ -90,6 +98,7 @@ class xPLModule():
         This will set event to leave the current threads of the module
         then force threads to stop after 5 seconds.
         '''
+        self._log.debug('Signal SIGTERM catched')
         self._stop.set()
         time.sleep(5)
         for t in self._threads:
