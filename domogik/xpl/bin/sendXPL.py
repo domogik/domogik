@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-22 13:34:47 +0100 (dim. 22 févr. 2009) $
-# $LastChangedRevision: 395 $
+# $LastChangedDate: 2009-02-22 15:31:11 +0100 (dim. 22 févr. 2009) $
+# $LastChangedRevision: 396 $
 
 #This script use arguments from command line to forge & send a message
 from domogik.xpl.lib.xplconnector import *
@@ -33,7 +33,9 @@ class Sender:
 
     supported_schemas = ["datetime.basic","dawndusk.request","x10.basic","sensor.basic"]
 
-    def __init__(self):
+    def __init__(self, schema=None, message=None):
+        self._schema = schema
+        self._message = message
         self.parse_parameters()
         cfgloader = Loader('send')
         config = cfgloader.load()
@@ -50,9 +52,13 @@ class Sender:
         '''
         Read parameters from command line and parse them
         '''
-        parser = optparse.OptionParser()
-        parser.add_option("-d","--dest",type="string",dest="message_dest", default="broadcast")
-        (self._options, self._args) = parser.parse_args()
+        if self._message != None and self._schema != None:
+            self._options = None
+            self._args = [self._schema, self._message]
+        else:
+            parser = optparse.OptionParser()
+            parser.add_option("-d","--dest",type="string",dest="message_dest", default="broadcast")
+            (self._options, self._args) = parser.parse_args()
 
         #Parsing of args
         if len(self._args) != 2:
