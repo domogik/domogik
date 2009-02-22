@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-18 17:42:18 +0100 (mer. 18 févr. 2009) $
-# $LastChangedRevision: 371 $
+# $LastChangedDate: 2009-02-22 20:50:17 +0100 (dim. 22 févr. 2009) $
+# $LastChangedRevision: 398 $
 
 import re
 import sys
@@ -214,6 +214,18 @@ class datetimeConfig(genericPluginConfig):
         file = "conf.d/datetime.cfg"
         section = "datetime"
         self.askandwrite(file, section)
+
+def OneWireConfig(genericPluginConfig):
+    '''
+    Ask the user for specific config for the xPL OneWire module
+    '''
+    def __init__(self, ip):
+        genericPluginConfig.__init__(self, ip)
+        self.informations.extend([
+        ('port','What is the port the plugin must bind ?',r"^[1-9][0-9]+", [5004]),
+        ('source','What is the xPL plugin name ?', None,['xpl-onewiretemp.domogik']),
+        ('temperature_delay','What is the delay you want between temperature update (in second) ?', r"^[1-9][0-9]+", [15])
+        ])
 
 def usage():
     print "usage : generate_config.py config"
