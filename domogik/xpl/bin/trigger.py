@@ -23,7 +23,7 @@
 # $LastChangedDate:$
 # $LastChangedRevision:$
 
-from domogik.xpl.xPLAPI import *
+from domogik.xpl.lib.xplconnector import *
 from domogik.common.configloader import Loader
 from domogik.common import logger
 

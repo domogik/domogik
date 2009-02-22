@@ -20,11 +20,11 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-22 13:26:13 +0100 (dim. 22 févr. 2009) $
-# $LastChangedRevision: 394 $
+# $LastChangedDate: 2009-02-22 13:34:47 +0100 (dim. 22 févr. 2009) $
+# $LastChangedRevision: 395 $
 
-from domogik.xpl.dawndusk import DawnDusk
-from domogik.xpl.xPLAPI import *
+from domogik.xpl.lib.dawndusk import DawnDusk
+from domogik.xpl.lib.xplconnector import *
 import datetime
 from domogik.common import configloader
 

@@ -24,7 +24,7 @@
 # $LastChangedRevision:$
 
 from time import localtime
-from xPLAPI import *
+from xplconnector import *
 from domogik.common.configloader import *
 
 class xPLDateTime():
