@@ -20,39 +20,42 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-22 13:34:47 +0100 (dim. 22 févr. 2009) $
-# $LastChangedRevision: 395 $
+# $LastChangedDate: 2009-02-22 16:05:05 +0100 (dim. 22 févr. 2009) $
+# $LastChangedRevision: 397 $
 
 from domogik.xpl.lib.xplconnector import *
 from onewire import *
 from domogik.common import configloader
 
-cfgloader = Loader('onewire')
-config = cfgloader.load()
-
-myow = OneWire()
-myow.set_cache_use(False)
-myxpl = Manager(config["address"],port = config["port"], source = config["source"], module_name='onewire')
-my_temp_message = Message()
-my_temp_message.set_type("xpl-trig")
-my_temp_message.set_schema("sensor.basic")
-my_x10_mess = Message()
-my_x10_mess.set_type("xpl-cmnd")
-my_x10_mess.set_schema("x10.basic")
-
-def test():
-    for  (i, t, v) in myow.get_temperature():
-        print "ITEM : "+ i +" - " + v
-        my_temp_message.set_data_key("device", i)
-        my_temp_message.set_data_key("type", t)
-        my_temp_message.set_data_key("current", v) 
-        myxpl.send(my_temp_message)
-        if float(v) > 23.0:
-            my_x10_mess.set_data_key("device","A3")
-            my_x10_mess.set_data_key("command","on")
-            myxpl.send( my_x10_mess )
 
 
-t = xPLTimer(15, test)
-t.start()
+class OneWireTemp():
+    '''
+    Manage the One-Wire stuff and connect it to xPL
+    '''
+    def __init__(self):
+        '''
+        Starts some timers to check temperature
+        '''
+        cfgloader = Loader('onewire')
+        config = cfgloader.load()
+        self._myxpl = Manager(config["address"],port = config["port"], source = config["source"], module_name='onewire')
+        self._myow = OneWire()
+        self._myow.set_cache_use(False)
+        timers = []
+        t_temp = xPLTimer(config['temperature_delay'], self._gettemp)
+        t_temp.start()
+        timers.append(t)
 
+    def _gettemp():
+        for  (i, t, v) in self._myow.get_temperature():
+            my_temp_message = Message()
+            my_temp_message.set_type("xpl-trig")
+            my_temp_message.set_schema("sensor.basic")
+            my_temp_message.set_data_key("device", i)
+            my_temp_message.set_data_key("type", t)
+            my_temp_message.set_data_key("current", v) 
+            self._myxpl.send(my_temp_message)
+
+if __name__ == "__main__":
+    OneWireTemp()
