@@ -19,25 +19,35 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-14 11:43:03 +0100 (sam. 14 févr. 2009) $
-# $LastChangedRevision: 359 $
+# $LastChangedDate: 2009-02-22 11:44:54 +0100 (dim. 22 févr. 2009) $
+# $LastChangedRevision: 390 $
 -->
 {% endcomment %}
+<script language="javascript">
+	// Set the hidden field with the value of either the one of the radio button
+	// or the one of the text field
+	function setLampValue(field, fieldValue){
+		eval(field).value = fieldValue;
+	}
+</script>
 
 {% for property in device.deviceproperty_set.all %}
 	{% if property.isChangeableByUser %}
 		<input id="id_key{{ device.id }}" type="hidden" name="key{{ device.id }}" value="{{ property.key }}"/>
 		{% if device.isAppliance  %}
 			{% ifequal property.value "on" %}
-				<input type="radio" name="value{{ device.id }}" value="on" checked/>On
-				<input type="radio" name="value{{ device.id }}" value="off"/>Off
+				<input id="id_value{{ device.id }}" type="radio" name="value{{ device.id }}" value="on" checked/>On
+				<input id="id_value{{ device.id }}" type="radio" name="value{{ device.id }}" value="off"/>Off
 			{% else %}
 				<input type="radio" name="value{{ device.id }}" value="on"/>On
 				<input type="radio" name="value{{ device.id }}" value="off" checked/>Off
 			{% endifequal %}
 		{% endif %}
 		{% if device.isLamp %}
-			<input id="id_value{{ device.id }}" type="text" name="value{{ device.id }}" value="{{ property.value }}" size="3"/>&nbsp;{{ property.valueUnit }}
+			<input type="text" name="lampValue" value="{{ property.value }}" size="2" onchange="setLampValue(value{{ device.id }},this.value)"/>&nbsp;{{ property.valueUnit }}
+			<input type="radio" name="lampOnOff" value="on" onchange="setLampValue(value{{ device.id }},'on')"/>On
+			<input type="radio" name="lampOnOff" value="off" onchange="setLampValue(value{{ device.id }},'off')"/>Off
+			<input id="id_value{{ device.id }}" type="hidden" name="value{{ device.id }}" value="{{ property.value }}"/>
 		{% endif %}
 	{% else %}
 		{{ property.value }}&nbsp;{{ property.valueUnit }}
