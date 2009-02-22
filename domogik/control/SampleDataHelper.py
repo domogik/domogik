@@ -20,8 +20,8 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-12 11:52:36 +0100 (jeu. 12 févr. 2009) $
-# $LastChangedRevision: 356 $
+# $LastChangedDate: 2009-02-22 11:45:39 +0100 (dim. 22 févr. 2009) $
+# $LastChangedRevision: 391 $
 
 from domogik.control.models import Area
 from domogik.control.models import Room
@@ -100,7 +100,7 @@ class SampleDataHelper:
 		)
 		DeviceProperty.objects.create(
 								key="value",
-								value="0", # Variable value (dimmer)
+								value="100", # Variable value (dimmer)
 								valueType="ALPHANUM",
 								valueUnit="%",
 								isChangeableByUser=True,
@@ -138,7 +138,7 @@ class SampleDataHelper:
 		)
 		DeviceProperty.objects.create(
 								key="value",
-								value="0", # Variable value (dimmer)
+								value="100", # Variable value (dimmer)
 								valueType="ALPHANUM",
 								valueUnit="%",
 								isChangeableByUser=True,
@@ -157,7 +157,7 @@ class SampleDataHelper:
 		)
 		DeviceProperty.objects.create(
 								key="value",
-								value="0", # Variable value (dimmer)
+								value="100", # Variable value (dimmer)
 								valueType="ALPHANUM",
 								valueUnit="%",
 								isChangeableByUser=True,
@@ -176,7 +176,7 @@ class SampleDataHelper:
 		)
 		DeviceProperty.objects.create(
 								key="value",
-								value="0", # Variable value (dimmer)
+								value="100", # Variable value (dimmer)
 								valueType="ALPHANUM",
 								valueUnit="%",
 								isChangeableByUser=True,
