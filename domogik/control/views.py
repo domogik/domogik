@@ -20,10 +20,11 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-14 11:36:34 +0100 (sam. 14 févr. 2009) $
-# $LastChangedRevision: 358 $
+# $LastChangedDate: 2009-02-22 11:46:25 +0100 (dim. 22 févr. 2009) $
+# $LastChangedRevision: 392 $
 
 import datetime
+import math
 import os
 from subprocess import *
 
@@ -115,27 +116,49 @@ def __sendValueToDevice(deviceId, propertyKey, propertyValue, appSetting):
 	"""
 	error = ""
 	# Read previous value, and update it if necessary
+	device = Device.objects.get(pk=deviceId)
 	deviceProperty = DeviceProperty.objects.get(device__id=deviceId, key=propertyKey)
-	if deviceProperty.value != propertyValue:
-		deviceProperty.value = propertyValue
-		device = Device.objects.get(pk=deviceId)
-		if device.technology.lower() == 'x10' and not appSetting.simulationMode:
-			error = __sendX10Cmd(device, deviceProperty)
+	oldValue = deviceProperty.value
+	newValue = propertyValue
+	if oldValue != newValue:
+		if device.technology.lower() == 'x10':
+			error = __sendX10Cmd(device, oldValue, newValue, appSetting.simulationMode)
 
 		if error == "":
+			deviceProperty.value = newValue
+			if device.isLamp():
+				if newValue == "on":
+					deviceProperty.value = 100
+				elif newValue == "off":
+					deviceProperty.value = 0
+
 			deviceProperty.save()
 			__writeDeviceCmdLog(deviceId, deviceProperty.value, "Nothing special", True)
 
-def __sendX10Cmd(device, deviceProperty):
+def __sendX10Cmd(device, oldValue, newValue, simulationMode):
 	"""
 	Send x10 cmd
 	"""
+	output = ""
 	xPLSchema = "x10.basic"
 	xPLParam = ""
-	if device.canBeSwitchedOnOff():
-		xPLParam = "device="+device.address+","+"command="+deviceProperty.value
+	if device.isAppliance():
+		xPLParam = "device="+device.address+","+"command="+newValue
+	elif device.isLamp():
+		if newValue == "on" or newValue == "off":
+			xPLParam = "device="+device.address+","+"command="+newValue
+		else:
+			# TODO check if type is int and 0 <= value <= 100
+			if int(newValue)-int(oldValue) > 0:
+				cmd = "bright"
+			else:
+				cmd = "dim"
+			level = abs(int(newValue)-int(oldValue))
+			xPLParam = "command=" + cmd + "," + "device=" + device.address + "," + "level=" + str(level)
 
-	output = XPLHelper().send(xPLSchema, xPLParam)
+	print "**** xPLParam = %s" %xPLParam
+	if not simulationMode:
+		output = XPLHelper().send(xPLSchema, xPLParam)
 	return output
 
 def __writeDeviceCmdLog(deviceId, newValue, newComment, newIsSuccessful):
