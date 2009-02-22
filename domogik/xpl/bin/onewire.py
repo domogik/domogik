@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-19 09:51:35 +0100 (jeu. 19 févr. 2009) $
-# $LastChangedRevision: 376 $
+# $LastChangedDate: 2009-02-22 13:26:13 +0100 (dim. 22 févr. 2009) $
+# $LastChangedRevision: 394 $
 
 from domogik.xpl.xPLAPI import *
 from onewire import *

@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-20 19:05:31 +0100 (ven. 20 févr. 2009) $
-# $LastChangedRevision: 379 $
+# $LastChangedDate: 2009-02-22 13:26:13 +0100 (dim. 22 févr. 2009) $
+# $LastChangedRevision: 394 $
 
 #This script use arguments from command line to forge & send a message
 from domogik.xpl.xPLAPI import *

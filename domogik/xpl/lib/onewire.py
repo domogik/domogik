@@ -19,9 +19,9 @@
 
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
-# $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-07-23 21:42:29 +0200 (mer. 23 juil. 2008) $
-# $LastChangedRevision: 100 $
+# $LastChangedBy: maxence $
+# $LastChangedDate: 2009-02-22 13:26:13 +0100 (dim. 22 févr. 2009) $
+# $LastChangedRevision: 394 $
 
 import ow
 
