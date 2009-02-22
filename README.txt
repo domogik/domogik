@@ -16,9 +16,9 @@
 
 # Author : Marc Schneider <marc@domogik.org>
 
-# $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-20 20:39:25 +0100 (ven. 20 févr. 2009) $
-# $LastChangedRevision: 382 $
+# $LastChangedBy: mschneider $
+# $LastChangedDate: 2009-02-22 11:59:15 +0100 (dim. 22 févr. 2009) $
+# $LastChangedRevision: 393 $
 
 See the web site on http://www.domogik.org to get the latest documentation.
 
@@ -29,7 +29,7 @@ See the web site on http://www.domogik.org to get the latest documentation.
 
 * Install all required components (see http://www.domogik.org)
 * You need to add the domogik directory to python path. One way 
-  to doing that is to create a file /usr/lib/python2.5/site-packages/domogik.pth
+  to do that is to create a file /usr/lib/python2.5/site-packages/domogik.pth
   which will contains the absolute path to the domogik root directory.
 
 X10
