@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-22 20:50:17 +0100 (dim. 22 févr. 2009) $
-# $LastChangedRevision: 398 $
+# $LastChangedDate: 2009-02-23 19:50:55 +0100 (lun. 23 févr. 2009) $
+# $LastChangedRevision: 399 $
 
 import re
 import sys
@@ -152,7 +152,9 @@ class generalConfig(genericPluginConfig):
         ('hub_address','What is the IP address the xPL system must bind ?',r"^([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])$",None),
         ('hub_port','What is the port the xPL system must bind ?',r"^[1-9][0-9]+$",[3865]),
         ('log_dir_path','What is the path of the log directory ?\nThe directory must exists with good permissions.', None, ['/tmp/']),
-        ('log_level','What is the debug level for logging you want ?', None, ['debug','info','warning','error','critical'])
+        ('log_level','What is the debug level for logging you want ?', None, ['debug','info','warning','error','critical']),
+        ('pid_dir_path','What is the directory for pids file ?', None, ['/var/run/domogik/']),
+        ('components_list','What are the components you want to enable ? (comma separated list)', None, ['x10,datetime'])
         ]
         file = "domogik.cfg"
         section = "domogik"

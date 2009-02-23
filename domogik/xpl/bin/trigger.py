@@ -250,6 +250,8 @@ class ListenerBuilder():
         @param listitems a dictionnary discribing items used in the condition
         @param expr : the condition
         '''
+        l = logger.Logger('trigger')
+        self._log = l.get_logger()
         self.listitems = listitems
         loader = Loader('trigger')
         config = loader.load()[1]
@@ -282,6 +284,7 @@ class ListenerBuilder():
         @param k2 : name of the item
         @param v : new value of the item
         '''
+        self._log.debug('updateList') 
         self.listitems[k1][k2] = v
         self.hasAllNeededValue()
 
@@ -291,24 +294,29 @@ class ListenerBuilder():
         @param items : items to add listener for
         '''
         for i in items:
+            self._log.debug("New  x10 listener created")
             Listener(lambda mess: self.updateList('x10',mess.get_key_value('device'), mess.get_key_value('command')) , self.__myxpl, {'schema':'x10.basic','device':i,'type':'xpl-cmnd'})
 
     def buildtimelistener(self, items):
         '''
         Create listener for time conditions
         '''
+        self._log.debug("New time listener created")
         Listener(self._parsetimeupdate , self.__myxpl, {'schema':'datetime.basic','type':'xpl-trig'})
 
     def _parsetimeupdate(self, mess):
         '''
         Parse the time received in a message and call updateList()
         '''
+        self._log.debug("Time update")
         dt = mess.get_key_value('format1')
         pars = {'year':dt[0:4],'month':dt[4:6],'day':dt[6:8],'daynumber':dt[11],'hour':dt[8:10],'minute':dt[10:12]}
         for p in pars:
             self.updateList('time', p, pars[p])
-
-if __name__ == "__main__":
+def main():
+    '''
+    Starts the trigger
+    '''
     #Petits tests
     state1 = "stateCond('x10','a1','==','on')"
     state2 = "stateCond('1wire','X23329500234','<','20')"
@@ -330,3 +338,5 @@ if __name__ == "__main__":
     print parsing
     l = ListenerBuilder(parsing, expr2)
 
+if __name__ == "__main__":
+    main()

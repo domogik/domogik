@@ -24,7 +24,7 @@
 # $LastChangedRevision:$
 
 from time import localtime
-from xplconnector import *
+from domogik.xpl.lib.xplconnector import *
 from domogik.common.configloader import *
 
 class xPLDateTime():
@@ -36,7 +36,7 @@ class xPLDateTime():
         cfgloader = Loader('datetime')
         config = cfgloader.load()[1]
         self.__myxpl = Manager(config["address"],port = config["port"], source = config["source"], module_name='datetime')
-        self._timer = xPLTimer(60, self._send_datetime)
+        self._timer = xPLTimer(10, self._send_datetime)
         self._timer.start()
 
     def _f(self, nb):

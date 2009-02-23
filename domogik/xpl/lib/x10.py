@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-22 13:34:47 +0100 (dim. 22 févr. 2009) $
-# $LastChangedRevision: 395 $
+# $LastChangedDate: 2009-02-23 19:50:55 +0100 (lun. 23 févr. 2009) $
+# $LastChangedRevision: 399 $
 
 from subprocess import *
 from domogik.common import logger
@@ -50,6 +50,7 @@ class X10API:
         res.stderr.close()
         if output:
             self._log.error("Output was : %s\nHeyu config file path is : %s" % (output, heyuconf))
+            raise X10Exception, "Something went wrong with heyu. check logs"
         self._housecodes = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P']
         self._unitcodes = [ i+1 for i in range(16) ]
         self._heyuconf = heyuconf

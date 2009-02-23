@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-22 13:34:47 +0100 (dim. 22 févr. 2009) $
-# $LastChangedRevision: 395 $
+# $LastChangedDate: 2009-02-23 19:50:55 +0100 (lun. 23 févr. 2009) $
+# $LastChangedRevision: 399 $
 
 from domogik.xpl.lib.x10 import *
 from domogik.xpl.lib.xplconnector import *
@@ -37,7 +37,11 @@ class x10Main():
         '''
         cfgloader = Loader('x10')
         config = cfgloader.load()[1]
-        self.__myx10 = X10API(config["heyu_cfg_file"])
+        try:
+            self.__myx10 = X10API(config["heyu_cfg_file"])
+        except:
+            print "Something went wrong during heyu init, check logs"
+            exit(1)
         self.__myxpl = Manager(config["address"],port = config["port"], source = config["source"], module_name='x10')
         #Create listeners
         Listener(self.x10_cmnd_cb, self.__myxpl, {'schema':'x10.basic','type':'xpl-cmnd'})
