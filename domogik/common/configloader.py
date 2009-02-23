@@ -20,13 +20,13 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-23 19:50:55 +0100 (lun. 23 févr. 2009) $
-# $LastChangedRevision: 399 $
+# $LastChangedDate: 2009-02-24 00:13:48 +0100 (mar. 24 févr. 2009) $
+# $LastChangedRevision: 400 $
 
 
 #Path to the configuration directory 
 global config_path
-config_path = "../../config"
+config_path = "/home/maxence/dev/domogik/domogik/domogik/config"
 
 ####################################################
 #       DON'T CHANGE ANYTHING AFTER THIS LINE      #

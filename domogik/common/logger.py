@@ -58,9 +58,9 @@ class Logger():
         hdlr.setFormatter(formatter)
         logger.addHandler(hdlr)
         logger.setLevel(LEVELS[level])
-        
+
         self.logger = logger
-    
+ 
     def get_logger(self):
         '''
         returns the configured logger instance
