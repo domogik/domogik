@@ -37,6 +37,8 @@ DOMOGIK.SYSTEM
 {
 COMMAND=command to send
 MODULE=name of the module concerned by the command
+[FORCE=0|1]
+[ERROR=error message if error occurs, 255 char max]
 }
 
 === XPL-CMND Structure ===
@@ -45,6 +47,7 @@ DOMOGIK.SYSTEM
 {
 COMMAND=command to send
 MODULE=name of the module concerned by the command
+[FORCE=0|1]
 }
 
 === XPL-STAT Structure ===
