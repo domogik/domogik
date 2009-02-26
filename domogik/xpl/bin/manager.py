@@ -28,11 +28,6 @@ from domogik.common import configloader
 import os
 import sys
 
-components = {'x10' : 'x10Main()',
-                'datetime' : 'xPLDateTime()',
-                'onewire' : 'OneWireTemp()',
-                'trigger' : 'main()',
-                'dawndusk' : 'main()'}
 
 class SysManager(xPLModule):
     '''
@@ -42,11 +37,48 @@ class SysManager(xPLModule):
 
     def __init__(self):
         '''
+        Init manager and start listeners
         '''
+        self._components = {'x10' : 'x10Main()',
+                        'datetime' : 'xPLDateTime()',
+                        'onewire' : 'OneWireTemp()',
+                        'trigger' : 'main()',
+                        'dawndusk' : 'main()'}
         cfgloader = Loader()
-        self._config = cfgloader.load()[0]
+        config = cfgloader.load()
+        self._config = config[0]
         l = logger.Logger('sysmanager')
         self._log = l.get_logger()
+        self.__myxpl = Manager(config[1]["address"],port = int(config[1]["port"]), source = config[1]["source"], module_name = 'send')
+
+
+    def _sys_cb(self, message):
+        '''
+        Internal callback for receiving system messages
+        '''
+        cmd = message.get_key_value('command')
+        mod = message.get_key_value('module')
+        force = 0
+        if message.has_key('force'):
+            force = mesage.get_key_value('force')
+        error = ""
+        if mod not in self._components:
+            error = "Invalide component.\n"
+        elif force and self._is_component_running(mod):
+            error += "The component seems already running and force is disabled"
+        if error == "":
+            pid = self._start_comp(mod)
+            if pid:
+                self._write_pid_file(mod, pid)
+                self._log.debug("Component %s started with pid %i" %(mod, pid))
+                mess = Message()
+                mess.set_type('xpl-trig')
+                mess.set_schema('domogik.system')
+                mess.set_data_key('command',cmd)
+                mess.set_data_key('module',mod)
+                mess.set_data_key('force',force)
+                mess.set_data_key('error',error)
+                self.__myxpl.send(mess)
 
     def _start_comp(self,name):
         '''
@@ -55,9 +87,6 @@ class SysManager(xPLModule):
         @param name : the name of the component to start
         This method does *not* check if the component exists
         '''
-        global lastpid
-        global components
-        global log
         log.info("Start the component %s" % name)
         mod_path = "domogik.xpl.bin." + name
         __import__(mod_path)
@@ -65,14 +94,20 @@ class SysManager(xPLModule):
         lastpid = os.fork()
         if not lastpid:
             eval("module.%s" % components[name])
-            log.debug("%s process stopped" % name)
+            self._log.debug("%s process stopped" % name)
+            exit(0)
+        return lastpid
 
-    def write_pid_file(self,component, pid):
+    def _is_component_running(component):
+        '''
+        Check if one component is still running == the pid file exists
+        '''
+        return os.path.isfile('%s/%s.pid' % (self._config['pid_dir_path'], component))
+
+    def _write_pid_file(self,component, pid):
         '''
         Write the pid in a file
         '''
-        global config
-        global log
-        f = open("%s/%s.pid" % (config['pid_dir_path'], component), "w")
+        f = open("%s/%s.pid" % (self._config['pid_dir_path'], component), "w")
         f.write(pid)
         f.close()

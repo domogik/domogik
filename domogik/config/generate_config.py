@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-23 19:50:55 +0100 (lun. 23 févr. 2009) $
-# $LastChangedRevision: 399 $
+# $LastChangedDate: 2009-02-26 22:03:22 +0100 (jeu. 26 févr. 2009) $
+# $LastChangedRevision: 402 $
 
 import re
 import sys
@@ -151,6 +151,8 @@ class generalConfig(genericPluginConfig):
         self.informations = [
         ('hub_address','What is the IP address the xPL system must bind ?',r"^([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])$",None),
         ('hub_port','What is the port the xPL system must bind ?',r"^[1-9][0-9]+$",[3865]),
+        ('dmg_port','What is the port control script will use ?',r"^[1-9][0-9]+", [3866]),
+        ('source','What is the xPL name you want control scripts use ?', None,['xpl-dmg.domogik']),
         ('log_dir_path','What is the path of the log directory ?\nThe directory must exists with good permissions.', None, ['/tmp/']),
         ('log_level','What is the debug level for logging you want ?', None, ['debug','info','warning','error','critical']),
         ('pid_dir_path','What is the directory for pids file ?', None, ['/var/run/domogik/']),
@@ -217,6 +219,7 @@ class datetimeConfig(genericPluginConfig):
         section = "datetime"
         self.askandwrite(file, section)
 
+
 def OneWireConfig(genericPluginConfig):
     '''
     Ask the user for specific config for the xPL OneWire module
@@ -229,10 +232,24 @@ def OneWireConfig(genericPluginConfig):
         ('temperature_delay','What is the delay you want between temperature update (in second) ?', r"^[1-9][0-9]+", [15])
         ])
 
+class SystemManagerConfig(genericPluginConfig):
+    '''
+    Ask the user for specific config for the xPL datetime module
+    '''
+    def __init__(self, ip):
+        genericPluginConfig.__init__(self, ip)
+        self.informations.extend([
+        ('port','What is the port the manager must bind ?',r"^[1-9][0-9]+", [5005]),
+        ('source','What is the xPL plugin name ?', None,['xpl-sysmanager.domogik']),
+        ])
+        file = "conf.d/sysmanager.cfg"
+        section = "sysmanager"
+        self.askandwrite(file, section)
+
 def usage():
     print "usage : generate_config.py config"
     print "   config : name of the section to reconfigure"
-    print "            Can be one of : all, plugins, x10, 1wire, send, trigger, datetime"
+    print "            Can be one of : all, system, plugins, x10, 1wire, send, trigger, datetime"
     exit(1)
 
 if __name__ == "__main__":
@@ -246,12 +263,14 @@ if __name__ == "__main__":
 
     if choice == 'all':
         ip = generalConfig().getvalue('hub_address')
+        SystemManagerConfig(ip)
         x10Config(ip)
         senderConfig(ip)
         triggerConfig(ip)
         datetimeConfig(ip)
     elif choice == 'main':
-        generalConfig()
+        ip = generalConfig().getvalue('hub_address')
+        SystemManagerConfig(ip)
     elif choice == 'plugins':
         x10Config() 
         senderConfig()
