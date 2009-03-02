@@ -83,35 +83,6 @@ def start_one_component(name):
             log.info("Component %s started with pid %i" % (name, lastpid))
             write_pid_file(name, str(lastpid))
 
-def _start_comp(name):
-    '''
-    Internal method
-    Fork the process then start the component
-    @param name : the name of the component to start
-    This method does *not* check if the component exists
-    '''
-    global lastpid
-    global components
-    global log
-    log.info("Start the component %s" % name)
-    mod_path = "domogik.xpl.bin." + name
-    __import__(mod_path)
-    module = sys.modules[mod_path]
-    lastpid = os.fork()
-    if not lastpid:
-        eval("module.%s" % components[name])
-        log.debug("%s process stopped" % name)
-
-def write_pid_file(component, pid):
-    '''
-    Write the a pid in a file
-    '''
-    global config
-    global log
-    f = open("%s/%s.pid" % (config['pid_dir_path'], component), "w")
-    f.write(pid)
-    f.close()
-
 def is_component_running(component):
     '''
     Check if one component is still running == the pid file exists
