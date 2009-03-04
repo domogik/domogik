@@ -20,13 +20,13 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-22 13:34:47 +0100 (dim. 22 févr. 2009) $
-# $LastChangedRevision: 395 $
+# $LastChangedDate: 2009-03-04 22:29:01 +0100 (mer. 04 mars 2009) $
+# $LastChangedRevision: 404 $
 
 import sys, string, select, threading
 from socket import *
 from domogik.common import logger
-from domogik.xpl.module import xPLModule
+from domogik.xpl.lib.module import xPLModule
 
 class Manager(xPLModule):
     """

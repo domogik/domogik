@@ -24,7 +24,7 @@
 # $LastChangedRevision: 395 $
 
 from domogik.xpl.lib.xplconnector import *
-from domogik.common import configloader
+from domogik.common.configloader import *
 import os
 import sys
 
@@ -44,27 +44,30 @@ class SysManager(xPLModule):
                         'onewire' : 'OneWireTemp()',
                         'trigger' : 'main()',
                         'dawndusk' : 'main()'}
-        cfgloader = Loader()
+        cfgloader = Loader('sysmanager')
         config = cfgloader.load()
         self._config = config[0]
         l = logger.Logger('sysmanager')
         self._log = l.get_logger()
         self.__myxpl = Manager(config[1]["address"],port = int(config[1]["port"]), source = config[1]["source"], module_name = 'send')
+        Listener(self._sys_cb, self.__myxpl, {'schema':'domogik.system','type':'xpl-cmnd'})
 
 
     def _sys_cb(self, message):
         '''
         Internal callback for receiving system messages
         '''
+        self._log.debug("Incoming message")
         cmd = message.get_key_value('command')
         mod = message.get_key_value('module')
         force = 0
         if message.has_key('force'):
-            force = mesage.get_key_value('force')
+            force = message.get_key_value('force')
         error = ""
         if mod not in self._components:
             error = "Invalide component.\n"
-        elif force and self._is_component_running(mod):
+        elif not force and self._is_component_running(mod):
+            self._log.info("The component seems already running and force is disabled")
             error += "The component seems already running and force is disabled"
         if error == "":
             pid = self._start_comp(mod)
@@ -87,18 +90,18 @@ class SysManager(xPLModule):
         @param name : the name of the component to start
         This method does *not* check if the component exists
         '''
-        log.info("Start the component %s" % name)
+        self._log.info("Start the component %s" % name)
         mod_path = "domogik.xpl.bin." + name
         __import__(mod_path)
         module = sys.modules[mod_path]
         lastpid = os.fork()
         if not lastpid:
-            eval("module.%s" % components[name])
+            eval("module.%s" % self._components[name])
             self._log.debug("%s process stopped" % name)
             exit(0)
         return lastpid
 
-    def _is_component_running(component):
+    def _is_component_running(self, component):
         '''
         Check if one component is still running == the pid file exists
         '''
@@ -111,3 +114,6 @@ class SysManager(xPLModule):
         f = open("%s/%s.pid" % (self._config['pid_dir_path'], component), "w")
         f.write(pid)
         f.close()
+
+if __name__ == "__main__":
+    s = SysManager()

@@ -25,15 +25,18 @@
 
 from domogik.common.configloader import Loader
 from domogik.common import logger
+from domogik.xpl.lib.xplconnector import *
 import os
 import sys
 import optparse
+import time
 
 global lastpid
 global components
 global arguments
 global config
 global log
+global myxpl
 
 lastpid = 0
 components = {'x10' : 'x10Main()',
@@ -63,25 +66,61 @@ def start_from_config():
 
 def start_one_component(name):
     '''
-    Start one component
+    Send xPL request to start one component
     @param name : The name of the component to start
     '''
     global components
     global lastpid
     global log
+    global config
+    global myxpl
+
     log.debug('Try to start component %s' % name)
     if name not in components:
         log.warning("%s is not an existing component !" % name)
         raise ValueError
-    elif is_component_running(name):
-        log.info("%s pid file exists" % name)
-        print "The component %s seems to already be started. If you think it's not, remove its pid file in %s." % (name, config['pid_dir_path'])
-        exit(1)
     else:
-        _start_comp(name)
-        if lastpid:
-            log.info("Component %s started with pid %i" % (name, lastpid))
-            write_pid_file(name, str(lastpid))
+        myxpl = Manager(config["hub_address"],port = int(config["dmg_port"]), source = config["source"], module_name = 'dmgstart')
+        log.debug("*Asking to start %s by sending xPL request" % name)
+        message = Message()
+        message.set_type("xpl-cmnd")
+        message.set_schema("domogik.system")
+        message.set_data_key("module",name)
+        message.set_data_key("command","start")
+        message.set_data_key("force","1") #TODO
+        #Create a listener to check the result
+        l = Listener(wait_ack, myxpl, {'schema':'domogik.system','type':'xpl-trig','command':'start','module':name})
+        myxpl.send(message)
+        time.sleep(5) #Wait 5 seconds for a message
+        print "No ack has been received during the last 5 seconds. It means that :\n"
+        print "\t - No manager have been found on the network"
+        print "\t - The manager has some issues"
+        myxpl.leave()
+        exit(1)
+
+def wait_ack(message):
+    """
+    Callback method to check the contents of an ack message (domogik.system)
+    """
+    global myxpl
+    ack = ""
+    error = ''
+    myxpl.leave()
+    if mesage.has_key('error'):
+        error = message.get_key_value('error')
+        print error
+        exit(1)
+
+
+def write_pid_file(component, pid):
+    '''
+    Write the a pid in a file
+    '''
+    global config
+    global log
+    f = open("%s/%s.pid" % (config['pid_dir_path'], component), "w")
+    f.write(pid)
+    f.close()
 
 def is_component_running(component):
     '''

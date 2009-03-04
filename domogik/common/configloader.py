@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-24 00:13:48 +0100 (mar. 24 févr. 2009) $
-# $LastChangedRevision: 400 $
+# $LastChangedDate: 2009-03-04 22:29:01 +0100 (mer. 04 mars 2009) $
+# $LastChangedRevision: 404 $
 
 
 #Path to the configuration directory 
@@ -53,7 +53,7 @@ class Loader():
         #Check the main conf file
         file_with_path = config_path + self.main_conf_name
         if not exists(file_with_path):
-            raise NotFoundException, "The main config file can't be found !\nMake sure %s exists." %file_with_path
+            raise ValueError, "The main config file can't be found !\nMake sure %s exists." %file_with_path
             exit(1)
 
         self.module_name = module_name
