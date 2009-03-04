@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-26 22:03:22 +0100 (jeu. 26 févr. 2009) $
-# $LastChangedRevision: 402 $
+# $LastChangedDate: 2009-03-04 22:54:24 +0100 (mer. 04 mars 2009) $
+# $LastChangedRevision: 405 $
 
 import re
 import sys
@@ -209,7 +209,7 @@ class datetimeConfig(genericPluginConfig):
     '''
     Ask the user for specific config for the xPL datetime module
     '''
-    def __init__(self, ip):
+    def __init__(self, ip=None):
         genericPluginConfig.__init__(self, ip)
         self.informations.extend([
         ('port','What is the port the plugin must bind ?',r"^[1-9][0-9]+", [5003]),
