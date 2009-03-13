@@ -35,8 +35,9 @@ class plcbusMain():
         Create the plcbusMain class
         This class is used to connect PLCBUS to the xPL Network
         '''
+#TODO: make a config file and test it  
         try:
-            self.__myx10 = X10API(config["heyu_cfg_file"])
+            self.__myplcbus = X10API(config["heyu_cfg_file"])
         except:
             print "Something went wrong during heyu init, check logs"
             exit(1)
@@ -50,7 +51,8 @@ class plcbusMain():
         '''
         General callback for all command messages
         '''
-        # test techno because x10.basic schema is use
+        # x10.basic schema is use only for testing
+        # if test need to be deleted after using the good schema xPL
         if tech == 'PLCBUS':
             if message.has_key('command'):
                 cmd = message.get_key_value('command')
@@ -61,13 +63,13 @@ class plcbusMain():
             if message.has_key('level'):
                 level = message.get_key_value('level')
         self._log.debug("%s received : device = %s, user code = %s, level = %s" % (cmd, dev, user, level))
-        _send(cmd, dev, usercode)
+        self._send(cmd, dev, usercode)
                 
     def plcbus_send_ack(self, message):
         '''
         General ack sending over xpl network
         '''
-# TODO : to be completed
+# TODO : need to be completed
         dt = localtime()
         mess = Message()
         dt = strftime("%Y-%m-%d %H:%M:%S")
@@ -79,4 +81,4 @@ class plcbusMain():
         self.__myplcbus.send(mess)
         
 if __name__ == "__main__":
-    x = x10Main()
+    x = plcbusMain()

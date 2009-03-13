@@ -121,7 +121,7 @@ class PLCBUSAPI:
         Check valid ACK message syntax
         '''
         ACK = self.__myser.read(size=9)
-# TODO : test regular expression message
+# TODO : test regular expression for received message
         
     def _convert_device_to_hex(item):
         var1 = int(item[1:]) - 1
@@ -139,6 +139,8 @@ class PLCBUSAPI:
 # TODO : define bright and dim cmd
         
         plcbus_frame = '0205%s%s%s000003' % (ucod, self._convert_device_to_hex(item), self._cmdplcbus[cmd]) #, int(level))
+        
+# TODO : need to be move to xpl/bin/plcbus.py
         for i in range(3):
             self.__myser.write(plcbus_frame.decode("hex"))
         ACK = self.__myser.read(size=9)
@@ -152,38 +154,6 @@ class PLCBUSAPI:
         ACK = self.__myser.read(size=9)
         if output:
             self._log.error("Error during send of command : %s " % output)
-
-    def on(self, item):
-        '''
-        Send an ON order to the item element
-        @param item : the item to send the ON order to
-        @Return True if order was sent, False in case of errors
-        '''
-        try:
-            self._valid_item(item)
-            self._send("ON", item)
-        except:
-            return False
-        else:
-            return True
-        
-    def off(self, item):
-        '''
-        Send an OFF order to the item element
-        @param item : the item to send the ON order to
-        @Return True if order was sent, False in case of errors
-        '''
-        try:
-            self._valid_item(item)
-            self._send("OFF", item)
-        except:
-            return False
-        else:
-            return True
-
-
-# use x10.basic to test
-general = Listener(plcbus_cmd, myxpl, {'schema':'x10.basic','type':'XPL-TRIG'}) 
 
 # TODO : def close serial port on error
 # ser.close()
