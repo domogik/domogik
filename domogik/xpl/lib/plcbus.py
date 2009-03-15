@@ -84,7 +84,7 @@ class PLCBUSAPI:
             'REPORT_ALL_ID_PULSE':   '1e',
             'REPORT_ONLY_ON_PULSE':  '1f'}
         #self.__myser = serial.Serial(5, 9600, timeout=2, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, xonxoff=0) #, rtscts=1)
-        #instead of using serial directly, use serialHandler
+	#instead of using serial directly, use serialHandler
         self._ser_handler = serialHandler(serial_port_no)
         self._ser_handler.start() #run the handler thread	
 
