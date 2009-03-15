@@ -28,6 +28,7 @@ import sys, serial
 from struct import *
 from time import localtime, strftime
 from domogik.common import logger
+from domogik.xpl.lib.PLCBusSerialHandler import *
 
 class PLCBUSException:
     '''
@@ -44,16 +45,17 @@ class PLCBUSAPI:
     This class define some facilities to use PLCBUS.
     ALL_USER_UNIT_OFF must be with home unit=00.
     '''
-    def __init__(self):
+    def __init__(self,serial_port_no):
         self._housecodes = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P']
         self._codevalue = {'A':0, 'B':1, 'C':2, 'D':3, 'E':4, 'F':5, 'G':6, 'H':7, 'I':8, 'J':9, 'K':10, 'L':11, 'M':12, 'N':13, 'O':14, 'P':15}
         self._unitcodes = [ i+1 for i in range(16) ]
-        self._usercodes = [ i+1 for i in range(F)]
+        #self._usercodes = [ i+1 for i in range(F)] #does not work
+        self._usercodes = ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"]
         self._cmdplcbus = {
             'ALL_UNITS_OFF':         '00',
             'ALL_LIGHTS_ON':         '01',
-            'ON':                    '02',
-            'OFF':                   '03',
+            'ON':                    '22',#ON and ask to send ACK (instead of '02')
+            'OFF':                   '23',#OFF and send ACK
             'DIM':                   '04',
             'BRIGHT':                '05',
             'ALL_LIGHTS_OFF':        '06',
@@ -81,7 +83,10 @@ class PLCBUSAPI:
             'GET_ALL_ON_ID_PULSE':   '1d',
             'REPORT_ALL_ID_PULSE':   '1e',
             'REPORT_ONLY_ON_PULSE':  '1f'}
-        self.__myser = serial.Serial(5, 9600, timeout=2, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, xonxoff=0) #, rtscts=1)
+        #self.__myser = serial.Serial(5, 9600, timeout=2, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, xonxoff=0) #, rtscts=1)
+        #instead of using serial directly, use serialHandler
+        self._ser_handler = serialHandler(serial_port_no)
+        self._ser_handler.start() #run the handler thread	
 
     def _valid_item(self, item):
         '''
@@ -120,12 +125,12 @@ class PLCBUSAPI:
         '''
         Check valid ACK message syntax
         '''
-        ACK = self.__myser.read(size=9)
+        #ACK = self.__myser.read(size=9)
 # TODO : test regular expression for received message
         
-    def _convert_device_to_hex(item):
+    def _convert_device_to_hex(self,item):
         var1 = int(item[1:]) - 1
-        var2 = '%01X%01x' % (self.code_value[item[0]], var1)
+        var2 = '%01X%01x' % (self._codevalue[item[0]], var1)
         return var2
     
     def _send(self, cmd, item, ucod):
@@ -140,12 +145,7 @@ class PLCBUSAPI:
         
         plcbus_frame = '0205%s%s%s000003' % (ucod, self._convert_device_to_hex(item), self._cmdplcbus[cmd]) #, int(level))
         
-# TODO : need to be move to xpl/bin/plcbus.py
-        for i in range(3):
-            self.__myser.write(plcbus_frame.decode("hex"))
-        ACK = self.__myser.read(size=9)
-        if output:
-            self._log.error("Error during send of command : %s " % output)
+        self._ser_handler.add_to_send_queue(plcbus_frame)
             
     def _received(self):
         '''
@@ -154,6 +154,11 @@ class PLCBUSAPI:
         ACK = self.__myser.read(size=9)
         if output:
             self._log.error("Error during send of command : %s " % output)
+
+
+#test
+#a=PLCBUSAPI(0)
+#a._send("ON","O3","45")
 
 # TODO : def close serial port on error
 # ser.close()
