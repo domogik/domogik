@@ -30,7 +30,7 @@
 
     
 import sys, serial
-from time import time
+import time 
 from binascii import hexlify
 import Queue
 import threading
@@ -58,33 +58,33 @@ class serialHandler(threading.Thread):
         for i in range(2):
             self.__myser.write(plcbus_frame.decode("hex"))
 
-        print 'emis 2 fois'
+        #print 'sent 2 times'
         #Resend if proper ACK not received
         if self._reliable:
+            time.sleep(0.41) #wait a bit, (in the spec it is written 400ms, in a forum it is stated that it should be a typo and should be 40ms
             ACK_received=0
             #like a timer, does not wait for more than 2seconds for example        
-            time1=time()
-            print "time1", time1
+            time1=time.time()
+            #print "time1", time1
             while 1:
-                time2=time()
-                print "time2", time2
+                time2=time.time()
+                #print "time2", time2
                 while 1:
                     message=self.__myser.read(size=9) #timeout should be 40ms
                     #put message in _received_queue        #in order to be sent on the xPL network
                     print "recu " + hexlify(message)
                     if(message and self._is_ack(message,plcbus_frame)): #check if the received frame is the waited ACK
                         ACK_received=1
-                        print "ACK received"
+                        #print "ACK received"
                     
-                    if (ACK_received==1 or time2 + 0.2 < time()): break #200ms
+                    if (ACK_received==1 or time2 + 0.2 < time.time()): break #200ms
                 #end of do while
-                print "end of while ack", ACK_received    
                 if(ACK_received==0):
                     #we waited 200ms and not received ACK, try again
-                    print "sending again message"
+                    #print "sending again message"
                     self.__myser.write(plcbus_frame.decode("HEX"))    
 
-                if(ACK_received==1 or time1 + 2 < time()): break            #2s
+                if(ACK_received==1 or time1 + 2 < time.time()): break            #2s
             #end of second do while
 
     def receive(self):
@@ -97,8 +97,12 @@ class serialHandler(threading.Thread):
     def _is_ack(self,m1, m2):
         #TODO check if m1 and m2 have same user code, house code and device code
         #check the ACK bit
-        #return m1 & 8192 #20 00 in hexa does not work because type(m1) is string...
-        return 1
+        #print "ACK check " + m1.encode('HEX') +" " + m2
+        #check house code and user code in hexa string format like '45E0'
+        if(m1.encode('HEX')[4:8].upper()==m2[4:8].upper()):
+            #print "housecode and usercode OK"
+            return (int(m1.encode('HEX')[14:16],16) & 0x20) #test only one bit
+        return 0
 
     #serial handler main thread
     def run(self):
