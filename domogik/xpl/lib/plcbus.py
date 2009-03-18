@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
 
-# Author: François PINET <domopyx@gmail.com>
+# Authors: François PINET <domopyx@gmail.com>, Yoann HINARD <yoann.hinard@gmail.com>
 
 # $LastChangedBy:$
 # $LastChangedDate:$
@@ -32,7 +32,7 @@ from domogik.xpl.lib.PLCBusSerialHandler import *
 
 class PLCBUSException:
     '''
-    X10 exception
+    PLCBUS Exception
     '''
     def __init__(self, value):
         self.value = value
@@ -52,7 +52,7 @@ class PLCBUSAPI:
         #self._usercodes = [ i+1 for i in range(F)] #does not work
         self._usercodes = ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"]
         self._cmdplcbus = {
-            'ALL_UNITS_OFF':         '00',
+            'ALL_UNITS_OFF':         '00',#020645000800000c03
             'ALL_LIGHTS_ON':         '01',
             'ON':                    '22',#ON and ask to send ACK (instead of '02')
             'OFF':                   '23',#OFF and send ACK
@@ -121,12 +121,6 @@ class PLCBUSAPI:
         except:
             self._log.warning("Invalid user code %s, must be 'H' format, between 00 and FF" % (item[0].upper()))
     
-    def _valid_ack_message(self, msg):
-        '''
-        Check valid ACK message syntax
-        '''
-        #ACK = self.__myser.read(size=9)
-# TODO : test regular expression for received message
         
     def _convert_device_to_hex(self,item):
         var1 = int(item[1:]) - 1
@@ -143,9 +137,21 @@ class PLCBUSAPI:
 # TODO : test on ALL_USER_UNIT_OFF
 # TODO : define bright and dim cmd
         
-        plcbus_frame = '0205%s%s%s000003' % (ucod, self._convert_device_to_hex(item), self._cmdplcbus[cmd]) #, int(level))
-        
-        self._ser_handler.add_to_send_queue(plcbus_frame)
+        #try:
+        try:
+            command=self._cmdplcbus[cmd]
+        except KeyError:
+            print "PLCBUS Frame generation error, command does not exist ",cmd
+        else:
+            plcbus_frame = '0205%s%s%s000003' % (ucod, self._convert_device_to_hex(item), self._cmdplcbus[cmd]) #, int(level))
+            try:
+                message=plcbus_frame.decode('HEX')
+            except TypeError:
+                print "PLCBUS Frame generation error, does not result in a HEX string ",plcbus_frame
+            else:
+        #exept 
+                print "putting in send queue ",plcbus_frame 
+                self._ser_handler.add_to_send_queue(plcbus_frame)
             
     def _received(self):
         '''
