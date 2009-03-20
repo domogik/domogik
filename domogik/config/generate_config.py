@@ -19,9 +19,9 @@
 
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
-# $LastChangedBy: maxence $
-# $LastChangedDate: 2009-03-20 12:03:31 +0100 (ven. 20 mars 2009) $
-# $LastChangedRevision: 414 $
+# $LastChangedBy: domopyx $
+# $LastChangedDate: 2009-03-21 00:59:18 +0100 (sam. 21 mars 2009) $
+# $LastChangedRevision: 416 $
 
 import re
 import sys
@@ -177,6 +177,21 @@ class x10Config(genericPluginConfig):
         section = "x10"
         self.askandwrite(file, section)
 
+class plcbusConfig(genericPluginConfig):
+    '''
+    Ask the user for specific config for PLCBUS xPL module
+    '''
+    def __init__(self, ip=None):
+        genericPluginConfig.__init__(self, ip=None)
+        self.informations.extend([
+        ('port','What is the port the plugin must bind ?',r"^[1-9][0-9]+", [5006]),
+        ('source','What is the xPL plugin name ?', None,['xpl-plcbus.domogik']),
+        ('port_com','What is the com number use by PLCBUS-1141 ?', r"^[0-9]+", [0])
+        ])
+        file = "conf.d/plcbus.cfg"
+        section = "plcbus"
+        self.askandwrite(file, section)
+        
 class senderConfig(genericPluginConfig):
     '''
     Ask the user for specific config for the xPL sender
@@ -265,6 +280,7 @@ if __name__ == "__main__":
         ip = generalConfig().getvalue('hub_address')
         SystemManagerConfig(ip)
         x10Config(ip)
+        plcbusConfig(ip)
         senderConfig(ip)
         triggerConfig(ip)
         datetimeConfig(ip)
@@ -272,12 +288,15 @@ if __name__ == "__main__":
         ip = generalConfig().getvalue('hub_address')
         SystemManagerConfig(ip)
     elif choice == 'plugins':
-        x10Config() 
+        x10Config()
+        plcbusConfig()
         senderConfig()
         triggerConfig()
         datetimeConfig()
     elif choice == 'x10':
         x10Config()
+    elif choice == 'plcbus':
+        plcbusConfig()
     elif choice == 'send':
         senderConfig()
     elif choice == 'trigger':

@@ -35,15 +35,13 @@ class plcbusMain():
         Create the plcbusMain class
         This class is used to connect PLCBUS to the xPL Network
         '''
+        cfgloader = Loader('plcbus')
+        config = cfgloader.load()[1]
 #TODO: make a config file and test it  
-        try:
-            self.__myplcbus = X10API(config["heyu_cfg_file"])
-        except:
-            print "Something went wrong during heyu init, check logs"
-            exit(1)
-        self.__myplcbus = Manager(source = config["source"], module_name='PLCBUS-1141')
+        self.__myplcbus = Manager(source = config["source"], module_name = 'PLCBUS-1141')
         #Create listeners
-        Listener(self.plcbus_cmnd_cb, self.__myplcbus, {'schema':'x10.basic','type':'xpl-cmnd'})
+        Listener(self.plcbus_cmnd_cb, self.__myplcbus, {'schema':'control.basic','type':'xpl-cmnd'})
+        self.api = PLCBUSAPI(config["port_com"])
         l = logger.Logger('plcbus')
         self._log = l.get_logger()
         
@@ -53,17 +51,16 @@ class plcbusMain():
         '''
         # x10.basic schema is use only for testing
         # if test need to be deleted after using the good schema xPL
-        if tech == 'PLCBUS':
-            if message.has_key('command'):
-                cmd = message.get_key_value('command')
-            if message.has_key('device'):
-                dev = message.get_key_value('device')
-            if message.has_key('usercode'):
-                user = message.get_key_value('usercode')
-            if message.has_key('level'):
-                level = message.get_key_value('level')
-        self._log.debug("%s received : device = %s, user code = %s, level = %s" % (cmd, dev, user, level))
-        self._send(cmd, dev, usercode)
+        if message.has_key('command'):
+            cmd = message.get_key_value('command')
+        if message.has_key('device'):
+            dev = message.get_key_value('device')
+        if message.has_key('usercode'):
+            user = message.get_key_value('usercode')
+        if message.has_key('level'):
+            level = message.get_key_value('level')
+        #self._log.debug("%s received : device = %s, user code = %s, level = %s" % (cmd, dev, user, level))
+        self.api._send(cmd, dev, user)
                 
     def plcbus_send_ack(self, message):
         '''
@@ -74,7 +71,7 @@ class plcbusMain():
         mess = Message()
         dt = strftime("%Y-%m-%d %H:%M:%S")
         mess.set_type("xpl-trig")
-        mess.set_schema("x10.basic")
+        mess.set_schema("control.basic")
         mess.set_data_key("datetime", dt)
         mess.set_data_key("command", cmd)
         mess.set_data_key("device", dev)

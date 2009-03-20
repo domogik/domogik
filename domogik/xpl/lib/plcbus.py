@@ -24,7 +24,8 @@
 # $LastChangedRevision:$
 
 import sys, serial
-#from struct import *
+
+from struct import *
 from time import localtime, strftime
 from domogik.common import logger
 from domogik.xpl.lib.PLCBusSerialHandler import *
@@ -45,10 +46,11 @@ class PLCBUSAPI:
     ALL_USER_UNIT_OFF must be with home unit=00.
     '''
     def __init__(self,serial_port_no):
+        cfgloader = Loader('plcbus')
+        config = cfgloader.load()[1]
         self._housecodes = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P']
         self._codevalue = {'A':0, 'B':1, 'C':2, 'D':3, 'E':4, 'F':5, 'G':6, 'H':7, 'I':8, 'J':9, 'K':10, 'L':11, 'M':12, 'N':13, 'O':14, 'P':15}
         self._unitcodes = [ i+1 for i in range(16) ]
-        #self._usercodes = [ i+1 for i in range(F)] #does not work
         self._usercodes = ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"]
         self._cmdplcbus = {
             'ALL_UNITS_OFF':         '00',#020645000800000c03 because the remote send all user unit off
@@ -82,8 +84,7 @@ class PLCBUSAPI:
             'GET_ALL_ON_ID_PULSE':   '1d',
             'REPORT_ALL_ID_PULSE':   '1e',
             'REPORT_ONLY_ON_PULSE':  '1f'}
-        #self.__myser = serial.Serial(5, 9600, timeout=2, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, xonxoff=0) #, rtscts=1)
-	#instead of using serial directly, use serialHandler
+        #instead of using serial directly, use serialHandler
         self._ser_handler = serialHandler(serial_port_no)
         self._ser_handler.start() #run the handler thread	
 
