@@ -43,10 +43,11 @@ class serialHandler(threading.Thread):
     def __init__(self,serial_port_no):
         #invoke constructor of parent class
         threading.Thread.__init__(self)
-        self._reliable=1
         self._send_queue=Queue.Queue()
         self._receive_queue=Queue.Queue()
+        self._answer_queue=Queue.Queue()
         
+        self._need_answer=["1D","1C"] 
         #serial port init
         self.__myser = serial.Serial(serial_port_no, 9600, timeout=0.4, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, xonxoff=0) #, rtscts=1)
         print "PLCBUS Serial port open " + self.__myser.portstr 
@@ -60,7 +61,8 @@ class serialHandler(threading.Thread):
 
         #print 'sent 2 times'
         #Resend if proper ACK not received
-        if self._reliable:
+        #check for ack pulse 
+        if (int(plcbus_frame[8:10],16)>>5) & 1: #ACK pulse bit set to 1
             time.sleep(0.41) #wait a bit, (in the spec it is written 400ms, in a forum it is stated that it should be a typo and should be 40ms
             ACK_received=0
             #like a timer, does not wait for more than 2seconds for example        
@@ -81,7 +83,7 @@ class serialHandler(threading.Thread):
                 #end of do while
                 if(ACK_received==0):
                     #we waited 200ms and not received ACK, try again
-                    #print "sending again message"
+                    print "sending again message"
                     self.__myser.write(plcbus_frame.decode("HEX"))    
 
                 if(ACK_received==1 or time1 + 2 < time.time()): break            #2s
@@ -92,10 +94,17 @@ class serialHandler(threading.Thread):
         message=self.__myser.read(9)
         #put frame_PLCbus in receivedqueue
         if(message):
-            print "recu " + hexlify(message)
-            self._receive_queue.put(hexlify(message))
+            m_string=hexlify(message)
+            print "recu " + m_string
+            #if message is likely to be an answer, put it in the right queue
+            if self._is_answer(m_string):
+                self._answer_queue.put(m_string)
+            else:
+                self._receive_queue.put(m_string)
+
+
+
     def _is_ack(self,m1, m2):
-        #TODO check if m1 and m2 have same user code, house code and device code
         #check the ACK bit
         #print "ACK check " + m1.encode('HEX') +" " + m2
         #check house code and user code in hexa string format like '45E0'
@@ -103,6 +112,14 @@ class serialHandler(threading.Thread):
             #print "housecode and usercode OK"
             return (int(m1.encode('HEX')[14:16],16) & 0x20) #test only one bit
         return 0
+
+    def _is_answer(self,message):
+        #if command is in answer required list (not ACK required, it's different)
+        #if R_ID_SW bit set
+        #maybe pass this list to the _init_ of this handler to make it compatible with other protocols
+        if( (int(message[14:15],16)>>2 & 1) and   message[8:10].upper() in self._need_answer):
+            return True
+        return False
 
     #serial handler main thread
     def run(self):
@@ -122,7 +139,11 @@ class serialHandler(threading.Thread):
     def get_from_receive_queue(self):
         trame=self._receive_queue.get_nowait()
         return trame
-    
+
+    def get_from_answer_queue(self):
+        trame=self._answer_queue.get()
+        return trame
+ 
     def dummytest(self):
         print 'ok'
 

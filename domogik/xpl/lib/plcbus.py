@@ -24,8 +24,7 @@
 # $LastChangedRevision:$
 
 import sys, serial
-#from domogik.xpl.lib.xplconnector import *
-from struct import *
+#from struct import *
 from time import localtime, strftime
 from domogik.common import logger
 from domogik.xpl.lib.PLCBusSerialHandler import *
@@ -52,7 +51,7 @@ class PLCBUSAPI:
         #self._usercodes = [ i+1 for i in range(F)] #does not work
         self._usercodes = ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"]
         self._cmdplcbus = {
-            'ALL_UNITS_OFF':         '00',#020645000800000c03
+            'ALL_UNITS_OFF':         '00',#020645000800000c03 because the remote send all user unit off
             'ALL_LIGHTS_ON':         '01',
             'ON':                    '22',#ON and ask to send ACK (instead of '02')
             'OFF':                   '23',#OFF and send ACK
@@ -153,15 +152,16 @@ class PLCBUSAPI:
                 print "putting in send queue ",plcbus_frame 
                 self._ser_handler.add_to_send_queue(plcbus_frame)
             
-    def _received(self):
+    def get_all_on_id(self,usercode,housecode):
         '''
-        Read ACK message
+        Fastpoll the housecode and return every on modules
+        @param usercode : User code of item (must be 'H' syntax between 00 to FF)
+        @param housecode : one or more housecodes
         '''
-        ACK = self.__myser.read(size=9)
-        if output:
-            self._log.error("Error during send of command : %s " % output)
-
-
+        self._send("GET_ALL_ON_ID_PULSE",housecode+"1",usercode)
+        
+        response=self._ser_handler.get_from_answer_queue()
+        print "Hoora response received ",response
 #test
 #a=PLCBUSAPI(0)
 #a._send("ON","O3","45")
