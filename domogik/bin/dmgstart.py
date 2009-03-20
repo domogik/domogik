@@ -103,14 +103,17 @@ def wait_ack(message):
     Callback method to check the contents of an ack message (domogik.system)
     """
     global myxpl
+    global log
     ack = ""
     error = ''
+    log.debug("Ack received from %s with error = %s" % (message.get_key_value('module'), message.get_key_value('error')))
     myxpl.leave()
-    if mesage.has_key('error'):
+    if message.has_key('error'):
         error = message.get_key_value('error')
         print error
         exit(1)
-
+    else:
+        exit(0)
 
 def write_pid_file(component, pid):
     '''

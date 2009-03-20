@@ -41,7 +41,7 @@ class plcbusMain():
         except:
             print "Something went wrong during heyu init, check logs"
             exit(1)
-        self.__myplcbus = Manager(config["address"],port = config["port"], source = config["source"], module_name='PLCBUS-1141')
+        self.__myplcbus = Manager(source = config["source"], module_name='PLCBUS-1141')
         #Create listeners
         Listener(self.plcbus_cmnd_cb, self.__myplcbus, {'schema':'x10.basic','type':'xpl-cmnd'})
         l = logger.Logger('plcbus')

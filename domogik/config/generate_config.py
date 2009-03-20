@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-03-04 22:54:24 +0100 (mer. 04 mars 2009) $
-# $LastChangedRevision: 405 $
+# $LastChangedDate: 2009-03-20 12:03:31 +0100 (ven. 20 mars 2009) $
+# $LastChangedRevision: 414 $
 
 import re
 import sys
@@ -166,8 +166,8 @@ class x10Config(genericPluginConfig):
     '''
     Ask the user for specific config for X10 xPL module
     '''
-    def __init__(self, ip):
-        genericPluginConfig.__init__(self, ip)
+    def __init__(self, ip=None):
+        genericPluginConfig.__init__(self, ip=None)
         self.informations.extend([
         ('port','What is the port the plugin must bind ?',r"^[1-9][0-9]+", [5000]),
         ('source','What is the xPL plugin name ?', None,['xpl-x10.domogik']),
@@ -181,7 +181,7 @@ class senderConfig(genericPluginConfig):
     '''
     Ask the user for specific config for the xPL sender
     '''
-    def __init__(self, ip):
+    def __init__(self, ip=None):
         genericPluginConfig.__init__(self, ip)
         self.informations.extend([
         ('port','What is the port the plugin must bind ?',r"^[1-9][0-9]+", [5001]),
@@ -195,7 +195,7 @@ class triggerConfig(genericPluginConfig):
     '''
     Ask the user for specific config for the xPL sender
     '''
-    def __init__(self, ip):
+    def __init__(self, ip=None):
         genericPluginConfig.__init__(self, ip)
         self.informations.extend([
         ('port','What is the port the plugin must bind ?',r"^[1-9][0-9]+", [5002]),
@@ -224,7 +224,7 @@ def OneWireConfig(genericPluginConfig):
     '''
     Ask the user for specific config for the xPL OneWire module
     '''
-    def __init__(self, ip):
+    def __init__(self, ip=None):
         genericPluginConfig.__init__(self, ip)
         self.informations.extend([
         ('port','What is the port the plugin must bind ?',r"^[1-9][0-9]+", [5004]),

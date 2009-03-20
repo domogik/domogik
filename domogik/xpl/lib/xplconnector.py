@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-03-04 22:29:01 +0100 (mer. 04 mars 2009) $
-# $LastChangedRevision: 404 $
+# $LastChangedDate: 2009-03-20 12:03:31 +0100 (ven. 20 mars 2009) $
+# $LastChangedRevision: 414 $
 
 import sys, string, select, threading
 from socket import *
@@ -41,7 +41,7 @@ class Manager(xPLModule):
 #    _listeners = [] # List of listeners to brodacast message
 #    _network = None
 #    _UDPSock = None
-    def __init__(self, ip = "0.0.0.0", source = "xpl-monitor.python", port = 3865, module_name = None):
+    def __init__(self, ip ="127.0.0.1", source = "xpl-monitor.python", module_name = None):
         """
         Create a new manager instance
         @param ip : IP to listen to (default 0.0.0.0)
@@ -52,13 +52,13 @@ class Manager(xPLModule):
         # Define maximum xPL message size
         self._buff = 1500
         # Define xPL base port
-        self._port = int(port)
-        self._ip = ip
         self._source = source
         self._listeners = []
         # Initialise the socket
         self._UDPSock = socket(AF_INET,SOCK_DGRAM)
-        addr = (ip, self._port)
+        #xPL plugins only needs to connect on local xPL Hub on localhost
+        #The port is dynamically selected by the system
+        addr = (ip,0)
 
         l = logger.Logger(module_name)
         self._log = l.get_logger()
@@ -136,6 +136,7 @@ class Manager(xPLModule):
                     mess = Message(data)
                     if ( mess.get_conf_key_value("target") == "*" ) or ( mess.get_conf_key_value("target") == self._source ):
                         [ l.new_message(mess) for l in self._listeners ]
+                        self._log.debug("New message received : %s" % mess.get_type())
                 except XPLException:
                     pass
         self.unregister_thread(self._network)
@@ -259,6 +260,8 @@ class Message:
         self._data = {}
         self._conf_order = ""
         self._data_order = ""
+        l = logger.Logger("message")
+        self._log = l.get_logger()
         if mess is None:
             return
         m = mess.split("\n")

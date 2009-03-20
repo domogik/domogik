@@ -20,18 +20,18 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-22 13:34:47 +0100 (dim. 22 févr. 2009) $
-# $LastChangedRevision: 395 $
+# $LastChangedDate: 2009-03-20 12:03:31 +0100 (ven. 20 mars 2009) $
+# $LastChangedRevision: 414 $
 
 from domogik.xpl.lib.dawndusk import DawnDusk
 from domogik.xpl.lib.xplconnector import *
 import datetime
-from domogik.common import configloader
+from domogik.common.configloader import *
 
 cfgloader = Loader('dawndusk')
 config = cfgloader.load()
 
-myxpl = Manager(config["address"],port = config["port"], source = config["source"],module_name = 'dawndusk')
+myxpl = Manager(source = config["source"],module_name = 'dawndusk')
 mydawndusk = DawnDusk()
 
 #Parameters definitions

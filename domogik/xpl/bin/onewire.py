@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-22 16:05:05 +0100 (dim. 22 févr. 2009) $
-# $LastChangedRevision: 397 $
+# $LastChangedDate: 2009-03-20 12:03:31 +0100 (ven. 20 mars 2009) $
+# $LastChangedRevision: 414 $
 
 from domogik.xpl.lib.xplconnector import *
 from onewire import *
@@ -39,7 +39,7 @@ class OneWireTemp():
         '''
         cfgloader = Loader('onewire')
         config = cfgloader.load()
-        self._myxpl = Manager(config["address"],port = config["port"], source = config["source"], module_name='onewire')
+        self._myxpl = Manager(source = config["source"], module_name='onewire')
         self._myow = OneWire()
         self._myow.set_cache_use(False)
         timers = []

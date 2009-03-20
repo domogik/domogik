@@ -70,10 +70,31 @@ class SysManager(xPLModule):
             self._log.info("The component seems already running and force is disabled")
             error += "The component seems already running and force is disabled"
         if error == "":
-            pid = self._start_comp(mod)
-            if pid:
-                self._write_pid_file(mod, pid)
-                self._log.debug("Component %s started with pid %i" %(mod, pid))
+            if cmd == "start":
+                pid = self._start_comp(mod)
+                if pid:
+                    self._write_pid_file(mod, pid)
+                    self._log.debug("Component %s started with pid %i" %(mod, pid))
+                    mess = Message()
+                    mess.set_type('xpl-trig')
+                    mess.set_schema('domogik.system')
+                    mess.set_data_key('command',cmd)
+                    mess.set_data_key('module',mod)
+                    mess.set_data_key('force',force)
+                    mess.set_data_key('error',error)
+                    self.__myxpl.send(mess)
+            elif cmd == "stop":
+                ret = self._stop_comp(mod)
+                if ret == 0:
+                    error = ''
+                elif ret == 1:
+                    error = 'The component was not started (no pid file)'
+                elif ret == 2:
+                    error = 'An error occurs during sending signal, check logs'
+                if not error:
+                    self._log.debug("Component %s stopped" % (mod))
+                else:
+                    self._log.debug("Error during stop of component %s : %s" % (mod, error)
                 mess = Message()
                 mess.set_type('xpl-trig')
                 mess.set_schema('domogik.system')
@@ -82,6 +103,22 @@ class SysManager(xPLModule):
                 mess.set_data_key('force',force)
                 mess.set_data_key('error',error)
                 self.__myxpl.send(mess)
+    
+    def _stop_comp(self, name);
+        '''
+        Internal method
+        Try to stop a component by getting its pid and sending signal
+        @param name : the name of the component to stop
+        @return 0 if stop is OK, 1 if the pid file doesn't exist, 2 in case of other problem
+        '''
+        if not os.path.isfile("%s/%s.pid" % (self._config['pid_dir_path'], name)):
+            return 1
+        else:
+            try:
+                f = open("%s/%s.pid"%  (self._config['pid_dir_path'], name),"r")
+                data = f.readlines().replace('\n','')
+            except:
+                return 2
 
     def _start_comp(self,name):
         '''
@@ -112,7 +149,7 @@ class SysManager(xPLModule):
         Write the pid in a file
         '''
         f = open("%s/%s.pid" % (self._config['pid_dir_path'], component), "w")
-        f.write(pid)
+        f.write("%s"  % pid)
         f.close()
 
 if __name__ == "__main__":
