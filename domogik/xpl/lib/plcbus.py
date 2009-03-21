@@ -46,10 +46,13 @@ class PLCBUSAPI:
     ALL_USER_UNIT_OFF must be with home unit=00.
     '''
     def __init__(self,serial_port_no):
-        cfgloader = Loader('plcbus')
-        config = cfgloader.load()[1]
+        #cfgloader = Loader('plcbus')
+        #config = cfgloader.load()[1]
         self._housecodes = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P']
         self._codevalue = {'A':0, 'B':1, 'C':2, 'D':3, 'E':4, 'F':5, 'G':6, 'H':7, 'I':8, 'J':9, 'K':10, 'L':11, 'M':12, 'N':13, 'O':14, 'P':15}
+        self._valuecode=dict()
+        for k, v in self._codevalue.items():
+            self._valuecode[v]=k
         self._unitcodes = [ i+1 for i in range(16) ]
         self._usercodes = ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"]
         self._cmdplcbus = {
@@ -159,10 +162,17 @@ class PLCBUSAPI:
         @param usercode : User code of item (must be 'H' syntax between 00 to FF)
         @param housecode : one or more housecodes
         '''
+        onlist=[]
         self._send("GET_ALL_ON_ID_PULSE",housecode+"1",usercode)
-        
         response=self._ser_handler.get_from_answer_queue()
-        print "Hoora response received ",response
+        if(response):
+            print "Hoora response received ",response
+            data=int(response[10:14],16)
+            for i in range(0,16):
+               if data>>i&1:
+                   onlist.append(housecode+str(self._unitcodes[i]))
+        print "on :",onlist
+        return onlist 
 #test
 #a=PLCBUSAPI(0)
 #a._send("ON","O3","45")

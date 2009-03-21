@@ -141,7 +141,7 @@ class serialHandler(threading.Thread):
         return trame
 
     def get_from_answer_queue(self):
-        trame=self._answer_queue.get()
+        trame=self._answer_queue.get(True,2) #do not wait for more than 2s
         return trame
  
     def dummytest(self):
