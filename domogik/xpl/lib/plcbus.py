@@ -46,8 +46,8 @@ class PLCBUSAPI:
     ALL_USER_UNIT_OFF must be with home unit=00.
     '''
     def __init__(self,serial_port_no):
-        #cfgloader = Loader('plcbus')
-        #config = cfgloader.load()[1]
+
+
         self._housecodes = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P']
         self._codevalue = {'A':0, 'B':1, 'C':2, 'D':3, 'E':4, 'F':5, 'G':6, 'H':7, 'I':8, 'J':9, 'K':10, 'L':11, 'M':12, 'N':13, 'O':14, 'P':15}
         self._valuecode=dict()
@@ -130,7 +130,15 @@ class PLCBUSAPI:
         var2 = '%01X%01x' % (self._codevalue[item[0]], var1)
         return var2
     
-    def _send(self, cmd, item, ucod):
+    def _convert_level(self, level):
+        #TODO : result must have 2 caracters
+        return hex(level)[2:]
+    
+    def _convert_rate(self, rate):
+        #TODO : result must have 2 caracters
+        return hex(rate)[2:]
+    
+    def _send(self, cmd, item, ucod):    #TODO : after cmd add level, rate
         '''
         Send a command PLCBUS to 1141 module
         @param cmd : Command to send ('ON','OFF', etc)
@@ -146,7 +154,7 @@ class PLCBUSAPI:
         except KeyError:
             print "PLCBUS Frame generation error, command does not exist ",cmd
         else:
-            plcbus_frame = '0205%s%s%s000003' % (ucod, self._convert_device_to_hex(item), self._cmdplcbus[cmd]) #, int(level))
+            plcbus_frame = '0205%s%s%s000003' % (ucod, self._convert_device_to_hex(item), self._cmdplcbus[cmd])   # for bright and dim cmd , self._convert_level, self._convert_rate) #, int(level))
             try:
                 message=plcbus_frame.decode('HEX')
             except TypeError:

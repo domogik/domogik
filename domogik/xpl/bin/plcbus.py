@@ -37,13 +37,13 @@ class plcbusMain():
         '''
         cfgloader = Loader('plcbus')
         config = cfgloader.load()[1]
-#TODO: make a config file and test it  
+
         self.__myplcbus = Manager(source = config["source"], module_name = 'PLCBUS-1141')
         #Create listeners
         Listener(self.plcbus_cmnd_cb, self.__myplcbus, {'schema':'control.basic','type':'xpl-cmnd'})
-        self.api = PLCBUSAPI(config["port_com"])
-        l = logger.Logger('plcbus')
-        self._log = l.get_logger()
+        self.api = PLCBUSAPI(int(config["port_com"]))
+        #l = logger.Logger('plcbus')
+        #self._log = l.get_logger()
         
     def plcbus_cmnd_cb(self, message):
         '''
@@ -51,6 +51,11 @@ class plcbusMain():
         '''
         # x10.basic schema is use only for testing
         # if test need to be deleted after using the good schema xPL
+        cmd = None
+        dev = None
+        user = None
+        level = 0
+        rate = 0
         if message.has_key('command'):
             cmd = message.get_key_value('command')
         if message.has_key('device'):
@@ -59,8 +64,11 @@ class plcbusMain():
             user = message.get_key_value('usercode')
         if message.has_key('level'):
             level = message.get_key_value('level')
+        if message.has_key('rate'):
+            level = message.get_key_value('rate')
         #self._log.debug("%s received : device = %s, user code = %s, level = %s" % (cmd, dev, user, level))
-        self.api._send(cmd, dev, user)
+        self.api._send(cmd, dev, user)  #TODO : add level, rate after cmd
+        
                 
     def plcbus_send_ack(self, message):
         '''
