@@ -80,7 +80,7 @@ def start_one_component(name):
         log.warning("%s is not an existing component !" % name)
         raise ValueError
     else:
-        myxpl = Manager(config["hub_address"],port = int(config["dmg_port"]), source = config["source"], module_name = 'dmgstart')
+        myxpl = Manager(source = config["source"], module_name = 'dmgstart')
         log.debug("*Asking to start %s by sending xPL request" % name)
         message = Message()
         message.set_type("xpl-cmnd")

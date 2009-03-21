@@ -20,8 +20,8 @@
 # Author: Maxence Dunnewind <maxence@dunnewind.net>
 
 # $LastChangedBy: maxence $
-# $LastChangedDate: 2009-03-20 12:03:31 +0100 (ven. 20 mars 2009) $
-# $LastChangedRevision: 414 $
+# $LastChangedDate: 2009-03-21 14:33:23 +0100 (sam. 21 mars 2009) $
+# $LastChangedRevision: 417 $
 
 import sys, string, select, threading
 from socket import *
@@ -41,7 +41,7 @@ class Manager(xPLModule):
 #    _listeners = [] # List of listeners to brodacast message
 #    _network = None
 #    _UDPSock = None
-    def __init__(self, ip ="127.0.0.1", source = "xpl-monitor.python", module_name = None):
+    def __init__(self, ip ="0.0.0.0", source = "xpl-monitor.python", module_name = None):
         """
         Create a new manager instance
         @param ip : IP to listen to (default 0.0.0.0)
@@ -71,6 +71,8 @@ class Manager(xPLModule):
             self._log.error("Can't bind to the port %i" % self._port)
             exit(1)
         else:
+            self._port = self._UDPSock.getsockname()[1]
+            self._ip = ip
             #All is good, we start sending Heartbeat every 5 minutes using xPLTimer
             self._SendHeartbeat()
             self._h_timer = xPLTimer(300,self._SendHeartbeat)

@@ -49,7 +49,8 @@ class SysManager(xPLModule):
         self._config = config[0]
         l = logger.Logger('sysmanager')
         self._log = l.get_logger()
-        self.__myxpl = Manager(config[1]["address"],port = int(config[1]["port"]), source = config[1]["source"], module_name = 'send')
+        self.__myxpl = Manager(source = config[1]["source"], module_name = 'send')
+        self._log.debug("Init system manager")
         Listener(self._sys_cb, self.__myxpl, {'schema':'domogik.system','type':'xpl-cmnd'})
 
 
@@ -58,6 +59,7 @@ class SysManager(xPLModule):
         Internal callback for receiving system messages
         '''
         self._log.debug("Incoming message")
+        print "Incoming message"
         cmd = message.get_key_value('command')
         mod = message.get_key_value('module')
         force = 0
@@ -94,7 +96,7 @@ class SysManager(xPLModule):
                 if not error:
                     self._log.debug("Component %s stopped" % (mod))
                 else:
-                    self._log.debug("Error during stop of component %s : %s" % (mod, error)
+                    self._log.debug("Error during stop of component %s : %s" % (mod, error))
                 mess = Message()
                 mess.set_type('xpl-trig')
                 mess.set_schema('domogik.system')
@@ -104,7 +106,7 @@ class SysManager(xPLModule):
                 mess.set_data_key('error',error)
                 self.__myxpl.send(mess)
     
-    def _stop_comp(self, name);
+    def _stop_comp(self, name):
         '''
         Internal method
         Try to stop a component by getting its pid and sending signal
@@ -134,7 +136,7 @@ class SysManager(xPLModule):
         lastpid = os.fork()
         if not lastpid:
             eval("module.%s" % self._components[name])
-            self._log.debug("%s process stopped" % name)
+            self._log.debug("%s process started" % name)
             exit(0)
         return lastpid
 
