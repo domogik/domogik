@@ -35,22 +35,21 @@ class plcbusMain():
         Create the plcbusMain class
         This class is used to connect PLCBUS to the xPL Network
         '''
+        # Load config
         cfgloader = Loader('plcbus')
         config = cfgloader.load()[1]
-
         self.__myplcbus = Manager(source = config["source"], module_name = 'PLCBUS-1141')
-        #Create listeners
+        # Create listeners
         Listener(self.plcbus_cmnd_cb, self.__myplcbus, {'schema':'control.basic','type':'xpl-cmnd'})
         self.api = PLCBUSAPI(int(config["port_com"]))
-        #l = logger.Logger('plcbus')
-        #self._log = l.get_logger()
+        # Create log instance
+        l = logger.Logger('plcbus')
+        self._log = l.get_logger()
         
     def plcbus_cmnd_cb(self, message):
         '''
         General callback for all command messages
         '''
-        # x10.basic schema is use only for testing
-        # if test need to be deleted after using the good schema xPL
         cmd = None
         dev = None
         user = None
@@ -65,9 +64,9 @@ class plcbusMain():
         if message.has_key('level'):
             level = message.get_key_value('level')
         if message.has_key('rate'):
-            level = message.get_key_value('rate')
-        #self._log.debug("%s received : device = %s, user code = %s, level = %s" % (cmd, dev, user, level))
-        self.api._send(cmd, dev, user)  #TODO : add level, rate after cmd
+            rate = message.get_key_value('rate')
+        self._log.debug("%s received : device = %s, user code = %s, level = %s" % (cmd, dev, user, level))
+        self.api._send(cmd, dev, user, level, rate)
         
                 
     def plcbus_send_ack(self, message):

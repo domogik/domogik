@@ -130,15 +130,17 @@ class PLCBUSAPI:
         var2 = '%01X%01x' % (self._codevalue[item[0]], var1)
         return var2
     
-    def _convert_level(self, level):
-        #TODO : result must have 2 caracters
-        return hex(level)[2:]
+    def _convert_data(self, data):
+        # result must have 2 caracters
+        var1 = hex(int(data))[2:]
+        if len(var1) == 2:
+            var2 = '%01X' % (int(data))
+            return var2
+        else:
+            var2 = '0%01X' % (int(data))
+            return var2
     
-    def _convert_rate(self, rate):
-        #TODO : result must have 2 caracters
-        return hex(rate)[2:]
-    
-    def _send(self, cmd, item, ucod, data1="00", data2="00"):    #after cmd add level, rate : put in data1 and data2 (just data1 for these cases
+    def _send(self, cmd, item, ucod, data1, data2):    #after cmd add level, rate : put in data1 and data2 (just data1 for these cases
         '''
         Send a command PLCBUS to 1141 module
         @param cmd : Command to send ('ON','OFF', etc)
@@ -146,7 +148,6 @@ class PLCBUSAPI:
         @param ucod : User code of item (must be 'H' syntax between 00 to FF)
         '''
 # TODO : test on ALL_USER_UNIT_OFF
-# TODO : define bright and dim cmd
         
         #try:
         try:
@@ -154,7 +155,8 @@ class PLCBUSAPI:
         except KeyError:
             print "PLCBUS Frame generation error, command does not exist ",cmd
         else:
-            plcbus_frame = '0205%s%s%s%s%s03' % (ucod, self._convert_device_to_hex(item), self._cmdplcbus[cmd],data1,data2)   # for bright and dim cmd , call _send with something in data1 and data2 
+            plcbus_frame = '0205%s%s%s%s%s03' % (ucod, self._convert_device_to_hex(item), self._cmdplcbus[cmd], self._convert_data(data1), self._convert_data(data2))   # for bright and dim cmd , call _send with something in data1 and data2 
+            print plcbus_frame
             try:
                 message=plcbus_frame.decode('HEX')
             except TypeError:
@@ -184,6 +186,7 @@ class PLCBUSAPI:
 #test
 #a=PLCBUSAPI(0)
 #a._send("ON","O3","45")
+#a._send("BRIGHT","O3,"45","50","1")
 
 # TODO : def close serial port on error
 # ser.close()
