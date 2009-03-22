@@ -52,6 +52,7 @@ class SysManager(xPLModule):
         self.__myxpl = Manager(source = config[1]["source"], module_name = 'send')
         self._log.debug("Init system manager")
         Listener(self._sys_cb, self.__myxpl, {'schema':'domogik.system','type':'xpl-cmnd'})
+        self._log.debug("System manager initialized")
 
 
     def _sys_cb(self, message):
