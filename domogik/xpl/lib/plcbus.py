@@ -138,7 +138,7 @@ class PLCBUSAPI:
         #TODO : result must have 2 caracters
         return hex(rate)[2:]
     
-    def _send(self, cmd, item, ucod):    #TODO : after cmd add level, rate
+    def _send(self, cmd, item, ucod, data1="00", data2="00"):    #after cmd add level, rate : put in data1 and data2 (just data1 for these cases
         '''
         Send a command PLCBUS to 1141 module
         @param cmd : Command to send ('ON','OFF', etc)
@@ -154,7 +154,7 @@ class PLCBUSAPI:
         except KeyError:
             print "PLCBUS Frame generation error, command does not exist ",cmd
         else:
-            plcbus_frame = '0205%s%s%s000003' % (ucod, self._convert_device_to_hex(item), self._cmdplcbus[cmd])   # for bright and dim cmd , self._convert_level, self._convert_rate) #, int(level))
+            plcbus_frame = '0205%s%s%s%s%s03' % (ucod, self._convert_device_to_hex(item), self._cmdplcbus[cmd],data1,data2)   # for bright and dim cmd , call _send with something in data1 and data2 
             try:
                 message=plcbus_frame.decode('HEX')
             except TypeError:
