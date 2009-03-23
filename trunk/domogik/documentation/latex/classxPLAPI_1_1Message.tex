@@ -1,0 +1,157 @@
+\hypertarget{classxPLAPI_1_1Message}{
+\section{xPLAPI::Message Class Reference}
+\label{classxPLAPI_1_1Message}\index{xPLAPI::Message@{xPLAPI::Message}}
+}
+\hyperlink{classxPLAPI_1_1Message}{Message} is the object for all data received form the network.  
+
+
+\subsection*{Public Member Functions}
+\begin{CompactItemize}
+\item 
+def \hyperlink{classxPLAPI_1_1Message_f1efb1186af373f1ce3d107be47e3f3f}{\_\-\_\-init\_\-\_\-}
+\begin{CompactList}\small\item\em Create \hyperlink{classxPLAPI_1_1Message}{Message} instance from a message string and check if the structure is correct. \item\end{CompactList}\item 
+\hypertarget{classxPLAPI_1_1Message_a24b962cfffbd90f1cb79a2c20e581e6}{
+def \hyperlink{classxPLAPI_1_1Message_a24b962cfffbd90f1cb79a2c20e581e6}{set\_\-type}}
+\label{classxPLAPI_1_1Message_a24b962cfffbd90f1cb79a2c20e581e6}
+
+\begin{CompactList}\small\item\em Define the message type (xpl-stat, xpl-trig or xpl-cmnd). \item\end{CompactList}\item 
+\hypertarget{classxPLAPI_1_1Message_55aad8c9b685e349f7e3d3f58b6ff5aa}{
+def \hyperlink{classxPLAPI_1_1Message_55aad8c9b685e349f7e3d3f58b6ff5aa}{get\_\-type}}
+\label{classxPLAPI_1_1Message_55aad8c9b685e349f7e3d3f58b6ff5aa}
+
+\begin{CompactList}\small\item\em Return the message type. \item\end{CompactList}\item 
+\hypertarget{classxPLAPI_1_1Message_560b2b7685ee99a34ea7d01e7135477c}{
+def \hyperlink{classxPLAPI_1_1Message_560b2b7685ee99a34ea7d01e7135477c}{set\_\-schema}}
+\label{classxPLAPI_1_1Message_560b2b7685ee99a34ea7d01e7135477c}
+
+\begin{CompactList}\small\item\em Define the message schema. \item\end{CompactList}\item 
+\hypertarget{classxPLAPI_1_1Message_58df48b064cb3d59780a51c67136e88a}{
+def \hyperlink{classxPLAPI_1_1Message_58df48b064cb3d59780a51c67136e88a}{get\_\-schema}}
+\label{classxPLAPI_1_1Message_58df48b064cb3d59780a51c67136e88a}
+
+\begin{CompactList}\small\item\em Return the message schema. \item\end{CompactList}\item 
+\hypertarget{classxPLAPI_1_1Message_014808e1035dcea973692d4d823427ce}{
+def \hyperlink{classxPLAPI_1_1Message_014808e1035dcea973692d4d823427ce}{set\_\-conf\_\-key}}
+\label{classxPLAPI_1_1Message_014808e1035dcea973692d4d823427ce}
+
+\begin{CompactList}\small\item\em Define a configuration key (which appears between first \{\}). \item\end{CompactList}\item 
+\hypertarget{classxPLAPI_1_1Message_6bc039067bf79dd06b649e95870cfba9}{
+def \hyperlink{classxPLAPI_1_1Message_6bc039067bf79dd06b649e95870cfba9}{set\_\-data\_\-key}}
+\label{classxPLAPI_1_1Message_6bc039067bf79dd06b649e95870cfba9}
+
+\begin{CompactList}\small\item\em Define a data key (which appears between second \{\}). \item\end{CompactList}\item 
+def \hyperlink{classxPLAPI_1_1Message_254a763505a2ddb64ecd8d1b96f984d6}{set\_\-data\_\-order}
+\begin{CompactList}\small\item\em As schema define parameter order, and since this class isn't specific enough to determine order, you have to set the order to ensure a good message. \item\end{CompactList}\item 
+def \hyperlink{classxPLAPI_1_1Message_191e86e1dccd20aa0ea63158429e6d68}{set\_\-conf\_\-order}
+\begin{CompactList}\small\item\em As schema define parameter order, and since this class isn't specific enough to determine order, you have to set the order to ensure a good message. \item\end{CompactList}\item 
+\hypertarget{classxPLAPI_1_1Message_e8bde03ac8436238c97cad324897c2ee}{
+def \hyperlink{classxPLAPI_1_1Message_e8bde03ac8436238c97cad324897c2ee}{has\_\-key}}
+\label{classxPLAPI_1_1Message_e8bde03ac8436238c97cad324897c2ee}
+
+\begin{CompactList}\small\item\em Check if a key exists in data dictionnary. \item\end{CompactList}\item 
+\hypertarget{classxPLAPI_1_1Message_8bc93e1bab48128e660be2d1e8ac7199}{
+def \hyperlink{classxPLAPI_1_1Message_8bc93e1bab48128e660be2d1e8ac7199}{has\_\-conf\_\-key}}
+\label{classxPLAPI_1_1Message_8bc93e1bab48128e660be2d1e8ac7199}
+
+\begin{CompactList}\small\item\em Check if a key exists in configuration dictionnary. \item\end{CompactList}\item 
+\hypertarget{classxPLAPI_1_1Message_80231e4e96a2247263ed3d2bb7f9cbf3}{
+def \hyperlink{classxPLAPI_1_1Message_80231e4e96a2247263ed3d2bb7f9cbf3}{get\_\-key\_\-value}}
+\label{classxPLAPI_1_1Message_80231e4e96a2247263ed3d2bb7f9cbf3}
+
+\begin{CompactList}\small\item\em get the value of a key from data \item\end{CompactList}\item 
+\hypertarget{classxPLAPI_1_1Message_de17ca84597e627ae63f9b1cf5a4b284}{
+def \hyperlink{classxPLAPI_1_1Message_de17ca84597e627ae63f9b1cf5a4b284}{get\_\-conf\_\-key\_\-value}}
+\label{classxPLAPI_1_1Message_de17ca84597e627ae63f9b1cf5a4b284}
+
+\begin{CompactList}\small\item\em get the value of a key from configuration \item\end{CompactList}\item 
+\hypertarget{classxPLAPI_1_1Message_4d5b950513dedc31dfe0dcf51823c43d}{
+def \textbf{\_\-\_\-str\_\-\_\-}}
+\label{classxPLAPI_1_1Message_4d5b950513dedc31dfe0dcf51823c43d}
+
+\end{CompactItemize}
+\subsection*{Private Attributes}
+\begin{CompactItemize}
+\item 
+\hypertarget{classxPLAPI_1_1Message_24328ca4d71be4d24f67d043d1c58f54}{
+\textbf{\_\-conf}}
+\label{classxPLAPI_1_1Message_24328ca4d71be4d24f67d043d1c58f54}
+
+\item 
+\hypertarget{classxPLAPI_1_1Message_29972dfac0cce8db6bd4a6a88adbe817}{
+\textbf{\_\-data}}
+\label{classxPLAPI_1_1Message_29972dfac0cce8db6bd4a6a88adbe817}
+
+\item 
+\hypertarget{classxPLAPI_1_1Message_88e4d23012224e9a9fa6ace6357016cb}{
+\textbf{\_\-conf\_\-order}}
+\label{classxPLAPI_1_1Message_88e4d23012224e9a9fa6ace6357016cb}
+
+\item 
+\hypertarget{classxPLAPI_1_1Message_9b6bd7b6c391434890d4ba996c3cda37}{
+\textbf{\_\-data\_\-order}}
+\label{classxPLAPI_1_1Message_9b6bd7b6c391434890d4ba996c3cda37}
+
+\item 
+\hypertarget{classxPLAPI_1_1Message_d4c56a71254ebbfc52582819bdc0c2d7}{
+\textbf{\_\-type}}
+\label{classxPLAPI_1_1Message_d4c56a71254ebbfc52582819bdc0c2d7}
+
+\item 
+\hypertarget{classxPLAPI_1_1Message_0f504647b076c8e1d4330941ee30f66f}{
+\textbf{\_\-schema}}
+\label{classxPLAPI_1_1Message_0f504647b076c8e1d4330941ee30f66f}
+
+\end{CompactItemize}
+\subsection*{Static Private Attributes}
+\begin{CompactItemize}
+\item 
+\hypertarget{classxPLAPI_1_1Message_cd58199e9068e7351ac49b73675311f5}{
+list \textbf{\_\-mess\_\-types} = \mbox{[}'xpl-stat','xpl-cmnd','xpl-trig'\mbox{]}}
+\label{classxPLAPI_1_1Message_cd58199e9068e7351ac49b73675311f5}
+
+\end{CompactItemize}
+
+
+\subsection{Detailed Description}
+\hyperlink{classxPLAPI_1_1Message}{Message} is the object for all data received form the network. 
+
+The monitor create an instance of \hyperlink{classxPLAPI_1_1Message}{Message} each time it receive smthg 
+
+\subsection{Member Function Documentation}
+\hypertarget{classxPLAPI_1_1Message_f1efb1186af373f1ce3d107be47e3f3f}{
+\index{xPLAPI::Message@{xPLAPI::Message}!\_\-\_\-init\_\-\_\-@{\_\-\_\-init\_\-\_\-}}
+\index{\_\-\_\-init\_\-\_\-@{\_\-\_\-init\_\-\_\-}!xPLAPI::Message@{xPLAPI::Message}}
+\subsubsection[\_\-\_\-init\_\-\_\-]{\setlength{\rightskip}{0pt plus 5cm}def xPLAPI::Message::\_\-\_\-init\_\-\_\- ( {\em self}, \/   {\em mess} = {\tt None})}}
+\label{classxPLAPI_1_1Message_f1efb1186af373f1ce3d107be47e3f3f}
+
+
+Create \hyperlink{classxPLAPI_1_1Message}{Message} instance from a message string and check if the structure is correct. 
+
+Raise exception if it is not The message can be None (to allow building a message) \begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em mess}]: the message as a unique string, as it is send on the network \end{description}
+\end{Desc}
+\hypertarget{classxPLAPI_1_1Message_254a763505a2ddb64ecd8d1b96f984d6}{
+\index{xPLAPI::Message@{xPLAPI::Message}!set\_\-data\_\-order@{set\_\-data\_\-order}}
+\index{set\_\-data\_\-order@{set\_\-data\_\-order}!xPLAPI::Message@{xPLAPI::Message}}
+\subsubsection[set\_\-data\_\-order]{\setlength{\rightskip}{0pt plus 5cm}def xPLAPI::Message::set\_\-data\_\-order ( {\em self}, \/   {\em order})}}
+\label{classxPLAPI_1_1Message_254a763505a2ddb64ecd8d1b96f984d6}
+
+
+As schema define parameter order, and since this class isn't specific enough to determine order, you have to set the order to ensure a good message. 
+
+If you do not, the order of parameter in each part may not conform to schema If you set order, be sure to list all the keys ! \hypertarget{classxPLAPI_1_1Message_191e86e1dccd20aa0ea63158429e6d68}{
+\index{xPLAPI::Message@{xPLAPI::Message}!set\_\-conf\_\-order@{set\_\-conf\_\-order}}
+\index{set\_\-conf\_\-order@{set\_\-conf\_\-order}!xPLAPI::Message@{xPLAPI::Message}}
+\subsubsection[set\_\-conf\_\-order]{\setlength{\rightskip}{0pt plus 5cm}def xPLAPI::Message::set\_\-conf\_\-order ( {\em self}, \/   {\em order})}}
+\label{classxPLAPI_1_1Message_191e86e1dccd20aa0ea63158429e6d68}
+
+
+As schema define parameter order, and since this class isn't specific enough to determine order, you have to set the order to ensure a good message. 
+
+If you do not, the order of parameter in each part may not conform to schema If you set order, be sure to list all the keys ! 
+
+The documentation for this class was generated from the following file:\begin{CompactItemize}
+\item 
+xpl/xPLAPI.py\end{CompactItemize}

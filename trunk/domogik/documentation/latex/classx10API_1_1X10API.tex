@@ -1,0 +1,139 @@
+\hypertarget{classx10API_1_1X10API}{
+\section{x10API::X10API Class Reference}
+\label{classx10API_1_1X10API}\index{x10API::X10API@{x10API::X10API}}
+}
+This class define some facilities to use X10.  
+
+
+\subsection*{Public Member Functions}
+\begin{CompactItemize}
+\item 
+\hypertarget{classx10API_1_1X10API_df1708474fd2eda336c665c64067a648}{
+def \textbf{\_\-\_\-init\_\-\_\-}}
+\label{classx10API_1_1X10API_df1708474fd2eda336c665c64067a648}
+
+\item 
+def \hyperlink{classx10API_1_1X10API_b23095bb54aa45e75857beaa59a7deed}{on}
+\begin{CompactList}\small\item\em Send an ON order to the item element. \item\end{CompactList}\item 
+def \hyperlink{classx10API_1_1X10API_37be53c20aaa39f5770a5085b80984bc}{off}
+\begin{CompactList}\small\item\em Send an OFF order to the item element. \item\end{CompactList}\item 
+def \hyperlink{classx10API_1_1X10API_d1e63a9dd573eb16a7d1009c72fac15e}{house\_\-on}
+\begin{CompactList}\small\item\em Send an ALLON order to the item element. \item\end{CompactList}\item 
+def \hyperlink{classx10API_1_1X10API_b04c7647aa5d80c462f0df36afaff4ec}{house\_\-off}
+\begin{CompactList}\small\item\em Send an ALLOFF order to the item element. \item\end{CompactList}\end{CompactItemize}
+\subsection*{Private Member Functions}
+\begin{CompactItemize}
+\item 
+\hypertarget{classx10API_1_1X10API_398d98e0674a6cefaef1154eafe94a15}{
+def \hyperlink{classx10API_1_1X10API_398d98e0674a6cefaef1154eafe94a15}{\_\-valid\_\-item}}
+\label{classx10API_1_1X10API_398d98e0674a6cefaef1154eafe94a15}
+
+\begin{CompactList}\small\item\em Check an item to have good 'HU' syntax Raise exception if it is not. \item\end{CompactList}\item 
+\hypertarget{classx10API_1_1X10API_e9639dcec52e0f507fcc224a6c377c7d}{
+def \hyperlink{classx10API_1_1X10API_e9639dcec52e0f507fcc224a6c377c7d}{\_\-valid\_\-house}}
+\label{classx10API_1_1X10API_e9639dcec52e0f507fcc224a6c377c7d}
+
+\begin{CompactList}\small\item\em Check an house to have good 'H' syntax Raise exception if it is not. \item\end{CompactList}\item 
+def \hyperlink{classx10API_1_1X10API_268f590bc14835490b1ea823c86e4dcb}{\_\-send}
+\begin{CompactList}\small\item\em Send a command trought heyu. \item\end{CompactList}\end{CompactItemize}
+\subsection*{Private Attributes}
+\begin{CompactItemize}
+\item 
+\hypertarget{classx10API_1_1X10API_e2bc653247758e1a67d8b8ac5b0d3611}{
+\textbf{\_\-housecodes}}
+\label{classx10API_1_1X10API_e2bc653247758e1a67d8b8ac5b0d3611}
+
+\item 
+\hypertarget{classx10API_1_1X10API_d2d5e02d43d6d4d1b0eba44248d29bb5}{
+\textbf{\_\-unitcodes}}
+\label{classx10API_1_1X10API_d2d5e02d43d6d4d1b0eba44248d29bb5}
+
+\item 
+\hypertarget{classx10API_1_1X10API_e11abda6663c0ad8d5e63d6abd52d562}{
+\textbf{\_\-heyuconf}}
+\label{classx10API_1_1X10API_e11abda6663c0ad8d5e63d6abd52d562}
+
+\end{CompactItemize}
+
+
+\subsection{Detailed Description}
+This class define some facilities to use X10. 
+
+It's based on heyu software, you need to have it installed and heyu binaries must be in your PATH 
+
+\subsection{Member Function Documentation}
+\hypertarget{classx10API_1_1X10API_268f590bc14835490b1ea823c86e4dcb}{
+\index{x10API::X10API@{x10API::X10API}!\_\-send@{\_\-send}}
+\index{\_\-send@{\_\-send}!x10API::X10API@{x10API::X10API}}
+\subsubsection[\_\-send]{\setlength{\rightskip}{0pt plus 5cm}def x10API::X10API::\_\-send ( {\em self}, \/   {\em cmd}, \/   {\em item})\hspace{0.3cm}{\tt  \mbox{[}private\mbox{]}}}}
+\label{classx10API_1_1X10API_268f590bc14835490b1ea823c86e4dcb}
+
+
+Send a command trought heyu. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em cmd}]: Command to send ('ON','OFF', etc) \item[{\em item}]: Item to send order to (Can be HU or H form) \end{description}
+\end{Desc}
+\hypertarget{classx10API_1_1X10API_b23095bb54aa45e75857beaa59a7deed}{
+\index{x10API::X10API@{x10API::X10API}!on@{on}}
+\index{on@{on}!x10API::X10API@{x10API::X10API}}
+\subsubsection[on]{\setlength{\rightskip}{0pt plus 5cm}def x10API::X10API::on ( {\em self}, \/   {\em item})}}
+\label{classx10API_1_1X10API_b23095bb54aa45e75857beaa59a7deed}
+
+
+Send an ON order to the item element. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em item}]: the item to send the ON order to  True if order was sent, False in case of errors \end{description}
+\end{Desc}
+\hypertarget{classx10API_1_1X10API_37be53c20aaa39f5770a5085b80984bc}{
+\index{x10API::X10API@{x10API::X10API}!off@{off}}
+\index{off@{off}!x10API::X10API@{x10API::X10API}}
+\subsubsection[off]{\setlength{\rightskip}{0pt plus 5cm}def x10API::X10API::off ( {\em self}, \/   {\em item})}}
+\label{classx10API_1_1X10API_37be53c20aaa39f5770a5085b80984bc}
+
+
+Send an OFF order to the item element. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em item}]: the item to send the OFF order to  True if order was sent, False in case of errors \end{description}
+\end{Desc}
+\hypertarget{classx10API_1_1X10API_d1e63a9dd573eb16a7d1009c72fac15e}{
+\index{x10API::X10API@{x10API::X10API}!house\_\-on@{house\_\-on}}
+\index{house\_\-on@{house\_\-on}!x10API::X10API@{x10API::X10API}}
+\subsubsection[house\_\-on]{\setlength{\rightskip}{0pt plus 5cm}def x10API::X10API::house\_\-on ( {\em self}, \/   {\em house})}}
+\label{classx10API_1_1X10API_d1e63a9dd573eb16a7d1009c72fac15e}
+
+
+Send an ALLON order to the item element. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em item}]: the item to send the ALLON order to  True if order was sent, False in case of errors \end{description}
+\end{Desc}
+\hypertarget{classx10API_1_1X10API_b04c7647aa5d80c462f0df36afaff4ec}{
+\index{x10API::X10API@{x10API::X10API}!house\_\-off@{house\_\-off}}
+\index{house\_\-off@{house\_\-off}!x10API::X10API@{x10API::X10API}}
+\subsubsection[house\_\-off]{\setlength{\rightskip}{0pt plus 5cm}def x10API::X10API::house\_\-off ( {\em self}, \/   {\em house})}}
+\label{classx10API_1_1X10API_b04c7647aa5d80c462f0df36afaff4ec}
+
+
+Send an ALLOFF order to the item element. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em item}]: the item to send the ALLOFF order to  True if order was sent, False in case of errors \end{description}
+\end{Desc}
+
+
+The documentation for this class was generated from the following file:\begin{CompactItemize}
+\item 
+xpl/x10API.py\end{CompactItemize}

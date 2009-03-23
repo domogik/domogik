@@ -1,0 +1,134 @@
+<!--
+# Copyright 2008 Domogik project
+
+# This file is part of Domogik.
+# Domogik is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Domogik is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+
+# Author : Marc Schneider <marc@domogik.org>
+
+# $LastChangedBy: mschneider $
+# $LastChangedDate: 2009-02-12 11:52:36 +0100 (jeu. 12 févr. 2009) $
+# $LastChangedRevision: 356 $
+-->
+{% extends "base.html" %}
+
+{% block title %}{{ pageTitle }}{% endblock %}
+
+{% block content %}
+	<div id="search">
+	{% if deviceList %}
+		<form name="filterForm" method="POST"/>
+			<fieldset>
+				<legend>Search</legend>
+				<table>
+					<tr valign="top">
+						<td>
+							<table>
+								<tr>
+									<th>Area</th>
+								</tr>
+								{% for area in areaList %}
+									<tr>
+										<td>{{ area.name }}</td><td><input type="checkbox" name="area" value="{{ area.id }}"/></td>
+									</tr>
+								{% endfor %}
+							</table>
+						</td>
+						<td>
+							<table>
+								<tr>
+									<th>Room</th>
+								</tr>
+								{% for room in roomList %}
+									<tr>
+										<td>{{ room.name }}</td><td><input type="checkbox" name="room" value="{{ room.id }}"/></td>
+									</tr>
+								{% endfor %}
+							</table>
+						</td>
+						<td>
+							<table>
+								<tr>
+									<th>Category</th>
+								</tr>
+								{% for deviceCategory in deviceCategoryList %}
+									<tr>
+										<td>{{ deviceCategory.name }}</td><td><input type="checkbox" name="deviceCategory" value="{{ deviceCategory.id }}"/></td>
+									</tr>
+								{% endfor %}
+							</table>
+						</td>
+					</tr>
+					<tr>
+						<input type="hidden" id="id_cmd" name="cmd" value="filter"/>
+						<td colspan="2"><input type="submit" value="Filter"/></td>
+					</tr>
+				</table>
+			</fieldset>
+		</form>
+	{% endif %}
+	</div>
+
+	<div id="list">
+	{% if deviceList %}
+		<form name="deviceListForm" method="POST"/>
+		<table>
+			<tr>
+				<th>Device name</th>
+				{% if adminMode %}
+					<th>Category</th>
+					<th>Address</th>
+					<th>Reference</th>
+					<th>Technology</th>
+				{% endif %}
+				<th>Room</th>
+				<th>Area</th>
+				<th>Status</th>
+			</tr>
+
+			{% for device in deviceList %}
+				<input type="hidden" id="id_deviceId" name="deviceId" value="{{ device.id }}"/>
+				<tr class="{% cycle 'oddRow' 'evenRow' %}">
+					<td><a href="{% url deviceView device.id %}">{{ device.name }}</a></td>
+					<td>{{ device.category.name }}</td>
+					{% if adminMode %}
+						<td>{{ device.address }}</td>
+						<td>{{ device.reference }}</td>
+						<td>{{ device.technology }}</td>
+					{% endif %}
+					<td>{{ device.room.name }}</td>
+					<td>{{ device.room.area.name }}</td>
+					<td>
+						<table id="listValue">
+							<tr>
+								<td>{% include "_inc_device_property.html" %}</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			{% endfor %}
+		</table>
+		<p></p>
+		<table>
+			<tr>
+				<input type="hidden" id="id_cmd" name="cmd" value="updateValues"/>
+				<td><input type="submit" value="Update"/></td>
+			</tr>
+		</table>
+		</form>
+	{% else %}
+		<p>No device found !</p>
+	{% endif %}
+	</div>
+{% endblock %}
