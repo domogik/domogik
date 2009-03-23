@@ -1,0 +1,174 @@
+/*
+# Copyright 2008 Domogik project
+
+# This file is part of Domogik.
+# Domogik is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Domogik is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+
+# Author : Marc Schneider <marc@domogik.org>
+
+# $LastChangedBy: mschneider $
+# $LastChangedDate: 2008-12-13 19:35:43 +0100 (sam. 13 déc. 2008) $
+# $LastChangedRevision: 276 $
+*/
+
+body {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	color: white;
+}
+
+#container {
+	margin: auto;
+	width: 1024px; 
+	background: #333333;
+}
+
+#top {
+	background: #DDDDDD;
+	color: #AF030A;
+}
+
+#leftBar {
+	font-size: 14px;
+	float: left;
+	width: 200px;
+	background: #333333;
+}
+
+#leftBar a {
+	color: #3AB17B;
+	font-weight: bold;
+	text-decoration: none;
+}
+
+#leftBar a:hover {
+	color: #FFFFFF;
+	text-decoration: none;
+}
+
+#leftBar ul {
+	margin-left: 0px;
+	padding-left: 0px;
+}
+
+#leftBar li {
+	padding: 5px;
+	list-style-type: none;
+}
+
+#content {
+	float:left;
+	width: 820px;
+	background-color: #333333;
+	margin-bottom: 20px;
+}
+
+#content h1 {
+	color: #00D2B1;
+}
+
+#content a {
+	color: #668CC7;
+}
+
+#content .error {
+	color: red;
+	font-weight: bold;
+}
+
+#search fieldset legend {
+	color: #7798BD;
+	font-size:14px;
+}
+
+#search th {
+	color: #7798BD;
+}
+
+#list table {
+	border-style: none;
+	width: 100%;
+	border-spacing: 0px;
+}
+
+#list th {
+	background-color: #dddddd;
+	color: #AF030A;
+	text-align: left;
+	padding-left: 7px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+#list td {
+	padding-left: 7px;
+	color: #333333;
+}
+
+#list a {
+	color: #333333;
+	font-weight: bold;
+	font-style: italic;
+	text-decoration: none;
+}
+#list a:hover {
+	color: #FFFFFF;
+}
+
+#list .oddRow {
+	background-color: #7798BD;
+}
+#list .evenRow {
+	background-color: #ABAFBD;
+}
+
+#list td {
+	vertical-align:middle;
+}
+
+#device .label {
+	color: #AF030A;
+	background-color: #DDDDDD;
+	font-weight: bold;
+	padding-left: 10px;
+	padding-right: 10px;
+}
+#device .value {
+	font-weight: normal;
+	background-color: #7798BD;
+	color: #333333;
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
+#adminMain fieldset legend {
+	padding: 0.2em 0.5em;
+	color: #7798BD;
+	font-size: 14px;
+	font-weight: bold;
+}
+
+/*
+rightBar {
+	float: right;
+	width: 200px;
+	background: #333333;
+}
+*/
+
+#bottom {
+	clear: both;
+	background: #DDDDDD;
+	color: black;
+}

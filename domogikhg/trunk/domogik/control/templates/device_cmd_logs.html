@@ -1,0 +1,76 @@
+<!--
+# Copyright 2008 Domogik project
+
+# This file is part of Domogik.
+# Domogik is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Domogik is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+
+# Author : Marc Schneider <marc@domogik.org>
+
+# $LastChangedBy: mschneider $
+# $LastChangedDate: 2008-12-13 19:11:10 +0100 (sam. 13 déc. 2008) $
+# $LastChangedRevision: 271 $
+-->
+{% extends "base.html" %}
+
+{% block script %}
+	function clearLogs() {
+		if (confirm("Are you sure you want to clear logs ?")) {
+			document.forms['deviceLogsForm'].cmd.value = "clearLogs"
+			document.forms['deviceLogsForm'].action = "{% url deviceCmdLogsView deviceId %}"
+			document.forms['deviceLogsForm'].submit()
+		}
+	}
+{% endblock %}
+
+{% block title %}{{ pageTitle }}{% endblock %}
+
+{% block content %}
+	<form name="deviceLogsForm" method="POST" action="">
+	<div id="list">
+	{% if deviceCmdLogList %}
+		<table>
+			<tr>
+				<th>Date</th>
+				<th>Device</th>
+				<th>Value</th>
+				<th>Successful</th>
+				<th>Comment</th>
+			</tr>
+
+			{% for deviceCmdLog in deviceCmdLogList %}
+				<tr class="{% cycle 'oddRow' 'evenRow' %}">
+					<td>{{ deviceCmdLog.date }}</td>
+					<td>{{ deviceCmdLog.device.name }}</td>
+					<td>{{ deviceCmdLog.value }}</td>
+					<td>{{ deviceCmdLog.isSuccessful }}</td>
+					<td>{{ deviceCmdLog.comment }}</td>
+				</tr>
+			{% endfor %}
+		</table>
+		{% if adminMode %}
+			<p></p>
+			<table>
+				<tr>
+					<td><input type="button" name="clearLogsButton" onclick="clearLogs()" value="Clear logs"/>
+				</tr>
+			</table>
+		{% endif %}
+	{% else %}
+		<p>No logs found !</p>
+	{% endif %}
+	</div>
+
+	<input type="hidden" name="cmd" value=""/>
+	</form>
+{% endblock %}
