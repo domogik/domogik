@@ -25,15 +25,20 @@
 #Interface for mpris support
 #All controllers should extends this class
 
+
 class NotImplementedException:
+    # FIXME: Souldn't us use the standard NotImplementedError exception ?
     """
-        This class defines an exception which should be raised if a function hasn't be implemented
+        This class defines an exception which should be raised if a function
+        hasn't been implemented
     """
+
     def __init__(self, value = "This method isn't implemented yet"):
         self.value = value
-    
+
     def __str__(self):
         return self.repr(self.value)
+
 
 class GenericController:
 
@@ -48,7 +53,8 @@ class GenericController:
 
     def GetTrackInformation(self, position):
         """
-            Gives all meta data available for element at given position (counting from 0)
+            Gives all metadata available for element at given position
+            (counting from 0)
         """
         raise NotImplementedException
 
@@ -70,7 +76,7 @@ class GenericController:
             Plays now if 'play' is True
         """
         raise NotImplementedException
-    
+
     def DeleteTrack(self, position):
         """
             Removes an URI from current playlist
@@ -115,7 +121,8 @@ class GenericController:
 
     def Play(self):
         """
-            If playing : rewind to the beginning of current track, else : start playing
+            If playing : rewind to the beginning of current track,
+            else : start playing
         """
         raise NotImplementedException
 
@@ -124,8 +131,10 @@ class GenericController:
             Returns a dict of 4 string/ints
             'state' : 0 = Playing, 1 = Paused, 2 = Stopped.
             'random' : 0 = Playing linearly , 1 = Playing randomly.
-            'loop' : 0 = Go to the next element once the current has finished playing , 1 = Repeat the current element
-            'repeat' : 0 = Stop playing once the last element has been played, 1 = Never give up playing
+            'loop' : 0 = Go to the next element once the current has finished
+                    playing , 1 = Repeat the current element
+            'repeat' : 0 = Stop playing once the last element has been played,
+                    1 = Never give up playing
         """
         raise NotImplementedException
 
@@ -134,7 +143,7 @@ class GenericController:
             Gives all meta data available for current element
         """
         raise NotImplementedException
-        
+
     def SetVolume(self, level):
         """
             Set the volume (argument must be in [0;100]
@@ -149,7 +158,8 @@ class GenericController:
 
     def SetPosition(self, position):
         """
-            Sets the playing position (argument must be in [0;<track length>]), in milliseconds
+            Sets the playing position (argument must be in [0;<track length>])
+            (in milliseconds)
         """
         raise NotImplementedException
 
@@ -158,4 +168,3 @@ class GenericController:
             Returns the playing position in milliseconds
         """
         raise NotImplementedException
-

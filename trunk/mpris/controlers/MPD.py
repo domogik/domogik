@@ -24,12 +24,13 @@
 
 import mpd
 
+
 class MPD(GenericController):
 
     def __init__(self):
         self.__mpd = mpd.MPDClient()
         self.__mpd.connect("localhost", 6600)
-        
+
     def Version(self):
         return self.__mpd.mpd_version
 
@@ -73,9 +74,18 @@ class MPD(GenericController):
         self.__mpd.play()
 
     def GetPlayerProperties(self):
-        state = {'play':0,'pause':1,'stop':2}
+        state = {
+            'play': 0,
+            'pause': 1,
+            'stop': 2,
+        }
         status = self.__mpd.status()
-        return {'state' : state[status['state']], 'random' : int(status['random']), 'loop' : 0, 'repeat' : int(status['repeat'])}
+        return {
+            'state': state[status['state']],
+            'random': int(status['random']),
+            'loop': 0,
+            'repeat': int(status['repeat']),
+        }
 
     def GetCurrentTrackInformation(self):
         return self.__mpd.currentsong()
@@ -91,4 +101,3 @@ class MPD(GenericController):
 
     def GetPosition(self):
         return int(self.__mpd.status()['time'].split(':')[0])
-

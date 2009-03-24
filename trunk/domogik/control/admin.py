@@ -32,12 +32,15 @@ from domogik.control.models import Device
 from domogik.control.models import DeviceProperty
 from domogik.control.models import ApplicationSetting
 
+
 class DevicePropertyInline(admin.TabularInline):
-	model = DeviceProperty
-	extra = 1
+    model = DeviceProperty
+    extra = 1
+
 
 class DeviceAdmin(admin.ModelAdmin):
-	inlines = [DevicePropertyInline]
+    inlines = [DevicePropertyInline]
+
 
 admin.site.register(Area)
 admin.site.register(Room)

@@ -25,15 +25,19 @@
 
 from subprocess import *
 from domogik.common import logger
+
+
 class X10Exception:
     """
     X10 exception
     """
+
     def __init__(self, value):
         self.value = value
 
     def __str__(self):
         return self.repr(self.value)
+
 
 class X10API:
     """
@@ -41,18 +45,19 @@ class X10API:
     It's based on heyu software, you need to have it installed
     and heyu binaries must be in your PATH
     """
+
     def __init__(self, heyuconf):
         l = logger.Logger('x10API')
         self._log = l.get_logger()
-
         res = Popen("heyu -c " + heyuconf + " start", shell=True, stderr=PIPE)
         output = res.stderr.read()
         res.stderr.close()
         if output:
-            self._log.error("Output was : %s\nHeyu config file path is : %s" % (output, heyuconf))
-            raise X10Exception, "Something went wrong with heyu. check logs"
-        self._housecodes = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P']
-        self._unitcodes = [ i+1 for i in range(16) ]
+            self._log.error("Output was : %s\nHeyu config file path is : %s" \
+                    % (output, heyuconf))
+            raise X10Exception("Something went wrong with heyu. check logs")
+        self._housecodes = list('ABCDEFGHIJKLMNOP')
+        self._unitcodes = range(1, 17)
         self._heyuconf = heyuconf
 
     def _valid_item(self, item):
@@ -60,11 +65,12 @@ class X10API:
         Check an item to have good 'HU' syntax
         Raise exception if it is not
         """
+        h, u = (item[0].upper(), item[1])
         try:
-            if ( item[0].upper() not in self._housecodes ) or ( int(item[1]) not in self._unitcodes ):
-                self._log.warning("Invalid item %s%s, must be 'HU'" % (item[0].upper(),item[1]))
+            if not (h in self._housecodes and int(u) in self._unitcodes):
+                raise AttributeError
         except:
-            self._log.warning("Invalid item %s%s, must be 'HU'" % (item[0].upper(),item[1]))
+            self._log.warning("Invalid item %s%s, must be 'HU'" % (h, u))
 
     def _valid_house(self, house):
         """
@@ -73,9 +79,10 @@ class X10API:
         """
         try:
             if house[0] not in self._housecodes:
-                self._log.warning("Invalid house %s, must be 'H' format, between A and P" % (house[0].upper()))
+                raise AttributeError
         except:
-            self._log.warning("Invalid house %s, must be 'H' format, between A and P" % (house[0].upper()))
+            self._log.warning("Invalid house %s, must be 'H' format, between "\
+                    "A and P" % (house[0].upper()))
 
     def _send(self, cmd, item):
         """

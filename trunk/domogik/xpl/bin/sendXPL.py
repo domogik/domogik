@@ -29,9 +29,11 @@ import optparse
 from domogik.common.configloader import Loader
 from domogik.common import logger
 
+
 class Sender:
 
-    supported_schemas = ["datetime.basic","dawndusk.request","x10.basic","sensor.basic"]
+    supported_schemas = ["datetime.basic", "dawndusk.request", "x10.basic",
+            "sensor.basic"]
 
     def __init__(self, schema=None, message=None):
         self._schema = schema
@@ -39,7 +41,9 @@ class Sender:
         self.parse_parameters()
         cfgloader = Loader('send')
         config = cfgloader.load()
-        self.__myxpl = Manager(config[1]["address"],port = int(config[1]["port"]), source = config[1]["source"], module_name = 'send')
+        self.__myxpl = Manager(config[1]["address"],
+                port=int(config[1]["port"]), source = config[1]["source"],
+                module_name = 'send')
         mess = self.forge_message()
         l = logger.Logger('send')
         self._log = l.get_logger()
@@ -57,7 +61,8 @@ class Sender:
             self._args = [self._schema, self._message]
         else:
             parser = optparse.OptionParser()
-            parser.add_option("-d","--dest",type="string",dest="message_dest", default="broadcast")
+            parser.add_option("-d", "--dest", type="string",
+                    dest="message_dest", default="broadcast")
             (self._options, self._args) = parser.parse_args()
 
         #Parsing of args
@@ -88,10 +93,14 @@ class Sender:
         return message
 
     def usage(self):
-        print "usage : send.py message_type message_contents"
-        print "\tmessage_type : Type of the message, must correpond to one of the supported schemas"
-        print "\tmessage_contents : comma separated pairs key=value that will be put in message"
-        print "\tExample (x10) : ./send.py x10.basic \"device=a1,command=on\""
+        print """\
+usage : send.py message_type message_contents"
+\tmessage_type: Type of the message, must correspond to one of the supported \
+schemas
+\tmessage_contents: comma separated pairs key=value that will be put in message
+\tExample (x10): ./send.py x10.basic "device=a1,command=on"
+"""
+
 
 if __name__ == "__main__":
     s = Sender()

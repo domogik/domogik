@@ -28,6 +28,7 @@ import threading
 import time
 from domogik.common import logger
 
+
 class xPLModule():
     '''
     Global module class, manage signal handlers.
@@ -113,4 +114,3 @@ class xPLModule():
             t._Thread__stop()
         for t in self._timers:
             t.cancel()
-

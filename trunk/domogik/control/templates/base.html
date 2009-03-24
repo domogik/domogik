@@ -22,54 +22,54 @@
 # $LastChangedRevision: 251 $
 -->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-	<link rel="stylesheet" href="/skins/css/style.css"/>
-	<script language="javascript">{% block script %}{% endblock %}</script>
-	<title>{% block title %}Domogik{% endblock %}</title>
+    <link rel="stylesheet" href="/skins/css/style.css"/>
+    <script language="javascript">{% block script %}{% endblock %}</script>
+    <title>{% block title %}Domogik{% endblock %}</title>
 </head>
 
 <body>
 <div id="container">
-	<div id="top">
-		<center><img width="184px" height="79px" src="/skins/img/logo_domogik.png" alt="Domogik"/></center>
-		<center><h1>&raquo; {{ pageTitle }} &laquo;</h1></center>
-	</div>
+    <div id="top">
+        <center><img width="184px" height="79px" src="/skins/img/logo_domogik.png" alt="Domogik"/></center>
+        <center><h1>&raquo; {{ pageTitle }} &laquo;</h1></center>
+    </div>
 
-	<div id="leftBar">
-	{% block leftBar %}
-		<ul>
-			<li><a href="{% url mainView %}">
-					<div align="center"><img src="/skins/img/home.png" alt="Home" border="0"></div>
-					<div align="center">Home</div></a></li>
-			<li>
-				<a href="{% url adminView %}">
-					<div align="center"><img src="/skins/img/admin.png" alt="Admin" border="0"/></div>
-					<div align="center">Admin</div>
-				</a>
-			</li>
-			<li>
-				<a href="/admin">
-					<div align="center"><img src="/skins/img/config.png" alt="Configuration" border="0"/></div>
-					<div align="center">Configuration</div>
-				</a>
-			</li>
-		</ul>
-	{% endblock %}
-	</div>
+    <div id="leftBar">
+    {% block leftBar %}
+        <ul>
+            <li><a href="{% url mainView %}">
+                    <div align="center"><img src="/skins/img/home.png" alt="Home" border="0"></div>
+                    <div align="center">Home</div></a></li>
+            <li>
+                <a href="{% url adminView %}">
+                    <div align="center"><img src="/skins/img/admin.png" alt="Admin" border="0"/></div>
+                    <div align="center">Admin</div>
+                </a>
+            </li>
+            <li>
+                <a href="/admin">
+                    <div align="center"><img src="/skins/img/config.png" alt="Configuration" border="0"/></div>
+                    <div align="center">Configuration</div>
+                </a>
+            </li>
+        </ul>
+    {% endblock %}
+    </div>
 
-	<div id="content">
-		{% block content %}{% endblock %}
-	</div>
+    <div id="content">
+        {% block content %}{% endblock %}
+    </div>
 
-	<!--div id="rightBar">
-		Right Bar
-	</div-->
+    <!--div id="rightBar">
+        Right Bar
+    </div-->
 
-	<div id="bottom">
-		<hr/><center>Copyright 2008 Domogik project - GNU/GPL v3 license</center>
-	</div>
+    <div id="bottom">
+        <hr/><center>Copyright 2008 Domogik project - GNU/GPL v3 license</center>
+    </div>
 </div>
 </body>
 </html>

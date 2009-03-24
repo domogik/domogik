@@ -27,6 +27,7 @@ from time import localtime
 from domogik.xpl.lib.xplconnector import *
 from domogik.common.configloader import *
 
+
 class xPLDateTime():
     '''
     Send date and time on the xPL network every minute
@@ -35,7 +36,8 @@ class xPLDateTime():
     def __init__(self):
         cfgloader = Loader('datetime')
         config = cfgloader.load()[1]
-        self.__myxpl = Manager(source = config["source"], module_name='datetime')
+        self.__myxpl = Manager(source = config["source"],
+                module_name='datetime')
         self._timer = xPLTimer(10, self._send_datetime)
         self._timer.start()
 
@@ -53,17 +55,17 @@ class xPLDateTime():
         Send date and time on xPL network
         '''
         dt = localtime()
-        date = "%s%s%s" % (dt[0], self._f(dt[1]),self._f(dt[2]))
-        time = "%s%s%s" % (self._f(dt[3]), self._f(dt[4]),self._f(dt[5]))
+        date = "%s%s%s" % (dt[0], self._f(dt[1]), self._f(dt[2]))
+        time = "%s%s%s" % (self._f(dt[3]), self._f(dt[4]), self._f(dt[5]))
         datetime = "%s%s" % (date, time)
         datetimedaynumber = "%s%s" % (datetime, dt[6])
         mess = Message()
         mess.set_type("xpl-trig")
         mess.set_schema("datetime.basic")
-        mess.set_data_key("date",date)
-        mess.set_data_key("time",time)
-        mess.set_data_key("datetime",datetime)
-        mess.set_data_key("format1",datetimedaynumber)
+        mess.set_data_key("date", date)
+        mess.set_data_key("time", time)
+        mess.set_data_key("datetime", datetime)
+        mess.set_data_key("format1", datetimedaynumber)
         self.__myxpl.send(mess)
 
 if __name__ == "__main__":

@@ -24,132 +24,132 @@
 {% extends "base.html" %}
 
 {% block script %}
-	function saveSettings() {
-		document.forms['settingsForm'].action="{% url saveSettingsView %}"
-		document.forms['settingsForm'].submit()
-	}
+    function saveSettings() {
+        document.forms['settingsForm'].action="{% url saveSettingsView %}"
+        document.forms['settingsForm'].submit()
+    }
 
-	function clearData() {
-		if(confirm("This is your last chance to keep your data. Are you sure to want to do that ?")) {
-			document.forms['simulationForm'].action="{% url clearDataView %}"
-			document.forms['simulationForm'].submit()
-		}
-	}
+    function clearData() {
+        if(confirm("This is your last chance to keep your data. Are you sure to want to do that ?")) {
+            document.forms['simulationForm'].action="{% url clearDataView %}"
+            document.forms['simulationForm'].submit()
+        }
+    }
 
-	function loadSampleData() {
-		document.forms['simulationForm'].action="{% url loadSampleDataView %}"
-		document.forms['simulationForm'].submit()
-	}
+    function loadSampleData() {
+        document.forms['simulationForm'].action="{% url loadSampleDataView %}"
+        document.forms['simulationForm'].submit()
+    }
 {% endblock %}
 
 {% block title %}{{ pageTitle }}{% endblock %}
 
 {% block content %}
-	{% ifequal action "index" %}
-	<div id="adminMain">
-		<form name="settingsForm" action="" method="POST">
-			<fieldset>
-				<legend>Settings</legend>
-				<table>
-					<tr>
-						<td>{{ appSettingForm.as_table }}</td>
-					</tr>
-					<tr>
-						<td><input type="button" value="Submit" onclick="saveSettings()"></td>
-					</tr>
-				</table>
-			</fieldset>
-		</form>
+    {% ifequal action "index" %}
+    <div id="adminMain">
+        <form name="settingsForm" action="" method="POST">
+            <fieldset>
+                <legend>Settings</legend>
+                <table>
+                    <tr>
+                        <td>{{ appSettingForm.as_table }}</td>
+                    </tr>
+                    <tr>
+                        <td><input type="button" value="Submit" onclick="saveSettings()"></td>
+                    </tr>
+                </table>
+            </fieldset>
+        </form>
 
-		<form name="dataForm" action="" method="POST">
-			<fieldset>
-				<legend>Data</legend>
-				<table>
-					<tr>
-						<td>&raquo;&nbsp;<a href="{% url deviceCmdLogsView 0 %}">View logs</a></td>
-					</tr>
-				</table>
-			</fieldset>
-		</form>
+        <form name="dataForm" action="" method="POST">
+            <fieldset>
+                <legend>Data</legend>
+                <table>
+                    <tr>
+                        <td>&raquo;&nbsp;<a href="{% url deviceCmdLogsView 0 %}">View logs</a></td>
+                    </tr>
+                </table>
+            </fieldset>
+        </form>
 
-		<form name="simulationForm" action="" method="POST">
-			<fieldset>
-				<legend>Simulation</legend>
-				<table>
-					<tr>
-						<td>Load sample data (will delete previous data)</td><td><input type="button" value="Load" onclick="loadSampleData()"></td>
-					</tr>
-					<tr>
-						<td>Clear all data</td><td><input type="button" value="Clear" onclick="clearData()"></td>
-					</tr>
-				</table>
-			</fieldset>		
-		</form>
-	</div>
-	{% endifequal %}
+        <form name="simulationForm" action="" method="POST">
+            <fieldset>
+                <legend>Simulation</legend>
+                <table>
+                    <tr>
+                        <td>Load sample data (will delete previous data)</td><td><input type="button" value="Load" onclick="loadSampleData()"></td>
+                    </tr>
+                    <tr>
+                        <td>Clear all data</td><td><input type="button" value="Clear" onclick="clearData()"></td>
+                    </tr>
+                </table>
+            </fieldset>        
+        </form>
+    </div>
+    {% endifequal %}
 
-	{% ifequal action "loadSampleData" %}
-		{% if errorMsg %}
-			<p class="error">{{ errorMsg }}</p>
-		{% else %}
-			<p>Done !</p>
-			<p>Following objects were created :</p>
-			<p>&nbsp;</p>
-			<p><strong>Rooms</strong></p>
-			<hr/>
-			{% if roomList %}
-				<ul>
-				{% for room in roomList %}
-					<li>{{ room.name }}</li>
-				{% endfor %}
-				</ul>
-			{% else %}
-				<p>No data</p>
-			{% endif %}
+    {% ifequal action "loadSampleData" %}
+        {% if errorMsg %}
+            <p class="error">{{ errorMsg }}</p>
+        {% else %}
+            <p>Done !</p>
+            <p>Following objects were created :</p>
+            <p>&nbsp;</p>
+            <p><strong>Rooms</strong></p>
+            <hr/>
+            {% if roomList %}
+                <ul>
+                {% for room in roomList %}
+                    <li>{{ room.name }}</li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <p>No data</p>
+            {% endif %}
 
-			<p><strong>Categories</strong></p>
-			<hr/>
-			{% if deviceCategoryList %}
-				<ul>
-				{% for deviceCategory in deviceCategoryList %}
-					<li>{{ deviceCategory.name }}</li>
-				{% endfor %}
-				</ul>
-			{% else %}
-				<p>No data</p>
-			{% endif %}
+            <p><strong>Categories</strong></p>
+            <hr/>
+            {% if deviceCategoryList %}
+                <ul>
+                {% for deviceCategory in deviceCategoryList %}
+                    <li>{{ deviceCategory.name }}</li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <p>No data</p>
+            {% endif %}
 
-			<p><strong>Devices</strong></p>
-			<hr/>
-			{% if deviceList %}
-				<ul>
-				{% for device in deviceList %}
-					<li>{{ device.name }} ({{ device.room.name }})</li>
-				{% endfor %}
-				</ul>
-			{% else %}
-				<p>No data</p>
-			{% endif %}
+            <p><strong>Devices</strong></p>
+            <hr/>
+            {% if deviceList %}
+                <ul>
+                {% for device in deviceList %}
+                    <li>{{ device.name }} ({{ device.room.name }})</li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <p>No data</p>
+            {% endif %}
 
-			<p><strong>Technologies</strong></p>
-			<hr/>
-			{% if techList %}
-				<ul>
-				{% for key,value in techList %}
-					<li>{{ value }}</li>
-				{% endfor %}
-				</ul>
-			{% else %}
-				<p>No data</p>
-			{% endif %}
-		{% endif %}
-	{% endifequal %}
+            <p><strong>Technologies</strong></p>
+            <hr/>
+            {% if techList %}
+                <ul>
+                {% for key,value in techList %}
+                    <li>{{ value }}</li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <p>No data</p>
+            {% endif %}
+        {% endif %}
+    {% endifequal %}
 
-	{% ifequal action "clearData" %}
-		{% if errorMsg %}
-			<p class="error">{{ errorMsg }}</p>
-		{% else %}
-			<p>All data cleared !</p>
-		{% endif %}
-	{% endifequal %}
+    {% ifequal action "clearData" %}
+        {% if errorMsg %}
+            <p class="error">{{ errorMsg }}</p>
+        {% else %}
+            <p>All data cleared !</p>
+        {% endif %}
+    {% endifequal %}
 {% endblock %}

@@ -28,10 +28,11 @@ from domogik.xpl.lib.xplconnector import *
 import datetime
 from domogik.common.configloader import *
 
+
 cfgloader = Loader('dawndusk')
 config = cfgloader.load()
 
-myxpl = Manager(source = config["source"],module_name = 'dawndusk')
+myxpl = Manager(source = config["source"], module_name = 'dawndusk')
 mydawndusk = DawnDusk()
 
 #Parameters definitions
@@ -43,20 +44,23 @@ fh = 1
 #This script is waiting for a messgage wich contains query=day or query=night
 #And return a message of the type DATETIME.BASIC with sunrise or sunset hour
 
+
 def dateFromTuple(tuple):
     """
-    Tranforme the result from get_dawn_dusk to string with  “yyyymmddhhmmss” form
+    Tranforme the result from get_dawn_dusk to string with "yyyymmddhhmmss"
+    form
     """
     h = "%.2i" % (tuple[0] + 1) #1h more because summer time TO FIX
     m = "%.2i" % (int(tuple[1]))
-    s = "%.2i" % ((tuple[1] - int(tuple[1])) *  60) #Passage in second
+    s = "%.2i" % ((tuple[1] - int(tuple[1])) * 60) #Passage in second
     today = datetime.date.today()
     y = today.year
     mo = "%.2i" % today.month
     d = "%.2i" % today.day
     date = "%s%s%s%s%s%s" % (y, mo, d, h, m, s)
     return date
-    
+
+
 def getDawn(message):
     """
     Send a xPL message of the type DATETIME.BASIC with sunrise hour
@@ -66,9 +70,9 @@ def getDawn(message):
     mess = Message()
     mess.set_type("xpl-stat")
     mess.set_schema("datetime.basic")
-    mess.set_data_key("status",date)
+    mess.set_data_key("status", date)
     myxpl.send(mess)
-    
+
 
 def getDusk(message):
     """
@@ -79,10 +83,20 @@ def getDusk(message):
     mess = Message()
     mess.set_type("xpl-stat")
     mess.set_schema("datetime.basic")
-    mess.set_data_key("status",date)
+    mess.set_data_key("status", date)
     myxpl.send(mess)
-   
+
 #Listener for the dawn
-dawnL = Listener(getDawn, myxpl, {'schema':'dawndusk.request','type':'xpl-cmnd','command':'status','query':'day'})
+dawnL = Listener(getDawn, myxpl, {
+    'schema': 'dawndusk.request',
+    'type': 'xpl-cmnd',
+    'command': 'status',
+    'query': 'day',
+})
 #Listener for the dusk
-duskL = Listener(getDusk, myxpl, {'schema':'dawndusk.request','type':'xpl-cmnd','command':'status','query':'night'})
+duskL = Listener(getDusk, myxpl, {
+    'schema': 'dawndusk.request',
+    'type': 'xpl-cmnd',
+    'command': 'status',
+    'query': 'night',
+})

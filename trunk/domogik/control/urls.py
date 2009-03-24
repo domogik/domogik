@@ -26,11 +26,13 @@
 from django.conf.urls.defaults import *
 
 urlpatterns = patterns('domogik.control.views',
-	url(r'^$', 'index', name="mainView"),
-	url(r'device/(?P<deviceId>\d+)/$', 'device', name="deviceView"),
-	url(r'device_cmd_logs/(?P<deviceId>\d+)/$', 'deviceCmdLogs', name="deviceCmdLogsView"),
-	url(r'admin/$', 'adminIndex', name="adminView"),
-	url(r'admin/load_sample_data$', 'loadSampleData', name="loadSampleDataView"),
-	url(r'admin/clear_data$', 'clearData', name="clearDataView"),
-	url(r'admin/save_settings$', 'saveSettings', name="saveSettingsView"),
+    url(r'^$', 'index', name="mainView"),
+    url(r'device/(?P<deviceId>\d+)/$', 'device', name="deviceView"),
+    url(r'device_cmd_logs/(?P<deviceId>\d+)/$', 'deviceCmdLogs',
+            name="deviceCmdLogsView"),
+    url(r'admin/$', 'adminIndex', name="adminView"),
+    url(r'admin/load_sample_data$', 'loadSampleData',
+            name="loadSampleDataView"),
+    url(r'admin/clear_data$', 'clearData', name="clearDataView"),
+    url(r'admin/save_settings$', 'saveSettings', name="saveSettingsView"),
 )

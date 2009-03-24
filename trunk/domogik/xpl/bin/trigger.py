@@ -27,24 +27,26 @@ from domogik.xpl.lib.xplconnector import *
 from domogik.common.configloader import Loader
 from domogik.common import logger
 
+
 class Condition():
     '''
     Parent class for each condition
-    A condition can be a node : it store 1 or 2 other conditions, or a final node :
-    it just implements some eval of the condition
+    A condition can be a node : it store 1 or 2 other conditions, or a final
+    node : it just implements some eval of the condition
     '''
+
     def __init__(self, cond1=None, cond2=None):
         self.cond1 = cond1
         self.cond2 = cond2
-        
+
     def run(self, statedic):
         '''
         Eval the condition
         @raise NotImplementedException
         '''
         raise NotImplementedException
-        
-    def parse(self,listelem):
+
+    def parse(self, listelem):
         '''
         Parse the expression to find item and store them
         '''
@@ -55,61 +57,71 @@ class Condition():
         return res1
 
 #####
-# Classes représentants les conditions (noeuds de l'arbre)
+# Classes représentant les conditions (noeuds de l'arbre)
 #####
+
+
 class OR(Condition):
     '''
     Implementation for the OR operator
     '''
+
     def __init__(self, cond1, cond2):
         '''
         @param cond1 : first condition of the OR
         @param cond2 : secondcondition of the OR
         '''
         Condition.__init__(self, cond1, cond2)
-    
+
     def run(self, statedic):
         return self.cond1.run(statedic) or self.cond2.run(statedic)
-        
+
+
 class AND(Condition):
     '''
     Implementation for the AND operator
     '''
+
     def __init__(self, cond1, cond2):
         '''
         @param cond1 : first condition of the AND
         @param cond2 : secondcondition of the AND
         '''
         Condition.__init__(self, cond1, cond2)
-    
+
     def run(self, statedic):
         return self.cond1.run(statedic) and self.cond2.run(statedic)
-        
+
+
 class NOT(Condition):
     '''
     Implementation for the NOT operator
     '''
+
     def __init__(self, cond1):
         '''
         @param cond1 : condition to use for negation
         '''
         Condition.__init__(self, cond1)
-    
+
     def run(self, statedic):
         return not self.cond1.run(statedic)
-    
+
     def parse(self, listelem):
         return self.cond1.parse(listelem)
-        
+
 #####
 # Classes représentant les feuilles (conditions de temps ou d'état)
 #####
+
+
 class timeCond(Condition):
     '''
     Implementation of the time condition
     This allows user to describe time periods like cron
     '''
-    def __init__(self,year, month, day, daynumber, hour, minute):
+
+    def __init__(self, year, month, day, daynumber, hour, minute):
         '''
         Create a time condition
         Each param can be :
@@ -137,22 +149,27 @@ class timeCond(Condition):
     def _check_time(self, timeunit, value):
         '''
             Check the timeunit value
-            @param timeunit Can be one of 'year','month','day','daynumber','hour','minute'
+            @param timeunit Can be one of 'year','month','day','daynumber',
+                    'hour','minute'
             @param value : the value to check
         '''
-        if timeunit not in ['year','month','day','daynumber','hour','minute']:
+        if timeunit not in ['year', 'month', 'day', 'daynumber', 'hour',
+                'minute']:
             raise ValueError
 
-        this_unit = eval("self."+timeunit)
+        this_unit = eval("self." + timeunit)
         clas = str(this_unit.__class__).split("'")[1]
-        value = clas+"('%s')" %value if clas == "int" or clas == "str" else value
-        this_unit = clas+"('%s')"% this_unit if clas == "int" or clas == "str" else this_unit
+        value = clas + "('%s')" % value if clas == "int" or clas == "str" \
+                else value
+        this_unit = clas + "('%s')" % this_unit if clas == "int" or \
+                clas == "str" else this_unit
         call = ("self._check_time_" + clas +"(%s,%s)"% (this_unit, value))
         return eval(call)
 
     ### Functions to check 'time equality' for each used type
 
-    #Int 
+    #Int
+
     def _check_time_int(self, unit, value):
         '''
         Check time equality between to integers
@@ -162,6 +179,7 @@ class timeCond(Condition):
         return unit == int(value)
 
     #tuple : represent an interval
+
     def _check_time_tuple(self, unit, value):
         '''
         Check if value is in the interval described by the tuple
@@ -171,6 +189,7 @@ class timeCond(Condition):
         return int(value) in range(unit[0], unit[1] + 1)
 
     #list
+
     def _check_time_list(self, unit, value):
         '''
         @param unit can be : a list of int => check if value is in the list
@@ -178,11 +197,12 @@ class timeCond(Condition):
         @param value : value catched by the system
         '''
         if isinstance(unit[0], tuple):
-            return any([ _check_time_tuple(u, value) for u in unit ])
+            return any([_check_time_tuple(u, value) for u in unit])
         else:
             return value in unit
 
     #string
+
     def _check_time_str(self, unit, value):
         '''
         @param unit can be  '*' or '*/x'
@@ -200,25 +220,31 @@ class timeCond(Condition):
     ### And of functions for evaluation
 
     def run(self, statedic):
-        #chaque variable peut etre un entier, un interval (tuple), une liste d'intervales ou la chaine '*' ou '*/x'
-        return all([ self._check_time(t, statedic['time'][t]) for t in  ['year','month','day','daynumber','hour','minute']])
-
+        # chaque variable peut etre un entier, un interval (tuple), une liste
+        # d'intervales ou la chaine '*' ou '*/x'
+        return all([self._check_time(t, statedic['time'][t]) for t in [
+                'year', 'month', 'day', 'daynumber', 'hour', 'minute']])
 
     def parse(self, listelem):
-        res = {'year':None, 'month':None, 'day':None, 'daynumber':None, 'hour':None, 'minute':None}
+        res = {'year': None, 'month': None, 'day': None, 'daynumber': None,
+                'hour': None, 'minute': None}
         listelem['time'] = res
         return listelem
+
 
 class stateCond(Condition):
     '''
     Implementation of the state condition
     This allows user to describe a condition on any item of the system
     '''
+
     def __init__(self, technology, item_name, operator, value):
         '''
         @param technology : technolgy of the item (eg : x10, 1wire, etc ...)
-        @param item_name : name of the item (eg: A1 for x10, 10B037A5010800DC for 1wire)
-        @param operator : any comparison operator that python recognize (==, <, <=, =>, >, !=)
+        @param item_name : name of the item (eg: A1 for x10, 10B037A5010800DC
+        for 1wire)
+        @param operator : any comparison operator that python recognize
+        (==, <, <=, =>, >, !=)
         @param value : the value to test
         '''
         self.technology = technology
@@ -228,12 +254,16 @@ class stateCond(Condition):
 
     def run(self, statedic):
         if isinstance(self.value, int):
-            return eval("%s %s %s" % (int(statedic[self.technology][self.item_name]), self.operator, self.value))
+            return eval("%s %s %s" % (
+                    int(statedic[self.technology][self.item_name]),
+                    self.operator, self.value))
         else:
-            return eval("'%s' %s '%s'" % (statedic[self.technology][self.item_name], self.operator, self.value))
+            return eval("'%s' %s '%s'" % (
+                    statedic[self.technology][self.item_name],
+                    self.operator, self.value))
 
     def parse(self, listelem):
-        if not listelem.has_key(self.technology):
+        if self.technology not in listelem:
             listelem[self.technology] = {}
         listelem[self.technology][self.item_name] = None
         return listelem
@@ -241,10 +271,13 @@ class stateCond(Condition):
 ####
 # Methods to catch informations
 ####
+
+
 class ListenerBuilder():
     '''
     Class to parse an expression and create appropriated listener
     '''
+
     def __init__(self, listitems, expr):
         '''
         @param listitems a dictionnary discribing items used in the condition
@@ -255,7 +288,7 @@ class ListenerBuilder():
         self.listitems = listitems
         loader = Loader('trigger')
         config = loader.load()[1]
-        self.__myxpl = Manager( source = config["source"], module_name = 'trigger')
+        self.__myxpl = Manager(source=config["source"], module_name='trigger')
         self.__expr = expr
 
         #We should try/catch this bloc in case of undefined method
@@ -267,7 +300,8 @@ class ListenerBuilder():
 
     def hasAllNeededValue(self):
         '''
-        Check if all the value used in the condition have been catched by listeners, then evaluate the expression
+        Check if all the value used in the condition have been catched by
+        listeners, then evaluate the expression
         '''
         all = True
         for k in self.listitems:
@@ -284,7 +318,7 @@ class ListenerBuilder():
         @param k2 : name of the item
         @param v : new value of the item
         '''
-        self._log.debug('updateList') 
+        self._log.debug('updateList')
         self.listitems[k1][k2] = v
         self.hasAllNeededValue()
 
@@ -295,14 +329,19 @@ class ListenerBuilder():
         '''
         for i in items:
             self._log.debug("New  x10 listener created")
-            Listener(lambda mess: self.updateList('x10',mess.get_key_value('device'), mess.get_key_value('command')) , self.__myxpl, {'schema':'x10.basic','device':i,'type':'xpl-cmnd'})
+            Listener(lambda mess: self.updateList('x10',
+                    mess.get_key_value('device'),
+                    mess.get_key_value('command')),
+                    self.__myxpl,
+                    {'schema': 'x10.basic', 'device': i, 'type': 'xpl-cmnd'})
 
     def buildtimelistener(self, items):
         '''
         Create listener for time conditions
         '''
         self._log.debug("New time listener created")
-        Listener(self._parsetimeupdate , self.__myxpl, {'schema':'datetime.basic','type':'xpl-trig'})
+        Listener(self._parsetimeupdate, self.__myxpl,
+                {'schema': 'datetime.basic', 'type': 'xpl-trig'})
 
     def _parsetimeupdate(self, mess):
         '''
@@ -310,9 +349,18 @@ class ListenerBuilder():
         '''
         self._log.debug("Time update")
         dt = mess.get_key_value('format1')
-        pars = {'year':dt[0:4],'month':dt[4:6],'day':dt[6:8],'daynumber':dt[11],'hour':dt[8:10],'minute':dt[10:12]}
+        pars = {
+            'year': dt[0:4],
+            'month': dt[4:6],
+            'day': dt[6:8],
+            'daynumber': dt[11],
+            'hour': dt[8:10],
+            'minute': dt[10:12],
+        }
         for p in pars:
             self.updateList('time', p, pars[p])
+
+
 def main():
     '''
     Starts the trigger
@@ -334,7 +382,7 @@ def main():
     #expr2 = "AND(%s, OR(%s, %s))" % (state1, time1, state3)
     print "Parsing de l'expression : %s" % expr2
     liste = {}
-    parsing =  eval(expr2+".parse(liste)")
+    parsing = eval(expr2+".parse(liste)")
     print parsing
     l = ListenerBuilder(parsing, expr2)
 

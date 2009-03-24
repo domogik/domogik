@@ -23,10 +23,15 @@
 # $LastChangedDate: 2009-03-21 14:33:23 +0100 (sam. 21 mars 2009) $
 # $LastChangedRevision: 417 $
 
-import sys, string, select, threading
+import sys
+import string
+import select
+import threading
 from socket import *
+
 from domogik.common import logger
 from domogik.xpl.lib.module import xPLModule
+
 
 class Manager(xPLModule):
     """
@@ -35,13 +40,15 @@ class Manager(xPLModule):
     Each manager will send an heartbeat message on broadcast on port 3865
     to announce itself to the xPL Hub
     """
-#    _port = 0
-#    _ip = ""
-#    _source = "" 
-#    _listeners = [] # List of listeners to brodacast message
-#    _network = None
-#    _UDPSock = None
-    def __init__(self, ip ="0.0.0.0", source = "xpl-monitor.python", module_name = None):
+    # _port = 0
+    # _ip = ""
+    # _source = ""
+    # _listeners = [] # List of listeners to brodacast message
+    # _network = None
+    # _UDPSock = None
+
+    def __init__(self, ip="0.0.0.0", source="xpl-monitor.python",
+            module_name=None):
         """
         Create a new manager instance
         @param ip : IP to listen to (default 0.0.0.0)
@@ -55,31 +62,33 @@ class Manager(xPLModule):
         self._source = source
         self._listeners = []
         # Initialise the socket
-        self._UDPSock = socket(AF_INET,SOCK_DGRAM)
+        self._UDPSock = socket(AF_INET, SOCK_DGRAM)
         #xPL plugins only needs to connect on local xPL Hub on localhost
         #The port is dynamically selected by the system
-        addr = (ip,0)
+        addr = (ip, 0)
 
         l = logger.Logger(module_name)
         self._log = l.get_logger()
 
         # Try and bind to the base port
-        try :
+        try:
             self._UDPSock.bind(addr)
-        except :
+        except:
             # Smthg is already running on this port
             self._log.error("Can't bind to the port %i" % self._port)
             exit(1)
         else:
             self._port = self._UDPSock.getsockname()[1]
             self._ip = ip
-            #All is good, we start sending Heartbeat every 5 minutes using xPLTimer
+            # All is good, we start sending Heartbeat every 5 minutes using
+            # xPLTimer
             self._SendHeartbeat()
-            self._h_timer = xPLTimer(300,self._SendHeartbeat)
+            self._h_timer = xPLTimer(300, self._SendHeartbeat)
             self._h_timer.start()
             #And finally we start network listener in a thread
             self._stop_thread = False
-            self._network = threading.Thread(None, self._run_thread_monitor, None, (), {})
+            self._network = threading.Thread(None, self._run_thread_monitor,
+                    None, (), {})
             self.register_thread(self._network)
             self._network.start()
             self._log.debug("xPL thread started")
@@ -100,29 +109,41 @@ class Manager(xPLModule):
         """
         try:
             if not message.has_conf_key("hop"):
-                message.set_conf_key("hop","1")
+                message.set_conf_key("hop", "1")
             if not message.has_conf_key("source"):
-                message.set_conf_key("source",self._source)
+                message.set_conf_key("source", self._source)
             if not message.has_conf_key("target"):
                 message.set_conf_key("target", "*")
         except:
             pass
         finally:
-            hbSock = socket(AF_INET,SOCK_DGRAM)
-            hbSock.setsockopt(SOL_SOCKET,SO_BROADCAST,1)
-            hbSock.sendto(message.__str__(),("255.255.255.255",3865))
+            hbSock = socket(AF_INET, SOCK_DGRAM)
+            hbSock.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
+            hbSock.sendto(message.__str__(), ("255.255.255.255", 3865))
             hbSock.close()
             self._log.debug("xPL Message sent")
 
-
-    # Sub routine for sending a heartbeat
     def _SendHeartbeat(self):
         """
-        Send heartbeat message in broadcast on the network, on the bus port (3865)
+        Send heartbeat message in broadcast on the network, on the bus port
+        (3865)
         This make the application able to be discovered by the hub
         """
-        msg = "xpl-stat\n{\nhop=1\nsource=" + self._source + "\ntarget=*\n}\nhbeat.app\n{\ninterval=5\nport=" + str(self._port) + "\nremote-ip="+self._ip+"\n}\n"
-        self.send(msg)
+        # Sub routine for sending a heartbeat
+        self.send("""\
+xpl-stat
+{
+hop=1
+source=%s
+target=*
+}
+hbeat.app
+{
+interval=5
+port=%s
+remote-ip=%s
+}
+""" % (self._source, self._port, self._ip))
 
     def _run_thread_monitor(self):
         """
@@ -130,19 +151,22 @@ class Manager(xPLModule):
         them to see if the target is the application.
         If it is, call all listeners
         """
-        while not self.should_stop() :
-            readable, writeable, errored = select.select([self._UDPSock],[],[],10)
-            if len(readable) == 1 :
-                data,addr = self._UDPSock.recvfrom(self._buff)
+        while not self.should_stop():
+            readable, writeable, errored = select.select(
+                    [self._UDPSock], [], [], 10)
+            if len(readable) == 1:
+                data, addr = self._UDPSock.recvfrom(self._buff)
                 try:
                     mess = Message(data)
-                    if ( mess.get_conf_key_value("target") == "*" ) or ( mess.get_conf_key_value("target") == self._source ):
-                        [ l.new_message(mess) for l in self._listeners ]
-                        self._log.debug("New message received : %s" % mess.get_type())
+                    if mess.get_conf_key_value("target") == "*" or (
+                            mess.get_conf_key_value("target") == self._source):
+                        [l.new_message(mess) for l in self._listeners]
+                        self._log.debug("New message received : %s" % \
+                                mess.get_type())
                 except XPLException:
                     pass
         self.unregister_thread(self._network)
- 
+
     def add_listener(self, listener):
         """
         Add a listener on the list of the manager
@@ -150,23 +174,23 @@ class Manager(xPLModule):
         """
         self._listeners.append(listener)
 
+
 class Listener:
     """
     Listener are objects which are able to check if a message
     match some filter and to call a function if they do
     """
+    # _callback = None
+    # _filter = None
 
-#    _callback = None
-#    _filter = None
-
-    def __init__(self, cb, manager, filter = {} ):
+    def __init__(self, cb, manager, filter = {}):
         """
         The listener will get all messages from the manager and parse them.
-        If a message match the filter, then the callback function will be called
-        with the message as parameter
+        If a message match the filter, then the callback function will be
+        called with the message as parameter
         @param cb : the callback function
         @param manager : the manager instance
-        @param filter : dictionnary { key : value } 
+        @param filter : dictionnary { key : value }
         """
         self._callback = cb
         self._filter = filter
@@ -180,13 +204,14 @@ class Listener:
 
     def new_message(self, message):
         """
-        This is the function which is called by the manager when a message arrives
-        The goal of this function is to check if message match filter rules, and to
-        call the callback function if it does
+        This is the function which is called by the manager when a message
+        arrives
+        The goal of this function is to check if message match filter rules,
+        and to call the callback function if it does
         """
         ok = True
         for key in self._filter:
-            if message.has_key(key):
+            if key in message:
                 if (message.get_key_value(key) != self._filter[key]):
                     ok = False
             else:
@@ -196,12 +221,13 @@ class Listener:
                     else:
                         pass
             if key == "schema":
-                ok = ok and ( self._filter[key] == message.get_schema() )
+                ok = ok and (self._filter[key] == message.get_schema())
 
             if key == "type":
-                ok = ok and ( self._filter[key] == message.get_type() )
+                ok = ok and (self._filter[key] == message.get_type())
 
-            if not message.has_key(key) and not message.has_conf_key(key) and key != "type" and key != "schema":
+            if not (key in message or message.has_conf_key(key) or key in (
+                    "type", "schema")):
                 ok = False
         #The message match the filter, we can call  the callback function
         if ok:
@@ -228,21 +254,25 @@ class Listener:
         """
         return self._filter
 
+
 class XPLException(Exception):
     """
     xPL exception
     """
+
     def __init__(self, value):
         self.value = value
+
     def __str__(self):
         return self.repr(self.value)
+
 
 class Message:
     """
     Message is the object for all data received form the network.
     The monitor create an instance of Message each time it receive smthg
     """
-    _mess_types = ['xpl-stat','xpl-cmnd','xpl-trig']
+    _mess_types = ['xpl-stat', 'xpl-cmnd', 'xpl-trig']
 
 #    _conf = {} #Dico ayant la configuration du paquet
 #    _data = {} #Dico ayant les données du paquet
@@ -251,12 +281,13 @@ class Message:
 #    _conf_order = ""
 #    _data_order = ""
 
-    def __init__(self, mess = None):
+    def __init__(self, mess=None):
         """
-        Create Message instance from a message string and check if the structure 
-        is correct. Raise exception if it is not
+        Create Message instance from a message string and check if the
+        structure is correct. Raise exception if it is not
         The message can be None (to allow building a message)
-        @param mess : the message as a unique string, as it is send on the network
+        @param mess : the message as a unique string, as it is send on the
+        network
         """
         self._conf = {}
         self._data = {}
@@ -301,7 +332,7 @@ class Message:
         """
         return self._type
 
-    def set_schema(self,schema):
+    def set_schema(self, schema):
         """
         Define the message schema
         """
@@ -313,13 +344,13 @@ class Message:
         """
         return self._schema
 
-    def set_conf_key(self,key,value):
+    def set_conf_key(self, key, value):
         """
         Define a configuration key (which appears between first {})
         """
         self._conf[key] = value
 
-    def set_data_key(self,key,value):
+    def set_data_key(self, key, value):
         """
         Define a data key (which appears between second {})
         """
@@ -327,18 +358,22 @@ class Message:
 
     def set_data_order(self, order):
         """
-        As schema define parameter order, and since this class isn't specific enough to determine order,
-        you have to set the order to ensure a good message.
-        If you do not, the order of parameter in each part may not conform to schema
+        As schema define parameter order, and since this class isn't specific
+        enough to determine order, you have to set the order to ensure a good
+        message.
+        If you do not, the order of parameter in each part may not conform to
+        schema
         If you set order, be sure to list all the keys !
         """
         self._data_order = order
 
     def set_conf_order(self, order):
         """
-        As schema define parameter order, and since this class isn't specific enough to determine order,
-        you have to set the order to ensure a good message.
-        If you do not, the order of parameter in each part may not conform to schema
+        As schema define parameter order, and since this class isn't specific
+        enough to determine order, you have to set the order to ensure a good
+        message.
+        If you do not, the order of parameter in each part may not conform to
+        schema
         If you set order, be sure to list all the keys !
         """
         self._conf_order = order
@@ -362,7 +397,7 @@ class Message:
         if key in self._data:
             return self._data[key]
         else:
-            raise XPLException, "Key not existing"
+            raise XPLException("Key not existing")
 
     def get_conf_key_value(self, key):
         """
@@ -377,19 +412,20 @@ class Message:
         str = "%s\n{\n" % self._type
         if (not self._conf_order):
             for k in self._conf:
-                str += "%s=%s\n" % (k,self._conf[k])
+                str += "%s=%s\n" % (k, self._conf[k])
         else:
             for k in self._conf_order:
-                str +=  "%s=%s\n" % (k,self._conf[k])
+                str += "%s=%s\n" % (k, self._conf[k])
         str += "}\n%s\n{\n" % (self._schema)
         if (not self._data_order):
             for k in self._data:
-                str +=  "%s=%s\n" % (k,self._data[k])
+                str += "%s=%s\n" % (k, self._data[k])
         else:
             for k in self._data_order:
                 str += "%s=%s\n" % (k, self._data[k])
         str += "}\n"
         return str
+
 
 class xPLTimer(xPLModule):
     """
@@ -438,9 +474,9 @@ class xPLTimer(xPLModule):
 
 
 if __name__ == "__main__":
-    m = Manager(ip = "192.168.1.24", port = 5123)
-    l = Listener(cb = boo, manager = m)
-    l.add_filter("source","cdp1802-dblogger.000001161j8ris")
+    m = Manager(ip="192.168.1.24", port=5123)
+    l = Listener(cb=boo, manager=m)
+    l.add_filter("source", "cdp1802-dblogger.000001161j8ris")
     l.del_filter("source")
     me = Message()
     me.set_type("xpl-cmnd")

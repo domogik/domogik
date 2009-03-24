@@ -25,131 +25,144 @@
 
 from django.db import models
 
-class Area(models.Model):
-	name = models.CharField(max_length=30)
+# __unicode__ is to output a representation of the object as a unicode string
+# (u"" instead of "" for Python < 3.0)
 
-	# This is the representation of the object
-	def __unicode__(self):
-		return self.name
+
+class Area(models.Model):
+    name = models.CharField(max_length=30)
+
+    def __unicode__(self):
+        return self.name
+
 
 class Room(models.Model):
-	name = models.CharField(max_length=30)
-	area = models.ForeignKey(Area)
+    name = models.CharField(max_length=30)
+    area = models.ForeignKey(Area)
 
-	# This is the representation of the object
-	def __unicode__(self):
-		return self.name
+    def __unicode__(self):
+        return self.name
+
 
 class DeviceCategory(models.Model):
-	"""
-	Examples : temperature, heating, lighting, music, ...
-	"""
-	name = models.CharField(max_length=30)
+    """
+    Examples : temperature, heating, lighting, music, ...
+    """
+    name = models.CharField(max_length=30)
 
-	class Meta:
-		verbose_name_plural = "Device categories"
+    class Meta:
+        verbose_name_plural = "Device categories"
+
 
 class Device(models.Model):
-	TECHNOLOGY_CHOICES = (
-		('x10', 'X10'),
-		('onewire', 'One-Wire'),
-		('plcbus', 'PLCBus'),
-		('ir', 'IR'),
-	)
+    TECHNOLOGY_CHOICES = (
+            ('x10', 'X10'),
+            ('onewire', 'One-Wire'),
+            ('plcbus', 'PLCBus'),
+            ('ir', 'IR'),
+    )
 
-	TYPE_CHOICES = (
-		('appliance','Appliance'),
-		('lamp','Lamp'),
-		('music','Music'),
-	)
+    TYPE_CHOICES = (
+            ('appliance', 'Appliance'),
+            ('lamp', 'Lamp'),
+            ('music', 'Music'),
+    )
 
-	name = models.CharField(max_length=30)
-	serialNb = models.CharField("Serial Nb", max_length=30, null=True, blank=True)
-	reference = models.CharField(max_length=30, null=True, blank=True)
-	address = models.CharField(max_length=30)
-	description = models.TextField(max_length=80, null=True, blank=True)
-	technology = models.CharField(max_length=20, choices=TECHNOLOGY_CHOICES)
-	# This is NOT user-defined
-	type = models.CharField(max_length=20, choices=TYPE_CHOICES)
-	# This is user-defined
-	category = models.ForeignKey(DeviceCategory)
-	room = models.ForeignKey(Room)
-	canGiveFeedback = models.BooleanField("Can give feedback", default=False)
-	isResetable = models.BooleanField("Is resetable", default=False)
+    name = models.CharField(max_length=30)
+    serialNb = models.CharField("Serial Nb", max_length=30, null=True,
+            blank=True)
+    reference = models.CharField(max_length=30, null=True, blank=True)
+    address = models.CharField(max_length=30)
+    description = models.TextField(max_length=80, null=True, blank=True)
+    technology = models.CharField(max_length=20, choices=TECHNOLOGY_CHOICES)
+    # This is NOT user-defined
+    type = models.CharField(max_length=20, choices=TYPE_CHOICES)
+    # This is user-defined
+    category = models.ForeignKey(DeviceCategory)
+    room = models.ForeignKey(Room)
+    canGiveFeedback = models.BooleanField("Can give feedback", default=False)
+    isResetable = models.BooleanField("Is resetable", default=False)
 
-	def isLamp(self):
-		return self.type.lower() == 'lamp'
+    def isLamp(self):
+        return self.type.lower() == 'lamp'
 
-	def isAppliance(self):
-		return self.type.lower() == 'appliance'
+    def isAppliance(self):
+        return self.type.lower() == 'appliance'
 
-	def canBeSwitchedOnOff(self):
-		return self.type.lower() == 'appliance' or self.type.lower() == 'lamp'
+    def canBeSwitchedOnOff(self):
+        return self.type.lower() == 'appliance' or self.type.lower() == 'lamp'
 
-	def canHaveInputValue(self):
-		# TODO : Add here supported devices
-		return self.type.lower() == 'lamp'
+    def canHaveInputValue(self):
+        # TODO : Add here supported devices
+        return self.type.lower() == 'lamp'
 
-	# This is the representation of the object
-	def __unicode__(self):
-		return self.name + " - " + self.address + " (" + self.reference + ")"
+    def __unicode__(self):
+        return u"%s - %s (%s)" % (self.name, self.address, self.reference)
+
 
 class DeviceProperty(models.Model):
-	VALUETYPE_CHOICES = (
-		('BOOLEAN', 'BOOLEAN'),
-		('ALPHANUM', 'ALPHANUM'),
-	)
-	VALUE_UNIT_CHOICES = (
-		('%', '%'),
-	)
+    VALUETYPE_CHOICES = (
+            ('BOOLEAN', 'BOOLEAN'),
+            ('ALPHANUM', 'ALPHANUM'),
+    )
+    VALUE_UNIT_CHOICES = (
+            ('%', '%'),
+    )
 
-	key = models.CharField(max_length=30)
-	value = models.CharField(max_length=80)
-	valueType = models.CharField("Value type", max_length=20, choices=VALUETYPE_CHOICES)
-	valueUnit = models.CharField("Value unit", max_length=30, choices=VALUE_UNIT_CHOICES)
-	isChangeableByUser = models.BooleanField("Can be changed by user")
-	device = models.ForeignKey(Device)
+    key = models.CharField(max_length=30)
+    value = models.CharField(max_length=80)
+    valueType = models.CharField("Value type", max_length=20,
+            choices=VALUETYPE_CHOICES)
+    valueUnit = models.CharField("Value unit", max_length=30,
+            choices=VALUE_UNIT_CHOICES)
+    isChangeableByUser = models.BooleanField("Can be changed by user")
+    device = models.ForeignKey(Device)
 
-	class Meta:
-		unique_together = ("key", "device")
-		verbose_name_plural = "Device properties"
+    class Meta:
+        unique_together = ("key", "device")
+        verbose_name_plural = "Device properties"
 
-	# This is the representation of the object
-	def __unicode__(self):
-		return self.key + "=" + self.value
+    def __unicode__(self):
+        return u"%s = %s" % (self.key, self.value)
+
 
 class DeviceCmdLog(models.Model):
-	date = models.DateTimeField()
-	value = models.CharField(max_length=80)
-	comment = models.CharField(max_length=80, null=True, blank=True)
-	isSuccessful = models.BooleanField("Successful")
-	device = models.ForeignKey(Device)
+    date = models.DateTimeField()
+    value = models.CharField(max_length=80)
+    comment = models.CharField(max_length=80, null=True, blank=True)
+    isSuccessful = models.BooleanField("Successful")
+    device = models.ForeignKey(Device)
 
-	# This is the representation of the object
-	def __unicode__(self):
-		return self.date + ":" + self.value + " (success=" + self.isSuccessful + ")"
+    def __unicode__(self):
+        return u"%s: %s (success=%s)" % (self.date, self.value,
+                self.isSuccessful)
+
 
 class StateReading(models.Model):
-	device = models.ForeignKey(Device)
-	value = models.FloatField()
-	date = models.DateTimeField()
+    device = models.ForeignKey(Device)
+    value = models.FloatField()
+    date = models.DateTimeField()
+
 
 class ApplicationSetting(models.Model):
-	# TODO : make sure there is only one line for this model
-	# See : http://groups.google.com/group/django-users/browse_thread/thread/d44a9417a81c4860?hl=en
-	# Or : http://docs.djangoproject.com/en/dev/ref/models/instances/#ref-models-instances
-	simulationMode = models.BooleanField("Simulation mode", default=True)
-	adminMode = models.BooleanField("Administrator mode", default=True)
-	debugMode = models.BooleanField("Debug mode", default=True)
+    # TODO : make sure there is only one line for this model
+    # See : http://groups.google.com/group/django-users/browse_thr
+    # ead/thread/d44a9417a81c4860?hl=en
+    # Or : http://docs.djangoproject.com/en/dev/ref/mod
+    # els/instances/#ref-models-instances
+    simulationMode = models.BooleanField("Simulation mode", default=True)
+    adminMode = models.BooleanField("Administrator mode", default=True)
+    debugMode = models.BooleanField("Debug mode", default=True)
+
 
 class Music(models.Model):
-	STATE_CHOICES = (
-		('play', 'Play'),
-		('pause', 'Pause'),
-		('stop', 'Stop')
-	)
-	room = models.ForeignKey(Room)
-	title = models.CharField(max_length=150)
-	time = models.TimeField()
-	current_time = models.TimeField()
-	state = models.CharField(max_length=10, choices=STATE_CHOICES)
+    STATE_CHOICES = (
+            ('play', 'Play'),
+            ('pause', 'Pause'),
+            ('stop', 'Stop'),
+    )
+    room = models.ForeignKey(Room)
+    title = models.CharField(max_length=150)
+    time = models.TimeField()
+    current_time = models.TimeField()
+    state = models.CharField(max_length=10, choices=STATE_CHOICES)

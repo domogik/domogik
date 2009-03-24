@@ -25,47 +25,54 @@
 
 import ow
 
+
 class OneWireException:
     """
     OneWire exception
     """
+
     def __init__(self, value):
         self.value = value
+
     def __str__(self):
         return self.repr(self.value)
 
+
 class OneWire:
     """
-    Manage OneWire 
+    Manage OneWire
     """
+
     def __init__(self, dev = 'u'):
         """
         Create OneWire instance, allowing to use OneWire Network
-        @param dev : device where the interface is connected to, default 'u' for USB
+        @param dev : device where the interface is connected to,
+        default 'u' for USB
         """
         try:
             ow.init(dev)
-            self._root_cached = ow.Sensor( '/' )
+            self._root_cached = ow.Sensor('/')
             self._root_uncached = ow.Sensor('/uncached')
         except:
-            raise OneWireException, "Can't access device"
+            raise OneWireException("Can't access device")
         else:
             self._cache = True
             self._root = self._root_cached
 
-     
     def set_cache_use(self, use):
         """
         Define use of cache.
-        If it's set to False, information will be reactualised each time a request is done
-        If it's true, the OWFS cache will be used (from 15s to 2 minutes of cache)
+        If it's set to False, information will be reactualised each time a
+        request is done
+        If it's true, the OWFS cache will be used (from 15s to 2 minutes of
+        cache)
         """
         self._cache = use
         if self._cache:
             self._root = self._root_cached
         else:
             self._root = self._root_uncached
-        
+
     def exec_type(self, t = ''):
         """
         Find all sensors matching a type
@@ -89,11 +96,16 @@ class OneWire:
         Return list of all temperature indicated by DS18B20 and DS18S20 sensors
         @return list of (id, temperature)
         """
-        return [ (i.id, i.type, i.temperature.replace(" ","")) for i in self.exec_type(t='DS18S20') ]  + [ (i.id, i.type, i.temperature.replace(" ","")) for i in self.exec_type(t='DS18B20') ]
+
+        def get_temperatures(t):
+            return [(i.id, i.type, i.temperature.replace(" ", "")) for i in
+                    self.exec_type(t=t)]
+        return get_temperatures('DS18S20') + get_temperatures('DS18B20')
 
     def is_present(self, item):
         """
-        Check if an item is on the network, and if it is, check if the present property is set to 1
+        Check if an item is on the network, and if it is, check if the present
+        property is set to 1
         """
         if item[0] != '/':
             item = '/%s' % item
@@ -102,4 +114,3 @@ class OneWire:
             return i[0].present
         except:
             return False
-

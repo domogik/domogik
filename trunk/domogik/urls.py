@@ -31,17 +31,16 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-	(r'^domogik/', include('domogik.control.urls')),
+    (r'^domogik/', include('domogik.control.urls')),
 
-    # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
+    # Uncomment the admin/doc line below and add 'django.contrib.admindocs'
     # to INSTALLED_APPS to enable admin documentation:
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
     # Uncomment the next line to enable the admin:
-	(r'^admin/(.*)', admin.site.root),
-	# TODO : change this, only used in development environment
-	# See : http://docs.djangoproject.com/en/dev/howto/static-files/
-	(r'^skins/(?P<path>.*)$', 'django.views.static.serve', 
-		{'document_root': settings.STATIC_DOC_ROOT}
-	),
+    (r'^admin/(.*)', admin.site.root),
+    # TODO : change this, only used in development environment
+    # See : http://docs.djangoproject.com/en/dev/howto/static-files/
+    (r'^skins/(?P<path>.*)$', 'django.views.static.serve',
+        {'document_root': settings.STATIC_DOC_ROOT}),
 )

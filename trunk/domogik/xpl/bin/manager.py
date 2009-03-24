@@ -23,6 +23,8 @@
 # $LastChangedDate: 2009-02-22 13:34:47 +0100 (dim 22 fév 2009) $
 # $LastChangedRevision: 395 $
 
+from __future__ import with_statement
+
 from domogik.xpl.lib.xplconnector import *
 from domogik.common.configloader import *
 import os
@@ -39,21 +41,24 @@ class SysManager(xPLModule):
         '''
         Init manager and start listeners
         '''
-        self._components = {'x10' : 'x10Main()',
-                        'datetime' : 'xPLDateTime()',
-                        'onewire' : 'OneWireTemp()',
-                        'trigger' : 'main()',
-                        'dawndusk' : 'main()'}
+        self._components = {
+            'x10': 'x10Main()',
+            'datetime': 'xPLDateTime()',
+            'onewire': 'OneWireTemp()',
+            'trigger': 'main()',
+            'dawndusk': 'main()'}
         cfgloader = Loader('sysmanager')
         config = cfgloader.load()
         self._config = config[0]
         l = logger.Logger('sysmanager')
         self._log = l.get_logger()
-        self.__myxpl = Manager(source = config[1]["source"], module_name = 'send')
+        self.__myxpl = Manager(source=config[1]["source"], module_name='send')
         self._log.debug("Init system manager")
-        Listener(self._sys_cb, self.__myxpl, {'schema':'domogik.system','type':'xpl-cmnd'})
+        Listener(self._sys_cb, self.__myxpl, {
+            'schema': 'domogik.system',
+            'type': 'xpl-cmnd',
+        })
         self._log.debug("System manager initialized")
-
 
     def _sys_cb(self, message):
         '''
@@ -64,27 +69,28 @@ class SysManager(xPLModule):
         cmd = message.get_key_value('command')
         mod = message.get_key_value('module')
         force = 0
-        if message.has_key('force'):
+        if 'force' in message:
             force = message.get_key_value('force')
         error = ""
         if mod not in self._components:
-            error = "Invalide component.\n"
+            error = "Invalid component.\n"
         elif not force and self._is_component_running(mod):
-            self._log.info("The component seems already running and force is disabled")
-            error += "The component seems already running and force is disabled"
+            error = "The component seems already running and force is disabled"
+            self._log.info(error)
         if error == "":
             if cmd == "start":
                 pid = self._start_comp(mod)
                 if pid:
                     self._write_pid_file(mod, pid)
-                    self._log.debug("Component %s started with pid %i" %(mod, pid))
+                    self._log.debug("Component %s started with pid %i" % (mod,
+                            pid))
                     mess = Message()
                     mess.set_type('xpl-trig')
                     mess.set_schema('domogik.system')
-                    mess.set_data_key('command',cmd)
-                    mess.set_data_key('module',mod)
-                    mess.set_data_key('force',force)
-                    mess.set_data_key('error',error)
+                    mess.set_data_key('command', cmd)
+                    mess.set_data_key('module', mod)
+                    mess.set_data_key('force', force)
+                    mess.set_data_key('error', error)
                     self.__myxpl.send(mess)
             elif cmd == "stop":
                 ret = self._stop_comp(mod)
@@ -97,33 +103,37 @@ class SysManager(xPLModule):
                 if not error:
                     self._log.debug("Component %s stopped" % (mod))
                 else:
-                    self._log.debug("Error during stop of component %s : %s" % (mod, error))
+                    self._log.debug("Error during stop of component %s : %s" %\
+                            (mod, error))
                 mess = Message()
                 mess.set_type('xpl-trig')
                 mess.set_schema('domogik.system')
-                mess.set_data_key('command',cmd)
-                mess.set_data_key('module',mod)
-                mess.set_data_key('force',force)
-                mess.set_data_key('error',error)
+                mess.set_data_key('command', cmd)
+                mess.set_data_key('module', mod)
+                mess.set_data_key('force', force)
+                mess.set_data_key('error', error)
                 self.__myxpl.send(mess)
-    
+
     def _stop_comp(self, name):
         '''
         Internal method
         Try to stop a component by getting its pid and sending signal
         @param name : the name of the component to stop
-        @return 0 if stop is OK, 1 if the pid file doesn't exist, 2 in case of other problem
+        @return 0 if stop is OK, 1 if the pid file doesn't exist,
+        2 in case of other problem
         '''
-        if not os.path.isfile("%s/%s.pid" % (self._config['pid_dir_path'], name)):
-            return 1
-        else:
+        pidfile = os.path.join(self._config['pid_dir_path'], name + ".pid")
+        if os.path.isfile(pidfile):
             try:
-                f = open("%s/%s.pid"%  (self._config['pid_dir_path'], name),"r")
-                data = f.readlines().replace('\n','')
+                with open(pidfile, "r") as f:
+                    data = f.readlines().replace('\n', '') # ?
+                    # FIXME: kill the process ??
             except:
                 return 2
+        else:
+            return 1
 
-    def _start_comp(self,name):
+    def _start_comp(self, name):
         '''
         Internal method
         Fork the process then start the component
@@ -145,15 +155,19 @@ class SysManager(xPLModule):
         '''
         Check if one component is still running == the pid file exists
         '''
-        return os.path.isfile('%s/%s.pid' % (self._config['pid_dir_path'], component))
+        pidfile = os.path.join(self._config['pid_dir_path'],
+                component + ".pid")
+        # TODO: test if process with given PID# actually running
+        return os.path.isfile(pidfile)
 
-    def _write_pid_file(self,component, pid):
+    def _write_pid_file(self, component, pid):
         '''
         Write the pid in a file
         '''
-        f = open("%s/%s.pid" % (self._config['pid_dir_path'], component), "w")
-        f.write("%s"  % pid)
-        f.close()
+        pidfile = os.path.join(self._config['pid_dir_path'],
+                component + ".pid")
+        with open(pidfile, "w") as f:
+            f.write(str(pid))
 
 if __name__ == "__main__":
     s = SysManager()

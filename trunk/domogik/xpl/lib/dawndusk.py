@@ -26,8 +26,9 @@
 import datetime
 import math
 
+
 class DawnDusk:
-    
+
     def __init__(self):
         pass
 
@@ -52,7 +53,7 @@ class DawnDusk:
         if mo < 3:
             mo = mo + 12
         h = 12 + lo / hr
-		# Number of days since 0,march,1
+        # Number of days since 0,march,1
         j = int(30.61 * (mo + 1)) + jo + h / 24 - 123
         # Anomaly and average longitude
         m = k * (j - jm)
@@ -69,7 +70,7 @@ class DawnDusk:
         ry = -1 * math.sin(r) * x + math.cos(r) * y
         x = rx
         y = ry
-        et = math.atan( y  / x)
+        et = math.atan(y / x)
         dc = math.atan(z / math.sqrt(1 - z * z))
         # Hour crossing the Meridien
         pm = h + fh + et / hr
@@ -79,7 +80,8 @@ class DawnDusk:
         pm = 60 * (pm - ms)
         midi = (hs, ms, pm)
         # Sunrise and sunset clockwise sun angle
-        cs = (math.sin(ht) - math.sin(la) * math.sin(dc)) / math.cos(la) / math.cos(dc)
+        cs = (math.sin(ht) - math.sin(la) * math.sin(dc)) \
+                / math.cos(la) / math.cos(dc)
         if cs > 1 or cs < -1:
             ah = None
         else:

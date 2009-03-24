@@ -38,14 +38,18 @@ class plcbusMain():
         # Load config
         cfgloader = Loader('plcbus')
         config = cfgloader.load()[1]
-        self.__myplcbus = Manager(source = config["source"], module_name = 'PLCBUS-1141')
+        self.__myplcbus = Manager(source=config["source"],
+                module_name='PLCBUS-1141')
         # Create listeners
-        Listener(self.plcbus_cmnd_cb, self.__myplcbus, {'schema':'control.basic','type':'xpl-cmnd'})
+        Listener(self.plcbus_cmnd_cb, self.__myplcbus, {
+            'schema': 'control.basic',
+            'type': 'xpl-cmnd',
+        })
         self.api = PLCBUSAPI(int(config["port_com"]))
         # Create log instance
         l = logger.Logger('plcbus')
         self._log = l.get_logger()
-        
+
     def plcbus_cmnd_cb(self, message):
         '''
         General callback for all command messages
@@ -55,25 +59,25 @@ class plcbusMain():
         user = None
         level = 0
         rate = 0
-        if message.has_key('command'):
+        if 'command' in message:
             cmd = message.get_key_value('command')
-        if message.has_key('device'):
+        if 'device' in message:
             dev = message.get_key_value('device')
-        if message.has_key('usercode'):
+        if 'usercode' in message:
             user = message.get_key_value('usercode')
-        if message.has_key('level'):
+        if 'level' in message:
             level = message.get_key_value('level')
-        if message.has_key('rate'):
+        if 'rate' in message:
             rate = message.get_key_value('rate')
-        self._log.debug("%s received : device = %s, user code = %s, level = %s, rate = %s" % (cmd.upper(), dev, user, level, rate))
+        self._log.debug("%s received : device = %s, user code = %s, level = "\
+                "%s, rate = %s" % (cmd.upper(), dev, user, level, rate))
         self.api._send(cmd.upper(), dev, user, level, rate)
-        
-                
+
     def plcbus_send_ack(self, message):
         '''
         General ack sending over xpl network
         '''
-# TODO : need to be completed
+        # TODO : need to be completed
         dt = localtime()
         mess = Message()
         dt = strftime("%Y-%m-%d %H:%M:%S")
@@ -83,6 +87,7 @@ class plcbusMain():
         mess.set_data_key("command", cmd)
         mess.set_data_key("device", dev)
         self.__myplcbus.send(mess)
-        
+
+
 if __name__ == "__main__":
     x = plcbusMain()

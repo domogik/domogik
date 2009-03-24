@@ -27,6 +27,8 @@ from django import forms
 from django.forms import ModelForm
 from domogik.control.models import ApplicationSetting
 
+
 class ApplicationSettingForm(ModelForm):
-	class Meta:
-		model = ApplicationSetting
+
+    class Meta:
+        model = ApplicationSetting

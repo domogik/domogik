@@ -26,21 +26,21 @@
 import os
 from subprocess import *
 
+
 class XPLHelper:
-	"""
-	Utility class for xPL
-	"""
+    """
+    Utility class for xPL
+    """
 
-	def send(self, xPLSchema, xPLCommand):
-		scriptCmd = "python send.py " + xPLSchema + " \"" + xPLCommand + "\""
-		print scriptCmd
-		curPath = os.getcwd()
-		# TODO : chdir is fishy, please change me!
-		os.chdir("xpl")
-		res = Popen(scriptCmd, shell=True, stderr=PIPE)
-		os.chdir(curPath)
-		output = res.stderr.read()
-		print "output = %s" % output
-		res.stderr.close()
-		return output
-
+    def send(self, xPLSchema, xPLCommand):
+        scriptCmd = "python send.py " + xPLSchema + " \"" + xPLCommand + "\""
+        print scriptCmd
+        curPath = os.getcwd()
+        # TODO : chdir is fishy, please change me!
+        os.chdir("xpl")
+        res = Popen(scriptCmd, shell=True, stderr=PIPE)
+        os.chdir(curPath)
+        output = res.stderr.read()
+        print "output = %s" % output
+        res.stderr.close()
+        return output

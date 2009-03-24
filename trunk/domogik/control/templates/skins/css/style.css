@@ -23,152 +23,152 @@
 */
 
 body {
-	font-family: Arial, Helvetica, sans-serif;
-	font-size: 12px;
-	color: white;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    color: white;
 }
 
 #container {
-	margin: auto;
-	width: 1024px; 
-	background: #333333;
+    margin: auto;
+    width: 1024px; 
+    background: #333333;
 }
 
 #top {
-	background: #DDDDDD;
-	color: #AF030A;
+    background: #DDDDDD;
+    color: #AF030A;
 }
 
 #leftBar {
-	font-size: 14px;
-	float: left;
-	width: 200px;
-	background: #333333;
+    font-size: 14px;
+    float: left;
+    width: 200px;
+    background: #333333;
 }
 
 #leftBar a {
-	color: #3AB17B;
-	font-weight: bold;
-	text-decoration: none;
+    color: #3AB17B;
+    font-weight: bold;
+    text-decoration: none;
 }
 
 #leftBar a:hover {
-	color: #FFFFFF;
-	text-decoration: none;
+    color: #FFFFFF;
+    text-decoration: none;
 }
 
 #leftBar ul {
-	margin-left: 0px;
-	padding-left: 0px;
+    margin-left: 0px;
+    padding-left: 0px;
 }
 
 #leftBar li {
-	padding: 5px;
-	list-style-type: none;
+    padding: 5px;
+    list-style-type: none;
 }
 
 #content {
-	float:left;
-	width: 820px;
-	background-color: #333333;
-	margin-bottom: 20px;
+    float:left;
+    width: 820px;
+    background-color: #333333;
+    margin-bottom: 20px;
 }
 
 #content h1 {
-	color: #00D2B1;
+    color: #00D2B1;
 }
 
 #content a {
-	color: #668CC7;
+    color: #668CC7;
 }
 
 #content .error {
-	color: red;
-	font-weight: bold;
+    color: red;
+    font-weight: bold;
 }
 
 #search fieldset legend {
-	color: #7798BD;
-	font-size:14px;
+    color: #7798BD;
+    font-size:14px;
 }
 
 #search th {
-	color: #7798BD;
+    color: #7798BD;
 }
 
 #list table {
-	border-style: none;
-	width: 100%;
-	border-spacing: 0px;
+    border-style: none;
+    width: 100%;
+    border-spacing: 0px;
 }
 
 #list th {
-	background-color: #dddddd;
-	color: #AF030A;
-	text-align: left;
-	padding-left: 7px;
-	padding-top: 5px;
-	padding-bottom: 5px;
+    background-color: #dddddd;
+    color: #AF030A;
+    text-align: left;
+    padding-left: 7px;
+    padding-top: 5px;
+    padding-bottom: 5px;
 }
 
 #list td {
-	padding-left: 7px;
-	color: #333333;
+    padding-left: 7px;
+    color: #333333;
 }
 
 #list a {
-	color: #333333;
-	font-weight: bold;
-	font-style: italic;
-	text-decoration: none;
+    color: #333333;
+    font-weight: bold;
+    font-style: italic;
+    text-decoration: none;
 }
 #list a:hover {
-	color: #FFFFFF;
+    color: #FFFFFF;
 }
 
 #list .oddRow {
-	background-color: #7798BD;
+    background-color: #7798BD;
 }
 #list .evenRow {
-	background-color: #ABAFBD;
+    background-color: #ABAFBD;
 }
 
 #list td {
-	vertical-align:middle;
+    vertical-align:middle;
 }
 
 #device .label {
-	color: #AF030A;
-	background-color: #DDDDDD;
-	font-weight: bold;
-	padding-left: 10px;
-	padding-right: 10px;
+    color: #AF030A;
+    background-color: #DDDDDD;
+    font-weight: bold;
+    padding-left: 10px;
+    padding-right: 10px;
 }
 #device .value {
-	font-weight: normal;
-	background-color: #7798BD;
-	color: #333333;
-	padding-left: 10px;
-	padding-right: 10px;
+    font-weight: normal;
+    background-color: #7798BD;
+    color: #333333;
+    padding-left: 10px;
+    padding-right: 10px;
 }
 
 #adminMain fieldset legend {
-	padding: 0.2em 0.5em;
-	color: #7798BD;
-	font-size: 14px;
-	font-weight: bold;
+    padding: 0.2em 0.5em;
+    color: #7798BD;
+    font-size: 14px;
+    font-weight: bold;
 }
 
 /*
 rightBar {
-	float: right;
-	width: 200px;
-	background: #333333;
+    float: right;
+    width: 200px;
+    background: #333333;
 }
 */
 
 #bottom {
-	clear: both;
-	background: #DDDDDD;
-	color: black;
+    clear: both;
+    background: #DDDDDD;
+    color: black;
 }

@@ -28,11 +28,11 @@ from onewire import *
 from domogik.common import configloader
 
 
-
 class OneWireTemp():
     '''
     Manage the One-Wire stuff and connect it to xPL
     '''
+
     def __init__(self):
         '''
         Starts some timers to check temperature
@@ -48,14 +48,15 @@ class OneWireTemp():
         timers.append(t)
 
     def _gettemp():
-        for  (i, t, v) in self._myow.get_temperature():
+        for (i, t, v) in self._myow.get_temperature():
             my_temp_message = Message()
             my_temp_message.set_type("xpl-trig")
             my_temp_message.set_schema("sensor.basic")
             my_temp_message.set_data_key("device", i)
             my_temp_message.set_data_key("type", t)
-            my_temp_message.set_data_key("current", v) 
+            my_temp_message.set_data_key("current", v)
             self._myxpl.send(my_temp_message)
+
 
 if __name__ == "__main__":
     OneWireTemp()

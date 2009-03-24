@@ -39,11 +39,12 @@ global log
 global myxpl
 
 lastpid = 0
-components = {'x10' : 'x10Main()',
-                'datetime' : 'xPLDateTime()',
-                'onewire' : 'OneWireTemp()',
-                'trigger' : 'main()',
-                'dawndusk' : 'main()'}
+components = {'x10': 'x10Main()',
+                'datetime': 'xPLDateTime()',
+                'onewire': 'OneWireTemp()',
+                'trigger': 'main()',
+                'dawndusk': 'main()'}
+
 
 def parse_command_line():
     '''
@@ -52,6 +53,7 @@ def parse_command_line():
     global arguments
     parser = optparse.OptionParser()
     (options, arguments) = parser.parse_args()
+
 
 def start_from_config():
     '''
@@ -63,6 +65,7 @@ def start_from_config():
     log.debug('Start components from config : %s' % config['components_list'])
     for c in lst:
         start_one_component(c)
+
 
 def start_one_component(name):
     '''
@@ -85,35 +88,35 @@ def start_one_component(name):
         message = Message()
         message.set_type("xpl-cmnd")
         message.set_schema("domogik.system")
-        message.set_data_key("module",name)
-        message.set_data_key("command","start")
-        message.set_data_key("force","1") #TODO
+        message.set_data_key("module", name)
+        message.set_data_key("command", "start")
+        message.set_data_key("force", "1") #TODO
         #Create a listener to check the result
-        l = Listener(wait_ack, myxpl, {'schema':'domogik.system','type':'xpl-trig','command':'start','module':name})
+        l = Listener(wait_ack, myxpl, {'schema': 'domogik.system',
+                'type': 'xpl-trig', 'command': 'start', 'module': name})
         myxpl.send(message)
         time.sleep(5) #Wait 5 seconds for a message
-        print "No ack has been received during the last 5 seconds. It means that :\n"
+        print "No ack has been received during the last 5 seconds. It means " \
+                "that :\n"
         print "\t - No manager have been found on the network"
         print "\t - The manager has some issues"
         myxpl.leave()
         exit(1)
+
 
 def wait_ack(message):
     """
     Callback method to check the contents of an ack message (domogik.system)
     """
     global myxpl
-    global log
     ack = ""
     error = ''
-    log.debug("Ack received from %s with error = %s" % (message.get_key_value('module'), message.get_key_value('error')))
     myxpl.leave()
-    if message.has_key('error'):
+    if 'error' in message:
         error = message.get_key_value('error')
         print error
         exit(1)
-    else:
-        exit(0)
+
 
 def write_pid_file(component, pid):
     '''
@@ -125,6 +128,7 @@ def write_pid_file(component, pid):
     f.write(pid)
     f.close()
 
+
 def is_component_running(component):
     '''
     Check if one component is still running == the pid file exists
@@ -132,6 +136,7 @@ def is_component_running(component):
     global config
     return False
     #return os.path.isfile('%s/%s.pid' % (config['pid_dir_path'], component))
+
 
 def init_config():
     '''
@@ -141,6 +146,7 @@ def init_config():
     cfgloader = Loader()
     config = cfgloader.load()[0]
 
+
 def init_log():
     '''
     Initialize the logger
@@ -149,12 +155,15 @@ def init_log():
     l = logger.Logger('dmgstart')
     log = l.get_logger()
 
+
 def usage():
     '''
     Display usage informations
     '''
     print "dmgstart.py <comp_name>\n"
-    print "\t - comp_name : The name of the component you would start. Can be 'auto' to use the config file."
+    print "\t - comp_name : The name of the component you would start. Can be"\
+            " 'auto' to use the config file."
+
 
 if __name__ == "__main__":
     init_log()
@@ -168,4 +177,3 @@ if __name__ == "__main__":
             start_from_config()
         else:
             start_one_component(arguments[0])
-

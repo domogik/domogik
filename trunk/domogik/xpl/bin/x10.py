@@ -28,6 +28,7 @@ from domogik.xpl.lib.xplconnector import *
 from domogik.common.configloader import Loader
 from domogik.common import logger
 
+
 class x10Main():
 
     def __init__(self):
@@ -44,7 +45,8 @@ class x10Main():
             exit(1)
         self.__myxpl = Manager(source = config["source"], module_name='x10')
         #Create listeners
-        Listener(self.x10_cmnd_cb, self.__myxpl, {'schema':'x10.basic','type':'xpl-cmnd'})
+        Listener(self.x10_cmnd_cb, self.__myxpl, {'schema': 'x10.basic',
+                'type': 'xpl-cmnd'})
         l = logger.Logger('x10')
         self._log = l.get_logger()
 
@@ -53,30 +55,31 @@ class x10Main():
         General callback for all command messages
         '''
         commands = {
-            'on': lambda d,h,l:self.__myx10.on(d),
-            'off': lambda d,h,l:self.__myx10.off(d),
-            'all_units_on': lambda d,h,l:self.__myx10.house_on(h),
-            'all_units_off': lambda d,h,l:self.__myx10.house_off(h),
-            'all_lights_on': lambda d,h,l:self.__myx10.lights_on(h),
-            'all_lights_off': lambda d,h,l:self.__myx10.lights_off(h),
-            'bright': lambda d,h,l:self.__myx10.bright(d,l),
-            'dim': lambda d,h,l:self.__myx10.dim(d,l),
-            'brightb': lambda d,h,l:self.__myx10.bright(d,l),
-            'dimb': lambda d,h,l:self.__myx10.dim(d,l)
+            'on': lambda d, h, l: self.__myx10.on(d),
+            'off': lambda d, h, l: self.__myx10.off(d),
+            'all_units_on': lambda d, h, l: self.__myx10.house_on(h),
+            'all_units_off': lambda d, h, l: self.__myx10.house_off(h),
+            'all_lights_on': lambda d, h, l: self.__myx10.lights_on(h),
+            'all_lights_off': lambda d, h, l: self.__myx10.lights_off(h),
+            'bright': lambda d, h, l: self.__myx10.bright(d, l),
+            'dim': lambda d, h, l: self.__myx10.dim(d, l),
+            'brightb': lambda d, h, l: self.__myx10.bright(d, l),
+            'dimb': lambda d, h, l: self.__myx10.dim(d, l),
         }
         cmd = None
         dev = None
         house = None
         level = None
-        if message.has_key('command'):
+        if 'command' in message:
             cmd = message.get_key_value('command')
-        if message.has_key('device'):
+        if 'device' in message:
             dev = message.get_key_value('device')
-        if message.has_key('house'):
+        if 'house' in message:
             house = message.get_key_value('house')
-        if message.has_key('level'):
+        if 'level' in message:
             level = message.get_key_value('level')
-        self._log.debug("%s received : device = %s, house = %s, level = %s" % (cmd, dev, house, level))
+        self._log.debug("%s received : device = %s, house = %s, level = %s" % (
+                cmd, dev, house, level))
         commands[cmd](dev, house, level)
 
 if __name__ == "__main__":
