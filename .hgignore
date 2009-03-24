@@ -1,0 +1,7 @@
+syntax: glob
+.svn
+*.orig
+*.rej
+.DS_Store
+*.pyc
+*.pyo
