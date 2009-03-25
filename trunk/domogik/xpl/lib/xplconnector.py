@@ -47,7 +47,7 @@ class Manager(xPLModule):
     # _network = None
     # _UDPSock = None
 
-    def __init__(self, ip="0.0.0.0", source="xpl-monitor.python",
+    def __init__(self, ip="192.168.10.23", source="xpl-monitor.python",
             module_name=None):
         """
         Create a new manager instance

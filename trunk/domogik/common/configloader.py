@@ -26,7 +26,8 @@
 
 #Path to the configuration directory
 global config_path
-config_path = "/home/maxence/dev/domogik/domogik/domogik/config"
+#config_path = "/home/maxence/dev/domogik/domogik/domogik/config"
+config_path = "d:/domogik/trunk/domogik/config"
 
 ####################################################
 #       DON'T CHANGE ANYTHING AFTER THIS LINE      #
