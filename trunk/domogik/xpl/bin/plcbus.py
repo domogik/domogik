@@ -59,15 +59,15 @@ class plcbusMain():
         user = None
         level = 0
         rate = 0
-        if 'command' in message:
+        if message.has_key('command'):
             cmd = message.get_key_value('command')
-        if 'device' in message:
+        if message.has_key('device'):
             dev = message.get_key_value('device')
-        if 'usercode' in message:
+        if message.has_key('usercode'):
             user = message.get_key_value('usercode')
-        if 'level' in message:
+        if message.has_key('level'):
             level = message.get_key_value('level')
-        if 'rate' in message:
+        if message.has_key('rate'):
             rate = message.get_key_value('rate')
         self._log.debug("%s received : device = %s, user code = %s, level = "\
                 "%s, rate = %s" % (cmd.upper(), dev, user, level, rate))
