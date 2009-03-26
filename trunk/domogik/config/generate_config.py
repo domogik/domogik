@@ -28,7 +28,7 @@ import sys
 from configobj import ConfigObj
 
 
-__IP_ADDRESS_REGEX = "^" + (r"\.".join(r"([01]?\d\d?|2[0-4]\d|25[0-5])")) + "$"
+_IP_ADDRESS_REGEX = "^" + (r"\.".join(r"([01]?\d\d?|2[0-4]\d|25[0-5])")) + "$"
 
 
 class ConfigManager():
