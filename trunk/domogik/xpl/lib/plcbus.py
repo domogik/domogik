@@ -61,8 +61,7 @@ class PLCBUSAPI:
             #020645000800000c03 because the remote send all user unit off
             'ALL_UNITS_OFF': '00',
             'ALL_LIGHTS_ON': '01',
-            #ON and ask to send ACK (instead of '02')
-            'ON': '22',
+            'ON': '22', #ON and ask to send ACK (instead of '02')
             'OFF': '23', #OFF and send ACK
             'DIM': '04',
             'BRIGHT': '05',
@@ -166,10 +165,12 @@ class PLCBUSAPI:
         except KeyError:
             print "PLCBUS Frame generation error, command does not exist ", cmd
         else:
-            plcbus_frame = '0205%s%s%s%s%s03' % (ucod,
-                self._convert_device_to_hex(item), self._cmdplcbus[cmd],
-                self._convert_data(data1), self._convert_data(data2))
-            #for bright and dim cmd, call _send with something in data1 & data2
+            if cmd == 'ALL_UNITS_OFF':
+                plcbus_frame = '020645000800000c03'
+            else:
+                plcbus_frame = '0205%s%s%s%s%s03' % (ucod,
+                    self._convert_device_to_hex(item), self._cmdplcbus[cmd],
+                    self._convert_data(data1), self._convert_data(data2))
             print plcbus_frame
             try:
                 message = plcbus_frame.decode('HEX')

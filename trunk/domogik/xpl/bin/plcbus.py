@@ -71,7 +71,10 @@ class plcbusMain():
             rate = message.get_key_value('rate')
         self._log.debug("%s received : device = %s, user code = %s, level = "\
                 "%s, rate = %s" % (cmd.upper(), dev, user, level, rate))
-        self.api._send(cmd.upper(), dev, user, level, rate)
+        if cmd == 'GET_ALL_ON_ID_PULSE':
+            self.api.get_all_on_id(dev, user)
+        else:
+            self.api._send(cmd.upper(), dev, user, level, rate)
 
     def plcbus_send_ack(self, message):
         '''
