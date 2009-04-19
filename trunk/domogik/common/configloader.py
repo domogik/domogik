@@ -23,11 +23,10 @@
 # $LastChangedDate: 2009-03-04 22:29:01 +0100 (mer. 04 mars 2009) $
 # $LastChangedRevision: 404 $
 
-
+import os
 #Path to the configuration directory
 global config_path
-#config_path = "/home/maxence/dev/domogik/domogik/domogik/config"
-config_path = "d:/domogik/trunk/domogik/config"
+config_path = "/home/maxence/domogik/trunk/domogik/config"
 
 ####################################################
 #       DON'T CHANGE ANYTHING AFTER THIS LINE      #

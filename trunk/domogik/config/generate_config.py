@@ -64,7 +64,7 @@ class ConfigManager():
             #Build the question
             req = question
             if proposed_val is not None:
-                req = "[%s]" % "  ".join(proposed_val)
+                req += "[%s]" % "  ".join(proposed_val)
             res_state_ok = False
             req += " : "
             while not res_state_ok:
@@ -166,14 +166,14 @@ class generalConfig(genericPluginConfig):
         Ask user for general parameters of Domogik to create the main cfg file
         '''
         self.informations = [
-        ('hub_address', 'What is the IP address the xPL system must bind ?',
-                _IP_ADDRESS_REGEX, None),
-        ('hub_port', 'What is the port the xPL system must bind ?',
-                r"^[1-9][0-9]+$", [3865]),
-        ('dmg_port', 'What is the port control script will use ?',
-                r"^[1-9][0-9]+", [3866]),
-        ('source', 'What is the xPL name you want control scripts use ?',
-                None, ['xpl-dmg.domogik']),
+#        ('hub_address', 'What is the IP address the xPL system must bind ?',
+#                _IP_ADDRESS_REGEX, None),
+#        ('hub_port', 'What is the port the xPL system must bind ?',
+#                r"^[1-9][0-9]+$", [3865]),
+#        ('dmg_port', 'What is the port control script will use ?',
+#                r"^[1-9][0-9]+", [3866]),
+#        ('source', 'What is the xPL name you want control scripts use ?',
+#                None, ['xpl-dmg.domogik']),
         ('log_dir_path', 'What is the path of the log directory ?\n'
                 'The directory must exist with good permissions.',
                 None, ['/tmp/']),
@@ -181,8 +181,8 @@ class generalConfig(genericPluginConfig):
                 None, ['debug', 'info', 'warning', 'error', 'critical']),
         ('pid_dir_path', 'What is the directory for pids file ?',
                 None, ['/var/run/domogik/']),
-        ('components_list', 'What are the components you want to enable ?'\
-                ' (comma separated list)', None, ['x10,datetime']),
+#        ('components_list', 'What are the components you want to enable ?'\
+#                ' (comma separated list)', None, ['x10,datetime']),
         ]
         file = "domogik.cfg"
         section = "domogik"
@@ -338,7 +338,7 @@ if __name__ == "__main__":
         usage()
 
     if choice == 'all':
-        ip = generalConfig().getvalue('hub_address')
+        ip = generalConfig()
         SystemManagerConfig(ip)
         x10Config(ip)
         plcbusConfig(ip)
@@ -346,8 +346,8 @@ if __name__ == "__main__":
         triggerConfig(ip)
         datetimeConfig(ip)
     elif choice == 'main':
-        ip = generalConfig().getvalue('hub_address')
-        SystemManagerConfig(ip)
+        generalConfig()
+        #SystemManagerConfig()
     elif choice == 'plugins':
         x10Config()
         plcbusConfig()

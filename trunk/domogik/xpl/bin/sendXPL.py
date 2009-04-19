@@ -33,20 +33,17 @@ from domogik.common import logger
 class Sender:
 
     supported_schemas = ["datetime.basic", "dawndusk.request", "x10.basic",
-            "sensor.basic"]
+            "sensor.basic","domogik.system"]
 
     def __init__(self, schema=None, message=None):
         self._schema = schema
         self._message = message
-        self.parse_parameters()
         cfgloader = Loader('send')
-        config = cfgloader.load()
-        self.__myxpl = Manager(config[1]["address"],
-                port=int(config[1]["port"]), source = config[1]["source"],
-                module_name = 'send')
-        mess = self.forge_message()
+        self.__myxpl = Manager(module_name = 'send')
         l = logger.Logger('send')
         self._log = l.get_logger()
+        self.parse_parameters()
+        mess = self.forge_message()
         self._log.debug("Send message : %s" % mess)
         self.__myxpl.send(mess)
         self.__myxpl.leave()

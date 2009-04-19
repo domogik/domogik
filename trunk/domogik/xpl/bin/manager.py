@@ -23,7 +23,6 @@
 # $LastChangedDate: 2009-02-22 13:34:47 +0100 (dim 22 fév 2009) $
 # $LastChangedRevision: 395 $
 
-from __future__ import with_statement
 
 from domogik.xpl.lib.xplconnector import *
 from domogik.common.configloader import *
@@ -47,12 +46,9 @@ class SysManager(xPLModule):
             'onewire': 'OneWireTemp()',
             'trigger': 'main()',
             'dawndusk': 'main()'}
-        cfgloader = Loader('sysmanager')
-        config = cfgloader.load()
-        self._config = config[0]
         l = logger.Logger('sysmanager')
         self._log = l.get_logger()
-        self.__myxpl = Manager(source=config[1]["source"], module_name='send')
+        self.__myxpl = Manager(module_name='sysmanager')
         self._log.debug("Init system manager")
         Listener(self._sys_cb, self.__myxpl, {
             'schema': 'domogik.system',

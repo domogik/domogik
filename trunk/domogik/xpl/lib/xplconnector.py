@@ -47,20 +47,21 @@ class Manager(xPLModule):
     # _network = None
     # _UDPSock = None
 
-    def __init__(self, ip="192.168.10.23", source="xpl-monitor.python",
-            module_name=None):
+    def __init__(self, ip="127.0.0.1", module_name="generic", port=3865):
         """
         Create a new manager instance
         @param ip : IP to listen to (default 0.0.0.0)
         @param source : source name of the application
         @param port : port to listen to (default 3865)
         """
+        source = "xpl-%s.domogik" % module_name
         xPLModule.__init__(self)
         # Define maximum xPL message size
         self._buff = 1500
         # Define xPL base port
         self._source = source
         self._listeners = []
+        self._port = port
         # Initialise the socket
         self._UDPSock = socket(AF_INET, SOCK_DGRAM)
         #xPL plugins only needs to connect on local xPL Hub on localhost
@@ -446,18 +447,19 @@ class xPLTimer(xPLModule):
         self._time = time
         self._timer = threading.Timer(self._time, self._run)
         self.register_timer(self._timer)
+        self.should_stop = False
 
     def _run(self):
         """
         internal timer loopback function
         """
-        self._timer = threading.Timer(self._time, self._run)
-        if self.should_stop():
+        if self.should_stop:
             self.unregister_timer(self._timer)
-            self._timer.cancel()
+            #self._timer.cancel()
         else:
+            self._intimer = threading.Timer(self._time, self._run)
             self._callback()
-            self._timer.start()
+            self._intimer.start()
 
     def start(self):
         """
@@ -469,6 +471,7 @@ class xPLTimer(xPLModule):
         """
         Stop the timer
         """
+        self.should_stop = True
         self.unregister_timer(self._timer)
         self._timer.cancel()
 
