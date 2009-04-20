@@ -24,6 +24,8 @@
 # $LastChangedRevision: 404 $
 
 import os
+from domogik.xpl.lib.xplconnector import *
+
 #Path to the configuration directory
 global config_path
 config_path = "/home/maxence/domogik/trunk/domogik/config"
@@ -97,6 +99,42 @@ class Loader():
         #If we're here, there is no plugin config
         return (main_result, None)
 
+class Query():
+	'''
+	Query throw xPL network to get a config item
+	'''
+	def __init__(self):
+		'''
+		Init the query system and connect it to xPL network
+		'''
+
+		l = logger.Logger('queryconfig')
+		self._log = l.get_logger()
+		self.__myxpl = Manager(module_name='queryconfig')
+		self._log.debug("Init config query instance")
+
+	def query(technology, key, element = None):
+		'''
+		Ask the config system for the value
+		@param technology : the technology of the item requesting the value, must exists in the config database
+		@param element : the name of the element which requests config, None if
+		it's a technolgy global parameter
+		@param key : the key to fetch corresponding value
+		'''
+		Listener(self._query_cb, self.__myxpl, {'schema':'domogik.config','type':'xpl-stat'})
+		mess = Message()
+		mess.set_type('xpl-trig')
+		mess.set_schema('domogik.config')
+		mess.set_data_key('technology', technology)
+		mess.set_data_key('element', element)
+		mess.set_data_key('key', key)
+	
+	def _query_cb(self, message):
+		'''
+		Callback to receive message after a query() call
+		@param message : the message received
+		'''
+		return message.ket_key_value('value')
 
 if __name__ == "__main__":
     l = Loader('x10')

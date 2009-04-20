@@ -212,7 +212,7 @@ class Listener:
         """
         ok = True
         for key in self._filter:
-            if key in message:
+            if message.has_key(key):
                 if (message.get_key_value(key) != self._filter[key]):
                     ok = False
             else:
@@ -227,7 +227,7 @@ class Listener:
             if key == "type":
                 ok = ok and (self._filter[key] == message.get_type())
 
-            if not (key in message or message.has_conf_key(key) or key in (
+            if not (message.has_key(key) or message.has_conf_key(key) or key in (
                     "type", "schema")):
                 ok = False
         #The message match the filter, we can call  the callback function

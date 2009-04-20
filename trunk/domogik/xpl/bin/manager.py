@@ -48,12 +48,14 @@ class SysManager(xPLModule):
             'dawndusk': 'main()'}
         l = logger.Logger('sysmanager')
         self._log = l.get_logger()
-        self.__myxpl = Manager(module_name='sysmanager')
         self._log.debug("Init system manager")
+        self.__myxpl = Manager(module_name='sysmanager')
         Listener(self._sys_cb, self.__myxpl, {
             'schema': 'domogik.system',
             'type': 'xpl-cmnd',
         })
+		self._config = Query()
+		self._pid_dir_path = self._config.query('global','pid_dir_path')
         self._log.debug("System manager initialized")
 
     def _sys_cb(self, message):
@@ -65,7 +67,7 @@ class SysManager(xPLModule):
         cmd = message.get_key_value('command')
         mod = message.get_key_value('module')
         force = 0
-        if 'force' in message:
+        if message.has_key('force'):
             force = message.get_key_value('force')
         error = ""
         if mod not in self._components:
@@ -118,12 +120,12 @@ class SysManager(xPLModule):
         @return 0 if stop is OK, 1 if the pid file doesn't exist,
         2 in case of other problem
         '''
-        pidfile = os.path.join(self._config['pid_dir_path'], name + ".pid")
+        pidfile = os.path.join(self._pid_dir_path, name + ".pid")
         if os.path.isfile(pidfile):
             try:
                 with open(pidfile, "r") as f:
                     data = f.readlines().replace('\n', '') # ?
-                    # FIXME: kill the process ??
+                    # TODO: kill the process ??
             except:
                 return 2
         else:
