@@ -27,7 +27,7 @@ import signal
 import threading
 import time
 from domogik.common import logger
-
+import threading
 
 class xPLModule():
     '''
@@ -114,3 +114,30 @@ class xPLModule():
             t._Thread__stop()
         for t in self._timers:
             t.cancel()
+
+class xPLResult():
+    '''
+    This object just provides a way to get and set a value between threads
+    '''
+
+    def __init__(self):
+	self.value = None
+	self.event = threading.Event()
+
+    def set_value(self, value):
+	'''
+	Set the new value of the objet
+	'''
+	self.value = value
+
+    def get_value(self):
+	'''
+	Get the value of the objet
+	'''
+	return self.value
+
+    def get_lock(self):
+	'''
+	Returns an event item
+	'''
+	return self.event
