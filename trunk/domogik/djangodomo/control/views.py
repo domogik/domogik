@@ -33,18 +33,18 @@ from django.http import Http404
 from django.http import QueryDict
 from django.shortcuts import render_to_response
 
-from domogik.control.models import Area
-from domogik.control.models import Room
-from domogik.control.models import DeviceCategory
-from domogik.control.models import DeviceProperty
-from domogik.control.models import DeviceCmdLog
-from domogik.control.models import Device
-from domogik.control.models import StateReading
-from domogik.control.models import ApplicationSetting
-from domogik.control.forms import ApplicationSettingForm
+from djangodomo.control.models import Area
+from djangodomo.control.models import Room
+from djangodomo.control.models import DeviceCategory
+from djangodomo.control.models import DeviceProperty
+from djangodomo.control.models import DeviceCmdLog
+from djangodomo.control.models import Device
+from djangodomo.control.models import StateReading
+from djangodomo.control.models import ApplicationSetting
+from djangodomo.control.forms import ApplicationSettingForm
 
-from domogik.control.SampleDataHelper import SampleDataHelper
-from domogik.control.XPLHelper import XPLHelper
+from djangodomo.control.SampleDataHelper import SampleDataHelper
+from djangodomo.control.XPLHelper import XPLHelper
 
 
 def index(request):

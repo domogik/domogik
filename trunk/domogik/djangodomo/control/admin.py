@@ -20,15 +20,29 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-13 10:57:14 +0100 (sam. 13 déc. 2008) $
-# $LastChangedRevision: 254 $
+# $LastChangedDate: 2009-01-18 12:34:24 +0100 (dim. 18 janv. 2009) $
+# $LastChangedRevision: 295 $
 
-from django import forms
-from django.forms import ModelForm
-from domogik.control.models import ApplicationSetting
+# This is the admin part of Domogik
+
+from django.contrib import admin
+from djangodomo.control.models import Area
+from djangodomo.control.models import Room
+from djangodomo.control.models import Device
+from djangodomo.control.models import DeviceProperty
+from djangodomo.control.models import ApplicationSetting
 
 
-class ApplicationSettingForm(ModelForm):
+class DevicePropertyInline(admin.TabularInline):
+    model = DeviceProperty
+    extra = 1
 
-    class Meta:
-        model = ApplicationSetting
+
+class DeviceAdmin(admin.ModelAdmin):
+    inlines = [DevicePropertyInline]
+
+
+admin.site.register(Area)
+admin.site.register(Room)
+admin.site.register(Device, DeviceAdmin)
+admin.site.register(ApplicationSetting)

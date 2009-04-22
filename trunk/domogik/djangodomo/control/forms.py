@@ -20,19 +20,15 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-06 16:48:26 +0100 (sam. 06 déc. 2008) $
-# $LastChangedRevision: 235 $
+# $LastChangedDate: 2008-12-13 10:57:14 +0100 (sam. 13 déc. 2008) $
+# $LastChangedRevision: 254 $
 
-from django.conf.urls.defaults import *
+from django import forms
+from django.forms import ModelForm
+from djangodomo.control.models import ApplicationSetting
 
-urlpatterns = patterns('domogik.control.views',
-    url(r'^$', 'index', name="mainView"),
-    url(r'device/(?P<deviceId>\d+)/$', 'device', name="deviceView"),
-    url(r'device_cmd_logs/(?P<deviceId>\d+)/$', 'deviceCmdLogs',
-            name="deviceCmdLogsView"),
-    url(r'admin/$', 'adminIndex', name="adminView"),
-    url(r'admin/load_sample_data$', 'loadSampleData',
-            name="loadSampleDataView"),
-    url(r'admin/clear_data$', 'clearData', name="clearDataView"),
-    url(r'admin/save_settings$', 'saveSettings', name="saveSettingsView"),
-)
+
+class ApplicationSettingForm(ModelForm):
+
+    class Meta:
+        model = ApplicationSetting

@@ -20,29 +20,19 @@
 # Author : Marc Schneider <marc@domogik.org>
 
 # $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-01-18 12:34:24 +0100 (dim. 18 janv. 2009) $
-# $LastChangedRevision: 295 $
+# $LastChangedDate: 2008-12-06 16:48:26 +0100 (sam. 06 déc. 2008) $
+# $LastChangedRevision: 235 $
 
-# This is the admin part of Domogik
+from django.conf.urls.defaults import *
 
-from django.contrib import admin
-from domogik.control.models import Area
-from domogik.control.models import Room
-from domogik.control.models import Device
-from domogik.control.models import DeviceProperty
-from domogik.control.models import ApplicationSetting
-
-
-class DevicePropertyInline(admin.TabularInline):
-    model = DeviceProperty
-    extra = 1
-
-
-class DeviceAdmin(admin.ModelAdmin):
-    inlines = [DevicePropertyInline]
-
-
-admin.site.register(Area)
-admin.site.register(Room)
-admin.site.register(Device, DeviceAdmin)
-admin.site.register(ApplicationSetting)
+urlpatterns = patterns('djangodomo.control.views',
+    url(r'^$', 'index', name="mainView"),
+    url(r'device/(?P<deviceId>\d+)/$', 'device', name="deviceView"),
+    url(r'device_cmd_logs/(?P<deviceId>\d+)/$', 'deviceCmdLogs',
+            name="deviceCmdLogsView"),
+    url(r'admin/$', 'adminIndex', name="adminView"),
+    url(r'admin/load_sample_data$', 'loadSampleData',
+            name="loadSampleDataView"),
+    url(r'admin/clear_data$', 'clearData', name="clearDataView"),
+    url(r'admin/save_settings$', 'saveSettings', name="saveSettingsView"),
+)

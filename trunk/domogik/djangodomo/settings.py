@@ -98,7 +98,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
 )
 
-ROOT_URLCONF = 'domogik.urls'
+ROOT_URLCONF = 'djangodomo.urls'
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or
@@ -114,7 +114,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.admin',
-    'domogik.control',
+    'djangodomo.control',
 )
 
 STATIC_DOC_ROOT = PROJECT_PATH + '/control/templates/skins'
