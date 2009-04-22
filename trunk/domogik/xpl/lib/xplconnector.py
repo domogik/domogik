@@ -92,7 +92,7 @@ class Manager(xPLModule):
                     None, (), {})
             self.register_thread(self._network)
             self._network.start()
-            self._log.debug("xPL thread started")
+            self._log.debug("xPL thread started for %s " % module_name)
 
     def leave(self):
         """
@@ -196,6 +196,7 @@ class Listener:
         self._callback = cb
         self._filter = filter
         manager.add_listener(self)
+        print "New Listener"
 
     def getFilter(self):
         return self._filter
@@ -211,6 +212,8 @@ class Listener:
         and to call the callback function if it does
         """
         ok = True
+        print "Message RECEIVED"
+
         for key in self._filter:
             if message.has_key(key):
                 if (message.get_key_value(key) != self._filter[key]):
@@ -476,16 +479,3 @@ class xPLTimer(xPLModule):
         self._timer.cancel()
 
 
-if __name__ == "__main__":
-    m = Manager(ip="192.168.1.24", port=5123)
-    l = Listener(cb=boo, manager=m)
-    l.add_filter("source", "cdp1802-dblogger.000001161j8ris")
-    l.del_filter("source")
-    me = Message()
-    me.set_type("xpl-cmnd")
-    me.set_schema("X10.basic")
-    me.set_data_key("DEVICE", "A3")
-    me.set_data_key("COMMAND", "ON")
-    m.send(me)
-#    t = xPLTimer(5,p)
-#    t.start()

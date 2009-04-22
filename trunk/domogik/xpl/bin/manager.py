@@ -52,17 +52,19 @@ class SysManager(xPLModule):
         self._log = l.get_logger()
         self._log.debug("Init system manager")
         self.__myxpl = Manager(module_name='sysmanager')
-	Listener(self._sys_cb, self.__myxpl, {
+    	Listener(self._sys_cb, self.__myxpl, {
             'schema': 'domogik.system',
             'type': 'xpl-cmnd',
         })
-	self._config = Query()
-	res = xPLResult()
-	self._config.query('global','pid_dir_path', res)
-	res.get_lock().wait()
-	self._pid_dir_path = res.get_value()
-
-	self._log.debug("pid_dir_path got value %s" % self._pid_dir_path)
+        self._config = Query(self.__myxpl)
+    	res = xPLResult()
+        self._config.query('global','pid_dir_path', res)
+        print "Before wait"
+        res.get_lock().wait()
+        self._pid_dir_path = res.get_value()
+    
+        self._log.debug("pid_dir_path got value %s" % self._pid_dir_path)
+        print "pid_dir_path got value %s" % self._pid_dir_path
         self._log.info("System manager initialized")
 
     def _sys_cb(self, message):
