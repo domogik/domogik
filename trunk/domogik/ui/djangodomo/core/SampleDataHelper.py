@@ -23,14 +23,14 @@
 # $LastChangedDate: 2009-02-22 11:45:39 +0100 (dim. 22 févr. 2009) $
 # $LastChangedRevision: 391 $
 
-from djangodomo.control.models import Area
-from djangodomo.control.models import Room
-from djangodomo.control.models import DeviceCategory
-from djangodomo.control.models import DeviceProperty
-from djangodomo.control.models import DeviceCmdLog
-from djangodomo.control.models import Device
-from djangodomo.control.models import StateReading
-from djangodomo.control.models import ApplicationSetting
+from djangodomo.core.models import Area
+from djangodomo.core.models import Room
+from djangodomo.core.models import DeviceCategory
+from djangodomo.core.models import DeviceProperty
+from djangodomo.core.models import DeviceCmdLog
+from djangodomo.core.models import Device
+from djangodomo.core.models import StateReading
+from djangodomo.core.models import ApplicationSetting
 
 
 class SampleDataHelper:

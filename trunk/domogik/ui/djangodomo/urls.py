@@ -31,7 +31,7 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    (r'^domogik/', include('djangodomo.control.urls')),
+    (r'^domogik/', include('djangodomo.core.urls')),
 
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs'
     # to INSTALLED_APPS to enable admin documentation:

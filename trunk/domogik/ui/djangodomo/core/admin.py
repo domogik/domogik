@@ -26,11 +26,11 @@
 # This is the admin part of Domogik
 
 from django.contrib import admin
-from djangodomo.control.models import Area
-from djangodomo.control.models import Room
-from djangodomo.control.models import Device
-from djangodomo.control.models import DeviceProperty
-from djangodomo.control.models import ApplicationSetting
+from djangodomo.core.models import Area
+from djangodomo.core.models import Room
+from djangodomo.core.models import Device
+from djangodomo.core.models import DeviceProperty
+from djangodomo.core.models import ApplicationSetting
 
 
 class DevicePropertyInline(admin.TabularInline):
