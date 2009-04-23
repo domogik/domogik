@@ -31,6 +31,7 @@ from django.db import models
 
 class Area(models.Model):
     name = models.CharField(max_length=30)
+    description = models.TextField(max_length=255, null=True, blank=True)
 
     def __unicode__(self):
         return self.name
@@ -39,6 +40,7 @@ class Area(models.Model):
 class Room(models.Model):
     name = models.CharField(max_length=30)
     area = models.ForeignKey(Area)
+    description = models.TextField(max_length=255, null=True, blank=True)
 
     def __unicode__(self):
         return self.name
