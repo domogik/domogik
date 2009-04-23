@@ -114,10 +114,10 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.admin',
-    'djangodomo.control',
+    'djangodomo.core',
 )
 
-STATIC_DOC_ROOT = PROJECT_PATH + '/control/templates/skins'
+STATIC_DOC_ROOT = PROJECT_PATH + '/core/templates/skins'
 
 try:
     from settings_local import *
