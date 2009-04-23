@@ -105,7 +105,7 @@
                     {% if adminMode %}
                         <td>{{ device.address }}</td>
                         <td>{{ device.reference }}</td>
-                        <td>{{ device.technology }}</td>
+                        <td>{{ device.technology.name }}</td>
                     {% endif %}
                     <td>{{ device.room.name }}</td>
                     <td>{{ device.room.area.name }}</td>

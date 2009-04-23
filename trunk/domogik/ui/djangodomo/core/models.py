@@ -56,14 +56,18 @@ class DeviceCategory(models.Model):
         verbose_name_plural = "Device categories"
 
 
-class Device(models.Model):
-    TECHNOLOGY_CHOICES = (
-            ('x10', 'X10'),
-            ('onewire', 'One-Wire'),
-            ('plcbus', 'PLCBus'),
-            ('ir', 'IR'),
-    )
+class DeviceTechnology(models.Model):
+    """
+    Examples : x10, plcbus, rfxcom, ...
+    """
+    name = models.CharField(max_length=30)
+    description = models.TextField(max_length=80, null=True, blank=True)
 
+    class Meta:
+        verbose_name_plural = "Device technologies"
+
+
+class Device(models.Model):
     TYPE_CHOICES = (
             ('appliance', 'Appliance'),
             ('lamp', 'Lamp'),
@@ -76,7 +80,7 @@ class Device(models.Model):
     reference = models.CharField(max_length=30, null=True, blank=True)
     address = models.CharField(max_length=30)
     description = models.TextField(max_length=80, null=True, blank=True)
-    technology = models.CharField(max_length=20, choices=TECHNOLOGY_CHOICES)
+    technology = models.ForeignKey(DeviceTechnology)
     # This is NOT user-defined
     type = models.CharField(max_length=20, choices=TYPE_CHOICES)
     # This is user-defined
