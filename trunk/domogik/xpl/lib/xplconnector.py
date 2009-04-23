@@ -28,6 +28,7 @@ import string
 import select
 import threading
 from socket import *
+import time
 
 from domogik.common import logger
 from domogik.xpl.lib.module import xPLModule
@@ -55,7 +56,7 @@ class Manager(xPLModule):
         @param port : port to listen to (default 3865)
         """
         source = "xpl-%s.domogik" % module_name
-        xPLModule.__init__(self)
+        xPLModule.__init__(self, self.leave)
         # Define maximum xPL message size
         self._buff = 1500
         # Define xPL base port
@@ -64,6 +65,8 @@ class Manager(xPLModule):
         self._port = port
         # Initialise the socket
         self._UDPSock = socket(AF_INET, SOCK_DGRAM)
+        #Set broadcast flag
+        self._UDPSock.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
         #xPL plugins only needs to connect on local xPL Hub on localhost
         #The port is dynamically selected by the system
         addr = (ip, 0)
@@ -84,7 +87,7 @@ class Manager(xPLModule):
             # All is good, we start sending Heartbeat every 5 minutes using
             # xPLTimer
             self._SendHeartbeat()
-            self._h_timer = xPLTimer(300, self._SendHeartbeat)
+            self._h_timer = xPLTimer(300, self._SendHeartbeat, self.get_stop())
             self._h_timer.start()
             #And finally we start network listener in a thread
             self._stop_thread = False
@@ -94,14 +97,21 @@ class Manager(xPLModule):
             self._network.start()
             self._log.debug("xPL thread started for %s " % module_name)
 
+    def __del__(self):
+        '''
+        Called when the object instance is destructed
+        '''
+        try:
+            self._UDPSock.close()
+        except:
+            pass
+
     def leave(self):
         """
         Stop threads and leave the Manager
         """
-        self._h_timer.stop()
-        self.force_leave()
+        self._UDPSock.close()
         self._log.debug("xPL thread stopped")
-        #exit(0)
 
     def send(self, message):
         """
@@ -118,10 +128,7 @@ class Manager(xPLModule):
         except:
             pass
         finally:
-            hbSock = socket(AF_INET, SOCK_DGRAM)
-            hbSock.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
-            hbSock.sendto(message.__str__(), ("255.255.255.255", 3865))
-            hbSock.close()
+            self._UDPSock.sendto(message.__str__(), ("255.255.255.255", 3865))
             self._log.debug("xPL Message sent")
 
     def _SendHeartbeat(self):
@@ -167,7 +174,6 @@ remote-ip=%s
                         #        mess.get_type())
                 except XPLException:
                     pass
-        self.unregister_thread(self._network)
 
     def add_listener(self, listener):
         """
@@ -430,7 +436,8 @@ class Message:
         return str
 
 
-class xPLTimer(xPLModule):
+
+class xPLTimer():
     """
     xPLTimer will call a callback function each n seconds
     """
@@ -438,30 +445,16 @@ class xPLTimer(xPLModule):
 #    _callback = None
 #    _timer = None
 
-    def __init__(self, time, cb):
+
+    def __init__(self, time, cb, stop):
         """
         Constructor : create the internal timer
         @param time : time of loop in second
         @param cb : callback function which will be call eact 'time' seconds
         """
-        xPLModule.__init__(self)
-        self._callback = cb
-        self._time = time
-        self._timer = threading.Timer(self._time, self._run)
-        self.register_timer(self._timer)
-        self.should_stop = False
-
-    def _run(self):
-        """
-        internal timer loopback function
-        """
-        if self.should_stop:
-            self.unregister_timer(self._timer)
-            #self._timer.cancel()
-        else:
-            self._intimer = threading.Timer(self._time, self._run)
-            self._callback()
-            self._intimer.start()
+        self._should_stop = threading.Event()
+        self._timer = self.__internalTimer(time, cb, stop)
+#       self.register_timer(self)
 
     def start(self):
         """
@@ -469,12 +462,41 @@ class xPLTimer(xPLModule):
         """
         self._timer.start()
 
+    def getTimer(self):
+        """
+        Waits for the internal thread to finish
+        """
+        return self._timer
+
     def stop(self):
         """
         Stop the timer
         """
-        self.should_stop = True
-        self.unregister_timer(self._timer)
-        self._timer.cancel()
+        self._timer._Thread__stop()
+#       self.unregister_timer(self._timer)
+
+    class __internalTimer(threading.Thread):
+        '''
+        Internal timer class
+        extends xPLModule to provide signal handling
+        '''
+        def __init__(self, time, cb, stop):
+            '''
+            @param time : interval between each callback call
+            @param cb : callback function
+            @param stop : Event to check for stop thread
+            '''
+            threading.Thread.__init__(self)
+            self._time = time
+            self._cb = cb
+            self._stop = stop
+
+        def run(self):
+            '''
+            Call the callback every X seconds
+            '''
+            while not self._stop.is_set():
+                self._cb()
+                self._stop.wait(self._time)
 
 

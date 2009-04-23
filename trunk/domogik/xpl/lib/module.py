@@ -35,9 +35,10 @@ class xPLModule():
     This class shouldn't be used as-it but should be extended by xPL module
     '''
 
-    def __init__(self):
+    def __init__(self, stop_cb = None):
         '''
         Create xPLModule instance, which defines signal handlers
+        @param stop_cb : Additional method to call when a SIGTERM is received
         '''
         self._threads = []
         self._timers = []
@@ -47,6 +48,7 @@ class xPLModule():
         self._log.debug("new signal manager instance")
 
         self._stop = threading.Event()
+        self._stop_cb = stop_cb
         signal.signal(signal.SIGTERM, self.hand_leave)
 
     def register_thread(self, thread):
@@ -95,6 +97,12 @@ class xPLModule():
         '''
         return self._stop.isSet()
 
+    def get_stop(self):
+        '''
+        Returns the Event instance
+        '''
+        return self._stop
+
     def hand_leave(self, signum, frame):
         '''
         Handler called when a SIGTERM is catched
@@ -103,17 +111,23 @@ class xPLModule():
         '''
         self._log.debug('Signal SIGTERM catched')
         self.force_leave()
+        if self._stop_cb:
+            print "Calling CB"
+            self._stop_cb()
 
     def force_leave(self):
         '''
         Leave threads & timers
         '''
+        print "Force leave"
         self._stop.set()
-        time.sleep(2)
         for t in self._threads:
-            t._Thread__stop()
+            t.join()
+            print "Thread stopped %s" % t
+            #t._Thread__stop()
         for t in self._timers:
-            t.cancel()
+            t.stop()
+        print "End Force leave"
 
 class xPLResult():
     '''

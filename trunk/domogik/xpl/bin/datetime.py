@@ -27,6 +27,7 @@ from time import localtime
 from domogik.xpl.lib.xplconnector import *
 from domogik.common.configloader import *
 import time
+import signal
 
 class xPLDateTime(xPLModule):
     '''
@@ -36,8 +37,11 @@ class xPLDateTime(xPLModule):
     def __init__(self):
         xPLModule.__init__(self)
         self.__myxpl = Manager(module_name='datetime')
-        self._timer = xPLTimer(10, self._send_datetime)
+        #TODO: Set it to 60 seconds instead of 10
+        self._timer = xPLTimer(10, self._send_datetime, self.get_stop())
         self._timer.start()
+        signal.pause()
+
 
     def _f(self, nb):
         '''
