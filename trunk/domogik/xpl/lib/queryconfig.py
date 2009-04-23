@@ -59,15 +59,13 @@ class Query():
         mess.set_data_key('element', element)
         mess.set_data_key('key', key)
         self.__myxpl.send(mess)
-        print "Message sent"
+        self._res.get_lock().wait()
 
     def _query_cb(self, message):
         '''
         Callback to receive message after a query() call
         @param message : the message received
         '''
-        print "value received %s" % message.get_key_value('value')
         self._log.debug("Config value received : %s" % message.get_key_value('value'))
         self._res.set_value(message.get_key_value('value'))
         self._res.get_lock().set()
-

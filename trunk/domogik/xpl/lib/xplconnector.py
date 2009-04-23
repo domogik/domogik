@@ -196,7 +196,6 @@ class Listener:
         self._callback = cb
         self._filter = filter
         manager.add_listener(self)
-        print "New Listener"
 
     def getFilter(self):
         return self._filter
@@ -212,7 +211,6 @@ class Listener:
         and to call the callback function if it does
         """
         ok = True
-        print "Message RECEIVED"
 
         for key in self._filter:
             if message.has_key(key):

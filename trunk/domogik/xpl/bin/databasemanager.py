@@ -42,7 +42,6 @@ class DBConnector():
         self._log.debug("Init database_manager instance")
         self.__myxpl = Manager(module_name='database_manager')
         Listener(self._request_config_cb, self.__myxpl,{'schema':'domogik.config','type':'xpl-cmnd'})
-        print "Started"
         #cfgloader = Loader('database')
         #config = cfgloader.load()[1]
         
@@ -67,7 +66,6 @@ class DBConnector():
         Callback to receive a request for some config stuff
         @param message : the xPL message
         '''
-        print "Message received"
         techno = message.get_key_value('technology')
         key = message.get_key_value('key')
         element = message.get_key_value('element')

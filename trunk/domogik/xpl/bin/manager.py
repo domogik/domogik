@@ -59,12 +59,10 @@ class SysManager(xPLModule):
         self._config = Query(self.__myxpl)
     	res = xPLResult()
         self._config.query('global','pid_dir_path', res)
-        print "Before wait"
-        res.get_lock().wait()
+#        res.get_lock().wait()
         self._pid_dir_path = res.get_value()
     
         self._log.debug("pid_dir_path got value %s" % self._pid_dir_path)
-        print "pid_dir_path got value %s" % self._pid_dir_path
         self._log.info("System manager initialized")
 
     def _sys_cb(self, message):
@@ -152,7 +150,7 @@ class SysManager(xPLModule):
         module = sys.modules[mod_path]
         lastpid = os.fork()
         if not lastpid:
-            eval("module.%s" % self._components[name])
+            os.execlp(sys.executable, sys.executable, module.__file__)
             self._log.debug("%s process started" % name)
             exit(0)
         return lastpid
@@ -171,7 +169,7 @@ class SysManager(xPLModule):
         '''
         Write the pid in a file
         '''
-        pidfile = os.path.join(self._config['pid_dir_path'],
+        pidfile = os.path.join(self._pid_dir_path,
                 component + ".pid")
         with open(pidfile, "w") as f:
             f.write(str(pid))

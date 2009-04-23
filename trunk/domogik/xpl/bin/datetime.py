@@ -34,8 +34,6 @@ class xPLDateTime():
     '''
 
     def __init__(self):
-        cfgloader = Loader('datetime')
-        config = cfgloader.load()[1]
         self.__myxpl = Manager(module_name='datetime')
         self._timer = xPLTimer(10, self._send_datetime)
         self._timer.start()
