@@ -27,7 +27,7 @@ from domogik.xpl.lib.xplconnector import *
 from domogik.common.configloader import *
 #from sqlalchemy import *
 
-class DBConnector():
+class DBConnector(xPLModule):
     '''
     Manage the connection between database and the xPL stuff
     Should be the *only* object to access the database in the core side
@@ -37,6 +37,7 @@ class DBConnector():
         '''
         Initialize database and xPL connection
         '''
+        xPLModule.__init__(self)
         l = logger.Logger('database_manager')
         self._log = l.get_logger()
         self._log.debug("Init database_manager instance")

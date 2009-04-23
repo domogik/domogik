@@ -162,8 +162,9 @@ remote-ip=%s
                     if mess.get_conf_key_value("target") == "*" or (
                             mess.get_conf_key_value("target") == self._source):
                         [l.new_message(mess) for l in self._listeners]
-                        self._log.debug("New message received : %s" % \
-                                mess.get_type())
+                        #Enabling this debug will really polute your logs
+                        #self._log.debug("New message received : %s" % \
+                        #        mess.get_type())
                 except XPLException:
                     pass
         self.unregister_thread(self._network)

@@ -42,6 +42,7 @@ class SysManager(xPLModule):
         '''
         Init manager and start listeners
         '''
+        xPLModule.__init__(self)
         self._components = {
             'x10': 'x10Main()',
             'datetime': 'xPLDateTime()',
@@ -151,8 +152,6 @@ class SysManager(xPLModule):
         lastpid = os.fork()
         if not lastpid:
             os.execlp(sys.executable, sys.executable, module.__file__)
-            self._log.debug("%s process started" % name)
-            exit(0)
         return lastpid
 
     def _is_component_running(self, component):

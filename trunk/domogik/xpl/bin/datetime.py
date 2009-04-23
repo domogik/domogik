@@ -26,14 +26,15 @@
 from time import localtime
 from domogik.xpl.lib.xplconnector import *
 from domogik.common.configloader import *
+import time
 
-
-class xPLDateTime():
+class xPLDateTime(xPLModule):
     '''
     Send date and time on the xPL network every minute
     '''
 
     def __init__(self):
+        xPLModule.__init__(self)
         self.__myxpl = Manager(module_name='datetime')
         self._timer = xPLTimer(10, self._send_datetime)
         self._timer.start()
