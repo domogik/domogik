@@ -52,6 +52,9 @@ class DeviceCategory(models.Model):
     """
     name = models.CharField(max_length=30)
 
+    def __unicode__(self):
+        return self.name
+
     class Meta:
         verbose_name_plural = "Device categories"
 
@@ -60,8 +63,21 @@ class DeviceTechnology(models.Model):
     """
     Examples : x10, plcbus, rfxcom, ...
     """
+    TYPETECHNOLOGY_CHOICES = (
+            ('cpl', 'cpl'),
+            ('wired_bus', 'Wired bus'),
+            ('wifi', 'wifi'),
+            ('wireless_bus', 'Wireless bus'),
+            ('rf', 'RF'),
+            ('ir', 'IR'),
+    )
+
     name = models.CharField(max_length=30)
     description = models.TextField(max_length=80, null=True, blank=True)
+    type = models.CharField(max_length=30, choices=TYPETECHNOLOGY_CHOICES)
+
+    def __unicode__(self):
+        return self.name
 
     class Meta:
         verbose_name_plural = "Device technologies"

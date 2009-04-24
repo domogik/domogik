@@ -57,9 +57,9 @@ class SampleDataHelper:
                 debugMode=True)
 
         # Create sample objects
-        x10 = DeviceTechnology.objects.create(name="x10")
-        plcbus = DeviceTechnology.objects.create(name="plcbus")
-        onewire = DeviceTechnology.objects.create(name="1-wire")
+        x10 = DeviceTechnology.objects.create(name="x10", type="cpl")
+        plcbus = DeviceTechnology.objects.create(name="plcbus", type="cpl")
+        onewire = DeviceTechnology.objects.create(name="1-wire", type="wired_bus")
 
         temperatureCat = DeviceCategory.objects.create(name="Temperature")
         heatingCat = DeviceCategory.objects.create(name="Heating")

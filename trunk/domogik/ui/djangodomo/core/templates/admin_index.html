@@ -136,7 +136,7 @@
             {% if techList %}
                 <ul>
                 {% for tech in techList %}
-                    <li>{{ tech.name }}</li>
+                    <li>{{ tech.name }} ({{ tech.type }})</li>
                 {% endfor %}
                 </ul>
             {% else %}
