@@ -23,7 +23,6 @@
 # $LastChangedDate: 2009-03-04 22:29:01 +0100 (mer. 04 mars 2009) $
 # $LastChangedRevision: 404 $
 
-
 from domogik.xpl.lib.xplconnector import *
 import domogik.common.logger
 
@@ -45,13 +44,15 @@ class Query():
     def query(self, technology, key, result, element = ''):
         '''
         Ask the config system for the value
-        @param technology : the technology of the item requesting the value, must exists in the config database
+        @param technology : the technology of the item requesting the value,
+        must exists in the config database
         @param element : the name of the element which requests config, None if
         it's a technolgy global parameter
         @param key : the key to fetch corresponding value
         '''
         self._res = result
-        Listener(self._query_cb, self.__myxpl, {'schema':'domogik.config','type':'xpl-stat'})
+        Listener(self._query_cb, self.__myxpl, 
+                {'schema': 'domogik.config', 'type': 'xpl-stat'})
         mess = Message()
         mess.set_type('xpl-cmnd')
         mess.set_schema('domogik.config')
@@ -66,6 +67,7 @@ class Query():
         Callback to receive message after a query() call
         @param message : the message received
         '''
-        self._log.debug("Config value received : %s" % message.get_key_value('value'))
+        self._log.debug("Config value received : %s" % 
+                message.get_key_value('value'))
         self._res.set_value(message.get_key_value('value'))
         self._res.get_lock().set()

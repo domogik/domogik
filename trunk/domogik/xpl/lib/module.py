@@ -57,7 +57,7 @@ class xPLModule():
         def __init__(self, stop_cb = None):
             '''
             Create xPLModule instance, which defines signal handlers
-            @param stop_cb : Additional method to call when a SIGTERM is received
+            @param stop_cb : Method to call when a SIGTERM is received
             '''
             self._threads = []
             self._timers = []
@@ -164,23 +164,23 @@ class xPLResult():
     '''
 
     def __init__(self):
-	self.value = None
-	self.event = threading.Event()
+        self.value = None
+        self.event = threading.Event()
 
     def set_value(self, value):
-	'''
-	Set the new value of the objet
-	'''
-	self.value = value
+        '''
+        Set the new value of the objet
+        '''
+        self.value = value
 
     def get_value(self):
-	'''
-	Get the value of the objet
-	'''
-	return self.value
+        '''
+        Get the value of the objet
+        '''
+        return self.value
 
     def get_lock(self):
-	'''
-	Returns an event item
-	'''
-	return self.event
+        '''
+        Returns an event item
+        '''
+        return self.event

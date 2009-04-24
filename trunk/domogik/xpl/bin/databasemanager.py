@@ -42,7 +42,8 @@ class DBConnector(xPLModule):
         self._log = l.get_logger()
         self._log.debug("Init database_manager instance")
         self.__myxpl = Manager(module_name='database_manager')
-        Listener(self._request_config_cb, self.__myxpl, {'schema':'domogik.config','type':'xpl-cmnd'})
+        Listener(self._request_config_cb, self.__myxpl,
+                {'schema': 'domogik.config', 'type': 'xpl-cmnd'})
         #cfgloader = Loader('database')
         #config = cfgloader.load()[1]
 
@@ -107,15 +108,12 @@ class DBConnector(xPLModule):
         @param key : the key of the config tuple to fetch
         '''
         #TODO : use the database
-        vals = {'x10':{'a3':{},
-                        'a2':{},
+        vals = {'x10': {'a3': {},
+                        'a2': {},
                         }
 
                 }
         return vals[techno][element][key]
-#        elmt_config = Table(self._prefix + 'config_element', self._metadata, autoload=True)
-#        s = users.select((elmt_config.c.name == element) & (elmt_config.c.key ==
-#        key) && (elmt_config.c.))
 
     def _fetch_techno_config(self, techno, key):
         '''
@@ -125,7 +123,7 @@ class DBConnector(xPLModule):
         '''
         #TODO : use the database
         vals = {'x10': {},
-                'global':{'pid_dir_path':'/tmp/'},
+                'global': {'pid_dir_path': '/tmp/'},
                 }
         try:
             return vals[techno][key]

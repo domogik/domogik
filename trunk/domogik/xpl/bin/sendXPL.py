@@ -33,7 +33,7 @@ from domogik.common import logger
 class Sender:
 
     supported_schemas = ["datetime.basic", "dawndusk.request", "x10.basic",
-            "sensor.basic","domogik.system"]
+            "sensor.basic", "domogik.system"]
 
     def __init__(self, schema=None, message=None):
         self._schema = schema
@@ -47,7 +47,6 @@ class Sender:
         self._log.debug("Send message : %s" % mess)
         self.__myxpl.send(mess)
         self.__myxpl.leave()
-        #exit(0)
 
     def parse_parameters(self):
         '''

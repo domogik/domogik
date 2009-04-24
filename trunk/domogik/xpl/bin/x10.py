@@ -37,9 +37,9 @@ class x10Main():
         This class is used to connect x10 (through heyu) to the xPL Network
         '''
         cfgloader = Loader('x10')
-		self._config = Query(self.__myxpl)
-		res = xPLResult()
-		self._config.query('x10','heyu_cfg_path',res)
+        self._config = Query(self.__myxpl)
+        res = xPLResult()
+        self._config.query('x10', 'heyu_cfg_path', res)
         try:
             self.__myx10 = X10API(res.get_value())
         except:

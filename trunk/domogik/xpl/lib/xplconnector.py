@@ -494,5 +494,3 @@ class xPLTimer():
             while not self._stop.is_set():
                 self._cb()
                 self._stop.wait(self._time)
-
-

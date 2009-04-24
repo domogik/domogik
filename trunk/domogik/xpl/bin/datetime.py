@@ -43,7 +43,6 @@ class xPLDateTime(xPLModule):
         self._timer.start()
         signal.pause()
 
-
     def _f(self, nb):
         '''
         Format the number

@@ -135,7 +135,6 @@ def is_component_running(component):
     '''
     global config
     return False
-    #return os.path.isfile('%s/%s.pid' % (config['pid_dir_path'], component))
 
 
 def init_config():

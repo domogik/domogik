@@ -22,8 +22,6 @@
 # $LastChangedBy: maxence $
 # $LastChangedDate: 2009-02-22 13:34:47 +0100 (dim 22 fév 2009) $
 # $LastChangedRevision: 395 $
-
-
 from domogik.xpl.lib.xplconnector import *
 from domogik.xpl.lib.module import *
 from domogik.xpl.lib.queryconfig import *
@@ -53,16 +51,16 @@ class SysManager(xPLModule):
         self._log = l.get_logger()
         self._log.debug("Init system manager")
         self.__myxpl = Manager(module_name='sysmanager')
-    	Listener(self._sys_cb, self.__myxpl, {
+        Listener(self._sys_cb, self.__myxpl, {
             'schema': 'domogik.system',
             'type': 'xpl-cmnd',
         })
         self._config = Query(self.__myxpl)
-    	res = xPLResult()
-        self._config.query('global','pid_dir_path', res)
+        res = xPLResult()
+        self._config.query('global', 'pid_dir_path', res)
 #        res.get_lock().wait()
         self._pid_dir_path = res.get_value()
-    
+
         self._log.debug("pid_dir_path got value %s" % self._pid_dir_path)
         self._log.info("System manager initialized")
 
@@ -158,7 +156,8 @@ class SysManager(xPLModule):
         '''
         Check if one component is still running == the pid file exists
         '''
-	self._log.debug("Test if %s is running on %s" %(component,self._pid_dir_path))
+        self._log.debug("Test if %s is running on %s" %
+                (component, self._pid_dir_path))
         pidfile = os.path.join(self._pid_dir_path,
                 component + ".pid")
         # TODO: test if process with given PID# actually running
