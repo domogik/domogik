@@ -47,6 +47,7 @@ class Logger():
               'error': logging.ERROR,
               'critical': logging.CRITICAL}
 
+        #FIXME : The config file seems not to be closed
         cfg = Loader()
         config = cfg.load()[0]
         file = "%s/%s.log" % (config['log_dir_path'], module_name)

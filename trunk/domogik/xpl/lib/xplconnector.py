@@ -88,6 +88,7 @@ class Manager(xPLModule):
             # xPLTimer
             self._SendHeartbeat()
             self._h_timer = xPLTimer(300, self._SendHeartbeat, self.get_stop())
+            self.register_timer(self._h_timer)
             self._h_timer.start()
             #And finally we start network listener in a thread
             self._stop_thread = False
@@ -97,14 +98,6 @@ class Manager(xPLModule):
             self._network.start()
             self._log.debug("xPL thread started for %s " % module_name)
 
-    def __del__(self):
-        '''
-        Called when the object instance is destructed
-        '''
-        try:
-            self._UDPSock.close()
-        except:
-            pass
 
     def leave(self):
         """
@@ -125,11 +118,10 @@ class Manager(xPLModule):
                 message.set_conf_key("source", self._source)
             if not message.has_conf_key("target"):
                 message.set_conf_key("target", "*")
-        except:
-            pass
-        finally:
             self._UDPSock.sendto(message.__str__(), ("255.255.255.255", 3865))
             self._log.debug("xPL Message sent")
+        except:
+            pass
 
     def _SendHeartbeat(self):
         """
@@ -163,17 +155,21 @@ remote-ip=%s
             readable, writeable, errored = select.select(
                     [self._UDPSock], [], [], 10)
             if len(readable) == 1:
-                data, addr = self._UDPSock.recvfrom(self._buff)
                 try:
-                    mess = Message(data)
-                    if mess.get_conf_key_value("target") == "*" or (
-                            mess.get_conf_key_value("target") == self._source):
-                        [l.new_message(mess) for l in self._listeners]
-                        #Enabling this debug will really polute your logs
-                        #self._log.debug("New message received : %s" % \
-                        #        mess.get_type())
-                except XPLException:
+                    data, addr = self._UDPSock.recvfrom(self._buff)
+                except:
                     pass
+                else:
+                    try:
+                        mess = Message(data)
+                        if mess.get_conf_key_value("target") == "*" or (
+                                mess.get_conf_key_value("target") == self._source):
+                            [l.new_message(mess) for l in self._listeners]
+                            #Enabling this debug will really polute your logs
+                            #self._log.debug("New message received : %s" % \
+                            #        mess.get_type())
+                    except XPLException:
+                        pass
 
     def add_listener(self, listener):
         """
