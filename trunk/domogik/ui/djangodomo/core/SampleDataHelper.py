@@ -86,13 +86,15 @@ class SampleDataHelper:
                 room=bedroom1,
                 type="appliance",
                 category=lightingCat,
-                isResetable=True)
+                isResetable=True
+        )
         DeviceProperty.objects.create(
                 key="value",
                 value="off",
                 valueType="BOOLEAN",
                 isChangeableByUser=True,
-                device=bedroom1BedsideLamp)
+                device=bedroom1BedsideLamp
+        )
         bedroom1Lamp = Device.objects.create(
                 name="Lamp",
                 technology=x10,
@@ -101,14 +103,16 @@ class SampleDataHelper:
                 room=bedroom1,
                 type="lamp",
                 category=lightingCat,
-                isResetable=True)
+                isResetable=True
+        )
         DeviceProperty.objects.create(
                 key="value",
                 value="100", # Variable value (dimmer)
                 valueType="ALPHANUM",
                 valueUnit="%",
                 isChangeableByUser=True,
-                device=bedroom1Lamp)
+                device=bedroom1Lamp
+        )
 
         bedroom2BedsideLamp = Device.objects.create(
                 name="Beside lamp",
@@ -118,14 +122,16 @@ class SampleDataHelper:
                 room=bedroom2,
                 type="appliance",
                 category=lightingCat,
-                isResetable=True)
+                isResetable=True
+        )
         DeviceProperty.objects.create(
                 key="value",
                 value="off",
                 valueType="BOOLEAN",
                 valueUnit="%",
                 isChangeableByUser=True,
-                device=bedroom2BedsideLamp)
+                device=bedroom2BedsideLamp
+        )
 
         bedroom2Lamp = Device.objects.create(
                 name="Lamp",
@@ -135,14 +141,16 @@ class SampleDataHelper:
                 room=bedroom2,
                 type="lamp",
                 category=lightingCat,
-                isResetable=True)
+                isResetable=True
+        )
         DeviceProperty.objects.create(
                 key="value",
                 value="100", # Variable value (dimmer)
                 valueType="ALPHANUM",
                 valueUnit="%",
                 isChangeableByUser=True,
-                device=bedroom2Lamp)
+                device=bedroom2Lamp
+        )
 
         loungeLamp = Device.objects.create(
                 name="Lamp",
@@ -152,14 +160,16 @@ class SampleDataHelper:
                 room=lounge,
                 type="lamp",
                 category=lightingCat,
-                isResetable=True)
+                isResetable=True
+        )
         DeviceProperty.objects.create(
                 key="value",
                 value="100", # Variable value (dimmer)
                 valueType="ALPHANUM",
                 valueUnit="%",
                 isChangeableByUser=True,
-                device=loungeLamp)
+                device=loungeLamp
+        )
 
         kitchenLamp = Device.objects.create(
                 name="Lamp",
@@ -169,7 +179,8 @@ class SampleDataHelper:
                 room=kitchen,
                 type="lamp",
                 category=lightingCat,
-                isResetable=True)
+                isResetable=True
+        )
 
         DeviceProperty.objects.create(
                 key="value",
@@ -177,7 +188,8 @@ class SampleDataHelper:
                 valueType="ALPHANUM",
                 valueUnit="%",
                 isChangeableByUser=True,
-                device=kitchenLamp)
+                device=kitchenLamp
+        )
 
         kitchenCoffeeMachine = Device.objects.create(
                 name="Coffee machine",
@@ -187,11 +199,13 @@ class SampleDataHelper:
                 room=kitchen,
                 type="appliance",
                 category=applianceCat,
-                isResetable=True)
+                isResetable=True
+        )
 
         DeviceProperty.objects.create(
                 key="value",
                 value="off",
                 valueType="BOOLEAN",
                 isChangeableByUser=True,
-                device=kitchenCoffeeMachine)
+                device=kitchenCoffeeMachine
+        )
