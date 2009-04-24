@@ -42,10 +42,10 @@ class DBConnector(xPLModule):
         self._log = l.get_logger()
         self._log.debug("Init database_manager instance")
         self.__myxpl = Manager(module_name='database_manager')
-        Listener(self._request_config_cb, self.__myxpl,{'schema':'domogik.config','type':'xpl-cmnd'})
+        Listener(self._request_config_cb, self.__myxpl, {'schema':'domogik.config','type':'xpl-cmnd'})
         #cfgloader = Loader('database')
         #config = cfgloader.load()[1]
-        
+
         #Build database url
 #        db_url = "%s://" % config['type']
 #        if config['username']:
@@ -61,7 +61,6 @@ class DBConnector(xPLModule):
 #        db = create_engine(db_url)
 #        self._metadata = BoundMetaData(db)
 #        self._prefix = config['prefix']
-
     def _request_config_cb(self, message):
         '''
         Callback to receive a request for some config stuff
@@ -75,7 +74,7 @@ class DBConnector(xPLModule):
         if element:
             self._send_config(techno, key, self._fetch_elmt_config(techno,
             element, key), message.get_conf_key_value("source"), element)
-        else:    
+        else:
             self._send_config(techno, key, self._fetch_techno_config(techno,
             key), message.get_conf_key_value("source"))
 
@@ -100,7 +99,6 @@ class DBConnector(xPLModule):
         mess.set_conf_key('target', module)
         self.__myxpl.send(mess)
 
-        
     def _fetch_elmt_config(self, techno, element, key):
         '''
         Fetch an element's config value in the database
@@ -109,8 +107,8 @@ class DBConnector(xPLModule):
         @param key : the key of the config tuple to fetch
         '''
         #TODO : use the database
-        vals = {'x10':    {'a3':{},
-                        'a2':{}
+        vals = {'x10':{'a3':{},
+                        'a2':{},
                         }
 
                 }
@@ -126,8 +124,8 @@ class DBConnector(xPLModule):
         @param key : the key of the config tuple to fetch
         '''
         #TODO : use the database
-        vals = { 'x10': {},
-                'global' : { 'pid_dir_path':'/tmp/'}
+        vals = {'x10': {},
+                'global':{'pid_dir_path':'/tmp/'},
                 }
         try:
             return vals[techno][key]
