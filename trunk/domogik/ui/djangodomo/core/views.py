@@ -36,6 +36,7 @@ from django.shortcuts import render_to_response
 from djangodomo.core.models import Area
 from djangodomo.core.models import Room
 from djangodomo.core.models import DeviceCategory
+from djangodomo.core.models import DeviceTechnology
 from djangodomo.core.models import DeviceProperty
 from djangodomo.core.models import DeviceCmdLog
 from djangodomo.core.models import Device
@@ -80,7 +81,7 @@ def index(request):
     areaList = Area.objects.all()
     roomList = Room.objects.all()
     deviceCategoryList = DeviceCategory.objects.all()
-    techList = Device.TECHNOLOGY_CHOICES
+    techList = DeviceTechnology.objects.all()
 
     if appSetting.adminMode == True:
         adminMode = "True"
@@ -316,7 +317,7 @@ def loadSampleData(request):
     roomList = Room.objects.all()
     deviceCategoryList = DeviceCategory.objects.all()
     deviceList = Device.objects.all()
-    techList = Device.TECHNOLOGY_CHOICES
+    techList = DeviceTechnology.objects.all()
 
     return render_to_response('admin_index.html', {
         'pageTitle': pageTitle,

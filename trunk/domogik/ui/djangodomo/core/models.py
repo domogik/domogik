@@ -31,6 +31,7 @@ from django.db import models
 
 class Area(models.Model):
     name = models.CharField(max_length=30)
+    description = models.TextField(max_length=255, null=True, blank=True)
 
     def __unicode__(self):
         return self.name
@@ -39,6 +40,7 @@ class Area(models.Model):
 class Room(models.Model):
     name = models.CharField(max_length=30)
     area = models.ForeignKey(Area)
+    description = models.TextField(max_length=255, null=True, blank=True)
 
     def __unicode__(self):
         return self.name
@@ -50,18 +52,38 @@ class DeviceCategory(models.Model):
     """
     name = models.CharField(max_length=30)
 
+    def __unicode__(self):
+        return self.name
+
     class Meta:
         verbose_name_plural = "Device categories"
 
 
-class Device(models.Model):
-    TECHNOLOGY_CHOICES = (
-            ('x10', 'X10'),
-            ('onewire', 'One-Wire'),
-            ('plcbus', 'PLCBus'),
+class DeviceTechnology(models.Model):
+    """
+    Examples : x10, plcbus, rfxcom, ...
+    """
+    TYPETECHNOLOGY_CHOICES = (
+            ('cpl', 'cpl'),
+            ('wired_bus', 'Wired bus'),
+            ('wifi', 'wifi'),
+            ('wireless_bus', 'Wireless bus'),
+            ('rf', 'RF'),
             ('ir', 'IR'),
     )
 
+    name = models.CharField(max_length=30)
+    description = models.TextField(max_length=80, null=True, blank=True)
+    type = models.CharField(max_length=30, choices=TYPETECHNOLOGY_CHOICES)
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        verbose_name_plural = "Device technologies"
+
+
+class Device(models.Model):
     TYPE_CHOICES = (
             ('appliance', 'Appliance'),
             ('lamp', 'Lamp'),
@@ -74,7 +96,7 @@ class Device(models.Model):
     reference = models.CharField(max_length=30, null=True, blank=True)
     address = models.CharField(max_length=30)
     description = models.TextField(max_length=80, null=True, blank=True)
-    technology = models.CharField(max_length=20, choices=TECHNOLOGY_CHOICES)
+    technology = models.ForeignKey(DeviceTechnology)
     # This is NOT user-defined
     type = models.CharField(max_length=20, choices=TYPE_CHOICES)
     # This is user-defined

@@ -26,6 +26,7 @@
 from djangodomo.core.models import Area
 from djangodomo.core.models import Room
 from djangodomo.core.models import DeviceCategory
+from djangodomo.core.models import DeviceTechnology
 from djangodomo.core.models import DeviceProperty
 from djangodomo.core.models import DeviceCmdLog
 from djangodomo.core.models import Device
@@ -42,6 +43,7 @@ class SampleDataHelper:
         ApplicationSetting.objects.all().delete()
         StateReading.objects.all().delete()
         DeviceCategory.objects.all().delete()
+        DeviceTechnology.objects.all().delete()
         DeviceProperty.objects.all().delete()
         DeviceCmdLog.objects.all().delete()
         Device.objects.all().delete()
@@ -55,6 +57,9 @@ class SampleDataHelper:
                 debugMode=True)
 
         # Create sample objects
+        x10 = DeviceTechnology.objects.create(name="x10", type="cpl")
+        plcbus = DeviceTechnology.objects.create(name="plcbus", type="cpl")
+        onewire = DeviceTechnology.objects.create(name="1-wire", type="wired_bus")
 
         temperatureCat = DeviceCategory.objects.create(name="Temperature")
         heatingCat = DeviceCategory.objects.create(name="Heating")
@@ -75,7 +80,7 @@ class SampleDataHelper:
 
         bedroom1BedsideLamp = Device.objects.create(
                 name="Beside lamp",
-                technology="x10",
+                technology=x10,
                 reference="AM12",
                 address="A1",
                 room=bedroom1,
@@ -90,7 +95,7 @@ class SampleDataHelper:
                 device=bedroom1BedsideLamp)
         bedroom1Lamp = Device.objects.create(
                 name="Lamp",
-                technology="x10",
+                technology=x10,
                 reference="LM12",
                 address="A2",
                 room=bedroom1,
@@ -107,7 +112,7 @@ class SampleDataHelper:
 
         bedroom2BedsideLamp = Device.objects.create(
                 name="Beside lamp",
-                technology="x10",
+                technology=x10,
                 reference="AM12",
                 address="B1",
                 room=bedroom2,
@@ -124,7 +129,7 @@ class SampleDataHelper:
 
         bedroom2Lamp = Device.objects.create(
                 name="Lamp",
-                technology="x10",
+                technology=x10,
                 reference="LM12",
                 address="B2",
                 room=bedroom2,
@@ -141,7 +146,7 @@ class SampleDataHelper:
 
         loungeLamp = Device.objects.create(
                 name="Lamp",
-                technology="x10",
+                technology=x10,
                 reference="LM12",
                 address="C1",
                 room=lounge,
@@ -158,7 +163,7 @@ class SampleDataHelper:
 
         kitchenLamp = Device.objects.create(
                 name="Lamp",
-                technology="x10",
+                technology=x10,
                 reference="LM12",
                 address="D1",
                 room=kitchen,
@@ -176,7 +181,7 @@ class SampleDataHelper:
 
         kitchenCoffeeMachine = Device.objects.create(
                 name="Coffee machine",
-                technology="x10",
+                technology=x10,
                 reference="AM12",
                 address="D2",
                 room=kitchen,

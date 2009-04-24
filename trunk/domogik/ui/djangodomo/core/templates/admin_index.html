@@ -135,8 +135,8 @@
             <hr/>
             {% if techList %}
                 <ul>
-                {% for key,value in techList %}
-                    <li>{{ value }}</li>
+                {% for tech in techList %}
+                    <li>{{ tech.name }} ({{ tech.type }})</li>
                 {% endfor %}
                 </ul>
             {% else %}
