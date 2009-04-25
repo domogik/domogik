@@ -121,7 +121,8 @@ class Manager(xPLModule):
             self._UDPSock.sendto(message.__str__(), ("255.255.255.255", 3865))
             self._log.debug("xPL Message sent")
         except:
-            pass
+            self._log.warning("Error during send of message")
+            self._log.debug(sys.exc_info()[2])
 
     def _SendHeartbeat(self):
         """
@@ -130,7 +131,8 @@ class Manager(xPLModule):
         This make the application able to be discovered by the hub
         """
         # Sub routine for sending a heartbeat
-        self.send("""\
+
+        mess = """\
 xpl-stat
 {
 hop=1
@@ -143,7 +145,8 @@ interval=5
 port=%s
 remote-ip=%s
 }
-""" % (self._source, self._port, self._ip))
+""" % (self._source, self._port, self._ip)
+        self._UDPSock.sendto(mess, ("127.0.0.1", 3865))
 
     def _run_thread_monitor(self):
         """
@@ -491,6 +494,7 @@ class xPLTimer():
             '''
             Call the callback every X seconds
             '''
+            print "Start timer"
             while not self._stop.is_set():
                 self._cb()
                 self._stop.wait(self._time)
