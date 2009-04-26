@@ -23,6 +23,7 @@
 # $LastChangedDate: 2009-02-13 09:20:19 +0100 (ven. 13 févr. 2009) $
 # $LastChangedRevision: 357 $
 
+import sys
 from django.db import models
 
 # __unicode__ is to output a representation of the object as a unicode string
@@ -104,7 +105,8 @@ class Device(models.Model):
     room = models.ForeignKey(Room)
     canGiveFeedback = models.BooleanField("Can give feedback", default=False)
     isResetable = models.BooleanField("Is resetable", default=False)
-    unitOfStoredValues = models.CharField(max_length=30, blank=True)
+    initialValue = models.CharField("Initial value", max_length=80)
+    unitOfStoredValues = models.CharField("Unit used for stored values", max_length=30, blank=True)
     canHaveInputValue = models.BooleanField("Can have input value", default=False)
 
     def isLamp(self):
@@ -115,6 +117,13 @@ class Device(models.Model):
 
     def canBeSwitchedOff(self):
         return isLamp() or isAppliance()
+
+    def getLastValue(self):
+        deviceStats = DeviceStats.objects.all().filter(device__id=self.id).order_by('-date')
+        if deviceStats:
+          return deviceStats[0].value.lower()
+        else:
+          return self.initialValue
 
     def __unicode__(self):
         return u"%s - %s (%s)" % (self.name, self.address, self.reference)

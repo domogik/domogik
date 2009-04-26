@@ -84,6 +84,7 @@ class SampleDataHelper:
                 room=bedroom1,
                 type="appliance",
                 category=lightingCat,
+                initialValue="off",
                 unitOfStoredValues="",
                 canHaveInputValue=False,
                 isResetable=True
@@ -103,6 +104,7 @@ class SampleDataHelper:
                 room=bedroom1,
                 type="lamp",
                 category=lightingCat,
+                initialValue="100",
                 unitOfStoredValues="%",
                 canHaveInputValue=True,
                 isResetable=True
@@ -124,6 +126,7 @@ class SampleDataHelper:
                 room=bedroom2,
                 type="appliance",
                 category=lightingCat,
+                initialValue="off",
                 unitOfStoredValues="",
                 canHaveInputValue=False,
                 isResetable=True
@@ -145,6 +148,7 @@ class SampleDataHelper:
                 room=bedroom2,
                 type="lamp",
                 category=lightingCat,
+                initialValue="100",
                 unitOfStoredValues="%",
                 canHaveInputValue=True,
                 isResetable=True
@@ -166,6 +170,7 @@ class SampleDataHelper:
                 room=lounge,
                 type="lamp",
                 category=lightingCat,
+                initialValue="100",
                 unitOfStoredValues="%",
                 canHaveInputValue=True,
                 isResetable=True
@@ -187,6 +192,7 @@ class SampleDataHelper:
                 room=kitchen,
                 type="lamp",
                 category=lightingCat,
+                initialValue="100",
                 unitOfStoredValues="%",
                 canHaveInputValue=True,
                 isResetable=True
@@ -209,6 +215,7 @@ class SampleDataHelper:
                 room=kitchen,
                 type="appliance",
                 category=applianceCat,
+                initialValue="off",
                 unitOfStoredValues="",
                 canHaveInputValue=False,
                 isResetable=True
