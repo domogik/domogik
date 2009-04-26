@@ -46,7 +46,7 @@ class Sender:
         mess = self.forge_message()
         self._log.debug("Send message : %s" % mess)
         self.__myxpl.send(mess)
-        self.__myxpl.leave()
+        self.__myxpl.force_leave()
 
     def parse_parameters(self):
         '''

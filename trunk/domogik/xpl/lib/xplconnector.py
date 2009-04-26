@@ -82,6 +82,7 @@ class Manager(xPLModule):
             self._log.error("Can't bind to the port %i" % self._port)
             exit(1)
         else:
+            self.add_stop_cb(self.leave)
             self._port = self._UDPSock.getsockname()[1]
             self._ip = ip
             # All is good, we start sending Heartbeat every 5 minutes using
@@ -146,7 +147,8 @@ port=%s
 remote-ip=%s
 }
 """ % (self._source, self._port, self._ip)
-        self._UDPSock.sendto(mess, ("127.0.0.1", 3865))
+        if not self.should_stop():
+            self._UDPSock.sendto(mess, ("255.255.255.255", 3865))
 
     def _run_thread_monitor(self):
         """
@@ -155,24 +157,28 @@ remote-ip=%s
         If it is, call all listeners
         """
         while not self.should_stop():
-            readable, writeable, errored = select.select(
+            try:
+                readable, writeable, errored = select.select(
                     [self._UDPSock], [], [], 10)
-            if len(readable) == 1:
-                try:
-                    data, addr = self._UDPSock.recvfrom(self._buff)
-                except:
-                    pass
-                else:
+            except:
+                self._log.info("Error during the read of the socket : %s" % sys.exc_info()[2])
+            else:
+                if len(readable) == 1:
                     try:
-                        mess = Message(data)
-                        if mess.get_conf_key_value("target") == "*" or (
-                                mess.get_conf_key_value("target") == self._source):
-                            [l.new_message(mess) for l in self._listeners]
-                            #Enabling this debug will really polute your logs
-                            #self._log.debug("New message received : %s" % \
-                            #        mess.get_type())
-                    except XPLException:
+                        data, addr = self._UDPSock.recvfrom(self._buff)
+                    except:
                         pass
+                    else:
+                        try:
+                            mess = Message(data)
+                            if mess.get_conf_key_value("target") == "*" or (
+                                    mess.get_conf_key_value("target") == self._source):
+                                [l.new_message(mess) for l in self._listeners]
+                                #Enabling this debug will really polute your logs
+                                #self._log.debug("New message received : %s" % \
+                                #        mess.get_type())
+                        except XPLException:
+                            self._log.warning("XPL Exception occured in : %s" % sys.exc_info()[2])
 
     def add_listener(self, listener):
         """

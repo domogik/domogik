@@ -134,14 +134,9 @@ class xPLModule():
         def hand_leave(self, signum, frame):
             '''
             Handler called when a SIGTERM is catched
-            This will set event to leave the current threads of the module
-            then force threads to stop after 5 seconds.
             '''
             self._log.debug('Signal SIGTERM catched')
             self.force_leave()
-            for cb in self._stop_cb:
-                print "Calling CB"
-                cb()
 
         def force_leave(self):
             '''
@@ -156,6 +151,9 @@ class xPLModule():
             for t in self._timers:
                 t.stop()
                 print "Timer stopped %s" % t
+            for cb in self._stop_cb:
+                print "Calling CB"
+                cb()
             print "End Force leave"
 
 class xPLResult():
