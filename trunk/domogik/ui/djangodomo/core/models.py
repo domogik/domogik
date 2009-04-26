@@ -104,6 +104,7 @@ class Device(models.Model):
     room = models.ForeignKey(Room)
     canGiveFeedback = models.BooleanField("Can give feedback", default=False)
     isResetable = models.BooleanField("Is resetable", default=False)
+    canHaveInputValue = models.BooleanField("Can have input value", default=False)
 
     def isLamp(self):
         return self.type.lower() == 'lamp'
@@ -111,15 +112,34 @@ class Device(models.Model):
     def isAppliance(self):
         return self.type.lower() == 'appliance'
 
-    def canBeSwitchedOnOff(self):
-        return self.type.lower() == 'appliance' or self.type.lower() == 'lamp'
+    def canBeSwitchedOff(self):
+        return isLamp() or isAppliance()
 
-    def canHaveInputValue(self):
-        # TODO : Add here supported devices
-        return self.type.lower() == 'lamp'
+    def getLastValue(self):
+        return DeviceStats.objects.order_by('date')[0]
 
     def __unicode__(self):
         return u"%s - %s (%s)" % (self.name, self.address, self.reference)
+
+
+class DeviceStats(models.Model):
+    date = models.DateTimeField()
+    device = models.ForeignKey(Device)
+    value = models.CharField(max_length=30)
+    unit = models.CharField(max_length=5)
+
+
+class SystemAccount(models.Model):
+    login = models.CharField(max_length=20)
+    password = models.CharField(max_length=20)
+    isAdmin = models.BooleanField("Admin")
+
+
+class User(models.Model):
+    firstName = models.CharField(max_length=20)
+    lastName = models.CharField(max_length=30)
+    birthDate = models.DateField()
+    systemAccount = models.ForeignKey(SystemAccount)
 
 
 class DeviceProperty(models.Model):
@@ -147,7 +167,7 @@ class DeviceProperty(models.Model):
     def __unicode__(self):
         return u"%s = %s" % (self.key, self.value)
 
-
+"""
 class DeviceCmdLog(models.Model):
     date = models.DateTimeField()
     value = models.CharField(max_length=80)
@@ -159,12 +179,11 @@ class DeviceCmdLog(models.Model):
         return u"%s: %s (success=%s)" % (self.date, self.value,
                 self.isSuccessful)
 
-
 class StateReading(models.Model):
     device = models.ForeignKey(Device)
     value = models.FloatField()
     date = models.DateTimeField()
-
+"""
 
 class ApplicationSetting(models.Model):
     # TODO : make sure there is only one line for this model

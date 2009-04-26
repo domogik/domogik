@@ -38,9 +38,8 @@ from djangodomo.core.models import Room
 from djangodomo.core.models import DeviceCategory
 from djangodomo.core.models import DeviceTechnology
 from djangodomo.core.models import DeviceProperty
-from djangodomo.core.models import DeviceCmdLog
+from djangodomo.core.models import DeviceStats
 from djangodomo.core.models import Device
-from djangodomo.core.models import StateReading
 from djangodomo.core.models import ApplicationSetting
 from djangodomo.core.forms import ApplicationSettingForm
 
@@ -126,7 +125,7 @@ def __sendValueToDevice(deviceId, propertyKey, propertyValue, appSetting):
     oldValue = deviceProperty.value
     newValue = propertyValue
     if oldValue != newValue:
-        if device.technology.lower() == 'x10':
+        if device.technology.name.lower() == 'x10':
             error = __sendX10Cmd(device, oldValue, newValue,
                     appSetting.simulationMode)
 
@@ -139,7 +138,7 @@ def __sendValueToDevice(deviceId, propertyKey, propertyValue, appSetting):
                     deviceProperty.value = 0
 
             deviceProperty.save()
-            __writeDeviceCmdLog(deviceId, deviceProperty.value,
+            __writeDeviceStats(deviceId, deviceProperty.value,
                     "Nothing special", True)
 
 
@@ -171,35 +170,37 @@ def __sendX10Cmd(device, oldValue, newValue, simulationMode):
     return output
 
 
-def __writeDeviceCmdLog(deviceId, newValue, newComment, newIsSuccessful):
+def __writeDeviceStats(deviceId, newValue, newComment, newIsSuccessful):
     """
-    Write device command log
+    Write device stats
     """
     newDevice = Device.objects.get(id=deviceId)
-    deviceCmdLog = DeviceCmdLog(
+    deviceStats = DeviceStats(
         date = datetime.datetime.now(),
         device = newDevice,
         value = newValue,
-        comment = newComment,
-        isSuccessful = newIsSuccessful)
-    deviceCmdLog.save()
+        unit = "unit",
+        #comment = newComment,
+        #isSuccessful = newIsSuccessful
+    )
+    deviceStats.save()
 
 
 def device(request, deviceId):
     """
     Details of a device
     """
-    hasCmdLogs = ""
+    hasStats = ""
     adminMode = ""
     pageTitle = "Device details"
-
-    if request.method == 'POST': # An action was submitted
-        # TODO check the value of the button (reset or update value)
-        __updateDeviceValues(request)
 
     appSetting = __readApplicationSetting()
     if appSetting.adminMode == True:
         adminMode = "True"
+
+    if request.method == 'POST': # An action was submitted
+        # TODO check the value of the button (reset or update value)
+        __updateDeviceValues(request, appSetting)
 
     # Read device information
     try:
@@ -207,23 +208,23 @@ def device(request, deviceId):
     except Device.DoesNotExist:
         raise Http404
 
-    if DeviceCmdLog.objects.filter(device__id=device.id).count() > 0:
-        hasCmdLogs = "True"
+    if DeviceStats.objects.filter(device__id=device.id).count() > 0:
+        hasStats = "True"
 
     return render_to_response('device.html', {
         'device': device,
-        'hasCmdLogs': hasCmdLogs,
+        'hasStats': hasStats,
         'adminMode': adminMode,
         'pageTitle': pageTitle,
     })
 
 
-def deviceCmdLogs(request, deviceId):
+def deviceStats(request, deviceId):
     """
-    View for logs of a device or all devices
+    View for stats of a device or all devices
     """
     deviceAll = ""
-    pageTitle = "Device logs"
+    pageTitle = "Device stats"
     adminMode = ""
 
     appSetting = __readApplicationSetting()
@@ -231,38 +232,38 @@ def deviceCmdLogs(request, deviceId):
         adminMode = "True"
 
     cmd = QueryDict.get(request.POST, "cmd", "")
-    if cmd == "clearLogs" and appSetting.adminMode:
-        __clearDeviceCmdLogs(request, deviceId, appSetting.adminMode)
+    if cmd == "clearStats" and appSetting.adminMode:
+        __clearDeviceStats(request, deviceId, appSetting.adminMode)
 
-    # Read device logs
+    # Read device stats
     if deviceId == "0": # For all devices
         deviceAll = "True"
-        deviceCmdLogList = DeviceCmdLog.objects.all()
+        deviceStatsList = DeviceStats.objects.all()
     else:
         try:
-            deviceCmdLogList = DeviceCmdLog.objects.filter(device__id=deviceId)
-        except DeviceCmdLog.DoesNotExist:
+            deviceStatsList = DeviceStats.objects.filter(device__id=deviceId)
+        except DeviceStats.DoesNotExist:
             raise Http404
 
-    return render_to_response('device_cmd_logs.html', {
+    return render_to_response('device_stats.html', {
         'deviceId': deviceId,
         'adminMode': adminMode,
-        'deviceCmdLogList': deviceCmdLogList,
+        'deviceStatsList': deviceStatsList,
         'deviceAll': deviceAll,
         'pageTitle': pageTitle,
     })
 
 
-def __clearDeviceCmdLogs(request, deviceId, isAdminMode):
+def __clearDeviceStats(request, deviceId, isAdminMode):
     """
-    Clear logs of a device or all devices
+    Clear stats of a device or all devices
     """
     if deviceId == "0": # For all devices
-        DeviceCmdLog.objects.all().delete()
+        DeviceStats.objects.all().delete()
     else:
         try:
-            DeviceCmdLog.objects.filter(device__id=deviceId).delete()
-        except DeviceCmdLog.DoesNotExist:
+            DeviceStats.objects.filter(device__id=deviceId).delete()
+        except DeviceStats.DoesNotExist:
             raise Http404
 
 

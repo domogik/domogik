@@ -28,9 +28,8 @@ from djangodomo.core.models import Room
 from djangodomo.core.models import DeviceCategory
 from djangodomo.core.models import DeviceTechnology
 from djangodomo.core.models import DeviceProperty
-from djangodomo.core.models import DeviceCmdLog
+from djangodomo.core.models import DeviceStats
 from djangodomo.core.models import Device
-from djangodomo.core.models import StateReading
 from djangodomo.core.models import ApplicationSetting
 
 
@@ -41,11 +40,10 @@ class SampleDataHelper:
 
     def remove(self):
         ApplicationSetting.objects.all().delete()
-        StateReading.objects.all().delete()
         DeviceCategory.objects.all().delete()
         DeviceTechnology.objects.all().delete()
         DeviceProperty.objects.all().delete()
-        DeviceCmdLog.objects.all().delete()
+        DeviceStats.objects.all().delete()
         Device.objects.all().delete()
         Room.objects.all().delete()
         Area.objects.all().delete()
@@ -86,6 +84,7 @@ class SampleDataHelper:
                 room=bedroom1,
                 type="appliance",
                 category=lightingCat,
+                canHaveInputValue=False,
                 isResetable=True
         )
         DeviceProperty.objects.create(
@@ -103,6 +102,7 @@ class SampleDataHelper:
                 room=bedroom1,
                 type="lamp",
                 category=lightingCat,
+                canHaveInputValue=True,
                 isResetable=True
         )
         DeviceProperty.objects.create(
@@ -122,6 +122,7 @@ class SampleDataHelper:
                 room=bedroom2,
                 type="appliance",
                 category=lightingCat,
+                canHaveInputValue=False,
                 isResetable=True
         )
         DeviceProperty.objects.create(
@@ -141,6 +142,7 @@ class SampleDataHelper:
                 room=bedroom2,
                 type="lamp",
                 category=lightingCat,
+                canHaveInputValue=True,
                 isResetable=True
         )
         DeviceProperty.objects.create(
@@ -160,6 +162,7 @@ class SampleDataHelper:
                 room=lounge,
                 type="lamp",
                 category=lightingCat,
+                canHaveInputValue=True,
                 isResetable=True
         )
         DeviceProperty.objects.create(
@@ -179,6 +182,7 @@ class SampleDataHelper:
                 room=kitchen,
                 type="lamp",
                 category=lightingCat,
+                canHaveInputValue=True,
                 isResetable=True
         )
 
@@ -199,6 +203,7 @@ class SampleDataHelper:
                 room=kitchen,
                 type="appliance",
                 category=applianceCat,
+                canHaveInputValue=False,
                 isResetable=True
         )
 

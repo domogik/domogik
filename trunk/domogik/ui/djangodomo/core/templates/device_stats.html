@@ -24,11 +24,11 @@
 {% extends "base.html" %}
 
 {% block script %}
-    function clearLogs() {
-        if (confirm("Are you sure you want to clear logs ?")) {
-            document.forms['deviceLogsForm'].cmd.value = "clearLogs"
-            document.forms['deviceLogsForm'].action = "{% url deviceCmdLogsView deviceId %}"
-            document.forms['deviceLogsForm'].submit()
+    function clearStats() {
+        if (confirm("Are you sure you want to clear stats ?")) {
+            document.forms['deviceStatsForm'].cmd.value = "clearStats"
+            document.forms['deviceStatsForm'].action = "{% url deviceStatsView deviceId %}"
+            document.forms['deviceStatsForm'].submit()
         }
     }
 {% endblock %}
@@ -36,25 +36,23 @@
 {% block title %}{{ pageTitle }}{% endblock %}
 
 {% block content %}
-    <form name="deviceLogsForm" method="POST" action="">
+    <form name="deviceStatsForm" method="POST" action="">
     <div id="list">
-    {% if deviceCmdLogList %}
+    {% if deviceStatsList %}
         <table>
             <tr>
                 <th>Date</th>
                 <th>Device</th>
                 <th>Value</th>
-                <th>Successful</th>
-                <th>Comment</th>
+                <th>Unit</th>
             </tr>
 
-            {% for deviceCmdLog in deviceCmdLogList %}
+            {% for deviceStat in deviceStatsList %}
                 <tr class="{% cycle 'oddRow' 'evenRow' %}">
-                    <td>{{ deviceCmdLog.date }}</td>
-                    <td>{{ deviceCmdLog.device.name }}</td>
-                    <td>{{ deviceCmdLog.value }}</td>
-                    <td>{{ deviceCmdLog.isSuccessful }}</td>
-                    <td>{{ deviceCmdLog.comment }}</td>
+                    <td>{{ deviceStat.date }}</td>
+                    <td>{{ deviceStat.device.name }}</td>
+                    <td>{{ deviceStat.value }}</td>
+                    <td>{{ deviceStat.unit }}</td>
                 </tr>
             {% endfor %}
         </table>
@@ -62,12 +60,12 @@
             <p></p>
             <table>
                 <tr>
-                    <td><input type="button" name="clearLogsButton" onclick="clearLogs()" value="Clear logs"/>
+                    <td><input type="button" name="clearStatsButton" onclick="clearStats()" value="Clear stats"/>
                 </tr>
             </table>
         {% endif %}
     {% else %}
-        <p>No logs found !</p>
+        <p>No stats found !</p>
     {% endif %}
     </div>
 
