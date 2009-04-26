@@ -179,7 +179,7 @@ def __writeDeviceStats(deviceId, newValue, newComment, newIsSuccessful):
         date = datetime.datetime.now(),
         device = newDevice,
         value = newValue,
-        unit = "unit",
+        unit = newDevice.unitOfStoredValues,
         #comment = newComment,
         #isSuccessful = newIsSuccessful
     )

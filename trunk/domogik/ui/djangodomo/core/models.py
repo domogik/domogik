@@ -104,6 +104,7 @@ class Device(models.Model):
     room = models.ForeignKey(Room)
     canGiveFeedback = models.BooleanField("Can give feedback", default=False)
     isResetable = models.BooleanField("Is resetable", default=False)
+    unitOfStoredValues = models.CharField(max_length=30, blank=True)
     canHaveInputValue = models.BooleanField("Can have input value", default=False)
 
     def isLamp(self):
@@ -114,9 +115,6 @@ class Device(models.Model):
 
     def canBeSwitchedOff(self):
         return isLamp() or isAppliance()
-
-    def getLastValue(self):
-        return DeviceStats.objects.order_by('date')[0]
 
     def __unicode__(self):
         return u"%s - %s (%s)" % (self.name, self.address, self.reference)
