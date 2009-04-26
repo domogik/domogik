@@ -37,7 +37,6 @@ from djangodomo.core.models import Area
 from djangodomo.core.models import Room
 from djangodomo.core.models import DeviceCategory
 from djangodomo.core.models import DeviceTechnology
-from djangodomo.core.models import DeviceProperty
 from djangodomo.core.models import DeviceStats
 from djangodomo.core.models import Device
 from djangodomo.core.models import ApplicationSetting
@@ -101,10 +100,9 @@ def __updateDeviceValues(request, appSetting):
     Update device values (main control page)
     """
     for deviceId in QueryDict.getlist(request.POST, "deviceId"):
-        keyList = QueryDict.getlist(request.POST, "key" + deviceId)
         valueList = QueryDict.getlist(request.POST, "value" + deviceId)
-        for i in range(len(keyList)):
-            __sendValueToDevice(deviceId, keyList[i], valueList[i], appSetting)
+        for i in range(len(valueList)):
+            __sendValueToDevice(deviceId, valueList[i], appSetting)
 
     # Get all values posted over the form
     # For each device :
@@ -113,32 +111,27 @@ def __updateDeviceValues(request, appSetting):
     #       Log the result
 
 
-def __sendValueToDevice(deviceId, propertyKey, propertyValue, appSetting):
+def __sendValueToDevice(deviceId, newValue, appSetting):
     """
     Send a value to a device
     """
     error = ""
     # Read previous value, and update it if necessary
     device = Device.objects.get(pk=deviceId)
-    deviceProperty = DeviceProperty.objects.get(device__id=deviceId,
-            key=propertyKey)
-    oldValue = deviceProperty.value
-    newValue = propertyValue
+    oldValue = device.getLastValue()
     if oldValue != newValue:
         if device.technology.name.lower() == 'x10':
             error = __sendX10Cmd(device, oldValue, newValue,
                     appSetting.simulationMode)
 
         if error == "":
-            deviceProperty.value = newValue
             if device.isLamp():
                 if newValue == "on":
-                    deviceProperty.value = 100
+                    newValue = "100"
                 elif newValue == "off":
-                    deviceProperty.value = 0
+                    newValue = "0"
 
-            deviceProperty.save()
-            __writeDeviceStats(deviceId, deviceProperty.value,
+            __writeDeviceStats(deviceId, newValue,
                     "Nothing special", True)
 
 

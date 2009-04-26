@@ -27,7 +27,6 @@ from djangodomo.core.models import Area
 from djangodomo.core.models import Room
 from djangodomo.core.models import DeviceCategory
 from djangodomo.core.models import DeviceTechnology
-from djangodomo.core.models import DeviceProperty
 from djangodomo.core.models import DeviceStats
 from djangodomo.core.models import Device
 from djangodomo.core.models import ApplicationSetting
@@ -42,7 +41,6 @@ class SampleDataHelper:
         ApplicationSetting.objects.all().delete()
         DeviceCategory.objects.all().delete()
         DeviceTechnology.objects.all().delete()
-        DeviceProperty.objects.all().delete()
         DeviceStats.objects.all().delete()
         Device.objects.all().delete()
         Room.objects.all().delete()
@@ -86,16 +84,10 @@ class SampleDataHelper:
                 category=lightingCat,
                 initialValue="off",
                 unitOfStoredValues="",
-                canHaveInputValue=False,
+                isValueChangeableByUser=True,
                 isResetable=True
         )
-        DeviceProperty.objects.create(
-                key="value",
-                value="off",
-                valueType="BOOLEAN",
-                isChangeableByUser=True,
-                device=bedroom1BedsideLamp
-        )
+
         bedroom1Lamp = Device.objects.create(
                 name="Lamp",
                 technology=x10,
@@ -106,16 +98,8 @@ class SampleDataHelper:
                 category=lightingCat,
                 initialValue="100",
                 unitOfStoredValues="%",
-                canHaveInputValue=True,
+                isValueChangeableByUser=True,
                 isResetable=True
-        )
-        DeviceProperty.objects.create(
-                key="value",
-                value="100", # Variable value (dimmer)
-                valueType="ALPHANUM",
-                valueUnit="%",
-                isChangeableByUser=True,
-                device=bedroom1Lamp
         )
 
         bedroom2BedsideLamp = Device.objects.create(
@@ -128,16 +112,8 @@ class SampleDataHelper:
                 category=lightingCat,
                 initialValue="off",
                 unitOfStoredValues="",
-                canHaveInputValue=False,
+                isValueChangeableByUser=True,
                 isResetable=True
-        )
-        DeviceProperty.objects.create(
-                key="value",
-                value="off",
-                valueType="BOOLEAN",
-                valueUnit="%",
-                isChangeableByUser=True,
-                device=bedroom2BedsideLamp
         )
 
         bedroom2Lamp = Device.objects.create(
@@ -150,16 +126,8 @@ class SampleDataHelper:
                 category=lightingCat,
                 initialValue="100",
                 unitOfStoredValues="%",
-                canHaveInputValue=True,
+                isValueChangeableByUser=True,
                 isResetable=True
-        )
-        DeviceProperty.objects.create(
-                key="value",
-                value="100", # Variable value (dimmer)
-                valueType="ALPHANUM",
-                valueUnit="%",
-                isChangeableByUser=True,
-                device=bedroom2Lamp
         )
 
         loungeLamp = Device.objects.create(
@@ -172,16 +140,8 @@ class SampleDataHelper:
                 category=lightingCat,
                 initialValue="100",
                 unitOfStoredValues="%",
-                canHaveInputValue=True,
+                isValueChangeableByUser=True,
                 isResetable=True
-        )
-        DeviceProperty.objects.create(
-                key="value",
-                value="100", # Variable value (dimmer)
-                valueType="ALPHANUM",
-                valueUnit="%",
-                isChangeableByUser=True,
-                device=loungeLamp
         )
 
         kitchenLamp = Device.objects.create(
@@ -194,17 +154,8 @@ class SampleDataHelper:
                 category=lightingCat,
                 initialValue="100",
                 unitOfStoredValues="%",
-                canHaveInputValue=True,
+                isValueChangeableByUser=True,
                 isResetable=True
-        )
-
-        DeviceProperty.objects.create(
-                key="value",
-                value="100", # Variable value (dimmer)
-                valueType="ALPHANUM",
-                valueUnit="%",
-                isChangeableByUser=True,
-                device=kitchenLamp
         )
 
         kitchenCoffeeMachine = Device.objects.create(
@@ -217,14 +168,6 @@ class SampleDataHelper:
                 category=applianceCat,
                 initialValue="off",
                 unitOfStoredValues="",
-                canHaveInputValue=False,
+                isValueChangeableByUser=True,
                 isResetable=True
-        )
-
-        DeviceProperty.objects.create(
-                key="value",
-                value="off",
-                valueType="BOOLEAN",
-                isChangeableByUser=True,
-                device=kitchenCoffeeMachine
         )

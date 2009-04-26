@@ -107,7 +107,7 @@ class Device(models.Model):
     isResetable = models.BooleanField("Is resetable", default=False)
     initialValue = models.CharField("Initial value", max_length=80)
     unitOfStoredValues = models.CharField("Unit used for stored values", max_length=30, blank=True)
-    canHaveInputValue = models.BooleanField("Can have input value", default=False)
+    isValueChangeableByUser = models.BooleanField("Is value changeable by user")
 
     def isLamp(self):
         return self.type.lower() == 'lamp'
@@ -148,31 +148,6 @@ class User(models.Model):
     birthDate = models.DateField()
     systemAccount = models.ForeignKey(SystemAccount)
 
-
-class DeviceProperty(models.Model):
-    VALUETYPE_CHOICES = (
-            ('BOOLEAN', 'BOOLEAN'),
-            ('ALPHANUM', 'ALPHANUM'),
-    )
-    VALUE_UNIT_CHOICES = (
-            ('%', '%'),
-    )
-
-    key = models.CharField(max_length=30)
-    value = models.CharField(max_length=80)
-    valueType = models.CharField("Value type", max_length=20,
-            choices=VALUETYPE_CHOICES)
-    valueUnit = models.CharField("Value unit", max_length=30,
-            choices=VALUE_UNIT_CHOICES)
-    isChangeableByUser = models.BooleanField("Can be changed by user")
-    device = models.ForeignKey(Device)
-
-    class Meta:
-        unique_together = ("key", "device")
-        verbose_name_plural = "Device properties"
-
-    def __unicode__(self):
-        return u"%s = %s" % (self.key, self.value)
 
 """
 class DeviceCmdLog(models.Model):
