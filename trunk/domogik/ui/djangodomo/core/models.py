@@ -115,8 +115,10 @@ class Device(models.Model):
     canGiveFeedback = models.BooleanField("Can give feedback", default=False)
     isResetable = models.BooleanField("Is resetable", default=False)
     initialValue = models.CharField("Initial value", max_length=80)
-    unitOfStoredValues = models.CharField("Unit used for stored values", max_length=30, blank=True)
-    isValueChangeableByUser = models.BooleanField("Is value changeable by user")
+    unitOfStoredValues = models.CharField("Unit used for stored values",
+                                          max_length=30, blank=True)
+    isValueChangeableByUser = models.BooleanField("Is value \
+                                                  changeable by user")
 
     def isLamp(self):
         return self.type.lower() == 'lamp'
@@ -128,11 +130,12 @@ class Device(models.Model):
         return isLamp() or isAppliance()
 
     def getLastValue(self):
-        deviceStats = DeviceStats.objects.all().filter(device__id=self.id).order_by('-date')
+        deviceStats = DeviceStats.objects.all().filter(
+                        device__id=self.id).order_by('-date')
         if deviceStats:
-          return deviceStats[0].value.lower()
+            return deviceStats[0].value.lower()
         else:
-          return self.initialValue
+            return self.initialValue
 
     def __unicode__(self):
         return u"%s - %s (%s)" % (self.name, self.address, self.reference)

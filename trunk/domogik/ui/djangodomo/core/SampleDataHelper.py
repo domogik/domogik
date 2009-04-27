@@ -55,7 +55,8 @@ class SampleDataHelper:
         # Create sample objects
         x10 = DeviceTechnology.objects.create(name="x10", type="cpl")
         plcbus = DeviceTechnology.objects.create(name="plcbus", type="cpl")
-        onewire = DeviceTechnology.objects.create(name="1-wire", type="wired_bus")
+        onewire = DeviceTechnology.objects.create(name="1-wire",
+                                                  type="wired_bus")
 
         temperatureCat = DeviceCategory.objects.create(name="Temperature")
         heatingCat = DeviceCategory.objects.create(name="Heating")
@@ -85,8 +86,7 @@ class SampleDataHelper:
                 initialValue="off",
                 unitOfStoredValues="",
                 isValueChangeableByUser=True,
-                isResetable=True
-        )
+                isResetable=True)
 
         bedroom1Lamp = Device.objects.create(
                 name="Lamp",
@@ -99,8 +99,7 @@ class SampleDataHelper:
                 initialValue="100",
                 unitOfStoredValues="%",
                 isValueChangeableByUser=True,
-                isResetable=True
-        )
+                isResetable=True)
 
         bedroom2BedsideLamp = Device.objects.create(
                 name="Beside lamp",
@@ -113,8 +112,7 @@ class SampleDataHelper:
                 initialValue="off",
                 unitOfStoredValues="",
                 isValueChangeableByUser=True,
-                isResetable=True
-        )
+                isResetable=True)
 
         bedroom2Lamp = Device.objects.create(
                 name="Lamp",
@@ -127,8 +125,7 @@ class SampleDataHelper:
                 initialValue="100",
                 unitOfStoredValues="%",
                 isValueChangeableByUser=True,
-                isResetable=True
-        )
+                isResetable=True)
 
         loungeLamp = Device.objects.create(
                 name="Lamp",
@@ -141,8 +138,7 @@ class SampleDataHelper:
                 initialValue="100",
                 unitOfStoredValues="%",
                 isValueChangeableByUser=True,
-                isResetable=True
-        )
+                isResetable=True)
 
         kitchenLamp = Device.objects.create(
                 name="Lamp",
@@ -155,8 +151,7 @@ class SampleDataHelper:
                 initialValue="100",
                 unitOfStoredValues="%",
                 isValueChangeableByUser=True,
-                isResetable=True
-        )
+                isResetable=True)
 
         kitchenCoffeeMachine = Device.objects.create(
                 name="Coffee machine",
@@ -169,5 +164,4 @@ class SampleDataHelper:
                 initialValue="off",
                 unitOfStoredValues="",
                 isValueChangeableByUser=True,
-                isResetable=True
-        )
+                isResetable=True)
