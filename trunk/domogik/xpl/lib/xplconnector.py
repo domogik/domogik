@@ -48,15 +48,15 @@ class Manager(xPLModule):
     # _network = None
     # _UDPSock = None
 
-    def __init__(self, ip="127.0.0.1", module_name="generic", port=3865):
+    def __init__(self, ip="127.0.0.1", port=3865):
         """
         Create a new manager instance
         @param ip : IP to listen to (default 0.0.0.0)
         @param source : source name of the application
         @param port : port to listen to (default 3865)
         """
-        source = "xpl-%s.domogik" % module_name
-        xPLModule.__init__(self, self.leave)
+        xPLModule.__init__(self, stop_cb = self.leave)
+        source = "xpl-%s.domogik" % self.get_module_name()
         # Define maximum xPL message size
         self._buff = 1500
         # Define xPL base port
@@ -71,8 +71,7 @@ class Manager(xPLModule):
         #The port is dynamically selected by the system
         addr = (ip, 0)
 
-        l = logger.Logger(module_name)
-        self._log = l.get_logger()
+        self._log = self.get_my_logger()
 
         # Try and bind to the base port
         try:
@@ -97,7 +96,7 @@ class Manager(xPLModule):
                     None, (), {})
             self.register_thread(self._network)
             self._network.start()
-            self._log.debug("xPL thread started for %s " % module_name)
+            self._log.debug("xPL thread started for %s " % self.get_module_name())
 
 
     def leave(self):

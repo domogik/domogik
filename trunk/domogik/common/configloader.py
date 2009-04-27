@@ -36,6 +36,7 @@ from os.path import *
 import os
 import ConfigParser
 
+
 class Loader():
     '''
     Parse Domogik config files
@@ -69,10 +70,12 @@ class Loader():
         global config_path
         main_result = {}
         config = ConfigParser.ConfigParser()
-        config.read(config_path + self.main_conf_name)
+        config.read(['/etc/' + self.main_conf_name,
+            '/usr/local/etc/' + self.main_conf_name,
+            config_path + self.main_conf_name])
         result = config.items('domogik')
         main_result = {}
-        for k,v in result:
+        for k, v in result:
             main_result[k] = v
         #Check the plugin conf file if defined
         if self.module_name == None:
@@ -92,8 +95,8 @@ class Loader():
         files = os.listdir(plugin_conf_dir)
         for file in files:
             if isfile(plugin_conf_dir + file):
-                plugin_config = config.read(plugin_conf_dir + self.module_name +
-                        ".cfg")
+                plugin_config = config.read(plugin_conf_dir + self.module_name
+                        + ".cfg")
                 if self.module_name in plugin_config:
                     return (main_result, plugin_config[self.module_name])
 

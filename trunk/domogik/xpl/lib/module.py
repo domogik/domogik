@@ -37,9 +37,16 @@ class xPLModule():
     '''
     __instance = None
 
-    def __init__(self, stop_cb = None):
+    def __init__(self, name = None, stop_cb = None):
+        '''
+        Create xPLModule instance, which defines signal handlers
+        @param name : The n,ame of the current module
+        @param stop_cb : Method to call when a SIGTERM is received
+        '''
+        if xPLModule.__instance is None and name is None:
+            raise AttributeError, "'name' attribute is mandatory for the first instance"
         if xPLModule.__instance is None:
-            xPLModule.__instance = xPLModule.__Singl_xPLModule(stop_cb)
+            xPLModule.__instance = xPLModule.__Singl_xPLModule(name, stop_cb)
             self.__dict__['_xPLModule__instance'] = xPLModule.__instance
         elif stop_cb is not None:
             xPLModule.__instance.add_stop_cb(stop_cb)
@@ -54,17 +61,18 @@ class xPLModule():
 
 
     class __Singl_xPLModule():
-        def __init__(self, stop_cb = None):
+        def __init__(self, name, stop_cb = None):
             '''
             Create xPLModule instance, which defines signal handlers
+            @param name : The n,ame of the current module
             @param stop_cb : Method to call when a SIGTERM is received
             '''
             self._threads = []
             self._timers = []
-
-            l = logger.Logger('signal')
+            self._module_name = name
+            l = logger.Logger(name)
             self._log = l.get_logger()
-            self._log.debug("new signal manager instance")
+            self._log.debug("New signal manager instance for %s" % name)
 
             self._stop = threading.Event()
             if stop_cb is not None:
@@ -72,6 +80,18 @@ class xPLModule():
             else:
                 self._stop_cb = []
             signal.signal(signal.SIGTERM, self.hand_leave)
+
+        def get_my_logger(self):
+            """
+            Returns the associated logger instance
+            """
+            return self._log
+
+        def get_module_name(self):
+            """
+            Returns the name of the current module
+            """
+            return self._module_name
 
         def add_stop_cb(self, cb):
             '''

@@ -40,17 +40,16 @@ class SysManager(xPLModule):
         '''
         Init manager and start listeners
         '''
-        xPLModule.__init__(self)
+        xPLModule.__init__(self, name = 'sysmanager')
         self._components = {
             'x10': 'x10Main()',
             'datetime': 'xPLDateTime()',
             'onewire': 'OneWireTemp()',
             'trigger': 'main()',
             'dawndusk': 'main()'}
-        l = logger.Logger('sysmanager')
-        self._log = l.get_logger()
+        self._log = self.get_my_logger()
         self._log.debug("Init system manager")
-        self.__myxpl = Manager(module_name='sysmanager')
+        self.__myxpl = Manager()
         Listener(self._sys_cb, self.__myxpl, {
             'schema': 'domogik.system',
             'type': 'xpl-cmnd',

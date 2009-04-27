@@ -25,23 +25,24 @@
 
 #This script use arguments from command line to forge & send a message
 from domogik.xpl.lib.xplconnector import *
+from domogik.xpl.lib.module import *
 import optparse
 from domogik.common.configloader import Loader
 from domogik.common import logger
 
 
-class Sender:
+class Sender(xPLModule):
 
     supported_schemas = ["datetime.basic", "dawndusk.request", "x10.basic",
             "sensor.basic", "domogik.system"]
 
     def __init__(self, schema=None, message=None):
+        xPLModule.__init__(self, name = 'send')
         self._schema = schema
         self._message = message
         cfgloader = Loader('send')
-        self.__myxpl = Manager(module_name = 'send')
-        l = logger.Logger('send')
-        self._log = l.get_logger()
+        self.__myxpl = Manager()
+        self._log = self.get_my_logger()
         self.parse_parameters()
         mess = self.forge_message()
         self._log.debug("Send message : %s" % mess)

@@ -37,11 +37,10 @@ class DBConnector(xPLModule):
         '''
         Initialize database and xPL connection
         '''
-        xPLModule.__init__(self)
-        l = logger.Logger('database_manager')
-        self._log = l.get_logger()
+        xPLModule.__init__(self, 'database_manager')
+        self._log = self.get_my_logger()
         self._log.debug("Init database_manager instance")
-        self.__myxpl = Manager(module_name='database_manager')
+        self.__myxpl = Manager()
         Listener(self._request_config_cb, self.__myxpl,
                 {'schema': 'domogik.config', 'type': 'xpl-cmnd'})
         #cfgloader = Loader('database')

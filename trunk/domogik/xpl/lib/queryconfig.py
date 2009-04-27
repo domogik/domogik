@@ -51,7 +51,7 @@ class Query():
         @param key : the key to fetch corresponding value
         '''
         self._res = result
-        Listener(self._query_cb, self.__myxpl, 
+        Listener(self._query_cb, self.__myxpl,
                 {'schema': 'domogik.config', 'type': 'xpl-stat'})
         mess = Message()
         mess.set_type('xpl-cmnd')
@@ -67,7 +67,7 @@ class Query():
         Callback to receive message after a query() call
         @param message : the message received
         '''
-        self._log.debug("Config value received : %s" % 
+        self._log.debug("Config value received : %s" %
                 message.get_key_value('value'))
         self._res.set_value(message.get_key_value('value'))
         self._res.get_lock().set()
