@@ -142,19 +142,17 @@ class xPLModule():
             '''
             Leave threads & timers
             '''
-            print "Force leave"
             self._stop.set()
             for t in self._threads:
                 t.join()
-                print "Thread stopped %s" % t
+                self._log.debug("Thread stopped %s" % t)
                 #t._Thread__stop()
             for t in self._timers:
                 t.stop()
-                print "Timer stopped %s" % t
+                self._log.debug("Timer stopped %s" % t)
             for cb in self._stop_cb:
-                print "Calling CB"
+                self._log.debug("Calling stop additionnal method : %s " % cb.__name__)
                 cb()
-            print "End Force leave"
 
 class xPLResult():
     '''

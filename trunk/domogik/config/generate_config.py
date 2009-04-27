@@ -25,8 +25,7 @@
 
 import re
 import sys
-from configobj import ConfigObj
-
+import ConfigParser
 
 _IP_ADDRESS_REGEX = "^" + (r"\.".join(r"([01]?\d\d?|2[0-4]\d|25[0-5])")) + "$"
 
@@ -110,7 +109,7 @@ class ConfigManager():
         '''
         Write data in a filename. May define a section
         '''
-        config = ConfigObj(filename)
+        config = ConfigParser.ConfigParser().read(filename)
         if section:
             config[section] = {}
             for k in datas:
@@ -149,8 +148,11 @@ class genericPluginConfig():
 
     def askandwrite(self, file, section):
         config = ConfigManager(self.informations, section)
-        self.result = config.ask()
-        config.write(file, self.result, section)
+
+        for k,v in result:
+            config.set(section,k,v)
+        with open(file, 'wb') as configfile:
+                config.write(configfile)
 
     def getvalue(self, value):
         return self.result.get(value, None)
