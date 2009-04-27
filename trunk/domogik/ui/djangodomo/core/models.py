@@ -84,6 +84,15 @@ class DeviceTechnology(models.Model):
         verbose_name_plural = "Device technologies"
 
 
+class DeviceTechnologyConfig(models.Model):
+    technology = models.ForeignKey(DeviceTechnology)
+    key = models.CharField(max_length=30)
+    value = models.CharField(max_length=80)
+
+    def __unicode__(self):
+        return "%s - %s" % (self.key, self.value)
+
+
 class Device(models.Model):
     TYPE_CHOICES = (
             ('appliance', 'Appliance'),
@@ -127,6 +136,15 @@ class Device(models.Model):
 
     def __unicode__(self):
         return u"%s - %s (%s)" % (self.name, self.address, self.reference)
+
+
+class DeviceConfig(models.Model):
+    device = models.ForeignKey(Device)
+    key = models.CharField(max_length=30)
+    value = models.CharField(max_length=80)
+
+    def __unicode__(self):
+        return "%s - %s" % (self.key, self.value)
 
 
 class DeviceStats(models.Model):
