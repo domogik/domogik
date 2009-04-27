@@ -33,87 +33,128 @@ class xPLModule():
     '''
     Global module class, manage signal handlers.
     This class shouldn't be used as-it but should be extended by xPL module
+    This class is a Singleton
     '''
+    __instance = None
 
-    def __init__(self):
-        '''
-        Create xPLModule instance, which defines signal handlers
-        '''
-        self._threads = []
-        self._timers = []
+    def __init__(self, stop_cb = None):
+        if xPLModule.__instance is None:
+            xPLModule.__instance = xPLModule.__Singl_xPLModule(stop_cb)
+            self.__dict__['_xPLModule__instance'] = xPLModule.__instance
+        elif stop_cb is not None:
+            xPLModule.__instance.add_stop_cb(stop_cb)
 
-        l = logger.Logger('signal')
-        self._log = l.get_logger()
-        self._log.debug("new signal manager instance")
+    def __getattr__(self, attr):
+        """ Delegate access to implementation """
+        return getattr(self.__instance, attr)
 
-        self._stop = threading.Event()
-        signal.signal(signal.SIGTERM, self.hand_leave)
+    def __setattr__(self, attr, value):
+        """ Delegate access to implementation """
+        return setattr(self.__instance, attr, value)
 
-    def register_thread(self, thread):
-        '''
-        Register a thread in the current instance
-        Should be called by each thread at start
-        @param thread : the thread to add
-        '''
-        self._log.debug('New thread registered')
-        self._threads.append(thread)
 
-    def unregister_thread(self, thread):
-        '''
-        Unregister a thread in the current instance
-        Should be the last action of each thread
-        @param thread : the thread to remove
-        '''
-        if thread in self._threads:
-            self._log.debug('Unregister thread')
-            self._threads.remove(thread)
+    class __Singl_xPLModule():
+        def __init__(self, stop_cb = None):
+            '''
+            Create xPLModule instance, which defines signal handlers
+            @param stop_cb : Method to call when a SIGTERM is received
+            '''
+            self._threads = []
+            self._timers = []
 
-    def register_timer(self, timer):
-        '''
-        Register a time in the current instance
-        Should be called by each timer
-        @param timer : the timer to add
-        '''
-        self._log.debug('New timer registered')
-        self._timers.append(timer)
+            l = logger.Logger('signal')
+            self._log = l.get_logger()
+            self._log.debug("new signal manager instance")
 
-    def unregister_timer(self, timer):
+            self._stop = threading.Event()
+            if stop_cb is not None:
+                self._stop_cb = [stop_cb]
+            else:
+                self._stop_cb = []
+            signal.signal(signal.SIGTERM, self.hand_leave)
 
-        '''
-        Unregister a timer in the current instance
-        Should be the last action of each timer
-        @param timer : the timer to remove
-        '''
-        if timer in self._timers:
-            self._log.debug('Unregister timer')
-            self._timers.remove(timer)
+        def add_stop_cb(self, cb):
+            '''
+            Add an additionnal callback to call when a SIGTERM is received
+            '''
+            self._stop_cb.append(cb)
 
-    def should_stop(self):
-        '''
-        Check if the module should stop
-        This method should be called to check loop condition in threads
-        '''
-        return self._stop.isSet()
+        def register_thread(self, thread):
+            '''
+            Register a thread in the current instance
+            Should be called by each thread at start
+            @param thread : the thread to add
+            '''
+            self._log.debug('New thread registered')
+            self._threads.append(thread)
 
-    def hand_leave(self, signum, frame):
-        '''
-        Handler called when a SIGTERM is catched
-        This will set event to leave the current threads of the module
-        then force threads to stop after 5 seconds.
-        '''
-        self._log.debug('Signal SIGTERM catched')
-        self.force_leave()
+        def unregister_thread(self, thread):
+            '''
+            Unregister a thread in the current instance
+            Should be the last action of each thread
+            @param thread : the thread to remove
+            '''
+            if thread in self._threads:
+                self._log.debug('Unregister thread')
+                self._threads.remove(thread)
 
-    def force_leave(self):
-        '''
-        Leave threads & timers
-        '''
-        self._stop.set()
-        time.sleep(2)
-        for t in self._threads:
-            t._Thread__stop()
-        for t in self._timers:
-            t.cancel()
+        def register_timer(self, timer):
+            '''
+            Register a time in the current instance
+            Should be called by each timer
+            @param timer : the timer to add
+            '''
+            self._log.debug('New timer registered')
+            self._timers.append(timer)
+
+        def unregister_timer(self, timer):
+
+            '''
+            Unregister a timer in the current instance
+            Should be the last action of each timer
+            @param timer : the timer to remove
+            '''
+            if timer in self._timers:
+                self._log.debug('Unregister timer')
+                self._timers.remove(timer)
+
+        def should_stop(self):
+            '''
+            Check if the module should stop
+            This method should be called to check loop condition in threads
+            '''
+            return self._stop.isSet()
+
+        def get_stop(self):
+            '''
+            Returns the Event instance
+            '''
+            return self._stop
+
+        def hand_leave(self, signum, frame):
+            '''
+            Handler called when a SIGTERM is catched
+            '''
+            self._log.debug('Signal SIGTERM catched')
+            self.force_leave()
+
+        def force_leave(self):
+            '''
+            Leave threads & timers
+            '''
+            print "Force leave"
+            self._stop.set()
+            for t in self._threads:
+                t.join()
+                print "Thread stopped %s" % t
+                #t._Thread__stop()
+            for t in self._timers:
+                t.stop()
+                print "Timer stopped %s" % t
+            for cb in self._stop_cb:
+                print "Calling CB"
+                cb()
+            print "End Force leave"
 
 class xPLResult():
     '''
@@ -121,23 +162,23 @@ class xPLResult():
     '''
 
     def __init__(self):
-	self.value = None
-	self.event = threading.Event()
+        self.value = None
+        self.event = threading.Event()
 
     def set_value(self, value):
-	'''
-	Set the new value of the objet
-	'''
-	self.value = value
+        '''
+        Set the new value of the objet
+        '''
+        self.value = value
 
     def get_value(self):
-	'''
-	Get the value of the objet
-	'''
-	return self.value
+        '''
+        Get the value of the objet
+        '''
+        return self.value
 
     def get_lock(self):
-	'''
-	Returns an event item
-	'''
-	return self.event
+        '''
+        Returns an event item
+        '''
+        return self.event

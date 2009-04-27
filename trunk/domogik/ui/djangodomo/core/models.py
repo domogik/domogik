@@ -149,24 +149,6 @@ class User(models.Model):
     systemAccount = models.ForeignKey(SystemAccount)
 
 
-"""
-class DeviceCmdLog(models.Model):
-    date = models.DateTimeField()
-    value = models.CharField(max_length=80)
-    comment = models.CharField(max_length=80, null=True, blank=True)
-    isSuccessful = models.BooleanField("Successful")
-    device = models.ForeignKey(Device)
-
-    def __unicode__(self):
-        return u"%s: %s (success=%s)" % (self.date, self.value,
-                self.isSuccessful)
-
-class StateReading(models.Model):
-    device = models.ForeignKey(Device)
-    value = models.FloatField()
-    date = models.DateTimeField()
-"""
-
 class ApplicationSetting(models.Model):
     # TODO : make sure there is only one line for this model
     # See : http://groups.google.com/group/django-users/browse_thr

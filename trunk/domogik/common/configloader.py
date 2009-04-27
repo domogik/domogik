@@ -97,4 +97,3 @@ class Loader():
 
         #If we're here, there is no plugin config
         return (main_result, None)
-

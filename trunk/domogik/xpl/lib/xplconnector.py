@@ -28,6 +28,7 @@ import string
 import select
 import threading
 from socket import *
+import time
 
 from domogik.common import logger
 from domogik.xpl.lib.module import xPLModule
@@ -55,7 +56,7 @@ class Manager(xPLModule):
         @param port : port to listen to (default 3865)
         """
         source = "xpl-%s.domogik" % module_name
-        xPLModule.__init__(self)
+        xPLModule.__init__(self, self.leave)
         # Define maximum xPL message size
         self._buff = 1500
         # Define xPL base port
@@ -64,6 +65,8 @@ class Manager(xPLModule):
         self._port = port
         # Initialise the socket
         self._UDPSock = socket(AF_INET, SOCK_DGRAM)
+        #Set broadcast flag
+        self._UDPSock.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
         #xPL plugins only needs to connect on local xPL Hub on localhost
         #The port is dynamically selected by the system
         addr = (ip, 0)
@@ -79,12 +82,14 @@ class Manager(xPLModule):
             self._log.error("Can't bind to the port %i" % self._port)
             exit(1)
         else:
+            self.add_stop_cb(self.leave)
             self._port = self._UDPSock.getsockname()[1]
             self._ip = ip
             # All is good, we start sending Heartbeat every 5 minutes using
             # xPLTimer
             self._SendHeartbeat()
-            self._h_timer = xPLTimer(300, self._SendHeartbeat)
+            self._h_timer = xPLTimer(300, self._SendHeartbeat, self.get_stop())
+            self.register_timer(self._h_timer)
             self._h_timer.start()
             #And finally we start network listener in a thread
             self._stop_thread = False
@@ -92,16 +97,15 @@ class Manager(xPLModule):
                     None, (), {})
             self.register_thread(self._network)
             self._network.start()
-            self._log.debug("xPL thread started")
+            self._log.debug("xPL thread started for %s " % module_name)
+
 
     def leave(self):
         """
         Stop threads and leave the Manager
         """
-        self._h_timer.stop()
-        self.force_leave()
+        self._UDPSock.close()
         self._log.debug("xPL thread stopped")
-        #exit(0)
 
     def send(self, message):
         """
@@ -115,14 +119,11 @@ class Manager(xPLModule):
                 message.set_conf_key("source", self._source)
             if not message.has_conf_key("target"):
                 message.set_conf_key("target", "*")
-        except:
-            pass
-        finally:
-            hbSock = socket(AF_INET, SOCK_DGRAM)
-            hbSock.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
-            hbSock.sendto(message.__str__(), ("255.255.255.255", 3865))
-            hbSock.close()
+            self._UDPSock.sendto(message.__str__(), ("255.255.255.255", 3865))
             self._log.debug("xPL Message sent")
+        except:
+            self._log.warning("Error during send of message")
+            self._log.debug(sys.exc_info()[2])
 
     def _SendHeartbeat(self):
         """
@@ -131,7 +132,8 @@ class Manager(xPLModule):
         This make the application able to be discovered by the hub
         """
         # Sub routine for sending a heartbeat
-        self.send("""\
+
+        mess = """\
 xpl-stat
 {
 hop=1
@@ -144,7 +146,9 @@ interval=5
 port=%s
 remote-ip=%s
 }
-""" % (self._source, self._port, self._ip))
+""" % (self._source, self._port, self._ip)
+        if not self.should_stop():
+            self._UDPSock.sendto(mess, ("255.255.255.255", 3865))
 
     def _run_thread_monitor(self):
         """
@@ -153,20 +157,28 @@ remote-ip=%s
         If it is, call all listeners
         """
         while not self.should_stop():
-            readable, writeable, errored = select.select(
+            try:
+                readable, writeable, errored = select.select(
                     [self._UDPSock], [], [], 10)
-            if len(readable) == 1:
-                data, addr = self._UDPSock.recvfrom(self._buff)
-                try:
-                    mess = Message(data)
-                    if mess.get_conf_key_value("target") == "*" or (
-                            mess.get_conf_key_value("target") == self._source):
-                        [l.new_message(mess) for l in self._listeners]
-                        self._log.debug("New message received : %s" % \
-                                mess.get_type())
-                except XPLException:
-                    pass
-        self.unregister_thread(self._network)
+            except:
+                self._log.info("Error during the read of the socket : %s" % sys.exc_info()[2])
+            else:
+                if len(readable) == 1:
+                    try:
+                        data, addr = self._UDPSock.recvfrom(self._buff)
+                    except:
+                        pass
+                    else:
+                        try:
+                            mess = Message(data)
+                            if mess.get_conf_key_value("target") == "*" or (
+                                    mess.get_conf_key_value("target") == self._source):
+                                [l.new_message(mess) for l in self._listeners]
+                                #Enabling this debug will really polute your logs
+                                #self._log.debug("New message received : %s" % \
+                                #        mess.get_type())
+                        except XPLException:
+                            self._log.warning("XPL Exception occured in : %s" % sys.exc_info()[2])
 
     def add_listener(self, listener):
         """
@@ -211,6 +223,7 @@ class Listener:
         and to call the callback function if it does
         """
         ok = True
+
         for key in self._filter:
             if message.has_key(key):
                 if (message.get_key_value(key) != self._filter[key]):
@@ -428,7 +441,8 @@ class Message:
         return str
 
 
-class xPLTimer(xPLModule):
+
+class xPLTimer():
     """
     xPLTimer will call a callback function each n seconds
     """
@@ -436,30 +450,16 @@ class xPLTimer(xPLModule):
 #    _callback = None
 #    _timer = None
 
-    def __init__(self, time, cb):
+
+    def __init__(self, time, cb, stop):
         """
         Constructor : create the internal timer
         @param time : time of loop in second
         @param cb : callback function which will be call eact 'time' seconds
         """
-        xPLModule.__init__(self)
-        self._callback = cb
-        self._time = time
-        self._timer = threading.Timer(self._time, self._run)
-        self.register_timer(self._timer)
-        self.should_stop = False
-
-    def _run(self):
-        """
-        internal timer loopback function
-        """
-        if self.should_stop:
-            self.unregister_timer(self._timer)
-            #self._timer.cancel()
-        else:
-            self._intimer = threading.Timer(self._time, self._run)
-            self._callback()
-            self._intimer.start()
+        self._should_stop = threading.Event()
+        self._timer = self.__internalTimer(time, cb, stop)
+#       self.register_timer(self)
 
     def start(self):
         """
@@ -467,25 +467,40 @@ class xPLTimer(xPLModule):
         """
         self._timer.start()
 
+    def getTimer(self):
+        """
+        Waits for the internal thread to finish
+        """
+        return self._timer
+
     def stop(self):
         """
         Stop the timer
         """
-        self.should_stop = True
-        self.unregister_timer(self._timer)
-        self._timer.cancel()
+        self._timer._Thread__stop()
+#       self.unregister_timer(self._timer)
 
+    class __internalTimer(threading.Thread):
+        '''
+        Internal timer class
+        extends xPLModule to provide signal handling
+        '''
+        def __init__(self, time, cb, stop):
+            '''
+            @param time : interval between each callback call
+            @param cb : callback function
+            @param stop : Event to check for stop thread
+            '''
+            threading.Thread.__init__(self)
+            self._time = time
+            self._cb = cb
+            self._stop = stop
 
-if __name__ == "__main__":
-    m = Manager(ip="192.168.1.24", port=5123)
-    l = Listener(cb=boo, manager=m)
-    l.add_filter("source", "cdp1802-dblogger.000001161j8ris")
-    l.del_filter("source")
-    me = Message()
-    me.set_type("xpl-cmnd")
-    me.set_schema("X10.basic")
-    me.set_data_key("DEVICE", "A3")
-    me.set_data_key("COMMAND", "ON")
-    m.send(me)
-#    t = xPLTimer(5,p)
-#    t.start()
+        def run(self):
+            '''
+            Call the callback every X seconds
+            '''
+            print "Start timer"
+            while not self._stop.is_set():
+                self._cb()
+                self._stop.wait(self._time)
