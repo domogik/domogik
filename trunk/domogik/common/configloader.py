@@ -34,8 +34,7 @@ config_path = "/home/maxence/domogik/trunk/domogik/config"
 ####################################################
 from os.path import *
 import os
-from configobj import ConfigObj
-
+import ConfigParser
 
 class Loader():
     '''
@@ -69,9 +68,12 @@ class Loader():
         '''
         global config_path
         main_result = {}
-        config = ConfigObj(config_path + self.main_conf_name)
-        main_result = config['domogik']
-
+        config = ConfigParser.ConfigParser()
+        config.read(config_path + self.main_conf_name)
+        result = config.items('domogik')
+        main_result = {}
+        for k,v in result:
+            main_result[k] = v
         #Check the plugin conf file if defined
         if self.module_name == None:
             return (main_result, None)
@@ -80,7 +82,7 @@ class Loader():
         #find the corresponding section
         plugin_conf_dir = config_path + "conf.d/"
         if exists(plugin_conf_dir + self.module_name + ".cfg"):
-            plugin_config = ConfigObj(plugin_conf_dir + self.module_name +
+            plugin_config = config.read(plugin_conf_dir + self.module_name +
                     ".cfg")
             if self.module_name in plugin_config:
                 return (main_result, plugin_config[self.module_name])
@@ -90,7 +92,7 @@ class Loader():
         files = os.listdir(plugin_conf_dir)
         for file in files:
             if isfile(plugin_conf_dir + file):
-                plugin_config = ConfigObj(plugin_conf_dir + self.module_name +
+                plugin_config = config.read(plugin_conf_dir + self.module_name +
                         ".cfg")
                 if self.module_name in plugin_config:
                     return (main_result, plugin_config[self.module_name])

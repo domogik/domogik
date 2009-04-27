@@ -500,7 +500,6 @@ class xPLTimer():
             '''
             Call the callback every X seconds
             '''
-            print "Start timer"
             while not self._stop.is_set():
                 self._cb()
                 self._stop.wait(self._time)
