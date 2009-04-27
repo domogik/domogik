@@ -51,7 +51,7 @@ class Query():
         @param key : the key to fetch corresponding value
         '''
         self._res = result
-        Listener(self._query_cb, self.__myxpl, 
+        Listener(self._query_cb, self.__myxpl,
                 {'schema': 'domogik.config', 'type': 'xpl-stat'})
         mess = Message()
         mess.set_type('xpl-cmnd')

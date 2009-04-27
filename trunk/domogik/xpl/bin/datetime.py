@@ -29,6 +29,7 @@ from domogik.common.configloader import *
 import time
 import signal
 
+
 class xPLDateTime(xPLModule):
     '''
     Send date and time on the xPL network every minute

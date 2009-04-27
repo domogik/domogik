@@ -169,6 +169,7 @@ class timeCond(Condition):
     ### Functions to check 'time equality' for each used type
 
     #Int
+
     def _check_time_int(self, unit, value):
         '''
         Check time equality between to integers
