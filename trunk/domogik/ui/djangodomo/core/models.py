@@ -154,6 +154,16 @@ class DeviceStats(models.Model):
     unit = models.CharField(max_length=5)
 
 
+class Trigger(models.Model):
+    name = models.CharField(max_length=80)
+    description = models.CharField(max_length=255, null=True, blank=True)
+    rule = models.TextField()
+    result = models.TextField()
+
+    def __unicode__(self):
+        return self.name
+
+
 class SystemAccount(models.Model):
     login = models.CharField(max_length=20)
     password = models.CharField(max_length=20)
