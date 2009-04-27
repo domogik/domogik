@@ -153,6 +153,9 @@ class DeviceStats(models.Model):
     value = models.CharField(max_length=30)
     unit = models.CharField(max_length=5)
 
+    def __unicode__(self):
+        return "%s - %s %s" % (self.date, self.value, self.unit)
+
 
 class Trigger(models.Model):
     name = models.CharField(max_length=80)
@@ -169,12 +172,18 @@ class SystemAccount(models.Model):
     password = models.CharField(max_length=20)
     isAdmin = models.BooleanField("Admin")
 
+    def __unicode__(self):
+        return self.login
+
 
 class User(models.Model):
     firstName = models.CharField(max_length=20)
     lastName = models.CharField(max_length=30)
     birthDate = models.DateField()
     systemAccount = models.ForeignKey(SystemAccount)
+
+    def __unicode__(self):
+        return "%s %s" % (self.firstName, self.lastName)
 
 
 class ApplicationSetting(models.Model):
