@@ -37,10 +37,8 @@ from djangodomo.core.models import Area
 from djangodomo.core.models import Room
 from djangodomo.core.models import DeviceCategory
 from djangodomo.core.models import DeviceTechnology
-from djangodomo.core.models import DeviceProperty
-from djangodomo.core.models import DeviceCmdLog
+from djangodomo.core.models import DeviceStats
 from djangodomo.core.models import Device
-from djangodomo.core.models import StateReading
 from djangodomo.core.models import ApplicationSetting
 from djangodomo.core.forms import ApplicationSettingForm
 
@@ -55,7 +53,7 @@ def index(request):
     adminMode = ""
     pageTitle = "Control overview"
 
-    appSetting = __readApplicationSetting()
+    appSetting = __read_application_setting()
 
     qListArea = Q()
     qListRoom = Q()
@@ -72,7 +70,7 @@ def index(request):
                 qListDeviceCategory = qListDeviceCategory | Q(category__id=
                     deviceCategory)
         elif cmd == "updateValues":
-            __updateDeviceValues(request, appSetting)
+            __update_device_values(request, appSetting)
 
     # select_related() should avoid one extra db query per property
     deviceList = Device.objects.filter(qListArea).filter(qListRoom).filter(
@@ -97,15 +95,14 @@ def index(request):
     })
 
 
-def __updateDeviceValues(request, appSetting):
+def __update_device_values(request, appSetting):
     """
     Update device values (main control page)
     """
     for deviceId in QueryDict.getlist(request.POST, "deviceId"):
-        keyList = QueryDict.getlist(request.POST, "key" + deviceId)
         valueList = QueryDict.getlist(request.POST, "value" + deviceId)
-        for i in range(len(keyList)):
-            __sendValueToDevice(deviceId, keyList[i], valueList[i], appSetting)
+        for i in range(len(valueList)):
+            __send_value_to_device(deviceId, valueList[i], appSetting)
 
     # Get all values posted over the form
     # For each device :
@@ -114,36 +111,31 @@ def __updateDeviceValues(request, appSetting):
     #       Log the result
 
 
-def __sendValueToDevice(deviceId, propertyKey, propertyValue, appSetting):
+def __send_value_to_device(deviceId, newValue, appSetting):
     """
     Send a value to a device
     """
     error = ""
     # Read previous value, and update it if necessary
     device = Device.objects.get(pk=deviceId)
-    deviceProperty = DeviceProperty.objects.get(device__id=deviceId,
-            key=propertyKey)
-    oldValue = deviceProperty.value
-    newValue = propertyValue
+    oldValue = device.getLastValue()
     if oldValue != newValue:
-        if device.technology.lower() == 'x10':
-            error = __sendX10Cmd(device, oldValue, newValue,
+        if device.technology.name.lower() == 'x10':
+            error = __send_x10_cmd(device, oldValue, newValue,
                     appSetting.simulationMode)
 
         if error == "":
-            deviceProperty.value = newValue
             if device.isLamp():
                 if newValue == "on":
-                    deviceProperty.value = 100
+                    newValue = "100"
                 elif newValue == "off":
-                    deviceProperty.value = 0
+                    newValue = "0"
 
-            deviceProperty.save()
-            __writeDeviceCmdLog(deviceId, deviceProperty.value,
+            __write_device_stats(deviceId, newValue,
                     "Nothing special", True)
 
 
-def __sendX10Cmd(device, oldValue, newValue, simulationMode):
+def __send_x10_cmd(device, oldValue, newValue, simulationMode):
     """
     Send x10 cmd
     """
@@ -171,35 +163,37 @@ def __sendX10Cmd(device, oldValue, newValue, simulationMode):
     return output
 
 
-def __writeDeviceCmdLog(deviceId, newValue, newComment, newIsSuccessful):
+def __write_device_stats(deviceId, newValue, newComment, newIsSuccessful):
     """
-    Write device command log
+    Write device stats
     """
     newDevice = Device.objects.get(id=deviceId)
-    deviceCmdLog = DeviceCmdLog(
+    deviceStats = DeviceStats(
         date = datetime.datetime.now(),
         device = newDevice,
         value = newValue,
-        comment = newComment,
-        isSuccessful = newIsSuccessful)
-    deviceCmdLog.save()
+        unit = newDevice.unitOfStoredValues,
+        #comment = newComment,
+        #isSuccessful = newIsSuccessful
+    )
+    deviceStats.save()
 
 
 def device(request, deviceId):
     """
     Details of a device
     """
-    hasCmdLogs = ""
+    hasStats = ""
     adminMode = ""
     pageTitle = "Device details"
 
-    if request.method == 'POST': # An action was submitted
-        # TODO check the value of the button (reset or update value)
-        __updateDeviceValues(request)
-
-    appSetting = __readApplicationSetting()
+    appSetting = __read_application_setting()
     if appSetting.adminMode == True:
         adminMode = "True"
+
+    if request.method == 'POST': # An action was submitted
+        # TODO check the value of the button (reset or update value)
+        __update_device_values(request, appSetting)
 
     # Read device information
     try:
@@ -207,69 +201,69 @@ def device(request, deviceId):
     except Device.DoesNotExist:
         raise Http404
 
-    if DeviceCmdLog.objects.filter(device__id=device.id).count() > 0:
-        hasCmdLogs = "True"
+    if DeviceStats.objects.filter(device__id=device.id).count() > 0:
+        hasStats = "True"
 
     return render_to_response('device.html', {
         'device': device,
-        'hasCmdLogs': hasCmdLogs,
+        'hasStats': hasStats,
         'adminMode': adminMode,
         'pageTitle': pageTitle,
     })
 
 
-def deviceCmdLogs(request, deviceId):
+def device_stats(request, deviceId):
     """
-    View for logs of a device or all devices
+    View for stats of a device or all devices
     """
     deviceAll = ""
-    pageTitle = "Device logs"
+    pageTitle = "Device stats"
     adminMode = ""
 
-    appSetting = __readApplicationSetting()
+    appSetting = __read_application_setting()
     if appSetting.adminMode == True:
         adminMode = "True"
 
     cmd = QueryDict.get(request.POST, "cmd", "")
-    if cmd == "clearLogs" and appSetting.adminMode:
-        __clearDeviceCmdLogs(request, deviceId, appSetting.adminMode)
+    if cmd == "clearStats" and appSetting.adminMode:
+        __clear_device_stats(request, deviceId, appSetting.adminMode)
 
-    # Read device logs
+    # Read device stats
     if deviceId == "0": # For all devices
         deviceAll = "True"
-        deviceCmdLogList = DeviceCmdLog.objects.all()
+        deviceStatsList = DeviceStats.objects.all()
     else:
         try:
-            deviceCmdLogList = DeviceCmdLog.objects.filter(device__id=deviceId)
-        except DeviceCmdLog.DoesNotExist:
+            deviceStatsList = DeviceStats.objects.filter(device__id=deviceId)
+        except DeviceStats.DoesNotExist:
             raise Http404
 
-    return render_to_response('device_cmd_logs.html', {
+    return render_to_response('device_stats.html', {
         'deviceId': deviceId,
         'adminMode': adminMode,
-        'deviceCmdLogList': deviceCmdLogList,
+        'deviceStatsList': deviceStatsList,
         'deviceAll': deviceAll,
         'pageTitle': pageTitle,
     })
 
 
-def __clearDeviceCmdLogs(request, deviceId, isAdminMode):
+def __clear_device_stats(request, deviceId, isAdminMode):
     """
-    Clear logs of a device or all devices
+    Clear stats of a device or all devices
     """
     if deviceId == "0": # For all devices
-        DeviceCmdLog.objects.all().delete()
+        DeviceStats.objects.all().delete()
     else:
         try:
-            DeviceCmdLog.objects.filter(device__id=deviceId).delete()
-        except DeviceCmdLog.DoesNotExist:
+            DeviceStats.objects.filter(device__id=deviceId).delete()
+        except DeviceStats.DoesNotExist:
             raise Http404
 
 
 # Views for the admin part
 
 
-def adminIndex(request):
+def admin_index(request):
     """
     Main page of the admin part
     """
@@ -277,7 +271,7 @@ def adminIndex(request):
     action = "index"
 
     appSettingForm = ApplicationSettingForm(
-            instance=__readApplicationSetting())
+            instance=__read_application_setting())
     return render_to_response('admin_index.html', {
         'appSettingForm': appSettingForm,
         'pageTitle': pageTitle,
@@ -285,22 +279,22 @@ def adminIndex(request):
     })
 
 
-def saveSettings(request):
+def save_settings(request):
     if request.method == 'POST':
         # Update existing applicationSetting instance with POST values
         form = ApplicationSettingForm(request.POST,
-                instance=__readApplicationSetting())
+                instance=__read_application_setting())
         if form.is_valid():
             form.save()
 
     return adminIndex(request)
 
 
-def loadSampleData(request):
+def load_sample_data(request):
     pageTitle = "Load sample data"
     action = "loadSampleData"
 
-    appSetting = __readApplicationSetting()
+    appSetting = __read_application_setting()
     if appSetting.simulationMode != True:
         errorMsg = "The application is not running in simulation mode : "\
                 "can't load sample data"
@@ -330,11 +324,11 @@ def loadSampleData(request):
     })
 
 
-def clearData(request):
+def clear_data(request):
     pageTitle = "Remove all data"
     action = "clearData"
 
-    appSetting = __readApplicationSetting()
+    appSetting = __read_application_setting()
     if appSetting.simulationMode != True:
         errorMsg = "The application is not running in simulation mode : "\
                 "can't clear data"
@@ -352,11 +346,7 @@ def clearData(request):
         'action': action,
     })
 
-
-### Private methods
-
-
-def __readApplicationSetting():
+def __read_application_setting():
     if ApplicationSetting.objects.all().count() == 1:
         return ApplicationSetting.objects.all()[0]
     else:

@@ -23,6 +23,7 @@
 # $LastChangedDate: 2009-02-13 09:20:19 +0100 (ven. 13 févr. 2009) $
 # $LastChangedRevision: 357 $
 
+import sys
 from django.db import models
 
 # __unicode__ is to output a representation of the object as a unicode string
@@ -31,7 +32,7 @@ from django.db import models
 
 class Area(models.Model):
     name = models.CharField(max_length=30)
-    description = models.TextField(max_length=255, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
 
     def __unicode__(self):
         return self.name
@@ -40,7 +41,7 @@ class Area(models.Model):
 class Room(models.Model):
     name = models.CharField(max_length=30)
     area = models.ForeignKey(Area)
-    description = models.TextField(max_length=255, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
 
     def __unicode__(self):
         return self.name
@@ -73,7 +74,7 @@ class DeviceTechnology(models.Model):
     )
 
     name = models.CharField(max_length=30)
-    description = models.TextField(max_length=80, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
     type = models.CharField(max_length=30, choices=TYPETECHNOLOGY_CHOICES)
 
     def __unicode__(self):
@@ -81,6 +82,15 @@ class DeviceTechnology(models.Model):
 
     class Meta:
         verbose_name_plural = "Device technologies"
+
+
+class DeviceTechnologyConfig(models.Model):
+    technology = models.ForeignKey(DeviceTechnology)
+    key = models.CharField(max_length=30)
+    value = models.CharField(max_length=80)
+
+    def __unicode__(self):
+        return "%s - %s" % (self.key, self.value)
 
 
 class Device(models.Model):
@@ -95,7 +105,7 @@ class Device(models.Model):
             blank=True)
     reference = models.CharField(max_length=30, null=True, blank=True)
     address = models.CharField(max_length=30)
-    description = models.TextField(max_length=80, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
     technology = models.ForeignKey(DeviceTechnology)
     # This is NOT user-defined
     type = models.CharField(max_length=20, choices=TYPE_CHOICES)
@@ -104,6 +114,11 @@ class Device(models.Model):
     room = models.ForeignKey(Room)
     canGiveFeedback = models.BooleanField("Can give feedback", default=False)
     isResetable = models.BooleanField("Is resetable", default=False)
+    initialValue = models.CharField("Initial value", max_length=80)
+    unitOfStoredValues = models.CharField("Unit used for stored values",
+                                          max_length=30, blank=True)
+    isValueChangeableByUser = models.BooleanField("Is value \
+                                                  changeable by user")
 
     def isLamp(self):
         return self.type.lower() == 'lamp'
@@ -111,59 +126,67 @@ class Device(models.Model):
     def isAppliance(self):
         return self.type.lower() == 'appliance'
 
-    def canBeSwitchedOnOff(self):
-        return self.type.lower() == 'appliance' or self.type.lower() == 'lamp'
+    def canBeSwitchedOff(self):
+        return isLamp() or isAppliance()
 
-    def canHaveInputValue(self):
-        # TODO : Add here supported devices
-        return self.type.lower() == 'lamp'
+    def getLastValue(self):
+        deviceStats = DeviceStats.objects.all().filter(
+                        device__id=self.id).order_by('-date')
+        if deviceStats:
+            return deviceStats[0].value.lower()
+        else:
+            return self.initialValue
 
     def __unicode__(self):
         return u"%s - %s (%s)" % (self.name, self.address, self.reference)
 
 
-class DeviceProperty(models.Model):
-    VALUETYPE_CHOICES = (
-            ('BOOLEAN', 'BOOLEAN'),
-            ('ALPHANUM', 'ALPHANUM'),
-    )
-    VALUE_UNIT_CHOICES = (
-            ('%', '%'),
-    )
-
+class DeviceConfig(models.Model):
+    device = models.ForeignKey(Device)
     key = models.CharField(max_length=30)
     value = models.CharField(max_length=80)
-    valueType = models.CharField("Value type", max_length=20,
-            choices=VALUETYPE_CHOICES)
-    valueUnit = models.CharField("Value unit", max_length=30,
-            choices=VALUE_UNIT_CHOICES)
-    isChangeableByUser = models.BooleanField("Can be changed by user")
-    device = models.ForeignKey(Device)
-
-    class Meta:
-        unique_together = ("key", "device")
-        verbose_name_plural = "Device properties"
 
     def __unicode__(self):
-        return u"%s = %s" % (self.key, self.value)
+        return "%s - %s" % (self.key, self.value)
 
 
-class DeviceCmdLog(models.Model):
+class DeviceStats(models.Model):
     date = models.DateTimeField()
-    value = models.CharField(max_length=80)
-    comment = models.CharField(max_length=80, null=True, blank=True)
-    isSuccessful = models.BooleanField("Successful")
     device = models.ForeignKey(Device)
+    value = models.CharField(max_length=30)
+    unit = models.CharField(max_length=5)
 
     def __unicode__(self):
-        return u"%s: %s (success=%s)" % (self.date, self.value,
-                self.isSuccessful)
+        return "%s - %s %s" % (self.date, self.value, self.unit)
 
 
-class StateReading(models.Model):
-    device = models.ForeignKey(Device)
-    value = models.FloatField()
-    date = models.DateTimeField()
+class Trigger(models.Model):
+    name = models.CharField(max_length=80)
+    description = models.TextField(null=True, blank=True)
+    rule = models.TextField()
+    result = models.TextField()
+
+    def __unicode__(self):
+        return self.name
+
+
+class SystemAccount(models.Model):
+    login = models.CharField(max_length=20)
+    password = models.CharField(max_length=20)
+    isAdmin = models.BooleanField("Admin")
+
+    def __unicode__(self):
+        return self.login
+
+
+class User(models.Model):
+    firstName = models.CharField(max_length=20)
+    lastName = models.CharField(max_length=30)
+    birthDate = models.DateField()
+    systemAccount = models.ForeignKey(SystemAccount)
+
+    def __unicode__(self):
+        return "%s %s" % (self.firstName, self.lastName)
 
 
 class ApplicationSetting(models.Model):

@@ -28,6 +28,7 @@ from domogik.xpl.lib.plcbus import *
 from domogik.common.configloader import Loader
 from domogik.common import logger
 
+
 class plcbusMain():
 
     def __init__(self):

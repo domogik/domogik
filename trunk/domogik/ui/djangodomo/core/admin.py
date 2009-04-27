@@ -30,21 +30,11 @@ from djangodomo.core.models import Area
 from djangodomo.core.models import Room
 from djangodomo.core.models import Device
 from djangodomo.core.models import DeviceTechnology
-from djangodomo.core.models import DeviceProperty
 from djangodomo.core.models import ApplicationSetting
-
-
-class DevicePropertyInline(admin.TabularInline):
-    model = DeviceProperty
-    extra = 1
-
-
-class DeviceAdmin(admin.ModelAdmin):
-    inlines = [DevicePropertyInline]
 
 
 admin.site.register(Area)
 admin.site.register(Room)
-admin.site.register(Device, DeviceAdmin)
+admin.site.register(Device)
 admin.site.register(DeviceTechnology)
 admin.site.register(ApplicationSetting)

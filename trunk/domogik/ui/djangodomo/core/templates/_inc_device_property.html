@@ -31,25 +31,22 @@
     }
 </script>
 
-{% for property in device.deviceproperty_set.all %}
-    {% if property.isChangeableByUser %}
-        <input id="id_key{{ device.id }}" type="hidden" name="key{{ device.id }}" value="{{ property.key }}"/>
-        {% if device.isAppliance  %}
-            {% ifequal property.value "on" %}
-                <input id="id_value{{ device.id }}" type="radio" name="value{{ device.id }}" value="on" checked/>On
-                <input id="id_value{{ device.id }}" type="radio" name="value{{ device.id }}" value="off"/>Off
-            {% else %}
-                <input type="radio" name="value{{ device.id }}" value="on"/>On
-                <input type="radio" name="value{{ device.id }}" value="off" checked/>Off
-            {% endifequal %}
-        {% endif %}
-        {% if device.isLamp %}
-            <input type="text" name="lampValue" value="{{ property.value }}" size="2" onchange="setLampValue(value{{ device.id }},this.value)"/>&nbsp;{{ property.valueUnit }}
-            <input type="radio" name="lampOnOff" value="on" onchange="setLampValue(value{{ device.id }},'on')"/>On
-            <input type="radio" name="lampOnOff" value="off" onchange="setLampValue(value{{ device.id }},'off')"/>Off
-            <input id="id_value{{ device.id }}" type="hidden" name="value{{ device.id }}" value="{{ property.value }}"/>
-        {% endif %}
-    {% else %}
-        {{ property.value }}&nbsp;{{ property.valueUnit }}
+{% if device.isValueChangeableByUser %}
+    {% if device.isAppliance  %}
+        {% ifequal device.getLastValue "on" %}
+            <input id="id_value{{ device.id }}" type="radio" name="value{{ device.id }}" value="on" checked/>On
+            <input id="id_value{{ device.id }}" type="radio" name="value{{ device.id }}" value="off"/>Off
+        {% else %}
+            <input type="radio" name="value{{ device.id }}" value="on"/>On
+            <input type="radio" name="value{{ device.id }}" value="off" checked/>Off
+        {% endifequal %}
     {% endif %}
-{% endfor %}
+    {% if device.isLamp %}
+        <input type="text" name="lampValue" value="{{ device.getLastValue }}" size="2" onchange="setLampValue(value{{ device.id }},this.value)"/>&nbsp;{{ device.unitOfStoredValues }}
+        <input type="radio" name="lampOnOff" value="on" onchange="setLampValue(value{{ device.id }},'on')"/>On
+        <input type="radio" name="lampOnOff" value="off" onchange="setLampValue(value{{ device.id }},'off')"/>Off
+        <input id="id_value{{ device.id }}" type="hidden" name="value{{ device.id }}" value="{{ device.getLastValue }}"/>
+    {% endif %}
+{% else %}
+    {{ device.getLastValue }}&nbsp;{{ device.unitOfStoredValues }}
+{% endif %}

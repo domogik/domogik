@@ -78,8 +78,7 @@
         </table>
 
         <p>
-            &raquo;&nbsp;{% if hasCmdLogs %}<a href="{% url deviceCmdLogsView device.id %}">View logs</a>{% else %}No logs{% endif %}&nbsp;
-            &raquo;&nbsp;<a href="#">View readings history</a>
+            &raquo;&nbsp;{% if hasStats %}<a href="{% url deviceStatsView device.id %}">View stats</a>{% else %}No stats{% endif %}
         </p>
     </div>
     </form>
