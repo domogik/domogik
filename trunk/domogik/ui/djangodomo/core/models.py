@@ -32,7 +32,7 @@ from django.db import models
 
 class Area(models.Model):
     name = models.CharField(max_length=30)
-    description = models.TextField(max_length=255, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
 
     def __unicode__(self):
         return self.name
@@ -41,7 +41,7 @@ class Area(models.Model):
 class Room(models.Model):
     name = models.CharField(max_length=30)
     area = models.ForeignKey(Area)
-    description = models.TextField(max_length=255, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
 
     def __unicode__(self):
         return self.name
@@ -74,7 +74,7 @@ class DeviceTechnology(models.Model):
     )
 
     name = models.CharField(max_length=30)
-    description = models.TextField(max_length=80, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
     type = models.CharField(max_length=30, choices=TYPETECHNOLOGY_CHOICES)
 
     def __unicode__(self):
@@ -105,7 +105,7 @@ class Device(models.Model):
             blank=True)
     reference = models.CharField(max_length=30, null=True, blank=True)
     address = models.CharField(max_length=30)
-    description = models.TextField(max_length=80, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
     technology = models.ForeignKey(DeviceTechnology)
     # This is NOT user-defined
     type = models.CharField(max_length=20, choices=TYPE_CHOICES)
@@ -156,7 +156,7 @@ class DeviceStats(models.Model):
 
 class Trigger(models.Model):
     name = models.CharField(max_length=80)
-    description = models.CharField(max_length=255, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
     rule = models.TextField()
     result = models.TextField()
 
