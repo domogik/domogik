@@ -28,7 +28,8 @@ from domogik.xpl.lib.queryconfig import *
 from domogik.common.configloader import *
 import os
 import sys
-
+import signal
+import time
 
 class SysManager(xPLModule):
     '''
@@ -72,12 +73,12 @@ class SysManager(xPLModule):
         mod = message.get_key_value('module')
         force = 0
         if message.has_key('force'):
-            force = message.get_key_value('force')
+            force = int(message.get_key_value('force'))
         error = ""
         if mod not in self._components:
             error = "Invalid component.\n"
         elif not force and self._is_component_running(mod):
-            error = "The component seems already running and force is disabled"
+            error = "ALREADY_RUNNING"
             self._log.info(error)
         if error == "":
             if cmd == "start":
@@ -101,20 +102,20 @@ class SysManager(xPLModule):
                 elif ret == 1:
                     error = 'The component was not started (no pid file)'
                 elif ret == 2:
-                    error = 'An error occurs during sending signal, check logs'
+                    error = 'An error occurs during sending signal'
                 if not error:
                     self._log.debug("Component %s stopped" % (mod))
                 else:
-                    self._log.debug("Error during stop of component %s : %s" %\
+                    self._log.warning("Error during stop of component %s : %s" %\
                             (mod, error))
-                mess = Message()
-                mess.set_type('xpl-trig')
-                mess.set_schema('domogik.system')
-                mess.set_data_key('command', cmd)
-                mess.set_data_key('module', mod)
-                mess.set_data_key('force', force)
-                mess.set_data_key('error', error)
-                self.__myxpl.send(mess)
+        mess = Message()
+        mess.set_type('xpl-trig')
+        mess.set_schema('domogik.system')
+        mess.set_data_key('command', cmd)
+        mess.set_data_key('module', mod)
+        mess.set_data_key('force', force)
+        mess.set_data_key('error', error)
+        self.__myxpl.send(mess)
 
     def _stop_comp(self, name):
         '''
@@ -126,12 +127,22 @@ class SysManager(xPLModule):
         '''
         pidfile = os.path.join(self._pid_dir_path, name + ".pid")
         if os.path.isfile(pidfile):
-            try:
-                with open(pidfile, "r") as f:
-                    data = f.readlines().replace('\n', '') # ?
-                    # TODO: kill the process ??
-            except:
-                return 2
+#            try:
+            with open(pidfile, "r") as f:
+                data = f.readlines()[0].replace('\n', '')
+                os.kill(int(data), 15)
+                print "%s" % data
+                #We now check is the process is still existing
+                #NASTY ! Wait 2s to let the process terminate
+                time.sleep(2)
+                try:
+                    os.kill(int(data), 0)
+                except OSError:
+                    return 0
+                else:
+                    return 2
+ #           except:
+  #              return 2
         else:
             return 1
 
@@ -159,7 +170,6 @@ class SysManager(xPLModule):
                 (component, self._pid_dir_path))
         pidfile = os.path.join(self._pid_dir_path,
                 component + ".pid")
-        # TODO: test if process with given PID# actually running
         return os.path.isfile(pidfile)
 
     def _write_pid_file(self, component, pid):
