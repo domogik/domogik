@@ -120,16 +120,13 @@ class Device(models.Model):
     isValueChangeableByUser = models.BooleanField("Is value \
                                                   changeable by user")
 
-    def isLamp(self):
+    def is_lamp(self):
         return self.type.lower() == 'lamp'
 
-    def isAppliance(self):
+    def is_appliance(self):
         return self.type.lower() == 'appliance'
 
-    def canBeSwitchedOff(self):
-        return isLamp() or isAppliance()
-
-    def getLastValue(self):
+    def get_last_value(self):
         deviceStats = DeviceStats.objects.all().filter(
                         device__id=self.id).order_by('-date')
         if deviceStats:
