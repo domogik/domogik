@@ -49,8 +49,8 @@ class SampleDataHelper:
     def create(self):
         self.remove()
 
-        ApplicationSetting.objects.create(simulationMode=True, adminMode=True,
-                debugMode=True)
+        ApplicationSetting.objects.create(simulation_mode=True, admin_mode=True,
+                debug_mode=True)
 
         # Create sample objects
         x10 = DeviceTechnology.objects.create(name="x10", type="cpl")

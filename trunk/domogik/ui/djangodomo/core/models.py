@@ -169,17 +169,17 @@ class Trigger(models.Model):
 class SystemAccount(models.Model):
     login = models.CharField(max_length=20)
     password = models.CharField(max_length=20)
-    isAdmin = models.BooleanField("Admin")
+    is_admin = models.BooleanField("Admin")
 
     def __unicode__(self):
         return self.login
 
 
 class User(models.Model):
-    firstName = models.CharField(max_length=20)
-    lastName = models.CharField(max_length=30)
-    birthDate = models.DateField()
-    systemAccount = models.ForeignKey(SystemAccount)
+    first_name = models.CharField(max_length=20)
+    last_name = models.CharField(max_length=30)
+    birthdate = models.DateField()
+    system_account = models.ForeignKey(SystemAccount)
 
     def __unicode__(self):
         return "%s %s" % (self.firstName, self.lastName)
@@ -191,9 +191,9 @@ class ApplicationSetting(models.Model):
     # ead/thread/d44a9417a81c4860?hl=en
     # Or : http://docs.djangoproject.com/en/dev/ref/mod
     # els/instances/#ref-models-instances
-    simulationMode = models.BooleanField("Simulation mode", default=True)
-    adminMode = models.BooleanField("Administrator mode", default=True)
-    debugMode = models.BooleanField("Debug mode", default=True)
+    simulation_mode = models.BooleanField("Simulation mode", default=True)
+    admin_mode = models.BooleanField("Administrator mode", default=True)
+    debug_mode = models.BooleanField("Debug mode", default=True)
 
 
 class Music(models.Model):

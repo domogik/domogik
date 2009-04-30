@@ -81,7 +81,7 @@ def index(request):
     deviceCategoryList = DeviceCategory.objects.all()
     techList = DeviceTechnology.objects.all()
 
-    if appSetting.adminMode == True:
+    if appSetting.admin_mode == True:
         adminMode = "True"
 
     return render_to_response('index.html', {
@@ -123,7 +123,7 @@ def __send_value_to_device(deviceId, newValue, appSetting):
     if oldValue != newValue:
         if device.technology.name.lower() == 'x10':
             error = __send_x10_cmd(device, oldValue, newValue,
-                    appSetting.simulationMode)
+                    appSetting.simulation_mode)
 
         if error == "":
             if device.is_lamp():
@@ -187,7 +187,7 @@ def device(request, deviceId):
     pageTitle = "Device details"
 
     appSetting = __read_application_setting()
-    if appSetting.adminMode == True:
+    if appSetting.admin_mode == True:
         adminMode = "True"
 
     if request.method == 'POST': # An action was submitted
@@ -220,12 +220,12 @@ def device_stats(request, deviceId):
     adminMode = ""
 
     appSetting = __read_application_setting()
-    if appSetting.adminMode == True:
+    if appSetting.admin_mode == True:
         adminMode = "True"
 
     cmd = QueryDict.get(request.POST, "cmd", "")
-    if cmd == "clearStats" and appSetting.adminMode:
-        __clear_device_stats(request, deviceId, appSetting.adminMode)
+    if cmd == "clearStats" and appSetting.admin_mode:
+        __clear_device_stats(request, deviceId, appSetting.admin_mode)
 
     # Read device stats
     if deviceId == "0": # For all devices
@@ -286,7 +286,7 @@ def save_settings(request):
         if form.is_valid():
             form.save()
 
-    return adminIndex(request)
+    return admin_index(request)
 
 
 def load_sample_data(request):
@@ -294,7 +294,7 @@ def load_sample_data(request):
     action = "loadSampleData"
 
     appSetting = __read_application_setting()
-    if appSetting.simulationMode != True:
+    if appSetting.simulation_mode != True:
         errorMsg = "The application is not running in simulation mode : "\
                 "can't load sample data"
         return render_to_response('admin_index.html', {
@@ -328,7 +328,7 @@ def clear_data(request):
     action = "clearData"
 
     appSetting = __read_application_setting()
-    if appSetting.simulationMode != True:
+    if appSetting.simulation_mode != True:
         errorMsg = "The application is not running in simulation mode : "\
                 "can't clear data"
         return render_to_response('admin_index.html', {
