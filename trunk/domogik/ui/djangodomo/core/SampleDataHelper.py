@@ -86,7 +86,7 @@ class SampleDataHelper:
                 initial_value="off",
                 unit_of_stored_values="",
                 is_value_changeable_by_user=True,
-                isResetable=True)
+                is_resetable=True)
 
         bedroom1Lamp = Device.objects.create(
                 name="Lamp",
@@ -99,7 +99,7 @@ class SampleDataHelper:
                 initial_value="100",
                 unit_of_stored_values="%",
                 is_value_changeable_by_user=True,
-                isResetable=True)
+                is_resetable=True)
 
         bedroom2BedsideLamp = Device.objects.create(
                 name="Beside lamp",
@@ -112,7 +112,7 @@ class SampleDataHelper:
                 initial_value="off",
                 unit_of_stored_values="",
                 is_value_changeable_by_user=True,
-                isResetable=True)
+                is_resetable=True)
 
         bedroom2Lamp = Device.objects.create(
                 name="Lamp",
@@ -125,7 +125,7 @@ class SampleDataHelper:
                 initial_value="100",
                 unit_of_stored_values="%",
                 is_value_changeable_by_user=True,
-                isResetable=True)
+                is_resetable=True)
 
         loungeLamp = Device.objects.create(
                 name="Lamp",
@@ -138,7 +138,7 @@ class SampleDataHelper:
                 initial_value="100",
                 unit_of_stored_values="%",
                 is_value_changeable_by_user=True,
-                isResetable=True)
+                is_resetable=True)
 
         kitchenLamp = Device.objects.create(
                 name="Lamp",
@@ -151,7 +151,7 @@ class SampleDataHelper:
                 initial_value="100",
                 unit_of_stored_values="%",
                 is_value_changeable_by_user=True,
-                isResetable=True)
+                is_resetable=True)
 
         kitchenCoffeeMachine = Device.objects.create(
                 name="Coffee machine",
@@ -164,4 +164,4 @@ class SampleDataHelper:
                 initial_value="off",
                 unit_of_stored_values="",
                 is_value_changeable_by_user=True,
-                isResetable=True)
+                is_resetable=True)

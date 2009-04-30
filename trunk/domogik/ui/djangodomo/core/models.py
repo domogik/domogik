@@ -112,7 +112,7 @@ class Device(models.Model):
     # This is user-defined
     category = models.ForeignKey(DeviceCategory)
     room = models.ForeignKey(Room)
-    isResetable = models.BooleanField("Is resetable", default=False)
+    is_resetable = models.BooleanField("Is resetable", default=False)
     initial_value = models.CharField("Initial value", max_length=80)
     unit_of_stored_values = models.CharField("Unit used for stored values",
                                           max_length=30, blank=True)
