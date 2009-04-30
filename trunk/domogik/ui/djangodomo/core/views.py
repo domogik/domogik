@@ -102,7 +102,8 @@ def __update_device_values(request, appSetting):
     for deviceId in QueryDict.getlist(request.POST, "deviceId"):
         valueList = QueryDict.getlist(request.POST, "value" + deviceId)
         for i in range(len(valueList)):
-            __send_value_to_device(deviceId, valueList[i], appSetting)
+            if valueList[i]:
+              __send_value_to_device(deviceId, valueList[i], appSetting)
 
     # Get all values posted over the form
     # For each device :
