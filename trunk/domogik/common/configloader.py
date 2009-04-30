@@ -24,7 +24,6 @@
 # $LastChangedRevision: 404 $
 
 import os
-from domogik.xpl.lib.xplconnector import *
 
 #Path to the configuration directory
 global config_path
@@ -35,7 +34,7 @@ config_path = "/home/maxence/domogik/trunk/domogik/config"
 ####################################################
 from os.path import *
 import os
-from configobj import ConfigObj
+import ConfigParser
 
 
 class Loader():
@@ -70,9 +69,14 @@ class Loader():
         '''
         global config_path
         main_result = {}
-        config = ConfigObj(config_path + self.main_conf_name)
-        main_result = config['domogik']
-
+        config = ConfigParser.ConfigParser()
+        config.read(['/etc/' + self.main_conf_name,
+            '/usr/local/etc/' + self.main_conf_name,
+            config_path + self.main_conf_name])
+        result = config.items('domogik')
+        main_result = {}
+        for k, v in result:
+            main_result[k] = v
         #Check the plugin conf file if defined
         if self.module_name == None:
             return (main_result, None)
@@ -81,7 +85,7 @@ class Loader():
         #find the corresponding section
         plugin_conf_dir = config_path + "conf.d/"
         if exists(plugin_conf_dir + self.module_name + ".cfg"):
-            plugin_config = ConfigObj(plugin_conf_dir + self.module_name +
+            plugin_config = config.read(plugin_conf_dir + self.module_name +
                     ".cfg")
             if self.module_name in plugin_config:
                 return (main_result, plugin_config[self.module_name])
@@ -91,51 +95,10 @@ class Loader():
         files = os.listdir(plugin_conf_dir)
         for file in files:
             if isfile(plugin_conf_dir + file):
-                plugin_config = ConfigObj(plugin_conf_dir + self.module_name +
-                        ".cfg")
+                plugin_config = config.read(plugin_conf_dir + self.module_name
+                        + ".cfg")
                 if self.module_name in plugin_config:
                     return (main_result, plugin_config[self.module_name])
 
         #If we're here, there is no plugin config
         return (main_result, None)
-
-class Query():
-	'''
-	Query throw xPL network to get a config item
-	'''
-	def __init__(self):
-		'''
-		Init the query system and connect it to xPL network
-		'''
-
-		l = logger.Logger('queryconfig')
-		self._log = l.get_logger()
-		self.__myxpl = Manager(module_name='queryconfig')
-		self._log.debug("Init config query instance")
-
-	def query(technology, key, element = None):
-		'''
-		Ask the config system for the value
-		@param technology : the technology of the item requesting the value, must exists in the config database
-		@param element : the name of the element which requests config, None if
-		it's a technolgy global parameter
-		@param key : the key to fetch corresponding value
-		'''
-		Listener(self._query_cb, self.__myxpl, {'schema':'domogik.config','type':'xpl-stat'})
-		mess = Message()
-		mess.set_type('xpl-trig')
-		mess.set_schema('domogik.config')
-		mess.set_data_key('technology', technology)
-		mess.set_data_key('element', element)
-		mess.set_data_key('key', key)
-	
-	def _query_cb(self, message):
-		'''
-		Callback to receive message after a query() call
-		@param message : the message received
-		'''
-		return message.ket_key_value('value')
-
-if __name__ == "__main__":
-    l = Loader('x10')
-    print l.load()

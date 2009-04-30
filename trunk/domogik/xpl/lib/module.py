@@ -27,90 +27,176 @@ import signal
 import threading
 import time
 from domogik.common import logger
-
+import threading
 
 class xPLModule():
     '''
     Global module class, manage signal handlers.
     This class shouldn't be used as-it but should be extended by xPL module
+    This class is a Singleton
+    '''
+    __instance = None
+
+    def __init__(self, name = None, stop_cb = None):
+        '''
+        Create xPLModule instance, which defines signal handlers
+        @param name : The n,ame of the current module
+        @param stop_cb : Method to call when a SIGTERM is received
+        '''
+        if xPLModule.__instance is None and name is None:
+            raise AttributeError, "'name' attribute is mandatory for the first instance"
+        if xPLModule.__instance is None:
+            xPLModule.__instance = xPLModule.__Singl_xPLModule(name, stop_cb)
+            self.__dict__['_xPLModule__instance'] = xPLModule.__instance
+        elif stop_cb is not None:
+            xPLModule.__instance.add_stop_cb(stop_cb)
+
+    def __getattr__(self, attr):
+        """ Delegate access to implementation """
+        return getattr(self.__instance, attr)
+
+    def __setattr__(self, attr, value):
+        """ Delegate access to implementation """
+        return setattr(self.__instance, attr, value)
+
+
+    class __Singl_xPLModule():
+        def __init__(self, name, stop_cb = None):
+            '''
+            Create xPLModule instance, which defines signal handlers
+            @param name : The n,ame of the current module
+            @param stop_cb : Method to call when a SIGTERM is received
+            '''
+            self._threads = []
+            self._timers = []
+            self._module_name = name
+            l = logger.Logger(name)
+            self._log = l.get_logger()
+            self._log.debug("New signal manager instance for %s" % name)
+
+            self._stop = threading.Event()
+            if stop_cb is not None:
+                self._stop_cb = [stop_cb]
+            else:
+                self._stop_cb = []
+            signal.signal(signal.SIGTERM, self.hand_leave)
+
+        def get_my_logger(self):
+            """
+            Returns the associated logger instance
+            """
+            return self._log
+
+        def get_module_name(self):
+            """
+            Returns the name of the current module
+            """
+            return self._module_name
+
+        def add_stop_cb(self, cb):
+            '''
+            Add an additionnal callback to call when a SIGTERM is received
+            '''
+            self._stop_cb.append(cb)
+
+        def register_thread(self, thread):
+            '''
+            Register a thread in the current instance
+            Should be called by each thread at start
+            @param thread : the thread to add
+            '''
+            self._log.debug('New thread registered')
+            self._threads.append(thread)
+
+        def unregister_thread(self, thread):
+            '''
+            Unregister a thread in the current instance
+            Should be the last action of each thread
+            @param thread : the thread to remove
+            '''
+            if thread in self._threads:
+                self._log.debug('Unregister thread')
+                self._threads.remove(thread)
+
+        def register_timer(self, timer):
+            '''
+            Register a time in the current instance
+            Should be called by each timer
+            @param timer : the timer to add
+            '''
+            self._log.debug('New timer registered')
+            self._timers.append(timer)
+
+        def unregister_timer(self, timer):
+
+            '''
+            Unregister a timer in the current instance
+            Should be the last action of each timer
+            @param timer : the timer to remove
+            '''
+            if timer in self._timers:
+                self._log.debug('Unregister timer')
+                self._timers.remove(timer)
+
+        def should_stop(self):
+            '''
+            Check if the module should stop
+            This method should be called to check loop condition in threads
+            '''
+            return self._stop.isSet()
+
+        def get_stop(self):
+            '''
+            Returns the Event instance
+            '''
+            return self._stop
+
+        def hand_leave(self, signum, frame):
+            '''
+            Handler called when a SIGTERM is catched
+            '''
+            self._log.debug('Signal SIGTERM catched')
+            self.force_leave()
+
+        def force_leave(self):
+            '''
+            Leave threads & timers
+            '''
+            self._stop.set()
+            for t in self._threads:
+                t.join()
+                self._log.debug("Thread stopped %s" % t)
+                #t._Thread__stop()
+            for t in self._timers:
+                t.stop()
+                self._log.debug("Timer stopped %s" % t)
+            for cb in self._stop_cb:
+                self._log.debug("Calling stop additionnal method : %s " % cb.__name__)
+                cb()
+
+class xPLResult():
+    '''
+    This object just provides a way to get and set a value between threads
     '''
 
     def __init__(self):
-        '''
-        Create xPLModule instance, which defines signal handlers
-        '''
-        self._threads = []
-        self._timers = []
+        self.value = None
+        self.event = threading.Event()
 
-        l = logger.Logger('signal')
-        self._log = l.get_logger()
-        self._log.debug("new signal manager instance")
+    def set_value(self, value):
+        '''
+        Set the new value of the objet
+        '''
+        self.value = value
 
-        self._stop = threading.Event()
-        signal.signal(signal.SIGTERM, self.hand_leave)
+    def get_value(self):
+        '''
+        Get the value of the objet
+        '''
+        return self.value
 
-    def register_thread(self, thread):
+    def get_lock(self):
         '''
-        Register a thread in the current instance
-        Should be called by each thread at start
-        @param thread : the thread to add
+        Returns an event item
         '''
-        self._log.debug('New thread registered')
-        self._threads.append(thread)
-
-    def unregister_thread(self, thread):
-        '''
-        Unregister a thread in the current instance
-        Should be the last action of each thread
-        @param thread : the thread to remove
-        '''
-        if thread in self._threads:
-            self._log.debug('Unregister thread')
-            self._threads.remove(thread)
-
-    def register_timer(self, timer):
-        '''
-        Register a time in the current instance
-        Should be called by each timer
-        @param timer : the timer to add
-        '''
-        self._log.debug('New timer registered')
-        self._timers.append(timer)
-
-    def unregister_timer(self, timer):
-
-        '''
-        Unregister a timer in the current instance
-        Should be the last action of each timer
-        @param timer : the timer to remove
-        '''
-        if timer in self._timers:
-            self._log.debug('Unregister timer')
-            self._timers.remove(timer)
-
-    def should_stop(self):
-        '''
-        Check if the module should stop
-        This method should be called to check loop condition in threads
-        '''
-        return self._stop.isSet()
-
-    def hand_leave(self, signum, frame):
-        '''
-        Handler called when a SIGTERM is catched
-        This will set event to leave the current threads of the module
-        then force threads to stop after 5 seconds.
-        '''
-        self._log.debug('Signal SIGTERM catched')
-        self.force_leave()
-
-    def force_leave(self):
-        '''
-        Leave threads & timers
-        '''
-        self._stop.set()
-        time.sleep(2)
-        for t in self._threads:
-            t._Thread__stop()
-        for t in self._timers:
-            t.cancel()
+        return self.event

@@ -179,7 +179,6 @@ class timeCond(Condition):
         return unit == int(value)
 
     #tuple : represent an interval
-
     def _check_time_tuple(self, unit, value):
         '''
         Check if value is in the interval described by the tuple
@@ -189,7 +188,6 @@ class timeCond(Condition):
         return int(value) in range(unit[0], unit[1] + 1)
 
     #list
-
     def _check_time_list(self, unit, value):
         '''
         @param unit can be : a list of int => check if value is in the list
@@ -202,7 +200,6 @@ class timeCond(Condition):
             return value in unit
 
     #string
-
     def _check_time_str(self, unit, value):
         '''
         @param unit can be  '*' or '*/x'
@@ -218,7 +215,6 @@ class timeCond(Condition):
             self._log.error('Bad time format %s' % unit)
 
     ### And of functions for evaluation
-
     def run(self, statedic):
         # chaque variable peut etre un entier, un interval (tuple), une liste
         # d'intervales ou la chaine '*' ou '*/x'

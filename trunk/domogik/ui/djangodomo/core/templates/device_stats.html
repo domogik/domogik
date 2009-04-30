@@ -1,0 +1,74 @@
+<!--
+# Copyright 2008 Domogik project
+
+# This file is part of Domogik.
+# Domogik is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Domogik is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+
+# Author : Marc Schneider <marc@domogik.org>
+
+# $LastChangedBy: mschneider $
+# $LastChangedDate: 2008-12-13 19:11:10 +0100 (sam. 13 déc. 2008) $
+# $LastChangedRevision: 271 $
+-->
+{% extends "base.html" %}
+
+{% block script %}
+    function clearStats() {
+        if (confirm("Are you sure you want to clear stats ?")) {
+            document.forms['deviceStatsForm'].cmd.value = "clearStats"
+            document.forms['deviceStatsForm'].action = "{% url deviceStatsView deviceId %}"
+            document.forms['deviceStatsForm'].submit()
+        }
+    }
+{% endblock %}
+
+{% block title %}{{ pageTitle }}{% endblock %}
+
+{% block content %}
+    <form name="deviceStatsForm" method="POST" action="">
+    <div id="list">
+    {% if deviceStatsList %}
+        <table>
+            <tr>
+                <th>Date</th>
+                <th>Device</th>
+                <th>Value</th>
+                <th>Unit</th>
+            </tr>
+
+            {% for deviceStat in deviceStatsList %}
+                <tr class="{% cycle 'oddRow' 'evenRow' %}">
+                    <td>{{ deviceStat.date }}</td>
+                    <td>{{ deviceStat.device.name }}</td>
+                    <td>{{ deviceStat.value }}</td>
+                    <td>{{ deviceStat.unit }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+        {% if adminMode %}
+            <p></p>
+            <table>
+                <tr>
+                    <td><input type="button" name="clearStatsButton" onclick="clearStats()" value="Clear stats"/>
+                </tr>
+            </table>
+        {% endif %}
+    {% else %}
+        <p>No stats found !</p>
+    {% endif %}
+    </div>
+
+    <input type="hidden" name="cmd" value=""/>
+    </form>
+{% endblock %}
