@@ -128,7 +128,7 @@ class Device(models.Model):
     def get_last_value(self):
         device_stats = DeviceStats.objects.all().filter(
                         device__id=self.id).order_by('-date')
-        if deviceStats:
+        if device_stats:
             return device_stats[0].value.lower()
         else:
             return self.initial_value
