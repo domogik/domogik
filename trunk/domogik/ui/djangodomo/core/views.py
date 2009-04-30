@@ -167,16 +167,14 @@ def __write_device_stats(deviceId, newValue, newComment, newIsSuccessful):
     """
     Write device stats
     """
-    newDevice = Device.objects.get(id=deviceId)
-    deviceStats = DeviceStats(
+    new_device = Device.objects.get(id=deviceId)
+    device_stats = DeviceStats(
         date = datetime.datetime.now(),
         device = newDevice,
         value = newValue,
-        unit = newDevice.unitOfStoredValues,
-        #comment = newComment,
-        #isSuccessful = newIsSuccessful
+        unit = new_device.unit_of_stored_values,
     )
-    deviceStats.save()
+    device_stats.save()
 
 
 def device(request, deviceId):

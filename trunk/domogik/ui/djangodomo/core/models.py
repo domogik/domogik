@@ -101,7 +101,7 @@ class Device(models.Model):
     )
 
     name = models.CharField(max_length=30)
-    serialNb = models.CharField("Serial Nb", max_length=30, null=True,
+    serial_nb = models.CharField("Serial Nb", max_length=30, null=True,
             blank=True)
     reference = models.CharField(max_length=30, null=True, blank=True)
     address = models.CharField(max_length=30)
@@ -114,10 +114,10 @@ class Device(models.Model):
     room = models.ForeignKey(Room)
     canGiveFeedback = models.BooleanField("Can give feedback", default=False)
     isResetable = models.BooleanField("Is resetable", default=False)
-    initialValue = models.CharField("Initial value", max_length=80)
-    unitOfStoredValues = models.CharField("Unit used for stored values",
+    initial_value = models.CharField("Initial value", max_length=80)
+    unit_of_stored_values = models.CharField("Unit used for stored values",
                                           max_length=30, blank=True)
-    isValueChangeableByUser = models.BooleanField("Is value \
+    is_value_changeable_by_user = models.BooleanField("Is value \
                                                   changeable by user")
 
     def is_lamp(self):
@@ -127,12 +127,12 @@ class Device(models.Model):
         return self.type.lower() == 'appliance'
 
     def get_last_value(self):
-        deviceStats = DeviceStats.objects.all().filter(
+        device_stats = DeviceStats.objects.all().filter(
                         device__id=self.id).order_by('-date')
         if deviceStats:
-            return deviceStats[0].value.lower()
+            return device_stats[0].value.lower()
         else:
-            return self.initialValue
+            return self.initial_value
 
     def __unicode__(self):
         return u"%s - %s (%s)" % (self.name, self.address, self.reference)

@@ -83,9 +83,9 @@ class SampleDataHelper:
                 room=bedroom1,
                 type="appliance",
                 category=lightingCat,
-                initialValue="off",
-                unitOfStoredValues="",
-                isValueChangeableByUser=True,
+                initial_value="off",
+                unit_of_stored_values="",
+                is_value_changeable_by_user=True,
                 isResetable=True)
 
         bedroom1Lamp = Device.objects.create(
@@ -96,9 +96,9 @@ class SampleDataHelper:
                 room=bedroom1,
                 type="lamp",
                 category=lightingCat,
-                initialValue="100",
-                unitOfStoredValues="%",
-                isValueChangeableByUser=True,
+                initial_value="100",
+                unit_of_stored_values="%",
+                is_value_changeable_by_user=True,
                 isResetable=True)
 
         bedroom2BedsideLamp = Device.objects.create(
@@ -109,9 +109,9 @@ class SampleDataHelper:
                 room=bedroom2,
                 type="appliance",
                 category=lightingCat,
-                initialValue="off",
-                unitOfStoredValues="",
-                isValueChangeableByUser=True,
+                initial_value="off",
+                unit_of_stored_values="",
+                is_value_changeable_by_user=True,
                 isResetable=True)
 
         bedroom2Lamp = Device.objects.create(
@@ -122,9 +122,9 @@ class SampleDataHelper:
                 room=bedroom2,
                 type="lamp",
                 category=lightingCat,
-                initialValue="100",
-                unitOfStoredValues="%",
-                isValueChangeableByUser=True,
+                initial_value="100",
+                unit_of_stored_values="%",
+                is_value_changeable_by_user=True,
                 isResetable=True)
 
         loungeLamp = Device.objects.create(
@@ -135,9 +135,9 @@ class SampleDataHelper:
                 room=lounge,
                 type="lamp",
                 category=lightingCat,
-                initialValue="100",
-                unitOfStoredValues="%",
-                isValueChangeableByUser=True,
+                initial_value="100",
+                unit_of_stored_values="%",
+                is_value_changeable_by_user=True,
                 isResetable=True)
 
         kitchenLamp = Device.objects.create(
@@ -148,9 +148,9 @@ class SampleDataHelper:
                 room=kitchen,
                 type="lamp",
                 category=lightingCat,
-                initialValue="100",
-                unitOfStoredValues="%",
-                isValueChangeableByUser=True,
+                initial_value="100",
+                unit_of_stored_values="%",
+                is_value_changeable_by_user=True,
                 isResetable=True)
 
         kitchenCoffeeMachine = Device.objects.create(
@@ -161,7 +161,7 @@ class SampleDataHelper:
                 room=kitchen,
                 type="appliance",
                 category=applianceCat,
-                initialValue="off",
-                unitOfStoredValues="",
-                isValueChangeableByUser=True,
+                initial_value="off",
+                unit_of_stored_values="",
+                is_value_changeable_by_user=True,
                 isResetable=True)

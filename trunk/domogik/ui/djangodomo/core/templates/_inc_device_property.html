@@ -31,7 +31,7 @@
     }
 </script>
 
-{% if device.isValueChangeableByUser %}
+{% if device.is_value_changeable_by_user %}
     {% if device.is_appliance  %}
         {% ifequal device.get_last_value "on" %}
             <input id="id_value{{ device.id }}" type="radio" name="value{{ device.id }}" value="on" checked/>On
@@ -42,11 +42,11 @@
         {% endifequal %}
     {% endif %}
     {% if device.is_lamp %}
-        <input type="text" name="lampValue" value="{{ device.getLastValue }}" size="2" onchange="setLampValue(value{{ device.id }},this.value)"/>&nbsp;{{ device.unitOfStoredValues }}
+        <input type="text" name="lampValue" value="{{ device.getLastValue }}" size="2" onchange="setLampValue(value{{ device.id }},this.value)"/>&nbsp;{{ device.unit_of_stored_values }}
         <input type="radio" name="lampOnOff" value="on" onchange="setLampValue(value{{ device.id }},'on')"/>On
         <input type="radio" name="lampOnOff" value="off" onchange="setLampValue(value{{ device.id }},'off')"/>Off
         <input id="id_value{{ device.id }}" type="hidden" name="value{{ device.id }}" value="{{ device.getLastValue }}"/>
     {% endif %}
 {% else %}
-    {{ device.get_last_value }}&nbsp;{{ device.unitOfStoredValues }}
+    {{ device.get_last_value }}&nbsp;{{ device.unit_of_stored_values }}
 {% endif %}
