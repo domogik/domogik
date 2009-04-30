@@ -42,10 +42,10 @@
         {% endifequal %}
     {% endif %}
     {% if device.is_lamp %}
-        <input type="text" name="lampValue" value="{{ device.getLastValue }}" size="2" onchange="setLampValue(value{{ device.id }},this.value)"/>&nbsp;{{ device.unit_of_stored_values }}
+        <input type="text" name="lampValue" value="{{ device.get_last_value }}" size="2" onchange="setLampValue(value{{ device.id }},this.value)"/>&nbsp;{{ device.unit_of_stored_values }}
         <input type="radio" name="lampOnOff" value="on" onchange="setLampValue(value{{ device.id }},'on')"/>On
         <input type="radio" name="lampOnOff" value="off" onchange="setLampValue(value{{ device.id }},'off')"/>Off
-        <input id="id_value{{ device.id }}" type="hidden" name="value{{ device.id }}" value="{{ device.getLastValue }}"/>
+        <input id="id_value{{ device.id }}" type="hidden" name="value{{ device.id }}" value="{{ device.get_last_value }}"/>
     {% endif %}
 {% else %}
     {{ device.get_last_value }}&nbsp;{{ device.unit_of_stored_values }}
