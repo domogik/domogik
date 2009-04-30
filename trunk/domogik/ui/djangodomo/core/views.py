@@ -118,14 +118,14 @@ def __send_value_to_device(deviceId, newValue, appSetting):
     error = ""
     # Read previous value, and update it if necessary
     device = Device.objects.get(pk=deviceId)
-    oldValue = device.getLastValue()
+    oldValue = device.get_last_value()
     if oldValue != newValue:
         if device.technology.name.lower() == 'x10':
             error = __send_x10_cmd(device, oldValue, newValue,
                     appSetting.simulationMode)
 
         if error == "":
-            if device.isLamp():
+            if device.is_lamp():
                 if newValue == "on":
                     newValue = "100"
                 elif newValue == "off":
@@ -142,9 +142,9 @@ def __send_x10_cmd(device, oldValue, newValue, simulationMode):
     output = ""
     xPLSchema = "x10.basic"
     xPLParam = ""
-    if device.isAppliance():
+    if device.is_appliance():
         xPLParam = "device="+device.address+","+"command="+newValue
-    elif device.isLamp():
+    elif device.is_lamp():
         if newValue == "on" or newValue == "off":
             xPLParam = "device="+device.address+","+"command="+newValue
         else:
@@ -170,7 +170,7 @@ def __write_device_stats(deviceId, newValue, newComment, newIsSuccessful):
     new_device = Device.objects.get(id=deviceId)
     device_stats = DeviceStats(
         date = datetime.datetime.now(),
-        device = newDevice,
+        device = new_device,
         value = newValue,
         unit = new_device.unit_of_stored_values,
     )
