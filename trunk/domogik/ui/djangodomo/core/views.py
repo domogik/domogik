@@ -266,14 +266,14 @@ def admin_index(request):
     """
     Main page of the admin part
     """
-    pageTitle = "Admin page"
+    page_title = "Admin page"
     action = "index"
 
-    appSettingForm = ApplicationSettingForm(
+    app_setting_form = ApplicationSettingForm(
             instance=__read_application_setting())
     return render_to_response('admin_index.html', {
-        'appSettingForm': appSettingForm,
-        'pageTitle': pageTitle,
+        'appSettingForm': app_setting_form,
+        'pageTitle': page_title,
         'action': action,
     })
 
@@ -290,58 +290,58 @@ def save_settings(request):
 
 
 def load_sample_data(request):
-    pageTitle = "Load sample data"
+    page_title = "Load sample data"
     action = "loadSampleData"
 
-    appSetting = __read_application_setting()
-    if appSetting.simulation_mode != True:
-        errorMsg = "The application is not running in simulation mode : "\
+    app_setting = __read_application_setting()
+    if app_setting.simulation_mode != True:
+        error_msg = "The application is not running in simulation mode : "\
                 "can't load sample data"
         return render_to_response('admin_index.html', {
-            'pageTitle': pageTitle,
+            'pageTitle': page_title,
             'action': action,
-            'errorMsg': errorMsg,
+            'errorMsg': error_msg,
         })
 
-    sampleDataHelper = SampleDataHelper()
-    sampleDataHelper.create()
+    sample_data_helper = SampleDataHelper()
+    sample_data_helper.create()
 
-    areaList = Area.objects.all()
-    roomList = Room.objects.all()
-    deviceCategoryList = DeviceCategory.objects.all()
-    deviceList = Device.objects.all()
-    techList = DeviceTechnology.objects.all()
+    area_list = Area.objects.all()
+    room_list = Room.objects.all()
+    device_category_list = DeviceCategory.objects.all()
+    device_list = Device.objects.all()
+    tech_list = DeviceTechnology.objects.all()
 
     return render_to_response('admin_index.html', {
-        'pageTitle': pageTitle,
+        'pageTitle': page_title,
         'action': action,
-        'areaList': areaList,
-        'roomList': roomList,
-        'deviceCategoryList': deviceCategoryList,
-        'deviceList': deviceList,
-        'techList': techList,
+        'areaList': area_list,
+        'roomList': room_list,
+        'deviceCategoryList': device_category_list,
+        'deviceList': device_list,
+        'techList': tech_list,
     })
 
 
 def clear_data(request):
-    pageTitle = "Remove all data"
+    page_title = "Remove all data"
     action = "clearData"
 
-    appSetting = __read_application_setting()
-    if appSetting.simulation_mode != True:
-        errorMsg = "The application is not running in simulation mode : "\
+    app_setting = __read_application_setting()
+    if app_setting.simulation_mode != True:
+        error_msg = "The application is not running in simulation mode : "\
                 "can't clear data"
         return render_to_response('admin_index.html', {
-            'pageTitle': pageTitle,
+            'pageTitle': page_title,
             'action': action,
-            'errorMsg': errorMsg,
+            'errorMsg': error_msg,
         })
 
-    sampleDataHelper = SampleDataHelper()
-    sampleDataHelper.remove()
+    sample_data_helper = SampleDataHelper()
+    sample_data_helper.remove()
 
     return render_to_response('admin_index.html', {
-        'pageTitle': pageTitle,
+        'pageTitle': page_title,
         'action': action,
     })
 
