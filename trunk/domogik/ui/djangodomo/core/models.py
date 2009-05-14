@@ -194,16 +194,3 @@ class ApplicationSetting(models.Model):
     simulation_mode = models.BooleanField("Simulation mode", default=True)
     admin_mode = models.BooleanField("Administrator mode", default=True)
     debug_mode = models.BooleanField("Debug mode", default=True)
-
-
-class Music(models.Model):
-    STATE_CHOICES = (
-            ('play', 'Play'),
-            ('pause', 'Pause'),
-            ('stop', 'Stop'),
-    )
-    room = models.ForeignKey(Room)
-    title = models.CharField(max_length=150)
-    time = models.TimeField()
-    current_time = models.TimeField()
-    state = models.CharField(max_length=10, choices=STATE_CHOICES)
