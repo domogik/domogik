@@ -29,6 +29,7 @@ from domogik.common.configloader import Loader
 from domogik.common import logger
 from domogik.xpl.lib.queryconfig import *
 
+
 class x10Main():
 
     def __init__(self):

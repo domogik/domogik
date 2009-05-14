@@ -44,7 +44,6 @@ fh = 1
 #This script is waiting for a messgage wich contains query=day or query=night
 #And return a message of the type DATETIME.BASIC with sunrise or sunset hour
 
-
 def dateFromTuple(tuple):
     """
     Tranforme the result from get_dawn_dusk to string with "yyyymmddhhmmss"

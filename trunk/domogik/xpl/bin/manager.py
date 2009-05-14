@@ -31,6 +31,7 @@ import sys
 import signal
 import time
 
+
 class SysManager(xPLModule):
     '''
     System management from domogik

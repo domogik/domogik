@@ -87,7 +87,7 @@ class serialHandler(threading.Thread):
 
                     if (ACK_received==1 or time2 + 0.2 < time.time()):
                         break #200ms
-                #end of do while
+
                 if(ACK_received==0):
                     #we waited 200ms and not received ACK, try again
                     print "sending again message"
@@ -95,7 +95,6 @@ class serialHandler(threading.Thread):
 
                 if(ACK_received==1 or time1 + 2 < time.time()):
                     break #2s
-            #end of second do while
 
     def receive(self):
         #not tested

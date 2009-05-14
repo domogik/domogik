@@ -26,14 +26,13 @@
 import sys
 from django.db import models
 
-# __unicode__ is to output a representation of the object as a unicode string
-# (u"" instead of "" for Python < 3.0)
-
 
 class Area(models.Model):
     name = models.CharField(max_length=30)
     description = models.TextField(null=True, blank=True)
 
+    # __unicode__ is to output a representation of the object as a unicode string
+    # (u"" instead of "" for Python < 3.0)
     def __unicode__(self):
         return self.name
 

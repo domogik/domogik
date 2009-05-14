@@ -26,6 +26,7 @@
 import logging
 from domogik.common.configloader import Loader
 
+
 class Logger():
     '''
     Logger for the xPL system.
@@ -54,7 +55,6 @@ class Logger():
     def __setattr__(self, attr, value):
         """ Delegate access to implementation """
         return setattr(self.__instance, attr, value)
-
 
     class __singl_logger:
 

@@ -23,9 +23,9 @@
 # $LastChangedDate:$
 # $LastChangedRevision:$
 
+#from sqlalchemy import *
 from domogik.xpl.lib.xplconnector import *
 from domogik.common.configloader import *
-#from sqlalchemy import *
 
 
 class DBConnector(xPLModule):
@@ -62,7 +62,6 @@ class DBConnector(xPLModule):
 #        db = create_engine(db_url)
 #        self._metadata = BoundMetaData(db)
 #        self._prefix = config['prefix']
-
     def _request_config_cb(self, message):
         '''
         Callback to receive a request for some config stuff

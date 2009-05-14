@@ -149,8 +149,8 @@ class genericPluginConfig():
     def askandwrite(self, file, section):
         config = ConfigManager(self.informations, section)
 
-        for k,v in result:
-            config.set(section,k,v)
+        for k, v in result:
+            config.set(section, k, v)
         with open(file, 'wb') as configfile:
                 config.write(configfile)
 

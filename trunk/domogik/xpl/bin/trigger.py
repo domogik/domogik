@@ -60,7 +60,6 @@ class Condition():
 # Classes représentant les conditions (noeuds de l'arbre)
 #####
 
-
 class OR(Condition):
     '''
     Implementation for the OR operator
@@ -113,7 +112,6 @@ class NOT(Condition):
 #####
 # Classes représentant les feuilles (conditions de temps ou d'état)
 #####
-
 
 class timeCond(Condition):
     '''
@@ -169,7 +167,6 @@ class timeCond(Condition):
     ### Functions to check 'time equality' for each used type
 
     #Int
-
     def _check_time_int(self, unit, value):
         '''
         Check time equality between to integers
@@ -267,7 +264,6 @@ class stateCond(Condition):
 ####
 # Methods to catch informations
 ####
-
 
 class ListenerBuilder():
     '''

@@ -103,18 +103,16 @@ def __update_device_values(request, app_setting):
         value_list = QueryDict.getlist(request.POST, "value" + device_id)
         for i in range(len(value_list)):
             if value_list[i]:
-              __send_value_to_device(device_id, value_list[i], app_setting)
-
-    # Get all values posted over the form
-    # For each device :
-    #       Check if value was changed
-    #       If yes, try to send new value to the device
-    #       Log the result
+                __send_value_to_device(device_id, value_list[i], app_setting)
 
 
 def __send_value_to_device(device_id, new_value, app_setting):
     """
-    Send a value to a device
+    Get all values posted over the form
+    For each device :
+      Check if value was changed
+      If yes, try to send new value to the device
+      Log the result
     """
     error = ""
     # Read previous value, and update it if necessary
@@ -259,11 +257,9 @@ def __clear_device_stats(request, device_id, is_admin_mode):
             raise Http404
 
 
-# Views for the admin part
-
-
 def admin_index(request):
     """
+    Views for the admin part
     Main page of the admin part
     """
     page_title = "Admin page"
@@ -344,6 +340,7 @@ def clear_data(request):
         'pageTitle': page_title,
         'action': action,
     })
+
 
 def __read_application_setting():
     if ApplicationSetting.objects.all().count() == 1:
