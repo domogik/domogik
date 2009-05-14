@@ -113,7 +113,7 @@ class NOT(Condition):
 # Classes représentant les feuilles (conditions de temps ou d'état)
 #####
 
-class timeCond(Condition):
+class TimeCond(Condition):
     '''
     Implementation of the time condition
     This allows user to describe time periods like cron
@@ -225,7 +225,7 @@ class timeCond(Condition):
         return listelem
 
 
-class stateCond(Condition):
+class StateCond(Condition):
     '''
     Implementation of the state condition
     This allows user to describe a condition on any item of the system
@@ -358,10 +358,10 @@ def main():
     Starts the trigger
     '''
     #Petits tests
-    state1 = "stateCond('x10','a1','==','on')"
-    state2 = "stateCond('1wire','X23329500234','<','20')"
-    state3 = "stateCond('x10','c3','==','off')"
-    time1 = "timeCond(2009, 02,(2,15),'*',10,'*/3')"
+    state1 = "StateCond('x10','a1','==','on')"
+    state2 = "StateCond('1wire','X23329500234','<','20')"
+    state3 = "StateCond('x10','c3','==','off')"
+    time1 = "TimeCond(2009, 02,(2,15),'*',10,'*/3')"
     expr1 = "AND(%s, OR(%s, %s))" % (state1, time1, state2)
 
     liste = {}
