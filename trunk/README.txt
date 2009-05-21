@@ -36,8 +36,14 @@ See the web site on http://www.domogik.org to get the latest documentation.
 X10
 ***
 
-* Install heyu (for x10 technology) and make sure it is running properly, running
-	manual commands. Then stop heyu.
+* Install heyu (for x10 technology)
+  * Plug in your CM11 device. Check /var/log/messages to see to which tty it was attached.
+    This will be asked when running "make install"
+  * ./Configure
+  * make
+  * make install (as root)
+
+  * make sure it is running properly, running manual commands. Then stop heyu.
 
 * Go to the 'config' directory and run :
 	python generate_config.py all
