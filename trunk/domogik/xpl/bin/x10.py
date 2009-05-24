@@ -25,19 +25,20 @@
 
 from domogik.xpl.lib.x10 import *
 from domogik.xpl.lib.xplconnector import *
+from domogik.xpl.lib.module import *
 from domogik.common.configloader import Loader
 from domogik.common import logger
 from domogik.xpl.lib.queryconfig import *
 
-
-class x10Main():
+class x10Main(xPLModule):
 
     def __init__(self):
         '''
         Create the X10Main class
         This class is used to connect x10 (through heyu) to the xPL Network
         '''
-        cfgloader = Loader('x10')
+        xPLModule.__init__(self, name = 'x10')
+        self.__myxpl = Manager()
         self._config = Query(self.__myxpl)
         res = xPLResult()
         self._config.query('x10', 'heyu_cfg_path', res)
@@ -46,7 +47,6 @@ class x10Main():
         except:
             print "Something went wrong during heyu init, check logs"
             exit(1)
-        self.__myxpl = Manager(module_name='x10')
         #Create listeners
         Listener(self.x10_cmnd_cb, self.__myxpl, {'schema': 'x10.basic',
                 'type': 'xpl-cmnd'})

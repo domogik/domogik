@@ -122,7 +122,7 @@ class DBConnector(xPLModule):
         @param key : the key of the config tuple to fetch
         '''
         #TODO : use the database
-        vals = {'x10': {},
+        vals = {'x10': {'heyu_cfg_path':'/etc/heyu/x10.conf'},
                 'global': {'pid_dir_path': '/tmp/'},
                 }
         try:

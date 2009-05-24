@@ -46,7 +46,7 @@ X10
   * make sure it is running properly, running manual commands. Then stop heyu.
 
 * Go to the 'config' directory and run :
-	python generate_config.py all
+	python generate_config.py
 * Go to the 'xPL' directory and start xPL hub :
 	./xPL_Hub
 	# or if you want to have more output
