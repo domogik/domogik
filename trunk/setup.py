@@ -1,5 +1,10 @@
 #!/usr/bin/python
 
+#Prepare env for using setuptools
+import ez_setup
+ez_setup.use_setuptools()
+
+#Main install part
 from setuptools import setup, find_packages
 
 setup(
