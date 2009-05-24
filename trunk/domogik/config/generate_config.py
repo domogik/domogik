@@ -109,15 +109,14 @@ class ConfigManager():
         '''
         Write data in a filename. May define a section
         '''
-        config = ConfigParser.ConfigParser().read(filename)
-        if section:
-            config[section] = {}
-            for k in datas:
-                config[section][k] = datas[k]
-        else:
-            for k in datas:
-                config[k] = datas[k]
-        config.write()
+        config = ConfigParser.ConfigParser()
+        config.read(filename)
+        if not config.has_section(section):
+            config.add_section(section)
+        for k in datas:
+            config.set(section,k,datas[k])
+        with open(filename, 'wb') as configfile:
+                config.write(configfile)
 
 
 class genericPluginConfig():
@@ -148,11 +147,10 @@ class genericPluginConfig():
 
     def askandwrite(self, file, section):
         config = ConfigManager(self.informations, section)
-
-        for k, v in result:
-            config.set(section, k, v)
-        with open(file, 'wb') as configfile:
-                config.write(configfile)
+        result = config.ask()
+        config.write(file, result, section)
+#        with open(file, 'wb') as configfile:
+#                config.write(configfile)
 
     def getvalue(self, value):
         return self.result.get(value, None)
@@ -191,6 +189,7 @@ class generalConfig(genericPluginConfig):
         self.askandwrite(file, section)
 
 
+#DEPRECATED
 class x10Config(genericPluginConfig):
     '''
     Ask the user for specific config for X10 xPL module
@@ -211,6 +210,7 @@ class x10Config(genericPluginConfig):
         self.askandwrite(file, section)
 
 
+#DEPRECATED
 class plcbusConfig(genericPluginConfig):
     '''
     Ask the user for specific config for PLCBUS xPL module
@@ -231,6 +231,7 @@ class plcbusConfig(genericPluginConfig):
         self.askandwrite(file, section)
 
 
+#DEPRECATED
 class senderConfig(genericPluginConfig):
     '''
     Ask the user for specific config for the xPL sender
@@ -248,7 +249,7 @@ class senderConfig(genericPluginConfig):
         section = "send"
         self.askandwrite(file, section)
 
-
+#DEPRECATED
 class triggerConfig(genericPluginConfig):
     '''
     Ask the user for specific config for the xPL sender
@@ -267,6 +268,7 @@ class triggerConfig(genericPluginConfig):
         self.askandwrite(file, section)
 
 
+#DEPRECATED
 class datetimeConfig(genericPluginConfig):
     '''
     Ask the user for specific config for the xPL datetime module
@@ -285,7 +287,8 @@ class datetimeConfig(genericPluginConfig):
         self.askandwrite(file, section)
 
 
-def OneWireConfig(genericPluginConfig):
+#DEPRECATED
+class OneWireConfig(genericPluginConfig):
     '''
     Ask the user for specific config for the xPL OneWire module
     '''
@@ -302,7 +305,7 @@ def OneWireConfig(genericPluginConfig):
                 r"^[1-9][0-9]+", [15]),
         ])
 
-
+#DEPRECATED
 class SystemManagerConfig(genericPluginConfig):
     '''
     Ask the user for specific config for the xPL datetime module
@@ -323,10 +326,7 @@ class SystemManagerConfig(genericPluginConfig):
 
 def usage():
     print """
-usage : generate_config.py config"
-    config : name of the section to reconfigure"
-        Can be one of : all, system, plugins, x10, 1wire, send, trigger, \
-datetime"
+usage : generate_config.py
     """
     exit(1)
 
@@ -336,33 +336,5 @@ if __name__ == "__main__":
         choice = sys.argv[1]
         if choice == "--help":
             usage()
-    else:
-        usage()
 
-    if choice == 'all':
-        ip = generalConfig()
-        SystemManagerConfig(ip)
-        x10Config(ip)
-        plcbusConfig(ip)
-        senderConfig(ip)
-        triggerConfig(ip)
-        datetimeConfig(ip)
-    elif choice == 'main':
-        generalConfig()
-        #SystemManagerConfig()
-    elif choice == 'plugins':
-        x10Config()
-        plcbusConfig()
-        senderConfig()
-        triggerConfig()
-        datetimeConfig()
-    elif choice == 'x10':
-        x10Config()
-    elif choice == 'plcbus':
-        plcbusConfig()
-    elif choice == 'send':
-        senderConfig()
-    elif choice == 'trigger':
-        triggerConfig()
-    elif choice == 'datetime':
-        datetimeConfig()
+    generalConfig()

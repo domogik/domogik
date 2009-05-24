@@ -391,6 +391,13 @@ class Message:
         """
         self._conf_order = order
 
+    def __contains__(self, key):
+        '''
+        Override 'in' operator
+        Call the has_key method
+        '''
+        return self.has_key(key)
+
     def has_key(self, key):
         """
         Check if a key exists in data dictionnary
