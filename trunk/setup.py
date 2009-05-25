@@ -20,4 +20,5 @@ setup(
     install_requires=['setuptools','django'],
     zip_safe = False,
     license = 'GPL v3',
+    scripts = ['domogik/bin/generate_config.py','domogik/bin/dmgstart.py'],
     )
