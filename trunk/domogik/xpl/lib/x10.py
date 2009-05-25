@@ -268,3 +268,8 @@ class X10API:
             return False
         else:
             return True
+
+
+class X10Monitor:
+    """
+    Manage heyu monitor output

@@ -26,7 +26,7 @@ setup(
     author = 'OpenSource home automation software',
     author_email = 'domogik-general@lists.labs.libre-entreprise.org',
     packages=find_packages(),
-    package_dir = {'domogik':'domogik'},
+#    package_dir = {'':'domogik'},
 #    namespace_packages=['domogik',],
     install_requires=['setuptools','django >=1.0'],
     zip_safe = False,
