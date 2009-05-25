@@ -27,8 +27,8 @@ from django.conf.urls.defaults import *
 
 urlpatterns = patterns('djangodomo.core.views',
     url(r'^$', 'index', name="mainView"),
-    url(r'device/(?P<deviceId>\d+)/$', 'device', name="deviceView"),
-    url(r'device_stats/(?P<deviceId>\d+)/$', 'device_stats',
+    url(r'device/(?P<device_id>\d+)/$', 'device', name="deviceView"),
+    url(r'device_stats/(?P<device_id>\d+)/$', 'device_stats',
             name="deviceStatsView"),
     url(r'admin/$', 'admin_index', name="adminView"),
     url(r'admin/load_sample_data$', 'load_sample_data',
