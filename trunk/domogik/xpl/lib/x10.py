@@ -273,3 +273,8 @@ class X10API:
 class X10Monitor:
     """
     Manage heyu monitor output
+    """
+
+    def __init__(self, heyuconf):
+        res = Popen("heyu -c " + heyuconf + " start", shell=True, stdout=PIPE)
+        self.out = res.stdout

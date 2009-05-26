@@ -23,8 +23,6 @@
 # $LastChangedDate: 2009-03-04 22:29:01 +0100 (mer. 04 mars 2009) $
 # $LastChangedRevision: 404 $
 
-import os
-
 #Path to the configuration directory
 global config_path
 config_path = "/home/maxence/domogik/trunk/domogik/config"
@@ -70,7 +68,8 @@ class Loader():
         global config_path
         main_result = {}
         config = ConfigParser.ConfigParser()
-        config.read(['/etc/' + self.main_conf_name,
+        config.read([os.getenv("HOME") + self.main_conf_name,
+            '/etc/' + self.main_conf_name,
             '/usr/local/etc/' + self.main_conf_name,
             config_path + self.main_conf_name])
         result = config.items('domogik')

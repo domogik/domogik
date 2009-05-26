@@ -23,6 +23,7 @@
 # $LastChangedDate: 2009-03-21 00:59:18 +0100 (sam. 21 mars 2009) $
 # $LastChangedRevision: 416 $
 
+import os
 import re
 import sys
 import ConfigParser
@@ -184,7 +185,7 @@ class generalConfig(genericPluginConfig):
 #        ('components_list', 'What are the components you want to enable ?'\
 #                ' (comma separated list)', None, ['x10,datetime']),
         ]
-        file = "domogik.cfg"
+        file = "%s/.domogik.cfg" % os.getenv("HOME")
         section = "domogik"
         self.askandwrite(file, section)
 
