@@ -135,6 +135,9 @@ class Device(models.Model):
     def __unicode__(self):
         return u"%s - %s (%s)" % (self.name, self.address, self.reference)
 
+    def get_template_name(self):
+        return 'devices/%s.html' % self.type.lower()
+
 
 class DeviceConfig(models.Model):
     device = models.ForeignKey(Device)

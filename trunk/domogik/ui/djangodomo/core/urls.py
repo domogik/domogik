@@ -27,6 +27,12 @@ from django.conf.urls.defaults import *
 
 urlpatterns = patterns('djangodomo.core.views',
     url(r'^$', 'index', name="mainView"),
+    
+    
+    url(r'status/$', 'device_status', name='device_status'),
+    url(r'status/room/(?P<room_id>\d+)/$', 'device_status', name='device_status'),
+    url(r'status/device/(?P<device_id>\d+)/$', 'device_status', name='device_status'),
+    
     url(r'device/(?P<device_id>\d+)/$', 'device', name="deviceView"),
     url(r'device_stats/(?P<device_id>\d+)/$', 'device_stats',
             name="deviceStatsView"),
@@ -35,4 +41,5 @@ urlpatterns = patterns('djangodomo.core.views',
             name="loadSampleDataView"),
     url(r'admin/clear_data$', 'clear_data', name="clearDataView"),
     url(r'admin/save_settings$', 'save_settings', name="saveSettingsView"),
+    
 )

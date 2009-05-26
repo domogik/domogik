@@ -27,11 +27,13 @@ import datetime
 import math
 import os
 from subprocess import *
+import simplejson
 
 from django.db.models import Q
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.http import QueryDict
 from django.shortcuts import render_to_response
+from django.core import serializers
 
 from djangodomo.core.models import Area
 from djangodomo.core.models import Room
@@ -347,3 +349,18 @@ def __read_application_setting():
         return ApplicationSetting.objects.all()[0]
     else:
         return ApplicationSetting()
+
+
+def device_status(request, room_id=None, device_id=None):
+    import random
+    print 'device_status: room_id: ', room_id, ' device_id: ', device_id 
+    if request.method == 'POST':
+        # modify status
+        response = {'power': request.POST['power']}
+    if device_id:
+        response = {
+            'power': ('on' if random.randint(0, 1) else 'off'),
+        }
+    response['id'] = device_id
+    return HttpResponse(simplejson.dumps(response))
+    
