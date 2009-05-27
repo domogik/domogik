@@ -132,6 +132,12 @@ class Device(models.Model):
         else:
             return self.initial_value
 
+    def get_data_dict(self):
+        return {
+            'value': self.get_last_value(),
+            'type': self.type,
+        }
+
     def __unicode__(self):
         return u"%s - %s (%s)" % (self.name, self.address, self.reference)
 

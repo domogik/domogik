@@ -357,10 +357,9 @@ def device_status(request, room_id=None, device_id=None):
     if request.method == 'POST':
         # modify status
         response = {'power': request.POST['power']}
-    if device_id:
-        response = {
-            'power': ('on' if random.randint(0, 1) else 'off'),
-        }
-    response['id'] = device_id
-    return HttpResponse(simplejson.dumps(response))
-    
+    else:
+        devices = Device.objects.filter(pk__in=request.GET.getlist('devices')) 
+        json = simplejson.dumps(dict((d.pk, d.get_data_dict()) for d in devices))
+        return HttpResponse(json)
+    return HttpResponse(response)
+            

@@ -1,38 +1,36 @@
-const REFRESH_DELAY = 1000 * 5; //30;
-const DEVICE_URL = '/domogik/status/device/' 
+const REFRESH_DELAY = 1000 * 30;
+const BASE_URL = '/domogik/status/';
+const DEVICE_URL = BASE_URL + 'device/'; 
 
-function callbackDevicePower(data) { // allow server to refuse change
-	$('#device_' + data.id + ' .device_power').attr('checked', ''); 
-	$('#device_' + data.id + '_' + data.power).attr('checked', 'on');		
+function callbackDevicePower(data) { // allow server to refuse change 
+	var prefix = '#device_' + data.id;
+	if ($(prefix + '_' + data.power).attr('checked') != 'on') {
+		$(prefix + ' .device_power').attr('checked', ''); 
+		$(prefix + '_' + data.power).attr('checked', 'on');
+	}	
 }
 
-function updateDevicePower(event, element) {
-	if (element == undefined) {
-		element = $(this); // called from event listener
-		method = $.post;
-	} else {
-		element = $(element); // called from refresh
-		method = $.get;
-	}
-	console.log(element);
-	var id = element.attr('id').split('_')[1];
+// notify changes to server
+function updateDevicePower(event, element) { 
+	var id = $(this).attr('id').split('_')[1];
 	var url = DEVICE_URL + id + '/';
-	method(url, {power: element.val()}, callbackDevicePower, 'json');
-}
-const REFRESH_FUNCTIONS = {
-	'.device_power:checked': updateDevicePower
+	$.post(url, {power: $(this).val()}, callbackDevicePower, 'json');
 }
 
 function refresh() {
-	for (var selector in REFRESH_FUNCTIONS) {
-		$(selector).each(REFRESH_FUNCTIONS[selector]);
-	}
+	var deviceIds = $.makeArray($('div.device').map(function (index, device) {
+		return Number($(device).attr('id').split('_')[1])
+	})); 
+	$.getJSON(BASE_URL, {devices: deviceIds}, function(data) { 
+		$.each(data, function(id, device) {
+			callbackDevicePower({id: id, power: device.value});
+		});
+	});
 	setTimeout(refresh, REFRESH_DELAY);
-}
-
+} 
+ 
 jQuery(function($) {
-	$('.device_power').change(updateDevicePower)
+	$('.device_power').change(updateDevicePower);
 	refresh();
 });
-
-
+ 
