@@ -331,11 +331,14 @@ usage : generate_config.py
     """
     exit(1)
 
-
-if __name__ == "__main__":
+def main():
     if len(sys.argv) > 1:
         choice = sys.argv[1]
         if choice == "--help":
             usage()
-
     generalConfig()
+
+if __name__ == "__main__":
+    main()
+
+

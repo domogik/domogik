@@ -163,8 +163,7 @@ def usage():
     print "\t - comp_name : The name of the component you would start. Can be"\
             " 'auto' to use the config file."
 
-
-if __name__ == "__main__":
+def main():
     init_log()
     init_config()
     parse_command_line()
@@ -176,3 +175,8 @@ if __name__ == "__main__":
             start_from_config()
         else:
             start_one_component(arguments[0])
+
+
+if __name__ == "__main__":
+    main()
+
