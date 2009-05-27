@@ -25,7 +25,6 @@
 
 #Path to the configuration directory
 global config_path
-config_path = "/home/maxence/domogik/trunk/domogik/config"
 
 ####################################################
 #       DON'T CHANGE ANYTHING AFTER THIS LINE      #
@@ -45,19 +44,7 @@ class Loader():
         Load the configuration for a part of the Domogik system
         @param module_name name of the module to load config from
         '''
-        global config_path
         self.main_conf_name = "domogik.cfg"
-        #Format the path
-        if config_path[-1] != "/":
-            config_path += "/"
-
-        #Check the main conf file
-        file_with_path = config_path + self.main_conf_name
-        if not exists(file_with_path):
-            raise ValueError("The main config file can't be found !\n"
-                    "Make sure %s exists." % file_with_path)
-            exit(1)
-
         self.module_name = module_name
 
     def load(self):
@@ -65,13 +52,11 @@ class Loader():
         Parse the config
         @return pair (main_config, plugin_config)
         '''
-        global config_path
         main_result = {}
         config = ConfigParser.ConfigParser()
-        config.read([os.getenv("HOME") + self.main_conf_name,
+        config.read([os.getenv("HOME") + "/." + self.main_conf_name,
             '/etc/' + self.main_conf_name,
-            '/usr/local/etc/' + self.main_conf_name,
-            config_path + self.main_conf_name])
+            '/usr/local/etc/' + self.main_conf_name])
         result = config.items('domogik')
         main_result = {}
         for k, v in result:

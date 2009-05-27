@@ -48,9 +48,9 @@ X10
 * Go to the 'config' directory and run :
 	python generate_config.py
 * Go to the 'xPL' directory and start xPL hub :
-	./xPL_Hub
+	./xPL_Hub -interface lo
 	# or if you want to have more output
-	./xPL_Hub -nodaemon -xpldebug
+	./xPL_Hub -nodaemon -xpldebug -interface lo
 
 * Go to the 'xPL' directory and run x10
 	python x10_main.py

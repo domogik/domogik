@@ -24,6 +24,7 @@
 # $LastChangedRevision: 399 $
 
 from subprocess import *
+import threading
 from domogik.common import logger
 
 
@@ -276,5 +277,76 @@ class X10Monitor:
     """
 
     def __init__(self, heyuconf):
-        res = Popen("heyu -c " + heyuconf + " start", shell=True, stdout=PIPE)
-        self.out = res.stdout
+        res = Popen(["heyu","-c",heyuconf,"monitor"], stdout=PIPE)
+        self._reader = self.__x10MonitorThread(res)
+
+    def get_monitor(self):
+        """
+        Returns the x10MonitorThread intance
+        """
+        return self._reader
+
+    class __x10MonitorThread(threading.Thread):
+        """
+        Internal class
+        Manage read of the pipe and call of callbacks
+        """
+
+        def __init__(self, pipe):
+            """
+            @param pipe : the Popen instance
+            """
+            threading.Thread.__init__(self)
+            self._pipe = pipe
+            self._cbs = []
+
+        def add_cb(self, cb):
+            """
+            Add a callback method
+            The callback needs to have 3 parameters : module name, command value and parameter
+            """
+            self._cbs.append(cb)
+
+        def del_cb(self, cb):
+            """
+            Removes a previously added callback if exists
+            """
+            self._cbs.remove(cb)
+
+        def run(self):
+            """
+            Starts to check the stdout line
+            """
+            units = []
+            order = None
+            arg = None
+            out = None
+            try:
+                while not self._pipe.stdout.closed and out != '':
+                    out = self._pipe.stdout.readline()
+                    print "communicate %s" % out
+                    if 'sndc addr unit' in out:
+                        units.append(out.split()[8].lower())
+                    elif 'sndc func' in out:
+                        order = out.split()[4].lower()
+                        if '%' in out:
+                            arg = out.split()[9].replace('%','')
+                    if units and order:
+                        self._call_cbs(units, order, arg)
+                        units = []
+                        order = None
+                        arg = None
+            except ValueError:
+                #The pipe is closed
+                print "Exception"
+                pass
+
+        def _call_cbs(self, units, order, arg):
+            """
+            Call all callbacks 
+            """
+            for cb in self._cbs:
+                for unit in units:
+                    cb(unit, order, arg)
+
+
