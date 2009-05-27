@@ -353,10 +353,9 @@ def __read_application_setting():
 
 def device_status(request, room_id=None, device_id=None):
     import random
-    print 'device_status: room_id: ', room_id, ' device_id: ', device_id 
     if request.method == 'POST':
-        # modify status
-        response = {'power': request.POST['power']}
+        print "Set power to ", request.POST["value"]
+        response = {'value': request.POST['value']}
     else:
         devices = Device.objects.filter(pk__in=request.GET.getlist('devices')) 
         json = simplejson.dumps(dict((d.pk, d.get_data_dict()) for d in devices))

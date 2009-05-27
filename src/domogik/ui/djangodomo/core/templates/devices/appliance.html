@@ -1,6 +1,7 @@
 <div class="device" id="device_{{ device.id }}">
 	<p>{{ device }}</p>
-	
-	<input type="radio" name="power_{{ device.id}}" value="on" id="device_{{ device.id }}_on" class="device_power" />On
-	<input type="radio" name="power_{{ device.id}}" value="off" id="device_{{ device.id }}_off" class="device_power" />Off	
+
+	<input type="radio" name="power_{{ device.id}}" value="on" class="device_power device_power_on" />On
+	<input type="radio" name="power_{{ device.id}}" value="off" class="device_power device_power_on" />Off		
+
 </div>
