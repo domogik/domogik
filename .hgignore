@@ -4,4 +4,9 @@ syntax: glob
 *.rej
 .DS_Store
 *.pyc
-*.pyo
+*.pyoeggs/*
+eggs
+bin
+.installed.cfg
+src/Domogik.egg-info/
+develop-eggs/
