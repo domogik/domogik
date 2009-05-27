@@ -85,7 +85,7 @@
 		{% for device in deviceList %}
 			{% include device.get_template_name %}
 		{% endfor %} 
-		 
+		 <!--
         <form name="deviceListForm" method="POST"/>
         <table>
             <tr>
@@ -131,6 +131,7 @@
             </tr>
         </table>
         </form>
+		-->
     {% else %}
         <p>No device found !</p>
     {% endif %} 
