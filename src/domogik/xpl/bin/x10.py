@@ -50,8 +50,11 @@ class x10Main(xPLModule):
         #Create listeners
         Listener(self.x10_cmnd_cb, self.__myxpl, {'schema': 'x10.basic',
                 'type': 'xpl-cmnd'})
-        l = logger.Logger('x10')
-        self._log = l.get_logger()
+        self._log = self.get_my_logger()
+        self._monitor = X10Monitor(res.get_value())
+        self._monitor.get_monitor().add_cb(self.x10_monitor_cb)
+        self._monitor.get_monitor().start()
+        self._log.debug("Heyu correctly started")
 
     def x10_cmnd_cb(self, message):
         '''
@@ -84,6 +87,22 @@ class x10Main(xPLModule):
         self._log.debug("%s received : device = %s, house = %s, level = %s" % (
                 cmd, dev, house, level))
         commands[cmd](dev, house, level)
+
+    def x10_monitor_cb(self, unit, order, args = None):
+        """
+        Callback for x10 monitoring
+        @param unit : the unit of the element controled
+        @param order : the order sent to the unit
+        """
+        self._log.debug("X10 Callback for %s" % unit)
+        mess = Message()
+        mess.set_type("xpl-trig")
+        mess.set_schema("x10.basic")
+        mess.set_data_key("device", unit)
+        mess.set_data_key("command", order)
+        if args:
+            mess.set_data_key("level",args)
+        self.__myxpl.send(mess)
 
 if __name__ == "__main__":
     x = x10Main()
