@@ -25,6 +25,7 @@
 
 from sqlalchemy import *
 
+from domogik.common.configloader import Loader
 
 class DbHelper():
     """
@@ -32,7 +33,7 @@ class DbHelper():
     The user should only use methods from this class and don't access the database directly
     """
 
-    def __init__(self, url):
+    def __init__(self):
         """
         @param url : the url to access the database, should be like
         driver://user:password@host[:port]/db_name or
@@ -41,7 +42,24 @@ class DbHelper():
         In you use sqllite and provide an absolute path, don't forget the 4 /
         like in the exemple.
         """
+
+        cfg = Loader('database')
+        config = cfg.load()
+
+        db = dict(config[1])
+        url = "%s://" % db['db_type']
+        if db['db_type'] == 'sqlite':
+            url = "%s%s" % (url,db['db_path'])
+        else:
+            if db['db_port'] != '':
+                url = "%s%s:%s@%s:%s/%s" % (url, db['db_user'], db['db_password'], db['db_host'], db['db_port'], db['db_name'])
+            else:
+                url = "%s%s:%s@%s/%s" % (url, db['db_user'], db['db_password'], db['db_host'], db['db_name'])
+
+        #Connecting to the database
         self._engine = create_engine(url)
         self._metadata = MetaData()
 
 
+if __name__ == "__main__":
+    d = DbHelper()

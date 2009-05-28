@@ -65,24 +65,8 @@ class Loader():
         if self.module_name == None:
             return (main_result, None)
 
-        #To find the plugin conf, we try all files in conf.d until we
-        #find the corresponding section
-        plugin_conf_dir = config_path + "conf.d/"
-        if exists(plugin_conf_dir + self.module_name + ".cfg"):
-            plugin_config = config.read(plugin_conf_dir + self.module_name +
-                    ".cfg")
-            if self.module_name in plugin_config:
-                return (main_result, plugin_config[self.module_name])
-
-        #If we are here, it's because the plugin conf file hasn't the same
-        #name as the plugin name
-        files = os.listdir(plugin_conf_dir)
-        for file in files:
-            if isfile(plugin_conf_dir + file):
-                plugin_config = config.read(plugin_conf_dir + self.module_name
-                        + ".cfg")
-                if self.module_name in plugin_config:
-                    return (main_result, plugin_config[self.module_name])
-
-        #If we're here, there is no plugin config
-        return (main_result, None)
+        if self.module_name:
+            return (main_result, config.items(self.module_name))
+        else:
+            #If we're here, there is no plugin config
+            return (main_result, None)

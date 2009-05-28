@@ -28,6 +28,9 @@ import re
 import sys
 import ConfigParser
 
+if sys.version_info[0] == 2 and sys._version_info[1] == 5:
+    from __future__ import with_statement
+
 _IP_ADDRESS_REGEX = "^" + (r"\.".join(r"([01]?\d\d?|2[0-4]\d|25[0-5])")) + "$"
 
 
@@ -205,6 +208,7 @@ class databaseAccess(genericPluginConfig):
                 '"sqlite" is the most simple one and does not need any particular setup.',
                 r"^(sqlite|mysql|postgres|oracle)$", None),
                 ('db_host','Which host to connect to (empty if sqlite)', None, None),
+                ('db_port','Which port to connect to (empty to use the default)', r"^[0_9]*$", None),
                 ('db_user','Database user (must exists, empty if sqlite)', None, None),
                 ('db_password','Database user password (empty if sqlite)', None, None),
                 ('db_name','Database name (empty if sqlite)', None, None),
@@ -212,7 +216,7 @@ class databaseAccess(genericPluginConfig):
                 'Domogik will need write permissions to create the database and write to it.', None, None)
         ]
         file = "%s/.domogik.cfg" % os.getenv("HOME")
-        section = "domogik"
+        section = "database"
         self.askandwrite(file, section)
 
 #DEPRECATED
