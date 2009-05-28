@@ -28,8 +28,6 @@ import re
 import sys
 import ConfigParser
 
-if sys.version_info[0] == 2 and sys._version_info[1] == 5:
-    from __future__ import with_statement
 
 _IP_ADDRESS_REGEX = "^" + (r"\.".join(r"([01]?\d\d?|2[0-4]\d|25[0-5])")) + "$"
 
@@ -123,8 +121,10 @@ class ConfigManager():
             config.add_section(section)
         for k in datas:
             config.set(section,k,datas[k])
-        with open(filename, 'wb') as configfile:
-                config.write(configfile)
+        f = open(filename, 'wb')
+        config.write(f)
+        f.close()
+
 
 
 class genericPluginConfig():
