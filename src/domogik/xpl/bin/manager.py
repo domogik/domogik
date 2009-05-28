@@ -129,20 +129,20 @@ class SysManager(xPLModule):
         pidfile = os.path.join(self._pid_dir_path, name + ".pid")
         if os.path.isfile(pidfile):
 #            try:
-                f = open(pidfile, "r")
-                data = f.readlines()[0].replace('\n', '')
-                f.close()
-                os.kill(int(data), 15)
-                print "%s" % data
-                #We now check if the process is still existing
-                #NASTY ! Wait 2s to let the process terminate
-                time.sleep(2)
-                try:
-                    os.kill(int(data), 0)
-                except OSError:
-                    return 0
-                else:
-                    return 2
+            f = open(pidfile, "r")
+            data = f.readlines()[0].replace('\n', '')
+            f.close()
+            os.kill(int(data), 15)
+            print "%s" % data
+            #We now check if the process is still existing
+            #NASTY ! Wait 2s to let the process terminate
+            time.sleep(2)
+            try:
+                os.kill(int(data), 0)
+            except OSError:
+                return 0
+            else:
+                return 2
  #           except:
   #              return 2
         else:
@@ -180,8 +180,8 @@ class SysManager(xPLModule):
         '''
         pidfile = os.path.join(self._pid_dir_path,
                 component + ".pid")
-        with open(pidfile, "w") as f:
-            f.write(str(pid))
+        f = open(pidfile, "w")
+        f.write(str(pid))
 
 if __name__ == "__main__":
     s = SysManager()

@@ -88,7 +88,6 @@ class ConfigManager():
                         res_state_ok = True
                         final_res = tmp_res
                 #Check against regex
-                print "aaa%saaa" % check_re
                 if check_re != None:
                     #WARNING : this line will throw an exception if the regex
                     #is badly formatted
@@ -100,11 +99,15 @@ class ConfigManager():
                     else:
                         #The result did not match regex
                         res_state_ok = False
+                if check_re == None and proposed_val == None:
+                    res_state_ok = True
+                    final_res = tmp_res
                 if not res_state_ok:
                     print "The supplied result isn't correct! Please retry.\n"
             #At this state the provided result is ok
             #We store it
             result[name] = final_res
+            final_res = ''
         return result
 
     def write(self, filename, datas, section=None):
@@ -200,11 +203,11 @@ class databaseAccess(genericPluginConfig):
                 ('db_type', 'Which database will you use ?\n'
                 'Must be one of sqlite, mysql, postgres, oracle.\n'
                 '"sqlite" is the most simple one and does not need any particular setup.',
-                r"^(sqlite|mysql|postgres|oracle|)$", None),
+                r"^(sqlite|mysql|postgres|oracle)$", None),
                 ('db_host','Which host to connect to (empty if sqlite)', None, None),
                 ('db_user','Database user (must exists, empty if sqlite)', None, None),
                 ('db_password','Database user password (empty if sqlite)', None, None),
-                ('db_name','Database user password (empty if sqlite)', None, None),
+                ('db_name','Database name (empty if sqlite)', None, None),
                 ('db_path','If you use sqlite, define here the absolute path (empty if not sqlite).\n'
                 'Domogik will need write permissions to create the database and write to it.', None, None)
         ]
