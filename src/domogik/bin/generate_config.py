@@ -189,6 +189,21 @@ class generalConfig(genericPluginConfig):
         section = "domogik"
         self.askandwrite(file, section)
 
+class databaseAccess(genericPluginConfig):
+    """
+    Ask the user for database related parameters
+    """
+
+    def __init__(self):
+        self.informations = [
+                ('db_type', 'Which database will you use ?\n
+                Must be one of sqlite, mysql, postgres, oracle.\n
+                "sqlite" is the most simple one and does not need any particular setup.',
+                r"^(sqlite|mysql|postgres|oracle)$", []),
+                ('db_host','Which host to connect to (empty if sqlite)', None, []),
+                ('db_user','Database user (must exists, empty if sqlite)', None, []),
+                ('db_password','Database user password (empty if sqlite)', None, []),
+                ('db_name','Database user password (empty if sqlite)', None, []),
 
 #DEPRECATED
 class x10Config(genericPluginConfig):

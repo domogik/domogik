@@ -38,7 +38,7 @@ class DbHelper():
         driver://user:password@host[:port]/db_name or
         driver:////path/tothe/file
         - driver : one of sqlite, mysql, postgres, oracle, mssql, firebird
-        In you use sqllite and provide an absolute path, don't ofrget the 4 /
+        In you use sqllite and provide an absolute path, don't forget the 4 /
         like in the exemple.
         """
         self._engine = create_engine(url)
