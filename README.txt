@@ -27,12 +27,6 @@ See the web site on http://www.domogik.org to get the latest documentation.
 *	This won't be necessary as soon as we have an installer
 ***********************************************************
 
-* Install all required components (see http://www.domogik.org)
-* You need to add the domogik directory to python path. One way 
-  to do that is to create a file /usr/lib/python2.5/site-packages/domogik.pth
-  which will contains the absolute path to the domogik root directory. If you're using
-  python2.6, the file should be /usr/lib/python2.6/dist-packages/domogik.pth.
-
 X10
 ***
 
@@ -45,17 +39,29 @@ X10
 
   * make sure it is running properly, running manual commands. Then stop heyu.
 
-* Go to the 'config' directory and run :
-	python generate_config.py
-* Go to the 'xPL' directory and start xPL hub :
-	./xPL_Hub -interface lo
-	# or if you want to have more output
-	./xPL_Hub -nodaemon -xpldebug -interface lo
+on the main directory :
+    sudo python ./setup.py develop
 
-* Go to the 'xPL' directory and run x10
-	python x10_main.py
+Then to configure sample file :
+	python src/domogik/bin/generate_config.py
+At the moment, you can answer 'N' when prompted for database configuration.
 
-* Point your browser to your domogik installation
+* start xPL hub :
+	src/domogik/xpl/tools/xPL_Hub -interface lo
+	or if you want to have more output
+	src/domogik/xpl/tools/xPL_Hub -nodaemon -xpldebug -interface lo
+
+    python src/domogik/xpl/bin/databasemanager.py
+
+To start x10 module :
+    python src/domogik/xpl/bin/x10.py
+
+then to start the django interface :
+    cd src/domogik/ui/djangodomo
+    python manage.py syncdb
+    python manage.py runserver
+
+* Point your browser to your domogik installation at http://localhost:8000/domogik
 * Click on the "config" link and set up your devices
 	(to have examples, you can first go to the admin section and load sample data)
 * You should be able to send x10 commands!
