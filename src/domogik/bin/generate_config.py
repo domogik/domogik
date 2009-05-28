@@ -88,11 +88,12 @@ class ConfigManager():
                         res_state_ok = True
                         final_res = tmp_res
                 #Check against regex
+                print "aaa%saaa" % check_re
                 if check_re != None:
                     #WARNING : this line will throw an exception if the regex
                     #is badly formatted
                     r = re.compile(check_re)
-                    if (r.match(str(tmp_res))):
+                    if r.match(str(tmp_res)):
                         #Result is ok for this test
                         res_state_ok = True
                         final_res = tmp_res
@@ -196,14 +197,20 @@ class databaseAccess(genericPluginConfig):
 
     def __init__(self):
         self.informations = [
-                ('db_type', 'Which database will you use ?\n
-                Must be one of sqlite, mysql, postgres, oracle.\n
-                "sqlite" is the most simple one and does not need any particular setup.',
-                r"^(sqlite|mysql|postgres|oracle)$", []),
-                ('db_host','Which host to connect to (empty if sqlite)', None, []),
-                ('db_user','Database user (must exists, empty if sqlite)', None, []),
-                ('db_password','Database user password (empty if sqlite)', None, []),
-                ('db_name','Database user password (empty if sqlite)', None, []),
+                ('db_type', 'Which database will you use ?\n'
+                'Must be one of sqlite, mysql, postgres, oracle.\n'
+                '"sqlite" is the most simple one and does not need any particular setup.',
+                r"^(sqlite|mysql|postgres|oracle|)$", None),
+                ('db_host','Which host to connect to (empty if sqlite)', None, None),
+                ('db_user','Database user (must exists, empty if sqlite)', None, None),
+                ('db_password','Database user password (empty if sqlite)', None, None),
+                ('db_name','Database user password (empty if sqlite)', None, None),
+                ('db_path','If you use sqlite, define here the absolute path (empty if not sqlite).\n'
+                'Domogik will need write permissions to create the database and write to it.', None, None)
+        ]
+        file = "%s/.domogik.cfg" % os.getenv("HOME")
+        section = "domogik"
+        self.askandwrite(file, section)
 
 #DEPRECATED
 class x10Config(genericPluginConfig):
@@ -352,6 +359,11 @@ def main():
         if choice == "--help":
             usage()
     generalConfig()
+
+    db = raw_input('Do you want to configure the database settings ?\n'
+    'This is only needed if you are on the host which will hot database. [y/N]')
+    if db == 'y' or db == 'Y':
+        databaseAccess()
 
 if __name__ == "__main__":
     main()

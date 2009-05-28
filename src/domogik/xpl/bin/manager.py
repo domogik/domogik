@@ -129,11 +129,12 @@ class SysManager(xPLModule):
         pidfile = os.path.join(self._pid_dir_path, name + ".pid")
         if os.path.isfile(pidfile):
 #            try:
-            with open(pidfile, "r") as f:
+                f = open(pidfile, "r")
                 data = f.readlines()[0].replace('\n', '')
+                f.close()
                 os.kill(int(data), 15)
                 print "%s" % data
-                #We now check is the process is still existing
+                #We now check if the process is still existing
                 #NASTY ! Wait 2s to let the process terminate
                 time.sleep(2)
                 try:
