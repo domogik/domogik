@@ -212,6 +212,7 @@ class databaseAccess(genericPluginConfig):
                 ('db_user','Database user (must exists, empty if sqlite)', None, None),
                 ('db_password','Database user password (empty if sqlite)', None, None),
                 ('db_name','Database name (empty if sqlite)', None, None),
+				('db_prefix','Core tables prefix (keep default if you don\'t know what it is)',None, ['core']),
                 ('db_path','If you use sqlite, define here the absolute path (empty if not sqlite).\n'
                 'Domogik will need write permissions to create the database and write to it.', None, None)
         ]

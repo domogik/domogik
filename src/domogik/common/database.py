@@ -23,7 +23,7 @@
 # $LastChangedDate:$
 # $LastChangedRevision:$
 
-from sqlalchemy import *
+from sqlalchemy.ext.sqlsoup import SqlSoup
 
 from domogik.common.configloader import Loader
 
@@ -34,20 +34,12 @@ class DbHelper():
     """
 
     def __init__(self):
-        """
-        @param url : the url to access the database, should be like
-        driver://user:password@host[:port]/db_name or
-        driver:////path/tothe/file
-        - driver : one of sqlite, mysql, postgres, oracle, mssql, firebird
-        In you use sqllite and provide an absolute path, don't forget the 4 /
-        like in the exemple.
-        """
 
         cfg = Loader('database')
         config = cfg.load()
 
         db = dict(config[1])
-        url = "%s://" % db['db_type']
+        url = "%s:///" % db['db_type']
         if db['db_type'] == 'sqlite':
             url = "%s%s" % (url,db['db_path'])
         else:
@@ -57,8 +49,8 @@ class DbHelper():
                 url = "%s%s:%s@%s/%s" % (url, db['db_user'], db['db_password'], db['db_host'], db['db_name'])
 
         #Connecting to the database
-        self._engine = create_engine(url)
-        self._metadata = MetaData()
+        self._soup = SqlSoup(url)
+        print self._soup.core_devicecategory.all()
 
 
 if __name__ == "__main__":
