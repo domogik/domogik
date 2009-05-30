@@ -173,7 +173,7 @@ device_technology_config_table = Table('%s_device_technology_config' % db['db_pr
 # technology : Device technology (foreign key)
 # type: One of 'appliance','lamp','music'
 # category : Device category (foreign key)
-# room : The room where the device is (foreign key)
+#  room : The room where the device is (foreign key)
 # is_resetable : Can we set the device to a default value
 # initial_value : Value to reset the device
 # is_value_changeable_by_user : Can the device receive orders from the user
