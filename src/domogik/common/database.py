@@ -130,13 +130,60 @@ class DbHelper():
 
 
 ####
-# User related informations
+# Rooms
 ####
+    def list_rooms(self):
+        """
+        Returns a list of rooms' name
+        """
+        result = []
+        for room in  self._get_table('room').all():
+            result.append(room.name)
+        return result    
+
+    def fetch_room_informations(self, room):
+        """
+        Return informations about an room
+        @param room : The room name
+        @return a dictionnary of name:value 
+        """
+#        try:
+        request = self._get_table('room').filter_by(name = room).first()
+        return {'id' : request.id, 'name' : request.name, 'area' : request.area,'description' : request.description}
+#        except AttributeError:
+#            return None
+
+    def add_room(self, r_name, r_area_id, r_description):
+        """
+        Add an room
+        @param r_name : room name
+        @param r_area_id : id of the area where the room is
+        @param r_description : room detailled description
+        """
+        self._get_table('room').insert(name = r_name, area = r_area_id, description = r_description)
+        self._soup.flush()
+
+    
+    def del_room(self, r_name):
+        """
+        Delete a room record 
+        Warning this also remove all the devices (+ their stats) in each deleted rooms !
+        @param a_name : name of the room to delete
+        """
+        room = self._get_table('room').filter_by(name = r_name).first()
+        devices = self._get_table('device').filter_by(room = room.id).all()
+        self._get_table('room').delete(id == room.id)
+        for device in devices:
+            self._get_table('device').delete(id == device.id)
+        self._get_table('room').delete(id == room.id)
+        self._soup.flush()
 
 
 if __name__ == "__main__":
     d = DbHelper()
+    print "================="
     print "=== test area ==="
+    print "================="
     print "= list areas ="
     print d.list_areas()
     print "= add area ="
@@ -148,4 +195,21 @@ if __name__ == "__main__":
     print "= del area ="
     print d.del_area('area1')    
     print "= list areas ="
-    print d.list_areas()    
+    print d.list_areas() 
+    print "\n\n================="
+    print "=== test room ==="
+    print "================="
+    print "= add area ="
+    print d.add_area('area1','description 1')
+    print "= list room ="
+    print d.list_rooms()
+    print "= add room ="
+    print d.add_room('room1', 'area1', 'description 1')
+    print "= list room ="
+    print d.list_rooms()
+    print "= fetch informations ="
+    print d.fetch_room_informations('room1')
+    print "= del room ="
+    print d.del_room('room1')    
+    print "= list rooms ="
+    print d.list_rooms() 

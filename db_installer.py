@@ -115,7 +115,7 @@ areas_table =  Table('%s_area' % db['db_prefix'], metadata,
 rooms_table =  Table('%s_room' % db['db_prefix'], metadata, 
 	    Column('id', Integer, primary_key=True),
 	    Column('name', String(30), nullable=False),
-	    Column('area', Integer, ForeignKey('%s_area.id' % db['db_prefix'])),
+	    Column('area', Integer, ForeignKey('%s_area.name' % db['db_prefix'])),
 	    Column('description', String(100)),
 	)
 
