@@ -79,14 +79,14 @@ class DbHelper():
 ####
 # Areas
 ####
-    def list_areas(self):
+    def list_areas_name(self):
         """
         Returns a list of areas' name
         """
         result = []
         for area in  self._get_table('area').all():
             result.append(area.name)
-        return result    
+        return result
 
     def fetch_area_informations(self, area):
         """
@@ -94,10 +94,11 @@ class DbHelper():
         @param area : The area name
         @return a dictionnary of name:value 
         """
-        try:
-            request = self._get_table('area').filter_by(name = area).first()
+        req = self._get_table('area').filter_by(name = area)
+        if req.count() > 0:
+            request = req.first()
             return {'id' : request.id, 'name' : request.name, 'description' : request.description}
-        except AttributeError:
+        else:
             return None
 
     def add_area(self, a_name, a_description):
@@ -109,7 +110,6 @@ class DbHelper():
         self._get_table('area').insert(name = a_name, description = a_description)
         self._soup.flush()
 
-    
     def del_area(self, a_name):
         """
         Delete an area record and
@@ -117,29 +117,31 @@ class DbHelper():
         and all the devices (+ their stats) in each deleted rooms !
         @param a_name : name of the area to delete
         """
-        area = self._get_table('area').filter_by(name = a_name).first()
-        rooms = self._get_table('room').filter_by(area = area.id)
-        devices = []
-        for room in rooms:
-            devices.extends(self._get_table('device').filter_by(room = room.id))
-            self._get_table('room').delete(id == room.id)
-        for device in devices:
-            self._get_table('device').delete(id == device.id)
-        self._get_table('area').delete(id == area.id)
-        self._soup.flush()
+        req = self._get_table('area').filter_by(name = a_name)
+        if req.count() > 0:
+            area = req.first()
+            rooms = self._get_table('room').filter_by(area = area.id)
+            devices = []
+            for room in rooms:
+                devices.extends(self._get_table('device').filter_by(room = room.id))
+                self._get_table('room').delete(id == room.id)
+            for device in devices:
+                self._get_table('device').delete(id == device.id)
+            self._get_table('area').delete(id == area.id)
+            self._soup.flush()
 
 
 ####
 # Rooms
 ####
-    def list_rooms(self):
+    def list_rooms_name(self):
         """
         Returns a list of rooms' name
         """
         result = []
         for room in  self._get_table('room').all():
             result.append(room.name)
-        return result    
+        return result
 
     def fetch_room_informations(self, room):
         """
@@ -147,11 +149,12 @@ class DbHelper():
         @param room : The room name
         @return a dictionnary of name:value 
         """
-#        try:
-        request = self._get_table('room').filter_by(name = room).first()
-        return {'id' : request.id, 'name' : request.name, 'area' : request.area,'description' : request.description}
-#        except AttributeError:
-#            return None
+        req = self._get_table('room').filter_by(name = room)
+        if req.count() > 0:
+            request = req.first()
+            return {'id' : request.id, 'name' : request.name, 'area' : request.area,'description' : request.description}
+        else:
+            return None
 
     def add_room(self, r_name, r_area_id, r_description):
         """
@@ -163,21 +166,93 @@ class DbHelper():
         self._get_table('room').insert(name = r_name, area = r_area_id, description = r_description)
         self._soup.flush()
 
-    
     def del_room(self, r_name):
         """
-        Delete a room record 
+        Delete a room record
         Warning this also remove all the devices (+ their stats) in each deleted rooms !
         @param a_name : name of the room to delete
         """
-        room = self._get_table('room').filter_by(name = r_name).first()
-        devices = self._get_table('device').filter_by(room = room.id).all()
-        self._get_table('room').delete(id == room.id)
-        for device in devices:
-            self._get_table('device').delete(id == device.id)
-        self._get_table('room').delete(id == room.id)
+        req = self._get_table('room').filter_by(name = r_name)
+        if req.count() > 0:
+            room = req.first()
+            devices = self._get_table('device').filter_by(room = room.id).all()
+            self._get_table('room').delete(id == room.id)
+            for device in devices:
+                self._get_table('device').delete(id == device.id)
+            self._soup.flush()
+
+    def get_all_room_of_area(self, a_name):
+        """
+        Returns all the rooms of an area
+        @param a_name : area name
+        @return a list of dictionary {'id':'xxx','name':'yyy','description':'zzzz', 'area':a_name}
+        """
+        rooms = self._get_table('room').filter_by(area= a_name).all()
+        result = []
+        for room in rooms:
+            result.append({'id':room.id, 'name':room.name, 'area':room.area, 'description':room.description})
+        return result
+
+####
+# Device category
+####
+    def list_device_categories_name(self):
+        """
+        Returns a list of device_categories' name
+        """
+        result = []
+        for device_category in  self._get_table(str('device_category')).all():
+            result.append(device_category.name)
+        return result
+
+    def fetch_device_category_informations(self, dc_name):
+        """
+        Return informations about a device category
+        @param dc_name : The device category name
+        @return a dictionnary of name:value 
+        """
+        req = self._get_table('device_category').filter_by(name = dc_name)
+        if req.count() > 0:
+            request = req.first()
+            return {'id' : request.id, 'name' : request.name}
+        else:
+            return None
+
+    def add_device_category(self, dc_name):
+        """
+        Add an device_category
+        @param dc_name : device category name
+        """
+        self._get_table('device_category').insert(name = dc_name)
         self._soup.flush()
 
+    def del_device_category(self, dc_name):
+        """
+        Delete a device category record
+        Warning, it will also remove all the devices using this category
+        @param dc_name : name of the device category to delete
+        """
+        req = self._get_table('device_category').filter_by(name = dc_name)
+        if req.count() > 0:
+            device_category = req.first()
+            devices = self._get_table('device').filter_by(category = device_category.id).all()
+            self._get_table('device_category').delete(id == device_category.id)
+            for device in devices:
+                self._get_table('device').delete(id == device.id)
+            self._soup.flush()
+    
+    def get_all_device_of_category(self, dc_name):
+        """
+        Returns all the devices of a category
+        @param a_name : category name
+        @return a list of dictionary {'id':'xxx','address':'yyy','technology':'zzzz'}
+        It does *not* return all attributes of devices
+        """
+        devices = self._get_table('device').filter_by(category = dc_name).all()
+        result = []
+        for device in devices:
+            result.append({'id':device.id, 'address':device.address, 'technology':device.technology})
+        return result
 
 if __name__ == "__main__":
     d = DbHelper()
@@ -185,31 +260,48 @@ if __name__ == "__main__":
     print "=== test area ==="
     print "================="
     print "= list areas ="
-    print d.list_areas()
+    print d.list_areas_name()
     print "= add area ="
     print d.add_area('area1','description 1')
     print "= list areas ="
-    print d.list_areas()
+    print d.list_areas_name()
     print "= fetch informations ="
     print d.fetch_area_informations('area1')
     print "= del area ="
     print d.del_area('area1')    
     print "= list areas ="
-    print d.list_areas() 
+    print d.list_areas_name() 
     print "\n\n================="
     print "=== test room ==="
     print "================="
     print "= add area ="
     print d.add_area('area1','description 1')
     print "= list room ="
-    print d.list_rooms()
+    print d.list_rooms_name()
     print "= add room ="
     print d.add_room('room1', 'area1', 'description 1')
     print "= list room ="
-    print d.list_rooms()
+    print d.list_rooms_name()
+    print "= get all rooms of area1 "
+    print d.get_all_room_of_area('area1')
     print "= fetch informations ="
     print d.fetch_room_informations('room1')
     print "= del room ="
     print d.del_room('room1')    
     print "= list rooms ="
-    print d.list_rooms() 
+    print d.list_rooms_name() 
+    print "\n\n================="
+    print "=== test device_category ==="
+    print "================="
+    print "= list device_category ="
+    print d.list_device_categories_name()
+    print "= add device_category ="
+    print d.add_device_category('device_category 1')
+    print "= list device_category ="
+    print d.list_device_categories_name()
+    print "= fetch informations ="
+    print d.fetch_device_category_informations('device_category 1')
+    print "= del room ="
+    print d.del_device_category('device_category 1')    
+    print "= list rooms ="
+    print d.list_device_categories_name()
