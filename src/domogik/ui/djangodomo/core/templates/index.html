@@ -79,13 +79,9 @@
         </form>
     {% endif %}
     </div>
-	
+
     <div id="list">
     {% if deviceList %}
-		{% for device in deviceList %}
-			{% include device.get_template_name %}
-		{% endfor %} 
-		 <!--
         <form name="deviceListForm" method="POST"/>
         <table>
             <tr>
@@ -131,11 +127,15 @@
             </tr>
         </table>
         </form>
-		-->
     {% else %}
         <p>No device found !</p>
     {% endif %} 
     </div>
-	<script src="/skins/javascript/jquery.js" ></script>
-	<script src="/skins/javascript/device.js" ></script>
+<!--
+    {% for device in deviceList %}
+      {% include device.get_template_name %}
+    {% endfor %}
+    <script src="/skins/javascript/jquery.js" ></script>
+    <script src="/skins/javascript/device.js" ></script>
+-->
 {% endblock %}
