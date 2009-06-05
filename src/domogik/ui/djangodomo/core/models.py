@@ -186,6 +186,7 @@ class SystemAccount(models.Model):
 class User(models.Model):
     first_name = models.CharField(max_length=20)
     last_name = models.CharField(max_length=30)
+    email = models.EmailField()
     birthdate = models.DateField()
     system_account = models.ForeignKey(SystemAccount)
 
