@@ -173,18 +173,11 @@ def missing_newline(physical_line):
 
 def maximum_line_length(physical_line):
     """
-    Limit all lines to a maximum of 79 characters.
-
-    There are still many devices around that are limited to 80 character
-    lines; plus, limiting windows to 80 characters makes it possible to have
-    several windows side-by-side.  The default wrapping on such devices looks
-    ugly.  Therefore, please limit all lines to a maximum of 79 characters.
-    For flowing long blocks of text (docstrings or comments), limiting the
-    length to 72 characters is recommended.
+    Limit all lines to a maximum of 119 characters.
     """
     length = len(physical_line.rstrip())
-    if length > 79:
-        return 79, "E501 line too long (%d characters)" % length
+    if length > 119:
+        return 119, "E501 line too long (%d characters)" % length
 
 
 ##############################################################################
