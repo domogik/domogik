@@ -33,11 +33,13 @@ class XPLHelper:
     """
 
     def send(self, xPLSchema, xPLCommand):
-        scriptCmd = "python send.py " + xPLSchema + " \"" + xPLCommand + "\""
+        scriptCmd = "python sendXPL.py " + xPLSchema + " \"" + xPLCommand + "\""
         print scriptCmd
         curPath = os.getcwd()
+        print curPath
         # TODO : chdir is fishy, please change me!
-        os.chdir("xpl")
+        # This will be changed when the new xPL API will be available
+        os.chdir("../../xpl/bin")
         res = Popen(scriptCmd, shell=True, stderr=PIPE)
         os.chdir(curPath)
         output = res.stderr.read()
