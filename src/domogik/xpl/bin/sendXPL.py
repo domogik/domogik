@@ -91,11 +91,11 @@ class Sender(xPLModule):
 
     def usage(self):
         print """\
-usage : send.py message_type message_contents"
+usage : sendXPL.py message_type message_contents"
 \tmessage_type: Type of the message, must correspond to one of the supported \
 schemas
 \tmessage_contents: comma separated pairs key=value that will be put in message
-\tExample (x10): ./send.py x10.basic "device=a1,command=on"
+\tExample (x10): ./sendXPL.py x10.basic "device=a1,command=on"
 """
 
 
