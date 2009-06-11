@@ -369,7 +369,7 @@ def main():
     generalConfig()
 
     db = raw_input('Do you want to configure the database settings ?\n'
-    'This is only needed if you are on the host which will hot database. [y/N]')
+    'This is only needed if you are on the host which will host database. [y/N]')
     if db == 'y' or db == 'Y':
         databaseAccess()
 
