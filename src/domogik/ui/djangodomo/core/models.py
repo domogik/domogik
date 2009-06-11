@@ -107,7 +107,7 @@ class Device(models.Model):
     description = models.TextField(null=True, blank=True)
     technology = models.ForeignKey(DeviceTechnology)
     # This is NOT user-defined
-    type = models.CharField(max_length=20, choices=TYPE_CHOICES)
+    type = models.CharField("Type (NOT user-defined)",max_length=20, choices=TYPE_CHOICES)
     # This is user-defined
     category = models.ForeignKey(DeviceCategory)
     room = models.ForeignKey(Room)
