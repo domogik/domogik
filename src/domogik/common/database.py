@@ -241,19 +241,88 @@ class DbHelper():
                 self._get_table('device').delete(id == device.id)
             self._soup.flush()
     
-    def get_all_device_of_category(self, dc_name):
+    def get_all_devices_of_category(self, dc_id):
         """
         Returns all the devices of a category
-        @param a_name : category name
+        @param a_id: categoryid 
         @return a list of dictionary {'id':'xxx','address':'yyy','technology':'zzzz'}
         It does *not* return all attributes of devices
         """
-        devices = self._get_table('device').filter_by(category = dc_name).all()
+        devices = self._get_table('device').filter_by(category = dc_id).all()
         result = []
         for device in devices:
             result.append({'id':device.id, 'address':device.address, 'technology':device.technology})
         return result
 
+####
+# Device technology
+####
+    def list_device_technologies_name(self):
+        """
+        Returns a list of device_technologies' name
+        """
+        result = []
+        for device_technology in  self._get_table(str('device_technology')).all():
+            result.append(device_technology.name)
+        return result
+
+    def fetch_device_technology_informations(self, dc_name):
+        """
+        Return informations about a device technology
+        @param dc_name : The device technology name
+        @return a dictionnary of name:value 
+        """
+        req = self._get_table('device_technology').filter_by(name = dc_name)
+        if req.count() > 0:
+            request = req.first()
+            return {'id' : request.id, 'name' : request.name, 
+                    'description' : request.description, 'type' : request.type}
+        else:
+            return None
+
+    def add_device_technology(self, dc_name, dt_description, dt_type):
+        """
+        Add an device_technology
+        @param dc_name : device technology name
+        @param dt_description : extended description of the technology
+        @param type : type of the technology, one of 'cpl','wired','wifi','wireless','ir'
+        """
+        if dt_type not in ['cpl','wired','wifi','wireless','ir']:
+            raise ValueError, 'dt_type must be one of cpl,wired,wifi,wireless,ir'
+        self._get_table('device_technology').insert(name = dc_name, 
+                description = dt_description, type = dt_type)
+        self._soup.flush()
+
+    def del_device_technology(self, dc_name):
+        """
+        Delete a device technology record
+        Warning, it will also remove all the devices using this technology
+        @param dc_name : name of the device technology to delete
+        """
+        req = self._get_table('device_technology').filter_by(name = dc_name)
+        if req.count() > 0:
+            device_technology = req.first()
+            devices = self._get_table('device').filter_by(technology = device_technology.id).all()
+            self._get_table('device_technology').delete(id == device_technology.id)
+            for device in devices:
+                self._get_table('device').delete(id == device.id)
+            self._soup.flush()
+    
+    def get_all_devices_of_technology(self, dt_id):
+        """
+        Returns all the devices of a technology
+        @param dt_id : technology id
+        @return a list of dictionary {'id':'xxx','address':'yyy','technology':'zzzz'}
+        It does *not* return all attributes of devices
+        """
+        devices = self._get_table('device').filter_by(technology = dt_id).all()
+        result = []
+        for device in devices:
+            result.append({'id':device.id, 'address':device.address, 'technology':device.technology})
+        return result
+
+####
+# 
 if __name__ == "__main__":
     d = DbHelper()
     print "================="
@@ -301,7 +370,26 @@ if __name__ == "__main__":
     print d.list_device_categories_name()
     print "= fetch informations ="
     print d.fetch_device_category_informations('device_category 1')
+    print "= Get all devices of category ="
+    print d.get_all_devices_of_category(d.fetch_device_category_informations('device_category 1')['id'])
     print "= del room ="
     print d.del_device_category('device_category 1')    
     print "= list rooms ="
     print d.list_device_categories_name()
+    print "\n\n================="
+    print "=== test device_tegnology==="
+    print "================="
+    print "= list device_technology ="
+    print d.list_device_technologies_name()
+    print "= add device_technology ="
+    print d.add_device_technology('device_technology 1', 'Device_technology 1 descrition', 'wired')
+    print "= list device_technology ="
+    print d.list_device_technologies_name()
+    print "= fetch informations ="
+    print d.fetch_device_technology_informations('device_technology 1')
+    print "= Get all devices of technology ="
+    print d.get_all_devices_of_technology(d.fetch_device_technology_informations('device_technology 1')['id'])
+    print "= del room ="
+    print d.del_device_technology('device_technology 1')    
+    print "= list rooms ="
+    print d.list_device_technologies_name()
