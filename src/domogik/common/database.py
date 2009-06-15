@@ -324,7 +324,6 @@ class DbHelper():
 ####
 # Device technology config
 ####
-
     def list_device_technology_config_keys(self):
         """
         Returns a list of device_technologies'config keys
@@ -401,6 +400,86 @@ class DbHelper():
         for device in devices:
             result.append({'id':device.id, 'address':device.address, 'technology':device.technology})
         return result
+
+###
+# Devices
+###
+    def list_devices(self):
+        """
+        Returns a list of some devices informations
+        This method doesn't return all informations
+        @return a list of dictionnaries {'id': device_id, 
+            'technology': device_technology, 'address' : device_address}
+
+        """
+        result = []
+        for device in  self._get_table(str('device')).all():
+            result.append({'id' : device.id, 'technology' : device.technology, 
+                'address' : device.address)
+        return result
+
+    def fetch_device_informations(self, d_id):
+        """
+        Return informations about a device 
+        @param d_id : The device id
+        @return a dictionnary of name:value 
+        """
+        req = self._get_table('device').filter_by(id = d_id)
+        if req.count() > 0:
+            request = req.first()
+            return {'id' : request.id, 'technology' : request.technology, 
+                    'address' : request.address, 'description' : request.description,
+                    'type' : request.type, 'category' : request.category,
+                    'room' : request.room, 'is_resetable' : request.is_resetable,
+                    'initial_value' : request.initial_value, 
+                    'is_value_changeable_by_user': request.is_value_changeable_by_user,
+                    'unit_of_stored_values' : request.unit_of_stored_values
+                    }
+        else:
+            return None
+
+    def add_device(self, d_address, d_technology, d_type, d_category,
+        d_room, d_initial_value = None, d_description = None, d_is_resetable = False, 
+        d_is_changeable_by_user = False, d_unit_of_stored_values ='Percent'):
+        """
+        Add a device item
+        @param technology : Item technology id
+        @param address : Item address (ex : 'A3' for x10/plcbus, '111.111111111' for 1wire)
+        @param description : Extended item description (100 char max)
+        @param type : One of 'appliance','light','music','sensor'
+        @param category : Item category id
+        @param room : Item room id
+        @param is_resetable : Can the item be reseted to some initial state
+        @param initial_value : What's the initial value of the item, should be 
+            the state when the item is created (except for sensors, music)
+        @param is_value_changeable_by_user : Can a user change item state (ex : false for sensor)
+        @param unit_of_stored_values : What is the unit of item values,
+            must be one of 'Volt', 'Celsius', 'Fahrenheit', 'Percent', 'Boolean'
+        """
+        if d_unit_of_stored_values not in ['Volt','Celsius','Farenight','Percent','Boolean']:
+            raise ValueError, "d_unit_of_stored_values must be one of 
+            'Volt','Celsius','Farenight','Percent','Boolean'."
+        if d_type not in ['appliance','lamp','music']:
+            raise ValueError, "d_type must be one of 'appliance','lamp','music'"
+        self._get_table('device').insert(address = d_address, technology = d_technology, 
+            type = d_type, category = d_category, room = d_room, initial_value = d_initial_value, 
+            description = d_description, is_resetable = d_is_resetable, 
+            is_value_changeable_by_user = d_is_changeable_by_user,
+            unit_of_stored_values =  d_unit_of_stored_values)
+        self._soup.flush()
+
+    def del_device(self, d_id):
+        """
+        Delete a device 
+        @param d_id : item id
+        """
+        req = self._get_table('device').filter_by(id = d_id)
+        if req.count() > 0:
+            device = req.first()
+            self._get_table('device').delete(id == device.id)
+            self._soup.flush()
+    
+    
 if __name__ == "__main__":
     d = DbHelper()
     print "================="

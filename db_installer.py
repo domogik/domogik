@@ -185,13 +185,13 @@ device_table = Table('%s_device' % db['db_prefix'], metadata,
 	    Column('address', String(30), nullable=False),
 	    Column('description', String(100)),
 		Column('technology', Integer, ForeignKey('%s_device_technology.id' % db['db_prefix'])),
-		Column('type', Enum([u'appliance',u'lamp',u'music'])),
+		Column('type', Enum([u'appliance',u'lamp',u'music',u'sensor'])),
 		Column('category', Integer, ForeignKey('%s_device_category.id' % db['db_prefix'])),
 	    Column('room', Integer, ForeignKey('%s_room.id' % db['db_prefix'])),
 	    Column('is_resetable', Boolean, nullable=False),
 		Column('initial_value', String(10)),
 	    Column('is_value_changeable_by_user', Boolean, nullable=False),
-		Column('unit_of_stored_values', Enum([u'Volt',u'Calsius',u'Farenight',u'Percent',u'Boolean']))
+		Column('unit_of_stored_values', Enum([u'Volt',u'Celsius',u'Fahrenheit',u'Percent',u'Boolean']))
 	)
 
 ###
