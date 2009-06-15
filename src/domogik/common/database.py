@@ -322,7 +322,85 @@ class DbHelper():
         return result
 
 ####
-# 
+# Device technology config
+####
+
+    def list_device_technology_config_keys(self):
+        """
+        Returns a list of device_technologies'config keys
+        """
+        result = []
+        for device_technology in  self._get_table(str('device_technology_config')).all():
+            result.append(device_technology.key)
+        return result
+
+    def fetch_device_technology_config_informations(self, dtc_technology, dtc_key):
+        """
+        Return informations about a device technology config item
+        @param dtc_technology : The device technology 
+        @param dtc_key : The device technology config key
+        @return a dictionnary of name:value 
+        """
+        req = self._get_table('device_technology_config').filter_by(key= dtc_key, 
+                technology = dtc_technology)
+        if req.count() > 0:
+            request = req.first()
+            return {'id' : request.id, 'technology' : request.technology, 
+                    'key' : request.key, 'value' : request.value}
+        else:
+            return None
+
+    def fetch_device_technology_config_value(self, dtc_technology, dtc_key):
+        """
+        Only returns the value for a config key
+        @param dtc_technology : The device technology 
+        @param dtc_key : The device technology config key
+        @return the value of the config item 'dtc_key' for the technology 'dtc_technology'
+        """
+        req = self._get_table('device_technology_config').filter_by(key= dtc_key, 
+                technology = dtc_technology)
+        if req.count() > 0:
+            request = req.first()
+            return request.value
+        else:
+            return None
+
+    def add_device_technology_config(self, dtc_technology, dtc_key, dtc_value):
+        """
+        Add a device's technology config item
+        @param dtc_technology : The device technology 
+        @param dtc_key : The device technology config key
+        @param dtc_value : The device technology config value
+        """
+        if dt_type not in ['cpl','wired','wifi','wireless','ir']:
+            raise ValueError, 'dt_type must be one of cpl,wired,wifi,wireless,ir'
+        self._get_table('device_technology').insert(name = dc_name, 
+                description = dt_description, type = dt_type)
+        self._soup.flush()
+
+    def del_device_technology_config(self, dtc_id):
+        """
+        Delete a device technology config record
+        @param dtc_id : config item id
+        """
+        req = self._get_table('device_technology_config').filter_by(id = dtc_id)
+        if req.count() > 0:
+            device_technology_config = req.first()
+            self._get_table('device_technology_config').delete(id == device_technology_config.id)
+            self._soup.flush()
+    
+    def get_all_config_of_technology(self, dt_id):
+        """
+        Returns all the devices of a technology
+        @param dt_id : technology id
+        @return a list of dictionary {'id':'xxx','address':'yyy','technology':'zzzz'}
+        It does *not* return all attributes of devices
+        """
+        devices = self._get_table('device').filter_by(technology = dt_id).all()
+        result = []
+        for device in devices:
+            result.append({'id':device.id, 'address':device.address, 'technology':device.technology})
+        return result
 if __name__ == "__main__":
     d = DbHelper()
     print "================="
