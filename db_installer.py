@@ -234,6 +234,7 @@ device_stats_table =  Table('%s_device_stats' % db['db_prefix'], metadata,
 ###
 trigger_table = Table('%s_trigger' % db['db_prefix'], metadata,
 		Column('id', Integer, primary_key=True),
+		Column('description', String(100)),
 	    Column('rule', Text, nullable=False),
 	    Column('result', Text, nullable=False)
 	)

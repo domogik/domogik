@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- encoding:utf-8 -*-
+# -*- coding: utf-8 -*-
 
 # Copyright 2008 Domogik project
 
@@ -77,6 +77,7 @@ class DbHelper():
         This method takes care of the prefix used
         """
         ref = eval("self._soup.%s_%s" % (self._dbprefix, table_name))
+        print ref.all()
         return ref
 
 ####
@@ -547,58 +548,48 @@ class DbHelper():
     def list_triggers(self):
         """
         Returns a list of all triggers
-        @return A list of dictionnary {'id' : trigger id, 'rule' : trigger rule,
-            'result' : trigger result}
+        @return A list of dictionnary {'id' : trigger id, 'decription' : trigger descripition,
+            'rule' : trigger rule, 'result' : trigger result}
         """
         result = []
         for trigger in  self._get_table('trigger').all():
-            result.append({'id': trigger.id, 'rule': trigger.rule, 'result': trigger.result})
+            result.append({'id': trigger.id, 'decription': trigger.decription, 'rule': trigger.rule, 'result': trigger.result})
         return result
 
-    def get_last_stat_of_devices(self, d_list):
+    def get_trigger(self, t_id):
         """
-        Fetch the last record for all devices in d_list
-        @param d_list : list of device ids
-        @return a list of dictionnary
+        Returns a trigger information from id
+        @param t_id : trigger id
+        @return A dictionnary {'id' : trigger id, 'description': trigger decription,
+            'rule' : trigger rule, 'result' : trigger result}
         """
         result = []
-        for device in d_list:
-            last_record = self._get_table('device_stats').\
-                filter_by(id = device).\
-                order_by(desc(self._get_table('device_stats').date)).first()
-            result.append({'device' : device, 'date' : last_record.date, 'value' : last_record.value})
-        return result
+        request = self._get_table('trigger').filter_by(id = t_id)
+        if request.count() > 0:
+            trigger = request.first()
+            return {'id': trigger.id, 'decription': trigger.decription, 'rule': trigger.rule, 'result': trigger.result}
 
-    def add_device_stat(self, ds_device, ds_date, ds_value):
+    def add_trigger(self, t_desc, t_rule, t_res):
         """
-        Add a device stat record
-        @param ds_device : device id
-        @param ds_date : timestamp
-        @param ds_value : stat value
+        Add a trigger
+        @param t_desc : trigger description
+        @param t_rule : trigger rule
+        @param t_res : trigger result
         """
-        self._get_table('device_stats').insert(device = ds_device, date = ds_date,
-                value = ds_value)
+        self._get_table('trigger').insert(description = t_desc, rule = t_rule, res = t_res)
         self._soup.flush()
 
-    def del_device_stat(self, ds_id):
+    def del_trigger(self, t_id):
         """
-        Delete a stat record
-        @param ds_id : record id
+        Delete a trigger
+        @param t_id : trigger id
         """
         req = self._get_table('device_stats').filter_by(id = ds_id)
         if req.count() > 0:
             device_stat = req.first()
-            self._get_table('device_stats').delete(id == device_stat.id)
+            self._get_table('trigger').delete(id == device_stat.id)
             self._soup.flush()
 
-    def del_all_device_stats(self, d_id):
-        """
-        Delete all stats for a device
-        @param d_id : device id
-        """
-        self._get_table('device_stats').delete(self._get_table('device_stats').device == d_id)
-        self._soup.flush()
-  
  
 ###
 # display tests
@@ -763,4 +754,18 @@ if __name__ == "__main__":
     print_test('list devices')
     print d.list_devices()
 
+    print_title('test trigger')
+    print_test('list triggers')
+    print d.list_triggers()
+    print_test('add triger')
+    print d.add_trigger('Trigger description 1','AND(x,OR(y,z))',['x10_on("a3")','1wire()'])
+    print_test('list triggers')
+    print d.list_triggers()
+    trig_id = d.list_triggers()[0]['id']
+    print_test('get trigger')
+    print d.get_trigger(trig_id)
+    print_tet('delete trigger')
+    print d.del_trigger(trig_id)
+    print_test('list triggers')
+    print d.list_triggers()
 
