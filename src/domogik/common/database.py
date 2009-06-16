@@ -39,6 +39,9 @@
 ####
 
 from sqlalchemy.ext.sqlsoup import SqlSoup
+from sqlalchemy import asc, desc
+import time
+from datetime import datetime
 
 from domogik.common.configloader import Loader
 
@@ -482,165 +485,155 @@ class DbHelper():
 ####
 # Device stats
 ####
-    def list_device_stats(self, d_id):
+    def list_device_stats(self, ds_id):
         """
         Returns a list of all stats for a device
-        @param d_id : the device id
+        @param ds_id : the device id
         @return A list of dictionnary {'date' : stat date/time, 'value' : stat value}
         """
         result = []
-        for device_stat in  self._get_table(str('device_stats')).filter_by(device = d_id):
-            result.append(device_stat.)
+        for device_stat in  self._get_table('device_stats').filter_by(device = ds_id):
+            result.append({'date': device_stat.date, 'value': device_stat.value})
         return result
 
-    def fetch_device_technology_config_informations(self, dtc_technology, dtc_key):
+    def get_last_stat_of_devices(self, d_list):
         """
-        Return informations about a device technology config item
-        @param dtc_technology : The device technology 
-        @param dtc_key : The device technology config key
-        @return a dictionnary of name:value 
+        Fetch the last record for all devices in d_list
+        @param d_list : list of device ids
+        @return a list of dictionnary
         """
-        req = self._get_table('device_technology_config').filter_by(key= dtc_key, 
-                technology = dtc_technology)
-        if req.count() > 0:
-            request = req.first()
-            return {'id' : request.id, 'technology' : request.technology, 
-                    'key' : request.key, 'value' : request.value}
-        else:
-            return None
+        result = []
+        for device in d_list:
+            last_record = self._get_table('device_stats').\
+                filter_by(id = device).\
+                order_by(desc(self._get_table('device_stats').date)).first()
+            result.append({'device' : device, 'date' : last_record.date, 'value' : last_record.value})
+        return result
 
-    def fetch_device_technology_config_value(self, dtc_technology, dtc_key):
+    def add_device_stat(self, ds_device, ds_date, ds_value):
         """
-        Only returns the value for a config key
-        @param dtc_technology : The device technology 
-        @param dtc_key : The device technology config key
-        @return the value of the config item 'dtc_key' for the technology 'dtc_technology'
+        Add a device stat record
+        @param ds_device : device id
+        @param ds_date : timestamp
+        @param ds_value : stat value
         """
-        req = self._get_table('device_technology_config').filter_by(key= dtc_key, 
-                technology = dtc_technology)
-        if req.count() > 0:
-            request = req.first()
-            return request.value
-        else:
-            return None
-
-    def add_device_technology_config(self, dtc_technology, dtc_key, dtc_value):
-        """
-        Add a device's technology config item
-        @param dtc_technology : The device technology 
-        @param dtc_key : The device technology config key
-        @param dtc_value : The device technology config value
-        """
-        if dt_type not in ['cpl','wired','wifi','wireless','ir']:
-            raise ValueError, 'dt_type must be one of cpl,wired,wifi,wireless,ir'
-        self._get_table('device_technology').insert(name = dc_name, 
-                description = dt_description, type = dt_type)
+        self._get_table('device_stats').insert(device = ds_device, date = ds_date,
+                value = ds_value)
         self._soup.flush()
 
-    def del_device_technology_config(self, dtc_id):
+    def del_device_stat(self, ds_id):
         """
-        Delete a device technology config record
-        @param dtc_id : config item id
+        Delete a stat record
+        @param ds_id : record id
         """
-        req = self._get_table('device_technology_config').filter_by(id = dtc_id)
+        req = self._get_table('device_stats').filter_by(id = ds_id)
         if req.count() > 0:
-            device_technology_config = req.first()
-            self._get_table('device_technology_config').delete(id == device_technology_config.id)
+            device_stat = req.first()
+            self._get_table('device_stats').delete(id == device_stat.id)
             self._soup.flush()
-    
-    def get_all_config_of_technology(self, dt_id):
+
+    def del_all_device_stats(self, d_id):
         """
-        Returns all the devices of a technology
-        @param dt_id : technology id
-        @return a list of dictionary {'id':'xxx','address':'yyy','technology':'zzzz'}
-        It does *not* return all attributes of devices
+        Delete all stats for a device
+        @param d_id : device id
         """
-        devices = self._get_table('device').filter_by(technology = dt_id).all()
-        result = []
-        for device in devices:
-            result.append({'id':device.id, 'address':device.address, 'technology':device.technology})
-        return result
+        self._get_table('device_stats').delete(self._get_table('device_stats').device == d_id)
+        self._soup.flush()
     
+
+def print_title(title):
+    """
+    Print a title in color
+    """
+    COLOR = '\033[92m'
+    ENDC = '\033[0m'
+    print "\n\n"
+    print COLOR
+    print "=" * (len(title) + 8)
+    print "=== %s ===" % title
+    print "=" * (len(title) + 8)
+    print ENDC
+
+def print_test(test):
+    """
+    Print a test title in color
+    """
+    COLOR = '\033[93m'
+    ENDC = '\033[0m'
+    print COLOR
+    print "= %s =" % test
+    print ENDC
+
 if __name__ == "__main__":
     d = DbHelper()
-    print "================="
-    print "=== test area ==="
-    print "================="
-    print "= list areas ="
+    print_title('test area')
+    print_test('list areas')
     print d.list_areas_name()
-    print "= add area ="
+    print_test('add area')
     print d.add_area('area1','description 1')
-    print "= list areas ="
+    print_test('list areas')
     print d.list_areas_name()
-    print "= fetch informations ="
+    print_test('fetch informations')
     print d.fetch_area_informations('area1')
-    print "= del area ="
+    print_test('del area')
     print d.del_area('area1')    
-    print "= list areas ="
+    print_test('list areas')
     print d.list_areas_name() 
 
-    print "\n\n================="
-    print "=== test room ==="
-    print "================="
+    print_title('test room')
     print "== add area =="
     print d.add_area('area1','description 1')
-    print "= list room ="
+    print_test('list room')
     print d.list_rooms_name()
-    print "= add room ="
+    print_test('add room')
     print d.add_room('room1', 'area1', 'description 1')
-    print "= list room ="
+    print_test('list room')
     print d.list_rooms_name()
     print "= get all rooms of area1 "
     print d.get_all_room_of_area('area1')
-    print "= fetch informations ="
+    print_test('fetch informations')
     print d.fetch_room_informations('room1')
-    print "= del room ="
+    print_test('del room')
     print d.del_room('room1')    
-    print "= list rooms ="
+    print_test('list rooms')
     print d.list_rooms_name() 
 
-    print "\n\n================="
-    print "=== test device_category ==="
-    print "================="
-    print "= list device_category ="
+    print_title('test device_category')
+    print_test('list device_category')
     print d.list_device_categories_name()
-    print "= add device_category ="
+    print_test('add device_category')
     print d.add_device_category('device_category 1')
-    print "= list device_category ="
+    print_test('list device_category')
     print d.list_device_categories_name()
-    print "= fetch informations ="
+    print_test('fetch informations')
     print d.fetch_device_category_informations('device_category 1')
-    print "= Get all devices of category ="
+    print_test('Get all devices of category')
     print d.get_all_devices_of_category(d.fetch_device_category_informations('device_category 1')['id'])
-    print "= del room ="
+    print_test('del room')
     print d.del_device_category('device_category 1')    
-    print "= list rooms ="
+    print_test('list rooms')
     print d.list_device_categories_name()
 
-    print "\n\n================="
-    print "=== test device_technology==="
-    print "================="
-    print "= list device_technology ="
+    print_title('test device_technology')
+    print_test('list device_technology')
     print d.list_device_technologies_name()
-    print "= add device_technology ="
+    print_test('add device_technology')
     print d.add_device_technology('device_technology 1', 'Device_technology 1 descrition', 'wired')
-    print "= list device_technology ="
+    print_test('list device_technology')
     print d.list_device_technologies_name()
-    print "= fetch informations ="
+    print_test('fetch informations')
     print d.fetch_device_technology_informations('device_technology 1')
-    print "= Get all devices of technology ="
+    print_test('Get all devices of technology')
     print d.get_all_devices_of_technology(d.fetch_device_technology_informations('device_technology 1')['id'])
-    print "= del technology ="
+    print_test('del technology')
     print d.del_device_technology('device_technology 1')    
-    print "= list technology ="
+    print_test('list technology')
     print d.list_device_technologies_name()
 
-    print "\n\n================="
-    print "=== test device ==="
-    print "================="
-    print "= list device="
+    print_title('test device')
+    print_test('list device')
     print d.list_devices()
-    print "= add device="
+    print_test('add device')
     print "== add device_technology =="
     print d.add_device_technology('device_technology 1', 'Device_technology 1 descrition', 'wired')
     dt_id = d.fetch_device_technology_informations('device_technology 1')['id']
@@ -655,13 +648,57 @@ if __name__ == "__main__":
     print d.add_device(d_address = 'A3', d_technology = dt_id, d_type = 'appliance', 
         d_category = dc_id, d_room = room_id, d_initial_value = 'off', d_description = 'My first device', 
         d_is_resetable = False, d_is_changeable_by_user = True, d_unit_of_stored_values ='Percent')
-    print "= list device="
+    print_test('list device')
     print d.list_devices()
-    print "= fetch informations ="
+    print_test('fetch informations')
     print d.fetch_device_informations(1)
-    print "= del device ="
+    print_test('del device')
     print d.del_device(1)    
-    print "= list devices ="
+    print_test('list devices')
+    print d.list_devices()
+
+    print_title('test device stats')
+    print_test('list device')
+    print d.list_devices()
+    print_test('add device')
+    print "== add device_technology =="
+    print d.add_device_technology('device_technology 1', 'Device_technology 1 descrition', 'wired')
+    dt_id = d.fetch_device_technology_informations('device_technology 1')['id']
+    print "== add device_category =="
+    print d.add_device_category('device_category 1')
+    dc_id = d.fetch_device_category_informations('device_category 1')['id']
+    print "== add area =="
+    print d.add_area('area1','description 1')
+    print "== add room =="
+    print d.add_room('room1', 'area1', 'description 1')
+    room_id = d.fetch_room_informations('room1')['id']
+    print d.add_device(d_address = 'A3', d_technology = dt_id, d_type = 'appliance', 
+        d_category = dc_id, d_room = room_id, d_initial_value = 'off', d_description = 'My first device', 
+        d_is_resetable = False, d_is_changeable_by_user = True, d_unit_of_stored_values ='Percent')
+    print_test('list device')
+    print d.list_devices()
+    d_id = d.list_devices()[0]['id']
+    print_test('fetch informations')
+    print d.fetch_device_informations(d_id)
+    print_test('list stats')
+    print d.list_device_stats(d_id)
+    print_test('Add stat')
+    from datetime import datetime
+    print d.add_device_stat(d_id, datetime.now(), 12)
+    print "[[[ sleep 3s ]]]"
+    time.sleep(3)
+    print d.add_device_stat(d_id, datetime.now(), 12)
+    print_test('list stats')
+    print d.list_device_stats(d_id)
+    print_test('last stat')
+    print d.get_last_stat_of_devices([d_id])
+    print_test('del stats')
+    print d.del_all_device_stats(d_id)
+    print_test('list stats')
+    print d.list_device_stats(d_id)
+    print_test('del device')
+    print d.del_device(d_id)    
+    print_test('list devices')
     print d.list_devices()
 
 
