@@ -55,7 +55,7 @@ class DbHelper():
 
         cfg = Loader('database')
         config = cfg.load()
-
+        print config
         db = dict(config[1])
         url = "%s:///" % db['db_type']
         if db['db_type'] == 'sqlite':
@@ -76,8 +76,14 @@ class DbHelper():
         Returns a referenceto the table
         This method takes care of the prefix used
         """
-        ref = eval("self._soup.%s_%s" % (self._dbprefix, table_name))
-        print ref.all()
+        print isinstance(self._dbprefix, unicode)
+        print isinstance(table_name, unicode)
+        ref =  getattr(self._soup, str('%s_%s') % (self._dbprefix, table_name))
+        print repr(ref)
+#        r = "self._soup.%s_%s" % (self._dbprefix, table_name)
+#        print repr(r)
+#        ref = eval(r)
+#        print ref.all()
         return ref
 
 ####

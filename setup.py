@@ -24,7 +24,7 @@ setup(
     url = 'http://www.domogik.org/',
     author = 'OpenSource home automation software',
     author_email = 'domogik-general@lists.labs.libre-entreprise.org',
-    install_requires=['setuptools','django >=1.0'],
+    install_requires=['setuptools','django >=1.0','sqlalchemy >= 0.5.4'],
     zip_safe = False,
     license = 'GPL v3',
     namespace_packages = ['domogik', 'mpris', 'tools'],

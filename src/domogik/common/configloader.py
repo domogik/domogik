@@ -62,6 +62,7 @@ class Loader():
         for k, v in result:
             main_result[k] = v
         #Check the plugin conf file if defined
+        print "xxxx" + self.module_name
         if self.module_name == None:
             return (main_result, None)
 
