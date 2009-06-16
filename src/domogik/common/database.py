@@ -539,8 +539,70 @@ class DbHelper():
         """
         self._get_table('device_stats').delete(self._get_table('device_stats').device == d_id)
         self._soup.flush()
-    
+   
+ 
+####
+# Triggers
+####
+    def list_triggers(self):
+        """
+        Returns a list of all triggers
+        @return A list of dictionnary {'id' : trigger id, 'rule' : trigger rule,
+            'result' : trigger result}
+        """
+        result = []
+        for trigger in  self._get_table('trigger').all():
+            result.append({'id': trigger.id, 'rule': trigger.rule, 'result': trigger.result})
+        return result
 
+    def get_last_stat_of_devices(self, d_list):
+        """
+        Fetch the last record for all devices in d_list
+        @param d_list : list of device ids
+        @return a list of dictionnary
+        """
+        result = []
+        for device in d_list:
+            last_record = self._get_table('device_stats').\
+                filter_by(id = device).\
+                order_by(desc(self._get_table('device_stats').date)).first()
+            result.append({'device' : device, 'date' : last_record.date, 'value' : last_record.value})
+        return result
+
+    def add_device_stat(self, ds_device, ds_date, ds_value):
+        """
+        Add a device stat record
+        @param ds_device : device id
+        @param ds_date : timestamp
+        @param ds_value : stat value
+        """
+        self._get_table('device_stats').insert(device = ds_device, date = ds_date,
+                value = ds_value)
+        self._soup.flush()
+
+    def del_device_stat(self, ds_id):
+        """
+        Delete a stat record
+        @param ds_id : record id
+        """
+        req = self._get_table('device_stats').filter_by(id = ds_id)
+        if req.count() > 0:
+            device_stat = req.first()
+            self._get_table('device_stats').delete(id == device_stat.id)
+            self._soup.flush()
+
+    def del_all_device_stats(self, d_id):
+        """
+        Delete all stats for a device
+        @param d_id : device id
+        """
+        self._get_table('device_stats').delete(self._get_table('device_stats').device == d_id)
+        self._soup.flush()
+  
+ 
+###
+# display tests
+###
 def print_title(title):
     """
     Print a title in color
