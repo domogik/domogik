@@ -55,7 +55,6 @@ class DbHelper():
 
         cfg = Loader('database')
         config = cfg.load()
-        print config
         db = dict(config[1])
         url = "%s:///" % db['db_type']
         if db['db_type'] == 'sqlite':
@@ -76,14 +75,7 @@ class DbHelper():
         Returns a referenceto the table
         This method takes care of the prefix used
         """
-        print isinstance(self._dbprefix, unicode)
-        print isinstance(table_name, unicode)
         ref =  getattr(self._soup, str('%s_%s') % (self._dbprefix, table_name))
-        print repr(ref)
-#        r = "self._soup.%s_%s" % (self._dbprefix, table_name)
-#        print repr(r)
-#        ref = eval(r)
-#        print ref.all()
         return ref
 
 ####
@@ -559,7 +551,7 @@ class DbHelper():
         """
         result = []
         for trigger in  self._get_table('trigger').all():
-            result.append({'id': trigger.id, 'decription': trigger.decription, 'rule': trigger.rule, 'result': trigger.result})
+            result.append({'id': trigger.id, 'description': trigger.description, 'rule': trigger.rule, 'result': trigger.result})
         return result
 
     def get_trigger(self, t_id):
@@ -573,7 +565,7 @@ class DbHelper():
         request = self._get_table('trigger').filter_by(id = t_id)
         if request.count() > 0:
             trigger = request.first()
-            return {'id': trigger.id, 'decription': trigger.decription, 'rule': trigger.rule, 'result': trigger.result}
+            return {'id': trigger.id, 'description': trigger.description, 'rule': trigger.rule, 'result': trigger.result}
 
     def add_trigger(self, t_desc, t_rule, t_res):
         """
@@ -582,7 +574,7 @@ class DbHelper():
         @param t_rule : trigger rule
         @param t_res : trigger result
         """
-        self._get_table('trigger').insert(description = t_desc, rule = t_rule, res = t_res)
+        self._get_table('trigger').insert(description = t_desc, rule = t_rule, result = ';'.join(t_res))
         self._soup.flush()
 
     def del_trigger(self, t_id):
@@ -590,13 +582,61 @@ class DbHelper():
         Delete a trigger
         @param t_id : trigger id
         """
-        req = self._get_table('device_stats').filter_by(id = ds_id)
+        req = self._get_table('trigger').filter_by(id = t_id)
         if req.count() > 0:
             device_stat = req.first()
             self._get_table('trigger').delete(id == device_stat.id)
             self._soup.flush()
 
- 
+
+####
+# System accounts
+####
+    def list_accounts(self):
+        """
+        Returns a list of all accounts id/login
+        @return A list of dictionnary {'id' : account_id, 'login': account_login}
+        """
+        result = []
+        for account in  self._get_table('system_account').all():
+            result.append({'id': account.id, 'login': account.login})
+        return result
+
+    def fetch_account_informations(self, a_id):
+        """
+        Returns account informations from id
+        @param a_id : account id
+        @return A dictionnary {'id' : account id, 'login': account login,
+            'password' : account encrypted password, 'is_admin' : True if the user is an admin}
+        """
+        result = []
+        request = self._get_table('system_account').filter_by(id = t_id)
+        if request.count() > 0:
+            account = request.first()
+            return {'id': account.id, 'login': account.login, 'password': account.password, 'is_admin': account.is_admin}
+
+    #TODO
+    def add_account(self, t_desc, t_rule, t_res):
+        """
+        Add a trigger
+        @param t_desc : trigger description
+        @param t_rule : trigger rule
+        @param t_res : trigger result
+        """
+        self._get_table('trigger').insert(description = t_desc, rule = t_rule, result = ';'.join(t_res))
+        self._soup.flush()
+
+    def del_trigger(self, t_id):
+        """
+        Delete a trigger
+        @param t_id : trigger id
+        """
+        req = self._get_table('trigger').filter_by(id = t_id)
+        if req.count() > 0:
+            device_stat = req.first()
+            self._get_table('trigger').delete(id == device_stat.id)
+            self._soup.flush()
+
 ###
 # display tests
 ###
@@ -770,7 +810,7 @@ if __name__ == "__main__":
     trig_id = d.list_triggers()[0]['id']
     print_test('get trigger')
     print d.get_trigger(trig_id)
-    print_tet('delete trigger')
+    print_test('delete trigger')
     print d.del_trigger(trig_id)
     print_test('list triggers')
     print d.list_triggers()
