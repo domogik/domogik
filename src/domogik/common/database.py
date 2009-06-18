@@ -42,6 +42,7 @@ from sqlalchemy.ext.sqlsoup import SqlSoup
 from sqlalchemy import asc, desc
 import time
 from datetime import datetime
+import md5
 
 from domogik.common.configloader import Loader
 
@@ -609,33 +610,43 @@ class DbHelper():
         @return A dictionnary {'id' : account id, 'login': account login,
             'password' : account encrypted password, 'is_admin' : True if the user is an admin}
         """
-        result = []
         request = self._get_table('system_account').filter_by(id = t_id)
         if request.count() > 0:
             account = request.first()
-            return {'id': account.id, 'login': account.login, 'password': account.password, 'is_admin': account.is_admin}
+            return {'id': account.id, 'login': account.login, 
+                    'password': account.password, 'is_admin': account.is_admin}
 
-    #TODO
-    def add_account(self, t_desc, t_rule, t_res):
+    def add_account(self, a_login, a_password, a_is_admin = False):
         """
         Add a trigger
-        @param t_desc : trigger description
-        @param t_rule : trigger rule
-        @param t_res : trigger result
+        @param a_login : Account login
+        @param a_password : Account clear password (will be hashed)
+        @param a_is_admin : Is an admin account ? 
         """
-        self._get_table('trigger').insert(description = t_desc, rule = t_rule, result = ';'.join(t_res))
+        self._get_table('system_account').insert(login = a_login, 
+                password = md5.update(a_password).digest(), is_admin = a_is_admin)
         self._soup.flush()
 
-    def del_trigger(self, t_id):
+    def del_account(self, a_id):
         """
-        Delete a trigger
-        @param t_id : trigger id
+        Delete a system account 
+        @param a_id : account id
         """
-        req = self._get_table('trigger').filter_by(id = t_id)
+        req = self._get_table('system_account').filter_by(id = a_id)
         if req.count() > 0:
-            device_stat = req.first()
-            self._get_table('trigger').delete(id == device_stat.id)
+            account = req.first()
+            self._get_table('system_account').delete(id == account.id)
             self._soup.flush()
+    
+    def get_user_system_account(self, u_id):
+        """
+        Returns the system account associated to a user, if existing
+        @param u_id : The user (not system !) account id
+        """
+        request = self._get_table('user_account').filter_by(id = u_id)
+        if request.count() > 0:
+            sys_id = request.first().system_account
+            return self.fetch_account_informations(sys_id)
 
 ###
 # display tests
