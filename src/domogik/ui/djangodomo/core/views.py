@@ -35,6 +35,8 @@ from django.http import QueryDict
 from django.shortcuts import render_to_response
 from django.core import serializers
 
+from domogik.common import database
+
 from djangodomo.core.models import Area
 from djangodomo.core.models import Room
 from djangodomo.core.models import DeviceCategory
@@ -46,6 +48,9 @@ from djangodomo.core.forms import ApplicationSettingForm
 
 from djangodomo.core.SampleDataHelper import SampleDataHelper
 from djangodomo.core.XPLHelper import XPLHelper
+
+
+__db_helper = database.DbHelper()
 
 
 def index(request):
