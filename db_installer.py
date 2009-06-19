@@ -28,17 +28,17 @@ from domogik.common.configloader import Loader
 cfg = Loader('database')
 config = cfg.load()
 try:
-	db = dict(config[1])
-	url = "%s:///" % db['db_type']
-	if db['db_type'] == 'sqlite':
-		url = "%s%s" % (url,db['db_path'])
-	else:
-		if db['db_port'] != '':
-			url = "%s%s:%s@%s:%s/%s" % (url, db['db_user'], db['db_password'], db['db_host'], db['db_port'], db['db_name'])
-		else:
-			url = "%s%s:%s@%s/%s" % (url, db['db_user'], db['db_password'], db['db_host'], db['db_name'])
+  db = dict(config[1])
+  url = "%s:///" % db['db_type']
+  if db['db_type'] == 'sqlite':
+    url = "%s%s" % (url,db['db_path'])
+  else:
+    if db['db_port'] != '':
+      url = "%s%s:%s@%s:%s/%s" % (url, db['db_user'], db['db_password'], db['db_host'], db['db_port'], db['db_name'])
+    else:
+      url = "%s%s:%s@%s/%s" % (url, db['db_user'], db['db_password'], db['db_host'], db['db_name'])
 except:
-	print "Some errors appears during connection to the database : Can't fetch informations from config file"
+  print "Some errors appears during connection to the database : Can't fetch informations from config file"
 
 engine = create_engine(url)
 metadata = MetaData()
@@ -101,10 +101,10 @@ class Enum(types.TypeDecorator):
 # That is not a room !
 ###
 areas_table =  Table('%s_area' % db['db_prefix'], metadata, 
-	    Column('id', Integer, primary_key=True),
-	    Column('name', String(30), nullable=False),
-	    Column('description', String(100)),
-	)
+      Column('id', Integer, primary_key=True),
+      Column('name', String(30), nullable=False),
+      Column('description', String(100)),
+  )
 
 ###
 # Rooms
@@ -113,11 +113,11 @@ areas_table =  Table('%s_area' % db['db_prefix'], metadata,
 # description : Extended description, up ti 100 chars
 ###
 rooms_table =  Table('%s_room' % db['db_prefix'], metadata, 
-	    Column('id', Integer, primary_key=True),
-	    Column('name', String(30), nullable=False),
-	    Column('area', Integer, ForeignKey('%s_area.name' % db['db_prefix'])),
-	    Column('description', String(100)),
-	)
+      Column('id', Integer, primary_key=True),
+      Column('name', String(30), nullable=False),
+      Column('area', Integer, ForeignKey('%s_area.name' % db['db_prefix'])),
+      Column('description', String(100)),
+  )
 
 ###
 # Categories for devices
@@ -127,29 +127,29 @@ rooms_table =  Table('%s_room' % db['db_prefix'], metadata,
 # The category is used to "tag" a device
 ###
 device_category_table = Table('%s_device_category' % db['db_prefix'], metadata,
-		Column('id', Integer, primary_key=True),
-	    Column('name', String(30), nullable=False)
-	)
+    Column('id', Integer, primary_key=True),
+    Column('name', String(30), nullable=False)
+)
 
 ###
 # Descriptions of the different technologies
 # name : Name of the technology (ex : X10, 1wire, PLCBUS)
 # description : Extended description, max 10 chars
-# type : Basic type of the technology,
-# 		one of 	'cpl' : use power lines,
-#				'wired' : Use a wired bus (1wire for ex),
-#				'wifi' : Use wifi,
-#				'wireless' : Use other wireless (RF based) technologies (ex : RFXCOM)
-#				'ir' : Infrared
+# type : Basic type of the technology, one of
+#       'cpl' : use power lines,
+#       'wired' : Use a wired bus (1wire for ex),
+#       'wifi' : Use wifi,
+#       'wireless' : Use other wireless (RF based) technologies (ex : RFXCOM)
+#       'ir' : Infrared
 #
 # Each device must be linked to one of these categories
 ###
 device_technology_table = Table('%s_device_technology' % db['db_prefix'], metadata,
-		Column('id', Integer, primary_key=True),
-	    Column('name', String(30), nullable=False),
-	    Column('description', String(100)),
-		Column('type', Enum([u'cpl',u'wired',u'wifi',u'wireless',u'ir']))
-	)
+    Column('id', Integer, primary_key=True),
+    Column('name', String(30), nullable=False),
+    Column('description', String(100)),
+    Column('type', Enum([u'cpl',u'wired',u'wifi',u'wireless',u'ir']))
+)
 
 ###
 # Config for technologies
@@ -159,11 +159,11 @@ device_technology_table = Table('%s_device_technology' % db['db_prefix'], metada
 # This table describes the technology wide configurations
 ###
 device_technology_config_table = Table('%s_device_technology_config' % db['db_prefix'], metadata,
-		Column('id', Integer, primary_key=True),
-		Column('technology', Integer, ForeignKey('%s_device_technology.id' % db['db_prefix'])),
-	    Column('key', String(30), nullable=False),
-	    Column('value', String(80), nullable=False)
-	)
+    Column('id', Integer, primary_key=True),
+    Column('technology', Integer, ForeignKey('%s_device_technology.id' % db['db_prefix'])),
+    Column('key', String(30), nullable=False),
+    Column('value', String(80), nullable=False)
+)
 
 ###
 # Devices
@@ -181,18 +181,18 @@ device_technology_config_table = Table('%s_device_technology_config' % db['db_pr
 # Volt, Celsius, Farenight, Percent, Boolean
 ###
 device_table = Table('%s_device' % db['db_prefix'], metadata,
-		Column('id', Integer, primary_key=True),
-	    Column('address', String(30), nullable=False),
-	    Column('description', String(100)),
-		Column('technology', Integer, ForeignKey('%s_device_technology.id' % db['db_prefix'])),
-		Column('type', Enum([u'appliance',u'lamp',u'music',u'sensor'])),
-		Column('category', Integer, ForeignKey('%s_device_category.id' % db['db_prefix'])),
-	    Column('room', Integer, ForeignKey('%s_room.id' % db['db_prefix'])),
-	    Column('is_resetable', Boolean, nullable=False),
-		Column('initial_value', String(10)),
-	    Column('is_value_changeable_by_user', Boolean, nullable=False),
-		Column('unit_of_stored_values', Enum([u'Volt',u'Celsius',u'Fahrenheit',u'Percent',u'Boolean']))
-	)
+    Column('id', Integer, primary_key=True),
+    Column('address', String(30), nullable=False),
+    Column('description', String(100)),
+    Column('technology', Integer, ForeignKey('%s_device_technology.id' % db['db_prefix'])),
+    Column('type', Enum([u'appliance',u'lamp',u'music',u'sensor'])),
+    Column('category', Integer, ForeignKey('%s_device_category.id' % db['db_prefix'])),
+    Column('room', Integer, ForeignKey('%s_room.id' % db['db_prefix'])),
+    Column('is_resetable', Boolean, nullable=False),
+    Column('initial_value', String(10)),
+    Column('is_value_changeable_by_user', Boolean, nullable=False),
+    Column('unit_of_stored_values', Enum([u'Volt',u'Celsius',u'Fahrenheit',u'Percent',u'Boolean']))
+)
 
 ###
 # Config for devices
@@ -202,11 +202,11 @@ device_table = Table('%s_device' % db['db_prefix'], metadata,
 # This table describes the device related configurations
 ###
 device_config_table = Table('%s_device_config' % db['db_prefix'], metadata,
-		Column('id', Integer, primary_key=True),
-		Column('device', Integer, ForeignKey('%s_device.id' % db['db_prefix'])),
-	    Column('key', String(30), nullable=False),
-	    Column('value', String(80), nullable=False)
-	)
+    Column('id', Integer, primary_key=True),
+    Column('device', Integer, ForeignKey('%s_device.id' % db['db_prefix'])),
+    Column('key', String(30), nullable=False),
+    Column('value', String(80), nullable=False)
+)
 
 ###
 # Stats for device's states
@@ -215,11 +215,11 @@ device_config_table = Table('%s_device_config' % db['db_prefix'], metadata,
 # value : The vale of the device
 ###
 device_stats_table =  Table('%s_device_stats' % db['db_prefix'], metadata,
-		Column('id', Integer, primary_key=True),
-		Column('device', Integer, ForeignKey('%s_device.id' % db['db_prefix'])),
-	    Column('date', DateTime, nullable=False),
-	    Column('value', String(80), nullable=False)
-	)
+    Column('id', Integer, primary_key=True),
+    Column('device', Integer, ForeignKey('%s_device.id' % db['db_prefix'])),
+    Column('date', DateTime, nullable=False),
+    Column('value', String(80), nullable=False)
+)
 
 ###
 # Define triggers
@@ -233,11 +233,11 @@ device_stats_table =  Table('%s_device_stats' % db['db_prefix'], metadata,
 # the 'result' is executed
 ###
 trigger_table = Table('%s_trigger' % db['db_prefix'], metadata,
-		Column('id', Integer, primary_key=True),
-		Column('description', String(100)),
-	    Column('rule', Text, nullable=False),
-	    Column('result', Text, nullable=False)
-	)
+    Column('id', Integer, primary_key=True),
+    Column('description', String(100)),
+    Column('rule', Text, nullable=False),
+    Column('result', Text, nullable=False)
+)
 
 ###
 # Define users' system account
@@ -248,11 +248,11 @@ trigger_table = Table('%s_trigger' % db['db_prefix'], metadata,
 # This table is only used by interface
 ###
 system_account_table = Table('%s_system_account' % db['db_prefix'], metadata,
-		Column('id', Integer, primary_key=True),
-	    Column('login', String(20), nullable=False),
-	    Column('password', Text, nullable=False),
-		Column('is_admin', Boolean, nullable=False, default=False),
-	)
+    Column('id', Integer, primary_key=True),
+    Column('login', String(20), nullable=False),
+    Column('password', Text, nullable=False),
+    Column('is_admin', Boolean, nullable=False, default=False),
+)
 
 ###
 # User account - personnal informations
@@ -264,12 +264,12 @@ system_account_table = Table('%s_system_account' % db['db_prefix'], metadata,
 # This table is only used by interface
 ###
 user_account_table = Table('%s_user_account' % db['db_prefix'], metadata,
-		Column('id', Integer, primary_key=True),
-	    Column('first_name', String(50), nullable=False),
-	    Column('last_name', String(60), nullable=False),
-		Column('birthdate', DateTime, nullable=False),
-		Column('system_account', Integer, ForeignKey('%s_system_account.id' % db['db_prefix'])),
-	)
+    Column('id', Integer, primary_key=True),
+    Column('first_name', String(50), nullable=False),
+    Column('last_name', String(60), nullable=False),
+    Column('birthdate', DateTime, nullable=False),
+    Column('system_account', Integer, ForeignKey('%s_system_account.id' % db['db_prefix'])),
+)
 
 ###
 # Installer
