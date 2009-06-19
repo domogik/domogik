@@ -257,6 +257,18 @@ class DbHelper():
             result.append({'id':device.id, 'address':device.address, 'technology':device.technology})
         return result
 
+    def get_all_devices_of_technology(self, dt_id):
+        """
+        Returns all the devices of a technology
+        @param dt_id : technology id
+        @return a list of dictionary {'id':'xxx','address':'yyy','technology':'zzzz'}
+        It does *not* return all attributes of devices
+        """
+        devices = self._get_table('device').filter_by(technology = dt_id).all()
+        result = []
+        for device in devices:
+            result.append({'id':device.id, 'address':device.address, 'technology':device.technology})
+        return result
 ####
 # Device technology
 ####
@@ -310,19 +322,6 @@ class DbHelper():
             for device in devices:
                 self._get_table('device').delete(id == device.id)
             self._soup.flush()
-    
-    def get_all_devices_of_technology(self, dt_id):
-        """
-        Returns all the devices of a technology
-        @param dt_id : technology id
-        @return a list of dictionary {'id':'xxx','address':'yyy','technology':'zzzz'}
-        It does *not* return all attributes of devices
-        """
-        devices = self._get_table('device').filter_by(technology = dt_id).all()
-        result = []
-        for device in devices:
-            result.append({'id':device.id, 'address':device.address, 'technology':device.technology})
-        return result
 
 ####
 # Device technology config
