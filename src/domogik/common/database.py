@@ -592,7 +592,7 @@ class DbHelper():
 ####
 # System accounts
 ####
-    def list_accounts(self):
+    def list_system_accounts(self):
         """
         Returns a list of all accounts id/login
         @return A list of dictionnary {'id' : account_id, 'login': account_login}
@@ -602,7 +602,7 @@ class DbHelper():
             result.append({'id': account.id, 'login': account.login})
         return result
 
-    def fetch_account_informations(self, a_id):
+    def fetch_system_account_informations(self, a_id):
         """
         Returns account informations from id
         @param a_id : account id
@@ -615,7 +615,7 @@ class DbHelper():
             return {'id': account.id, 'login': account.login, 
                     'password': account.password, 'is_admin': account.is_admin}
 
-    def add_account(self, a_login, a_password, a_is_admin = False):
+    def add_system_account(self, a_login, a_password, a_is_admin = False):
         """
         Add a system_account
         @param a_login : Account login
@@ -629,7 +629,7 @@ class DbHelper():
                 password = password.hexdigest(), is_admin = a_is_admin)
         self._soup.flush()
 
-    def del_account(self, a_id):
+    def del_system_account(self, a_id):
         """
         Delete a system account 
         @param a_id : account id
@@ -648,7 +648,7 @@ class DbHelper():
         request = self._get_table('user_account').filter_by(id = u_id)
         if request.count() > 0:
             sys_id = request.first().system_account
-            return self.fetch_account_informations(sys_id)
+            return self.fetch_system_account_informations(sys_id)
 
 ####
 # User accounts
@@ -660,7 +660,7 @@ class DbHelper():
         """
         result = []
         for account in  self._get_table('user_account').all():
-            result.append({'id': account.id, 'first_name' : first_name, 'last_name': last_name})
+            result.append({'id': account.id, 'first_name' : account.first_name, 'last_name': account.last_name})
         return result
 
     def fetch_user_account_informations(self, u_id):
@@ -670,46 +670,36 @@ class DbHelper():
         @return A dictionnary {'id' : account id, 'login': account login,
             'password' : account ssha256 encrypted password, 'is_admin' : True if the user is an admin}
         """
-        request = self._get_table('system_account').filter_by(id = u_id)
+        request = self._get_table('user_account').filter_by(id = u_id)
         if request.count() > 0:
             account = request.first()
             return {'id': account.id, 'first_name' : account.first_name, 'last_name': account.last_name, 
                     'birthdate' : account.birthdate, 'system_account' : account.system_account}
 
-        def add_user_account(self, u_first_name, u_last_name, u_birthdate, u_system_account = None):
+    def add_user_account(self, u_first_name, u_last_name, u_birthdate, u_system_account = None):
         """
         Add a user account
-        @param a_login : Account login
-        @param a_password : Account clear password (will be hashed in sha256)
-        @param a_is_admin : Is an admin account ? 
+        @param u_first_name : User's first name
+        @param u_last_name : User's last name
+        @param u_birthdate : User's birthdate
+        @param u_system_account : User's account on the system (can be None)
         """
-        
-        password = hashlib.sha256()
-        password.update(a_password)
-        self._get_table('system_account').insert(login = a_login, 
-                password = password.hexdigest(), is_admin = a_is_admin)
+        self._get_table('user_account').insert(first_name = u_first_name, last_name = u_last_name,
+                birthdate = u_birthdate, system_account = u_system_account)
         self._soup.flush()
 
-    def del_account(self, a_id):
+    def del_user_account(self, u_id):
         """
-        Delete a system account 
-        @param a_id : account id
+        Delete a user account and the associated system  account if it exists
+        @param u_id : user's account id
         """
-        req = self._get_table('system_account').filter_by(id = a_id)
+        req = self._get_table('user_account').filter_by(id = u_id)
         if req.count() > 0:
             account = req.first()
-            self._get_table('system_account').delete(id == account.id)
+            self.del_system_account(self.get_user_system_account(u_id)['id'])
+            self._get_table('user_account').delete(id == account.id)
             self._soup.flush()
     
-    def get_user_system_account(self, u_id):
-        """
-        Returns the system account associated to a user, if existing
-        @param u_id : The user (not system !) account id
-        """
-        request = self._get_table('user_account').filter_by(id = u_id)
-        if request.count() > 0:
-            sys_id = request.first().system_account
-            return self.fetch_account_informations(sys_id)
 
 ###
 # display tests
@@ -891,16 +881,36 @@ if __name__ == "__main__":
 
     print_title('test system account')
     print_test('list system accounts')
-    print d.list_accounts()
+    print d.list_system_accounts()
     print_test('add system account')
-    print d.add_account('login 1','password 1',True)
+    print d.add_system_account('login 1','password 1',True)
     print_test('list system accounts')
-    print d.list_accounts()
-    acc_id = d.list_accounts()[0]['id']
+    print d.list_system_accounts()
+    acc_id = d.list_system_accounts()[0]['id']
     print_test('get system account')
-    print d.fetch_account_informations(acc_id)
+    print d.fetch_system_account_informations(acc_id)
     print_test('delete system account')
-    print d.del_account(acc_id)
+    print d.del_system_account(acc_id)
     print_test('list system accounts')
-    print d.list_accounts()
+    print d.list_system_accounts()
+
+    print_title('test user account')
+    print_test('list users accounts')
+    print d.list_user_accounts()
+    print_test('add system account')
+    print d.add_system_account('login 1','password 1',True)
+    sys_id = d.list_system_accounts()[0]['id']
+    print_test('add user account')
+    print d.add_user_account('first name 1', 'last name 1', datetime.now(), sys_id)
+    print_test('list user accounts')
+    print d.list_user_accounts()
+    acc_id = d.list_user_accounts()[0]['id']
+    print_test('get user account')
+    print d.fetch_user_account_informations(acc_id)
+    print_test('get user system account')
+    print d.get_user_system_account(acc_id)
+    print_test('delete user account')
+    print d.del_user_account(acc_id)
+    print_test('list user accounts')
+    print d.list_user_accounts()
 
