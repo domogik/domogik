@@ -42,7 +42,7 @@ from sqlalchemy.ext.sqlsoup import SqlSoup
 from sqlalchemy import asc, desc
 import time
 from datetime import datetime
-import md5
+import hashlib
 
 from domogik.common.configloader import Loader
 
@@ -607,9 +607,9 @@ class DbHelper():
         Returns account informations from id
         @param a_id : account id
         @return A dictionnary {'id' : account id, 'login': account login,
-            'password' : account encrypted password, 'is_admin' : True if the user is an admin}
+            'password' : account ssha256 encrypted password, 'is_admin' : True if the user is an admin}
         """
-        request = self._get_table('system_account').filter_by(id = t_id)
+        request = self._get_table('system_account').filter_by(id = a_id)
         if request.count() > 0:
             account = request.first()
             return {'id': account.id, 'login': account.login, 
@@ -617,13 +617,77 @@ class DbHelper():
 
     def add_account(self, a_login, a_password, a_is_admin = False):
         """
-        Add a trigger
+        Add a system_account
         @param a_login : Account login
-        @param a_password : Account clear password (will be hashed)
+        @param a_password : Account clear password (will be hashed in sha256)
         @param a_is_admin : Is an admin account ? 
         """
+        
+        password = hashlib.sha256()
+        password.update(a_password)
         self._get_table('system_account').insert(login = a_login, 
-                password = md5.update(a_password).digest(), is_admin = a_is_admin)
+                password = password.hexdigest(), is_admin = a_is_admin)
+        self._soup.flush()
+
+    def del_account(self, a_id):
+        """
+        Delete a system account 
+        @param a_id : account id
+        """
+        req = self._get_table('system_account').filter_by(id = a_id)
+        if req.count() > 0:
+            account = req.first()
+            self._get_table('system_account').delete(id == account.id)
+            self._soup.flush()
+    
+    def get_user_system_account(self, u_id):
+        """
+        Returns the system account associated to a user, if existing
+        @param u_id : The user (not system !) account id
+        """
+        request = self._get_table('user_account').filter_by(id = u_id)
+        if request.count() > 0:
+            sys_id = request.first().system_account
+            return self.fetch_account_informations(sys_id)
+
+####
+# User accounts
+####
+    def list_user_accounts(self):
+        """
+        Returns a list of all user accounts id/first_name/last_name
+        @return A list of dictionnary {'id' : account_id, 'first_name' : first_name, 'last_name': last_name}
+        """
+        result = []
+        for account in  self._get_table('user_account').all():
+            result.append({'id': account.id, 'first_name' : first_name, 'last_name': last_name})
+        return result
+
+    def fetch_user_account_informations(self, u_id):
+        """
+        Returns account informations from id
+        @param u_id : user account id
+        @return A dictionnary {'id' : account id, 'login': account login,
+            'password' : account ssha256 encrypted password, 'is_admin' : True if the user is an admin}
+        """
+        request = self._get_table('system_account').filter_by(id = u_id)
+        if request.count() > 0:
+            account = request.first()
+            return {'id': account.id, 'first_name' : account.first_name, 'last_name': account.last_name, 
+                    'birthdate' : account.birthdate, 'system_account' : account.system_account}
+
+        def add_user_account(self, u_first_name, u_last_name, u_birthdate, u_system_account = None):
+        """
+        Add a user account
+        @param a_login : Account login
+        @param a_password : Account clear password (will be hashed in sha256)
+        @param a_is_admin : Is an admin account ? 
+        """
+        
+        password = hashlib.sha256()
+        password.update(a_password)
+        self._get_table('system_account').insert(login = a_login, 
+                password = password.hexdigest(), is_admin = a_is_admin)
         self._soup.flush()
 
     def del_account(self, a_id):
@@ -824,4 +888,19 @@ if __name__ == "__main__":
     print d.del_trigger(trig_id)
     print_test('list triggers')
     print d.list_triggers()
+
+    print_title('test system account')
+    print_test('list system accounts')
+    print d.list_accounts()
+    print_test('add system account')
+    print d.add_account('login 1','password 1',True)
+    print_test('list system accounts')
+    print d.list_accounts()
+    acc_id = d.list_accounts()[0]['id']
+    print_test('get system account')
+    print d.fetch_account_informations(acc_id)
+    print_test('delete system account')
+    print d.del_account(acc_id)
+    print_test('list system accounts')
+    print d.list_accounts()
 
