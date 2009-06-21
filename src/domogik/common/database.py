@@ -420,6 +420,27 @@ class DbHelper():
                 'address' : device.address})
         return result
 
+    def find_devices(self, **filters):
+        """
+        Looks for device with filter on their attributes
+        filter fileds can be one of id,address, type, room, initial_value, 
+        is_value_changeable_by_user, unit_of_stored_values.
+        @return a list of dictionnaries for each corresponding device
+        """
+        data = None
+        if not filters:
+            data = self._get_table(str('device')).all()
+        else:
+            request = []
+            for filter in filters:
+                request.append("%s == '%s'" % (filter, filters[filter]))
+            filter = " and ".join(request)
+            data = self._get_table(str('device')).filter(filter)
+        result = []
+        for d in data:
+            result.append(self.fetch_device_informations(d.id))
+        return result
+
     def fetch_device_informations(self, d_id):
         """
         Return informations about a device 
@@ -813,6 +834,8 @@ if __name__ == "__main__":
         d_is_resetable = False, d_is_changeable_by_user = True, d_unit_of_stored_values ='Percent')
     print_test('list device')
     print d.list_devices()
+    print_test('find devices')
+    print d.find_devices(address = 'A3', initial_value = 'off')
     print_test('fetch informations')
     print d.fetch_device_informations(1)
     print_test('del device')
