@@ -554,6 +554,37 @@ class DbHelper():
             unit_of_stored_values =  d_unit_of_stored_values)
         self._soup.flush()
 
+    def update_device(self, d_id, d_address = None, d_technology = None, d_type = None, d_category = None,
+        d_room = None, d_initial_value = None, d_description = None, d_is_resetable = None, 
+        d_is_changeable_by_user = None, d_unit_of_stored_values = None):
+        """
+        Update a device item
+        If a param is None, then the old value will be kept
+        @param d_id : Device id
+        @param technology : Item technology id
+        @param address : Item address (ex : 'A3' for x10/plcbus, '111.111111111' for 1wire)
+        @param description : Extended item description (100 char max)
+        @param type : One of 'appliance','light','music','sensor'
+        @param category : Item category id
+        @param room : Item room id
+        @param is_resetable : Can the item be reseted to some initial state
+        @param initial_value : What's the initial value of the item, should be 
+            the state when the item is created (except for sensors, music)
+        @param is_value_changeable_by_user : Can a user change item state (ex : false for sensor)
+        @param unit_of_stored_values : What is the unit of item values,
+            must be one of 'Volt', 'Celsius', 'Fahrenheit', 'Percent', 'Boolean'
+        """
+        if d_unit_of_stored_values not in ['Volt','Celsius','Farenight','Percent','Boolean']:
+            raise ValueError, "d_unit_of_stored_values must be one of \
+            'Volt','Celsius','Farenight','Percent','Boolean'."
+        if d_type not in ['appliance','lamp','music']:
+            raise ValueError, "d_type must be one of 'appliance','lamp','music'"
+        self._get_table('device').insert(address = d_address, technology = d_technology, 
+            type = d_type, category = d_category, room = d_room, initial_value = d_initial_value, 
+            description = d_description, is_resetable = d_is_resetable, 
+            is_value_changeable_by_user = d_is_changeable_by_user,
+            unit_of_stored_values =  d_unit_of_stored_values)
+        self._soup.flush()
     def del_device(self, d_id):
         """
         Delete a device 

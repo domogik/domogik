@@ -53,6 +53,7 @@ class xPLSendHelper(xPLModule):
         xPLModule.__init__(self, name = 'xplsendhelper')
         self.__myxpl = Manager()
         self._log = self.get_my_logger()
+        self.x10 = self.X10(self.__myxpl)
 
     def __del__(self):
         self.__myxpl.force_leave()
