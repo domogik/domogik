@@ -61,19 +61,6 @@ class xPLSendHelper(xPLModule):
 ###
 # Format check functions
 ###
-	def _check_x10_unit_name(self, unit):
-		"""
-		Checks x10 unit_name_format
-		@param unit : then unit's name
-		"""
-        return re.match(r'^[a-pA-P][0-9]$', unit)
-
-	def _check_x10_house_name(self, unit):
-		"""
-		Checks x10 unit_name_format
-		@param unit : then unit's name
-		"""
-        return re.match(r'^[a-pA-P]$', unit)
 
 	def _check_plcbus_unit_name(self, unit):
 		"""
@@ -90,63 +77,81 @@ class xPLSendHelper(xPLModule):
         return re.match(r'^[a-pA-P]$', unit)
 
 ###
-# Public methods
+# Helper subclasses
 ###
-    def x10_on_unit(unit):
-        """
-        Send a message with command 'on' for unit
-        @param unit : the unit to light up
-        """
-        if not self._check_x10_unit_name(unit)
-            raise ValueError, "Incorrect unit name"
-        m = Message()
-        mess.set_type("xpl-cmnd")
-        mess.set_schema("x10.basic")
-        mess.set_data_key("device", unit)
-        mess.set_data_key("command", "on")
-        self.__myxpl.send(m)
+    class X10:
+        def __init__(self, xpl):
+            self.__myxpl = xpl
 
-    def x10_off_unit(unit):
-        """
-        Send a message with command 'off' for unit
-        @param unit : the unit to light down
-        """
-        if not self._check_x10_unit_name(unit)
-            raise ValueError, "Incorrect unit name"
-        m = Message()
-        mess.set_type("xpl-cmnd")
-        mess.set_schema("x10.basic")
-        mess.set_data_key("device", unit)
-        mess.set_data_key("command", "off")
-        self.__myxpl.send(m)
+        def _check_unit_name(self, unit):
+            """
+            Checks x10 unit_name_format
+            @param unit : then unit's name
+            """
+            return re.match(r'^[a-pA-P][0-9]$', unit)
 
-    def x10_on_house(house):
-        """
-        Send a message with command 'on' for house
-        @param house : the house house to light up
-        """
-        if not self._check_x10_house_name(house)
-            raise ValueError, "Incorrect house name"
-        m = Message()
-        mess.set_type("xpl-cmnd")
-        mess.set_schema("x10.basic")
-        mess.set_data_key("device", house)
-        mess.set_data_key("command", "all_units_on")
-        self.__myxpl.send(m)
+        def _check_house_name(self, unit):
+            """
+            Checks x10 unit_name_format
+            @param unit : then unit's name
+            """
+            return re.match(r'^[a-pA-P]$', unit)
 
-    def x10_off_house(house):
-        """
-        Send a message with command 'off' for house
-        @param house : the house code to light down
-        """
-        if not self._check_x10_house_name(house)
-            raise ValueError, "Incorrect house name"
-        m = Message()
-        mess.set_type("xpl-cmnd")
-        mess.set_schema("x10.basic")
-        mess.set_data_key("device", house)
-        mess.set_data_key("command", "all_units_off")
-        self.__myxpl.send(m)
+        def on_unit(unit):
+            """
+            Send a message with command 'on' for unit
+            @param unit : the unit to light up
+            """
+            if not self._check_x10_unit_name(unit)
+                raise ValueError, "Incorrect unit name"
+            m = Message()
+            mess.set_type("xpl-cmnd")
+            mess.set_schema("x10.basic")
+            mess.set_data_key("device", unit)
+            mess.set_data_key("command", "on")
+            self.__myxpl.send(m)
+
+        def off_unit(unit):
+            """
+            Send a message with command 'off' for unit
+            @param unit : the unit to light down
+            """
+            if not self._check_x10_unit_name(unit)
+                raise ValueError, "Incorrect unit name"
+            m = Message()
+            mess.set_type("xpl-cmnd")
+            mess.set_schema("x10.basic")
+            mess.set_data_key("device", unit)
+            mess.set_data_key("command", "off")
+            self.__myxpl.send(m)
+
+        def on_house(house):
+            """
+            Send a message with command 'on' for house
+            @param house : the house house to light up
+            """
+            if not self._check_x10_house_name(house)
+                raise ValueError, "Incorrect house name"
+            m = Message()
+            mess.set_type("xpl-cmnd")
+            mess.set_schema("x10.basic")
+            mess.set_data_key("device", house)
+            mess.set_data_key("command", "all_units_on")
+            self.__myxpl.send(m)
+
+        def off_house(house):
+            """
+            Send a message with command 'off' for house
+            @param house : the house code to light down
+            """
+            if not self._check_x10_house_name(house)
+                raise ValueError, "Incorrect house name"
+            m = Message()
+            mess.set_type("xpl-cmnd")
+            mess.set_schema("x10.basic")
+            mess.set_data_key("device", house)
+            mess.set_data_key("command", "all_units_off")
+            self.__myxpl.send(m)
 
 
 
