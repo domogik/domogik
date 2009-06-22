@@ -1,27 +1,48 @@
 #!/usr/bin/python
-# -*- encoding:utf-8 -*-
+# -*- coding: utf-8 -*-                                                                           
 
-# Copyright 2008 Domogik project
+""" This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
-# This file is part of Domogik.
-# Domogik is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+License
+=======
 
-# Domogik is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+B{Domogik} is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-# You should have received a copy of the GNU General Public License
-# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+B{Domogik} is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
 
-# Author: Maxence Dunnewind <maxence@dunnewind.net>
+You should have received a copy of the GNU General Public License
+along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-# $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-22 13:26:13 +0100 (dim. 22 févr. 2009) $
-# $LastChangedRevision: 394 $
+Module purpose
+==============
+
+Support One-Wire bus
+
+Implements
+==========
+
+- OneWireException:.__init__(self, value)
+- OneWireException:.__str__(self)
+- OneWire:.__init__(self, dev = 'u')
+- OneWire:.set_cache_use(self, use)
+- OneWire:.exec_type(self, t = '')
+- OneWire:.exec_name(self, n = '')
+- OneWire:.exec_family(self, f = '')
+- OneWire:.get_temperature(self)
+- OneWire:.get_temperatures(t)
+- OneWire:.is_present(self, item)
+
+@author: Maxence Dunnewind <maxence@dunnewind.net>
+@copyright: (C) 2007-2009 Domogik project
+@license: GPL(v3)
+@organization: Domogik
+"""
 
 import ow
 

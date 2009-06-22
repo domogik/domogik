@@ -1,27 +1,52 @@
 #!/usr/bin/python
-#-*- encoding:utf-8 *-*
+# -*- coding: utf-8 -*-                                                                           
 
-# Copyright 2008 Domogik project
+""" This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
-# This file is part of Domogik.
-# Domogik is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+License
+=======
 
-# Domogik is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+B{Domogik} is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-# You should have received a copy of the GNU General Public License
-# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+B{Domogik} is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
 
-# Author : Marc Schneider <marc@domogik.org>
+You should have received a copy of the GNU General Public License
+along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-# $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-22 11:46:25 +0100 (dim. 22 févr. 2009) $
-# $LastChangedRevision: 392 $
+Module purpose
+==============
+
+Django web UI views
+
+Implements
+==========
+
+- index(request)
+- __update_device_values(request, app_setting)
+- __send_value_to_device(device_id, new_value, app_setting)
+- __send_x10_cmd(device, old_value, new_value, simulation_mode)
+- __write_device_stats(device_id, new_value, new_comment, new_is_successful)
+- device(request, device_id)
+- device_stats(request, device_id)
+- __clear_device_stats(request, device_id, is_admin_mode)
+- admin_index(request)
+- save_settings(request)
+- load_sample_data(request)
+- clear_data(request)
+- __read_application_setting()
+- device_status(request, room_id=None, device_id=None)
+
+@author: Domogik project
+@copyright: (C) 2007-2009 Domogik project
+@license: GPL(v3)
+@organization: Domogik
+"""
 
 import datetime
 import math

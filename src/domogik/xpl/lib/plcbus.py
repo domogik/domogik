@@ -1,28 +1,48 @@
-#!/usr/bin/env python
-# -*- encoding:utf-8 -*-
+#!/usr/bin/python
+# -*- coding: utf-8 -*-                                                                           
 
-# Copyright 2009 Domogik project
+""" This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
-# This file is part of Domogik.
-# Domogik is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+License
+=======
 
-# Domogik is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+B{Domogik} is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-# You should have received a copy of the GNU General Public License
-# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+B{Domogik} is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
 
-# Authors: François PINET <domopyx@gmail.com>,
-#    Yoann HINARD <yoann.hinard@gmail.com>
+You should have received a copy of the GNU General Public License
+along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-# $LastChangedBy:$
-# $LastChangedDate:$
-# $LastChangedRevision:$
+Module purpose
+==============
+
+Support PLCBUS power-based technology
+
+Implements
+==========
+
+- PLCBUSException:.def __init__(self, value):
+- PLCBUSException:.def __str__(self):
+- PLCBUSAPI:.def __init__(self, serial_port_no):
+- PLCBUSAPI:.def _valid_item(self, item):
+- PLCBUSAPI:.def _valid_house(self, house):
+- PLCBUSAPI:.def _valid_usercode(self, item):
+- PLCBUSAPI:.def _convert_device_to_hex(self, item):
+- PLCBUSAPI:.def _convert_data(self, data):
+- PLCBUSAPI:.def _send(self, cmd, item, ucod, data1, data2):
+- PLCBUSAPI:.def get_all_on_id(self, usercode, housecode):
+
+@author: Domogik project
+@copyright: (C) 2007-2009 Domogik project
+@license: GPL(v3)
+@organization: Domogik
+"""
 
 import sys
 import serial

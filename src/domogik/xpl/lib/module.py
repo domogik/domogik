@@ -1,27 +1,57 @@
 #!/usr/bin/python
-# -*- encoding:utf-8 -*-
+# -*- coding: utf-8 -*-                                                                           
 
-# Copyright 2008 Domogik project
+""" This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
-# This file is part of Domogik.
-# Domogik is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+License
+=======
 
-# Domogik is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+B{Domogik} is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-# You should have received a copy of the GNU General Public License
-# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+B{Domogik} is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
 
-# Author: Maxence Dunnewind <maxence@dunnewind.net>
+You should have received a copy of the GNU General Public License
+along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-# $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-19 13:56:04 +0100 (jeu 19 fév 2009) $
-# $LastChangedRevision: 378 $
+Module purpose
+==============
+
+Base class for all xPL clients
+
+Implements
+==========
+
+- xPLModule.__init__(self, name = None, stop_cb = None)
+- xPLModule.__getattr__(self, attr)
+- xPLModule.__setattr__(self, attr, value)
+- xPLModule.__init__(self, name, stop_cb = None)
+- xPLModule.get_my_logger(self)
+- xPLModule.get_module_name(self)
+- xPLModule.add_stop_cb(self, cb)
+- xPLModule.register_thread(self, thread)
+- xPLModule.unregister_thread(self, thread)
+- xPLModule.register_timer(self, timer)
+- xPLModule.unregister_timer(self, timer)
+- xPLModule.should_stop(self)
+- xPLModule.get_stop(self)
+- xPLModule.hand_leave(self, signum, frame)
+- xPLModule.force_leave(self)
+- xPLResult.__init__(self)
+- xPLResult.set_value(self, value)
+- xPLResult.get_value(self)
+- xPLResult.get_lock(self)
+
+@author: Maxence Dunnewind <maxence@dunnewind.net>
+@copyright: (C) 2007-2009 Domogik project
+@license: GPL(v3)
+@organization: Domogik
+"""
 
 import signal
 import threading

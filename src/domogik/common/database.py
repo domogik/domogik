@@ -1,5 +1,91 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-                                                                           
+
+""" This file is part of B{Domogik} project (U{http://www.domogik.org}).
+
+License
+=======
+
+B{Domogik} is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+B{Domogik} is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Domogik. If not, see U{http://www.gnu.org/licenses}.
+
+Module purpose
+==============
+
+API to use Domogik database
+
+Implements
+==========
+
+- DbHelper.__init__(self)
+- DbHelper._get_table(self, table_name)
+- DbHelper.list_areas_name(self)
+- DbHelper.fetch_area_informations(self, area)
+- DbHelper.add_area(self, a_name, a_description)
+- DbHelper.del_area(self, a_name)
+- DbHelper.list_rooms_name(self)
+- DbHelper.fetch_room_informations(self, room)
+- DbHelper.add_room(self, r_name, r_area_id, r_description)
+- DbHelper.del_room(self, r_name)
+- DbHelper.get_all_room_of_area(self, a_name)
+- DbHelper.list_device_categories_name(self)
+- DbHelper.fetch_device_category_informations(self, dc_name)
+- DbHelper.add_device_category(self, dc_name)
+- DbHelper.del_device_category(self, dc_name)
+- DbHelper.get_all_devices_of_category(self, dc_id)
+- DbHelper.get_all_devices_of_technology(self, dt_id)
+- DbHelper.list_device_technologies_name(self)
+- DbHelper.fetch_device_technology_informations(self, dc_name)
+- DbHelper.add_device_technology(self, dc_name, dt_description, dt_type)
+- DbHelper.del_device_technology(self, dc_name)
+- DbHelper.list_device_technology_config_keys(self)
+- DbHelper.fetch_device_technology_config_informations(self, dtc_technology, dtc_key)
+- DbHelper.fetch_device_technology_config_value(self, dtc_technology, dtc_key)
+- DbHelper.add_device_technology_config(self, dtc_technology, dtc_key, dtc_value)
+- DbHelper.del_device_technology_config(self, dtc_id)
+- DbHelper.get_all_config_of_technology(self, dt_id)
+- DbHelper.list_devices(self)
+- DbHelper.find_devices(self, **filters)
+- DbHelper.fetch_device_informations(self, d_id)
+- DbHelper.def add_device(self, d_address, d_technology, d_type, d_category,
+- DbHelper.del_device(self, d_id)
+- DbHelper.list_device_stats(self, ds_id)
+- DbHelper.get_last_stat_of_devices(self, d_list)
+- DbHelper.add_device_stat(self, ds_device, ds_date, ds_value)
+- DbHelper.del_device_stat(self, ds_id)
+- DbHelper.del_all_device_stats(self, d_id)
+- DbHelper.list_triggers(self)
+- DbHelper.get_trigger(self, t_id)
+- DbHelper.add_trigger(self, t_desc, t_rule, t_res)
+- DbHelper.del_trigger(self, t_id)
+- DbHelper.list_system_accounts(self)
+- DbHelper.fetch_system_account_informations(self, a_id)
+- DbHelper.add_system_account(self, a_login, a_password, a_is_admin = False)
+- DbHelper.del_system_account(self, a_id)
+- DbHelper.get_user_system_account(self, u_id)
+- DbHelper.list_user_accounts(self)
+- DbHelper.fetch_user_account_informations(self, u_id)
+- DbHelper.add_user_account(self, u_first_name, u_last_name, u_birthdate, u_system_account = None)
+- DbHelper.del_user_account(self, u_id)
+- print_title(title)
+- print_test(test)
+
+@author: Domogik project
+@copyright: (C) 2007-2009 Domogik project
+@license: GPL(v3)
+@organization: Domogik
+"""
+
 """
 This file is part of B{Domogik} project (U{http://www.domogik.org}).
 

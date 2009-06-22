@@ -1,27 +1,41 @@
-#!/usr/bin/env python
-# -*- encoding:utf-8 -*-
+#!/usr/bin/python
+# -*- coding: utf-8 -*-                                                                           
 
-# Copyright 2009 Domogik project
+""" This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
-# This file is part of Domogik.
-# Domogik is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+License
+=======
 
-# Domogik is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+B{Domogik} is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-# You should have received a copy of the GNU General Public License
-# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+B{Domogik} is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
 
-# Author: François PINET <domopyx@gmail.com>
+You should have received a copy of the GNU General Public License
+along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-# $LastChangedBy:$
-# $LastChangedDate:$
-# $LastChangedRevision:$
+Module purpose
+==============
+
+xPL PLCBUS client
+
+Implements
+==========
+
+- plcbusMain.__init__(self)
+- plcbusMain.plcbus_cmnd_cb(self, message)
+- plcbusMain.plcbus_send_ack(self, message)
+
+@author: François PINET <domopyx@gmail.com>
+@copyright: (C) 2007-2009 Domogik project
+@license: GPL(v3)
+@organization: Domogik
+"""
 
 from domogik.xpl.lib.xplconnector import *
 from domogik.xpl.lib.plcbus import *

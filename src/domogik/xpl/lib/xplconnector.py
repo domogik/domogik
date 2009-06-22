@@ -1,27 +1,74 @@
 #!/usr/bin/python
-# -*- encoding:utf-8 -*-
+# -*- coding: utf-8 -*-                                                                           
 
-# Copyright 2008 Domogik project
+""" This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
-# This file is part of Domogik.
-# Domogik is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+License
+=======
 
-# Domogik is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+B{Domogik} is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-# You should have received a copy of the GNU General Public License
-# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+B{Domogik} is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
 
-# Author: Maxence Dunnewind <maxence@dunnewind.net>
+You should have received a copy of the GNU General Public License
+along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-# $LastChangedBy: maxence $
-# $LastChangedDate: 2009-03-21 14:33:23 +0100 (sam. 21 mars 2009) $
-# $LastChangedRevision: 417 $
+Module purpose
+==============
+
+Manage connection to the xPL network
+
+Implements
+==========
+
+- Manager.__init__(self, ip="127.0.0.1", port=3865)
+- Manager.leave(self)
+- Manager.send(self, message)
+- Manager._SendHeartbeat(self)
+- Manager._run_thread_monitor(self)
+- Manager.add_listener(self, listener)
+- Listener:.__init__(self, cb, manager, filter = {})
+- Listener:.getFilter(self)
+- Listener:.getCb(self)
+- Listener:.new_message(self, message)
+- Listener:.add_filter(self, key, value)
+- Listener:.del_filter(self, key)
+- Listener:.get_filter_list(self)
+- XPLException.__init__(self, value)
+- XPLException.__str__(self)
+- Message:.__init__(self, mess=None)
+- Message:.set_type(self, type)
+- Message:.get_type(self)
+- Message:.set_schema(self, schema)
+- Message:.get_schema(self)
+- Message:.set_conf_key(self, key, value)
+- Message:.set_data_key(self, key, value)
+- Message:.set_data_order(self, order)
+- Message:.set_conf_order(self, order)
+- Message:.__contains__(self, key)
+- Message:.has_key(self, key)
+- Message:.has_conf_key(self, key)
+- Message:.get_key_value(self, key)
+- Message:.get_conf_key_value(self, key)
+- Message:.__str__(self)
+- xPLTimer.__init__(self, time, cb, stop)
+- xPLTimer.start(self)
+- xPLTimer.getTimer(self)
+- xPLTimer.stop(self)
+- xPLTimer.__init__(self, time, cb, stop)
+- xPLTimer.run(self)
+
+@author: Maxence Dunnewind <maxence@dunnewind.net>
+@copyright: (C) 2007-2009 Domogik project
+@license: GPL(v3)
+@organization: Domogik
+"""
 
 import sys
 import string

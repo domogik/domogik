@@ -1,32 +1,72 @@
 #!/usr/bin/python
-#-*- encoding:utf-8 *-*
+# -*- coding: utf-8 -*-                                                                           
 
-# Copyright 2008 Domogik project
+""" This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
-# This file is part of Domogik.
-# Domogik is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+License
+=======
 
-# Domogik is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+B{Domogik} is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-# You should have received a copy of the GNU General Public License
-# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+B{Domogik} is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
 
-# Author: Maxence Dunnewind <maxence@dunnewind.net>
+You should have received a copy of the GNU General Public License
+along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-# $LastChangedBy: maxence $
-# $LastChangedDate: 2008-10-05 22:02:29 +0200 (dim. 05 oct. 2008) $
-# $LastChangedRevision: 122 $
+Module purpose
+==============
 
-# This is the MPD support for MPRIS
-# See mpris.py and http://wiki.xmms2.xmms.se/wiki/Media_Player_Interfaces
+Allow user to control MPD using DBUS/MPRIS API
 
-# Core dbus stuff
+Implements
+==========
+
+- Trigger.__init__(self, cbtrack, cbstatus, cbcaps, cbtracklist, client, die)
+- Trigger.run(self)
+- Trigger.check(self, prev, cur)
+- Root.__init__(self, session_bus, object_path, mainloop)
+- Root.Identity(self)
+- Root.Quit(self)
+- Root.MprisVersion(self)
+- TrackList.__init__(self, session_bus, object_path)
+- TrackList.GetMetadata(self, position)
+- TrackList.GetCurrentTrack(self)
+- TrackList.GetLength(self)
+- TrackList.AddTrack(self, uri, playImmediately)
+- TrackList.DelTrack(self, track_position)
+- TrackList.SetLoop(self, loop)
+- TrackList.SetRandom(self, random)
+- Player.__init__(self, session_bus, object_path)
+- Player.Next(self)
+- Player.Prev(self)
+- Player.Pause(self)
+- Player.Stop(self)
+- Player.Play(self)
+- Player.Repeat(self, repeat)
+- Player.GetStatus(self)
+- Player.GetMetadata(self)
+- Player.GetCaps(self)
+- Player.VolumeSet(self, level)
+- Player.VolumeGet(self)
+- Player.PositionSet(self, position)
+- Player.PositionGet(self)
+- Player.TrackChange(self, items, values)
+- Player.StatusChange(self, state, random, repeat, loop)
+- Player.CapsChange(self, capabilities)
+- Player.TrackListChange(self, elementsCount)
+
+@author: Maxence Dunnewind <maxence@dunnewind.net>
+@copyright: (C) 2007-2009 Domogik project
+@license: GPL(v3)
+@organization: Domogik
+"""
+
 import dbus
 #from dbus import glib
 import dbus.service

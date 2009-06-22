@@ -1,27 +1,62 @@
 #!/usr/bin/python
-# -*- encoding:utf-8 -*-
+# -*- coding: utf-8 -*-                                                                           
 
-# Copyright 2008 Domogik project
+""" This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
-# This file is part of Domogik.
-# Domogik is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+License
+=======
 
-# Domogik is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+B{Domogik} is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-# You should have received a copy of the GNU General Public License
-# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+B{Domogik} is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
 
-# Author: Maxence Dunnewind <maxence@dunnewind.net>
+You should have received a copy of the GNU General Public License
+along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-# $LastChangedBy: maxence $
-# $LastChangedDate: 2009-02-23 19:50:55 +0100 (lun. 23 févr. 2009) $
-# $LastChangedRevision: 399 $
+Module purpose
+==============
+
+X10 technology support
+
+Implements
+==========
+
+- X10Exception:.__init__(self, value)
+- X10Exception:.__str__(self)
+- X10API:.__init__(self, heyuconf)
+- X10API:._valid_item(self, item)
+- X10API:._valid_house(self, house)
+- X10API:._send(self, cmd, item)
+- X10API:._send_lvl(self, cmd, item, lvl)
+- X10API:.on(self, item)
+- X10API:.off(self, item)
+- X10API:.house_on(self, house)
+- X10API:.house_off(self, house)
+- X10API:.bright(self, item, lvl)
+- X10API:.brightb(self, item, lvl)
+- X10API:.dim(self, item, lvl)
+- X10API:.dimb(self, item, lvl)
+- X10API:.lights_on(self, house)
+- X10API:.lights_off(self, house)
+- X10Monitor:.__init__(self, heyuconf)
+- X10Monitor:.get_monitor(self)
+- X10Monitor:.__init__(self, pipe)
+- X10Monitor:.add_cb(self, cb)
+- X10Monitor:.del_cb(self, cb)
+- X10Monitor:.run(self)
+- X10Monitor:._call_cbs(self, units, order, arg)
+
+@author: Maxence Dunnewind <maxence@dunnewind.net>
+@copyright: (C) 2007-2009 Domogik project
+@license: GPL(v3)
+@organization: Domogik
+"""
 
 from subprocess import *
 import threading

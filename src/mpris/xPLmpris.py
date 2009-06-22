@@ -1,32 +1,67 @@
 #!/usr/bin/python
-#-*- encoding:utf-8 *-*
+# -*- coding: utf-8 -*-                                                                           
 
-# Copyright 2008 Domogik project
+""" This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
-# This file is part of Domogik.
-# Domogik is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+License
+=======
 
-# Domogik is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+B{Domogik} is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-# You should have received a copy of the GNU General Public License
-# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+B{Domogik} is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
 
-# Author : Marc Schneider <marc@mirelsol.org>
+You should have received a copy of the GNU General Public License
+along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-# $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-08-22 22:58:38 +0200 (ven. 22 août 2008) $
-# $LastChangedRevision: 109 $
+Module purpose
+==============
 
-# This is the mpris API
-# See http://wiki.xmms2.xmms.se/wiki/Media_Player_Interfaces
 
-# Core dbus stuff
+
+Implements
+==========
+
+- Root:.__init__(self, session_bus, object_path, mainloop)
+- Root:.GetIdentity(self)
+- Root:.Quit(self)
+- Root:.GetMprisVersion(self)
+- TrackList:.GetMetaData(self, position)
+- TrackList:.GetCurrentTrack(self)
+- TrackList:.GetLength(self)
+- TrackList:.AddTrack(self, uri, shouldBePlayedImmediately)
+- TrackList:.DelTrack(self, position)
+- TrackList:.SetLoop(self, isLoop)
+- TrackList:.SetRandom(self, isRandom)
+- Player:.Next(self)
+- Player:.Prev(self)
+- Player:.Pause(self)
+- Player:.Stop(self)
+- Player:.Play(self)
+- Player:.Repeat(self)
+- Player:.GetStatus(self)
+- Player:.GetMetaData(self)
+- Player:.GetCaps(self)
+- Player:.VolumeSet(self, volume)
+- Player:.VolumeGet(self)
+- Player:.PositionSet(self, position)
+- Player:.PositionGet(self)
+- Player:.TrackChange(self, metaData):#userDefinedTrackChange(metaData))
+- Player:.StatusChange(self)
+- Player:.CapsChange(self)
+- Player:.SetTrackChangeCb(self, cb)
+
+@author: Domogik project
+@copyright: (C) 2007-2009 Domogik project
+@license: GPL(v3)
+@organization: Domogik
+"""
+
 import dbus
 import dbus.glib
 

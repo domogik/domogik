@@ -1,27 +1,66 @@
 #!/usr/bin/python
-# -*- encoding:utf-8 -*-
+# -*- coding: utf-8 -*-                                                                           
 
-# Copyright 2008 Domogik project
+""" This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
-# This file is part of Domogik.
-# Domogik is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+License
+=======
 
-# Domogik is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+B{Domogik} is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-# You should have received a copy of the GNU General Public License
-# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+B{Domogik} is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
 
-# Author: Maxence Dunnewind <maxence@dunnewind.net>
+You should have received a copy of the GNU General Public License
+along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-# $LastChangedBy:$
-# $LastChangedDate:$
-# $LastChangedRevision:$
+Module purpose
+==============
+
+Manage user triggers and conditions
+
+Implements
+==========
+
+- Condition.__init__(self, cond1=None, cond2=None)
+- Condition.run(self, statedic)
+- Condition.parse(self, listelem)
+- OR.__init__(self, cond1, cond2)
+- OR.run(self, statedic)
+- AND.__init__(self, cond1, cond2)
+- AND.run(self, statedic)
+- NOT.__init__(self, cond1)
+- NOT.run(self, statedic)
+- NOT.parse(self, listelem)
+- TimeCond.__init__(self, year, month, day, daynumber, hour, minute)
+- TimeCond._check_time(self, timeunit, value)
+- TimeCond._check_time_int(self, unit, value)
+- TimeCond._check_time_tuple(self, unit, value)
+- TimeCond._check_time_list(self, unit, value)
+- TimeCond._check_time_str(self, unit, value)
+- TimeCond.run(self, statedic)
+- TimeCond.parse(self, listelem)
+- StateCond.__init__(self, technology, item_name, operator, value)
+- StateCond.run(self, statedic)
+- StateCond.parse(self, listelem)
+- ListenerBuilder.__init__(self, listitems, expr)
+- ListenerBuilder.hasAllNeededValue(self)
+- ListenerBuilder.updateList(self, k1, k2, v)
+- ListenerBuilder.buildx10listener(self, items)
+- ListenerBuilder.buildtimelistener(self, items)
+- ListenerBuilder._parsetimeupdate(self, mess)
+- main()
+
+@author: Maxence Dunnewind <maxence@dunnewind.net>
+@copyright: (C) 2007-2009 Domogik project
+@license: GPL(v3)
+@organization: Domogik
+"""
 
 from domogik.xpl.lib.xplconnector import *
 from domogik.common.configloader import Loader

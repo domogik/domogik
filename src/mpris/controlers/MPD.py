@@ -1,26 +1,59 @@
 #!/usr/bin/python
-#-*- encoding:utf-8 *-*
+# -*- coding: utf-8 -*-                                                                           
 
-# Copyright 2008 Domogik project
-# This file is part of Domogik.
-# Domogik is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+""" This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
-# Domogik is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+License
+=======
 
-# You should have received a copy of the GNU General Public License
-# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+B{Domogik} is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-# Author: Maxence Dunnewind <maxence@dunnewind.net>
+B{Domogik} is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
 
-# $LastChangedBy: mschneider $
-# $LastChangedDate: 2008-12-06 16:30:18 +0100 (sam. 06 déc. 2008) $
-# $LastChangedRevision: 234 $
+You should have received a copy of the GNU General Public License
+along with Domogik. If not, see U{http://www.gnu.org/licenses}.
+
+Module purpose
+==============
+
+
+
+Implements
+==========
+
+- MPD.__init__(self)
+- MPD.Version(self)
+- MPD.GetTrackInformation(self, position)
+- MPD.GetCurrentTrackPosition(self)
+- MPD.GetPlayListLength(self)
+- MPD.AppendTrack(self, uri)
+- MPD.PlayTrack(self, id)
+- MPD.DeleteTrack(self, position)
+- MPD.SetRepeat(self, enable)
+- MPD.SetRandom(self, enable)
+- MPD.Next(self)
+- MPD.Prev(self)
+- MPD.Pause(self)
+- MPD.Stop(self)
+- MPD.Play(self)
+- MPD.GetPlayerProperties(self)
+- MPD.GetCurrentTrackInformation(self)
+- MPD.SetVolume(self, level)
+- MPD.GetVolume(self)
+- MPD.SetPosition(self, position)
+- MPD.GetPosition(self)
+
+@author: Maxence Dunnewind <maxence@dunnewind.net>
+@copyright: (C) 2007-2009 Domogik project
+@license: GPL(v3)
+@organization: Domogik
+"""
 
 import mpd
 
