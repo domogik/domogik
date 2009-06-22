@@ -574,17 +574,36 @@ class DbHelper():
         @param unit_of_stored_values : What is the unit of item values,
             must be one of 'Volt', 'Celsius', 'Fahrenheit', 'Percent', 'Boolean'
         """
-        if d_unit_of_stored_values not in ['Volt','Celsius','Farenight','Percent','Boolean']:
+        if d_unit_of_stored_values not in [None,'Volt','Celsius','Farenight','Percent','Boolean']:
             raise ValueError, "d_unit_of_stored_values must be one of \
             'Volt','Celsius','Farenight','Percent','Boolean'."
-        if d_type not in ['appliance','lamp','music']:
+        if d_type not in [None,'appliance','lamp','music']:
             raise ValueError, "d_type must be one of 'appliance','lamp','music'"
-        self._get_table('device').insert(address = d_address, technology = d_technology, 
-            type = d_type, category = d_category, room = d_room, initial_value = d_initial_value, 
-            description = d_description, is_resetable = d_is_resetable, 
-            is_value_changeable_by_user = d_is_changeable_by_user,
-            unit_of_stored_values =  d_unit_of_stored_values)
-        self._soup.flush()
+        req = self._get_table('device').filter_by(id = d_id)
+        if req.count() > 0:
+            device = req.first()
+            if d_address is not None:
+                device.address = d_address
+            if d_technology is not None:
+                device.technology = d_technology
+            if d_description is not None:
+                device.description = d_description
+            if d_type is not None:
+                device.type = d_type
+            if d_category is not None:
+                device.category = d_category
+            if d_room is not None:
+                device.room = d_room
+            if d_is_resetable is not None:
+                device.is_resetable = d_is_resetable
+            if d_initial_value is not None:
+                device.initial_value = d_initial_value
+            if d_is_changeable_by_user is not None:
+                device.is_changeable_by_user = d_is_changeable_by_user
+            if d_unit_of_stored_values is not None:
+                device.unit_of_stored_values = d_unit_of_stored_values
+            self._soup.flush()
+
     def del_device(self, d_id):
         """
         Delete a device 
@@ -928,8 +947,13 @@ if __name__ == "__main__":
         d_is_resetable = False, d_is_changeable_by_user = True, d_unit_of_stored_values ='Percent')
     print_test('list device')
     print d.list_devices()
+    dev_id = d.list_devices()[0]['id']
+    print_test('update device')
+    print d.update_device(d_id = dev_id, d_address = 'E2', d_initial_value = 'on')
+    print_test('list device')
+    print d.list_devices()
     print_test('find devices')
-    print d.find_devices(address = 'A3', initial_value = 'off')
+    print d.find_devices(address = 'E2', initial_value = 'on')
     print_test('fetch informations')
     print d.fetch_device_informations(1)
     print_test('del device')
