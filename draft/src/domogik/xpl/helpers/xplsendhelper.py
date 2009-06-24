@@ -299,8 +299,8 @@ class PlcBusSendHelper(AbstractSendHelper):
                             ):
             return lambda *args, **kwargs: self._function_wrapper(name, *args, **kwargs)
         else:
-            return super(PlcBusSendHelper, self).__getattr__(name)
-            #raise AttributeError("PlcBusSendHelper instance has no attribute %s" % name)
+            #return super(PlcBusSendHelper, self).__getattr__(name)
+            raise AttributeError("PlcBusSendHelper instance has no attribute %s" % name)
 
     def _function_wrapper(self, command, device, user_code, level, rate):
         """ Wrapper for all PLC bus commands except "GET_ALL_ON_ID_PULSE".
@@ -324,8 +324,7 @@ class PlcBusSendHelper(AbstractSendHelper):
         #self._check_user_code(user)
         self._check_level(user)
         #self._check_rate(user)
-        message = self._create_message(device=device, command="GET_ALL_ON_ID_PULSE",
-                                       user_code=user_code,level=level, rate=rate)
+        message = self._create_message(device=device, command=command, user_code=user_code,level=level, rate=rate)
         self._send_message(message)
 
     def get_all_on_id_pulse(self, device, user_code):
