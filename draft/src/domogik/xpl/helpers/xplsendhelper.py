@@ -54,6 +54,8 @@ class xPLSendHelper(xPLModule):
         self.__xpl_manager = Manager()
         self._log = self.get_my_logger()
         self.x10 = X10SendHelper(self.__xpl_manager)
+        self.pcl_bus = PclBusSendHelper(self.__xpl_manager)
+        self.one_wire = OneWireSendHelper(self.__xpl_manager)
 
     def __del__(self):
         self.__xpl_manager.force_leave()
@@ -262,51 +264,49 @@ class X10SendHelper(AbstractSendHelper):
 class PlcBusSendHelper(AbstractSendHelper):
     """ PLC bus helper.
     """
+    __commands = ('all_units_off',
+                  'all_lights_on',
+                  'on',
+                  'off',
+                  'dim',
+                  'bright',
+                  'all_lights_off',
+                  'all_user_lts_on',
+                  'all_user_unit_off',
+                  'all_user_light_off',
+                  'blink',
+                  'fade_stop',
+                  'preset_dim',
+                  'status_off',
+                  'status_request',
+                  'rec_master_add_setup',
+                  'tra_master_add_setup',
+                  'scene_adr_setup',
+                  'scene_adr_erase',
+                  'all_scenes_add_erase',
+                  'get_signal_strength',
+                  'get_noise_strength',
+                  'report_signal_stren',
+                  'report_noise_stren',
+                  'get_all_id_pulse',
+                  #'get_all_on_id_pulse',
+                  'report_all_id_pulse',
+                  'report_only_on_pulse')
+
     def _init(self):
         self._schema = "control.basic"
 
-    def __getattr__(self, name):
-        """ Wrapper for all PLC bus function calls.
-        """
-        if name.upper() in ('ALL_UNITS_OFF',
-                            'ALL_LIGHTS_ON',
-                            'ON',
-                            'OFF',
-                            'DIM',
-                            'BRIGHT',
-                            'ALL_LIGHTS_OFF',
-                            'ALL_USER_LTS_ON',
-                            'ALL_USER_UNIT_OFF',
-                            'ALL_USER_LIGHT_OFF',
-                            'BLINK',
-                            'FADE_STOP',
-                            'PRESET_DIM',
-                            'STATUS_OFF',
-                            'STATUS_REQUEST',
-                            'REC_MASTER_ADD_SETUP',
-                            'TRA_MASTER_ADD_SETUP',
-                            'SCENE_ADR_SETUP',
-                            'SCENE_ADR_ERASE',
-                            'ALL_SCENES_ADD_ERASE',
-                            'GET_SIGNAL_STRENGTH',
-                            'GET_NOISE_STRENGTH',
-                            'REPORT_SIGNAL_STREN',
-                            'REPORT_NOISE_STREN',
-                            'GET_ALL_ID_PULSE',
-                            #'GET_ALL_ON_ID_PULSE',
-                            'REPORT_ALL_ID_PULSE',
-                            'REPORT_ONLY_ON_PULSE',
-                            ):
+    def __getattribute__(self, name):
+        if name in PlcBusSendHelper.__commands:
             return lambda *args, **kwargs: self._function_wrapper(name, *args, **kwargs)
         else:
-            #return super(PlcBusSendHelper, self).__getattr__(name)
-            raise AttributeError("PlcBusSendHelper instance has no attribute %s" % name)
+            return super(PlcBusSendHelper, self).__getattribute__(name)
 
-    def _function_wrapper(self, command, device, user_code, level, rate):
+    def _function_wrapper(self, name, device, user_code, level, rate):
         """ Wrapper for all PLC bus commands except "GET_ALL_ON_ID_PULSE".
 
-        @param command: name of the command
-        @ptype command: str
+        @param name: name of the original called method (used as name command)
+        @ptype name: str
 
         @param device: name of the device
         @type device: str
@@ -324,6 +324,7 @@ class PlcBusSendHelper(AbstractSendHelper):
         #self._check_user_code(user)
         self._check_level(user)
         #self._check_rate(user)
+        command = name.upper()
         message = self._create_message(device=device, command=command, user_code=user_code,level=level, rate=rate)
         self._send_message(message)
 
@@ -340,3 +341,10 @@ class PlcBusSendHelper(AbstractSendHelper):
         #self._check_user_code(user)
         message = self._create_message(device=device, command="GET_ALL_ON_ID_PULSE", user_code=user_code)
         self._send_message(message)
+
+
+class OneWireSendHelper(AbstractSendHelper):
+    """ One wire helper.
+    """
+    def _init(self):
+        self._schema = "sensor.basic"
