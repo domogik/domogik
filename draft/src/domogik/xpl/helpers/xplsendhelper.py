@@ -56,6 +56,7 @@ class xPLSendHelper(xPLModule):
         self.x10 = X10SendHelper(self.__xpl_manager)
         self.pcl_bus = PclBusSendHelper(self.__xpl_manager)
         self.one_wire = OneWireSendHelper(self.__xpl_manager)
+        self.knx = KnxSendHelper(self.__xpl_manager)
 
     def __del__(self):
         self.__xpl_manager.force_leave()
@@ -83,6 +84,21 @@ class AbstractSendHelper(object):
         """ Additional init.
         """
         raise NotImplemntedError("BaseSendHelper._init() must be overloaded")
+
+    def _send_message(self, message):
+        """ Send the message on teh xpl bus.
+
+        @param message: xpl message
+        @type message: L{Message}
+        """
+        self._xpl_manager.send(message)
+
+
+class X10SendHelper(AbstractSendHelper):
+    """ X10 helper.
+    """
+    def _init(self):
+        self._schema = "x10.basic"
 
     def _check_house_name(self, house):
         """ Checks house name.
@@ -128,21 +144,6 @@ class AbstractSendHelper(object):
         mess.set_schema(self._schema)
         for key, value in kwargs.iteritems():
             mess.set_data_key(key, value)
-
-    def _send_message(self, message):
-        """ Send the message on teh xpl bus.
-
-        @param message: xpl message
-        @type message: L{Message}
-        """
-        self._xpl_manager.send(message)
-
-
-class X10SendHelper(AbstractSendHelper):
-    """ X10 helper.
-    """
-    def _init(self):
-        self._schema = "x10.basic"
 
     def on_device(self, device):
         """ Send a message with command 'on' for device.
@@ -264,7 +265,8 @@ class X10SendHelper(AbstractSendHelper):
 class PlcBusSendHelper(AbstractSendHelper):
     """ PLC bus helper.
     """
-    __commands = ('all_units_off',
+    __metaclass__ = PlcBusSendHelperMeta
+    _commands = ('all_units_off',
                   'all_lights_on',
                   'on',
                   'off',
@@ -293,20 +295,64 @@ class PlcBusSendHelper(AbstractSendHelper):
                   'report_all_id_pulse',
                   'report_only_on_pulse')
 
+    def __init__(self):
+        super(PlcBusSendHelper, self).__init()
+        for command_name in PlcBusSendHelper._commands:
+            command_method = lambda *args, **kwargs: self._command_wrapper(command_name, *args, **kwargs)
+            setattr(self, command_name, command_method)
+
     def _init(self):
         self._schema = "control.basic"
 
-    def __getattribute__(self, name):
-        if name in PlcBusSendHelper.__commands:
-            return lambda *args, **kwargs: self._function_wrapper(name, *args, **kwargs)
-        else:
-            return super(PlcBusSendHelper, self).__getattribute__(name)
+    def _check_device_name(self, device):
+        """ Checks device name.
 
-    def _function_wrapper(self, name, device, user_code, level, rate):
+        @param device: the device name
+        @type device: str
+
+        @raise ValueError: the device name is not valid
+
+        @todo: to be completed
+        """
+
+    def _check_user_code(self, user_code):
+        """ Checks device name.
+
+        @param user_code: the user code
+        @type user_code: str
+
+        @raise ValueError: the user code name is not valid
+
+        @todo: to be completed
+        """
+
+    def _check_level(self, level):
+        """ Checks level.
+
+        @param level: the level
+        @type level: str
+
+        @raise ValueError: the level is not valid
+
+        @todo: to be completed
+        """
+
+    def _check_rate(self, rate):
+        """ Checks rate.
+
+        @param rate: the rate
+        @type rate: str
+
+        @raise ValueError: the rate is not valid
+
+        @todo: to be completed
+        """
+
+    def _command_wrapper(self, command_name, device, user_code, level, rate):
         """ Wrapper for all PLC bus commands except "GET_ALL_ON_ID_PULSE".
 
-        @param name: name of the original called method (used as name command)
-        @ptype name: str
+        @param command_name: name of the original called method (used as name command)
+        @ptype command_name: str
 
         @param device: name of the device
         @type device: str
@@ -321,10 +367,10 @@ class PlcBusSendHelper(AbstractSendHelper):
         @type rate: str
        """
         self._check_device_name(device)
-        #self._check_user_code(user)
+        self._check_user_code(user)
         self._check_level(user)
-        #self._check_rate(user)
-        command = name.upper()
+        self._check_rate(user)
+        command = command_name.upper()
         message = self._create_message(device=device, command=command, user_code=user_code,level=level, rate=rate)
         self._send_message(message)
 
@@ -338,7 +384,7 @@ class PlcBusSendHelper(AbstractSendHelper):
         @type user_code: str
         """
         self._check_device_name(device)
-        #self._check_user_code(user)
+        self._check_user_code(user)
         message = self._create_message(device=device, command="GET_ALL_ON_ID_PULSE", user_code=user_code)
         self._send_message(message)
 
@@ -348,3 +394,10 @@ class OneWireSendHelper(AbstractSendHelper):
     """
     def _init(self):
         self._schema = "sensor.basic"
+
+
+class KnxSendHelper(AbstractSendHelper):
+    """ KNX helper.
+    """
+    def _init(self):
+        self._schema = "KNX.basic"
