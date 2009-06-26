@@ -40,7 +40,7 @@ level=75
 
 The XplMessage object maps all values as object attributes:
 
-- type_ (str)
+- type (str)
 - hop_count (int)
 - source (str)
 - source_vendor_id (str)
@@ -156,7 +156,7 @@ class XplMessage(object):
         @type packet: str
         """
         super(XplMessage, self).__init__()
-        self.type_ = ""
+        self.type = ""
         self.hop_count = 1
         self.source = ""
         self.source_vendor_id = ""
@@ -168,7 +168,7 @@ class XplMessage(object):
         self.target_instance_id = ""
         self.schema = ""
         self.schema_class = ""
-        self.schema_typ = ""
+        self.schema_type = ""
         self.data = OrderedDict()
         if packet is not None:
             self.from_string(packet)
@@ -226,7 +226,7 @@ class XplMessage(object):
         match_type = XplMessage.__regexp_type.match(type_)
         if match_type is None:
             raise XplMessageError("Invalid type (%s)" % type_)
-        self.type_ = type_
+        self.type = type_
 
     def set_hop_count(self, hop_count):
         """ Set hop count value.
@@ -390,7 +390,7 @@ class XplMessage(object):
         @return: message packet, as sent on the network
         @rtype: str
         """
-        packet = "%s\n" % self.type_
+        packet = "%s\n" % self.type
         packet += "{\n"
         packet += "hop=%d\n" % self.hop_count
         packet += "source=%s\n" % self.source
