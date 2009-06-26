@@ -64,7 +64,7 @@ class XplMessageTest(unittest.TestCase):
         self.assertRaises(XplMessageError, self.__xpl_message.set_type, 'dummy')
         for type_ in ('xpl-cmnd', 'xpl-trig', 'xpl-stat'):
             self.__xpl_message.set_type(type_)
-            self.assertEqual(self.__xpl_message.type_, type_)
+            self.assertEqual(self.__xpl_message.type, type_)
 
     def test_set_hop_count(self):
         """ Test XplMessage.set_hop_count() method.
@@ -202,7 +202,7 @@ level=75
 }
 """
         self.__xpl_message.from_packet(packet)
-        self.assertEqual(self.__xpl_message.type_, 'xpl-cmnd')
+        self.assertEqual(self.__xpl_message.type, 'xpl-cmnd')
         self.assertEqual(self.__xpl_message.hop_count, 1)
         self.assertEqual(self.__xpl_message.source, "xpl-xplhal.myhouse")
         self.assertEqual(self.__xpl_message.source_vendor_id, "xpl")
