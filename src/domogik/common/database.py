@@ -486,7 +486,7 @@ class DbHelper():
     def find_devices(self, **filters):
         """
         Looks for device with filter on their attributes
-        filter fileds can be one of id,address, type, room, initial_value, 
+        filter fileds can be one of id, address, type, room, initial_value, 
         is_value_changeable_by_user, unit_of_stored_values.
         @return a list of dictionnaries for each corresponding device
         """
