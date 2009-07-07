@@ -286,7 +286,7 @@ class DbHelper():
 
     def add_device_category(self, dc_name):
         """
-        Add an device_category
+        Add a device_category (temperature, heating, lighting, music, ...)
         @param dc_name : device category name
         """
         self._get_table('device_category').insert(name = dc_name)
