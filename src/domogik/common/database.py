@@ -360,7 +360,7 @@ class DbHelper():
 
     def add_device_technology(self, dc_name, dt_description, dt_type):
         """
-        Add an device_technology
+        Add a device_technology
         @param dc_name : device technology name
         @param dt_description : extended description of the technology
         @param type : type of the technology, one of 'cpl','wired','wifi','wireless','ir'
