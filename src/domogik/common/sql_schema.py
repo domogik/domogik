@@ -27,7 +27,9 @@ Defines the sql schema used by Domogik
 Implements
 ==========
 
-
+- Enum.__init__(self, values, empty_to_none=False, strict=False)
+- Enum.process_bind_param(self, value, dialect)
+- Enum.process_result_value(self, value, dialect)
 
 @author: Marc SCHNEIDER <marc@domogik.org>
 @copyright: (C) 2007-2009 Domogik project
@@ -103,6 +105,7 @@ class Enum(types.TypeDecorator):
 ###
 
 class Area(Base):
+  # areas_table =  Table('%s_area' % db['db_prefix'], metadata, 
   __tablename__ = 'area'
   id = Column(Integer, primary_key=True)
   name = Column(String(30), nullable=False)
