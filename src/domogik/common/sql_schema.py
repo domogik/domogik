@@ -37,13 +37,18 @@ Implements
 @organization: Domogik
 """
 
-from sqlalchemy import types, create_engine, Table, Column, Integer, String, MetaData, ForeignKey, Boolean, DateTime, Date, Text
+from sqlalchemy import types, create_engine, Table, Column, Integer, String, \
+      MetaData, ForeignKey, Boolean, DateTime, Date, Text
 from sqlalchemy.ext.declarative import declarative_base
+from domogik.common.configloader import Loader
 
 
 Base = declarative_base()
 metadata = Base.metadata
 
+_cfg = Loader('database')
+_config = _cfg.load()
+_db_prefix = dict(_config[1])['db_prefix']
 
 ###
 # Enum stuff
@@ -105,8 +110,8 @@ class Enum(types.TypeDecorator):
 ###
 
 class Area(Base):
-  # areas_table =  Table('%s_area' % db['db_prefix'], metadata, 
-  __tablename__ = 'area'
+  __tablename__ = '%s_area' % _db_prefix
+
   id = Column(Integer, primary_key=True)
   name = Column(String(30), nullable=False)
   description = Column(String(100))
@@ -118,6 +123,10 @@ class Area(Base):
   def __repr__(self):
     return "<Area('%s', '%s')>" % (self.name, self.description)
 
+  @staticmethod
+  def get_tablename():
+    return Area.__tablename__
+
 ###
 # Rooms
 # name : The "short" name (a few words, 30 char max)
@@ -126,12 +135,11 @@ class Area(Base):
 ###
 
 class Room(Base):
-  __tablename__ = 'room'
+  __tablename__ = '%s_room' % _db_prefix
   id = Column(Integer, primary_key=True)
   name = Column(String(30), nullable=False)
   description = Column(String(100))
-  #area = Column(Integer, ForeignKey('%s_area.name' % db['db_prefix'])),
-  area = Column(Integer, ForeignKey('area.id'))
+  area = Column(Integer, ForeignKey('%s.id' % Area.get_tablename()))
 
   def __init__(self, name, description, area):
     self.name = name
@@ -140,6 +148,10 @@ class Room(Base):
 
   def __repr__(self):
     return "<Room('%s', '%s')>" % (self.name, self.description)
+
+  @staticmethod
+  def get_tablename():
+    return Room.__tablename__
 
 ###
 # Categories for devices
@@ -150,7 +162,7 @@ class Room(Base):
 ###
 
 class DeviceCategory(Base):
-  __tablename__ = 'device_category'
+  __tablename__ = '%s_device_category' % _db_prefix
   id = Column(Integer, primary_key=True)
   name = Column(String(30), nullable=False)
 
@@ -159,6 +171,10 @@ class DeviceCategory(Base):
 
   def __repr__(self):
     return "<DeviceCategory('%s')>" % (self.name)
+
+  @staticmethod
+  def get_tablename():
+    return DeviceCategory.__tablename__
 
 ###
 # Descriptions of the different technologies
@@ -175,7 +191,7 @@ class DeviceCategory(Base):
 ###
 
 class DeviceTechnology(Base):
-  __tablename__ = 'device_technology'
+  __tablename__ = '%s_device_technology' % _db_prefix
   id = Column(Integer, primary_key=True)
   name = Column(String(30), nullable=False)
   description = Column(String(100))
@@ -189,6 +205,10 @@ class DeviceTechnology(Base):
   def __repr__(self):
     return "<DeviceTechnology('%s', '%s', '%s')>" % (self.name, self.description, self.type)
 
+  @staticmethod
+  def get_tablename():
+    return DeviceTechnology.__tablename__
+
 ###
 # Config for technologies
 # key : the config item
@@ -198,9 +218,9 @@ class DeviceTechnology(Base):
 ###
 
 class DeviceTechnologyConfig(Base):
-  __tablename__ = 'device_technology_config'
+  __tablename__ = '%s_device_technology_config' % _db_prefix
   id = Column(Integer, primary_key=True)
-  technology = Column(Integer, ForeignKey('device_technology.id'))
+  technology = Column(Integer, ForeignKey('%s.id' % DeviceTechnology.get_tablename()))
   key = Column(String(30), nullable=False)
   value = Column(String(80), nullable=False)
 
@@ -211,6 +231,10 @@ class DeviceTechnologyConfig(Base):
 
   def __repr__(self):
     return "<DeviceTechnologyConfig('%s', '%s')>" % (self.key, self.value)
+
+  @staticmethod
+  def get_tablename():
+    return DeviceTechnologyConfig.__tablename__
 
 ###
 # Devices
@@ -229,14 +253,14 @@ class DeviceTechnologyConfig(Base):
 ###
 
 class Device(Base):
-  __tablename__ = 'device'
+  __tablename__ = '%s_device' % _db_prefix
   id = Column(Integer, primary_key=True)
   address = Column(String(30), nullable=False)
   description = Column(String(100))
-  technology = Column(Integer, ForeignKey('device_technology.id'))
+  technology = Column(Integer, ForeignKey('%s.id' % DeviceTechnology.get_tablename()))
   type = Column(Enum([u'appliance',u'lamp',u'music',u'sensor']))
-  category = Column(Integer, ForeignKey('device_category.id'))
-  room = Column(Integer, ForeignKey('room.id'))
+  category = Column(Integer, ForeignKey('%s.id' % DeviceCategory.get_tablename()))
+  room = Column(Integer, ForeignKey('%s.id' % Room.get_tablename()))
   is_resetable = Column(Boolean, nullable=False)
   initial_value = Column(String(10))
   is_value_changeable_by_user = Column(Boolean, nullable=False)
@@ -257,6 +281,10 @@ class Device(Base):
   def __repr__(self):
     return "<Device('%s', '%s')>" % (self.address, self.description)
 
+  @staticmethod
+  def get_tablename():
+    return Device.__tablename__
+
 ###
 # Config for devices
 # key : the config item
@@ -266,9 +294,9 @@ class Device(Base):
 ###
 
 class DeviceConfig(Base):
-  __tablename__ = 'device_config'
+  __tablename__ = '%s_device_config' % _db_prefix
   id = Column(Integer, primary_key=True)
-  device = Column(Integer, ForeignKey('device.id'))
+  device = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()))
   key = Column(String(30), nullable=False)
   value = Column(String(80), nullable=False)
 
@@ -280,6 +308,10 @@ class DeviceConfig(Base):
   def __repr__(self):
     return "<DeviceConfig('%s', '%s')>" % (self.key, self.value)
 
+  @staticmethod
+  def get_tablename():
+    return DeviceConfig.__tablename__
+
 ###
 # Stats for device's states
 # date : timestamp of the record
@@ -288,9 +320,9 @@ class DeviceConfig(Base):
 ###
 
 class DeviceStats(Base):
-  __tablename__ = 'device_stats'
+  __tablename__ = '%s_device_stats' % _db_prefix
   id = Column(Integer, primary_key=True)
-  device = Column(Integer, ForeignKey('device.id'))
+  device = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()))
   date = Column(DateTime, nullable=False)
   value = Column(String(80), nullable=False)
 
@@ -301,6 +333,10 @@ class DeviceStats(Base):
 
   def __repr__(self):
     return "<DeviceStats('%s', '%s')>" % (self.date, self.value)
+
+  @staticmethod
+  def get_tablename():
+    return DeviceStats.__tablename__
 
 ###
 # Define triggers
@@ -315,7 +351,7 @@ class DeviceStats(Base):
 ###
 
 class Trigger(Base):
-  __tablename__ = 'trigger'
+  __tablename__ = '%s_trigger' % _db_prefix
   id = Column(Integer, primary_key=True)
   description = Column(String(100))
   rule = Column(Text, nullable=False)
@@ -329,6 +365,10 @@ class Trigger(Base):
   def __repr__(self):
     return "<Trigger('%s', '%s', '%s')>" % (self.description, self.rule, self.result)
 
+  @staticmethod
+  def get_tablename():
+    return Trigger.__tablename__
+
 ###
 # Define users' system account
 # login : username used for login
@@ -339,7 +379,7 @@ class Trigger(Base):
 ###
 
 class SystemAccount(Base):
-  __tablename__ = 'system_account'
+  __tablename__ = '%s_system_account' % _db_prefix
   id = Column(Integer, primary_key=True)
   login = Column(String(20), nullable=False)
   password = Column(Text, nullable=False)
@@ -353,6 +393,10 @@ class SystemAccount(Base):
   def __repr__(self):
     return "<SystemAccount('%s', '%s')>" % (self.login, self.is_admin)
 
+  @staticmethod
+  def get_tablename():
+    return SystemAccount.__tablename__
+
 ###
 # User account - personnal informations
 # first_name : User's first name
@@ -364,12 +408,12 @@ class SystemAccount(Base):
 ###
 
 class UserAccount(Base):
-  __tablename__ = 'user_account'
+  __tablename__ = '%s_user_account' % _db_prefix
   id = Column(Integer, primary_key=True)
   first_name = Column(String(50), nullable=False)
   last_name = Column(String(60), nullable=False)
   birthdate = Column(Date, nullable=False)
-  system_account = Column(Integer, ForeignKey('system_account.id'))
+  system_account = Column(Integer, ForeignKey('%s.id' % SystemAccount.get_tablename()))
 
   def __init__(self, first_name, last_name, birthdate, system_account):
     self.first_name = first_name
@@ -379,3 +423,7 @@ class UserAccount(Base):
 
   def __repr__(self):
     return "<UserAccount('%s', '%s')>" % (self.first_name, self.last_name)
+
+  @staticmethod
+  def get_tablename():
+    return UserAccount.__tablename__
