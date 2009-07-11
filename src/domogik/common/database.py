@@ -116,7 +116,6 @@ class DbHelper():
     """
 
     def __init__(self):
-
         cfg = Loader('database')
         config = cfg.load()
         db = dict(config[1])
@@ -150,7 +149,7 @@ class DbHelper():
         Returns a list of areas' name
         """
         result = []
-        for area in  self._get_table('area').all():
+        for area in self._get_table('area').all():
             result.append(area.name)
         return result
 
@@ -211,7 +210,7 @@ class DbHelper():
 
     def fetch_room_informations(self, room):
         """
-        Return informations about an room
+        Return informations about a room
         @param room : The room name
         @return a dictionnary of name:value 
         """
@@ -224,7 +223,7 @@ class DbHelper():
 
     def add_room(self, r_name, r_area_id, r_description):
         """
-        Add an room
+        Add a room
         @param r_name : room name
         @param r_area_id : id of the area where the room is
         @param r_description : room detailled description
