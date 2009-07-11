@@ -114,6 +114,8 @@ class DbHelper():
     This class provides methods to fetch and put informations on the Domogik database
     The user should only use methods from this class and don't access the database directly
     """
+    self._soup = None
+    self._dbprefix = None
 
     def __init__(self):
         cfg = Loader('database')
