@@ -253,20 +253,20 @@ class DeviceTechnologyConfig(Base):
 ###
 
 class Device(Base):
-  __tablename__ = '%s_device' % _db_prefix
-  id = Column(Integer, primary_key=True)
-  address = Column(String(30), nullable=False)
-  description = Column(String(100))
-  technology = Column(Integer, ForeignKey('%s.id' % DeviceTechnology.get_tablename()))
-  type = Column(Enum([u'appliance',u'lamp',u'music',u'sensor']))
-  category = Column(Integer, ForeignKey('%s.id' % DeviceCategory.get_tablename()))
-  room = Column(Integer, ForeignKey('%s.id' % Room.get_tablename()))
-  is_resetable = Column(Boolean, nullable=False)
-  initial_value = Column(String(10))
-  is_value_changeable_by_user = Column(Boolean, nullable=False)
-  unit_of_stored_values = Column(Enum([u'Volt',u'Celsius',u'Fahrenheit',u'Percent',u'Boolean']))
+    __tablename__ = '%s_device' % _db_prefix
+    id = Column(Integer, primary_key=True)
+    address = Column(String(30), nullable=False)
+    description = Column(String(100))
+    technology = Column(Integer, ForeignKey('%s.id' % DeviceTechnology.get_tablename()))
+    type = Column(Enum([u'appliance',u'lamp',u'music',u'sensor']))
+    category = Column(Integer, ForeignKey('%s.id' % DeviceCategory.get_tablename()))
+    room = Column(Integer, ForeignKey('%s.id' % Room.get_tablename()))
+    is_resetable = Column(Boolean, nullable=False)
+    initial_value = Column(String(10))
+    is_value_changeable_by_user = Column(Boolean, nullable=False)
+    unit_of_stored_values = Column(Enum([u'Volt',u'Celsius',u'Fahrenheit',u'Percent',u'Boolean']))
 
-  def __init__(self, address, description, technology, type, category, room, is_resetable, initial_value, is_value_changeable_by_user, unit_of_stored_values):
+    def __init__(self, address, description, technology, type, category, room, is_resetable, initial_value, is_value_changeable_by_user, unit_of_stored_values):
       self.address = address
       self.description = description
       self.technology = technology
