@@ -130,7 +130,7 @@ class DbHelper():
             else:
                 url = "%s%s:%s@%s/%s" % (url, db['db_user'], db['db_password'], db['db_host'], db['db_name'])
 
-        #Connecting to the database    
+        # Connecting to the database
         soup = SqlSoup(url)
         self._soup = soup
         self._dbprefix = db['db_prefix']
