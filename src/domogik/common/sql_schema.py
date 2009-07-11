@@ -387,7 +387,7 @@ class SystemAccount(Base):
     is_admin = Column(Boolean, nullable=False, default=False)
 
     def __init__(self, login, password, is_admin):
-        self.login = description
+        self.login = login
         self.password = password
         self.is_admin = is_admin
 
