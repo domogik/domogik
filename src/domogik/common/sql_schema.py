@@ -266,7 +266,8 @@ class Device(Base):
     is_value_changeable_by_user = Column(Boolean, nullable=False)
     unit_of_stored_values = Column(Enum([u'Volt',u'Celsius',u'Fahrenheit',u'Percent',u'Boolean']))
 
-    def __init__(self, address, description, technology, type, category, room, is_resetable, initial_value, is_value_changeable_by_user, unit_of_stored_values):
+    def __init__(self, address, description, technology, type, category, room, \
+        is_resetable, initial_value, is_value_changeable_by_user, unit_of_stored_values):
       self.address = address
       self.description = description
       self.technology = technology

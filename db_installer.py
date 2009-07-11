@@ -48,9 +48,11 @@ try:
         url = "%s%s" % (url,db['db_path'])
     else:
         if db['db_port'] != '':
-            url = "%s%s:%s@%s:%s/%s" % (url, db['db_user'], db['db_password'], db['db_host'], db['db_port'], db['db_name'])
+            url = "%s%s:%s@%s:%s/%s" % (url, db['db_user'], db['db_password'], \
+              db['db_host'], db['db_port'], db['db_name'])
         else:
-            url = "%s%s:%s@%s/%s" % (url, db['db_user'], db['db_password'], db['db_host'], db['db_name'])
+            url = "%s%s:%s@%s/%s" % (url, db['db_user'], db['db_password'], \
+              db['db_host'], db['db_name'])
 except:
     print "Some errors appears during connection to the database : Can't fetch informations from config file"
 
