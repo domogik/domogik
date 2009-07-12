@@ -116,6 +116,7 @@ class x10Main(xPLModule):
         mess.set_data_key("command", order)
         if args:
             mess.set_data_key("level",args)
+        print mess
         self.__myxpl.send(mess)
 
 if __name__ == "__main__":

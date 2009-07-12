@@ -59,6 +59,7 @@ Implements
 """
 
 import os
+import re
 from subprocess import *
 import threading
 from domogik.common import logger
@@ -357,13 +358,17 @@ class X10Monitor:
             order = None
             arg = None
             out = None
+            regex_order = re.compile(r".* ([a-zA-Z0-9]+) :[^:]+$")
+            regex_unit = re.compile(r".* : h[uc] ([^ ]+).*$")
             try:
                 while not self._pipe.stdout.closed and out != '':
                     out = self._pipe.stdout.readline()
-                    print "communicate %s" % out
-                    if 'sndc addr unit' in out:
+#                    print "communicate %s" % out
+                    if 'addr unit' in out:
+                        print "regex unit : |%s|" % regex_unit.sub(r"\1", out)
                         units.append(out.split()[8].lower())
-                    elif 'sndc func' in out:
+                    elif 'func' in out:
+                        print "regex : |%s|" % regex_order.sub(r"\1", out)
                         order = out.split()[4].lower()
                         if '%' in out:
                             arg = out.split()[9].replace('%','')
@@ -392,7 +397,7 @@ class HeyuManager:
     """
 
     ITEMS_SECTION = OrderedDict()
-    ITEMS_SECTION['general'] = ['TTY','TTY_AUX','LOG_DIR', 'HOUSECODE', 'REPORT_PATH','DEFAULT_MODULE','START_ENGINE','DATE_FORMAT','LOGDATE_YEAR','TAILPATH','HEYU_UMASK', 'STATUS_TIMEOUT', 'SPF_TIMEOUT']
+    ITEMS_SECTION['general'] = ['TTY','TTY_AUX','LOG_DIR', 'HOUSECODE', 'REPORT_PATH','DEFAULT_MODULE','START_ENGINE','DATE_FORMAT','LOGDATE_YEAR','TAILPATH','HEYU_UMASK', 'STATUS_TIMEOUT', 'SPF_TIMEOUT','TRANS_DIMLEVEL']
     ITEMS_SECTION['aliases'] = ['ALIAS']
     ITEMS_SECTION['scenes'] = ['SCENE', 'USERSYN', 'MAX_PPARMS']
     ITEMS_SECTION['scripts'] = ['SCRIPT','SCRIPT_MODE', 'SCRIPT_CTRL']
