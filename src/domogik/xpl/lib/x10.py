@@ -58,10 +58,11 @@ Implements
 @organization: Domogik
 """
 
+import os
 from subprocess import *
 import threading
 from domogik.common import logger
-
+from domogik.common.ordereddict import OrderedDict
 
 class X10Exception:
     """
@@ -384,4 +385,62 @@ class X10Monitor:
                 for unit in units:
                     cb(unit, order, arg)
 
+
+class HeyuManager:
+    """
+    This class manage the heyu configuration file
+    """
+
+    ITEMS_SECTION = OrderedDict()
+    ITEMS_SECTION['general'] = ['TTY','TTY_AUX','LOG_DIR', 'HOUSECODE', 'REPORT_PATH','DEFAULT_MODULE','START_ENGINE','DATE_FORMAT','LOGDATE_YEAR','TAILPATH','HEYU_UMASK', 'STATUS_TIMEOUT', 'SPF_TIMEOUT']
+    ITEMS_SECTION['aliases'] = ['ALIAS']
+    ITEMS_SECTION['scenes'] = ['SCENE', 'USERSYN', 'MAX_PPARMS']
+    ITEMS_SECTION['scripts'] = ['SCRIPT','SCRIPT_MODE', 'SCRIPT_CTRL']
+    ITEMS_SECTION['scheduler'] = ['SCHEDULE_FILE','MODE','PROGRAM_DAYS','COMBINE_EVENTS','COMPRESS_MACROS','REPL_DELAYED_MACROS', 'WRITE_CHECK_FILES']
+    ITEMS_SECTION['dawnduk'] = ['LONGITUDE','LATITUDE','DAWN_OPTION','DUSK_OPTION','MIN_DAWN','MAX_DAWN','MIN_DUSK','MAX_DUSK']
+
+    def __init__(self, path):
+        """
+        @param path = The heyu config file path, must be absolute
+        """
+        self._file = path
+
+    def load(self):
+        """
+        Load the file and parse it
+        @return a list containing all the *uncommented* lines of config file
+        """
+        f = open(self._file, "r")
+        lines = f.readlines()
+        f.close()
+        result = []
+        for line in lines:
+            if not line.startswith("#") and line.strip() != "":
+                result.append(line.strip())
+        return result
+
+    def write(self, data):
+        """
+        Write config datas in the config file
+        Warning : it will erease the previous config file
+        """
+        f = open(self._file, "w")
+        for section in self.ITEMS_SECTION:
+            f.write("##### %s #####\n\n" % section)
+            for item in self.ITEMS_SECTION[section]:
+                for d in data:
+                    if d.startswith("%s " % item) or d.startswith("%s\t" % item):
+                        f.write("%s\n" % d)
+            f.write("\n")
+        f.close()
+
+    def restart(self):
+        """
+        Restart heyu process, needed to reload config
+        """
+        res = Popen("heyu restart", shell=True, stderr=PIPE)
+        output = res.stderr.read()
+        res.stderr.close()
+        if output:
+            self._log.error("Error during heyu restart : %s " % output)
 
