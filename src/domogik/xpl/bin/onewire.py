@@ -41,7 +41,7 @@ from onewire import *
 from domogik.common import configloader
 
 
-class OneWireTemp():
+class OneWireTemp(xPLModule):
     '''
     Manage the One-Wire stuff and connect it to xPL
     '''
@@ -50,9 +50,9 @@ class OneWireTemp():
         '''
         Starts some timers to check temperature
         '''
-        cfgloader = Loader('onewire')
-        config = cfgloader.load()
-        self._myxpl = Manager(source = config["source"], module_name='onewire')
+        xPLModule.__init__(self, name='onewire')
+        config = {"source":"dmg-onewire"}
+        self._myxpl = Manager('onewire')
         self._myow = OneWire()
         self._myow.set_cache_use(False)
         timers = []

@@ -60,7 +60,9 @@ HBEAT.*
 
 Schema Specific Notes
 COMMAND value can be one of :
+
 * START : Start a component
 * STOP : Stop a component
 * PING : Ask all components to reply (MODULE should equals '*', FORCE isn't used)
-
+* RELOAD : If the module is able to do, refresh its config and reload it.
+* PUSH_CONFIG : Send all the config items on the network. Should be used to refresh the config in database side
