@@ -99,8 +99,8 @@ class DBConnector(xPLModule):
         Send a config value message for an element's config item
         @param technology : the technology of the element
         @param element :  the name of the element
-        @param key : the key of the config tuple to fetch
-        @param value : the value corresponding to the key
+        @param key : the key or list of keys of the config tuple(s) to fetch
+        @param value : the value or list of values corresponding to the key(s)
         @param module : the name of the module which requested the value
         '''
         self._log.debug("Send config response %s : %s" % (key, value))
@@ -110,8 +110,13 @@ class DBConnector(xPLModule):
         mess.set_data_key('technology', technology)
         if element:
             mess.set_data_key('element', element)
-        mess.set_data_key('key', key)
-        mess.set_data_key('value', value)
+#        mess.set_data_key('key', key)
+        #If key/value are lists, then we add an key=value for each item
+        if isinstance(key, list):
+            for (k, v) in zip(key, value):
+                mess.set_data_key(k, v)
+        else:
+            mess.set_data_key(key, value)
         mess.set_conf_key('target', module)
         self.__myxpl.send(mess)
 

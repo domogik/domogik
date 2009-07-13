@@ -64,11 +64,27 @@ class x10Main(xPLModule):
         #Create listeners
         Listener(self.x10_cmnd_cb, self.__myxpl, {'schema': 'x10.basic',
                 'type': 'xpl-cmnd'})
+        #One listener for system schema, allowing to reload config
+        Listener(self.heyu_reload_config, self.__myxpl, {'schema': 'domogik.system', 
+            'type': 'xpl-cmnd'})
         self._log = self.get_my_logger()
         self._monitor = X10Monitor(res.get_value())
         self._monitor.get_monitor().add_cb(self.x10_monitor_cb)
         self._monitor.get_monitor().start()
         self._log.debug("Heyu correctly started")
+
+    def heyu_reload_config(self, message):
+        '''
+        Regenerate the heyu config file 
+        First, it needs to get all config items, then rewrite the config file 
+        and finally restart heyu
+        '''
+        res = xPLResult()
+        self._config.query('x10','heyu_cfg_path', res)
+        heyu_cfg_path = res.get_value()
+        
+
+        
 
     def x10_cmnd_cb(self, message):
         '''
