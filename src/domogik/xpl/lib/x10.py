@@ -22,35 +22,39 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 Module purpose
 ==============
 
-X10 technology support
+X10 technology support using Heyu
 
 Implements
 ==========
 
-- X10Exception:.__init__(self, value)
-- X10Exception:.__str__(self)
-- X10API:.__init__(self, heyuconf)
-- X10API:._valid_item(self, item)
-- X10API:._valid_house(self, house)
-- X10API:._send(self, cmd, item)
-- X10API:._send_lvl(self, cmd, item, lvl)
-- X10API:.on(self, item)
-- X10API:.off(self, item)
-- X10API:.house_on(self, house)
-- X10API:.house_off(self, house)
-- X10API:.bright(self, item, lvl)
-- X10API:.brightb(self, item, lvl)
-- X10API:.dim(self, item, lvl)
-- X10API:.dimb(self, item, lvl)
-- X10API:.lights_on(self, house)
-- X10API:.lights_off(self, house)
-- X10Monitor:.__init__(self, heyuconf)
-- X10Monitor:.get_monitor(self)
-- X10Monitor:.__init__(self, pipe)
-- X10Monitor:.add_cb(self, cb)
-- X10Monitor:.del_cb(self, cb)
-- X10Monitor:.run(self)
-- X10Monitor:._call_cbs(self, units, order, arg)
+- X10Exception.__init__(self, value)
+- X10Exception.__str__(self)
+- X10API.__init__(self, heyuconf)
+- X10API._valid_item(self, item)
+- X10API._valid_house(self, house)
+- X10API._send(self, cmd, item)
+- X10API._send_lvl(self, cmd, item, lvl)
+- X10API.on(self, item)
+- X10API.off(self, item)
+- X10API.house_on(self, house)
+- X10API.house_off(self, house)
+- X10API.bright(self, item, lvl)
+- X10API.brightb(self, item, lvl)
+- X10API.dim(self, item, lvl)
+- X10API.dimb(self, item, lvl)
+- X10API.lights_on(self, house)
+- X10API.lights_off(self, house)
+- X10Monitor.__init__(self, heyuconf)
+- X10Monitor.get_monitor(self)
+- X10Monitor.__init__(self, pipe)
+- X10Monitor.add_cb(self, cb)
+- X10Monitor.del_cb(self, cb)
+- X10Monitor.run(self)
+- X10Monitor._call_cbs(self, units, order, arg)
+- HeyuManager.__init__(path)
+- HeyuManager.load()
+- HeyuManager.restart()
+- HeyuManager.write()
 
 @author: Maxence Dunnewind <maxence@dunnewind.net>
 @copyright: (C) 2007-2009 Domogik project
