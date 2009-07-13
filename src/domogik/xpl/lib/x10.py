@@ -360,6 +360,7 @@ class X10Monitor:
             out = None
             regex_order = re.compile(r".* ([a-zA-Z0-9]+) :[^:]+$")
             regex_unit = re.compile(r".* : h[uc] ([^ ]+).*$")
+            regex_security = re.compile(r".*(Alert|Clear) : hc ([A-P]) unit ([1-16]).*$")
             try:
                 while not self._pipe.stdout.closed and out != '':
                     out = self._pipe.stdout.readline()
@@ -369,7 +370,13 @@ class X10Monitor:
                         units.append(out.split()[8].lower())
                     elif 'func' in out:
                         print "regex : |%s|" % regex_order.sub(r"\1", out)
-                        order = out.split()[4].lower()
+                        if "Alert" in out or "Clear" in out:
+                            #RF Security device
+                            (order, house, unit) = regex_security.sub(r"\1,\2,\3", out).lower().split(",")
+                            units = ["%s%s" % (house, unit)]
+                        else:
+                            #Standard order
+                            order = out.split()[4].lower()
                         if '%' in out:
                             arg = out.split()[9].replace('%','')
                     if units and order:
@@ -393,16 +400,20 @@ class X10Monitor:
 
 class HeyuManager:
     """
-    This class manage the heyu configuration file
+    This class manages the heyu configuration file
     """
 
     ITEMS_SECTION = OrderedDict()
-    ITEMS_SECTION['general'] = ['TTY','TTY_AUX','LOG_DIR', 'HOUSECODE', 'REPORT_PATH','DEFAULT_MODULE','START_ENGINE','DATE_FORMAT','LOGDATE_YEAR','TAILPATH','HEYU_UMASK', 'STATUS_TIMEOUT', 'SPF_TIMEOUT','TRANS_DIMLEVEL']
+    ITEMS_SECTION['general'] = ['TTY','TTY_AUX','LOG_DIR', 'HOUSECODE', 'REPORT_PATH',
+            'DEFAULT_MODULE','START_ENGINE','DATE_FORMAT','LOGDATE_YEAR','TAILPATH',
+            'HEYU_UMASK', 'STATUS_TIMEOUT', 'SPF_TIMEOUT','TRANS_DIMLEVEL']
     ITEMS_SECTION['aliases'] = ['ALIAS']
     ITEMS_SECTION['scenes'] = ['SCENE', 'USERSYN', 'MAX_PPARMS']
     ITEMS_SECTION['scripts'] = ['SCRIPT','SCRIPT_MODE', 'SCRIPT_CTRL']
-    ITEMS_SECTION['scheduler'] = ['SCHEDULE_FILE','MODE','PROGRAM_DAYS','COMBINE_EVENTS','COMPRESS_MACROS','REPL_DELAYED_MACROS', 'WRITE_CHECK_FILES']
-    ITEMS_SECTION['dawnduk'] = ['LONGITUDE','LATITUDE','DAWN_OPTION','DUSK_OPTION','MIN_DAWN','MAX_DAWN','MIN_DUSK','MAX_DUSK']
+    ITEMS_SECTION['scheduler'] = ['SCHEDULE_FILE','MODE','PROGRAM_DAYS','COMBINE_EVENTS',
+            'COMPRESS_MACROS','REPL_DELAYED_MACROS', 'WRITE_CHECK_FILES']
+    ITEMS_SECTION['dawnduk'] = ['LONGITUDE','LATITUDE','DAWN_OPTION','DUSK_OPTION',
+            'MIN_DAWN','MAX_DAWN','MIN_DUSK','MAX_DUSK']
 
     def __init__(self, path):
         """

@@ -43,7 +43,6 @@ Implements
 from domogik.xpl.lib.xplconnector import *
 from domogik.common.configloader import *
 
-
 class DBConnector(xPLModule):
     '''
     Manage the connection between database and the xPL stuff
