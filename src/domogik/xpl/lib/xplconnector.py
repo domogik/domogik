@@ -233,6 +233,12 @@ remote-ip=%s
         """
         self._listeners.append(listener)
 
+    def del_listener(self, listener):
+        """
+        Remove a listener
+        @param listener : the listener instance
+        """
+        self._listeners.remove(listener)
 
 class Listener:
     """
@@ -465,6 +471,12 @@ class Message:
             return self._data[key]
         else:
             raise XPLException("Key not existing")
+
+    def get_all_keys(self):
+        """
+        Get all the keys
+        """
+        return self._data.keys()
 
     def get_conf_key_value(self, key):
         """

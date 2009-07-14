@@ -433,6 +433,7 @@ class HeyuManager:
     def write(self, data):
         """
         Write config datas in the config file
+        @param data : list of config lines
         Warning : it will erease the previous config file
         """
         f = open(self._file, "w")

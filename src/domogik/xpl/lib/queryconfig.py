@@ -65,9 +65,9 @@ class Query():
         @param key : the key to fetch corresponding value, if it's an empty string,
         all the config items for this technology will be fetched
         '''
-        self._res = result
-        Listener(self._query_cb, self.__myxpl,
+        self._list = Listener(self._query_cb, self.__myxpl,
                 {'schema': 'domogik.config', 'type': 'xpl-stat'})
+        self._res = result
         mess = Message()
         mess.set_type('xpl-cmnd')
         mess.set_schema('domogik.config')
@@ -83,8 +83,10 @@ class Query():
         Callback to receive message after a query() call
         @param message : the message received
         '''
+        self.__myxpl.del_listener(self._list)
         self._log.debug("Config value received : %s" %
                 message.get_key_value(self._key))
         result = message.get_key_value(self._key)
         self._res.set_value(result)
         self._res.get_lock().set()
+
