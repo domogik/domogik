@@ -85,14 +85,24 @@ class DBConnector(xPLModule):
         techno = message.get_key_value('technology')
         key = message.get_key_value('key')
         element = message.get_key_value('element')
-        self._log.debug("New request config received for %s : %s" % (techno,
-        key))
+        if not key:
+            self._log.debug("New request config received for %s :\
+                    asked for all config items" % (techno))
+        else:
+            self._log.debug("New request config received for %s : %s" % (techno,
+            key))
         if element:
             self._send_config(techno, key, self._fetch_elmt_config(techno,
             element, key), message.get_conf_key_value("source"), element)
         else:
-            self._send_config(techno, key, self._fetch_techno_config(techno,
-            key), message.get_conf_key_value("source"))
+            if not key:
+                keys = self._fetch_techno_config(techno, key).keys()
+                values = self._fetch_techno_config(techno, key).values()
+                self._send_config(techno, keys, values,
+                message.get_conf_key_value("source"))
+            else:
+                self._send_config(techno, key, self._fetch_techno_config(techno,
+                key), message.get_conf_key_value("source"))
 
     def _send_config(self, technology, key, value, module, element = None):
         '''
@@ -110,14 +120,15 @@ class DBConnector(xPLModule):
         mess.set_data_key('technology', technology)
         if element:
             mess.set_data_key('element', element)
-#        mess.set_data_key('key', key)
         #If key/value are lists, then we add an key=value for each item
+        print "LIST : %s, %s" % (key, isinstance(key, list))
         if isinstance(key, list):
             for (k, v) in zip(key, value):
+                print "set data key %s = %s " % (k, v)
                 mess.set_data_key(k, v)
         else:
             mess.set_data_key(key, value)
-        mess.set_conf_key('target', module)
+#        mess.set_conf_key('target', module)
         self.__myxpl.send(mess)
 
     def _fetch_elmt_config(self, techno, element, key):
@@ -143,10 +154,16 @@ class DBConnector(xPLModule):
         '''
         #TODO : use the database
         vals = {'x10': {'heyu_cfg_path':'/etc/heyu/x10.conf'},
+#            'heyu_file_0': 'TTY /dev/ttyUSB0',
+ #           'heyu_file_1': 'TTY_AUX /dev/ttyUSB0 RFXCOM',
+ #           'heyu_file_2': 'ALIAS back_door D5 DS10A 0x677'},
                 'global': {'pid_dir_path': '/tmp/'},
                 }
         try:
-            return vals[techno][key]
+            if key:
+                return vals[techno][key]
+            else:
+                return vals[techno]
         except:
             return None
 

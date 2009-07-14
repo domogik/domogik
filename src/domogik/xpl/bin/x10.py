@@ -53,10 +53,12 @@ class x10Main(xPLModule):
         '''
         xPLModule.__init__(self, name = 'x10')
         self.__myxpl = Manager()
-        self._config = Query(self.__myxpl)
-        res = xPLResult() 
-        self._config.query('x10', 'heyu_cfg_path', res)
+        _config = Query(self.__myxpl)
+        res = xPLResult()
+        _config.query('x10', 'heyu_cfg_path', res)
         self._heyu_cfg_path_res = res.get_value()
+        del(_config)
+        del(res)
         try:
             self.__myx10 = X10API(self._heyu_cfg_path_res)
         except:
@@ -84,9 +86,17 @@ class x10Main(xPLModule):
         and finally restart heyu
         '''
         #Heyu config items
+        print "Reload 1"
         res = xPLResult()
+        self._config = Query(self.__myxpl)
+        print "Reload 1.1"
+
         self._config.query('x10','', res)
+
+        print "Reload 2"
         result = res.get_value()
+        print "Reload 3 : %s " % result
+        print "Heyu config received !"
         heyu_config_items = filter(lambda k : k.startswith("heyu_file_", result.keys()))
         heyu_config_values = []
         for key in heyu_config_items:
@@ -101,13 +111,10 @@ class x10Main(xPLModule):
         '''
         Send the heyu config file on the network
         '''
-        print "Dump started"
         res = xPLResult()
         #Heyu path
-        print "Starts heyu amnager with path = %s" % self._heyu_cfg_path_res
         myheyu = HeyuManager(self._heyu_cfg_path_res)
         lines = myheyu.load()
-        print "lines loaded : %s" % lines
         m = Message()
         m.set_type('xpl-trig')
         m.set_schema('domogik.config')
@@ -116,7 +123,7 @@ class x10Main(xPLModule):
             key = "heyu_file_%s" % count
             count = count + 1
             m.set_data_key(key, line)
-        print "Message is : %s" % m
+        #print "Message is : %s" % m
         self.__myxpl.send(m)
 
 

@@ -160,7 +160,7 @@ class Manager(xPLModule):
         """
         try:
             if not message.has_conf_key("hop"):
-                message.set_conf_key("hop", "1")
+                message.set_conf_key("hop", "5")
             if not message.has_conf_key("source"):
                 message.set_conf_key("source", self._source)
             if not message.has_conf_key("target"):
@@ -217,6 +217,7 @@ remote-ip=%s
                     else:
                         try:
                             mess = Message(data)
+                            print mess
                             if mess.get_conf_key_value("target") == "*" or (
                                     mess.get_conf_key_value("target") == self._source):
                                 [l.new_message(mess) for l in self._listeners]
