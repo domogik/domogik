@@ -253,17 +253,11 @@ class X10API:
         @param lvl : dim level in percent
         @Return True if order was sent, False in case of errors
         '''
-#        try:
         self._valid_item(item)
         level = int(int(lvl) * 0.22)
         if level == 0:
             level = 1
         self._send_lvl("dim", item, level)
-#        except:
-#            print "Exception lors de l'envoi de dim"
-#            return False
-#        else:
-#            return True
 
     def dimb(self, item, lvl):
         '''
@@ -364,20 +358,17 @@ class X10Monitor:
             out = None
             regex_order = re.compile(r".* ([a-zA-Z0-9]+) :[^:]+$")
             regex_unit = re.compile(r".* : h[uc] ([^ ]+).*$")
-            regex_security = re.compile(r".*(Alert|Clear) : hc ([A-P]) unit ([1-16]).*$")
+            regex_security = re.compile(r".*(Alert|Clear) : hu ([A-P][0-9]+).*$")
             try:
                 while not self._pipe.stdout.closed and out != '':
                     out = self._pipe.stdout.readline()
-#                    print "communicate %s" % out
                     if 'addr unit' in out:
-                        print "regex unit : |%s|" % regex_unit.sub(r"\1", out)
                         units.append(out.split()[8].lower())
                     elif 'func' in out:
-                        print "regex : |%s|" % regex_order.sub(r"\1", out)
                         if "Alert" in out or "Clear" in out:
                             #RF Security device
-                            (order, house, unit) = regex_security.sub(r"\1,\2,\3", out).lower().split(",")
-                            units = ["%s%s" % (house, unit)]
+                            (order, unit) = regex_security.sub(r"\1,\2", out).lower().split(",")
+                            units = [unit]
                         else:
                             #Standard order
                             order = out.split()[4].lower()
@@ -390,7 +381,7 @@ class X10Monitor:
                         arg = None
             except ValueError:
                 #The pipe is closed
-                print "Exception"
+                self._log.warning("The heyu-monitor pipe is closed. Finish silently.")
                 pass
 
         def _call_cbs(self, units, order, arg):
