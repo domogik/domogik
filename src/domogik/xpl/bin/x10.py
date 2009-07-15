@@ -60,7 +60,8 @@ class x10Main(xPLModule):
         del(_config)
         del(res)
         try:
-            self.__myx10 = X10API(self._heyu_cfg_path_res)
+            pass
+#            self.__myx10 = X10API(self._heyu_cfg_path_res)
         except:
             print "Something went wrong during heyu init, check logs"
             exit(1)
@@ -68,15 +69,16 @@ class x10Main(xPLModule):
         Listener(self.x10_cmnd_cb, self.__myxpl, {'schema': 'x10.basic',
                 'type': 'xpl-cmnd'})
         #One listener for system schema, allowing to reload config
-        Listener(self.heyu_reload_config, self.__myxpl, {'schema': 'domogik.system', 
-            'type': 'xpl-cmnd', 'command': 'reload', 'module': 'x10'})
+#        Listener(self.heyu_reload_config, self.__myxpl, {'schema': 'domogik.system', 
+ #           'type': 'xpl-cmnd', 'command': 'reload', 'module': 'x10'})
+        Listener(self.heyu_reload_config, self.__myxpl,{'schema': 'domogik.config', 'type': 'xpl-cmnd'})
         #One listener for system schema, allowing to dump config
         Listener(self.heyu_dump_config, self.__myxpl, {'schema': 'domogik.system', 
             'type': 'xpl-cmnd', 'command': 'push_config', 'module': 'x10'})
         self._log = self.get_my_logger()
-        self._monitor = X10Monitor(self._heyu_cfg_path_res)
-        self._monitor.get_monitor().add_cb(self.x10_monitor_cb)
-        self._monitor.get_monitor().start()
+#        self._monitor = X10Monitor(self._heyu_cfg_path_res)
+#        self._monitor.get_monitor().add_cb(self.x10_monitor_cb)
+#        self._monitor.get_monitor().start()
         self._log.debug("Heyu correctly started")
 
     def heyu_reload_config(self, message):
@@ -91,20 +93,26 @@ class x10Main(xPLModule):
         self._config = Query(self.__myxpl)
         print "Reload 1.1"
 
-        self._config.query('x10','', res)
+#        self._config.query('x10','heyu_cfg_path', res)
+        print "Event : %s" % res.get_lock().is_set()
 
         print "Reload 2"
         result = res.get_value()
-        print "Reload 3 : %s " % result
+        print "Message : %s" % message
+        return
+#        print "Reload 3 : %s " % result
         print "Heyu config received !"
-        heyu_config_items = filter(lambda k : k.startswith("heyu_file_", result.keys()))
-        heyu_config_values = []
-        for key in heyu_config_items:
-            heyu_config_values.append(result[key])
-        #Heyu path
-        myheyu = HeyuManager(self._heyu_cfg_path_res)
-        myheyu.write(heyu_config_values)
-        myheyu.restart()
+        if result is not None:
+            heyu_config_items = filter(lambda k : k.startswith("heyu_file_", result.keys()))
+            heyu_config_values = []
+            for key in heyu_config_items:
+                heyu_config_values.append(result[key])
+            #Heyu path
+            myheyu = HeyuManager(self._heyu_cfg_path_res)
+            myheyu.write(heyu_config_values)
+            myheyu.restart()
+        else:
+            print "empty res"
 
 
     def heyu_dump_config(self, message):

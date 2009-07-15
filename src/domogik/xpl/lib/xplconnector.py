@@ -217,7 +217,6 @@ remote-ip=%s
                     else:
                         try:
                             mess = Message(data)
-                            print mess
                             if mess.get_conf_key_value("target") == "*" or (
                                     mess.get_conf_key_value("target") == self._source):
                                 [l.new_message(mess) for l in self._listeners]
@@ -232,14 +231,8 @@ remote-ip=%s
         Add a listener on the list of the manager
         @param listener : the listener instance
         """
+        print "Listener added : %s " % listener
         self._listeners.append(listener)
-
-    def del_listener(self, listener):
-        """
-        Remove a listener
-        @param listener : the listener instance
-        """
-        self._listeners.remove(listener)
 
 class Listener:
     """
@@ -261,6 +254,9 @@ class Listener:
         self._callback = cb
         self._filter = filter
         manager.add_listener(self)
+
+    def __str__(self):
+        return "Listener<%s>" % (self._filter)
 
     def getFilter(self):
         return self._filter

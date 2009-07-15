@@ -48,7 +48,7 @@ from domogik.common import logger
 class Sender(xPLModule):
 
     supported_schemas = ["datetime.basic", "dawndusk.request", "x10.basic",
-            "sensor.basic", "domogik.system"]
+            "sensor.basic", "domogik.system","domogik.config"]
 
     def __init__(self, schema=None, message=None):
         xPLModule.__init__(self, name = 'send')

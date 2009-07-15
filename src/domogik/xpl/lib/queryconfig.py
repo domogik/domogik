@@ -77,6 +77,7 @@ class Query():
         self.__myxpl.send(mess)
         print "Wait for answer"
         self._res.get_lock().wait()
+        print "answer received"
 
     def _query_cb(self, message):
         '''
