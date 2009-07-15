@@ -55,6 +55,7 @@ Implements
 - Message:.has_key(self, key)
 - Message:.has_conf_key(self, key)
 - Message:.get_key_value(self, key)
+- Message:.get_all_keys(self)
 - Message:.get_conf_key_value(self, key)
 - Message:.__str__(self)
 - xPLTimer.__init__(self, time, cb, stop)
@@ -219,6 +220,7 @@ remote-ip=%s
                             mess = Message(data)
                             if mess.get_conf_key_value("target") == "*" or (
                                     mess.get_conf_key_value("target") == self._source):
+
                                 [l.new_message(mess) for l in self._listeners]
                                 #Enabling this debug will really polute your logs
                                 #self._log.debug("New message received : %s" % \
@@ -231,8 +233,8 @@ remote-ip=%s
         Add a listener on the list of the manager
         @param listener : the listener instance
         """
-        print "Listener added : %s " % listener
         self._listeners.append(listener)
+
 
 class Listener:
     """
@@ -272,7 +274,6 @@ class Listener:
         and to call the callback function if it does
         """
         ok = True
-
         for key in self._filter:
             if message.has_key(key):
                 if (message.get_key_value(key) != self._filter[key]):
@@ -294,7 +295,8 @@ class Listener:
                 ok = False
         #The message match the filter, we can call  the callback function
         if ok:
-            self._callback(message)
+            thread = threading.Thread(target=self._callback, args = (message,))
+            thread.start()
 
     def add_filter(self, key, value):
         """
@@ -467,13 +469,19 @@ class Message:
         if key in self._data:
             return self._data[key]
         else:
-            raise XPLException("Key not existing")
+            raise XPLException,"Key not existing"
 
     def get_all_keys(self):
         """
         Get all the keys
         """
         return self._data.keys()
+
+    def get_all_data_pairs(self):
+        """
+        Get all data key=value pairs
+        """
+        return self._data
 
     def get_conf_key_value(self, key):
         """

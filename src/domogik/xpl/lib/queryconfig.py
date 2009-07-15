@@ -88,7 +88,10 @@ class Query():
         #self.__myxpl.del_listener(self._list)
         self._log.debug("Config value received : %s" %
                 message.get_key_value(self._key))
-        result = message.get_key_value(self._key)
+        result = message.get_all_data_pairs()
+        #We remove the technology key which is useless now
+        print message
+        result.pop("technology")
         self._res.set_value(result)
         self._res.get_lock().set()
 

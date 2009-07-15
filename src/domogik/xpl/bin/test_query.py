@@ -56,11 +56,11 @@ class query_test(xPLModule):
 #        del(query_obj)
 #        del(res)
 #        print "=== config 1 FINI ==="
-        Listener(self._cb, self.xpl,{})
+        Listener(self._cb, self.xpl,{'schema':'dawndusk.request'})
 
     def _cb(self, message):
         res = xPLResult()
-#        query_obj = Query(self.xpl)
+        query_obj = Query(self.xpl)
 
         print "Send query for x10.heyu_cfg_path"
         mess = Message()
@@ -68,13 +68,11 @@ class query_test(xPLModule):
         mess.set_schema('domogik.config')
         mess.set_data_key('technology', 'x10')
         mess.set_data_key('element', 'heyu_cfg_path')
-        mess.set_data_key('key', '')
-        Listener(self._query_cb, self.__myxpl,{'schema': 'domogik.config', 'type': 'xpl-stat'})
-        self.__myxpl.send(mess)
+        Listener(self._query_cb, self.xpl,{'schema': 'domogik.config', 'type': 'xpl-stat'})
+        self.xpl.send(mess)
 
 #        query_obj.query("x10","heyu_cfg_path", res)
         print "Answer received for x10.heyu_cfg_path : %s" % res.get_value()
-
         print "Send query for x10.all"
         query_obj.query("x10","heyu_cfg_path", res)
         print "Answer received for x10.all : %s" % res.get_value()

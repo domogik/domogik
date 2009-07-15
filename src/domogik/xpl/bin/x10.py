@@ -53,12 +53,11 @@ class x10Main(xPLModule):
         '''
         xPLModule.__init__(self, name = 'x10')
         self.__myxpl = Manager()
-        _config = Query(self.__myxpl)
+        self._config = Query(self.__myxpl)
         res = xPLResult()
-        _config.query('x10', 'heyu_cfg_path', res)
-        self._heyu_cfg_path_res = res.get_value()
-        del(_config)
-        del(res)
+        self._config.query('x10', 'heyu_cfg_path', res)
+        print "heyu_cfg_path : %s" % res.get_value()
+        self._heyu_cfg_path_res = res.get_value()['heyu_cfg_path']
         try:
             pass
 #            self.__myx10 = X10API(self._heyu_cfg_path_res)
@@ -69,9 +68,8 @@ class x10Main(xPLModule):
         Listener(self.x10_cmnd_cb, self.__myxpl, {'schema': 'x10.basic',
                 'type': 'xpl-cmnd'})
         #One listener for system schema, allowing to reload config
-#        Listener(self.heyu_reload_config, self.__myxpl, {'schema': 'domogik.system', 
- #           'type': 'xpl-cmnd', 'command': 'reload', 'module': 'x10'})
-        Listener(self.heyu_reload_config, self.__myxpl,{'schema': 'domogik.config', 'type': 'xpl-cmnd'})
+        Listener(self.heyu_reload_config, self.__myxpl, {'schema': 'domogik.system', 
+           'type': 'xpl-cmnd', 'command': 'reload', 'module': 'x10'})
         #One listener for system schema, allowing to dump config
         Listener(self.heyu_dump_config, self.__myxpl, {'schema': 'domogik.system', 
             'type': 'xpl-cmnd', 'command': 'push_config', 'module': 'x10'})
@@ -88,22 +86,12 @@ class x10Main(xPLModule):
         and finally restart heyu
         '''
         #Heyu config items
-        print "Reload 1"
         res = xPLResult()
-        self._config = Query(self.__myxpl)
-        print "Reload 1.1"
-
-#        self._config.query('x10','heyu_cfg_path', res)
-        print "Event : %s" % res.get_lock().is_set()
-
-        print "Reload 2"
+#        self._config = Query(self.__myxpl)
+        self._config.query('x10','heyu_cfg_path', res)
         result = res.get_value()
-        print "Message : %s" % message
-        return
-#        print "Reload 3 : %s " % result
-        print "Heyu config received !"
         if result is not None:
-            heyu_config_items = filter(lambda k : k.startswith("heyu_file_", result.keys()))
+            heyu_config_items = filter(lambda k : k.startswith("heyu_file_"), result.keys())
             heyu_config_values = []
             for key in heyu_config_items:
                 heyu_config_values.append(result[key])

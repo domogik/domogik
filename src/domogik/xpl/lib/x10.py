@@ -414,7 +414,7 @@ class HeyuManager:
         """
         @param path = The heyu config file path, must be absolute
         """
-        self._file = path
+        self._file = "%s" % path
 
     def load(self):
         """

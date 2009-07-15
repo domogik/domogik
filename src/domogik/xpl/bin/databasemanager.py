@@ -96,11 +96,13 @@ class DBConnector(xPLModule):
             element, key), message.get_conf_key_value("source"), element)
         else:
             if not key:
+                print "not key : %s" % key
                 keys = self._fetch_techno_config(techno, key).keys()
                 values = self._fetch_techno_config(techno, key).values()
                 self._send_config(techno, keys, values,
                 message.get_conf_key_value("source"))
             else:
+                print "key : %s" % key
                 self._send_config(techno, key, self._fetch_techno_config(techno,
                 key), message.get_conf_key_value("source"))
 
@@ -121,7 +123,6 @@ class DBConnector(xPLModule):
         if element:
             mess.set_data_key('element', element)
         #If key/value are lists, then we add an key=value for each item
-        print "LIST : %s, %s" % (key, isinstance(key, list))
         if isinstance(key, list):
             for (k, v) in zip(key, value):
                 print "set data key %s = %s " % (k, v)
@@ -153,14 +154,15 @@ class DBConnector(xPLModule):
         @param key : the key of the config tuple to fetch
         '''
         #TODO : use the database
-        vals = {'x10': {'heyu_cfg_path':'/etc/heyu/x10.conf'},
-#            'heyu_file_0': 'TTY /dev/ttyUSB0',
- #           'heyu_file_1': 'TTY_AUX /dev/ttyUSB0 RFXCOM',
- #           'heyu_file_2': 'ALIAS back_door D5 DS10A 0x677'},
+        vals = {'x10': {'heyu_cfg_path':'/etc/heyu/x10.conf',
+            'heyu_file_0': 'TTY /dev/ttyUSB0',
+            'heyu_file_1': 'TTY_AUX /dev/ttyUSB0 RFXCOM',
+            'heyu_file_2': 'ALIAS back_door D5 DS10A 0x677'},
                 'global': {'pid_dir_path': '/tmp/'},
                 }
         try:
             if key:
+                print "vals->techno->key : %s " % vals[techno][key]
                 return vals[techno][key]
             else:
                 return vals[techno]
@@ -170,5 +172,6 @@ class DBConnector(xPLModule):
     def _update_stat(self, message):
         #TODO
         pass
+
 if __name__ == "__main__":
     d = DBConnector()
