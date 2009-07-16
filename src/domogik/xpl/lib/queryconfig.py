@@ -53,7 +53,6 @@ class Query():
         self._log = l.get_logger()
         self.__myxpl = xpl
         self._log.debug("Init config query instance")
-        #
 
     def query(self, technology, key, result, element = ''):
         '''
@@ -75,9 +74,7 @@ class Query():
         mess.set_data_key('key', key)
         self._key = key
         self.__myxpl.send(mess)
-        print "Wait for answer"
         self._res.get_lock().wait()
-        print "answer received"
 
     def _query_cb(self, message):
         '''
@@ -85,13 +82,9 @@ class Query():
         @param message : the message received
         '''
         print "Answer received"
-        #self.__myxpl.del_listener(self._list)
-        self._log.debug("Config value received : %s" %
-                message.get_key_value(self._key))
         result = message.get_all_data_pairs()
-        #We remove the technology key which is useless now
-        print message
-        result.pop("technology")
+        for r in result:
+            self._log.debug("Config value received : %s" % r)
         self._res.set_value(result)
         self._res.get_lock().set()
 

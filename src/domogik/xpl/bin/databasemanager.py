@@ -96,13 +96,11 @@ class DBConnector(xPLModule):
             element, key), message.get_conf_key_value("source"), element)
         else:
             if not key:
-                print "not key : %s" % key
                 keys = self._fetch_techno_config(techno, key).keys()
                 values = self._fetch_techno_config(techno, key).values()
                 self._send_config(techno, keys, values,
                 message.get_conf_key_value("source"))
             else:
-                print "key : %s" % key
                 self._send_config(techno, key, self._fetch_techno_config(techno,
                 key), message.get_conf_key_value("source"))
 
@@ -119,13 +117,12 @@ class DBConnector(xPLModule):
         mess = Message()
         mess.set_type('xpl-stat')
         mess.set_schema('domogik.config')
-        mess.set_data_key('technology', technology)
+#        mess.set_data_key('technology', technology)
         if element:
             mess.set_data_key('element', element)
-        #If key/value are lists, then we add an key=value for each item
+        #If key/value are lists, then we add a key=value for each item
         if isinstance(key, list):
             for (k, v) in zip(key, value):
-                print "set data key %s = %s " % (k, v)
                 mess.set_data_key(k, v)
         else:
             mess.set_data_key(key, value)
@@ -162,7 +159,6 @@ class DBConnector(xPLModule):
                 }
         try:
             if key:
-                print "vals->techno->key : %s " % vals[techno][key]
                 return vals[techno][key]
             else:
                 return vals[techno]

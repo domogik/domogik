@@ -434,7 +434,8 @@ class HeyuManager:
         """
         Write config datas in the config file
         @param data : list of config lines
-        Warning : it will erease the previous config file
+        @Warning : it will erease the previous config file
+        @raise IOError if the file can'"t be opened
         """
         f = open(self._file, "w")
         for section in self.ITEMS_SECTION:
@@ -449,10 +450,11 @@ class HeyuManager:
     def restart(self):
         """
         Restart heyu process, needed to reload config
+        @return the output of heyu restart command on stderr,
+        should be empty if everything goes well
         """
         res = Popen("heyu restart", shell=True, stderr=PIPE)
         output = res.stderr.read()
         res.stderr.close()
-        if output:
-            self._log.error("Error during heyu restart : %s " % output)
+        return output
 

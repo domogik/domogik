@@ -56,7 +56,6 @@ class x10Main(xPLModule):
         self._config = Query(self.__myxpl)
         res = xPLResult()
         self._config.query('x10', 'heyu_cfg_path', res)
-        print "heyu_cfg_path : %s" % res.get_value()
         self._heyu_cfg_path_res = res.get_value()['heyu_cfg_path']
         try:
             pass
@@ -88,7 +87,7 @@ class x10Main(xPLModule):
         #Heyu config items
         res = xPLResult()
 #        self._config = Query(self.__myxpl)
-        self._config.query('x10','heyu_cfg_path', res)
+        self._config.query('x10','', res)
         result = res.get_value()
         if result is not None:
             heyu_config_items = filter(lambda k : k.startswith("heyu_file_"), result.keys())
@@ -97,8 +96,14 @@ class x10Main(xPLModule):
                 heyu_config_values.append(result[key])
             #Heyu path
             myheyu = HeyuManager(self._heyu_cfg_path_res)
-            myheyu.write(heyu_config_values)
-            myheyu.restart()
+            try:
+                myheyu.write(heyu_config_values)
+            except IOError:
+                self._log.warning("Heyu config file can't be opened")
+            res = myheyu.restart()
+            if res:
+                self._log.warning("Error during heyu restart : %s" % res)
+
         else:
             print "empty res"
 
