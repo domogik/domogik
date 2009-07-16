@@ -112,16 +112,16 @@ class OneWire:
         """
         return self._root.find(family = f)
 
-    def get_temperature(self):
+    def get_temperatures(self):
         """
         Return list of all temperature indicated by DS18B20 and DS18S20 sensors
         @return list of (id, temperature)
         """
-
-        def get_temperatures(t):
-            return [(i.id, i.type, i.temperature.replace(" ", "")) for i in
-                    self.exec_type(t=t)]
         return get_temperatures('DS18S20') + get_temperatures('DS18B20')
+
+    def get_temperatures(t):
+        return [(i.id, i.type, i.temperature.replace(" ", "")) for i in
+                self.exec_type(t=t)]
 
     def is_present(self, item):
         """

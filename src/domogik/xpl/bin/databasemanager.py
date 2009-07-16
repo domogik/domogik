@@ -156,6 +156,7 @@ class DBConnector(xPLModule):
             'heyu_file_1': 'TTY_AUX /dev/ttyUSB0 RFXCOM',
             'heyu_file_2': 'ALIAS back_door D5 DS10A 0x677'},
                 'global': {'pid_dir_path': '/tmp/'},
+                'onewire': {'temperature_refresh_delay' : '10'}
                 }
         try:
             if key:
