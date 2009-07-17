@@ -121,7 +121,7 @@ class Area(Base):
         self.description = description
 
     def __repr__(self):
-        return "<Area('%s', '%s')>" % (self.name, self.description)
+        return "<Area(id=%s, name='%s', desc='%s')>" % (self.id, self.name, self.description)
 
     @staticmethod
     def get_tablename():
@@ -147,7 +147,8 @@ class Room(Base):
         self.area_id = area_id
 
     def __repr__(self):
-        return "<Room('%s', '%s')>" % (self.name, self.description)
+        return "<Room(id=%s, name='%s', desc='%s', area=%s)>" \
+          % (self.id, self.name, self.description, self.area_id)
 
     @staticmethod
     def get_tablename():
@@ -170,7 +171,7 @@ class DeviceCategory(Base):
         self.name = name
 
     def __repr__(self):
-        return "<DeviceCategory('%s')>" % (self.name)
+        return "<DeviceCategory(id=%s, name='%s')>" % (self.id, self.name)
 
     @staticmethod
     def get_tablename():
@@ -203,7 +204,8 @@ class DeviceTechnology(Base):
         self.type = type
 
     def __repr__(self):
-        return "<DeviceTechnology('%s', '%s', '%s')>" % (self.name, self.description, self.type)
+        return "<DeviceTechnology(id=%s, name='%s', desc='%s', type='%s')>" \
+          % (self.id, self.name, self.description, self.type)
 
     @staticmethod
     def get_tablename():
@@ -230,7 +232,8 @@ class DeviceTechnologyConfig(Base):
         self.value = value
 
     def __repr__(self):
-        return "<DeviceTechnologyConfig('%s', '%s')>" % (self.key, self.value)
+        return "<DeviceTechnologyConfig(id=%s, techno=%s, ('%s', '%s'))>" \
+          % (self.id, technology_id, self.key, self.value)
 
     @staticmethod
     def get_tablename():
@@ -280,7 +283,11 @@ class Device(Base):
       self.unit_of_stored_values = unit_of_stored_values
 
     def __repr__(self):
-        return "<Device('%s', '%s')>" % (self.address, self.description)
+        return "<Device(id=%s, addr='%s', desc='%s', techno=%s, type='%s', cat=%s, \
+          room=%s, is_reset='%s', initial_val='%s', is_value_change='%s', unit='%s')>" \
+          % (self.id, self.address, self.description, self.technology_id, \
+             self.type, self.category_id, self.room_id, is_resetable, initial_value,\
+             is_value_changeable_by_user, unit_of_stored_values)
 
     @staticmethod
     def get_tablename():
@@ -307,7 +314,8 @@ class DeviceConfig(Base):
         self.value = value
 
     def __repr__(self):
-        return "<DeviceConfig('%s', '%s')>" % (self.key, self.value)
+        return "<DeviceConfig(id=%s, device=%s, ('%s', '%s'))>" \
+          % (self.id, self.device_id, self.key, self.value)
 
     @staticmethod
     def get_tablename():
@@ -333,7 +341,8 @@ class DeviceStats(Base):
         self.value = value
 
     def __repr__(self):
-        return "<DeviceStats('%s', '%s')>" % (self.date, self.value)
+        return "<DeviceStats(id=%s, device=%s, date='%s', val='%s')>" \
+          % (self.id, self.device_id, self.date, self.value)
 
     @staticmethod
     def get_tablename():
@@ -364,7 +373,8 @@ class Trigger(Base):
         self.result = result
 
     def __repr__(self):
-        return "<Trigger('%s', '%s', '%s')>" % (self.description, self.rule, self.result)
+        return "<Trigger(id=%s, desc='%s', rule='%s', result='%s')>" \
+          % (self.id, self.description, self.rule, self.result)
 
     @staticmethod
     def get_tablename():
@@ -392,7 +402,8 @@ class SystemAccount(Base):
         self.is_admin = is_admin
 
     def __repr__(self):
-        return "<SystemAccount('%s', '%s')>" % (self.login, self.is_admin)
+        return "<SystemAccount(id=%s, login='%s', pass='%s' is_admin='%s')>" \
+          % (self.id, self.login, self. password, self.is_admin)
 
     @staticmethod
     def get_tablename():
@@ -423,7 +434,8 @@ class UserAccount(Base):
         self.system_account_id = system_account_id
 
     def __repr__(self):
-        return "<UserAccount('%s', '%s')>" % (self.first_name, self.last_name)
+        return "<UserAccount(id=%s, first_name='%s', last_name='%s', system_account=%s)>" \
+          % (self.id, self.first_name, self.last_name, self.system_account_id)
 
     @staticmethod
     def get_tablename():
