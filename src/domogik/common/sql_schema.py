@@ -139,12 +139,12 @@ class Room(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(30), nullable=False)
     description = Column(String(100))
-    area = Column(Integer, ForeignKey('%s.id' % Area.get_tablename()))
+    area_id = Column(Integer, ForeignKey('%s.id' % Area.get_tablename()))
 
-    def __init__(self, name, description, area):
+    def __init__(self, name, description, area_id):
         self.name = name
         self.description = description
-        self.area = area
+        self.area_id = area_id
 
     def __repr__(self):
         return "<Room('%s', '%s')>" % (self.name, self.description)
@@ -220,12 +220,12 @@ class DeviceTechnology(Base):
 class DeviceTechnologyConfig(Base):
     __tablename__ = '%s_device_technology_config' % _db_prefix
     id = Column(Integer, primary_key=True)
-    technology = Column(Integer, ForeignKey('%s.id' % DeviceTechnology.get_tablename()))
+    technology_id = Column(Integer, ForeignKey('%s.id' % DeviceTechnology.get_tablename()))
     key = Column(String(30), nullable=False)
     value = Column(String(80), nullable=False)
 
-    def __init__(self, technology, key, value):
-        self.technology = technology
+    def __init__(self, technology_id, key, value):
+        self.technology_id = technology_id
         self.key = key
         self.value = value
 
@@ -257,23 +257,23 @@ class Device(Base):
     id = Column(Integer, primary_key=True)
     address = Column(String(30), nullable=False)
     description = Column(String(100))
-    technology = Column(Integer, ForeignKey('%s.id' % DeviceTechnology.get_tablename()))
+    technology_id = Column(Integer, ForeignKey('%s.id' % DeviceTechnology.get_tablename()))
     type = Column(Enum([u'appliance',u'lamp',u'music',u'sensor']))
-    category = Column(Integer, ForeignKey('%s.id' % DeviceCategory.get_tablename()))
-    room = Column(Integer, ForeignKey('%s.id' % Room.get_tablename()))
+    category_id = Column(Integer, ForeignKey('%s.id' % DeviceCategory.get_tablename()))
+    room_id = Column(Integer, ForeignKey('%s.id' % Room.get_tablename()))
     is_resetable = Column(Boolean, nullable=False)
     initial_value = Column(String(10))
     is_value_changeable_by_user = Column(Boolean, nullable=False)
     unit_of_stored_values = Column(Enum([u'Volt',u'Celsius',u'Fahrenheit',u'Percent',u'Boolean']))
 
-    def __init__(self, address, description, technology, type, category, room, \
+    def __init__(self, address, description, technology_id, type, category_id, room_id, \
         is_resetable, initial_value, is_value_changeable_by_user, unit_of_stored_values):
       self.address = address
       self.description = description
-      self.technology = technology
+      self.technology_id = technology_id
       self.type = type
-      self.category = category
-      self.room = room
+      self.category_id = category_id
+      self.room_id = room_id
       self.is_resetable = is_resetable
       self.initial_value = initial_value
       self.is_value_changeable_by_user = is_value_changeable_by_user
@@ -297,12 +297,12 @@ class Device(Base):
 class DeviceConfig(Base):
     __tablename__ = '%s_device_config' % _db_prefix
     id = Column(Integer, primary_key=True)
-    device = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()))
+    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()))
     key = Column(String(30), nullable=False)
     value = Column(String(80), nullable=False)
 
-    def __init__(self, device, key, value):
-        self.device = device
+    def __init__(self, device_id, key, value):
+        self.device_id = device_id
         self.key = key
         self.value = value
 
@@ -323,12 +323,12 @@ class DeviceConfig(Base):
 class DeviceStats(Base):
     __tablename__ = '%s_device_stats' % _db_prefix
     id = Column(Integer, primary_key=True)
-    device = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()))
+    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()))
     date = Column(DateTime, nullable=False)
     value = Column(String(80), nullable=False)
 
-    def __init__(self, device, date, value):
-        self.device = device
+    def __init__(self, device_id, date, value):
+        self.device_id = device_id
         self.date = date
         self.value = value
 
@@ -414,13 +414,13 @@ class UserAccount(Base):
     first_name = Column(String(50), nullable=False)
     last_name = Column(String(60), nullable=False)
     birthdate = Column(Date, nullable=False)
-    system_account = Column(Integer, ForeignKey('%s.id' % SystemAccount.get_tablename()))
+    system_account_id = Column(Integer, ForeignKey('%s.id' % SystemAccount.get_tablename()))
 
-    def __init__(self, first_name, last_name, birthdate, system_account):
+    def __init__(self, first_name, last_name, birthdate, system_account_id):
         self.first_name = first_name
         self.last_name = last_name
         self.birthdate = birthdate
-        self.system_account = system_account
+        self.system_account_id = system_account_id
 
     def __repr__(self):
         return "<UserAccount('%s', '%s')>" % (self.first_name, self.last_name)
