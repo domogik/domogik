@@ -233,7 +233,7 @@ class DeviceTechnologyConfig(Base):
 
     def __repr__(self):
         return "<DeviceTechnologyConfig(id=%s, techno=%s, ('%s', '%s'))>" \
-          % (self.id, technology_id, self.key, self.value)
+          % (self.id, self.technology_id, self.key, self.value)
 
     @staticmethod
     def get_tablename():
