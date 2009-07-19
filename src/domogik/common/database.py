@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-                                                                           
+# -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -22,7 +22,8 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 Module purpose
 ==============
 
-API to use Domogik database
+API to use Domogik database.
+Please don't forget to add unit test in 'database_test.py' if you add a new method
 
 Implements
 ==========
@@ -30,11 +31,11 @@ Implements
 - DbHelper.__init__(self)
 - DbHelper._get_table(self, table_name)
 - DbHelper.list_areas_name(self)
-- DbHelper.fetch_area_informations(self, area)
+- DbHelper.get_area_by_name(self, area)
 - DbHelper.add_area(self, a_name, a_description)
 - DbHelper.del_area(self, a_name)
 - DbHelper.list_rooms_name(self)
-- DbHelper.fetch_room_informations(self, room)
+- DbHelper.get_room_by_name(self, room)
 - DbHelper.add_room(self, r_name, r_area_id, r_description)
 - DbHelper.del_room(self, r_name)
 - DbHelper.get_all_room_of_area(self, a_name)
@@ -80,10 +81,18 @@ Implements
 - print_title(title)
 - print_test(test)
 
-@author: Domogik project
+@author: Maxence DUNNEWIND / Marc SCHNEIDER
 @copyright: (C) 2007-2009 Domogik project
 @license: GPL(v3)
 @organization: Domogik
+"""
+
+#TODO database.py (general)
+"""
+- may be this is not a good idea to raise standard Exception objects when there is an error
+- see if we can check the uniqueness of records, when it should be and raise and exception otherwise
+- make sure reference to list values are not hardcoded but point to the ones defined in sql_schema
+- Make sure all items are deleted if you delete an area for example
 """
 
 ####
@@ -101,21 +110,28 @@ Implements
 # user_account
 ####
 
+from sqlalchemy import asc, desc, and_
+from sqlalchemy import create_engine
 from sqlalchemy.ext.sqlsoup import SqlSoup
-from sqlalchemy import asc, desc
-import time
-from datetime import datetime
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
+
 import hashlib
 
 from domogik.common.configloader import Loader
+from domogik.common.sql_schema import Area, Device, DeviceCategory, DeviceConfig, \
+                                      DeviceStats, DeviceTechnology, DeviceTechnologyConfig, \
+                                      Room, UserAccount, SystemAccount, Trigger
+from domogik.common.sql_schema import UNIT_OF_STORED_VALUE_LIST, DEVICE_TECHNOLOGY_TYPE_LIST, DEVICE_TYPE_LIST
 
 class DbHelper():
     """
     This class provides methods to fetch and put informations on the Domogik database
     The user should only use methods from this class and don't access the database directly
     """
-    _soup = None
     _dbprefix = None
+    _engine = None
+    _session = None
 
     def __init__(self):
         cfg = Loader('database')
@@ -131,40 +147,30 @@ class DbHelper():
                 url = "%s%s:%s@%s/%s" % (url, db['db_user'], db['db_password'], db['db_host'], db['db_name'])
 
         # Connecting to the database
-        soup = SqlSoup(url)
-        self._soup = soup
         self._dbprefix = db['db_prefix']
-
-    def _get_table(self, table_name):
-        """
-        Returns a referenceto the table
-        This method takes care of the prefix used
-        """
-        ref =  getattr(self._soup, str('%s_%s') % (self._dbprefix, table_name))
-        return ref
+        self._engine = create_engine(url, echo=True)
+        Session = sessionmaker(bind=self._engine)
+        self._session = Session()
 
 ####
 # Areas
 ####
-    def list_areas_name(self):
+    def list_areas(self):
         """
-        Returns a list of areas' name
+        Return a list of areas
+        @return list of Area objects
         """
-        result = []
-        for area in self._get_table('area').all():
-            result.append(area.name)
-        return result
+        return self._session.query(Area).all()
 
-    def fetch_area_informations(self, area):
+    def get_area_by_name(self, area_name):
         """
-        Return informations about an area
+        Fetch area information
         @param area : The area name
-        @return a dictionnary of name:value 
+        @return an area object
         """
-        req = self._get_table('area').filter_by(name = area)
-        if req.count() > 0:
-            request = req.first()
-            return {'id' : request.id, 'name' : request.name, 'description' : request.description}
+        area = self._session.query(Area).filter_by(name = area_name).first()
+        if area:
+            return area
         else:
             return None
 
@@ -173,507 +179,439 @@ class DbHelper():
         Add an area
         @param a_name : area name
         @param a_description : area detailled description
+        @return an area object
         """
-        self._get_table('area').insert(name = a_name, description = a_description)
-        self._soup.flush()
+        area = Area(name = a_name, description = a_description)
+        self._session.add(area)
+        self._session.commit()
+        return area
 
-    def del_area(self, a_name):
+    def del_area(self, area_del_id):
         """
-        Delete an area record and
+        Delete an area record.
         Warning this also remove all the rooms in this area
         and all the devices (+ their stats) in each deleted rooms !
-        @param a_name : name of the area to delete
+        @param area_id : id of the area to delete
         """
-        req = self._get_table('area').filter_by(name = a_name)
-        if req.count() > 0:
-            area = req.first()
-            rooms = self._get_table('room').filter_by(area = area.id)
-            devices = []
-            for room in rooms:
-                devices.extends(self._get_table('device').filter_by(room = room.id))
-                self._get_table('room').delete(id == room.id)
-            for device in devices:
-                self._get_table('device').delete(id == device.id)
-            self._get_table('area').delete(id == area.id)
-            self._soup.flush()
-
+        area = self._session.query(Area).filter_by(id=area_del_id).first()
+        if area:
+            for room in self._session.query(Room).filter_by(area_id = area_del_id).all():
+                self.del_room(room.id)
+            self._session.delete(area)
+            self._session.commit()
 
 ####
 # Rooms
 ####
-    def list_rooms_name(self):
+    def list_rooms(self):
         """
-        Returns a list of rooms' name
+        Return a list of rooms
+        @return list of Room objects
         """
-        result = []
-        for room in  self._get_table('room').all():
-            result.append(room.name)
-        return result
+        return self._session.query(Room).all()
 
-    def fetch_room_informations(self, room):
+    def get_room_by_name(self, r_name):
         """
-        Return informations about a room
-        @param room : The room name
-        @return a dictionnary of name:value 
+        Return information about a room
+        @param r_name : The room name
+        @return a room object 
         """
-        req = self._get_table('room').filter_by(name = room)
-        if req.count() > 0:
-            request = req.first()
-            return {'id' : request.id, 'name' : request.name, 'area' : request.area,'description' : request.description}
+        room = self._session.query(Room).filter_by(name = r_name).first()
+        if room:
+            return room
         else:
             return None
 
-    def add_room(self, r_name, r_area_id, r_description):
+    def add_room(self, r_name, r_description, r_area_id):
         """
         Add a room
         @param r_name : room name
-        @param r_area_id : id of the area where the room is
+        @param area_id : id of the area where the room is
         @param r_description : room detailled description
+        @return : a room object
         """
-        self._get_table('room').insert(name = r_name, area = r_area_id, description = r_description)
-        self._soup.flush()
+        try: 
+            area = self._session.query(Area).filter_by(id = r_area_id).one()
+        except NoResultFound, e:
+            raise Exception("Couldn't add room with area id %s. It does not exist" % r_area_id)
 
-    def del_room(self, r_name):
+        room = Room(name = r_name, description = r_description, area_id = r_area_id)
+        self._session.add(room)
+        self._session.commit()
+        return room
+
+    def del_room(self, r_id):
         """
         Delete a room record
-        Warning this also remove all the devices (+ their stats) in each deleted rooms !
-        @param a_name : name of the room to delete
+        Warning this also remove all the devices in each deleted rooms!
+        @param r_id : id of the room to delete
         """
-        req = self._get_table('room').filter_by(name = r_name)
-        if req.count() > 0:
-            room = req.first()
-            devices = self._get_table('device').filter_by(room = room.id).all()
-            self._get_table('room').delete(id == room.id)
-            for device in devices:
-                self._get_table('device').delete(id == device.id)
-            self._soup.flush()
+        room = self._session.query(Room).filter_by(id=r_id).first()
+        if room:
+            for device in self._session.query(Device).filter_by(room_id = r_id).all():
+                self.del_device(device.id)
+            self._session.delete(room)
+            self._session.commit()
 
-    def get_all_room_of_area(self, a_name):
+    def get_all_room_of_area(self, area_searched):
         """
         Returns all the rooms of an area
-        @param a_name : area name
-        @return a list of dictionary {'id':'xxx','name':'yyy','description':'zzzz', 'area':a_name}
+        @param area_searched : an Area object
+        @return a list of Room objects
         """
-        rooms = self._get_table('room').filter_by(area= a_name).all()
-        result = []
-        for room in rooms:
-            result.append({'id':room.id, 'name':room.name, 'area':room.area, 'description':room.description})
-        return result
+        return self._session.query(Room).filter_by(area_id = area_searched.id).all()
 
 ####
 # Device category
 ####
-    def list_device_categories_name(self):
+    def list_device_categories(self):
         """
-        Returns a list of device_categories' name
+        Return a list of device categories
+        @return a list of DeviceCategory objects
         """
-        result = []
-        for device_category in  self._get_table(str('device_category')).all():
-            result.append(device_category.name)
-        return result
+        return self._session.query(DeviceCategory).all()
 
-    def fetch_device_category_informations(self, dc_name):
+    def get_device_category_by_name(self, dc_name):
         """
-        Return informations about a device category
+        Return information about a device category
         @param dc_name : The device category name
-        @return a dictionnary of name:value 
+        @return a DeviceCategory object 
         """
-        req = self._get_table('device_category').filter_by(name = dc_name)
-        if req.count() > 0:
-            request = req.first()
-            return {'id' : request.id, 'name' : request.name}
-        else:
-            return None
+        return self._session.query(DeviceCategory).filter_by(name = dc_name).first()
 
     def add_device_category(self, dc_name):
         """
         Add a device_category (temperature, heating, lighting, music, ...)
         @param dc_name : device category name
+        @return a DeviceCategory (the newly created one)
         """
-        self._get_table('device_category').insert(name = dc_name)
-        self._soup.flush()
+        dc = DeviceCategory(name = dc_name)
+        self._session.add(dc)
+        self._session.commit()
+        return dc
 
-    def del_device_category(self, dc_name):
+    def del_device_category(self, dc_id):
         """
         Delete a device category record
         Warning, it will also remove all the devices using this category
-        @param dc_name : name of the device category to delete
+        @param dc_id : id of the device category to delete
         """
-        req = self._get_table('device_category').filter_by(name = dc_name)
-        if req.count() > 0:
-            device_category = req.first()
-            devices = self._get_table('device').filter_by(category = device_category.id).all()
-            self._get_table('device_category').delete(id == device_category.id)
-            for device in devices:
-                self._get_table('device').delete(id == device.id)
-            self._soup.flush()
-    
+        dc = self._session.query(DeviceCategory).filter_by(id = dc_id).first()
+        if dc:
+            for device in self._session.query(Device).filter_by(category_id = dc.id).all():
+                self.del_device(device.id)
+            self._session.delete(dc)
+            self._session.commit()
+
     def get_all_devices_of_category(self, dc_id):
         """
-        Returns all the devices of a category
-        @param a_id: categoryid 
-        @return a list of dictionary {'id':'xxx','address':'yyy','technology':'zzzz'}
-        It does *not* return all attributes of devices
+        Return all the devices of a category
+        @param dc_id: category id 
+        @return a list of Device objects
         """
-        devices = self._get_table('device').filter_by(category = dc_id).all()
-        result = []
-        for device in devices:
-            result.append({'id':device.id, 'address':device.address, 'technology':device.technology})
-        return result
+        return self._session.query(Device).filter_by(category_id = dc_id).all()
+
+####
+# Device technology
+####
+    def list_device_technologies(self):
+        """
+        Return a list of device technologies
+        @return a list of DeviceTechnology objects
+        """
+        return self._session.query(DeviceTechnology).all()
+
+    def get_device_technology_by_name(self, dt_name):
+        """
+        Return information about a device technology
+        @param dt_name : the device technology name
+        @return a DeviceTechnology object
+        """
+        return self._session.query(DeviceTechnology).filter_by(name = dt_name).first()
+
+    def add_device_technology(self, dt_name, dt_description, dt_type):
+        """
+        Add a device_technology
+        @param dt_name : device technology name
+        @param dt_description : extended description of the technology
+        @param type : type of the technology, one of 'cpl','wired','wifi','wireless','ir'
+        """
+        if dt_type not in ['cpl','wired','wifi','wireless','ir']:
+            raise ValueError, 'dt_type must be one of cpl, wired, wifi, wireless, ir'
+        dt = DeviceTechnology(name = dt_name, description = dt_description, type= dt_type)
+        self._session.add(dt)
+        self._session.commit()
+        return dt
+
+    def del_device_technology(self, dt_id):
+        """
+        Delete a device technology record
+        Warning, it will also remove all the devices using this technology
+        @param dt_id : id of the device technology to delete
+        """
+        dt = self._session.query(DeviceTechnology).filter_by(id = dt_id).first()
+        if dt:
+            for device in self._session.query(Device).filter_by(technology_id = dt.id).all():
+                self.del_device(device.id)
+            self._session.delete(dt)
+            self._session.commit()
 
     def get_all_devices_of_technology(self, dt_id):
         """
         Returns all the devices of a technology
         @param dt_id : technology id
-        @return a list of dictionary {'id':'xxx','address':'yyy','technology':'zzzz'}
-        It does *not* return all attributes of devices
+        @return a list Device objects
         """
-        devices = self._get_table('device').filter_by(technology = dt_id).all()
-        result = []
-        for device in devices:
-            result.append({'id':device.id, 'address':device.address, 'technology':device.technology})
-        return result
-####
-# Device technology
-####
-    def list_device_technologies_name(self):
-        """
-        Returns a list of device_technologies' name
-        """
-        result = []
-        for device_technology in  self._get_table(str('device_technology')).all():
-            result.append(device_technology.name)
-        return result
-
-    def fetch_device_technology_informations(self, dc_name):
-        """
-        Return informations about a device technology
-        @param dc_name : The device technology name
-        @return a dictionnary of name:value 
-        """
-        req = self._get_table('device_technology').filter_by(name = dc_name)
-        if req.count() > 0:
-            request = req.first()
-            return {'id' : request.id, 'name' : request.name, 
-                    'description' : request.description, 'type' : request.type}
-        else:
-            return None
-
-    def add_device_technology(self, dc_name, dt_description, dt_type):
-        """
-        Add a device_technology
-        @param dc_name : device technology name
-        @param dt_description : extended description of the technology
-        @param type : type of the technology, one of 'cpl','wired','wifi','wireless','ir'
-        """
-        if dt_type not in ['cpl','wired','wifi','wireless','ir']:
-            raise ValueError, 'dt_type must be one of cpl,wired,wifi,wireless,ir'
-        self._get_table('device_technology').insert(name = dc_name, 
-                description = dt_description, type = dt_type)
-        self._soup.flush()
-
-    def del_device_technology(self, dc_name):
-        """
-        Delete a device technology record
-        Warning, it will also remove all the devices using this technology
-        @param dc_name : name of the device technology to delete
-        """
-        req = self._get_table('device_technology').filter_by(name = dc_name)
-        if req.count() > 0:
-            device_technology = req.first()
-            devices = self._get_table('device').filter_by(technology = device_technology.id).all()
-            self._get_table('device_technology').delete(id == device_technology.id)
-            for device in devices:
-                self._get_table('device').delete(id == device.id)
-            self._soup.flush()
+        return self._session.query(Device).filter_by(technology_id = dt_id).all()
 
 ####
 # Device technology config
 ####
-    def list_device_technology_config_keys(self):
+    def list_device_technology_config(self, dt_id):
         """
-        Returns a list of device_technologies'config keys
+        Return all keys and values of a device technology
+        @param dt_id : id of the device technology
+        @return a list of DeviceTechnologyConfig objects
         """
-        result = []
-        for device_technology in  self._get_table(str('device_technology_config')).all():
-            result.append(device_technology.key)
-        return result
+        return self._session.query(DeviceTechnologyConfig).filter_by(technology_id = dt_id).all()
 
-    def fetch_device_technology_config_informations(self, dtc_technology, dtc_key):
+    def get_device_technology_config_info(self, dt_id, dtc_key):
         """
-        Return informations about a device technology config item
-        @param dtc_technology : The device technology 
-        @param dtc_key : The device technology config key
-        @return a dictionnary of name:value 
+        Return information about a device technology config item
+        @param dt_id : id of the device technology
+        @param dtc_key : key of the device technology config
+        @return a DeviceTechnologyConfig object
         """
-        req = self._get_table('device_technology_config').filter_by(key= dtc_key, 
-                technology = dtc_technology)
-        if req.count() > 0:
-            request = req.first()
-            return {'id' : request.id, 'technology' : request.technology, 
-                    'key' : request.key, 'value' : request.value}
-        else:
-            return None
+        #TODO : check that there is only one result
+        return self._session.query(DeviceTechnologyConfig).filter_by(technology_id = dt_id)\
+                                                          .filter_by(key = dtc_key)\
+                                                          .first()
 
-    def fetch_device_technology_config_value(self, dtc_technology, dtc_key):
-        """
-        Only returns the value for a config key
-        @param dtc_technology : The device technology 
-        @param dtc_key : The device technology config key
-        @return the value of the config item 'dtc_key' for the technology 'dtc_technology'
-        """
-        req = self._get_table('device_technology_config').filter_by(key= dtc_key, 
-                technology = dtc_technology)
-        if req.count() > 0:
-            request = req.first()
-            return request.value
-        else:
-            return None
-
-    def add_device_technology_config(self, dtc_technology, dtc_key, dtc_value):
+    def add_device_technology_config(self, dt_id, dtc_key, dtc_value):
         """
         Add a device's technology config item
-        @param dtc_technology : The device technology 
+        @param dt_id : the device technology id
         @param dtc_key : The device technology config key
         @param dtc_value : The device technology config value
+        @return the new DeviceTechnologyConfig item
         """
-        if dt_type not in ['cpl','wired','wifi','wireless','ir']:
-            raise ValueError, 'dt_type must be one of cpl,wired,wifi,wireless,ir'
-        self._get_table('device_technology').insert(name = dc_name, 
-                description = dt_description, type = dt_type)
-        self._soup.flush()
+        try: 
+            dt = self._session.query(DeviceTechnology).filter_by(id = dt_id).one()
+        except NoResultFound, e:
+            raise Exception("Couldn't add device technology config with device technology id %s. \
+                            It does not exist" % dt_id)
+        if self.get_device_technology_config_info(dt_id, dtc_key):
+            raise Exception("This key '%s' already exists for device technology %s" % (dtc_key, dt_id))
+        dtc = DeviceTechnologyConfig(technology_id = dt_id, key = dtc_key, value = dtc_value)
+        self._session.add(dtc)
+        self._session.commit()
+        return dtc
 
     def del_device_technology_config(self, dtc_id):
         """
         Delete a device technology config record
         @param dtc_id : config item id
         """
-        req = self._get_table('device_technology_config').filter_by(id = dtc_id)
-        if req.count() > 0:
-            device_technology_config = req.first()
-            self._get_table('device_technology_config').delete(id == device_technology_config.id)
-            self._soup.flush()
-    
-    def get_all_config_of_technology(self, dt_id):
-        """
-        Returns all the devices of a technology
-        @param dt_id : technology id
-        @return a list of dictionary {'id':'xxx','address':'yyy','technology':'zzzz'}
-        It does *not* return all attributes of devices
-        """
-        devices = self._get_table('device').filter_by(technology = dt_id).all()
-        result = []
-        for device in devices:
-            result.append({'id':device.id, 'address':device.address, 'technology':device.technology})
-        return result
+        dt = self._session.query(DeviceTechnologyConfig).filter_by(id = dtc_id).first()
+        self._session.delete(dt)
+        self._session.commit()
 
 ###
 # Devices
 ###
     def list_devices(self):
         """
-        Returns a list of some devices informations
-        This method doesn't return all informations
-        @return a list of dictionnaries {'id': device_id, 
-            'technology': device_technology, 'address' : device_address}
-
+        Returns a list of devices
+        @return a list of Device objects
         """
-        result = []
-        for device in  self._get_table(str('device')).all():
-            result.append({'id' : device.id, 'technology' : device.technology, 
-                'address' : device.address})
-        return result
+        return self._session.query(Device).all()
 
     def find_devices(self, **filters):
         """
-        Looks for device with filter on their attributes
-        filter fileds can be one of id, address, type, room, initial_value, 
-        is_value_changeable_by_user, unit_of_stored_values.
-        @return a list of dictionnaries for each corresponding device
+        Look for device(s) with filter on their attributes
+        @param filters :  filter fields can be one of id, address, type, room, initial_value, 
+                          is_value_changeable_by_user, unit_of_stored_values.
+        @return a list of Device objects
         """
-        data = None
-        if not filters:
-            data = self._get_table(str('device')).all()
-        else:
-            request = []
-            for filter in filters:
-                request.append("%s == '%s'" % (filter, filters[filter]))
-            filter = " and ".join(request)
-            data = self._get_table(str('device')).filter(filter)
-        result = []
-        for d in data:
-            result.append(self.fetch_device_informations(d.id))
-        return result
+        device_list = self._session.query(Device)
+        for filter in filters:
+            filter_arg = "%s = '%s'" % (filter, filters[filter])
+            device_list = device_list.filter(filter_arg)
 
-    def fetch_device_informations(self, d_id):
+        return device_list.all()
+
+    def get_device(self, d_id):
         """
-        Return informations about a device 
+        Return a device by its it
         @param d_id : The device id
-        @return a dictionnary of name:value 
+        @return a Device object
         """
-        req = self._get_table('device').filter_by(id = d_id)
-        if req.count() > 0:
-            request = req.first()
-            return {'id' : request.id, 'technology' : request.technology, 
-                    'address' : request.address, 'description' : request.description,
-                    'type' : request.type, 'category' : request.category,
-                    'room' : request.room, 'is_resetable' : request.is_resetable,
-                    'initial_value' : request.initial_value, 
-                    'is_value_changeable_by_user': request.is_value_changeable_by_user,
-                    'unit_of_stored_values' : request.unit_of_stored_values
-                    }
-        else:
-            return None
+        return self._session.query(Device).filter_by(id = d_id).first()
 
-    def add_device(self, d_address, d_technology, d_type, d_category,
-        d_room, d_initial_value = None, d_description = None, d_is_resetable = False, 
-        d_is_changeable_by_user = False, d_unit_of_stored_values ='Percent'):
+    def add_device(self, d_address, d_technology_id, d_type, d_category_id, d_room_id, 
+        d_description = None, d_is_resetable = False, d_initial_value = None,
+        d_is_value_changeable_by_user = False, d_unit_of_stored_values ='Percent'):
         """
         Add a device item
-        @param technology : Item technology id
-        @param address : Item address (ex : 'A3' for x10/plcbus, '111.111111111' for 1wire)
-        @param description : Extended item description (100 char max)
-        @param type : One of 'appliance','light','music','sensor'
-        @param category : Item category id
-        @param room : Item room id
-        @param is_resetable : Can the item be reseted to some initial state
-        @param initial_value : What's the initial value of the item, should be 
+        @param d_address : address (ex : 'A3' for x10/plcbus, '111.111111111' for 1wire)
+        @param d_technology_id : technology id
+        @param d_type : One of 'appliance','light','music','sensor'
+        @param d_category_id : category id
+        @param d_room_id : room id
+        @param d_description : Extended item description (100 char max)
+        @param d_is_resetable : Can the item be reseted to some initial state
+        @param d_initial_value : What's the initial value of the item, should be 
             the state when the item is created (except for sensors, music)
-        @param is_value_changeable_by_user : Can a user change item state (ex : false for sensor)
-        @param unit_of_stored_values : What is the unit of item values,
-            must be one of 'Volt', 'Celsius', 'Fahrenheit', 'Percent', 'Boolean'
+        @param d_is_value_changeable_by_user : Can a user change item state (ex : false for sensor)
+        @param d_unit_of_stored_values : What is the unit of item values,
+                must be one of 'Volt', 'Celsius', 'Fahrenheit', 'Percent', 'Boolean'
+        @return the new Device object
         """
-        if d_unit_of_stored_values not in ['Volt','Celsius','Farenight','Percent','Boolean']:
-            raise ValueError, "d_unit_of_stored_values must be one of \
-            'Volt','Celsius','Farenight','Percent','Boolean'."
-        if d_type not in ['appliance','lamp','music']:
-            raise ValueError, "d_type must be one of 'appliance','lamp','music'"
-        self._get_table('device').insert(address = d_address, technology = d_technology, 
-            type = d_type, category = d_category, room = d_room, initial_value = d_initial_value, 
-            description = d_description, is_resetable = d_is_resetable, 
-            is_value_changeable_by_user = d_is_changeable_by_user,
-            unit_of_stored_values =  d_unit_of_stored_values)
-        self._soup.flush()
+        #TODO : check that category and technology exist?
+        if d_unit_of_stored_values not in UNIT_OF_STORED_VALUE_LIST:
+            raise ValueError, "d_unit_of_stored_values must be one of %s" % UNIT_OF_STORED_VALUE_LIST
+        if d_type not in DEVICE_TYPE_LIST:
+            raise ValueError, "d_type must be one of %s" % DEVICE_TYPE_LIST
+        device = Device(address = d_address, description = d_description, 
+                        technology_id = d_technology_id, type = d_type, 
+                        category_id = d_category_id, room_id = d_room_id, 
+                        is_resetable = d_is_resetable, initial_value = d_initial_value, 
+                        is_value_changeable_by_user = d_is_value_changeable_by_user, 
+                        unit_of_stored_values = d_unit_of_stored_values)
+        self._session.add(device)
+        self._session.commit()
+        return device
 
-    def update_device(self, d_id, d_address = None, d_technology = None, d_type = None, d_category = None,
-        d_room = None, d_initial_value = None, d_description = None, d_is_resetable = None, 
-        d_is_changeable_by_user = None, d_unit_of_stored_values = None):
+    def update_device(self, d_id, d_address = None, d_technology_id = None, d_type = None, 
+        d_category_id = None, d_room_id = None, d_description = None, d_is_resetable = None, 
+        d_initial_value = None, d_is_value_changeable_by_user = None, d_unit_of_stored_values = None):
         """
         Update a device item
         If a param is None, then the old value will be kept
         @param d_id : Device id
-        @param technology : Item technology id
-        @param address : Item address (ex : 'A3' for x10/plcbus, '111.111111111' for 1wire)
-        @param description : Extended item description (100 char max)
-        @param type : One of 'appliance','light','music','sensor'
-        @param category : Item category id
-        @param room : Item room id
-        @param is_resetable : Can the item be reseted to some initial state
-        @param initial_value : What's the initial value of the item, should be 
+        @param d_address : Item address (ex : 'A3' for x10/plcbus, '111.111111111' for 1wire)
+        @param d_description : Extended item description (100 char max)
+        @param d_technology : Item technology id
+        @param d_type : One of 'appliance','light','music','sensor'
+        @param d_category : Item category id
+        @param d_room : Item room id
+        @param d_is_resetable : Can the item be reseted to some initial state
+        @param d_initial_value : What's the initial value of the item, should be 
             the state when the item is created (except for sensors, music)
-        @param is_value_changeable_by_user : Can a user change item state (ex : false for sensor)
-        @param unit_of_stored_values : What is the unit of item values,
+        @param d_is_value_changeable_by_user : Can a user change item state (ex : false for sensor)
+        @param d_unit_of_stored_values : What is the unit of item values,
             must be one of 'Volt', 'Celsius', 'Fahrenheit', 'Percent', 'Boolean'
+        @return the updated Device object
         """
-        if d_unit_of_stored_values not in [None,'Volt','Celsius','Farenight','Percent','Boolean']:
-            raise ValueError, "d_unit_of_stored_values must be one of \
-            'Volt','Celsius','Farenight','Percent','Boolean'."
-        if d_type not in [None,'appliance','lamp','music']:
-            raise ValueError, "d_type must be one of 'appliance','lamp','music'"
-        req = self._get_table('device').filter_by(id = d_id)
-        if req.count() > 0:
-            device = req.first()
-            if d_address is not None:
-                device.address = d_address
-            if d_technology is not None:
-                device.technology = d_technology
-            if d_description is not None:
-                device.description = d_description
-            if d_type is not None:
-                device.type = d_type
-            if d_category is not None:
-                device.category = d_category
-            if d_room is not None:
-                device.room = d_room
-            if d_is_resetable is not None:
-                device.is_resetable = d_is_resetable
-            if d_initial_value is not None:
-                device.initial_value = d_initial_value
-            if d_is_changeable_by_user is not None:
-                device.is_changeable_by_user = d_is_changeable_by_user
-            if d_unit_of_stored_values is not None:
-                device.unit_of_stored_values = d_unit_of_stored_values
-            self._soup.flush()
+        if d_unit_of_stored_values not in [UNIT_OF_STORED_VALUE_LIST, None]: 
+            raise ValueError, "d_unit_of_stored_values must be one of %s" % UNIT_OF_STORED_VALUE_LIST
+        if d_type not in [DEVICE_TYPE_LIST, None]:
+            raise ValueError, "d_type must be one of %s" % DEVICE_TYPE_LIST
+
+        device = self._session.query(Device).filter_by(id = d_id).first()
+        if device is None:
+            raise Exception("Device with id %s couldn't be found" % d_id)
+
+        if d_address is not None:
+            device.address = d_address
+        if d_technology_id is not None:
+            device.technology = d_technology_id
+        if d_description is not None:
+            device.description = d_description
+        if d_type is not None:
+            device.type = d_type
+        if d_category_id is not None:
+            device.category = d_category_id
+        if d_room_id is not None:
+            device.room = d_room_id
+        if d_is_resetable is not None:
+            device.is_resetable = d_is_resetable
+        if d_initial_value is not None:
+            device.initial_value = d_initial_value
+        if d_is_value_changeable_by_user is not None:
+            device.is_value_changeable_by_user = d_is_value_changeable_by_user
+        if d_unit_of_stored_values is not None:
+            device.unit_of_stored_values = d_unit_of_stored_values
+        
+        self._session.update(device)
+        self._session.commit()
+        return device
 
     def del_device(self, d_id):
         """
-        Delete a device 
+        Delete a device
+        Warning : this deletes also the associated objects (DeviceConfig, DeviceStats)
         @param d_id : item id
         """
-        req = self._get_table('device').filter_by(id = d_id)
-        if req.count() > 0:
-            device = req.first()
-            self._get_table('device').delete(id == device.id)
-            self._soup.flush()
-    
+        device = self.get_device(d_id)
+        if device is None:
+            raise Exception("Device with id %s couldn't be found" % d_id)
+
+        for device_conf in self._session.query(DeviceConfig).filter_by(device_id=d_id).all():
+            self._session.delete(device_conf)
+        for device_stats in self._session.query(DeviceStats).filter_by(device_id=d_id).all():
+            self._session.delete(device_stats)
+        self._session.delete(device)
+        self._session.commit()
+
 ####
 # Device stats
 ####
-    def list_device_stats(self, ds_id):
+    def list_device_stats(self, device_id):
         """
-        Returns a list of all stats for a device
-        @param ds_id : the device id
-        @return A list of dictionnary {'date' : stat date/time, 'value' : stat value}
+        Return a list of all stats for a device
+        @param device_id : the device id
+        @return a list of DeviceStats objects
         """
-        result = []
-        for device_stat in  self._get_table('device_stats').filter_by(device = ds_id):
-            result.append({'date': device_stat.date, 'value': device_stat.value})
-        return result
+        return self._session.query(DeviceStats).filter_by(device_id = device_id).all()
 
-    def get_last_stat_of_devices(self, d_list):
+    def get_last_stat_of_devices(self, device_list):
         """
         Fetch the last record for all devices in d_list
-        @param d_list : list of device ids
-        @return a list of dictionnary
+        @param device_list : list of device ids
+        @return a list of DeviceStats objects
         """
         result = []
-        for device in d_list:
-            last_record = self._get_table('device_stats').\
-                filter_by(id = device).\
-                order_by(desc(self._get_table('device_stats').date)).first()
-            result.append({'device' : device, 'date' : last_record.date, 'value' : last_record.value})
+        for d_id in device_list:
+            last_record = self._session.query(DeviceStats)\
+                              .filter_by(device_id = d_id)\
+                              .order_by(desc(DeviceStats.date)).first()
+            result.append(last_record)
         return result
 
-    def add_device_stat(self, ds_device, ds_date, ds_value):
+    def add_device_stat(self, d_id, ds_date, ds_value):
         """
         Add a device stat record
-        @param ds_device : device id
-        @param ds_date : timestamp
+        @param device_id : device id
+        @param ds_date : when the stat was gathered (timestamp)
         @param ds_value : stat value
+        @return the new DeviceStats object
         """
-        self._get_table('device_stats').insert(device = ds_device, date = ds_date,
-                value = ds_value)
-        self._soup.flush()
+        device_stat = DeviceStats(device_id = d_id, date = ds_date, value = ds_value)
+        self._session.add(device_stat)
+        self._session.commit()
+        return device_stat
 
     def del_device_stat(self, ds_id):
         """
         Delete a stat record
         @param ds_id : record id
         """
-        req = self._get_table('device_stats').filter_by(id = ds_id)
-        if req.count() > 0:
-            device_stat = req.first()
-            self._get_table('device_stats').delete(id == device_stat.id)
-            self._soup.flush()
+        device_stat = self._session.query(DeviceStats).filter_by(id = ds_id).first()
+        if device_stat:
+            self._session.delete(device_stat)
+            self._session.commit()
 
     def del_all_device_stats(self, d_id):
         """
         Delete all stats for a device
         @param d_id : device id
         """
-        self._get_table('device_stats').delete(self._get_table('device_stats').device == d_id)
-        self._soup.flush()
-   
+        #TODO : this could be optimized
+        device_stats = self._session.query(DeviceStats).filter_by(device_id = d_id).all()
+        for device_stat in device_stats:
+            self._session.delete(device_stat)
+        self._session.commit()
  
 ####
 # Triggers
@@ -681,378 +619,135 @@ class DbHelper():
     def list_triggers(self):
         """
         Returns a list of all triggers
-        @return A list of dictionnary {'id' : trigger id, 'decription' : trigger descripition,
-            'rule' : trigger rule, 'result' : trigger result}
+        @return a list of Trigger objects
         """
-        result = []
-        for trigger in  self._get_table('trigger').all():
-            result.append({'id': trigger.id, 'description': trigger.description, 'rule': trigger.rule, 'result': trigger.result})
-        return result
+        return self._session.query(Trigger).all()
 
     def get_trigger(self, t_id):
         """
         Returns a trigger information from id
         @param t_id : trigger id
-        @return A dictionnary {'id' : trigger id, 'description': trigger decription,
-            'rule' : trigger rule, 'result' : trigger result}
+        @return a Trigger object
         """
-        result = []
-        request = self._get_table('trigger').filter_by(id = t_id)
-        if request.count() > 0:
-            trigger = request.first()
-            return {'id': trigger.id, 'description': trigger.description, 'rule': trigger.rule, 'result': trigger.result}
+        return self._session.query(Trigger).filter_by(id = t_id).first()
 
-    def add_trigger(self, t_desc, t_rule, t_res):
+    def add_trigger(self, t_description, t_rule, t_result):
         """
         Add a trigger
         @param t_desc : trigger description
         @param t_rule : trigger rule
         @param t_res : trigger result
+        @return the new Trigger object
         """
-        self._get_table('trigger').insert(description = t_desc, rule = t_rule, result = ';'.join(t_res))
-        self._soup.flush()
+        trigger = Trigger(description = t_description, rule = t_rule, result = ';'.join(t_result))
+        self._session.add(trigger)
+        self._session.commit()
+        return trigger
 
     def del_trigger(self, t_id):
         """
         Delete a trigger
         @param t_id : trigger id
         """
-        req = self._get_table('trigger').filter_by(id = t_id)
-        if req.count() > 0:
-            device_stat = req.first()
-            self._get_table('trigger').delete(id == device_stat.id)
-            self._soup.flush()
-
+        trigger = self._session.query(Trigger).filter_by(id = t_id).first()
+        self._session.delete(trigger)
+        self._session.commit()
 
 ####
 # System accounts
 ####
     def list_system_accounts(self):
         """
-        Returns a list of all accounts id/login
-        @return A list of dictionnary {'id' : account_id, 'login': account_login}
+        Returns a list of all accounts
+        @return a list of SystemAccount objects
         """
-        result = []
-        for account in  self._get_table('system_account').all():
-            result.append({'id': account.id, 'login': account.login})
-        return result
+        return self._session.query(SystemAccount).all()
 
-    def fetch_system_account_informations(self, a_id):
+    def get_system_account(self, a_id):
         """
-        Returns account informations from id
+        Return system account information from id
         @param a_id : account id
-        @return A dictionnary {'id' : account id, 'login': account login,
-            'password' : account ssha256 encrypted password, 'is_admin' : True if the user is an admin}
+        @return a SystemAccount object
         """
-        request = self._get_table('system_account').filter_by(id = a_id)
-        if request.count() > 0:
-            account = request.first()
-            return {'id': account.id, 'login': account.login, 
-                    'password': account.password, 'is_admin': account.is_admin}
+        return self._session.query(SystemAccount).filter_by(id = a_id).first()
 
     def add_system_account(self, a_login, a_password, a_is_admin = False):
         """
         Add a system_account
         @param a_login : Account login
         @param a_password : Account clear password (will be hashed in sha256)
-        @param a_is_admin : Is an admin account ? 
+        @param a_is_admin : True if it is an admin account, False otherwise
+        @return the new SystemAccount object
         """
-        
         password = hashlib.sha256()
         password.update(a_password)
-        self._get_table('system_account').insert(login = a_login, 
-                password = password.hexdigest(), is_admin = a_is_admin)
-        self._soup.flush()
+        system_account = SystemAccount(login = a_login, password = password.hexdigest(), is_admin = a_is_admin)
+        self._session.add(system_account)
+        self._session.commit()
+        return system_account
 
     def del_system_account(self, a_id):
         """
         Delete a system account 
         @param a_id : account id
         """
-        req = self._get_table('system_account').filter_by(id = a_id)
-        if req.count() > 0:
-            account = req.first()
-            self._get_table('system_account').delete(id == account.id)
-            self._soup.flush()
+        system_account = self._session.query(SystemAccount).filter_by(id = a_id).first()
+        self._session.delete(system_account)
+        self._session.commit()
     
-    def get_user_system_account(self, u_id):
-        """
-        Returns the system account associated to a user, if existing
-        @param u_id : The user (not system !) account id
-        """
-        request = self._get_table('user_account').filter_by(id = u_id)
-        if request.count() > 0:
-            sys_id = request.first().system_account
-            return self.fetch_system_account_informations(sys_id)
-
 ####
 # User accounts
 ####
     def list_user_accounts(self):
         """
-        Returns a list of all user accounts id/first_name/last_name
-        @return A list of dictionnary {'id' : account_id, 'first_name' : first_name, 'last_name': last_name}
+        Returns a list of all user accounts
+        @return a list of UserAccount objects
         """
-        result = []
-        for account in  self._get_table('user_account').all():
-            result.append({'id': account.id, 'first_name' : account.first_name, 'last_name': account.last_name})
-        return result
+        return self._session.query(UserAccount).all()
 
-    def fetch_user_account_informations(self, u_id):
+    def get_user_account(self, u_id):
         """
-        Returns account informations from id
+        Returns account information from id
         @param u_id : user account id
-        @return A dictionnary {'id' : account id, 'login': account login,
-            'password' : account ssha256 encrypted password, 'is_admin' : True if the user is an admin}
+        @return a UserAccount object
         """
-        request = self._get_table('user_account').filter_by(id = u_id)
-        if request.count() > 0:
-            account = request.first()
-            return {'id': account.id, 'first_name' : account.first_name, 'last_name': account.last_name, 
-                    'birthdate' : account.birthdate, 'system_account' : account.system_account}
+        return self._session.query(UserAccount).filter_by(id = u_id).first()
 
-    def add_user_account(self, u_first_name, u_last_name, u_birthdate, u_system_account = None):
+    def get_user_system_account(self, u_id):
+        """
+        Return a system account associated to a user, if existing
+        @param u_id : The user (not system !) account id
+        @return a SystemAccount object
+        """
+        user_account = self._session.query(UserAccount).filter_by(id = u_id).first()
+        if user_account is not None:
+            return self._session.query(SystemAccount).filter_by(id = user_account.system_account_id).first()
+        else:
+            return None
+
+    def add_user_account(self, u_first_name, u_last_name, u_birthdate, u_system_account_id = None):
         """
         Add a user account
         @param u_first_name : User's first name
         @param u_last_name : User's last name
         @param u_birthdate : User's birthdate
         @param u_system_account : User's account on the system (can be None)
+        @return the new UserAccount object
         """
-        self._get_table('user_account').insert(first_name = u_first_name, last_name = u_last_name,
-                birthdate = u_birthdate, system_account = u_system_account)
-        self._soup.flush()
+        user_account = UserAccount(first_name = u_first_name, last_name = u_last_name, 
+                                  birthdate = u_birthdate, system_account_id = u_system_account_id)
+        self._session.add(user_account)
+        self._session.commit()
+        return user_account
 
     def del_user_account(self, u_id):
         """
-        Delete a user account and the associated system  account if it exists
+        Delete a user account and the associated system account if it exists
         @param u_id : user's account id
         """
-        req = self._get_table('user_account').filter_by(id = u_id)
-        if req.count() > 0:
-            account = req.first()
-            self.del_system_account(self.get_user_system_account(u_id)['id'])
-            self._get_table('user_account').delete(id == account.id)
-            self._soup.flush()
-    
-
-###
-# display tests
-###
-def print_title(title):
-    """
-    Print a title in color
-    """
-    COLOR = '\033[92m'
-    ENDC = '\033[0m'
-    print "\n\n"
-    print COLOR
-    print "=" * (len(title) + 8)
-    print "=== %s ===" % title
-    print "=" * (len(title) + 8)
-    print ENDC
-
-def print_test(test):
-    """
-    Print a test title in color
-    """
-    COLOR = '\033[93m'
-    ENDC = '\033[0m'
-    print COLOR
-    print "= %s =" % test
-    print ENDC
-
-if __name__ == "__main__":
-    d = DbHelper()
-    print_title('test area')
-    print_test('list areas')
-    print d.list_areas_name()
-    print_test('add area')
-    print d.add_area('area1','description 1')
-    print_test('list areas')
-    print d.list_areas_name()
-    print_test('fetch informations')
-    print d.fetch_area_informations('area1')
-    print_test('del area')
-    print d.del_area('area1')    
-    print_test('list areas')
-    print d.list_areas_name() 
-
-    print_title('test room')
-    print "== add area =="
-    print d.add_area('area1','description 1')
-    print_test('list room')
-    print d.list_rooms_name()
-    print_test('add room')
-    print d.add_room('room1', 'area1', 'description 1')
-    print_test('list room')
-    print d.list_rooms_name()
-    print "= get all rooms of area1 "
-    print d.get_all_room_of_area('area1')
-    print_test('fetch informations')
-    print d.fetch_room_informations('room1')
-    print_test('del room')
-    print d.del_room('room1')    
-    print_test('list rooms')
-    print d.list_rooms_name() 
-
-    print_title('test device_category')
-    print_test('list device_category')
-    print d.list_device_categories_name()
-    print_test('add device_category')
-    print d.add_device_category('device_category 1')
-    print_test('list device_category')
-    print d.list_device_categories_name()
-    print_test('fetch informations')
-    print d.fetch_device_category_informations('device_category 1')
-    print_test('Get all devices of category')
-    print d.get_all_devices_of_category(d.fetch_device_category_informations('device_category 1')['id'])
-    print_test('del room')
-    print d.del_device_category('device_category 1')    
-    print_test('list rooms')
-    print d.list_device_categories_name()
-
-    print_title('test device_technology')
-    print_test('list device_technology')
-    print d.list_device_technologies_name()
-    print_test('add device_technology')
-    print d.add_device_technology('device_technology 1', 'Device_technology 1 descrition', 'wired')
-    print_test('list device_technology')
-    print d.list_device_technologies_name()
-    print_test('fetch informations')
-    print d.fetch_device_technology_informations('device_technology 1')
-    print_test('Get all devices of technology')
-    print d.get_all_devices_of_technology(d.fetch_device_technology_informations('device_technology 1')['id'])
-    print_test('del technology')
-    print d.del_device_technology('device_technology 1')    
-    print_test('list technology')
-    print d.list_device_technologies_name()
-
-    print_title('test device')
-    print_test('list device')
-    print d.list_devices()
-    print_test('add device')
-    print "== add device_technology =="
-    print d.add_device_technology('device_technology 1', 'Device_technology 1 descrition', 'wired')
-    dt_id = d.fetch_device_technology_informations('device_technology 1')['id']
-    print "== add device_category =="
-    print d.add_device_category('device_category 1')
-    dc_id = d.fetch_device_category_informations('device_category 1')['id']
-    print "== add area =="
-    print d.add_area('area1','description 1')
-    print "== add room =="
-    print d.add_room('room1', 'area1', 'description 1')
-    room_id = d.fetch_room_informations('room1')['id']
-    print d.add_device(d_address = 'A3', d_technology = dt_id, d_type = 'appliance', 
-        d_category = dc_id, d_room = room_id, d_initial_value = 'off', d_description = 'My first device', 
-        d_is_resetable = False, d_is_changeable_by_user = True, d_unit_of_stored_values ='Percent')
-    print_test('list device')
-    print d.list_devices()
-    dev_id = d.list_devices()[0]['id']
-    print_test('update device')
-    print d.update_device(d_id = dev_id, d_address = 'E2', d_initial_value = 'on')
-    print_test('list device')
-    print d.list_devices()
-    print_test('find devices')
-    print d.find_devices(address = 'E2', initial_value = 'on')
-    print_test('fetch informations')
-    print d.fetch_device_informations(1)
-    print_test('del device')
-    print d.del_device(1)    
-    print_test('list devices')
-    print d.list_devices()
-
-    print_title('test device stats')
-    print_test('list device')
-    print d.list_devices()
-    print_test('add device')
-    print "== add device_technology =="
-    print d.add_device_technology('device_technology 1', 'Device_technology 1 descrition', 'wired')
-    dt_id = d.fetch_device_technology_informations('device_technology 1')['id']
-    print "== add device_category =="
-    print d.add_device_category('device_category 1')
-    dc_id = d.fetch_device_category_informations('device_category 1')['id']
-    print "== add area =="
-    print d.add_area('area1','description 1')
-    print "== add room =="
-    print d.add_room('room1', 'area1', 'description 1')
-    room_id = d.fetch_room_informations('room1')['id']
-    print d.add_device(d_address = 'A3', d_technology = dt_id, d_type = 'appliance', 
-        d_category = dc_id, d_room = room_id, d_initial_value = 'off', d_description = 'My first device', 
-        d_is_resetable = False, d_is_changeable_by_user = True, d_unit_of_stored_values ='Percent')
-    print_test('list device')
-    print d.list_devices()
-    d_id = d.list_devices()[0]['id']
-    print_test('fetch informations')
-    print d.fetch_device_informations(d_id)
-    print_test('list stats')
-    print d.list_device_stats(d_id)
-    print_test('Add stat')
-    from datetime import datetime
-    print d.add_device_stat(d_id, datetime.now(), 12)
-    print "[[[ sleep 3s ]]]"
-    time.sleep(3)
-    print d.add_device_stat(d_id, datetime.now(), 12)
-    print_test('list stats')
-    print d.list_device_stats(d_id)
-    print_test('last stat')
-    print d.get_last_stat_of_devices([d_id])
-    print_test('del stats')
-    print d.del_all_device_stats(d_id)
-    print_test('list stats')
-    print d.list_device_stats(d_id)
-    print_test('del device')
-    print d.del_device(d_id)    
-    print_test('list devices')
-    print d.list_devices()
-
-    print_title('test trigger')
-    print_test('list triggers')
-    print d.list_triggers()
-    print_test('add triger')
-    print d.add_trigger('Trigger description 1','AND(x,OR(y,z))',['x10_on("a3")','1wire()'])
-    print_test('list triggers')
-    print d.list_triggers()
-    trig_id = d.list_triggers()[0]['id']
-    print_test('get trigger')
-    print d.get_trigger(trig_id)
-    print_test('delete trigger')
-    print d.del_trigger(trig_id)
-    print_test('list triggers')
-    print d.list_triggers()
-
-    print_title('test system account')
-    print_test('list system accounts')
-    print d.list_system_accounts()
-    print_test('add system account')
-    print d.add_system_account('login 1','password 1',True)
-    print_test('list system accounts')
-    print d.list_system_accounts()
-    acc_id = d.list_system_accounts()[0]['id']
-    print_test('get system account')
-    print d.fetch_system_account_informations(acc_id)
-    print_test('delete system account')
-    print d.del_system_account(acc_id)
-    print_test('list system accounts')
-    print d.list_system_accounts()
-
-    print_title('test user account')
-    print_test('list users accounts')
-    print d.list_user_accounts()
-    print_test('add system account')
-    print d.add_system_account('login 1','password 1',True)
-    sys_id = d.list_system_accounts()[0]['id']
-    print_test('add user account')
-    print d.add_user_account('first name 1', 'last name 1', datetime.now(), sys_id)
-    print_test('list user accounts')
-    print d.list_user_accounts()
-    acc_id = d.list_user_accounts()[0]['id']
-    print_test('get user account')
-    print d.fetch_user_account_informations(acc_id)
-    print_test('get user system account')
-    print d.get_user_system_account(acc_id)
-    print_test('delete user account')
-    print d.del_user_account(acc_id)
-    print_test('list user accounts')
-    print d.list_user_accounts()
-
+        user_account = self._session.query(UserAccount).filter_by(id = u_id).first()
+        if user_account is not None:
+            if user_account.system_account_id is not None:
+                self.del_system_account(user_account.system_account_id)
+            self._session.delete(user_account)
+            self._session.commit()
