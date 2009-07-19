@@ -289,8 +289,8 @@ class Device(Base):
         return "<Device(id=%s, addr='%s', desc='%s', techno=%s, type='%s', cat=%s, \
           room=%s, is_reset='%s', initial_val='%s', is_value_change='%s', unit='%s')>" \
           % (self.id, self.address, self.description, self.technology_id, \
-             self.type, self.category_id, self.room_id, is_resetable, initial_value,\
-             is_value_changeable_by_user, unit_of_stored_values)
+             self.type, self.category_id, self.room_id, self.is_resetable, self.initial_value,\
+             self.is_value_changeable_by_user, self.unit_of_stored_values)
 
     @staticmethod
     def get_tablename():
