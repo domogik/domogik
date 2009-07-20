@@ -385,4 +385,5 @@ if __name__ == "__main__":
     for sys in l_sys:
         assert sys.login != 'mschneider', "System account with 'mschneider' login was NOT deleted"
 
+    room_temp = d.add_room('room1', 'description 1', 8000)
     print_test('*********** All tests successfully passed! ***********')

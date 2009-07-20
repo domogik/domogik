@@ -448,7 +448,10 @@ class DbHelper():
         @param d_id : The device id
         @return a Device object
         """
-        return self._session.query(Device).filter_by(id = d_id).first()
+        try: 
+            return self._session.query(Device).filter_by(id = d_id).one()
+        except MultipleResultFound, e:
+            raise DbHelperException("Database may be incoherent, there are several devices with id %s" % d_id)
 
     def add_device(self, d_address, d_technology_id, d_type, d_category_id, d_room_id, 
         d_description = None, d_is_resetable = False, d_initial_value = None,
@@ -687,7 +690,10 @@ class DbHelper():
         @param a_id : account id
         @return a SystemAccount object
         """
-        return self._session.query(SystemAccount).filter_by(id = a_id).first()
+        try: 
+            return self._session.query(SystemAccount).filter_by(id = a_id).one()
+        except MultipleResultFound, e:
+            raise DbHelperException("Database may be incoherent, there are several system accounts with id %s" % a_id)
 
     def add_system_account(self, a_login, a_password, a_is_admin = False):
         """
@@ -729,7 +735,10 @@ class DbHelper():
         @param u_id : user account id
         @return a UserAccount object
         """
-        return self._session.query(UserAccount).filter_by(id = u_id).first()
+        try: 
+            return self._session.query(UserAccount).filter_by(id = u_id).one()
+        except MultipleResultFound, e:
+            raise DbHelperException("Database may be incoherent, there are several user accounts with id %s" % u_id)
 
     def get_user_system_account(self, u_id):
         """
@@ -737,9 +746,17 @@ class DbHelper():
         @param u_id : The user (not system !) account id
         @return a SystemAccount object
         """
-        user_account = self._session.query(UserAccount).filter_by(id = u_id).first()
+        try:
+          user_account = self._session.query(UserAccount).filter_by(id = u_id).one()
+        except MultipleResultFound, e:
+            raise DbHelperException("Database may be incoherent, there are several user accounts with id %s" % u_id)
+
         if user_account is not None:
-            return self._session.query(SystemAccount).filter_by(id = user_account.system_account_id).first()
+            try:
+                return self._session.query(SystemAccount).filter_by(id = user_account.system_account_id).one()
+            except MultipleResultFound, e:
+                raise DbHelperException("Database may be incoherent, user with id %s has more than one account" % u_id)
+
         else:
             return None
 
