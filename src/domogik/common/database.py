@@ -88,12 +88,6 @@ Implements
 @organization: Domogik
 """
 
-#TODO database.py (general)
-"""
-- see if we can check the uniqueness of records, when it should be and raise and exception otherwise
-- Make sure all items are deleted if you delete an area for example
-"""
-
 ####
 # Existing tables :
 # areas
