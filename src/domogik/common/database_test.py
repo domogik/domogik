@@ -149,6 +149,7 @@ if __name__ == "__main__":
 
     print_title('test room')
     remove_all_areas(d)
+    remove_all_rooms(d)
     area1 = d.add_area('area1','description 1')
     area2 = d.add_area('area2','description 2')
     assert len(d.list_areas()) == 2, "Area list should have 2 items, it has %s" % len(d.list_areas())
