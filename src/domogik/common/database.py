@@ -472,11 +472,24 @@ class DbHelper():
                 must be one of 'Volt', 'Celsius', 'Fahrenheit', 'Percent', 'Boolean'
         @return the new Device object
         """
-        #TODO : check that category and technology exist?
+        try:
+            room = self._session.query(Room).filter_by(id = d_room_id).one()
+        except NoResultFound, e:
+            raise DbHelperException("Couldn't add device with room id %s. It does not exist" % d_room_id)
+        try:
+            dc = self._session.query(DeviceCategory).filter_by(id = d_category_id).one()
+        except NoResultFound, e:
+            raise DbHelperException("Couldn't add device with category id %s. It does not exist" % d_category_id)
+        try:
+            dt = self._session.query(DeviceTechnology).filter_by(id = d_technology_id).one()
+        except NoResultFound, e:
+            raise DbHelperException("Couldn't add device with technology id %s. It does not exist" % d_technology_id)
+
         if d_unit_of_stored_values not in UNIT_OF_STORED_VALUE_LIST:
             raise ValueError, "d_unit_of_stored_values must be one of %s" % UNIT_OF_STORED_VALUE_LIST
         if d_type not in DEVICE_TYPE_LIST:
             raise ValueError, "d_type must be one of %s" % DEVICE_TYPE_LIST
+
         device = Device(address = d_address, description = d_description, 
                         technology_id = d_technology_id, type = d_type, 
                         category_id = d_category_id, room_id = d_room_id, 
@@ -520,15 +533,27 @@ class DbHelper():
         if d_address is not None:
             device.address = d_address
         if d_technology_id is not None:
-            device.technology = d_technology_id
+            try:
+                dt = self._session.query(DeviceTechnology).filter_by(id = d_technology_id).one()
+                device.technology = d_technology_id
+            except NoResultFound, e:
+                raise DbHelperException("Couldn't update device with technology id %s. It does not exist" % d_technology_id)
         if d_description is not None:
             device.description = d_description
         if d_type is not None:
             device.type = d_type
         if d_category_id is not None:
-            device.category = d_category_id
+          try:
+              dc = self._session.query(DeviceCategory).filter_by(id = d_category_id).one()
+              device.category = d_category_id
+          except NoResultFound, e:
+              raise DbHelperException("Couldn't update device with category id %s. It does not exist" % d_category_id)
         if d_room_id is not None:
-            device.room = d_room_id
+            try:
+                room = self._session.query(Room).filter_by(id = d_room_id).one()
+                device.room = d_room_id
+            except NoResultFound, e:
+                raise DbHelperException("Couldn't update device with room id %s. It does not exist" % d_room_id)
         if d_is_resetable is not None:
             device.is_resetable = d_is_resetable
         if d_initial_value is not None:
