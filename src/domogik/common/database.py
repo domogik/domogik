@@ -89,9 +89,7 @@ Implements
 
 #TODO database.py (general)
 """
-- may be this is not a good idea to raise standard Exception objects when there is an error
 - see if we can check the uniqueness of records, when it should be and raise and exception otherwise
-- make sure reference to list values are not hardcoded but point to the ones defined in sql_schema
 - Make sure all items are deleted if you delete an area for example
 """
 
