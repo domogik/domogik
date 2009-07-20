@@ -336,8 +336,8 @@ class DbHelper():
         @param dt_description : extended description of the technology
         @param type : type of the technology, one of 'cpl','wired','wifi','wireless','ir'
         """
-        if dt_type not in ['cpl','wired','wifi','wireless','ir']:
-            raise ValueError, 'dt_type must be one of cpl, wired, wifi, wireless, ir'
+        if dt_type not in DEVICE_TECHNOLOGY_TYPE_LIST:
+            raise ValueError, "dt_type must be one of %s" % DEVICE_TECHNOLOGY_TYPE_LIST
         dt = DeviceTechnology(name = dt_name, description = dt_description, type= dt_type)
         self._session.add(dt)
         self._session.commit()
