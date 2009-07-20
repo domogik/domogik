@@ -27,8 +27,7 @@ Unit test class for the database API
 Implements
 ==========
 
-- DbTest.__init__(self)
-- DbTest.run(self)
+- No class
 
 @author: Marc SCHNEIDER
 @copyright: (C) 2007-2009 Domogik project

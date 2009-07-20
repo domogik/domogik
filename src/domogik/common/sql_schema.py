@@ -27,9 +27,18 @@ Defines the sql schema used by Domogik
 Implements
 ==========
 
-- Enum.__init__(self, values, empty_to_none=False, strict=False)
-- Enum.process_bind_param(self, value, dialect)
-- Enum.process_result_value(self, value, dialect)
+- class Enum(types.TypeDecorator) : enum stuff for sqlAlchemy
+- class Area(Base) : areas of the house (1st floor, ground...)
+- class Room(Base) : rooms of the house
+- class Deviceategory(Base) : temperature, lighting, heating, music...
+- class DeviceTechnology(Base) : cpl, wired, wireless, wifi, ir...
+- class DeviceTechnologyConfig(Base) : list of parameters for the device technology
+- class Device(Base) : devices which are manages by the automation system
+- class DeviceConfig(Base) : list of parameters for the device
+- class DeviceStats(Base) : statistics associated to the device (history of values stored)
+- class Trigger(Base) : to trigger an action when a condition is met
+- class SystemAccount(Base) : accounts to log into the app
+- class UserAccount(Base) : users
 
 @author: Marc SCHNEIDER <marc@domogik.org>
 @copyright: (C) 2007-2009 Domogik project
@@ -354,7 +363,7 @@ class DeviceStats(Base):
 ###
 # Define triggers
 # name : The name of the rule
-# description : Long" description of the rule
+# description : Long description of the rule
 # rule : formatted trigger rule
 # result : list of xpl messages to send
 #
