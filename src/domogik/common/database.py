@@ -321,14 +321,6 @@ class DbHelper():
             self._session.delete(dc)
             self._session.commit()
 
-    def get_all_devices_of_category(self, dc_id):
-        """
-        Return all the devices of a category
-        @param dc_id: category id 
-        @return a list of Device objects
-        """
-        return self._session.query(Device).filter_by(category_id = dc_id).all()
-
 ####
 # Device technology
 ####
@@ -373,14 +365,6 @@ class DbHelper():
                 self.del_device(device.id)
             self._session.delete(dt)
             self._session.commit()
-
-    def get_all_devices_of_technology(self, dt_id):
-        """
-        Returns all the devices of a technology
-        @param dt_id : technology id
-        @return a list Device objects
-        """
-        return self._session.query(Device).filter_by(technology_id = dt_id).all()
 
 ####
 # Device technology config
@@ -571,6 +555,22 @@ class DbHelper():
             self._session.delete(device_stats)
         self._session.delete(device)
         self._session.commit()
+
+    def get_all_devices_of_category(self, dc_id):
+        """
+        Return all the devices of a category
+        @param dc_id: category id 
+        @return a list of Device objects
+        """
+        return self._session.query(Device).filter_by(category_id = dc_id).all()
+
+    def get_all_devices_of_technology(self, dt_id):
+        """
+        Returns all the devices of a technology
+        @param dt_id : technology id
+        @return a list of Device objects
+        """
+        return self._session.query(Device).filter_by(technology_id = dt_id).all()
 
 ####
 # Device stats
