@@ -124,6 +124,25 @@ from domogik.common.sql_schema import Area, Device, DeviceCategory, DeviceConfig
                                       Room, UserAccount, SystemAccount, Trigger
 from domogik.common.sql_schema import UNIT_OF_STORED_VALUE_LIST, DEVICE_TECHNOLOGY_TYPE_LIST, DEVICE_TYPE_LIST
 
+
+class DbHelperException(Exception):
+    """
+    This class provides exceptions related to the DbHelper class
+    """
+
+    def __init__(self, value):
+        """
+        @param value : value of the exception
+        """
+        self.value = value
+
+    def __str__(self):
+        """
+        @return value of the exception
+        """
+        return repr(self.value)
+
+
 class DbHelper():
     """
     This class provides methods to fetch and put informations on the Domogik database
@@ -233,7 +252,7 @@ class DbHelper():
         try: 
             area = self._session.query(Area).filter_by(id = r_area_id).one()
         except NoResultFound, e:
-            raise Exception("Couldn't add room with area id %s. It does not exist" % r_area_id)
+            raise DbHelperException("Couldn't add room with area id %s. It does not exist" % r_area_id)
 
         room = Room(name = r_name, description = r_description, area_id = r_area_id)
         self._session.add(room)
@@ -398,10 +417,10 @@ class DbHelper():
         try: 
             dt = self._session.query(DeviceTechnology).filter_by(id = dt_id).one()
         except NoResultFound, e:
-            raise Exception("Couldn't add device technology config with device technology id %s. \
+            raise DbHelperException("Couldn't add device technology config with device technology id %s. \
                             It does not exist" % dt_id)
         if self.get_device_technology_config(dt_id, dtc_key):
-            raise Exception("This key '%s' already exists for device technology %s" % (dtc_key, dt_id))
+            raise DbHelperException("This key '%s' already exists for device technology %s" % (dtc_key, dt_id))
         dtc = DeviceTechnologyConfig(technology_id = dt_id, key = dtc_key, value = dtc_value)
         self._session.add(dtc)
         self._session.commit()
@@ -510,7 +529,7 @@ class DbHelper():
 
         device = self._session.query(Device).filter_by(id = d_id).first()
         if device is None:
-            raise Exception("Device with id %s couldn't be found" % d_id)
+            raise DbHelperException("Device with id %s couldn't be found" % d_id)
 
         if d_address is not None:
             device.address = d_address
@@ -545,7 +564,7 @@ class DbHelper():
         """
         device = self.get_device(d_id)
         if device is None:
-            raise Exception("Device with id %s couldn't be found" % d_id)
+            raise DbHelperException("Device with id %s couldn't be found" % d_id)
 
         for device_conf in self._session.query(DeviceConfig).filter_by(device_id=d_id).all():
             self._session.delete(device_conf)

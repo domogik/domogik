@@ -40,7 +40,7 @@ Implements
 import time
 import datetime
 
-from domogik.common.database import DbHelper
+from domogik.common.database import DbHelper, DbHelperException
 from domogik.common.sql_schema import Area, Device, DeviceCategory, DeviceConfig, \
                                       DeviceStats, DeviceTechnology, DeviceTechnologyConfig, \
                                       Room, UserAccount, SystemAccount, Trigger
@@ -221,7 +221,7 @@ if __name__ == "__main__":
         duplicate_key = False
         dtc = d.add_device_technology_config(dt3.id, 'key3_3', 'val3_3')
         duplicate_key = True
-    except Exception:
+    except DbHelperException:
         pass
     assert not duplicate_key, "It shouldn't have been possible to add 'key3_3' for device technology %s : it already exists" % dt3.id
 
