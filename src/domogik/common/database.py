@@ -53,8 +53,7 @@ Implements
 # user_account
 ####
 
-from sqlalchemy import asc, desc, and_
-from sqlalchemy import create_engine
+import sqlalchemy
 from sqlalchemy.ext.sqlsoup import SqlSoup
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
@@ -110,7 +109,7 @@ class DbHelper():
 
         # Connecting to the database
         self._dbprefix = db['db_prefix']
-        self._engine = create_engine(url, echo=True)
+        self._engine = sqlalchemy.create_engine(url, echo=True)
         Session = sessionmaker(bind=self._engine)
         self._session = Session()
 
@@ -565,7 +564,7 @@ class DbHelper():
         for d_id in device_list:
             last_record = self._session.query(DeviceStats)\
                               .filter_by(device_id = d_id)\
-                              .order_by(desc(DeviceStats.date)).first()
+                              .order_by(sqlalchemy.desc(DeviceStats.date)).first()
             result.append(last_record)
         return result
 
