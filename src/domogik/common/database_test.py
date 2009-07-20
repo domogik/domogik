@@ -231,13 +231,13 @@ if __name__ == "__main__":
     assert len(d.list_device_technology_config(dt3.id)) == 3, \
             "%s devices technologies config found, instead of 3 " \
             % len(d.list_device_technology_config(dt3.id))
-    print_test("get_device_technology_config_info")
-    dtc = d.get_device_technology_config_info(dt3.id, 'key3_2')
+    print_test("get_device_technology_config")
+    dtc = d.get_device_technology_config(dt3.id, 'key3_2')
     assert dtc.value == 'val3_2', "Wrong value for %s. Should be val3_2" % dtc.value
 
     print_test("del_device_technology_config")
     d.del_device_technology_config(dtc.id)
-    assert d.get_device_technology_config_info(dt3.id, 'key3_2') == None, "key3_2 was NOT deleted"
+    assert d.get_device_technology_config(dt3.id, 'key3_2') == None, "key3_2 was NOT deleted"
 
     print_title('test device')
     remove_all_areas(d)

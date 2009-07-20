@@ -375,7 +375,7 @@ class DbHelper():
         """
         return self._session.query(DeviceTechnologyConfig).filter_by(technology_id = dt_id).all()
 
-    def get_device_technology_config_info(self, dt_id, dtc_key):
+    def get_device_technology_config(self, dt_id, dtc_key):
         """
         Return information about a device technology config item
         @param dt_id : id of the device technology
@@ -400,7 +400,7 @@ class DbHelper():
         except NoResultFound, e:
             raise Exception("Couldn't add device technology config with device technology id %s. \
                             It does not exist" % dt_id)
-        if self.get_device_technology_config_info(dt_id, dtc_key):
+        if self.get_device_technology_config(dt_id, dtc_key):
             raise Exception("This key '%s' already exists for device technology %s" % (dtc_key, dt_id))
         dtc = DeviceTechnologyConfig(technology_id = dt_id, key = dtc_key, value = dtc_value)
         self._session.add(dtc)
