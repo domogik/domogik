@@ -23,7 +23,8 @@ Module purpose
 ==============
 
 API to use Domogik database.
-Please don't forget to add unit test in 'database_test.py' if you add a new method
+Please don't forget to add unit test in 'database_test.py' if you add a new method.
+Please always run 'python database_test.py' if you change something in this file.
 
 Implements
 ==========
