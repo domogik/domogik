@@ -53,7 +53,6 @@ class Query():
         self._log = l.get_logger()
         self.__myxpl = xpl
         self._log.debug("Init config query instance")
-        #
 
     def query(self, technology, key, result, element = ''):
         '''
@@ -62,17 +61,18 @@ class Query():
         must exists in the config database
         @param element : the name of the element which requests config, None if
         it's a technolgy global parameter
-        @param key : the key to fetch corresponding value
+        @param key : the key to fetch corresponding value, if it's an empty string,
+        all the config items for this technology will be fetched
         '''
+        Listener(self._query_cb, self.__myxpl,{'schema': 'domogik.config', 'type': 'xpl-stat'})
         self._res = result
-        Listener(self._query_cb, self.__myxpl,
-                {'schema': 'domogik.config', 'type': 'xpl-stat'})
         mess = Message()
         mess.set_type('xpl-cmnd')
         mess.set_schema('domogik.config')
         mess.set_data_key('technology', technology)
         mess.set_data_key('element', element)
         mess.set_data_key('key', key)
+        self._key = key
         self.__myxpl.send(mess)
         self._res.get_lock().wait()
 
@@ -81,7 +81,10 @@ class Query():
         Callback to receive message after a query() call
         @param message : the message received
         '''
-        self._log.debug("Config value received : %s" %
-                message.get_key_value('value'))
-        self._res.set_value(message.get_key_value('value'))
+        print "Answer received"
+        result = message.get_all_data_pairs()
+        for r in result:
+            self._log.debug("Config value received : %s" % r)
+        self._res.set_value(result)
         self._res.get_lock().set()
+

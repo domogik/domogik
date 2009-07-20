@@ -56,19 +56,77 @@ class x10Main(xPLModule):
         self._config = Query(self.__myxpl)
         res = xPLResult()
         self._config.query('x10', 'heyu_cfg_path', res)
+        self._heyu_cfg_path_res = res.get_value()['heyu_cfg_path']
         try:
-            self.__myx10 = X10API(res.get_value())
+            pass
+#            self.__myx10 = X10API(self._heyu_cfg_path_res)
         except:
             print "Something went wrong during heyu init, check logs"
             exit(1)
         #Create listeners
         Listener(self.x10_cmnd_cb, self.__myxpl, {'schema': 'x10.basic',
                 'type': 'xpl-cmnd'})
+        #One listener for system schema, allowing to reload config
+        Listener(self.heyu_reload_config, self.__myxpl, {'schema': 'domogik.system', 
+           'type': 'xpl-cmnd', 'command': 'reload', 'module': 'x10'})
+        #One listener for system schema, allowing to dump config
+        Listener(self.heyu_dump_config, self.__myxpl, {'schema': 'domogik.system', 
+            'type': 'xpl-cmnd', 'command': 'push_config', 'module': 'x10'})
         self._log = self.get_my_logger()
-        self._monitor = X10Monitor(res.get_value())
-        self._monitor.get_monitor().add_cb(self.x10_monitor_cb)
-        self._monitor.get_monitor().start()
+#        self._monitor = X10Monitor(self._heyu_cfg_path_res)
+#        self._monitor.get_monitor().add_cb(self.x10_monitor_cb)
+#        self._monitor.get_monitor().start()
         self._log.debug("Heyu correctly started")
+
+    def heyu_reload_config(self, message):
+        '''
+        Regenerate the heyu config file
+        First, it needs to get all config items, then rewrite the config file 
+        and finally restart heyu
+        '''
+        #Heyu config items
+        res = xPLResult()
+#        self._config = Query(self.__myxpl)
+        self._config.query('x10','', res)
+        result = res.get_value()
+        if result is not None:
+            heyu_config_items = filter(lambda k : k.startswith("heyu_file_"), result.keys())
+            heyu_config_values = []
+            for key in heyu_config_items:
+                heyu_config_values.append(result[key])
+            #Heyu path
+            myheyu = HeyuManager(self._heyu_cfg_path_res)
+            try:
+                myheyu.write(heyu_config_values)
+            except IOError:
+                self._log.warning("Heyu config file can't be opened")
+            res = myheyu.restart()
+            if res:
+                self._log.warning("Error during heyu restart : %s" % res)
+
+        else:
+            print "empty res"
+
+
+    def heyu_dump_config(self, message):
+        '''
+        Send the heyu config file on the network
+        '''
+        res = xPLResult()
+        #Heyu path
+        myheyu = HeyuManager(self._heyu_cfg_path_res)
+        lines = myheyu.load()
+        m = Message()
+        m.set_type('xpl-trig')
+        m.set_schema('domogik.config')
+        count = 0
+        for line in lines:
+            key = "heyu_file_%s" % count
+            count = count + 1
+            m.set_data_key(key, line)
+        #print "Message is : %s" % m
+        self.__myxpl.send(m)
+
 
     def x10_cmnd_cb(self, message):
         '''

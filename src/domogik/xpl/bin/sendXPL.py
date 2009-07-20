@@ -48,7 +48,7 @@ from domogik.common import logger
 class Sender(xPLModule):
 
     supported_schemas = ["datetime.basic", "dawndusk.request", "x10.basic",
-            "sensor.basic", "domogik.system"]
+            "sensor.basic", "domogik.system","domogik.config"]
 
     def __init__(self, schema=None, message=None):
         xPLModule.__init__(self, name = 'send')
@@ -77,11 +77,11 @@ class Sender(xPLModule):
             (self._options, self._args) = parser.parse_args()
 
         #Parsing of args
-        if len(self._args) != 2:
+        if len(self._args) != 3:
             self.usage()
             exit(1)
 
-        if self._args[0] not in self.supported_schemas:
+        if self._args[1] not in self.supported_schemas:
             self._log.error("Schema %s not supported" % self._args[0])
             self.usage()
             exit(2)
@@ -91,9 +91,9 @@ class Sender(xPLModule):
         Create the message based on script arguments
         '''
         message = Message()
-        message.set_type("xpl-cmnd")
-        message.set_schema(self._args[0])
-        datas = self._args[1].split(',')
+        message.set_type(self._args[0])
+        message.set_schema(self._args[1])
+        datas = self._args[2].split(',')
         for data in datas:
             if "=" not in data:
                 self._log.error("Bad formatted commands. Must be key=value")
@@ -109,7 +109,7 @@ usage : sendXPL.py message_type message_contents"
 \tmessage_type: Type of the message, must correspond to one of the supported \
 schemas
 \tmessage_contents: comma separated pairs key=value that will be put in message
-\tExample (x10): ./sendXPL.py x10.basic "device=a1,command=on"
+\tExample (x10): ./sendXPL.py xpl-cmnd x10.basic "device=a1,command=on"
 """
 
 

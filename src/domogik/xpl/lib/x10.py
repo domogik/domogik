@@ -22,35 +22,39 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 Module purpose
 ==============
 
-X10 technology support
+X10 technology support using Heyu
 
 Implements
 ==========
 
-- X10Exception:.__init__(self, value)
-- X10Exception:.__str__(self)
-- X10API:.__init__(self, heyuconf)
-- X10API:._valid_item(self, item)
-- X10API:._valid_house(self, house)
-- X10API:._send(self, cmd, item)
-- X10API:._send_lvl(self, cmd, item, lvl)
-- X10API:.on(self, item)
-- X10API:.off(self, item)
-- X10API:.house_on(self, house)
-- X10API:.house_off(self, house)
-- X10API:.bright(self, item, lvl)
-- X10API:.brightb(self, item, lvl)
-- X10API:.dim(self, item, lvl)
-- X10API:.dimb(self, item, lvl)
-- X10API:.lights_on(self, house)
-- X10API:.lights_off(self, house)
-- X10Monitor:.__init__(self, heyuconf)
-- X10Monitor:.get_monitor(self)
-- X10Monitor:.__init__(self, pipe)
-- X10Monitor:.add_cb(self, cb)
-- X10Monitor:.del_cb(self, cb)
-- X10Monitor:.run(self)
-- X10Monitor:._call_cbs(self, units, order, arg)
+- X10Exception.__init__(self, value)
+- X10Exception.__str__(self)
+- X10API.__init__(self, heyuconf)
+- X10API._valid_item(self, item)
+- X10API._valid_house(self, house)
+- X10API._send(self, cmd, item)
+- X10API._send_lvl(self, cmd, item, lvl)
+- X10API.on(self, item)
+- X10API.off(self, item)
+- X10API.house_on(self, house)
+- X10API.house_off(self, house)
+- X10API.bright(self, item, lvl)
+- X10API.brightb(self, item, lvl)
+- X10API.dim(self, item, lvl)
+- X10API.dimb(self, item, lvl)
+- X10API.lights_on(self, house)
+- X10API.lights_off(self, house)
+- X10Monitor.__init__(self, heyuconf)
+- X10Monitor.get_monitor(self)
+- X10Monitor.__init__(self, pipe)
+- X10Monitor.add_cb(self, cb)
+- X10Monitor.del_cb(self, cb)
+- X10Monitor.run(self)
+- X10Monitor._call_cbs(self, units, order, arg)
+- HeyuManager.__init__(path)
+- HeyuManager.load()
+- HeyuManager.restart()
+- HeyuManager.write()
 
 @author: Maxence Dunnewind <maxence@dunnewind.net>
 @copyright: (C) 2007-2009 Domogik project
@@ -58,10 +62,12 @@ Implements
 @organization: Domogik
 """
 
+import os
+import re
 from subprocess import *
 import threading
 from domogik.common import logger
-
+from domogik.common.ordereddict import OrderedDict
 
 class X10Exception:
     """
@@ -247,17 +253,11 @@ class X10API:
         @param lvl : dim level in percent
         @Return True if order was sent, False in case of errors
         '''
-#        try:
         self._valid_item(item)
         level = int(int(lvl) * 0.22)
         if level == 0:
             level = 1
         self._send_lvl("dim", item, level)
-#        except:
-#            print "Exception lors de l'envoi de dim"
-#            return False
-#        else:
-#            return True
 
     def dimb(self, item, lvl):
         '''
@@ -356,14 +356,22 @@ class X10Monitor:
             order = None
             arg = None
             out = None
+            regex_order = re.compile(r".* ([a-zA-Z0-9]+) :[^:]+$")
+            regex_unit = re.compile(r".* : h[uc] ([^ ]+).*$")
+            regex_security = re.compile(r".*(Alert|Clear) : hu ([A-P][0-9]+).*$")
             try:
                 while not self._pipe.stdout.closed and out != '':
                     out = self._pipe.stdout.readline()
-                    print "communicate %s" % out
-                    if 'sndc addr unit' in out:
+                    if 'addr unit' in out:
                         units.append(out.split()[8].lower())
-                    elif 'sndc func' in out:
-                        order = out.split()[4].lower()
+                    elif 'func' in out:
+                        if "Alert" in out or "Clear" in out:
+                            #RF Security device
+                            (order, unit) = regex_security.sub(r"\1,\2", out).lower().split(",")
+                            units = [unit]
+                        else:
+                            #Standard order
+                            order = out.split()[4].lower()
                         if '%' in out:
                             arg = out.split()[9].replace('%','')
                     if units and order:
@@ -373,7 +381,7 @@ class X10Monitor:
                         arg = None
             except ValueError:
                 #The pipe is closed
-                print "Exception"
+                self._log.warning("The heyu-monitor pipe is closed. Finish silently.")
                 pass
 
         def _call_cbs(self, units, order, arg):
@@ -384,4 +392,69 @@ class X10Monitor:
                 for unit in units:
                     cb(unit, order, arg)
 
+
+class HeyuManager:
+    """
+    This class manages the heyu configuration file
+    """
+
+    ITEMS_SECTION = OrderedDict()
+    ITEMS_SECTION['general'] = ['TTY','TTY_AUX','LOG_DIR', 'HOUSECODE', 'REPORT_PATH',
+            'DEFAULT_MODULE','START_ENGINE','DATE_FORMAT','LOGDATE_YEAR','TAILPATH',
+            'HEYU_UMASK', 'STATUS_TIMEOUT', 'SPF_TIMEOUT','TRANS_DIMLEVEL']
+    ITEMS_SECTION['aliases'] = ['ALIAS']
+    ITEMS_SECTION['scenes'] = ['SCENE', 'USERSYN', 'MAX_PPARMS']
+    ITEMS_SECTION['scripts'] = ['SCRIPT','SCRIPT_MODE', 'SCRIPT_CTRL']
+    ITEMS_SECTION['scheduler'] = ['SCHEDULE_FILE','MODE','PROGRAM_DAYS','COMBINE_EVENTS',
+            'COMPRESS_MACROS','REPL_DELAYED_MACROS', 'WRITE_CHECK_FILES']
+    ITEMS_SECTION['dawnduk'] = ['LONGITUDE','LATITUDE','DAWN_OPTION','DUSK_OPTION',
+            'MIN_DAWN','MAX_DAWN','MIN_DUSK','MAX_DUSK']
+
+    def __init__(self, path):
+        """
+        @param path = The heyu config file path, must be absolute
+        """
+        self._file = "%s" % path
+
+    def load(self):
+        """
+        Load the file and parse it
+        @return a list containing all the *uncommented* lines of config file
+        """
+        f = open(self._file, "r")
+        lines = f.readlines()
+        f.close()
+        result = []
+        for line in lines:
+            if not line.startswith("#") and line.strip() != "":
+                result.append(line.strip())
+        return result
+
+    def write(self, data):
+        """
+        Write config datas in the config file
+        @param data : list of config lines
+        @Warning : it will erease the previous config file
+        @raise IOError if the file can'"t be opened
+        """
+        f = open(self._file, "w")
+        for section in self.ITEMS_SECTION:
+            f.write("##### %s #####\n\n" % section)
+            for item in self.ITEMS_SECTION[section]:
+                for d in data:
+                    if d.startswith("%s " % item) or d.startswith("%s\t" % item):
+                        f.write("%s\n" % d)
+            f.write("\n")
+        f.close()
+
+    def restart(self):
+        """
+        Restart heyu process, needed to reload config
+        @return the output of heyu restart command on stderr,
+        should be empty if everything goes well
+        """
+        res = Popen("heyu restart", shell=True, stderr=PIPE)
+        output = res.stderr.read()
+        res.stderr.close()
+        return output
 

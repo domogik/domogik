@@ -43,7 +43,6 @@ Implements
 from domogik.xpl.lib.xplconnector import *
 from domogik.common.configloader import *
 
-
 class DBConnector(xPLModule):
     '''
     Manage the connection between database and the xPL stuff
@@ -86,34 +85,48 @@ class DBConnector(xPLModule):
         techno = message.get_key_value('technology')
         key = message.get_key_value('key')
         element = message.get_key_value('element')
-        self._log.debug("New request config received for %s : %s" % (techno,
-        key))
+        if not key:
+            self._log.debug("New request config received for %s :\
+                    asked for all config items" % (techno))
+        else:
+            self._log.debug("New request config received for %s : %s" % (techno,
+            key))
         if element:
             self._send_config(techno, key, self._fetch_elmt_config(techno,
             element, key), message.get_conf_key_value("source"), element)
         else:
-            self._send_config(techno, key, self._fetch_techno_config(techno,
-            key), message.get_conf_key_value("source"))
+            if not key:
+                keys = self._fetch_techno_config(techno, key).keys()
+                values = self._fetch_techno_config(techno, key).values()
+                self._send_config(techno, keys, values,
+                message.get_conf_key_value("source"))
+            else:
+                self._send_config(techno, key, self._fetch_techno_config(techno,
+                key), message.get_conf_key_value("source"))
 
     def _send_config(self, technology, key, value, module, element = None):
         '''
         Send a config value message for an element's config item
         @param technology : the technology of the element
         @param element :  the name of the element
-        @param key : the key of the config tuple to fetch
-        @param value : the value corresponding to the key
+        @param key : the key or list of keys of the config tuple(s) to fetch
+        @param value : the value or list of values corresponding to the key(s)
         @param module : the name of the module which requested the value
         '''
         self._log.debug("Send config response %s : %s" % (key, value))
         mess = Message()
         mess.set_type('xpl-stat')
         mess.set_schema('domogik.config')
-        mess.set_data_key('technology', technology)
+#        mess.set_data_key('technology', technology)
         if element:
             mess.set_data_key('element', element)
-        mess.set_data_key('key', key)
-        mess.set_data_key('value', value)
-        mess.set_conf_key('target', module)
+        #If key/value are lists, then we add a key=value for each item
+        if isinstance(key, list):
+            for (k, v) in zip(key, value):
+                mess.set_data_key(k, v)
+        else:
+            mess.set_data_key(key, value)
+#        mess.set_conf_key('target', module)
         self.__myxpl.send(mess)
 
     def _fetch_elmt_config(self, techno, element, key):
@@ -138,16 +151,24 @@ class DBConnector(xPLModule):
         @param key : the key of the config tuple to fetch
         '''
         #TODO : use the database
-        vals = {'x10': {'heyu_cfg_path':'/etc/heyu/x10.conf'},
+        vals = {'x10': {'heyu_cfg_path':'/etc/heyu/x10.conf',
+            'heyu_file_0': 'TTY /dev/ttyUSB0',
+            'heyu_file_1': 'TTY_AUX /dev/ttyUSB0 RFXCOM',
+            'heyu_file_2': 'ALIAS back_door D5 DS10A 0x677'},
                 'global': {'pid_dir_path': '/tmp/'},
+                'onewire': {'temperature_refresh_delay' : '10'}
                 }
         try:
-            return vals[techno][key]
+            if key:
+                return vals[techno][key]
+            else:
+                return vals[techno]
         except:
             return None
 
     def _update_stat(self, message):
         #TODO
         pass
+
 if __name__ == "__main__":
     d = DBConnector()

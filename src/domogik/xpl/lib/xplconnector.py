@@ -55,6 +55,7 @@ Implements
 - Message:.has_key(self, key)
 - Message:.has_conf_key(self, key)
 - Message:.get_key_value(self, key)
+- Message:.get_all_keys(self)
 - Message:.get_conf_key_value(self, key)
 - Message:.__str__(self)
 - xPLTimer.__init__(self, time, cb, stop)
@@ -160,7 +161,7 @@ class Manager(xPLModule):
         """
         try:
             if not message.has_conf_key("hop"):
-                message.set_conf_key("hop", "1")
+                message.set_conf_key("hop", "5")
             if not message.has_conf_key("source"):
                 message.set_conf_key("source", self._source)
             if not message.has_conf_key("target"):
@@ -219,6 +220,7 @@ remote-ip=%s
                             mess = Message(data)
                             if mess.get_conf_key_value("target") == "*" or (
                                     mess.get_conf_key_value("target") == self._source):
+
                                 [l.new_message(mess) for l in self._listeners]
                                 #Enabling this debug will really polute your logs
                                 #self._log.debug("New message received : %s" % \
@@ -255,6 +257,9 @@ class Listener:
         self._filter = filter
         manager.add_listener(self)
 
+    def __str__(self):
+        return "Listener<%s>" % (self._filter)
+
     def getFilter(self):
         return self._filter
 
@@ -269,7 +274,6 @@ class Listener:
         and to call the callback function if it does
         """
         ok = True
-
         for key in self._filter:
             if message.has_key(key):
                 if (message.get_key_value(key) != self._filter[key]):
@@ -291,7 +295,8 @@ class Listener:
                 ok = False
         #The message match the filter, we can call  the callback function
         if ok:
-            self._callback(message)
+            thread = threading.Thread(target=self._callback, args = (message,))
+            thread.start()
 
     def add_filter(self, key, value):
         """
@@ -464,7 +469,19 @@ class Message:
         if key in self._data:
             return self._data[key]
         else:
-            raise XPLException("Key not existing")
+            raise XPLException,"Key not existing"
+
+    def get_all_keys(self):
+        """
+        Get all the keys
+        """
+        return self._data.keys()
+
+    def get_all_data_pairs(self):
+        """
+        Get all data key=value pairs
+        """
+        return self._data
 
     def get_conf_key_value(self, key):
         """
