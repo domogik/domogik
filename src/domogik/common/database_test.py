@@ -153,7 +153,7 @@ if __name__ == "__main__":
     area2 = d.add_area('area2','description 2')
     assert len(d.list_areas()) == 2, "Area list should have 2 items, it has %s" % len(d.list_areas())
     print_test('list room')
-    assert len(d.list_rooms()) == 0, "Room list is not empty"
+    assert len(d.list_rooms()) == 0, "Room list is not empty : %s" % d.list_rooms()
     print_test('add room')
     room1 = d.add_room('room1', 'description 1', area1.id)
     room2 = d.add_room('room2', 'description 2', area1.id)
