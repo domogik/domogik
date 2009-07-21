@@ -166,9 +166,40 @@ class DBConnector(xPLModule):
         except:
             return None
 
-    def _update_stat(self, message):
-        #TODO
-        pass
+class StatsManager(xPLModule):
+    """
+    Listen on the xPL network and keep stats of device and system state
+    """
+    def __init__(self):
+        xPLModule.__init__(self, 'database_manager')
+        self._log = self.get_my_logger()
+        self._log.debug("Init database_manager instance")
+        self.__myxpl = Manager()
+        
+    def _x10_cb(self, message):
+        """
+        Manage X10 stats
+        """
+
+    def _onewire_cb(self, message):
+        """
+        Manage X10 stats
+        """
+
+    def _plcbus_cb(self, message):
+        """
+        Manage X10 stats
+        """
+
+    def _knx_cb(self, message):
+        """
+        Manage X10 stats
+        """
+
+    def _sys_cb(self, message):
+        """
+        Manage system stats 
+        """
 
 if __name__ == "__main__":
     d = DBConnector()
