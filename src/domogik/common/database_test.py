@@ -324,7 +324,6 @@ if __name__ == "__main__":
     for trigger in d.list_triggers():
         d.del_trigger(trigger.id)
     assert len(d.list_triggers()) == 0, "Trigger list should be empty, but it has % item(s)" % len(d.list_triggers())
-    #list_triggers, add_trigger, get_trigger, del_trigger
     trigger1 = d.add_trigger(t_description = 'desc1', 
                             t_rule = 'AND(x,OR(y,z))', t_result= ['x10_on("a3")','1wire()'])
     trigger2 = d.add_trigger(t_description = 'desc2', 
