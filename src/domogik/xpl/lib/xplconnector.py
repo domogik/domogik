@@ -27,7 +27,7 @@ Manage connection to the xPL network
 Implements
 ==========
 
-- Manager.__init__(self, ip="127.0.0.1", port=3865)
+- Manager.__init__(self, ip=gethostbyname(gethostname()), port=0)
 - Manager.leave(self)
 - Manager.send(self, message)
 - Manager._SendHeartbeat(self)
@@ -96,12 +96,12 @@ class Manager(xPLModule):
     # _network = None
     # _UDPSock = None
 
-    def __init__(self, ip="127.0.0.1", port=3865):
+    def __init__(self, ip=gethostbyname(gethostname()), port=0):
         """
         Create a new manager instance
-        @param ip : IP to listen to (default 0.0.0.0)
+        @param ip : IP to listen to (default real ip address)
         @param source : source name of the application
-        @param port : port to listen to (default 3865)
+        @param port : port to listen to (default 0)
         """
         xPLModule.__init__(self, stop_cb = self.leave)
         source = "xpl-%s.domogik" % self.get_module_name()
@@ -110,14 +110,14 @@ class Manager(xPLModule):
         # Define xPL base port
         self._source = source
         self._listeners = []
-        self._port = port
+		#Not really usefull
+        #self._port = port
         # Initialise the socket
         self._UDPSock = socket(AF_INET, SOCK_DGRAM)
         #Set broadcast flag
         self._UDPSock.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
         #xPL plugins only needs to connect on local xPL Hub on localhost
-        #The port is dynamically selected by the system
-        addr = (ip, 0)
+        addr = (ip, port)
 
         self._log = self.get_my_logger()
 
@@ -131,13 +131,17 @@ class Manager(xPLModule):
         else:
             self.add_stop_cb(self.leave)
             self._port = self._UDPSock.getsockname()[1]
-            self._ip = ip
+            #Get the port number assigned by the system
+            self._ip, self._port = self._UDPSock.getsockname()
+            self._log.debug("xPL module %s socket bound to %s, port %s" % (self.get_module_name(), self._ip, self._port))
             # All is good, we start sending Heartbeat every 5 minutes using
             # xPLTimer
             self._SendHeartbeat()
             self._h_timer = xPLTimer(300, self._SendHeartbeat, self.get_stop())
             self.register_timer(self._h_timer)
             self._h_timer.start()
+            #We add a listener in order to answer to the hbeat requests
+            Listener(cb = self.got_hbeat, manager = self, filter = {'schema':'hbeat.app','type':'xpl-stat'})
             #And finally we start network listener in a thread
             self._stop_thread = False
             self._network = threading.Thread(None, self._run_thread_monitor,
@@ -145,7 +149,6 @@ class Manager(xPLModule):
             self.register_thread(self._network)
             self._network.start()
             self._log.debug("xPL thread started for %s " % self.get_module_name())
-
 
     def leave(self):
         """
@@ -172,7 +175,7 @@ class Manager(xPLModule):
             self._log.warning("Error during send of message")
             self._log.debug(sys.exc_info()[2])
 
-    def _SendHeartbeat(self):
+    def _SendHeartbeat(self, target='*'):
         """
         Send heartbeat message in broadcast on the network, on the bus port
         (3865)
@@ -185,7 +188,7 @@ xpl-stat
 {
 hop=1
 source=%s
-target=*
+target=%s
 }
 hbeat.app
 {
@@ -193,9 +196,13 @@ interval=5
 port=%s
 remote-ip=%s
 }
-""" % (self._source, self._port, self._ip)
+""" % (self._source, target, self._port, self._ip)
         if not self.should_stop():
             self._UDPSock.sendto(mess, ("255.255.255.255", 3865))
+
+    def got_hbeat(self, message):
+        if(message.get_conf_key_value('target') != self._source ):
+            self._SendHeartbeat(message.get_conf_key_value('source'))
 
     def _run_thread_monitor(self):
         """
@@ -220,7 +227,6 @@ remote-ip=%s
                             mess = Message(data)
                             if mess.get_conf_key_value("target") == "*" or (
                                     mess.get_conf_key_value("target") == self._source):
-
                                 [l.new_message(mess) for l in self._listeners]
                                 #Enabling this debug will really polute your logs
                                 #self._log.debug("New message received : %s" % \
