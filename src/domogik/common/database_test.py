@@ -161,11 +161,11 @@ if __name__ == "__main__":
     print_test('list room')
     assert len(d.list_rooms()) == 3, "Room list should have 3 items, it has %s" % len(d.list_rooms())
     print_test('= get all rooms of area1')
-    assert len(d.get_all_room_of_area(area1.id)) == 2, \
-      "Area1 should have 2 rooms, it has %s" % len(d.get_all_room_of_area(area1.id))
+    assert len(d.get_all_rooms_of_area(area1.id)) == 2, \
+      "Area1 should have 2 rooms, it has %s" % len(d.get_all_rooms_of_area(area1.id))
     print_test('= get all rooms of area2')
-    assert len(d.get_all_room_of_area(area2.id)) == 1, \
-      "Area2 should have 1 room, it has %s" % len(d.get_all_room_of_area(area2.id))
+    assert len(d.get_all_rooms_of_area(area2.id)) == 1, \
+      "Area2 should have 1 room, it has %s" % len(d.get_all_rooms_of_area(area2.id))
     print_test('get room by name')
     assert d.get_room_by_name('room1').name == 'room1', "Couldn't find room1"
     print_test('del room')

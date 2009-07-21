@@ -214,7 +214,7 @@ class DbHelper():
             self._session.delete(room)
             self._session.commit()
 
-    def get_all_room_of_area(self, a_area_id):
+    def get_all_rooms_of_area(self, a_area_id):
         """
         Returns all the rooms of an area
         @param a_area_id : the area id
@@ -542,7 +542,7 @@ class DbHelper():
         @return a list of Device objects
         """
         device_list = []
-        for room in self.get_all_room_of_area(d_area_id):
+        for room in self.get_all_rooms_of_area(d_area_id):
             for device in self.get_all_devices_of_room(room.id):
               device_list.append(device)
         return device_list
