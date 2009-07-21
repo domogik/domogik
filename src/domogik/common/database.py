@@ -95,7 +95,11 @@ class DbHelper():
     _engine = None
     _session = None
 
-    def __init__(self):
+    def __init__(self, echo_output = False):
+        """
+        Class constructor
+        @param echo_output : if set to True displays sqlAlchemy queries (default set to False)
+        """
         cfg = Loader('database')
         config = cfg.load()
         db = dict(config[1])
@@ -110,7 +114,7 @@ class DbHelper():
 
         # Connecting to the database
         self._dbprefix = db['db_prefix']
-        self._engine = sqlalchemy.create_engine(url, echo=True)
+        self._engine = sqlalchemy.create_engine(url, echo = echo_output)
         Session = sessionmaker(bind=self._engine)
         self._session = Session()
 
