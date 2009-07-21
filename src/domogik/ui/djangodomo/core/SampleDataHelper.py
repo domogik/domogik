@@ -27,8 +27,7 @@ Load sample datas (deprecated)
 Implements
 ==========
 
-- SampleDataHelper:.remove(self)
-- SampleDataHelper:.create(self)
+- SampleDataHelper
 
 @author: Domogik project
 @copyright: (C) 2007-2009 Domogik project
