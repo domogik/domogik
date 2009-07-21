@@ -133,6 +133,7 @@ if __name__ == "__main__":
     print_test('*********** Starting tests ***********')
     d = DbHelper()
 
+    ### Areas
     print_title('test area')
     remove_all_areas(d)
     assert len(d.list_areas()) == 0, "Area list is not empty"
@@ -146,6 +147,7 @@ if __name__ == "__main__":
     d.del_area(area0.id)
     assert not has_item(d.list_areas(), ['area0']), "area0 was NOT deleted"
 
+    ### Rooms
     print_title('test room')
     remove_all_areas(d)
     remove_all_rooms(d)
@@ -173,6 +175,7 @@ if __name__ == "__main__":
     assert not has_item(d.list_rooms(), ['room1']), "room1 was NOT deleted"
     assert has_item(d.list_rooms(), ['room2', 'room3']), "rooms were deleted but shouldn't have been"
 
+    ### Device category
     print_title('test device_category')
     remove_all_device_categories(d)
     print_test('list device_category')
@@ -190,14 +193,15 @@ if __name__ == "__main__":
     assert has_item(d.list_device_categories(), ['dc1']), "Couldn't find 'dc1'"
     assert not has_item(d.list_device_categories(), ['dc2']), "'dc2' was NOT deleted"
 
+    ### Device technology
     print_title('test device_technology')
     remove_all_device_technologies(d)
     print_test('list device_technology')
     assert len(d.list_device_technologies()) == 0, "There should have no device technology"
     print_test('add device_technology')
-    dt1 = d.add_device_technology('dt1', 'desc dt1', 'cpl')
-    dt2 = d.add_device_technology('dt2', 'desc dt2', 'wired')
-    dt3 = d.add_device_technology('dt3', 'desc dt3', 'wifi')
+    dt1 = d.add_device_technology('dt1', 'desc dt1', u'cpl')
+    dt2 = d.add_device_technology('dt2', 'desc dt2', u'wired')
+    dt3 = d.add_device_technology('dt3', 'desc dt3', u'wifi')
     assert len(d.list_device_technologies()) == 3, "%s devices technologies found, instead of 3 " \
                                                   % len(d.list_device_technologies())
     assert has_item(d.list_device_technologies(), ['dt1', 'dt2', 'dt3']), \
@@ -209,6 +213,7 @@ if __name__ == "__main__":
     assert has_item(d.list_device_technologies(), ['dt1', 'dt3']), "Couldn't find 'dt1' and 'dt3'"
     assert not has_item(d.list_device_technologies(), ['dt2']), "'dt2' was NOT deleted"
 
+    ### Device technology config
     print_title('test device technology config')
     remove_all_device_technology_config(d)
     print_test('add device technology config')
@@ -239,6 +244,7 @@ if __name__ == "__main__":
     d.del_device_technology_config(dtc.id)
     assert d.get_device_technology_config(dt3.id, 'key3_2') == None, "key3_2 was NOT deleted"
 
+    ### Device
     print_title('test device')
     remove_all_areas(d)
     remove_all_device_categories(d)
@@ -249,12 +255,12 @@ if __name__ == "__main__":
     area2 = d.add_area('area2','description 2')
     room1 = d.add_room('room1', 'description 1', area1.id)
     room2 = d.add_room('room2', 'description 2', area2.id)
-    dt1 = d.add_device_technology('dt1', 'desc dt1', 'cpl')
+    dt1 = d.add_device_technology('dt1', 'desc dt1', u'cpl')
     dc1 = d.add_device_category('dc1')
-    device1 = d.add_device(d_address = 'A1', d_technology_id = dt1.id, d_type = 'lamp', 
+    device1 = d.add_device(d_address = 'A1', d_technology_id = dt1.id, d_type = u'lamp', 
                           d_category_id = dc1.id, d_room_id = room1.id, d_description = 'desc1', 
                           d_is_resetable = True, d_initial_value = 30, 
-                          d_is_value_changeable_by_user = False, d_unit_of_stored_values = 'Percent')
+                          d_is_value_changeable_by_user = False, d_unit_of_stored_values = u'Percent')
     assert len(d.list_devices()) == 1, "Device was NOT added"
     print_test("update_device")
     device_id = device1.id
@@ -263,9 +269,9 @@ if __name__ == "__main__":
     device1 = d.get_device(device_id)
     assert device1.description == 'desc2',\
           "Device desc. was NOT changed : should be 'desc2' but is '%s'" % device1.description
-    device2 = d.add_device(d_address='A2', d_technology_id=dt1.id, d_type = 'appliance',
+    device2 = d.add_device(d_address='A2', d_technology_id=dt1.id, d_type = u'appliance',
                           d_category_id=dc1.id, d_room_id=room1.id)
-    device3 = d.add_device(d_address='A3', d_technology_id=dt1.id, d_type = 'appliance',
+    device3 = d.add_device(d_address='A3', d_technology_id=dt1.id, d_type = u'appliance',
                           d_category_id=dc1.id, d_room_id=room2.id)
     assert len(d.list_devices()) == 3, "Device list should have 3 items, but it has %s" % d.list_devices()
     assert len(d.get_all_devices_of_room(room1.id)) == 2, \
@@ -289,17 +295,18 @@ if __name__ == "__main__":
     assert d.list_devices()[0].address == 'A1', \
           "Device should have 'A1' address but has : %s instead" % d.list_devices()[0].address
 
+    ### Device stats
     print_title("device stats")
     remove_all_device_stats(d)
-    dt1 = d.add_device_technology("x10", "this is x10", "cpl")
+    dt1 = d.add_device_technology("x10", "this is x10", u"cpl")
     dc1 = d.add_device_category("lighting")
     area1 = d.add_area('area1','description 1')
     room1 = d.add_room('room1', 'description 1', area1.id)
-    device1 = d.add_device(d_address = "A1", d_technology_id = dt1.id, d_type = "lamp", 
+    device1 = d.add_device(d_address = "A1", d_technology_id = dt1.id, d_type = u"lamp", 
                           d_category_id = dc1.id, d_room_id = room1.id)
-    device2 = d.add_device(d_address = "A2", d_technology_id = dt1.id, d_type = "lamp", 
+    device2 = d.add_device(d_address = "A2", d_technology_id = dt1.id, d_type = u"lamp", 
                           d_category_id = dc1.id, d_room_id = room1.id)
-    device3 = d.add_device(d_address = "A3", d_technology_id = dt1.id, d_type = "lamp", 
+    device3 = d.add_device(d_address = "A3", d_technology_id = dt1.id, d_type = u"lamp", 
                           d_category_id = dc1.id, d_room_id = room1.id)
     print_test("add_device_stat")
     now = datetime.datetime.now()
@@ -315,7 +322,6 @@ if __name__ == "__main__":
           "device stats for device id %s should have 1 item. It has %s" % (device2.id, len(l_stats))
     print_test("get_last_stat_of_devices")
     l_stats = d.get_last_stat_of_devices([device1.id, device2.id])
-    print l_stats
     assert len(l_stats) == 2, "last device stats should have 2 items. It has %s" % len(l_stats)
     device_id_list = []
     for stat in l_stats:
@@ -332,18 +338,22 @@ if __name__ == "__main__":
     l_stats = d.list_device_stats(device2.id)
     assert len(l_stats) == 1, "List of stats should have 1 item for device2, but it has %s items" % len(l_stats)
 
+    ### Triggers
     print_title("test triggers")
     for trigger in d.list_triggers():
         d.del_trigger(trigger.id)
     assert len(d.list_triggers()) == 0, "Trigger list should be empty, but it has % item(s)" % len(d.list_triggers())
+    print_test("add_trigger")
     trigger1 = d.add_trigger(t_description = 'desc1', 
                             t_rule = 'AND(x,OR(y,z))', t_result= ['x10_on("a3")','1wire()'])
     trigger2 = d.add_trigger(t_description = 'desc2', 
                             t_rule = 'OR(x,AND(y,z))', t_result= ['x10_on("a2")','1wire()'])
-    print trigger1.id
+    print_test("list_triggers")
     assert len(d.list_triggers()) == 2, "Trigger list should have 2 items but it has %s item(s)" % len(d.list_triggers())
+    print_test("get_trigger")
     assert d.get_trigger(trigger1.id).description == 'desc1', "Trigger1 should have 'desc1', but it has not"
 
+    ### User and system accounts
     print_title("test user and system accounts")
     for user in d.list_user_accounts():
         d.del_user_account(user.id)
@@ -396,19 +406,26 @@ if __name__ == "__main__":
     for sys in l_sys:
         assert sys.login != 'mschneider', "System account with 'mschneider' login was NOT deleted"
 
+    ### System stats
     print_title("System stats")
+    print_test("del_all_system_stats")
     d.del_all_system_stats()
     assert len(d.list_system_stats()) == 0, "List of system stats should be empty : %s" % d.list_system_stats()
     now = datetime.datetime.now()
     sstat_list = []
+    print_test("add_system_stat")
     for i in range(4):
         sstat_list.append(d.add_system_stat("sstat%s" %i, now + datetime.timedelta(seconds=i), 
                           SYSTEMSTATS_TYPE_LIST[i%2], "val%s" %i))
+    print_test("list_system_stats")
     assert len(d.list_system_stats()) == 4, "List of system stats should have 4 items : %s" % d.list_system_stats()
+    print_test("get_system_stats_by_type")
     nb_items = len(d.get_system_stats_by_type(SYSTEMSTATS_TYPE_LIST[0]))
     assert nb_items == 2, "Should have 2 system stats of type %s, but have %s" % (SYSTEMSTATS_TYPE_LIST[0], nb_items)
+    print_test("get_system_stat")
     val0 = d.get_system_stat("sstat0").value
     assert val0 == "val0", "Wrong value for sstat0 : '%s'. Should be 'val0'" % val0
+    print_test("del_system_stat")
     d.del_system_stat("sstat0")
     assert len(d.list_system_stats()) == 3, "List of system stats should have 3 items : %s" % d.list_system_stats()
 

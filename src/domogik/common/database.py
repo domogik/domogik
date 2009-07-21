@@ -53,12 +53,13 @@ Implements
 # user_account
 ####
 
+
+import hashlib
+
 import sqlalchemy
 from sqlalchemy.ext.sqlsoup import SqlSoup
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
-
-import hashlib
 
 from domogik.common.configloader import Loader
 from domogik.common.sql_schema import Area, Device, DeviceCategory, DeviceConfig, \
@@ -75,12 +76,14 @@ class DbHelperException(Exception):
 
     def __init__(self, value):
         """
+        Class constructor
         @param value : value of the exception
         """
         self.value = value
 
     def __str__(self):
         """
+        Return the object representation
         @return value of the exception
         """
         return repr(self.value)
