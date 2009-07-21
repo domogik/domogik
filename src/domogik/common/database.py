@@ -63,8 +63,9 @@ import hashlib
 from domogik.common.configloader import Loader
 from domogik.common.sql_schema import Area, Device, DeviceCategory, DeviceConfig, \
                                       DeviceStats, DeviceTechnology, DeviceTechnologyConfig, \
-                                      Room, UserAccount, SystemAccount, Trigger
-from domogik.common.sql_schema import UNIT_OF_STORED_VALUE_LIST, DEVICE_TECHNOLOGY_TYPE_LIST, DEVICE_TYPE_LIST
+                                      Room, UserAccount, SystemAccount, SystemStats, Trigger
+from domogik.common.sql_schema import DEVICE_TECHNOLOGY_TYPE_LIST, DEVICE_TYPE_LIST, SYSTEMSTATS_TYPE_LIST, \
+                                      UNIT_OF_STORED_VALUE_LIST
 
 
 class DbHelperException(Exception):
@@ -774,3 +775,65 @@ class DbHelper():
                 self.del_system_account(user_account.system_account_id)
             self._session.delete(user_account)
             self._session.commit()
+
+####
+# System stats
+####
+    def list_system_stats(self):
+        """
+        Return a list of all system stats
+        @return a list of SystemStats objects
+        """
+        return self._session.query(SystemStats).all()
+
+    def get_system_stat(self, s_name):
+        """
+        Return a system stat
+        @param s_name : the name of the stat to be retrieved
+        @return a SystemStats object
+        """
+        return self._session.query(SystemStats).filter_by(name = s_name).first()
+
+
+    def get_system_stats_by_type(self, s_type):
+        """
+        Return a list of all system stats
+        @param s_type : type of the stats to be retrieved
+        @return a list of SystemStats objects
+        """
+        return self._session.query(SystemStats).filter_by(type = s_type).all()
+
+    def add_system_stat(self, s_name, s_date, s_type, s_value):
+        """
+        Add a system stat record
+        @param s_name : name of the stat
+        @param s_date : when the stat was gathered (timestamp)
+        @param s_type : stat type (must be one of sql_schema.SYSTEMSTATS_TYPE_LIST list)
+        @param s_value : stat value
+        @return the new SystemStats object
+        """
+        if s_type not in SYSTEMSTATS_TYPE_LIST:
+            raise ValueError, "s_type must be one of %s" % SYSTEMSTATS_TYPE_LIST
+        system_stat = SystemStats(name = s_name, date = s_date, type = s_type, value = s_value)
+        self._session.add(system_stat)
+        self._session.commit()
+        return system_stat
+
+    def del_system_stat(self, s_name):
+        """
+        Delete a system stat record
+        @param s_name : name of the stat that has to be deleted
+        """
+        system_stat = self._session.query(SystemStats).filter_by(name = s_name).first()
+        if system_stat:
+            self._session.delete(system_stat)
+            self._session.commit()
+
+    def del_all_system_stats(self):
+        """
+        Delete all stats for a device
+        """
+        system_stats = self._session.query(SystemStats).all()
+        for system_stat in system_stats:
+            self._session.delete(system_stat)
+        self._session.commit()
