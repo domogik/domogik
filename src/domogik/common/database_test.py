@@ -247,6 +247,7 @@ if __name__ == "__main__":
     print_test("add_device")
     area1 = d.add_area('area1','description 1')
     room1 = d.add_room('room1', 'description 1', area1.id)
+    room2 = d.add_room('room2', 'description 2', area1.id)
     dt1 = d.add_device_technology('dt1', 'desc dt1', 'cpl')
     dc1 = d.add_device_category('dc1')
     device1 = d.add_device(d_address = 'A1', d_technology_id = dt1.id, d_type = 'lamp', 
@@ -263,9 +264,13 @@ if __name__ == "__main__":
           "Device desc. was NOT changed : should be 'desc2' but is '%s'" % device1.description
     device2 = d.add_device(d_address='A2', d_technology_id=dt1.id, d_type = 'appliance',
                           d_category_id=dc1.id, d_room_id=room1.id)
-    assert len(d.list_devices()) == 2, "Device list should have 2 items, but it has %s" % d.list_devices()
+    device3 = d.add_device(d_address='A3', d_technology_id=dt1.id, d_type = 'appliance',
+                          d_category_id=dc1.id, d_room_id=room2.id)
+    assert len(d.list_devices()) == 3, "Device list should have 3 items, but it has %s" % d.list_devices()
     assert len(d.get_all_devices_of_room(room1.id)) == 2, \
               "Room id %s should have 2 devices but has %s" % (room1.id, len(d.get_all_devices_of_room(room1.id)))
+    assert len(d.get_all_devices_of_room(room2.id)) == 1, \
+              "Room id %s should have 1 device but has %s" % (room2.id, len(d.get_all_devices_of_room(room2.id)))
     print_test("find_devices")
     nb_of_dev = len(d.find_devices(category_id = dc1.id, room_id = room1.id))
     assert nb_of_dev == 2, "Should have found 2 devices, but found %s" % nb_of_dev
@@ -275,7 +280,7 @@ if __name__ == "__main__":
     assert nb_of_dev == 0, "Should have found 0 device, but found %s" % nb_of_dev
     print_test("del_device")
     d.del_device(device2.id)
-    assert len(d.list_devices()) == 1, "Found %s device(s), should be %s" % (d.list_devices(), 1)
+    assert len(d.list_devices()) == 2, "Found %s device(s), should be %s" % (d.list_devices(), 1)
     assert d.list_devices()[0].address == 'A1', \
           "Device should have 'A1' address but has : %s instead" % d.list_devices()[0].address
 
