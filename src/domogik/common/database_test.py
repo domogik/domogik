@@ -42,8 +42,8 @@ import datetime
 from domogik.common.database import DbHelper, DbHelperException
 from domogik.common.sql_schema import Area, Device, DeviceCategory, DeviceConfig, \
                                       DeviceStats, DeviceTechnology, DeviceTechnologyConfig, \
-                                      Room, UserAccount, SystemAccount, Trigger
-
+                                      Room, UserAccount, SystemAccount, SystemStats, Trigger
+from domogik.common.sql_schema import SYSTEMSTATS_TYPE_LIST
 
 def print_title(title):
     """
@@ -395,5 +395,21 @@ if __name__ == "__main__":
     assert len(l_sys) > 0, "The list is empty but it shouldn't"
     for sys in l_sys:
         assert sys.login != 'mschneider', "System account with 'mschneider' login was NOT deleted"
+
+    print_title("System stats")
+    d.del_all_system_stats()
+    assert len(d.list_system_stats()) == 0, "List of system stats should be empty : %s" % d.list_system_stats()
+    now = datetime.datetime.now()
+    sstat_list = []
+    for i in range(4):
+        sstat_list.append(d.add_system_stat("sstat%s" %i, now + datetime.timedelta(seconds=i), 
+                          SYSTEMSTATS_TYPE_LIST[i%2], "val%s" %i))
+    assert len(d.list_system_stats()) == 4, "List of system stats should have 4 items : %s" % d.list_system_stats()
+    nb_items = len(d.get_system_stats_by_type(SYSTEMSTATS_TYPE_LIST[0]))
+    assert nb_items == 2, "Should have 2 system stats of type %s, but have %s" % (SYSTEMSTATS_TYPE_LIST[0], nb_items)
+    val0 = d.get_system_stat("sstat0").value
+    assert val0 == "val0", "Wrong value for sstat0 : '%s'. Should be 'val0'" % val0
+    d.del_system_stat("sstat0")
+    assert len(d.list_system_stats()) == 3, "List of system stats should have 3 items : %s" % d.list_system_stats()
 
     print_test('*********** All tests successfully passed! ***********')

@@ -54,6 +54,7 @@ from domogik.common.configloader import Loader
 UNIT_OF_STORED_VALUE_LIST = ['Volt', 'Celsius', 'Farenheit', 'Percent', 'Boolean']
 DEVICE_TECHNOLOGY_TYPE_LIST = ['cpl', 'wired', 'wifi', 'wireless', 'ir']
 DEVICE_TYPE_LIST = ['appliance', 'lamp', 'music', 'sensor']
+SYSTEMSTATS_TYPE_LIST = ['HB_CLIENT', 'CORE']
 
 Base = declarative_base()
 metadata = Base.metadata
@@ -452,3 +453,33 @@ class UserAccount(Base):
     @staticmethod
     def get_tablename():
         return UserAccount.__tablename__
+
+###
+# Stats for device's states
+# date : timestamp of the record
+# name : name of the record
+# type : type of the record
+# value : The vale of the device
+###
+
+class SystemStats(Base):
+    __tablename__ = '%s_system_stats' % _db_prefix
+    id = Column(Integer, primary_key=True)
+    name = Column(String(30), nullable=False)
+    date = Column(DateTime, nullable=False)
+    type = Column(Enum(SYSTEMSTATS_TYPE_LIST))
+    value = Column(String(80), nullable=False)
+
+    def __init__(self, name, date, type, value):
+        self.name = name
+        self.date = date
+        self.type = type
+        self.value = value
+
+    def __repr__(self):
+        return "<SystemStats(id=%s, name=%s, date=%s, type='%s', value='%s')>" \
+          % (self.id, self.name, self.date, self.type, self.value)
+
+    @staticmethod
+    def get_tablename():
+        return SystemStats.__tablename__
