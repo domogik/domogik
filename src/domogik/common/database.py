@@ -535,6 +535,18 @@ class DbHelper():
         """
         return self._session.query(Device).filter_by(room_id = d_room_id).all()
 
+    def get_all_devices_of_area(self, d_area_id):
+        """
+        Return all the devices of an area
+        @param d_area_id : the area id
+        @return a list of Device objects
+        """
+        device_list = []
+        for room in self.get_all_room_of_area(d_area_id):
+            for device in self.get_all_devices_of_room(room.id):
+              device_list.append(device)
+        return device_list
+
     def get_all_devices_of_category(self, dc_id):
         """
         Return all the devices of a category

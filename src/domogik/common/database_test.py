@@ -246,8 +246,9 @@ if __name__ == "__main__":
     assert len(d.list_devices()) == 0, "Device list is NOT empty"
     print_test("add_device")
     area1 = d.add_area('area1','description 1')
+    area2 = d.add_area('area2','description 2')
     room1 = d.add_room('room1', 'description 1', area1.id)
-    room2 = d.add_room('room2', 'description 2', area1.id)
+    room2 = d.add_room('room2', 'description 2', area2.id)
     dt1 = d.add_device_technology('dt1', 'desc dt1', 'cpl')
     dc1 = d.add_device_category('dc1')
     device1 = d.add_device(d_address = 'A1', d_technology_id = dt1.id, d_type = 'lamp', 
@@ -271,6 +272,10 @@ if __name__ == "__main__":
               "Room id %s should have 2 devices but has %s" % (room1.id, len(d.get_all_devices_of_room(room1.id)))
     assert len(d.get_all_devices_of_room(room2.id)) == 1, \
               "Room id %s should have 1 device but has %s" % (room2.id, len(d.get_all_devices_of_room(room2.id)))
+    assert len(d.get_all_devices_of_area(area1.id)) == 2, \
+              "Area id %s should have 2 devices but has %s" % (area1.id, len(d.get_all_devices_of_area(area1.id)))
+    assert len(d.get_all_devices_of_area(area2.id)) == 1, \
+              "Area id %s should have 1 device but has %s" % (area2.id, len(d.get_all_devices_of_area(area2.id)))
     print_test("find_devices")
     nb_of_dev = len(d.find_devices(category_id = dc1.id, room_id = room1.id))
     assert nb_of_dev == 2, "Should have found 2 devices, but found %s" % nb_of_dev

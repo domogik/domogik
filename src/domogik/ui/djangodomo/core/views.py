@@ -61,7 +61,7 @@ from djangodomo.core.SampleDataHelper import SampleDataHelper
 from djangodomo.core.XPLHelper import XPLHelper
 
 
-__db = database.DbHelper()
+_db = database.DbHelper()
 
 
 def index(request):
