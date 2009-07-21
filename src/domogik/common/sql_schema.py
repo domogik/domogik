@@ -51,10 +51,10 @@ from sqlalchemy import types, create_engine, Table, Column, Integer, String, \
 from sqlalchemy.ext.declarative import declarative_base
 from domogik.common.configloader import Loader
 
-UNIT_OF_STORED_VALUE_LIST = ['Volt', 'Celsius', 'Farenheit', 'Percent', 'Boolean']
-DEVICE_TECHNOLOGY_TYPE_LIST = ['cpl', 'wired', 'wifi', 'wireless', 'ir']
-DEVICE_TYPE_LIST = ['appliance', 'lamp', 'music', 'sensor']
-SYSTEMSTATS_TYPE_LIST = ['HB_CLIENT', 'CORE']
+UNIT_OF_STORED_VALUE_LIST = [u'Volt', u'Celsius', u'Farenheit', u'Percent', u'Boolean']
+DEVICE_TECHNOLOGY_TYPE_LIST = [u'cpl', u'wired', u'wifi', u'wireless', u'ir']
+DEVICE_TYPE_LIST = [u'appliance', u'lamp', u'music', u'sensor']
+SYSTEMSTATS_TYPE_LIST = [u'HB_CLIENT', u'CORE']
 
 Base = declarative_base()
 metadata = Base.metadata
