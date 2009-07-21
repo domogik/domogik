@@ -81,7 +81,6 @@ import time
 from domogik.common import logger
 from domogik.xpl.lib.module import xPLModule
 
-
 class Manager(xPLModule):
     """
     Manager is the main component of the system
