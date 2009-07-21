@@ -214,13 +214,13 @@ class DbHelper():
             self._session.delete(room)
             self._session.commit()
 
-    def get_all_room_of_area(self, area_searched):
+    def get_all_room_of_area(self, a_area_id):
         """
         Returns all the rooms of an area
-        @param area_searched : an Area object
+        @param a_area_id : the area id
         @return a list of Room objects
         """
-        return self._session.query(Room).filter_by(area_id = area_searched.id).all()
+        return self._session.query(Room).filter_by(area_id = a_area_id).all()
 
 ####
 # Device category
