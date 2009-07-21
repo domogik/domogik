@@ -264,6 +264,8 @@ if __name__ == "__main__":
     device2 = d.add_device(d_address='A2', d_technology_id=dt1.id, d_type = 'appliance',
                           d_category_id=dc1.id, d_room_id=room1.id)
     assert len(d.list_devices()) == 2, "Device list should have 2 items, but it has %s" % d.list_devices()
+    assert len(d.get_all_devices_of_room(room1.id)) == 2, \
+              "Room id %s should have 2 devices but has %s" % (room1.id, len(d.get_all_devices_of_room(room1.id)))
     print_test("find_devices")
     nb_of_dev = len(d.find_devices(category_id = dc1.id, room_id = room1.id))
     assert nb_of_dev == 2, "Should have found 2 devices, but found %s" % nb_of_dev

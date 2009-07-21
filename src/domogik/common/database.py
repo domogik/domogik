@@ -527,6 +527,14 @@ class DbHelper():
         self._session.delete(device)
         self._session.commit()
 
+    def get_all_devices_of_room(self, d_room_id):
+        """
+        Return all the devices of a room
+        @param d_room_id: room id
+        @return a list of Device objects
+        """
+        return self._session.query(Device).filter_by(room_id = d_room_id).all()
+
     def get_all_devices_of_category(self, dc_id):
         """
         Return all the devices of a category
