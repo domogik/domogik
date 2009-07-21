@@ -27,20 +27,6 @@ Django web UI views
 Implements
 ==========
 
-- index(request)
-- __update_device_values(request, app_setting)
-- __send_value_to_device(device_id, new_value, app_setting)
-- __send_x10_cmd(device, old_value, new_value, simulation_mode)
-- __write_device_stats(device_id, new_value, new_comment, new_is_successful)
-- device(request, device_id)
-- device_stats(request, device_id)
-- __clear_device_stats(request, device_id, is_admin_mode)
-- admin_index(request)
-- save_settings(request)
-- load_sample_data(request)
-- clear_data(request)
-- __read_application_setting()
-- device_status(request, room_id=None, device_id=None)
 
 @author: Domogik project
 @copyright: (C) 2007-2009 Domogik project
