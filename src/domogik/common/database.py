@@ -510,7 +510,7 @@ class DbHelper():
         if d_unit_of_stored_values is not None:
             device.unit_of_stored_values = d_unit_of_stored_values
         
-        self._session.update(device)
+        self._session.add(device)
         self._session.commit()
         return device
 
