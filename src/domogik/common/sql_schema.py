@@ -51,10 +51,10 @@ from sqlalchemy import types, create_engine, Table, Column, Integer, String, \
 from sqlalchemy.ext.declarative import declarative_base
 from domogik.common.configloader import Loader
 
-UNIT_OF_STORED_VALUE_LIST = ['Volt', 'Celsius', 'Farenheit', 'Percent', 'Boolean']
-DEVICE_TECHNOLOGY_TYPE_LIST = ['cpl', 'wired', 'wifi', 'wireless', 'ir']
-DEVICE_TYPE_LIST = ['appliance', 'lamp', 'music', 'sensor']
-SYSTEMSTATS_TYPE_LIST = ['HB_CLIENT', 'CORE']
+UNIT_OF_STORED_VALUE_LIST = [u'Volt', u'Celsius', u'Farenheit', u'Percent', u'Boolean']
+DEVICE_TECHNOLOGY_TYPE_LIST = [u'cpl', u'wired', u'wifi', u'wireless', u'ir']
+DEVICE_TYPE_LIST = [u'appliance', u'lamp', u'music', u'sensor']
+SYSTEMSTATS_TYPE_LIST = [u'HB_CLIENT', u'CORE']
 
 Base = declarative_base()
 metadata = Base.metadata
@@ -209,7 +209,7 @@ class DeviceTechnology(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(30), nullable=False)
     description = Column(String(100))
-    type = Column(Enum([u'cpl',u'wired',u'wifi',u'wireless',u'ir']))
+    type = Column(Enum(DEVICE_TECHNOLOGY_TYPE_LIST))
 
     def __init__(self, name, description, type):
         self.name = name
@@ -274,13 +274,13 @@ class Device(Base):
     address = Column(String(30), nullable=False)
     description = Column(String(100))
     technology_id = Column(Integer, ForeignKey('%s.id' % DeviceTechnology.get_tablename()))
-    type = Column(Enum([u'appliance',u'lamp',u'music',u'sensor']))
+    type = Column(Enum(DEVICE_TYPE_LIST))
     category_id = Column(Integer, ForeignKey('%s.id' % DeviceCategory.get_tablename()))
     room_id = Column(Integer, ForeignKey('%s.id' % Room.get_tablename()))
     is_resetable = Column(Boolean, nullable=False)
     initial_value = Column(String(10))
     is_value_changeable_by_user = Column(Boolean, nullable=False)
-    unit_of_stored_values = Column(Enum([u'Volt',u'Celsius',u'Fahrenheit',u'Percent',u'Boolean']))
+    unit_of_stored_values = Column(Enum(UNIT_OF_STORED_VALUE_LIST))
 
     def __init__(self, address, description, technology_id, type, category_id, room_id, \
         is_resetable, initial_value, is_value_changeable_by_user, unit_of_stored_values):

@@ -53,12 +53,13 @@ Implements
 # user_account
 ####
 
+
+import hashlib
+
 import sqlalchemy
 from sqlalchemy.ext.sqlsoup import SqlSoup
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
-
-import hashlib
 
 from domogik.common.configloader import Loader
 from domogik.common.sql_schema import Area, Device, DeviceCategory, DeviceConfig, \
@@ -75,12 +76,14 @@ class DbHelperException(Exception):
 
     def __init__(self, value):
         """
+        Class constructor
         @param value : value of the exception
         """
         self.value = value
 
     def __str__(self):
         """
+        Return the object representation
         @return value of the exception
         """
         return repr(self.value)
@@ -95,7 +98,11 @@ class DbHelper():
     _engine = None
     _session = None
 
-    def __init__(self):
+    def __init__(self, echo_output = False):
+        """
+        Class constructor
+        @param echo_output : if set to True displays sqlAlchemy queries (default set to False)
+        """
         cfg = Loader('database')
         config = cfg.load()
         db = dict(config[1])
@@ -110,7 +117,7 @@ class DbHelper():
 
         # Connecting to the database
         self._dbprefix = db['db_prefix']
-        self._engine = sqlalchemy.create_engine(url, echo=True)
+        self._engine = sqlalchemy.create_engine(url, echo = echo_output)
         Session = sessionmaker(bind=self._engine)
         self._session = Session()
 
@@ -328,7 +335,6 @@ class DbHelper():
         @param dtc_key : key of the device technology config
         @return a DeviceTechnologyConfig object
         """
-        #TODO : check that there is only one result
         return self._session.query(DeviceTechnologyConfig).filter_by(technology_id = dt_id)\
                                                           .filter_by(key = dtc_key)\
                                                           .first()
@@ -392,10 +398,7 @@ class DbHelper():
         @param d_id : The device id
         @return a Device object
         """
-        try: 
-            return self._session.query(Device).filter_by(id = d_id).one()
-        except MultipleResultFound, e:
-            raise DbHelperException("Database may be incoherent, there are several devices with id %s" % d_id)
+        return self._session.query(Device).filter_by(id = d_id).first()
 
     def add_device(self, d_address, d_technology_id, d_type, d_category_id, d_room_id, 
         d_description = None, d_is_resetable = False, d_initial_value = None,
@@ -507,7 +510,7 @@ class DbHelper():
         if d_unit_of_stored_values is not None:
             device.unit_of_stored_values = d_unit_of_stored_values
         
-        self._session.update(device)
+        self._session.add(device)
         self._session.commit()
         return device
 
@@ -679,10 +682,7 @@ class DbHelper():
         @param a_id : account id
         @return a SystemAccount object
         """
-        try: 
-            return self._session.query(SystemAccount).filter_by(id = a_id).one()
-        except MultipleResultFound, e:
-            raise DbHelperException("Database may be incoherent, there are several system accounts with id %s" % a_id)
+        return self._session.query(SystemAccount).filter_by(id = a_id).first()
 
     def add_system_account(self, a_login, a_password, a_is_admin = False):
         """
@@ -724,10 +724,7 @@ class DbHelper():
         @param u_id : user account id
         @return a UserAccount object
         """
-        try: 
-            return self._session.query(UserAccount).filter_by(id = u_id).one()
-        except MultipleResultFound, e:
-            raise DbHelperException("Database may be incoherent, there are several user accounts with id %s" % u_id)
+        return self._session.query(UserAccount).filter_by(id = u_id).first()
 
     def get_user_system_account(self, u_id):
         """
@@ -735,11 +732,7 @@ class DbHelper():
         @param u_id : The user (not system !) account id
         @return a SystemAccount object
         """
-        try:
-          user_account = self._session.query(UserAccount).filter_by(id = u_id).one()
-        except MultipleResultFound, e:
-            raise DbHelperException("Database may be incoherent, there are several user accounts with id %s" % u_id)
-
+        user_account = self._session.query(UserAccount).filter_by(id = u_id).first()
         if user_account is not None:
             try:
                 return self._session.query(SystemAccount).filter_by(id = user_account.system_account_id).one()
