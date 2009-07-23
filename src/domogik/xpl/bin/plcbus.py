@@ -95,13 +95,11 @@ class plcbusMain():
         '''
         General ack sending over xpl network
         '''
-        # TODO : need to be completed
         dt = localtime()
         mess = Message()
-        dt = strftime("%Y-%m-%d %H:%M:%S")
         mess.set_type("xpl-trig")
-        mess.set_schema("control.basic")
-        mess.set_data_key("datetime", dt)
+        mess.set_schema("sensor.basic")
+        mess.set_data_key("type", "plcbus")
         mess.set_data_key("command", cmd)
         mess.set_data_key("device", dev)
         self.__myplcbus.send(mess)
