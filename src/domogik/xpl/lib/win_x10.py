@@ -26,42 +26,11 @@ X10 technology support using serial a CM11 controller
 
 Implements
 ==========
-- X10Exception.__init__(self, value)
-- X10Exception.__str__(self)
-- X10Controler.__init__(self, serialConf)
-- X10Controler._open(self)
-- X10Controler._close(self)
-- X10Controler._read(self, count)
-- X10Controler._readline(self)
-- X10Controler._write(self, buff)
-- X10Controler.sendCmd(self, x10unit, func)
-- X10API.__init__(self, serialConf)
-- X10API._valid_item(self, item)
-- X10API._valid_house(self, house)
-- X10API._resolveUnit(self, *args)
-- X10API._send(self, cmd, item)
-- X10API._send_lvl(self, cmd, item, lvl)
-- X10API.on(self, item)
-- X10API.off(self, item)
-- X10API.house_on(self, house)
-- X10API.house_off(self, house)
-- X10API.bright(self, item, lvl)
-- X10API.brightb(self, item, lvl)
-- X10API.dim(self, item, lvl)
-- X10API.dimb(self, item, lvl)
-- X10API.lights_on(self, house)
-- X10API.lights_off(self, house)
-- X10Monitor.__init__(self, heyuconf)
-- X10Monitor.get_monitor(self)
-- X10Monitor.__init__(self, pipe)
-- X10Monitor.add_cb(self, cb)
-- X10Monitor.del_cb(self, cb)
-- X10Monitor.run(self)
-- X10Monitor._call_cbs(self, units, order, arg)
-- HeyuManager.__init__(path)
-- HeyuManager.load()
-- HeyuManager.restart()
-- HeyuManager.write()
+- class X10Exception
+- class X10Controler
+- class X10API
+- class X10Monitor
+- class HeyuManager
 
 @author: Dominique Pierre <dominique.pierre.jlm@orange.fr>
 @copyright: (C) 2007-2009 Domogik project
