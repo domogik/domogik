@@ -824,7 +824,7 @@ class DbHelper():
 
     def del_all_system_stats(self):
         """
-        Delete all stats for a device
+        Delete all stats of the system
         """
         system_stats = self._session.query(SystemStats).all()
         for system_stat in system_stats:
