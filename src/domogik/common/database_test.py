@@ -335,6 +335,9 @@ if __name__ == "__main__":
     l_stats = d.list_device_stats(device2.id)
     assert len(l_stats) == 1, \
           "device stats for device id %s should have 1 item. It has %s" % (device2.id, len(l_stats))
+    print_test("get_last_stat_of_device")
+    stat = d.get_last_stat_of_device(device1.id)
+    assert stat.value == "11", "Should get value '11' for last stat of device %s. Got %s instead" % (device1.id, stat.value)
     print_test("get_last_stat_of_devices")
     l_stats = d.get_last_stat_of_devices([device1.id, device2.id])
     assert len(l_stats) == 2, "last device stats should have 2 items. It has %s" % len(l_stats)

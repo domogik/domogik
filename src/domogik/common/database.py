@@ -599,6 +599,16 @@ class DbHelper():
         """
         return self._session.query(DeviceStats).filter_by(device_id = device_id).all()
 
+    def get_last_stat_of_device(self, d_device_id):
+        """
+        Fetch the last record of stats for a device
+        @param d_device_id : device id
+        @return a DeviceStat object
+        """
+        return self._session.query(DeviceStats)\
+                              .filter_by(device_id = d_device_id)\
+                              .order_by(sqlalchemy.desc(DeviceStats.date)).first()
+
     def get_last_stat_of_devices(self, device_list):
         """
         Fetch the last record for all devices in d_list
