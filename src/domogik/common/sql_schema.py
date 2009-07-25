@@ -179,12 +179,14 @@ class DeviceCategory(Base):
     __tablename__ = '%s_device_category' % _db_prefix
     id = Column(Integer, primary_key=True)
     name = Column(String(30), nullable=False)
+    description = Column(String(100))
 
-    def __init__(self, name):
+    def __init__(self, name, description):
         self.name = name
+        self.description = description
 
     def __repr__(self):
-        return "<DeviceCategory(id=%s, name='%s')>" % (self.id, self.name)
+        return "<DeviceCategory(id=%s, name='%s', desc='%s')>" % (self.id, self.name, self.description)
 
     @staticmethod
     def get_tablename():

@@ -240,7 +240,7 @@ class DbHelper():
         """
         return self._session.query(DeviceCategory).all()
 
-    def get_device_category_by_name(self, dc_name):
+    def get_device_category_by_name(self, dc_name,):
         """
         Return information about a device category
         @param dc_name : The device category name
@@ -248,13 +248,14 @@ class DbHelper():
         """
         return self._session.query(DeviceCategory).filter_by(name = dc_name).first()
 
-    def add_device_category(self, dc_name):
+    def add_device_category(self, dc_name, dc_description=None):
         """
         Add a device_category (temperature, heating, lighting, music, ...)
         @param dc_name : device category name
+        @param dc_description : The device category description
         @return a DeviceCategory (the newly created one)
         """
-        dc = DeviceCategory(name = dc_name)
+        dc = DeviceCategory(name=dc_name, description=dc_description)
         self._session.add(dc)
         self._session.commit()
         return dc
