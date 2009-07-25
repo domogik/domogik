@@ -94,16 +94,14 @@ class Enum(types.TypeDecorator):
         # in values
         size = max([len(v) for v in values if v is not None])
         super(Enum, self).__init__(size)        
-        
-        
+
     def process_bind_param(self, value, dialect):
         if self.empty_to_none and value is '':
             value = None
         if value not in self.values:
             raise exceptions.AssertionError('"%s" not in Enum.values' % value)
         return value
-        
-        
+
     def process_result_value(self, value, dialect):
         if self.strict and value not in self.values:
             raise exceptions.AssertionError('"%s" not in Enum.values' % value)
