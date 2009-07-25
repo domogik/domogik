@@ -402,6 +402,42 @@ class DbHelper():
         """
         return self._session.query(Device).filter_by(id = d_id).first()
 
+    def get_all_devices_of_room(self, d_room_id):
+        """
+        Return all the devices of a room
+        @param d_room_id: room id
+        @return a list of Device objects
+        """
+        return self._session.query(Device).filter_by(room_id = d_room_id).all()
+
+    def get_all_devices_of_area(self, d_area_id):
+        """
+        Return all the devices of an area
+        @param d_area_id : the area id
+        @return a list of Device objects
+        """
+        device_list = []
+        for room in self.get_all_rooms_of_area(d_area_id):
+            for device in self.get_all_devices_of_room(room.id):
+              device_list.append(device)
+        return device_list
+
+    def get_all_devices_of_category(self, dc_id):
+        """
+        Return all the devices of a category
+        @param dc_id: category id 
+        @return a list of Device objects
+        """
+        return self._session.query(Device).filter_by(category_id = dc_id).all()
+
+    def get_all_devices_of_technology(self, dt_id):
+        """
+        Returns all the devices of a technology
+        @param dt_id : technology id
+        @return a list of Device objects
+        """
+        return self._session.query(Device).filter_by(technology_id = dt_id).all()
+
     def add_device(self, d_name, d_address, d_technology_id, d_type, d_category_id, d_room_id, 
         d_description = None, d_reference = None, d_is_resetable = False, d_initial_value = None,
         d_is_value_changeable_by_user = False, d_unit_of_stored_values ='Percent'):
@@ -538,42 +574,6 @@ class DbHelper():
             self._session.delete(device_stats)
         self._session.delete(device)
         self._session.commit()
-
-    def get_all_devices_of_room(self, d_room_id):
-        """
-        Return all the devices of a room
-        @param d_room_id: room id
-        @return a list of Device objects
-        """
-        return self._session.query(Device).filter_by(room_id = d_room_id).all()
-
-    def get_all_devices_of_area(self, d_area_id):
-        """
-        Return all the devices of an area
-        @param d_area_id : the area id
-        @return a list of Device objects
-        """
-        device_list = []
-        for room in self.get_all_rooms_of_area(d_area_id):
-            for device in self.get_all_devices_of_room(room.id):
-              device_list.append(device)
-        return device_list
-
-    def get_all_devices_of_category(self, dc_id):
-        """
-        Return all the devices of a category
-        @param dc_id: category id 
-        @return a list of Device objects
-        """
-        return self._session.query(Device).filter_by(category_id = dc_id).all()
-
-    def get_all_devices_of_technology(self, dt_id):
-        """
-        Returns all the devices of a technology
-        @param dt_id : technology id
-        @return a list of Device objects
-        """
-        return self._session.query(Device).filter_by(technology_id = dt_id).all()
 
 ####
 # Device stats
