@@ -27,9 +27,18 @@ Defines the sql schema used by Domogik
 Implements
 ==========
 
-- Enum.__init__(self, values, empty_to_none=False, strict=False)
-- Enum.process_bind_param(self, value, dialect)
-- Enum.process_result_value(self, value, dialect)
+- class Enum(types.TypeDecorator) : enum stuff for sqlAlchemy
+- class Area(Base) : areas of the house (1st floor, ground...)
+- class Room(Base) : rooms of the house
+- class Deviceategory(Base) : temperature, lighting, heating, music...
+- class DeviceTechnology(Base) : cpl, wired, wireless, wifi, ir...
+- class DeviceTechnologyConfig(Base) : list of parameters for the device technology
+- class Device(Base) : devices which are manages by the automation system
+- class DeviceConfig(Base) : list of parameters for the device
+- class DeviceStats(Base) : statistics associated to the device (history of values stored)
+- class Trigger(Base) : to trigger an action when a condition is met
+- class SystemAccount(Base) : accounts to log into the app
+- class UserAccount(Base) : users
 
 @author: Marc SCHNEIDER <marc@domogik.org>
 @copyright: (C) 2007-2009 Domogik project
@@ -42,6 +51,10 @@ from sqlalchemy import types, create_engine, Table, Column, Integer, String, \
 from sqlalchemy.ext.declarative import declarative_base
 from domogik.common.configloader import Loader
 
+UNIT_OF_STORED_VALUE_LIST = [u'Volt', u'Celsius', u'Farenheit', u'Percent', u'Boolean']
+DEVICE_TECHNOLOGY_TYPE_LIST = [u'cpl', u'wired', u'wifi', u'wireless', u'ir']
+DEVICE_TYPE_LIST = [u'appliance', u'lamp', u'music', u'sensor']
+SYSTEMSTATS_TYPE_LIST = [u'HB_CLIENT', u'CORE']
 
 Base = declarative_base()
 metadata = Base.metadata
@@ -121,7 +134,7 @@ class Area(Base):
         self.description = description
 
     def __repr__(self):
-        return "<Area('%s', '%s')>" % (self.name, self.description)
+        return "<Area(id=%s, name='%s', desc='%s')>" % (self.id, self.name, self.description)
 
     @staticmethod
     def get_tablename():
@@ -139,15 +152,16 @@ class Room(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(30), nullable=False)
     description = Column(String(100))
-    area = Column(Integer, ForeignKey('%s.id' % Area.get_tablename()))
+    area_id = Column(Integer, ForeignKey('%s.id' % Area.get_tablename()))
 
-    def __init__(self, name, description, area):
+    def __init__(self, name, description, area_id):
         self.name = name
         self.description = description
-        self.area = area
+        self.area_id = area_id
 
     def __repr__(self):
-        return "<Room('%s', '%s')>" % (self.name, self.description)
+        return "<Room(id=%s, name='%s', desc='%s', area=%s)>" \
+          % (self.id, self.name, self.description, self.area_id)
 
     @staticmethod
     def get_tablename():
@@ -166,11 +180,11 @@ class DeviceCategory(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(30), nullable=False)
 
-    def __init__(self, name, description):
+    def __init__(self, name):
         self.name = name
 
     def __repr__(self):
-        return "<DeviceCategory('%s')>" % (self.name)
+        return "<DeviceCategory(id=%s, name='%s')>" % (self.id, self.name)
 
     @staticmethod
     def get_tablename():
@@ -195,7 +209,7 @@ class DeviceTechnology(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(30), nullable=False)
     description = Column(String(100))
-    type = Column(Enum([u'cpl',u'wired',u'wifi',u'wireless',u'ir']))
+    type = Column(Enum(DEVICE_TECHNOLOGY_TYPE_LIST))
 
     def __init__(self, name, description, type):
         self.name = name
@@ -203,7 +217,8 @@ class DeviceTechnology(Base):
         self.type = type
 
     def __repr__(self):
-        return "<DeviceTechnology('%s', '%s', '%s')>" % (self.name, self.description, self.type)
+        return "<DeviceTechnology(id=%s, name='%s', desc='%s', type='%s')>" \
+          % (self.id, self.name, self.description, self.type)
 
     @staticmethod
     def get_tablename():
@@ -220,17 +235,18 @@ class DeviceTechnology(Base):
 class DeviceTechnologyConfig(Base):
     __tablename__ = '%s_device_technology_config' % _db_prefix
     id = Column(Integer, primary_key=True)
-    technology = Column(Integer, ForeignKey('%s.id' % DeviceTechnology.get_tablename()))
+    technology_id = Column(Integer, ForeignKey('%s.id' % DeviceTechnology.get_tablename()))
     key = Column(String(30), nullable=False)
     value = Column(String(80), nullable=False)
 
-    def __init__(self, technology, key, value):
-        self.technology = technology
+    def __init__(self, technology_id, key, value):
+        self.technology_id = technology_id
         self.key = key
         self.value = value
 
     def __repr__(self):
-        return "<DeviceTechnologyConfig('%s', '%s')>" % (self.key, self.value)
+        return "<DeviceTechnologyConfig(id=%s, techno=%s, ('%s', '%s'))>" \
+          % (self.id, self.technology_id, self.key, self.value)
 
     @staticmethod
     def get_tablename():
@@ -257,30 +273,34 @@ class Device(Base):
     id = Column(Integer, primary_key=True)
     address = Column(String(30), nullable=False)
     description = Column(String(100))
-    technology = Column(Integer, ForeignKey('%s.id' % DeviceTechnology.get_tablename()))
-    type = Column(Enum([u'appliance',u'lamp',u'music',u'sensor']))
-    category = Column(Integer, ForeignKey('%s.id' % DeviceCategory.get_tablename()))
-    room = Column(Integer, ForeignKey('%s.id' % Room.get_tablename()))
+    technology_id = Column(Integer, ForeignKey('%s.id' % DeviceTechnology.get_tablename()))
+    type = Column(Enum(DEVICE_TYPE_LIST))
+    category_id = Column(Integer, ForeignKey('%s.id' % DeviceCategory.get_tablename()))
+    room_id = Column(Integer, ForeignKey('%s.id' % Room.get_tablename()))
     is_resetable = Column(Boolean, nullable=False)
     initial_value = Column(String(10))
     is_value_changeable_by_user = Column(Boolean, nullable=False)
-    unit_of_stored_values = Column(Enum([u'Volt',u'Celsius',u'Fahrenheit',u'Percent',u'Boolean']))
+    unit_of_stored_values = Column(Enum(UNIT_OF_STORED_VALUE_LIST))
 
-    def __init__(self, address, description, technology, type, category, room, \
+    def __init__(self, address, description, technology_id, type, category_id, room_id, \
         is_resetable, initial_value, is_value_changeable_by_user, unit_of_stored_values):
       self.address = address
       self.description = description
-      self.technology = technology
+      self.technology_id = technology_id
       self.type = type
-      self.category = category
-      self.room = room
+      self.category_id = category_id
+      self.room_id = room_id
       self.is_resetable = is_resetable
       self.initial_value = initial_value
       self.is_value_changeable_by_user = is_value_changeable_by_user
       self.unit_of_stored_values = unit_of_stored_values
 
     def __repr__(self):
-        return "<Device('%s', '%s')>" % (self.address, self.description)
+        return "<Device(id=%s, addr='%s', desc='%s', techno=%s, type='%s', cat=%s, \
+          room=%s, is_reset='%s', initial_val='%s', is_value_change='%s', unit='%s')>" \
+          % (self.id, self.address, self.description, self.technology_id, \
+             self.type, self.category_id, self.room_id, self.is_resetable, self.initial_value,\
+             self.is_value_changeable_by_user, self.unit_of_stored_values)
 
     @staticmethod
     def get_tablename():
@@ -297,17 +317,18 @@ class Device(Base):
 class DeviceConfig(Base):
     __tablename__ = '%s_device_config' % _db_prefix
     id = Column(Integer, primary_key=True)
-    device = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()))
+    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()))
     key = Column(String(30), nullable=False)
     value = Column(String(80), nullable=False)
 
-    def __init__(self, device, key, value):
-        self.device = device
+    def __init__(self, device_id, key, value):
+        self.device_id = device_id
         self.key = key
         self.value = value
 
     def __repr__(self):
-        return "<DeviceConfig('%s', '%s')>" % (self.key, self.value)
+        return "<DeviceConfig(id=%s, device=%s, ('%s', '%s'))>" \
+          % (self.id, self.device_id, self.key, self.value)
 
     @staticmethod
     def get_tablename():
@@ -323,17 +344,18 @@ class DeviceConfig(Base):
 class DeviceStats(Base):
     __tablename__ = '%s_device_stats' % _db_prefix
     id = Column(Integer, primary_key=True)
-    device = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()))
+    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()))
     date = Column(DateTime, nullable=False)
     value = Column(String(80), nullable=False)
 
-    def __init__(self, device, date, value):
-        self.device = device
+    def __init__(self, device_id, date, value):
+        self.device_id = device_id
         self.date = date
         self.value = value
 
     def __repr__(self):
-        return "<DeviceStats('%s', '%s')>" % (self.date, self.value)
+        return "<DeviceStats(id=%s, device=%s, date='%s', val='%s')>" \
+          % (self.id, self.device_id, self.date, self.value)
 
     @staticmethod
     def get_tablename():
@@ -342,7 +364,7 @@ class DeviceStats(Base):
 ###
 # Define triggers
 # name : The name of the rule
-# description : Long" description of the rule
+# description : Long description of the rule
 # rule : formatted trigger rule
 # result : list of xpl messages to send
 #
@@ -364,7 +386,8 @@ class Trigger(Base):
         self.result = result
 
     def __repr__(self):
-        return "<Trigger('%s', '%s', '%s')>" % (self.description, self.rule, self.result)
+        return "<Trigger(id=%s, desc='%s', rule='%s', result='%s')>" \
+          % (self.id, self.description, self.rule, self.result)
 
     @staticmethod
     def get_tablename():
@@ -387,12 +410,13 @@ class SystemAccount(Base):
     is_admin = Column(Boolean, nullable=False, default=False)
 
     def __init__(self, login, password, is_admin):
-        self.login = description
+        self.login = login
         self.password = password
         self.is_admin = is_admin
 
     def __repr__(self):
-        return "<SystemAccount('%s', '%s')>" % (self.login, self.is_admin)
+        return "<SystemAccount(id=%s, login='%s', pass='%s' is_admin='%s')>" \
+          % (self.id, self.login, self. password, self.is_admin)
 
     @staticmethod
     def get_tablename():
@@ -414,17 +438,48 @@ class UserAccount(Base):
     first_name = Column(String(50), nullable=False)
     last_name = Column(String(60), nullable=False)
     birthdate = Column(Date, nullable=False)
-    system_account = Column(Integer, ForeignKey('%s.id' % SystemAccount.get_tablename()))
+    system_account_id = Column(Integer, ForeignKey('%s.id' % SystemAccount.get_tablename()))
 
-    def __init__(self, first_name, last_name, birthdate, system_account):
+    def __init__(self, first_name, last_name, birthdate, system_account_id):
         self.first_name = first_name
         self.last_name = last_name
         self.birthdate = birthdate
-        self.system_account = system_account
+        self.system_account_id = system_account_id
 
     def __repr__(self):
-        return "<UserAccount('%s', '%s')>" % (self.first_name, self.last_name)
+        return "<UserAccount(id=%s, first_name='%s', last_name='%s', system_account=%s)>" \
+          % (self.id, self.first_name, self.last_name, self.system_account_id)
 
     @staticmethod
     def get_tablename():
         return UserAccount.__tablename__
+
+###
+# Stats for device's states
+# date : timestamp of the record
+# name : name of the record
+# type : type of the record
+# value : The vale of the device
+###
+
+class SystemStats(Base):
+    __tablename__ = '%s_system_stats' % _db_prefix
+    id = Column(Integer, primary_key=True)
+    name = Column(String(30), nullable=False)
+    date = Column(DateTime, nullable=False)
+    type = Column(Enum(SYSTEMSTATS_TYPE_LIST))
+    value = Column(String(80), nullable=False)
+
+    def __init__(self, name, date, type, value):
+        self.name = name
+        self.date = date
+        self.type = type
+        self.value = value
+
+    def __repr__(self):
+        return "<SystemStats(id=%s, name=%s, date=%s, type='%s', value='%s')>" \
+          % (self.id, self.name, self.date, self.type, self.value)
+
+    @staticmethod
+    def get_tablename():
+        return SystemStats.__tablename__
