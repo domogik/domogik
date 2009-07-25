@@ -143,7 +143,7 @@ class DbHelper():
         else:
             return None
 
-    def add_area(self, a_name, a_description):
+    def add_area(self, a_name, a_description=None):
         """
         Add an area
         @param a_name : area name
