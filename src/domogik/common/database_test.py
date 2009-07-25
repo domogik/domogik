@@ -264,6 +264,8 @@ if __name__ == "__main__":
                           d_is_resetable = True, d_initial_value = 30, 
                           d_is_value_changeable_by_user = False, d_unit_of_stored_values = u'Percent')
     assert len(d.list_devices()) == 1, "Device was NOT added"
+    assert device1.is_lamp(), "device1.is_lamp() returns False. Should have returned True"
+    assert not device1.is_appliance(), "device1.is_appliance() returns True. Should have returned False"
     print_test("update_device")
     device_id = device1.id
     device1 = d.update_device(d_id = device1.id, d_description = 'desc2')

@@ -309,6 +309,20 @@ class Device(Base):
       self.is_value_changeable_by_user = is_value_changeable_by_user
       self.unit_of_stored_values = unit_of_stored_values
 
+    def is_lamp(self):
+        """
+        Check if the device is a lamp
+        @return True or False
+        """
+        return self.type.lower() == u'lamp'
+
+    def is_appliance(self):
+        """
+        Check if the device is an appliance
+        @return True or False
+        """
+        return self.type.lower() == u'appliance'
+
     def __repr__(self):
         return "<Device(id=%s, name='%s', addr='%s', desc='%s', ref='%s', techno=%s, type='%s', cat=%s, \
           room=%s, is_reset='%s', initial_val='%s', is_value_change='%s', unit='%s')>" \
