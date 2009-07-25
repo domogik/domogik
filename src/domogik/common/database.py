@@ -147,7 +147,7 @@ class DbHelper():
         """
         Add an area
         @param a_name : area name
-        @param a_description : area detailled description (optional)
+        @param a_description : area detailed description (optional)
         @return an area object
         """
         area = Area(name = a_name, description = a_description)
@@ -196,7 +196,7 @@ class DbHelper():
         Add a room
         @param r_name : room name
         @param area_id : id of the area where the room is
-        @param r_description : room detailled description (optional)
+        @param r_description : room detailed description (optional)
         @return : a room object
         """
         try: 
