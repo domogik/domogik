@@ -154,7 +154,7 @@ class X10Controler:
         """
         return self._serialdevice.read(count)
 
-    def _readLine(self):
+    def _read_line(self):
         """
         Read bytes until '\n' is not received.
         @Return a string containing the bytes read
@@ -168,7 +168,7 @@ class X10Controler:
         """
         self._serialdevice.write(buffer)
 
-    def sendCmd(self, x10unit, func):
+    def send_cmd(self, x10unit, func):
         """
         Send an X10 commmand over the serial line.
 
@@ -361,7 +361,7 @@ class X10API:
         @param item : the item to send the ON order to
         @Return True if order was sent, False in case of errors
         """
-        self._controler.sendCmd(apply(self._resolveUnit, unitArgs), X10API.funcToX10['ON'])
+        self._controler.send_cmd(apply(self._resolveUnit, unitArgs), X10API.funcToX10['ON'])
 
     def off(self, *unitArgs):
         """
@@ -369,7 +369,7 @@ class X10API:
         @param item : the item to send the OFF order to
         @Return True if order was sent, False in case of errors
         """
-        self._controler.sendCmd(apply(self._resolveUnit, unitArgs), X10API.funcToX10['OFF'])
+        self._controler.send_cmd(apply(self._resolveUnit, unitArgs), X10API.funcToX10['OFF'])
 
     def house_on(self, *unitArgs):
         """
@@ -377,7 +377,7 @@ class X10API:
         @param item : the item to send the ALLON order to
         @Return True if order was sent, False in case of errors
         """
-        self._controler.sendCmd(apply(self._resolveUnit, unitArgs), X10API.funcToX10['ALL_LIGHTS_ON'])
+        self._controler.send_cmd(apply(self._resolveUnit, unitArgs), X10API.funcToX10['ALL_LIGHTS_ON'])
 
     def house_off(self, *unitArgs):
         """
@@ -385,7 +385,7 @@ class X10API:
         @param house: the item to send the ALLOFF order to
         @Return True if order was sent, False in case of errors
         """
-        self._controler.sendCmd(apply(self._resolveUnit, unitArgs), X10API.funcToX10['ALL_LIGHTS_OFF'])
+        self._controler.send_cmd(apply(self._resolveUnit, unitArgs), X10API.funcToX10['ALL_LIGHTS_OFF'])
 
     def bright(self, *unitArgs):
         """
@@ -394,7 +394,7 @@ class X10API:
         @param lvl : bright level in percent
         @Return True if order was sent, False in case of errors
         """
-        self._controler.sendCmd(apply(self._resolveUnit, unitArgs), X10API.funcToX10['BRIGHT'])
+        self._controler.send_cmd(apply(self._resolveUnit, unitArgs), X10API.funcToX10['BRIGHT'])
 
     def brightb(self, *unitArgs):
         '''
@@ -403,8 +403,8 @@ class X10API:
         @param lvl : bright level in percent
         @Return True if order was sent, False in case of errors
         '''
-        self._controler.sendCmd(apply(self._resolveUnit, (unitArgs[0], '23')), X10API.funcToX10['DIM'])
-        self._controler.sendCmd(apply(self._resolveUnit, unitArgs), X10API.funcToX10['BRIGHT'])
+        self._controler.send_cmd(apply(self._resolveUnit, (unitArgs[0], '23')), X10API.funcToX10['DIM'])
+        self._controler.send_cmd(apply(self._resolveUnit, unitArgs), X10API.funcToX10['BRIGHT'])
 
     def dim(self, *unitArgs):
         '''
@@ -413,7 +413,7 @@ class X10API:
         @param lvl : dim level in percent
         @Return True if order was sent, False in case of errors
         '''
-        self._controler.sendCmd(apply(self._resolveUnit, unitArgs), X10API.funcToX10['DIM'])
+        self._controler.send_cmd(apply(self._resolveUnit, unitArgs), X10API.funcToX10['DIM'])
 
     def dimb(self, *unitArgs):
         '''
@@ -422,8 +422,8 @@ class X10API:
         @param lvl : dim level in percent
         @Return True if order was sent, False in case of errors
         '''
-        self._controler.sendCmd(apply(self._resolveUnit, (unitArgs[0], '23')), X10API.funcToX10['BRIGHT'])
-        self._controler.sendCmd(apply(self._resolveUnit, unitArgs), X10API.funcToX10['DIM'])
+        self._controler.send_cmd(apply(self._resolveUnit, (unitArgs[0], '23')), X10API.funcToX10['BRIGHT'])
+        self._controler.send_cmd(apply(self._resolveUnit, unitArgs), X10API.funcToX10['DIM'])
 
     def lights_on(self, *unitArgs):
         """
@@ -431,7 +431,7 @@ class X10API:
         @param item : the house to send the lights_on order to
         @Return True if order was sent, False in case of errors
         """
-        self._controler.sendCmd(apply(self._resolveUnit, unitArgs), X10API.funcToX10['ALL_LIGHTS_ON'])
+        self._controler.send_cmd(apply(self._resolveUnit, unitArgs), X10API.funcToX10['ALL_LIGHTS_ON'])
 
     def lights_off(self, *unitArgs):
         """
@@ -439,7 +439,7 @@ class X10API:
         @param house: the house to send the lightsoff order to
         @Return True if order was sent, False in case of errors
         """
-        self._controler.sendCmd(apply(self._resolveUnit, unitArgs), X10API.funcToX10['ALL_LIGHTS_OFF'])
+        self._controler.send_cmd(apply(self._resolveUnit, unitArgs), X10API.funcToX10['ALL_LIGHTS_OFF'])
 
 
 class X10Monitor:
