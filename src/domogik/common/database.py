@@ -57,7 +57,6 @@ Implements
 import hashlib
 
 import sqlalchemy
-from sqlalchemy.ext.sqlsoup import SqlSoup
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
@@ -380,7 +379,7 @@ class DbHelper():
         """
         return self._session.query(Device).all()
 
-    def find_devices(self, **filters):
+    def search_devices(self, **filters):
         """
         Look for device(s) with filter on their attributes
         @param filters :  filter fields can be one of id, address, type, room, initial_value, 
@@ -392,6 +391,20 @@ class DbHelper():
             filter_arg = "%s = '%s'" % (filter, filters[filter])
             device_list = device_list.filter(filter_arg)
 
+        return device_list.all()
+
+    def find_devices(self, room_id_list, category_id_list):
+        """
+        Look for devices that have at least 1 item in room_id_list AND 1 item in category_id_list
+        @param room_id_list : list of room ids
+        @param category_id_list : list of category ids
+        @return a list of DeviceObject items
+        """
+        device_list = self._session.query(Device)
+        if room_id_list is not None:
+            device_list = device_list.filter(Device.room_id.in_(room_id_list))
+        if category_id_list is not None:
+            device_list = device_list.filter(Device.category_id.in_(category_id_list))
         return device_list.all()
 
     def get_device(self, d_id):

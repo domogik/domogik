@@ -258,6 +258,7 @@ if __name__ == "__main__":
     room2 = d.add_room('room2', area2.id)
     dt1 = d.add_device_technology('dt1', 'desc dt1', u'cpl')
     dc1 = d.add_device_category('dc1')
+    dc2 = d.add_device_category('dc2')
     device1 = d.add_device(d_name='device1', d_address = 'A1', d_technology_id = dt1.id, d_type = u'lamp', 
                           d_category_id = dc1.id, d_room_id = room1.id, d_description = 'desc1', 
                           d_is_resetable = True, d_initial_value = 30, 
@@ -273,7 +274,7 @@ if __name__ == "__main__":
     device2 = d.add_device(d_name='device2', d_address='A2', d_technology_id=dt1.id, d_type = u'appliance',
                           d_category_id=dc1.id, d_room_id=room1.id)
     device3 = d.add_device(d_name='device3', d_address='A3', d_technology_id=dt1.id, d_type = u'appliance',
-                          d_category_id=dc1.id, d_room_id=room2.id)
+                          d_category_id=dc2.id, d_room_id=room2.id)
     assert len(d.list_devices()) == 3, "Device list should have 3 items, but it has %s" % d.list_devices()
     assert len(d.get_all_devices_of_room(room1.id)) == 2, \
               "Room id %s should have 2 devices but has %s" % (room1.id, len(d.get_all_devices_of_room(room1.id)))
@@ -283,13 +284,26 @@ if __name__ == "__main__":
               "Area id %s should have 2 devices but has %s" % (area1.id, len(d.get_all_devices_of_area(area1.id)))
     assert len(d.get_all_devices_of_area(area2.id)) == 1, \
               "Area id %s should have 1 device but has %s" % (area2.id, len(d.get_all_devices_of_area(area2.id)))
-    print_test("find_devices")
-    nb_of_dev = len(d.find_devices(category_id = dc1.id, room_id = room1.id))
+    print_test("search_devices")
+    nb_of_dev = len(d.search_devices(category_id = dc1.id, room_id = room1.id))
     assert nb_of_dev == 2, "Should have found 2 devices, but found %s" % nb_of_dev
-    nb_of_dev = len(d.find_devices(address = 'A2'))
+    nb_of_dev = len(d.search_devices(address = 'A2'))
     assert nb_of_dev == 1, "Should have found 1 device, but found %s" % nb_of_dev
-    nb_of_dev = len(d.find_devices(address = 'A1544'))
+    nb_of_dev = len(d.search_devices(address = 'A1544'))
     assert nb_of_dev == 0, "Should have found 0 device, but found %s" % nb_of_dev
+    print_test("find_devices")
+    device_list = d.find_devices(None, None)
+    assert len(device_list) == 3, "Should have found 3 devices, but found %s" % len(device_list)
+    device_list = d.find_devices([room1.id, room2.id], [dc1.id, dc2.id])
+    assert len(device_list) == 3, "Should have found 3 devices, but found %s" % len(device_list)
+    device_list = d.find_devices([room1.id], [dc1.id, dc2.id])
+    assert len(device_list) == 2, "Should have found 2 devices, but found %s" % len(device_list)
+    device_list = d.find_devices([room2.id], None)
+    assert len(device_list) == 1, "Should have found 1 device, but found %s" % len(device_list)
+    device_list = d.find_devices([room1.id], [dc2.id])
+    assert len(device_list) == 0, "Should have found NO device, but found %s" % len(device_list)
+    device_list = d.find_devices([room1.id, room2.id], [dc2.id])
+    assert len(device_list) == 1, "Should have found 1 device, but found %s" % len(device_list)
     print_test("del_device")
     d.del_device(device2.id)
     assert len(d.list_devices()) == 2, "Found %s device(s), should be %s" % (d.list_devices(), 1)
