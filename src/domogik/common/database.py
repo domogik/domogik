@@ -436,7 +436,7 @@ class DbHelper():
         except NoResultFound, e:
             raise DbHelperException("Couldn't add device with technology id %s. It does not exist" % d_technology_id)
 
-        if d_unit_of_stored_values is not None and d_unit_of_stored_values not in UNIT_OF_STORED_VALUE_LIST:
+        if d_unit_of_stored_values not in UNIT_OF_STORED_VALUE_LIST:
             raise ValueError, "d_unit_of_stored_values must be one of %s" % UNIT_OF_STORED_VALUE_LIST
         if d_type not in DEVICE_TYPE_LIST:
             raise ValueError, "d_type must be one of %s" % DEVICE_TYPE_LIST

@@ -54,7 +54,7 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from domogik.common.configloader import Loader
 
-UNIT_OF_STORED_VALUE_LIST = [u'Volt', u'Celsius', u'Farenheit', u'Percent', u'Boolean']
+UNIT_OF_STORED_VALUE_LIST = [u'Volt', u'Celsius', u'Farenheit', u'Percent', u'Boolean', None]
 DEVICE_TECHNOLOGY_TYPE_LIST = [u'cpl', u'wired', u'wifi', u'wireless', u'ir']
 DEVICE_TYPE_LIST = [u'appliance', u'lamp', u'music', u'sensor']
 SYSTEMSTATS_TYPE_LIST = [u'HB_CLIENT', u'CORE']
