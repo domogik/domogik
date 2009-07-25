@@ -46,9 +46,12 @@ Implements
 @organization: Domogik
 """
 
+from exceptions import AssertionError
+
 from sqlalchemy import types, create_engine, Table, Column, Integer, String, \
       MetaData, ForeignKey, Boolean, DateTime, Date, Text
 from sqlalchemy.ext.declarative import declarative_base
+
 from domogik.common.configloader import Loader
 
 UNIT_OF_STORED_VALUE_LIST = [u'Volt', u'Celsius', u'Farenheit', u'Percent', u'Boolean']
@@ -85,7 +88,7 @@ class Enum(types.TypeDecorator):
         """
 
         if values is None or len(values) is 0:
-            raise exceptions.AssertionError('Enum requires a list of values')
+            raise AssertionError('Enum requires a list of values')
         self.empty_to_none = empty_to_none
         self.strict = strict
         self.values = values[:]
@@ -99,12 +102,12 @@ class Enum(types.TypeDecorator):
         if self.empty_to_none and value is '':
             value = None
         if value not in self.values:
-            raise exceptions.AssertionError('"%s" not in Enum.values' % value)
+            raise AssertionError('"%s" not in Enum.values' % value)
         return value
 
     def process_result_value(self, value, dialect):
         if self.strict and value not in self.values:
-            raise exceptions.AssertionError('"%s" not in Enum.values' % value)
+            raise AssertionError('"%s" not in Enum.values' % value)
         return value
 
 #Define objects
