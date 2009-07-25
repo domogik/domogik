@@ -393,7 +393,7 @@ class DbHelper():
 
         return device_list.all()
 
-    def find_devices(self, room_id_list, category_id_list):
+    def find_devices(self, d_room_id_list, d_category_id_list):
         """
         Look for devices that have at least 1 item in room_id_list AND 1 item in category_id_list
         @param room_id_list : list of room ids
@@ -401,10 +401,10 @@ class DbHelper():
         @return a list of DeviceObject items
         """
         device_list = self._session.query(Device)
-        if room_id_list is not None:
-            device_list = device_list.filter(Device.room_id.in_(room_id_list))
-        if category_id_list is not None:
-            device_list = device_list.filter(Device.category_id.in_(category_id_list))
+        if d_room_id_list is not None:
+            device_list = device_list.filter(Device.room_id.in_(d_room_id_list))
+        if d_category_id_list is not None:
+            device_list = device_list.filter(Device.category_id.in_(d_category_id_list))
         return device_list.all()
 
     def get_device(self, d_id):
