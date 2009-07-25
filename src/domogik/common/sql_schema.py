@@ -259,6 +259,7 @@ class DeviceTechnologyConfig(Base):
 # name : The short (30 char max) name of the device
 # address : The device address (like 'a3' for x10, or '01.123456789ABC' for 1wire)
 # description : Explain what this device is used to
+# reference : device reference (ex. AM12 for x10 devices)
 # technology : Device technology (foreign key)
 # type: One of 'appliance','lamp','music'
 # category : Device category (foreign key)
@@ -273,8 +274,10 @@ class DeviceTechnologyConfig(Base):
 class Device(Base):
     __tablename__ = '%s_device' % _db_prefix
     id = Column(Integer, primary_key=True)
+    name = Column(String(30), nullable=False)
     address = Column(String(30), nullable=False)
     description = Column(String(100))
+    reference = Column(String(30))
     technology_id = Column(Integer, ForeignKey('%s.id' % DeviceTechnology.get_tablename()))
     type = Column(Enum(DEVICE_TYPE_LIST))
     category_id = Column(Integer, ForeignKey('%s.id' % DeviceCategory.get_tablename()))
@@ -284,10 +287,12 @@ class Device(Base):
     is_value_changeable_by_user = Column(Boolean, nullable=False)
     unit_of_stored_values = Column(Enum(UNIT_OF_STORED_VALUE_LIST))
 
-    def __init__(self, address, description, technology_id, type, category_id, room_id, \
+    def __init__(self, name, address, description, reference, technology_id, type, category_id, room_id, \
         is_resetable, initial_value, is_value_changeable_by_user, unit_of_stored_values):
+      self.name = name
       self.address = address
       self.description = description
+      self.reference = reference
       self.technology_id = technology_id
       self.type = type
       self.category_id = category_id
@@ -298,9 +303,9 @@ class Device(Base):
       self.unit_of_stored_values = unit_of_stored_values
 
     def __repr__(self):
-        return "<Device(id=%s, addr='%s', desc='%s', techno=%s, type='%s', cat=%s, \
+        return "<Device(id=%s, name='%s', addr='%s', desc='%s', ref='%s', techno=%s, type='%s', cat=%s, \
           room=%s, is_reset='%s', initial_val='%s', is_value_change='%s', unit='%s')>" \
-          % (self.id, self.address, self.description, self.technology_id, \
+          % (self.id, self.name, self.address, self.description, self.reference, self.technology_id, \
              self.type, self.category_id, self.room_id, self.is_resetable, self.initial_value,\
              self.is_value_changeable_by_user, self.unit_of_stored_values)
 

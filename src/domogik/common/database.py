@@ -401,17 +401,19 @@ class DbHelper():
         """
         return self._session.query(Device).filter_by(id = d_id).first()
 
-    def add_device(self, d_address, d_technology_id, d_type, d_category_id, d_room_id, 
-        d_description = None, d_is_resetable = False, d_initial_value = None,
+    def add_device(self, d_name, d_address, d_technology_id, d_type, d_category_id, d_room_id, 
+        d_description = None, d_reference = None, d_is_resetable = False, d_initial_value = None,
         d_is_value_changeable_by_user = False, d_unit_of_stored_values ='Percent'):
         """
         Add a device item
+        @param d_name : name of the device
         @param d_address : address (ex : 'A3' for x10/plcbus, '111.111111111' for 1wire)
         @param d_technology_id : technology id
         @param d_type : One of 'appliance','light','music','sensor'
         @param d_category_id : category id
         @param d_room_id : room id
         @param d_description : Extended item description (100 char max)
+        @param d_reference : device reference (ex. AM12 for x10)
         @param d_is_resetable : Can the item be reseted to some initial state
         @param d_initial_value : What's the initial value of the item, should be 
             the state when the item is created (except for sensors, music)
@@ -438,8 +440,8 @@ class DbHelper():
         if d_type not in DEVICE_TYPE_LIST:
             raise ValueError, "d_type must be one of %s" % DEVICE_TYPE_LIST
 
-        device = Device(address = d_address, description = d_description, 
-                        technology_id = d_technology_id, type = d_type, 
+        device = Device(name = d_name, address = d_address, description = d_description, 
+                        reference = d_reference, technology_id = d_technology_id, type = d_type, 
                         category_id = d_category_id, room_id = d_room_id, 
                         is_resetable = d_is_resetable, initial_value = d_initial_value, 
                         is_value_changeable_by_user = d_is_value_changeable_by_user, 
@@ -448,8 +450,8 @@ class DbHelper():
         self._session.commit()
         return device
 
-    def update_device(self, d_id, d_address = None, d_technology_id = None, d_type = None, 
-        d_category_id = None, d_room_id = None, d_description = None, d_is_resetable = None, 
+    def update_device(self, d_id, d_name = None, d_address = None, d_technology_id = None, d_type = None, 
+        d_category_id = None, d_room_id = None, d_description = None, d_reference = None, d_is_resetable = None, 
         d_initial_value = None, d_is_value_changeable_by_user = None, d_unit_of_stored_values = None):
         """
         Update a device item
@@ -478,6 +480,8 @@ class DbHelper():
         if device is None:
             raise DbHelperException("Device with id %s couldn't be found" % d_id)
 
+        if d_name is not None:
+            device.name = d_name
         if d_address is not None:
             device.address = d_address
         if d_technology_id is not None:
@@ -488,6 +492,8 @@ class DbHelper():
                 raise DbHelperException("Couldn't update device with technology id %s. It does not exist" % d_technology_id)
         if d_description is not None:
             device.description = d_description
+        if d_reference is not None:
+            device.reference = d_reference
         if d_type is not None:
             device.type = d_type
         if d_category_id is not None:

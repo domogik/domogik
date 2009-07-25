@@ -257,7 +257,7 @@ if __name__ == "__main__":
     room2 = d.add_room('room2', area2.id)
     dt1 = d.add_device_technology('dt1', 'desc dt1', u'cpl')
     dc1 = d.add_device_category('dc1')
-    device1 = d.add_device(d_address = 'A1', d_technology_id = dt1.id, d_type = u'lamp', 
+    device1 = d.add_device(d_name='device1', d_address = 'A1', d_technology_id = dt1.id, d_type = u'lamp', 
                           d_category_id = dc1.id, d_room_id = room1.id, d_description = 'desc1', 
                           d_is_resetable = True, d_initial_value = 30, 
                           d_is_value_changeable_by_user = False, d_unit_of_stored_values = u'Percent')
@@ -269,9 +269,9 @@ if __name__ == "__main__":
     device1 = d.get_device(device_id)
     assert device1.description == 'desc2',\
           "Device desc. was NOT changed : should be 'desc2' but is '%s'" % device1.description
-    device2 = d.add_device(d_address='A2', d_technology_id=dt1.id, d_type = u'appliance',
+    device2 = d.add_device(d_name='device2', d_address='A2', d_technology_id=dt1.id, d_type = u'appliance',
                           d_category_id=dc1.id, d_room_id=room1.id)
-    device3 = d.add_device(d_address='A3', d_technology_id=dt1.id, d_type = u'appliance',
+    device3 = d.add_device(d_name='device3', d_address='A3', d_technology_id=dt1.id, d_type = u'appliance',
                           d_category_id=dc1.id, d_room_id=room2.id)
     assert len(d.list_devices()) == 3, "Device list should have 3 items, but it has %s" % d.list_devices()
     assert len(d.get_all_devices_of_room(room1.id)) == 2, \
@@ -302,11 +302,11 @@ if __name__ == "__main__":
     dc1 = d.add_device_category("lighting")
     area1 = d.add_area('area1','description 1')
     room1 = d.add_room('room1', area1.id)
-    device1 = d.add_device(d_address = "A1", d_technology_id = dt1.id, d_type = u"lamp", 
+    device1 = d.add_device(d_name='device1', d_address = "A1", d_technology_id = dt1.id, d_type = u"lamp", 
                           d_category_id = dc1.id, d_room_id = room1.id)
-    device2 = d.add_device(d_address = "A2", d_technology_id = dt1.id, d_type = u"lamp", 
+    device2 = d.add_device(d_name='device2', d_address = "A2", d_technology_id = dt1.id, d_type = u"lamp", 
                           d_category_id = dc1.id, d_room_id = room1.id)
-    device3 = d.add_device(d_address = "A3", d_technology_id = dt1.id, d_type = u"lamp", 
+    device3 = d.add_device(d_name='device3', d_address = "A3", d_technology_id = dt1.id, d_type = u"lamp", 
                           d_category_id = dc1.id, d_room_id = room1.id)
     print_test("add_device_stat")
     now = datetime.datetime.now()
