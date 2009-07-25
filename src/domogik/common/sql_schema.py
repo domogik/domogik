@@ -490,3 +490,32 @@ class SystemStats(Base):
     @staticmethod
     def get_tablename():
         return SystemStats.__tablename__
+
+
+###
+# Configuration parameters for the system
+# This table contains only one row
+# simulation_mode : True if the system is running in simulation mode
+# admin_mode : True if the system is running in administrator mode
+# debug_mode : True if the system is running in debug mode
+###
+
+class SystemConfig(Base):
+    __tablename__ = '%s_system_config' % _db_prefix
+    id = Column(Integer, primary_key=True)
+    simulation_mode = Column(Boolean, nullable=False, default=False)
+    admin_mode = Column(Boolean, nullable=False, default=False)
+    debug_mode = Column(Boolean, nullable=False, default=False)
+
+    def __init__(self, simulation_mode, admin_mode, debug_mode):
+        self.simulation_mode = simulation_mode
+        self.admin_mode = admin_mode
+        self.debug_mode = debug_mode
+
+    def __repr__(self):
+        return "<SystemConfig(id=%s, simulation=%s, admin=%s, debug=%s)>" \
+          % (self.id, self.simulation_mode, self.admin_mode, self.debug_mode)
+
+    @staticmethod
+    def get_tablename():
+        return SystemConfig.__tablename__

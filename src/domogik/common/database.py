@@ -64,7 +64,8 @@ from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 from domogik.common.configloader import Loader
 from domogik.common.sql_schema import Area, Device, DeviceCategory, DeviceConfig, \
                                       DeviceStats, DeviceTechnology, DeviceTechnologyConfig, \
-                                      Room, UserAccount, SystemAccount, SystemStats, Trigger
+                                      Room, UserAccount, SystemAccount, SystemConfig, \
+                                      SystemStats, Trigger
 from domogik.common.sql_schema import DEVICE_TECHNOLOGY_TYPE_LIST, DEVICE_TYPE_LIST, SYSTEMSTATS_TYPE_LIST, \
                                       UNIT_OF_STORED_VALUE_LIST
 
@@ -743,7 +744,7 @@ class DbHelper():
         if user_account is not None:
             try:
                 return self._session.query(SystemAccount).filter_by(id = user_account.system_account_id).one()
-            except MultipleResultFound, e:
+            except MultipleResultsFound, e:
                 raise DbHelperException("Database may be incoherent, user with id %s has more than one account" % u_id)
 
         else:
@@ -837,3 +838,41 @@ class DbHelper():
         for system_stat in system_stats:
             self._session.delete(system_stat)
         self._session.commit()
+
+###
+# SystemConfig
+###
+    def get_system_config(self):
+        """
+        Get current system configuration
+        @return a SystemConfig object
+        """
+        try:
+            return self._session.query(SystemConfig).one()
+        except MultipleResultsFound, e:
+            raise DbHelperException("Error : SystemConfig has more than one line")
+        except NoResultFound, e:
+            pass
+
+    def update_system_config(self, s_simulation_mode=None, s_admin_mode=None, s_debug_mode=None):
+        """
+        Update (or create) system configuration
+        @param s_simulation_mode : True if the system is running in simulation mode
+        @param s_admin_mode : True if the system is running in administrator mode
+        @param s_debug_mode : True if the system is running in debug mode
+        @return a SystemConfig object
+        """
+        system_config = self.get_system_config()
+        if system_config is not None:
+            if s_simulation_mode is not None:
+                system_config.simulation_mode = s_simulation_mode
+            if s_admin_mode is not None:
+                system_config.admin_mode = s_admin_mode
+            if s_debug_mode is not None:
+                system_config.debug_mode = s_debug_mode
+        else:
+            system_config = SystemConfig(simulation_mode=s_simulation_mode, 
+                                        admin_mode=s_admin_mode, debug_mode=s_debug_mode)
+        self._session.add(system_config)
+        self._session.commit()
+        return system_config

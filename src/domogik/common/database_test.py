@@ -42,7 +42,8 @@ import datetime
 from domogik.common.database import DbHelper, DbHelperException
 from domogik.common.sql_schema import Area, Device, DeviceCategory, DeviceConfig, \
                                       DeviceStats, DeviceTechnology, DeviceTechnologyConfig, \
-                                      Room, UserAccount, SystemAccount, SystemStats, Trigger
+                                      Room, UserAccount, SystemAccount, SystemConfig, \
+                                      SystemStats, Trigger
 from domogik.common.sql_schema import SYSTEMSTATS_TYPE_LIST
 
 def print_title(title):
@@ -428,5 +429,19 @@ if __name__ == "__main__":
     print_test("del_system_stat")
     d.del_system_stat("sstat0")
     assert len(d.list_system_stats()) == 3, "List of system stats should have 3 items : %s" % d.list_system_stats()
+
+    ### System config
+    print_title("System config")
+    print_test("update_system_config (create)")
+    system_config = d.update_system_config(s_simulation_mode=True, s_admin_mode=True, s_debug_mode=True)
+    assert system_config.simulation_mode, "System should be in simulation mode but it is NOT"
+    assert system_config.admin_mode, "System should be in admin mode but it is NOT"
+    assert system_config.debug_mode, "System should be in debug mode but it is NOT"
+    print_test("update_system_config (update)")
+    system_config = d.update_system_config(s_admin_mode=False)
+    assert not system_config.admin_mode, "System shouldn't be in admin mode, but it IS"
+    print_test("get_system_config")
+    system_config = d.get_system_config()
+    assert system_config.debug_mode, "System should be in debug mode but it is NOT"
 
     print_test('*********** All tests successfully passed! ***********')
