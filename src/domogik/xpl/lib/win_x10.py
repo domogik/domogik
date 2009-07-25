@@ -63,7 +63,7 @@ class X10Controller:
     """
     This class implements the low level acces to a CM11 controller thru a serial port,
     requieres PySerial.
-	"""
+    """
 
     def __init__(self, serialConf):
         l = logger.Logger('x10API')
@@ -76,10 +76,10 @@ class X10Controller:
         self._timeout = serialConf['timeout']
         self._serialdevice = serial.Serial()
 
-		# Port
+        # Port
         self._serialdevice.setPort(serialConf['port'])
 
-		# Speed
+        # Speed
         self._serialdevice.setBaudrate(serialConf['speed'])
 
         # Timeout
@@ -108,11 +108,11 @@ class X10Controller:
         # Open the serial device
         self._serialdevice.open()
 
-		# Check whether the CM11 has something to tell or not
+        # Check whether the CM11 has something to tell or not
         self._serialdevice.setTimeout(2)
         buff = self._serialdevice.read()
 
-		# Restore timeout
+        # Restore timeout
         self._serialdevice.setTimeout(self._timeout)
 
         # Check whether the CM11 is gone in power fail or not
@@ -172,7 +172,7 @@ class X10Controller:
         """
         Send an X10 commmand over the serial line.
 
-		The command is encoded as the raw Cm11 house, unit & function codes.
+        The command is encoded as the raw Cm11 house, unit & function codes.
         Extended protocol not yet supported.
 
         @param x10unit : a tuple containing the house code, the unit address and the dimming level
@@ -182,7 +182,7 @@ class X10Controller:
 
         self._lock.acquire()
 
-		# Unpack tuple
+        # Unpack tuple
         house, unit, dimLvl = x10unit
 
         currentUnit = (house << 4) | unit
@@ -285,8 +285,8 @@ class X10API:
 
     def __init__(self, heyuconf):
         self._serialconf = {'port':0,
-		                    'speed':4800,
-		                    'timeout':15,
+                            'speed':4800,
+                            'timeout':15,
                             'parity':serial.PARITY_NONE,
                             'stop_bits':serial.STOPBITS_ONE,
                             'byte_size':serial.EIGHTBITS}
@@ -328,7 +328,7 @@ class X10API:
         device is 1-16.
         @param item : the method arguments
         @Return a tuple containing the house code, the device code and the dimming level
-		"""
+        """
 
         errString = 'Parse args: '
         house, device, dimLevel = None, 1, 0
