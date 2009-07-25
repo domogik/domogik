@@ -591,13 +591,13 @@ class DbHelper():
 ####
 # Device stats
 ####
-    def list_device_stats(self, device_id):
+    def list_device_stats(self, d_device_id):
         """
         Return a list of all stats for a device
-        @param device_id : the device id
+        @param d_device_id : the device id
         @return a list of DeviceStats objects
         """
-        return self._session.query(DeviceStats).filter_by(device_id = device_id).all()
+        return self._session.query(DeviceStats).filter_by(device_id = d_device_id).all()
 
     def get_last_stat_of_device(self, d_device_id):
         """
