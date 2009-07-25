@@ -147,7 +147,7 @@ class DbHelper():
         """
         Add an area
         @param a_name : area name
-        @param a_description : area detailled description
+        @param a_description : area detailled description (optional)
         @return an area object
         """
         area = Area(name = a_name, description = a_description)
@@ -191,12 +191,12 @@ class DbHelper():
         else:
             return None
 
-    def add_room(self, r_name, r_description, r_area_id):
+    def add_room(self, r_name, r_area_id, r_description=None):
         """
         Add a room
         @param r_name : room name
         @param area_id : id of the area where the room is
-        @param r_description : room detailled description
+        @param r_description : room detailled description (optional)
         @return : a room object
         """
         try: 

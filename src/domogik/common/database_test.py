@@ -157,9 +157,9 @@ if __name__ == "__main__":
     print_test('list room')
     assert len(d.list_rooms()) == 0, "Room list is not empty : %s" % d.list_rooms()
     print_test('add room')
-    room1 = d.add_room('room1', 'description 1', area1.id)
-    room2 = d.add_room('room2', 'description 2', area1.id)
-    room3 = d.add_room('room3', 'description 3', area2.id)
+    room1 = d.add_room(r_name='room1', r_description='description 1', r_area_id=area1.id)
+    room2 = d.add_room(r_name='room2', r_description='description 2', r_area_id=area1.id)
+    room3 = d.add_room(r_name='room3', r_description='description 3', r_area_id=area2.id)
     print_test('list room')
     assert len(d.list_rooms()) == 3, "Room list should have 3 items, it has %s" % len(d.list_rooms())
     print_test('= get all rooms of area1')
@@ -253,8 +253,8 @@ if __name__ == "__main__":
     print_test("add_device")
     area1 = d.add_area('area1','description 1')
     area2 = d.add_area('area2','description 2')
-    room1 = d.add_room('room1', 'description 1', area1.id)
-    room2 = d.add_room('room2', 'description 2', area2.id)
+    room1 = d.add_room('room1', area1.id)
+    room2 = d.add_room('room2', area2.id)
     dt1 = d.add_device_technology('dt1', 'desc dt1', u'cpl')
     dc1 = d.add_device_category('dc1')
     device1 = d.add_device(d_address = 'A1', d_technology_id = dt1.id, d_type = u'lamp', 
@@ -301,7 +301,7 @@ if __name__ == "__main__":
     dt1 = d.add_device_technology("x10", "this is x10", u"cpl")
     dc1 = d.add_device_category("lighting")
     area1 = d.add_area('area1','description 1')
-    room1 = d.add_room('room1', 'description 1', area1.id)
+    room1 = d.add_room('room1', area1.id)
     device1 = d.add_device(d_address = "A1", d_technology_id = dt1.id, d_type = u"lamp", 
                           d_category_id = dc1.id, d_room_id = room1.id)
     device2 = d.add_device(d_address = "A2", d_technology_id = dt1.id, d_type = u"lamp", 
