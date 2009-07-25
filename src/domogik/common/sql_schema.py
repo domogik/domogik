@@ -51,6 +51,7 @@ from exceptions import AssertionError
 from sqlalchemy import types, create_engine, Table, Column, Integer, String, \
       MetaData, ForeignKey, Boolean, DateTime, Date, Text
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relation, backref
 
 from domogik.common.configloader import Loader
 
@@ -154,6 +155,7 @@ class Room(Base):
     name = Column(String(30), nullable=False)
     description = Column(String(100))
     area_id = Column(Integer, ForeignKey('%s.id' % Area.get_tablename()))
+    area = relation(Area, backref=backref(__tablename__, order_by=id))
 
     def __init__(self, name, description, area_id):
         self.name = name
@@ -239,6 +241,7 @@ class DeviceTechnologyConfig(Base):
     __tablename__ = '%s_device_technology_config' % _db_prefix
     id = Column(Integer, primary_key=True)
     technology_id = Column(Integer, ForeignKey('%s.id' % DeviceTechnology.get_tablename()))
+    technology = relation(DeviceTechnology, backref=backref(__tablename__))
     key = Column(String(30), nullable=False)
     value = Column(String(80), nullable=False)
 
@@ -280,9 +283,12 @@ class Device(Base):
     description = Column(String(100))
     reference = Column(String(30))
     technology_id = Column(Integer, ForeignKey('%s.id' % DeviceTechnology.get_tablename()))
+    technology = relation(DeviceTechnology, backref=backref(__tablename__))
     type = Column(Enum(DEVICE_TYPE_LIST))
     category_id = Column(Integer, ForeignKey('%s.id' % DeviceCategory.get_tablename()))
+    category = relation(DeviceCategory, backref=backref(__tablename__))
     room_id = Column(Integer, ForeignKey('%s.id' % Room.get_tablename()))
+    room = relation(Room, backref=backref(__tablename__))
     is_resetable = Column(Boolean, nullable=False)
     initial_value = Column(String(10))
     is_value_changeable_by_user = Column(Boolean, nullable=False)
@@ -326,6 +332,7 @@ class DeviceConfig(Base):
     __tablename__ = '%s_device_config' % _db_prefix
     id = Column(Integer, primary_key=True)
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()))
+    device = relation(Device, backref=backref(__tablename__))
     key = Column(String(30), nullable=False)
     value = Column(String(80), nullable=False)
 
@@ -353,6 +360,7 @@ class DeviceStats(Base):
     __tablename__ = '%s_device_stats' % _db_prefix
     id = Column(Integer, primary_key=True)
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()))
+    device = relation(Device, backref=backref(__tablename__))
     date = Column(DateTime, nullable=False)
     value = Column(String(80), nullable=False)
 
@@ -447,6 +455,7 @@ class UserAccount(Base):
     last_name = Column(String(60), nullable=False)
     birthdate = Column(Date, nullable=False)
     system_account_id = Column(Integer, ForeignKey('%s.id' % SystemAccount.get_tablename()))
+    system_account = relation(SystemAccount, backref=backref(__tablename__))
 
     def __init__(self, first_name, last_name, birthdate, system_account_id):
         self.first_name = first_name
