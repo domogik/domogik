@@ -623,6 +623,14 @@ class DbHelper():
             result.append(last_record)
         return result
 
+    def device_has_stats(self, d_device_id):
+        """
+        Check if the device has stats that were recorded
+        @param d_device_id : device id
+        @return True or False
+        """
+        return self._session.query(DeviceStats).filter_by(device_id=d_device_id).count() > 0
+
     def add_device_stat(self, d_id, ds_date, ds_value):
         """
         Add a device stat record

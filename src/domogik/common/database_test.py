@@ -325,6 +325,8 @@ if __name__ == "__main__":
                           d_category_id = dc1.id, d_room_id = room1.id)
     device3 = d.add_device(d_name='device3', d_address = "A3", d_technology_id = dt1.id, d_type = u"lamp", 
                           d_category_id = dc1.id, d_room_id = room1.id)
+    device4 = d.add_device(d_name='device4', d_address = "A4", d_technology_id = dt1.id, d_type = u"lamp", 
+                          d_category_id = dc1.id, d_room_id = room1.id)
     print_test("add_device_stat")
     now = datetime.datetime.now()
     d_stat1_1 = d.add_device_stat(device1.id, now, '10')
@@ -337,6 +339,11 @@ if __name__ == "__main__":
     l_stats = d.list_device_stats(device2.id)
     assert len(l_stats) == 1, \
           "device stats for device id %s should have 1 item. It has %s" % (device2.id, len(l_stats))
+    print_test("device_has_stats")
+    assert d.device_has_stats(device1.id), \
+          "device_hast_stats should have returned True for device id %s " % device1.id
+    assert not d.device_has_stats(device4.id), \
+          "device_hast_stats should have returned False for device id %s " % device4.id
     print_test("get_last_stat_of_device")
     stat = d.get_last_stat_of_device(device1.id)
     assert stat.value == "11", "Should get value '11' for last stat of device %s. Got %s instead" % (device1.id, stat.value)
