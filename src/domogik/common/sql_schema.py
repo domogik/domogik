@@ -293,6 +293,7 @@ class Device(Base):
     initial_value = Column(String(10))
     is_value_changeable_by_user = Column(Boolean, nullable=False)
     unit_of_stored_values = Column(Enum(UNIT_OF_STORED_VALUE_LIST))
+    _stats = relation("DeviceStats", order_by="DeviceStats.date.desc()", backref=__tablename__)
 
     def __init__(self, name, address, description, reference, technology_id, type, category_id, room_id, \
         is_resetable, initial_value, is_value_changeable_by_user, unit_of_stored_values):
@@ -322,6 +323,16 @@ class Device(Base):
         @return True or False
         """
         return self.type.lower() == u'appliance'
+
+    def get_last_value(self):
+        """
+        Return the last value that was recorded for the device
+        @return the value
+        """
+        if len(self._stats) == 0:
+            return self.initial_value
+        else:
+            return self._stats[0]
 
     def __repr__(self):
         return "<Device(id=%s, name='%s', addr='%s', desc='%s', ref='%s', techno=%s, type='%s', cat=%s, \
