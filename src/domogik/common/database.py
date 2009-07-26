@@ -401,9 +401,9 @@ class DbHelper():
         @return a list of DeviceObject items
         """
         device_list = self._session.query(Device)
-        if d_room_id_list is not None:
+        if d_room_id_list is not None and len(d_room_id_list) != 0:
             device_list = device_list.filter(Device.room_id.in_(d_room_id_list))
-        if d_category_id_list is not None:
+        if d_category_id_list is not None and len(d_category_id_list) != 0:
             device_list = device_list.filter(Device.category_id.in_(d_category_id_list))
         return device_list.all()
 
