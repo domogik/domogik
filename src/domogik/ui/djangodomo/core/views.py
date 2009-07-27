@@ -193,7 +193,7 @@ def device(request, device_id):
 
     if request.method == 'POST': # An action was submitted
         # TODO check the value of the button (reset or update value)
-        _update_device_values(request, app_setting)
+        _update_device_values(request, sys_config)
 
     # Read device information
     device = _db.get_device(device_id)
