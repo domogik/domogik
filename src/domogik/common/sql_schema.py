@@ -332,7 +332,7 @@ class Device(Base):
         if len(self._stats) == 0:
             return self.initial_value
         else:
-            return self._stats[0]
+            return self._stats[0].value
 
     def __repr__(self):
         return "<Device(id=%s, name='%s', addr='%s', desc='%s', ref='%s', techno=%s, type='%s', cat=%s, \
