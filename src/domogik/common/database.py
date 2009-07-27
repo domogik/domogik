@@ -605,7 +605,9 @@ class DbHelper():
         @param d_device_id : device id
         @return a DeviceStat object
         """
-        return self._session.query(Device).filter_by(id=d_device_id).first().get_last_value()
+        return self._session.query(DeviceStats)\
+                              .filter_by(device_id = d_device_id)\
+                              .order_by(sqlalchemy.desc(DeviceStats.date)).first()
 
     def get_last_stat_of_devices(self, device_list):
         """
