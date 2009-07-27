@@ -57,7 +57,8 @@ _db = database.DbHelper()
 
 def index(request):
     """
-    Main page
+    Method called when the main page is accessed
+    @param request : the HTTP request
     """
     admin_mode = ""
     page_title = "Control overview"
@@ -109,6 +110,8 @@ def index(request):
 def _update_device_values(request, sys_config):
     """
     Update device values (main control page)
+    @param request : the HTTP request
+    @param sys_config : a SystemConfig object (parameters for system configuration)
     """
     for device_id in QueryDict.getlist(request.POST, "device_id"):
         value_list = QueryDict.getlist(request.POST, "value" + device_id)
@@ -123,6 +126,9 @@ def _send_value_to_device(device_id, new_value, sys_config):
       Check if value was changed
       If yes, try to send new value to the device
       Log the result
+    @param device_id : device id
+    @param new_value : value sent to the device
+    @param sys_config : a SystemConfig object (parameters for system configuration)
     """
     error = ""
     # Read previous value, and update it if necessary
@@ -143,7 +149,11 @@ def _send_value_to_device(device_id, new_value, sys_config):
 
 def _send_x10_cmd(device, old_value, new_value, simulation_mode):
     """
-    Send x10 cmd
+    Send a x10 command
+    @param device : a Device object
+    @param old_value : previous value associated to the device
+    @param new_value : new value sent to the device
+    @param simulation_mode : True if we are in simulation mode
     """
     output = ""
     xPL_schema = "x10.basic"
@@ -171,12 +181,16 @@ def _send_x10_cmd(device, old_value, new_value, simulation_mode):
 def _write_device_stats(device_id, new_value, new_comment, new_is_successful):
     """
     Write device stats
+    @param device_id : device id
+    @param new_value : new value associated to the device
     """
     _db.add_device_stat(d_id=device_id, ds_date=datetime.datetime.now(), ds_value=new_value)
 
 def device(request, device_id):
     """
-    Details of a device
+    Method called when the page showing the details of a device is called
+    @param request : HTTP request
+    @param device_id : device id
     """
     has_stats = ""
     admin_mode = ""
@@ -205,7 +219,9 @@ def device(request, device_id):
 
 def device_stats(request, device_id):
     """
-    View for stats of a device or all devices
+    Method called when the page of stats of a device or all devices is accessed
+    @param request : HTTP request
+    @param device_id : device id
     """
     device_all = ""
     page_title = "Device stats"
@@ -240,6 +256,9 @@ def device_stats(request, device_id):
 def _clear_device_stats(request, device_id, is_admin_mode):
     """
     Clear stats of a device or all devices
+    @param request : HTTP request
+    @param device_id : device id
+    @param is_admin_mode : True if we are in administrator mode
     """
     if device_id == "0": # For all devices
         for device in _db.list_devices():
@@ -249,8 +268,8 @@ def _clear_device_stats(request, device_id, is_admin_mode):
 
 def admin_index(request):
     """
-    Views for the admin part
-    Main page of the admin part
+    Method called when the admin page is accessed
+    @param request : HTTP request
     """
     simulation_mode = ""
     admin_mode = ""
@@ -275,6 +294,10 @@ def admin_index(request):
     })
 
 def save_settings(request):
+    """
+    Save the administrator settings (admin, debug and simulation mode
+    @param request : HTTP request
+    """
     if request.method == 'POST':
         simulation_mode = QueryDict.get(request.POST, "simulation_mode", False)
         admin_mode = QueryDict.get(request.POST, "admin_mode", False)
@@ -283,6 +306,10 @@ def save_settings(request):
     return admin_index(request)
 
 def load_sample_data(request):
+    """
+    Load sample data
+    @param request : HTTP request
+    """
     page_title = "Load sample data"
     action = "loadSampleData"
 
@@ -316,6 +343,10 @@ def load_sample_data(request):
     })
 
 def clear_data(request):
+    """
+    Clear all data of the system (in the database). Please use with care!
+    @param request : HTTP request
+    """
     page_title = "Remove all data"
     action = "clearData"
 
