@@ -42,7 +42,7 @@
     }
 {% endblock %}
 
-{% block title %}{{ pageTitle }}{% endblock %}
+{% block title %}{{ page_title }}{% endblock %}
 
 {% block content %}
     {% ifequal action "index" %}
@@ -52,7 +52,16 @@
                 <legend>Settings</legend>
                 <table>
                     <tr>
-                        <td>{{ appSettingForm.as_table }}</td>
+                        <td>Simulation mode</td>
+                        <td><input type="checkbox" name="simulation_mode" value="{{ system_config.simulation_mode }}" {{ simulation_mode }}/></td>
+                    </tr>
+                    <tr>
+                        <td>Admin mode</td>
+                        <td><input type="checkbox" name="admin_mode" value="{{ system_config.admin_mode }}" {{ admin_mode }}/></td>
+                    </tr>
+                    <tr>
+                        <td>Debug mode</td>
+                        <td><input type="checkbox" name="debug_mode" value="{{ system_config.debug_mode }}" {{ debug_mode }}/></td>
                     </tr>
                     <tr>
                         <td><input type="button" value="Submit" onclick="saveSettings()"></td>
@@ -83,23 +92,36 @@
                         <td>Clear all data</td><td><input type="button" value="Clear" onclick="clearData()"></td>
                     </tr>
                 </table>
-            </fieldset>        
+            </fieldset>
         </form>
     </div>
     {% endifequal %}
 
     {% ifequal action "loadSampleData" %}
-        {% if errorMsg %}
-            <p class="error">{{ errorMsg }}</p>
+        {% if error_msg %}
+            <p class="error">{{ error_msg }}</p>
         {% else %}
             <p>Done !</p>
             <p>Following objects were created :</p>
             <p>&nbsp;</p>
+
+            <p><strong>Areas</strong></p>
+            <hr/>
+            {% if area_list %}
+                <ul>
+                {% for area in area_list %}
+                    <li>{{ area.name }}</li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <p>No data</p>
+            {% endif %}
+
             <p><strong>Rooms</strong></p>
             <hr/>
-            {% if roomList %}
+            {% if room_list %}
                 <ul>
-                {% for room in roomList %}
+                {% for room in room_list %}
                     <li>{{ room.name }}</li>
                 {% endfor %}
                 </ul>
@@ -109,10 +131,10 @@
 
             <p><strong>Categories</strong></p>
             <hr/>
-            {% if deviceCategoryList %}
+            {% if device_category_list %}
                 <ul>
-                {% for deviceCategory in deviceCategoryList %}
-                    <li>{{ deviceCategory.name }}</li>
+                {% for device_category in device_category_list %}
+                    <li>{{ device_category.name }}</li>
                 {% endfor %}
                 </ul>
             {% else %}
@@ -121,9 +143,9 @@
 
             <p><strong>Devices</strong></p>
             <hr/>
-            {% if deviceList %}
+            {% if device_list %}
                 <ul>
-                {% for device in deviceList %}
+                {% for device in device_list %}
                     <li>{{ device.name }} ({{ device.room.name }})</li>
                 {% endfor %}
                 </ul>
@@ -133,9 +155,9 @@
 
             <p><strong>Technologies</strong></p>
             <hr/>
-            {% if techList %}
+            {% if device_tech_list %}
                 <ul>
-                {% for tech in techList %}
+                {% for tech in device_tech_list %}
                     <li>{{ tech.name }} ({{ tech.type }})</li>
                 {% endfor %}
                 </ul>
@@ -146,8 +168,8 @@
     {% endifequal %}
 
     {% ifequal action "clearData" %}
-        {% if errorMsg %}
-            <p class="error">{{ errorMsg }}</p>
+        {% if error_msg %}
+            <p class="error">{{ error_msg }}</p>
         {% else %}
             <p>All data cleared !</p>
         {% endif %}

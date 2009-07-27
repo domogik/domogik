@@ -48,15 +48,6 @@ from django.core import serializers
 
 from domogik.common import database
 
-from djangodomo.core.models import Area
-from djangodomo.core.models import Room
-from djangodomo.core.models import DeviceCategory
-from djangodomo.core.models import DeviceTechnology
-from djangodomo.core.models import DeviceStats
-from djangodomo.core.models import Device
-from djangodomo.core.models import ApplicationSetting
-from djangodomo.core.forms import ApplicationSettingForm
-
 from djangodomo.core.SampleDataHelper import SampleDataHelper
 from djangodomo.core.XPLHelper import XPLHelper
 
@@ -70,61 +61,64 @@ def index(request):
     """
     admin_mode = ""
     page_title = "Control overview"
+    sys_config = _db.get_system_config()
 
-    app_setting = _read_application_setting()
-
-    qlist_area = Q()
-    qlist_room = Q()
-    qlist_device_category = Q()
+    device_list = _db.list_devices()
     if request.method == 'POST': # An action was submitted
         cmd = QueryDict.get(request.POST, "cmd", "")
         if cmd == "filter":
-            for area in QueryDict.getlist(request.POST, "area"):
-                qlist_area = qlist_area | Q(room__area__id = area)
-            for room in QueryDict.getlist(request.POST, "room"):
-                qlist_room = qlist_room | Q(room__id = room)
-            for device_category in QueryDict.getlist(request.POST,
-                    "deviceCategory"):
-                qlist_device_category = qlist_device_category | Q(category__id=
-                    device_category)
-        elif cmd == "updateValues":
-            _update_device_values(request, app_setting)
+            # Get all possible rooms
+            possible_room_id_list = []
+            for area_id in QueryDict.getlist(request.POST, "area_id"):
+                room_list = _db.get_all_rooms_of_area(area_id)
+                for room in room_list:
+                    if room.id not in possible_room_id_list:
+                        possible_room_id_list.append(room.id)
+            room_id_list = []
+            for room_id in QueryDict.getlist(request.POST, "room_id"):
+                if room_id in possible_room_id_list or len(possible_room_id_list) == 0:
+                    room_id_list.append(room_id)
 
-    # select_related() should avoid one extra db query per property
-    device_list = Device.objects.filter(qlist_area).filter(qlist_room).filter(
-            qlist_device_category).select_related()
+            if len(room_id_list) == 0:
+                room_id_list = possible_room_id_list
+            device_category_id_list = QueryDict.getlist(request.POST, "device_category_id")
+            print "*** device_category_id_list %s" % device_category_id_list
+            print "*** room_id_list = %s" % room_id_list
+            device_list = _db.find_devices(room_id_list, device_category_id_list)
+        elif cmd == "update_values":
+            _update_device_values(request, sys_config)
 
-    area_list = Area.objects.all()
-    room_list = Room.objects.all()
-    device_category_list = DeviceCategory.objects.all()
-    tech_list = DeviceTechnology.objects.all()
+    area_list = _db.list_areas()
+    room_list = _db.list_rooms()
+    device_category_list = _db.list_device_categories()
+    tech_list = _db.list_device_technologies()
 
-    if app_setting.admin_mode == True:
+    if sys_config.admin_mode == True:
         admin_mode = "True"
 
     return render_to_response('index.html', {
-        'areaList': area_list,
-        'roomList': room_list,
-        'deviceCategoryList': device_category_list,
-        'deviceList': device_list,
-        'techList': tech_list,
-        'adminMode': admin_mode,
-        'pageTitle': page_title,
+        'area_list': area_list,
+        'room_list': room_list,
+        'device_category_list': device_category_list,
+        'device_list': device_list,
+        'tech_list': tech_list,
+        'admin_mode': admin_mode,
+        'page_title': page_title,
     })
 
 
-def _update_device_values(request, app_setting):
+def _update_device_values(request, sys_config):
     """
     Update device values (main control page)
     """
-    for device_id in QueryDict.getlist(request.POST, "deviceId"):
+    for device_id in QueryDict.getlist(request.POST, "device_id"):
         value_list = QueryDict.getlist(request.POST, "value" + device_id)
         for i in range(len(value_list)):
             if value_list[i]:
-                _send_value_to_device(device_id, value_list[i], app_setting)
+                _send_value_to_device(device_id, value_list[i], sys_config)
 
 
-def _send_value_to_device(device_id, new_value, app_setting):
+def _send_value_to_device(device_id, new_value, sys_config):
     """
     Get all values posted over the form
     For each device :
@@ -134,12 +128,11 @@ def _send_value_to_device(device_id, new_value, app_setting):
     """
     error = ""
     # Read previous value, and update it if necessary
-    device = Device.objects.get(pk=device_id)
-    old_value = device.get_last_value()
+    device = _db.get_device(device_id)
+    old_value = _db.get_last_stat_of_device(device_id)
     if old_value != new_value:
         if device.technology.name.lower() == 'x10':
-            error = _send_x10_cmd(device, old_value, new_value,
-                    app_setting.simulation_mode)
+            error = _send_x10_cmd(device, old_value, new_value, sys_config.simulation_mode)
 
         if error == "":
             if device.is_lamp():
@@ -148,8 +141,7 @@ def _send_value_to_device(device_id, new_value, app_setting):
                 elif new_value == "off":
                     new_value = "0"
 
-            _write_device_stats(device_id, new_value,
-                    "Nothing special", True)
+            _write_device_stats(device_id, new_value, "Nothing special", True)
 
 
 def _send_x10_cmd(device, old_value, new_value, simulation_mode):
@@ -184,14 +176,8 @@ def _write_device_stats(device_id, new_value, new_comment, new_is_successful):
     """
     Write device stats
     """
-    new_device = Device.objects.get(id=device_id)
-    device_stats = DeviceStats(
-        date = datetime.datetime.now(),
-        device = new_device,
-        value = new_value,
-        unit = new_device.unit_of_stored_values,
-    )
-    device_stats.save()
+    device = _db.get_device(device_id)
+    _db.add_device_stat(d_id=device_id, ds_date=datetime.datetime.now(), ds_value=new_value)
 
 
 def device(request, device_id):
@@ -202,8 +188,8 @@ def device(request, device_id):
     admin_mode = ""
     page_title = "Device details"
 
-    app_setting = _read_application_setting()
-    if app_setting.admin_mode == True:
+    sys_config = _db.get_system_config()
+    if sys_config.admin_mode == True:
         admin_mode = "True"
 
     if request.method == 'POST': # An action was submitted
@@ -211,19 +197,16 @@ def device(request, device_id):
         _update_device_values(request, app_setting)
 
     # Read device information
-    try:
-        device = Device.objects.get(pk=device_id)
-    except Device.DoesNotExist:
-        raise Http404
+    device = _db.get_device(device_id)
 
-    if DeviceStats.objects.filter(device__id=device.id).count() > 0:
+    if _db.device_has_stats(device_id):
         has_stats = "True"
 
     return render_to_response('device.html', {
         'device': device,
-        'hasStats': has_stats,
-        'adminMode': admin_mode,
-        'pageTitle': page_title,
+        'has_stats': has_stats,
+        'admin_mode': admin_mode,
+        'page_title': page_title,
     })
 
 
@@ -235,30 +218,30 @@ def device_stats(request, device_id):
     page_title = "Device stats"
     admin_mode = ""
 
-    app_setting = _read_application_setting()
-    if app_setting.admin_mode == True:
+    sys_config = _db.get_system_config()
+    if sys_config.admin_mode == True:
         admin_mode = "True"
 
     cmd = QueryDict.get(request.POST, "cmd", "")
-    if cmd == "clearStats" and app_setting.admin_mode:
-        _clear_device_stats(request, device_id, app_setting.admin_mode)
+    if cmd == "clear_stats" and sys_config.admin_mode:
+        _clear_device_stats(request, device_id, sys_config.admin_mode)
 
     # Read device stats
     if device_id == "0": # For all devices
         device_all = "True"
-        device_stats_list = DeviceStats.objects.all()
+        device_stats_list = []
+        for device in _db.list_devices():
+            for device_stat in _db.list_device_stats(device.id):
+              device_stats_list.append(device_stat)
     else:
-        try:
-            device_stats_list = DeviceStats.objects.filter(device__id=device_id)
-        except DeviceStats.DoesNotExist:
-            raise Http404
+        device_stats_list = _db.list_device_stats(device_id)
 
     return render_to_response('device_stats.html', {
-        'deviceId': device_id,
-        'adminMode': admin_mode,
-        'deviceStatsList': device_stats_list,
-        'deviceAll': device_all,
-        'pageTitle': page_title,
+        'device_id': device_id,
+        'admin_mode': admin_mode,
+        'device_stats_list': device_stats_list,
+        'device_all': device_all,
+        'page_title': page_title,
     })
 
 
@@ -267,12 +250,10 @@ def _clear_device_stats(request, device_id, is_admin_mode):
     Clear stats of a device or all devices
     """
     if device_id == "0": # For all devices
-        DeviceStats.objects.all().delete()
+        for device in _db.list_devices():
+            _db.del_all_device_stats(device.id)
     else:
-        try:
-            DeviceStats.objects.filter(device__id=device_id).delete()
-        except DeviceStats.DoesNotExist:
-            raise Http404
+        _db.del_all_device_stats(device_id)
 
 
 def admin_index(request):
@@ -280,26 +261,35 @@ def admin_index(request):
     Views for the admin part
     Main page of the admin part
     """
+    simulation_mode = ""
+    admin_mode = ""
+    debug_mode = ""
     page_title = "Admin page"
     action = "index"
+    system_config = _db.get_system_config()
+    if system_config.simulation_mode:
+        simulation_mode = "checked"
+    if system_config.admin_mode:
+        admin_mode = "checked"
+    if system_config.debug_mode:
+        debug_mode = "checked"
 
-    app_setting_form = ApplicationSettingForm(
-            instance=_read_application_setting())
     return render_to_response('admin_index.html', {
-        'appSettingForm': app_setting_form,
-        'pageTitle': page_title,
+        'system_config': system_config,
+        'page_title': page_title,
         'action': action,
+        'simulation_mode': simulation_mode,
+        'admin_mode': admin_mode,
+        'debug_mode': debug_mode,
     })
 
 
 def save_settings(request):
     if request.method == 'POST':
-        # Update existing applicationSetting instance with POST values
-        form = ApplicationSettingForm(request.POST,
-                instance=_read_application_setting())
-        if form.is_valid():
-            form.save()
-
+        simulation_mode = QueryDict.get(request.POST, "simulation_mode", False)
+        admin_mode = QueryDict.get(request.POST, "admin_mode", False)
+        debug_mode = QueryDict.get(request.POST, "debug_mode", False)
+        _db.update_system_config(s_simulation_mode=simulation_mode, s_admin_mode=admin_mode, s_debug_mode=debug_mode)
     return admin_index(request)
 
 
@@ -307,33 +297,33 @@ def load_sample_data(request):
     page_title = "Load sample data"
     action = "loadSampleData"
 
-    app_setting = _read_application_setting()
-    if app_setting.simulation_mode != True:
+    sys_config = _db.get_system_config()
+    if sys_config.simulation_mode != True:
         error_msg = "The application is not running in simulation mode : "\
                 "can't load sample data"
         return render_to_response('admin_index.html', {
-            'pageTitle': page_title,
+            'page_title': page_title,
             'action': action,
-            'errorMsg': error_msg,
+            'error_msg': error_msg,
         })
 
-    sample_data_helper = SampleDataHelper()
+    sample_data_helper = SampleDataHelper(_db)
     sample_data_helper.create()
 
-    area_list = Area.objects.all()
-    room_list = Room.objects.all()
-    device_category_list = DeviceCategory.objects.all()
-    device_list = Device.objects.all()
-    tech_list = DeviceTechnology.objects.all()
+    area_list = _db.list_areas()
+    room_list = _db.list_rooms()
+    device_category_list = _db.list_device_categories()
+    device_list = _db.list_devices()
+    device_tech_list = _db.list_device_technologies()
 
     return render_to_response('admin_index.html', {
-        'pageTitle': page_title,
+        'page_title': page_title,
         'action': action,
-        'areaList': area_list,
-        'roomList': room_list,
-        'deviceCategoryList': device_category_list,
-        'deviceList': device_list,
-        'techList': tech_list,
+        'area_list': area_list,
+        'room_list': room_list,
+        'device_category_list': device_category_list,
+        'device_list': device_list,
+        'device_tech_list': device_tech_list,
     })
 
 
@@ -341,33 +331,28 @@ def clear_data(request):
     page_title = "Remove all data"
     action = "clearData"
 
-    app_setting = _read_application_setting()
-    if app_setting.simulation_mode != True:
+    sys_config = _db.get_system_config()
+    if sys_config.simulation_mode != True:
         error_msg = "The application is not running in simulation mode : "\
                 "can't clear data"
         return render_to_response('admin_index.html', {
-            'pageTitle': page_title,
+            'page_title': page_title,
             'action': action,
-            'errorMsg': error_msg,
+            'error_msg': error_msg,
         })
 
-    sample_data_helper = SampleDataHelper()
+    sample_data_helper = SampleDataHelper(_db)
     sample_data_helper.remove()
 
     return render_to_response('admin_index.html', {
-        'pageTitle': page_title,
+        'page_title': page_title,
         'action': action,
     })
 
 
-def _read_application_setting():
-    if ApplicationSetting.objects.all().count() == 1:
-        return ApplicationSetting.objects.all()[0]
-    else:
-        return ApplicationSetting()
-
-
 def device_status(request, room_id=None, device_id=None):
+    return None
+    """
     import random
     if request.method == 'POST':
         print "Set power to ", request.POST["value"]
@@ -377,4 +362,4 @@ def device_status(request, room_id=None, device_id=None):
         json = simplejson.dumps(dict((d.pk, d.get_data_dict()) for d in devices))
         return HttpResponse(json)
     return HttpResponse(response)
-            
+    """
