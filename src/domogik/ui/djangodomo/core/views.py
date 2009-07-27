@@ -145,7 +145,7 @@ def _send_value_to_device(device_id, new_value, sys_config):
                 elif new_value == "off":
                     new_value = "0"
 
-            _write_device_stats(device_id, new_value, "Nothing special", True)
+            _write_device_stats(device_id, new_value,)
 
 def _send_x10_cmd(device, old_value, new_value, simulation_mode):
     """
@@ -178,7 +178,7 @@ def _send_x10_cmd(device, old_value, new_value, simulation_mode):
         output = XPLHelper().send(xPL_schema, xPL_param)
     return output
 
-def _write_device_stats(device_id, new_value, new_comment, new_is_successful):
+def _write_device_stats(device_id, new_value):
     """
     Write device stats
     @param device_id : device id
