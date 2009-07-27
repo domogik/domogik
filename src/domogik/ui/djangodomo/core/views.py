@@ -106,7 +106,6 @@ def index(request):
         'page_title': page_title,
     })
 
-
 def _update_device_values(request, sys_config):
     """
     Update device values (main control page)
@@ -116,7 +115,6 @@ def _update_device_values(request, sys_config):
         for i in range(len(value_list)):
             if value_list[i]:
                 _send_value_to_device(device_id, value_list[i], sys_config)
-
 
 def _send_value_to_device(device_id, new_value, sys_config):
     """
@@ -142,7 +140,6 @@ def _send_value_to_device(device_id, new_value, sys_config):
                     new_value = "0"
 
             _write_device_stats(device_id, new_value, "Nothing special", True)
-
 
 def _send_x10_cmd(device, old_value, new_value, simulation_mode):
     """
@@ -171,13 +168,11 @@ def _send_x10_cmd(device, old_value, new_value, simulation_mode):
         output = XPLHelper().send(xPL_schema, xPL_param)
     return output
 
-
 def _write_device_stats(device_id, new_value, new_comment, new_is_successful):
     """
     Write device stats
     """
     _db.add_device_stat(d_id=device_id, ds_date=datetime.datetime.now(), ds_value=new_value)
-
 
 def device(request, device_id):
     """
@@ -207,7 +202,6 @@ def device(request, device_id):
         'admin_mode': admin_mode,
         'page_title': page_title,
     })
-
 
 def device_stats(request, device_id):
     """
@@ -243,7 +237,6 @@ def device_stats(request, device_id):
         'page_title': page_title,
     })
 
-
 def _clear_device_stats(request, device_id, is_admin_mode):
     """
     Clear stats of a device or all devices
@@ -253,7 +246,6 @@ def _clear_device_stats(request, device_id, is_admin_mode):
             _db.del_all_device_stats(device.id)
     else:
         _db.del_all_device_stats(device_id)
-
 
 def admin_index(request):
     """
@@ -282,7 +274,6 @@ def admin_index(request):
         'debug_mode': debug_mode,
     })
 
-
 def save_settings(request):
     if request.method == 'POST':
         simulation_mode = QueryDict.get(request.POST, "simulation_mode", False)
@@ -290,7 +281,6 @@ def save_settings(request):
         debug_mode = QueryDict.get(request.POST, "debug_mode", False)
         _db.update_system_config(s_simulation_mode=simulation_mode, s_admin_mode=admin_mode, s_debug_mode=debug_mode)
     return admin_index(request)
-
 
 def load_sample_data(request):
     page_title = "Load sample data"
@@ -325,7 +315,6 @@ def load_sample_data(request):
         'device_tech_list': device_tech_list,
     })
 
-
 def clear_data(request):
     page_title = "Remove all data"
     action = "clearData"
@@ -347,7 +336,6 @@ def clear_data(request):
         'page_title': page_title,
         'action': action,
     })
-
 
 def device_status(request, room_id=None, device_id=None):
     return None
