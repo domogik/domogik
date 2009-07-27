@@ -129,7 +129,7 @@ def _send_value_to_device(device_id, new_value, sys_config):
     error = ""
     # Read previous value, and update it if necessary
     device = _db.get_device(device_id)
-    old_value = _db.get_last_stat_of_device(device_id)
+    old_value = device.get_last_value()
     if old_value != new_value:
         if device.technology.name.lower() == 'x10':
             error = _send_x10_cmd(device, old_value, new_value, sys_config.simulation_mode)
@@ -176,7 +176,6 @@ def _write_device_stats(device_id, new_value, new_comment, new_is_successful):
     """
     Write device stats
     """
-    device = _db.get_device(device_id)
     _db.add_device_stat(d_id=device_id, ds_date=datetime.datetime.now(), ds_value=new_value)
 
 
