@@ -22,7 +22,7 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 Module purpose
 ==============
 
-
+Django's model is not used in Domogik.
 
 Implements
 ==========
@@ -33,17 +33,3 @@ Implements
 @license: GPL(v3)
 @organization: Domogik
 """
-
-from django.contrib import admin
-from djangodomo.core.models import Area
-from djangodomo.core.models import Room
-from djangodomo.core.models import Device
-from djangodomo.core.models import DeviceTechnology
-from djangodomo.core.models import ApplicationSetting
-
-
-admin.site.register(Area)
-admin.site.register(Room)
-admin.site.register(Device)
-admin.site.register(DeviceTechnology)
-admin.site.register(ApplicationSetting)
