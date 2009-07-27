@@ -293,7 +293,7 @@ def admin_index(request):
         'debug_mode': debug_mode,
     })
 
-def save_settings(request):
+def save_admin_settings(request):
     """
     Save the administrator settings (admin, debug and simulation mode
     @param request : HTTP request

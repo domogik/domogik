@@ -51,6 +51,6 @@ urlpatterns = patterns('djangodomo.core.views',
     url(r'admin/load_sample_data$', 'load_sample_data',
             name="loadSampleDataView"),
     url(r'admin/clear_data$', 'clear_data', name="clearDataView"),
-    url(r'admin/save_settings$', 'save_settings', name="saveSettingsView"),
+    url(r'admin/save_admin_settings$', 'save_admin_settings', name="saveAdminSettingsView"),
     
 )

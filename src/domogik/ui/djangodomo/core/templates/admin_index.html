@@ -25,7 +25,7 @@
 
 {% block script %}
     function saveSettings() {
-        document.forms['settingsForm'].action="{% url saveSettingsView %}"
+        document.forms['settingsForm'].action="{% url saveAdminSettingsView %}"
         document.forms['settingsForm'].submit()
     }
 
