@@ -53,14 +53,25 @@ Implements
 # user_account
 ####
 
+<<<<<<< /home/floriane/domogik/domogik/src/domogik/common/database.py
 
 import hashlib
+=======
+
+import hashlib
+
+import sqlalchemy
+from sqlalchemy.ext.sqlsoup import SqlSoup
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
+>>>>>>> /tmp/database.py~other.hHL1sS
 
 import sqlalchemy
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
 from domogik.common.configloader import Loader
+<<<<<<< /home/floriane/domogik/domogik/src/domogik/common/database.py
 from domogik.common.sql_schema import Area, Device, DeviceCategory, DeviceConfig, \
                                       DeviceStats, DeviceTechnology, DeviceTechnologyConfig, \
                                       Room, UserAccount, SystemAccount, SystemConfig, \
@@ -88,6 +99,34 @@ class DbHelperException(Exception):
         """
         return repr(self.value)
 
+=======
+from domogik.common.sql_schema import Area, Device, DeviceCategory, DeviceConfig, \
+                                      DeviceStats, DeviceTechnology, DeviceTechnologyConfig, \
+                                      Room, UserAccount, SystemAccount, SystemStats, Trigger
+from domogik.common.sql_schema import DEVICE_TECHNOLOGY_TYPE_LIST, DEVICE_TYPE_LIST, SYSTEMSTATS_TYPE_LIST, \
+                                      UNIT_OF_STORED_VALUE_LIST
+
+
+class DbHelperException(Exception):
+    """
+    This class provides exceptions related to the DbHelper class
+    """
+
+    def __init__(self, value):
+        """
+        Class constructor
+        @param value : value of the exception
+        """
+        self.value = value
+
+    def __str__(self):
+        """
+        Return the object representation
+        @return value of the exception
+        """
+        return repr(self.value)
+
+>>>>>>> /tmp/database.py~other.hHL1sS
 
 class DbHelper():
     """
@@ -147,8 +186,13 @@ class DbHelper():
         """
         Add an area
         @param a_name : area name
+<<<<<<< /home/floriane/domogik/domogik/src/domogik/common/database.py
         @param a_description : area detailed description (optional)
         @return an area object
+=======
+        @param a_description : area detailled description
+        @return an area object
+>>>>>>> /tmp/database.py~other.hHL1sS
         """
         area = Area(name = a_name, description = a_description)
         self._session.add(area)
@@ -191,10 +235,15 @@ class DbHelper():
         else:
             return None
 
+<<<<<<< /home/floriane/domogik/domogik/src/domogik/common/database.py
     def add_room(self, r_name, r_area_id, r_description=None):
+=======
+    def add_room(self, r_name, r_description, r_area_id):
+>>>>>>> /tmp/database.py~other.hHL1sS
         """
         Add a room
         @param r_name : room name
+<<<<<<< /home/floriane/domogik/domogik/src/domogik/common/database.py
         @param area_id : id of the area where the room is
         @param r_description : room detailed description (optional)
         @return : a room object
@@ -208,6 +257,21 @@ class DbHelper():
         self._session.add(room)
         self._session.commit()
         return room
+=======
+        @param area_id : id of the area where the room is
+        @param r_description : room detailled description
+        @return : a room object
+        """
+        try: 
+            area = self._session.query(Area).filter_by(id = r_area_id).one()
+        except NoResultFound, e:
+            raise DbHelperException("Couldn't add room with area id %s. It does not exist" % r_area_id)
+
+        room = Room(name = r_name, description = r_description, area_id = r_area_id)
+        self._session.add(room)
+        self._session.commit()
+        return room
+>>>>>>> /tmp/database.py~other.hHL1sS
 
     def del_room(self, r_id):
         """
@@ -240,7 +304,11 @@ class DbHelper():
         """
         return self._session.query(DeviceCategory).all()
 
+<<<<<<< /home/floriane/domogik/domogik/src/domogik/common/database.py
     def get_device_category_by_name(self, dc_name,):
+=======
+    def get_device_category_by_name(self, dc_name):
+>>>>>>> /tmp/database.py~other.hHL1sS
         """
         Return information about a device category
         @param dc_name : The device category name
@@ -252,13 +320,24 @@ class DbHelper():
         """
         Add a device_category (temperature, heating, lighting, music, ...)
         @param dc_name : device category name
+<<<<<<< /home/floriane/domogik/domogik/src/domogik/common/database.py
         @param dc_description : The device category description
         @return a DeviceCategory (the newly created one)
+=======
+        @return a DeviceCategory (the newly created one)
+>>>>>>> /tmp/database.py~other.hHL1sS
         """
+<<<<<<< /home/floriane/domogik/domogik/src/domogik/common/database.py
         dc = DeviceCategory(name=dc_name, description=dc_description)
         self._session.add(dc)
         self._session.commit()
         return dc
+=======
+        dc = DeviceCategory(name = dc_name)
+        self._session.add(dc)
+        self._session.commit()
+        return dc
+>>>>>>> /tmp/database.py~other.hHL1sS
 
     def del_device_category(self, dc_id):
         """
@@ -283,13 +362,25 @@ class DbHelper():
         """
         return self._session.query(DeviceTechnology).all()
 
+<<<<<<< /home/floriane/domogik/domogik/src/domogik/common/database.py
     def get_device_technology_by_name(self, dt_name):
         """
         Return information about a device technology
         @param dt_name : the device technology name
         @return a DeviceTechnology object
+=======
+    def get_device_technology_by_name(self, dt_name):
+>>>>>>> /tmp/database.py~other.hHL1sS
+        """
+<<<<<<< /home/floriane/domogik/domogik/src/domogik/common/database.py
+        return self._session.query(DeviceTechnology).filter_by(name = dt_name).first()
+=======
+        Return information about a device technology
+        @param dt_name : the device technology name
+        @return a DeviceTechnology object
         """
         return self._session.query(DeviceTechnology).filter_by(name = dt_name).first()
+>>>>>>> /tmp/database.py~other.hHL1sS
 
     def add_device_technology(self, dt_name, dt_description, dt_type):
         """
@@ -374,6 +465,7 @@ class DbHelper():
 ###
     def list_devices(self):
         """
+<<<<<<< /home/floriane/domogik/domogik/src/domogik/common/database.py
         Returns a list of devices
         @return a list of Device objects
         """
@@ -385,16 +477,25 @@ class DbHelper():
         @param filters :  filter fields can be one of id, address, type, room, initial_value, 
                           is_value_changeable_by_user, unit_of_stored_values.
         @return a list of Device objects
+=======
+        Returns a list of devices
+        @return a list of Device objects
+>>>>>>> /tmp/database.py~other.hHL1sS
         """
+<<<<<<< /home/floriane/domogik/domogik/src/domogik/common/database.py
         device_list = self._session.query(Device)
         for filter in filters:
             filter_arg = "%s = '%s'" % (filter, filters[filter])
             device_list = device_list.filter(filter_arg)
 
         return device_list.all()
+=======
+        return self._session.query(Device).all()
+>>>>>>> /tmp/database.py~other.hHL1sS
 
     def find_devices(self, d_room_id_list, d_category_id_list):
         """
+<<<<<<< /home/floriane/domogik/domogik/src/domogik/common/database.py
         Look for devices that have at least 1 item in room_id_list AND 1 item in category_id_list
         @param room_id_list : list of room ids
         @param category_id_list : list of category ids
@@ -406,11 +507,25 @@ class DbHelper():
         if d_category_id_list is not None and len(d_category_id_list) != 0:
             device_list = device_list.filter(Device.category_id.in_(d_category_id_list))
         return device_list.all()
+=======
+        Look for device(s) with filter on their attributes
+        @param filters :  filter fields can be one of id, address, type, room, initial_value, 
+                          is_value_changeable_by_user, unit_of_stored_values.
+        @return a list of Device objects
+        """
+        device_list = self._session.query(Device)
+        for filter in filters:
+            filter_arg = "%s = '%s'" % (filter, filters[filter])
+            device_list = device_list.filter(filter_arg)
+
+        return device_list.all()
+>>>>>>> /tmp/database.py~other.hHL1sS
 
     def get_device(self, d_id):
         """
         Return a device by its it
         @param d_id : The device id
+<<<<<<< /home/floriane/domogik/domogik/src/domogik/common/database.py
         @return a Device object
         """
         return self._session.query(Device).filter_by(id = d_id).first()
@@ -420,7 +535,11 @@ class DbHelper():
         Return all the devices of a room
         @param d_room_id: room id
         @return a list of Device objects
+=======
+        @return a Device object
+>>>>>>> /tmp/database.py~other.hHL1sS
         """
+<<<<<<< /home/floriane/domogik/domogik/src/domogik/common/database.py
         return self._session.query(Device).filter_by(room_id = d_room_id).all()
 
     def get_all_devices_of_area(self, d_area_id):
@@ -450,12 +569,22 @@ class DbHelper():
         @return a list of Device objects
         """
         return self._session.query(Device).filter_by(technology_id = dt_id).all()
+=======
+        return self._session.query(Device).filter_by(id = d_id).first()
+>>>>>>> /tmp/database.py~other.hHL1sS
 
+<<<<<<< /home/floriane/domogik/domogik/src/domogik/common/database.py
     def add_device(self, d_name, d_address, d_technology_id, d_type, d_category_id, d_room_id, 
         d_description = None, d_reference = None, d_is_resetable = False, d_initial_value = None,
         d_is_value_changeable_by_user = False, d_unit_of_stored_values ='Percent'):
+=======
+    def add_device(self, d_address, d_technology_id, d_type, d_category_id, d_room_id, 
+        d_description = None, d_is_resetable = False, d_initial_value = None,
+        d_is_value_changeable_by_user = False, d_unit_of_stored_values ='Percent'):
+>>>>>>> /tmp/database.py~other.hHL1sS
         """
         Add a device item
+<<<<<<< /home/floriane/domogik/domogik/src/domogik/common/database.py
         @param d_name : name of the device
         @param d_address : address (ex : 'A3' for x10/plcbus, '111.111111111' for 1wire)
         @param d_technology_id : technology id
@@ -466,7 +595,18 @@ class DbHelper():
         @param d_reference : device reference (ex. AM12 for x10)
         @param d_is_resetable : Can the item be reseted to some initial state
         @param d_initial_value : What's the initial value of the item, should be 
+=======
+        @param d_address : address (ex : 'A3' for x10/plcbus, '111.111111111' for 1wire)
+        @param d_technology_id : technology id
+        @param d_type : One of 'appliance','light','music','sensor'
+        @param d_category_id : category id
+        @param d_room_id : room id
+        @param d_description : Extended item description (100 char max)
+        @param d_is_resetable : Can the item be reseted to some initial state
+        @param d_initial_value : What's the initial value of the item, should be 
+>>>>>>> /tmp/database.py~other.hHL1sS
             the state when the item is created (except for sensors, music)
+<<<<<<< /home/floriane/domogik/domogik/src/domogik/common/database.py
         @param d_is_value_changeable_by_user : Can a user change item state (ex : false for sensor)
         @param d_unit_of_stored_values : What is the unit of item values,
                 must be one of 'Volt', 'Celsius', 'Fahrenheit', 'Percent', 'Boolean'
@@ -503,6 +643,44 @@ class DbHelper():
     def update_device(self, d_id, d_name = None, d_address = None, d_technology_id = None, d_type = None, 
         d_category_id = None, d_room_id = None, d_description = None, d_reference = None, d_is_resetable = None, 
         d_initial_value = None, d_is_value_changeable_by_user = None, d_unit_of_stored_values = None):
+=======
+        @param d_is_value_changeable_by_user : Can a user change item state (ex : false for sensor)
+        @param d_unit_of_stored_values : What is the unit of item values,
+                must be one of 'Volt', 'Celsius', 'Fahrenheit', 'Percent', 'Boolean'
+        @return the new Device object
+        """
+        try:
+            room = self._session.query(Room).filter_by(id = d_room_id).one()
+        except NoResultFound, e:
+            raise DbHelperException("Couldn't add device with room id %s. It does not exist" % d_room_id)
+        try:
+            dc = self._session.query(DeviceCategory).filter_by(id = d_category_id).one()
+        except NoResultFound, e:
+            raise DbHelperException("Couldn't add device with category id %s. It does not exist" % d_category_id)
+        try:
+            dt = self._session.query(DeviceTechnology).filter_by(id = d_technology_id).one()
+        except NoResultFound, e:
+            raise DbHelperException("Couldn't add device with technology id %s. It does not exist" % d_technology_id)
+
+        if d_unit_of_stored_values not in UNIT_OF_STORED_VALUE_LIST:
+            raise ValueError, "d_unit_of_stored_values must be one of %s" % UNIT_OF_STORED_VALUE_LIST
+        if d_type not in DEVICE_TYPE_LIST:
+            raise ValueError, "d_type must be one of %s" % DEVICE_TYPE_LIST
+
+        device = Device(address = d_address, description = d_description, 
+                        technology_id = d_technology_id, type = d_type, 
+                        category_id = d_category_id, room_id = d_room_id, 
+                        is_resetable = d_is_resetable, initial_value = d_initial_value, 
+                        is_value_changeable_by_user = d_is_value_changeable_by_user, 
+                        unit_of_stored_values = d_unit_of_stored_values)
+        self._session.add(device)
+        self._session.commit()
+        return device
+
+    def update_device(self, d_id, d_address = None, d_technology_id = None, d_type = None, 
+        d_category_id = None, d_room_id = None, d_description = None, d_is_resetable = None, 
+        d_initial_value = None, d_is_value_changeable_by_user = None, d_unit_of_stored_values = None):
+>>>>>>> /tmp/database.py~other.hHL1sS
         """
         Update a device item
         If a param is None, then the old value will be kept
@@ -521,6 +699,7 @@ class DbHelper():
             must be one of 'Volt', 'Celsius', 'Fahrenheit', 'Percent', 'Boolean'
         @return the updated Device object
         """
+<<<<<<< /home/floriane/domogik/domogik/src/domogik/common/database.py
         if d_unit_of_stored_values not in [UNIT_OF_STORED_VALUE_LIST, None]: 
             raise ValueError, "d_unit_of_stored_values must be one of %s" % UNIT_OF_STORED_VALUE_LIST
         if d_type not in [DEVICE_TYPE_LIST, None]:
@@ -570,6 +749,53 @@ class DbHelper():
         self._session.add(device)
         self._session.commit()
         return device
+=======
+        if d_unit_of_stored_values not in [UNIT_OF_STORED_VALUE_LIST, None]: 
+            raise ValueError, "d_unit_of_stored_values must be one of %s" % UNIT_OF_STORED_VALUE_LIST
+        if d_type not in [DEVICE_TYPE_LIST, None]:
+            raise ValueError, "d_type must be one of %s" % DEVICE_TYPE_LIST
+
+        device = self._session.query(Device).filter_by(id = d_id).first()
+        if device is None:
+            raise DbHelperException("Device with id %s couldn't be found" % d_id)
+
+        if d_address is not None:
+            device.address = d_address
+        if d_technology_id is not None:
+            try:
+                dt = self._session.query(DeviceTechnology).filter_by(id = d_technology_id).one()
+                device.technology = d_technology_id
+            except NoResultFound, e:
+                raise DbHelperException("Couldn't update device with technology id %s. It does not exist" % d_technology_id)
+        if d_description is not None:
+            device.description = d_description
+        if d_type is not None:
+            device.type = d_type
+        if d_category_id is not None:
+          try:
+              dc = self._session.query(DeviceCategory).filter_by(id = d_category_id).one()
+              device.category = d_category_id
+          except NoResultFound, e:
+              raise DbHelperException("Couldn't update device with category id %s. It does not exist" % d_category_id)
+        if d_room_id is not None:
+            try:
+                room = self._session.query(Room).filter_by(id = d_room_id).one()
+                device.room = d_room_id
+            except NoResultFound, e:
+                raise DbHelperException("Couldn't update device with room id %s. It does not exist" % d_room_id)
+        if d_is_resetable is not None:
+            device.is_resetable = d_is_resetable
+        if d_initial_value is not None:
+            device.initial_value = d_initial_value
+        if d_is_value_changeable_by_user is not None:
+            device.is_value_changeable_by_user = d_is_value_changeable_by_user
+        if d_unit_of_stored_values is not None:
+            device.unit_of_stored_values = d_unit_of_stored_values
+        
+        self._session.add(device)
+        self._session.commit()
+        return device
+>>>>>>> /tmp/database.py~other.hHL1sS
 
     def del_device(self, d_id):
         """
@@ -577,6 +803,7 @@ class DbHelper():
         Warning : this deletes also the associated objects (DeviceConfig, DeviceStats)
         @param d_id : item id
         """
+<<<<<<< /home/floriane/domogik/domogik/src/domogik/common/database.py
         device = self.get_device(d_id)
         if device is None:
             raise DbHelperException("Device with id %s couldn't be found" % d_id)
@@ -588,15 +815,75 @@ class DbHelper():
         self._session.delete(device)
         self._session.commit()
 
+=======
+        device = self.get_device(d_id)
+        if device is None:
+            raise DbHelperException("Device with id %s couldn't be found" % d_id)
+
+        for device_conf in self._session.query(DeviceConfig).filter_by(device_id=d_id).all():
+            self._session.delete(device_conf)
+        for device_stats in self._session.query(DeviceStats).filter_by(device_id=d_id).all():
+            self._session.delete(device_stats)
+        self._session.delete(device)
+        self._session.commit()
+
+    def get_all_devices_of_room(self, d_room_id):
+        """
+        Return all the devices of a room
+        @param d_room_id: room id
+        @return a list of Device objects
+        """
+        return self._session.query(Device).filter_by(room_id = d_room_id).all()
+
+    def get_all_devices_of_area(self, d_area_id):
+        """
+        Return all the devices of an area
+        @param d_area_id : the area id
+        @return a list of Device objects
+        """
+        device_list = []
+        for room in self.get_all_rooms_of_area(d_area_id):
+            for device in self.get_all_devices_of_room(room.id):
+              device_list.append(device)
+        return device_list
+
+    def get_all_devices_of_category(self, dc_id):
+        """
+        Return all the devices of a category
+        @param dc_id: category id 
+        @return a list of Device objects
+        """
+        return self._session.query(Device).filter_by(category_id = dc_id).all()
+
+    def get_all_devices_of_technology(self, dt_id):
+        """
+        Returns all the devices of a technology
+        @param dt_id : technology id
+        @return a list of Device objects
+        """
+        return self._session.query(Device).filter_by(technology_id = dt_id).all()
+
+>>>>>>> /tmp/database.py~other.hHL1sS
 ####
 # Device stats
 ####
+<<<<<<< /home/floriane/domogik/domogik/src/domogik/common/database.py
     def list_device_stats(self, d_device_id):
+=======
+    def list_device_stats(self, device_id):
+>>>>>>> /tmp/database.py~other.hHL1sS
         """
+<<<<<<< /home/floriane/domogik/domogik/src/domogik/common/database.py
         Return a list of all stats for a device
         @param d_device_id : the device id
         @return a list of DeviceStats objects
+=======
+        Return a list of all stats for a device
+        @param device_id : the device id
+        @return a list of DeviceStats objects
+>>>>>>> /tmp/database.py~other.hHL1sS
         """
+<<<<<<< /home/floriane/domogik/domogik/src/domogik/common/database.py
         return self._session.query(DeviceStats).filter_by(device_id = d_device_id).all()
 
     def get_last_stat_of_device(self, d_device_id):
@@ -608,6 +895,9 @@ class DbHelper():
         return self._session.query(DeviceStats)\
                               .filter_by(device_id = d_device_id)\
                               .order_by(sqlalchemy.desc(DeviceStats.date)).first()
+=======
+        return self._session.query(DeviceStats).filter_by(device_id = device_id).all()
+>>>>>>> /tmp/database.py~other.hHL1sS
 
     def get_last_stat_of_devices(self, device_list):
         """
@@ -623,6 +913,7 @@ class DbHelper():
             result.append(last_record)
         return result
 
+<<<<<<< /home/floriane/domogik/domogik/src/domogik/common/database.py
     def device_has_stats(self, d_device_id):
         """
         Check if the device has stats that were recorded
@@ -632,6 +923,9 @@ class DbHelper():
         return self._session.query(DeviceStats).filter_by(device_id=d_device_id).count() > 0
 
     def add_device_stat(self, d_id, ds_date, ds_value):
+=======
+    def add_device_stat(self, d_id, ds_date, ds_value):
+>>>>>>> /tmp/database.py~other.hHL1sS
         """
         Add a device stat record
         @param device_id : device id
@@ -761,6 +1055,7 @@ class DbHelper():
         """
         Returns account information from id
         @param u_id : user account id
+<<<<<<< /home/floriane/domogik/domogik/src/domogik/common/database.py
         @return a UserAccount object
         """
         return self._session.query(UserAccount).filter_by(id = u_id).first()
@@ -770,18 +1065,45 @@ class DbHelper():
         Return a system account associated to a user, if existing
         @param u_id : The user (not system !) account id
         @return a SystemAccount object
+=======
+        @return a UserAccount object
         """
+        return self._session.query(UserAccount).filter_by(id = u_id).first()
+
+    def get_user_system_account(self, u_id):
+>>>>>>> /tmp/database.py~other.hHL1sS
+        """
+<<<<<<< /home/floriane/domogik/domogik/src/domogik/common/database.py
         user_account = self._session.query(UserAccount).filter_by(id = u_id).first()
         if user_account is not None:
             try:
                 return self._session.query(SystemAccount).filter_by(id = user_account.system_account_id).one()
             except MultipleResultsFound, e:
                 raise DbHelperException("Database may be incoherent, user with id %s has more than one account" % u_id)
+=======
+        Return a system account associated to a user, if existing
+        @param u_id : The user (not system !) account id
+        @return a SystemAccount object
+        """
+        user_account = self._session.query(UserAccount).filter_by(id = u_id).first()
+        if user_account is not None:
+            try:
+                return self._session.query(SystemAccount).filter_by(id = user_account.system_account_id).one()
+            except MultipleResultFound, e:
+                raise DbHelperException("Database may be incoherent, user with id %s has more than one account" % u_id)
 
+        else:
+            return None
+>>>>>>> /tmp/database.py~other.hHL1sS
+
+<<<<<<< /home/floriane/domogik/domogik/src/domogik/common/database.py
         else:
             return None
 
     def add_user_account(self, u_first_name, u_last_name, u_birthdate, u_system_account_id = None):
+=======
+    def add_user_account(self, u_first_name, u_last_name, u_birthdate, u_system_account_id = None):
+>>>>>>> /tmp/database.py~other.hHL1sS
         """
         Add a user account
         @param u_first_name : User's first name
@@ -801,6 +1123,7 @@ class DbHelper():
         Delete a user account and the associated system account if it exists
         @param u_id : user's account id
         """
+<<<<<<< /home/floriane/domogik/domogik/src/domogik/common/database.py
         user_account = self._session.query(UserAccount).filter_by(id = u_id).first()
         if user_account is not None:
             if user_account.system_account_id is not None:
@@ -869,7 +1192,43 @@ class DbHelper():
         for system_stat in system_stats:
             self._session.delete(system_stat)
         self._session.commit()
+=======
+        user_account = self._session.query(UserAccount).filter_by(id = u_id).first()
+        if user_account is not None:
+            if user_account.system_account_id is not None:
+                self.del_system_account(user_account.system_account_id)
+            self._session.delete(user_account)
+            self._session.commit()
 
+####
+# System stats
+####
+    def list_system_stats(self):
+        """
+        Return a list of all system stats
+        @return a list of SystemStats objects
+        """
+        return self._session.query(SystemStats).all()
+
+    def get_system_stat(self, s_name):
+        """
+        Return a system stat
+        @param s_name : the name of the stat to be retrieved
+        @return a SystemStats object
+        """
+        return self._session.query(SystemStats).filter_by(name = s_name).first()
+
+
+    def get_system_stats_by_type(self, s_type):
+        """
+        Return a list of all system stats
+        @param s_type : type of the stats to be retrieved
+        @return a list of SystemStats objects
+        """
+        return self._session.query(SystemStats).filter_by(type = s_type).all()
+>>>>>>> /tmp/database.py~other.hHL1sS
+
+<<<<<<< /home/floriane/domogik/domogik/src/domogik/common/database.py
 ###
 # SystemConfig
 ###
@@ -907,3 +1266,39 @@ class DbHelper():
         self._session.add(system_config)
         self._session.commit()
         return system_config
+=======
+    def add_system_stat(self, s_name, s_date, s_type, s_value):
+        """
+        Add a system stat record
+        @param s_name : name of the stat
+        @param s_date : when the stat was gathered (timestamp)
+        @param s_type : stat type (must be one of sql_schema.SYSTEMSTATS_TYPE_LIST list)
+        @param s_value : stat value
+        @return the new SystemStats object
+        """
+        if s_type not in SYSTEMSTATS_TYPE_LIST:
+            raise ValueError, "s_type must be one of %s" % SYSTEMSTATS_TYPE_LIST
+        system_stat = SystemStats(name = s_name, date = s_date, type = s_type, value = s_value)
+        self._session.add(system_stat)
+        self._session.commit()
+        return system_stat
+
+    def del_system_stat(self, s_name):
+        """
+        Delete a system stat record
+        @param s_name : name of the stat that has to be deleted
+        """
+        system_stat = self._session.query(SystemStats).filter_by(name = s_name).first()
+        if system_stat:
+            self._session.delete(system_stat)
+            self._session.commit()
+
+    def del_all_system_stats(self):
+        """
+        Delete all stats for a device
+        """
+        system_stats = self._session.query(SystemStats).all()
+        for system_stat in system_stats:
+            self._session.delete(system_stat)
+        self._session.commit()
+>>>>>>> /tmp/database.py~other.hHL1sS

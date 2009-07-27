@@ -27,7 +27,11 @@ Load sample data
 Implements
 ==========
 
+<<<<<<< /home/floriane/domogik/domogik/src/domogik/ui/djangodomo/core/SampleDataHelper.py
 - class SampleDataHelper
+=======
+- SampleDataHelper
+>>>>>>> /tmp/SampleDataHelper.py~other.0Qaud1
 
 @author: Domogik project
 @copyright: (C) 2007-2009 Domogik project

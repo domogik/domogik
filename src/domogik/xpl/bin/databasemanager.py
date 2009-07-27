@@ -40,6 +40,8 @@ Implements
 @organization: Domogik
 """
 
+import time 
+
 from domogik.xpl.lib.xplconnector import *
 from domogik.common.configloader import *
 
@@ -166,9 +168,61 @@ class DBConnector(xPLModule):
         except:
             return None
 
-    def _update_stat(self, message):
+class StatsManager(xPLModule):
+    """
+    Listen on the xPL network and keep stats of device and system state
+    """
+    def __init__(self):
+        xPLModule.__init__(self, 'database_manager')
+        self._log = self.get_my_logger()
+        self.__myxpl = Manager()
+        self.__dbhelper = DbHelper()
+        l_x10 = Listener(self._x10_cb, self.__myxpl,
+                {'schema': 'x10.basic', 'type': 'xpl-trig'})
+        l_ow = Listener(self._onewire_cb, self.__myxpl,
+                {'schema': 'sensor.basic', 'type': 'xpl-trig','type': 'onewire'})
+        l_plcbus = Listener(self._plcbus_cb, self.__myxpl,
+                {'schema': 'control.basic', 'type': 'xpl-trig','type':'plcbus'})
+        l_hb = Listener(self._sys_cb, self.__myxpl,
+                {'schema': 'hbeat.app', 'type': 'xpl-stat'})
+
+    def _x10_cb(self, message):
+        """
+        Manage X10 stats
+        """
+        techno_id = self.__dbhelper.get_device_technology_by_name('x10').id
+        d_id = self.__dbhelper.find_devices(technology = techno_id, name = 
+                message.data['device'])[0].id
+        add_device_stat(d_id, int(time.time()), message.data['command'].lower())
+
+    def _onewire_cb(self, message):
+        """
+        Manage OneWire stats
+        """
+        techno_id = self.__dbhelper.get_device_technology_by_name('onewire').id
+        d_id = self.__dbhelper.find_devices(technology = techno_id, name =
+                message.data['device'])[0].id
+        add_device_stat(d_id, int(time.time()), message.data['current'].lower())
+
+    def _plcbus_cb(self, message):
+        """
+        Manage PLCBUS stats
+        """
+        techno_id = self.__dbhelper.get_device_technology_by_name('plcbus').id
+        d_id = self.__dbhelper.find_devices(technology = techno_id, name =
+                message.data['device'])[0].id
+        add_device_stat(d_id, int(time.time()), message.data['command'].lower())
+
+    def _knx_cb(self, message):
+        """
+        Manage KNX stats
+        """
+
+    def _sys_cb(self, message):
+        """
+        Manage system stats 
+        """
         #TODO
-        pass
 
 if __name__ == "__main__":
     d = DBConnector()

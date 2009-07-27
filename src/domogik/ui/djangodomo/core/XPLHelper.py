@@ -27,7 +27,7 @@ Helper to send xpl message (deprecated)
 Implements
 ==========
 
-- XPLHelper:.send(self, xPLSchema, xPLCommand)
+XPLHelper
 
 @author: Domogik project
 @copyright: (C) 2007-2009 Domogik project

@@ -70,7 +70,10 @@ class OneWireTemp(xPLModule):
             my_temp_message.set_type("xpl-trig")
             my_temp_message.set_schema("sensor.basic")
             my_temp_message.set_data_key("device", i)
-            my_temp_message.set_data_key("type", t)
+            #type should be the model of the o1wire component.
+            #Anyway, because we need a way to determine which is the 
+            #technology of the device, we use it with value 'onewire'
+            my_temp_message.set_data_key("type", "onewire")
             my_temp_message.set_data_key("current", v)
             self._myxpl.send(my_temp_message)
 
