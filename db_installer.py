@@ -37,6 +37,7 @@ Implements
 from sqlalchemy import create_engine
 
 from domogik.common import sql_schema
+from domogik.common import database
 from domogik.common.configloader import Loader
 
 cfg = Loader('database')
@@ -63,3 +64,7 @@ engine = create_engine(url)
 # Installer
 ###
 sql_schema.metadata.create_all(engine)
+_db = database.DbHelper()
+
+# Initialize default system configuration
+_db.update_system_config()
