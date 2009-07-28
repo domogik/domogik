@@ -101,7 +101,7 @@ class DbHelper():
     def __init__(self, echo_output = False):
         """
         Class constructor
-        @param echo_output : if set to True displays sqlAlchemy queries (default set to False)
+        @param echo_output : if set to True displays sqlAlchemy queries (optional, default set to False)
         """
         cfg = Loader('database')
         config = cfg.load()
@@ -252,7 +252,7 @@ class DbHelper():
         """
         Add a device_category (temperature, heating, lighting, music, ...)
         @param dc_name : device category name
-        @param dc_description : The device category description
+        @param dc_description : device category description (optional)
         @return a DeviceCategory (the newly created one)
         """
         dc = DeviceCategory(name=dc_name, description=dc_description)
@@ -453,7 +453,7 @@ class DbHelper():
 
     def add_device(self, d_name, d_address, d_technology_id, d_type, d_category_id, d_room_id, 
         d_description = None, d_reference = None, d_is_resetable = False, d_initial_value = None,
-        d_is_value_changeable_by_user = False, d_unit_of_stored_values ='Percent'):
+        d_is_value_changeable_by_user = False, d_unit_of_stored_values = None):
         """
         Add a device item
         @param d_name : name of the device
@@ -464,12 +464,13 @@ class DbHelper():
         @param d_room_id : room id
         @param d_description : Extended item description (100 char max)
         @param d_reference : device reference (ex. AM12 for x10)
-        @param d_is_resetable : Can the item be reseted to some initial state
-        @param d_initial_value : What's the initial value of the item, should be 
-            the state when the item is created (except for sensors, music)
+        @param d_is_resetable : Can the item be reseted to some initial state (optional, default = False)
+        @param d_initial_value : What's the initial value of the item, should be
+            the state when the item is created (except for sensors, music) (optional, default = None)
         @param d_is_value_changeable_by_user : Can a user change item state (ex : false for sensor)
+            (optional, default = False)
         @param d_unit_of_stored_values : What is the unit of item values,
-                must be one of 'Volt', 'Celsius', 'Fahrenheit', 'Percent', 'Boolean'
+                must be one of 'Volt', 'Celsius', 'Fahrenheit', 'Percent', 'Boolean' (optional, default = None)
         @return the new Device object
         """
         try:
@@ -507,18 +508,19 @@ class DbHelper():
         Update a device item
         If a param is None, then the old value will be kept
         @param d_id : Device id
-        @param d_address : Item address (ex : 'A3' for x10/plcbus, '111.111111111' for 1wire)
-        @param d_description : Extended item description (100 char max)
-        @param d_technology : Item technology id
-        @param d_type : One of 'appliance','light','music','sensor'
-        @param d_category : Item category id
-        @param d_room : Item room id
-        @param d_is_resetable : Can the item be reseted to some initial state
-        @param d_initial_value : What's the initial value of the item, should be 
-            the state when the item is created (except for sensors, music)
-        @param d_is_value_changeable_by_user : Can a user change item state (ex : false for sensor)
+        @param d_name : device name (optional)
+        @param d_address : Item address (ex : 'A3' for x10/plcbus, '111.111111111' for 1wire) (optional)
+        @param d_description : Extended item description (optional)
+        @param d_technology : Item technology id (optional)
+        @param d_type : One of 'appliance','light','music','sensor' (optional)
+        @param d_category : Item category id (optional) 
+        @param d_room : Item room id (optional)
+        @param d_is_resetable : Can the item be reseted to some initial state (optional)
+        @param d_initial_value : What's the initial value of the item, should be
+            the state when the item is created (except for sensors, music) (optional)
+        @param d_is_value_changeable_by_user : Can a user change item state (ex : false for sensor) (optional)
         @param d_unit_of_stored_values : What is the unit of item values,
-            must be one of 'Volt', 'Celsius', 'Fahrenheit', 'Percent', 'Boolean'
+            must be one of 'Volt', 'Celsius', 'Fahrenheit', 'Percent', 'Boolean' (optional)
         @return the updated Device object
         """
         if d_unit_of_stored_values not in [UNIT_OF_STORED_VALUE_LIST, None]: 
@@ -728,7 +730,7 @@ class DbHelper():
         Add a system_account
         @param a_login : Account login
         @param a_password : Account clear password (will be hashed in sha256)
-        @param a_is_admin : True if it is an admin account, False otherwise
+        @param a_is_admin : True if it is an admin account, False otherwise (optional, default = False)
         @return the new SystemAccount object
         """
         password = hashlib.sha256()
@@ -787,7 +789,7 @@ class DbHelper():
         @param u_first_name : User's first name
         @param u_last_name : User's last name
         @param u_birthdate : User's birthdate
-        @param u_system_account : User's account on the system (can be None)
+        @param u_system_account : User's account on the system (optional, default = False)
         @return the new UserAccount object
         """
         user_account = UserAccount(first_name = u_first_name, last_name = u_last_name, 
@@ -888,9 +890,9 @@ class DbHelper():
     def update_system_config(self, s_simulation_mode=None, s_admin_mode=None, s_debug_mode=None):
         """
         Update (or create) system configuration
-        @param s_simulation_mode : True if the system is running in simulation mode
-        @param s_admin_mode : True if the system is running in administrator mode
-        @param s_debug_mode : True if the system is running in debug mode
+        @param s_simulation_mode : True if the system is running in simulation mode (optional)
+        @param s_admin_mode : True if the system is running in administrator mode (optional)
+        @param s_debug_mode : True if the system is running in debug mode (optional)
         @return a SystemConfig object
         """
         system_config = self.get_system_config()
