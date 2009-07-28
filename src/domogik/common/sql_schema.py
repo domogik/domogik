@@ -111,9 +111,7 @@ class Enum(types.TypeDecorator):
             raise AssertionError('"%s" not in Enum.values' % value)
         return value
 
-#Define objects
-
-### TODO : add db prefix to table names
+# Define objects
 
 ###
 # Areas
