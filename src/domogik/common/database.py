@@ -55,6 +55,7 @@ Implements
 
 
 import hashlib
+from types import DictType, ListType, NoneType
 
 import sqlalchemy
 from sqlalchemy.orm import sessionmaker
@@ -386,6 +387,8 @@ class DbHelper():
                           is_value_changeable_by_user, unit_of_stored_values.
         @return a list of Device objects
         """
+        assert type(filters) is DictType
+
         device_list = self._session.query(Device)
         for filter in filters:
             filter_arg = "%s = '%s'" % (filter, filters[filter])
@@ -400,6 +403,9 @@ class DbHelper():
         @param category_id_list : list of category ids
         @return a list of DeviceObject items
         """
+        assert type(d_room_id_list) is ListType or type(d_room_id_list) is NoneType
+        assert type(d_category_id_list) is ListType or type(d_category_id_list) is NoneType
+
         device_list = self._session.query(Device)
         if d_room_id_list is not None and len(d_room_id_list) != 0:
             device_list = device_list.filter(Device.room_id.in_(d_room_id_list))
@@ -617,6 +623,8 @@ class DbHelper():
         @param device_list : list of device ids
         @return a list of DeviceStats objects
         """
+        assert type(device_list) == list
+
         result = []
         for d_id in device_list:
             last_record = self._session.query(DeviceStats)\
