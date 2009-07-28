@@ -67,25 +67,22 @@ _cfg = Loader('database')
 _config = _cfg.load()
 _db_prefix = dict(_config[1])['db_prefix']
 
-###
-# Enum stuff
-# http://www.sqlalchemy.org/trac/wiki/UsageRecipes/Enum
-###
-class Enum(types.TypeDecorator):
-    impl = types.Unicode
-    
-    def __init__(self, values, empty_to_none=False, strict=False):
-        """Emulate an Enum type.
 
-        values:
-           A list of valid values for this column
-        empty_to_none:
-           Optional, treat the empty string '' as None
-        strict:
-           Also insist that columns read from the database are in the
+class Enum(types.TypeDecorator):
+    """
+    Emulate an Enum type (see http://www.sqlalchemy.org/trac/wiki/UsageRecipes/Enum)
+    """
+    impl = types.Unicode
+
+    def __init__(self, values, empty_to_none=False, strict=False):
+        """
+        Class constructor
+        @param values : a list of valid values for this column
+        @param empty_to_none : treat the empty string '' as None (optional default = False)
+        @param strict : also insist that columns read from the database are in the
            list of valid values.  Note that, with strict=True, you won't
            be able to clean out bad data from the database through your
-           code.
+           code. (optional default = False)
         """
 
         if values is None or len(values) is 0:
@@ -111,18 +108,13 @@ class Enum(types.TypeDecorator):
             raise AssertionError('"%s" not in Enum.values' % value)
         return value
 
+
 # Define objects
 
-###
-# Areas
-# name : The "short" name of the area (a few words, 30 char max)
-# description : Extended description, up to 100 chars
-#
-# An area is something like "first floor", "garden", etc ...
-# That is not a room !
-###
-
 class Area(Base):
+    """
+    Area : it is something like "first floor", "garden", etc ...
+    """
     __tablename__ = '%s_area' % _db_prefix
 
     id = Column(Integer, primary_key=True)
@@ -130,24 +122,34 @@ class Area(Base):
     description = Column(String(100))
 
     def __init__(self, name, description):
+        """
+        Class constructor
+        @param name : short name of the area
+        @param description : extended description
+        """
         self.name = name
         self.description = description
 
     def __repr__(self):
+        """
+        Print an internal representation of the class
+        @return an internal representation
+        """
         return "<Area(id=%s, name='%s', desc='%s')>" % (self.id, self.name, self.description)
 
     @staticmethod
     def get_tablename():
+        """
+        Return the table name associated to the class
+        @return table name
+        """
         return Area.__tablename__
 
-###
-# Rooms
-# name : The "short" name (a few words, 30 char max)
-# area : id of the area where the room is
-# description : Extended description, up ti 100 chars
-###
 
 class Room(Base):
+    """
+    Room
+    """
     __tablename__ = '%s_room' % _db_prefix
     id = Column(Integer, primary_key=True)
     name = Column(String(30), nullable=False)
@@ -156,58 +158,71 @@ class Room(Base):
     area = relation(Area, backref=backref(__tablename__, order_by=id))
 
     def __init__(self, name, description, area_id):
+        """
+        Class constructor
+        @param name : short name of the area
+        @param description : extended description
+        @param area_id : id of the area where the room is
+        """
         self.name = name
         self.description = description
         self.area_id = area_id
 
     def __repr__(self):
+        """
+        Print an internal representation of the class
+        @return an internal representation
+        """
         return "<Room(id=%s, name='%s', desc='%s', area=%s)>" \
           % (self.id, self.name, self.description, self.area_id)
 
     @staticmethod
     def get_tablename():
+        """
+        Return the table name associated to the class
+        @return table name
+        """
         return Room.__tablename__
 
-###
-# Categories for devices
-# name : the category name (1 word, max 30 chars)
-# ex : temperature, heating, lighting, music
-#
-# The category is used to "tag" a device
-###
 
 class DeviceCategory(Base):
+    """
+    Category of a device (temperature, heating, lighting, music...)
+    """
     __tablename__ = '%s_device_category' % _db_prefix
     id = Column(Integer, primary_key=True)
     name = Column(String(30), nullable=False)
     description = Column(String(100))
 
     def __init__(self, name, description):
+        """
+        Class constructor
+        @param name : short name of the category
+        @param description : extended description
+        """
         self.name = name
         self.description = description
 
     def __repr__(self):
+        """
+        Print an internal representation of the class
+        @return an internal representation
+        """
         return "<DeviceCategory(id=%s, name='%s', desc='%s')>" % (self.id, self.name, self.description)
 
     @staticmethod
     def get_tablename():
+        """
+        Return the table name associated to the class
+        @return table name
+        """
         return DeviceCategory.__tablename__
 
-###
-# Descriptions of the different technologies
-# name : Name of the technology (ex : X10, 1wire, PLCBUS)
-# description : Extended description, max 10 chars
-# type : Basic type of the technology, one of
-#       'cpl' : use power lines,
-#       'wired' : Use a wired bus (1wire for ex),
-#       'wifi' : Use wifi,
-#       'wireless' : Use other wireless (RF based) technologies (ex : RFXCOM)
-#       'ir' : Infrared
-#
-# Each device must be linked to one of these categories
-###
 
 class DeviceTechnology(Base):
+    """
+    Technology of a device (X10, PLCBus, 1wire, RFXCOM,...)
+    """
     __tablename__ = '%s_device_technology' % _db_prefix
     id = Column(Integer, primary_key=True)
     name = Column(String(30), nullable=False)
@@ -215,27 +230,38 @@ class DeviceTechnology(Base):
     type = Column(Enum(DEVICE_TECHNOLOGY_TYPE_LIST))
 
     def __init__(self, name, description, type):
+        """
+        Class constructor
+        @param name : short name of the technology
+        @param description : extended description
+        @param type : cpl (power lines), wired (ex. 1wire), wifi, 
+        @param wireless (RF based, for example RFXCOM), ir (infrared)
+        """
         self.name = name
         self.description = description
         self.type = type
 
     def __repr__(self):
+        """
+        Print an internal representation of the class
+        @return an internal representation
+        """
         return "<DeviceTechnology(id=%s, name='%s', desc='%s', type='%s')>" \
           % (self.id, self.name, self.description, self.type)
 
     @staticmethod
     def get_tablename():
+        """
+        Return the table name associated to the class
+        @return table name
+        """
         return DeviceTechnology.__tablename__
 
-###
-# Config for technologies
-# key : the config item
-# value : the config value
-# 
-# This table describes the technology wide configurations
-###
 
 class DeviceTechnologyConfig(Base):
+    """
+    Configuration for device technology
+    """
     __tablename__ = '%s_device_technology_config' % _db_prefix
     id = Column(Integer, primary_key=True)
     technology_id = Column(Integer, ForeignKey('%s.id' % DeviceTechnology.get_tablename()))
@@ -244,41 +270,42 @@ class DeviceTechnologyConfig(Base):
     value = Column(String(80), nullable=False)
 
     def __init__(self, technology_id, key, value):
+        """
+        Class constructor
+        @param technology_id : link to the device technology
+        @param key : configuration item
+        @param value : configuration value
+        """
         self.technology_id = technology_id
         self.key = key
         self.value = value
 
     def __repr__(self):
+        """
+        Print an internal representation of the class
+        @return an internal representation
+        """
         return "<DeviceTechnologyConfig(id=%s, techno=%s, ('%s', '%s'))>" \
           % (self.id, self.technology_id, self.key, self.value)
 
     @staticmethod
     def get_tablename():
+        """
+        Return the table name associated to the class
+        @return table name
+        """
         return DeviceTechnologyConfig.__tablename__
 
-###
-# Devices
-# name : The short (30 char max) name of the device
-# address : The device address (like 'a3' for x10, or '01.123456789ABC' for 1wire)
-# description : Explain what this device is used to
-# reference : device reference (ex. AM12 for x10 devices)
-# technology : Device technology (foreign key)
-# type: One of 'appliance','lamp','music'
-# category : Device category (foreign key)
-#  room : The room where the device is (foreign key)
-# is_resetable : Can we set the device to a default value
-# initial_value : Value to reset the device
-# is_value_changeable_by_user : Can the device receive orders from the user
-# unit_of_stored_values : Unit to display the values, one of
-# Volt, Celsius, Farenheit, Percent, Boolean
-###
 
 class Device(Base):
+    """
+    Device
+    """
     __tablename__ = '%s_device' % _db_prefix
     id = Column(Integer, primary_key=True)
     name = Column(String(30), nullable=False)
-    address = Column(String(30), nullable=False)
     description = Column(String(100))
+    address = Column(String(30), nullable=False)
     reference = Column(String(30))
     technology_id = Column(Integer, ForeignKey('%s.id' % DeviceTechnology.get_tablename()))
     technology = relation(DeviceTechnology, backref=backref(__tablename__))
@@ -295,18 +322,33 @@ class Device(Base):
 
     def __init__(self, name, address, description, reference, technology_id, type, category_id, room_id, \
         is_resetable, initial_value, is_value_changeable_by_user, unit_of_stored_values):
-      self.name = name
-      self.address = address
-      self.description = description
-      self.reference = reference
-      self.technology_id = technology_id
-      self.type = type
-      self.category_id = category_id
-      self.room_id = room_id
-      self.is_resetable = is_resetable
-      self.initial_value = initial_value
-      self.is_value_changeable_by_user = is_value_changeable_by_user
-      self.unit_of_stored_values = unit_of_stored_values
+        """
+        Class constructor
+        @param name : short name of the device
+        @param description : extended description
+        @param address : device address (like 'A3' for x10, or '01.123456789ABC' for 1wire)
+        @param reference : internal reference of the device (like AM12 for a X10 device)
+        @param technology_id : link to the device technology
+        @param type : 'appliance', 'lamp', 'music'
+        @param category_id : link to the device category
+        @param room_id : link to the room where the device is
+        @param is_resetable : True if a default value can be set to the device
+        @param initial_value : initial value set to the device when it is switched on
+        @param is_value_changeable_by_user : True if the user can set a value to the device
+        @param unit_of_stored_values : unit associated to the value (Volt, Celsius, Farenheit, Percent, Boolean)
+        """
+        self.name = name
+        self.address = address
+        self.description = description
+        self.reference = reference
+        self.technology_id = technology_id
+        self.type = type
+        self.category_id = category_id
+        self.room_id = room_id
+        self.is_resetable = is_resetable
+        self.initial_value = initial_value
+        self.is_value_changeable_by_user = is_value_changeable_by_user
+        self.unit_of_stored_values = unit_of_stored_values
 
     def is_lamp(self):
         """
@@ -333,6 +375,10 @@ class Device(Base):
             return self._stats[0].value
 
     def __repr__(self):
+        """
+        Print an internal representation of the class
+        @return an internal representation
+        """
         return "<Device(id=%s, name='%s', addr='%s', desc='%s', ref='%s', techno=%s, type='%s', cat=%s, \
           room=%s, is_reset='%s', initial_val='%s', is_value_change='%s', unit='%s')>" \
           % (self.id, self.name, self.address, self.description, self.reference, self.technology_id, \
@@ -341,17 +387,17 @@ class Device(Base):
 
     @staticmethod
     def get_tablename():
+        """
+        Return the table name associated to the class
+        @return table name
+        """
         return Device.__tablename__
 
-###
-# Config for devices
-# key : the config item
-# value : the config value
-# 
-# This table describes the device related configurations
-###
 
 class DeviceConfig(Base):
+    """
+    Device configuration
+    """
     __tablename__ = '%s_device_config' % _db_prefix
     id = Column(Integer, primary_key=True)
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()))
@@ -360,26 +406,37 @@ class DeviceConfig(Base):
     value = Column(String(80), nullable=False)
 
     def __init__(self, device_id, key, value):
+        """
+        Class constructor
+        @param device_id : device id
+        @param key : configuration item
+        @param value : configuration value
+        """
         self.device_id = device_id
         self.key = key
         self.value = value
 
     def __repr__(self):
+        """
+        Print an internal representation of the class
+        @return an internal representation
+        """
         return "<DeviceConfig(id=%s, device=%s, ('%s', '%s'))>" \
           % (self.id, self.device_id, self.key, self.value)
 
     @staticmethod
     def get_tablename():
+        """
+        Return the table name associated to the class
+        @return table name
+        """
         return DeviceConfig.__tablename__
 
-###
-# Stats for device's states
-# date : timestamp of the record
-# device : the device which send value
-# value : The vale of the device
-###
 
 class DeviceStats(Base):
+    """
+    Device stats (values that were associated to the device)
+    """
     __tablename__ = '%s_device_stats' % _db_prefix
     id = Column(Integer, primary_key=True)
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()))
@@ -388,31 +445,37 @@ class DeviceStats(Base):
     value = Column(String(80), nullable=False)
 
     def __init__(self, device_id, date, value):
+        """
+        Class constructor
+        @param device_id : device id
+        @param date : datetime when the stat was recorded
+        @param value : stat value
+        """
         self.device_id = device_id
         self.date = date
         self.value = value
 
     def __repr__(self):
+        """
+        Print an internal representation of the class
+        @return an internal representation
+        """
         return "<DeviceStats(id=%s, device=%s, date='%s', val='%s')>" \
           % (self.id, self.device_id, self.date, self.value)
 
     @staticmethod
     def get_tablename():
+        """
+        Return the table name associated to the class
+        @return table name
+        """
         return DeviceStats.__tablename__
 
-###
-# Define triggers
-# name : The name of the rule
-# description : Long description of the rule
-# rule : formatted trigger rule
-# result : list of xpl messages to send
-#
-# Triggers are set or (device, condition). 
-# When all the devices respects the condition, 
-# the 'result' is executed
-###
 
 class Trigger(Base):
+    """
+    Trigger : execute commands when conditions are met
+    """
     __tablename__ = '%s_trigger' % _db_prefix
     id = Column(Integer, primary_key=True)
     description = Column(String(100))
@@ -420,28 +483,37 @@ class Trigger(Base):
     result = Column(Text, nullable=False)
 
     def __init__(self, description, rule, result):
+        """
+        Class constructor
+        @param description : long description of the rule
+        @param rule : formatted trigger rule
+        @param result : list of xpl message to send when the rule is met
+        """
         self.description = description
         self.rule = rule
         self.result = result
 
     def __repr__(self):
+        """
+        Print an internal representation of the class
+        @return an internal representation
+        """
         return "<Trigger(id=%s, desc='%s', rule='%s', result='%s')>" \
           % (self.id, self.description, self.rule, self.result)
 
     @staticmethod
     def get_tablename():
+        """
+        Return the table name associated to the class
+        @return table name
+        """
         return Trigger.__tablename__
 
-###
-# Define users' system account
-# login : username used for login
-# password : account password
-# is_admin : does this account have administrative power ?
-#
-# This table is only used by interface
-###
 
 class SystemAccount(Base):
+    """
+    System account for users : it is only used by the UI
+    """
     __tablename__ = '%s_system_account' % _db_prefix
     id = Column(Integer, primary_key=True)
     login = Column(String(20), nullable=False)
@@ -449,29 +521,37 @@ class SystemAccount(Base):
     is_admin = Column(Boolean, nullable=False, default=False)
 
     def __init__(self, login, password, is_admin):
+        """
+        Class constructor
+        @param login : login
+        @param password : password
+        @parma is_admin : True if the user has administrator privileges
+        """
         self.login = login
         self.password = password
         self.is_admin = is_admin
 
     def __repr__(self):
+        """
+        Print an internal representation of the class
+        @return an internal representation
+        """
         return "<SystemAccount(id=%s, login='%s', pass='%s' is_admin='%s')>" \
           % (self.id, self.login, self. password, self.is_admin)
 
     @staticmethod
     def get_tablename():
+        """
+        Return the table name associated to the class
+        @return table name
+        """
         return SystemAccount.__tablename__
 
-###
-# User account - personnal informations
-# first_name : User's first name
-# last_name : User's last date
-# birthdate : User's date of birth
-# system_account : User account on the system (if exists)
-#
-# This table is only used by interface
-###
 
 class UserAccount(Base):
+    """
+    Personnal information of the user
+    """
     __tablename__ = '%s_user_account' % _db_prefix
     id = Column(Integer, primary_key=True)
     first_name = Column(String(50), nullable=False)
@@ -481,28 +561,39 @@ class UserAccount(Base):
     system_account = relation(SystemAccount, backref=backref(__tablename__))
 
     def __init__(self, first_name, last_name, birthdate, system_account_id):
+        """
+        Class constructor
+        @param first_name : first name
+        @param last_name : last name
+        @param birthdate : birthdate
+        @param system_account_id : link to the system account (optional)
+        """
         self.first_name = first_name
         self.last_name = last_name
         self.birthdate = birthdate
         self.system_account_id = system_account_id
 
     def __repr__(self):
+        """
+        Print an internal representation of the class
+        @return an internal representation
+        """
         return "<UserAccount(id=%s, first_name='%s', last_name='%s', system_account=%s)>" \
           % (self.id, self.first_name, self.last_name, self.system_account_id)
 
     @staticmethod
     def get_tablename():
+        """
+        Return the table name associated to the class
+        @return table name
+        """
         return UserAccount.__tablename__
 
-###
-# Stats for device's states
-# date : timestamp of the record
-# name : name of the record
-# type : type of the record
-# value : The vale of the device
-###
 
 class SystemStats(Base):
+    """
+    Statistics for the system
+    """
     __tablename__ = '%s_system_stats' % _db_prefix
     id = Column(Integer, primary_key=True)
     name = Column(String(30), nullable=False)
@@ -511,29 +602,39 @@ class SystemStats(Base):
     value = Column(String(80), nullable=False)
 
     def __init__(self, name, date, type, value):
+        """
+        Class constructor
+        @param name : statistic name
+        @param date : datetime when the statistic was recorded
+        @param type : statistic type like HB_CLIENT (hardbeat client), CORE
+        @param value : statistic value
+        """
         self.name = name
         self.date = date
         self.type = type
         self.value = value
 
     def __repr__(self):
+        """
+        Print an internal representation of the class
+        @return an internal representation
+        """
         return "<SystemStats(id=%s, name=%s, date=%s, type='%s', value='%s')>" \
           % (self.id, self.name, self.date, self.type, self.value)
 
     @staticmethod
     def get_tablename():
+        """
+        Return the table name associated to the class
+        @return table name
+        """
         return SystemStats.__tablename__
 
 
-###
-# Configuration parameters for the system
-# This table contains only one row
-# simulation_mode : True if the system is running in simulation mode
-# admin_mode : True if the system is running in administrator mode
-# debug_mode : True if the system is running in debug mode
-###
-
 class SystemConfig(Base):
+    """
+    Configuration parameters for the system. This object contains only one record
+    """
     __tablename__ = '%s_system_config' % _db_prefix
     id = Column(Integer, primary_key=True)
     simulation_mode = Column(Boolean, nullable=False, default=False)
@@ -541,14 +642,28 @@ class SystemConfig(Base):
     debug_mode = Column(Boolean, nullable=False, default=False)
 
     def __init__(self, simulation_mode, admin_mode, debug_mode):
+        """
+        Class constructor
+        @param simulation_mode : if we are running the app in simulation mode
+        @param admin_mode : if we are running the app in administrator mode
+        @param debug_mode : if we are running the app in debug mode
+        """
         self.simulation_mode = simulation_mode
         self.admin_mode = admin_mode
         self.debug_mode = debug_mode
 
     def __repr__(self):
+        """
+        Print an internal representation of the class
+        @return an internal representation
+        """
         return "<SystemConfig(id=%s, simulation=%s, admin=%s, debug=%s)>" \
           % (self.id, self.simulation_mode, self.admin_mode, self.debug_mode)
 
     @staticmethod
     def get_tablename():
+        """
+        Return the table name associated to the class
+        @return table name
+        """
         return SystemConfig.__tablename__
