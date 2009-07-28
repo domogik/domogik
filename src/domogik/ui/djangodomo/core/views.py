@@ -114,7 +114,7 @@ def _update_device_values(request, sys_config):
     @param sys_config : a SystemConfig object (parameters for system configuration)
     """
     for device_id in QueryDict.getlist(request.POST, "device_id"):
-        value_list = QueryDict.getlist(request.POST, "value" + device_id)
+        value_list = QueryDict.getlist(request.POST, "value%s" % device_id)
         for i in range(len(value_list)):
             if value_list[i]:
                 _send_value_to_device(device_id, value_list[i], sys_config)
@@ -159,10 +159,10 @@ def _send_x10_cmd(device, old_value, new_value, simulation_mode):
     xPL_schema = "x10.basic"
     xPL_param = ""
     if device.is_appliance():
-        xPL_param = "device="+device.address+","+"command="+new_value
+        xPL_param = "device=%s,command=%s" % (device.address, new_value)
     elif device.is_lamp():
         if new_value == "on" or new_value == "off":
-            xPL_param = "device="+device.address+","+"command="+new_value
+            xPL_param = "device=%s,command=%s" % (device.address, new_value)
         else:
             # TODO check if type is int and 0 <= value <= 100
             if int(new_value)-int(old_value) > 0:
@@ -170,8 +170,7 @@ def _send_x10_cmd(device, old_value, new_value, simulation_mode):
             else:
                 cmd = "dim"
             level = abs(int(new_value)-int(old_value))
-            xPL_param = "command=" + cmd + "," + "device=" + device.address + \
-                    "," + "level=" + str(level)
+            xPL_param = "command=%s,device=%s,level=%s" % (cmd, device.address, str(level))
 
     print "**** xPLParam = %s" %xPL_param
     if not simulation_mode:
