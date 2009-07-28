@@ -623,7 +623,7 @@ class DbHelper():
         @param device_list : list of device ids
         @return a list of DeviceStats objects
         """
-        assert type(device_list) == list
+        assert type(device_list) is ListType
 
         result = []
         for d_id in device_list:
