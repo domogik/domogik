@@ -55,17 +55,10 @@ from sqlalchemy.orm import relation, backref
 
 from domogik.common.configloader import Loader
 
-<<<<<<< /home/floriane/domogik/domogik/src/domogik/common/sql_schema.py
 UNIT_OF_STORED_VALUE_LIST = [u'Volt', u'Celsius', u'Farenheit', u'Percent', u'Boolean', None]
 DEVICE_TECHNOLOGY_TYPE_LIST = [u'cpl', u'wired', u'wifi', u'wireless', u'ir']
 DEVICE_TYPE_LIST = [u'appliance', u'lamp', u'music', u'sensor']
 SYSTEMSTATS_TYPE_LIST = [u'HB_CLIENT', u'CORE']
-=======
-UNIT_OF_STORED_VALUE_LIST = [u'Volt', u'Celsius', u'Farenheit', u'Percent', u'Boolean']
-DEVICE_TECHNOLOGY_TYPE_LIST = [u'cpl', u'wired', u'wifi', u'wireless', u'ir']
-DEVICE_TYPE_LIST = [u'appliance', u'lamp', u'music', u'sensor']
-SYSTEMSTATS_TYPE_LIST = [u'HB_CLIENT', u'CORE']
->>>>>>> /tmp/sql_schema.py~other.9n0cRN
 
 Base = declarative_base()
 metadata = Base.metadata
@@ -161,12 +154,8 @@ class Room(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(30), nullable=False)
     description = Column(String(100))
-<<<<<<< /home/floriane/domogik/domogik/src/domogik/common/sql_schema.py
     area_id = Column(Integer, ForeignKey('%s.id' % Area.get_tablename()))
     area = relation(Area, backref=backref(__tablename__, order_by=id))
-=======
-    area_id = Column(Integer, ForeignKey('%s.id' % Area.get_tablename()))
->>>>>>> /tmp/sql_schema.py~other.9n0cRN
 
     def __init__(self, name, description, area_id):
         self.name = name
@@ -195,16 +184,12 @@ class DeviceCategory(Base):
     name = Column(String(30), nullable=False)
     description = Column(String(100))
 
-    def __init__(self, name):
+    def __init__(self, name, description):
         self.name = name
         self.description = description
 
     def __repr__(self):
-<<<<<<< /home/floriane/domogik/domogik/src/domogik/common/sql_schema.py
         return "<DeviceCategory(id=%s, name='%s', desc='%s')>" % (self.id, self.name, self.description)
-=======
-        return "<DeviceCategory(id=%s, name='%s')>" % (self.id, self.name)
->>>>>>> /tmp/sql_schema.py~other.9n0cRN
 
     @staticmethod
     def get_tablename():
@@ -255,12 +240,8 @@ class DeviceTechnology(Base):
 class DeviceTechnologyConfig(Base):
     __tablename__ = '%s_device_technology_config' % _db_prefix
     id = Column(Integer, primary_key=True)
-<<<<<<< /home/floriane/domogik/domogik/src/domogik/common/sql_schema.py
     technology_id = Column(Integer, ForeignKey('%s.id' % DeviceTechnology.get_tablename()))
     technology = relation(DeviceTechnology, backref=backref(__tablename__))
-=======
-    technology_id = Column(Integer, ForeignKey('%s.id' % DeviceTechnology.get_tablename()))
->>>>>>> /tmp/sql_schema.py~other.9n0cRN
     key = Column(String(30), nullable=False)
     value = Column(String(80), nullable=False)
 
@@ -300,7 +281,6 @@ class Device(Base):
     name = Column(String(30), nullable=False)
     address = Column(String(30), nullable=False)
     description = Column(String(100))
-<<<<<<< /home/floriane/domogik/domogik/src/domogik/common/sql_schema.py
     reference = Column(String(30))
     technology_id = Column(Integer, ForeignKey('%s.id' % DeviceTechnology.get_tablename()))
     technology = relation(DeviceTechnology, backref=backref(__tablename__))
@@ -309,37 +289,19 @@ class Device(Base):
     category = relation(DeviceCategory, backref=backref(__tablename__))
     room_id = Column(Integer, ForeignKey('%s.id' % Room.get_tablename()))
     room = relation(Room, backref=backref(__tablename__))
-=======
-    technology_id = Column(Integer, ForeignKey('%s.id' % DeviceTechnology.get_tablename()))
-    type = Column(Enum(DEVICE_TYPE_LIST))
-    category_id = Column(Integer, ForeignKey('%s.id' % DeviceCategory.get_tablename()))
-    room_id = Column(Integer, ForeignKey('%s.id' % Room.get_tablename()))
->>>>>>> /tmp/sql_schema.py~other.9n0cRN
     is_resetable = Column(Boolean, nullable=False)
     initial_value = Column(String(10))
     is_value_changeable_by_user = Column(Boolean, nullable=False)
-<<<<<<< /home/floriane/domogik/domogik/src/domogik/common/sql_schema.py
     unit_of_stored_values = Column(Enum(UNIT_OF_STORED_VALUE_LIST))
     _stats = relation("DeviceStats", order_by="DeviceStats.date.desc()", backref=__tablename__)
-=======
-    unit_of_stored_values = Column(Enum(UNIT_OF_STORED_VALUE_LIST))
->>>>>>> /tmp/sql_schema.py~other.9n0cRN
 
-<<<<<<< /home/floriane/domogik/domogik/src/domogik/common/sql_schema.py
     def __init__(self, name, address, description, reference, technology_id, type, category_id, room_id, \
-=======
-    def __init__(self, address, description, technology_id, type, category_id, room_id, \
->>>>>>> /tmp/sql_schema.py~other.9n0cRN
         is_resetable, initial_value, is_value_changeable_by_user, unit_of_stored_values):
       self.name = name
       self.address = address
       self.description = description
-<<<<<<< /home/floriane/domogik/domogik/src/domogik/common/sql_schema.py
       self.reference = reference
       self.technology_id = technology_id
-=======
-      self.technology_id = technology_id
->>>>>>> /tmp/sql_schema.py~other.9n0cRN
       self.type = type
       self.category_id = category_id
       self.room_id = room_id
@@ -373,19 +335,11 @@ class Device(Base):
             return self._stats[0].value
 
     def __repr__(self):
-<<<<<<< /home/floriane/domogik/domogik/src/domogik/common/sql_schema.py
         return "<Device(id=%s, name='%s', addr='%s', desc='%s', ref='%s', techno=%s, type='%s', cat=%s, \
           room=%s, is_reset='%s', initial_val='%s', is_value_change='%s', unit='%s')>" \
           % (self.id, self.name, self.address, self.description, self.reference, self.technology_id, \
              self.type, self.category_id, self.room_id, self.is_resetable, self.initial_value,\
              self.is_value_changeable_by_user, self.unit_of_stored_values)
-=======
-        return "<Device(id=%s, addr='%s', desc='%s', techno=%s, type='%s', cat=%s, \
-          room=%s, is_reset='%s', initial_val='%s', is_value_change='%s', unit='%s')>" \
-          % (self.id, self.address, self.description, self.technology_id, \
-             self.type, self.category_id, self.room_id, self.is_resetable, self.initial_value,\
-             self.is_value_changeable_by_user, self.unit_of_stored_values)
->>>>>>> /tmp/sql_schema.py~other.9n0cRN
 
     @staticmethod
     def get_tablename():
@@ -402,12 +356,8 @@ class Device(Base):
 class DeviceConfig(Base):
     __tablename__ = '%s_device_config' % _db_prefix
     id = Column(Integer, primary_key=True)
-<<<<<<< /home/floriane/domogik/domogik/src/domogik/common/sql_schema.py
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()))
     device = relation(Device, backref=backref(__tablename__))
-=======
-    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()))
->>>>>>> /tmp/sql_schema.py~other.9n0cRN
     key = Column(String(30), nullable=False)
     value = Column(String(80), nullable=False)
 
@@ -434,12 +384,8 @@ class DeviceConfig(Base):
 class DeviceStats(Base):
     __tablename__ = '%s_device_stats' % _db_prefix
     id = Column(Integer, primary_key=True)
-<<<<<<< /home/floriane/domogik/domogik/src/domogik/common/sql_schema.py
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()))
     device = relation(Device, backref=backref(__tablename__))
-=======
-    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()))
->>>>>>> /tmp/sql_schema.py~other.9n0cRN
     date = Column(DateTime, nullable=False)
     value = Column(String(80), nullable=False)
 
@@ -533,12 +479,8 @@ class UserAccount(Base):
     first_name = Column(String(50), nullable=False)
     last_name = Column(String(60), nullable=False)
     birthdate = Column(Date, nullable=False)
-<<<<<<< /home/floriane/domogik/domogik/src/domogik/common/sql_schema.py
     system_account_id = Column(Integer, ForeignKey('%s.id' % SystemAccount.get_tablename()))
     system_account = relation(SystemAccount, backref=backref(__tablename__))
-=======
-    system_account_id = Column(Integer, ForeignKey('%s.id' % SystemAccount.get_tablename()))
->>>>>>> /tmp/sql_schema.py~other.9n0cRN
 
     def __init__(self, first_name, last_name, birthdate, system_account_id):
         self.first_name = first_name
@@ -553,7 +495,6 @@ class UserAccount(Base):
     @staticmethod
     def get_tablename():
         return UserAccount.__tablename__
-<<<<<<< /home/floriane/domogik/domogik/src/domogik/common/sql_schema.py
 
 ###
 # Stats for device's states
@@ -613,35 +554,3 @@ class SystemConfig(Base):
     @staticmethod
     def get_tablename():
         return SystemConfig.__tablename__
-=======
-
-###
-# Stats for device's states
-# date : timestamp of the record
-# name : name of the record
-# type : type of the record
-# value : The vale of the device
-###
-
-class SystemStats(Base):
-    __tablename__ = '%s_system_stats' % _db_prefix
-    id = Column(Integer, primary_key=True)
-    name = Column(String(30), nullable=False)
-    date = Column(DateTime, nullable=False)
-    type = Column(Enum(SYSTEMSTATS_TYPE_LIST))
-    value = Column(String(80), nullable=False)
-
-    def __init__(self, name, date, type, value):
-        self.name = name
-        self.date = date
-        self.type = type
-        self.value = value
-
-    def __repr__(self):
-        return "<SystemStats(id=%s, name=%s, date=%s, type='%s', value='%s')>" \
-          % (self.id, self.name, self.date, self.type, self.value)
-
-    @staticmethod
-    def get_tablename():
-        return SystemStats.__tablename__
->>>>>>> /tmp/sql_schema.py~other.9n0cRN
