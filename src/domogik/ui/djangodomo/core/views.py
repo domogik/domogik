@@ -83,8 +83,6 @@ def index(request):
             if len(room_id_list) == 0:
                 room_id_list = possible_room_id_list
             device_category_id_list = QueryDict.getlist(request.POST, "device_category_id")
-            print "*** device_category_id_list %s" % device_category_id_list
-            print "*** room_id_list = %s" % room_id_list
             device_list = _db.find_devices(room_id_list, device_category_id_list)
         elif cmd == "update_values":
             _update_device_values(request, sys_config)
