@@ -106,13 +106,13 @@ class SampleDataHelper:
         self._db.update_system_config(s_simulation_mode=True, s_admin_mode=True, s_debug_mode=True)
 
         # Create sample objects
-        x10 = self._db.add_device_technology(dt_name="x10", 
+        x10 = self._db.add_device_technology(dt_name=u"x10", 
                                             dt_description="x10 techno", 
                                             dt_type=u"cpl")
-        plcbus = self._db.add_device_technology(dt_name="plcbus", 
+        plcbus = self._db.add_device_technology(dt_name=u"PLCBus", 
                                                 dt_description="plcbus techno", 
                                                 dt_type=u"cpl")
-        onewire = self._db.add_device_technology(dt_name="1-wire", 
+        onewire = self._db.add_device_technology(dt_name=u"1wire", 
                                                 dt_description="1-wire techno", 
                                                 dt_type=u"wired")
 

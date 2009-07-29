@@ -200,19 +200,19 @@ if __name__ == "__main__":
     print_test('list device_technology')
     assert len(d.list_device_technologies()) == 0, "There should have no device technology"
     print_test('add device_technology')
-    dt1 = d.add_device_technology('dt1', 'desc dt1', u'cpl')
-    dt2 = d.add_device_technology('dt2', 'desc dt2', u'wired')
-    dt3 = d.add_device_technology('dt3', 'desc dt3', u'wifi')
+    dt1 = d.add_device_technology(u'x10', 'desc dt1', u'cpl')
+    dt2 = d.add_device_technology(u'1wire', 'desc dt2', u'wired')
+    dt3 = d.add_device_technology(u'PLCBus', 'desc dt3', u'cpl')
     assert len(d.list_device_technologies()) == 3, "%s devices technologies found, instead of 3 " \
                                                   % len(d.list_device_technologies())
-    assert has_item(d.list_device_technologies(), ['dt1', 'dt2', 'dt3']), \
+    assert has_item(d.list_device_technologies(), [u'x10', u'1wire', u'PLCBus']), \
                                                   "Couldn't find all device technologies" 
     print_test('fetch informations')
-    assert d.get_device_technology_by_name('dt1').name == 'dt1', "DeviceTechnology dt1 was not found"
+    assert d.get_device_technology_by_name(u'1wire').name == u'1wire', "DeviceTechnology '1wire' was not found"
     print_test('del device technology')
     d.del_device_technology(dt2.id)
-    assert has_item(d.list_device_technologies(), ['dt1', 'dt3']), "Couldn't find 'dt1' and 'dt3'"
-    assert not has_item(d.list_device_technologies(), ['dt2']), "'dt2' was NOT deleted"
+    assert has_item(d.list_device_technologies(), [u'x10', u'PLCBus']), "Couldn't find 'x10' and 'PLCBus'"
+    assert not has_item(d.list_device_technologies(), [u'1wire']), "'1wire' was NOT deleted"
 
     ### Device technology config
     print_title('test device technology config')
@@ -256,7 +256,7 @@ if __name__ == "__main__":
     area2 = d.add_area('area2','description 2')
     room1 = d.add_room('room1', area1.id)
     room2 = d.add_room('room2', area2.id)
-    dt1 = d.add_device_technology('dt1', 'desc dt1', u'cpl')
+    dt1 = d.add_device_technology(u'x10', 'desc dt1', u'cpl')
     dc1 = d.add_device_category('dc1')
     dc2 = d.add_device_category('dc2')
     device1 = d.add_device(d_name='device1', d_address = 'A1', d_technology_id = dt1.id, d_type = u'lamp', 
@@ -319,7 +319,7 @@ if __name__ == "__main__":
     ### Device stats
     print_title("device stats")
     remove_all_device_stats(d)
-    dt1 = d.add_device_technology("x10", "this is x10", u"cpl")
+    dt1 = d.add_device_technology(u"x10", "this is x10", u"cpl")
     dc1 = d.add_device_category("lighting")
     area1 = d.add_area('area1','description 1')
     room1 = d.add_room('room1', area1.id)
