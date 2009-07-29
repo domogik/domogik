@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-                                                                           
+# -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -37,7 +37,12 @@ Implements
 @organization: Domogik
 """
 
-from domogik.xpl.lib.x10 import *
+import os
+
+if os.name == 'nt':
+    from domogik.xpl.lib.win_x10 import *
+else:
+    from domogik.xpl.lib.x10 import *
 from domogik.xpl.lib.xplconnector import *
 from domogik.xpl.lib.module import *
 from domogik.common.configloader import Loader
@@ -52,6 +57,7 @@ class x10Main(xPLModule):
         This class is used to connect x10 (through heyu) to the xPL Network
         '''
         xPLModule.__init__(self, name = 'x10')
+        self._heyu_cfg_path_res = ""
         self.__myxpl = Manager()
         self._config = Query(self.__myxpl)
         res = xPLResult()
@@ -59,7 +65,7 @@ class x10Main(xPLModule):
         self._heyu_cfg_path_res = res.get_value()['heyu_cfg_path']
         try:
             pass
-#            self.__myx10 = X10API(self._heyu_cfg_path_res)
+            self.__myx10 = X10API(self._heyu_cfg_path_res)
         except:
             print "Something went wrong during heyu init, check logs"
             exit(1)
@@ -67,10 +73,10 @@ class x10Main(xPLModule):
         Listener(self.x10_cmnd_cb, self.__myxpl, {'schema': 'x10.basic',
                 'type': 'xpl-cmnd'})
         #One listener for system schema, allowing to reload config
-        Listener(self.heyu_reload_config, self.__myxpl, {'schema': 'domogik.system', 
+        Listener(self.heyu_reload_config, self.__myxpl, {'schema': 'domogik.system',
            'type': 'xpl-cmnd', 'command': 'reload', 'module': 'x10'})
         #One listener for system schema, allowing to dump config
-        Listener(self.heyu_dump_config, self.__myxpl, {'schema': 'domogik.system', 
+        Listener(self.heyu_dump_config, self.__myxpl, {'schema': 'domogik.system',
             'type': 'xpl-cmnd', 'command': 'push_config', 'module': 'x10'})
         self._log = self.get_my_logger()
 #        self._monitor = X10Monitor(self._heyu_cfg_path_res)
@@ -81,7 +87,7 @@ class x10Main(xPLModule):
     def heyu_reload_config(self, message):
         '''
         Regenerate the heyu config file
-        First, it needs to get all config items, then rewrite the config file 
+        First, it needs to get all config items, then rewrite the config file
         and finally restart heyu
         '''
         #Heyu config items
@@ -141,8 +147,8 @@ class x10Main(xPLModule):
             'all_lights_off': lambda d, h, l: self.__myx10.lights_off(h),
             'bright': lambda d, h, l: self.__myx10.bright(d, l),
             'dim': lambda d, h, l: self.__myx10.dim(d, l),
-            'brightb': lambda d, h, l: self.__myx10.bright(d, l),
-            'dimb': lambda d, h, l: self.__myx10.dim(d, l),
+            'brightb': lambda d, h, l: self.__myx10.brightb(d, l),
+            'dimb': lambda d, h, l: self.__myx10.dimb(d, l),
         }
         cmd = None
         dev = None
