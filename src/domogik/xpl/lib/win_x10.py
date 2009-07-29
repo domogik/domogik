@@ -283,13 +283,15 @@ class X10API:
                  'HAIL_REQUEST': 0x08, 'HAIL_ACK': 0x09, 'PRESET_DIM1': 0x0A, 'PRESET_DIM2': 0x0B,
                  'EXTENDED_DATA': 0x0C, 'STATUS_ON': 0x0D, 'STATUS_OFF': 0x0E, 'STATUS_REQUEST': 0x0F}
 
-    def __init__(self, heyuconf):
-        self._serialconf = {'port':0,
+    def __init__(self, heyuconf, serial_port = 0):
+        self._serialconf = {
                             'speed':4800,
                             'timeout':15,
                             'parity':serial.PARITY_NONE,
                             'stop_bits':serial.STOPBITS_ONE,
-                            'byte_size':serial.EIGHTBITS}
+                            'byte_size':serial.EIGHTBITS
+                            }
+        self._serialconf['port'] = serial_port
         l = logger.Logger('x10API')
         self._log = l.get_logger()
         self._housecodes = list('ABCDEFGHIJKLMNOP')
