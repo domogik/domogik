@@ -27,7 +27,6 @@ Help to manage Domogik installation
 Implements
 ==========
 
-- rec_glob_get_files(path)
 
 @author: Domogik project
 @copyright: (C) 2007-2009 Domogik project
@@ -38,7 +37,6 @@ Implements
 import ez_setup
 ez_setup.use_setuptools()
 
-#Main install part
 import os
 from setuptools import setup, find_packages
 
