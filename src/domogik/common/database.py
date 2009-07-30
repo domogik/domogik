@@ -109,7 +109,7 @@ class DbHelper():
         db = dict(config[1])
         url = "%s:///" % db['db_type']
         if db['db_type'] == 'sqlite':
-            url = "%s%s" % (url,db['db_path'])
+            url = "%s%s" % (url, db['db_path'])
         else:
             if db['db_port'] != '':
                 url = "%s%s:%s@%s:%s/%s" % (url, db['db_user'], db['db_password'], db['db_host'], db['db_port'], db['db_name'])
