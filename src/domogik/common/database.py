@@ -749,8 +749,11 @@ class DbHelper():
         @param a_login : Account login
         @param a_password : Account clear password (will be hashed in sha256)
         @param a_is_admin : True if it is an admin account, False otherwise (optional, default=False)
-        @return the new SystemAccount object
+        @return the new SystemAccount object or raise a DbHelperException if it already exists
         """
+        system_account = self.get_system_account_by_login(a_login)
+        if system_account is not None:
+            raise DbHelperException("Error %s login already exists" % a_login)
         password = hashlib.sha256()
         password.update(a_password)
         system_account = SystemAccount(login=a_login, password=password.hexdigest(), is_admin=a_is_admin)

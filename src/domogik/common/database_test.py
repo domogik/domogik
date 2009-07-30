@@ -396,6 +396,12 @@ if __name__ == "__main__":
           "System account list should be empty but it is NOT %s" % d.list_system_accounts()
     print_test("add_user_account")
     sys1 = d.add_system_account(a_login = 'mschneider', a_password = 'IwontGiveIt', a_is_admin = True)
+    try:
+        d.add_system_account(a_login = 'mschneider', a_password = 'plop', a_is_admin = True)
+        error = False
+    except DbHelperException:
+        error = True
+    assert error, "It shouldn't have been possible to add login %s. It already exists!" % 'mschneider'
     sys2 = d.add_system_account(a_login = 'lonely', a_password = 'boy', a_is_admin = True)
     sys3 = d.add_system_account(a_login = 'domo', a_password = 'gik', a_is_admin = True)
     user1 = d.add_user_account(u_first_name='Marc', u_last_name='SCHNEIDER', u_birthdate=datetime.date(1973, 4, 24), 
