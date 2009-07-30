@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-                                                                           
+# -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -37,6 +37,7 @@ Implements
 from sqlalchemy import create_engine
 
 from domogik.common import sql_schema
+from domogik.common import database
 from domogik.common.configloader import Loader
 
 cfg = Loader('database')
@@ -63,3 +64,14 @@ engine = create_engine(url)
 # Installer
 ###
 sql_schema.metadata.create_all(engine)
+_db = database.DbHelper()
+
+# Initialize default system configuration
+_db.update_system_config()
+
+# Create supported device technologies
+_db.add_device_technology(dt_name=u"x10", dt_description="x10 techno", dt_type=u"cpl")
+_db.add_device_technology(dt_name=u"PLCBus", dt_description="plcbus techno", dt_type=u"cpl")
+_db.add_device_technology(dt_name=u"1wire", dt_description="1-wire techno", dt_type=u"wired")
+_db.add_device_technology(dt_name=u"RFXCom", dt_description="RFXCom techno", dt_type=u"wireless")
+_db.add_device_technology(dt_name=u"IR", dt_description="IR techno", dt_type=u"wireless")
