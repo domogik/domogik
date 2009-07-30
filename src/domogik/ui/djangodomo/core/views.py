@@ -105,84 +105,6 @@ def index(request):
         'page_title': page_title,
     })
 
-def _update_device_values(request, sys_config):
-    """
-    Update device values (main control page)
-    @param request : the HTTP request
-    @param sys_config : a SystemConfig object (parameters for system configuration)
-    """
-    for device_id in QueryDict.getlist(request.POST, "device_id"):
-        value_list = QueryDict.getlist(request.POST, "value%s" % device_id)
-        for i in range(len(value_list)):
-            if value_list[i]:
-                _send_value_to_device(device_id, value_list[i], sys_config)
-
-def _send_value_to_device(device_id, new_value, sys_config):
-    """
-    Get all values posted over the form
-    For each device :
-      Check if value was changed
-      If yes, try to send new value to the device
-      Log the result
-    @param device_id : device id
-    @param new_value : value sent to the device
-    @param sys_config : a SystemConfig object (parameters for system configuration)
-    """
-    error = ""
-    # Read previous value, and update it if necessary
-    device = _db.get_device(device_id)
-    old_value = device.get_last_value()
-    if old_value != new_value:
-        if device.technology.name.lower() == 'x10':
-            error = _send_x10_cmd(device, old_value, new_value, sys_config.simulation_mode)
-
-        if error == "":
-            if device.is_lamp():
-                if new_value == "on":
-                    new_value = "100"
-                elif new_value == "off":
-                    new_value = "0"
-
-            _write_device_stats(device_id, new_value,)
-
-def _send_x10_cmd(device, old_value, new_value, simulation_mode):
-    """
-    Send a x10 command
-    @param device : a Device object
-    @param old_value : previous value associated to the device
-    @param new_value : new value sent to the device
-    @param simulation_mode : True if we are in simulation mode
-    """
-    output = ""
-    xPL_schema = "x10.basic"
-    xPL_param = ""
-    if device.is_appliance():
-        xPL_param = "device=%s,command=%s" % (device.address, new_value)
-    elif device.is_lamp():
-        if new_value == "on" or new_value == "off":
-            xPL_param = "device=%s,command=%s" % (device.address, new_value)
-        else:
-            # TODO check if type is int and 0 <= value <= 100
-            if int(new_value)-int(old_value) > 0:
-                cmd = "bright"
-            else:
-                cmd = "dim"
-            level = abs(int(new_value)-int(old_value))
-            xPL_param = "command=%s,device=%s,level=%s" % (cmd, device.address, str(level))
-
-    print "**** xPLParam = %s" %xPL_param
-    if not simulation_mode:
-        output = XPLHelper().send(xPL_schema, xPL_param)
-    return output
-
-def _write_device_stats(device_id, new_value):
-    """
-    Write device stats
-    @param device_id : device id
-    @param new_value : new value associated to the device
-    """
-    _db.add_device_stat(d_id=device_id, ds_date=datetime.datetime.now(), ds_value=new_value)
-
 def device(request, device_id):
     """
     Method called when the page showing the details of a device is called
@@ -249,19 +171,6 @@ def device_stats(request, device_id):
         'device_all': device_all,
         'page_title': page_title,
     })
-
-def _clear_device_stats(request, device_id, is_admin_mode):
-    """
-    Clear stats of a device or all devices
-    @param request : HTTP request
-    @param device_id : device id
-    @param is_admin_mode : True if we are in administrator mode
-    """
-    if device_id == "0": # For all devices
-        for device in _db.list_devices():
-            _db.del_all_device_stats(device.id)
-    else:
-        _db.del_all_device_stats(device_id)
 
 def admin_index(request):
     """
@@ -364,6 +273,97 @@ def clear_data(request):
         'page_title': page_title,
         'action': action,
     })
+
+def _update_device_values(request, sys_config):
+    """
+    Update device values (main control page)
+    @param request : the HTTP request
+    @param sys_config : a SystemConfig object (parameters for system configuration)
+    """
+    for device_id in QueryDict.getlist(request.POST, "device_id"):
+        value_list = QueryDict.getlist(request.POST, "value%s" % device_id)
+        for i in range(len(value_list)):
+            if value_list[i]:
+                _send_value_to_device(device_id, value_list[i], sys_config)
+
+def _send_value_to_device(device_id, new_value, sys_config):
+    """
+    Get all values posted over the form
+    For each device :
+      Check if value was changed
+      If yes, try to send new value to the device
+      Log the result
+    @param device_id : device id
+    @param new_value : value sent to the device
+    @param sys_config : a SystemConfig object (parameters for system configuration)
+    """
+    error = ""
+    # Read previous value, and update it if necessary
+    device = _db.get_device(device_id)
+    old_value = device.get_last_value()
+    if old_value != new_value:
+        if device.technology.name.lower() == 'x10':
+            error = _send_x10_cmd(device, old_value, new_value, sys_config.simulation_mode)
+
+        if error == "":
+            if device.is_lamp():
+                if new_value == "on":
+                    new_value = "100"
+                elif new_value == "off":
+                    new_value = "0"
+
+            _write_device_stats(device_id, new_value,)
+
+def _send_x10_cmd(device, old_value, new_value, simulation_mode):
+    """
+    Send a x10 command
+    @param device : a Device object
+    @param old_value : previous value associated to the device
+    @param new_value : new value sent to the device
+    @param simulation_mode : True if we are in simulation mode
+    """
+    output = ""
+    xPL_schema = "x10.basic"
+    xPL_param = ""
+    if device.is_appliance():
+        xPL_param = "device=%s,command=%s" % (device.address, new_value)
+    elif device.is_lamp():
+        if new_value == "on" or new_value == "off":
+            xPL_param = "device=%s,command=%s" % (device.address, new_value)
+        else:
+            # TODO check if type is int and 0 <= value <= 100
+            if int(new_value)-int(old_value) > 0:
+                cmd = "bright"
+            else:
+                cmd = "dim"
+            level = abs(int(new_value)-int(old_value))
+            xPL_param = "command=%s,device=%s,level=%s" % (cmd, device.address, str(level))
+
+    print "**** xPLParam = %s" %xPL_param
+    if not simulation_mode:
+        output = XPLHelper().send(xPL_schema, xPL_param)
+    return output
+
+def _write_device_stats(device_id, new_value):
+    """
+    Write device stats
+    @param device_id : device id
+    @param new_value : new value associated to the device
+    """
+    _db.add_device_stat(d_id=device_id, ds_date=datetime.datetime.now(), ds_value=new_value)
+
+def _clear_device_stats(request, device_id, is_admin_mode):
+    """
+    Clear stats of a device or all devices
+    @param request : HTTP request
+    @param device_id : device id
+    @param is_admin_mode : True if we are in administrator mode
+    """
+    if device_id == "0": # For all devices
+        for device in _db.list_devices():
+            _db.del_all_device_stats(device.id)
+    else:
+        _db.del_all_device_stats(device_id)
 
 def device_status(request, room_id=None, device_id=None):
     return None
