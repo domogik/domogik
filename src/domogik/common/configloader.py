@@ -27,8 +27,7 @@ Load config from file
 Implements
 ==========
 
-- Loader.__init__(self, module_name=None)
-- Loader.load(self)
+- Loader
 
 @author: Maxence Dunnewind <maxence@dunnewind.net>
 @copyright: (C) 2007-2009 Domogik project
