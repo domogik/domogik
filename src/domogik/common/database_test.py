@@ -132,7 +132,7 @@ def remove_all_device_stats(db):
 
 if __name__ == "__main__":
     print_test('*********** Starting tests ***********')
-    d = DbHelper()
+    d = DbHelper(use_test_db=True)
 
     ### Areas
     print_title('test area')

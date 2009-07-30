@@ -99,10 +99,11 @@ class DbHelper():
     _engine = None
     _session = None
 
-    def __init__(self, echo_output=False):
+    def __init__(self, echo_output=False, use_test_db=False):
         """
         Class constructor
-        @param echo_output : if set to True displays sqlAlchemy queries (optional, default set to False)
+        @param echo_output : if True displays sqlAlchemy queries (optional, default False)
+        @param use_test_db : if True use a test database (optional, default False)
         """
         cfg = Loader('database')
         config = cfg.load()
@@ -115,6 +116,9 @@ class DbHelper():
                 url = "%s%s:%s@%s:%s/%s" % (url, db['db_user'], db['db_password'], db['db_host'], db['db_port'], db['db_name'])
             else:
                 url = "%s%s:%s@%s/%s" % (url, db['db_user'], db['db_password'], db['db_host'], db['db_name'])
+
+        if use_test_db:
+            url = '%s_test' % url
 
         # Connecting to the database
         self._dbprefix = db['db_prefix']

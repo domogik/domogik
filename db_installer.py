@@ -42,6 +42,8 @@ from domogik.common.configloader import Loader
 
 cfg = Loader('database')
 config = cfg.load()
+test_url = ''
+
 try:
     db = dict(config[1])
     url = "%s:///" % db['db_type']
@@ -54,16 +56,20 @@ try:
         else:
             url = "%s%s:%s@%s/%s" % (url, db['db_user'], db['db_password'], \
               db['db_host'], db['db_name'])
+    test_url = '%s_test' % url
 except:
     print "Some errors appears during connection to the database : Can't fetch informations from config file"
 
 engine = create_engine(url)
-
+engine_test = create_engine(test_url)
 
 ###
 # Installer
 ###
 sql_schema.metadata.create_all(engine)
+# For unit tests
+sql_schema.metadata.create_all(engine_test)
+
 _db = database.DbHelper()
 
 # Initialize default system configuration
