@@ -61,7 +61,7 @@ setup(
     install_requires=['setuptools','django >=1.0','sqlalchemy >= 0.5.4'],
     zip_safe = False,
     license = 'GPL v3',
-    namespace_packages = ['domogik', 'mpris', 'tools'],
+#    namespace_packages = ['domogik', 'mpris', 'tools'],
     include_package_data = True,
     packages = find_packages('src'),
     package_dir = {'': 'src'},
