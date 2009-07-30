@@ -25,19 +25,19 @@
 
 {% block script %}
     function saveSettings() {
-        document.forms['settingsForm'].action="{% url saveAdminSettingsView %}"
+        document.forms['settingsForm'].action="{% url save_admin_settings_view %}"
         document.forms['settingsForm'].submit()
     }
 
     function clearData() {
         if(confirm("This is your last chance to keep your data. Are you sure to want to do that ?")) {
-            document.forms['simulationForm'].action="{% url clearDataView %}"
+            document.forms['simulationForm'].action="{% url clear_data_view %}"
             document.forms['simulationForm'].submit()
         }
     }
 
     function loadSampleData() {
-        document.forms['simulationForm'].action="{% url loadSampleDataView %}"
+        document.forms['simulationForm'].action="{% url load_sample_data_view %}"
         document.forms['simulationForm'].submit()
     }
 {% endblock %}
@@ -75,7 +75,7 @@
                 <legend>Data</legend>
                 <table>
                     <tr>
-                        <td>&raquo;&nbsp;<a href="{% url deviceStatsView 0 %}">View stats</a></td>
+                        <td>&raquo;&nbsp;<a href="{% url device_stats_view 0 %}">View stats</a></td>
                     </tr>
                 </table>
             </fieldset>

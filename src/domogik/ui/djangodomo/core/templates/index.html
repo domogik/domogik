@@ -100,7 +100,7 @@
             {% for device in device_list %}
                 <input type="hidden" id="id_deviceId" name="device_id" value="{{ device.id }}"/>
                 <tr class="{% cycle 'oddRow' 'evenRow' %}">
-                    <td><a href="{% url deviceView device.id %}">{{ device.name }}</a></td>
+                    <td><a href="{% url device_view device.id %}">{{ device.name }}</a></td>
                     <td>{{ device.category.name }}</td>
                     {% if admin_mode %}
                         <td>{{ device.address }}</td>

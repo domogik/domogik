@@ -27,7 +27,7 @@
     function clearStats() {
         if (confirm("Are you sure you want to clear stats ?")) {
             document.forms['deviceStatsForm'].cmd.value = "clear_stats"
-            document.forms['deviceStatsForm'].action = "{% url deviceStatsView device_id %}"
+            document.forms['deviceStatsForm'].action = "{% url device_stats_view device_id %}"
             document.forms['deviceStatsForm'].submit()
         }
     }
