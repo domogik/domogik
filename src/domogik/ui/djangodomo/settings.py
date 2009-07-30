@@ -131,9 +131,9 @@ STATIC_DOC_ROOT = PROJECT_PATH + '/core/templates/skins'
 
 # Session stuff
 # Other options are : 
+### 'django.contrib.sessions.backends.db'
 ### 'django.contrib.sessions.backends.file'
-### 'django.contrib.sessions.backends.cache'
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 
 try:
     from settings_local import *

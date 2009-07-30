@@ -64,6 +64,14 @@ def index(request):
     page_title = "Control overview"
     sys_config = _db.get_system_config()
 
+    try:
+        user = request.session['user']
+        print "*** user registered %s" % user
+    except KeyError:
+        print "*** no user registered"
+        new_user = _db.add_system_account(a_login='mschneider', a_password='msc', a_is_admin=True)
+        request.session['user'] = {'login': new_user.login, 'is_admin': new_user.is_admin}
+
     device_list = _db.list_devices()
     if request.method == 'POST': # An action was submitted
         cmd = QueryDict.get(request.POST, "cmd", "")
