@@ -735,6 +735,14 @@ class DbHelper():
         """
         return self._session.query(SystemAccount).filter_by(id=a_id).first()
 
+    def get_system_account_by_login(self, a_login):
+        """
+        Return system account information from login
+        @param a_login : login
+        @return a SystemAccount object
+        """
+        return self._session.query(SystemAccount).filter_by(login=a_login).first()
+
     def add_system_account(self, a_login, a_password, a_is_admin=False):
         """
         Add a system_account

@@ -408,6 +408,11 @@ if __name__ == "__main__":
     print_test("get_system_account")
     assert d.get_system_account(sys1.id).login == 'mschneider', \
           "Login for system id %s should be 'mschneider' but is %s" % (sys1.id, sys1.login)
+    print_test("get_system_account_by_login")
+    assert d.get_system_account_by_login('mschneider') is not None
+    assert d.get_system_account_by_login('mschneider').id == sys1.id, \
+          "Id for login 'mschneider' should be %s but is %s" % (sys1.id, d.get_system_account('mschneider').id)
+    assert d.get_system_account_by_login('lucyfer') is None
     print_test("get_user_account")
     assert d.get_user_account(user1.id).first_name == 'Marc', \
           "First name for user id %s should be 'Marc' but is %s" % (user1.id, user1.first_name)
