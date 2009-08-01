@@ -419,15 +419,15 @@ if __name__ == "__main__":
     assert d.get_system_account_by_login('mschneider').id == sys1.id, \
           "Id for login 'mschneider' should be %s but is %s" % (sys1.id, d.get_system_account('mschneider').id)
     assert d.get_system_account_by_login('lucyfer') is None
+    print_test("get_system_account_by_user")
+    login = d.get_system_account_by_user(user1.id).login
+    assert login == 'mschneider', \
+          "System account login for user id %s should be 'mschneider' but is %s" % (user1.id, login)
     print_test("get_user_account")
     assert d.get_user_account(user1.id).first_name == 'Marc', \
           "First name for user id %s should be 'Marc' but is %s" % (user1.id, user1.first_name)
     assert d.get_user_account(user2.id).last_name == 'PYTHON', \
           "Last name for user id %s should be 'PYTHON' but is %s" % (user2.id, user2.last_name)
-    print_test("get_system_account_by_user")
-    login = d.get_system_account_by_user(user1.id).login
-    assert login == 'mschneider', \
-          "System account login for user id %s should be 'mschneider' but is %s" % (user1.id, login)
     print_test("del_system_account")
     sys_temp = d.add_system_account(a_login = 'fantom', a_password = 'as', a_is_admin = False)
     d.del_system_account(sys_temp.id)
