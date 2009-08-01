@@ -75,9 +75,6 @@ _db = database.DbHelper()
 # Initialize default system configuration
 _db.update_system_config()
 
-# Add default administrator
-_db.add_system_account(a_login='admin', a_password='domogik', a_is_admin=True)
-
 # Create supported device technologies
 _db.add_device_technology(dt_name=u"x10", dt_description="x10 techno", dt_type=u"cpl")
 _db.add_device_technology(dt_name=u"PLCBus", dt_description="plcbus techno", dt_type=u"cpl")
