@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-                                                                           
+# -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -27,29 +27,18 @@ Generate configuration
 Implements
 ==========
 
-- ConfigManager.__init__(self, settings = [], session = None)
-- ConfigManager.ask(self)
-- ConfigManager.write(self, filename, datas, section=None)
-- genericPluginConfig.__init__(self, ip)
-- genericPluginConfig.askandwrite(self, file, section)
-- genericPluginConfig.getvalue(self, value)
-- generalConfig.__init__(self)
-- databaseAccess.__init__(self)
-- x10Config.__init__(self, ip=None)
-- plcbusConfig.__init__(self, ip=None)
-- senderConfig.__init__(self, ip=None)
-- triggerConfig.__init__(self, ip=None)
-- datetimeConfig.__init__(self, ip=None)
-- OneWireConfig.__init__(self, ip=None)
-- SystemManagerConfig.__init__(self, ip)
-- usage()
-- main()
+- ConfigManager
+- generalConfig
+- genericPluginConfig
+- databaseAccess
 
 @author: Maxence Dunnewind <maxence@dunnewind.net>
 @copyright: (C) 2007-2009 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """
+
+# TODO : rename class names with Uppercase
 
 import os
 import re
@@ -152,7 +141,6 @@ class ConfigManager():
         f = open(filename, 'wb')
         config.write(f)
         f.close()
-
 
 
 class genericPluginConfig():
