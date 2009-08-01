@@ -792,10 +792,10 @@ class DbHelper():
         """
         return self._session.query(UserAccount).filter_by(id=u_id).first()
 
-    def get_user_system_account(self, u_id):
+    def get_system_account_by_user(self, u_id):
         """
         Return a system account associated to a user, if existing
-        @param u_id : The user (not system !) account id
+        @param u_id : The user account id
         @return a SystemAccount object
         """
         user_account = self._session.query(UserAccount).filter_by(id=u_id).first()

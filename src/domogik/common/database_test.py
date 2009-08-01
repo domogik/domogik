@@ -424,8 +424,8 @@ if __name__ == "__main__":
           "First name for user id %s should be 'Marc' but is %s" % (user1.id, user1.first_name)
     assert d.get_user_account(user2.id).last_name == 'PYTHON', \
           "Last name for user id %s should be 'PYTHON' but is %s" % (user2.id, user2.last_name)
-    print_test("get_user_system_account")
-    login = d.get_user_system_account(user1.id).login
+    print_test("get_system_account_by_user")
+    login = d.get_system_account_by_user(user1.id).login
     assert login == 'mschneider', \
           "System account login for user id %s should be 'mschneider' but is %s" % (user1.id, login)
     print_test("del_system_account")
