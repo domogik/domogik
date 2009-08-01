@@ -36,8 +36,8 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block content %}
+    <div id="list" style="margin-top: 5px;">
     <form name="deviceStatsForm" method="POST" action="">
-    <div id="list">
     {% if device_stats_list %}
         <table>
             <tr>
@@ -67,8 +67,7 @@
     {% else %}
         <p>No stats found !</p>
     {% endif %}
-    </div>
-
-    <input type="hidden" name="cmd" value=""/>
+        <input type="hidden" name="cmd" value=""/>
     </form>
+    </div>
 {% endblock %}
