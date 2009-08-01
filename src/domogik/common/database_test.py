@@ -428,6 +428,14 @@ if __name__ == "__main__":
           "First name for user id %s should be 'Marc' but is %s" % (user1.id, user1.first_name)
     assert d.get_user_account(user2.id).last_name == 'PYTHON', \
           "Last name for user id %s should be 'PYTHON' but is %s" % (user2.id, user2.last_name)
+    print_test("get_user_account_by_system_account")
+    assert d.get_user_account_by_system_account(sys1.id) is not None, \
+          "System account with id '%s' should have a User account, but it doesn't have" % sys1.id
+    assert d.get_user_account_by_system_account(sys1.id).first_name == 'Marc', \
+          "System account with id '%s' should have as first name 'Marc' but have '%s' instead" \
+          % (sys1.id, d.get_user_account_by_system_account(sys1.id).first_name)
+    assert d.get_user_account_by_system_account(sys3.id) is None, \
+          "System account with id '%s' shouldn't have a User account, but it has one" % sys3.id
     print_test("del_system_account")
     sys_temp = d.add_system_account(a_login = 'fantom', a_password = 'as', a_is_admin = False)
     d.del_system_account(sys_temp.id)

@@ -808,6 +808,19 @@ class DbHelper():
         """
         return self._session.query(UserAccount).filter_by(id=u_id).first()
 
+    def get_user_account_by_system_account(self, s_id):
+        """
+        Return a user account associated to a system account, if existing
+        @param s_id : the system account id
+        @return a UserAccount object or None
+        """
+        try:
+            return self._session.query(UserAccount).filter_by(system_account_id=s_id).one()
+        except NoResultFound:
+            return None
+        except MultipleResultsFound, e:
+            raise DbHelperException("Database may be incoherent, user with id %s has more than one account" % u_id)
+
     def add_user_account(self, u_first_name, u_last_name, u_birthdate, u_system_account_id=None):
         """
         Add a user account
