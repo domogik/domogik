@@ -288,7 +288,7 @@ def clear_data(request):
 
 def _update_device_values(request, sys_config):
     """
-    Update device values (main control page)
+    Update device values
     @param request : the HTTP request
     @param sys_config : a SystemConfig object (parameters for system configuration)
     """
