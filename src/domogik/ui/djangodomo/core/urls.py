@@ -45,6 +45,10 @@ urlpatterns = patterns('djangodomo.core.views',
     
     url(r'device/(?P<device_id>\d+)/$', 'device', name="device_view"),
     url(r'device_stats/(?P<device_id>\d+)/$', 'device_stats', name="device_stats_view"),
+
+    url(r'login/$', 'login', name='login_view'),
+    url(r'logout/$', 'logout', name='logout_view'),
+
     url(r'admin/$', 'admin_index', name="admin_view"),
     url(r'admin/load_sample_data$', 'load_sample_data', name="load_sample_data_view"),
     url(r'admin/clear_data$', 'clear_data', name="clear_data_view"),

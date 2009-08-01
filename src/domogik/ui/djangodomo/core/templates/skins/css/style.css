@@ -67,6 +67,22 @@ body {
     list-style-type: none;
 }
 
+#login {
+    font-size: 12px;
+    float: right;
+}
+
+#login a {
+    color: #3AB17B;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+#login a:hover {
+    color: #FFFFFF;
+    text-decoration: none;
+}
+
 #content {
     float:left;
     width: 820px;

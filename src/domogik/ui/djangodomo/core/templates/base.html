@@ -33,8 +33,17 @@
 <body>
 <div id="container">
     <div id="top">
-        <center><img width="184px" height="79px" src="/skins/img/logo_domogik.png" alt="Domogik"/></center>
-        <center><h1>&raquo; {{ page_title }} &laquo;</h1></center>
+            <div>
+                <center><img width="184px" height="79px" src="/skins/img/logo_domogik.png" alt="Domogik"/></center>
+            </div>
+            <div id="login">
+            {% if not user %}
+              &nbsp;&nbsp;<a href="{% url login_view %}">&raquo;Log in</a>
+            {% else %}
+              &nbsp;Hello, {{ user.first_name }}&nbsp;&nbsp;<a href="{% url logout_view %}">&raquo;Log out</a>
+            {% endif %}
+            </div>
+            <div><center><h1>&raquo; {{ page_title }} &laquo;</center></h1></div>
     </div>
 
     <div id="leftBar">

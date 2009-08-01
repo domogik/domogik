@@ -104,6 +104,7 @@ def device(request, device_id):
     """
     has_stats = ""
     page_title = "Device details"
+    sys_config = _db.get_system_config()
 
     if request.method == 'POST': # An action was submitted
         # TODO check the value of the button (reset or update value)
@@ -142,6 +143,51 @@ def device_stats(request, device_id):
         device_stats_list = _db.list_device_stats(device_id)
     return _go_to_view(request, 'device_stats.html', page_title, device_id=device_id, 
                       device_stats_list=device_stats_list, device_all=device_all)
+
+def login(request):
+    """
+    Login process
+    @param request : HTTP request
+    @return an HttpResponse object
+    """
+    page_title = "Login page"
+    error_msg = ""
+    if request.method == 'POST':
+        # An action was submitted => login action
+        login = QueryDict.get(request.POST, "login", False)
+        password = QueryDict.get(request.POST, "password", False)
+        sys_account = _db.get_system_account_by_login(login)
+        if sys_account is not None:
+            user_account = _db.get_user_account_by_system_account(sys_account.id)
+            if user_account is not None:
+                first_name = user_account.first_name
+                last_name = user_account.last_name
+            else:
+                first_name = login
+                last_name = login
+            request.session['user'] = {
+                'login': sys_account.login, 
+                'is_admin': sys_account.is_admin, 
+                'first_name': first_name, 
+                'last_name': last_name,
+            }
+            return index(request)
+        else:
+            # User not found, ask again to log in
+            error_msg = "Sorry unable to log in. Please check login name / password and try again."
+            return _go_to_view(request, 'login.html', page_title, error_msg=error_msg)
+    else:
+        # User asked to log in
+        return _go_to_view(request, 'login.html', page_title)
+
+def logout(request):
+    """
+    Logout process
+    @param request: HTTP request
+    @return an HttpResponse object
+    """
+    request.session.clear()
+    return index(request)
 
 def admin_index(request):
     """
@@ -328,9 +374,21 @@ def _go_to_view(request, html_page, page_title, **attribute_list):
     response_attr_list = {}
     response_attr_list['page_title'] = page_title
     response_attr_list['sys_config'] = _db.get_system_config()
+    response_attr_list['user'] = _get_user_connected(request)
     for attribute in attribute_list:
         response_attr_list[attribute] = attribute_list[attribute]
     return render_to_response(html_page, response_attr_list)
+
+def _get_user_connected(request):
+    """
+    Check if the user is connected
+    @param request : HTTP request
+    @return the user or None
+    """
+    try:
+        return request.session['user']
+    except KeyError:
+        return None
 
 def device_status(request, room_id=None, device_id=None):
     return None
