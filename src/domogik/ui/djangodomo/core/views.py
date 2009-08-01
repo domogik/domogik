@@ -170,16 +170,16 @@ def admin_index(request):
     debug_mode = ""
     page_title = "Admin page"
     action = "index"
-    system_config = _db.get_system_config()
-    if system_config.simulation_mode:
+    sys_config = _db.get_system_config()
+    if sys_config.simulation_mode:
         simulation_mode = "checked"
-    if system_config.admin_mode:
+    if sys_config.admin_mode:
         admin_mode = "checked"
-    if system_config.debug_mode:
+    if sys_config.debug_mode:
         debug_mode = "checked"
 
     return render_to_response('admin_index.html', {
-        'system_config': system_config,
+        'sys_config': sys_config,
         'page_title': page_title,
         'action': action,
         'simulation_mode': simulation_mode,
