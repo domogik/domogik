@@ -59,6 +59,7 @@ def index(request):
     """
     Method called when the main page is accessed
     @param request : the HTTP request
+    @return an HttpResponse object
     """
     page_title = "Control overview"
     sys_config = _db.get_system_config()
@@ -99,6 +100,7 @@ def device(request, device_id):
     Method called when the page showing the details of a device is called
     @param request : HTTP request
     @param device_id : device id
+    @return an HttpResponse object
     """
     has_stats = ""
     page_title = "Device details"
@@ -119,6 +121,7 @@ def device_stats(request, device_id):
     Method called when the page of stats of a device or all devices is accessed
     @param request : HTTP request
     @param device_id : device id
+    @return an HttpResponse object
     """
     device_all = ""
     page_title = "Device stats"
@@ -144,6 +147,7 @@ def admin_index(request):
     """
     Method called when the admin page is accessed
     @param request : HTTP request
+    @return an HttpResponse object
     """
     simulation_mode = ""
     admin_mode = ""
@@ -165,6 +169,7 @@ def save_admin_settings(request):
     """
     Save the administrator settings (admin, debug and simulation mode
     @param request : HTTP request
+    @return an HttpResponse object
     """
     if request.method == 'POST':
         simulation_mode = QueryDict.get(request.POST, "simulation_mode", False)
@@ -177,6 +182,7 @@ def load_sample_data(request):
     """
     Load sample data
     @param request : HTTP request
+    @return an HttpResponse object
     """
     page_title = "Load sample data"
     action = "loadSampleData"
@@ -204,6 +210,7 @@ def clear_data(request):
     """
     Clear all data of the system (in the database). Please use with care!
     @param request : HTTP request
+    @return an HttpResponse object
     """
     page_title = "Remove all data"
     action = "clearData"
