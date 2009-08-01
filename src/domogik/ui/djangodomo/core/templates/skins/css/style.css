@@ -70,6 +70,7 @@ body {
 #login {
     font-size: 12px;
     float: right;
+    margin-right: 15px;
 }
 
 #login a {
