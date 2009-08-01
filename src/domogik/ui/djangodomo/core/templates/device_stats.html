@@ -56,13 +56,13 @@
                 </tr>
             {% endfor %}
         </table>
-        {% if sys_config.admin_mode %}
-            <p></p>
-            <table>
-                <tr>
-                    <td><input type="button" name="clearStatsButton" onclick="clearStats()" value="Clear stats"/>
-                </tr>
-            </table>
+        {% if is_user_admin %}
+        <p></p>
+        <table>
+            <tr>
+                <td><input type="button" name="clearStatsButton" onclick="clearStats()" value="Clear stats"/>
+            </tr>
+        </table>
         {% endif %}
     {% else %}
         <p>No stats found !</p>

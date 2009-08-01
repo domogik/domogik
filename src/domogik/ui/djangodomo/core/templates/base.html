@@ -37,7 +37,7 @@
                 <center><img width="184px" height="79px" src="/skins/img/logo_domogik.png" alt="Domogik"/></center>
             </div>
             <div id="login">
-            {% if not user %}
+            {% if not is_user_connected %}
               &nbsp;&nbsp;<a href="{% url login_view %}">&raquo;Log in</a>
             {% else %}
               &nbsp;Hello, {{ user.first_name }}&nbsp;&nbsp;<a href="{% url logout_view %}">&raquo;Log out</a>
@@ -52,6 +52,7 @@
             <li><a href="{% url index_view %}">
                     <div align="center"><img src="/skins/img/home.png" alt="Home" border="0"></div>
                     <div align="center">Home</div></a></li>
+            {% if is_user_admin %}
             <li>
                 <a href="{% url admin_view %}">
                     <div align="center"><img src="/skins/img/admin.png" alt="Admin" border="0"/></div>
@@ -64,6 +65,7 @@
                     <div align="center">Django Admin</div>
                 </a>
             </li>
+            {% endif %}
         </ul>
     {% endblock %}
     </div>

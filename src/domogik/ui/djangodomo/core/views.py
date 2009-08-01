@@ -124,6 +124,9 @@ def device_stats(request, device_id):
     @param device_id : device id
     @return an HttpResponse object
     """
+    if not _is_user_connected(request):
+        return index(request)
+
     device_all = ""
     page_title = "Device stats"
     sys_config = _db.get_system_config()
@@ -195,6 +198,9 @@ def admin_index(request):
     @param request : HTTP request
     @return an HttpResponse object
     """
+    if not _is_user_admin(request):
+        return index(request)
+
     simulation_mode = ""
     admin_mode = ""
     debug_mode = ""
@@ -217,6 +223,9 @@ def save_admin_settings(request):
     @param request : HTTP request
     @return an HttpResponse object
     """
+    if not _is_user_admin(request):
+        return index(request)
+
     if request.method == 'POST':
         simulation_mode = QueryDict.get(request.POST, "simulation_mode", False)
         admin_mode = QueryDict.get(request.POST, "admin_mode", False)
@@ -230,6 +239,9 @@ def load_sample_data(request):
     @param request : HTTP request
     @return an HttpResponse object
     """
+    if not _is_user_admin(request):
+        return index(request)
+
     page_title = "Load sample data"
     action = "loadSampleData"
 
@@ -258,6 +270,9 @@ def clear_data(request):
     @param request : HTTP request
     @return an HttpResponse object
     """
+    if not _is_user_admin(request):
+        return index(request)
+
     page_title = "Remove all data"
     action = "clearData"
 
@@ -277,30 +292,37 @@ def _update_device_values(request, sys_config):
     @param request : the HTTP request
     @param sys_config : a SystemConfig object (parameters for system configuration)
     """
+    if not _is_user_connected(request):
+        return
+
     for device_id in QueryDict.getlist(request.POST, "device_id"):
         value_list = QueryDict.getlist(request.POST, "value%s" % device_id)
         for i in range(len(value_list)):
             if value_list[i]:
-                _send_value_to_device(device_id, value_list[i], sys_config)
+                _send_value_to_device(request, device_id, value_list[i], sys_config)
 
-def _send_value_to_device(device_id, new_value, sys_config):
+def _send_value_to_device(request, device_id, new_value, sys_config):
     """
     Get all values posted over the form
     For each device :
       Check if value was changed
       If yes, try to send new value to the device
       Log the result
+    @param request : HTTP request
     @param device_id : device id
     @param new_value : value sent to the device
     @param sys_config : a SystemConfig object (parameters for system configuration)
     """
+    if not _is_user_connected(request):
+        return
+
     error = ""
     # Read previous value, and update it if necessary
     device = _db.get_device(device_id)
     old_value = device.get_last_value()
     if old_value != new_value:
         if device.technology.name.lower() == 'x10':
-            error = _send_x10_cmd(device, old_value, new_value, sys_config.simulation_mode)
+            error = _send_x10_cmd(request, device, old_value, new_value, sys_config.simulation_mode)
 
         if error == "":
             if device.is_lamp():
@@ -311,14 +333,18 @@ def _send_value_to_device(device_id, new_value, sys_config):
 
             _write_device_stats(device_id, new_value,)
 
-def _send_x10_cmd(device, old_value, new_value, simulation_mode):
+def _send_x10_cmd(request, device, old_value, new_value, simulation_mode):
     """
     Send a x10 command
+    @param request : HTTP request
     @param device : a Device object
     @param old_value : previous value associated to the device
     @param new_value : new value sent to the device
     @param simulation_mode : True if we are in simulation mode
     """
+    if not _is_user_connected(request):
+        return None
+
     output = ""
     xPL_schema = "x10.basic"
     xPL_param = ""
@@ -356,11 +382,12 @@ def _clear_device_stats(request, device_id, is_admin_mode):
     @param device_id : device id
     @param is_admin_mode : True if we are in administrator mode
     """
-    if device_id == "0": # For all devices
-        for device in _db.list_devices():
-            _db.del_all_device_stats(device.id)
-    else:
-        _db.del_all_device_stats(device_id)
+    if _is_user_admin(request):
+        if device_id == "0": # For all devices
+            for device in _db.list_devices():
+                _db.del_all_device_stats(device.id)
+        else:
+            _db.del_all_device_stats(device_id)
 
 def _go_to_view(request, html_page, page_title, **attribute_list):
     """
@@ -374,14 +401,17 @@ def _go_to_view(request, html_page, page_title, **attribute_list):
     response_attr_list = {}
     response_attr_list['page_title'] = page_title
     response_attr_list['sys_config'] = _db.get_system_config()
-    response_attr_list['user'] = _get_user_connected(request)
+    user = _get_user_connected(request)
+    response_attr_list['user'] = user
+    response_attr_list['is_user_admin'] = _is_user_admin(request)
+    response_attr_list['is_user_connected'] = _is_user_connected(request)
     for attribute in attribute_list:
         response_attr_list[attribute] = attribute_list[attribute]
     return render_to_response(html_page, response_attr_list)
 
 def _get_user_connected(request):
     """
-    Check if the user is connected
+    Get current user connected
     @param request : HTTP request
     @return the user or None
     """
@@ -389,6 +419,27 @@ def _get_user_connected(request):
         return request.session['user']
     except KeyError:
         return None
+
+def _is_user_connected(request):
+    """
+    Check if the user is connected
+    @param request : HTTP request
+    @return True or False
+    """
+    try:
+        request.session['user']
+        return True
+    except KeyError:
+        return False
+
+def _is_user_admin(request):
+    """
+    Check if user has administrator rights
+    @param request : HTTP request
+    @return True or False
+    """
+    user = _get_user_connected(request)
+    return user is not None and user['is_admin']
 
 def device_status(request, room_id=None, device_id=None):
     return None

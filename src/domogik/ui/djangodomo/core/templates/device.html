@@ -68,6 +68,7 @@
             </tr>
         </table>
         <p></p>
+        {% if is_user_connected %}
         <table>
             <tr>
                 <td><input name="update" type="submit" value="Update"/></td>
@@ -76,10 +77,10 @@
                 {% endif %}
             </tr>
         </table>
-
         <p>
             &raquo;&nbsp;{% if has_stats %}<a href="{% url device_stats_view device.id %}">View stats</a>{% else %}No stats{% endif %}
         </p>
+        {% endif %}
     </div>
     </form>
 {% endblock %}

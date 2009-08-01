@@ -119,6 +119,7 @@
                 </tr>
             {% endfor %}
         </table>
+        {% if is_user_connected %}
         <p></p>
         <table>
             <tr>
@@ -126,6 +127,7 @@
                 <td><input type="submit" value="Update"/></td>
             </tr>
         </table>
+        {% endif %}
         </form>
     {% else %}
         <p>No device found !</p>
