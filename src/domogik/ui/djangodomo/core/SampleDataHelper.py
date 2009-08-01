@@ -103,6 +103,9 @@ class SampleDataHelper:
         """
         self.remove()
 
+        # Add default administrator
+        self._db.add_system_account(a_login='admin', a_password='domogik', a_is_admin=True)
+
         self._db.update_system_config(s_simulation_mode=True, s_admin_mode=True, s_debug_mode=True)
 
         # Create sample objects
