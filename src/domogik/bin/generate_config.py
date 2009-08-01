@@ -55,7 +55,7 @@ class ConfigManager():
     results and write config file
     '''
 
-    def __init__(self, settings = [], session = None):
+    def __init__(self, settings=[], session=None):
         '''
         Constructor
         @param settings List of tuples defining parameters to ask user for :
