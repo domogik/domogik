@@ -26,7 +26,7 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block content %}
-    <form name="deviceForm" method="POST"/>
+    <form name="deviceForm" method="POST" action="{% url device_view %}"/>
     <div id="device">
         <table>
             <tr>

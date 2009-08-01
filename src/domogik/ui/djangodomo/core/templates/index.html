@@ -28,7 +28,7 @@
 {% block content %}
     <div id="search">
     {% if device_list %}
-        <form name="filterForm" method="POST"/>
+        <form name="filterForm" method="POST" action="{% url index_view %}"/>
             <fieldset>
                 <legend>Search</legend>
                 <table>
@@ -82,7 +82,7 @@
 
     <div id="list">
     {% if device_list %}
-        <form name="deviceListForm" method="POST"/>
+        <form name="deviceListForm" method="POST" action="{% url index_view %}"/>
         <table>
             <tr>
                 <th>Device name</th>

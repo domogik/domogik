@@ -22,7 +22,7 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block content %}
-    <form name="loginForm" method="POST"/>
+    <form name="loginForm" method="POST" action="{% url login_view %}"/>
     <div>
         {% if error_msg %}
             <p class="error">{{ error_msg }}</p>
