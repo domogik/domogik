@@ -747,6 +747,22 @@ class DbHelper():
         """
         return self._session.query(SystemAccount).filter_by(login=a_login).first()
 
+    def get_system_account_by_user(self, u_id):
+        """
+        Return a system account associated to a user, if existing
+        @param u_id : The user account id
+        @return a SystemAccount object
+        """
+        user_account = self._session.query(UserAccount).filter_by(id=u_id).first()
+        if user_account is not None:
+            try:
+                return self._session.query(SystemAccount).filter_by(id=user_account.system_account_id).one()
+            except MultipleResultsFound, e:
+                raise DbHelperException("Database may be incoherent, user with id %s has more than one account" % u_id)
+
+        else:
+            return None
+
     def add_system_account(self, a_login, a_password, a_is_admin=False):
         """
         Add a system_account
@@ -791,22 +807,6 @@ class DbHelper():
         @return a UserAccount object
         """
         return self._session.query(UserAccount).filter_by(id=u_id).first()
-
-    def get_system_account_by_user(self, u_id):
-        """
-        Return a system account associated to a user, if existing
-        @param u_id : The user account id
-        @return a SystemAccount object
-        """
-        user_account = self._session.query(UserAccount).filter_by(id=u_id).first()
-        if user_account is not None:
-            try:
-                return self._session.query(SystemAccount).filter_by(id=user_account.system_account_id).one()
-            except MultipleResultsFound, e:
-                raise DbHelperException("Database may be incoherent, user with id %s has more than one account" % u_id)
-
-        else:
-            return None
 
     def add_user_account(self, u_first_name, u_last_name, u_birthdate, u_system_account_id=None):
         """
