@@ -90,16 +90,9 @@ def index(request):
     room_list = _db.list_rooms()
     device_category_list = _db.list_device_categories()
     tech_list = _db.list_device_technologies()
-
-    return render_to_response('index.html', {
-        'area_list': area_list,
-        'room_list': room_list,
-        'device_category_list': device_category_list,
-        'device_list': device_list,
-        'tech_list': tech_list,
-        'sys_config': sys_config,
-        'page_title': page_title,
-    })
+    return _go_to_view(request, 'index.html', page_title, area_list=area_list, 
+                      room_list=room_list, device_category_list=device_category_list, 
+                      device_list=device_list, tech_list=tech_list)
 
 def device(request, device_id):
     """
@@ -109,7 +102,6 @@ def device(request, device_id):
     """
     has_stats = ""
     page_title = "Device details"
-    sys_config = _db.get_system_config()
 
     if request.method == 'POST': # An action was submitted
         # TODO check the value of the button (reset or update value)
@@ -117,16 +109,10 @@ def device(request, device_id):
 
     # Read device information
     device = _db.get_device(device_id)
-
     if _db.device_has_stats(device_id):
         has_stats = "True"
 
-    return render_to_response('device.html', {
-        'device': device,
-        'has_stats': has_stats,
-        'sys_config': sys_config,
-        'page_title': page_title,
-    })
+    return _go_to_view(request, 'device.html', page_title, device=device, has_stats=has_stats)
 
 def device_stats(request, device_id):
     """
@@ -151,14 +137,8 @@ def device_stats(request, device_id):
               device_stats_list.append(device_stat)
     else:
         device_stats_list = _db.list_device_stats(device_id)
-
-    return render_to_response('device_stats.html', {
-        'device_id': device_id,
-        'sys_config': sys_config,
-        'device_stats_list': device_stats_list,
-        'device_all': device_all,
-        'page_title': page_title,
-    })
+    return _go_to_view(request, 'device_stats.html', page_title, device_id=device_id, 
+                      device_stats_list=device_stats_list, device_all=device_all)
 
 def admin_index(request):
     """
@@ -177,15 +157,9 @@ def admin_index(request):
         admin_mode = "checked"
     if sys_config.debug_mode:
         debug_mode = "checked"
-
-    return render_to_response('admin_index.html', {
-        'sys_config': sys_config,
-        'page_title': page_title,
-        'action': action,
-        'simulation_mode': simulation_mode,
-        'admin_mode': admin_mode,
-        'debug_mode': debug_mode,
-    })
+    return _go_to_view(request, 'admin_index.html', page_title, action=action, 
+                      simulation_mode=simulation_mode, admin_mode=admin_mode, 
+                      debug_mode=debug_mode)
 
 def save_admin_settings(request):
     """
@@ -211,11 +185,7 @@ def load_sample_data(request):
     if sys_config.simulation_mode != True:
         error_msg = "The application is not running in simulation mode : "\
                 "can't load sample data"
-        return render_to_response('admin_index.html', {
-            'page_title': page_title,
-            'action': action,
-            'error_msg': error_msg,
-        })
+        return _go_to_view(request, 'admin_index.html', page_title, action=action, error_msg=error_msg)
 
     sample_data_helper = SampleDataHelper(_db)
     sample_data_helper.create()
@@ -225,16 +195,10 @@ def load_sample_data(request):
     device_category_list = _db.list_device_categories()
     device_list = _db.list_devices()
     device_tech_list = _db.list_device_technologies()
-
-    return render_to_response('admin_index.html', {
-        'page_title': page_title,
-        'action': action,
-        'area_list': area_list,
-        'room_list': room_list,
-        'device_category_list': device_category_list,
-        'device_list': device_list,
-        'device_tech_list': device_tech_list,
-    })
+    return _go_to_view(request, 'admin_index.html', page_title, action=action, 
+                      area_list=area_list, room_list=room_list, 
+                      device_category_list=device_category_list, 
+                      device_list=device_list, device_tech_list=device_tech_list)
 
 def clear_data(request):
     """
@@ -248,19 +212,11 @@ def clear_data(request):
     if sys_config.simulation_mode != True:
         error_msg = "The application is not running in simulation mode : "\
                 "can't clear data"
-        return render_to_response('admin_index.html', {
-            'page_title': page_title,
-            'action': action,
-            'error_msg': error_msg,
-        })
+        return _go_to_view(request, 'admin_index.html', page_title, action=action, error_msg=error_msg)
 
     sample_data_helper = SampleDataHelper(_db)
     sample_data_helper.remove()
-
-    return render_to_response('admin_index.html', {
-        'page_title': page_title,
-        'action': action,
-    })
+    return _go_to_view(request, 'admin_index.html', page_title, action=action)
 
 def _update_device_values(request, sys_config):
     """
@@ -352,6 +308,22 @@ def _clear_device_stats(request, device_id, is_admin_mode):
             _db.del_all_device_stats(device.id)
     else:
         _db.del_all_device_stats(device_id)
+
+def _go_to_view(request, html_page, page_title, **attribute_list):
+    """
+    Common method called to go to a view (html page)
+    @param request : HTTP request
+    @param html_page : the page to go to
+    @param page_title : page title
+    @param **attribute_list : list of attributes (dictionnary) that need to be put in the HTTP response
+    @return an HttpResponse object
+    """
+    response_attr_list = {}
+    response_attr_list['page_title'] = page_title
+    response_attr_list['sys_config'] = _db.get_system_config()
+    for attribute in attribute_list:
+        response_attr_list[attribute] = attribute_list[attribute]
+    return render_to_response(html_page, response_attr_list)
 
 def device_status(request, room_id=None, device_id=None):
     return None
