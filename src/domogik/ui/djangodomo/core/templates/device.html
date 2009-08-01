@@ -31,7 +31,24 @@
         <table>
             <tr>
                 <input type="hidden" id="id_deviceId" name="device_id" value="{{ device.id }}"/>
-                <td class="label">Device</td><td class="value">{{ device.name }}</td>
+                <td class="label">Device</td>
+                <td class="value">
+                {% if is_user_admin %}
+                    <input type="text" name="device_name" size="20" value="{{ device.name }}"/>
+                {% else %}
+                    {{ device.name }}
+                {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td class="label">Description</td>
+                <td class="value">
+                {% if is_user_admin %}
+                    <textarea name="device_description" cols="40" rows="3">{{ device.description }}</textarea>
+                {% else %}
+                    {{ device.description }}
+                {% endif %}
+                </td>
             </tr>
             {% if sys_config.admin_mode %}
                 <tr>

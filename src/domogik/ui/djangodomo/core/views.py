@@ -296,6 +296,9 @@ def _update_device_values(request, sys_config):
         return
 
     for device_id in QueryDict.getlist(request.POST, "device_id"):
+        name = QueryDict.get(request.POST, "device_name", False)
+        description = QueryDict.get(request.POST, "device_description", False)
+        _db.update_device(d_id=device_id, d_name=name, d_description=description)
         value_list = QueryDict.getlist(request.POST, "value%s" % device_id)
         for i in range(len(value_list)):
             if value_list[i]:
