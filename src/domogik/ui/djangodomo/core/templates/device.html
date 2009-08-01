@@ -33,7 +33,7 @@
                 <input type="hidden" id="id_deviceId" name="device_id" value="{{ device.id }}"/>
                 <td class="label">Device</td><td class="value">{{ device.name }}</td>
             </tr>
-            {% if admin_mode %}
+            {% if sys_config.admin_mode %}
                 <tr>
                     <td class="label">Address</td><td class="value">{{ device.address }}</td>
                 </tr>

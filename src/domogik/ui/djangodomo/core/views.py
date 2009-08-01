@@ -60,17 +60,8 @@ def index(request):
     Method called when the main page is accessed
     @param request : the HTTP request
     """
-    admin_mode = ""
     page_title = "Control overview"
     sys_config = _db.get_system_config()
-
-    try:
-        user = request.session['user']
-        print "*** user registered %s" % user
-    except KeyError:
-        print "*** no user registered"
-        new_user = _db.add_system_account(a_login='mschneider', a_password='msc', a_is_admin=True)
-        request.session['user'] = {'login': new_user.login, 'is_admin': new_user.is_admin}
 
     device_list = _db.list_devices()
     if request.method == 'POST': # An action was submitted
@@ -100,16 +91,13 @@ def index(request):
     device_category_list = _db.list_device_categories()
     tech_list = _db.list_device_technologies()
 
-    if sys_config.admin_mode == True:
-        admin_mode = "True"
-
     return render_to_response('index.html', {
         'area_list': area_list,
         'room_list': room_list,
         'device_category_list': device_category_list,
         'device_list': device_list,
         'tech_list': tech_list,
-        'admin_mode': admin_mode,
+        'sys_config': sys_config,
         'page_title': page_title,
     })
 
@@ -120,12 +108,8 @@ def device(request, device_id):
     @param device_id : device id
     """
     has_stats = ""
-    admin_mode = ""
     page_title = "Device details"
-
     sys_config = _db.get_system_config()
-    if sys_config.admin_mode == True:
-        admin_mode = "True"
 
     if request.method == 'POST': # An action was submitted
         # TODO check the value of the button (reset or update value)
@@ -140,7 +124,7 @@ def device(request, device_id):
     return render_to_response('device.html', {
         'device': device,
         'has_stats': has_stats,
-        'admin_mode': admin_mode,
+        'sys_config': sys_config,
         'page_title': page_title,
     })
 
@@ -152,11 +136,7 @@ def device_stats(request, device_id):
     """
     device_all = ""
     page_title = "Device stats"
-    admin_mode = ""
-
     sys_config = _db.get_system_config()
-    if sys_config.admin_mode == True:
-        admin_mode = "True"
 
     cmd = QueryDict.get(request.POST, "cmd", "")
     if cmd == "clear_stats" and sys_config.admin_mode:
@@ -174,7 +154,7 @@ def device_stats(request, device_id):
 
     return render_to_response('device_stats.html', {
         'device_id': device_id,
-        'admin_mode': admin_mode,
+        'sys_config': sys_config,
         'device_stats_list': device_stats_list,
         'device_all': device_all,
         'page_title': page_title,
