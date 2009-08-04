@@ -781,6 +781,13 @@ class DbHelper():
         self._session.commit()
         return system_account
 
+    def add_default_system_account(self):
+        """
+        Add a default system account (login = admin, password = domogik, is_admin = True)
+        @return a SystemAccount object
+        """
+        return self.add_system_account(a_login='admin', a_password='domogik', a_is_admin=True)
+
     def del_system_account(self, a_id):
         """
         Delete a system account 
