@@ -50,7 +50,7 @@
                 {% endif %}
                 </td>
             </tr>
-            {% if sys_config.admin_mode %}
+            {% if is_user_admin %}
                 <tr>
                     <td class="label">Address</td><td class="value">{{ device.address }}</td>
                 </tr>

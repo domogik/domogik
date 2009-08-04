@@ -925,11 +925,10 @@ class DbHelper():
         except NoResultFound, e:
             pass
 
-    def update_system_config(self, s_simulation_mode=None, s_admin_mode=None, s_debug_mode=None):
+    def update_system_config(self, s_simulation_mode=None, s_debug_mode=None):
         """
         Update (or create) system configuration
         @param s_simulation_mode : True if the system is running in simulation mode (optional)
-        @param s_admin_mode : True if the system is running in administrator mode (optional)
         @param s_debug_mode : True if the system is running in debug mode (optional)
         @return a SystemConfig object
         """
@@ -937,13 +936,11 @@ class DbHelper():
         if system_config is not None:
             if s_simulation_mode is not None:
                 system_config.simulation_mode = s_simulation_mode
-            if s_admin_mode is not None:
-                system_config.admin_mode = s_admin_mode
             if s_debug_mode is not None:
                 system_config.debug_mode = s_debug_mode
         else:
             system_config = SystemConfig(simulation_mode=s_simulation_mode, 
-                                        admin_mode=s_admin_mode, debug_mode=s_debug_mode)
+                                        debug_mode=s_debug_mode)
         self._session.add(system_config)
         self._session.commit()
         return system_config

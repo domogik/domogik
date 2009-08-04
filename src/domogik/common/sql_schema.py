@@ -639,10 +639,9 @@ class SystemConfig(Base):
     __tablename__ = '%s_system_config' % _db_prefix
     id = Column(Integer, primary_key=True)
     simulation_mode = Column(Boolean, nullable=False, default=False)
-    admin_mode = Column(Boolean, nullable=False, default=False)
     debug_mode = Column(Boolean, nullable=False, default=False)
 
-    def __init__(self, simulation_mode, admin_mode, debug_mode):
+    def __init__(self, simulation_mode, debug_mode):
         """
         Class constructor
         @param simulation_mode : if we are running the app in simulation mode
@@ -650,7 +649,6 @@ class SystemConfig(Base):
         @param debug_mode : if we are running the app in debug mode
         """
         self.simulation_mode = simulation_mode
-        self.admin_mode = admin_mode
         self.debug_mode = debug_mode
 
     def __repr__(self):
@@ -658,8 +656,8 @@ class SystemConfig(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<SystemConfig(id=%s, simulation=%s, admin=%s, debug=%s)>" \
-          % (self.id, self.simulation_mode, self.admin_mode, self.debug_mode)
+        return "<SystemConfig(id=%s, simulation=%s, debug=%s)>" \
+          % (self.id, self.simulation_mode, self.debug_mode)
 
     @staticmethod
     def get_tablename():

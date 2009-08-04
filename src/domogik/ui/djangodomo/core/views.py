@@ -132,8 +132,8 @@ def device_stats(request, device_id):
     sys_config = _db.get_system_config()
 
     cmd = QueryDict.get(request.POST, "cmd", "")
-    if cmd == "clear_stats" and sys_config.admin_mode:
-        _clear_device_stats(request, device_id, sys_config.admin_mode)
+    if cmd == "clear_stats" and _is_user_admin(request):
+        _clear_device_stats(request, device_id)
 
     # Read device stats
     if device_id == "0": # For all devices
@@ -209,7 +209,7 @@ def admin_index(request):
     sys_config = _db.get_system_config()
     if sys_config.simulation_mode:
         simulation_mode = "checked"
-    if sys_config.admin_mode:
+    if _is_user_admin(request):
         admin_mode = "checked"
     if sys_config.debug_mode:
         debug_mode = "checked"
@@ -230,7 +230,7 @@ def save_admin_settings(request):
         simulation_mode = QueryDict.get(request.POST, "simulation_mode", False)
         admin_mode = QueryDict.get(request.POST, "admin_mode", False)
         debug_mode = QueryDict.get(request.POST, "debug_mode", False)
-        _db.update_system_config(s_simulation_mode=simulation_mode, s_admin_mode=admin_mode, s_debug_mode=debug_mode)
+        _db.update_system_config(s_simulation_mode=simulation_mode, s_debug_mode=debug_mode)
     return admin_index(request)
 
 def load_sample_data(request):
@@ -378,12 +378,11 @@ def _write_device_stats(device_id, new_value):
     """
     _db.add_device_stat(d_id=device_id, ds_date=datetime.datetime.now(), ds_value=new_value)
 
-def _clear_device_stats(request, device_id, is_admin_mode):
+def _clear_device_stats(request, device_id):
     """
     Clear stats of a device or all devices
     @param request : HTTP request
     @param device_id : device id
-    @param is_admin_mode : True if we are in administrator mode
     """
     if _is_user_admin(request):
         if device_id == "0": # For all devices
