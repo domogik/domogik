@@ -40,7 +40,7 @@ Implements
 @organization: Domogik
 """
 
-import time 
+from datetime import datetime 
 
 from domogik.xpl.lib.xplconnector import *
 from domogik.xpl.common.xplmessage import XplMessage
@@ -199,11 +199,11 @@ class StatsManager(xPLModule):
         Manage X10 stats
         """
         dbhelper = DbHelper()
-        techno_id = self.__dbhelper.get_device_technology_by_name('x10').id
-        d = dbhelper.search_devices(technology_id = techno_id, name = message.data['device'])
+        techno_id = dbhelper.get_device_technology_by_name(u'x10').id
+        d = dbhelper.search_devices(technology_id = techno_id, address = message.data['device'])
         if d:
             d_id = d[0].id
-            dbhelper.add_device_stat(d_id, int(time.time()), message.data['command'].lower())
+            dbhelper.add_device_stat(d_id, datetime.today(), message.data['command'].lower())
         else:
             self._log.warning("A X10 stat has been received for a non existing device : %s" % message.data['device'])
 
@@ -214,7 +214,7 @@ class StatsManager(xPLModule):
         techno_id = self.__dbhelper.get_device_technology_by_name('onewire').id
         d_id = dbhelper.search_devices(technology = techno_id, name =
                 message.data['device'])[0].id
-        dbhelper.add_device_stat(d_id, int(time.time()), message.data['current'].lower())
+        dbhelper.add_device_stat(d_id, datetime.today(), message.data['current'].lower())
 
     def _plcbus_cb(self, message):
         """
@@ -223,7 +223,7 @@ class StatsManager(xPLModule):
         techno_id = self.__dbhelper.get_device_technology_by_name('plcbus').id
         d_id = dbhelper.search_devices(technology = techno_id, name =
                 message.data['device'])[0].id
-        dbhelper.add_device_stat(d_id, int(time.time()), message.data['command'].lower())
+        dbhelper.add_device_stat(d_id, datetime.today(), message.data['command'].lower())
 
     def _knx_cb(self, message):
         """
