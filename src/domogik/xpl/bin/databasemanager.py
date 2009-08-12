@@ -199,17 +199,19 @@ class StatsManager(xPLModule):
         Manage X10 stats
         """
         techno_id = self.__dbhelper.get_device_technology_by_name('x10').id
-        d_id = self.__dbhelper.find_devices(technology = techno_id, name = 
-                message.data['device'])[0].id
-        add_device_stat(d_id, int(time.time()), message.data['command'].lower())
-        print "X10 stat received !"
+        d = self.__dbhelper.search_devices(technology_id = techno_id, name = message.data['device'])
+        if d:
+            d_id = d[0].id
+            add_device_stat(d_id, int(time.time()), message.data['command'].lower())
+        else:
+            self._log.warning("A X10 stat has been received for a non existing device : %s" % message.data['device'])
 
     def _onewire_cb(self, message):
         """
         Manage OneWire stats
         """
         techno_id = self.__dbhelper.get_device_technology_by_name('onewire').id
-        d_id = self.__dbhelper.find_devices(technology = techno_id, name =
+        d_id = self.__dbhelper.search_devices(technology = techno_id, name =
                 message.data['device'])[0].id
         add_device_stat(d_id, int(time.time()), message.data['current'].lower())
 
@@ -218,7 +220,7 @@ class StatsManager(xPLModule):
         Manage PLCBUS stats
         """
         techno_id = self.__dbhelper.get_device_technology_by_name('plcbus').id
-        d_id = self.__dbhelper.find_devices(technology = techno_id, name =
+        d_id = self.__dbhelper.search_devices(technology = techno_id, name =
                 message.data['device'])[0].id
         add_device_stat(d_id, int(time.time()), message.data['command'].lower())
 
