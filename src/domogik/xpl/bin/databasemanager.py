@@ -44,6 +44,7 @@ import time
 
 from domogik.xpl.lib.xplconnector import *
 from domogik.common.configloader import *
+from domogik.common.database import DbHelper
 
 class DBConnector(xPLModule):
     '''
@@ -59,6 +60,8 @@ class DBConnector(xPLModule):
         self._log = self.get_my_logger()
         self._log.debug("Init database_manager instance")
         self.__myxpl = Manager()
+        self._db = DbHelper()
+        self._stats = StatsManager(self._db)
         Listener(self._request_config_cb, self.__myxpl,
                 {'schema': 'domogik.config', 'type': 'xpl-cmnd'})
         #cfgloader = Loader('database')
@@ -172,11 +175,11 @@ class StatsManager(xPLModule):
     """
     Listen on the xPL network and keep stats of device and system state
     """
-    def __init__(self):
+    def __init__(self, db):
         xPLModule.__init__(self, 'database_manager')
         self._log = self.get_my_logger()
         self.__myxpl = Manager()
-        self.__dbhelper = DbHelper()
+        self.__dbhelper = db
         l_x10 = Listener(self._x10_cb, self.__myxpl,
                 {'schema': 'x10.basic', 'type': 'xpl-trig'})
         l_ow = Listener(self._onewire_cb, self.__myxpl,
