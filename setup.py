@@ -56,11 +56,10 @@ setup(
     url = 'http://www.domogik.org/',
     author = 'OpenSource home automation software',
     author_email = 'domogik-general@lists.labs.libre-entreprise.org',
-    #TODO 'python-simplejson' seems to be an APT name, so it doesn't work on other distros (like ArchLinux)
-    install_requires=['setuptools','django >=1.1','sqlalchemy >= 0.5.4', 'python-simplejson >= 1.9.2'],
+    install_requires=['setuptools','django >=1.1','sqlalchemy >= 0.5.4', 'simplejson >= 1.9.2'],
     zip_safe = False,
     license = 'GPL v3',
-    namespace_packages = ['domogik', 'mpris', 'tools'],
+    #namespace_packages = ['domogik', 'mpris', 'tools'],
     include_package_data = True,
     packages = find_packages('src'),
     package_dir = {'': 'src'},
