@@ -41,6 +41,7 @@ Implements
 """
 
 from domogik.xpl.lib.xplconnector import *
+from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.lib.module import *
 from domogik.xpl.lib.queryconfig import *
 from domogik.common.configloader import *
@@ -88,11 +89,11 @@ class SysManager(xPLModule):
         Internal callback for receiving system messages
         '''
         self._log.debug("Incoming message")
-        cmd = message.get_key_value('command')
-        mod = message.get_key_value('module')
+        cmd = message.data['command']
+        mod = message.data['module']
         force = 0
         if message.has_key('force'):
-            force = int(message.get_key_value('force'))
+            force = int(message.data['force'])
         error = ""
         if mod not in self._components:
             error = "Invalid component.\n"
@@ -106,13 +107,13 @@ class SysManager(xPLModule):
                     self._write_pid_file(mod, pid)
                     self._log.debug("Component %s started with pid %i" % (mod,
                             pid))
-                    mess = Message()
+                    mess = XplMessage()
                     mess.set_type('xpl-trig')
                     mess.set_schema('domogik.system')
-                    mess.set_data_key('command', cmd)
-                    mess.set_data_key('module', mod)
-                    mess.set_data_key('force', force)
-                    mess.set_data_key('error', error)
+                    mess.add_data({'command' :  cmd})
+                    mess.add_data({'module' :  mod})
+                    mess.add_data({'force' :  force})
+                    mess.add_data({'error' :  error})
                     self.__myxpl.send(mess)
             elif cmd == "stop":
                 ret = self._stop_comp(mod)
@@ -127,13 +128,13 @@ class SysManager(xPLModule):
                 else:
                     self._log.warning("Error during stop of component %s : %s" %\
                             (mod, error))
-        mess = Message()
+        mess = XplMessage()
         mess.set_type('xpl-trig')
         mess.set_schema('domogik.system')
-        mess.set_data_key('command', cmd)
-        mess.set_data_key('module', mod)
-        mess.set_data_key('force', force)
-        mess.set_data_key('error', error)
+        mess.add_data({'command' :  cmd})
+        mess.add_data({'module' :  mod})
+        mess.add_data({'force' :  force})
+        mess.add_data({'error' :  error})
         self.__myxpl.send(mess)
 
     def _stop_comp(self, name):

@@ -54,9 +54,9 @@ Implements
 - Message:.__contains__(self, key)
 - Message:.has_key(self, key)
 - Message:.has_conf_key(self, key)
-- Message:.get_key_value(self, key)
+- Message:.data[self, key]
 - Message:.get_all_keys(self)
-- Message:.get_conf_key_value(self, key)
+- Message:.self, key
 - Message:.__str__(self)
 - xPLTimer.__init__(self, time, cb, stop)
 - xPLTimer.start(self)
@@ -80,6 +80,7 @@ import time
 
 from domogik.common import logger
 from domogik.xpl.lib.module import xPLModule
+from domogik.xpl.common.xplmessage import XplMessage
 
 class Manager(xPLModule):
     """
@@ -162,12 +163,12 @@ class Manager(xPLModule):
         Be carreful, there is no check on message correctness
         """
         try:
-            if not message.has_conf_key("hop"):
-                message.set_conf_key("hop", "5")
-            if not message.has_conf_key("source"):
-                message.set_conf_key("source", self._source)
-            if not message.has_conf_key("target"):
-                message.set_conf_key("target", "*")
+            if not message.hop_count:
+                message.set_hop_count("5")
+            if not message.source:
+                message.set_source(self._source)
+            if not message.target:
+                message.set_target("*")
             self._UDPSock.sendto(message.__str__(), ("255.255.255.255", 3865))
             self._log.debug("xPL Message sent")
         except:
@@ -200,8 +201,8 @@ remote-ip=%s
             self._UDPSock.sendto(mess, ("255.255.255.255", 3865))
 
     def got_hbeat(self, message):
-        if(message.get_conf_key_value('target') != self._source ):
-            self._SendHeartbeat(message.get_conf_key_value('source'))
+        if(message.target != self._source ):
+            self._SendHeartbeat(message.source)
 
     def _run_thread_monitor(self):
         """
@@ -223,9 +224,9 @@ remote-ip=%s
                         pass
                     else:
                         try:
-                            mess = Message(data)
-                            if mess.get_conf_key_value("target") == "*" or (
-                                    mess.get_conf_key_value("target") == self._source):
+                            mess = XplMessage(data)
+                            if mess.target == "*" or (
+                                    mess.target == self._source):
                                 [l.new_message(mess) for l in self._listeners]
                                 #Enabling this debug will really polute your logs
                                 #self._log.debug("New message received : %s" % \
@@ -280,22 +281,16 @@ class Listener:
         """
         ok = True
         for key in self._filter:
-            if message.has_key(key):
-                if (message.get_key_value(key) != self._filter[key]):
+            if key in message.data:
+                if (message.data[key] != self._filter[key]):
                     ok = False
-            else:
-                if message.has_conf_key(key):
-                    if (message.get_conf_key_value(key) != self._filter[key]):
-                        ok = False
-                    else:
-                        pass
-            if key == "schema":
-                ok = ok and (self._filter[key] == message.get_schema())
+            elif key == "schema":
+                ok = ok and (self._filter[key] == message.schema)
 
-            if key == "type":
-                ok = ok and (self._filter[key] == message.get_type())
+            elif key == "type":
+                ok = ok and (self._filter[key] == message.type)
 
-            if not (message.has_key(key) or message.has_conf_key(key) or key in (
+            elif not (key in message.data or message.key or key in (
                     "type", "schema")):
                 ok = False
         #The message match the filter, we can call  the callback function
@@ -337,186 +332,186 @@ class XPLException(Exception):
         return self.repr(self.value)
 
 
-class Message:
-    """
-    Message is the object for all data received form the network.
-    The monitor create an instance of Message each time it receive smthg
-    """
-    _mess_types = ['xpl-stat', 'xpl-cmnd', 'xpl-trig']
-
-#    _conf = {} #Dico ayant la configuration du paquet
-#    _data = {} #Dico ayant les données du paquet
-#    _schema = ''
-#    _type = ''
-#    _conf_order = ""
-#    _data_order = ""
-
-    def __init__(self, mess=None):
-        """
-        Create Message instance from a message string and check if the
-        structure is correct. Raise exception if it is not
-        The message can be None (to allow building a message)
-        @param mess : the message as a unique string, as it is send on the
-        network
-        """
-        self._conf = {}
-        self._data = {}
-        self._conf_order = ""
-        self._data_order = ""
-        l = logger.Logger("message")
-        self._log = l.get_logger()
-        if mess is None:
-            return
-        m = mess.split("\n")
-        if not m[0] in self._mess_types:
-            self._log.warning("Packet type not existing")
-        else:
-            self._type = m[0]
-            try:
-                #We get the configuration part (between first {})
-                for line in m[m.index('{')+1:m.index('}')]:
-                    (key, value) = line.split('=')
-                    self._conf[string.lower(key)] = value
-                #We get the schema
-                self._schema = m[m.index('}') + 1]
-                #And the last part, between second {}
-                m = m[m.index('}') + 2:]
-                for line in m[m.index('{')+1:m.index('}')]:
-                    (key, value) = line.split('=')
-                    self._data[string.lower(key)] = value
-            except:
-                self._log.warning("Bad message format, won't be sent")
-
-    def set_type(self, type):
-        """
-        Define the message type (xpl-stat, xpl-trig or xpl-cmnd)
-        """
-        if type in self._mess_types:
-            self._type = type
-        else:
-            self._log.warning("Bad message type")
-
-    def get_type(self):
-        """
-        Return the message type
-        """
-        return self._type
-
-    def set_schema(self, schema):
-        """
-        Define the message schema
-        """
-        self._schema = schema
-
-    def get_schema(self):
-        """
-        Return the message schema
-        """
-        return self._schema
-
-    def set_conf_key(self, key, value):
-        """
-        Define a configuration key (which appears between first {})
-        """
-        self._conf[key] = value
-
-    def set_data_key(self, key, value):
-        """
-        Define a data key (which appears between second {})
-        """
-        self._data[key] = value
-
-    def set_data_order(self, order):
-        """
-        As schema define parameter order, and since this class isn't specific
-        enough to determine order, you have to set the order to ensure a good
-        message.
-        If you do not, the order of parameter in each part may not conform to
-        schema
-        If you set order, be sure to list all the keys !
-        """
-        self._data_order = order
-
-    def set_conf_order(self, order):
-        """
-        As schema define parameter order, and since this class isn't specific
-        enough to determine order, you have to set the order to ensure a good
-        message.
-        If you do not, the order of parameter in each part may not conform to
-        schema
-        If you set order, be sure to list all the keys !
-        """
-        self._conf_order = order
-
-    def __contains__(self, key):
-        '''
-        Override 'in' operator
-        Call the has_key method
-        '''
-        return self.has_key(key)
-
-    def has_key(self, key):
-        """
-        Check if a key exists in data dictionnary
-        """
-        return key in self._data
-
-    def has_conf_key(self, key):
-        """
-        Check if a key exists in configuration dictionnary
-        """
-        return key in self._conf
-
-    def get_key_value(self, key):
-        """
-        get the value of a key from data
-        """
-        if key in self._data:
-            return self._data[key]
-        else:
-            raise XPLException,"Key not existing"
-
-    def get_all_keys(self):
-        """
-        Get all the keys
-        """
-        return self._data.keys()
-
-    def get_all_data_pairs(self):
-        """
-        Get all data key=value pairs
-        """
-        return self._data
-
-    def get_conf_key_value(self, key):
-        """
-        get the value of a key from configuration
-        """
-        if key in self._conf:
-            return self._conf[key]
-        else:
-            self._log.warning("Key %s does not exist" % key)
-
-    def __str__(self):
-        str = "%s\n{\n" % self._type
-        if (not self._conf_order):
-            for k in self._conf:
-                str += "%s=%s\n" % (k, self._conf[k])
-        else:
-            for k in self._conf_order:
-                str += "%s=%s\n" % (k, self._conf[k])
-        str += "}\n%s\n{\n" % (self._schema)
-        if (not self._data_order):
-            for k in self._data:
-                str += "%s=%s\n" % (k, self._data[k])
-        else:
-            for k in self._data_order:
-                str += "%s=%s\n" % (k, self._data[k])
-        str += "}\n"
-        return str
-
-
-
+#class Message:
+#    """
+#    Message is the object for all data received form the network.
+#    The monitor create an instance of Message each time it receive smthg
+#    """
+#    _mess_types = ['xpl-stat', 'xpl-cmnd', 'xpl-trig']
+#
+##    _conf = {} #Dico ayant la configuration du paquet
+##    _data = {} #Dico ayant les données du paquet
+##    _schema = ''
+##    _type = ''
+##    _conf_order = ""
+##    _data_order = ""
+#
+#    def __init__(self, mess=None):
+#        """
+#        Create Message instance from a message string and check if the
+#        structure is correct. Raise exception if it is not
+#        The message can be None (to allow building a message)
+#        @param mess : the message as a unique string, as it is send on the
+#        network
+#        """
+#        self._conf = {}
+#        self._data = {}
+#        self._conf_order = ""
+#        self._data_order = ""
+#        l = logger.Logger("message")
+#        self._log = l.get_logger()
+#        if mess is None:
+#            return
+#        m = mess.split("\n")
+#        if not m[0] in self._mess_types:
+#            self._log.warning("Packet type not existing")
+#        else:
+#            self._type = m[0]
+#            try:
+#                #We get the configuration part (between first {})
+#                for line in m[m.index('{')+1:m.index('}')]:
+#                    (key, value) = line.split('=')
+#                    self._conf[string.lower(key)] = value
+#                #We get the schema
+#                self._schema = m[m.index('}') + 1]
+#                #And the last part, between second {}
+#                m = m[m.index('}') + 2:]
+#                for line in m[m.index('{')+1:m.index('}')]:
+#                    (key, value) = line.split('=')
+#                    self._data[string.lower(key)] = value
+#            except:
+#                self._log.warning("Bad message format, won't be sent")
+#
+#    def set_type(self, type):
+#        """
+#        Define the message type (xpl-stat, xpl-trig or xpl-cmnd)
+#        """
+#        if type in self._mess_types:
+#            self._type = type
+#        else:
+#            self._log.warning("Bad message type")
+#
+#    def get_type(self):
+#        """
+#        Return the message type
+#        """
+#        return self._type
+#
+#    def set_schema(self, schema):
+#        """
+#        Define the message schema
+#        """
+#        self._schema = schema
+#
+#    def get_schema(self):
+#        """
+#        Return the message schema
+#        """
+#        return self._schema
+#
+#    def set_conf_key(self, key, value):
+#        """
+#        Define a configuration key (which appears between first {})
+#        """
+#        self._conf[key] = value
+#
+#    def set_data_key(self, key, value):
+#        """
+#        Define a data key (which appears between second {})
+#        """
+#        self._data[key] = value
+#
+#    def set_data_order(self, order):
+#        """
+#        As schema define parameter order, and since this class isn't specific
+#        enough to determine order, you have to set the order to ensure a good
+#        message.
+#        If you do not, the order of parameter in each part may not conform to
+#        schema
+#        If you set order, be sure to list all the keys !
+#        """
+#        self._data_order = order
+#
+#    def set_conf_order(self, order):
+#        """
+#        As schema define parameter order, and since this class isn't specific
+#        enough to determine order, you have to set the order to ensure a good
+#        message.
+#        If you do not, the order of parameter in each part may not conform to
+#        schema
+#        If you set order, be sure to list all the keys !
+#        """
+#        self._conf_order = order
+#
+#    def __contains__(self, key):
+#        '''
+#        Override 'in' operator
+#        Call the has_key method
+#        '''
+#        return self.has_key(key)
+#
+#    def has_key(self, key):
+#        """
+#        Check if a key exists in data dictionnary
+#        """
+#        return key in self._data
+#
+#    def has_conf_key(self, key):
+#        """
+#        Check if a key exists in configuration dictionnary
+#        """
+#        return key in self._conf
+#
+#    def data[self, key]:
+#        """
+#        get the value of a key from data
+#        """
+#        if key in self._data:
+#            return self._data[key]
+#        else:
+#            raise XPLException,"Key not existing"
+#
+#    def get_all_keys(self):
+#        """
+#        Get all the keys
+#        """
+#        return self._data.keys()
+#
+#    def get_all_data_pairs(self):
+#        """
+#        Get all data key=value pairs
+#        """
+#        return self._data
+#
+#    def self, key:
+#        """
+#        get the value of a key from configuration
+#        """
+#        if key in self._conf:
+#            return self._conf[key]
+#        else:
+#            self._log.warning("Key %s does not exist" % key)
+#
+#    def __str__(self):
+#        str = "%s\n{\n" % self._type
+#        if (not self._conf_order):
+#            for k in self._conf:
+#                str += "%s=%s\n" % (k, self._conf[k])
+#        else:
+#            for k in self._conf_order:
+#                str += "%s=%s\n" % (k, self._conf[k])
+#        str += "}\n%s\n{\n" % (self._schema)
+#        if (not self._data_order):
+#            for k in self._data:
+#                str += "%s=%s\n" % (k, self._data[k])
+#        else:
+#            for k in self._data_order:
+#                str += "%s=%s\n" % (k, self._data[k])
+#        str += "}\n"
+#        return str
+#
+#
+#
 class xPLTimer():
     """
     xPLTimer will call a callback function each n seconds

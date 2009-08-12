@@ -37,6 +37,7 @@ Implements
 """
 
 from domogik.xpl.lib.xplconnector import *
+from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.lib.module import *
 from domogik.xpl.lib.onewire import *
 from domogik.common import configloader
@@ -66,15 +67,15 @@ class OneWireTemp(xPLModule):
 
     def _gettemp():
         for (i, t, v) in self._myow.get_temperature():
-            my_temp_message = Message()
+            my_temp_message = XplMessage()
             my_temp_message.set_type("xpl-trig")
             my_temp_message.set_schema("sensor.basic")
-            my_temp_message.set_data_key("device", i)
+            my_temp_message.add_data({"device" :  i})
             #type should be the model of the o1wire component.
             #Anyway, because we need a way to determine which is the 
             #technology of the device, we use it with value 'onewire'
-            my_temp_message.set_data_key("type", "onewire")
-            my_temp_message.set_data_key("current", v)
+            my_temp_message.add_data({"type" :  "onewire"})
+            my_temp_message.add_data({"current" :  v})
             self._myxpl.send(my_temp_message)
 
 

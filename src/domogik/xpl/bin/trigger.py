@@ -63,6 +63,7 @@ Implements
 """
 
 from domogik.xpl.lib.xplconnector import *
+from domogik.xpl.common.xplmessage import XplMessage
 from domogik.common.configloader import Loader
 from domogik.common import logger
 
@@ -361,8 +362,8 @@ class ListenerBuilder():
         for i in items:
             self._log.debug("New  x10 listener created")
             Listener(lambda mess: self.updateList('x10',
-                    mess.get_key_value('device'),
-                    mess.get_key_value('command')),
+                    mess.data['device'],
+                    mess.data['command']),
                     self.__myxpl,
                     {'schema': 'x10.basic', 'device': i, 'type': 'xpl-cmnd'})
 
@@ -379,7 +380,7 @@ class ListenerBuilder():
         Parse the time received in a message and call updateList()
         '''
         self._log.debug("Time update")
-        dt = mess.get_key_value('format1')
+        dt = mess.data['format1']
         pars = {
             'year': dt[0:4],
             'month': dt[4:6],

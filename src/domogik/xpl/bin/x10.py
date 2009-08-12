@@ -44,6 +44,7 @@ if os.name == 'nt':
 else:
     from domogik.xpl.lib.x10 import *
 from domogik.xpl.lib.xplconnector import *
+from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.lib.module import *
 from domogik.common.configloader import Loader
 from domogik.common import logger
@@ -122,14 +123,14 @@ class x10Main(xPLModule):
         #Heyu path
         myheyu = HeyuManager(self._heyu_cfg_path_res)
         lines = myheyu.load()
-        m = Message()
+        m = XplMessage()
         m.set_type('xpl-trig')
         m.set_schema('domogik.config')
         count = 0
         for line in lines:
             key = "heyu_file_%s" % count
             count = count + 1
-            m.set_data_key(key, line)
+            m.add_data({key :  line})
         #print "Message is : %s" % m
         self.__myxpl.send(m)
 
@@ -155,13 +156,13 @@ class x10Main(xPLModule):
         house = None
         level = None
         if 'command' in message:
-            cmd = message.get_key_value('command')
+            cmd = message.data['command']
         if 'device' in message:
-            dev = message.get_key_value('device')
+            dev = message.data['device']
         if 'house' in message:
-            house = message.get_key_value('house')
+            house = message.data['house']
         if 'level' in message:
-            level = message.get_key_value('level')
+            level = message.data['level']
         self._log.debug("%s received : device = %s, house = %s, level = %s" % (
                 cmd, dev, house, level))
         commands[cmd](dev, house, level)
@@ -173,13 +174,13 @@ class x10Main(xPLModule):
         @param order : the order sent to the unit
         """
         self._log.debug("X10 Callback for %s" % unit)
-        mess = Message()
+        mess = XplMessage()
         mess.set_type("xpl-trig")
         mess.set_schema("x10.basic")
-        mess.set_data_key("device", unit)
-        mess.set_data_key("command", order)
+        mess.add_data({"device" :  unit})
+        mess.add_data({"command" :  order})
         if args:
-            mess.set_data_key("level",args)
+            mess.add_data({"level" : args})
         self.__myxpl.send(mess)
 
 if __name__ == "__main__":

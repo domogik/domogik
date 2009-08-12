@@ -38,6 +38,7 @@ Implements
 """
 
 from domogik.xpl.lib.xplconnector import *
+from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.lib.plcbus import *
 from domogik.common.configloader import Loader
 from domogik.common import logger
@@ -75,15 +76,15 @@ class plcbusMain():
         level = 0
         rate = 0
         if message.has_key('command'):
-            cmd = message.get_key_value('command')
+            cmd = message.data['command']
         if message.has_key('device'):
-            dev = message.get_key_value('device')
+            dev = message.data['device']
         if message.has_key('usercode'):
-            user = message.get_key_value('usercode')
+            user = message.data['usercode']
         if message.has_key('level'):
-            level = message.get_key_value('level')
+            level = message.data['level']
         if message.has_key('rate'):
-            rate = message.get_key_value('rate')
+            rate = message.data['rate']
         self._log.debug("%s received : device = %s, user code = %s, level = "\
                 "%s, rate = %s" % (cmd.upper(), dev, user, level, rate))
         if cmd == 'GET_ALL_ON_ID_PULSE':
@@ -96,12 +97,12 @@ class plcbusMain():
         General ack sending over xpl network
         '''
         dt = localtime()
-        mess = Message()
+        mess = XplMessage()
         mess.set_type("xpl-trig")
         mess.set_schema("sensor.basic")
-        mess.set_data_key("type", "plcbus")
-        mess.set_data_key("command", cmd)
-        mess.set_data_key("device", dev)
+        mess.add_data({"type" :  "plcbus"})
+        mess.add_data({"command" :  cmd})
+        mess.add_data({"device" :  dev})
         self.__myplcbus.send(mess)
 
 

@@ -1,5 +1,4 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-                                                                           
+# -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -22,39 +21,26 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 Module purpose
 ==============
 
-Print all xPL traffic
+Exceptions.
 
 Implements
 ==========
 
-- Sniffer.__init__(self)
-- Sniffer._sniffer_cb(self, message)
+- DomogikBaseError
+- XplMessageError
 
-
-@author: Maxence Dunnewind <maxence@dunnewind.net>
-@copyright: (C) 2007-2009 Domogik project
+@author:Frédéric Mantegazza <frederic.mantegazza@gbiloba.org>
+@copyright: (C) 2009 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """
 
-from domogik.xpl.lib.xplconnector import *
-from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.lib.module import *
+
+class DomogikBaseError(Exception):
+    """ Base error class for all Domogik errors.
+    """
 
 
-class Sniffer(xPLModule):
-
-
-    def __init__(self):
-        xPLModule.__init__(self, name = 'sniffer')
-        self.__myxpl = Manager()
-        Listener(self._sniffer_cb, self.__myxpl)
-
-    def _sniffer_cb(self, message):
-        '''
-        Print received message
-        '''
-        print message
-
-if __name__ == "__main__":
-    s = Sniffer()
+class XplMessageError(DomogikBaseError):
+    """ Invalid xPL message.
+    """

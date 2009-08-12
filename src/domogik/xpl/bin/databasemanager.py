@@ -43,6 +43,7 @@ Implements
 import time 
 
 from domogik.xpl.lib.xplconnector import *
+from domogik.xpl.common.xplmessage import XplMessage
 from domogik.common.configloader import *
 from domogik.common.database import DbHelper
 
@@ -56,7 +57,7 @@ class DBConnector(xPLModule):
         '''
         Initialize database and xPL connection
         '''
-        xPLModule.__init__(self, 'database_manager')
+        xPLModule.__init__(self, 'dbmgr')
         self._log = self.get_my_logger()
         self._log.debug("Init database_manager instance")
         self.__myxpl = Manager()
@@ -87,27 +88,30 @@ class DBConnector(xPLModule):
         Callback to receive a request for some config stuff
         @param message : the xPL message
         '''
-        techno = message.get_key_value('technology')
-        key = message.get_key_value('key')
-        element = message.get_key_value('element')
-        if not key:
-            self._log.debug("New request config received for %s :\
-                    asked for all config items" % (techno))
-        else:
-            self._log.debug("New request config received for %s : %s" % (techno,
-            key))
-        if element:
-            self._send_config(techno, key, self._fetch_elmt_config(techno,
-            element, key), message.get_conf_key_value("source"), element)
-        else:
+        try:
+            techno = message.data['technology']
+            key = message.data['key']
+            element = message.data['element']
             if not key:
-                keys = self._fetch_techno_config(techno, key).keys()
-                values = self._fetch_techno_config(techno, key).values()
-                self._send_config(techno, keys, values,
-                message.get_conf_key_value("source"))
+                self._log.debug("New request config received for %s :\
+                        asked for all config items" % (techno))
             else:
-                self._send_config(techno, key, self._fetch_techno_config(techno,
-                key), message.get_conf_key_value("source"))
+                self._log.debug("New request config received for %s : %s" % (techno,
+                key))
+            if element:
+                self._send_config(techno, key, self._fetch_elmt_config(techno,
+                element, key), message.source, element)
+            else:
+                if not key:
+                    keys = self._fetch_techno_config(techno, key).keys()
+                    values = self._fetch_techno_config(techno, key).values()
+                    self._send_config(techno, keys, values,
+                    message.source)
+                else:
+                    self._send_config(techno, key, self._fetch_techno_config(techno,
+                    key), message.source)
+        except KeyError:
+            self._log.warning("A request for configuration has been received, but it was misformatted")
 
     def _send_config(self, technology, key, value, module, element = None):
         '''
@@ -119,18 +123,18 @@ class DBConnector(xPLModule):
         @param module : the name of the module which requested the value
         '''
         self._log.debug("Send config response %s : %s" % (key, value))
-        mess = Message()
+        mess = XplMessage()
         mess.set_type('xpl-stat')
         mess.set_schema('domogik.config')
-#        mess.set_data_key('technology', technology)
+#        mess.add_data({'technology' :  technology})
         if element:
-            mess.set_data_key('element', element)
+            mess.add_data({'element' :  element})
         #If key/value are lists, then we add a key=value for each item
         if isinstance(key, list):
             for (k, v) in zip(key, value):
-                mess.set_data_key(k, v)
+                mess.add_data({k :  v})
         else:
-            mess.set_data_key(key, value)
+            mess.add_data({key :  value})
 #        mess.set_conf_key('target', module)
         self.__myxpl.send(mess)
 
@@ -176,7 +180,7 @@ class StatsManager(xPLModule):
     Listen on the xPL network and keep stats of device and system state
     """
     def __init__(self, db):
-        xPLModule.__init__(self, 'database_manager')
+        xPLModule.__init__(self, 'statmgr')
         self._log = self.get_my_logger()
         self.__myxpl = Manager()
         self.__dbhelper = db
@@ -188,6 +192,7 @@ class StatsManager(xPLModule):
                 {'schema': 'control.basic', 'type': 'xpl-trig','type':'plcbus'})
         l_hb = Listener(self._sys_cb, self.__myxpl,
                 {'schema': 'hbeat.app', 'type': 'xpl-stat'})
+        self._log.debug("Stats manager initialized")
 
     def _x10_cb(self, message):
         """
@@ -197,6 +202,7 @@ class StatsManager(xPLModule):
         d_id = self.__dbhelper.find_devices(technology = techno_id, name = 
                 message.data['device'])[0].id
         add_device_stat(d_id, int(time.time()), message.data['command'].lower())
+        print "X10 stat received !"
 
     def _onewire_cb(self, message):
         """
