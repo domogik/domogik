@@ -136,15 +136,14 @@ class LeftMenu:
         
 class DeviceRepresentation:
     """
-    Representation of a device
+    Basic representation of a device 
+    Is extended by <category>Representation classes
     """
-    UNITS = {'light':'',
-            'temperature':u'°C'}
 
     def __init__(self, window, line, type, technology, id, name, value, left, top):
         #@param window : The main window against which we should register our items 
         #@param line : the line where the device is
-        #@param type : device type (light, temperature, etc)
+        #@param type : device type (lighting, temperature, etc)
         #@param name : device name 
         #@param value : device value
         #@param left : left padding of the left-top corner
@@ -153,7 +152,7 @@ class DeviceRepresentation:
         self._technology = technology 
         self.n = name
         self.line = line
-        self.image = xbmcgui.ControlImage(left + 10, top + 10, 80, 80, os.path.realpath('.') + '/light.png')
+        self.image = xbmcgui.ControlImage(left + 10, top + 10, 80, 80, 'background.png')
         self._win = window
         self.name = xbmcgui.ControlButton(left + 10, top + 85, 80, 20, name, focusedColor = '0xF0F0F0F0', alignment = 2)
 #        self.name.setAnimations([('unfocus', 'effect=rotate start=0 end=180 time=4000',)])
@@ -166,10 +165,59 @@ class DeviceRepresentation:
         self._win.removeControl(self.image)
         self._win.removeControl(self.name)
 
+class LightingRepresentation(DeviceRepresentation):
+    """
+    Representation of a lighting device
+    """
+    def __init__(self, window, line, type, technology, id, name, value, left, top):
+        DeviceRepresentation.__init__( self, window, line, type, technology, id,
+                name, value, left, top)
+        self.image.setImage('pictures/lighting.png')
+
+class TemperatureRepresentation(DeviceRepresentation):
+    """
+    Representation of a temperature device
+    """
+    def __init__(self, window, line, type, technology, id, name, value, left, top):
+        DeviceRepresentation.__init__( self, window, line, type, technology, id,
+                name, value, left, top)
+        self.image.setImage('pictures/temperature.png')
+
+class HeatingRepresentation(DeviceRepresentation):
+    """
+    Representation of a heating device
+    """
+    def __init__(self, window, line, type, technology, id, name, value, left, top):
+        DeviceRepresentation.__init__( self, window, line, type, technology, id,
+                name, value, left, top)
+
+class MusicRepresentation(DeviceRepresentation):
+    """
+    Representation of a music device
+    """
+    def __init__(self, window, line, type, technology, id, name, value, left, top):
+        DeviceRepresentation.__init__( self, window, line, type, technology, id,
+                name, value, left, top)
+
+class ApplianceRepresentation(DeviceRepresentation):
+    """
+    Representation of a appliance device
+    """
+    def __init__(self, window, line, type, technology, id, name, value, left, top):
+        DeviceRepresentation.__init__( self, window, line, type, technology, id,
+                name, value, left, top)
+        self.image.setImage('pictures/appliance_%s.png' % value)
+
 class DeviceSet:
     """
     Set of device to create
     """
+    REPRESENTATIONS = {"lighting" : LightingRepresentation,
+            "temperature" : TemperatureRepresentation,
+            "heating" : HeatingRepresentation,
+            "music" : MusicRepresentation,
+            "appliance" : ApplianceRepresentation}
+
     def __init__(self, window, focus, left, top, nb_device_per_line, devices):
         #@param window : The main window against which we should register our items 
         #@param left : left padding of the left-top corner
@@ -182,13 +230,26 @@ class DeviceSet:
         self._eff = MyEffect(window)
         self._top = top
         self._win = window
+        print "RANGE : %s" % math.ceil(len(devices) / (nb_device_per_line * 1.0))
+        if len(devices) == 0:
+            xbmcgui.unlock()
+            dialog = xbmcgui.Dialog()
+            dialog.ok("No device found", "It seems there is no device in this room")
+            return 
+
         for j in range(math.ceil(len(devices) / (nb_device_per_line * 1.0))):
             for i in range(nb_device_per_line):
                 if (j * nb_device_per_line + i) >= len(devices):
                     break
                 dev_t = devices[j * nb_device_per_line + i]
-                dev = DeviceRepresentation(window, j, dev_t[0], dev_t[1], dev_t[2],
-                        dev_t[3], dev_t[4], left + i * 110, top + j * 110)
+                dev = None
+                print "TYPE : %s" % dev_t[0]
+                if dev_t[0] in self.REPRESENTATIONS:
+                    dev = self.REPRESENTATIONS[dev_t[0]](window, j, dev_t[0], dev_t[1], dev_t[2],
+                            dev_t[3], dev_t[4], left + i * 110, top + j * 110)
+                else:
+                    dev = DeviceRepresentation(window, j, dev_t[0], dev_t[1], dev_t[2],
+                            dev_t[3], dev_t[4], left + i * 110, top + j * 110)
                 self.devices.append(dev)
 
         #Update controls
@@ -217,7 +278,8 @@ class DeviceSet:
                 #avant derniere ligne
                 self.devices[i].name.controlUp(self.devices[(len(devices) - (len(devices)  % nb_device_per_line) + i - nb_device_per_line)].name)
 
-        window.setFocus(self.devices[nb_device_per_line].name)
+        print "before window : %s" % self.devices
+        window.setFocus(self.devices[0].name)
         self._oldline = None
 
     def get_line_of_device(self, device):
@@ -280,7 +342,7 @@ class DeviceSet:
         Delete all DeviceRepresentation
         """
         print "DELETE DEVICES" #do *not* remove this debug
-        for device in self._devices:
+        for device in self.devices:
             del device
 
 class DMGWindow(xbmcgui.Window):
@@ -331,8 +393,8 @@ class DMGWindow(xbmcgui.Window):
             dev = DB.search_devices(room_id = DB.get_room_by_name(n).id)
             devices = []
             for d in dev:
-                this_dev = ()
-
+                this_dev = (d.type, d.technology_id, d.id, d.name, DB.get_last_stat_of_device(d.id).value)
+                devices.append(this_dev)
             print devices 
         else:
             devices = [("type1","techno1", 1, "%s1" % n, "value1"),
