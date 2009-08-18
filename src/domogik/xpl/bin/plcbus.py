@@ -38,13 +38,15 @@ Implements
 """
 
 from domogik.xpl.lib.xplconnector import *
+from domogik.xpl.lib.module import *
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.lib.plcbus import *
 from domogik.common.configloader import Loader
 from domogik.common import logger
+from domogik.xpl.lib.queryconfig import *
 
 
-class plcbusMain():
+class plcbusMain(xPLModule):
 
     def __init__(self):
         '''
@@ -52,19 +54,17 @@ class plcbusMain():
         This class is used to connect PLCBUS to the xPL Network
         '''
         # Load config
-        cfgloader = Loader('plcbus')
-        config = cfgloader.load()[1]
-        self.__myplcbus = Manager(source=config["source"],
-                module_name='PLCBUS-1141')
+        xPLModule.__init__(self, name = 'plcbus')
+        self.__myxpl = Manager()
+        self._config = Query(self.__myxpl)
         # Create listeners
-        Listener(self.plcbus_cmnd_cb, self.__myplcbus, {
+        Listener(self.plcbus_cmnd_cb, self.__myxpl, {
             'schema': 'control.basic',
             'type': 'xpl-cmnd',
         })
-        self.api = PLCBUSAPI(int(config["port_com"]))
+        self.api = PLCBUSAPI(int(0)) #need to be updated with dynamic config
         # Create log instance
-        l = logger.Logger('plcbus')
-        self._log = l.get_logger()
+        self._log = self.get_my_logger()
 
     def plcbus_cmnd_cb(self, message):
         '''
@@ -103,7 +103,7 @@ class plcbusMain():
         mess.add_data({"type" :  "plcbus"})
         mess.add_data({"command" :  cmd})
         mess.add_data({"device" :  dev})
-        self.__myplcbus.send(mess)
+        self.__myxpl.send(mess)
 
 
 if __name__ == "__main__":
