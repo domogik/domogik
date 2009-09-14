@@ -127,7 +127,7 @@ INSTALLED_APPS = (
     'djangodomo.core',
 )
 
-STATIC_DOC_ROOT = PROJECT_PATH + '/core/templates/skins'
+STATIC_DOC_ROOT = '%s/core/templates/skins' % PROJECT_PATH
 
 # Session stuff
 # Other options are : 
