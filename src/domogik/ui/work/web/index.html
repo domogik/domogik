@@ -1,0 +1,156 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<title>Domogik's new UI</title>
+<link href="css/ui-lightness/jquery-ui-1.7.2.custom.css" rel="stylesheet" type="text/css"/>
+<link href="css/ui-selectmenu.css" rel="stylesheet" type="text/css" />
+<link href="css/main.css" rel="stylesheet" type="text/css" />
+<link href="css/page-prog.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="js/jquery-1.3.2.min.js"></script>
+<script type="text/javascript" src="js/jquery-ui-1.7.2.custom.min.js"></script>
+<script type="text/javascript" src="js/ui.selectmenu.js"></script>
+<script type="text/javascript" src="js/page-prog.js"></script>
+</head>
+<body>
+<div class="ui-widget ui-widget-content ui-corner-all">
+  <div id="header">
+    <h1>Welcome to Domogik<span class="subtitle">Free home automation under Linux</span></h1>
+    <ul id="nav1">
+      <li><a href="index.html" class="selected ui-corner-top">Programmation</a></li>
+      <li><a href="update/index.html" class="ui-corner-top">Modification</a></li>
+      <li><a href="view/index.html" class="ui-corner-top">Visualisation</a></li>
+    </ul>
+  </div>
+  <div id="content">
+    <div class="left">
+      <!-- Accordion -->
+      <div id="accordion">
+        <h2><a href="#">Par pièce</a></h2>
+        <div>
+          <ul>
+            <li>Température
+              <ul>
+                <li>Pièce principale</li>
+                <li>Séjour</li>
+                <li>Chambre des enfants</li>
+                <li>Chambre des parents</li>
+                <li>Chambre des amis</li>
+                <li>Salle de bain</li>
+                <li>Salle de jeux</li>
+                <li>Garage</li>
+                <li>Extérieur</li>
+              </ul>
+            </li>
+            <li>Eclairage</li>
+            <li> Prises électriques </li>
+            <li> Fermetures </li>
+            <li> Ventilation </li>
+            <li> Scénario </li>
+            <li> Autres actions
+              <ul>
+                <li>Envoyer email</li>
+                <li>Envoyer SMS</li>
+                <li>Appeler</li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+        <h2><a href="#">Par zone</a></h2>
+        <div>
+          <ul>
+            <li> Zone 1
+              <ul>
+                <li>Pièces de jour</li>
+                <li>Pièces de nuit</li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="right">
+      <div id="scenarios">
+        <ul>
+          <li id="scenario1">SI temperature: chambre parents EST INFERIEUR A 16°C ALORS allumer: prise 1 ch.parents PENDANT 20 min.
+            <ul class="scenario-commands">
+              <li><a href="#details" onclick="toggleScenario('scenario1');">Modifier</a></li>
+              <li><a href="#">Supprimer</a></li>
+            </ul>
+          </li>
+          <li id="scenario2">SI temperature: chambre parents EST INFERIEUR A 16°C ALORS allumer: prise 1 ch.parents PENDANT 20 min.
+            <ul class="scenario-commands">
+              <li><a href="#details" onclick="toggleScenario('scenario2');">Modifier</a></li>
+              <li><a href="#">Supprimer</a></li>
+            </ul>
+          </li>
+          <li id="scenario3">SI temperature: chambre parents EST INFERIEUR A 16°C ALORS allumer: prise 1 ch.parents PENDANT 20 min.
+            <ul class="scenario-commands">
+              <li><a href="#details" onclick="toggleScenario('scenario3');">Modifier</a></li>
+              <li><a href="#">Supprimer</a></li>
+            </ul>
+          </li>
+          <li id="scenario4">SI temperature: chambre parents EST INFERIEUR A 16°C ALORS allumer: prise 1 ch.parents PENDANT 20 min.
+            <ul class="scenario-commands">
+              <li><a href="#details" onclick="toggleScenario('scenario4');">Modifier</a></li>
+              <li><a href="#">Supprimer</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+      <div id="details">
+        <form onsubmit="validForm();">
+          <div id="conditions" class="details">
+            <h2>Condition</h2>
+            <h3>SI</h3>
+            <fieldset>
+              <legend>Température</legend>
+              Pièce principale
+              <select id="comp" name="comp" title="Comparateur">
+                <option value="inf">&lt;</option>
+                <option value="sup">&gt;</option>
+                <option value="egal">=</option>
+              </select>
+              <select id="temp" name="temp" title="Valeur">
+                <option value="7">7 °C</option>
+                <option value="8">8 °C</option>
+                <option value="9">9 °C</option>
+                <option value="10">10 °C</option>
+                <option value="11">11 °C</option>
+                <option value="12">12 °C</option>
+                <option value="13" selected="selected">13 °C</option>
+                <option value="14">14 °C</option>
+                <option value="15">15 °C</option>
+                <option value="16">16 °C</option>
+                <option value="17">17 °C</option>
+                <option value="18">18 °C</option>
+              </select>
+            </fieldset>
+            <h3>ET</h3>
+          </div>
+          <div id="actions" class="details">
+            <h2>Action</h2>
+            <h3>Alors</h3>
+            <fieldset>
+              <legend>Fermer volets</legend>
+              <label for="amount">Pièce principale :</label>
+              <input type="text" id="value-blind" title="Fermeture volets en %"/>
+              <div id="slider-blind"></div>
+            </fieldset>
+            <h3>Et</h3>
+            <fieldset>
+              <legend>Envoyer email à</legend>
+              <p>Papa (m.bernard)</p>
+            </fieldset>
+          </div>
+          <div id="commands" class="details">
+            <input type="submit" value="Valider" class="button"/>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="footer"/>
+</div>
+</body>
+</html>
