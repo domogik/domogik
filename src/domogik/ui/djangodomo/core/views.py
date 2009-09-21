@@ -91,7 +91,7 @@ def index(request):
     room_list = _db.list_rooms()
     device_category_list = _db.list_device_categories()
     tech_list = _db.list_device_technologies()
-    return _go_to_view(request, 'index.html', page_title, area_list=area_list, 
+    return _go_to_page(request, 'index.html', page_title, area_list=area_list, 
                       room_list=room_list, device_category_list=device_category_list, 
                       device_list=device_list, tech_list=tech_list)
 
@@ -115,7 +115,7 @@ def device(request, device_id):
     if _db.device_has_stats(device_id):
         has_stats = "True"
 
-    return _go_to_view(request, 'device.html', page_title, device=device, has_stats=has_stats)
+    return _go_to_page(request, 'device.html', page_title, device=device, has_stats=has_stats)
 
 def device_stats(request, device_id):
     """
@@ -144,7 +144,7 @@ def device_stats(request, device_id):
               device_stats_list.append(device_stat)
     else:
         device_stats_list = _db.list_device_stats(device_id)
-    return _go_to_view(request, 'device_stats.html', page_title, device_id=device_id, 
+    return _go_to_page(request, 'device_stats.html', page_title, device_id=device_id, 
                       device_stats_list=device_stats_list, device_all=device_all)
 
 def login(request):
@@ -178,10 +178,10 @@ def login(request):
         else:
             # User not found, ask again to log in
             error_msg = "Sorry unable to log in. Please check login name / password and try again."
-            return _go_to_view(request, 'login.html', page_title, error_msg=error_msg)
+            return _go_to_page(request, 'login.html', page_title, error_msg=error_msg)
     else:
         # User asked to log in
-        return _go_to_view(request, 'login.html', page_title)
+        return _go_to_page(request, 'login.html', page_title)
 
 def logout(request):
     """
@@ -213,7 +213,7 @@ def admin_index(request):
         admin_mode = "checked"
     if sys_config.debug_mode:
         debug_mode = "checked"
-    return _go_to_view(request, 'admin_index.html', page_title, action=action, 
+    return _go_to_page(request, 'admin_index.html', page_title, action=action, 
                       simulation_mode=simulation_mode, admin_mode=admin_mode, 
                       debug_mode=debug_mode)
 
@@ -249,7 +249,7 @@ def load_sample_data(request):
     if sys_config.simulation_mode != True:
         error_msg = "The application is not running in simulation mode : "\
                 "can't load sample data"
-        return _go_to_view(request, 'admin_index.html', page_title, action=action, error_msg=error_msg)
+        return _go_to_page(request, 'admin_index.html', page_title, action=action, error_msg=error_msg)
 
     sample_data_helper = SampleDataHelper(_db)
     sample_data_helper.create()
@@ -259,7 +259,7 @@ def load_sample_data(request):
     device_category_list = _db.list_device_categories()
     device_list = _db.list_devices()
     device_tech_list = _db.list_device_technologies()
-    return _go_to_view(request, 'admin_index.html', page_title, action=action, 
+    return _go_to_page(request, 'admin_index.html', page_title, action=action, 
                       area_list=area_list, room_list=room_list, 
                       device_category_list=device_category_list, 
                       device_list=device_list, device_tech_list=device_tech_list)
@@ -280,11 +280,11 @@ def clear_data(request):
     if sys_config.simulation_mode != True:
         error_msg = "The application is not running in simulation mode : "\
                 "can't clear data"
-        return _go_to_view(request, 'admin_index.html', page_title, action=action, error_msg=error_msg)
+        return _go_to_page(request, 'admin_index.html', page_title, action=action, error_msg=error_msg)
 
     sample_data_helper = SampleDataHelper(_db)
     sample_data_helper.remove()
-    return _go_to_view(request, 'admin_index.html', page_title, action=action)
+    return _go_to_page(request, 'admin_index.html', page_title, action=action)
 
 def _update_device_values(request, sys_config):
     """
@@ -391,9 +391,9 @@ def _clear_device_stats(request, device_id):
         else:
             _db.del_all_device_stats(device_id)
 
-def _go_to_view(request, html_page, page_title, **attribute_list):
+def _go_to_page(request, html_page, page_title, **attribute_list):
     """
-    Common method called to go to a view (html page)
+    Common method called to go to an html page
     @param request : HTTP request
     @param html_page : the page to go to
     @param page_title : page title
