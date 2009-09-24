@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title>Domogik's new UI</title>
 <link href="css/ui-lightness/jquery-ui-1.7.2.custom.css" rel="stylesheet" type="text/css"/>
 <link href="css/ui-selectmenu.css" rel="stylesheet" type="text/css" />
@@ -16,37 +16,37 @@
 <div class="ui-widget ui-widget-content ui-corner-all">
   <div id="header">
     <h1>Welcome to Domogik<span class="subtitle">Free home automation under Linux</span></h1>
-    <ul id="nav1">
-      <li><a href="index.html" class="selected ui-corner-top">Programmation</a></li>
-      <li><a href="update/index.html" class="ui-corner-top">Modification</a></li>
-      <li><a href="view/index.html" class="ui-corner-top">Visualisation</a></li>
-    </ul>
   </div>
+  <ul id="nav1">
+    <li><a href="index.html" class="selected ui-corner-top">Programmation</a></li>
+    <li><a href="update/index.html" class="ui-corner-top">Modification</a></li>
+    <li><a href="view/index.html" class="ui-corner-top">Visualisation</a></li>
+  </ul>
   <div id="content">
     <div class="left">
       <!-- Accordion -->
       <div id="accordion">
-        <h2><a href="#">Par pièce</a></h2>
+        <h2><a href="#">Par piÃ¨ce</a></h2>
         <div>
           <ul>
-            <li>Température
+            <li>TempÃ©rature
               <ul>
-                <li>Pièce principale</li>
-                <li>Séjour</li>
+                <li>PiÃ¨ce principale</li>
+                <li>SÃ©jour</li>
                 <li>Chambre des enfants</li>
                 <li>Chambre des parents</li>
                 <li>Chambre des amis</li>
                 <li>Salle de bain</li>
                 <li>Salle de jeux</li>
                 <li>Garage</li>
-                <li>Extérieur</li>
+                <li>ExtÃ©rieur</li>
               </ul>
             </li>
             <li>Eclairage</li>
-            <li> Prises électriques </li>
+            <li> Prises Ã©lectriques </li>
             <li> Fermetures </li>
             <li> Ventilation </li>
-            <li> Scénario </li>
+            <li> ScÃ©nario </li>
             <li> Autres actions
               <ul>
                 <li>Envoyer email</li>
@@ -61,8 +61,8 @@
           <ul>
             <li> Zone 1
               <ul>
-                <li>Pièces de jour</li>
-                <li>Pièces de nuit</li>
+                <li>PiÃ¨ces de jour</li>
+                <li>PiÃ¨ces de nuit</li>
               </ul>
             </li>
           </ul>
@@ -72,25 +72,25 @@
     <div class="right">
       <div id="scenarios">
         <ul>
-          <li id="scenario1">SI temperature: chambre parents EST INFERIEUR A 16°C ALORS allumer: prise 1 ch.parents PENDANT 20 min.
+          <li id="scenario1">SI temperature: chambre parents EST INFERIEUR A 16Â°C ALORS allumer: prise 1 ch.parents PENDANT 20 min.
             <ul class="scenario-commands">
               <li><a href="#details" onclick="toggleScenario('scenario1');">Modifier</a></li>
               <li><a href="#">Supprimer</a></li>
             </ul>
           </li>
-          <li id="scenario2">SI temperature: chambre parents EST INFERIEUR A 16°C ALORS allumer: prise 1 ch.parents PENDANT 20 min.
+          <li id="scenario2">SI temperature: chambre parents EST INFERIEUR A 16Â°C ALORS allumer: prise 1 ch.parents PENDANT 20 min.
             <ul class="scenario-commands">
               <li><a href="#details" onclick="toggleScenario('scenario2');">Modifier</a></li>
               <li><a href="#">Supprimer</a></li>
             </ul>
           </li>
-          <li id="scenario3">SI temperature: chambre parents EST INFERIEUR A 16°C ALORS allumer: prise 1 ch.parents PENDANT 20 min.
+          <li id="scenario3">SI temperature: chambre parents EST INFERIEUR A 16Â°C ALORS allumer: prise 1 ch.parents PENDANT 20 min.
             <ul class="scenario-commands">
               <li><a href="#details" onclick="toggleScenario('scenario3');">Modifier</a></li>
               <li><a href="#">Supprimer</a></li>
             </ul>
           </li>
-          <li id="scenario4">SI temperature: chambre parents EST INFERIEUR A 16°C ALORS allumer: prise 1 ch.parents PENDANT 20 min.
+          <li id="scenario4">SI temperature: chambre parents EST INFERIEUR A 16Â°C ALORS allumer: prise 1 ch.parents PENDANT 20 min.
             <ul class="scenario-commands">
               <li><a href="#details" onclick="toggleScenario('scenario4');">Modifier</a></li>
               <li><a href="#">Supprimer</a></li>
@@ -104,26 +104,26 @@
             <h2>Condition</h2>
             <h3>SI</h3>
             <fieldset>
-              <legend>Température</legend>
-              Pièce principale
+              <legend>TempÃ©rature</legend>
+              PiÃ¨ce principale
               <select id="comp" name="comp" title="Comparateur">
                 <option value="inf">&lt;</option>
                 <option value="sup">&gt;</option>
                 <option value="egal">=</option>
               </select>
               <select id="temp" name="temp" title="Valeur">
-                <option value="7">7 °C</option>
-                <option value="8">8 °C</option>
-                <option value="9">9 °C</option>
-                <option value="10">10 °C</option>
-                <option value="11">11 °C</option>
-                <option value="12">12 °C</option>
-                <option value="13" selected="selected">13 °C</option>
-                <option value="14">14 °C</option>
-                <option value="15">15 °C</option>
-                <option value="16">16 °C</option>
-                <option value="17">17 °C</option>
-                <option value="18">18 °C</option>
+                <option value="7">7 Â°C</option>
+                <option value="8">8 Â°C</option>
+                <option value="9">9 Â°C</option>
+                <option value="10">10 Â°C</option>
+                <option value="11">11 Â°C</option>
+                <option value="12">12 Â°C</option>
+                <option value="13" selected="selected">13 Â°C</option>
+                <option value="14">14 Â°C</option>
+                <option value="15">15 Â°C</option>
+                <option value="16">16 Â°C</option>
+                <option value="17">17 Â°C</option>
+                <option value="18">18 Â°C</option>
               </select>
             </fieldset>
             <h3>ET</h3>
@@ -133,13 +133,13 @@
             <h3>Alors</h3>
             <fieldset>
               <legend>Fermer volets</legend>
-              <label for="amount">Pièce principale :</label>
+              <label for="amount">PiÃ¨ce principale :</label>
               <input type="text" id="value-blind" title="Fermeture volets en %"/>
               <div id="slider-blind"></div>
             </fieldset>
             <h3>Et</h3>
             <fieldset>
-              <legend>Envoyer email à</legend>
+              <legend>Envoyer email Ã </legend>
               <p>Papa (m.bernard)</p>
             </fieldset>
           </div>

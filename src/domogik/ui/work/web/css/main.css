@@ -15,6 +15,11 @@ div.right {
 	margin-bottom:1em;
 }
 /* Header */
+#header {
+	background:url(../images/logo_domogik.png) left top no-repeat;
+	padding-left:150px;
+	margin-left:1em;
+}
 
 span.subtitle {
 	display:block;
