@@ -26,27 +26,27 @@
     <div class="left">
       <!-- Accordion -->
       <div id="accordion">
-        <h2><a href="#">Par pièce</a></h2>
+        <h2><a href="#">Par pi&egrave;ce</a></h2>
         <div>
           <ul>
-            <li>Température
+            <li>Temp&eacute;rature
               <ul>
-                <li>Pièce principale</li>
-                <li>Séjour</li>
+                <li>Pi&egrave;ce principale</li>
+                <li>S&eacute;jour</li>
                 <li>Chambre des enfants</li>
                 <li>Chambre des parents</li>
                 <li>Chambre des amis</li>
                 <li>Salle de bain</li>
                 <li>Salle de jeux</li>
                 <li>Garage</li>
-                <li>Extérieur</li>
+                <li>Ext&eacute;rieur</li>
               </ul>
             </li>
             <li>Eclairage</li>
-            <li> Prises électriques </li>
+            <li> Prises &eacute;lectriques </li>
             <li> Fermetures </li>
             <li> Ventilation </li>
-            <li> Scénario </li>
+            <li> Sc&eacute;nario </li>
             <li> Autres actions
               <ul>
                 <li>Envoyer email</li>
@@ -61,8 +61,8 @@
           <ul>
             <li> Zone 1
               <ul>
-                <li>Pièces de jour</li>
-                <li>Pièces de nuit</li>
+                <li>Pi&egrave;ces de jour</li>
+                <li>Pi&egrave;ces de nuit</li>
               </ul>
             </li>
           </ul>
@@ -72,25 +72,25 @@
     <div class="right">
       <div id="scenarios">
         <ul>
-          <li id="scenario1">SI temperature: chambre parents EST INFERIEUR A 16°C ALORS allumer: prise 1 ch.parents PENDANT 20 min.
+          <li id="scenario1">SI temperature: chambre parents EST INFERIEUR A 16&deg;C ALORS allumer: prise 1 ch.parents PENDANT 20 min.
             <ul class="scenario-commands">
               <li><a href="#details" onclick="toggleScenario('scenario1');">Modifier</a></li>
               <li><a href="#">Supprimer</a></li>
             </ul>
           </li>
-          <li id="scenario2">SI temperature: chambre parents EST INFERIEUR A 16°C ALORS allumer: prise 1 ch.parents PENDANT 20 min.
+          <li id="scenario2">SI temperature: chambre parents EST INFERIEUR A 16&deg;C ALORS allumer: prise 1 ch.parents PENDANT 20 min.
             <ul class="scenario-commands">
               <li><a href="#details" onclick="toggleScenario('scenario2');">Modifier</a></li>
               <li><a href="#">Supprimer</a></li>
             </ul>
           </li>
-          <li id="scenario3">SI temperature: chambre parents EST INFERIEUR A 16°C ALORS allumer: prise 1 ch.parents PENDANT 20 min.
+          <li id="scenario3">SI temperature: chambre parents EST INFERIEUR A 16&deg;C ALORS allumer: prise 1 ch.parents PENDANT 20 min.
             <ul class="scenario-commands">
               <li><a href="#details" onclick="toggleScenario('scenario3');">Modifier</a></li>
               <li><a href="#">Supprimer</a></li>
             </ul>
           </li>
-          <li id="scenario4">SI temperature: chambre parents EST INFERIEUR A 16°C ALORS allumer: prise 1 ch.parents PENDANT 20 min.
+          <li id="scenario4">SI temperature: chambre parents EST INFERIEUR A 16&deg;C ALORS allumer: prise 1 ch.parents PENDANT 20 min.
             <ul class="scenario-commands">
               <li><a href="#details" onclick="toggleScenario('scenario4');">Modifier</a></li>
               <li><a href="#">Supprimer</a></li>
@@ -99,13 +99,13 @@
         </ul>
       </div>
       <div id="details">
-        <form onsubmit="validForm();">
+        <form action="" onsubmit="validForm();">
           <div id="conditions" class="details">
             <h2>Condition</h2>
             <h3>SI</h3>
             <fieldset>
-              <legend>Température</legend>
-              Pièce principale
+              <legend>Temp&eacute;rature</legend>
+              Pi&egrave;ce principale
               <select id="comp" name="comp" title="Comparateur">
                 <option value="inf">&lt;</option>
                 <option value="sup">&gt;</option>
@@ -133,7 +133,7 @@
             <h3>Alors</h3>
             <fieldset>
               <legend>Fermer volets</legend>
-              <label for="amount">Pièce principale :</label>
+              <label for="value-blind">Pi&egrave;ce principale :</label>
               <input type="text" id="value-blind" title="Fermeture volets en %"/>
               <div id="slider-blind"></div>
             </fieldset>
