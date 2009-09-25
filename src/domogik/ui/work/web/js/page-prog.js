@@ -1,7 +1,7 @@
 			$(function(){
 			
 				// Accordion
-				$("#accordion").accordion({ header: "h2" });
+				$("#nav2").accordion({ header: "h2" });
 				$('fieldset').addClass('ui-corner-all');
 				$('input.button').addClass('ui-corner-all');
 				

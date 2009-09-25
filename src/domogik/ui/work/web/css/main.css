@@ -1,3 +1,7 @@
+img {
+	border:none;
+}
+
 /* Main Layout */
 body {
 	font: 62.5% "Trebuchet MS", sans-serif;
@@ -15,9 +19,12 @@ div.right {
 	margin-bottom:1em;
 }
 /* Header */
+#logo {
+	float:left;
+	margin-right:1em;
+}
+
 #header {
-	background:url(../images/logo_domogik.png) left top no-repeat;
-	padding-left:150px;
 	margin-left:1em;
 }
 
