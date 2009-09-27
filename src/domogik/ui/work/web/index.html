@@ -5,21 +5,147 @@
 <title>Domogik's new UI</title>
 <link href="css/ui-lightness/jquery-ui-1.7.2.custom.css" rel="stylesheet" type="text/css"/>
 <link href="css/main.css" rel="stylesheet" type="text/css" />
+<link href="css/page-home.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="js/jquery-ui-1.7.2.custom.min.js"></script>
 </head>
 <body>
 <div class="ui-widget ui-widget-content ui-corner-all">
-  <div id="header">
-    <a href="index.html" id="logo"><img src="images/logo_domogik.png" width="131" height="37" alt="Domotik logo" /></a>
-    <h1>Welcome to Domogik<span class="subtitle">Free home automation under Linux</span></h1>
-  </div>
-  <ul id="nav1">
-    <li><a href="view/index.html" class="ui-corner-top">Visualisation</a></li>
-    <li><a href="program/index.html" class="ui-corner-top">Programmation</a></li>
-    <li><a href="update/index.html" class="ui-corner-top">Modification</a></li>
+<div id="header"> <a href="index.html" id="logo"><img src="images/logo_domogik.png" width="131" height="37" alt="Domotik logo" /></a>
+  <h1>Welcome to Domogik<span class="subtitle">Free home automation under Linux</span></h1>
+</div>
+<div id="general">
+  <div id="general-temp" class="sun">21&deg;C</div>
+  <div id="general-datetime"><span id="general-time">10:20</span><br />
+    <span id="general-date">Dimanche 27 Septembre 2009</span></div>
+  <ul class="general-infos">
+    <li id="general-infos-elect">150 Kw/h</li>
+    <li id="general-infos-water">1,7 l/h</li>
   </ul>
-  <div id="content">
+  <ul class="general-infos">
+    <li id="general-infos-message">1 message</li>
+    <li id="general-infos-notify">2 notifications</li>
+    <li id="general-infos-error">Pas d'erreur</li>
+  </ul>
+</div>
+<ul id="nav1">
+  <li><a href="view/index.html">Visualisation</a></li>
+  <li><a href="program/index.html">Programmation</a></li>
+  <li><a href="update/index.html">Modification</a></li>
+</ul>
+<div id="content">
+  <div class="line">
+    <div class="room leftcol ui-widget ui-widget-content ui-corner-tl ui-corner-br">
+      <div class="room-ident"><span class="room-title">Salon TV</span><br />
+        <span class="room-zone">Rez-de-chaussée</span></div>
+      <div class="room-temp">19&deg;C</div>
+      <ul class="room-infos">
+        <li class="room-light">Lumière <span class="on">(on)</span></li>
+        <li class="room-shutter">Volet <span class="down">(fermé)</span></li>
+      </ul>
+      <ul class="room-others">
+        <li class="room-tv">Télévision <span class="on">(on)</span></li>
+        <li class="room-sound">Audio <span class="playing">sortie TV</span></li>
+      </ul>
+    </div>
+    <div class="room middlecol ui-widget ui-widget-content ui-corner-tl ui-corner-br">
+      <div class="room-ident"><span class="room-title">Séjour</span><br />
+        <span class="room-zone">Rez-de-chaussée</span></div>
+      <div class="room-temp">20&deg;C</div>
+      <ul class="room-infos">
+        <li class="room-light">Lumière <span class="on">(on)</span></li>
+        <li class="room-shutter">Volet <span class="down">(fermé)</span></li>
+      </ul>
+      <ul class="room-others">
+        <li class="room-clim">Climatisation <span class="on">(19°C)</span></li>
+      </ul>
+    </div>
+    <div class="room rightcol ui-widget ui-widget-content ui-corner-tl ui-corner-br">
+      <div class="room-ident"><span class="room-title">Cuisine</span><br />
+        <span class="room-zone">Rez-de-chaussée</span></div>
+      <div class="room-temp">19&deg;C</div>
+      <ul class="room-infos">
+        <li class="room-light">Lumière <span class="on">(off)</span></li>
+        <li class="room-shutter">Volet <span class="down">(fermé)</span></li>
+      </ul>
+      <ul class="room-others">
+        <li class="room-vmc">Ventilation <span class="off">(off)</span></li>
+      </ul>
+    </div>
+  </div>
+    <div class="line">
+    <div class="room leftcol ui-widget ui-widget-content ui-corner-tl ui-corner-br">
+      <div class="room-ident"><span class="room-title">Salle de Bain</span><br />
+        <span class="room-zone">Etage</span></div>
+      <div class="room-temp">19&deg;C</div>
+      <ul class="room-infos">
+        <li class="room-light">Lumière <span class="off">(off)</span></li>
+        <li class="room-shutter">Volet <span class="down">(fermé)</span></li>
+      </ul>
+      <ul class="room-others">
+        <li class="room-vmc">Ventilation <span class="off">(off)</span></li>
+      </ul>
+    </div>
+    <div class="room middlecol ui-widget ui-widget-content ui-corner-tl ui-corner-br">
+      <div class="room-ident"><span class="room-title">Chambre parents</span><br />
+        <span class="room-zone">Etage</span></div>
+      <div class="room-temp">16&deg;C</div>
+      <ul class="room-infos">
+        <li class="room-light">Lumière <span class="off">(off)</span></li>
+        <li class="room-shutter">Volet <span class="down">(fermé)</span></li>
+      </ul>
+      <ul class="room-others">
+      </ul>
+    </div>
+    <div class="room rightcol ui-widget ui-widget-content ui-corner-tl ui-corner-br">
+      <div class="room-ident"><span class="room-title">Chambre enfants</span><br />
+        <span class="room-zone">Etage</span></div>
+      <div class="room-temp">16&deg;C</div>
+      <ul class="room-infos">
+        <li class="room-light">Lumière <span class="on">(on)</span></li>
+        <li class="room-shutter">Volet <span class="down">(fermé)</span></li>
+      </ul>
+      <ul class="room-others">
+        <li class="room-sound">Audio <span class="playing">"Vertigo, U2"</span></li>
+      </ul>
+    </div>
+  </div>
+    <div class="line">
+    <div class="room leftcol ui-widget ui-widget-content ui-corner-tl ui-corner-br">
+      <div class="room-ident"><span class="room-title">Chambre amis</span><br />
+        <span class="room-zone">Etage</span></div>
+      <div class="room-temp">16&deg;C</div>
+      <ul class="room-infos">
+        <li class="room-light">Lumière <span class="off">(off)</span></li>
+        <li class="room-shutter">Volet <span class="down">(fermé)</span></li>
+      </ul>
+      <ul class="room-others">
+        <li class="room-tv">TV <span class="on">(on)</span></li>
+      </ul>
+    </div>
+    <div class="room middlecol ui-widget ui-widget-content ui-corner-tl ui-corner-br">
+      <div class="room-ident"><span class="room-title">Garage</span><br />
+        <span class="room-zone">Sous-sol</span></div>
+      <div class="room-temp">15&deg;C</div>
+      <ul class="room-infos">
+        <li class="room-light">Lumière <span class="off">(off)</span></li>
+      </ul>
+      <ul class="room-others">
+        <li class="room-vmc">Ventilation <span class="on">(on)</span></li>
+      </ul>
+    </div>
+    <div class="room rightcol ui-widget ui-widget-content ui-corner-tl ui-corner-br">
+      <div class="room-ident"><span class="room-title">Bureau</span><br />
+        <span class="room-zone">Rez-de-chaussée</span></div>
+      <div class="room-temp">19&deg;C</div>
+      <ul class="room-infos">
+        <li class="room-light">Lumière <span class="off">(off)</span></li>
+        <li class="room-shutter">Volet <span class="down">(fermé)</span></li>
+      </ul>
+      <ul class="room-others">
+         <li class="room-wifi">Réseau sans fil <span class="on">(activé)</span></li>
+      </ul>
+    </div>
   </div>
   <div class="footer"/>
 </div>
