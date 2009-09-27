@@ -56,7 +56,7 @@ class OneWireTemp(xPLModule):
         xPLModule.__init__(self, name='onewire')
         config = {"source":"dmg-onewire"}
         self._myxpl = Manager()
-        self._config = Query(self.__myxpl)
+        self._config = Query(self._myxpl)
         res = xPLResult()
         self._config.query('onewire', 'temperature_refresh_delay', res)
         temp_delay = res.get_value()['temperature_refresh_delay']

@@ -53,11 +53,11 @@ Implements
 @organization: Domogik
 """
 
-import signal
 import threading
 import time
 from domogik.common import logger
 import threading
+from domogik.xpl.lib.xplconnector import *
 
 class xPLModule():
     '''
@@ -71,7 +71,7 @@ class xPLModule():
         '''
         Create xPLModule instance, which defines signal handlers
         @param name : The n,ame of the current module
-        @param stop_cb : Method to call when a SIGTERM is received
+        @param stop_cb : Method to call when a stop request is received
         '''
         if xPLModule.__instance is None and name is None:
             raise AttributeError, "'name' attribute is mandatory for the first instance"
@@ -93,23 +93,25 @@ class xPLModule():
     class __Singl_xPLModule():
         def __init__(self, name, stop_cb = None):
             '''
-            Create xPLModule instance, which defines signal handlers
-            @param name : The n,ame of the current module
-            @param stop_cb : Method to call when a SIGTERM is received
+            Create xPLModule instance, which defines system handlers
+            @param name : The name of the current module
+            @param stop_cb : Additionnal method to call when a stop request is received
             '''
             self._threads = []
             self._timers = []
             self._module_name = name
             l = logger.Logger(name)
             self._log = l.get_logger()
-            self._log.debug("New signal manager instance for %s" % name)
+            self._log.debug("New system manager instance for %s" % name)
 
             self._stop = threading.Event()
             if stop_cb is not None:
                 self._stop_cb = [stop_cb]
             else:
                 self._stop_cb = []
-            signal.signal(signal.SIGTERM, self.hand_leave)
+            self._myxpl = Manager()
+            self._l = Listener(self.hand_leave, self._myxpl, {'schema' : 'domogik.system',
+                'type':'xpl-cmnd'})
 
         def get_my_logger(self):
             """
@@ -125,7 +127,7 @@ class xPLModule():
 
         def add_stop_cb(self, cb):
             '''
-            Add an additionnal callback to call when a SIGTERM is received
+            Add an additionnal callback to call when a stop request is received
             '''
             self._stop_cb.append(cb)
 
@@ -183,9 +185,9 @@ class xPLModule():
 
         def hand_leave(self, signum, frame):
             '''
-            Handler called when a SIGTERM is catched
+            Handler called when a stop request is catched
             '''
-            self._log.debug('Signal SIGTERM catched')
+            self._log.debug('Stop request catched, try to end gracefullly')
             self.force_leave()
 
         def force_leave(self):

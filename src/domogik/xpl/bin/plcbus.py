@@ -55,10 +55,10 @@ class plcbusMain(xPLModule):
         '''
         # Load config
         xPLModule.__init__(self, name = 'plcbus')
-        self.__myxpl = Manager()
-        self._config = Query(self.__myxpl)
+        
+        self._config = Query(self._myxpl)
         # Create listeners
-        Listener(self.plcbus_cmnd_cb, self.__myxpl, {
+        Listener(self.plcbus_cmnd_cb, self._myxpl, {
             'schema': 'control.basic',
             'type': 'xpl-cmnd',
         })
@@ -103,7 +103,7 @@ class plcbusMain(xPLModule):
         mess.add_data({"type" :  "plcbus"})
         mess.add_data({"command" :  cmd})
         mess.add_data({"device" :  dev})
-        self.__myxpl.send(mess)
+        self._myxpl.send(mess)
 
 
 if __name__ == "__main__":

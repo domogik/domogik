@@ -56,13 +56,13 @@ class Sender(xPLModule):
         self._schema = schema
         self._message = message
         cfgloader = Loader('send')
-        self.__myxpl = Manager()
+        
         self._log = self.get_my_logger()
         self.parse_parameters()
         mess = self.forge_message()
         self._log.debug("Send message : %s" % mess)
-        self.__myxpl.send(mess)
-        self.__myxpl.force_leave()
+        self._myxpl.send(mess)
+        self._myxpl.force_leave()
 
     def parse_parameters(self):
         '''
