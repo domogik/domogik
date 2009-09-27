@@ -88,30 +88,33 @@ class DBConnector(xPLModule):
         Callback to receive a request for some config stuff
         @param message : the xPL message
         '''
-        try:
-            techno = message.data['technology']
-            key = message.data['key']
+        #try:
+        techno = message.data['technology']
+        key = message.data['key']
+        if "element" in message.data:
             element = message.data['element']
+        else:
+            element = None
+        if not key:
+            self._log.debug("New request config received for %s :\
+                    asked for all config items" % (techno))
+        else:
+            self._log.debug("New request config received for %s : %s" % (techno,
+            key))
+        if element:
+            self._send_config(techno, key, self._fetch_elmt_config(techno,
+            element, key), message.source, element)
+        else:
             if not key:
-                self._log.debug("New request config received for %s :\
-                        asked for all config items" % (techno))
+                keys = self._fetch_techno_config(techno, key).keys()
+                values = self._fetch_techno_config(techno, key).values()
+                self._send_config(techno, keys, values,
+                message.source)
             else:
-                self._log.debug("New request config received for %s : %s" % (techno,
-                key))
-            if element:
-                self._send_config(techno, key, self._fetch_elmt_config(techno,
-                element, key), message.source, element)
-            else:
-                if not key:
-                    keys = self._fetch_techno_config(techno, key).keys()
-                    values = self._fetch_techno_config(techno, key).values()
-                    self._send_config(techno, keys, values,
-                    message.source)
-                else:
-                    self._send_config(techno, key, self._fetch_techno_config(techno,
-                    key), message.source)
-        except KeyError:
-            self._log.warning("A request for configuration has been received, but it was misformatted")
+                self._send_config(techno, key, self._fetch_techno_config(techno,
+                key), message.source)
+        #except KeyError:
+         #   self._log.warning("A request for configuration has been received, but it was misformatted")
 
     def _send_config(self, technology, key, value, module, element = None):
         '''
@@ -165,7 +168,9 @@ class DBConnector(xPLModule):
             'heyu_file_1': 'TTY_AUX /dev/ttyUSB0 RFXCOM',
             'heyu_file_2': 'ALIAS back_door D5 DS10A 0x677'},
                 'global': {'pid_dir_path': '/tmp/'},
-                'onewire': {'temperature_refresh_delay' : '10'}
+                'onewire': {'temperature_refresh_delay' : '10'},
+                'teleinfo' : {'device' : '/dev/ttyUSB0',
+                    'interval' : '30'},
                 }
         try:
             if key:
