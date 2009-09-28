@@ -2,6 +2,15 @@ img {
 	border:none;
 }
 
+.ui-widget-content a {
+	text-decoration:none;
+	color:#1c94c4;
+}
+
+.ui-widget-content a:hover, .ui-widget-content a:active, .ui-widget-content a:focus {
+	color:#eb8f00;
+}
+
 /* Main Layout */
 body {
 	font: 62.5% "Trebuchet MS", sans-serif;
@@ -9,10 +18,10 @@ body {
 }
 div.left {
 	float:left;
-	width: 23em;
+	width: 20em;
 }
 div.right {
-	margin-left: 24em;
+	margin-left: 21em;
 }
 .footer {
 	clear:both;
@@ -21,14 +30,18 @@ div.right {
 /* Header */
 #logo {
 	float:left;
-	margin-right:1em;
+	margin:0 1em 0 0;
 }
 
 #header {
-	margin-left:1em;
+	padding:1em 0 0 1em;
 }
 
-span.subtitle {
+#title {
+	font-size:2em;
+}
+
+#subtitle {
 	display:block;
 	font-size:0.6em;
 	font-style:italic;
@@ -68,20 +81,6 @@ ul#nav1 li a.selected {
 ul#nav1 li a.selected:hover {
 	color: #eb8f00;
 	background:#FFF;
-}
-/* Left menu */
-#accordion ul {
-	margin: 0;
-	padding: 0;
-	list-style:none;
-}
-#accordion li {
-	margin-left: 0;
-	padding-left: 0;
-}
-#accordion li ul {
-	list-style:disc;
-	padding-left:2em;
 }
 
 /* Forms */
