@@ -2,11 +2,8 @@
 /* CSS Document */
 
 .element-main {
+	margin-right:1em;
 	padding:0 1em 0 1em;
-}
-
-.element-main h1 {
-	float:right;
 }
 
 .element-main h2, .element h2 {
@@ -19,7 +16,74 @@
 	padding:0 1em 0 1em;
 }
 
+.label {
+	font-weight:bold;
+}
+
+.parameter {
+	line-height:3em;
+}
+
+/* Indicators */
+.on {
+	padding:7px 0 7px 20px;
+	background:url(../images/room_various_on.png) left 50% no-repeat;
+}
+.off {
+	padding:7px 0 7px 20px;
+	background:url(../images/room_various_off.png) left 50% no-repeat;
+}
+.lighton {
+	padding:7px 0 7px 20px;
+	background: url(../images/room_light_on.png) left 50% no-repeat;
+}
+.lightoff {
+	padding:7px 0 7px 20px;
+	background: url(../images/room_light_off.png) left 50% no-repeat;
+}
+.shutteropen {
+}
+.shutterclosed {
+	padding:7px 0 7px 20px;
+	background: url(../images/room_shutter_down.png) left 50% no-repeat;
+}
+
+
+/* Room main */
+.room-general {
+	background:url(../images/room-type.png) top right no-repeat;
+		min-height:10em;
+}
+
+.room-ident {
+	line-height:0.5em;
+}
+
+.room-title {
+	font-size:1em;
+}
+.room-zone {
+	font-size:0.6em;
+	font-style:italic;
+	padding-left:1em;
+}
+
+.room-temp {
+	font-size:2em;
+	float:right;
+	clear:right;
+	margin-right:5em;
+}
+
+.room-humidity {
+	font-style:italic;
+	float:right;
+	clear:right;
+	margin-right:5em;
+}
+
 /* Element General */
+
 .element-main li {
 	padding-left:20px;
 }
@@ -51,11 +115,6 @@ li.general-error {
 
 
 /* Element Phone */
-
-.on {
-	padding:7px 0 7px 20px;
-	background:url(../images/room_various_on.png) left 50% no-repeat;
-}
 
 .phone-summary {
 	float:right;
@@ -94,3 +153,5 @@ td.hidden-call {
 	color:#F00;
 	font-style:italic;
 }
+
+/* Element Light */

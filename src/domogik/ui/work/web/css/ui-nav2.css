@@ -13,7 +13,7 @@
 }
 #nav2 li a {
 	color:#000;
-	margin: 0;
+	margin: 0 1px 0 1px;
 	padding: 0.7em 0.5em 0.7em 40px;
 	border-bottom:#CCC solid 1px;
 	display:block;

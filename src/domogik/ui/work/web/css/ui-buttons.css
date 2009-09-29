@@ -1,0 +1,26 @@
+@charset "UTF-8";
+/* CSS Document */
+
+.button {
+	background:#FFF;
+	padding:0.2em;
+	margin:0;
+	border:#1c94c4 1px solid;
+	font-size:1.2em;
+}
+
+.button:hover {
+	color: #c77405;
+	border:#eb8f00 1px solid;
+	background: #fdf5ce url(images/ui-bg_glass_100_fdf5ce_1x400.png) repeat-x 50% 50%;
+}
+
+.button.on {
+	color:#096;
+	border-color:#096;
+}
+
+.button.off {
+	color:#930;
+	border-color:#930;
+}

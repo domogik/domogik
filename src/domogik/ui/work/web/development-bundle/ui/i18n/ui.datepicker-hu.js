@@ -11,7 +11,7 @@ jQuery(function($){
 		monthNamesShort: ['Jan', 'Feb', 'Már', 'Ápr', 'Máj', 'Jún',
 		'Júl', 'Aug', 'Szep', 'Okt', 'Nov', 'Dec'],
 		dayNames: ['Vasámap', 'Hétfö', 'Kedd', 'Szerda', 'Csütörtök', 'Péntek', 'Szombat'],
-		dayNamesShort: ['Vas', 'Hét', 'Ked', 'Sze', 'Csü', 'Pén', 'Szo'],
+		dayNamesShort: ['Vas', 'H&eacute;t', 'Ked', 'Sze', 'Csü', 'P&eacute;n', 'Szo'],
 		dayNamesMin: ['V', 'H', 'K', 'Sze', 'Cs', 'P', 'Szo'],
 		dateFormat: 'yy-mm-dd', firstDay: 1,
 		isRTL: false};

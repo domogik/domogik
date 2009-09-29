@@ -5,11 +5,7 @@
 
 /* Nav menu */
 ul#nav1 {
-	float:left;
 	clear:both;
-}
-ul#nav1 li {
-	padding:0;
 }
 
 /* General box */

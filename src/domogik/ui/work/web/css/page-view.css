@@ -1,0 +1,41 @@
+@charset "UTF-8";
+/* CSS Document */
+
+/* Heat section */
+select#heat-mode {
+	width: 13em;
+}
+
+
+#slider-heat-temp {
+	width: 50%;
+	margin-bottom:1em;
+}
+#value-heat-tempmin {
+	border:0;
+	background: transparent;
+	color:#f6931f;
+	font-weight:bold;
+	width:3em;
+}
+#value-heat-tempmax {
+	border:0;
+	background: transparent;
+	color:#f6931f;
+	font-weight:bold;
+	width:3em;
+}
+
+
+/* Light */
+#slider-light-2 {
+	width: 50%;
+	margin-bottom:1em;
+}
+#value-light-2 {
+	border:0;
+	background: transparent;
+	color:#f6931f;
+	font-weight:bold;
+	width:5em;
+}
