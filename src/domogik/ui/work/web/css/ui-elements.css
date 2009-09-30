@@ -10,10 +10,30 @@
 	font-style:italic;
 }
 
+.element-full {
+	float:left;
+	width:94%;
+}
+
+.element-left {
+	width:41%;
+	float:left;
+}
+
+.element-right {
+	float:left;
+	width:41%;
+	clear:right;
+}
+
+.line {
+}
+
 .element {
 	border:1px solid #1c94c4;
 	margin:1em;
 	padding:0 1em 0 1em;
+	min-height:15em;
 }
 
 .label {
@@ -22,6 +42,16 @@
 
 .parameter {
 	line-height:3em;
+}
+
+.element .parameter {
+	border-top:1px solid #CCC;
+}
+
+.parameter .button {
+	float:right;
+	line-height:1.6em;
+	margin:0.2em;
 }
 
 /* Indicators */
@@ -117,7 +147,6 @@ li.general-error {
 /* Element Phone */
 
 .phone-summary {
-	float:right;
 }
 
 table.phone-calllist {
