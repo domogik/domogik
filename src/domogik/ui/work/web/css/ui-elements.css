@@ -4,35 +4,26 @@
 .element-main {
 	margin-right:1em;
 	padding:0 1em 0 1em;
+	-moz-box-shadow: 5px 5px 5px #888;
+	-webkit-box-shadow: 5px 5px 5px #888;
 }
 
 .element-main h2, .element h2 {
 	font-style:italic;
 }
 
-.element-full {
-	float:left;
-	width:94%;
-}
-
-.element-left {
-	width:41%;
-	float:left;
-}
-
-.element-right {
-	float:left;
-	width:41%;
-	clear:right;
-}
-
-.line {
+.columns {
+	-moz-column-width: 40em;
+    -webkit-column-width: 40em;
+    -moz-column-gap: 1em;
+    -webkit-column-gap: 1em;
 }
 
 .element {
 	border:1px solid #1c94c4;
-	margin:1em;
+	margin:1em 0 0 0;
 	padding:0 1em 0 1em;
+	column-break-inside: avoid;
 	min-height:15em;
 }
 
@@ -55,22 +46,15 @@
 }
 
 /* Indicators */
-.on {
+span.on {
 	padding:7px 0 7px 20px;
 	background:url(../images/room_various_on.png) left 50% no-repeat;
 }
-.off {
+span.off {
 	padding:7px 0 7px 20px;
 	background:url(../images/room_various_off.png) left 50% no-repeat;
 }
-.lighton {
-	padding:7px 0 7px 20px;
-	background: url(../images/room_light_on.png) left 50% no-repeat;
-}
-.lightoff {
-	padding:7px 0 7px 20px;
-	background: url(../images/room_light_off.png) left 50% no-repeat;
-}
+
 .shutteropen {
 }
 .shutterclosed {
@@ -79,108 +63,17 @@
 }
 
 
-/* Room main */
-.room-general {
-	background:url(../images/room-type.png) top right no-repeat;
-		min-height:10em;
-}
+/* Element main */
 
-.room-ident {
+.element-ident {
 	line-height:0.5em;
 }
 
-.room-title {
+.element-title {
 	font-size:1em;
 }
-.room-zone {
+.element-subtitle {
 	font-size:0.6em;
 	font-style:italic;
 	padding-left:1em;
 }
-
-.room-temp {
-	font-size:2em;
-	float:right;
-	clear:right;
-	margin-right:5em;
-}
-
-.room-humidity {
-	font-style:italic;
-	float:right;
-	clear:right;
-	margin-right:5em;
-}
-
-/* Element General */
-
-.element-main li {
-	padding-left:20px;
-}
-
-li.general-electric {
-	background:url(../images/infos_elect.png) top left no-repeat;
-}
-
-li.general-water {
-	background:url(../images/infos_water.png) top left no-repeat;
-}
-
-li.general-message {
-	background:url(../images/infos_message.png) top left no-repeat;
-}
-
-li.general-notify {
-	background:url(../images/infos_notify.png) top left no-repeat;
-}
-
-li.general-error {
-	background:url(../images/infos_error.png) top left no-repeat;
-}
-
-/* Element Meteo */
-.meteo-sun {
-	background:url(../images/meteo_sun.png) top right no-repeat;
-}
-
-
-/* Element Phone */
-
-.phone-summary {
-}
-
-table.phone-calllist {
-	width:100%;
-}
-
-table.phone-calllist th {
-	background-color:#1c94c4;
-	color:#FFF;
-}
-
-table.phone-calllist td {
-	padding:1em;
-}
-
-table.phone-calllist tr.odd {
-	background-color:#FFF;
-}
-
-ul.phone-callactions {
-	list-style:none;
-	margin:0;
-	padding:0;
-}
-
-ul.phone-callactions li {
-	display:inline;
-	margin:0 1em 0 0;
-	padding:0;
-}
-
-td.hidden-call {
-	color:#F00;
-	font-style:italic;
-}
-
-/* Element Light */

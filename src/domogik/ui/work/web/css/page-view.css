@@ -1,41 +1,76 @@
 @charset "UTF-8";
 /* CSS Document */
 
-/* Heat section */
-select#heat-mode {
-	width: 13em;
+.house-general {
+	background:url(../images/room-type.png) top right no-repeat;
+	min-height:10em;
+}
+
+.element-main li {
+	padding-left:20px;
+}
+
+li.general-electric {
+	background:url(../images/infos_elect.png) top left no-repeat;
+}
+
+li.general-water {
+	background:url(../images/infos_water.png) top left no-repeat;
+}
+
+li.general-message {
+	background:url(../images/infos_message.png) top left no-repeat;
+}
+
+li.general-notify {
+	background:url(../images/infos_notify.png) top left no-repeat;
+}
+
+li.general-error {
+	background:url(../images/infos_error.png) top left no-repeat;
+}
+
+/* Element Meteo */
+.meteo-sun {
+	background:url(../images/meteo_sun.png) top right no-repeat;
 }
 
 
-#slider-heat-temp {
-	width: 50%;
-	margin-bottom:1em;
-}
-#value-heat-tempmin {
-	border:0;
-	background: transparent;
-	color:#f6931f;
-	font-weight:bold;
-	width:3em;
-}
-#value-heat-tempmax {
-	border:0;
-	background: transparent;
-	color:#f6931f;
-	font-weight:bold;
-	width:3em;
+/* Element Phone */
+
+.phone-summary {
 }
 
-
-/* Light */
-#slider-light-2 {
-	width: 50%;
-	margin-bottom:1em;
+table.phone-calllist {
+	width:100%;
 }
-#value-light-2 {
-	border:0;
-	background: transparent;
-	color:#f6931f;
-	font-weight:bold;
-	width:5em;
+
+table.phone-calllist th {
+	background-color:#1c94c4;
+	color:#FFF;
+}
+
+table.phone-calllist td {
+	padding:1em;
+}
+
+table.phone-calllist tr.odd {
+	background-color:#FFF;
+}
+
+ul.phone-callactions {
+	list-style:none;
+	margin:0;
+	padding:0;
+}
+
+ul.phone-callactions li {
+	display:inline;
+	margin:0 1em 0 0;
+	padding:0;
+}
+
+td.hidden-call {
+	color:#F00;
+	font-style:italic;
 }

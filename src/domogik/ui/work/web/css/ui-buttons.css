@@ -1,26 +1,28 @@
 @charset "UTF-8";
 /* CSS Document */
 
-.button {
-	background:#FFF;
+a.button {
+	color:#FFF;
+	background-color:#1c94c4;
 	padding:0.2em;
 	margin:0;
-	border:#1c94c4 1px solid;
 	font-size:1.2em;
+	display:inline-block;
+	
+	-moz-border-radius: 0.8em 0;
+	-webkit-border-radius: 0.8em 0;
+}
+a.button.on {
+	background-color:#096;
 }
 
-.button:hover {
-	color: #c77405;
-	border:#eb8f00 1px solid;
-	background: #fdf5ce url(images/ui-bg_glass_100_fdf5ce_1x400.png) repeat-x 50% 50%;
+a.button.off {
+	background-color:#930;
+}
+a.button:hover, a.button.on:hover, a.button.off:hover,
+a.button:focus, a.button.on:focus, a.button.off:focus,
+a.button:active, a.button.on:active, a.button.off:active {
+	color:#FFF;
+	background-color: #c77405;
 }
 
-.button.on {
-	color:#096;
-	border-color:#096;
-}
-
-.button.off {
-	color:#930;
-	border-color:#930;
-}
