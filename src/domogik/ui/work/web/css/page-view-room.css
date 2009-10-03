@@ -1,0 +1,20 @@
+@charset "UTF-8";
+/* CSS Document */
+.room-general {
+	background:url(../images/room-type.png) top right no-repeat;
+	min-height:10em;
+}
+
+.room-temp {
+	font-size:2em;
+	float:right;
+	clear:right;
+	margin-right:5em;
+}
+
+.room-humidity {
+	font-style:italic;
+	float:right;
+	clear:right;
+	margin-right:5em;
+}

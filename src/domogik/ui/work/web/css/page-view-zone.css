@@ -1,0 +1,22 @@
+@charset "UTF-8";
+/* CSS Document */
+
+.zone-general {
+	background:url(../images/room-type.png) top right no-repeat;
+	min-height:10em;
+}
+
+.zone-temps {
+	list-style:none;
+	margin-left:40%;
+}
+
+.zone-temps li {
+	display:inline-block;
+	text-align:center;
+	margin:1em;
+}
+
+.zone-temps img {
+	display:block;
+}
