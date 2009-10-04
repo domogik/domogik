@@ -40,11 +40,11 @@ import os
 import simplejson
 from subprocess import *
 
-from django.http import Http404, HttpResponse
+from django.core import serializers
 from django.db.models import Q
 from django.http import QueryDict
+from django.http import Http404, HttpResponse
 from django.shortcuts import render_to_response
-from django.core import serializers
 
 from domogik.common import database
 
