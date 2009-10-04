@@ -120,7 +120,7 @@ class Area(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(30), nullable=False)
-    description = Column(String(100))
+    description = Column(String(255))
 
     def __init__(self, name, description):
         """
@@ -154,7 +154,7 @@ class Room(Base):
     __tablename__ = '%s_room' % _db_prefix
     id = Column(Integer, primary_key=True)
     name = Column(String(30), nullable=False)
-    description = Column(String(100))
+    description = Column(String(255))
     area_id = Column(Integer, ForeignKey('%s.id' % Area.get_tablename()))
     area = relation(Area, backref=backref(__tablename__, order_by=id))
 
@@ -193,7 +193,7 @@ class DeviceCategory(Base):
     __tablename__ = '%s_device_category' % _db_prefix
     id = Column(Integer, primary_key=True)
     name = Column(String(30), nullable=False)
-    description = Column(String(100))
+    description = Column(String(255))
 
     def __init__(self, name, description):
         """
@@ -227,7 +227,7 @@ class DeviceTechnology(Base):
     __tablename__ = '%s_device_technology' % _db_prefix
     id = Column(Integer, primary_key=True)
     name = Column(Enum(DEVICE_TECHNOLOGY_LIST), nullable=False)
-    description = Column(String(100))
+    description = Column(String(255))
     type = Column(Enum(DEVICE_TECHNOLOGY_TYPE_LIST))
 
     def __init__(self, name, description, type):
@@ -306,7 +306,7 @@ class Device(Base):
     __tablename__ = '%s_device' % _db_prefix
     id = Column(Integer, primary_key=True)
     name = Column(String(30), nullable=False)
-    description = Column(String(100))
+    description = Column(String(255))
     address = Column(String(30), nullable=False)
     reference = Column(String(30))
     technology_id = Column(Integer, ForeignKey('%s.id' % DeviceTechnology.get_tablename()))
@@ -481,7 +481,7 @@ class Trigger(Base):
     """
     __tablename__ = '%s_trigger' % _db_prefix
     id = Column(Integer, primary_key=True)
-    description = Column(String(100))
+    description = Column(String(255))
     rule = Column(Text, nullable=False)
     result = Column(Text, nullable=False)
 
