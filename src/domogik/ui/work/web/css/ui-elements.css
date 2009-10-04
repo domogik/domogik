@@ -8,6 +8,18 @@
 	-webkit-box-shadow: 5px 5px 5px #888;
 }
 
+.element-actions {
+	list-style:none;
+	margin:0;
+	padding:0;
+}
+
+.element-actions li{
+	display:inline-block;
+	margin:0;
+	padding:0;
+}
+
 .element-main h2, .element h2 {
 	font-style:italic;
 }

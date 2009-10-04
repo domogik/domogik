@@ -1,6 +1,17 @@
 @charset "UTF-8";
 /* CSS Document */
 
+/* Link */
+a {
+	text-decoration:none;
+	color:#1c94c4;
+}
+
+a:hover, a:active, a:focus {
+	color:#eb8f00;
+}
+
+/* Button */
 a.button {
 	color:#FFF;
 	background-color:#1c94c4;
@@ -26,3 +37,10 @@ a.button:active, a.button.on:active, a.button.off:active {
 	background-color: #c77405;
 }
 
+
+
+h2 a.action {
+	color:#1c94c4;
+	font-size:0.6em;
+	float:right;
+}

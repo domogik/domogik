@@ -6,15 +6,6 @@ img {
 	display:none;
 }
 
-.ui-widget-content a {
-	text-decoration:none;
-	color:#1c94c4;
-}
-
-.ui-widget-content a:hover, .ui-widget-content a:active, .ui-widget-content a:focus {
-	color:#eb8f00;
-}
-
 /* Main Layout */
 body {
 	font: 62.5% "Trebuchet MS", sans-serif;
