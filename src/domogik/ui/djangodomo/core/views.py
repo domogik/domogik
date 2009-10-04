@@ -37,14 +37,15 @@ Implements
 import datetime
 import math
 import os
-from subprocess import *
 import simplejson
+from subprocess import *
 
-from django.db.models import Q
-from django.http import Http404, HttpResponse
-from django.http import QueryDict
-from django.shortcuts import render_to_response
 from django.core import serializers
+from django.db.models import Q
+from django.http import QueryDict
+from django.http import Http404, HttpResponse
+from django.shortcuts import render_to_response
+from django.utils.translation import ugettext_lazy as _
 
 from domogik.common import database
 
@@ -61,7 +62,7 @@ def index(request):
     @param request : the HTTP request
     @return an HttpResponse object
     """
-    page_title = "Control overview"
+    page_title = _("Control overview")
     sys_config = _db.get_system_config()
 
     device_list = _db.list_devices()
@@ -103,7 +104,7 @@ def device(request, device_id):
     @return an HttpResponse object
     """
     has_stats = ""
-    page_title = "Device details"
+    page_title = _("Device details")
     sys_config = _db.get_system_config()
 
     if request.method == 'POST': # An action was submitted
@@ -128,7 +129,7 @@ def device_stats(request, device_id):
         return index(request)
 
     device_all = ""
-    page_title = "Device stats"
+    page_title = _("Device stats")
     sys_config = _db.get_system_config()
 
     cmd = QueryDict.get(request.POST, "cmd", "")
@@ -153,7 +154,7 @@ def login(request):
     @param request : HTTP request
     @return an HttpResponse object
     """
-    page_title = "Login page"
+    page_title = _("Login page")
     error_msg = ""
     if request.method == 'POST':
         # An action was submitted => login action
@@ -177,7 +178,7 @@ def login(request):
             return index(request)
         else:
             # User not found, ask again to log in
-            error_msg = "Sorry unable to log in. Please check login name / password and try again."
+            error_msg = _("Sorry unable to log in. Please check login name / password and try again.")
             return _go_to_page(request, 'login.html', page_title, error_msg=error_msg)
     else:
         # User asked to log in
@@ -204,7 +205,7 @@ def admin_index(request):
     simulation_mode = ""
     admin_mode = ""
     debug_mode = ""
-    page_title = "Admin page"
+    page_title = _("Admin page")
     action = "index"
     sys_config = _db.get_system_config()
     if sys_config.simulation_mode:
@@ -242,13 +243,12 @@ def load_sample_data(request):
     if not _is_user_admin(request):
         return index(request)
 
-    page_title = "Load sample data"
+    page_title = _("Load sample data")
     action = "loadSampleData"
 
     sys_config = _db.get_system_config()
     if sys_config.simulation_mode != True:
-        error_msg = "The application is not running in simulation mode : "\
-                "can't load sample data"
+        error_msg = _("The application is not running in simulation mode : can't load sample data")
         return _go_to_page(request, 'admin_index.html', page_title, action=action, error_msg=error_msg)
 
     sample_data_helper = SampleDataHelper(_db)
@@ -273,13 +273,12 @@ def clear_data(request):
     if not _is_user_admin(request):
         return index(request)
 
-    page_title = "Remove all data"
+    page_title = _("Remove all data")
     action = "clearData"
 
     sys_config = _db.get_system_config()
     if sys_config.simulation_mode != True:
-        error_msg = "The application is not running in simulation mode : "\
-                "can't clear data"
+        error_msg = _("The application is not running in simulation mode : can't clear data")
         return _go_to_page(request, 'admin_index.html', page_title, action=action, error_msg=error_msg)
 
     sample_data_helper = SampleDataHelper(_db)
