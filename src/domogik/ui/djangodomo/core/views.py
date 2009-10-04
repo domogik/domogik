@@ -66,7 +66,8 @@ def index(request):
     sys_config = _db.get_system_config()
 
     device_list = _db.list_devices()
-    if request.method == 'POST': # An action was submitted
+    if request.method == 'POST': 
+        # An action was submitted
         cmd = QueryDict.get(request.POST, "cmd", "")
         if cmd == "filter":
             # Get all possible rooms
@@ -107,7 +108,8 @@ def device(request, device_id):
     page_title = _("Device details")
     sys_config = _db.get_system_config()
 
-    if request.method == 'POST': # An action was submitted
+    if request.method == 'POST': 
+        # An action was submitted
         # TODO check the value of the button (reset or update value)
         _update_device_values(request, sys_config)
 
@@ -137,7 +139,8 @@ def device_stats(request, device_id):
         _clear_device_stats(request, device_id)
 
     # Read device stats
-    if device_id == "0": # For all devices
+    if device_id == "0": 
+        # For all devices
         device_all = "True"
         device_stats_list = []
         for device in _db.list_devices():
@@ -384,7 +387,8 @@ def _clear_device_stats(request, device_id):
     @param device_id : device id
     """
     if _is_user_admin(request):
-        if device_id == "0": # For all devices
+        if device_id == "0": 
+            # For all devices
             for device in _db.list_devices():
                 _db.del_all_device_stats(device.id)
         else:
