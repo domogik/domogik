@@ -269,6 +269,7 @@ class DeviceTechnologyConfig(Base):
     technology = relation(DeviceTechnology, backref=backref(__tablename__))
     key = Column(String(30), nullable=False)
     value = Column(String(80), nullable=False)
+    description = Column(String(255), nullable=True)
 
     def __init__(self, technology_id, key, value):
         """
@@ -405,6 +406,7 @@ class DeviceConfig(Base):
     device = relation(Device, backref=backref(__tablename__))
     key = Column(String(30), nullable=False)
     value = Column(String(80), nullable=False)
+    description = Column(String(255), nullable=True)
 
     def __init__(self, device_id, key, value):
         """
