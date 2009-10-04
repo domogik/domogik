@@ -22,8 +22,9 @@
 # $LastChangedRevision: 356 $
 -->
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}{{ page_title }}{% endblock %}
+{% block title %}{% trans page_title %}{% endblock %}
 
 {% block content %}
     <form name="deviceForm" method="POST" action=""/>

@@ -18,8 +18,9 @@
 # Author : Marc Schneider <marc@domogik.org>
 -->
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}{{ page_title }}{% endblock %}
+{% block title %}{% trans page_title %}{% endblock %}
 
 {% block content %}
     <form name="loginForm" method="POST" action="{% url login_view %}"/>

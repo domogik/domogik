@@ -21,6 +21,7 @@
 # $LastChangedDate: 2008-12-09 20:30:20 +0100 (mar. 09 déc. 2008) $
 # $LastChangedRevision: 251 $
 -->
+{% load i18n %}
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
@@ -38,9 +39,9 @@
         </div>
         <div id="login">
         {% if not is_user_connected %}
-          &nbsp;&nbsp;<a href="{% url login_view %}">&raquo;Log in</a>
+           &nbsp;&nbsp;<a href="{% url login_view %}">&raquo;{% trans "Log in" %}</a>
         {% else %}
-          &nbsp;Hello, {{ user.first_name }}&nbsp;&nbsp;<a href="{% url logout_view %}">&raquo;Log out</a>
+           &nbsp;{% trans "Hello" %}, {{ user.first_name }}&nbsp;&nbsp;<a href="{% url logout_view %}">&raquo;{% trans "Log out" %}</a>
         {% endif %}
         </div>
         <div><center><h1>&raquo; {{ page_title }} &laquo;</center></h1></div>

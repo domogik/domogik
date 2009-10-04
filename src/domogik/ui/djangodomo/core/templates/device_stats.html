@@ -22,6 +22,7 @@
 # $LastChangedRevision: 271 $
 -->
 {% extends "base.html" %}
+{% load i18n %}
 
 {% block script %}
     function clearStats() {
@@ -33,7 +34,7 @@
     }
 {% endblock %}
 
-{% block title %}{{ page_title }}{% endblock %}
+{% block title %}{% trans page_title %}{% endblock %}
 
 {% block content %}
     <div id="list" style="margin-top: 5px;">

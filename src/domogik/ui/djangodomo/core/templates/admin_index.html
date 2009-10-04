@@ -22,6 +22,7 @@
 # $LastChangedRevision: 347 $
 -->
 {% extends "base.html" %}
+{% load i18n %}
 
 {% block script %}
     function saveSettings() {
@@ -42,7 +43,7 @@
     }
 {% endblock %}
 
-{% block title %}{{ page_title }}{% endblock %}
+{% block title %}{% trans page_title %}{% endblock %}
 
 {% block content %}
     {% ifequal action "index" %}
