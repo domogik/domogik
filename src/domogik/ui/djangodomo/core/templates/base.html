@@ -33,25 +33,25 @@
 <body>
 <div id="container">
     <div id="top">
-            <div>
-                <center><img width="184px" height="79px" src="/skins/img/logo_domogik.png" alt="Domogik"/></center>
-            </div>
-            <div id="login">
-            {% if not is_user_connected %}
-              &nbsp;&nbsp;<a href="{% url login_view %}">&raquo;Log in</a>
-            {% else %}
-              &nbsp;Hello, {{ user.first_name }}&nbsp;&nbsp;<a href="{% url logout_view %}">&raquo;Log out</a>
-            {% endif %}
-            </div>
-            <div><center><h1>&raquo; {{ page_title }} &laquo;</center></h1></div>
+        <div>
+            <center><img width="184px" height="79px" src="/skins/img/logo_domogik.png" alt="Domogik"/></center>
+        </div>
+        <div id="login">
+        {% if not is_user_connected %}
+          &nbsp;&nbsp;<a href="{% url login_view %}">&raquo;Log in</a>
+        {% else %}
+          &nbsp;Hello, {{ user.first_name }}&nbsp;&nbsp;<a href="{% url logout_view %}">&raquo;Log out</a>
+        {% endif %}
+        </div>
+        <div><center><h1>&raquo; {{ page_title }} &laquo;</center></h1></div>
     </div>
 
     <div id="leftBar">
     {% block leftBar %}
         <ul>
             <li><a href="{% url index_view %}">
-                    <div align="center"><img src="/skins/img/home.png" alt="Home" border="0"></div>
-                    <div align="center">Home</div></a></li>
+                <div align="center"><img src="/skins/img/home.png" alt="Home" border="0"></div>
+                <div align="center">Home</div></a></li>
             {% if is_user_admin %}
             <li>
                 <a href="{% url admin_view %}">
