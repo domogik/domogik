@@ -39,6 +39,7 @@ Implements
 
 from time import localtime
 from domogik.xpl.lib.xplconnector import *
+from domogik.xpl.lib.module import xPLModule
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.common.configloader import *
 import time

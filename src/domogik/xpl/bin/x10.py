@@ -61,8 +61,8 @@ class x10Main(xPLModule):
         self._heyu_cfg_path_res = ""
         self._config = Query(self._myxpl)
         res = xPLResult()
-        self._config.query('x10', 'heyu_cfg_path', res)
-        self._heyu_cfg_path_res = res.get_value()['heyu_cfg_path']
+        self._config.query('x10', 'heyu-cfg-path', res)
+        self._heyu_cfg_path_res = res.get_value()['heyu-cfg-path']
         try:
             pass
             self.__myx10 = X10API(self._heyu_cfg_path_res)

@@ -27,25 +27,8 @@ Base class for all xPL clients
 Implements
 ==========
 
-- xPLModule.__init__(self, name = None, stop_cb = None)
-- xPLModule.__getattr__(self, attr)
-- xPLModule.__setattr__(self, attr, value)
-- xPLModule.__init__(self, name, stop_cb = None)
-- xPLModule.get_my_logger(self)
-- xPLModule.get_module_name(self)
-- xPLModule.add_stop_cb(self, cb)
-- xPLModule.register_thread(self, thread)
-- xPLModule.unregister_thread(self, thread)
-- xPLModule.register_timer(self, timer)
-- xPLModule.unregister_timer(self, timer)
-- xPLModule.should_stop(self)
-- xPLModule.get_stop(self)
-- xPLModule.hand_leave(self, signum, frame)
-- xPLModule.force_leave(self)
-- xPLResult.__init__(self)
-- xPLResult.set_value(self, value)
-- xPLResult.get_value(self)
-- xPLResult.get_lock(self)
+- xPLModule
+- xPLResult
 
 @author: Maxence Dunnewind <maxence@dunnewind.net>
 @copyright: (C) 2007-2009 Domogik project
@@ -53,11 +36,9 @@ Implements
 @organization: Domogik
 """
 
-import threading
 import time
-from domogik.common import logger
-import threading
 from domogik.xpl.lib.xplconnector import *
+from domogik.xpl.lib.basemodule import BaseModule
 
 class xPLModule():
     '''
@@ -90,98 +71,20 @@ class xPLModule():
         return setattr(self.__instance, attr, value)
 
 
-    class __Singl_xPLModule():
+    class __Singl_xPLModule(BaseModule):
         def __init__(self, name, stop_cb = None):
             '''
             Create xPLModule instance, which defines system handlers
             @param name : The name of the current module
             @param stop_cb : Additionnal method to call when a stop request is received
             '''
-            self._threads = []
-            self._timers = []
-            self._module_name = name
-            l = logger.Logger(name)
-            self._log = l.get_logger()
+            BaseModule.__init__(self, name, stop_cb)
+            print "create xPLModule instance"
             self._log.debug("New system manager instance for %s" % name)
 
-            self._stop = threading.Event()
-            if stop_cb is not None:
-                self._stop_cb = [stop_cb]
-            else:
-                self._stop_cb = []
             self._myxpl = Manager()
             self._l = Listener(self.hand_leave, self._myxpl, {'schema' : 'domogik.system',
                 'type':'xpl-cmnd'})
-
-        def get_my_logger(self):
-            """
-            Returns the associated logger instance
-            """
-            return self._log
-
-        def get_module_name(self):
-            """
-            Returns the name of the current module
-            """
-            return self._module_name
-
-        def add_stop_cb(self, cb):
-            '''
-            Add an additionnal callback to call when a stop request is received
-            '''
-            self._stop_cb.append(cb)
-
-        def register_thread(self, thread):
-            '''
-            Register a thread in the current instance
-            Should be called by each thread at start
-            @param thread : the thread to add
-            '''
-            self._log.debug('New thread registered')
-            self._threads.append(thread)
-
-        def unregister_thread(self, thread):
-            '''
-            Unregister a thread in the current instance
-            Should be the last action of each thread
-            @param thread : the thread to remove
-            '''
-            if thread in self._threads:
-                self._log.debug('Unregister thread')
-                self._threads.remove(thread)
-
-        def register_timer(self, timer):
-            '''
-            Register a time in the current instance
-            Should be called by each timer
-            @param timer : the timer to add
-            '''
-            self._log.debug('New timer registered')
-            self._timers.append(timer)
-
-        def unregister_timer(self, timer):
-
-            '''
-            Unregister a timer in the current instance
-            Should be the last action of each timer
-            @param timer : the timer to remove
-            '''
-            if timer in self._timers:
-                self._log.debug('Unregister timer')
-                self._timers.remove(timer)
-
-        def should_stop(self):
-            '''
-            Check if the module should stop
-            This method should be called to check loop condition in threads
-            '''
-            return self._stop.isSet()
-
-        def get_stop(self):
-            '''
-            Returns the Event instance
-            '''
-            return self._stop
 
         def hand_leave(self, signum, frame):
             '''

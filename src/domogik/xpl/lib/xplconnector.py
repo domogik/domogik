@@ -79,10 +79,10 @@ from socket import *
 import time
 
 from domogik.common import logger
-from domogik.xpl.lib.module import xPLModule
+from domogik.xpl.lib.basemodule import BaseModule
 from domogik.xpl.common.xplmessage import XplMessage
 
-class Manager(xPLModule):
+class Manager(BaseModule):
     """
     Manager is the main component of the system
     You can run many managers on different port
@@ -100,10 +100,10 @@ class Manager(xPLModule):
         """
         Create a new manager instance
         @param ip : IP to listen to (default real ip address)
-        @param source : source name of the application
         @param port : port to listen to (default 0)
         """
-        xPLModule.__init__(self, stop_cb = self.leave)
+        BaseModule.__init__(self, stop_cb = self.leave)
+        print "create Manager instance"
         source = "xpl-%s.domogik" % self.get_module_name()
         # Define maximum xPL message size
         self._buff = 1500

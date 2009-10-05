@@ -43,6 +43,7 @@ Implements
 from datetime import datetime 
 
 from domogik.xpl.lib.xplconnector import *
+from domogik.xpl.lib.module import xPLModule
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.common.configloader import *
 from domogik.common.database import DbHelper
@@ -85,7 +86,7 @@ class DBConnector(xPLModule):
 #        self._prefix = config['prefix']
     def _request_config_cb(self, message):
         '''
-        Callback to receive a request for some config stuff
+        -allback to receive a request for some config stuff
         @param message : the xPL message
         '''
         #try:
@@ -163,10 +164,10 @@ class DBConnector(xPLModule):
         @param key : the key of the config tuple to fetch
         '''
         #TODO : use the database
-        vals = {'x10': {'heyu_cfg_path':'/etc/heyu/x10.conf',
-            'heyu_file_0': 'TTY /dev/ttyUSB0',
-            'heyu_file_1': 'TTY_AUX /dev/ttyUSB0 RFXCOM',
-            'heyu_file_2': 'ALIAS back_door D5 DS10A 0x677'},
+        vals = {'x10': {'heyu-cfg-path':'/etc/heyu/x10.conf',
+            'heyu-file-0': 'TTY /dev/ttyUSB0',
+            'heyu-file-1': 'TTY_AUX /dev/ttyUSB0 RFXCOM',
+            'heyu-file-2': 'ALIAS back_door D5 DS10A 0x677'},
                 'global': {'pid_dir_path': '/tmp/'},
                 'onewire': {'temperature_refresh_delay' : '10'},
                 'teleinfo' : {'device' : '/dev/ttyUSB0',
