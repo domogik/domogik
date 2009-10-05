@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-                                                                           
+# -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -27,29 +27,18 @@ Generate configuration
 Implements
 ==========
 
-- ConfigManager.__init__(self, settings = [], session = None)
-- ConfigManager.ask(self)
-- ConfigManager.write(self, filename, datas, section=None)
-- genericPluginConfig.__init__(self, ip)
-- genericPluginConfig.askandwrite(self, file, section)
-- genericPluginConfig.getvalue(self, value)
-- generalConfig.__init__(self)
-- databaseAccess.__init__(self)
-- x10Config.__init__(self, ip=None)
-- plcbusConfig.__init__(self, ip=None)
-- senderConfig.__init__(self, ip=None)
-- triggerConfig.__init__(self, ip=None)
-- datetimeConfig.__init__(self, ip=None)
-- OneWireConfig.__init__(self, ip=None)
-- SystemManagerConfig.__init__(self, ip)
-- usage()
-- main()
+- ConfigManager
+- generalConfig
+- genericPluginConfig
+- databaseAccess
 
 @author: Maxence Dunnewind <maxence@dunnewind.net>
 @copyright: (C) 2007-2009 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """
+
+# TODO : rename class names with Uppercase
 
 import os
 import re
@@ -66,7 +55,7 @@ class ConfigManager():
     results and write config file
     '''
 
-    def __init__(self, settings = [], session = None):
+    def __init__(self, settings=[], session=None):
         '''
         Constructor
         @param settings List of tuples defining parameters to ask user for :
@@ -154,7 +143,6 @@ class ConfigManager():
         f.close()
 
 
-
 class genericPluginConfig():
     '''
     Generic list for plugins
@@ -240,7 +228,7 @@ class databaseAccess(genericPluginConfig):
                 ('db_user','Database user (must exists, empty if sqlite)', None, None),
                 ('db_password','Database user password (empty if sqlite)', None, None),
                 ('db_name','Database name (empty if sqlite)', None, None),
-				('db_prefix','Core tables prefix (keep default if you don\'t know what it is)',None, ['core']),
+                ('db_prefix','Core tables prefix (keep default if you don\'t know what it is)',None, ['core']),
                 ('db_path','If you use sqlite, define here the absolute path to the sqlite database (including file name, empty if not sqlite).\n'
                 'Domogik will need write permissions to create the database and write to it.', None, None)
         ]
@@ -248,139 +236,17 @@ class databaseAccess(genericPluginConfig):
         section = "database"
         self.askandwrite(file, section)
 
-#DEPRECATED
-class x10Config(genericPluginConfig):
-    '''
-    Ask the user for specific config for X10 xPL module
-    '''
-
-    def __init__(self, ip=None):
-        genericPluginConfig.__init__(self, ip=None)
-        self.informations.extend([
-        ('port', 'What is the port the plugin must bind ?',
-                r"^[1-9][0-9]+", [5000]),
-        ('source', 'What is the xPL plugin name ?',
-                None, ['xpl-x10.domogik']),
-        ('heyu_cfg_file', 'What is the full path to Heyu config file ?',
-                None, ['/etc/heyu/x10.cfg', '/usr/local/etc/heyu/x10.cfg']),
-        ])
-        file = "conf.d/x10.cfg"
-        section = "x10"
-        self.askandwrite(file, section)
-
-
-#DEPRECATED
-class plcbusConfig(genericPluginConfig):
-    '''
-    Ask the user for specific config for PLCBUS xPL module
-    '''
-
-    def __init__(self, ip=None):
-        genericPluginConfig.__init__(self, ip=None)
-        self.informations.extend([
-        ('port', 'What is the port the plugin must bind ?',
-                r"^[1-9][0-9]+", [5006]),
-        ('source', 'What is the xPL plugin name ?',
-                None, ['xpl-plcbus.domogik']),
-        ('port_com', 'What is the com number use by PLCBUS-1141 ?',
-                r"^[0-9]+", [0]),
-        ])
-        file = "conf.d/plcbus.cfg"
-        section = "plcbus"
-        self.askandwrite(file, section)
-
-
-#DEPRECATED
-class senderConfig(genericPluginConfig):
-    '''
-    Ask the user for specific config for the xPL sender
-    '''
-
-    def __init__(self, ip=None):
-        genericPluginConfig.__init__(self, ip)
-        self.informations.extend([
-        ('port', 'What is the port the plugin must bind ?',
-                r"^[1-9][0-9]+", [5001]),
-        ('source', 'What is the xPL plugin name ?',
-                None, ['xpl-send.domogik']),
-        ])
-        file = "conf.d/send.cfg"
-        section = "send"
-        self.askandwrite(file, section)
-
-#DEPRECATED
-class triggerConfig(genericPluginConfig):
-    '''
-    Ask the user for specific config for the xPL sender
-    '''
-
-    def __init__(self, ip=None):
-        genericPluginConfig.__init__(self, ip)
-        self.informations.extend([
-        ('port', 'What is the port the plugin must bind ?',
-                r"^[1-9][0-9]+", [5002]),
-        ('source', 'What is the xPL plugin name ?',
-                None, ['xpl-trigger.domogik']),
-        ])
-        file = "conf.d/trigger.cfg"
-        section = "trigger"
-        self.askandwrite(file, section)
-
-
-#DEPRECATED
-class datetimeConfig(genericPluginConfig):
-    '''
-    Ask the user for specific config for the xPL datetime module
-    '''
-
-    def __init__(self, ip=None):
-        genericPluginConfig.__init__(self, ip)
-        self.informations.extend([
-        ('port', 'What is the port the plugin must bind ?',
-                r"^[1-9][0-9]+", [5003]),
-        ('source', 'What is the xPL plugin name ?',
-                None, ['xpl-datetime.domogik']),
-        ])
-        file = "conf.d/datetime.cfg"
-        section = "datetime"
-        self.askandwrite(file, section)
-
-
-#DEPRECATED
-class OneWireConfig(genericPluginConfig):
-    '''
-    Ask the user for specific config for the xPL OneWire module
-    '''
-
-    def __init__(self, ip=None):
-        genericPluginConfig.__init__(self, ip)
-        self.informations.extend([
-        ('port', 'What is the port the plugin must bind ?',
-                r"^[1-9][0-9]+", [5004]),
-        ('source', 'What is the xPL plugin name ?',
-                None, ['xpl-onewiretemp.domogik']),
-        ('temperature_delay',
-        'What is the delay you want between temperature update (in second) ?',
-                r"^[1-9][0-9]+", [15]),
-        ])
-
-#DEPRECATED
-class SystemManagerConfig(genericPluginConfig):
-    '''
-    Ask the user for specific config for the xPL datetime module
-    '''
-
-    def __init__(self, ip):
-        genericPluginConfig.__init__(self, ip)
-        self.informations.extend([
-        ('port', 'What is the port the manager must bind ?',
-                r"^[1-9][0-9]+", [5005]),
-        ('source', 'What is the xPL plugin name ?',
-                None, ['xpl-sysmanager.domogik']),
-        ])
-        file = "conf.d/sysmanager.cfg"
-        section = "sysmanager"
-        self.askandwrite(file, section)
+class pythonPathes(genericPluginConfig):
+    """
+    This class doesn't ask the user for config values
+    Instead, it make some test to get python path
+    """
+    def __init__(self):
+        file = "%s/.domogik.cfg" % os.getenv("HOME")
+        section = "python"
+        config = ConfigManager(None, section)
+        result = {"path":"%s" % sys.path}
+        config.write(file, result, section)
 
 
 def usage():
@@ -395,6 +261,7 @@ def main():
         if choice == "--help":
             usage()
     generalConfig()
+    pythonPathes()
 
     db = raw_input('Do you want to configure the database settings ?\n'
     'This is only needed if you are on the host which will host database. [y/N]')

@@ -22,13 +22,14 @@
 # $LastChangedRevision: 356 $
 -->
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}{{ page_title }}{% endblock %}
+{% block title %}{% trans page_title %}{% endblock %}
 
 {% block content %}
     <div id="search">
     {% if device_list %}
-        <form name="filterForm" method="POST"/>
+        <form name="filterForm" method="POST" action="{% url index_view %}"/>
             <fieldset>
                 <legend>Search</legend>
                 <table>
@@ -82,12 +83,12 @@
 
     <div id="list">
     {% if device_list %}
-        <form name="deviceListForm" method="POST"/>
+        <form name="deviceListForm" method="POST" action="{% url index_view %}"/>
         <table>
             <tr>
                 <th>Device name</th>
                 <th>Category</th>
-                {% if admin_mode %}
+                {% if is_user_admin %}
                     <th>Address</th>
                     <th>Reference</th>
                     <th>Technology</th>
@@ -102,7 +103,7 @@
                 <tr class="{% cycle 'oddRow' 'evenRow' %}">
                     <td><a href="{% url device_view device.id %}">{{ device.name }}</a></td>
                     <td>{{ device.category.name }}</td>
-                    {% if admin_mode %}
+                    {% if is_user_admin %}
                         <td>{{ device.address }}</td>
                         <td>{{ device.reference }}</td>
                         <td>{{ device.technology.name }}</td>
@@ -119,6 +120,7 @@
                 </tr>
             {% endfor %}
         </table>
+        {% if is_user_connected %}
         <p></p>
         <table>
             <tr>
@@ -126,6 +128,7 @@
                 <td><input type="submit" value="Update"/></td>
             </tr>
         </table>
+        {% endif %}
         </form>
     {% else %}
         <p>No device found !</p>

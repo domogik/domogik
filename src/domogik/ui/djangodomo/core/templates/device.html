@@ -22,18 +22,36 @@
 # $LastChangedRevision: 356 $
 -->
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}{{ page_title }}{% endblock %}
+{% block title %}{% trans page_title %}{% endblock %}
 
 {% block content %}
-    <form name="deviceForm" method="POST"/>
+    <form name="deviceForm" method="POST" action=""/>
     <div id="device">
         <table>
             <tr>
                 <input type="hidden" id="id_deviceId" name="device_id" value="{{ device.id }}"/>
-                <td class="label">Device</td><td class="value">{{ device.name }}</td>
+                <td class="label">Device</td>
+                <td class="value">
+                {% if is_user_admin %}
+                    <input type="text" name="device_name" size="20" value="{{ device.name }}"/>
+                {% else %}
+                    {{ device.name }}
+                {% endif %}
+                </td>
             </tr>
-            {% if admin_mode %}
+            <tr>
+                <td class="label">Description</td>
+                <td class="value">
+                {% if is_user_admin %}
+                    <textarea name="device_description" cols="40" rows="3">{{ device.description }}</textarea>
+                {% else %}
+                    {{ device.description }}
+                {% endif %}
+                </td>
+            </tr>
+            {% if is_user_admin %}
                 <tr>
                     <td class="label">Address</td><td class="value">{{ device.address }}</td>
                 </tr>
@@ -68,6 +86,7 @@
             </tr>
         </table>
         <p></p>
+        {% if is_user_connected %}
         <table>
             <tr>
                 <td><input name="update" type="submit" value="Update"/></td>
@@ -76,10 +95,10 @@
                 {% endif %}
             </tr>
         </table>
-
         <p>
             &raquo;&nbsp;{% if has_stats %}<a href="{% url device_stats_view device.id %}">View stats</a>{% else %}No stats{% endif %}
         </p>
+        {% endif %}
     </div>
     </form>
 {% endblock %}

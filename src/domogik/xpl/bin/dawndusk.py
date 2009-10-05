@@ -39,6 +39,7 @@ Implements
 
 from domogik.xpl.lib.dawndusk import DawnDusk
 from domogik.xpl.lib.xplconnector import *
+from domogik.xpl.common.xplmessage import XplMessage
 import datetime
 from domogik.common.configloader import *
 
@@ -80,10 +81,10 @@ def getDawn(message):
     """
     dawn, dusk = mydawndusk.get_dawn_dusk(long, lat, fh)
     date = dateFromTuple(dawn)
-    mess = Message()
+    mess = XplMessage()
     mess.set_type("xpl-stat")
     mess.set_schema("datetime.basic")
-    mess.set_data_key("status", date)
+    mess.add_data({"status" :  date})
     myxpl.send(mess)
 
 
@@ -93,10 +94,10 @@ def getDusk(message):
     """
     dawn, dusk = mydawndusk.get_dawn_dusk(long, lat, fh)
     date = dateFromTuple(dusk)
-    mess = Message()
+    mess = XplMessage()
     mess.set_type("xpl-stat")
     mess.set_schema("datetime.basic")
-    mess.set_data_key("status", date)
+    mess.add_data({"status" :  date})
     myxpl.send(mess)
 
 #Listener for the dawn

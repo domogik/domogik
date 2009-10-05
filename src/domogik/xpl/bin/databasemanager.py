@@ -40,10 +40,13 @@ Implements
 @organization: Domogik
 """
 
-import time 
+from datetime import datetime 
 
 from domogik.xpl.lib.xplconnector import *
+from domogik.xpl.lib.module import xPLModule
+from domogik.xpl.common.xplmessage import XplMessage
 from domogik.common.configloader import *
+from domogik.common.database import DbHelper
 
 class DBConnector(xPLModule):
     '''
@@ -55,11 +58,13 @@ class DBConnector(xPLModule):
         '''
         Initialize database and xPL connection
         '''
-        xPLModule.__init__(self, 'database_manager')
+        xPLModule.__init__(self, 'dbmgr')
         self._log = self.get_my_logger()
         self._log.debug("Init database_manager instance")
-        self.__myxpl = Manager()
-        Listener(self._request_config_cb, self.__myxpl,
+        
+        self._db = DbHelper()
+        self._stats = StatsManager(self._db)
+        Listener(self._request_config_cb, self._myxpl,
                 {'schema': 'domogik.config', 'type': 'xpl-cmnd'})
         #cfgloader = Loader('database')
         #config = cfgloader.load()[1]
@@ -81,12 +86,16 @@ class DBConnector(xPLModule):
 #        self._prefix = config['prefix']
     def _request_config_cb(self, message):
         '''
-        Callback to receive a request for some config stuff
+        -allback to receive a request for some config stuff
         @param message : the xPL message
         '''
-        techno = message.get_key_value('technology')
-        key = message.get_key_value('key')
-        element = message.get_key_value('element')
+        #try:
+        techno = message.data['technology']
+        key = message.data['key']
+        if "element" in message.data:
+            element = message.data['element']
+        else:
+            element = None
         if not key:
             self._log.debug("New request config received for %s :\
                     asked for all config items" % (techno))
@@ -95,16 +104,18 @@ class DBConnector(xPLModule):
             key))
         if element:
             self._send_config(techno, key, self._fetch_elmt_config(techno,
-            element, key), message.get_conf_key_value("source"), element)
+            element, key), message.source, element)
         else:
             if not key:
                 keys = self._fetch_techno_config(techno, key).keys()
                 values = self._fetch_techno_config(techno, key).values()
                 self._send_config(techno, keys, values,
-                message.get_conf_key_value("source"))
+                message.source)
             else:
                 self._send_config(techno, key, self._fetch_techno_config(techno,
-                key), message.get_conf_key_value("source"))
+                key), message.source)
+        #except KeyError:
+         #   self._log.warning("A request for configuration has been received, but it was misformatted")
 
     def _send_config(self, technology, key, value, module, element = None):
         '''
@@ -116,20 +127,20 @@ class DBConnector(xPLModule):
         @param module : the name of the module which requested the value
         '''
         self._log.debug("Send config response %s : %s" % (key, value))
-        mess = Message()
+        mess = XplMessage()
         mess.set_type('xpl-stat')
         mess.set_schema('domogik.config')
-#        mess.set_data_key('technology', technology)
+#        mess.add_data({'technology' :  technology})
         if element:
-            mess.set_data_key('element', element)
+            mess.add_data({'element' :  element})
         #If key/value are lists, then we add a key=value for each item
         if isinstance(key, list):
             for (k, v) in zip(key, value):
-                mess.set_data_key(k, v)
+                mess.add_data({k :  v})
         else:
-            mess.set_data_key(key, value)
+            mess.add_data({key :  value})
 #        mess.set_conf_key('target', module)
-        self.__myxpl.send(mess)
+        self._myxpl.send(mess)
 
     def _fetch_elmt_config(self, techno, element, key):
         '''
@@ -153,12 +164,14 @@ class DBConnector(xPLModule):
         @param key : the key of the config tuple to fetch
         '''
         #TODO : use the database
-        vals = {'x10': {'heyu_cfg_path':'/etc/heyu/x10.conf',
-            'heyu_file_0': 'TTY /dev/ttyUSB0',
-            'heyu_file_1': 'TTY_AUX /dev/ttyUSB0 RFXCOM',
-            'heyu_file_2': 'ALIAS back_door D5 DS10A 0x677'},
+        vals = {'x10': {'heyu-cfg-path':'/etc/heyu/x10.conf',
+            'heyu-file-0': 'TTY /dev/ttyUSB0',
+            'heyu-file-1': 'TTY_AUX /dev/ttyUSB0 RFXCOM',
+            'heyu-file-2': 'ALIAS back_door D5 DS10A 0x677'},
                 'global': {'pid_dir_path': '/tmp/'},
-                'onewire': {'temperature_refresh_delay' : '10'}
+                'onewire': {'temperature_refresh_delay' : '10'},
+                'teleinfo' : {'device' : '/dev/ttyUSB0',
+                    'interval' : '30'},
                 }
         try:
             if key:
@@ -172,46 +185,51 @@ class StatsManager(xPLModule):
     """
     Listen on the xPL network and keep stats of device and system state
     """
-    def __init__(self):
-        xPLModule.__init__(self, 'database_manager')
+    def __init__(self, db):
+        xPLModule.__init__(self, 'statmgr')
         self._log = self.get_my_logger()
-        self.__myxpl = Manager()
-        self.__dbhelper = DbHelper()
-        l_x10 = Listener(self._x10_cb, self.__myxpl,
+        
+        self.__dbhelper = db
+        l_x10 = Listener(self._x10_cb, self._myxpl,
                 {'schema': 'x10.basic', 'type': 'xpl-trig'})
-        l_ow = Listener(self._onewire_cb, self.__myxpl,
+        l_ow = Listener(self._onewire_cb, self._myxpl,
                 {'schema': 'sensor.basic', 'type': 'xpl-trig','type': 'onewire'})
-        l_plcbus = Listener(self._plcbus_cb, self.__myxpl,
+        l_plcbus = Listener(self._plcbus_cb, self._myxpl,
                 {'schema': 'control.basic', 'type': 'xpl-trig','type':'plcbus'})
-        l_hb = Listener(self._sys_cb, self.__myxpl,
+        l_hb = Listener(self._sys_cb, self._myxpl,
                 {'schema': 'hbeat.app', 'type': 'xpl-stat'})
+        self._log.debug("Stats manager initialized")
 
     def _x10_cb(self, message):
         """
         Manage X10 stats
         """
-        techno_id = self.__dbhelper.get_device_technology_by_name('x10').id
-        d_id = self.__dbhelper.find_devices(technology = techno_id, name = 
-                message.data['device'])[0].id
-        add_device_stat(d_id, int(time.time()), message.data['command'].lower())
+        dbhelper = DbHelper()
+        techno_id = dbhelper.get_device_technology_by_name(u'x10').id
+        d = dbhelper.search_devices(technology_id = techno_id, address = message.data['device'])
+        if d:
+            d_id = d[0].id
+            dbhelper.add_device_stat(d_id, datetime.today(), message.data['command'].lower())
+        else:
+            self._log.warning("A X10 stat has been received for a non existing device : %s" % message.data['device'])
 
     def _onewire_cb(self, message):
         """
         Manage OneWire stats
         """
         techno_id = self.__dbhelper.get_device_technology_by_name('onewire').id
-        d_id = self.__dbhelper.find_devices(technology = techno_id, name =
+        d_id = dbhelper.search_devices(technology = techno_id, name =
                 message.data['device'])[0].id
-        add_device_stat(d_id, int(time.time()), message.data['current'].lower())
+        dbhelper.add_device_stat(d_id, datetime.today(), message.data['current'].lower())
 
     def _plcbus_cb(self, message):
         """
         Manage PLCBUS stats
         """
         techno_id = self.__dbhelper.get_device_technology_by_name('plcbus').id
-        d_id = self.__dbhelper.find_devices(technology = techno_id, name =
+        d_id = dbhelper.search_devices(technology = techno_id, name =
                 message.data['device'])[0].id
-        add_device_stat(d_id, int(time.time()), message.data['command'].lower())
+        dbhelper.add_device_stat(d_id, datetime.today(), message.data['command'].lower())
 
     def _knx_cb(self, message):
         """

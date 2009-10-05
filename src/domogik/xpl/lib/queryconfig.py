@@ -66,12 +66,13 @@ class Query():
         '''
         Listener(self._query_cb, self.__myxpl,{'schema': 'domogik.config', 'type': 'xpl-stat'})
         self._res = result
-        mess = Message()
+        mess = XplMessage()
         mess.set_type('xpl-cmnd')
         mess.set_schema('domogik.config')
-        mess.set_data_key('technology', technology)
-        mess.set_data_key('element', element)
-        mess.set_data_key('key', key)
+        mess.add_data({'technology': technology})
+        if element:
+            mess.add_data({'element': element})
+        mess.add_data({'key': key})
         self._key = key
         self.__myxpl.send(mess)
         self._res.get_lock().wait()
@@ -82,7 +83,7 @@ class Query():
         @param message : the message received
         '''
         print "Answer received"
-        result = message.get_all_data_pairs()
+        result = message.data
         for r in result:
             self._log.debug("Config value received : %s" % r)
         self._res.set_value(result)

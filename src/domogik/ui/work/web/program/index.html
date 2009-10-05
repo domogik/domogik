@@ -1,0 +1,131 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Domogik's new UI</title>
+<link href="../css/ui-lightness/jquery-ui-1.7.2.custom.css" rel="stylesheet" type="text/css"/>
+<link href="../css/ui-selectmenu.css" rel="stylesheet" type="text/css" />
+<link href="../css/ui-buttons.css" rel="stylesheet" type="text/css" />
+<link href="../css/main.css" rel="stylesheet" type="text/css" />
+<link href="../css/page-prog.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="../js/jquery-1.3.2.min.js"></script>
+<script type="text/javascript" src="../js/jquery-ui-1.7.2.custom.min.js"></script>
+<script type="text/javascript" src="../js/ui.selectmenu.js"></script>
+<script type="text/javascript" src="../js/page-prog.js"></script>
+</head>
+<body>
+<div class="ui-widget ui-widget-content ui-corner-all">
+  <div id="header">
+  	<a href="../index.html" id="logo"><img src="../images/logo_domogik.png" width="131" height="37" alt="Domotik logo" /></a>
+    <div id="title">Welcome to Domogik<span id="subtitle">Free home automation under Linux</span></div>
+  </div>
+  <ul id="nav1">
+    <li><a href="../view/index.html" class="ui-corner-top">Visualisation</a></li>
+    <li><a href="index.html" class="selected ui-corner-top">Programmation</a></li>
+    <li><a href="../admin/index.html" class="ui-corner-top">Administration</a></li>
+  </ul>
+  <div id="content">
+    <div class="left">
+      <div id="nav2">
+        <h2><a href="#">Par pi&egrave;ce</a></h2>
+        <div>
+          <ul>
+          </ul>
+        </div>
+        <h2><a href="#">Par zone</a></h2>
+        <div>
+          <ul>
+          </ul>
+        </div>
+        <h2><a href="#">Par dispositif</a></h2>
+        <div>
+          <ul>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="right">
+      <div id="scenarios">
+        <ul>
+          <li id="scenario1">SI temperature: chambre parents EST INFERIEUR A 16&deg;C ALORS allumer: prise 1 ch.parents PENDANT 20 min.
+            <ul class="scenario-commands">
+              <li><a href="#details" onclick="toggleScenario('scenario1');">Modifier</a></li>
+              <li><a href="#">Supprimer</a></li>
+            </ul>
+          </li>
+          <li id="scenario2">SI temperature: chambre parents EST INFERIEUR A 16&deg;C ALORS allumer: prise 1 ch.parents PENDANT 20 min.
+            <ul class="scenario-commands">
+              <li><a href="#details" onclick="toggleScenario('scenario2');">Modifier</a></li>
+              <li><a href="#">Supprimer</a></li>
+            </ul>
+          </li>
+          <li id="scenario3">SI temperature: chambre parents EST INFERIEUR A 16&deg;C ALORS allumer: prise 1 ch.parents PENDANT 20 min.
+            <ul class="scenario-commands">
+              <li><a href="#details" onclick="toggleScenario('scenario3');">Modifier</a></li>
+              <li><a href="#">Supprimer</a></li>
+            </ul>
+          </li>
+          <li id="scenario4">SI temperature: chambre parents EST INFERIEUR A 16&deg;C ALORS allumer: prise 1 ch.parents PENDANT 20 min.
+            <ul class="scenario-commands">
+              <li><a href="#details" onclick="toggleScenario('scenario4');">Modifier</a></li>
+              <li><a href="#">Supprimer</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+      <div id="details">
+        <form action="" onsubmit="validForm();">
+          <div id="conditions" class="details">
+            <h2>Condition</h2>
+            <h3>SI</h3>
+            <fieldset>
+              <legend>Temp&eacute;rature</legend>
+              Pi&egrave;ce principale
+              <select id="comp" name="comp" title="Comparateur">
+                <option value="inf">&lt;</option>
+                <option value="sup">&gt;</option>
+                <option value="egal">=</option>
+              </select>
+              <select id="temp" name="temp" title="Valeur">
+                <option value="7">7 °C</option>
+                <option value="8">8 °C</option>
+                <option value="9">9 °C</option>
+                <option value="10">10 °C</option>
+                <option value="11">11 °C</option>
+                <option value="12">12 °C</option>
+                <option value="13" selected="selected">13 °C</option>
+                <option value="14">14 °C</option>
+                <option value="15">15 °C</option>
+                <option value="16">16 °C</option>
+                <option value="17">17 °C</option>
+                <option value="18">18 °C</option>
+              </select>
+            </fieldset>
+            <h3>ET</h3>
+          </div>
+          <div id="actions" class="details">
+            <h2>Action</h2>
+            <h3>Alors</h3>
+            <fieldset>
+              <legend>Fermer volets</legend>
+              <label for="value-blind">Pi&egrave;ce principale :</label>
+              <input type="text" id="value-blind" title="Fermeture volets en %"/>
+              <div id="slider-blind"></div>
+            </fieldset>
+            <h3>Et</h3>
+            <fieldset>
+              <legend>Envoyer email à</legend>
+              <p>Papa (m.bernard)</p>
+            </fieldset>
+          </div>
+          <div id="commands" class="details">
+            <input type="submit" value="Valider" class="button"/>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="footer"/>
+</div>
+</body>
+</html>

@@ -39,6 +39,7 @@ Implements
 """
 
 from domogik.xpl.lib.xplconnector import *
+from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.lib.module import *
 import optparse
 from domogik.common.configloader import Loader
@@ -55,13 +56,13 @@ class Sender(xPLModule):
         self._schema = schema
         self._message = message
         cfgloader = Loader('send')
-        self.__myxpl = Manager()
+        
         self._log = self.get_my_logger()
         self.parse_parameters()
         mess = self.forge_message()
         self._log.debug("Send message : %s" % mess)
-        self.__myxpl.send(mess)
-        self.__myxpl.force_leave()
+        self._myxpl.send(mess)
+        self._myxpl.force_leave()
 
     def parse_parameters(self):
         '''
@@ -90,7 +91,7 @@ class Sender(xPLModule):
         '''
         Create the message based on script arguments
         '''
-        message = Message()
+        message = XplMessage()
         message.set_type(self._args[0])
         message.set_schema(self._args[1])
         datas = self._args[2].split(',')
@@ -100,7 +101,7 @@ class Sender(xPLModule):
                 self.usage()
                 exit(4)
             else:
-                message.set_data_key(data.split("=")[0], data.split("=")[1])
+                message.add_data({data.split("=")[0] :  data.split("=")[1]})
         return message
 
     def usage(self):

@@ -38,6 +38,7 @@ Implements
 from domogik.xpl.lib.queryconfig import *
 from domogik.xpl.lib.module import *
 from domogik.xpl.lib.xplconnector import *
+from domogik.xpl.common.xplmessage import XplMessage
 
 class query_test(xPLModule):
     def __init__(self):
@@ -63,11 +64,11 @@ class query_test(xPLModule):
         query_obj = Query(self.xpl)
 
         print "Send query for x10.heyu_cfg_path"
-        mess = Message()
+        mess = XplMessage()
         mess.set_type('xpl-cmnd')
         mess.set_schema('domogik.config')
-        mess.set_data_key('technology', 'x10')
-        mess.set_data_key('element', 'heyu_cfg_path')
+        mess.add_data({'technology' :  'x10'})
+        mess.add_data({'element' :  'heyu_cfg_path'})
         Listener(self._query_cb, self.xpl,{'schema': 'domogik.config', 'type': 'xpl-stat'})
         self.xpl.send(mess)
 

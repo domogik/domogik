@@ -132,7 +132,7 @@ def remove_all_device_stats(db):
 
 if __name__ == "__main__":
     print_test('*********** Starting tests ***********')
-    d = DbHelper()
+    d = DbHelper(use_test_db=True)
 
     ### Areas
     print_title('test area')
@@ -396,6 +396,12 @@ if __name__ == "__main__":
           "System account list should be empty but it is NOT %s" % d.list_system_accounts()
     print_test("add_user_account")
     sys1 = d.add_system_account(a_login = 'mschneider', a_password = 'IwontGiveIt', a_is_admin = True)
+    try:
+        d.add_system_account(a_login = 'mschneider', a_password = 'plop', a_is_admin = True)
+        error = False
+    except DbHelperException:
+        error = True
+    assert error, "It shouldn't have been possible to add login %s. It already exists!" % 'mschneider'
     sys2 = d.add_system_account(a_login = 'lonely', a_password = 'boy', a_is_admin = True)
     sys3 = d.add_system_account(a_login = 'domo', a_password = 'gik', a_is_admin = True)
     user1 = d.add_user_account(u_first_name='Marc', u_last_name='SCHNEIDER', u_birthdate=datetime.date(1973, 4, 24), 
@@ -408,15 +414,28 @@ if __name__ == "__main__":
     print_test("get_system_account")
     assert d.get_system_account(sys1.id).login == 'mschneider', \
           "Login for system id %s should be 'mschneider' but is %s" % (sys1.id, sys1.login)
+    print_test("get_system_account_by_login")
+    assert d.get_system_account_by_login('mschneider') is not None
+    assert d.get_system_account_by_login('mschneider').id == sys1.id, \
+          "Id for login 'mschneider' should be %s but is %s" % (sys1.id, d.get_system_account('mschneider').id)
+    assert d.get_system_account_by_login('lucyfer') is None
+    print_test("get_system_account_by_user")
+    login = d.get_system_account_by_user(user1.id).login
+    assert login == 'mschneider', \
+          "System account login for user id %s should be 'mschneider' but is %s" % (user1.id, login)
     print_test("get_user_account")
     assert d.get_user_account(user1.id).first_name == 'Marc', \
           "First name for user id %s should be 'Marc' but is %s" % (user1.id, user1.first_name)
     assert d.get_user_account(user2.id).last_name == 'PYTHON', \
           "Last name for user id %s should be 'PYTHON' but is %s" % (user2.id, user2.last_name)
-    print_test("get_user_system_account")
-    login = d.get_user_system_account(user1.id).login
-    assert login == 'mschneider', \
-          "System account login for user id %s should be 'mschneider' but is %s" % (user1.id, login)
+    print_test("get_user_account_by_system_account")
+    assert d.get_user_account_by_system_account(sys1.id) is not None, \
+          "System account with id '%s' should have a User account, but it doesn't have" % sys1.id
+    assert d.get_user_account_by_system_account(sys1.id).first_name == 'Marc', \
+          "System account with id '%s' should have as first name 'Marc' but have '%s' instead" \
+          % (sys1.id, d.get_user_account_by_system_account(sys1.id).first_name)
+    assert d.get_user_account_by_system_account(sys3.id) is None, \
+          "System account with id '%s' shouldn't have a User account, but it has one" % sys3.id
     print_test("del_system_account")
     sys_temp = d.add_system_account(a_login = 'fantom', a_password = 'as', a_is_admin = False)
     d.del_system_account(sys_temp.id)

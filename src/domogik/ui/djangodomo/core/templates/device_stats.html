@@ -22,6 +22,7 @@
 # $LastChangedRevision: 271 $
 -->
 {% extends "base.html" %}
+{% load i18n %}
 
 {% block script %}
     function clearStats() {
@@ -33,11 +34,11 @@
     }
 {% endblock %}
 
-{% block title %}{{ page_title }}{% endblock %}
+{% block title %}{% trans page_title %}{% endblock %}
 
 {% block content %}
+    <div id="list" style="margin-top: 5px;">
     <form name="deviceStatsForm" method="POST" action="">
-    <div id="list">
     {% if device_stats_list %}
         <table>
             <tr>
@@ -56,19 +57,18 @@
                 </tr>
             {% endfor %}
         </table>
-        {% if admin_mode %}
-            <p></p>
-            <table>
-                <tr>
-                    <td><input type="button" name="clearStatsButton" onclick="clearStats()" value="Clear stats"/>
-                </tr>
-            </table>
+        {% if is_user_admin %}
+        <p></p>
+        <table>
+            <tr>
+                <td><input type="button" name="clearStatsButton" onclick="clearStats()" value="Clear stats"/>
+            </tr>
+        </table>
         {% endif %}
     {% else %}
         <p>No stats found !</p>
     {% endif %}
-    </div>
-
-    <input type="hidden" name="cmd" value=""/>
+        <input type="hidden" name="cmd" value=""/>
     </form>
+    </div>
 {% endblock %}

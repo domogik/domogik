@@ -42,6 +42,8 @@ from domogik.common.configloader import Loader
 
 cfg = Loader('database')
 config = cfg.load()
+test_url = ''
+
 try:
     db = dict(config[1])
     url = "%s:///" % db['db_type']
@@ -54,24 +56,32 @@ try:
         else:
             url = "%s%s:%s@%s/%s" % (url, db['db_user'], db['db_password'], \
               db['db_host'], db['db_name'])
+    test_url = '%s_test' % url
 except:
     print "Some errors appears during connection to the database : Can't fetch informations from config file"
 
 engine = create_engine(url)
-
+engine_test = create_engine(test_url)
 
 ###
 # Installer
 ###
 sql_schema.metadata.create_all(engine)
+# For unit tests
+sql_schema.metadata.create_all(engine_test)
+
 _db = database.DbHelper()
 
 # Initialize default system configuration
 _db.update_system_config()
 
+# Create a default system account
+_db.add_default_system_account()
+
 # Create supported device technologies
 _db.add_device_technology(dt_name=u"x10", dt_description="x10 techno", dt_type=u"cpl")
 _db.add_device_technology(dt_name=u"PLCBus", dt_description="plcbus techno", dt_type=u"cpl")
+_db.add_device_technology(dt_name=u"EIB/KNX", dt_description="EIB/KNX techno", dt_type=u"wired")
 _db.add_device_technology(dt_name=u"1wire", dt_description="1-wire techno", dt_type=u"wired")
 _db.add_device_technology(dt_name=u"RFXCom", dt_description="RFXCom techno", dt_type=u"wireless")
 _db.add_device_technology(dt_name=u"IR", dt_description="IR techno", dt_type=u"wireless")

@@ -56,7 +56,7 @@ from sqlalchemy.orm import relation, backref
 from domogik.common.configloader import Loader
 
 UNIT_OF_STORED_VALUE_LIST = [u'Volt', u'Celsius', u'Farenheit', u'Percent', u'Boolean', None]
-DEVICE_TECHNOLOGY_LIST = [u'x10',u'1wire',u'PLCBus',u'RFXCom',u'IR']
+DEVICE_TECHNOLOGY_LIST = [u'x10',u'1wire',u'PLCBus',u'RFXCom',u'IR',u'EIB/KNX']
 DEVICE_TECHNOLOGY_TYPE_LIST = [u'cpl', u'wired', u'wifi', u'wireless', u'ir']
 DEVICE_TYPE_LIST = [u'appliance', u'lamp', u'music', u'sensor']
 SYSTEMSTATS_TYPE_LIST = [u'HB_CLIENT', u'CORE']
@@ -120,7 +120,7 @@ class Area(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(30), nullable=False)
-    description = Column(String(100))
+    description = Column(String(255))
 
     def __init__(self, name, description):
         """
@@ -154,7 +154,7 @@ class Room(Base):
     __tablename__ = '%s_room' % _db_prefix
     id = Column(Integer, primary_key=True)
     name = Column(String(30), nullable=False)
-    description = Column(String(100))
+    description = Column(String(255))
     area_id = Column(Integer, ForeignKey('%s.id' % Area.get_tablename()))
     area = relation(Area, backref=backref(__tablename__, order_by=id))
 
@@ -193,7 +193,7 @@ class DeviceCategory(Base):
     __tablename__ = '%s_device_category' % _db_prefix
     id = Column(Integer, primary_key=True)
     name = Column(String(30), nullable=False)
-    description = Column(String(100))
+    description = Column(String(255))
 
     def __init__(self, name, description):
         """
@@ -227,7 +227,7 @@ class DeviceTechnology(Base):
     __tablename__ = '%s_device_technology' % _db_prefix
     id = Column(Integer, primary_key=True)
     name = Column(Enum(DEVICE_TECHNOLOGY_LIST), nullable=False)
-    description = Column(String(100))
+    description = Column(String(255))
     type = Column(Enum(DEVICE_TECHNOLOGY_TYPE_LIST))
 
     def __init__(self, name, description, type):
@@ -269,6 +269,7 @@ class DeviceTechnologyConfig(Base):
     technology = relation(DeviceTechnology, backref=backref(__tablename__))
     key = Column(String(30), nullable=False)
     value = Column(String(80), nullable=False)
+    description = Column(String(255), nullable=True)
 
     def __init__(self, technology_id, key, value):
         """
@@ -305,7 +306,7 @@ class Device(Base):
     __tablename__ = '%s_device' % _db_prefix
     id = Column(Integer, primary_key=True)
     name = Column(String(30), nullable=False)
-    description = Column(String(100))
+    description = Column(String(255))
     address = Column(String(30), nullable=False)
     reference = Column(String(30))
     technology_id = Column(Integer, ForeignKey('%s.id' % DeviceTechnology.get_tablename()))
@@ -405,6 +406,7 @@ class DeviceConfig(Base):
     device = relation(Device, backref=backref(__tablename__))
     key = Column(String(30), nullable=False)
     value = Column(String(80), nullable=False)
+    description = Column(String(255), nullable=True)
 
     def __init__(self, device_id, key, value):
         """
@@ -479,7 +481,7 @@ class Trigger(Base):
     """
     __tablename__ = '%s_trigger' % _db_prefix
     id = Column(Integer, primary_key=True)
-    description = Column(String(100))
+    description = Column(String(255))
     rule = Column(Text, nullable=False)
     result = Column(Text, nullable=False)
 
@@ -639,10 +641,9 @@ class SystemConfig(Base):
     __tablename__ = '%s_system_config' % _db_prefix
     id = Column(Integer, primary_key=True)
     simulation_mode = Column(Boolean, nullable=False, default=False)
-    admin_mode = Column(Boolean, nullable=False, default=False)
     debug_mode = Column(Boolean, nullable=False, default=False)
 
-    def __init__(self, simulation_mode, admin_mode, debug_mode):
+    def __init__(self, simulation_mode, debug_mode):
         """
         Class constructor
         @param simulation_mode : if we are running the app in simulation mode
@@ -650,7 +651,6 @@ class SystemConfig(Base):
         @param debug_mode : if we are running the app in debug mode
         """
         self.simulation_mode = simulation_mode
-        self.admin_mode = admin_mode
         self.debug_mode = debug_mode
 
     def __repr__(self):
@@ -658,8 +658,8 @@ class SystemConfig(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<SystemConfig(id=%s, simulation=%s, admin=%s, debug=%s)>" \
-          % (self.id, self.simulation_mode, self.admin_mode, self.debug_mode)
+        return "<SystemConfig(id=%s, simulation=%s, debug=%s)>" \
+          % (self.id, self.simulation_mode, self.debug_mode)
 
     @staticmethod
     def get_tablename():

@@ -44,6 +44,7 @@ if os.name == 'nt':
 else:
     from domogik.xpl.lib.x10 import *
 from domogik.xpl.lib.xplconnector import *
+from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.lib.module import *
 from domogik.common.configloader import Loader
 from domogik.common import logger
@@ -58,11 +59,10 @@ class x10Main(xPLModule):
         '''
         xPLModule.__init__(self, name = 'x10')
         self._heyu_cfg_path_res = ""
-        self.__myxpl = Manager()
-        self._config = Query(self.__myxpl)
+        self._config = Query(self._myxpl)
         res = xPLResult()
-        self._config.query('x10', 'heyu_cfg_path', res)
-        self._heyu_cfg_path_res = res.get_value()['heyu_cfg_path']
+        self._config.query('x10', 'heyu-cfg-path', res)
+        self._heyu_cfg_path_res = res.get_value()['heyu-cfg-path']
         try:
             pass
             self.__myx10 = X10API(self._heyu_cfg_path_res)
@@ -70,13 +70,13 @@ class x10Main(xPLModule):
             print "Something went wrong during heyu init, check logs"
             exit(1)
         #Create listeners
-        Listener(self.x10_cmnd_cb, self.__myxpl, {'schema': 'x10.basic',
+        Listener(self.x10_cmnd_cb, self._myxpl, {'schema': 'x10.basic',
                 'type': 'xpl-cmnd'})
         #One listener for system schema, allowing to reload config
-        Listener(self.heyu_reload_config, self.__myxpl, {'schema': 'domogik.system',
+        Listener(self.heyu_reload_config, self._myxpl, {'schema': 'domogik.system',
            'type': 'xpl-cmnd', 'command': 'reload', 'module': 'x10'})
         #One listener for system schema, allowing to dump config
-        Listener(self.heyu_dump_config, self.__myxpl, {'schema': 'domogik.system',
+        Listener(self.heyu_dump_config, self._myxpl, {'schema': 'domogik.system',
             'type': 'xpl-cmnd', 'command': 'push_config', 'module': 'x10'})
         self._log = self.get_my_logger()
 #        self._monitor = X10Monitor(self._heyu_cfg_path_res)
@@ -92,7 +92,7 @@ class x10Main(xPLModule):
         '''
         #Heyu config items
         res = xPLResult()
-#        self._config = Query(self.__myxpl)
+#        self._config = Query(self._myxpl)
         self._config.query('x10','', res)
         result = res.get_value()
         if result is not None:
@@ -122,16 +122,16 @@ class x10Main(xPLModule):
         #Heyu path
         myheyu = HeyuManager(self._heyu_cfg_path_res)
         lines = myheyu.load()
-        m = Message()
+        m = XplMessage()
         m.set_type('xpl-trig')
         m.set_schema('domogik.config')
         count = 0
         for line in lines:
             key = "heyu_file_%s" % count
             count = count + 1
-            m.set_data_key(key, line)
+            m.add_data({key :  line})
         #print "Message is : %s" % m
-        self.__myxpl.send(m)
+        self._myxpl.send(m)
 
 
     def x10_cmnd_cb(self, message):
@@ -155,13 +155,13 @@ class x10Main(xPLModule):
         house = None
         level = None
         if 'command' in message:
-            cmd = message.get_key_value('command')
+            cmd = message.data['command']
         if 'device' in message:
-            dev = message.get_key_value('device')
+            dev = message.data['device']
         if 'house' in message:
-            house = message.get_key_value('house')
+            house = message.data['house']
         if 'level' in message:
-            level = message.get_key_value('level')
+            level = message.data['level']
         self._log.debug("%s received : device = %s, house = %s, level = %s" % (
                 cmd, dev, house, level))
         commands[cmd](dev, house, level)
@@ -173,14 +173,14 @@ class x10Main(xPLModule):
         @param order : the order sent to the unit
         """
         self._log.debug("X10 Callback for %s" % unit)
-        mess = Message()
+        mess = XplMessage()
         mess.set_type("xpl-trig")
         mess.set_schema("x10.basic")
-        mess.set_data_key("device", unit)
-        mess.set_data_key("command", order)
+        mess.add_data({"device" :  unit})
+        mess.add_data({"command" :  order})
         if args:
-            mess.set_data_key("level",args)
-        self.__myxpl.send(mess)
+            mess.add_data({"level" : args})
+        self._myxpl.send(mess)
 
 if __name__ == "__main__":
     x = x10Main()

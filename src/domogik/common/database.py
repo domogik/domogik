@@ -99,22 +99,26 @@ class DbHelper():
     _engine = None
     _session = None
 
-    def __init__(self, echo_output=False):
+    def __init__(self, echo_output=False, use_test_db=False):
         """
         Class constructor
-        @param echo_output : if set to True displays sqlAlchemy queries (optional, default set to False)
+        @param echo_output : if True displays sqlAlchemy queries (optional, default False)
+        @param use_test_db : if True use a test database (optional, default False)
         """
         cfg = Loader('database')
         config = cfg.load()
         db = dict(config[1])
         url = "%s:///" % db['db_type']
         if db['db_type'] == 'sqlite':
-            url = "%s%s" % (url,db['db_path'])
+            url = "%s%s" % (url, db['db_path'])
         else:
             if db['db_port'] != '':
                 url = "%s%s:%s@%s:%s/%s" % (url, db['db_user'], db['db_password'], db['db_host'], db['db_port'], db['db_name'])
             else:
                 url = "%s%s:%s@%s/%s" % (url, db['db_user'], db['db_password'], db['db_host'], db['db_name'])
+
+        if use_test_db:
+            url = '%s_test' % url
 
         # Connecting to the database
         self._dbprefix = db['db_prefix']
@@ -735,20 +739,54 @@ class DbHelper():
         """
         return self._session.query(SystemAccount).filter_by(id=a_id).first()
 
+    def get_system_account_by_login(self, a_login):
+        """
+        Return system account information from login
+        @param a_login : login
+        @return a SystemAccount object
+        """
+        return self._session.query(SystemAccount).filter_by(login=a_login).first()
+
+    def get_system_account_by_user(self, u_id):
+        """
+        Return a system account associated to a user, if existing
+        @param u_id : The user account id
+        @return a SystemAccount object
+        """
+        user_account = self._session.query(UserAccount).filter_by(id=u_id).first()
+        if user_account is not None:
+            try:
+                return self._session.query(SystemAccount).filter_by(id=user_account.system_account_id).one()
+            except MultipleResultsFound, e:
+                raise DbHelperException("Database may be incoherent, user with id %s has more than one account" % u_id)
+
+        else:
+            return None
+
     def add_system_account(self, a_login, a_password, a_is_admin=False):
         """
         Add a system_account
         @param a_login : Account login
         @param a_password : Account clear password (will be hashed in sha256)
         @param a_is_admin : True if it is an admin account, False otherwise (optional, default=False)
-        @return the new SystemAccount object
+        @return the new SystemAccount object or raise a DbHelperException if it already exists
         """
+        system_account = self.get_system_account_by_login(a_login)
+        if system_account is not None:
+            raise DbHelperException("Error %s login already exists" % a_login)
         password = hashlib.sha256()
         password.update(a_password)
         system_account = SystemAccount(login=a_login, password=password.hexdigest(), is_admin=a_is_admin)
         self._session.add(system_account)
         self._session.commit()
         return system_account
+
+    def add_default_system_account(self):
+        """
+        Add a default system account (login = admin, password = domogik, is_admin = True)
+        @return a SystemAccount object
+        """
+        return self.add_system_account(a_login='admin', a_password='domogik', a_is_admin=True)
 
     def del_system_account(self, a_id):
         """
@@ -777,21 +815,18 @@ class DbHelper():
         """
         return self._session.query(UserAccount).filter_by(id=u_id).first()
 
-    def get_user_system_account(self, u_id):
+    def get_user_account_by_system_account(self, s_id):
         """
-        Return a system account associated to a user, if existing
-        @param u_id : The user (not system !) account id
-        @return a SystemAccount object
+        Return a user account associated to a system account, if existing
+        @param s_id : the system account id
+        @return a UserAccount object or None
         """
-        user_account = self._session.query(UserAccount).filter_by(id=u_id).first()
-        if user_account is not None:
-            try:
-                return self._session.query(SystemAccount).filter_by(id=user_account.system_account_id).one()
-            except MultipleResultsFound, e:
-                raise DbHelperException("Database may be incoherent, user with id %s has more than one account" % u_id)
-
-        else:
+        try:
+            return self._session.query(UserAccount).filter_by(system_account_id=s_id).one()
+        except NoResultFound:
             return None
+        except MultipleResultsFound, e:
+            raise DbHelperException("Database may be incoherent, user with id %s has more than one account" % u_id)
 
     def add_user_account(self, u_first_name, u_last_name, u_birthdate, u_system_account_id=None):
         """
@@ -897,11 +932,10 @@ class DbHelper():
         except NoResultFound, e:
             pass
 
-    def update_system_config(self, s_simulation_mode=None, s_admin_mode=None, s_debug_mode=None):
+    def update_system_config(self, s_simulation_mode=None, s_debug_mode=None):
         """
         Update (or create) system configuration
         @param s_simulation_mode : True if the system is running in simulation mode (optional)
-        @param s_admin_mode : True if the system is running in administrator mode (optional)
         @param s_debug_mode : True if the system is running in debug mode (optional)
         @return a SystemConfig object
         """
@@ -909,13 +943,11 @@ class DbHelper():
         if system_config is not None:
             if s_simulation_mode is not None:
                 system_config.simulation_mode = s_simulation_mode
-            if s_admin_mode is not None:
-                system_config.admin_mode = s_admin_mode
             if s_debug_mode is not None:
                 system_config.debug_mode = s_debug_mode
         else:
             system_config = SystemConfig(simulation_mode=s_simulation_mode, 
-                                        admin_mode=s_admin_mode, debug_mode=s_debug_mode)
+                                        debug_mode=s_debug_mode)
         self._session.add(system_config)
         self._session.commit()
         return system_config

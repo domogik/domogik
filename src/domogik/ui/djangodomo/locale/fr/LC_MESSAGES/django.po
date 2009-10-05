@@ -1,0 +1,3269 @@
+# French translation of Django.
+# This file is distributed under the same license as the Django package.
+# Copyright (C) 2008 Django Software Foundation and individual contributors.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-10-04 18:59+0200\n"
+"PO-Revision-Date: 2009-03-01 12:35+0100\n"
+"Last-Translator: Stéphane Raimbault <stephane.raimbault@gmail.com>\n"
+"Language-Team: French <http://django-fr.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n>1;\n"
+
+#: core/views.py:65
+msgid "Control overview"
+msgstr ""
+
+#: core/views.py:108
+msgid "Device details"
+msgstr ""
+
+#: core/views.py:134
+msgid "Device stats"
+msgstr ""
+
+#: core/views.py:160
+msgid "Login page"
+msgstr "Page de connexion"
+
+#: core/views.py:184
+msgid ""
+"Sorry unable to log in. Please check login name / password and try again."
+msgstr ""
+
+#: core/views.py:211
+msgid "Admin page"
+msgstr "Page d'administration"
+
+#: core/views.py:249
+msgid "Load sample data"
+msgstr ""
+
+#: core/views.py:254
+msgid ""
+"The application is not running in simulation mode : can't load sample data"
+msgstr ""
+
+#: core/views.py:279
+msgid "Remove all data"
+msgstr "Supprimer toutes les données"
+
+#: core/views.py:284
+msgid "The application is not running in simulation mode : can't clear data"
+msgstr ""
+
+#: core/templates/base.html:42
+msgid "Log in"
+msgstr "Connexion"
+
+#: core/templates/base.html:44
+msgid "Hello"
+msgstr "Bonjour"
+
+#: core/templates/base.html:44
+msgid "Log out"
+msgstr "Déconnexion"
+
+#: core/templates/login.html:28
+#, fuzzy
+msgid "toto"
+msgstr "Kyōto"
+
+#~ msgid "Arabic"
+#~ msgstr "Arabe"
+
+#~ msgid "Bengali"
+#~ msgstr "Bengalî"
+
+#~ msgid "Bulgarian"
+#~ msgstr "Bulgare"
+
+#~ msgid "Catalan"
+#~ msgstr "Catalan"
+
+#~ msgid "Czech"
+#~ msgstr "Tchèque"
+
+#~ msgid "Welsh"
+#~ msgstr "Gallois"
+
+#~ msgid "Danish"
+#~ msgstr "Dannois"
+
+#~ msgid "German"
+#~ msgstr "Allemand"
+
+#~ msgid "Greek"
+#~ msgstr "Grec"
+
+#~ msgid "English"
+#~ msgstr "Anglais"
+
+#~ msgid "Spanish"
+#~ msgstr "Espagnol"
+
+#~ msgid "Estonian"
+#~ msgstr "Estonien"
+
+#~ msgid "Argentinean Spanish"
+#~ msgstr "Espagnol argentin"
+
+#~ msgid "Basque"
+#~ msgstr "Basque"
+
+#~ msgid "Persian"
+#~ msgstr "Perse"
+
+#~ msgid "Finnish"
+#~ msgstr "Finlandais"
+
+#~ msgid "French"
+#~ msgstr "Français"
+
+#~ msgid "Irish"
+#~ msgstr "Irlandais"
+
+#~ msgid "Galician"
+#~ msgstr "Galicien"
+
+#~ msgid "Hungarian"
+#~ msgstr "Hongrois"
+
+#~ msgid "Hebrew"
+#~ msgstr "Hébreu"
+
+#~ msgid "Hindi"
+#~ msgstr "Hindi"
+
+#~ msgid "Croatian"
+#~ msgstr "Croate"
+
+#~ msgid "Icelandic"
+#~ msgstr "Islandais"
+
+#~ msgid "Italian"
+#~ msgstr "Italien"
+
+#~ msgid "Japanese"
+#~ msgstr "Japonais"
+
+#~ msgid "Georgian"
+#~ msgstr "Géorgien"
+
+#~ msgid "Korean"
+#~ msgstr "Coréen"
+
+#~ msgid "Khmer"
+#~ msgstr "Khmer"
+
+#~ msgid "Kannada"
+#~ msgstr "Kannada"
+
+#~ msgid "Latvian"
+#~ msgstr "Letton"
+
+#~ msgid "Lithuanian"
+#~ msgstr "Lituanien"
+
+#~ msgid "Macedonian"
+#~ msgstr "Macédonien"
+
+#~ msgid "Dutch"
+#~ msgstr "Hollandais"
+
+#~ msgid "Norwegian"
+#~ msgstr "Norvégien"
+
+#~ msgid "Polish"
+#~ msgstr "Polonais"
+
+#~ msgid "Portuguese"
+#~ msgstr "Portugais"
+
+#~ msgid "Brazilian Portuguese"
+#~ msgstr "Portugais brésilien"
+
+#~ msgid "Romanian"
+#~ msgstr "Roumain"
+
+#~ msgid "Russian"
+#~ msgstr "Russe"
+
+#~ msgid "Slovak"
+#~ msgstr "Slovaque"
+
+#~ msgid "Slovenian"
+#~ msgstr "Slovène"
+
+#~ msgid "Serbian"
+#~ msgstr "Serbe"
+
+#~ msgid "Swedish"
+#~ msgstr "Suédois"
+
+#~ msgid "Tamil"
+#~ msgstr "Tamoul"
+
+#~ msgid "Telugu"
+#~ msgstr "Télougou"
+
+#~ msgid "Thai"
+#~ msgstr "Thaï"
+
+#~ msgid "Turkish"
+#~ msgstr "Turc"
+
+#~ msgid "Ukrainian"
+#~ msgstr "Ukrainien"
+
+#~ msgid "Simplified Chinese"
+#~ msgstr "Chinois simplifié"
+
+#~ msgid "Traditional Chinese"
+#~ msgstr "Chinois traditionnel"
+
+#~ msgid ""
+#~ "<h3>By %s:</h3>\n"
+#~ "<ul>\n"
+#~ msgstr ""
+#~ "<h3>Par %s&nbsp;:</h3>\n"
+#~ "<ul>\n"
+
+#~ msgid "All"
+#~ msgstr "Tout"
+
+#~ msgid "Any date"
+#~ msgstr "Toutes les dates"
+
+#~ msgid "Today"
+#~ msgstr "Aujourd'hui"
+
+#~ msgid "Past 7 days"
+#~ msgstr "Les 7 derniers jours"
+
+#~ msgid "This month"
+#~ msgstr "Ce mois-ci"
+
+#~ msgid "This year"
+#~ msgstr "Cette année"
+
+#~ msgid "Yes"
+#~ msgstr "Oui"
+
+#~ msgid "No"
+#~ msgstr "Non"
+
+#~ msgid "Unknown"
+#~ msgstr "Inconnu"
+
+#~ msgid "action time"
+#~ msgstr "heure de l'action"
+
+#~ msgid "object id"
+#~ msgstr "id de l'objet"
+
+#~ msgid "object repr"
+#~ msgstr "représentation de l'objet"
+
+#~ msgid "action flag"
+#~ msgstr "indicateur de l'action"
+
+#~ msgid "change message"
+#~ msgstr "message de modification"
+
+#~ msgid "log entry"
+#~ msgstr "entrée d'historique"
+
+#~ msgid "log entries"
+#~ msgstr "entrées d'historique"
+
+#~ msgid "None"
+#~ msgstr "Aucun(e)"
+
+#~ msgid "Changed %s."
+#~ msgstr "Modifié %s."
+
+#~ msgid "and"
+#~ msgstr "et"
+
+#~ msgid "Added %(name)s \"%(object)s\"."
+#~ msgstr "%(name)s « %(object)s » ajouté."
+
+#~ msgid "Changed %(list)s for %(name)s \"%(object)s\"."
+#~ msgstr "%(list)s modifié pour %(name)s « %(object)s »."
+
+#~ msgid "Deleted %(name)s \"%(object)s\"."
+#~ msgstr "%(name)s « %(object)s » supprimé."
+
+#~ msgid "No fields changed."
+#~ msgstr "Aucun champ modifié."
+
+#~ msgid "The %(name)s \"%(obj)s\" was added successfully."
+#~ msgstr "L'objet %(name)s « %(obj)s » a été ajouté avec succès."
+
+#~ msgid "You may edit it again below."
+#~ msgstr "Vous pouvez continuer l'édition ci-dessous."
+
+#~ msgid "You may add another %s below."
+#~ msgstr "Vous pouvez ajouter un autre %s ci-dessous."
+
+#~ msgid "The %(name)s \"%(obj)s\" was changed successfully."
+#~ msgstr "L'objet %(name)s « %(obj)s » a été modifié avec succès."
+
+#~ msgid ""
+#~ "The %(name)s \"%(obj)s\" was added successfully. You may edit it again "
+#~ "below."
+#~ msgstr ""
+#~ "L'objet %(name)s « %(obj)s » a été ajouté avec succès. Vous pouvez "
+#~ "continuer l'édition ci-dessous."
+
+# Titre
+#~ msgid "Add %s"
+#~ msgstr "Ajout %s"
+
+#~ msgid "%(name)s object with primary key %(key)r does not exist."
+#~ msgstr "L'objet %(name)s avec la clef primaire %(key)r n'existe pas."
+
+# Titre
+#~ msgid "Change %s"
+#~ msgstr "Changement %s"
+
+#~ msgid "Database error"
+#~ msgstr "Erreur de base de données"
+
+#~ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+#~ msgstr "L'objet %(name)s « %(obj)s » a été supprimé avec succès."
+
+#~ msgid "Are you sure?"
+#~ msgstr "Êtes-vous sûr ?"
+
+#~ msgid "Change history: %s"
+#~ msgstr "Historique des changements : %s"
+
+#~ msgid ""
+#~ "Please enter a correct username and password. Note that both fields are "
+#~ "case-sensitive."
+#~ msgstr ""
+#~ "Saisissez un nom d'utilisateur et un mot de passe valide. Remarquez que "
+#~ "chacun de ces champs est sensible à la casse (différenciation des "
+#~ "majuscules/minuscules)."
+
+#~ msgid "Please log in again, because your session has expired."
+#~ msgstr "Reconnectez-vous car votre session a expiré."
+
+#~ msgid ""
+#~ "Looks like your browser isn't configured to accept cookies. Please enable "
+#~ "cookies, reload this page, and try again."
+#~ msgstr ""
+#~ "Il semblerait que votre navigateur n'accepte pas les cookies. Activez-"
+#~ "les, rechargez cette page puis essayez à nouveau."
+
+#~ msgid "Usernames cannot contain the '@' character."
+#~ msgstr "Les noms d'utilisateur ne peuvent contenir le caractère « @ »."
+
+#~ msgid "Your e-mail address is not your username. Try '%s' instead."
+#~ msgstr ""
+#~ "Votre adresse électronique n'est pas votre nom d'utilisateur. Essayez « %"
+#~ "s » à la place."
+
+#~ msgid "Site administration"
+#~ msgstr "Administration du site"
+
+#~ msgid "%s administration"
+#~ msgstr "Administration %s"
+
+#~ msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
+#~ msgstr "Un ou plusieurs %(fieldname)s dans %(name)s : %(obj)s"
+
+#~ msgid "One or more %(fieldname)s in %(name)s:"
+#~ msgstr "Un ou plusieurs %(fieldname)s dans %(name)s :"
+
+#~ msgid "Date:"
+#~ msgstr "Date :"
+
+#~ msgid "Time:"
+#~ msgstr "Heure :"
+
+#~ msgid "Currently:"
+#~ msgstr "Actuellement :"
+
+#~ msgid "Change:"
+#~ msgstr "Modification :"
+
+#~ msgid "Lookup"
+#~ msgstr "Recherche"
+
+#~ msgid "Add Another"
+#~ msgstr "Ajouter un autre"
+
+#~ msgid "Page not found"
+#~ msgstr "Cette page n'a pas été trouvée"
+
+#~ msgid "We're sorry, but the requested page could not be found."
+#~ msgstr "Nous sommes désolés, mais la page demandée est introuvable."
+
+#~ msgid "Home"
+#~ msgstr "Accueil"
+
+#~ msgid "Server error"
+#~ msgstr "Erreur du serveur"
+
+#~ msgid "Server error (500)"
+#~ msgstr "Erreur du serveur (500)"
+
+#~ msgid "Server Error <em>(500)</em>"
+#~ msgstr "Erreur du serveur <em>(500)</em>"
+
+#~ msgid ""
+#~ "There's been an error. It's been reported to the site administrators via "
+#~ "e-mail and should be fixed shortly. Thanks for your patience."
+#~ msgstr ""
+#~ "Une erreur est survenue. Elle a été transmise par courriel aux "
+#~ "administrateurs du site et sera corrigée dans les meilleurs délais. Merci "
+#~ "pour votre patience."
+
+#~ msgid "%(name)s"
+#~ msgstr "%(name)s"
+
+#~ msgid "Welcome,"
+#~ msgstr "Bienvenue,"
+
+#~ msgid "Documentation"
+#~ msgstr "Documentation"
+
+#~ msgid "Change password"
+#~ msgstr "Modifier votre mot de passe"
+
+#~ msgid "Django site admin"
+#~ msgstr "Site d'administration de Django"
+
+#~ msgid "Django administration"
+#~ msgstr "Administration de Django"
+
+#~ msgid "Add"
+#~ msgstr "Ajouter"
+
+#~ msgid "History"
+#~ msgstr "Historique"
+
+#~ msgid "View on site"
+#~ msgstr "Voir sur le site"
+
+#~ msgid "Please correct the error below."
+#~ msgid_plural "Please correct the errors below."
+#~ msgstr[0] "Corrigez l'erreur suivante."
+#~ msgstr[1] "Corrigez les erreurs suivantes."
+
+#~ msgid "Add %(name)s"
+#~ msgstr "Ajouter %(name)s"
+
+#~ msgid "Filter"
+#~ msgstr "Filtre"
+
+#~ msgid "Delete"
+#~ msgstr "Supprimer"
+
+#~ msgid ""
+#~ "Deleting the %(object_name)s '%(escaped_object)s' would result in "
+#~ "deleting related objects, but your account doesn't have permission to "
+#~ "delete the following types of objects:"
+#~ msgstr ""
+#~ "Supprimer l'objet %(object_name)s « %(escaped_object)s » provoquerait la "
+#~ "suppression des objets qui lui sont liés, mais votre compte ne possède "
+#~ "pas la permission de supprimer les types d'objets suivants :"
+
+#~ msgid ""
+#~ "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s"
+#~ "\"? All of the following related items will be deleted:"
+#~ msgstr ""
+#~ "Voulez-vous vraiment supprimer l'objet %(object_name)s « %(escaped_object)"
+#~ "s » ? Les éléments suivants sont liés à celui-ci et seront aussi "
+#~ "supprimés :"
+
+#~ msgid "Yes, I'm sure"
+#~ msgstr "Oui, j'en suis certain"
+
+#~ msgid " By %(filter_title)s "
+#~ msgstr " Par %(filter_title)s "
+
+#~ msgid "Models available in the %(name)s application."
+#~ msgstr "Modèles disponibles dans l'application %(name)s."
+
+#~ msgid "Change"
+#~ msgstr "Modifier"
+
+#~ msgid "You don't have permission to edit anything."
+#~ msgstr "Vous n'avez pas la permission de modifier quoi que ce soit."
+
+#~ msgid "Recent Actions"
+#~ msgstr "Actions récentes"
+
+#~ msgid "My Actions"
+#~ msgstr "Mes actions"
+
+#~ msgid "None available"
+#~ msgstr "Aucun(e) disponible"
+
+#~ msgid ""
+#~ "Something's wrong with your database installation. Make sure the "
+#~ "appropriate database tables have been created, and make sure the database "
+#~ "is readable by the appropriate user."
+#~ msgstr ""
+#~ "L'installation de votre base de données est incorrecte. Vérifiez que les "
+#~ "tables utiles ont été créées, et que la base est accessible par "
+#~ "l'utilisateur concerné."
+
+#~ msgid "Username:"
+#~ msgstr "Nom d'utilisateur :"
+
+#~ msgid "Password:"
+#~ msgstr "Mot de passe :"
+
+#~ msgid "Date/time"
+#~ msgstr "Date/heure"
+
+#~ msgid "User"
+#~ msgstr "Utilisateur"
+
+#~ msgid "Action"
+#~ msgstr "Action"
+
+#~ msgid "DATETIME_FORMAT"
+#~ msgstr "j F Y, G:i"
+
+#~ msgid ""
+#~ "This object doesn't have a change history. It probably wasn't added via "
+#~ "this admin site."
+#~ msgstr ""
+#~ "Cet objet n'a pas d'historique de modification. Il n'a probablement pas "
+#~ "été ajouté au moyen de ce site d'administration."
+
+#~ msgid "Show all"
+#~ msgstr "Tout afficher"
+
+#~ msgid "Go"
+#~ msgstr "Envoyer"
+
+#~ msgid "1 result"
+#~ msgid_plural "%(counter)s results"
+#~ msgstr[0] "1 résultat"
+#~ msgstr[1] "%(counter)s résultats"
+
+#~ msgid "%(full_result_count)s total"
+#~ msgstr "%(full_result_count)s résultats"
+
+#~ msgid "Save"
+#~ msgstr "Enregistrer"
+
+#~ msgid "Save as new"
+#~ msgstr "Enregistrer en tant que nouveau"
+
+#~ msgid "Save and add another"
+#~ msgstr "Enregistrer et ajouter un nouveau"
+
+#~ msgid "Save and continue editing"
+#~ msgstr "Enregistrer et continuer les modifications"
+
+#~ msgid ""
+#~ "First, enter a username and password. Then, you'll be able to edit more "
+#~ "user options."
+#~ msgstr ""
+#~ "Saisissez tout d'abord un nom d'utilisateur et un mot de passe. Vous "
+#~ "pourrez ensuite modifier plus d'options."
+
+#~ msgid "Username"
+#~ msgstr "Nom d'utilisateur"
+
+#~ msgid "Password"
+#~ msgstr "Mot de passe"
+
+#~ msgid "Password (again)"
+#~ msgstr "Mot de passe (à nouveau)"
+
+#~ msgid "Enter the same password as above, for verification."
+#~ msgstr "Saisissez le même mot de passe que précédemment, par sécurité."
+
+#~ msgid "Enter a new password for the user <strong>%(username)s</strong>."
+#~ msgstr ""
+#~ "Saisissez un nouveau mot de passe pour l'utilisateur <strong>%(username)"
+#~ "s</strong>."
+
+#~ msgid "Delete?"
+#~ msgstr "Supprimer ?"
+
+#~ msgid "Thanks for spending some quality time with the Web site today."
+#~ msgstr "Merci pour le temps que vous avez accordé à ce site aujourd'hui."
+
+#~ msgid "Password change"
+#~ msgstr "Modification de votre mot de passe"
+
+#~ msgid "Password change successful"
+#~ msgstr "Mot de passe modifié avec succès"
+
+#~ msgid "Your password was changed."
+#~ msgstr "Votre mot de passe a été modifié."
+
+#~ msgid ""
+#~ "Please enter your old password, for security's sake, and then enter your "
+#~ "new password twice so we can verify you typed it in correctly."
+#~ msgstr ""
+#~ "Pour des raisons de sécurité, saisissez votre ancien mot de passe puis "
+#~ "votre nouveau mot de passe à deux reprises afin de vérifier qu'il est "
+#~ "correctement saisi."
+
+#~ msgid "Old password:"
+#~ msgstr "Ancien mot de passe :"
+
+#~ msgid "New password:"
+#~ msgstr "Nouveau mot de passe :"
+
+#~ msgid "Confirm password:"
+#~ msgstr "Confirmation du mot de passe :"
+
+#~ msgid "Change my password"
+#~ msgstr "Modifier mon mot de passe"
+
+#~ msgid "Password reset"
+#~ msgstr "Réinitialisation du mot de passe"
+
+#~ msgid "Password reset complete"
+#~ msgstr "Mise à jour du mot de passe effectuée avec succès"
+
+#~ msgid "Your password has been set.  You may go ahead and log in now."
+#~ msgstr ""
+#~ "Votre mot de passe a été défini. Vous pouvez maintenant vous authentifier."
+
+#~ msgid "Password reset confirmation"
+#~ msgstr "Confirmation de mise à jour du mot de passe"
+
+#~ msgid "Enter new password"
+#~ msgstr "Saisissez un nouveau mot de passe"
+
+#~ msgid ""
+#~ "Please enter your new password twice so we can verify you typed it in "
+#~ "correctly."
+#~ msgstr ""
+#~ "Saisissez deux fois votre nouveau mot de passe afin de vérifier qu'il est "
+#~ "correctement saisi."
+
+#~ msgid "Password reset unsuccessful"
+#~ msgstr "Échec lors de la mise à jour du mot de passe"
+
+#~ msgid ""
+#~ "The password reset link was invalid, possibly because it has already been "
+#~ "used.  Please request a new password reset."
+#~ msgstr ""
+#~ "Le lien de mise à jour du mot de passe n'était pas valide, probablement "
+#~ "en raison de sa précédente utilisation. Veuillez renouveler votre demande "
+#~ "de mise à jour de mot de passe."
+
+#~ msgid "Password reset successful"
+#~ msgstr "Mot de passe mis à jour avec succès"
+
+#~ msgid ""
+#~ "We've e-mailed you instructions for setting your password to the e-mail "
+#~ "address you submitted. You should be receiving it shortly."
+#~ msgstr ""
+#~ "Nous vous avons envoyé par courriel les instructions pour changer de mot "
+#~ "de passe à l'adresse que vous avez indiquée. Vous devriez le recevoir "
+#~ "rapidement."
+
+#~ msgid "You're receiving this e-mail because you requested a password reset"
+#~ msgstr ""
+#~ "Vous recevez ce courriel car vous avez demandé un changement de mot de "
+#~ "passe"
+
+#~ msgid "for your user account at %(site_name)s"
+#~ msgstr "pour votre compte sur le site %(site_name)s"
+
+#~ msgid "Please go to the following page and choose a new password:"
+#~ msgstr ""
+#~ "Veuillez vous rendre sur cette page et choisir un nouveau mot de passe :"
+
+#~ msgid "Your username, in case you've forgotten:"
+#~ msgstr "Votre nom d'utilisateur, en cas d'oubli :"
+
+#~ msgid "Thanks for using our site!"
+#~ msgstr "Merci d'utiliser notre site !"
+
+#~ msgid "The %(site_name)s team"
+#~ msgstr "L'équipe %(site_name)s"
+
+#~ msgid ""
+#~ "Forgotten your password? Enter your e-mail address below, and we'll e-"
+#~ "mail instructions for setting a new one."
+#~ msgstr ""
+#~ "Mot de passe perdu ? Saisissez votre adresse électronique ci-dessous et "
+#~ "nous vous enverrons les instructions pour en créer un nouveau."
+
+#~ msgid "E-mail address:"
+#~ msgstr "Adresse électronique :"
+
+#~ msgid "Reset my password"
+#~ msgstr "Réinitialiser mon mot de passe"
+
+#~ msgid "All dates"
+#~ msgstr "Toutes les dates"
+
+#~ msgid "Select %s"
+#~ msgstr "Sélectionnez %s"
+
+#~ msgid "Select %s to change"
+#~ msgstr "Sélectionnez l'objet %s à changer"
+
+#~ msgid "site"
+#~ msgstr "site"
+
+#~ msgid "template"
+#~ msgstr "template"
+
+#~ msgid "tag:"
+#~ msgstr "mot-clé :"
+
+#~ msgid "filter:"
+#~ msgstr "filtre :"
+
+#~ msgid "view:"
+#~ msgstr "vue :"
+
+#~ msgid "App %r not found"
+#~ msgstr "L'application %r n'a pas été trouvée"
+
+#~ msgid "Model %(model_name)r not found in app %(app_label)r"
+#~ msgstr ""
+#~ "Le modèle %(model_name)r n'a pas été trouvé dans l'application %"
+#~ "(app_label)r"
+
+#~ msgid "the related `%(app_label)s.%(data_type)s` object"
+#~ msgstr "l'objet « %(app_label)s.%(data_type)s » en relation"
+
+#~ msgid "model:"
+#~ msgstr "modèle :"
+
+#~ msgid "related `%(app_label)s.%(object_name)s` objects"
+#~ msgstr "les objets « %(app_label)s.%(object_name)s » en relation"
+
+#~ msgid "all %s"
+#~ msgstr "tous les %s"
+
+#~ msgid "number of %s"
+#~ msgstr "nombre de %s"
+
+#~ msgid "Fields on %s objects"
+#~ msgstr "Champs sur les objets %s"
+
+#~ msgid "Integer"
+#~ msgstr "Entier"
+
+#~ msgid "Boolean (Either True or False)"
+#~ msgstr "Booléen (soit vrai ou faux)"
+
+#~ msgid "String (up to %(max_length)s)"
+#~ msgstr "Chaîne de caractère (jusqu'à %(max_length)s)"
+
+#~ msgid "Comma-separated integers"
+#~ msgstr "Des entiers séparés par une virgule"
+
+#~ msgid "Date (without time)"
+#~ msgstr "Date (sans l'heure)"
+
+#~ msgid "Date (with time)"
+#~ msgstr "Date (avec l'heure)"
+
+#~ msgid "Decimal number"
+#~ msgstr "Nombre décimal"
+
+#~ msgid "E-mail address"
+#~ msgstr "Adresse électronique"
+
+#~ msgid "File path"
+#~ msgstr "Chemin vers le fichier"
+
+#~ msgid "Floating point number"
+#~ msgstr "Nombre à virgule flottante"
+
+#~ msgid "IP address"
+#~ msgstr "adresse IP"
+
+#~ msgid "Boolean (Either True, False or None)"
+#~ msgstr "Booléen (soit vrai, faux ou nul)"
+
+#~ msgid "Relation to parent model"
+#~ msgstr "Relation au modèle parent"
+
+#~ msgid "Phone number"
+#~ msgstr "Numéro de téléphone"
+
+#~ msgid "Text"
+#~ msgstr "Texte"
+
+#~ msgid "Time"
+#~ msgstr "Heure"
+
+#~ msgid "URL"
+#~ msgstr "URL"
+
+#~ msgid "U.S. state (two uppercase letters)"
+#~ msgstr "État Américain (deux lettres majuscules)"
+
+#~ msgid "XML text"
+#~ msgstr "Texte XML"
+
+#~ msgid "%s does not appear to be a urlpattern object"
+#~ msgstr "%s ne semble pas être un objet urlpattern"
+
+#~ msgid "Bookmarklets"
+#~ msgstr "Signets"
+
+#~ msgid "Documentation bookmarklets"
+#~ msgstr "Documentation des signets"
+
+#~ msgid ""
+#~ "\n"
+#~ "<p class=\"help\">To install bookmarklets, drag the link to your "
+#~ "bookmarks\n"
+#~ "toolbar, or right-click the link and add it to your bookmarks. Now you "
+#~ "can\n"
+#~ "select the bookmarklet from any page in the site.  Note that some of "
+#~ "these\n"
+#~ "bookmarklets require you to be viewing the site from a computer "
+#~ "designated\n"
+#~ "as \"internal\" (talk to your system administrator if you aren't sure if\n"
+#~ "your computer is \"internal\").</p>\n"
+#~ msgstr ""
+#~ "\n"
+#~ "<p class=\"help\">Pour installer des signets, faites glisser le lien vers "
+#~ "votre barre \n"
+#~ "de marques-pages, ou effectuez un clic droit dessus et ajoutez-le.\n"
+#~ "Maintenant, vous pouvez le sélectionner depuis n'importe quelle page\n"
+#~ "du site. Notez que certains d'entre eux nécessitent que vous visionniez\n"
+#~ "le site depuis un ordinateur dit « interne » (contactez votre "
+#~ "administrateur\n"
+#~ "système si vous n'êtes pas sûr que votre ordinateur le soit).</p>\n"
+
+#~ msgid "Documentation for this page"
+#~ msgstr "Documentation pour cette page"
+
+#~ msgid ""
+#~ "Jumps you from any page to the documentation for the view that generates "
+#~ "that page."
+#~ msgstr ""
+#~ "Vous envoie de n'importe quelle page vers la documentation de la vue qui "
+#~ "a généré cette page."
+
+#~ msgid "Show object ID"
+#~ msgstr "Afficher l'identifiant de l'objet"
+
+#~ msgid ""
+#~ "Shows the content-type and unique ID for pages that represent a single "
+#~ "object."
+#~ msgstr ""
+#~ "Affiche le content-type et l'identifiant unique pour les pages qui "
+#~ "représentent un objet unique."
+
+#~ msgid "Edit this object (current window)"
+#~ msgstr "Modifier cet objet (fenêtre actuelle)"
+
+#~ msgid "Jumps to the admin page for pages that represent a single object."
+#~ msgstr "Renvoie à la page d'administration qui représente un objet seul."
+
+#~ msgid "Edit this object (new window)"
+#~ msgstr "Modifier cet objet (nouvelle fenêtre)"
+
+#~ msgid "As above, but opens the admin page in a new window."
+#~ msgstr ""
+#~ "Comme ci-dessus, mais ouvre la page d'administration dans une nouvelle "
+#~ "fenêtre."
+
+#~ msgid "Personal info"
+#~ msgstr "Information personnelle"
+
+#~ msgid "Permissions"
+#~ msgstr "Permissions"
+
+#~ msgid "Important dates"
+#~ msgstr "Dates importantes"
+
+#~ msgid "Groups"
+#~ msgstr "Groupes"
+
+#~ msgid "Add user"
+#~ msgstr "Ajouter l'utilisateur"
+
+#~ msgid "Password changed successfully."
+#~ msgstr "Mot de passe modifié avec succès"
+
+#~ msgid "Change password: %s"
+#~ msgstr "Modifier le mot de passe : %s"
+
+#~ msgid ""
+#~ "Required. 30 characters or fewer. Alphanumeric characters only (letters, "
+#~ "digits and underscores)."
+#~ msgstr ""
+#~ "Requis. 30 caractères maximum, alphanumériques uniquement (lettres, "
+#~ "chiffres, et tirets bas _)."
+
+#~ msgid "This value must contain only letters, numbers and underscores."
+#~ msgstr ""
+#~ "Ce champ ne doit contenir que des lettres, des nombres et des tirets bas "
+#~ "_."
+
+#~ msgid "Password confirmation"
+#~ msgstr "Confirmation de votre mot de passe"
+
+#~ msgid "A user with that username already exists."
+#~ msgstr "Un utilisateur avec ce nom existe déjà."
+
+#~ msgid "The two password fields didn't match."
+#~ msgstr "Les deux mots de passe ne correspondent pas."
+
+#~ msgid "This account is inactive."
+#~ msgstr "Ce compte est inactif."
+
+#~ msgid ""
+#~ "Your Web browser doesn't appear to have cookies enabled. Cookies are "
+#~ "required for logging in."
+#~ msgstr ""
+#~ "Votre navigateur ne semble pas avoir activé les cookies. Les cookies sont "
+#~ "nécessaires pour se connecter."
+
+#~ msgid "E-mail"
+#~ msgstr "Courriel"
+
+#~ msgid ""
+#~ "That e-mail address doesn't have an associated user account. Are you sure "
+#~ "you've registered?"
+#~ msgstr ""
+#~ "Cette adresse électronique ne correspond à aucun compte utilisateur. Êtes-"
+#~ "vous sûr de vous être enregistré ?"
+
+#~ msgid "Password reset on %s"
+#~ msgstr "Mot de passe mis à jour sur %s"
+
+#~ msgid "New password"
+#~ msgstr "Nouveau mot de passe"
+
+#~ msgid "New password confirmation"
+#~ msgstr "Confirmation du nouveau mot de passe"
+
+#~ msgid "Old password"
+#~ msgstr "Ancien mot de passe"
+
+#~ msgid "Your old password was entered incorrectly. Please enter it again."
+#~ msgstr "Votre ancien mot de passe est incorrect. Veuillez le rectifier."
+
+#~ msgid "name"
+#~ msgstr "nom"
+
+#~ msgid "codename"
+#~ msgstr "nom de code"
+
+#~ msgid "permission"
+#~ msgstr "permission"
+
+#~ msgid "permissions"
+#~ msgstr "permissions"
+
+#~ msgid "group"
+#~ msgstr "groupe"
+
+#~ msgid "groups"
+#~ msgstr "groupes"
+
+#~ msgid "username"
+#~ msgstr "nom d'utilisateur"
+
+#~ msgid "first name"
+#~ msgstr "prénom"
+
+#~ msgid "last name"
+#~ msgstr "nom"
+
+#~ msgid "e-mail address"
+#~ msgstr "adresse électronique"
+
+#~ msgid "password"
+#~ msgstr "mot de passe"
+
+#~ msgid ""
+#~ "Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
+#~ "password form</a>."
+#~ msgstr ""
+#~ "Utilisez « [algo]$[salt]$[hexdigest] » ou le <a href=\"password/"
+#~ "\">formulaire de changement de mot de passe</a>."
+
+#~ msgid "staff status"
+#~ msgstr "statut équipe"
+
+#~ msgid "Designates whether the user can log into this admin site."
+#~ msgstr ""
+#~ "Précise si l'utilisateur peut se connecter à ce site d'administration."
+
+#~ msgid "active"
+#~ msgstr "actif"
+
+#~ msgid ""
+#~ "Designates whether this user should be treated as active. Unselect this "
+#~ "instead of deleting accounts."
+#~ msgstr ""
+#~ "Précise si l'utilisateur doit être considéré comme actif. Décochez ceci "
+#~ "plutôt que de supprimer le compte."
+
+#~ msgid "superuser status"
+#~ msgstr "statut super-utilisateur"
+
+#~ msgid ""
+#~ "Designates that this user has all permissions without explicitly "
+#~ "assigning them."
+#~ msgstr ""
+#~ "Précise que l'utilisateur possède toutes les permissions sans les "
+#~ "assigner explicitement."
+
+#~ msgid "last login"
+#~ msgstr "dernière connexion"
+
+#~ msgid "date joined"
+#~ msgstr "date d'inscription"
+
+#~ msgid ""
+#~ "In addition to the permissions manually assigned, this user will also get "
+#~ "all permissions granted to each group he/she is in."
+#~ msgstr ""
+#~ "En plus des permissions qui lui sont manuellement assignées, cet "
+#~ "utilisateur recevra aussi toutes les permissions de tous les groupes "
+#~ "auxquels il appartient. "
+
+#~ msgid "user permissions"
+#~ msgstr "permissions de l'utilisateur"
+
+#~ msgid "user"
+#~ msgstr "utilisateur"
+
+#~ msgid "users"
+#~ msgstr "utilisateurs"
+
+#~ msgid "message"
+#~ msgstr "message"
+
+#~ msgid "Logged out"
+#~ msgstr "Déconnecté"
+
+#~ msgid "Enter a valid e-mail address."
+#~ msgstr "Entrez une adresse de courriel valide."
+
+#~ msgid "Content"
+#~ msgstr "Contenu"
+
+#~ msgid "Metadata"
+#~ msgstr "Metadonnées"
+
+#~ msgid "Name"
+#~ msgstr "Nom"
+
+#~ msgid "Email address"
+#~ msgstr "Adresse électronique"
+
+#~ msgid "Comment"
+#~ msgstr "Commentaire"
+
+#~ msgid ""
+#~ "If you enter anything in this field your comment will be treated as spam"
+#~ msgstr ""
+#~ "Si vous saisissez quelque chose dans ce champ, votre commentaire sera "
+#~ "considéré comme étant indésirable"
+
+#~ msgid "Watch your mouth! The word %s is not allowed here."
+#~ msgid_plural "Watch your mouth! The words %s are not allowed here."
+#~ msgstr[0] "Attention à votre langage ! Le terme %s n'est pas autorisé ici."
+#~ msgstr[1] ""
+#~ "Attention à votre langage ! Les termes %s ne sont pas autorisés ici."
+
+#~ msgid "object ID"
+#~ msgstr "ID de l'objet"
+
+#~ msgid "user's name"
+#~ msgstr "nom de l'utilisateur"
+
+#~ msgid "user's email address"
+#~ msgstr "adresse électronique de l'utilisateur"
+
+#~ msgid "user's URL"
+#~ msgstr "URL de l'utilisateur"
+
+#~ msgid "comment"
+#~ msgstr "commentaire"
+
+#~ msgid "date/time submitted"
+#~ msgstr "date et heure soumises"
+
+#~ msgid "is public"
+#~ msgstr "est public"
+
+#~ msgid ""
+#~ "Uncheck this box to make the comment effectively disappear from the site."
+#~ msgstr ""
+#~ "Décochez cette case pour faire vraiment disparaître ce commentaire du "
+#~ "site."
+
+#~ msgid "is removed"
+#~ msgstr "est supprimé"
+
+#~ msgid ""
+#~ "Check this box if the comment is inappropriate. A \"This comment has been "
+#~ "removed\" message will be displayed instead."
+#~ msgstr ""
+#~ "Cochez cette case si le commentaire est inadéquat. Un message type « Ce "
+#~ "commentaire a été supprimé » sera affiché en lieu et place de celui-ci."
+
+#~ msgid ""
+#~ "This comment was posted by an authenticated user and thus the name is "
+#~ "read-only."
+#~ msgstr ""
+#~ "Ce commentaire a été posté par un utilisateur authentifié, le nom est "
+#~ "donc en lecture seule."
+
+#~ msgid ""
+#~ "This comment was posted by an authenticated user and thus the email is "
+#~ "read-only."
+#~ msgstr ""
+#~ "Ce commentaire a été posté par un utilisateur authentifié et le courriel "
+#~ "est donc en lecture seule"
+
+#~ msgid ""
+#~ "Posted by %(user)s at %(date)s\n"
+#~ "\n"
+#~ "%(comment)s\n"
+#~ "\n"
+#~ "http://%(domain)s%(url)s"
+#~ msgstr ""
+#~ "Posté par %(user)s le %(date)s\n"
+#~ "\n"
+#~ "%(comment)s\n"
+#~ "\n"
+#~ "http://%(domain)s%(url)s"
+
+#~ msgid "Approve a comment"
+#~ msgstr "Valider un commentaire"
+
+#~ msgid "Really make this comment public?"
+#~ msgstr "Voulez-vous rendre ce commentaire public ?"
+
+#~ msgid "Approve"
+#~ msgstr "Valider"
+
+#~ msgid "Thanks for approving"
+#~ msgstr "Merci pour cette validation"
+
+#~ msgid ""
+#~ "Thanks for taking the time to improve the quality of discussion on our "
+#~ "site"
+#~ msgstr ""
+#~ "Merci d'avoir pris le temps d'améliorer la qualité de la discussion sur "
+#~ "notre site"
+
+#~ msgid "Really remove this comment?"
+#~ msgstr "Voulez-vous supprimer définitivement ce commentaire ?"
+
+#~ msgid "Remove"
+#~ msgstr "Supprimer"
+
+#~ msgid "Thanks for removing"
+#~ msgstr "Merci pour cette suppression"
+
+#~ msgid "Flag this comment"
+#~ msgstr "Signaler ce commentaire"
+
+#~ msgid "Really flag this comment?"
+#~ msgstr "Voulez-vous vraiment signaler ce commentaire ?"
+
+#~ msgid "Flag"
+#~ msgstr "Signaler"
+
+#~ msgid "Thanks for flagging"
+#~ msgstr "Merci d'avoir signalé ce commentaire"
+
+#~ msgid "Post"
+#~ msgstr "Envoyer"
+
+#~ msgid "Preview"
+#~ msgstr "Prévisualiser"
+
+#~ msgid "Comment moderation queue"
+#~ msgstr "Liste de modération des commentaires"
+
+#~ msgid "No comments to moderate"
+#~ msgstr "Aucun commentaire à modérer"
+
+#~ msgid "Email"
+#~ msgstr "Courriel"
+
+#~ msgid "Authenticated?"
+#~ msgstr "Authentifié ?"
+
+#~ msgid "IP Address"
+#~ msgstr "Adresse IP"
+
+#~ msgid "Date posted"
+#~ msgstr "Date de soumission"
+
+#~ msgid "yes"
+#~ msgstr "oui"
+
+#~ msgid "no"
+#~ msgstr "non"
+
+#~ msgid "Thanks for commenting"
+#~ msgstr "Merci pour votre commentaire"
+
+#~ msgid "Thank you for your comment"
+#~ msgstr "Merci pour votre commentaire"
+
+#~ msgid "Preview your comment"
+#~ msgstr "Prévisualiser votre commentaire"
+
+#~ msgid "Please correct the error below"
+#~ msgid_plural "Please correct the errors below"
+#~ msgstr[0] "Veuillez corriger l'erreur suivante."
+#~ msgstr[1] "Veuillez corriger les erreurs suivantes."
+
+#~ msgid "Post your comment"
+#~ msgstr "Envoyer votre commentaire"
+
+#~ msgid "or make changes"
+#~ msgstr "ou le modifier"
+
+#~ msgid "python model class name"
+#~ msgstr "nom de la classe python du modèle"
+
+#~ msgid "content type"
+#~ msgstr "type de contenu"
+
+#~ msgid "content types"
+#~ msgstr "types de contenu"
+
+#~ msgid ""
+#~ "Example: '/about/contact/'. Make sure to have leading and trailing "
+#~ "slashes."
+#~ msgstr ""
+#~ "Par exemple, « /a_propos/contact/ ». Vérifiez la présence du caractère "
+#~ "« / » en début et en fin de chaîne."
+
+#~ msgid ""
+#~ "This value must contain only letters, numbers, underscores, dashes or "
+#~ "slashes."
+#~ msgstr ""
+#~ "Ce champ ne doit contenir que des lettres, des nombres, des tirets bas "
+#~ "« _ », des traits d'union, et des « / »."
+
+#~ msgid "Advanced options"
+#~ msgstr "Options avancées"
+
+#~ msgid "title"
+#~ msgstr "titre"
+
+#~ msgid "content"
+#~ msgstr "contenu"
+
+#~ msgid "enable comments"
+#~ msgstr "autoriser les commentaires"
+
+#~ msgid "template name"
+#~ msgstr "nom du template"
+
+#~ msgid ""
+#~ "Example: 'flatpages/contact_page.html'. If this isn't provided, the "
+#~ "system will use 'flatpages/default.html'."
+#~ msgstr ""
+#~ "Par exemple, « flatpages/contact_page.html ». Sans définition, le système "
+#~ "utilisera « flatpages/default.html »."
+
+#~ msgid "registration required"
+#~ msgstr "enregistrement requis"
+
+#~ msgid ""
+#~ "If this is checked, only logged-in users will be able to view the page."
+#~ msgstr ""
+#~ "Si coché, seuls les utilisateurs connectés auront la possibilité de voir "
+#~ "cette page."
+
+#~ msgid "flat page"
+#~ msgstr "page statique"
+
+#~ msgid "flat pages"
+#~ msgstr "pages statiques"
+
+#~ msgid ""
+#~ "We apologize, but your form has expired. Please continue filling out the "
+#~ "form from this page."
+#~ msgstr ""
+#~ "Nous sommes désolés, mais votre formulaire a expiré. Veuillez compléter "
+#~ "le formulaire sur cette page."
+
+#~ msgid "No geometry value provided."
+#~ msgstr "Valeur géométrique manquante."
+
+#~ msgid "Invalid geometry value."
+#~ msgstr "Valeur géométrique non valide"
+
+#~ msgid "Invalid geometry type."
+#~ msgstr "Type de géométrie non valide"
+
+#~ msgid "th"
+#~ msgstr "<sup>e</sup>"
+
+#~ msgid "st"
+#~ msgstr "<sup>er</sup>"
+
+#~ msgid "nd"
+#~ msgstr "<sup>d</sup>"
+
+#~ msgid "rd"
+#~ msgstr "<sup>e</sup>"
+
+#~ msgid "%(value).1f million"
+#~ msgid_plural "%(value).1f million"
+#~ msgstr[0] "%(value).1f million"
+#~ msgstr[1] "%(value).1f millions"
+
+#~ msgid "%(value).1f billion"
+#~ msgid_plural "%(value).1f billion"
+#~ msgstr[0] "%(value).1f milliard"
+#~ msgstr[1] "%(value).1f milliards"
+
+#~ msgid "%(value).1f trillion"
+#~ msgid_plural "%(value).1f trillion"
+#~ msgstr[0] "%(value).1f billion"
+#~ msgstr[1] "%(value).1f billions"
+
+#~ msgid "one"
+#~ msgstr "un"
+
+#~ msgid "two"
+#~ msgstr "deux"
+
+#~ msgid "three"
+#~ msgstr "trois"
+
+#~ msgid "four"
+#~ msgstr "quatre"
+
+#~ msgid "five"
+#~ msgstr "cinq"
+
+#~ msgid "six"
+#~ msgstr "six"
+
+#~ msgid "seven"
+#~ msgstr "sept"
+
+#~ msgid "eight"
+#~ msgstr "huit"
+
+#~ msgid "nine"
+#~ msgstr "neuf"
+
+#~ msgid "today"
+#~ msgstr "aujourd'hui"
+
+#~ msgid "tomorrow"
+#~ msgstr "demain"
+
+#~ msgid "yesterday"
+#~ msgstr "hier"
+
+#~ msgid "Enter a postal code in the format NNNN or ANNNNAAA."
+#~ msgstr "Saisissez un code postal au format NNNN ou ANNNNAAA."
+
+#~ msgid "This field requires only numbers."
+#~ msgstr "Ce champ ne doit contenir que des nombres."
+
+#~ msgid "This field requires 7 or 8 digits."
+#~ msgstr "Ce champ requiert 7 ou 8 chiffres."
+
+#~ msgid "Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format."
+#~ msgstr "Saisissez un numéro CUIT au format XX-XXXXXXXX-X ou XXXXXXXXXXXX."
+
+#~ msgid "Invalid CUIT."
+#~ msgstr "CUIT non valide."
+
+#~ msgid "Burgenland"
+#~ msgstr "Burgenland"
+
+#~ msgid "Carinthia"
+#~ msgstr "Carinthie"
+
+#~ msgid "Lower Austria"
+#~ msgstr "Basse-Autriche"
+
+#~ msgid "Upper Austria"
+#~ msgstr "Haute-Autriche"
+
+#~ msgid "Salzburg"
+#~ msgstr "Salzburg"
+
+#~ msgid "Styria"
+#~ msgstr "Styrie"
+
+#~ msgid "Tyrol"
+#~ msgstr "Tyrol"
+
+#~ msgid "Vorarlberg"
+#~ msgstr "Vorarlberg"
+
+#~ msgid "Vienna"
+#~ msgstr "Vienne"
+
+#~ msgid "Enter a zip code in the format XXXX."
+#~ msgstr "Saisissez un code postal norvégien au format XXXX."
+
+#~ msgid "Enter a valid Austrian Social Security Number in XXXX XXXXXX format."
+#~ msgstr ""
+#~ "Saisissez un numéro de sécurité sociale autrichien valide au format XXXX "
+#~ "XXXXXX."
+
+#~ msgid "Enter a 4 digit post code."
+#~ msgstr "Saisissez un code postal australien (4 chiffres)."
+
+#~ msgid "Enter a zip code in the format XXXXX-XXX."
+#~ msgstr "Saisissez un code postal brésilien au format XXXXX-XXX."
+
+#~ msgid "Phone numbers must be in XX-XXXX-XXXX format."
+#~ msgstr "Les numéros de téléphone doivent être au format XX-XXXX-XXXX."
+
+#~ msgid ""
+#~ "Select a valid brazilian state. That state is not one of the available "
+#~ "states."
+#~ msgstr ""
+#~ "Sélectionnez un état brésilien valide. Cet état ne fait pas partie de "
+#~ "ceux disponibles."
+
+#~ msgid "Invalid CPF number."
+#~ msgstr "Numéro CPF non valide."
+
+#~ msgid "This field requires at most 11 digits or 14 characters."
+#~ msgstr "Ce champ requiert au plus 11 chiffres ou 14 caractères."
+
+#~ msgid "Invalid CNPJ number."
+#~ msgstr "Numéro CNPJ non valide."
+
+#~ msgid "This field requires at least 14 digits"
+#~ msgstr "Ce champ requiert au minimum 14 chiffres"
+
+#~ msgid "Enter a postal code in the format XXX XXX."
+#~ msgstr "Saisissez un code postal au format XXX XXX."
+
+#~ msgid ""
+#~ "Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format."
+#~ msgstr ""
+#~ "Saisissez un numéro de sécurité sociale canadien au format XXX-XXX-XXX."
+
+#~ msgid "Aargau"
+#~ msgstr "Argovie"
+
+#~ msgid "Appenzell Innerrhoden"
+#~ msgstr "Appenzell Rhodes-Intérieures"
+
+#~ msgid "Appenzell Ausserrhoden"
+#~ msgstr "Appenzell Rhodes-Extérieures"
+
+#~ msgid "Basel-Stadt"
+#~ msgstr "Bâle-Ville"
+
+#~ msgid "Basel-Land"
+#~ msgstr "Bâle-Campagne"
+
+#~ msgid "Berne"
+#~ msgstr "Berne"
+
+#~ msgid "Fribourg"
+#~ msgstr "Fribourg"
+
+#~ msgid "Geneva"
+#~ msgstr "Genève"
+
+#~ msgid "Glarus"
+#~ msgstr "Glaris"
+
+#~ msgid "Graubuenden"
+#~ msgstr "Grisons"
+
+#~ msgid "Jura"
+#~ msgstr "Jura"
+
+#~ msgid "Lucerne"
+#~ msgstr "Lucerne"
+
+#~ msgid "Neuchatel"
+#~ msgstr "Neuchâtel"
+
+#~ msgid "Nidwalden"
+#~ msgstr "Nidwald"
+
+#~ msgid "Obwalden"
+#~ msgstr "Obwald"
+
+#~ msgid "Schaffhausen"
+#~ msgstr "Schaffhouse"
+
+#~ msgid "Schwyz"
+#~ msgstr "Schwyz"
+
+#~ msgid "Solothurn"
+#~ msgstr "Soleure"
+
+#~ msgid "St. Gallen"
+#~ msgstr "Saint Gall"
+
+#~ msgid "Thurgau"
+#~ msgstr "Thurgovie"
+
+#~ msgid "Ticino"
+#~ msgstr "Tessin"
+
+#~ msgid "Uri"
+#~ msgstr "Uri"
+
+#~ msgid "Valais"
+#~ msgstr "Valais"
+
+#~ msgid "Vaud"
+#~ msgstr "Vaud"
+
+#~ msgid "Zug"
+#~ msgstr "Zoug"
+
+#~ msgid "Zurich"
+#~ msgstr "Zurich"
+
+#~ msgid ""
+#~ "Enter a valid Swiss identity or passport card number in X1234567<0 or "
+#~ "1234567890 format."
+#~ msgstr ""
+#~ "Saisissez un numéro de passeport ou de carte d'identité suisse valide au "
+#~ "format X1234567<0 ou 1234567890."
+
+#~ msgid "Enter a valid Chilean RUT."
+#~ msgstr "Saisissez un RUT chilien valide."
+
+#~ msgid "Enter a valid Chilean RUT. The format is XX.XXX.XXX-X."
+#~ msgstr "Saisissez un RUT chilien valide au format XX.XXX.XXX-X."
+
+#~ msgid "The Chilean RUT is not valid."
+#~ msgstr "Ce RUT chilien est non valide."
+
+#~ msgid "Prague"
+#~ msgstr "Prague"
+
+# Ticket #10385
+#~ msgid "Cenral Bohemian Region"
+#~ msgstr "Bohême du Centre"
+
+#~ msgid "South Bohemian Region"
+#~ msgstr "Bohême du Sud"
+
+#~ msgid "Pilsen Region"
+#~ msgstr "Pilsen"
+
+#~ msgid "Carlsbad Region"
+#~ msgstr "Carlsbad"
+
+#~ msgid "Usti Region"
+#~ msgstr "Usti"
+
+#~ msgid "Liberec Region"
+#~ msgstr "Liberec"
+
+#~ msgid "Hradec Region"
+#~ msgstr "Hradec"
+
+#~ msgid "Pardubice Region"
+#~ msgstr "Pardubice"
+
+#~ msgid "Vysocina Region"
+#~ msgstr "Vysocina"
+
+#~ msgid "South Moravian Region"
+#~ msgstr "Moravie du Sud"
+
+#~ msgid "Olomouc Region"
+#~ msgstr "Olomouc"
+
+#~ msgid "Zlin Region"
+#~ msgstr "Zlin"
+
+#~ msgid "Moravian-Silesian Region"
+#~ msgstr "Moravie-Silésie"
+
+#~ msgid "Enter a postal code in the format XXXXX or XXX XX."
+#~ msgstr "Saisissez un code postal au format XXXXX ou XXX XX."
+
+#~ msgid "Enter a birth number in the format XXXXXX/XXXX or XXXXXXXXXX."
+#~ msgstr ""
+#~ "Saisissez une date de naissance au format XXXXXX/XXXX ou XXXXXXXXXX."
+
+#~ msgid "Invalid optional parameter Gender, valid values are 'f' and 'm'"
+#~ msgstr ""
+#~ "Le paramètre optionnel du genre est non valide, les valeurs autorisées "
+#~ "sont « f » et « m »"
+
+#~ msgid "Enter a valid birth number."
+#~ msgstr "Saisissez une date de naissance valide."
+
+#~ msgid "Enter a valid IC number."
+#~ msgstr "Saisissez un numéro IC valide."
+
+#~ msgid "Baden-Wuerttemberg"
+#~ msgstr "Bade-Wurtemberg"
+
+#~ msgid "Bavaria"
+#~ msgstr "Bavière"
+
+#~ msgid "Berlin"
+#~ msgstr "Berlin"
+
+#~ msgid "Brandenburg"
+#~ msgstr "Brandebourg"
+
+#~ msgid "Bremen"
+#~ msgstr "Brême"
+
+#~ msgid "Hamburg"
+#~ msgstr "Hambourg"
+
+#~ msgid "Hessen"
+#~ msgstr "Hess"
+
+#~ msgid "Mecklenburg-Western Pomerania"
+#~ msgstr "Mecklembourg-Poméranie occidentale"
+
+#~ msgid "Lower Saxony"
+#~ msgstr "Basse Saxe"
+
+#~ msgid "North Rhine-Westphalia"
+#~ msgstr "Rhénanie-du-Nord-Westphalie"
+
+#~ msgid "Rhineland-Palatinate"
+#~ msgstr "Rhénanie-Palatinat"
+
+#~ msgid "Saarland"
+#~ msgstr "Sarre"
+
+#~ msgid "Saxony"
+#~ msgstr "Saxe"
+
+#~ msgid "Saxony-Anhalt"
+#~ msgstr "Saxe-Anhalt"
+
+#~ msgid "Schleswig-Holstein"
+#~ msgstr "Schleswig-Holstein"
+
+#~ msgid "Thuringia"
+#~ msgstr "Thuringe"
+
+#~ msgid "Enter a zip code in the format XXXXX."
+#~ msgstr "Saisissez un code postal au format XXXXX."
+
+#~ msgid ""
+#~ "Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-"
+#~ "X format."
+#~ msgstr ""
+#~ "Saisissez un numéro de carte d'identité allemande au format XXXXXXXXXXX-"
+#~ "XXXXXXX-XXXXXXX-X."
+
+#~ msgid "Arava"
+#~ msgstr "Álava"
+
+#~ msgid "Albacete"
+#~ msgstr "Albacete"
+
+#~ msgid "Alacant"
+#~ msgstr "Alicante"
+
+#~ msgid "Almeria"
+#~ msgstr "Almería"
+
+#~ msgid "Avila"
+#~ msgstr "Ávila"
+
+#~ msgid "Badajoz"
+#~ msgstr "Badajoz"
+
+#~ msgid "Illes Balears"
+#~ msgstr "Îles Baléares"
+
+#~ msgid "Barcelona"
+#~ msgstr "Barcelone"
+
+#~ msgid "Burgos"
+#~ msgstr "Burgos"
+
+#~ msgid "Caceres"
+#~ msgstr "Cáceres"
+
+#~ msgid "Cadiz"
+#~ msgstr "Cadix"
+
+#~ msgid "Ciudad Real"
+#~ msgstr "Ciudad Real"
+
+#~ msgid "Cordoba"
+#~ msgstr "Córdoba"
+
+#~ msgid "A Coruna"
+#~ msgstr "La Corogne"
+
+#~ msgid "Cuenca"
+#~ msgstr "Cuenca"
+
+#~ msgid "Girona"
+#~ msgstr "Gérone"
+
+#~ msgid "Granada"
+#~ msgstr "Grenade"
+
+#~ msgid "Guadalajara"
+#~ msgstr "Guadalajara"
+
+#~ msgid "Guipuzkoa"
+#~ msgstr "Guipúzcoa"
+
+#~ msgid "Huelva"
+#~ msgstr "Huelva"
+
+#~ msgid "Huesca"
+#~ msgstr "Huesca"
+
+#~ msgid "Jaen"
+#~ msgstr "Jaén"
+
+#~ msgid "Leon"
+#~ msgstr "León"
+
+#~ msgid "Lleida"
+#~ msgstr "Lérida"
+
+#~ msgid "La Rioja"
+#~ msgstr "La Rioja"
+
+#~ msgid "Lugo"
+#~ msgstr "Lugo"
+
+#~ msgid "Madrid"
+#~ msgstr "Madrid"
+
+#~ msgid "Malaga"
+#~ msgstr "Málaga"
+
+#~ msgid "Murcia"
+#~ msgstr "Murcie"
+
+#~ msgid "Navarre"
+#~ msgstr "Navarre"
+
+#~ msgid "Ourense"
+#~ msgstr "Orense"
+
+#~ msgid "Asturias"
+#~ msgstr "Asturias"
+
+#~ msgid "Palencia"
+#~ msgstr "Palencia"
+
+#~ msgid "Las Palmas"
+#~ msgstr "Las Palmas"
+
+#~ msgid "Pontevedra"
+#~ msgstr "Pontevedra"
+
+#~ msgid "Salamanca"
+#~ msgstr "Salamanca"
+
+#~ msgid "Santa Cruz de Tenerife"
+#~ msgstr "Santa Cruz de Ténérife"
+
+#~ msgid "Cantabria"
+#~ msgstr "Cantabrie"
+
+#~ msgid "Segovia"
+#~ msgstr "Ségovie"
+
+#~ msgid "Seville"
+#~ msgstr "Séville"
+
+#~ msgid "Soria"
+#~ msgstr "Soria"
+
+#~ msgid "Tarragona"
+#~ msgstr "Tarragone"
+
+#~ msgid "Teruel"
+#~ msgstr "Teruel"
+
+#~ msgid "Toledo"
+#~ msgstr "Toledo"
+
+#~ msgid "Valencia"
+#~ msgstr "Valence"
+
+#~ msgid "Valladolid"
+#~ msgstr "Valladolid"
+
+#~ msgid "Bizkaia"
+#~ msgstr "Biscaye"
+
+#~ msgid "Zamora"
+#~ msgstr "Zamora"
+
+#~ msgid "Zaragoza"
+#~ msgstr "Saragosse"
+
+#~ msgid "Ceuta"
+#~ msgstr "Ceuta"
+
+#~ msgid "Melilla"
+#~ msgstr "Melilla"
+
+#~ msgid "Andalusia"
+#~ msgstr "Andalousie"
+
+#~ msgid "Aragon"
+#~ msgstr "Aragon"
+
+#~ msgid "Principality of Asturias"
+#~ msgstr "Principauté des Asturies"
+
+#~ msgid "Balearic Islands"
+#~ msgstr "Îles Baléares"
+
+#~ msgid "Basque Country"
+#~ msgstr "Pays basque"
+
+#~ msgid "Canary Islands"
+#~ msgstr "Îles Canaries"
+
+#~ msgid "Castile-La Mancha"
+#~ msgstr "Castille-La Manche"
+
+#~ msgid "Castile and Leon"
+#~ msgstr "Castille-et-León"
+
+#~ msgid "Catalonia"
+#~ msgstr "Catalogne"
+
+#~ msgid "Extremadura"
+#~ msgstr "Estrémadure"
+
+#~ msgid "Galicia"
+#~ msgstr "Galice"
+
+#~ msgid "Region of Murcia"
+#~ msgstr "Murcie"
+
+#~ msgid "Foral Community of Navarre"
+#~ msgstr "Navarre"
+
+#~ msgid "Valencian Community"
+#~ msgstr "Communauté valencienne"
+
+#~ msgid "Enter a valid postal code in the range and format 01XXX - 52XXX."
+#~ msgstr ""
+#~ "Saisissez un code postal dans l'intervalle et au format 01XXX - 52XXX."
+
+#~ msgid ""
+#~ "Enter a valid phone number in one of the formats 6XXXXXXXX, 8XXXXXXXX or "
+#~ "9XXXXXXXX."
+#~ msgstr ""
+#~ "Saisissez un numéro de téléphone au format 6XXXXXXXX, 8XXXXXXXX ou "
+#~ "9XXXXXXXX."
+
+#~ msgid "Please enter a valid NIF, NIE, or CIF."
+#~ msgstr "Saisissez une adresse NIF, NIE ou CIF valide."
+
+#~ msgid "Please enter a valid NIF or NIE."
+#~ msgstr "Saisissez un NIF ou NIE valide."
+
+#~ msgid "Invalid checksum for NIF."
+#~ msgstr "Mauvais checksum pour NIF."
+
+#~ msgid "Invalid checksum for NIE."
+#~ msgstr "Mauvais checksum pour NIE."
+
+#~ msgid "Invalid checksum for CIF."
+#~ msgstr "Mauvais checksum pour CIF."
+
+#~ msgid ""
+#~ "Please enter a valid bank account number in format XXXX-XXXX-XX-"
+#~ "XXXXXXXXXX."
+#~ msgstr ""
+#~ "Saisissez un numéro de compte bancaire valide au format XXXXX-XXXX-XX-"
+#~ "XXXXXXXXXX."
+
+#~ msgid "Invalid checksum for bank account number."
+#~ msgstr "Somme de contrôle non valide pour le numéro de compte bancaire."
+
+#~ msgid "Enter a valid Finnish social security number."
+#~ msgstr "Saisissez un numéro de sécurité sociale finlandais."
+
+#~ msgid "Enter a zip code in the format XXXXXXX."
+#~ msgstr "Saisissez un code postal au format XXXXXXX."
+
+#~ msgid ""
+#~ "Enter a valid Icelandic identification number. The format is XXXXXX-XXXX."
+#~ msgstr "Saisissez un code postal islandais valide au format XXXXXX-XXXX."
+
+#~ msgid "The Icelandic identification number is not valid."
+#~ msgstr "Le numéro d'identification islandais est non valide."
+
+#~ msgid "Enter a valid zip code."
+#~ msgstr "Saisissez un code postal valide."
+
+#~ msgid "Enter a valid Social Security number."
+#~ msgstr "Saisissez un numéro valide de Sécurité Sociale."
+
+#~ msgid "Enter a valid VAT number."
+#~ msgstr "Saisissez un numéro de TVA valide."
+
+#~ msgid "Enter a postal code in the format XXXXXXX or XXX-XXXX."
+#~ msgstr "Saisissez un code postal japonais au format XXXXXXX ou XXX-XXXX."
+
+#~ msgid "Hokkaido"
+#~ msgstr "Hokkaidō"
+
+#~ msgid "Aomori"
+#~ msgstr "Aomori"
+
+#~ msgid "Iwate"
+#~ msgstr "Iwate"
+
+#~ msgid "Miyagi"
+#~ msgstr "Miyagi"
+
+#~ msgid "Akita"
+#~ msgstr "Akita"
+
+#~ msgid "Yamagata"
+#~ msgstr "Yamagata"
+
+#~ msgid "Fukushima"
+#~ msgstr "Fukushima"
+
+#~ msgid "Ibaraki"
+#~ msgstr "Ibaraki"
+
+#~ msgid "Tochigi"
+#~ msgstr "Tochigi"
+
+#~ msgid "Gunma"
+#~ msgstr "Gunma"
+
+#~ msgid "Saitama"
+#~ msgstr "Saitama"
+
+#~ msgid "Chiba"
+#~ msgstr "Chiba"
+
+#~ msgid "Tokyo"
+#~ msgstr "Tokyo"
+
+#~ msgid "Kanagawa"
+#~ msgstr "Kanagawa"
+
+#~ msgid "Yamanashi"
+#~ msgstr "Yamanashi"
+
+#~ msgid "Nagano"
+#~ msgstr "Nagano"
+
+#~ msgid "Niigata"
+#~ msgstr "Niigata"
+
+#~ msgid "Toyama"
+#~ msgstr "Toyama"
+
+#~ msgid "Ishikawa"
+#~ msgstr "Ishikawa"
+
+#~ msgid "Fukui"
+#~ msgstr "Fukui"
+
+#~ msgid "Gifu"
+#~ msgstr "Gifu"
+
+#~ msgid "Shizuoka"
+#~ msgstr "Shizuoka"
+
+#~ msgid "Aichi"
+#~ msgstr "Aichi"
+
+#~ msgid "Mie"
+#~ msgstr "Mie"
+
+#~ msgid "Shiga"
+#~ msgstr "Shiga"
+
+#~ msgid "Osaka"
+#~ msgstr "Osaka"
+
+#~ msgid "Hyogo"
+#~ msgstr "Hyōgo"
+
+#~ msgid "Nara"
+#~ msgstr "Nara"
+
+#~ msgid "Wakayama"
+#~ msgstr "Wakayama"
+
+#~ msgid "Tottori"
+#~ msgstr "Tottori"
+
+#~ msgid "Shimane"
+#~ msgstr "Shimane"
+
+#~ msgid "Okayama"
+#~ msgstr "Okayama"
+
+#~ msgid "Hiroshima"
+#~ msgstr "Hiroshima"
+
+#~ msgid "Yamaguchi"
+#~ msgstr "Yamaguchi"
+
+#~ msgid "Tokushima"
+#~ msgstr "Tokushima"
+
+#~ msgid "Kagawa"
+#~ msgstr "Kagawa"
+
+#~ msgid "Ehime"
+#~ msgstr "Ehime"
+
+#~ msgid "Kochi"
+#~ msgstr "Kochi"
+
+#~ msgid "Fukuoka"
+#~ msgstr "Fukuoka"
+
+#~ msgid "Saga"
+#~ msgstr "Saga"
+
+#~ msgid "Nagasaki"
+#~ msgstr "Nagasaki"
+
+#~ msgid "Kumamoto"
+#~ msgstr "Kumamoto"
+
+#~ msgid "Oita"
+#~ msgstr "Ōita"
+
+#~ msgid "Miyazaki"
+#~ msgstr "Miyazaki"
+
+#~ msgid "Kagoshima"
+#~ msgstr "Kagoshima"
+
+#~ msgid "Okinawa"
+#~ msgstr "Okinawa"
+
+#~ msgid "Aguascalientes"
+#~ msgstr "Aguascalientes"
+
+#~ msgid "Baja California"
+#~ msgstr "Baja California"
+
+#~ msgid "Baja California Sur"
+#~ msgstr "Baja California Sur"
+
+#~ msgid "Campeche"
+#~ msgstr "Campeche"
+
+#~ msgid "Chihuahua"
+#~ msgstr "Chihuahua"
+
+#~ msgid "Chiapas"
+#~ msgstr "Chiapas"
+
+#~ msgid "Coahuila"
+#~ msgstr "Coahuila"
+
+#~ msgid "Colima"
+#~ msgstr "Colima"
+
+#~ msgid "Distrito Federal"
+#~ msgstr "District fédéral"
+
+#~ msgid "Durango"
+#~ msgstr "Durango"
+
+#~ msgid "Guerrero"
+#~ msgstr "Guerrero"
+
+#~ msgid "Guanajuato"
+#~ msgstr "Guanajuato"
+
+#~ msgid "Hidalgo"
+#~ msgstr "Hidalgo"
+
+#~ msgid "Jalisco"
+#~ msgstr "Jalisco"
+
+#~ msgid "Estado de México"
+#~ msgstr "État de Mexico"
+
+#~ msgid "Michoacán"
+#~ msgstr "Michoacán"
+
+#~ msgid "Morelos"
+#~ msgstr "Morelos"
+
+#~ msgid "Nayarit"
+#~ msgstr "Nayarit"
+
+#~ msgid "Nuevo León"
+#~ msgstr "Nuevo León"
+
+#~ msgid "Oaxaca"
+#~ msgstr "Oaxaca"
+
+#~ msgid "Puebla"
+#~ msgstr "Puebla"
+
+#~ msgid "Querétaro"
+#~ msgstr "Querétaro"
+
+#~ msgid "Quintana Roo"
+#~ msgstr "Quintana Roo"
+
+#~ msgid "Sinaloa"
+#~ msgstr "Sinaloa"
+
+#~ msgid "San Luis Potosí"
+#~ msgstr "San Luis Potosí"
+
+#~ msgid "Sonora"
+#~ msgstr "Sonora"
+
+#~ msgid "Tabasco"
+#~ msgstr "Tabasco"
+
+#~ msgid "Tamaulipas"
+#~ msgstr "Tamaulipas"
+
+#~ msgid "Tlaxcala"
+#~ msgstr "Tlaxcala"
+
+#~ msgid "Veracruz"
+#~ msgstr "Veracruz"
+
+#~ msgid "Yucatán"
+#~ msgstr "Yucatán"
+
+#~ msgid "Zacatecas"
+#~ msgstr "Zacatecas"
+
+#~ msgid "Enter a valid postal code"
+#~ msgstr "Saisissez un code postal valide."
+
+#~ msgid "Enter a valid phone number"
+#~ msgstr "Saisissez un numéro de téléphone valide."
+
+#~ msgid "Enter a valid SoFi number"
+#~ msgstr "Saisissez un numéro SoFi valide."
+
+#~ msgid "Drenthe"
+#~ msgstr "Drenthe"
+
+#~ msgid "Flevoland"
+#~ msgstr "Flevoland"
+
+#~ msgid "Friesland"
+#~ msgstr "Frise"
+
+#~ msgid "Gelderland"
+#~ msgstr "Gueldre"
+
+#~ msgid "Groningen"
+#~ msgstr "Groningue"
+
+#~ msgid "Limburg"
+#~ msgstr "Limbourg"
+
+#~ msgid "Noord-Brabant"
+#~ msgstr "Brabant-du-Nord"
+
+#~ msgid "Noord-Holland"
+#~ msgstr "Hollande-du-Nord"
+
+#~ msgid "Overijssel"
+#~ msgstr "Overĳssel"
+
+#~ msgid "Utrecht"
+#~ msgstr "Utrecht"
+
+#~ msgid "Zeeland"
+#~ msgstr "Zeeland"
+
+#~ msgid "Zuid-Holland"
+#~ msgstr "Hollande-Méridionale"
+
+#~ msgid "Enter a valid Norwegian social security number."
+#~ msgstr "Saisissez un numéro de sécurité sociale norvégien valide."
+
+#~ msgid "This field requires 8 digits."
+#~ msgstr "Ce champ requiert 8 chiffres."
+
+#~ msgid "This field requires 11 digits."
+#~ msgstr "Ce champ requiert 11 chiffres."
+
+#~ msgid "National Identification Number consists of 11 digits."
+#~ msgstr "Le numéro national d'identification (NIN) comporte 11 chiffres."
+
+#~ msgid "Wrong checksum for the National Identification Number."
+#~ msgstr ""
+#~ "Somme de contrôle non valide pour le numéro d'identification national."
+
+#~ msgid ""
+#~ "Enter a tax number field (NIP) in the format XXX-XXX-XX-XX or XX-XX-XXX-"
+#~ "XXX."
+#~ msgstr ""
+#~ "Saisissez un code NIP (impôts) au format XXX-XXX-XX-XX ou XX-XX-XXX-XXX."
+
+#~ msgid "Wrong checksum for the Tax Number (NIP)."
+#~ msgstr "Somme de contrôle non valide du numéro de taxe (NIP)."
+
+#~ msgid "National Business Register Number (REGON) consists of 7 or 9 digits."
+#~ msgstr ""
+#~ "Le numéro de registre du commerce national (REGON) comporte 7 ou 9 "
+#~ "chiffres."
+
+#~ msgid "Wrong checksum for the National Business Register Number (REGON)."
+#~ msgstr ""
+#~ "Somme de contrôle non valide pour le numéro de registre du commerce "
+#~ "national (REGON)."
+
+#~ msgid "Enter a postal code in the format XX-XXX."
+#~ msgstr "Saisissez un code postal au format XX-XXX."
+
+#~ msgid "Lower Silesia"
+#~ msgstr "Basse-Silésie"
+
+#~ msgid "Kuyavia-Pomerania"
+#~ msgstr "Cujavie-Poméranie"
+
+#~ msgid "Lublin"
+#~ msgstr "Lublin"
+
+#~ msgid "Lubusz"
+#~ msgstr "Lubusz"
+
+#~ msgid "Lodz"
+#~ msgstr "Łódź"
+
+#~ msgid "Lesser Poland"
+#~ msgstr "Petite-Pologne"
+
+#~ msgid "Masovia"
+#~ msgstr "Mazovie "
+
+#~ msgid "Opole"
+#~ msgstr "Opole"
+
+#~ msgid "Subcarpatia"
+#~ msgstr "Basses-Carpates"
+
+#~ msgid "Podlasie"
+#~ msgstr "Podlachie"
+
+#~ msgid "Pomerania"
+#~ msgstr "Poméranie"
+
+#~ msgid "Silesia"
+#~ msgstr "Silésie"
+
+#~ msgid "Swietokrzyskie"
+#~ msgstr "Swietokrzyskie"
+
+#~ msgid "Warmia-Masuria"
+#~ msgstr "Varmie-Mazurie"
+
+#~ msgid "Greater Poland"
+#~ msgstr "Grande-Pologne"
+
+#~ msgid "West Pomerania"
+#~ msgstr "Poméranie Occidentale"
+
+#~ msgid "Enter a valid CIF."
+#~ msgstr "Saisissez une CIF valide."
+
+#~ msgid "Enter a valid CNP."
+#~ msgstr "Saisissez une CNP valide."
+
+#~ msgid "Enter a valid IBAN in ROXX-XXXX-XXXX-XXXX-XXXX-XXXX format"
+#~ msgstr "Saisissez un IBAN valide au format ROXX-XXXX-XXXX-XXXX-XXXX-XXXX."
+
+#~ msgid "Phone numbers must be in XXXX-XXXXXX format."
+#~ msgstr "Les numéros de téléphone doivent être au format XXXX-XXXXXX."
+
+#~ msgid "Enter a valid postal code in the format XXXXXX"
+#~ msgstr "Saisissez un code postal valide au format XXXXXX"
+
+#~ msgid "Banska Bystrica"
+#~ msgstr "Banská Bystrica"
+
+#~ msgid "Banska Stiavnica"
+#~ msgstr "Banská Štiavnica"
+
+#~ msgid "Bardejov"
+#~ msgstr "Bardejov"
+
+#~ msgid "Banovce nad Bebravou"
+#~ msgstr "Bánovce nad Bebravou"
+
+#~ msgid "Brezno"
+#~ msgstr "Brezno"
+
+#~ msgid "Bratislava I"
+#~ msgstr "Bratislava·I"
+
+#~ msgid "Bratislava II"
+#~ msgstr "Bratislava·II"
+
+#~ msgid "Bratislava III"
+#~ msgstr "Bratislava·III"
+
+#~ msgid "Bratislava IV"
+#~ msgstr "Bratislava·IV"
+
+#~ msgid "Bratislava V"
+#~ msgstr "Bratislava·V"
+
+#~ msgid "Bytca"
+#~ msgstr "Bytča"
+
+#~ msgid "Cadca"
+#~ msgstr "Čadca"
+
+#~ msgid "Detva"
+#~ msgstr "Detva"
+
+#~ msgid "Dolny Kubin"
+#~ msgstr "Dolný Kubín"
+
+#~ msgid "Dunajska Streda"
+#~ msgstr "Dunajská Streda"
+
+#~ msgid "Galanta"
+#~ msgstr "Galanta"
+
+#~ msgid "Gelnica"
+#~ msgstr "Gelnica"
+
+#~ msgid "Hlohovec"
+#~ msgstr "Hlohovec"
+
+#~ msgid "Humenne"
+#~ msgstr "Humenné"
+
+#~ msgid "Ilava"
+#~ msgstr "Ilava"
+
+#~ msgid "Kezmarok"
+#~ msgstr "Kežmarok"
+
+#~ msgid "Komarno"
+#~ msgstr "Komárno"
+
+#~ msgid "Kosice I"
+#~ msgstr "Košice I"
+
+#~ msgid "Kosice II"
+#~ msgstr "Košice·II"
+
+#~ msgid "Kosice III"
+#~ msgstr "Košice III"
+
+#~ msgid "Kosice IV"
+#~ msgstr "Košice·IV"
+
+#~ msgid "Kosice - okolie"
+#~ msgstr "Košice–okolie"
+
+#~ msgid "Krupina"
+#~ msgstr "Krupina"
+
+#~ msgid "Kysucke Nove Mesto"
+#~ msgstr "Kysucké Nové Mesto"
+
+#~ msgid "Levice"
+#~ msgstr "Levice"
+
+#~ msgid "Levoca"
+#~ msgstr "Levoča"
+
+#~ msgid "Liptovsky Mikulas"
+#~ msgstr "Liptovský Mikuláš"
+
+#~ msgid "Lucenec"
+#~ msgstr "Lučenec"
+
+#~ msgid "Malacky"
+#~ msgstr "Malacky"
+
+#~ msgid "Martin"
+#~ msgstr "Martin"
+
+#~ msgid "Medzilaborce"
+#~ msgstr "Medzilaborce"
+
+#~ msgid "Michalovce"
+#~ msgstr "Michalovce"
+
+#~ msgid "Myjava"
+#~ msgstr "Myjava"
+
+#~ msgid "Namestovo"
+#~ msgstr "Námestovo"
+
+#~ msgid "Nitra"
+#~ msgstr "Nitra"
+
+#~ msgid "Nove Mesto nad Vahom"
+#~ msgstr "Nové Mesto nad Váhom"
+
+#~ msgid "Nove Zamky"
+#~ msgstr "Nové Zámky"
+
+#~ msgid "Partizanske"
+#~ msgstr "Partizánske"
+
+#~ msgid "Pezinok"
+#~ msgstr "Pezinok"
+
+#~ msgid "Piestany"
+#~ msgstr "Piešťany"
+
+#~ msgid "Poltar"
+#~ msgstr "Poltár"
+
+#~ msgid "Poprad"
+#~ msgstr "Poprad"
+
+#~ msgid "Povazska Bystrica"
+#~ msgstr "Považská Bystrica"
+
+#~ msgid "Presov"
+#~ msgstr "Prešov"
+
+#~ msgid "Prievidza"
+#~ msgstr "Prievidza"
+
+#~ msgid "Puchov"
+#~ msgstr "Púchov"
+
+#~ msgid "Revuca"
+#~ msgstr "Revúca"
+
+#~ msgid "Rimavska Sobota"
+#~ msgstr "Rimavská Sobota"
+
+#~ msgid "Roznava"
+#~ msgstr "Rožňava"
+
+#~ msgid "Ruzomberok"
+#~ msgstr "Ružomberok"
+
+#~ msgid "Sabinov"
+#~ msgstr "Sabinov"
+
+#~ msgid "Senec"
+#~ msgstr "Senec"
+
+#~ msgid "Senica"
+#~ msgstr "Senica"
+
+#~ msgid "Skalica"
+#~ msgstr "Skalica"
+
+#~ msgid "Snina"
+#~ msgstr "Snina"
+
+#~ msgid "Sobrance"
+#~ msgstr "Sobrance"
+
+#~ msgid "Spisska Nova Ves"
+#~ msgstr "Spišská Nová Ves"
+
+#~ msgid "Stara Lubovna"
+#~ msgstr "Stará Ľubovňa"
+
+#~ msgid "Stropkov"
+#~ msgstr "Stropkov"
+
+#~ msgid "Svidnik"
+#~ msgstr "Svidník"
+
+#~ msgid "Sala"
+#~ msgstr "Šaľa"
+
+#~ msgid "Topolcany"
+#~ msgstr "Topoľčany"
+
+#~ msgid "Trebisov"
+#~ msgstr "Trebišov"
+
+#~ msgid "Trencin"
+#~ msgstr "Trenčín"
+
+#~ msgid "Trnava"
+#~ msgstr "Trnava"
+
+#~ msgid "Turcianske Teplice"
+#~ msgstr "Turčianske Teplice"
+
+#~ msgid "Tvrdosin"
+#~ msgstr "Tvrdošín"
+
+#~ msgid "Velky Krtis"
+#~ msgstr "Veľký Krtíš"
+
+#~ msgid "Vranov nad Toplou"
+#~ msgstr "Vranov nad Topľou"
+
+#~ msgid "Zlate Moravce"
+#~ msgstr "Zlaté Moravce"
+
+#~ msgid "Zvolen"
+#~ msgstr "Zvolen"
+
+#~ msgid "Zarnovica"
+#~ msgstr "Žarnovica"
+
+#~ msgid "Ziar nad Hronom"
+#~ msgstr "Žiar nad Hronom"
+
+#~ msgid "Zilina"
+#~ msgstr "Žilina"
+
+#~ msgid "Banska Bystrica region"
+#~ msgstr "Région de Banská Bystrica"
+
+#~ msgid "Bratislava region"
+#~ msgstr "Région de Bratislava"
+
+#~ msgid "Kosice region"
+#~ msgstr "Région de Košice"
+
+#~ msgid "Nitra region"
+#~ msgstr "Nitra"
+
+#~ msgid "Presov region"
+#~ msgstr "Prešov"
+
+#~ msgid "Trencin region"
+#~ msgstr "Trenčín"
+
+#~ msgid "Trnava region"
+#~ msgstr "Trnava"
+
+#~ msgid "Zilina region"
+#~ msgstr "Žilina"
+
+#~ msgid "Enter a valid postcode."
+#~ msgstr "Saisissez un code postal valide."
+
+#~ msgid "Bedfordshire"
+#~ msgstr "Bedfordshire"
+
+#~ msgid "Buckinghamshire"
+#~ msgstr "Buckinghamshire"
+
+#~ msgid "Cheshire"
+#~ msgstr "Cheshire"
+
+#~ msgid "Cornwall and Isles of Scilly"
+#~ msgstr "Cornouailles et les îles Scilly"
+
+#~ msgid "Cumbria"
+#~ msgstr "Cumbrie"
+
+#~ msgid "Derbyshire"
+#~ msgstr "Derbyshire"
+
+#~ msgid "Devon"
+#~ msgstr "Devon"
+
+#~ msgid "Dorset"
+#~ msgstr "Dorset"
+
+#~ msgid "Durham"
+#~ msgstr "Durham"
+
+#~ msgid "East Sussex"
+#~ msgstr "Sussex de l'Est"
+
+#~ msgid "Essex"
+#~ msgstr "Essex"
+
+#~ msgid "Gloucestershire"
+#~ msgstr "Gloucestershire"
+
+#~ msgid "Greater London"
+#~ msgstr "Grand Londres"
+
+#~ msgid "Greater Manchester"
+#~ msgstr "Grand Manchester"
+
+#~ msgid "Hampshire"
+#~ msgstr "Hampshire"
+
+#~ msgid "Hertfordshire"
+#~ msgstr "Hertfordshire"
+
+#~ msgid "Kent"
+#~ msgstr "Kent"
+
+#~ msgid "Lancashire"
+#~ msgstr "Lancastre"
+
+#~ msgid "Leicestershire"
+#~ msgstr "Leicestershire"
+
+#~ msgid "Lincolnshire"
+#~ msgstr "Lincolnshire"
+
+#~ msgid "Merseyside"
+#~ msgstr "Merseyside"
+
+#~ msgid "Norfolk"
+#~ msgstr "Norfolk"
+
+#~ msgid "North Yorkshire"
+#~ msgstr "Yorkshire du Nord"
+
+#~ msgid "Northamptonshire"
+#~ msgstr "Northamptonshire"
+
+#~ msgid "Northumberland"
+#~ msgstr "Northumberland"
+
+#~ msgid "Nottinghamshire"
+#~ msgstr "Nottinghamshire"
+
+#~ msgid "Oxfordshire"
+#~ msgstr "Oxfordshire"
+
+#~ msgid "Shropshire"
+#~ msgstr "Shropshire"
+
+#~ msgid "Somerset"
+#~ msgstr "Somerset"
+
+#~ msgid "South Yorkshire"
+#~ msgstr "Yorkshire du Su"
+
+#~ msgid "Staffordshire"
+#~ msgstr "Staffordshire"
+
+#~ msgid "Suffolk"
+#~ msgstr "Suffolk"
+
+#~ msgid "Surrey"
+#~ msgstr "Surrey"
+
+#~ msgid "Tyne and Wear"
+#~ msgstr "Tyne et Wear"
+
+#~ msgid "Warwickshire"
+#~ msgstr "Warwickshire"
+
+#~ msgid "West Midlands"
+#~ msgstr "Midlands de l'Ouest"
+
+#~ msgid "West Sussex"
+#~ msgstr "Sussex de l'Ouest"
+
+#~ msgid "West Yorkshire"
+#~ msgstr "Yorkshire de l'Ouest"
+
+#~ msgid "Wiltshire"
+#~ msgstr "Wiltshire"
+
+#~ msgid "Worcestershire"
+#~ msgstr "Worcestershire"
+
+#~ msgid "County Antrim"
+#~ msgstr "Comté d'Antrim"
+
+#~ msgid "County Armagh"
+#~ msgstr "Comté d'Armagh"
+
+#~ msgid "County Down"
+#~ msgstr "Comté de Down"
+
+#~ msgid "County Fermanagh"
+#~ msgstr "Comté de Fermanagh"
+
+#~ msgid "County Londonderry"
+#~ msgstr "Comté de Londonderry"
+
+#~ msgid "County Tyrone"
+#~ msgstr "Comté de Tyrone"
+
+#~ msgid "Clwyd"
+#~ msgstr "Clwyd"
+
+#~ msgid "Dyfed"
+#~ msgstr "Dyfed"
+
+#~ msgid "Gwent"
+#~ msgstr "Gwent"
+
+#~ msgid "Gwynedd"
+#~ msgstr "Gwynedd"
+
+#~ msgid "Mid Glamorgan"
+#~ msgstr "Mid·Glamorgan"
+
+#~ msgid "Powys"
+#~ msgstr "Powys"
+
+#~ msgid "South Glamorgan"
+#~ msgstr "South Glamorgan"
+
+#~ msgid "West Glamorgan"
+#~ msgstr "West Glamorgan"
+
+#~ msgid "Borders"
+#~ msgstr "Borders"
+
+#~ msgid "Central Scotland"
+#~ msgstr "Écosse centrale"
+
+#~ msgid "Dumfries and Galloway"
+#~ msgstr "Dumfries and Galloway"
+
+#~ msgid "Fife"
+#~ msgstr "Fife"
+
+#~ msgid "Grampian"
+#~ msgstr "Grampian"
+
+#~ msgid "Highland"
+#~ msgstr "Highland"
+
+#~ msgid "Lothian"
+#~ msgstr "Lothian"
+
+#~ msgid "Orkney Islands"
+#~ msgstr "Orcades"
+
+#~ msgid "Shetland Islands"
+#~ msgstr "Îles Shetland"
+
+#~ msgid "Strathclyde"
+#~ msgstr "Strathclyde"
+
+#~ msgid "Tayside"
+#~ msgstr "Tayside"
+
+#~ msgid "Western Isles"
+#~ msgstr "Hébrides extérieures"
+
+#~ msgid "England"
+#~ msgstr "Angleterre"
+
+#~ msgid "Northern Ireland"
+#~ msgstr "Irlande du Nord"
+
+#~ msgid "Scotland"
+#~ msgstr "Écosse"
+
+#~ msgid "Wales"
+#~ msgstr "Pays de Galles"
+
+#~ msgid "Enter a zip code in the format XXXXX or XXXXX-XXXX."
+#~ msgstr "Saisissez un code postal américain au format XXXXX ou XXXXX-XXXX."
+
+#~ msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."
+#~ msgstr ""
+#~ "Saisissez un numéro de sécurité sociale américain au format XXX-XX-XXXX."
+
+#~ msgid "Enter a valid South African ID number"
+#~ msgstr "Saisissez un numéro d'identification sud-africain valide."
+
+#~ msgid "Enter a valid South African postal code"
+#~ msgstr "Saisissez un code postal sud-africain valide."
+
+#~ msgid "Eastern Cape"
+#~ msgstr "Cap-Oriental"
+
+#~ msgid "Free State"
+#~ msgstr "État-Libre"
+
+#~ msgid "Gauteng"
+#~ msgstr "Gauteng"
+
+#~ msgid "KwaZulu-Natal"
+#~ msgstr "KwaZulu-Natal"
+
+#~ msgid "Limpopo"
+#~ msgstr "Limpopo"
+
+#~ msgid "Mpumalanga"
+#~ msgstr "Mpumalanga"
+
+#~ msgid "Northern Cape"
+#~ msgstr "Cap-du-Nord"
+
+#~ msgid "North West"
+#~ msgstr "Nord-Ouest"
+
+#~ msgid "Western Cape"
+#~ msgstr "Cap-Occidental"
+
+#~ msgid "redirect from"
+#~ msgstr "redirigé depuis"
+
+#~ msgid ""
+#~ "This should be an absolute path, excluding the domain name. Example: '/"
+#~ "events/search/'."
+#~ msgstr ""
+#~ "Ceci doit être un chemin absolu, sans nom de domaine. Par exemple, « /"
+#~ "evenements/rechercher/ »."
+
+#~ msgid "redirect to"
+#~ msgstr "redirigé vers"
+
+#~ msgid ""
+#~ "This can be either an absolute path (as above) or a full URL starting "
+#~ "with 'http://'."
+#~ msgstr ""
+#~ "Ceci peut être soit un chemin absolu (voir ci-dessus) soit une URL "
+#~ "complète débutant par « http:// »."
+
+#~ msgid "redirect"
+#~ msgstr "redirige"
+
+#~ msgid "redirects"
+#~ msgstr "redirige"
+
+#~ msgid "session key"
+#~ msgstr "clé de session"
+
+#~ msgid "session data"
+#~ msgstr "données de session"
+
+#~ msgid "expire date"
+#~ msgstr "date d'expiration"
+
+#~ msgid "session"
+#~ msgstr "session"
+
+#~ msgid "sessions"
+#~ msgstr "sessions"
+
+#~ msgid "display name"
+#~ msgstr "nom à afficher"
+
+#~ msgid "sites"
+#~ msgstr "sites"
+
+#~ msgid "This value must be an integer."
+#~ msgstr "Cette valeur doit être un entier."
+
+#~ msgid "This value must be either True or False."
+#~ msgstr "Cette valeur doit être soit vraie (True) soit fausse (False)."
+
+#~ msgid "This field cannot be null."
+#~ msgstr "Ce champ ne peut pas être vide."
+
+#~ msgid "Enter only digits separated by commas."
+#~ msgstr "Saisissez uniquement des chiffres séparés par des virgules."
+
+#~ msgid "Enter a valid date in YYYY-MM-DD format."
+#~ msgstr "Saisissez une date valide au format AAAA-MM-JJ."
+
+#~ msgid "Invalid date: %s"
+#~ msgstr "Date non valide : %s"
+
+#~ msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
+#~ msgstr ""
+#~ "Saisissez une date et une heure valides au format AAAA-MM-JJ HH:MM[:ss[."
+#~ "uuuuuu]]."
+
+#~ msgid "This value must be a decimal number."
+#~ msgstr "Cette valeur doit être un nombre décimal."
+
+#~ msgid "This value must be a float."
+#~ msgstr "Cette valeur doit être un nombre réel."
+
+#~ msgid "This value must be either None, True or False."
+#~ msgstr ""
+#~ "Cette valeur doit être nulle (None), vraie (True) ou fausse (False)."
+
+#~ msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
+#~ msgstr "Saisissez une heure valide au format HH:MM[:ss[.uuuuuu]]."
+
+#~ msgid ""
+#~ "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+#~ msgstr ""
+#~ "Maintenez appuyé « Ctrl », ou « Commande (touche pomme) » sur un Mac, pour "
+#~ "en sélectionner plusieurs."
+
+#~ msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
+#~ msgid_plural ""
+#~ "Please enter valid %(self)s IDs. The values %(value)r are invalid."
+#~ msgstr[0] ""
+#~ "Saisissez un ID %(self)s valide. La valeur %(value)r est non valide."
+#~ msgstr[1] ""
+#~ "Saisissez des ID %(self)s valides. Les valeurs %(value)r sont non valides."
+
+#~ msgid "This field is required."
+#~ msgstr "Ce champ est obligatoire."
+
+#~ msgid "Enter a valid value."
+#~ msgstr "Saisissez une valeur valide."
+
+#~ msgid ""
+#~ "Ensure this value has at most %(max)d characters (it has %(length)d)."
+#~ msgstr ""
+#~ "Assurez-vous que cette valeur fait moins de %(max)d caractères "
+#~ "(actuellement %(length)d caractères)."
+
+#~ msgid ""
+#~ "Ensure this value has at least %(min)d characters (it has %(length)d)."
+#~ msgstr ""
+#~ "Assurez-vous que cette valeur fait plus de %(min)d caractères "
+#~ "(actuellement %(length)d caractères)."
+
+#~ msgid "Enter a whole number."
+#~ msgstr "Saisissez un nombre entier."
+
+#~ msgid "Ensure this value is less than or equal to %s."
+#~ msgstr "Assurez-vous que cette valeur est inférieure ou égale à %s."
+
+#~ msgid "Ensure this value is greater than or equal to %s."
+#~ msgstr "Assurez-vous que cette valeur est supérieure ou égale à %s."
+
+#~ msgid "Enter a number."
+#~ msgstr "Saisissez un nombre."
+
+#~ msgid "Ensure that there are no more than %s digits in total."
+#~ msgstr "Assurez-vous qu'il n'y a pas plus de %s chiffres au total."
+
+#~ msgid "Ensure that there are no more than %s decimal places."
+#~ msgstr "Assurez-vous qu'il n'y a pas plus de %s chiffres après la virgule."
+
+#~ msgid ""
+#~ "Ensure that there are no more than %s digits before the decimal point."
+#~ msgstr "Assurez-vous qu'il n'y a pas plus de %s chiffres avant la virgule."
+
+#~ msgid "Enter a valid date."
+#~ msgstr "Saisissez une date valide."
+
+#~ msgid "Enter a valid time."
+#~ msgstr "Saisissez une heure valide."
+
+#~ msgid "Enter a valid date/time."
+#~ msgstr "Saisissez une date et une heure valides."
+
+#~ msgid "No file was submitted. Check the encoding type on the form."
+#~ msgstr ""
+#~ "Aucun fichier n'a été soumis. Vérifiez le type d'encodage du formulaire."
+
+#~ msgid "No file was submitted."
+#~ msgstr "Aucun fichier n'a été soumis."
+
+#~ msgid "The submitted file is empty."
+#~ msgstr "Le fichier soumis est vide."
+
+#~ msgid ""
+#~ "Upload a valid image. The file you uploaded was either not an image or a "
+#~ "corrupted image."
+#~ msgstr ""
+#~ "Téléversez une image valide. Le fichier que vous avez transféré n'est pas "
+#~ "une image ou bien est corrompu."
+
+#~ msgid "Enter a valid URL."
+#~ msgstr "Saisissez une URL valide."
+
+#~ msgid "This URL appears to be a broken link."
+#~ msgstr "Cette URL semble être cassée."
+
+#~ msgid ""
+#~ "Select a valid choice. %(value)s is not one of the available choices."
+#~ msgstr "Sélectionnez un choix valide. %(value)s n'en fait pas partie."
+
+#~ msgid "Enter a list of values."
+#~ msgstr "Saisissez une liste de valeurs."
+
+#~ msgid "Enter a valid IPv4 address."
+#~ msgstr "Saisissez une adresse IPv4 valide."
+
+#~ msgid ""
+#~ "Enter a valid 'slug' consisting of letters, numbers, underscores or "
+#~ "hyphens."
+#~ msgstr ""
+#~ "Ce champ ne doit contenir que des lettres, des nombres, des tirets bas _ "
+#~ "et des traits d'union."
+
+# Si « : » est requis, créer un ticket
+#~ msgid "Order"
+#~ msgstr "Ordre"
+
+#~ msgid "%(model_name)s with this %(field_label)s already exists."
+#~ msgstr "Un(e) %(model_name)s avec ce %(field_label)s existe déjà."
+
+#~ msgid ""
+#~ "The inline foreign key did not match the parent instance primary key."
+#~ msgstr ""
+#~ "La clé étrangère en ligne ne correspond pas à la clé primaire de "
+#~ "l'instance parente."
+
+#~ msgid ""
+#~ "Select a valid choice. That choice is not one of the available choices."
+#~ msgstr ""
+#~ "Sélectionnez un choix valide. Ce choix ne fait pas partie de ceux "
+#~ "disponibles."
+
+#~ msgid "Select a valid choice. %s is not one of the available choices."
+#~ msgstr "Sélectionnez un choix valide ; %s n'en fait pas partie."
+
+#~ msgid "yes,no,maybe"
+#~ msgstr "oui, non, peut-être"
+
+#~ msgid "%(size)d byte"
+#~ msgid_plural "%(size)d bytes"
+#~ msgstr[0] "%(size)d octet"
+#~ msgstr[1] "%(size)d octets"
+
+#~ msgid "%.1f KB"
+#~ msgstr "%.1f Ko"
+
+#~ msgid "%.1f MB"
+#~ msgstr "%.1f Mo"
+
+#~ msgid "%.1f GB"
+#~ msgstr "%.1f Go"
+
+#~ msgid "p.m."
+#~ msgstr "après-midi"
+
+#~ msgid "a.m."
+#~ msgstr "matin"
+
+#~ msgid "PM"
+#~ msgstr "Après-midi"
+
+#~ msgid "AM"
+#~ msgstr "Matin"
+
+#~ msgid "midnight"
+#~ msgstr "minuit"
+
+#~ msgid "noon"
+#~ msgstr "midi"
+
+#~ msgid "Monday"
+#~ msgstr "lundi"
+
+#~ msgid "Tuesday"
+#~ msgstr "mardi"
+
+#~ msgid "Wednesday"
+#~ msgstr "mercredi"
+
+#~ msgid "Thursday"
+#~ msgstr "jeudi"
+
+#~ msgid "Friday"
+#~ msgstr "vendredi"
+
+#~ msgid "Saturday"
+#~ msgstr "samedi"
+
+#~ msgid "Sunday"
+#~ msgstr "dimanche"
+
+#~ msgid "Mon"
+#~ msgstr "lun"
+
+#~ msgid "Tue"
+#~ msgstr "mar"
+
+#~ msgid "Wed"
+#~ msgstr "mer"
+
+#~ msgid "Thu"
+#~ msgstr "jeu"
+
+#~ msgid "Fri"
+#~ msgstr "ven"
+
+#~ msgid "Sat"
+#~ msgstr "sam"
+
+#~ msgid "Sun"
+#~ msgstr "dim"
+
+# Les mois ne sont pas correctement traduisibles
+# http://code.djangoproject.com/ticket/9988
+#~ msgid "January"
+#~ msgstr "janvier"
+
+#~ msgid "February"
+#~ msgstr "février"
+
+#~ msgid "March"
+#~ msgstr "mars"
+
+#~ msgid "April"
+#~ msgstr "avril"
+
+#~ msgid "May"
+#~ msgstr "mai"
+
+#~ msgid "June"
+#~ msgstr "juin"
+
+#~ msgid "July"
+#~ msgstr "juillet"
+
+#~ msgid "August"
+#~ msgstr "août"
+
+#~ msgid "September"
+#~ msgstr "septembre"
+
+#~ msgid "October"
+#~ msgstr "octobre"
+
+#~ msgid "November"
+#~ msgstr "novembre"
+
+#~ msgid "December"
+#~ msgstr "décembre"
+
+#~ msgid "jan"
+#~ msgstr "jan"
+
+#~ msgid "feb"
+#~ msgstr "fév"
+
+#~ msgid "mar"
+#~ msgstr "mar"
+
+#~ msgid "apr"
+#~ msgstr "avr"
+
+#~ msgid "may"
+#~ msgstr "mai"
+
+#~ msgid "jun"
+#~ msgstr "jui"
+
+#~ msgid "jul"
+#~ msgstr "jul"
+
+#~ msgid "aug"
+#~ msgstr "aoû"
+
+#~ msgid "sep"
+#~ msgstr "sep"
+
+#~ msgid "oct"
+#~ msgstr "oct"
+
+#~ msgid "nov"
+#~ msgstr "nov"
+
+#~ msgid "dec"
+#~ msgstr "déc"
+
+#~ msgid "Jan."
+#~ msgstr "jan."
+
+#~ msgid "Feb."
+#~ msgstr "fév."
+
+#~ msgid "Aug."
+#~ msgstr "août"
+
+#~ msgid "Sept."
+#~ msgstr "sept."
+
+#~ msgid "Oct."
+#~ msgstr "oct."
+
+#~ msgid "Nov."
+#~ msgstr "nov."
+
+#~ msgid "Dec."
+#~ msgstr "déc."
+
+#~ msgid "or"
+#~ msgstr "ou"
+
+#~ msgid "year"
+#~ msgid_plural "years"
+#~ msgstr[0] "an"
+#~ msgstr[1] "ans"
+
+#~ msgid "month"
+#~ msgid_plural "months"
+#~ msgstr[0] "mois"
+#~ msgstr[1] "mois"
+
+#~ msgid "week"
+#~ msgid_plural "weeks"
+#~ msgstr[0] "semaine"
+#~ msgstr[1] "semaines"
+
+#~ msgid "day"
+#~ msgid_plural "days"
+#~ msgstr[0] "jour"
+#~ msgstr[1] "jours"
+
+#~ msgid "hour"
+#~ msgid_plural "hours"
+#~ msgstr[0] "heure"
+#~ msgstr[1] "heures"
+
+#~ msgid "minute"
+#~ msgid_plural "minutes"
+#~ msgstr[0] "minute"
+#~ msgstr[1] "minutes"
+
+#~ msgid "minutes"
+#~ msgstr "minutes"
+
+#~ msgid "%(number)d %(type)s"
+#~ msgstr "%(number)d %(type)s"
+
+#~ msgid ", %(number)d %(type)s"
+#~ msgstr ", %(number)d %(type)s"
+
+#~ msgid "DATE_FORMAT"
+#~ msgstr "j F Y"
+
+#~ msgid "TIME_FORMAT"
+#~ msgstr "G:i:s"
+
+#~ msgid "YEAR_MONTH_FORMAT"
+#~ msgstr "F Y"
+
+#~ msgid "MONTH_DAY_FORMAT"
+#~ msgstr "j F"
+
+#~ msgid "The %(verbose_name)s was created successfully."
+#~ msgstr "L'objet %(verbose_name)s a été créé avec succès."
+
+#~ msgid "The %(verbose_name)s was updated successfully."
+#~ msgstr "L'objet %(verbose_name)s a été mis à jour avec succès."
+
+#~ msgid "The %(verbose_name)s was deleted."
+#~ msgstr "L'objet %(verbose_name)s a été supprimé."

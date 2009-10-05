@@ -103,7 +103,10 @@ class SampleDataHelper:
         """
         self.remove()
 
-        self._db.update_system_config(s_simulation_mode=True, s_admin_mode=True, s_debug_mode=True)
+        # Add default administrator
+        self._db.add_default_system_account()
+
+        self._db.update_system_config(s_simulation_mode=True, s_debug_mode=True)
 
         # Create sample objects
         x10 = self._db.add_device_technology(dt_name=u"x10", 

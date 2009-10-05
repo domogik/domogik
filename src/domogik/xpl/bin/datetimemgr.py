@@ -39,6 +39,8 @@ Implements
 
 from time import localtime
 from domogik.xpl.lib.xplconnector import *
+from domogik.xpl.lib.module import xPLModule
+from domogik.xpl.common.xplmessage import XplMessage
 from domogik.common.configloader import *
 import time
 import signal
@@ -51,7 +53,7 @@ class xPLDateTime(xPLModule):
 
     def __init__(self):
         xPLModule.__init__(self, name = 'datetime')
-        self.__myxpl = Manager()
+        
         #TODO: Set it to 60 seconds instead of 10
         self._timer = xPLTimer(10, self._send_datetime, self.get_stop())
         self.register_timer(self._timer)
@@ -76,14 +78,14 @@ class xPLDateTime(xPLModule):
         time = "%s%s%s" % (self._f(dt[3]), self._f(dt[4]), self._f(dt[5]))
         datetime = "%s%s" % (date, time)
         datetimedaynumber = "%s%s" % (datetime, dt[6])
-        mess = Message()
+        mess = XplMessage()
         mess.set_type("xpl-trig")
         mess.set_schema("datetime.basic")
-        mess.set_data_key("date", date)
-        mess.set_data_key("time", time)
-        mess.set_data_key("datetime", datetime)
-        mess.set_data_key("format1", datetimedaynumber)
-        self.__myxpl.send(mess)
+        mess.add_data({"date" :  date})
+        mess.add_data({"time" :  time})
+        mess.add_data({"datetime" :  datetime})
+        mess.add_data({"format1" :  datetimedaynumber})
+        self._myxpl.send(mess)
 
 if __name__ == "__main__":
     xPLDateTime()

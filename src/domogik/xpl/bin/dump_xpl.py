@@ -38,6 +38,7 @@ Implements
 """
 
 from domogik.xpl.lib.xplconnector import *
+from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.lib.module import *
 
 
@@ -46,8 +47,8 @@ class Sniffer(xPLModule):
 
     def __init__(self):
         xPLModule.__init__(self, name = 'sniffer')
-        self.__myxpl = Manager()
-        Listener(self._sniffer_cb, self.__myxpl)
+        
+        Listener(self._sniffer_cb, self._myxpl)
 
     def _sniffer_cb(self, message):
         '''
