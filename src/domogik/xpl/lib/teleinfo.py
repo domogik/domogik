@@ -154,7 +154,7 @@ class TeleInfo:
             sum = 0
             for c in datas:
                 sum = sum + ord(c)
-            computed_checksum = ( sum & 0b111111 ) + 0x20
+            computed_checksum = ( sum & int("111111", 2) ) + 0x20
             return chr(computed_checksum) == checksum
 
 ###Exemple
@@ -165,5 +165,5 @@ def cb( frame):
         print "%s : %s" % (entry["name"], entry["value"])
 
 if __name__ == "__main__":
-    tele = TeleInfo('/dev/ttyUSB0', cb, 5)
+    tele = TeleInfo('/dev/ttyUSB1', cb, 5)
     tele.start()
