@@ -70,12 +70,12 @@ class SysManager(xPLModule):
             'dawndusk': 'main()'}
         self._log = self.get_my_logger()
         self._log.debug("Init system manager")
-        self.__myxpl = Manager()
-        Listener(self._sys_cb, self.__myxpl, {
+        
+        Listener(self._sys_cb, self._myxpl, {
             'schema': 'domogik.system',
             'type': 'xpl-cmnd',
         })
-        self._config = Query(self.__myxpl)
+        self._config = Query(self._myxpl)
         res = xPLResult()
         self._config.query('global', 'pid_dir_path', res)
 #        res.get_lock().wait()
@@ -114,7 +114,7 @@ class SysManager(xPLModule):
                     mess.add_data({'module' :  mod})
                     mess.add_data({'force' :  force})
                     mess.add_data({'error' :  error})
-                    self.__myxpl.send(mess)
+                    self._myxpl.send(mess)
             elif cmd == "stop":
                 ret = self._stop_comp(mod)
                 if ret == 0:
@@ -135,7 +135,7 @@ class SysManager(xPLModule):
         mess.add_data({'module' :  mod})
         mess.add_data({'force' :  force})
         mess.add_data({'error' :  error})
-        self.__myxpl.send(mess)
+        self._myxpl.send(mess)
 
     def _stop_comp(self, name):
         '''

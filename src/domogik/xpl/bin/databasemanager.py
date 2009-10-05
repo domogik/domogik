@@ -43,6 +43,7 @@ Implements
 from datetime import datetime 
 
 from domogik.xpl.lib.xplconnector import *
+from domogik.xpl.lib.module import xPLModule
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.common.configloader import *
 from domogik.common.database import DbHelper
@@ -60,10 +61,10 @@ class DBConnector(xPLModule):
         xPLModule.__init__(self, 'dbmgr')
         self._log = self.get_my_logger()
         self._log.debug("Init database_manager instance")
-        self.__myxpl = Manager()
+        
         self._db = DbHelper()
         self._stats = StatsManager(self._db)
-        Listener(self._request_config_cb, self.__myxpl,
+        Listener(self._request_config_cb, self._myxpl,
                 {'schema': 'domogik.config', 'type': 'xpl-cmnd'})
         #cfgloader = Loader('database')
         #config = cfgloader.load()[1]
@@ -85,7 +86,7 @@ class DBConnector(xPLModule):
 #        self._prefix = config['prefix']
     def _request_config_cb(self, message):
         '''
-        Callback to receive a request for some config stuff
+        -allback to receive a request for some config stuff
         @param message : the xPL message
         '''
         #try:
@@ -139,7 +140,7 @@ class DBConnector(xPLModule):
         else:
             mess.add_data({key :  value})
 #        mess.set_conf_key('target', module)
-        self.__myxpl.send(mess)
+        self._myxpl.send(mess)
 
     def _fetch_elmt_config(self, techno, element, key):
         '''
@@ -163,10 +164,10 @@ class DBConnector(xPLModule):
         @param key : the key of the config tuple to fetch
         '''
         #TODO : use the database
-        vals = {'x10': {'heyu_cfg_path':'/etc/heyu/x10.conf',
-            'heyu_file_0': 'TTY /dev/ttyUSB0',
-            'heyu_file_1': 'TTY_AUX /dev/ttyUSB0 RFXCOM',
-            'heyu_file_2': 'ALIAS back_door D5 DS10A 0x677'},
+        vals = {'x10': {'heyu-cfg-path':'/etc/heyu/x10.conf',
+            'heyu-file-0': 'TTY /dev/ttyUSB0',
+            'heyu-file-1': 'TTY_AUX /dev/ttyUSB0 RFXCOM',
+            'heyu-file-2': 'ALIAS back_door D5 DS10A 0x677'},
                 'global': {'pid_dir_path': '/tmp/'},
                 'onewire': {'temperature_refresh_delay' : '10'},
                 'teleinfo' : {'device' : '/dev/ttyUSB0',
@@ -187,15 +188,15 @@ class StatsManager(xPLModule):
     def __init__(self, db):
         xPLModule.__init__(self, 'statmgr')
         self._log = self.get_my_logger()
-        self.__myxpl = Manager()
+        
         self.__dbhelper = db
-        l_x10 = Listener(self._x10_cb, self.__myxpl,
+        l_x10 = Listener(self._x10_cb, self._myxpl,
                 {'schema': 'x10.basic', 'type': 'xpl-trig'})
-        l_ow = Listener(self._onewire_cb, self.__myxpl,
+        l_ow = Listener(self._onewire_cb, self._myxpl,
                 {'schema': 'sensor.basic', 'type': 'xpl-trig','type': 'onewire'})
-        l_plcbus = Listener(self._plcbus_cb, self.__myxpl,
+        l_plcbus = Listener(self._plcbus_cb, self._myxpl,
                 {'schema': 'control.basic', 'type': 'xpl-trig','type':'plcbus'})
-        l_hb = Listener(self._sys_cb, self.__myxpl,
+        l_hb = Listener(self._sys_cb, self._myxpl,
                 {'schema': 'hbeat.app', 'type': 'xpl-stat'})
         self._log.debug("Stats manager initialized")
 

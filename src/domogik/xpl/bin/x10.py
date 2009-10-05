@@ -59,11 +59,10 @@ class x10Main(xPLModule):
         '''
         xPLModule.__init__(self, name = 'x10')
         self._heyu_cfg_path_res = ""
-        self.__myxpl = Manager()
-        self._config = Query(self.__myxpl)
+        self._config = Query(self._myxpl)
         res = xPLResult()
-        self._config.query('x10', 'heyu_cfg_path', res)
-        self._heyu_cfg_path_res = res.get_value()['heyu_cfg_path']
+        self._config.query('x10', 'heyu-cfg-path', res)
+        self._heyu_cfg_path_res = res.get_value()['heyu-cfg-path']
         try:
             pass
             self.__myx10 = X10API(self._heyu_cfg_path_res)
@@ -71,13 +70,13 @@ class x10Main(xPLModule):
             print "Something went wrong during heyu init, check logs"
             exit(1)
         #Create listeners
-        Listener(self.x10_cmnd_cb, self.__myxpl, {'schema': 'x10.basic',
+        Listener(self.x10_cmnd_cb, self._myxpl, {'schema': 'x10.basic',
                 'type': 'xpl-cmnd'})
         #One listener for system schema, allowing to reload config
-        Listener(self.heyu_reload_config, self.__myxpl, {'schema': 'domogik.system',
+        Listener(self.heyu_reload_config, self._myxpl, {'schema': 'domogik.system',
            'type': 'xpl-cmnd', 'command': 'reload', 'module': 'x10'})
         #One listener for system schema, allowing to dump config
-        Listener(self.heyu_dump_config, self.__myxpl, {'schema': 'domogik.system',
+        Listener(self.heyu_dump_config, self._myxpl, {'schema': 'domogik.system',
             'type': 'xpl-cmnd', 'command': 'push_config', 'module': 'x10'})
         self._log = self.get_my_logger()
 #        self._monitor = X10Monitor(self._heyu_cfg_path_res)
@@ -93,7 +92,7 @@ class x10Main(xPLModule):
         '''
         #Heyu config items
         res = xPLResult()
-#        self._config = Query(self.__myxpl)
+#        self._config = Query(self._myxpl)
         self._config.query('x10','', res)
         result = res.get_value()
         if result is not None:
@@ -132,7 +131,7 @@ class x10Main(xPLModule):
             count = count + 1
             m.add_data({key :  line})
         #print "Message is : %s" % m
-        self.__myxpl.send(m)
+        self._myxpl.send(m)
 
 
     def x10_cmnd_cb(self, message):
@@ -181,7 +180,7 @@ class x10Main(xPLModule):
         mess.add_data({"command" :  order})
         if args:
             mess.add_data({"level" : args})
-        self.__myxpl.send(mess)
+        self._myxpl.send(mess)
 
 if __name__ == "__main__":
     x = x10Main()

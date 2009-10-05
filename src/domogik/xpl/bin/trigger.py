@@ -320,7 +320,7 @@ class ListenerBuilder():
         self.listitems = listitems
         loader = Loader('trigger')
         config = loader.load()[1]
-        self.__myxpl = Manager(source=config["source"], module_name='trigger')
+        self._myxpl = Manager(source=config["source"], module_name='trigger')
         self.__expr = expr
 
         #We should try/catch this bloc in case of undefined method
@@ -364,7 +364,7 @@ class ListenerBuilder():
             Listener(lambda mess: self.updateList('x10',
                     mess.data['device'],
                     mess.data['command']),
-                    self.__myxpl,
+                    self._myxpl,
                     {'schema': 'x10.basic', 'device': i, 'type': 'xpl-cmnd'})
 
     def buildtimelistener(self, items):
@@ -372,7 +372,7 @@ class ListenerBuilder():
         Create listener for time conditions
         '''
         self._log.debug("New time listener created")
-        Listener(self._parsetimeupdate, self.__myxpl,
+        Listener(self._parsetimeupdate, self._myxpl,
                 {'schema': 'datetime.basic', 'type': 'xpl-trig'})
 
     def _parsetimeupdate(self, mess):
