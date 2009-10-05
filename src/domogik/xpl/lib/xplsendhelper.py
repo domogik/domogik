@@ -29,10 +29,10 @@ Implements
 
 - xPLSendHelper.__init__(self)
 - xPLSendHelper.__del__(self)
-- xPLSendHelper.x10_on_unit(unit)
-- xPLSendHelper.x10_off_unit(unit)
-- xPLSendHelper.x10_on_house(house)
-- xPLSendHelper.x10_off_house(house)
+- xPLSendHelper.x10.on_unit(unit)
+- xPLSendHelper.x10.off_unit(unit)
+- xPLSendHelper.x10.on_house(house)
+- xPLSendHelper.x10.off_house(house)
 
 @author: Maxence Dunnewind <maxence@dunnewind.net>
 @copyright: (C) 2007-2009 Domogik project
@@ -60,6 +60,7 @@ class xPLSendHelper(xPLModule):
 
 ###
 # Format check functions
+#TODO : put them in appropriated subclass
 ###
 
 	def _check_plcbus_unit_name(self, unit):
@@ -77,20 +78,20 @@ class xPLSendHelper(xPLModule):
         return re.match(r'^[a-pA-P]$', unit)
 
 ###
-# Helper subclasses
+# Public methods
 ###
     class X10:
         def __init__(self, xpl):
             self.__myxpl = xpl
 
-        def _check_unit_name(self, unit):
+        def _check_x10_unit_name(self, unit):
             """
             Checks x10 unit_name_format
             @param unit : then unit's name
             """
             return re.match(r'^[a-pA-P][0-9]$', unit)
 
-        def _check_house_name(self, unit):
+        def _check_x10_house_name(self, unit):
             """
             Checks x10 unit_name_format
             @param unit : then unit's name

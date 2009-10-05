@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-                                                                           
+# -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -37,20 +37,20 @@ Implements
 from django.conf.urls.defaults import *
 
 urlpatterns = patterns('djangodomo.core.views',
-    url(r'^$', 'index', name="mainView"),
+    url(r'^$', 'index', name="index_view"),
+
+    url(r'status/$', 'device_status', name='device_status_view'),
+    url(r'status/room/(?P<room_id>\d+)/$', 'device_status', name='device_status_view'),
+    url(r'status/device/(?P<device_id>\d+)/$', 'device_status', name='device_status_view'),
     
-    
-    url(r'status/$', 'device_status', name='device_status'),
-    url(r'status/room/(?P<room_id>\d+)/$', 'device_status', name='device_status'),
-    url(r'status/device/(?P<device_id>\d+)/$', 'device_status', name='device_status'),
-    
-    url(r'device/(?P<device_id>\d+)/$', 'device', name="deviceView"),
-    url(r'device_stats/(?P<device_id>\d+)/$', 'device_stats',
-            name="deviceStatsView"),
-    url(r'admin/$', 'admin_index', name="adminView"),
-    url(r'admin/load_sample_data$', 'load_sample_data',
-            name="loadSampleDataView"),
-    url(r'admin/clear_data$', 'clear_data', name="clearDataView"),
-    url(r'admin/save_settings$', 'save_settings', name="saveSettingsView"),
-    
+    url(r'device/(?P<device_id>\d+)/$', 'device', name="device_view"),
+    url(r'device_stats/(?P<device_id>\d+)/$', 'device_stats', name="device_stats_view"),
+
+    url(r'login/$', 'login', name='login_view'),
+    url(r'logout/$', 'logout', name='logout_view'),
+
+    url(r'admin/$', 'admin_index', name="admin_view"),
+    url(r'admin/load_sample_data$', 'load_sample_data', name="load_sample_data_view"),
+    url(r'admin/clear_data$', 'clear_data', name="clear_data_view"),
+    url(r'admin/save_admin_settings$', 'save_admin_settings', name="save_admin_settings_view"),
 )

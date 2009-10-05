@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-                                                                           
+# -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -27,7 +27,7 @@ Helper to send xpl message (deprecated)
 Implements
 ==========
 
-- XPLHelper:.send(self, xPLSchema, xPLCommand)
+XPLHelper
 
 @author: Domogik project
 @copyright: (C) 2007-2009 Domogik project

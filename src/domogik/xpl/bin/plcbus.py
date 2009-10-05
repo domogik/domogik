@@ -38,12 +38,15 @@ Implements
 """
 
 from domogik.xpl.lib.xplconnector import *
+from domogik.xpl.lib.module import *
+from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.lib.plcbus import *
 from domogik.common.configloader import Loader
 from domogik.common import logger
+from domogik.xpl.lib.queryconfig import *
 
 
-class plcbusMain():
+class plcbusMain(xPLModule):
 
     def __init__(self):
         '''
@@ -51,19 +54,17 @@ class plcbusMain():
         This class is used to connect PLCBUS to the xPL Network
         '''
         # Load config
-        cfgloader = Loader('plcbus')
-        config = cfgloader.load()[1]
-        self.__myplcbus = Manager(source=config["source"],
-                module_name='PLCBUS-1141')
+        xPLModule.__init__(self, name = 'plcbus')
+        
+        self._config = Query(self._myxpl)
         # Create listeners
-        Listener(self.plcbus_cmnd_cb, self.__myplcbus, {
+        Listener(self.plcbus_cmnd_cb, self._myxpl, {
             'schema': 'control.basic',
             'type': 'xpl-cmnd',
         })
-        self.api = PLCBUSAPI(int(config["port_com"]))
+        self.api = PLCBUSAPI(int(0)) #need to be updated with dynamic config
         # Create log instance
-        l = logger.Logger('plcbus')
-        self._log = l.get_logger()
+        self._log = self.get_my_logger()
 
     def plcbus_cmnd_cb(self, message):
         '''
@@ -75,15 +76,15 @@ class plcbusMain():
         level = 0
         rate = 0
         if message.has_key('command'):
-            cmd = message.get_key_value('command')
+            cmd = message.data['command']
         if message.has_key('device'):
-            dev = message.get_key_value('device')
+            dev = message.data['device']
         if message.has_key('usercode'):
-            user = message.get_key_value('usercode')
+            user = message.data['usercode']
         if message.has_key('level'):
-            level = message.get_key_value('level')
+            level = message.data['level']
         if message.has_key('rate'):
-            rate = message.get_key_value('rate')
+            rate = message.data['rate']
         self._log.debug("%s received : device = %s, user code = %s, level = "\
                 "%s, rate = %s" % (cmd.upper(), dev, user, level, rate))
         if cmd == 'GET_ALL_ON_ID_PULSE':
@@ -95,16 +96,14 @@ class plcbusMain():
         '''
         General ack sending over xpl network
         '''
-        # TODO : need to be completed
         dt = localtime()
-        mess = Message()
-        dt = strftime("%Y-%m-%d %H:%M:%S")
+        mess = XplMessage()
         mess.set_type("xpl-trig")
-        mess.set_schema("control.basic")
-        mess.set_data_key("datetime", dt)
-        mess.set_data_key("command", cmd)
-        mess.set_data_key("device", dev)
-        self.__myplcbus.send(mess)
+        mess.set_schema("sensor.basic")
+        mess.add_data({"type" :  "plcbus"})
+        mess.add_data({"command" :  cmd})
+        mess.add_data({"device" :  dev})
+        self._myxpl.send(mess)
 
 
 if __name__ == "__main__":

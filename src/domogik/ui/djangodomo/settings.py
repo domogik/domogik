@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-                                                                           
+# -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -103,8 +103,9 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = (
-    'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
 )
 
@@ -115,7 +116,7 @@ TEMPLATE_DIRS = (
     # "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    PROJECT_PATH + '/templates/',
+    '%s/templates/' % PROJECT_PATH,
 )
 
 INSTALLED_APPS = (
@@ -127,7 +128,13 @@ INSTALLED_APPS = (
     'djangodomo.core',
 )
 
-STATIC_DOC_ROOT = PROJECT_PATH + '/core/templates/skins'
+STATIC_DOC_ROOT = '%s/core/templates/skins' % PROJECT_PATH
+
+# Session stuff
+# Other options are : 
+### 'django.contrib.sessions.backends.db'
+### 'django.contrib.sessions.backends.file'
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 
 try:
     from settings_local import *

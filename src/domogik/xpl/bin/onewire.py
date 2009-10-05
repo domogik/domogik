@@ -37,11 +37,14 @@ Implements
 """
 
 from domogik.xpl.lib.xplconnector import *
-from onewire import *
+from domogik.xpl.common.xplmessage import XplMessage
+from domogik.xpl.lib.module import *
+from domogik.xpl.lib.onewire import *
 from domogik.common import configloader
+from domogik.xpl.lib.queryconfig import *
 
 
-class OneWireTemp():
+class OneWireTemp(xPLModule):
     '''
     Manage the One-Wire stuff and connect it to xPL
     '''
@@ -50,24 +53,29 @@ class OneWireTemp():
         '''
         Starts some timers to check temperature
         '''
-        cfgloader = Loader('onewire')
-        config = cfgloader.load()
-        self._myxpl = Manager(source = config["source"], module_name='onewire')
+        xPLModule.__init__(self, name='onewire')
+        config = {"source":"dmg-onewire"}
+        self._myxpl = Manager()
+        self._config = Query(self._myxpl)
+        res = xPLResult()
+        self._config.query('onewire', 'temperature_refresh_delay', res)
+        temp_delay = res.get_value()['temperature_refresh_delay']
         self._myow = OneWire()
         self._myow.set_cache_use(False)
-        timers = []
-        t_temp = xPLTimer(config['temperature_delay'], self._gettemp)
+        t_temp = xPLTimer(temp_delay, self._gettemp)
         t_temp.start()
-        timers.append(t)
 
     def _gettemp():
         for (i, t, v) in self._myow.get_temperature():
-            my_temp_message = Message()
+            my_temp_message = XplMessage()
             my_temp_message.set_type("xpl-trig")
             my_temp_message.set_schema("sensor.basic")
-            my_temp_message.set_data_key("device", i)
-            my_temp_message.set_data_key("type", t)
-            my_temp_message.set_data_key("current", v)
+            my_temp_message.add_data({"device" :  i})
+            #type should be the model of the o1wire component.
+            #Anyway, because we need a way to determine which is the 
+            #technology of the device, we use it with value 'onewire'
+            my_temp_message.add_data({"type" :  "onewire"})
+            my_temp_message.add_data({"current" :  v})
             self._myxpl.send(my_temp_message)
 
 

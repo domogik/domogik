@@ -22,23 +22,24 @@
 # $LastChangedRevision: 271 $
 -->
 {% extends "base.html" %}
+{% load i18n %}
 
 {% block script %}
     function clearStats() {
         if (confirm("Are you sure you want to clear stats ?")) {
-            document.forms['deviceStatsForm'].cmd.value = "clearStats"
-            document.forms['deviceStatsForm'].action = "{% url deviceStatsView deviceId %}"
+            document.forms['deviceStatsForm'].cmd.value = "clear_stats"
+            document.forms['deviceStatsForm'].action = "{% url device_stats_view device_id %}"
             document.forms['deviceStatsForm'].submit()
         }
     }
 {% endblock %}
 
-{% block title %}{{ pageTitle }}{% endblock %}
+{% block title %}{% trans page_title %}{% endblock %}
 
 {% block content %}
+    <div id="list" style="margin-top: 5px;">
     <form name="deviceStatsForm" method="POST" action="">
-    <div id="list">
-    {% if deviceStatsList %}
+    {% if device_stats_list %}
         <table>
             <tr>
                 <th>Date</th>
@@ -47,28 +48,27 @@
                 <th>Unit</th>
             </tr>
 
-            {% for deviceStat in deviceStatsList %}
+            {% for device_stat in device_stats_list %}
                 <tr class="{% cycle 'oddRow' 'evenRow' %}">
-                    <td>{{ deviceStat.date }}</td>
-                    <td>{{ deviceStat.device.name }}</td>
-                    <td>{{ deviceStat.value }}</td>
-                    <td>{{ deviceStat.unit }}</td>
+                    <td>{{ device_stat.date }}</td>
+                    <td>{{ device_stat.device.name }}</td>
+                    <td>{{ device_stat.value }}</td>
+                    <td>{{ device_stat.unit }}</td>
                 </tr>
             {% endfor %}
         </table>
-        {% if adminMode %}
-            <p></p>
-            <table>
-                <tr>
-                    <td><input type="button" name="clearStatsButton" onclick="clearStats()" value="Clear stats"/>
-                </tr>
-            </table>
+        {% if is_user_admin %}
+        <p></p>
+        <table>
+            <tr>
+                <td><input type="button" name="clearStatsButton" onclick="clearStats()" value="Clear stats"/>
+            </tr>
+        </table>
         {% endif %}
     {% else %}
         <p>No stats found !</p>
     {% endif %}
-    </div>
-
-    <input type="hidden" name="cmd" value=""/>
+        <input type="hidden" name="cmd" value=""/>
     </form>
+    </div>
 {% endblock %}

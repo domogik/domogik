@@ -27,7 +27,6 @@ Help to manage Domogik installation
 Implements
 ==========
 
-- rec_glob_get_files(path)
 
 @author: Domogik project
 @copyright: (C) 2007-2009 Domogik project
@@ -38,7 +37,6 @@ Implements
 import ez_setup
 ez_setup.use_setuptools()
 
-#Main install part
 import os
 from setuptools import setup, find_packages
 
@@ -58,10 +56,10 @@ setup(
     url = 'http://www.domogik.org/',
     author = 'OpenSource home automation software',
     author_email = 'domogik-general@lists.labs.libre-entreprise.org',
-    install_requires=['setuptools','django >=1.0','sqlalchemy >= 0.5.4'],
+    install_requires=['setuptools','django >=1.1','sqlalchemy >= 0.5.4', 'simplejson >= 1.9.2'],
     zip_safe = False,
     license = 'GPL v3',
-    namespace_packages = ['domogik', 'mpris', 'tools'],
+    #namespace_packages = ['domogik', 'mpris', 'tools'],
     include_package_data = True,
     packages = find_packages('src'),
     package_dir = {'': 'src'},

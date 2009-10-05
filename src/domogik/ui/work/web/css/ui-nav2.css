@@ -1,0 +1,43 @@
+@charset "UTF-8";
+/* CSS Document */
+
+.ui-accordion .ui-accordion-content {
+	padding:0;
+}
+
+/* Left menu */
+#nav2 ul {
+	margin: 0;
+	padding: 0;
+	list-style:none;
+}
+#nav2 li a {
+	color:#000;
+	margin: 0 1px 0 1px;
+	padding: 0.7em 0.5em 0.7em 40px;
+	border-bottom:#CCC solid 1px;
+	display:block;
+	text-decoration:none;
+}
+
+#nav2 li a:hover, #nav2 li a:active, #nav2 li a:focus {
+	color:#1c94c4;
+}
+
+.menu-room {
+	background:url(../images/menu_room.png) left 50% no-repeat;
+}
+
+
+.menu-electric {
+	background:url(../images/menu_electric.png) left 50% no-repeat;
+}
+.menu-vmc {
+	background:url(../images/menu_vmc.png) left 50% no-repeat;
+}
+.menu-audio {
+	background:url(../images/menu_audio.png) left 50% no-repeat;
+}
+.menu-light {
+	background:url(../images/menu_light.png) left 50% no-repeat;
+}

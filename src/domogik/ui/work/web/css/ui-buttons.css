@@ -1,0 +1,46 @@
+@charset "UTF-8";
+/* CSS Document */
+
+/* Link */
+a {
+	text-decoration:none;
+	color:#1c94c4;
+}
+
+a:hover, a:active, a:focus {
+	color:#eb8f00;
+}
+
+/* Button */
+a.button {
+	color:#FFF;
+	background-color:#1c94c4;
+	padding:0.2em;
+	margin:0;
+	font-size:1.2em;
+	display:inline-block;
+	
+	-moz-border-radius: 0.8em 0;
+	-webkit-border-radius: 0.8em 0;
+}
+a.button.on {
+	background-color:#096;
+}
+
+a.button.off {
+	background-color:#930;
+}
+a.button:hover, a.button.on:hover, a.button.off:hover,
+a.button:focus, a.button.on:focus, a.button.off:focus,
+a.button:active, a.button.on:active, a.button.off:active {
+	color:#FFF;
+	background-color: #c77405;
+}
+
+
+
+h2 a.action {
+	color:#1c94c4;
+	font-size:0.6em;
+	float:right;
+}

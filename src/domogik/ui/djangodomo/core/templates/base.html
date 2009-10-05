@@ -21,6 +21,7 @@
 # $LastChangedDate: 2008-12-09 20:30:20 +0100 (mar. 09 déc. 2008) $
 # $LastChangedRevision: 251 $
 -->
+{% load i18n %}
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
@@ -33,28 +34,39 @@
 <body>
 <div id="container">
     <div id="top">
-        <center><img width="184px" height="79px" src="/skins/img/logo_domogik.png" alt="Domogik"/></center>
-        <center><h1>&raquo; {{ pageTitle }} &laquo;</h1></center>
+        <div>
+            <center><img width="184px" height="79px" src="/skins/img/logo_domogik.png" alt="Domogik"/></center>
+        </div>
+        <div id="login">
+        {% if not is_user_connected %}
+           &nbsp;&nbsp;<a href="{% url login_view %}">&raquo;{% trans "Log in" %}</a>
+        {% else %}
+           &nbsp;{% trans "Hello" %}, {{ user.first_name }}&nbsp;&nbsp;<a href="{% url logout_view %}">&raquo;{% trans "Log out" %}</a>
+        {% endif %}
+        </div>
+        <div><center><h1>&raquo; {{ page_title }} &laquo;</center></h1></div>
     </div>
 
     <div id="leftBar">
     {% block leftBar %}
         <ul>
-            <li><a href="{% url mainView %}">
-                    <div align="center"><img src="/skins/img/home.png" alt="Home" border="0"></div>
-                    <div align="center">Home</div></a></li>
+            <li><a href="{% url index_view %}">
+                <div align="center"><img src="/skins/img/home.png" alt="Home" border="0"></div>
+                <div align="center">Home</div></a></li>
+            {% if is_user_admin %}
             <li>
-                <a href="{% url adminView %}">
+                <a href="{% url admin_view %}">
                     <div align="center"><img src="/skins/img/admin.png" alt="Admin" border="0"/></div>
-                    <div align="center">Admin</div>
+                    <div align="center">DMG Admin</div>
                 </a>
             </li>
             <li>
                 <a href="/admin">
                     <div align="center"><img src="/skins/img/config.png" alt="Configuration" border="0"/></div>
-                    <div align="center">Configuration</div>
+                    <div align="center">Django Admin</div>
                 </a>
             </li>
+            {% endif %}
         </ul>
     {% endblock %}
     </div>

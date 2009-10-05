@@ -63,6 +63,7 @@ Implements
 """
 
 from domogik.xpl.lib.xplconnector import *
+from domogik.xpl.common.xplmessage import XplMessage
 from domogik.common.configloader import Loader
 from domogik.common import logger
 
@@ -319,7 +320,7 @@ class ListenerBuilder():
         self.listitems = listitems
         loader = Loader('trigger')
         config = loader.load()[1]
-        self.__myxpl = Manager(source=config["source"], module_name='trigger')
+        self._myxpl = Manager(source=config["source"], module_name='trigger')
         self.__expr = expr
 
         #We should try/catch this bloc in case of undefined method
@@ -361,9 +362,9 @@ class ListenerBuilder():
         for i in items:
             self._log.debug("New  x10 listener created")
             Listener(lambda mess: self.updateList('x10',
-                    mess.get_key_value('device'),
-                    mess.get_key_value('command')),
-                    self.__myxpl,
+                    mess.data['device'],
+                    mess.data['command']),
+                    self._myxpl,
                     {'schema': 'x10.basic', 'device': i, 'type': 'xpl-cmnd'})
 
     def buildtimelistener(self, items):
@@ -371,7 +372,7 @@ class ListenerBuilder():
         Create listener for time conditions
         '''
         self._log.debug("New time listener created")
-        Listener(self._parsetimeupdate, self.__myxpl,
+        Listener(self._parsetimeupdate, self._myxpl,
                 {'schema': 'datetime.basic', 'type': 'xpl-trig'})
 
     def _parsetimeupdate(self, mess):
@@ -379,7 +380,7 @@ class ListenerBuilder():
         Parse the time received in a message and call updateList()
         '''
         self._log.debug("Time update")
-        dt = mess.get_key_value('format1')
+        dt = mess.data['format1']
         pars = {
             'year': dt[0:4],
             'month': dt[4:6],
