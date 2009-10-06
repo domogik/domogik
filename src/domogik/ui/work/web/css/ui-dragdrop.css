@@ -28,7 +28,7 @@ li.draggable
 	cursor: move;
 }
 
-ul.draggables li.hover, ul li.focused
+ul.draggables li.hover, ul.draggables li.focused
 {
 	background: #fc0;
 }

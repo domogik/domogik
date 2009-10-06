@@ -158,7 +158,7 @@ li.room-tv {
 }
 
 li.room-vmc {
-	background:url(../images/room_fan.png) left 50% no-repeat;
+	background:url(../images/ventilo_white_32.png) left 50% no-repeat;
 }
 
 li.room-sound {
@@ -166,21 +166,41 @@ li.room-sound {
 }
 
 li.room-clim {
-	background:url(../images/room_aircon.png) left 50% no-repeat;
+	background:url(../images/clim_white_32.png) left 50% no-repeat;
 }
 
 li.room-wifi {
 	background:url(../images/room_wifi.png) left 50% no-repeat;
 }
 
-li.room-tv .on, li.room-vmc .on, li.room-clim .on, li.room-wifi .on {
+li.room-tv .on, li.room-clim .on, li.room-wifi .on {
 	padding:7px 0 7px 20px;
 	background:url(../images/room_various_on.png) left 50% no-repeat;
 }
 
-li.room-tv .off, li.room-vmc .off, li.room-clim .off, li.room-wifi .off {
+li.room-tv .off, li.room-clim .off, li.room-wifi .off {
 	padding:7px 0 7px 20px;
 	background:url(../images/room_various_off.png) left 50% no-repeat;
+}
+
+li.room-vmc .on {
+	padding:7px 0 7px 20px;
+	background:url(../images/ventilo_on_16.png) left 50% no-repeat;
+}
+
+li.room-vmc .off {
+	padding:7px 0 7px 20px;
+	background:url(../images/ventilo_off_16.png) left 50% no-repeat;
+}
+
+li.room-clim .on {
+	padding:7px 0 7px 20px;
+	background:url(../images/clim_on_16.png) left 50% no-repeat;
+}
+
+li.room-clim .off {
+	padding:7px 0 7px 20px;
+	background:url(../images/clim_off_16.png) left 50% no-repeat;
 }
 
 li.room-sound .playing {

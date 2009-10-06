@@ -33,7 +33,10 @@
 	background:url(../images/menu_electric.png) left 50% no-repeat;
 }
 .menu-vmc {
-	background:url(../images/menu_vmc.png) left 50% no-repeat;
+	background:url(../images/ventilo_white_32.png) left 50% no-repeat;
+}
+.menu-clim {
+	background:url(../images/clim_white_32.png) left 50% no-repeat;
 }
 .menu-audio {
 	background:url(../images/menu_audio.png) left 50% no-repeat;
