@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Domogik's new UI</title>
+<link href="css/ui-lightness/jquery-ui-1.7.2.custom.css" rel="stylesheet" type="text/css"/>
+<link href="css/main.css" rel="stylesheet" type="text/css" />
+<link href="css/ui-buttons.css" rel="stylesheet" type="text/css" />
+<link href="css/page-login.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="js/jquery-1.3.2.min.js"></script>
+<script type="text/javascript" src="js/jquery-ui-1.7.2.custom.min.js"></script>
+<script type="text/javascript" src="js/page-login.js"></script>
+</head>
+<body>
+<div id="frame">
+  <div id="header"><img src="images/logo_domogik.png" width="131" height="37" alt="Domotik logo" />
+    <div id="title">Welcome to Domogik<span id="subtitle">Free home automation under Linux</span></div>
+  </div>
+  <div id="content">
+  <h1>Identification</h1>
+    <form action="admin/index.html">
+      <div class="left">
+      	<h2>1. Choisir un utilisateur</h2>
+        <ul id="users">
+          <li><a href="#"><img src="images/userid.jpg" alt="User A" width="64" height="64" /></a></li>
+          <li><a href="#"><img src="images/userid.jpg" alt="User B" width="64" height="64" /></a></li>
+          <li><a href="#"><img src="images/userid.jpg" alt="User C" width="64" height="64" /></a></li>
+          <li><a href="#"><img src="images/userid.jpg" alt="User D" width="64" height="64" /></a></li>
+        </ul>
+        <input id="loginname" name="name"type="text" />
+      </div>
+      <div class="right">
+      	<h2>2. Taper le code</h2>
+        <input id="logincode" name="code"type="password" value="test" />
+        <ul id="digits">
+          <li><a href="#">0</a></li>
+          <li><a href="#">1</a></li>
+          <li><a href="#">2</a></li>
+          <li><a href="#">3</a></li>
+          <li><a href="#">4</a></li>
+          <li><a href="#">5</a></li>
+          <li><a href="#">6</a></li>
+          <li><a href="#">7</a></li>
+          <li><a href="#">8</a></li>
+          <li><a href="#">9</a></li>
+          <li><a href="#">Eff.</a></li>
+          <li>
+            <input type="submit" value="OK" />
+          </li>
+        </ul>
+      </div>
+    </form>
+  </div>
+</div>
+</body>
+</html>

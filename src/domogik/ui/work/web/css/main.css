@@ -6,6 +6,10 @@ img {
 	display:none;
 }
 
+h2 {
+	margin-top:0;
+}
+
 /* Main Layout */
 body {
 	font: 62.5% "Trebuchet MS", sans-serif;

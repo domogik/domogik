@@ -12,7 +12,8 @@ a:hover, a:active, a:focus {
 }
 
 /* Button */
-a.button {
+a.button, input.button {
+	border:none;
 	color:#FFF;
 	background-color:#1c94c4;
 	padding:0.2em;
