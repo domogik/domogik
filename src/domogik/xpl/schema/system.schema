@@ -40,6 +40,7 @@ DOMOGIK.SYSTEM
 {
 COMMAND=command to send
 MODULE=name of the module concerned by the command|*
+HOST=Host sending the message
 [FORCE=0|1]
 [ERROR=error message if error occurs, 255 char max]
 }
@@ -50,6 +51,7 @@ DOMOGIK.SYSTEM
 {
 COMMAND=command to send
 MODULE=name of the module concerned by the command|*
+HOST=name of the host where a component should be started/stopped
 [FORCE=0|1]
 }
 
@@ -64,8 +66,9 @@ HBEAT.*
 Schema Specific Notes
 COMMAND value can be one of :
 
-* START : Start a component
-* STOP : Stop a component
-* PING : Ask all components to reply (MODULE should equals '*', FORCE isn't used)
-* RELOAD : If the module is able to do, refresh its config and reload it.
-* PUSH_CONFIG : Send all the config items on the network. Should be used to refresh the config in database side
+* START : Start a component (managed by Domogik Manager)
+* STOP : Stop a component (managed by the component)
+* PING : Ask all components to reply (MODULE should equals '*', FORCE isn't used) (managed by each component)
+* HOST-PING : Ask all hosts to reply (MODULE, FORCE aren't used) (managed by Domogik manager)
+* RELOAD : If the component is able to do, refresh its config and reload it. (managed by the component)
+* DUMP : If the component is able to do, dump its running config over Xpl. (managed by the component)

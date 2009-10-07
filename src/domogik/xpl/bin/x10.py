@@ -96,7 +96,7 @@ class x10Main(xPLModule):
         self._config.query('x10','', res)
         result = res.get_value()
         if result is not None:
-            heyu_config_items = filter(lambda k : k.startswith("heyu_file_"), result.keys())
+            heyu_config_items = filter(lambda k : k.startswith("heyu-file-"), result.keys())
             heyu_config_values = []
             for key in heyu_config_items:
                 heyu_config_values.append(result[key])

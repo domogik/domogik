@@ -37,6 +37,7 @@ Implements
 """
 
 import time
+from socket import gethostname
 from domogik.xpl.lib.xplconnector import *
 from domogik.xpl.lib.basemodule import BaseModule
 
@@ -48,16 +49,23 @@ class xPLModule():
     '''
     __instance = None
 
-    def __init__(self, name = None, stop_cb = None):
+    def __init__(self, name = None, stop_cb = None, is_manager = False, reload_cb = None, dump_cb = None):
         '''
         Create xPLModule instance, which defines signal handlers
         @param name : The n,ame of the current module
         @param stop_cb : Method to call when a stop request is received
+        @param is_manager : Must be True if the child script is a Domogik Manager process 
+        @param reload_cb : Callback to call when a "RELOAD" order is received, if None, 
+        nothing will happen
+        @param dump_cb : Callback to call when a "DUMP" order is received, if None, 
+        nothing will happen
+
+        You should never need to set it to True
         '''
         if xPLModule.__instance is None and name is None:
             raise AttributeError, "'name' attribute is mandatory for the first instance"
         if xPLModule.__instance is None:
-            xPLModule.__instance = xPLModule.__Singl_xPLModule(name, stop_cb)
+            xPLModule.__instance = xPLModule.__Singl_xPLModule(name, stop_cb, is_manager, reload_cb, dump_cb)
             self.__dict__['_xPLModule__instance'] = xPLModule.__instance
         elif stop_cb is not None:
             xPLModule.__instance.add_stop_cb(stop_cb)
@@ -72,26 +80,75 @@ class xPLModule():
 
 
     class __Singl_xPLModule(BaseModule):
-        def __init__(self, name, stop_cb = None):
+        def __init__(self, name, stop_cb = None, is_manager = False, reload_cb = None, dump_cb = None):
             '''
             Create xPLModule instance, which defines system handlers
             @param name : The name of the current module
             @param stop_cb : Additionnal method to call when a stop request is received
+            @param is_manager : Must be True if the child script is a Domogik Manager process 
+            You should never need to set it to True unless you develop your own manager
+            @param reload_cb : Callback to call when a "RELOAD" order is received, if None, 
+            nothing will happen
+            @param dump_cb : Callback to call when a "DUMP" order is received, if None, 
+            nothing will happen
             '''
             BaseModule.__init__(self, name, stop_cb)
-            print "create xPLModule instance"
             self._log.debug("New system manager instance for %s" % name)
-
+            self._is_manager = is_manager
             self._myxpl = Manager()
-            self._l = Listener(self.hand_leave, self._myxpl, {'schema' : 'domogik.system',
+            self._l = Listener(self._system_handler, self._myxpl, {'schema' : 'domogik.system',
                 'type':'xpl-cmnd'})
+            self._reload_cb = reload_cb 
+            self._dump_cb = dump_cb
 
-        def hand_leave(self, signum, frame):
-            '''
-            Handler called when a stop request is catched
-            '''
-            self._log.debug('Stop request catched, try to end gracefullly')
-            self.force_leave()
+        def _system_handler(self, message):
+            """ Handler for domogik system messages
+            """
+            cmd = message.data['command']
+            if not self._is_manager and cmd in ["stop", "reload", "dump", "ping"]:
+                self._client_handler(message)
+            else:
+                self._manager_handler(message)
+
+        def _client_handler(self, message):
+            """ Handle domogik system request for an xpl client 
+            @param message : the Xpl message received 
+            """
+            cmd = message.data["command"]
+            if cmd == "stop":
+                self._log.info("Someone asked to stop %s, doing." % self.get_module_name())
+                self.force_leave()
+            elif cmd == "reload":
+                if self._reload_cb is None:
+                    log.info("Someone asked to reload config of %s, but the module \
+                    isn't able to do it." % self.get_module_name())
+                else:
+                    self._reload_cb()
+            elif cmd == "dump":
+                if self._dump_cb is None:
+                    log.info("Someone asked to dump config of %s, but the module \
+                    isn't able to do it." % self.get_module_name())
+                else:
+                    self._dump_cb()
+            else: #cmd == ping 
+                if message.data["module"] in [self.get_module_name(), "*"]:
+                    self._answer_ping()
+
+        def _answer_ping(self):
+            """ Send a ping reply
+            """
+            mess = XplMessage()
+            mess.set_type("xpl-trig")
+            mess.set_schema("domogik.system")
+            mess.add_data({"command":"ping", "module": self.get_module_name(), 
+                "host": gethostname()})
+            self._myxpl.send(mess)
+
+        def _manager_handler(self, message):
+            """ Handle domogik system request for the Domogik manager
+            @param message : the Xpl message received 
+            """
+
 
         def force_leave(self):
             '''
