@@ -62,7 +62,7 @@ class Sender(xPLModule):
         mess = self.forge_message()
         self._log.debug("Send message : %s" % mess)
         self._myxpl.send(mess)
-        self._myxpl.force_leave()
+        self.force_leave()
 
     def parse_parameters(self):
         '''
