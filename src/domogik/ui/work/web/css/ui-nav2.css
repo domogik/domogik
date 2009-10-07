@@ -24,11 +24,24 @@
 	color:#1c94c4;
 }
 
+/* Rooms */
 .menu-room {
 	background:url(../images/menu_room.png) left 50% no-repeat;
 }
 
+/* Zones */
 
+.menu-zone-grndfloor {
+	background:url(../images/rdc_white_32.png) left 50% no-repeat;
+}
+.menu-zone-floor {
+	background:url(../images/etage1_white_32.png) left 50% no-repeat;
+}
+.menu-zone-basement {
+	background:url(../images/sous-sol_white_32.png) left 50% no-repeat;
+}
+
+/* Devices */
 .menu-electric {
 	background:url(../images/menu_electric.png) left 50% no-repeat;
 }

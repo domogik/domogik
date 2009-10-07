@@ -5,6 +5,21 @@
 	min-height:10em;
 }
 
+.zone-grndfloor {
+	background:url(../images/rdc_white_16.png) left 50% no-repeat;
+	padding-left:20px;
+}
+
+.zone-floor {
+	background:url(../images/etage1_white_16.png) left 50% no-repeat;
+	padding-left:20px;
+}
+
+.zone-basement {
+	background:url(../images/sous-sol_white_16.png) left 50% no-repeat;
+	padding-left:20px;
+}
+
 .room-temp {
 	font-size:2em;
 	float:right;

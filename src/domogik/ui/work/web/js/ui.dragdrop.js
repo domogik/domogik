@@ -30,8 +30,6 @@ function getElementsByClassName(objElement, strTagName, strClassName)
 var drag = {
 	objCurrent : null,
 
-	arTargets : ['Fav', 'Tol', 'Rej'],
-
 	initialise : function(objNode)
 	{
 		// Add event handlers
@@ -175,7 +173,9 @@ var drag = {
 		drag.objCurrent.lastY = objEvent.clientY;
 		drag.objCurrent.style.zIndex = '2';
 		drag.objCurrent.setAttribute('aria-grabbed', 'true');
-
+		
+		drag.objCurrent.className = 'draggable dragged';
+		
 		document.onmousemove = drag.drag;
 		document.onmouseup = drag.end;
 		drag.identifyTargets(true);
@@ -323,6 +323,9 @@ var drag = {
 		drag.objCurrent.style.zIndex = 'auto';
 		drag.objCurrent.setAttribute('aria-grabbed', 'false');
 		drag.objCurrent.removeAttribute('aria-owns');
+				drag.objCurrent.className = 'draggable';
+
+
 
 		drag.identifyTargets(false);
 	},

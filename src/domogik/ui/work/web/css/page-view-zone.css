@@ -1,8 +1,8 @@
 @charset "UTF-8";
 /* CSS Document */
 
-.zone-general {
-	background:url(../images/room-type.png) top right no-repeat;
+.zone-groundfloor {
+	background:url(../images/rdc_white_64.png) top right no-repeat;
 	min-height:10em;
 }
 
