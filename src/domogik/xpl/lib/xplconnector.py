@@ -373,7 +373,6 @@ class xPLTimer():
     class __internalTimer(threading.Thread):
         '''
         Internal timer class
-        extends xPLModule to provide signal handling
         '''
         def __init__(self, time, cb, stop):
             '''
