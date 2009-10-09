@@ -39,8 +39,8 @@ xpl.trig message should be sent as an acknowledgement to a xpl.cmnd command.
 DOMOGIK.SYSTEM
 {
 COMMAND=command to send
-MODULE=name of the module concerned by the command|*
 HOST=Host sending the message
+[MODULE]=name of the module concerned by the command|*
 [FORCE=0|1]
 [ERROR=error message if error occurs, 255 char max]
 }
@@ -50,8 +50,8 @@ HOST=Host sending the message
 DOMOGIK.SYSTEM
 {
 COMMAND=command to send
-MODULE=name of the module concerned by the command|*
 HOST=name of the host where a component should be started/stopped
+[MODULE]=name of the module concerned by the command|*
 [FORCE=0|1]
 }
 

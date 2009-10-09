@@ -865,13 +865,13 @@ class DbHelper():
         """
         return self._session.query(SystemStats).all()
 
-    def get_system_stat(self, s_name):
+    def get_system_stat(self, s_id):
         """
         Return a system stat
         @param s_name : the name of the stat to be retrieved
         @return a SystemStats object
         """
-        return self._session.query(SystemStats).filter_by(name=s_name).first()
+        return self._session.query(SystemStats).filter_by(id=s_id).first()
 
 
     def get_system_stats_by_type(self, s_type):
@@ -882,10 +882,11 @@ class DbHelper():
         """
         return self._session.query(SystemStats).filter_by(type=s_type).all()
 
-    def add_system_stat(self, s_name, s_date, s_type, s_value):
+    def add_system_stat(self, s_name, s_hostname, s_date, s_type, s_value):
         """
         Add a system stat record
-        @param s_name : name of the stat
+        @param s_name : name of the  module
+        @param s_hostname : name of the  host
         @param s_date : when the stat was gathered (timestamp)
         @param s_type : stat type (must be one of sql_schema.SYSTEMSTATS_TYPE_LIST list)
         @param s_value : stat value
@@ -893,7 +894,7 @@ class DbHelper():
         """
         if s_type not in SYSTEMSTATS_TYPE_LIST:
             raise ValueError, "s_type must be one of %s" % SYSTEMSTATS_TYPE_LIST
-        system_stat = SystemStats(name=s_name, date=s_date, type=s_type, value=s_value)
+        system_stat = SystemStats(module_name=s_name, host_name=s_hostname, date=s_date, type=s_type, value=s_value)
         self._session.add(system_stat)
         self._session.commit()
         return system_stat
