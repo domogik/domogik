@@ -117,7 +117,8 @@ class xPLModule():
             @param message : the Xpl message received 
             """
             cmd = message.data["command"]
-            if cmd == "stop":
+            module = message.data["module"]
+            if cmd == "stop" and module == self.get_module_name():
                 self._log.info("Someone asked to stop %s, doing." % self.get_module_name())
                 self.force_leave()
             elif cmd == "reload":

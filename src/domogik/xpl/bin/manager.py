@@ -65,7 +65,7 @@ class SysManager(xPLModule):
         xPLModule.__init__(self, name = 'sysmgr')
         self._components = {
             'x10': 'x10Main()',
-            'datetime': 'xPLDateTime()',
+            'dtmgr': 'xPLDateTime()',
             'onewire': 'OneWireTemp()',
             'trigger': 'main()',
             'dawndusk': 'main()'}
@@ -79,7 +79,7 @@ class SysManager(xPLModule):
         self._config = Query(self._myxpl)
         res = xPLResult()
         self._config.query('global', 'pid-dir-path', res)
-        self._pid_dir_path = res.get_value()
+        self._pid_dir_path = res.get_value()['pid-dir-path']
 
         self._log.info("System manager initialized")
 
@@ -115,7 +115,8 @@ class SysManager(xPLModule):
                         mess.add_data({'command' :  cmd})
                         mess.add_data({'module' :  mod})
                         mess.add_data({'force' :  force})
-                        mess.add_data({'error' :  error})
+                        if error:
+                            mess.add_data({'error' :  error})
                         self._myxpl.send(mess)
             elif cmd == "host-ping":
                 mess = XplMessage()

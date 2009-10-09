@@ -168,7 +168,7 @@ class DBConnector(xPLModule):
             'heyu-file-0': 'TTY /dev/ttyUSB0',
             'heyu-file-1': 'TTY_AUX /dev/ttyUSB0 RFXCOM',
             'heyu-file-2': 'ALIAS back_door D5 DS10A 0x677'},
-                'global': {'pid_dir_path': '/tmp/'},
+                'global': {'pid-dir-path': '/tmp/'},
                 'onewire': {'temperature_refresh_delay' : '10'},
                 'teleinfo' : {'device' : '/dev/ttyUSB0',
                     'interval' : '30'},
