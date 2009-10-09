@@ -311,7 +311,7 @@ var drag = {
 			if (objBands.length === 0)
 			{
 				objItem = document.createElement('li');
-				objItem.appendChild(document.createTextNode('None'));
+				objItem.appendChild(document.createTextNode('Vide'));
 				objItem.className = 'empty';
 				objOriginal.appendChild(objItem);
 			}

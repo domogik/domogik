@@ -6,6 +6,9 @@
 	padding:0 1em 0 1em;
 	-moz-box-shadow: 5px 5px 5px #888;
 	-webkit-box-shadow: 5px 5px 5px #888;
+	-moz-border-radius: 0.8em;
+	-webkit-border-radius: 0.8em;
+
 }
 
 .element-actions {
@@ -37,6 +40,13 @@
 	padding:0 1em 0 1em;
 	column-break-inside: avoid;
 	min-height:15em;
+	-moz-border-radius: 0.8em 0 0.8em 0;
+	-webkit-border-radius: 0.8em 0 0.8em 0;
+}
+
+.mediumbox {
+	width:40em;
+	margin-left:5em;
 }
 
 .label {
@@ -45,9 +55,6 @@
 
 .parameter {
 	line-height:3em;
-}
-
-.element .parameter {
 	border-top:1px solid #CCC;
 }
 

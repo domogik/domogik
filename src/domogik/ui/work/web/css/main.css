@@ -10,11 +10,21 @@ h2 {
 	margin-top:0;
 }
 
+h2.splitter, h3.splitter {
+	border-top:1px solid #999;
+}
+
 /* Main Layout */
 body {
 	font: 62.5% "Trebuchet MS", sans-serif;
 	margin: 1em;
 }
+
+#frame {
+	-moz-border-radius: 0.8em;
+	-webkit-border-radius: 0.8em;
+}
+
 div.left {
 	float:left;
 	width: 20em;

@@ -90,8 +90,10 @@ li#general-infos-error {
 .room {
 	margin:1em 0 0 1em;
 	width:31%;
-		-moz-box-shadow: 5px 5px 5px #888;
+	-moz-box-shadow: 5px 5px 5px #888;
 	-webkit-box-shadow: 5px 5px 5px #888;
+	-moz-border-radius: 0.8em 0 0.8em 0;
+	-webkit-border-radius: 0.8em 0 0.8em 0;
 }
 
 h2.room-ident {
@@ -101,6 +103,11 @@ h2.room-ident {
 	padding:1em 0 0 70px;
 	width:43%;
 }
+
+h2.room-ident.room-livingroom {
+	background:url(../images/sofa_white_64.png) top left no-repeat;
+}
+
 .room-title {
 	font-size:1.5em;
 }

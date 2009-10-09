@@ -21,7 +21,8 @@
 }
 
 #nav2 li a:hover, #nav2 li a:active, #nav2 li a:focus {
-	color:#1c94c4;
+	color:#000;
+	background-color: #eb8f00;
 }
 
 /* Rooms */
@@ -29,6 +30,9 @@
 	background:url(../images/menu_room.png) left 50% no-repeat;
 }
 
+.menu-room-livingroom {
+	background:url(../images/sofa_white_32.png) left 50% no-repeat;
+}
 /* Zones */
 
 .menu-zone-grndfloor {

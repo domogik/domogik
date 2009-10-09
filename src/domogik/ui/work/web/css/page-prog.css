@@ -29,10 +29,6 @@ ul.scenario-commands li {
 	display:inline;
 	clear:both;
 }
-ul.scenario-commands li a {
-	color: #1c94c4;
-	font-style:italic;
-}
 /* Details */
 
 .details h2 {
