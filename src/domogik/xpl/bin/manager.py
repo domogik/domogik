@@ -40,28 +40,29 @@ Implements
 @organization: Domogik
 """
 
+import os
+import sys
+import signal
+import time
+from socket import gethostname
+
 from domogik.xpl.lib.xplconnector import *
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.lib.module import *
 from domogik.xpl.lib.queryconfig import *
 from domogik.common.configloader import *
-import os
-import sys
-import signal
-import time
 
 
 class SysManager(xPLModule):
     '''
     System management from domogik
-    At the moment, can only start a module by receiving an xPL message
     '''
 
     def __init__(self):
         '''
         Init manager and start listeners
         '''
-        xPLModule.__init__(self, name = 'sysmanager')
+        xPLModule.__init__(self, name = 'sysmgr')
         self._components = {
             'x10': 'x10Main()',
             'datetime': 'xPLDateTime()',
@@ -77,95 +78,54 @@ class SysManager(xPLModule):
         })
         self._config = Query(self._myxpl)
         res = xPLResult()
-        self._config.query('global', 'pid_dir_path', res)
-#        res.get_lock().wait()
+        self._config.query('global', 'pid-dir-path', res)
         self._pid_dir_path = res.get_value()
 
-        self._log.debug("pid_dir_path got value %s" % self._pid_dir_path)
         self._log.info("System manager initialized")
 
     def _sys_cb(self, message):
         '''
         Internal callback for receiving system messages
         '''
-        self._log.debug("Incoming message")
         cmd = message.data['command']
         mod = message.data['module']
+        host = message.data["host"]
         force = 0
-        if message.has_key('force'):
+        if "force" in message.data:
             force = int(message.data['force'])
         error = ""
-        if mod not in self._components:
+        if mod not in self._components and mod != "*":
             error = "Invalid component.\n"
-        elif not force and self._is_component_running(mod):
-            error = "ALREADY_RUNNING"
-            self._log.info(error)
         if error == "":
-            if cmd == "start":
-                pid = self._start_comp(mod)
-                if pid:
-                    self._write_pid_file(mod, pid)
-                    self._log.debug("Component %s started with pid %i" % (mod,
-                            pid))
-                    mess = XplMessage()
-                    mess.set_type('xpl-trig')
-                    mess.set_schema('domogik.system')
-                    mess.add_data({'command' :  cmd})
-                    mess.add_data({'module' :  mod})
-                    mess.add_data({'force' :  force})
-                    mess.add_data({'error' :  error})
-                    self._myxpl.send(mess)
-            elif cmd == "stop":
-                ret = self._stop_comp(mod)
-                if ret == 0:
-                    error = ''
-                elif ret == 1:
-                    error = 'The component was not started (no pid file)'
-                elif ret == 2:
-                    error = 'An error occurs during sending signal'
-                if not error:
-                    self._log.debug("Component %s stopped" % (mod))
+            self._log.debug("System request %s for host %s, module %s" % (cmd, host, mod))
+            if cmd == "start" and host == gethostname():
+                if not force and self._is_component_running(mod):
+                    error = "Component is already running"
+                    self._log.info(error)
                 else:
-                    self._log.warning("Error during stop of component %s : %s" %\
-                            (mod, error))
-        mess = XplMessage()
-        mess.set_type('xpl-trig')
-        mess.set_schema('domogik.system')
-        mess.add_data({'command' :  cmd})
-        mess.add_data({'module' :  mod})
-        mess.add_data({'force' :  force})
-        mess.add_data({'error' :  error})
-        self._myxpl.send(mess)
-
-    def _stop_comp(self, name):
-        '''
-        Internal method
-        Try to stop a component by getting its pid and sending signal
-        @param name : the name of the component to stop
-        @return 0 if stop is OK, 1 if the pid file doesn't exist,
-        2 in case of other problem
-        '''
-        pidfile = os.path.join(self._pid_dir_path, name + ".pid")
-        if os.path.isfile(pidfile):
-#            try:
-            f = open(pidfile, "r")
-            data = f.readlines()[0].replace('\n', '')
-            f.close()
-            os.kill(int(data), 15)
-            print "%s" % data
-            #We now check if the process is still existing
-            #NASTY ! Wait 2s to let the process terminate
-            time.sleep(2)
-            try:
-                os.kill(int(data), 0)
-            except OSError:
-                return 0
-            else:
-                return 2
- #           except:
-  #              return 2
+                    pid = self._start_comp(mod)
+                    if pid:
+                        self._write_pid_file(mod, pid)
+                        self._log.debug("Component %s started with pid %i" % (mod,
+                                pid))
+                        mess = XplMessage()
+                        mess.set_type('xpl-trig')
+                        mess.set_schema('domogik.system')
+                        message.add_data({'host' : gethostname()})
+                        mess.add_data({'command' :  cmd})
+                        mess.add_data({'module' :  mod})
+                        mess.add_data({'force' :  force})
+                        mess.add_data({'error' :  error})
+                        self._myxpl.send(mess)
+            elif cmd == "host-ping":
+                mess = XplMessage()
+                mess.set_type('xpl-trig')
+                mess.set_schema('domogik.system')
+                mess.add_data({'command' :  cmd})
+                mess.add_data({'host' : gethostname()})
+                self._myxpl.send(mess)
         else:
-            return 1
+            self._log.info("Error detected : %s, request %s has been cancelled" % (error, cmd))
 
     def _start_comp(self, name):
         '''

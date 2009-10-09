@@ -290,7 +290,7 @@ class Listener:
             elif key == "type":
                 ok = ok and (self._filter[key] == message.type)
 
-            elif not (key in message.data or message.key or key in (
+            elif not (key in message.data or key in (
                     "type", "schema")):
                 ok = False
         #The message match the filter, we can call  the callback function

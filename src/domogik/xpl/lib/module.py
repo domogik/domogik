@@ -62,6 +62,8 @@ class xPLModule():
 
         You should never need to set it to True
         '''
+        if len(name) > 8:
+            raise IoError, "The name must be 8 chars max"
         if xPLModule.__instance is None and name is None:
             raise AttributeError, "'name' attribute is mandatory for the first instance"
         if xPLModule.__instance is None:
