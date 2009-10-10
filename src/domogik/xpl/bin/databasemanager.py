@@ -168,7 +168,7 @@ class DBConnector(xPLModule):
             'heyu-file-0': 'TTY /dev/ttyUSB0',
             'heyu-file-1': 'TTY_AUX /dev/ttyUSB0 RFXCOM',
             'heyu-file-2': 'ALIAS back_door D5 DS10A 0x677'},
-                'global': {'pid_dir_path': '/tmp/'},
+                'global': {'pid-dir-path': '/tmp/'},
                 'onewire': {'temperature_refresh_delay' : '10'},
                 'teleinfo' : {'device' : '/dev/ttyUSB0',
                     'interval' : '30'},
@@ -197,7 +197,7 @@ class StatsManager(xPLModule):
         l_plcbus = Listener(self._plcbus_cb, self._myxpl,
                 {'schema': 'control.basic', 'type': 'xpl-trig','type':'plcbus'})
         l_hb = Listener(self._sys_cb, self._myxpl,
-                {'schema': 'hbeat.app', 'type': 'xpl-stat'})
+                {'schema': 'hbeat.app', 'type': 'xpl-trig'})
         self._log.debug("Stats manager initialized")
 
     def _x10_cb(self, message):
@@ -240,7 +240,17 @@ class StatsManager(xPLModule):
         """
         Manage system stats 
         """
-        #TODO
+        command = message.data["command"]
+        host = message.data["host"]
+        if command in ["start","stop","reload","dump"]:
+            module = message.data["module"]
+            dbhelper.add_system_stat(module, datetime.today(), 'CORE', command)
+        elif command == "ping":
+            module = message.data["module"]
+            dbhelper.add_system_stat(module, datetime.today(), 'HB_CLIENT', command)
+        else:
+            dbhelper.add_system_stat(None, datetime.today(), 'CORE', command)
+
 
 if __name__ == "__main__":
     d = DBConnector()

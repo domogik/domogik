@@ -62,6 +62,8 @@ class xPLModule():
 
         You should never need to set it to True
         '''
+        if len(name) > 8:
+            raise IoError, "The name must be 8 chars max"
         if xPLModule.__instance is None and name is None:
             raise AttributeError, "'name' attribute is mandatory for the first instance"
         if xPLModule.__instance is None:
@@ -115,7 +117,8 @@ class xPLModule():
             @param message : the Xpl message received 
             """
             cmd = message.data["command"]
-            if cmd == "stop":
+            module = message.data["module"]
+            if cmd == "stop" and module == self.get_module_name():
                 self._log.info("Someone asked to stop %s, doing." % self.get_module_name())
                 self.force_leave()
             elif cmd == "reload":

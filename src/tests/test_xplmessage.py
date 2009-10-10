@@ -47,7 +47,7 @@ class XplMessageTest(unittest.TestCase):
     def setUp(self):
         """ Setup context.
 
-        The ontext is setup before each call to a test method.
+        The context is setup before each call to a test method.
         """
         self.__xpl_message = XplMessage()
 

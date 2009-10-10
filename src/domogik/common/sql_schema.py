@@ -600,19 +600,22 @@ class SystemStats(Base):
     __tablename__ = '%s_system_stats' % _db_prefix
     id = Column(Integer, primary_key=True)
     name = Column(String(30), nullable=False)
+    hostname = Column(String(40), nullable=False)
     date = Column(DateTime, nullable=False)
     type = Column(Enum(SYSTEMSTATS_TYPE_LIST))
     value = Column(String(80), nullable=False)
 
-    def __init__(self, name, date, type, value):
+    def __init__(self, module_name, host_name, date, type, value):
         """
         Class constructor
-        @param name : statistic name
+        @param module_name : module name
+        @param host_name : host name
         @param date : datetime when the statistic was recorded
         @param type : statistic type like HB_CLIENT (hardbeat client), CORE
         @param value : statistic value
         """
-        self.name = name
+        self.name = module_name
+        self.hostname = host_name
         self.date = date
         self.type = type
         self.value = value
@@ -622,8 +625,8 @@ class SystemStats(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<SystemStats(id=%s, name=%s, date=%s, type='%s', value='%s')>" \
-          % (self.id, self.name, self.date, self.type, self.value)
+        return "<SystemStats(id=%s, module_name=%s, host_name=%s, date=%s, type='%s', value='%s')>" \
+          % (self.id, self.name, self.hostname, self.date, self.type, self.value)
 
     @staticmethod
     def get_tablename():
