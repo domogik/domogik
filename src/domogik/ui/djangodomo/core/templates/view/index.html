@@ -1,0 +1,169 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Domogik's new UI</title>
+<link type="text/css" href="../css/ui-lightness/jquery-ui-1.7.2.custom.css" rel="stylesheet" />
+<link href="../css/main.css" rel="stylesheet" type="text/css" />
+<link href="../css/ui-nav2.css" rel="stylesheet" type="text/css" />
+<link href="../css/ui-elements.css" rel="stylesheet" type="text/css" />
+<link href="../css/ui-buttons.css" rel="stylesheet" type="text/css" />
+<link href="../css/page-view.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="../js/jquery-1.3.2.min.js"></script>
+<script type="text/javascript" src="../js/jquery-ui-1.7.2.custom.min.js"></script>
+<script type="text/javascript" src="../js/page-view.js"></script>
+<script type="text/javascript">
+$(function(){
+	// Accordion
+	$("#nav2").accordion({ header: ".section", active:false});
+});
+</script>
+</head>
+<body>
+<div id="frame">
+  <div id="header"> <a href="../index.html" id="logo"><img src="../images/logo_domogik.png" width="131" height="37" alt="Domotik logo" /></a>
+    <div id="title">Welcome to Domogik<span id="subtitle">Free home automation under Linux</span></div>
+  </div>
+  <ul id="nav1">
+    <li><a href="index.html" class="selected ui-corner-top">Visualisation</a></li>
+    <li><a href="../program/index.html" class="ui-corner-top">Programmation</a></li>
+    <li><a href="../admin/index.html" class="ui-corner-top">Administration</a></li>
+  </ul>
+  <div id="content">
+    <div class="left">
+      <div id="nav2">
+        <div class="section"><a href="#">Par pi&egrave;ce</a></div>
+        <ul>
+          <li><a href="room.html" class="menu-room">Pi&egrave;ce principale</a></li>
+          <li><a href="room.html" class="menu-room-livingroom">S&eacute;jour</a></li>
+          <li><a href="room.html" class="menu-room">Chambre des enfants</a></li>
+          <li><a href="room.html" class="menu-room">Chambre des parents</a></li>
+          <li><a href="room.html" class="menu-room">Chambre des amis</a></li>
+          <li><a href="room.html" class="menu-room">Salle de bain</a></li>
+          <li><a href="room.html" class="menu-room">Salle de jeux</a></li>
+          <li><a href="room.html" class="menu-room">Garage</a></li>
+          <li><a href="room.html" class="menu-room">Jardin</a></li>
+        </ul>
+        <div class="section"><a href="#">Par zone</a></div>
+        <ul>
+          <li><a href="zone.html" class="menu-zone-grndfloor">Rez-de-chauss&eacute;e</a></li>
+          <li><a href="zone.html" class="menu-zone-floor">Etage</a></li>
+          <li><a href="zone.html" class="menu-zone-basement">Sous-sol</a></li>
+          <li><a href="zone.html" class="menu-zone">Ext&eacute;rieur</a></li>
+        </ul>
+        <div class="section"><a href="#">Par dispositif</a></div>
+        <ul>
+          <li><a href="device.html" class="menu-heat">Chauffage</a></li>
+          <li><a href="device.html" class="menu-light">Eclairage</a></li>
+          <li><a href="device.html" class="menu-electric">Prises &eacute;lectriques</a></li>
+          <li><a href="device.html" class="menu-window">Fenêtres/Volets</a></li>
+          <li><a href="device.html" class="menu-vmc">Ventilation</a></li>
+          <li><a href="device.html" class="menu-clim">Climatisation</a></li>
+          <li><a href="device.html" class="menu-audio">Audio</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="right">
+      <div class="element-main">
+        <div class="house-general">
+          <h1 class="element-ident"><span class="element-title">Maison</span><br />
+            <span class="element-subtitle">Rez-de-chaussée, Etage, Sous-sol, Exterieur</span></h1>
+          <ul>
+            <li class="general-electric">El&eacute;ctricit&eacute;: 150 Kw/h</li>
+            <li class="general-water">Eau: 1.6 l/h</li>
+          </ul>
+          <h2 class="splitter">Etat actuel de l'installation</h2>
+          <ul>
+            <li class="general-message">1 message</li>
+            <li class="general-notify">2 notifications</li>
+            <li class="general-error">Pas d'erreur</li>
+          </ul>
+        </div>
+      </div>
+      <div class="nocolumns">
+        <div class="element meteo-sun">
+          <h2>M&eacute;t&eacute;o</h2>
+          <ul>
+            <li>Temperature: 21°C</li>
+            <li>Vent: 5km/s sud</li>
+            <li>Pluviom&eacute;tre: 10 cm</li>
+          </ul>
+        </div>
+        <div class="element">
+          <h2>T&eacute;l&eacute;phone</h2>
+          <div class="phone-summary">5 appels - 3 messages</div>
+          <div class="parameter">R&eacute;pondeur: <span class="on">ON</span> <a href="#" class="button off">Eteindre</a> <a href="#" class="button">Configurer</a></div>
+          <div class="parameter">Archives: <a href="#" class="button">Consulter</a></div>
+          <table class="phone-calllist">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Num&eacute;ro</th>
+                <th>Nom</th>
+                <th>Message</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="odd">
+                <td>28/09/2009 10:14</td>
+                <td>+33(0)675897543</td>
+                <td>Sp4rKy</td>
+                <td>Oui (0'38s)</td>
+                <td><ul class="phone-callactions">
+                    <li><a href="#">Effacer</a></li>
+                    <li><a href="#">Rappeler</a></li>
+                    <li><a href="#">Ecouter message</a></li>
+                  </ul></td>
+              </tr>
+              <tr class="even">
+                <td>28/09/2009 9:15</td>
+                <td>+33(0)975797043</td>
+                <td>Kuri</td>
+                <td>Non</td>
+                <td><ul class="phone-callactions">
+                    <li><a href="#">Effacer</a></li>
+                    <li><a href="#">Rappeler</a></li>
+                  </ul></td>
+              </tr>
+              <tr class="odd">
+                <td>26/09/2009 20:26</td>
+                <td class="hidden-call">Num&eacute;ro masqu&eacute;</td>
+                <td class="hidden-call">Nom masqu&eacute;</td>
+                <td>Non</td>
+                <td><ul class="phone-callactions">
+                    <li><a href="#">Effacer</a></li>
+                    <li><a href="#">Rappeler</a></li>
+                  </ul></td>
+              </tr>
+              <tr class="even">
+                <td>26/09/2009 20:20</td>
+                <td class="hidden-call">Num&eacute;ro masqu&eacute;</td>
+                <td class="hidden-call">Nom masqu&eacute;</td>
+                <td>Non</td>
+                <td><ul class="phone-callactions">
+                    <li><a href="#">Effacer</a></li>
+                    <li><a href="#">Rappeler</a></li>
+                  </ul></td>
+              </tr>
+              <tr class="odd">
+                <td>25/09/2009 12:12</td>
+                <td>+33(0)877747323</td>
+                <td>Mirelsol</td>
+                <td>Oui (43'34s)</td>
+                <td><ul class="phone-callactions">
+                    <li><a href="#">Effacer</a></li>
+                    <li><a href="#">Rappeler</a></li>
+                    <li><a href="#">Ecouter message</a></li>
+                  </ul></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer"/>
+</div>
+</body>
+</html>
