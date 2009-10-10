@@ -27,113 +27,113 @@
 {% block title %}{% trans page_title %}{% endblock %}
 
 {% block content %}
-    <div id="search">
-    {% if device_list %}
-        <form name="filterForm" method="POST" action="{% url index_view %}"/>
-            <fieldset>
-                <legend>Search</legend>
-                <table>
-                    <tr valign="top">
-                        <td>
-                            <table>
-                                <tr>
-                                    <th>Area</th>
-                                </tr>
-                                {% for area in area_list %}
-                                    <tr>
-                                        <td>{{ area.name }}</td><td><input type="checkbox" name="area_id" value="{{ area.id }}"/></td>
-                                    </tr>
-                                {% endfor %}
-                            </table>
-                        </td>
-                        <td>
-                            <table>
-                                <tr>
-                                    <th>Room</th>
-                                </tr>
-                                {% for room in room_list %}
-                                    <tr>
-                                        <td>{{ room.name }}</td><td><input type="checkbox" name="room_id" value="{{ room.id }}"/></td>
-                                    </tr>
-                                {% endfor %}
-                            </table>
-                        </td>
-                        <td>
-                            <table>
-                                <tr>
-                                    <th>Category</th>
-                                </tr>
-                                {% for device_category in device_category_list %}
-                                    <tr>
-                                        <td>{{ device_category.name }}</td><td><input type="checkbox" name="device_category_id" value="{{ device_category.id }}"/></td>
-                                    </tr>
-                                {% endfor %}
-                            </table>
-                        </td>
-                    </tr>
-                    <tr>
-                        <input type="hidden" id="id_cmd" name="cmd" value="filter"/>
-                        <td colspan="2"><input type="submit" value="Filter"/></td>
-                    </tr>
-                </table>
-            </fieldset>
-        </form>
-    {% endif %}
-    </div>
-
-    <div id="list">
-    {% if device_list %}
-        <form name="deviceListForm" method="POST" action="{% url index_view %}"/>
+  <div id="search">
+  {% if device_list %}
+    <form name="filterForm" method="POST" action="{% url index_view %}"/>
+      <fieldset>
+        <legend>Search</legend>
         <table>
-            <tr>
-                <th>Device name</th>
-                <th>Category</th>
-                {% if is_user_admin %}
-                    <th>Address</th>
-                    <th>Reference</th>
-                    <th>Technology</th>
-                {% endif %}
-                <th>Room</th>
-                <th>Area</th>
-                <th>Status</th>
-            </tr>
-
-            {% for device in device_list %}
-                <input type="hidden" id="id_deviceId" name="device_id" value="{{ device.id }}"/>
-                <tr class="{% cycle 'oddRow' 'evenRow' %}">
-                    <td><a href="{% url device_view device.id %}">{{ device.name }}</a></td>
-                    <td>{{ device.category.name }}</td>
-                    {% if is_user_admin %}
-                        <td>{{ device.address }}</td>
-                        <td>{{ device.reference }}</td>
-                        <td>{{ device.technology.name }}</td>
-                    {% endif %}
-                    <td>{{ device.room.name }}</td>
-                    <td>{{ device.room.area.name }}</td>
-                    <td>
-                        <table id="listValue">
-                            <tr>
-                                <td>{% include "_inc_device_property.html" %}</td>
-                            </tr>
-                        </table>
-                    </td>
+          <tr valign="top">
+            <td>
+              <table>
+                <tr>
+                  <th>Area</th>
                 </tr>
-            {% endfor %}
+                {% for area in area_list %}
+                  <tr>
+                    <td>{{ area.name }}</td><td><input type="checkbox" name="area_id" value="{{ area.id }}"/></td>
+                  </tr>
+                {% endfor %}
+              </table>
+            </td>
+            <td>
+              <table>
+                <tr>
+                  <th>Room</th>
+                </tr>
+                {% for room in room_list %}
+                  <tr>
+                    <td>{{ room.name }}</td><td><input type="checkbox" name="room_id" value="{{ room.id }}"/></td>
+                  </tr>
+                {% endfor %}
+              </table>
+            </td>
+            <td>
+              <table>
+                <tr>
+                  <th>Category</th>
+                </tr>
+                {% for device_category in device_category_list %}
+                  <tr>
+                    <td>{{ device_category.name }}</td><td><input type="checkbox" name="device_category_id" value="{{ device_category.id }}"/></td>
+                  </tr>
+                {% endfor %}
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <input type="hidden" id="id_cmd" name="cmd" value="filter"/>
+            <td colspan="2"><input type="submit" value="Filter"/></td>
+          </tr>
         </table>
-        {% if is_user_connected %}
-        <p></p>
-        <table>
-            <tr>
-                <input type="hidden" id="id_cmd" name="cmd" value="update_values"/>
-                <td><input type="submit" value="Update"/></td>
-            </tr>
-        </table>
+      </fieldset>
+    </form>
+  {% endif %}
+  </div>
+
+  <div id="list">
+  {% if device_list %}
+    <form name="deviceListForm" method="POST" action="{% url index_view %}"/>
+    <table>
+      <tr>
+        <th>Device name</th>
+        <th>Category</th>
+        {% if is_user_admin %}
+          <th>Address</th>
+          <th>Reference</th>
+          <th>Technology</th>
         {% endif %}
-        </form>
-    {% else %}
-        <p>No device found !</p>
-    {% endif %} 
-    </div>
+        <th>Room</th>
+        <th>Area</th>
+        <th>Status</th>
+      </tr>
+
+      {% for device in device_list %}
+        <input type="hidden" id="id_deviceId" name="device_id" value="{{ device.id }}"/>
+        <tr class="{% cycle 'oddRow' 'evenRow' %}">
+          <td><a href="{% url device_view device.id %}">{{ device.name }}</a></td>
+          <td>{{ device.category.name }}</td>
+          {% if is_user_admin %}
+            <td>{{ device.address }}</td>
+            <td>{{ device.reference }}</td>
+            <td>{{ device.technology.name }}</td>
+          {% endif %}
+          <td>{{ device.room.name }}</td>
+          <td>{{ device.room.area.name }}</td>
+          <td>
+            <table id="listValue">
+              <tr>
+                <td>{% include "_inc_device_property.html" %}</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      {% endfor %}
+    </table>
+    {% if is_user_connected %}
+    <p></p>
+    <table>
+      <tr>
+        <input type="hidden" id="id_cmd" name="cmd" value="update_values"/>
+        <td><input type="submit" value="Update"/></td>
+      </tr>
+    </table>
+    {% endif %}
+    </form>
+  {% else %}
+    <p>No device found !</p>
+  {% endif %} 
+  </div>
 <!--
     {% for device in deviceList %}
       {% include device.get_template_name %}
