@@ -16,10 +16,6 @@
 # along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
 
 # Author : Marc Schneider <marc@domogik.org>
-
-# $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-12 11:52:36 +0100 (jeu. 12 févr. 2009) $
-# $LastChangedRevision: 356 $
 -->
 {% extends "base_with_menu.html" %}
 {% load i18n %}
@@ -27,78 +23,83 @@
 {% block title %}{% trans page_title %}{% endblock %}
 
 {% block right %}
-    <form name="deviceForm" method="POST" action=""/>
-    <div id="device">
-        <table>
-            <tr>
-                <input type="hidden" id="id_deviceId" name="device_id" value="{{ device.id }}"/>
-                <td class="label">Device</td>
-                <td class="value">
-                {% if is_user_admin %}
-                    <input type="text" name="device_name" size="20" value="{{ device.name }}"/>
-                {% else %}
-                    {{ device.name }}
-                {% endif %}
-                </td>
-            </tr>
-            <tr>
-                <td class="label">Description</td>
-                <td class="value">
-                {% if is_user_admin %}
-                    <textarea name="device_description" cols="40" rows="3">{{ device.description }}</textarea>
-                {% else %}
-                    {{ device.description }}
-                {% endif %}
-                </td>
-            </tr>
-            {% if is_user_admin %}
-                <tr>
-                    <td class="label">Address</td><td class="value">{{ device.address }}</td>
-                </tr>
-                <tr>
-                    <td class="label">Reference</td><td class="value">{{ device.reference }}</td>
-                </tr>
-                <tr>
-                    <td class="label">Technology</td><td class="value">{{ device.technology.name }}</td>
-                </tr>
-                <tr>
-                    <td class="label">Type</td><td class="value">{{ device.type }}</td>
-                </tr>
-            {% endif %}
-            <tr>
-                <td class="label">Category</td><td class="value">{{ device.category.name }}</td>
-            </tr>
-            <tr>
-                <td class="label">Room</td><td class="value">{{ device.room.name }}</td>
-            </tr>
-            <tr>
-                <td class="label">Area</td><td class="value">{{ device.room.area.name }}</td>
-            </tr>
-            <tr>
-                <td class="label">Value</td>
-                <td class="value">
-                    <table>
-                        <tr>
-                            <td>{% include "_inc_device_property.html" %}</td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-        </table>
-        <p></p>
-        {% if is_user_connected %}
-        <table>
-            <tr>
-                <td><input name="update" type="submit" value="Update"/></td>
-                {% if device.is_resetable %}
-                    <td><input name="reset" type="submit" value="Reset device"/></td>
-                {% endif %}
-            </tr>
-        </table>
-        <p>
-            &raquo;&nbsp;{% if has_stats %}<a href="{% url device_stats_view device.id %}">View stats</a>{% else %}No stats{% endif %}
-        </p>
+  <form name="deviceForm" method="POST" action=""/>
+  <div id="device">
+    <table>
+      <tr>
+        <input type="hidden" id="id_deviceId" name="device_id" value="{{ device.id }}"/>
+        <td class="label">Device</td>
+        <td class="value">
+          {% if is_user_admin %}
+            <input type="text" name="device_name" size="20" value="{{ device.name }}"/>
+          {% else %}
+            {{ device.name }}
+          {% endif %}
+        </td>
+      </tr>
+      <tr>
+        <td class="label">Description</td>
+        <td class="value">
+        {% if is_user_admin %}
+          <textarea name="device_description" cols="40" rows="3">{{ device.description }}</textarea>
+        {% else %}
+          {{ device.description }}
         {% endif %}
-    </div>
-    </form>
+        </td>
+      </tr>
+      {% if is_user_admin %}
+        <tr>
+          <td class="label">Address</td><td class="value">{{ device.address }}</td>
+        </tr>
+        <tr>
+          <td class="label">Reference</td><td class="value">{{ device.reference }}</td>
+        </tr>
+        <tr>
+          <td class="label">Technology</td><td class="value">{{ device.technology.name }}</td>
+        </tr>
+        <tr>
+          <td class="label">Type</td><td class="value">{{ device.type }}</td>
+        </tr>
+      {% endif %}
+      <tr>
+        <td class="label">Category</td><td class="value">{{ device.category.name }}</td>
+      </tr>
+      <tr>
+        <td class="label">Room</td><td class="value">{{ device.room.name }}</td>
+      </tr>
+      <tr>
+        <td class="label">Area</td><td class="value">{{ device.room.area.name }}</td>
+      </tr>
+      <tr>
+        <td class="label">Value</td>
+        <td class="value">
+          <table>
+            <tr>
+              <td>{% include "_inc_device_property.html" %}</td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+    <p></p>
+    {% if is_user_connected %}
+      <table>
+        <tr>
+          <td><input name="update" type="submit" value="Update"/></td>
+          {% if device.is_resetable %}
+            <td><input name="reset" type="submit" value="Reset device"/></td>
+          {% endif %}
+        </tr>
+      </table>
+      <p>
+        &raquo;&nbsp;
+        {% if has_stats %}
+          <a href="{% url device_stats_view device.id %}">View stats</a>
+        {% else %}
+          No stats
+        {% endif %}
+      </p>
+    {% endif %}
+  </div>
+  </form>
 {% endblock %}
