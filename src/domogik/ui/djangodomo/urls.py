@@ -49,7 +49,7 @@ urlpatterns = patterns('',
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
     # Uncomment the next line to enable the admin:
-    (r'^admin/', include(admin.site.urls)),
+    #(r'^admin/', include(admin.site.urls)),
     # TODO : change this, only used in development environment
     # See : http://docs.djangoproject.com/en/dev/howto/static-files/
     (r'^design/(?P<path>.*)$', 'django.views.static.serve',
