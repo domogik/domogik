@@ -1,0 +1,98 @@
+@charset "UTF-8";
+/* CSS Document */
+
+.element-main {
+	margin-right:1em;
+	padding:0 1em 0 1em;
+	-moz-box-shadow: 5px 5px 5px #888;
+	-webkit-box-shadow: 5px 5px 5px #888;
+	-moz-border-radius: 0.8em;
+	-webkit-border-radius: 0.8em;
+
+}
+
+.element-actions {
+	list-style:none;
+	margin:0;
+	padding:0;
+}
+
+.element-actions li{
+	display:inline-block;
+	margin:0;
+	padding:0;
+}
+
+.element-main h2, .element h2 {
+	font-style:italic;
+}
+
+.columns {
+	-moz-column-width: 40em;
+    -webkit-column-width: 40em;
+    -moz-column-gap: 1em;
+    -webkit-column-gap: 1em;
+}
+
+.element {
+	border:1px solid #1c94c4;
+	margin:1em 0 0 0;
+	padding:0 1em 0 1em;
+	column-break-inside: avoid;
+	min-height:15em;
+	-moz-border-radius: 0.8em 0 0.8em 0;
+	-webkit-border-radius: 0.8em 0 0.8em 0;
+}
+
+.mediumbox {
+	width:40em;
+	margin-left:5em;
+}
+
+.label {
+	font-weight:bold;
+}
+
+.parameter {
+	line-height:3em;
+	border-top:1px solid #CCC;
+}
+
+.parameter .button {
+	float:right;
+	line-height:1.6em;
+	margin:0.2em;
+}
+
+/* Indicators */
+span.on {
+	padding:7px 0 7px 20px;
+	background:url(../images/room_various_on.png) left 50% no-repeat;
+}
+span.off {
+	padding:7px 0 7px 20px;
+	background:url(../images/room_various_off.png) left 50% no-repeat;
+}
+
+.shutteropen {
+}
+.shutterclosed {
+	padding:7px 0 7px 20px;
+	background: url(../images/room_shutter_down.png) left 50% no-repeat;
+}
+
+
+/* Element main */
+
+.element-ident {
+	line-height:0.5em;
+}
+
+.element-title {
+	font-size:1em;
+}
+.element-subtitle {
+	font-size:0.6em;
+	font-style:italic;
+	padding-left:1em;
+}

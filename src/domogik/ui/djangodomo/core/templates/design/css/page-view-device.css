@@ -1,0 +1,33 @@
+@charset "UTF-8";
+/* CSS Document */
+
+.device-general {
+	background:url(../images/menu_light.png) top right no-repeat;
+	min-height:10em;
+}
+
+.light-infos {
+	list-style:none;
+	margin-left:20%;
+}
+
+
+.light-infos li {
+	display:inline-block;
+	margin:1em;
+}
+
+.header_grndfloor {
+	background:url(../images/rdc_white_16.png) left 50% no-repeat;
+	padding-left:20px;
+}
+
+.header_floor {
+	background:url(../images/etage1_white_16.png) left 50% no-repeat;
+	padding-left:20px;
+}
+
+.header_basement {
+	background:url(../images/sous-sol_white_16.png) left 50% no-repeat;
+	padding-left:20px;
+}

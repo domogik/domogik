@@ -17,12 +17,12 @@
 
 # Author : Marc Schneider <marc@domogik.org>
 -->
-{% extends "base.html" %}
+{% extends "base_with_menu.html" %}
 {% load i18n %}
 
 {% block title %}{% trans page_title %}{% endblock %}
 
-{% block content %}
+{% block right %}
   <div id="search">
   {% if device_list %}
     <form name="filterForm" method="POST" action="{% url index_view %}"/>
