@@ -788,7 +788,7 @@ class DbHelper():
         Add a default system account (login = admin, password = domogik, is_admin = True)
         @return a SystemAccount object
         """
-        return self.add_system_account(a_login='admin', a_password='domogik', a_is_admin=True)
+        return self.add_system_account(a_login='admin', a_password='12345', a_is_admin=True)
 
     def del_system_account(self, a_id):
         """
