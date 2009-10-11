@@ -57,7 +57,7 @@
   <ul id="nav1">
     <li><a href="show/index.html">Visualisation</a></li>
     <li><a href="program/index.html">Programmation</a></li>
-    <li><a href="login.html">Administration</a></li>
+    <li><a href="{% url admin_view %}">Administration</a></li>
     <li>
       {% if not is_user_connected %}
          <a href="{% url login_view %}">{% trans "Log in" %}</a>

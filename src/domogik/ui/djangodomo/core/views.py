@@ -204,7 +204,6 @@ def admin_index(request):
     """
     if not _is_user_admin(request):
         return index(request)
-
     simulation_mode = ""
     admin_mode = ""
     debug_mode = ""
@@ -217,7 +216,7 @@ def admin_index(request):
         admin_mode = "checked"
     if sys_config.debug_mode:
         debug_mode = "checked"
-    return _go_to_page(request, 'admin_index.html', page_title, action=action, 
+    return _go_to_page(request, 'admin/admin_index.html', page_title, action=action, 
                       simulation_mode=simulation_mode, admin_mode=admin_mode, 
                       debug_mode=debug_mode)
 
