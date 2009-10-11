@@ -25,6 +25,12 @@
   <link href="/design/css/ui-elements.css" rel="stylesheet" type="text/css" />
   <link href="/design/css/ui-buttons.css" rel="stylesheet" type="text/css" />
 {% endblock %}
+{% block script %}
+$(function(){
+  // Accordion
+  $("#nav2").accordion({ header: ".section", active:false});
+});
+{% endblock %}
 
 {% block content %}
   <div class="left">
