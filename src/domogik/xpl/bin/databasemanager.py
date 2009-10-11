@@ -63,7 +63,7 @@ class DBConnector(xPLModule):
         self._log.debug("Init database_manager instance")
         
         self._db = DbHelper()
-        self._stats = StatsManager(self._db)
+        self._stats = StatsManager()
         Listener(self._request_config_cb, self._myxpl,
                 {'schema': 'domogik.config', 'type': 'xpl-cmnd'})
         #cfgloader = Loader('database')
@@ -185,10 +185,9 @@ class StatsManager(xPLModule):
     """
     Listen on the xPL network and keep stats of device and system state
     """
-    def __init__(self, db):
+    def __init__(self):
         xPLModule.__init__(self, 'statmgr')
         self._log = self.get_my_logger()
-        self.__dbhelper = db
         l_x10 = Listener(self._x10_cb, self._myxpl,
                 {'schema': 'x10.basic', 'type': 'xpl-trig'})
         l_ow = Listener(self._onewire_cb, self._myxpl,
@@ -203,11 +202,12 @@ class StatsManager(xPLModule):
         """
         Manage X10 stats
         """
+        dbhelper = DbHelper()
         techno_id = self.__dbhelper.get_device_technology_by_name(u'x10').id
-        d = self.__dbhelper.search_devices(technology_id = techno_id, address = message.data['device'])
+        d = dbhelper.search_devices(technology_id = techno_id, address = message.data['device'])
         if d:
             d_id = d[0].id
-            self.__dbhelper.add_device_stat(d_id, datetime.today(), message.data['command'].lower())
+            dbhelper.add_device_stat(d_id, datetime.today(), message.data['command'].lower())
         else:
             self._log.warning("A X10 stat has been received for a non existing device : %s" % message.data['device'])
 
@@ -215,19 +215,21 @@ class StatsManager(xPLModule):
         """
         Manage OneWire stats
         """
+        dbhelper = DbHelper()
         techno_id = self.__self.__dbhelper.get_device_technology_by_name('onewire').id
         d_id = self.__dbhelper.search_devices(technology = techno_id, name =
                 message.data['device'])[0].id
-        self.__dbhelper.add_device_stat(d_id, datetime.today(), message.data['current'].lower())
+        dbhelper.add_device_stat(d_id, datetime.today(), message.data['current'].lower())
 
     def _plcbus_cb(self, message):
         """
         Manage PLCBUS stats
         """
+        dbhelper = DbHelper()
         techno_id = self.__self.__dbhelper.get_device_technology_by_name('plcbus').id
         d_id = self.__dbhelper.search_devices(technology = techno_id, name =
                 message.data['device'])[0].id
-        self.__dbhelper.add_device_stat(d_id, datetime.today(), message.data['command'].lower())
+        dbhelper.add_device_stat(d_id, datetime.today(), message.data['command'].lower())
 
     def _knx_cb(self, message):
         """
@@ -240,14 +242,15 @@ class StatsManager(xPLModule):
         """
         command = message.data["command"]
         host = message.data["host"]
+        dbhelper = DbHelper()
         if command in ["start","stop","reload","dump"]:
             module = message.data["module"]
-            self.__dbhelper.add_system_stat(module, datetime.today(), 'CORE', command)
+            dbhelper.add_system_stat(module, gethostname(), datetime.today(), u'CORE', command)
         elif command == "ping":
             module = message.data["module"]
-            self.__dbhelper.add_system_stat(module, datetime.today(), 'HB_CLIENT', command)
+            dbhelper.add_system_stat(module, gethostname(), datetime.today(), u'HB_CLIENT', command)
         else:
-            self.__dbhelper.add_system_stat(None, datetime.today(), 'CORE', command)
+            dbhelper.add_system_stat(None, gethostname(), datetime.today(), u'CORE', command)
 
 
 if __name__ == "__main__":
