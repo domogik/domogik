@@ -1,0 +1,54 @@
+<!--
+# Copyright 2008 Domogik project
+
+# This file is part of Domogik.
+# Domogik is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Domogik is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+
+# Author : Marc Schneider <marc@domogik.org>
+-->
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block css %}
+  <link href="/design/css/ui-nav2.css" rel="stylesheet" type="text/css" />
+  <link href="/design/css/ui-elements.css" rel="stylesheet" type="text/css" />
+  <link href="/design/css/ui-buttons.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+{% block script %}
+$(function(){
+  // Accordion
+  $("#nav2").accordion({ header: ".section", active:false});
+});
+{% endblock %}
+
+{% block content %}
+  <div class="left">
+    <div id="nav2">
+      <div class="section"><a href="#">Organisation</a></div>
+      <ul>
+        <li><a href="organisation/devices.html">Dispositifs</a></li>
+        <li><a href="organisation/rooms.html">Pièces</a></li>
+        <li><a href="organisation/zones.html">Zones</a></li>
+      </ul>
+      <div class="section"><a href="#">Gestion</a></div>
+      <ul>
+        <li><a href="management/modules.html">Modules</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="right">
+    {% block right %}{% endblock %}
+  </div>
+{% endblock %}
+
