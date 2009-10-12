@@ -399,6 +399,9 @@ if __name__ == "__main__":
     assert d.is_system_account('mschneider', 'IwontGiveIt'), "is_system_account should have returned True"
     assert not d.is_system_account('mschneider', 'plop'), "is_system_account should have returned False"
     assert not d.is_system_account('hello', 'boy'), "is_system_account should have returned False"
+    sys1 = d.get_system_account_by_login_and_pass('mschneider', 'IwontGiveIt')
+    assert sys1 is not None, "Should have found an account 'mschneider'"
+    assert sys1.login == 'mschneider', "Login should be 'mschneider' but is '%s'" %sys1.login
     try:
         d.add_system_account(a_login = 'mschneider', a_password = 'plop', a_is_admin = True)
         error = False

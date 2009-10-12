@@ -749,6 +749,17 @@ class DbHelper():
         """
         return self._session.query(SystemAccount).filter_by(login=a_login).first()
 
+    def get_system_account_by_login_and_pass(self, a_login, a_password):
+        """
+        Return system account information from login
+        @param a_login : login
+        @param a_pass : password
+        @return a SystemAccount object or None if login / password is wrong
+        """
+        sha_pass = hashlib.sha256()
+        sha_pass.update(a_password)
+        return self._session.query(SystemAccount).filter_by(login=a_login, password=sha_pass.hexdigest()).first()
+
     def get_system_account_by_user(self, u_id):
         """
         Return a system account associated to a user, if existing
@@ -769,6 +780,7 @@ class DbHelper():
         Check if a system account with a_login, a_password exists
         @param a_login : Account login
         @param a_password : Account password (clear)
+        @return True or False
         """
         system_account = self.get_system_account_by_login(a_login)
         if system_account is not None:
