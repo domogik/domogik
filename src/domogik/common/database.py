@@ -764,6 +764,20 @@ class DbHelper():
         else:
             return None
 
+    def is_system_account(self, a_login, a_password):
+        """
+        Check if a system account with a_login, a_password exists
+        @param a_login : Account login
+        @param a_password : Account password (clear)
+        """
+        system_account = self.get_system_account_by_login(a_login)
+        if system_account is not None:
+            password = hashlib.sha256()
+            password.update(a_password)
+            if system_account.password == password.hexdigest():
+                return True
+        return False
+
     def add_system_account(self, a_login, a_password, a_is_admin=False):
         """
         Add a system_account

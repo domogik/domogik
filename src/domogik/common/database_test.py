@@ -396,6 +396,9 @@ if __name__ == "__main__":
           "System account list should be empty but it is NOT %s" % d.list_system_accounts()
     print_test("add_user_account")
     sys1 = d.add_system_account(a_login = 'mschneider', a_password = 'IwontGiveIt', a_is_admin = True)
+    assert d.is_system_account('mschneider', 'IwontGiveIt'), "is_system_account should have returned True"
+    assert not d.is_system_account('mschneider', 'plop'), "is_system_account should have returned False"
+    assert not d.is_system_account('hello', 'boy'), "is_system_account should have returned False"
     try:
         d.add_system_account(a_login = 'mschneider', a_password = 'plop', a_is_admin = True)
         error = False
@@ -465,7 +468,7 @@ if __name__ == "__main__":
     sstat_list = []
     print_test("add_system_stat")
     for i in range(4):
-        sstat_list.append(d.add_system_stat("sstat%s" %i, now + datetime.timedelta(seconds=i), 
+        sstat_list.append(d.add_system_stat("sstat%s" %i, 'localhost', now + datetime.timedelta(seconds=i), 
                           SYSTEMSTATS_TYPE_LIST[i%2], "val%s" %i))
     print_test("list_system_stats")
     assert len(d.list_system_stats()) == 4, "List of system stats should have 4 items : %s" % d.list_system_stats()
@@ -473,7 +476,7 @@ if __name__ == "__main__":
     nb_items = len(d.get_system_stats_by_type(SYSTEMSTATS_TYPE_LIST[0]))
     assert nb_items == 2, "Should have 2 system stats of type %s, but have %s" % (SYSTEMSTATS_TYPE_LIST[0], nb_items)
     print_test("get_system_stat")
-    val0 = d.get_system_stat("sstat0").value
+    val0 = d.get_system_stat(sstat_list[0].id).value
     assert val0 == "val0", "Wrong value for sstat0 : '%s'. Should be 'val0'" % val0
     print_test("del_system_stat")
     d.del_system_stat("sstat0")
