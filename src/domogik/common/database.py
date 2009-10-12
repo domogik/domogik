@@ -753,7 +753,7 @@ class DbHelper():
         """
         Return system account information from login
         @param a_login : login
-        @param a_pass : password
+        @param a_pass : password (clear)
         @return a SystemAccount object or None if login / password is wrong
         """
         sha_pass = hashlib.sha256()
