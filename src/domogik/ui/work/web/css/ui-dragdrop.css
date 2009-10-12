@@ -2,79 +2,79 @@
 /* CSS Document */
 
 ul.draggables {
-	list-style:none;
-	border:2px solid #1c94c4;
-	-moz-border-radius: 0.8em;
-	-webkit-border-radius: 0.8em;
+  list-style:none;
+  border:2px solid #1c94c4;
+  -moz-border-radius: 0.8em;
+  -webkit-border-radius: 0.8em;
 }
 
 li.draggable, li.empty
 {
-	position: relative;
-	border: 1px solid #666;
-	padding: 0.5em;
-	margin:0.1em;
-	width: 10em;
-	text-align: center;
-	color: #000;
-	background: #fff;
-	display:inline-block;
-	-moz-border-radius: 1em;
-	-webkit-border-radius: 1em;
+  position: relative;
+  border: 1px solid #666;
+  padding: 0.5em;
+  margin:0.1em;
+  width: 10em;
+  text-align: center;
+  color: #000;
+  background: #fff;
+  display:inline-block;
+  -moz-border-radius: 1em;
+  -webkit-border-radius: 1em;
 }
 
 li.draggable
 {
-	cursor: move;
+  cursor: move;
 }
 
 li.dragged
 {
-	-moz-box-shadow: 5px 5px 5px #888;
-	-webkit-box-shadow: 5px 5px 5px #888;
+  -moz-box-shadow: 5px 5px 5px #888;
+  -webkit-box-shadow: 5px 5px 5px #888;
 }
 
 ul.draggables li.hover, ul.draggables li.focused
 {
-	background: #f6a828;
+  background: #f6a828;
 }
 
 ul.highlight
 {
-	background: #1c94c4;
+  background: #1c94c4;
 }
 
 ul.highlight.hover
 {
-	background: #f6a828;
+  background: #f6a828;
 }
 
 ul#popup
 {
-	list-style:none;
-	position: absolute;
-	width: 10em;
-	padding: 0.3em;
-	background:#CCC;
-	color: #000;
-	border: 2px solid #f6a828;
-	top: 1em;
-	left: 1em;
-	cursor: default;
-	z-index: 40;
-	-moz-border-radius: 0.5em;
-	-webkit-border-radius: 0.5em;
+  list-style:none;
+  position: absolute;
+  width: 10em;
+  padding: 0.3em;
+  background:#CCC;
+  color: #000;
+  border: 2px solid #f6a828;
+  top: 1em;
+  left: 1em;
+  cursor: default;
+  z-index: 40;
+  -moz-border-radius: 0.5em;
+  -webkit-border-radius: 0.5em;
 }
 
 ul#popup li
 {
-	text-align: left;
-	margin: 0.3em 0;
-	padding: 0.4em;
+  text-align: left;
+  margin: 0.3em 0;
+  padding: 0.4em;
 }
 
 ul#popup li.focus, ul#popup li.hover
 {
-	background: #f6a828;
-	color: #fff;
+  background: #f6a828;
+  color: #fff;
 }

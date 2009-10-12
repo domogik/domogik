@@ -1,93 +1,93 @@
 img {
-	border:none;
+  border:none;
 }
 
 .hidden {
-	display:none;
+  display:none;
 }
 
 h2 {
-	margin-top:0;
+  margin-top:0;
 }
 
 h2.splitter, h3.splitter {
-	border-top:1px solid #999;
+  border-top:1px solid #999;
 }
 
 /* Main Layout */
 body {
-	font: 62.5% "Trebuchet MS", sans-serif;
-	margin: 1em;
+  font: 62.5% "Trebuchet MS", sans-serif;
+  margin: 1em;
 }
 
 #frame {
-	-moz-border-radius: 0.8em;
-	-webkit-border-radius: 0.8em;
+  -moz-border-radius: 0.8em;
+  -webkit-border-radius: 0.8em;
 }
 
 div.left {
-	float:left;
-	width: 20em;
+  float:left;
+  width: 20em;
 }
 div.right {
-	margin-left: 21em;
+  margin-left: 21em;
 }
 .footer {
-	clear:both;
-	margin-bottom:1em;
+  clear:both;
+  margin-bottom:1em;
 }
 /* Header */
 #logo {
-	float:left;
-	margin:0 1em 0 0;
+  float:left;
+  margin:0 1em 0 0;
 }
 
 #header {
-	padding:1em 0 0 1em;
+  padding:1em 0 0 1em;
 }
 
 #title {
-	font-size:2em;
+  font-size:2em;
 }
 
 #subtitle {
-	display:block;
-	font-size:0.6em;
-	font-style:italic;
+  display:block;
+  font-size:0.6em;
+  font-style:italic;
 }
 /* Nav menu */
 ul#nav1 {
-	list-style: none;
-	position: relative;
-	padding: 0.2em 0.2em 0 0.2em;
-	border: #e78f08 1px solid;
-	background: #f6a828 url(images/ui-bg_gloss-wave_35_f6a828_500x100.png) 50% 50% repeat-x;
-	background-attachment: scroll;
-	color: #ffffff;
-	font-weight: bold;
+  list-style: none;
+  position: relative;
+  padding: 0.2em 0.2em 0 0.2em;
+  border: #e78f08 1px solid;
+  background: #f6a828 url(images/ui-bg_gloss-wave_35_f6a828_500x100.png) 50% 50% repeat-x;
+  background-attachment: scroll;
+  color: #ffffff;
+  font-weight: bold;
 }
 ul#nav1 li {
-	display:inline-block;
-	padding:0;
+  display:inline-block;
+  padding:0;
 }
 ul#nav1 li a {
-	display:inline-block;
-	text-decoration:none;
-	padding: 0.5em 1em 0.5em 1em;
-	color:#FFF;
-	background:#FFF;
-	color: #1c94c4;
-	border: #cccccc 1px solid;
+  display:inline-block;
+  text-decoration:none;
+  padding: 0.5em 1em 0.5em 1em;
+  color:#FFF;
+  background:#FFF;
+  color: #1c94c4;
+  border: #cccccc 1px solid;
 }
 ul#nav1 li a:hover, ul#nav1 li a:focus, ul#nav1 li a:active {
-	color: #c77405;
-	background: #fdf5ce url(images/ui-bg_glass_100_fdf5ce_1x400.png) repeat-x 50% 50%;
-	background-attachment: scroll;
+  color: #c77405;
+  background: #fdf5ce url(images/ui-bg_glass_100_fdf5ce_1x400.png) repeat-x 50% 50%;
+  background-attachment: scroll;
 }
 ul#nav1 li a.selected {
-	color: #eb8f00;
+  color: #eb8f00;
 }
 ul#nav1 li a.selected:hover {
-	color: #eb8f00;
-	background:#FFF;
+  color: #eb8f00;
+  background:#FFF;
 }

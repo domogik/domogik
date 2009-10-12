@@ -1,22 +1,22 @@
 @charset "UTF-8";
 /* CSS Document */
 .slider-light {
-	width: 50%;
-	margin-bottom:1em;
+  width: 50%;
+  margin-bottom:1em;
 }
 .value-light {
-	border:0;
-	background: transparent;
-	color:#f6931f;
-	font-weight:bold;
-	width:2em;
+  border:0;
+  background: transparent;
+  color:#f6931f;
+  font-weight:bold;
+  width:2em;
 }
 
 .lighton {
-	padding:7px 0 7px 20px;
-	background: url(../images/room_light_on.png) left 50% no-repeat;
+  padding:7px 0 7px 20px;
+  background: url(../images/room_light_on.png) left 50% no-repeat;
 }
 .lightoff {
-	padding:7px 0 7px 20px;
-	background: url(../images/room_light_off.png) left 50% no-repeat;
+  padding:7px 0 7px 20px;
+  background: url(../images/room_light_off.png) left 50% no-repeat;
 }

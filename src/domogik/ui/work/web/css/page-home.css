@@ -1,237 +1,237 @@
 #header {
-	float:left;
-	margin-top:1em;
+  float:left;
+  margin-top:1em;
 }
 
 /* Nav menu */
 ul#nav1 {
-	clear:both;
+  clear:both;
 }
 
 /* General box */
 
 #general {
-	float:right;
-	width:35em;
+  float:right;
+  width:35em;
 }
 
 .sun {
-	background:url(../images/meteo_sun.png) top left no-repeat;
+  background:url(../images/meteo_sun.png) top left no-repeat;
 }
 
 #general-temp {
-	float:right;
-	font-size:2em;
-	height:64px;
-	width:64px;
-	text-align:center;
-	padding-top:1em;
+  float:right;
+  font-size:2em;
+  height:64px;
+  width:64px;
+  text-align:center;
+  padding-top:1em;
 }
 
 #general-time {
-	font-size:3em;
+  font-size:3em;
 }
 
 #general-date {
-	font-style:italic;
+  font-style:italic;
 }
 
 .general-infos {
-	list-style:none;
+  list-style:none;
 }
 
 .general-infos li {
-	display:inline;
-	margin-left:1em;
-	padding-left:20px;
+  display:inline;
+  margin-left:1em;
+  padding-left:20px;
 }
 
 li#general-infos-elect {
-	background:url(../images/infos_elect.png) top left no-repeat;
+  background:url(../images/infos_elect.png) top left no-repeat;
 }
 
 li#general-infos-water {
-	background:url(../images/infos_water.png) top left no-repeat;
+  background:url(../images/infos_water.png) top left no-repeat;
 }
 
 li#general-infos-message {
-	background:url(../images/infos_message.png) top left no-repeat;
+  background:url(../images/infos_message.png) top left no-repeat;
 }
 
 li#general-infos-notify {
-	background:url(../images/infos_notify.png) top left no-repeat;
+  background:url(../images/infos_notify.png) top left no-repeat;
 }
 
 li#general-infos-error {
-	background:url(../images/infos_error.png) top left no-repeat;
+  background:url(../images/infos_error.png) top left no-repeat;
 }
 
 /* Layout */
 .line {
-	clear:both;
+  clear:both;
 }
 
 .room.leftcol {
-	float:left;
+  float:left;
 }
 
 .room.middlecol {
-	float:left;
-	margin-left:1%;
-	margin-right:1%;
+  float:left;
+  margin-left:1%;
+  margin-right:1%;
 }
 
 .room.rightcol {
-	float:left;
+  float:left;
 }
 
 /* Room */
 
 .room {
-	margin:1em 0 0 1em;
-	width:31%;
-	-moz-box-shadow: 5px 5px 5px #888;
-	-webkit-box-shadow: 5px 5px 5px #888;
-	-moz-border-radius: 0.8em 0 0.8em 0;
-	-webkit-border-radius: 0.8em 0 0.8em 0;
+  margin:1em 0 0 1em;
+  width:31%;
+  -moz-box-shadow: 5px 5px 5px #888;
+  -webkit-box-shadow: 5px 5px 5px #888;
+  -moz-border-radius: 0.8em 0 0.8em 0;
+  -webkit-border-radius: 0.8em 0 0.8em 0;
 }
 
 h2.room-ident {
-	font-size:1em;
-	float:left;
-	background:url(../images/room-type.png) top left no-repeat;
-	padding:1em 0 0 70px;
-	width:43%;
-	min-height:50px;
+  font-size:1em;
+  float:left;
+  background:url(../images/room-type.png) top left no-repeat;
+  padding:1em 0 0 70px;
+  width:43%;
+  min-height:50px;
 }
 
 h2.room-ident.room-livingroom {
-	background:url(../images/sofa_white_64.png) top left no-repeat;
+  background:url(../images/sofa_white_64.png) top left no-repeat;
 }
 h2.room-ident.room-kitchen {
-	background:url(../images/kitchen_64.png) top left no-repeat;
+  background:url(../images/kitchen_64.png) top left no-repeat;
 }
 h2.room-ident.room-bathroom {
-	background:url(../images/bathroom_64.png) top left no-repeat;
+  background:url(../images/bathroom_64.png) top left no-repeat;
 }
 
 .room-title {
-	font-size:1.5em;
+  font-size:1.5em;
 }
 .room-zone {
-	font-style:italic;
+  font-style:italic;
 }
 
 .zone-grndfloor {
-	background:url(../images/rdc_white_16.png) left 50% no-repeat;
-	padding-left:20px;
+  background:url(../images/rdc_white_16.png) left 50% no-repeat;
+  padding-left:20px;
 }
 
 .zone-floor {
-	background:url(../images/etage1_white_16.png) left 50% no-repeat;
-	padding-left:20px;
+  background:url(../images/etage1_white_16.png) left 50% no-repeat;
+  padding-left:20px;
 }
 
 .zone-basement {
-	background:url(../images/sous-sol_white_16.png) left 50% no-repeat;
-	padding-left:20px;
+  background:url(../images/sous-sol_white_16.png) left 50% no-repeat;
+  padding-left:20px;
 }
 .room-temp {
-	min-height:32px;
-	margin:1em 0.5em 0 0;
-	padding-left:25px;
-	float:right;
-	font-size:1.5em;
-	background:url(../images/room_temp.png) top left no-repeat;
+  min-height:32px;
+  margin:1em 0.5em 0 0;
+  padding-left:25px;
+  float:right;
+  font-size:1.5em;
+  background:url(../images/room_temp.png) top left no-repeat;
 }
 
 .room-infos {
-	clear:both;
-	list-style:none;
-	margin:0 1em 0 1em;
-	padding:1em 0 0 0;
-	border-top:#CCC 1px solid;
+  clear:both;
+  list-style:none;
+  margin:0 1em 0 1em;
+  padding:1em 0 0 0;
+  border-top:#CCC 1px solid;
 }
 
 .room-infos li {
-	display:inline;
-	margin-right:1em;
+  display:inline;
+  margin-right:1em;
 }
 
 .room-light .on {
-	padding:10px 0 10px 18px;
-	background:url(../images/room_light_on.png) left 50% no-repeat;
+  padding:10px 0 10px 18px;
+  background:url(../images/room_light_on.png) left 50% no-repeat;
 }
 
 .room-light .off {
-	padding:10px 0 10px 18px;
-	background:url(../images/room_light_off.png) left 50% no-repeat;
+  padding:10px 0 10px 18px;
+  background:url(../images/room_light_off.png) left 50% no-repeat;
 }
 
 .room-shutter .down {
-	padding:10px 0 10px 18px;
-	background:url(../images/room_shutter_down.png) left 50% no-repeat;
+  padding:10px 0 10px 18px;
+  background:url(../images/room_shutter_down.png) left 50% no-repeat;
 }
 
 .room-others {
-	list-style:none;
+  list-style:none;
 }
 
 .room-others li {
-	padding:1em 0 0.5em 35px;
+  padding:1em 0 0.5em 35px;
 }
 
 li.room-tv {
-	background:url(../images/room_tv.png) left 50% no-repeat;
+  background:url(../images/room_tv.png) left 50% no-repeat;
 }
 
 li.room-vmc {
-	background:url(../images/ventilo_white_32.png) left 50% no-repeat;
+  background:url(../images/ventilo_white_32.png) left 50% no-repeat;
 }
 
 li.room-sound {
-	background:url(../images/room_sound.png) left 50% no-repeat;
+  background:url(../images/room_sound.png) left 50% no-repeat;
 }
 
 li.room-clim {
-	background:url(../images/clim_white_32.png) left 50% no-repeat;
+  background:url(../images/clim_white_32.png) left 50% no-repeat;
 }
 
 li.room-wifi {
-	background:url(../images/room_wifi.png) left 50% no-repeat;
+  background:url(../images/room_wifi.png) left 50% no-repeat;
 }
 
 li.room-tv .on, li.room-clim .on, li.room-wifi .on {
-	padding:7px 0 7px 20px;
-	background:url(../images/room_various_on.png) left 50% no-repeat;
+  padding:7px 0 7px 20px;
+  background:url(../images/room_various_on.png) left 50% no-repeat;
 }
 
 li.room-tv .off, li.room-clim .off, li.room-wifi .off {
-	padding:7px 0 7px 20px;
-	background:url(../images/room_various_off.png) left 50% no-repeat;
+  padding:7px 0 7px 20px;
+  background:url(../images/room_various_off.png) left 50% no-repeat;
 }
 
 li.room-vmc .on {
-	padding:7px 0 7px 20px;
-	background:url(../images/ventilo_on_16.png) left 50% no-repeat;
+  padding:7px 0 7px 20px;
+  background:url(../images/ventilo_on_16.png) left 50% no-repeat;
 }
 
 li.room-vmc .off {
-	padding:7px 0 7px 20px;
-	background:url(../images/ventilo_off_16.png) left 50% no-repeat;
+  padding:7px 0 7px 20px;
+  background:url(../images/ventilo_off_16.png) left 50% no-repeat;
 }
 
 li.room-clim .on {
-	padding:7px 0 7px 20px;
-	background:url(../images/clim_on_16.png) left 50% no-repeat;
+  padding:7px 0 7px 20px;
+  background:url(../images/clim_on_16.png) left 50% no-repeat;
 }
 
 li.room-clim .off {
-	padding:7px 0 7px 20px;
-	background:url(../images/clim_off_16.png) left 50% no-repeat;
+  padding:7px 0 7px 20px;
+  background:url(../images/clim_off_16.png) left 50% no-repeat;
 }
 
 li.room-sound .playing {
-	padding:7px 0 7px 20px;
-	background:url(../images/room_sound_play.png) left 50% no-repeat;
+  padding:7px 0 7px 20px;
+  background:url(../images/room_sound_play.png) left 50% no-repeat;
 }

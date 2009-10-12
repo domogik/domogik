@@ -1,69 +1,69 @@
 #frame {
-	margin:auto;
-	width:50em;
-	padding:1em;
+  margin:auto;
+  width:50em;
+  padding:1em;
 }
 
 input {
-	display:block;
-	margin:auto;
+  display:block;
+  margin:auto;
 }
 
 ul#users {
-	list-style:none;
-	text-align:center;
-	margin:1em;
-	padding:0;
-	-moz-column-count: 2;
+  list-style:none;
+  text-align:center;
+  margin:1em;
+  padding:0;
+  -moz-column-count: 2;
     -webkit-column-count: 2;
     -moz-column-gap: 0;
     -webkit-column-gap: 0;
 }
 
 ul#users li a {
-	display:inline-block;
-	border:1px solid #999;
-	padding:0;
-	margin:0.2em;
+  display:inline-block;
+  border:1px solid #999;
+  padding:0;
+  margin:0.2em;
 }
 
 ul#digits {
-	list-style:none;
-	margin:auto;
-	padding:0;
-	width:20em;
-	-moz-column-count: 3;
+  list-style:none;
+  margin:auto;
+  padding:0;
+  width:20em;
+  -moz-column-count: 3;
     -webkit-column-count: 3;
     -moz-column-gap: 0;
     -webkit-column-gap: 0;
 }
 
 ul#digits li a, ul#digits li input {
-	display:block;
-	border:none;
-	margin:0.2em;
-	text-align:center;
-	background-color:#333;
-	font-size:2em;
-	line-height:3em;
-	height:3em;
-	width:3em;
-	color:#FFF;
+  display:block;
+  border:none;
+  margin:0.2em;
+  text-align:center;
+  background-color:#333;
+  font-size:2em;
+  line-height:3em;
+  height:3em;
+  width:3em;
+  color:#FFF;
 }
 
 ul#digits li a:hover, ul#digits li a:focus,
 ul#digits li input:hover, ul#digits li input:focus,
 #logincode:hover, #logincode:focus,
 ul#users li a:hover, ul#users li a:focus{
-	background:#eb8f00;
+  background:#eb8f00;
 }
 
 #logincode {
-	width:6em;
-	border:2px solid #666;
-	background:#CCC;
-	font-size: 3em;
-	text-align:center;
-	-moz-border-radius: 0.8em;
-	-webkit-border-radius: 0.8em;
+  width:6em;
+  border:2px solid #666;
+  background:#CCC;
+  font-size: 3em;
+  text-align:center;
+  -moz-border-radius: 0.8em;
+  -webkit-border-radius: 0.8em;
 }
