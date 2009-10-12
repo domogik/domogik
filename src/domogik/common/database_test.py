@@ -485,13 +485,12 @@ if __name__ == "__main__":
     ### System config
     print_title("System config")
     print_test("update_system_config (create)")
-    system_config = d.update_system_config(s_simulation_mode=True, s_admin_mode=True, s_debug_mode=True)
+    system_config = d.update_system_config(s_simulation_mode=True, s_debug_mode=True)
     assert system_config.simulation_mode, "System should be in simulation mode but it is NOT"
-    assert system_config.admin_mode, "System should be in admin mode but it is NOT"
     assert system_config.debug_mode, "System should be in debug mode but it is NOT"
     print_test("update_system_config (update)")
-    system_config = d.update_system_config(s_admin_mode=False)
-    assert not system_config.admin_mode, "System shouldn't be in admin mode, but it IS"
+    system_config = d.update_system_config(s_simulation_mode=False)
+    assert not system_config.simulation_mode, "System shouldn't be in simulation mode, but it IS"
     print_test("get_system_config")
     system_config = d.get_system_config()
     assert system_config.debug_mode, "System should be in debug mode but it is NOT"
