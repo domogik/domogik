@@ -11,6 +11,7 @@
   padding: 0;
   list-style:none;
 }
+
 #nav2 li a {
   color:#000;
   margin: 0 1px 0 1px;
@@ -18,6 +19,8 @@
   border-bottom:#CCC solid 1px;
   display:block;
   text-decoration:none;
+  background-position:left 50%;
+  background-repeat:no-repeat;
 }
 
 #nav2 li a:hover, #nav2 li a:active, #nav2 li a:focus {
@@ -25,45 +28,3 @@
   background-color: #eb8f00;
 }
 
-/* Rooms */
-.menu-room {
-  background:url(../images/menu_room.png) left 50% no-repeat;
-}
-
-.menu-room-livingroom {
-  background:url(../images/sofa_white_32.png) left 50% no-repeat;
-}
-.menu-room-kitchen {
-  background:url(../images/toaster_32.png) left 50% no-repeat;
-}
-.menu-room-bedroom {
-  background:url(../images/bed_32.png) left 50% no-repeat;
-}
-/* Zones */
-
-.menu-zone-grndfloor {
-  background:url(../images/rdc_white_32.png) left 50% no-repeat;
-}
-.menu-zone-floor {
-  background:url(../images/etage1_white_32.png) left 50% no-repeat;
-}
-.menu-zone-basement {
-  background:url(../images/sous-sol_white_32.png) left 50% no-repeat;
-}
-
-/* Devices */
-.menu-electric {
-  background:url(../images/menu_electric.png) left 50% no-repeat;
-}
-.menu-vmc {
-  background:url(../images/ventilo_white_32.png) left 50% no-repeat;
-}
-.menu-clim {
-  background:url(../images/clim_white_32.png) left 50% no-repeat;
-}
-.menu-audio {
-  background:url(../images/menu_audio.png) left 50% no-repeat;
-}
-.menu-light {
-  background:url(../images/menu_light.png) left 50% no-repeat;
-}

@@ -11,12 +11,3 @@
   font-weight:bold;
   width:2em;
 }
-
-.lighton {
-  padding:7px 0 7px 20px;
-  background: url(../images/room_light_on.png) left 50% no-repeat;
-}
-.lightoff {
-  padding:7px 0 7px 20px;
-  background: url(../images/room_light_off.png) left 50% no-repeat;
-}

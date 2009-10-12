@@ -1,45 +1,21 @@
 @charset "UTF-8";
 /* CSS Document */
 
-.house-general {
-  background:url(../images/room-type.png) top right no-repeat;
-  min-height:10em;
-}
-
 .element-main li {
   padding-left:20px;
+  background-position: top left;
+  background-repeat:no-repeat;
 }
 
-li.general-electric {
-  background:url(../images/infos_elect.png) top left no-repeat;
-}
-
-li.general-water {
-  background:url(../images/infos_water.png) top left no-repeat;
-}
-
-li.general-message {
-  background:url(../images/infos_message.png) top left no-repeat;
-}
-
-li.general-notify {
-  background:url(../images/infos_notify.png) top left no-repeat;
-}
-
-li.general-error {
-  background:url(../images/infos_error.png) top left no-repeat;
-}
 
 /* Element Meteo */
-.meteo-sun {
-  background:url(../images/meteo_sun.png) top right no-repeat;
+.element-meteo {
+  background-position: top right;
+  background-repeat:no-repeat;
 }
 
 
 /* Element Phone */
-
-.phone-summary {
-}
 
 table.phone-calllist {
   width:100%;
