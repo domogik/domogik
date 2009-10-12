@@ -33,6 +33,12 @@
 .menu-room-livingroom {
 	background:url(../images/sofa_white_32.png) left 50% no-repeat;
 }
+.menu-room-kitchen {
+	background:url(../images/toaster_32.png) left 50% no-repeat;
+}
+.menu-room-bedroom {
+	background:url(../images/bed_32.png) left 50% no-repeat;
+}
 /* Zones */
 
 .menu-zone-grndfloor {

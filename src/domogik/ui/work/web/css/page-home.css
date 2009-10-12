@@ -102,10 +102,17 @@ h2.room-ident {
 	background:url(../images/room-type.png) top left no-repeat;
 	padding:1em 0 0 70px;
 	width:43%;
+	min-height:50px;
 }
 
 h2.room-ident.room-livingroom {
 	background:url(../images/sofa_white_64.png) top left no-repeat;
+}
+h2.room-ident.room-kitchen {
+	background:url(../images/kitchen_64.png) top left no-repeat;
+}
+h2.room-ident.room-bathroom {
+	background:url(../images/bathroom_64.png) top left no-repeat;
 }
 
 .room-title {
