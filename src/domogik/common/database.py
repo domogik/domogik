@@ -761,7 +761,6 @@ class DbHelper():
                 return self._session.query(SystemAccount).filter_by(id=user_account.system_account_id).one()
             except MultipleResultsFound, e:
                 raise DbHelperException("Database may be incoherent, user with id %s has more than one account" % u_id)
-
         else:
             return None
 
