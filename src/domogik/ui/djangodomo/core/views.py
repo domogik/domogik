@@ -163,7 +163,7 @@ def login(request):
         # An action was submitted => login action
         login = QueryDict.get(request.POST, "login", False)
         password = QueryDict.get(request.POST, "password", False)
-        sys_account = _db.get_system_account_by_login(login)
+        sys_account = _db.get_system_account_by_login_and_pass(login, password)
         if sys_account is not None:
             user_account = _db.get_user_account_by_system_account(sys_account.id)
             if user_account is not None:
