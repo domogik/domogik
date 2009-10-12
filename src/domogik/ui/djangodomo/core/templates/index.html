@@ -21,6 +21,9 @@
 {% load i18n %}
 
 {% block title %}{% trans page_title %}{% endblock %}
+{% block include_js_script %}
+  <script type="text/javascript" src="/design/js/page-main.js"></script>
+{% endblock %}
 
 {% block content %}
   <div id="search">
