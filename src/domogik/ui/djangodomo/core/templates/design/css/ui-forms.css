@@ -2,28 +2,28 @@
 /* CSS Document */
 
 label {
-	font-weight:bold;
-	display:inline-block;
+  font-weight:bold;
+  display:inline-block;
 }
 
 label.medium {
-	width: 10em;
+  width: 10em;
 }
 
 input[type='text'] {
-	border:1px solid #999;
-	margin-left:1em;
+  border:1px solid #999;
+  margin-left:1em;
 }
 
 input[type='text']:hover, input[type='text']:focus {
-	color:#000;
-	background-color: #eb8f00;
+  color:#000;
+  background-color: #eb8f00;
 }
 
 input[type='text'].medium {
-	width:20em;
+  width:20em;
 }
 
 select.medium {
-	width:15em;
+  width:15em;
 }

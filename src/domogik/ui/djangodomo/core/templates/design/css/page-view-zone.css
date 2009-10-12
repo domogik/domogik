@@ -2,21 +2,21 @@
 /* CSS Document */
 
 .zone-groundfloor {
-	background:url(../images/rdc_white_64.png) top right no-repeat;
-	min-height:10em;
+  background:url(../images/rdc_white_64.png) top right no-repeat;
+  min-height:10em;
 }
 
 .zone-temps {
-	list-style:none;
-	margin-left:40%;
+  list-style:none;
+  margin-left:40%;
 }
 
 .zone-temps li {
-	display:inline-block;
-	text-align:center;
-	margin:1em;
+  display:inline-block;
+  text-align:center;
+  margin:1em;
 }
 
 .zone-temps img {
-	display:block;
+  display:block;
 }
