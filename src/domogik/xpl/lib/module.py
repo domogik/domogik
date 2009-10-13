@@ -117,6 +117,7 @@ class xPLModule():
             cmd = message.data["command"]
             if cmd == "stop":
                 self._log.info("Someone asked to stop %s, doing." % self.get_module_name())
+                self._answer_stop()
                 self.force_leave()
             elif cmd == "reload":
                 if self._reload_cb is None:
@@ -133,6 +134,16 @@ class xPLModule():
             else: #cmd == ping 
                 if message.data["module"] in [self.get_module_name(), "*"]:
                     self._answer_ping()
+
+        def _answer_stop(self):
+            """ Ack a stop request
+            """
+            mess = XplMessage()
+            mess.set_type("xpl-trig")
+            mess.set_schema("domogik.system")
+            mess.add_data({"command":"stop", "module": self.get_module_name(), 
+                "host": gethostname()})
+            self._myxpl.send(mess)
 
         def _answer_ping(self):
             """ Send a ping reply
