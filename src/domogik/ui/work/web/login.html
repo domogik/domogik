@@ -22,32 +22,32 @@
     <form action="admin/index.html">
       <div class="left">
       	<h2 class="splitter">1. Choisir un utilisateur</h2>
-        <ul id="users">
-          <li><a href="#"><img src="images/userid.jpg" alt="User A" width="64" height="64" /></a></li>
-          <li><a href="#"><img src="images/userid.jpg" alt="User B" width="64" height="64" /></a></li>
-          <li><a href="#"><img src="images/userid.jpg" alt="User C" width="64" height="64" /></a></li>
-          <li><a href="#"><img src="images/userid.jpg" alt="User D" width="64" height="64" /></a></li>
-        </ul>
         <input id="loginname" name="name"type="text" />
+        <ul id="users">
+          <li><a href="#" id="ida" onclick="chooseUser('ida', 'User A');"><img src="images/userid.jpg" alt="User A" width="64" height="64" /></a></li>
+          <li><a href="#" id="idb" onclick="chooseUser('idb', 'User B');"><img src="images/userid.jpg" alt="User B" width="64" height="64" /></a></li>
+          <li><a href="#" id="idc" onclick="chooseUser('idc', 'User C');"><img src="images/userid.jpg" alt="User C" width="64" height="64" /></a></li>
+          <li><a href="#" id="idd" onclick="chooseUser('idd', 'User D');"><img src="images/userid.jpg" alt="User D" width="64" height="64" /></a></li>
+        </ul>
       </div>
       <div class="right">
       	<h2 class="splitter">2. Taper le code</h2>
-        <input id="logincode" name="code"type="password" value="test" />
+        <div id="code">
+	        <input id="logincode" name="code" type="password" value="" /><input type="submit" class="buttonok" value="Ok" />
+            </div>
         <ul id="digits">
-          <li><a href="#">0</a></li>
-          <li><a href="#">1</a></li>
-          <li><a href="#">2</a></li>
-          <li><a href="#">3</a></li>
-          <li><a href="#">4</a></li>
-          <li><a href="#">5</a></li>
-          <li><a href="#">6</a></li>
-          <li><a href="#">7</a></li>
-          <li><a href="#">8</a></li>
-          <li><a href="#">9</a></li>
-          <li><a href="#">Eff.</a></li>
-          <li>
-            <input type="submit" value="OK" />
-          </li>
+          <li><a href="#" onclick="addDigit('0');">0</a></li>
+          <li><a href="#" onclick="addDigit('1');">1</a></li>
+          <li><a href="#" onclick="addDigit('2');">2</a></li>
+          <li><a href="#" onclick="addDigit('3');">3</a></li>
+          <li><a href="#" onclick="addDigit('4');">4</a></li>
+          <li><a href="#" onclick="addDigit('5');">5</a></li>
+          <li><a href="#" onclick="addDigit('6');">6</a></li>
+          <li><a href="#" onclick="addDigit('7');">7</a></li>
+          <li><a href="#" onclick="addDigit('8');">8</a></li>
+          <li><a href="#" onclick="addDigit('9');">9</a></li>
+          <li><a href="#" onclick="removeLastDigit();"><-</a></li>
+          <li><a href="#" onclick="resetDigit();">Eff.</a></li>
         </ul>
       </div>
     </form>
