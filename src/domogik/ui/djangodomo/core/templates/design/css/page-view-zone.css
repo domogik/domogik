@@ -1,11 +1,6 @@
 @charset "UTF-8";
 /* CSS Document */
 
-.zone-groundfloor {
-  background:url(../images/rdc_white_64.png) top right no-repeat;
-  min-height:10em;
-}
-
 .zone-temps {
   list-style:none;
   margin-left:40%;
@@ -15,8 +10,11 @@
   display:inline-block;
   text-align:center;
   margin:1em;
+  background-position:50% top;
+  background-repeat:no-repeat;
+  padding-top:32px;
 }
 
-.zone-temps img {
-  display:block;
+.zone-temps span {
+	display:block;
 }
