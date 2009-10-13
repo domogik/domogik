@@ -6,6 +6,10 @@ img {
   display:none;
 }
 
+.error_msg {
+  color: red;
+}
+
 h2 {
   margin-top:0;
 }
