@@ -65,8 +65,8 @@ input.buttonok:hover, input.buttonok:active, input.buttonok:focus {
 }
 
 #code {
-	margin:auto;
-	text-align:center;
+  margin:auto;
+  text-align:center;
 }
 
 #logincode {
@@ -79,7 +79,7 @@ input.buttonok:hover, input.buttonok:active, input.buttonok:focus {
   font-size: 2.5em;
   text-align:center;
   -moz-border-radius: 0.8em 0 0 0.8em;
-  -webkit-border-radius: 0.8em 0 0 0.8em;  
+  -webkit-border-radius: 0.8em 0 0 0.8em;
 }
 
 input.buttonok {
