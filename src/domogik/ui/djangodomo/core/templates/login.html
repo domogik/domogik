@@ -1,3 +1,4 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <!--
 # Copyright 2008 Domogik project
 
@@ -15,33 +16,72 @@
 # You should have received a copy of the GNU General Public License
 # along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
 
-# Author : Marc Schneider <marc@domogik.org>
+# Author : Cédric Trévisan <cedric@domogik.org> / Marc Schneider <marc@domogik.org>
 -->
-{% extends "base.html" %}
 {% load i18n %}
-
-{% block title %}{% trans page_title %}{% endblock %}
-
-{% block content %}
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <title>{% trans page_title %}</title>
+  <link href="/design/css/ui-lightness/jquery-ui-1.7.2.custom.css" rel="stylesheet" type="text/css"/>
+  <link href="/design/css/main.css" rel="stylesheet" type="text/css" />
+  <link href="/design/css/ui-buttons.css" rel="stylesheet" type="text/css" />
+  <link href="/design/css/page-login.css" rel="stylesheet" type="text/css" />
+  <script type="text/javascript" src="/design/js/jquery-1.3.2.min.js"></script>
+  <script type="text/javascript" src="/design/js/jquery-ui-1.7.2.custom.min.js"></script>
+  <script type="text/javascript" src="/design/js/page-login.js"></script>
+</head>
+<body>
+<div id="frame">
+  <div id="header">
+    <a href="/domogik" id="logo">
+      <img src="/design/images/logo_domogik.png" width="131" height="37" alt="Domogik logo" />
+    </a>
+    <div id="title">{% trans "Welcome to Domogik" %}
+    <span id="subtitle">{% trans "Free home automation under Linux" %}</span></div>
+  </div>
+  <div id="content">
+    <h1>{% trans "Identification" %}</h1>
+    {% if error_msg %}
+      <h2 class="error_msg">{{ error_msg }}</h1>
+    {% endif %}
     <form name="loginForm" method="POST" action="{% url login_view %}"/>
-    <div>
-        {% if error_msg %}
-            <p class="error">{{ error_msg }}</p>
-        {% endif %}
-        <table>
-            <tr>
-                <td class="label">Login</td><td><input type="text" name="login" value="" size="10"/></td>
-            </tr>
-            <tr>
-                <td class="label">Password</td><td><input type="password" name="password" value="" size="10"/></td>
-            </tr>
-        </table>
-        <p></p>
-        <table>
-            <tr>
-                <td><input name="update" type="submit" value="Log in!"/></td>
-            </tr>
-        </table>
-    </div>
+      <div class="left">
+        <h2 class="splitter">1. {% trans "Select a user" %}</h2>
+        <input id="loginname" name="login" type="text" />
+        <ul id="users">
+          {% for account in account_list %}
+            <li>
+              <a href="#" id="id{{ account.login }}" onclick="chooseUser('id{{ account.login }}', '{{ account.login }}');">
+                <img src="/design/images/userid.jpg" alt="" width="64" height="64" />{{ account.login }}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="right">
+        <h2 class="splitter">2. {% trans "Enter your code" %}</h2>
+        <div id="code">
+          <input id="logincode" name="password" type="password" value="" />
+          <input name="update" type="submit" class="buttonok" value="Ok" />
+        </div>
+        <ul id="digits">
+          <li><a href="#" onclick="addDigit('0');">0</a></li>
+          <li><a href="#" onclick="addDigit('1');">1</a></li>
+          <li><a href="#" onclick="addDigit('2');">2</a></li>
+          <li><a href="#" onclick="addDigit('3');">3</a></li>
+          <li><a href="#" onclick="addDigit('4');">4</a></li>
+          <li><a href="#" onclick="addDigit('5');">5</a></li>
+          <li><a href="#" onclick="addDigit('6');">6</a></li>
+          <li><a href="#" onclick="addDigit('7');">7</a></li>
+          <li><a href="#" onclick="addDigit('8');">8</a></li>
+          <li><a href="#" onclick="addDigit('9');">9</a></li>
+          <li><a href="#" onclick="removeLastDigit();"><-</a></li>
+          <li><a href="#" onclick="resetDigit();">{% trans "Del." %}</a></li>
+        </ul>
+      </div>
     </form>
-{% endblock %}
+  </div>
+</div>
+</body>
+</html>

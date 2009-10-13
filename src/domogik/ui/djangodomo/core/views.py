@@ -181,11 +181,13 @@ def login(request):
             return index(request)
         else:
             # User not found, ask again to log in
+            account_list = _db.list_system_accounts()
             error_msg = _("Sorry unable to log in. Please check login name / password and try again.")
-            return _go_to_page(request, 'login.html', page_title, error_msg=error_msg)
+            return _go_to_page(request, 'login.html', page_title, account_list=account_list, error_msg=error_msg)
     else:
         # User asked to log in
-        return _go_to_page(request, 'login.html', page_title)
+        account_list = _db.list_system_accounts()
+        return _go_to_page(request, 'login.html', page_title, account_list=account_list)
 
 def logout(request):
     """

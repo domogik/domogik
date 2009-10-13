@@ -5,8 +5,8 @@
 }
 
 input {
-  display:block;
-  margin:auto;
+/*  display:block;
+  margin:auto;*/
 }
 
 ul#users {
@@ -14,10 +14,10 @@ ul#users {
   text-align:center;
   margin:1em;
   padding:0;
-  -moz-column-count: 2;
-    -webkit-column-count: 2;
-    -moz-column-gap: 0;
-    -webkit-column-gap: 0;
+  -moz-column-width: 6em;
+  -webkit-column-width: 6em;
+  -moz-column-gap: 1em;
+  -webkit-column-gap: 1em;
 }
 
 ul#users li a {
@@ -25,6 +25,10 @@ ul#users li a {
   border:1px solid #999;
   padding:0;
   margin:0.2em;
+  text-align:center;
+  color:#000;
+  text-decoration:none;
+  width:7em;
 }
 
 ul#digits {
@@ -49,21 +53,52 @@ ul#digits li a, ul#digits li input {
   height:3em;
   width:3em;
   color:#FFF;
+  text-decoration:none;
 }
 
 ul#digits li a:hover, ul#digits li a:focus,
 ul#digits li input:hover, ul#digits li input:focus,
 #logincode:hover, #logincode:focus,
-ul#users li a:hover, ul#users li a:focus{
+ul#users li a:hover, ul#users li a:focus,
+input.buttonok:hover, input.buttonok:active, input.buttonok:focus {
   background:#eb8f00;
+}
+
+#code {
+  margin:auto;
+  text-align:center;
 }
 
 #logincode {
   width:6em;
-  border:2px solid #666;
+  border-top:2px solid #666;
+  border-bottom:2px solid #666;
+  border-left:2px solid #666;
+  border-right:none;
   background:#CCC;
-  font-size: 3em;
+  font-size: 2.5em;
   text-align:center;
-  -moz-border-radius: 0.8em;
-  -webkit-border-radius: 0.8em;
+  -moz-border-radius: 0.8em 0 0 0.8em;
+  -webkit-border-radius: 0.8em 0 0 0.8em;
+}
+
+input.buttonok {
+  font-size: 2.5em;
+  border-top:2px solid #666;
+  border-bottom:2px solid #666;
+  border-right:2px solid #666;
+  border-left:none;
+  background-color:#9C0;
+  -moz-border-radius: 0 0.8em 0.8em 0;
+  -webkit-border-radius: 0 0.8em 0.8em 0;
+  color:#666;
+}
+
+ul#users li a.selected {
+  background-color:#9C0;
+}
+
+ul#users img {
+	display:block;
+	margin:auto;
 }
