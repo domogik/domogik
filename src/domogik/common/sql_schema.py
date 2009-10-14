@@ -154,7 +154,7 @@ class Room(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(30), nullable=False)
     description = Column(String(255))
-    area_id = Column(Integer, ForeignKey('%s.id' % Area.get_tablename()))
+    area_id = Column(Integer, ForeignKey('%s.id' % Area.get_tablename()), nullable=False)
     area = relation(Area, backref=backref(__tablename__, order_by=id))
 
     def __init__(self, name, description, area_id):
@@ -264,7 +264,7 @@ class DeviceTechnologyConfig(Base):
     """
     __tablename__ = '%s_device_technology_config' % _db_prefix
     id = Column(Integer, primary_key=True)
-    technology_id = Column(Integer, ForeignKey('%s.id' % DeviceTechnology.get_tablename()))
+    technology_id = Column(Integer, ForeignKey('%s.id' % DeviceTechnology.get_tablename()), nullable=False)
     technology = relation(DeviceTechnology, backref=backref(__tablename__))
     key = Column(String(30), nullable=False)
     value = Column(String(80), nullable=False)
@@ -308,10 +308,10 @@ class Device(Base):
     description = Column(String(255))
     address = Column(String(30), nullable=False)
     reference = Column(String(30))
-    technology_id = Column(Integer, ForeignKey('%s.id' % DeviceTechnology.get_tablename()))
+    technology_id = Column(Integer, ForeignKey('%s.id' % DeviceTechnology.get_tablename()), nullable=False)
     technology = relation(DeviceTechnology, backref=backref(__tablename__))
     type = Column(Enum(DEVICE_TYPE_LIST))
-    category_id = Column(Integer, ForeignKey('%s.id' % DeviceCategory.get_tablename()))
+    category_id = Column(Integer, ForeignKey('%s.id' % DeviceCategory.get_tablename()), nullable=False)
     category = relation(DeviceCategory, backref=backref(__tablename__))
     room_id = Column(Integer, ForeignKey('%s.id' % Room.get_tablename()))
     room = relation(Room, backref=backref(__tablename__))
@@ -401,7 +401,7 @@ class DeviceConfig(Base):
     """
     __tablename__ = '%s_device_config' % _db_prefix
     id = Column(Integer, primary_key=True)
-    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()))
+    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), nullable=False)
     device = relation(Device, backref=backref(__tablename__))
     key = Column(String(30), nullable=False)
     value = Column(String(80), nullable=False)
@@ -441,7 +441,7 @@ class DeviceStats(Base):
     """
     __tablename__ = '%s_device_stats' % _db_prefix
     id = Column(Integer, primary_key=True)
-    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()))
+    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), nullable=False)
     device = relation(Device, backref=backref(__tablename__))
     date = Column(DateTime, nullable=False)
 
