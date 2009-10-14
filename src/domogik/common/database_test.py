@@ -41,10 +41,9 @@ import datetime
 
 from domogik.common.database import DbHelper, DbHelperException
 from domogik.common.sql_schema import Area, Device, DeviceCategory, DeviceConfig, \
-                                      DeviceStats, DeviceTechnology, DeviceTechnologyConfig, \
+                                      DeviceStats, DeviceStatsValue, DeviceTechnology, DeviceTechnologyConfig, \
                                       Room, UserAccount, SystemAccount, SystemConfig, \
-                                      SystemStats, Trigger
-from domogik.common.sql_schema import SYSTEMSTATS_TYPE_LIST
+                                      SystemStats, SystemStatsValue, Trigger
 
 def print_title(title):
     """
@@ -333,10 +332,11 @@ if __name__ == "__main__":
                           d_category_id = dc1.id, d_room_id = room1.id)
     print_test("add_device_stat")
     now = datetime.datetime.now()
-    d_stat1_1 = d.add_device_stat(device1.id, now, '10')
-    d_stat1_2 = d.add_device_stat(device1.id, now + datetime.timedelta(seconds=1), '11')
-    d_stat2_1 = d.add_device_stat(device2.id, now, '40')
-    d_stat3_1 = d.add_device_stat(device3.id, now, '100')
+
+    d_stat1_1 = d.add_device_stat(device1.id, now, {'val1': '10', 'val2': '10.5' })
+    d_stat1_2 = d.add_device_stat(device1.id, now + datetime.timedelta(seconds=1), {'val1': '11', 'val2': '12' })
+    d_stat2_1 = d.add_device_stat(device2.id, now, {'val1': '40', 'val2': '41' })
+    d_stat3_1 = d.add_device_stat(device3.id, now, {'val1': '100', 'val2': '101' })
     l_stats = d.list_device_stats(device1.id)
     assert len(l_stats) == 2, \
           "device stats for device id %s should have 2 items. It has %s" % (device1.id, len(l_stats))
@@ -350,7 +350,14 @@ if __name__ == "__main__":
           "device_hast_stats should have returned False for device id %s " % device4.id
     print_test("get_last_stat_of_device")
     stat = d.get_last_stat_of_device(device1.id)
-    assert stat.value == "11", "Should get value '11' for last stat of device %s. Got %s instead" % (device1.id, stat.value)
+    dsv = d.list_device_stats_values(stat.id)
+    for item in dsv:
+        if item.name == 'val1':
+            assert item.value == '11', "Should get value '11' for last stat of device %s. Got %s instead" \
+                                          % (device1.id, dsv[0].value)
+        elif item.name == 'val2':
+            assert item.value == '12', "Should get value '12' for last stat of device %s. Got %s instead" \
+                                          % (device1.id, dsv[1].value)
     print_test("get_last_stat_of_devices")
     l_stats = d.get_last_stat_of_devices([device1.id, device2.id])
     assert len(l_stats) == 2, "last device stats should have 2 items. It has %s" % len(l_stats)
@@ -359,7 +366,12 @@ if __name__ == "__main__":
         device_id_list.append(stat.device_id)
         if stat.device_id == device1.id:
             # Make sure we get the LAST stat for device1
-            assert stat.value == '11', "Wrong stat was retrieved. Value should be 11, but is %s" % stat.value
+            dsv = d.list_device_stats_values(stat.id)
+            value_list = []
+            for item in dsv:
+                value_list.append(item.value)
+            assert '11' in value_list and '12' in value_list, \
+                  "Should have found values '11' and '12' for last device stat"
     assert device1.id in device_id_list, "device1 is not in the list but should have been"
     assert device2.id in device_id_list, "device2 is not in the list but should have been"
     print_test("del_all_device_stats")
@@ -471,19 +483,23 @@ if __name__ == "__main__":
     sstat_list = []
     print_test("add_system_stat")
     for i in range(4):
-        sstat_list.append(d.add_system_stat("sstat%s" %i, 'localhost', now + datetime.timedelta(seconds=i), 
-                          SYSTEMSTATS_TYPE_LIST[i%2], "val%s" %i))
+        ssv = {'ssv1': (i*2), 'ssv2': (i*3),}
+        sstat_list.append(d.add_system_stat("sstat%s" %i, 'localhost', 
+                            now + datetime.timedelta(seconds=i), ssv))
     print_test("list_system_stats")
     assert len(d.list_system_stats()) == 4, "List of system stats should have 4 items : %s" % d.list_system_stats()
-    print_test("get_system_stats_by_type")
-    nb_items = len(d.get_system_stats_by_type(SYSTEMSTATS_TYPE_LIST[0]))
-    assert nb_items == 2, "Should have 2 system stats of type %s, but have %s" % (SYSTEMSTATS_TYPE_LIST[0], nb_items)
     print_test("get_system_stat")
-    val0 = d.get_system_stat(sstat_list[0].id).value
-    assert val0 == "val0", "Wrong value for sstat0 : '%s'. Should be 'val0'" % val0
+    system_stat1 = d.get_system_stat(sstat_list[1].id)
+    ssv = d.list_system_stats_values(system_stat1.id)
+    assert len(ssv) == 2, "%s should have 2 statistics values, it has %s" %(system_stat1.name, len(ssv))
+    assert ssv[0].value == '2', "Wrong value for stat %s : %s. Should be '2'" % (ssv[0].name, ssv[0].value)
     print_test("del_system_stat")
     d.del_system_stat("sstat0")
     assert len(d.list_system_stats()) == 3, "List of system stats should have 3 items : %s" % d.list_system_stats()
+    d.del_all_system_stats()
+    assert len(d.list_system_stats()) == 0, "System statistics should be empty, but it is NOT"
+    ssv = d._session.query(SystemStatsValue).all()
+    assert len(ssv) == 0, "System statistic values should be empty, but it is NOT"
 
     ### System config
     print_title("System config")

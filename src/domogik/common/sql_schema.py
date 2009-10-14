@@ -59,7 +59,6 @@ UNIT_OF_STORED_VALUE_LIST = [u'Volt', u'Celsius', u'Farenheit', u'Percent', u'Bo
 DEVICE_TECHNOLOGY_LIST = [u'x10',u'1wire',u'PLCBus',u'RFXCom',u'IR',u'EIB/KNX']
 DEVICE_TECHNOLOGY_TYPE_LIST = [u'cpl', u'wired', u'wifi', u'wireless', u'ir']
 DEVICE_TYPE_LIST = [u'appliance', u'lamp', u'music', u'sensor']
-SYSTEMSTATS_TYPE_LIST = [u'HB_CLIENT', u'CORE']
 
 Base = declarative_base()
 metadata = Base.metadata
@@ -445,26 +444,23 @@ class DeviceStats(Base):
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()))
     device = relation(Device, backref=backref(__tablename__))
     date = Column(DateTime, nullable=False)
-    value = Column(String(80), nullable=False)
 
-    def __init__(self, device_id, date, value):
+    def __init__(self, device_id, date):
         """
         Class constructor
         @param device_id : device id
         @param date : datetime when the stat was recorded
-        @param value : stat value
         """
         self.device_id = device_id
         self.date = date
-        self.value = value
 
     def __repr__(self):
         """
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<DeviceStats(id=%s, device=%s, date='%s', val='%s')>" \
-          % (self.id, self.device_id, self.date, self.value)
+        return "<DeviceStats(id=%s, device=%s, date='%s')>" \
+          % (self.id, self.device_id, self.date)
 
     @staticmethod
     def get_tablename():
@@ -473,6 +469,44 @@ class DeviceStats(Base):
         @return table name
         """
         return DeviceStats.__tablename__
+
+
+class DeviceStatsValue(Base):
+    """
+    Value(s) associated to a device statistic
+    """
+    __tablename__ = '%s_device_stats_value' % _db_prefix
+    id = Column(Integer, primary_key=True)
+    device_stats_id = Column(Integer, ForeignKey('%s.id' % DeviceStats.get_tablename()), nullable=False)
+    name = Column(String(30), nullable=False)
+    value = Column(String(80), nullable=False)
+
+    def __init__(self, name, value, device_stats_id):
+        """
+        Class constructor
+        @param name : value name
+        @param value : value
+        @param device_stats_id : id of the device statistic
+        """
+        self.name = name
+        self.value = value
+        self.device_stats_id = device_stats_id
+
+    def __repr__(self):
+        """
+        Print an internal representation of the class
+        @return an internal representation
+        """
+        return "<DeviceStatsValue(id=%s, name=%s, value=%s, stat_id=%s)>" \
+          % (self.id, self.name, self.value, self.device_stats_id)
+
+    @staticmethod
+    def get_tablename():
+        """
+        Return the table name associated to the class
+        @return table name
+        """
+        return DeviceStatsValue.__tablename__
 
 
 class Trigger(Base):
@@ -602,31 +636,25 @@ class SystemStats(Base):
     name = Column(String(30), nullable=False)
     hostname = Column(String(40), nullable=False)
     date = Column(DateTime, nullable=False)
-    type = Column(Enum(SYSTEMSTATS_TYPE_LIST))
-    value = Column(String(80), nullable=False)
 
-    def __init__(self, module_name, host_name, date, type, value):
+    def __init__(self, module_name, host_name, date):
         """
         Class constructor
         @param module_name : module name
         @param host_name : host name
         @param date : datetime when the statistic was recorded
-        @param type : statistic type like HB_CLIENT (hardbeat client), CORE
-        @param value : statistic value
         """
         self.name = module_name
         self.hostname = host_name
         self.date = date
-        self.type = type
-        self.value = value
 
     def __repr__(self):
         """
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<SystemStats(id=%s, module_name=%s, host_name=%s, date=%s, type='%s', value='%s')>" \
-          % (self.id, self.name, self.hostname, self.date, self.type, self.value)
+        return "<SystemStats(id=%s, module_name=%s, host_name=%s, date=%s)>" \
+          % (self.id, self.name, self.hostname, self.date)
 
     @staticmethod
     def get_tablename():
@@ -635,6 +663,44 @@ class SystemStats(Base):
         @return table name
         """
         return SystemStats.__tablename__
+
+
+class SystemStatsValue(Base):
+    """
+    Value(s) associated to a system statistic
+    """
+    __tablename__ = '%s_system_stats_value' % _db_prefix
+    id = Column(Integer, primary_key=True)
+    system_stats_id = Column(Integer, ForeignKey('%s.id' % SystemStats.get_tablename()), nullable=False)
+    name = Column(String(30), nullable=False)
+    value = Column(String(80), nullable=False)
+
+    def __init__(self, name, value, system_stats_id):
+        """
+        Class constructor
+        @param name : value name
+        @param value : value
+        @param system_stats_id : statistic id
+        """
+        self.name = name
+        self.value = value
+        self.system_stats_id = system_stats_id
+
+    def __repr__(self):
+        """
+        Print an internal representation of the class
+        @return an internal representation
+        """
+        return "<SystemStatsValue(id=%s, name=%s, value=%s, stat_id=%s)>" \
+          % (self.id, self.name, self.value, self.system_stats_id)
+
+    @staticmethod
+    def get_tablename():
+        """
+        Return the table name associated to the class
+        @return table name
+        """
+        return SystemStatsValue.__tablename__
 
 
 class SystemConfig(Base):

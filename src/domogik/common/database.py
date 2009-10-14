@@ -63,11 +63,11 @@ from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
 from domogik.common.configloader import Loader
 from domogik.common.sql_schema import Area, Device, DeviceCategory, DeviceConfig, \
-                                      DeviceStats, DeviceTechnology, DeviceTechnologyConfig, \
+                                      DeviceStats, DeviceStatsValue, DeviceTechnology, DeviceTechnologyConfig, \
                                       Room, UserAccount, SystemAccount, SystemConfig, \
-                                      SystemStats, Trigger
+                                      SystemStats, SystemStatsValue, Trigger
 from domogik.common.sql_schema import DEVICE_TECHNOLOGY_LIST, DEVICE_TECHNOLOGY_TYPE_LIST, \
-                                      DEVICE_TYPE_LIST, SYSTEMSTATS_TYPE_LIST, UNIT_OF_STORED_VALUE_LIST
+                                      DEVICE_TYPE_LIST, UNIT_OF_STORED_VALUE_LIST
 
 
 class DbHelperException(Exception):
@@ -590,7 +590,7 @@ class DbHelper():
     def del_device(self, d_id):
         """
         Delete a device
-        Warning : this deletes also the associated objects (DeviceConfig, DeviceStats)
+        Warning : this deletes also the associated objects (DeviceConfig, DeviceStats, DeviceStatsValue)
         @param d_id : item id
         """
         device = self.get_device(d_id)
@@ -599,8 +599,13 @@ class DbHelper():
 
         for device_conf in self._session.query(DeviceConfig).filter_by(device_id=d_id).all():
             self._session.delete(device_conf)
+
         for device_stats in self._session.query(DeviceStats).filter_by(device_id=d_id).all():
+            for device_stats_value in self._session.query(DeviceStatsValue)\
+                                          .filter_by(device_stats_id=device_stats.id).all():
+                self._session.delete(device_stats_value)
             self._session.delete(device_stats)
+
         self._session.delete(device)
         self._session.commit()
 
@@ -614,6 +619,14 @@ class DbHelper():
         @return a list of DeviceStats objects
         """
         return self._session.query(DeviceStats).filter_by(device_id=d_device_id).all()
+
+    def list_device_stats_values(self, d_device_stats_id):
+        """
+        Return a list of all values associated to a device statistic
+        @param d_device_stats_id : the device statistic id
+        @return a list of DeviceStatsValue objects
+        """
+        return self._session.query(DeviceStatsValue).filter_by(device_stats_id=d_device_stats_id).all()
 
     def get_last_stat_of_device(self, d_device_id):
         """
@@ -649,16 +662,21 @@ class DbHelper():
         """
         return self._session.query(DeviceStats).filter_by(device_id=d_device_id).count() > 0
 
-    def add_device_stat(self, d_id, ds_date, ds_value):
+    def add_device_stat(self, d_id, ds_date, ds_values):
         """
         Add a device stat record
         @param device_id : device id
         @param ds_date : when the stat was gathered (timestamp)
-        @param ds_value : stat value
+        @param ds_value : dictionnary of statistics values
         @return the new DeviceStats object
         """
-        device_stat = DeviceStats(device_id=d_id, date=ds_date, value=ds_value)
+        device_stat = DeviceStats(device_id=d_id, date=ds_date)
         self._session.add(device_stat)
+        self._session.commit()
+        for ds_name in ds_values.keys():
+            dsv = DeviceStatsValue(name=ds_name, value=ds_values[ds_name], device_stats_id=device_stat.id)
+            self._session.add(dsv)
+
         self._session.commit()
         return device_stat
 
@@ -670,6 +688,10 @@ class DbHelper():
         device_stat = self._session.query(DeviceStats).filter_by(id=ds_id).first()
         if device_stat:
             self._session.delete(device_stat)
+            for device_stats_value in self._session.query(DeviceStatsValue) \
+                                          .filter_by(device_stats_id=device_stat.id).all():
+                self._session.delete(device_stats_value)
+
             self._session.commit()
 
     def del_all_device_stats(self, d_id):
@@ -680,7 +702,11 @@ class DbHelper():
         #TODO : this could be optimized
         device_stats = self._session.query(DeviceStats).filter_by(device_id=d_id).all()
         for device_stat in device_stats:
+            for device_stats_value in self._session.query(DeviceStatsValue) \
+                                          .filter_by(device_stats_id=device_stat.id).all():
+                self._session.delete(device_stats_value)
             self._session.delete(device_stat)
+
         self._session.commit()
  
 ####
@@ -892,6 +918,14 @@ class DbHelper():
         """
         return self._session.query(SystemStats).all()
 
+    def list_system_stats_values(self, s_system_stats_id):
+        """
+        Return a list of all values associated to a system statistic
+        @param s_system_stats_id : the system statistic id
+        @return a list of SystemStatsValue objects
+        """
+        return self._session.query(SystemStatsValue).filter_by(system_stats_id=s_system_stats_id).all()
+
     def get_system_stat(self, s_id):
         """
         Return a system stat
@@ -900,29 +934,23 @@ class DbHelper():
         """
         return self._session.query(SystemStats).filter_by(id=s_id).first()
 
-
-    def get_system_stats_by_type(self, s_type):
-        """
-        Return a list of all system stats
-        @param s_type : type of the stats to be retrieved
-        @return a list of SystemStats objects
-        """
-        return self._session.query(SystemStats).filter_by(type=s_type).all()
-
-    def add_system_stat(self, s_name, s_hostname, s_date, s_type, s_value):
+    def add_system_stat(self, s_name, s_hostname, s_date, s_values):
         """
         Add a system stat record
         @param s_name : name of the  module
         @param s_hostname : name of the  host
         @param s_date : when the stat was gathered (timestamp)
-        @param s_type : stat type (must be one of sql_schema.SYSTEMSTATS_TYPE_LIST list)
-        @param s_value : stat value
+        @param s_values : a dictionnary of system statistics values
         @return the new SystemStats object
         """
-        if s_type not in SYSTEMSTATS_TYPE_LIST:
-            raise ValueError, "s_type must be one of %s" % SYSTEMSTATS_TYPE_LIST
-        system_stat = SystemStats(module_name=s_name, host_name=s_hostname, date=s_date, type=s_type, value=s_value)
+        system_stat = SystemStats(module_name=s_name, host_name=s_hostname, date=s_date)
         self._session.add(system_stat)
+        self._session.commit()
+        for stat_value_name in s_values.keys():
+            ssv = SystemStatsValue(name=stat_value_name, value=s_values[stat_value_name], 
+                                  system_stats_id=system_stat.id)
+            self._session.add(ssv)
+
         self._session.commit()
         return system_stat
 
@@ -933,6 +961,10 @@ class DbHelper():
         """
         system_stat = self._session.query(SystemStats).filter_by(name=s_name).first()
         if system_stat:
+            system_stats_values = self._session.query(SystemStatsValue)\
+                                      .filter_by(system_stats_id=system_stat.id).all()
+            for ssv in system_stats_values:
+                self._session.delete(ssv)
             self._session.delete(system_stat)
             self._session.commit()
 
@@ -942,6 +974,10 @@ class DbHelper():
         """
         system_stats = self._session.query(SystemStats).all()
         for system_stat in system_stats:
+            system_stats_values = self._session.query(SystemStatsValue)\
+                                      .filter_by(system_stats_id=system_stat.id).all()
+            for ssv in system_stats_values:
+                self._session.delete(ssv)
             self._session.delete(system_stat)
         self._session.commit()
 
