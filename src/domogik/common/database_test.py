@@ -110,6 +110,7 @@ def remove_all_device_technologies(db):
     Remove all device technologies
     @param db : db API instance
     """
+    remove_all_device_technology_config(db)
     for dt in db.list_device_technologies():
         db.del_device_technology(dt.id)
 
