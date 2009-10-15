@@ -1,0 +1,16 @@
+@charset "UTF-8";
+/* CSS Document */
+select.heat-mode {
+  width: 13em;
+}
+.slider-heat-temp {
+  width: 50%;
+  margin-bottom:1em;
+}
+.value-heat-temp {
+  border:0;
+  background: transparent;
+  color:#f6931f;
+  font-weight:bold;
+  width:1.3em;
+}
