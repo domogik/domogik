@@ -12,3 +12,4 @@ src/Domogik.egg-info/
 develop-eggs/
 db.sqlite
 settings_local.py
+domogik.sqlite

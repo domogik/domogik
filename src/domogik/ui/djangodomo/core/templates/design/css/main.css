@@ -7,7 +7,14 @@ img {
 }
 
 .error_msg {
-  color: red;
+  border:2px solid #CC0000;
+  color: #CC0000;
+  margin:1em;
+  padding:0 0 0 35px;
+  text-align:center;
+  font-size:1.2em;
+  background:url(../images/error_32.png) left top no-repeat;
+  line-height:32px;
 }
 
 h2 {

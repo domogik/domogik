@@ -43,7 +43,7 @@
   <div id="content">
     <h1>{% trans "Identification" %}</h1>
     {% if error_msg %}
-      <h2 class="error_msg">{{ error_msg }}</h1>
+      <p class="error_msg">{{ error_msg }}</p>
     {% endif %}
     <form name="loginForm" method="POST" action="{% url login_view %}"/>
       <div class="left">
