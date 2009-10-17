@@ -17,36 +17,8 @@
 
 /* Element Phone */
 
-table.phone-calllist {
-  width:100%;
-}
-
-table.phone-calllist th {
-  background-color:#1c94c4;
-  color:#FFF;
-}
-
-table.phone-calllist td {
-  padding:1em;
-}
-
-table.phone-calllist tr.odd {
-  background-color:#FFF;
-}
-
-ul.phone-callactions {
-  list-style:none;
-  margin:0;
-  padding:0;
-}
-
-ul.phone-callactions li {
-  display:inline;
-  margin:0 1em 0 0;
-  padding:0;
-}
-
 td.hidden-call {
   color:#F00;
   font-style:italic;
 }
+

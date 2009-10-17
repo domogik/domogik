@@ -3,7 +3,13 @@
 
 label {
   font-weight:bold;
-  display:inline-block;
+  display:block;
+  height:1.6em;
+  line-height:1.6em;
+}
+
+label.inline {
+	display:inline-block;
 }
 
 label.medium {
@@ -12,18 +18,34 @@ label.medium {
 
 input[type='text'] {
   border:1px solid #999;
-  margin-left:1em;
+  height:1.6em;
+  margin: 0 0 0.2em 0;
 }
 
-input[type='text']:hover, input[type='text']:focus {
+textarea {
+  border:1px solid #999;
+}
+
+input[type='text']:hover, input[type='text']:focus,
+textarea:hover, textarea:focus {
   color:#000;
   background-color: #eb8f00;
 }
 
-input[type='text'].medium {
+input[type='text'].medium, textarea.medium  {
   width:20em;
 }
 
 select.medium {
   width:15em;
+}
+
+select.large {
+  width:22em;
+}
+
+fieldset {
+  border:1px solid #999;
+  -moz-border-radius: 0.4em;
+  -webkit-border-radius: 0.4em;
 }

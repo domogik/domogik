@@ -186,10 +186,16 @@ $.widget("ui.selectmenu", {
 							.data('optionClasses', selectOptionData[i].classes + ' ' + self.widgetBaseClass + '-hasIcon')
 							.addClass(self.widgetBaseClass + '-hasIcon');
 						var iconClass = o.icons[j].icon || "";
-						
+						if (o.icons[j].jquery == "no") {
+					
 						thisLi
 							.find('a:eq(0)')
+							.prepend('<span class="'+self.widgetBaseClass+'-item-icon '+iconClass + '"></span>');
+						} else {
+							thisLi
+							.find('a:eq(0)')
 							.prepend('<span class="'+self.widgetBaseClass+'-item-icon ui-icon '+iconClass + '"></span>');
+					}
 					}
 				}
 			}

@@ -102,3 +102,6 @@ ul#nav1 li a.selected:hover {
   color: #eb8f00;
   background:#FFF;
 }
+
+ul#nav1.loginbutton {
+}

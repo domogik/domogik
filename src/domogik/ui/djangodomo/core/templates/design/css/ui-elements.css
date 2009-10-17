@@ -50,9 +50,30 @@
   -webkit-border-radius: 0.8em 0 0.8em 0;
 }
 
+.element h2 {
+	line-height:2em;
+	padding-left:35px;
+	background-position:left top;
+	background-repeat:no-repeat;
+	margin-bottom:0.2em;
+}
+
 .mediumbox {
   width:40em;
   margin-left:5em;
+}
+
+.largebox {
+  width:70%;
+  max-width:60em;
+  margin-left:5em;
+}
+
+.columnsbox {
+    -moz-column-width: 25em;
+    -webkit-column-width: 25em;
+    -moz-column-gap: 1em;
+    -webkit-column-gap: 1em;
 }
 
 .label {
