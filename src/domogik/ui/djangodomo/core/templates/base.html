@@ -62,12 +62,11 @@
     <li><a href="show/index.html">Visualisation</a></li>
     <li><a href="program/index.html">Programmation</a></li>
     <li><a href="{% url admin_view %}">Administration</a></li>
-    <li class="loginbutton">
+    <li class="login">
       {% if not is_user_connected %}
          <a href="{% url login_view %}">{% trans "Log in" %}</a>
       {% else %}
-         {% trans "Hello" %}, {{ user.first_name }}&nbsp;&nbsp;
-         <a href="{% url logout_view %}">{% trans "Log out" %}</a>
+         <a href="{% url logout_view %}">{% trans "Log out" %} {{ user.first_name }}</a>
       {% endif %}
     </li>
   </ul>
