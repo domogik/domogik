@@ -21,10 +21,15 @@
 # $LastChangedDate: 2008-12-13 19:11:10 +0100 (sam. 13 déc. 2008) $
 # $LastChangedRevision: 271 $
 -->
-{% extends "base.html" %}
+{% extends "base_with_admin_menu.html" %}
 {% load i18n %}
 
-{% block script %}
+{% block js_script %}
+$(function(){
+  // Accordion
+  $("#nav2").accordion({ header: ".section", active:false});
+});
+
     function clearStats() {
         if (confirm("Are you sure you want to clear stats ?")) {
             document.forms['deviceStatsForm'].cmd.value = "clear_stats"
@@ -36,7 +41,7 @@
 
 {% block title %}{% trans page_title %}{% endblock %}
 
-{% block content %}
+{% block right %}
     <div id="list" style="margin-top: 5px;">
     <form name="deviceStatsForm" method="POST" action="">
     {% if device_stats_list %}

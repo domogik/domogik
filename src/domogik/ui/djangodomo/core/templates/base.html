@@ -36,27 +36,7 @@
 <body>
 <div id="frame">
   <div id="header">
-    <a href="/domogik" id="logo">
-      <img src="/design/images/logo_domogik.png" width="131" height="37" alt="Domotik logo" />
-    </a>
-    <div id="title">
-      {% trans "Welcome to Domogik" %}
-      <span id="subtitle">{% trans "Free home automation under Linux" %}</span>
-    </div>
-  </div>
-  <div id="general">
-    <div id="general-temp" class="icon64-weather-clouds">21&deg;C</div>
-    <div id="general-datetime"><span id="general-time">10:20</span><br />
-      <span id="general-date">Dimanche 27 Septembre 2009</span></div>
-    <ul class="general-infos">
-      <li class="icon16-device-electricity">150 Kw/h</li>
-      <li class="icon16-device-water">1,7 l/h</li>
-    </ul>
-    <ul class="general-infos">
-      <li class="icon16-device-message">1 message</li>
-      <li class="icon16-device-notification">2 notifications</li>
-      <li class="icon16-device-error">Pas d'erreur</li>
-    </ul>
+  {% block header%}{% endblock %}
   </div>
   <ul id="nav1">
     <li><a href="show/index.html">Visualisation</a></li>

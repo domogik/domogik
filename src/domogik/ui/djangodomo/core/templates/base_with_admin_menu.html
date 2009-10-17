@@ -15,21 +15,16 @@
 # You should have received a copy of the GNU General Public License
 # along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
 
-# Author : Marc Schneider <marc@domogik.org>
+# Author :  Cédric Trévisan <cedric@domogik.org> / Marc Schneider <marc@domogik.org>
 -->
-{% extends "base.html" %}
+{% extends "base_with_header.html" %}
 {% load i18n %}
 
 {% block css %}
   <link href="/design/css/ui-nav2.css" rel="stylesheet" type="text/css" />
   <link href="/design/css/ui-elements.css" rel="stylesheet" type="text/css" />
   <link href="/design/css/ui-buttons.css" rel="stylesheet" type="text/css" />
-{% endblock %}
-{% block script %}
-$(function(){
-  // Accordion
-  $("#nav2").accordion({ header: ".section", active:false});
-});
+  <link href="/design/css/ui-forms.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 
 {% block content %}
@@ -43,6 +38,7 @@ $(function(){
       </ul>
       <div class="section"><a href="#">Gestion</a></div>
       <ul>
+        <li><a href="management/domogik.html">Domogik</a></li>
         <li><a href="management/modules.html">Modules</a></li>
       </ul>
     </div>

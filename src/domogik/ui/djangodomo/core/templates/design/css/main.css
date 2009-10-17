@@ -54,7 +54,7 @@ div.right {
 }
 
 #header {
-  padding:1em 0 0 1em;
+  padding:1em 0 1em 1em;
 }
 
 #title {
@@ -76,7 +76,7 @@ ul#nav1 {
   background: #f6a828 url(images/ui-bg_gloss-wave_35_f6a828_500x100.png) 50% 50% repeat-x;
   color: #ffffff;
   font-weight: bold;
-  margin:0;
+  margin:0 0 0.5em 0;
   padding:0.5em 0.5em 0 0.5em;
 }
 ul#nav1 li {

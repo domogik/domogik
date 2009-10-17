@@ -21,10 +21,14 @@
 # $LastChangedDate: 2009-02-08 16:33:23 +0100 (dim. 08 févr. 2009) $
 # $LastChangedRevision: 347 $
 -->
-{% extends "base.html" %}
+{% extends "base_with_admin_menu.html" %}
 {% load i18n %}
+{% block js_script %}
+$(function(){
+  // Accordion
+  $("#nav2").accordion({ header: ".section", active:false});
+});
 
-{% block script %}
     function saveSettings() {
         document.forms['settingsForm'].action="{% url save_admin_settings_view %}"
         document.forms['settingsForm'].submit()
@@ -45,7 +49,7 @@
 
 {% block title %}{% trans page_title %}{% endblock %}
 
-{% block content %}
+{% block right %}
     {% ifequal action "index" %}
     <div id="adminMain">
         <form name="settingsForm" action="" method="POST">
