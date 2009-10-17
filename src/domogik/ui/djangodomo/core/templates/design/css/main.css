@@ -28,7 +28,6 @@ h2.splitter, h3.splitter {
 /* Main Layout */
 body {
   font: 62.5% "Trebuchet MS", sans-serif;
-  margin: 1em;
 }
 
 #frame {
@@ -45,7 +44,10 @@ div.right {
 }
 .footer {
   clear:both;
-  margin-bottom:1em;
+  margin:0.5em;
+  padding:0.5em;
+  text-align:center;
+  border-top:1px solid #999;
 }
 /* Header */
 #logo {
@@ -54,7 +56,7 @@ div.right {
 }
 
 #header {
-  padding:1em 0 1em 1em;
+  padding:1em 0 0 1em;
 }
 
 #title {

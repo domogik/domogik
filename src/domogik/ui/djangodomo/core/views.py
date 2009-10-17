@@ -460,3 +460,14 @@ def device_status(request, room_id=None, device_id=None):
         return HttpResponse(json)
     return HttpResponse(response)
     """
+    
+def admin_organisation_devices(request):
+    """
+    Method called when the admin devices organisation page is accessed
+    @param request : HTTP request
+    @return an HttpResponse object
+    """
+    if not _is_user_admin(request):
+        return index(request)
+    page_title = _("Organisation des dispositifs")
+    return _go_to_page(request, 'admin/organisation/devices.html', page_title)

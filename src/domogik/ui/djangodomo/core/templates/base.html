@@ -21,41 +21,28 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-  <link type="text/css" href="/design/css/ui-lightness/jquery-ui-1.7.2.custom.css" rel="stylesheet" type="text/css"/>
-  <link href="/design/css/main.css" rel="stylesheet" type="text/css" />
-  <link href="/design/css/ui-icons.css" rel="stylesheet" type="text/css" />
-  {% block css %}{% endblock %}
-  <script type="text/javascript" src="/design/js/jquery-1.3.2.min.js"></script>
-  <script type="text/javascript" src="/design/js/jquery-ui-1.7.2.custom.min.js"></script>
-  <script type="text/javascript" src="/design/js/main.js"></script>
-  {% block include_js_script %}{% endblock %}
-  <script language="javascript">{% block js_script %}{% endblock %}</script>
-  <title>{% block title %}Domogik{% endblock %}</title>
-</head>
-<body>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link href="/design/css/ui-lightness/jquery-ui-1.7.2.custom.css" rel="stylesheet" type="text/css"/>
+<link href="/design/css/main.css" rel="stylesheet" type="text/css" />
+<link href="/design/css/ui-icons.css" rel="stylesheet" type="text/css" />
+{% block css %}{% endblock %}
+<script type="text/javascript" src="/design/js/jquery-1.3.2.min.js"></script>
+<script type="text/javascript" src="/design/js/jquery-ui-1.7.2.custom.min.js"></script>
+<script type="text/javascript" src="/design/js/main.js"></script>
+{% block include_js_script %}{% endblock %}
+<script type="text/javascript">{% block js_script %}{% endblock %}</script>
+<title>{% block title %}Domogik{% endblock %}</title>
+</head><body>
 <div id="frame">
-  <div id="header">
-  {% block header%}{% endblock %}
-  </div>
+  <div id="header"> {% block header%}{% endblock %} </div>
   <ul id="nav1">
     <li><a href="show/index.html">Visualisation</a></li>
     <li><a href="program/index.html">Programmation</a></li>
     <li><a href="{% url admin_view %}">Administration</a></li>
-    <li class="login">
-      {% if not is_user_connected %}
-         <a href="{% url login_view %}">{% trans "Log in" %}</a>
-      {% else %}
-         <a href="{% url logout_view %}">{% trans "Log out" %} {{ user.first_name }}</a>
-      {% endif %}
-    </li>
+    <li class="login"> {% if not is_user_connected %} <a href="{% url login_view %}">{% trans "Log in" %}</a> {% else %} <a href="{% url logout_view %}">{% trans "Log out" %} {{ user.first_name }}</a> {% endif %} </li>
   </ul>
-  <div id="content">
-    {% block content %}{% endblock %}
-  </div>
-  <div class="footer">
-    <hr/><center>Copyright 2008 Domogik project - GNU/GPL v3 license</center>
-  </div>
+  <div id="content"> {% block content %}{% endblock %} </div>
+  <div class="footer">Copyright 2008 Domogik project - GNU/GPL v3 license</div>
 </div>
 </body>
 </html>

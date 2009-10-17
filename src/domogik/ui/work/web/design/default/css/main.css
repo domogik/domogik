@@ -7,7 +7,14 @@ img {
 }
 
 .error_msg {
-  color: red;
+  border:2px solid #CC0000;
+  color: #CC0000;
+  margin:1em;
+  padding:0 0 0 35px;
+  text-align:center;
+  font-size:1.2em;
+  background:url(../images/error_32.png) left top no-repeat;
+  line-height:32px;
 }
 
 h2 {
@@ -62,30 +69,39 @@ div.right {
 /* Nav menu */
 ul#nav1 {
   list-style: none;
-  position: relative;
   padding: 0.2em 0.2em 0 0.2em;
-  border: #e78f08 1px solid;
-  background: #f6a828 url(../../../css/images/ui-bg_gloss-wave_35_f6a828_500x100.png) 50% 50% repeat-x;
-  background-attachment: scroll;
+  border-top: #e78f08 1px solid;
+  border-left: #e78f08 1px solid;
+  border-right: #e78f08 1px solid;
+  background: #f6a828 url(images/ui-bg_gloss-wave_35_f6a828_500x100.png) 50% 50% repeat-x;
   color: #ffffff;
   font-weight: bold;
+  margin:0 0 0.5em 0;
+  padding:0.5em 0.5em 0 0.5em;
 }
 ul#nav1 li {
   display:inline-block;
   padding:0;
+  margin:0;
 }
 ul#nav1 li a {
   display:inline-block;
   text-decoration:none;
-  padding: 0.5em 1em 0.5em 1em;
+  padding: 0 1em 0 1em;
+  margin:0;
   color:#FFF;
   background:#FFF;
   color: #1c94c4;
-  border: #cccccc 1px solid;
+  border-top: #cccccc 1px solid;
+  border-left: #cccccc 1px solid;
+  border-right: #cccccc 1px solid;
+  -moz-border-radius: 0.8em 0.8em 0 0;
+  -webkit-border-radius: 0.8em 0.8em 0 0;
+  line-height:2.5em;
 }
 ul#nav1 li a:hover, ul#nav1 li a:focus, ul#nav1 li a:active {
   color: #c77405;
-  background: #fdf5ce url(../../../css/images/ui-bg_glass_100_fdf5ce_1x400.png) repeat-x 50% 50%;
+  background: #fdf5ce url(images/ui-bg_glass_100_fdf5ce_1x400.png) repeat-x 50% 50%;
   background-attachment: scroll;
 }
 ul#nav1 li a.selected {
@@ -94,4 +110,19 @@ ul#nav1 li a.selected {
 ul#nav1 li a.selected:hover {
   color: #eb8f00;
   background:#FFF;
+}
+
+ul#nav1 .login {
+	float:right;
+}
+
+ul#nav1 .login a {
+  text-decoration:none;
+  border-top:1px solid #FFF;
+  border-left:1px solid #FFF;
+  border-right:1px solid #FFF;
+  color:#FFF;
+  background-color:#1c94c4;
+  margin:0;
+  display:inline-block;
 }

@@ -53,4 +53,5 @@ urlpatterns = patterns('djangodomo.core.views',
     url(r'admin/load_sample_data$', 'load_sample_data', name="load_sample_data_view"),
     url(r'admin/clear_data$', 'clear_data', name="clear_data_view"),
     url(r'admin/save_admin_settings$', 'save_admin_settings', name="save_admin_settings_view"),
+    url(r'admin/organisation/devices/$', 'admin_organisation_devices', name="admin_organisation_devices_view"),
 )
