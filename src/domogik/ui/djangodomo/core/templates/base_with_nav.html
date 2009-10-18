@@ -1,4 +1,5 @@
-<!--
+{% extends "base.html" %}
+{% comment %}
 # Copyright 2008 Domogik project
 
 # This file is part of Domogik.
@@ -16,16 +17,16 @@
 # along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
 
 # Author : Cédric Trévisan <cedric@domogik.org>
--->
-{% extends "base.html" %}
+{% endcomment %}
+
+
 {% load i18n %}
 
-{% block header %}
-    <a href="/domogik" id="logo">
-      <img src="/design/images/logo_domogik.png" width="131" height="37" alt="Domotik logo" />
-    </a>
-    <div id="title">
-      {% trans "Welcome to Domogik" %}
-      <span id="subtitle">{% trans "Free home automation under Linux" %}</span>
-    </div>
+{% block nav1 %}
+  <ul id="nav1">
+    <li><a href="show/index.html">Visualisation</a></li>
+    <li><a href="program/index.html">Programmation</a></li>
+    <li><a href="{% url admin_view %}">Administration</a></li>
+    <li class="login"> {% if not is_user_connected %} <a href="{% url login_view %}">{% trans "Log in" %}</a> {% else %} <a href="{% url logout_view %}">{% trans "Log out" %} {{ user.first_name }}</a> {% endif %} </li>
+  </ul>
 {% endblock %}

@@ -1,4 +1,5 @@
-<!--
+{% extends "base_with_admin_menu.html" %}
+{% comment %}
 # Copyright 2008 Domogik project
 
 # This file is part of Domogik.
@@ -13,28 +14,91 @@
 # GNU General Public License for more details.
 
 # You should have received a copy of the GNU General Public License
-# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+# along with Domogik.  If not, see
+<http://www.gnu.org/licenses/>
+.
 
-# Author : Cédric Trévisan <cedric@domogik.org>
--->
-{% extends "base_with_admin_menu.html" %}
+# Author : Cédric Trévisan <cedric@domogik.org> {% endcomment %}
+
+
 {% load i18n %}
 {% block js_script %}
 $(function(){
   // Accordion
-  $("#nav2").accordion({ header: ".section", active:1});
+  $("#nav2").accordion({ header: ".section", active:1});  
+  
+  // Add new form  
+   		var name = $("#name"),
+			description = $("#description"),
+			address = $("#address"),
+			reference = $("#reference"),
+            allFields = $([]).add(name).add(description).add(reference),
+
+			tips = $("#validateTips");
+
+		function updateTips(t) {
+			tips.text(t).effect("highlight",{},1500);
+		}
+
+		function checkLength(o,n,min,max) {
+
+			if ( o.val().length > max || o.val().length < min ) {
+				o.addClass('ui-state-error');
+				updateTips("La longueur de " + n + " doit être comprise entre "+min+" et "+max+".");
+				return false;
+			} else {
+				return true;
+			}
+
+		}
+		
+		$("#addnewdialog").dialog({
+			bgiframe: true,
+			autoOpen: false,
+			height: 400,
+			modal: true,
+			buttons: {
+				'Ajouter': function() {
+					var bValid = true;
+					allFields.removeClass('ui-state-error');
+
+					bValid = bValid && checkLength(name,"nom",1,80);
+					bValid = bValid && checkLength(address,"adresse",1,80);
+					bValid = bValid && checkLength(reference,"référence",1,80);
+                    				
+					if (bValid) {
+                    	// Submit form
+						$(this).dialog('close');
+					}
+				},
+				Cancel: function() {
+					$(this).dialog('close');
+				}
+			},
+			close: function() {
+				allFields.val('').removeClass('ui-state-error');
+			}
+		});
+		
+		
+		
+		$('#addnew').click(function() {
+			$('#addnewdialog').dialog('open');
+		})
 });
 
 {% endblock %}
 {% block css %}
-<link href="/design/css/ui-elements.css" rel="stylesheet" type="text/css" />
-<link href="/design/css/ui-buttons.css" rel="stylesheet" type="text/css" />
-<link href="/design/css/ui-forms.css" rel="stylesheet" type="text/css" />
-<link href="/design/css/ui-nav2.css" rel="stylesheet" type="text/css" />
-<link href="/design/css/ui-tables.css" rel="stylesheet" type="text/css" />
-<link href="/design/css/page-admin-organisation.css" rel="stylesheet" type="text/css" />
+                    <link href="/design/css/ui-selectmenu.css" rel="stylesheet" type="text/css" />
+                    <link href="/design/css/ui-elements.css" rel="stylesheet" type="text/css" />
+                    <link href="/design/css/ui-buttons.css" rel="stylesheet" type="text/css" />
+                    <link href="/design/css/ui-forms.css" rel="stylesheet" type="text/css" />
+                    <link href="/design/css/ui-nav2.css" rel="stylesheet" type="text/css" />
+                    <link href="/design/css/ui-tables.css" rel="stylesheet" type="text/css" />
+                    <link href="/design/css/page-admin-organisation.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block include_js_script %}
+<script type="text/javascript" src="/design/js/ui.selectmenu.js"></script>
 <script type="text/javascript" src="/design/js/page-admin.js"></script>
 {% endblock %}
 {% block title %}{% trans page_title %}{% endblock %}
@@ -42,108 +106,113 @@ $(function(){
 {% block right %}
 <div class="element-main">
   <h1 class="element-ident"><span class="element-title">Organisations des dispositifs</span></h1>
-  <h2 class="splitter">Nouveau dispositif</h2>
-  <form action="#">
-    <div class="largebox columnsbox">
-      <div class="parameter">
-        <label class="medium" for="address">Adresse :</label>
-        <input type="text" class="medium" id="address" name="address" />
-      </div>
-      <div class="parameter">
-        <label class="medium" for="name">Nom :</label>
+  <ul class="element-actions">
+    <li>
+      <button id="addnew" class="button">Ajouter nouveau</button>
+    </li>
+    <li><a href="#" class="button">Tout supprimer</a></li>
+  </ul>
+  <div id="addnewdialog" title="Ajouter nouveau dispositif">
+    <p id="validateTips">Tous les champs (sauf description) sont requis.</p>
+    <form>
+      <fieldset>
+        <label class="medium" for="name">Nom</label>
         <input type="text" class="medium" id="name" name="name" />
-      </div>
-      <div class="parameter">
-        <label class="medium" for="description">Description :</label>
+        <label class="medium" for="description">Description</label>
         <textarea class="medium" id="description" name="description"></textarea>
-      </div>
-      <div class="parameter">
-        <label class="medium" for="reference">Référence :</label>
+        <label class="medium" for="address">Adresse</label>
+        <input type="text" class="medium" id="address" name="address" />
+        <label class="medium" for="reference">Référence</label>
         <input type="text" class="medium" id="reference" name="reference" />
-      </div>
-      <div class="parameter">
-        <label class="medium" for="technology">Technologie :</label>
-        <select id="technology" name="technology">
-          <optgroup label="Courant porteur">
-          <option>X10</option>
-          <option>plcBus</option>
-          </optgroup>
-          <optgroup label="Sans fil">
-          <option>ZigBee</option>
-          </optgroup>
-          <optgroup label="Bus dédié">
-          <option>1-Wire</option>
-          <option>EIB/KNX</option>
-          </optgroup>
+        <label class="medium" for="technology">Technologie</label>
+        <select class="medium" id="technology" name="technology">
+          
+          
+        {% regroup device_tech_list|dictsort:"type" by type as types_list %}
+
+{% for type in types_list %}
+  
+          
+          <optgroup label="{{ type.grouper }}">
+    {% for technology in type.list %}
+      
+          
+          <option value="{{ technology.id }}">{{ technology.name }}</option>
+          
+          
+    {% endfor %}
+  </optgroup>
+          
+          
+{% endfor %}
+        
+        
         </select>
-      </div>
-      <div class="parameter">
-        <label class="medium" for="category">Categorie :</label>
-        <select id="category" name="category">
-          <option>Température</option>
-          <option>Chauffage</option>
-          <option>Lumière</option>
-          <option>Musique</option>
-          <option>Appareil</option>
+        <label class="medium" for="category">Categorie</label>
+        <select class="medium" id="category" name="category">
+          
+          
+        {% for category in device_category_list %}
+        	
+          
+          <option value="{{ category.id }}">{{ category.name }}</option>
+          
+          
+          {% endfor %}
+        
+        
         </select>
-      </div>
-      <div class="parameter">
-        <input type="submit" class="button" value="Ajouter" />
-      </div>
-    </div>
-  </form>
+      </fieldset>
+    </form>
+  </div>
 </div>
-<div class="nocolumns">
+<div class="nocolumns"> {% regroup devices_list|dictsort:"room" by room as rooms_list %}
+  {% for room in rooms_list %}
   <div class="element">
-    <h2>Dispositifs non attribués</h2>
+    <h2>{{ room.grouper.name }}</h2>
     <table class="devices-list">
       <thead>
         <tr>
           <th>Nom</th>
           <th>Adresse</th>
           <th>Référence</th>
+          <th>Type</th>
           <th>Description</th>
           <th>Technologie</th>
           <th>Catégorie</th>
+          <th>Pièce</th>
           <th>Reinitialisable</th>
           <th>Valeur initiale</th>
+          <th>Modifiable</th>
           <th>Unitée</th>
           <th>Actions</th>
         </tr>
       </thead>
       <tbody>
-        <tr class="odd">
-          <td>Lumière</td>
-          <td>A1</td>
-          <td>AM12</td>
-          <td>Lampe de chevet</td>
-          <td>X10</td>
-          <td>Lumière</td>
-          <td>Oui</td>
-          <td>Off</td>
-          <td></td>
-          <td><ul class="actions">
-              <li><a href="#" class="buttonsmall">Effacer</a></li>
-              <li><a href="#" class="buttonsmall">Modifier</a></li>
-            </ul></td>
-        </tr>
-        <tr class="odd">
-          <td>Eléctricité</td>
-          <td>D1</td>
-          <td></td>
-          <td>Machine à café</td>
-          <td>plcBus</td>
-          <td>Appareil</td>
-          <td>Oui</td>
-          <td>100</td>
-          <td>%</td>
-          <td><ul class="actions">
-              <li><a href="#" class="buttonsmall">Effacer</a></li>
-              <li><a href="#" class="buttonsmall">Modifier</a></li>
-            </ul></td>
-        </tr>
+      
+      {% for device in room.list %}
+      <tr class="{% cycle odd,even %}">
+        <td>{{device.name}}</td>
+        <td>{{device.address}}</td>
+        <td>{{device.reference}}</td>
+        <td>{{device.type}}</td>
+        <td>{{device.description}}</td>
+        <td>{{device.technology.name}}</td>
+        <td>{{device.category.name}}</td>
+        <td>{{device.room.name}}</td>
+        <td>{{device.is_resetable}}</td>
+        <td>{{device.initial_value}}</td>
+        <td>{{device.is_value_changeable_by_user}}</td>
+        <td>{{device.unit_of_stored}}</td>
+        <td><ul class="actions">
+            <li><a href="#" class="buttonsmall">Effacer</a></li>
+            <li><a href="#" class="buttonsmall">Modifier</a></li>
+          </ul></td>
+      </tr>
+      {% endfor %}
       </tbody>
+      
     </table>
   </div>
-</div>
+  {% endfor %} </div>
 {% endblock %}

@@ -17,22 +17,14 @@
 
 # Author : Cédric Trévisan <cedric@domogik.org> / Marc Schneider <marc@domogik.org>
 -->
-{% extends "base.html" %}
+{% extends "base_with_nav.html" %}
 {% load i18n %}
 
 {% block title %}{% trans page_title %}{% endblock %}
 {% block css %}
   <link href="/design/css/page-home.css" rel="stylesheet" type="text/css" />
 {% endblock %}
-{% block header %}
-    <a href="/domogik" id="logo">
-      <img src="/design/images/logo_domogik.png" width="131" height="37" alt="Domotik logo" />
-    </a>
-    <div id="title">
-      {% trans "Welcome to Domogik" %}
-      <span id="subtitle">{% trans "Free home automation under Linux" %}</span>
-    </div>
-  </div>
+{% block banner %}
   <div id="general">
     <div id="general-temp" class="icon64-weather-clouds">21&deg;C</div>
     <div id="general-datetime"><span id="general-time">10:20</span><br />
@@ -46,6 +38,7 @@
       <li class="icon16-device-notification">2 notifications</li>
       <li class="icon16-device-error">Pas d'erreur</li>
     </ul>
+    </div>
 {% endblock %}
 {% block content %}
 

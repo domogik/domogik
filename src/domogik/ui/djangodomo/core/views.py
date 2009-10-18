@@ -469,5 +469,35 @@ def admin_organisation_devices(request):
     """
     if not _is_user_admin(request):
         return index(request)
+    rooms_list = _db.list_rooms()
+    device_category_list = _db.list_device_categories()
+    devices_list = _db.list_devices()
+    device_tech_list = _db.list_device_technologies()
     page_title = _("Organisation des dispositifs")
-    return _go_to_page(request, 'admin/organisation/devices.html', page_title)
+    return _go_to_page(request, 'admin/organisation/devices.html', page_title,
+                      device_category_list=device_category_list, rooms_list=rooms_list,
+                      devices_list=devices_list, device_tech_list=device_tech_list)
+					  
+def admin_organisation_rooms(request):
+    """
+    Method called when the admin rooms organisation page is accessed
+    @param request : HTTP request
+    @return an HttpResponse object
+    """
+    if not _is_user_admin(request):
+        return index(request)
+    rooms_list = _db.list_rooms()
+    page_title = _("Organisation des pi&egrav;ces")
+    return _go_to_page(request, 'admin/organisation/rooms.html', page_title, rooms_list=rooms_list)
+					  
+def admin_organisation_areas(request):
+    """
+    Method called when the admin areas organisation page is accessed
+    @param request : HTTP request
+    @return an HttpResponse object
+    """
+    if not _is_user_admin(request):
+        return index(request)
+    areas_list = _db.list_areas()
+    page_title = _("Organisation des zones")
+    return _go_to_page(request, 'admin/organisation/areas.html', page_title, areas_list=areas_list)

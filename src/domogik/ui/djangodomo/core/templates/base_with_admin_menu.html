@@ -1,4 +1,5 @@
-<!--
+{% extends "base_with_nav.html" %}
+{% comment %}
 # Copyright 2008 Domogik project
 
 # This file is part of Domogik.
@@ -16,8 +17,8 @@
 # along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
 
 # Author :  Cédric Trévisan <cedric@domogik.org> / Marc Schneider <marc@domogik.org>
--->
-{% extends "base_with_header.html" %}
+{% endcomment %}
+
 {% load i18n %}
 
 {% block css %}
@@ -38,8 +39,8 @@
       <div class="section"><a href="#">Organisation</a></div>
       <ul>
         <li><a href="{% url admin_organisation_devices_view %}">Dispositifs</a></li>
-        <li><a href="organisation/rooms.html">Pièces</a></li>
-        <li><a href="organisation/zones.html">Zones</a></li>
+        <li><a href="{% url admin_organisation_rooms_view %}">Pièces</a></li>
+        <li><a href="{% url admin_organisation_areas_view %}">Zones</a></li>
       </ul>
     </div>
   </div>

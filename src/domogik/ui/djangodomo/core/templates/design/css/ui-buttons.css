@@ -23,20 +23,24 @@ a.button, .button {
   
   -moz-border-radius: 0.8em 0;
   -webkit-border-radius: 0.8em 0;
+  font-family: Trebuchet MS,Tahoma,Verdana,Arial,sans-serif;
+	font-size: 1em;
 }
 
 .button.on {
-  background-color:#096;
+  background:#096;
 }
 
 .button.off {
-  background-color:#930;
+  background:#930;
 }
 .button:hover, .button.on:hover, .button.off:hover,
 .button:focus, .button.on:focus, .button.off:focus,
 .button:active, .button.on:active, .button.off:active {
     color:#000;
-    background-color: #eb8f00;
+    background: #eb8f00;
+	font-weight:normal;
+	border:none;
 }
 
 

@@ -1,0 +1,170 @@
+{% extends "base_with_admin_menu.html" %}
+{% comment %}
+# Copyright 2008 Domogik project
+
+# This file is part of Domogik.
+# Domogik is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Domogik is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Domogik.  If not, see
+<http://www.gnu.org/licenses/>
+.
+
+# Author : Cédric Trévisan <cedric@domogik.org> {% endcomment %}
+
+
+{% load i18n %}
+{% block js_script %}
+$(function(){
+  // Accordion
+  $('select.room-zone').selectmenu();
+
+	// Accordion
+  $("#nav2").accordion({ header: ".section", active:1});
+	$('#instructions').dialog({autoOpen: false}); 
+	$('#btinstructions').click(function() {  
+                    $('#instructions').dialog('open',{closeOnEscape: false});  
+                });
+	
+	$('select#area1-largeicon').selectmenu({
+				icons: [
+					{find: '.icon1l', icon: 'icon64-area-grndfloor', jquery:'no'},
+					{find: '.icon2l', icon: 'icon64-area-firstfloor', jquery:'no'},
+					{find: '.icon3l', icon: 'icon64-area-basement', jquery:'no'}
+				]
+			});
+	$('select#area1-mediumicon').selectmenu({
+				icons: [
+					{find: '.icon1m', icon: 'icon32-area-grndfloor', jquery:'no'},
+					{find: '.icon2m', icon: 'icon32-area-firstfloor', jquery:'no'},
+					{find: '.icon3m', icon: 'icon32-area-basement', jquery:'no'}
+				]
+			});
+		$('select#area1-smallicon').selectmenu({
+				icons: [
+					{find: '.icon1s', icon: 'icon16-area-grndfloor', jquery:'no'},
+					{find: '.icon2s', icon: 'icon16-area-firstfloor', jquery:'no'},
+					{find: '.icon3s', icon: 'icon16-area-basement', jquery:'no'}
+				]
+			});
+
+});
+
+{% endblock %}
+{% block css %}
+  <link href="/design/css/ui-selectmenu.css" rel="stylesheet" type="text/css" />
+  <link href="/design/css/ui-dragdrop.css" rel="stylesheet" type="text/css" />
+  <link href="/design/css/ui-elements.css" rel="stylesheet" type="text/css" />
+  <link href="/design/css/ui-buttons.css" rel="stylesheet" type="text/css" />
+  <link href="/design/css/ui-forms.css" rel="stylesheet" type="text/css" />
+  <link href="/design/css/ui-nav2.css" rel="stylesheet" type="text/css" />
+  <link href="/design/css/page-admin-organisation.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+{% block include_js_script %}
+<script type="text/javascript" src="/design/js/ui.selectmenu.js"></script>
+<script type="text/javascript" src="/design/js/ui.dragdrop.js"></script>
+<script type="text/javascript" src="/design/js/page-admin.js"></script>
+{% endblock %}
+{% block title %}{% trans page_title %}{% endblock %}
+{% block right %}
+<div class="element-main">
+  <div>
+    <h1 class="element-ident"><span class="element-title">Organisations des zones</span></h1>
+    <h2 class="splitter">Créer une zone</h2>
+    <div class="mediumbox">
+      <div class="parameter">
+        <form action="#">
+          <label class="medium">Nom :</label>
+          <input type="text" class="medium" />
+          <input type="submit" class="button" value="Ajouter">
+        </form>
+      </div>
+    </div>
+    <h2 id="zonenah" class="choice splitter">Pièces non attribuées <a href="#" class="action" id="btinstructions">(Instructions Drag &amp; Drop)</a></h2>
+    <div id="instructions" title="Instructions Drag &amp; Drop">
+      <h3>Utilisation de la souris</h3>
+      <h3>Utilisation du clavier</h3>
+      <ul>
+        <li>Use the <kbd>Tab</kbd> to move to the artist you want to move.</li>
+        <li>Select the item you want to move with the <kbd>Spacebar</kbd>.</li>
+        <li>Use the <kbd>Up</kbd> and <kbd>Down</kbd> cursor keys to select a target in the context menu.</li>
+        <li>Press <kbd>Enter</kbd> to move the artist to the target list.</li>
+      </ul>
+    </div>
+    <ul id="zonena" class="draggables">
+      <li class="draggable">Salon TV</li>
+      <li class="draggable">S&eacute;jour</li>
+      <li class="draggable">Cuisine</li>
+      <li class="draggable">Salle de bain</li>
+      <li class="draggable">Chambre parents</li>
+      <li class="draggable">Chambre enfants</li>
+      <li class="draggable">Chambre amis</li>
+      <li class="draggable">Bureau</li>
+    </ul>
+  </div>
+</div>
+<div class="nocolumns">
+{% for area in areas_list %}
+  <div class="element">
+    <h2 id="zone{{ area.id }}h" class="choice icon32-area-grndfloor">{{ area.name }}</h2>
+    <ul class="element-actions">
+      <li><a href="#" class="button">Supprimer</a></li>
+      <li>
+        <input type="submit" class="button" value="Sauvegarder la pièce">
+      </li>
+    </ul>
+    <h3 class="splitter">Paramètres</h3>
+    <div class="mediumbox">
+      <div class="parameter">
+        <label class="medium" for="area{{ area.id }}-newname">Nouveau nom :</label>
+        <input id="area{{ area.id }}-newname" name="area{{ area.id }}-newname" type="text" class="medium" />
+      </div>
+    </div>
+    <div class="parameter">
+      <fieldset>
+        <legend>Icônes</legend>
+        <ul class="icons">
+          <li>
+            <label for="area{{ area.id }}-largeicon">Large :</label>
+            <select class="large customlargeicons" id="area{{ area.id }}-largeicon" name="area{{ area.id }}-largeicon">
+              <option value="icon1l" class="icon1l">Rez-de-chaussée</option>
+              <option value="icon2l" class="icon2l">Etage</option>
+              <option value="icon3l" class="icon3l">Sous-sol</option>
+            </select>
+          </li>
+          <li>
+            <label for="area{{ area.id }}-mediumicon">Moyen :</label>
+            <select class="large custommediumicons" id="area{{ area.id }}-mediumicon" name="area{{ area.id }}-mediumicon">
+              <option value="icon1m" class="icon1m">Rez-de-chaussée</option>
+              <option value="icon2m" class="icon2m">Etage</option>
+              <option value="icon3m" class="icon3m">Sous-sol</option>
+            </select>
+          </li>
+          <li>
+            <label for="area{{ area.id }}-smallicon">Petit :</label>
+            <select class="large customsmallicons" id="area{{ area.id }}-smallicon" name="area{{ area.id }}-smallicon">
+              <option value="icon1s" class="icon1s">Rez-de-chaussée</option>
+              <option value="icon2s" class="icon2s">Etage</option>
+              <option value="icon3s" class="icon3s">Sous-sol</option>
+            </select>
+          </li>
+        </ul>
+      </fieldset>
+    </div>
+    <h3 class="splitter">Pièces {{ area.name }}</h3>
+    <ul id="zone1" class="draggables">
+      <li class="empty">Vide</li>
+    </ul>
+  </div>
+
+    {% endfor %}
+</div>
+{% endblock %}

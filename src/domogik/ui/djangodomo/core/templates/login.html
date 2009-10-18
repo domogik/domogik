@@ -18,29 +18,20 @@
 
 # Author : Cédric Trévisan <cedric@domogik.org> / Marc Schneider <marc@domogik.org>
 -->
+{% extends "base.html" %}
 {% load i18n %}
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-  <title>{% trans page_title %}</title>
-  <link href="/design/css/ui-lightness/jquery-ui-1.7.2.custom.css" rel="stylesheet" type="text/css"/>
-  <link href="/design/css/main.css" rel="stylesheet" type="text/css" />
+
+{% block css %}
   <link href="/design/css/ui-buttons.css" rel="stylesheet" type="text/css" />
   <link href="/design/css/page-login.css" rel="stylesheet" type="text/css" />
-  <script type="text/javascript" src="/design/js/jquery-1.3.2.min.js"></script>
-  <script type="text/javascript" src="/design/js/jquery-ui-1.7.2.custom.min.js"></script>
+{% endblock %}
+{% block include_js_script %}
   <script type="text/javascript" src="/design/js/page-login.js"></script>
-</head>
-<body>
-<div id="frame">
-  <div id="header">
-    <a href="/domogik" id="logo">
-      <img src="/design/images/logo_domogik.png" width="131" height="37" alt="Domogik logo" />
-    </a>
-    <div id="title">{% trans "Welcome to Domogik" %}
-    <span id="subtitle">{% trans "Free home automation under Linux" %}</span></div>
-  </div>
-  <div id="content">
+{% endblock %}
+{% block title %}{% trans page_title %}{% endblock %}
+
+{% block content %}
+
     <h1>{% trans "Identification" %}</h1>
     {% if error_msg %}
       <p class="error_msg">{{ error_msg }}</p>
@@ -80,7 +71,5 @@
         </ul>
       </div>
     </form>
-  </div>
-</div>
-</body>
-</html>
+
+{% endblock %}
