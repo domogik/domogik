@@ -25,8 +25,24 @@
 $(function(){
   // Accordion
   $("#nav2").accordion({ header: ".section", active:1});
-  $('select.room-zone').selectmenu();
+//  $('select.room-zone').selectmenu();
 
+	function updateTips(tips, t) {
+			tips.text(t).effect("highlight",{},1500);
+		}
+
+		function checkLength(tips, o,n,min,max) {
+
+			if ( o.val().length > max || o.val().length < min ) {
+				o.addClass('ui-state-error');
+				updateTips(tips, "La longueur de " + n + " doit être comprise entre "+min+" et "+max+".");
+				return false;
+			} else {
+				return true;
+			}
+
+		}
+        
 	$('#instructions').dialog({autoOpen: false}); 
 	$('#btinstructions').click(function() {  
                     $('#instructions').dialog('open',{closeOnEscape: false});  
@@ -75,16 +91,22 @@ $(function(){
 <div class="element-main">
   <div>
     <h1 class="element-ident"><span class="element-title">Organisations des pièces</span></h1>
-    <h2 class="splitter">Créer une pièce</h2>
-    <div class="mediumbox">
-      <div class="parameter">
-        <form action="#">
-          <label class="medium" for="room-name">Nom :</label>
-          <input id="room-name" name="room-name" type="text" class="medium" />
-          <input type="submit" class="button" value="Ajouter">
-        </form>
-      </div>
-    </div>
+      <ul class="element-actions">
+    <li>
+      <button id="addnew" class="button">Créer nouvelle</button>
+    </li>
+    <li><a href="#" class="button">Tout supprimer</a></li>
+  </ul>
+    <div id="addnewdialog" title="Créer nouvelle pièce">
+    <p id="validateTips">Tous les champs (sauf description) sont requis.</p>
+    <form>
+      <fieldset>
+        <label class="medium" for="name">Nom</label>
+        <input type="text" class="medium" id="name" name="name" />
+      </fieldset>
+    </form>
+  </div>
+  
     <h2 id="roomnah" class="choice splitter">Dispositifs non attribuées <a href="#" class="action" id="btinstructions">(Instructions Drag &amp; Drop)</a></h2>
     <div id="instructions" title="Instructions Drag &amp; Drop">
       <h3>Utilisation de la souris</h3>
@@ -111,21 +133,65 @@ $(function(){
 <div class="nocolumns">
 {% for room in rooms_list %}
   <div class="element">
+  <script type="text/javascript">
+  $(function(){
+  // Add new form  
+   		var room{{ room.id }}newname = $("#room{{ room.id }}-newname"),
+
+            allFields = $([]).add(room{{ room.id }}newname),
+
+			tips{{ room.id }} = $("#validateTips{{ room.id }}");
+
+	
+		
+		$("#updatedialog{{ room.id }}").dialog({
+			bgiframe: true,
+			autoOpen: false,
+			height: 300,
+			modal: true,
+			buttons: {
+				'Modifier': function() {
+					var bValid = true;
+					allFields.removeClass('ui-state-error');
+
+					bValid = bValid && checkLength(tips{{ room.id }}, room{{ room.id }}newnam,"nom",1,80);
+                    				
+					if (bValid) {
+                    	// Submit form
+						$(this).dialog('close');
+					}
+				},
+				Cancel: function() {
+					$(this).dialog('close');
+				}
+			},
+			close: function() {
+				allFields.val('').removeClass('ui-state-error');
+			}
+		});
+		
+		
+		
+		$('#update{{ room.id }}').click(function() {
+			$('#updatedialog{{ room.id }}').dialog('open');
+		})
+		
+			});
+  </script>
     <h2 id="room{{ room.id }}h" class="choice icon32-room-livingroom">{{ room.name }}</h2>
-    <form action="#">
+    
       <ul class="element-actions">
         <li><a href="#" class="button">Supprimer</a></li>
         <li>
-          <input type="submit" class="button" value="Sauvegarder la pièce">
+          <button id="update{{ room.id }}" class="button">Modifier</button>
         </li>
       </ul>
-      <h3 class="splitter">Paramètres</h3>
-      <div class="mediumbox">
-        <div class="parameter">
+          <div id="updatedialog{{ room.id }}" title="Modifier {{ room.name }}">
+    <p id="validateTips{{ room.id }}">Tous les champs sont requis.</p>
+    <form action="#">
+    
           <label class="medium" for="room{{ room.id }}-newname">Nouveau nom :</label>
           <input id="room{{ room.id }}-newname" name="room{{ room.id }}-newname" type="text" class="medium" />
-        </div>
-        <div class="parameter">
           <label class="medium" for="room{{ room.id }}-zone">Zone :</label>
           <select class="room-zone medium" id="room{{ room.id }}-zone" name="room{{ room.id }}-zone">
             <option>Rez-de-chaussée</option>
@@ -133,7 +199,7 @@ $(function(){
             <option>Sous-sol</option>
             <option>Exterieur</option>
           </select>
-        </div>
+          </form>
       </div>
       <div class="parameter">
         <fieldset>
@@ -170,7 +236,6 @@ $(function(){
       <ul id="room{{ room.id }}" class="draggables">
         <li class="empty">Vide</li>
       </ul>
-    </form>
   </div>
   {% endfor %}
 </div>
