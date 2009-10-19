@@ -83,8 +83,8 @@ class PLCBUSAPI:
             'ALL_LIGHTS_ON': '01',
             'ON': '22', #ON and ask to send ACK (instead of '02')
             'OFF': '23', #OFF and send ACK
-            'DIM': '04',
-            'BRIGHT': '05',
+            'DIM': '24',
+            'BRIGHT': '25',
             'ALL_LIGHTS_OFF': '06',
             'ALL_USER_LTS_ON': '07',
             'ALL_USER_UNIT_OFF': '08',
@@ -92,6 +92,7 @@ class PLCBUSAPI:
             'BLINK': '0a',
             'FADE_STOP': '0b',
             'PRESET_DIM': '0c',
+            'STATUS_ON': '0d',
             'STATUS_OFF': '0e',
             'STATUS_REQUEST': '0f',
             'REC_MASTER_ADD_SETUP': '10',
@@ -112,7 +113,7 @@ class PLCBUSAPI:
             'REPORT_ONLY_ON_PULSE': '1f'}
         #instead of using serial directly, use serialHandler
         self._ser_handler = serialHandler(serial_port_no)
-        self._ser_handler.start() #run the handler thread
+#        self._ser_handler.start() #run the handler thread
 
     # FIXME: repetition in the following three methods
     # FIXME: the methods don't raise an exception as stated by the docstring
@@ -169,7 +170,7 @@ class PLCBUSAPI:
             var2 = '0%01X' % (int(data))
             return var2
 
-    def _send(self, cmd, item, ucod, data1, data2):
+    def _send(self, cmd, item, ucod, data1 = "00", data2 = "00"):
         # after cmd add level, rate : put in data1 and data2
         # (just data1 for these cases)
         '''
@@ -221,10 +222,34 @@ class PLCBUSAPI:
         print "on :", onlist
         return onlist
 
-#test
-#a = PLCBUSAPI(0)
-#a._send("ON", "O3", "45")
-#a._send("BRIGHT", "O3, "45", "50", "1")
+    def stop(self):
+        """ Ask thread to stop
+        """
+        self._ser_handler.stop()
 
-# TODO : def close serial port on error
-# ser.close()
+#test
+a = PLCBUSAPI("/dev/ttyUSB0")
+#a.get_all_on_id("00","B")
+print "--------------ON------------------"
+a._send("ON", "B2", "00") 
+time.sleep(3)
+print "--------------STATUS------------------"
+a._send("STATUS_REQUEST", "B2", "00") 
+time.sleep(3)
+print "----------------OFF----------------"
+a._send("OFF", "B2", "00") 
+time.sleep(3)
+#print "---------------STATUS-----------------"
+#a._send("STATUS_REQUEST", "B2", "00") 
+#time.sleep(3)
+#print "---------------BRIGHT-----------------"
+#a._send("BRIGHT", "B2", "00", "100","100")
+#time.sleep(10)
+#print "---------------DIM-----------------"
+#a._send("DIM", "B2", "00", "50","0")
+#time.sleep(3)
+print "---------------STATUS-----------------"
+a._send("STATUS_REQUEST", "B2", "00") 
+time.sleep(5)
+a.stop()
+
