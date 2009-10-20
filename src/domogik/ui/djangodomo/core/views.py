@@ -55,7 +55,6 @@ from djangodomo.core.XPLHelper import XPLHelper
 
 _db = database.DbHelper()
 
-
 def index(request):
     """
     Method called when the main page is accessed
@@ -177,6 +176,7 @@ def login(request):
                 'is_admin': sys_account.is_admin, 
                 'first_name': first_name, 
                 'last_name': last_name,
+                'skin_used': sys_account.skin_used,
             }
             return index(request)
         else:

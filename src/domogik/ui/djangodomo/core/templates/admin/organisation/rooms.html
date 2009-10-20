@@ -57,13 +57,13 @@ $(function(){
 
 {% endblock %}
 {% block css %}
-<link href="/design/css/ui-selectmenu.css" rel="stylesheet" type="text/css" />
-<link href="/design/css/ui-dragdrop.css" rel="stylesheet" type="text/css" />
-<link href="/design/css/ui-elements.css" rel="stylesheet" type="text/css" />
-<link href="/design/css/ui-buttons.css" rel="stylesheet" type="text/css" />
-<link href="/design/css/ui-forms.css" rel="stylesheet" type="text/css" />
-<link href="/design/css/ui-nav2.css" rel="stylesheet" type="text/css" />
-<link href="/design/css/page-admin-organisation.css" rel="stylesheet" type="text/css" />
+<link href="/design/{{ user.skin_used|default:'skins/default' }}/css/ui-selectmenu.css" rel="stylesheet" type="text/css" />
+<link href="/design/{{ user.skin_used|default:'skins/default' }}/css/ui-dragdrop.css" rel="stylesheet" type="text/css" />
+<link href="/design/{{ user.skin_used|default:'skins/default' }}/css/ui-elements.css" rel="stylesheet" type="text/css" />
+<link href="/design/{{ user.skin_used|default:'skins/default' }}/css/ui-buttons.css" rel="stylesheet" type="text/css" />
+<link href="/design/{{ user.skin_used|default:'skins/default' }}/css/ui-forms.css" rel="stylesheet" type="text/css" />
+<link href="/design/{{ user.skin_used|default:'skins/default' }}/css/ui-nav2.css" rel="stylesheet" type="text/css" />
+<link href="/design/{{ user.skin_used|default:'skins/default' }}/css/page-admin-organisation.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block include_js_script %}
 <script type="text/javascript" src="/design/js/ui.selectmenu.js"></script>

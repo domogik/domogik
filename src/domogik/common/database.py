@@ -816,7 +816,7 @@ class DbHelper():
                 return True
         return False
 
-    def add_system_account(self, a_login, a_password, a_is_admin=False, a_skin_used='default'):
+    def add_system_account(self, a_login, a_password, a_is_admin=False, a_skin_used='skins/default'):
         """
         Add a system_account
         @param a_login : Account login
