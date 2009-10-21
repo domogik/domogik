@@ -54,10 +54,13 @@ class serialHandler():
     Put received frames in the receveive_queue (to be sent on the xPL network
     """
 
-    def __init__(self, serial_port_no):
+    def __init__(self, serial_port_no, command_cb, message_cb):
         """ Initialize threaded PLCBUS manager
         Will handle communication to and from PLCBus 
         @param serial_port_no : Number or path of the serial port 
+        @param command_cb: callback called when a command has been succesfully sent
+        @param message_cb: called when a message is received from somewhere else on the network
+        For these 2 callbacks, the param is sent as an array
         """
         #invoke constructor of parent class
         self._ack = [] #Shared list between reader and writer
@@ -70,11 +73,10 @@ class serialHandler():
                 xonxoff=0) #, rtscts=1)
         self._want_lock = threading.Event()
         self._mutex = mutex.mutex()
-        self._writer = self.__Writer(self.__myser, self._want_lock, self._mutex, self._ack)
-        self._reader = self.__Reader(self.__myser, self._want_lock, self._mutex, self._ack)
+        self._writer = self.__Writer(self.__myser, self._want_lock, self._mutex, self._ack, command_cb)
+        self._reader = self.__Reader(self.__myser, self._want_lock, self._mutex, self._ack, message_cb)
         self._writer.start()
         self._reader.start()
-        print "PLCBUS Serial port open", self.__myser.portstr
 
     def add_to_send_queue(self, frame):
         """ Add a frame to the send queue
@@ -91,7 +93,7 @@ class serialHandler():
         """Threaded writer
         """
 
-        def __init__(self, serial, lock, mutex, ack_queue):
+        def __init__(self, serial, lock, mutex, ack_queue, command_callback):
             """ Internal threaded class
             Manage write to serial port
             @param serial : serial object
@@ -106,6 +108,7 @@ class serialHandler():
             self._ack = ack_queue
             self._send_queue = Queue.Queue()
             self._stop = threading.Event()
+            self._cb = command_callback
 
         def _send(self, plcbus_frame):
             #seems to work OK, but is all this retransmission process needed ?
@@ -128,8 +131,6 @@ class serialHandler():
                 # print "time1", time1
                 while 1:
                     time2 = time.time()
-                    print "date1 : %s" % datetime.datetime.now()
-                    # print "time2", time2
                     while 1:
                       #  message=self.__myser.read(size=9) #timeout is 400ms
                         #The ack message is sent immediately after the message has been received 
@@ -139,26 +140,25 @@ class serialHandler():
                         time.sleep(0.3)
                         if self._has_ack_received(plcbus_frame.decode('HEX')):
                             ACK_received=1
-                            break
+                            self._cb(self.explicit_message(plcbus_frame))
                         
                         #We check up to 3 times (3*0.3s) if a ack has been received 
                         #before resending it once.
                         if (time2 + 0.9 < time.time()):
-                            print "pass %s" % str(time.time() - time2)
-                            print "date2 : %s" % datetime.datetime.now()
                             break #200ms
-                        else:
-                            print "date3 : %s" % datetime.datetime.now()
 
                     #We resend the message up to 3 times (max 1.8s for global timeout)
                     if(ACK_received==0):
                         self._mutex.lock(self._basic_write, plcbus_frame)
                         self._has_message_to_send.clear()
                         self._has_message_to_send.wait()
-                        print "RESEND %s : %s" % (plcbus_frame, datetime.datetime.now())
 
-                    if(ACK_received==1 or time1 + 1.8 < time.time()):
+                    if(ACK_received==1 or time1 + 2.7 < time.time()):
                         break #2s
+            else:
+                #No ACK asked, we consider that the message has been correctly sent
+                self._cb(self.explicit_message(plcbus_frame))
+
 
         def stop(self):
             self._stop.set()
@@ -170,10 +170,8 @@ class serialHandler():
             @param check ack against this message
             """
             for ack in self._ack:
-                print "check ack : %s against message %s" % (ack, hexlify(message))
                 if self._is_ack_for_message(ack, hexlify(message)):
                     self._ack.remove(ack)
-                    print "ACK RECEIVED"
                     return True
             return False
 
@@ -204,6 +202,24 @@ class serialHandler():
             self._send_queue.put(trame)
             self._has_message_to_send.set()
 
+        def explicit_message(self, message):
+            """ Parse a frame 
+            """
+            r = {}
+            r["start_bit"] = message[0:2]
+            r["data_length"] = int(message[2:4])
+            int_length = int(message[2:4])*2
+            r["data"] = message[4:5+int_length]
+            r["d_user_code"] = r["data"][0:2]
+            r["d_home_unit"] = r["data"][2:4]
+            r["d_command"] = r["data"][4:6]
+            r["d_data1"] = r["data"][6:8]
+            r["d_data2"] = r["data"][8:10]
+            if r["data_length"] == 6:
+                r["rx_tw_switch"] = r["data"][11:]
+            r["end_bit"] = message[-2:]
+            return r
+
         def run(self):
             """ Start writer thread 
             """
@@ -217,7 +233,7 @@ class serialHandler():
         """Threaded reader
         """
 
-        def __init__(self, serial, lock, mutex, ack_queue):
+        def __init__(self, serial, lock, mutex, ack_queue, message_cb):
             """ Internal threaded class
             Manage read from serial port
             @param serial : serial object
@@ -233,6 +249,7 @@ class serialHandler():
             self._receive_queue = Queue.Queue()
             self._answer_queue = Queue.Queue()
             self._stop = threading.Event()
+            self._cb = message_cb
 
         def _is_answer(self, message):
             # if command is in answer required list (not ACK required, it's
@@ -250,18 +267,18 @@ class serialHandler():
             """
             r = {}
             r["start_bit"] = message[0:2]
-            r["data_length"] = message[2:4]
+            r["data_length"] = int(message[2:4])
             int_length = int(message[2:4])*2
             r["data"] = message[4:5+int_length]
             r["d_user_code"] = r["data"][0:2]
             r["d_home_unit"] = r["data"][2:4]
             r["d_command"] = r["data"][4:6]
-            if int_length > 6:
-                r["d_data1"] = r["data"][7:9]
-            if int_length > 8:
-                r["d_data2"] = r["data"][9:11]
+            r["d_data1"] = r["data"][6:8]
+            r["d_data2"] = r["data"][8:10]
+            if r["data_length"] == 6:
+                r["rx_tw_switch"] = r["data"][11:]
             r["end_bit"] = message[-2:]
-            print r
+            return r
 
         def receive(self):
             #not tested
@@ -277,13 +294,10 @@ class serialHandler():
                     return
                 if self._is_answer(m_string):
                     self._answer_queue.put(m_string)
-                    print "recu answer " + m_string
                 elif self._is_ack(m_string):
                     self._ack.append(m_string)
-                    print "recu ack %s : %s" %( m_string, datetime.datetime.now())
                 else:
-                    self._receive_queue.put(m_string)
-                    print "RECEIVE QUEUE"
+                    self._cb(self.explicit_message(m_string))
 
         def stop(self):
             """ Ask the thread to stop, 
@@ -304,7 +318,6 @@ class serialHandler():
                     #in the queue, so the unlock() will just do this call, 
                     #not really unlock the mutex.
                     self._mutex.unlock()
-                    print "mutex locked ? %s" % self._mutex.test()
                     self._mutex.testandset()
                     self._has_message_to_send.set()
                 #print "receiving"
@@ -314,7 +327,6 @@ class serialHandler():
             """ Check if a message is an ack 
                 @param message : message to check
             """
-            print message
             return int(message[14:16], 16) & 0x20
 
         def _is_from_myself(self, message):

@@ -45,12 +45,12 @@ from domogik.xpl.lib.queryconfig import *
 
 class TeleinfoManager(xPLModule):
     '''
-    Manage the One-Wire stuff and connect it to xPL
+    Manage the Téléinfo stuff and connect it to xPL
     '''
 
     def __init__(self):
         '''
-        Starts some timers to check temperature
+        Start teleinfo device handler
         '''
         xPLModule.__init__(self, name='teleinfo')
         self._myxpl = Manager()
@@ -62,6 +62,7 @@ class TeleinfoManager(xPLModule):
         self._config.query('teleinfo', 'interval', res)
         interval = res.get_value()['interval']
         self._myteleinfo  = TeleInfo(device, self._broadcastframe, interval)
+        self.add_stop_cb(self._myteleinfo.stop)
         self._myteleinfo.start()
 
     def _broadcastframe(self, frame):
