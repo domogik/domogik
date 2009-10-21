@@ -55,14 +55,16 @@ class plcbusMain(xPLModule):
         '''
         # Load config
         xPLModule.__init__(self, name = 'plcbus')
-        
         self._config = Query(self._myxpl)
         # Create listeners
         Listener(self.plcbus_cmnd_cb, self._myxpl, {
             'schema': 'control.basic',
             'type': 'xpl-cmnd',
         })
-        self.api = PLCBUSAPI(int(0)) #need to be updated with dynamic config
+        res = xPLResult()
+        self._config.query('plcbus','device', res)
+        device = res.get_value()['device']
+        self.api = PLCBUSAPI(device) #need to be updated with dynamic config
         # Create log instance
         self._log = self.get_my_logger()
 
