@@ -198,6 +198,8 @@ class generalConfig(genericPluginConfig):
 #                r"^[1-9][0-9]+", [3866]),
 #        ('source', 'What is the xPL name you want control scripts use ?',
 #                None, ['xpl-dmg.domogik']),
+        ('cfg_path', 'What is the main config directory ?',
+            None, ['/etc/domogik/']),
         ('log_dir_path', 'What is the path of the log directory ?\n'
                 'The directory must exist with good permissions.',
                 None, ['/tmp/']),
