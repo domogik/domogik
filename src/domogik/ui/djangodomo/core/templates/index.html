@@ -22,7 +22,7 @@
 
 {% block title %}{% trans page_title %}{% endblock %}
 {% block css %}
-  <link href="/design/css/page-home.css" rel="stylesheet" type="text/css" />
+  <link href="/design/{{ user.skin_used|default:'skins/default' }}/css/page-home.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block banner %}
   <div id="general">

@@ -816,7 +816,7 @@ class DbHelper():
                 return True
         return False
 
-    def add_system_account(self, a_login, a_password, a_is_admin=False):
+    def add_system_account(self, a_login, a_password, a_is_admin=False, a_skin_used='skins/default'):
         """
         Add a system_account
         @param a_login : Account login
@@ -829,7 +829,8 @@ class DbHelper():
             raise DbHelperException("Error %s login already exists" % a_login)
         password = hashlib.sha256()
         password.update(a_password)
-        system_account = SystemAccount(login=a_login, password=password.hexdigest(), is_admin=a_is_admin)
+        system_account = SystemAccount(login=a_login, password=password.hexdigest(), 
+                                      is_admin=a_is_admin, skin_used=a_skin_used)
         self._session.add(system_account)
         self._session.commit()
         return system_account

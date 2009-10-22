@@ -556,17 +556,20 @@ class SystemAccount(Base):
     login = Column(String(20), nullable=False)
     password = Column(Text, nullable=False)
     is_admin = Column(Boolean, nullable=False, default=False)
+    skin_used = Column(String(80), nullable=False)
 
-    def __init__(self, login, password, is_admin):
+    def __init__(self, login, password, is_admin, skin_used):
         """
         Class constructor
         @param login : login
         @param password : password
-        @parma is_admin : True if the user has administrator privileges
+        @param is_admin : True if the user has administrator privileges
+        @param skin_used : skin used in the UI (default value = 'default')
         """
         self.login = login
         self.password = password
         self.is_admin = is_admin
+        self.skin_used = skin_used
 
     def __repr__(self):
         """

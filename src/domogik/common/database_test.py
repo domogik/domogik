@@ -421,7 +421,7 @@ if __name__ == "__main__":
     except DbHelperException:
         error = True
     assert error, "It shouldn't have been possible to add login %s. It already exists!" % 'mschneider'
-    sys2 = d.add_system_account(a_login = 'lonely', a_password = 'boy', a_is_admin = True)
+    sys2 = d.add_system_account(a_login = 'lonely', a_password = 'boy', a_is_admin = True, a_skin_used='myskin')
     sys3 = d.add_system_account(a_login = 'domo', a_password = 'gik', a_is_admin = True)
     user1 = d.add_user_account(u_first_name='Marc', u_last_name='SCHNEIDER', u_birthdate=datetime.date(1973, 4, 24), 
                               u_system_account_id = sys1.id)
