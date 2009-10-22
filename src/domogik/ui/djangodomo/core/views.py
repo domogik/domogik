@@ -486,9 +486,11 @@ def admin_organisation_rooms(request):
     """
     if not _is_user_admin(request):
         return index(request)
-    rooms_list = _db.list_rooms()
+    unattribued_devices = _db.search_devices(room_id=None)
+    devices_list = _db.list_devices()
     page_title = _("Organisation des pieces")
-    return _go_to_page(request, 'admin/organisation/rooms.html', page_title, rooms_list=rooms_list)
+    return _go_to_page(request, 'admin/organisation/rooms.html', page_title,
+    				devices_list=devices_list, unattribued_devices=unattribued_devices)
 					  
 def admin_organisation_areas(request):
     """
