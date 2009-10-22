@@ -41,12 +41,15 @@ Implements
 """
 
 from datetime import datetime 
+from xml.dom import minidom
+import glob
 
 from domogik.xpl.lib.xplconnector import *
 from domogik.xpl.lib.module import xPLModule
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.common.configloader import *
 from domogik.common.database import DbHelper
+from domogik.common.configloader import Loader
 
 class DBConnector(xPLModule):
     '''
@@ -66,27 +69,10 @@ class DBConnector(xPLModule):
         self._stats = StatsManager()
         Listener(self._request_config_cb, self._myxpl,
                 {'schema': 'domogik.config', 'type': 'xpl-cmnd'})
-        #cfgloader = Loader('database')
-        #config = cfgloader.load()[1]
 
-        #Build database url
-#        db_url = "%s://" % config['type']
-#        if config['username']:
-#            db_url += config['username']
-#            if config['password']:
-#                db_url += ':%s' % config['password']
-#            db_url += '@'
-#        db_url += "%s" % config['host']
-#        if config['port']:
-#            db_url += ':%s' % config['port']
-#        db_url += '/%s' % config['db_name']
-#
-#        db = create_engine(db_url)
-#        self._metadata = BoundMetaData(db)
-#        self._prefix = config['prefix']
     def _request_config_cb(self, message):
         '''
-        -allback to receive a request for some config stuff
+        Callback to receive a request for some config stuff
         @param message : the xPL message
         '''
         #try:
@@ -181,76 +167,83 @@ class DBConnector(xPLModule):
         except:
             return None
 
+
 class StatsManager(xPLModule):
     """
     Listen on the xPL network and keep stats of device and system state
     """
     def __init__(self):
         xPLModule.__init__(self, 'statmgr')
+        cfg = Loader('domogik')
+        config = cfg.load()
+        db = dict(config[1])
+        directory = "%s/xml" % db['cfg_path']
+        files = glob.glob("%s/*xml" % directory)
+        stats = {}
         self._log = self.get_my_logger()
-        l_x10 = Listener(self._x10_cb, self._myxpl,
-                {'schema': 'x10.basic', 'type': 'xpl-trig'})
-        l_ow = Listener(self._onewire_cb, self._myxpl,
-                {'schema': 'sensor.basic', 'type': 'xpl-trig','type': 'onewire'})
-        l_plcbus = Listener(self._plcbus_cb, self._myxpl,
-                {'schema': 'control.basic', 'type': 'xpl-trig','type':'plcbus'})
-        l_hb = Listener(self._sys_cb, self._myxpl,
-                {'schema': 'domogik.system', 'type': 'xpl-trig'})
-        self._log.debug("Stats manager initialized")
 
-    def _x10_cb(self, message):
-        """
-        Manage X10 stats
-        """
-        dbhelper = DbHelper()
-        techno_id = self.__dbhelper.get_device_technology_by_name(u'x10').id
-        d = dbhelper.search_devices(technology_id = techno_id, address = message.data['device'])
-        if d:
-            d_id = d[0].id
-            dbhelper.add_device_stat(d_id, datetime.today(), message.data['command'].lower())
-        else:
-            self._log.warning("A X10 stat has been received for a non existing device : %s" % message.data['device'])
+        for file in files :
+            self._log.info("Parse file %s" % file)
+            doc = minidom.parse(file)
+            res = {}
+            res["technology"] = doc.documentElement.attributes.get("technology").value
+            res.update(self.parse_listener(doc.documentElement.getElementsByTagName("listener")[0]))
+            res.update(self.parse_mapping(doc.documentElement.getElementsByTagName("mapping")[0]))
+            stat = self.__Stat(self._myxpl, res)
+            stats[file] = stat
 
-    def _onewire_cb(self, message):
+    def parse_listener(self,node):
+        """ Parse the "listener" node
         """
-        Manage OneWire stats
+        res = {}
+        res["schema"] = node.getElementsByTagName("schema")[0].firstChild.nodeValue
+        res["xpltype"] = node.getElementsByTagName("xpltype")[0].firstChild.nodeValue
+        filters = {}
+        for filter in node.getElementsByTagName("filter")[0].getElementsByTagName("key"):
+            filters[filter.attributes["name"].value] = filter.attributes["value"].value
+        res["filter"] = filters
+        return res
+        
+    def parse_mapping(self,node):
+        """ Parse the "mapping" node
         """
-        dbhelper = DbHelper()
-        techno_id = self.__self.__dbhelper.get_device_technology_by_name('onewire').id
-        d_id = self.__dbhelper.search_devices(technology = techno_id, name =
-                message.data['device'])[0].id
-        dbhelper.add_device_stat(d_id, datetime.today(), message.data['current'].lower())
+        res = {}
+        res["device"] = node.getElementsByTagName("device")[0].attributes["field"].value
+        values = {}
+        for value in node.getElementsByTagName("value"):
+            #If a "name" attribute is defined, use it as vallue, else value is empty
+            if value.attributes.has_key("name"):
+                values[value.attributes["field"].value] = value.attributes["name"].value
+            else:
+                values[value.attributes["field"].value] = None
+        res["values"] = values
+        return res
 
-    def _plcbus_cb(self, message):
-        """
-        Manage PLCBUS stats
-        """
-        dbhelper = DbHelper()
-        techno_id = self.__self.__dbhelper.get_device_technology_by_name('plcbus').id
-        d_id = self.__dbhelper.search_devices(technology = techno_id, name =
-                message.data['device'])[0].id
-        dbhelper.add_device_stat(d_id, datetime.today(), message.data['command'].lower())
 
-    def _knx_cb(self, message):
-        """
-        Manage KNX stats
+    class __Stat:
+        """ This class define a statistic parser and logger instance
+        Each instance create a Listener and the associated callbacks
         """
 
-    def _sys_cb(self, message):
-        """
-        Manage system stats 
-        """
-        command = message.data["command"]
-        host = message.data["host"]
-        dbhelper = DbHelper()
-        if command in ["start","stop","reload","dump"]:
-            module = message.data["module"]
-            dbhelper.add_system_stat(module, gethostname(), datetime.today(), u'CORE', command)
-        elif command == "ping":
-            module = message.data["module"]
-            dbhelper.add_system_stat(module, gethostname(), datetime.today(), u'HB_CLIENT', command)
-        else:
-            dbhelper.add_system_stat(None, gethostname(), datetime.today(), u'CORE', command)
+        def __init__(self, xpl, res):
+            """ Initialize a stat instance 
+            @param xpl : A xpl manager instance
+            @param res : The result of xml parsing
+            """
+            self._res = res
+            params = {'schema':res["schema"], 'xpltype':res["xpltype"]}
+            params.update(res["filter"])
+            self._listener = Listener(self._callback, xpl, params)
+
+        def _callback(self, message):
+            """ Callback for the xpl message
+            @param message : the Xpl message received 
+            """
+            dbhelper = DbHelper()
+            techno_id = self.__self.__dbhelper.get_device_technology_by_name(self._res["technology"]).id
+            d_id = self.__dbhelper.search_devices(technology = techno_id, name =
+                    message.data[self._res['device']])[0].id
+            dbhelper.add_device_stat(d_id, datetime.today(), self._res["values"])
 
 
 if __name__ == "__main__":

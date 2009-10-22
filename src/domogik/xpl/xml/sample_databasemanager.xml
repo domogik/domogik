@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!-- All xml definition files must be in <domogik.cfg_path>/xml directory, 
+    one mapping definintion per file.
+-->
+<!-- statistic : root element 
+attribute technology is mandatory 
+It specifies the technology for which this mapping is used.
+-->
+<statistic technology="plcbus"> 
+    <listener> 
+        <!-- define filter fields 
+        schema and xpltype are mandatory.
+        -->
+        <schema>control.basic</schema>
+        <xpltype>xpl-trig</xpltype>
+        <filter>
+            <!-- list of 'key' nodes.
+            each node must have 2 parameters :
+                - name : the "key" of the pair 
+                - command : the "value" of the pair 
+                A message will be loggued only if schema and xpltype are corrects,
+                and only if for all "key" nodes specified, there is a name=value pair in the message.
+            -->
+            <key name="type" value="plcbus" />
+            <key name="command" value="on" />
+        </filter>
+    </listener>
+    <mapping> <!-- define the mapping between message keys and the database -->
+        <device field="device"/> <!-- define the device name -->
+        <!-- The "value" node can have 2 attributes :
+            - field : mandatory ! define the key of the pair key=value to get in the Xpl message 
+            - name : optionnal, if it's define, the 'name' of this value entry will be the value defined,
+                    else it will be the filed name.
+        -->
+        <value field="command"/>
+        <value field="command" name="bar" />
+    </mapping>
+</statistic>
+
