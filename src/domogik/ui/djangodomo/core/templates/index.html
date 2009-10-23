@@ -32,7 +32,8 @@
       {% for room in room_list %}
       <div class="room {% cycle 'leftcol' 'middlecol' 'rightcol' %}">
         <h2 class="room-ident icon64-room-default"><span class="room-title">{{ room.name }}</span><br />
-          <span class="room-zone icon16-area-firstfloor">Etage</span></h2>
+          <span class="room-zone icon16-area-firstfloor">{{ room.area.name }}</span>
+        </h2>
         <div class="room-temp">16&deg;</div>
         <ul class="room-infos">
           <li class="room-light">Lumi&egrave;re <span class="device-status-off icon16-status-lightoff">(off)</span></li>
