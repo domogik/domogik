@@ -1,4 +1,5 @@
-<!--
+{% extends "base_with_nav.html" %}
+{% comment %}
 # Copyright 2008 Domogik project
 
 # This file is part of Domogik.
@@ -16,30 +17,44 @@
 # along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
 
 # Author : Cédric Trévisan <cedric@domogik.org> / Marc Schneider <marc@domogik.org>
--->
-{% extends "base_with_nav.html" %}
+{% endcomment %}
+
 {% load i18n %}
 
 {% block title %}{% trans page_title %}{% endblock %}
 {% block css %}
   <link href="/design/{{ user.skin_used|default:'skins/default' }}/css/page-home.css" rel="stylesheet" type="text/css" />
 {% endblock %}
-{% block banner %}
-  <div id="general">
-    <div id="general-temp" class="icon64-weather-clouds">21&deg;C</div>
-    <div id="general-datetime"><span id="general-time">10:20</span><br />
-      <span id="general-date">Dimanche 27 Septembre 2009</span></div>
-    <ul class="general-infos">
-      <li class="icon16-device-electricity">150 Kw/h</li>
-      <li class="icon16-device-water">1,7 l/h</li>
-    </ul>
-    <ul class="general-infos">
-      <li class="icon16-device-message">1 message</li>
-      <li class="icon16-device-notification">2 notifications</li>
-      <li class="icon16-device-error">Pas d'erreur</li>
-    </ul>
-    </div>
-{% endblock %}
-{% block content %}
 
+{% block content %}
+  <div id="content">
+    <div class="line">
+      {% for room in room_list %}
+      <div class="room {% cycle 'leftcol' 'middlecol' 'rightcol' %}">
+        <h2 class="room-ident icon64-room-default"><span class="room-title">{{ room.name }}</span><br />
+          <span class="room-zone icon16-area-firstfloor">Etage</span></h2>
+        <div class="room-temp">16&deg;</div>
+        <ul class="room-infos">
+          <li class="room-light">Lumi&egrave;re <span class="device-status-off icon16-status-lightoff">(off)</span></li>
+          <li class="room-shutter">Volet <span class="device-status-down icon16-status-shutterdown">(ferm&eacute;)</span></li>
+        </ul>
+        <ul class="room-others">
+          <li class="icon32-device-tv">T&eacute;l&eacute;vision <span class="device-status-on icon16-status-defaulton">(on)</span></li>
+        </ul>
+        <ul class="room-others">
+          {% regroup device_list|dictsort:"room" by room as d_list_by_room %}
+          {% for device in d_list_by_room %}
+            {% ifequal device.grouper room.id %}
+              {% for item in device.list %}
+                <li>{{ item.device.name }}</li>
+              {% endfor %}
+            {% endifequal %}
+          {% endfor %}
+        </ul>
+      </div>
+      {% empty %}
+          <li>{% trans "No rooms configured yet" %}</li>
+      {% endfor %}
+    </div>
+  </div>
 {% endblock %}

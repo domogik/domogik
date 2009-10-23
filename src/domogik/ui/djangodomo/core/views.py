@@ -64,7 +64,8 @@ def index(request):
     page_title = _("Control overview")
     sys_config = _db.get_system_config()
 
-    device_list = _db.list_devices()
+    #device_list = _db.list_devices()
+    """
     if request.method == 'POST': 
         # An action was submitted
         cmd = QueryDict.get(request.POST, "cmd", "")
@@ -87,14 +88,14 @@ def index(request):
             device_list = _db.find_devices(room_id_list, device_category_id_list)
         elif cmd == "update_values":
             _update_device_values(request, sys_config)
-
-    area_list = _db.list_areas()
+    """
+    #area_list = _db.list_areas()
     room_list = _db.list_rooms()
-    device_category_list = _db.list_device_categories()
-    tech_list = _db.list_device_technologies()
-    return _go_to_page(request, 'index.html', page_title, area_list=area_list, 
-                      room_list=room_list, device_category_list=device_category_list, 
-                      device_list=device_list, tech_list=tech_list)
+    device_list = []
+    for device in _db.list_devices():
+      device_list.append({'room': device.room_id, 'device': device})
+
+    return _go_to_page(request, 'index.html', page_title, room_list=room_list, device_list=device_list)
 
 def device(request, device_id):
     """
