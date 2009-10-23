@@ -3,7 +3,7 @@
 
 .element-main {
   margin-right:1em;
-  padding:0 1em 0 1em;
+  padding:0 1em 1em 1em;
   -moz-box-shadow: 5px 5px 5px #888;
   -webkit-box-shadow: 5px 5px 5px #888;
   -moz-border-radius: 0.8em;
@@ -43,7 +43,7 @@
 .element {
   border:1px solid #1c94c4;
   margin:1em 0 0 0;
-  padding:0 1em 0 1em;
+  padding:0 1em 1em 1em;
   column-break-inside: avoid;
   min-height:15em;
   -moz-border-radius: 0.8em 0 0.8em 0;

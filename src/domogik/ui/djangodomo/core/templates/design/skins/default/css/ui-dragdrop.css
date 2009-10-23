@@ -3,9 +3,21 @@
 
 ul.draggables {
   list-style:none;
+  margin:0;
+  padding:0;
+}
+
+.areadrop {
+  margin:0.2em;
+  padding:0.2em;
   border:2px solid #1c94c4;
   -moz-border-radius: 0.8em;
   -webkit-border-radius: 0.8em;
+}
+
+.areadrop legend {
+	font-weight:bold;
+	margin-left:2em;
 }
 
 li.draggable, li.empty

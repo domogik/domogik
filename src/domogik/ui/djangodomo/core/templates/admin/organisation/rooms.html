@@ -28,85 +28,97 @@ $(function(){
   $("#nav2").accordion({ header: ".section", active:1});
 //  $('select.room-zone').selectmenu();
 
-  function updateTips(tips, t) {
-    tips.text(t).effect("highlight",{},1500);
-  }
+	function updateTips(tips, t) {
+			tips.text(t).effect("highlight",{},1500);
+		}
 
-  function checkLength(tips, o,n,min,max) {
+		function checkLength(tips, o,n,min,max) {
 
-    if ( o.val().length > max || o.val().length < min ) {
-      o.addClass('ui-state-error');
-      updateTips(tips, "La longueur de " + n + " doit être comprise entre "+min+" et "+max+".");
-      return false;
-    } else {
-      return true;
-    }
-  }
+			if ( o.val().length > max || o.val().length < min ) {
+				o.addClass('ui-state-error');
+				updateTips(tips, "La longueur de " + n + " doit être comprise entre "+min+" et "+max+".");
+				return false;
+			} else {
+				return true;
+			}
 
-  // Add new form  
-  var name = $("#name"),
-  allFields = $([]).add(name),
-  tips = $("#validateTips");
+		}
+          // Add new form  
+   		var name = $("#name"),
 
-  function updateTips(t) {
-    tips.text(t).effect("highlight",{},1500);
-  }
+            allFields = $([]).add(name),
 
-  function checkLength(o,n,min,max) {
+			tips = $("#validateTips");
 
-    if ( o.val().length > max || o.val().length < min ) {
-      o.addClass('ui-state-error');
-      updateTips("La longueur de " + n + " doit être comprise entre "+min+" et "+max+".");
-      return false;
-    } else {
-      return true;
-    }
-  }
+		function updateTips(t) {
+			tips.text(t).effect("highlight",{},1500);
+		}
 
-  $("#addnewdialog").dialog({
-    bgiframe: true,
-    autoOpen: false,
-    height: 200,
-    modal: true,
-    buttons: {
-      'Créer': function() {
-        var bValid = true;
-        allFields.removeClass('ui-state-error');
-        bValid = bValid && checkLength(name,"nom",1,80);
+		function checkLength(o,n,min,max) {
 
-        if (bValid) {
-          // Submit form
-          $(this).dialog('close');
-        }
-      },
-      Cancel: function() {
-        $(this).dialog('close');
-      }
-    },
-    close: function() {
-      allFields.val('').removeClass('ui-state-error');
-    }
-  });
+			if ( o.val().length > max || o.val().length < min ) {
+				o.addClass('ui-state-error');
+				updateTips("La longueur de " + n + " doit être comprise entre "+min+" et "+max+".");
+				return false;
+			} else {
+				return true;
+			}
 
-    $('#addnew').click(function() {
-      $('#addnewdialog').dialog('open');
-    })
+		}
+		
+		$("#addnewdialog").dialog({
+			bgiframe: true,
+			autoOpen: false,
+			height: 200,
+			modal: true,
+			buttons: {
+				'Créer': function() {
+					var bValid = true;
+					allFields.removeClass('ui-state-error');
 
-  $('#instructions').dialog({autoOpen: false});
-  $('#btinstructions').click(function() {
-    $('#instructions').dialog('open',{closeOnEscape: false});  
-  });
+					bValid = bValid && checkLength(name,"nom",1,80);
+                    				
+					if (bValid) {
+                    	// Submit form
+						$(this).dialog('close');
+					}
+				},
+				Cancel: function() {
+					$(this).dialog('close');
+				}
+			},
+			close: function() {
+				allFields.val('').removeClass('ui-state-error');
+			}
+		});
+		
+		
+		
+		$('#addnew').click(function() {
+			$('#addnewdialog').dialog('open');
+		})
+
+
+	$('#instructions').dialog({autoOpen: false}); 
+	$('#btinstructions').click(function() {  
+                    $('#instructions').dialog('open',{closeOnEscape: false});  
+                });
+        $("#devices").hide();
+        $("button#showdevices").click(function () {
+      $("#devices").toggle();
+    });
+
 });
 
 {% endblock %}
 {% block css %}
-<link href="/design/{{ user.skin_used|default:'skins/default' }}/css/ui-selectmenu.css" rel="stylesheet" type="text/css" />
-<link href="/design/{{ user.skin_used|default:'skins/default' }}/css/ui-dragdrop.css" rel="stylesheet" type="text/css" />
-<link href="/design/{{ user.skin_used|default:'skins/default' }}/css/ui-elements.css" rel="stylesheet" type="text/css" />
-<link href="/design/{{ user.skin_used|default:'skins/default' }}/css/ui-buttons.css" rel="stylesheet" type="text/css" />
-<link href="/design/{{ user.skin_used|default:'skins/default' }}/css/ui-forms.css" rel="stylesheet" type="text/css" />
-<link href="/design/{{ user.skin_used|default:'skins/default' }}/css/ui-nav2.css" rel="stylesheet" type="text/css" />
-<link href="/design/{{ user.skin_used|default:'skins/default' }}/css/page-admin-organisation.css" rel="stylesheet" type="text/css" />
+                    <link href="/design/{{ user.skin_used|default:'skins/default' }}/css/ui-selectmenu.css" rel="stylesheet" type="text/css" />
+                    <link href="/design/{{ user.skin_used|default:'skins/default' }}/css/ui-dragdrop.css" rel="stylesheet" type="text/css" />
+                    <link href="/design/{{ user.skin_used|default:'skins/default' }}/css/ui-elements.css" rel="stylesheet" type="text/css" />
+                    <link href="/design/{{ user.skin_used|default:'skins/default' }}/css/ui-buttons.css" rel="stylesheet" type="text/css" />
+                    <link href="/design/{{ user.skin_used|default:'skins/default' }}/css/ui-forms.css" rel="stylesheet" type="text/css" />
+                    <link href="/design/{{ user.skin_used|default:'skins/default' }}/css/ui-nav2.css" rel="stylesheet" type="text/css" />
+                    <link href="/design/{{ user.skin_used|default:'skins/default' }}/css/page-admin-organisation.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block include_js_script %}
 <script type="text/javascript" src="/design/js/ui.selectmenu.js"></script>
@@ -123,6 +135,7 @@ $(function(){
         <button id="addnew" class="button">Créer nouvelle</button>
       </li>
       <li><a href="#" class="button">Tout supprimer</a></li>
+      <li><button id="showdevices" class="button">Dispositifs</a></li>
     </ul>
     <div id="addnewdialog" title="Créer nouvelle pièce">
       <p id="validateTips">Tous les champs (sauf description) sont requis.</p>
@@ -133,102 +146,119 @@ $(function(){
         </fieldset>
       </form>
     </div>
-    <h2 id="roomnah" class="choice splitter">Dispositifs non attribuées</h2>
-    <a href="#" class="action" id="btinstructions">(Instructions Drag &amp; Drop)</a>
-    <div id="instructions" title="Instructions Drag &amp; Drop">
-      <h3>Utilisation de la souris</h3>
-      <h3>Utilisation du clavier</h3>
-      <ul>
-        <li>Use the <kbd>Tab</kbd> to move to the artist you want to move.</li>
-        <li>Select the item you want to move with the <kbd>Spacebar</kbd>.</li>
-        <li>Use the <kbd>Up</kbd> and <kbd>Down</kbd> cursor keys to select a target in the context menu.</li>
-        <li>Press <kbd>Enter</kbd> to move the artist to the target list.</li>
-      </ul>
-    </div>
-    <ul id="roomna" class="draggables">
-      {% for device in unattribued_devices %}
-      <li class="draggable" title="{{ device.technology.name }}.{{device.address }}">{{ device.name }}<span class="description">{{ device.description }}</span></li>
-      {% empty %}
-      <li class="empty">Vide</li>
+    <div id="devices">
+      <h2 class="splitter">Dispositifs</h2>
+      <a href="#" class="action" id="btinstructions">(Instructions Drag &amp; Drop)</a>
+      <div id="instructions" title="Instructions Drag &amp; Drop">
+        <h3>Utilisation de la souris</h3>
+        <h3>Utilisation du clavier</h3>
+        <ul>
+          <li>Use the <kbd>Tab</kbd> to move to the artist you want to move.</li>
+          <li>Select the item you want to move with the <kbd>Spacebar</kbd>.</li>
+          <li>Use the <kbd>Up</kbd> and <kbd>Down</kbd> cursor keys to select a target in the context menu.</li>
+          <li>Press <kbd>Enter</kbd> to move the artist to the target list.</li>
+        </ul>
+      </div>
+      <fieldset class="areadrop">
+        <legend id="roomnah" class="choice">Dispositifs non attribuées</legend>
+        <ul id="roomna" class="draggables">
+          {% for device in unattribued_devices %}
+          <li class="draggable" title="{{ device.technology.name }}.{{ device.address }}">{{ device.name }}<span class="description">{{ device.description }}</span></li>
+          {% empty %}
+          <li class="empty">Vide</li>
+          {% endfor %}
+        </ul>
+      </fieldset>
+      {% regroup devices_list|dictsort:"room" by room as rooms %}
+      {% for room in rooms %}
+      <fieldset class="areadrop">
+        <legend id="room{{ room.grouper.id }}h" class="choice">{{ room.grouper.name }}</legend>
+        <ul id="room{{ room.grouper.id }}" class="draggables">
+          {% for device in room.list %}
+          <li class="draggable" title="{{ device.technology.name }}.{{device.address }}">{{ device.name }}<span class="description">{{ device.description }}</span></li>
+          {% empty %}
+          <li class="empty">Vide</li>
+          {% endfor %}
+        </ul>
+      </fieldset>
       {% endfor %}
-    </ul>
+     </div>
   </div>
 </div>
-<div class="nocolumns">
-  {% regroup devices_list|dictsort:"room" by room as rooms_list %}
-  {% for room in rooms_list %}
+<div class="nocolumns"> {% for room in rooms_list %}
   <div class="element">
     <script type="text/javascript">
-      $(function(){
-        // Add new form
-        var room{{ room.grouper.id }}newname = $("#room{{ room.grouper.id }}-newname"),
-        allFields = $([]).add(room{{ room.grouper.id }}newname),
-          tips{{ room.grouper.id }} = $("#validateTips{{ room.grouper.id }}");
-        $("#updatedialog{{ room.grouper.id }}").dialog({
-          bgiframe: true,
-          autoOpen: false,
-          height: 300,
-          modal: true,
-          buttons: {
-            'Modifier': function() {
-              var bValid = true;
-              allFields.removeClass('ui-state-error');
-              bValid = bValid && checkLength(tips{{ room.grouper.id }}, room{{ room.grouper.id }}newnam,"nom",1,80);
-              if (bValid) {
+  $(function(){
+  // Add new form
+  var room{{ room.id }}newname = $("#room{{ room.id }}-newname"),
+  allFields = $([]).add(room{{ room.id }}newname),
+  tips{{ room.id }} = $("#validateTips{{ room.id }}");
+  $("#updatedialog{{ room.id }}").dialog({
+    bgiframe: true,
+    autoOpen: false,
+    height: 300,
+    modal: true,
+    buttons: {
+        'Modifier': function() {
+            var bValid = true;
+            allFields.removeClass('ui-state-error');
+            bValid = bValid && checkLength(tips{{ room.id }}, room{{ room.id }}newnam,"nom",1,80);
+            if (bValid) {
                 // Submit form
                 $(this).dialog('close');
-              }
-            },
-            Cancel: function() {
-              $(this).dialog('close');
-            }
-          },
-          close: function() {
-            allFields.val('').removeClass('ui-state-error');
-          }
-        });
-
-        $('select#room{{ room.grouper.id }}-largeicon').selectmenu({
-          icons: [
-            {find: '.icon1l', icon: 'icon64-room-default', jquery:'no'},
-            {find: '.icon2l', icon: 'icon64-room-kitchen', jquery:'no'},
-            {find: '.icon3l', icon: 'icon64-room-bathroom', jquery:'no'}
-          ]
-        });
-        $('select#room{{ room.grouper.id }}-mediumicon').selectmenu({
-          icons: [
-            {find: '.icon1m', icon: 'icon32-room-default', jquery:'no'},
-            {find: '.icon2m', icon: 'icon32-room-kitchen', jquery:'no'},
-            {find: '.icon3m', icon: 'icon32-room-livingroom', jquery:'no'}
-          ]
-        });
-        $('select#room{{ room.grouper.id }}-smallicon').selectmenu({
-          icons: [
-            {find: '.icon1s', icon: 'icon16-room-bedroom', jquery:'no'},
-            {find: '.icon2s', icon: 'icon16-room-kitchen', jquery:'no'},
-            {find: '.icon3s', icon: 'icon16-room-livingroom', jquery:'no'}
-          ]
-        });
-
-        $('#update{{ room.grouper.id }}').click(function() {
-          $('#updatedialog{{ room.grouper.id }}').dialog('open');
-        })
-      });
-    </script>
-    <h2 id="room{{ room.grouper.id }}h" class="choice icon32-room-livingroom">{{ room.grouper.name }}</h2>
+                }
+                },
+                Cancel: function() {
+					$(this).dialog('close');
+				}
+			},
+			close: function() {
+				allFields.val('').removeClass('ui-state-error');
+			}
+		});
+		
+			$('select#room{{ room.id }}-largeicon').selectmenu({
+				icons: [
+                                    {% for icon in icons64_room %}
+					{find: '.icon64_room_{{ icon }}', icon: 'icon64-room-{{ icon }}', jquery:'no'},
+                                    {% endfor %}
+				]
+			});
+	$('select#room{{ room.id }}-mediumicon').selectmenu({
+				icons: [
+                                    {% for icon in icons32_room %}
+					{find: '.icon32_room_{{ icon }}', icon: 'icon32-room-{{ icon }}', jquery:'no'},
+                                    {% endfor %}
+				]
+			});
+		$('select#room{{ room.id }}-smallicon').selectmenu({
+				icons: [
+                                    {% for icon in icons16_room %}
+					{find: '.icon16_room_{{ icon }}', icon: 'icon16-room-{{ icon }}', jquery:'no'},
+                                    {% endfor %}
+				]
+			});
+		
+		$('#update{{ room.id }}').click(function() {
+			$('#updatedialog{{ room.id }}').dialog('open');
+		})
+		
+			});
+  </script>
+    <h2 class="icon32-room-livingroom">{{ room.name }}</h2>
     <ul class="element-actions">
       <li><a href="#" class="button">Supprimer</a></li>
       <li>
-        <button id="update{{ room.grouper.id }}" class="button">Modifier</button>
+        <button id="update{{ room.id }}" class="button">Modifier</button>
       </li>
     </ul>
-    <div id="updatedialog{{ room.grouper.id }}" title="Modifier {{ room.grouper.name }}">
-      <p id="validateTips{{ room.grouper.id }}">Tous les champs sont requis.</p>
+    <div id="updatedialog{{ room.id }}" title="Modifier {{ room.name }}">
+      <p id="validateTips{{ room.id }}">Tous les champs sont requis.</p>
       <form action="#">
-        <label class="medium" for="room{{ room.grouper.id }}-newname">Nouveau nom :</label>
-        <input id="room{{ room.grouper.id }}-newname" name="room{{ room.grouper.id }}-newname" type="text" class="medium" />
-        <label class="medium" for="room{{ room.grouper.id }}-zone">Zone :</label>
-        <select class="room-zone medium" id="room{{ room.grouper.id }}-zone" name="room{{ room.grouper.id }}-zone">
+        <label class="medium" for="room{{ room.id }}-newname">Nouveau nom :</label>
+        <input id="room{{ room.id }}-newname" name="room{{ room.id }}-newname" type="text" class="medium" />
+        <label class="medium" for="room{{ room.id }}-zone">Zone :</label>
+        <select class="room-zone medium" id="room{{ room.id }}-zone" name="room{{ room.id }}-zone">
           <option>Rez-de-chaussée</option>
           <option>Etage</option>
           <option>Sous-sol</option>
@@ -241,41 +271,32 @@ $(function(){
         <legend>Icônes</legend>
         <ul class="icons">
           <li>
-            <label for="room{{ room.grouper.id }}-largeicon">Large :</label>
-            <select class="large customlargeicons" id="room{{ room.grouper.id }}-largeicon" name="room{{ room.grouper.id }}-largeicon">
-              <option value="icon1l" class="icon1l">Divers</option>
-              <option value="icon2l" class="icon2l">Cuisine</option>
-              <option value="icon3l" class="icon3l">Salle de bain</option>
+            <label for="room{{ room.id }}-largeicon">Large :</label>
+            <select class="large customlargeicons" id="room{{ room.id }}-largeicon" name="room{{ room.id }}-largeicon">
+              {% for icon in icons64_room %}
+              <option value="{{ icon }}" class="icon64_room_{{ icon }}">{{ icon }}</option>
+                {% endfor %}
             </select>
           </li>
           <li>
-            <label for="room{{ room.grouper.id }}-mediumicon">Moyen :</label>
-            <select class="large custommediumicons" id="room{{ room.grouper.id }}-mediumicon" name="room{{ room.grouper.id }}-mediumicon">
-              <option value="icon1m" class="icon1m">Divers</option>
-              <option value="icon2m" class="icon2m">Cuisine</option>
-              <option value="icon3m" class="icon3m">Séjour</option>
+            <label for="room{{ room.id }}-mediumicon">Moyen :</label>
+            <select class="large custommediumicons" id="room{{ room.id }}-mediumicon" name="room{{ room.id }}-mediumicon">
+              {% for icon in icons32_room %}
+              <option value="{{ icon }}" class="icon32_room_{{ icon }}">{{ icon }}</option>
+                {% endfor %}
             </select>
           </li>
           <li>
-            <label for="room{{ room.grouper.id }}-smallicon">Petit :</label>
-            <select class="large customsmallicons" id="room{{ room.grouper.id }}-smallicon" name="room{{ room.grouper.id }}-smallicon">
-              <option value="icon1s" class="icon1s">Chambre</option>
-              <option value="icon2s" class="icon2s">Cuisine</option>
-              <option value="icon3s" class="icon3s">Salle de bain</option>
+            <label for="room{{ room.id }}-smallicon">Petit :</label>
+            <select class="large customsmallicons" id="room{{ room.id }}-smallicon" name="room{{ room.id }}-smallicon">
+              {% for icon in icons16_room %}
+              <option value="{{ icon }}" class="icon16_room_{{ icon }}">{{ icon }}</option>
+                {% endfor %}
             </select>
           </li>
         </ul>
       </fieldset>
     </div>
-    <h3 class="splitter">Dispositifs</h3>
-    <ul id="room{{ room.grouper.id }}" class="draggables">
-      {% for device in room.list %}
-      <li class="draggable" title="{{ device.technology.name }}.{{device.address }}">{{ device.name }}<span class="description">{{ device.description }}</span></li>
-      {% empty %}
-      <li class="empty">Vide</li>
-      {% endfor %}
-    </ul>
   </div>
-  {% endfor %}
-</div>
+  {% endfor %} </div>
 {% endblock %}

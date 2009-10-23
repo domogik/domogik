@@ -238,8 +238,7 @@ var drag = {
 				$('#'+this.id).removeClass('highlight');
 				this.removeAttribute('aria-dropeffect');
 			}
-			});
-		
+		});
 	},
 
 	getTarget : function()

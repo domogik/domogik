@@ -489,9 +489,14 @@ def admin_organisation_rooms(request):
         return index(request)
     unattribued_devices = _db.search_devices(room_id=None)
     devices_list = _db.list_devices()
+    rooms_list = _db.list_rooms()
+    icons64_room = ["default", "kitchen", "bathroom"]
+    icons32_room = ["default", "kitchen", "livingroom"]
+    icons16_room = ["bedroom", "kitchen", "livingroom"]
     page_title = _("Organisation des pieces")
     return _go_to_page(request, 'admin/organisation/rooms.html', page_title,
-    				devices_list=devices_list, unattribued_devices=unattribued_devices)
+    				devices_list=devices_list, unattribued_devices=unattribued_devices, rooms_list=rooms_list,
+                    icons64_room=icons64_room, icons32_room=icons32_room, icons16_room=icons16_room)
 					  
 def admin_organisation_areas(request):
     """
