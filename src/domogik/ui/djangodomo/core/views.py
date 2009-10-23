@@ -52,7 +52,7 @@ from domogik.common import database
 from djangodomo.core.SampleDataHelper import SampleDataHelper
 from djangodomo.core.XPLHelper import XPLHelper
 
-
+_ADMIN_PAGE_INDEX = 'admin/admin_index.html'
 _db = database.DbHelper()
 
 def index(request):
@@ -218,7 +218,7 @@ def admin_index(request):
         admin_mode = "checked"
     if sys_config.debug_mode:
         debug_mode = "checked"
-    return _go_to_page(request, 'admin/admin_index.html', page_title, action=action, 
+    return _go_to_page(request, _ADMIN_PAGE_INDEX, page_title, action=action, 
                       simulation_mode=simulation_mode, admin_mode=admin_mode, 
                       debug_mode=debug_mode)
 
@@ -253,7 +253,7 @@ def load_sample_data(request):
     sys_config = _db.get_system_config()
     if sys_config.simulation_mode != True:
         error_msg = _("The application is not running in simulation mode : can't load sample data")
-        return _go_to_page(request, 'admin_index.html', page_title, action=action, error_msg=error_msg)
+        return _go_to_page(request, _ADMIN_PAGE_INDEX, page_title, action=action, error_msg=error_msg)
 
     sample_data_helper = SampleDataHelper(_db)
     sample_data_helper.create()
@@ -263,7 +263,7 @@ def load_sample_data(request):
     device_category_list = _db.list_device_categories()
     device_list = _db.list_devices()
     device_tech_list = _db.list_device_technologies()
-    return _go_to_page(request, 'admin_index.html', page_title, action=action, 
+    return _go_to_page(request, _ADMIN_PAGE_INDEX, page_title, action=action, 
                       area_list=area_list, room_list=room_list, 
                       device_category_list=device_category_list, 
                       device_list=device_list, device_tech_list=device_tech_list)
@@ -283,11 +283,11 @@ def clear_data(request):
     sys_config = _db.get_system_config()
     if sys_config.simulation_mode != True:
         error_msg = _("The application is not running in simulation mode : can't clear data")
-        return _go_to_page(request, 'admin_index.html', page_title, action=action, error_msg=error_msg)
+        return _go_to_page(request, _ADMIN_PAGE_INDEX, page_title, action=action, error_msg=error_msg)
 
     sample_data_helper = SampleDataHelper(_db)
     sample_data_helper.remove()
-    return _go_to_page(request, 'admin_index.html', page_title, action=action)
+    return _go_to_page(request, _ADMIN_PAGE_INDEX, page_title, action=action)
 
 def _update_device_values(request, sys_config):
     """
