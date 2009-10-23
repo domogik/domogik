@@ -28,81 +28,74 @@ $(function(){
   $("#nav2").accordion({ header: ".section", active:1});
 //  $('select.room-zone').selectmenu();
 
-	function updateTips(tips, t) {
-			tips.text(t).effect("highlight",{},1500);
-		}
+  function updateTips(tips, t) {
+    tips.text(t).effect("highlight",{},1500);
+  }
 
-		function checkLength(tips, o,n,min,max) {
+  function checkLength(tips, o,n,min,max) {
 
-			if ( o.val().length > max || o.val().length < min ) {
-				o.addClass('ui-state-error');
-				updateTips(tips, "La longueur de " + n + " doit être comprise entre "+min+" et "+max+".");
-				return false;
-			} else {
-				return true;
-			}
+    if ( o.val().length > max || o.val().length < min ) {
+      o.addClass('ui-state-error');
+      updateTips(tips, "La longueur de " + n + " doit être comprise entre "+min+" et "+max+".");
+      return false;
+    } else {
+      return true;
+    }
+  }
 
-		}
-          // Add new form  
-   		var name = $("#name"),
+  // Add new form  
+  var name = $("#name"),
+  allFields = $([]).add(name),
+  tips = $("#validateTips");
 
-            allFields = $([]).add(name),
+  function updateTips(t) {
+    tips.text(t).effect("highlight",{},1500);
+  }
 
-			tips = $("#validateTips");
+  function checkLength(o,n,min,max) {
 
-		function updateTips(t) {
-			tips.text(t).effect("highlight",{},1500);
-		}
+    if ( o.val().length > max || o.val().length < min ) {
+      o.addClass('ui-state-error');
+      updateTips("La longueur de " + n + " doit être comprise entre "+min+" et "+max+".");
+      return false;
+    } else {
+      return true;
+    }
+  }
 
-		function checkLength(o,n,min,max) {
+  $("#addnewdialog").dialog({
+    bgiframe: true,
+    autoOpen: false,
+    height: 200,
+    modal: true,
+    buttons: {
+      'Créer': function() {
+        var bValid = true;
+        allFields.removeClass('ui-state-error');
+        bValid = bValid && checkLength(name,"nom",1,80);
 
-			if ( o.val().length > max || o.val().length < min ) {
-				o.addClass('ui-state-error');
-				updateTips("La longueur de " + n + " doit être comprise entre "+min+" et "+max+".");
-				return false;
-			} else {
-				return true;
-			}
+        if (bValid) {
+          // Submit form
+          $(this).dialog('close');
+        }
+      },
+      Cancel: function() {
+        $(this).dialog('close');
+      }
+    },
+    close: function() {
+      allFields.val('').removeClass('ui-state-error');
+    }
+  });
 
-		}
-		
-		$("#addnewdialog").dialog({
-			bgiframe: true,
-			autoOpen: false,
-			height: 200,
-			modal: true,
-			buttons: {
-				'Créer': function() {
-					var bValid = true;
-					allFields.removeClass('ui-state-error');
+    $('#addnew').click(function() {
+      $('#addnewdialog').dialog('open');
+    })
 
-					bValid = bValid && checkLength(name,"nom",1,80);
-                    				
-					if (bValid) {
-                    	// Submit form
-						$(this).dialog('close');
-					}
-				},
-				Cancel: function() {
-					$(this).dialog('close');
-				}
-			},
-			close: function() {
-				allFields.val('').removeClass('ui-state-error');
-			}
-		});
-		
-		
-		
-		$('#addnew').click(function() {
-			$('#addnewdialog').dialog('open');
-		})
-
-
-	$('#instructions').dialog({autoOpen: false}); 
-	$('#btinstructions').click(function() {  
-                    $('#instructions').dialog('open',{closeOnEscape: false});  
-                });
+  $('#instructions').dialog({autoOpen: false});
+  $('#btinstructions').click(function() {
+    $('#instructions').dialog('open',{closeOnEscape: false});  
+  });
 });
 
 {% endblock %}
@@ -161,74 +154,67 @@ $(function(){
     </ul>
   </div>
 </div>
-<div class="nocolumns"> {% regroup devices_list|dictsort:"room" by room as rooms_list %}
+<div class="nocolumns">
+  {% regroup devices_list|dictsort:"room" by room as rooms_list %}
   {% for room in rooms_list %}
   <div class="element">
     <script type="text/javascript">
-  $(function(){
-  // Add new form  
-   		var room{{ room.grouper.id }}newname = $("#room{{ room.grouper.id }}-newname"),
+      $(function(){
+        // Add new form
+        var room{{ room.grouper.id }}newname = $("#room{{ room.grouper.id }}-newname"),
+        allFields = $([]).add(room{{ room.grouper.id }}newname),
+          tips{{ room.grouper.id }} = $("#validateTips{{ room.grouper.id }}");
+        $("#updatedialog{{ room.grouper.id }}").dialog({
+          bgiframe: true,
+          autoOpen: false,
+          height: 300,
+          modal: true,
+          buttons: {
+            'Modifier': function() {
+              var bValid = true;
+              allFields.removeClass('ui-state-error');
+              bValid = bValid && checkLength(tips{{ room.grouper.id }}, room{{ room.grouper.id }}newnam,"nom",1,80);
+              if (bValid) {
+                // Submit form
+                $(this).dialog('close');
+              }
+            },
+            Cancel: function() {
+              $(this).dialog('close');
+            }
+          },
+          close: function() {
+            allFields.val('').removeClass('ui-state-error');
+          }
+        });
 
-            allFields = $([]).add(room{{ room.grouper.id }}newname),
+        $('select#room{{ room.grouper.id }}-largeicon').selectmenu({
+          icons: [
+            {find: '.icon1l', icon: 'icon64-room-default', jquery:'no'},
+            {find: '.icon2l', icon: 'icon64-room-kitchen', jquery:'no'},
+            {find: '.icon3l', icon: 'icon64-room-bathroom', jquery:'no'}
+          ]
+        });
+        $('select#room{{ room.grouper.id }}-mediumicon').selectmenu({
+          icons: [
+            {find: '.icon1m', icon: 'icon32-room-default', jquery:'no'},
+            {find: '.icon2m', icon: 'icon32-room-kitchen', jquery:'no'},
+            {find: '.icon3m', icon: 'icon32-room-livingroom', jquery:'no'}
+          ]
+        });
+        $('select#room{{ room.grouper.id }}-smallicon').selectmenu({
+          icons: [
+            {find: '.icon1s', icon: 'icon16-room-bedroom', jquery:'no'},
+            {find: '.icon2s', icon: 'icon16-room-kitchen', jquery:'no'},
+            {find: '.icon3s', icon: 'icon16-room-livingroom', jquery:'no'}
+          ]
+        });
 
-			tips{{ room.grouper.id }} = $("#validateTips{{ room.grouper.id }}");
-
-	
-		
-		$("#updatedialog{{ room.grouper.id }}").dialog({
-			bgiframe: true,
-			autoOpen: false,
-			height: 300,
-			modal: true,
-			buttons: {
-				'Modifier': function() {
-					var bValid = true;
-					allFields.removeClass('ui-state-error');
-
-					bValid = bValid && checkLength(tips{{ room.grouper.id }}, room{{ room.grouper.id }}newnam,"nom",1,80);
-                    				
-					if (bValid) {
-                    	// Submit form
-						$(this).dialog('close');
-					}
-				},
-				Cancel: function() {
-					$(this).dialog('close');
-				}
-			},
-			close: function() {
-				allFields.val('').removeClass('ui-state-error');
-			}
-		});
-		
-			$('select#room{{ room.grouper.id }}-largeicon').selectmenu({
-				icons: [
-					{find: '.icon1l', icon: 'icon64-room-default', jquery:'no'},
-					{find: '.icon2l', icon: 'icon64-room-kitchen', jquery:'no'},
-					{find: '.icon3l', icon: 'icon64-room-bathroom', jquery:'no'}
-				]
-			});
-	$('select#room{{ room.grouper.id }}-mediumicon').selectmenu({
-				icons: [
-					{find: '.icon1m', icon: 'icon32-room-default', jquery:'no'},
-					{find: '.icon2m', icon: 'icon32-room-kitchen', jquery:'no'},
-					{find: '.icon3m', icon: 'icon32-room-livingroom', jquery:'no'}
-				]
-			});
-		$('select#room{{ room.grouper.id }}-smallicon').selectmenu({
-				icons: [
-					{find: '.icon1s', icon: 'icon16-room-bedroom', jquery:'no'},
-					{find: '.icon2s', icon: 'icon16-room-kitchen', jquery:'no'},
-					{find: '.icon3s', icon: 'icon16-room-livingroom', jquery:'no'}
-				]
-			});
-		
-		$('#update{{ room.grouper.id }}').click(function() {
-			$('#updatedialog{{ room.grouper.id }}').dialog('open');
-		})
-		
-			});
-  </script>
+        $('#update{{ room.grouper.id }}').click(function() {
+          $('#updatedialog{{ room.grouper.id }}').dialog('open');
+        })
+      });
+    </script>
     <h2 id="room{{ room.grouper.id }}h" class="choice icon32-room-livingroom">{{ room.grouper.name }}</h2>
     <ul class="element-actions">
       <li><a href="#" class="button">Supprimer</a></li>
