@@ -123,26 +123,26 @@ var drag = {
 
 		switch (iKey)
 		{
-			case 38 : // Down arrow
-				objFocus = objItem.nextSibling;
-				if (!objFocus)
-				{
-					objFocus = objItem.previousSibling;
-				}
-				objItem.className = '';
-				objFocus.focus();
-				objFocus.className = 'focus';
-				break;
-			case 40 : // Up arrow
-				objFocus = objItem.previousSibling;
-				if (!objFocus)
-				{
-					objFocus = objItem.nextSibling;
-				}
-				objItem.className = '';
-				objFocus.focus();
-				objFocus.className = 'focus';
-				break;
+			case 38 : // Up arrow
+               objFocus = objItem.previousSibling;
+               if (!objFocus)
+               {
+                   objFocus = objItem.parentNode.lastChild
+               }
+               objItem.className = '';
+               objFocus.focus();
+               objFocus.className = 'focus';
+               break;
+           case 40 : // Down arrow
+               objFocus = objItem.nextSibling;
+               if (!objFocus)
+               {
+                   objFocus = objItem.parentNode.firstChild
+               }
+               objItem.className = '';
+               objFocus.focus();
+               objFocus.className = 'focus';
+               break;
 			case 13 : // Enter
 				strTarget = objItem.getAttribute('value');
 				drag.dropObject(strTarget);
