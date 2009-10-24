@@ -14,48 +14,95 @@
 # GNU General Public License for more details.
 
 # You should have received a copy of the GNU General Public License
-# along with Domogik.  If not, see
-<http://www.gnu.org/licenses/>
-.
+# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
 
-# Author : Cédric Trévisan <cedric@domogik.org> {% endcomment %}
+# Author : Cédric Trévisan <cedric@domogik.org>
+{% endcomment %}
 
 
 {% load i18n %}
 {% block js_script %}
 $(function(){
   // Accordion
-  $('select.room-zone').selectmenu();
-
-	// Accordion
   $("#nav2").accordion({ header: ".section", active:1});
-	$('#instructions').dialog({autoOpen: false}); 
-	$('#btinstructions').click(function() {  
-                    $('#instructions').dialog('open',{closeOnEscape: false});  
-                });
+  $('#instructions').dialog({autoOpen: false}); 
+  $('#btinstructions').click(function() {
+    $('#instructions').dialog('open',{closeOnEscape: false});
+  });
 	
-	$('select#area1-largeicon').selectmenu({
-				icons: [
-					{find: '.icon1l', icon: 'icon64-area-grndfloor', jquery:'no'},
-					{find: '.icon2l', icon: 'icon64-area-firstfloor', jquery:'no'},
-					{find: '.icon3l', icon: 'icon64-area-basement', jquery:'no'}
-				]
-			});
-	$('select#area1-mediumicon').selectmenu({
-				icons: [
-					{find: '.icon1m', icon: 'icon32-area-grndfloor', jquery:'no'},
-					{find: '.icon2m', icon: 'icon32-area-firstfloor', jquery:'no'},
-					{find: '.icon3m', icon: 'icon32-area-basement', jquery:'no'}
-				]
-			});
-		$('select#area1-smallicon').selectmenu({
-				icons: [
-					{find: '.icon1s', icon: 'icon16-area-grndfloor', jquery:'no'},
-					{find: '.icon2s', icon: 'icon16-area-firstfloor', jquery:'no'},
-					{find: '.icon3s', icon: 'icon16-area-basement', jquery:'no'}
-				]
-			});
+		function updateTips(tips, t) {
+			tips.text(t).effect("highlight",{},1500);
+		}
 
+		function checkLength(tips, o,n,min,max) {
+
+			if ( o.val().length > max || o.val().length < min ) {
+				o.addClass('ui-state-error');
+				updateTips(tips, "La longueur de " + n + " doit être comprise entre "+min+" et "+max+".");
+				return false;
+			} else {
+				return true;
+			}
+
+		}
+          // Add new form  
+   		var name = $("#name"),
+
+            allFields = $([]).add(name),
+
+			tips = $("#validateTips");
+
+		function updateTips(t) {
+			tips.text(t).effect("highlight",{},1500);
+		}
+
+		function checkLength(o,n,min,max) {
+
+			if ( o.val().length > max || o.val().length < min ) {
+				o.addClass('ui-state-error');
+				updateTips("La longueur de " + n + " doit être comprise entre "+min+" et "+max+".");
+				return false;
+			} else {
+				return true;
+			}
+
+		}
+		
+		$("#addnewdialog").dialog({
+			bgiframe: true,
+			autoOpen: false,
+			height: 200,
+			modal: true,
+			buttons: {
+				'Créer': function() {
+					var bValid = true;
+					allFields.removeClass('ui-state-error');
+
+					bValid = bValid && checkLength(name,"nom",1,80);
+                    				
+					if (bValid) {
+                    	// Submit form
+						$(this).dialog('close');
+					}
+				},
+				Cancel: function() {
+					$(this).dialog('close');
+				}
+			},
+			close: function() {
+				allFields.val('').removeClass('ui-state-error');
+			}
+		});
+		
+		
+		
+		$('#addnew').click(function() {
+			$('#addnewdialog').dialog('open');
+		});
+		
+	        $("#rooms").hide();
+        $("button#showrooms").click(function () {
+      $("#rooms").toggle();});
 });
 
 {% endblock %}
@@ -78,55 +125,135 @@ $(function(){
 <div class="element-main">
   <div>
     <h1 class="element-ident"><span class="element-title">Organisations des zones</span></h1>
-    <h2 class="splitter">Créer une zone</h2>
-    <div class="mediumbox">
-      <div class="parameter">
-        <form action="#">
-          <label class="medium">Nom :</label>
-          <input type="text" class="medium" />
-          <input type="submit" class="button" value="Ajouter">
-        </form>
-      </div>
-    </div>
-    <h2 id="zonenah" class="choice splitter">Pièces non attribuées <a href="#" class="action" id="btinstructions">(Instructions Drag &amp; Drop)</a></h2>
-    <div id="instructions" title="Instructions Drag &amp; Drop">
-      <h3>Utilisation de la souris</h3>
-      <h3>Utilisation du clavier</h3>
-      <ul>
-        <li>Use the <kbd>Tab</kbd> to move to the artist you want to move.</li>
-        <li>Select the item you want to move with the <kbd>Spacebar</kbd>.</li>
-        <li>Use the <kbd>Up</kbd> and <kbd>Down</kbd> cursor keys to select a target in the context menu.</li>
-        <li>Press <kbd>Enter</kbd> to move the artist to the target list.</li>
-      </ul>
-    </div>
-    <ul id="zonena" class="draggables">
-      <li class="draggable">Salon TV</li>
-      <li class="draggable">S&eacute;jour</li>
-      <li class="draggable">Cuisine</li>
-      <li class="draggable">Salle de bain</li>
-      <li class="draggable">Chambre parents</li>
-      <li class="draggable">Chambre enfants</li>
-      <li class="draggable">Chambre amis</li>
-      <li class="draggable">Bureau</li>
+	    <ul class="element-actions">
+      <li>
+        <button id="addnew" class="button">Créer nouvelle</button>
+      </li>
+      <li><a href="#" class="button">Tout supprimer</a></li>
+      <li><button id="showrooms" class="button">Pièces</a></li>
     </ul>
+    <div id="addnewdialog" title="Créer nouvelle zone">
+      <p id="validateTips">Tous les champs (sauf description) sont requis.</p>
+      <form>
+        <fieldset>
+          <label class="medium" for="name">Nom</label>
+          <input type="text" class="medium" id="name" name="name" />
+        </fieldset>
+      </form>
+    </div>
+   <div id="rooms">
+      <h2 class="splitter">Dispositifs</h2>
+      <a href="#" class="action" id="btinstructions">(Instructions Drag &amp; Drop)</a>
+      <div id="instructions" title="Instructions Drag &amp; Drop">
+        <h3>Utilisation de la souris</h3>
+        <h3>Utilisation du clavier</h3>
+        <ul>
+          <li>Use the <kbd>Tab</kbd> to move to the artist you want to move.</li>
+          <li>Select the item you want to move with the <kbd>Spacebar</kbd>.</li>
+          <li>Use the <kbd>Up</kbd> and <kbd>Down</kbd> cursor keys to select a target in the context menu.</li>
+          <li>Press <kbd>Enter</kbd> to move the artist to the target list.</li>
+        </ul>
+      </div>
+      <fieldset class="areadrop">
+        <legend id="areanah" class="choice">Pièces non attribuées</legend>
+        <ul id="areana" class="draggables">
+          {% for room in unattribued_rooms %}
+          <li class="draggable">{{ room.name }}<span class="description">{{ room.description }}</span></li>
+          {% empty %}
+          <li class="empty">Vide</li>
+          {% endfor %}
+        </ul>
+      </fieldset>
+      {% regroup rooms_list|dictsort:"area" by area as areas %}
+      {% for area in areas %}
+      <fieldset class="areadrop">
+        <legend id="area{{ area.grouper.id }}h" class="choice">{{ area.grouper.name }}</legend>
+        <ul id="area{{ area.grouper.id }}" class="draggables">
+          {% for room in area.list %}
+          <li class="draggable">{{ room.name }}<span class="description">{{ room.description }}</span></li>
+          {% empty %}
+          <li class="empty">Vide</li>
+          {% endfor %}
+        </ul>
+      </fieldset>
+      {% endfor %}
+     </div>
   </div>
 </div>
 <div class="nocolumns">
 {% for area in areas_list %}
   <div class="element">
+	    <script type="text/javascript">
+		// Update form
+  $(function(){
+  var area{{ area.id }}newname = $("#area{{ area.id }}-newname"),
+  allFields = $([]).add(area{{ area.id }}newname),
+  tips{{ area.id }} = $("#validateTips{{ area.id }}");
+  $("#updatedialog{{ area.id }}").dialog({
+    bgiframe: true,
+    autoOpen: false,
+    height: 300,
+    modal: true,
+    buttons: {
+        'Modifier': function() {
+            var bValid = true;
+            allFields.removeClass('ui-state-error');
+            bValid = bValid && checkLength(tips{{ area.id }}, area{{ area.id }}newnam,"nom",1,80);
+            if (bValid) {
+                // Submit form
+                $(this).dialog('close');
+                }
+                },
+                Cancel: function() {
+					$(this).dialog('close');
+				}
+			},
+			close: function() {
+				allFields.val('').removeClass('ui-state-error');
+			}
+		});
+			$('select#area{{ area.id }}-largeicon').selectmenu({
+				icons: [
+                                    {% for icon in icons64_area %}
+					{find: '.icon64_area_{{ icon }}', icon: 'icon64-area-{{ icon }}', jquery:'no'},
+                                    {% endfor %}
+				]
+			});
+	$('select#area{{ area.id }}-mediumicon').selectmenu({
+				icons: [
+                                    {% for icon in icons32_area %}
+					{find: '.icon32_area_{{ icon }}', icon: 'icon32-area-{{ icon }}', jquery:'no'},
+                                    {% endfor %}
+				]
+			});
+		$('select#area{{ area.id }}-smallicon').selectmenu({
+				icons: [
+                                    {% for icon in icons16_area %}
+					{find: '.icon16_area_{{ icon }}', icon: 'icon16-area-{{ icon }}', jquery:'no'},
+                                    {% endfor %}
+				]
+			});
+		
+				$('#update{{ area.id }}').click(function() {
+			$('#updatedialog{{ area.id }}').dialog('open');
+		})
+				
+			});
+  </script>
     <h2 id="zone{{ area.id }}h" class="choice icon32-area-grndfloor">{{ area.name }}</h2>
     <ul class="element-actions">
       <li><a href="#" class="button">Supprimer</a></li>
       <li>
-        <input type="submit" class="button" value="Sauvegarder la pièce">
+        <button id="update{{ area.id }}" class="button">Modifier</button>
       </li>
+
     </ul>
-    <h3 class="splitter">Paramètres</h3>
-    <div class="mediumbox">
-      <div class="parameter">
+	      <div id="updatedialog{{ area.id }}" title="Modifier {{ area.name }}">
+      <p id="validateTips{{ area.id }}">Tous les champs sont requis.</p>
+      <form action="#">
         <label class="medium" for="area{{ area.id }}-newname">Nouveau nom :</label>
         <input id="area{{ area.id }}-newname" name="area{{ area.id }}-newname" type="text" class="medium" />
-      </div>
+      </form>
     </div>
     <div class="parameter">
       <fieldset>
@@ -135,36 +262,32 @@ $(function(){
           <li>
             <label for="area{{ area.id }}-largeicon">Large :</label>
             <select class="large customlargeicons" id="area{{ area.id }}-largeicon" name="area{{ area.id }}-largeicon">
-              <option value="icon1l" class="icon1l">Rez-de-chaussée</option>
-              <option value="icon2l" class="icon2l">Etage</option>
-              <option value="icon3l" class="icon3l">Sous-sol</option>
+              {% for icon in icons64_area %}
+              <option value="{{ icon }}" class="icon64_area_{{ icon }}">{{ icon }}</option>
+                {% endfor %}
             </select>
           </li>
           <li>
             <label for="area{{ area.id }}-mediumicon">Moyen :</label>
             <select class="large custommediumicons" id="area{{ area.id }}-mediumicon" name="area{{ area.id }}-mediumicon">
-              <option value="icon1m" class="icon1m">Rez-de-chaussée</option>
-              <option value="icon2m" class="icon2m">Etage</option>
-              <option value="icon3m" class="icon3m">Sous-sol</option>
+              {% for icon in icons32_area %}
+              <option value="{{ icon }}" class="icon32_area_{{ icon }}">{{ icon }}</option>
+                {% endfor %}
             </select>
           </li>
           <li>
             <label for="area{{ area.id }}-smallicon">Petit :</label>
             <select class="large customsmallicons" id="area{{ area.id }}-smallicon" name="area{{ area.id }}-smallicon">
-              <option value="icon1s" class="icon1s">Rez-de-chaussée</option>
-              <option value="icon2s" class="icon2s">Etage</option>
-              <option value="icon3s" class="icon3s">Sous-sol</option>
+              {% for icon in icons16_area %}
+              <option value="{{ icon }}" class="icon16_area_{{ icon }}">{{ icon }}</option>
+                {% endfor %}
             </select>
           </li>
         </ul>
       </fieldset>
-    </div>
-    <h3 class="splitter">Pièces {{ area.name }}</h3>
-    <ul id="zone1" class="draggables">
-      <li class="empty">Vide</li>
-    </ul>
-  </div>
 
+    </div>
+  </div>
     {% endfor %}
 </div>
 {% endblock %}

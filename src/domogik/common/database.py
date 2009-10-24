@@ -138,6 +138,21 @@ class DbHelper():
         """
         return self._session.query(Area).all()
 
+    def search_areas(self, **filters):
+        """
+        Look for area(s) with filter on their attributes
+        @param filters :  filter fields can be one of 
+        @return a list of Area objects
+        """
+        assert type(filters) is DictType
+
+        area_list = self._session.query(Area)
+        for filter in filters:
+            filter_arg = "%s = '%s'" % (filter, filters[filter])
+            area_list = area_list.filter(filter_arg)
+
+        return area_list.all()
+        
     def get_area_by_name(self, area_name):
         """
         Fetch area information
@@ -186,6 +201,21 @@ class DbHelper():
         """
         return self._session.query(Room).all()
 
+    def search_rooms(self, **filters):
+        """
+        Look for room(s) with filter on their attributes
+        @param filters :  filter fields can be one of 
+        @return a list of Room objects
+        """
+        assert type(filters) is DictType
+
+        room_list = self._session.query(Room)
+        for filter in filters:
+            filter_arg = "%s = '%s'" % (filter, filters[filter])
+            room_list = room_list.filter(filter_arg)
+
+        return room_list.all()
+        
     def get_room_by_name(self, r_name):
         """
         Return information about a room

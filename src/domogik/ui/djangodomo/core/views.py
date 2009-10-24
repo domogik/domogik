@@ -506,6 +506,14 @@ def admin_organisation_areas(request):
     """
     if not _is_user_admin(request):
         return index(request)
+    unattribued_rooms = _db.search_rooms(area_id=None)
+    rooms_list = _db.list_rooms()
     areas_list = _db.list_areas()
+    icons64_area = ["grndfloor", "firstfloor", "basement"]
+    icons32_area = ["grndfloor", "firstfloor", "basement"]
+    icons16_area = ["grndfloor", "firstfloor", "basement"]
     page_title = _("Organisation des zones")
-    return _go_to_page(request, 'admin/organisation/areas.html', page_title, areas_list=areas_list)
+    return _go_to_page(request, 'admin/organisation/areas.html', page_title,
+                       unattribued_rooms=unattribued_rooms, rooms_list=rooms_list, areas_list=areas_list,
+                    icons64_area=icons64_area, icons32_area=icons32_area, icons16_area=icons16_area)
+
