@@ -256,13 +256,13 @@ $(function(){
       <p id="validateTips{{ room.id }}">Tous les champs sont requis.</p>
       <form action="#">
         <label class="medium" for="room{{ room.id }}-newname">Nouveau nom :</label>
-        <input id="room{{ room.id }}-newname" name="room{{ room.id }}-newname" type="text" class="medium" />
+        <input id="room{{ room.id }}-newname" name="room{{ room.id }}-newname" type="text" class="medium" value="{{ room.name }}" />
         <label class="medium" for="room{{ room.id }}-zone">Zone :</label>
         <select class="room-zone medium" id="room{{ room.id }}-zone" name="room{{ room.id }}-zone">
-          <option>Rez-de-chaussée</option>
-          <option>Etage</option>
-          <option>Sous-sol</option>
-          <option>Exterieur</option>
+          <option value="" {% ifequal room.area_id None %}selected='selected'{% endifequal %}></option>
+                      {% for area in areas_list %}
+          <option value="{{ area.id }}" {% ifequal room.area_id area.id %}selected='selected'{% endifequal %}>{{ area.name }}</option>
+                    {% endfor %}
         </select>
       </form>
     </div>
