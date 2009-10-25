@@ -3,32 +3,32 @@
 
 /* Room icons */
 .icon64-room-default { background-image:url(../images/default_room_64.png);}
-.icon32-room-default { background-image:url(../images/default_room_32.png);}
-
 .icon64-room-kitchen { background-image:url(../images/kitchen_64.png);}
-.icon32-room-kitchen { background-image:url(../images/toaster_32.png);}
-.icon16-room-kitchen { background-image:url(../images/toaster_16.png);}
-
 .icon64-room-livingroom { background-image:url(../images/sofa_white_64.png);}
-.icon32-room-livingroom { background-image:url(../images/sofa_white_32.png);}
-.icon16-room-livingroom { background-image:url(../images/sofa_white_16.png);}
-
+.icon64-room-tvlounge { background-image:url(../images/tvlounge_64.png);}
 .icon64-room-bathroom { background-image:url(../images/bathroom_64.png);}
 
+.icon32-room-default { background-image:url(../images/default_room_32.png);}
+.icon32-room-kitchen { background-image:url(../images/toaster_32.png);}
 .icon32-room-bedroom { background-image:url(../images/bed_32.png);}
+.icon32-room-livingroom { background-image:url(../images/sofa_white_32.png);}
+.icon32-room-tvlounge { background-image:url(../images/tvlounge_32.png);}
+
 .icon16-room-bedroom { background-image:url(../images/bed_16.png);}
+.icon16-room-kitchen { background-image:url(../images/toaster_16.png);}
+.icon16-room-livingroom { background-image:url(../images/sofa_white_16.png);}
 
 /* Area icons */
 .icon64-area-grndfloor { background-image:url(../images/rdc_white_64.png);}
-.icon32-area-grndfloor { background-image:url(../images/rdc_white_32.png);}
-.icon16-area-grndfloor { background-image:url(../images/rdc_white_16.png);}
-
 .icon64-area-firstfloor { background-image:url(../images/etage1_white_64.png);}
-.icon32-area-firstfloor { background-image:url(../images/etage1_white_32.png);}
-.icon16-area-firstfloor { background-image:url(../images/etage1_white_16.png);}
-
 .icon64-area-basement { background-image:url(../images/sous-sol_white_64.png);}
+
+.icon32-area-grndfloor { background-image:url(../images/rdc_white_32.png);}
+.icon32-area-firstfloor { background-image:url(../images/etage1_white_32.png);}
 .icon32-area-basement { background-image:url(../images/sous-sol_white_32.png);}
+
+.icon16-area-grndfloor { background-image:url(../images/rdc_white_16.png);}
+.icon16-area-firstfloor { background-image:url(../images/etage1_white_16.png);}
 .icon16-area-basement { background-image:url(../images/sous-sol_white_16.png);}
 
 /* Device icons */

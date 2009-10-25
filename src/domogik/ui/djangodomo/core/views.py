@@ -491,8 +491,8 @@ def admin_organisation_rooms(request):
     devices_list = _db.list_devices()
     rooms_list = _db.list_rooms()
     areas_list = _db.list_areas()
-    icons64_room = ["default", "kitchen", "bathroom"]
-    icons32_room = ["default", "kitchen", "livingroom"]
+    icons64_room = ["default", "kitchen", "livingroom", "tvlounge", "bathroom"]
+    icons32_room = ["default", "kitchen", "bedroom", "livingroom", "tvlounge"]
     icons16_room = ["bedroom", "kitchen", "livingroom"]
     page_title = _("Organisation des pieces")
     return _go_to_page(request, 'admin/organisation/rooms.html', page_title,
