@@ -78,7 +78,7 @@ class PLCBUSAPI:
         @param command_cb: callback called when a command has been succesfully sent
         @param message_cb: called when a message is received from somewhere else on the network
         """
-        For these 2 callbacks, the param is sent as an array
+        #For these 2 callbacks, the param is sent as an array
         self._housecodes = list('ABCDEFGHIJKLMNOP')
         self._valuecode = enumerate(self._housecodes)
         self._codevalue = dict([(v, k) for (k, v) in self._valuecode])

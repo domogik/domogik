@@ -103,7 +103,7 @@ class xPLSendHelper(xPLModule):
             Send a message with command 'on' for unit
             @param unit : the unit to light up
             """
-            if not self._check_x10_unit_name(unit)
+            if not self._check_x10_unit_name(unit):
                 raise ValueError, "Incorrect unit name"
             m = Message()
             mess.set_type("xpl-cmnd")
@@ -117,7 +117,7 @@ class xPLSendHelper(xPLModule):
             Send a message with command 'off' for unit
             @param unit : the unit to light down
             """
-            if not self._check_x10_unit_name(unit)
+            if not self._check_x10_unit_name(unit):
                 raise ValueError, "Incorrect unit name"
             m = Message()
             mess.set_type("xpl-cmnd")
@@ -131,7 +131,7 @@ class xPLSendHelper(xPLModule):
             Send a message with command 'on' for house
             @param house : the house house to light up
             """
-            if not self._check_x10_house_name(house)
+            if not self._check_x10_house_name(house):
                 raise ValueError, "Incorrect house name"
             m = Message()
             mess.set_type("xpl-cmnd")
@@ -145,7 +145,7 @@ class xPLSendHelper(xPLModule):
             Send a message with command 'off' for house
             @param house : the house code to light down
             """
-            if not self._check_x10_house_name(house)
+            if not self._check_x10_house_name(house):
                 raise ValueError, "Incorrect house name"
             m = Message()
             mess.set_type("xpl-cmnd")
