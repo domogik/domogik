@@ -65,8 +65,7 @@ setup(
     package_dir = {'': 'src'},
     #Include all files of the ui/djangodomo directory
     #in data files.
-    package_data = {'domogik':['ui/djangodomo/*.*']},
-    extras_require={'test': ['IPython', 'zope.testing',]},
+    package_data = {'':['ui/djangodomo']},
     data_files = [
         ('domogik', rec_glob_get_files('src/domogik/ui/')),
     ],

@@ -13,3 +13,5 @@ develop-eggs/
 db.sqlite
 settings_local.py
 domogik.sqlite
+dist/ 
+build/
