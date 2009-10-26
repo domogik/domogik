@@ -48,5 +48,10 @@ somehow.)
 """ % __file__)
     sys.exit(1)
 
-if __name__ == "__main__":
+def run_manager():
+    """ This method is called by setuptools generated wrapper.
+    """
     execute_manager(settings)
+
+if __name__ == "__main__":
+    run_manager()

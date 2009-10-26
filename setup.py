@@ -60,22 +60,24 @@ setup(
     zip_safe = False,
     license = 'GPL v3',
     #namespace_packages = ['domogik', 'mpris', 'tools'],
-    include_package_data = True,
+#    include_package_data = True,
     packages = find_packages('src', exclude=["mpris"]),
     package_dir = {'': 'src'},
     #Include all files of the ui/djangodomo directory
     #in data files.
-    package_data = {'':['ui/djangodomo']},
-    data_files = [
-        ('domogik', rec_glob_get_files('src/domogik/ui/')),
-    ],
+    package_data = {'domogik.ui.djangodomo': rec_glob_get_files('src/domogik/ui/djangodomo/'),
+        'domogik.ui.djangodomo': ['locale/*.po', 'locale/*.mo'],
+                'domogik.ui.djangodomo.core': rec_glob_get_files('src/domogik/ui/djangodomo/core/templates/'),
+        },
     entry_points = {
         'console_scripts': [
             """
             dmgstart = domogik.bin.dmgstart:main
             generate_config = domogik.bin.generate_config:main
+            django = domogik.ui.djangodomo.manage:run_manager
             """
         ],
     },
 )
 
+print rec_glob_get_files('src/domogik/ui/djangodomo/core/templates/')
