@@ -80,4 +80,3 @@ setup(
     },
 )
 
-print rec_glob_get_files('src/domogik/ui/djangodomo/core/templates/')
