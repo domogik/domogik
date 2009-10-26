@@ -70,7 +70,6 @@ Implements
 import dbus
 #from dbus import glib
 import dbus.service
-from dbus.mainloop.glib import DBusGMainLoop
 import gobject
 
 import time

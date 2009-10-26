@@ -65,12 +65,6 @@ Implements
 import dbus
 import dbus.glib
 
-# Timer
-import gobject
-
-# File loading
-import os
-
 global client
 
 

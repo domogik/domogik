@@ -56,7 +56,7 @@ Implements
 """
 
 import mpd
-
+import GenericController
 
 class MPD(GenericController):
 
