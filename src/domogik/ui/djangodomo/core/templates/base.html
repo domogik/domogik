@@ -41,24 +41,7 @@
     <div id="title"> {% trans "Welcome to Domogik" %} <span id="subtitle">{% trans "Free home automation under Linux" %}</span> </div>
     </div>
     {% block banner %}
-        <div id="general">
-            <div id="general-temp" class="icon64-weather-clouds">21&deg;C</div>
-            <div id="general-datetime">
-                <span id="general-time">{% now "H:i" %}</span><br />
-                <span id="general-date">{% now "l j F Y" %}</span>
-            </div>
-            <ul class="general-infos">
-                <li class="icon16-device-electricity">150 Kw/h</li>
-                <li class="icon16-device-water">1,7 l/h</li>
-            </ul>
-            <ul class="general-infos">
-                <li class="icon16-device-message">1 message</li>
-                <li class="icon16-device-notification">2 notifications</li>
-                <li class="icon16-device-error">Pas d'erreur</li>
-            </ul>
-        </div>
     {% endblock %}
-
     {% block nav1 %}{% endblock %}
     <div id="content"> {% block content %}{% endblock %} </div>
     <div class="footer">Copyright 2009 Domogik project - GNU/GPL v3 license</div>

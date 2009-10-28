@@ -73,6 +73,7 @@ ul#nav1 {
 .room {
     margin:1em 0 0 1em;
     width:31%;
+    border: solid 1px #CCC;
     -moz-box-shadow: 5px 5px 5px #888;
     -webkit-box-shadow: 5px 5px 5px #888;
     -moz-border-radius: 0.8em 0 0.8em 0;
