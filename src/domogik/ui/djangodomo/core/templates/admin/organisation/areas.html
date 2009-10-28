@@ -23,12 +23,12 @@
 {% load i18n %}
 {% block js_script %}
 $(function(){
-  // Accordion
-  $("#nav2").accordion({ header: ".section", active:1});
-  $('#instructions').dialog({autoOpen: false}); 
-  $('#btinstructions').click(function() {
-    $('#instructions').dialog('open',{closeOnEscape: false});
-  });
+    // Accordion
+    $("#nav2").accordion({ header: ".section", active:1});
+    $('#instructions').dialog({autoOpen: false}); 
+    $('#btinstructions').click(function() {
+        $('#instructions').dialog('open',{closeOnEscape: false});
+    });
 	
 		function updateTips(tips, t) {
 			tips.text(t).effect("highlight",{},1500);
@@ -45,10 +45,10 @@ $(function(){
 			}
 
 		}
-          // Add new form  
-   		var name = $("#name"),
+                    // Add new form  
+      		var name = $("#name"),
 
-            allFields = $([]).add(name),
+                        allFields = $([]).add(name),
 
 			tips = $("#validateTips");
 
@@ -79,9 +79,9 @@ $(function(){
 					allFields.removeClass('ui-state-error');
 
 					bValid = bValid && checkLength(name,"nom",1,80);
-                    				
+                                        				
 					if (bValid) {
-                    	// Submit form
+                                        	// Submit form
 						$(this).dialog('close');
 					}
 				},
@@ -101,19 +101,19 @@ $(function(){
 		});
 		
 	        $("#rooms").hide();
-        $("button#showrooms").click(function () {
-      $("#rooms").toggle();});
+                $("button#showrooms").click(function () {
+            $("#rooms").toggle();});
 });
 
 {% endblock %}
 {% block css %}
-  <link href="/design/{{ s_user.skin_used|default:'skins/default' }}/css/ui-selectmenu.css" rel="stylesheet" type="text/css" />
-  <link href="/design/{{ s_user.skin_used|default:'skins/default' }}/css/ui-dragdrop.css" rel="stylesheet" type="text/css" />
-  <link href="/design/{{ s_user.skin_used|default:'skins/default' }}/css/ui-elements.css" rel="stylesheet" type="text/css" />
-  <link href="/design/{{ s_user.skin_used|default:'skins/default' }}/css/ui-buttons.css" rel="stylesheet" type="text/css" />
-  <link href="/design/{{ s_user.skin_used|default:'skins/default' }}/css/ui-forms.css" rel="stylesheet" type="text/css" />
-  <link href="/design/{{ s_user.skin_used|default:'skins/default' }}/css/ui-nav2.css" rel="stylesheet" type="text/css" />
-  <link href="/design/{{ s_user.skin_used|default:'skins/default' }}/css/page-admin-organisation.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ s_user.skin_used|default:'skins/default' }}/css/ui-selectmenu.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ s_user.skin_used|default:'skins/default' }}/css/ui-dragdrop.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ s_user.skin_used|default:'skins/default' }}/css/ui-elements.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ s_user.skin_used|default:'skins/default' }}/css/ui-buttons.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ s_user.skin_used|default:'skins/default' }}/css/ui-forms.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ s_user.skin_used|default:'skins/default' }}/css/ui-nav2.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ s_user.skin_used|default:'skins/default' }}/css/page-admin-organisation.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block include_js_script %}
 <script type="text/javascript" src="/design/js/ui.selectmenu.js"></script>
@@ -123,88 +123,88 @@ $(function(){
 {% block title %}{% trans page_title %}{% endblock %}
 {% block right %}
 <div class="element-main">
-  <div>
-    <h1 class="element-ident"><span class="element-title">Organisations des zones</span></h1>
+    <div>
+        <h1 class="element-ident"><span class="element-title">Organisations des zones</span></h1>
 	    <ul class="element-actions">
-      <li>
-        <button id="addnew" class="button">Créer nouvelle</button>
-      </li>
-      <li><a href="#" class="button">Tout supprimer</a></li>
-      <li><button id="showrooms" class="button">Pièces</a></li>
-    </ul>
-    <div id="addnewdialog" title="Créer nouvelle zone">
-      <p id="validateTips">Tous les champs (sauf description) sont requis.</p>
-      <form>
-        <fieldset>
-          <label class="medium" for="name">Nom</label>
-          <input type="text" class="medium" id="name" name="name" />
-        </fieldset>
-      </form>
+            <li>
+                <button id="addnew" class="button">Créer nouvelle</button>
+            </li>
+            <li><a href="#" class="button">Tout supprimer</a></li>
+            <li><button id="showrooms" class="button">Pièces</a></li>
+        </ul>
+        <div id="addnewdialog" title="Créer nouvelle zone">
+            <p id="validateTips">Tous les champs (sauf description) sont requis.</p>
+            <form>
+                <fieldset>
+                    <label class="medium" for="name">Nom</label>
+                    <input type="text" class="medium" id="name" name="name" />
+                </fieldset>
+            </form>
+        </div>
+      <div id="rooms">
+            <h2 class="splitter">Dispositifs</h2>
+            <a href="#" class="action" id="btinstructions">(Instructions Drag &amp; Drop)</a>
+            <div id="instructions" title="Instructions Drag &amp; Drop">
+                <h3>Utilisation de la souris</h3>
+                <h3>Utilisation du clavier</h3>
+                <ul>
+                    <li>Use the <kbd>Tab</kbd> to move to the artist you want to move.</li>
+                    <li>Select the item you want to move with the <kbd>Spacebar</kbd>.</li>
+                    <li>Use the <kbd>Up</kbd> and <kbd>Down</kbd> cursor keys to select a target in the context menu.</li>
+                    <li>Press <kbd>Enter</kbd> to move the artist to the target list.</li>
+                </ul>
+            </div>
+            <fieldset class="areadrop">
+                <legend id="areanah" class="choice">Pièces non attribuées</legend>
+                <ul id="areana" class="draggables">
+                    {% for room in unattribued_rooms %}
+                    <li class="draggable">{{ room.name }}<span class="description">{{ room.description }}</span></li>
+                    {% empty %}
+                    <li class="empty">Vide</li>
+                    {% endfor %}
+                </ul>
+            </fieldset>
+            {% regroup rooms_list|dictsort:"area" by area as areas %}
+            {% for area in areas %}
+            <fieldset class="areadrop">
+                <legend id="area{{ area.grouper.id }}h" class="choice">{{ area.grouper.name }}</legend>
+                <ul id="area{{ area.grouper.id }}" class="draggables">
+                    {% for room in area.list %}
+                    <li class="draggable">{{ room.name }}<span class="description">{{ room.description }}</span></li>
+                    {% empty %}
+                    <li class="empty">Vide</li>
+                    {% endfor %}
+                </ul>
+            </fieldset>
+            {% endfor %}
+          </div>
     </div>
-   <div id="rooms">
-      <h2 class="splitter">Dispositifs</h2>
-      <a href="#" class="action" id="btinstructions">(Instructions Drag &amp; Drop)</a>
-      <div id="instructions" title="Instructions Drag &amp; Drop">
-        <h3>Utilisation de la souris</h3>
-        <h3>Utilisation du clavier</h3>
-        <ul>
-          <li>Use the <kbd>Tab</kbd> to move to the artist you want to move.</li>
-          <li>Select the item you want to move with the <kbd>Spacebar</kbd>.</li>
-          <li>Use the <kbd>Up</kbd> and <kbd>Down</kbd> cursor keys to select a target in the context menu.</li>
-          <li>Press <kbd>Enter</kbd> to move the artist to the target list.</li>
-        </ul>
-      </div>
-      <fieldset class="areadrop">
-        <legend id="areanah" class="choice">Pièces non attribuées</legend>
-        <ul id="areana" class="draggables">
-          {% for room in unattribued_rooms %}
-          <li class="draggable">{{ room.name }}<span class="description">{{ room.description }}</span></li>
-          {% empty %}
-          <li class="empty">Vide</li>
-          {% endfor %}
-        </ul>
-      </fieldset>
-      {% regroup rooms_list|dictsort:"area" by area as areas %}
-      {% for area in areas %}
-      <fieldset class="areadrop">
-        <legend id="area{{ area.grouper.id }}h" class="choice">{{ area.grouper.name }}</legend>
-        <ul id="area{{ area.grouper.id }}" class="draggables">
-          {% for room in area.list %}
-          <li class="draggable">{{ room.name }}<span class="description">{{ room.description }}</span></li>
-          {% empty %}
-          <li class="empty">Vide</li>
-          {% endfor %}
-        </ul>
-      </fieldset>
-      {% endfor %}
-     </div>
-  </div>
 </div>
 <div class="nocolumns">
 {% for area in areas_list %}
-  <div class="element">
+    <div class="element">
 	    <script type="text/javascript">
 		// Update form
-  $(function(){
-  var area{{ area.id }}newname = $("#area{{ area.id }}-newname"),
-  allFields = $([]).add(area{{ area.id }}newname),
-  tips{{ area.id }} = $("#validateTips{{ area.id }}");
-  $("#updatedialog{{ area.id }}").dialog({
-    bgiframe: true,
-    autoOpen: false,
-    height: 300,
-    modal: true,
-    buttons: {
-        'Modifier': function() {
-            var bValid = true;
-            allFields.removeClass('ui-state-error');
-            bValid = bValid && checkLength(tips{{ area.id }}, area{{ area.id }}newnam,"nom",1,80);
-            if (bValid) {
-                // Submit form
-                $(this).dialog('close');
-                }
-                },
-                Cancel: function() {
+    $(function(){
+    var area{{ area.id }}newname = $("#area{{ area.id }}-newname"),
+    allFields = $([]).add(area{{ area.id }}newname),
+    tips{{ area.id }} = $("#validateTips{{ area.id }}");
+    $("#updatedialog{{ area.id }}").dialog({
+        bgiframe: true,
+        autoOpen: false,
+        height: 300,
+        modal: true,
+        buttons: {
+                'Modifier': function() {
+                        var bValid = true;
+                        allFields.removeClass('ui-state-error');
+                        bValid = bValid && checkLength(tips{{ area.id }}, area{{ area.id }}newnam,"nom",1,80);
+                        if (bValid) {
+                                // Submit form
+                                $(this).dialog('close');
+                                }
+                                },
+                                Cancel: function() {
 					$(this).dialog('close');
 				}
 			},
@@ -214,23 +214,23 @@ $(function(){
 		});
 			$('select#area{{ area.id }}-largeicon').selectmenu({
 				icons: [
-                                    {% for icon in icons64_area %}
+                                                                        {% for icon in icons64_area %}
 					{find: '.icon64_area_{{ icon }}', icon: 'icon64-area-{{ icon }}', jquery:'no'},
-                                    {% endfor %}
+                                                                        {% endfor %}
 				]
 			});
 	$('select#area{{ area.id }}-mediumicon').selectmenu({
 				icons: [
-                                    {% for icon in icons32_area %}
+                                                                        {% for icon in icons32_area %}
 					{find: '.icon32_area_{{ icon }}', icon: 'icon32-area-{{ icon }}', jquery:'no'},
-                                    {% endfor %}
+                                                                        {% endfor %}
 				]
 			});
 		$('select#area{{ area.id }}-smallicon').selectmenu({
 				icons: [
-                                    {% for icon in icons16_area %}
+                                                                        {% for icon in icons16_area %}
 					{find: '.icon16_area_{{ icon }}', icon: 'icon16-area-{{ icon }}', jquery:'no'},
-                                    {% endfor %}
+                                                                        {% endfor %}
 				]
 			});
 		
@@ -239,55 +239,55 @@ $(function(){
 		})
 				
 			});
-  </script>
-    <h2 id="zone{{ area.id }}h" class="icon32-area-grndfloor">{{ area.name }}</h2>
-    <ul class="element-actions">
-      <li><a href="#" class="button">Supprimer</a></li>
-      <li>
-        <button id="update{{ area.id }}" class="button">Modifier</button>
-      </li>
+    </script>
+        <h2 id="zone{{ area.id }}h" class="icon32-area-grndfloor">{{ area.name }}</h2>
+        <ul class="element-actions">
+            <li><a href="#" class="button">Supprimer</a></li>
+            <li>
+                <button id="update{{ area.id }}" class="button">Modifier</button>
+            </li>
 
-    </ul>
-	      <div id="updatedialog{{ area.id }}" title="Modifier {{ area.name }}">
-      <p id="validateTips{{ area.id }}">Tous les champs sont requis.</p>
-      <form action="#">
-        <label class="medium" for="area{{ area.id }}-newname">Nouveau nom :</label>
-        <input id="area{{ area.id }}-newname" name="area{{ area.id }}-newname" type="text" class="medium" value="{{ area.name }}" />
-      </form>
-    </div>
-    <div class="parameter">
-      <fieldset>
-        <legend>Icônes</legend>
-        <ul class="icons">
-          <li>
-            <label for="area{{ area.id }}-largeicon">Large :</label>
-            <select class="large customlargeicons" id="area{{ area.id }}-largeicon" name="area{{ area.id }}-largeicon">
-              {% for icon in icons64_area %}
-              <option value="{{ icon }}" class="icon64_area_{{ icon }}">{{ icon }}</option>
-                {% endfor %}
-            </select>
-          </li>
-          <li>
-            <label for="area{{ area.id }}-mediumicon">Moyen :</label>
-            <select class="large custommediumicons" id="area{{ area.id }}-mediumicon" name="area{{ area.id }}-mediumicon">
-              {% for icon in icons32_area %}
-              <option value="{{ icon }}" class="icon32_area_{{ icon }}">{{ icon }}</option>
-                {% endfor %}
-            </select>
-          </li>
-          <li>
-            <label for="area{{ area.id }}-smallicon">Petit :</label>
-            <select class="large customsmallicons" id="area{{ area.id }}-smallicon" name="area{{ area.id }}-smallicon">
-              {% for icon in icons16_area %}
-              <option value="{{ icon }}" class="icon16_area_{{ icon }}">{{ icon }}</option>
-                {% endfor %}
-            </select>
-          </li>
         </ul>
-      </fieldset>
+	      <div id="updatedialog{{ area.id }}" title="Modifier {{ area.name }}">
+            <p id="validateTips{{ area.id }}">Tous les champs sont requis.</p>
+            <form action="#">
+                <label class="medium" for="area{{ area.id }}-newname">Nouveau nom :</label>
+                <input id="area{{ area.id }}-newname" name="area{{ area.id }}-newname" type="text" class="medium" value="{{ area.name }}" />
+            </form>
+        </div>
+        <div class="parameter">
+            <fieldset>
+                <legend>Icônes</legend>
+                <ul class="icons">
+                    <li>
+                        <label for="area{{ area.id }}-largeicon">Large :</label>
+                        <select class="large customlargeicons" id="area{{ area.id }}-largeicon" name="area{{ area.id }}-largeicon">
+                            {% for icon in icons64_area %}
+                            <option value="{{ icon }}" class="icon64_area_{{ icon }}">{{ icon }}</option>
+                                {% endfor %}
+                        </select>
+                    </li>
+                    <li>
+                        <label for="area{{ area.id }}-mediumicon">Moyen :</label>
+                        <select class="large custommediumicons" id="area{{ area.id }}-mediumicon" name="area{{ area.id }}-mediumicon">
+                            {% for icon in icons32_area %}
+                            <option value="{{ icon }}" class="icon32_area_{{ icon }}">{{ icon }}</option>
+                                {% endfor %}
+                        </select>
+                    </li>
+                    <li>
+                        <label for="area{{ area.id }}-smallicon">Petit :</label>
+                        <select class="large customsmallicons" id="area{{ area.id }}-smallicon" name="area{{ area.id }}-smallicon">
+                            {% for icon in icons16_area %}
+                            <option value="{{ icon }}" class="icon16_area_{{ icon }}">{{ icon }}</option>
+                                {% endfor %}
+                        </select>
+                    </li>
+                </ul>
+            </fieldset>
 
+        </div>
     </div>
-  </div>
-    {% endfor %}
+        {% endfor %}
 </div>
 {% endblock %}
