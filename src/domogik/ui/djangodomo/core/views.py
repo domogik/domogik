@@ -172,7 +172,7 @@ def login(request):
             else:
                 first_name = login
                 last_name = login
-            request.session['user'] = {
+            request.session['s_user'] = {
                 'login': sys_account.login, 
                 'is_admin': sys_account.is_admin, 
                 'first_name': first_name, 
@@ -423,7 +423,7 @@ def _get_user_connected(request):
     @return the user or None
     """
     try:
-        return request.session['user']
+        return request.session['s_user']
     except KeyError:
         return None
 
@@ -434,7 +434,7 @@ def _is_user_connected(request):
     @return True or False
     """
     try:
-        request.session['user']
+        request.session['s_user']
         return True
     except KeyError:
         return False

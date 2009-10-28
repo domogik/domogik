@@ -23,9 +23,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link href="/design/{{ user.skin_used|default:'skins/default' }}/css/ui-lightness/jquery-ui-1.7.2.custom.css" rel="stylesheet" type="text/css"/>
-<link href="/design/{{ user.skin_used|default:'skins/default' }}/css/main.css" rel="stylesheet" type="text/css" />
-<link href="/design/{{ user.skin_used|default:'skins/default' }}/css/ui-icons.css" rel="stylesheet" type="text/css" />
+<link href="/design/{{ s_user.skin_used|default:'skins/default' }}/css/ui-lightness/jquery-ui-1.7.2.custom.css" rel="stylesheet" type="text/css"/>
+<link href="/design/{{ s_user.skin_used|default:'skins/default' }}/css/main.css" rel="stylesheet" type="text/css" />
+<link href="/design/{{ s_user.skin_used|default:'skins/default' }}/css/ui-icons.css" rel="stylesheet" type="text/css" />
 {% block css %}{% endblock %}
 <script type="text/javascript" src="/design/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="/design/js/jquery-ui-1.7.2.custom.min.js"></script>
@@ -37,7 +37,7 @@
 <body>
 <div id="frame">
   <div id="header">
-    <a href="/domogik" id="logo"> <img src="/design/{{ user.skin_used|default:'skins/default' }}/images/logo_domogik.png" width="131" height="37" alt="Domotik logo" /></a>
+    <a href="/domogik" id="logo"> <img src="/design/{{ s_user.skin_used|default:'skins/default' }}/images/logo_domogik.png" width="131" height="37" alt="Domotik logo" /></a>
   <div id="title"> {% trans "Welcome to Domogik" %} <span id="subtitle">{% trans "Free home automation under Linux" %}</span> </div>
   </div>
   {% block banner %}
