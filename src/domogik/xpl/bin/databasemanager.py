@@ -156,6 +156,7 @@ class DBConnector(xPLModule):
             'heyu-file-2': 'ALIAS back_door D5 DS10A 0x677'},
                 'global': {'pid-dir-path': '/tmp/'},
                 'onewire': {'temperature_refresh_delay' : '10'},
+                'calleridmodem': {'device' : '/dev/ttyUSB1'},
                 'teleinfo' : {'device' : '/dev/ttyUSB0',
                     'interval' : '30'},
                 }
