@@ -2,10 +2,10 @@
 /* CSS Document */
 
 label {
-  font-weight:bold;
-  display:block;
-  height:1.6em;
-  line-height:1.6em;
+    font-weight:bold;
+    display:block;
+    height:1.6em;
+    line-height:1.6em;
 }
 
 label.inline {
@@ -13,43 +13,43 @@ label.inline {
 }
 
 label.medium {
-  width: 10em;
+    width: 10em;
 }
 
 input[type='text'] {
-  border:1px solid #999;
-  height:1.6em;
-  margin: 0 0 0.2em 0;
-  -moz-border-radius: 0.4em;
-  -webkit-border-radius: 0.4em;
+    border:1px solid #999;
+    height:1.6em;
+    margin: 0 0 0.2em 0;
+    -moz-border-radius: 0.4em;
+    -webkit-border-radius: 0.4em;
 }
 
 textarea {
-  border:1px solid #999;
-  -moz-border-radius: 0.4em;
-  -webkit-border-radius: 0.4em;
+    border:1px solid #999;
+    -moz-border-radius: 0.4em;
+    -webkit-border-radius: 0.4em;
 }
 
 input[type='text']:hover, input[type='text']:focus,
 textarea:hover, textarea:focus {
-  color:#000;
-  background-color: #eb8f00;
+    color:#000;
+    background-color: #eb8f00;
 }
 
 input[type='text'].medium, textarea.medium  {
-  width:20em;
+    width:20em;
 }
 
 select.medium {
-  width:15em;
+    width:15em;
 }
 
 select.large {
-  width:22em;
+    width:22em;
 }
 
 fieldset {
-  border:1px solid #999;
-  -moz-border-radius: 0.4em;
-  -webkit-border-radius: 0.4em;
+    border:1px solid #999;
+    -moz-border-radius: 0.4em;
+    -webkit-border-radius: 0.4em;
 }

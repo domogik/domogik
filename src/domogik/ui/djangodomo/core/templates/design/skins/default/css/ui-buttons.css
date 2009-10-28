@@ -3,42 +3,42 @@
 
 /* Link */
 .ui-widget-content a {
-  color:#1c94c4;
+    color:#1c94c4;
 }
 
 a:hover, a:active, a:focus {
-  color:#eb8f00;
+    color:#eb8f00;
 }
 
 /* Button */
 a.button, .button {
-  text-decoration:none;
-  border:none;
-  color:#FFF;
-  background-color:#1c94c4;
-  padding:0.2em;
-  margin:0;
-  font-size:1.2em;
-  display:inline-block;
-  
-  -moz-border-radius: 0.8em 0;
-  -webkit-border-radius: 0.8em 0;
-  font-family: Trebuchet MS,Tahoma,Verdana,Arial,sans-serif;
+    text-decoration:none;
+    border:none;
+    color:#FFF;
+    background-color:#1c94c4;
+    padding:0.2em;
+    margin:0;
+    font-size:1.2em;
+    display:inline-block;
+    
+    -moz-border-radius: 0.8em 0;
+    -webkit-border-radius: 0.8em 0;
+    font-family: Trebuchet MS,Tahoma,Verdana,Arial,sans-serif;
 	font-size: 1em;
 }
 
 .button.on {
-  background:#096;
+    background:#096;
 }
 
 .button.off {
-  background:#930;
+    background:#930;
 }
 .button:hover, .button.on:hover, .button.off:hover,
 .button:focus, .button.on:focus, .button.off:focus,
 .button:active, .button.on:active, .button.off:active {
-    color:#000;
-    background: #eb8f00;
+        color:#000;
+        background: #eb8f00;
 	font-weight:normal;
 	border:none;
 }
@@ -46,27 +46,27 @@ a.button, .button {
 
 
 h2 a.action {
-  color:#1c94c4;
-  font-size:0.6em;
-  float:right;
+    color:#1c94c4;
+    font-size:0.6em;
+    float:right;
 }
 
 a.buttonsmall {
-  text-decoration:none;
-  border:2px solid #eb8f00;
-  color:#FFF;
-  background-color:#1c94c4;
-  padding:0 0.4em 0 0.4em;
-  margin:0;
-  font-size:1em;
-  display:inline-block;
-  
-  -moz-border-radius: 1em;
-  -webkit-border-radius: 1em;
+    text-decoration:none;
+    border:2px solid #eb8f00;
+    color:#FFF;
+    background-color:#1c94c4;
+    padding:0 0.4em 0 0.4em;
+    margin:0;
+    font-size:1em;
+    display:inline-block;
+    
+    -moz-border-radius: 1em;
+    -webkit-border-radius: 1em;
 }
 
 .buttonsmall:hover, .buttonsmall:active, .buttonsmall:focus {
-    color:#000;
-    background-color: #eb8f00;
+        color:#000;
+        background-color: #eb8f00;
 }
 

@@ -2,17 +2,17 @@
 /* CSS Document */
 
 .zone-temps {
-  list-style:none;
-  margin-left:40%;
+    list-style:none;
+    margin-left:40%;
 }
 
 .zone-temps li {
-  display:inline-block;
-  text-align:center;
-  margin:1em;
-  background-position:50% top;
-  background-repeat:no-repeat;
-  padding-top:32px;
+    display:inline-block;
+    text-align:center;
+    margin:1em;
+    background-position:50% top;
+    background-repeat:no-repeat;
+    padding-top:32px;
 }
 
 .zone-temps span {
