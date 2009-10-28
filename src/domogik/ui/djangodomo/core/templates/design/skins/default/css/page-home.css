@@ -8,30 +8,60 @@ ul#nav1 {
     clear:both;
 }
 
-/* General box */
-
-#general {
+/* Banner */
+.widget {
+    width:248px;
     float:right;
-    width:35em;
+    border:2px solid #ccc;
+    text-align:left;
+    -moz-border-radius: 0.8em;
+    -webkit-border-radius: 0.8em;
+    background-color:#FCFCFC;
+    padding:4px;
+    margin:35px 4px;
 }
 
 #general-temp {
+    width:264px;
     float:right;
-    font-size:2em;
-    height:64px;
-    width:64px;
     text-align:center;
-    padding-top:1em;
-    background-position:top left;
-    background-repeat:no-repeat;
+    height:100px;
 }
 
-#general-time {
+#general-temp #general-templocation {
+    font-weight:bold;
+}
+
+#general-temp #general-tempcurrent {
+    float:right;
     font-size:3em;
 }
 
-#general-date {
+#general-tempicon {
+    position:relative;
+}
+
+.icon-weather-sun {
+    top:-135px;
+}
+
+.icon-weather-raincloud {
+    top:-131px;    
+}
+
+#general-datetime #general-time {
+    font-size:3em;
+}
+
+#general-datetime #general-date {
     font-style:italic;
+    float:right;
+    margin-top:1em;
+}
+/* General box */
+
+#general {
+    text-align:center;
 }
 
 .general-infos {
@@ -48,6 +78,7 @@ ul#nav1 {
   background-position:top left;
   background-repeat:no-repeat;
 }
+
 
 /* Layout */
 .line {

@@ -25,26 +25,37 @@
 {% block css %}
     <link href="/design/{{ s_user.skin_used|default:'skins/default' }}/css/page-home.css" rel="stylesheet" type="text/css" />
 {% endblock %}
+{% block include_js_script %}
+    <script type="text/javascript" src="/design/js/page-home.js"></script>
+{% endblock %}
 {% block banner %}
-    <div id="general">
-        <div id="general-temp" class="icon64-weather-clouds">21&deg;C</div>
-        <div id="general-datetime">
-            <span id="general-time">{% now "H:i" %}</span><br />
-            <span id="general-date">{% now "l j F Y" %}</span>
+    <div id="general-temp">
+        <div class="widget">
+            <div id="general-tempcurrent">9&deg;</div>
+            <div id="general-templocation">Paris</div>
+            <div id="general-tempmax">Max: 18&deg;</div>
+            <div id="general-tempmin">Min: 7&deg;</div>
         </div>
-        <ul class="general-infos">
-            <li class="icon16-device-electricity">150 Kw/h</li>
-            <li class="icon16-device-water">1,7 l/h</li>
-        </ul>
-        <ul class="general-infos">
-            <li class="icon16-device-message">1 message</li>
-            <li class="icon16-device-notification">2 notifications</li>
-            <li class="icon16-device-error">Pas d'erreur</li>
-        </ul>
+        <img id="general-tempicon" class="icon-weather-sun" src="/design/{{ s_user.skin_used|default:'skins/default' }}/images/weather/sun.png" alt="Soleil"/>
+    </div>
+    <div id="general-datetime" class="widget">
+        <span id="general-date">{% now "l j F Y" %}</span>
+        <span id="general-time">{% now "H:i" %}</span>
     </div>
 {% endblock %}       
 {% block content %}
     <div id="content">
+        <div id="general">
+            <ul class="general-infos">
+                <li class="icon16-device-electricity">150 Kw/h</li>
+                <li class="icon16-device-water">1,7 l/h</li>
+            </ul>
+            <ul class="general-infos">
+                <li class="icon16-device-message">1 message</li>
+                <li class="icon16-device-notification">2 notifications</li>
+                <li class="icon16-device-error">Pas d'erreur</li>
+            </ul>
+        </div>
     {% for room in room_list %}
         {% if forloop.counter0|divisibleby:"3" %}
         <div class="line">

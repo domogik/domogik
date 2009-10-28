@@ -59,6 +59,3 @@
 .icon16-status-airconditioningon { background-image:url(../images/clim_on_16.png);}
 .icon16-status-airconditioningoff { background-image:url(../images/clim_off_16.png);}
 .icon16-status-soundplaying { background-image:url(../images/room_sound_play.png);}
-
-/* Weather icons */
-.icon64-weather-clouds { background-image:url(../images/weather_clouds_64.png);}
