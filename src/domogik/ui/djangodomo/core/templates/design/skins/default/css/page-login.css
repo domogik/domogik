@@ -58,7 +58,7 @@ ul#digits li a, ul#digits li input {
 
 ul#digits li a:hover, ul#digits li a:focus,
 ul#digits li input:hover, ul#digits li input:focus,
-#logincode:hover, #logincode:focus,
+#logincode[disabled='false']:hover, #logincode:focus,
 ul#users li a:hover, ul#users li a:focus,
 input.buttonok:hover, input.buttonok:active, input.buttonok:focus {
     background:#eb8f00;
