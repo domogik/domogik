@@ -182,8 +182,8 @@ $(function(){
 </div>
 <div class="nocolumns">
 {% for area in areas_list %}
-    <div class="element">
-	    <script type="text/javascript">
+  <div class="element">
+	<script type="text/javascript">
 		// Update form
     $(function(){
     var area{{ area.id }}newname = $("#area{{ area.id }}-newname"),
@@ -212,24 +212,11 @@ $(function(){
 				allFields.val('').removeClass('ui-state-error');
 			}
 		});
-			$('select#area{{ area.id }}-largeicon').selectmenu({
+	
+	$('select#area{{ area.id }}-icon').selectmenu({
 				icons: [
-                                                                        {% for icon in icons64_area %}
-					{find: '.icon64_area_{{ icon }}', icon: 'icon64-area-{{ icon }}', jquery:'no'},
-                                                                        {% endfor %}
-				]
-			});
-	$('select#area{{ area.id }}-mediumicon').selectmenu({
-				icons: [
-                                                                        {% for icon in icons32_area %}
-					{find: '.icon32_area_{{ icon }}', icon: 'icon32-area-{{ icon }}', jquery:'no'},
-                                                                        {% endfor %}
-				]
-			});
-		$('select#area{{ area.id }}-smallicon').selectmenu({
-				icons: [
-                                                                        {% for icon in icons16_area %}
-					{find: '.icon16_area_{{ icon }}', icon: 'icon16-area-{{ icon }}', jquery:'no'},
+                                                                        {% for icon in icons_area %}
+					{find: '.icon_area_{{ icon }}', icon: 'icon64-area-{{ icon }}', jquery:'no'},
                                                                         {% endfor %}
 				]
 			});
@@ -246,7 +233,9 @@ $(function(){
             <li>
                 <button id="update{{ area.id }}" class="button">Modifier</button>
             </li>
-
+            <li>
+                <button id="save{{ area.id }}" class="button">Sauvegarder</button>
+            </li>
         </ul>
 	      <div id="updatedialog{{ area.id }}" title="Modifier {{ area.name }}">
             <p id="validateTips{{ area.id }}">Tous les champs sont requis.</p>
@@ -255,39 +244,17 @@ $(function(){
                 <input id="area{{ area.id }}-newname" name="area{{ area.id }}-newname" type="text" class="medium" value="{{ area.name }}" />
             </form>
         </div>
-        <div class="parameter">
-            <fieldset>
-                <legend>Icônes</legend>
-                <ul class="icons">
-                    <li>
-                        <label for="area{{ area.id }}-largeicon">Large :</label>
-                        <select class="large customlargeicons" id="area{{ area.id }}-largeicon" name="area{{ area.id }}-largeicon">
-                            {% for icon in icons64_area %}
-                            <option value="{{ icon }}" class="icon64_area_{{ icon }}">{{ icon }}</option>
-                                {% endfor %}
-                        </select>
-                    </li>
-                    <li>
-                        <label for="area{{ area.id }}-mediumicon">Moyen :</label>
-                        <select class="large custommediumicons" id="area{{ area.id }}-mediumicon" name="area{{ area.id }}-mediumicon">
-                            {% for icon in icons32_area %}
-                            <option value="{{ icon }}" class="icon32_area_{{ icon }}">{{ icon }}</option>
-                                {% endfor %}
-                        </select>
-                    </li>
-                    <li>
-                        <label for="area{{ area.id }}-smallicon">Petit :</label>
-                        <select class="large customsmallicons" id="area{{ area.id }}-smallicon" name="area{{ area.id }}-smallicon">
-                            {% for icon in icons16_area %}
-                            <option value="{{ icon }}" class="icon16_area_{{ icon }}">{{ icon }}</option>
-                                {% endfor %}
-                        </select>
-                    </li>
-                </ul>
-            </fieldset>
-
-        </div>
+	<form action="#">
+          <div class="parameter">
+            <label for="area{{ area.id }}-icon">Icône:</label>
+            <select class="large customicons" id="area{{ area.id }}-icon" name="area{{ area.id }}-icon">
+            {% for icon in icons_area %}
+              <option value="{{ icon }}" class="icon_area_{{ icon }}">{{ icon }}</option>
+            {% endfor %}
+            </select>
+          </div>
+      </form>
     </div>
-        {% endfor %}
+{% endfor %}
 </div>
 {% endblock %}

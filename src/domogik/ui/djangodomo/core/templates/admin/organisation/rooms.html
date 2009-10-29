@@ -217,24 +217,10 @@ $(function(){
 			}
 		});
 		
-			$('select#room{{ room.id }}-largeicon').selectmenu({
+        	$('select#room{{ room.id }}-icon').selectmenu({
 				icons: [
-                                                                        {% for icon in icons64_room %}
-					{find: '.icon64_room_{{ icon }}', icon: 'icon64-room-{{ icon }}', jquery:'no'},
-                                                                        {% endfor %}
-				]
-			});
-	$('select#room{{ room.id }}-mediumicon').selectmenu({
-				icons: [
-                                                                        {% for icon in icons32_room %}
-					{find: '.icon32_room_{{ icon }}', icon: 'icon32-room-{{ icon }}', jquery:'no'},
-                                                                        {% endfor %}
-				]
-			});
-		$('select#room{{ room.id }}-smallicon').selectmenu({
-				icons: [
-                                                                        {% for icon in icons16_room %}
-					{find: '.icon16_room_{{ icon }}', icon: 'icon16-room-{{ icon }}', jquery:'no'},
+                                                                        {% for icon in icons_room %}
+					{find: '.icon_room_{{ icon }}', icon: 'icon64-room-{{ icon }}', jquery:'no'},
                                                                         {% endfor %}
 				]
 			});
@@ -251,6 +237,9 @@ $(function(){
             <li>
                 <button id="update{{ room.id }}" class="button">Modifier</button>
             </li>
+            <li>
+                <button id="save{{ area.id }}" class="button">Sauvegarder</button>
+            </li>
         </ul>
         <div id="updatedialog{{ room.id }}" title="Modifier {{ room.name }}">
             <p id="validateTips{{ room.id }}">Tous les champs sont requis.</p>
@@ -266,37 +255,17 @@ $(function(){
                 </select>
             </form>
         </div>
-        <div class="parameter">
-            <fieldset>
-                <legend>Icônes</legend>
-                <ul class="icons">
-                    <li>
-                        <label for="room{{ room.id }}-largeicon">Large :</label>
-                        <select class="large customlargeicons" id="room{{ room.id }}-largeicon" name="room{{ room.id }}-largeicon">
-                            {% for icon in icons64_room %}
-                            <option value="{{ icon }}" class="icon64_room_{{ icon }}">{{ icon }}</option>
-                                {% endfor %}
-                        </select>
-                    </li>
-                    <li>
-                        <label for="room{{ room.id }}-mediumicon">Moyen :</label>
-                        <select class="large custommediumicons" id="room{{ room.id }}-mediumicon" name="room{{ room.id }}-mediumicon">
-                            {% for icon in icons32_room %}
-                            <option value="{{ icon }}" class="icon32_room_{{ icon }}">{{ icon }}</option>
-                                {% endfor %}
-                        </select>
-                    </li>
-                    <li>
-                        <label for="room{{ room.id }}-smallicon">Petit :</label>
-                        <select class="large customsmallicons" id="room{{ room.id }}-smallicon" name="room{{ room.id }}-smallicon">
-                            {% for icon in icons16_room %}
-                            <option value="{{ icon }}" class="icon16_room_{{ icon }}">{{ icon }}</option>
-                                {% endfor %}
-                        </select>
-                    </li>
-                </ul>
-            </fieldset>
-        </div>
+        <form action="#">
+            <div class="parameter">
+                <label for="room{{ room.id }}-icon">Icône :</label>
+                <select class="large customicons" id="room{{ room.id }}-icon" name="room{{ room.id }}-icon">
+                {% for icon in icons_room %}
+                    <option value="{{ icon }}" class="icon_room_{{ icon }}">{{ icon }}</option>
+                {% endfor %}
+                </select>
+            </div>
+        </form>
     </div>
-    {% endfor %} </div>
+    {% endfor %}
+</div>
 {% endblock %}

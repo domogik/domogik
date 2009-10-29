@@ -171,3 +171,13 @@ class SampleDataHelper:
             d_category_id=appliance_cat.id, d_reference="AM12", d_room_id=kitchen.id, d_is_resetable=True, 
             d_initial_value="off", d_is_value_changeable_by_user=True, d_unit_of_stored_values=None
         )
+
+        bedroom1_icon = self._db.add_item_ui_config(bedroom1.id, 'room', icon="bedroom")
+        bedroom2_icon = self._db.add_item_ui_config(bedroom2.id, 'room', icon="bedroom")
+        lounge_icon = self._db.add_item_ui_config(lounge.id, 'room', icon="tvlounge")
+        kitchen_icon = self._db.add_item_ui_config(kitchen.id, 'room', icon="kitchen")
+        bathroom_icon = self._db.add_item_ui_config(bathroom.id, 'room', icon="bathroom")
+        
+        basement_icon = self._db.add_item_ui_config(basement.id, 'area', icon="basement")
+        groundfloor_icon = self._db.add_item_ui_config(ground_floor.id, 'area', icon="grndfloor")
+        firstfloor_icon = self._db.add_item_ui_config(first_floor.id, 'area', icon="firstfloor")

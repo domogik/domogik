@@ -491,14 +491,12 @@ def admin_organisation_rooms(request):
     devices_list = _db.list_devices()
     rooms_list = _db.list_rooms()
     areas_list = _db.list_areas()
-    icons64_room = ["default", "kitchen", "livingroom", "tvlounge", "bathroom"]
-    icons32_room = ["default", "kitchen", "bedroom", "livingroom", "tvlounge"]
-    icons16_room = ["bedroom", "kitchen", "livingroom"]
+    icons_room = ["default", "kitchen", "bedroom", "livingroom", "tvlounge", "bathroom"]
     page_title = _("Organisation des pieces")
     return _go_to_page(request, 'admin/organisation/rooms.html', page_title,
     				devices_list=devices_list, unattribued_devices=unattribued_devices,
                     rooms_list=rooms_list, areas_list=areas_list,
-                    icons64_room=icons64_room, icons32_room=icons32_room, icons16_room=icons16_room)
+                    icons_room=icons_room)
 					  
 def admin_organisation_areas(request):
     """
@@ -511,11 +509,9 @@ def admin_organisation_areas(request):
     unattribued_rooms = _db.search_rooms(area_id=None)
     rooms_list = _db.list_rooms()
     areas_list = _db.list_areas()
-    icons64_area = ["grndfloor", "firstfloor", "basement"]
-    icons32_area = ["grndfloor", "firstfloor", "basement"]
-    icons16_area = ["grndfloor", "firstfloor", "basement"]
+    icons_area = ["grndfloor", "firstfloor", "basement"]
     page_title = _("Organisation des zones")
     return _go_to_page(request, 'admin/organisation/areas.html', page_title,
                        unattribued_rooms=unattribued_rooms, rooms_list=rooms_list, areas_list=areas_list,
-                    icons64_area=icons64_area, icons32_area=icons32_area, icons16_area=icons16_area)
+                    icons_area=icons_area)
 
