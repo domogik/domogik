@@ -159,11 +159,7 @@ class DbHelper():
         @param area_id : The area id
         @return an area object
         """
-        area = self._session.query(Area).filter_by(id=area_id).first()
-        if area:
-            return area
-        else:
-            return None
+        return self._session.query(Area).filter_by(id=area_id).first()
 
     def get_area_by_name(self, area_name):
         """
@@ -171,11 +167,7 @@ class DbHelper():
         @param area_name : The area name
         @return an area object
         """
-        area = self._session.query(Area).filter_by(name=area_name).first()
-        if area:
-            return area
-        else:
-            return None
+        return self._session.query(Area).filter_by(name=area_name).first()
 
     def add_area(self, a_name, a_description=None):
         """
@@ -235,11 +227,7 @@ class DbHelper():
         @param r_name : The room name
         @return a room object 
         """
-        room = self._session.query(Room).filter_by(name=r_name).first()
-        if room:
-            return room
-        else:
-            return None
+        return self._session.query(Room).filter_by(name=r_name).first()
 
     def get_room_by_id(self, r_id):
         """
@@ -247,11 +235,7 @@ class DbHelper():
         @param r_id : The room id
         @return a room object 
         """
-        room = self._session.query(Room).filter_by(id=r_id).first()
-        if room:
-            return room
-        else:
-            return None
+        return self._session.query(Room).filter_by(id=r_id).first()
 
     def add_room(self, r_name, r_area_id, r_description=None):
         """
