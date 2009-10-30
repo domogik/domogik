@@ -30,7 +30,7 @@
                 <input type="hidden" id="id_deviceId" name="device_id" value="{{ device.id }}"/>
                 <td class="label">Device</td>
                 <td class="value">
-                    {% if is_user_admin %}
+                    {% if request.session.user.is_admin %}
                         <input type="text" name="device_name" size="20" value="{{ device.name }}"/>
                     {% else %}
                         {{ device.name }}
@@ -40,14 +40,14 @@
             <tr>
                 <td class="label">Description</td>
                 <td class="value">
-                {% if is_user_admin %}
+                {% if request.session.user.is_admin %}
                     <textarea name="device_description" cols="40" rows="3">{{ device.description }}</textarea>
                 {% else %}
                     {{ device.description }}
                 {% endif %}
                 </td>
             </tr>
-            {% if is_user_admin %}
+            {% if request.session.user.is_admin %}
                 <tr>
                     <td class="label">Address</td><td class="value">{{ device.address }}</td>
                 </tr>

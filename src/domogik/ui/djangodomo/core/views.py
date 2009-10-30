@@ -540,7 +540,12 @@ def admin_organisation_areas(request):
     areas_list = _db.list_areas()
     icons_area = ["grndfloor", "firstfloor", "basement"]
     page_title = _("Organisation des zones")
-    return _go_to_page(request, 'admin/organisation/areas.html', page_title,
-                       unattribued_rooms=unattribued_rooms, rooms_list=rooms_list, areas_list=areas_list,
-                    icons_area=icons_area)
+    return _go_to_page(
+        request, 'admin/organisation/areas.html',
+        page_title,
+        unattribued_rooms=unattribued_rooms,
+        rooms_list=rooms_list,
+        areas_list=areas_list,
+        icons_area=icons_area
+    )
 

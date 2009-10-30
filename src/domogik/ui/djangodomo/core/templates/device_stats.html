@@ -62,7 +62,7 @@ $(function(){
                                 </tr>
                         {% endfor %}
                 </table>
-                {% if is_user_admin %}
+                {% if request.session.user.is_admin %}
                 <p></p>
                 <table>
                         <tr>

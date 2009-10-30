@@ -87,7 +87,7 @@
             <tr>
                 <th>Device name</th>
                 <th>Category</th>
-                {% if is_user_admin %}
+                {% if request.session.user.is_admin %}
                     <th>Address</th>
                     <th>Reference</th>
                     <th>Technology</th>
@@ -102,7 +102,7 @@
                 <tr class="{% cycle 'oddRow' 'evenRow' %}">
                     <td><a href="{% url device_view device.id %}">{{ device.name }}</a></td>
                     <td>{{ device.category.name }}</td>
-                    {% if is_user_admin %}
+                    {% if request.session.user.is_admin %}
                         <td>{{ device.address }}</td>
                         <td>{{ device.reference }}</td>
                         <td>{{ device.technology.name }}</td>

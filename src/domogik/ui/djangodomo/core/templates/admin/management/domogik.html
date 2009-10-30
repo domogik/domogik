@@ -63,7 +63,7 @@ $(function(){
                                         </tr>
                                         <tr>
                                                 <td>Admin mode</td>
-                                                <td><input type="checkbox" name="admin_mode" value="{{ is_user_admin }}" {{ admin_mode }}/></td>
+                                                <td><input type="checkbox" name="admin_mode" value="{{ request.session.user.is_admin }}" {{ admin_mode }}/></td>
                                         </tr>
                                         <tr>
                                                 <td>Debug mode</td>
