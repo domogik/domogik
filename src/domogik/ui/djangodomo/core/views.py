@@ -496,10 +496,15 @@ def admin_organisation_devices(request):
     devices_list = _db.list_devices()
     device_tech_list = _db.list_device_technologies()
     page_title = _("Organisation des dispositifs")
-    return _go_to_page(request, 'admin/organisation/devices.html', page_title,
-                      device_category_list=device_category_list, rooms_list=rooms_list,
-                      devices_list=devices_list, device_tech_list=device_tech_list)
-					  
+    return _go_to_page(
+        request, 'admin/organisation/devices.html', 
+        page_title,
+        device_category_list=device_category_list,
+        rooms_list=rooms_list,
+        devices_list=devices_list,
+        device_tech_list=device_tech_list
+    )
+
 def admin_organisation_rooms(request):
     """
     Method called when the admin rooms organisation page is accessed
@@ -514,11 +519,14 @@ def admin_organisation_rooms(request):
     areas_list = _db.list_areas()
     icons_room = ["default", "kitchen", "bedroom", "livingroom", "tvlounge", "bathroom"]
     page_title = _("Organisation des pieces")
-    return _go_to_page(request, 'admin/organisation/rooms.html', page_title,
-    				devices_list=devices_list, unattribued_devices=unattribued_devices,
-                    rooms_list=rooms_list, areas_list=areas_list,
-                    icons_room=icons_room)
-					  
+    return _go_to_page(
+        request, 'admin/organisation/rooms.html', 
+        page_title,
+        devices_list=devices_list, unattribued_devices=unattribued_devices,
+        rooms_list=rooms_list, areas_list=areas_list,
+        icons_room=icons_room
+    )
+
 def admin_organisation_areas(request):
     """
     Method called when the admin areas organisation page is accessed
