@@ -52,7 +52,7 @@ from domogik.common import database
 from djangodomo.core.SampleDataHelper import SampleDataHelper
 from djangodomo.core.XPLHelper import XPLHelper
 
-_ADMIN_PAGE_INDEX = 'admin/admin_index.html'
+_ADMIN_MANAGEMENT_DOMOGIK = 'admin/management/domogik.html'
 _db = database.DbHelper()
 
 def index(request):
@@ -207,10 +207,21 @@ def admin_index(request):
     """
     if not _is_user_admin(request):
         return index(request)
+    page_title = _("Admin page")
+    return _go_to_page(request, 'admin/index.html', page_title)
+
+def admin_management_domogik(request):
+    """
+    Method called when the admin domogik management page is accessed
+    @param request : HTTP request
+    @return an HttpResponse object
+    """
+    if not _is_user_admin(request):
+        return index(request)
     simulation_mode = ""
     admin_mode = ""
     debug_mode = ""
-    page_title = _("Admin page")
+    page_title = _("Gestion de Domogik")
     action = "index"
     sys_config = _db.get_system_config()
     if sys_config.simulation_mode:
@@ -219,10 +230,21 @@ def admin_index(request):
         admin_mode = "checked"
     if sys_config.debug_mode:
         debug_mode = "checked"
-    return _go_to_page(request, _ADMIN_PAGE_INDEX, page_title, action=action, 
+    return _go_to_page(request, _ADMIN_MANAGEMENT_DOMOGIK, page_title, action=action, 
                       simulation_mode=simulation_mode, admin_mode=admin_mode, 
                       debug_mode=debug_mode)
 
+def admin_management_modules(request):
+    """
+    Method called when the admin modules management page is accessed
+    @param request : HTTP request
+    @return an HttpResponse object
+    """
+    if not _is_user_admin(request):
+        return index(request)
+    page_title = _("Gestion des modules")
+    return _go_to_page(request, 'admin/management/modules.html', page_title)
+    
 def save_admin_settings(request):
     """
     Save the administrator settings (admin, debug and simulation mode
@@ -237,7 +259,7 @@ def save_admin_settings(request):
         admin_mode = QueryDict.get(request.POST, "admin_mode", False)
         debug_mode = QueryDict.get(request.POST, "debug_mode", False)
         _db.update_system_config(s_simulation_mode=simulation_mode, s_debug_mode=debug_mode)
-    return admin_index(request)
+    return admin_management_domogik(request)
 
 def load_sample_data(request):
     """
@@ -254,7 +276,7 @@ def load_sample_data(request):
     sys_config = _db.get_system_config()
     if sys_config.simulation_mode != True:
         error_msg = _("The application is not running in simulation mode : can't load sample data")
-        return _go_to_page(request, _ADMIN_PAGE_INDEX, page_title, action=action, error_msg=error_msg)
+        return _go_to_page(request, _ADMIN_MANAGEMENT_DOMOGIK, page_title, action=action, error_msg=error_msg)
 
     sample_data_helper = SampleDataHelper(_db)
     sample_data_helper.create()
@@ -264,7 +286,7 @@ def load_sample_data(request):
     device_category_list = _db.list_device_categories()
     device_list = _db.list_devices()
     device_tech_list = _db.list_device_technologies()
-    return _go_to_page(request, _ADMIN_PAGE_INDEX, page_title, action=action, 
+    return _go_to_page(request, _ADMIN_MANAGEMENT_DOMOGIK, page_title, action=action, 
                       area_list=area_list, room_list=room_list, 
                       device_category_list=device_category_list, 
                       device_list=device_list, device_tech_list=device_tech_list)
@@ -284,11 +306,11 @@ def clear_data(request):
     sys_config = _db.get_system_config()
     if sys_config.simulation_mode != True:
         error_msg = _("The application is not running in simulation mode : can't clear data")
-        return _go_to_page(request, _ADMIN_PAGE_INDEX, page_title, action=action, error_msg=error_msg)
+        return _go_to_page(request, _ADMIN_MANAGEMENT_DOMOGIK, page_title, action=action, error_msg=error_msg)
 
     sample_data_helper = SampleDataHelper(_db)
     sample_data_helper.remove()
-    return _go_to_page(request, _ADMIN_PAGE_INDEX, page_title, action=action)
+    return _go_to_page(request, _ADMIN_MANAGEMENT_DOMOGIK, page_title, action=action)
 
 def _update_device_values(request, sys_config):
     """
