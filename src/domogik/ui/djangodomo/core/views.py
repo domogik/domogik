@@ -45,6 +45,7 @@ from django.db.models import Q
 from django.http import QueryDict
 from django.http import Http404, HttpResponse
 from django.shortcuts import render_to_response
+from django.template import RequestContext
 from django.utils.translation import ugettext_lazy as _
 
 from domogik.common import database
@@ -172,7 +173,7 @@ def login(request):
             else:
                 first_name = login
                 last_name = login
-            request.session['s_user'] = {
+            request.session['user'] = {
                 'login': sys_account.login, 
                 'is_admin': sys_account.is_admin, 
                 'first_name': first_name, 
@@ -430,13 +431,11 @@ def _go_to_page(request, html_page, page_title, **attribute_list):
     response_attr_list = {}
     response_attr_list['page_title'] = page_title
     response_attr_list['sys_config'] = _db.get_system_config()
-    user = _get_user_connected(request)
-    response_attr_list['user'] = user
     response_attr_list['is_user_admin'] = _is_user_admin(request)
     response_attr_list['is_user_connected'] = _is_user_connected(request)
     for attribute in attribute_list:
         response_attr_list[attribute] = attribute_list[attribute]
-    return render_to_response(html_page, response_attr_list)
+    return render_to_response(html_page, response_attr_list, context_instance=RequestContext(request))
 
 def _get_user_connected(request):
     """
@@ -445,7 +444,7 @@ def _get_user_connected(request):
     @return the user or None
     """
     try:
-        return request.session['s_user']
+        return request.session['user']
     except KeyError:
         return None
 
@@ -456,7 +455,7 @@ def _is_user_connected(request):
     @return True or False
     """
     try:
-        request.session['s_user']
+        request.session['user']
         return True
     except KeyError:
         return False

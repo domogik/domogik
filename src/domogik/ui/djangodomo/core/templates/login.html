@@ -22,8 +22,8 @@
 {% load i18n %}
 
 {% block css %}
-    <link href="/design/{{ s_user.skin_used|default:'skins/default' }}/css/ui-buttons.css" rel="stylesheet" type="text/css" />
-    <link href="/design/{{ s_user.skin_used|default:'skins/default' }}/css/page-login.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-buttons.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/page-login.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block include_js_script %}
     <script type="text/javascript" src="/design/js/page-login.js"></script>
@@ -44,7 +44,7 @@
                     {% for account in account_list %}
                         <li>
                             <a href="#" id="id{{ account.login }}" onclick="chooseUser('id{{ account.login }}', '{{ account.login }}');">
-                                <img src="/design/{{ s_user.skin_used|default:'skins/default' }}/images/userid.jpg" alt="" width="64" height="64" />{{ account.login }}
+                                <img src="/design/{{ request.session.user.skin_used|default:'skins/default' }}/images/userid.jpg" alt="" width="64" height="64" />{{ account.login }}
                             </a>
                         </li>
                     {% endfor %}

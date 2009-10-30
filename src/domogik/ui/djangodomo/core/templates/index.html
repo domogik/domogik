@@ -23,7 +23,7 @@
 
 {% block title %}{% trans page_title %}{% endblock %}
 {% block css %}
-    <link href="/design/{{ s_user.skin_used|default:'skins/default' }}/css/page-home.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/page-home.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block include_js_script %}
     <script type="text/javascript" src="/design/js/page-home.js"></script>
@@ -36,7 +36,7 @@
             <div id="general-tempmax">Max: 18&deg;</div>
             <div id="general-tempmin">Min: 7&deg;</div>
         </div>
-        <img id="general-tempicon" class="icon-weather-sun" src="/design/{{ s_user.skin_used|default:'skins/default' }}/images/weather/sun.png" alt="Soleil"/>
+        <img id="general-tempicon" class="icon-weather-sun" src="/design/{{ request.session.user.skin_used|default:'skins/default' }}/images/weather/sun.png" alt="Soleil"/>
     </div>
     <div id="general-datetime" class="widget">
         <span id="general-date">{% now "l j F Y" %}</span>
