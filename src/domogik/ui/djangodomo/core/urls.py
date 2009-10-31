@@ -43,8 +43,8 @@ urlpatterns = patterns('djangodomo.core.views',
     url(r'status/room/(?P<room_id>\d+)/$', 'device_status', name='device_status_view'),
     url(r'status/device/(?P<device_id>\d+)/$', 'device_status', name='device_status_view'),
     
-    url(r'device/(?P<device_id>\d+)/$', 'device', name="device_view"),
-    url(r'device_stats/(?P<device_id>\d+)/$', 'device_stats', name="device_stats_view"),
+#    url(r'device/(?P<device_id>\d+)/$', 'device', name="device_view"),
+#    url(r'device_stats/(?P<device_id>\d+)/$', 'device_stats', name="device_stats_view"),
 
     url(r'login/$', 'login', name='login_view'),
     url(r'logout/$', 'logout', name='logout_view'),
@@ -58,4 +58,10 @@ urlpatterns = patterns('djangodomo.core.views',
     url(r'admin/organisation/devices/$', 'admin_organisation_devices', name="admin_organisation_devices_view"),
     url(r'admin/organisation/rooms/$', 'admin_organisation_rooms', name="admin_organisation_rooms_view"),
     url(r'admin/organisation/areas/$', 'admin_organisation_areas', name="admin_organisation_areas_view"),
+
+    url(r'show/$', 'show_index', name="show_view"),
+    url(r'show/room/(?P<room_id>\d+)/$', 'show_room', name='show_room_view'),
+    url(r'show/area/(?P<area_id>\d+)/$', 'show_area', name='show_area_view'),
+    url(r'show/device/(?P<category_id>\d+)/$', 'show_device', name='show_device_view'),
+
 )

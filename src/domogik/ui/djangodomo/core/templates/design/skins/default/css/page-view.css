@@ -2,23 +2,23 @@
 /* CSS Document */
 
 .element-main li {
-    padding-left:20px;
-    background-position: top left;
-    background-repeat:no-repeat;
+  padding-left:20px;
+  background-position: top left;
+  background-repeat:no-repeat;
 }
 
 
 /* Element Meteo */
 .element-meteo {
-    background-position: top right;
-    background-repeat:no-repeat;
+  background-position: top right;
+  background-repeat:no-repeat;
 }
 
 
 /* Element Phone */
 
 td.hidden-call {
-    color:#F00;
-    font-style:italic;
+  color:#F00;
+  font-style:italic;
 }
 

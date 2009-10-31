@@ -1,0 +1,20 @@
+@charset "UTF-8";
+/* CSS Document */
+
+.zone-temps {
+  list-style:none;
+  margin-left:40%;
+}
+
+.zone-temps li {
+  display:inline-block;
+  text-align:center;
+  margin:1em;
+  background-position:50% top;
+  background-repeat:no-repeat;
+  padding-top:32px;
+}
+
+.zone-temps span {
+	display:block;
+}

@@ -522,8 +522,10 @@ def admin_organisation_rooms(request):
     return _go_to_page(
         request, 'admin/organisation/rooms.html', 
         page_title,
-        devices_list=devices_list, unattribued_devices=unattribued_devices,
-        rooms_list=rooms_list, areas_list=areas_list,
+        unattribued_devices=unattribued_devices,
+        devices_list=devices_list,
+        rooms_list=rooms_list,
+        areas_list=areas_list,
         icons_room=icons_room
     )
 
@@ -549,3 +551,78 @@ def admin_organisation_areas(request):
         icons_area=icons_area
     )
 
+def show_index(request):
+    """
+    Method called when the show index page is accessed
+    @param request : HTTP request
+    @return an HttpResponse object
+    """
+    rooms_list = _db.list_rooms()
+    areas_list = _db.list_areas()
+    device_categories_list = _db.list_device_categories()
+
+    page_title = _("Visualisation Maison")
+    return _go_to_page(
+        request, 'show/index.html',
+        page_title,
+        device_categories_list=device_categories_list,
+        rooms_list=rooms_list,
+        areas_list=areas_list
+    )
+    
+def show_room(request, room_id):
+    """
+    Method called when the show room page is accessed
+    @param request : HTTP request
+    @return an HttpResponse object
+    """
+    rooms_list = _db.list_rooms()
+    areas_list = _db.list_areas()
+    device_categories_list = _db.list_device_categories()
+
+    page_title = _("Visualisation Piece")
+    return _go_to_page(
+        request, 'show/room.html',
+        page_title,
+        device_categories_list=device_categories_list,
+        rooms_list=rooms_list,
+        areas_list=areas_list
+    )
+    
+def show_area(request, area_id):
+    """
+    Method called when the show area page is accessed
+    @param request : HTTP request
+    @return an HttpResponse object
+    """
+    rooms_list = _db.list_rooms()
+    areas_list = _db.list_areas()
+    device_categories_list = _db.list_device_categories()
+
+    page_title = _("Visualisation Zone")
+    return _go_to_page(
+        request, 'show/area.html',
+        page_title,
+        device_categories_list=device_categories_list,
+        rooms_list=rooms_list,
+        areas_list=areas_list
+    )
+
+def show_device(request, category_id):
+    """
+    Method called when the show category page is accessed
+    @param request : HTTP request
+    @return an HttpResponse object
+    """
+    rooms_list = _db.list_rooms()
+    areas_list = _db.list_areas()
+    device_categories_list = _db.list_device_categories()
+
+    page_title = _("Visualisation Dispositif")
+    return _go_to_page(
+        request, 'show/device.html',
+        page_title,
+        device_categories_list=device_categories_list,
+        rooms_list=rooms_list,
+        areas_list=areas_list
+    )    
