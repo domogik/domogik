@@ -45,6 +45,7 @@ from django.db.models import Q
 from django.http import QueryDict
 from django.http import Http404, HttpResponse
 from django.shortcuts import render_to_response
+from django.template import RequestContext
 from django.utils.translation import ugettext_lazy as _
 
 from domogik.common import database
@@ -52,7 +53,7 @@ from domogik.common import database
 from djangodomo.core.SampleDataHelper import SampleDataHelper
 from djangodomo.core.XPLHelper import XPLHelper
 
-_ADMIN_PAGE_INDEX = 'admin/admin_index.html'
+_ADMIN_MANAGEMENT_DOMOGIK = 'admin/management/domogik.html'
 _db = database.DbHelper()
 
 def index(request):
@@ -207,10 +208,21 @@ def admin_index(request):
     """
     if not _is_user_admin(request):
         return index(request)
+    page_title = _("Admin page")
+    return _go_to_page(request, 'admin/index.html', page_title)
+
+def admin_management_domogik(request):
+    """
+    Method called when the admin domogik management page is accessed
+    @param request : HTTP request
+    @return an HttpResponse object
+    """
+    if not _is_user_admin(request):
+        return index(request)
     simulation_mode = ""
     admin_mode = ""
     debug_mode = ""
-    page_title = _("Admin page")
+    page_title = _("Gestion de Domogik")
     action = "index"
     sys_config = _db.get_system_config()
     if sys_config.simulation_mode:
@@ -219,10 +231,21 @@ def admin_index(request):
         admin_mode = "checked"
     if sys_config.debug_mode:
         debug_mode = "checked"
-    return _go_to_page(request, _ADMIN_PAGE_INDEX, page_title, action=action, 
+    return _go_to_page(request, _ADMIN_MANAGEMENT_DOMOGIK, page_title, action=action, 
                       simulation_mode=simulation_mode, admin_mode=admin_mode, 
                       debug_mode=debug_mode)
 
+def admin_management_modules(request):
+    """
+    Method called when the admin modules management page is accessed
+    @param request : HTTP request
+    @return an HttpResponse object
+    """
+    if not _is_user_admin(request):
+        return index(request)
+    page_title = _("Gestion des modules")
+    return _go_to_page(request, 'admin/management/modules.html', page_title)
+    
 def save_admin_settings(request):
     """
     Save the administrator settings (admin, debug and simulation mode
@@ -237,7 +260,7 @@ def save_admin_settings(request):
         admin_mode = QueryDict.get(request.POST, "admin_mode", False)
         debug_mode = QueryDict.get(request.POST, "debug_mode", False)
         _db.update_system_config(s_simulation_mode=simulation_mode, s_debug_mode=debug_mode)
-    return admin_index(request)
+    return admin_management_domogik(request)
 
 def load_sample_data(request):
     """
@@ -254,7 +277,7 @@ def load_sample_data(request):
     sys_config = _db.get_system_config()
     if sys_config.simulation_mode != True:
         error_msg = _("The application is not running in simulation mode : can't load sample data")
-        return _go_to_page(request, _ADMIN_PAGE_INDEX, page_title, action=action, error_msg=error_msg)
+        return _go_to_page(request, _ADMIN_MANAGEMENT_DOMOGIK, page_title, action=action, error_msg=error_msg)
 
     sample_data_helper = SampleDataHelper(_db)
     sample_data_helper.create()
@@ -264,7 +287,7 @@ def load_sample_data(request):
     device_category_list = _db.list_device_categories()
     device_list = _db.list_devices()
     device_tech_list = _db.list_device_technologies()
-    return _go_to_page(request, _ADMIN_PAGE_INDEX, page_title, action=action, 
+    return _go_to_page(request, _ADMIN_MANAGEMENT_DOMOGIK, page_title, action=action, 
                       area_list=area_list, room_list=room_list, 
                       device_category_list=device_category_list, 
                       device_list=device_list, device_tech_list=device_tech_list)
@@ -284,11 +307,11 @@ def clear_data(request):
     sys_config = _db.get_system_config()
     if sys_config.simulation_mode != True:
         error_msg = _("The application is not running in simulation mode : can't clear data")
-        return _go_to_page(request, _ADMIN_PAGE_INDEX, page_title, action=action, error_msg=error_msg)
+        return _go_to_page(request, _ADMIN_MANAGEMENT_DOMOGIK, page_title, action=action, error_msg=error_msg)
 
     sample_data_helper = SampleDataHelper(_db)
     sample_data_helper.remove()
-    return _go_to_page(request, _ADMIN_PAGE_INDEX, page_title, action=action)
+    return _go_to_page(request, _ADMIN_MANAGEMENT_DOMOGIK, page_title, action=action)
 
 def _update_device_values(request, sys_config):
     """
@@ -408,13 +431,11 @@ def _go_to_page(request, html_page, page_title, **attribute_list):
     response_attr_list = {}
     response_attr_list['page_title'] = page_title
     response_attr_list['sys_config'] = _db.get_system_config()
-    user = _get_user_connected(request)
-    response_attr_list['user'] = user
     response_attr_list['is_user_admin'] = _is_user_admin(request)
     response_attr_list['is_user_connected'] = _is_user_connected(request)
     for attribute in attribute_list:
         response_attr_list[attribute] = attribute_list[attribute]
-    return render_to_response(html_page, response_attr_list)
+    return render_to_response(html_page, response_attr_list, context_instance=RequestContext(request))
 
 def _get_user_connected(request):
     """
@@ -475,10 +496,15 @@ def admin_organisation_devices(request):
     devices_list = _db.list_devices()
     device_tech_list = _db.list_device_technologies()
     page_title = _("Organisation des dispositifs")
-    return _go_to_page(request, 'admin/organisation/devices.html', page_title,
-                      device_category_list=device_category_list, rooms_list=rooms_list,
-                      devices_list=devices_list, device_tech_list=device_tech_list)
-					  
+    return _go_to_page(
+        request, 'admin/organisation/devices.html', 
+        page_title,
+        device_category_list=device_category_list,
+        rooms_list=rooms_list,
+        devices_list=devices_list,
+        device_tech_list=device_tech_list
+    )
+
 def admin_organisation_rooms(request):
     """
     Method called when the admin rooms organisation page is accessed
@@ -491,15 +517,18 @@ def admin_organisation_rooms(request):
     devices_list = _db.list_devices()
     rooms_list = _db.list_rooms()
     areas_list = _db.list_areas()
-    icons64_room = ["default", "kitchen", "livingroom", "tvlounge", "bathroom"]
-    icons32_room = ["default", "kitchen", "bedroom", "livingroom", "tvlounge"]
-    icons16_room = ["bedroom", "kitchen", "livingroom"]
+    icons_room = ["default", "kitchen", "bedroom", "livingroom", "tvlounge", "bathroom"]
     page_title = _("Organisation des pieces")
-    return _go_to_page(request, 'admin/organisation/rooms.html', page_title,
-    				devices_list=devices_list, unattribued_devices=unattribued_devices,
-                    rooms_list=rooms_list, areas_list=areas_list,
-                    icons64_room=icons64_room, icons32_room=icons32_room, icons16_room=icons16_room)
-					  
+    return _go_to_page(
+        request, 'admin/organisation/rooms.html', 
+        page_title,
+        unattribued_devices=unattribued_devices,
+        devices_list=devices_list,
+        rooms_list=rooms_list,
+        areas_list=areas_list,
+        icons_room=icons_room
+    )
+
 def admin_organisation_areas(request):
     """
     Method called when the admin areas organisation page is accessed
@@ -511,11 +540,89 @@ def admin_organisation_areas(request):
     unattribued_rooms = _db.search_rooms(area_id=None)
     rooms_list = _db.list_rooms()
     areas_list = _db.list_areas()
-    icons64_area = ["grndfloor", "firstfloor", "basement"]
-    icons32_area = ["grndfloor", "firstfloor", "basement"]
-    icons16_area = ["grndfloor", "firstfloor", "basement"]
+    icons_area = ["grndfloor", "firstfloor", "basement"]
     page_title = _("Organisation des zones")
-    return _go_to_page(request, 'admin/organisation/areas.html', page_title,
-                       unattribued_rooms=unattribued_rooms, rooms_list=rooms_list, areas_list=areas_list,
-                    icons64_area=icons64_area, icons32_area=icons32_area, icons16_area=icons16_area)
+    return _go_to_page(
+        request, 'admin/organisation/areas.html',
+        page_title,
+        unattribued_rooms=unattribued_rooms,
+        rooms_list=rooms_list,
+        areas_list=areas_list,
+        icons_area=icons_area
+    )
 
+def show_index(request):
+    """
+    Method called when the show index page is accessed
+    @param request : HTTP request
+    @return an HttpResponse object
+    """
+    rooms_list = _db.list_rooms()
+    areas_list = _db.list_areas()
+    device_categories_list = _db.list_device_categories()
+
+    page_title = _("Visualisation Maison")
+    return _go_to_page(
+        request, 'show/index.html',
+        page_title,
+        device_categories_list=device_categories_list,
+        rooms_list=rooms_list,
+        areas_list=areas_list
+    )
+    
+def show_room(request, room_id):
+    """
+    Method called when the show room page is accessed
+    @param request : HTTP request
+    @return an HttpResponse object
+    """
+    rooms_list = _db.list_rooms()
+    areas_list = _db.list_areas()
+    device_categories_list = _db.list_device_categories()
+
+    page_title = _("Visualisation Piece")
+    return _go_to_page(
+        request, 'show/room.html',
+        page_title,
+        device_categories_list=device_categories_list,
+        rooms_list=rooms_list,
+        areas_list=areas_list
+    )
+    
+def show_area(request, area_id):
+    """
+    Method called when the show area page is accessed
+    @param request : HTTP request
+    @return an HttpResponse object
+    """
+    rooms_list = _db.list_rooms()
+    areas_list = _db.list_areas()
+    device_categories_list = _db.list_device_categories()
+
+    page_title = _("Visualisation Zone")
+    return _go_to_page(
+        request, 'show/area.html',
+        page_title,
+        device_categories_list=device_categories_list,
+        rooms_list=rooms_list,
+        areas_list=areas_list
+    )
+
+def show_device(request, category_id):
+    """
+    Method called when the show category page is accessed
+    @param request : HTTP request
+    @return an HttpResponse object
+    """
+    rooms_list = _db.list_rooms()
+    areas_list = _db.list_areas()
+    device_categories_list = _db.list_device_categories()
+
+    page_title = _("Visualisation Dispositif")
+    return _go_to_page(
+        request, 'show/device.html',
+        page_title,
+        device_categories_list=device_categories_list,
+        rooms_list=rooms_list,
+        areas_list=areas_list
+    )    

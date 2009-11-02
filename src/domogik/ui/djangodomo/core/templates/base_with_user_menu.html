@@ -21,54 +21,54 @@
 {% load i18n %}
 
 {% block css %}
-  <link href="/design/{{ user.skin_used|default:'skins/default' }}/css/ui-nav2.css" rel="stylesheet" type="text/css" />
-  <link href="/design/{{ user.skin_used|default:'skins/default' }}/css/ui-elements.css" rel="stylesheet" type="text/css" />
-  <link href="/design/{{ user.skin_used|default:'skins/default' }}/css/ui-buttons.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-nav2.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-elements.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-buttons.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block script %}
 $(function(){
-  // Accordion
-  $("#nav2").accordion({ header: ".section", active:false});
+    // Accordion
+    $("#nav2").accordion({ header: ".section", active:false});
 });
 {% endblock %}
 
 {% block content %}
-  <div class="left">
-    <div id="nav2">
-      <div class="section"><a href="#">Par pi&egrave;ce</a></div>
-      <ul>
-        <li><a href="room.html" class="menu-room">Pi&egrave;ce principale</a></li>
-        <li><a href="room.html" class="menu-room-livingroom">S&eacute;jour</a></li>
-        <li><a href="room.html" class="menu-room-kitchen">Cuisine</a></li>
-        <li><a href="room.html" class="menu-room-bedroom">Chambre des enfants</a></li>
-        <li><a href="room.html" class="menu-room-bedroom">Chambre des parents</a></li>
-        <li><a href="room.html" class="menu-room-bedroom">Chambre des amis</a></li>
-        <li><a href="room.html" class="menu-room">Salle de bain</a></li>
-        <li><a href="room.html" class="menu-room">Salle de jeux</a></li>
-        <li><a href="room.html" class="menu-room">Garage</a></li>
-        <li><a href="room.html" class="menu-room">Jardin</a></li>
-      </ul>
-      <div class="section"><a href="#">Par zone</a></div>
-      <ul>
-        <li><a href="zone.html" class="menu-zone-grndfloor">Rez-de-chauss&eacute;e</a></li>
-        <li><a href="zone.html" class="menu-zone-floor">Etage</a></li>
-        <li><a href="zone.html" class="menu-zone-basement">Sous-sol</a></li>
-        <li><a href="zone.html" class="menu-zone">Ext&eacute;rieur</a></li>
-      </ul>
-      <div class="section"><a href="#">Par dispositif</a></div>
-      <ul>
-        <li><a href="device.html" class="menu-heat">Chauffage</a></li>
-        <li><a href="device.html" class="menu-light">Eclairage</a></li>
-        <li><a href="device.html" class="menu-electric">Prises &eacute;lectriques</a></li>
-        <li><a href="device.html" class="menu-window">Fenêtres/Volets</a></li>
-        <li><a href="device.html" class="menu-vmc">Ventilation</a></li>
-        <li><a href="device.html" class="menu-clim">Climatisation</a></li>
-        <li><a href="device.html" class="menu-audio">Audio</a></li>
-      </ul>
+    <div class="left">
+        <div id="nav2">
+            <div class="section"><a href="#">Par pi&egrave;ce</a></div>
+            <ul>
+                <li><a href="room.html" class="menu-room">Pi&egrave;ce principale</a></li>
+                <li><a href="room.html" class="menu-room-livingroom">S&eacute;jour</a></li>
+                <li><a href="room.html" class="menu-room-kitchen">Cuisine</a></li>
+                <li><a href="room.html" class="menu-room-bedroom">Chambre des enfants</a></li>
+                <li><a href="room.html" class="menu-room-bedroom">Chambre des parents</a></li>
+                <li><a href="room.html" class="menu-room-bedroom">Chambre des amis</a></li>
+                <li><a href="room.html" class="menu-room">Salle de bain</a></li>
+                <li><a href="room.html" class="menu-room">Salle de jeux</a></li>
+                <li><a href="room.html" class="menu-room">Garage</a></li>
+                <li><a href="room.html" class="menu-room">Jardin</a></li>
+            </ul>
+            <div class="section"><a href="#">Par zone</a></div>
+            <ul>
+                <li><a href="zone.html" class="menu-zone-grndfloor">Rez-de-chauss&eacute;e</a></li>
+                <li><a href="zone.html" class="menu-zone-floor">Etage</a></li>
+                <li><a href="zone.html" class="menu-zone-basement">Sous-sol</a></li>
+                <li><a href="zone.html" class="menu-zone">Ext&eacute;rieur</a></li>
+            </ul>
+            <div class="section"><a href="#">Par dispositif</a></div>
+            <ul>
+                <li><a href="device.html" class="menu-heat">Chauffage</a></li>
+                <li><a href="device.html" class="menu-light">Eclairage</a></li>
+                <li><a href="device.html" class="menu-electric">Prises &eacute;lectriques</a></li>
+                <li><a href="device.html" class="menu-window">Fenêtres/Volets</a></li>
+                <li><a href="device.html" class="menu-vmc">Ventilation</a></li>
+                <li><a href="device.html" class="menu-clim">Climatisation</a></li>
+                <li><a href="device.html" class="menu-audio">Audio</a></li>
+            </ul>
+        </div>
     </div>
-  </div>
-  <div class="right">
-    {% block right %}{% endblock %}
-  </div>
+    <div class="right">
+        {% block right %}{% endblock %}
+    </div>
 {% endblock %}
 

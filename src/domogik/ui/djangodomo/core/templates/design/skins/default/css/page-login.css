@@ -1,101 +1,101 @@
 #frame {
-  margin:auto;
-  width:50em;
-  padding:1em;
+    margin:auto;
+    width:50em;
+    padding:1em;
 }
 
 input {
 /*  display:block;
-  margin:auto;*/
+    margin:auto;*/
 }
 
 ul#users {
-  list-style:none;
-  text-align:center;
-  margin:1em;
-  padding:0;
-  -moz-column-width: 6em;
-  -webkit-column-width: 6em;
-  -moz-column-gap: 1em;
-  -webkit-column-gap: 1em;
+    list-style:none;
+    text-align:center;
+    margin:1em;
+    padding:0;
+    -moz-column-width: 6em;
+    -webkit-column-width: 6em;
+    -moz-column-gap: 1em;
+    -webkit-column-gap: 1em;
 }
 
 ul#users li a {
-  display:inline-block;
-  border:1px solid #999;
-  padding:0;
-  margin:0.2em;
-  text-align:center;
-  color:#000;
-  text-decoration:none;
-  width:7em;
+    display:inline-block;
+    border:1px solid #999;
+    padding:0;
+    margin:0.2em;
+    text-align:center;
+    color:#000;
+    text-decoration:none;
+    width:7em;
 }
 
 ul#digits {
-  list-style:none;
-  margin:auto;
-  padding:0;
-  width:20em;
-  -moz-column-count: 3;
-    -webkit-column-count: 3;
-    -moz-column-gap: 0;
-    -webkit-column-gap: 0;
+    list-style:none;
+    margin:auto;
+    padding:0;
+    width:20em;
+    -moz-column-count: 3;
+        -webkit-column-count: 3;
+        -moz-column-gap: 0;
+        -webkit-column-gap: 0;
 }
 
 ul#digits li a, ul#digits li input {
-  display:block;
-  border:none;
-  margin:0.2em;
-  text-align:center;
-  background-color:#333;
-  font-size:2em;
-  line-height:3em;
-  height:3em;
-  width:3em;
-  color:#FFF;
-  text-decoration:none;
+    display:block;
+    border:none;
+    margin:0.2em;
+    text-align:center;
+    background-color:#333;
+    font-size:2em;
+    line-height:3em;
+    height:3em;
+    width:3em;
+    color:#FFF;
+    text-decoration:none;
 }
 
 ul#digits li a:hover, ul#digits li a:focus,
 ul#digits li input:hover, ul#digits li input:focus,
-#logincode:hover, #logincode:focus,
+#logincode[disabled='false']:hover, #logincode:focus,
 ul#users li a:hover, ul#users li a:focus,
 input.buttonok:hover, input.buttonok:active, input.buttonok:focus {
-  background:#eb8f00;
+    background:#eb8f00;
 }
 
 #code {
-  margin:auto;
-  text-align:center;
+    margin:auto;
+    text-align:center;
 }
 
 #logincode {
-  width:6em;
-  border-top:2px solid #666;
-  border-bottom:2px solid #666;
-  border-left:2px solid #666;
-  border-right:none;
-  background:#CCC;
-  font-size: 2.5em;
-  text-align:center;
-  -moz-border-radius: 0.8em 0 0 0.8em;
-  -webkit-border-radius: 0.8em 0 0 0.8em;
+    width:6em;
+    border-top:2px solid #666;
+    border-bottom:2px solid #666;
+    border-left:2px solid #666;
+    border-right:none;
+    background:#CCC;
+    font-size: 2.5em;
+    text-align:center;
+    -moz-border-radius: 0.8em 0 0 0.8em;
+    -webkit-border-radius: 0.8em 0 0 0.8em;
 }
 
 input.buttonok {
-  font-size: 2.5em;
-  border-top:2px solid #666;
-  border-bottom:2px solid #666;
-  border-right:2px solid #666;
-  border-left:none;
-  background-color:#9C0;
-  -moz-border-radius: 0 0.8em 0.8em 0;
-  -webkit-border-radius: 0 0.8em 0.8em 0;
-  color:#666;
+    font-size: 2.5em;
+    border-top:2px solid #666;
+    border-bottom:2px solid #666;
+    border-right:2px solid #666;
+    border-left:none;
+    background-color:#9C0;
+    -moz-border-radius: 0 0.8em 0.8em 0;
+    -webkit-border-radius: 0 0.8em 0.8em 0;
+    color:#666;
 }
 
 ul#users li a.selected {
-  background-color:#9C0;
+    background-color:#9C0;
 }
 
 ul#users img {

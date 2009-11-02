@@ -4,19 +4,27 @@
 /* Room icons */
 .icon64-room-default { background-image:url(../images/default_room_64.png);}
 .icon64-room-kitchen { background-image:url(../images/kitchen_64.png);}
-.icon64-room-livingroom { background-image:url(../images/sofa_white_64.png);}
+.icon64-room-bedroom { background-image:url(../images/bedroom_64.png);}
+.icon64-room-livingroom { background-image:url(../images/livingroom_64.png);}
+.icon64-room-livingroom2 { background-image:url(../images/livingroom2_64.png);}
 .icon64-room-tvlounge { background-image:url(../images/tvlounge_64.png);}
 .icon64-room-bathroom { background-image:url(../images/bathroom_64.png);}
 
 .icon32-room-default { background-image:url(../images/default_room_32.png);}
-.icon32-room-kitchen { background-image:url(../images/toaster_32.png);}
-.icon32-room-bedroom { background-image:url(../images/bed_32.png);}
-.icon32-room-livingroom { background-image:url(../images/sofa_white_32.png);}
+.icon32-room-kitchen { background-image:url(../images/kitchen_32.png);}
+.icon32-room-bedroom { background-image:url(../images/bedroom_32.png);}
+.icon32-room-livingroom { background-image:url(../images/livingroom_32.png);}
+.icon32-room-livingroom2 { background-image:url(../images/livingroom2_32.png);}
 .icon32-room-tvlounge { background-image:url(../images/tvlounge_32.png);}
+.icon32-room-bathroom { background-image:url(../images/default_room_32.png);}
 
-.icon16-room-bedroom { background-image:url(../images/bed_16.png);}
-.icon16-room-kitchen { background-image:url(../images/toaster_16.png);}
-.icon16-room-livingroom { background-image:url(../images/sofa_white_16.png);}
+.icon16-room-default { background-image:url(../images/default_room_16.png);}
+.icon16-room-kitchen { background-image:url(../images/kitchen_16.png);}
+.icon16-room-bedroom { background-image:url(../images/bedroom_16.png);}
+.icon16-room-livingroom { background-image:url(../images/livingroom_16.png);}
+.icon16-room-livingroom2 { background-image:url(../images/livingroom2_16.png);}
+.icon16-room-tvlounge { background-image:url(../images/default_room_16.png);}
+.icon16-room-bathroom { background-image:url(../images/default_room_16.png);}
 
 /* Area icons */
 .icon64-area-grndfloor { background-image:url(../images/rdc_white_64.png);}
@@ -59,6 +67,3 @@
 .icon16-status-airconditioningon { background-image:url(../images/clim_on_16.png);}
 .icon16-status-airconditioningoff { background-image:url(../images/clim_off_16.png);}
 .icon16-status-soundplaying { background-image:url(../images/room_sound_play.png);}
-
-/* Weather icons */
-.icon64-weather-clouds { background-image:url(../images/weather_clouds_64.png);}

@@ -22,15 +22,15 @@
 {% load i18n %}
 {% block js_script %}
 $(function(){
-  // Accordion
-  $("#nav2").accordion({ header: ".section", active:1});  
-  
-  // Add new form  
-   		var name = $("#name"),
+    // Accordion
+    $("#nav2").accordion({ header: ".section", active:1});  
+    
+    // Add new form  
+      		var name = $("#name"),
 			description = $("#description"),
 			address = $("#address"),
 			reference = $("#reference"),
-            allFields = $([]).add(name).add(description).add(reference),
+                        allFields = $([]).add(name).add(description).add(reference),
 
 			tips = $("#validateTips");
 
@@ -63,9 +63,9 @@ $(function(){
 					bValid = bValid && checkLength(name,"nom",1,80);
 					bValid = bValid && checkLength(address,"adresse",1,80);
 					bValid = bValid && checkLength(reference,"référence",1,80);
-                    				
+                                        				
 					if (bValid) {
-                    	// Submit form
+                                        	// Submit form
 						$(this).dialog('close');
 					}
 				},
@@ -87,13 +87,13 @@ $(function(){
 
 {% endblock %}
 {% block css %}
-<link href="/design/{{ user.skin_used|default:'skins/default' }}/css/ui-selectmenu.css" rel="stylesheet" type="text/css" />
-<link href="/design/{{ user.skin_used|default:'skins/default' }}/css/ui-elements.css" rel="stylesheet" type="text/css" />
-<link href="/design/{{ user.skin_used|default:'skins/default' }}/css/ui-buttons.css" rel="stylesheet" type="text/css" />
-<link href="/design/{{ user.skin_used|default:'skins/default' }}/css/ui-forms.css" rel="stylesheet" type="text/css" />
-<link href="/design/{{ user.skin_used|default:'skins/default' }}/css/ui-nav2.css" rel="stylesheet" type="text/css" />
-<link href="/design/{{ user.skin_used|default:'skins/default' }}/css/ui-tables.css" rel="stylesheet" type="text/css" />
-<link href="/design/{{ user.skin_used|default:'skins/default' }}/css/page-admin-organisation.css" rel="stylesheet" type="text/css" />
+<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-selectmenu.css" rel="stylesheet" type="text/css" />
+<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-elements.css" rel="stylesheet" type="text/css" />
+<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-buttons.css" rel="stylesheet" type="text/css" />
+<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-forms.css" rel="stylesheet" type="text/css" />
+<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-nav2.css" rel="stylesheet" type="text/css" />
+<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-tables.css" rel="stylesheet" type="text/css" />
+<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/page-admin-organisation.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block include_js_script %}
 <script type="text/javascript" src="/design/js/ui.selectmenu.js"></script>
@@ -103,114 +103,114 @@ $(function(){
 
 {% block right %}
 <div class="element-main">
-  <h1 class="element-ident"><span class="element-title">Organisations des dispositifs</span></h1>
-  <ul class="element-actions">
-    <li>
-      <button id="addnew" class="button">Ajouter nouveau</button>
-    </li>
-    <li><a href="#" class="button">Tout supprimer</a></li>
-  </ul>
-  <div id="addnewdialog" title="Ajouter nouveau dispositif">
-    <p id="validateTips">Tous les champs (sauf description) sont requis.</p>
-    <form>
-      <fieldset>
-        <label class="medium" for="name">Nom</label>
-        <input type="text" class="medium" id="name" name="name" />
-        <label class="medium" for="description">Description</label>
-        <textarea class="medium" id="description" name="description"></textarea>
-        <label class="medium" for="address">Adresse</label>
-        <input type="text" class="medium" id="address" name="address" />
-        <label class="medium" for="reference">Référence</label>
-        <input type="text" class="medium" id="reference" name="reference" />
-        <label class="medium" for="technology">Technologie</label>
-        <select class="medium" id="technology" name="technology">
-          
-          
-        {% regroup device_tech_list|dictsort:"type" by type as types_list %}
+    <h1 class="element-ident"><span class="element-title">Organisations des dispositifs</span></h1>
+    <ul class="element-actions">
+        <li>
+            <button id="addnew" class="button">Ajouter nouveau</button>
+        </li>
+        <li><a href="#" class="button">Tout supprimer</a></li>
+    </ul>
+    <div id="addnewdialog" title="Ajouter nouveau dispositif">
+        <p id="validateTips">Tous les champs (sauf description) sont requis.</p>
+        <form>
+            <fieldset>
+                <label class="medium" for="name">Nom</label>
+                <input type="text" class="medium" id="name" name="name" />
+                <label class="medium" for="description">Description</label>
+                <textarea class="medium" id="description" name="description"></textarea>
+                <label class="medium" for="address">Adresse</label>
+                <input type="text" class="medium" id="address" name="address" />
+                <label class="medium" for="reference">Référence</label>
+                <input type="text" class="medium" id="reference" name="reference" />
+                <label class="medium" for="technology">Technologie</label>
+                <select class="medium" id="technology" name="technology">
+                    
+                    
+                {% regroup device_tech_list|dictsort:"type" by type as types_list %}
 
 {% for type in types_list %}
-  
-          
-          <optgroup label="{{ type.grouper }}">
-    {% for technology in type.list %}
-      
-          
-          <option value="{{ technology.id }}">{{ technology.name }}</option>
-          
-          
-    {% endfor %}
-  </optgroup>
-          
-          
+    
+                    
+                    <optgroup label="{{ type.grouper }}">
+        {% for technology in type.list %}
+            
+                    
+                    <option value="{{ technology.id }}">{{ technology.name }}</option>
+                    
+                    
+        {% endfor %}
+    </optgroup>
+                    
+                    
 {% endfor %}
-        
-        
-        </select>
-        <label class="medium" for="category">Categorie</label>
-        <select class="medium" id="category" name="category">
-          
-          
-        {% for category in device_category_list %}
-        	
-          
-          <option value="{{ category.id }}">{{ category.name }}</option>
-          
-          
-          {% endfor %}
-        
-        
-        </select>
-      </fieldset>
-    </form>
-  </div>
+                
+                
+                </select>
+                <label class="medium" for="category">Categorie</label>
+                <select class="medium" id="category" name="category">
+                    
+                    
+                {% for category in device_category_list %}
+                	
+                    
+                    <option value="{{ category.id }}">{{ category.name }}</option>
+                    
+                    
+                    {% endfor %}
+                
+                
+                </select>
+            </fieldset>
+        </form>
+    </div>
 </div>
 <div class="nocolumns"> {% regroup devices_list|dictsort:"room" by room as rooms_list %}
-  {% for room in rooms_list %}
-  <div class="element">
-    <h2>{{ room.grouper.name }}</h2>
-    <table class="devices-list">
-      <thead>
-        <tr>
-          <th>Nom</th>
-          <th>Adresse</th>
-          <th>Référence</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Technologie</th>
-          <th>Catégorie</th>
-          <th>Pièce</th>
-          <th>Reinitialisable</th>
-          <th>Valeur initiale</th>
-          <th>Modifiable</th>
-          <th>Unitée</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-      
-      {% for device in room.list %}
-      <tr class="{% cycle odd,even %}">
-        <td>{{device.name}}</td>
-        <td>{{device.address}}</td>
-        <td>{{device.reference}}</td>
-        <td>{{device.type}}</td>
-        <td>{{device.description}}</td>
-        <td>{{device.technology.name}}</td>
-        <td>{{device.category.name}}</td>
-        <td>{{device.room.name}}</td>
-        <td>{{device.is_resetable}}</td>
-        <td>{{device.initial_value}}</td>
-        <td>{{device.is_value_changeable_by_user}}</td>
-        <td>{{device.unit_of_stored_values}}</td>
-        <td><ul class="actions">
-            <li><a href="#" class="buttonsmall">Effacer</a></li>
-            <li><a href="#" class="buttonsmall">Modifier</a></li>
-          </ul></td>
-      </tr>
-      {% endfor %}
-      </tbody>
-      
-    </table>
-  </div>
-  {% endfor %} </div>
+    {% for room in rooms_list %}
+    <div class="element">
+        <h2>{{ room.grouper.name }}</h2>
+        <table class="devices-list">
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Adresse</th>
+                    <th>Référence</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                    <th>Technologie</th>
+                    <th>Catégorie</th>
+                    <th>Pièce</th>
+                    <th>Reinitialisable</th>
+                    <th>Valeur initiale</th>
+                    <th>Modifiable</th>
+                    <th>Unitée</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            
+            {% for device in room.list %}
+            <tr class="{% cycle odd,even %}">
+                <td>{{device.name}}</td>
+                <td>{{device.address}}</td>
+                <td>{{device.reference}}</td>
+                <td>{{device.type}}</td>
+                <td>{{device.description}}</td>
+                <td>{{device.technology.name}}</td>
+                <td>{{device.category.name}}</td>
+                <td>{{device.room.name}}</td>
+                <td>{{device.is_resetable}}</td>
+                <td>{{device.initial_value}}</td>
+                <td>{{device.is_value_changeable_by_user}}</td>
+                <td>{{device.unit_of_stored_values}}</td>
+                <td><ul class="actions">
+                        <li><a href="#" class="buttonsmall">Effacer</a></li>
+                        <li><a href="#" class="buttonsmall">Modifier</a></li>
+                    </ul></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+            
+        </table>
+    </div>
+    {% endfor %} </div>
 {% endblock %}

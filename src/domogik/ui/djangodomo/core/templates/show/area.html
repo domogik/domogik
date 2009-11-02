@@ -1,0 +1,153 @@
+{% extends "base_with_view_menu.html" %}
+{% comment %}
+# Copyright 2008 Domogik project
+
+# This file is part of Domogik.
+# Domogik is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Domogik is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+
+# Author : Cédric Trévisan <cedric@domogik.org>
+{% endcomment %}
+
+{% load i18n %}
+{% block js_script %}
+$(function(){
+	// Accordion
+	$("#nav2").accordion({ header: ".section", active:1});
+
+   	$('select.heat-mode').selectmenu();
+
+	// Slider heat temperature
+	$("#slider-heat-temp1").slider({
+		range: false,
+		min: 10,
+		max: 25,
+		values: [18],
+		slide: function(event, ui) {
+			$("#value-heat-temp1").val(ui.values[0]);
+	}
+	});
+	$("#value-heat-temp1").val($("#slider-heat-temp1").slider("values", 0));
+
+	// Slider heat temperature
+	$("#slider-heat-temp2").slider({
+		range: false,
+		min: 10,
+		max: 25,
+		values: [18],
+		slide: function(event, ui) {
+			$("#value-heat-temp2").val(ui.values[0]);
+		}
+	});
+	$("#value-heat-temp2").val($("#slider-heat-temp2").slider("values", 0));
+
+	// Slider heat temperature
+	$("#slider-heat-temp3").slider({
+		range: false,
+		min: 10,
+		max: 25,
+		values: [18],
+		slide: function(event, ui) {
+			$("#value-heat-temp3").val(ui.values[0]);
+		}
+	});
+	$("#value-heat-temp3").val($("#slider-heat-temp3").slider("values", 0));
+
+});
+{% endblock %}
+
+{% block css %}
+	<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-nav2.css" rel="stylesheet" type="text/css" />
+	<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-elements.css" rel="stylesheet" type="text/css" />
+	<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-buttons.css" rel="stylesheet" type="text/css" />
+	<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-tables.css" rel="stylesheet" type="text/css" />
+	<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-selectmenu.css" rel="stylesheet" type="text/css" />
+	<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-element-heat.css" rel="stylesheet" type="text/css" />
+	<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-element-light.css" rel="stylesheet" type="text/css" />
+	<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/page-view-area.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+{% block include_js_script %}
+	<script type="text/javascript" src="/design/js/ui.selectmenu.js"></script>
+	<script type="text/javascript" src="/design/js/page-view.js"></script>
+{% endblock %}
+{% block title %}{% trans page_title %}{% endblock %}
+
+{% block right %}
+    <div class="element-main">
+        <div class="element-icon icon64-area-grndfloor">
+			<h1 class="element-ident"><span class="element-title">Rez-de-chaussée</span><br />
+				<span class="element-subtitle">Salon TV, S&eacute;jour, Cuisine</span></h1>
+            <ul class="zone-temps">
+            	<li class="icon32-room-default">Salon TV<span>19°C</span></li>
+            	<li class="icon32-room-livingroom">S&eacute;jour<span>18°C</span></li>
+            	<li class="icon32-room-kitchen">Cuisine<span>20°C</span></li>
+            </ul>
+        </div>
+    </div>
+    <div class="nocolumns">
+        <div class="element">
+			<h2>Lumières</h2>
+			<div class="parameter"><span class="label">Salon TV :</span> <span class="device-status-on icon16-status-lighton">On</span> <a href="#" class="button off">Eteindre</a></div>
+			<div class="parameter"><span class="label">S&eacute;jour :</span> <span class="device-status-off icon16-status-lightoff">Off</span> <a href="#" class="button on">Allumer</a></div>
+			<div class="parameter"><span class="label">Cuisine :</span> <span class="device-status-on icon16-status-lighton">On</span> <a href="#" class="button off">Eteindre</a></div>
+        </div>
+        <div class="element">
+			<h2>Chauffage</h2>
+			<div class="parameter"><span class="label">Salon TV Mode :</span>
+				<select class="heat-mode" id="heat-mode1" name="heat-mode1" title="Mode Chauffage">
+					<option value="0">Hors-Gel</option>
+					<option value="1">Nuit</option>
+					<option value="2">Veille</option>
+					<option value="3">Confort</option>
+				</select>
+			</div>
+			<div class="parameter">
+			    <label for="value-heat-temp1" class="label">Consigne Temp&egrave;rature Salon TV:</label>
+			    <input type="text" class="value-heat-temp" id="value-heat-temp1" title="Température en °C"/>&deg;C
+			    <div class="slider-heat-temp" id="slider-heat-temp1"></div>
+			</div> 
+			<div class="parameter"><span class="label">S&eacute;jour Mode :</span>
+				<select class="heat-mode" id="heat-mode2" name="heat-mode2" title="Mode Chauffage">
+					<option value="0">Hors-Gel</option>
+					<option value="1">Nuit</option>
+					<option value="2">Veille</option>
+					<option value="3">Confort</option>
+				</select>
+			</div>
+			<div class="parameter">
+				<label for="value-heat-temp2" class="label">Consigne Temp&egrave;rature S&eacute;jour:</label>
+				<input type="text" class="value-heat-temp" id="value-heat-temp2" title="Température en °C"/>&deg;C
+				<div class="slider-heat-temp" id="slider-heat-temp2"></div>
+			</div>
+            <div class="parameter"><span class="label">Cuisine Mode :</span>
+				<select class="heat-mode" id="heat-mode3" name="heat-mode3" title="Mode Chauffage">
+					<option value="0">Hors-Gel</option>
+					<option value="1">Nuit</option>
+					<option value="2">Veille</option>
+					<option value="3">Confort</option>
+				</select>
+			</div>
+			<div class="parameter">
+				<label for="value-heat-temp3" class="label">Consigne Temp&egrave;rature Cuisine:</label>
+				<input type="text" class="value-heat-temp" id="value-heat-temp3" title="Température en °C"/>&deg;C
+				<div class="slider-heat-temp" id="slider-heat-temp3"></div>
+			</div> 
+        </div>
+        <div class="element">
+			<h2>Volets</h2>
+			<div class="parameter"><span class="label">Salon TV :</span> <span class="device-status-off icon16-status-shutterdown">Fermés</span> <a href="#" class="button">Ouvrir</a></div>
+			<div class="parameter"><span class="label">S&eacute;jour :</span> <span class="device-status-off icon16-status-shutterdown">Fermés</span> <a href="#" class="button">Ouvrir</a></div>
+			<div class="parameter"><span class="label">Cuisine :</span> <span class="device-status-off icon16-status-shutterdown">Fermés</span> <a href="#" class="button">Ouvrir</a></div>
+        </div>
+    </div>
+{% endblock %}

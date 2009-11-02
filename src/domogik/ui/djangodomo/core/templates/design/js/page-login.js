@@ -2,12 +2,17 @@ $(function(){
   $("#loginname").addClass("hidden");
   $("#loginname").val('');
   $("#logincode").val('');
+  $("#logincode").attr('disabled', true);
+  $("#digits").hide();
 });
 
 function chooseUser(id, name) {
   $("#loginname").val(name);
   $("#users li a").removeClass('selected');
   $("#"+id).addClass('selected');
+  $("#logincode").attr('disabled', false);
+  $("#digits").slideDown();
+  $("#logincode").focus();
 }
 
 function addDigit(digit) {

@@ -64,10 +64,10 @@ from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 from domogik.common.configloader import Loader
 from domogik.common.sql_schema import Area, Device, DeviceCategory, DeviceConfig, \
                                       DeviceStats, DeviceStatsValue, DeviceTechnology, DeviceTechnologyConfig, \
-                                      Room, UserAccount, SystemAccount, SystemConfig, \
+                                      ItemUIConfig, Room, UserAccount, SystemAccount, SystemConfig, \
                                       SystemStats, SystemStatsValue, Trigger
 from domogik.common.sql_schema import DEVICE_TECHNOLOGY_LIST, DEVICE_TECHNOLOGY_TYPE_LIST, \
-                                      DEVICE_TYPE_LIST, UNIT_OF_STORED_VALUE_LIST
+                                      DEVICE_TYPE_LIST, ITEM_TYPE_LIST, UNIT_OF_STORED_VALUE_LIST
 
 
 class DbHelperException(Exception):
@@ -152,18 +152,22 @@ class DbHelper():
             area_list = area_list.filter(filter_arg)
 
         return area_list.all()
-        
+
+    def get_area_by_id(self, area_id):
+        """
+        Fetch area information
+        @param area_id : The area id
+        @return an area object
+        """
+        return self._session.query(Area).filter_by(id=area_id).first()
+
     def get_area_by_name(self, area_name):
         """
         Fetch area information
-        @param area : The area name
+        @param area_name : The area name
         @return an area object
         """
-        area = self._session.query(Area).filter_by(name=area_name).first()
-        if area:
-            return area
-        else:
-            return None
+        return self._session.query(Area).filter_by(name=area_name).first()
 
     def add_area(self, a_name, a_description=None):
         """
@@ -188,6 +192,7 @@ class DbHelper():
         if area:
             for room in self._session.query(Room).filter_by(area_id=area_del_id).all():
                 self.del_room(room.id)
+            self.delete_all_item_ui_config(area.id, 'area')
             self._session.delete(area)
             self._session.commit()
 
@@ -222,11 +227,15 @@ class DbHelper():
         @param r_name : The room name
         @return a room object 
         """
-        room = self._session.query(Room).filter_by(name=r_name).first()
-        if room:
-            return room
-        else:
-            return None
+        return self._session.query(Room).filter_by(name=r_name).first()
+
+    def get_room_by_id(self, r_id):
+        """
+        Return information about a room
+        @param r_id : The room id
+        @return a room object 
+        """
+        return self._session.query(Room).filter_by(id=r_id).first()
 
     def add_room(self, r_name, r_area_id, r_description=None):
         """
@@ -256,6 +265,7 @@ class DbHelper():
         if room:
             for device in self._session.query(Device).filter_by(room_id=r_id).all():
                 self.del_device(device.id)
+            self.delete_all_item_ui_config(room.id, 'room')
             self._session.delete(room)
             self._session.commit()
 
@@ -635,7 +645,7 @@ class DbHelper():
                                           .filter_by(device_stats_id=device_stats.id).all():
                 self._session.delete(device_stats_value)
             self._session.delete(device_stats)
-
+        self.delete_all_item_ui_config(device.id, 'device')
         self._session.delete(device)
         self._session.commit()
 
@@ -870,7 +880,7 @@ class DbHelper():
         Add a default system account (login = admin, password = domogik, is_admin = True)
         @return a SystemAccount object
         """
-        return self.add_system_account(a_login='admin', a_password='12345', a_is_admin=True)
+        return self.add_system_account(a_login='admin', a_password='123', a_is_admin=True)
 
     def del_system_account(self, a_id):
         """
@@ -1012,6 +1022,127 @@ class DbHelper():
             self._session.delete(system_stat)
         self._session.commit()
 
+
+###
+# ItemUIConfig
+###
+
+    def add_item_ui_config(self, i_item_id, i_item_type, **i_parameters):
+        """
+        Add a UI parameter for an item
+        @param i_item_id : id of the item we want to bind a parameter
+        @param i_item_type : the item type (area, room, device) to add a configuration parameter
+        @param **i_parameters : named parameters to add (key1=value1, key2=value2,...)
+        """
+        item_ui_config = None
+        if i_item_type not in ITEM_TYPE_LIST:
+            raise DbHelperException("Unknown item type '%s', should be one of : %s" \
+                                    % (i_item_type, ITEM_TYPE_LIST))
+        item = None
+        if i_item_type == 'device':
+            item = self.get_device(i_item_id)
+        elif i_item_type == 'area':
+            item = self.get_area_by_id(i_item_id)
+        elif i_item_type == 'room':
+            item = self.get_room_by_id(i_item_id)
+
+        if item is None:
+            raise DbHelperException("Can't find this item  (%s,%s)" % (i_item_id, i_item_type))
+
+        for param in i_parameters:
+            item_ui_config = ItemUIConfig(item_id=i_item_id, item_type=i_item_type, 
+                                          key=param, value=i_parameters[param])
+            self._session.add(item_ui_config)
+            self._session.commit()
+
+    def update_item_ui_config(self, i_item_id, i_item_type, i_key, i_value):
+        """
+        Update a UI parameter of an item
+        @param i_item_id : id of the item we want to update the parameter
+        @param i_item_type : type of the item (area, room, device)
+        @param i_key : key we want to update
+        @param i_value : key value
+        @return : the updated ItemUIConfig item
+        """
+        if i_item_type not in ITEM_TYPE_LIST:
+            raise DbHelperException("Unknown item type '%s', should be one of : %s" \
+                                    % (i_item_type, ITEM_TYPE_LIST))
+        item_ui_config = self._session.query(ItemUIConfig)\
+                                      .filter_by(item_id=i_item_id, item_type=i_item_type, key=i_key).first()
+        if item_ui_config is None:
+            raise DbHelperException("Can't find item (%s,%s) with key '%s' : can't update it" \
+                                    % (i_item_id, i_item_key, i_key))
+        item_ui_config.value = i_value
+        self._session.add(item_ui_config)
+        self._session.commit()
+        return item_ui_config
+
+    def get_item_ui_config(self, i_item_id, i_item_type, i_key):
+        """
+        Get a UI parameter of an item
+        @param i_item_id : id of the item we want to update the parameter
+        @param i_item_type : type of the item (area, room, device)
+        @param i_key : key we want to get the value
+        """
+        if i_item_type not in ITEM_TYPE_LIST:
+            raise DbHelperException("Unknown item type '%s', should be one of : %s" \
+                                    % (i_item_type, ITEM_TYPE_LIST))
+        item_ui_config = self._session.query(ItemUIConfig)\
+                                      .filter_by(item_id=i_item_id, item_type=i_item_type, key=i_key).first()
+        if item_ui_config is None:
+            raise DbHelperException("Can't find item (%s,%s) with key '%s'" \
+                                    % (i_item_id, i_item_type, i_key))
+        return item_ui_config
+
+    def list_item_ui_config(self, i_item_id, i_item_type):
+        """
+        List all UI parameters of an item
+        @param i_item_id : if of the item we want to list the parameters
+        @param i_item_type : type of the item (area, room, device)
+        @return a dictionnary containing all the (key, value) tuples
+        """
+        if i_item_type not in ITEM_TYPE_LIST:
+            raise DbHelperException("Unknown item type '%s', should be one of : %s" \
+                                    % (i_item_type, ITEM_TYPE_LIST))
+        item_ui_config_list = self._session.query(ItemUIConfig)\
+                                           .filter_by(item_id=i_item_id, item_type=i_item_type).all()
+        param_list = {}
+        for item in item_ui_config_list:
+            param_list[item.key] = item.value
+        return param_list
+
+    def delete_item_ui_config(self, i_item_id, i_item_type, i_key):
+        """
+        Delete a UI parameter of an item
+        @param i_item_id : id of the item we want to delete its parameter
+        @param i_item_type : type of the item (area, room, device)
+        @param i_key : key corresponding to the parameter name we want to delete
+        """
+        if i_item_type not in ITEM_TYPE_LIST:
+            raise DbHelperException("Unknown item type '%s', should be one of : %s" \
+                                    % (i_item_type, ITEM_TYPE_LIST))
+        item_ui_config = self._session.query(ItemUIConfig)\
+                                      .filter_by(item_id=i_item_id, item_type=i_item_type, key=i_key).first()
+        if item_ui_config is None:
+            raise DbHelperException("Can't find item (%s,%s) with key '%s'" \
+                                    % (i_item_id, i_tem_key, i_key))
+        self._session.delete(item_ui_config)
+        self._session.commit()
+
+    def delete_all_item_ui_config(self, i_item_id, i_item_type):
+        """
+        Delete all UI parameter of an item
+        @param i_item_id : id of the item we want to delete its parameter
+        @param i_item_type : type of the item (area, room, device)
+        """
+        if i_item_type not in ITEM_TYPE_LIST:
+            raise DbHelperException("Unknown item type '%s', should be one of : %s" \
+                                    % (i_item_type, ITEM_TYPE_LIST))
+        item_ui_config_list = self._session.query(ItemUIConfig)\
+                                           .filter_by(item_id=i_item_id, item_type=i_item_type).all()
+        for item_ui_config in item_ui_config_list:
+            self._session.delete(item_ui_config)
+            self._session.commit()
 ###
 # SystemConfig
 ###

@@ -22,10 +22,10 @@
 {% load i18n %}
 
 {% block nav1 %}
-  <ul id="nav1">
-    <li><a href="show/index.html">Visualisation</a></li>
-    <li><a href="program/index.html">Programmation</a></li>
-    <li><a href="{% url admin_view %}">Administration</a></li>
-    <li class="login"> {% if not is_user_connected %} <a href="{% url login_view %}">{% trans "Log in" %}</a> {% else %} <a href="{% url logout_view %}">{% trans "Log out" %} {{ user.first_name }}</a> {% endif %} </li>
-  </ul>
+    <ul id="nav1">
+        <li><a href="{% url show_view %}">Visualisation</a></li>
+        <li><a href="#">Programmation</a></li>
+        <li><a href="{% url admin_view %}">Administration</a></li>
+        <li class="login"> {% if not is_user_connected %} <a href="{% url login_view %}">{% trans "Log in" %}</a> {% else %} <a href="{% url logout_view %}">{% trans "Log out" %} {{ request.session.user.first_name }}</a> {% endif %} </li>
+    </ul>
 {% endblock %}

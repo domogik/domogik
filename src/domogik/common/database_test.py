@@ -42,7 +42,7 @@ import datetime
 from domogik.common.database import DbHelper, DbHelperException
 from domogik.common.sql_schema import Area, Device, DeviceCategory, DeviceConfig, \
                                       DeviceStats, DeviceStatsValue, DeviceTechnology, DeviceTechnologyConfig, \
-                                      Room, UserAccount, SystemAccount, SystemConfig, \
+                                      ItemUIConfig, Room, UserAccount, SystemAccount, SystemConfig, \
                                       SystemStats, SystemStatsValue, Trigger
 
 def print_title(title):
@@ -129,6 +129,14 @@ def remove_all_device_stats(db):
     """
     for device in db.list_devices():
         db.del_all_device_stats(device.id)
+
+def remove_all_item_ui_config(db):
+    """
+    Remove all ui configuration parameters of all items (area, room, device)
+    @param db : db API instance
+    """
+    for iuc in db._session.query(ItemUIConfig).all():
+        db._session.delete(iuc)
 
 if __name__ == "__main__":
     print_test('*********** Starting tests ***********')
@@ -501,6 +509,43 @@ if __name__ == "__main__":
     assert len(d.list_system_stats()) == 0, "System statistics should be empty, but it is NOT"
     ssv = d._session.query(SystemStatsValue).all()
     assert len(ssv) == 0, "System statistic values should be empty, but it is NOT"
+
+    ### ItemUiConfig
+    print_title("Item UI config")
+    print_test("add_item_ui_config")
+    remove_all_item_ui_config(d)
+    area1 = d.add_area('area1','description 1')
+    room1 = d.add_room('room1', area1.id)
+    d.add_item_ui_config(area1.id, 'area', param_a1='value_a1', param_a2='value_a2')
+    d.add_item_ui_config(room1.id, 'room', param_r1='value_r1', param_r2='value_r2')
+    value_dict = d.list_item_ui_config(room1.id, 'room')
+    assert value_dict == {'param_r1': 'value_r1', 'param_r2': 'value_r2'}, "Wrong dictionnary returned : %s" % value_dict
+    uic = d.get_item_ui_config(room1.id, 'room', 'param_r2')
+    assert uic.value == 'value_r2', "item should have the value 'value_r2' but it has %s" % uic.value
+    uic = d.get_item_ui_config(area1.id, 'area', 'param_a1')
+    assert uic.value == 'value_a1', "item should have the value 'value_a1' but it has %s" % uic.value
+    error = False
+    try:
+        d.get_item_ui_config(area1.id, 'foo', 'param_a1')
+    except DbHelperException:
+        error = True
+    assert error is True, "Shouldn't have found any param values for (%s, %s)" % (area1.id, 'foo')
+    try:
+        d.add_item_ui_config(800000000, 'area', param_a1='value_a1', param_a2='value_a2')
+    except DbHelperException:
+        error = True
+    assert error is True, "Shouldn't have been able to add parameters with this item.id which doesn't exist"
+    uic = d.update_item_ui_config(area1.id, 'area', 'param_a1', 'new_value_a1')
+    uic = d.get_item_ui_config(area1.id, 'area', 'param_a1')
+    assert uic.value == 'new_value_a1', "Parameter should have the value '%s' but it has '%s'" \
+                        % ('new_value_a1', uic.value)
+    d.add_item_ui_config(area1.id, 'area', param_a3='value_a3')
+    uic = d.get_item_ui_config(area1.id, 'area', 'param_a3')
+    d.delete_item_ui_config(area1.id, 'area', 'param_a3')
+    assert 'param_a1' in d.list_item_ui_config(area1.id, 'area').keys(), "param_a1 should have been found"
+    assert 'param_a3' not in d.list_item_ui_config(area1.id, 'area').keys(), "param_a3 should NOT have been found"
+    d.delete_all_item_ui_config(area1.id, 'area')
+    assert len(d.list_item_ui_config(area1.id, 'area')) == 0, "No parameter should have been found"
 
     ### System config
     print_title("System config")

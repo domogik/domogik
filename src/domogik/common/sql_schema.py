@@ -59,6 +59,7 @@ UNIT_OF_STORED_VALUE_LIST = [u'Volt', u'Celsius', u'Farenheit', u'Percent', u'Bo
 DEVICE_TECHNOLOGY_LIST = [u'x10',u'1wire',u'PLCBus',u'RFXCom',u'IR',u'EIB/KNX']
 DEVICE_TECHNOLOGY_TYPE_LIST = [u'cpl', u'wired', u'wifi', u'wireless', u'ir']
 DEVICE_TYPE_LIST = [u'appliance', u'lamp', u'music', u'sensor']
+ITEM_TYPE_LIST = [u'area', u'room', u'device'] 
 
 Base = declarative_base()
 metadata = Base.metadata
@@ -704,6 +705,47 @@ class SystemStatsValue(Base):
         @return table name
         """
         return SystemStatsValue.__tablename__
+
+
+class ItemUIConfig(Base):
+    """
+    UI configuration parameters for items (area, room, device) such as class name for icons
+    """
+    __tablename__ = '%s_item_ui_config' % _db_prefix
+
+    item_id = Column(Integer, primary_key=True)
+    item_type = Column(Enum(ITEM_TYPE_LIST), nullable=False, primary_key=True)
+    key = Column(String(30), nullable=False, primary_key=True)
+    value = Column(String(30), nullable=False)
+
+    def __init__(self, item_id, item_type, key, value):
+        """
+        Class constructor
+        @param item_id : reference to the item id (area id, room id or device_id)
+        @param item_type : area, room, device
+        @param key : key
+        @param value : associated value
+        """
+        self.item_id = item_id
+        self.item_type = item_type
+        self.key = key
+        self.value = value
+
+    def __repr__(self):
+        """
+        Print an internal representation of the class
+        @return an internal representation
+        """
+        return "<ItemUIConfig(id=%s, item_type='%s', key='%s', value='%s')>" \
+                % (self.item_id, self.item_type, self.key, self.value)
+
+    @staticmethod
+    def get_tablename():
+        """
+        Return the table name associated to the class
+        @return table name
+        """
+        return ItemUIConfig.__tablename__
 
 
 class SystemConfig(Base):
