@@ -52,16 +52,13 @@ class CallerIdModemManager(xPLModule):
         """ Init module
         """
         xPLModule.__init__(self, name='cidmodem')
-        self._myxpl = Manager()
-        """ Get config
-            - serial port
-        """
+        # Get config
+        #   - serial port
         self._config = Query(self._myxpl)
         res = xPLResult()
         self._config.query('calleridmodem', 'device', res)
         device = res.get_value()['device']
-        """ Call Library
-        """
+        # Call Library
         self._mycalleridmodem  = CallerIdModem(device, self._broadcastframe)
         self._mycalleridmodem.start()
 
