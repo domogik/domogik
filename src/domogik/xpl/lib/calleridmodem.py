@@ -93,12 +93,10 @@ class CallerIdModem:
                 self._ser.close()
 
         def run(self):
-            """ Configure caller id mode
-            """
+            # Configure caller id mode
             self._log.debug("Set modem to caller id mode : AT#CID=1")
             self._ser.write("AT#CID=1\r\n")
-            """ listen to modem
-            """
+            # listen to modem
             self._log.debug("Start listening modem")
             while not self._lock.isSet():
                 resp=self._ser.readline()
@@ -113,8 +111,7 @@ class CallerIdModem:
 
 ###Exemple
 def cb(data):
-    """ Print a data 
-    """
+    # Print a data 
     print "DATA : %s" % data
 
 if __name__ == "__main__":
