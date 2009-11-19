@@ -157,6 +157,10 @@ class DBConnector(xPLModule):
                 'global': {'pid-dir-path': '/tmp/'},
                 'onewire': {'temperature_refresh_delay' : '10'},
                 'calleridmodem': {'device' : '/dev/ttyUSB1'},
+                'mirror': {'device' : '/dev/hidraw0',
+                           'nbmaxtry' : '10',
+                           'interval' : '15'},
+                'xbmc': {'ip_port' : '192.168.0.20:8080'},
                 'teleinfo' : {'device' : '/dev/ttyUSB0',
                     'interval' : '30'},
                 }
