@@ -44,12 +44,15 @@ class CallerIdModem:
     """ Look for incoming calls with a modem
     """
 
-    def __init__(self, serial_port, callback):
+    def __init__(self, serial_port, nbmaxtry, interval, callback):
         """ @param serial_port : The full path or number of the device where modem is connected
+        @param nbmaxtry : number max of tries to open modem
+        @param interval : delay between each try to open modem
         @param callback : method to call each time all data are collected
         """
         self._stop = threading.Event()
-        self._thread = self.__CallerIdModemHandler(serial_port, callback, self._stop)
+        self._thread = self.__CallerIdModemHandler(serial_port, int(nbmaxtry), \
+                                                   float(interval), callback, self._stop)
 
     def start(self):
         """ Start the caller id handler thread 
@@ -66,8 +69,8 @@ class CallerIdModem:
         """ Internal class 
         Read data on serial port
         """
-    
-        def __init__(self, serial_port, callback, lock):
+
+        def __init__(self, serial_port, nbMaxTry, interval, callback, lock):
 
             # logging initialization
             l = logger.Logger('CallerIdModem')
@@ -76,12 +79,20 @@ class CallerIdModem:
             self._log.debug("cidmodem initialisation...")
             self._lock = lock
             self._cb = callback 
-            self._log.debug("- open " + serial_port)
-            try:
-                self._ser = serial.Serial(serial_port, 19200, timeout=1)
-            except:
-                self._log.error("Error while opening " + serial_port)
-                return
+            self._deviceNotOpen = 1
+            nbTry = 0
+            while self._deviceNotOpen and nbTry < nbMaxTry:
+                self._log.debug("- open " + serial_port)
+                try:
+                    self._ser = serial.Serial(serial_port, 19200, timeout=1)
+                    self._deviceNotOpen = 0
+                    self._log.debug("- Modem open")
+                except:
+                    self._log.error("- error while opening " + serial_port + \
+                                    "(" + str(nbTry+1) + "/" + str(nbMaxTry) + "). Next try in 15s")
+                    # device is not connected : we wait for 15s before next try
+                    time.sleep(interval)
+                    nbTry = nbTry + 1
 
             # Initialize thread 
             threading.Thread.__init__(self)
@@ -93,18 +104,22 @@ class CallerIdModem:
                 self._ser.close()
 
         def run(self):
-            # Configure caller id mode
-            self._log.debug("Set modem to caller id mode : AT#CID=1")
-            self._ser.write("AT#CID=1\r\n")
-            # listen to modem
-            self._log.debug("Start listening modem")
-            while not self._lock.isSet():
-                resp=self._ser.readline()
-                if "NMBR" in resp:
-                    # we get the third string's item (separator : blank)
-                    f = lambda s,d=' ': s.split(d)[2].strip()
-                    self._log.debug("Incoming call from " + f(resp))
-                    self._cb(f(resp))
+            if self._deviceNotOpen == 0:
+                self._log.info("Start managing modem")
+                # Configure caller id mode
+                self._log.debug("Set modem to caller id mode : AT#CID=1")
+                self._ser.write("AT#CID=1\r\n")
+                # listen to modem
+                self._log.debug("Start listening modem")
+                while not self._lock.isSet():
+                    resp=self._ser.readline()
+                    if "NMBR" in resp:
+                        # we get the third string's item (separator : blank)
+                        f = lambda s,d=' ': s.split(d)[2].strip()
+                        self._log.debug("Incoming call from " + f(resp))
+                        self._cb(f(resp))
+            else:
+                self._log.error("No Modem detected")
 
 
 

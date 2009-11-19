@@ -58,8 +58,16 @@ class CallerIdModemManager(xPLModule):
         res = xPLResult()
         self._config.query('calleridmodem', 'device', res)
         device = res.get_value()['device']
+        self._config = Query(self._myxpl)
+        res = xPLResult()
+        self._config.query('calleridmodem', 'interval', res)
+        interval = res.get_value()['interval']
+        self._config = Query(self._myxpl)
+        res = xPLResult()
+        self._config.query('calleridmodem', 'nbmaxtry', res)
+        nbmaxtry = res.get_value()['nbmaxtry']
         # Call Library
-        self._mycalleridmodem  = CallerIdModem(device, self._broadcastframe)
+        self._mycalleridmodem  = CallerIdModem(device, nbmaxtry, interval, self._broadcastframe)
         self._mycalleridmodem.start()
 
     def _broadcastframe(self, data):
