@@ -116,7 +116,7 @@ class DBConnector(xPLModule):
         mess = XplMessage()
         mess.set_type('xpl-stat')
         mess.set_schema('domogik.config')
-#        mess.add_data({'technology' :  technology})
+        mess.add_data({'technology' :  technology})
         if element:
             mess.add_data({'element' :  element})
         #If key/value are lists, then we add a key=value for each item
