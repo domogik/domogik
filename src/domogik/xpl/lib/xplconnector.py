@@ -280,6 +280,7 @@ class Listener:
         and to call the callback function if it does
         """
         ok = True
+        print "new message %s" % message
         for key in self._filter:
             if key in message.data:
                 if (message.data[key] != self._filter[key]):
@@ -287,11 +288,11 @@ class Listener:
             elif key == "schema":
                 ok = ok and (self._filter[key] == message.schema)
 
-            elif key == "type":
+            elif key == "xpltype":
                 ok = ok and (self._filter[key] == message.type)
 
             elif not (key in message.data or key in (
-                    "type", "schema")):
+                    "xpltype", "schema")):
                 ok = False
         #The message match the filter, we can call  the callback function
         if ok:

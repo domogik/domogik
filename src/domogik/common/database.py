@@ -138,7 +138,7 @@ class DbHelper():
         """
         return self._session.query(Area).all()
 
-    def search_areas(self, **filters):
+    def search_areas(self, filters):
         """
         Look for area(s) with filter on their attributes
         @param filters :  filter fields can be one of 
@@ -206,7 +206,7 @@ class DbHelper():
         """
         return self._session.query(Room).all()
 
-    def search_rooms(self, **filters):
+    def search_rooms(self, filters):
         """
         Look for room(s) with filter on their attributes
         @param filters :  filter fields can be one of 
@@ -389,12 +389,13 @@ class DbHelper():
                                                           .filter_by(key=dtc_key)\
                                                           .first()
 
-    def add_device_technology_config(self, dt_id, dtc_key, dtc_value):
+    def add_device_technology_config(self, dt_id, dtc_key, dtc_value, dtc_description):
         """
         Add a device's technology config item
         @param dt_id : the device technology id
         @param dtc_key : The device technology config key
         @param dtc_value : The device technology config value
+        @param dtc_description : The device technology config description
         @return the new DeviceTechnologyConfig item
         """
         try: 
@@ -404,7 +405,7 @@ class DbHelper():
                             It does not exist" % dt_id)
         if self.get_device_technology_config(dt_id, dtc_key):
             raise DbHelperException("This key '%s' already exists for device technology %s" % (dtc_key, dt_id))
-        dtc = DeviceTechnologyConfig(technology_id=dt_id, key=dtc_key, value=dtc_value)
+        dtc = DeviceTechnologyConfig(technology_id=dt_id, key=dtc_key, value=dtc_value, description=dtc_description)
         self._session.add(dtc)
         self._session.commit()
         return dtc
@@ -428,7 +429,7 @@ class DbHelper():
         """
         return self._session.query(Device).all()
 
-    def search_devices(self, **filters):
+    def search_devices(self, filters):
         """
         Look for device(s) with filter on their attributes
         @param filters :  filter fields can be one of id, address, type, room, initial_value, 
