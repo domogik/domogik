@@ -232,7 +232,7 @@ class StatsManager(xPLModule):
             @param res : The result of xml parsing
             """
             self._res = res
-            params = {'schema':res["schema"], 'xpltype':res["xpltype"]}
+            params = {'schema':res["schema"], 'type':res["xpltype"]}
             params.update(res["filter"])
             self._listener = Listener(self._callback, xpl, params)
 

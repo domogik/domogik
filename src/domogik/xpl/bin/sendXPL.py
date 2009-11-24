@@ -82,10 +82,10 @@ class Sender(xPLModule):
             self.usage()
             exit(1)
 
-        if self._args[1] not in self.supported_schemas:
-            self._log.error("Schema %s not supported" % self._args[0])
-            self.usage()
-            exit(2)
+       # if self._args[1] not in self.supported_schemas:
+       #     self._log.error("Schema %s not supported" % self._args[0])
+       #     self.usage()
+       #     exit(2)
 
     def forge_message(self):
         '''
