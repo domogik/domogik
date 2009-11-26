@@ -162,7 +162,7 @@ class DBConnector(xPLModule):
                 'mirror': {'device' : '/dev/hidraw0',
                            'nbmaxtry' : '10',
                            'interval' : '15'},
-                'xbmc': {'ip_port' : '192.168.0.20:8080'},
+                'xbmc': {'address' : '192.168.0.20:8080'},
                 'teleinfo' : {'device' : '/dev/ttyUSB0',
                     'interval' : '30'},
                 }

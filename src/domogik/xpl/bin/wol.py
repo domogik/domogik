@@ -50,13 +50,13 @@ class WOLListener(xPLModule):
         Create lister for wake on lan
         '''
         xPLModule.__init__(self, name = 'wol')
-        # Create listeners
-        Listener(self.wol_cb, self._myxpl, {'schema': 'control.basic',
-                'xpltype': 'xpl-cmnd'})
         # Create logger
         self._log.debug("Listener for wake on lan created")
         # Create WOL object
         self._wolmanager = WOL()
+        # Create listeners
+        Listener(self.wol_cb, self._myxpl, {'schema': 'control.basic',
+                'xpltype': 'xpl-cmnd'})
 
     def wol_cb(self, message):
         '''
