@@ -226,14 +226,14 @@ if __name__ == "__main__":
     print_title('test device technology config')
     remove_all_device_technology_config(d)
     print_test('add device technology config')
-    dtc1_1 = d.add_device_technology_config(dt1.id, 'key1_1', 'val1_1')
-    dtc1_2 = d.add_device_technology_config(dt1.id, 'key1_2', 'val1_2')
-    dtc3_1 = d.add_device_technology_config(dt3.id, 'key3_1', 'val3_1')
-    dtc3_2 = d.add_device_technology_config(dt3.id, 'key3_2', 'val3_2')
-    dtc3_3 = d.add_device_technology_config(dt3.id, 'key3_3', 'val3_3')
+    dtc1_1 = d.add_device_technology_config(dt1.id, 'key1_1', 'val1_1', 'descr1_1')
+    dtc1_2 = d.add_device_technology_config(dt1.id, 'key1_2', 'val1_2', 'descr1_2')
+    dtc3_1 = d.add_device_technology_config(dt3.id, 'key3_1', 'val3_1', 'descr3_1')
+    dtc3_2 = d.add_device_technology_config(dt3.id, 'key3_2', 'val3_2', 'descr3_2')
+    dtc3_3 = d.add_device_technology_config(dt3.id, 'key3_3', 'val3_3', 'descr3_3')
     try:
         duplicate_key = False
-        dtc = d.add_device_technology_config(dt3.id, 'key3_3', 'val3_3')
+        dtc = d.add_device_technology_config(dt3.id, 'key3_3', 'val3_3', 'descr3_3')
         duplicate_key = True
     except DbHelperException:
         pass
@@ -295,11 +295,11 @@ if __name__ == "__main__":
     assert len(d.get_all_devices_of_area(area2.id)) == 1, \
               "Area id %s should have 1 device but has %s" % (area2.id, len(d.get_all_devices_of_area(area2.id)))
     print_test("search_devices")
-    nb_of_dev = len(d.search_devices(category_id = dc1.id, room_id = room1.id))
+    nb_of_dev = len(d.search_devices({'category_id': dc1.id, 'room_id': room1.id}))
     assert nb_of_dev == 2, "Should have found 2 devices, but found %s" % nb_of_dev
-    nb_of_dev = len(d.search_devices(address = 'A2'))
+    nb_of_dev = len(d.search_devices({'address': 'A2'}))
     assert nb_of_dev == 1, "Should have found 1 device, but found %s" % nb_of_dev
-    nb_of_dev = len(d.search_devices(address = 'A1544'))
+    nb_of_dev = len(d.search_devices({'address': 'A1544'}))
     assert nb_of_dev == 0, "Should have found 0 device, but found %s" % nb_of_dev
     print_test("find_devices")
     device_list = d.find_devices(None, None)

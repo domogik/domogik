@@ -271,12 +271,13 @@ class DeviceTechnologyConfig(Base):
     value = Column(String(80), nullable=False)
     description = Column(String(255), nullable=True)
 
-    def __init__(self, technology_id, key, value):
+    def __init__(self, technology_id, key, value, description):
         """
         Class constructor
         @param technology_id : link to the device technology
         @param key : configuration item
         @param value : configuration value
+        @param description : description of the ocnfiguration item
         """
         self.technology_id = technology_id
         self.key = key

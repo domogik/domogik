@@ -586,3 +586,44 @@ class XmlRpcDbHelper():
         @param d_id : device id
         '''
         self._db.del_all_device_stats(d_id)
+
+ 
+####
+# Triggers
+####
+    def list_triggers(self):
+        ''' Returns a list of all triggers
+        @return a list of tuple (id, description, rule, result)
+        '''
+        triggers = self._db.list_triggers()
+        res = []
+        for trigger in triggers:
+            res.append((trigger.id, trigger.description, trigger.rule, trigger.result))
+        return res
+
+    def get_trigger(self, t_id):
+        ''' Returns a trigger information from id
+        @param t_id : trigger id
+        @return a Trigger object
+        '''
+        trigger = self._db.get_trigger(t_id)
+        return (trigger.id, trigger.description, trigger.rule, trigger.result)
+
+    def add_trigger(self, t_description, t_rule, t_result):
+        ''' Add a trigger
+        @param t_desc : trigger description
+        @param t_rule : trigger rule
+        @param t_res : trigger result
+        @return the new Trigger object
+        '''
+        trigger = self._db.add_trigger(t_description, t_rule, t_result)
+        return (trigger.id, trigger.description, trigger.rule, trigger.result)
+
+    def del_trigger(self, t_id):
+        '''
+        Delete a trigger
+        @param t_id : trigger id
+        '''
+        trigger = self._session.query(Trigger).filter_by(id=t_id).first()
+        self._session.delete(trigger)
+        self._session.commit()

@@ -259,6 +259,7 @@ class Listener:
         @param manager : the manager instance
         @param filter : dictionnary { key : value }
         """
+        print "new listener"
         self._callback = cb
         self._filter = filter
         manager.add_listener(self)
