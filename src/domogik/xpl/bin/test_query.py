@@ -69,7 +69,7 @@ class query_test(xPLModule):
         mess.set_schema('domogik.config')
         mess.add_data({'technology' :  'x10'})
         mess.add_data({'element' :  'heyu_cfg_path'})
-        Listener(self._query_cb, self.xpl,{'schema': 'domogik.config', 'type': 'xpl-stat'})
+        Listener(self._query_cb, self.xpl,{'schema': 'domogik.config', 'xpltype': 'xpl-stat'})
         self.xpl.send(mess)
 
 #        query_obj.query("x10","heyu_cfg_path", res)

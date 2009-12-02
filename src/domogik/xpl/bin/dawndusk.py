@@ -103,14 +103,14 @@ def getDusk(message):
 #Listener for the dawn
 dawnL = Listener(getDawn, myxpl, {
     'schema': 'dawndusk.request',
-    'type': 'xpl-cmnd',
+    'xpltype': 'xpl-cmnd',
     'command': 'status',
     'query': 'day',
 })
 #Listener for the dusk
 duskL = Listener(getDusk, myxpl, {
     'schema': 'dawndusk.request',
-    'type': 'xpl-cmnd',
+    'xpltype': 'xpl-cmnd',
     'command': 'status',
     'query': 'night',
 })

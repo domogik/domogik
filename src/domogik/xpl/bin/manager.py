@@ -74,7 +74,7 @@ class SysManager(xPLModule):
         
         Listener(self._sys_cb, self._myxpl, {
             'schema': 'domogik.system',
-            'type': 'xpl-cmnd',
+            'xpltype': 'xpl-cmnd',
         })
         self._config = Query(self._myxpl)
         res = xPLResult()

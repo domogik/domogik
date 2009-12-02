@@ -59,7 +59,7 @@ class plcbusMain(xPLModule):
         # Create listeners
         Listener(self.plcbus_cmnd_cb, self._myxpl, {
             'schema': 'control.basic',
-            'type': 'xpl-cmnd',
+            'xpltype': 'xpl-cmnd',
         })
         res = xPLResult()
         self._config.query('plcbus','device', res)

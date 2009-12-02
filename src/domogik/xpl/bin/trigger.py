@@ -365,7 +365,7 @@ class ListenerBuilder():
                     mess.data['device'],
                     mess.data['command']),
                     self._myxpl,
-                    {'schema': 'x10.basic', 'device': i, 'type': 'xpl-cmnd'})
+                    {'schema': 'x10.basic', 'device': i, 'xpltype': 'xpl-cmnd'})
 
     def buildtimelistener(self, items):
         '''
@@ -373,7 +373,7 @@ class ListenerBuilder():
         '''
         self._log.debug("New time listener created")
         Listener(self._parsetimeupdate, self._myxpl,
-                {'schema': 'datetime.basic', 'type': 'xpl-trig'})
+                {'schema': 'datetime.basic', 'xpltype': 'xpl-trig'})
 
     def _parsetimeupdate(self, mess):
         '''

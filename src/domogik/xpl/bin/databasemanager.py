@@ -68,7 +68,7 @@ class DBConnector(xPLModule):
         self._db = DbHelper()
         self._stats = StatsManager()
         Listener(self._request_config_cb, self._myxpl,
-                {'schema': 'domogik.config', 'type': 'xpl-cmnd'})
+                {'schema': 'domogik.config', 'xpltype': 'xpl-cmnd'})
 
     def _request_config_cb(self, message):
         '''
@@ -238,7 +238,7 @@ class StatsManager(xPLModule):
             @param res : The result of xml parsing
             """
             self._res = res
-            params = {'schema':res["schema"], 'type':res["xpltype"]}
+            params = {'schema':res["schema"], 'xpltype':res["xpltype"]}
             params.update(res["filter"])
             self._listener = Listener(self._callback, xpl, params)
 
