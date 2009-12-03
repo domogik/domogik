@@ -431,7 +431,6 @@ def _go_to_page(request, html_page, page_title, **attribute_list):
     response_attr_list = {}
     response_attr_list['page_title'] = page_title
     response_attr_list['sys_config'] = _db.get_system_config()
-    response_attr_list['is_user_admin'] = _is_user_admin(request)
     response_attr_list['is_user_connected'] = _is_user_connected(request)
     for attribute in attribute_list:
         response_attr_list[attribute] = attribute_list[attribute]
