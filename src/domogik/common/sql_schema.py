@@ -59,7 +59,7 @@ UNIT_OF_STORED_VALUE_LIST = [u'Volt', u'Celsius', u'Farenheit', u'Percent', u'Bo
 DEVICE_TECHNOLOGY_LIST = [u'x10',u'1wire',u'PLCBus',u'RFXCom',u'IR',u'EIB/KNX']
 DEVICE_TECHNOLOGY_TYPE_LIST = [u'cpl', u'wired', u'wifi', u'wireless', u'ir']
 DEVICE_TYPE_LIST = [u'appliance', u'lamp', u'music', u'sensor']
-ITEM_TYPE_LIST = [u'area', u'room', u'device'] 
+ITEM_TYPE_LIST = [u'area', u'room', u'device']
 
 Base = declarative_base()
 metadata = Base.metadata
@@ -95,7 +95,7 @@ class Enum(types.TypeDecorator):
         # The length of the string/unicode column should be the longest string
         # in values
         size = max([len(v) for v in values if v is not None])
-        super(Enum, self).__init__(size)        
+        super(Enum, self).__init__(size)
 
     def process_bind_param(self, value, dialect):
         if self.empty_to_none and value is '':
@@ -235,7 +235,7 @@ class DeviceTechnology(Base):
         Class constructor
         @param name : short name of the technology
         @param description : extended description
-        @param type : cpl (power lines), wired (ex. 1wire), wifi, 
+        @param type : cpl (power lines), wired (ex. 1wire), wifi,
         @param wireless (RF based, for example RFXCOM), ir (infrared)
         """
         self.name = name
@@ -271,7 +271,7 @@ class DeviceTechnologyConfig(Base):
     value = Column(String(80), nullable=False)
     description = Column(String(255), nullable=True)
 
-    def __init__(self, technology_id, key, value):
+    def __init__(self, technology_id, key, value, description):
         """
         Class constructor
         @param technology_id : link to the device technology
@@ -281,6 +281,7 @@ class DeviceTechnologyConfig(Base):
         self.technology_id = technology_id
         self.key = key
         self.value = value
+        self.description = description
 
     def __repr__(self):
         """
