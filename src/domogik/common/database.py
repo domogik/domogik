@@ -113,10 +113,10 @@ class DbHelper():
             url = "%s/%s" % (url, db['db_path'])
         else:
             if db['db_port'] != '':
-                url = "%s%s:%s@%s:%s/%s" % (url, db['db_user'], db['db_password'], 
+                url = "%s%s:%s@%s:%s/%s" % (url, db['db_user'], db['db_password'],
                                             db['db_host'], db['db_port'], db['db_name'])
             else:
-                url = "%s%s:%s@%s/%s" % (url, db['db_user'], db['db_password'], 
+                url = "%s%s:%s@%s/%s" % (url, db['db_user'], db['db_password'],
                                         db['db_host'], db['db_name'])
 
         if use_test_db:
@@ -141,7 +141,7 @@ class DbHelper():
     def search_areas(self, filters):
         """
         Look for area(s) with filter on their attributes
-        @param filters :  filter fields can be one of 
+        @param filters :  filter fields can be one of
         @return a list of Area objects
         """
         assert type(filters) is DictType
@@ -209,7 +209,7 @@ class DbHelper():
     def search_rooms(self, filters):
         """
         Look for room(s) with filter on their attributes
-        @param filters :  filter fields can be one of 
+        @param filters :  filter fields can be one of
         @return a list of Room objects
         """
         assert type(filters) is DictType
@@ -220,12 +220,12 @@ class DbHelper():
             room_list = room_list.filter(filter_arg)
 
         return room_list.all()
-        
+
     def get_room_by_name(self, r_name):
         """
         Return information about a room
         @param r_name : The room name
-        @return a room object 
+        @return a room object
         """
         return self._session.query(Room).filter_by(name=r_name).first()
 
@@ -233,7 +233,7 @@ class DbHelper():
         """
         Return information about a room
         @param r_id : The room id
-        @return a room object 
+        @return a room object
         """
         return self._session.query(Room).filter_by(id=r_id).first()
 
@@ -245,7 +245,7 @@ class DbHelper():
         @param r_description : room detailed description (optional)
         @return : a room object
         """
-        try: 
+        try:
             area = self._session.query(Area).filter_by(id=r_area_id).one()
         except NoResultFound, e:
             raise DbHelperException("Couldn't add room with area id %s. It does not exist" % r_area_id)
@@ -291,7 +291,7 @@ class DbHelper():
         """
         Return information about a device category
         @param dc_name : The device category name
-        @return a DeviceCategory object 
+        @return a DeviceCategory object
         """
         return self._session.query(DeviceCategory).filter_by(name=dc_name).first()
 
@@ -398,7 +398,7 @@ class DbHelper():
         @param dtc_description : The device technology config description
         @return the new DeviceTechnologyConfig item
         """
-        try: 
+        try:
             dt = self._session.query(DeviceTechnology).filter_by(id=dt_id).one()
         except NoResultFound, e:
             raise DbHelperException("Couldn't add device technology config with device technology id %s. \
@@ -432,7 +432,7 @@ class DbHelper():
     def search_devices(self, filters):
         """
         Look for device(s) with filter on their attributes
-        @param filters :  filter fields can be one of id, address, type, room, initial_value, 
+        @param filters :  filter fields can be one of id, address, type, room, initial_value,
                           is_value_changeable_by_user, unit_of_stored_values.
         @return a list of Device objects
         """
@@ -493,7 +493,7 @@ class DbHelper():
     def get_all_devices_of_category(self, dc_id):
         """
         Return all the devices of a category
-        @param dc_id: category id 
+        @param dc_id: category id
         @return a list of Device objects
         """
         return self._session.query(Device).filter_by(category_id=dc_id).all()
@@ -506,7 +506,7 @@ class DbHelper():
         """
         return self._session.query(Device).filter_by(technology_id=dt_id).all()
 
-    def add_device(self, d_name, d_address, d_technology_id, d_type, d_category_id, d_room_id, 
+    def add_device(self, d_name, d_address, d_technology_id, d_type, d_category_id, d_room_id,
         d_description=None, d_reference=None, d_is_resetable=False, d_initial_value=None,
         d_is_value_changeable_by_user=False, d_unit_of_stored_values=None):
         """
@@ -546,18 +546,18 @@ class DbHelper():
         if d_type not in DEVICE_TYPE_LIST:
             raise ValueError, "d_type must be one of %s" % DEVICE_TYPE_LIST
 
-        device = Device(name=d_name, address=d_address, description=d_description, 
-                        reference=d_reference, technology_id=d_technology_id, type=d_type, 
-                        category_id=d_category_id, room_id=d_room_id, 
-                        is_resetable=d_is_resetable, initial_value=d_initial_value, 
-                        is_value_changeable_by_user=d_is_value_changeable_by_user, 
+        device = Device(name=d_name, address=d_address, description=d_description,
+                        reference=d_reference, technology_id=d_technology_id, type=d_type,
+                        category_id=d_category_id, room_id=d_room_id,
+                        is_resetable=d_is_resetable, initial_value=d_initial_value,
+                        is_value_changeable_by_user=d_is_value_changeable_by_user,
                         unit_of_stored_values=d_unit_of_stored_values)
         self._session.add(device)
         self._session.commit()
         return device
 
-    def update_device(self, d_id, d_name=None, d_address=None, d_technology_id=None, d_type=None, 
-        d_category_id=None, d_room_id=None, d_description=None, d_reference=None, d_is_resetable=None, 
+    def update_device(self, d_id, d_name=None, d_address=None, d_technology_id=None, d_type=None,
+        d_category_id=None, d_room_id=None, d_description=None, d_reference=None, d_is_resetable=None,
         d_initial_value=None, d_is_value_changeable_by_user=None, d_unit_of_stored_values =None):
         """
         Update a device item
@@ -568,7 +568,7 @@ class DbHelper():
         @param d_description : Extended item description (optional)
         @param d_technology : Item technology id (optional)
         @param d_type : One of 'appliance','light','music','sensor' (optional)
-        @param d_category : Item category id (optional) 
+        @param d_category : Item category id (optional)
         @param d_room : Item room id (optional)
         @param d_is_resetable : Can the item be reseted to some initial state (optional)
         @param d_initial_value : What's the initial value of the item, should be
@@ -578,7 +578,7 @@ class DbHelper():
             must be one of 'Volt', 'Celsius', 'Fahrenheit', 'Percent', 'Boolean' (optional)
         @return the updated Device object
         """
-        if d_unit_of_stored_values not in [UNIT_OF_STORED_VALUE_LIST, None]: 
+        if d_unit_of_stored_values not in [UNIT_OF_STORED_VALUE_LIST, None]:
             raise ValueError, "d_unit_of_stored_values must be one of %s" % UNIT_OF_STORED_VALUE_LIST
         if d_type not in [DEVICE_TYPE_LIST, None]:
             raise ValueError, "d_type must be one of %s" % DEVICE_TYPE_LIST
@@ -623,7 +623,7 @@ class DbHelper():
             device.is_value_changeable_by_user = d_is_value_changeable_by_user
         if d_unit_of_stored_values is not None:
             device.unit_of_stored_values = d_unit_of_stored_values
-        
+
         self._session.add(device)
         self._session.commit()
         return device
@@ -660,6 +660,13 @@ class DbHelper():
         @return a list of DeviceStats objects
         """
         return self._session.query(DeviceStats).filter_by(device_id=d_device_id).all()
+
+    def list_all_device_stats(self):
+        """
+        Return a list of all device stats
+        @return a list of DeviceStats objects
+        """
+        return self._session.query(DeviceStats).all()
 
     def list_device_stats_values(self, d_device_stats_id):
         """
@@ -749,7 +756,7 @@ class DbHelper():
             self._session.delete(device_stat)
 
         self._session.commit()
- 
+
 ####
 # Triggers
 ####
@@ -870,7 +877,7 @@ class DbHelper():
             raise DbHelperException("Error %s login already exists" % a_login)
         password = hashlib.sha256()
         password.update(a_password)
-        system_account = SystemAccount(login=a_login, password=password.hexdigest(), 
+        system_account = SystemAccount(login=a_login, password=password.hexdigest(),
                                       is_admin=a_is_admin, skin_used=a_skin_used)
         self._session.add(system_account)
         self._session.commit()
@@ -885,13 +892,13 @@ class DbHelper():
 
     def del_system_account(self, a_id):
         """
-        Delete a system account 
+        Delete a system account
         @param a_id : account id
         """
         system_account = self._session.query(SystemAccount).filter_by(id=a_id).first()
         self._session.delete(system_account)
         self._session.commit()
-    
+
 ####
 # User accounts
 ####
@@ -932,7 +939,7 @@ class DbHelper():
         @param u_system_account : User's account on the system (optional)
         @return the new UserAccount object
         """
-        user_account = UserAccount(first_name=u_first_name, last_name=u_last_name, 
+        user_account = UserAccount(first_name=u_first_name, last_name=u_last_name,
                                   birthdate=u_birthdate, system_account_id=u_system_account_id)
         self._session.add(user_account)
         self._session.commit()
@@ -989,7 +996,7 @@ class DbHelper():
         self._session.add(system_stat)
         self._session.commit()
         for stat_value_name in s_values.keys():
-            ssv = SystemStatsValue(name=stat_value_name, value=s_values[stat_value_name], 
+            ssv = SystemStatsValue(name=stat_value_name, value=s_values[stat_value_name],
                                   system_stats_id=system_stat.id)
             self._session.add(ssv)
 
@@ -1051,7 +1058,7 @@ class DbHelper():
             raise DbHelperException("Can't find this item  (%s,%s)" % (i_item_id, i_item_type))
 
         for param in i_parameters:
-            item_ui_config = ItemUIConfig(item_id=i_item_id, item_type=i_item_type, 
+            item_ui_config = ItemUIConfig(item_id=i_item_id, item_type=i_item_type,
                                           key=param, value=i_parameters[param])
             self._session.add(item_ui_config)
             self._session.commit()
@@ -1173,7 +1180,7 @@ class DbHelper():
             if s_debug_mode is not None:
                 system_config.debug_mode = s_debug_mode
         else:
-            system_config = SystemConfig(simulation_mode=s_simulation_mode, 
+            system_config = SystemConfig(simulation_mode=s_simulation_mode,
                                         debug_mode=s_debug_mode)
         self._session.add(system_config)
         self._session.commit()
