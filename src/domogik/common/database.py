@@ -378,6 +378,14 @@ class DbHelper():
         """
         return self._session.query(DeviceTechnologyConfig).filter_by(technology_id=dt_id).all()
 
+    def list_all_device_technology_config(self):
+        """
+        Return a list of all device technology configuration
+        @param dt_id : id of the device technology
+        @return a list of DeviceTechnologyConfig objects
+        """
+        return self._session.query(DeviceTechnologyConfig).all()
+
     def get_device_technology_config(self, dt_id, dtc_key):
         """
         Return information about a device technology config item
