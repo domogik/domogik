@@ -450,7 +450,6 @@ class DbHelper():
         for filter in filters:
             filter_arg = "%s = '%s'" % (filter, filters[filter])
             device_list = device_list.filter(filter_arg)
-
         return device_list.all()
 
     def find_devices(self, d_room_id_list, d_category_id_list):
