@@ -1126,6 +1126,13 @@ class DbHelper():
             param_list[item.key] = item.value
         return param_list
 
+    def list_all_item_ui_config(self):
+        """
+        List all UI parameters
+        @return a list of ItemUIConfig objects
+        """
+        return self._session.query(ItemUIConfig).all()
+
     def delete_item_ui_config(self, i_item_id, i_item_type, i_key):
         """
         Delete a UI parameter of an item
