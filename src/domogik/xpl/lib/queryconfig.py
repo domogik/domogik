@@ -69,7 +69,7 @@ class Query():
         all the config items for this technology will be fetched
         '''
         print "new query"
-        Listener(self._query_cb, self.__myxpl,{'schema': 'domogik.config', 'type': 'xpl-stat', 'technology': technology})
+        Listener(self._query_cb, self.__myxpl,{'schema': 'domogik.config', 'xpltype': 'xpl-stat', 'technology': technology})
         self._keys[key] = result
         mess = XplMessage()
         mess.set_type('xpl-cmnd')

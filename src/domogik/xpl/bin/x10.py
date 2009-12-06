@@ -71,13 +71,13 @@ class x10Main(xPLModule):
             exit(1)
         #Create listeners
         Listener(self.x10_cmnd_cb, self._myxpl, {'schema': 'x10.basic',
-                'type': 'xpl-cmnd'})
+                'xpltype': 'xpl-cmnd'})
         #One listener for system schema, allowing to reload config
         Listener(self.heyu_reload_config, self._myxpl, {'schema': 'domogik.system',
-           'type': 'xpl-cmnd', 'command': 'reload', 'module': 'x10'})
+           'xpltype': 'xpl-cmnd', 'command': 'reload', 'module': 'x10'})
         #One listener for system schema, allowing to dump config
         Listener(self.heyu_dump_config, self._myxpl, {'schema': 'domogik.system',
-            'type': 'xpl-cmnd', 'command': 'push_config', 'module': 'x10'})
+            'xpltype': 'xpl-cmnd', 'command': 'push_config', 'module': 'x10'})
         self._log = self.get_my_logger()
 #        self._monitor = X10Monitor(self._heyu_cfg_path_res)
 #        self._monitor.get_monitor().add_cb(self.x10_monitor_cb)

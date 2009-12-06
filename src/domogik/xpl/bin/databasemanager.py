@@ -68,7 +68,7 @@ class DBConnector(xPLModule):
         self._db = DbHelper()
         self._stats = StatsManager()
         Listener(self._request_config_cb, self._myxpl,
-                {'schema': 'domogik.config', 'type': 'xpl-cmnd'})
+                {'schema': 'domogik.config', 'xpltype': 'xpl-cmnd'})
 
     def _request_config_cb(self, message):
         '''
@@ -162,7 +162,9 @@ class DBConnector(xPLModule):
                 'mirror': {'device' : '/dev/hidraw0',
                            'nbmaxtry' : '10',
                            'interval' : '15'},
-                'xbmc': {'ip_port' : '192.168.0.20:8080'},
+                'xbmc': {'address' : '192.168.0.20:8080', 
+                         'delay' : '15',
+                         'maxdelay' : '20'},
                 'teleinfo' : {'device' : '/dev/ttyUSB0',
                     'interval' : '30'},
                 }
@@ -238,7 +240,7 @@ class StatsManager(xPLModule):
             @param res : The result of xml parsing
             """
             self._res = res
-            params = {'schema':res["schema"], 'type':res["xpltype"]}
+            params = {'schema':res["schema"], 'xpltype':res["xpltype"]}
             params.update(res["filter"])
             self._listener = Listener(self._callback, xpl, params)
 

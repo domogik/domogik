@@ -99,7 +99,7 @@ class xPLModule():
             self._is_manager = is_manager
             self._myxpl = Manager()
             self._l = Listener(self._system_handler, self._myxpl, {'schema' : 'domogik.system',
-                'type':'xpl-cmnd'})
+                'xpltype':'xpl-cmnd'})
             self._reload_cb = reload_cb 
             self._dump_cb = dump_cb
 

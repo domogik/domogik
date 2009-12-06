@@ -141,7 +141,7 @@ class Manager(BaseModule):
             self.register_timer(self._h_timer)
             self._h_timer.start()
             #We add a listener in order to answer to the hbeat requests
-            Listener(cb = self.got_hbeat, manager = self, filter = {'schema':'hbeat.app','type':'xpl-stat'})
+            Listener(cb = self.got_hbeat, manager = self, filter = {'schema':'hbeat.app','xpltype':'xpl-stat'})
             #And finally we start network listener in a thread
             self._stop_thread = False
             self._network = threading.Thread(None, self._run_thread_monitor,
