@@ -122,6 +122,6 @@ class DawnDusk:
 
 if __name__ == "__main__":
     dd = DawnDusk()
-    l, c = dd.get_dawn_dusk(-01.4046, 48.0653, 1)
+    l, c = dd.get_dawn_dusk(-01.7075, 48.1173, 1)
     print l
     print c

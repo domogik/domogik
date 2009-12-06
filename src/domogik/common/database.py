@@ -1028,12 +1028,12 @@ class DbHelper():
 # ItemUIConfig
 ###
 
-    def add_item_ui_config(self, i_item_id, i_item_type, **i_parameters):
+    def add_item_ui_config(self, i_item_id, i_item_type, i_parameters):
         """
         Add a UI parameter for an item
         @param i_item_id : id of the item we want to bind a parameter
         @param i_item_type : the item type (area, room, device) to add a configuration parameter
-        @param **i_parameters : named parameters to add (key1=value1, key2=value2,...)
+        @param i_parameters : dictionnary of named parameters to add {key1:value1, key2:value2,...}
         """
         item_ui_config = None
         if i_item_type not in ITEM_TYPE_LIST:

@@ -516,8 +516,8 @@ if __name__ == "__main__":
     remove_all_item_ui_config(d)
     area1 = d.add_area('area1','description 1')
     room1 = d.add_room('room1', area1.id)
-    d.add_item_ui_config(area1.id, 'area', param_a1='value_a1', param_a2='value_a2')
-    d.add_item_ui_config(room1.id, 'room', param_r1='value_r1', param_r2='value_r2')
+    d.add_item_ui_config(area1.id, 'area',{ 'param_a1':'value_a1', 'param_a2':'value_a2'})
+    d.add_item_ui_config(room1.id, 'room',{ 'param_r1':'value_r1', 'param_r2':'value_r2'})
     value_dict = d.list_item_ui_config(room1.id, 'room')
     assert value_dict == {'param_r1': 'value_r1', 'param_r2': 'value_r2'}, "Wrong dictionnary returned : %s" % value_dict
     uic = d.get_item_ui_config(room1.id, 'room', 'param_r2')
@@ -531,7 +531,7 @@ if __name__ == "__main__":
         error = True
     assert error is True, "Shouldn't have found any param values for (%s, %s)" % (area1.id, 'foo')
     try:
-        d.add_item_ui_config(800000000, 'area', param_a1='value_a1', param_a2='value_a2')
+        d.add_item_ui_config(800000000, 'area', {'param_a1':'value_a1', 'param_a2':'value_a2'})
     except DbHelperException:
         error = True
     assert error is True, "Shouldn't have been able to add parameters with this item.id which doesn't exist"
@@ -539,7 +539,7 @@ if __name__ == "__main__":
     uic = d.get_item_ui_config(area1.id, 'area', 'param_a1')
     assert uic.value == 'new_value_a1', "Parameter should have the value '%s' but it has '%s'" \
                         % ('new_value_a1', uic.value)
-    d.add_item_ui_config(area1.id, 'area', param_a3='value_a3')
+    d.add_item_ui_config(area1.id, 'area', {'param_a3':'value_a3'})
     uic = d.get_item_ui_config(area1.id, 'area', 'param_a3')
     d.delete_item_ui_config(area1.id, 'area', 'param_a3')
     assert 'param_a1' in d.list_item_ui_config(area1.id, 'area').keys(), "param_a1 should have been found"

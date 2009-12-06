@@ -44,6 +44,8 @@ class XmlRpcDbHelper():
     def __init__(self):
         self._db = DbHelper()
 
+    def get_helper(self):
+        return self._db
 ####
 # Areas 
 ####
@@ -130,7 +132,7 @@ class XmlRpcDbHelper():
         rooms = self._db.search_rooms(filters)
         res = []
         for room in rooms:
-            res.append((room.id, room.name, room.description, room.area_id)
+            res.append((room.id, room.name, room.description, room.area_id))
         return res
 
     
@@ -179,9 +181,10 @@ class XmlRpcDbHelper():
         @param a_area_id : the area id
         @return a list of Room objects
         '''
+        res = []
         rooms = self._db.get_all_rooms_of_area(a_area_id)
         for room in rooms:
-            res.append((room.id, room.name, room.description, room.area_id, room.area))
+            res.append((room.id, room.name, room.description, room.area_id))
         return res
 
 ####
@@ -378,7 +381,7 @@ class XmlRpcDbHelper():
         '''
         device = self._db.get_device(device_id)
         if device is not None:
-            return (device.id, device.name, device.description, device.address, device.reference
+            return (device.id, device.name, device.description, device.address, device.reference,
                 device.technology_id, device.type, device.category_id, device.room_id,
                 device.is_resetable, device.initial_value, device.is_value_changeable_by_user,
                 device.unit_of_stored_values)
@@ -407,10 +410,10 @@ class XmlRpcDbHelper():
         @return the new Device object
         '''        
         device = self._db.add_device(d_name, d_address, d_technology_id, d_type, d_category_id, d_room_id, 
-        d_description, d_reference, d_is_resetable=False, d_initial_value,
-        d_is_value_changeable_by_user=False, d_unit_of_stored_values)
+        d_description, d_reference, d_is_resetable, d_initial_value,
+        d_is_value_changeable_by_user, d_unit_of_stored_values)
         if device is not None:
-            return (device.id, device.name, device.description, device.address, device.reference
+            return (device.id, device.name, device.description, device.address, device.reference,
                 device.technology_id, device.type, device.category_id, device.room_id,
                 device.is_resetable, device.initial_value, device.is_value_changeable_by_user,
                 device.unit_of_stored_values)
@@ -439,10 +442,10 @@ class XmlRpcDbHelper():
         @return the new Device object
         '''        
         device = self._db.update_device(d_id, d_name, d_address, d_technology_id, d_type, d_category_id, d_room_id, 
-        d_description, d_reference, d_is_resetable=False, d_initial_value,
-        d_is_value_changeable_by_user=False, d_unit_of_stored_values)
+        d_description, d_reference, d_is_resetable, d_initial_value,
+        d_is_value_changeable_by_user, d_unit_of_stored_values)
         if device is not None:
-            return (device.id, device.name, device.description, device.address, device.reference
+            return (device.id, device.name, device.description, device.address, device.reference,
                 device.technology_id, device.type, device.category_id, device.room_id,
                 device.is_resetable, device.initial_value, device.is_value_changeable_by_user,
                 device.unit_of_stored_values)
@@ -489,7 +492,7 @@ class XmlRpcDbHelper():
                 device.unit_of_stored_values))
         return res
 
-     def get_all_devices_of_technology(self, technology_id):
+    def get_all_devices_of_technology(self, technology_id):
         ''' Return all the devices of a technology
         @param technology_id : The id of the technology 
         @return a list of tuple 
@@ -541,7 +544,7 @@ class XmlRpcDbHelper():
         '''
         stat = self._db.get_last_stat_of_devices(d_device_id)
         if stat is not None:
-            return ((stat.id, stat.device_id, stat.date)
+            return ((stat.id, stat.device_id, stat.date))
 
     def get_last_stat_of_devices(self, device_list):
         '''
@@ -624,6 +627,222 @@ class XmlRpcDbHelper():
         Delete a trigger
         @param t_id : trigger id
         '''
-        trigger = self._session.query(Trigger).filter_by(id=t_id).first()
-        self._session.delete(trigger)
-        self._session.commit()
+        self._db.del_trigger(t_id)
+
+        
+####
+# System accounts
+####
+    def list_system_accounts(self):
+        ''' Returns a list of all accounts
+        @return a list of tuple (id, login, is_admin, skin_used)
+        @warning the password is not added in returned informations
+        '''
+        accounts = self._db.list_system_accounts()
+        res = []
+        for account in accounts:
+            res.append((account.id, account.login, account.is_admin, account.skin_used))
+        return res
+
+    def get_system_account(self, a_id):
+        ''' Return system account information from id
+        @param a_id : account id
+        @return a tuple (id, login, is_admin, skin_used)
+        @warning the password is not added in returned informations
+        '''
+        account = self._db.get_system_account(a_id)
+        if account is not None:
+            return (account.id, account.login, account.is_admin, account.skin_used)
+
+    def get_system_account_by_login(self, a_login):
+        '''Return system account information from login
+        @param a_login : login
+        @return a tuple (id, login, is_admin, skin_used)
+        @warning the password is not added in returned informations
+        '''
+        account = self._db.get_system_account_by_login(a_login)
+        if account is not None:
+            return (account.id, account.login, account.is_admin, account.skin_used)
+
+    def get_system_account_by_login_and_pass(self, a_login, a_password):
+        '''Return system account information from login and password
+        @param a_login : login
+        @param a_pass : password (clear)
+        @return a tuple (id, login, is_admin, skin_used) or None
+        @warning the password is not added in returned informations
+        '''
+        account = self._db.get_system_account_by_login_and_pass(a_login, a_password)
+        if account is not None:
+            return (account.id, account.login, account.is_admin, account.skin_used)
+
+    def get_system_account_by_user(self, u_id):
+        '''Return a system account associated to a user, if exists
+        @param u_id : The user account id
+        @return a tuple (id, login, is_admin, skin_used)
+        @warning the password is not added in returned informations
+        '''
+        account = self._db.get_system_account_by_user(u_id)
+        if account is not None:
+            return (account.id, account.login, account.is_admin, account.skin_used)
+
+    def is_system_account(self, a_login, a_password):
+        ''' Check if a system account with a_login, a_password exists
+        @param a_login : Account login
+        @param a_password : Account password (clear)
+        @return True or False
+        '''
+        return self._db.is_system_account(a_login, a_password)
+
+    def add_system_account(self, a_login, a_password, a_is_admin=False, a_skin_used='skins/default'):
+        '''Add a system_account
+        @param a_login : Account login
+        @param a_password : Account clear password (will be hashed in sha256)
+        @param a_is_admin : True if it is an admin account, False otherwise (optional, default=False)
+        @return a tuple (id, login, is_admin, skin_used) raise a DbHelperException if it already exists
+        @warning the password is not added in returned informations
+        '''
+        account = self._db.add_system_account(a_login, a_password, a_is_admin, a_skin_used)
+        if account is not None:
+            return (account.id, account.login, account.is_admin, account.skin_used)
+
+    def add_default_system_account(self):
+        ''' Add a default system account (login = admin, password = domogik, is_admin = True)
+        @return a tuple (id, login, is_admin, skin_used)
+        '''
+        account = self._db.add_default_system_account()
+        if account is not None:
+            return (account.id, account.login, account.is_admin, account.skin_used)
+        
+    def del_system_account(self, a_id):
+        ''' Delete a system account 
+        @param a_id : account id
+        '''
+        self._db.del_system_account(a_id) 
+
+####
+# User accounts
+####
+    def list_user_accounts(self):
+        ''' Returns a list of all user accounts
+        @return a list of tuple (id, first_name, last_name, birthdate, system_account_id)
+        '''
+        accounts = self._db.list_user_accounts()
+        res = []
+        for account in accounts:
+            res.append((account.id, account.first_name, account.last_name, account.system_account_id))
+        return res
+        
+
+    def get_user_account(self, u_id):
+        ''' Returns account information from id
+        @param u_id : user account id
+        @return a tuple (id, first_name, last_name, birthdate, system_account_id)
+        '''
+        account = self._db.get_user_account(u_id)
+        if account is not None:
+            return (account.id, account.first_name, account.last_name, account.system_account_id)
+
+    def get_user_account_by_system_account(self, s_id):
+        ''' Returns a user account associated to a system account, if existing
+        @param s_id : the system account id
+        @return a tuple (id, first_name, last_name, birthdate, system_account_id)
+        '''
+        account = self._db.get_user_account_by_system_account(s_id)
+        if account is not None:
+            return (account.id, account.first_name, account.last_name, account.system_account_id)
+
+    def add_user_account(self, u_first_name, u_last_name, u_birthdate, u_system_account_id=None):
+        ''' Add a user account
+        @param u_first_name : User's first name
+        @param u_last_name : User's last name
+        @param u_birthdate : User's birthdate
+        @param u_system_account : User's account on the system (optional)
+        @return a tuple (id, first_name, last_name, birthdate, system_account_id)
+        '''
+        account = self._db.add_user_account(u_first_name, u_last_name, u_birthdate, u_system_account_id)
+        if account is not None:
+            return (account.id, account.first_name, account.last_name, account.system_account_id)
+
+    def del_user_account(self, u_id):
+        ''' Delete a user account and the associated system account if it exists
+        @param u_id : user's account id
+        '''
+        self._db.del_user_account(u_id)
+
+###
+# ItemUIConfig
+###
+
+    def add_item_ui_config(self, i_item_id, i_item_type, **i_parameters):
+        ''' Add a UI parameter for an item
+        @param i_item_id : id of the item we want to bind a parameter
+        @param i_item_type : the item type (area, room, device) to add a configuration parameter
+        @param **i_parameters : named parameters to add (key1=value1, key2=value2,...)
+        '''
+        self._db.add_item_ui_config(i_item_id, i_item_type, i_parameters)
+
+    def update_item_ui_config(self, i_item_id, i_item_type, i_key, i_value):
+        ''' Update a UI parameter of an item
+        @param i_item_id : id of the item we want to update the parameter
+        @param i_item_type : type of the item (area, room, device)
+        @param i_key : key we want to update
+        @param i_value : key value
+        @return : a tuple (item_id, type, key, value)
+        '''
+        item = self._db.update_item_ui_config(i_item_id, i_item_type, i_key, i_value)
+        if item is not None:
+            return (item.item_id, item.item_type, item.key, item.value)
+
+    def get_item_ui_config(self, i_item_id, i_item_type, i_key):
+        ''' Get a UI parameter of an item
+        @param i_item_id : id of the item we want to update the parameter
+        @param i_item_type : type of the item (area, room, device)
+        @param i_key : key we want to get the value
+        '''
+        item = self._db.get_item_ui_config(i_item_id, i_item_type, i_key)
+        if item is not None:
+            return (item.item_id, item.type, item.key, item.value)
+
+    def list_item_ui_config(self, i_item_id, i_item_type):
+        ''' List all UI parameters of an item
+        @param i_item_id : if of the item we want to list the parameters
+        @param i_item_type : type of the item (area, room, device)
+        @return a dictionnary containing all the (key, value) tuples
+        '''
+        return self._db.list_item_ui_config(i_item_id, i_item_type)
+
+    def delete_item_ui_config(self, i_item_id, i_item_type, i_key):
+        ''' Delete a UI parameter of an item
+        @param i_item_id : id of the item we want to delete its parameter
+        @param i_item_type : type of the item (area, room, device)
+        @param i_key : key corresponding to the parameter name we want to delete
+        '''
+        return self._db.delete_item_ui_config(i_item_id, i_item_type, i_key)
+
+    def delete_all_item_ui_config(self, i_item_id, i_item_type):
+        ''' Delete all UI parameter of an item
+        @param i_item_id : id of the item we want to delete its parameter
+        @param i_item_type : type of the item (area, room, device)
+        '''
+        self._db.delete_all_item_ui_config(i_item_id, i_item_type)
+
+###
+# SystemConfig
+###
+    def get_system_config(self):
+        ''' Get current system configuration
+        @return a tuple(id, simulation_mode, debug_mode)
+        '''
+        system = self._db.get_system_config()
+        if system is not None:
+            return (system.id, system.simulation_mode, system.debug_mode)
+
+    def update_system_config(self, s_simulation_mode=None, s_debug_mode=None):
+        ''' Update (or create) system configuration
+        @param s_simulation_mode : True if the system is running in simulation mode (optional)
+        @param s_debug_mode : True if the system is running in debug mode (optional)
+        @return a tuple(id, simulation_mode, debug_mode)
+        '''
+        system = self._db.update_system_config(s_simulation_mode, s_debug_mode)
+        if system is not None:
+            return (system.id, system.simulation_mode, system.debug_mode)
