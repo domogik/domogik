@@ -248,11 +248,12 @@ class XmlRpcDbHelper():
         @param device_technology_name : The device_technology's name 
         @return a tuple (id, name, description, type)
         '''
-        device_technology = self._db.get_device_technology_by_name(device_technology_name)
-        if device_technology is not None:
-            return (device_technology.id, device_technology.name, device_technology.description, device_technology.type)
-        else:
+        try:
+            device_technology = self._db.get_device_technology_by_name(device_technology_name)
+        except AssertionError:
             return None
+        else:
+            return (device_technology.id, device_technology.name, device_technology.description, device_technology.type)
 
     def add_device_technology(self, d_name, d_description = None, d_type = None):
         '''Add an device_technology
@@ -515,7 +516,7 @@ class XmlRpcDbHelper():
         res = []
         for device in devices:
             res.append((device.id, device.name, device.description, device.address, device.reference,
-                device.technology_id, device.type, device.technology_id, device.room_id,
+                device.technology_id, device.type, device.category_id, device.room_id,
                 device.is_resetable, device.initial_value, device.is_value_changeable_by_user,
                 device.unit_of_stored_values))
         return res
@@ -549,7 +550,7 @@ class XmlRpcDbHelper():
         stats = self._db.list_all_device_stats()
         res = []
         for stat in stats:
-            res.append((stat.id, stat.name, stat.value))
+            res.append((stat.id, stat.device_id, stat.date))
         return res
 
         

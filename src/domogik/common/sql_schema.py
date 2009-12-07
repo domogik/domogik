@@ -75,7 +75,7 @@ class Enum(types.TypeDecorator):
     """
     impl = types.Unicode
 
-    def __init__(self, values, empty_to_none=False, strict=False):
+    def __init__(self, values, empty_to_none=True, strict=False):
         """
         Class constructor
         @param values : a list of valid values for this column

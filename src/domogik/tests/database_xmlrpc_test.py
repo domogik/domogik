@@ -348,6 +348,28 @@ class DeviceCategoryTestCase(GenericTestCase):
         self.assertEqual(name3, "device_category3_name")
         self.assertEqual(description3, "device_category3_description")
 
+    def testGetUnexistingDeviceCategoryByName(self):
+        ''' try to find an unexisting device '''
+        self.assertEqual(self.db.get_device_category_by_name("nonexisting"), None)
+
+    def testGetAllDevicesOfCategory(self):
+        ''' Add a few devices and check the method find them '''
+        dc1 = self.db.add_device_category("device_category3_name", "device_category3_description")
+        area1 = self.db.add_area('area1','description 1')
+        dt1 = self.db.add_device_technology(u'x10', 'desc dt1', u'cpl')
+        room1 = self.db.add_room('room1', area1[0])
+        devices = []
+        for i in range(5):
+            devices.append(self.db.add_device(d_name='device' + str(i), d_address = 'A' + str(i), d_technology_id = dt1[0], d_type = u'lamp',
+                              d_category_id = dc1[0], d_room_id = room1[0], d_description = 'desc' + str(i),
+                              d_is_resetable = True, d_initial_value = 30,
+                              d_is_value_changeable_by_user = False, d_unit_of_stored_values = u'Percent'))
+        devices2 = self.db.get_all_devices_of_category(dc1[0])
+        for device in devices2:
+            assert device in devices
+        self.assertEqual(len(devices), len(devices2))
+        
+
     def testDelDeviceCategory(self):
         ''' Add and delete an device_category'''
         device_category = self.db.add_device_category("device_category4_name", "device_category4_description")
@@ -380,6 +402,11 @@ class DeviceTechnologyTestCase(GenericTestCase):
         self.assertEqual(len(self.db.list_device_technologies()), 3)
         assert self.has_item(self.db.list_device_technologies(), [u'x10', u'1wire', u'PLCBus'])
 
+    def testGetDeviceTechnologyByName(self):
+        dt1 = self.db.add_device_technology(u'x10', 'desc dt1', u'cpl')
+        self.assertEqual(self.db.get_device_technology_by_name('x10'), dt1)
+        self.assertEqual(self.db.get_device_technology_by_name('nonexisting'), None)
+
     def testFetchInformation(self):
         dt2 = self.db.add_device_technology(u'1wire', 'desc dt2', u'wired')
         self.assertEqual(self.db.get_device_technology_by_name(u'1wire')[1], u'1wire')
@@ -392,6 +419,23 @@ class DeviceTechnologyTestCase(GenericTestCase):
         assert self.has_item(self.db.list_device_technologies(), [u'x10', u'PLCBus']), "Couldn't find 'x10' and 'PLCBus'"
         assert not self.has_item(self.db.list_device_technologies(), [u'1wire']), "'1wire' was NOT deleted"
 
+    def testGetAllDevicesOfTechnology(self):
+        ''' Add a few devices and check the method find them '''
+        dc1 = self.db.add_device_category("device_category3_name", "device_category3_description")
+        area1 = self.db.add_area('area1','description 1')
+        dt1 = self.db.add_device_technology(u'x10', 'desc dt1', u'cpl')
+        room1 = self.db.add_room('room1', area1[0])
+        devices = []
+        for i in range(5):
+            devices.append(self.db.add_device(d_name='device' + str(i), d_address = 'A' + str(i), d_technology_id = dt1[0], d_type = u'lamp',
+                              d_category_id = dc1[0], d_room_id = room1[0], d_description = 'desc' + str(i),
+                              d_is_resetable = True, d_initial_value = 30,
+                              d_is_value_changeable_by_user = False, d_unit_of_stored_values = u'Percent'))
+        devices2 = self.db.get_all_devices_of_technology(dt1[0])
+        for device in devices2:
+            assert device in devices
+        self.assertEqual(len(devices), len(devices2))
+       
 
 class DeviceTechnologyConfigTestCase(GenericTestCase):
     """
@@ -429,6 +473,12 @@ class DeviceTechnologyConfigTestCase(GenericTestCase):
         assert not duplicate_key, "It shouldn't have been possible to add 'key3_3' for device technology %s : it already exists" % dt3[0]
         self.assertEqual(len(self.db.list_device_technology_config(dt1[0])),  2)
         self.assertEqual(len(self.db.list_device_technology_config(dt3[0])), 3)
+
+    def testNonEmptyList(self):
+        dt1 = self.db.add_device_technology(u'x10', 'desc dt1', u'cpl')
+        dtc1_1 = self.db.add_device_technology_config(dt1[0], 'key1_1', 'val1_1', 'desc1')
+        dtc1_2 = self.db.add_device_technology_config(dt1[0], 'key1_2', 'val1_2', 'desc2')
+        self.assertEqual(len(self.db.list_all_device_technology_config()), 2)
 
     def testGet(self):
         dt3 = self.db.add_device_technology(u'PLCBus', 'desc dt3', u'cpl')
@@ -478,6 +528,10 @@ class DeviceTestCase(GenericTestCase):
         self.assertEqual(len(self.db.list_devices()),1)
         self.assertEqual(device1[6], "lamp")
         self.assertNotEqual(device1, "appliance")
+
+    def testEmptyGetDevice(self):
+        """ Test a get of unexisting device """
+        self.assertEqual(self.db.get_device(11111111111), None)
 
     def testUpdate(self):
         area1 = self.db.add_area('area1','description 1')
@@ -604,7 +658,34 @@ class DeviceStatsTestCase(GenericTestCase):
 
         assert self.db.device_has_stats(device1[0])
         assert not self.db.device_has_stats(device4[0])
+:
+    def testDelDeviceStat(self):
+        dt1 = self.db.add_device_technology(u"x10", "this is x10", u"cpl")
+        dc1 = self.db.add_device_category("lighting")
+        area1 = self.db.add_area('area1','description 1')
+        room1 = self.db.add_room('room1', area1[0])
+        device1 = self.db.add_device(d_name='device1', d_address = "A1", d_technology_id = dt1[0], d_type = u"lamp",
+                              d_category_id = dc1[0], d_room_id = room1[0])
+        now = datetime.datetime.now()
+        d_stat1_1 = self.db.add_device_stat(device1[0], now, {'val1': '10', 'val2': '10.5' })
+        d_stat1_2 = self.db.add_device_stat(device1[0], now + datetime.timedelta(seconds=1), {'val1': '11', 'val2': '12' })
+        self.db.del_device_stat(d_stat1_1[0])
+        self.db.del_device_stat(d_stat1_2[0])
+        self.assertEqual(len(self.db.list_all_device_stats()),0)
 
+    def testNonEmptyList(self):
+        dt1 = self.db.add_device_technology(u"x10", "this is x10", u"cpl")
+        dc1 = self.db.add_device_category("lighting")
+        area1 = self.db.add_area('area1','description 1')
+        room1 = self.db.add_room('room1', area1[0])
+        device1 = self.db.add_device(d_name='device1', d_address = "A1", d_technology_id = dt1[0], d_type = u"lamp",
+                              d_category_id = dc1[0], d_room_id = room1[0])
+        now = datetime.datetime.now()
+        d_stat1_1 = self.db.add_device_stat(device1[0], now, {'val1': '10', 'val2': '10.5' })
+        d_stat1_2 = self.db.add_device_stat(device1[0], now + datetime.timedelta(seconds=1), {'val1': '11', 'val2': '12' })
+        self.assertEqual(len(self.db.list_all_device_stats()),2)
+        for device in self.db.list_all_device_stats():
+            assert device in [d_stat1_1, d_stat1_2]
 
     def testLastStatOfOneDevice(self):
         dt1 = self.db.add_device_technology(u"x10", "this is x10", u"cpl")
@@ -758,6 +839,10 @@ class UserAndSystemAccountsTestCase(GenericTestCase):
 
         self.assertEqual(len(self.db.list_system_accounts()),3)
 
+    def testAddDefaultSystemAccount(self):
+        id, login, is_admin, skin_used = self.db.add_default_system_account()
+        self.assertEqual(login, "admin")
+        self.assertEqual(is_admin, True)
 
     def testGet(self):
         sys1 = self.db.add_system_account(a_login = 'mschneider', a_password = 'IwontGiveIt', a_is_admin = True)
@@ -903,6 +988,13 @@ class ItemUIConfigTestCase(GenericTestCase):
         except DbHelperException:
             error = True
         assert error is True, "Shouldn't have been able to add parameters with this item[0] which doesn't exist"
+
+    def testNotEmptyList(self):
+        area1 = self.db.add_area('area1','description 1')
+        room1 = self.db.add_room('room1', area1[0])
+        self.db.add_item_ui_config(area1[0], 'area', param_a1='value_a1', param_a2='value_a2')
+        self.db.add_item_ui_config(room1[0], 'room', param_r1='value_r1', param_r2='value_r2')
+        self.assertEqual(len(self.db.list_all_item_ui_config()),4)
 
     def testUpdate(self):
         area1 = self.db.add_area('area1','description 1')
