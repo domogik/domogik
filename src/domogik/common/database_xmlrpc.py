@@ -261,7 +261,7 @@ class XmlRpcDbHelper():
         @param d_type : type of the technology, one of 'cpl', 'wired', 'wifi', 'wireless', 'ir'
         @return a device_technology definition : (id, name, description, type)
         '''
-        device_technology = self._db.add_device_technology(d_name, d_description)
+        device_technology = self._db.add_device_technology(d_name, d_description, d_type)
         return (device_technology.id, device_technology.name, device_technology.description, device_technology.type)
 
     def del_device_technology(self, device_technology_id):
@@ -276,23 +276,37 @@ class XmlRpcDbHelper():
 # Device technology_config
 ####
 
-    def list_device_technology_config(self):
+    def list_all_device_technology_config(self):
         ''' Get the list of device_technology_config and return it as a list of tuples 
         @return a list of tuple (id, key, value, description, technology_id)
         '''
-        device_technology_config = self._db.list_device_technology_config()
+        device_technology_config = self._db.list_all_device_technology_config()
         res = []
         for device_technology_config in device_technology_config:
             res.append((device_technology_config.id, device_technology_config.key, device_technology_config.value, 
                     device_technology_config.description, device_technology_config.technology_id))
         return res
 
+    def list_device_technology_config(self, dt_id):
+        """
+        Return all keys and values of a device technology
+        @param dt_id : id of the device technology
+        @return a list of DeviceTechnologyConfig objects
+        """
+        device_technology_config = self._db.list_device_technology_config(dt_id)
+        res = []
+        for device_technology_config in device_technology_config:
+            res.append((device_technology_config.id, device_technology_config.key, device_technology_config.value, 
+                    device_technology_config.description, device_technology_config.technology_id))
+        return res
+
+
     def get_device_technology_config(self, device_technology_id, device_technology_config_key):
         ''' Return informations about a device technology config item
         @param device_technology_config_name : The device_technology_config's name 
         @return a tuple (id, key, value, description, technology_id)
         '''
-        device_technology_config = self._db.get_device_technology_config_by_name(device_technology_config_name)
+        device_technology_config = self._db.get_device_technology_config(device_technology_id, device_technology_config_key)
         if device_technology_config is not None:
             return (device_technology_config.id, device_technology_config.key, device_technology_config.value, 
                     device_technology_config.description, device_technology_config.technology_id)
@@ -522,9 +536,23 @@ class XmlRpcDbHelper():
         @warning this won't list device  stat values
         @return a list of tuple (id, device_id, date) 
         '''
-        stat = self._db.list_device_stats(d_device_id)
-        if stat is not None:
-            return (stat.id, stat.device_id, stat.date)
+        stats = self._db.list_device_stats(d_device_id)
+        res = []
+        for stat in stats:
+            res.append((stat.id, stat.device_id, stat.date))
+        return res
+
+    def list_all_device_stats(self):
+        """ Return a list of all device stats 
+        @return a list of tuple (stat.id, stat.device_id, stat.date)
+        """
+        stats = self._db.list_all_device_stats()
+        res = []
+        for stat in stats:
+            res.append((stat.id, stat.name, stat.value))
+        return res
+
+        
 
     def list_device_stats_values(self, d_device_stats_id):
         ''' Return a list of all values associated to a device statistic
@@ -539,10 +567,10 @@ class XmlRpcDbHelper():
 
     def get_last_stat_of_device(self, d_device_id):
         '''Fetch the last record of stats for a device
-        @param d_device_id : device id
+        @param d_device_id : device id list
         @return a tuple (device_stat.id, device_stat.device_id, device_stat.date)
         '''
-        stat = self._db.get_last_stat_of_devices(d_device_id)
+        stat = self._db.get_last_stat_of_device(d_device_id)
         if stat is not None:
             return ((stat.id, stat.device_id, stat.date))
 
@@ -607,7 +635,7 @@ class XmlRpcDbHelper():
     def get_trigger(self, t_id):
         ''' Returns a trigger information from id
         @param t_id : trigger id
-        @return a Trigger object
+        @return a tuple (id, description, rule, result)
         '''
         trigger = self._db.get_trigger(t_id)
         return (trigger.id, trigger.description, trigger.rule, trigger.result)
@@ -769,6 +797,69 @@ class XmlRpcDbHelper():
         '''
         self._db.del_user_account(u_id)
 
+
+####
+# System stats
+####
+    def list_system_stats(self):
+        """
+        Return a list of all system stats
+        @return a list of tuple  (id, name, hostname, date)
+        """
+        stats = self._db.list_system_stats()
+        res = []
+        for stat in stats:
+            res.append((stat.id, stat.name, stat.hostname, stat.date))
+        return res
+
+    def list_system_stats_values(self, s_system_stats_id):
+        """
+        Return a list of all values associated to a system statistic
+        @param s_system_stats_id : the system statistic id
+        @return a list of tuple (system_stat_value.id, system_stat_value.system_id,
+        system_stat_value.name, system_stat_value.value)
+        """
+        stats = self._db.list_system_stats_values(s_system_stats_id)
+        res = []
+        for stat in stats:
+            res.append((stat.id, stat.system_stats_id, stat.name, stat.value))
+        return res
+
+    def get_system_stat(self, s_id):
+        """
+        Return a system stat
+        @param s_name : the name of the stat to be retrieved
+        @return a tuple (id, name, hostname, date)
+        """
+        stat = self._db.get_system_stat(s_id)
+        return (stat.id, stat.name, stat.hostname, stat.date)
+
+    def add_system_stat(self, s_name, s_hostname, s_date, s_values):
+        """
+        Add a system stat record
+        @param s_name : name of the  module
+        @param s_hostname : name of the  host
+        @param s_date : when the stat was gathered (timestamp)
+        @param s_values : a dictionnary of system statistics values
+        @return the tuple (stat.id, stat.name, stat.hostname, stat.date) 
+        """
+        stat = self._db.add_system_stat(s_name, s_hostname, s_date, s_values)
+        if stat is not None:
+            return (stat.id, stat.name, stat.hostname, stat.date)
+
+    def del_system_stat(self, s_name):
+        """
+        Delete a system stat record
+        @param s_name : name of the stat that has to be deleted
+        """
+        self._db.del_system_stat(s_name)
+
+    def del_all_system_stats(self):
+        """
+        Delete all stats of the system
+        """
+        self._db.del_all_system_stats()
+
 ###
 # ItemUIConfig
 ###
@@ -801,7 +892,7 @@ class XmlRpcDbHelper():
         '''
         item = self._db.get_item_ui_config(i_item_id, i_item_type, i_key)
         if item is not None:
-            return (item.item_id, item.type, item.key, item.value)
+            return (item.item_id, item.item_type, item.key, item.value)
 
     def list_item_ui_config(self, i_item_id, i_item_type):
         ''' List all UI parameters of an item
@@ -811,6 +902,19 @@ class XmlRpcDbHelper():
         '''
         return self._db.list_item_ui_config(i_item_id, i_item_type)
 
+    def list_all_item_ui_config(self):
+        ''' List all UI parameters 
+        @param i_item_id : if of the item we want to list the parameters
+        @param i_item_type : type of the item (area, room, device)
+        @return a list containing all the (key, value) tuples
+        '''
+        items = self._db.list_all_item_ui_config()
+        res = []
+        for item in items:
+            res.append((item.item_id, item.item_type, item.key, item.value))
+        return res
+
+    
     def delete_item_ui_config(self, i_item_id, i_item_type, i_key):
         ''' Delete a UI parameter of an item
         @param i_item_id : id of the item we want to delete its parameter
