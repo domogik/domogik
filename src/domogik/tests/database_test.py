@@ -813,8 +813,8 @@ class ItemUIConfigTestCase(GenericTestCase):
     def testAdd(self):
         area1 = self.db.add_area('area1','description 1')
         room1 = self.db.add_room('room1', area1.id)
-        self.db.add_item_ui_config(area1.id, 'area', param_a1='value_a1', param_a2='value_a2')
-        self.db.add_item_ui_config(room1.id, 'room', param_r1='value_r1', param_r2='value_r2')
+        self.db.add_item_ui_config(area1.id, 'area', {'param_a1':'value_a1','param_a2':'value_a2'})
+        self.db.add_item_ui_config(room1.id, 'room', {'param_r1':'value_r1', 'param_r2':'value_r2'})
         value_dict = self.db.list_item_ui_config(room1.id, 'room')
         assert value_dict == {'param_r1': 'value_r1', 'param_r2': 'value_r2'}, "Wrong dictionnary returned : %s" % value_dict
         uic = self.db.get_item_ui_config(room1.id, 'room', 'param_r2')
@@ -828,7 +828,7 @@ class ItemUIConfigTestCase(GenericTestCase):
             error = True
         assert error is True, "Shouldn't have found any param values for (%s, %s)" % (area1.id, 'foo')
         try:
-            self.db.add_item_ui_config(800000000, 'area', param_a1='value_a1', param_a2='value_a2')
+            self.db.add_item_ui_config(800000000, 'area', {'param_a1':'value_a1', 'param_a2':'value_a2'})
         except DbHelperException:
             error = True
         assert error is True, "Shouldn't have been able to add parameters with this item.id which doesn't exist"
@@ -836,8 +836,8 @@ class ItemUIConfigTestCase(GenericTestCase):
     def testUpdate(self):
         area1 = self.db.add_area('area1','description 1')
         room1 = self.db.add_room('room1', area1.id)
-        self.db.add_item_ui_config(area1.id, 'area', param_a1='value_a1', param_a2='value_a2')
-        self.db.add_item_ui_config(room1.id, 'room', param_r1='value_r1', param_r2='value_r2')
+        self.db.add_item_ui_config(area1.id, 'area', {'param_a1':'value_a1', 'param_a2':'value_a2'})
+        self.db.add_item_ui_config(room1.id, 'room', {'param_r1':'value_r1', 'param_r2':'value_r2'})
         uic = self.db.update_item_ui_config(area1.id, 'area', 'param_a1', 'new_value_a1')
         uic = self.db.get_item_ui_config(area1.id, 'area', 'param_a1')
         assert uic.value == 'new_value_a1', "Parameter should have the value '%s' but it has '%s'" \
@@ -846,9 +846,9 @@ class ItemUIConfigTestCase(GenericTestCase):
     def testDel(self):
         area1 = self.db.add_area('area1','description 1')
         room1 = self.db.add_room('room1', area1.id)
-        self.db.add_item_ui_config(area1.id, 'area', param_a1='value_a1', param_a2='value_a2')
-        self.db.add_item_ui_config(room1.id, 'room', param_r1='value_r1', param_r2='value_r2')
-        self.db.add_item_ui_config(area1.id, 'area', param_a3='value_a3')
+        self.db.add_item_ui_config(area1.id, 'area', {'param_a1':'value_a1', 'param_a2':'value_a2'})
+        self.db.add_item_ui_config(room1.id, 'room', {'param_r1':'value_r1', 'param_r2':'value_r2'})
+        self.db.add_item_ui_config(area1.id, 'area', {'param_a3':'value_a3'})
         self.db.delete_item_ui_config(area1.id, 'area', 'param_a3')
         assert 'param_a1' in self.db.list_item_ui_config(area1.id, 'area').keys(), "param_a1 should have been found"
         assert 'param_a3' not in self.db.list_item_ui_config(area1.id, 'area').keys(), "param_a3 should NOT have been found"

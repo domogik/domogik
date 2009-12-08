@@ -36,7 +36,7 @@ Implements
 import unittest
 import re
 
-from domogik.common.exceptions import XplMessageError
+from domogik.common.dmg_exceptions import XplMessageError
 from domogik.common.ordereddict import OrderedDict
 from domogik.xpl.common.xplmessage import XplMessage
 

@@ -36,25 +36,29 @@ Implements
 import unittest
 import re
 
-from domogik.xpl.lib.module import XplModule
+from domogik.xpl.lib.module import xPLModule
 from domogik.xpl.common.xplmessage import XplMessage
+from domogik.common.dmg_exceptions import XplMessageError
+from domogik.common.ordereddict import OrderedDict
 
 
-class XplModuleTest(unittest.TestCase):
-    """ Test XplModule class.
+class xPLModuleTest(unittest.TestCase):
+    """ Test xPLModule class.
     """
+
     def setUp(self):
         """ Setup context.
-
         The context is setup before each call to a test method.
         """
-        self.__xpl_module = XplModule('test')
+        self.__xpl_module = xPLModule('test')
+        self.__xpl_message = XplMessage()
 
     def tearDown(self):
         """ clean context.
-
         The context is cleaned after each call of a test method.
         """
+        self.__xpl_module.force_leave()
+        del self.__xpl_message
         del self.__xpl_module
 
     def test_set_type(self):

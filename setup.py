@@ -63,6 +63,7 @@ setup(
 #    include_package_data = True,
     packages = find_packages('src', exclude=["mpris"]),
     package_dir = {'': 'src'},
+    test_suite = 'domogik.tests',
     #Include all files of the ui/djangodomo directory
     #in data files.
     package_data = {'domogik.ui.djangodomo': rec_glob_get_files('src/domogik/ui/djangodomo/'),

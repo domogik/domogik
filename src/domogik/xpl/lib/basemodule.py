@@ -55,7 +55,10 @@ class BaseModule():
 
     def __getattr__(self, attr):
         """ Delegate access to implementation """
-        return getattr(self.__instance, attr)
+        try:
+            return getattr(self.__instance, attr)
+        except:
+            pass
 
     def __setattr__(self, attr, value):
         """ Delegate access to implementation """

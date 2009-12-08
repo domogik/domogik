@@ -658,7 +658,7 @@ class DeviceStatsTestCase(GenericTestCase):
 
         assert self.db.device_has_stats(device1[0])
         assert not self.db.device_has_stats(device4[0])
-:
+
     def testDelDeviceStat(self):
         dt1 = self.db.add_device_technology(u"x10", "this is x10", u"cpl")
         dc1 = self.db.add_device_category("lighting")
