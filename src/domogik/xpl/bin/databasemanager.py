@@ -165,6 +165,9 @@ class DBConnector(xPLModule):
                 'xbmc': {'address' : '192.168.0.20:8080', 
                          'delay' : '15',
                          'maxdelay' : '20'},
+                'gagenda': {'email' : "fritz.smh@gmail.com",
+                         'password' : 'XXXXXXXX',
+                         'calendarname' : 'fritz.smh@gmail.com'},
                 'teleinfo' : {'device' : '/dev/ttyUSB0',
                     'interval' : '30'},
                 }
