@@ -72,7 +72,7 @@ class XBMCNotification:
         """
         self._log.info("Start process for notification on XBMC (" + self._XBMCAddress + ")")
         row=int(row)
-        delay=float(delay)
+        delay=int(delay)
 
         self._currentAction = time.time()
         timeBetweenActions = float(self._currentAction - self._lastAction)
@@ -82,7 +82,7 @@ class XBMCNotification:
         self._log.debug("Max delay : " + str(self._maxDelayBetweenActions))
         if timeBetweenActions > self._maxDelayBetweenActions:
             self._log.debug("Time elapsed (" + str(timeBetweenActions) + ") for completing last notification : start new notification")
-            self._title = "Domogik"
+            self._title = ""
             self._text = ""
             self._titleReceived = 0
             self._textReceived = 0
@@ -103,13 +103,17 @@ class XBMCNotification:
                 self._delay = self._defaultDisplayDelay
                 self._log.debug("DELAY=0 : setting default value : " + str(self._defaultDisplayDelay))
             else:
-                self._delay = delay
+                self._delay = delay 
 
             # All components of notification received
             if self._titleReceived and self._textReceived:
                 self._stop = threading.Event()
                 self._thread = self.__XBMCNotificationHandler(self._XBMCAddress, self._title, self._text, self._delay)
                 self._thread.run()
+                self._title = ""
+                self._text = ""
+                self._titleReceived = 0
+                self._textReceived = 0
 
             
         self._lastAction = self._currentAction
