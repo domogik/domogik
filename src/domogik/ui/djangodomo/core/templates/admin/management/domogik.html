@@ -75,18 +75,18 @@ $(function(){
                                 </table>
                         </fieldset>
                 </form>
-
-                <form name="dataForm" action="{% url admin_view %}" method="POST">
-                        <fieldset>
-                                <legend>Data</legend>
-                                <table>
-                                        <tr>
-                                                <td>&raquo;&nbsp;<a href="{% url device_stats_view 0 %}">View stats</a></td>
-                                        </tr>
-                                </table>
-                        </fieldset>
-                </form>
-
+{% comment %}
+#                <form name="dataForm" action="{% url admin_view %}" method="POST">
+#                        <fieldset>
+#                                <legend>Data</legend>
+#                                <table>
+#                                        <tr>
+#                                                <td>&raquo;&nbsp;<a href="{% url device_stats_view 0 %}">View stats</a></td>
+#                                        </tr>
+#                                </table>
+#                        </fieldset>
+#                </form>
+{% endcomment %}
                 <form name="simulationForm" action="" method="POST">
                         <fieldset>
                                 <legend>Simulation</legend>
