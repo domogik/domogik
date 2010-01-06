@@ -1,0 +1,19 @@
+/* Header */
+#logo {
+  float:left;
+  margin:0 1em 0 0;
+}
+
+#header {
+  padding:1em 0 0 1em;
+}
+
+#title {
+  font-size:2em;
+}
+
+#subtitle {
+  display:block;
+  font-size:0.6em;
+  font-style:italic;
+}

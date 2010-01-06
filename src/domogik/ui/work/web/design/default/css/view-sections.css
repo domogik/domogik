@@ -1,0 +1,45 @@
+.section {
+    background:#eeeeee url(ui-lightness/images/ui-bg_highlight-soft_100_eeeeee_1x100.png) top left repeat-x;
+    width:30em;
+    border: 1px solid #cccccc;
+          -moz-border-radius: 0.8em;
+  -webkit-border-radius: 0.8em;
+}
+
+.section-header {
+  background-position: top left;
+  background-repeat:no-repeat;
+}
+
+.section-extended {
+    padding:1em;
+}
+
+.section-footer {
+    text-align:right;
+}
+
+.section-footer a {
+    display:block;
+    padding: 0 0.5em 0 0.5em;
+    text-decoration:none;
+    font-size:2em;
+}
+
+h2.ident {
+  font-size:1em;
+  padding:0.5em 0 0 70px;
+  min-height:50px;
+}
+
+.title {
+  font-size:1.5em;
+}
+
+.subtitle {
+  font-style:italic;
+  color:#666;
+  padding-left:20px;
+  background-position:left 50%;
+  background-repeat:no-repeat;
+ }
