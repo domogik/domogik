@@ -67,7 +67,7 @@ def index(request):
 
     #device_list = _db.list_devices()
     """
-    if request.method == 'POST': 
+    if request.method == 'POST':
         # An action was submitted
         cmd = QueryDict.get(request.POST, "cmd", "")
         if cmd == "filter":
@@ -109,7 +109,7 @@ def device(request, device_id):
     page_title = _("Device details")
     sys_config = _db.get_system_config()
 
-    if request.method == 'POST': 
+    if request.method == 'POST':
         # An action was submitted
         # TODO check the value of the button (reset or update value)
         _update_device_values(request, sys_config)
@@ -140,7 +140,7 @@ def device_stats(request, device_id):
         _clear_device_stats(request, device_id)
 
     # Read device stats
-    if device_id == "0": 
+    if device_id == "0":
         # For all devices
         device_all = "True"
         device_stats_list = []
@@ -149,7 +149,7 @@ def device_stats(request, device_id):
               device_stats_list.append(device_stat)
     else:
         device_stats_list = _db.list_device_stats(device_id)
-    return _go_to_page(request, 'device_stats.html', page_title, device_id=device_id, 
+    return _go_to_page(request, 'device_stats.html', page_title, device_id=device_id,
                       device_stats_list=device_stats_list, device_all=device_all)
 
 def login(request):
@@ -174,9 +174,9 @@ def login(request):
                 first_name = login
                 last_name = login
             request.session['user'] = {
-                'login': sys_account.login, 
-                'is_admin': sys_account.is_admin, 
-                'first_name': first_name, 
+                'login': sys_account.login,
+                'is_admin': sys_account.is_admin,
+                'first_name': first_name,
                 'last_name': last_name,
                 'skin_used': sys_account.skin_used,
             }
@@ -231,8 +231,8 @@ def admin_management_domogik(request):
         admin_mode = "checked"
     if sys_config.debug_mode:
         debug_mode = "checked"
-    return _go_to_page(request, _ADMIN_MANAGEMENT_DOMOGIK, page_title, action=action, 
-                      simulation_mode=simulation_mode, admin_mode=admin_mode, 
+    return _go_to_page(request, _ADMIN_MANAGEMENT_DOMOGIK, page_title, action=action,
+                      simulation_mode=simulation_mode, admin_mode=admin_mode,
                       debug_mode=debug_mode)
 
 def admin_management_modules(request):
@@ -245,7 +245,7 @@ def admin_management_modules(request):
         return index(request)
     page_title = _("Gestion des modules")
     return _go_to_page(request, 'admin/management/modules.html', page_title)
-    
+
 def save_admin_settings(request):
     """
     Save the administrator settings (admin, debug and simulation mode
@@ -271,7 +271,7 @@ def load_sample_data(request):
     if not _is_user_admin(request):
         return index(request)
 
-    page_title = _("Load sample data")
+    page_title = _(u"Chargement d'un jeu de données de test")
     action = "loadSampleData"
 
     sys_config = _db.get_system_config()
@@ -287,9 +287,9 @@ def load_sample_data(request):
     device_category_list = _db.list_device_categories()
     device_list = _db.list_devices()
     device_tech_list = _db.list_device_technologies()
-    return _go_to_page(request, _ADMIN_MANAGEMENT_DOMOGIK, page_title, action=action, 
-                      area_list=area_list, room_list=room_list, 
-                      device_category_list=device_category_list, 
+    return _go_to_page(request, _ADMIN_MANAGEMENT_DOMOGIK, page_title, action=action,
+                      area_list=area_list, room_list=room_list,
+                      device_category_list=device_category_list,
                       device_list=device_list, device_tech_list=device_tech_list)
 
 def clear_data(request):
@@ -412,7 +412,7 @@ def _clear_device_stats(request, device_id):
     @param device_id : device id
     """
     if _is_user_admin(request):
-        if device_id == "0": 
+        if device_id == "0":
             # For all devices
             for device in _db.list_devices():
                 _db.del_all_device_stats(device.id)
@@ -476,12 +476,12 @@ def device_status(request, room_id=None, device_id=None):
         print "Set power to ", request.POST["value"]
         response = {'value': request.POST['value']}
     else:
-        devices = Device.objects.filter(pk__in=request.GET.getlist('devices')) 
+        devices = Device.objects.filter(pk__in=request.GET.getlist('devices'))
         json = simplejson.dumps(dict((d.pk, d.get_data_dict()) for d in devices))
         return HttpResponse(json)
     return HttpResponse(response)
     """
-    
+
 def admin_organisation_devices(request):
     """
     Method called when the admin devices organisation page is accessed
@@ -496,7 +496,7 @@ def admin_organisation_devices(request):
     device_tech_list = _db.list_device_technologies()
     page_title = _("Organisation des dispositifs")
     return _go_to_page(
-        request, 'admin/organisation/devices.html', 
+        request, 'admin/organisation/devices.html',
         page_title,
         device_category_list=device_category_list,
         rooms_list=rooms_list,
@@ -519,7 +519,7 @@ def admin_organisation_rooms(request):
     icons_room = ["default", "kitchen", "bedroom", "livingroom", "tvlounge", "bathroom"]
     page_title = _("Organisation des pieces")
     return _go_to_page(
-        request, 'admin/organisation/rooms.html', 
+        request, 'admin/organisation/rooms.html',
         page_title,
         unattribued_devices=unattribued_devices,
         devices_list=devices_list,
@@ -568,7 +568,7 @@ def show_index(request):
         rooms_list=rooms_list,
         areas_list=areas_list
     )
-    
+
 def show_room(request, room_id):
     """
     Method called when the show room page is accessed
@@ -587,7 +587,7 @@ def show_room(request, room_id):
         rooms_list=rooms_list,
         areas_list=areas_list
     )
-    
+
 def show_area(request, area_id):
     """
     Method called when the show area page is accessed
@@ -624,4 +624,4 @@ def show_device(request, category_id):
         device_categories_list=device_categories_list,
         rooms_list=rooms_list,
         areas_list=areas_list
-    )    
+    )

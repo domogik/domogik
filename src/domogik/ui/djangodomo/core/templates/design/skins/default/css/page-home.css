@@ -46,7 +46,7 @@ ul#nav1 {
 }
 
 .icon-weather-raincloud {
-    top:-131px;    
+    top:-131px;
 }
 
 #general-datetime #general-time {
@@ -139,7 +139,7 @@ h2.room-ident {
     padding-left:25px;
     float:right;
     font-size:1.5em;
-    background:url(../images/room_temp.png) top left no-repeat;
+    background:url(../images/temperature.png) top left no-repeat;
 }
 
 .room-infos {
@@ -156,7 +156,7 @@ h2.room-ident {
 }
 
 .device-status-on, .device-status-off,
-.device-status-up, .device-status-down, 
+.device-status-up, .device-status-down,
 .device-status-play, .device-status-stop {
     padding:10px 0 10px 18px;
     background-position:left 50%;

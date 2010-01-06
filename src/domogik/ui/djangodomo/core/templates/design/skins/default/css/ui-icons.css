@@ -27,17 +27,17 @@
 .icon16-room-bathroom { background-image:url(../images/default_room_16.png);}
 
 /* Area icons */
-.icon64-area-grndfloor { background-image:url(../images/rdc_white_64.png);}
-.icon64-area-firstfloor { background-image:url(../images/etage1_white_64.png);}
-.icon64-area-basement { background-image:url(../images/sous-sol_white_64.png);}
+.icon64-area-grndfloor { background-image:url(../images/groundfloor_white_64.png);}
+.icon64-area-firstfloor { background-image:url(../images/floor1_white_64.png);}
+.icon64-area-basement { background-image:url(../images/basement_white_64.png);}
 
-.icon32-area-grndfloor { background-image:url(../images/rdc_white_32.png);}
-.icon32-area-firstfloor { background-image:url(../images/etage1_white_32.png);}
-.icon32-area-basement { background-image:url(../images/sous-sol_white_32.png);}
+.icon32-area-grndfloor { background-image:url(../images/groundfloor_white_32.png);}
+.icon32-area-firstfloor { background-image:url(../images/floor1_white_32.png);}
+.icon32-area-basement { background-image:url(../images/basement_white_32.png);}
 
-.icon16-area-grndfloor { background-image:url(../images/rdc_white_16.png);}
-.icon16-area-firstfloor { background-image:url(../images/etage1_white_16.png);}
-.icon16-area-basement { background-image:url(../images/sous-sol_white_16.png);}
+.icon16-area-grndfloor { background-image:url(../images/groundfloor_white_16.png);}
+.icon16-area-firstfloor { background-image:url(../images/floor1_white_16.png);}
+.icon16-area-basement { background-image:url(../images/basement_white_16.png);}
 
 /* Device icons */
 .icon32-device-electricity { background-image:url(../images/electricity_32.png);}
@@ -49,21 +49,21 @@
 
 
 .icon32-device-tv { background-image:url(../images/tv_32.png);}
-.icon32-device-ventilation { background-image:url(../images/ventilo_white_32.png);}
+.icon32-device-ventilation { background-image:url(../images/fan_white_32.png);}
 .icon32-device-sound { background-image:url(../images/audio_32.png);}
-.icon32-device-aiconditioning { background-image:url(../images/clim_white_32.png);}
+.icon32-device-aiconditioning { background-image:url(../images/aircond_white_32.png);}
 .icon32-device-wifi { background-image:url(../images/wifi_32.png);}
 .icon32-device-light { background-image:url(../images/light_32.png);}
 
 /* Status icons */
-.icon16-status-defaulton { background-image:url(../images/room_various_on.png);}
-.icon16-status-defaultoff { background-image:url(../images/room_various_off.png);}
-.icon16-status-lighton { background-image:url(../images/room_light_on.png);}
-.icon16-status-lightoff { background-image:url(../images/room_light_off.png);}
-.icon16-status-shutterup { background-image:url(../images/room_shutter_down.png);}
-.icon16-status-shutterdown { background-image:url(../images/room_shutter_down.png);}
-.icon16-status-ventilationon { background-image:url(../images/ventilo_on_16.png);}
-.icon16-status-ventilationoff { background-image:url(../images/ventilo_off_16.png);}
-.icon16-status-airconditioningon { background-image:url(../images/clim_on_16.png);}
-.icon16-status-airconditioningoff { background-image:url(../images/clim_off_16.png);}
-.icon16-status-soundplaying { background-image:url(../images/room_sound_play.png);}
+.icon16-status-defaulton { background-image:url(../images/various_green_on.png);}
+.icon16-status-defaultoff { background-image:url(../images/various_grey_off.png);}
+.icon16-status-lighton { background-image:url(../images/lightbulb_on.png);}
+.icon16-status-lightoff { background-image:url(../images/lightbulb_off.png);}
+.icon16-status-shutterup { background-image:url(../images/shutter_down.png);}
+.icon16-status-shutterdown { background-image:url(../images/shutter_down.png);}
+.icon16-status-ventilationon { background-image:url(../images/fan_green_16.png);}
+.icon16-status-ventilationoff { background-image:url(../images/fan_black_16.png);}
+.icon16-status-airconditioningon { background-image:url(../images/aircond_green_16.png);}
+.icon16-status-airconditioningoff { background-image:url(../images/aircond_black_16.png);}
+.icon16-status-soundplaying { background-image:url(../images/sound_play_green.png);}
