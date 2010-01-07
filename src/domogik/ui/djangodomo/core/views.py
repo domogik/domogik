@@ -512,7 +512,7 @@ def admin_organisation_rooms(request):
     """
     if not _is_user_admin(request):
         return index(request)
-    unattribued_devices = _db.search_devices(room_id=None)
+    unattribued_devices = _db.search_devices({'room_id':None})
     devices_list = _db.list_devices()
     rooms_list = _db.list_rooms()
     areas_list = _db.list_areas()
@@ -536,7 +536,7 @@ def admin_organisation_areas(request):
     """
     if not _is_user_admin(request):
         return index(request)
-    unattribued_rooms = _db.search_rooms(area_id=None)
+    unattribued_rooms = _db.search_rooms({'area_id':None})
     rooms_list = _db.list_rooms()
     areas_list = _db.list_areas()
     icons_area = ["grndfloor", "firstfloor", "basement"]
