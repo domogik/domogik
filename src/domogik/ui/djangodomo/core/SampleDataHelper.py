@@ -109,14 +109,14 @@ class SampleDataHelper:
         self._db.update_system_config(s_simulation_mode=True, s_debug_mode=True)
 
         # Create sample objects
-        x10 = self._db.add_device_technology(dt_name=u"x10", 
-                                            dt_description="x10 techno", 
+        x10 = self._db.add_device_technology(dt_name=u"x10",
+                                            dt_description="x10 techno",
                                             dt_type=u"cpl")
-        plcbus = self._db.add_device_technology(dt_name=u"PLCBus", 
-                                                dt_description="plcbus techno", 
+        plcbus = self._db.add_device_technology(dt_name=u"PLCBus",
+                                                dt_description="plcbus techno",
                                                 dt_type=u"cpl")
-        onewire = self._db.add_device_technology(dt_name=u"1wire", 
-                                                dt_description="1-wire techno", 
+        onewire = self._db.add_device_technology(dt_name=u"1wire",
+                                                dt_description="1-wire techno",
                                                 dt_type=u"wired")
 
         temperature_cat = self._db.add_device_category(dc_name="Temperature")
@@ -138,46 +138,46 @@ class SampleDataHelper:
 
         bedroom1_beside_lamp = self._db.add_device(
             d_name="Beside lamp", d_address="A1", d_technology_id=x10.id, d_type=u"appliance", d_reference="AM12",
-            d_category_id=lighting_cat.id, d_room_id=bedroom1.id, d_is_resetable=True, d_initial_value="off", 
+            d_category_id=lighting_cat.id, d_room_id=bedroom1.id, d_is_resetable=True, d_initial_value="off",
             d_is_value_changeable_by_user=True, d_unit_of_stored_values=None
         )
         bedroom1_lamp = self._db.add_device(
             d_name="Lamp", d_address="A2", d_technology_id=x10.id, d_type=u"lamp", d_category_id=lighting_cat.id,
-            d_reference="LM12", d_room_id=bedroom1.id, d_is_resetable=True, 
+            d_reference="LM12", d_room_id=bedroom1.id, d_is_resetable=True,
             d_initial_value="100", d_is_value_changeable_by_user=True, d_unit_of_stored_values=u"Percent"
         )
         bedroom2_beside_lamp = self._db.add_device(
             d_name="Beside lamp", d_address="B1", d_technology_id=x10.id, d_type=u"appliance", d_reference="AM12",
-            d_category_id=lighting_cat.id, d_room_id=bedroom2.id, d_is_resetable=True, d_initial_value="off", 
+            d_category_id=lighting_cat.id, d_room_id=bedroom2.id, d_is_resetable=True, d_initial_value="off",
             d_is_value_changeable_by_user=True, d_unit_of_stored_values=None
         )
         bedroom2_lamp = self._db.add_device(
             d_name="Lamp", d_address="B2", d_technology_id=x10.id, d_type=u"lamp", d_category_id=lighting_cat.id,
-            d_reference="LM12", d_room_id=bedroom2.id, d_is_resetable=True, 
+            d_reference="LM12", d_room_id=bedroom2.id, d_is_resetable=True,
             d_initial_value="100", d_is_value_changeable_by_user=True, d_unit_of_stored_values=u"Percent"
         )
         lounge_lamp = self._db.add_device(
             d_name="Lamp", d_address="C1", d_technology_id=x10.id, d_type=u"lamp", d_category_id=lighting_cat.id,
-            d_reference="LM12", d_room_id=lounge.id, d_is_resetable=True, 
+            d_reference="LM12", d_room_id=lounge.id, d_is_resetable=True,
             d_initial_value="100", d_is_value_changeable_by_user=True, d_unit_of_stored_values=u"Percent"
         )
         kitchen_lamp = self._db.add_device(
             d_name="Lamp", d_address="D1", d_technology_id=x10.id, d_type=u"lamp", d_category_id=lighting_cat.id,
-            d_reference="LM12", d_room_id=kitchen.id, d_is_resetable=True, 
+            d_reference="LM12", d_room_id=kitchen.id, d_is_resetable=True,
             d_initial_value="100", d_is_value_changeable_by_user=True, d_unit_of_stored_values=u"Percent"
         )
         kitchen_coffee_machine = self._db.add_device(
-            d_name="Coffee machine", d_address="D2", d_technology_id=x10.id, d_type=u"appliance", 
-            d_category_id=appliance_cat.id, d_reference="AM12", d_room_id=kitchen.id, d_is_resetable=True, 
+            d_name="Coffee machine", d_address="D2", d_technology_id=x10.id, d_type=u"appliance",
+            d_category_id=appliance_cat.id, d_reference="AM12", d_room_id=kitchen.id, d_is_resetable=True,
             d_initial_value="off", d_is_value_changeable_by_user=True, d_unit_of_stored_values=None
         )
 
-        bedroom1_icon = self._db.add_item_ui_config(bedroom1.id, 'room', icon="bedroom")
-        bedroom2_icon = self._db.add_item_ui_config(bedroom2.id, 'room', icon="bedroom")
-        lounge_icon = self._db.add_item_ui_config(lounge.id, 'room', icon="tvlounge")
-        kitchen_icon = self._db.add_item_ui_config(kitchen.id, 'room', icon="kitchen")
-        bathroom_icon = self._db.add_item_ui_config(bathroom.id, 'room', icon="bathroom")
-        
-        basement_icon = self._db.add_item_ui_config(basement.id, 'area', icon="basement")
-        groundfloor_icon = self._db.add_item_ui_config(ground_floor.id, 'area', icon="grndfloor")
-        firstfloor_icon = self._db.add_item_ui_config(first_floor.id, 'area', icon="firstfloor")
+        bedroom1_icon = self._db.add_item_ui_config(bedroom1.id, 'room', {'icon':'bedroom'})
+        bedroom2_icon = self._db.add_item_ui_config(bedroom2.id, 'room', {'icon':'bedroom'})
+        lounge_icon = self._db.add_item_ui_config(lounge.id, 'room', {'icon':'tvlounge'})
+        kitchen_icon = self._db.add_item_ui_config(kitchen.id, 'room', {'icon':'kitchen'})
+        bathroom_icon = self._db.add_item_ui_config(bathroom.id, 'room', {'icon':'bathroom'})
+
+        basement_icon = self._db.add_item_ui_config(basement.id, 'area', {'icon':'basement'})
+        groundfloor_icon = self._db.add_item_ui_config(ground_floor.id, 'area', {'icon':'grndfloor'})
+        firstfloor_icon = self._db.add_item_ui_config(first_floor.id, 'area', {'icon':'firstfloor'})
