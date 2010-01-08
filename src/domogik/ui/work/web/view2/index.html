@@ -1,37 +1,499 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
-
-    <title>Domogik's new UI</title>
-    <link href="../design/default/css/ui-lightness/jquery-ui-1.7.2.custom.css" rel="stylesheet" type="text/css" />
-    <link href="../design/default/css/main.css" rel="stylesheet" type="text/css" />
-    <link href="../design/default/css/ui-icons.css" rel="stylesheet" type="text/css" />
-    <link href="../design/default/css/ui-nav1_mini.css" rel="stylesheet" type="text/css" />
-    <link href="../design/default/css/view-sections.css" rel="stylesheet" type="text/css" />
-    <script type="text/javascript" src="../design/js/jquery-1.3.2.min.js"></script>
-    <script type="text/javascript" src="../design/js/jquery-ui-1.7.2.custom.min.js"></script>
-</script>
-</head>
-
-<body>
-    <ul id="nav1">
-        <li><a href="../index.html">Home</a></li>
-        <li><a href="index.html">Visualisation</a></li>
-        <li><a href="../program/index.html">Programmation</a></li>
-        <li><a href="../admin/index.html"">Administration</a></li>
-    </ul>
-    <div id="frame">
-        <div class='section'>
-            <div class='section-header icon64-room-default'>
-                 <h2 class="ident"><span class="title">Salon TV</span><br />
-                 <span class="subtitle icon16-area-grndfloor">Rez-de-chauss&eacute;e</span></h2>
+    <head>
+        <meta name="generator" content="HTML Tidy for Mac OS X (vers 11 August 2008), see www.w3.org" />
+        <meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+        <title>Domogik's new UI</title>
+        <link href="../design/default/css/ui-lightness/jquery-ui-1.7.2.custom.css" rel="stylesheet" type="text/css" />
+        <link href="../design/default/css/ui-selectmenu.css" rel="stylesheet" type="text/css" />
+        <link href="../design/default/css/main.css" rel="stylesheet" type="text/css" />
+        <link href="../design/default/css/ui-icons.css" rel="stylesheet" type="text/css" />
+        <link href="../design/default/css/ui-nav1_mini.css" rel="stylesheet" type="text/css" />
+        <link href="../design/default/css/ui-element-heat.css" rel="stylesheet" type="text/css" />
+        <link href="../design/default/css/view-sections.css" rel="stylesheet" type="text/css" />
+        <script type="text/javascript" src="../design/js/jquery-1.3.2.min.js"></script>
+        <script type="text/javascript" src="../design/js/jquery-ui-1.7.2.custom.min.js"></script>
+        <script type="text/javascript" src="../design/js/ui.selectmenu.js"></script>
+        <script type="text/javascript">$(function() {
+    $("#button_1").click(function() {
+        $(".section-extended[id!='extended_1']").hide();
+        $("#extended_1").toggle();
+    });
+    $("#button_2").click(function() {
+        $(".section-extended[id!='extended_2']").hide();
+        $("#extended_2").toggle();
+    });
+    $("#button_3").click(function() {
+        $(".section-extended[id!='extended_3']").hide();
+        $("#extended_3").toggle();
+    });
+    $("#button_4").click(function() {
+        $(".section-extended[id!='extended_4']").hide();
+        $("#extended_4").toggle();
+    });
+    $("#button_5").click(function() {
+        $(".section-extended[id!='extended_5']").hide();
+        $("#extended_5").toggle();
+    });
+    $("#button_6").click(function() {
+        $(".section-extended[id!='extended_6']").hide();
+        $("#extended_6").toggle();
+    });
+    $("#button_7").click(function() {
+        $(".section-extended[id!='extended_7']").hide();
+        $("#extended_7").toggle();
+    });
+    $("#button_8").click(function() {
+        $(".section-extended[id!='extended_8']").hide();
+        $("#extended_8").toggle();
+    });
+    $("#button_9").click(function() {
+        $(".section-extended[id!='extended_9']").hide();
+        $("#extended_9").toggle();
+    });
+    $('select.heat-mode').selectmenu(); // Slider heat temperature
+    $("#slider-heat-temp1").slider({
+        range: false,
+        min: 10,
+        max: 25,
+        values: [18],
+        slide: function(event, ui) {
+            $("#value-heat-temp1").val(ui.values[0]);
+        }
+    });
+    $("#value-heat-temp1").val($("#slider-heat-temp1").slider("values", 0));
+    $(".section-extended").hide();
+});</script>
+    </head>
+    <body>
+        <ul id="nav1">
+            <li>
+                <a href="../index.html">Home</a>
+            </li>
+            <li>
+                <a href="index.html">Visualisation</a>
+            </li>
+            <li>
+                <a href="../program/index.html">Programmation</a>
+            </li>
+            <li>
+                <a href="../admin/index.html">Administration</a>
+            </li>
+        </ul>
+        <div id="frame">
+            <div class='row'>
+                <div class='column'>
+                    <div class='section'>
+                        <div class='section-header icon64-room-default'>
+                            <h2 class="ident">
+                                <span class="title">Salon TV</span>
+                                <br />
+                                <span class="subtitle icon16-area-grndfloor">Rez-de-chauss&#233;e</span>
+                            </h2>
+                            <span class='section-temp icon32-device-temp'>21 &#176;C</span>
+                        </div>
+                        <ul class='section-action'>
+                            <li>
+                                <a href='#'>
+                                    <img src='../design/default/images/light_32.png' />
+                                </a>
+                            </li>
+                            <li>
+                                <a href='#'>
+                                    <img src='../design/default/images/shutters_32.png' />
+                                </a>
+                            </li>
+                        </ul>
+                        <div id='extended_1' class='section-extended'>
+                            <div class='section-device'>
+                                <h2>Chauffage</h2>
+                                <div class="section-parameter">
+                                    <span class="label">Mode :</span>
+                                    <select class="heat-mode" id="heat-mode1" name="heat-mode1" title="Mode Chauffage">
+                                        <option value="0">Hors-Gel</option>
+                                        <option value="1">Nuit</option>
+                                        <option value="2">Veille</option>
+                                        <option value="3">Confort</option>
+                                    </select>
+                                </div>
+                                <div class="section-parameter">
+                                <label for="value-heat-temp1" class="label">Temp&#232;rature :</label>
+                                <input type="text" class="value-heat-temp" id="value-heat-temp1" title="Temp&#195;&#169;rature en &#194;&#176;C" />&#176;C 
+                                <div class="slider-heat-temp" id="slider-heat-temp1"></div></div>
+                            </div>
+                        </div>
+                        <div class='section-footer'>
+                            <a id='button_1' href='#' name="button_1">&#187;</a>
+                        </div>
+                    </div>
+                </div>
+                <div class='column'>
+                    <div class='section'>
+                        <div class='section-header icon64-room-default'>
+                            <h2 class="ident">
+                                <span class="title">Salon TV</span>
+                                <br />
+                                <span class="subtitle icon16-area-grndfloor">Rez-de-chauss&#233;e</span>
+                            </h2>
+                            <span class='section-temp icon32-device-temp'>21 &#176;C</span>
+                        </div>
+                        <ul class='section-action'>
+                            <li>
+                                <a href='#'>
+                                    <img src='../design/default/images/light_32.png' />
+                                </a>
+                            </li>
+                            <li>
+                                <a href='#'>
+                                    <img src='../design/default/images/shutters_32.png' />
+                                </a>
+                            </li>
+                        </ul>
+                        <div id='extended_2' class='section-extended'>
+                            <div class='section-device'>
+                                <h2>Chauffage</h2>
+                                <div class="section-parameter">
+                                    <span class="label">Mode :</span>
+                                    <select class="heat-mode" id="heat-mode1" name="heat-mode1" title="Mode Chauffage">
+                                        <option value="0">Hors-Gel</option>
+                                        <option value="1">Nuit</option>
+                                        <option value="2">Veille</option>
+                                        <option value="3">Confort</option>
+                                    </select>
+                                </div>
+                                <div class="section-parameter">
+                                <label for="value-heat-temp1" class="label">Temp&#232;rature :</label>
+                                <input type="text" class="value-heat-temp" id="value-heat-temp1" title="Temp&#195;&#169;rature en &#194;&#176;C" />&#176;C 
+                                <div class="slider-heat-temp" id="slider-heat-temp1"></div></div>
+                            </div>
+                        </div>
+                        <div class='section-footer'>
+                            <a id='button_2' href='#' name="button_1">&#187;</a>
+                        </div>
+                    </div>
+                </div>
+                <div class='column'>
+                    <div class='section'>
+                        <div class='section-header icon64-room-default'>
+                            <h2 class="ident">
+                                <span class="title">Salon TV</span>
+                                <br />
+                                <span class="subtitle icon16-area-grndfloor">Rez-de-chauss&#233;e</span>
+                            </h2>
+                            <span class='section-temp icon32-device-temp'>21 &#176;C</span>
+                        </div>
+                        <ul class='section-action'>
+                            <li>
+                                <a href='#'>
+                                    <img src='../design/default/images/light_32.png' />
+                                </a>
+                            </li>
+                            <li>
+                                <a href='#'>
+                                    <img src='../design/default/images/shutters_32.png' />
+                                </a>
+                            </li>
+                        </ul>
+                        <div id='extended_3' class='section-extended'>
+                            <div class='section-device'>
+                                <h2>Chauffage</h2>
+                                <div class="section-parameter">
+                                    <span class="label">Mode :</span>
+                                    <select class="heat-mode" id="heat-mode1" name="heat-mode1" title="Mode Chauffage">
+                                        <option value="0">Hors-Gel</option>
+                                        <option value="1">Nuit</option>
+                                        <option value="2">Veille</option>
+                                        <option value="3">Confort</option>
+                                    </select>
+                                </div>
+                                <div class="section-parameter">
+                                <label for="value-heat-temp1" class="label">Temp&#232;rature :</label>
+                                <input type="text" class="value-heat-temp" id="value-heat-temp1" title="Temp&#195;&#169;rature en &#194;&#176;C" />&#176;C 
+                                <div class="slider-heat-temp" id="slider-heat-temp1"></div></div>
+                            </div>
+                        </div>
+                        <div class='section-footer'>
+                            <a id='button_3' href='#' name="button_1">&#187;</a>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class='section-extended'>B
+            <div class='row'>
+                <div class='column'>
+                    <div class='section'>
+                        <div class='section-header icon64-room-default'>
+                            <h2 class="ident">
+                                <span class="title">Salon TV</span>
+                                <br />
+                                <span class="subtitle icon16-area-grndfloor">Rez-de-chauss&#233;e</span>
+                            </h2>
+                            <span class='section-temp icon32-device-temp'>21 &#176;C</span>
+                        </div>
+                        <ul class='section-action'>
+                            <li>
+                                <a href='#'>
+                                    <img src='../design/default/images/light_32.png' />
+                                </a>
+                            </li>
+                            <li>
+                                <a href='#'>
+                                    <img src='../design/default/images/shutters_32.png' />
+                                </a>
+                            </li>
+                        </ul>
+                        <div id='extended_4' class='section-extended'>
+                            <div class='section-device'>
+                                <h2>Chauffage</h2>
+                                <div class="section-parameter">
+                                    <span class="label">Mode :</span>
+                                    <select class="heat-mode" id="heat-mode1" name="heat-mode1" title="Mode Chauffage">
+                                        <option value="0">Hors-Gel</option>
+                                        <option value="1">Nuit</option>
+                                        <option value="2">Veille</option>
+                                        <option value="3">Confort</option>
+                                    </select>
+                                </div>
+                                <div class="section-parameter">
+                                <label for="value-heat-temp1" class="label">Temp&#232;rature :</label>
+                                <input type="text" class="value-heat-temp" id="value-heat-temp1" title="Temp&#195;&#169;rature en &#194;&#176;C" />&#176;C 
+                                <div class="slider-heat-temp" id="slider-heat-temp1"></div></div>
+                            </div>
+                        </div>
+                        <div class='section-footer'>
+                            <a id='button_4' href='#' name="button_1">&#187;</a>
+                        </div>
+                    </div>
+                </div>
+                <div class='column'>
+                    <div class='section'>
+                        <div class='section-header icon64-room-default'>
+                            <h2 class="ident">
+                                <span class="title">Salon TV</span>
+                                <br />
+                                <span class="subtitle icon16-area-grndfloor">Rez-de-chauss&#233;e</span>
+                            </h2>
+                            <span class='section-temp icon32-device-temp'>21 &#176;C</span>
+                        </div>
+                        <ul class='section-action'>
+                            <li>
+                                <a href='#'>
+                                    <img src='../design/default/images/light_32.png' />
+                                </a>
+                            </li>
+                            <li>
+                                <a href='#'>
+                                    <img src='../design/default/images/shutters_32.png' />
+                                </a>
+                            </li>
+                        </ul>
+                        <div id='extended_5' class='section-extended'>
+                            <div class='section-device'>
+                                <h2>Chauffage</h2>
+                                <div class="section-parameter">
+                                    <span class="label">Mode :</span>
+                                    <select class="heat-mode" id="heat-mode1" name="heat-mode1" title="Mode Chauffage">
+                                        <option value="0">Hors-Gel</option>
+                                        <option value="1">Nuit</option>
+                                        <option value="2">Veille</option>
+                                        <option value="3">Confort</option>
+                                    </select>
+                                </div>
+                                <div class="section-parameter">
+                                <label for="value-heat-temp1" class="label">Temp&#232;rature :</label>
+                                <input type="text" class="value-heat-temp" id="value-heat-temp1" title="Temp&#195;&#169;rature en &#194;&#176;C" />&#176;C 
+                                <div class="slider-heat-temp" id="slider-heat-temp1"></div></div>
+                            </div>
+                        </div>
+                        <div class='section-footer'>
+                            <a id='button_5' href='#' name="button_1">&#187;</a>
+                        </div>
+                    </div>
+                </div>
+                <div class='column'>
+                    <div class='section'>
+                        <div class='section-header icon64-room-default'>
+                            <h2 class="ident">
+                                <span class="title">Salon TV</span>
+                                <br />
+                                <span class="subtitle icon16-area-grndfloor">Rez-de-chauss&#233;e</span>
+                            </h2>
+                            <span class='section-temp icon32-device-temp'>21 &#176;C</span>
+                        </div>
+                        <ul class='section-action'>
+                            <li>
+                                <a href='#'>
+                                    <img src='../design/default/images/light_32.png' />
+                                </a>
+                            </li>
+                            <li>
+                                <a href='#'>
+                                    <img src='../design/default/images/shutters_32.png' />
+                                </a>
+                            </li>
+                        </ul>
+                        <div id='extended_6' class='section-extended'>
+                            <div class='section-device'>
+                                <h2>Chauffage</h2>
+                                <div class="section-parameter">
+                                    <span class="label">Mode :</span>
+                                    <select class="heat-mode" id="heat-mode1" name="heat-mode1" title="Mode Chauffage">
+                                        <option value="0">Hors-Gel</option>
+                                        <option value="1">Nuit</option>
+                                        <option value="2">Veille</option>
+                                        <option value="3">Confort</option>
+                                    </select>
+                                </div>
+                                <div class="section-parameter">
+                                <label for="value-heat-temp1" class="label">Temp&#232;rature :</label>
+                                <input type="text" class="value-heat-temp" id="value-heat-temp1" title="Temp&#195;&#169;rature en &#194;&#176;C" />&#176;C 
+                                <div class="slider-heat-temp" id="slider-heat-temp1"></div></div>
+                            </div>
+                        </div>
+                        <div class='section-footer'>
+                            <a id='button_6' href='#' name="button_1">&#187;</a>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class='section-footer'><a href='#'>&raquo;</a></div
+            <div class='row'>
+                <div class='column'>
+                    <div class='section'>
+                        <div class='section-header icon64-room-default'>
+                            <h2 class="ident">
+                                <span class="title">Salon TV</span>
+                                <br />
+                                <span class="subtitle icon16-area-grndfloor">Rez-de-chauss&#233;e</span>
+                            </h2>
+                            <span class='section-temp icon32-device-temp'>21 &#176;C</span>
+                        </div>
+                        <ul class='section-action'>
+                            <li>
+                                <a href='#'>
+                                    <img src='../design/default/images/light_32.png' />
+                                </a>
+                            </li>
+                            <li>
+                                <a href='#'>
+                                    <img src='../design/default/images/shutters_32.png' />
+                                </a>
+                            </li>
+                        </ul>
+                        <div id='extended_7' class='section-extended'>
+                            <div class='section-device'>
+                                <h2>Chauffage</h2>
+                                <div class="section-parameter">
+                                    <span class="label">Mode :</span>
+                                    <select class="heat-mode" id="heat-mode1" name="heat-mode1" title="Mode Chauffage">
+                                        <option value="0">Hors-Gel</option>
+                                        <option value="1">Nuit</option>
+                                        <option value="2">Veille</option>
+                                        <option value="3">Confort</option>
+                                    </select>
+                                </div>
+                                <div class="section-parameter">
+                                <label for="value-heat-temp1" class="label">Temp&#232;rature :</label>
+                                <input type="text" class="value-heat-temp" id="value-heat-temp1" title="Temp&#195;&#169;rature en &#194;&#176;C" />&#176;C 
+                                <div class="slider-heat-temp" id="slider-heat-temp1"></div></div>
+                            </div>
+                        </div>
+                        <div class='section-footer'>
+                            <a id='button_7' href='#' name="button_1">&#187;</a>
+                        </div>
+                    </div>
+                </div>
+                <div class='column'>
+                    <div class='section'>
+                        <div class='section-header icon64-room-default'>
+                            <h2 class="ident">
+                                <span class="title">Salon TV</span>
+                                <br />
+                                <span class="subtitle icon16-area-grndfloor">Rez-de-chauss&#233;e</span>
+                            </h2>
+                            <span class='section-temp icon32-device-temp'>21 &#176;C</span>
+                        </div>
+                        <ul class='section-action'>
+                            <li>
+                                <a href='#'>
+                                    <img src='../design/default/images/light_32.png' />
+                                </a>
+                            </li>
+                            <li>
+                                <a href='#'>
+                                    <img src='../design/default/images/shutters_32.png' />
+                                </a>
+                            </li>
+                        </ul>
+                        <div id='extended_8' class='section-extended'>
+                            <div class='section-device'>
+                                <h2>Chauffage</h2>
+                                <div class="section-parameter">
+                                    <span class="label">Mode :</span>
+                                    <select class="heat-mode" id="heat-mode1" name="heat-mode1" title="Mode Chauffage">
+                                        <option value="0">Hors-Gel</option>
+                                        <option value="1">Nuit</option>
+                                        <option value="2">Veille</option>
+                                        <option value="3">Confort</option>
+                                    </select>
+                                </div>
+                                <div class="section-parameter">
+                                <label for="value-heat-temp1" class="label">Temp&#232;rature :</label>
+                                <input type="text" class="value-heat-temp" id="value-heat-temp1" title="Temp&#195;&#169;rature en &#194;&#176;C" />&#176;C 
+                                <div class="slider-heat-temp" id="slider-heat-temp1"></div></div>
+                            </div>
+                        </div>
+                        <div class='section-footer'>
+                            <a id='button_8' href='#' name="button_1">&#187;</a>
+                        </div>
+                    </div>
+                </div>
+                <div class='column'>
+                    <div class='section'>
+                        <div class='section-header icon64-room-default'>
+                            <h2 class="ident">
+                                <span class="title">Salon TV</span>
+                                <br />
+                                <span class="subtitle icon16-area-grndfloor">Rez-de-chauss&#233;e</span>
+                            </h2>
+                            <span class='section-temp icon32-device-temp'>21 &#176;C</span>
+                        </div>
+                        <ul class='section-action'>
+                            <li>
+                                <a href='#'>
+                                    <img src='../design/default/images/light_32.png' />
+                                </a>
+                            </li>
+                            <li>
+                                <a href='#'>
+                                    <img src='../design/default/images/shutters_32.png' />
+                                </a>
+                            </li>
+                        </ul>
+                        <div id='extended_9' class='section-extended'>
+                            <div class='section-device'>
+                                <h2>Chauffage</h2>
+                                <div class="section-parameter">
+                                    <span class="label">Mode :</span>
+                                    <select class="heat-mode" id="heat-mode1" name="heat-mode1" title="Mode Chauffage">
+                                        <option value="0">Hors-Gel</option>
+                                        <option value="1">Nuit</option>
+                                        <option value="2">Veille</option>
+                                        <option value="3">Confort</option>
+                                    </select>
+                                </div>
+                                <div class="section-parameter">
+                                <label for="value-heat-temp1" class="label">Temp&#232;rature :</label>
+                                <input type="text" class="value-heat-temp" id="value-heat-temp1" title="Temp&#195;&#169;rature en &#194;&#176;C" />&#176;C 
+                                <div class="slider-heat-temp" id="slider-heat-temp1"></div></div>
+                            </div>
+                        </div>
+                        <div class='section-footer'>
+                            <a id='button_9' href='#' name="button_1">&#187;</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer"></div>
         </div>
-        <div class="footer"></div>
-    </div>
-</body>
+    </body>
 </html>
