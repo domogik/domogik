@@ -70,3 +70,10 @@ a.buttonsmall {
         background-color: #eb8f00;
 }
 
+/* Icon button */
+a.buttonicon {
+    display:inline-block;
+    border: 1px solid #cccccc;
+    -moz-border-radius: 0.8em;
+    -webkit-border-radius: 0.8em;
+}

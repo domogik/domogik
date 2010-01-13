@@ -60,8 +60,7 @@ urlpatterns = patterns('djangodomo.core.views',
     url(r'admin/organisation/areas/$', 'admin_organisation_areas', name="admin_organisation_areas_view"),
 
     url(r'show/$', 'show_index', name="show_view"),
-    url(r'show/room/(?P<room_id>\d+)/$', 'show_room', name='show_room_view'),
     url(r'show/area/(?P<area_id>\d+)/$', 'show_area', name='show_area_view'),
-    url(r'show/device/(?P<category_id>\d+)/$', 'show_device', name='show_device_view'),
-
+    url(r'show/room/(?P<room_id>\d+)/$', 'show_room', name='show_room_view'),
+    url(r'show/device/(?P<device_id>\d+)/$', 'show_device', name='show_device_view'),
 )

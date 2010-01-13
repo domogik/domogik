@@ -1,0 +1,57 @@
+/* Nav menu */
+ul#nav1 {
+  list-style: none;
+  color: #ffffff;
+  margin:0;
+  padding:0 1em 0 10em;
+  background:#f6a828 url(../images/logo_domogik_mini.png) 1em 50% no-repeat;
+}
+
+ul#nav1 li {
+  display:inline-block;
+  padding:0;
+  margin:0;
+}
+ul#nav1 li a {
+  font-weight: bold;
+  display:inline-block;
+  text-decoration:none;
+  line-height:2em;
+  padding: 0.5em 1em 0.5em 1em;
+  margin:0 0 1em 0;
+  background:#FFF;
+  color: #1c94c4;
+  border-left: #cccccc 1px solid;
+  border-right: #cccccc 1px solid;
+  border-bottom: #cccccc 1px solid;
+  -moz-border-radius: 0 0 0.8em 0.8em;
+  -webkit-border-radius: 0 0 0.8em 0.8em;
+}
+
+ul#nav1 li a:hover, ul#nav1 li a:focus, ul#nav1 li a:active {
+  color: #c77405;
+  background: #fdf5ce url(images/ui-bg_glass_100_fdf5ce_1x400.png) repeat-x 50% 50%;
+  background-attachment: scroll;
+}
+ul#nav1 li a.selected {
+  color: #eb8f00;
+}
+ul#nav1 li a.selected:hover {
+  color: #eb8f00;
+  background:#FFF;
+}
+
+ul#nav1 .login {
+    float:right;
+}
+
+ul#nav1 .login a {
+  text-decoration:none;
+  border-top:1px solid #FFF;
+  border-left:1px solid #FFF;
+  border-right:1px solid #FFF;
+  color:#FFF;
+  background-color:#1c94c4;
+  margin:0;
+  display:inline-block;
+}

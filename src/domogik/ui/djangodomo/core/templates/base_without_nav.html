@@ -26,7 +26,6 @@
 <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-lightness/jquery-ui-1.7.2.custom.css" rel="stylesheet" type="text/css"/>
 <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/main.css" rel="stylesheet" type="text/css" />
 <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-icons.css" rel="stylesheet" type="text/css" />
-<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-nav1.css" rel="stylesheet" type="text/css" />
 {% block css %}{% endblock %}
 <script type="text/javascript" src="/design/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="/design/js/jquery-ui-1.7.2.custom.min.js"></script>
@@ -43,12 +42,6 @@
     </div>
     {% block banner %}
     {% endblock %}
-    <ul id="nav1">
-        <li><a href="{% url show_view %}">Visualisation</a></li>
-        <li><a href="#">Programmation</a></li>
-        <li><a href="{% url admin_view %}">Administration</a></li>
-        <li class="login"> {% if not is_user_connected %} <a href="{% url login_view %}">{% trans "Log in" %}</a> {% else %} <a href="{% url logout_view %}">{% trans "Log out" %} {{ request.session.user.first_name }}</a> {% endif %} </li>
-    </ul>
     <div id="content"> {% block content %}{% endblock %} </div>
     <div id="footer">Copyright 2009 Domogik project - GNU/GPL v3 license</div>
 </div>

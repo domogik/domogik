@@ -1,0 +1,27 @@
+.element {
+    padding:1em;
+    background:#eeeeee url(ui-lightness/images/ui-bg_highlight-soft_100_eeeeee_1x100.png) top left repeat-x;
+    border: 1px solid #cccccc;
+    -moz-box-shadow: 5px 5px 5px #888;
+    -webkit-box-shadow: 5px 5px 5px #888;
+    -moz-border-radius: 0.8em;
+    -webkit-border-radius: 0.8em;
+}
+
+.element .icon {
+    background-position:top right;
+    background-repeat:no-repeat;
+    min-height:10em;
+}
+
+.element .actions {
+    list-style:none;
+    margin:0;
+    padding:0;
+}
+
+.element .actions li{
+    display:inline-block;
+    margin:0;
+    padding:0;
+}

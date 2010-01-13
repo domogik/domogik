@@ -1,4 +1,4 @@
-{% extends "layout_show.html" %}
+{% extends "base_with_mini_nav.html" %}
 {% comment %}
 # Copyright 2008 Domogik project
 
@@ -16,30 +16,14 @@
 # You should have received a copy of the GNU General Public License
 # along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
 
-# Author : Cédric Trévisan <cedric@domogik.org>
+# Author :  Cédric Trévisan <cedric@domogik.org> / Marc Schneider <marc@domogik.org>
 {% endcomment %}
 
 {% load i18n %}
-{% block js_script %}
-$(function(){
-});
-{% endblock %}
 
 {% block css %}
     <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-buttons.css" rel="stylesheet" type="text/css" />
-    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/show-element.css" rel="stylesheet" type="text/css" />
     <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/show-section.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 
-{% block include_js_script %}
-{% endblock %}
 
-{% block title %}{% trans page_title %}{% endblock %}
-
-{% block content %}
-    <div class="element">
-        <h1 class="ident"><span class="title">{{ device.name }}</span></h1>
-	    <ul class="actions">
-        </ul>
-    </div>
-{% endblock %}

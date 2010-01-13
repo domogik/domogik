@@ -1,4 +1,4 @@
-{% extends "base_with_view_menu.html" %}
+{% extends "layout_show.html" %}
 {% comment %}
 # Copyright 2008 Domogik project
 
@@ -22,132 +22,68 @@
 {% load i18n %}
 {% block js_script %}
 $(function(){
-	// Accordion
-	$("#nav2").accordion({ header: ".section", active:1});
-
-   	$('select.heat-mode').selectmenu();
-
-	// Slider heat temperature
-	$("#slider-heat-temp1").slider({
-		range: false,
-		min: 10,
-		max: 25,
-		values: [18],
-		slide: function(event, ui) {
-			$("#value-heat-temp1").val(ui.values[0]);
-	}
-	});
-	$("#value-heat-temp1").val($("#slider-heat-temp1").slider("values", 0));
-
-	// Slider heat temperature
-	$("#slider-heat-temp2").slider({
-		range: false,
-		min: 10,
-		max: 25,
-		values: [18],
-		slide: function(event, ui) {
-			$("#value-heat-temp2").val(ui.values[0]);
-		}
-	});
-	$("#value-heat-temp2").val($("#slider-heat-temp2").slider("values", 0));
-
-	// Slider heat temperature
-	$("#slider-heat-temp3").slider({
-		range: false,
-		min: 10,
-		max: 25,
-		values: [18],
-		slide: function(event, ui) {
-			$("#value-heat-temp3").val(ui.values[0]);
-		}
-	});
-	$("#value-heat-temp3").val($("#slider-heat-temp3").slider("values", 0));
-
 });
 {% endblock %}
 
 {% block css %}
-	<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-nav2.css" rel="stylesheet" type="text/css" />
-	<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-elements.css" rel="stylesheet" type="text/css" />
-	<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-buttons.css" rel="stylesheet" type="text/css" />
-	<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-tables.css" rel="stylesheet" type="text/css" />
-	<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-selectmenu.css" rel="stylesheet" type="text/css" />
-	<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-element-heat.css" rel="stylesheet" type="text/css" />
-	<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-element-light.css" rel="stylesheet" type="text/css" />
-	<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/page-view-area.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-buttons.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/show-element.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/show-section.css" rel="stylesheet" type="text/css" />
 {% endblock %}
+
 {% block include_js_script %}
-	<script type="text/javascript" src="/design/js/ui.selectmenu.js"></script>
-	<script type="text/javascript" src="/design/js/page-view.js"></script>
 {% endblock %}
+
 {% block title %}{% trans page_title %}{% endblock %}
 
-{% block right %}
-    <div class="element-main">
-        <div class="element-icon icon64-area-grndfloor">
-			<h1 class="element-ident"><span class="element-title">Rez-de-chaussée</span><br />
-				<span class="element-subtitle">Salon TV, S&eacute;jour, Cuisine</span></h1>
-            <ul class="zone-temps">
-            	<li class="icon32-room-default">Salon TV<span>19°C</span></li>
-            	<li class="icon32-room-livingroom">S&eacute;jour<span>18°C</span></li>
-            	<li class="icon32-room-kitchen">Cuisine<span>20°C</span></li>
-            </ul>
-        </div>
+{% block content %}
+    <div class="element">
+        <h1 class="ident"><span class="title">{{ area.name }}</span></h1>
+	    <ul class="actions">
+        </ul>
     </div>
-    <div class="nocolumns">
-        <div class="element">
-			<h2>Lumières</h2>
-			<div class="parameter"><span class="label">Salon TV :</span> <span class="device-status-on icon16-status-lighton">On</span> <a href="#" class="button off">Eteindre</a></div>
-			<div class="parameter"><span class="label">S&eacute;jour :</span> <span class="device-status-off icon16-status-lightoff">Off</span> <a href="#" class="button on">Allumer</a></div>
-			<div class="parameter"><span class="label">Cuisine :</span> <span class="device-status-on icon16-status-lighton">On</span> <a href="#" class="button off">Eteindre</a></div>
-        </div>
-        <div class="element">
-			<h2>Chauffage</h2>
-			<div class="parameter"><span class="label">Salon TV Mode :</span>
-				<select class="heat-mode" id="heat-mode1" name="heat-mode1" title="Mode Chauffage">
-					<option value="0">Hors-Gel</option>
-					<option value="1">Nuit</option>
-					<option value="2">Veille</option>
-					<option value="3">Confort</option>
-				</select>
-			</div>
-			<div class="parameter">
-			    <label for="value-heat-temp1" class="label">Consigne Temp&egrave;rature Salon TV:</label>
-			    <input type="text" class="value-heat-temp" id="value-heat-temp1" title="Température en °C"/>&deg;C
-			    <div class="slider-heat-temp" id="slider-heat-temp1"></div>
-			</div> 
-			<div class="parameter"><span class="label">S&eacute;jour Mode :</span>
-				<select class="heat-mode" id="heat-mode2" name="heat-mode2" title="Mode Chauffage">
-					<option value="0">Hors-Gel</option>
-					<option value="1">Nuit</option>
-					<option value="2">Veille</option>
-					<option value="3">Confort</option>
-				</select>
-			</div>
-			<div class="parameter">
-				<label for="value-heat-temp2" class="label">Consigne Temp&egrave;rature S&eacute;jour:</label>
-				<input type="text" class="value-heat-temp" id="value-heat-temp2" title="Température en °C"/>&deg;C
-				<div class="slider-heat-temp" id="slider-heat-temp2"></div>
-			</div>
-            <div class="parameter"><span class="label">Cuisine Mode :</span>
-				<select class="heat-mode" id="heat-mode3" name="heat-mode3" title="Mode Chauffage">
-					<option value="0">Hors-Gel</option>
-					<option value="1">Nuit</option>
-					<option value="2">Veille</option>
-					<option value="3">Confort</option>
-				</select>
-			</div>
-			<div class="parameter">
-				<label for="value-heat-temp3" class="label">Consigne Temp&egrave;rature Cuisine:</label>
-				<input type="text" class="value-heat-temp" id="value-heat-temp3" title="Température en °C"/>&deg;C
-				<div class="slider-heat-temp" id="slider-heat-temp3"></div>
-			</div> 
-        </div>
-        <div class="element">
-			<h2>Volets</h2>
-			<div class="parameter"><span class="label">Salon TV :</span> <span class="device-status-off icon16-status-shutterdown">Fermés</span> <a href="#" class="button">Ouvrir</a></div>
-			<div class="parameter"><span class="label">S&eacute;jour :</span> <span class="device-status-off icon16-status-shutterdown">Fermés</span> <a href="#" class="button">Ouvrir</a></div>
-			<div class="parameter"><span class="label">Cuisine :</span> <span class="device-status-off icon16-status-shutterdown">Fermés</span> <a href="#" class="button">Ouvrir</a></div>
-        </div>
-    </div>
+	
+    <dl>
+	{% for room in rooms_list %}
+		{% if forloop.counter0|divisibleby:"3" %}
+            <div class='row'>
+        {% endif %}
+    		<div class='column'>
+        		<div class='section'>
+			        <script type="text/javascript">
+                	// <![CDATA[
+                		$(function() {
+                            $("#button_{{ room.id }}").click(function() {
+                            $(".section-extended[id!='extended_{{ room.id }}']").hide();
+                            $("#extended_{{ room.id }}").toggle();
+                        });
+                    // ]]>
+                    </script>
+                    <dt class='header icon64-room-default'>
+                        <a href='{% url show_room_view room.id %}' class="ident">
+                            <span class="title">{{ room.name }}</span>
+                            <br />
+                            <span class="subtitle icon16-area-grndfloor">{{ room.description }}</span>
+                        </a>
+                        <span class='temp icon32-device-temp'>21 &#176;C</span>
+                    </dt>
+                    <dd class='actions'>
+                        <ul>
+                            <li>
+                                <a href='#' class='buttonicon'><img src='/design/{{ request.session.user.skin_used|default:'skins/default' }}/images/light_32.png' /></a>
+                            </li>
+                            <li>
+                                <a href='#' class='buttonicon'><img src='/design/{{ request.session.user.skin_used|default:'skins/default' }}/images/shutters_32.png' /></a>
+                            </li>
+                        </ul>
+                    </dd>
+                    <dd  class='extended' id='extended_{{ room.id }}'></dd>
+                    <dd class='footer'><a id='button_{{ room.id }}' href='#'>&#187;</a></dd>
+                </div>
+            </div>
+		{% if forloop.counter0|divisibleby:"3" %}
+            </div>
+		{% endif %}
+	{% endfor %}
+</dl>
 {% endblock %}
