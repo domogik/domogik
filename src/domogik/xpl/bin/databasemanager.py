@@ -194,6 +194,29 @@ class StatsManager(xPLModule):
         stats = {}
         self._log = self.get_my_logger()
 
+        # 
+        #<?xml version="1.0" encoding="UTF-8"?>  
+        #<statistic technology="plcbus"> <!-- Element racine -->
+        #    <listener> <!-- défini les paramètres de filtrage du listener -->
+        #        <schema>control.basic</schema>
+        #        <xpltype>xpl-trig</xpltype>
+        #        <filter>
+        #            <key name="type" value="plcbus" />
+        #            <key name="command" value="on" />
+        #        </filter>
+        #    </listener>
+        #    <mapping> <!-- défini le mapping entre les clés du message et la bdd -->
+        #        <device field="device"/> <!-- define the device name -->
+        #        <!-- The value node can have 2 attributes :
+        #            - field : mandatory ! define the key of the pair key=value to get in the Xpl message 
+        #            - name : optionnal, if it's define, the 'name' of this value entry will be the value defined,
+        #                    else it will be the filed name.
+        #        -->
+        #        <value field="command"/>
+        #        <value field="command" name="bar" />
+        #    </mapping>
+        #</statistic>
+
         for file in files :
             self._log.info("Parse file %s" % file)
             doc = minidom.parse(file)
