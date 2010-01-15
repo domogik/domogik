@@ -43,6 +43,7 @@
         <li><a href="{% url admin_view %}">Administration</a></li>
         <li class="login"> {% if not is_user_connected %} <a href="{% url login_view %}">{% trans "Log in" %}</a> {% else %} <a href="{% url logout_view %}">{% trans "Log out" %} {{ request.session.user.first_name }}</a> {% endif %} </li>
     </ul>
+	<ul class="breadcrumb">{% block breadcrumb %}{% endblock %}</ul>
     <div id="frame">
         <div id="content"> {% block content %}{% endblock %} </div>
         <div id="footer">Copyright 2009 Domogik project - GNU/GPL v3 license</div>

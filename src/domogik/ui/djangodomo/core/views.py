@@ -590,13 +590,17 @@ def show_room(request, room_id):
     """
     room = _db.get_room_by_id(room_id)
     devices_list = _db.search_devices({'room_id':room_id})
-
+    area_id = room.area_id
+    area_name = (_db.get_area_by_id(area_id)).name
+    
     page_title = _("Visualisation Piece")
     return _go_to_page(
         request, 'show/room.html',
         page_title,
         room=room,
         devices_list=devices_list,
+        area_id=area_id,
+        area_name=area_name
     )
 
 def show_device(request, device_id):
@@ -606,10 +610,18 @@ def show_device(request, device_id):
     @return an HttpResponse object
     """
     device = _db.get_device(device_id)
-
+    room_id = device.room_id
+    room = _db.get_room_by_id(room_id)
+    room_name = room.name
+    area_id = room.area_id
+    area_name = (_db.get_area_by_id(area_id)).name
     page_title = _("Visualisation Dispositif")
     return _go_to_page(
         request, 'show/device.html',
         page_title,
-        device=device
+        device=device,
+        area_id=area_id,
+        area_name=area_name,
+        room_id=room_id,
+        room_name=room_name
     )
