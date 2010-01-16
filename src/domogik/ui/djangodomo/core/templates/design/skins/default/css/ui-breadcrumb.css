@@ -19,11 +19,14 @@
     color:#666666;
     text-decoration:none;
     font-size:1.1em;
+    background-color: transparent;
+    background-position: left center;
+    background-repeat: no-repeat;
+    padding-left: 20px;
 }
 
 .breadcrumb li a.home {
-    background: transparent url(../images/home.gif) left center no-repeat;
-    padding-left: 20px;
+    background-image: url(../images/home.gif);
 }
 
 .breadcrumb li a:hover, .breadcrumb li a:focus, .breadcrumb li a:active  {

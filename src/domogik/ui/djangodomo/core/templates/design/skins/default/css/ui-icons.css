@@ -1,6 +1,19 @@
 @charset "UTF-8";
 /* CSS Document */
 
+/* Area icons */
+.icon64-area-grndfloor { background-image:url(../images/groundfloor_white_64.png);}
+.icon64-area-firstfloor { background-image:url(../images/floor1_white_64.png);}
+.icon64-area-basement { background-image:url(../images/basement_white_64.png);}
+
+.icon32-area-grndfloor { background-image:url(../images/groundfloor_white_32.png);}
+.icon32-area-firstfloor { background-image:url(../images/floor1_white_32.png);}
+.icon32-area-basement { background-image:url(../images/basement_white_32.png);}
+
+.icon16-area-grndfloor { background-image:url(../images/groundfloor_white_16.png);}
+.icon16-area-firstfloor { background-image:url(../images/floor1_white_16.png);}
+.icon16-area-basement { background-image:url(../images/basement_white_16.png);}
+
 /* Room icons */
 .icon64-room-default { background-image:url(../images/default_room_64.png);}
 .icon64-room-kitchen { background-image:url(../images/kitchen_64.png);}
@@ -26,20 +39,7 @@
 .icon16-room-tvlounge { background-image:url(../images/default_room_16.png);}
 .icon16-room-bathroom { background-image:url(../images/default_room_16.png);}
 
-/* Area icons */
-.icon64-area-grndfloor { background-image:url(../images/groundfloor_white_64.png);}
-.icon64-area-firstfloor { background-image:url(../images/floor1_white_64.png);}
-.icon64-area-basement { background-image:url(../images/basement_white_64.png);}
-
-.icon32-area-grndfloor { background-image:url(../images/groundfloor_white_32.png);}
-.icon32-area-firstfloor { background-image:url(../images/floor1_white_32.png);}
-.icon32-area-basement { background-image:url(../images/basement_white_32.png);}
-
-.icon16-area-grndfloor { background-image:url(../images/groundfloor_white_16.png);}
-.icon16-area-firstfloor { background-image:url(../images/floor1_white_16.png);}
-.icon16-area-basement { background-image:url(../images/basement_white_16.png);}
-
-/* Device icons */
+/* Function icons */
 .icon32-device-electricity { background-image:url(../images/electricity_32.png);}
 .icon16-device-electricity { background-image:url(../images/electricity_16.png);}
 .icon16-device-water { background-image:url(../images/water_16.png);}
