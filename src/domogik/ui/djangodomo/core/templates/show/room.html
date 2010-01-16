@@ -21,8 +21,11 @@
 
 {% load i18n %}
 {% block js_script %}
-$(function(){
-});
+// <![CDATA[
+    $(function(){
+		$(".section .extended").hide();
+    });
+// ]]>
 {% endblock %}
 
 {% block css %}
@@ -30,9 +33,11 @@ $(function(){
     <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-buttons.css" rel="stylesheet" type="text/css" />
     <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/show-element.css" rel="stylesheet" type="text/css" />
     <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/show-section.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-action-binary.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 
 {% block include_js_script %}
+    <script type="text/javascript" src="/design/js/ui.action-binary.js"></script>
 {% endblock %}
 
 {% block title %}{% trans page_title %}{% endblock %}
@@ -60,8 +65,11 @@ $(function(){
                 	// <![CDATA[
                 		$(function() {
                             $("#button_{{ device.id }}").click(function() {
-                            $(".section-extended[id!='extended_{{ device.id }}']").hide();
-                            $("#extended_{{ device.id }}").toggle();
+								$(".section .extended[id!='extended_{{ device.id }}']").hide();
+								$("#extended_{{ device.id }}").toggle();
+							});
+							widgetmini_binary("widgetmini_{{ device.id }}", "{{ device.id }}", "light");
+							widget_binary("widget_{{ device.id }}", "{{ device.id }}", "light");
                         });
                     // ]]>
                     </script>
@@ -74,9 +82,22 @@ $(function(){
                     </dt>
                     <dd class='actions'>
                         <ul>
+                            <li><div id="widgetmini_{{ device.id }}"></div></li>
                         </ul>
                     </dd>
-                    <dd  class='extended' id='extended_{{ device.id }}'></dd>
+                    <dd  class='extended' id='extended_{{ device.id }}'>
+								Commandes
+						<ul class='commands'>
+								<li><div id="widget_{{ device.id }}">
+												<span class='name'>Switch</span>
+														<ul>
+																		<li><a href='#' class='buttonsmall off'>Off</a></li>
+																		<li><a href='#' class='buttonsmall on'>On</a></li>
+														</ul>
+								</div>
+								</li>
+						</ul>
+					</dd>
                     <dd class='footer'><a id='button_{{ device.id }}' href='#'>&#187;</a></dd>
                 </div>
             </div>

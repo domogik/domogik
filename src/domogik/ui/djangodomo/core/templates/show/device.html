@@ -21,8 +21,11 @@
 
 {% load i18n %}
 {% block js_script %}
-$(function(){
-});
+// <![CDATA[
+    $(function(){
+		$(".section .extended").hide();
+    });
+// ]]>
 {% endblock %}
 
 {% block css %}

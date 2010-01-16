@@ -6,6 +6,10 @@ img {
     display:none;
 }
 
+a {
+	outline: none;
+}
+
 .error_msg {
     border:2px solid #CC0000;
     color: #CC0000;
@@ -30,6 +34,7 @@ body {
     font: 65% Arial, Helvetica, sans-serif;
     margin: 0;
 }
+
 
 #frame {
   margin:1em;

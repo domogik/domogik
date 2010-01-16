@@ -21,8 +21,11 @@
 
 {% load i18n %}
 {% block js_script %}
-$(function(){
-});
+// <![CDATA[
+    $(function(){
+		$(".section .extended").hide();
+    });
+// ]]>
 {% endblock %}
 
 {% block css %}
@@ -59,8 +62,9 @@ $(function(){
                 	// <![CDATA[
                 		$(function() {
                             $("#button_{{ room.id }}").click(function() {
-                            $(".section-extended[id!='extended_{{ room.id }}']").hide();
-                            $("#extended_{{ room.id }}").toggle();
+								$(".section .extended[id!='extended_{{ room.id }}']").hide();
+								$("#extended_{{ room.id }}").toggle();
+							})
                         });
                     // ]]>
                     </script>
@@ -74,12 +78,6 @@ $(function(){
                     </dt>
                     <dd class='actions'>
                         <ul>
-                            <li>
-                                <a href='#' class='buttonicon'><img src='/design/{{ request.session.user.skin_used|default:'skins/default' }}/images/light_32.png' /></a>
-                            </li>
-                            <li>
-                                <a href='#' class='buttonicon'><img src='/design/{{ request.session.user.skin_used|default:'skins/default' }}/images/shutters_32.png' /></a>
-                            </li>
                         </ul>
                     </dd>
                     <dd  class='extended' id='extended_{{ room.id }}'></dd>

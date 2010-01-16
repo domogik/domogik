@@ -67,3 +67,8 @@
 .icon16-status-airconditioningon { background-image:url(../images/aircond_green_16.png);}
 .icon16-status-airconditioningoff { background-image:url(../images/aircond_black_16.png);}
 .icon16-status-soundplaying { background-image:url(../images/sound_play_green.png);}
+
+/* Widget icons */
+.icon32-widget-light { background-image:url(../images/light/lightbulb_full_32.png);}
+.icon32-widget-light.binary_0 { background-image:url(../images/light/binary/0_32.png);}
+.icon32-widget-light.binary_1 { background-image:url(../images/light/binary/1_32.png);}

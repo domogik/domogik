@@ -7,6 +7,11 @@
     -webkit-border-radius: 0.8em;
 }
 
+.section dl, .section dt, .section dd {
+    padding:0;
+    margin:0;
+}
+
 /* Header section */
 .section .header {
     background-position: top left;
@@ -52,14 +57,38 @@
     text-align:center;
 }
 
-.section .actions li {
+.section .actions ul > li {
     display:inline-block;
     margin: 0 0.5em 0 0.5em;
+    padding: 0;
 }
 
 /* Colapsable section */
 .section .extended {
     padding:1em;
+}
+
+.section ul.commands {
+    list-style:none;
+    margin:0;
+    padding:0;
+}
+
+.section ul.commands > li {
+    display:block;
+    margin: 0;
+    padding: 1em 0 0 0;
+}
+
+.commands .name {
+    padding: 0.2em 1em 0.2em 1em;
+        border: 1px solid #cccccc;
+    -moz-border-radius: 0.8em;
+    -webkit-border-radius: 0.8em;
+    background-color: #FFFFFF;
+    position: relative;
+    top: -1em;
+    left: 32px;
 }
 
 /* Footer section */
@@ -68,6 +97,7 @@
 }
 
 .section .footer a {
+    color:#000000;
     display:block;
     padding: 0 0.5em 0 0.5em;
     text-decoration:none;
