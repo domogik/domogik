@@ -28,7 +28,7 @@ Implements
 ==========
 
 - WOL._init
-- WOL._wol
+- WOL.wake_up
 
 @author: Fritz <fritz.smh@gmail.com>
 @copyright: (C) 2007-2009 Domogik project
@@ -51,7 +51,7 @@ class WOL:
         l = logger.Logger('WOL')
         self._log = l.get_logger()
 
-    def _wol(self, mac, port):
+    def wake_up(self, mac, port):
         """
         Send a magic packet to wake a computer on lan
         """
@@ -69,20 +69,20 @@ class WOL:
      
         # Create magic packet
         self._log.debug("Create magic packet")
-        magicPacket = ''.join(['FFFFFFFFFFFF', mac * 20])
-        magicHexa = '' 
+        magic_packet = ''.join(['FFFFFFFFFFFF', mac * 20])
+        magic_hexa = '' 
     
         # Convert magic packet in hexa
-        for i in range(0, len(magicPacket), 2):
-            magicHexa = ''.join([magicHexa,
-                                 struct.pack('B', int(magicPacket[i: i + 2], 16))])
+        for i in range(0, len(magic_packet), 2):
+            magic_hexa = ''.join([magic_hexa,
+                                 struct.pack('B', int(magic_packet[i: i + 2], 16))])
     
         # Send magic packet
         self._log.debug("Send magic packet to broadcast")
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-            sock.sendto(magicHexa, ('<broadcast>', port))
+            sock.sendto(magic_hexa, ('<broadcast>', port))
             self._log.info("Magic packet send")
         except:
             self._log.error("Fail to send magic packet")

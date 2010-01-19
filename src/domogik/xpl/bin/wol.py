@@ -74,7 +74,7 @@ class WOLListener(xPLModule):
         # if it is a wol message for computer
         if device == "computer" and type == "wakeonlan":
             self._log.debug("Wake on lan command received for " + mac)
-            self._wolmanager._wol(mac, port)
+            self._wolmanager.wake_up(mac, port)
 
 
 if __name__ == "__main__":
