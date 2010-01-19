@@ -1,4 +1,4 @@
-{% extends "base_with_view_menu.html" %}
+{% extends "layout_show.html" %}
 {% comment %}
 # Copyright 2008 Domogik project
 
@@ -21,59 +21,35 @@
 
 {% load i18n %}
 {% block js_script %}
-$(function(){
-	// Accordion
-	$("#nav2").accordion({ header: ".section", active:2});
-});
+// <![CDATA[
+    $(function(){
+		$(".section .extended").hide();
+    });
+// ]]>
 {% endblock %}
 
 {% block css %}
-	<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-nav2.css" rel="stylesheet" type="text/css" />
-	<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-elements.css" rel="stylesheet" type="text/css" />
-	<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-buttons.css" rel="stylesheet" type="text/css" />
-	<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-tables.css" rel="stylesheet" type="text/css" />
-	<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-selectmenu.css" rel="stylesheet" type="text/css" />
-	<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-element-heat.css" rel="stylesheet" type="text/css" />
-	<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-element-light.css" rel="stylesheet" type="text/css" />
-	<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/page-view-device.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-breadcrumb.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-buttons.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/show-element.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/show-section.css" rel="stylesheet" type="text/css" />
 {% endblock %}
+
 {% block include_js_script %}
-	<script type="text/javascript" src="/design/js/ui.selectmenu.js"></script>
-	<script type="text/javascript" src="/design/js/page-view.js"></script>
 {% endblock %}
+
 {% block title %}{% trans page_title %}{% endblock %}
 
-{% block right %}
-    <div class="element-main">
-        <div class="element-icon icon32-device-light">
-			<h1 class="element-ident"><span class="element-title">Lumières</span></h1>
-			<ul class="light-infos">
-				<li class="icon16-status-lighton">5 Allumées</li>
-				<li class="icon16-status-lightoff">4 Eteintes</li>
-			</ul>
-        </div>
-    </div>
-    <div class="nocolumns">
-      	<div class="element">
-            <h2 class="icon16-area-grndfloor">Rez-de-chaussée</h2>
-			<div class="parameter"><span class="label">Salon TV :</span> <span class="device-status-on icon16-status-lighton">On</span> <a href="#" class="button off">Eteindre</a></div>
-			<div class="parameter"><span class="label">S&eacute;jour :</span> <span class="device-status-off icon16-status-lightoff">Off</span> <a href="#" class="button on">Allumer</a></div>
-			<div class="parameter"><span class="label">Cuisine :</span> <span class="device-status-on icon16-status-lighton">On</span> <a href="#" class="button off">Eteindre</a></div>
-        </div>
-      	<div class="element">
-            <h2 class="icon16-area-firstfloor">Etage</h2>
-			<div class="parameter"><span class="label">Salle de bain :</span> <span class="device-status-on icon16-status-lighton">On</span> <a href="#" class="button off">Eteindre</a></div>
-			<div class="parameter"><span class="label">Chambre parents :</span> <span class="device-status-off icon16-status-lightoff">Off</span> <a href="#" class="button on">Allumer</a></div>
-			<div class="parameter"><span class="label">Chambre enfants :</span> <span class="device-status-on icon16-status-lighton">On</span> <a href="#" class="button off">Eteindre</a></div>
-			<div class="parameter"><span class="label">Chambre amis :</span> <span class="device-status-off icon16-status-lightoff">Off</span> <a href="#" class="button on">Allumer</a></div>
-        </div>
-      	<div class="element">
-            <h2 class="icon16-area-basement">Sous-sol</h2>
-			<div class="parameter"><span class="label">Garage :</span> <span class="device-status-on icon16-status-lighton">On</span> <a href="#" class="button off">Eteindre</a></div>
-        </div>
-      	<div class="element">
-			<h2>Exterieur</h2>
-			<div class="parameter"><span class="label">Jardin :</span> <span class="device-status-off icon16-status-lightoff">Off</span> <a href="#" class="button on">Allumer</a></div>
-        </div>
+{% block breadcrumb %}
+		<li><a href='{% url show_view %}' class='home'>My House</a></li>
+		<li><a href='{% url show_area_view area_id %}' class='icon16-area-grndfloor'>{{ area_name }}</a></li>
+		<li><a href='{% url show_area_view room_id %}' class='icon16-room-kitchen'>{{ room_name }}</a></li>
+{% endblock %}
+
+{% block content %}
+    <div class="element">
+        <h1 class="ident"><span class="title">{{ device.name }}</span></h1>
+	    <ul class="actions">
+        </ul>
     </div>
 {% endblock %}

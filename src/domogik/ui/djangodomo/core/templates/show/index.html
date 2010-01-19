@@ -1,4 +1,4 @@
-{% extends "base_with_view_menu.html" %}
+{% extends "layout_show.html" %}
 {% comment %}
 # Copyright 2008 Domogik project
 
@@ -21,120 +21,67 @@
 
 {% load i18n %}
 {% block js_script %}
-$(function(){
-    // Accordion
-    $("#nav2").accordion({ header: ".section", active:false});  
-});
+// <![CDATA[
+    $(function(){
+		$(".section .extended").hide();
+    });
+// ]]>
 {% endblock %}
 
 {% block css %}
-	<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-nav2.css" rel="stylesheet" type="text/css" />
-	<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-elements.css" rel="stylesheet" type="text/css" />
-	<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-buttons.css" rel="stylesheet" type="text/css" />
-	<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-tables.css" rel="stylesheet" type="text/css" />
-	<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/page-view.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-buttons.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/show-element.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/show-section.css" rel="stylesheet" type="text/css" />
 {% endblock %}
+
 {% block include_js_script %}
-	<script type="text/javascript" src="/design/js/ui.selectmenu.js"></script>
-	<script type="text/javascript" src="/design/js/page-view.js"></script>
 {% endblock %}
+
 {% block title %}{% trans page_title %}{% endblock %}
 
-{% block right %}
-	<div class="element-main">
-        <div class="element-icon icon64-room-default">
-			<h1 class="element-ident"><span class="element-title">Maison</span><br />
-				<span class="element-subtitle">Rez-de-chaussée, Etage, Sous-sol, Exterieur</span></h1>
-			<ul>
-				<li class="icon16-device-electricity">El&eacute;ctricit&eacute;: 150 Kw/h</li>
-				<li class="icon16-device-water">Eau: 1.6 l/h</li>
-			</ul>
-			<h2 class="splitter">Etat actuel de l'installation</h2>
-			<ul>
-				<li class="icon16-device-message">1 message</li>
-				<li class="icon16-device-notification">2 notifications</li>
-				<li class="icon16-device-error">Pas d'erreur</li>
-			</ul>
-        </div>
+{% block content %}
+    <div class="element">
+        <h1 class="ident"><span class="title">My House</span></h1>
+	    <ul class="actions">
+        </ul>
     </div>
-    <div class="nocolumns">
-        <div class="element element-meteo icon64-weather-clouds">
-			<h2>M&eacute;t&eacute;o</h2>
-			<ul>
-				<li>Temperature: 21°C</li>
-				<li>Vent: 5km/s sud</li>
-				<li>Pluviom&eacute;tre: 10 cm</li>
-			</ul>
-        </div>
-        <div class="element">
-			<h2>T&eacute;l&eacute;phone</h2>
-			<div class="phone-summary">5 appels - 3 messages</div>
-			<div class="parameter">R&eacute;pondeur: <span class="on">ON</span> <a href="#" class="button off">Eteindre</a> <a href="#" class="button">Configurer</a></div>
-			<div class="parameter">Archives: <a href="#" class="button">Consulter</a></div>
-			<table class="phone-calllist">
-				<thead>
-					<tr>
-						<th>Date</th>
-						<th>Num&eacute;ro</th>
-						<th>Nom</th>
-						<th>Message</th>
-						<th>Action</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr class="odd">
-						<td>28/09/2009 10:14</td>
-						<td>+33(0)675897543</td>
-						<td>Sp4rKy</td>
-						<td>Oui (0'38s)</td>
-						<td><ul class="actions">
-							<li><a href="#" class="buttonsmall">Effacer</a></li>
-							<li><a href="#" class="buttonsmall">Rappeler</a></li>
-							<li><a href="#" class="buttonsmall">Ecouter message</a></li>
-						</ul></td>
-					</tr>
-					<tr class="even">
-						<td>28/09/2009 9:15</td>
-						<td>+33(0)975797043</td>
-						<td>Kuri</td>
-						<td>Non</td>
-						<td><ul class="actions">
-							<li><a href="#" class="buttonsmall">Effacer</a></li>
-							<li><a href="#" class="buttonsmall">Rappeler</a></li>
-						</ul></td>
-					</tr>
-					<tr class="odd">
-						<td>26/09/2009 20:26</td>
-						<td class="hidden-call">Num&eacute;ro masqu&eacute;</td>
-						<td class="hidden-call">Nom masqu&eacute;</td>
-						<td>Non</td>
-						<td><ul class="actions">
-							<li><a href="#" class="buttonsmall">Effacer</a></li>
-							<li><a href="#" class="buttonsmall">Rappeler</a></li>
-						</ul></td>
-					</tr>
-					<tr class="even">
-						<td>26/09/2009 20:20</td>
-						<td class="hidden-call">Num&eacute;ro masqu&eacute;</td>
-						<td class="hidden-call">Nom masqu&eacute;</td>
-						<td>Non</td>
-						<td><ul class="actions">
-							<li><a href="#" class="buttonsmall">Effacer</a></li>
-							<li><a href="#" class="buttonsmall">Rappeler</a></li>
-						</ul></td>
-					</tr>
-					<tr class="odd">
-						<td>25/09/2009 12:12</td>
-						<td>+33(0)877747323</td>
-						<td>Mirelsol</td>
-						<td>Oui (43'34s)</td>
-						<td><ul class="actions">
-							<li><a href="#" class="buttonsmall">Effacer</a></li>
-							<li><a href="#" class="buttonsmall">Rappeler</a></li>
-							<li><a href="#" class="buttonsmall">Ecouter message</a></li>
-						</ul></td>
-					</tr>
-				</tbody>
-          </table>
-    </div>
+   
+    <dl>
+	{% for area in areas_list %}
+		{% if forloop.counter0|divisibleby:"3" %}
+            <div class='row'>
+        {% endif %}
+    		<div class='column'>
+        		<div class='section'>
+			        <script type="text/javascript">
+                	// <![CDATA[
+                		$(function() {
+                            $("#button_{{ area.id }}").click(function() {
+                                $(".section .extended[id!='extended_{{ area.id }}']").hide();
+                                $("#extended_{{ area.id }}").toggle();
+                            });
+                        });
+                    // ]]>
+                    </script>
+                    <dt class='header icon64-room-default'>
+                        <a href='{% url show_area_view area.id %}' class="ident">
+                            <span class="title">{{ area.name }}</span>
+                            <br />
+                            <span class="subtitle icon16-area-grndfloor">{{ area.description }}</span>
+                        </a>
+                        <span class='temp icon32-device-temp'>21 &#176;C</span>
+                    </dt>
+                    <dd class='actions'>
+                        <ul>
+                        </ul>
+                    </dd>
+                    <dd  class='extended' id='extended_{{ area.id }}'></dd>
+                    <dd class='footer'><a id='button_{{ area.id }}' href='#'>&#187;</a></dd>
+                </div>
+            </div>
+		{% if forloop.counter0|divisibleby:"3" %}
+            </div>
+		{% endif %}
+	{% endfor %}
+</dl>
 {% endblock %}

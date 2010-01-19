@@ -1,4 +1,4 @@
-{% extends "base_with_view_menu.html" %}
+{% extends "layout_show.html" %}
 {% comment %}
 # Copyright 2008 Domogik project
 
@@ -21,99 +21,95 @@
 
 {% load i18n %}
 {% block js_script %}
-$(function(){
-	$("#nav2").accordion({ header: ".section", active:0});
-
-   	$('select.heat-mode').selectmenu();
-
-	// Slider heat temperature
-	$("#slider-heat-temp1").slider({
-		range: false,
-		min: 10,
-		max: 25,
-		values: [18],
-		slide: function(event, ui) {
-			$("#value-heat-temp1").val(ui.values[0]);
-	}
-	});
-	$("#value-heat-temp1").val($("#slider-heat-temp1").slider("values", 0));
-	
-	// Slider light
-	$("#slider-light-2").slider({
-		range: false,
-		min: 0,
-		max: 100,
-		value: 50,
-		slide: function(event, ui) {
-			$("#value-light-2").val(ui.value);
-		}
-	});
-	$("#value-light-2").val($("#slider-light-2").slider("value"));
-});
+// <![CDATA[
+    $(function(){
+		$(".section .extended").hide();
+    });
+// ]]>
 {% endblock %}
 
 {% block css %}
-	<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-nav2.css" rel="stylesheet" type="text/css" />
-	<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-elements.css" rel="stylesheet" type="text/css" />
-	<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-buttons.css" rel="stylesheet" type="text/css" />
-	<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-tables.css" rel="stylesheet" type="text/css" />
-	<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-selectmenu.css" rel="stylesheet" type="text/css" />
-	<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-element-heat.css" rel="stylesheet" type="text/css" />
-	<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-element-light.css" rel="stylesheet" type="text/css" />
-	<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/page-view-room.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-breadcrumb.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-buttons.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/show-element.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/show-section.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-action-binary.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-action-range.css" rel="stylesheet" type="text/css" />
 {% endblock %}
+
 {% block include_js_script %}
-	<script type="text/javascript" src="/design/js/ui.selectmenu.js"></script>
-	<script type="text/javascript" src="/design/js/page-view.js"></script>
+    <script type="text/javascript" src="/design/js/ui.action-binary.js"></script>
+    <script type="text/javascript" src="/design/js/ui.action-range.js"></script>
 {% endblock %}
+
 {% block title %}{% trans page_title %}{% endblock %}
 
-{% block right %}
-	<div class="element-main">
-        <div class="element-icon icon64-room-default">
-			<h1 class="element-ident"><span class="element-title">Salon TV</span><br />
-				<span class="element-subtitle icon16-area-grndfloor">Rez-de-chauss&eacute;e</span></h1>
-			<div class="room-temp">19&deg;C</div>
-			<div class="room-humidity">20% humidit&eacute;</div>
-			<div class="parameter"><span class="label">En cours de visionage :</span> <img src="../design/default/images/tv-FR2.png" width="16" height="25" alt="France 2" /> "Journal télévisé"</div>
-        </div>
-	</div>
-    <div class="columns">
-        <div class="element">
-			<h2>Lumi&egrave;res</h2>
-			<div class="parameter"><span class="label">Plafonier :</span> <span class="device-status-off icon16-status-lightoff">Off</span> <a href="#" class="button on">Allumer</a></div>
-			<div class="parameter">
-				<label for="value-light-2" class="label">Halog&egrave;ne d'ambiance :</label>
-				<input type="text" class="value-light" id="value-light-2" title="Luminosité en %"/>%
-				<a href="#" class="button off">Eteindre</a>
-				<div class="slider-light" id="slider-light-2"></div>
-			</div>
-        </div>
-        <div class="element">
-			<h2>Chauffage</h2>
-			<div class="parameter"><span class="label">Mode :</span>
-				<select class="heat-mode" id="heat-mode1" name="heat-mode1" title="Mode Chauffage">
-					<option value="0">Hors-Gel</option>
-					<option value="1">Nuit</option>
-					<option value="2">Veille</option>
-					<option value="3">Confort</option>
-				</select>
-			</div>
-			<div class="parameter">
-				<label for="value-heat-temp1" class="label">Temp&egrave;rature :</label>
-				<input type="text" class="value-heat-temp" id="value-heat-temp1" title="Température en °C"/>&deg;C
-				<div class="slider-heat-temp" id="slider-heat-temp1"></div>
-			</div>
-        </div>
-        <div class="element">
-			<h2>Télévision</h2>
-			<div class="parameter"><span class="label">Status :</span> <span class="device-status-on icon16-status-defaulton">On</span> <a href="#" class="button off">Eteindre</a> <a href="#" class="button">Programmer l'extinction</a></div>
-			<div class="parameter"><span class="label">Média Center :</span> XBMC <a href="#" class="button">Interface de contrôle</a></div>
-        </div>
-        <div class="element">
-			<h2>Volets</h2>
-			<div class="parameter"><span class="label">Fen&ecirc;tre nord :</span> <span class="device-status-down icon16-status-shutterdown">Fermés</span> <a href="#" class="button">Ouvrir</a></div>
-        </div>
-    </div>
+{% block breadcrumb %}
+		<li><a href='{% url show_view %}' class='home'>My House</a></li>
+		<li><a href='{% url show_area_view area_id %}' class='icon16-area-grndfloor'>{{ area_name }}</a></li>
 {% endblock %}
 
+{% block content %}
+	<div id='binary_data' />
+	<div id='range_data' />
+    <div class="element">
+        <h1 class="ident"><span class="title">{{ room.name }}</span></h1>
+	    <ul class="actions">
+        </ul>
+    </div>
+	
+    <dl>
+	{% for device in devices_list %}
+		{% if forloop.counter0|divisibleby:"3" %}
+            <div class='row'>
+        {% endif %}
+    		<div class='column'>
+        		<div class='section'>
+			        <script type="text/javascript">
+                	// <![CDATA[
+                		$(function() {
+                            $("#button_{{ device.id }}").click(function() {
+								$(".section .extended[id!='extended_{{ device.id }}']").hide();
+								$("#extended_{{ device.id }}").toggle();
+							});
+							widgetmini_binary("widgetmini_{{ device.id }}1", "{{ device.id }}1", "light");
+							widget_binary("widget_{{ device.id }}1", "{{ device.id }}1", "light");
+							widgetmini_range("widgetmini_{{ device.id }}2", "{{ device.id }}2", "light", 0, 100, 52, '%');
+                        });
+                    // ]]>
+                    </script>
+                    <dt class='header icon64-room-default'>
+                        <a href='{% url show_device_view device.id %}' class="ident">
+                            <span class="title">{{ device.name }}</span>
+                            <br />
+                            <span class="subtitle icon16-area-grndfloor">{{ device.description }}</span>
+                        </a>
+                    </dt>
+                    <dd class='actions'>
+                        <ul>
+                            <li><div id="widgetmini_{{ device.id }}1"></div></li>
+                            <li><div id="widgetmini_{{ device.id }}2"></div></li>
+                        </ul>
+                    </dd>
+                    <dd  class='extended' id='extended_{{ device.id }}'>
+								Commandes
+						<ul class='commands'>
+								<li><div id="widget_{{ device.id }}1">
+												<span class='name'>Switch</span>
+														<ul>
+																		<li><a href='#' class='buttonsmall off'>Off</a></li>
+																		<li><a href='#' class='buttonsmall on'>On</a></li>
+														</ul>
+								</div>
+								</li>
+						</ul>
+					</dd>
+                    <dd class='footer'><a id='button_{{ device.id }}' href='#'>&#187;</a></dd>
+                </div>
+            </div>
+		{% if forloop.counter0|divisibleby:"3" %}
+            </div>
+		{% endif %}
+	{% endfor %}
+</dl>
+{% endblock %}

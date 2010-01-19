@@ -1,0 +1,34 @@
+.breadcrumb {
+    background-color: #F0F0F0;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    clear: both;
+}
+
+.breadcrumb li {
+    display: inline-block;
+    background: transparent url(../images/breadcrumb_separator.gif) right center no-repeat;
+    padding-right: 15px;
+    padding-left: 10px;
+}
+
+.breadcrumb li a {
+    display: inline-block;
+    line-height:2.5em;
+    color:#666666;
+    text-decoration:none;
+    font-size:1.1em;
+    background-color: transparent;
+    background-position: left center;
+    background-repeat: no-repeat;
+    padding-left: 20px;
+}
+
+.breadcrumb li a.home {
+    background-image: url(../images/home.gif);
+}
+
+.breadcrumb li a:hover, .breadcrumb li a:focus, .breadcrumb li a:active  {
+    color:#0a8ecc;  
+}
