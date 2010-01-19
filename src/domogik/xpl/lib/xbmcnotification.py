@@ -28,7 +28,7 @@ Implements
 ==========
 
 - XBMCNotification.__init
-- XBMCNotification._notify
+- XBMCNotification.notify
 
 @author: Fritz <fritz.smh@gmail.com>
 @copyright: (C) 2007-2009 Domogik project
@@ -55,37 +55,37 @@ class XBMCNotification:
         self._log = l.get_logger()
         self._log.info("XBMCNotification:__init")
         # Config
-        self._XBMCAddress = address
-        self._maxDelayBetweenActions = float(maxdelay)
-        self._defaultDisplayDelay = delay
+        self._xbmc_address = address
+        self._maxdelay_between_actions = float(maxdelay)
+        self._default_display_delay = delay
         # Persistent data
-        self._lastAction = time.time()
+        self._last_action = time.time()
         self._title = ""
         self._text = ""
-        self._titleReceived = 0
-        self._textReceived = 0
+        self._title_received = 0
+        self._text_received = 0
         self._delay = 0
 
-    def _notify(self, command, text, row, delay):
+    def notify(self, command, text, row, delay):
         """
         Send notification to XBMC
         """
-        self._log.info("Start process for notification on XBMC (" + self._XBMCAddress + ")")
+        self._log.info("Start process for notification on XBMC (" + self._xbmc_address + ")")
         row=int(row)
         delay=int(delay)
 
-        self._currentAction = time.time()
-        timeBetweenActions = float(self._currentAction - self._lastAction)
+        self._current_action = time.time()
+        time_between_actions = float(self._current_action - self._last_action)
 
         # New notification 
-        self._log.debug("Time elapsed : " + str(timeBetweenActions))
-        self._log.debug("Max delay : " + str(self._maxDelayBetweenActions))
-        if timeBetweenActions > self._maxDelayBetweenActions:
-            self._log.debug("Time elapsed (" + str(timeBetweenActions) + ") for completing last notification : start new notification")
+        self._log.debug("Time elapsed : " + str(time_between_actions))
+        self._log.debug("Max delay : " + str(self._maxdelay_between_actions))
+        if time_between_actions > self._maxdelay_between_actions:
+            self._log.debug("Time elapsed (" + str(time_between_actions) + ") for completing last notification : start new notification")
             self._title = ""
             self._text = ""
-            self._titleReceived = 0
-            self._textReceived = 0
+            self._title_received = 0
+            self._text_received = 0
 
         if command == "WRITE":
             self._log.debug("COMMAND=WRITE")
@@ -93,41 +93,41 @@ class XBMCNotification:
                 self._log.debug("ROW=0 : Title : " + text)
                 self._title = text
                 self._delay = delay
-                self._titleReceived = 1
+                self._title_received = 1
             if row == 1:
                 self._log.debug("ROW=1 : Message : " + text)
                 self._text = text
                 self._delay = delay
-                self._textReceived = 1
+                self._text_received = 1
             if delay == 0:
-                self._delay = self._defaultDisplayDelay
-                self._log.debug("DELAY=0 : setting default value : " + str(self._defaultDisplayDelay))
+                self._delay = self._default_display_delay
+                self._log.debug("DELAY=0 : setting default value : " + str(self._default_display_delay))
             else:
                 self._delay = delay 
 
             # All components of notification received
-            if self._titleReceived and self._textReceived:
+            if self._title_received and self._text_received:
                 self._stop = threading.Event()
-                self._thread = self.__XBMCNotificationHandler(self._XBMCAddress, self._title, self._text, self._delay)
+                self._thread = self.__XBMCNotificationHandler(self._xbmc_address, self._title, self._text, self._delay)
                 self._thread.run()
                 self._title = ""
                 self._text = ""
-                self._titleReceived = 0
-                self._textReceived = 0
+                self._title_received = 0
+                self._text_received = 0
 
             
-        self._lastAction = self._currentAction
+        self._last_action = self._current_action
 
 
     class __XBMCNotificationHandler(threading.Thread):
 
-        def __init__(self, XBMCAddress, title, text, delay):
+        def __init__(self, xbmc_address, title, text, delay):
             # Initialize logger
             l = logger.Logger('XBMC_MSG')
             self._log = l.get_logger()
             self._log.debug("__XBMCNotificationHandler:__init__")
             # Parameters
-            self._XBMCAddress = XBMCAddress
+            self._xbmc_address = xbmc_address
             self._title = urllib.quote(title)
             self._text = urllib.quote(text)
             self._delay = str(delay)+"000"
@@ -141,11 +141,11 @@ class XBMCNotification:
             self._log.debug("NOTIF : text  " + self._text)
             self._log.debug("NOTIF : delay " + self._delay)
             try:
-                self._log.debug("Call http://" + self._XBMCAddress + "/xbmcCmds/xbmcHttp?command=ExecBuiltIn&parameter=XBMC.Notification(" + self._title + "," + self._text + "," + self._delay + ")")
-                urllib.urlopen("http://" + self._XBMCAddress + "/xbmcCmds/xbmcHttp?command=ExecBuiltIn&parameter=XBMC.Notification(" + self._title + "," + self._text + "," + self._delay + ")")
+                self._log.debug("Call http://" + self._xbmc_address + "/xbmcCmds/xbmcHttp?command=ExecBuiltIn&parameter=XBMC.Notification(" + self._title + "," + self._text + "," + self._delay + ")")
+                urllib.urlopen("http://" + self._xbmc_address + "/xbmcCmds/xbmcHttp?command=ExecBuiltIn&parameter=XBMC.Notification(" + self._title + "," + self._text + "," + self._delay + ")")
                 # in case we would want to make a pause on movie playing
-                #self._log.debug("Call http://" + self._XBMCAddress + "/xbmcCmds/xbmcHttp?command=pause")
-                #urllib.urlopen("http://" + self._XBMCAddress + "/xbmcCmds/xbmcHttp?command=pause")
+                #self._log.debug("Call http://" + self._xbmc_address + "/xbmcCmds/xbmcHttp?command=pause")
+                #urllib.urlopen("http://" + self._xbmc_address + "/xbmcCmds/xbmcHttp?command=pause")
             except:
                 self._log.error("Error while calling XBMC HTTP API")
 

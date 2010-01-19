@@ -95,7 +95,7 @@ class XBMCNotificationListener(xPLModule):
             delay = message.data['delay']
 
         self._log.debug("Call _notify")
-        self._XBMCNotificationManager._notify(command, text, row, delay)
+        self._XBMCNotificationManager.notify(command, text, row, delay)
 
 
 if __name__ == "__main__":
