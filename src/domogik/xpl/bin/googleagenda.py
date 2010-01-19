@@ -66,10 +66,10 @@ class GAgendaListener(xPLModule):
         self._config = Query(self._myxpl)
         res = xPLResult()
         self._config.query('gagenda', 'calendarname', res)
-        self._calendarName = res.get_value()['calendarname']
+        self._calendar_name = res.get_value()['calendarname']
 
         # Create object
-        self._gAgendaManager = GAgenda(self._email, self._password, self._calendarName, self._broadcastEvents)
+        self._gAgendaManager = GAgenda(self._email, self._password, self._calendar_name, self._broadcast_events)
 
         # Create listener for today
         Listener(self.gagenda_cb, self._myxpl, {'schema': 'calendar.request',
@@ -89,13 +89,13 @@ class GAgendaListener(xPLModule):
         if command == "REQUEST":
             self._log.debug("Google agende request command received for " + str(date))
             if date == "TODAY":
-                self._gAgendaManager.getTodayEvents()
+                self._gAgendaManager.get_today_events()
             elif date == "TOMORROW":
-                self._gAgendaManager.getTomorrowEvents()
+                self._gAgendaManager.get_tomorrow_events()
             else:
-                self._gAgendaManager.getEventsAtDate(date)
+                self._gAgendaManager.get_events_at_date(date)
 
-    def _broadcastEvents(self, events):
+    def _broadcast_events(self, events):
         for entry in events:
             my_temp_message = XplMessage()
             my_temp_message.set_type("xpl-trig")

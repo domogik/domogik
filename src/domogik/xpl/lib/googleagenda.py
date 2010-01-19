@@ -29,9 +29,9 @@ Implements
 
 - GAgenda.__init__
 - GAgenda._connect
-- GAgenda._getTodayEvents
-- GAgenda._getTomorrowEvents
-- GAgenda._getEvents
+- GAgenda._get_today_events
+- GAgenda._get_tomorrow_events
+- GAgenda.__get_events
 
 @author: Fritz <fritz.smh@gmail.com>
 @copyright: (C) 2007-2009 Domogik project
@@ -51,10 +51,10 @@ class GAgenda:
     This class allow to get events from Google Agenda
     """
 
-    def __init__(self, email, password, calendarName, callback):
+    def __init__(self, email, password, calendar_name, callback):
         """ @param email : email of gmail account
         @param password : password for account
-        @param calendarName : name of calendar to check (by default, it has email value)
+        @param calendar_name : name of calendar to check (by default, it has email value)
         @param callback : callback for sending events found
         """
 
@@ -85,48 +85,48 @@ class GAgenda:
         self._calendar.ProgrammaticLogin()
 
 
-    def getTodayEvents(self):
+    def get_today_events(self):
         """
         Get today's events
         """
-        self._log.info("GAgenda:_getTodayEvents")
+        self._log.info("GAgenda:_get_today_events")
         start_date = datetime.date.today()
         end_date = datetime.date.today() + datetime.timedelta(days=1)
-        self.getEvents(start_date, end_date)
+        self._get_events(start_date, end_date)
 
 
-    def getTomorrowEvents(self):
+    def get_tomorrow_events(self):
         """
         Get tomorrow's events
         """
-        self._log.info("GAgenda:_getTomorrowEvents")
+        self._log.info("GAgenda:_get_tomorrow_events")
         start_date = datetime.date.today() + datetime.timedelta(days=1)
         end_date = datetime.date.today() + datetime.timedelta(days=2)
-        self.getEvents(start_date, end_date)
+        self._get_events(start_date, end_date)
 
 
-    def getEventsAtDate(self, date):
+    def get_events_at_date(self, date):
         """
         Get events of a specified date
         """
-        self._log.info("GAgenda:_getEventsAtDate")
+        self._log.info("GAgenda:_get_events_at_date")
 
         # treat requested date to make a date
-        reqYear = int(date[0:4])
-        reqMonth = int(date[5:7])
-        reqDay = int(date[8:10])
-        start_date = datetime.date(reqYear, reqMonth, reqDay)
+        req_year = int(date[0:4])
+        req_month = int(date[5:7])
+        req_day = int(date[8:10])
+        start_date = datetime.date(req_year, req_month, req_day)
         end_date = start_date + datetime.timedelta(days=1)
 
-        self.getEvents(start_date, end_date)
+        self._get_events(start_date, end_date)
 
 
 
-    def getEvents(self, date_min, date_max):
+    def _get_events(self, date_min, date_max):
         """
         Get events
         """
-        self._log.info("GAgenda:_getEvents")
+        self._log.info("GAgenda:__get_events")
         self._log.info("date_min : " + str(date_min))
         self._log.info("date_max : " + str(date_max))
 
@@ -142,24 +142,24 @@ class GAgenda:
         feed = self._calendar.CalendarQuery(query)
 
         # Sort events by date/time
-        eventList = sorted(feed.entry, self._sortEvent) 
+        event_list = sorted(feed.entry, self._sort_event) 
 
         # Display events
-        for i, an_event in enumerate(eventList):
+        for i, an_event in enumerate(event_list):
             futurEvent = False
             # get event data
-            eventTitle = an_event.title.text
-            eventYear = int(an_event.when[0].start_time[0:4])
-            eventMonth = int(an_event.when[0].start_time[5:7])
-            eventDay = int(an_event.when[0].start_time[8:10])
-            eventHour = int(an_event.when[0].start_time[11:13])
-            eventMinute = int(an_event.when[0].start_time[14:16])
-            eventDatetime = datetime.datetime(eventYear, eventMonth, eventDay, eventHour, eventMinute)
+            event_title = an_event.title.text
+            event_year = int(an_event.when[0].start_time[0:4])
+            event_month = int(an_event.when[0].start_time[5:7])
+            event_day = int(an_event.when[0].start_time[8:10])
+            event_hour = int(an_event.when[0].start_time[11:13])
+            event_minute = int(an_event.when[0].start_time[14:16])
+            event_datetime = datetime.datetime(event_year, event_month, event_day, event_hour, event_minute)
             # we only take futur events
-            if eventDatetime > datetime.datetime.now():
+            if event_datetime > datetime.datetime.now():
                 futurEvent = True
-                self._log.info("Event : " + eventTitle + " at " + str(eventDatetime))
-                events.append({"object" : eventTitle, "startdate" : eventDatetime})
+                self._log.info("Event : " + event_title + " at " + str(event_datetime))
+                events.append({"object" : event_title, "startdate" : event_datetime})
 
         # send events to callback
         if events:
@@ -168,7 +168,7 @@ class GAgenda:
             self._log.info("No events to send")
 
 
-    def _sortEvent(self, x, y):
+    def _sort_event(self, x, y):
         """
         Sort events by date
         """
@@ -196,6 +196,6 @@ def cb(data):
 if __name__ == "__main__":
     g = GAgenda("fritz.smh@gmail.com", "XXXXXXXX", "fritz.smh@gmail.com", cb)
     print "Today :"
-    g.getTodayEvents()
+    g.get_today_events()
     print "Tomorrow :"
-    g.getTomorrowEvents()
+    g.get_tomorrow_events()
