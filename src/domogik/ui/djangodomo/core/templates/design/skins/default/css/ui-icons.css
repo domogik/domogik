@@ -72,3 +72,6 @@
 .icon32-widget-light { background-image:url(../images/light/lightbulb_full_32.png);}
 .icon32-widget-light.binary_0 { background-image:url(../images/light/binary/0_32.png);}
 .icon32-widget-light.binary_1 { background-image:url(../images/light/binary/1_32.png);}
+.icon32-widget-shutter { background-image:url(../images/light/shutter_down_32.png);}
+.icon32-widget-shutter.binary_0 { background-image:url(../images/shutter/binary/0_32.png);}
+.icon32-widget-shutter.binary_1 { background-image:url(../images/shutter/binary/1_32.png);}

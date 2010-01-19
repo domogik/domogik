@@ -1,8 +1,8 @@
 /* Mini widget */
 .widgetmini_binary {
     display:inline-block;
-    width: 4em;
-    height: 4em;
+    width: 45px;
+    height: 45px;
     border: 1px solid #cccccc;
     -moz-border-radius: 0.8em;
     -webkit-border-radius: 0.8em;
