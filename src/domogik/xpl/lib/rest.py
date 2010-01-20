@@ -30,6 +30,9 @@ Implements
 - RestHandler.do_GET
 - RestHandler.do_POST
 - RestHandler.rest_command
+- RestHandler.rest_xpl_cmnd
+- RestHandler.send_http_response_ok
+- RestHandler.send_http_response_error
 
 
 
@@ -63,6 +66,8 @@ class RestHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         print "==== GET ============================================"
+        if self.path[-1:] == "/":
+            self.path = self.path[0:len(self.path)-1]
         print "PATH : " + self.path
         tab_path = self.path.split("/")
 
@@ -78,7 +83,7 @@ class RestHandler(BaseHTTPRequestHandler):
         elif self.rest_type == "xpl-cmnd":
             self.rest_xpl_cmnd()
         else:
-            self.send_http_response_error(self.rest_type + " is not supported")
+            self.send_http_response_error("Type [" + self.rest_type + "] is not supported")
 
 
 
@@ -92,30 +97,45 @@ class RestHandler(BaseHTTPRequestHandler):
 
     def rest_command(self):
         print "Call rest_command"
-        self.commandTechno = self.rest_request[0]
-        self.commandElement = self.rest_request[1]
-        self.commandCommand = self.rest_request[2]
-        self.commandOptionnal = self.rest_request[3:]
-        print "Techno    : %s" % self.commandTechno
-        print "Element   : %s" % self.commandElement
-        print "Command   : %s" % self.commandCommand
-        print "Optionnal : %s" % str(self.commandOptionnal)
+        self.command_techno = self.rest_request[0]
+        self.command_element = self.rest_request[1]
+        self.command_command = self.rest_request[2]
+        self.command_optionnal = self.rest_request[3:]
+        print "Techno    : %s" % self.command_techno
+        print "Element   : %s" % self.command_element
+        print "Command   : %s" % self.command_command
+        print "Optionnal : %s" % str(self.command_optionnal)
 
 
     def rest_xpl_cmnd(self):
-        print "Call rest_xpl_cmnd"
-        self.xplCmndSchema = self.rest_request[0]
+        """ Send xPL message given in REST url
+            1/ Decode and check URL
+            2/ Send message
+        """
 
+        print "Call rest_xpl_cmnd"
+        if len(self.rest_request) == 0:
+            self.send_http_response_error("Target not given")
+            return
+        self.xpl_target = self.rest_request[0]
+        if len(self.rest_request) == 1:
+            self.send_http_response_error("Schema not given")
+            return
+        self.xpl_cmnd_schema = self.rest_request[1]
+
+        # Init xpl message
         message = XplMessage()
         message.set_type('xpl-cmnd')
-        message.set_schema(self.xplCmndSchema)
+        if self.xpl_target.lower() != "all":
+            message.set_header(target=self.xpl_target)
+        message.set_schema(self.xpl_cmnd_schema)
   
         ii = 0
         for val in self.rest_request:
-            # We pass schema
-            if ii > 0:
+            # We pass target and schema
+            if ii > 1:
                 # Parameter
-                if ii % 2 == 1:
+                if ii % 2 == 0:
                     param = val
                 # Value
                 else:
@@ -124,17 +144,21 @@ class RestHandler(BaseHTTPRequestHandler):
             ii = ii + 1
 
         # no parameters
-        if ii == 0:
+        if ii == 2:
             self.send_http_response_error("No parameters specified")
+            return
         # no value for last parameter
-        if ii % 2 == 0:
+        if ii % 2 == 1:
             self.send_http_response_error("Value missing for last parameter")
+            return
 
         print "Send message : %s" % message
-        self._myxpl.send(message)
+        #self._myxpl.send(message)
 
         # REST processing finished and OK
         self.send_http_response_ok()
+
+        # TODO : send result : "{status : 'ok', code : '0', description : ''}"
 
 
 
@@ -162,7 +186,7 @@ def main():
 
 if __name__ == '__main__':
     #main()
-    serv = Rest("0.0.0.0", "8080")
+    serv = Rest("192.168.0.10", "80")
 
 
 
