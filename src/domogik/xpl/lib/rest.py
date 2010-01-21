@@ -89,9 +89,21 @@ class RestHandler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         print "==== POST ==========================================="
+        if self.path[-1:] == "/":
+            self.path = self.path[0:len(self.path)-1]
         print "PATH : " + self.path
-        self.send_http_response_error("POST method not supported yet")
+        tab_path = self.path.split("/")
 
+        # Get type of request : /command, /xpl-cmnd, /base, etc
+        self.rest_type = tab_path[1].lower()
+        self.rest_request = tab_path[2:]
+        print "TYPE    : " + self.rest_type
+        print "Request : " + str(self.rest_request)
+
+        if self.rest_type == "xpl-cmnd":
+            self.rest_xpl_cmnd()
+        else:
+            self.send_http_response_error("Type [" + self.rest_type + "] is not supported")
 
 
 
