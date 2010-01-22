@@ -43,13 +43,14 @@
 {% block breadcrumb %}
 		<li><a href='{% url show_view %}' class='home'>My House</a></li>
 		<li><a href='{% url show_area_view area_id %}' class='icon16-area-grndfloor'>{{ area_name }}</a></li>
-		<li><a href='{% url show_area_view room_id %}' class='icon16-room-kitchen'>{{ room_name }}</a></li>
+		<li><a href='{% url show_room_view room_id %}' class='icon16-room-kitchen'>{{ room_name }}</a></li>
 {% endblock %}
 
 {% block content %}
-    <div class="element">
-        <h1 class="ident"><span class="title">{{ device.name }}</span></h1>
-	    <ul class="actions">
-        </ul>
+    <div class='element-bgnd'>
+        <div class="element icon64-device-coffeemachine">
+	    <h1 class="ident"><span class="title">{{ device.name }}</span></h1>
+	    <ul class="actions"></ul>
+        </div>
     </div>
 {% endblock %}

@@ -40,12 +40,12 @@
 {% block title %}{% trans page_title %}{% endblock %}
 
 {% block content %}
-    <div class="element">
-        <h1 class="ident"><span class="title">My House</span></h1>
-	    <ul class="actions">
-        </ul>
+    <div class='element-bgnd'>
+	<div class="element icon64-room-default">
+	    <h1 class="ident"><span class="title">My House</span></h1>
+	    <ul class="actions"></ul>
+	</div>
     </div>
-   
     <dl>
 	{% for area in areas_list %}
 		{% if forloop.counter0|divisibleby:"3" %}
@@ -63,11 +63,11 @@
                         });
                     // ]]>
                     </script>
-                    <dt class='header icon64-room-default'>
+                    <dt class='header icon64-area-grndfloor'>
                         <a href='{% url show_area_view area.id %}' class="ident">
                             <span class="title">{{ area.name }}</span>
                             <br />
-                            <span class="subtitle icon16-area-grndfloor">{{ area.description }}</span>
+                            <span class="subtitle">{{ area.description }}</span>
                         </a>
                         <span class='temp icon32-device-temp'>21 &#176;C</span>
                     </dt>

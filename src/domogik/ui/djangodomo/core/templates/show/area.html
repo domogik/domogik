@@ -23,7 +23,7 @@
 {% block js_script %}
 // <![CDATA[
     $(function(){
-		$(".section .extended").hide();
+	$(".section .extended").hide();
     });
 // ]]>
 {% endblock %}
@@ -45,14 +45,14 @@
 {% endblock %}
 
 {% block content %}
-    <div class="element">
-        <h1 class="ident"><span class="title">{{ area.name }}</span></h1>
-	    <ul class="actions">
-        </ul>
+    <div class='element-bgnd'>
+        <div class="element icon64-area-grndfloor">
+            <h1 class="ident"><span class="title">{{ area.name }}</span></h1>
+	    <ul class="actions"></ul>
+        </div>
     </div>
-	
     <dl>
-	{% for room in rooms_list %}
+{% for room in rooms_list %}
 		{% if forloop.counter0|divisibleby:"3" %}
             <div class='row'>
         {% endif %}
@@ -62,17 +62,17 @@
                 	// <![CDATA[
                 		$(function() {
                             $("#button_{{ room.id }}").click(function() {
-								$(".section .extended[id!='extended_{{ room.id }}']").hide();
-								$("#extended_{{ room.id }}").toggle();
-							})
+				$(".section .extended[id!='extended_{{ room.id }}']").hide();
+				$("#extended_{{ room.id }}").toggle();
+			    })
                         });
                     // ]]>
                     </script>
-                    <dt class='header icon64-room-default'>
+                    <dt class='header icon64-room-kitchen'>
                         <a href='{% url show_room_view room.id %}' class="ident">
                             <span class="title">{{ room.name }}</span>
                             <br />
-                            <span class="subtitle icon16-area-grndfloor">{{ room.description }}</span>
+                            <span class="subtitle">{{ room.description }}</span>
                         </a>
                         <span class='temp icon32-device-temp'>21 &#176;C</span>
                     </dt>

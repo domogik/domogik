@@ -39,7 +39,11 @@
 .icon16-room-tvlounge { background-image:url(../images/default_room_16.png);}
 .icon16-room-bathroom { background-image:url(../images/default_room_16.png);}
 
-/* Function icons */
+/* Device icons */
+.icon64-device-coffeemachine { background-image:url(../images/coffee_machine_64.png);}
+.icon32-device-coffeemachine { background-image:url(../images/coffee_machine_32.png);}
+.icon16-device-coffeemachine { background-image:url(../images/coffee_machine_16.png);}
+
 .icon32-device-electricity { background-image:url(../images/electricity_32.png);}
 .icon16-device-electricity { background-image:url(../images/electricity_16.png);}
 .icon16-device-water { background-image:url(../images/water_16.png);}

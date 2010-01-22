@@ -1,17 +1,17 @@
 .element {
-    padding:1em;
-    background:#eeeeee url(ui-lightness/images/ui-bg_highlight-soft_100_eeeeee_1x100.png) top left repeat-x;
+    padding:1em 1em 1em 70px;
+    background-position:top left;
+    background-repeat:no-repeat;
+    min-height: 64px;
+}
+
+.element-bgnd {
     border: 1px solid #cccccc;
     -moz-box-shadow: 5px 5px 5px #888;
     -webkit-box-shadow: 5px 5px 5px #888;
     -moz-border-radius: 0.8em;
     -webkit-border-radius: 0.8em;
-}
-
-.element .icon {
-    background-position:top right;
-    background-repeat:no-repeat;
-    min-height:10em;
+    background:url(ui-lightness/images/ui-bg_highlight-soft_100_eeeeee_1x100.png) top left repeat-x;
 }
 
 .element .actions {

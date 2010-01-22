@@ -18,8 +18,8 @@
 .opened {
     border-top: 1px solid #cccccc;
     border-bottom: 1px solid #cccccc;
-    border-left: none;
-    border-right: none;
+    border-left: 1px dashed #cccccc;
+    border-right: 1px dashed #cccccc;
     -moz-border-radius: 0;
     -webkit-border-radius: 0;
     background-color: #FFFFFF;
@@ -32,6 +32,7 @@
     height: 45px;
     text-align:center;
     outline: none;
+    font-weight: bold;
 }
 
 .range_plus {
@@ -44,7 +45,7 @@
     border-left: 1px solid #cccccc;
     border-bottom: 1px solid #cccccc;
     top:-46px;
-    left:-45px;
+    left:-47px;
     -moz-border-radius: 0.8em 0 0 0.8em;
     -webkit-border-radius: 0.8em 0 0 0.8em;
 }
@@ -60,7 +61,56 @@
     border-right: 1px solid #cccccc;
     border-bottom: 1px solid #cccccc;
     top:-93px;
-    right:-45px;
+    right:-46px;
     -moz-border-radius: 0 0.8em 0.8em 0;
     -webkit-border-radius: 0 0.8em 0.8em 0;
+}
+
+.widget_range {
+    display:block;
+    border: 1px solid #cccccc;
+    -moz-border-radius: 0.8em;
+    -webkit-border-radius: 0.8em;
+    background-color: #FFFFFF;
+    background-position: top left;
+    background-repeat: no-repeat;
+    padding:0.5em;
+}
+
+.widget_range ul {
+    list-style:none;
+    margin:0;
+    padding:0;
+    text-align:right;
+}
+
+.widget_range li {
+    display:inline-block;
+    margin: 0;
+    padding: 0;
+}
+
+.widget_range.ok_state .name {
+    border: 1px solid #098876;
+}
+
+.widget_range.error_state .name {
+    border: 1px solid #098876;
+}
+
+.widget_range.unknown_state .name {
+    border: 1px solid #098876;
+}
+
+.widget_range .value {
+        display:block;
+    margin-left: 2em;
+    font-weight: bold;
+    border: none;
+    background-color: transparent;
+    width: 4em;
+}
+
+.widget_range .slider {
+    margin-top: 1em;
 }
