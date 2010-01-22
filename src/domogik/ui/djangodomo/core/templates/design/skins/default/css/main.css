@@ -38,11 +38,14 @@ body {
 
 #frame {
   margin:1em;
-  padding:1em;
   -moz-border-radius: 0.8em;
   -webkit-border-radius: 0.8em;
   border:1px solid #dddddd;
   background: #eeeeee url(/ui-lightness/images/ui-bg_highlight-soft_100_eeeeee_1x100.png) top left repeat-x;
+}
+
+#content {
+    padding: 1em;    
 }
 
 div.left {

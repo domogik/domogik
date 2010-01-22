@@ -17,6 +17,7 @@
     background-position: top left;
     background-repeat:no-repeat;
     min-height: 64px;
+    padding-bottom: 1em;
 }
 
 .section .ident {
