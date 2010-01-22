@@ -34,6 +34,7 @@ Implements
 - RestHandler.send_http_response_ok
 - RestHandler.send_http_response_error
 
+- XmlRpcDbHelper
 
 
 @author: Friz <fritz.smh@gmail.com>
@@ -47,7 +48,12 @@ from domogik.xpl.lib.module import *
 from domogik.common import logger
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 
+from domogik.common.database import DbHelper
 
+
+
+
+################################################################################
 class Rest(xPLModule):
 
     def __init__(self, ip, port):
@@ -61,8 +67,20 @@ class Rest(xPLModule):
         print 'Start REST server on port %s...' % port
         server.serve_forever()
 
+        # DB Helper
+        self._db = DbHelper()
 
+    def get_helper(self):
+        return self._db
+
+
+################################################################################
 class RestHandler(BaseHTTPRequestHandler):
+
+
+######
+# GET/POST processing
+######
 
     def do_GET(self):
         print "==== GET ============================================"
@@ -82,6 +100,9 @@ class RestHandler(BaseHTTPRequestHandler):
             self.rest_command()
         elif self.rest_type == "xpl-cmnd":
             self.rest_xpl_cmnd()
+        elif self.rest_type == "base":
+            # specific for GET
+            self.rest_base_get()
         else:
             self.send_http_response_error("Type [" + self.rest_type + "] is not supported")
 
@@ -102,10 +123,17 @@ class RestHandler(BaseHTTPRequestHandler):
 
         if self.rest_type == "xpl-cmnd":
             self.rest_xpl_cmnd()
+        elif self.rest_type == "base":
+            # specific for POST
+            self.rest_base_post() 
         else:
             self.send_http_response_error("Type [" + self.rest_type + "] is not supported")
 
 
+
+######
+# /command processing
+######
 
     def rest_command(self):
         print "Call rest_command"
@@ -118,6 +146,11 @@ class RestHandler(BaseHTTPRequestHandler):
         print "Command   : %s" % self.command_command
         print "Optionnal : %s" % str(self.command_optionnal)
 
+
+
+######
+# /xpl-cmnd processing
+######
 
     def rest_xpl_cmnd(self):
         """ Send xPL message given in REST url
@@ -174,6 +207,53 @@ class RestHandler(BaseHTTPRequestHandler):
 
 
 
+######
+# /base processing
+######
+
+    def rest_base_get(self):
+        """ get data in database
+            1/ Decode and check URL
+            2/ call the good fonction to get data
+        """
+        print "Call rest_base_get"
+        if len(self.rest_request) < 2:
+            self.send_http_response_error("Url too short")
+            return
+
+        if self.rest_request[0] == "area":
+            if self.rest_request[1] == "list":
+                for area in self._db.list_areas():
+                    print "-- AREA --"
+                    print area
+
+            else:
+                self.send_http_response_error("GET : " +  self.rest_request[1] + " not allowed for " + self.rest_request[0])
+                return
+        elif self.rest_request[0] == "room":
+            print "TODO !!"
+        elif self.rest_request[0] == "device":
+            print "TODO !!"
+        else:
+            self.send_http_response_error("GET : " +  self.rest_request[0] + " not allowed")
+            return
+
+
+
+
+    def rest_base_post(self):
+        """ create or update data in database
+            1/ Decode and check URL
+            2/ call the good fonction to create or update data
+        """
+        print "TODO !!!!!!"
+
+
+
+######
+# HTTP return
+######
+
     def send_http_response_ok(self):
         self.send_response(200)
         self.send_header('Content-type',    'text/html')
@@ -183,6 +263,37 @@ class RestHandler(BaseHTTPRequestHandler):
     def send_http_response_error(self, errMsg):
         msg = 'Error : ' + errMsg
         self.send_error(500,msg)
+
+
+
+
+
+################################################################################
+#class XmlRpcDbHelper():
+#    ''' This class provides a mapping of DbHelper methods to use them throw REST
+#    '''
+#
+#    def __init__(self):
+#        self._db = DbHelper()
+#
+#    def get_helper(self):
+#        return self._db
+#####
+## Areas
+#####
+#
+#    def list_areas(self):
+#        ''' Get the list of areas and return it as a list of tuples
+#        @return a list of tuple (id, name, description)
+#        '''
+#        areas = self._db.list_areas()
+#        res = []
+#        for area in areas:
+#            res.append((area.id, area.name, area.description))
+#        return res
+
+
+
 
 
 
