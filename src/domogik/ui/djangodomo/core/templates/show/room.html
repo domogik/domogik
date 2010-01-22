@@ -23,7 +23,7 @@
 {% block js_script %}
 // <![CDATA[
     $(function(){
-		$(".section .extended").hide();
+	$(".section .extended").hide();
     });
 // ]]>
 {% endblock %}
@@ -50,63 +50,76 @@
 {% endblock %}
 
 {% block content %}
-	<div id='binary_data' />
-	<div id='range_data' />
-    <div class="element">
-        <h1 class="ident"><span class="title">{{ room.name }}</span></h1>
-	    <ul class="actions">
-        </ul>
-    </div>
-	
+    <div id='binary_data'></div>
+    <div id='range_data'></div>
+    <div class='element-bgnd'>
+        <div class="element icon64-room-kitchen">
+	    <h1 class="ident"><span class="title">{{ room.name }}</span></h1>
+	    <ul class="actions"></ul>
+        </div>
+    </div>	
     <dl>
 	{% for device in devices_list %}
 		{% if forloop.counter0|divisibleby:"3" %}
             <div class='row'>
         {% endif %}
     		<div class='column'>
-        		<div class='section'>
-			        <script type="text/javascript">
+        	    <div class='section'>
+			<script type="text/javascript">
                 	// <![CDATA[
-                		$(function() {
-                            $("#button_{{ device.id }}").click(function() {
-								$(".section .extended[id!='extended_{{ device.id }}']").hide();
-								$("#extended_{{ device.id }}").toggle();
-							});
-							widgetmini_binary("widgetmini_{{ device.id }}1", "{{ device.id }}1", "light");
-							widget_binary("widget_{{ device.id }}1", "{{ device.id }}1", "light");
-							widgetmini_range("widgetmini_{{ device.id }}2", "{{ device.id }}2", "light", 0, 100, 52, '%');
-                        });
-                    // ]]>
-                    </script>
-                    <dt class='header icon64-room-default'>
-                        <a href='{% url show_device_view device.id %}' class="ident">
-                            <span class="title">{{ device.name }}</span>
-                            <br />
-                            <span class="subtitle icon16-area-grndfloor">{{ device.description }}</span>
-                        </a>
-                    </dt>
-                    <dd class='actions'>
-                        <ul>
-                            <li><div id="widgetmini_{{ device.id }}1"></div></li>
-                            <li><div id="widgetmini_{{ device.id }}2"></div></li>
-                        </ul>
-                    </dd>
-                    <dd  class='extended' id='extended_{{ device.id }}'>
-								Commandes
-						<ul class='commands'>
-								<li><div id="widget_{{ device.id }}1">
-												<span class='name'>Switch</span>
-														<ul>
-																		<li><a href='#' class='buttonsmall off'>Off</a></li>
-																		<li><a href='#' class='buttonsmall on'>On</a></li>
-														</ul>
-								</div>
-								</li>
-						</ul>
-					</dd>
-                    <dd class='footer'><a id='button_{{ device.id }}' href='#'>&#187;</a></dd>
-                </div>
-            </div>
+                	    $(function() {
+			        $("#button_{{ device.id }}").click(function() {
+				    $(".section .extended[id!='extended_{{ device.id }}']").hide();
+				    $("#extended_{{ device.id }}").toggle();
+				});
+				widgetmini_binary("widgetmini_{{ device.id }}1", "{{ device.id }}1", "light");
+				widget_binary("widget_{{ device.id }}1", "{{ device.id }}1", "light");
+				widgetmini_range("widgetmini_{{ device.id }}2", "{{ device.id }}2", "light", 0, 100, 12, '%');
+				widget_range("widget_{{ device.id }}2", "{{ device.id }}2", "light", 0, 100, 12, '%');
+			    });
+			// ]]>
+			</script>
+			<dt class='header icon64-device-coffeemachine'>
+			    <a href='{% url show_device_view device.id %}' class="ident">
+				<span class="title">{{ device.name }}</span>
+				<br />
+				<span class="subtitle">{{ device.description }}</span>
+			    </a>
+			</dt>
+			<dd class='actions'>
+			    <ul>
+				<li><div id="widgetmini_{{ device.id }}1"></div></li>
+				<li><div id="widgetmini_{{ device.id }}2"></div></li>
+			    </ul>
+			</dd>
+			<dd  class='extended' id='extended_{{ device.id }}'>
+			    Commandes
+			    <ul class='commands'>
+				<li>
+				    <div id="widget_{{ device.id }}1">
+					<span class='name'>Switch</span>
+					<ul>
+		    		    	    <li><a href='#' class='buttonsmall off'>Off</a></li>
+					    <li><a href='#' class='buttonsmall on'>On</a></li>
+					</ul>
+				    </div>
+				</li>
+				<li>
+				    <div id="widget_{{ device.id }}2">
+					<label class='name'>Dimmer</label>
+					<input type="text" class="value" title="Variation in %"/>
+					<ul>
+		    		    	    <li><a href='#' class='buttonsmall down'>Down</a></li>
+					    <li><a href='#' class='buttonsmall up'>Up</a></li>
+					</ul>
+					<div class="slider"></div>
+				    </div>
+				</li>
+			    </ul>
+			</dd>
+			<dd class='footer'><a id='button_{{ device.id }}' href='#'>&#187;</a></dd>
+		    </div>
+		</div>
 		{% if forloop.counter0|divisibleby:"3" %}
             </div>
 		{% endif %}

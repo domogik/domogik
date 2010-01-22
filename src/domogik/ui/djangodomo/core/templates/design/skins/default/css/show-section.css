@@ -16,6 +16,7 @@
 .section .header {
     background-position: top left;
     background-repeat:no-repeat;
+    min-height: 64px;
 }
 
 .section .ident {
@@ -66,6 +67,7 @@
 /* Colapsable section */
 .section .extended {
     padding:1em;
+    border-top: 1px dashed #cccccc;
 }
 
 .section ul.commands {
@@ -82,7 +84,7 @@
 
 .commands .name {
     padding: 0.2em 1em 0.2em 1em;
-        border: 1px solid #cccccc;
+    border: 1px solid #cccccc;
     -moz-border-radius: 0.8em;
     -webkit-border-radius: 0.8em;
     background-color: #FFFFFF;

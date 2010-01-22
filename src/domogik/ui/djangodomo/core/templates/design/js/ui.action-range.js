@@ -27,6 +27,24 @@ function widgetmini_range(widgetmini_id, function_id, widget_type, min_value, ma
         $('#' + widgetmini_id + ' .range_minus').click(function () {minus_range(function_id)});
 }
 
+function widget_range(widget_id, function_id, widget_type, min_value, max_value, default_value, unit) {
+    $('#' + widget_id).addClass('widget_range')
+        .addClass('icon32-widget-' + widget_type);
+    $('#' + widget_id + " .up").click(function () {plus_range(function_id)});
+    $('#' + widget_id + " .down").click(function () {minus_range(function_id)});
+    
+    $('#' + widget_id + " .slider").slider({
+	range: false,
+	min: min_value,
+	max: max_value,
+	value: default_value,
+	slide: function(event, ui) {
+		slide_range(function_id, ui.value);
+	    }
+	});
+	$('#' + widget_id + " .value").val(default_value + unit);
+}
+
 function open_range(function_id) {
     $('#widgetmini_' + function_id).removeClass('closed')
     .addClass('opened');
@@ -44,6 +62,8 @@ function plus_range(function_id) {
     data.value = Math.floor((data.value + 10) / 10) * 10;
     if (data.value > data.max) {data.value = data.max}
     $('#widgetmini_' + function_id + ' .range_value').text(data.value+data.unit);
+    $('#widget_' + function_id + " .value").val(data.value+data.unit);
+    $('#widget_' + function_id + " .slider").slider('value', data.value);
 }
 
 function minus_range(function_id) {
@@ -51,4 +71,13 @@ function minus_range(function_id) {
     data.value = Math.floor((data.value - 10) / 10) * 10;
     if (data.value < data.min) {data.value = data.min}
     $('#widgetmini_' + function_id + ' .range_value').text(data.value+data.unit);
+    $('#widget_' + function_id + " .value").val(data.value+data.unit);
+    $('#widget_' + function_id + " .slider").slider('value', data.value);
+}
+
+function slide_range(function_id, value) {
+    var data = $("#range_data").data(function_id);
+    data.value = value;
+    $('#widgetmini_' + function_id + ' .range_value').text(data.value+data.unit);
+    $('#widget_' + function_id + " .value").val(data.value+data.unit);
 }
