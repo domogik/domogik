@@ -5,9 +5,8 @@
     border: 1px solid #cccccc;
     -moz-border-radius: 0.8em;
     -webkit-border-radius: 0.8em;
-    background-position: center center;
-    background-repeat: no-repeat;
     outline: none;
+    background: transparent url('../images/background_blue.png') bottom left no-repeat;
 }
 
 .widgetmini_range:hover, .widgetmini_range:focus {
@@ -31,8 +30,10 @@
     width: 45px;
     height: 45px;
     text-align:center;
-    outline: none;
     font-weight: bold;
+    background-position: center center;
+    background-repeat: no-repeat;
+    line-height:45px;
 }
 
 .range_plus {
