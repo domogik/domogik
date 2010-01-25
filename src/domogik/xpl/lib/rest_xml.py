@@ -17,6 +17,8 @@ class TestXml:
         #directory = "%s/xml/rest/" % db['cfg_path']
         directory = "/home/maxence/"
 #        files = glob.glob("%s/*xml" % directory)
+        if url[0] == '/':
+            url = url[1:]
 
         cmd, techno, address, order  = self.split_url(url, directory)
         file = "%s/%s.xml" % (directory, techno)
@@ -56,15 +58,15 @@ class TestXml:
         optional_parameters_value = {}
         if the_order.getElementsByTagName("parameters")[0].hasChildNodes():
             mandatory_parameters = the_order.getElementsByTagName("parameters")[0].getElementsByTagName("mandatory")[0]
-            count_mandatory_parameters = len(mandatory_parameters)
+            count_mandatory_parameters = len(mandatory_parameters.getElementsByTagName("parameter"))
             mandatory_parameters_from_url = url.split('/')[4:4+count_mandatory_parameters]
             for mandatory_param in mandatory_parameters.getElementsByTagName("parameter"):
                 key = mandatory_param.attributes.get("key").value
                 value = mandatory_parameters_from_url[int(mandatory_param.attributes.get("location").value) - 1]
                 mandatory_parameters_value[key] = value
             #optional parameters 
-            if the_order.getElementsByTagName("parse_listener")[0].getElementsByTagName("optional") != []:
-                optional_parameters =  the_order.getElementsByTagName("parse_listener")[0].getElementsByTagName("optional")
+            if the_order.getElementsByTagName("parameters")[0].getElementsByTagName("optional") != []:
+                optional_parameters =  the_order.getElementsByTagName("parameters")[0].getElementsByTagName("optional")[0]
                 for opt_param in optional_parameters.getElementsByTagName("parameter"):
                     ind = url.index(opt_param.getElementsByTagName("name")[0])
                     optional_parameters_value[url[ind]] = url[ind + 1]
@@ -84,7 +86,7 @@ target=*
 %s=%s
 """ % (schema, device_address_key, address, order_key, order_value)
         for m_param in mandatory_parameters_value.keys():
-            msg += "%s=%s\n" % (m_param, mandatory_parameters_value[o_param])
+            msg += "%s=%s\n" % (m_param, mandatory_parameters_value[m_param])
         for o_param in optional_parameters_value.keys():
             msg += "%s=%s\n" % (o_param, optional_parameters_value[o_param])
         msg += "}"
@@ -113,3 +115,4 @@ target=*
 if __name__ == "__main__":
     test = TestXml()
     print test.parse("/command/x10/a3/on")
+    print test.parse("/command/x10/a3/dim/10")
