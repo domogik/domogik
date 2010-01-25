@@ -47,8 +47,8 @@ from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.lib.module import *
 from domogik.common import logger
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
-
 from domogik.common.database import DbHelper
+import json
 
 
 
@@ -57,23 +57,24 @@ from domogik.common.database import DbHelper
 class Rest(xPLModule):
 
     def __init__(self, ip, port):
-        xPLModule.__init__(self, name = 'REST')
+        xPLModule.__init__(self, name = 'rest')
         # logging initialization
         l = logger.Logger('REST')
         self._log = l.get_logger()
         self._log.info("Rest Server initialisation...")
+        # DB Helper
+        self._db = DbHelper()
 
-        server = HTTPServerWithParam((ip, int(port)), RestHandler, handler_params = [1,2,3])
+        server = HTTPServerWithParam((ip, int(port)), RestHandler, handler_params = [self])
         print 'Start REST server on port %s...' % port
         server.serve_forever()
 
-        # DB Helper
-        self._db = DbHelper()
 
     def get_helper(self):
         return self._db
 
 
+################################################################################
 class HTTPServerWithParam(HTTPServer):
     """ Extends HTTPServer to allow send params to the Handler.
     """
@@ -91,15 +92,22 @@ class RestHandler(BaseHTTPRequestHandler):
 ######
 
     def do_GET(self):
+        """ Process GET requests
+        """
+
         print "==== GET ============================================"
-        print self.server.handler_params
-        print "====================================================="
+        # Create shorter access : self.server.handler_params[0].* => self.*
+        self._move_namespace()
+
         if self.path[-1:] == "/":
             self.path = self.path[0:len(self.path)-1]
         print "PATH : " + self.path
         tab_path = self.path.split("/")
 
         # Get type of request : /command, /xpl-cmnd, /base, etc
+        if len(tab_path) <= 1:
+            self.send_http_response_error("No type given")
+            return
         self.rest_type = tab_path[1].lower()
         self.rest_request = tab_path[2:]
         print "TYPE    : " + self.rest_type
@@ -115,11 +123,18 @@ class RestHandler(BaseHTTPRequestHandler):
             self.rest_base_get()
         else:
             self.send_http_response_error("Type [" + self.rest_type + "] is not supported")
+            return
 
 
 
     def do_POST(self):
+        """ Process POST requests
+        """
+
         print "==== POST ==========================================="
+        # Create shorter access : self.server.handler_params[0].* => self.*
+        self._move_namespace()
+
         if self.path[-1:] == "/":
             self.path = self.path[0:len(self.path)-1]
         print "PATH : " + self.path
@@ -138,6 +153,15 @@ class RestHandler(BaseHTTPRequestHandler):
             self.rest_base_post() 
         else:
             self.send_http_response_error("Type [" + self.rest_type + "] is not supported")
+
+
+
+    def _move_namespace(self):
+        """ Create shorter access : self.server.handler_params[0].* => self.*
+        """
+        self._db = self.server.handler_params[0]._db
+        self._myxpl = self.server.handler_params[0]._myxpl
+        self._log = self.server.handler_params[0]._log
 
 
 
@@ -208,7 +232,7 @@ class RestHandler(BaseHTTPRequestHandler):
             return
 
         print "Send message : %s" % message
-        #self._myxpl.send(message)
+        self._myxpl.send(message)
 
         # REST processing finished and OK
         self.send_http_response_ok()
@@ -231,21 +255,49 @@ class RestHandler(BaseHTTPRequestHandler):
             self.send_http_response_error("Url too short")
             return
 
+        ### area #####################################
         if self.rest_request[0] == "area":
-            if self.rest_request[1] == "list":
-                for area in self._db.list_areas():
-                    print "-- AREA --"
-                    print area
 
+            ### list
+            if self.rest_request[1] == "list":
+                if len(self.rest_request) == 2:
+                    self._rest_base_area_list()
+                elif len(self.rest_request) == 3:
+                    self.send_http_response_error("Wrong syntax for " + self.rest_request[1])
+                else:
+                    if self.rest_request[2] == "by-id":
+                        self._rest_base_area_list(id=self.rest_request[3])
+
+            ### add
+            elif self.rest_request[1] == "add":
+                if len(self.rest_request) == 4:
+                    self._rest_base_area_add(name=self.rest_request[2], description=self.rest_request[3])
+                else:
+                    self.send_http_response_error("Wrong syntax for " + self.rest_request[1])
+
+            ### del
+            elif self.rest_request[1] == "del":
+                if len(self.rest_request) == 3:
+                    self._rest_base_area_del(id=self.rest_request[2])
+                else:
+                    self.send_http_response_error("Wrong syntax for " + self.rest_request[1])
+
+            ### others
             else:
-                self.send_http_response_error("GET : " +  self.rest_request[1] + " not allowed for " + self.rest_request[0])
+                self.send_http_response_error(self.rest_request[1] + " not allowed for " + self.rest_request[0])
                 return
+
+        ### room #####################################
         elif self.rest_request[0] == "room":
             print "TODO !!"
+
+        ### device #####################################
         elif self.rest_request[0] == "device":
             print "TODO !!"
+
+        ### others ###################################
         else:
-            self.send_http_response_error("GET : " +  self.rest_request[0] + " not allowed")
+            self.send_http_response_error(self.rest_request[0] + " not allowed")
             return
 
 
@@ -260,19 +312,71 @@ class RestHandler(BaseHTTPRequestHandler):
 
 
 
+
+
+
+
+
+
+    def _rest_base_area_list(self, id = None):
+        result = "{status : 'OK', description: '', area : ["
+        if id == None:
+            for area in self._db.list_areas():
+                result += "{id : '%s', name : '%s', description : '%s'}," % (area.id, area.name, area.description)
+            result = result[0:len(result)-1]
+        else:
+            area = self._db.get_area_by_id(id)
+            if area is not None:
+                result += "{id : '%s', name : '%s', description : '%s'}" % (area.id, area.name, area.description)
+        result += "]}"
+        print result
+        self.send_http_response_ok(result)
+        # TODO : send result properly
+
+
+    def _rest_base_area_add(self, name = None, description = None):
+        area = self._db.add_area(name, description)
+        result = "{status : 'OK', description: '', area : ["
+        result += "{id : '%s', name : '%s', description : '%s'}" % (area.id, area.name, area.description)
+        result += "]}"
+        print result
+        self.send_http_response_ok(result)
+        # TODO : send result properly
+
+
+    def _rest_base_area_del(self, id=None):
+        # Check existence
+        area = self._db.get_area_by_id(id)
+        if area is not None:
+            self._db.del_area(id)
+            result = "{status : 'OK', description: '', area : ["
+            result += "{id : '%s', name : '%s', description : '%s'}" % (area.id, area.name, area.description)
+            result += "]}"
+        else:
+            result = "{status : 'KO', description : 'No data'}"
+        print result
+        self.send_http_response_ok(result)
+
+
+
+
 ######
 # HTTP return
 ######
 
-    def send_http_response_ok(self):
+    def send_http_response_ok(self, data = ""):
         self.send_response(200)
         self.send_header('Content-type',    'text/html')
         self.end_headers()
+        if data:
+            self.wfile.write(data);
+        ### TODO : log this
 
 
     def send_http_response_error(self, errMsg):
         msg = 'Error : ' + errMsg
         self.send_error(500,msg)
+        ### TODO : log this
 
 
 
@@ -320,6 +424,7 @@ def main():
 if __name__ == '__main__':
     #main()
     serv = Rest("127.0.0.1", "8080")
+    #serv = Rest("192.168.0.10", "80")
 
 
 
