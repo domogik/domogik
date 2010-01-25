@@ -1,0 +1,28 @@
+<mapping>
+    <technology name="x10">
+        <schema>x10.basic</schema>
+        
+        <device>
+            <key>device</key>
+        </device>
+
+        <orders>
+            <key>command</key>
+            <order>
+                <name>on</name>
+                <value>on</value>
+                <parameters />
+            </order>
+            <order>
+                <name>dim</name>
+                <value>dim</value>
+                <parameters>
+                    <mandatory>
+                        <parameter key="value" location="1"/>
+                    </mandatory>
+                    <optional />
+                </parameters>
+            </order>
+        </orders>
+    </technology>
+</mapping>

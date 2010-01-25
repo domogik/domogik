@@ -1,0 +1,22 @@
+<mapping>
+  <technology name="plcbus">
+        <schema>plcbus.basic</schema>
+
+        <device>
+            <key>device</key>
+        </device>
+
+        <orders>
+            <key>command</key>
+            <order>
+                <name>bright</name>
+                <value>bright</value>
+                <parameters>
+                    <mandatory>
+                        <parameter key="level" location="1"/>
+                    </mandatory>
+                </parameters>
+            </order>
+        </orders>
+    </technology>
+</mapping>
