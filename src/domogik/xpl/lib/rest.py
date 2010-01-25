@@ -63,7 +63,7 @@ class Rest(xPLModule):
         self._log = l.get_logger()
         self._log.info("Rest Server initialisation...")
 
-        server = HTTPServer((ip, int(port)), RestHandler)
+        server = HTTPServerWithParam((ip, int(port)), RestHandler, handler_params = [1,2,3])
         print 'Start REST server on port %s...' % port
         server.serve_forever()
 
@@ -73,6 +73,14 @@ class Rest(xPLModule):
     def get_helper(self):
         return self._db
 
+
+class HTTPServerWithParam(HTTPServer):
+    """ Extends HTTPServer to allow send params to the Handler.
+    """
+
+    def __init__(self, server_address, RequestHandlerClass, bind_and_activate=True, handler_params = []):
+        HTTPServer.__init__(self, server_address, RequestHandlerClass, bind_and_activate)
+        self.handler_params = handler_params
 
 ################################################################################
 class RestHandler(BaseHTTPRequestHandler):
@@ -84,6 +92,8 @@ class RestHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         print "==== GET ============================================"
+        print self.server.handler_params
+        print "====================================================="
         if self.path[-1:] == "/":
             self.path = self.path[0:len(self.path)-1]
         print "PATH : " + self.path
@@ -309,7 +319,7 @@ def main():
 
 if __name__ == '__main__':
     #main()
-    serv = Rest("192.168.0.10", "80")
+    serv = Rest("127.0.0.1", "8080")
 
 
 
