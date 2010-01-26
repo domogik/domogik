@@ -33,3 +33,16 @@ Implements
 @license: GPL(v3)
 @organization: Domogik
 """
+
+from django.db import models
+import django_pipes as pipes
+
+# Create your models here.
+class Areas(pipes.Pipe):
+    uri = "http://127.0.0.1:8080/base/area/list/"
+
+    @staticmethod
+    def fetch():
+        resp = Areas.objects.get()
+        if resp :
+            return resp
