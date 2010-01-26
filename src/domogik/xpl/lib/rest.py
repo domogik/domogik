@@ -106,7 +106,7 @@ class RestHandler(BaseHTTPRequestHandler):
 
         # Get type of request : /command, /xpl-cmnd, /base, etc
         if len(tab_path) <= 1:
-            self.send_http_response_error("No type given")
+            self.send_http_response_error(999, "No type given")
             return
         self.rest_type = tab_path[1].lower()
         self.rest_request = tab_path[2:]
@@ -122,7 +122,7 @@ class RestHandler(BaseHTTPRequestHandler):
             # specific for GET
             self.rest_base_get()
         else:
-            self.send_http_response_error("Type [" + self.rest_type + "] is not supported")
+            self.send_http_response_error(999, "Type [" + self.rest_type + "] is not supported")
             return
 
 
@@ -152,7 +152,7 @@ class RestHandler(BaseHTTPRequestHandler):
             # specific for POST
             self.rest_base_post() 
         else:
-            self.send_http_response_error("Type [" + self.rest_type + "] is not supported")
+            self.send_http_response_error(999, "Type [" + self.rest_type + "] is not supported")
 
 
 
@@ -194,11 +194,11 @@ class RestHandler(BaseHTTPRequestHandler):
 
         print "Call rest_xpl_cmnd"
         if len(self.rest_request) == 0:
-            self.send_http_response_error("Target not given")
+            self.send_http_response_error(999, "Target not given")
             return
         self.xpl_target = self.rest_request[0]
         if len(self.rest_request) == 1:
-            self.send_http_response_error("Schema not given")
+            self.send_http_response_error(999, "Schema not given")
             return
         self.xpl_cmnd_schema = self.rest_request[1]
 
@@ -224,11 +224,11 @@ class RestHandler(BaseHTTPRequestHandler):
 
         # no parameters
         if ii == 2:
-            self.send_http_response_error("No parameters specified")
+            self.send_http_response_error(999, "No parameters specified")
             return
         # no value for last parameter
         if ii % 2 == 1:
-            self.send_http_response_error("Value missing for last parameter")
+            self.send_http_response_error(999, "Value missing for last parameter")
             return
 
         print "Send message : %s" % message
@@ -252,7 +252,7 @@ class RestHandler(BaseHTTPRequestHandler):
         """
         print "Call rest_base_get"
         if len(self.rest_request) < 2:
-            self.send_http_response_error("Url too short")
+            self.send_http_response_error(999, "Url too short")
             return
 
         ### area #####################################
@@ -263,7 +263,7 @@ class RestHandler(BaseHTTPRequestHandler):
                 if len(self.rest_request) == 2:
                     self._rest_base_area_list()
                 elif len(self.rest_request) == 3:
-                    self.send_http_response_error("Wrong syntax for " + self.rest_request[1])
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1])
                 else:
                     if self.rest_request[2] == "by-id":
                         self._rest_base_area_list(id=self.rest_request[3])
@@ -273,18 +273,18 @@ class RestHandler(BaseHTTPRequestHandler):
                 if len(self.rest_request) == 4:
                     self._rest_base_area_add(name=self.rest_request[2], description=self.rest_request[3])
                 else:
-                    self.send_http_response_error("Wrong syntax for " + self.rest_request[1])
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1])
 
             ### del
             elif self.rest_request[1] == "del":
                 if len(self.rest_request) == 3:
                     self._rest_base_area_del(id=self.rest_request[2])
                 else:
-                    self.send_http_response_error("Wrong syntax for " + self.rest_request[1])
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1])
 
             ### others
             else:
-                self.send_http_response_error(self.rest_request[1] + " not allowed for " + self.rest_request[0])
+                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0])
                 return
 
         ### room #####################################
@@ -297,7 +297,7 @@ class RestHandler(BaseHTTPRequestHandler):
 
         ### others ###################################
         else:
-            self.send_http_response_error(self.rest_request[0] + " not allowed")
+            self.send_http_response_error(999, self.rest_request[0] + " not allowed")
             return
 
 
@@ -316,46 +316,50 @@ class RestHandler(BaseHTTPRequestHandler):
 
 
 
-
+######
+# /base/area processing
+######
 
     def _rest_base_area_list(self, id = None):
-        result = "{status : 'OK', description: '', area : ["
+        """ list areas
+        """
+        json = JSonHelper("OK")
+        json.set_data_type("area")
         if id == None:
             for area in self._db.list_areas():
-                result += "{id : '%s', name : '%s', description : '%s'}," % (area.id, area.name, area.description)
-            result = result[0:len(result)-1]
+                json.add_data(area)
         else:
             area = self._db.get_area_by_id(id)
             if area is not None:
-                result += "{id : '%s', name : '%s', description : '%s'}" % (area.id, area.name, area.description)
-        result += "]}"
-        print result
-        self.send_http_response_ok(result)
-        # TODO : send result properly
+                json.add_data(area)
+        self.send_http_response_ok(json.get())
 
 
     def _rest_base_area_add(self, name = None, description = None):
+        """ add areas
+        """
+        json = JSonHelper("OK")
+        json.set_data_type("area")
         area = self._db.add_area(name, description)
-        result = "{status : 'OK', description: '', area : ["
-        result += "{id : '%s', name : '%s', description : '%s'}" % (area.id, area.name, area.description)
-        result += "]}"
-        print result
-        self.send_http_response_ok(result)
-        # TODO : send result properly
+        json.add_data(area)
+        self.send_http_response_ok(json.get())
 
 
     def _rest_base_area_del(self, id=None):
+        """ delete areas
+        """
+        json = JSonHelper("OK")
+
         # Check existence
         area = self._db.get_area_by_id(id)
         if area is not None:
             self._db.del_area(id)
-            result = "{status : 'OK', description: '', area : ["
-            result += "{id : '%s', name : '%s', description : '%s'}" % (area.id, area.name, area.description)
-            result += "]}"
+            json.set_data_type("area")
+            json.add_data(area)
         else:
-            result = "{status : 'KO', description : 'No data'}"
-        print result
-        self.send_http_response_ok(result)
+            json.set_error(code = 999, description = "Area not found")
+        self.send_http_response_ok(json.get())
+
 
 
 
@@ -369,14 +373,65 @@ class RestHandler(BaseHTTPRequestHandler):
         self.send_header('Content-type',    'text/html')
         self.end_headers()
         if data:
-            self.wfile.write(data);
+            self.wfile.write(data)
         ### TODO : log this
 
 
-    def send_http_response_error(self, errMsg):
-        msg = 'Error : ' + errMsg
-        self.send_error(500,msg)
+    def send_http_response_error(self, errCode, errMsg):
+        self.send_response(200)
+        self.send_header('Content-type',    'text/html')
+        self.end_headers()
+        json = JSonHelper("ERROR", errCode, errMsg)
+        self.wfile.write(json.get())
         ### TODO : log this
+
+
+
+
+################################################################################
+class JSonHelper():
+
+    def __init__(self, status = "OK", code = 0, description = ""):
+        if status == "OK":
+            self.set_ok()
+        else:
+            self.set_error(code, description)
+        self._data_type = ""
+        self._data_values = ""
+        self._nb_data_values = 0
+
+    def set_ok(self):
+        self._status = '"status" : "OK", "code" : 0, "description" : "",'
+
+    def set_error(self, code=0, description=None):
+        self._status = '"status" : "ERROR", "code" : ' + str(code) + ', "description" : "' + description + '",'
+
+    def set_data_type(self, type):
+        self._data_type = type
+
+    def add_data(self, data):
+        data_out = "{"
+        self._nb_data_values += 1
+        for key in data.__dict__:
+            if key != "_sa_instance_state":
+                if (isinstance(data.__dict__[key],int)) or \
+                   (isinstance(data.__dict__[key],float)):
+                    data_out += '"' + key + '" : ' + str(data.__dict__[key]) + ','
+                else:
+                    data_out += '"' + key + '" : "' + str(data.__dict__[key]) + '",'
+        self._data_values += data_out[0:len(data_out)-1] + '},'
+
+        
+
+    def get(self):
+        if self._data_type != "":
+            json = '{' + self._status + '"' + self._data_type + '" : [' + \
+                   self._data_values[0:len(self._data_values)-1] + ']' + '}'
+        else:
+            json = '{' + self._status[0:len(self._status)-1] + '}'
+        return json
+        
+    
 
 
 
