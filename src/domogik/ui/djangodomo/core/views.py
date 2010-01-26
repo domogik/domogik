@@ -49,6 +49,7 @@ from django.template import RequestContext
 from django.utils.translation import ugettext_lazy as _
 
 from domogik.common import database
+from djangodomo.core.models import *
 
 from djangodomo.core.SampleDataHelper import SampleDataHelper
 from djangodomo.core.XPLHelper import XPLHelper
@@ -557,13 +558,15 @@ def show_index(request):
     @return an HttpResponse object
     """
     areas_list = _db.list_areas()
-
     page_title = _("Visualisation Maison")
+    results = Areas.fetch()
+    
     return _go_to_page(
         request, 'show/index.html',
         page_title,
-        areas_list=areas_list
+        areas_list=results.area,
     )
+    
 
 def show_area(request, area_id):
     """

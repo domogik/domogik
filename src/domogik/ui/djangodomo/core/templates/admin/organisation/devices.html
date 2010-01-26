@@ -146,7 +146,7 @@ $(function(){
                 
                 
                 </select>
-                <label class="medium" for="category">Categorie</label>
+                <label class="medium" for="category">Usage</label>
                 <select class="medium" id="category" name="category">
                     
                     
@@ -177,12 +177,9 @@ $(function(){
                     <th>Type</th>
                     <th>Description</th>
                     <th>Technologie</th>
-                    <th>Catégorie</th>
-                    <th>Pièce</th>
+                    <th>Usage</th>
                     <th>Reinitialisable</th>
-                    <th>Valeur initiale</th>
                     <th>Modifiable</th>
-                    <th>Unitée</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -197,11 +194,8 @@ $(function(){
                 <td>{{device.description}}</td>
                 <td>{{device.technology.name}}</td>
                 <td>{{device.category.name}}</td>
-                <td>{{device.room.name}}</td>
                 <td>{{device.is_resetable}}</td>
-                <td>{{device.initial_value}}</td>
                 <td>{{device.is_value_changeable_by_user}}</td>
-                <td>{{device.unit_of_stored_values}}</td>
                 <td><ul class="actions">
                         <li><a href="#" class="buttonsmall">Effacer</a></li>
                         <li><a href="#" class="buttonsmall">Modifier</a></li>
