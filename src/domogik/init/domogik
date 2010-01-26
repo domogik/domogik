@@ -1,0 +1,39 @@
+#!/bin/sh    
+
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+
+. /etc/default/domogik
+
+USER=${USER:-domogik}
+
+pidfile=/var/run/domogik.pid
+
+case "$1" in
+    start)
+        echo -n "Starting domogik manager"
+        start-stop-daemon -S -p ${pidfile} -c $USER -b -m -x $(which dmg_manager)
+        echo "."    
+    ;;
+
+    stop)
+        echo -n "Stopping domogik manager"
+        start-stop-daemon --stop -p ${pidfile} -u $USER -x /usr/bin/python
+        echo "."    
+    ;;
+
+    restart)
+        $0 stop
+        $0 start
+    ;;
+
+    force-reload)
+        $0 restart
+    ;;
+
+    *)
+        echo "Usage: $0 {start|stop|restart|force-reload}" >&2
+        exit 1
+    ;;
+esac
+
+exit 0

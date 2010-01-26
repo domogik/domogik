@@ -49,12 +49,12 @@ def rec_glob_get_files(path):
         else:
             d.extend(rec_glob_get_files(path+i))
     return d
-
 setup(
     name = 'Domogik',
-    version = '0.1a',
+    version = '0.1.0',
     url = 'http://www.domogik.org/',
-    author = 'OpenSource home automation software',
+    description = 'OpenSource home automation software',
+    author = 'Domogik team',
     author_email = 'domogik-general@lists.labs.libre-entreprise.org',
     install_requires=['setuptools','django >=1.1','sqlalchemy >= 0.5.4', 'simplejson >= 1.9.2'],
     zip_safe = False,
@@ -70,11 +70,19 @@ setup(
         'domogik.ui.djangodomo': ['locale/*.po', 'locale/*.mo'],
                 'domogik.ui.djangodomo.core': rec_glob_get_files('src/domogik/ui/djangodomo/core/templates/'),
         },
+    data_files = [('share/domogik/listeners/', rec_glob_get_files('src/data/xml/')),
+        ('share/domogik/rest/', rec_glob_get_files('src/domogik/xpl/xml/')),
+        ('share/doc/schemas', rec_glob_get_files('src/domogik/xpl/schema/')),
+        ('bin/', ['src/domogik/xpl/tools/xPL_Hub']),
+        ('/etc/init.d/', ['src/domogik/init/domogik']),
+        ('/etc/default/', ['src/domogik/default/domogik'])],
+
     entry_points = {
         'console_scripts': [
             """
             dmgstart = domogik.bin.dmgstart:main
             generate_config = domogik.bin.generate_config:main
+            dmg_manager = domogik.bin.manager:main
             django = domogik.ui.djangodomo.manage:run_manager
             """
         ],

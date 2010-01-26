@@ -1,0 +1,7 @@
+# This file define config parameters for domogik 
+
+#Start domogik daemon under this user
+USER=domogik
+
+
+

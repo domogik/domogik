@@ -163,5 +163,8 @@ class SysManager(xPLModule):
         f = open(pidfile, "w")
         f.write(str(pid))
 
-if __name__ == "__main__":
+def main():
     s = SysManager()
+
+if __name__ == "__main__":
+    main()
