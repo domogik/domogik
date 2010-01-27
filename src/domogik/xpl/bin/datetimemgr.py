@@ -54,11 +54,9 @@ class xPLDateTime(xPLModule):
     def __init__(self):
         xPLModule.__init__(self, name = 'dtmgr')
         
-        #TODO: Set it to 60 seconds instead of 10
         self._timer = xPLTimer(10, self._send_datetime, self.get_stop())
         self.register_timer(self._timer)
         self._timer.start()
-        signal.pause()
 
     def _f(self, nb):
         '''
