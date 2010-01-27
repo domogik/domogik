@@ -289,7 +289,33 @@ class RestHandler(BaseHTTPRequestHandler):
 
         ### room #####################################
         elif self.rest_request[0] == "room":
-            print "TODO !!"
+
+            ### list
+            if self.rest_request[1] == "list":
+                if len(self.rest_request) == 2:
+                    self._rest_base_room_list()
+                elif len(self.rest_request) == 3:
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1])
+                else:
+                    if self.rest_request[2] == "by-id":
+                        self._rest_base_room_list(id=self.rest_request[3])
+                    elif self.rest_request[2] == "by-area":
+                        self._rest_base_room_list(area_id=self.rest_request[3])
+
+            ### add
+            elif self.rest_request[1] == "add":
+                if len(self.rest_request) == 5:
+                    self._rest_base_room_add(name=self.rest_request[2], area_id=self.rest_request[3], description=self.rest_request[4])
+                else:
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1])
+
+
+
+
+            ### others
+            else:
+                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0])
+                return
 
         ### device #####################################
         elif self.rest_request[0] == "device":
@@ -357,7 +383,42 @@ class RestHandler(BaseHTTPRequestHandler):
             json.set_data_type("area")
             json.add_data(area)
         else:
-            json.set_error(code = 999, description = "Area not found")
+            json.set_error(code = 999, description = "No area to delete")
+        self.send_http_response_ok(json.get())
+
+
+
+######
+# /base/room processing
+######
+
+    def _rest_base_room_list(self, id = None, area_id = None):
+        """ list rooms
+        """
+        json = JSonHelper("OK")
+        json.set_data_type("room")
+        if id == None and area_id == None:
+            for room in self._db.list_rooms():
+                json.add_data(room)
+        elif id != None:
+            room = self._db.get_room_by_id(id)
+            if room is not None:
+                json.add_data(room)
+        elif area_id != None:
+            for room in self._db.get_all_rooms_of_area(area_id):
+                json.add_data(room)
+        self.send_http_response_ok(json.get())
+
+
+
+    def _rest_base_room_add(self, name = None, area_id = None, description = None):
+        """ add rooms
+        """
+        json = JSonHelper("OK")
+        json.set_data_type("room")
+        room = self._db.add_room(name, area_id, description)
+        print room
+        json.add_data(room)
         self.send_http_response_ok(json.get())
 
 
