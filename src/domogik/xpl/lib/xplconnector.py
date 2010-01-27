@@ -207,7 +207,6 @@ remote-ip=%s
 """ % (self._source, target, self._port, self._ip)
         if not self.should_stop():
             self._UDPSock.sendto(mess, ("255.255.255.255", 3865))
-        print "1 - %s" % threading.currentThread().getName()
 
     def got_hbeat(self, message):
         if(message.target != self._source ):
