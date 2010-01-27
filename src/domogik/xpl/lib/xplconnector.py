@@ -77,7 +77,8 @@ import select
 import threading
 from socket import *
 import time
-
+import signal
+import os
 from domogik.common import logger
 from domogik.xpl.lib.basemodule import BaseModule
 from domogik.xpl.common.xplmessage import XplMessage
@@ -103,7 +104,6 @@ class Manager(BaseModule):
         @param port : port to listen to (default 0)
         """
         BaseModule.__init__(self, stop_cb = self.leave)
-        print "create Manager instance"
         source = "xpl-%s.domogik" % self.get_module_name()
         # Define maximum xPL message size
         self._buff = 1500
@@ -199,6 +199,7 @@ remote-ip=%s
 """ % (self._source, target, self._port, self._ip)
         if not self.should_stop():
             self._UDPSock.sendto(mess, ("255.255.255.255", 3865))
+        print "1 - %s" % threading.currentThread().getName()
 
     def got_hbeat(self, message):
         if(message.target != self._source ):
@@ -259,7 +260,7 @@ class Listener:
         @param manager : the manager instance
         @param filter : dictionnary { key : value }
         """
-        print "new listener"
+        manager._log.debug("New listener, filter : %s" % filter)
         self._callback = cb
         self._filter = filter
         manager.add_listener(self)
@@ -281,7 +282,6 @@ class Listener:
         and to call the callback function if it does
         """
         ok = True
-        print "new message %s" % message
         for key in self._filter:
             if key in message.data:
                 if (message.data[key] != self._filter[key]):

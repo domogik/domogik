@@ -37,6 +37,9 @@ Implements
 """
 
 import time
+import signal
+import threading
+import os
 from socket import gethostname
 from domogik.xpl.lib.xplconnector import *
 from domogik.xpl.lib.basemodule import BaseModule
@@ -55,12 +58,11 @@ class xPLModule():
         @param name : The n,ame of the current module
         @param stop_cb : Method to call when a stop request is received
         @param is_manager : Must be True if the child script is a Domogik Manager process 
+        You should never need to set it to True
         @param reload_cb : Callback to call when a "RELOAD" order is received, if None, 
         nothing will happen
         @param dump_cb : Callback to call when a "DUMP" order is received, if None, 
         nothing will happen
-
-        You should never need to set it to True
         '''
         if len(name) > 8:
             raise IoError, "The name must be 8 chars max"
@@ -80,7 +82,6 @@ class xPLModule():
         """ Delegate access to implementation """
         return setattr(self.__instance, attr, value)
 
-
     class __Singl_xPLModule(BaseModule):
         def __init__(self, name, stop_cb = None, is_manager = False, reload_cb = None, dump_cb = None):
             '''
@@ -95,6 +96,7 @@ class xPLModule():
             nothing will happen
             '''
             BaseModule.__init__(self, name, stop_cb)
+            Watcher(self)
             self._log.debug("New system manager instance for %s" % name)
             self._is_manager = is_manager
             self._myxpl = Manager()
@@ -206,3 +208,59 @@ class xPLResult():
         Returns an event item
         '''
         return self.event
+
+
+class Watcher:
+    """this class solves two problems with multithreaded
+    programs in Python, (1) a signal might be delivered
+    to any thread (which is just a malfeature) and (2) if
+    the thread that gets the signal is waiting, the signal
+    is ignored (which is a bug).
+
+    The watcher is a concurrent process (not thread) that
+    waits for a signal and the process that contains the
+    threads.  See Appendix A of The Little Book of Semaphores.
+    http://greenteapress.com/semaphores/
+
+    I have only tested this on Linux.  I would expect it to
+    work on the Macintosh and not work on Windows.
+    Tip found at http://code.activestate.com/recipes/496735/
+    """
+    
+    def __init__(self, module):
+        """ Creates a child thread, which returns.  The parent
+            thread waits for a KeyboardInterrupt and then kills
+            the child thread.
+        """
+        self.child = os.fork()
+        if self.child == 0:
+            return
+        else:
+            self._module = module
+            signal.signal(signal.SIGTERM, self._signal_handler)
+            self.watch()
+
+    def _signal_handler(self, signum, frame):
+        """ Handler called when a SIGTERM is received 
+        Stop the module 
+        """
+        self._module._log.info("SIGTERM receive, stopping module")
+        self._module.force_leave()
+        self.kill()
+
+    def watch(self):
+        try:
+            os.wait()
+        except KeyboardInterrupt:
+            print 'KeyBoardInterrupt'
+            self._module._log.info("Keyoard Interrupt detected, leave now.")
+            self._module.force_leave()
+            self.kill()
+        except OSError:
+            pass
+        sys.exit()
+
+    def kill(self):
+        try:
+            os.kill(self.child, signal.SIGKILL)
+        except OSError: pass
