@@ -309,8 +309,12 @@ class RestHandler(BaseHTTPRequestHandler):
                 else:
                     self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1])
 
-
-
+            ### del
+            elif self.rest_request[1] == "del":
+                if len(self.rest_request) == 3:
+                    self._rest_base_room_del(id=self.rest_request[2])
+                else:
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1])
 
             ### others
             else:
@@ -416,12 +420,29 @@ class RestHandler(BaseHTTPRequestHandler):
         """
         json = JSonHelper("OK")
         json.set_data_type("room")
-        room = self._db.add_room(name, area_id, description)
-        print room
-        json.add_data(room)
+        try:
+            room = self._db.add_room(name, area_id, description)
+            json.add_data(room)
+        except:
+            json.set_error(999, "Error while trying to add a room")
         self.send_http_response_ok(json.get())
 
 
+
+    def _rest_base_room_del(self, id=None):
+        """ delete rooms
+        """
+        json = JSonHelper("OK")
+
+        # Check existence
+        room = self._db.get_room_by_id(id)
+        if room is not None:
+            self._db.del_room(id)
+            json.set_data_type("room")
+            json.add_data(room)
+        else:
+            json.set_error(code = 999, description = "No room to delete")
+        self.send_http_response_ok(json.get())
 
 
 
@@ -473,7 +494,10 @@ class JSonHelper():
     def add_data(self, data):
         data_out = "{"
         self._nb_data_values += 1
+        if hasattr(data, 'id'):
+            pass
         for key in data.__dict__:
+            print key + " => " + str(data.__dict__[key])
             if key != "_sa_instance_state":
                 if (isinstance(data.__dict__[key],int)) or \
                    (isinstance(data.__dict__[key],float)):
