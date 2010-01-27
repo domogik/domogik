@@ -75,6 +75,9 @@ class BaseModule():
             l = logger.Logger(name)
             self._log = l.get_logger()
             self._stop = threading.Event()
+            self._lock_add_thread = threading.Semaphore()
+            self._lock_add_timer = threading.Semaphore()
+            self._lock_add_cb = threading.Semaphore()
             if stop_cb is not None:
                 self._stop_cb = [stop_cb]
             else:
@@ -111,8 +114,10 @@ class BaseModule():
             Should be called by each thread at start
             @param thread : the thread to add
             '''
+            self._lock_add_thread.acquire()
             self._log.debug('New thread registered')
             self._threads.append(thread)
+            self._lock_add_thread.release()
 
         def unregister_thread(self, thread):
             '''
@@ -120,9 +125,11 @@ class BaseModule():
             Should be the last action of each thread
             @param thread : the thread to remove
             '''
+            self._lock_add_thread.acquire()
             if thread in self._threads:
                 self._log.debug('Unregister thread')
                 self._threads.remove(thread)
+            self._lock_add_thread.release()
 
         def register_timer(self, timer):
             '''
@@ -130,8 +137,10 @@ class BaseModule():
             Should be called by each timer
             @param timer : the timer to add
             '''
+            self._lock_add_timer.acquire()
             self._log.debug('New timer registered')
             self._timers.append(timer)
+            self._lock_add_timer.release()
 
         def unregister_timer(self, timer):
 
@@ -140,14 +149,18 @@ class BaseModule():
             Should be the last action of each timer
             @param timer : the timer to remove
             '''
+            self._lock_add_timer.acquire()
             if timer in self._timers:
                 self._log.debug('Unregister timer')
                 self._timers.remove(timer)
+            self._lock_add_timer.release()
 
         def add_stop_cb(self, cb):
             '''
             Add an additionnal callback to call when a stop request is received
             '''
+            self._lock_add_cb.acquire()
             self._stop_cb.append(cb)
+            self._lock_add_cb.release()
 
 

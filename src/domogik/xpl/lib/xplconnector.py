@@ -120,6 +120,9 @@ class Manager(BaseModule):
         addr = (ip, port)
 
         self._log = self.get_my_logger()
+        #Define locks
+        self._lock_send = threading.Semaphore()
+        self._lock_list = threading.Semaphore()
 
         # Try and bind to the base port
         try:
@@ -161,7 +164,10 @@ class Manager(BaseModule):
         """
         This function allows you to send an xPL message on the Bus
         Be carreful, there is no check on message correctness
+        This method is protected by semaphore because in some module (REST for example)
+        many threads can call it.
         """
+        self._lock_send.acquire()
         try:
             if not message.hop_count:
                 message.set_hop_count("5")
@@ -174,12 +180,14 @@ class Manager(BaseModule):
         except:
             self._log.warning("Error during send of message")
             self._log.debug(sys.exc_info()[2])
+        self._lock_send.release()
 
     def _SendHeartbeat(self, target='*'):
         """
         Send heartbeat message in broadcast on the network, on the bus port
         (3865)
         This make the application able to be discovered by the hub
+        This method is not called by childs, so no need to protect it.
         """
         # Sub routine for sending a heartbeat
 
@@ -210,6 +218,7 @@ remote-ip=%s
         The monitor thread receive all messages on the connection and check
         them to see if the target is the application.
         If it is, call all listeners
+        This method is not called by childs, so no need to protect it.
         """
         while not self.should_stop():
             try:
@@ -240,7 +249,9 @@ remote-ip=%s
         Add a listener on the list of the manager
         @param listener : the listener instance
         """
+        self._lock_list.acquire()
         self._listeners.append(listener)
+        self._lock_list.release()
 
 
 class Listener:
