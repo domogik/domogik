@@ -49,6 +49,7 @@ from domogik.common import logger
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from domogik.common.database import DbHelper
 import json
+import time
 
 
 
@@ -97,21 +98,25 @@ class RestHandler(BaseHTTPRequestHandler):
 
         print "==== GET ============================================"
         # Create shorter access : self.server.handler_params[0].* => self.*
-        self._move_namespace()
+        self._init_namespace()
 
-        if self.path[-1:] == "/":
-            self.path = self.path[0:len(self.path)-1]
-        print "PATH : " + self.path
-        tab_path = self.path.split("/")
+        #tab_url = self.path.split("?")
+        #self.path = tab_url[0]
+        #self.parameters = tab_url[1]
+      
+        #if self.path[-1:] == "/":
+        #    self.path = self.path[0:len(self.path)-1]
+        #print "PATH : " + self.path
+        #tab_path = self.path.split("/")
 
-        # Get type of request : /command, /xpl-cmnd, /base, etc
-        if len(tab_path) <= 1:
-            self.send_http_response_error(999, "No type given")
-            return
-        self.rest_type = tab_path[1].lower()
-        self.rest_request = tab_path[2:]
-        print "TYPE    : " + self.rest_type
-        print "Request : " + str(self.rest_request)
+        ## Get type of request : /command, /xpl-cmnd, /base, etc
+        #if len(tab_path) <= 1:
+        #    self.send_http_response_error(999, "No type given")
+        #    return
+        #self.rest_type = tab_path[1].lower()
+        #self.rest_request = tab_path[2:]
+        #print "TYPE    : " + self.rest_type
+        #print "Request : " + str(self.rest_request)
 
         if self.rest_type == "command":
             # TODO will be to move in do_POST
@@ -133,18 +138,18 @@ class RestHandler(BaseHTTPRequestHandler):
 
         print "==== POST ==========================================="
         # Create shorter access : self.server.handler_params[0].* => self.*
-        self._move_namespace()
+        self._init_namespace()
 
-        if self.path[-1:] == "/":
-            self.path = self.path[0:len(self.path)-1]
-        print "PATH : " + self.path
-        tab_path = self.path.split("/")
+        #if self.path[-1:] == "/":
+        #    self.path = self.path[0:len(self.path)-1]
+        #print "PATH : " + self.path
+        #tab_path = self.path.split("/")
 
-        # Get type of request : /command, /xpl-cmnd, /base, etc
-        self.rest_type = tab_path[1].lower()
-        self.rest_request = tab_path[2:]
-        print "TYPE    : " + self.rest_type
-        print "Request : " + str(self.rest_request)
+        ## Get type of request : /command, /xpl-cmnd, /base, etc
+        #self.rest_type = tab_path[1].lower()
+        #self.rest_request = tab_path[2:]
+        #print "TYPE    : " + self.rest_type
+        #print "Request : " + str(self.rest_request)
 
         if self.rest_type == "xpl-cmnd":
             self.rest_xpl_cmnd()
@@ -156,12 +161,67 @@ class RestHandler(BaseHTTPRequestHandler):
 
 
 
-    def _move_namespace(self):
+    def _init_namespace(self):
         """ Create shorter access : self.server.handler_params[0].* => self.*
+            First processing on url given
         """
+
+        # shorter access
         self._db = self.server.handler_params[0]._db
         self._myxpl = self.server.handler_params[0]._myxpl
         self._log = self.server.handler_params[0]._log
+
+        # url processing
+        tab_url = self.path.split("?")
+        self.path = tab_url[0]
+        if len(tab_url) > 1:
+            self.parameters = tab_url[1]
+            self._debug()
+
+        if self.path[-1:] == "/":
+            self.path = self.path[0:len(self.path)-1]
+        print "PATH : " + self.path
+        tab_path = self.path.split("/")
+
+        # Get type of request : /command, /xpl-cmnd, /base, etc
+        if len(tab_path) <= 1:
+            self.send_http_response_error(999, "No type given")
+            return
+        self.rest_type = tab_path[1].lower()
+        self.rest_request = tab_path[2:]
+        print "TYPE    : " + self.rest_type
+        print "Request : " + str(self.rest_request)
+
+
+
+
+    def _debug(self):
+        """ Do debug stuff in function of parameters given
+        """
+
+        # for each debug option
+        for opt in self.parameters.split("&"):
+            print "DEBUG OPT :" + opt
+            tab_opt = opt.split("=")
+            opt_key = tab_opt[0]
+            if len(tab_opt) > 1:
+                opt_value = tab_opt[1]
+            else:
+                opt_value = None
+
+            # call debug functions
+            if opt_key == "debug-sleep" and opt_value != None:
+                self._debug_sleep(opt_value)
+
+
+
+    def _debug_sleep(self, duration):
+        """ Sleep process for 15 seconds
+        """
+        print "DEBUG : start sleeping for " + str(duration)
+        time.sleep(float(duration))
+        print "DEBUG : end sleeping"
+
 
 
 
