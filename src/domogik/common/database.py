@@ -308,16 +308,16 @@ class DbHelper():
         self._session.commit()
         return du
 
-    def del_device_usage(self, du_id):
+    def del_device_usage(self, du_id, cascade_delete=False):
         """
         Delete a device usage record
-        Warning, it will also remove all the devices using this usage
         @param dc_id : id of the device usage to delete
         """
         du = self._session.query(DeviceUsage).filter_by(id=du_id).first()
         if du:
-            for device in self._session.query(Device).filter_by(usage_id=du.id).all():
-                self.del_device(device.id)
+            if cascade_delete:
+                for device in self._session.query(Device).filter_by(usage_id=du.id).all():
+                    self.del_device(device.id)
             self._session.delete(du)
             self._session.commit()
 
@@ -355,16 +355,16 @@ class DbHelper():
         self._session.commit()
         return dt
 
-    def del_device_technology(self, dt_id):
+    def del_device_technology(self, dt_id, cascade_delete=False):
         """
         Delete a device technology record
-        Warning, it will also remove all the devices using this technology
         @param dt_id : id of the device technology to delete
         """
         dt = self._session.query(DeviceTechnology).filter_by(id=dt_id).first()
         if dt:
-            for device in self._session.query(Device).filter_by(technology_id=dt.id).all():
-                self.del_device(device.id)
+            if cascade_delete:
+                for device in self._session.query(Device).filter_by(technology_id=dt.id).all():
+                    self.del_device(device.id)
             self._session.delete(dt)
             self._session.commit()
 
