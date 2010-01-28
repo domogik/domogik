@@ -23,9 +23,9 @@
 {% block js_script %}
 $(function(){
     // Accordion
-    $("#nav2").accordion({ header: ".section", active:1});  
-    
-    // Add new form  
+    $("#nav2").accordion({ header: ".section", active:1});
+
+    // Add new form
       		var name = $("#name"),
 			description = $("#description"),
 			address = $("#address"),
@@ -49,7 +49,7 @@ $(function(){
 			}
 
 		}
-		
+
 		$("#addnewdialog").dialog({
 			bgiframe: true,
 			autoOpen: false,
@@ -63,7 +63,7 @@ $(function(){
 					bValid = bValid && checkLength(name,"nom",1,80);
 					bValid = bValid && checkLength(address,"adresse",1,80);
 					bValid = bValid && checkLength(reference,"référence",1,80);
-                                        				
+
 					if (bValid) {
                                         	// Submit form
 						$(this).dialog('close');
@@ -77,9 +77,9 @@ $(function(){
 				allFields.val('').removeClass('ui-state-error');
 			}
 		});
-		
-		
-		
+
+
+
 		$('#addnew').click(function() {
 			$('#addnewdialog').dialog('open');
 		})
@@ -124,41 +124,41 @@ $(function(){
                 <input type="text" class="medium" id="reference" name="reference" />
                 <label class="medium" for="technology">Technologie</label>
                 <select class="medium" id="technology" name="technology">
-                    
-                    
+
+
                 {% regroup device_tech_list|dictsort:"type" by type as types_list %}
 
 {% for type in types_list %}
-    
-                    
+
+
                     <optgroup label="{{ type.grouper }}">
         {% for technology in type.list %}
-            
-                    
+
+
                     <option value="{{ technology.id }}">{{ technology.name }}</option>
-                    
-                    
+
+
         {% endfor %}
     </optgroup>
-                    
-                    
+
+
 {% endfor %}
-                
-                
+
+
                 </select>
-                <label class="medium" for="category">Usage</label>
-                <select class="medium" id="category" name="category">
-                    
-                    
-                {% for category in device_category_list %}
-                	
-                    
-                    <option value="{{ category.id }}">{{ category.name }}</option>
-                    
-                    
+                <label class="medium" for="usage">Usage</label>
+                <select class="medium" id="usage" name="usage">
+
+
+                {% for usage in device_usage_list %}
+
+
+                    <option value="{{ usage.id }}">{{ usage.name }}</option>
+
+
                     {% endfor %}
-                
-                
+
+
                 </select>
             </fieldset>
         </form>
@@ -184,7 +184,7 @@ $(function(){
                 </tr>
             </thead>
             <tbody>
-            
+
             {% for device in room.list %}
             <tr class="{% cycle odd,even %}">
                 <td>{{device.name}}</td>
@@ -193,7 +193,7 @@ $(function(){
                 <td>{{device.type}}</td>
                 <td>{{device.description}}</td>
                 <td>{{device.technology.name}}</td>
-                <td>{{device.category.name}}</td>
+                <td>{{device.usage.name}}</td>
                 <td>{{device.is_resetable}}</td>
                 <td>{{device.is_value_changeable_by_user}}</td>
                 <td><ul class="actions">
@@ -203,7 +203,7 @@ $(function(){
             </tr>
             {% endfor %}
             </tbody>
-            
+
         </table>
     </div>
     {% endfor %} </div>

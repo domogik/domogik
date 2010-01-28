@@ -90,7 +90,7 @@ class GenericTestCase(unittest.TestCase):
         @param db : db API instance
         """
         for du in db.list_device_usages():
-            db.del_device_usage(du.id)
+            db.del_device_usage(du.id, cascade_delete=True)
 
     def remove_all_device_technology_config(self, db):
         """
@@ -107,7 +107,7 @@ class GenericTestCase(unittest.TestCase):
         """
         self.remove_all_device_technology_config(db)
         for dt in db.list_device_technologies():
-            db.del_device_technology(dt.id)
+            db.del_device_technology(dt.id, cascade_delete=True)
 
     def remove_all_device_stats(self, db):
         """
@@ -303,7 +303,6 @@ class DeviceTechnologyTestCase(GenericTestCase):
         self.db.del_device_technology(dt2.id)
         assert self.has_item(self.db.list_device_technologies(), [u'x10', u'PLCBus']), "Couldn't find 'x10' and 'PLCBus'"
         assert not self.has_item(self.db.list_device_technologies(), [u'1wire']), "'1wire' was NOT deleted"
-
 
 class DeviceTechnologyConfigTestCase(GenericTestCase):
     """

@@ -285,12 +285,12 @@ def load_sample_data(request):
 
     area_list = _db.list_areas()
     room_list = _db.list_rooms()
-    device_category_list = _db.list_device_categories()
+    device_usage_list = _db.list_device_usages()
     device_list = _db.list_devices()
     device_tech_list = _db.list_device_technologies()
     return _go_to_page(request, _ADMIN_MANAGEMENT_DOMOGIK, page_title, action=action,
                       area_list=area_list, room_list=room_list,
-                      device_category_list=device_category_list,
+                      device_usage_list=device_usage_list,
                       device_list=device_list, device_tech_list=device_tech_list)
 
 def clear_data(request):
@@ -492,14 +492,14 @@ def admin_organisation_devices(request):
     if not _is_user_admin(request):
         return index(request)
     rooms_list = _db.list_rooms()
-    device_category_list = _db.list_device_categories()
+    device_usage_list = _db.list_device_usages()
     devices_list = _db.list_devices()
     device_tech_list = _db.list_device_technologies()
     page_title = _("Organisation des dispositifs")
     return _go_to_page(
         request, 'admin/organisation/devices.html',
         page_title,
-        device_category_list=device_category_list,
+        device_usage_list=device_usage_list,
         rooms_list=rooms_list,
         devices_list=devices_list,
         device_tech_list=device_tech_list
@@ -560,13 +560,13 @@ def show_index(request):
     areas_list = _db.list_areas()
     page_title = _("Visualisation Maison")
     results = Areas.fetch()
-    
+
     return _go_to_page(
         request, 'show/index.html',
         page_title,
         areas_list=results.area,
     )
-    
+
 
 def show_area(request, area_id):
     """
@@ -584,7 +584,7 @@ def show_area(request, area_id):
         area=area,
         rooms_list=rooms_list
     )
-    
+
 def show_room(request, room_id):
     """
     Method called when the show room page is accessed
@@ -595,7 +595,7 @@ def show_room(request, room_id):
     devices_list = _db.search_devices({'room_id':room_id})
     area_id = room.area_id
     area_name = (_db.get_area_by_id(area_id)).name
-    
+
     page_title = _("Visualisation Piece")
     return _go_to_page(
         request, 'show/room.html',
