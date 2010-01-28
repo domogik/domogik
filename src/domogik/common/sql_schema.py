@@ -155,7 +155,7 @@ class Room(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(30), nullable=False)
     description = Column(String(255))
-    area_id = Column(Integer, ForeignKey('%s.id' % Area.get_tablename()), nullable=False)
+    area_id = Column(Integer, ForeignKey('%s.id' % Area.get_tablename()))
     area = relation(Area, backref=backref(__tablename__, order_by=id))
 
     def __init__(self, name, description, area_id):
