@@ -374,6 +374,10 @@ class DbHelper():
                 device_list = self._session.query(Device).filter_by(technology_id=dt.id).all()
                 if len(device_list) > 0:
                     raise DbHelperException("Couldn't delete device technology %s : there are associated devices" % dt_id)
+            dtc_list = self._session.query(DeviceTechnologyConfig).filter_by(technology_id=dt.id).all()
+            for dtc in dtc_list:
+                self.del_device_technology_config(dtc.id)
+
             self._session.delete(dt)
             self._session.commit()
 
