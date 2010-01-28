@@ -183,9 +183,7 @@ class DbHelper():
 
     def del_area(self, area_del_id, cascade_delete=False):
         """
-        Delete an area record.
-        Warning this also remove all the rooms in this area
-        and all the devices (+ their stats) in each deleted rooms !
+        Delete an area record
         @param area_id : id of the area to delete
         @param cascade_delete : True if we wish to delete associated items
         """
@@ -260,7 +258,6 @@ class DbHelper():
     def del_room(self, r_id, cascade_delete=False):
         """
         Delete a room record
-        Warning this also remove all the devices in each deleted rooms!
         @param r_id : id of the room to delete
         @param cascade_delete : True if we wish to delete associated items
         """
