@@ -31,20 +31,20 @@ $(function(){
 });
 
         function saveSettings() {
-                document.forms['settingsForm'].action="{% url save_admin_settings_view %}"
-                document.forms['settingsForm'].submit()
+            document.forms['settingsForm'].action="{% url save_admin_settings_view %}"
+            document.forms['settingsForm'].submit()
         }
 
         function clearData() {
-                if(confirm("This is your last chance to keep your data. Are you sure to want to do that ?")) {
-                        document.forms['simulationForm'].action="{% url clear_data_view %}"
-                        document.forms['simulationForm'].submit()
-                }
+            if(confirm("This is your last chance to keep your data. Are you sure to want to do that ?")) {
+                document.forms['simulationForm'].action="{% url clear_data_view %}"
+                document.forms['simulationForm'].submit()
+            }
         }
 
         function loadSampleData() {
-                document.forms['simulationForm'].action="{% url load_sample_data_view %}"
-                document.forms['simulationForm'].submit()
+            document.forms['simulationForm'].action="{% url load_sample_data_view %}"
+            document.forms['simulationForm'].submit()
         }
 {% endblock %}
 
@@ -53,131 +53,131 @@ $(function(){
 {% block right %}
         {% ifequal action "index" %}
         <div id="adminMain">
-                <form name="settingsForm" action="" method="POST">
-                        <fieldset>
-                                <legend>Settings</legend>
-                                <table>
-                                        <tr>
-                                                <td>Simulation mode</td>
-                                                <td><input type="checkbox" name="simulation_mode" value="{{ sys_config.simulation_mode }}" {{ simulation_mode }}/></td>
-                                        </tr>
-                                        <tr>
-                                                <td>Admin mode</td>
-                                                <td><input type="checkbox" name="admin_mode" value="{{ request.session.user.is_admin }}" {{ admin_mode }}/></td>
-                                        </tr>
-                                        <tr>
-                                                <td>Debug mode</td>
-                                                <td><input type="checkbox" name="debug_mode" value="{{ sys_config.debug_mode }}" {{ debug_mode }}/></td>
-                                        </tr>
-                                        <tr>
-                                                <td><input type="button" value="Submit" onclick="saveSettings()"></td>
-                                        </tr>
-                                </table>
-                        </fieldset>
-                </form>
+            <form name="settingsForm" action="" method="POST">
+                <fieldset>
+                    <legend>Settings</legend>
+                    <table>
+                        <tr>
+                            <td>Simulation mode</td>
+                            <td><input type="checkbox" name="simulation_mode" value="{{ sys_config.simulation_mode }}" {{ simulation_mode }}/></td>
+                        </tr>
+                        <tr>
+                            <td>Admin mode</td>
+                            <td><input type="checkbox" name="admin_mode" value="{{ request.session.user.is_admin }}" {{ admin_mode }}/></td>
+                        </tr>
+                        <tr>
+                            <td>Debug mode</td>
+                            <td><input type="checkbox" name="debug_mode" value="{{ sys_config.debug_mode }}" {{ debug_mode }}/></td>
+                        </tr>
+                        <tr>
+                            <td><input type="button" value="Submit" onclick="saveSettings()"></td>
+                        </tr>
+                    </table>
+                </fieldset>
+            </form>
 {% comment %}
 #                <form name="dataForm" action="{% url admin_view %}" method="POST">
-#                        <fieldset>
-#                                <legend>Data</legend>
-#                                <table>
-#                                        <tr>
-#                                                <td>&raquo;&nbsp;<a href="{% url device_stats_view 0 %}">View stats</a></td>
-#                                        </tr>
-#                                </table>
-#                        </fieldset>
+#                    <fieldset>
+#                        <legend>Data</legend>
+#                        <table>
+#                            <tr>
+#                                <td>&raquo;&nbsp;<a href="{% url device_stats_view 0 %}">View stats</a></td>
+#                            </tr>
+#                        </table>
+#                    </fieldset>
 #                </form>
 {% endcomment %}
-                <form name="simulationForm" action="" method="POST">
-                        <fieldset>
-                                <legend>Simulation</legend>
-                                <table>
-                                        <tr>
-                                                <td>Load sample data (will delete previous data)</td><td><input type="button" value="Load" onclick="loadSampleData()"></td>
-                                        </tr>
-                                        <tr>
-                                                <td>Clear all data</td><td><input type="button" value="Clear" onclick="clearData()"></td>
-                                        </tr>
-                                </table>
-                        </fieldset>
-                </form>
+            <form name="simulationForm" action="" method="POST">
+                <fieldset>
+                    <legend>Simulation</legend>
+                    <table>
+                        <tr>
+                            <td>Load sample data (will delete previous data)</td><td><input type="button" value="Load" onclick="loadSampleData()"></td>
+                        </tr>
+                        <tr>
+                            <td>Clear all data</td><td><input type="button" value="Clear" onclick="clearData()"></td>
+                        </tr>
+                    </table>
+                </fieldset>
+            </form>
         </div>
         {% endifequal %}
 
         {% ifequal action "loadSampleData" %}
-                {% if error_msg %}
-                        <p class="error">{{ error_msg }}</p>
+            {% if error_msg %}
+                    <p class="error">{{ error_msg }}</p>
+            {% else %}
+                <p>Done !</p>
+                <p>Following objects were created :</p>
+                <p>&nbsp;</p>
+
+                <p><strong>Areas</strong></p>
+                <hr/>
+                {% if area_list %}
+                    <ul>
+                    {% for area in area_list %}
+                            <li>{{ area.name }}</li>
+                    {% endfor %}
+                    </ul>
                 {% else %}
-                        <p>Done !</p>
-                        <p>Following objects were created :</p>
-                        <p>&nbsp;</p>
-
-                        <p><strong>Areas</strong></p>
-                        <hr/>
-                        {% if area_list %}
-                                <ul>
-                                {% for area in area_list %}
-                                        <li>{{ area.name }}</li>
-                                {% endfor %}
-                                </ul>
-                        {% else %}
-                                <p>No data</p>
-                        {% endif %}
-
-                        <p><strong>Rooms</strong></p>
-                        <hr/>
-                        {% if room_list %}
-                                <ul>
-                                {% for room in room_list %}
-                                        <li>{{ room.name }}</li>
-                                {% endfor %}
-                                </ul>
-                        {% else %}
-                                <p>No data</p>
-                        {% endif %}
-
-                        <p><strong>Usages</strong></p>
-                        <hr/>
-                        {% if device_usage_list %}
-                                <ul>
-                                {% for device_usage in device_usage_list %}
-                                        <li>{{ device_usage.name }}</li>
-                                {% endfor %}
-                                </ul>
-                        {% else %}
-                                <p>No data</p>
-                        {% endif %}
-
-                        <p><strong>Devices</strong></p>
-                        <hr/>
-                        {% if device_list %}
-                                <ul>
-                                {% for device in device_list %}
-                                        <li>{{ device.name }} ({{ device.room.name }})</li>
-                                {% endfor %}
-                                </ul>
-                        {% else %}
-                                <p>No data</p>
-                        {% endif %}
-
-                        <p><strong>Technologies</strong></p>
-                        <hr/>
-                        {% if device_tech_list %}
-                                <ul>
-                                {% for tech in device_tech_list %}
-                                        <li>{{ tech.name }} ({{ tech.type }})</li>
-                                {% endfor %}
-                                </ul>
-                        {% else %}
-                                <p>No data</p>
-                        {% endif %}
+                    <p>No data</p>
                 {% endif %}
+
+                <p><strong>Rooms</strong></p>
+                <hr/>
+                {% if room_list %}
+                    <ul>
+                    {% for room in room_list %}
+                            <li>{{ room.name }}</li>
+                    {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No data</p>
+                {% endif %}
+
+                <p><strong>Usages</strong></p>
+                <hr/>
+                {% if device_usage_list %}
+                    <ul>
+                    {% for device_usage in device_usage_list %}
+                            <li>{{ device_usage.name }}</li>
+                    {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No data</p>
+                {% endif %}
+
+                <p><strong>Devices</strong></p>
+                <hr/>
+                {% if device_list %}
+                    <ul>
+                    {% for device in device_list %}
+                            <li>{{ device.name }} ({{ device.room.name }})</li>
+                    {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No data</p>
+                {% endif %}
+
+                <p><strong>Technologies</strong></p>
+                <hr/>
+                {% if device_tech_list %}
+                    <ul>
+                    {% for tech in device_tech_list %}
+                            <li>{{ tech.name }} ({{ tech.type }})</li>
+                    {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No data</p>
+                {% endif %}
+            {% endif %}
         {% endifequal %}
 
         {% ifequal action "clearData" %}
-                {% if error_msg %}
-                        <p class="error">{{ error_msg }}</p>
-                {% else %}
-                        <p>All data cleared !</p>
-                {% endif %}
+            {% if error_msg %}
+                <p class="error">{{ error_msg }}</p>
+            {% else %}
+                <p>All data cleared !</p>
+            {% endif %}
         {% endifequal %}
 {% endblock %}
