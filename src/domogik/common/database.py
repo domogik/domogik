@@ -42,7 +42,7 @@ Implements
 # Existing tables :
 # areas
 # rooms
-# device_category
+# device_usage
 # device_technology
 # device_technology_config
 # device
@@ -62,7 +62,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
 from domogik.common.configloader import Loader
-from domogik.common.sql_schema import Area, Device, DeviceCategory, DeviceConfig, \
+from domogik.common.sql_schema import Area, Device, DeviceUsage, DeviceConfig, \
                                       DeviceStats, DeviceStatsValue, DeviceTechnology, DeviceTechnologyConfig, \
                                       ItemUIConfig, Room, UserAccount, SystemAccount, SystemConfig, \
                                       SystemStats, SystemStatsValue, Trigger
@@ -282,46 +282,46 @@ class DbHelper():
         return self._session.query(Room).filter_by(area_id=a_area_id).all()
 
 ####
-# Device category
+# Device usage
 ####
-    def list_device_categories(self):
+    def list_device_usages(self):
         """
-        Return a list of device categories
-        @return a list of DeviceCategory objects
+        Return a list of device usages
+        @return a list of DeviceUsage objects
         """
-        return self._session.query(DeviceCategory).all()
+        return self._session.query(DeviceUsage).all()
 
-    def get_device_category_by_name(self, dc_name,):
+    def get_device_usage_by_name(self, du_name,):
         """
-        Return information about a device category
-        @param dc_name : The device category name
-        @return a DeviceCategory object
+        Return information about a device usage
+        @param du_name : The device usage name
+        @return a DeviceUsage object
         """
-        return self._session.query(DeviceCategory).filter_by(name=dc_name).first()
+        return self._session.query(DeviceUsage).filter_by(name=du_name).first()
 
-    def add_device_category(self, dc_name, dc_description=None):
+    def add_device_usage(self, du_name, du_description=None):
         """
-        Add a device_category (temperature, heating, lighting, music, ...)
-        @param dc_name : device category name
-        @param dc_description : device category description (optional)
-        @return a DeviceCategory (the newly created one)
+        Add a device_usage (temperature, heating, lighting, music, ...)
+        @param du_name : device usage name
+        @param du_description : device usage description (optional)
+        @return a DeviceUsage (the newly created one)
         """
-        dc = DeviceCategory(name=dc_name, description=dc_description)
-        self._session.add(dc)
+        du = DeviceUsage(name=du_name, description=du_description)
+        self._session.add(du)
         self._session.commit()
-        return dc
+        return du
 
-    def del_device_category(self, dc_id):
+    def del_device_usage(self, du_id):
         """
-        Delete a device category record
-        Warning, it will also remove all the devices using this category
-        @param dc_id : id of the device category to delete
+        Delete a device usage record
+        Warning, it will also remove all the devices using this usage
+        @param dc_id : id of the device usage to delete
         """
-        dc = self._session.query(DeviceCategory).filter_by(id=dc_id).first()
-        if dc:
-            for device in self._session.query(Device).filter_by(category_id=dc.id).all():
+        du = self._session.query(DeviceUsage).filter_by(id=du_id).first()
+        if du:
+            for device in self._session.query(Device).filter_by(usage_id=du.id).all():
                 self.del_device(device.id)
-            self._session.delete(dc)
+            self._session.delete(du)
             self._session.commit()
 
 ####
@@ -456,21 +456,21 @@ class DbHelper():
             device_list = device_list.filter(filter_arg)
         return device_list.all()
 
-    def find_devices(self, d_room_id_list, d_category_id_list):
+    def find_devices(self, d_room_id_list, d_usage_id_list):
         """
-        Look for devices that have at least 1 item in room_id_list AND 1 item in category_id_list
+        Look for devices that have at least 1 item in room_id_list AND 1 item in usage_id_list
         @param room_id_list : list of room ids
-        @param category_id_list : list of category ids
+        @param usage_id_list : list of usage ids
         @return a list of DeviceObject items
         """
         assert type(d_room_id_list) is ListType or type(d_room_id_list) is NoneType
-        assert type(d_category_id_list) is ListType or type(d_category_id_list) is NoneType
+        assert type(d_usage_id_list) is ListType or type(d_usage_id_list) is NoneType
 
         device_list = self._session.query(Device)
         if d_room_id_list is not None and len(d_room_id_list) != 0:
             device_list = device_list.filter(Device.room_id.in_(d_room_id_list))
-        if d_category_id_list is not None and len(d_category_id_list) != 0:
-            device_list = device_list.filter(Device.category_id.in_(d_category_id_list))
+        if d_usage_id_list is not None and len(d_usage_id_list) != 0:
+            device_list = device_list.filter(Device.usage_id.in_(d_usage_id_list))
         return device_list.all()
 
     def get_device(self, d_id):
@@ -501,13 +501,13 @@ class DbHelper():
               device_list.append(device)
         return device_list
 
-    def get_all_devices_of_category(self, dc_id):
+    def get_all_devices_of_usage(self, dc_id):
         """
-        Return all the devices of a category
-        @param dc_id: category id
+        Return all the devices of a usage
+        @param du_id: usage id
         @return a list of Device objects
         """
-        return self._session.query(Device).filter_by(category_id=dc_id).all()
+        return self._session.query(Device).filter_by(usage_id=du_id).all()
 
     def get_all_devices_of_technology(self, dt_id):
         """
@@ -517,7 +517,7 @@ class DbHelper():
         """
         return self._session.query(Device).filter_by(technology_id=dt_id).all()
 
-    def add_device(self, d_name, d_address, d_technology_id, d_type, d_category_id, d_room_id,
+    def add_device(self, d_name, d_address, d_technology_id, d_type, d_usage_id, d_room_id,
         d_description=None, d_reference=None, d_is_resetable=False, d_initial_value=None,
         d_is_value_changeable_by_user=False, d_unit_of_stored_values=None):
         """
@@ -526,7 +526,7 @@ class DbHelper():
         @param d_address : address (ex : 'A3' for x10/plcbus, '111.111111111' for 1wire)
         @param d_technology_id : technology id
         @param d_type : One of 'appliance','light','music','sensor'
-        @param d_category_id : category id
+        @param d_usage_id : usage id
         @param d_room_id : room id
         @param d_description : Extended item description (100 char max)
         @param d_reference : device reference (ex. AM12 for x10)
@@ -544,9 +544,9 @@ class DbHelper():
         except NoResultFound, e:
             raise DbHelperException("Couldn't add device with room id %s. It does not exist" % d_room_id)
         try:
-            dc = self._session.query(DeviceCategory).filter_by(id=d_category_id).one()
+            dc = self._session.query(DeviceUsage).filter_by(id=d_usage_id).one()
         except NoResultFound, e:
-            raise DbHelperException("Couldn't add device with category id %s. It does not exist" % d_category_id)
+            raise DbHelperException("Couldn't add device with usage id %s. It does not exist" % d_usage_id)
         try:
             dt = self._session.query(DeviceTechnology).filter_by(id=d_technology_id).one()
         except NoResultFound, e:
@@ -559,7 +559,7 @@ class DbHelper():
 
         device = Device(name=d_name, address=d_address, description=d_description,
                         reference=d_reference, technology_id=d_technology_id, type=d_type,
-                        category_id=d_category_id, room_id=d_room_id,
+                        usage_id=d_usage_id, room_id=d_room_id,
                         is_resetable=d_is_resetable, initial_value=d_initial_value,
                         is_value_changeable_by_user=d_is_value_changeable_by_user,
                         unit_of_stored_values=d_unit_of_stored_values)
@@ -568,7 +568,7 @@ class DbHelper():
         return device
 
     def update_device(self, d_id, d_name=None, d_address=None, d_technology_id=None, d_type=None,
-        d_category_id=None, d_room_id=None, d_description=None, d_reference=None, d_is_resetable=None,
+        d_usage_id=None, d_room_id=None, d_description=None, d_reference=None, d_is_resetable=None,
         d_initial_value=None, d_is_value_changeable_by_user=None, d_unit_of_stored_values =None):
         """
         Update a device item
@@ -579,7 +579,7 @@ class DbHelper():
         @param d_description : Extended item description (optional)
         @param d_technology : Item technology id (optional)
         @param d_type : One of 'appliance','light','music','sensor' (optional)
-        @param d_category : Item category id (optional)
+        @param d_usage : Item usage id (optional)
         @param d_room : Item room id (optional)
         @param d_is_resetable : Can the item be reseted to some initial state (optional)
         @param d_initial_value : What's the initial value of the item, should be
@@ -614,12 +614,12 @@ class DbHelper():
             device.reference = d_reference
         if d_type is not None:
             device.type = d_type
-        if d_category_id is not None:
+        if d_usage_id is not None:
           try:
-              dc = self._session.query(DeviceCategory).filter_by(id=d_category_id).one()
-              device.category = d_category_id
+              dc = self._session.query(DeviceUsage).filter_by(id=d_usage_id).one()
+              device.usage = d_usage_id
           except NoResultFound, e:
-              raise DbHelperException("Couldn't update device with category id %s. It does not exist" % d_category_id)
+              raise DbHelperException("Couldn't update device with usage id %s. It does not exist" % d_usage_id)
         if d_room_id is not None:
             try:
                 room = self._session.query(Room).filter_by(id=d_room_id).one()

@@ -186,11 +186,11 @@ class Room(Base):
         return Room.__tablename__
 
 
-class DeviceCategory(Base):
+class DeviceUsage(Base):
     """
-    Category of a device (temperature, heating, lighting, music...)
+    Usage of a device (temperature, heating, lighting, music...)
     """
-    __tablename__ = '%s_device_category' % _db_prefix
+    __tablename__ = '%s_device_usage' % _db_prefix
     id = Column(Integer, primary_key=True)
     name = Column(String(30), nullable=False)
     description = Column(String(255))
@@ -198,7 +198,7 @@ class DeviceCategory(Base):
     def __init__(self, name, description):
         """
         Class constructor
-        @param name : short name of the category
+        @param name : short name of the usage
         @param description : extended description
         """
         self.name = name
@@ -209,7 +209,7 @@ class DeviceCategory(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<DeviceCategory(id=%s, name='%s', desc='%s')>" % (self.id, self.name, self.description)
+        return "<DeviceUsage(id=%s, name='%s', desc='%s')>" % (self.id, self.name, self.description)
 
     @staticmethod
     def get_tablename():
@@ -217,7 +217,7 @@ class DeviceCategory(Base):
         Return the table name associated to the class
         @return table name
         """
-        return DeviceCategory.__tablename__
+        return DeviceUsage.__tablename__
 
 
 class DeviceTechnology(Base):
@@ -314,8 +314,8 @@ class Device(Base):
     technology_id = Column(Integer, ForeignKey('%s.id' % DeviceTechnology.get_tablename()), nullable=False)
     technology = relation(DeviceTechnology, backref=backref(__tablename__))
     type = Column(Enum(DEVICE_TYPE_LIST))
-    category_id = Column(Integer, ForeignKey('%s.id' % DeviceCategory.get_tablename()), nullable=False)
-    category = relation(DeviceCategory, backref=backref(__tablename__))
+    usage_id = Column(Integer, ForeignKey('%s.id' % DeviceUsage.get_tablename()), nullable=False)
+    usage = relation(DeviceUsage, backref=backref(__tablename__))
     room_id = Column(Integer, ForeignKey('%s.id' % Room.get_tablename()))
     room = relation(Room, backref=backref(__tablename__))
     is_resetable = Column(Boolean, nullable=False)
@@ -324,8 +324,9 @@ class Device(Base):
     unit_of_stored_values = Column(Enum(UNIT_OF_STORED_VALUE_LIST))
     _stats = relation("DeviceStats", order_by="DeviceStats.date.desc()", backref=__tablename__)
 
-    def __init__(self, name, address, description, reference, technology_id, type, category_id, room_id, \
-        is_resetable, initial_value, is_value_changeable_by_user, unit_of_stored_values):
+    def __init__(self, name, address, description, reference, technology_id, \
+        type, usage_id, room_id, is_resetable, initial_value, \
+        is_value_changeable_by_user, unit_of_stored_values):
         """
         Class constructor
         @param name : short name of the device
@@ -334,7 +335,7 @@ class Device(Base):
         @param reference : internal reference of the device (like AM12 for a X10 device)
         @param technology_id : link to the device technology
         @param type : 'appliance', 'lamp', 'music'
-        @param category_id : link to the device category
+        @param usage_id : link to the device usage
         @param room_id : link to the room where the device is
         @param is_resetable : True if a default value can be set to the device
         @param initial_value : initial value set to the device when it is switched on
@@ -347,7 +348,7 @@ class Device(Base):
         self.reference = reference
         self.technology_id = technology_id
         self.type = type
-        self.category_id = category_id
+        self.usage_id = usage_id
         self.room_id = room_id
         self.is_resetable = is_resetable
         self.initial_value = initial_value
@@ -383,10 +384,10 @@ class Device(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<Device(id=%s, name='%s', addr='%s', desc='%s', ref='%s', techno=%s, type='%s', cat=%s, \
+        return "<Device(id=%s, name='%s', addr='%s', desc='%s', ref='%s', techno=%s, type='%s', usage=%s, \
           room=%s, is_reset='%s', initial_val='%s', is_value_change='%s', unit='%s')>" \
           % (self.id, self.name, self.address, self.description, self.reference, self.technology_id, \
-             self.type, self.category_id, self.room_id, self.is_resetable, self.initial_value,\
+             self.type, self.usage_id, self.room_id, self.is_resetable, self.initial_value,\
              self.is_value_changeable_by_user, self.unit_of_stored_values)
 
     @staticmethod
