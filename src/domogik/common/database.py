@@ -318,6 +318,11 @@ class DbHelper():
             if cascade_delete:
                 for device in self._session.query(Device).filter_by(usage_id=du.id).all():
                     self.del_device(device.id)
+            else:
+                device_list = self._session.query(Device).filter_by(usage_id=du.id).all()
+                if len(device_list) > 0:
+                    raise DbHelperException("Couldn't delete device usage %s : there are associated devices" % du_id)
+
             self._session.delete(du)
             self._session.commit()
 
@@ -365,6 +370,10 @@ class DbHelper():
             if cascade_delete:
                 for device in self._session.query(Device).filter_by(technology_id=dt.id).all():
                     self.del_device(device.id)
+            else:
+                device_list = self._session.query(Device).filter_by(technology_id=dt.id).all()
+                if len(device_list) > 0:
+                    raise DbHelperException("Couldn't delete device technology %s : there are associated devices" % dt_id)
             self._session.delete(dt)
             self._session.commit()
 
