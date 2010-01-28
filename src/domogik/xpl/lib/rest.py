@@ -48,6 +48,8 @@ from domogik.xpl.lib.module import *
 from domogik.common import logger
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from domogik.common.database import DbHelper
+from domogik.common.configloader import Loader
+from xml.dom import minidom
 import json
 import time
 
@@ -59,13 +61,23 @@ class Rest(xPLModule):
 
     def __init__(self, ip, port):
         xPLModule.__init__(self, name = 'rest')
+
         # logging initialization
         l = logger.Logger('REST')
         self._log = l.get_logger()
         self._log.info("Rest Server initialisation...")
+
         # DB Helper
         self._db = DbHelper()
 
+        # Congig
+        cfg = Loader('domogik')
+        config = cfg.load()
+        db = dict(config[1])
+        self._xml_directory = "%s/xml/rest/" % db['cfg_path']
+
+
+        # Start HTTP server
         server = HTTPServerWithParam((ip, int(port)), RestHandler, handler_params = [self])
         print 'Start REST server on port %s...' % port
         server.serve_forever()
@@ -170,6 +182,7 @@ class RestHandler(BaseHTTPRequestHandler):
         self._db = self.server.handler_params[0]._db
         self._myxpl = self.server.handler_params[0]._myxpl
         self._log = self.server.handler_params[0]._log
+        self._xml_directory = self.server.handler_params[0]._xml_directory
 
         # url processing
         tab_url = self.path.split("?")
@@ -231,14 +244,127 @@ class RestHandler(BaseHTTPRequestHandler):
 
     def rest_command(self):
         print "Call rest_command"
-        self.command_techno = self.rest_request[0]
-        self.command_element = self.rest_request[1]
-        self.command_command = self.rest_request[2]
-        self.command_optionnal = self.rest_request[3:]
-        print "Techno    : %s" % self.command_techno
-        print "Element   : %s" % self.command_element
-        print "Command   : %s" % self.command_command
-        print "Optionnal : %s" % str(self.command_optionnal)
+
+        # parse data in URL
+        techno = self.rest_request[0]
+        address = self.rest_request[1]
+        order = self.rest_request[2]
+        others = self.rest_request[3:]
+        print "Techno    : %s" % techno
+        print "Address   : %s" % address
+        print "Order     : %s" % order
+        print "Others    : %s" % str(others)
+
+        # open xml file
+        #xml_file = "%s/%s.xml" % (self._xml_directory, techno)
+        xml_file = "%s/%s.xml" % ("../xml/", techno)
+        # process xml
+        message = self._parse_xml(xml_file, techno, address, order, others)
+        if message == None:
+            return
+
+        print "Send message : %s" % message
+        self._myxpl.send(message)
+
+        # REST processing finished and OK
+        json = JSonHelper("OK")
+        self.send_http_response_ok(json.get())
+
+        
+
+
+
+
+
+    def _parse_xml(self, xml_file, techno, address, order, others):
+        try:
+            xml_doc = minidom.parse(xml_file)
+        except:
+            json = JSonHelper("ERROR", 999, "Error while reading xml file : " + xml_file)
+            self.send_http_response_ok(json.get())
+            return None
+
+        mapping = xml_doc.documentElement
+        if mapping.getElementsByTagName("technology")[0].attributes.get("name").value != techno:
+            self.send_http_response_error(999, "'technology' attribute must be the same as file name !")
+            return
+        
+        #Schema
+        schema = mapping.getElementsByTagName("schema")[0].firstChild.nodeValue
+
+        #Device key name
+        device = mapping.getElementsByTagName("device")[0]
+        if device.getElementsByTagName("key") != []:
+            device_address_key = device.getElementsByTagName("key")[0].firstChild.nodeValue
+        else:
+            device_address_key = None
+
+        #Orders
+        orders = mapping.getElementsByTagName("orders")[0]
+        order_key = orders.getElementsByTagName("key")[0].firstChild.nodeValue
+
+        #Get the good order bloc :
+        the_order = None
+        for an_order in orders.getElementsByTagName("order"):
+            if an_order.getElementsByTagName("name")[0].firstChild.nodeValue == order:
+                the_order = an_order
+        if the_order == None:
+            self.send_http_response_error(999, "Order can't be found")
+            return
+
+        #Parse the order bloc
+        order_value = the_order.getElementsByTagName("value")[0].firstChild.nodeValue
+        #mandatory parameters
+        mandatory_parameters_value = {}
+        optional_parameters_value = {}
+        if the_order.getElementsByTagName("parameters")[0].hasChildNodes():
+            mandatory_parameters = the_order.getElementsByTagName("parameters")[0].getElementsByTagName("mandatory")[0]
+            count_mandatory_parameters = len(mandatory_parameters.getElementsByTagName("parameter"))
+            mandatory_parameters_from_url = others[3:3+count_mandatory_parameters]
+            for mandatory_param in mandatory_parameters.getElementsByTagName("parameter"):
+                key = mandatory_param.attributes.get("key").value
+                value = mandatory_parameters_from_url[int(mandatory_param.attributes.get("location").value) - 1]
+                mandatory_parameters_value[key] = value
+            #optional parameters
+            if the_order.getElementsByTagName("parameters")[0].getElementsByTagName("optional") != []:
+                optional_parameters =  the_order.getElementsByTagName("parameters")[0].getElementsByTagName("optional")[0]
+                for opt_param in optional_parameters.getElementsByTagName("parameter"):
+                    ind = others.index(opt_param.getElementsByTagName("name")[0])
+                    optional_parameters_value[url[ind]] = url[ind + 1]
+
+        return self._forge_msg(schema, device_address_key, address, order_key, order_value, mandatory_parameters_value, optional_parameters_value)
+
+
+
+
+
+
+
+
+    def _forge_msg(self, schema, device_address_key, address, order_key, order_value, mandatory_parameters_value, optional_parameters_value):
+        msg = """xpl-cmnd
+{
+hop=1
+source=rest
+target=*
+}
+%s
+{
+%s=%s
+%s=%s
+""" % (schema, device_address_key, address, order_key, order_value)
+        for m_param in mandatory_parameters_value.keys():
+            msg += "%s=%s\n" % (m_param, mandatory_parameters_value[m_param])
+        for o_param in optional_parameters_value.keys():
+            msg += "%s=%s\n" % (o_param, optional_parameters_value[o_param])
+        msg += "}"
+        return msg
+
+
+
+
+
+        
 
 
 
@@ -295,9 +421,9 @@ class RestHandler(BaseHTTPRequestHandler):
         self._myxpl.send(message)
 
         # REST processing finished and OK
-        self.send_http_response_ok()
+        json = JSonHelper("OK")
+        self.send_http_response_ok(json.get())
 
-        # TODO : send result : "{status : 'ok', code : '0', description : ''}"
 
 
 
@@ -577,37 +703,6 @@ class JSonHelper():
         return json
         
     
-
-
-
-
-
-################################################################################
-#class XmlRpcDbHelper():
-#    ''' This class provides a mapping of DbHelper methods to use them throw REST
-#    '''
-#
-#    def __init__(self):
-#        self._db = DbHelper()
-#
-#    def get_helper(self):
-#        return self._db
-#####
-## Areas
-#####
-#
-#    def list_areas(self):
-#        ''' Get the list of areas and return it as a list of tuples
-#        @return a list of tuple (id, name, description)
-#        '''
-#        areas = self._db.list_areas()
-#        res = []
-#        for area in areas:
-#            res.append((area.id, area.name, area.description))
-#        return res
-
-
-
 
 
 
