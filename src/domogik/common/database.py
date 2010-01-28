@@ -181,17 +181,19 @@ class DbHelper():
         self._session.commit()
         return area
 
-    def del_area(self, area_del_id):
+    def del_area(self, area_del_id, cascade_delete=False):
         """
         Delete an area record.
         Warning this also remove all the rooms in this area
         and all the devices (+ their stats) in each deleted rooms !
         @param area_id : id of the area to delete
+        @param cascade_delete : True if we wish to delete associated items
         """
         area = self._session.query(Area).filter_by(id=area_del_id).first()
         if area:
-            for room in self._session.query(Room).filter_by(area_id=area_del_id).all():
-                self.del_room(room.id)
+            if cascade_delete:
+                for room in self._session.query(Room).filter_by(area_id=area_del_id).all():
+                    self.del_room(room.id)
             self.delete_all_item_ui_config(area.id, 'area')
             self._session.delete(area)
             self._session.commit()
@@ -255,16 +257,18 @@ class DbHelper():
         self._session.commit()
         return room
 
-    def del_room(self, r_id):
+    def del_room(self, r_id, cascade_delete=False):
         """
         Delete a room record
         Warning this also remove all the devices in each deleted rooms!
         @param r_id : id of the room to delete
+        @param cascade_delete : True if we wish to delete associated items
         """
         room = self._session.query(Room).filter_by(id=r_id).first()
         if room:
-            for device in self._session.query(Device).filter_by(room_id=r_id).all():
-                self.del_device(device.id)
+            if cascade_delete:
+                for device in self._session.query(Device).filter_by(room_id=r_id).all():
+                    self.del_device(device.id)
             self.delete_all_item_ui_config(room.id, 'room')
             self._session.delete(room)
             self._session.commit()
