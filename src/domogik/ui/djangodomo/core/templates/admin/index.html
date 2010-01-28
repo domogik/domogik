@@ -60,11 +60,11 @@
                         <td>
                             <table>
                                 <tr>
-                                    <th>Category</th>
+                                    <th>Usage</th>
                                 </tr>
-                                {% for device_category in device_category_list %}
+                                {% for device_usage in device_usage_list %}
                                     <tr>
-                                        <td>{{ device_category.name }}</td><td><input type="checkbox" name="device_category_id" value="{{ device_category.id }}"/></td>
+                                        <td>{{ device_usage.name }}</td><td><input type="checkbox" name="device_usage_id" value="{{ device_usage.id }}"/></td>
                                     </tr>
                                 {% endfor %}
                             </table>
@@ -86,7 +86,7 @@
         <table>
             <tr>
                 <th>Device name</th>
-                <th>Category</th>
+                <th>Usage</th>
                 {% if request.session.user.is_admin %}
                     <th>Address</th>
                     <th>Reference</th>
@@ -101,7 +101,7 @@
                 <input type="hidden" id="id_deviceId" name="device_id" value="{{ device.id }}"/>
                 <tr class="{% cycle 'oddRow' 'evenRow' %}">
                     <td><a href="{% url device_view device.id %}">{{ device.name }}</a></td>
-                    <td>{{ device.category.name }}</td>
+                    <td>{{ device.usage.name }}</td>
                     {% if request.session.user.is_admin %}
                         <td>{{ device.address }}</td>
                         <td>{{ device.reference }}</td>
@@ -131,7 +131,7 @@
         </form>
     {% else %}
         <p>No device found !</p>
-    {% endif %} 
+    {% endif %}
     </div>
 <!--
         {% for device in deviceList %}

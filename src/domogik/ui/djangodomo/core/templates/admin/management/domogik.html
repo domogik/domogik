@@ -135,12 +135,12 @@ $(function(){
                                 <p>No data</p>
                         {% endif %}
 
-                        <p><strong>Categories</strong></p>
+                        <p><strong>Usages</strong></p>
                         <hr/>
-                        {% if device_category_list %}
+                        {% if device_usage_list %}
                                 <ul>
-                                {% for device_category in device_category_list %}
-                                        <li>{{ device_category.name }}</li>
+                                {% for device_usage in device_usage_list %}
+                                        <li>{{ device_usage.name }}</li>
                                 {% endfor %}
                                 </ul>
                         {% else %}
