@@ -196,7 +196,7 @@ class DbHelper():
             self._session.delete(area)
             self._session.commit()
         else:
-            raise DbHelperException("Couldn't delete area id %s : it doesn't exist" % r_area_id)
+            raise DbHelperException("Couldn't delete area id %s : it doesn't exist" % area_del_id)
 
 ####
 # Rooms
