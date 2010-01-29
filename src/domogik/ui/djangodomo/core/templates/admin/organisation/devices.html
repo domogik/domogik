@@ -78,7 +78,10 @@ $(function(){
 			}
 		});
 
-
+                $("#devices").hide();
+                $("button#showdevices").click(function () {
+            $("#devices").toggle();
+        });
 
 		$('#addnew').click(function() {
 			$('#addnewdialog').dialog('open');
@@ -109,6 +112,8 @@ $(function(){
             <button id="addnew" class="button">Ajouter nouveau</button>
         </li>
         <li><a href="#" class="button">Tout supprimer</a></li>
+                    <li><button id="showdevices" class="button">Dispositifs</a></li>
+
     </ul>
     <div id="addnewdialog" title="Ajouter nouveau dispositif">
         <p id="validateTips">Tous les champs (sauf description) sont requis.</p>
@@ -162,6 +167,44 @@ $(function(){
                 </select>
             </fieldset>
         </form>
+        
+                <div id="devices">
+            <h2 class="splitter">Dispositifs</h2>
+            <a href="#" class="action" id="btinstructions">(Instructions Drag &amp; Drop)</a>
+            <div id="instructions" title="Instructions Drag &amp; Drop">
+                <h3>Utilisation de la souris</h3>
+                <h3>Utilisation du clavier</h3>
+                <ul>
+                    <li>Use the <kbd>Tab</kbd> to move to the artist you want to move.</li>
+                    <li>Select the item you want to move with the <kbd>Spacebar</kbd>.</li>
+                    <li>Use the <kbd>Up</kbd> and <kbd>Down</kbd> cursor keys to select a target in the context menu.</li>
+                    <li>Press <kbd>Enter</kbd> to move the artist to the target list.</li>
+                </ul>
+            </div>
+            <fieldset class="areadrop">
+                <legend id="roomnah" class="choice">Dispositifs non attribuées</legend>
+                <ul id="roomna" class="draggables">
+                    {% for device in unattribued_devices %}
+                    <li class="draggable" title="{{ device.technology.name }}.{{ device.address }}">{{ device.name }}<span class="description">{{ device.description }}</span></li>
+                    {% empty %}
+                    <li class="empty">Vide</li>
+                    {% endfor %}
+                </ul>
+            </fieldset>
+            {% regroup devices_list|dictsort:"room" by room as rooms %}
+            {% for room in rooms %}
+            <fieldset class="areadrop">
+                <legend id="room{{ room.grouper.id }}h" class="choice">{{ room.grouper.name }}</legend>
+                <ul id="room{{ room.grouper.id }}" class="draggables">
+                    {% for device in room.list %}
+                    <li class="draggable" title="{{ device.technology.name }}.{{device.address }}">{{ device.name }}<span class="description">{{ device.description }}</span></li>
+                    {% empty %}
+                    <li class="empty">Vide</li>
+                    {% endfor %}
+                </ul>
+            </fieldset>
+            {% endfor %}
+          </div>
     </div>
 </div>
 <div class="nocolumns"> {% regroup devices_list|dictsort:"room" by room as rooms_list %}
