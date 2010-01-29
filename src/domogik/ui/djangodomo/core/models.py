@@ -39,10 +39,10 @@ import dmg_pipes as pipes
 
 
 class Areas(pipes.DmgPipe):
-    uri = "http://127.0.0.1:8080/base/area/list/"
+    uri = "http://127.0.0.1:8080/base/area"
 
     @staticmethod
-    def fetch():
-        resp = Areas.objects.get()
+    def getAll():
+        resp = Areas.objects.get({'parameters':"list/"})
         if resp :
             return resp

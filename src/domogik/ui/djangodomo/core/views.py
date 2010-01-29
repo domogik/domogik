@@ -539,7 +539,7 @@ def admin_organisation_areas(request):
         return index(request)
     unattribued_rooms = _db.search_rooms({'area_id':None})
     rooms_list = _db.list_rooms()
-    areas_list = _db.list_areas()
+    results = Areas.getAll()
     icons_area = ["grndfloor", "firstfloor", "basement"]
     page_title = _("Organisation des zones")
     return _go_to_page(
@@ -547,7 +547,7 @@ def admin_organisation_areas(request):
         page_title,
         unattribued_rooms=unattribued_rooms,
         rooms_list=rooms_list,
-        areas_list=areas_list,
+        areas_list=results.area,
         icons_area=icons_area
     )
 
@@ -559,7 +559,7 @@ def show_index(request):
     """
     areas_list = _db.list_areas()
     page_title = _("Visualisation Maison")
-    results = Areas.fetch()
+    results = Areas.getAll()
 
     return _go_to_page(
         request, 'show/index.html',
