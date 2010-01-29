@@ -549,8 +549,11 @@ target=*
         """
         json = JSonHelper("OK")
         json.set_data_type("area")
-        area = self._db.add_area(name, description)
-        json.add_data(area)
+        try:
+            area = self._db.add_area(name, description)
+            json.add_data(area)
+        except:
+            json.set_error(code = 999, description = str(sys.exc_info()[1]))
         self.send_http_response_ok(json.get())
 
 
@@ -558,15 +561,12 @@ target=*
         """ delete areas
         """
         json = JSonHelper("OK")
-
-        # Check existence
-        area = self._db.get_area_by_id(id)
-        if area is not None:
-            self._db.del_area(id)
-            json.set_data_type("area")
+        json.set_data_type("area")
+        try:
+            area = self._db.del_area(id)
             json.add_data(area)
-        else:
-            json.set_error(code = 999, description = "No area to delete")
+        except:
+            json.set_error(code = 999, description = str(sys.exc_info()[1]))
         self.send_http_response_ok(json.get())
 
 
@@ -588,6 +588,8 @@ target=*
             if room is not None:
                 json.add_data(room)
         elif area_id != None:
+            if area_id == "null":
+                area_id = None
             for room in self._db.get_all_rooms_of_area(area_id):
                 json.add_data(room)
         self.send_http_response_ok(json.get())
@@ -603,7 +605,7 @@ target=*
             room = self._db.add_room(name, area_id, description)
             json.add_data(room)
         except:
-            json.set_error(999, "Error while trying to add a room")
+            json.set_error(code = 999, description = str(sys.exc_info()[1]))
         self.send_http_response_ok(json.get())
 
 
@@ -612,15 +614,12 @@ target=*
         """ delete rooms
         """
         json = JSonHelper("OK")
-
-        # Check existence
-        room = self._db.get_room_by_id(id)
-        if room is not None:
-            self._db.del_room(id)
-            json.set_data_type("room")
+        json.set_data_type("room")
+        try:
+            room = self._db.del_room(id)
             json.add_data(room)
-        else:
-            json.set_error(code = 999, description = "No room to delete")
+        except:
+            json.set_error(code = 999, description = str(sys.exc_info()[1]))
         self.send_http_response_ok(json.get())
 
 
@@ -675,6 +674,8 @@ class JSonHelper():
         self._nb_data_values += 1
         if hasattr(data, 'id'):
             pass
+        if data == None:
+            return
         for key in data.__dict__:
             print key + " => " + str(data.__dict__[key])
             if key != "_sa_instance_state":
