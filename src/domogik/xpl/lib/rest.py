@@ -29,6 +29,7 @@ Implements
 
 - RestHandler.do_GET
 - RestHandler.do_POST
+- RestHandler.do_OPTIONS
 - RestHandler.rest_command
 - RestHandler.rest_xpl_cmnd
 - RestHandler.send_http_response_ok
@@ -112,35 +113,8 @@ class RestHandler(BaseHTTPRequestHandler):
         # Create shorter access : self.server.handler_params[0].* => self.*
         self._init_namespace()
 
-        #tab_url = self.path.split("?")
-        #self.path = tab_url[0]
-        #self.parameters = tab_url[1]
-      
-        #if self.path[-1:] == "/":
-        #    self.path = self.path[0:len(self.path)-1]
-        #print "PATH : " + self.path
-        #tab_path = self.path.split("/")
-
-        ## Get type of request : /command, /xpl-cmnd, /base, etc
-        #if len(tab_path) <= 1:
-        #    self.send_http_response_error(999, "No type given")
-        #    return
-        #self.rest_type = tab_path[1].lower()
-        #self.rest_request = tab_path[2:]
-        #print "TYPE    : " + self.rest_type
-        #print "Request : " + str(self.rest_request)
-
-        if self.rest_type == "command":
-            # TODO will be to move in do_POST
-            self.rest_command()
-        elif self.rest_type == "xpl-cmnd":
-            self.rest_xpl_cmnd()
-        elif self.rest_type == "base":
-            # specific for GET
-            self.rest_base_get()
-        else:
-            self.send_http_response_error(999, "Type [" + self.rest_type + "] is not supported")
-            return
+        # common processing for all HTTP methods
+        self.do_FOR_ALL_METHODS()
 
 
 
@@ -152,24 +126,39 @@ class RestHandler(BaseHTTPRequestHandler):
         # Create shorter access : self.server.handler_params[0].* => self.*
         self._init_namespace()
 
-        #if self.path[-1:] == "/":
-        #    self.path = self.path[0:len(self.path)-1]
-        #print "PATH : " + self.path
-        #tab_path = self.path.split("/")
+        # common processing for all HTTP methods
+        self.do_FOR_ALL_METHODS()
 
-        ## Get type of request : /command, /xpl-cmnd, /base, etc
-        #self.rest_type = tab_path[1].lower()
-        #self.rest_request = tab_path[2:]
-        #print "TYPE    : " + self.rest_type
-        #print "Request : " + str(self.rest_request)
 
-        if self.rest_type == "xpl-cmnd":
+
+
+    def do_OPTIONS(self):
+        """ Process OPTIONS requests
+        """
+
+        print "==== OPTIONS ==========================================="
+        # Create shorter access : self.server.handler_params[0].* => self.*
+        self._init_namespace()
+
+        # common processing for all HTTP methods
+        self.do_FOR_ALL_METHODS()
+
+
+
+
+
+    def do_FOR_ALL_METHODS(self):
+        if self.rest_type == "command":
+            self.rest_command()
+        elif self.rest_type == "xpl-cmnd":
             self.rest_xpl_cmnd()
         elif self.rest_type == "base":
-            # specific for POST
-            self.rest_base_post() 
+            self.rest_base()
         else:
-            self.send_http_response_error(999, "Type [" + self.rest_type + "] is not supported")
+            self.send_http_response_error(999, "Type [" + str(self.rest_type) + "] is not supported")
+            return
+
+
 
 
 
@@ -197,11 +186,15 @@ class RestHandler(BaseHTTPRequestHandler):
         tab_path = self.path.split("/")
 
         # Get type of request : /command, /xpl-cmnd, /base, etc
-        if len(tab_path) <= 1:
+        if len(tab_path) < 2:
+            self.rest_type = None
             self.send_http_response_error(999, "No type given")
             return
         self.rest_type = tab_path[1].lower()
-        self.rest_request = tab_path[2:]
+        if len(tab_path) > 2:
+            self.rest_request = tab_path[2:]
+        else:
+            self.rest_request = []
         print "TYPE    : " + self.rest_type
         print "Request : " + str(self.rest_request)
 
@@ -246,10 +239,18 @@ class RestHandler(BaseHTTPRequestHandler):
         print "Call rest_command"
 
         # parse data in URL
-        techno = self.rest_request[0]
-        address = self.rest_request[1]
-        order = self.rest_request[2]
-        others = self.rest_request[3:]
+        if len(self.rest_request) >= 3:
+            techno = self.rest_request[0]
+            address = self.rest_request[1]
+            order = self.rest_request[2]
+            if len(self.rest_request) > 3:
+                others = self.rest_request[3:]
+            else:
+                others = None
+        else:
+            json = JSonHelper("ERROR", 999, "Url too short for /command")
+            self.send_http_response_ok(json.get())
+            return
         print "Techno    : %s" % techno
         print "Address   : %s" % address
         print "Order     : %s" % order
@@ -431,7 +432,7 @@ target=*
 # /base processing
 ######
 
-    def rest_base_get(self):
+    def rest_base(self):
         """ get data in database
             1/ Decode and check URL
             2/ call the good fonction to get data
@@ -517,14 +518,6 @@ target=*
             return
 
 
-
-
-    def rest_base_post(self):
-        """ create or update data in database
-            1/ Decode and check URL
-            2/ call the good fonction to create or update data
-        """
-        print "TODO !!!!!!"
 
 
 
@@ -638,7 +631,7 @@ target=*
 
     def send_http_response_ok(self, data = ""):
         self.send_response(200)
-        self.send_header('Content-type',    'text/html')
+        self.send_header('Content-type',    'application/json')
         self.end_headers()
         if data:
             self.wfile.write(data)
