@@ -301,6 +301,43 @@ class DeviceTechnologyConfig(Base):
         return DeviceTechnologyConfig.__tablename__
 
 
+class DeviceType(Base):
+    """
+    Type of a device (x10.Switch, x10.Dimmer, Computer.WOL...)
+    """
+    __tablename__ = '%s_device_type' % _db_prefix
+    id = Column(Integer, primary_key=True)
+    technology_id = Column(Integer, ForeignKey('%s.id' % \
+                           DeviceTechnology.get_tablename()), nullable=False)
+    name = Column(String(30), nullable=False)
+    description = Column(String(255))
+
+    def __init__(self, name, description, technology_id):
+        """
+        Class constructor
+        @param name : short name of the type
+        @param description : extended description
+        """
+        self.name = name
+        self.description = description
+        self.technology_id = technology_id
+
+    def __repr__(self):
+        """
+        Print an internal representation of the class
+        @return an internal representation
+        """
+        return "<DeviceType(id=%s, name='%s', desc='%s')>" % (self.id, self.name, self.description)
+
+    @staticmethod
+    def get_tablename():
+        """
+        Return the table name associated to the class
+        @return table name
+        """
+        return DeviceType.__tablename__
+
+
 class Device(Base):
     """
     Device
@@ -311,11 +348,10 @@ class Device(Base):
     description = Column(String(255))
     address = Column(String(30), nullable=False)
     reference = Column(String(30))
-    technology_id = Column(Integer, ForeignKey('%s.id' % DeviceTechnology.get_tablename()), nullable=False)
-    technology = relation(DeviceTechnology, backref=backref(__tablename__))
-    type = Column(Enum(DEVICE_TYPE_LIST))
     usage_id = Column(Integer, ForeignKey('%s.id' % DeviceUsage.get_tablename()), nullable=False)
     usage = relation(DeviceUsage, backref=backref(__tablename__))
+    type_id = Column(Integer, ForeignKey('%s.id' % DeviceType.get_tablename()), nullable=False)
+    type = relation(DeviceType, backref=backref(__tablename__))
     room_id = Column(Integer, ForeignKey('%s.id' % Room.get_tablename()))
     room = relation(Room, backref=backref(__tablename__))
     is_resetable = Column(Boolean, nullable=False)
@@ -324,18 +360,17 @@ class Device(Base):
     unit_of_stored_values = Column(Enum(UNIT_OF_STORED_VALUE_LIST))
     _stats = relation("DeviceStats", order_by="DeviceStats.date.desc()", backref=__tablename__)
 
-    def __init__(self, name, address, description, reference, technology_id, \
-        type, usage_id, room_id, is_resetable, initial_value, \
-        is_value_changeable_by_user, unit_of_stored_values):
+    def __init__(self, name, address, description, reference, usage_id, type_id,\
+        room_id, is_resetable, initial_value, is_value_changeable_by_user, \
+        unit_of_stored_values):
         """
         Class constructor
         @param name : short name of the device
         @param description : extended description
         @param address : device address (like 'A3' for x10, or '01.123456789ABC' for 1wire)
         @param reference : internal reference of the device (like AM12 for a X10 device)
-        @param technology_id : link to the device technology
-        @param type : 'appliance', 'lamp', 'music'
         @param usage_id : link to the device usage
+        @param type_id : 'link to the device type (x10.Switch, x10.Dimmer, Computer.WOL...)
         @param room_id : link to the room where the device is
         @param is_resetable : True if a default value can be set to the device
         @param initial_value : initial value set to the device when it is switched on
@@ -346,8 +381,7 @@ class Device(Base):
         self.address = address
         self.description = description
         self.reference = reference
-        self.technology_id = technology_id
-        self.type = type
+        self.type_id = type_id
         self.usage_id = usage_id
         self.room_id = room_id
         self.is_resetable = is_resetable
@@ -355,6 +389,7 @@ class Device(Base):
         self.is_value_changeable_by_user = is_value_changeable_by_user
         self.unit_of_stored_values = unit_of_stored_values
 
+    # TODO see if following methods are still useful
     def is_lamp(self):
         """
         Check if the device is a lamp
@@ -384,10 +419,10 @@ class Device(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<Device(id=%s, name='%s', addr='%s', desc='%s', ref='%s', techno=%s, type='%s', usage=%s, \
+        return "<Device(id=%s, name='%s', addr='%s', desc='%s', ref='%s', type='%s', usage=%s, \
           room=%s, is_reset='%s', initial_val='%s', is_value_change='%s', unit='%s')>" \
-          % (self.id, self.name, self.address, self.description, self.reference, self.technology_id, \
-             self.type, self.usage_id, self.room_id, self.is_resetable, self.initial_value,\
+          % (self.id, self.name, self.address, self.description, self.reference, \
+             self.type_id, self.usage_id, self.room_id, self.is_resetable, self.initial_value,\
              self.is_value_changeable_by_user, self.unit_of_stored_values)
 
     @staticmethod

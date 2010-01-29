@@ -83,8 +83,11 @@ class SampleDataHelper:
         for dt in self._db.list_device_technologies():
             self._db.del_device_technology(dt.id)
 
-        for dc in self._db.list_device_usages():
-            self._db.del_device_usage(dc.id)
+        for du in self._db.list_device_usages():
+            self._db.del_device_usage(du.id)
+
+        for dty in self._db.list_device_types():
+            self._db.del_device_type(dty.id)
 
         for trigger in self._db.list_triggers():
             self._db.del_trigger(trigger.id)
@@ -125,6 +128,11 @@ class SampleDataHelper:
         music_cat = self._db.add_device_usage(du_name="Music")
         appliance_cat = self._db.add_device_usage(du_name="Appliance")
 
+        x10_switch = self._db.add_device_type('Switch','x10 Switch', x10.id)
+        x10_dimmer = self._db.add_device_type('Dimmer','x10 Dimmer', x10.id)
+        plcbus_switch = self._db.add_device_type('Switch','PLCBus switch', plcbus.id)
+        plcbus_dimmer = self._db.add_device_type('Dimmer','PLCBus dimmer', plcbus.id)
+
         basement = self._db.add_area(a_name="Basement")
         ground_floor = self._db.add_area(a_name="Ground floor")
         first_floor = self._db.add_area(a_name="First floor")
@@ -137,38 +145,40 @@ class SampleDataHelper:
         cellar = self._db.add_room(r_name="Cellar", r_area_id=basement.id)
 
         bedroom1_beside_lamp = self._db.add_device(
-            d_name="Beside lamp", d_address="A1", d_technology_id=x10.id, d_type=u"appliance", d_reference="AM12",
-            d_usage_id=lighting_cat.id, d_room_id=bedroom1.id, d_is_resetable=True, d_initial_value="off",
+            d_name="Beside lamp", d_address="A1", d_reference="AM12",
+            d_usage_id=lighting_cat.id, d_type_id=x10_switch.id,
+            d_room_id=bedroom1.id, d_is_resetable=True, d_initial_value="off",
             d_is_value_changeable_by_user=True, d_unit_of_stored_values=None
         )
         bedroom1_lamp = self._db.add_device(
-            d_name="Lamp", d_address="A2", d_technology_id=x10.id, d_type=u"lamp", d_usage_id=lighting_cat.id,
+            d_name="Lamp", d_address="A2", d_type_id=x10_dimmer.id, d_usage_id=lighting_cat.id,
             d_reference="LM12", d_room_id=bedroom1.id, d_is_resetable=True,
             d_initial_value="100", d_is_value_changeable_by_user=True, d_unit_of_stored_values=u"Percent"
         )
         bedroom2_beside_lamp = self._db.add_device(
-            d_name="Beside lamp", d_address="B1", d_technology_id=x10.id, d_type=u"appliance", d_reference="AM12",
-            d_usage_id=lighting_cat.id, d_room_id=bedroom2.id, d_is_resetable=True, d_initial_value="off",
+            d_name="Beside lamp", d_address="B1", d_reference="AM12",
+            d_usage_id=lighting_cat.id, d_type_id=plcbus_switch.id,
+            d_room_id=bedroom2.id, d_is_resetable=True, d_initial_value="off",
             d_is_value_changeable_by_user=True, d_unit_of_stored_values=None
         )
         bedroom2_lamp = self._db.add_device(
-            d_name="Lamp", d_address="B2", d_technology_id=x10.id, d_type=u"lamp", d_usage_id=lighting_cat.id,
-            d_reference="LM12", d_room_id=bedroom2.id, d_is_resetable=True,
+            d_name="Lamp", d_address="B2", d_usage_id=lighting_cat.id,
+            d_reference="LM12", d_type_id=plcbus_dimmer.id, d_room_id=bedroom2.id, d_is_resetable=True,
             d_initial_value="100", d_is_value_changeable_by_user=True, d_unit_of_stored_values=u"Percent"
         )
         lounge_lamp = self._db.add_device(
-            d_name="Lamp", d_address="C1", d_technology_id=x10.id, d_type=u"lamp", d_usage_id=lighting_cat.id,
-            d_reference="LM12", d_room_id=lounge.id, d_is_resetable=True,
+            d_name="Lamp", d_address="C1", d_usage_id=lighting_cat.id,
+            d_reference="LM12", d_type_id=plcbus_dimmer.id, d_room_id=lounge.id, d_is_resetable=True,
             d_initial_value="100", d_is_value_changeable_by_user=True, d_unit_of_stored_values=u"Percent"
         )
         kitchen_lamp = self._db.add_device(
-            d_name="Lamp", d_address="D1", d_technology_id=x10.id, d_type=u"lamp", d_usage_id=lighting_cat.id,
-            d_reference="LM12", d_room_id=kitchen.id, d_is_resetable=True,
+            d_name="Lamp", d_address="D1", d_usage_id=lighting_cat.id,
+            d_reference="LM12", d_type_id=x10_dimmer.id, d_room_id=kitchen.id, d_is_resetable=True,
             d_initial_value="100", d_is_value_changeable_by_user=True, d_unit_of_stored_values=u"Percent"
         )
         kitchen_coffee_machine = self._db.add_device(
-            d_name="Coffee machine", d_address="D2", d_technology_id=x10.id, d_type=u"appliance",
-            d_usage_id=appliance_cat.id, d_reference="AM12", d_room_id=kitchen.id, d_is_resetable=True,
+            d_name="Coffee machine", d_address="D2", d_usage_id=appliance_cat.id,
+            d_type_id=plcbus_switch.id, d_reference="AM12", d_room_id=kitchen.id, d_is_resetable=True,
             d_initial_value="off", d_is_value_changeable_by_user=True, d_unit_of_stored_values=None
         )
 

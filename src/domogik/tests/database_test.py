@@ -39,7 +39,7 @@ import datetime
 from domogik.common.database import DbHelper, DbHelperException
 from domogik.common.sql_schema import Area, Device, DeviceUsage, DeviceConfig, \
                                       DeviceStats, DeviceStatsValue, DeviceTechnology, DeviceTechnologyConfig, \
-                                      ItemUIConfig, Room, UserAccount, SystemAccount, SystemConfig, \
+                                      DeviceType, ItemUIConfig, Room, UserAccount, SystemAccount, SystemConfig, \
                                       SystemStats, SystemStatsValue, Trigger
 
 class GenericTestCase(unittest.TestCase):
@@ -91,6 +91,14 @@ class GenericTestCase(unittest.TestCase):
         """
         for du in db.list_device_usages():
             db.del_device_usage(du.id, cascade_delete=True)
+
+    def remove_all_device_types(self, db):
+        """
+        Remove all device types
+        @param db : db API instance
+        """
+        for dty in db.list_device_types():
+            db.del_device_type(dty.id, cascade_delete=True)
 
     def remove_all_device_technology_config(self, db):
         """
@@ -267,6 +275,43 @@ class DeviceUsageTestCase(GenericTestCase):
         assert self.has_item(self.db.list_device_usages(), ['du1']), "Couldn't find 'du1'"
         assert not self.has_item(self.db.list_device_usages(), ['du2']), "'du2' was NOT deleted"
 
+class DeviceTypeTestCase(GenericTestCase):
+    """
+    Test device types
+    """
+
+    def setUp(self):
+        self.db = DbHelper(use_test_db=True)
+        self.remove_all_device_types(self.db)
+
+    def tearDown(self):
+        self.remove_all_device_types(self.db)
+        del self.db
+
+    def testEmptyList(self):
+        assert len(self.db.list_device_types()) == 0, "There should have no device type"
+
+    def testAdd(self):
+        dt1 = self.db.add_device_technology(u'x10', 'desc dt1', u'cpl')
+        dty1 = self.db.add_device_type('x10 Switch', 'desc1', dt1.id)
+        dty2 = self.db.add_device_type('x10 Dimmer', 'desc2', dt1.id)
+        assert len(self.db.list_device_types()) == 2, "%s devices types found, instead of 2 " \
+                                                      % len(self.db.list_device_types())
+        assert self.has_item(self.db.list_device_types(), ['x10 Switch', 'x10 Dimmer']), "Couldn't find all device types"
+
+    def testFetchInformation(self):
+        dt1 = self.db.add_device_technology(u'x10', 'desc dt1', u'cpl')
+        dty1 = self.db.add_device_type('x10 Switch', 'desc1', dt1.id)
+        assert self.db.get_device_type_by_name('x10 Switch').name == 'x10 Switch', "DeviceType 'x10 Switch' was not found"
+
+    def testDel(self):
+        dt1 = self.db.add_device_technology(u'x10', 'desc dt1', u'cpl')
+        dty1 = self.db.add_device_type('x10 Switch', dt1.id)
+        dty2 = self.db.add_device_type('x10 Dimmer', dt1.id)
+        self.db.del_device_type(dty2.id)
+        assert self.has_item(self.db.list_device_types(), ['x10 Switch']), "Couldn't find 'x10 Switch'"
+        assert not self.has_item(self.db.list_device_usages(), ['x10 Dimmer']), "'x10 Dimmer' was NOT deleted"
+
 class DeviceTechnologyTestCase(GenericTestCase):
     """
     Test device technologies
@@ -386,23 +431,31 @@ class DeviceTestCase(GenericTestCase):
         room1 = self.db.add_room('room1', area1.id)
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1', u'cpl')
         du1 = self.db.add_device_usage('du1')
-        device1 = self.db.add_device(d_name='device1', d_address = 'A1', d_technology_id = dt1.id, d_type = u'lamp',
-                              d_usage_id = du1.id, d_room_id = room1.id, d_description = 'desc1',
-                              d_is_resetable = True, d_initial_value = 30,
-                              d_is_value_changeable_by_user = False, d_unit_of_stored_values = u'Percent')
+        dty1 = self.db.add_device_type('x10 Switch', 'desc1', dt1.id)
+
+        device1 = self.db.add_device(d_name='device1', d_address = 'A1',
+                    d_type_id = dty1.id, d_usage_id = du1.id,
+                    d_room_id = room1.id, d_description = 'desc1',
+                    d_is_resetable = True, d_initial_value = 30,
+                    d_is_value_changeable_by_user = False,
+                    d_unit_of_stored_values = u'Percent')
         assert len(self.db.list_devices()) == 1, "Device was NOT added"
-        assert device1.is_lamp(), "device1.is_lamp() returns False. Should have returned True"
-        assert not device1.is_appliance(), "device1.is_appliance() returns True. Should have returned False"
+        # TODO see if these methods are still used
+        #assert device1.is_lamp(), "device1.is_lamp() returns False. Should have returned True"
+        #assert not device1.is_appliance(), "device1.is_appliance() returns True. Should have returned False"
 
     def testUpdate(self):
         area1 = self.db.add_area('area1','description 1')
         room1 = self.db.add_room('room1', area1.id)
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1', u'cpl')
+        dty1 = self.db.add_device_type('x10 Switch', 'desc1', dt1.id)
         du1 = self.db.add_device_usage('du1')
-        device1 = self.db.add_device(d_name='device1', d_address = 'A1', d_technology_id = dt1.id, d_type = u'lamp',
-                              d_usage_id = du1.id, d_room_id = room1.id, d_description = 'desc1',
-                              d_is_resetable = True, d_initial_value = 30,
-                              d_is_value_changeable_by_user = False, d_unit_of_stored_values = u'Percent')
+        device1 = self.db.add_device(d_name='device1', d_address = 'A1',
+                    d_type_id = dty1.id, d_usage_id = du1.id,
+                    d_room_id = room1.id, d_description = 'desc1',
+                    d_is_resetable = True, d_initial_value = 30,
+                    d_is_value_changeable_by_user = False,
+                    d_unit_of_stored_values = u'Percent')
         device_id = device1.id
         device1 = self.db.update_device(d_id = device1.id, d_description = 'desc2')
         self.db._session.expunge(device1) # Remove object from session
@@ -416,16 +469,20 @@ class DeviceTestCase(GenericTestCase):
         room1 = self.db.add_room('room1', area1.id)
         room2 = self.db.add_room('room2', area2.id)
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1', u'cpl')
+        dty1 = self.db.add_device_type('x10 Switch', 'desc1', dt1.id)
+        dty2 = self.db.add_device_type('x10 Dimmer', 'desc1', dt1.id)
         du1 = self.db.add_device_usage('du1')
         du2 = self.db.add_device_usage('du2')
-        device1 = self.db.add_device(d_name='device1', d_address = 'A1', d_technology_id = dt1.id, d_type = u'lamp',
-                              d_usage_id = du1.id, d_room_id = room1.id, d_description = 'desc1',
-                              d_is_resetable = True, d_initial_value = 30,
-                              d_is_value_changeable_by_user = False, d_unit_of_stored_values = u'Percent')
-        device2 = self.db.add_device(d_name='device2', d_address='A2', d_technology_id=dt1.id, d_type = u'appliance',
-                              d_usage_id=du1.id, d_room_id=room1.id)
-        device3 = self.db.add_device(d_name='device3', d_address='A3', d_technology_id=dt1.id, d_type = u'appliance',
-                              d_usage_id=du2.id, d_room_id=room2.id)
+        device1 = self.db.add_device(d_name='device1', d_address = 'A1',
+                    d_type_id = dty1.id, d_usage_id = du1.id,
+                    d_room_id = room1.id, d_description = 'desc1',
+                    d_is_resetable = True, d_initial_value = 30,
+                    d_is_value_changeable_by_user = False,
+                    d_unit_of_stored_values = u'Percent')
+        device2 = self.db.add_device(d_name='device2', d_address='A2',
+                    d_type_id = dty2.id, d_usage_id=du1.id, d_room_id=room1.id)
+        device3 = self.db.add_device(d_name='device3', d_address='A3',
+                    d_type_id = dty2.id, d_usage_id=du2.id, d_room_id=room2.id)
 
         assert len(self.db.list_devices()) == 3, "Device list should have 3 items, but it has %s" % self.db.list_devices()
         assert len(self.db.get_all_devices_of_room(room1.id)) == 2, \
@@ -467,16 +524,19 @@ class DeviceTestCase(GenericTestCase):
         room1 = self.db.add_room('room1', area1.id)
         room2 = self.db.add_room('room2', area2.id)
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1', u'cpl')
+        dty1 = self.db.add_device_type('x10 Switch', 'desc1', dt1.id)
         du1 = self.db.add_device_usage('du1')
         du2 = self.db.add_device_usage('du2')
-        device1 = self.db.add_device(d_name='device1', d_address = 'A1', d_technology_id = dt1.id, d_type = u'lamp',
-                              d_usage_id = du1.id, d_room_id = room1.id, d_description = 'desc1',
-                              d_is_resetable = True, d_initial_value = 30,
-                              d_is_value_changeable_by_user = False, d_unit_of_stored_values = u'Percent')
-        device2 = self.db.add_device(d_name='device2', d_address='A2', d_technology_id=dt1.id, d_type = u'appliance',
-                              d_usage_id=du1.id, d_room_id=room1.id)
-        device3 = self.db.add_device(d_name='device3', d_address='A3', d_technology_id=dt1.id, d_type = u'appliance',
-                              d_usage_id=du2.id, d_room_id=room2.id)
+        device1 = self.db.add_device(d_name='device1', d_address = 'A1',
+                    d_type_id = dty1.id, d_usage_id = du1.id,
+                    d_room_id = room1.id, d_description = 'desc1',
+                    d_is_resetable = True, d_initial_value = 30,
+                    d_is_value_changeable_by_user = False,
+                    d_unit_of_stored_values = u'Percent')
+        device2 = self.db.add_device(d_name='device2', d_address='A2',
+                    d_type_id = dty1.id, d_usage_id=du1.id, d_room_id=room1.id)
+        device3 = self.db.add_device(d_name='device3', d_address='A3',
+                    d_type_id = dty1.id, d_usage_id=du2.id, d_room_id=room2.id)
         self.db.del_device(device2.id)
         assert len(self.db.list_devices()) == 2, "Found %s device(s), should be %s" % (self.db.list_devices(), 1)
         assert self.db.list_devices()[0].address == 'A1', \
@@ -502,16 +562,17 @@ class DeviceStatsTestCase(GenericTestCase):
     def testAdd(self):
         dt1 = self.db.add_device_technology(u"x10", "this is x10", u"cpl")
         du1 = self.db.add_device_usage("lighting")
+        dty1 = self.db.add_device_type('x10 Switch', 'desc1', dt1.id)
         area1 = self.db.add_area('area1','description 1')
         room1 = self.db.add_room('room1', area1.id)
-        device1 = self.db.add_device(d_name='device1', d_address = "A1", d_technology_id = dt1.id, d_type = u"lamp",
-                              d_usage_id = du1.id, d_room_id = room1.id)
-        device2 = self.db.add_device(d_name='device2', d_address = "A2", d_technology_id = dt1.id, d_type = u"lamp",
-                              d_usage_id = du1.id, d_room_id = room1.id)
-        device3 = self.db.add_device(d_name='device3', d_address = "A3", d_technology_id = dt1.id, d_type = u"lamp",
-                              d_usage_id = du1.id, d_room_id = room1.id)
-        device4 = self.db.add_device(d_name='device4', d_address = "A4", d_technology_id = dt1.id, d_type = u"lamp",
-                              d_usage_id = du1.id, d_room_id = room1.id)
+        device1 = self.db.add_device(d_name='device1', d_address = "A1",
+                    d_type_id = dty1.id, d_usage_id = du1.id, d_room_id = room1.id)
+        device2 = self.db.add_device(d_name='device2', d_address = "A2",
+                    d_type_id = dty1.id, d_usage_id = du1.id, d_room_id = room1.id)
+        device3 = self.db.add_device(d_name='device3', d_address = "A3",
+                    d_type_id = dty1.id, d_usage_id = du1.id, d_room_id = room1.id)
+        device4 = self.db.add_device(d_name='device4', d_address = "A4",
+                    d_type_id = dty1.id, d_usage_id = du1.id, d_room_id = room1.id)
         now = datetime.datetime.now()
         d_stat1_1 = self.db.add_device_stat(device1.id, now, {'val1': '10', 'val2': '10.5' })
         d_stat1_2 = self.db.add_device_stat(device1.id, now + datetime.timedelta(seconds=1), {'val1': '11', 'val2': '12' })
@@ -530,14 +591,17 @@ class DeviceStatsTestCase(GenericTestCase):
 
     def testLastStatOfOneDevice(self):
         dt1 = self.db.add_device_technology(u"x10", "this is x10", u"cpl")
+        dty1 = self.db.add_device_type('x10 Switch', 'desc1', dt1.id)
         du1 = self.db.add_device_usage("lighting")
         area1 = self.db.add_area('area1','description 1')
         room1 = self.db.add_room('room1', area1.id)
-        device1 = self.db.add_device(d_name='device1', d_address = "A1", d_technology_id = dt1.id, d_type = u"lamp",
-                              d_usage_id = du1.id, d_room_id = room1.id)
+        device1 = self.db.add_device(d_name='device1', d_address = "A1",
+                    d_type_id = dty1.id, d_usage_id = du1.id, d_room_id = room1.id)
         now = datetime.datetime.now()
-        d_stat1_1 = self.db.add_device_stat(device1.id, now, {'val1': '10', 'val2': '10.5' })
-        d_stat1_2 = self.db.add_device_stat(device1.id, now + datetime.timedelta(seconds=1), {'val1': '11', 'val2': '12' })
+        d_stat1_1 = self.db.add_device_stat(device1.id, now,
+                                            {'val1': '10', 'val2': '10.5' })
+        d_stat1_2 = self.db.add_device_stat(device1.id, now + datetime.timedelta(seconds=1),
+                                            {'val1': '11', 'val2': '12' })
 
         stat = self.db.get_last_stat_of_device(device1.id)
         dsv = self.db.list_device_stats_values(stat.id)
@@ -551,22 +615,28 @@ class DeviceStatsTestCase(GenericTestCase):
 
     def testLastStatOfDevices(self):
         dt1 = self.db.add_device_technology(u"x10", "this is x10", u"cpl")
+        dty1 = self.db.add_device_type('x10 Switch', 'desc1', dt1.id)
         du1 = self.db.add_device_usage("lighting")
         area1 = self.db.add_area('area1','description 1')
         room1 = self.db.add_room('room1', area1.id)
-        device1 = self.db.add_device(d_name='device1', d_address = "A1", d_technology_id = dt1.id, d_type = u"lamp",
-                              d_usage_id = du1.id, d_room_id = room1.id)
-        device2 = self.db.add_device(d_name='device2', d_address = "A2", d_technology_id = dt1.id, d_type = u"lamp",
-                              d_usage_id = du1.id, d_room_id = room1.id)
-        device3 = self.db.add_device(d_name='device3', d_address = "A3", d_technology_id = dt1.id, d_type = u"lamp",
-                              d_usage_id = du1.id, d_room_id = room1.id)
-        device4 = self.db.add_device(d_name='device4', d_address = "A4", d_technology_id = dt1.id, d_type = u"lamp",
-                              d_usage_id = du1.id, d_room_id = room1.id)
+        device1 = self.db.add_device(d_name='device1', d_address = "A1",
+                    d_type_id = dty1.id, d_usage_id = du1.id, d_room_id = room1.id)
+        device2 = self.db.add_device(d_name='device2', d_address = "A2",
+                    d_type_id = dty1.id, d_usage_id = du1.id, d_room_id = room1.id)
+        device3 = self.db.add_device(d_name='device3', d_address = "A3",
+                    d_type_id = dty1.id, d_usage_id = du1.id, d_room_id = room1.id)
+        device4 = self.db.add_device(d_name='device4', d_address = "A4",
+                    d_type_id = dty1.id, d_usage_id = du1.id, d_room_id = room1.id)
         now = datetime.datetime.now()
-        d_stat1_1 = self.db.add_device_stat(device1.id, now, {'val1': '10', 'val2': '10.5' })
-        d_stat1_2 = self.db.add_device_stat(device1.id, now + datetime.timedelta(seconds=1), {'val1': '11', 'val2': '12' })
-        d_stat2_1 = self.db.add_device_stat(device2.id, now, {'val1': '40', 'val2': '41' })
-        d_stat3_1 = self.db.add_device_stat(device3.id, now, {'val1': '100', 'val2': '101' })
+        d_stat1_1 = self.db.add_device_stat(device1.id,
+                                            now, {'val1': '10', 'val2': '10.5' })
+        d_stat1_2 = self.db.add_device_stat(device1.id,
+                                            now + datetime.timedelta(seconds=1),
+                                            {'val1': '11', 'val2': '12' })
+        d_stat2_1 = self.db.add_device_stat(device2.id,
+                                            now, {'val1': '40', 'val2': '41' })
+        d_stat3_1 = self.db.add_device_stat(device3.id,
+                                            now, {'val1': '100', 'val2': '101' })
         #l_stats = self.db.list_device_stats(device1.id)
 
         l_stats = self.db.get_last_stat_of_devices([device1.id, device2.id])
@@ -587,13 +657,14 @@ class DeviceStatsTestCase(GenericTestCase):
 
     def testDel(self):
         dt1 = self.db.add_device_technology(u"x10", "this is x10", u"cpl")
+        dty1 = self.db.add_device_type('x10 Switch', 'desc1', dt1.id)
         du1 = self.db.add_device_usage("lighting")
         area1 = self.db.add_area('area1','description 1')
         room1 = self.db.add_room('room1', area1.id)
-        device1 = self.db.add_device(d_name='device1', d_address = "A1", d_technology_id = dt1.id, d_type = u"lamp",
-                              d_usage_id = du1.id, d_room_id = room1.id)
-        device2 = self.db.add_device(d_name='device2', d_address = "A2", d_technology_id = dt1.id, d_type = u"lamp",
-                              d_usage_id = du1.id, d_room_id = room1.id)
+        device1 = self.db.add_device(d_name='device1', d_address = "A1",
+                    d_type_id = dty1.id, d_usage_id = du1.id, d_room_id = room1.id)
+        device2 = self.db.add_device(d_name='device2', d_address = "A2",
+                    d_type_id = dty1.id, d_usage_id = du1.id, d_room_id = room1.id)
         now = datetime.datetime.now()
         d_stat1_1 = self.db.add_device_stat(device1.id, now, {'val1': '10', 'val2': '10.5' })
         d_stat1_2 = self.db.add_device_stat(device1.id, now + datetime.timedelta(seconds=1), {'val1': '11', 'val2': '12' })

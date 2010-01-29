@@ -64,7 +64,7 @@ from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 from domogik.common.configloader import Loader
 from domogik.common.sql_schema import Area, Device, DeviceUsage, DeviceConfig, \
                                       DeviceStats, DeviceStatsValue, DeviceTechnology, DeviceTechnologyConfig, \
-                                      ItemUIConfig, Room, UserAccount, SystemAccount, SystemConfig, \
+                                      DeviceType, ItemUIConfig, Room, UserAccount, SystemAccount, SystemConfig, \
                                       SystemStats, SystemStatsValue, Trigger
 from domogik.common.sql_schema import DEVICE_TECHNOLOGY_LIST, DEVICE_TECHNOLOGY_TYPE_LIST, \
                                       DEVICE_TYPE_LIST, ITEM_TYPE_LIST, UNIT_OF_STORED_VALUE_LIST
@@ -327,6 +327,55 @@ class DbHelper():
             self._session.commit()
 
 ####
+# Device type
+####
+    def list_device_types(self):
+        """
+        Return a list of device types
+        @return a list of DeviceType objects
+        """
+        return self._session.query(DeviceType).all()
+
+    def get_device_type_by_name(self, dty_name):
+        """
+        Return information about a device type
+        @param dty_name : The device type name
+        @return a DeviceType object
+        """
+        return self._session.query(DeviceType).filter_by(name=dty_name).first()
+
+    def add_device_type(self, dty_name, dt_id, dty_description=None):
+        """
+        Add a device_type (x10.Switch, x10.Dimmer, Computer.WOL...)
+        @param dty_name : device type name
+        @param dt_id : technology id (x10, plcbus,...)
+        @param dty_description : device type description (optional)
+        @return a DeviceType (the newly created one)
+        """
+        dty = DeviceType(name=dty_name, description=dty_description, technology_id=dt_id)
+        self._session.add(dty)
+        self._session.commit()
+        return dty
+
+    def del_device_type(self, dty_id, cascade_delete=False):
+        """
+        Delete a device type record
+        @param dc_id : id of the device type to delete
+        """
+        dty = self._session.query(DeviceType).filter_by(id=dty_id).first()
+        if dty:
+            if cascade_delete:
+                for device in self._session.query(Device).filter_by(usage_id=dty.id).all():
+                    self.del_device(device.id)
+            else:
+                device_list = self._session.query(Device).filter_by(usage_id=dty.id).all()
+                if len(device_list) > 0:
+                    raise DbHelperException("Couldn't delete device type %s : there are associated devices" % dty_id)
+
+            self._session.delete(dty)
+            self._session.commit()
+
+####
 # Device technology
 ####
     def list_device_technologies(self):
@@ -368,12 +417,12 @@ class DbHelper():
         dt = self._session.query(DeviceTechnology).filter_by(id=dt_id).first()
         if dt:
             if cascade_delete:
-                for device in self._session.query(Device).filter_by(technology_id=dt.id).all():
-                    self.del_device(device.id)
+                for device_type in self._session.query(DeviceType).filter_by(technology_id=dt.id).all():
+                    self.del_device_type(device_type.id)
             else:
-                device_list = self._session.query(Device).filter_by(technology_id=dt.id).all()
-                if len(device_list) > 0:
-                    raise DbHelperException("Couldn't delete device technology %s : there are associated devices" % dt_id)
+                device_type_list = self._session.query(DeviceType).filter_by(technology_id=dt.id).all()
+                if len(device_type_list) > 0:
+                    raise DbHelperException("Couldn't delete device technology %s : there are associated device types" % dt_id)
             dtc_list = self._session.query(DeviceTechnologyConfig).filter_by(technology_id=dt.id).all()
             for dtc in dtc_list:
                 self.del_device_technology_config(dtc.id)
@@ -527,15 +576,14 @@ class DbHelper():
         """
         return self._session.query(Device).filter_by(technology_id=dt_id).all()
 
-    def add_device(self, d_name, d_address, d_technology_id, d_type, d_usage_id, d_room_id,
+    def add_device(self, d_name, d_address, d_type_id, d_usage_id, d_room_id,
         d_description=None, d_reference=None, d_is_resetable=False, d_initial_value=None,
         d_is_value_changeable_by_user=False, d_unit_of_stored_values=None):
         """
         Add a device item
         @param d_name : name of the device
         @param d_address : address (ex : 'A3' for x10/plcbus, '111.111111111' for 1wire)
-        @param d_technology_id : technology id
-        @param d_type : One of 'appliance','light','music','sensor'
+        @param d_type_id : type id (x10.Switch, x10.Dimmer, Computer.WOL...)
         @param d_usage_id : usage id
         @param d_room_id : room id
         @param d_description : Extended item description (100 char max)
@@ -557,18 +605,12 @@ class DbHelper():
             dc = self._session.query(DeviceUsage).filter_by(id=d_usage_id).one()
         except NoResultFound, e:
             raise DbHelperException("Couldn't add device with usage id %s. It does not exist" % d_usage_id)
-        try:
-            dt = self._session.query(DeviceTechnology).filter_by(id=d_technology_id).one()
-        except NoResultFound, e:
-            raise DbHelperException("Couldn't add device with technology id %s. It does not exist" % d_technology_id)
 
         if d_unit_of_stored_values not in UNIT_OF_STORED_VALUE_LIST:
             raise ValueError, "d_unit_of_stored_values must be one of %s" % UNIT_OF_STORED_VALUE_LIST
-        if d_type not in DEVICE_TYPE_LIST:
-            raise ValueError, "d_type must be one of %s" % DEVICE_TYPE_LIST
 
         device = Device(name=d_name, address=d_address, description=d_description,
-                        reference=d_reference, technology_id=d_technology_id, type=d_type,
+                        reference=d_reference, type_id=d_type_id,
                         usage_id=d_usage_id, room_id=d_room_id,
                         is_resetable=d_is_resetable, initial_value=d_initial_value,
                         is_value_changeable_by_user=d_is_value_changeable_by_user,
@@ -577,7 +619,7 @@ class DbHelper():
         self._session.commit()
         return device
 
-    def update_device(self, d_id, d_name=None, d_address=None, d_technology_id=None, d_type=None,
+    def update_device(self, d_id, d_name=None, d_address=None, d_technology_id=None, d_type_id=None,
         d_usage_id=None, d_room_id=None, d_description=None, d_reference=None, d_is_resetable=None,
         d_initial_value=None, d_is_value_changeable_by_user=None, d_unit_of_stored_values =None):
         """
@@ -587,8 +629,7 @@ class DbHelper():
         @param d_name : device name (optional)
         @param d_address : Item address (ex : 'A3' for x10/plcbus, '111.111111111' for 1wire) (optional)
         @param d_description : Extended item description (optional)
-        @param d_technology : Item technology id (optional)
-        @param d_type : One of 'appliance','light','music','sensor' (optional)
+        @param d_type_id : type id (x10.Switch, x10.Dimmer, Computer.WOL...)
         @param d_usage : Item usage id (optional)
         @param d_room : Item room id (optional)
         @param d_is_resetable : Can the item be reseted to some initial state (optional)
@@ -601,8 +642,6 @@ class DbHelper():
         """
         if d_unit_of_stored_values not in [UNIT_OF_STORED_VALUE_LIST, None]:
             raise ValueError, "d_unit_of_stored_values must be one of %s" % UNIT_OF_STORED_VALUE_LIST
-        if d_type not in [DEVICE_TYPE_LIST, None]:
-            raise ValueError, "d_type must be one of %s" % DEVICE_TYPE_LIST
 
         device = self._session.query(Device).filter_by(id=d_id).first()
         if device is None:
@@ -612,18 +651,12 @@ class DbHelper():
             device.name = d_name
         if d_address is not None:
             device.address = d_address
-        if d_technology_id is not None:
-            try:
-                dt = self._session.query(DeviceTechnology).filter_by(id=d_technology_id).one()
-                device.technology = d_technology_id
-            except NoResultFound, e:
-                raise DbHelperException("Couldn't update device with technology id %s. It does not exist" % d_technology_id)
         if d_description is not None:
             device.description = d_description
         if d_reference is not None:
             device.reference = d_reference
-        if d_type is not None:
-            device.type = d_type
+        if d_type_id is not None:
+            device.type_id = d_type_id
         if d_usage_id is not None:
           try:
               dc = self._session.query(DeviceUsage).filter_by(id=d_usage_id).one()
