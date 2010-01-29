@@ -195,6 +195,8 @@ class DbHelper():
             self.delete_all_item_ui_config(area.id, 'area')
             self._session.delete(area)
             self._session.commit()
+        else:
+            raise DbHelperException("Couldn't delete area id %s : it doesn't exist" % r_area_id)
 
 ####
 # Rooms
@@ -269,6 +271,8 @@ class DbHelper():
             self.delete_all_item_ui_config(room.id, 'room')
             self._session.delete(room)
             self._session.commit()
+        else:
+            raise DbHelperException("Couldn't delete room id %s : it doesn't exist" % r_id)
 
     def get_all_rooms_of_area(self, a_area_id):
         """
@@ -325,6 +329,8 @@ class DbHelper():
 
             self._session.delete(du)
             self._session.commit()
+        else:
+            raise DbHelperException("Couldn't delete device usage id %s : it doesn't exist" % du_id)
 
 ####
 # Device type
@@ -374,6 +380,8 @@ class DbHelper():
 
             self._session.delete(dty)
             self._session.commit()
+        else:
+            raise DbHelperException("Couldn't delete device type id %s : it doesn't exist" % dty_id)
 
 ####
 # Device technology
@@ -429,6 +437,8 @@ class DbHelper():
 
             self._session.delete(dt)
             self._session.commit()
+        else:
+            raise DbHelperException("Couldn't delete device technology id %s : it doesn't exist" % dt_id)
 
 ####
 # Device technology config
@@ -486,9 +496,12 @@ class DbHelper():
         Delete a device technology config record
         @param dtc_id : config item id
         """
-        dt = self._session.query(DeviceTechnologyConfig).filter_by(id=dtc_id).first()
-        self._session.delete(dt)
-        self._session.commit()
+        dtc = self._session.query(DeviceTechnologyConfig).filter_by(id=dtc_id).first()
+        if dtc:
+            self._session.delete(dtc)
+            self._session.commit()
+        else:
+            raise DbHelperException("Couldn't delete device technology config id %s : it doesn't exist" % dtc_id)
 
 ###
 # Devices
@@ -784,8 +797,9 @@ class DbHelper():
             for device_stats_value in self._session.query(DeviceStatsValue) \
                                           .filter_by(device_stats_id=device_stat.id).all():
                 self._session.delete(device_stats_value)
-
             self._session.commit()
+        else:
+            raise DbHelperException("Couldn't delete device stat id %s : it doesn't exist" % ds_id)
 
     def del_all_device_stats(self, d_id):
         """
@@ -799,7 +813,6 @@ class DbHelper():
                                           .filter_by(device_stats_id=device_stat.id).all():
                 self._session.delete(device_stats_value)
             self._session.delete(device_stat)
-
         self._session.commit()
 
 ####
@@ -839,8 +852,11 @@ class DbHelper():
         @param t_id : trigger id
         """
         trigger = self._session.query(Trigger).filter_by(id=t_id).first()
-        self._session.delete(trigger)
-        self._session.commit()
+        if trigger:
+            self._session.delete(trigger)
+            self._session.commit()
+        else:
+            raise DbHelperException("Couldn't delete trigger id %s : it doesn't exist" % t_id)
 
 ####
 # System accounts
@@ -941,8 +957,11 @@ class DbHelper():
         @param a_id : account id
         """
         system_account = self._session.query(SystemAccount).filter_by(id=a_id).first()
-        self._session.delete(system_account)
-        self._session.commit()
+        if system_account:
+            self._session.delete(system_account)
+            self._session.commit()
+        else:
+            raise DbHelperException("Couldn't delete system account id %s : it doesn't exist" % a_id)
 
 ####
 # User accounts
@@ -1001,6 +1020,8 @@ class DbHelper():
                 self.del_system_account(user_account.system_account_id)
             self._session.delete(user_account)
             self._session.commit()
+        else:
+            raise DbHelperException("Couldn't delete user account id %s : it doesn't exist" % u_id)
 
 ####
 # System stats
@@ -1061,6 +1082,8 @@ class DbHelper():
                 self._session.delete(ssv)
             self._session.delete(system_stat)
             self._session.commit()
+        else:
+            raise DbHelperException("Couldn't delete system stat %s : it doesn't exist" % s_name)
 
     def del_all_system_stats(self):
         """
