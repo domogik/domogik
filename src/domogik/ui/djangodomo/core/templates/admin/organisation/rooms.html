@@ -103,11 +103,10 @@ $(function(){
 	$('#btinstructions').click(function() {  
                                         $('#instructions').dialog('open',{closeOnEscape: false});  
                                 });
-                $("#devices").hide();
-                $("button#showdevices").click(function () {
-            $("#devices").toggle();
-        });
 
+	        $("#rooms").hide();
+                $("button#showrooms").click(function () {
+            $("#rooms").toggle();});
 });
 
 {% endblock %}
@@ -135,7 +134,8 @@ $(function(){
                 <button id="addnew" class="button">Créer nouvelle</button>
             </li>
             <li><a href="#" class="button">Tout supprimer</a></li>
-            <li><button id="showdevices" class="button">Dispositifs</a></li>
+            <li><button id="showrooms" class="button">Pièces</a></li>
+
         </ul>
         <div id="addnewdialog" title="Créer nouvelle pièce">
             <p id="validateTips">Tous les champs (sauf description) sont requis.</p>
@@ -146,8 +146,8 @@ $(function(){
                 </fieldset>
             </form>
         </div>
-        <div id="devices">
-            <h2 class="splitter">Dispositifs</h2>
+      <div id="rooms">
+            <h2 class="splitter">Pièces</h2>
             <a href="#" class="action" id="btinstructions">(Instructions Drag &amp; Drop)</a>
             <div id="instructions" title="Instructions Drag &amp; Drop">
                 <h3>Utilisation de la souris</h3>
@@ -160,22 +160,22 @@ $(function(){
                 </ul>
             </div>
             <fieldset class="areadrop">
-                <legend id="roomnah" class="choice">Dispositifs non attribuées</legend>
-                <ul id="roomna" class="draggables">
-                    {% for device in unattribued_devices %}
-                    <li class="draggable" title="{{ device.technology.name }}.{{ device.address }}">{{ device.name }}<span class="description">{{ device.description }}</span></li>
+                <legend id="areanah" class="choice">Pièces non attribuées</legend>
+                <ul id="areana" class="draggables">
+                    {% for room in unattribued_rooms %}
+                    <li class="draggable">{{ room.name }}<span class="description">{{ room.description }}</span></li>
                     {% empty %}
                     <li class="empty">Vide</li>
                     {% endfor %}
                 </ul>
             </fieldset>
-            {% regroup devices_list|dictsort:"room" by room as rooms %}
-            {% for room in rooms %}
+            {% regroup rooms_list|dictsort:"area" by area as areas %}
+            {% for area in areas %}
             <fieldset class="areadrop">
-                <legend id="room{{ room.grouper.id }}h" class="choice">{{ room.grouper.name }}</legend>
-                <ul id="room{{ room.grouper.id }}" class="draggables">
-                    {% for device in room.list %}
-                    <li class="draggable" title="{{ device.technology.name }}.{{device.address }}">{{ device.name }}<span class="description">{{ device.description }}</span></li>
+                <legend id="area{{ area.grouper.id }}h" class="choice">{{ area.grouper.name }}</legend>
+                <ul id="area{{ area.grouper.id }}" class="draggables">
+                    {% for room in area.list %}
+                    <li class="draggable">{{ room.name }}<span class="description">{{ room.description }}</span></li>
                     {% empty %}
                     <li class="empty">Vide</li>
                     {% endfor %}
