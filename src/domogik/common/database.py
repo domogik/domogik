@@ -191,7 +191,7 @@ class DbHelper():
         if area:
             if cascade_delete:
                 for room in self._session.query(Room).filter_by(area_id=area_del_id).all():
-                    self.del_room(room.id)
+                    self.del_room(room.id, True)
             self.delete_all_item_ui_config(area.id, 'area')
             self._session.delete(area)
             self._session.commit()
