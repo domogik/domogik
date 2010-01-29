@@ -33,6 +33,7 @@ Unit test class for the database API
 
 
 import unittest
+from unittest import TestCase
 import time
 import datetime
 
@@ -187,6 +188,11 @@ class AreaTestCase(GenericTestCase):
         area0 = self.db.add_area('area0','description 0')
         self.db.del_area(area0.id)
         assert not self.has_item(self.db.list_areas(), ['area0']), "area0 was NOT deleted"
+        try:
+            self.db.del_area(12345678910)
+            TestCase.fail(self, "Area does not exist, an exception should have been raised")
+        except DbHelperException:
+            pass
 
 
 class RoomTestCase(GenericTestCase):
@@ -224,6 +230,11 @@ class RoomTestCase(GenericTestCase):
         self.db.del_room(room1.id)
         assert not self.has_item(self.db.list_rooms(), ['room1']), "room1 was NOT deleted"
         assert self.has_item(self.db.list_rooms(), ['room2', 'room3']), "rooms were deleted but shouldn't have been"
+        try:
+            self.db.del_room(12345678910)
+            TestCase.fail(self, "Room does not exist, an exception should have been raised")
+        except DbHelperException:
+            pass
 
     def testGetRoomByName(self):
         area1 = self.db.add_area('area1','description 1')
@@ -274,6 +285,11 @@ class DeviceUsageTestCase(GenericTestCase):
         self.db.del_device_usage(du2.id)
         assert self.has_item(self.db.list_device_usages(), ['du1']), "Couldn't find 'du1'"
         assert not self.has_item(self.db.list_device_usages(), ['du2']), "'du2' was NOT deleted"
+        try:
+            self.db.del_device_usage(12345678910)
+            TestCase.fail(self, "Device usage does not exist, an exception should have been raised")
+        except DbHelperException:
+            pass
 
 class DeviceTypeTestCase(GenericTestCase):
     """
@@ -311,6 +327,11 @@ class DeviceTypeTestCase(GenericTestCase):
         self.db.del_device_type(dty2.id)
         assert self.has_item(self.db.list_device_types(), ['x10 Switch']), "Couldn't find 'x10 Switch'"
         assert not self.has_item(self.db.list_device_usages(), ['x10 Dimmer']), "'x10 Dimmer' was NOT deleted"
+        try:
+            self.db.del_device_type(12345678910)
+            TestCase.fail(self, "Device type does not exist, an exception should have been raised")
+        except DbHelperException:
+            pass
 
 class DeviceTechnologyTestCase(GenericTestCase):
     """
@@ -348,6 +369,11 @@ class DeviceTechnologyTestCase(GenericTestCase):
         self.db.del_device_technology(dt2.id)
         assert self.has_item(self.db.list_device_technologies(), [u'x10', u'PLCBus']), "Couldn't find 'x10' and 'PLCBus'"
         assert not self.has_item(self.db.list_device_technologies(), [u'1wire']), "'1wire' was NOT deleted"
+        try:
+            self.db.del_device_technology(12345678910)
+            TestCase.fail(self, "Device technology does not exist, an exception should have been raised")
+        except DbHelperException:
+            pass
 
 class DeviceTechnologyConfigTestCase(GenericTestCase):
     """
@@ -408,7 +434,11 @@ class DeviceTechnologyConfigTestCase(GenericTestCase):
         dtc3_3 = self.db.add_device_technology_config(dt3.id, 'key3_3', 'val3_3', 'desc5')
         self.db.del_device_technology_config(dtc3_2.id)
         assert self.db.get_device_technology_config(dt3.id, 'key3_2') == None, "key3_2 was NOT deleted"
-
+        try:
+            self.db.del_device_technology_config(12345678910)
+            TestCase.fail(self, "Device technology config does not exist, an exception should have been raised")
+        except DbHelperException:
+            pass
 
 class DeviceTestCase(GenericTestCase):
     """
@@ -541,6 +571,11 @@ class DeviceTestCase(GenericTestCase):
         assert len(self.db.list_devices()) == 2, "Found %s device(s), should be %s" % (self.db.list_devices(), 1)
         assert self.db.list_devices()[0].address == 'A1', \
               "Device should have 'A1' address but has : %s instead" % self.db.list_devices()[0].address
+        try:
+            self.db.del_device(12345678910)
+            TestCase.fail(self, "Device does not exist, an exception should have been raised")
+        except DbHelperException:
+            pass
 
 
 class DeviceStatsTestCase(GenericTestCase):
@@ -708,6 +743,11 @@ class TriggersTestCase(GenericTestCase):
         for trigger in self.db.list_triggers():
             self.db.del_trigger(trigger.id)
         assert len(self.db.list_triggers()) == 0, "Trigger list should be empty, but it has % item(s)" % len(self.db.list_triggers())
+        try:
+            self.db.del_trigger(12345678910)
+            TestCase.fail(self, "Trigger does not exist, an exception should have been raised")
+        except DbHelperException:
+            pass
 
 
 class UserAndSystemAccountsTestCase(GenericTestCase):
@@ -808,7 +848,16 @@ class UserAndSystemAccountsTestCase(GenericTestCase):
         assert len(l_sys) > 0, "The list is empty but it shouldn't"
         for sys in l_sys:
             assert sys.login != 'mschneider', "System account with 'mschneider' login was NOT deleted"
-
+        try:
+            self.db.del_user_account(12345678910)
+            TestCase.fail(self, "User account does not exist, an exception should have been raised")
+        except DbHelperException:
+            pass
+        try:
+            self.db.del_system_account(12345678910)
+            TestCase.fail(self, "System account does not exist, an exception should have been raised")
+        except DbHelperException:
+            pass
 
 class SystemStatsTestCase(GenericTestCase):
     """
@@ -857,6 +906,11 @@ class SystemStatsTestCase(GenericTestCase):
                                 now + datetime.timedelta(seconds=i), ssv))
         self.db.del_system_stat("sstat0")
         assert len(self.db.list_system_stats()) == 3, "List of system stats should have 3 items : %s" % self.db.list_system_stats()
+        try:
+            self.db.del_system_stat("i_dont_exist")
+            TestCase.fail(self, "System stat does not exist, an exception should have been raised")
+        except DbHelperException:
+            pass
         self.db.del_all_system_stats()
         assert len(self.db.list_system_stats()) == 0, "System statistics should be empty, but it is NOT"
         ssv = self.db._session.query(SystemStatsValue).all()
