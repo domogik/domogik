@@ -66,38 +66,13 @@ def index(request):
     page_title = _("Control overview")
     sys_config = _db.get_system_config()
 
-    #device_list = _db.list_devices()
-    """
-    if request.method == 'POST':
-        # An action was submitted
-        cmd = QueryDict.get(request.POST, "cmd", "")
-        if cmd == "filter":
-            # Get all possible rooms
-            possible_room_id_list = []
-            for area_id in QueryDict.getlist(request.POST, "area_id"):
-                room_list = _db.get_all_rooms_of_area(area_id)
-                for room in room_list:
-                    if room.id not in possible_room_id_list:
-                        possible_room_id_list.append(room.id)
-            room_id_list = []
-            for room_id in QueryDict.getlist(request.POST, "room_id"):
-                if room_id in possible_room_id_list or len(possible_room_id_list) == 0:
-                    room_id_list.append(room_id)
-
-            if len(room_id_list) == 0:
-                room_id_list = possible_room_id_list
-            device_category_id_list = QueryDict.getlist(request.POST, "device_category_id")
-            device_list = _db.find_devices(room_id_list, device_category_id_list)
-        elif cmd == "update_values":
-            _update_device_values(request, sys_config)
-    """
-    #area_list = _db.list_areas()
     room_list = _db.list_rooms()
     device_list = []
     for device in _db.list_devices():
       device_list.append({'room': device.room_id, 'device': device})
 
-    return _go_to_page(request, 'index.html', page_title, room_list=room_list, device_list=device_list)
+    return _go_to_page(request, 'index.html', page_title, room_list=room_list,
+                       device_list=device_list)
 
 def device(request, device_id):
     """
@@ -120,7 +95,8 @@ def device(request, device_id):
     if _db.device_has_stats(device_id):
         has_stats = "True"
 
-    return _go_to_page(request, 'device.html', page_title, device=device, has_stats=has_stats)
+    return _go_to_page(request, 'device.html', page_title, device=device,
+                       has_stats=has_stats)
 
 def device_stats(request, device_id):
     """
@@ -150,8 +126,9 @@ def device_stats(request, device_id):
               device_stats_list.append(device_stat)
     else:
         device_stats_list = _db.list_device_stats(device_id)
-    return _go_to_page(request, 'device_stats.html', page_title, device_id=device_id,
-                      device_stats_list=device_stats_list, device_all=device_all)
+    return _go_to_page(request, 'device_stats.html', page_title,
+                       device_id=device_id, device_stats_list=device_stats_list,
+                       device_all=device_all)
 
 def login(request):
     """
@@ -186,11 +163,13 @@ def login(request):
             # User not found, ask again to log in
             account_list = _db.list_system_accounts()
             error_msg = _("Sorry unable to log in. Please check login name / password and try again.")
-            return _go_to_page(request, 'login.html', page_title, account_list=account_list, error_msg=error_msg)
+            return _go_to_page(request, 'login.html', page_title,
+                               account_list=account_list, error_msg=error_msg)
     else:
         # User asked to log in
         account_list = _db.list_system_accounts()
-        return _go_to_page(request, 'login.html', page_title, account_list=account_list)
+        return _go_to_page(request, 'login.html', page_title,
+                           account_list=account_list)
 
 def logout(request):
     """
@@ -232,9 +211,9 @@ def admin_management_domogik(request):
         admin_mode = "checked"
     if sys_config.debug_mode:
         debug_mode = "checked"
-    return _go_to_page(request, _ADMIN_MANAGEMENT_DOMOGIK, page_title, action=action,
-                      simulation_mode=simulation_mode, admin_mode=admin_mode,
-                      debug_mode=debug_mode)
+    return _go_to_page(request, _ADMIN_MANAGEMENT_DOMOGIK, page_title,
+                       action=action, simulation_mode=simulation_mode,
+                       admin_mode=admin_mode, debug_mode=debug_mode)
 
 def admin_management_modules(request):
     """
@@ -260,7 +239,8 @@ def save_admin_settings(request):
         simulation_mode = QueryDict.get(request.POST, "simulation_mode", False)
         admin_mode = QueryDict.get(request.POST, "admin_mode", False)
         debug_mode = QueryDict.get(request.POST, "debug_mode", False)
-        _db.update_system_config(s_simulation_mode=simulation_mode, s_debug_mode=debug_mode)
+        _db.update_system_config(s_simulation_mode=simulation_mode,
+                                 s_debug_mode=debug_mode)
     return admin_management_domogik(request)
 
 def load_sample_data(request):
@@ -278,7 +258,8 @@ def load_sample_data(request):
     sys_config = _db.get_system_config()
     if sys_config.simulation_mode != True:
         error_msg = _("The application is not running in simulation mode : can't load sample data")
-        return _go_to_page(request, _ADMIN_MANAGEMENT_DOMOGIK, page_title, action=action, error_msg=error_msg)
+        return _go_to_page(request, _ADMIN_MANAGEMENT_DOMOGIK,
+                           page_title, action=action, error_msg=error_msg)
 
     sample_data_helper = SampleDataHelper(_db)
     sample_data_helper.create()
@@ -288,10 +269,10 @@ def load_sample_data(request):
     device_usage_list = _db.list_device_usages()
     device_list = _db.list_devices()
     device_tech_list = _db.list_device_technologies()
-    return _go_to_page(request, _ADMIN_MANAGEMENT_DOMOGIK, page_title, action=action,
-                      area_list=area_list, room_list=room_list,
-                      device_usage_list=device_usage_list,
-                      device_list=device_list, device_tech_list=device_tech_list)
+    return _go_to_page(request, _ADMIN_MANAGEMENT_DOMOGIK, page_title,
+                       action=action, area_list=area_list, room_list=room_list,
+                       device_usage_list=device_usage_list,
+                       device_list=device_list, device_tech_list=device_tech_list)
 
 def clear_data(request):
     """
@@ -308,17 +289,20 @@ def clear_data(request):
     sys_config = _db.get_system_config()
     if sys_config.simulation_mode != True:
         error_msg = _("The application is not running in simulation mode : can't clear data")
-        return _go_to_page(request, _ADMIN_MANAGEMENT_DOMOGIK, page_title, action=action, error_msg=error_msg)
+        return _go_to_page(request, _ADMIN_MANAGEMENT_DOMOGIK, page_title,
+                           action=action, error_msg=error_msg)
 
     sample_data_helper = SampleDataHelper(_db)
     sample_data_helper.remove()
-    return _go_to_page(request, _ADMIN_MANAGEMENT_DOMOGIK, page_title, action=action)
+    return _go_to_page(request, _ADMIN_MANAGEMENT_DOMOGIK, page_title,
+                       action=action)
 
 def _update_device_values(request, sys_config):
     """
     Update device values
     @param request : the HTTP request
-    @param sys_config : a SystemConfig object (parameters for system configuration)
+    @param sys_config : a SystemConfig object
+                        (parameters for system configuration)
     """
     if not _is_user_connected(request):
         return
@@ -330,7 +314,8 @@ def _update_device_values(request, sys_config):
         value_list = QueryDict.getlist(request.POST, "value%s" % device_id)
         for i in range(len(value_list)):
             if value_list[i]:
-                _send_value_to_device(request, device_id, value_list[i], sys_config)
+                _send_value_to_device(request, device_id, value_list[i],
+                                      sys_config)
 
 def _send_value_to_device(request, device_id, new_value, sys_config):
     """
@@ -342,7 +327,8 @@ def _send_value_to_device(request, device_id, new_value, sys_config):
     @param request : HTTP request
     @param device_id : device id
     @param new_value : value sent to the device
-    @param sys_config : a SystemConfig object (parameters for system configuration)
+    @param sys_config : a SystemConfig object
+                        (parameters for system configuration)
     """
     if not _is_user_connected(request):
         return
@@ -353,7 +339,8 @@ def _send_value_to_device(request, device_id, new_value, sys_config):
     old_value = device.get_last_value()
     if old_value != new_value:
         if device.technology.name.lower() == 'x10':
-            error = _send_x10_cmd(request, device, old_value, new_value, sys_config.simulation_mode)
+            error = _send_x10_cmd(request, device, old_value, new_value,
+                                  sys_config.simulation_mode)
 
         if error == "":
             if device.is_lamp():
@@ -391,7 +378,8 @@ def _send_x10_cmd(request, device, old_value, new_value, simulation_mode):
             else:
                 cmd = "dim"
             level = abs(int(new_value)-int(old_value))
-            xPL_param = "command=%s,device=%s,level=%s" % (cmd, device.address, str(level))
+            xPL_param = "command=%s,device=%s,level=%s" \
+                        % (cmd, device.address, str(level))
 
     print "**** xPLParam = %s" %xPL_param
     if not simulation_mode:
@@ -404,7 +392,8 @@ def _write_device_stats(device_id, new_value):
     @param device_id : device id
     @param new_value : new value associated to the device
     """
-    _db.add_device_stat(d_id=device_id, ds_date=datetime.datetime.now(), ds_value=new_value)
+    _db.add_device_stat(d_id=device_id, ds_date=datetime.datetime.now(),
+                        ds_value=new_value)
 
 def _clear_device_stats(request, device_id):
     """
@@ -426,7 +415,8 @@ def _go_to_page(request, html_page, page_title, **attribute_list):
     @param request : HTTP request
     @param html_page : the page to go to
     @param page_title : page title
-    @param **attribute_list : list of attributes (dictionnary) that need to be put in the HTTP response
+    @param **attribute_list : list of attributes (dictionnary) that need to be
+           put in the HTTP response
     @return an HttpResponse object
     """
     response_attr_list = {}
@@ -435,7 +425,8 @@ def _go_to_page(request, html_page, page_title, **attribute_list):
     response_attr_list['is_user_connected'] = _is_user_connected(request)
     for attribute in attribute_list:
         response_attr_list[attribute] = attribute_list[attribute]
-    return render_to_response(html_page, response_attr_list, context_instance=RequestContext(request))
+    return render_to_response(html_page, response_attr_list,
+                              context_instance=RequestContext(request))
 
 def _get_user_connected(request):
     """
@@ -517,7 +508,8 @@ def admin_organisation_rooms(request):
     devices_list = _db.list_devices()
     rooms_list = _db.list_rooms()
     areas_list = _db.list_areas()
-    icons_room = ["default", "kitchen", "bedroom", "livingroom", "tvlounge", "bathroom"]
+    icons_room = ["default", "kitchen", "bedroom", "livingroom", "tvlounge",
+                  "bathroom"]
     page_title = _("Organisation des pieces")
     return _go_to_page(
         request, 'admin/organisation/rooms.html',
