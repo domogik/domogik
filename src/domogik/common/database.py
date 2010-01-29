@@ -597,15 +597,6 @@ class DbHelper():
                 must be one of 'Volt', 'Celsius', 'Fahrenheit', 'Percent', 'Boolean' (optional, default=None)
         @return the new Device object
         """
-        try:
-            room = self._session.query(Room).filter_by(id=d_room_id).one()
-        except NoResultFound, e:
-            raise DbHelperException("Couldn't add device with room id %s. It does not exist" % d_room_id)
-        try:
-            dc = self._session.query(DeviceUsage).filter_by(id=d_usage_id).one()
-        except NoResultFound, e:
-            raise DbHelperException("Couldn't add device with usage id %s. It does not exist" % d_usage_id)
-
         if d_unit_of_stored_values not in UNIT_OF_STORED_VALUE_LIST:
             raise ValueError, "d_unit_of_stored_values must be one of %s" % UNIT_OF_STORED_VALUE_LIST
 
