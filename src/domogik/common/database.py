@@ -1203,6 +1203,7 @@ class DbHelper():
         @param i_item_id : id of the item we want to update the parameter
         @param i_item_type : type of the item (area, room, device)
         @param i_key : key we want to get the value
+        @return an ItemUIConfig object
         """
         if i_item_type not in ITEM_TYPE_LIST:
             raise DbHelperException("Unknown item type '%s', should be one of : %s" \
