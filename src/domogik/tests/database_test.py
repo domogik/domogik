@@ -5,7 +5,6 @@
 
 License
 =======
-
 B{Domogik} is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
@@ -186,8 +185,10 @@ class AreaTestCase(GenericTestCase):
 
     def testDel(self):
         area0 = self.db.add_area('area0','description 0')
-        self.db.del_area(area0.id)
+        area0_id = area0.id
+        area_d = self.db.del_area(area0.id)
         assert not self.has_item(self.db.list_areas(), ['area0']), "area0 was NOT deleted"
+        assert area_d.id == area0.id, "The returned area is not the one that was deleted"
         try:
             self.db.del_area(12345678910)
             TestCase.fail(self, "Area does not exist, an exception should have been raised")
@@ -227,9 +228,11 @@ class RoomTestCase(GenericTestCase):
         room1 = self.db.add_room(r_name='room1', r_description='description 1', r_area_id=area1.id)
         room2 = self.db.add_room(r_name='room2', r_description='description 2', r_area_id=area1.id)
         room3 = self.db.add_room(r_name='room3', r_description='description 3', r_area_id=area2.id)
-        self.db.del_room(room1.id)
+        room1_id = room1.id
+        room_deleted = self.db.del_room(room1.id)
         assert not self.has_item(self.db.list_rooms(), ['room1']), "room1 was NOT deleted"
         assert self.has_item(self.db.list_rooms(), ['room2', 'room3']), "rooms were deleted but shouldn't have been"
+        assert room_deleted.id == room1_id, "Returned room was not the one that was deleted"
         try:
             self.db.del_room(12345678910)
             TestCase.fail(self, "Room does not exist, an exception should have been raised")
@@ -282,9 +285,11 @@ class DeviceUsageTestCase(GenericTestCase):
     def testDel(self):
         du1 = self.db.add_device_usage('du1')
         du2 = self.db.add_device_usage('du2')
-        self.db.del_device_usage(du2.id)
+        du2_id = du2.id
+        du_del = self.db.del_device_usage(du2.id)
         assert self.has_item(self.db.list_device_usages(), ['du1']), "Couldn't find 'du1'"
         assert not self.has_item(self.db.list_device_usages(), ['du2']), "'du2' was NOT deleted"
+        assert du_del.id == du2_id, "Returned DeviceUsage is not the one that was deleted"
         try:
             self.db.del_device_usage(12345678910)
             TestCase.fail(self, "Device usage does not exist, an exception should have been raised")
@@ -324,9 +329,11 @@ class DeviceTypeTestCase(GenericTestCase):
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1', u'cpl')
         dty1 = self.db.add_device_type('x10 Switch', dt1.id)
         dty2 = self.db.add_device_type('x10 Dimmer', dt1.id)
-        self.db.del_device_type(dty2.id)
+        dty2_id = dty2.id
+        dty_del = self.db.del_device_type(dty2.id)
         assert self.has_item(self.db.list_device_types(), ['x10 Switch']), "Couldn't find 'x10 Switch'"
         assert not self.has_item(self.db.list_device_usages(), ['x10 Dimmer']), "'x10 Dimmer' was NOT deleted"
+        assert dty_del.id == dty2_id, "The returned DeviceType is not the one that was deleted"
         try:
             self.db.del_device_type(12345678910)
             TestCase.fail(self, "Device type does not exist, an exception should have been raised")
@@ -365,10 +372,13 @@ class DeviceTechnologyTestCase(GenericTestCase):
     def testDel(self):
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1', u'cpl')
         dt2 = self.db.add_device_technology(u'1wire', 'desc dt2', u'wired')
+        dt_del = dt2
+        dt2_id = dt2.id
         dt3 = self.db.add_device_technology(u'PLCBus', 'desc dt3', u'cpl')
         self.db.del_device_technology(dt2.id)
         assert self.has_item(self.db.list_device_technologies(), [u'x10', u'PLCBus']), "Couldn't find 'x10' and 'PLCBus'"
         assert not self.has_item(self.db.list_device_technologies(), [u'1wire']), "'1wire' was NOT deleted"
+        assert dt_del.id == dt2_id, "The returned DeviceTechnology object is not the one that was deleted"
         try:
             self.db.del_device_technology(12345678910)
             TestCase.fail(self, "Device technology does not exist, an exception should have been raised")
@@ -432,8 +442,10 @@ class DeviceTechnologyConfigTestCase(GenericTestCase):
         dtc3_1 = self.db.add_device_technology_config(dt3.id, 'key3_1', 'val3_1', 'desc3')
         dtc3_2 = self.db.add_device_technology_config(dt3.id, 'key3_2', 'val3_2', 'desc4')
         dtc3_3 = self.db.add_device_technology_config(dt3.id, 'key3_3', 'val3_3', 'desc5')
-        self.db.del_device_technology_config(dtc3_2.id)
+        dtc3_2_id = dtc3_2.id
+        dtc_del = self.db.del_device_technology_config(dtc3_2.id)
         assert self.db.get_device_technology_config(dt3.id, 'key3_2') == None, "key3_2 was NOT deleted"
+        assert dtc_del.id == dtc3_2_id, "The return DeviceTechnologyConfig object was not the one that was deleted"
         try:
             self.db.del_device_technology_config(12345678910)
             TestCase.fail(self, "Device technology config does not exist, an exception should have been raised")
@@ -567,10 +579,13 @@ class DeviceTestCase(GenericTestCase):
                     d_type_id = dty1.id, d_usage_id=du1.id, d_room_id=room1.id)
         device3 = self.db.add_device(d_name='device3', d_address='A3',
                     d_type_id = dty1.id, d_usage_id=du2.id, d_room_id=room2.id)
+        device_del = device2
+        device2_id = device2.id
         self.db.del_device(device2.id)
         assert len(self.db.list_devices()) == 2, "Found %s device(s), should be %s" % (self.db.list_devices(), 1)
         assert self.db.list_devices()[0].address == 'A1', \
               "Device should have 'A1' address but has : %s instead" % self.db.list_devices()[0].address
+        assert device_del.id == device2.id, "The return Device object is not the one that was deleted"
         try:
             self.db.del_device(12345678910)
             TestCase.fail(self, "Device does not exist, an exception should have been raised")
@@ -704,7 +719,9 @@ class DeviceStatsTestCase(GenericTestCase):
         d_stat1_1 = self.db.add_device_stat(device1.id, now, {'val1': '10', 'val2': '10.5' })
         d_stat1_2 = self.db.add_device_stat(device1.id, now + datetime.timedelta(seconds=1), {'val1': '11', 'val2': '12' })
         d_stat2_1 = self.db.add_device_stat(device2.id, now, {'val1': '40', 'val2': '41' })
-        self.db.del_all_device_stats(device1.id)
+        l_stats = self.db.list_device_stats(device1.id)
+        d_stats_list_d = self.db.del_all_device_stats(device1.id)
+        assert len(d_stats_list_d) == len(l_stats), "Returned length of device stats deleted differs from the one that was deleted (%s != %s)" % (d_stats_list_d, l_stats)
         l_stats = self.db.list_device_stats(device1.id)
         assert len(l_stats) == 0, "List of stats should be empty for device1, but it has %s items" % len(l_stats)
         l_stats = self.db.list_device_stats(device2.id)
@@ -741,7 +758,10 @@ class TriggersTestCase(GenericTestCase):
         trigger2 = self.db.add_trigger(t_description = 'desc2',
                                 t_rule = 'OR(x,AND(y,z))', t_result= ['x10_on("a2")','1wire()'])
         for trigger in self.db.list_triggers():
+            trigger_id = trigger.id
+            trigger_del = trigger
             self.db.del_trigger(trigger.id)
+            assert trigger_del.id == trigger.id, "The returned Trigger is not the one that was deleted"
         assert len(self.db.list_triggers()) == 0, "Trigger list should be empty, but it has % item(s)" % len(self.db.list_triggers())
         try:
             self.db.del_trigger(12345678910)
@@ -832,12 +852,16 @@ class UserAndSystemAccountsTestCase(GenericTestCase):
                                   u_system_account_id = sys1.id)
         user2 = self.db.add_user_account(u_first_name='Monthy', u_last_name='PYTHON', u_birthdate=datetime.date(1981, 4, 24))
         sys_temp = self.db.add_system_account(a_login = 'fantom', a_password = 'as', a_is_admin = False)
-        self.db.del_system_account(sys_temp.id)
+        sys_temp_id = sys_temp.id
+        sys_acc_del = self.db.del_system_account(sys_temp.id)
+        assert sys_acc_del.id == sys_temp.id, "The return SystemAccount is not the one that was deleted"
         l_sys = self.db.list_system_accounts()
         assert len(l_sys) > 0, "The list is empty but it shouldn't"
         for sys in l_sys:
             assert sys.login != 'fantom', "System account with 'fantom' login was NOT deleted"
-        self.db.del_user_account(user1.id)
+        user1_acc_id = user1.id
+        user_acc_del = self.db.del_user_account(user1.id)
+        assert user_acc_del.id == user1_acc_id, "The return UserAccount is not the one that was deleted"
         found_user2 = False
         for user in self.db.list_user_accounts():
             assert user.id != user1.id, "User %s was NOT deleted" % user1.id
@@ -904,14 +928,17 @@ class SystemStatsTestCase(GenericTestCase):
             ssv = {'ssv1': (i*2), 'ssv2': (i*3),}
             sstat_list.append(self.db.add_system_stat("sstat%s" %i, 'localhost',
                                 now + datetime.timedelta(seconds=i), ssv))
-        self.db.del_system_stat("sstat0")
+        sstat_del = self.db.del_system_stat("sstat0")
+        assert sstat_del.name == "sstat0", "The returned SystemStats is not the one that was deleted"
         assert len(self.db.list_system_stats()) == 3, "List of system stats should have 3 items : %s" % self.db.list_system_stats()
         try:
             self.db.del_system_stat("i_dont_exist")
             TestCase.fail(self, "System stat does not exist, an exception should have been raised")
         except DbHelperException:
             pass
-        self.db.del_all_system_stats()
+        ss_list = self.db.list_system_stats() 
+        ss_list_del = self.db.del_all_system_stats()
+        assert len(ss_list) == len(ss_list_del), "The returned SystemStats list is not the one that was deleted"
         assert len(self.db.list_system_stats()) == 0, "System statistics should be empty, but it is NOT"
         ssv = self.db._session.query(SystemStatsValue).all()
         assert len(ssv) == 0, "System statistic values should be empty, but it is NOT"
@@ -972,11 +999,11 @@ class ItemUIConfigTestCase(GenericTestCase):
         room1 = self.db.add_room('room1', area1.id)
         self.db.add_item_ui_config(area1.id, 'area', {'param_a1':'value_a1', 'param_a2':'value_a2'})
         self.db.add_item_ui_config(room1.id, 'room', {'param_r1':'value_r1', 'param_r2':'value_r2'})
-        self.db.add_item_ui_config(area1.id, 'area', {'param_a3':'value_a3'})
-        self.db.delete_item_ui_config(area1.id, 'area', 'param_a3')
+        self.db.delete_item_ui_config(area1.id, 'area', 'param_a2')
         assert 'param_a1' in self.db.list_item_ui_config(area1.id, 'area').keys(), "param_a1 should have been found"
         assert 'param_a3' not in self.db.list_item_ui_config(area1.id, 'area').keys(), "param_a3 should NOT have been found"
-        self.db.delete_all_item_ui_config(area1.id, 'area')
+        item_ui_config_list = self.db.list_item_ui_config(area1.id, 'area')
+        item_ui_config_del_list = self.db.delete_all_item_ui_config(area1.id, 'area')
         assert len(self.db.list_item_ui_config(area1.id, 'area')) == 0, "No parameter should have been found"
 
 

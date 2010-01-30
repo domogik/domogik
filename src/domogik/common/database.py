@@ -174,7 +174,7 @@ class DbHelper():
         Add an area
         @param a_name : area name
         @param a_description : area detailed description (optional)
-        @return an area object
+        @return an Area object
         """
         area = Area(name=a_name, description=a_description)
         self._session.add(area)
@@ -186,15 +186,18 @@ class DbHelper():
         Delete an area record
         @param area_id : id of the area to delete
         @param cascade_delete : True if we wish to delete associated items
+        @return the deleted Area object
         """
         area = self._session.query(Area).filter_by(id=area_del_id).first()
         if area:
+            area_d = area
             if cascade_delete:
                 for room in self._session.query(Room).filter_by(area_id=area_del_id).all():
                     self.del_room(room.id, True)
             self.delete_all_item_ui_config(area.id, 'area')
             self._session.delete(area)
             self._session.commit()
+            return area_d
         else:
             raise DbHelperException("Couldn't delete area id %s : it doesn't exist" % area_del_id)
 
@@ -262,15 +265,18 @@ class DbHelper():
         Delete a room record
         @param r_id : id of the room to delete
         @param cascade_delete : True if we wish to delete associated items
+        @return the deleted Room object
         """
         room = self._session.query(Room).filter_by(id=r_id).first()
         if room:
+            room_d = room
             if cascade_delete:
                 for device in self._session.query(Device).filter_by(room_id=r_id).all():
                     self.del_device(device.id)
             self.delete_all_item_ui_config(room.id, 'room')
             self._session.delete(room)
             self._session.commit()
+            return room_d
         else:
             raise DbHelperException("Couldn't delete room id %s : it doesn't exist" % r_id)
 
@@ -316,9 +322,11 @@ class DbHelper():
         """
         Delete a device usage record
         @param dc_id : id of the device usage to delete
+        @return the deleted DeviceUsage object
         """
         du = self._session.query(DeviceUsage).filter_by(id=du_id).first()
         if du:
+            du_d = du
             if cascade_delete:
                 for device in self._session.query(Device).filter_by(usage_id=du.id).all():
                     self.del_device(device.id)
@@ -329,6 +337,7 @@ class DbHelper():
 
             self._session.delete(du)
             self._session.commit()
+            return du_d
         else:
             raise DbHelperException("Couldn't delete device usage id %s : it doesn't exist" % du_id)
 
@@ -367,9 +376,11 @@ class DbHelper():
         """
         Delete a device type record
         @param dc_id : id of the device type to delete
+        @return the deleted DeviceType object
         """
         dty = self._session.query(DeviceType).filter_by(id=dty_id).first()
         if dty:
+            dty_d = dty
             if cascade_delete:
                 for device in self._session.query(Device).filter_by(usage_id=dty.id).all():
                     self.del_device(device.id)
@@ -380,6 +391,7 @@ class DbHelper():
 
             self._session.delete(dty)
             self._session.commit()
+            return dty_d
         else:
             raise DbHelperException("Couldn't delete device type id %s : it doesn't exist" % dty_id)
 
@@ -421,9 +433,11 @@ class DbHelper():
         """
         Delete a device technology record
         @param dt_id : id of the device technology to delete
+        @return the deleted DeviceTechnology object
         """
         dt = self._session.query(DeviceTechnology).filter_by(id=dt_id).first()
         if dt:
+            dt_d = dt
             if cascade_delete:
                 for device_type in self._session.query(DeviceType).filter_by(technology_id=dt.id).all():
                     self.del_device_type(device_type.id)
@@ -437,6 +451,7 @@ class DbHelper():
 
             self._session.delete(dt)
             self._session.commit()
+            return dt_d
         else:
             raise DbHelperException("Couldn't delete device technology id %s : it doesn't exist" % dt_id)
 
@@ -495,11 +510,14 @@ class DbHelper():
         """
         Delete a device technology config record
         @param dtc_id : config item id
+        @return the deleted DeviceTechnologyConfig object
         """
         dtc = self._session.query(DeviceTechnologyConfig).filter_by(id=dtc_id).first()
         if dtc:
+            dtc_d = dtc
             self._session.delete(dtc)
             self._session.commit()
+            return dtc_d
         else:
             raise DbHelperException("Couldn't delete device technology config id %s : it doesn't exist" % dtc_id)
 
@@ -691,11 +709,13 @@ class DbHelper():
         Delete a device
         Warning : this deletes also the associated objects (DeviceConfig, DeviceStats, DeviceStatsValue)
         @param d_id : item id
+        @return the deleted Device object
         """
         device = self.get_device(d_id)
         if device is None:
             raise DbHelperException("Device with id %s couldn't be found" % d_id)
 
+        device_d = device
         for device_conf in self._session.query(DeviceConfig).filter_by(device_id=d_id).all():
             self._session.delete(device_conf)
 
@@ -707,6 +727,7 @@ class DbHelper():
         self.delete_all_item_ui_config(device.id, 'device')
         self._session.delete(device)
         self._session.commit()
+        return device_d
 
 ####
 # Device stats
@@ -790,14 +811,17 @@ class DbHelper():
         """
         Delete a stat record
         @param ds_id : record id
+        @return the deleted DeviceStat object
         """
         device_stat = self._session.query(DeviceStats).filter_by(id=ds_id).first()
         if device_stat:
+            device_stat_d = device_stat
             self._session.delete(device_stat)
             for device_stats_value in self._session.query(DeviceStatsValue) \
                                           .filter_by(device_stats_id=device_stat.id).all():
                 self._session.delete(device_stats_value)
             self._session.commit()
+            return device_stat_d
         else:
             raise DbHelperException("Couldn't delete device stat id %s : it doesn't exist" % ds_id)
 
@@ -805,15 +829,19 @@ class DbHelper():
         """
         Delete all stats for a device
         @param d_id : device id
+        @return the list of DeviceStatsValue objects that were deleted
         """
         #TODO : this could be optimized
         device_stats = self._session.query(DeviceStats).filter_by(device_id=d_id).all()
+        device_stats_d_list = []
         for device_stat in device_stats:
             for device_stats_value in self._session.query(DeviceStatsValue) \
                                           .filter_by(device_stats_id=device_stat.id).all():
                 self._session.delete(device_stats_value)
+            device_stats_d_list.append(device_stat) 
             self._session.delete(device_stat)
         self._session.commit()
+        return device_stats_d_list
 
 ####
 # Triggers
@@ -850,11 +878,14 @@ class DbHelper():
         """
         Delete a trigger
         @param t_id : trigger id
+        @return the deleted Trigger object
         """
         trigger = self._session.query(Trigger).filter_by(id=t_id).first()
         if trigger:
+            trigger_d = trigger
             self._session.delete(trigger)
             self._session.commit()
+            return trigger
         else:
             raise DbHelperException("Couldn't delete trigger id %s : it doesn't exist" % t_id)
 
@@ -955,11 +986,14 @@ class DbHelper():
         """
         Delete a system account
         @param a_id : account id
+        @return the deleted SystemAccount object
         """
         system_account = self._session.query(SystemAccount).filter_by(id=a_id).first()
         if system_account:
+            system_account_d = system_account
             self._session.delete(system_account)
             self._session.commit()
+            return system_account_d
         else:
             raise DbHelperException("Couldn't delete system account id %s : it doesn't exist" % a_id)
 
@@ -1013,13 +1047,16 @@ class DbHelper():
         """
         Delete a user account and the associated system account if it exists
         @param u_id : user's account id
+        @return the deleted UserAccount object
         """
         user_account = self._session.query(UserAccount).filter_by(id=u_id).first()
         if user_account is not None:
+            user_account_d = user_account
             if user_account.system_account_id is not None:
                 self.del_system_account(user_account.system_account_id)
             self._session.delete(user_account)
             self._session.commit()
+            return user_account_d
         else:
             raise DbHelperException("Couldn't delete user account id %s : it doesn't exist" % u_id)
 
@@ -1073,30 +1110,37 @@ class DbHelper():
         """
         Delete a system stat record
         @param s_name : name of the stat that has to be deleted
+        @return the deleted SystemStats object
         """
         system_stat = self._session.query(SystemStats).filter_by(name=s_name).first()
         if system_stat:
+            system_stat_d = system_stat   
             system_stats_values = self._session.query(SystemStatsValue)\
                                       .filter_by(system_stats_id=system_stat.id).all()
             for ssv in system_stats_values:
                 self._session.delete(ssv)
             self._session.delete(system_stat)
             self._session.commit()
+            return system_stat
         else:
             raise DbHelperException("Couldn't delete system stat %s : it doesn't exist" % s_name)
 
     def del_all_system_stats(self):
         """
         Delete all stats of the system
+        @return the list of deleted SystemStats objects
         """
-        system_stats = self._session.query(SystemStats).all()
-        for system_stat in system_stats:
+        system_stats_list = self._session.query(SystemStats).all()
+        system_stats_d_list = []
+        for system_stat in system_stats_list:
             system_stats_values = self._session.query(SystemStatsValue)\
                                       .filter_by(system_stats_id=system_stat.id).all()
             for ssv in system_stats_values:
                 self._session.delete(ssv)
+            system_stats_d_list.append(system_stat)
             self._session.delete(system_stat)
         self._session.commit()
+        return system_stats_d_list
 
 
 ###
@@ -1200,6 +1244,7 @@ class DbHelper():
         @param i_item_id : id of the item we want to delete its parameter
         @param i_item_type : type of the item (area, room, device)
         @param i_key : key corresponding to the parameter name we want to delete
+        @return the deleted ItemUIConfig object
         """
         if i_item_type not in ITEM_TYPE_LIST:
             raise DbHelperException("Unknown item type '%s', should be one of : %s" \
@@ -1208,9 +1253,11 @@ class DbHelper():
                                       .filter_by(item_id=i_item_id, item_type=i_item_type, key=i_key).first()
         if item_ui_config is None:
             raise DbHelperException("Can't find item (%s,%s) with key '%s'" \
-                                    % (i_item_id, i_tem_key, i_key))
+                                    % (i_item_id, i_item_type, i_key))
+        item_ui_config_d = item_ui_config
         self._session.delete(item_ui_config)
         self._session.commit()
+        return item_ui_config_d
 
     def delete_all_item_ui_config(self, i_item_id, i_item_type):
         """
@@ -1223,9 +1270,14 @@ class DbHelper():
                                     % (i_item_type, ITEM_TYPE_LIST))
         item_ui_config_list = self._session.query(ItemUIConfig)\
                                            .filter_by(item_id=i_item_id, item_type=i_item_type).all()
+        item_ui_config_d_list = []
         for item_ui_config in item_ui_config_list:
             self._session.delete(item_ui_config)
             self._session.commit()
+            item_ui_config_d_list.append(item_ui_config)
+
+        return item_ui_config_d_list
+
 ###
 # SystemConfig
 ###
