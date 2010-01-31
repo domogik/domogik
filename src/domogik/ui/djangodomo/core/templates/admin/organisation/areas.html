@@ -84,10 +84,11 @@
 					if (bValid) {
 						
                             // Submit form
-                            $.getJSON('http://127.0.0.1:8080/base/area/add/' + new_name.val() + '/' + new_description.val(), function(data) {
+                            getREST('/base/area/add/' + new_name.val() + '/' + new_description.val(), function(data) {
                              alert(data.status);
                         });
-                        $(this).dialog('close');
+                        //$(this).dialog('close');
+                        location.reload(true);
                             }
 				},
 				Cancel: function() {
@@ -195,12 +196,17 @@
     				$('#update{{ area.id }}').click(function() {
             			$('#updatedialog{{ area.id }}').dialog('open');
                     });
+                    
+                    $('#del{{ area.id }}').click(function() {
+            			getREST('/base/area/del/{{ area.id }}');
+                        location=location+"?msg=error";
+                    });
                 });
                 // ]]>
             </script>
             <h2 id="zone{{ area.id }}h" class="icon32-area-grndfloor">{{ area.name }}</h2>
             <ul class="element-actions">
-                <li><a href="#" class="button">Supprimer</a></li>
+                <li><button id="del{{ area.id }}" class="button">Supprimer</button></li>
                 <li><button id="update{{ area.id }}" class="button">Modifier</button></li>
                 <li><button id="save{{ area.id }}" class="button">Sauvegarder</button></li>
             </ul>
@@ -211,6 +217,7 @@
                     <input id="area{{ area.id }}-newname" name="area{{ area.id }}-newname" type="text" class="medium" value="{{ area.name }}" />
                 </form>
             </div>
+            <!--
             <form action="#">
                 <div class="parameter">
                     <label for="area{{ area.id }}-icon">Icône:</label>
@@ -221,6 +228,7 @@
                     </select>
                 </div>
             </form>
+            -->
         </div>
     {% endfor %}
 </div>

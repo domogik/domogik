@@ -36,6 +36,7 @@ Implements
 
 from django.conf.urls.defaults import *
 
+
 urlpatterns = patterns('djangodomo.core.views',
     url(r'^$', 'index', name="index_view"),
 

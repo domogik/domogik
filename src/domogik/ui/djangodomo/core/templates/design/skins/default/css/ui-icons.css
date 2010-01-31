@@ -2,80 +2,79 @@
 /* CSS Document */
 
 /* Area icons */
-.icon64-area-grndfloor { background-image:url(../images/groundfloor_white_64.png);}
-.icon64-area-firstfloor { background-image:url(../images/floor1_white_64.png);}
-.icon64-area-basement { background-image:url(../images/basement_white_64.png);}
+.icon64-area-grndfloor { background-image:url(../images/area/groundfloor_white_64.png);}
+.icon64-area-firstfloor { background-image:url(../images/area/floor1_white_64.png);}
+.icon64-area-basement { background-image:url(../images/area/basement_white_64.png);}
 
-.icon32-area-grndfloor { background-image:url(../images/groundfloor_white_32.png);}
-.icon32-area-firstfloor { background-image:url(../images/floor1_white_32.png);}
-.icon32-area-basement { background-image:url(../images/basement_white_32.png);}
+.icon32-area-grndfloor { background-image:url(../images/area/groundfloor_white_32.png);}
+.icon32-area-firstfloor { background-image:url(../images/area/floor1_white_32.png);}
+.icon32-area-basement { background-image:url(../images/area/basement_white_32.png);}
 
-.icon16-area-grndfloor { background-image:url(../images/groundfloor_white_16.png);}
-.icon16-area-firstfloor { background-image:url(../images/floor1_white_16.png);}
-.icon16-area-basement { background-image:url(../images/basement_white_16.png);}
+.icon16-area-grndfloor { background-image:url(../images/area/groundfloor_white_16.png);}
+.icon16-area-firstfloor { background-image:url(../images/area/floor1_white_16.png);}
+.icon16-area-basement { background-image:url(../images/area/basement_white_16.png);}
 
 /* Room icons */
-.icon64-room-default { background-image:url(../images/default_room_64.png);}
-.icon64-room-kitchen { background-image:url(../images/kitchen_64.png);}
-.icon64-room-bedroom { background-image:url(../images/bedroom_64.png);}
-.icon64-room-livingroom { background-image:url(../images/livingroom_64.png);}
-.icon64-room-livingroom2 { background-image:url(../images/livingroom2_64.png);}
-.icon64-room-tvlounge { background-image:url(../images/tvlounge_64.png);}
-.icon64-room-bathroom { background-image:url(../images/bathroom_64.png);}
+.icon64-room-default { background-image:url(../images/room/default_room_64.png);}
+.icon64-room-kitchen { background-image:url(../images/room/kitchen_64.png);}
+.icon64-room-bedroom { background-image:url(../images/room/bedroom_64.png);}
+.icon64-room-livingroom { background-image:url(../images/room/livingroom_64.png);}
+.icon64-room-livingroom2 { background-image:url(../images/room/livingroom2_64.png);}
+.icon64-room-tvlounge { background-image:url(../images/room/tvlounge_64.png);}
+.icon64-room-bathroom { background-image:url(../images/room/bathroom_64.png);}
+.icon64-room-office { background-image:url(../images/room/office_64.png);}
 
-.icon32-room-default { background-image:url(../images/default_room_32.png);}
-.icon32-room-kitchen { background-image:url(../images/kitchen_32.png);}
-.icon32-room-bedroom { background-image:url(../images/bedroom_32.png);}
-.icon32-room-livingroom { background-image:url(../images/livingroom_32.png);}
-.icon32-room-livingroom2 { background-image:url(../images/livingroom2_32.png);}
-.icon32-room-tvlounge { background-image:url(../images/tvlounge_32.png);}
-.icon32-room-bathroom { background-image:url(../images/default_room_32.png);}
+.icon32-room-default { background-image:url(../images/room/default_room_32.png);}
+.icon32-room-kitchen { background-image:url(../images/room/kitchen_32.png);}
+.icon32-room-bedroom { background-image:url(../images/room/bedroom_32.png);}
+.icon32-room-livingroom { background-image:url(../images/room/livingroom_32.png);}
+.icon32-room-livingroom2 { background-image:url(../images/room/livingroom2_32.png);}
+.icon32-room-tvlounge { background-image:url(../images/room/tvlounge_32.png);}
+.icon32-room-bathroom { background-image:url(../images/room/default_room_32.png);}
+.icon32-room-office { background-image:url(../images/room/default_room_32.png);}
 
-.icon16-room-default { background-image:url(../images/default_room_16.png);}
-.icon16-room-kitchen { background-image:url(../images/kitchen_16.png);}
-.icon16-room-bedroom { background-image:url(../images/bedroom_16.png);}
-.icon16-room-livingroom { background-image:url(../images/livingroom_16.png);}
-.icon16-room-livingroom2 { background-image:url(../images/livingroom2_16.png);}
-.icon16-room-tvlounge { background-image:url(../images/default_room_16.png);}
-.icon16-room-bathroom { background-image:url(../images/default_room_16.png);}
-
-/* Device icons */
-.icon64-device-coffeemachine { background-image:url(../images/coffee_machine_64.png);}
-.icon32-device-coffeemachine { background-image:url(../images/coffee_machine_32.png);}
-.icon16-device-coffeemachine { background-image:url(../images/coffee_machine_16.png);}
-
-.icon32-device-electricity { background-image:url(../images/electricity_32.png);}
-.icon16-device-electricity { background-image:url(../images/electricity_16.png);}
-.icon16-device-water { background-image:url(../images/water_16.png);}
-.icon16-device-message { background-image:url(../images/message_16.png);}
-.icon16-device-notification { background-image:url(../images/notify_16.png);}
-.icon16-device-error { background-image:url(../images/error_16.png);}
-.icon32-device-temp { background-image:url(../images/temperature_32.png);}
-
-.icon32-device-tv { background-image:url(../images/tv_32.png);}
-.icon32-device-ventilation { background-image:url(../images/fan_white_32.png);}
-.icon32-device-sound { background-image:url(../images/audio_32.png);}
-.icon32-device-aiconditioning { background-image:url(../images/aircond_white_32.png);}
-.icon32-device-wifi { background-image:url(../images/wifi_32.png);}
-.icon32-device-light { background-image:url(../images/light_32.png);}
-
-/* Status icons */
-.icon16-status-defaulton { background-image:url(../images/various_green_on.png);}
-.icon16-status-defaultoff { background-image:url(../images/various_grey_off.png);}
-.icon16-status-lighton { background-image:url(../images/lightbulb_on.png);}
-.icon16-status-lightoff { background-image:url(../images/lightbulb_off.png);}
-.icon16-status-shutterup { background-image:url(../images/shutter_down.png);}
-.icon16-status-shutterdown { background-image:url(../images/shutter_down.png);}
-.icon16-status-ventilationon { background-image:url(../images/fan_green_16.png);}
-.icon16-status-ventilationoff { background-image:url(../images/fan_black_16.png);}
-.icon16-status-airconditioningon { background-image:url(../images/aircond_green_16.png);}
-.icon16-status-airconditioningoff { background-image:url(../images/aircond_black_16.png);}
-.icon16-status-soundplaying { background-image:url(../images/sound_play_green.png);}
+.icon16-room-default { background-image:url(../images/room/default_room_16.png);}
+.icon16-room-kitchen { background-image:url(../images/room/kitchen_16.png);}
+.icon16-room-bedroom { background-image:url(../images/room/bedroom_16.png);}
+.icon16-room-livingroom { background-image:url(../images/room/livingroom_16.png);}
+.icon16-room-livingroom2 { background-image:url(../images/room/livingroom2_16.png);}
+.icon16-room-tvlounge { background-image:url(../images/room/default_room_16.png);}
+.icon16-room-bathroom { background-image:url(../images/room/default_room_16.png);}
+.icon16-room-office { background-image:url(../images/room/default_room_16.png);}
 
 /* Widget icons */
-.icon32-widget-light { background-image:url(../images/light/lightbulb_full_32.png);}
-.icon32-widget-light.binary_0 { background-image:url(../images/light/binary/0_32.png);}
-.icon32-widget-light.binary_1 { background-image:url(../images/light/binary/1_32.png);}
-.icon32-widget-shutter { background-image:url(../images/light/shutter_down_32.png);}
-.icon32-widget-shutter.binary_0 { background-image:url(../images/shutter/binary/0_32.png);}
-.icon32-widget-shutter.binary_1 { background-image:url(../images/shutter/binary/1_32.png);}
+.icon32-widget-light { background-image:url(../images/device_usage/light/lamp_32.png);}
+.icon32-widget-light.binary_0 { background-image:url(../images/device_usage/light/binary/0_32.png);}
+.icon32-widget-light.binary_1 { background-image:url(../images/device_usage/light/binary/1_32.png);}
+.icon32-widget-light.range_0 { background-image:url(../images/device_usage/light/range/0_32.png);}
+.icon32-widget-light.range_30 { background-image:url(../images/device_usage/light/range/30_32.png);}
+.icon32-widget-light.range_60 { background-image:url(../images/device_usage/light/range/60_32.png);}
+.icon32-widget-light.range_100 { background-image:url(../images/device_usage/light/range/100_32.png);}
+
+.icon32-widget-shutter { background-image:url(../images/device_usage/light/shutter_down_32.png);}
+.icon32-widget-shutter.binary_0 { background-image:url(../images/device_usage/shutter/binary/0_32.png);}
+.icon32-widget-shutter.binary_1 { background-image:url(../images/device_usage/shutter/binary/1_32.png);}
+
+/* Tmp icons */
+.icon64-device-coffeemachine { background-image:url(../images/tmp/coffee_machine_64.png);}
+.icon32-device-coffeemachine { background-image:url(../images/tmp/coffee_machine_32.png);}
+.icon16-device-coffeemachine { background-image:url(../images/tmp/coffee_machine_16.png);}
+.icon32-device-electricity { background-image:url(../images/tmp/electricity_32.png);}
+.icon16-device-electricity { background-image:url(../images/tmp/electricity_16.png);}
+.icon16-device-water { background-image:url(../images/tmp/water_16.png);}
+.icon16-device-message { background-image:url(../images/tmp/message_16.png);}
+.icon16-device-notification { background-image:url(../images/tmp/notify_16.png);}
+.icon16-device-error { background-image:url(../images/tmp/error_16.png);}
+.icon32-device-temp { background-image:url(../images/tmp/temperature_32.png);}
+.icon32-device-tv { background-image:url(../images/tmp/tv_32.png);}
+.icon32-device-ventilation { background-image:url(../images/tmp/fan_white_32.png);}
+.icon32-device-sound { background-image:url(../images/tmp/audio_32.png);}
+.icon32-device-aiconditioning { background-image:url(../images/tmp/aircond_white_32.png);}
+.icon32-device-wifi { background-image:url(../images/tmp/wifi_32.png);}
+.icon16-status-defaulton { background-image:url(../images/tmp/various_green_on.png);}
+.icon16-status-defaultoff { background-image:url(../images/tmp/various_grey_off.png);}
+.icon16-status-ventilationon { background-image:url(../images/tmp/fan_green_16.png);}
+.icon16-status-ventilationoff { background-image:url(../images/tmp/fan_black_16.png);}
+.icon16-status-airconditioningon { background-image:url(../images/tmp/aircond_green_16.png);}
+.icon16-status-airconditioningoff { background-image:url(../images/tmp/aircond_black_16.png);}
+.icon16-status-soundplaying { background-image:url(../images/tmp/sound_play_green.png);}

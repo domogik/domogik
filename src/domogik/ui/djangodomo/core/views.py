@@ -54,6 +54,8 @@ from djangodomo.core.models import *
 from djangodomo.core.SampleDataHelper import SampleDataHelper
 from djangodomo.core.XPLHelper import XPLHelper
 
+from django.views.decorators.cache import never_cache
+
 _ADMIN_MANAGEMENT_DOMOGIK = 'admin/management/domogik.html'
 _db = database.DbHelper()
 
