@@ -683,6 +683,7 @@ target=*
     def send_http_response_ok(self, data = ""):
         self.send_response(200)
         self.send_header('Content-type',  'application/json')
+        self.send_header('Expires', '-1')
         self.send_header('Cache-control', 'no-cache')
         self.end_headers()
         if data:
