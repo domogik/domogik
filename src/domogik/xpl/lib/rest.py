@@ -53,6 +53,7 @@ from domogik.common.configloader import Loader
 from xml.dom import minidom
 import json
 import time
+import urllib
 
 
 
@@ -174,6 +175,7 @@ class RestHandler(BaseHTTPRequestHandler):
         self._xml_directory = self.server.handler_params[0]._xml_directory
 
         # url processing
+        self.path = urllib.unquote(self.path)  
         tab_url = self.path.split("?")
         self.path = tab_url[0]
         if len(tab_url) > 1:
