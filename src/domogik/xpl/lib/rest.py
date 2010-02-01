@@ -508,6 +508,34 @@ target=*
                 self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0])
                 return
 
+        ### ui_config ################################
+        elif self.rest_request[0] == "ui_config":
+
+            ### list
+            if self.rest_request[1] == "list":
+                if len(self.rest_request) == 2:
+                    self._rest_base_ui_config_list()
+                elif len(self.rest_request) == 3 or len(self.rest_request) == 4:
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1])
+                else:
+                    if self.rest_request[2] == "by-item":
+                        if len(self.rest_request) == 5:
+                            self._rest_base_ui_config_list(item_type=self.rest_request[3], item_id=self.rest_request[4])
+                        else:
+                            if len(self.rest_request) == 6:
+                                self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1])
+                            else:
+                                if self.rest_request[5] == "by-key":
+                                    self._rest_base_ui_config_list(item_type=self.rest_request[3], item_id=self.rest_request[4], item_key=self.rest_request[6])
+                                else:
+                                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1])
+
+
+            ### others
+            else:
+                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0])
+                return
+
         ### device #####################################
         elif self.rest_request[0] == "device":
             print "TODO !!"
@@ -623,6 +651,30 @@ target=*
         self.send_http_response_ok(json.get())
 
 
+######
+# /base/ui_config processing
+######
+
+    def _rest_base_ui_config_list(self, item_type = None, item_id = None, item_key = None):
+        """ list ui_config
+        """
+        json = JSonHelper("OK")
+        json.set_data_type("ui_config")
+        if item_id == None:
+            for ui_config in self._db.list_all_item_ui_config():
+                json.add_data(ui_config)
+        elif item_key == None:
+            print "list_item_ui_config : " + str(item_id) + ", " + str(item_type)
+            for ui_config in self._db.list_item_ui_config(item_id, item_type):
+                json.add_data(ui_config)
+        else:
+            ui_config = self._db.get_item_ui_config(item_id, item_type, item_key)
+            if ui_config is not None:
+                json.add_data(ui_config)
+        self.send_http_response_ok(json.get())
+
+
+
 
 ######
 # HTTP return
@@ -630,7 +682,8 @@ target=*
 
     def send_http_response_ok(self, data = ""):
         self.send_response(200)
-        self.send_header('Content-type',    'application/json')
+        self.send_header('Content-type',  'application/json')
+        self.send_header('Cache-control', 'no-cache')
         self.end_headers()
         if data:
             self.wfile.write(data)
@@ -676,6 +729,7 @@ class JSonHelper():
             pass
         if data == None:
             return
+        print data
         for key in data.__dict__:
             print key + " => " + str(data.__dict__[key])
             if key != "_sa_instance_state":
