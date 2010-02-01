@@ -838,7 +838,7 @@ class DbHelper():
             for device_stats_value in self._session.query(DeviceStatsValue) \
                                           .filter_by(device_stats_id=device_stat.id).all():
                 self._session.delete(device_stats_value)
-            device_stats_d_list.append(device_stat) 
+            device_stats_d_list.append(device_stat)
             self._session.delete(device_stat)
         self._session.commit()
         return device_stats_d_list
@@ -1114,7 +1114,7 @@ class DbHelper():
         """
         system_stat = self._session.query(SystemStats).filter_by(name=s_name).first()
         if system_stat:
-            system_stat_d = system_stat   
+            system_stat_d = system_stat
             system_stats_values = self._session.query(SystemStatsValue)\
                                       .filter_by(system_stats_id=system_stat.id).all()
             for ssv in system_stats_values:
@@ -1210,9 +1210,6 @@ class DbHelper():
                                     % (i_item_type, ITEM_TYPE_LIST))
         item_ui_config = self._session.query(ItemUIConfig)\
                                       .filter_by(item_id=i_item_id, item_type=i_item_type, key=i_key).first()
-        if item_ui_config is None:
-            raise DbHelperException("Can't find item (%s,%s) with key '%s'" \
-                                    % (i_item_id, i_item_type, i_key))
         return item_ui_config
 
     def list_item_ui_config(self, i_item_id, i_item_type):
