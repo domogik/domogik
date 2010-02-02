@@ -174,13 +174,17 @@ class RestHandler(BaseHTTPRequestHandler):
         self._log = self.server.handler_params[0]._log
         self._xml_directory = self.server.handler_params[0]._xml_directory
 
+        # global init
+        self.jsonp = False
+        self.jsonp_cb = ""
+
         # url processing
         self.path = urllib.unquote(self.path)  
         tab_url = self.path.split("?")
         self.path = tab_url[0]
         if len(tab_url) > 1:
             self.parameters = tab_url[1]
-            self._debug()
+            self._parse_options()
 
         if self.path[-1:] == "/":
             self.path = self.path[0:len(self.path)-1]
@@ -203,13 +207,14 @@ class RestHandler(BaseHTTPRequestHandler):
 
 
 
-    def _debug(self):
-        """ Do debug stuff in function of parameters given
+    def _parse_options(self):
+        """Take parameters in count 
+           Or do debug stuff in function of parameters given
         """
 
         # for each debug option
         for opt in self.parameters.split("&"):
-            print "DEBUG OPT :" + opt
+            print "OPT :" + opt
             tab_opt = opt.split("=")
             opt_key = tab_opt[0]
             if len(tab_opt) > 1:
@@ -217,8 +222,13 @@ class RestHandler(BaseHTTPRequestHandler):
             else:
                 opt_value = None
 
+            # call json specific options
+            if opt_key == "callback" and opt_value != None:
+                self.jsonp = True
+                self.jsonp_cb = opt_value
+
             # call debug functions
-            if opt_key == "debug-sleep" and opt_value != None:
+            elif opt_key == "debug-sleep" and opt_value != None:
                 self._debug_sleep(opt_value)
 
 
@@ -251,6 +261,7 @@ class RestHandler(BaseHTTPRequestHandler):
                 others = None
         else:
             json = JSonHelper("ERROR", 999, "Url too short for /command")
+            json.set_jsonp(self.jsonp, self.jsonp_cb)
             self.send_http_response_ok(json.get())
             return
         print "Techno    : %s" % techno
@@ -271,6 +282,7 @@ class RestHandler(BaseHTTPRequestHandler):
 
         # REST processing finished and OK
         json = JSonHelper("OK")
+        json.set_jsonp(self.jsonp, self.jsonp_cb)
         self.send_http_response_ok(json.get())
 
         
@@ -284,6 +296,7 @@ class RestHandler(BaseHTTPRequestHandler):
             xml_doc = minidom.parse(xml_file)
         except:
             json = JSonHelper("ERROR", 999, "Error while reading xml file : " + xml_file)
+            json.set_jsonp(self.jsonp, self.jsonp_cb)
             self.send_http_response_ok(json.get())
             return None
 
@@ -425,6 +438,7 @@ target=*
 
         # REST processing finished and OK
         json = JSonHelper("OK")
+        json.set_jsonp(self.jsonp, self.jsonp_cb)
         self.send_http_response_ok(json.get())
 
 
@@ -563,6 +577,7 @@ target=*
         """ list areas
         """
         json = JSonHelper("OK")
+        json.set_jsonp(self.jsonp, self.jsonp_cb)
         json.set_data_type("area")
         if id == None:
             for area in self._db.list_areas():
@@ -578,6 +593,7 @@ target=*
         """ add areas
         """
         json = JSonHelper("OK")
+        json.set_jsonp(self.jsonp, self.jsonp_cb)
         json.set_data_type("area")
         try:
             area = self._db.add_area(name, description)
@@ -591,6 +607,7 @@ target=*
         """ delete areas
         """
         json = JSonHelper("OK")
+        json.set_jsonp(self.jsonp, self.jsonp_cb)
         json.set_data_type("area")
         try:
             area = self._db.del_area(id)
@@ -609,6 +626,7 @@ target=*
         """ list rooms
         """
         json = JSonHelper("OK")
+        json.set_jsonp(self.jsonp, self.jsonp_cb)
         json.set_data_type("room")
         if id == None and area_id == None:
             for room in self._db.list_rooms():
@@ -630,6 +648,7 @@ target=*
         """ add rooms
         """
         json = JSonHelper("OK")
+        json.set_jsonp(self.jsonp, self.jsonp_cb)
         json.set_data_type("room")
         try:
             room = self._db.add_room(name, area_id, description)
@@ -644,6 +663,7 @@ target=*
         """ delete rooms
         """
         json = JSonHelper("OK")
+        json.set_jsonp(self.jsonp, self.jsonp_cb)
         json.set_data_type("room")
         try:
             room = self._db.del_room(id)
@@ -661,6 +681,7 @@ target=*
         """ list ui_config
         """
         json = JSonHelper("OK")
+        json.set_jsonp(self.jsonp, self.jsonp_cb)
         json.set_data_type("ui_config")
         if item_id == None:
             for ui_config in self._db.list_all_item_ui_config():
@@ -698,6 +719,7 @@ target=*
         self.send_header('Content-type',    'text/html')
         self.end_headers()
         json = JSonHelper("ERROR", errCode, errMsg)
+        json.set_jsonp(self.jsonp, self.jsonp_cb)
         self.wfile.write(json.get())
         ### TODO : log this
 
@@ -715,6 +737,10 @@ class JSonHelper():
         self._data_type = ""
         self._data_values = ""
         self._nb_data_values = 0
+
+    def set_jsonp(self, jsonp, jsonp_cb):
+        self._jsonp = jsonp
+        self._jsonp_cb = jsonp_cb
 
     def set_ok(self):
         self._status = '"status" : "OK", "code" : 0, "description" : "",'
@@ -746,11 +772,19 @@ class JSonHelper():
         
 
     def get(self):
+        if self._jsonp is True and self._jsonp_cb != "":
+            json = "%s (" % self._jsonp_cb
+        else:
+            json = ""
+
         if self._data_type != "":
-            json = '{' + self._status + '"' + self._data_type + '" : [' + \
+            json += '{' + self._status + '"' + self._data_type + '" : [' + \
                    self._data_values[0:len(self._data_values)-1] + ']' + '}'
         else:
-            json = '{' + self._status[0:len(self._status)-1] + '}'
+            json += '{' + self._status[0:len(self._status)-1] + '}'
+
+        if self._jsonp is True and self._jsonp_cb != "":
+            json += ")"
         return json
         
     
