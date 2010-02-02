@@ -98,81 +98,94 @@ class HTTPServerWithParam(HTTPServer):
         HTTPServer.__init__(self, server_address, RequestHandlerClass, bind_and_activate)
         self.handler_params = handler_params
 
+
+
+
+
+
 ################################################################################
 class RestHandler(BaseHTTPRequestHandler):
 
 
 ######
-# GET/POST processing
+# GET/POST/OPTIONS processing
 ######
 
     def do_GET(self):
         """ Process GET requests
         """
-
         print "==== GET ============================================"
-        # Create shorter access : self.server.handler_params[0].* => self.*
-        self._init_namespace()
-
-        # common processing for all HTTP methods
         self.do_FOR_ALL_METHODS()
-
-
 
     def do_POST(self):
         """ Process POST requests
         """
-
         print "==== POST ==========================================="
-        # Create shorter access : self.server.handler_params[0].* => self.*
-        self._init_namespace()
-
-        # common processing for all HTTP methods
         self.do_FOR_ALL_METHODS()
-
-
-
 
     def do_OPTIONS(self):
         """ Process OPTIONS requests
         """
-
         print "==== OPTIONS ==========================================="
-        # Create shorter access : self.server.handler_params[0].* => self.*
-        self._init_namespace()
-
-        # common processing for all HTTP methods
         self.do_FOR_ALL_METHODS()
 
-
-
-
-
     def do_FOR_ALL_METHODS(self):
-        if self.rest_type == "command":
-            self.rest_command()
-        elif self.rest_type == "xpl-cmnd":
-            self.rest_xpl_cmnd()
-        elif self.rest_type == "base":
-            self.rest_base()
-        else:
-            self.send_http_response_error(999, "Type [" + str(self.rest_type) + "] is not supported")
-            return
+        request = ProcessRequest(self.server.handler_params, self.path, self.send_http_response_ok, self.send_http_response_error)
+        request.do_FOR_ALL_METHODS()
 
 
 
 
+######
+# HTTP return
+######
 
-    def _init_namespace(self):
+    def send_http_response_ok(self, data = ""):
+        self.send_response(200)
+        self.send_header('Content-type',  'application/json')
+        self.send_header('Expires', '-1')
+        self.send_header('Cache-control', 'no-cache')
+        self.end_headers()
+        if data:
+            self.wfile.write(data)
+        ### TODO : log this
+
+
+    def send_http_response_error(self, errCode, errMsg, jsonp, jsonp_cb):
+        self.send_response(200)
+        self.send_header('Content-type',    'text/html')
+        self.end_headers()
+        json = JSonHelper("ERROR", errCode, errMsg)
+        json.set_jsonp(jsonp, jsonp_cb)
+        self.wfile.write(json.get())
+        ### TODO : log this
+
+
+
+
+################################################################################
+class ProcessRequest():
+
+######
+# init namespace
+######
+
+
+    def __init__(self, handler_params, path, cb_send_http_response_ok, cb_send_http_response_error):
         """ Create shorter access : self.server.handler_params[0].* => self.*
             First processing on url given
         """
 
+        self.handler_params = handler_params
+        self.path = path
+        self.send_http_response_ok = cb_send_http_response_ok
+        self.send_http_response_error = cb_send_http_response_error
+
         # shorter access
-        self._db = self.server.handler_params[0]._db
-        self._myxpl = self.server.handler_params[0]._myxpl
-        self._log = self.server.handler_params[0]._log
-        self._xml_directory = self.server.handler_params[0]._xml_directory
+        self._db = self.handler_params[0]._db
+        self._myxpl = self.handler_params[0]._myxpl
+        self._log = self.handler_params[0]._log
+        self._xml_directory = self.handler_params[0]._xml_directory
 
         # global init
         self.jsonp = False
@@ -194,7 +207,7 @@ class RestHandler(BaseHTTPRequestHandler):
         # Get type of request : /command, /xpl-cmnd, /base, etc
         if len(tab_path) < 2:
             self.rest_type = None
-            self.send_http_response_error(999, "No type given")
+            self.send_http_response_error(999, "No type given", self.jsonp, self.jsonp_cb)
             return
         self.rest_type = tab_path[1].lower()
         if len(tab_path) > 2:
@@ -204,6 +217,20 @@ class RestHandler(BaseHTTPRequestHandler):
         print "TYPE    : " + self.rest_type
         print "Request : " + str(self.rest_request)
 
+
+
+
+
+    def do_FOR_ALL_METHODS(self):
+        if self.rest_type == "command":
+            self.rest_command()
+        elif self.rest_type == "xpl-cmnd":
+            self.rest_xpl_cmnd()
+        elif self.rest_type == "base":
+            self.rest_base()
+        else:
+            self.send_http_response_error(999, "Type [" + str(self.rest_type) + "] is not supported", self.jsonp, self.jsonp_cb)
+            return
 
 
 
@@ -302,7 +329,7 @@ class RestHandler(BaseHTTPRequestHandler):
 
         mapping = xml_doc.documentElement
         if mapping.getElementsByTagName("technology")[0].attributes.get("name").value != techno:
-            self.send_http_response_error(999, "'technology' attribute must be the same as file name !")
+            self.send_http_response_error(999, "'technology' attribute must be the same as file name !", self.jsonp, self.jsonp_cb)
             return
         
         #Schema
@@ -325,7 +352,7 @@ class RestHandler(BaseHTTPRequestHandler):
             if an_order.getElementsByTagName("name")[0].firstChild.nodeValue == order:
                 the_order = an_order
         if the_order == None:
-            self.send_http_response_error(999, "Order can't be found")
+            self.send_http_response_error(999, "Order can't be found", self.jsonp, self.jsonp_cb)
             return
 
         #Parse the order bloc
@@ -396,11 +423,11 @@ target=*
 
         print "Call rest_xpl_cmnd"
         if len(self.rest_request) == 0:
-            self.send_http_response_error(999, "Target not given")
+            self.send_http_response_error(999, "Target not given", self.jsonp, self.jsonp_cb)
             return
         self.xpl_target = self.rest_request[0]
         if len(self.rest_request) == 1:
-            self.send_http_response_error(999, "Schema not given")
+            self.send_http_response_error(999, "Schema not given", self.jsonp, self.jsonp_cb)
             return
         self.xpl_cmnd_schema = self.rest_request[1]
 
@@ -426,11 +453,11 @@ target=*
 
         # no parameters
         if ii == 2:
-            self.send_http_response_error(999, "No parameters specified")
+            self.send_http_response_error(999, "No parameters specified", self.jsonp, self.jsonp_cb)
             return
         # no value for last parameter
         if ii % 2 == 1:
-            self.send_http_response_error(999, "Value missing for last parameter")
+            self.send_http_response_error(999, "Value missing for last parameter", self.jsonp, self.jsonp_cb)
             return
 
         print "Send message : %s" % message
@@ -455,7 +482,7 @@ target=*
         """
         print "Call rest_base_get"
         if len(self.rest_request) < 2:
-            self.send_http_response_error(999, "Url too short")
+            self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
             return
 
         ### area #####################################
@@ -466,7 +493,7 @@ target=*
                 if len(self.rest_request) == 2:
                     self._rest_base_area_list()
                 elif len(self.rest_request) == 3:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1])
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
                 else:
                     if self.rest_request[2] == "by-id":
                         self._rest_base_area_list(id=self.rest_request[3])
@@ -476,18 +503,18 @@ target=*
                 if len(self.rest_request) == 4:
                     self._rest_base_area_add(name=self.rest_request[2], description=self.rest_request[3])
                 else:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1])
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
 
             ### del
             elif self.rest_request[1] == "del":
                 if len(self.rest_request) == 3:
                     self._rest_base_area_del(id=self.rest_request[2])
                 else:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1])
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
 
             ### others
             else:
-                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0])
+                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], self.jsonp, self.jsonp_cb)
                 return
 
         ### room #####################################
@@ -498,7 +525,7 @@ target=*
                 if len(self.rest_request) == 2:
                     self._rest_base_room_list()
                 elif len(self.rest_request) == 3:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1])
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
                 else:
                     if self.rest_request[2] == "by-id":
                         self._rest_base_room_list(id=self.rest_request[3])
@@ -510,18 +537,18 @@ target=*
                 if len(self.rest_request) == 5:
                     self._rest_base_room_add(name=self.rest_request[2], area_id=self.rest_request[3], description=self.rest_request[4])
                 else:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1])
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
 
             ### del
             elif self.rest_request[1] == "del":
                 if len(self.rest_request) == 3:
                     self._rest_base_room_del(id=self.rest_request[2])
                 else:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1])
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
 
             ### others
             else:
-                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0])
+                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], self.jsonp, self.jsonp_cb)
                 return
 
         ### ui_config ################################
@@ -532,24 +559,24 @@ target=*
                 if len(self.rest_request) == 2:
                     self._rest_base_ui_config_list()
                 elif len(self.rest_request) == 3 or len(self.rest_request) == 4:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1])
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
                 else:
                     if self.rest_request[2] == "by-item":
                         if len(self.rest_request) == 5:
                             self._rest_base_ui_config_list(item_type=self.rest_request[3], item_id=self.rest_request[4])
                         else:
                             if len(self.rest_request) == 6:
-                                self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1])
+                                self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
                             else:
                                 if self.rest_request[5] == "by-key":
                                     self._rest_base_ui_config_list(item_type=self.rest_request[3], item_id=self.rest_request[4], item_key=self.rest_request[6])
                                 else:
-                                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1])
+                                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
 
 
             ### others
             else:
-                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0])
+                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], self.jsonp, self.jsonp_cb)
                 return
 
         ### device #####################################
@@ -558,7 +585,7 @@ target=*
 
         ### others ###################################
         else:
-            self.send_http_response_error(999, self.rest_request[0] + " not allowed")
+            self.send_http_response_error(999, self.rest_request[0] + " not allowed", self.jsonp, self.jsonp_cb)
             return
 
 
@@ -695,34 +722,6 @@ target=*
             if ui_config is not None:
                 json.add_data(ui_config)
         self.send_http_response_ok(json.get())
-
-
-
-
-######
-# HTTP return
-######
-
-    def send_http_response_ok(self, data = ""):
-        self.send_response(200)
-        self.send_header('Content-type',  'application/json')
-        self.send_header('Expires', '-1')
-        self.send_header('Cache-control', 'no-cache')
-        self.end_headers()
-        if data:
-            self.wfile.write(data)
-        ### TODO : log this
-
-
-    def send_http_response_error(self, errCode, errMsg):
-        self.send_response(200)
-        self.send_header('Content-type',    'text/html')
-        self.end_headers()
-        json = JSonHelper("ERROR", errCode, errMsg)
-        json.set_jsonp(self.jsonp, self.jsonp_cb)
-        self.wfile.write(json.get())
-        ### TODO : log this
-
 
 
 
