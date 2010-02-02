@@ -35,13 +35,11 @@ fi
 
 
 
-### Check domogik is down
+### Check REST is up
 echo ""
 echo ""
-echo "Check if Domogik is down :"
-echo " - UI"
-echo " - REST module"
-echo " - others module"
+echo "REST module will be killed and restarted after operation."
+echo "You may also have to restart UI"
 echo "Continue ? [Y/N]"
 read choice
 
@@ -49,6 +47,18 @@ if [[ $choice != "Y" ]] ; then
     echo "Exiting..."
     exit 1
 fi
+
+
+
+
+### Kill REST module
+echo ""
+echo ""
+echo "Killing REST module..."
+killall -9 rest.py
+echo "...ok"
+
+
 
 
 ### Move actual database
@@ -67,7 +77,7 @@ echo "...ok"
 echo ""
 echo ""
 echo "Creating new database..."
-python ../../db_installer.py 
+python ../../../db_installer.py 
 if [[ $? -ne 0 ]] ; then
     echo "Error... exiting."
     exit 1
@@ -75,11 +85,12 @@ fi
 echo "...ok"
 
 
+
 ### Start REST module
 echo ""
 echo ""
 echo "Starting REST module..."
-nohup ../domogik/xpl/lib/rest.py &
+nohup ../../domogik/xpl/lib/rest.py > /tmp/demo.log &
 sleep 10
 if [[ $? -ne 0 ]] ; then
     echo "Error... exiting."
@@ -93,27 +104,5 @@ echo "...ok"
 ### Add data in database
 echo ""
 echo ""
-echo "Read file $file_in for data to create..."
-while read line
-  do
-    echo " - $line"
+./call_rest.py
 
-    if [[ $line != "" ]] ; then
-        wget -O /tmp/wg http://$ip:$port$line  && cat /tmp/wg && echo ""
-    fi
-
-done < $file_in
-
-
-
-
-### Kill REST module
-echo ""
-echo ""
-echo "Killing REST module..."
-killall rest.py
-if [[ $? -ne 0 ]] ; then
-    echo "Error... exiting."
-    exit 1
-fi
-echo "...ok"
