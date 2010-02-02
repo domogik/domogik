@@ -13,3 +13,4 @@
 /base/area/add/Garage/None
 /base/room/add/Garage/3/Zone%20pour%20la%20voiture
 /base/room/add/Cellier/3/Zone%20pour%20madame
+
