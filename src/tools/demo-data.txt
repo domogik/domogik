@@ -1,0 +1,15 @@
+/base/area/add/RDC/Rez%20de%20chausse
+/base/room/add/Cuisine/1/None
+/base/room/add/Salon/1/None
+/base/room/add/Sejour/1/None
+/base/room/add/Cellier/1/None
+/base/room/add/Salle%20d%20eau/1/None
+
+/base/area/add/Etage/Premier%20etage
+/base/room/add/Chambre%20Parents/2/None
+/base/room/add/Chambre%20Garcon/2/None
+/base/room/add/Chambre%20Fille/2/None
+
+/base/area/add/Garage/None
+/base/room/add/Garage/3/Zone%20pour%20la%20voiture
+/base/room/add/Cellier/3/Zone%20pour%20madame
