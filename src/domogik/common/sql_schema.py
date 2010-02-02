@@ -338,6 +338,44 @@ class DeviceType(Base):
         return DeviceType.__tablename__
 
 
+class SensorReference(Base):
+    """
+    Reference data for sensors
+    """
+    __tablename__ = '%s_sensor_reference' % _db_prefix
+    id = Column(Integer, primary_key=True)
+    name = Column(String(30), nullable=False)
+    technology_id = Column(Integer, ForeignKey('%s.id' % \
+                           DeviceTechnology.get_tablename()), nullable=False)
+    name = Column(String(30), nullable=False)
+    description = Column(String(255))
+
+    def __init__(self, name, description, technology_id):
+        """
+        Class constructor
+        @param name : short name of the type
+        @param description : extended description
+        """
+        self.name = name
+        self.description = description
+        self.technology_id = technology_id
+
+    def __repr__(self):
+        """
+        Print an internal representation of the class
+        @return an internal representation
+        """
+        return "<DeviceType(id=%s, name='%s', desc='%s')>" % (self.id, self.name, self.description)
+
+    @staticmethod
+    def get_tablename():
+        """
+        Return the table name associated to the class
+        @return table name
+        """
+        return DeviceType.__tablename__
+
+
 class Device(Base):
     """
     Device

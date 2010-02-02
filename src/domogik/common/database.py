@@ -1217,17 +1217,13 @@ class DbHelper():
         List all UI parameters of an item
         @param i_item_id : if of the item we want to list the parameters
         @param i_item_type : type of the item (area, room, device)
-        @return a dictionnary containing all the (key, value) tuples
+        @return a list of ItemUIConfig objects
         """
         if i_item_type not in ITEM_TYPE_LIST:
             raise DbHelperException("Unknown item type '%s', should be one of : %s" \
                                     % (i_item_type, ITEM_TYPE_LIST))
-        item_ui_config_list = self._session.query(ItemUIConfig)\
-                                           .filter_by(item_id=i_item_id, item_type=i_item_type).all()
-        param_list = {}
-        for item in item_ui_config_list:
-            param_list[item.key] = item.value
-        return param_list
+        return self._session.query(ItemUIConfig).filter_by(item_id=i_item_id,
+                                                    item_type=i_item_type).all()
 
     def list_all_item_ui_config(self):
         """
