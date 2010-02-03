@@ -55,6 +55,11 @@
 .icon32-widget-shutter.binary_0 { background-image:url(../images/device_usage/shutter/binary/0_32.png);}
 .icon32-widget-shutter.binary_1 { background-image:url(../images/device_usage/shutter/binary/1_32.png);}
 
+
+/* Action */
+.icon16-action-add { background-image:url(../images/plus_16.png);}
+.icon16-action-del { background-image:url(../images/minus_16.png);}
+
 /* Tmp icons */
 .icon64-device-coffeemachine { background-image:url(../images/tmp/coffee_machine_64.png);}
 .icon32-device-coffeemachine { background-image:url(../images/tmp/coffee_machine_32.png);}

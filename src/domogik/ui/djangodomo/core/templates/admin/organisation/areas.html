@@ -165,11 +165,7 @@
 <div class="nocolumns">
 
 <div id="tabs">
-	<ul>
-        {% for area in areas_list %}
-		<li><a href="#subelement{{ area.id }}" class="icon16-area-grndfloor">{{ area.name }}</a></li>
-        {% endfor %}
-	</ul>
+	<ul>{% for area in areas_list %}<li><a href="#subelement{{ area.id }}" class="icon16-area-grndfloor">{{ area.name }}</a><a href='#' id='del{{ area.id }}' class='del icon16-action-del'>&nbsp;<span class='offscreen'>Delete area</span></a></li>{% endfor %}</ul>
     {% for area in areas_list %}
 	<div id="subelement{{ area.id }}" class="subelement">
             <script type="text/javascript">
@@ -234,7 +230,6 @@
             </script>
             <h2 id="zone{{ area.id }}h" class="icon32-area-grndfloor">{{ area.name }}</h2>
             <ul class="actions">
-                <li><button id="del{{ area.id }}" class="button">Supprimer</button></li>
                 <!--li><button id="update{{ area.id }}" class="button">Modifier</button></li-->
             </ul>
             <!--
