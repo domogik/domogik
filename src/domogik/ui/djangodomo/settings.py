@@ -144,6 +144,8 @@ STATIC_DOC_ROOT = '%s/core/templates/design' % PROJECT_PATH
 ### 'django.contrib.sessions.backends.file'
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 
+PIPES_CACHE_EXPIRY=1
+
 try:
     from settings_local import *
 except ImportError:
