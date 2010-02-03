@@ -1,4 +1,4 @@
 $(function(){
-	$(".element-main").addClass("ui-widget ui-widget-content");
+    // Accordion
+	$("#nav2").accordion({ header: ".subnav2", active:1});
 });
-				

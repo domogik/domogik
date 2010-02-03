@@ -22,21 +22,25 @@
 {% load i18n %}
 
 {% block css %}
-    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-nav2.css" rel="stylesheet" type="text/css" />
-    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-elements.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-selectmenu.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-dragdrop.css" rel="stylesheet" type="text/css" />
     <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-buttons.css" rel="stylesheet" type="text/css" />
     <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-forms.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-nav2.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-dialog.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-accordion.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-tabs.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 
 {% block content %}
     <div class="left">
         <div id="nav2">
-            <div class="section"><a href="#">Gestion</a></div>
+            <div class="subnav2"><a href="#">Gestion</a></div>
             <ul>
                 <li><a href="{% url admin_management_domogik_view %}">Domogik</a></li>
                 <li><a href="{% url admin_management_modules_view %}">Modules</a></li>
             </ul>
-            <div class="section"><a href="#">Organisation</a></div>
+            <div class="subnav2"><a href="#">Organisation</a></div>
             <ul>
                 <li><a href="{% url admin_organisation_devices_view %}">Dispositifs</a></li>
                 <li><a href="{% url admin_organisation_rooms_view %}">Pièces</a></li>
