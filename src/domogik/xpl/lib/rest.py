@@ -481,6 +481,7 @@ target=*
             2/ call the good fonction to get data
         """
         print "Call rest_base_get"
+        self.parameters = {}
         if len(self.rest_request) < 2:
             self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
             return
@@ -500,10 +501,19 @@ target=*
 
             ### add
             elif self.rest_request[1] == "add":
-                if len(self.rest_request) == 4:
-                    self._rest_base_area_add(name=self.rest_request[2], description=self.rest_request[3])
+                offset = 2
+                if self.set_parameters(offset):
+                    self._rest_base_area_add(self.parameters)
                 else:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "No parameters given", self.jsonp, self.jsonp_cb)
+
+            ### update
+            elif self.rest_request[1] == "update":
+                offset = 2
+                if self.set_parameters(offset):
+                    self._rest_base_area_update(self.parameters)
+                else:
+                    self.send_http_response_error(999, "No parameters given", self.jsonp, self.jsonp_cb)
 
             ### del
             elif self.rest_request[1] == "del":
@@ -534,10 +544,19 @@ target=*
 
             ### add
             elif self.rest_request[1] == "add":
-                if len(self.rest_request) == 5:
-                    self._rest_base_room_add(name=self.rest_request[2], area_id=self.rest_request[3], description=self.rest_request[4])
+                offset = 2
+                if self.set_parameters(offset):
+                    self._rest_base_room_add(self.parameters)
                 else:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "No parameters given", self.jsonp, self.jsonp_cb)
+
+            ### update
+            elif self.rest_request[1] == "update":
+                offset = 2
+                if self.set_parameters(offset):
+                    self._rest_base_room_update(self.parameters)
+                else:
+                    self.send_http_response_error(999, "No parameters given", self.jsonp, self.jsonp_cb)
 
             ### del
             elif self.rest_request[1] == "del":
@@ -573,11 +592,35 @@ target=*
                                 else:
                                     self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
 
+            ### add
+            elif self.rest_request[1] == "add":
+                offset = 2
+                if self.set_parameters(offset):
+                    self._rest_base_ui_config_add(self.parameters)
+                else:
+                    self.send_http_response_error(999, "No parameters given", self.jsonp, self.jsonp_cb)
+
+            ### update
+            elif self.rest_request[1] == "update":
+                offset = 2
+                if self.set_parameters(offset):
+                    self._rest_base_ui_config_update(self.parameters)
+                else:
+                    self.send_http_response_error(999, "No parameters given", self.jsonp, self.jsonp_cb)
+
+            ### delete
+            elif self.rest_request[1] == "del":
+                offset = 2
+                if self.set_parameters(offset):
+                    self._rest_base_ui_config_del(self.parameters)
+                else:
+                    self.send_http_response_error(999, "No parameters given", self.jsonp, self.jsonp_cb)
 
             ### others
             else:
                 self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], self.jsonp, self.jsonp_cb)
                 return
+
 
         ### device #####################################
         elif self.rest_request[0] == "device":
@@ -589,6 +632,37 @@ target=*
             return
 
 
+
+
+
+
+    def set_parameters(self, offset):
+        ii = 0
+        while offset + ii < len(self.rest_request):
+            key = self.rest_request[offset + ii]
+            if offset + ii + 1 < len(self.rest_request):
+                value = self.rest_request[offset + ii + 1]
+            else:
+                self.send_http_response_error(999, "Value missing for " + key, self.jsonp, self.jsonp_cb)
+                return
+            self.parameters[key] = value
+            ii += 2
+        if ii == 0:
+            return False
+        else:
+            return True
+
+
+
+
+
+
+
+    def get_parameters(self, name):
+        try:
+            return self.parameters[name]
+        except KeyError:
+            return None
 
 
 
@@ -616,18 +690,36 @@ target=*
         self.send_http_response_ok(json.get())
 
 
-    def _rest_base_area_add(self, name = None, description = None):
+
+    def _rest_base_area_add(self, params):
         """ add areas
         """
         json = JSonHelper("OK")
         json.set_jsonp(self.jsonp, self.jsonp_cb)
         json.set_data_type("area")
         try:
-            area = self._db.add_area(name, description)
+            area = self._db.add_area(self.get_parameters("name"), self.get_parameters("description"))
             json.add_data(area)
         except:
             json.set_error(code = 999, description = str(sys.exc_info()[1]))
         self.send_http_response_ok(json.get())
+
+
+
+    def _rest_base_area_update(self, params):
+        """ update areas
+        """
+        json = JSonHelper("OK")
+        json.set_jsonp(self.jsonp, self.jsonp_cb)
+        json.set_data_type("area")
+        try:
+            area = self._db.update_area(self.get_parameters("id"), self.get_parameters("name"), self.get_parameters("description"))
+            json.add_data(area)
+        except:
+            json.set_error(code = 999, description = str(sys.exc_info()[1]))
+        self.send_http_response_ok(json.get())
+
+
 
 
     def _rest_base_area_del(self, id=None):
@@ -671,14 +763,29 @@ target=*
 
 
 
-    def _rest_base_room_add(self, name = None, area_id = None, description = None):
+    def _rest_base_room_add(self, params):
         """ add rooms
         """
         json = JSonHelper("OK")
         json.set_jsonp(self.jsonp, self.jsonp_cb)
         json.set_data_type("room")
         try:
-            room = self._db.add_room(name, area_id, description)
+            room = self._db.add_room(self.get_parameters("name"), self.get_parameters("area_id"), self.get_parameters("description"))
+            json.add_data(room)
+        except:
+            json.set_error(code = 999, description = str(sys.exc_info()[1]))
+        self.send_http_response_ok(json.get())
+
+
+
+    def _rest_base_room_update(self, params):
+        """ update rooms
+        """
+        json = JSonHelper("OK")
+        json.set_jsonp(self.jsonp, self.jsonp_cb)
+        json.set_data_type("room")
+        try:
+            room = self._db.update_room(self.get_parameters("name"), self.get_parameters("area_id"), self.get_parameters("description"))
             json.add_data(room)
         except:
             json.set_error(code = 999, description = str(sys.exc_info()[1]))
@@ -725,6 +832,55 @@ target=*
 
 
 
+    def _rest_base_ui_config_add(self, params):
+        """ add ui_config
+        """
+        json = JSonHelper("OK")
+        json.set_jsonp(self.jsonp, self.jsonp_cb)
+        json.set_data_type("ui_config")
+        try:
+            ui_config = self._db.add_item_ui_config(self.get_parameters("item_id"), self.get_parameters("item_type"), {self.get_parameters("key") : self.get_parameters("value")})
+            json.add_data(ui_config)
+        except:
+            json.set_error(code = 999, description = str(sys.exc_info()[1]))
+        self.send_http_response_ok(json.get())
+
+
+    def _rest_base_ui_config_update(self, params):
+        """ update ui_config
+        """
+        json = JSonHelper("OK")
+        json.set_jsonp(self.jsonp, self.jsonp_cb)
+        json.set_data_type("ui_config")
+        try:
+            ui_config = self._db.update_item_ui_config(self.get_parameters("item_id"), self.get_parameters("item_type"), self.get_parameters("key"), self.get_parameters("value"))
+            json.add_data(ui_config)
+        except:
+            json.set_error(code = 999, description = str(sys.exc_info()[1]))
+        self.send_http_response_ok(json.get())
+
+
+    def _rest_base_ui_config_del(self, params):
+        """ del ui_config
+        """
+        json = JSonHelper("OK")
+        json.set_jsonp(self.jsonp, self.jsonp_cb)
+        json.set_data_type("ui_config")
+        try:
+            if self.get_parameters("key") == None:
+                ui_config = self._db.delete_all_item_ui_config(self.get_parameters("item_id"), self.get_parameters("item_type"))
+            else:
+                ui_config = self._db.delete_item_ui_config(self.get_parameters("item_id"), self.get_parameters("item_type"), self.get_parameters("key"))
+            json.add_data(ui_config)
+        except:
+            json.set_error(code = 999, description = str(sys.exc_info()[1]))
+        self.send_http_response_ok(json.get())
+
+
+
+
+
+
 ################################################################################
 class JSonHelper():
 
@@ -753,20 +909,36 @@ class JSonHelper():
     def add_data(self, data):
         data_out = "{"
         self._nb_data_values += 1
-        if hasattr(data, 'id'):
+
+        # dirty issue to force data not to be in cache
+        if hasattr(data, 'id'):    # for all
             pass
+        if hasattr(data, 'area'):  # for room
+            pass
+
         if data == None:
             return
+        print "=== DATA ==="
         print data
+        print "============"
         for key in data.__dict__:
-            print key + " => " + str(data.__dict__[key])
-            if key != "_sa_instance_state":
-                if (isinstance(data.__dict__[key],int)) or \
-                   (isinstance(data.__dict__[key],float)):
-                    data_out += '"' + key + '" : ' + str(data.__dict__[key]) + ','
-                else:
-                    data_out += '"' + key + '" : "' + str(data.__dict__[key]) + '",'
+            print data.__dict__[key]
+            type_data = type(data.__dict__[key]).__name__
+            if type_data == "int" or type_data == "float":
+                data_out += '"' + key + '" : ' + str(data.__dict__[key]) + ','
+            elif type_data == "unicode":
+                data_out += '"' + key + '" : "' + str(data.__dict__[key]) + '",'
+            elif type_data == "Area" or type_data == "Room":
+                data_out += '"' + key + '" : {'
+                for key_dmg in data.__dict__[key].__dict__:
+                    type_data_dmg = type(data.__dict__[key].__dict__[key_dmg]).__name__
+                    if type_data_dmg == "int" or type_data_dmg == "float":
+                        data_out += '"' + key_dmg + '" : ' + str(data.__dict__[key].__dict__[key_dmg]) + ','
+                    elif type_data_dmg == "unicode":
+                        data_out += '"' + key_dmg + '" : "' + str(data.__dict__[key].__dict__[key_dmg]) + '",'
+                data_out = data_out[0:len(data_out)-1] + '},'
         self._data_values += data_out[0:len(data_out)-1] + '},'
+            
 
         
 
