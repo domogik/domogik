@@ -301,7 +301,7 @@ class DbHelper():
             raise DbHelperException("SQL exception : %s" % sql_exception)
         return room
 
-    def update_room(self, r_id, r_name=None, r_description=None, r_area_id=None):
+    def update_room(self, r_id, r_name=None, r_area_id=None, r_description=None):
         """
         Update a room
         @param r_id : room id to be updated
