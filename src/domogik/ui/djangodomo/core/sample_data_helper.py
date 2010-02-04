@@ -56,10 +56,6 @@ Implements
 
 # Author : Marc Schneider <marc@domogik.org>
 
-# $LastChangedBy: mschneider $
-# $LastChangedDate: 2009-02-22 11:45:39 +0100 (dim. 22 févr. 2009) $
-# $LastChangedRevision: 391 $
-
 
 class SampleDataHelper:
     """
@@ -113,14 +109,11 @@ class SampleDataHelper:
 
         # Create sample objects
         x10 = self.__db.add_device_technology(dt_name=u"x10",
-                                            dt_description="x10 techno",
-                                            dt_type=u"cpl")
+                                            dt_description="x10 techno")
         plcbus = self.__db.add_device_technology(dt_name=u"PLCBus",
-                                                dt_description="plcbus techno",
-                                                dt_type=u"cpl")
+                                                dt_description="plcbus techno")
         onewire = self.__db.add_device_technology(dt_name=u"1wire",
-                                                dt_description="1-wire techno",
-                                                dt_type=u"wired")
+                                                dt_description="1-wire techno")
 
         temperature_cat = self.__db.add_device_usage(du_name="Temperature")
         heating_cat = self.__db.add_device_usage(du_name="Heating")

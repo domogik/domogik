@@ -66,7 +66,7 @@ from domogik.common.sql_schema import Area, Device, DeviceUsage, DeviceConfig, \
                                       DeviceStats, DeviceStatsValue, DeviceTechnology, DeviceTechnologyConfig, \
                                       DeviceType, ItemUIConfig, Room, UserAccount, SystemAccount, SystemConfig, \
                                       SystemStats, SystemStatsValue, Trigger
-from domogik.common.sql_schema import DEVICE_TECHNOLOGY_LIST, DEVICE_TECHNOLOGY_TYPE_LIST, \
+from domogik.common.sql_schema import DEVICE_TECHNOLOGY_LIST, \
                                       DEVICE_TYPE_LIST, ITEM_TYPE_LIST, UNIT_OF_STORED_VALUE_LIST
 
 
@@ -549,18 +549,15 @@ class DbHelper():
         """
         return self._session.query(DeviceTechnology).filter_by(name=dt_name).first()
 
-    def add_device_technology(self, dt_name, dt_description, dt_type):
+    def add_device_technology(self, dt_name, dt_description):
         """
         Add a device_technology
         @param dt_name : device technology name, one of 'x10', '1wire', 'PLCBus', 'RFXCom', 'IR'
         @param dt_description : extended description of the technology
-        @param type : type of the technology, one of 'cpl','wired','wifi','wireless','ir'
         """
         if dt_name not in DEVICE_TECHNOLOGY_LIST:
             raise ValueError, "dt_name must be one of %s" % DEVICE_TECHNOLOGY_LIST
-        if dt_type not in DEVICE_TECHNOLOGY_TYPE_LIST:
-            raise ValueError, "dt_type must be one of %s" % DEVICE_TECHNOLOGY_TYPE_LIST
-        dt = DeviceTechnology(name=dt_name, description=dt_description, type=dt_type)
+        dt = DeviceTechnology(name=dt_name, description=dt_description)
         self._session.add(dt)
         try:
             self._session.commit()

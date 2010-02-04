@@ -57,7 +57,6 @@ from domogik.common.configloader import Loader
 
 UNIT_OF_STORED_VALUE_LIST = [u'Volt', u'Celsius', u'Farenheit', u'Percent', u'Boolean', None]
 DEVICE_TECHNOLOGY_LIST = [u'x10',u'1wire',u'PLCBus',u'RFXCom',u'IR',u'EIB/KNX']
-DEVICE_TECHNOLOGY_TYPE_LIST = [u'cpl', u'wired', u'wifi', u'wireless', u'ir']
 DEVICE_TYPE_LIST = [u'appliance', u'lamp', u'music', u'sensor']
 ITEM_TYPE_LIST = [u'area', u'room', u'device']
 
@@ -228,27 +227,23 @@ class DeviceTechnology(Base):
     id = Column(Integer, primary_key=True)
     name = Column(Enum(DEVICE_TECHNOLOGY_LIST), nullable=False)
     description = Column(String(255))
-    type = Column(Enum(DEVICE_TECHNOLOGY_TYPE_LIST))
 
-    def __init__(self, name, description, type):
+    def __init__(self, name, description):
         """
         Class constructor
         @param name : short name of the technology
         @param description : extended description
-        @param type : cpl (power lines), wired (ex. 1wire), wifi,
-        @param wireless (RF based, for example RFXCOM), ir (infrared)
         """
         self.name = name
         self.description = description
-        self.type = type
 
     def __repr__(self):
         """
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<DeviceTechnology(id=%s, name='%s', desc='%s', type='%s')>" \
-          % (self.id, self.name, self.description, self.type)
+        return "<DeviceTechnology(id=%s, name='%s', desc='%s')>" \
+          % (self.id, self.name, self.description)
 
     @staticmethod
     def get_tablename():

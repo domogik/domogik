@@ -341,7 +341,7 @@ class DeviceTypeTestCase(GenericTestCase):
         assert len(self.db.list_device_types()) == 0, "There should have no device type"
 
     def testAdd(self):
-        dt1 = self.db.add_device_technology(u'x10', 'desc dt1', u'cpl')
+        dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
         dty1 = self.db.add_device_type('x10 Switch', 'desc1', dt1.id)
         dty2 = self.db.add_device_type('x10 Dimmer', 'desc2', dt1.id)
         assert len(self.db.list_device_types()) == 2, "%s devices types found, instead of 2 " \
@@ -349,8 +349,8 @@ class DeviceTypeTestCase(GenericTestCase):
         assert self.has_item(self.db.list_device_types(), ['x10 Switch', 'x10 Dimmer']), "Couldn't find all device types"
 
     def testUpdate(self):
-        dt1 = self.db.add_device_technology(u'x10', 'desc dt1', u'cpl')
-        dt2 = self.db.add_device_technology(u'PLCBus', 'desc dt2', u'cpl')
+        dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
+        dt2 = self.db.add_device_technology(u'PLCBus', 'desc dt2')
         dty = self.db.add_device_type('x10 Switch', 'desc1', dt1.id)
         dty_u = self.db.update_device_type(dty.id, 'x10 Dimmer', 'desc2', dt2.id)
         assert dty_u.name == 'x10 Dimmer'
@@ -358,12 +358,12 @@ class DeviceTypeTestCase(GenericTestCase):
         assert dty_u.technology_id == dt2.id
 
     def testFetchInformation(self):
-        dt1 = self.db.add_device_technology(u'x10', 'desc dt1', u'cpl')
+        dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
         dty1 = self.db.add_device_type('x10 Switch', 'desc1', dt1.id)
         assert self.db.get_device_type_by_name('x10 Switch').name == 'x10 Switch', "DeviceType 'x10 Switch' was not found"
 
     def testDel(self):
-        dt1 = self.db.add_device_technology(u'x10', 'desc dt1', u'cpl')
+        dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
         dty1 = self.db.add_device_type('x10 Switch', dt1.id)
         dty2 = self.db.add_device_type('x10 Dimmer', dt1.id)
         dty2_id = dty2.id
@@ -394,24 +394,24 @@ class DeviceTechnologyTestCase(GenericTestCase):
         assert len(self.db.list_device_technologies()) == 0, "There should have no device technology"
 
     def testAdd(self):
-        dt1 = self.db.add_device_technology(u'x10', 'desc dt1', u'cpl')
-        dt2 = self.db.add_device_technology(u'1wire', 'desc dt2', u'wired')
-        dt3 = self.db.add_device_technology(u'PLCBus', 'desc dt3', u'cpl')
+        dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
+        dt2 = self.db.add_device_technology(u'1wire', 'desc dt2')
+        dt3 = self.db.add_device_technology(u'PLCBus', 'desc dt3')
         assert len(self.db.list_device_technologies()) == 3, "%s devices technologies found, instead of 3 " \
                                                       % len(self.db.list_device_technologies())
         assert self.has_item(self.db.list_device_technologies(), [u'x10', u'1wire', u'PLCBus']), \
                                                       "Couldn't find all device technologies"
 
     def testFetchInformation(self):
-        dt2 = self.db.add_device_technology(u'1wire', 'desc dt2', u'wired')
+        dt2 = self.db.add_device_technology(u'1wire', 'desc dt2')
         assert self.db.get_device_technology_by_name(u'1wire').name == u'1wire', "DeviceTechnology '1wire' was not found"
 
     def testDel(self):
-        dt1 = self.db.add_device_technology(u'x10', 'desc dt1', u'cpl')
-        dt2 = self.db.add_device_technology(u'1wire', 'desc dt2', u'wired')
+        dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
+        dt2 = self.db.add_device_technology(u'1wire', 'desc dt2')
         dt_del = dt2
         dt2_id = dt2.id
-        dt3 = self.db.add_device_technology(u'PLCBus', 'desc dt3', u'cpl')
+        dt3 = self.db.add_device_technology(u'PLCBus', 'desc dt3')
         self.db.del_device_technology(dt2.id)
         assert self.has_item(self.db.list_device_technologies(), [u'x10', u'PLCBus']), "Couldn't find 'x10' and 'PLCBus'"
         assert not self.has_item(self.db.list_device_technologies(), [u'1wire']), "'1wire' was NOT deleted"
@@ -441,8 +441,8 @@ class DeviceTechnologyConfigTestCase(GenericTestCase):
         assert len(self.db.list_all_device_technology_config()) == 0, "There should have no device technology configurations"
 
     def testAdd(self):
-        dt1 = self.db.add_device_technology(u'x10', 'desc dt1', u'cpl')
-        dt3 = self.db.add_device_technology(u'PLCBus', 'desc dt3', u'cpl')
+        dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
+        dt3 = self.db.add_device_technology(u'PLCBus', 'desc dt3')
         dtc1_1 = self.db.add_device_technology_config(dt1.id, 'key1_1', 'val1_1', 'desc1')
         dtc1_2 = self.db.add_device_technology_config(dt1.id, 'key1_2', 'val1_2', 'desc2')
         dtc3_1 = self.db.add_device_technology_config(dt3.id, 'key3_1', 'val3_1', 'desc3')
@@ -464,7 +464,7 @@ class DeviceTechnologyConfigTestCase(GenericTestCase):
                 % len(self.db.list_device_technology_config(dt3.id))
 
     def testGet(self):
-        dt3 = self.db.add_device_technology(u'PLCBus', 'desc dt3', u'cpl')
+        dt3 = self.db.add_device_technology(u'PLCBus', 'desc dt3')
         dtc3_1 = self.db.add_device_technology_config(dt3.id, 'key3_1', 'val3_1', 'desc3_1')
         dtc3_2 = self.db.add_device_technology_config(dt3.id, 'key3_2', 'val3_2', 'desc3_2')
         dtc3_3 = self.db.add_device_technology_config(dt3.id, 'key3_3', 'val3_3', 'desc3_3')
@@ -472,8 +472,8 @@ class DeviceTechnologyConfigTestCase(GenericTestCase):
         assert dtc.value == 'val3_2', "Wrong value for %s. Should be val3_2" % dtc.value
 
     def testDel(self):
-        dt1 = self.db.add_device_technology(u'x10', 'desc dt1', u'cpl')
-        dt3 = self.db.add_device_technology(u'PLCBus', 'desc dt3', u'cpl')
+        dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
+        dt3 = self.db.add_device_technology(u'PLCBus', 'desc dt3')
         dtc1_1 = self.db.add_device_technology_config(dt1.id, 'key1_1', 'val1_1', 'desc1')
         dtc1_2 = self.db.add_device_technology_config(dt1.id, 'key1_2', 'val1_2', 'desc2')
         dtc3_1 = self.db.add_device_technology_config(dt3.id, 'key3_1', 'val3_1', 'desc3')
@@ -508,7 +508,7 @@ class DeviceTestCase(GenericTestCase):
     def testAdd(self):
         area1 = self.db.add_area('area1','description 1')
         room1 = self.db.add_room('room1', area1.id)
-        dt1 = self.db.add_device_technology(u'x10', 'desc dt1', u'cpl')
+        dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
         du1 = self.db.add_device_usage('du1')
         dty1 = self.db.add_device_type('x10 Switch', 'desc1', dt1.id)
 
@@ -526,7 +526,7 @@ class DeviceTestCase(GenericTestCase):
     def testUpdate(self):
         area1 = self.db.add_area('area1','description 1')
         room1 = self.db.add_room('room1', area1.id)
-        dt1 = self.db.add_device_technology(u'x10', 'desc dt1', u'cpl')
+        dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
         dty1 = self.db.add_device_type('x10 Switch', 'desc1', dt1.id)
         du1 = self.db.add_device_usage('du1')
         device1 = self.db.add_device(d_name='device1', d_address = 'A1',
@@ -547,7 +547,7 @@ class DeviceTestCase(GenericTestCase):
         area2 = self.db.add_area('area2','description 2')
         room1 = self.db.add_room('room1', area1.id)
         room2 = self.db.add_room('room2', area2.id)
-        dt1 = self.db.add_device_technology(u'x10', 'desc dt1', u'cpl')
+        dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
         dty1 = self.db.add_device_type('x10 Switch', 'desc1', dt1.id)
         dty2 = self.db.add_device_type('x10 Dimmer', 'desc1', dt1.id)
         du1 = self.db.add_device_usage('du1')
@@ -602,7 +602,7 @@ class DeviceTestCase(GenericTestCase):
         area2 = self.db.add_area('area2','description 2')
         room1 = self.db.add_room('room1', area1.id)
         room2 = self.db.add_room('room2', area2.id)
-        dt1 = self.db.add_device_technology(u'x10', 'desc dt1', u'cpl')
+        dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
         dty1 = self.db.add_device_type('x10 Switch', 'desc1', dt1.id)
         du1 = self.db.add_device_usage('du1')
         du2 = self.db.add_device_usage('du2')
@@ -647,7 +647,7 @@ class DeviceStatsTestCase(GenericTestCase):
         assert len(self.db.list_all_device_stats()) == 0, "Device stats list is NOT empty"
 
     def testAdd(self):
-        dt1 = self.db.add_device_technology(u"x10", "this is x10", u"cpl")
+        dt1 = self.db.add_device_technology(u"x10", "this is x10")
         du1 = self.db.add_device_usage("lighting")
         dty1 = self.db.add_device_type('x10 Switch', 'desc1', dt1.id)
         area1 = self.db.add_area('area1','description 1')
@@ -677,7 +677,7 @@ class DeviceStatsTestCase(GenericTestCase):
               "device_hast_stats should have returned False for device id %s " % device4.id
 
     def testLastStatOfOneDevice(self):
-        dt1 = self.db.add_device_technology(u"x10", "this is x10", u"cpl")
+        dt1 = self.db.add_device_technology(u"x10", "this is x10")
         dty1 = self.db.add_device_type('x10 Switch', 'desc1', dt1.id)
         du1 = self.db.add_device_usage("lighting")
         area1 = self.db.add_area('area1','description 1')
@@ -701,7 +701,7 @@ class DeviceStatsTestCase(GenericTestCase):
                                               % (device1.id, dsv[1].value)
 
     def testLastStatOfDevices(self):
-        dt1 = self.db.add_device_technology(u"x10", "this is x10", u"cpl")
+        dt1 = self.db.add_device_technology(u"x10", "this is x10")
         dty1 = self.db.add_device_type('x10 Switch', 'desc1', dt1.id)
         du1 = self.db.add_device_usage("lighting")
         area1 = self.db.add_area('area1','description 1')
@@ -743,7 +743,7 @@ class DeviceStatsTestCase(GenericTestCase):
         assert device2.id in device_id_list, "device2 is not in the list but should have been"
 
     def testDel(self):
-        dt1 = self.db.add_device_technology(u"x10", "this is x10", u"cpl")
+        dt1 = self.db.add_device_technology(u"x10", "this is x10")
         dty1 = self.db.add_device_type('x10 Switch', 'desc1', dt1.id)
         du1 = self.db.add_device_usage("lighting")
         area1 = self.db.add_area('area1','description 1')
