@@ -490,7 +490,7 @@ class DbHelper():
         """
         device_type = self._session.query(DeviceType).filter_by(id=dty_id).first()
         if device_type is None:
-            raise DbHelperException("DeviceType with id %s couldn't be found" % du_id)
+            raise DbHelperException("DeviceType with id %s couldn't be found" % dty_id)
         if dty_name is not None:
             device_type.name = dty_name
         if dty_description is not None:
@@ -565,6 +565,29 @@ class DbHelper():
             self._session.rollback()
             raise DbHelperException("SQL exception : %s" % sql_exception)
         return dt
+
+    def update_device_technology(self, dt_id, dt_name=None, dt_description=None):
+        """
+        Update a device technology
+        @param dt_id : device technology id to be updated
+        @param dt_name : device technology name (optional)
+        @param dt_description : device technology detailed description (optional)
+        @return a DeviceTechnology object
+        """
+        device_tech = self._session.query(DeviceTechnology).filter_by(id=dt_id).first()
+        if device_tech is None:
+            raise DbHelperException("DeviceType with id %s couldn't be found" % dt_id)
+        if dt_name is not None:
+            device_tech.name = dt_name
+        if dt_description is not None:
+            device_tech.description = dt_description
+        self._session.add(device_tech)
+        try:
+            self._session.commit()
+        except Exception as sql_exception:
+            self._session.rollback()
+            raise DbHelperException("SQL exception : %s" % sql_exception)
+        return device_tech
 
     def del_device_technology(self, dt_id, cascade_delete=False):
         """
@@ -644,6 +667,36 @@ class DbHelper():
         if self.get_device_technology_config(dt_id, dtc_key):
             raise DbHelperException("This key '%s' already exists for device technology %s" % (dtc_key, dt_id))
         dtc = DeviceTechnologyConfig(technology_id=dt_id, key=dtc_key, value=dtc_value, description=dtc_description)
+        self._session.add(dtc)
+        try:
+            self._session.commit()
+        except Exception as sql_exception:
+            self._session.rollback()
+            raise DbHelperException("SQL exception : %s" % sql_exception)
+        return dtc
+
+    def update_device_technology_config(self, dtc_id, dt_id=None, dtc_key=None,
+                                        dtc_value=None, dtc_description=None):
+        """
+        Update a device technology config
+        @param dtc_id : device technology config id to be updated
+        @param dt_id : device technology id (optional)
+        @param dtc_key : parameter key (optional)
+        @param dtc_value : parameter value (optional)
+        @param dtc_description : device technology config detailed description (optional)
+        @return a DeviceTechnologyConfig object
+        """
+        dtc = self._session.query(DeviceTechnologyConfig).filter_by(id=dtc_id).first()
+        if dtc is None:
+            raise DbHelperException("DeviceTypeConfig with id %s couldn't be found" % dtc_id)
+        if dt_id is not None:
+            dtc.technology_id = dt_id
+        if dtc_key is not None:
+            dtc.key = dtc_key
+        if dtc_value is not None:
+            dtc.value = dtc_value
+        if dtc_description is not None:
+            dtc.description = dtc_description
         self._session.add(dtc)
         try:
             self._session.commit()
@@ -1041,12 +1094,38 @@ class DbHelper():
     def add_trigger(self, t_description, t_rule, t_result):
         """
         Add a trigger
-        @param t_desc : trigger description
+        @param t_description : trigger description
         @param t_rule : trigger rule
-        @param t_res : trigger result
+        @param t_result : trigger result (list of strings)
         @return the new Trigger object
         """
         trigger = Trigger(description=t_description, rule=t_rule, result=';'.join(t_result))
+        self._session.add(trigger)
+        try:
+            self._session.commit()
+        except Exception as sql_exception:
+            self._session.rollback()
+            raise DbHelperException("SQL exception : %s" % sql_exception)
+        return trigger
+
+    def update_trigger(self, t_id, t_description=None, t_rule=None, t_result=None):
+        """
+        Update a trigger
+        @param dt_id : trigger id to be updated
+        @param t_description : trigger description
+        @param t_rule : trigger rule
+        @param t_result : trigger result (list of strings)
+        @return a Trigger object
+        """
+        trigger = self._session.query(Trigger).filter_by(id=t_id).first()
+        if trigger is None:
+            raise DbHelperException("Trigger with id %s couldn't be found" % t_id)
+        if t_description is not None:
+            trigger.description = t_description
+        if t_rule is not None:
+            trigger.rule = t_rule
+        if t_result is not None:
+            trigger.result = ';'.join(t_result)
         self._session.add(trigger)
         try:
             self._session.commit()
@@ -1104,12 +1183,11 @@ class DbHelper():
         """
         Return system account information from login
         @param a_login : login
-        @param a_pass : password (clear)
+        @param a_pass : password (clear text)
         @return a SystemAccount object or None if login / password is wrong
         """
-        sha_pass = hashlib.sha256()
-        sha_pass.update(a_password)
-        return self._session.query(SystemAccount).filter_by(login=a_login, password=sha_pass.hexdigest()).first()
+        return self._session.query(SystemAccount).filter_by(login=a_login,
+                    password=self.__make_crypted_password(a_password)).first()
 
     def get_system_account_by_user(self, u_id):
         """
@@ -1141,21 +1219,21 @@ class DbHelper():
                 return True
         return False
 
-    def add_system_account(self, a_login, a_password, a_is_admin=False, a_skin_used='skins/default'):
+    def add_system_account(self, a_login, a_password, a_is_admin=False,
+                           a_skin_used='skins/default'):
         """
         Add a system_account
         @param a_login : Account login
-        @param a_password : Account clear password (will be hashed in sha256)
+        @param a_password : Account clear text password (will be hashed in sha256)
         @param a_is_admin : True if it is an admin account, False otherwise (optional, default=False)
         @return the new SystemAccount object or raise a DbHelperException if it already exists
         """
         system_account = self.get_system_account_by_login(a_login)
         if system_account is not None:
             raise DbHelperException("Error %s login already exists" % a_login)
-        password = hashlib.sha256()
-        password.update(a_password)
-        system_account = SystemAccount(login=a_login, password=password.hexdigest(),
-                                      is_admin=a_is_admin, skin_used=a_skin_used)
+        system_account = SystemAccount(login=a_login,
+                                password=self.__make_crypted_password(a_password),
+                                is_admin=a_is_admin, skin_used=a_skin_used)
         self._session.add(system_account)
         try:
             self._session.commit()
@@ -1163,6 +1241,43 @@ class DbHelper():
             self._session.rollback()
             raise DbHelperException("SQL exception : %s" % sql_exception)
         return system_account
+
+    def update_system_account(self, a_login, a_new_login=None, a_password=None,
+                              a_is_admin=None, a_skin_used=None):
+        """
+        Update a system account
+        @param a_login : Account login to be updated
+        @param a_new_login : The new login (optional)
+        @param a_password : Account clear text password (will be hashed in sha256, optional)
+        @param a_is_admin : True if it is an admin account, False otherwise (optional)
+        @return a SystemAccount object
+        """
+        sys_acc = self.get_system_account_by_login(a_login)
+        if sys_acc is None:
+            raise DbHelperException("SystemAccount with login %s couldn't be found" % a_login)
+        if a_new_login is not None:
+            sys_acc.login = a_new_login
+        if a_password is not None:
+            sys_acc.password = self.__make_crypted_password(a_password)
+        if a_is_admin is not None:
+            sys_acc.is_admin = a_is_admin
+        self._session.add(sys_acc)
+        try:
+            self._session.commit()
+        except Exception as sql_exception:
+            self._session.rollback()
+            raise DbHelperException("SQL exception : %s" % sql_exception)
+        return sys_acc
+
+    def __make_crypted_password(self, clear_text_password):
+        """
+        Make a crypted password (using sha256)
+        @param clear_text_password : password in clear text
+        @return crypted password
+        """
+        password = hashlib.sha256()
+        password.update(clear_text_password)
+        return password.hexdigest()
 
     def add_default_system_account(self):
         """
@@ -1239,6 +1354,36 @@ class DbHelper():
             self._session.rollback()
             raise DbHelperException("SQL exception : %s" % sql_exception)
         return user_account
+
+    def update_user_account(self, u_id, u_first_name=None, u_last_name=None,
+                            u_birthdate=None, u_system_account_id=None):
+        """
+        Update a user account
+        @param u_id : User account id to be updated
+        @param u_first_name : User's first name (optional)
+        @param u_last_name : User's last name (optional)
+        @param u_birthdate : User's birthdate (optional)
+        @param u_system_account : User's account on the system (optional)
+        @return a UserAccount object
+        """
+        user_acc = self._session.query(UserAccount).filter_by(id=u_id).first()
+        if user_acc is None:
+            raise DbHelperException("UserAccount with id %s couldn't be found" % u_id)
+        if u_first_name is not None:
+            user_acc.first_name = u_first_name
+        if u_last_name is not None:
+            user_acc.last_name = u_last_name
+        if u_birthdate is not None:
+            user_acc.birthdate = u_birthdate
+        if u_system_account_id is not None:
+            user_acc.system_account_id = u_system_account_id
+        self._session.add(user_acc)
+        try:
+            self._session.commit()
+        except Exception as sql_exception:
+            self._session.rollback()
+            raise DbHelperException("SQL exception : %s" % sql_exception)
+        return user_acc
 
     def del_user_account(self, u_id):
         """

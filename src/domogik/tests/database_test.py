@@ -402,6 +402,12 @@ class DeviceTechnologyTestCase(GenericTestCase):
         assert self.has_item(self.db.list_device_technologies(), [u'x10', u'1wire', u'PLCBus']), \
                                                       "Couldn't find all device technologies"
 
+    def testUpdate(self):
+        dt = self.db.add_device_technology(u'x10', 'desc dt1')
+        dt_u = self.db.update_device_technology(dt.id, u'PLCBus', 'desc dt2')
+        assert dt_u.name == 'PLCBus'
+        assert dt_u.description == 'desc dt2'
+
     def testFetchInformation(self):
         dt2 = self.db.add_device_technology(u'1wire', 'desc dt2')
         assert self.db.get_device_technology_by_name(u'1wire').name == u'1wire', "DeviceTechnology '1wire' was not found"
@@ -454,7 +460,6 @@ class DeviceTechnologyConfigTestCase(GenericTestCase):
             duplicate_key = True
         except DbHelperException:
             pass
-
         assert not duplicate_key, "It shouldn't have been possible to add 'key3_3' for device technology %s : it already exists" % dt3.id
         assert len(self.db.list_device_technology_config(dt1.id)) == 2, \
                 "%s devices technologies config found, instead of 2 " \
@@ -462,6 +467,17 @@ class DeviceTechnologyConfigTestCase(GenericTestCase):
         assert len(self.db.list_device_technology_config(dt3.id)) == 3, \
                 "%s devices technologies config found, instead of 3 " \
                 % len(self.db.list_device_technology_config(dt3.id))
+
+    def testUpdate(self):
+        dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
+        dt2 = self.db.add_device_technology(u'PLCBus', 'desc dt2')
+        dtc = self.db.add_device_technology_config(dt1.id, 'key1', 'val1', 'desc1')
+        dtc_u = self.db.update_device_technology_config(dtc.id, dt_id=dt2.id,
+                      dtc_key='key2', dtc_value='val2', dtc_description='desc2')
+        assert dtc_u.technology_id == dt2.id
+        assert dtc_u.key == 'key2'
+        assert dtc_u.value == 'val2'
+        assert dtc_u.description == 'desc2'
 
     def testGet(self):
         dt3 = self.db.add_device_technology(u'PLCBus', 'desc dt3')
@@ -782,12 +798,22 @@ class TriggersTestCase(GenericTestCase):
         assert len(self.db.list_triggers()) == 0, "Trigger list is NOT empty"
 
     def testAdd(self):
-        trigger1 = self.db.add_trigger(t_description = 'desc1',
-                                t_rule = 'AND(x,OR(y,z))', t_result= ['x10_on("a3")','1wire()'])
+        trigger1 = self.db.add_trigger(t_description='desc1',
+                                t_rule='AND(x,OR(y,z))', t_result=['x10_on("a3")','1wire()'])
         trigger2 = self.db.add_trigger(t_description = 'desc2',
-                                t_rule = 'OR(x,AND(y,z))', t_result= ['x10_on("a2")','1wire()'])
+                                t_rule='OR(x,AND(y,z))', t_result=['x10_on("a2")','1wire()'])
         assert len(self.db.list_triggers()) == 2, "Trigger list should have 2 items but it has %s item(s)" % len(self.db.list_triggers())
         assert self.db.get_trigger(trigger1.id).description == 'desc1', "Trigger1 should have 'desc1', but it has not"
+
+    def testUpdate(self):
+        trigger = self.db.add_trigger(t_description='desc1', t_rule='AND(x,OR(y,z))',
+                                      t_result=['x10_on("a3")','1wire()'])
+        trigger_u = self.db.update_trigger(t_id=trigger.id, t_description='desc2',
+                                      t_rule='OR(x,AND(y,z))',
+                                      t_result=['x10_on("a2")','1wire()'])
+        assert trigger_u.description == 'desc2'
+        assert trigger_u.rule == 'OR(x,AND(y,z))'
+        assert trigger_u.result == 'x10_on("a2");1wire()'
 
     def testDel(self):
         trigger1 = self.db.add_trigger(t_description = 'desc1',
@@ -842,13 +868,34 @@ class UserAndSystemAccountsTestCase(GenericTestCase):
         assert error, "It shouldn't have been possible to add login %s. It already exists!" % 'mschneider'
         sys2 = self.db.add_system_account(a_login = 'lonely', a_password = 'boy', a_is_admin = True, a_skin_used='myskin')
         sys3 = self.db.add_system_account(a_login = 'domo', a_password = 'gik', a_is_admin = True)
-        user1 = self.db.add_user_account(u_first_name='Marc', u_last_name='SCHNEIDER', u_birthdate=datetime.date(1973, 4, 24),
-                                  u_system_account_id = sys1.id)
+        user1 = self.db.add_user_account(u_first_name='Marc', u_last_name='SCHNEIDER', u_birthdate=datetime.date(1973, 4, 24), u_system_account_id = sys1.id)
         user2 = self.db.add_user_account(u_first_name='Monthy', u_last_name='PYTHON', u_birthdate=datetime.date(1981, 4, 24))
         assert len(self.db.list_user_accounts()) == 2, \
                   "List of user accounts should have 2 items, but it has NOT %s" % self.db.list_user_accounts()
         assert len(self.db.list_system_accounts()) == 3, \
                   "List of system accounts should have 3 items, but it has NOT %s" % self.db.list_system_accounts()
+
+    def testUpdate(self):
+        sys_acc = self.db.add_system_account(a_login='mschneider',
+                        a_password='IwontGiveIt', a_is_admin=True)
+        sys_acc_u = self.db.update_system_account(a_login='mschneider',
+                        a_new_login='mschneider2', a_password='ItWasWrong',
+                        a_is_admin=False)
+        sys_acc_msc = self.db.get_system_account_by_login_and_pass(
+                        'mschneider2', 'ItWasWrong')
+        assert sys_acc_msc is not None
+        assert sys_acc_u.is_admin == False
+        user = self.db.add_user_account(u_first_name='Marc', u_last_name='SCHNEIDER',
+                                        u_birthdate=datetime.date(1973, 4, 24),
+                                        u_system_account_id = sys_acc.id)
+        user_u = self.db.update_user_account(u_id=user.id, u_first_name='Marco',
+                                        u_last_name='SCHNEIDERO',
+                                        u_birthdate=datetime.date(1981, 4, 24),
+                                        u_system_account_id = sys_acc_u.id)
+        assert user_u.first_name == 'Marco'
+        assert user_u.last_name == 'SCHNEIDERO'
+        assert user_u.birthdate == datetime.date(1981, 4, 24)
+        assert user_u.system_account_id == sys_acc_u.id
 
     def testGet(self):
         sys1 = self.db.add_system_account(a_login = 'mschneider', a_password = 'IwontGiveIt', a_is_admin = True)
