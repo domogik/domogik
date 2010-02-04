@@ -95,8 +95,8 @@ class DbHelper():
     This class provides methods to fetch and put informations on the Domogik database
     The user should only use methods from this class and don't access the database directly
     """
-    _dbprefix = None
-    _engine = None
+    __dbprefix = None
+    __engine = None
     _session = None
 
     def __init__(self, echo_output=False, use_test_db=False):
@@ -123,9 +123,9 @@ class DbHelper():
             url = '%s_test' % url
 
         # Connecting to the database
-        self._dbprefix = db['db_prefix']
-        self._engine = sqlalchemy.create_engine(url, echo=echo_output)
-        Session = sessionmaker(bind=self._engine)
+        self.__dbprefix = db['db_prefix']
+        self.__engine = sqlalchemy.create_engine(url, echo=echo_output)
+        Session = sessionmaker(bind=self.__engine)
         self._session = Session()
 
     def __rollback(self):
