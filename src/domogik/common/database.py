@@ -191,6 +191,29 @@ class DbHelper():
             raise DbHelperException("SQL exception : %s" % sql_exception)
         return area
 
+    def update_area(self, a_id, a_name=None, a_description=None):
+        """
+        Update an area
+        @param a_id : area id to be updated
+        @param a_name : area name (optional)
+        @param a_description : area detailed description (optional)
+        @return an Area object
+        """
+        area = self._session.query(Area).filter_by(id=a_id).first()
+        if area is None:
+            raise DbHelperException("Area with id %s couldn't be found" % a_id)
+        if a_name is not None:
+            area.name = a_name
+        if a_description is not None:
+            area.description = a_description
+        self._session.add(area)
+        try:
+            self._session.commit()
+        except Exception as sql_exception:
+            self._session.rollback()
+            raise DbHelperException("SQL exception : %s" % sql_exception)
+        return area
+
     def del_area(self, area_del_id, cascade_delete=False):
         """
         Delete an area record
@@ -270,6 +293,32 @@ class DbHelper():
             raise DbHelperException("Couldn't add room with area id %s. It does not exist" % r_area_id)
 
         room = Room(name=r_name, description=r_description, area_id=r_area_id)
+        self._session.add(room)
+        try:
+            self._session.commit()
+        except Exception as sql_exception:
+            self._session.rollback()
+            raise DbHelperException("SQL exception : %s" % sql_exception)
+        return room
+
+    def update_room(self, r_id, r_name=None, r_description=None, r_area_id=None):
+        """
+        Update a room
+        @param r_id : room id to be updated
+        @param r_name : room name (optional)
+        @param r_description : room detailed description (optional)
+        @param r_area_id : id of the area the room belongs to (optional)
+        @return a Room object
+        """
+        room = self._session.query(Room).filter_by(id=r_id).first()
+        if room is None:
+            raise DbHelperException("Room with id %s couldn't be found" % r_id)
+        if r_name is not None:
+            room.name = r_name
+        if r_description is not None:
+            room.description = r_description
+        if r_area_id is not None:
+            room.area_id = r_area_id
         self._session.add(room)
         try:
             self._session.commit()

@@ -184,6 +184,12 @@ class AreaTestCase(GenericTestCase):
         area0 = self.db.add_area('area0','description 0')
         assert self.db.list_areas()[0].name == 'area0', "area0 not found"
 
+    def testUpdate(self):
+        area = self.db.add_area('area0','description 0')
+        area_u = self.db.update_area(area.id, 'area1','description 1')
+        assert area_u.name == 'area1'
+        assert area_u.description == 'description 1'
+
     def testFetchInformation(self):
         area = self.db.add_area('area0','description 0')
         area0 = self.db.get_area_by_name('area0')
@@ -227,6 +233,15 @@ class RoomTestCase(GenericTestCase):
         room2 = self.db.add_room(r_name='room2', r_description='description 2', r_area_id=area1.id)
         room3 = self.db.add_room(r_name='room3', r_description='description 3', r_area_id=area2.id)
         assert len(self.db.list_rooms()) == 3, "Room list should have 3 items, it has %s" % len(self.db.list_rooms())
+
+    def testUpdate(self):
+        area1 = self.db.add_area('area1','description 1')
+        area2 = self.db.add_area('area2','description 2')
+        room = self.db.add_room(r_name='room1', r_description='description 1', r_area_id=area1.id)
+        room_u = self.db.update_room(room.id, r_name='room2', r_description='description 2', r_area_id=area2.id)
+        assert room_u.name == 'room2'
+        assert room_u.description == 'description 2'
+        assert room_u.area_id == area2.id
 
     def testDel(self):
         area1 = self.db.add_area('area1','description 1')
