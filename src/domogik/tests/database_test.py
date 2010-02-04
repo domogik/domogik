@@ -966,8 +966,13 @@ class ItemUIConfigTestCase(GenericTestCase):
         room1 = self.db.add_room('room1', area1.id)
         self.db.add_item_ui_config(area1.id, 'area', {'param_a1':'value_a1','param_a2':'value_a2'})
         self.db.add_item_ui_config(room1.id, 'room', {'param_r1':'value_r1', 'param_r2':'value_r2'})
-        ui_config_list = self.db.list_item_ui_config(room1.id, 'room')
-        #assert value_dict == {'param_r1': 'value_r1', 'param_r2': 'value_r2'}, "Wrong dictionnary returned : %s" % value_dict
+        ui_config_list_all = self.db.list_all_item_ui_config()
+        assert len(ui_config_list_all) == 4, "List should contain 4 items but has %s" % len(ui_config_list_all)
+        ui_config_list_r = self.db.list_item_ui_config(room1.id, 'room')
+        assert len(ui_config_list_r) == 2 and ui_config_list_r[0].item_type == 'room' \
+               and ui_config_list_r[0].key == 'param_r1' and ui_config_list_r[0].value == 'value_r1' \
+               and ui_config_list_r[1].item_type == 'room' and ui_config_list_r[1].key == 'param_r2' \
+               and ui_config_list_r[1].value == 'value_r2', "Wrong list returned %s" % ui_config_list_r
         uic = self.db.get_item_ui_config(room1.id, 'room', 'param_r2')
         assert uic.value == 'value_r2', "item should have the value 'value_r2' but it has %s" % uic.value
         uic = self.db.get_item_ui_config(area1.id, 'area', 'param_a1')
@@ -1000,8 +1005,10 @@ class ItemUIConfigTestCase(GenericTestCase):
         self.db.add_item_ui_config(area1.id, 'area', {'param_a1':'value_a1', 'param_a2':'value_a2'})
         self.db.add_item_ui_config(room1.id, 'room', {'param_r1':'value_r1', 'param_r2':'value_r2'})
         self.db.delete_item_ui_config(area1.id, 'area', 'param_a2')
-        #assert 'param_a1' in self.db.list_item_ui_config(area1.id, 'area').keys(), "param_a1 should have been found"
-        #assert 'param_a3' not in self.db.list_item_ui_config(area1.id, 'area').keys(), "param_a3 should NOT have been found"
+        ui_config_list_all = self.db.list_all_item_ui_config()
+        assert len(ui_config_list_all) == 3, "List should contain 3 items but has %s" % len(ui_config_list_all)
+        assert self.db.get_item_ui_config(room1.id, 'area', 'param_a1') is not None
+        assert self.db.get_item_ui_config(room1.id, 'area', 'param_a2') is None
         item_ui_config_list = self.db.list_item_ui_config(area1.id, 'area')
         item_ui_config_del_list = self.db.delete_all_item_ui_config(area1.id, 'area')
         assert len(self.db.list_item_ui_config(area1.id, 'area')) == 0, "No parameter should have been found"
