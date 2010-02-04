@@ -175,6 +175,12 @@ class AreaTestCase(GenericTestCase):
         assert len(self.db.list_areas()) == 0, "Area list is not empty"
 
     def testAdd(self):
+        try:
+            self.db.add_area(None, None)
+            TestCase.fail(self, "An exception should have been raised : \
+                          impossible to create an area without a name")
+        except DbHelperException:
+            pass
         area0 = self.db.add_area('area0','description 0')
         assert self.db.list_areas()[0].name == 'area0', "area0 not found"
 
