@@ -455,12 +455,11 @@ class DeviceTechnologyConfigTestCase(GenericTestCase):
         dtc3_2 = self.db.add_device_technology_config(dt3.id, 'key3_2', 'val3_2', 'desc4')
         dtc3_3 = self.db.add_device_technology_config(dt3.id, 'key3_3', 'val3_3', 'desc5')
         try:
-            duplicate_key = False
             dtc = self.db.add_device_technology_config(dt3.id, 'key3_3', 'val3_3', 'desc')
-            duplicate_key = True
+            TestCase.fail(self, "It shouldn't have been possible to add 'key3_3'\
+                          for device technology %s : it already exists" % dt3.id)
         except DbHelperException:
             pass
-        assert not duplicate_key, "It shouldn't have been possible to add 'key3_3' for device technology %s : it already exists" % dt3.id
         assert len(self.db.list_device_technology_config(dt1.id)) == 2, \
                 "%s devices technologies config found, instead of 2 " \
                 % len(self.db.list_device_technology_config(dt1.id))
@@ -862,10 +861,10 @@ class UserAndSystemAccountsTestCase(GenericTestCase):
         assert sys1.login == 'mschneider', "Login should be 'mschneider' but is '%s'" %sys1.login
         try:
             self.db.add_system_account(a_login = 'mschneider', a_password = 'plop', a_is_admin = True)
-            error = False
+            TestCase.fail(self, "It shouldn't have been possible to add \
+                          login %s. It already exists!" % 'mschneider')
         except DbHelperException:
-            error = True
-        assert error, "It shouldn't have been possible to add login %s. It already exists!" % 'mschneider'
+            pass
         sys2 = self.db.add_system_account(a_login = 'lonely', a_password = 'boy', a_is_admin = True, a_skin_used='myskin')
         sys3 = self.db.add_system_account(a_login = 'domo', a_password = 'gik', a_is_admin = True)
         user1 = self.db.add_user_account(u_first_name='Marc', u_last_name='SCHNEIDER', u_birthdate=datetime.date(1973, 4, 24), u_system_account_id = sys1.id)
@@ -1065,14 +1064,16 @@ class ItemUIConfigTestCase(GenericTestCase):
         error = False
         try:
             self.db.get_item_ui_config(area1.id, 'foo', 'param_a1')
+            TestCase.fail(self, "Shouldn't have found any param values for \
+                                 (%s, %s)" % (area1.id, 'foo'))
         except DbHelperException:
-            error = True
-        assert error is True, "Shouldn't have found any param values for (%s, %s)" % (area1.id, 'foo')
+            pass
         try:
             self.db.add_item_ui_config(800000000, 'area', {'param_a1':'value_a1', 'param_a2':'value_a2'})
+            TestCase.fail(self, "Shouldn't have been able to add parameters \
+                                 with this item.id which doesn't exist")
         except DbHelperException:
-            error = True
-        assert error is True, "Shouldn't have been able to add parameters with this item.id which doesn't exist"
+            pass
 
     def testUpdate(self):
         area1 = self.db.add_area('area1','description 1')
