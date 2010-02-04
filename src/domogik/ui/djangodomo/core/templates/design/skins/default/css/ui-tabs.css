@@ -12,26 +12,42 @@
     margin:0;
     padding:0;
     list-style:none;
-    background-color: #FFFFFF;
+    background-color: #f6f6f6;
     border-bottom: 1px solid #cccccc;
 }
 .ui-tabs .ui-tabs-nav li {
     margin:0;
     padding:0;
     display:inline-block;
+    border-right: 1px solid #cccccc;
 }
 .ui-tabs .ui-tabs-nav li a {
     margin:0;
     display:inline-block;
-	background-position:left 50%;
+	background-position:3px 50%;
 	background-repeat:no-repeat;
-    padding: 1em 2em 1em 20px;
-    background-color:#FFFFFF;
+    padding: 1em 1em 1em 25px;
     text-decoration:none;
     color:#000000;
     font-weight:bold;
-    border-right: 1px solid #cccccc;
 }
-.ui-tabs .ui-tabs-nav li.ui-tabs-selected { }
-.ui-tabs .ui-tabs-panel { padding: 1em 1.4em; display: block; border-width: 0; background: none; }
+
+.ui-tabs .ui-tabs-nav li a:hover {
+    background-color:#FFFFFF;
+}
+
+.ui-tabs .ui-tabs-nav li a.add {
+    padding: 1em 2em 1em 2em;
+    background-position:50% 50%;
+}
+
+.ui-tabs .ui-tabs-nav li.ui-tabs-selected {
+    background-color: #FFFFFF;
+}
+
+.ui-tabs .ui-tabs-nav li.ui-tabs-selected a {
+    color:#1c94c4;
+}
+
+.ui-tabs .ui-tabs-panel { display: block; background: none; }
 .ui-tabs .ui-tabs-hide { display: none !important; }

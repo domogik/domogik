@@ -121,6 +121,29 @@
             }
         });
         
+        $('.buttonleft[title]').qtip({
+           position: {
+      corner: {
+         target: 'leftMiddle',
+         tooltip: 'rightMiddle'
+      }
+   },
+
+        style: {
+        
+      padding: 5,
+      background: '#A2D959',
+      color: 'black',
+      textAlign: 'center',
+      border: {
+         width: 7,
+         radius: 5,
+         color: '#A2D959'
+      },
+      tip: 'rightMiddle',
+      name: 'dark' // Inherit the rest of the attributes from the preset dark style
+   }
+ });
     });
     // ]]>
 {% endblock %}
@@ -165,11 +188,7 @@
 <div class="nocolumns">
 
 <div id="tabs">
-	<ul>
-        {% for area in areas_list %}
-		<li><a href="#subelement{{ area.id }}" class="icon16-area-grndfloor">{{ area.name }}</a></li>
-        {% endfor %}
-	</ul>
+	<ul>{% for area in areas_list %}<li><a href="#subelement{{ area.id }}" class="icon16-area-grndfloor">{{ area.name }}</a></li>{% endfor %}</ul>
     {% for area in areas_list %}
 	<div id="subelement{{ area.id }}" class="subelement">
             <script type="text/javascript">
@@ -232,11 +251,13 @@
                 });
                 // ]]>
             </script>
+        <ul class="actions">
+            <li><button id='del{{ area.id }}' class='icon16-action-del buttonleft' title="Delete '{{ area.name }}'"><span class='offscreen'>Delete {{ area.name }}</span></button></li>
+            <li><button id="update{{ area.id }}" class="icon16-action-update buttonleft" title="Modify '{{ area.name }}'"><span class='offscreen'>Modify {{ area.name }}</span></button></li>
+        </ul>
+        <div class="content">
             <h2 id="zone{{ area.id }}h" class="icon32-area-grndfloor">{{ area.name }}</h2>
-            <ul class="actions">
-                <li><button id="del{{ area.id }}" class="button">Supprimer</button></li>
-                <!--li><button id="update{{ area.id }}" class="button">Modifier</button></li-->
-            </ul>
+            <p>{{ area.description }}</p>
             <!--
             <div id="updatedialog{{ area.id }}" title="Modifier {{ area.name }}">
                 <p id="validateTips{{ area.id }}">Tous les champs sont requis.</p>
@@ -258,6 +279,7 @@
                 </div>
             </form>
             -->
+        </div>
 	</div>
     {% endfor %}
 </div>

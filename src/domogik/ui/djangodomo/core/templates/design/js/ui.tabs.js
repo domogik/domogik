@@ -3,7 +3,7 @@
         _init: function() {
             var self = this, o = this.options;
             this.list = this.element.children("ul:first");
-            var addButton = $("<li><a href='#'><span>+</span></a></li>");
+            var addButton = $("<li><a href='#' class='add icon16-action-add'>&nbsp;<span class='offscreen'>Add new area</span></a></li>");
             addButton.click(o.addCallback);
             this.list.prepend(addButton);
         }

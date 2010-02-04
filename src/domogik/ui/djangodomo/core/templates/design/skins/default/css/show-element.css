@@ -14,13 +14,13 @@
     background:url(ui-lightness/images/ui-bg_highlight-soft_100_eeeeee_1x100.png) top left repeat-x;
 }
 
-.element .actions, .subelement .actions {
+.element .actions {
     list-style:none;
     margin:0;
     padding:0;
 }
 
-.element .actions li, .subelement .actions li {
+.element .actions li {
     display:inline-block;
     margin:0;
     padding:0;
@@ -59,4 +59,24 @@
 	background-position:left top;
 	background-repeat:no-repeat;
 	margin-bottom:0.2em;
+}
+
+.subelement .actions {
+    float:left;
+}
+
+.subelement .actions {
+    list-style:none;
+    margin:0;
+    padding:0;
+}
+
+.subelement .actions li {
+    margin-top: 0.2em;
+    padding:0;
+}
+
+.subelement .content {
+    margin-left:4em;
+    padding:1em;
 }
