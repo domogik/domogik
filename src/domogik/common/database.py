@@ -393,6 +393,29 @@ class DbHelper():
             raise DbHelperException("SQL exception : %s" % sql_exception)
         return du
 
+    def update_device_usage(self, du_id, du_name=None, du_description=None):
+        """
+        Update a device usage
+        @param du_id : device usage id to be updated
+        @param du_name : device usage name (optional)
+        @param du_description : device usage detailed description (optional)
+        @return a DeviceUsage object
+        """
+        device_usage = self._session.query(DeviceUsage).filter_by(id=du_id).first()
+        if device_usage is None:
+            raise DbHelperException("DeviceUsage with id %s couldn't be found" % du_id)
+        if du_name is not None:
+            device_usage.name = du_name
+        if du_description is not None:
+            device_usage.description = du_description
+        self._session.add(device_usage)
+        try:
+            self._session.commit()
+        except Exception as sql_exception:
+            self._session.rollback()
+            raise DbHelperException("SQL exception : %s" % sql_exception)
+        return device_usage
+
     def del_device_usage(self, du_id, cascade_delete=False):
         """
         Delete a device usage record
@@ -454,6 +477,33 @@ class DbHelper():
             self._session.rollback()
             raise DbHelperException("SQL exception : %s" % sql_exception)
         return dty
+
+    def update_device_type(self, dty_id, dty_name=None, dty_description=None,
+                           dt_id=None):
+        """
+        Update a device type
+        @param dty_id : device type id to be updated
+        @param dty_name : device type name (optional)
+        @param dty_description : device type detailed description (optional)
+        @param dt_id : id of the associated technology (optional)
+        @return a DeviceType object
+        """
+        device_type = self._session.query(DeviceType).filter_by(id=dty_id).first()
+        if device_type is None:
+            raise DbHelperException("DeviceType with id %s couldn't be found" % du_id)
+        if dty_name is not None:
+            device_type.name = dty_name
+        if dty_description is not None:
+            device_type.description = dty_description
+        if dt_id is not None:
+            device_type.technology_id = dt_id
+        self._session.add(device_type)
+        try:
+            self._session.commit()
+        except Exception as sql_exception:
+            self._session.rollback()
+            raise DbHelperException("SQL exception : %s" % sql_exception)
+        return device_type
 
     def del_device_type(self, dty_id, cascade_delete=False):
         """

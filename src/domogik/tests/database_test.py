@@ -297,7 +297,14 @@ class DeviceUsageTestCase(GenericTestCase):
         du2 = self.db.add_device_usage('du2')
         assert len(self.db.list_device_usages()) == 2, "%s devices usages found, instead of 2 " \
                                                       % len(self.db.list_device_usages())
-        assert self.has_item(self.db.list_device_usages(), ['du1', 'du2']), "Couldn't find all device usages"
+        assert self.has_item(self.db.list_device_usages(), ['du1', 'du2']),\
+                             "Couldn't find all device usages"
+
+    def testUpdate(self):
+        du = self.db.add_device_usage('du1')
+        du_u = self.db.update_device_usage(du_id=du.id, du_name='du2', du_description='description 2')
+        assert du_u.name == 'du2'
+        assert du_u.description == 'description 2'
 
     def testFetchInformation(self):
         du1 = self.db.add_device_usage('du1')
@@ -340,6 +347,15 @@ class DeviceTypeTestCase(GenericTestCase):
         assert len(self.db.list_device_types()) == 2, "%s devices types found, instead of 2 " \
                                                       % len(self.db.list_device_types())
         assert self.has_item(self.db.list_device_types(), ['x10 Switch', 'x10 Dimmer']), "Couldn't find all device types"
+
+    def testUpdate(self):
+        dt1 = self.db.add_device_technology(u'x10', 'desc dt1', u'cpl')
+        dt2 = self.db.add_device_technology(u'PLCBus', 'desc dt2', u'cpl')
+        dty = self.db.add_device_type('x10 Switch', 'desc1', dt1.id)
+        dty_u = self.db.update_device_type(dty.id, 'x10 Dimmer', 'desc2', dt2.id)
+        assert dty_u.name == 'x10 Dimmer'
+        assert dty_u.description == 'desc2'
+        assert dty_u.technology_id == dt2.id
 
     def testFetchInformation(self):
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1', u'cpl')
