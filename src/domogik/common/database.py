@@ -186,9 +186,9 @@ class DbHelper():
         self._session.add(area)
         try:
             self._session.commit()
-        except Exception:
+        except Exception, sql_exception:
             self._session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % Exception)
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return area
 
     def update_area(self, a_id, a_name=None, a_description=None):
@@ -209,9 +209,9 @@ class DbHelper():
         self._session.add(area)
         try:
             self._session.commit()
-        except Exception:
+        except Exception, sql_exception:
             self._session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % Exception)
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return area
 
     def del_area(self, area_del_id, cascade_delete=False):
@@ -231,9 +231,9 @@ class DbHelper():
             self._session.delete(area)
             try:
                 self._session.commit()
-            except Exception:
+            except Exception, sql_exception:
                 self._session.rollback()
-                raise DbHelperException("SQL exception (commit) : %s" % Exception)
+                raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
             return area_d
         else:
             raise DbHelperException("Couldn't delete area id %s : it doesn't exist" % area_del_id)
@@ -296,9 +296,9 @@ class DbHelper():
         self._session.add(room)
         try:
             self._session.commit()
-        except Exception:
+        except Exception, sql_exception:
             self._session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % Exception)
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return room
 
     def update_room(self, r_id, r_name=None, r_area_id=None, r_description=None):
@@ -322,9 +322,9 @@ class DbHelper():
         self._session.add(room)
         try:
             self._session.commit()
-        except Exception:
+        except Exception, sql_exception:
             self._session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % Exception)
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return room
 
     def del_room(self, r_id, cascade_delete=False):
@@ -344,9 +344,9 @@ class DbHelper():
             self._session.delete(room)
             try:
                 self._session.commit()
-            except Exception:
+            except Exception, sql_exception:
                 self._session.rollback()
-                raise DbHelperException("SQL exception (commit) : %s" % Exception)
+                raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
             return room_d
         else:
             raise DbHelperException("Couldn't delete room id %s : it doesn't exist" % r_id)
@@ -388,9 +388,9 @@ class DbHelper():
         self._session.add(du)
         try:
             self._session.commit()
-        except Exception:
+        except Exception, sql_exception:
             self._session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % Exception)
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return du
 
     def update_device_usage(self, du_id, du_name=None, du_description=None):
@@ -411,9 +411,9 @@ class DbHelper():
         self._session.add(device_usage)
         try:
             self._session.commit()
-        except Exception:
+        except Exception, sql_exception:
             self._session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % Exception)
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return device_usage
 
     def del_device_usage(self, du_id, cascade_delete=False):
@@ -436,9 +436,9 @@ class DbHelper():
             self._session.delete(du)
             try:
                 self._session.commit()
-            except Exception:
+            except Exception, sql_exception:
                 self._session.rollback()
-                raise DbHelperException("SQL exception (commit) : %s" % Exception)
+                raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
             return du_d
         else:
             raise DbHelperException("Couldn't delete device usage id %s : it doesn't exist" % du_id)
@@ -473,9 +473,9 @@ class DbHelper():
         self._session.add(dty)
         try:
             self._session.commit()
-        except Exception:
+        except Exception, sql_exception:
             self._session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % Exception)
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return dty
 
     def update_device_type(self, dty_id, dty_name=None, dty_description=None,
@@ -500,9 +500,9 @@ class DbHelper():
         self._session.add(device_type)
         try:
             self._session.commit()
-        except Exception:
+        except Exception, sql_exception:
             self._session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % Exception)
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return device_type
 
     def del_device_type(self, dty_id, cascade_delete=False):
@@ -524,9 +524,9 @@ class DbHelper():
             self._session.delete(dty)
             try:
                 self._session.commit()
-            except Exception:
+            except Exception, sql_exception:
                 self._session.rollback()
-                raise DbHelperException("SQL exception (commit) : %s" % Exception)
+                raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
             return dty_d
         else:
             raise DbHelperException("Couldn't delete device type id %s : it doesn't exist" % dty_id)
@@ -561,9 +561,9 @@ class DbHelper():
         self._session.add(dt)
         try:
             self._session.commit()
-        except Exception:
+        except Exception, sql_exception:
             self._session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % Exception)
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return dt
 
     def update_device_technology(self, dt_id, dt_name=None, dt_description=None):
@@ -584,9 +584,9 @@ class DbHelper():
         self._session.add(device_tech)
         try:
             self._session.commit()
-        except Exception:
+        except Exception, sql_exception:
             self._session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % Exception)
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return device_tech
 
     def del_device_technology(self, dt_id, cascade_delete=False):
@@ -613,9 +613,9 @@ class DbHelper():
             self._session.delete(dt)
             try:
                 self._session.commit()
-            except Exception:
+            except Exception, sql_exception:
                 self._session.rollback()
-                raise DbHelperException("SQL exception (commit) : %s" % Exception)
+                raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
             return dt_d
         else:
             raise DbHelperException("Couldn't delete device technology id %s : it doesn't exist" % dt_id)
@@ -670,9 +670,9 @@ class DbHelper():
         self._session.add(dtc)
         try:
             self._session.commit()
-        except Exception:
+        except Exception, sql_exception:
             self._session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % Exception)
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return dtc
 
     def update_device_technology_config(self, dtc_id, dt_id=None, dtc_key=None,
@@ -700,9 +700,9 @@ class DbHelper():
         self._session.add(dtc)
         try:
             self._session.commit()
-        except Exception:
+        except Exception, sql_exception:
             self._session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % Exception)
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return dtc
 
     def del_device_technology_config(self, dtc_id):
@@ -717,9 +717,9 @@ class DbHelper():
             self._session.delete(dtc)
             try:
                 self._session.commit()
-            except Exception:
+            except Exception, sql_exception:
                 self._session.rollback()
-                raise DbHelperException("SQL exception (commit) : %s" % Exception)
+                raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
             return dtc_d
         else:
             raise DbHelperException("Couldn't delete device technology config id %s : it doesn't exist" % dtc_id)
@@ -843,9 +843,9 @@ class DbHelper():
         self._session.add(device)
         try:
             self._session.commit()
-        except Exception:
+        except Exception, sql_exception:
             self._session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % Exception)
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return device
 
     def update_device(self, d_id, d_name=None, d_address=None, d_technology_id=None, d_type_id=None,
@@ -910,9 +910,9 @@ class DbHelper():
         self._session.add(device)
         try:
             self._session.commit()
-        except Exception:
+        except Exception, sql_exception:
             self._session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % Exception)
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return device
 
     def del_device(self, d_id):
@@ -939,9 +939,9 @@ class DbHelper():
         self._session.delete(device)
         try:
             self._session.commit()
-        except Exception:
+        except Exception, sql_exception:
             self._session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % Exception)
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return device_d
 
 ####
@@ -1016,17 +1016,17 @@ class DbHelper():
         self._session.add(device_stat)
         try:
             self._session.commit()
-        except Exception:
+        except Exception, sql_exception:
             self._session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % Exception)
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         for ds_name in ds_values.keys():
             dsv = DeviceStatsValue(name=ds_name, value=ds_values[ds_name], device_stats_id=device_stat.id)
             self._session.add(dsv)
         try:
             self._session.commit()
-        except Exception:
+        except Exception, sql_exception:
             self._session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % Exception)
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return device_stat
 
     def del_device_stat(self, ds_id):
@@ -1044,9 +1044,9 @@ class DbHelper():
                 self._session.delete(device_stats_value)
             try:
                 self._session.commit()
-            except Exception:
+            except Exception, sql_exception:
                 self._session.rollback()
-                raise DbHelperException("SQL exception (commit) : %s" % Exception)
+                raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
             return device_stat_d
         else:
             raise DbHelperException("Couldn't delete device stat id %s : it doesn't exist" % ds_id)
@@ -1068,9 +1068,9 @@ class DbHelper():
             self._session.delete(device_stat)
         try:
             self._session.commit()
-        except Exception:
+        except Exception, sql_exception:
             self._session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % Exception)
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return device_stats_d_list
 
 ####
@@ -1103,9 +1103,9 @@ class DbHelper():
         self._session.add(trigger)
         try:
             self._session.commit()
-        except Exception:
+        except Exception, sql_exception:
             self._session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % Exception)
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return trigger
 
     def update_trigger(self, t_id, t_description=None, t_rule=None, t_result=None):
@@ -1129,9 +1129,9 @@ class DbHelper():
         self._session.add(trigger)
         try:
             self._session.commit()
-        except Exception:
+        except Exception, sql_exception:
             self._session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % Exception)
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return trigger
 
     def del_trigger(self, t_id):
@@ -1146,9 +1146,9 @@ class DbHelper():
             self._session.delete(trigger)
             try:
                 self._session.commit()
-            except Exception:
+            except Exception, sql_exception:
                 self._session.rollback()
-                raise DbHelperException("SQL exception (commit) : %s" % Exception)
+                raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
             return trigger
         else:
             raise DbHelperException("Couldn't delete trigger id %s : it doesn't exist" % t_id)
@@ -1237,9 +1237,9 @@ class DbHelper():
         self._session.add(system_account)
         try:
             self._session.commit()
-        except Exception:
+        except Exception, sql_exception:
             self._session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % Exception)
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return system_account
 
     def update_system_account(self, a_login, a_new_login=None, a_password=None,
@@ -1264,9 +1264,9 @@ class DbHelper():
         self._session.add(sys_acc)
         try:
             self._session.commit()
-        except Exception:
+        except Exception, sql_exception:
             self._session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % Exception)
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return sys_acc
 
     def __make_crypted_password(self, clear_text_password):
@@ -1303,9 +1303,9 @@ class DbHelper():
             self._session.delete(system_account)
             try:
                 self._session.commit()
-            except Exception:
+            except Exception, sql_exception:
                 self._session.rollback()
-                raise DbHelperException("SQL exception (commit) : %s" % Exception)
+                raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
             return system_account_d
         else:
             raise DbHelperException("Couldn't delete system account id %s : it doesn't exist" % a_id)
@@ -1355,9 +1355,9 @@ class DbHelper():
         self._session.add(user_account)
         try:
             self._session.commit()
-        except Exception:
+        except Exception, sql_exception:
             self._session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % Exception)
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return user_account
 
     def update_user_account(self, u_id, u_first_name=None, u_last_name=None,
@@ -1385,9 +1385,9 @@ class DbHelper():
         self._session.add(user_acc)
         try:
             self._session.commit()
-        except Exception:
+        except Exception, sql_exception:
             self._session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % Exception)
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return user_acc
 
     def del_user_account(self, u_id):
@@ -1401,9 +1401,9 @@ class DbHelper():
             self._session.delete(user_account)
             try:
                 self._session.commit()
-            except Exception:
+            except Exception, sql_exception:
                 self._session.rollback()
-                raise DbHelperException("SQL exception (commit) : %s" % Exception)
+                raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
             user_account_d = user_account
             if user_account.system_account_id is not None:
                 self.del_system_account(user_account.system_account_id)
@@ -1450,18 +1450,18 @@ class DbHelper():
         self._session.add(system_stat)
         try:
             self._session.commit()
-        except Exception:
+        except Exception, sql_exception:
             self._session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % Exception)
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         for stat_value_name in s_values.keys():
             ssv = SystemStatsValue(name=stat_value_name, value=s_values[stat_value_name],
                                   system_stats_id=system_stat.id)
             self._session.add(ssv)
         try:
             self._session.commit()
-        except Exception:
+        except Exception, sql_exception:
             self._session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % Exception)
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return system_stat
 
     def del_system_stat(self, s_name):
@@ -1480,9 +1480,9 @@ class DbHelper():
             self._session.delete(system_stat)
             try:
                 self._session.commit()
-            except Exception:
+            except Exception, sql_exception:
                 self._session.rollback()
-                raise DbHelperException("SQL exception (commit) : %s" % Exception)
+                raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
             return system_stat
         else:
             raise DbHelperException("Couldn't delete system stat %s : it doesn't exist" % s_name)
@@ -1503,9 +1503,9 @@ class DbHelper():
             self._session.delete(system_stat)
         try:
             self._session.commit()
-        except Exception:
+        except Exception, sql_exception:
             self._session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % Exception)
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return system_stats_d_list
 
 
@@ -1542,9 +1542,9 @@ class DbHelper():
             self._session.add(item_ui_config)
             try:
                 self._session.commit()
-            except Exception:
+            except Exception, sql_exception:
                 self._session.rollback()
-                raise DbHelperException("SQL exception (commit) : %s" % Exception)
+                raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
             item_ui_config_list.append(item_ui_config)
         return item_ui_config_list
 
@@ -1569,9 +1569,9 @@ class DbHelper():
         self._session.add(item_ui_config)
         try:
             self._session.commit()
-        except Exception:
+        except Exception, sql_exception:
             self._session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % Exception)
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return item_ui_config
 
     def get_item_ui_config(self, i_item_id, i_item_type, i_key):
@@ -1629,9 +1629,9 @@ class DbHelper():
         self._session.delete(item_ui_config)
         try:
             self._session.commit()
-        except Exception:
+        except Exception, sql_exception:
             self._session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % Exception)
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return item_ui_config_d
 
     def delete_all_item_ui_config(self, i_item_id, i_item_type):
@@ -1650,9 +1650,9 @@ class DbHelper():
             self._session.delete(item_ui_config)
             try:
                 self._session.commit()
-            except Exception:
+            except Exception, sql_exception:
                 self._session.rollback()
-                raise DbHelperException("SQL exception (commit) : %s" % Exception)
+                raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
             item_ui_config_d_list.append(item_ui_config)
         return item_ui_config_d_list
 
@@ -1690,7 +1690,7 @@ class DbHelper():
         self._session.add(system_config)
         try:
             self._session.commit()
-        except Exception:
+        except Exception, sql_exception:
             self._session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % Exception)
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return system_config
