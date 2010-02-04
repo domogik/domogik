@@ -1,16 +1,30 @@
-/base/area/add/RDC/Rez%20de%20chausse
-/base/room/add/Cuisine/1/None
-/base/room/add/Salon/1/None
-/base/room/add/Sejour/1/None
-/base/room/add/Cellier/1/None
-/base/room/add/Salle%20d%20eau/1/None
+# area : id 1
+/base/area/add/name/RDC/description/Rez%20de%20chausse
+# room : id 1
+/base/room/add/name/Cuisine/area_id/1/description/la%20cuisine
+# room : id 2
+/base/room/add/name/Salon/area_id/1
+# room : id 3
+/base/room/add/name/Sejour/area_id/1
+# room : id 4
+/base/room/add/name/Cellier/area_id/1
+# room : id 5
+/base/room/add/name/Salle%20d%20eau/area_id/1/description/la%20o20se%20lave
 
-/base/area/add/Etage/Premier%20etage
-/base/room/add/Chambre%20Parents/2/None
-/base/room/add/Chambre%20Garcon/2/None
-/base/room/add/Chambre%20Fille/2/None
+# area : id 2
+/base/area/add/name/Etage/description/Premier%20etage
+# room : id 6
+/base/room/add/name/Chambre%20Parents/area_id/2
+# room : id 7
+/base/room/add/name/Chambre%20Garcon/area_id/2
+# room : id 8
+/base/room/add/name/Chambre%20Fille/area_id/2
+# room : id 9
 
-/base/area/add/Garage/None
-/base/room/add/Garage/3/Zone%20pour%20la%20voiture
-/base/room/add/Cellier/3/Zone%20pour%20madame
+# area : id 3
+/base/area/add/name/Garage
+# room : id 10
+/base/room/add/name/Garage/area_id/3
+# room : id 11
+/base/room/add/name/Cellier/area_id/3
 
