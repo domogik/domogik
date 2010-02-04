@@ -51,7 +51,7 @@ from django.utils.translation import ugettext_lazy as _
 from domogik.common import database
 from djangodomo.core.models import *
 
-from djangodomo.core.SampleDataHelper import SampleDataHelper
+from djangodomo.core.sample_data_helper import SampleDataHelper
 from djangodomo.core.XPLHelper import XPLHelper
 
 from django.views.decorators.cache import never_cache
