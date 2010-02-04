@@ -1169,11 +1169,14 @@ class DbHelper():
         if item is None:
             raise DbHelperException("Can't find this item  (%s,%s)" % (i_item_id, i_item_type))
 
+        item_ui_config_list = []
         for param in i_parameters:
             item_ui_config = ItemUIConfig(item_id=i_item_id, item_type=i_item_type,
                                           key=param, value=i_parameters[param])
             self._session.add(item_ui_config)
             self._session.commit()
+            item_ui_config_list.append(item_ui_config)
+        return item_ui_config_list
 
     def update_item_ui_config(self, i_item_id, i_item_type, i_key, i_value):
         """

@@ -964,7 +964,8 @@ class ItemUIConfigTestCase(GenericTestCase):
     def testAdd(self):
         area1 = self.db.add_area('area1','description 1')
         room1 = self.db.add_room('room1', area1.id)
-        self.db.add_item_ui_config(area1.id, 'area', {'param_a1':'value_a1','param_a2':'value_a2'})
+        ui_config_list_a = self.db.add_item_ui_config(area1.id, 'area', {'param_a1':'value_a1','param_a2':'value_a2'})
+        assert len(ui_config_list_a) == 2
         self.db.add_item_ui_config(room1.id, 'room', {'param_r1':'value_r1', 'param_r2':'value_r2'})
         ui_config_list_all = self.db.list_all_item_ui_config()
         assert len(ui_config_list_all) == 4, "List should contain 4 items but has %s" % len(ui_config_list_all)
