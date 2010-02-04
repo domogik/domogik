@@ -1295,6 +1295,11 @@ class DbHelper():
         system_account = self._session.query(SystemAccount).filter_by(id=a_id).first()
         if system_account:
             system_account_d = system_account
+            user = self.get_user_account_by_system_account(system_account.id)
+            if user is not None:
+                raise DbHelperException("Couldn't delete system account '%s' : \
+                        '%s %s' user has a reference to it" \
+                        % (system_account.login, user.first_name, user.last_name))
             self._session.delete(system_account)
             try:
                 self._session.commit()
@@ -1393,15 +1398,15 @@ class DbHelper():
         """
         user_account = self._session.query(UserAccount).filter_by(id=u_id).first()
         if user_account is not None:
-            user_account_d = user_account
-            if user_account.system_account_id is not None:
-                self.del_system_account(user_account.system_account_id)
             self._session.delete(user_account)
             try:
                 self._session.commit()
             except Exception:
                 self._session.rollback()
                 raise DbHelperException("SQL exception (commit) : %s" % Exception)
+            user_account_d = user_account
+            if user_account.system_account_id is not None:
+                self.del_system_account(user_account.system_account_id)
             return user_account_d
         else:
             raise DbHelperException("Couldn't delete user account id %s : it doesn't exist" % u_id)

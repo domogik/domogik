@@ -945,8 +945,15 @@ class UserAndSystemAccountsTestCase(GenericTestCase):
         sys1 = self.db.add_system_account(a_login = 'mschneider', a_password = 'IwontGiveIt', a_is_admin = True)
         sys2 = self.db.add_system_account(a_login = 'lonely', a_password = 'boy', a_is_admin = True, a_skin_used='myskin')
         sys3 = self.db.add_system_account(a_login = 'domo', a_password = 'gik', a_is_admin = True)
-        user1 = self.db.add_user_account(u_first_name='Marc', u_last_name='SCHNEIDER', u_birthdate=datetime.date(1973, 4, 24),
-                                  u_system_account_id = sys1.id)
+        user1 = self.db.add_user_account(u_first_name='Marc',
+                u_last_name='SCHNEIDER', u_birthdate=datetime.date(1973, 4, 24),
+                u_system_account_id = sys1.id)
+        try:
+            self.db.del_system_account(sys1.id)
+            TestCase.fail(self, "It shouldn't have been possible to delete this \
+                                 system account, a user has a reference to it")
+        except DbHelperException:
+            pass
         user2 = self.db.add_user_account(u_first_name='Monthy', u_last_name='PYTHON', u_birthdate=datetime.date(1981, 4, 24))
         sys_temp = self.db.add_system_account(a_login = 'fantom', a_password = 'as', a_is_admin = False)
         sys_temp_id = sys_temp.id
