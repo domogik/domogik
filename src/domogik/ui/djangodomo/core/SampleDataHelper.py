@@ -71,34 +71,34 @@ class SampleDataHelper:
         Class constructor
         @param db : an instance of DbHelper class to connect to the db API
         """
-        self._db = db
+        self.__db = db
 
     def remove(self):
         """
         Remove all sample data
         """
-        for area in self._db.list_areas():
-            self._db.del_area(area.id)
+        for area in self.__db.list_areas():
+            self.__db.del_area(area.id)
 
-        for dt in self._db.list_device_technologies():
-            self._db.del_device_technology(dt.id)
+        for dt in self.__db.list_device_technologies():
+            self.__db.del_device_technology(dt.id)
 
-        for du in self._db.list_device_usages():
-            self._db.del_device_usage(du.id)
+        for du in self.__db.list_device_usages():
+            self.__db.del_device_usage(du.id)
 
-        for dty in self._db.list_device_types():
-            self._db.del_device_type(dty.id)
+        for dty in self.__db.list_device_types():
+            self.__db.del_device_type(dty.id)
 
-        for trigger in self._db.list_triggers():
-            self._db.del_trigger(trigger.id)
+        for trigger in self.__db.list_triggers():
+            self.__db.del_trigger(trigger.id)
 
-        for user_acc in self._db.list_user_accounts():
-            self._db.del_user_account(user_acc.id)
+        for user_acc in self.__db.list_user_accounts():
+            self.__db.del_user_account(user_acc.id)
 
-        for sys_acc in self._db.list_system_accounts():
-            self._db.del_system_account(sys_acc.id)
+        for sys_acc in self.__db.list_system_accounts():
+            self.__db.del_system_account(sys_acc.id)
 
-        self._db.del_all_system_stats()
+        self.__db.del_all_system_stats()
 
     def create(self):
         """
@@ -107,87 +107,87 @@ class SampleDataHelper:
         self.remove()
 
         # Add default administrator
-        self._db.add_default_system_account()
+        self.__db.add_default_system_account()
 
-        self._db.update_system_config(s_simulation_mode=True, s_debug_mode=True)
+        self.__db.update_system_config(s_simulation_mode=True, s_debug_mode=True)
 
         # Create sample objects
-        x10 = self._db.add_device_technology(dt_name=u"x10",
+        x10 = self.__db.add_device_technology(dt_name=u"x10",
                                             dt_description="x10 techno",
                                             dt_type=u"cpl")
-        plcbus = self._db.add_device_technology(dt_name=u"PLCBus",
+        plcbus = self.__db.add_device_technology(dt_name=u"PLCBus",
                                                 dt_description="plcbus techno",
                                                 dt_type=u"cpl")
-        onewire = self._db.add_device_technology(dt_name=u"1wire",
+        onewire = self.__db.add_device_technology(dt_name=u"1wire",
                                                 dt_description="1-wire techno",
                                                 dt_type=u"wired")
 
-        temperature_cat = self._db.add_device_usage(du_name="Temperature")
-        heating_cat = self._db.add_device_usage(du_name="Heating")
-        lighting_cat = self._db.add_device_usage(du_name="Lighting")
-        music_cat = self._db.add_device_usage(du_name="Music")
-        appliance_cat = self._db.add_device_usage(du_name="Appliance")
+        temperature_cat = self.__db.add_device_usage(du_name="Temperature")
+        heating_cat = self.__db.add_device_usage(du_name="Heating")
+        lighting_cat = self.__db.add_device_usage(du_name="Lighting")
+        music_cat = self.__db.add_device_usage(du_name="Music")
+        appliance_cat = self.__db.add_device_usage(du_name="Appliance")
 
-        x10_switch = self._db.add_device_type('Switch','x10 Switch', x10.id)
-        x10_dimmer = self._db.add_device_type('Dimmer','x10 Dimmer', x10.id)
-        plcbus_switch = self._db.add_device_type('Switch','PLCBus switch', plcbus.id)
-        plcbus_dimmer = self._db.add_device_type('Dimmer','PLCBus dimmer', plcbus.id)
+        x10_switch = self.__db.add_device_type('Switch','x10 Switch', x10.id)
+        x10_dimmer = self.__db.add_device_type('Dimmer','x10 Dimmer', x10.id)
+        plcbus_switch = self.__db.add_device_type('Switch','PLCBus switch', plcbus.id)
+        plcbus_dimmer = self.__db.add_device_type('Dimmer','PLCBus dimmer', plcbus.id)
 
-        basement = self._db.add_area(a_name="Basement")
-        ground_floor = self._db.add_area(a_name="Ground floor")
-        first_floor = self._db.add_area(a_name="First floor")
+        basement = self.__db.add_area(a_name="Basement")
+        ground_floor = self.__db.add_area(a_name="Ground floor")
+        first_floor = self.__db.add_area(a_name="First floor")
 
-        bedroom1 = self._db.add_room(r_name="Bedroom 1", r_area_id=first_floor.id)
-        bedroom2 = self._db.add_room(r_name="Bedroom 2", r_area_id=first_floor.id)
-        lounge = self._db.add_room(r_name="Lounge", r_area_id=ground_floor.id)
-        kitchen = self._db.add_room(r_name="Kitchen", r_area_id=ground_floor.id)
-        bathroom = self._db.add_room(r_name="Bathroom", r_area_id=first_floor.id)
-        cellar = self._db.add_room(r_name="Cellar", r_area_id=basement.id)
+        bedroom1 = self.__db.add_room(r_name="Bedroom 1", r_area_id=first_floor.id)
+        bedroom2 = self.__db.add_room(r_name="Bedroom 2", r_area_id=first_floor.id)
+        lounge = self.__db.add_room(r_name="Lounge", r_area_id=ground_floor.id)
+        kitchen = self.__db.add_room(r_name="Kitchen", r_area_id=ground_floor.id)
+        bathroom = self.__db.add_room(r_name="Bathroom", r_area_id=first_floor.id)
+        cellar = self.__db.add_room(r_name="Cellar", r_area_id=basement.id)
 
-        bedroom1_beside_lamp = self._db.add_device(
+        bedroom1_beside_lamp = self.__db.add_device(
             d_name="Beside lamp", d_address="A1", d_reference="AM12",
             d_usage_id=lighting_cat.id, d_type_id=x10_switch.id,
             d_room_id=bedroom1.id, d_is_resetable=True, d_initial_value="off",
             d_is_value_changeable_by_user=True, d_unit_of_stored_values=None
         )
-        bedroom1_lamp = self._db.add_device(
+        bedroom1_lamp = self.__db.add_device(
             d_name="Lamp", d_address="A2", d_type_id=x10_dimmer.id, d_usage_id=lighting_cat.id,
             d_reference="LM12", d_room_id=bedroom1.id, d_is_resetable=True,
             d_initial_value="100", d_is_value_changeable_by_user=True, d_unit_of_stored_values=u"Percent"
         )
-        bedroom2_beside_lamp = self._db.add_device(
+        bedroom2_beside_lamp = self.__db.add_device(
             d_name="Beside lamp", d_address="B1", d_reference="AM12",
             d_usage_id=lighting_cat.id, d_type_id=plcbus_switch.id,
             d_room_id=bedroom2.id, d_is_resetable=True, d_initial_value="off",
             d_is_value_changeable_by_user=True, d_unit_of_stored_values=None
         )
-        bedroom2_lamp = self._db.add_device(
+        bedroom2_lamp = self.__db.add_device(
             d_name="Lamp", d_address="B2", d_usage_id=lighting_cat.id,
             d_reference="LM12", d_type_id=plcbus_dimmer.id, d_room_id=bedroom2.id, d_is_resetable=True,
             d_initial_value="100", d_is_value_changeable_by_user=True, d_unit_of_stored_values=u"Percent"
         )
-        lounge_lamp = self._db.add_device(
+        lounge_lamp = self.__db.add_device(
             d_name="Lamp", d_address="C1", d_usage_id=lighting_cat.id,
             d_reference="LM12", d_type_id=plcbus_dimmer.id, d_room_id=lounge.id, d_is_resetable=True,
             d_initial_value="100", d_is_value_changeable_by_user=True, d_unit_of_stored_values=u"Percent"
         )
-        kitchen_lamp = self._db.add_device(
+        kitchen_lamp = self.__db.add_device(
             d_name="Lamp", d_address="D1", d_usage_id=lighting_cat.id,
             d_reference="LM12", d_type_id=x10_dimmer.id, d_room_id=kitchen.id, d_is_resetable=True,
             d_initial_value="100", d_is_value_changeable_by_user=True, d_unit_of_stored_values=u"Percent"
         )
-        kitchen_coffee_machine = self._db.add_device(
+        kitchen_coffee_machine = self.__db.add_device(
             d_name="Coffee machine", d_address="D2", d_usage_id=appliance_cat.id,
             d_type_id=plcbus_switch.id, d_reference="AM12", d_room_id=kitchen.id, d_is_resetable=True,
             d_initial_value="off", d_is_value_changeable_by_user=True, d_unit_of_stored_values=None
         )
 
-        bedroom1_icon = self._db.add_item_ui_config(bedroom1.id, 'room', {'icon':'bedroom'})
-        bedroom2_icon = self._db.add_item_ui_config(bedroom2.id, 'room', {'icon':'bedroom'})
-        lounge_icon = self._db.add_item_ui_config(lounge.id, 'room', {'icon':'tvlounge'})
-        kitchen_icon = self._db.add_item_ui_config(kitchen.id, 'room', {'icon':'kitchen'})
-        bathroom_icon = self._db.add_item_ui_config(bathroom.id, 'room', {'icon':'bathroom'})
+        bedroom1_icon = self.__db.add_item_ui_config(bedroom1.id, 'room', {'icon':'bedroom'})
+        bedroom2_icon = self.__db.add_item_ui_config(bedroom2.id, 'room', {'icon':'bedroom'})
+        lounge_icon = self.__db.add_item_ui_config(lounge.id, 'room', {'icon':'tvlounge'})
+        kitchen_icon = self.__db.add_item_ui_config(kitchen.id, 'room', {'icon':'kitchen'})
+        bathroom_icon = self.__db.add_item_ui_config(bathroom.id, 'room', {'icon':'bathroom'})
 
-        basement_icon = self._db.add_item_ui_config(basement.id, 'area', {'icon':'basement'})
-        groundfloor_icon = self._db.add_item_ui_config(ground_floor.id, 'area', {'icon':'grndfloor'})
-        firstfloor_icon = self._db.add_item_ui_config(first_floor.id, 'area', {'icon':'firstfloor'})
+        basement_icon = self.__db.add_item_ui_config(basement.id, 'area', {'icon':'basement'})
+        groundfloor_icon = self.__db.add_item_ui_config(ground_floor.id, 'area', {'icon':'grndfloor'})
+        firstfloor_icon = self.__db.add_item_ui_config(first_floor.id, 'area', {'icon':'firstfloor'})
