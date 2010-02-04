@@ -128,6 +128,12 @@ class DbHelper():
         Session = sessionmaker(bind=self._engine)
         self._session = Session()
 
+    def __rollback(self):
+        """
+        Issue a rollback to a SQL transaction (for dev purposes only)
+        """
+        self._session.rollback()
+
 ####
 # Areas
 ####
