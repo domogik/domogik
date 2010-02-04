@@ -230,6 +230,9 @@ class RoomTestCase(GenericTestCase):
         area1 = self.db.add_area('area1','description 1')
         area2 = self.db.add_area('area2','description 2')
         room1 = self.db.add_room(r_name='room1', r_description='description 1', r_area_id=area1.id)
+        assert room1.name == 'room1'
+        assert room1.description == 'description 1'
+        assert room1.area_id == area1.id
         room2 = self.db.add_room(r_name='room2', r_description='description 2', r_area_id=area1.id)
         room3 = self.db.add_room(r_name='room3', r_description='description 3', r_area_id=area2.id)
         assert len(self.db.list_rooms()) == 3, "Room list should have 3 items, it has %s" % len(self.db.list_rooms())
@@ -294,6 +297,7 @@ class DeviceUsageTestCase(GenericTestCase):
 
     def testAdd(self):
         du1 = self.db.add_device_usage('du1')
+        assert du1.name == 'du1'
         du2 = self.db.add_device_usage('du2')
         assert len(self.db.list_device_usages()) == 2, "%s devices usages found, instead of 2 " \
                                                       % len(self.db.list_device_usages())
@@ -342,7 +346,11 @@ class DeviceTypeTestCase(GenericTestCase):
 
     def testAdd(self):
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
-        dty1 = self.db.add_device_type('x10 Switch', 'desc1', dt1.id)
+        dty1 = self.db.add_device_type(dty_name='x10 Switch',
+                                       dty_description='desc1', dt_id=dt1.id)
+        assert dty1.name == 'x10 Switch'
+        assert dty1.description == 'desc1'
+        assert dty1.technology_id == dt1.id
         dty2 = self.db.add_device_type('x10 Dimmer', 'desc2', dt1.id)
         assert len(self.db.list_device_types()) == 2, "%s devices types found, instead of 2 " \
                                                       % len(self.db.list_device_types())
@@ -395,6 +403,8 @@ class DeviceTechnologyTestCase(GenericTestCase):
 
     def testAdd(self):
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
+        assert dt1.name == 'x10'
+        assert dt1.description == 'desc dt1'
         dt2 = self.db.add_device_technology(u'1wire', 'desc dt2')
         dt3 = self.db.add_device_technology(u'PLCBus', 'desc dt3')
         assert len(self.db.list_device_technologies()) == 3, "%s devices technologies found, instead of 3 " \
@@ -450,6 +460,10 @@ class DeviceTechnologyConfigTestCase(GenericTestCase):
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
         dt3 = self.db.add_device_technology(u'PLCBus', 'desc dt3')
         dtc1_1 = self.db.add_device_technology_config(dt1.id, 'key1_1', 'val1_1', 'desc1')
+        assert dtc1_1.technology_id == dt1.id
+        assert dtc1_1.key == 'key1_1'
+        assert dtc1_1.value == 'val1_1'
+        assert dtc1_1.description == 'desc1'
         dtc1_2 = self.db.add_device_technology_config(dt1.id, 'key1_2', 'val1_2', 'desc2')
         dtc3_1 = self.db.add_device_technology_config(dt3.id, 'key3_1', 'val3_1', 'desc3')
         dtc3_2 = self.db.add_device_technology_config(dt3.id, 'key3_2', 'val3_2', 'desc4')
@@ -990,7 +1004,9 @@ class SystemStatsTestCase(GenericTestCase):
             ssv = {'ssv1': (i*2), 'ssv2': (i*3),}
             sstat_list.append(self.db.add_system_stat("sstat%s" %i, 'localhost',
                                 now + datetime.timedelta(seconds=i), ssv))
-        assert len(self.db.list_system_stats()) == 4, "List of system stats should have 4 items : %s" % self.db.list_system_stats()
+        assert len(self.db.list_system_stats()) == 4, \
+                   "List of system stats should have 4 items : %s" \
+                   % self.db.list_system_stats()
 
     def testListAndGet(self):
         now = datetime.datetime.now()
@@ -1013,7 +1029,9 @@ class SystemStatsTestCase(GenericTestCase):
                                 now + datetime.timedelta(seconds=i), ssv))
         sstat_del = self.db.del_system_stat("sstat0")
         assert sstat_del.name == "sstat0", "The returned SystemStats is not the one that was deleted"
-        assert len(self.db.list_system_stats()) == 3, "List of system stats should have 3 items : %s" % self.db.list_system_stats()
+        assert len(self.db.list_system_stats()) == 3, \
+                   "List of system stats should have 3 items : %s" \
+                   % self.db.list_system_stats()
         try:
             self.db.del_system_stat("i_dont_exist")
             TestCase.fail(self, "System stat does not exist, an exception should have been raised")
