@@ -147,7 +147,7 @@ class RestHandler(BaseHTTPRequestHandler):
         self.send_header('Cache-control', 'no-cache')
         self.end_headers()
         if data:
-            self.wfile.write(data)
+            self.wfile.write(data.encode("utf-8"))
         ### TODO : log this
 
 
@@ -192,7 +192,11 @@ class ProcessRequest():
         self.jsonp_cb = ""
 
         # url processing
-        self.path = urllib.unquote(self.path)  
+        print "====DEBUGPATH======"
+        self.path = str(urllib.unquote(self.path))
+        self.path = unicode(self.path, "utf-8")
+        print "===================="
+
         tab_url = self.path.split("?")
         self.path = tab_url[0]
         if len(tab_url) > 1:
@@ -919,15 +923,15 @@ class JSonHelper():
         if data == None:
             return
         print "=== DATA ==="
-        print data
+        print str(data)
         print "============"
         for key in data.__dict__:
-            print data.__dict__[key]
+            #print data.__dict__[key]
             type_data = type(data.__dict__[key]).__name__
             if type_data == "int" or type_data == "float":
                 data_out += '"' + key + '" : ' + str(data.__dict__[key]) + ','
             elif type_data == "unicode":
-                data_out += '"' + key + '" : "' + str(data.__dict__[key]) + '",'
+                data_out += '"' + key + '" : "' + data.__dict__[key] + '",'
             elif type_data == "Area" or type_data == "Room":
                 data_out += '"' + key + '" : {'
                 for key_dmg in data.__dict__[key].__dict__:
@@ -935,7 +939,7 @@ class JSonHelper():
                     if type_data_dmg == "int" or type_data_dmg == "float":
                         data_out += '"' + key_dmg + '" : ' + str(data.__dict__[key].__dict__[key_dmg]) + ','
                     elif type_data_dmg == "unicode":
-                        data_out += '"' + key_dmg + '" : "' + str(data.__dict__[key].__dict__[key_dmg]) + '",'
+                        data_out += '"' + key_dmg + '" : "' + data.__dict__[key].__dict__[key_dmg] + '",'
                 data_out = data_out[0:len(data_out)-1] + '},'
         self._data_values += data_out[0:len(data_out)-1] + '},'
             
