@@ -626,6 +626,48 @@ target=*
                 return
 
 
+        ### device_usage #############################
+        if self.rest_request[0] == "device_usage":
+
+            ### list
+            if self.rest_request[1] == "list":
+                if len(self.rest_request) == 2:
+                    self._rest_base_device_usage_list()
+                elif len(self.rest_request) == 3:
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
+                else:
+                    if self.rest_request[2] == "by-name":
+                        self._rest_base_device_usage_list(self.rest_request[3])
+
+            ### add
+            elif self.rest_request[1] == "add":
+                offset = 2
+                if self.set_parameters(offset):
+                    self._rest_base_device_usage_add(self.parameters)
+                else:
+                    self.send_http_response_error(999, "No parameters given", self.jsonp, self.jsonp_cb)
+
+            ### update
+            elif self.rest_request[1] == "update":
+                offset = 2
+                if self.set_parameters(offset):
+                    self._rest_base_device_usage_update(self.parameters)
+                else:
+                    self.send_http_response_error(999, "No parameters given", self.jsonp, self.jsonp_cb)
+
+            ### del
+            elif self.rest_request[1] == "del":
+                if len(self.rest_request) == 3:
+                    self._rest_base_device_usage_del(id=self.rest_request[2])
+                else:
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
+
+            ### others
+            else:
+                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], self.jsonp, self.jsonp_cb)
+                return
+
+
         ### device #####################################
         elif self.rest_request[0] == "device":
             print "TODO !!"
@@ -879,6 +921,81 @@ target=*
         except:
             json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
         self.send_http_response_ok(json.get())
+
+
+
+######
+# /base/device_usage processing
+######
+
+    def _rest_base_device_usage_list(self, name = None):
+        """ list device usages
+        """
+        json = JSonHelper("OK")
+        json.set_jsonp(self.jsonp, self.jsonp_cb)
+        json.set_data_type("device_usage")
+        if name == None:
+            for device_usage in self._db.list_device_usages():
+                json.add_data(device_usage)
+        else:
+            device_usage = self._db.get_device_usage_by_name(name)
+            if device_usage is not None:
+                json.add_data(device_usage)
+        self.send_http_response_ok(json.get())
+
+
+
+    def _rest_base_device_usage_add(self, params):
+        """ add device_usage
+        """
+        json = JSonHelper("OK")
+        json.set_jsonp(self.jsonp, self.jsonp_cb)
+        json.set_data_type("device_usage")
+        try:
+            device_usage = self._db.add_device_usage(self.get_parameters("name"), self.get_parameters("description"))
+            json.add_data(device_usage)
+        except:
+            json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+        self.send_http_response_ok(json.get())
+
+
+
+    def _rest_base_device_usage_update(self, params):
+        """ update device usage
+        """
+        json = JSonHelper("OK")
+        json.set_jsonp(self.jsonp, self.jsonp_cb)
+        json.set_data_type("device_usage")
+        try:
+            device_usage = self._db.update_device_usage(self.get_parameters("id"), self.get_parameters("name"), self.get_parameters("description"))
+            json.add_data(device_usage)
+        except:
+            json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+        self.send_http_response_ok(json.get())
+
+
+
+
+    def _rest_base_device_usage_del(self, id=None):
+        """ delete device usage
+        """
+        json = JSonHelper("OK")
+        json.set_jsonp(self.jsonp, self.jsonp_cb)
+        json.set_data_type("device_usage")
+        try:
+            device_usage = self._db.del_device_usage(id)
+            json.add_data(device_usage)
+        except:
+            json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+        self.send_http_response_ok(json.get())
+
+
+
+
+
+
+
+
 
 
 
