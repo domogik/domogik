@@ -287,10 +287,11 @@ class DbHelper():
         @param r_description : room detailed description (optional)
         @return : a room object
         """
-        try:
-            area = self._session.query(Area).filter_by(id=r_area_id).one()
-        except NoResultFound, e:
-            raise DbHelperException("Couldn't add room with area id %s. It does not exist" % r_area_id)
+        if r_area_id != None:
+            try:
+                area = self._session.query(Area).filter_by(id=r_area_id).one()
+            except NoResultFound, e:
+                raise DbHelperException("Couldn't add room with area id %s. It does not exist" % r_area_id)
 
         room = Room(name=r_name, description=r_description, area_id=r_area_id)
         self._session.add(room)

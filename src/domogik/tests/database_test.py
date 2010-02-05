@@ -227,6 +227,9 @@ class RoomTestCase(GenericTestCase):
         assert len(self.db.list_rooms()) == 0, "Room list is not empty : %s" % self.db.list_rooms()
 
     def testAdd(self):
+        room = self.db.add_room(r_name='my_room', r_area_id=None, r_description='my_description')
+        assert room.name == 'my_room'
+        assert room.description == 'my_description'
         area1 = self.db.add_area('area1','description 1')
         area2 = self.db.add_area('area2','description 2')
         room1 = self.db.add_room(r_name='room1', r_description='description 1', r_area_id=area1.id)
@@ -235,7 +238,7 @@ class RoomTestCase(GenericTestCase):
         assert room1.area_id == area1.id
         room2 = self.db.add_room(r_name='room2', r_description='description 2', r_area_id=area1.id)
         room3 = self.db.add_room(r_name='room3', r_description='description 3', r_area_id=area2.id)
-        assert len(self.db.list_rooms()) == 3, "Room list should have 3 items, it has %s" % len(self.db.list_rooms())
+        assert len(self.db.list_rooms()) == 4, "Room list should have 4 items, it has %s" % len(self.db.list_rooms())
 
     def testUpdate(self):
         area1 = self.db.add_area('area1','description 1')
