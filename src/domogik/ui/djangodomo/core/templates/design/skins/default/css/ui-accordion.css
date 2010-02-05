@@ -4,7 +4,7 @@
 .ui-accordion .ui-accordion-header {
 	cursor: pointer; position: relative; margin-top: 1px;
 	border: 1px solid #cccccc;
-	background: #f6f6f6 url(images/ui-bg_glass_100_f6f6f6_1x400.png) 50% 50% repeat-x;
+	background: #f6f6f6 url(../images/jquery/ui-bg_glass_100_f6f6f6_1x400.png) 50% 50% repeat-x;
 	font-weight: bold; color: #1c94c4;
 	-moz-border-radius: 0.4em;
     -webkit-border-radius: 0.4em;
@@ -13,7 +13,7 @@
 .ui-accordion .ui-accordion-header-active { border-bottom: 0 !important; }
 .ui-accordion .ui-accordion-header a { display: block; font-size: 1em; padding: .5em .5em .5em 2.2em;color: #1c94c4; text-decoration: none; }
 .ui-accordion .ui-accordion-header:hover {
-border: 1px solid #fbcb09; background: #fdf5ce url(images/ui-bg_glass_100_fdf5ce_1x400.png) 50% 50% repeat-x; font-weight: bold; color: #c77405;	
+border: 1px solid #fbcb09; background: #fdf5ce url(../images/jquery/ui-bg_glass_100_fdf5ce_1x400.png) 50% 50% repeat-x; font-weight: bold; color: #c77405;	
 }
 .ui-accordion .ui-accordion-header.ui-state-active {
  color: #c77405;

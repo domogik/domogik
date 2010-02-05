@@ -30,7 +30,7 @@ ul#nav1 li a {
 
 ul#nav1 li a:hover, ul#nav1 li a:focus, ul#nav1 li a:active {
   color: #c77405;
-  background: #fdf5ce url(images/ui-bg_glass_100_fdf5ce_1x400.png) repeat-x 50% 50%;
+  background: #fdf5ce url(../images/jquery/ui-bg_glass_100_fdf5ce_1x400.png) repeat-x 50% 50%;
   background-attachment: scroll;
 }
 ul#nav1 li a.selected {
