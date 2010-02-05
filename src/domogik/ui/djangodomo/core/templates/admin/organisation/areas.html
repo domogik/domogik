@@ -22,50 +22,17 @@
 
 {% load i18n %}
 {% block js_script %}
-// <![CDATA[
     $(function(){
-    $('#instructions').dialog({autoOpen: false}); 
-    $('#btinstructions').click(function() {
-        $('#instructions').dialog('open',{closeOnEscape: false});
-    });
+        $('#instructions').dialog({autoOpen: false}); 
+        $('#btinstructions').click(function() {
+            $('#instructions').dialog('open',{closeOnEscape: false});
+        });
 	
-		function updateTips(tips, t) {
-			tips.text(t).effect("highlight",{},1500);
-		}
-
-		function checkLength(tips, o,n,min,max) {
-
-			if ( o.val().length > max || o.val().length < min ) {
-				o.addClass('ui-state-error');
-				updateTips(tips, "La longueur de " + n + " doit être comprise entre "+min+" et "+max+".");
-				return false;
-			} else {
-				return true;
-			}
-
-		}
-                    // Add new form  
-      		var new_name = $("#new_name"),
-                new_description = $("#new_description"),
-                allFields = $([]).add(new_name).add(new_description),
-
-			tips = $("#validateTips");
-
-		function updateTips(t) {
-			tips.text(t).effect("highlight",{},1500);
-		}
-
-		function checkLength(o,n,min,max) {
-
-			if ( o.val().length > max || o.val().length < min ) {
-				o.addClass('ui-state-error');
-				updateTips("La longueur de " + n + " doit être comprise entre "+min+" et "+max+".");
-				return false;
-			} else {
-				return true;
-			}
-
-		}
+        // Add form  
+        var new_name = $("#new_name"),
+            new_description = $("#new_description"),
+            allFields = $([]).add(new_name).add(new_description),
+            tips = $("#validateTips");
 		
 		$("#addnewdialog").dialog({
 			bgiframe: true,
@@ -78,7 +45,7 @@
 					allFields.removeClass('ui-state-error');
 
 					bValid = bValid && checkLength(new_name,"nom",1,80);
-                                        				
+                    bValid = bValid && checkLength(new_description,"description",1,80);                    				
 					if (bValid) {
 						
                             // Submit form
@@ -101,11 +68,11 @@
 				allFields.val('').removeClass('ui-state-error');
 			}
 		});
-		
-        $("#devices").hide();
-        $("button#showdevices").click(function () {
-            $("#devices").toggle();
-        });
+
+//        $("#devices").hide();
+//        $("button#showdevices").click(function () {
+//            $("#devices").toggle();
+//        });
         
         var status = $.getUrlVar('status');
         if (status) {
@@ -121,49 +88,36 @@
             }
         });
         
-        $('.buttonleft[title]').qtip({
-           position: {
-      corner: {
-         target: 'leftMiddle',
-         tooltip: 'rightMiddle'
-      }
-   },
+        $('.buttonleft[title], .add').qtip({
+            position: {
+                corner: {
+                    target: 'leftMiddle',
+                    tooltip: 'rightMiddle'
+                }
+            },
 
-        style: {
-        
-      padding: 5,
-      background: '#A2D959',
-      color: 'black',
-      textAlign: 'center',
-      border: {
-         width: 7,
-         radius: 5,
-         color: '#A2D959'
-      },
-      tip: 'rightMiddle',
-      name: 'dark' // Inherit the rest of the attributes from the preset dark style
-   }
- });
+            style: {
+
+                padding: 5,
+                background: '#A2D959',
+                color: 'black',
+                textAlign: 'center',
+                border: {
+                    width: 7,
+                    radius: 5,
+                    color: '#A2D959'
+                },
+                tip: 'rightMiddle',
+                name: 'dark' // Inherit the rest of the attributes from the preset dark style
+            }
+        });
     });
-    // ]]>
 {% endblock %}
 {% block css %}
-    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-selectmenu.css" rel="stylesheet" type="text/css" />
-    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-dragdrop.css" rel="stylesheet" type="text/css" />
-    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-buttons.css" rel="stylesheet" type="text/css" />
-    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-forms.css" rel="stylesheet" type="text/css" />
-    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-nav2.css" rel="stylesheet" type="text/css" />
-    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-dialog.css" rel="stylesheet" type="text/css" />
-    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-accordion.css" rel="stylesheet" type="text/css" />
-    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-tabs.css" rel="stylesheet" type="text/css" />
     <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/page-admin-organisation.css" rel="stylesheet" type="text/css" />
-    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/show-element.css" rel="stylesheet" type="text/css" />
 {% endblock %}
-{% block include_js_script %}
-<script type="text/javascript" src="/design/js/ui.selectmenu.js"></script>
-<script type="text/javascript" src="/design/js/ui.dragdrop.js"></script>
-<script type="text/javascript" src="/design/js/ui.tabs.js"></script>
-<script type="text/javascript" src="/design/js/page-admin.js"></script>
+{% block js_include %}
+    <script type="text/javascript" src="/design/js/page-admin.js"></script>
 {% endblock %}
 {% block title %}{% trans page_title %}{% endblock %}
 {% block right %}
@@ -193,12 +147,15 @@
 	<div id="subelement{{ area.id }}" class="subelement">
             <script type="text/javascript">
                 // Update form
-                $(function(){
-                    /*
+                $(function(){      
                     var area{{ area.id }}newname = $("#area{{ area.id }}-newname"),
+                        area{{ area.id }}newdescription = $("#area{{ area.id }}-newdescription"),
                         allFields = $([]).add(area{{ area.id }}newname),
                         tips{{ area.id }} = $("#validateTips{{ area.id }}");
-                      
+                    
+                    area{{ area.id }}newname.val("{{ area.name }}");
+                    area{{ area.id }}newdescription.val("{{ area.description }}");
+                    
                     $("#updatedialog{{ area.id }}").dialog({
                         bgiframe: true,
                         autoOpen: false,
@@ -208,7 +165,8 @@
                             'Modifier': function() {
                                 var bValid = true;
                                 allFields.removeClass('ui-state-error');
-                                bValid = bValid && checkLength(tips{{ area.id }}, area{{ area.id }}newnam,"nom",1,80);
+                                bValid = bValid && checkLength(tips{{ area.id }}, area{{ area.id }}newname,"nom",1,80);
+                                bValid = bValid && checkLength(tips{{ area.id }}, area{{ area.id }}newdescription,"description",1,80);
                                 if (bValid) {
                                     // Submit form
                                     $(this).dialog('close');
@@ -222,7 +180,7 @@
                             allFields.val('').removeClass('ui-state-error');
                         }
                     });
-                    
+                    /*
                 	$('select#area{{ area.id }}-icon').selectmenu({
                         icons: [
                             {% for icon in icons_area %}
@@ -230,11 +188,11 @@
                             {% endfor %}
                         ]
                     });
-                    
+                */
     				$('#update{{ area.id }}').click(function() {
             			$('#updatedialog{{ area.id }}').dialog('open');
                     });
-             */
+
                     /* Add a onclick function to delete the current area */
                     $('#del{{ area.id }}').click(function(data) {
             			getREST('/base/area/del/{{ area.id }}',
@@ -259,15 +217,6 @@
             <h2 id="zone{{ area.id }}h" class="icon32-area-grndfloor">{{ area.name }}</h2>
             <p>{{ area.description }}</p>
             <!--
-            <div id="updatedialog{{ area.id }}" title="Modifier {{ area.name }}">
-                <p id="validateTips{{ area.id }}">Tous les champs sont requis.</p>
-                <form action="#">
-                    <label class="medium" for="area{{ area.id }}-newname">Nouveau nom :</label>
-                    <input id="area{{ area.id }}-newname" name="area{{ area.id }}-newname" type="text" class="medium" value="{{ area.name }}" />
-                </form>
-            </div>
-            -->
-            <!--
             <form action="#">
                 <div class="parameter">
                     <label for="area{{ area.id }}-icon">Icône:</label>
@@ -281,6 +230,17 @@
             -->
         </div>
 	</div>
+    <div id="updatedialog{{ area.id }}" title="Modifier {{ area.name }}">
+        <p id="validateTips{{ area.id }}">Tous les champs sont requis.</p>
+        <form >
+            <fieldset>
+                <label class="medium" for="area{{ area.id }}-newname">Nouveau nom</label>
+                <input type="text" class="medium" id="area{{ area.id }}-newname" name="area{{ area.id }}-newname" />
+                <label class="medium" for="area{{ area.id }}-newdescription">Nouvelle description</label>
+                <textarea type="text" class="medium" id="area{{ area.id }}-newdescription" name="area{{ area.id }}-newdescription" />
+            </fieldset>
+        </form>
+    </div>
     {% endfor %}
 </div>
 
