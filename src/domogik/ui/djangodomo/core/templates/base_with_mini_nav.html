@@ -26,16 +26,24 @@
 <meta http-equiv="Cache-Control" content="no-cache" />
 <meta http-equiv="Pragma" content="no-cache" />
 
-<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-lightness/jquery-ui-1.7.2.custom.css" rel="stylesheet" type="text/css"/>
+<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/jquery-ui-1.7.2.custom.css" rel="stylesheet" type="text/css"/>
 <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/main.css" rel="stylesheet" type="text/css" />
 <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-icons.css" rel="stylesheet" type="text/css" />
 <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-nav1_mini.css" rel="stylesheet" type="text/css" />
+{% block global_css %}{% endblock %}
 {% block css %}{% endblock %}
 <script type="text/javascript" src="/design/js/jquery-1.4.1.min.js"></script>
 <script type="text/javascript" src="/design/js/jquery-ui-1.7.2.custom.min.js"></script>
+<script type="text/javascript" src="/design/js/jquery.qtip-1.0.0-rc3.min.js"></script>
 <script type="text/javascript" src="/design/js/main.js"></script>
-{% block include_js_script %}{% endblock %}
-<script type="text/javascript">{% block js_script %}{% endblock %}</script>
+<script type="text/javascript" src="/design/js/rest.js"></script>
+{% block global_js_include %}{% endblock %}
+{% block js_include %}{% endblock %}
+<script type="text/javascript">
+    // <![CDATA[
+    {% block js_script %}{% endblock %}
+    // ]]>
+</script>
 <title>{% block title %}Domogik{% endblock %}</title>
 </head>
 <body>

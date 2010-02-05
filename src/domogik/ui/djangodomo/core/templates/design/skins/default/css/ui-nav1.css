@@ -25,7 +25,7 @@ ul#nav1 {
     border-top: #e78f08 1px solid;
     border-left: #e78f08 1px solid;
     border-right: #e78f08 1px solid;
-    background: #f6a828 url(images/ui-bg_gloss-wave_35_f6a828_500x100.png) 50% 50% repeat-x;
+    background: #f6a828 url(../images/jquery/ui-bg_gloss-wave_35_f6a828_500x100.png) 50% 50% repeat-x;
     color: #ffffff;
     font-weight: bold;
     margin:0 0 0.5em 0;
@@ -53,7 +53,7 @@ ul#nav1 li a {
 }
 ul#nav1 li a:hover, ul#nav1 li a:focus, ul#nav1 li a:active {
     color: #c77405;
-    background: #fdf5ce url(images/ui-bg_glass_100_fdf5ce_1x400.png) repeat-x 50% 50%;
+    background: #fdf5ce url(../images/jquery/ui-bg_glass_100_fdf5ce_1x400.png) repeat-x 50% 50%;
     background-attachment: scroll;
 }
 ul#nav1 li a.selected {

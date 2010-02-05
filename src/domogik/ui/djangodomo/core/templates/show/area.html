@@ -21,21 +21,15 @@
 
 {% load i18n %}
 {% block js_script %}
-// <![CDATA[
     $(function(){
-	$(".section .extended").hide();
+		$(".section .extended").hide();
     });
-// ]]>
 {% endblock %}
 
 {% block css %}
-    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-breadcrumb.css" rel="stylesheet" type="text/css" />
-    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-buttons.css" rel="stylesheet" type="text/css" />
-    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/show-element.css" rel="stylesheet" type="text/css" />
-    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/show-section.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 
-{% block include_js_script %}
+{% block js_include %}
 {% endblock %}
 
 {% block title %}{% trans page_title %}{% endblock %}
