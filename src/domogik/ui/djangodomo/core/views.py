@@ -484,6 +484,7 @@ def admin_organisation_devices(request):
     """
     if not _is_user_admin(request):
         return index(request)
+
     rooms_list = _db.list_rooms()
     device_usage_list = _db.list_device_usages()
     devices_list = _db.list_devices()
@@ -506,21 +507,28 @@ def admin_organisation_rooms(request):
     """
     if not _is_user_admin(request):
         return index(request)
-    unattribued_devices = _db.search_devices({'room_id':None})
-    devices_list = _db.list_devices()
-    rooms_list = _db.list_rooms()
-    areas_list = _db.list_areas()
-    icons_room = ["default", "kitchen", "bedroom", "livingroom", "tvlounge",
-                  "bathroom"]
+    
+    status = request.GET.get('status', '')
+    msg = request.GET.get('msg', '')
+    
+    resultAllRooms = Rooms.getAll()
+#    unattribued_devices = _db.search_devices({'room_id':None})
+#    devices_list = _db.list_devices()
+#    rooms_list = _db.list_rooms()
+#    areas_list = _db.list_areas()
+#    icons_room = ["default", "kitchen", "bedroom", "livingroom", "tvlounge",
+#                  "bathroom"]
     page_title = _("Organisation des pieces")
     return _go_to_page(
         request, 'admin/organisation/rooms.html',
         page_title,
-        unattribued_devices=unattribued_devices,
-        devices_list=devices_list,
-        rooms_list=rooms_list,
-        areas_list=areas_list,
-        icons_room=icons_room
+        status=status,
+        msg=msg,
+ #       unattribued_devices=unattribued_devices,
+#        devices_list=devices_list,
+        rooms_list=resultAllRooms.room
+#        areas_list=areas_list,
+#        icons_room=icons_room
     )
 
 def admin_organisation_areas(request):
@@ -531,18 +539,18 @@ def admin_organisation_areas(request):
     """
     if not _is_user_admin(request):
         return index(request)
-    unattribued_rooms = _db.search_rooms({'area_id':None})
-    rooms_list = _db.list_rooms()
-    results = Areas.getAll()
-    icons_area = ["grndfloor", "firstfloor", "basement"]
+    
+    status = request.GET.get('status', '')
+    msg = request.GET.get('msg', '')
+    
+    resultAllAreas = Areas.getAll()
     page_title = _("Organisation des zones")
     return _go_to_page(
         request, 'admin/organisation/areas.html',
         page_title,
-        unattribued_rooms=unattribued_rooms,
-        rooms_list=rooms_list,
-        areas_list=results.area,
-        icons_area=icons_area
+        status=status,
+        msg=msg,
+        areas_list=resultAllAreas.area
     )
 
 def show_index(request):
@@ -551,14 +559,13 @@ def show_index(request):
     @param request : HTTP request
     @return an HttpResponse object
     """
-    areas_list = _db.list_areas()
     page_title = _("Visualisation Maison")
-    results = Areas.getAll()
+    resultAllAreas = Areas.getAll()
 
     return _go_to_page(
         request, 'show/index.html',
         page_title,
-        areas_list=results.area,
+        areas_list=resultAllAreas.area,
     )
 
 
@@ -568,15 +575,15 @@ def show_area(request, area_id):
     @param request : HTTP request
     @return an HttpResponse object
     """
-    area = _db.get_area_by_id(area_id)
-    rooms_list = _db.search_rooms({'area_id':area_id})
+    resultAreaById = Areas.getById(area_id)
+    resultRoomsByArea = Rooms.getByArea(area_id)
 
     page_title = _("Visualisation Zone")
     return _go_to_page(
         request, 'show/area.html',
         page_title,
-        area=area,
-        rooms_list=rooms_list
+        area=resultAreaById.area[0],
+        rooms_list=resultRoomsByArea.room
     )
 
 def show_room(request, room_id):

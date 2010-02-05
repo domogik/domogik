@@ -23,65 +23,44 @@
 
 {% load i18n %}
 {% block js_script %}
-$(function(){
-    // Accordion
-    $("#nav2").accordion({ header: ".section", active:1});
-//  $('select.room-zone').selectmenu();
-
-	function updateTips(tips, t) {
-			tips.text(t).effect("highlight",{},1500);
-		}
-
-		function checkLength(tips, o,n,min,max) {
-
-			if ( o.val().length > max || o.val().length < min ) {
-				o.addClass('ui-state-error');
-				updateTips(tips, "La longueur de " + n + " doit être comprise entre "+min+" et "+max+".");
-				return false;
-			} else {
-				return true;
-			}
-
-		}
-                    // Add new form  
-      		var name = $("#name"),
-
-                        allFields = $([]).add(name),
-
-			tips = $("#validateTips");
-
-		function updateTips(t) {
-			tips.text(t).effect("highlight",{},1500);
-		}
-
-		function checkLength(o,n,min,max) {
-
-			if ( o.val().length > max || o.val().length < min ) {
-				o.addClass('ui-state-error');
-				updateTips("La longueur de " + n + " doit être comprise entre "+min+" et "+max+".");
-				return false;
-			} else {
-				return true;
-			}
-
-		}
+    $(function(){
+    /*
+        $('#instructions').dialog({autoOpen: false}); 
+        $('#btinstructions').click(function() {
+            $('#instructions').dialog('open',{closeOnEscape: false});
+        });
+	*/
+        // Add form  
+        var new_name = $("#new_name"),
+            new_description = $("#new_description"),
+            allFields = $([]).add(new_name).add(new_description),
+            tips = $("#validateTips");
 		
 		$("#addnewdialog").dialog({
 			bgiframe: true,
 			autoOpen: false,
-			height: 200,
+			height: 250,
 			modal: true,
 			buttons: {
 				'Créer': function() {
 					var bValid = true;
 					allFields.removeClass('ui-state-error');
 
-					bValid = bValid && checkLength(name,"nom",1,80);
-                                        				
-					if (bValid) {
-                                        	// Submit form
-						$(this).dialog('close');
-					}
+					bValid = bValid && checkLength(new_name,"nom",1,80);
+                    bValid = bValid && checkLength(new_description,"description",1,80);                    				
+					if (bValid) {						
+                        // Submit form
+                        getREST('/base/room/add/name/' + new_name.val() + '/description/' + new_description.val(),
+                            function(data) {
+                                var status = (data.status).toLowerCase();
+                                if (status == 'ok') {
+                                    $.reloadPage({'status': 'ok', 'msg': 'Succes : New room added \'' + data.room[0].name + '\''});                                   
+                                } else {
+                                    $.reloadPage({'status': 'error', 'msg': 'Error : Room not created (' + data.description + ')'});                                                                      
+                                }
+                            }
+                        );
+                    }
 				},
 				Cancel: function() {
 					$(this).dialog('close');
@@ -91,62 +70,75 @@ $(function(){
 				allFields.val('').removeClass('ui-state-error');
 			}
 		});
-		
-		
-		
-		$('#addnew').click(function() {
-			$('#addnewdialog').dialog('open');
-		})
 
+//        $("#devices").hide();
+//        $("button#showdevices").click(function () {
+//            $("#devices").toggle();
+//        });
+        
+        $("#tabs").tabs().domogik_tabs({
+            addTitle: "Add new room",
+            addCallback: function() {
+                $('#addnewdialog').dialog('open');
+            }
+        });
+        
+        $('.buttonleft[title], .add').qtip({
+            position: {
+                corner: {
+                    target: 'leftMiddle',
+                    tooltip: 'rightMiddle'
+                }
+            },
 
-	$('#instructions').dialog({autoOpen: false}); 
-	$('#btinstructions').click(function() {  
-                                        $('#instructions').dialog('open',{closeOnEscape: false});  
-                                });
+            style: {
 
-	        $("#rooms").hide();
-                $("button#showrooms").click(function () {
-            $("#rooms").toggle();});
-});
+                padding: 5,
+                background: '#A2D959',
+                color: 'black',
+                textAlign: 'center',
+                border: {
+                    width: 7,
+                    radius: 5,
+                    color: '#A2D959'
+                },
+                tip: 'rightMiddle',
+                name: 'dark' // Inherit the rest of the attributes from the preset dark style
+            }
+        });
+    });
 
 {% endblock %}
 {% block css %}
-                                        <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-selectmenu.css" rel="stylesheet" type="text/css" />
-                                        <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-dragdrop.css" rel="stylesheet" type="text/css" />
-                                        <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-elements.css" rel="stylesheet" type="text/css" />
-                                        <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-buttons.css" rel="stylesheet" type="text/css" />
-                                        <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-forms.css" rel="stylesheet" type="text/css" />
-                                        <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-nav2.css" rel="stylesheet" type="text/css" />
-                                        <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/page-admin-organisation.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/page-admin-organisation.css" rel="stylesheet" type="text/css" />
 {% endblock %}
-{% block include_js_script %}
-<script type="text/javascript" src="/design/js/ui.selectmenu.js"></script>
-<script type="text/javascript" src="/design/js/ui.dragdrop.js"></script>
-<script type="text/javascript" src="/design/js/page-admin.js"></script>
+{% block js_include %}
+    <script type="text/javascript" src="/design/js/page-admin.js"></script>
 {% endblock %}
 {% block title %}{% trans page_title %}{% endblock %}
 {% block right %}
-<div class="element-main">
-    <div>
-        <h1 class="element-ident"><span class="element-title">Organisations des pièces</span></h1>
-        <ul class="element-actions">
-            <li>
-                <button id="addnew" class="button">Créer nouvelle</button>
-            </li>
-            <li><a href="#" class="button">Tout supprimer</a></li>
-            <li><button id="showrooms" class="button">Pièces</a></li>
-
-        </ul>
-        <div id="addnewdialog" title="Créer nouvelle pièce">
-            <p id="validateTips">Tous les champs (sauf description) sont requis.</p>
-            <form>
-                <fieldset>
-                    <label class="medium" for="name">Nom</label>
-                    <input type="text" class="medium" id="name" name="name" />
-                </fieldset>
-            </form>
-        </div>
-      <div id="rooms">
+    <div class='element-bgnd'>
+        <div class="element">
+            <h1 class="ident"><span class="title">Organisations des pièces</span></h1>
+            {% ifnotequal status "" %}
+            <div class='action-message {{status}}'>{{msg}}</div>
+            {% endifnotequal %}
+            <ul class="actions">
+                <!--li><button id="showrooms" class="button">Pièces</a></li-->
+            </ul>
+            <div id="addnewdialog" title="Créer nouvelle pièce">
+                <p id="validateTips">Tous les champs sont requis.</p>
+                <form>
+                    <fieldset>
+                        <label class="medium" for="new_name">Nom</label>
+                        <input type="text" class="medium" id="new_name" name="new_name" />
+                        <label class="medium" for="new_description">Description</label>
+                        <textarea type="text" class="medium" id="new_description" name="new_description"></textarea>
+                    </fieldset>
+                </form>
+            </div>
+            
+            <!--div id="rooms">
             <h2 class="splitter">Pièces</h2>
             <a href="#" class="action" id="btinstructions">(Instructions Drag &amp; Drop)</a>
             <div id="instructions" title="Instructions Drag &amp; Drop">
@@ -162,110 +154,131 @@ $(function(){
             <fieldset class="areadrop">
                 <legend id="areanah" class="choice">Pièces non attribuées</legend>
                 <ul id="areana" class="draggables">
-                    {% for room in unattribued_rooms %}
+                    % for room in unattribued_rooms %}
                     <li class="draggable">{{ room.name }}<span class="description">{{ room.description }}</span></li>
-                    {% empty %}
+                    % empty %}
                     <li class="empty">Vide</li>
-                    {% endfor %}
+                    % endfor %}
                 </ul>
             </fieldset>
-            {% regroup rooms_list|dictsort:"area" by area as areas %}
-            {% for area in areas %}
+            % regroup rooms_list|dictsort:"area" by area as areas %}
+            % for area in areas %}
             <fieldset class="areadrop">
-                <legend id="area{{ area.grouper.id }}h" class="choice">{{ area.grouper.name }}</legend>
-                <ul id="area{{ area.grouper.id }}" class="draggables">
-                    {% for room in area.list %}
-                    <li class="draggable">{{ room.name }}<span class="description">{{ room.description }}</span></li>
-                    {% empty %}
+                <legend id="room{ room.grouper.id }}h" class="choice">{ room.grouper.name }}</legend>
+                <ul id="room{ room.grouper.id }}" class="draggables">
+                    % for room in room.list %}
+                    <li class="draggable">{ room.name }}<span class="description">{ room.description }}</span></li>
+                    % empty %}
                     <li class="empty">Vide</li>
-                    {% endfor %}
+                    % endfor %}
                 </ul>
             </fieldset>
-            {% endfor %}
-          </div>
+            % endfor %}
+          </div-->
+          
+        </div>
     </div>
-</div>
-<div class="nocolumns"> {% for room in rooms_list %}
-    <div class="element">
-        <script type="text/javascript">
-    $(function(){
-    // Update form
-    var room{{ room.id }}newname = $("#room{{ room.id }}-newname"),
-    allFields = $([]).add(room{{ room.id }}newname),
-    tips{{ room.id }} = $("#validateTips{{ room.id }}");
-    $("#updatedialog{{ room.id }}").dialog({
-        bgiframe: true,
-        autoOpen: false,
-        height: 300,
-        modal: true,
-        buttons: {
-                'Modifier': function() {
-                        var bValid = true;
-                        allFields.removeClass('ui-state-error');
-                        bValid = bValid && checkLength(tips{{ room.id }}, room{{ room.id }}newnam,"nom",1,80);
-                        if (bValid) {
-                                // Submit form
-                                $(this).dialog('close');
-                                }
+    
+    <div class="nocolumns">    
+        <div id="tabs">
+            <ul>{% for room in rooms_list %}<li><a href="#subelement{{ room.id }}" class="icon16-room-livingroom">{{ room.name }}</a></li>{% endfor %}</ul>
+            {% for room in rooms_list %}
+            <div id="subelement{{ room.id }}" class="subelement">
+                <script type="text/javascript">
+                    // Update form
+                    $(function(){      
+                        var room{{ room.id }}newname = $("#room{{ room.id }}-newname"),
+                            room{{ room.id }}newdescription = $("#room{{ room.id }}-newdescription"),
+                            allFields = $([]).add(room{{ room.id }}newname),
+                            tips{{ room.id }} = $("#validateTips{{ room.id }}");
+                        
+                        room{{ room.id }}newname.val("{{ room.name }}");
+                        room{{ room.id }}newdescription.val("{{ room.description }}");
+                        
+                        $("#updatedialog{{ room.id }}").dialog({
+                            bgiframe: true,
+                            autoOpen: false,
+                            height: 300,
+                            modal: true,
+                            buttons: {
+                                'Modifier': function() {
+                                    var bValid = true;
+                                    allFields.removeClass('ui-state-error');
+                                    bValid = bValid && checkLength(tips{{ room.id }}, room{{ room.id }}newname,"nom",1,80);
+                                    bValid = bValid && checkLength(tips{{ room.id }}, room{{ room.id }}newdescription,"description",1,80);
+                                    if (bValid) {
+                                        // Submit form
+                                        getREST('/base/room/update/id/' + {{ room.id }} + '/name/' + room{{ room.id }}newname.val() + '/description/' + room{{ room.id }}newdescription.val(),
+                                            function(data) {
+                                                var status = (data.status).toLowerCase();
+                                                if (status == 'ok') {
+                                                    $.reloadPage({'status': 'ok', 'msg': 'Succes : Room \'' + data.room[0].name + '\' succesfully updated'});                                   
+                                                } else {
+                                                    $.reloadPage({'status': 'error', 'msg': 'Error : Room not updated (' + data.description + ')'});                                                                      
+                                                }
+                                            }
+                                        );
+                                    }
                                 },
                                 Cancel: function() {
-					$(this).dialog('close');
-				}
-			},
-			close: function() {
-				allFields.val('').removeClass('ui-state-error');
-			}
-		});
-		
-        	$('select#room{{ room.id }}-icon').selectmenu({
-				icons: [
-                                                                        {% for icon in icons_room %}
-					{find: '.icon_room_{{ icon }}', icon: 'icon64-room-{{ icon }}', jquery:'no'},
-                                                                        {% endfor %}
-				]
-			});
-		
-		$('#update{{ room.id }}').click(function() {
-			$('#updatedialog{{ room.id }}').dialog('open');
-		})
-		
-			});
-    </script>
-        <h2 class="icon32-room-livingroom">{{ room.name }}</h2>
-        <ul class="element-actions">
-            <li><a href="#" class="button">Supprimer</a></li>
-            <li>
-                <button id="update{{ room.id }}" class="button">Modifier</button>
-            </li>
-            <li>
-                <button id="save{{ area.id }}" class="button">Sauvegarder</button>
-            </li>
-        </ul>
-        <div id="updatedialog{{ room.id }}" title="Modifier {{ room.name }}">
-            <p id="validateTips{{ room.id }}">Tous les champs sont requis.</p>
-            <form action="#">
-                <label class="medium" for="room{{ room.id }}-newname">Nouveau nom :</label>
-                <input id="room{{ room.id }}-newname" name="room{{ room.id }}-newname" type="text" class="medium" value="{{ room.name }}" />
-                <label class="medium" for="room{{ room.id }}-zone">Zone :</label>
-                <select class="room-zone medium" id="room{{ room.id }}-zone" name="room{{ room.id }}-zone">
-                    <option value="" {% ifequal room.area_id None %}selected='selected'{% endifequal %}></option>
-                                            {% for area in areas_list %}
-                    <option value="{{ area.id }}" {% ifequal room.area_id area.id %}selected='selected'{% endifequal %}>{{ area.name }}</option>
-                                        {% endfor %}
-                </select>
-            </form>
-        </div>
-        <form action="#">
-            <div class="parameter">
-                <label for="room{{ room.id }}-icon">Icône :</label>
-                <select class="large customicons" id="room{{ room.id }}-icon" name="room{{ room.id }}-icon">
-                {% for icon in icons_room %}
-                    <option value="{{ icon }}" class="icon_room_{{ icon }}">{{ icon }}</option>
-                {% endfor %}
-                </select>
+                                    $(this).dialog('close');
+                                }
+                            },
+                            close: function() {
+                                allFields.val('').removeClass('ui-state-error');
+                            }
+                        });
+                        /*
+                        $('select#room{{ room.id }}-icon').selectmenu({
+                            icons: [
+                                {% for icon in icons_area %}
+                                    {find: '.icon_area_{{ icon }}', icon: 'icon64-area-{{ icon }}', jquery:'no'},
+                                {% endfor %}
+                            ]
+                        });
+                    */
+                        $('#update{{ room.id }}').click(function() {
+                            $('#updatedialog{{ room.id }}').dialog('open');
+                        });
+        
+                        /* Add a onclick function to delete the current area */
+                        $('#del{{ room.id }}').click(function(data) {
+                            getREST('/base/room/del/{{ room.id }}',
+                                function(data) {
+                                    var status = (data.status).toLowerCase();
+                                    if (status == 'ok') {
+                                        $.reloadPage({'status': 'ok', 'msg': 'Succes : Room \'' + data.room[0].name + '\' deleted'});                                   
+                                    } else {
+                                        $.reloadPage({'status': 'error', 'msg': 'Error : Room not deleted (' + data.description + ')'});                                                                      
+                                    }
+                                }
+                            );
+                        });
+                    });
+                    // ]]>
+                </script>
+                <ul class="actions">
+                    <li><button id='del{{ room.id }}' class='icon16-action-del buttonleft' title="Delete '{{ room.name }}'"><span class='offscreen'>Delete {{ room.name }}</span></button></li>
+                    <li><button id="update{{ room.id }}" class="icon16-action-update buttonleft" title="Modify '{{ room.name }}'"><span class='offscreen'>Modify {{ room.name }}</span></button></li>
+                </ul>
+                <div class="content">
+                    <h2 id="zone{{ room.id }}h" class="icon32-area-grndfloor">{{ room.name }}</h2>
+                    <p>{{ room.description }}</p>
+
+                </div>
+                <div id="updatedialog{{ room.id }}" title="Modifier {{ room.name }}">
+                    <p id="validateTips{{ room.id }}">Tous les champs sont requis.</p>
+                    <form >
+                        <fieldset>
+                            <label class="medium" for="room{{ room.id }}-newname">Nouveau nom</label>
+                            <input type="text" class="medium" id="room{{ room.id }}-newname" name="room{{ room.id }}-newname" />
+                            <label class="medium" for="room{{ room.id }}-newdescription">Nouvelle description</label>
+                            <textarea type="text" class="medium" id="room{{ room.id }}-newdescription" name="room{{ room.id }}-newdescription"></textarea>
+                        </fieldset>
+                    </form>
+                </div>
             </div>
-        </form>
+            {% endfor %}
+        </div>
     </div>
-    {% endfor %}
-</div>
 {% endblock %}
