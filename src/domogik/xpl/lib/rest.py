@@ -627,7 +627,7 @@ target=*
 
 
         ### device_usage #############################
-        if self.rest_request[0] == "device_usage":
+        elif self.rest_request[0] == "device_usage":
 
             ### list
             if self.rest_request[1] == "list":
