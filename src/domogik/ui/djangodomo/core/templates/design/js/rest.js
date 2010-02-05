@@ -71,7 +71,7 @@ function getREST(url, callback) {
             callback,
         error:
             function(XMLHttpRequest, textStatus, errorThrown) {
-//                alert(XMLHttpRequest.readyState + ' ' + XMLHttpRequest.status + ' '+ textStatus + ' '+ errorThrown);
+                $.reloadPage({'status': 'error', 'msg': 'REST Error : ' + XMLHttpRequest.readyState + ' ' + XMLHttpRequest.status + ' ' + textStatus + ' ' + errorThrown});
             }
     });
 }
