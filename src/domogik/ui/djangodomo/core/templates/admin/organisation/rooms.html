@@ -76,14 +76,6 @@
 //            $("#devices").toggle();
 //        });
         
-        var status = $.getUrlVar('status');
-        if (status) {
-            $('#action-message').addClass(status);
-            $('#action-message').text($.getUrlVar('msg'));
-        } else {
-            $('#action-message').addClass('hidden');
-        }
-        
         $("#tabs").tabs().domogik_tabs({
             addTitle: "Add new room",
             addCallback: function() {
@@ -128,7 +120,9 @@
     <div class='element-bgnd'>
         <div class="element">
             <h1 class="ident"><span class="title">Organisations des pièces</span></h1>
-            <div id="action-message"></div>
+            {% ifnotequal status "" %}
+            <div class='action-message {{status}}'>{{msg}}</div>
+            {% endifnotequal %}
             <ul class="actions">
                 <!--li><button id="showrooms" class="button">Pièces</a></li-->
             </ul>

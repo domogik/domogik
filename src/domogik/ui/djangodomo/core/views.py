@@ -484,6 +484,7 @@ def admin_organisation_devices(request):
     """
     if not _is_user_admin(request):
         return index(request)
+
     rooms_list = _db.list_rooms()
     device_usage_list = _db.list_device_usages()
     devices_list = _db.list_devices()
@@ -506,6 +507,10 @@ def admin_organisation_rooms(request):
     """
     if not _is_user_admin(request):
         return index(request)
+    
+    status = request.GET.get('status', '')
+    msg = request.GET.get('msg', '')
+    
     resultAllRooms = Rooms.getAll()
 #    unattribued_devices = _db.search_devices({'room_id':None})
 #    devices_list = _db.list_devices()
@@ -517,6 +522,8 @@ def admin_organisation_rooms(request):
     return _go_to_page(
         request, 'admin/organisation/rooms.html',
         page_title,
+        status=status,
+        msg=msg,
  #       unattribued_devices=unattribued_devices,
 #        devices_list=devices_list,
         rooms_list=resultAllRooms.room
@@ -532,12 +539,18 @@ def admin_organisation_areas(request):
     """
     if not _is_user_admin(request):
         return index(request)
+    
+    status = request.GET.get('status', '')
+    msg = request.GET.get('msg', '')
+    
     resultAllAreas = Areas.getAll()
     page_title = _("Organisation des zones")
     return _go_to_page(
         request, 'admin/organisation/areas.html',
         page_title,
-        areas_list=resultsAllArea.area
+        status=status,
+        msg=msg,
+        areas_list=resultAllAreas.area
     )
 
 def show_index(request):
