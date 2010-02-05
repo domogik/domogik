@@ -923,7 +923,7 @@ class JSonHelper():
         if data == None:
             return
         print "=== DATA ==="
-        print str(data)
+        #print str(data)
         print "============"
         for key in data.__dict__:
             #print data.__dict__[key]
@@ -960,6 +960,7 @@ class JSonHelper():
 
         if self._jsonp is True and self._jsonp_cb != "":
             json += ")"
+        print json
         return json
         
     
