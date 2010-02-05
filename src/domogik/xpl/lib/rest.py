@@ -701,7 +701,7 @@ target=*
             area = self._db.add_area(self.get_parameters("name"), self.get_parameters("description"))
             json.add_data(area)
         except:
-            json.set_error(code = 999, description = str(sys.exc_info()[1]))
+            json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
         self.send_http_response_ok(json.get())
 
 
@@ -716,7 +716,7 @@ target=*
             area = self._db.update_area(self.get_parameters("id"), self.get_parameters("name"), self.get_parameters("description"))
             json.add_data(area)
         except:
-            json.set_error(code = 999, description = str(sys.exc_info()[1]))
+            json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
         self.send_http_response_ok(json.get())
 
 
@@ -732,7 +732,7 @@ target=*
             area = self._db.del_area(id)
             json.add_data(area)
         except:
-            json.set_error(code = 999, description = str(sys.exc_info()[1]))
+            json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
         self.send_http_response_ok(json.get())
 
 
@@ -773,7 +773,7 @@ target=*
             room = self._db.add_room(self.get_parameters("name"), self.get_parameters("area_id"), self.get_parameters("description"))
             json.add_data(room)
         except:
-            json.set_error(code = 999, description = str(sys.exc_info()[1]))
+            json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
         self.send_http_response_ok(json.get())
 
 
@@ -788,7 +788,7 @@ target=*
             room = self._db.update_room(self.get_parameters("name"), self.get_parameters("area_id"), self.get_parameters("description"))
             json.add_data(room)
         except:
-            json.set_error(code = 999, description = str(sys.exc_info()[1]))
+            json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
         self.send_http_response_ok(json.get())
 
 
@@ -803,7 +803,7 @@ target=*
             room = self._db.del_room(id)
             json.add_data(room)
         except:
-            json.set_error(code = 999, description = str(sys.exc_info()[1]))
+            json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
         self.send_http_response_ok(json.get())
 
 
@@ -842,7 +842,7 @@ target=*
             ui_config = self._db.add_item_ui_config(self.get_parameters("item_id"), self.get_parameters("item_type"), {self.get_parameters("key") : self.get_parameters("value")})
             json.add_data(ui_config)
         except:
-            json.set_error(code = 999, description = str(sys.exc_info()[1]))
+            json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
         self.send_http_response_ok(json.get())
 
 
@@ -856,7 +856,7 @@ target=*
             ui_config = self._db.update_item_ui_config(self.get_parameters("item_id"), self.get_parameters("item_type"), self.get_parameters("key"), self.get_parameters("value"))
             json.add_data(ui_config)
         except:
-            json.set_error(code = 999, description = str(sys.exc_info()[1]))
+            json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
         self.send_http_response_ok(json.get())
 
 
@@ -873,7 +873,7 @@ target=*
                 ui_config = self._db.delete_item_ui_config(self.get_parameters("item_id"), self.get_parameters("item_type"), self.get_parameters("key"))
             json.add_data(ui_config)
         except:
-            json.set_error(code = 999, description = str(sys.exc_info()[1]))
+            json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
         self.send_http_response_ok(json.get())
 
 
