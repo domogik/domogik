@@ -546,14 +546,13 @@ def show_index(request):
     @param request : HTTP request
     @return an HttpResponse object
     """
-    areas_list = _db.list_areas()
     page_title = _("Visualisation Maison")
-    results = Areas.getAll()
+    resultAllAreas = Areas.getAll()
 
     return _go_to_page(
         request, 'show/index.html',
         page_title,
-        areas_list=results.area,
+        areas_list=resultAllAreas.area,
     )
 
 
@@ -563,15 +562,15 @@ def show_area(request, area_id):
     @param request : HTTP request
     @return an HttpResponse object
     """
-    area = _db.get_area_by_id(area_id)
-    rooms_list = _db.search_rooms({'area_id':area_id})
+    resultAreaById = Areas.getById(area_id)
+    resultRoomsByArea = Rooms.getByArea(area_id)
 
     page_title = _("Visualisation Zone")
     return _go_to_page(
         request, 'show/area.html',
         page_title,
-        area=area,
-        rooms_list=rooms_list
+        area=resultAreaById.area[0],
+        rooms_list=resultRoomsByArea.room
     )
 
 def show_room(request, room_id):

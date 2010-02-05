@@ -47,11 +47,23 @@ class Areas(pipes.DmgPipe):
         if resp :
             return resp
 
+    @staticmethod
+    def getById(id):
+        resp = Areas.objects.get({'parameters':"list/by-id/"+id})
+        if resp :
+            return resp
+
 class Rooms(pipes.DmgPipe):
     uri = "http://127.0.0.1:8080/base/room"
 
     @staticmethod
     def getAll():
         resp = Rooms.objects.get({'parameters':"list/"})
+        if resp :
+            return resp
+
+    @staticmethod
+    def getByArea(id):
+        resp = Rooms.objects.get({'parameters':"list/by-area/"+id})
         if resp :
             return resp
