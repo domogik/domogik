@@ -506,21 +506,22 @@ def admin_organisation_rooms(request):
     """
     if not _is_user_admin(request):
         return index(request)
-    unattribued_devices = _db.search_devices({'room_id':None})
-    devices_list = _db.list_devices()
-    rooms_list = _db.list_rooms()
-    areas_list = _db.list_areas()
-    icons_room = ["default", "kitchen", "bedroom", "livingroom", "tvlounge",
-                  "bathroom"]
+    resultAllRooms = Rooms.getAll()
+#    unattribued_devices = _db.search_devices({'room_id':None})
+#    devices_list = _db.list_devices()
+#    rooms_list = _db.list_rooms()
+#    areas_list = _db.list_areas()
+#    icons_room = ["default", "kitchen", "bedroom", "livingroom", "tvlounge",
+#                  "bathroom"]
     page_title = _("Organisation des pieces")
     return _go_to_page(
         request, 'admin/organisation/rooms.html',
         page_title,
-        unattribued_devices=unattribued_devices,
-        devices_list=devices_list,
-        rooms_list=rooms_list,
-        areas_list=areas_list,
-        icons_room=icons_room
+ #       unattribued_devices=unattribued_devices,
+#        devices_list=devices_list,
+        rooms_list=resultAllRooms.room
+#        areas_list=areas_list,
+#        icons_room=icons_room
     )
 
 def admin_organisation_areas(request):
@@ -531,18 +532,12 @@ def admin_organisation_areas(request):
     """
     if not _is_user_admin(request):
         return index(request)
-    unattribued_rooms = _db.search_rooms({'area_id':None})
-    rooms_list = _db.list_rooms()
-    results = Areas.getAll()
-    icons_area = ["grndfloor", "firstfloor", "basement"]
+    resultAllAreas = Areas.getAll()
     page_title = _("Organisation des zones")
     return _go_to_page(
         request, 'admin/organisation/areas.html',
         page_title,
-        unattribued_rooms=unattribued_rooms,
-        rooms_list=rooms_list,
-        areas_list=results.area,
-        icons_area=icons_area
+        areas_list=resultsAllArea.area
     )
 
 def show_index(request):

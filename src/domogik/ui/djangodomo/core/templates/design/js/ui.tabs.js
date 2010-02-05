@@ -3,13 +3,14 @@
         _init: function() {
             var self = this, o = this.options;
             this.list = this.element.children("ul:first");
-            var addButton = $("<li><a href='#' class='add icon16-action-add' title='Add new area'>&nbsp;<span class='offscreen'>Add new area</span></a></li>");
+            var addButton = $("<li><a href='#' class='add icon16-action-add' title='"+ o.addTitle + "'>&nbsp;<span class='offscreen'>"+ o.addTitle + "</span></a></li>");
             addButton.click(o.addCallback);
             this.list.prepend(addButton);
         }
     });
     $.extend($.ui.domogik_tabs, {
         defaults: {
+            addTitle: "Add",
         	addCallback: null
         }
     });
