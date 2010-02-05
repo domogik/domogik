@@ -25,7 +25,7 @@
     <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-buttons.css" rel="stylesheet" type="text/css" />
     <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/page-login.css" rel="stylesheet" type="text/css" />
 {% endblock %}
-{% block include_js_script %}
+{% block js_include %}
     <script type="text/javascript" src="/design/js/page-login.js"></script>
 {% endblock %}
 {% block title %}{% trans page_title %}{% endblock %}
