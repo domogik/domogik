@@ -13,13 +13,14 @@
     padding:0;
     list-style:none;
     background-color: #f6f6f6;
-    border-bottom: 1px solid #cccccc;
 }
+
 .ui-tabs .ui-tabs-nav li {
     margin:0;
     padding:0;
     display:inline-block;
     border-right: 1px solid #cccccc;
+    border-bottom: 1px solid #cccccc;
 }
 .ui-tabs .ui-tabs-nav li a {
     margin:0;

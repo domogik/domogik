@@ -54,7 +54,7 @@
                             function(data) {
                                 var status = (data.status).toLowerCase();
                                 if (status == 'ok') {
-                                    $.reloadPage({'status': 'ok', 'msg': '{% trans "Succes" %} : {% trans "New room added" %} \'' + data.room[0].name + '\''});                                   
+                                    $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "New room added" %} \'' + data.room[0].name + '\''});                                   
                                 } else {
                                     $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Room not created" %} (' + data.description + ')'});                                                                      
                                 }
@@ -211,7 +211,7 @@
                                             function(data) {
                                                 var status = (data.status).toLowerCase();
                                                 if (status == 'ok') {
-                                                    $.reloadPage({'status': 'ok', 'msg': '{% trans "Succes" %} : {% trans "Room" %} \'' + data.room[0].name + '\' {% trans "succesfully updated" %}'});                                   
+                                                    $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Room" %} \'' + data.room[0].name + '\' {% trans "successfully updated" %}'});                                   
                                                 } else {
                                                     $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Room not updated" %} (' + data.description + ')'});                                                                      
                                                 }
@@ -246,7 +246,7 @@
                                 function(data) {
                                     var status = (data.status).toLowerCase();
                                     if (status == 'ok') {
-                                        $.reloadPage({'status': 'ok', 'msg': '{% trans "Succes" %} : {% trans "Room" %} \'' + data.room[0].name + '\' {% trans "succesfully deleted" %}'});                                   
+                                        $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Room" %} \'' + data.room[0].name + '\' {% trans "successfully deleted" %}'});                                   
                                     } else {
                                         $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Room not deleted" %} (' + data.description + ')'});                                                                      
                                     }
