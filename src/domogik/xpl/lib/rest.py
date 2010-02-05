@@ -147,7 +147,7 @@ class RestHandler(BaseHTTPRequestHandler):
         self.send_header('Cache-control', 'no-cache')
         self.end_headers()
         if data:
-            self.wfile.write(data)
+            self.wfile.write(data.encode("utf-8"))
         ### TODO : log this
 
 
@@ -192,7 +192,11 @@ class ProcessRequest():
         self.jsonp_cb = ""
 
         # url processing
-        self.path = urllib.unquote(self.path)  
+        print "====DEBUGPATH======"
+        self.path = str(urllib.unquote(self.path))
+        self.path = unicode(self.path, "utf-8")
+        print "===================="
+
         tab_url = self.path.split("?")
         self.path = tab_url[0]
         if len(tab_url) > 1:
@@ -701,7 +705,7 @@ target=*
             area = self._db.add_area(self.get_parameters("name"), self.get_parameters("description"))
             json.add_data(area)
         except:
-            json.set_error(code = 999, description = str(sys.exc_info()[1]))
+            json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
         self.send_http_response_ok(json.get())
 
 
@@ -716,7 +720,7 @@ target=*
             area = self._db.update_area(self.get_parameters("id"), self.get_parameters("name"), self.get_parameters("description"))
             json.add_data(area)
         except:
-            json.set_error(code = 999, description = str(sys.exc_info()[1]))
+            json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
         self.send_http_response_ok(json.get())
 
 
@@ -732,7 +736,7 @@ target=*
             area = self._db.del_area(id)
             json.add_data(area)
         except:
-            json.set_error(code = 999, description = str(sys.exc_info()[1]))
+            json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
         self.send_http_response_ok(json.get())
 
 
@@ -773,7 +777,7 @@ target=*
             room = self._db.add_room(self.get_parameters("name"), self.get_parameters("area_id"), self.get_parameters("description"))
             json.add_data(room)
         except:
-            json.set_error(code = 999, description = str(sys.exc_info()[1]))
+            json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
         self.send_http_response_ok(json.get())
 
 
@@ -788,7 +792,7 @@ target=*
             room = self._db.update_room(self.get_parameters("name"), self.get_parameters("area_id"), self.get_parameters("description"))
             json.add_data(room)
         except:
-            json.set_error(code = 999, description = str(sys.exc_info()[1]))
+            json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
         self.send_http_response_ok(json.get())
 
 
@@ -803,7 +807,7 @@ target=*
             room = self._db.del_room(id)
             json.add_data(room)
         except:
-            json.set_error(code = 999, description = str(sys.exc_info()[1]))
+            json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
         self.send_http_response_ok(json.get())
 
 
@@ -842,7 +846,7 @@ target=*
             ui_config = self._db.add_item_ui_config(self.get_parameters("item_id"), self.get_parameters("item_type"), {self.get_parameters("key") : self.get_parameters("value")})
             json.add_data(ui_config)
         except:
-            json.set_error(code = 999, description = str(sys.exc_info()[1]))
+            json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
         self.send_http_response_ok(json.get())
 
 
@@ -856,7 +860,7 @@ target=*
             ui_config = self._db.update_item_ui_config(self.get_parameters("item_id"), self.get_parameters("item_type"), self.get_parameters("key"), self.get_parameters("value"))
             json.add_data(ui_config)
         except:
-            json.set_error(code = 999, description = str(sys.exc_info()[1]))
+            json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
         self.send_http_response_ok(json.get())
 
 
@@ -873,7 +877,7 @@ target=*
                 ui_config = self._db.delete_item_ui_config(self.get_parameters("item_id"), self.get_parameters("item_type"), self.get_parameters("key"))
             json.add_data(ui_config)
         except:
-            json.set_error(code = 999, description = str(sys.exc_info()[1]))
+            json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
         self.send_http_response_ok(json.get())
 
 
@@ -919,15 +923,15 @@ class JSonHelper():
         if data == None:
             return
         print "=== DATA ==="
-        print data
+        #print str(data)
         print "============"
         for key in data.__dict__:
-            print data.__dict__[key]
+            #print data.__dict__[key]
             type_data = type(data.__dict__[key]).__name__
             if type_data == "int" or type_data == "float":
                 data_out += '"' + key + '" : ' + str(data.__dict__[key]) + ','
             elif type_data == "unicode":
-                data_out += '"' + key + '" : "' + str(data.__dict__[key]) + '",'
+                data_out += '"' + key + '" : "' + data.__dict__[key] + '",'
             elif type_data == "Area" or type_data == "Room":
                 data_out += '"' + key + '" : {'
                 for key_dmg in data.__dict__[key].__dict__:
@@ -935,7 +939,7 @@ class JSonHelper():
                     if type_data_dmg == "int" or type_data_dmg == "float":
                         data_out += '"' + key_dmg + '" : ' + str(data.__dict__[key].__dict__[key_dmg]) + ','
                     elif type_data_dmg == "unicode":
-                        data_out += '"' + key_dmg + '" : "' + str(data.__dict__[key].__dict__[key_dmg]) + '",'
+                        data_out += '"' + key_dmg + '" : "' + data.__dict__[key].__dict__[key_dmg] + '",'
                 data_out = data_out[0:len(data_out)-1] + '},'
         self._data_values += data_out[0:len(data_out)-1] + '},'
             
@@ -956,6 +960,7 @@ class JSonHelper():
 
         if self._jsonp is True and self._jsonp_cb != "":
             json += ")"
+        print json
         return json
         
     
