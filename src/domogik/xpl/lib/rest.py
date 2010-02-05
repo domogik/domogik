@@ -831,7 +831,7 @@ target=*
         json.set_jsonp(self.jsonp, self.jsonp_cb)
         json.set_data_type("room")
         try:
-            room = self._db.update_room(self.get_parameters("name"), self.get_parameters("area_id"), self.get_parameters("description"))
+            room = self._db.update_room(self.get_parameters("id"), self.get_parameters("name"), self.get_parameters("area_id"), self.get_parameters("description"))
             json.add_data(room)
         except:
             json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
