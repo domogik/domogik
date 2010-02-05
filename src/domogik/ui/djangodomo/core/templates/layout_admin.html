@@ -36,21 +36,22 @@
     <script type="text/javascript" src="/design/js/ui.dragdrop.js"></script>
     <script type="text/javascript" src="/design/js/ui.tabs.js"></script>
     <script type="text/javascript" src="/design/js/ui.forms.js"></script>
+    <script type="text/javascript" src="/design/js/page-admin.js"></script>
 {% endblock %}
 
 {% block content %}
     <div class="left">
         <div id="nav2">
-            <div class="subnav2"><a href="#">Gestion</a></div>
+            <div class="subnav2"><a href="#">{% trans "Organisation" %}</a></div>
             <ul>
-                <li><a href="{% url admin_management_domogik_view %}">Domogik</a></li>
-                <li><a href="{% url admin_management_modules_view %}">Modules</a></li>
+                <li><a href="{% url admin_organisation_areas_view %}">{% trans "Areas" %}</a></li>
+                <li><a href="{% url admin_organisation_rooms_view %}">{% trans "Rooms" %}</a></li>
+                <li><a href="{% url admin_organisation_devices_view %}">{% trans "Devices" %}</a></li>
             </ul>
-            <div class="subnav2"><a href="#">Organisation</a></div>
+            <div class="subnav2"><a href="#">{% trans "Management" %}</a></div>
             <ul>
-                <li><a href="{% url admin_organisation_devices_view %}">Dispositifs</a></li>
-                <li><a href="{% url admin_organisation_rooms_view %}">Pièces</a></li>
-                <li><a href="{% url admin_organisation_areas_view %}">Zones</a></li>
+                <li><a href="{% url admin_management_domogik_view %}">{% trans "Database" %}</a></li>
+                <li><a href="{% url admin_management_modules_view %}">{% trans "Modules" %}</a></li>
             </ul>
         </div>
     </div>

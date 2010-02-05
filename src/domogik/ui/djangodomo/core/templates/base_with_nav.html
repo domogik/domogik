@@ -49,16 +49,16 @@
 <body>
 <div id="frame">
     <div id="header">
-        <a href="/domogik" id="logo"> <img src="/design/{{ request.session.user.skin_used|default:'skins/default' }}/images/logo_domogik.png" width="131" height="37" alt="Domotik logo" /></a>
-    <div id="title"> {% trans "Welcome to Domogik" %} <span id="subtitle">{% trans "Free home automation under Linux" %}</span> </div>
+        <a href="/domogik" id="logo"> <img src="/design/{{ request.session.user.skin_used|default:'skins/default' }}/images/logo_domogik.png" width="131" height="37" alt="Domogik logo" /></a>
+    <div id="title">{% trans "Welcome to Domogik" %} <span id="subtitle">{% trans "Free home automation under Linux" %}</span> </div>
     </div>
     {% block banner %}
     {% endblock %}
     <ul id="nav1">
-        <li><a href="{% url show_view %}">Visualisation</a></li>
+        <li><a href="{% url show_view %}">{% trans "View" %}</a></li>
         {% if is_user_connected %}
-        <li><a href="#">Programmation</a></li>
-        <li><a href="{% url admin_view %}">Administration</a></li>
+        <!--li><a href="#">Programmation</a></li-->
+        <li><a href="{% url admin_view %}">{% trans "Administration" %}</a></li>
         {% endif %}
         <li class="login"> {% if not is_user_connected %} <a href="{% url login_view %}">{% trans "Log in" %}</a> {% else %} <a href="{% url logout_view %}">{% trans "Log out" %} {{ request.session.user.first_name }}</a> {% endif %} </li>
     </ul>

@@ -54,9 +54,9 @@
                             function(data) {
                                 var status = (data.status).toLowerCase();
                                 if (status == 'ok') {
-                                    $.reloadPage({'status': 'ok', 'msg': 'Succes : New room added \'' + data.room[0].name + '\''});                                   
+                                    $.reloadPage({'status': 'ok', 'msg': '{% trans "Succes" %} : {% trans "New room added" %} \'' + data.room[0].name + '\''});                                   
                                 } else {
-                                    $.reloadPage({'status': 'error', 'msg': 'Error : Room not created (' + data.description + ')'});                                                                      
+                                    $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Room not created" %} (' + data.description + ')'});                                                                      
                                 }
                             }
                         );
@@ -77,7 +77,7 @@
 //        });
         
         $("#tabs").tabs().domogik_tabs({
-            addTitle: "Add new room",
+            addTitle: "{% trans "Add new room" %}",
             addCallback: function() {
                 $('#addnewdialog').dialog('open');
             }
@@ -113,26 +113,25 @@
     <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/page-admin-organisation.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block js_include %}
-    <script type="text/javascript" src="/design/js/page-admin.js"></script>
 {% endblock %}
 {% block title %}{% trans page_title %}{% endblock %}
 {% block right %}
     <div class='element-bgnd'>
         <div class="element">
-            <h1 class="ident"><span class="title">Organisations des pièces</span></h1>
+            <h1 class="ident"><span class="title">{% trans "Room organisation" %}</span></h1>
             {% ifnotequal status "" %}
             <div class='action-message {{status}}'>{{msg}}</div>
             {% endifnotequal %}
             <ul class="actions">
                 <!--li><button id="showrooms" class="button">Pièces</a></li-->
             </ul>
-            <div id="addnewdialog" title="Créer nouvelle pièce">
-                <p id="validateTips">Tous les champs sont requis.</p>
+            <div id="addnewdialog" title="{% trans "Create new room" %}">
+                <p id="validateTips">{% trans "All fields are required." %}</p>
                 <form>
                     <fieldset>
-                        <label class="medium" for="new_name">Nom</label>
+                        <label class="medium" for="new_name">{% trans "Name" %}</label>
                         <input type="text" class="medium" id="new_name" name="new_name" />
-                        <label class="medium" for="new_description">Description</label>
+                        <label class="medium" for="new_description">{% trans "Description" %}</label>
                         <textarea type="text" class="medium" id="new_description" name="new_description"></textarea>
                     </fieldset>
                 </form>
@@ -212,9 +211,9 @@
                                             function(data) {
                                                 var status = (data.status).toLowerCase();
                                                 if (status == 'ok') {
-                                                    $.reloadPage({'status': 'ok', 'msg': 'Succes : Room \'' + data.room[0].name + '\' succesfully updated'});                                   
+                                                    $.reloadPage({'status': 'ok', 'msg': '{% trans "Succes" %} : {% trans "Room" %} \'' + data.room[0].name + '\' {% trans "succesfully updated" %}'});                                   
                                                 } else {
-                                                    $.reloadPage({'status': 'error', 'msg': 'Error : Room not updated (' + data.description + ')'});                                                                      
+                                                    $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Room not updated" %} (' + data.description + ')'});                                                                      
                                                 }
                                             }
                                         );
@@ -247,9 +246,9 @@
                                 function(data) {
                                     var status = (data.status).toLowerCase();
                                     if (status == 'ok') {
-                                        $.reloadPage({'status': 'ok', 'msg': 'Succes : Room \'' + data.room[0].name + '\' deleted'});                                   
+                                        $.reloadPage({'status': 'ok', 'msg': '{% trans "Succes" %} : {% trans "Room" %} \'' + data.room[0].name + '\' {% trans "succesfully deleted" %}'});                                   
                                     } else {
-                                        $.reloadPage({'status': 'error', 'msg': 'Error : Room not deleted (' + data.description + ')'});                                                                      
+                                        $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Room not deleted" %} (' + data.description + ')'});                                                                      
                                     }
                                 }
                             );
@@ -258,21 +257,21 @@
                     // ]]>
                 </script>
                 <ul class="actions">
-                    <li><button id='del{{ room.id }}' class='icon16-action-del buttonleft' title="Delete '{{ room.name }}'"><span class='offscreen'>Delete {{ room.name }}</span></button></li>
-                    <li><button id="update{{ room.id }}" class="icon16-action-update buttonleft" title="Modify '{{ room.name }}'"><span class='offscreen'>Modify {{ room.name }}</span></button></li>
+                    <li><button id='del{{ room.id }}' class='icon16-action-del buttonleft' title="{% trans "Delete" %} '{{ room.name }}'"><span class='offscreen'>{% trans "Delete" %} {{ room.name }}</span></button></li>
+                    <li><button id="update{{ room.id }}" class="icon16-action-update buttonleft" title="{% trans "Modify" %} '{{ room.name }}'"><span class='offscreen'>{% trans "Modify" %} {{ room.name }}</span></button></li>
                 </ul>
                 <div class="content">
                     <h2 id="zone{{ room.id }}h" class="icon32-area-grndfloor">{{ room.name }}</h2>
                     <p>{{ room.description }}</p>
 
                 </div>
-                <div id="updatedialog{{ room.id }}" title="Modifier {{ room.name }}">
-                    <p id="validateTips{{ room.id }}">Tous les champs sont requis.</p>
+                <div id="updatedialog{{ room.id }}" title="{% trans "Modify" %} {{ room.name }}">
+                    <p id="validateTips{{ room.id }}">{% trans "All fields are required." %}</p>
                     <form >
                         <fieldset>
-                            <label class="medium" for="room{{ room.id }}-newname">Nouveau nom</label>
+                            <label class="medium" for="room{{ room.id }}-newname">{% trans "New name" %}</label>
                             <input type="text" class="medium" id="room{{ room.id }}-newname" name="room{{ room.id }}-newname" />
-                            <label class="medium" for="room{{ room.id }}-newdescription">Nouvelle description</label>
+                            <label class="medium" for="room{{ room.id }}-newdescription">{% trans "New description" %}</label>
                             <textarea type="text" class="medium" id="room{{ room.id }}-newdescription" name="room{{ room.id }}-newdescription"></textarea>
                         </fieldset>
                     </form>

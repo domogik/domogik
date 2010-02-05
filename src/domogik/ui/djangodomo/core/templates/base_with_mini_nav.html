@@ -48,11 +48,11 @@
 </head>
 <body>
     <ul id="nav1">
-        <li><a href="/domogik">Home</a></li>
-        <li><a href="{% url show_view %}">Visualisation</a></li>
+        <li><a href="/domogik">{% trans "Home" %}</a></li>
+        <li><a href="{% url show_view %}">{% trans "View" %}</a></li>
 	{% if is_user_connected %}
-        <li><a href="#">Programmation</a></li>
-        <li><a href="{% url admin_view %}">Administration</a></li>
+        <!--li><a href="#">Programmation</a></li-->
+        <li><a href="{% url admin_view %}">{% trans "Administration" %}</a></li>
 	{% endif %}
         <li class="login"> {% if not is_user_connected %} <a href="{% url login_view %}">{% trans "Log in" %}</a> {% else %} <a href="{% url logout_view %}">{% trans "Log out" %} {{ request.session.user.first_name }}</a> {% endif %} </li>
     </ul>
