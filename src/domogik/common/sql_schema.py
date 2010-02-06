@@ -304,6 +304,7 @@ class DeviceType(Base):
     id = Column(Integer, primary_key=True)
     technology_id = Column(Integer, ForeignKey('%s.id' % \
                            DeviceTechnology.get_tablename()), nullable=False)
+    technology = relation(DeviceTechnology, backref=backref(__tablename__))
     name = Column(String(30), nullable=False)
     description = Column(String(255))
 
@@ -322,7 +323,8 @@ class DeviceType(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<DeviceType(id=%s, name='%s', desc='%s')>" % (self.id, self.name, self.description)
+        return "<DeviceType(id=%s, name='%s', desc='%s', device techno)>" \
+                % (self.id, self.name, self.description, self.technology)
 
     @staticmethod
     def get_tablename():
