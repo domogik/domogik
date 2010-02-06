@@ -65,11 +65,11 @@ from domogik.common.configloader import Loader
 from domogik.common.sql_schema import ActuatorFeature, Area, Device, DeviceUsage, \
                                       DeviceConfig, DeviceStats, DeviceStatsValue, \
                                       DeviceTechnology, DeviceTechnologyConfig, \
-                                      DeviceType, ItemUIConfig, Room, UserAccount, \
+                                      DeviceType, UIItemConfig, Room, UserAccount, \
                                       SensorReferenceData, SystemAccount, SystemConfig, \
                                       SystemStats, SystemStatsValue, Trigger
 from domogik.common.sql_schema import DEVICE_TECHNOLOGY_LIST, \
-                                      DEVICE_TYPE_LIST, ITEM_TYPE_LIST, UNIT_OF_STORED_VALUE_LIST
+                                      DEVICE_TYPE_LIST, UNIT_OF_STORED_VALUE_LIST
 
 
 class DbHelperException(Exception):
@@ -229,7 +229,6 @@ class DbHelper():
             if cascade_delete:
                 for room in self._session.query(Room).filter_by(area_id=area_del_id).all():
                     self.del_room(room.id, True)
-            self.delete_all_item_ui_config(area.id, 'area')
             self._session.delete(area)
             try:
                 self._session.commit()
@@ -343,7 +342,6 @@ class DbHelper():
             if cascade_delete:
                 for device in self._session.query(Device).filter_by(room_id=r_id).all():
                     self.del_device(device.id)
-            self.delete_all_item_ui_config(room.id, 'room')
             self._session.delete(room)
             try:
                 self._session.commit()
@@ -1151,7 +1149,6 @@ class DbHelper():
                                           .filter_by(device_stats_id=device_stats.id).all():
                 self._session.delete(device_stats_value)
             self._session.delete(device_stats)
-        self.delete_all_item_ui_config(device.id, 'device')
         self._session.delete(device)
         try:
             self._session.commit()
@@ -1726,151 +1723,114 @@ class DbHelper():
 
 
 ###
-# ItemUIConfig
+# UIItemConfig
 ###
 
-    def add_item_ui_config(self, i_item_id, i_item_type, i_parameters):
+    def add_ui_item_config(self, i_item_type, i_parameters):
         """
         Add a UI parameter for an item
-        @param i_item_id : id of the item we want to bind a parameter
         @param i_item_type : the item type (area, room, device) to add a configuration parameter
         @param i_parameters : dictionnary of named parameters to add {key1:value1, key2:value2,...}
         """
-        item_ui_config = None
-        if i_item_type not in ITEM_TYPE_LIST:
-            raise DbHelperException("Unknown item type '%s', should be one of : %s" \
-                                    % (i_item_type, ITEM_TYPE_LIST))
-        item = None
-        if i_item_type == 'device':
-            item = self.get_device(i_item_id)
-        elif i_item_type == 'area':
-            item = self.get_area_by_id(i_item_id)
-        elif i_item_type == 'room':
-            item = self.get_room_by_id(i_item_id)
-
-        if item is None:
-            raise DbHelperException("Can't find this item  (%s,%s)" % (i_item_id, i_item_type))
-
-        item_ui_config_list = []
+        ui_item_config_list = []
         for param in i_parameters:
-            item_ui_config = ItemUIConfig(item_id=i_item_id, item_type=i_item_type,
+            ui_item_config = UIItemConfig(item_type=i_item_type,
                                           key=param, value=i_parameters[param])
-            self._session.add(item_ui_config)
+            self._session.add(ui_item_config)
             try:
                 self._session.commit()
             except Exception, sql_exception:
                 self._session.rollback()
                 raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-            item_ui_config_list.append(item_ui_config)
-        return item_ui_config_list
+            ui_item_config_list.append(ui_item_config)
+        return ui_item_config_list
 
-    def update_item_ui_config(self, i_item_id, i_item_type, i_key, i_value):
+    def update_ui_item_config(self, i_item_type, i_key, i_value):
         """
         Update a UI parameter of an item
-        @param i_item_id : id of the item we want to update the parameter
         @param i_item_type : type of the item (area, room, device)
         @param i_key : key we want to update
         @param i_value : key value
-        @return : the updated ItemUIConfig item
+        @return : the updated UIItemConfig item
         """
-        if i_item_type not in ITEM_TYPE_LIST:
-            raise DbHelperException("Unknown item type '%s', should be one of : %s" \
-                                    % (i_item_type, ITEM_TYPE_LIST))
-        item_ui_config = self._session.query(ItemUIConfig)\
-                                      .filter_by(item_id=i_item_id, item_type=i_item_type, key=i_key).first()
-        if item_ui_config is None:
-            raise DbHelperException("Can't find item (%s,%s) with key '%s' : can't update it" \
-                                    % (i_item_id, i_item_key, i_key))
-        item_ui_config.value = i_value
-        self._session.add(item_ui_config)
+        ui_item_config = self._session.query(UIItemConfig)\
+                                      .filter_by(item_type=i_item_type, key=i_key).first()
+        if ui_item_config is None:
+            raise DbHelperException("Can't find item (%s,%s) : can't update it" \
+                                    % (i_item_type, i_key))
+        ui_item_config.value = i_value
+        self._session.add(ui_item_config)
         try:
             self._session.commit()
         except Exception, sql_exception:
             self._session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-        return item_ui_config
+        return ui_item_config
 
-    def get_item_ui_config(self, i_item_id, i_item_type, i_key):
+    def get_ui_item_config(self, i_item_type, i_key):
         """
         Get a UI parameter of an item
-        @param i_item_id : id of the item we want to update the parameter
         @param i_item_type : type of the item (area, room, device)
         @param i_key : key we want to get the value
-        @return an ItemUIConfig object
+        @return an UIItemConfig object
         """
-        if i_item_type not in ITEM_TYPE_LIST:
-            raise DbHelperException("Unknown item type '%s', should be one of : %s" \
-                                    % (i_item_type, ITEM_TYPE_LIST))
-        item_ui_config = self._session.query(ItemUIConfig)\
-                                      .filter_by(item_id=i_item_id, item_type=i_item_type, key=i_key).first()
-        return item_ui_config
+        ui_item_config = self._session.query(UIItemConfig)\
+                                      .filter_by(item_type=i_item_type, key=i_key).first()
+        return ui_item_config
 
-    def list_item_ui_config(self, i_item_id, i_item_type):
+    def list_ui_item_config(self, i_item_type):
         """
         List all UI parameters of an item
-        @param i_item_id : if of the item we want to list the parameters
         @param i_item_type : type of the item (area, room, device)
-        @return a list of ItemUIConfig objects
+        @return a list of UIItemConfig objects
         """
-        if i_item_type not in ITEM_TYPE_LIST:
-            raise DbHelperException("Unknown item type '%s', should be one of : %s" \
-                                    % (i_item_type, ITEM_TYPE_LIST))
-        return self._session.query(ItemUIConfig).filter_by(item_id=i_item_id,
-                                                    item_type=i_item_type).all()
+        return self._session.query(UIItemConfig).filter_by(item_type=i_item_type).all()
 
-    def list_all_item_ui_config(self):
+    def list_all_ui_item_config(self):
         """
         List all UI parameters
-        @return a list of ItemUIConfig objects
+        @return a list of UIItemConfig objects
         """
-        return self._session.query(ItemUIConfig).all()
+        return self._session.query(UIItemConfig).all()
 
-    def delete_item_ui_config(self, i_item_id, i_item_type, i_key):
+    def delete_ui_item_config(self, i_item_type, i_key):
         """
         Delete a UI parameter of an item
-        @param i_item_id : id of the item we want to delete its parameter
         @param i_item_type : type of the item (area, room, device)
         @param i_key : key corresponding to the parameter name we want to delete
-        @return the deleted ItemUIConfig object
+        @return the deleted UIItemConfig object
         """
-        if i_item_type not in ITEM_TYPE_LIST:
-            raise DbHelperException("Unknown item type '%s', should be one of : %s" \
-                                    % (i_item_type, ITEM_TYPE_LIST))
-        item_ui_config = self._session.query(ItemUIConfig)\
-                                      .filter_by(item_id=i_item_id, item_type=i_item_type, key=i_key).first()
-        if item_ui_config is None:
-            raise DbHelperException("Can't find item (%s,%s) with key '%s'" \
-                                    % (i_item_id, i_item_type, i_key))
-        item_ui_config_d = item_ui_config
-        self._session.delete(item_ui_config)
+        ui_item_config = self._session.query(UIItemConfig)\
+                                      .filter_by(item_type=i_item_type, key=i_key).first()
+        if ui_item_config is None:
+            raise DbHelperException("Can't find item (%s,%s)" \
+                                    % (i_item_type, i_key))
+        ui_item_config_d = ui_item_config
+        self._session.delete(ui_item_config)
         try:
             self._session.commit()
         except Exception, sql_exception:
             self._session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-        return item_ui_config_d
+        return ui_item_config_d
 
-    def delete_all_item_ui_config(self, i_item_id, i_item_type):
+    def delete_all_ui_item_config(self, i_item_type):
         """
         Delete all UI parameter of an item
-        @param i_item_id : id of the item we want to delete its parameter
         @param i_item_type : type of the item (area, room, device)
         """
-        if i_item_type not in ITEM_TYPE_LIST:
-            raise DbHelperException("Unknown item type '%s', should be one of : %s" \
-                                    % (i_item_type, ITEM_TYPE_LIST))
-        item_ui_config_list = self._session.query(ItemUIConfig)\
-                                           .filter_by(item_id=i_item_id, item_type=i_item_type).all()
-        item_ui_config_d_list = []
-        for item_ui_config in item_ui_config_list:
-            self._session.delete(item_ui_config)
+        ui_item_config_list = self._session.query(UIItemConfig)\
+                                           .filter_by(item_type=i_item_type).all()
+        ui_item_config_d_list = []
+        for ui_item_config in ui_item_config_list:
+            self._session.delete(ui_item_config)
             try:
                 self._session.commit()
             except Exception, sql_exception:
                 self._session.rollback()
                 raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-            item_ui_config_d_list.append(item_ui_config)
-        return item_ui_config_d_list
+            ui_item_config_d_list.append(ui_item_config)
+        return ui_item_config_d_list
 
 ###
 # SystemConfig

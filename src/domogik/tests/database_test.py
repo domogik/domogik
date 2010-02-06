@@ -40,7 +40,7 @@ from domogik.common.database import DbHelper, DbHelperException
 from domogik.common.sql_schema import ActuatorFeature, Area, Device, DeviceUsage, \
                                       DeviceConfig, DeviceStats, DeviceStatsValue, \
                                       DeviceTechnology, DeviceTechnologyConfig, \
-                                      DeviceType, ItemUIConfig, Room, \
+                                      DeviceType, UIItemConfig, Room, \
                                       SensorReferenceData, SystemAccount, \
                                       SystemConfig, SystemStats, SystemStatsValue, \
                                       Trigger, UserAccount
@@ -160,13 +160,13 @@ class GenericTestCase(unittest.TestCase):
         for sys in self.db.list_system_accounts():
             self.db.del_system_account(sys.id)
 
-    def remove_all_item_ui_config(self, db):
+    def remove_all_ui_item_config(self, db):
         """
         Remove all ui configuration parameters of all items (area, room, device)
         @param db : db API instance
         """
-        for iuc in db.list_all_item_ui_config():
-            db.delete_all_item_ui_config(iuc.item_id, iuc.item_type)
+        for iuc in db.list_all_ui_item_config():
+            db.delete_all_ui_item_config(iuc.item_type)
 
 
 class AreaTestCase(GenericTestCase):
@@ -1277,79 +1277,66 @@ class SystemStatsTestCase(GenericTestCase):
         assert len(ssv) == 0, "System statistic values should be empty, but it is NOT"
 
 
-class ItemUIConfigTestCase(GenericTestCase):
+class UIItemConfigTestCase(GenericTestCase):
     """
     Test item UI config
     """
 
     def setUp(self):
         self.db = DbHelper(use_test_db=True)
-        self.remove_all_item_ui_config(self.db)
+        self.remove_all_ui_item_config(self.db)
 
     def tearDown(self):
-        self.remove_all_item_ui_config(self.db)
+        self.remove_all_ui_item_config(self.db)
         del self.db
 
     def testEmptyList(self):
-        assert len(self.db.list_all_item_ui_config()) == 0, "List of UI config parameters should be empty : %s" \
-                                                            % self.db.list_all_item_ui_config()
+        assert len(self.db.list_all_ui_item_config()) == 0
 
     def testAdd(self):
         area1 = self.db.add_area('area1','description 1')
         room1 = self.db.add_room('room1', area1.id)
-        ui_config_list_a = self.db.add_item_ui_config(area1.id, 'area', \
+        ui_config_list_a = self.db.add_ui_item_config('area', \
                                 {'param_a1':'value_a1','param_a2':'value_a2'})
         print ui_config_list_a
         assert len(ui_config_list_a) == 2
-        self.db.add_item_ui_config(room1.id, 'room', {'param_r1':'value_r1', 'param_r2':'value_r2'})
-        ui_config_list_all = self.db.list_all_item_ui_config()
+        self.db.add_ui_item_config('room', {'param_r1':'value_r1', 'param_r2':'value_r2'})
+        ui_config_list_all = self.db.list_all_ui_item_config()
         assert len(ui_config_list_all) == 4, "List should contain 4 items but has %s" % len(ui_config_list_all)
-        ui_config_list_r = self.db.list_item_ui_config(room1.id, 'room')
+        ui_config_list_r = self.db.list_ui_item_config('room')
         assert len(ui_config_list_r) == 2 and ui_config_list_r[0].item_type == 'room' \
                and ui_config_list_r[0].key == 'param_r1' and ui_config_list_r[0].value == 'value_r1' \
                and ui_config_list_r[1].item_type == 'room' and ui_config_list_r[1].key == 'param_r2' \
                and ui_config_list_r[1].value == 'value_r2', "Wrong list returned %s" % ui_config_list_r
-        uic = self.db.get_item_ui_config(room1.id, 'room', 'param_r2')
+        uic = self.db.get_ui_item_config('room', 'param_r2')
         assert uic.value == 'value_r2', "item should have the value 'value_r2' but it has %s" % uic.value
-        uic = self.db.get_item_ui_config(area1.id, 'area', 'param_a1')
+        uic = self.db.get_ui_item_config('area', 'param_a1')
         assert uic.value == 'value_a1', "item should have the value 'value_a1' but it has %s" % uic.value
-        error = False
-        try:
-            self.db.get_item_ui_config(area1.id, 'foo', 'param_a1')
-            TestCase.fail(self, "Shouldn't have found any param values for \
-                                 (%s, %s)" % (area1.id, 'foo'))
-        except DbHelperException:
-            pass
-        try:
-            self.db.add_item_ui_config(800000000, 'area', {'param_a1':'value_a1', 'param_a2':'value_a2'})
-            TestCase.fail(self, "Shouldn't have been able to add parameters \
-                                 with this item.id which doesn't exist")
-        except DbHelperException:
-            pass
+        assert self.db.get_ui_item_config('foo', 'param_a1') is None
 
     def testUpdate(self):
         area1 = self.db.add_area('area1','description 1')
         room1 = self.db.add_room('room1', area1.id)
-        self.db.add_item_ui_config(area1.id, 'area', {'param_a1':'value_a1', 'param_a2':'value_a2'})
-        self.db.add_item_ui_config(room1.id, 'room', {'param_r1':'value_r1', 'param_r2':'value_r2'})
-        uic = self.db.update_item_ui_config(area1.id, 'area', 'param_a1', 'new_value_a1')
-        uic = self.db.get_item_ui_config(area1.id, 'area', 'param_a1')
+        self.db.add_ui_item_config('area', {'param_a1':'value_a1', 'param_a2':'value_a2'})
+        self.db.add_ui_item_config('room', {'param_r1':'value_r1', 'param_r2':'value_r2'})
+        uic = self.db.update_ui_item_config('area', 'param_a1', 'new_value_a1')
+        uic = self.db.get_ui_item_config('area', 'param_a1')
         assert uic.value == 'new_value_a1', "Parameter should have the value '%s' but it has '%s'" \
                             % ('new_value_a1', uic.value)
 
     def testDel(self):
         area1 = self.db.add_area('area1','description 1')
         room1 = self.db.add_room('room1', area1.id)
-        self.db.add_item_ui_config(area1.id, 'area', {'param_a1':'value_a1', 'param_a2':'value_a2'})
-        self.db.add_item_ui_config(room1.id, 'room', {'param_r1':'value_r1', 'param_r2':'value_r2'})
-        self.db.delete_item_ui_config(area1.id, 'area', 'param_a2')
-        ui_config_list_all = self.db.list_all_item_ui_config()
+        self.db.add_ui_item_config('area', {'param_a1':'value_a1', 'param_a2':'value_a2'})
+        self.db.add_ui_item_config('room', {'param_r1':'value_r1', 'param_r2':'value_r2'})
+        self.db.delete_ui_item_config('area', 'param_a2')
+        ui_config_list_all = self.db.list_all_ui_item_config()
         assert len(ui_config_list_all) == 3, "List should contain 3 items but has %s" % len(ui_config_list_all)
-        assert self.db.get_item_ui_config(room1.id, 'area', 'param_a1') is not None
-        assert self.db.get_item_ui_config(room1.id, 'area', 'param_a2') is None
-        item_ui_config_list = self.db.list_item_ui_config(area1.id, 'area')
-        item_ui_config_del_list = self.db.delete_all_item_ui_config(area1.id, 'area')
-        assert len(self.db.list_item_ui_config(area1.id, 'area')) == 0, "No parameter should have been found"
+        assert self.db.get_ui_item_config('area', 'param_a1') is not None
+        assert self.db.get_ui_item_config('area', 'param_a2') is None
+        ui_item_config_list = self.db.list_ui_item_config('area')
+        ui_item_config_del_list = self.db.delete_all_ui_item_config('area')
+        assert len(self.db.list_ui_item_config('area')) == 0
 
 
 class SystemConfigTestCase(GenericTestCase):
