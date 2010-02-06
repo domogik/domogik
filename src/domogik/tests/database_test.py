@@ -37,10 +37,13 @@ import time
 import datetime
 
 from domogik.common.database import DbHelper, DbHelperException
-from domogik.common.sql_schema import Area, Device, DeviceUsage, DeviceConfig, \
-                                      DeviceStats, DeviceStatsValue, DeviceTechnology, DeviceTechnologyConfig, \
-                                      DeviceType, ItemUIConfig, Room, UserAccount, SystemAccount, SystemConfig, \
-                                      SystemStats, SystemStatsValue, Trigger
+from domogik.common.sql_schema import ActuatorFeature, Area, Device, DeviceUsage, \
+                                      DeviceConfig, DeviceStats, DeviceStatsValue, \
+                                      DeviceTechnology, DeviceTechnologyConfig, \
+                                      DeviceType, ItemUIConfig, Room, \
+                                      SensorReferenceData, SystemAccount, \
+                                      SystemConfig, SystemStats, SystemStatsValue, \
+                                      Trigger, UserAccount
 
 class GenericTestCase(unittest.TestCase):
     """
@@ -99,6 +102,10 @@ class GenericTestCase(unittest.TestCase):
         """
         for dty in db.list_device_types():
             db.del_device_type(dty.id, cascade_delete=True)
+
+    def remove_all_sensor_reference_data(self, db):
+        for srd in db.list_sensor_reference_data():
+            db.del_sensor_reference_data(srd.id)
 
     def remove_all_device_technology_config(self, db):
         """
@@ -385,6 +392,100 @@ class DeviceTypeTestCase(GenericTestCase):
         try:
             self.db.del_device_type(12345678910)
             TestCase.fail(self, "Device type does not exist, an exception should have been raised")
+        except DbHelperException:
+            pass
+
+class SensorReferenceDataTestCase(GenericTestCase):
+    """
+    Test sensor reference data
+    """
+
+    def setUp(self):
+        self.db = DbHelper(use_test_db=True)
+        self.remove_all_sensor_reference_data(self.db)
+
+    def tearDown(self):
+        self.remove_all_sensor_reference_data(self.db)
+        del self.db
+
+    def testEmptyList(self):
+        assert len(self.db.list_sensor_reference_data()) == 0, \
+                   "There should have no device type"
+
+    def testAdd(self):
+        dt1 = self.db.add_device_technology(u'1wire', 'desc dt1')
+        dty1 = self.db.add_device_type(dty_name='1wire.Temperature',
+                                       dty_description='desc1', dt_id=dt1.id)
+        dty2 = self.db.add_device_type(dty_name='1wire.Voltmeter',
+                                       dty_description='desc2', dt_id=dt1.id)
+        srd1 = self.db.add_sensor_reference_data(srd_name='Temperature',
+                    srd_value='number', dty_id=dty1.id, srd_unit='degreeC',
+                    srd_stat_key='key1')
+        assert srd1.name == 'Temperature'
+        assert srd1.value == 'number'
+        assert srd1.device_type_id == dty1.id
+        assert srd1.unit == 'degreeC'
+        assert srd1.stat_key == 'key1'
+        srd2 = self.db.add_sensor_reference_data(srd_name='Voltage',
+                    srd_value='number', dty_id=dty2.id, srd_unit='V',
+                    srd_stat_key='key2')
+        assert len(self.db.list_sensor_reference_data()) == 2
+        assert self.has_item(self.db.list_sensor_reference_data(), \
+               ['Temperature', 'Voltage'])
+
+    def testUpdate(self):
+        dt1 = self.db.add_device_technology(u'1wire', 'desc dt1')
+        dty1 = self.db.add_device_type(dty_name='1wire.Temperature',
+                                       dty_description='desc1', dt_id=dt1.id)
+        dty2 = self.db.add_device_type(dty_name='1wire.Voltmeter',
+                                       dty_description='desc2', dt_id=dt1.id)
+        srd = self.db.add_sensor_reference_data(srd_name='Temperature',
+                    srd_value='number', dty_id=dty1.id, srd_unit='degreeC',
+                    srd_stat_key='key1')
+        srd_u = self.db.update_sensor_reference_data(srd_id=srd.id, srd_name='Voltage',
+                    srd_value='number', dty_id=dty2.id, srd_unit='V',
+                    srd_stat_key='key2')
+        assert srd_u.name == 'Voltage'
+        assert srd_u.value == 'number'
+        assert srd_u.device_type_id == dty2.id
+        assert srd_u.unit == 'V'
+        assert srd_u.stat_key == 'key2'
+
+    def testFetchInformation(self):
+        dt1 = self.db.add_device_technology(u'1wire', 'desc dt1')
+        dty1 = self.db.add_device_type(dty_name='1wire.Temperature',
+                                       dty_description='desc1', dt_id=dt1.id)
+        dty2 = self.db.add_device_type(dty_name='1wire.Voltmeter',
+                                       dty_description='desc2', dt_id=dt1.id)
+        srd1 = self.db.add_sensor_reference_data(srd_name='Temperature',
+                    srd_value='number', dty_id=dty1.id, srd_unit='degreeC',
+                    srd_stat_key='key1')
+        srd2 = self.db.add_sensor_reference_data(srd_name='Voltage',
+                    srd_value='number', dty_id=dty2.id, srd_unit='V',
+                    srd_stat_key='key2')
+        assert self.db.get_sensor_reference_data_by_name('Temperature').unit == srd1.unit
+
+    def testDel(self):
+        dt1 = self.db.add_device_technology(u'1wire', 'desc dt1')
+        dty1 = self.db.add_device_type(dty_name='1wire.Temperature',
+                                       dty_description='desc1', dt_id=dt1.id)
+        dty2 = self.db.add_device_type(dty_name='1wire.Voltmeter',
+                                       dty_description='desc2', dt_id=dt1.id)
+        srd1 = self.db.add_sensor_reference_data(srd_name='Temperature',
+                    srd_value='number', dty_id=dty1.id, srd_unit='degreeC',
+                    srd_stat_key='key1')
+        srd1_id = srd1.id
+        srd2 = self.db.add_sensor_reference_data(srd_name='Voltage',
+                    srd_value='number', dty_id=dty2.id, srd_unit='V',
+                    srd_stat_key='key2')
+        srd_del = self.db.del_sensor_reference_data(srd1.id)
+        assert self.has_item(self.db.list_sensor_reference_data(), ['Voltage'])
+        assert not self.has_item(self.db.list_device_usages(), ['Temperature'])
+        assert srd_del.id == srd1_id
+        try:
+            self.db.del_sensor_reference_data(12345678910)
+            TestCase.fail(self, "SensorReferenceData does not exist, an \
+                                 exception should have been raised")
         except DbHelperException:
             pass
 

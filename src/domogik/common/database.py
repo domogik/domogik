@@ -62,9 +62,11 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
 from domogik.common.configloader import Loader
-from domogik.common.sql_schema import Area, Device, DeviceUsage, DeviceConfig, \
-                                      DeviceStats, DeviceStatsValue, DeviceTechnology, DeviceTechnologyConfig, \
-                                      DeviceType, ItemUIConfig, Room, UserAccount, SystemAccount, SystemConfig, \
+from domogik.common.sql_schema import ActuatorFeature, Area, Device, DeviceUsage, \
+                                      DeviceConfig, DeviceStats, DeviceStatsValue, \
+                                      DeviceTechnology, DeviceTechnologyConfig, \
+                                      DeviceType, ItemUIConfig, Room, UserAccount, \
+                                      SensorReferenceData, SystemAccount, SystemConfig, \
                                       SystemStats, SystemStatsValue, Trigger
 from domogik.common.sql_schema import DEVICE_TECHNOLOGY_LIST, \
                                       DEVICE_TYPE_LIST, ITEM_TYPE_LIST, UNIT_OF_STORED_VALUE_LIST
@@ -509,7 +511,7 @@ class DbHelper():
     def del_device_type(self, dty_id, cascade_delete=False):
         """
         Delete a device type record
-        @param dc_id : id of the device type to delete
+        @param dty_id : id of the device type to delete
         @return the deleted DeviceType object
         """
         dty = self._session.query(DeviceType).filter_by(id=dty_id).first()
@@ -531,6 +533,98 @@ class DbHelper():
             return dty_d
         else:
             raise DbHelperException("Couldn't delete device type id %s : it doesn't exist" % dty_id)
+
+####
+# Sensor reference data
+####
+    def list_sensor_reference_data(self):
+        """
+        Return a list of sensor reference data
+        @return a list of SensorReferenceData objects
+        """
+        return self._session.query(SensorReferenceData).all()
+
+    def get_sensor_reference_data_by_name(self, srd_name):
+        """
+        Return information about a sensor reference data
+        @param srd_name : The device sensor reference data name
+        @return a SensorReferenceData object
+        """
+        return self._session.query(SensorReferenceData).filter_by(name=srd_name).first()
+
+    def add_sensor_reference_data(self, srd_name, srd_value, dty_id,
+                                  srd_unit=None, srd_stat_key=None):
+        """
+        Add a sensor reference data
+        @param srd_name : name (ex. Temperature)
+        @param srd_value : value (number, string, trigger, complex...)
+        @param dty_id : id of the device type
+        @param srd_unit  unit of the value (ex. degreeC), optional
+        @param srd_stat_key : reference to a stat, optional
+        @return a SensorReferenceData (the newly created one)
+        """
+        srd = SensorReferenceData(name=srd_name, value=srd_value,
+                    device_type_id=dty_id, unit=srd_unit, stat_key=srd_stat_key)
+        self._session.add(srd)
+        try:
+            self._session.commit()
+        except Exception, sql_exception:
+            self._session.rollback()
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
+        return srd
+
+    def update_sensor_reference_data(self, srd_id, srd_name=None, srd_value=None,
+                                     dty_id=None, srd_unit=None, srd_stat_key=None):
+        """
+        Update a sensor reference data
+        @param srd_id : id of the sensor reference data
+        @param srd_name : name (ex. Temperature), optional
+        @param srd_value : value (number, string, trigger, complex...), optional
+        @param dty_id : id of the device type, optional
+        @param srd_unit  unit of the value (ex. degreeC), optional
+        @param srd_stat_key : reference to a stat, optional
+        @return a SensorReferenceData (the updated one)
+        """
+        srd = self._session.query(SensorReferenceData).filter_by(id=srd_id).first()
+        if srd is None:
+            raise DbHelperException("SensorReferenceData with id %s couldn't be found" % srd_id)
+        if srd_name is not None:
+            srd.name = srd_name
+        if srd_value is not None:
+            srd.value = srd_value
+        if dty_id is not None:
+            srd.device_type_id = dty_id
+        if srd_unit is not None:
+            srd.unit = srd_unit
+        if srd_stat_key is not None:
+            srd.stat_key = srd_stat_key
+        self._session.add(srd)
+        try:
+            self._session.commit()
+        except Exception, sql_exception:
+            self._session.rollback()
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
+        return srd
+
+    def del_sensor_reference_data(self, srd_id):
+        """
+        Delete a sensor reference data record
+        @param srd_id : id of the sensor reference data to delete
+        @return the deleted SensorReferenceData object
+        """
+        srd = self._session.query(SensorReferenceData).filter_by(id=srd_id).first()
+        if srd:
+            srd_d = srd
+            self._session.delete(srd)
+            try:
+                self._session.commit()
+            except Exception, sql_exception:
+                self._session.rollback()
+                raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
+            return srd_d
+        else:
+            raise DbHelperException("Couldn't delete sensor reference data id \
+                                    %s : it doesn't exist" % srd_id)
 
 ####
 # Device technology

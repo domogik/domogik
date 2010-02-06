@@ -333,34 +333,44 @@ class DeviceType(Base):
         return DeviceType.__tablename__
 
 
-class SensorReference(Base):
+class SensorReferenceData(Base):
     """
     Reference data for sensors
     """
-    __tablename__ = '%s_sensor_reference' % _db_prefix
+    __tablename__ = '%s_sensor_reference_data' % _db_prefix
     id = Column(Integer, primary_key=True)
     name = Column(String(30), nullable=False)
-    technology_id = Column(Integer, ForeignKey('%s.id' % \
-                           DeviceTechnology.get_tablename()), nullable=False)
-    name = Column(String(30), nullable=False)
-    description = Column(String(255))
+    value = Column(String(30), nullable=False)
+    unit = Column(String(30))
+    stat_key = Column(String(30))
+    device_type_id = Column(Integer, ForeignKey('%s.id' % \
+                           DeviceType.get_tablename()), nullable=False)
+    device_type = relation(DeviceType, backref=backref(__tablename__))
 
-    def __init__(self, name, description, technology_id):
+    def __init__(self, name, value, device_type_id, unit=None, stat_key=None):
         """
         Class constructor
-        @param name : short name of the type
-        @param description : extended description
+        @param name : name (ex. Temperature)
+        @param value : value (binary, range, number, string, list, complex, trigger)
+        @param device_type_id : id of the device type
+        @param unit : unit (ex. degreeC), optional
+        @param stat_key : link to DeviceStatsValue, optional
         """
         self.name = name
-        self.description = description
-        self.technology_id = technology_id
+        self.value = value
+        self.unit = unit
+        self.stat_key = stat_key
+        self.device_type_id = device_type_id
 
     def __repr__(self):
         """
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<DeviceType(id=%s, name='%s', desc='%s')>" % (self.id, self.name, self.description)
+        return "<SensorReferenceData(id=%s, name='%s', value='%s', unit='%s', \
+                stat_key='%s', device_type='%s')>" \
+                % (self.id, self.name, self.value, self.unit, self.stat_key, \
+                   self.device_type)
 
     @staticmethod
     def get_tablename():
@@ -368,7 +378,60 @@ class SensorReference(Base):
         Return the table name associated to the class
         @return table name
         """
-        return DeviceType.__tablename__
+        return SensorReferenceData.__tablename__
+
+
+class ActuatorFeature(Base):
+    """
+    Actuator features
+    """
+    __tablename__ = '%s_actuator_feature' % _db_prefix
+    id = Column(Integer, primary_key=True)
+    name = Column(String(30), nullable=False)
+    value = Column(String(30), nullable=False)
+    unit = Column(String(30))
+    configurable_states = Column(String(255))
+    return_confirmation = Column(Boolean())
+    device_type_id = Column(Integer, ForeignKey('%s.id' % \
+                           DeviceType.get_tablename()), nullable=False)
+    device_type = relation(DeviceType, backref=backref(__tablename__))
+
+    def __init__(self, name, value, unit, configurable_states,
+                 return_confirmation,device_type_id):
+        """
+        Class constructor
+        @param name : name (Dimmer, Switch, Activation...)
+        @param value : value (binary, range, number, string, list, complex, trigger)
+        @param unit : unit (%...)
+        @param configurable_states : on, off / 0,100,10 ...
+        @param return_confirmation : True if the actuator returns a confirmation
+                                     after it was updated
+        @param device_type_id : id of the device type
+        """
+        self.name = name
+        self.value = value
+        self.unit = unit
+        self.configurable_states = configurable_states
+        self.return_confirmation = return_confirmation
+        self.device_type_id = device_type_id
+
+    def __repr__(self):
+        """
+        Print an internal representation of the class
+        @return an internal representation
+        """
+        return "<ActuatorFeature(id=%s, name='%s', value='%s', unit='%s', \
+                configurable_states='%s', return_confirmation='%s' device_type='%s')>" \
+                % (self.id, self.name, self.value, self.unit, \
+                   self.configurable_states, self.return_confirmation, self.device_type)
+
+    @staticmethod
+    def get_tablename():
+        """
+        Return the table name associated to the class
+        @return table name
+        """
+        return ActuatorFeature.__tablename__
 
 
 class Device(Base):
