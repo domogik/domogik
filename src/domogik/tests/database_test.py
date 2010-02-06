@@ -183,7 +183,7 @@ class AreaTestCase(GenericTestCase):
         del self.db
 
     def testEmptyList(self):
-        assert len(self.db.list_areas()) == 0, "Area list is not empty"
+        assert len(self.db.list_areas()) == 0
 
     def testAdd(self):
         try:
@@ -194,7 +194,7 @@ class AreaTestCase(GenericTestCase):
             pass
         area0 = self.db.add_area('area0','description 0')
         print area0
-        assert self.db.list_areas()[0].name == 'area0', "area0 not found"
+        assert self.db.list_areas()[0].name == 'area0'
 
     def testUpdate(self):
         area = self.db.add_area('area0','description 0')
@@ -211,11 +211,12 @@ class AreaTestCase(GenericTestCase):
         area0 = self.db.add_area('area0','description 0')
         area0_id = area0.id
         area_d = self.db.del_area(area0.id)
-        assert not self.has_item(self.db.list_areas(), ['area0']), "area0 was NOT deleted"
-        assert area_d.id == area0.id, "The returned area is not the one that was deleted"
+        assert not self.has_item(self.db.list_areas(), ['area0'])
+        assert area_d.id == area0.id
         try:
             self.db.del_area(12345678910)
-            TestCase.fail(self, "Area does not exist, an exception should have been raised")
+            TestCase.fail(self, "Area does not exist, an exception \
+                                 should have been raised")
         except DbHelperException:
             pass
 
@@ -236,28 +237,33 @@ class RoomTestCase(GenericTestCase):
         del self.db
 
     def testEmptyList(self):
-        assert len(self.db.list_rooms()) == 0, "Room list is not empty : %s" % self.db.list_rooms()
+        assert len(self.db.list_rooms()) == 0
 
     def testAdd(self):
-        room = self.db.add_room(r_name='my_room', r_area_id=None, r_description='my_description')
+        room = self.db.add_room(r_name='my_room', r_area_id=None,
+                                r_description='my_description')
         print room
-        assert room.name == 'my_room'
-        assert room.description == 'my_description'
         area1 = self.db.add_area('area1','description 1')
         area2 = self.db.add_area('area2','description 2')
-        room1 = self.db.add_room(r_name='room1', r_description='description 1', r_area_id=area1.id)
+        room1 = self.db.add_room(r_name='room1', r_description='description 1',
+                                 r_area_id=area1.id)
         assert room1.name == 'room1'
         assert room1.description == 'description 1'
         assert room1.area_id == area1.id
-        room2 = self.db.add_room(r_name='room2', r_description='description 2', r_area_id=area1.id)
-        room3 = self.db.add_room(r_name='room3', r_description='description 3', r_area_id=area2.id)
-        assert len(self.db.list_rooms()) == 4, "Room list should have 4 items, it has %s" % len(self.db.list_rooms())
+        room2 = self.db.add_room(r_name='room2', r_description='description 2',
+                                 r_area_id=area1.id)
+        room3 = self.db.add_room(r_name='room3', r_description='description 3',
+                                 r_area_id=area2.id)
+        assert len(self.db.list_rooms()) == 4
 
     def testUpdate(self):
         area1 = self.db.add_area('area1','description 1')
         area2 = self.db.add_area('area2','description 2')
-        room = self.db.add_room(r_name='room1', r_description='description 1', r_area_id=area1.id)
-        room_u = self.db.update_room(room.id, r_name='room2', r_description='description 2', r_area_id=area2.id)
+        room = self.db.add_room(r_name='room1', r_description='description 1',
+                                r_area_id=area1.id)
+        room_u = self.db.update_room(room.id, r_name='room2',
+                                     r_description='description 2',
+                                     r_area_id=area2.id)
         assert room_u.name == 'room2'
         assert room_u.description == 'description 2'
         assert room_u.area_id == area2.id
@@ -265,35 +271,41 @@ class RoomTestCase(GenericTestCase):
     def testDel(self):
         area1 = self.db.add_area('area1','description 1')
         area2 = self.db.add_area('area2','description 2')
-        room1 = self.db.add_room(r_name='room1', r_description='description 1', r_area_id=area1.id)
-        room2 = self.db.add_room(r_name='room2', r_description='description 2', r_area_id=area1.id)
-        room3 = self.db.add_room(r_name='room3', r_description='description 3', r_area_id=area2.id)
+        room1 = self.db.add_room(r_name='room1', r_description='description 1',
+                                 r_area_id=area1.id)
+        room2 = self.db.add_room(r_name='room2', r_description='description 2',
+                                 r_area_id=area1.id)
+        room3 = self.db.add_room(r_name='room3', r_description='description 3',
+                                 r_area_id=area2.id)
         room1_id = room1.id
         room_deleted = self.db.del_room(room1.id)
-        assert not self.has_item(self.db.list_rooms(), ['room1']), "room1 was NOT deleted"
-        assert self.has_item(self.db.list_rooms(), ['room2', 'room3']), "rooms were deleted but shouldn't have been"
-        assert room_deleted.id == room1_id, "Returned room was not the one that was deleted"
+        assert not self.has_item(self.db.list_rooms(), ['room1'])
+        assert self.has_item(self.db.list_rooms(), ['room2', 'room3'])
+        assert room_deleted.id == room1_id
         try:
             self.db.del_room(12345678910)
-            TestCase.fail(self, "Room does not exist, an exception should have been raised")
+            TestCase.fail(self, "Room does not exist, an exception \
+                                 should have been raised")
         except DbHelperException:
             pass
 
     def testGetRoomByName(self):
         area1 = self.db.add_area('area1','description 1')
-        room1 = self.db.add_room(r_name='room1', r_description='description 1', r_area_id=area1.id)
-        assert self.db.get_room_by_name('room1').name == 'room1', "Couldn't find room1"
+        room1 = self.db.add_room(r_name='room1', r_description='description 1',
+                                 r_area_id=area1.id)
+        assert self.db.get_room_by_name('room1').name == 'room1'
 
     def testGetRoomsOfArea(self):
         area1 = self.db.add_area('area1','description 1')
         area2 = self.db.add_area('area2','description 2')
-        room1 = self.db.add_room(r_name='room1', r_description='description 1', r_area_id=area1.id)
-        room2 = self.db.add_room(r_name='room2', r_description='description 2', r_area_id=area1.id)
-        room3 = self.db.add_room(r_name='room3', r_description='description 3', r_area_id=area2.id)
-        assert len(self.db.get_all_rooms_of_area(area1.id)) == 2, \
-          "Area1 should have 2 rooms, it has %s" % len(self.db.get_all_rooms_of_area(area1.id))
-        assert len(self.db.get_all_rooms_of_area(area2.id)) == 1, \
-          "Area2 should have 1 room, it has %s" % len(self.db.get_all_rooms_of_area(area2.id))
+        room1 = self.db.add_room(r_name='room1', r_description='description 1',
+                                 r_area_id=area1.id)
+        room2 = self.db.add_room(r_name='room2', r_description='description 2',
+                                 r_area_id=area1.id)
+        room3 = self.db.add_room(r_name='room3', r_description='description 3',
+                                 r_area_id=area2.id)
+        assert len(self.db.get_all_rooms_of_area(area1.id)) == 2
+        assert len(self.db.get_all_rooms_of_area(area2.id)) == 1
 
 class DeviceUsageTestCase(GenericTestCase):
     """
@@ -309,39 +321,39 @@ class DeviceUsageTestCase(GenericTestCase):
         del self.db
 
     def testEmptyList(self):
-        assert len(self.db.list_device_usages()) == 0, "There should have no device usage"
+        assert len(self.db.list_device_usages()) == 0
 
     def testAdd(self):
         du1 = self.db.add_device_usage('du1')
         print du1
         assert du1.name == 'du1'
         du2 = self.db.add_device_usage('du2')
-        assert len(self.db.list_device_usages()) == 2, "%s devices usages found, instead of 2 " \
-                                                      % len(self.db.list_device_usages())
-        assert self.has_item(self.db.list_device_usages(), ['du1', 'du2']),\
-                             "Couldn't find all device usages"
+        assert len(self.db.list_device_usages()) == 2
+        assert self.has_item(self.db.list_device_usages(), ['du1', 'du2'])
 
     def testUpdate(self):
         du = self.db.add_device_usage('du1')
-        du_u = self.db.update_device_usage(du_id=du.id, du_name='du2', du_description='description 2')
+        du_u = self.db.update_device_usage(du_id=du.id, du_name='du2',
+                                           du_description='description 2')
         assert du_u.name == 'du2'
         assert du_u.description == 'description 2'
 
     def testFetchInformation(self):
         du1 = self.db.add_device_usage('du1')
-        assert self.db.get_device_usage_by_name('du1').name == 'du1', "DeviceUsage du1 was not found"
+        assert self.db.get_device_usage_by_name('du1').name == 'du1'
 
     def testDel(self):
         du1 = self.db.add_device_usage('du1')
         du2 = self.db.add_device_usage('du2')
         du2_id = du2.id
         du_del = self.db.del_device_usage(du2.id)
-        assert self.has_item(self.db.list_device_usages(), ['du1']), "Couldn't find 'du1'"
-        assert not self.has_item(self.db.list_device_usages(), ['du2']), "'du2' was NOT deleted"
-        assert du_del.id == du2_id, "Returned DeviceUsage is not the one that was deleted"
+        assert self.has_item(self.db.list_device_usages(), ['du1'])
+        assert not self.has_item(self.db.list_device_usages(), ['du2'])
+        assert du_del.id == du2_id
         try:
             self.db.del_device_usage(12345678910)
-            TestCase.fail(self, "Device usage does not exist, an exception should have been raised")
+            TestCase.fail(self, "Device usage does not exist, an exception \
+                                 should have been raised")
         except DbHelperException:
             pass
 
@@ -359,7 +371,7 @@ class DeviceTypeTestCase(GenericTestCase):
         del self.db
 
     def testEmptyList(self):
-        assert len(self.db.list_device_types()) == 0, "There should have no device type"
+        assert len(self.db.list_device_types()) == 0
 
     def testAdd(self):
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
@@ -370,9 +382,8 @@ class DeviceTypeTestCase(GenericTestCase):
         assert dty1.description == 'desc1'
         assert dty1.technology_id == dt1.id
         dty2 = self.db.add_device_type('x10 Dimmer', 'desc2', dt1.id)
-        assert len(self.db.list_device_types()) == 2, "%s devices types found, instead of 2 " \
-                                                      % len(self.db.list_device_types())
-        assert self.has_item(self.db.list_device_types(), ['x10 Switch', 'x10 Dimmer']), "Couldn't find all device types"
+        assert len(self.db.list_device_types()) == 2
+        assert self.has_item(self.db.list_device_types(), ['x10 Switch', 'x10 Dimmer'])
 
     def testUpdate(self):
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
@@ -386,7 +397,7 @@ class DeviceTypeTestCase(GenericTestCase):
     def testFetchInformation(self):
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
         dty1 = self.db.add_device_type('x10 Switch', 'desc1', dt1.id)
-        assert self.db.get_device_type_by_name('x10 Switch').name == 'x10 Switch', "DeviceType 'x10 Switch' was not found"
+        assert self.db.get_device_type_by_name('x10 Switch').name == 'x10 Switch'
 
     def testDel(self):
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
@@ -394,12 +405,13 @@ class DeviceTypeTestCase(GenericTestCase):
         dty2 = self.db.add_device_type('x10 Dimmer', dt1.id)
         dty2_id = dty2.id
         dty_del = self.db.del_device_type(dty2.id)
-        assert self.has_item(self.db.list_device_types(), ['x10 Switch']), "Couldn't find 'x10 Switch'"
-        assert not self.has_item(self.db.list_device_usages(), ['x10 Dimmer']), "'x10 Dimmer' was NOT deleted"
-        assert dty_del.id == dty2_id, "The returned DeviceType is not the one that was deleted"
+        assert self.has_item(self.db.list_device_types(), ['x10 Switch'])
+        assert not self.has_item(self.db.list_device_usages(), ['x10 Dimmer'])
+        assert dty_del.id == dty2_id
         try:
             self.db.del_device_type(12345678910)
-            TestCase.fail(self, "Device type does not exist, an exception should have been raised")
+            TestCase.fail(self, "Device type does not exist, an exception \
+                                 should have been raised")
         except DbHelperException:
             pass
 
@@ -417,8 +429,7 @@ class SensorReferenceDataTestCase(GenericTestCase):
         del self.db
 
     def testEmptyList(self):
-        assert len(self.db.list_sensor_reference_data()) == 0, \
-                   "There should have no sensor reference data"
+        assert len(self.db.list_sensor_reference_data()) == 0
 
     def testAdd(self):
         dt1 = self.db.add_device_technology(u'1wire', 'desc dt1')
@@ -512,8 +523,7 @@ class ActuatorFeatureTestCase(GenericTestCase):
         del self.db
 
     def testEmptyList(self):
-        assert len(self.db.list_actuator_features()) == 0, \
-                   "There should have no actuator features"
+        assert len(self.db.list_actuator_features()) == 0
 
     def testAdd(self):
         dt1 = self.db.add_device_technology(u'PLCBus', 'desc dt1')
@@ -609,7 +619,7 @@ class DeviceTechnologyTestCase(GenericTestCase):
         del self.db
 
     def testEmptyList(self):
-        assert len(self.db.list_device_technologies()) == 0, "There should have no device technology"
+        assert len(self.db.list_device_technologies()) == 0
 
     def testAdd(self):
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
@@ -618,10 +628,9 @@ class DeviceTechnologyTestCase(GenericTestCase):
         assert dt1.description == 'desc dt1'
         dt2 = self.db.add_device_technology(u'1wire', 'desc dt2')
         dt3 = self.db.add_device_technology(u'PLCBus', 'desc dt3')
-        assert len(self.db.list_device_technologies()) == 3, "%s devices technologies found, instead of 3 " \
-                                                      % len(self.db.list_device_technologies())
-        assert self.has_item(self.db.list_device_technologies(), [u'x10', u'1wire', u'PLCBus']), \
-                                                      "Couldn't find all device technologies"
+        assert len(self.db.list_device_technologies()) == 3
+        assert self.has_item(self.db.list_device_technologies(),
+                             [u'x10', u'1wire', u'PLCBus'])
 
     def testUpdate(self):
         dt = self.db.add_device_technology(u'x10', 'desc dt1')
@@ -631,7 +640,7 @@ class DeviceTechnologyTestCase(GenericTestCase):
 
     def testFetchInformation(self):
         dt2 = self.db.add_device_technology(u'1wire', 'desc dt2')
-        assert self.db.get_device_technology_by_name(u'1wire').name == u'1wire', "DeviceTechnology '1wire' was not found"
+        assert self.db.get_device_technology_by_name(u'1wire').name == u'1wire'
 
     def testDel(self):
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
@@ -640,12 +649,13 @@ class DeviceTechnologyTestCase(GenericTestCase):
         dt2_id = dt2.id
         dt3 = self.db.add_device_technology(u'PLCBus', 'desc dt3')
         self.db.del_device_technology(dt2.id)
-        assert self.has_item(self.db.list_device_technologies(), [u'x10', u'PLCBus']), "Couldn't find 'x10' and 'PLCBus'"
-        assert not self.has_item(self.db.list_device_technologies(), [u'1wire']), "'1wire' was NOT deleted"
-        assert dt_del.id == dt2_id, "The returned DeviceTechnology object is not the one that was deleted"
+        assert self.has_item(self.db.list_device_technologies(), [u'x10', u'PLCBus'])
+        assert not self.has_item(self.db.list_device_technologies(), [u'1wire'])
+        assert dt_del.id == dt2_id
         try:
             self.db.del_device_technology(12345678910)
-            TestCase.fail(self, "Device technology does not exist, an exception should have been raised")
+            TestCase.fail(self, "Device technology does not exist, an exception \
+                                 should have been raised")
         except DbHelperException:
             pass
 
@@ -665,23 +675,29 @@ class DeviceTechnologyConfigTestCase(GenericTestCase):
         del self.db
 
     def testEmptyList(self):
-        assert len(self.db.list_all_device_technology_config()) == 0, "There should have no device technology configurations"
+        assert len(self.db.list_all_device_technology_config()) == 0
 
     def testAdd(self):
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
         dt3 = self.db.add_device_technology(u'PLCBus', 'desc dt3')
-        dtc1_1 = self.db.add_device_technology_config(dt1.id, 'key1_1', 'val1_1', 'desc1')
+        dtc1_1 = self.db.add_device_technology_config(dt1.id, 'key1_1', 'val1_1',
+                                                      'desc1')
         print dtc1_1
         assert dtc1_1.technology_id == dt1.id
         assert dtc1_1.key == 'key1_1'
         assert dtc1_1.value == 'val1_1'
         assert dtc1_1.description == 'desc1'
-        dtc1_2 = self.db.add_device_technology_config(dt1.id, 'key1_2', 'val1_2', 'desc2')
-        dtc3_1 = self.db.add_device_technology_config(dt3.id, 'key3_1', 'val3_1', 'desc3')
-        dtc3_2 = self.db.add_device_technology_config(dt3.id, 'key3_2', 'val3_2', 'desc4')
-        dtc3_3 = self.db.add_device_technology_config(dt3.id, 'key3_3', 'val3_3', 'desc5')
+        dtc1_2 = self.db.add_device_technology_config(dt1.id, 'key1_2', 'val1_2',
+                                                     'desc2')
+        dtc3_1 = self.db.add_device_technology_config(dt3.id, 'key3_1', 'val3_1',
+                                                      'desc3')
+        dtc3_2 = self.db.add_device_technology_config(dt3.id, 'key3_2', 'val3_2',
+                                                      'desc4')
+        dtc3_3 = self.db.add_device_technology_config(dt3.id, 'key3_3', 'val3_3',
+                                                      'desc5')
         try:
-            dtc = self.db.add_device_technology_config(dt3.id, 'key3_3', 'val3_3', 'desc')
+            dtc = self.db.add_device_technology_config(dt3.id, 'key3_3', 'val3_3',
+                                                       'desc')
             TestCase.fail(self, "It shouldn't have been possible to add 'key3_3'\
                           for device technology %s : it already exists" % dt3.id)
         except DbHelperException:
@@ -706,27 +722,36 @@ class DeviceTechnologyConfigTestCase(GenericTestCase):
 
     def testGet(self):
         dt3 = self.db.add_device_technology(u'PLCBus', 'desc dt3')
-        dtc3_1 = self.db.add_device_technology_config(dt3.id, 'key3_1', 'val3_1', 'desc3_1')
-        dtc3_2 = self.db.add_device_technology_config(dt3.id, 'key3_2', 'val3_2', 'desc3_2')
-        dtc3_3 = self.db.add_device_technology_config(dt3.id, 'key3_3', 'val3_3', 'desc3_3')
+        dtc3_1 = self.db.add_device_technology_config(dt3.id, 'key3_1', 'val3_1',
+                                                      'desc3_1')
+        dtc3_2 = self.db.add_device_technology_config(dt3.id, 'key3_2', 'val3_2',
+                                                      'desc3_2')
+        dtc3_3 = self.db.add_device_technology_config(dt3.id, 'key3_3', 'val3_3',
+                                                      'desc3_3')
         dtc = self.db.get_device_technology_config(dt3.id, 'key3_2')
-        assert dtc.value == 'val3_2', "Wrong value for %s. Should be val3_2" % dtc.value
+        assert dtc.value == 'val3_2'
 
     def testDel(self):
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
         dt3 = self.db.add_device_technology(u'PLCBus', 'desc dt3')
-        dtc1_1 = self.db.add_device_technology_config(dt1.id, 'key1_1', 'val1_1', 'desc1')
-        dtc1_2 = self.db.add_device_technology_config(dt1.id, 'key1_2', 'val1_2', 'desc2')
-        dtc3_1 = self.db.add_device_technology_config(dt3.id, 'key3_1', 'val3_1', 'desc3')
-        dtc3_2 = self.db.add_device_technology_config(dt3.id, 'key3_2', 'val3_2', 'desc4')
-        dtc3_3 = self.db.add_device_technology_config(dt3.id, 'key3_3', 'val3_3', 'desc5')
+        dtc1_1 = self.db.add_device_technology_config(dt1.id, 'key1_1', 'val1_1',
+                                                      'desc1')
+        dtc1_2 = self.db.add_device_technology_config(dt1.id, 'key1_2', 'val1_2',
+                                                      'desc2')
+        dtc3_1 = self.db.add_device_technology_config(dt3.id, 'key3_1', 'val3_1',
+                                                      'desc3')
+        dtc3_2 = self.db.add_device_technology_config(dt3.id, 'key3_2', 'val3_2',
+                                                      'desc4')
+        dtc3_3 = self.db.add_device_technology_config(dt3.id, 'key3_3', 'val3_3',
+                                                      'desc5')
         dtc3_2_id = dtc3_2.id
         dtc_del = self.db.del_device_technology_config(dtc3_2.id)
-        assert self.db.get_device_technology_config(dt3.id, 'key3_2') == None, "key3_2 was NOT deleted"
-        assert dtc_del.id == dtc3_2_id, "The return DeviceTechnologyConfig object was not the one that was deleted"
+        assert self.db.get_device_technology_config(dt3.id, 'key3_2') == None
+        assert dtc_del.id == dtc3_2_id
         try:
             self.db.del_device_technology_config(12345678910)
-            TestCase.fail(self, "Device technology config does not exist, an exception should have been raised")
+            TestCase.fail(self, "Device technology config does not exist, \
+                                 an exception should have been raised")
         except DbHelperException:
             pass
 
@@ -744,7 +769,7 @@ class DeviceTestCase(GenericTestCase):
         del self.db
 
     def testEmptyList(self):
-        assert len(self.db.list_devices()) == 0, "Device list is NOT empty"
+        assert len(self.db.list_devices()) == 0
 
     def testAdd(self):
         area1 = self.db.add_area('area1','description 1')
@@ -762,8 +787,10 @@ class DeviceTestCase(GenericTestCase):
         print device1
         assert len(self.db.list_devices()) == 1, "Device was NOT added"
         # TODO see if these methods are still used
-        #assert device1.is_lamp(), "device1.is_lamp() returns False. Should have returned True"
-        #assert not device1.is_appliance(), "device1.is_appliance() returns True. Should have returned False"
+        # assert device1.is_lamp(), "device1.is_lamp() returns False.
+        # Should have returned True"
+        # assert not device1.is_appliance(), "device1.is_appliance()
+        # returns True. Should have returned False"
 
     def testUpdate(self):
         area1 = self.db.add_area('area1','description 1')
@@ -778,11 +805,11 @@ class DeviceTestCase(GenericTestCase):
                     d_is_value_changeable_by_user = False,
                     d_unit_of_stored_values = u'Percent')
         device_id = device1.id
-        device1 = self.db.update_device(d_id = device1.id, d_description = 'desc2')
+        device1 = self.db.update_device(d_id = device1.id,
+                                        d_description = 'desc2')
         self.db._session.expunge(device1) # Remove object from session
         device1 = self.db.get_device(device_id)
-        assert device1.description == 'desc2',\
-              "Device desc. was NOT changed : should be 'desc2' but is '%s'" % device1.description
+        assert device1.description == 'desc2'
 
     def testFindAndSearch(self):
         area1 = self.db.add_area('area1','description 1')
@@ -805,39 +832,26 @@ class DeviceTestCase(GenericTestCase):
         device3 = self.db.add_device(d_name='device3', d_address='A3',
                     d_type_id = dty2.id, d_usage_id=du2.id, d_room_id=room2.id)
 
-        assert len(self.db.list_devices()) == 3, "Device list should have 3 items, but it has %s" % self.db.list_devices()
-        assert len(self.db.get_all_devices_of_room(room1.id)) == 2, \
-                  "Room id %s should have 2 devices but has %s" % (room1.id, len(self.db.get_all_devices_of_room(room1.id)))
-        assert len(self.db.get_all_devices_of_room(room2.id)) == 1, \
-                  "Room id %s should have 1 device but has %s" % (room2.id, len(self.db.get_all_devices_of_room(room2.id)))
-        assert len(self.db.get_all_devices_of_area(area1.id)) == 2, \
-                  "Area id %s should have 2 devices but has %s" % (area1.id, len(self.db.get_all_devices_of_area(area1.id)))
-        assert len(self.db.get_all_devices_of_area(area2.id)) == 1, \
-                  "Area id %s should have 1 device but has %s" % (area2.id, len(self.db.get_all_devices_of_area(area2.id)))
+        assert len(self.db.list_devices()) == 3
+        assert len(self.db.get_all_devices_of_room(room1.id)) == 2
+        assert len(self.db.get_all_devices_of_room(room2.id)) == 1
+        assert len(self.db.get_all_devices_of_area(area1.id)) == 2
+        assert len(self.db.get_all_devices_of_area(area2.id)) == 1
 
-        nb_of_dev = len(self.db.search_devices({'usage_id':du1.id, 'room_id':room1.id}))
-        assert nb_of_dev == 2, "Should have found 2 devices, but found %s" % nb_of_dev
-        nb_of_dev = len(self.db.search_devices({'address':'A2'}))
-        assert nb_of_dev == 1, "Should have found 1 device, but found %s" % nb_of_dev
-        nb_of_dev = len(self.db.search_devices({'address':'A1544'}))
-        assert nb_of_dev == 0, "Should have found 0 device, but found %s" % nb_of_dev
+        assert len(self.db.search_devices({'usage_id':du1.id,
+                                          'room_id':room1.id})) == 2
+        assert len(self.db.search_devices({'address':'A2'})) == 1
+        assert len(self.db.search_devices({'address':'A1544'})) == 0
 
-        device_list = self.db.find_devices(None, None)
-        assert len(device_list) == 3, "Should have found 3 devices, but found %s" % len(device_list)
-        device_list = self.db.find_devices([], [])
-        assert len(device_list) == 3, "Should have found 3 devices, but found %s" % len(device_list)
-        device_list = self.db.find_devices([room1.id, room2.id], [du1.id, du2.id])
-        assert len(device_list) == 3, "Should have found 3 devices, but found %s" % len(device_list)
-        device_list = self.db.find_devices([room1.id], [du1.id, du2.id])
-        assert len(device_list) == 2, "Should have found 2 devices, but found %s" % len(device_list)
-        device_list = self.db.find_devices([room2.id], None)
-        assert len(device_list) == 1, "Should have found 1 device, but found %s" % len(device_list)
-        device_list = self.db.find_devices([room2.id], [])
-        assert len(device_list) == 1, "Should have found 1 device, but found %s" % len(device_list)
-        device_list = self.db.find_devices([room1.id], [du2.id])
-        assert len(device_list) == 0, "Should have found NO device, but found %s" % len(device_list)
-        device_list = self.db.find_devices([room1.id, room2.id], [du2.id])
-        assert len(device_list) == 1, "Should have found 1 device, but found %s" % len(device_list)
+        assert len(self.db.find_devices(None, None)) == 3
+        assert len(self.db.find_devices([], [])) == 3
+        assert len(self.db.find_devices([room1.id, room2.id],
+                                        [du1.id, du2.id])) == 3
+        assert len(self.db.find_devices([room1.id], [du1.id, du2.id])) == 2
+        assert len(self.db.find_devices([room2.id], None)) == 1
+        assert len(self.db.find_devices([room2.id], [])) == 1
+        assert len(self.db.find_devices([room1.id], [du2.id])) == 0
+        assert len(self.db.find_devices([room1.id, room2.id], [du2.id])) == 1
 
     def testDel(self):
         area1 = self.db.add_area('area1','description 1')
@@ -861,13 +875,13 @@ class DeviceTestCase(GenericTestCase):
         device_del = device2
         device2_id = device2.id
         self.db.del_device(device2.id)
-        assert len(self.db.list_devices()) == 2, "Found %s device(s), should be %s" % (self.db.list_devices(), 1)
-        assert self.db.list_devices()[0].address == 'A1', \
-              "Device should have 'A1' address but has : %s instead" % self.db.list_devices()[0].address
-        assert device_del.id == device2.id, "The return Device object is not the one that was deleted"
+        assert len(self.db.list_devices()) == 2
+        assert self.db.list_devices()[0].address == 'A1'
+        assert device_del.id == device2.id
         try:
             self.db.del_device(12345678910)
-            TestCase.fail(self, "Device does not exist, an exception should have been raised")
+            TestCase.fail(self, "Device does not exist, an exception should \
+                          have been raised")
         except DbHelperException:
             pass
 
@@ -886,7 +900,7 @@ class DeviceStatsTestCase(GenericTestCase):
         del self.db
 
     def testEmptyList(self):
-        assert len(self.db.list_all_device_stats()) == 0, "Device stats list is NOT empty"
+        assert len(self.db.list_all_device_stats()) == 0
 
     def testAdd(self):
         dt1 = self.db.add_device_technology(u"x10", "this is x10")
@@ -903,22 +917,20 @@ class DeviceStatsTestCase(GenericTestCase):
         device4 = self.db.add_device(d_name='device4', d_address = "A4",
                     d_type_id = dty1.id, d_usage_id = du1.id, d_room_id = room1.id)
         now = datetime.datetime.now()
-        d_stat1_1 = self.db.add_device_stat(device1.id, now, {'val1': '10', 'val2': '10.5' })
+        d_stat1_1 = self.db.add_device_stat(device1.id, now,
+                                            {'val1': '10', 'val2': '10.5' })
         print d_stat1_1
-        d_stat1_2 = self.db.add_device_stat(device1.id, now + datetime.timedelta(seconds=1),
+        d_stat1_2 = self.db.add_device_stat(device1.id,
+                                            now + datetime.timedelta(seconds=1),
                                             {'val1': '11', 'val2': '12' })
-        d_stat2_1 = self.db.add_device_stat(device2.id, now, {'val1': '40', 'val2': '41' })
-        d_stat3_1 = self.db.add_device_stat(device3.id, now, {'val1': '100', 'val2': '101' })
-        l_stats = self.db.list_device_stats(device1.id)
-        assert len(l_stats) == 2, \
-              "device stats for device id %s should have 2 items. It has %s" % (device1.id, len(l_stats))
-        l_stats = self.db.list_device_stats(device2.id)
-        assert len(l_stats) == 1, \
-              "device stats for device id %s should have 1 item. It has %s" % (device2.id, len(l_stats))
-        assert self.db.device_has_stats(device1.id), \
-              "device_hast_stats should have returned True for device id %s " % device1.id
-        assert not self.db.device_has_stats(device4.id), \
-              "device_hast_stats should have returned False for device id %s " % device4.id
+        d_stat2_1 = self.db.add_device_stat(device2.id, now,
+                                            {'val1': '40', 'val2': '41' })
+        d_stat3_1 = self.db.add_device_stat(device3.id, now,
+                                            {'val1': '100', 'val2': '101' })
+        assert len(self.db.list_device_stats(device1.id)) == 2
+        assert len(self.db.list_device_stats(device2.id)) == 1
+        assert self.db.device_has_stats(device1.id)
+        assert not self.db.device_has_stats(device4.id)
 
     def testLastStatOfOneDevice(self):
         dt1 = self.db.add_device_technology(u"x10", "this is x10")
@@ -931,18 +943,17 @@ class DeviceStatsTestCase(GenericTestCase):
         now = datetime.datetime.now()
         d_stat1_1 = self.db.add_device_stat(device1.id, now,
                                             {'val1': '10', 'val2': '10.5' })
-        d_stat1_2 = self.db.add_device_stat(device1.id, now + datetime.timedelta(seconds=1),
+        d_stat1_2 = self.db.add_device_stat(device1.id,
+                                            now + datetime.timedelta(seconds=1),
                                             {'val1': '11', 'val2': '12' })
 
         stat = self.db.get_last_stat_of_device(device1.id)
         dsv = self.db.list_device_stats_values(stat.id)
         for item in dsv:
             if item.name == 'val1':
-                assert item.value == '11', "Should get value '11' for last stat of device %s. Got %s instead" \
-                                              % (device1.id, dsv[0].value)
+                assert item.value == '11'
             elif item.name == 'val2':
-                assert item.value == '12', "Should get value '12' for last stat of device %s. Got %s instead" \
-                                              % (device1.id, dsv[1].value)
+                assert item.value == '12'
 
     def testLastStatOfDevices(self):
         dt1 = self.db.add_device_technology(u"x10", "this is x10")
@@ -971,7 +982,7 @@ class DeviceStatsTestCase(GenericTestCase):
         #l_stats = self.db.list_device_stats(device1.id)
 
         l_stats = self.db.get_last_stat_of_devices([device1.id, device2.id])
-        assert len(l_stats) == 2, "last device stats should have 2 items. It has %s" % len(l_stats)
+        assert len(l_stats) == 2
         device_id_list = []
         for stat in l_stats:
             device_id_list.append(stat.device_id)
@@ -981,10 +992,9 @@ class DeviceStatsTestCase(GenericTestCase):
                 value_list = []
                 for item in dsv:
                     value_list.append(item.value)
-                assert '11' in value_list and '12' in value_list, \
-                      "Should have found values '11' and '12' for last device stat"
-        assert device1.id in device_id_list, "device1 is not in the list but should have been"
-        assert device2.id in device_id_list, "device2 is not in the list but should have been"
+                assert '11' in value_list and '12' in value_list
+        assert device1.id in device_id_list
+        assert device2.id in device_id_list
 
     def testDel(self):
         dt1 = self.db.add_device_technology(u"x10", "this is x10")
@@ -997,16 +1007,20 @@ class DeviceStatsTestCase(GenericTestCase):
         device2 = self.db.add_device(d_name='device2', d_address = "A2",
                     d_type_id = dty1.id, d_usage_id = du1.id, d_room_id = room1.id)
         now = datetime.datetime.now()
-        d_stat1_1 = self.db.add_device_stat(device1.id, now, {'val1': '10', 'val2': '10.5' })
-        d_stat1_2 = self.db.add_device_stat(device1.id, now + datetime.timedelta(seconds=1), {'val1': '11', 'val2': '12' })
-        d_stat2_1 = self.db.add_device_stat(device2.id, now, {'val1': '40', 'val2': '41' })
+        d_stat1_1 = self.db.add_device_stat(device1.id,
+                                            now, {'val1': '10', 'val2': '10.5' })
+        d_stat1_2 = self.db.add_device_stat(device1.id,
+                                            now + datetime.timedelta(seconds=1),
+                                            {'val1': '11', 'val2': '12' })
+        d_stat2_1 = self.db.add_device_stat(device2.id, now,
+                                            {'val1': '40', 'val2': '41' })
         l_stats = self.db.list_device_stats(device1.id)
         d_stats_list_d = self.db.del_all_device_stats(device1.id)
-        assert len(d_stats_list_d) == len(l_stats), "Returned length of device stats deleted differs from the one that was deleted (%s != %s)" % (d_stats_list_d, l_stats)
+        assert len(d_stats_list_d) == len(l_stats)
         l_stats = self.db.list_device_stats(device1.id)
-        assert len(l_stats) == 0, "List of stats should be empty for device1, but it has %s items" % len(l_stats)
+        assert len(l_stats) == 0
         l_stats = self.db.list_device_stats(device2.id)
-        assert len(l_stats) == 1, "List of stats should have 1 item for device2, but it has %s items" % len(l_stats)
+        assert len(l_stats) == 1
 
 
 class TriggersTestCase(GenericTestCase):
@@ -1023,16 +1037,18 @@ class TriggersTestCase(GenericTestCase):
         del self.db
 
     def testEmptyList(self):
-        assert len(self.db.list_triggers()) == 0, "Trigger list is NOT empty"
+        assert len(self.db.list_triggers()) == 0
 
     def testAdd(self):
         trigger1 = self.db.add_trigger(t_description='desc1',
-                                t_rule='AND(x,OR(y,z))', t_result=['x10_on("a3")','1wire()'])
+                                       t_rule='AND(x,OR(y,z))',
+                                       t_result=['x10_on("a3")','1wire()'])
         print trigger1
         trigger2 = self.db.add_trigger(t_description = 'desc2',
-                                t_rule='OR(x,AND(y,z))', t_result=['x10_on("a2")','1wire()'])
-        assert len(self.db.list_triggers()) == 2, "Trigger list should have 2 items but it has %s item(s)" % len(self.db.list_triggers())
-        assert self.db.get_trigger(trigger1.id).description == 'desc1', "Trigger1 should have 'desc1', but it has not"
+                                       t_rule='OR(x,AND(y,z))',
+                                       t_result=['x10_on("a2")','1wire()'])
+        assert len(self.db.list_triggers()) == 2
+        assert self.db.get_trigger(trigger1.id).description == 'desc1'
 
     def testUpdate(self):
         trigger = self.db.add_trigger(t_description='desc1', t_rule='AND(x,OR(y,z))',
@@ -1046,18 +1062,21 @@ class TriggersTestCase(GenericTestCase):
 
     def testDel(self):
         trigger1 = self.db.add_trigger(t_description = 'desc1',
-                                t_rule = 'AND(x,OR(y,z))', t_result= ['x10_on("a3")','1wire()'])
+                                       t_rule = 'AND(x,OR(y,z))',
+                                       t_result= ['x10_on("a3")','1wire()'])
         trigger2 = self.db.add_trigger(t_description = 'desc2',
-                                t_rule = 'OR(x,AND(y,z))', t_result= ['x10_on("a2")','1wire()'])
+                                       t_rule = 'OR(x,AND(y,z))',
+                                       t_result= ['x10_on("a2")','1wire()'])
         for trigger in self.db.list_triggers():
             trigger_id = trigger.id
             trigger_del = trigger
             self.db.del_trigger(trigger.id)
-            assert trigger_del.id == trigger.id, "The returned Trigger is not the one that was deleted"
-        assert len(self.db.list_triggers()) == 0, "Trigger list should be empty, but it has % item(s)" % len(self.db.list_triggers())
+            assert trigger_del.id == trigger.id
+        assert len(self.db.list_triggers()) == 0
         try:
             self.db.del_trigger(12345678910)
-            TestCase.fail(self, "Trigger does not exist, an exception should have been raised")
+            TestCase.fail(self, "Trigger does not exist, an exception should \
+                                 have been raised")
         except DbHelperException:
             pass
 
@@ -1078,38 +1097,38 @@ class UserAndSystemAccountsTestCase(GenericTestCase):
         del self.db
 
     def testEmptyList(self):
-        assert len(self.db.list_system_accounts()) == 0, "System account list is NOT empty"
-        assert len(self.db.list_user_accounts()) == 0, "User account list is NOT empty"
+        assert len(self.db.list_system_accounts()) == 0
+        assert len(self.db.list_user_accounts()) == 0
 
     def testAdd(self):
-        sys1 = self.db.add_system_account(a_login = 'mschneider', a_password = 'IwontGiveIt', a_is_admin = True)
+        sys1 = self.db.add_system_account(a_login='mschneider',
+                                          a_password='IwontGiveIt', a_is_admin=True)
         print sys1
-        assert self.db.is_system_account('mschneider', 'IwontGiveIt'), "is_system_account should have returned True"
-        assert not self.db.is_system_account('mschneider', 'plop'), "is_system_account should have returned False"
-        assert not self.db.is_system_account('hello', 'boy'), "is_system_account should have returned False"
+        assert self.db.is_system_account('mschneider', 'IwontGiveIt')
+        assert not self.db.is_system_account('mschneider', 'plop')
+        assert not self.db.is_system_account('hello', 'boy')
         sys1 = self.db.get_system_account_by_login_and_pass('mschneider', 'IwontGiveIt')
-        assert sys1 is not None, "Should have found an account 'mschneider'"
-        assert sys1.login == 'mschneider', "Login should be 'mschneider' but is '%s'" %sys1.login
+        assert sys1 is not None
+        assert sys1.login == 'mschneider'
         try:
-            self.db.add_system_account(a_login = 'mschneider', a_password = 'plop', a_is_admin = True)
+            self.db.add_system_account(a_login='mschneider', a_password='plop',
+                                       a_is_admin = True)
             TestCase.fail(self, "It shouldn't have been possible to add \
                           login %s. It already exists!" % 'mschneider')
         except DbHelperException:
             pass
-        sys2 = self.db.add_system_account(a_login = 'lonely', a_password = 'boy', a_is_admin = True, a_skin_used='myskin')
-        sys3 = self.db.add_system_account(a_login = 'domo', a_password = 'gik', a_is_admin = True)
+        sys2 = self.db.add_system_account(a_login='lonely', a_password='boy',
+                                          a_is_admin=True, a_skin_used='myskin')
+        sys3 = self.db.add_system_account(a_login='domo', a_password='gik',
+                                          a_is_admin=True)
         user1 = self.db.add_user_account(u_first_name='Marc', u_last_name='SCHNEIDER',
                                          u_birthdate=datetime.date(1973, 4, 24),
                                          u_system_account_id = sys1.id)
         print user1
         user2 = self.db.add_user_account(u_first_name='Monthy', u_last_name='PYTHON',
                                          u_birthdate=datetime.date(1981, 4, 24))
-        assert len(self.db.list_user_accounts()) == 2, \
-                  "List of user accounts should have 2 items, but it has NOT %s" \
-                  % self.db.list_user_accounts()
-        assert len(self.db.list_system_accounts()) == 3, \
-                  "List of system accounts should have 3 items, but it has NOT %s" \
-                  % self.db.list_system_accounts()
+        assert len(self.db.list_user_accounts()) == 2
+        assert len(self.db.list_system_accounts()) == 3
 
     def testUpdate(self):
         sys_acc = self.db.add_system_account(a_login='mschneider',
@@ -1134,79 +1153,84 @@ class UserAndSystemAccountsTestCase(GenericTestCase):
         assert user_u.system_account_id == sys_acc_u.id
 
     def testGet(self):
-        sys1 = self.db.add_system_account(a_login = 'mschneider', a_password = 'IwontGiveIt', a_is_admin = True)
-        sys2 = self.db.add_system_account(a_login = 'lonely', a_password = 'boy', a_is_admin = True, a_skin_used='myskin')
-        sys3 = self.db.add_system_account(a_login = 'domo', a_password = 'gik', a_is_admin = True)
-        user1 = self.db.add_user_account(u_first_name='Marc', u_last_name='SCHNEIDER', u_birthdate=datetime.date(1973, 4, 24),
-                                  u_system_account_id = sys1.id)
-        user2 = self.db.add_user_account(u_first_name='Monthy', u_last_name='PYTHON', u_birthdate=datetime.date(1981, 4, 24))
+        sys1 = self.db.add_system_account(a_login='mschneider', a_password='IwontGiveIt',
+                                          a_is_admin=True)
+        sys2 = self.db.add_system_account(a_login='lonely', a_password='boy',
+                                          a_is_admin = True, a_skin_used='myskin')
+        sys3 = self.db.add_system_account(a_login='domo', a_password='gik',
+                                          a_is_admin=True)
+        user1 = self.db.add_user_account(u_first_name='Marc', u_last_name='SCHNEIDER',
+                                         u_birthdate=datetime.date(1973, 4, 24),
+                                         u_system_account_id = sys1.id)
+        user2 = self.db.add_user_account(u_first_name='Monthy',
+                                         u_last_name='PYTHON',
+                                         u_birthdate=datetime.date(1981, 4, 24))
 
-        assert self.db.get_system_account(sys1.id).login == 'mschneider', \
-              "Login for system id %s should be 'mschneider' but is %s" % (sys1.id, sys1.login)
+        assert self.db.get_system_account(sys1.id).login == 'mschneider'
         assert self.db.get_system_account_by_login('mschneider') is not None
-        assert self.db.get_system_account_by_login('mschneider').id == sys1.id, \
-              "Id for login 'mschneider' should be %s but is %s" % (sys1.id, self.db.get_system_account('mschneider').id)
+        assert self.db.get_system_account_by_login('mschneider').id == sys1.id
         assert self.db.get_system_account_by_login('lucyfer') is None
 
         login = self.db.get_system_account_by_user(user1.id).login
-        assert login == 'mschneider', \
-              "System account login for user id %s should be 'mschneider' but is %s" % (user1.id, login)
-        assert self.db.get_user_account(user1.id).first_name == 'Marc', \
-              "First name for user id %s should be 'Marc' but is %s" % (user1.id, user1.first_name)
-        assert self.db.get_user_account(user2.id).last_name == 'PYTHON', \
-              "Last name for user id %s should be 'PYTHON' but is %s" % (user2.id, user2.last_name)
-
-        assert self.db.get_user_account_by_system_account(sys1.id) is not None, \
-              "System account with id '%s' should have a User account, but it doesn't have" % sys1.id
-        assert self.db.get_user_account_by_system_account(sys1.id).first_name == 'Marc', \
-              "System account with id '%s' should have as first name 'Marc' but have '%s' instead" \
-              % (sys1.id, self.db.get_user_account_by_system_account(sys1.id).first_name)
-        assert self.db.get_user_account_by_system_account(sys3.id) is None, \
-              "System account with id '%s' shouldn't have a User account, but it has one" % sys3.id
+        assert login == 'mschneider'
+        assert self.db.get_user_account(user1.id).first_name == 'Marc'
+        assert self.db.get_user_account(user2.id).last_name == 'PYTHON'
+        assert self.db.get_user_account_by_system_account(sys1.id) is not None
+        assert self.db.get_user_account_by_system_account(sys1.id).first_name == 'Marc'
+        assert self.db.get_user_account_by_system_account(sys3.id) is None
 
     def testDel(self):
-        sys1 = self.db.add_system_account(a_login = 'mschneider', a_password = 'IwontGiveIt', a_is_admin = True)
-        sys2 = self.db.add_system_account(a_login = 'lonely', a_password = 'boy', a_is_admin = True, a_skin_used='myskin')
-        sys3 = self.db.add_system_account(a_login = 'domo', a_password = 'gik', a_is_admin = True)
+        sys1 = self.db.add_system_account(a_login='mschneider', a_password='IwontGiveIt',
+                                          a_is_admin=True)
+        sys2 = self.db.add_system_account(a_login='lonely', a_password='boy',
+                                          a_is_admin=True, a_skin_used='myskin')
+        sys3 = self.db.add_system_account(a_login='domo', a_password='gik',
+                                          a_is_admin=True)
         user1 = self.db.add_user_account(u_first_name='Marc',
-                u_last_name='SCHNEIDER', u_birthdate=datetime.date(1973, 4, 24),
-                u_system_account_id = sys1.id)
+                                         u_last_name='SCHNEIDER',
+                                         u_birthdate=datetime.date(1973, 4, 24),
+                                         u_system_account_id = sys1.id)
         try:
             self.db.del_system_account(sys1.id)
             TestCase.fail(self, "It shouldn't have been possible to delete this \
                                  system account, a user has a reference to it")
         except DbHelperException:
             pass
-        user2 = self.db.add_user_account(u_first_name='Monthy', u_last_name='PYTHON', u_birthdate=datetime.date(1981, 4, 24))
-        sys_temp = self.db.add_system_account(a_login = 'fantom', a_password = 'as', a_is_admin = False)
+        user2 = self.db.add_user_account(u_first_name='Monthy',
+                                         u_last_name='PYTHON',
+                                         u_birthdate=datetime.date(1981, 4, 24))
+        sys_temp = self.db.add_system_account(a_login='fantom', a_password='as',
+                                              a_is_admin = False)
         sys_temp_id = sys_temp.id
         sys_acc_del = self.db.del_system_account(sys_temp.id)
-        assert sys_acc_del.id == sys_temp.id, "The return SystemAccount is not the one that was deleted"
+        assert sys_acc_del.id == sys_temp.id
         l_sys = self.db.list_system_accounts()
-        assert len(l_sys) > 0, "The list is empty but it shouldn't"
+        assert len(l_sys) > 0
         for sys in l_sys:
-            assert sys.login != 'fantom', "System account with 'fantom' login was NOT deleted"
+            assert sys.login != 'fantom'
         user1_acc_id = user1.id
         user_acc_del = self.db.del_user_account(user1.id)
-        assert user_acc_del.id == user1_acc_id, "The return UserAccount is not the one that was deleted"
+        assert user_acc_del.id == user1_acc_id
         found_user2 = False
         for user in self.db.list_user_accounts():
-            assert user.id != user1.id, "User %s was NOT deleted" % user1.id
+            assert user.id != user1.id
             found_user2 = (user.id == user2.id)
-        assert found_user2, "User %s was deleted, but shouldn't have been" % user2.id
+        assert found_user2
         # Make sure associated system account has been deleted
         l_sys = self.db.list_system_accounts()
-        assert len(l_sys) > 0, "The list is empty but it shouldn't"
+        assert len(l_sys) > 0
         for sys in l_sys:
-            assert sys.login != 'mschneider', "System account with 'mschneider' login was NOT deleted"
+            assert sys.login != 'mschneider'
         try:
             self.db.del_user_account(12345678910)
-            TestCase.fail(self, "User account does not exist, an exception should have been raised")
+            TestCase.fail(self, "User account does not exist, an exception \
+                          should have been raised")
         except DbHelperException:
             pass
         try:
             self.db.del_system_account(12345678910)
-            TestCase.fail(self, "System account does not exist, an exception should have been raised")
+            TestCase.fail(self, "System account does not exist, an exception \
+                          should have been raised")
         except DbHelperException:
             pass
 
@@ -1224,8 +1248,7 @@ class SystemStatsTestCase(GenericTestCase):
         del self.db
 
     def testEmptyList(self):
-        assert len(self.db.list_system_stats()) == 0, "List of system stats should be empty : %s" % self.db.list_system_stats()
-
+        assert len(self.db.list_system_stats()) == 0
 
     def testAdd(self):
         now = datetime.datetime.now()
@@ -1246,11 +1269,11 @@ class SystemStatsTestCase(GenericTestCase):
         for i in range(4):
             ssv = {'ssv1': (i*2), 'ssv2': (i*3),}
             sstat_list.append(self.db.add_system_stat("sstat%s" %i, 'localhost',
-                                now + datetime.timedelta(seconds=i), ssv))
+                              now + datetime.timedelta(seconds=i), ssv))
         system_stat1 = self.db.get_system_stat(sstat_list[1].id)
         ssv = self.db.list_system_stats_values(system_stat1.id)
-        assert len(ssv) == 2, "%s should have 2 statistics values, it has %s" %(system_stat1.name, len(ssv))
-        assert ssv[0].value == '2', "Wrong value for stat %s : %s. Should be '2'" % (ssv[0].name, ssv[0].value)
+        assert len(ssv) == 2
+        assert ssv[0].value == '2'
 
     def testDel(self):
         now = datetime.datetime.now()
@@ -1260,21 +1283,20 @@ class SystemStatsTestCase(GenericTestCase):
             sstat_list.append(self.db.add_system_stat("sstat%s" %i, 'localhost',
                                 now + datetime.timedelta(seconds=i), ssv))
         sstat_del = self.db.del_system_stat("sstat0")
-        assert sstat_del.name == "sstat0", "The returned SystemStats is not the one that was deleted"
-        assert len(self.db.list_system_stats()) == 3, \
-                   "List of system stats should have 3 items : %s" \
-                   % self.db.list_system_stats()
+        assert sstat_del.name == "sstat0"
+        assert len(self.db.list_system_stats()) == 3
         try:
             self.db.del_system_stat("i_dont_exist")
-            TestCase.fail(self, "System stat does not exist, an exception should have been raised")
+            TestCase.fail(self, "System stat does not exist, an exception \
+                                 should have been raised")
         except DbHelperException:
             pass
         ss_list = self.db.list_system_stats()
         ss_list_del = self.db.del_all_system_stats()
-        assert len(ss_list) == len(ss_list_del), "The returned SystemStats list is not the one that was deleted"
-        assert len(self.db.list_system_stats()) == 0, "System statistics should be empty, but it is NOT"
+        assert len(ss_list) == len(ss_list_del)
+        assert len(self.db.list_system_stats()) == 0
         ssv = self.db._session.query(SystemStatsValue).all()
-        assert len(ssv) == 0, "System statistic values should be empty, but it is NOT"
+        assert len(ssv) == 0
 
 
 class UIItemConfigTestCase(GenericTestCase):
@@ -1302,16 +1324,19 @@ class UIItemConfigTestCase(GenericTestCase):
         assert len(ui_config_list_a) == 2
         self.db.add_ui_item_config('room', {'param_r1':'value_r1', 'param_r2':'value_r2'})
         ui_config_list_all = self.db.list_all_ui_item_config()
-        assert len(ui_config_list_all) == 4, "List should contain 4 items but has %s" % len(ui_config_list_all)
+        assert len(ui_config_list_all) == 4
         ui_config_list_r = self.db.list_ui_item_config('room')
-        assert len(ui_config_list_r) == 2 and ui_config_list_r[0].item_type == 'room' \
-               and ui_config_list_r[0].key == 'param_r1' and ui_config_list_r[0].value == 'value_r1' \
-               and ui_config_list_r[1].item_type == 'room' and ui_config_list_r[1].key == 'param_r2' \
-               and ui_config_list_r[1].value == 'value_r2', "Wrong list returned %s" % ui_config_list_r
+        assert len(ui_config_list_r) == 2 \
+               and ui_config_list_r[0].item_type == 'room' \
+               and ui_config_list_r[0].key == 'param_r1' \
+               and ui_config_list_r[0].value == 'value_r1' \
+               and ui_config_list_r[1].item_type == 'room' \
+               and ui_config_list_r[1].key == 'param_r2' \
+               and ui_config_list_r[1].value == 'value_r2', "%s" % ui_config_list_r
         uic = self.db.get_ui_item_config('room', 'param_r2')
-        assert uic.value == 'value_r2', "item should have the value 'value_r2' but it has %s" % uic.value
+        assert uic.value == 'value_r2'
         uic = self.db.get_ui_item_config('area', 'param_a1')
-        assert uic.value == 'value_a1', "item should have the value 'value_a1' but it has %s" % uic.value
+        assert uic.value == 'value_a1'
         assert self.db.get_ui_item_config('foo', 'param_a1') is None
 
     def testUpdate(self):
@@ -1321,8 +1346,7 @@ class UIItemConfigTestCase(GenericTestCase):
         self.db.add_ui_item_config('room', {'param_r1':'value_r1', 'param_r2':'value_r2'})
         uic = self.db.update_ui_item_config('area', 'param_a1', 'new_value_a1')
         uic = self.db.get_ui_item_config('area', 'param_a1')
-        assert uic.value == 'new_value_a1', "Parameter should have the value '%s' but it has '%s'" \
-                            % ('new_value_a1', uic.value)
+        assert uic.value == 'new_value_a1'
 
     def testDel(self):
         area1 = self.db.add_area('area1','description 1')
@@ -1330,8 +1354,7 @@ class UIItemConfigTestCase(GenericTestCase):
         self.db.add_ui_item_config('area', {'param_a1':'value_a1', 'param_a2':'value_a2'})
         self.db.add_ui_item_config('room', {'param_r1':'value_r1', 'param_r2':'value_r2'})
         self.db.delete_ui_item_config('area', 'param_a2')
-        ui_config_list_all = self.db.list_all_ui_item_config()
-        assert len(ui_config_list_all) == 3, "List should contain 3 items but has %s" % len(ui_config_list_all)
+        assert len(self.db.list_all_ui_item_config()) == 3
         assert self.db.get_ui_item_config('area', 'param_a1') is not None
         assert self.db.get_ui_item_config('area', 'param_a2') is None
         ui_item_config_list = self.db.list_ui_item_config('area')
@@ -1351,13 +1374,14 @@ class SystemConfigTestCase(GenericTestCase):
         del self.db
 
     def testUpdate(self):
-        system_config = self.db.update_system_config(s_simulation_mode=True, s_debug_mode=True)
-        assert system_config.simulation_mode, "System should be in simulation mode but it is NOT"
-        assert system_config.debug_mode, "System should be in debug mode but it is NOT"
+        system_config = self.db.update_system_config(s_simulation_mode=True,
+                                                     s_debug_mode=True)
+        assert system_config.simulation_mode
+        assert system_config.debug_mode
         system_config = self.db.update_system_config(s_simulation_mode=False)
-        assert not system_config.simulation_mode, "System shouldn't be in simulation mode, but it IS"
+        assert not system_config.simulation_mode
         system_config = self.db.get_system_config()
-        assert system_config.debug_mode, "System should be in debug mode but it is NOT"
+        assert system_config.debug_mode
 
 
 if __name__ == "__main__":
