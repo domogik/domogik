@@ -174,7 +174,7 @@ class Room(Base):
         @return an internal representation
         """
         return "<Room(id=%s, name='%s', desc='%s', area=%s)>" \
-          % (self.id, self.name, self.description, self.area_id)
+          % (self.id, self.name, self.description, self.area)
 
     @staticmethod
     def get_tablename():
@@ -208,7 +208,8 @@ class DeviceUsage(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<DeviceUsage(id=%s, name='%s', desc='%s')>" % (self.id, self.name, self.description)
+        return "<DeviceUsage(id=%s, name='%s', desc='%s')>" \
+                % (self.id, self.name, self.description)
 
     @staticmethod
     def get_tablename():
@@ -260,7 +261,9 @@ class DeviceTechnologyConfig(Base):
     """
     __tablename__ = '%s_device_technology_config' % _db_prefix
     id = Column(Integer, primary_key=True)
-    technology_id = Column(Integer, ForeignKey('%s.id' % DeviceTechnology.get_tablename()), nullable=False)
+    technology_id = Column(Integer,
+                           ForeignKey('%s.id' % DeviceTechnology.get_tablename()),
+                           nullable=False)
     technology = relation(DeviceTechnology, backref=backref(__tablename__))
     key = Column(String(30), nullable=False)
     value = Column(String(80), nullable=False)
@@ -285,7 +288,7 @@ class DeviceTechnologyConfig(Base):
         @return an internal representation
         """
         return "<DeviceTechnologyConfig(id=%s, techno=%s, ('%s', '%s'))>" \
-          % (self.id, self.technology_id, self.key, self.value)
+          % (self.id, self.technology, self.key, self.value)
 
     @staticmethod
     def get_tablename():
@@ -324,7 +327,7 @@ class DeviceType(Base):
         @return an internal representation
         """
         return "<DeviceType(id=%s, name='%s', desc='%s', device techno='%s')>" \
-                % (self.id, self.name, self.description, self.technology_id)
+                % (self.id, self.name, self.description, self.technology)
 
     @staticmethod
     def get_tablename():
@@ -474,7 +477,8 @@ class Device(Base):
         @param is_resetable : True if a default value can be set to the device
         @param initial_value : initial value set to the device when it is switched on
         @param is_value_changeable_by_user : True if the user can set a value to the device
-        @param unit_of_stored_values : unit associated to the value (Volt, Celsius, Farenheit, Percent, Boolean)
+        @param unit_of_stored_values : unit associated to the value
+                                       (Volt, Celsius, Farenheit, Percent, Boolean)
         """
         self.name = name
         self.address = address
@@ -521,7 +525,7 @@ class Device(Base):
         return "<Device(id=%s, name='%s', addr='%s', desc='%s', ref='%s', type='%s', usage=%s, \
           room=%s, is_reset='%s', initial_val='%s', is_value_change='%s', unit='%s')>" \
           % (self.id, self.name, self.address, self.description, self.reference, \
-             self.type_id, self.usage_id, self.room_id, self.is_resetable, self.initial_value,\
+             self.type, self.usage, self.room, self.is_resetable, self.initial_value,\
              self.is_value_changeable_by_user, self.unit_of_stored_values)
 
     @staticmethod
@@ -539,7 +543,8 @@ class DeviceConfig(Base):
     """
     __tablename__ = '%s_device_config' % _db_prefix
     id = Column(Integer, primary_key=True)
-    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), nullable=False)
+    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()),
+                       nullable=False)
     device = relation(Device, backref=backref(__tablename__))
     key = Column(String(30), nullable=False)
     value = Column(String(80), nullable=False)
@@ -562,7 +567,7 @@ class DeviceConfig(Base):
         @return an internal representation
         """
         return "<DeviceConfig(id=%s, device=%s, ('%s', '%s'))>" \
-          % (self.id, self.device_id, self.key, self.value)
+          % (self.id, self.device, self.key, self.value)
 
     @staticmethod
     def get_tablename():
@@ -579,7 +584,8 @@ class DeviceStats(Base):
     """
     __tablename__ = '%s_device_stats' % _db_prefix
     id = Column(Integer, primary_key=True)
-    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), nullable=False)
+    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()),
+                       nullable=False)
     device = relation(Device, backref=backref(__tablename__))
     date = Column(DateTime, nullable=False)
 
@@ -598,7 +604,7 @@ class DeviceStats(Base):
         @return an internal representation
         """
         return "<DeviceStats(id=%s, device=%s, date='%s')>" \
-          % (self.id, self.device_id, self.date)
+          % (self.id, self.device, self.date)
 
     @staticmethod
     def get_tablename():
@@ -615,7 +621,9 @@ class DeviceStatsValue(Base):
     """
     __tablename__ = '%s_device_stats_value' % _db_prefix
     id = Column(Integer, primary_key=True)
-    device_stats_id = Column(Integer, ForeignKey('%s.id' % DeviceStats.get_tablename()), nullable=False)
+    device_stats_id = Column(Integer,
+                             ForeignKey('%s.id' % DeviceStats.get_tablename()),
+                             nullable=False)
     name = Column(String(30), nullable=False)
     value = Column(String(80), nullable=False)
 
@@ -636,7 +644,7 @@ class DeviceStatsValue(Base):
         @return an internal representation
         """
         return "<DeviceStatsValue(id=%s, name=%s, value=%s, stat_id=%s)>" \
-          % (self.id, self.name, self.value, self.device_stats_id)
+          % (self.id, self.name, self.value, self.device_stat)
 
     @staticmethod
     def get_tablename():
@@ -735,7 +743,8 @@ class UserAccount(Base):
     first_name = Column(String(50), nullable=False)
     last_name = Column(String(60), nullable=False)
     birthdate = Column(Date, nullable=False)
-    system_account_id = Column(Integer, ForeignKey('%s.id' % SystemAccount.get_tablename()))
+    system_account_id = Column(Integer,
+                               ForeignKey('%s.id' % SystemAccount.get_tablename()))
     system_account = relation(SystemAccount, backref=backref(__tablename__))
 
     def __init__(self, first_name, last_name, birthdate, system_account_id):
@@ -757,7 +766,7 @@ class UserAccount(Base):
         @return an internal representation
         """
         return "<UserAccount(id=%s, first_name='%s', last_name='%s', system_account=%s)>" \
-          % (self.id, self.first_name, self.last_name, self.system_account_id)
+          % (self.id, self.first_name, self.last_name, self.system_account)
 
     @staticmethod
     def get_tablename():
@@ -812,7 +821,10 @@ class SystemStatsValue(Base):
     """
     __tablename__ = '%s_system_stats_value' % _db_prefix
     id = Column(Integer, primary_key=True)
-    system_stats_id = Column(Integer, ForeignKey('%s.id' % SystemStats.get_tablename()), nullable=False)
+    system_stats_id = Column(Integer,
+                             ForeignKey('%s.id' % SystemStats.get_tablename()),
+                             nullable=False)
+    system_stats = relation(SystemStats, backref=backref(__tablename__))
     name = Column(String(30), nullable=False)
     value = Column(String(80), nullable=False)
 
@@ -833,7 +845,7 @@ class SystemStatsValue(Base):
         @return an internal representation
         """
         return "<SystemStatsValue(id=%s, name=%s, value=%s, stat_id=%s)>" \
-          % (self.id, self.name, self.value, self.system_stats_id)
+          % (self.id, self.name, self.value, self.system_stats)
 
     @staticmethod
     def get_tablename():
@@ -846,7 +858,8 @@ class SystemStatsValue(Base):
 
 class ItemUIConfig(Base):
     """
-    UI configuration parameters for items (area, room, device) such as class name for icons
+    UI configuration parameters for items (area, room, device) such as
+    class name for icons
     """
     __tablename__ = '%s_item_ui_config' % _db_prefix
 
