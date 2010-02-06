@@ -193,6 +193,7 @@ class AreaTestCase(GenericTestCase):
         except DbHelperException:
             pass
         area0 = self.db.add_area('area0','description 0')
+        print area0
         assert self.db.list_areas()[0].name == 'area0', "area0 not found"
 
     def testUpdate(self):
@@ -239,6 +240,7 @@ class RoomTestCase(GenericTestCase):
 
     def testAdd(self):
         room = self.db.add_room(r_name='my_room', r_area_id=None, r_description='my_description')
+        print room
         assert room.name == 'my_room'
         assert room.description == 'my_description'
         area1 = self.db.add_area('area1','description 1')
@@ -311,6 +313,7 @@ class DeviceUsageTestCase(GenericTestCase):
 
     def testAdd(self):
         du1 = self.db.add_device_usage('du1')
+        print du1
         assert du1.name == 'du1'
         du2 = self.db.add_device_usage('du2')
         assert len(self.db.list_device_usages()) == 2, "%s devices usages found, instead of 2 " \
@@ -362,6 +365,7 @@ class DeviceTypeTestCase(GenericTestCase):
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
         dty1 = self.db.add_device_type(dty_name='x10 Switch',
                                        dty_description='desc1', dt_id=dt1.id)
+        print dty1
         assert dty1.name == 'x10 Switch'
         assert dty1.description == 'desc1'
         assert dty1.technology_id == dt1.id
@@ -425,6 +429,7 @@ class SensorReferenceDataTestCase(GenericTestCase):
         srd1 = self.db.add_sensor_reference_data(srd_name='Temperature',
                     srd_value='number', dty_id=dty1.id, srd_unit='degreeC',
                     srd_stat_key='key1')
+        print srd1
         assert srd1.name == 'Temperature'
         assert srd1.value == 'number'
         assert srd1.device_type_id == dty1.id
@@ -519,6 +524,7 @@ class ActuatorFeatureTestCase(GenericTestCase):
         af1 = self.db.add_actuator_feature(af_name='Dimmer',
                     af_value='range', dty_id=dty2.id, af_unit='Percent',
                     af_configurable_states='0,100,10', af_return_confirmation=True)
+        print af1
         assert af1.name == 'Dimmer'
         assert af1.value == 'range'
         assert af1.device_type_id == dty2.id
@@ -607,6 +613,7 @@ class DeviceTechnologyTestCase(GenericTestCase):
 
     def testAdd(self):
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
+        print dt1
         assert dt1.name == 'x10'
         assert dt1.description == 'desc dt1'
         dt2 = self.db.add_device_technology(u'1wire', 'desc dt2')
@@ -664,6 +671,7 @@ class DeviceTechnologyConfigTestCase(GenericTestCase):
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
         dt3 = self.db.add_device_technology(u'PLCBus', 'desc dt3')
         dtc1_1 = self.db.add_device_technology_config(dt1.id, 'key1_1', 'val1_1', 'desc1')
+        print dtc1_1
         assert dtc1_1.technology_id == dt1.id
         assert dtc1_1.key == 'key1_1'
         assert dtc1_1.value == 'val1_1'
@@ -751,6 +759,7 @@ class DeviceTestCase(GenericTestCase):
                     d_is_resetable = True, d_initial_value = 30,
                     d_is_value_changeable_by_user = False,
                     d_unit_of_stored_values = u'Percent')
+        print device1
         assert len(self.db.list_devices()) == 1, "Device was NOT added"
         # TODO see if these methods are still used
         #assert device1.is_lamp(), "device1.is_lamp() returns False. Should have returned True"
@@ -895,7 +904,9 @@ class DeviceStatsTestCase(GenericTestCase):
                     d_type_id = dty1.id, d_usage_id = du1.id, d_room_id = room1.id)
         now = datetime.datetime.now()
         d_stat1_1 = self.db.add_device_stat(device1.id, now, {'val1': '10', 'val2': '10.5' })
-        d_stat1_2 = self.db.add_device_stat(device1.id, now + datetime.timedelta(seconds=1), {'val1': '11', 'val2': '12' })
+        print d_stat1_1
+        d_stat1_2 = self.db.add_device_stat(device1.id, now + datetime.timedelta(seconds=1),
+                                            {'val1': '11', 'val2': '12' })
         d_stat2_1 = self.db.add_device_stat(device2.id, now, {'val1': '40', 'val2': '41' })
         d_stat3_1 = self.db.add_device_stat(device3.id, now, {'val1': '100', 'val2': '101' })
         l_stats = self.db.list_device_stats(device1.id)
@@ -1017,6 +1028,7 @@ class TriggersTestCase(GenericTestCase):
     def testAdd(self):
         trigger1 = self.db.add_trigger(t_description='desc1',
                                 t_rule='AND(x,OR(y,z))', t_result=['x10_on("a3")','1wire()'])
+        print trigger1
         trigger2 = self.db.add_trigger(t_description = 'desc2',
                                 t_rule='OR(x,AND(y,z))', t_result=['x10_on("a2")','1wire()'])
         assert len(self.db.list_triggers()) == 2, "Trigger list should have 2 items but it has %s item(s)" % len(self.db.list_triggers())
@@ -1071,6 +1083,7 @@ class UserAndSystemAccountsTestCase(GenericTestCase):
 
     def testAdd(self):
         sys1 = self.db.add_system_account(a_login = 'mschneider', a_password = 'IwontGiveIt', a_is_admin = True)
+        print sys1
         assert self.db.is_system_account('mschneider', 'IwontGiveIt'), "is_system_account should have returned True"
         assert not self.db.is_system_account('mschneider', 'plop'), "is_system_account should have returned False"
         assert not self.db.is_system_account('hello', 'boy'), "is_system_account should have returned False"
@@ -1085,12 +1098,18 @@ class UserAndSystemAccountsTestCase(GenericTestCase):
             pass
         sys2 = self.db.add_system_account(a_login = 'lonely', a_password = 'boy', a_is_admin = True, a_skin_used='myskin')
         sys3 = self.db.add_system_account(a_login = 'domo', a_password = 'gik', a_is_admin = True)
-        user1 = self.db.add_user_account(u_first_name='Marc', u_last_name='SCHNEIDER', u_birthdate=datetime.date(1973, 4, 24), u_system_account_id = sys1.id)
-        user2 = self.db.add_user_account(u_first_name='Monthy', u_last_name='PYTHON', u_birthdate=datetime.date(1981, 4, 24))
+        user1 = self.db.add_user_account(u_first_name='Marc', u_last_name='SCHNEIDER',
+                                         u_birthdate=datetime.date(1973, 4, 24),
+                                         u_system_account_id = sys1.id)
+        print user1
+        user2 = self.db.add_user_account(u_first_name='Monthy', u_last_name='PYTHON',
+                                         u_birthdate=datetime.date(1981, 4, 24))
         assert len(self.db.list_user_accounts()) == 2, \
-                  "List of user accounts should have 2 items, but it has NOT %s" % self.db.list_user_accounts()
+                  "List of user accounts should have 2 items, but it has NOT %s" \
+                  % self.db.list_user_accounts()
         assert len(self.db.list_system_accounts()) == 3, \
-                  "List of system accounts should have 3 items, but it has NOT %s" % self.db.list_system_accounts()
+                  "List of system accounts should have 3 items, but it has NOT %s" \
+                  % self.db.list_system_accounts()
 
     def testUpdate(self):
         sys_acc = self.db.add_system_account(a_login='mschneider',
@@ -1213,8 +1232,10 @@ class SystemStatsTestCase(GenericTestCase):
         sstat_list = []
         for i in range(4):
             ssv = {'ssv1': (i*2), 'ssv2': (i*3),}
-            sstat_list.append(self.db.add_system_stat("sstat%s" %i, 'localhost',
-                                now + datetime.timedelta(seconds=i), ssv))
+            sstat = self.db.add_system_stat("sstat%s" %i, 'localhost',
+                                now + datetime.timedelta(seconds=i), ssv)
+            print sstat
+            sstat_list.append(sstat)
         assert len(self.db.list_system_stats()) == 4, \
                    "List of system stats should have 4 items : %s" \
                    % self.db.list_system_stats()
@@ -1276,7 +1297,9 @@ class ItemUIConfigTestCase(GenericTestCase):
     def testAdd(self):
         area1 = self.db.add_area('area1','description 1')
         room1 = self.db.add_room('room1', area1.id)
-        ui_config_list_a = self.db.add_item_ui_config(area1.id, 'area', {'param_a1':'value_a1','param_a2':'value_a2'})
+        ui_config_list_a = self.db.add_item_ui_config(area1.id, 'area', \
+                                {'param_a1':'value_a1','param_a2':'value_a2'})
+        print ui_config_list_a
         assert len(ui_config_list_a) == 2
         self.db.add_item_ui_config(room1.id, 'room', {'param_r1':'value_r1', 'param_r2':'value_r2'})
         ui_config_list_all = self.db.list_all_item_ui_config()
