@@ -23,12 +23,12 @@
 {% load i18n %}
 {% block js_script %}
     $(function(){
-        // Add form  
+        // Add form
         var new_name = $("#new_name"),
             new_description = $("#new_description"),
             allFields = $([]).add(new_name).add(new_description),
             tips = $("#validateTips");
-		
+
 		$("#addnewdialog").dialog({
 			bgiframe: true,
 			autoOpen: false,
@@ -40,16 +40,16 @@
 					allFields.removeClass('ui-state-error');
 
 					bValid = bValid && checkLength(new_name,"nom",1,80);
-                    bValid = bValid && checkLength(new_description,"description",1,80);                    				
-					if (bValid) {						
+                    bValid = bValid && checkLength(new_description,"description",1,80);
+					if (bValid) {
                         // Submit form
                         getREST('/base/area/add/name/' + new_name.val() + '/description/' + new_description.val(),
                             function(data) {
                                 var status = (data.status).toLowerCase();
                                 if (status == 'ok') {
-                                    $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "New area added" %} \'' + data.area[0].name + '\''});                                   
+                                    $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "New area added" %} \'' + data.area[0].name + '\''});
                                 } else {
-                                    $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Area not created" %} (' + data.description + ')'});                                                                      
+                                    $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Area not created" %} (' + data.description + ')'});
                                 }
                             }
                         );
@@ -63,14 +63,14 @@
 				allFields.val('').removeClass('ui-state-error');
 			}
 		});
-           
+
         $("#tabs").tabs().domogik_tabs({
             addTitle: "{% trans "Add new area" %}",
             addCallback: function() {
                 $('#addnewdialog').dialog('open');
             }
         });
-        
+
         $('.buttonleft[title], .add').qtip({
             position: {
                 corner: {
@@ -105,12 +105,12 @@
 {% block right %}
     <div class='element-bgnd'>
         <div class="element">
-            <h1 class="ident"><span class="title">{% trans "Zones organisation" %}</span></h1>
+            <h1 class="ident"><span class="title">{% trans "Area organization" %}</span></h1>
             {% ifnotequal status "" %}
             <div class='action-message {{status}}'>{{msg}}</div>
             {% endifnotequal %}
             <ul class="actions"></ul>
-            <div id="addnewdialog" title='{% trans "Create new zone" %}'>
+            <div id="addnewdialog" title='{% trans "Create new area" %}'>
                 <p id="validateTips">{% trans "All fields are required." %}</p>
                 <form>
                     <fieldset>
@@ -123,22 +123,22 @@
             </div>
         </div>
     </div>
-    <div class="nocolumns">    
+    <div class="nocolumns">
         <div id="tabs">
             <ul>{% for area in areas_list %}<li><a href="#subelement{{ area.id }}" class="icon16-area-grndfloor">{{ area.name }}</a></li>{% endfor %}</ul>
             {% for area in areas_list %}
             <div id="subelement{{ area.id }}" class="subelement">
                 <script type="text/javascript">
                     // Update form
-                    $(function(){      
+                    $(function(){
                         var area{{ area.id }}newname = $("#area{{ area.id }}-newname"),
                             area{{ area.id }}newdescription = $("#area{{ area.id }}-newdescription"),
                             allFields = $([]).add(area{{ area.id }}newname),
                             tips{{ area.id }} = $("#validateTips{{ area.id }}");
-                        
+
                         area{{ area.id }}newname.val("{{ area.name }}");
                         area{{ area.id }}newdescription.val("{{ area.description }}");
-                        
+
                         $("#updatedialog{{ area.id }}").dialog({
                             bgiframe: true,
                             autoOpen: false,
@@ -156,9 +156,9 @@
                                             function(data) {
                                                 var status = (data.status).toLowerCase();
                                                 if (status == 'ok') {
-                                                    $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Area" %} \'' + data.area[0].name + '\' {% trans "successfully updated" %}'});                                   
+                                                    $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Area" %} \'' + data.area[0].name + '\' {% trans "successfully updated" %}'});
                                                 } else {
-                                                    $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Area not updated" %} (' + data.description + ')'});                                                                      
+                                                    $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Area not updated" %} (' + data.description + ')'});
                                                 }
                                             }
                                         );
@@ -184,16 +184,16 @@
                         $('#update{{ area.id }}').click(function() {
                             $('#updatedialog{{ area.id }}').dialog('open');
                         });
-        
+
                         /* Add a onclick function to delete the current area */
                         $('#del{{ area.id }}').click(function(data) {
                             getREST('/base/area/del/{{ area.id }}',
                                 function(data) {
                                     var status = (data.status).toLowerCase();
                                     if (status == 'ok') {
-                                        $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Area" %}\'' + data.area[0].name + '\' {% trans "successfully deleted" %}'});                                   
+                                        $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Area" %}\'' + data.area[0].name + '\' {% trans "successfully deleted" %}'});
                                     } else {
-                                        $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Area not deleted" %} (' + data.description + ')'});                                                                      
+                                        $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Area not deleted" %} (' + data.description + ')'});
                                     }
                                 }
                             );
