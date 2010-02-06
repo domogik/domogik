@@ -695,7 +695,7 @@ class DbHelper():
             dt_d = dt
             if cascade_delete:
                 for device_type in self._session.query(DeviceType).filter_by(technology_id=dt.id).all():
-                    self.del_device_type(device_type.id)
+                    self.del_device_type(device_type.id, cascade_delete=True)
             else:
                 device_type_list = self._session.query(DeviceType).filter_by(technology_id=dt.id).all()
                 if len(device_type_list) > 0:
