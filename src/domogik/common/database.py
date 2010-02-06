@@ -520,10 +520,27 @@ class DbHelper():
             if cascade_delete:
                 for device in self._session.query(Device).filter_by(usage_id=dty.id).all():
                     self.del_device(device.id)
+                for srd in self._session.query(SensorReferenceData)\
+                                        .filter_by(device_type_id=dty.id).all():
+                    self.del_sensor_reference_data(srd.id)
+                for af in self._session.query(ActuatorFeature)\
+                                        .filter_by(device_type_id=dty.id).all():
+                    self.del_actuator_feature(af.id)
             else:
                 device_list = self._session.query(Device).filter_by(usage_id=dty.id).all()
                 if len(device_list) > 0:
-                    raise DbHelperException("Couldn't delete device type %s : there are associated devices" % dty_id)
+                    raise DbHelperException("Couldn't delete device type %s : \
+                                             there are associated device(s)" % dty_id)
+                srd_list = self._session.query(SensorReferenceData)\
+                                        .filter_by(device_type_id=dty.id).all()
+                if len(srd_list) > 0:
+                    raise DbHelperException("Couldn't delete device type %s : \
+                                             there are associated sensor reference data" % dty_id)
+                af_list = self._session.query(ActuatorFeature)\
+                                       .filter_by(device_type_id=dty.id).all()
+                if len(af_list) > 0:
+                    raise DbHelperException("Couldn't delete device type %s : \
+                                             there are associated actuator feature(s)" % dty_id)
             self._session.delete(dty)
             try:
                 self._session.commit()
@@ -547,7 +564,7 @@ class DbHelper():
     def get_sensor_reference_data_by_name(self, srd_name):
         """
         Return information about a sensor reference data
-        @param srd_name : The device sensor reference data name
+        @param srd_name : The sensor reference data name
         @return a SensorReferenceData object
         """
         return self._session.query(SensorReferenceData).filter_by(name=srd_name).first()
@@ -577,7 +594,7 @@ class DbHelper():
                                      dty_id=None, srd_unit=None, srd_stat_key=None):
         """
         Update a sensor reference data
-        @param srd_id : id of the sensor reference data
+        @param srd_id : id of the sensor reference data to update
         @param srd_name : name (ex. Temperature), optional
         @param srd_value : value (number, string, trigger, complex...), optional
         @param dty_id : id of the device type, optional
@@ -627,6 +644,110 @@ class DbHelper():
                                     %s : it doesn't exist" % srd_id)
 
 ####
+# Actuator feature
+####
+    def list_actuator_features(self):
+        """
+        Return a list of actuator features
+        @return a list of ActuatorFeature objects
+        """
+        return self._session.query(ActuatorFeature).all()
+
+    def get_actuator_feature_by_name(self, af_name):
+        """
+        Return information about an actuator feature
+        @param af_name : The name of the actuator feature
+        @return an ActuatorFeature object
+        """
+        return self._session.query(ActuatorFeature).filter_by(name=af_name).first()
+
+    def add_actuator_feature(self, af_name, af_value, dty_id, af_unit=None,
+                             af_configurable_states=None,
+                             af_return_confirmation=False):
+        """
+        Add a sensor reference data
+        @param af_name : name (ex. Switch, Dimmer, ...)
+        @param af_value : value (binary, number, string, trigger, complex, list, range)
+        @param dty_id : id of the device type
+        @param af_unit  unit of the value (ex. %), optional
+        @param af_configurable_states : configurable states
+                                        (0, 10, 100 - on / off, ...), optional
+        @param af_return_confirmation : True if the device returns a confirmation
+                                     after executing a command, default is false
+        @return an ActuatorFeature (the newly created one)
+        """
+        af = ActuatorFeature(name=af_name, value=af_value,
+                    device_type_id=dty_id, unit=af_unit,
+                    configurable_states=af_configurable_states,
+                    return_confirmation=af_return_confirmation)
+        self._session.add(af)
+        try:
+            self._session.commit()
+        except Exception, sql_exception:
+            self._session.rollback()
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
+        return af
+
+    def update_actuator_feature(self, af_id, af_name=None, af_value=None,
+                                dty_id=None, af_unit=None, af_configurable_states=None, af_return_confirmation=None):
+        """
+        Update an actuator feature
+        @param af_id : id of the actuator feature to update
+        @param af_name : name (ex. Switch, Dimmer, ...), optional
+        @param af_value : value (binary, number, string, trigger, complex,
+                          list, range), optional
+        @param dty_id : id of the device type, optional
+        @param af_unit  unit of the value (ex. %), optional
+        @param af_configurable_states : configurable states
+                                        (0, 10, 100 - on / off, ...), optional
+        @param af_return_confirmation : True if the device returns a confirmation
+                                     after executing a command, optional
+        @return an ActuatorFeature (the updated one)
+        """
+        af = self._session.query(ActuatorFeature).filter_by(id=af_id).first()
+        if af is None:
+            raise DbHelperException("ActuatorFeature with id %s couldn't be found" % af_id)
+        if af_name is not None:
+            af.name = af_name
+        if af_value is not None:
+            af.value = af_value
+        if dty_id is not None:
+            af.device_type_id = dty_id
+        if af_unit is not None:
+            af.unit = af_unit
+        if af_configurable_states is not None:
+            af.configurable_states = af_configurable_states
+        if af_return_confirmation is not None:
+            af.return_confirmation = af_return_confirmation
+        self._session.add(af)
+        try:
+            self._session.commit()
+        except Exception, sql_exception:
+            self._session.rollback()
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
+        return af
+
+    def del_actuator_feature(self, af_id):
+        """
+        Delete an actuator feature record
+        @param srd_id : id of the actuator feature to delete
+        @return the deleted ActuatorFeature object
+        """
+        af = self._session.query(ActuatorFeature).filter_by(id=af_id).first()
+        if af:
+            af_d = af
+            self._session.delete(af)
+            try:
+                self._session.commit()
+            except Exception, sql_exception:
+                self._session.rollback()
+                raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
+            return af_d
+        else:
+            raise DbHelperException("Couldn't delete actuator feature id \
+                                    %s : it doesn't exist" % af_id)
+
+####
 # Device technology
 ####
     def list_device_technologies(self):
@@ -671,7 +792,7 @@ class DbHelper():
         """
         device_tech = self._session.query(DeviceTechnology).filter_by(id=dt_id).first()
         if device_tech is None:
-            raise DbHelperException("DeviceType with id %s couldn't be found" % dt_id)
+            raise DbHelperException("DeviceTechnology with id %s couldn't be found" % dt_id)
         if dt_name is not None:
             device_tech.name = dt_name
         if dt_description is not None:

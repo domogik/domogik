@@ -389,31 +389,31 @@ class ActuatorFeature(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(30), nullable=False)
     value = Column(String(30), nullable=False)
-    unit = Column(String(30))
-    configurable_states = Column(String(255))
-    return_confirmation = Column(Boolean())
     device_type_id = Column(Integer, ForeignKey('%s.id' % \
                            DeviceType.get_tablename()), nullable=False)
     device_type = relation(DeviceType, backref=backref(__tablename__))
+    unit = Column(String(30))
+    configurable_states = Column(String(255))
+    return_confirmation = Column(Boolean(), nullable=False)
 
-    def __init__(self, name, value, unit, configurable_states,
-                 return_confirmation,device_type_id):
+    def __init__(self, name, device_type_id, value=None, unit=None,
+                 configurable_states=None, return_confirmation=False):
         """
         Class constructor
         @param name : name (Dimmer, Switch, Activation...)
         @param value : value (binary, range, number, string, list, complex, trigger)
-        @param unit : unit (%...)
-        @param configurable_states : on, off / 0,100,10 ...
-        @param return_confirmation : True if the actuator returns a confirmation
-                                     after it was updated
         @param device_type_id : id of the device type
+        @param unit : unit (%...), optional
+        @param configurable_states : on, off / 0,100,10 ..., optional
+        @param return_confirmation : True if the actuator returns a confirmation
+                                     after it was updated (default is False)
         """
         self.name = name
         self.value = value
+        self.device_type_id = device_type_id
         self.unit = unit
         self.configurable_states = configurable_states
         self.return_confirmation = return_confirmation
-        self.device_type_id = device_type_id
 
     def __repr__(self):
         """

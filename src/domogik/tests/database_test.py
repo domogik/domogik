@@ -107,6 +107,10 @@ class GenericTestCase(unittest.TestCase):
         for srd in db.list_sensor_reference_data():
             db.del_sensor_reference_data(srd.id)
 
+    def remove_all_actuator_features(self, db):
+        for af in db.list_actuator_features():
+            db.del_actuator_feature(af.id)
+
     def remove_all_device_technology_config(self, db):
         """
         Remove all configurations of device technologies
@@ -410,7 +414,7 @@ class SensorReferenceDataTestCase(GenericTestCase):
 
     def testEmptyList(self):
         assert len(self.db.list_sensor_reference_data()) == 0, \
-                   "There should have no device type"
+                   "There should have no sensor reference data"
 
     def testAdd(self):
         dt1 = self.db.add_device_technology(u'1wire', 'desc dt1')
@@ -485,6 +489,102 @@ class SensorReferenceDataTestCase(GenericTestCase):
         try:
             self.db.del_sensor_reference_data(12345678910)
             TestCase.fail(self, "SensorReferenceData does not exist, an \
+                                 exception should have been raised")
+        except DbHelperException:
+            pass
+
+class ActuatorFeatureTestCase(GenericTestCase):
+    """
+    Test actuator features
+    """
+
+    def setUp(self):
+        self.db = DbHelper(use_test_db=True)
+        self.remove_all_actuator_features(self.db)
+
+    def tearDown(self):
+        self.remove_all_actuator_features(self.db)
+        del self.db
+
+    def testEmptyList(self):
+        assert len(self.db.list_actuator_features()) == 0, \
+                   "There should have no actuator features"
+
+    def testAdd(self):
+        dt1 = self.db.add_device_technology(u'PLCBus', 'desc dt1')
+        dty1 = self.db.add_device_type(dty_name='PLCBus Switch',
+                                       dty_description='desc1', dt_id=dt1.id)
+        dty2 = self.db.add_device_type(dty_name='PLCBus.Dimmer',
+                                       dty_description='desc2', dt_id=dt1.id)
+        af1 = self.db.add_actuator_feature(af_name='Dimmer',
+                    af_value='range', dty_id=dty2.id, af_unit='Percent',
+                    af_configurable_states='0,100,10', af_return_confirmation=True)
+        assert af1.name == 'Dimmer'
+        assert af1.value == 'range'
+        assert af1.device_type_id == dty2.id
+        assert af1.unit == 'Percent'
+        assert af1.configurable_states == '0,100,10'
+        assert af1.return_confirmation == True
+        af2 = self.db.add_actuator_feature(af_name='Switch',
+                    af_value='binary', dty_id=dty1.id,
+                    af_configurable_states='off/on', af_return_confirmation=True)
+        assert len(self.db.list_actuator_features()) == 2
+        assert self.has_item(self.db.list_actuator_features(), ['Switch', 'Dimmer'])
+
+    def testUpdate(self):
+        dt1 = self.db.add_device_technology(u'PLCBus', 'desc dt1')
+        dt2 = self.db.add_device_technology(u'x10', 'desc dt2')
+        dty1 = self.db.add_device_type(dty_name='PLCBus Switch',
+                                       dty_description='desc1', dt_id=dt1.id)
+        dty2 = self.db.add_device_type(dty_name='x10.Dimmer',
+                                       dty_description='desc2', dt_id=dt2.id)
+        af = self.db.add_actuator_feature(af_name='Switch',
+                    af_value='binary', dty_id=dty1.id,
+                    af_configurable_states='off/on', af_return_confirmation=True)
+        af_u = self.db.update_actuator_feature(af_id=af.id, af_name='Dimmer',
+                    af_value='range', dty_id=dty2.id, af_unit='Percent',
+                    af_configurable_states='0,100,10', af_return_confirmation=False)
+        assert af_u.name == 'Dimmer'
+        assert af_u.value == 'range'
+        assert af_u.device_type_id == dty2.id
+        assert af_u.unit == 'Percent'
+        assert af_u.configurable_states == '0,100,10'
+        assert af_u.return_confirmation == False
+
+    def testFetchInformation(self):
+        dt1 = self.db.add_device_technology(u'PLCBus', 'desc dt1')
+        dty1 = self.db.add_device_type(dty_name='PLCBus Switch',
+                                       dty_description='desc1', dt_id=dt1.id)
+        dty2 = self.db.add_device_type(dty_name='PLCBus.Dimmer',
+                                       dty_description='desc2', dt_id=dt1.id)
+        af1 = self.db.add_actuator_feature(af_name='Dimmer',
+                    af_value='range', dty_id=dty2.id, af_unit='Percent',
+                    af_configurable_states='0,100,10', af_return_confirmation=True)
+        af2 = self.db.add_actuator_feature(af_name='Switch',
+                    af_value='binary', dty_id=dty1.id,
+                    af_configurable_states='off/on', af_return_confirmation=True)
+        assert self.db.get_actuator_feature_by_name('Dimmer').unit == af1.unit
+
+    def testDel(self):
+        dt1 = self.db.add_device_technology(u'PLCBus', 'desc dt1')
+        dty1 = self.db.add_device_type(dty_name='PLCBus Switch',
+                                       dty_description='desc1', dt_id=dt1.id)
+        dty2 = self.db.add_device_type(dty_name='PLCBus.Dimmer',
+                                       dty_description='desc2', dt_id=dt1.id)
+        af1 = self.db.add_actuator_feature(af_name='Dimmer',
+                    af_value='range', dty_id=dty2.id, af_unit='Percent',
+                    af_configurable_states='0,100,10', af_return_confirmation=True)
+        af2 = self.db.add_actuator_feature(af_name='Switch',
+                    af_value='binary', dty_id=dty1.id,
+                    af_configurable_states='off/on', af_return_confirmation=True)
+        af1_id = af1.id
+        af_del = self.db.del_actuator_feature(af1.id)
+        assert self.has_item(self.db.list_actuator_features(), ['Switch'])
+        assert not self.has_item(self.db.list_actuator_features(), ['Dimmer'])
+        assert af_del.id == af1_id
+        try:
+            self.db.del_actuator_feature(12345678910)
+            TestCase.fail(self, "ActuatorFeature does not exist, an \
                                  exception should have been raised")
         except DbHelperException:
             pass
