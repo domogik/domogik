@@ -323,8 +323,8 @@ class DeviceType(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<DeviceType(id=%s, name='%s', desc='%s', device techno)>" \
-                % (self.id, self.name, self.description, self.technology)
+        return "<DeviceType(id=%s, name='%s', desc='%s', device techno='%s')>" \
+                % (self.id, self.name, self.description, self.technology_id)
 
     @staticmethod
     def get_tablename():
@@ -425,7 +425,8 @@ class ActuatorFeature(Base):
         return "<ActuatorFeature(id=%s, name='%s', value='%s', unit='%s', \
                 configurable_states='%s', return_confirmation='%s' device_type='%s')>" \
                 % (self.id, self.name, self.value, self.unit, \
-                   self.configurable_states, self.return_confirmation, self.device_type)
+                   self.configurable_states, self.return_confirmation, \
+                   self.device_type)
 
     @staticmethod
     def get_tablename():
