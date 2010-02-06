@@ -518,7 +518,7 @@ class DbHelper():
         if dty:
             dty_d = dty
             if cascade_delete:
-                for device in self._session.query(Device).filter_by(usage_id=dty.id).all():
+                for device in self._session.query(Device).filter_by(type_id=dty.id).all():
                     self.del_device(device.id)
                 for srd in self._session.query(SensorReferenceData)\
                                         .filter_by(device_type_id=dty.id).all():
@@ -527,7 +527,7 @@ class DbHelper():
                                         .filter_by(device_type_id=dty.id).all():
                     self.del_actuator_feature(af.id)
             else:
-                device_list = self._session.query(Device).filter_by(usage_id=dty.id).all()
+                device_list = self._session.query(Device).filter_by(type_id=dty.id).all()
                 if len(device_list) > 0:
                     raise DbHelperException("Couldn't delete device type %s : \
                                              there are associated device(s)" % dty_id)
