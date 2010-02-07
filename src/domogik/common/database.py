@@ -492,14 +492,14 @@ class DbHelper():
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return dty
 
-    def update_device_type(self, dty_id, dty_name=None, dty_description=None,
-                           dt_id=None):
+    def update_device_type(self, dty_id, dty_name=None, dt_id=None,
+                           dty_description=None):
         """
         Update a device type
         @param dty_id : device type id to be updated
         @param dty_name : device type name (optional)
-        @param dty_description : device type detailed description (optional)
         @param dt_id : id of the associated technology (optional)
+        @param dty_description : device type detailed description (optional)
         @return a DeviceType object
         """
         device_type = self._session.query(DeviceType).filter_by(id=dty_id).first()
@@ -507,11 +507,11 @@ class DbHelper():
             raise DbHelperException("DeviceType with id %s couldn't be found" % dty_id)
         if dty_name is not None:
             device_type.name = dty_name
-        if dty_description is not None:
-            device_type.description = dty_description
         if dt_id is not None:
             device_type.technology_id = dt_id
         self._session.add(device_type)
+        if dty_description is not None:
+            device_type.description = dty_description
         try:
             self._session.commit()
         except Exception, sql_exception:

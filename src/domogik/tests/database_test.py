@@ -389,7 +389,7 @@ class DeviceTypeTestCase(GenericTestCase):
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
         dt2 = self.db.add_device_technology(u'PLCBus', 'desc dt2')
         dty = self.db.add_device_type('x10 Switch', 'desc1', dt1.id)
-        dty_u = self.db.update_device_type(dty.id, 'x10 Dimmer', 'desc2', dt2.id)
+        dty_u = self.db.update_device_type(dty.id, 'x10 Dimmer', dt2.id, 'desc2')
         assert dty_u.name == 'x10 Dimmer'
         assert dty_u.description == 'desc2'
         assert dty_u.technology_id == dt2.id
