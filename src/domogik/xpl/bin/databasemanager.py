@@ -149,7 +149,10 @@ class DBConnector(xPLModule):
         @param techno : the technology of the element
         @param key : the key of the config tuple to fetch
         '''
-        #TODO : use the database
+        #Get technology id 
+
+        #This array is here for information only but is not used anymore
+        #Values are now on the database
         vals = {'x10': {'heyu-cfg-path':'/etc/heyu/x10.conf',
             'heyu-file-0': 'TTY /dev/ttyUSB0',
             'heyu-file-1': 'TTY_AUX /dev/ttyUSB0 RFXCOM',
@@ -172,11 +175,17 @@ class DBConnector(xPLModule):
                     'interval' : '30'},
                 }
         try:
+            id = self._db.get_device_technology_by_name(techno).id
             if key:
-                return vals[techno][key]
+                return self._db.get_device_technology_config(id, key).value
             else:
-                return vals[techno]
+                vals = self._db.list_device_technology_config(id)
+                res = {}
+                for val in vals:
+                    res[val.key] = val.value
+                return res
         except:
+            self._log.warn("No config found for technolgy %s, key %s" % (techno, key))
             return None
 
 
