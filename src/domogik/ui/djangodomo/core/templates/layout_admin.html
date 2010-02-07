@@ -30,7 +30,7 @@
     <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-dialog.css" rel="stylesheet" type="text/css" />
     <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-accordion.css" rel="stylesheet" type="text/css" />
     <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-tabs.css" rel="stylesheet" type="text/css" />
-    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/show-element.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-page-section.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block global_js_include %}
     <script type="text/javascript" src="/design/js/ui.dragdrop.js"></script>
@@ -42,11 +42,11 @@
 {% block content %}
     <div class="left">
         <div id="nav2">
-            <div class="subnav2"><a href="#">{% trans "Organisation" %}</a></div>
+            <div class="subnav2"><a href="#">{% trans "Organization" %}</a></div>
             <ul>
-                <li><a href="{% url admin_organisation_areas_view %}">{% trans "Areas" %}</a></li>
-                <li><a href="{% url admin_organisation_rooms_view %}">{% trans "Rooms" %}</a></li>
-                <li><a href="{% url admin_organisation_devices_view %}">{% trans "Devices" %}</a></li>
+                <li><a href="{% url admin_organization_areas_view %}">{% trans "Areas" %}</a></li>
+                <li><a href="{% url admin_organization_rooms_view %}">{% trans "Rooms" %}</a></li>
+                <!--li><a href="{% url admin_organization_devices_view %}">{% trans "Devices" %}</a></li-->
             </ul>
             <div class="subnav2"><a href="#">{% trans "Management" %}</a></div>
             <ul>

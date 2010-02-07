@@ -23,8 +23,8 @@
 
 {% block title %}{% trans page_title %}{% endblock %}
 {% block css %}
-    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/show-element.css" rel="stylesheet" type="text/css" />
-    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/show-section.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-page-section.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-page-block.css" rel="stylesheet" type="text/css" />
     <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-action-binary.css" rel="stylesheet" type="text/css" />
     <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-action-range.css" rel="stylesheet" type="text/css" />
     <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/page-home.css" rel="stylesheet" type="text/css" />
@@ -48,8 +48,8 @@
     </div>
 {% endblock %}       
 {% block content %}
-    <div class='element-bgnd'>
-        <div class="element icon64-room-default">
+    <div class='section-bgnd'>
+        <div class="section icon64-room-default">
 	    <h1 class="ident"><span class="title">My House</span></h1>
             <ul class="general-infos">
                 <li class="icon16-device-electricity">150 Kw/h</li>
@@ -68,7 +68,7 @@
         <div class="row">
         {% endif %}
             <div class='column'>
-                <div class="section">
+                <div class="block">
                     <dt class='header icon64-room-kitchen'>
 			<div class="ident">
 			    <span class="title">{{ room.name }}</span>

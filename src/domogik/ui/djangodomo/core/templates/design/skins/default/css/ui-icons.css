@@ -2,20 +2,23 @@
 /* CSS Document */
 
 /* Area icons */
+.icon64-area-unknown { background-image:url(../images/unknown_64.png);}
 .icon64-area-grndfloor { background-image:url(../images/area/groundfloor_white_64.png);}
 .icon64-area-firstfloor { background-image:url(../images/area/floor1_white_64.png);}
 .icon64-area-basement { background-image:url(../images/area/basement_white_64.png);}
 
+.icon32-area-unknown { background-image:url(../images/unknown_32.png);}
 .icon32-area-grndfloor { background-image:url(../images/area/groundfloor_white_32.png);}
 .icon32-area-firstfloor { background-image:url(../images/area/floor1_white_32.png);}
 .icon32-area-basement { background-image:url(../images/area/basement_white_32.png);}
 
+.icon16-area-unknown { background-image:url(../images/unknown_16.png);}
 .icon16-area-grndfloor { background-image:url(../images/area/groundfloor_white_16.png);}
 .icon16-area-firstfloor { background-image:url(../images/area/floor1_white_16.png);}
 .icon16-area-basement { background-image:url(../images/area/basement_white_16.png);}
 
 /* Room icons */
-.icon64-room-default { background-image:url(../images/room/default_room_64.png);}
+.icon64-room-unknown { background-image:url(../images/unknown_64.png);}
 .icon64-room-kitchen { background-image:url(../images/room/kitchen_64.png);}
 .icon64-room-bedroom { background-image:url(../images/room/bedroom_64.png);}
 .icon64-room-livingroom { background-image:url(../images/room/livingroom_64.png);}
@@ -24,7 +27,7 @@
 .icon64-room-bathroom { background-image:url(../images/room/bathroom_64.png);}
 .icon64-room-office { background-image:url(../images/room/office_64.png);}
 
-.icon32-room-default { background-image:url(../images/room/default_room_32.png);}
+.icon32-room-unknown { background-image:url(../images/unknown_32.png);}
 .icon32-room-kitchen { background-image:url(../images/room/kitchen_32.png);}
 .icon32-room-bedroom { background-image:url(../images/room/bedroom_32.png);}
 .icon32-room-livingroom { background-image:url(../images/room/livingroom_32.png);}
@@ -33,7 +36,7 @@
 .icon32-room-bathroom { background-image:url(../images/room/default_room_32.png);}
 .icon32-room-office { background-image:url(../images/room/default_room_32.png);}
 
-.icon16-room-default { background-image:url(../images/room/default_room_16.png);}
+.icon16-room-unknown { background-image:url(../images/unknown_16.png);}
 .icon16-room-kitchen { background-image:url(../images/room/kitchen_16.png);}
 .icon16-room-bedroom { background-image:url(../images/room/bedroom_16.png);}
 .icon16-room-livingroom { background-image:url(../images/room/livingroom_16.png);}
@@ -60,6 +63,10 @@
 .icon16-action-add { background-image:url(../images/plus_16.png);}
 .icon16-action-del { background-image:url(../images/minus_16.png);}
 .icon16-action-update { background-image:url(../images/update_16.png);}
+.icon16-action-next { background-image:url(../images/right_16.png);}
+.icon16-action-previous { background-image:url(../images/left_16.png);}
+.icon16-action-submit { background-image:url(../images/success_16.png);}
+.icon16-action-cancel { background-image:url(../images/error_16.png);}
 
 /* Tmp icons */
 .icon64-device-coffeemachine { background-image:url(../images/tmp/coffee_machine_64.png);}

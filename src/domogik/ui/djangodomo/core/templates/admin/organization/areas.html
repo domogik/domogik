@@ -97,37 +97,34 @@
     });
 {% endblock %}
 {% block css %}
-    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/page-admin-organisation.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/page-admin-organization.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block js_include %}
 {% endblock %}
 {% block title %}{% trans page_title %}{% endblock %}
 {% block right %}
-    <div class='element-bgnd'>
-        <div class="element">
-            <h1 class="ident"><span class="title">{% trans "Area organization" %}</span></h1>
+    <div class='section-bgnd'>
+        <div class="section">
+            <h1 class="ident"><span class="title">{% trans "Areas" %}</span></h1>
             {% ifnotequal status "" %}
             <div class='action-message {{status}}'>{{msg}}</div>
             {% endifnotequal %}
             <ul class="actions"></ul>
-            <div id="addnewdialog" title='{% trans "Create new area" %}'>
-                <p id="validateTips">{% trans "All fields are required." %}</p>
-                <form>
-                    <fieldset>
-                        <label class="medium" for="new_name">{% trans "Name" %}</label>
-                        <input type="text" class="medium" id="new_name" name="new_name" />
-                        <label class="medium" for="new_description">{% trans "Description" %}</label>
-                        <textarea type="text" class="medium" id="new_description" name="new_description"></textarea>
-                    </fieldset>
-                </form>
-            </div>
         </div>
     </div>
-    <div class="nocolumns">
+    
+    <div class="subsection">
+        <h2>{% trans "Areas list" %}</h2>
         <div id="tabs">
-            <ul>{% for area in areas_list %}<li><a href="#subelement{{ area.id }}" class="icon16-area-grndfloor">{{ area.name }}</a></li>{% endfor %}</ul>
+            {% spaceless %}
+            <ul>
+                {% for area in areas_list %}
+                    <li><a href="#element{{ area.id }}" class="icon16-area-grndfloor">{{ area.name }}</a></li>
+                {% endfor %}
+            </ul>
+            {% endspaceless %}
             {% for area in areas_list %}
-            <div id="subelement{{ area.id }}" class="subelement">
+            <div id="element{{ area.id }}" class="tabelement">
                 <script type="text/javascript">
                     // Update form
                     $(function(){
@@ -172,21 +169,13 @@
                                 allFields.val('').removeClass('ui-state-error');
                             }
                         });
-                        /*
-                        $('select#area{{ area.id }}-icon').selectmenu({
-                            icons: [
-                                {% for icon in icons_area %}
-                                    {find: '.icon_area_{{ icon }}', icon: 'icon64-area-{{ icon }}', jquery:'no'},
-                                {% endfor %}
-                            ]
-                        });
-                    */
+
                         $('#update{{ area.id }}').click(function() {
                             $('#updatedialog{{ area.id }}').dialog('open');
                         });
 
                         /* Add a onclick function to delete the current area */
-                        $('#del{{ area.id }}').click(function(data) {
+                        $('#del{{ area.id }}').click(function() {
                             getREST('/base/area/del/{{ area.id }}',
                                 function(data) {
                                     var status = (data.status).toLowerCase();
@@ -198,28 +187,32 @@
                                 }
                             );
                         });
+                        
+                        $('#icon{{ area.id }}').editable_icon({
+                            type: "area",
+                            list: area_icons,
+                            icon: "grndfloor",
+                            validCallback: function(icon) {
+/*                                getREST('/base/area/del/{{ area.id }}',
+                                    function(data) {
+                                        var status = (data.status).toLowerCase();
+                                        if (status == 'error') {
+                                        }
+                                    }
+                                )*/
+                            }
+                        });
                     });
                     // ]]>
                 </script>
                 <ul class="actions">
-                    <li><button id='del{{ area.id }}' class='icon16-action-del buttonleft' title="{% trans "Delete" %} '{{ area.name }}'"><span class='offscreen'>{% trans "Delete" %} {{ area.name }}</span></button></li>
-                    <li><button id="update{{ area.id }}" class="icon16-action-update buttonleft" title="{% trans "Modify" %} '{{ area.name }}'"><span class='offscreen'>{% trans "Modify" %} {{ area.name }}</span></button></li>
+                    <li><button id='del{{ area.id }}' class='icon16-action-del buttonside' title="{% trans "Delete" %} '{{ area.name }}'"><span class='offscreen'>{% trans "Delete" %} {{ area.name }}</span></button></li>
+                    <li><button id="update{{ area.id }}" class="icon16-action-update buttonside" title="{% trans "Modify" %} '{{ area.name }}'"><span class='offscreen'>{% trans "Modify" %} {{ area.name }}</span></button></li>
                 </ul>
                 <div class="content">
-                    <h2 id="zone{{ area.id }}h" class="icon32-area-grndfloor">{{ area.name }}</h2>
+                    <div id="icon{{ area.id }}"></div>
+                    <h2>{{ area.name }}</h2>
                     <p>{{ area.description }}</p>
-                    <!--
-                    <form action="#">
-                        <div class="parameter">
-                            <label for="area{{ area.id }}-icon">Icône:</label>
-                            <select class="large customicons" id="area{{ area.id }}-icon" name="area{{ area.id }}-icon">
-                                {% for icon in icons_area %}
-                                    <option value="{{ icon }}" class="icon_area_{{ icon }}">{{ icon }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </form>
-                    -->
                 </div>
                 <div id="updatedialog{{ area.id }}" title="{% trans "Modify" %} {{ area.name }}">
                     <p id="validateTips{{ area.id }}">{% trans "All fields are required." %}</p>
@@ -234,6 +227,17 @@
                 </div>
             </div>
             {% endfor %}
+        </div>
+        <div id="addnewdialog" title='{% trans "Create new area" %}'>
+            <p id="validateTips">{% trans "All fields are required." %}</p>
+            <form>
+                <fieldset>
+                    <label class="medium" for="new_name">{% trans "Name" %}</label>
+                    <input type="text" class="medium" id="new_name" name="new_name" />
+                    <label class="medium" for="new_description">{% trans "Description" %}</label>
+                    <textarea type="text" class="medium" id="new_description" name="new_description"></textarea>
+                </fieldset>
+            </form>
         </div>
     </div>
 {% endblock %}

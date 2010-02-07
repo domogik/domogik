@@ -1,4 +1,4 @@
-.section {
+.block {
     background:#eeeeee url(ui-lightness/images/ui-bg_highlight-soft_100_eeeeee_1x100.png) top left repeat-x;
     width:30em;
     margin:1em 0 1em 0;
@@ -7,20 +7,21 @@
     -webkit-border-radius: 0.8em;
 }
 
-.section dl, .section dt, .section dd {
+.block dl, .block dt, .block dd {
     padding:0;
     margin:0;
 }
 
 /* Header section */
-.section .header {
+
+.block .header {
     background-position: top left;
     background-repeat:no-repeat;
     min-height: 64px;
     padding-bottom: 1em;
 }
 
-.section .ident {
+.block .ident {
     font-size:1em;
     padding:0.5em 0 0 70px;
     min-height:50px;
@@ -28,12 +29,12 @@
     text-decoration:none;
 }
 
-.section .title {
+.block .title {
     font-size:1.5em;
     color:#000000;
 }
 
-.section .subtitle {
+.block .subtitle {
     font-style:italic;
     color:#666;
     padding-left:20px;
@@ -41,7 +42,7 @@
     background-repeat:no-repeat;
 }
  
-.section .temp {
+.block .temp {
     padding:0.5em 0.5em 0 32px;
     font-size:1.5em;
     float:right;
@@ -52,32 +53,34 @@
 }
 
 /* Actions section */
-.section .actions ul {
+
+.block .actions ul {
     list-style:none;
     margin:0;
     padding:0;
     text-align:center;
 }
 
-.section .actions ul > li {
+.block .actions ul > li {
     display:inline-block;
     margin: 0 0.5em 0 0.5em;
     padding: 0;
 }
 
 /* Colapsable section */
-.section .extended {
+
+.block .extended {
     padding:1em;
     border-top: 1px dashed #cccccc;
 }
 
-.section ul.commands {
+.block ul.commands {
     list-style:none;
     margin:0;
     padding:0;
 }
 
-.section ul.commands > li {
+.block ul.commands > li {
     display:block;
     margin: 0;
     padding: 1em 0 0 0;
@@ -95,11 +98,12 @@
 }
 
 /* Footer section */
-.section .footer {
+
+.block .footer {
     text-align:right;
 }
 
-.section .footer a {
+.block .footer a {
     color:#000000;
     display:block;
     padding: 0 0.5em 0 0.5em;

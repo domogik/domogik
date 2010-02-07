@@ -23,7 +23,7 @@
 {% block js_script %}
 // <![CDATA[
     $(function(){
-		$(".section .extended").hide();
+		$(".block .extended").hide();
     });
 // ]]>
 {% endblock %}
@@ -37,45 +37,45 @@
 {% block title %}{% trans page_title %}{% endblock %}
 
 {% block content %}
-    <div class='element-bgnd'>
-	<div class="element icon64-room-default">
-	    <h1 class="ident"><span class="title">My House</span></h1>
-	    <ul class="actions"></ul>
-	</div>
+    <div class='section-bgnd'>
+		<div class="section icon64-room-default">
+			<h1 class="ident"><span class="title">My House</span></h1>
+			<ul class="actions"></ul>
+		</div>
     </div>
     <dl>
 	{% for area in areas_list %}
 		{% if forloop.counter0|divisibleby:"3" %}
             <div class='row'>
-        {% endif %}
-    		<div class='column'>
-        		<div class='section'>
-			        <script type="text/javascript">
-                	// <![CDATA[
-                		$(function() {
-                            $("#button_{{ area.id }}").click(function() {
-                                $(".section .extended[id!='extended_{{ area.id }}']").hide();
-                                $("#extended_{{ area.id }}").toggle();
-                            });
-                        });
-                    // ]]>
-                    </script>
-                    <dt class='header icon64-area-grndfloor'>
-                        <a href='{% url show_area_view area.id %}' class="ident">
-                            <span class="title">{{ area.name }}</span>
-                            <br />
-                            <span class="subtitle">{{ area.description }}</span>
-                        </a>
-                        <span class='temp icon32-device-temp'>21 &#176;C</span>
-                    </dt>
-                    <dd class='actions'>
-                        <ul>
-                        </ul>
-                    </dd>
-                    <dd  class='extended' id='extended_{{ area.id }}'></dd>
-                    <dd class='footer'><a id='button_{{ area.id }}' href='#'>&#187;</a></dd>
-                </div>
-            </div>
+		{% endif %}
+				<div class='column'>
+					<div class='block'>
+						<script type="text/javascript">
+						// <![CDATA[
+							$(function() {
+								$("#button_{{ area.id }}").click(function() {
+									$(".section .extended[id!='extended_{{ area.id }}']").hide();
+									$("#extended_{{ area.id }}").toggle();
+								});
+							});
+						// ]]>
+						</script>
+						<dt class='header icon64-area-grndfloor'>
+							<a href='{% url show_area_view area.id %}' class="ident">
+								<span class="title">{{ area.name }}</span>
+								<br />
+								<span class="subtitle">{{ area.description }}</span>
+							</a>
+							<span class='temp icon32-device-temp'>21 &#176;C</span>
+						</dt>
+						<dd class='actions'>
+							<ul>
+							</ul>
+						</dd>
+						<dd  class='extended' id='extended_{{ area.id }}'></dd>
+						<dd class='footer'><a id='button_{{ area.id }}' href='#'>&#187;</a></dd>
+					</div>
+				</div>
 		{% if forloop.counter0|divisibleby:"3" %}
             </div>
 		{% endif %}

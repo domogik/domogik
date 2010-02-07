@@ -71,10 +71,6 @@
 			}
 		});
 
-//        $("#devices").hide();
-//        $("button#showdevices").click(function () {
-//            $("#devices").toggle();
-//        });
         
         $("#tabs").tabs().domogik_tabs({
             addTitle: "{% trans "Add new room" %}",
@@ -110,79 +106,34 @@
 
 {% endblock %}
 {% block css %}
-    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/page-admin-organisation.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/page-admin-organization.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block js_include %}
 {% endblock %}
 {% block title %}{% trans page_title %}{% endblock %}
 {% block right %}
-    <div class='element-bgnd'>
-        <div class="element">
-            <h1 class="ident"><span class="title">{% trans "Room organisation" %}</span></h1>
+    <div class='section-bgnd'>
+        <div class="section">
+            <h1 class="ident"><span class="title">{% trans "Rooms" %}</span></h1>
             {% ifnotequal status "" %}
             <div class='action-message {{status}}'>{{msg}}</div>
             {% endifnotequal %}
-            <ul class="actions">
-                <!--li><button id="showrooms" class="button">Pièces</a></li-->
-            </ul>
-            <div id="addnewdialog" title="{% trans "Create new room" %}">
-                <p id="validateTips">{% trans "All fields are required." %}</p>
-                <form>
-                    <fieldset>
-                        <label class="medium" for="new_name">{% trans "Name" %}</label>
-                        <input type="text" class="medium" id="new_name" name="new_name" />
-                        <label class="medium" for="new_description">{% trans "Description" %}</label>
-                        <textarea type="text" class="medium" id="new_description" name="new_description"></textarea>
-                    </fieldset>
-                </form>
-            </div>
-            
-            <!--div id="rooms">
-            <h2 class="splitter">Pièces</h2>
-            <a href="#" class="action" id="btinstructions">(Instructions Drag &amp; Drop)</a>
-            <div id="instructions" title="Instructions Drag &amp; Drop">
-                <h3>Utilisation de la souris</h3>
-                <h3>Utilisation du clavier</h3>
-                <ul>
-                    <li>Use the <kbd>Tab</kbd> to move to the artist you want to move.</li>
-                    <li>Select the item you want to move with the <kbd>Spacebar</kbd>.</li>
-                    <li>Use the <kbd>Up</kbd> and <kbd>Down</kbd> cursor keys to select a target in the context menu.</li>
-                    <li>Press <kbd>Enter</kbd> to move the artist to the target list.</li>
-                </ul>
-            </div>
-            <fieldset class="areadrop">
-                <legend id="areanah" class="choice">Pièces non attribuées</legend>
-                <ul id="areana" class="draggables">
-                    % for room in unattribued_rooms %}
-                    <li class="draggable">{{ room.name }}<span class="description">{{ room.description }}</span></li>
-                    % empty %}
-                    <li class="empty">Vide</li>
-                    % endfor %}
-                </ul>
-            </fieldset>
-            % regroup rooms_list|dictsort:"area" by area as areas %}
-            % for area in areas %}
-            <fieldset class="areadrop">
-                <legend id="room{ room.grouper.id }}h" class="choice">{ room.grouper.name }}</legend>
-                <ul id="room{ room.grouper.id }}" class="draggables">
-                    % for room in room.list %}
-                    <li class="draggable">{ room.name }}<span class="description">{ room.description }}</span></li>
-                    % empty %}
-                    <li class="empty">Vide</li>
-                    % endfor %}
-                </ul>
-            </fieldset>
-            % endfor %}
-          </div-->
-          
+            <ul class="actions"></ul>
         </div>
     </div>
     
-    <div class="nocolumns">    
+    <div class="subsection">
+        <h2>{% trans "Rooms list" %}</h2>
         <div id="tabs">
-            <ul>{% for room in rooms_list %}<li><a href="#subelement{{ room.id }}" class="icon16-room-livingroom">{{ room.name }}</a></li>{% endfor %}</ul>
+            {% spaceless %}
+                <ul>
+                    {% for room in rooms_list %}
+                        <li><a href="#element{{ room.id }}" class="icon16-room-livingroom">{{ room.name }}</a></li>
+                    {% endfor %}
+                </ul>
+            {% endspaceless %}
             {% for room in rooms_list %}
-            <div id="subelement{{ room.id }}" class="subelement">
+            <div id="element{{ room.id }}" class="tabelement">
                 <script type="text/javascript">
                     // Update form
                     $(function(){      
@@ -253,15 +204,31 @@
                                 }
                             );
                         });
+                        
+                        $('#icon{{ room.id }}').editable_icon({
+                            type: "room",
+                            list: room_icons,
+                            icon: "kitchen",
+                            validCallback: function(icon) {
+/*                                getREST('/base/area/del/{{ area.id }}',
+                                    function(data) {
+                                        var status = (data.status).toLowerCase();
+                                        if (status == 'error') {
+                                        }
+                                    }
+                                )*/
+                            }
+                        });
                     });
                     // ]]>
                 </script>
                 <ul class="actions">
-                    <li><button id='del{{ room.id }}' class='icon16-action-del buttonleft' title="{% trans "Delete" %} '{{ room.name }}'"><span class='offscreen'>{% trans "Delete" %} {{ room.name }}</span></button></li>
-                    <li><button id="update{{ room.id }}" class="icon16-action-update buttonleft" title="{% trans "Modify" %} '{{ room.name }}'"><span class='offscreen'>{% trans "Modify" %} {{ room.name }}</span></button></li>
+                    <li><button id='del{{ room.id }}' class='icon16-action-del buttonside' title="{% trans "Delete" %} '{{ room.name }}'"><span class='offscreen'>{% trans "Delete" %} {{ room.name }}</span></button></li>
+                    <li><button id="update{{ room.id }}" class="icon16-action-update buttonside" title="{% trans "Modify" %} '{{ room.name }}'"><span class='offscreen'>{% trans "Modify" %} {{ room.name }}</span></button></li>
                 </ul>
                 <div class="content">
-                    <h2 id="zone{{ room.id }}h" class="icon32-area-grndfloor">{{ room.name }}</h2>
+                    <div id="icon{{ room.id }}"></div>
+                    <h2 id="zone{{ room.id }}h">{{ room.name }}</h2>
                     <p>{{ room.description }}</p>
 
                 </div>
@@ -279,5 +246,54 @@
             </div>
             {% endfor %}
         </div>
+        <div id="addnewdialog" title="{% trans "Create new room" %}">
+            <p id="validateTips">{% trans "All fields are required." %}</p>
+            <form>
+                <fieldset>
+                    <label class="medium" for="new_name">{% trans "Name" %}</label>
+                    <input type="text" class="medium" id="new_name" name="new_name" />
+                    <label class="medium" for="new_description">{% trans "Description" %}</label>
+                    <textarea type="text" class="medium" id="new_description" name="new_description"></textarea>
+                </fieldset>
+            </form>
+        </div>
     </div>
+<!--
+        <div class="subsection">
+            <h2>{% trans "Rooms organisation" %}</h2>
+            <a href="#" class="action" id="btinstructions">(Instructions Drag &amp; Drop)</a>
+            <div id="instructions" title="Instructions Drag &amp; Drop">
+                <h3>Utilisation de la souris</h3>
+                <h3>Utilisation du clavier</h3>
+                <ul>
+                    <li>Use the <kbd>Tab</kbd> to move to the artist you want to move.</li>
+                    <li>Select the item you want to move with the <kbd>Spacebar</kbd>.</li>
+                    <li>Use the <kbd>Up</kbd> and <kbd>Down</kbd> cursor keys to select a target in the context menu.</li>
+                    <li>Press <kbd>Enter</kbd> to move the artist to the target list.</li>
+                </ul>
+            </div>
+            <fieldset class="areadrop">
+                <legend id="areanah" class="choice">Pièces non attribuées</legend>
+                <ul id="areana" class="draggables">
+                    {% for room in unattribued_rooms %}
+                    <li class="draggable">{{ room.name }}<span class="description">{{ room.description }}</span></li>
+                    {% empty %}
+                    <li class="empty">Vide</li>
+                    {% endfor %}
+                </ul>
+            </fieldset>
+            {% for area in areas_list %}
+            <fieldset class="areadrop">
+                <legend id="area{{ area.id }}h" class="choice">{{ area.name }}</legend>
+                <ul id="room{{ room.grouper.id }}" class="draggables">
+                    {% for room in room.list %}
+                    <li class="draggable">{{ room.name }}<span class="description">{{ room.description }}</span></li>
+                    {% empty %}
+                    <li class="empty">Vide</li>
+                    {% endfor %}
+                </ul>
+            </fieldset>
+            {% endfor %}
+        </div>
+-->
 {% endblock %}
