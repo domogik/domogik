@@ -863,18 +863,18 @@ class UIItemConfig(Base):
     """
     __tablename__ = '%s_ui_item_config' % _db_prefix
 
-    item_type = Column(String(30), nullable=False, primary_key=True)
+    reference = Column(String(30), nullable=False, primary_key=True)
     key = Column(String(30), nullable=False, primary_key=True)
     value = Column(String(30), nullable=False)
 
-    def __init__(self, item_type, key, value):
+    def __init__(self, reference, key, value):
         """
         Class constructor
-        @param item_type : area, room, device
+        @param reference : item reference
         @param key : key
         @param value : associated value
         """
-        self.item_type = item_type
+        self.reference = reference
         self.key = key
         self.value = value
 
@@ -883,8 +883,8 @@ class UIItemConfig(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<UIItemConfig(item_type='%s', key='%s', value='%s')>" \
-                % (self.item_type, self.key, self.value)
+        return "<UIItemConfig(item_reference='%s', key='%s', value='%s')>" \
+                % (self.reference, self.key, self.value)
 
     @staticmethod
     def get_tablename():

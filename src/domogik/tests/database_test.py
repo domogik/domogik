@@ -165,8 +165,8 @@ class GenericTestCase(unittest.TestCase):
         Remove all ui configuration parameters of all items (area, room, device)
         @param db : db API instance
         """
-        for iuc in db.list_all_ui_item_config():
-            db.delete_all_ui_item_config(iuc.item_type)
+        for uic in db.list_all_ui_item_config():
+            db.delete_all_ui_item_config(uic.reference)
 
 
 class AreaTestCase(GenericTestCase):
@@ -1327,10 +1327,10 @@ class UIItemConfigTestCase(GenericTestCase):
         assert len(ui_config_list_all) == 4
         ui_config_list_r = self.db.list_ui_item_config('room')
         assert len(ui_config_list_r) == 2 \
-               and ui_config_list_r[0].item_type == 'room' \
+               and ui_config_list_r[0].reference == 'room' \
                and ui_config_list_r[0].key == 'param_r1' \
                and ui_config_list_r[0].value == 'value_r1' \
-               and ui_config_list_r[1].item_type == 'room' \
+               and ui_config_list_r[1].reference == 'room' \
                and ui_config_list_r[1].key == 'param_r2' \
                and ui_config_list_r[1].value == 'value_r2', "%s" % ui_config_list_r
         uic = self.db.get_ui_item_config('room', 'param_r2')
