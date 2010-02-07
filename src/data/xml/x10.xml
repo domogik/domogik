@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<statistic technology="x10">
+    <listener>
+        <schema>x10.basic</x10>
+        <xpltype>xpl-trig</xpltype>
+        <filter/>
+    </listener>
+    <mapping>
+        <device field="device"/>
+        <value field="command"/>
+        <value field="level" />
+    </mapping>
+</statistic>
+
