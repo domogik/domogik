@@ -829,6 +829,51 @@ target=*
                 return
 
 
+        ### device technology config #################
+        elif self.rest_request[0] == "device_technology_config":
+
+            ### list
+            if self.rest_request[1] == "list":
+                if len(self.rest_request) == 2:
+                    self._rest_base_device_technology_config_list()
+                elif len(self.rest_request) == 3 or len(self.rest_request) == 5:
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
+                elif len(self.rest_request) == 4:
+                    if self.rest_request[2] == "by-technology-id":
+                        self._rest_base_device_technology_config_list(technology_id=self.rest_request[3])
+                elif len(self.rest_request) == 6:
+                    if self.rest_request[2] == "by-technology-id" and self.rest_request[4] == "by-key":
+                        self._rest_base_device_technology_config_list(technology_id = self.rest_request[3], key = self.rest_request[5])
+
+            ### add
+            elif self.rest_request[1] == "add":
+                offset = 2
+                if self.set_parameters(offset):
+                    self._rest_base_device_technology_config_add(self.parameters)
+                else:
+                    self.send_http_response_error(999, "No parameters given", self.jsonp, self.jsonp_cb)
+
+            ### update
+            elif self.rest_request[1] == "update":
+                offset = 2
+                if self.set_parameters(offset):
+                    self._rest_base_device_technology_config_update(self.parameters)
+                else:
+                    self.send_http_response_error(999, "No parameters given", self.jsonp, self.jsonp_cb)
+
+            ### del
+            elif self.rest_request[1] == "del":
+                if len(self.rest_request) == 3:
+                    self._rest_base_device_technology_config__del(id=self.rest_request[2])
+                else:
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
+
+            ### others
+            else:
+                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], self.jsonp, self.jsonp_cb)
+                return
+
+
 
 
 
@@ -1411,12 +1456,85 @@ target=*
         json.set_jsonp(self.jsonp, self.jsonp_cb)
         json.set_data_type("device_technology")
         try:
-            actuator_feature = self._db.del_device_technology(id)
+            device_technology = self._db.del_device_technology(id)
             json.add_data(device_technology)
         except:
             json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
         self.send_http_response_ok(json.get())
 
+
+
+######
+# /base/device_technology _config processing
+######
+
+    def _rest_base_device_technology_config_list(self, technology_id = None, key = None):
+        """ list device technology config
+        """
+        json = JSonHelper("OK")
+        json.set_jsonp(self.jsonp, self.jsonp_cb)
+        json.set_data_type("device_technology_config")
+        if technology_id == None:
+            for device_technology_config in self._db.list_all_device_technology_config():
+                json.add_data(device_technology_config)
+        elif key == None:
+            for device_technology_config in self._db.list_device_technology_config(technology_id):
+                json.add_data(device_technology_config)
+        else:
+            device_technology_config = self._db.get_device_technology_config(technology_id, key)
+            if device_technology_config is not None:
+                json.add_data(device_technology_config)
+        self.send_http_response_ok(json.get())
+
+
+
+    def _rest_base_device_technology_config_add(self, params):
+        """ add device technology config
+        """
+        json = JSonHelper("OK")
+        json.set_jsonp(self.jsonp, self.jsonp_cb)
+        json.set_data_type("device_technology_config")
+        try:
+            device_technology_config = self._db.add_device_technology_config(self.get_parameters("technology_id"), \
+                                                                             self.get_parameters("key"), \
+                                                                             self.get_parameters("value"), \
+                                                                             self.get_parameters("description"))
+            json.add_data(device_technology_config)
+        except:
+            json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+        self.send_http_response_ok(json.get())
+
+
+    def _rest_base_device_technology_config_update(self, params):
+        """ update device technology config
+        """
+        json = JSonHelper("OK")
+        json.set_jsonp(self.jsonp, self.jsonp_cb)
+        json.set_data_type("device_technology_config")
+        try:
+            device_technology_config = self._db.update_device_technology_config(self.get_parameters("id"), \
+                                                                             self.get_parameters("technology_id"), \
+                                                                             self.get_parameters("key"), \
+                                                                             self.get_parameters("value"), \
+                                                                             self.get_parameters("description"))
+            json.add_data(device_technology_config)
+        except:
+            json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+        self.send_http_response_ok(json.get())
+
+
+    def _rest_base_device_technology_config_del(self, id=None):
+        """ delete device technology config
+        """
+        json = JSonHelper("OK")
+        json.set_jsonp(self.jsonp, self.jsonp_cb)
+        json.set_data_type("device_technology_config")
+        try:
+            device_technology_config = self._db.del_device_technology_config(id)
+            json.add_data(device_technology_config)
+        except:
+            json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+        self.send_http_response_ok(json.get())
 
 
 
