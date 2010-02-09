@@ -555,7 +555,8 @@ def show_index(request):
     """
     page_title = _("Visualisation Maison")
     resultAllAreas = Areas.getAll()
-
+    resultAllAreas.merge_uiconfig()
+    
     return __go_to_page(
         request, 'show/index.html',
         page_title,
