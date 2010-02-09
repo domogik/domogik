@@ -498,6 +498,8 @@ target=*
                 else:
                     if self.rest_request[2] == "by-id":
                         self._rest_base_area_list(id=self.rest_request[3])
+                    else:
+                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
 
             ### add
             elif self.rest_request[1] == "add":
@@ -541,6 +543,8 @@ target=*
                         self._rest_base_room_list(id=self.rest_request[3])
                     elif self.rest_request[2] == "by-area":
                         self._rest_base_room_list(area_id=self.rest_request[3])
+                    else:
+                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
 
             ### add
             elif self.rest_request[1] == "add":
@@ -577,21 +581,22 @@ target=*
             if self.rest_request[1] == "list":
                 if len(self.rest_request) == 2:
                     self._rest_base_ui_item_config_list()
-                elif len(self.rest_request) == 3:
+                elif len(self.rest_request) >= 3 and len(self.rest_request) <=4:
                     self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
-                else:
-                    if self.rest_request[2] == "by-item":
-                        if len(self.rest_request) == 5:
-                            self._rest_base_ui_item_config_list(item_key=self.rest_request[3], item_reference=self.rest_request[4])
-                        else:
-                            self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
-                    elif self.rest_request[2] == "by-key":
-                        if len(self.rest_request) == 4:
-                            self._rest_base_ui_item_config_list(item_key=self.rest_request[3])
-                        else:
-                            self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
+                elif len(self.rest_request) == 5:
+                    if self.rest_request[2] == "by-key":
+                        self._rest_base_ui_item_config_list(name = self.rest_request[3], key = self.rest_request[4])
+                    elif self.rest_request[2] == "by-reference":
+                        self._rest_base_ui_item_config_list(name = self.rest_request[3], reference = self.rest_request[4])
                     else:
                         self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
+                elif len(self.rest_request) == 6:
+                    if self.rest_request[2] == "by-element":
+                        self._rest_base_ui_item_config_list(name = self.rest_request[3], reference = self.rest_request[4], key = self.rest_request[5])
+                    else:
+                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
+                else:
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
 
             ### add
             elif self.rest_request[1] == "add":
@@ -635,6 +640,8 @@ target=*
                 else:
                     if self.rest_request[2] == "by-name":
                         self._rest_base_device_usage_list(self.rest_request[3])
+                    else:
+                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
 
             ### add
             elif self.rest_request[1] == "add":
@@ -715,6 +722,8 @@ target=*
                 else:
                     if self.rest_request[2] == "by-name":
                         self._rest_base_sensor_reference_list(name=self.rest_request[3])
+                    else:
+                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
 
             ### add
             elif self.rest_request[1] == "add":
@@ -757,6 +766,8 @@ target=*
                 else:
                     if self.rest_request[2] == "by-name":
                         self._rest_base_actuator_feature_list(name=self.rest_request[3])
+                    else:
+                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
 
             ### add
             elif self.rest_request[1] == "add":
@@ -799,6 +810,8 @@ target=*
                 else:
                     if self.rest_request[2] == "by-name":
                         self._rest_base_device_technology_list(name=self.rest_request[3])
+                    else:
+                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
 
             ### add
             elif self.rest_request[1] == "add":
@@ -844,6 +857,10 @@ target=*
                 elif len(self.rest_request) == 6:
                     if self.rest_request[2] == "by-technology-id" and self.rest_request[4] == "by-key":
                         self._rest_base_device_technology_config_list(technology_id = self.rest_request[3], key = self.rest_request[5])
+                    else:
+                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
+                else:
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
 
             ### add
             elif self.rest_request[1] == "add":
@@ -1066,20 +1083,27 @@ target=*
 # /base/ui_config processing
 ######
 
-    def _rest_base_ui_item_config_list(self, item_key = None, item_reference = None):
+    def _rest_base_ui_item_config_list(self, name = None, reference = None, key = None):
         """ list ui_item_config
         """
         json = JSonHelper("OK")
         json.set_jsonp(self.jsonp, self.jsonp_cb)
         json.set_data_type("ui_config")
-        if item_key == None:
-            for ui_config in self._db.list_all_ui_item_config():
+        if name == None and reference == None and key == None:
+            for ui_item_config in self._db.list_all_ui_item_config():
                 json.add_data(ui_item_config)
-        elif item_reference == None:
-            for ui_item_config in self._db.list_item_ui_config(item_id, item_type):
-                json.add_data(ui_item_config)
-        else:
-            ui_item_config = self._db.get_item_ui_config(item_id, item_type, item_key)
+        elif name != None and reference != None:
+            if key == None:
+                # by-reference
+                for ui_item_config in self._db.list_ui_item_config(name, reference):
+                    json.add_data(ui_item_config)
+            else:
+                # by-key
+                for ui_item_config in self._db.get_ui_item_config(ui_item_name = name, ui_key= key):
+                    json.add_data(ui_item_config)
+        elif name != None and key != None and reference != None:
+            # by-element
+            ui_item_config = self._db.get_ui_item_config(self, ui_item_name = name, ui_item_reference = reference, ui_key = key)
             if ui_item_config is not None:
                 json.add_data(ui_item_config)
         self.send_http_response_ok(json.get())
@@ -1093,7 +1117,7 @@ target=*
         json.set_jsonp(self.jsonp, self.jsonp_cb)
         json.set_data_type("ui_config")
         try:
-            ui_item_config = self._db.add_item_ui_config(self.get_parameters("item_id"), self.get_parameters("item_type"), {self.get_parameters("key") : self.get_parameters("value")})
+            ui_item_config = self._db.add_item_ui_config(self.get_parameters("name"), self.get_parameters("reference"), {self.get_parameters("key") : self.get_parameters("value")})
             json.add_data(ui_item_config)
         except:
             json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
@@ -1107,13 +1131,18 @@ target=*
         json.set_jsonp(self.jsonp, self.jsonp_cb)
         json.set_data_type("ui_config")
         try:
-            ui_item_config = self._db.update_ui_item_config(self.get_parameters("item_type"), self.get_parameters("key"), self.get_parameters("value"))
+            ui_item_config = self._db.update_ui_item_config(self.get_parameters("name"), self.get_parameters("reference"), self.get_parameters("key"), self.get_parameters("value"))
             json.add_data(ui_item_config)
         except:
             json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
         self.send_http_response_ok(json.get())
 
 
+
+ #### TODO TODO 
+ #### TODO TODO 
+ #### TODO TODO 
+ #### TODO TODO 
     def _rest_base_ui_item_config_del(self, params):
         """ del ui_item_config
         """
@@ -1121,14 +1150,12 @@ target=*
         json.set_jsonp(self.jsonp, self.jsonp_cb)
         json.set_data_type("ui_config")
         try:
-            if self.get_parameters("key") == None:
-                ui_item_config = self._db.delete_all_item_ui_config(self.get_parameters("item_id"), self.get_parameters("item_type"))
-            else:
-                ui_item_config = self._db.delete_item_ui_config(self.get_parameters("item_id"), self.get_parameters("item_type"), self.get_parameters("key"))
-            json.add_data(ui_item_config)
+            for ui_item_config in self._db.delete_ui_item_config(ui_item_name = name, ui_item_reference = reference, ui_key = key):
+                json.add_data(ui_item_config)
         except:
             json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
         self.send_http_response_ok(json.get())
+
 
 
 
