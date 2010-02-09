@@ -1117,7 +1117,7 @@ target=*
         json.set_jsonp(self.jsonp, self.jsonp_cb)
         json.set_data_type("ui_config")
         try:
-            ui_item_config = self._db.add_item_ui_config(self.get_parameters("name"), self.get_parameters("reference"), {self.get_parameters("key") : self.get_parameters("value")})
+            ui_item_config = self._db.add_ui_item_config(self.get_parameters("name"), self.get_parameters("reference"), {self.get_parameters("key") : self.get_parameters("value")})
             json.add_data(ui_item_config)
         except:
             json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))

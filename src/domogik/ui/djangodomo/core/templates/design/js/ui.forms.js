@@ -42,7 +42,7 @@ function checkLength(o, n, min, max) {
             this.button_edit.click(function() {
                 self.current_index = $.inArray(self.current_icon, o.list);
                 if(self.current_index == -1) {
-                    self.original_icon = "undefined";
+                    self.original_icon = "";
                 } else {
                     self.original_icon = self.current_icon;
                 }
@@ -78,6 +78,8 @@ function checkLength(o, n, min, max) {
                 self.button_cancel.addClass('hidden');
                 self.button_edit.removeClass('hidden');
                 o.validCallback(self.current_icon);
+                self.element.removeClass("icon64-" + o.type + "-" + self.current_icon);
+                self.element.addClass("icon24-processing");
             });
             this.button_cancel = $("<button class='icon16-action-cancel button-cancel hidden'><span class='offscreen'>" + o.cancelText + "</span></button>");
             this.button_cancel.click(function() {
@@ -95,11 +97,18 @@ function checkLength(o, n, min, max) {
             this.element.append(this.button_next);
             this.element.append(this.button_submit);
             this.element.append(this.button_cancel);
+        },
+        
+        cancel: function() {
+            self.element.removeClass("icon64-" + o.type + "-" + self.current_icon);
+            self.element.addClass("icon24-processing");
+            self.current_icon = self.original_icon;
+            
         }
     });
     $.extend($.ui.editable_icon, {
         defaults: {
-            icon: "undefined",
+            icon: "",
             editText: "Edit icon",
             previousText: "View previous icon",
             nextText: "View next icon",

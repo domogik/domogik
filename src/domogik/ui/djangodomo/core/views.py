@@ -512,6 +512,7 @@ def admin_organization_rooms(request):
     msg = request.GET.get('msg', '')
 
     resultAllRooms = Rooms.getAll()
+    resultAllRooms.merge_uiconfig()
     resultUnattribuedRooms = Rooms.getWithoutArea()
     resultAllAreas = Areas.getAll()
     page_title = _("Room organization")
@@ -538,6 +539,7 @@ def admin_organization_areas(request):
     msg = request.GET.get('msg', '')
 
     resultAllAreas = Areas.getAll()
+    resultAllAreas.merge_uiconfig()
     page_title = _("Area organization")
     return __go_to_page(
         request, 'admin/organization/areas.html',
@@ -571,7 +573,9 @@ def show_area(request, area_id):
     @return an HttpResponse object
     """
     resultAreaById = Areas.getById(area_id)
+    resultAreaById.merge_uiconfig()
     resultRoomsByArea = Rooms.getByArea(area_id)
+    resultRoomsByArea.merge_uiconfig()
 
     page_title = _("Visualisation Zone")
     return __go_to_page(

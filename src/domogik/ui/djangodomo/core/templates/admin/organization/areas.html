@@ -196,9 +196,8 @@
                                 getREST('/base/ui_config/add/name/area/reference/{{ area.id }}/key/icon/value/' + icon,
                                     function(data) {
                                         var status = (data.status).toLowerCase();
-                                        alert(status);
                                         if (status == 'error') {
-                                            display_message('error', data.msg);
+                                            display_message('error', data.description);
                                         }
                                     }
                                 )

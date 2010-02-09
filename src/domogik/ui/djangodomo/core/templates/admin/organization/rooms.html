@@ -128,7 +128,7 @@
             {% spaceless %}
                 <ul>
                     {% for room in rooms_list %}
-                        <li><a href="#element{{ room.id }}" class="icon16-room-livingroom">{{ room.name }}</a></li>
+                        <li><a id="tab{{ room.id }}" href="#element{{ room.id }}" class="icon16-room-{{ room.config.icon }}">{{ room.name }}</a></li>
                     {% endfor %}
                 </ul>
             {% endspaceless %}
@@ -208,15 +208,21 @@
                         $('#icon{{ room.id }}').editable_icon({
                             type: "room",
                             list: room_icons,
-                            icon: "kitchen",
+                            icon: "{{ room.config.icon }}",
                             validCallback: function(icon) {
-/*                                getREST('/base/area/del/{{ area.id }}',
+                                var self = this;
+                                getREST('/base/ui_config/add/name/room/reference/{{ room.id }}/key/icon/value/' + icon,
                                     function(data) {
                                         var status = (data.status).toLowerCase();
-                                        if (status == 'error') {
+                                        if (status == 'ok') {
+                                            $("#tab{{ room.id }}").removeClass();
+                                            $("#tab{{ room.id }}").addClass("icon16-room-" + icon);
+                                        } else {
+                                            self.cancel();
+                                            display_message('error', data.description);                                          
                                         }
                                     }
-                                )*/
+                                )
                             }
                         });
                     });

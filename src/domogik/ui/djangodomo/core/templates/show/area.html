@@ -22,7 +22,7 @@
 {% load i18n %}
 {% block js_script %}
     $(function(){
-		$(".section .extended").hide();
+		$(".block .extended").hide();
     });
 {% endblock %}
 
@@ -40,7 +40,7 @@
 
 {% block content %}
     <div class='section-bgnd'>
-        <div class="section icon64-area-grndfloor">
+        <div class="section icon64-area-{{ area.config.icon }}">
             <h1 class="ident"><span class="title">{{ area.name }}</span></h1>
 	    <ul class="actions"></ul>
         </div>
@@ -51,18 +51,18 @@
             <div class='row'>
         {% endif %}
 				<div class='column'>
-					<div class='section'>
+					<div class='block'>
 						<script type="text/javascript">
 						// <![CDATA[
 							$(function() {
 								$("#button_{{ room.id }}").click(function() {
-					$(".section .extended[id!='extended_{{ room.id }}']").hide();
-					$("#extended_{{ room.id }}").toggle();
-					})
+									$(".section .extended[id!='extended_{{ room.id }}']").hide();
+									$("#extended_{{ room.id }}").toggle();
+								})
 							});
 						// ]]>
 						</script>
-						<dt class='header icon64-room-kitchen'>
+						<dt class='header icon64-room-{{ room.config.icon }}'>
 							<a href='{% url show_room_view room.id %}' class="ident">
 								<span class="title">{{ room.name }}</span>
 								<br />

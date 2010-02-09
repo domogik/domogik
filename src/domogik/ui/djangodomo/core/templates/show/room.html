@@ -23,7 +23,7 @@
 {% block js_script %}
 // <![CDATA[
     $(function(){
-	$(".section .extended").hide();
+	$(".block .extended").hide();
     });
 // ]]>
 {% endblock %}
@@ -45,7 +45,7 @@
     <div id='binary_data'></div>
     <div id='range_data'></div>
     <div class='section-bgnd'>
-        <div class="section icon64-room-kitchen">
+        <div class="section icon64-room-{{ room.config.icon }}">
 			<h1 class="ident"><span class="title">{{ room.name }}</span></h1>
 			<ul class="actions"></ul>
         </div>

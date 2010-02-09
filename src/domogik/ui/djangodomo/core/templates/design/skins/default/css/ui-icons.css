@@ -60,6 +60,7 @@
 
 
 /* Action */
+.icon24-processing { background-image:url(../images/processing_24.gif);}
 .icon16-action-add { background-image:url(../images/plus_16.png);}
 .icon16-action-del { background-image:url(../images/minus_16.png);}
 .icon16-action-update { background-image:url(../images/update_16.png);}
