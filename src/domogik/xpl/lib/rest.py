@@ -232,6 +232,8 @@ class ProcessRequest():
             self.rest_xpl_cmnd()
         elif self.rest_type == "base":
             self.rest_base()
+        elif self.rest_type == "module":
+            self.rest_module()
         else:
             self.send_http_response_error(999, "Type [" + str(self.rest_type) + "] is not supported", self.jsonp, self.jsonp_cb)
             return
@@ -507,7 +509,7 @@ target=*
                 if self.set_parameters(offset):
                     self._rest_base_area_add(self.parameters)
                 else:
-                    self.send_http_response_error(999, "No parameters given", self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
             ### update
             elif self.rest_request[1] == "update":
@@ -515,7 +517,7 @@ target=*
                 if self.set_parameters(offset):
                     self._rest_base_area_update(self.parameters)
                 else:
-                    self.send_http_response_error(999, "No parameters given", self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
             ### del
             elif self.rest_request[1] == "del":
@@ -552,7 +554,7 @@ target=*
                 if self.set_parameters(offset):
                     self._rest_base_room_add(self.parameters)
                 else:
-                    self.send_http_response_error(999, "No parameters given", self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
             ### update
             elif self.rest_request[1] == "update":
@@ -560,7 +562,7 @@ target=*
                 if self.set_parameters(offset):
                     self._rest_base_room_update(self.parameters)
                 else:
-                    self.send_http_response_error(999, "No parameters given", self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
             ### del
             elif self.rest_request[1] == "del":
@@ -604,7 +606,7 @@ target=*
                 if self.set_parameters(offset):
                     self._rest_base_ui_item_config_add(self.parameters)
                 else:
-                    self.send_http_response_error(999, "No parameters given", self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
             ### update
             elif self.rest_request[1] == "update":
@@ -612,7 +614,7 @@ target=*
                 if self.set_parameters(offset):
                     self._rest_base_ui_item_config_update(self.parameters)
                 else:
-                    self.send_http_response_error(999, "No parameters given", self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
             ### delete
             elif self.rest_request[1] == "del":
@@ -620,7 +622,7 @@ target=*
                 if self.set_parameters(offset):
                     self._rest_base_ui_item_config_del(self.parameters)
                 else:
-                    self.send_http_response_error(999, "No parameters given", self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
             ### others
             else:
@@ -649,7 +651,7 @@ target=*
                 if self.set_parameters(offset):
                     self._rest_base_device_usage_add(self.parameters)
                 else:
-                    self.send_http_response_error(999, "No parameters given", self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
             ### update
             elif self.rest_request[1] == "update":
@@ -657,7 +659,7 @@ target=*
                 if self.set_parameters(offset):
                     self._rest_base_device_usage_update(self.parameters)
                 else:
-                    self.send_http_response_error(999, "No parameters given", self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
             ### del
             elif self.rest_request[1] == "del":
@@ -688,7 +690,7 @@ target=*
                 if self.set_parameters(offset):
                     self._rest_base_area_add(self.parameters)
                 else:
-                    self.send_http_response_error(999, "No parameters given", self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
             ### update
             elif self.rest_request[1] == "update":
@@ -696,7 +698,7 @@ target=*
                 if self.set_parameters(offset):
                     self._rest_base_area_update(self.parameters)
                 else:
-                    self.send_http_response_error(999, "No parameters given", self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
             ### del
             elif self.rest_request[1] == "del":
@@ -731,7 +733,7 @@ target=*
                 if self.set_parameters(offset):
                     self._rest_base_sensor_reference_add(self.parameters)
                 else:
-                    self.send_http_response_error(999, "No parameters given", self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
             ### update
             elif self.rest_request[1] == "update":
@@ -739,7 +741,7 @@ target=*
                 if self.set_parameters(offset):
                     self._rest_base_sensor_reference_update(self.parameters)
                 else:
-                    self.send_http_response_error(999, "No parameters given", self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
             ### del
             elif self.rest_request[1] == "del":
@@ -775,7 +777,7 @@ target=*
                 if self.set_parameters(offset):
                     self._rest_base_actuator_feature_add(self.parameters)
                 else:
-                    self.send_http_response_error(999, "No parameters given", self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
             ### update
             elif self.rest_request[1] == "update":
@@ -783,7 +785,7 @@ target=*
                 if self.set_parameters(offset):
                     self._rest_base_actuator_feature_update(self.parameters)
                 else:
-                    self.send_http_response_error(999, "No parameters given", self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
             ### del
             elif self.rest_request[1] == "del":
@@ -819,7 +821,7 @@ target=*
                 if self.set_parameters(offset):
                     self._rest_base_device_technology_add(self.parameters)
                 else:
-                    self.send_http_response_error(999, "No parameters given", self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
             ### update
             elif self.rest_request[1] == "update":
@@ -827,7 +829,7 @@ target=*
                 if self.set_parameters(offset):
                     self._rest_base_device_technology_update(self.parameters)
                 else:
-                    self.send_http_response_error(999, "No parameters given", self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
             ### del
             elif self.rest_request[1] == "del":
@@ -868,7 +870,7 @@ target=*
                 if self.set_parameters(offset):
                     self._rest_base_device_technology_config_add(self.parameters)
                 else:
-                    self.send_http_response_error(999, "No parameters given", self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
             ### update
             elif self.rest_request[1] == "update":
@@ -876,7 +878,7 @@ target=*
                 if self.set_parameters(offset):
                     self._rest_base_device_technology_config_update(self.parameters)
                 else:
-                    self.send_http_response_error(999, "No parameters given", self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
             ### del
             elif self.rest_request[1] == "del":
@@ -915,12 +917,14 @@ target=*
             if offset + ii + 1 < len(self.rest_request):
                 value = self.rest_request[offset + ii + 1]
             else:
-                self.send_http_response_error(999, "Value missing for " + key, self.jsonp, self.jsonp_cb)
-                return
+                # wrong number of arguments
+                return False
             self.parameters[key] = value
             ii += 2
+        # no parameters
         if ii == 0:
             return False
+        # ok
         else:
             return True
 
@@ -1117,7 +1121,7 @@ target=*
         json.set_jsonp(self.jsonp, self.jsonp_cb)
         json.set_data_type("ui_config")
         try:
-            ui_item_config = self._db.add_item_ui_config(self.get_parameters("name"), self.get_parameters("reference"), {self.get_parameters("key") : self.get_parameters("value")})
+            ui_item_config = self._db.add_ui_item_config(self.get_parameters("name"), self.get_parameters("reference"), {self.get_parameters("key") : self.get_parameters("value")})
             json.add_data(ui_item_config)
         except:
             json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
@@ -1139,10 +1143,6 @@ target=*
 
 
 
- #### TODO TODO 
- #### TODO TODO 
- #### TODO TODO 
- #### TODO TODO 
     def _rest_base_ui_item_config_del(self, params):
         """ del ui_item_config
         """
@@ -1568,6 +1568,27 @@ target=*
 
 
 
+######
+# /module processing
+######
+
+    def rest_module(self):
+        print "Call rest_module"
+        if len(self.rest_request) < 2:
+            self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
+            return
+
+        json = JSonHelper("OK")
+        json.set_jsonp(self.jsonp, self.jsonp_cb)
+        json.set_data_type("module")
+
+        ### start #####################################
+        if self.rest_request[0] == "start":
+            print "start!!"
+        elif self.rest_request[0] == "stop":
+            print "stop!!"
+
+        self.send_http_response_ok(json.get())
 
 
 
@@ -1611,9 +1632,9 @@ class JSonHelper():
 
         if data == None:
             return
-        print "=== DATA ==="
+        #print "=== DATA ==="
         #print str(data)
-        print "============"
+        #print "============"
         for key in data.__dict__:
             #print data.__dict__[key]
             type_data = type(data.__dict__[key]).__name__
