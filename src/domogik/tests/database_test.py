@@ -792,6 +792,37 @@ class DeviceTestCase(GenericTestCase):
         # assert not device1.is_appliance(), "device1.is_appliance()
         # returns True. Should have returned False"
 
+    def testListAndGet(self):
+        area1 = self.db.add_area('Basement','description 1')
+        room1 = self.db.add_room('Kitchen', area1.id)
+        room2 = self.db.add_room('Bathroom', area1.id)
+        dt1 = self.db.add_device_technology(u'x10', 'x10 device type')
+        dt2 = self.db.add_device_technology(u'PLCBus', 'PLCBus device type')
+        du1 = self.db.add_device_usage('Appliance')
+        dty1 = self.db.add_device_type(dty_name='x10 Switch', dt_id=dt1.id,
+                                       dty_description='My beautiful switch')
+        dty2 = self.db.add_device_type(dty_name='PLCBus Switch', dt_id=dt2.id,
+                                       dty_description='Another beautiful switch')
+        device1 = self.db.add_device(d_name='Toaster', d_address='A1',
+                    d_type_id=dty1.id, d_usage_id=du1.id,
+                    d_room_id=room1.id, d_description='My new toaster',
+                    d_is_resetable=True,
+                    d_is_value_changeable_by_user = False)
+        device2 = self.db.add_device(d_name='Washing machine', d_address='A1',
+                    d_type_id=dty2.id, d_usage_id=du1.id,
+                    d_room_id=room1.id, d_description='Laden',
+                    d_is_resetable=True,
+                    d_is_value_changeable_by_user = False)
+        device3 = self.db.add_device(d_name='Mixer', d_address='A2',
+                    d_type_id=dty2.id, d_usage_id=du1.id,
+                    d_room_id=room1.id, d_description='Moulinex',
+                    d_is_resetable=True,
+                    d_is_value_changeable_by_user = False)
+        search_dev1 =self.db.get_device_by_technology_and_address(dt1.name, 'A1')
+        assert search_dev1.name == 'Toaster'
+        search_dev2 =self.db.get_device_by_technology_and_address(dt1.name, 'A2')
+        assert search_dev2 == None
+
     def testUpdate(self):
         area1 = self.db.add_area('area1','description 1')
         room1 = self.db.add_room('room1', area1.id)

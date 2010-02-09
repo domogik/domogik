@@ -61,6 +61,7 @@ import sqlalchemy
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
+
 from domogik.common.configloader import Loader
 from domogik.common.sql_schema import ActuatorFeature, Area, Device, DeviceUsage, \
                                       DeviceConfig, DeviceStats, DeviceStatsValue, \
@@ -125,7 +126,6 @@ class DbHelper():
 
         if use_test_db:
             url = '%s_test' % url
-
         # Connecting to the database
         self.__dbprefix = db['db_prefix']
         self.__engine = sqlalchemy.create_engine(url, echo=echo_output)
@@ -1026,11 +1026,34 @@ class DbHelper():
 
     def get_device(self, d_id):
         """
-        Return a device by its it
+        Return a device by its id
         @param d_id : The device id
         @return a Device object
         """
         return self._session.query(Device).filter_by(id=d_id).first()
+
+    def get_device_by_technology_and_address(self, techno_name, device_address):
+        """
+        Return a device by its technology and address
+        @param techno_name : technology name
+        @param device address : device address
+        @return a device object
+        """
+        device_list = self._session.query(Device)\
+                                   .filter_by(address=device_address)\
+                                   .all()
+        if len(device_list) == 0:
+            return None
+        device = []
+        for device in device_list:
+            device_type = self._session.query(DeviceType)\
+                                       .filter_by(id=device.type_id).first()
+            device_tech = self._session.query(DeviceTechnology)\
+                                       .filter_by(id=device_type.technology_id)\
+                                       .first()
+            if device_tech.name == techno_name:
+                return device
+        return None
 
     def get_all_devices_of_room(self, d_room_id):
         """
