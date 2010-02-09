@@ -166,7 +166,7 @@ class GenericTestCase(unittest.TestCase):
         @param db : db API instance
         """
         for uic in db.list_all_ui_item_config():
-            db.delete_all_ui_item_config(uic.reference)
+            db.delete_ui_item_config(uic.item_name, uic.item_reference)
 
 
 class AreaTestCase(GenericTestCase):
@@ -1316,50 +1316,72 @@ class UIItemConfigTestCase(GenericTestCase):
         assert len(self.db.list_all_ui_item_config()) == 0
 
     def testAdd(self):
-        area1 = self.db.add_area('area1','description 1')
-        room1 = self.db.add_room('room1', area1.id)
-        ui_config_list_a = self.db.add_ui_item_config('area', \
-                                {'param_a1':'value_a1','param_a2':'value_a2'})
+        ui_config_list_a = self.db.add_ui_item_config('area', 2,\
+                                                      {'icon':'basement'})
         print ui_config_list_a
-        assert len(ui_config_list_a) == 2
-        self.db.add_ui_item_config('room', {'param_r1':'value_r1', 'param_r2':'value_r2'})
+        assert len(ui_config_list_a) == 1
+        self.db.add_ui_item_config('room', 1, {'icon':'kitchen'})
+        self.db.add_ui_item_config('room', 4, {'icon':'bathroom',
+                                               'param_r2':'value_r2'})
         ui_config_list_all = self.db.list_all_ui_item_config()
-        assert len(ui_config_list_all) == 4
-        ui_config_list_r = self.db.list_ui_item_config('room')
+        assert len(ui_config_list_all) == 4, len(ui_config_list_all)
+        assert len(self.db.get_ui_item_config(ui_item_name='room', ui_key='icon')) == 2
+        ui_config_list_r = self.db.get_ui_item_config(ui_item_name='room',
+                                                      ui_item_reference=4)
         assert len(ui_config_list_r) == 2 \
-               and ui_config_list_r[0].reference == 'room' \
-               and ui_config_list_r[0].key == 'param_r1' \
-               and ui_config_list_r[0].value == 'value_r1' \
-               and ui_config_list_r[1].reference == 'room' \
+               and ui_config_list_r[0].item_name == 'room' \
+               and ui_config_list_r[0].item_reference == '4' \
+               and ui_config_list_r[0].key == 'icon' \
+               and ui_config_list_r[0].value == 'bathroom' \
+               and ui_config_list_r[1].item_name == 'room' \
+               and ui_config_list_r[1].item_reference == '4' \
                and ui_config_list_r[1].key == 'param_r2' \
                and ui_config_list_r[1].value == 'value_r2', "%s" % ui_config_list_r
-        uic = self.db.get_ui_item_config('room', 'param_r2')
+        uic = self.db.get_ui_item_config('room', 4, 'param_r2')
         assert uic.value == 'value_r2'
-        uic = self.db.get_ui_item_config('area', 'param_a1')
-        assert uic.value == 'value_a1'
-        assert self.db.get_ui_item_config('foo', 'param_a1') is None
+        uic = self.db.get_ui_item_config('area', 2, 'icon')
+        assert uic.value == 'basement'
+        assert self.db.get_ui_item_config('foo', 13, 'param_a1') is None
 
     def testUpdate(self):
-        area1 = self.db.add_area('area1','description 1')
-        room1 = self.db.add_room('room1', area1.id)
-        self.db.add_ui_item_config('area', {'param_a1':'value_a1', 'param_a2':'value_a2'})
-        self.db.add_ui_item_config('room', {'param_r1':'value_r1', 'param_r2':'value_r2'})
-        uic = self.db.update_ui_item_config('area', 'param_a1', 'new_value_a1')
-        uic = self.db.get_ui_item_config('area', 'param_a1')
-        assert uic.value == 'new_value_a1'
+        self.db.add_ui_item_config('area', 1, {'icon':'basement'})
+        self.db.add_ui_item_config('room', 1, {'icon':'bathroom',
+                                               'param_r2':'value_r2'})
+        uic = self.db.update_ui_item_config('area', 1, 'icon', 'basement')
+        uic = self.db.get_ui_item_config('area', 1,  'icon')
+        assert uic.value == 'basement'
+
+    def testListAndGet(self):
+        self.db.add_ui_item_config('area', 1, {'icon':'basement'})
+        self.db.add_ui_item_config('room', 1, {'icon':'bathroom',
+                                   'param_r2':'value_r2'})
+        self.db.add_ui_item_config('room', 2, {'icon':'kitchen'})
+        assert len(self.db.list_all_ui_item_config()) == 4
+        assert len(self.db.get_ui_item_config(ui_item_name='room')) == 3
+        assert len(self.db.get_ui_item_config(ui_item_name='room',
+                                              ui_item_reference=1)) == 2
+        item=self.db.get_ui_item_config(ui_item_name='room',
+                                        ui_item_reference=2, ui_key='icon')
+        assert item.value == 'kitchen'
 
     def testDel(self):
-        area1 = self.db.add_area('area1','description 1')
-        room1 = self.db.add_room('room1', area1.id)
-        self.db.add_ui_item_config('area', {'param_a1':'value_a1', 'param_a2':'value_a2'})
-        self.db.add_ui_item_config('room', {'param_r1':'value_r1', 'param_r2':'value_r2'})
-        self.db.delete_ui_item_config('area', 'param_a2')
-        assert len(self.db.list_all_ui_item_config()) == 3
-        assert self.db.get_ui_item_config('area', 'param_a1') is not None
-        assert self.db.get_ui_item_config('area', 'param_a2') is None
-        ui_item_config_list = self.db.list_ui_item_config('area')
-        ui_item_config_del_list = self.db.delete_all_ui_item_config('area')
-        assert len(self.db.list_ui_item_config('area')) == 0
+        self.db.add_ui_item_config('area', 1, {'icon':'basement'})
+        self.db.add_ui_item_config('room', 1, {'icon':'bathroom',
+                                   'param_r2':'value_r2'})
+        self.db.delete_ui_item_config('area', 1, 'icon')
+        assert len(self.db.list_all_ui_item_config()) == 2
+        assert self.db.get_ui_item_config('room', 1, 'icon') is not None
+        self.db.delete_ui_item_config(ui_item_name='room', ui_item_reference=1)
+        assert len(self.db.list_all_ui_item_config()) == 0
+        assert self.db.get_ui_item_config('area', 1, 'icon') is None
+        self.db.add_ui_item_config('area', 2, {'icon':'first_floor', 'pa1': 'va1'})
+        self.db.add_ui_item_config('room', 2, {'icon':'kitchen', 'pr1': 'vr1'})
+        self.db.delete_ui_item_config(ui_item_name='area', ui_item_reference=2)
+        assert len(self.db.get_ui_item_config(ui_item_name='area')) == 0
+        self.db.delete_ui_item_config(ui_item_name='room', ui_key='icon')
+        ui_item_list = self.db.get_ui_item_config(ui_item_name='room')
+        assert len(ui_item_list) == 1
+        assert ui_item_list[0].key == 'pr1'
 
 
 class SystemConfigTestCase(GenericTestCase):
