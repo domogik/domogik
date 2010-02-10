@@ -1104,18 +1104,20 @@ class DbHelper():
         @param d_room_id : room id
         @param d_description : Extended item description (100 char max)
         @param d_reference : device reference (ex. AM12 for x10)
-        @param d_is_resetable : Can the item be reseted to some initial state (optional, default=False)
+        @param d_is_resetable : Can the item be reseted to some initial state, optional, default=False. If None value is passed then it is automatically set to False.
         @param d_initial_value : What's the initial value of the item, should be
             the state when the item is created (except for sensors, music) (optional, default=None)
-        @param d_is_value_changeable_by_user : Can a user change item state (ex : false for sensor)
-            (optional, default=False)
+        @param d_is_value_changeable_by_user : Can a user change item state (ex : false for sensor), optional, default=False. If None value is passed then it is automatically set to False.
         @param d_unit_of_stored_values : What is the unit of item values,
                 must be one of 'Volt', 'Celsius', 'Fahrenheit', 'Percent', 'Boolean' (optional, default=None)
         @return the new Device object
         """
         if d_unit_of_stored_values not in UNIT_OF_STORED_VALUE_LIST:
             raise ValueError, "d_unit_of_stored_values must be one of %s" % UNIT_OF_STORED_VALUE_LIST
-
+        if d_is_resetable == None:
+            d_is_resetable = False
+        if d_is_value_changeable_by_user == None:
+            d_is_value_changeable_by_user = False
         device = Device(name=d_name, address=d_address, description=d_description,
                         reference=d_reference, type_id=d_type_id,
                         usage_id=d_usage_id, room_id=d_room_id,

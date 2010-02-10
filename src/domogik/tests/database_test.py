@@ -786,6 +786,15 @@ class DeviceTestCase(GenericTestCase):
                     d_unit_of_stored_values = u'Percent')
         print device1
         assert len(self.db.list_devices()) == 1, "Device was NOT added"
+        device2 = self.db.add_device(d_name='device2', d_address = 'A2',
+                    d_type_id = dty1.id, d_usage_id = du1.id,
+                    d_room_id = room1.id, d_description = 'desc1',
+                    d_is_resetable = None, d_initial_value = 30,
+                    d_is_value_changeable_by_user = None,
+                    d_unit_of_stored_values = u'Percent')
+        assert len(self.db.list_devices()) == 2
+        assert not device2.is_resetable
+        assert not device2.is_value_changeable_by_user
         # TODO see if these methods are still used
         # assert device1.is_lamp(), "device1.is_lamp() returns False.
         # Should have returned True"
