@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>  
 <statistic technology="x10">
     <listener>
-        <schema>x10.basic</x10>
+        <schema>x10.basic</schema>
         <xpltype>xpl-trig</xpltype>
         <filter/>
     </listener>

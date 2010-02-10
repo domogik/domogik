@@ -198,8 +198,8 @@ class generalConfig(genericPluginConfig):
 #                r"^[1-9][0-9]+", [3866]),
 #        ('source', 'What is the xPL name you want control scripts use ?',
 #                None, ['xpl-dmg.domogik']),
-        ('cfg_path', 'What is the main config directory ?',
-            None, ['/etc/domogik/']),
+#        ('cfg_path', 'What is the main config directory ?',
+#            None, ['/etc/domogik/']),
         ('log_dir_path', 'What is the path of the log directory ?\n'
                 'The directory must exist with good permissions.',
                 None, ['/tmp/']),
@@ -250,6 +250,19 @@ class pythonPathes(genericPluginConfig):
         result = {"path":"%s" % sys.path}
         config.write(file, result, section)
 
+class customPrefix(genericPluginConfig):
+    """ This class let the ability for the user to define a custom prefix 
+    """
+    def __init__(self):
+        section = "domogik"
+        file = "%s/.domogik.cfg" % os.getenv("HOME")
+        self.informations = [
+                ('custom_prefix', 'If you have installed domogik with a custom prefix (using --prefix), \
+                you *must* specify this prefix now, otherwise keep default value.',
+                None, [sys.prefix])
+                ]
+        self.askandwrite(file, section)
+        
 
 def usage():
     print """
@@ -263,7 +276,9 @@ def main():
         if choice == "--help":
             usage()
     generalConfig()
-    pythonPathes()
+    #deprecated
+#    pythonPathes()
+    customPrefix()
 
     db = raw_input('Do you want to configure the database settings ?\n'
     'This is only needed if you are on the host which will host database. [y/N]')

@@ -36,6 +36,14 @@ Implements
 """
 
 
+from datetime import datetime 
+from xml.dom import minidom
+import glob
+
+from domogik.xpl.lib.module import xPLModule
+from domogik.common.database import DbHelper
+from domogik.common.configloader import Loader
+from domogik.xpl.lib.xplconnector import *
 
 class StatsManager(xPLModule):
     """
@@ -83,7 +91,7 @@ class StatsManager(xPLModule):
             res["technology"] = doc.documentElement.attributes.get("technology").value
             res.update(self.parse_listener(doc.documentElement.getElementsByTagName("listener")[0]))
             res.update(self.parse_mapping(doc.documentElement.getElementsByTagName("mapping")[0]))
-            stat = self.__Stat(self._myxpl, res, self._db)
+            stat = self.__Stat(self._myxpl, res, self._db, self._log)
             stats[file] = stat
 
     def parse_listener(self,node):
@@ -119,33 +127,44 @@ class StatsManager(xPLModule):
         Each instance create a Listener and the associated callbacks
         """
 
-        def __init__(self, xpl, res, db):
+        def __init__(self, xpl, res, db, log):
             """ Initialize a stat instance 
             @param xpl : A xpl manager instance
             @param res : The result of xml parsing
+            @param db : a DbHelper instance 
+            @param log : the module logger (from self.get_my_logger())
             """
             self._res = res
             self._db = db
             params = {'schema':res["schema"], 'xpltype':res["xpltype"]}
             params.update(res["filter"])
             self._listener = Listener(self._callback, xpl, params)
+            self._log = log
 
         def _callback(self, message):
             """ Callback for the xpl message
             @param message : the Xpl message received 
             """
-            dbhelper = DbHelper()
-            techno_id = self._db.get_device_technology_by_name(self._res["technology"]).id
-            d_id = self._db.search_devices(technology = techno_id, name =
-                    message.data[self._res['device']])[0].id
-            datas = {}
-            for key in self._res["values"].keys():
-                if message.data.has_key(key):
-                    if self._res["values"][key] == None:
-                        datas[key] = message.data[key]
-                    else:
-                        datas[self._res["values"][key]] = message.data[key]
-            self._db.add_device_stat(d_id, datetime.today(), datas)
+            self._log.debug("message catcher : %s" % message)
+            d_id = self._db.get_device_by_technology_and_address(self._res["technology"], \
+                    message.data[self._res["device"])
+            if d_id == None:
+                self._log.warning("Received a stat for an unreferenced device : %s - %s" \
+                        % (self._res["technology"], message.data[self._res["device"]))
+                return
+            else:
+                self._log.debug("Stat received for %s - %s." \
+                        % (self._res["technology"], message.data[self._res["device"]))
+                datas = {}
+                for key in self._res["values"].keys():
+                    if message.data.has_key(key):
+                        #Check if a name has been chosen for this value entry
+                        if self._res["values"][key] == None:
+                            #If not, keep the one from message
+                            datas[key] = message.data[key]
+                        else:
+                            datas[self._res["values"][key]] = message.data[key]
+                self._db.add_device_stat(d_id, datetime.today(), datas)
 
 if __name__ == "__main__":
     s = StatsManager()
