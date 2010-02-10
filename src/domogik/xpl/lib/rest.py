@@ -192,10 +192,8 @@ class ProcessRequest():
         self.jsonp_cb = ""
 
         # url processing
-        print "====DEBUGPATH======"
         self.path = str(urllib.unquote(self.path))
         self.path = unicode(self.path, "utf-8")
-        print "===================="
 
         tab_url = self.path.split("?")
         self.path = tab_url[0]
@@ -898,7 +896,34 @@ target=*
 
         ### device #####################################
         elif self.rest_request[0] == "device":
-            print "TODO !!"
+            ### list
+            if self.rest_request[1] == "list":
+                if len(self.rest_request) == 2:
+                    self._rest_base_device_list()
+                else:
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
+
+            ### add
+            elif self.rest_request[1] == "add":
+                offset = 2
+                if self.set_parameters(offset):
+                    self._rest_base_device_add(self.parameters)
+                else:
+                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
+
+            ### update
+            elif self.rest_request[1] == "update":
+                offset = 2
+                if self.set_parameters(offset):
+                    self._rest_base_device_update(self.parameters)
+                else:
+                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
+
+            ### others
+            else:
+                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], self.jsonp, self.jsonp_cb)
+                return
+
 
         ### others ###################################
         else:
@@ -1565,6 +1590,50 @@ target=*
 
 
 
+######
+# /base/device processing
+######
+
+    def _rest_base_device_list(self):
+        """ list devices
+        """
+        json = JSonHelper("OK")
+        json.set_jsonp(self.jsonp, self.jsonp_cb)
+        json.set_data_type("device")
+        for device in self._db.list_devices():
+            json.add_data(device)
+        self.send_http_response_ok(json.get())
+
+
+
+    def _rest_base_device_add(self, params):
+        """ add devices
+        """
+        json = JSonHelper("OK")
+        json.set_jsonp(self.jsonp, self.jsonp_cb)
+        json.set_data_type("device")
+        try:
+            device = self._db.add_device(self.get_parameters("name"), \
+                                         self.get_parameters("address"), \
+                                         self.get_parameters("type_id"), \
+                                         self.get_parameters("usage_id"), \
+                                         self.get_parameters("room_id"), \
+                                         self.get_parameters("description"), \
+                                         self.get_parameters("reference"), \
+                                         self.get_parameters("is_resetable"), \
+                                         self.get_parameters("initial_value"), \
+                                         self.get_parameters("is_value_changeable_by_user"), \
+                                         self.get_parameters("unit_of_stored_values"))
+            json.add_data(device)
+        except:
+            json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+        self.send_http_response_ok(json.get())
+
+
+
+
+
+
 
 
 
@@ -1636,20 +1705,20 @@ class JSonHelper():
         #print str(data)
         #print "============"
         for key in data.__dict__:
-            #print data.__dict__[key]
+            #print "#> "+ str(key) + " (" + str( type(data.__dict__[key]).__name__) + ")  : " + str(data.__dict__[key])
             type_data = type(data.__dict__[key]).__name__
-            if type_data == "int" or type_data == "float":
-                data_out += '"' + key + '" : ' + str(data.__dict__[key]) + ','
+            if type_data == "int" or type_data == "float" or type_data == "bool" or type_data == "NoneType":
+                data_out += '"' + key + '" : ' + str(data.__dict__[key]) + ', '
             elif type_data == "unicode":
-                data_out += '"' + key + '" : "' + data.__dict__[key] + '",'
+                data_out += '"' + key + '" : "' + data.__dict__[key] + '", '
             elif type_data == "Area" or type_data == "Room":
                 data_out += '"' + key + '" : {'
                 for key_dmg in data.__dict__[key].__dict__:
                     type_data_dmg = type(data.__dict__[key].__dict__[key_dmg]).__name__
                     if type_data_dmg == "int" or type_data_dmg == "float":
-                        data_out += '"' + key_dmg + '" : ' + str(data.__dict__[key].__dict__[key_dmg]) + ','
+                        data_out += '"' + key_dmg + '" : ' + str(data.__dict__[key].__dict__[key_dmg]) + ', '
                     elif type_data_dmg == "unicode":
-                        data_out += '"' + key_dmg + '" : "' + data.__dict__[key].__dict__[key_dmg] + '",'
+                        data_out += '"' + key_dmg + '" : "' + data.__dict__[key].__dict__[key_dmg] + '", '
                 data_out = data_out[0:len(data_out)-1] + '},'
         self._data_values += data_out[0:len(data_out)-1] + '},'
             
