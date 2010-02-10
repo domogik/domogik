@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-                                                                           
+# -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -35,12 +35,11 @@ Implements
 @organization: Domogik
 """
 
-from domogik.xpl.lib.xplconnector import *
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.lib.module import *
-from domogik.xpl.lib.calleridmodem import *
-from domogik.common import configloader
-from domogik.xpl.lib.queryconfig import *
+from domogik.xpl.lib.module import xPLModule
+from domogik.xpl.lib.module import xPLResult
+from domogik.xpl.lib.calleridmodem import CallerIdModem
+from domogik.xpl.lib.queryconfig import Query
 
 
 class CallerIdModemManager(xPLModule):
@@ -67,10 +66,15 @@ class CallerIdModemManager(xPLModule):
         self._config.query('calleridmodem', 'nbmaxtry', res)
         nbmaxtry = res.get_value()['nbmaxtry']
         # Call Library
-        self._mycalleridmodem  = CallerIdModem(device, nbmaxtry, interval, self._broadcastframe)
+        self._mycalleridmodem  = CallerIdModem(device, nbmaxtry, \
+                                               interval, \
+                                               self._broadcastframe)
         self._mycalleridmodem.start()
 
     def _broadcastframe(self, data):
+        """ Send data on xPL network
+            @param data : data to send : phone number
+        """
         my_temp_message = XplMessage()
         my_temp_message.set_type("xpl-trig")
         my_temp_message.set_schema("cid.basic")
