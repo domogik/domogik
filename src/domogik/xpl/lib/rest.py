@@ -27,15 +27,8 @@ REST support for Domogik project
 Implements
 ==========
 
-- RestHandler.do_GET
-- RestHandler.do_POST
-- RestHandler.do_OPTIONS
-- RestHandler.rest_command
-- RestHandler.rest_xpl_cmnd
-- RestHandler.send_http_response_ok
-- RestHandler.send_http_response_error
+TODO when finished ;)
 
-- XmlRpcDbHelper
 
 
 @author: Friz <fritz.smh@gmail.com>
@@ -60,8 +53,18 @@ import urllib
 
 ################################################################################
 class Rest(xPLModule):
+    """ REST Server 
+        - create a HTTP server 
+        - process REST requests
+    """
+        
 
     def __init__(self, ip, port):
+        """ Initiate DbHelper, Logs and config
+            Then, start HTTP server and give it initialized data
+            @param ip :  ip of HTTP server
+            @param port :  port of HTTP server
+        """
         xPLModule.__init__(self, name = 'rest')
 
         # logging initialization
@@ -85,8 +88,8 @@ class Rest(xPLModule):
         server.serve_forever()
 
 
-    def get_helper(self):
-        return self._db
+    #def get_helper(self):
+    #    return self._db
 
 
 ################################################################################
@@ -94,7 +97,8 @@ class HTTPServerWithParam(HTTPServer):
     """ Extends HTTPServer to allow send params to the Handler.
     """
 
-    def __init__(self, server_address, RequestHandlerClass, bind_and_activate=True, handler_params = []):
+    def __init__(self, server_address, RequestHandlerClass, \
+                 bind_and_activate=True, handler_params = []):
         HTTPServer.__init__(self, server_address, RequestHandlerClass, bind_and_activate)
         self.handler_params = handler_params
 
@@ -105,6 +109,9 @@ class HTTPServerWithParam(HTTPServer):
 
 ################################################################################
 class RestHandler(BaseHTTPRequestHandler):
+    """ Class/object called for each request to HTTP server
+        Here we will process use GET/POST/OPTION HTTP methods and then create a REST request
+    """
 
 
 ######
@@ -113,24 +120,30 @@ class RestHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         """ Process GET requests
+            Call directly .do_FOR_ALL_METHODS()
         """
         print "==== GET ============================================"
         self.do_FOR_ALL_METHODS()
 
     def do_POST(self):
         """ Process POST requests
+            Call directly .do_FOR_ALL_METHODS()
         """
         print "==== POST ==========================================="
         self.do_FOR_ALL_METHODS()
 
     def do_OPTIONS(self):
         """ Process OPTIONS requests
+            Call directly .do_FOR_ALL_METHODS()
         """
         print "==== OPTIONS ==========================================="
         self.do_FOR_ALL_METHODS()
 
     def do_FOR_ALL_METHODS(self):
-        request = ProcessRequest(self.server.handler_params, self.path, self.send_http_response_ok, self.send_http_response_error)
+        """ Create an object for each request. This object will process the REST url
+        """
+        request = ProcessRequest(self.server.handler_params, self.path, self.send_http_response_ok, \
+                                 self.send_http_response_error)
         request.do_FOR_ALL_METHODS()
 
 
@@ -141,6 +154,11 @@ class RestHandler(BaseHTTPRequestHandler):
 ######
 
     def send_http_response_ok(self, data = ""):
+        """ Send to browser a HTTP 200 responde
+            200 is the code for "no problem"
+            Send also json data
+            @param data : json data to display
+        """
         self.send_response(200)
         self.send_header('Content-type',  'application/json')
         self.send_header('Expires', '-1')
@@ -152,6 +170,14 @@ class RestHandler(BaseHTTPRequestHandler):
 
 
     def send_http_response_error(self, errCode, errMsg, jsonp, jsonp_cb):
+        """ Send to browser a HTTP 200 responde
+            200 is the code for "no problem" but we send error status in json data, so we use 200 code
+            Send also json data
+            @param errCode : error code. 999 : generic error (or error not referenced)
+            @param errMsg : error description
+            @param jsonp : True/False. True : use jsonp format instead of json
+            @param jsonp_cb : if jsonp is True, name of callback to use in jsonp format
+        """
         self.send_response(200)
         self.send_header('Content-type',    'text/html')
         self.end_headers()
@@ -174,6 +200,10 @@ class ProcessRequest():
     def __init__(self, handler_params, path, cb_send_http_response_ok, cb_send_http_response_error):
         """ Create shorter access : self.server.handler_params[0].* => self.*
             First processing on url given
+            @param handler_params : parameters given to HTTPHandler
+            @param path : path given to HTTP server : /base/area/... for example
+            @param cb_send_http_response_ok : callback for REST.send_http_response_ok function
+            @param cb_send_http_response_error : callback for REST.send_http_response_error function
         """
 
         self.handler_params = handler_params
@@ -224,6 +254,9 @@ class ProcessRequest():
 
 
     def do_FOR_ALL_METHODS(self):
+        """ Process request
+            This function call appropriate functions for processing path
+        """
         if self.rest_type == "command":
             self.rest_command()
         elif self.rest_type == "xpl-cmnd":
@@ -233,14 +266,14 @@ class ProcessRequest():
         elif self.rest_type == "module":
             self.rest_module()
         else:
-            self.send_http_response_error(999, "Type [" + str(self.rest_type) + "] is not supported", self.jsonp, self.jsonp_cb)
+            self.send_http_response_error(999, "Type [" + str(self.rest_type) + "] is not supported", \
+                                          self.jsonp, self.jsonp_cb)
             return
 
 
 
     def _parse_options(self):
-        """Take parameters in count 
-           Or do debug stuff in function of parameters given
+        """ Process parameters : ...?param1=val1&param2=val2&....
         """
 
         # for each debug option
@@ -279,6 +312,11 @@ class ProcessRequest():
 ######
 
     def rest_command(self):
+        """ Process /command url
+            - decode request
+            - call a xml parser for the technology (self.rest_request[0])
+           - send appropriate xPL message on network
+        """
         print "Call rest_command"
 
         # parse data in URL
@@ -323,6 +361,15 @@ class ProcessRequest():
 
 
     def _parse_xml(self, xml_file, techno, address, order, others):
+        """ xml parser for a technology file
+            Generation of a xPL message by processing REST request and XML file
+            @param xml_file : xml file defining how to construct message
+            @param techno : technology (x10, etc)
+            @param address : address of device
+            @param order : order to send
+            @param others : other parameters
+            @return None if a problem occurs or a xPL message if everything is allright
+        """
         try:
             xml_doc = minidom.parse(xml_file)
         except:
@@ -333,7 +380,8 @@ class ProcessRequest():
 
         mapping = xml_doc.documentElement
         if mapping.getElementsByTagName("technology")[0].attributes.get("name").value != techno:
-            self.send_http_response_error(999, "'technology' attribute must be the same as file name !", self.jsonp, self.jsonp_cb)
+            self.send_http_response_error(999, "'technology' attribute must be the same as file name !", \
+                                          self.jsonp, self.jsonp_cb)
             return
         
         #Schema
@@ -374,21 +422,31 @@ class ProcessRequest():
                 mandatory_parameters_value[key] = value
             #optional parameters
             if the_order.getElementsByTagName("parameters")[0].getElementsByTagName("optional") != []:
-                optional_parameters =  the_order.getElementsByTagName("parameters")[0].getElementsByTagName("optional")[0]
+                optional_parameters =  the_order.getElementsByTagName( \
+                                                   "parameters")[0].getElementsByTagName("optional")[0]
                 for opt_param in optional_parameters.getElementsByTagName("parameter"):
                     ind = others.index(opt_param.getElementsByTagName("name")[0])
                     optional_parameters_value[url[ind]] = url[ind + 1]
 
-        return self._forge_msg(schema, device_address_key, address, order_key, order_value, mandatory_parameters_value, optional_parameters_value)
+        return self._forge_msg(schema, device_address_key, address, order_key, order_value, \
+                               mandatory_parameters_value, optional_parameters_value)
 
 
 
 
 
-
-
-
-    def _forge_msg(self, schema, device_address_key, address, order_key, order_value, mandatory_parameters_value, optional_parameters_value):
+    def _forge_msg(self, schema, device_address_key, address, order_key, order_value, \
+                   mandatory_parameters_value, optional_parameters_value):
+        """ forge xpl message
+            @param schema : xpl schema
+            @param device_address_key : key for address in xpl message
+            @param address : value for address in xpl message
+            @param order_key : key for order in xpl message
+            @param order_value : value for order in xpl message
+            @param mandatory_parameters_value : mandatory params
+            @param optional_parameters_value : optionnal params
+            @return xPL message
+        """
         msg = """xpl-cmnd
 {
 hop=1
@@ -421,8 +479,8 @@ target=*
 
     def rest_xpl_cmnd(self):
         """ Send xPL message given in REST url
-            1/ Decode and check URL
-            2/ Send message
+            - Decode and check URL
+            - Send message
         """
 
         print "Call rest_xpl_cmnd"
@@ -476,12 +534,15 @@ target=*
 ######
 
     def rest_base(self):
-        """ get data in database
-            1/ Decode and check URL
-            2/ call the good fonction to get data
+        """ Get data in database
+            - Decode and check URL format
+            - call the good fonction to get data from database
         """
         print "Call rest_base_get"
+        # parameters initialisation
         self.parameters = {}
+
+        # Check url length
         if len(self.rest_request) < 2:
             self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
             return
@@ -494,39 +555,45 @@ target=*
                 if len(self.rest_request) == 2:
                     self._rest_base_area_list()
                 elif len(self.rest_request) == 3:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
                 else:
                     if self.rest_request[2] == "by-id":
                         self._rest_base_area_list(id=self.rest_request[3])
                     else:
-                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
+                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
 
             ### add
             elif self.rest_request[1] == "add":
                 offset = 2
                 if self.set_parameters(offset):
-                    self._rest_base_area_add(self.parameters)
+                    self._rest_base_area_add()
                 else:
-                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Error in parameters", \
+                                                  self.jsonp, self.jsonp_cb)
 
             ### update
             elif self.rest_request[1] == "update":
                 offset = 2
                 if self.set_parameters(offset):
-                    self._rest_base_area_update(self.parameters)
+                    self._rest_base_area_update()
                 else:
-                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Error in parameters", \
+                                                  self.jsonp, self.jsonp_cb)
 
             ### del
             elif self.rest_request[1] == "del":
                 if len(self.rest_request) == 3:
                     self._rest_base_area_del(id=self.rest_request[2])
                 else:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
 
             ### others
             else:
-                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], self.jsonp, self.jsonp_cb)
+                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], \
+                                                  self.jsonp, self.jsonp_cb)
                 return
 
         ### room #####################################
@@ -537,41 +604,47 @@ target=*
                 if len(self.rest_request) == 2:
                     self._rest_base_room_list()
                 elif len(self.rest_request) == 3:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
                 else:
                     if self.rest_request[2] == "by-id":
                         self._rest_base_room_list(id=self.rest_request[3])
                     elif self.rest_request[2] == "by-area":
                         self._rest_base_room_list(area_id=self.rest_request[3])
                     else:
-                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
+                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
 
             ### add
             elif self.rest_request[1] == "add":
                 offset = 2
                 if self.set_parameters(offset):
-                    self._rest_base_room_add(self.parameters)
+                    self._rest_base_room_add()
                 else:
-                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Error in parameters", \
+                                                  self.jsonp, self.jsonp_cb)
 
             ### update
             elif self.rest_request[1] == "update":
                 offset = 2
                 if self.set_parameters(offset):
-                    self._rest_base_room_update(self.parameters)
+                    self._rest_base_room_update()
                 else:
-                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Error in parameters", \
+                                                  self.jsonp, self.jsonp_cb)
 
             ### del
             elif self.rest_request[1] == "del":
                 if len(self.rest_request) == 3:
                     self._rest_base_room_del(id=self.rest_request[2])
                 else:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
 
             ### others
             else:
-                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], self.jsonp, self.jsonp_cb)
+                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], \
+                                                  self.jsonp, self.jsonp_cb)
                 return
 
         ### ui_config ################################
@@ -582,27 +655,31 @@ target=*
                 if len(self.rest_request) == 2:
                     self._rest_base_ui_item_config_list()
                 elif len(self.rest_request) >= 3 and len(self.rest_request) <=4:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
                 elif len(self.rest_request) == 5:
                     if self.rest_request[2] == "by-key":
                         self._rest_base_ui_item_config_list(name = self.rest_request[3], key = self.rest_request[4])
                     elif self.rest_request[2] == "by-reference":
                         self._rest_base_ui_item_config_list(name = self.rest_request[3], reference = self.rest_request[4])
                     else:
-                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
+                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
                 elif len(self.rest_request) == 6:
                     if self.rest_request[2] == "by-element":
                         self._rest_base_ui_item_config_list(name = self.rest_request[3], reference = self.rest_request[4], key = self.rest_request[5])
                     else:
-                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
+                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
                 else:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
 
             ### add
             elif self.rest_request[1] == "add":
                 offset = 2
                 if self.set_parameters(offset):
-                    self._rest_base_ui_item_config_add(self.parameters)
+                    self._rest_base_ui_item_config_add()
                 else:
                     self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
@@ -610,7 +687,7 @@ target=*
             elif self.rest_request[1] == "update":
                 offset = 2
                 if self.set_parameters(offset):
-                    self._rest_base_ui_item_config_update(self.parameters)
+                    self._rest_base_ui_item_config_update()
                 else:
                     self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
@@ -618,13 +695,14 @@ target=*
             elif self.rest_request[1] == "del":
                 offset = 2
                 if self.set_parameters(offset):
-                    self._rest_base_ui_item_config_del(self.parameters)
+                    self._rest_base_ui_item_config_del()
                 else:
                     self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
             ### others
             else:
-                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], self.jsonp, self.jsonp_cb)
+                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], \
+                                                  self.jsonp, self.jsonp_cb)
                 return
 
 
@@ -636,18 +714,20 @@ target=*
                 if len(self.rest_request) == 2:
                     self._rest_base_device_usage_list()
                 elif len(self.rest_request) == 3:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
                 else:
                     if self.rest_request[2] == "by-name":
                         self._rest_base_device_usage_list(self.rest_request[3])
                     else:
-                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
+                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
 
             ### add
             elif self.rest_request[1] == "add":
                 offset = 2
                 if self.set_parameters(offset):
-                    self._rest_base_device_usage_add(self.parameters)
+                    self._rest_base_device_usage_add()
                 else:
                     self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
@@ -655,7 +735,7 @@ target=*
             elif self.rest_request[1] == "update":
                 offset = 2
                 if self.set_parameters(offset):
-                    self._rest_base_device_usage_update(self.parameters)
+                    self._rest_base_device_usage_update()
                 else:
                     self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
@@ -664,11 +744,13 @@ target=*
                 if len(self.rest_request) == 3:
                     self._rest_base_device_usage_del(id=self.rest_request[2])
                 else:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
 
             ### others
             else:
-                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], self.jsonp, self.jsonp_cb)
+                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], \
+                                                  self.jsonp, self.jsonp_cb)
                 return
 
 
@@ -680,13 +762,14 @@ target=*
                 if len(self.rest_request) == 2:
                     self._rest_base_device_type_list()
                 else:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
 
             ### add
             elif self.rest_request[1] == "add":
                 offset = 2
                 if self.set_parameters(offset):
-                    self._rest_base_area_add(self.parameters)
+                    self._rest_base_area_add()
                 else:
                     self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
@@ -694,7 +777,7 @@ target=*
             elif self.rest_request[1] == "update":
                 offset = 2
                 if self.set_parameters(offset):
-                    self._rest_base_area_update(self.parameters)
+                    self._rest_base_area_update()
                 else:
                     self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
@@ -703,11 +786,13 @@ target=*
                 if len(self.rest_request) == 3:
                     self._rest_base_area_del(id=self.rest_request[2])
                 else:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
 
             ### others
             else:
-                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], self.jsonp, self.jsonp_cb)
+                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], \
+                                                  self.jsonp, self.jsonp_cb)
                 return
 
         ### sensor reference #########################
@@ -718,18 +803,20 @@ target=*
                 if len(self.rest_request) == 2:
                     self._rest_base_sensor_reference_list()
                 elif len(self.rest_request) == 3:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
                 else:
                     if self.rest_request[2] == "by-name":
                         self._rest_base_sensor_reference_list(name=self.rest_request[3])
                     else:
-                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
+                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
 
             ### add
             elif self.rest_request[1] == "add":
                 offset = 2
                 if self.set_parameters(offset):
-                    self._rest_base_sensor_reference_add(self.parameters)
+                    self._rest_base_sensor_reference_add()
                 else:
                     self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
@@ -737,7 +824,7 @@ target=*
             elif self.rest_request[1] == "update":
                 offset = 2
                 if self.set_parameters(offset):
-                    self._rest_base_sensor_reference_update(self.parameters)
+                    self._rest_base_sensor_reference_update()
                 else:
                     self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
@@ -746,11 +833,13 @@ target=*
                 if len(self.rest_request) == 3:
                     self._rest_base_sensor_reference_del(id=self.rest_request[2])
                 else:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
 
             ### others
             else:
-                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], self.jsonp, self.jsonp_cb)
+                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], \
+                                                  self.jsonp, self.jsonp_cb)
                 return
 
 
@@ -762,18 +851,20 @@ target=*
                 if len(self.rest_request) == 2:
                     self._rest_base_actuator_feature_list()
                 elif len(self.rest_request) == 3:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
                 else:
                     if self.rest_request[2] == "by-name":
                         self._rest_base_actuator_feature_list(name=self.rest_request[3])
                     else:
-                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
+                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
 
             ### add
             elif self.rest_request[1] == "add":
                 offset = 2
                 if self.set_parameters(offset):
-                    self._rest_base_actuator_feature_add(self.parameters)
+                    self._rest_base_actuator_feature_add()
                 else:
                     self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
@@ -781,7 +872,7 @@ target=*
             elif self.rest_request[1] == "update":
                 offset = 2
                 if self.set_parameters(offset):
-                    self._rest_base_actuator_feature_update(self.parameters)
+                    self._rest_base_actuator_feature_update()
                 else:
                     self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
@@ -790,11 +881,13 @@ target=*
                 if len(self.rest_request) == 3:
                     self._rest_base_actuator_feature__del(id=self.rest_request[2])
                 else:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
 
             ### others
             else:
-                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], self.jsonp, self.jsonp_cb)
+                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], \
+                                                  self.jsonp, self.jsonp_cb)
                 return
 
 
@@ -806,18 +899,20 @@ target=*
                 if len(self.rest_request) == 2:
                     self._rest_base_device_technology_list()
                 elif len(self.rest_request) == 3:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
                 else:
                     if self.rest_request[2] == "by-name":
                         self._rest_base_device_technology_list(name=self.rest_request[3])
                     else:
-                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
+                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
 
             ### add
             elif self.rest_request[1] == "add":
                 offset = 2
                 if self.set_parameters(offset):
-                    self._rest_base_device_technology_add(self.parameters)
+                    self._rest_base_device_technology_add()
                 else:
                     self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
@@ -825,7 +920,7 @@ target=*
             elif self.rest_request[1] == "update":
                 offset = 2
                 if self.set_parameters(offset):
-                    self._rest_base_device_technology_update(self.parameters)
+                    self._rest_base_device_technology_update()
                 else:
                     self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
@@ -834,11 +929,13 @@ target=*
                 if len(self.rest_request) == 3:
                     self._rest_base_device_technology__del(id=self.rest_request[2])
                 else:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
 
             ### others
             else:
-                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], self.jsonp, self.jsonp_cb)
+                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], \
+                                                  self.jsonp, self.jsonp_cb)
                 return
 
 
@@ -850,7 +947,8 @@ target=*
                 if len(self.rest_request) == 2:
                     self._rest_base_device_technology_config_list()
                 elif len(self.rest_request) == 3 or len(self.rest_request) == 5:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
                 elif len(self.rest_request) == 4:
                     if self.rest_request[2] == "by-technology-id":
                         self._rest_base_device_technology_config_list(technology_id=self.rest_request[3])
@@ -858,15 +956,17 @@ target=*
                     if self.rest_request[2] == "by-technology-id" and self.rest_request[4] == "by-key":
                         self._rest_base_device_technology_config_list(technology_id = self.rest_request[3], key = self.rest_request[5])
                     else:
-                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
+                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
                 else:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
 
             ### add
             elif self.rest_request[1] == "add":
                 offset = 2
                 if self.set_parameters(offset):
-                    self._rest_base_device_technology_config_add(self.parameters)
+                    self._rest_base_device_technology_config_add()
                 else:
                     self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
@@ -874,7 +974,7 @@ target=*
             elif self.rest_request[1] == "update":
                 offset = 2
                 if self.set_parameters(offset):
-                    self._rest_base_device_technology_config_update(self.parameters)
+                    self._rest_base_device_technology_config_update()
                 else:
                     self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
@@ -883,11 +983,13 @@ target=*
                 if len(self.rest_request) == 3:
                     self._rest_base_device_technology_config__del(id=self.rest_request[2])
                 else:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
 
             ### others
             else:
-                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], self.jsonp, self.jsonp_cb)
+                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], \
+                                                  self.jsonp, self.jsonp_cb)
                 return
 
 
@@ -901,13 +1003,14 @@ target=*
                 if len(self.rest_request) == 2:
                     self._rest_base_device_list()
                 else:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
 
             ### add
             elif self.rest_request[1] == "add":
                 offset = 2
                 if self.set_parameters(offset):
-                    self._rest_base_device_add(self.parameters)
+                    self._rest_base_device_add()
                 else:
                     self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
@@ -915,13 +1018,14 @@ target=*
             elif self.rest_request[1] == "update":
                 offset = 2
                 if self.set_parameters(offset):
-                    self._rest_base_device_update(self.parameters)
+                    self._rest_base_device_update()
                 else:
                     self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
             ### others
             else:
-                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], self.jsonp, self.jsonp_cb)
+                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], \
+                                                  self.jsonp, self.jsonp_cb)
                 return
 
 
@@ -932,10 +1036,11 @@ target=*
 
 
 
-
-
-
     def set_parameters(self, offset):
+        """ define parameters as key => value
+            @param offset : number of item to pass before getting key/values in REST request
+            @return value if OK. False if no parameters or missing value
+        """
         ii = 0
         while offset + ii < len(self.rest_request):
             key = self.rest_request[offset + ii]
@@ -955,18 +1060,15 @@ target=*
 
 
 
-
-
-
-
     def get_parameters(self, name):
+        """ Getter for parameters. If parameter doesn't exist, return None
+            @param name : name of parameter to get
+            @return parameter value or None if parameter doesn't exist
+        """
         try:
             return self.parameters[name]
         except KeyError:
             return None
-
-
-
 
 
 
@@ -977,6 +1079,7 @@ target=*
 
     def _rest_base_area_list(self, id = None):
         """ list areas
+            @param id : id of area
         """
         json = JSonHelper("OK")
         json.set_jsonp(self.jsonp, self.jsonp_cb)
@@ -992,7 +1095,7 @@ target=*
 
 
 
-    def _rest_base_area_add(self, params):
+    def _rest_base_area_add(self):
         """ add areas
         """
         json = JSonHelper("OK")
@@ -1007,14 +1110,15 @@ target=*
 
 
 
-    def _rest_base_area_update(self, params):
+    def _rest_base_area_update(self):
         """ update areas
         """
         json = JSonHelper("OK")
         json.set_jsonp(self.jsonp, self.jsonp_cb)
         json.set_data_type("area")
         try:
-            area = self._db.update_area(self.get_parameters("id"), self.get_parameters("name"), self.get_parameters("description"))
+            area = self._db.update_area(self.get_parameters("id"), self.get_parameters("name"), \
+                                        self.get_parameters("description"))
             json.add_data(area)
         except:
             json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
@@ -1025,6 +1129,7 @@ target=*
 
     def _rest_base_area_del(self, id=None):
         """ delete areas
+            @param id : id of area
         """
         json = JSonHelper("OK")
         json.set_jsonp(self.jsonp, self.jsonp_cb)
@@ -1044,6 +1149,8 @@ target=*
 
     def _rest_base_room_list(self, id = None, area_id = None):
         """ list rooms
+            @param id : id of room
+            @param area_id : id of area
         """
         json = JSonHelper("OK")
         json.set_jsonp(self.jsonp, self.jsonp_cb)
@@ -1064,14 +1171,15 @@ target=*
 
 
 
-    def _rest_base_room_add(self, params):
+    def _rest_base_room_add(self):
         """ add rooms
         """
         json = JSonHelper("OK")
         json.set_jsonp(self.jsonp, self.jsonp_cb)
         json.set_data_type("room")
         try:
-            room = self._db.add_room(self.get_parameters("name"), self.get_parameters("area_id"), self.get_parameters("description"))
+            room = self._db.add_room(self.get_parameters("name"), self.get_parameters("area_id"), \
+                                     self.get_parameters("description"))
             json.add_data(room)
         except:
             json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
@@ -1079,14 +1187,15 @@ target=*
 
 
 
-    def _rest_base_room_update(self, params):
+    def _rest_base_room_update(self):
         """ update rooms
         """
         json = JSonHelper("OK")
         json.set_jsonp(self.jsonp, self.jsonp_cb)
         json.set_data_type("room")
         try:
-            room = self._db.update_room(self.get_parameters("id"), self.get_parameters("name"), self.get_parameters("area_id"), self.get_parameters("description"))
+            room = self._db.update_room(self.get_parameters("id"), self.get_parameters("name"), \
+                                        self.get_parameters("area_id"), self.get_parameters("description"))
             json.add_data(room)
         except:
             json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
@@ -1096,6 +1205,7 @@ target=*
 
     def _rest_base_room_del(self, id=None):
         """ delete rooms
+            @param id : room id
         """
         json = JSonHelper("OK")
         json.set_jsonp(self.jsonp, self.jsonp_cb)
@@ -1114,6 +1224,9 @@ target=*
 
     def _rest_base_ui_item_config_list(self, name = None, reference = None, key = None):
         """ list ui_item_config
+            @param name : ui item config name
+            @param reference : ui item config reference
+            @param key : ui item config key
         """
         json = JSonHelper("OK")
         json.set_jsonp(self.jsonp, self.jsonp_cb)
@@ -1132,35 +1245,41 @@ target=*
                     json.add_data(ui_item_config)
         elif name != None and key != None and reference != None:
             # by-element
-            ui_item_config = self._db.get_ui_item_config(self, ui_item_name = name, ui_item_reference = reference, ui_key = key)
+            ui_item_config = self._db.get_ui_item_config(self, ui_item_name = name, \
+                                                         ui_item_reference = reference, ui_key = key)
             if ui_item_config is not None:
                 json.add_data(ui_item_config)
         self.send_http_response_ok(json.get())
 
 
 
-    def _rest_base_ui_item_config_add(self, params):
+    def _rest_base_ui_item_config_add(self):
         """ add ui_item_config
         """
         json = JSonHelper("OK")
         json.set_jsonp(self.jsonp, self.jsonp_cb)
         json.set_data_type("ui_config")
         try:
-            ui_item_config = self._db.add_ui_item_config(self.get_parameters("name"), self.get_parameters("reference"), {self.get_parameters("key") : self.get_parameters("value")})
+            ui_item_config = self._db.add_ui_item_config(self.get_parameters("name"), \
+                                                         self.get_parameters("reference"), \
+                                                         {self.get_parameters("key") : self.get_parameters("value")})
             json.add_data(ui_item_config)
         except:
             json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
         self.send_http_response_ok(json.get())
 
 
-    def _rest_base_ui_item_config_update(self, params):
+    def _rest_base_ui_item_config_update(self):
         """ update ui_item_config
         """
         json = JSonHelper("OK")
         json.set_jsonp(self.jsonp, self.jsonp_cb)
         json.set_data_type("ui_config")
         try:
-            ui_item_config = self._db.update_ui_item_config(self.get_parameters("name"), self.get_parameters("reference"), self.get_parameters("key"), self.get_parameters("value"))
+            ui_item_config = self._db.update_ui_item_config(self.get_parameters("name"), \
+                                                         self.get_parameters("reference"), \
+                                                         self.get_parameters("key"), \
+                                                         self.get_parameters("value"))
             json.add_data(ui_item_config)
         except:
             json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
@@ -1168,14 +1287,15 @@ target=*
 
 
 
-    def _rest_base_ui_item_config_del(self, params):
+    def _rest_base_ui_item_config_del(self):
         """ del ui_item_config
         """
         json = JSonHelper("OK")
         json.set_jsonp(self.jsonp, self.jsonp_cb)
         json.set_data_type("ui_config")
         try:
-            for ui_item_config in self._db.delete_ui_item_config(ui_item_name = name, ui_item_reference = reference, ui_key = key):
+            for ui_item_config in self._db.delete_ui_item_config(ui_item_name = name, \
+                                                         ui_item_reference = reference, ui_key = key):
                 json.add_data(ui_item_config)
         except:
             json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
@@ -1190,6 +1310,7 @@ target=*
 
     def _rest_base_device_usage_list(self, name = None):
         """ list device usages
+            @param name : name of device usage
         """
         json = JSonHelper("OK")
         json.set_jsonp(self.jsonp, self.jsonp_cb)
@@ -1205,14 +1326,15 @@ target=*
 
 
 
-    def _rest_base_device_usage_add(self, params):
+    def _rest_base_device_usage_add(self):
         """ add device_usage
         """
         json = JSonHelper("OK")
         json.set_jsonp(self.jsonp, self.jsonp_cb)
         json.set_data_type("device_usage")
         try:
-            device_usage = self._db.add_device_usage(self.get_parameters("name"), self.get_parameters("description"))
+            device_usage = self._db.add_device_usage(self.get_parameters("name"), \
+                                                     self.get_parameters("description"))
             json.add_data(device_usage)
         except:
             json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
@@ -1220,14 +1342,16 @@ target=*
 
 
 
-    def _rest_base_device_usage_update(self, params):
+    def _rest_base_device_usage_update(self):
         """ update device usage
         """
         json = JSonHelper("OK")
         json.set_jsonp(self.jsonp, self.jsonp_cb)
         json.set_data_type("device_usage")
         try:
-            device_usage = self._db.update_device_usage(self.get_parameters("id"), self.get_parameters("name"), self.get_parameters("description"))
+            device_usage = self._db.update_device_usage(self.get_parameters("id"), \
+                                                        self.get_parameters("name"), \
+                                                        self.get_parameters("description"))
             json.add_data(device_usage)
         except:
             json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
@@ -1238,6 +1362,7 @@ target=*
 
     def _rest_base_device_usage_del(self, id=None):
         """ delete device usage
+            @param id : device usage id
         """
         json = JSonHelper("OK")
         json.set_jsonp(self.jsonp, self.jsonp_cb)
@@ -1266,14 +1391,16 @@ target=*
         self.send_http_response_ok(json.get())
 
 
-    def _rest_base_device_type_add(self, params):
+    def _rest_base_device_type_add(self):
         """ add device type
         """
         json = JSonHelper("OK")
         json.set_jsonp(self.jsonp, self.jsonp_cb)
         json.set_data_type("device_type")
         try:
-            device_type = self._db.add_device_type(self.get_parameters("name"), self.get_parameters("technology_id"), self.get_parameters("description"))
+            device_type = self._db.add_device_type(self.get_parameters("name"), \
+                                                   self.get_parameters("technology_id"), \
+                                                   self.get_parameters("description"))
             json.add_data(device_type)
         except:
             json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
@@ -1281,14 +1408,17 @@ target=*
 
 
 
-    def _rest_base_device_type_update(self, params):
+    def _rest_base_device_type_update(self):
         """ update device_type
         """
         json = JSonHelper("OK")
         json.set_jsonp(self.jsonp, self.jsonp_cb)
         json.set_data_type("device_type")
         try:
-            area = self._db.update_device_type(self.get_parameters("id"), self.get_parameters("name"), self.get_parameters("technology_id"), self.get_parameters("description"))
+            area = self._db.update_device_type(self.get_parameters("id"), \
+                                               self.get_parameters("name"), \
+                                               self.get_parameters("technology_id"), \
+                                               self.get_parameters("description"))
             json.add_data(area)
         except:
             json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
@@ -1299,6 +1429,7 @@ target=*
 
     def _rest_base_device_type_del(self, id=None):
         """ delete device_type
+            @param : device type id to delete
         """
         json = JSonHelper("OK")
         json.set_jsonp(self.jsonp, self.jsonp_cb)
@@ -1318,6 +1449,7 @@ target=*
 
     def _rest_base_sensor_reference_list(self, name = None):
         """ list sensor references
+            @param name : sensor reference name
         """ 
         json = JSonHelper("OK")
         json.set_jsonp(self.jsonp, self.jsonp_cb)
@@ -1333,15 +1465,17 @@ target=*
 
 
 
-    def _rest_base_sensor_reference_add(self, params):
+    def _rest_base_sensor_reference_add(self):
         """ add sensor reference
         """ 
         json = JSonHelper("OK")
         json.set_jsonp(self.jsonp, self.jsonp_cb)
         json.set_data_type("sensor_reference")
         try:
-            sensor_reference = self._db.add_sensor_reference_data(self.get_parameters("name"), self.get_parameters("value"), \
-                                                                  self.get_parameters("type_id"), self.get_parameters("unit"), \
+            sensor_reference = self._db.add_sensor_reference_data(self.get_parameters("name"), \
+                                                                  self.get_parameters("value"), \
+                                                                  self.get_parameters("type_id"), \
+                                                                  self.get_parameters("unit"), \
                                                                   self.get_parameters("stat_key"))
             json.add_data(sensor_reference)
         except:
@@ -1350,15 +1484,18 @@ target=*
 
 
 
-    def _rest_base_sensor_reference_update(self, params):
+    def _rest_base_sensor_reference_update(self):
         """ update sensor_reference
         """
         json = JSonHelper("OK")
         json.set_jsonp(self.jsonp, self.jsonp_cb)
         json.set_data_type("sensor_reference")
         try:
-            sensor_reference = self._db.update_sensor_reference_data(self.get_parameters("id"), self.get_parameters("name"), self.get_parameters("value"), \
-                                                                  self.get_parameters("type_id"), self.get_parameters("unit"), \
+            sensor_reference = self._db.update_sensor_reference_data(self.get_parameters("id"), \
+                                                                  self.get_parameters("name"), \
+                                                                  self.get_parameters("value"), \
+                                                                  self.get_parameters("type_id"), \
+                                                                  self.get_parameters("unit"), \
                                                                   self.get_parameters("stat_key"))
             json.add_data(sensor_reference)
         except:
@@ -1370,6 +1507,7 @@ target=*
 
     def _rest_base_sensor_reference_del(self, id=None):
         """ delete sensor reference
+            @param id : sensor reference id to delete
         """
         json = JSonHelper("OK")
         json.set_jsonp(self.jsonp, self.jsonp_cb)
@@ -1389,6 +1527,7 @@ target=*
 
     def _rest_base_actuator_feature_list(self, name = None):
         """ list actuator features
+            @param name : actuator feature name
         """
         json = JSonHelper("OK")
         json.set_jsonp(self.jsonp, self.jsonp_cb)
@@ -1404,32 +1543,39 @@ target=*
 
 
 
-    def _rest_base_actuator_feature_add(self, params):
+    def _rest_base_actuator_feature_add(self):
         """ add actuator feature
         """
         json = JSonHelper("OK")
         json.set_jsonp(self.jsonp, self.jsonp_cb)
         json.set_data_type("actuator_feature")
         try:
-            actuator_feature = self._db.add_actuator_feature(self.get_parameters("name"), self.get_parameters("value"), \
-                                                                  self.get_parameters("type_id"), self.get_parameters("unit"), \
-                                                                  self.get_parameters("configurable_states"), self.get_parameters("return_confirmation"))
+            actuator_feature = self._db.add_actuator_feature(self.get_parameters("name"), \
+                                                                  self.get_parameters("value"), \
+                                                                  self.get_parameters("type_id"), \
+                                                                  self.get_parameters("unit"), \
+                                                                  self.get_parameters("configurable_states"), \
+                                                                  self.get_parameters("return_confirmation"))
             json.add_data(actuator_feature)
         except:
             json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
         self.send_http_response_ok(json.get())
 
 
-    def _rest_base_actuator_feature_update(self, params):
+    def _rest_base_actuator_feature_update(self):
         """ update actuator feature
         """
         json = JSonHelper("OK")
         json.set_jsonp(self.jsonp, self.jsonp_cb)
         json.set_data_type("actuator_feature")
         try:
-            actuator_feature = self._db.update_actuator_feature(self.get_parameters("id"), self.get_parameters("name"), self.get_parameters("value"), \
-                                                                  self.get_parameters("type_id"), self.get_parameters("unit"), \
-                                                                  self.get_parameters("configurable_states"), self.get_parameters("return_confirmation"))
+            actuator_feature = self._db.update_actuator_feature(self.get_parameters("id"), \
+                                                                  self.get_parameters("name"), \
+                                                                  self.get_parameters("value"), \
+                                                                  self.get_parameters("type_id"), \
+                                                                  self.get_parameters("unit"), \
+                                                                  self.get_parameters("configurable_states"), \
+                                                                  self.get_parameters("return_confirmation"))
             json.add_data(actuator_feature)
         except:
             json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
@@ -1438,6 +1584,7 @@ target=*
 
     def _rest_base_actuator_feature_del(self, id=None):
         """ delete actuator feature
+            @param id : actuator feature id to delete
         """
         json = JSonHelper("OK")
         json.set_jsonp(self.jsonp, self.jsonp_cb)
@@ -1457,6 +1604,7 @@ target=*
 
     def _rest_base_device_technology_list(self, name = None):
         """ list device technologies
+            @param name : device technology name
         """
         json = JSonHelper("OK")
         json.set_jsonp(self.jsonp, self.jsonp_cb)
@@ -1472,28 +1620,30 @@ target=*
 
 
 
-    def _rest_base_device_technology_add(self, params):
+    def _rest_base_device_technology_add(self):
         """ add device technology
         """
         json = JSonHelper("OK")
         json.set_jsonp(self.jsonp, self.jsonp_cb)
         json.set_data_type("device_technology")
         try:
-            device_technology = self._db.add_device_technology(self.get_parameters("name"), self.get_parameters("description"))
+            device_technology = self._db.add_device_technology(self.get_parameters("name"), \
+                                                                  self.get_parameters("description"))
             json.add_data(device_technology)
         except:
             json.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
         self.send_http_response_ok(json.get())
 
 
-    def _rest_base_device_technology_update(self, params):
+    def _rest_base_device_technology_update(self):
         """ update device technology
         """
         json = JSonHelper("OK")
         json.set_jsonp(self.jsonp, self.jsonp_cb)
         json.set_data_type("device_technology")
         try:
-            device_technology = self._db.update_device_technology(self.get_parameters("id"), self.get_parameters("name"), \
+            device_technology = self._db.update_device_technology(self.get_parameters("id"), \
+                                                                  self.get_parameters("name"), \
                                                                   self.get_parameters("description"))
             json.add_data(device_technology)
         except:
@@ -1503,6 +1653,7 @@ target=*
 
     def _rest_base_device_technology_del(self, id=None):
         """ delete device technology
+            @param id : device tehcnology id
         """
         json = JSonHelper("OK")
         json.set_jsonp(self.jsonp, self.jsonp_cb)
@@ -1517,11 +1668,13 @@ target=*
 
 
 ######
-# /base/device_technology _config processing
+# /base/device_technology_config processing
 ######
 
     def _rest_base_device_technology_config_list(self, technology_id = None, key = None):
         """ list device technology config
+            @param technology_id : device technology config id
+            @param key : key of config
         """
         json = JSonHelper("OK")
         json.set_jsonp(self.jsonp, self.jsonp_cb)
@@ -1540,7 +1693,7 @@ target=*
 
 
 
-    def _rest_base_device_technology_config_add(self, params):
+    def _rest_base_device_technology_config_add(self):
         """ add device technology config
         """
         json = JSonHelper("OK")
@@ -1557,7 +1710,7 @@ target=*
         self.send_http_response_ok(json.get())
 
 
-    def _rest_base_device_technology_config_update(self, params):
+    def _rest_base_device_technology_config_update(self):
         """ update device technology config
         """
         json = JSonHelper("OK")
@@ -1577,6 +1730,7 @@ target=*
 
     def _rest_base_device_technology_config_del(self, id=None):
         """ delete device technology config
+            @param id : device technology config id
         """
         json = JSonHelper("OK")
         json.set_jsonp(self.jsonp, self.jsonp_cb)
@@ -1606,7 +1760,7 @@ target=*
 
 
 
-    def _rest_base_device_add(self, params):
+    def _rest_base_device_add(self):
         """ add devices
         """
         json = JSonHelper("OK")
@@ -1642,6 +1796,8 @@ target=*
 ######
 
     def rest_module(self):
+        """ /module processing
+        """
         print "Call rest_module"
         if len(self.rest_request) < 2:
             self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
@@ -1666,8 +1822,15 @@ target=*
 
 ################################################################################
 class JSonHelper():
+    """ Easy way to create a json or jsonp structure
+    """
 
     def __init__(self, status = "OK", code = 0, description = ""):
+        """ Init json structure
+            @param status : OK/ERROR
+            @param code : 0...999 : error code. If error no referenced, 999
+            @param description : error description
+        """
         if status == "OK":
             self.set_ok()
         else:
@@ -1677,19 +1840,35 @@ class JSonHelper():
         self._nb_data_values = 0
 
     def set_jsonp(self, jsonp, jsonp_cb):
+        """ define jsonp mode
+            @param jsonp : True/False : True : jsonp mode
+            @param jsonp_cb : name of jsonp callback
+        """
         self._jsonp = jsonp
         self._jsonp_cb = jsonp_cb
 
     def set_ok(self):
+        """ set ok status
+        """
         self._status = '"status" : "OK", "code" : 0, "description" : "",'
 
     def set_error(self, code=0, description=None):
+        """ set error status
+            @param code : error code
+            @param description : error description
+        """
         self._status = '"status" : "ERROR", "code" : ' + str(code) + ', "description" : "' + description + '",'
 
     def set_data_type(self, type):
+        """ set data type
+            @param type : data type
+        """
         self._data_type = type
 
     def add_data(self, data):
+        """ add data to json structure in 'type' table
+            @param data : data to add
+        """
         data_out = "{"
         self._nb_data_values += 1
 
@@ -1726,6 +1905,9 @@ class JSonHelper():
         
 
     def get(self):
+        """ getter for all json data created
+            @return json or jsonp data
+        """
         if self._jsonp is True and self._jsonp_cb != "":
             json = "%s (" % self._jsonp_cb
         else:
