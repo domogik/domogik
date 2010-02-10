@@ -147,14 +147,14 @@ class StatsManager(xPLModule):
             """
             self._log.debug("message catcher : %s" % message)
             d_id = self._db.get_device_by_technology_and_address(self._res["technology"], \
-                    message.data[self._res["device"])
+                    message.data[self._res["device"]])
             if d_id == None:
                 self._log.warning("Received a stat for an unreferenced device : %s - %s" \
-                        % (self._res["technology"], message.data[self._res["device"]))
+                        % (self._res["technology"], message.data[self._res["device"]]))
                 return
             else:
                 self._log.debug("Stat received for %s - %s." \
-                        % (self._res["technology"], message.data[self._res["device"]))
+                        % (self._res["technology"], message.data[self._res["device"]]))
                 datas = {}
                 for key in self._res["values"].keys():
                     if message.data.has_key(key):
