@@ -1905,18 +1905,20 @@ class JSonHelper():
         for key in data.__dict__:
             #print "#> "+ str(key) + " (" + str( type(data.__dict__[key]).__name__) + ")  : " + str(data.__dict__[key])
             type_data = type(data.__dict__[key]).__name__
-            if type_data == "int" or type_data == "float" or type_data == "bool" or type_data == "NoneType":
-                data_out += '"' + key + '" : ' + str(data.__dict__[key]) + ', '
+            if type_data == "int" or type_data == "float" or type_data == "bool":
+                data_out += '"' + key + '" : ' + str(data.__dict__[key]) + ','
             elif type_data == "unicode":
-                data_out += '"' + key + '" : "' + data.__dict__[key] + '", '
+                data_out += '"' + key + '" : "' + data.__dict__[key] + '",'
+            elif type_data == "NoneType":
+                data_out += '"' + key + '" : "None",'
             elif type_data == "Area" or type_data == "Room":
                 data_out += '"' + key + '" : {'
                 for key_dmg in data.__dict__[key].__dict__:
                     type_data_dmg = type(data.__dict__[key].__dict__[key_dmg]).__name__
                     if type_data_dmg == "int" or type_data_dmg == "float":
-                        data_out += '"' + key_dmg + '" : ' + str(data.__dict__[key].__dict__[key_dmg]) + ', '
+                        data_out += '"' + key_dmg + '" : ' + str(data.__dict__[key].__dict__[key_dmg]) + ','
                     elif type_data_dmg == "unicode":
-                        data_out += '"' + key_dmg + '" : "' + data.__dict__[key].__dict__[key_dmg] + '", '
+                        data_out += '"' + key_dmg + '" : "' + data.__dict__[key].__dict__[key_dmg] + '",'
                 data_out = data_out[0:len(data_out)-1] + '},'
         self._data_values += data_out[0:len(data_out)-1] + '},'
             
