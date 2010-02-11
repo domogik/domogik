@@ -27,7 +27,7 @@
 }
 
 /* Action message */
-.action-message {
+#messages {
     padding:1em 1em 1em 50px;
     margin:1em 0 1em 0;
     -moz-border-radius: 0.8em;
@@ -38,13 +38,13 @@
     font-style:italic;
 }
 
-.action-message.ok {
+#messages.ok {
     background-color:#99FF66;
     background-image: url(../images/success_32.png);
     border:1px solid #339900;
 }
 
-.action-message.error {
+#messages.error {
     background-color:#FF6666;
     background-image: url(../images/error_32.png);
     border:1px solid #993300;

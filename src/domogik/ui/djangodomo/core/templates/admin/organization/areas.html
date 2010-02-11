@@ -107,7 +107,7 @@
         <div class="section">
             <h1 class="ident"><span class="title">{% trans "Areas" %}</span></h1>
             {% ifnotequal status "" %}
-            <div class='action-message {{status}}'>{{msg}}</div>
+            <div id='messages' class='{{status}}'>{{msg}}</div>
             {% endifnotequal %}
             <ul class="actions"></ul>
         </div>
@@ -119,7 +119,7 @@
             {% spaceless %}
             <ul>
                 {% for area in areas_list %}
-                    <li><a href="#element{{ area.id }}" class="icon16-area-{{ area.config.icon }}">{{ area.name }}</a></li>
+                    <li><a id="tab{{ area.id }}" href="#element{{ area.id }}" class="icon16-area-{{ area.config.icon }}">{{ area.name }}</a></li>
                 {% endfor %}
             </ul>
             {% endspaceless %}
@@ -196,8 +196,12 @@
                                 getREST('/base/ui_config/add/name/area/reference/{{ area.id }}/key/icon/value/' + icon,
                                     function(data) {
                                         var status = (data.status).toLowerCase();
-                                        if (status == 'error') {
-                                            display_message('error', data.description);
+                                        if (status == 'ok') {
+                                            $("#tab{{ area.id }}").removeClass();
+                                            $("#tab{{ area.id }}").addClass("icon16-area-" + icon);
+                                        } else {
+                                            self.cancel();
+                                            display_message('error', data.description);                                          
                                         }
                                     }
                                 )

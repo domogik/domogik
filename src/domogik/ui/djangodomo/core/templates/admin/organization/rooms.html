@@ -116,7 +116,7 @@
         <div class="section">
             <h1 class="ident"><span class="title">{% trans "Rooms" %}</span></h1>
             {% ifnotequal status "" %}
-            <div class='action-message {{status}}'>{{msg}}</div>
+            <div id='messages' class='{{status}}'>{{msg}}</div>
             {% endifnotequal %}
             <ul class="actions"></ul>
         </div>
@@ -209,8 +209,7 @@
                             type: "room",
                             list: room_icons,
                             icon: "{{ room.config.icon }}",
-                            validCallback: function(icon) {
-                                var self = this;
+                            validCallback: function(self, icon) {
                                 getREST('/base/ui_config/add/name/room/reference/{{ room.id }}/key/icon/value/' + icon,
                                     function(data) {
                                         var status = (data.status).toLowerCase();

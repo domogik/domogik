@@ -77,7 +77,7 @@ function checkLength(o, n, min, max) {
                 self.button_submit.addClass('hidden');
                 self.button_cancel.addClass('hidden');
                 self.button_edit.removeClass('hidden');
-                o.validCallback(self.current_icon);
+                o.validCallback(self, self.current_icon);
                 self.element.removeClass("icon64-" + o.type + "-" + self.current_icon);
                 self.element.addClass("icon24-processing");
             });
@@ -100,10 +100,9 @@ function checkLength(o, n, min, max) {
         },
         
         cancel: function() {
-            self.element.removeClass("icon64-" + o.type + "-" + self.current_icon);
-            self.element.addClass("icon24-processing");
-            self.current_icon = self.original_icon;
-            
+            this.element.removeClass("icon24-processing");
+            this.element.addClass("icon64-" + this.options.type + "-" + this.current_icon);
+            this.current_icon = this.original_icon;            
         }
     });
     $.extend($.ui.editable_icon, {
