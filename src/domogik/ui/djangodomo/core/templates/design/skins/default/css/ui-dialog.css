@@ -2,7 +2,7 @@
 /* CSS Document */
 
 .ui-widget-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-.ui-widget-overlay { background: #666666 url(../images/jquery/ui-bg_diagonals-thick_20_666666_40x40.png) 50% 50% repeat; opacity: .50;filter:Alpha(Opacity=50); }
+.ui-widget-overlay { background: #666666 url(../images/jquery/ui-bg_diagonals-thick_20_666666_40x40.png) 50% 50% repeat; opacity: .50; }
 
 .ui-dialog {
 	position: relative; padding: .2em; width: 300px;

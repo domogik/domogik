@@ -22,7 +22,7 @@
 {% load i18n %}
 {% block js_script %}
     $(function(){
-		$(".section .extended").hide();
+		$(".block .extended").hide();
     });
 {% endblock %}
 
@@ -39,8 +39,8 @@
 {% endblock %}
 
 {% block content %}
-    <div class='element-bgnd'>
-        <div class="element icon64-area-grndfloor">
+    <div class='section-bgnd'>
+        <div class="section icon64-area-{{ area.config.icon }}">
             <h1 class="ident"><span class="title">{{ area.name }}</span></h1>
 	    <ul class="actions"></ul>
         </div>
@@ -50,34 +50,34 @@
 		{% if forloop.counter0|divisibleby:"3" %}
             <div class='row'>
         {% endif %}
-    		<div class='column'>
-        		<div class='section'>
-			        <script type="text/javascript">
-                	// <![CDATA[
-                		$(function() {
-                            $("#button_{{ room.id }}").click(function() {
-				$(".section .extended[id!='extended_{{ room.id }}']").hide();
-				$("#extended_{{ room.id }}").toggle();
-			    })
-                        });
-                    // ]]>
-                    </script>
-                    <dt class='header icon64-room-kitchen'>
-                        <a href='{% url show_room_view room.id %}' class="ident">
-                            <span class="title">{{ room.name }}</span>
-                            <br />
-                            <span class="subtitle">{{ room.description }}</span>
-                        </a>
-                        <span class='temp icon32-device-temp'>21 &#176;C</span>
-                    </dt>
-                    <dd class='actions'>
-                        <ul>
-                        </ul>
-                    </dd>
-                    <dd  class='extended' id='extended_{{ room.id }}'></dd>
-                    <dd class='footer'><a id='button_{{ room.id }}' href='#'>&#187;</a></dd>
-                </div>
-            </div>
+				<div class='column'>
+					<div class='block'>
+						<script type="text/javascript">
+						// <![CDATA[
+							$(function() {
+								$("#button_{{ room.id }}").click(function() {
+									$(".section .extended[id!='extended_{{ room.id }}']").hide();
+									$("#extended_{{ room.id }}").toggle();
+								})
+							});
+						// ]]>
+						</script>
+						<dt class='header icon64-room-{{ room.config.icon }}'>
+							<a href='{% url show_room_view room.id %}' class="ident">
+								<span class="title">{{ room.name }}</span>
+								<br />
+								<span class="subtitle">{{ room.description }}</span>
+							</a>
+							<span class='temp icon32-device-temp'>21 &#176;C</span>
+						</dt>
+						<dd class='actions'>
+							<ul>
+							</ul>
+						</dd>
+						<dd  class='extended' id='extended_{{ room.id }}'></dd>
+						<dd class='footer'><a id='button_{{ room.id }}' href='#'>&#187;</a></dd>
+					</div>
+				</div>
 		{% if forloop.counter0|divisibleby:"3" %}
             </div>
 		{% endif %}

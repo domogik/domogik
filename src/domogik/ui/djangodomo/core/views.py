@@ -476,9 +476,9 @@ def device_status(request, room_id=None, device_id=None):
     return HttpResponse(response)
     """
 
-def admin_organisation_devices(request):
+def admin_organization_devices(request):
     """
-    Method called when the admin devices organisation page is accessed
+    Method called when the admin devices organization page is accessed
     @param request : HTTP request
     @return an HttpResponse object
     """
@@ -489,9 +489,9 @@ def admin_organisation_devices(request):
     device_usage_list = __db.list_device_usages()
     devices_list = __db.list_devices()
     device_tech_list = __db.list_device_technologies()
-    page_title = _("Organisation des dispositifs")
+    page_title = _("Devices organization")
     return __go_to_page(
-        request, 'admin/organisation/devices.html',
+        request, 'admin/organization/devices.html',
         page_title,
         device_usage_list=device_usage_list,
         rooms_list=rooms_list,
@@ -499,9 +499,9 @@ def admin_organisation_devices(request):
         device_tech_list=device_tech_list
     )
 
-def admin_organisation_rooms(request):
+def admin_organization_rooms(request):
     """
-    Method called when the admin rooms organisation page is accessed
+    Method called when the admin rooms organization page is accessed
     @param request : HTTP request
     @return an HttpResponse object
     """
@@ -512,28 +512,23 @@ def admin_organisation_rooms(request):
     msg = request.GET.get('msg', '')
 
     resultAllRooms = Rooms.getAll()
-#    unattribued_devices = __db.search_devices({'room_id':None})
-#    devices_list = __db.list_devices()
-#    rooms_list = __db.list_rooms()
-#    areas_list = __db.list_areas()
-#    icons_room = ["default", "kitchen", "bedroom", "livingroom", "tvlounge",
-#                  "bathroom"]
-    page_title = _("Organisation des pieces")
+    resultAllRooms.merge_uiconfig()
+    resultUnattribuedRooms = Rooms.getWithoutArea()
+    resultAllAreas = Areas.getAll()
+    page_title = _("Room organization")
     return __go_to_page(
-        request, 'admin/organisation/rooms.html',
+        request, 'admin/organization/rooms.html',
         page_title,
         status=status,
         msg=msg,
- #       unattribued_devices=unattribued_devices,
-#        devices_list=devices_list,
-        rooms_list=resultAllRooms.room
-#        areas_list=areas_list,
-#        icons_room=icons_room
+        unattribued_rooms=resultUnattribuedRooms.room,
+        rooms_list=resultAllRooms.room,
+        areas_list=resultAllAreas.area
     )
 
-def admin_organisation_areas(request):
+def admin_organization_areas(request):
     """
-    Method called when the admin areas organisation page is accessed
+    Method called when the admin areas organization page is accessed
     @param request : HTTP request
     @return an HttpResponse object
     """
@@ -544,9 +539,10 @@ def admin_organisation_areas(request):
     msg = request.GET.get('msg', '')
 
     resultAllAreas = Areas.getAll()
-    page_title = _("Organisation des zones")
+    resultAllAreas.merge_uiconfig()
+    page_title = _("Area organization")
     return __go_to_page(
-        request, 'admin/organisation/areas.html',
+        request, 'admin/organization/areas.html',
         page_title,
         status=status,
         msg=msg,
@@ -561,7 +557,8 @@ def show_index(request):
     """
     page_title = _("Visualisation Maison")
     resultAllAreas = Areas.getAll()
-
+    resultAllAreas.merge_uiconfig()
+    
     return __go_to_page(
         request, 'show/index.html',
         page_title,
@@ -576,7 +573,9 @@ def show_area(request, area_id):
     @return an HttpResponse object
     """
     resultAreaById = Areas.getById(area_id)
+    resultAreaById.merge_uiconfig()
     resultRoomsByArea = Rooms.getByArea(area_id)
+    resultRoomsByArea.merge_uiconfig()
 
     page_title = _("Visualisation Zone")
     return __go_to_page(

@@ -43,8 +43,6 @@ a.button, .button {
 	border:none;
 }
 
-
-
 h2 a.action {
     color:#1c94c4;
     font-size:0.6em;
@@ -68,26 +66,4 @@ a.buttonsmall {
 .buttonsmall:hover, .buttonsmall:active, .buttonsmall:focus {
         color:#000;
         background-color: #eb8f00;
-}
-
-.buttonleft {
-	border-top: 1px solid #cccccc;
-	border-right: 1px solid #cccccc;
-	border-bottom: 1px solid #cccccc;
-	height:2em;
-	width: 2.5em;
-	-moz-border-radius: 0 1.4em 1.4em 0;
-    -webkit-border-radius: 1.4em;
-	background-color:#f6f6f6;
-	background-position: 50% 50%;
-	background-repeat: no-repeat;
-	outline:none;
-	margin:0;
-	cursor: pointer;
-	border-left:none;
-}
-
-.buttonleft:hover {
-	background-color:#FFFFFF;
-	width: 3.5em;
 }

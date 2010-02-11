@@ -37,13 +37,13 @@ Implements
 from django.db import models
 import dmg_pipes as pipes
 
-
 class Areas(pipes.DmgPipe):
     uri = "http://127.0.0.1:8080/base/area"
 
     @staticmethod
     def getAll():
         resp = Areas.objects.get({'parameters':"list/"})
+ #       icons = Areas.objects.get({'parameters':"ui_config/list/by-key/area/icon"})
         if resp :
             return resp
 
@@ -52,6 +52,13 @@ class Areas(pipes.DmgPipe):
         resp = Areas.objects.get({'parameters':"list/by-id/"+id})
         if resp :
             return resp
+
+    def merge_uiconfig(self):
+        for area in self.area:
+            uiconfigs = UIConfigs.getByReference('area', area.id)
+            area.config = {}
+            for uiconfig in uiconfigs.ui_config:
+                area.config[uiconfig.key] = uiconfig.value
 
 class Rooms(pipes.DmgPipe):
     uri = "http://127.0.0.1:8080/base/room"
@@ -65,5 +72,33 @@ class Rooms(pipes.DmgPipe):
     @staticmethod
     def getByArea(id):
         resp = Rooms.objects.get({'parameters':"list/by-area/"+id})
+        if resp :
+            return resp
+    
+    @staticmethod
+    def getWithoutArea():
+        resp = Rooms.objects.get({'parameters':"list/by-area/null"})
+        if resp :
+            return resp
+
+    def merge_uiconfig(self):
+        for room in self.room:
+            uiconfigs = UIConfigs.getByReference('room', room.id)
+            room.config = {}
+            for uiconfig in uiconfigs.ui_config:
+                room.config[uiconfig.key] = uiconfig.value
+
+class UIConfigs(pipes.DmgPipe):
+    uri = "http://127.0.0.1:8080/base/ui_config"
+    
+    @staticmethod
+    def getByKey(name, key):
+        resp = UIConfigs.objects.get({'parameters':"list/by-key/" + name + "/" + key})
+        if resp :
+            return resp
+    
+    @staticmethod
+    def getByReference(name, reference):
+        resp = UIConfigs.objects.get({'parameters':"list/by-reference/" + name + "/" + str(reference)})
         if resp :
             return resp
