@@ -28,7 +28,7 @@ Implements
 ==========
 
 - Mirror
--   __MirrorHandler
+-   _MirrorHandler
 
 @author: Friz <fritz.smh@gmail.com>
 @copyright: (C) 2007-2009 Domogik project
@@ -49,8 +49,9 @@ class Mirror:
         @param callback : method to call each time all data are collected
         """
         self._stop = threading.Event()
-        self._thread = self.__MirrorHandler(mirror_device, int(nb_max_try), \
-                                            float(interval), callback, self._stop)
+        self._thread = self._MirrorHandler(mirror_device, int(nb_max_try), \
+                                            float(interval), callback, 
+                                            self._stop)
 
     def start(self):
         """ Start the mirror handler thread 
@@ -63,7 +64,7 @@ class Mirror:
         self._stop.set()
 
 
-    class __MirrorHandler(threading.Thread):
+    class _MirrorHandler(threading.Thread):
         """ Internal class 
         Read data mir:ror device
         """
@@ -71,23 +72,27 @@ class Mirror:
         def __init__(self, mirror_device, nb_max_try, interval, callback, lock):
 
             # logging initialization
-            l = logger.Logger('Mirror')
-            self._log = l.get_logger()
+            my_logger = logger.Logger('Mirror')
+            self._log = my_logger.get_logger()
 
             self._log.info("mir:ror initialisation...")
             self._lock = lock
+            self.mirror_device = mirror_device
             self._cb = callback 
             self._device_not_open = 1
             nb_try = 0
             while self._device_not_open and nb_try < nb_max_try:
-                self._log.debug("- open " + mirror_device)
+                self._log.debug("- open " + self.mirror_device)
                 try:
-                    self._mirror = open(mirror_device, "rb")
+                    self._mirror = open(self.mirror_device, "rb")
                     self._device_not_open = 0
                     self._log.debug("- mir:ror open")
                 except:
-                    self._log.error("- error while opening " + mirror_device + \
-                                    "(" + str(nb_try+1) + "/" + str(nb_max_try) + "). Next try in 15s")
+                    self._log.error("- error while opening " + \
+                                    self.mirror_device + \
+                                    "(" + str(nb_try+1) + "/" + \
+                                    str(nb_max_try) + \
+                                    "). Next try in 15s")
                     # device is not connected : we wait for 15s before next try
                     time.sleep(interval)
                     nb_try = nb_try + 1
@@ -98,10 +103,12 @@ class Mirror:
 
         def __del__(self):
             if self._mirror.isOpen():
-                self._log.debug("Close " + mirror_device)
+                self._log.debug("Close " + self.mirror_device)
                 self._mirror.close()
 
         def run(self):
+            """ Start listening to mir:ror
+            """
             # listen to mir:ror
             if self._device_not_open == 0:
                 self._log.info("Start listening mirror")
@@ -114,21 +121,27 @@ class Mirror:
                         if data[0] == '\x02':
                             ### action on ztamp
                             # data[0] and data[1] : action type
-                            # data[2...15] : ztamp identifier (it seems that 2,3, 14,15 are always nulls)
+                            # data[2...15] : ztamp identifier 
+                            #        (it seems that 2,3, 14,15 are always nulls)
                             self._log.debug("Action on : ztamp")
-                            ztamp_id = binascii.hexlify(data[2]+data[3]+data[4]+data[5]+data[6]+ \
-                                             data[7]+data[8]+data[9]+data[10]+ \
-                                             data[11]+data[12]+data[13]+data[14]+data[15])
+                            ztamp_id = binascii.hexlify(data[2]+data[3]+ \
+                                             data[4]+data[5]+data[6]+ \
+                                             data[7]+data[8]+data[9]+ \
+                                             data[10]+data[11]+data[12]+ \
+                                             data[13]+data[14]+data[15])
                             if data[1] == '\x01':
-                                self._log.debug("ztamp near from mir:ror : "+ztamp_id)
+                                self._log.debug("ztamp near from mir:ror : "+ \
+                                                ztamp_id)
                                 self._cb("ztamp_in", ztamp_id)
                             if data[1] == '\x02':
-                                self._log.debug("ztamp far from mir:ror : "+ztamp_id)
+                                self._log.debug("ztamp far from mir:ror : "+ \
+                                                ztamp_id)
                                 self._cb("ztamp_out", ztamp_id)
 
                         if data[0] == '\x01':
                             ### action on mir:ror
-                            # Only the data[0] and data[1] are used in this case. The others are nulls
+                            # Only the data[0] and data[1] are used in this case
+                            # The others are nulls
                             self._log.debug("Action on : mir:ror")
                             if data[1] == '\x04':
                                 self._log.debug("mir:ror faced up")
@@ -144,10 +157,12 @@ class Mirror:
 
 
 ###Exemple
-def cb(action, ztamp_id):
+def cb_print(action, ztamp_id):
+    """ Test fucntion
+    """
     print "ACTION : %s" % action
     print "ZTAMPID : %s" % ztamp_id
 
 if __name__ == "__main__":
-    mirror = Mirror('/dev/hidraw0', 15, 10, cb)
-    mirror.start()
+    MIRROR = Mirror('/dev/hidraw0', 15, 10, cb_print)
+    MIRROR.start()
