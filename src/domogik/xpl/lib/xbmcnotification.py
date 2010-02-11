@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-                                                                           
+# -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -38,21 +38,23 @@ Implements
 
 import threading
 import time
-from datetime import date
 import urllib
 
 from domogik.common import logger
-from domogik.common.ordereddict import OrderedDict
 
 class XBMCNotification:
-    """
-    This class allow to send notifications to XBMC
+    """ This class allow to send notifications to XBMC
     """
 
     def __init__(self, address, delay, maxdelay):
+        """ Init data
+            @param address : XBMC HTTP server address
+            @param delay : default display delay
+            @param maxdelay : maxdelay between title and text messages
+        """
         # Init logger
-        l = logger.Logger('XBMC_MSG')
-        self._log = l.get_logger()
+        my_logger = logger.Logger('XBMC_MSG')
+        self._log = my_logger.get_logger()
         self._log.info("XBMCNotification:__init")
         # Config
         self._xbmc_address = address
@@ -65,14 +67,19 @@ class XBMCNotification:
         self._title_received = 0
         self._text_received = 0
         self._delay = 0
+        self._current_action = 0
 
     def notify(self, command, text, row, delay):
+        """ Send notification to XBMC
+            @param command : command part of xPL message
+            @param text : text part of xPL message
+            @param row : row part of xPL message
+            @param delay : delay part of xPL message
         """
-        Send notification to XBMC
-        """
-        self._log.info("Start process for notification on XBMC (" + self._xbmc_address + ")")
-        row=int(row)
-        delay=int(delay)
+        self._log.info("Start process for notification on XBMC (" + \
+                       self._xbmc_address + ")")
+        row = int(row)
+        delay = int(delay)
 
         self._current_action = time.time()
         time_between_actions = float(self._current_action - self._last_action)
@@ -81,7 +88,8 @@ class XBMCNotification:
         self._log.debug("Time elapsed : " + str(time_between_actions))
         self._log.debug("Max delay : " + str(self._maxdelay_between_actions))
         if time_between_actions > self._maxdelay_between_actions:
-            self._log.debug("Time elapsed (" + str(time_between_actions) + ") for completing last notification : start new notification")
+            self._log.debug("Time elapsed (" + str(time_between_actions) + \
+                  ") for completing last notification : start new notification")
             self._title = ""
             self._text = ""
             self._title_received = 0
@@ -101,14 +109,18 @@ class XBMCNotification:
                 self._text_received = 1
             if delay == 0:
                 self._delay = self._default_display_delay
-                self._log.debug("DELAY=0 : setting default value : " + str(self._default_display_delay))
+                self._log.debug("DELAY=0 : setting default value : " + \
+                                str(self._default_display_delay))
             else:
                 self._delay = delay 
 
             # All components of notification received
             if self._title_received and self._text_received:
                 self._stop = threading.Event()
-                self._thread = self.__XBMCNotificationHandler(self._xbmc_address, self._title, self._text, self._delay)
+                self._thread = self._XBMCNotificationHandler( \
+                                                      self._xbmc_address, \
+                                                      self._title, self._text, \
+                                                      self._delay)
                 self._thread.run()
                 self._title = ""
                 self._text = ""
@@ -119,13 +131,21 @@ class XBMCNotification:
         self._last_action = self._current_action
 
 
-    class __XBMCNotificationHandler(threading.Thread):
+    class _XBMCNotificationHandler(threading.Thread):
+        """ Class for sending message in a thread
+        """
 
         def __init__(self, xbmc_address, title, text, delay):
+            """ Prepare data to send
+                @param xbmc_address : xbmc adress
+                @param title : notification title
+                @param text : notification text
+                @param delay : notification delay
+            """
             # Initialize logger
-            l = logger.Logger('XBMC_MSG')
-            self._log = l.get_logger()
-            self._log.debug("__XBMCNotificationHandler:__init__")
+            my_logger = logger.Logger('XBMC_MSG')
+            self._log = my_logger.get_logger()
+            self._log.debug("_XBMCNotificationHandler:__init__")
             # Parameters
             self._xbmc_address = xbmc_address
             self._title = urllib.quote(title)
@@ -136,19 +156,22 @@ class XBMCNotification:
 
 
         def run(self):
-            self._log.debug("__XBMCNotificationHandler:run")
+            """ Call XBMC HTTP API to send notification
+            """
+            self._log.debug("_XBMCNotificationHandler:run")
             self._log.debug("NOTIF : title " + self._title)
             self._log.debug("NOTIF : text  " + self._text)
             self._log.debug("NOTIF : delay " + self._delay)
             try:
-                self._log.debug("Call http://" + self._xbmc_address + "/xbmcCmds/xbmcHttp?command=ExecBuiltIn&parameter=XBMC.Notification(" + self._title + "," + self._text + "," + self._delay + ")")
-                urllib.urlopen("http://" + self._xbmc_address + "/xbmcCmds/xbmcHttp?command=ExecBuiltIn&parameter=XBMC.Notification(" + self._title + "," + self._text + "," + self._delay + ")")
-                # in case we would want to make a pause on movie playing
-                #self._log.debug("Call http://" + self._xbmc_address + "/xbmcCmds/xbmcHttp?command=pause")
-                #urllib.urlopen("http://" + self._xbmc_address + "/xbmcCmds/xbmcHttp?command=pause")
+                self._log.debug("Call http://" + self._xbmc_address + \
+                           "/xbmcCmds/xbmcHttp?command=ExecBuiltIn&parameter=XBMC.Notification(" + \
+                           self._title + "," + self._text + "," + \
+                           self._delay + ")")
+                urllib.urlopen("http://" + self._xbmc_address + \
+                           "/xbmcCmds/xbmcHttp?command=ExecBuiltIn&parameter=XBMC.Notification(" + \
+                           self._title + "," + self._text + "," + \
+                           self._delay + ")")
             except:
                 self._log.error("Error while calling XBMC HTTP API")
-
-
 
 

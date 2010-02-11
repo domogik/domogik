@@ -35,20 +35,20 @@ Implements
 @organization: Domogik
 """
 
-from domogik.xpl.lib.xbmcnotification import *
-from domogik.xpl.lib.xplconnector import *
-from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.lib.module import *
-from domogik.common.configloader import Loader
-from domogik.common import logger
-from domogik.xpl.lib.queryconfig import *
+from domogik.xpl.lib.xplconnector import Listener
+from domogik.xpl.lib.module import xPLModule
+from domogik.xpl.lib.xbmcnotification import XBMCNotification
+from domogik.xpl.lib.module import xPLResult
+from domogik.xpl.lib.queryconfig import Query
+
 
 class XBMCNotificationListener(xPLModule):
+    """ Create listener for xPL messages about xbmc notifications
+    """
 
     def __init__(self):
-        '''
-        Create lister for XBMC notifications
-        '''
+        """ Create lister for XBMC notifications
+        """
         xPLModule.__init__(self, name = 'xbmcmsg')
         # Create logger
         self._log.debug("Listener for XBMC notifications created")
@@ -72,7 +72,8 @@ class XBMCNotificationListener(xPLModule):
         self._log.debug("Config : maxdelay = " + maxdelay)
 
         # Create XBMCNotification object
-        self._XBMCNotificationManager = XBMCNotification(address, delay, maxdelay)
+        self.xbmc_notification_manager = XBMCNotification(address, delay, \
+                                                         maxdelay)
 
         # Create listeners
         Listener(self.xbmc_notification_cb, self._myxpl, {'schema': 'osd.basic',
@@ -80,9 +81,9 @@ class XBMCNotificationListener(xPLModule):
 
 
     def xbmc_notification_cb(self, message):
-        '''
-        Call XBMC notification lib
-        '''
+        """ Call XBMC notification lib
+            @param message : message to send
+        """
         self._log.debug("Call xbmc_notification_cb")
 
         if 'command' in message.data:
@@ -95,9 +96,9 @@ class XBMCNotificationListener(xPLModule):
             delay = message.data['delay']
 
         self._log.debug("Call _notify")
-        self._XBMCNotificationManager.notify(command, text, row, delay)
+        self.xbmc_notification_manager.notify(command, text, row, delay)
 
 
 if __name__ == "__main__":
-    x = XBMCNotificationListener()
+    XN = XBMCNotificationListener()
 
