@@ -61,6 +61,7 @@ import sqlalchemy
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
+
 from domogik.common.configloader import Loader
 from domogik.common.sql_schema import ActuatorFeature, Area, Device, DeviceUsage, \
                                       DeviceConfig, DeviceStats, DeviceStatsValue, \
@@ -125,7 +126,6 @@ class DbHelper():
 
         if use_test_db:
             url = '%s_test' % url
-
         # Connecting to the database
         self.__dbprefix = db['db_prefix']
         self.__engine = sqlalchemy.create_engine(url, echo=echo_output)
@@ -294,7 +294,7 @@ class DbHelper():
         """
         if r_area_id != None:
             try:
-                area = self._session.query(Area).filter_by(id=r_area_id).one()
+                self._session.query(Area).filter_by(id=r_area_id).one()
             except NoResultFound, e:
                 raise DbHelperException("Couldn't add room with area id %s. \
                                         It does not exist" % r_area_id)
@@ -325,6 +325,11 @@ class DbHelper():
         if r_description is not None:
             room.description = r_description
         if r_area_id is not None:
+            try:
+                self._session.query(Area).filter_by(id=r_area_id).one()
+            except NoResultFound, e:
+                raise DbHelperException("Couldn't find area id %s. \
+                                        It does not exist" % r_area_id)
             room.area_id = r_area_id
         self._session.add(room)
         try:
@@ -482,6 +487,11 @@ class DbHelper():
         @param dty_description : device type description (optional)
         @return a DeviceType (the newly created one)
         """
+        try:
+            self._session.query(DeviceTechnology).filter_by(id=dt_id).one()
+        except NoResultFound, e:
+            raise DbHelperException("Couldn't add device type with technology id %s. \
+                                    It does not exist" % dt_id)
         dty = DeviceType(name=dty_name, description=dty_description,
                          technology_id=dt_id)
         self._session.add(dty)
@@ -508,6 +518,11 @@ class DbHelper():
         if dty_name is not None:
             device_type.name = dty_name
         if dt_id is not None:
+            try:
+                self._session.query(DeviceTechnology).filter_by(id=dt_id).one()
+            except NoResultFound, e:
+                raise DbHelperException("Couldn't find technology id %s. \
+                                        It does not exist" % dt_id)
             device_type.technology_id = dt_id
         self._session.add(device_type)
         if dty_description is not None:
@@ -597,6 +612,11 @@ class DbHelper():
         @param srd_stat_key : reference to a stat, optional
         @return a SensorReferenceData (the newly created one)
         """
+        try:
+            self._session.query(DeviceType).filter_by(id=dty_id).one()
+        except NoResultFound, e:
+            raise DbHelperException("Couldn't add sensor reference with device type id %s. \
+                                    It does not exist" % dty_id)
         srd = SensorReferenceData(name=srd_name, value=srd_value,
                     device_type_id=dty_id, unit=srd_unit, stat_key=srd_stat_key)
         self._session.add(srd)
@@ -631,6 +651,11 @@ class DbHelper():
         if srd_value is not None:
             srd.value = srd_value
         if dty_id is not None:
+            try:
+                self._session.query(DeviceType).filter_by(id=dty_id).one()
+            except NoResultFound, e:
+                raise DbHelperException("Couldn't find device type id %s. \
+                                        It does not exist" % dty_id)
             srd.device_type_id = dty_id
         if srd_unit is not None:
             srd.unit = srd_unit
@@ -700,6 +725,11 @@ class DbHelper():
                                      after executing a command, default is false
         @return an ActuatorFeature (the newly created one)
         """
+        try:
+            self._session.query(DeviceType).filter_by(id=dty_id).one()
+        except NoResultFound, e:
+            raise DbHelperException("Couldn't add actuator feature with device type id %s. \
+                                    It does not exist" % dty_id)
         af = ActuatorFeature(name=af_name, value=af_value,
                     device_type_id=dty_id, unit=af_unit,
                     configurable_states=af_configurable_states,
@@ -736,6 +766,11 @@ class DbHelper():
         if af_value is not None:
             af.value = af_value
         if dty_id is not None:
+            try:
+                self._session.query(DeviceType).filter_by(id=dty_id).one()
+            except NoResultFound, e:
+                raise DbHelperException("Couldn't find device type id %s. \
+                                        It does not exist" % dty_id)
             af.device_type_id = dty_id
         if af_unit is not None:
             af.unit = af_unit
@@ -911,7 +946,7 @@ class DbHelper():
         @return the new DeviceTechnologyConfig item
         """
         try:
-            dt = self._session.query(DeviceTechnology).filter_by(id=dt_id).one()
+            self._session.query(DeviceTechnology).filter_by(id=dt_id).one()
         except NoResultFound, e:
             raise DbHelperException("Couldn't add device technology config \
                                     with device technology id %s. \
@@ -946,6 +981,11 @@ class DbHelper():
             raise DbHelperException("DeviceTypeConfig with id %s couldn't \
                                     be found" % dtc_id)
         if dt_id is not None:
+            try:
+                self._session.query(DeviceTechnology).filter_by(id=dt_id).one()
+            except NoResultFound, e:
+                raise DbHelperException("Couldn't find device technology id %s. \
+                                        It does not exist" % dt_id)
             dtc.technology_id = dt_id
         if dtc_key is not None:
             dtc.key = dtc_key
@@ -1026,11 +1066,34 @@ class DbHelper():
 
     def get_device(self, d_id):
         """
-        Return a device by its it
+        Return a device by its id
         @param d_id : The device id
         @return a Device object
         """
         return self._session.query(Device).filter_by(id=d_id).first()
+
+    def get_device_by_technology_and_address(self, techno_name, device_address):
+        """
+        Return a device by its technology and address
+        @param techno_name : technology name
+        @param device address : device address
+        @return a device object
+        """
+        device_list = self._session.query(Device)\
+                                   .filter_by(address=device_address)\
+                                   .all()
+        if len(device_list) == 0:
+            return None
+        device = []
+        for device in device_list:
+            device_type = self._session.query(DeviceType)\
+                                       .filter_by(id=device.type_id).first()
+            device_tech = self._session.query(DeviceTechnology)\
+                                       .filter_by(id=device_type.technology_id)\
+                                       .first()
+            if device_tech.name == techno_name:
+                return device
+        return None
 
     def get_all_devices_of_room(self, d_room_id):
         """
@@ -1081,18 +1144,35 @@ class DbHelper():
         @param d_room_id : room id
         @param d_description : Extended item description (100 char max)
         @param d_reference : device reference (ex. AM12 for x10)
-        @param d_is_resetable : Can the item be reseted to some initial state (optional, default=False)
+        @param d_is_resetable : Can the item be reseted to some initial state, optional, default=False. If None value is passed then it is automatically set to False.
         @param d_initial_value : What's the initial value of the item, should be
             the state when the item is created (except for sensors, music) (optional, default=None)
-        @param d_is_value_changeable_by_user : Can a user change item state (ex : false for sensor)
-            (optional, default=False)
+        @param d_is_value_changeable_by_user : Can a user change item state (ex : false for sensor), optional, default=False. If None value is passed then it is automatically set to False.
         @param d_unit_of_stored_values : What is the unit of item values,
                 must be one of 'Volt', 'Celsius', 'Fahrenheit', 'Percent', 'Boolean' (optional, default=None)
         @return the new Device object
         """
         if d_unit_of_stored_values not in UNIT_OF_STORED_VALUE_LIST:
             raise ValueError, "d_unit_of_stored_values must be one of %s" % UNIT_OF_STORED_VALUE_LIST
-
+        try:
+            self._session.query(DeviceType).filter_by(id=d_type_id).one()
+        except NoResultFound, e:
+            raise DbHelperException("Couldn't add device with device type id %s \
+                                    It does not exist" % d_type_id)
+        try:
+            self._session.query(DeviceUsage).filter_by(id=d_usage_id).one()
+        except NoResultFound, e:
+            raise DbHelperException("Couldn't add device with device usage id %s \
+                                    It does not exist" % d_usage_id)
+        try:
+            self._session.query(Room).filter_by(id=d_room_id).one()
+        except NoResultFound, e:
+            raise DbHelperException("Couldn't add device with room id %s \
+                                    It does not exist" % d_room_id)
+        if d_is_resetable == None:
+            d_is_resetable = False
+        if d_is_value_changeable_by_user == None:
+            d_is_value_changeable_by_user = False
         device = Device(name=d_name, address=d_address, description=d_description,
                         reference=d_reference, type_id=d_type_id,
                         usage_id=d_usage_id, room_id=d_room_id,
@@ -1132,11 +1212,9 @@ class DbHelper():
         """
         if d_unit_of_stored_values not in [UNIT_OF_STORED_VALUE_LIST, None]:
             raise ValueError, "d_unit_of_stored_values must be one of %s" % UNIT_OF_STORED_VALUE_LIST
-
         device = self._session.query(Device).filter_by(id=d_id).first()
         if device is None:
             raise DbHelperException("Device with id %s couldn't be found" % d_id)
-
         if d_name is not None:
             device.name = d_name
         if d_address is not None:
@@ -1146,20 +1224,25 @@ class DbHelper():
         if d_reference is not None:
             device.reference = d_reference
         if d_type_id is not None:
+            try:
+                self._session.query(DeviceType).filter_by(id=d_type_id).one()
+            except NoResultFound, e:
+                raise DbHelperException("Couldn't find device type id %s \
+                                        It does not exist" % d_type_id)
             device.type_id = d_type_id
         if d_usage_id is not None:
           try:
               dc = self._session.query(DeviceUsage).filter_by(id=d_usage_id).one()
               device.usage = d_usage_id
           except NoResultFound, e:
-              raise DbHelperException("Couldn't update device with usage \
+              raise DbHelperException("Couldn't find device usage \
                                       id %s. It does not exist" % d_usage_id)
         if d_room_id is not None:
             try:
                 room = self._session.query(Room).filter_by(id=d_room_id).one()
                 device.room = d_room_id
             except NoResultFound, e:
-                raise DbHelperException("Couldn't update device with room \
+                raise DbHelperException("Couldn't find room \
                                         id %s. It does not exist" % d_room_id)
         if d_is_resetable is not None:
             device.is_resetable = d_is_resetable
@@ -1272,11 +1355,16 @@ class DbHelper():
     def add_device_stat(self, d_id, ds_date, ds_values):
         """
         Add a device stat record
-        @param device_id : device id
+        @param d_id : device id
         @param ds_date : when the stat was gathered (timestamp)
         @param ds_value : dictionnary of statistics values
         @return the new DeviceStats object
         """
+        try:
+            self._session.query(Device).filter_by(id=d_id).one()
+        except NoResultFound, e:
+            raise DbHelperException("Couldn't add device stat with device id %s \
+                                    It does not exist" % d_id)
         device_stat = DeviceStats(device_id=d_id, date=ds_date)
         self._session.add(device_stat)
         try:
@@ -1627,6 +1715,13 @@ class DbHelper():
         @param u_system_account : User's account on the system (optional)
         @return the new UserAccount object
         """
+        if u_system_account_id is not None:
+            try:
+                self._session.query(SystemAccount)\
+                             .filter_by(id=u_system_account_id).one()
+            except NoResultFound, e:
+                raise DbHelperException("Couldn't add user with account id %s \
+                                        It does not exist" % u_system_account_id)
         user_account = UserAccount(first_name=u_first_name, last_name=u_last_name,
                                    birthdate=u_birthdate,
                                    system_account_id=u_system_account_id)
@@ -1659,6 +1754,12 @@ class DbHelper():
         if u_birthdate is not None:
             user_acc.birthdate = u_birthdate
         if u_system_account_id is not None:
+            try:
+                self._session.query(SystemAccount)\
+                             .filter_by(id=u_system_account_id).one()
+            except NoResultFound, e:
+                raise DbHelperException("Couldn't find account id %s \
+                                        It does not exist" % u_system_account_id)
             user_acc.system_account_id = u_system_account_id
         self._session.add(user_acc)
         try:

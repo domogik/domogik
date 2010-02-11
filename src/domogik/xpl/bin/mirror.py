@@ -35,19 +35,17 @@ Implements
 @organization: Domogik
 """
 
-from domogik.xpl.lib.xplconnector import *
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.lib.module import *
-from domogik.xpl.lib.mirror import *
-from domogik.common import configloader
-from domogik.xpl.lib.queryconfig import *
+from domogik.xpl.lib.module import xPLModule
+from domogik.xpl.lib.module import xPLResult
+from domogik.xpl.lib.mirror import Mirror
+from domogik.xpl.lib.queryconfig import Query
 
-import time
+
 
 class MirrorManager(xPLModule):
-    '''
-    Manage the Mir:ror device and connect it to xPL
-    '''
+    """ Manage the Mir:ror device and connect it to xPL
+    """
 
     def __init__(self):
         """ Init module
@@ -68,16 +66,21 @@ class MirrorManager(xPLModule):
         self._config.query('mirror', 'nbmaxtry', res)
         nbmaxtry = res.get_value()['nbmaxtry']
         # Call Library
-        self._mymirror  = Mirror(device, nbmaxtry, interval, self._broadcastframe)
+        self._mymirror  = Mirror(device, nbmaxtry, interval, \
+                                 self._broadcastframe)
         self._mymirror.start()
 
-    def _broadcastframe(self, action, ztampId):
+    def _broadcastframe(self, action, ztamp_id):
+        """ Send xPL message on network
+            @param action : action done on mir:ror device
+            @param ztamp_id : id of ztamp put on mir:ror
+        """
         my_temp_message = XplMessage()
         my_temp_message.set_type("xpl-trig")
         my_temp_message.set_schema("sensor.basic")
         my_temp_message.add_data({"device" : "mirror"})
         my_temp_message.add_data({"type" : action})
-        my_temp_message.add_data({"current" : ztampId})
+        my_temp_message.add_data({"current" : ztamp_id})
         self._myxpl.send(my_temp_message)
 
 

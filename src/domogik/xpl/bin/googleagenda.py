@@ -35,20 +35,21 @@ Implements
 @organization: Domogik
 """
 
-from domogik.xpl.lib.googleagenda import *
-from domogik.xpl.lib.xplconnector import *
+from domogik.xpl.lib.googleagenda import GAgenda
+from domogik.xpl.lib.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.lib.module import *
-from domogik.common.configloader import Loader
-from domogik.common import logger
-from domogik.xpl.lib.queryconfig import *
+from domogik.xpl.lib.module import xPLModule
+from domogik.xpl.lib.module import xPLResult
+from domogik.xpl.lib.queryconfig import Query
+
 
 class GAgendaListener(xPLModule):
+    """ Listen for xPL messages to get infos from agenda
+    """
 
     def __init__(self):
-        '''
-        Create lister for google agenda requets
-        '''
+        """ Create lister for google agenda requets
+        """
         xPLModule.__init__(self, name = 'gagenda')
 
         # Create logger
@@ -69,16 +70,19 @@ class GAgendaListener(xPLModule):
         self._calendar_name = res.get_value()['calendarname']
 
         # Create object
-        self._gAgendaManager = GAgenda(self._email, self._password, self._calendar_name, self._broadcast_events)
+        self._gagenda_manager = GAgenda(self._email, \
+                                       self._password, \
+                                       self._calendar_name, \
+                                       self._broadcast_events)
 
         # Create listener for today
         Listener(self.gagenda_cb, self._myxpl, {'schema': 'calendar.request',
                 'xpltype': 'xpl-cmnd', 'command': 'REQUEST'})
 
     def gagenda_cb(self, message):
-        '''
-        Call google agenda lib
-        '''
+        """ Call google agenda lib
+            @param message : xlp message received
+        """
         self._log.debug("Call gagenda_cb")
         if 'command' in message.data:
             command = message.data['command']
@@ -87,15 +91,20 @@ class GAgendaListener(xPLModule):
 
         # if it is a request command
         if command == "REQUEST":
-            self._log.debug("Google agende request command received for " + str(date))
+            self._log.debug("Google agende request command received for " + \
+                            str(date))
             if date == "TODAY":
-                self._gAgendaManager.get_today_events()
+                self._gagenda_manager.get_today_events()
             elif date == "TOMORROW":
-                self._gAgendaManager.get_tomorrow_events()
+                self._gagenda_manager.get_tomorrow_events()
             else:
-                self._gAgendaManager.get_events_at_date(date)
+                self._gagenda_manager.get_events_at_date(date)
+
 
     def _broadcast_events(self, events):
+        """ Send xPL message on network
+            @param events : list of events
+        """
         for entry in events:
             my_temp_message = XplMessage()
             my_temp_message.set_type("xpl-trig")
@@ -108,5 +117,5 @@ class GAgendaListener(xPLModule):
 
 
 if __name__ == "__main__":
-    x = GAgendaListener()
+    GAL = GAgendaListener()
 

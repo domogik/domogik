@@ -240,6 +240,13 @@ class RoomTestCase(GenericTestCase):
         assert len(self.db.list_rooms()) == 0
 
     def testAdd(self):
+        try:
+            self.db.add_room(r_name='foo', r_area_id=99999999999,
+                             r_description='foo')
+            TestCase.fail(self, "An exception should have been raised : \
+                          area id does not exist")
+        except DbHelperException:
+            pass
         room = self.db.add_room(r_name='my_room', r_area_id=None,
                                 r_description='my_description')
         print room
@@ -261,6 +268,14 @@ class RoomTestCase(GenericTestCase):
         area2 = self.db.add_area('area2','description 2')
         room = self.db.add_room(r_name='room1', r_description='description 1',
                                 r_area_id=area1.id)
+        try:
+            self.db.update_room(room.id, r_name='room2',
+                                r_description='description 2',
+                                r_area_id=99999999999)
+            TestCase.fail(self, "An exception should have been raised : \
+                          area id does not exist")
+        except DbHelperException:
+            pass
         room_u = self.db.update_room(room.id, r_name='room2',
                                      r_description='description 2',
                                      r_area_id=area2.id)
@@ -375,34 +390,52 @@ class DeviceTypeTestCase(GenericTestCase):
 
     def testAdd(self):
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
+        try:
+            self.db.add_device_type(dty_name='x10 Switch',
+                                    dty_description='desc1', dt_id=99999999999)
+            TestCase.fail(self, "An exception should have been raised : \
+                          device techno id does not exist")
+        except DbHelperException:
+            pass
         dty1 = self.db.add_device_type(dty_name='x10 Switch',
                                        dty_description='desc1', dt_id=dt1.id)
         print dty1
         assert dty1.name == 'x10 Switch'
         assert dty1.description == 'desc1'
         assert dty1.technology_id == dt1.id
-        dty2 = self.db.add_device_type('x10 Dimmer', 'desc2', dt1.id)
+        dty2 = self.db.add_device_type(dty_name='x10 Dimmer',
+                                       dty_description='desc2', dt_id=dt1.id)
         assert len(self.db.list_device_types()) == 2
         assert self.has_item(self.db.list_device_types(), ['x10 Switch', 'x10 Dimmer'])
 
     def testUpdate(self):
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
         dt2 = self.db.add_device_technology(u'PLCBus', 'desc dt2')
-        dty = self.db.add_device_type('x10 Switch', 'desc1', dt1.id)
-        dty_u = self.db.update_device_type(dty.id, 'x10 Dimmer', dt2.id, 'desc2')
+        dty = self.db.add_device_type(dty_name='x10 Switch',
+                                      dty_description='desc1', dt_id=dt1.id)
+        try:
+            self.db.update_device_type(dty_id=dty.id, dty_name='x10 Dimmer',
+                                       dt_id=99999999999)
+            TestCase.fail(self, "An exception should have been raised : \
+                          device techno id does not exist")
+        except DbHelperException:
+            pass
+        dty_u = self.db.update_device_type(dty_id=dty.id, dty_name='x10 Dimmer',
+                                           dt_id=dt2.id, dty_description='desc2')
         assert dty_u.name == 'x10 Dimmer'
         assert dty_u.description == 'desc2'
         assert dty_u.technology_id == dt2.id
 
     def testFetchInformation(self):
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
-        dty1 = self.db.add_device_type('x10 Switch', 'desc1', dt1.id)
+        dty1 = self.db.add_device_type(dty_name='x10 Switch',
+                                       dty_description='desc1', dt_id=dt1.id)
         assert self.db.get_device_type_by_name('x10 Switch').name == 'x10 Switch'
 
     def testDel(self):
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
-        dty1 = self.db.add_device_type('x10 Switch', dt1.id)
-        dty2 = self.db.add_device_type('x10 Dimmer', dt1.id)
+        dty1 = self.db.add_device_type(dty_name='x10 Switch', dt_id=dt1.id)
+        dty2 = self.db.add_device_type(dty_name='x10 Dimmer', dt_id=dt1.id)
         dty2_id = dty2.id
         dty_del = self.db.del_device_type(dty2.id)
         assert self.has_item(self.db.list_device_types(), ['x10 Switch'])
@@ -437,6 +470,14 @@ class SensorReferenceDataTestCase(GenericTestCase):
                                        dty_description='desc1', dt_id=dt1.id)
         dty2 = self.db.add_device_type(dty_name='1wire.Voltmeter',
                                        dty_description='desc2', dt_id=dt1.id)
+        try:
+            self.db.add_sensor_reference_data(srd_name='Temperature',
+                    srd_value='number', dty_id=99999999999, srd_unit='degreeC',
+                    srd_stat_key='key1')
+            TestCase.fail(self, "An exception should have been raised : \
+                          device type id does not exist")
+        except DbHelperException:
+            pass
         srd1 = self.db.add_sensor_reference_data(srd_name='Temperature',
                     srd_value='number', dty_id=dty1.id, srd_unit='degreeC',
                     srd_stat_key='key1')
@@ -465,6 +506,14 @@ class SensorReferenceDataTestCase(GenericTestCase):
         srd_u = self.db.update_sensor_reference_data(srd_id=srd.id, srd_name='Voltage',
                     srd_value='number', dty_id=dty2.id, srd_unit='V',
                     srd_stat_key='key2')
+        try:
+            self.db.update_sensor_reference_data(srd_id=srd.id, srd_name='Voltage',
+                    srd_value='number', dty_id=99999999999, srd_unit='V',
+                    srd_stat_key='key2')
+            TestCase.fail(self, "An exception should have been raised : \
+                          device type id does not exist")
+        except DbHelperException:
+            pass
         assert srd_u.name == 'Voltage'
         assert srd_u.value == 'number'
         assert srd_u.device_type_id == dty2.id
@@ -531,6 +580,14 @@ class ActuatorFeatureTestCase(GenericTestCase):
                                        dty_description='desc1', dt_id=dt1.id)
         dty2 = self.db.add_device_type(dty_name='PLCBus.Dimmer',
                                        dty_description='desc2', dt_id=dt1.id)
+        try:
+            self.db.add_actuator_feature(af_name='Dimmer',
+                    af_value='range', dty_id=99999999999, af_unit='Percent',
+                    af_configurable_states='0,100,10', af_return_confirmation=True)
+            TestCase.fail(self, "An exception should have been raised : \
+                          device type id does not exist")
+        except DbHelperException:
+            pass
         af1 = self.db.add_actuator_feature(af_name='Dimmer',
                     af_value='range', dty_id=dty2.id, af_unit='Percent',
                     af_configurable_states='0,100,10', af_return_confirmation=True)
@@ -557,6 +614,14 @@ class ActuatorFeatureTestCase(GenericTestCase):
         af = self.db.add_actuator_feature(af_name='Switch',
                     af_value='binary', dty_id=dty1.id,
                     af_configurable_states='off/on', af_return_confirmation=True)
+        try:
+            self.db.update_actuator_feature(af_id=af.id, af_name='Dimmer',
+                    af_value='range', dty_id=99999999999, af_unit='Percent',
+                    af_configurable_states='0,100,10', af_return_confirmation=False)
+            TestCase.fail(self, "An exception should have been raised : \
+                          device type id does not exist")
+        except DbHelperException:
+            pass
         af_u = self.db.update_actuator_feature(af_id=af.id, af_name='Dimmer',
                     af_value='range', dty_id=dty2.id, af_unit='Percent',
                     af_configurable_states='0,100,10', af_return_confirmation=False)
@@ -680,6 +745,13 @@ class DeviceTechnologyConfigTestCase(GenericTestCase):
     def testAdd(self):
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
         dt3 = self.db.add_device_technology(u'PLCBus', 'desc dt3')
+        try:
+            self.db.add_device_technology_config(99999999999, 'key1_1', 'val1_1',
+                                                 'desc1')
+            TestCase.fail(self, "An exception should have been raised : \
+                          device technology id does not exist")
+        except DbHelperException:
+            pass
         dtc1_1 = self.db.add_device_technology_config(dt1.id, 'key1_1', 'val1_1',
                                                       'desc1')
         print dtc1_1
@@ -776,8 +848,35 @@ class DeviceTestCase(GenericTestCase):
         room1 = self.db.add_room('room1', area1.id)
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
         du1 = self.db.add_device_usage('du1')
-        dty1 = self.db.add_device_type('x10 Switch', 'desc1', dt1.id)
-
+        dty1 = self.db.add_device_type(dty_name='x10 Switch',
+                                       dty_description='desc1', dt_id=dt1.id)
+        try:
+            self.db.add_device(d_name='device1', d_address = 'A1',
+                    d_type_id = 9999999999, d_usage_id = du1.id,
+                    d_room_id = room1.id, d_description = 'desc1',
+                    d_is_resetable = True, d_initial_value = 30,
+                    d_is_value_changeable_by_user = False,
+                        d_unit_of_stored_values = u'Percent')
+            TestCase.fail(self, "Device type does not exist, \
+                                 an exception should have been raised")
+            self.db.add_device(d_name='device1', d_address = 'A1',
+                    d_type_id = dty1.id, d_usage_id = 9999999999999,
+                    d_room_id = room1.id, d_description = 'desc1',
+                    d_is_resetable = True, d_initial_value = 30,
+                    d_is_value_changeable_by_user = False,
+                    d_unit_of_stored_values = u'Percent')
+            TestCase.fail(self, "Device usage does not exist, \
+                                 an exception should have been raised")
+            self.db.add_device(d_name='device1', d_address = 'A1',
+                    d_type_id = dty1.id, d_usage_id = du1.id,
+                    d_room_id = 9999999999999, d_description = 'desc1',
+                    d_is_resetable = True, d_initial_value = 30,
+                    d_is_value_changeable_by_user = False,
+                    d_unit_of_stored_values = u'Percent')
+            TestCase.fail(self, "Room does not exist, \
+                                 an exception should have been raised")
+        except DbHelperException:
+            pass
         device1 = self.db.add_device(d_name='device1', d_address = 'A1',
                     d_type_id = dty1.id, d_usage_id = du1.id,
                     d_room_id = room1.id, d_description = 'desc1',
@@ -786,17 +885,58 @@ class DeviceTestCase(GenericTestCase):
                     d_unit_of_stored_values = u'Percent')
         print device1
         assert len(self.db.list_devices()) == 1, "Device was NOT added"
+        device2 = self.db.add_device(d_name='device2', d_address = 'A2',
+                    d_type_id = dty1.id, d_usage_id = du1.id,
+                    d_room_id = room1.id, d_description = 'desc1',
+                    d_is_resetable = None, d_initial_value = 30,
+                    d_is_value_changeable_by_user = None,
+                    d_unit_of_stored_values = u'Percent')
+        assert len(self.db.list_devices()) == 2
+        assert not device2.is_resetable
+        assert not device2.is_value_changeable_by_user
         # TODO see if these methods are still used
         # assert device1.is_lamp(), "device1.is_lamp() returns False.
         # Should have returned True"
         # assert not device1.is_appliance(), "device1.is_appliance()
         # returns True. Should have returned False"
 
+    def testListAndGet(self):
+        area1 = self.db.add_area('Basement','description 1')
+        room1 = self.db.add_room('Kitchen', area1.id)
+        room2 = self.db.add_room('Bathroom', area1.id)
+        dt1 = self.db.add_device_technology(u'x10', 'x10 device type')
+        dt2 = self.db.add_device_technology(u'PLCBus', 'PLCBus device type')
+        du1 = self.db.add_device_usage('Appliance')
+        dty1 = self.db.add_device_type(dty_name='x10 Switch', dt_id=dt1.id,
+                                       dty_description='My beautiful switch')
+        dty2 = self.db.add_device_type(dty_name='PLCBus Switch', dt_id=dt2.id,
+                                       dty_description='Another beautiful switch')
+        device1 = self.db.add_device(d_name='Toaster', d_address='A1',
+                    d_type_id=dty1.id, d_usage_id=du1.id,
+                    d_room_id=room1.id, d_description='My new toaster',
+                    d_is_resetable=True,
+                    d_is_value_changeable_by_user = False)
+        device2 = self.db.add_device(d_name='Washing machine', d_address='A1',
+                    d_type_id=dty2.id, d_usage_id=du1.id,
+                    d_room_id=room1.id, d_description='Laden',
+                    d_is_resetable=True,
+                    d_is_value_changeable_by_user = False)
+        device3 = self.db.add_device(d_name='Mixer', d_address='A2',
+                    d_type_id=dty2.id, d_usage_id=du1.id,
+                    d_room_id=room1.id, d_description='Moulinex',
+                    d_is_resetable=True,
+                    d_is_value_changeable_by_user = False)
+        search_dev1 =self.db.get_device_by_technology_and_address(dt1.name, 'A1')
+        assert search_dev1.name == 'Toaster'
+        search_dev2 =self.db.get_device_by_technology_and_address(dt1.name, 'A2')
+        assert search_dev2 == None
+
     def testUpdate(self):
         area1 = self.db.add_area('area1','description 1')
         room1 = self.db.add_room('room1', area1.id)
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
-        dty1 = self.db.add_device_type('x10 Switch', 'desc1', dt1.id)
+        dty1 = self.db.add_device_type(dty_name='x10 Switch',
+                                       dty_description='desc1', dt_id=dt1.id)
         du1 = self.db.add_device_usage('du1')
         device1 = self.db.add_device(d_name='device1', d_address = 'A1',
                     d_type_id = dty1.id, d_usage_id = du1.id,
@@ -805,6 +945,18 @@ class DeviceTestCase(GenericTestCase):
                     d_is_value_changeable_by_user = False,
                     d_unit_of_stored_values = u'Percent')
         device_id = device1.id
+        try:
+            self.db.update_device(d_id = device1.id, d_type_id = 9999999999)
+            TestCase.fail(self, "Device type does not exist, \
+                                 an exception should have been raised")
+            self.db.update_device(d_id = device1.id, d_usage_id = 9999999999999)
+            TestCase.fail(self, "Device usage does not exist, \
+                                 an exception should have been raised")
+            self.db.update_device(d_id = device1.id, d_room_id = 9999999999999)
+            TestCase.fail(self, "Room does not exist, \
+                                 an exception should have been raised")
+        except DbHelperException:
+            pass
         device1 = self.db.update_device(d_id = device1.id,
                                         d_description = 'desc2')
         self.db._session.expunge(device1) # Remove object from session
@@ -817,8 +969,10 @@ class DeviceTestCase(GenericTestCase):
         room1 = self.db.add_room('room1', area1.id)
         room2 = self.db.add_room('room2', area2.id)
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
-        dty1 = self.db.add_device_type('x10 Switch', 'desc1', dt1.id)
-        dty2 = self.db.add_device_type('x10 Dimmer', 'desc1', dt1.id)
+        dty1 = self.db.add_device_type(dty_name='x10 Switch',
+                                       dty_description='desc1', dt_id=dt1.id)
+        dty2 = self.db.add_device_type(dty_name='x10 Dimmer',
+                                       dty_description='desc1', dt_id=dt1.id)
         du1 = self.db.add_device_usage('du1')
         du2 = self.db.add_device_usage('du2')
         device1 = self.db.add_device(d_name='device1', d_address = 'A1',
@@ -859,7 +1013,8 @@ class DeviceTestCase(GenericTestCase):
         room1 = self.db.add_room('room1', area1.id)
         room2 = self.db.add_room('room2', area2.id)
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
-        dty1 = self.db.add_device_type('x10 Switch', 'desc1', dt1.id)
+        dty1 = self.db.add_device_type(dty_name='x10 Switch',
+                                       dty_description='desc1', dt_id=dt1.id)
         du1 = self.db.add_device_usage('du1')
         du2 = self.db.add_device_usage('du2')
         device1 = self.db.add_device(d_name='device1', d_address = 'A1',
@@ -905,7 +1060,8 @@ class DeviceStatsTestCase(GenericTestCase):
     def testAdd(self):
         dt1 = self.db.add_device_technology(u"x10", "this is x10")
         du1 = self.db.add_device_usage("lighting")
-        dty1 = self.db.add_device_type('x10 Switch', 'desc1', dt1.id)
+        dty1 = self.db.add_device_type(dty_name='x10 Switch',
+                                       dty_description='desc1', dt_id=dt1.id)
         area1 = self.db.add_area('area1','description 1')
         room1 = self.db.add_room('room1', area1.id)
         device1 = self.db.add_device(d_name='device1', d_address = "A1",
@@ -920,6 +1076,13 @@ class DeviceStatsTestCase(GenericTestCase):
         d_stat1_1 = self.db.add_device_stat(device1.id, now,
                                             {'val1': '10', 'val2': '10.5' })
         print d_stat1_1
+        try:
+            self.db.add_device_stat(99999999999, now,
+                                    {'val1': '10', 'val2': '10.5' })
+            TestCase.fail(self, "An exception should have been raised : \
+                          device id does not exist")
+        except DbHelperException:
+            pass
         d_stat1_2 = self.db.add_device_stat(device1.id,
                                             now + datetime.timedelta(seconds=1),
                                             {'val1': '11', 'val2': '12' })
@@ -934,7 +1097,8 @@ class DeviceStatsTestCase(GenericTestCase):
 
     def testLastStatOfOneDevice(self):
         dt1 = self.db.add_device_technology(u"x10", "this is x10")
-        dty1 = self.db.add_device_type('x10 Switch', 'desc1', dt1.id)
+        dty1 = self.db.add_device_type(dty_name='x10 Switch',
+                                       dty_description='desc1', dt_id=dt1.id)
         du1 = self.db.add_device_usage("lighting")
         area1 = self.db.add_area('area1','description 1')
         room1 = self.db.add_room('room1', area1.id)
@@ -957,7 +1121,8 @@ class DeviceStatsTestCase(GenericTestCase):
 
     def testLastStatOfDevices(self):
         dt1 = self.db.add_device_technology(u"x10", "this is x10")
-        dty1 = self.db.add_device_type('x10 Switch', 'desc1', dt1.id)
+        dty1 = self.db.add_device_type(dty_name='x10 Switch',
+                                       dty_description='desc1', dt_id=dt1.id)
         du1 = self.db.add_device_usage("lighting")
         area1 = self.db.add_area('area1','description 1')
         room1 = self.db.add_room('room1', area1.id)
@@ -998,7 +1163,8 @@ class DeviceStatsTestCase(GenericTestCase):
 
     def testDel(self):
         dt1 = self.db.add_device_technology(u"x10", "this is x10")
-        dty1 = self.db.add_device_type('x10 Switch', 'desc1', dt1.id)
+        dty1 = self.db.add_device_type(dty_name='x10 Switch',
+                                       dty_description='desc1', dt_id=dt1.id)
         du1 = self.db.add_device_usage("lighting")
         area1 = self.db.add_area('area1','description 1')
         room1 = self.db.add_room('room1', area1.id)
@@ -1102,12 +1268,14 @@ class UserAndSystemAccountsTestCase(GenericTestCase):
 
     def testAdd(self):
         sys1 = self.db.add_system_account(a_login='mschneider',
-                                          a_password='IwontGiveIt', a_is_admin=True)
+                                          a_password='IwontGiveIt',
+                                          a_is_admin=True)
         print sys1
         assert self.db.is_system_account('mschneider', 'IwontGiveIt')
         assert not self.db.is_system_account('mschneider', 'plop')
         assert not self.db.is_system_account('hello', 'boy')
-        sys1 = self.db.get_system_account_by_login_and_pass('mschneider', 'IwontGiveIt')
+        sys1 = self.db.get_system_account_by_login_and_pass('mschneider',
+                                                            'IwontGiveIt')
         assert sys1 is not None
         assert sys1.login == 'mschneider'
         try:
@@ -1125,6 +1293,14 @@ class UserAndSystemAccountsTestCase(GenericTestCase):
                                          u_birthdate=datetime.date(1973, 4, 24),
                                          u_system_account_id = sys1.id)
         print user1
+        try:
+            self.db.add_user_account(u_first_name='Marc', u_last_name='SCHNEIDER',
+                                         u_birthdate=datetime.date(1973, 4, 24),
+                                         u_system_account_id=99999999999)
+            TestCase.fail(self, "An exception should have been raised : \
+                          account id does not exist")
+        except DbHelperException:
+            pass
         user2 = self.db.add_user_account(u_first_name='Monthy', u_last_name='PYTHON',
                                          u_birthdate=datetime.date(1981, 4, 24))
         assert len(self.db.list_user_accounts()) == 2
@@ -1147,6 +1323,13 @@ class UserAndSystemAccountsTestCase(GenericTestCase):
                                         u_last_name='SCHNEIDERO',
                                         u_birthdate=datetime.date(1981, 4, 24),
                                         u_system_account_id = sys_acc_u.id)
+        try:
+            self.db.update_user_account(u_id=user.id,
+                                        u_system_account_id=99999999999)
+            TestCase.fail(self, "An exception should have been raised : \
+                          account id does not exist")
+        except DbHelperException:
+            pass
         assert user_u.first_name == 'Marco'
         assert user_u.last_name == 'SCHNEIDERO'
         assert user_u.birthdate == datetime.date(1981, 4, 24)
