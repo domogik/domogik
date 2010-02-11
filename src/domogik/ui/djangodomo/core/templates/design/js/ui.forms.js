@@ -46,12 +46,7 @@ function checkLength(o, n, min, max) {
                 } else {
                     self.original_icon = self.current_icon;
                 }
-                self.button_edit.addClass('hidden');
-                self.element.addClass('edited');
-                self.button_previous.removeClass('hidden');
-                self.button_next.removeClass('hidden');
-                self.button_submit.removeClass('hidden');
-                self.button_cancel.removeClass('hidden');
+                self.edit_mode();
             });
             this.button_previous = $("<button class='icon16-action-previous button-previous hidden'><span class='offscreen'>" + o.previousText + "</span></button>");
             this.button_previous.click(function() {
@@ -71,26 +66,17 @@ function checkLength(o, n, min, max) {
             });
             this.button_submit = $("<button class='icon16-action-submit button-submit hidden'><span class='offscreen'>" + o.validText + "</span></button>");
             this.button_submit.click(function() {
-                self.element.removeClass('edited');
-                self.button_previous.addClass('hidden');
-                self.button_next.addClass('hidden');
-                self.button_submit.addClass('hidden');
-                self.button_cancel.addClass('hidden');
-                self.button_edit.removeClass('hidden');
-                o.validCallback(self, self.current_icon);
+                self.display_mode();
                 self.element.removeClass("icon64-" + o.type + "-" + self.current_icon);
                 self.element.addClass("icon24-processing");
+                o.validCallback(self, self.current_icon);
             });
             this.button_cancel = $("<button class='icon16-action-cancel button-cancel hidden'><span class='offscreen'>" + o.cancelText + "</span></button>");
             this.button_cancel.click(function() {
-                self.element.removeClass('edited');
-                self.button_previous.addClass('hidden');
-                self.button_next.addClass('hidden');
-                self.button_submit.addClass('hidden');
-                self.button_cancel.addClass('hidden');
-                self.button_edit.removeClass('hidden');
+                self.display_mode();
                 self.element.removeClass("icon64-" + o.type + "-" + self.current_icon);
                 self.element.addClass("icon64-" + o.type + "-" + self.original_icon);
+                self.current_icon = self.original_icon;
             });    
             this.element.append(this.button_edit);
             this.element.append(this.button_previous);
@@ -100,9 +86,27 @@ function checkLength(o, n, min, max) {
         },
         
         cancel: function() {
+            this.current_icon = this.original_icon;
             this.element.removeClass("icon24-processing");
-            this.element.addClass("icon64-" + this.options.type + "-" + this.current_icon);
-            this.current_icon = this.original_icon;            
+            this.element.addClass("icon64-" + this.options.type + "-" + this.original_icon);
+        },
+        
+        display_mode: function() {
+            this.element.removeClass('edited');
+            this.button_previous.addClass('hidden');
+            this.button_next.addClass('hidden');
+            this.button_submit.addClass('hidden');
+            this.button_cancel.addClass('hidden');
+            this.button_edit.removeClass('hidden');
+        },
+        
+        edit_mode: function() {
+            this.button_edit.addClass('hidden');
+            this.element.addClass('edited');
+            this.button_previous.removeClass('hidden');
+            this.button_next.removeClass('hidden');
+            this.button_submit.removeClass('hidden');
+            this.button_cancel.removeClass('hidden');
         }
     });
     $.extend($.ui.editable_icon, {
