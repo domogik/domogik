@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-                                                                           
+# -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -38,9 +38,7 @@ Implements
 
 import socket
 import struct
-import threading
 from domogik.common import logger
-from domogik.common.ordereddict import OrderedDict
 
 class WOL:
     """
@@ -48,8 +46,8 @@ class WOL:
     """
 
     def __init__(self):
-        l = logger.Logger('WOL')
-        self._log = l.get_logger()
+        my_logger = logger.Logger('WOL')
+        self._log = my_logger.get_logger()
 
     def wake_up(self, mac, port):
         """
@@ -75,7 +73,7 @@ class WOL:
         # Convert magic packet in hexa
         for i in range(0, len(magic_packet), 2):
             magic_hexa = ''.join([magic_hexa,
-                                 struct.pack('B', int(magic_packet[i: i + 2], 16))])
+                         struct.pack('B', int(magic_packet[i: i + 2], 16))])
     
         # Send magic packet
         self._log.debug("Send magic packet to broadcast")

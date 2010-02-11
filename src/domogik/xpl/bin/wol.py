@@ -35,20 +35,18 @@ Implements
 @organization: Domogik
 """
 
-from domogik.xpl.lib.wol import *
-from domogik.xpl.lib.xplconnector import *
-from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.lib.module import *
-from domogik.common.configloader import Loader
-from domogik.common import logger
-from domogik.xpl.lib.queryconfig import *
+from domogik.xpl.lib.xplconnector import Listener
+from domogik.xpl.lib.module import xPLModule
+from domogik.xpl.lib.wol import WOL
+
 
 class WOLListener(xPLModule):
+    """ Implements a listener for wol messages on xPL network
+    """
 
     def __init__(self):
-        '''
-        Create lister for wake on lan
-        '''
+        """ Create lister for wake on lan
+        """
         xPLModule.__init__(self, name = 'wol')
         # Create logger
         self._log.debug("Listener for wake on lan created")
@@ -59,24 +57,24 @@ class WOLListener(xPLModule):
                 'xpltype': 'xpl-cmnd'})
 
     def wol_cb(self, message):
-        '''
-        Call wake on lan lib
-        '''
+        """ Call wake on lan lib
+            @param message : xPL message detected by listener
+        """
         self._log.debug("Call wol_cb")
         if 'device' in message.data:
             device = message.data['device']
         if 'type' in message.data:
-            type = message.data['type']
+            xpl_type = message.data['type']
         if 'current' in message.data:
             current = message.data['current']
         mac = current
         port = 7
         # if it is a wol message for computer
-        if device == "computer" and type == "wakeonlan":
+        if device == "computer" and xpl_type == "wakeonlan":
             self._log.debug("Wake on lan command received for " + mac)
             self._wolmanager.wake_up(mac, port)
 
 
 if __name__ == "__main__":
-    x = WOLListener()
+    WOLL = WOLListener()
 

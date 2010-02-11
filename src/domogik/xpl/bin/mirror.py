@@ -35,14 +35,6 @@ Implements
 @organization: Domogik
 """
 
-#from domogik.xpl.lib.xplconnector import *
-#from domogik.xpl.common.xplmessage import XplMessage
-#from domogik.xpl.lib.module import *
-#from domogik.xpl.lib.mirror import *
-#from domogik.common import configloader
-#from domogik.xpl.lib.queryconfig import *
-
-
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.lib.module import xPLModule
 from domogik.xpl.lib.module import xPLResult
