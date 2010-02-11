@@ -135,7 +135,8 @@ class Area(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<Area(id=%s, name='%s', desc='%s')>" % (self.id, self.name, self.description)
+        return "<Area(id=%s, name='%s', desc='%s')>" \
+               % (self.id, self.name, self.description)
 
     @staticmethod
     def get_tablename():
@@ -174,7 +175,7 @@ class Room(Base):
         @return an internal representation
         """
         return "<Room(id=%s, name='%s', desc='%s', area=%s)>" \
-          % (self.id, self.name, self.description, self.area)
+               % (self.id, self.name, self.description, self.area)
 
     @staticmethod
     def get_tablename():
@@ -209,7 +210,7 @@ class DeviceUsage(Base):
         @return an internal representation
         """
         return "<DeviceUsage(id=%s, name='%s', desc='%s')>" \
-                % (self.id, self.name, self.description)
+               % (self.id, self.name, self.description)
 
     @staticmethod
     def get_tablename():
@@ -244,7 +245,7 @@ class DeviceTechnology(Base):
         @return an internal representation
         """
         return "<DeviceTechnology(id=%s, name='%s', desc='%s')>" \
-          % (self.id, self.name, self.description)
+               % (self.id, self.name, self.description)
 
     @staticmethod
     def get_tablename():
@@ -288,7 +289,7 @@ class DeviceTechnologyConfig(Base):
         @return an internal representation
         """
         return "<DeviceTechnologyConfig(id=%s, techno=%s, ('%s', '%s'))>" \
-          % (self.id, self.technology, self.key, self.value)
+               % (self.id, self.technology, self.key, self.value)
 
     @staticmethod
     def get_tablename():
@@ -327,7 +328,7 @@ class DeviceType(Base):
         @return an internal representation
         """
         return "<DeviceType(id=%s, name='%s', desc='%s', device techno='%s')>" \
-                % (self.id, self.name, self.description, self.technology)
+               % (self.id, self.name, self.description, self.technology)
 
     @staticmethod
     def get_tablename():
@@ -372,10 +373,9 @@ class SensorReferenceData(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<SensorReferenceData(id=%s, name='%s', value='%s', unit='%s', \
-                stat_key='%s', device_type='%s')>" \
-                % (self.id, self.name, self.value, self.unit, self.stat_key, \
-                   self.device_type)
+        return "<SensorReferenceData(id=%s, name='%s', value='%s', unit='%s', stat_key='%s', device_type='%s')>" \
+               % (self.id, self.name, self.value, self.unit, self.stat_key, \
+                  self.device_type)
 
     @staticmethod
     def get_tablename():
@@ -425,11 +425,10 @@ class ActuatorFeature(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<ActuatorFeature(id=%s, name='%s', value='%s', unit='%s', \
-                configurable_states='%s', return_confirmation='%s' device_type='%s')>" \
-                % (self.id, self.name, self.value, self.unit, \
-                   self.configurable_states, self.return_confirmation, \
-                   self.device_type)
+        return "<ActuatorFeature(id=%s, name='%s', value='%s', unit='%s', configurable_states='%s', return_confirmation='%s' device_type='%s')>" \
+               % (self.id, self.name, self.value, self.unit, \
+                  self.configurable_states, self.return_confirmation, \
+                  self.device_type)
 
     @staticmethod
     def get_tablename():
@@ -522,11 +521,10 @@ class Device(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<Device(id=%s, name='%s', addr='%s', desc='%s', ref='%s', type='%s', usage=%s, \
-          room=%s, is_reset='%s', initial_val='%s', is_value_change='%s', unit='%s')>" \
-          % (self.id, self.name, self.address, self.description, self.reference, \
-             self.type, self.usage, self.room, self.is_resetable, self.initial_value,\
-             self.is_value_changeable_by_user, self.unit_of_stored_values)
+        return "<Device(id=%s, name='%s', addr='%s', desc='%s', ref='%s', type='%s', usage=%s, room=%s, is_reset='%s', initial_val='%s', is_value_change='%s', unit='%s')>" \
+               % (self.id, self.name, self.address, self.description, self.reference, \
+               self.type, self.usage, self.room, self.is_resetable, self.initial_value,\
+               self.is_value_changeable_by_user, self.unit_of_stored_values)
 
     @staticmethod
     def get_tablename():
@@ -567,7 +565,7 @@ class DeviceConfig(Base):
         @return an internal representation
         """
         return "<DeviceConfig(id=%s, device=%s, ('%s', '%s'))>" \
-          % (self.id, self.device, self.key, self.value)
+               % (self.id, self.device, self.key, self.value)
 
     @staticmethod
     def get_tablename():
@@ -604,7 +602,7 @@ class DeviceStats(Base):
         @return an internal representation
         """
         return "<DeviceStats(id=%s, device=%s, date='%s')>" \
-          % (self.id, self.device, self.date)
+               % (self.id, self.device, self.date)
 
     @staticmethod
     def get_tablename():
@@ -644,7 +642,7 @@ class DeviceStatsValue(Base):
         @return an internal representation
         """
         return "<DeviceStatsValue(id=%s, name=%s, value=%s, stat_id=%s)>" \
-          % (self.id, self.name, self.value, self.device_stat)
+               % (self.id, self.name, self.value, self.device_stat)
 
     @staticmethod
     def get_tablename():
@@ -682,7 +680,7 @@ class Trigger(Base):
         @return an internal representation
         """
         return "<Trigger(id=%s, desc='%s', rule='%s', result='%s')>" \
-          % (self.id, self.description, self.rule, self.result)
+               % (self.id, self.description, self.rule, self.result)
 
     @staticmethod
     def get_tablename():
@@ -723,7 +721,7 @@ class SystemAccount(Base):
         @return an internal representation
         """
         return "<SystemAccount(id=%s, login='%s', pass='%s' is_admin='%s')>" \
-          % (self.id, self.login, self. password, self.is_admin)
+               % (self.id, self.login, self. password, self.is_admin)
 
     @staticmethod
     def get_tablename():
@@ -766,7 +764,7 @@ class UserAccount(Base):
         @return an internal representation
         """
         return "<UserAccount(id=%s, first_name='%s', last_name='%s', system_account=%s)>" \
-          % (self.id, self.first_name, self.last_name, self.system_account)
+               % (self.id, self.first_name, self.last_name, self.system_account)
 
     @staticmethod
     def get_tablename():
@@ -804,7 +802,7 @@ class SystemStats(Base):
         @return an internal representation
         """
         return "<SystemStats(id=%s, module_name=%s, host_name=%s, date=%s)>" \
-          % (self.id, self.name, self.hostname, self.date)
+               % (self.id, self.name, self.hostname, self.date)
 
     @staticmethod
     def get_tablename():
@@ -845,7 +843,7 @@ class SystemStatsValue(Base):
         @return an internal representation
         """
         return "<SystemStatsValue(id=%s, name=%s, value=%s, stat_id=%s)>" \
-          % (self.id, self.name, self.value, self.system_stats)
+               % (self.id, self.name, self.value, self.system_stats)
 
     @staticmethod
     def get_tablename():
@@ -863,18 +861,21 @@ class UIItemConfig(Base):
     """
     __tablename__ = '%s_ui_item_config' % _db_prefix
 
-    reference = Column(String(30), nullable=False, primary_key=True)
+    item_name =  Column(String(30), nullable=False, primary_key=True)
+    item_reference = Column(String(30), nullable=False, primary_key=True)
     key = Column(String(30), nullable=False, primary_key=True)
     value = Column(String(30), nullable=False)
 
-    def __init__(self, reference, key, value):
+    def __init__(self, item_name, item_reference, key, value):
         """
         Class constructor
-        @param reference : item reference
-        @param key : key
-        @param value : associated value
+        @param item_name : item name (ex. area)
+        @param item_reference : item reference (ex. 2)
+        @param key : key (ex. icon)
+        @param value : associated value (ex. basement)
         """
-        self.reference = reference
+        self.item_name = item_name
+        self.item_reference = item_reference
         self.key = key
         self.value = value
 
@@ -883,8 +884,8 @@ class UIItemConfig(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<UIItemConfig(item_reference='%s', key='%s', value='%s')>" \
-                % (self.reference, self.key, self.value)
+        return "<UIItemConfig(item_name='%s' item_reference='%s', key='%s', value='%s')>" \
+               % (self.item_name, self.item_reference, self.key, self.value)
 
     @staticmethod
     def get_tablename():
@@ -920,7 +921,7 @@ class SystemConfig(Base):
         @return an internal representation
         """
         return "<SystemConfig(id=%s, simulation=%s, debug=%s)>" \
-          % (self.id, self.simulation_mode, self.debug_mode)
+               % (self.id, self.simulation_mode, self.debug_mode)
 
     @staticmethod
     def get_tablename():
