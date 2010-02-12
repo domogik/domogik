@@ -49,7 +49,7 @@ Implements
 from exceptions import AssertionError
 
 from sqlalchemy import types, create_engine, Table, Column, Integer, String, \
-      MetaData, ForeignKey, Boolean, DateTime, Date, Text
+      MetaData, ForeignKey, Boolean, DateTime, Date, Text, UniqueConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relation, backref
 
@@ -282,6 +282,7 @@ class DeviceTechnologyConfig(Base):
         self.key = key
         self.value = value
         self.description = description
+        UniqueConstraint(technology_id, key)
 
     def __repr__(self):
         """
@@ -697,7 +698,7 @@ class SystemAccount(Base):
     """
     __tablename__ = '%s_system_account' % _db_prefix
     id = Column(Integer, primary_key=True)
-    login = Column(String(20), nullable=False)
+    login = Column(String(20), nullable=False, unique=True)
     password = Column(Text, nullable=False)
     is_admin = Column(Boolean, nullable=False, default=False)
     skin_used = Column(String(80), nullable=False)
