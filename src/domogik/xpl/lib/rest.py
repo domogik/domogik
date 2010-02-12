@@ -577,7 +577,7 @@ target=*
                                                   self.jsonp, self.jsonp_cb)
                 else:
                     if self.rest_request[2] == "by-id":
-                        self._rest_base_area_list(arza_id=self.rest_request[3])
+                        self._rest_base_area_list(area_id=self.rest_request[3])
                     else:
                         self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
