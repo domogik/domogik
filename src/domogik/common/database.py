@@ -1895,43 +1895,24 @@ class DbHelper():
 # UIItemConfig
 ###
 
-    def add_ui_item_config(self, ui_item_name, ui_item_reference, ui_parameters):
+    def set_ui_item_config(self, ui_item_name, ui_item_reference, ui_key,
+                           ui_value):
         """
-        Add a UI parameter for an item
-        @param ui_item_name : the item name
-        @param ui_item_reference : the item reference
-        @param i_parameters : dictionnary of named parameters {key1:value1, key2:value2,...}
-        """
-        ui_item_config_list = []
-        for param in ui_parameters:
-            ui_item_config = UIItemConfig(item_name=ui_item_name,
-                                          item_reference=ui_item_reference,
-                                          key=param, value=ui_parameters[param])
-            self._session.add(ui_item_config)
-            try:
-                self._session.commit()
-            except Exception, sql_exception:
-                self._session.rollback()
-                raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-            ui_item_config_list.append(ui_item_config)
-        return ui_item_config_list
-
-    def update_ui_item_config(self, ui_item_name, ui_item_reference,
-                              ui_key, ui_value):
-        """
-        Update a UI parameter of an item
+        Add / update an UI parameter
         @param ui_item_name : item name
-        @param ui_item_reference : item reference
-        @param ui_key : key we want to update
-        @param ui_value : key value
+        @param ui_item_reference : the item reference
+        @param ui_key : key we want to add / update
+        @param ui_value : key value we want to add / update
         @return : the updated UIItemConfig item
         """
         ui_item_config = self.get_ui_item_config(ui_item_name,
                                                  ui_item_reference, ui_key)
         if ui_item_config is None:
-            raise DbHelperException("Can't find item (%s, %s, %s) : can't update it"
-                                    % (ui_item_name, ui_item_reference, ui_key))
-        ui_item_config.value = ui_value
+            ui_item_config = UIItemConfig(item_name=ui_item_name,
+                                          item_reference=ui_item_reference,
+                                          key=ui_key, value=ui_value)
+        else:
+            ui_item_config.value = ui_value
         self._session.add(ui_item_config)
         try:
             self._session.commit()
