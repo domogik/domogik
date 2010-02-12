@@ -693,19 +693,11 @@ target=*
                     self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
 
-            ### add
-            elif self.rest_request[1] == "add":
+            ### set
+            elif self.rest_request[1] == "set":
                 offset = 2
                 if self.set_parameters(offset):
-                    self._rest_base_ui_item_config_add()
-                else:
-                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
-
-            ### update
-            elif self.rest_request[1] == "update":
-                offset = 2
-                if self.set_parameters(offset):
-                    self._rest_base_ui_item_config_update()
+                    self._rest_base_ui_item_config_set()
                 else:
                     self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
@@ -1272,30 +1264,14 @@ target=*
 
 
 
-    def _rest_base_ui_item_config_add(self):
-        """ add ui_item_config
+    def _rest_base_ui_item_config_set(self):
+        """ set ui_item_config (add if it doesn't exists, update else)
         """
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("ui_config")
         try:
-            ui_item_config = self._db.add_ui_item_config(self.get_parameters("name"), \
-                                                         self.get_parameters("reference"), \
-                                                         {self.get_parameters("key") : self.get_parameters("value")})
-            json_data.add_data(ui_item_config)
-        except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
-        self.send_http_response_ok(json_data.get())
-
-
-    def _rest_base_ui_item_config_update(self):
-        """ update ui_item_config
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("ui_config")
-        try:
-            ui_item_config = self._db.update_ui_item_config(self.get_parameters("name"), \
+            ui_item_config = self._db.set_ui_item_config(self.get_parameters("name"), \
                                                          self.get_parameters("reference"), \
                                                          self.get_parameters("key"), \
                                                          self.get_parameters("value"))
@@ -1892,16 +1868,14 @@ class JSonHelper():
         self._nb_data_values += 1
 
         # dirty issue to force data not to be in cache
-        if hasattr(data, 'id'):    # for all
-            pass
+        print data
+        #if hasattr(data, 'id') or hasattr(data, 'reference'):    # for all
+        #    pass
         if hasattr(data, 'area'):  # for room
             pass
 
         if data == None:
             return
-        #print "=== DATA ==="
-        #print str(data)
-        #print "============"
         for key in data.__dict__:
             #print "#> "+ str(key) + " (" + str( type(data.__dict__[key]).__name__) + ")  : " + str(data.__dict__[key])
             type_data = type(data.__dict__[key]).__name__
