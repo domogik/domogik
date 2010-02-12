@@ -193,10 +193,11 @@
                             list: area_icons,
                             icon: '{{ area.config.icon }}',
                             validCallback: function(self, icon) {
-                                getREST('/base/ui_config/add/name/area/reference/{{ area.id }}/key/icon/value/' + icon,
+                                getREST('/base/ui_config/set/name/area/reference/{{ area.id }}/key/icon/value/' + icon,
                                     function(data) {
                                         var status = (data.status).toLowerCase();
                                         if (status == 'ok') {
+                                            self.valid();
                                             $("#tab{{ area.id }}").removeClass();
                                             $("#tab{{ area.id }}").addClass("icon16-area-" + icon);
                                         } else {

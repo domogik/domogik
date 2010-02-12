@@ -91,6 +91,11 @@ function checkLength(o, n, min, max) {
             this.element.addClass("icon64-" + this.options.type + "-" + this.original_icon);
         },
         
+        valid: function() {
+            this.element.removeClass("icon24-processing");
+            this.element.addClass("icon64-" + this.options.type + "-" + this.current_icon);
+        },
+        
         display_mode: function() {
             this.element.removeClass('edited');
             this.button_previous.addClass('hidden');

@@ -210,10 +210,11 @@
                             list: room_icons,
                             icon: "{{ room.config.icon }}",
                             validCallback: function(self, icon) {
-                                getREST('/base/ui_config/add/name/room/reference/{{ room.id }}/key/icon/value/' + icon,
+                                getREST('/base/ui_config/set/name/room/reference/{{ room.id }}/key/icon/value/' + icon,
                                     function(data) {
                                         var status = (data.status).toLowerCase();
                                         if (status == 'ok') {
+                                            self.valid();
                                             $("#tab{{ room.id }}").removeClass();
                                             $("#tab{{ room.id }}").addClass("icon16-room-" + icon);
                                         } else {
