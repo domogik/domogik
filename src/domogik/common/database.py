@@ -58,6 +58,7 @@ import hashlib
 from types import DictType, ListType, NoneType
 
 import sqlalchemy
+from sqlalchemy.sql.expression import func
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
@@ -171,13 +172,16 @@ class DbHelper():
         """
         return self._session.query(Area).filter_by(id=area_id).first()
 
+
     def get_area_by_name(self, area_name):
         """
         Fetch area information
         @param area_name : The area name
         @return an area object
         """
-        return self._session.query(Area).filter_by(name=area_name).first()
+        return self._session.query(Area)\
+                            .filter(func.lower(Area.name)==area_name.lower())\
+                            .first()
 
     def add_area(self, a_name, a_description=None):
         """
@@ -274,7 +278,9 @@ class DbHelper():
         @param r_name : The room name
         @return a room object
         """
-        return self._session.query(Room).filter_by(name=r_name).first()
+        return self._session.query(Room)\
+                            .filter(func.lower(Room.name)==r_name.lower())\
+                            .first()
 
     def get_room_by_id(self, r_id):
         """
@@ -388,7 +394,9 @@ class DbHelper():
         @param du_name : The device usage name
         @return a DeviceUsage object
         """
-        return self._session.query(DeviceUsage).filter_by(name=du_name).first()
+        return self._session.query(DeviceUsage)\
+                            .filter(func.lower(DeviceUsage.name)==du_name.lower())\
+                            .first()
 
     def add_device_usage(self, du_name, du_description=None):
         """
@@ -477,7 +485,9 @@ class DbHelper():
         @param dty_name : The device type name
         @return a DeviceType object
         """
-        return self._session.query(DeviceType).filter_by(name=dty_name).first()
+        return self._session.query(DeviceType)\
+                            .filter(func.lower(DeviceType.name)==dty_name.lower())\
+                            .first()
 
     def add_device_type(self, dty_name, dt_id, dty_description=None):
         """
@@ -598,7 +608,7 @@ class DbHelper():
         @return a SensorReferenceData object
         """
         return self._session.query(SensorReferenceData)\
-                            .filter_by(name=srd_name)\
+                            .filter(func.lower(SensorReferenceData.name)==srd_name.lower())\
                             .first()
 
     def add_sensor_reference_data(self, srd_name, srd_value, dty_id,
@@ -708,7 +718,9 @@ class DbHelper():
         @param af_name : The name of the actuator feature
         @return an ActuatorFeature object
         """
-        return self._session.query(ActuatorFeature).filter_by(name=af_name).first()
+        return self._session.query(ActuatorFeature)\
+                            .filter(func.lower(ActuatorFeature.name)==af_name.lower())\
+                            .first()
 
     def add_actuator_feature(self, af_name, af_value, dty_id, af_unit=None,
                              af_configurable_states=None,
@@ -823,7 +835,8 @@ class DbHelper():
         @return a DeviceTechnology object
         """
         return self._session.query(DeviceTechnology)\
-                            .filter_by(name=dt_name).first()
+                            .filter(func.lower(DeviceTechnology.name)==dt_name.lower())\
+                            .first()
 
     def add_device_technology(self, dt_name, dt_description):
         """
@@ -1091,7 +1104,7 @@ class DbHelper():
             device_tech = self._session.query(DeviceTechnology)\
                                        .filter_by(id=device_type.technology_id)\
                                        .first()
-            if device_tech.name == techno_name:
+            if device_tech.name.lower() == techno_name.lower():
                 return device
         return None
 

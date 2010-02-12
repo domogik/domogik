@@ -204,7 +204,7 @@ class AreaTestCase(GenericTestCase):
 
     def testFetchInformation(self):
         area = self.db.add_area('area0','description 0')
-        area0 = self.db.get_area_by_name('area0')
+        area0 = self.db.get_area_by_name('Area0')
         assert area0.name == 'area0', 'area0 not found'
 
     def testDel(self):
@@ -308,7 +308,7 @@ class RoomTestCase(GenericTestCase):
         area1 = self.db.add_area('area1','description 1')
         room1 = self.db.add_room(r_name='room1', r_description='description 1',
                                  r_area_id=area1.id)
-        assert self.db.get_room_by_name('room1').name == 'room1'
+        assert self.db.get_room_by_name('Room1').name == 'room1'
 
     def testGetRoomsOfArea(self):
         area1 = self.db.add_area('area1','description 1')
@@ -355,7 +355,7 @@ class DeviceUsageTestCase(GenericTestCase):
 
     def testFetchInformation(self):
         du1 = self.db.add_device_usage('du1')
-        assert self.db.get_device_usage_by_name('du1').name == 'du1'
+        assert self.db.get_device_usage_by_name('Du1').name == 'du1'
 
     def testDel(self):
         du1 = self.db.add_device_usage('du1')
@@ -430,7 +430,7 @@ class DeviceTypeTestCase(GenericTestCase):
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
         dty1 = self.db.add_device_type(dty_name='x10 Switch',
                                        dty_description='desc1', dt_id=dt1.id)
-        assert self.db.get_device_type_by_name('x10 Switch').name == 'x10 Switch'
+        assert self.db.get_device_type_by_name('x10 switch').name == 'x10 Switch'
 
     def testDel(self):
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
@@ -532,7 +532,7 @@ class SensorReferenceDataTestCase(GenericTestCase):
         srd2 = self.db.add_sensor_reference_data(srd_name='Voltage',
                     srd_value='number', dty_id=dty2.id, srd_unit='V',
                     srd_stat_key='key2')
-        assert self.db.get_sensor_reference_data_by_name('Temperature').unit == srd1.unit
+        assert self.db.get_sensor_reference_data_by_name('temperature').unit == srd1.unit
 
     def testDel(self):
         dt1 = self.db.add_device_technology(u'1wire', 'desc dt1')
@@ -644,7 +644,7 @@ class ActuatorFeatureTestCase(GenericTestCase):
         af2 = self.db.add_actuator_feature(af_name='Switch',
                     af_value='binary', dty_id=dty1.id,
                     af_configurable_states='off/on', af_return_confirmation=True)
-        assert self.db.get_actuator_feature_by_name('Dimmer').unit == af1.unit
+        assert self.db.get_actuator_feature_by_name('dimmer').unit == af1.unit
 
     def testDel(self):
         dt1 = self.db.add_device_technology(u'PLCBus', 'desc dt1')
@@ -705,7 +705,7 @@ class DeviceTechnologyTestCase(GenericTestCase):
 
     def testFetchInformation(self):
         dt2 = self.db.add_device_technology(u'1wire', 'desc dt2')
-        assert self.db.get_device_technology_by_name(u'1wire').name == u'1wire'
+        assert self.db.get_device_technology_by_name(u'1Wire').name == u'1wire'
 
     def testDel(self):
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
