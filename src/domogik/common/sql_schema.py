@@ -158,12 +158,12 @@ class Room(Base):
     area_id = Column(Integer, ForeignKey('%s.id' % Area.get_tablename()))
     area = relation(Area, backref=backref(__tablename__, order_by=id))
 
-    def __init__(self, name, description, area_id):
+    def __init__(self, name, description, area_id=None):
         """
         Class constructor
         @param name : short name of the area
         @param description : extended description
-        @param area_id : id of the area where the room is
+        @param area_id : id of the area where the room is, optional
         """
         self.name = name
         self.description = description

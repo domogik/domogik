@@ -262,6 +262,7 @@ class RoomTestCase(GenericTestCase):
         room3 = self.db.add_room(r_name='room3', r_description='description 3',
                                  r_area_id=area2.id)
         assert len(self.db.list_rooms()) == 4
+        room4 = self.db.add_room(r_name='room4')
 
     def testUpdate(self):
         area1 = self.db.add_area('area1','description 1')

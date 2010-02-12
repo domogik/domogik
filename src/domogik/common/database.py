@@ -290,12 +290,12 @@ class DbHelper():
         """
         return self._session.query(Room).filter_by(id=r_id).first()
 
-    def add_room(self, r_name, r_area_id, r_description=None):
+    def add_room(self, r_name, r_area_id=None, r_description=None):
         """
         Add a room
         @param r_name : room name
-        @param area_id : id of the area where the room is
-        @param r_description : room detailed description (optional)
+        @param area_id : id of the area where the room is, optional
+        @param r_description : room detailed description, optional
         @return : a room object
         """
         if r_area_id != None:
