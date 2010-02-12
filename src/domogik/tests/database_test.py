@@ -206,6 +206,23 @@ class AreaTestCase(GenericTestCase):
         area = self.db.add_area('area0','description 0')
         area0 = self.db.get_area_by_name('Area0')
         assert area0.name == 'area0', 'area0 not found'
+        basement = self.db.add_area('Basement')
+        first_floor = self.db.add_area('First floor')
+        self.db.add_room(r_name='Bedroom1', r_area_id=first_floor.id)
+        self.db.add_room(r_name='Bedroom2', r_area_id=first_floor.id)
+        self.db.add_room(r_name='Kitchen', r_area_id=basement.id)
+        self.db.add_room(r_name='Bathroom', r_area_id=basement.id)
+        self.db.add_room(r_name='Lounge', r_area_id=basement.id)
+        area_w_rooms_list = self.db.get_areas_with_rooms()
+        for my_area in area_w_rooms_list:
+            if my_area[0].name == 'Basement':
+                assert len(my_area[1]) == 3
+                for room in my_area[1]:
+                    assert room.name in ['Kitchen', 'Bathroom', 'Lounge']
+            elif my_area[0].name == 'First floor':
+                assert len(my_area[1]) == 2
+                for room in my_area[1]:
+                    assert room.name in ['Bedroom1', 'Bedroom2']
 
     def testDel(self):
         area0 = self.db.add_area('area0','description 0')

@@ -144,10 +144,23 @@ class DbHelper():
 ####
     def list_areas(self):
         """
-        Return a list of areas
+        Return all areas
         @return list of Area objects
         """
         return self._session.query(Area).all()
+
+    def get_areas_with_rooms(self):
+        """
+        Return all areas with associated rooms
+        @return a list of tuples (area, [room1, room2...])
+        """
+        area_list = self.list_areas()
+        area_rooms_list = []
+        for area in area_list:
+            room_list = self._session.query(Room)\
+                            .filter_by(area_id=area.id).all()
+            area_rooms_list.append((area, room_list))
+        return area_rooms_list
 
     def search_areas(self, filters):
         """
@@ -260,7 +273,7 @@ class DbHelper():
     def search_rooms(self, filters):
         """
         Look for room(s) with filter on their attributes
-        @param filters :  filter fields can be one of
+        @param filters :  filter fields (dictionnary)
         @return a list of Room objects
         """
         assert type(filters) is DictType
@@ -269,7 +282,6 @@ class DbHelper():
         for filter in filters:
             filter_arg = "%s = '%s'" % (filter, filters[filter])
             room_list = room_list.filter(filter_arg)
-
         return room_list.all()
 
     def get_room_by_name(self, r_name):
