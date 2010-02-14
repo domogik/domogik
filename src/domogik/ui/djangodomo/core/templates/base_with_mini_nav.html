@@ -49,18 +49,27 @@
 </head>
 <body>
     <ul id="nav1">
-        <li><a href="/domogik">{% trans "Home" %}</a></li>
-        <li><a href="{% url show_view %}">{% trans "View" %}</a></li>
-	{% if is_user_connected %}
-        <!--li><a href="#">Programmation</a></li-->
-        <li><a href="{% url admin_view %}">{% trans "Administration" %}</a></li>
-	{% endif %}
-        <li class="login"> {% if not is_user_connected %} <a href="{% url login_view %}">{% trans "Log in" %}</a> {% else %} <a href="{% url logout_view %}">{% trans "Log out" %} {{ request.session.user.first_name }}</a> {% endif %} </li>
+        <li><a href="/domogik" id='logo'><img src="/design/images/logo_domogik_mini.png" alt="Domogik logo" /></span></a></li>
+        <li><a href="{% url show_view %}" class="{{ nav1_show_class }}">{% trans "Visualisation" %}</a></li>
+		{% if is_user_connected %}
+	        <!--li><a href="#">Programmation</a></li-->
+	        <li><a href="{% url admin_view %}">{% trans "Administration" %}</a></li>
+		{% endif %}
+        <li class="login">
+            {% if not is_user_connected %}
+                <a href="{% url login_view %}">{% trans "Log in" %}</a>
+            {% else %}
+                <a href="{% url logout_view %}">{% trans "Log out" %} {{ request.session.user.first_name }}</a>
+            {% endif %}
+        </li>
     </ul>
 	<ul class="breadcrumb">{% block breadcrumb %}{% endblock %}</ul>
-    <div id="frame">
-        <div id="content"> {% block content %}{% endblock %} </div>
-        <div id="footer">Copyright 2009 Domogik project - GNU/GPL v3 license</div>
-    </div>
+	<div id="content-bgnd">
+		<div id="content">
+			<div id="banner">{% block banner %}{% endblock %}</div>
+			{% block content %}{% endblock %}
+		</div>
+		<div id="footer">Copyright 2009 Domogik project - GNU/GPL v3 license</div>
+	</div>
 </body>
 </html>

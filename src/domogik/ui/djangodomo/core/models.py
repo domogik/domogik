@@ -43,7 +43,6 @@ class Areas(pipes.DmgPipe):
     @staticmethod
     def getAll():
         resp = Areas.objects.get({'parameters':"list/"})
- #       icons = Areas.objects.get({'parameters':"ui_config/list/by-key/area/icon"})
         if resp :
             return resp
 
@@ -68,7 +67,13 @@ class Rooms(pipes.DmgPipe):
         resp = Rooms.objects.get({'parameters':"list/"})
         if resp :
             return resp
-
+    
+    @staticmethod
+    def getById(id):
+        resp = Rooms.objects.get({'parameters':"list/by-id/"+id})
+        if resp :
+            return resp
+        
     @staticmethod
     def getByArea(id):
         resp = Rooms.objects.get({'parameters':"list/by-area/"+id})
@@ -87,6 +92,11 @@ class Rooms(pipes.DmgPipe):
             room.config = {}
             for uiconfig in uiconfigs.ui_config:
                 room.config[uiconfig.key] = uiconfig.value
+            # If is associated with area
+            uiconfigs = UIConfigs.getByReference('area', room.area.id)
+            room.area.config = {}
+            for uiconfig in uiconfigs.ui_config:
+                room.area.config[uiconfig.key] = uiconfig.value
 
 class UIConfigs(pipes.DmgPipe):
     uri = "http://127.0.0.1:8080/base/ui_config"

@@ -1,14 +1,16 @@
 .breadcrumb {
-    background-color: #F0F0F0;
+    background-color: #eeeeee;
     list-style: none;
     margin: 0;
     padding: 0;
     clear: both;
+    border-top: #979387 1px solid;
+    border-bottom: #979387 1px solid;
 }
 
 .breadcrumb li {
     display: inline-block;
-    background: transparent url(../images/breadcrumb_separator.gif) right center no-repeat;
+    background: transparent url(../images/decoration/breadcrumb_separator.gif) right center no-repeat;
     padding-right: 15px;
     padding-left: 10px;
 }
@@ -30,5 +32,5 @@
 }
 
 .breadcrumb li a:hover, .breadcrumb li a:focus, .breadcrumb li a:active  {
-    color:#0a8ecc;  
+    color:#9BB528;  
 }

@@ -65,16 +65,19 @@ def index(request):
     @param request : the HTTP request
     @return an HttpResponse object
     """
-    page_title = _("Control overview")
-    sys_config = __db.get_system_config()
-
-    room_list = __db.list_rooms()
+    page_title = _("Domogik Homepage")
+    resultAllRooms = Rooms.getAll()
+    resultAllRooms.merge_uiconfig()
+        
     device_list = []
     for device in __db.list_devices():
       device_list.append({'room': device.room_id, 'device': device})
 
-    return __go_to_page(request, 'index.html', page_title, room_list=room_list,
-                       device_list=device_list)
+    return __go_to_page(request, 'index.html',
+                        page_title,
+                        rooms_list=resultAllRooms.room,
+                        device_list=device_list
+                    )
 
 def device(request, device_id):
     """
@@ -493,6 +496,8 @@ def admin_organization_devices(request):
     return __go_to_page(
         request, 'admin/organization/devices.html',
         page_title,
+        nav1_admin = "selected",
+        nav2_organization_devices = "selected",
         device_usage_list=device_usage_list,
         rooms_list=rooms_list,
         devices_list=devices_list,
@@ -519,6 +524,8 @@ def admin_organization_rooms(request):
     return __go_to_page(
         request, 'admin/organization/rooms.html',
         page_title,
+        nav1_admin = "selected",
+        nav2_organization_rooms = "selected",
         status=status,
         msg=msg,
         unattribued_rooms=resultUnattribuedRooms.room,
@@ -544,6 +551,8 @@ def admin_organization_areas(request):
     return __go_to_page(
         request, 'admin/organization/areas.html',
         page_title,
+        nav1_admin = "selected",
+        nav2_organization_areas = "selected",
         status=status,
         msg=msg,
         areas_list=resultAllAreas.area
@@ -555,13 +564,14 @@ def show_index(request):
     @param request : HTTP request
     @return an HttpResponse object
     """
-    page_title = _("Visualisation Maison")
+    page_title = _("View House")
     resultAllAreas = Areas.getAll()
     resultAllAreas.merge_uiconfig()
     
     return __go_to_page(
         request, 'show/index.html',
         page_title,
+        nav1_show = "selected",
         areas_list=resultAllAreas.area,
     )
 
@@ -577,10 +587,11 @@ def show_area(request, area_id):
     resultRoomsByArea = Rooms.getByArea(area_id)
     resultRoomsByArea.merge_uiconfig()
 
-    page_title = _("Visualisation Zone")
+    page_title = _("View ") + resultAreaById.area[0].name
     return __go_to_page(
         request, 'show/area.html',
         page_title,
+        nav1_show = "selected",
         area=resultAreaById.area[0],
         rooms_list=resultRoomsByArea.room
     )
@@ -591,19 +602,18 @@ def show_room(request, room_id):
     @param request : HTTP request
     @return an HttpResponse object
     """
-    room = __db.get_room_by_id(room_id)
+    resultRoomById = Rooms.getById(room_id)
+    resultRoomById.merge_uiconfig()
+    
     devices_list = __db.search_devices({'room_id':room_id})
-    area_id = room.area_id
-    area_name = (__db.get_area_by_id(area_id)).name
 
     page_title = _("Visualisation Piece")
     return __go_to_page(
         request, 'show/room.html',
         page_title,
-        room=room,
+        nav1_show = "selected",
+        room=resultRoomById.room[0],
         devices_list=devices_list,
-        area_id=area_id,
-        area_name=area_name
     )
 
 def show_device(request, device_id):
@@ -622,6 +632,7 @@ def show_device(request, device_id):
     return __go_to_page(
         request, 'show/device.html',
         page_title,
+        nav1_show = "selected",
         device=device,
         area_id=area_id,
         area_name=area_name,

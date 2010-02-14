@@ -36,17 +36,17 @@
 
 {% block title %}{% trans page_title %}{% endblock %}
 
+{% block banner %}
+	<div class="section icon64-house-default">
+		<h1 class="ident"><span class="title">My House</span></h1>
+		<ul class="actions"></ul>
+	</div>
+{% endblock %}
 {% block content %}
-    <div class='section-bgnd'>
-		<div class="section icon64-room-default">
-			<h1 class="ident"><span class="title">My House</span></h1>
-			<ul class="actions"></ul>
-		</div>
-    </div>
-    <dl>
+	<dl>
 	{% for area in areas_list %}
 		{% if forloop.counter0|divisibleby:"3" %}
-            <div class='row'>
+			<div class='row'>
 		{% endif %}
 				<div class='column'>
 					<div class='block'>
@@ -77,8 +77,8 @@
 					</div>
 				</div>
 		{% if forloop.counter0|divisibleby:"3" %}
-            </div>
+			</div>
 		{% endif %}
 	{% endfor %}
-    </dl>
+	</dl>
 {% endblock %}

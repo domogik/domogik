@@ -38,18 +38,19 @@
 
 {% block breadcrumb %}
 		<li><a href='{% url show_view %}' class='home'>My House</a></li>
-		<li><a href='{% url show_area_view area_id %}' class='icon16-area-grndfloor'>{{ area_name }}</a></li>
+		<li><a href='{% url show_area_view room.area.id %}' class='icon16-area-{{ room.area.config.icon }}'>{{ room.area.name }}</a></li>
+{% endblock %}
+
+{% block banner %}
+    <div id='binary_data'></div>
+    <div id='range_data'></div>
+	<div class="section icon64-room-{{ room.config.icon }}">
+		<h1 class="ident"><span class="title">{{ room.name }}</span></h1>
+		<ul class="actions"></ul>
+	</div>
 {% endblock %}
 
 {% block content %}
-    <div id='binary_data'></div>
-    <div id='range_data'></div>
-    <div class='section-bgnd'>
-        <div class="section icon64-room-{{ room.config.icon }}">
-			<h1 class="ident"><span class="title">{{ room.name }}</span></h1>
-			<ul class="actions"></ul>
-        </div>
-    </div>	
     <dl>
 	{% for device in devices_list %}
 		{% if forloop.counter0|divisibleby:"3" %}

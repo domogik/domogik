@@ -6,12 +6,6 @@
 }
 
 .section-bgnd {
-    border: 1px solid #cccccc;
-    -moz-box-shadow: 5px 5px 5px #888;
-    -webkit-box-shadow: 5px 5px 5px #888;
-    -moz-border-radius: 0.8em;
-    -webkit-border-radius: 0.8em;
-    background:url(ui-lightness/images/ui-bg_highlight-soft_100_eeeeee_1x100.png) top left repeat-x;
 }
 
 .section .actions {
@@ -53,11 +47,10 @@
 /* Subsection */
 
 .subsection {
-    margin-top:2em;
+    margin:1em;
     padding:1em;
-    border: 1px solid #cccccc;
-    -moz-box-shadow: 5px 5px 5px #888;
-    -webkit-box-shadow: 5px 5px 5px #888;
+    border: 1px solid #979387;
     -moz-border-radius: 0.8em;
     -webkit-border-radius: 0.8em;
+    background-color:#eeeeee;
 }

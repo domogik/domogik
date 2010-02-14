@@ -1,7 +1,23 @@
-#frame {
+#content-bgnd {
     margin:auto;
-    width:50em;
+    width:55em;
     padding:1em;
+}
+
+.left, .right {
+    background-color:#eeeeee;
+    border: 1px solid #979387;
+    -moz-border-radius: 0.8em;
+    -webkit-border-radius: 0.8em;
+    min-height:35em;
+    padding:1em;
+}
+
+.left {
+    width:18em;
+}
+
+.right {
 }
 
 input {
@@ -12,7 +28,7 @@ input {
 ul#users {
     list-style:none;
     text-align:center;
-    margin:1em;
+    margin:0;
     padding:0;
     -moz-column-width: 6em;
     -webkit-column-width: 6em;
@@ -24,7 +40,7 @@ ul#users li a {
     display:inline-block;
     border:1px solid #999;
     padding:0;
-    margin:0.2em;
+    margin:0;
     text-align:center;
     color:#000;
     text-decoration:none;
@@ -35,15 +51,17 @@ ul#digits {
     list-style:none;
     margin:auto;
     padding:0;
-    width:20em;
-    -moz-column-count: 3;
-        -webkit-column-count: 3;
-        -moz-column-gap: 0;
-        -webkit-column-gap: 0;
+    width:21em;
+}
+
+ul#digits li {
+    display: inline-block;
+    margin:0;
+    padding:0;
 }
 
 ul#digits li a, ul#digits li input {
-    display:block;
+    display:inline-block;
     border:none;
     margin:0.2em;
     text-align:center;
@@ -70,6 +88,8 @@ input.buttonok:hover, input.buttonok:active, input.buttonok:focus {
 }
 
 #logincode {
+    -moz-appearance: none;
+    -webkit-appearance: none;
     width:6em;
     border-top:2px solid #666;
     border-bottom:2px solid #666;
@@ -80,22 +100,28 @@ input.buttonok:hover, input.buttonok:active, input.buttonok:focus {
     text-align:center;
     -moz-border-radius: 0.8em 0 0 0.8em;
     -webkit-border-radius: 0.8em 0 0 0.8em;
+    margin:0;
+    line-height:1em;
 }
 
 input.buttonok {
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    margin:0;
     font-size: 2.5em;
     border-top:2px solid #666;
     border-bottom:2px solid #666;
     border-right:2px solid #666;
     border-left:none;
-    background-color:#9C0;
+    background-color:#9BB528;
     -moz-border-radius: 0 0.8em 0.8em 0;
     -webkit-border-radius: 0 0.8em 0.8em 0;
     color:#666;
+    line-height:1em;
 }
 
 ul#users li a.selected {
-    background-color:#9C0;
+    background-color:#9BB528;
 }
 
 ul#users img {

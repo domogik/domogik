@@ -32,25 +32,24 @@
 {% block include_js_script %}
     <script type="text/javascript" src="/design/js/page-home.js"></script>
 {% endblock %}
-{% block banner %}
-    <div id="general-temp">
-        <div class="widget">
-            <div id="general-tempcurrent">9&deg;</div>
-            <div id="general-templocation">Paris</div>
-            <div id="general-tempmax">Max: 18&deg;</div>
-            <div id="general-tempmin">Min: 7&deg;</div>
-        </div>
-        <img id="general-tempicon" class="icon-weather-sun" src="/design/{{ request.session.user.skin_used|default:'skins/default' }}/images/weather/sun.png" alt="Soleil"/>
-    </div>
-    <div id="general-datetime" class="widget">
-        <span id="general-date">{% now "l j F Y" %}</span>
-        <span id="general-time">{% now "H:i" %}</span>
-    </div>
-{% endblock %}       
 {% block content %}
-    <div class='section-bgnd'>
-        <div class="section icon64-room-default">
-	    <h1 class="ident"><span class="title">My House</span></h1>
+    <div id="banner">
+        <!--div id="general-temp">
+            <div class="widget">
+                <div id="general-tempcurrent">9&deg;</div>
+                <div id="general-templocation">Paris</div>
+                <div id="general-tempmax">Max: 18&deg;</div>
+                <div id="general-tempmin">Min: 7&deg;</div>
+            </div>
+            <img id="general-tempicon" class="icon-weather-sun" src="/design/{{ request.session.user.skin_used|default:'skins/default' }}/images/weather/sun.png" alt="Soleil"/>
+        </div>
+        <div id="general-datetime" class="widget">
+            <span id="general-date">{% now "l j F Y" %}</span>
+            <span id="general-time">{% now "H:i" %}</span>
+        </div-->
+        
+        <div class="section icon64-house-default">
+        <h1 class="ident"><span class="title">My House</span></h1>
             <ul class="general-infos">
                 <li class="icon16-device-electricity">150 Kw/h</li>
                 <li class="icon16-device-water">1,7 l/h</li>
@@ -61,34 +60,34 @@
                 <li class="icon16-device-error">Pas d'erreur</li>
             </ul>
         </div>
-    </div>    
-        <dl>
-    {% for room in room_list %}
+    </div>
+    <dl>
+    {% for room in rooms_list %}
         {% if forloop.counter0|divisibleby:"3" %}
         <div class="row">
         {% endif %}
             <div class='column'>
                 <div class="block">
-                    <dt class='header icon64-room-kitchen'>
-			<div class="ident">
-			    <span class="title">{{ room.name }}</span>
-			    <br />
-			    <span class="subtitle icon16-area-grndfloor">{{ room.area.name }}</span>
-			</div>
-		    </dt>
-                    <dd>
-                    <ul>
-                        {% regroup device_list|dictsort:"room" by room as d_list_by_room %}
-                        {% for device in d_list_by_room %}
-                            {% ifequal device.grouper room.id %}
-                                {% for item in device.list %}
-                                    <li>{{ item.device.name }}</li>
+                    <dt class='header icon64-room-{{ room.config.icon }}'>
+                        <div class="ident">
+                            <span class="title">{{ room.name }}</span>
+                            <br />
+                            <span class="subtitle icon16-area-{{ room.area.config.icon }}">{{ room.area.name }}</span>
+                        </div>
+                    </dt>
+                        <dd>
+                            <ul>
+                                {% regroup device_list|dictsort:"room" by room as d_list_by_room %}
+                                {% for device in d_list_by_room %}
+                                    {% ifequal device.grouper room.id %}
+                                        {% for item in device.list %}
+                                            <li>{{ item.device.name }}</li>
+                                        {% endfor %}
+                                    {% endifequal %}
                                 {% endfor %}
-                            {% endifequal %}
-                        {% endfor %}
-                    </ul>
-                    </dd>
-		    <dd class='footer'></dd>
+                            </ul>
+                        </dd>
+                    <dd class='footer'></dd>
                 </div>
             </div>
         {% if forloop.counter0|divisibleby:"3" %}

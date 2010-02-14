@@ -1,8 +1,8 @@
 .block {
-    background:#eeeeee url(ui-lightness/images/ui-bg_highlight-soft_100_eeeeee_1x100.png) top left repeat-x;
+    background-color:#eeeeee;
     width:30em;
     margin:1em 0 1em 0;
-    border: 1px solid #cccccc;
+    border: 1px solid #979387;
     -moz-border-radius: 0.8em;
     -webkit-border-radius: 0.8em;
 }

@@ -1,0 +1,23 @@
+@charset "UTF-8";
+/* CSS Document */
+
+.light-infos {
+  list-style:none;
+  margin-left:20%;
+}
+
+.light-infos li {
+  display:inline-block;
+  text-align:center;
+  margin:1em;
+  background-position:50% top;
+  background-repeat:no-repeat;
+  padding-top:16px;
+}
+
+.element h2 {
+  background-position:left 50%;
+  background-repeat:no-repeat;
+  padding-left:20px;
+  min-height:16px;
+}

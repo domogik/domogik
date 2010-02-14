@@ -1,0 +1,71 @@
+/* Mini widget */
+.widgetmini_binary {
+    display:inline-block;
+    width: 45px;
+    height: 45px;
+    border: 1px solid #cccccc;
+    -moz-border-radius: 0.8em;
+    -webkit-border-radius: 0.8em;
+    background-position: center center;
+    background-repeat: no-repeat;
+    outline: none;
+}
+
+.widgetmini_binary:hover, .widgetmini_binary:focus {
+    background-color:#FFFFFF;
+    cursor: pointer;
+}
+
+.widgetmini_binary.processing_state, .widget_binary.processing_state {
+    background-color:#FFFFFF;
+    background-image : url('../images/processing_24.gif');
+}
+
+.widgetmini_binary.ok_state {
+    border: 1px solid #098876;
+}
+
+.widgetmini_binary.error_state {
+    border: 1px solid #098876;
+}
+
+.widgetmini_binary.unknown_state {
+    border: 1px solid #098876;
+}
+
+/* Widget */
+.widget_binary {
+    display:block;
+    border: 1px solid #cccccc;
+    -moz-border-radius: 0.8em;
+    -webkit-border-radius: 0.8em;
+    background-color: #FFFFFF;
+    background-position: top left;
+    background-repeat: no-repeat;
+    padding:0.5em;
+}
+
+.widget_binary ul {
+    list-style:none;
+    margin:0;
+    padding:0;
+    text-align:right;
+}
+
+.widget_binary li {
+    display:inline-block;
+    margin: 0;
+    padding: 0;
+}
+
+.widget_binary.ok_state .name {
+    border: 1px solid #098876;
+}
+
+.widget_binary.error_state .name {
+    border: 1px solid #098876;
+}
+
+.widget_binary.unknown_state .name {
+    border: 1px solid #098876;
+}

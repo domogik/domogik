@@ -102,16 +102,18 @@
 {% block js_include %}
 {% endblock %}
 {% block title %}{% trans page_title %}{% endblock %}
-{% block right %}
-    <div class='section-bgnd'>
-        <div class="section">
-            <h1 class="ident"><span class="title">{% trans "Areas" %}</span></h1>
-            {% ifnotequal status "" %}
-            <div id='messages' class='{{status}}'>{{msg}}</div>
-            {% endifnotequal %}
-            <ul class="actions"></ul>
-        </div>
+
+{% block banner %}
+    <div class="section">
+        <h1 class="ident"><span class="title">{% trans "Areas" %}</span></h1>
+        {% ifnotequal status "" %}
+        <div id='messages' class='{{status}}'>{{msg}}</div>
+        {% endifnotequal %}
+        <ul class="actions"></ul>
     </div>
+{% endblock %}
+
+{% block right %}
     
     <div class="subsection">
         <h2>{% trans "Areas list" %}</h2>

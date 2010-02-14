@@ -1,57 +1,50 @@
+ul#nav1 #logo {
+    background: url(../../../images/logo_domogik_mini.png) 50% 50% no-repeat;
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 60%, from(#BDCB2F), to(#9BB528));
+    background-image: -moz-linear-gradient(100% 60% 270deg, #BDCB2F, #9BB528);
+	border: #B9C248 1px solid;
+	padding:0.3em;
+    margin:0 0 0 1em;
+	-moz-border-radius: 0.4em;
+	-webkit-border-radius: 0.4em;
+}
+
 /* Nav menu */
 ul#nav1 {
-  list-style: none;
-  color: #ffffff;
-  margin:0;
-  padding:0 1em 0 10em;
-  background:#f6a828 url(../images/logo_domogik_mini.png) 1em 50% no-repeat;
+    list-style: none;
+    color: #ffffff;
+    margin:0;
+    padding:0;
+	background-image: -webkit-gradient(linear, 0% 0%, 0% 80%, from(#000000), to(#403E3F));
+    background-image: -moz-linear-gradient(100% 80% 90deg, #403E3F, #000000);
 }
 
 ul#nav1 li {
-  display:inline-block;
-  padding:0;
-  margin:0;
+    display:inline-block;
+    padding:0;
+    margin:0;
 }
+
 ul#nav1 li a {
-  font-weight: bold;
-  display:inline-block;
-  text-decoration:none;
-  line-height:2em;
-  padding: 0.5em 1em 0.5em 1em;
-  margin:0 0 1em 0;
-  background:#FFF;
-  color: #1c94c4;
-  border-left: #cccccc 1px solid;
-  border-right: #cccccc 1px solid;
-  border-bottom: #cccccc 1px solid;
-  -moz-border-radius: 0 0 0.8em 0.8em;
-  -webkit-border-radius: 0 0 0.8em 0.8em;
+    display:inline-block;
+    text-decoration:none;
+    line-height:1.4em;
+    padding: 0.8em 1em 0.8em 1em;
+    margin: 0;
+    color: #7D8430;
+  	font-family:Impact;
+	font-size:1.8em;
 }
 
 ul#nav1 li a:hover, ul#nav1 li a:focus, ul#nav1 li a:active {
-  color: #c77405;
-  background: #fdf5ce url(../images/jquery/ui-bg_glass_100_fdf5ce_1x400.png) repeat-x 50% 50%;
-  background-attachment: scroll;
+    color: #B9C248;
 }
+
 ul#nav1 li a.selected {
-  color: #eb8f00;
-}
-ul#nav1 li a.selected:hover {
-  color: #eb8f00;
-  background:#FFF;
+    color: #B9C248;
+    background: url(../images/decoration/nav1_selector_green.png) 50% 100% no-repeat;
 }
 
 ul#nav1 .login {
     float:right;
-}
-
-ul#nav1 .login a {
-  text-decoration:none;
-  border-top:1px solid #FFF;
-  border-left:1px solid #FFF;
-  border-right:1px solid #FFF;
-  color:#FFF;
-  background-color:#1c94c4;
-  margin:0;
-  display:inline-block;
 }

@@ -1,0 +1,31 @@
+@charset "UTF-8";
+/* CSS Document */
+
+table {
+    width:100%;
+}
+
+table th {
+    background-color:#1c94c4;
+    color:#FFF;
+}
+
+table td {
+    padding:1em;
+}
+
+table tr.odd {
+    background-color:#FFF;
+}
+
+table ul.actions {
+    list-style:none;
+    margin:0;
+    padding:0;
+}
+
+table ul.actions li {
+    display:inline;
+    margin:0 1em 0 0;
+    padding:0;
+}

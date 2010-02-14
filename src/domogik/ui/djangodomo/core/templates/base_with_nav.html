@@ -48,23 +48,29 @@
 <title>{% block title %}Domogik{% endblock %}</title>
 </head>
 <body>
-<div id="frame">
     <div id="header">
-        <a href="/domogik" id="logo"> <img src="/design/{{ request.session.user.skin_used|default:'skins/default' }}/images/logo_domogik.png" width="131" height="37" alt="Domogik logo" /></a>
+        <a href="/domogik" id="logo"><img src="/design/images/logo_domogik.png" width="131" height="37" alt="Domogik logo" /></a>
     <div id="title">{% trans "Welcome to Domogik" %} <span id="subtitle">{% trans "Free home automation under Linux" %}</span> </div>
     </div>
-    {% block banner %}
-    {% endblock %}
     <ul id="nav1">
-        <li><a href="{% url show_view %}">{% trans "View" %}</a></li>
+        <li><a href="{% url show_view %}" class="{{ nav1_show }}">{% trans "Visualisation" %}<span class='description'>{% trans "View, Control your house" %}</span></a></li>
         {% if is_user_connected %}
-        <!--li><a href="#">Programmation</a></li-->
-        <li><a href="{% url admin_view %}">{% trans "Administration" %}</a></li>
+            <!--li><a href="#">Programmation</a></li-->
+            <li><a href="{% url admin_view %}" class="{{ nav1_admin }}">{% trans "Administration" %}<span class='description'>{% trans "Configure, Manage" %}</span></a></li>
         {% endif %}
-        <li class="login"> {% if not is_user_connected %} <a href="{% url login_view %}">{% trans "Log in" %}</a> {% else %} <a href="{% url logout_view %}">{% trans "Log out" %} {{ request.session.user.first_name }}</a> {% endif %} </li>
+        <li class="login">
+            {% if not is_user_connected %}
+                <a href="{% url login_view %}">{% trans "Log in" %}<span class='description'>{% trans "Identify yourself" %}</span></a>
+            {% else %}
+                <a href="{% url logout_view %}">{% trans "Log out" %}<span class='description'>{% trans "Deconnect" %} {{ request.session.user.first_name }}</span></a>
+            {% endif %}
+        </li>
     </ul>
-    <div id="content"> {% block content %}{% endblock %} </div>
-    <div id="footer">Copyright 2009 Domogik project - GNU/GPL v3 license</div>
-</div>
+    <div id="content-bgnd"> 
+        <div id="content">
+            {% block content %}{% endblock %}
+        </div>
+        <div id="footer">Copyright 2009 Domogik project - GNU/GPL v3 license</div>
+    </div>
 </body>
 </html>

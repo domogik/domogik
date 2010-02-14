@@ -1,0 +1,16 @@
+@charset "UTF-8";
+/* CSS Document */
+
+.room-temp {
+  font-size:2em;
+  float:right;
+  clear:right;
+  margin-right:5em;
+}
+
+.room-humidity {
+  font-style:italic;
+  float:right;
+  clear:right;
+  margin-right:5em;
+}

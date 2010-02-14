@@ -111,8 +111,8 @@
 {% block js_include %}
 {% endblock %}
 {% block title %}{% trans page_title %}{% endblock %}
-{% block right %}
-    <div class='section-bgnd'>
+
+{% block banner %}
         <div class="section">
             <h1 class="ident"><span class="title">{% trans "Rooms" %}</span></h1>
             {% ifnotequal status "" %}
@@ -120,8 +120,9 @@
             {% endifnotequal %}
             <ul class="actions"></ul>
         </div>
-    </div>
-    
+{% endblock %}
+
+{% block right %}
     <div class="subsection">
         <h2>{% trans "Rooms list" %}</h2>
         <div id="tabs">

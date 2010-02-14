@@ -38,7 +38,7 @@
         {% endif %}
         <form name="loginForm" method="POST" action="{% url login_view %}"/>
             <div class="left">
-                <h2 class="splitter">1. {% trans "Select a user" %}</h2>
+                <h2>1. {% trans "Select a user" %}</h2>
                 <input id="loginname" name="login" type="text" />
                 <ul id="users">
                     {% for account in account_list %}
@@ -51,10 +51,13 @@
                 </ul>
             </div>
             <div class="right">
-                <h2 class="splitter">2. {% trans "Enter your code" %}</h2>
+                <h2>2. {% trans "Enter your code" %}</h2>
+                {% spaceless %}
                 <div id="code">
-                    <input id="logincode" name="password" type="password" value="" /><input name="update" type="submit" class="buttonok" value="Ok" />
+                    <input id="logincode" name="password" type="password" value="" />
+                    <input name="update" type="submit" class="buttonok" value="Ok" />
                 </div>
+                {% endspaceless %}
                 <ul id="digits">
                     <li><a href="#" onclick="addDigit('0');">0</a></li>
                     <li><a href="#" onclick="addDigit('1');">1</a></li>
