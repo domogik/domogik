@@ -1,11 +1,13 @@
-.section {
-    padding:1em 1em 1em 70px;
+.section .icon {
+    
+
+}
+.section .ident {
+    padding:0 0 0 70px;
     background-position:top left;
     background-repeat:no-repeat;
-    min-height: 64px;
-}
-
-.section-bgnd {
+    -webkit-box-reflect:below -30px -webkit-gradient(linear, left top, left bottom, from(transparent), color-stop(0.5, transparent), to(white));
+    line-height:64px;
 }
 
 .section .actions {
