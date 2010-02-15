@@ -65,6 +65,16 @@ fieldset {
     display:inline-block;
 }
 
+.editable_icon.processing {
+    /*
+    -moz-box-shadow: 0 0 2em #E2DE95;
+    -webkit-box-shadow: 0 0 2em #E2DE95;
+    border:2px #cccccc dashed;
+    -moz-border-radius: 0.8em;
+    -webkit-border-radius: 0.8em;
+    */
+}
+
 .editable_icon:hover, .editable_icon.edited {
     width:98px;
     height:98px;

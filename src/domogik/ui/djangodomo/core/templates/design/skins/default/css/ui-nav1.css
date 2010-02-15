@@ -61,7 +61,7 @@ ul#nav1 li a {
 ul#nav1 li a .description {
 	font-size:0.6em;
     display:block;
-	color:#E3EB57;
+	color:#6F7718;
 	font-family:Arial;
 	font-style:italic;
 	line-height:0.8em;
@@ -72,7 +72,7 @@ ul#nav1 li a:hover, ul#nav1 li a:focus, ul#nav1 li a:active {
 }
 
 ul#nav1 li a:hover .description, ul#nav1 li a:focus .description, ul#nav1 li a:active .description {
-    color: #ffffff;
+    color: #444432;
 }
 
 ul#nav1 li a.selected {
@@ -81,7 +81,7 @@ ul#nav1 li a.selected {
 }
 
 ul#nav1 li a.selected .description {
-    color: #ffffff;
+    color: #444432;
 }
 
 ul#nav1 .login {

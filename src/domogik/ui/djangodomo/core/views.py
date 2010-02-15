@@ -607,7 +607,7 @@ def show_room(request, room_id):
     
     devices_list = __db.search_devices({'room_id':room_id})
 
-    page_title = _("Visualisation Piece")
+    page_title = _("View ") + resultRoomById.room[0].name
     return __go_to_page(
         request, 'show/room.html',
         page_title,

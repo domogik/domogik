@@ -68,7 +68,7 @@ function checkLength(o, n, min, max) {
             this.button_submit.click(function() {
                 self.display_mode();
                 self.element.removeClass("icon64-" + o.type + "-" + self.current_icon);
-                self.element.addClass("icon24-processing");
+                self.element.addClass("processing");
                 o.validCallback(self, self.current_icon);
             });
             this.button_cancel = $("<button class='icon16-action-cancel button-cancel hidden'><span class='offscreen'>" + o.cancelText + "</span></button>");
@@ -87,12 +87,12 @@ function checkLength(o, n, min, max) {
         
         cancel: function() {
             this.current_icon = this.original_icon;
-            this.element.removeClass("icon24-processing");
+            this.element.removeClass("processing");
             this.element.addClass("icon64-" + this.options.type + "-" + this.original_icon);
         },
         
         valid: function() {
-            this.element.removeClass("icon24-processing");
+            this.element.removeClass("processing");
             this.element.addClass("icon64-" + this.options.type + "-" + this.current_icon);
         },
         
