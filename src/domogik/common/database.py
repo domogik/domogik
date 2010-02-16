@@ -1534,7 +1534,7 @@ class DbHelper():
             except Exception, sql_exception:
                 self._session.rollback()
                 raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-            return trigger
+            return trigger_d
         else:
             raise DbHelperException("Couldn't delete trigger with id %s : \
                                     it doesn't exist" % t_id)
@@ -1650,6 +1650,8 @@ class DbHelper():
             sys_acc.password = self.__make_crypted_password(a_password)
         if a_is_admin is not None:
             sys_acc.is_admin = a_is_admin
+        if a_skin_used is not None:
+            sys_acc.skin_used = a_skin_used
         self._session.add(sys_acc)
         try:
             self._session.commit()
@@ -1730,9 +1732,9 @@ class DbHelper():
                                 .filter_by(system_account_id=s_id).one()
         except NoResultFound:
             return None
-        except MultipleResultsFound, e:
+        except MultipleResultsFound:
             raise DbHelperException("Database may be incoherent, user with \
-                                    id %s has more than one account" % u_id)
+                                    id %s has more than one account" % s_id)
 
     def add_user_account(self, u_first_name, u_last_name, u_birthdate,
                          u_system_account_id=None):
@@ -1748,7 +1750,7 @@ class DbHelper():
             try:
                 self._session.query(SystemAccount)\
                              .filter_by(id=u_system_account_id).one()
-            except NoResultFound, e:
+            except NoResultFound:
                 raise DbHelperException("Couldn't add user with account id %s \
                                         It does not exist" % u_system_account_id)
         user_account = UserAccount(first_name=u_first_name, last_name=u_last_name,
