@@ -36,9 +36,8 @@ TODO when finished ;)
 @license: GPL(v3)
 @organization: Domogik
 """
-#from domogik.xpl.lib.xplconnector import *
+from domogik.xpl.lib.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
-#from domogik.xpl.lib.module import *
 from domogik.xpl.lib.module import xPLModule
 from domogik.common import logger
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
@@ -581,6 +580,13 @@ target=*
                     else:
                         self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
+            elif self.rest_request[1] == "list-with-rooms":
+                if len(self.rest_request) == 2:
+                    self._rest_base_area_list_with_rooms()
+                else:
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
+
 
             ### add
             elif self.rest_request[1] == "add":
@@ -1101,6 +1107,18 @@ target=*
             area = self._db.get_area_by_id(area_id)
             if area is not None:
                 json_data.add_data(area)
+        self.send_http_response_ok(json_data.get())
+
+
+
+    def _rest_base_area_list_with_rooms(self):
+        """ list areas and associated rooms
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("area")
+        for area in self._db.get_areas_with_rooms():
+            json_data.add_data(area)
         self.send_http_response_ok(json_data.get())
 
 
@@ -1798,17 +1816,87 @@ target=*
             self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
             return
 
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("module")
-
         ### start #####################################
         if self.rest_request[0] == "start":
-            print "start!!"
+            self.rest_module_start(module =  self.rest_request[1], \
+                                   command = "start")
         elif self.rest_request[0] == "stop":
             print "stop!!"
+        else:
+            self.send_http_response_error(999, "Bad operation for /module", self.jsonp, self.jsonp_cb)
 
-        self.send_http_response_ok(json_data.get())
+
+    def rest_module_start(self, command, host = "127.0.0.1", module = None, force = 0):
+        """ Send start xpl message to manager
+            Then, listen for a response
+            @param host : host to which we send command
+            @param module : name of module
+            @param force : force (or not) action. 0/1. 1 : force
+        """
+
+        ### Send xpl message
+
+        #DOMOGIK.SYSTEM
+        #{
+        #COMMAND=command to send
+        #HOST=name of the host where a component should be started/stopped|*
+        #[MODULE]=name of the module concerned by the command|*
+        #[FORCE=0|1]
+        #}
+
+        my_temp_message = XplMessage()
+        my_temp_message.set_type("xpl-cmnd")
+        my_temp_message.set_schema("domogik.system")
+        my_temp_message.add_data({"command" : command})
+        my_temp_message.add_data({"host" : host})
+        my_temp_message.add_data({"module" : module})
+        my_temp_message.add_data({"force" : force})
+        self._myxpl.send(my_temp_message)
+        print "Message sent : " + str(my_temp_message)
+
+        ### Listen for response
+
+        #DOMOGIK.SYSTEM
+        #{
+        #COMMAND=command to send
+        #HOST=Host sending the message|*
+        #[MODULE]=name of the module concerned by the command|*
+        #[FORCE=0|1]
+        #[ERROR=error message if error occurs, 255 char max]
+        #}
+
+        Listener(self.rest_module_start_response, self._myxpl, \
+                 {'schema': 'domogik.system', 
+                  'xpltype': 'xpl-trig', 
+                  'command' : command, 
+                  'host' : host, 
+                  'module' : module, 
+                  'force' : force})
+
+
+
+    def rest_module_start_response(self, message):
+        """ Process xpl manager response to make a json
+            @param message : xpl message received
+        """
+
+        # an error happens
+        if 'error' in message.data:
+            error_msg = message.data['error']
+
+            json_data = JSonHelper("OK")
+            json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+            self.send_http_response_ok(json_data.get())
+
+        # no error
+        else:
+            json_data = JSonHelper("ERROR", 999, error)
+            json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+            self.send_http_response_ok(json_data.get())
+
+
+
+
 
 
 
@@ -1864,7 +1952,7 @@ class JSonHelper():
         """ add data to json structure in 'type' table
             @param data : data to add
         """
-        data_out = "{"
+        data_out = ""
         self._nb_data_values += 1
 
         # dirty issue to force data not to be in cache
@@ -1874,28 +1962,100 @@ class JSonHelper():
         if hasattr(data, 'area'):  # for room
             pass
 
+        print "T=" + str(type(data))
         if data == None:
             return
-        for key in data.__dict__:
-            #print "#> "+ str(key) + " (" + str( type(data.__dict__[key]).__name__) + ")  : " + str(data.__dict__[key])
-            type_data = type(data.__dict__[key]).__name__
-            if type_data == "int" or type_data == "float" or type_data == "bool":
-                data_out += '"' + key + '" : ' + str(data.__dict__[key]) + ','
-            elif type_data == "unicode":
-                data_out += '"' + key + '" : "' + data.__dict__[key] + '",'
-            elif type_data == "NoneType":
-                data_out += '"' + key + '" : "None",'
-            elif type_data == "Area" or type_data == "Room":
-                data_out += '"' + key + '" : {'
-                for key_dmg in data.__dict__[key].__dict__:
-                    type_data_dmg = type(data.__dict__[key].__dict__[key_dmg]).__name__
-                    if type_data_dmg == "int" or type_data_dmg == "float":
-                        data_out += '"' + key_dmg + '" : ' + str(data.__dict__[key].__dict__[key_dmg]) + ','
-                    elif type_data_dmg == "unicode":
-                        data_out += '"' + key_dmg + '" : "' + data.__dict__[key].__dict__[key_dmg] + '",'
-                data_out = data_out[0:len(data_out)-1] + '},'
-        self._data_values += data_out[0:len(data_out)-1] + '},'
+
+        data_out += self._process_data(data)
+        self._data_values += data_out
             
+
+
+    def _process_data(self, data, idx = 0):
+        #print "==== PROCESS DATA " + str(idx) + " ===="
+        db_type = ("Area", "Room", "Device")
+        num_type = ("int", "float", "bool")
+        str_type = ("unicode")
+        none_type = ("NoneType")
+        tuple_type = ("tuple")
+        list_type = ("list")
+
+        data_json = ""
+
+        # get data type
+        data_type = type(data).__name__
+        #print "DATA TYPE : " + str(data_type)
+
+        # type : tuple 
+        if data_type in tuple_type:
+            data_json += "{"
+            for idy in range(len(data)):
+                sub_data_key = "???"
+                sub_data = data[idy]
+                sub_data_type = type(data[idy]).__name__
+                #print "    DATA KEY : " + str(sub_data_key)
+                #print "    DATA : " + str(sub_data)
+                #print "    DATA TYPE : " + str(sub_data_type)
+                data_json += self._process_sub_data(False, sub_data_key, sub_data, sub_data_type, db_type, num_type, str_type, none_type, tuple_type, list_type)
+            data_json = data_json[0:len(data_json)-1] + "},"
+
+        # type : Area, Room, Device, etc
+        elif data_type in db_type:
+            data_json += "{"
+            for key in data.__dict__:
+                sub_data_key = key
+                sub_data = data.__dict__[key]
+                sub_data_type = type(sub_data).__name__
+                #print "    DATA KEY : " + str(sub_data_key)
+                #print "    DATA : " + str(sub_data)
+                #print "    DATA TYPE : " + str(sub_data_type)
+                data_json += self._process_sub_data(False, sub_data_key, sub_data, sub_data_type, db_type, num_type, str_type, none_type, tuple_type, list_type)
+            data_json = data_json[0:len(data_json)-1] + "},"
+
+        elif data_type in list_type:
+            # get first data type
+            sub_data_elt0_type = type(data[0]).__name__
+            # start table
+            data_json += '"%s" : [' % sub_data_elt0_type.lower()
+            print "SUB DATA TYPE : " + str(sub_data_elt0_type)
+            # process each data
+            for sub_data in data:
+                sub_data_key  = "???(2)"
+                sub_data_type = type(sub_data).__name__
+                #print "    DATA KEY : " + str(sub_data_key)
+                #print "    DATA : " + str(sub_data)
+                #print "    DATA TYPE : " + str(sub_data_type)
+                data_json += self._process_sub_data(True, sub_data_key, sub_data, sub_data_type, db_type, num_type, str_type, none_type, tuple_type, list_type)
+            # finish table
+            data_json = data_json[0:len(data_json)-1] + "],"
+         
+
+
+        #print "========================="
+        return data_json
+
+
+
+    def _process_sub_data(self, is_table, sub_data_key, sub_data, sub_data_type, db_type, num_type, str_type, none_type, tuple_type, list_type):
+        data_tmp = ""
+        if sub_data_type in db_type:
+            if is_table is False:
+                data_tmp = '"%s" : ' % sub_data_type.lower()
+            data_tmp += self._process_data(sub_data, 1)
+        elif sub_data_type in list_type:
+            data_tmp += self._process_data(sub_data, 1)
+        elif sub_data_type in num_type:
+            data_tmp = '"%s" : %s,' % (sub_data_key, sub_data)
+        elif sub_data_type in str_type:
+            data_tmp = '"%s" : "%s",' % (sub_data_key, sub_data)
+        elif sub_data_type in none_type:
+            data_tmp = '"%s" : "None",' % (sub_data_key)
+        else: 
+            data_tmp = ""
+        return data_tmp
+
+
+
 
         
 
