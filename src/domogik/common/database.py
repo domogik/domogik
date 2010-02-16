@@ -72,7 +72,7 @@ from domogik.common.sql_schema import ActuatorFeature, Area, Device, DeviceUsage
                                       SensorReferenceData, SystemAccount, SystemConfig, \
                                       SystemStats, SystemStatsValue, Trigger
 from domogik.common.sql_schema import DEVICE_TECHNOLOGY_LIST, \
-                                      DEVICE_TYPE_LIST, UNIT_OF_STORED_VALUE_LIST
+                                      UNIT_OF_STORED_VALUE_LIST
 
 
 class DbHelperException(Exception):
