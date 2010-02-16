@@ -1143,7 +1143,7 @@ class DbHelper():
                 device_list.append(device)
         return device_list
 
-    def get_all_devices_of_usage(self, dc_id):
+    def get_all_devices_of_usage(self, du_id):
         """
         Return all the devices of a usage
         @param du_id: usage id
