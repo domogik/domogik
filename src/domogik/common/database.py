@@ -173,13 +173,12 @@ class DbHelper():
         @param filters :  filter fields can be one of
         @return a list of Area objects
         """
-        assert type(filters) is DictType
-
+        if type(filters) is not DictType:
+            raise DbHelperException("Wrong type of 'filters', Should be a dictionnary")
         area_list = self._session.query(Area)
         for filter in filters:
             filter_arg = "%s = '%s'" % (filter, filters[filter])
             area_list = area_list.filter(filter_arg)
-
         return area_list.all()
 
     def get_area_by_id(self, area_id):
@@ -281,8 +280,8 @@ class DbHelper():
         @param filters :  filter fields (dictionnary)
         @return a list of Room objects
         """
-        assert type(filters) is DictType
-
+        if type(filters) is not DictType:
+            raise DbHelperException("Wrong type of 'filters', Should be a dictionnary")
         room_list = self._session.query(Room)
         for filter in filters:
             filter_arg = "%s = '%s'" % (filter, filters[filter])
