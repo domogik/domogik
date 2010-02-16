@@ -1650,6 +1650,8 @@ class DbHelper():
             sys_acc.password = self.__make_crypted_password(a_password)
         if a_is_admin is not None:
             sys_acc.is_admin = a_is_admin
+        if a_skin_used is not None:
+            sys_acc.skin_used = a_skin_used
         self._session.add(sys_acc)
         try:
             self._session.commit()
