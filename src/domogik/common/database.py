@@ -1260,14 +1260,14 @@ class DbHelper():
             device.type_id = d_type_id
         if d_usage_id is not None:
           try:
-              dc = self._session.query(DeviceUsage).filter_by(id=d_usage_id).one()
+              self._session.query(DeviceUsage).filter_by(id=d_usage_id).one()
               device.usage = d_usage_id
           except NoResultFound:
               raise DbHelperException("Couldn't find device usage \
                                       id %s. It does not exist" % d_usage_id)
         if d_room_id is not None:
             try:
-                room = self._session.query(Room).filter_by(id=d_room_id).one()
+                self._session.query(Room).filter_by(id=d_room_id).one()
                 device.room = d_room_id
             except NoResultFound:
                 raise DbHelperException("Couldn't find room \
