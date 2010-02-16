@@ -1973,7 +1973,12 @@ class JSonHelper():
 
     def _process_data(self, data, idx = 0):
         print "==== PROCESS DATA " + str(idx) + " ===="
-        db_type = ("Area", "Room", "Device")
+        db_type = ("ActuatorFeature", "Area", "Device", "DeviceUsage", \
+                   "DeviceConfig", "DeviceStats", "DeviceStatsValue", \
+                   "DeviceTechnology", "DeviceTechnologyConfig", \
+                   "DeviceType", "UIItemConfig", "Room," "UserAccount", \
+                   "SensorReferenceData", "SystemAccount", "SystemConfig", \
+                   "SystemStats", "SystemStatsValue", "Trigger")
         num_type = ("int", "float", "bool")
         str_type = ("unicode")
         none_type = ("NoneType")
