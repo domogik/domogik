@@ -215,13 +215,13 @@ class AreaTestCase(GenericTestCase):
         self.db.add_room(r_name='Lounge', r_area_id=basement.id)
         area_w_rooms_list = self.db.get_areas_with_rooms()
         for my_area in area_w_rooms_list:
-            if my_area[0].name == 'Basement':
-                assert len(my_area[1]) == 3
-                for room in my_area[1].Room:
+            if my_area.name == 'Basement':
+                assert len(my_area.Room) == 3
+                for room in my_area.Room:
                     assert room.name in ['Kitchen', 'Bathroom', 'Lounge']
-            elif my_area[0].name == 'First floor':
-                assert len(my_area[1]) == 2
-                for room in my_area[1].Room:
+            elif my_area.name == 'First floor':
+                assert len(my_area.Room) == 2
+                for room in my_area.Room:
                     assert room.name in ['Bedroom1', 'Bedroom2']
 
     def testDel(self):
