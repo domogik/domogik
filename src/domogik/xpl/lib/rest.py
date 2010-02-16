@@ -829,7 +829,7 @@ target=*
                                                   self.jsonp, self.jsonp_cb)
 
             ### add
-            elif self.rest_request[1] == "add":
+            elif self.rest_request[1] == "add_OFF":
                 offset = 2
                 if self.set_parameters(offset):
                     self._rest_base_sensor_reference_add()
@@ -837,7 +837,7 @@ target=*
                     self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
             ### update
-            elif self.rest_request[1] == "update":
+            elif self.rest_request[1] == "update_OFF":
                 offset = 2
                 if self.set_parameters(offset):
                     self._rest_base_sensor_reference_update()
@@ -845,7 +845,7 @@ target=*
                     self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
             ### del
-            elif self.rest_request[1] == "del":
+            elif self.rest_request[1] == "del_OFF":
                 if len(self.rest_request) == 3:
                     self._rest_base_sensor_reference_del(sr_id=self.rest_request[2])
                 else:
@@ -877,7 +877,7 @@ target=*
                                                   self.jsonp, self.jsonp_cb)
 
             ### add
-            elif self.rest_request[1] == "add":
+            elif self.rest_request[1] == "add_OFF":
                 offset = 2
                 if self.set_parameters(offset):
                     self._rest_base_actuator_feature_add()
@@ -885,7 +885,7 @@ target=*
                     self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
             ### update
-            elif self.rest_request[1] == "update":
+            elif self.rest_request[1] == "update_OFF":
                 offset = 2
                 if self.set_parameters(offset):
                     self._rest_base_actuator_feature_update()
@@ -893,7 +893,7 @@ target=*
                     self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
             ### del
-            elif self.rest_request[1] == "del":
+            elif self.rest_request[1] == "del_OFF":
                 if len(self.rest_request) == 3:
                     self._rest_base_actuator_feature__del(af_id=self.rest_request[2])
                 else:
