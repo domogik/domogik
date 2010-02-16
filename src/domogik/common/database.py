@@ -1216,10 +1216,9 @@ class DbHelper():
         return device
 
     def update_device(self, d_id, d_name=None, d_address=None,
-        d_technology_id=None, d_type_id=None, d_usage_id=None, d_room_id=None,
-        d_description=None, d_reference=None, d_is_resetable=None,
-        d_initial_value=None, d_is_value_changeable_by_user=None,
-        d_unit_of_stored_values =None):
+        d_type_id=None, d_usage_id=None, d_room_id=None, d_description=None,
+        d_reference=None, d_is_resetable=None, d_initial_value=None,
+        d_is_value_changeable_by_user=None, d_unit_of_stored_values=None):
         """
         Update a device item
         If a param is None, then the old value will be kept
