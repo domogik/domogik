@@ -152,7 +152,7 @@ class DbHelper():
     def get_areas_with_rooms(self):
         """
         Return all areas with associated rooms
-        @return a list of tuples (area, [room1, room2...])
+        @return a list of Area objects containing the associated room list
         """
         area_list = self.list_areas()
         area_rooms_list = []
