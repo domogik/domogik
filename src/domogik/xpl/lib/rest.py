@@ -2046,9 +2046,10 @@ class JSonHelper():
 
 
     def _process_sub_data(self, idx, is_table, sub_data_key, sub_data, sub_data_type, db_type, num_type, str_type, none_type, tuple_type, list_type):
+        ### TODO : it seems we could remove idx
         data_tmp = ""
         if sub_data_type in db_type:
-            if is_table is False and idx != 0:
+            if is_table is False:  # and idx != 0:
                 data_tmp = '"%s" : ' % sub_data_type.lower()
             data_tmp += self._process_data(sub_data, 1)
         elif sub_data_type in list_type:
