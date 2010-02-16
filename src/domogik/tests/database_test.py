@@ -217,11 +217,11 @@ class AreaTestCase(GenericTestCase):
         for my_area in area_w_rooms_list:
             if my_area[0].name == 'Basement':
                 assert len(my_area[1]) == 3
-                for room in my_area[1]:
+                for room in my_area[1].Room:
                     assert room.name in ['Kitchen', 'Bathroom', 'Lounge']
             elif my_area[0].name == 'First floor':
                 assert len(my_area[1]) == 2
-                for room in my_area[1]:
+                for room in my_area[1].Room:
                     assert room.name in ['Bedroom1', 'Bedroom2']
 
     def testDel(self):

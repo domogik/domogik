@@ -157,9 +157,13 @@ class DbHelper():
         area_list = self.list_areas()
         area_rooms_list = []
         for area in area_list:
+            # to avoid creating a join with following request
+            id = area.id
             room_list = self._session.query(Room)\
-                            .filter_by(area_id=area.id).all()
-            area_rooms_list.append((area, room_list))
+                            .filter_by(area_id=id).all()
+            # set Room in area object
+            area.Room = room_list
+            area_rooms_list.append((area))
         return area_rooms_list
 
     def search_areas(self, filters):
