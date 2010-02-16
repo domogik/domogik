@@ -1730,7 +1730,7 @@ class DbHelper():
                                 .filter_by(system_account_id=s_id).one()
         except NoResultFound:
             return None
-        except MultipleResultsFound, e:
+        except MultipleResultsFound:
             raise DbHelperException("Database may be incoherent, user with \
                                     id %s has more than one account" % u_id)
 
@@ -1748,7 +1748,7 @@ class DbHelper():
             try:
                 self._session.query(SystemAccount)\
                              .filter_by(id=u_system_account_id).one()
-            except NoResultFound, e:
+            except NoResultFound:
                 raise DbHelperException("Couldn't add user with account id %s \
                                         It does not exist" % u_system_account_id)
         user_account = UserAccount(first_name=u_first_name, last_name=u_last_name,
