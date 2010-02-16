@@ -53,7 +53,7 @@
     <div id="title">{% trans "Welcome to Domogik" %} <span id="subtitle">{% trans "Free home automation under Linux" %}</span> </div>
     </div>
     <ul id="nav1">
-        <li><a href="{% url show_view %}" class="{{ nav1_show }}">{% trans "Visualisation" %}<span class='description'>{% trans "View, Control your house" %}</span></a></li>
+        <li><a href="{% url show_view %}" class="{{ nav1_show }}">{% trans "Visualization" %}<span class='description'>{% trans "View, Control your house" %}</span></a></li>
         {% if is_user_connected %}
             <!--li><a href="#">Programmation</a></li-->
             <li><a href="{% url admin_view %}" class="{{ nav1_admin }}">{% trans "Administration" %}<span class='description'>{% trans "Configure, Manage" %}</span></a></li>
