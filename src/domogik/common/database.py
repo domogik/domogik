@@ -159,9 +159,8 @@ class DbHelper():
         area_rooms_list = []
         for area in area_list:
             # to avoid creating a join with following request
-            id = area.id
             room_list = self._session.query(Room)\
-                            .filter_by(area_id=id).all()
+                            .filter_by(area_id=area.id).all()
             # set Room in area object
             area.Room = room_list
             area_rooms_list.append((area))
