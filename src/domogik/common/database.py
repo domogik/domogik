@@ -1732,7 +1732,7 @@ class DbHelper():
             return None
         except MultipleResultsFound:
             raise DbHelperException("Database may be incoherent, user with \
-                                    id %s has more than one account" % u_id)
+                                    id %s has more than one account" % s_id)
 
     def add_user_account(self, u_first_name, u_last_name, u_birthdate,
                          u_system_account_id=None):
