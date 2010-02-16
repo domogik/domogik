@@ -1534,7 +1534,7 @@ class DbHelper():
             except Exception, sql_exception:
                 self._session.rollback()
                 raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-            return trigger
+            return trigger_d
         else:
             raise DbHelperException("Couldn't delete trigger with id %s : \
                                     it doesn't exist" % t_id)
