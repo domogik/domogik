@@ -23,8 +23,9 @@ Module purpose
 ==============
 
 API to use Domogik database.
-Please don't forget to add unit test in 'database_test.py' if you add a new method.
-Please always run 'python database_test.py' if you change something in this file.
+Please don't forget to add unit test in 'database_test.py' if you add a new
+method. Please always run 'python database_test.py' if you change something in
+this file.
 
 Implements
 ==========
@@ -1141,7 +1142,7 @@ class DbHelper():
         device_list = []
         for room in self.get_all_rooms_of_area(d_area_id):
             for device in self.get_all_devices_of_room(room.id):
-              device_list.append(device)
+                device_list.append(device)
         return device_list
 
     def get_all_devices_of_usage(self, dc_id):
