@@ -316,7 +316,7 @@ class DbHelper():
         if r_area_id != None:
             try:
                 self._session.query(Area).filter_by(id=r_area_id).one()
-            except NoResultFound, e:
+            except NoResultFound:
                 raise DbHelperException("Couldn't add room with area id %s. \
                                         It does not exist" % r_area_id)
 
@@ -348,7 +348,7 @@ class DbHelper():
         if r_area_id is not None:
             try:
                 self._session.query(Area).filter_by(id=r_area_id).one()
-            except NoResultFound, e:
+            except NoResultFound:
                 raise DbHelperException("Couldn't find area id %s. \
                                         It does not exist" % r_area_id)
             room.area_id = r_area_id
@@ -514,7 +514,7 @@ class DbHelper():
         """
         try:
             self._session.query(DeviceTechnology).filter_by(id=dt_id).one()
-        except NoResultFound, e:
+        except NoResultFound:
             raise DbHelperException("Couldn't add device type with technology id %s. \
                                     It does not exist" % dt_id)
         dty = DeviceType(name=dty_name, description=dty_description,
@@ -545,7 +545,7 @@ class DbHelper():
         if dt_id is not None:
             try:
                 self._session.query(DeviceTechnology).filter_by(id=dt_id).one()
-            except NoResultFound, e:
+            except NoResultFound:
                 raise DbHelperException("Couldn't find technology id %s. \
                                         It does not exist" % dt_id)
             device_type.technology_id = dt_id
@@ -639,7 +639,7 @@ class DbHelper():
         """
         try:
             self._session.query(DeviceType).filter_by(id=dty_id).one()
-        except NoResultFound, e:
+        except NoResultFound:
             raise DbHelperException("Couldn't add sensor reference with device type id %s. \
                                     It does not exist" % dty_id)
         srd = SensorReferenceData(name=srd_name, value=srd_value,
@@ -678,7 +678,7 @@ class DbHelper():
         if dty_id is not None:
             try:
                 self._session.query(DeviceType).filter_by(id=dty_id).one()
-            except NoResultFound, e:
+            except NoResultFound:
                 raise DbHelperException("Couldn't find device type id %s. \
                                         It does not exist" % dty_id)
             srd.device_type_id = dty_id
@@ -754,7 +754,7 @@ class DbHelper():
         """
         try:
             self._session.query(DeviceType).filter_by(id=dty_id).one()
-        except NoResultFound, e:
+        except NoResultFound:
             raise DbHelperException("Couldn't add actuator feature with device type id %s. \
                                     It does not exist" % dty_id)
         af = ActuatorFeature(name=af_name, value=af_value,
@@ -795,7 +795,7 @@ class DbHelper():
         if dty_id is not None:
             try:
                 self._session.query(DeviceType).filter_by(id=dty_id).one()
-            except NoResultFound, e:
+            except NoResultFound:
                 raise DbHelperException("Couldn't find device type id %s. \
                                         It does not exist" % dty_id)
             af.device_type_id = dty_id
@@ -975,7 +975,7 @@ class DbHelper():
         """
         try:
             self._session.query(DeviceTechnology).filter_by(id=dt_id).one()
-        except NoResultFound, e:
+        except NoResultFound:
             raise DbHelperException("Couldn't add device technology config \
                                     with device technology id %s. \
                                     It does not exist" % dt_id)
@@ -1011,7 +1011,7 @@ class DbHelper():
         if dt_id is not None:
             try:
                 self._session.query(DeviceTechnology).filter_by(id=dt_id).one()
-            except NoResultFound, e:
+            except NoResultFound:
                 raise DbHelperException("Couldn't find device technology id %s. \
                                         It does not exist" % dt_id)
             dtc.technology_id = dt_id
@@ -1184,17 +1184,17 @@ class DbHelper():
             raise ValueError, "d_unit_of_stored_values must be one of %s" % UNIT_OF_STORED_VALUE_LIST
         try:
             self._session.query(DeviceType).filter_by(id=d_type_id).one()
-        except NoResultFound, e:
+        except NoResultFound:
             raise DbHelperException("Couldn't add device with device type id %s \
                                     It does not exist" % d_type_id)
         try:
             self._session.query(DeviceUsage).filter_by(id=d_usage_id).one()
-        except NoResultFound, e:
+        except NoResultFound:
             raise DbHelperException("Couldn't add device with device usage id %s \
                                     It does not exist" % d_usage_id)
         try:
             self._session.query(Room).filter_by(id=d_room_id).one()
-        except NoResultFound, e:
+        except NoResultFound:
             raise DbHelperException("Couldn't add device with room id %s \
                                     It does not exist" % d_room_id)
         if d_is_resetable == None:
@@ -1254,7 +1254,7 @@ class DbHelper():
         if d_type_id is not None:
             try:
                 self._session.query(DeviceType).filter_by(id=d_type_id).one()
-            except NoResultFound, e:
+            except NoResultFound:
                 raise DbHelperException("Couldn't find device type id %s \
                                         It does not exist" % d_type_id)
             device.type_id = d_type_id
@@ -1262,14 +1262,14 @@ class DbHelper():
           try:
               dc = self._session.query(DeviceUsage).filter_by(id=d_usage_id).one()
               device.usage = d_usage_id
-          except NoResultFound, e:
+          except NoResultFound:
               raise DbHelperException("Couldn't find device usage \
                                       id %s. It does not exist" % d_usage_id)
         if d_room_id is not None:
             try:
                 room = self._session.query(Room).filter_by(id=d_room_id).one()
                 device.room = d_room_id
-            except NoResultFound, e:
+            except NoResultFound:
                 raise DbHelperException("Couldn't find room \
                                         id %s. It does not exist" % d_room_id)
         if d_is_resetable is not None:
@@ -1390,7 +1390,7 @@ class DbHelper():
         """
         try:
             self._session.query(Device).filter_by(id=d_id).one()
-        except NoResultFound, e:
+        except NoResultFound:
             raise DbHelperException("Couldn't add device stat with device id %s \
                                     It does not exist" % d_id)
         device_stat = DeviceStats(device_id=d_id, date=ds_date)
@@ -1585,7 +1585,7 @@ class DbHelper():
             try:
                 return self._session.query(SystemAccount)\
                                     .filter_by(id=user_account.system_account_id).one()
-            except MultipleResultsFound, e:
+            except MultipleResultsFound:
                 raise DbHelperException("Database may be incoherent, user with \
                                         id %s has more than one account" % u_id)
         else:
@@ -1787,7 +1787,7 @@ class DbHelper():
             try:
                 self._session.query(SystemAccount)\
                              .filter_by(id=u_system_account_id).one()
-            except NoResultFound, e:
+            except NoResultFound:
                 raise DbHelperException("Couldn't find account id %s \
                                         It does not exist" % u_system_account_id)
             user_acc.system_account_id = u_system_account_id
@@ -2035,9 +2035,9 @@ class DbHelper():
         """
         try:
             return self._session.query(SystemConfig).one()
-        except MultipleResultsFound, e:
+        except MultipleResultsFound:
             raise DbHelperException("Error : SystemConfig has more than one line")
-        except NoResultFound, e:
+        except NoResultFound:
             pass
 
     def update_system_config(self, s_simulation_mode=None, s_debug_mode=None):
