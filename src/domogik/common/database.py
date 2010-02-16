@@ -1893,7 +1893,7 @@ class DbHelper():
             except Exception, sql_exception:
                 self._session.rollback()
                 raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-            return system_stat
+            return system_stat_d
         else:
             raise DbHelperException("Couldn't delete system stat %s : \
                                     it doesn't exist" % s_name)
