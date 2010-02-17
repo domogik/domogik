@@ -253,8 +253,7 @@ class ProcessRequest():
         # Get type of request : /command, /xpl-cmnd, /base, etc
         if len(tab_path) < 2:
             self.rest_type = None
-            self.send_http_response_error(999, "No type given", \
-                                          self.jsonp, self.jsonp_cb)
+            # Display an information json if no request done in do_for_all_methods
             return
         self.rest_type = tab_path[1].lower()
         if len(tab_path) > 2:
@@ -280,12 +279,12 @@ class ProcessRequest():
             self.rest_base()
         elif self.rest_type == "module":
             self.rest_module()
+        elif self.rest_type == None:
+            self.rest_status()
         else:
             self.send_http_response_error(999, "Type [" + str(self.rest_type) + \
                                           "] is not supported", \
                                           self.jsonp, self.jsonp_cb)
-            return
-
 
 
     def _parse_options(self):
@@ -319,6 +318,25 @@ class ProcessRequest():
         print "DEBUG : start sleeping for " + str(duration)
         time.sleep(float(duration))
         print "DEBUG : end sleeping"
+
+
+
+
+
+######
+# / processing
+######
+
+    def rest_status(self):
+        json_data = JSonHelper("OK", 0, "REST server available")
+        json_data.set_data_type("rest")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        # TODO : get version by a better way
+        json_data.add_data(("Version : 0.1.x", "Status : UP"))
+        self.send_http_response_ok(json_data.get())
+
+
+
 
 
 
@@ -1812,18 +1830,44 @@ target=*
         """ /module processing
         """
         print "Call rest_module"
-        if len(self.rest_request) < 2:
+        if len(self.rest_request) < 1:
             self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
             return
 
         ### start #####################################
-        if self.rest_request[0] == "start":
+        if self.rest_request[0] == "list":
+            self.rest_module_list()
+            return
+        elif self.rest_request[0] == "start":
+            if len(self.rest_request) < 2:
+                self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
+                return
             self.rest_module_start(module =  self.rest_request[1], \
                                    command = "start")
         elif self.rest_request[0] == "stop":
+            if len(self.rest_request) < 2:
+                self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
+                return
             print "stop!!"
+            # TODO when start will be OK
         else:
             self.send_http_response_error(999, "Bad operation for /module", self.jsonp, self.jsonp_cb)
+
+
+
+    def rest_module_list(self):
+        """ Send a xpl message to manager to get module list
+            Display this list as json
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("module")
+        json_data.add_data({"name" : "x10", "description" : "X10 module", "status" : "ON"})
+        json_data.add_data({"name" : "onewire", "description" : "1 wire", "status" : "ON"})
+        json_data.add_data({"name" : "wol", "description" : "Wake on lan", "status" : "ON"})
+        json_data.add_data({"name" : "teleinfo", "description" : "Teleinfo", "status" : "ON"})
+        self.send_http_response_ok(json_data.get())
+
 
 
     def rest_module_start(self, command, host = "127.0.0.1", module = None, force = 0):
@@ -1980,10 +2024,11 @@ class JSonHelper():
                    "SensorReferenceData", "SystemAccount", "SystemConfig", \
                    "SystemStats", "SystemStatsValue", "Trigger")
         num_type = ("int", "float", "bool")
-        str_type = ("unicode")
+        str_type = ("str", "unicode")
         none_type = ("NoneType")
         tuple_type = ("tuple")
         list_type = ("list")
+        dict_type = ("dict")
 
         data_json = ""
 
@@ -2005,13 +2050,12 @@ class JSonHelper():
                 #print "    DATA KEY : " + str(sub_data_key)
                 #print "    DATA : " + str(sub_data)
                 #print "    DATA TYPE : " + str(sub_data_type)
-                data_json += self._process_sub_data(idx, False, sub_data_key, sub_data, sub_data_type, db_type, num_type, str_type, none_type, tuple_type, list_type)
+                data_json += self._process_sub_data(idx, False, sub_data_key, sub_data, sub_data_type, db_type, num_type, str_type, none_type, tuple_type, list_type, dict_type)
             if idx > 0:
                 data_json = data_json[0:len(data_json)-1] + "},"
 
         # type : Area, Room, Device, etc
         elif data_type in db_type:
-            #if idx > 0:
             data_json += "{"
             for key in data.__dict__:
                 sub_data_key = key
@@ -2020,8 +2064,7 @@ class JSonHelper():
                 #print "    DATA KEY : " + str(sub_data_key)
                 #print "    DATA : " + str(sub_data)
                 #print "    DATA TYPE : " + str(sub_data_type)
-                data_json += self._process_sub_data(idx, False, sub_data_key, sub_data, sub_data_type, db_type, num_type, str_type, none_type, tuple_type, list_type)
-            #if idx > 0:
+                data_json += self._process_sub_data(idx, False, sub_data_key, sub_data, sub_data_type, db_type, num_type, str_type, none_type, tuple_type, list_type, dict_type)
             data_json = data_json[0:len(data_json)-1] + "},"
 
         elif data_type in list_type:
@@ -2037,20 +2080,28 @@ class JSonHelper():
                 #print "    DATA KEY : " + str(sub_data_key)
                 #print "    DATA : " + str(sub_data)
                 #print "    DATA TYPE : " + str(sub_data_type)
-                data_json += self._process_sub_data(idx, True, sub_data_key, sub_data, sub_data_type, db_type, num_type, str_type, none_type, tuple_type, list_type)
+                data_json += self._process_sub_data(idx, True, sub_data_key, sub_data, sub_data_type, db_type, num_type, str_type, none_type, tuple_type, list_type, dict_type)
             # finish table
             data_json = data_json[0:len(data_json)-1] + "],"
-         
 
+        elif data_type in dict_type:
+            data_json += "{"
+            for key in data:
+                sub_data_key = key
+                sub_data = data[key]
+                sub_data_type = type(sub_data).__name__
+                #print "    DATA KEY : " + str(sub_data_key)
+                #print "    DATA : " + str(sub_data)
+                #print "    DATA TYPE : " + str(sub_data_type)
+                data_json += self._process_sub_data(idx, False, sub_data_key, sub_data, sub_data_type, db_type, num_type, str_type, none_type, tuple_type, list_type, dict_type)
+            data_json = data_json[0:len(data_json)-1] + "},"
 
-        #if idx == 0:
-        #    data_json = data_json[0:len(data_json)-1] + "],"
         #print "========================="
         return data_json
 
 
 
-    def _process_sub_data(self, idx, is_table, sub_data_key, sub_data, sub_data_type, db_type, num_type, str_type, none_type, tuple_type, list_type):
+    def _process_sub_data(self, idx, is_table, sub_data_key, sub_data, sub_data_type, db_type, num_type, str_type, none_type, tuple_type, list_type, dict_type):
         ### TODO : it seems we could remove idx
         data_tmp = ""
         if sub_data_type in db_type:
