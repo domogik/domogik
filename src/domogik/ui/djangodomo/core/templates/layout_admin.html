@@ -29,13 +29,17 @@
     <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-nav2.css" rel="stylesheet" type="text/css" />
     <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-dialog.css" rel="stylesheet" type="text/css" />
     <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-tabs.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-processing.css" rel="stylesheet" type="text/css" />
     <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-page-section.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block global_js_include %}
+    <script type="text/javascript" src="/design/js/jquery.timers-1.2.js"></script>
     <script type="text/javascript" src="/design/js/ui.dragdrop.js"></script>
     <script type="text/javascript" src="/design/js/ui.tabs.js"></script>
     <script type="text/javascript" src="/design/js/ui.forms.js"></script>
     <script type="text/javascript" src="/design/js/ui.messages.js"></script>
+    <script type="text/javascript" src="/design/js/ui.processing.js"></script>
+
     <script type="text/javascript" src="/design/js/page-admin.js"></script>
 {% endblock %}
 

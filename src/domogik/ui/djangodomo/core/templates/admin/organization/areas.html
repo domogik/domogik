@@ -98,11 +98,8 @@
 {% endblock %}
 {% block css %}
     <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/page-admin-organization.css" rel="stylesheet" type="text/css" />
-    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-processing.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block js_include %}
-    <script type="text/javascript" src="/design/js/jquery.timers-1.2.js"></script>
-    <script type="text/javascript" src="/design/js/ui.processing.js"></script>
 {% endblock %}
 {% block title %}{% trans page_title %}{% endblock %}
 
