@@ -55,7 +55,20 @@
             <div class="subnav2"><a href="#">{% trans "Management" %}</a></div>
             <ul>
                 <li><a href="{% url admin_management_domogik_view %}">{% trans "Database" %}</a></li>
-                <li><a href="{% url admin_management_modules_view %}">{% trans "Modules" %}</a></li>
+            </ul>
+            <div class="subnav2"><a href="#">{% trans "Modules" %}</a></div>
+            <ul>
+                {% spaceless %}
+                {% for module in modules_list %}
+                    <li><a href="#" class="icon16-module-{{ module.name }}">{{ module.description }}
+                    {% ifequal module.status "ON" %}
+                        <div class='status icon16-status-active'></div>
+                    {% else %}
+                        <div class='status icon16-status-inactive'></div>                        
+                    {% endifequal %}
+                    </a></li>
+                {% endfor %}
+                {% endspaceless %}
             </ul>
         </div>
     </div>

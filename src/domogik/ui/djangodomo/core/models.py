@@ -112,3 +112,12 @@ class UIConfigs(pipes.DmgPipe):
         resp = UIConfigs.objects.get({'parameters':"list/by-reference/" + name + "/" + str(reference)})
         if resp :
             return resp
+        
+class Modules(pipes.DmgPipe):
+    uri = "http://127.0.0.1:8080/module"
+
+    @staticmethod
+    def getAll():
+        resp = Modules.objects.get({'parameters':"list/"})
+        if resp :
+            return resp

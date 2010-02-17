@@ -220,17 +220,6 @@ def admin_management_domogik(request):
                        action=action, simulation_mode=simulation_mode,
                        admin_mode=admin_mode, debug_mode=debug_mode)
 
-def admin_management_modules(request):
-    """
-    Method called when the admin modules management page is accessed
-    @param request : HTTP request
-    @return an HttpResponse object
-    """
-    if not __is_user_admin(request):
-        return index(request)
-    page_title = _("Gestion des modules")
-    return __go_to_page(request, 'admin/management/modules.html', page_title)
-
 def save_admin_settings(request):
     """
     Save the administrator settings (admin, debug and simulation mode
@@ -492,12 +481,14 @@ def admin_organization_devices(request):
     device_usage_list = __db.list_device_usages()
     devices_list = __db.list_devices()
     device_tech_list = __db.list_device_technologies()
+    resultAllModules = Modules.getAll()
     page_title = _("Devices organization")
     return __go_to_page(
         request, 'admin/organization/devices.html',
         page_title,
         nav1_admin = "selected",
         nav2_organization_devices = "selected",
+        modules_list=resultAllModules.module,
         device_usage_list=device_usage_list,
         rooms_list=rooms_list,
         devices_list=devices_list,
@@ -520,12 +511,14 @@ def admin_organization_rooms(request):
     resultAllRooms.merge_uiconfig()
     resultUnattribuedRooms = Rooms.getWithoutArea()
     resultAllAreas = Areas.getAll()
+    resultAllModules = Modules.getAll()
     page_title = _("Room organization")
     return __go_to_page(
         request, 'admin/organization/rooms.html',
         page_title,
         nav1_admin = "selected",
         nav2_organization_rooms = "selected",
+        modules_list=resultAllModules.module,
         status=status,
         msg=msg,
         unattribued_rooms=resultUnattribuedRooms.room,
@@ -547,12 +540,14 @@ def admin_organization_areas(request):
 
     resultAllAreas = Areas.getAll()
     resultAllAreas.merge_uiconfig()
+    resultAllModules = Modules.getAll()
     page_title = _("Area organization")
     return __go_to_page(
         request, 'admin/organization/areas.html',
         page_title,
         nav1_admin = "selected",
         nav2_organization_areas = "selected",
+        modules_list=resultAllModules.module,
         status=status,
         msg=msg,
         areas_list=resultAllAreas.area

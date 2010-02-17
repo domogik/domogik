@@ -20,7 +20,7 @@
 /* Header section */
 
 .block .header {
-    background-position: top left;
+    background-position: 5px 5px;
     background-repeat:no-repeat;
     min-height: 64px;
     padding-bottom: 1em;
