@@ -46,6 +46,7 @@ from domogik.common.configloader import Loader
 from xml.dom import minidom
 import time
 import urllib
+import sys
 
 
 
