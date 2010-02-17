@@ -74,19 +74,19 @@ class SampleDataHelper:
         Remove all sample data
         """
         for area in self.__db.list_areas():
-            self.__db.del_area(area.id)
+            self.__db.del_area(area.id, cascade_delete=True)
 
         for dt in self.__db.list_device_technologies():
-            self.__db.del_device_technology(dt.id)
+            self.__db.del_device_technology(dt.id, cascade_delete=True)
 
         for du in self.__db.list_device_usages():
-            self.__db.del_device_usage(du.id)
+            self.__db.del_device_usage(du.id, cascade_delete=True)
 
         for dty in self.__db.list_device_types():
-            self.__db.del_device_type(dty.id)
+            self.__db.del_device_type(dty.id, cascade_delete=True)
 
         for trigger in self.__db.list_triggers():
-            self.__db.del_trigger(trigger.id)
+            self.__db.del_trigger(trigger.id, cascade_delete=True)
 
         for user_acc in self.__db.list_user_accounts():
             self.__db.del_user_account(user_acc.id)
@@ -121,10 +121,10 @@ class SampleDataHelper:
         music_cat = self.__db.add_device_usage(du_name="Music")
         appliance_cat = self.__db.add_device_usage(du_name="Appliance")
 
-        x10_switch = self.__db.add_device_type('Switch','x10 Switch', x10.id)
-        x10_dimmer = self.__db.add_device_type('Dimmer','x10 Dimmer', x10.id)
-        plcbus_switch = self.__db.add_device_type('Switch','PLCBus switch', plcbus.id)
-        plcbus_dimmer = self.__db.add_device_type('Dimmer','PLCBus dimmer', plcbus.id)
+        x10_switch = self.__db.add_device_type('Switch', x10.id, 'x10 Switch')
+        x10_dimmer = self.__db.add_device_type('Dimmer', x10.id, 'x10 Dimmer')
+        plcbus_switch = self.__db.add_device_type('Switch', plcbus.id, 'PLCBus switch')
+        plcbus_dimmer = self.__db.add_device_type('Dimmer', plcbus.id, 'PLCBus dimmer')
 
         basement = self.__db.add_area(a_name="Basement")
         ground_floor = self.__db.add_area(a_name="Ground floor")
@@ -174,7 +174,7 @@ class SampleDataHelper:
             d_type_id=plcbus_switch.id, d_reference="AM12", d_room_id=kitchen.id, d_is_resetable=True,
             d_initial_value="off", d_is_value_changeable_by_user=True, d_unit_of_stored_values=None
         )
-
+        """
         bedroom1_icon = self.__db.add_item_ui_config(bedroom1.id, 'room', {'icon':'bedroom'})
         bedroom2_icon = self.__db.add_item_ui_config(bedroom2.id, 'room', {'icon':'bedroom'})
         lounge_icon = self.__db.add_item_ui_config(lounge.id, 'room', {'icon':'tvlounge'})
@@ -184,3 +184,4 @@ class SampleDataHelper:
         basement_icon = self.__db.add_item_ui_config(basement.id, 'area', {'icon':'basement'})
         groundfloor_icon = self.__db.add_item_ui_config(ground_floor.id, 'area', {'icon':'grndfloor'})
         firstfloor_icon = self.__db.add_item_ui_config(first_floor.id, 'area', {'icon':'firstfloor'})
+        """
