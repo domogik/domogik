@@ -58,29 +58,14 @@ fieldset {
 .editable_icon {
     margin:0 10px 10px 10px;
     float:left;
-    width:102px;
-    height:102px;
-    background-position: 50% 50%;
-    background-repeat: no-repeat;
-    display:inline-block;
-}
-
-.editable_icon.processing {
-    /*
-    -moz-box-shadow: 0 0 2em #E2DE95;
-    -webkit-box-shadow: 0 0 2em #E2DE95;
-    border:2px #cccccc dashed;
-    -moz-border-radius: 0.8em;
-    -webkit-border-radius: 0.8em;
-    */
-}
-
-.editable_icon:hover, .editable_icon.edited {
     width:98px;
     height:98px;
     border:2px #cccccc dashed;
     -moz-border-radius: 0.8em;
     -webkit-border-radius: 0.8em;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    display:inline-block;
 }
 
 .button-edit, .editable_icon.edited .button-edit {

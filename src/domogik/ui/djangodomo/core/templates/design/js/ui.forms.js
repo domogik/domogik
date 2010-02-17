@@ -77,7 +77,7 @@ function checkLength(o, n, min, max) {
                 self.element.removeClass("icon64-" + o.type + "-" + self.current_icon);
                 self.element.addClass("icon64-" + o.type + "-" + self.original_icon);
                 self.current_icon = self.original_icon;
-            });    
+            });
             this.element.append(this.button_edit);
             this.element.append(this.button_previous);
             this.element.append(this.button_next);

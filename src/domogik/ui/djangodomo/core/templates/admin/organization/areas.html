@@ -98,8 +98,11 @@
 {% endblock %}
 {% block css %}
     <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/page-admin-organization.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-processing.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block js_include %}
+    <script type="text/javascript" src="/design/js/jquery.timers-1.2.js"></script>
+    <script type="text/javascript" src="/design/js/ui.processing.js"></script>
 {% endblock %}
 {% block title %}{% trans page_title %}{% endblock %}
 
@@ -195,8 +198,10 @@
                             list: area_icons,
                             icon: '{{ area.config.icon }}',
                             validCallback: function(self, icon) {
+                                $('#icon{{ area.id }}').processing('start');
                                 getREST('/base/ui_config/set/name/area/reference/{{ area.id }}/key/icon/value/' + icon,
                                     function(data) {
+                                        $('#icon{{ area.id }}').processing('stop');
                                         var status = (data.status).toLowerCase();
                                         if (status == 'ok') {
                                             self.valid();
@@ -210,6 +215,8 @@
                                 )
                             }
                         });
+                        
+                        $( "#icon{{ area.id }}").processing();
                     });
                     // ]]>
                 </script>
@@ -218,7 +225,7 @@
                     <li><button id="update{{ area.id }}" class="icon16-action-update buttonside" title="{% trans "Modify" %} '{{ area.name }}'"><span class='offscreen'>{% trans "Modify" %} {{ area.name }}</span></button></li>
                 </ul>
                 <div class="content">
-                    <div id="icon{{ area.id }}" class='processing'></div>
+                    <div id="icon{{ area.id }}"></div>
                     <h2>{{ area.name }}</h2>
                     <p>{{ area.description }}</p>
                 </div>
