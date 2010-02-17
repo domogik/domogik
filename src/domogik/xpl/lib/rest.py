@@ -2001,9 +2001,8 @@ class JSonHelper():
         self._nb_data_values += 1
 
         # dirty issue to force data not to be in cache
-        print data
-        #if hasattr(data, 'id') or hasattr(data, 'reference'):    # for all
-        #    pass
+        if hasattr(data, 'id') or hasattr(data, 'reference'):    # for all
+            pass
         if hasattr(data, 'area'):  # for room
             pass
 
