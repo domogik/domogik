@@ -1976,7 +1976,7 @@ class JSonHelper():
         db_type = ("ActuatorFeature", "Area", "Device", "DeviceUsage", \
                    "DeviceConfig", "DeviceStats", "DeviceStatsValue", \
                    "DeviceTechnology", "DeviceTechnologyConfig", \
-                   "DeviceType", "UIItemConfig", "Room," "UserAccount", \
+                   "DeviceType", "UIItemConfig", "Room", "UserAccount", \
                    "SensorReferenceData", "SystemAccount", "SystemConfig", \
                    "SystemStats", "SystemStatsValue", "Trigger")
         num_type = ("int", "float", "bool")
