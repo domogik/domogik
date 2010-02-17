@@ -102,6 +102,8 @@
                 name: 'dark' // Inherit the rest of the attributes from the preset dark style
             }
         });
+        
+        $(".icon_room").processing();
     });
 
 {% endblock %}
@@ -211,8 +213,10 @@
                             list: room_icons,
                             icon: "{{ room.config.icon }}",
                             validCallback: function(self, icon) {
+                                $('#icon{{ room.id }}').processing('start');
                                 getREST('/base/ui_config/set/name/room/reference/{{ room.id }}/key/icon/value/' + icon,
                                     function(data) {
+                                        $('#icon{{ room.id }}').processing('stop');
                                         var status = (data.status).toLowerCase();
                                         if (status == 'ok') {
                                             self.valid();
@@ -226,6 +230,8 @@
                                 )
                             }
                         });
+                        
+                        $( "#icon{{ room.id }}").processing();
                     });
                     // ]]>
                 </script>
