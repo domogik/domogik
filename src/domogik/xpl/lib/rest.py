@@ -253,8 +253,7 @@ class ProcessRequest():
         # Get type of request : /command, /xpl-cmnd, /base, etc
         if len(tab_path) < 2:
             self.rest_type = None
-            self.send_http_response_error(999, "No type given", \
-                                          self.jsonp, self.jsonp_cb)
+            # Display an information json if no request done in do_for_all_methods
             return
         self.rest_type = tab_path[1].lower()
         if len(tab_path) > 2:
@@ -280,12 +279,12 @@ class ProcessRequest():
             self.rest_base()
         elif self.rest_type == "module":
             self.rest_module()
+        elif self.rest_type == None:
+            self.rest_status()
         else:
             self.send_http_response_error(999, "Type [" + str(self.rest_type) + \
                                           "] is not supported", \
                                           self.jsonp, self.jsonp_cb)
-            return
-
 
 
     def _parse_options(self):
@@ -319,6 +318,25 @@ class ProcessRequest():
         print "DEBUG : start sleeping for " + str(duration)
         time.sleep(float(duration))
         print "DEBUG : end sleeping"
+
+
+
+
+
+######
+# / processing
+######
+
+    def rest_status(self):
+        json_data = JSonHelper("OK", 0, "REST server available")
+        json_data.set_data_type("rest")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        # TODO : get version by a better way
+        json_data.add_data(("Version : 0.1.x", "Status : UP"))
+        self.send_http_response_ok(json_data.get())
+
+
+
 
 
 
