@@ -1311,7 +1311,6 @@ class UserAndSystemAccountsTestCase(GenericTestCase):
         sys1 = self.db.add_system_account(a_login='mschneider',
                                           a_password='IwontGiveIt',
                                           a_is_admin=True)
-        print sys1
         assert self.db.is_system_account('mschneider', 'IwontGiveIt')
         assert not self.db.is_system_account('mschneider', 'plop')
         assert not self.db.is_system_account('hello', 'boy')
@@ -1319,6 +1318,7 @@ class UserAndSystemAccountsTestCase(GenericTestCase):
                                                             'IwontGiveIt')
         assert sys1 is not None
         assert sys1.login == 'mschneider'
+        assert sys1.password == ''
         try:
             self.db.add_system_account(a_login='mschneider', a_password='plop',
                                        a_is_admin = True)
@@ -1335,7 +1335,6 @@ class UserAndSystemAccountsTestCase(GenericTestCase):
         user1 = self.db.add_user_account(u_first_name='Marc', u_last_name='SCHNEIDER',
                                          u_birthdate=datetime.date(1973, 4, 24),
                                          u_system_account_id = sys1.id)
-        print user1
         try:
             self.db.add_user_account(u_first_name='Marc', u_last_name='SCHNEIDER',
                                          u_birthdate=datetime.date(1973, 4, 24),
@@ -1358,6 +1357,7 @@ class UserAndSystemAccountsTestCase(GenericTestCase):
         sys_acc_msc = self.db.get_system_account_by_login_and_pass(
                         'mschneider2', 'ItWasWrong')
         assert sys_acc_msc is not None
+        assert sys_acc.password == ''
         assert sys_acc_u.is_admin == False
         user = self.db.add_user_account(u_first_name='Marc', u_last_name='SCHNEIDER',
                                         u_birthdate=datetime.date(1973, 4, 24),
@@ -1392,13 +1392,18 @@ class UserAndSystemAccountsTestCase(GenericTestCase):
                                          u_last_name='PYTHON',
                                          u_birthdate=datetime.date(1981, 4, 24))
 
-        assert self.db.get_system_account(sys1.id).login == 'mschneider'
-        assert self.db.get_system_account_by_login('mschneider') is not None
+        sys_acc = self.db.get_system_account(sys1.id)
+        assert sys_acc.login == 'mschneider'
+        assert sys_acc.password == ''
+        sys_acc = self.db.get_system_account_by_login('mschneider')
+        assert sys_acc is not None
+        assert sys_acc.password == ''
         assert self.db.get_system_account_by_login('mschneider').id == sys1.id
         assert self.db.get_system_account_by_login('lucyfer') is None
 
-        login = self.db.get_system_account_by_user(user1.id).login
-        assert login == 'mschneider'
+        sys_acc = self.db.get_system_account_by_user(user1.id)
+        assert sys_acc.login == 'mschneider'
+        assert sys_acc.password == ''
         assert self.db.get_user_account(user1.id).first_name == 'Marc'
         assert self.db.get_user_account(user2.id).last_name == 'PYTHON'
         assert self.db.get_user_account_by_system_account(sys1.id) is not None
