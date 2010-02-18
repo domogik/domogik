@@ -322,17 +322,13 @@ class RoomTestCase(GenericTestCase):
         except DbHelperException:
             pass
 
-    def testGetRoomByName(self):
+    def testListAndGet(self):
         area1 = self.db.add_area('area1','description 1')
         room1 = self.db.add_room(r_name='room1', r_description='description 1',
                                  r_area_id=area1.id)
         assert self.db.get_room_by_name('Room1').name == 'room1'
 
-    def testGetRoomsOfArea(self):
-        area1 = self.db.add_area('area1','description 1')
         area2 = self.db.add_area('area2','description 2')
-        room1 = self.db.add_room(r_name='room1', r_description='description 1',
-                                 r_area_id=area1.id)
         room2 = self.db.add_room(r_name='room2', r_description='description 2',
                                  r_area_id=area1.id)
         room3 = self.db.add_room(r_name='room3', r_description='description 3',
