@@ -1561,7 +1561,11 @@ class DbHelper():
         Returns a list of all accounts
         @return a list of SystemAccount objects
         """
-        return self._session.query(SystemAccount).all()
+        list_sa = self._session.query(SystemAccount).all()
+        for sys_acc in list_sa:
+            # I won't send the password, right?
+            sys_acc.password = ""
+        return list_sa
 
     def get_system_account(self, a_id):
         """

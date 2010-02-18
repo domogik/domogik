@@ -1330,6 +1330,8 @@ class UserAndSystemAccountsTestCase(GenericTestCase):
                                           a_is_admin=True, a_skin_used='myskin')
         sys3 = self.db.add_system_account(a_login='domo', a_password='gik',
                                           a_is_admin=True)
+        for sys_acc in self.db.list_system_accounts():
+            assert sys_acc.password == ""
         user1 = self.db.add_user_account(u_first_name='Marc', u_last_name='SCHNEIDER',
                                          u_birthdate=datetime.date(1973, 4, 24),
                                          u_system_account_id = sys1.id)
