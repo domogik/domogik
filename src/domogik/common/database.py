@@ -150,7 +150,7 @@ class DbHelper():
         """
         return self._session.query(Area).all()
 
-    def get_areas_with_rooms(self):
+    def list_areas_with_rooms(self):
         """
         Return all areas with associated rooms
         @return a list of Area objects containing the associated room list

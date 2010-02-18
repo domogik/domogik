@@ -213,7 +213,7 @@ class AreaTestCase(GenericTestCase):
         self.db.add_room(r_name='Kitchen', r_area_id=basement.id)
         self.db.add_room(r_name='Bathroom', r_area_id=basement.id)
         self.db.add_room(r_name='Lounge', r_area_id=basement.id)
-        area_w_rooms_list = self.db.get_areas_with_rooms()
+        area_w_rooms_list = self.db.list_areas_with_rooms()
         for my_area in area_w_rooms_list:
             if my_area.name == 'Basement':
                 assert len(my_area.Room) == 3
