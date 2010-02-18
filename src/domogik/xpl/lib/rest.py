@@ -1884,10 +1884,12 @@ target=*
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("module")
-        json_data.add_data({"name" : "x10", "description" : "X10 module", "status" : "ON"})
-        json_data.add_data({"name" : "onewire", "description" : "1 wire", "status" : "ON"})
-        json_data.add_data({"name" : "wol", "description" : "Wake on lan", "status" : "ON"})
-        json_data.add_data({"name" : "teleinfo", "description" : "Teleinfo", "status" : "ON"})
+        json_data.add_data({"name" : "x10", "description" : "X10 module", "status" : "ON", "host" : "lightstar"})
+        json_data.add_data({"name" : "onewire", "description" : "1 wire", "status" : "OFF", "host" : "lightstar"})
+        json_data.add_data({"name" : "wol", "description" : "Wake on lan", "status" : "ON", "host" : "lightstar"})
+        json_data.add_data({"name" : "teleinfo", "description" : "Teleinfo", "status" : "ON", "host" : "lightstar"})
+        json_data.add_data({"name" : "onewire", "description" : "1 wire", "status" : "ON", "host" : "dyonisos"})
+        json_data.add_data({"name" : "callerid", "description" : "Caller ID", "status" : "OFF", "host" : "dyonisos"})
         self.send_http_response_ok(json_data.get())
 
 
