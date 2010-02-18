@@ -336,6 +336,33 @@ class RoomTestCase(GenericTestCase):
         assert len(self.db.get_all_rooms_of_area(area1.id)) == 2
         assert len(self.db.get_all_rooms_of_area(area2.id)) == 1
 
+        dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
+        du1 = self.db.add_device_usage('du1')
+        dty1 = self.db.add_device_type(dty_name='x10 Switch',
+                                       dty_description='desc1', dt_id=dt1.id)
+        device1 = self.db.add_device(d_name='Toaster', d_address='A1',
+                    d_type_id=dty1.id, d_usage_id=du1.id,
+                    d_room_id=room1.id, d_description='My new toaster',
+                    d_is_resetable=True,
+                    d_is_value_changeable_by_user = False)
+        device2 = self.db.add_device(d_name='Washing machine', d_address='A1',
+                    d_type_id=dty1.id, d_usage_id=du1.id,
+                    d_room_id=room1.id, d_description='Laden',
+                    d_is_resetable=True,
+                    d_is_value_changeable_by_user = False)
+        device3 = self.db.add_device(d_name='Mixer', d_address='A2',
+                    d_type_id=dty1.id, d_usage_id=du1.id,
+                    d_room_id=room2.id, d_description='Moulinex',
+                    d_is_resetable=True,
+                    d_is_value_changeable_by_user = False)
+        for room in self.db.list_rooms_with_devices():
+            if room.id == room1.id:
+                assert len(room.Device) == 2
+            if room.id == room2.id:
+                assert len(room.Device) == 1
+        assert len(room3.Device) == 0
+
+
 class DeviceUsageTestCase(GenericTestCase):
     """
     Test device usages

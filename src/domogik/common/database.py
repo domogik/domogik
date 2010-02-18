@@ -273,6 +273,21 @@ class DbHelper():
         """
         return self._session.query(Room).all()
 
+    def list_rooms_with_devices(self):
+        """
+        Return all rooms with associated devices
+        @return a list of Room objects containing the associated device list
+        """
+        room_list = self.list_rooms()
+        room_devices_list = []
+        for room in room_list:
+            device_list = self._session.query(Device)\
+                              .filter_by(room_id=room.id).all()
+            # set Room in area object
+            room.Device = device_list
+            room_devices_list.append((room))
+        return room_devices_list
+
     def search_rooms(self, filters):
         """
         Look for room(s) with filter on their attributes
@@ -1300,7 +1315,8 @@ class DbHelper():
             raise DbHelperException("Device with id %s couldn't be found" % d_id)
 
         device_d = device
-        for device_conf in self._session.query(DeviceConfig).filter_by(device_id=d_id).all():
+        for device_conf in self._session.query(DeviceConfig)\
+                                        .filter_by(device_id=d_id).all():
             self._session.delete(device_conf)
 
         for device_stats in self._session.query(DeviceStats).filter_by(device_id=d_id).all():
@@ -1351,8 +1367,8 @@ class DbHelper():
         @return a DeviceStat object
         """
         return self._session.query(DeviceStats)\
-                              .filter_by(device_id=d_device_id)\
-                              .order_by(sqlalchemy.desc(DeviceStats.date)).first()
+                            .filter_by(device_id=d_device_id)\
+                            .order_by(sqlalchemy.desc(DeviceStats.date)).first()
 
     def get_last_stat_of_devices(self, device_list):
         """
