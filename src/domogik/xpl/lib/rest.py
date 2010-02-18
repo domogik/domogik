@@ -280,6 +280,8 @@ class ProcessRequest():
             self.rest_base()
         elif self.rest_type == "module":
             self.rest_module()
+        elif self.rest_type == "account":
+            self.rest_account()
         elif self.rest_type == None:
             self.rest_status()
         else:
@@ -1938,6 +1940,52 @@ target=*
             json_data = JSonHelper("ERROR", 999, error)
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
             self.send_http_response_ok(json_data.get())
+
+
+
+######
+# /account processing
+######
+
+    def rest_account(self):
+        print "Call rest_action"
+
+        # Check url length
+        if len(self.rest_request) < 1:
+            self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
+            return
+
+        # parameters initialisation
+        self.parameters = {}
+
+        ### list #####################################
+        if self.rest_request[0] == "list":
+
+            if len(self.rest_request) == 1:
+                self._rest_account_list()
+            else:
+                self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
+                                                  self.jsonp, self.jsonp_cb)
+                return
+
+        ### others ###################################
+        else:
+            self.send_http_response_error(999, self.rest_request[0] + " not allowed", self.jsonp, self.jsonp_cb)
+            return
+
+
+
+    def _rest_account_list(self):
+        """ list accounts
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("account")
+        for account in self._db.list_system_accounts():
+            json_data.add_data(account)
+        self.send_http_response_ok(json_data.get())
+
+        
 
 
 
