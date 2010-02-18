@@ -659,6 +659,13 @@ target=*
                     else:
                         self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
+            elif self.rest_request[1] == "list-with-devices":
+                if len(self.rest_request) == 2:
+                    self._rest_base_room_list_with_devices()
+                else:
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
+
 
             ### add
             elif self.rest_request[1] == "add":
@@ -1138,7 +1145,7 @@ target=*
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("area")
-        for area in self._db.get_areas_with_rooms():
+        for area in self._db.list_areas_with_rooms():
             json_data.add_data(area)
         self.send_http_response_ok(json_data.get())
 
@@ -1217,6 +1224,18 @@ target=*
                 area_id = None
             for room in self._db.get_all_rooms_of_area(area_id):
                 json_data.add_data(room)
+        self.send_http_response_ok(json_data.get())
+
+
+
+    def _rest_base_room_list_with_devices(self):
+        """ list rooms and associated devices
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("room")
+        for room in self._db.list_rooms_with_devices():
+            json_data.add_data(room)
         self.send_http_response_ok(json_data.get())
 
 
@@ -2071,8 +2090,8 @@ class JSonHelper():
                    "DeviceType", "UIItemConfig", "Room", "UserAccount", \
                    "SensorReferenceData", "SystemAccount", "SystemConfig", \
                    "SystemStats", "SystemStatsValue", "Trigger")
-        num_type = ("int", "float", "bool")
-        str_type = ("str", "unicode")
+        num_type = ("int", "float")
+        str_type = ("str", "unicode", "bool")
         none_type = ("NoneType")
         tuple_type = ("tuple")
         list_type = ("list")
@@ -2117,7 +2136,11 @@ class JSonHelper():
 
         elif data_type in list_type:
             # get first data type
-            sub_data_elt0_type = type(data[0]).__name__
+            if len(data) > 0:
+                sub_data_elt0_type = type(data[0]).__name__
+            else:
+                return data_json
+
             # start table
             data_json += '"%s" : [' % sub_data_elt0_type.lower()
             print "SUB DATA TYPE : " + str(sub_data_elt0_type)
