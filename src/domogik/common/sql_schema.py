@@ -733,11 +733,11 @@ class SystemAccount(Base):
         return SystemAccount.__tablename__
 
 
-class UserAccount(Base):
+class Person(Base):
     """
-    Personnal information of the user
+    Persons registered in the app
     """
-    __tablename__ = '%s_user_account' % _db_prefix
+    __tablename__ = '%s_person' % _db_prefix
     id = Column(Integer, primary_key=True)
     first_name = Column(String(50), nullable=False)
     last_name = Column(String(60), nullable=False)
@@ -764,8 +764,7 @@ class UserAccount(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<UserAccount(id=%s, first_name='%s', last_name='%s', system_account=%s)>" \
-               % (self.id, self.first_name, self.last_name, self.system_account)
+        return "<Person(id=%s, first_name='%s', last_name='%s', system_account=%s)>" % (self.id, self.first_name, self.last_name, self.system_account)
 
     @staticmethod
     def get_tablename():
@@ -773,7 +772,7 @@ class UserAccount(Base):
         Return the table name associated to the class
         @return table name
         """
-        return UserAccount.__tablename__
+        return Person.__tablename__
 
 
 class SystemStats(Base):
