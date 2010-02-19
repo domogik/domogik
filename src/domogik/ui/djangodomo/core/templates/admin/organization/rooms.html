@@ -24,12 +24,6 @@
 {% load i18n %}
 {% block js_script %}
     $(function(){
-    /*
-        $('#instructions').dialog({autoOpen: false}); 
-        $('#btinstructions').click(function() {
-            $('#instructions').dialog('open',{closeOnEscape: false});
-        });
-	*/
         // Add form  
         var new_name = $("#new_name"),
             new_description = $("#new_description"),
@@ -42,7 +36,7 @@
 			height: 250,
 			modal: true,
 			buttons: {
-				'Créer': function() {
+				'{% trans "Create" %}': function() {
 					var bValid = true;
 					allFields.removeClass('ui-state-error');
 
@@ -62,7 +56,7 @@
                         );
                     }
 				},
-				Cancel: function() {
+				'{% trans "Cancel" %}': function() {
 					$(this).dialog('close');
 				}
 			},
@@ -88,7 +82,6 @@
             },
 
             style: {
-
                 padding: 5,
                 background: '#A2D959',
                 color: 'black',
@@ -188,13 +181,13 @@
                         room{{ room.id }}newname.val("{{ room.name }}");
                         room{{ room.id }}newdescription.val("{{ room.description }}");
                         
-                        $("#updatedialog{{ room.id }}").dialog({
+                        $("#update_dialog_{{ room.id }}").dialog({
                             bgiframe: true,
                             autoOpen: false,
                             height: 300,
                             modal: true,
                             buttons: {
-                                'Modifier': function() {
+                                '{% trans "Modify" %}': function() {
                                     var bValid = true;
                                     allFields.removeClass('ui-state-error');
                                     bValid = bValid && checkLength(tips{{ room.id }}, room{{ room.id }}newname,"nom",1,80);
@@ -213,7 +206,7 @@
                                         );
                                     }
                                 },
-                                Cancel: function() {
+                                '{% trans "Cancel" %}': function() {
                                     $(this).dialog('close');
                                 }
                             },
@@ -221,31 +214,40 @@
                                 allFields.val('').removeClass('ui-state-error');
                             }
                         });
-                        /*
-                        $('select#room{{ room.id }}-icon').selectmenu({
-                            icons: [
-                                {% for icon in icons_area %}
-                                    {find: '.icon_area_{{ icon }}', icon: 'icon64-area-{{ icon }}', jquery:'no'},
-                                {% endfor %}
-                            ]
-                        });
-                    */
+
                         $('#update{{ room.id }}').click(function() {
-                            $('#updatedialog{{ room.id }}').dialog('open');
+                            $('#update_dialog_{{ room.id }}').dialog('open');
                         });
         
                         /* Add a onclick function to delete the current area */
-                        $('#del{{ room.id }}').click(function(data) {
-                            getREST('/base/room/del/{{ room.id }}',
-                                function(data) {
-                                    var status = (data.status).toLowerCase();
-                                    if (status == 'ok') {
-                                        $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Room" %} \'' + data.room[0].name + '\' {% trans "successfully deleted" %}'});                                   
-                                    } else {
-                                        $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Room not deleted" %} (' + data.description + ')'});                                                                      
-                                    }
+                        $('#del{{ room.id }}').click(function() {
+                            $('#delete_confirmation_{{ room.id }}').dialog('open');
+                        });
+                        
+                        $("#delete_confirmation_{{ room.id }}").dialog({
+                            bgiframe: true,
+                            autoOpen: false,
+                            height: 100,
+                            modal: true,
+                            buttons: {
+                                '{% trans "Delete" %}': function() {
+                                    getREST('/base/room/del/{{ room.id }}',
+                                        function(data) {
+                                            var status = (data.status).toLowerCase();
+                                            if (status == 'ok') {
+                                                $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Room" %} \'' + data.room[0].name + '\' {% trans "successfully deleted" %}'});                                   
+                                            } else {
+                                                $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Room not deleted" %} (' + data.description + ')'});                                                                      
+                                            }
+                                        }
+                                    );
+                                },
+                                '{% trans "Cancel" %}': function() {
+                                    $(this).dialog('close');
                                 }
-                            );
+                            },
+                            close: function() {
+                            }
                         });
                         
                         $('#icon{{ room.id }}').editable_icon({
@@ -285,7 +287,7 @@
                     <p>{{ room.description }}</p>
 
                 </div>
-                <div id="updatedialog{{ room.id }}" title="{% trans "Modify" %} {{ room.name }}">
+                <div id="update_dialog_{{ room.id }}" title="{% trans "Modify" %} {{ room.name }}">
                     <p id="validateTips{{ room.id }}">{% trans "All fields are required." %}</p>
                     <form >
                         <fieldset>
@@ -295,6 +297,9 @@
                             <textarea type="text" class="medium" id="room{{ room.id }}-newdescription" name="room{{ room.id }}-newdescription"></textarea>
                         </fieldset>
                     </form>
+                </div>
+                <div id="delete_confirmation_{{ room.id }}" title="{% trans "Delete" %} {{ room.name }}">
+                    <p>{% trans "Please confirm to delete" %} '{{ room.name }}'</p>
                 </div>
             </div>
             {% endfor %}

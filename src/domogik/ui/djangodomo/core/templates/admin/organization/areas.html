@@ -35,7 +35,7 @@
 			height: 250,
 			modal: true,
 			buttons: {
-				'Créer': function() {
+				'{% trans "Create" %}': function() {
 					var bValid = true;
 					allFields.removeClass('ui-state-error');
 
@@ -55,7 +55,7 @@
                         );
                     }
 				},
-				Cancel: function() {
+				'{% trans "Cancel" %}': function() {
 					$(this).dialog('close');
 				}
 			},
@@ -138,13 +138,13 @@
                         area{{ area.id }}newname.val("{{ area.name }}");
                         area{{ area.id }}newdescription.val("{{ area.description }}");
 
-                        $("#updatedialog{{ area.id }}").dialog({
+                        $("#update_dialog_{{ area.id }}").dialog({
                             bgiframe: true,
                             autoOpen: false,
                             height: 300,
                             modal: true,
                             buttons: {
-                                'Modifier': function() {
+                                '{% trans "Modify" %}': function() {
                                     var bValid = true;
                                     allFields.removeClass('ui-state-error');
                                     bValid = bValid && checkLength(tips{{ area.id }}, area{{ area.id }}newname,"nom",1,80);
@@ -163,7 +163,7 @@
                                         );
                                     }
                                 },
-                                Cancel: function() {
+                                '{% trans "Cancel" %}': function() {
                                     $(this).dialog('close');
                                 }
                             },
@@ -173,23 +173,40 @@
                         });
 
                         $('#update{{ area.id }}').click(function() {
-                            $('#updatedialog{{ area.id }}').dialog('open');
+                            $('#update_dialog_{{ area.id }}').dialog('open');
                         });
 
                         /* Add a onclick function to delete the current area */
                         $('#del{{ area.id }}').click(function() {
-                            getREST('/base/area/del/{{ area.id }}',
-                                function(data) {
-                                    var status = (data.status).toLowerCase();
-                                    if (status == 'ok') {
-                                        $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Area" %}\'' + data.area[0].name + '\' {% trans "successfully deleted" %}'});
-                                    } else {
-                                        $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Area not deleted" %} (' + data.description + ')'});
-                                    }
-                                }
-                            );
+                            $('#delete_confirmation_{{ area.id }}').dialog('open');
                         });
                         
+                        $("#delete_confirmation_{{ area.id }}").dialog({
+                            bgiframe: true,
+                            autoOpen: false,
+                            height: 100,
+                            modal: true,
+                            buttons: {
+                                '{% trans "Delete" %}': function() {
+                                    getREST('/base/area/del/{{ area.id }}',
+                                        function(data) {
+                                            var status = (data.status).toLowerCase();
+                                            if (status == 'ok') {
+                                                $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Area" %}\'' + data.area[0].name + '\' {% trans "successfully deleted" %}'});
+                                            } else {
+                                                $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Area not deleted" %} (' + data.description + ')'});
+                                            }
+                                        }
+                                    );
+                                },
+                                '{% trans "Cancel" %}': function() {
+                                    $(this).dialog('close');
+                                }
+                            },
+                            close: function() {
+                            }
+                        });
+                                                
                         $('#icon{{ area.id }}').editable_icon({
                             type: "area",
                             list: area_icons,
@@ -226,7 +243,7 @@
                     <h2>{{ area.name }}</h2>
                     <p>{{ area.description }}</p>
                 </div>
-                <div id="updatedialog{{ area.id }}" title="{% trans "Modify" %} {{ area.name }}">
+                <div id="update_dialog_{{ area.id }}" title="{% trans "Modify" %} {{ area.name }}">
                     <p id="validateTips{{ area.id }}">{% trans "All fields are required." %}</p>
                     <form >
                         <fieldset>
@@ -234,8 +251,11 @@
                             <input type="text" class="medium" id="area{{ area.id }}-newname" name="area{{ area.id }}-newname" />
                             <label class="medium" for="area{{ area.id }}-newdescription">{% trans "New description" %}</label>
                             <textarea type="text" class="medium" id="area{{ area.id }}-newdescription" name="area{{ area.id }}-newdescription"></textarea>
-                        </fieldset>
+                        </fieldset>'
                     </form>
+                </div>
+                <div id="delete_confirmation_{{ area.id }}" title="{% trans "Delete" %} {{ area.name }}">
+                    <p>{% trans "Please confirm to delete" %} '{{ area.name }}'</p>
                 </div>
             </div>
             {% endfor %}
