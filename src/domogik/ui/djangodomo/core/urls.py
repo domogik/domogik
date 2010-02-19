@@ -40,13 +40,6 @@ from django.conf.urls.defaults import *
 urlpatterns = patterns('djangodomo.core.views',
     url(r'^$', 'index', name="index_view"),
 
-    url(r'status/$', 'device_status', name='device_status_view'),
-    url(r'status/room/(?P<room_id>\d+)/$', 'device_status', name='device_status_view'),
-    url(r'status/device/(?P<device_id>\d+)/$', 'device_status', name='device_status_view'),
-    
-#    url(r'device/(?P<device_id>\d+)/$', 'device', name="device_view"),
-#    url(r'device_stats/(?P<device_id>\d+)/$', 'device_stats', name="device_stats_view"),
-
     url(r'login/$', 'login', name='login_view'),
     url(r'logout/$', 'logout', name='logout_view'),
 
@@ -58,6 +51,7 @@ urlpatterns = patterns('djangodomo.core.views',
     url(r'admin/organization/devices/$', 'admin_organization_devices', name="admin_organization_devices_view"),
     url(r'admin/organization/rooms/$', 'admin_organization_rooms', name="admin_organization_rooms_view"),
     url(r'admin/organization/areas/$', 'admin_organization_areas', name="admin_organization_areas_view"),
+    url(r'admin/module/(?P<module_name>\w+)/$', 'admin_modules_module', name="admin_modules_module_view"),
 
     url(r'show/$', 'show_index', name="show_view"),
     url(r'show/area/(?P<area_id>\d+)/$', 'show_area', name='show_area_view'),

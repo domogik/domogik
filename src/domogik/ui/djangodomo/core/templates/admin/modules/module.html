@@ -22,82 +22,12 @@
 
 {% load i18n %}
 {% block js_script %}
-    $(function(){
-        // Add form
-        var new_name = $("#new_name"),
-            new_description = $("#new_description"),
-            allFields = $([]).add(new_name).add(new_description),
-            tips = $("#validateTips");
-
-		$("#addnewdialog").dialog({
-			bgiframe: true,
-			autoOpen: false,
-			height: 250,
-			modal: true,
-			buttons: {
-				'Créer': function() {
-					var bValid = true;
-					allFields.removeClass('ui-state-error');
-
-					bValid = bValid && checkLength(new_name,"nom",1,80);
-                    bValid = bValid && checkLength(new_description,"description",1,80);
-					if (bValid) {
-                        // Submit form
-                        getREST('/base/area/add/name/' + new_name.val() + '/description/' + new_description.val(),
-                            function(data) {
-                                var status = (data.status).toLowerCase();
-                                if (status == 'ok') {
-                                    $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "New area added" %} \'' + data.area[0].name + '\''});
-                                } else {
-                                    $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Area not created" %} (' + data.description + ')'});
-                                }
-                            }
-                        );
-                    }
-				},
-				Cancel: function() {
-					$(this).dialog('close');
-				}
-			},
-			close: function() {
-				allFields.val('').removeClass('ui-state-error');
-			}
-		});
-
-        $("#tabs").tabs().domogik_tabs({
-            addTitle: "{% trans "Add new area" %}",
-            addCallback: function() {
-                $('#addnewdialog').dialog('open');
-            }
-        });
-
-        $('.buttonleft[title], .add').qtip({
-            position: {
-                corner: {
-                    target: 'leftMiddle',
-                    tooltip: 'rightMiddle'
-                }
-            },
-
-            style: {
-
-                padding: 5,
-                background: '#A2D959',
-                color: 'black',
-                textAlign: 'center',
-                border: {
-                    width: 7,
-                    radius: 5,
-                    color: '#A2D959'
-                },
-                tip: 'rightMiddle',
-                name: 'dark' // Inherit the rest of the attributes from the preset dark style
-            }
-        });
-    });
+$(function(){
+    // Accordion
+	$("#nav2").accordion({ header: ".subnav2", active:2});
+});
 {% endblock %}
 {% block css %}
-    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/page-admin-organization.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block js_include %}
 {% endblock %}
@@ -105,7 +35,7 @@
 
 {% block banner %}
     <div class="section">
-        <h1 class="ident"><span class="title">{% trans "Areas" %}</span></h1>
+        <h1 class="ident"><span class="title">{% trans "Module" %} '{{ module_name }}'</span></h1>
         {% ifnotequal status "" %}
         <div id='messages' class='{{status}}'>{{msg}}</div>
         {% endifnotequal %}
@@ -114,142 +44,7 @@
 {% endblock %}
 
 {% block right %}
-    
     <div class="subsection">
-        <h2>{% trans "Areas list" %}</h2>
-        <div id="tabs">
-            {% spaceless %}
-            <ul>
-                {% for area in areas_list %}
-                    <li><a id="tab{{ area.id }}" href="#element{{ area.id }}" class="icon16-area-{{ area.config.icon }}">{{ area.name }}</a></li>
-                {% endfor %}
-            </ul>
-            {% endspaceless %}
-            {% for area in areas_list %}
-            <div id="element{{ area.id }}" class="tabelement">
-                <script type="text/javascript">
-                    // Update form
-                    $(function(){
-                        var area{{ area.id }}newname = $("#area{{ area.id }}-newname"),
-                            area{{ area.id }}newdescription = $("#area{{ area.id }}-newdescription"),
-                            allFields = $([]).add(area{{ area.id }}newname),
-                            tips{{ area.id }} = $("#validateTips{{ area.id }}");
-
-                        area{{ area.id }}newname.val("{{ area.name }}");
-                        area{{ area.id }}newdescription.val("{{ area.description }}");
-
-                        $("#updatedialog{{ area.id }}").dialog({
-                            bgiframe: true,
-                            autoOpen: false,
-                            height: 300,
-                            modal: true,
-                            buttons: {
-                                'Modifier': function() {
-                                    var bValid = true;
-                                    allFields.removeClass('ui-state-error');
-                                    bValid = bValid && checkLength(tips{{ area.id }}, area{{ area.id }}newname,"nom",1,80);
-                                    bValid = bValid && checkLength(tips{{ area.id }}, area{{ area.id }}newdescription,"description",1,80);
-                                    if (bValid) {
-                                        // Submit form
-                                        getREST('/base/area/update/id/' + {{ area.id }} + '/name/' + area{{ area.id }}newname.val() + '/description/' + area{{ area.id }}newdescription.val(),
-                                            function(data) {
-                                                var status = (data.status).toLowerCase();
-                                                if (status == 'ok') {
-                                                    $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Area" %} \'' + data.area[0].name + '\' {% trans "successfully updated" %}'});
-                                                } else {
-                                                    $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Area not updated" %} (' + data.description + ')'});
-                                                }
-                                            }
-                                        );
-                                    }
-                                },
-                                Cancel: function() {
-                                    $(this).dialog('close');
-                                }
-                            },
-                            close: function() {
-                                allFields.val('').removeClass('ui-state-error');
-                            }
-                        });
-
-                        $('#update{{ area.id }}').click(function() {
-                            $('#updatedialog{{ area.id }}').dialog('open');
-                        });
-
-                        /* Add a onclick function to delete the current area */
-                        $('#del{{ area.id }}').click(function() {
-                            getREST('/base/area/del/{{ area.id }}',
-                                function(data) {
-                                    var status = (data.status).toLowerCase();
-                                    if (status == 'ok') {
-                                        $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Area" %}\'' + data.area[0].name + '\' {% trans "successfully deleted" %}'});
-                                    } else {
-                                        $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Area not deleted" %} (' + data.description + ')'});
-                                    }
-                                }
-                            );
-                        });
-                        
-                        $('#icon{{ area.id }}').editable_icon({
-                            type: "area",
-                            list: area_icons,
-                            icon: '{{ area.config.icon }}',
-                            validCallback: function(self, icon) {
-                                $('#icon{{ area.id }}').processing('start');
-                                getREST('/base/ui_config/set/name/area/reference/{{ area.id }}/key/icon/value/' + icon,
-                                    function(data) {
-                                        $('#icon{{ area.id }}').processing('stop');
-                                        var status = (data.status).toLowerCase();
-                                        if (status == 'ok') {
-                                            self.valid();
-                                            $("#tab{{ area.id }}").removeClass();
-                                            $("#tab{{ area.id }}").addClass("icon16-area-" + icon);
-                                        } else {
-                                            self.cancel();
-                                            display_message('error', data.description);                                          
-                                        }
-                                    }
-                                )
-                            }
-                        });
-                        
-                        $( "#icon{{ area.id }}").processing();
-                    });
-                    // ]]>
-                </script>
-                <ul class="actions">
-                    <li><button id='del{{ area.id }}' class='icon16-action-del buttonside' title="{% trans "Delete" %} '{{ area.name }}'"><span class='offscreen'>{% trans "Delete" %} {{ area.name }}</span></button></li>
-                    <li><button id="update{{ area.id }}" class="icon16-action-update buttonside" title="{% trans "Modify" %} '{{ area.name }}'"><span class='offscreen'>{% trans "Modify" %} {{ area.name }}</span></button></li>
-                </ul>
-                <div class="content">
-                    <div id="icon{{ area.id }}"></div>
-                    <h2>{{ area.name }}</h2>
-                    <p>{{ area.description }}</p>
-                </div>
-                <div id="updatedialog{{ area.id }}" title="{% trans "Modify" %} {{ area.name }}">
-                    <p id="validateTips{{ area.id }}">{% trans "All fields are required." %}</p>
-                    <form >
-                        <fieldset>
-                            <label class="medium" for="area{{ area.id }}-newname">{% trans "New name" %}</label>
-                            <input type="text" class="medium" id="area{{ area.id }}-newname" name="area{{ area.id }}-newname" />
-                            <label class="medium" for="area{{ area.id }}-newdescription">{% trans "New description" %}</label>
-                            <textarea type="text" class="medium" id="area{{ area.id }}-newdescription" name="area{{ area.id }}-newdescription"></textarea>
-                        </fieldset>
-                    </form>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        <div id="addnewdialog" title='{% trans "Create new area" %}'>
-            <p id="validateTips">{% trans "All fields are required." %}</p>
-            <form>
-                <fieldset>
-                    <label class="medium" for="new_name">{% trans "Name" %}</label>
-                    <input type="text" class="medium" id="new_name" name="new_name" />
-                    <label class="medium" for="new_description">{% trans "Description" %}</label>
-                    <textarea type="text" class="medium" id="new_description" name="new_description"></textarea>
-                </fieldset>
-            </form>
-        </div>
+        <h2>{% trans "Basic Control" %}</h2>
     </div>
 {% endblock %}

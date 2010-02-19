@@ -295,20 +295,6 @@ def __is_user_admin(request):
     user = __get_user_connected(request)
     return user is not None and user['is_admin']
 
-def device_status(request, room_id=None, device_id=None):
-    return None
-    """
-    import random
-    if request.method == 'POST':
-        print "Set power to ", request.POST["value"]
-        response = {'value': request.POST['value']}
-    else:
-        devices = Device.objects.filter(pk__in=request.GET.getlist('devices'))
-        json = simplejson.dumps(dict((d.pk, d.get_data_dict()) for d in devices))
-        return HttpResponse(json)
-    return HttpResponse(response)
-    """
-
 def admin_organization_devices(request):
     """
     Method called when the admin devices organization page is accessed
@@ -395,6 +381,31 @@ def admin_organization_areas(request):
         areas_list=resultAllAreas.area
     )
 
+def admin_modules_module(request, module_name):
+    """
+    Method called when the admin module command page is accessed
+    @param request : HTTP request
+    @return an HttpResponse object
+    """
+    if not __is_user_admin(request):
+        return index(request)
+
+    status = request.GET.get('status', '')
+    msg = request.GET.get('msg', '')
+    
+    resultAllModules = Modules.getAll()
+    page_title = _("Module")
+    return __go_to_page(
+        request, 'admin/modules/module.html',
+        page_title,
+        nav1_admin = "selected",
+        nav2_modules_module = "selected",
+        modules_list=resultAllModules.module,
+        status=status,
+        msg=msg,
+        module_name=module_name
+    )
+    
 def show_index(request):
     """
     Method called when the show index page is accessed

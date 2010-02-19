@@ -59,9 +59,9 @@
             <div class="subnav2"><a href="#">{% trans "Modules" %}</a></div>
             <ul>
                 {% spaceless %}
-                {% for module in modules_list %}
-                    <li><a href="#" class="icon16-module-{{ module.name }}">{{ module.description }}
-                    {% ifequal module.status "ON" %}
+                {% for menu_module in modules_list %}
+                    <li><a href="{% url admin_modules_module_view menu_module.name %}" class="icon16-module-{{ menu_module.name }} {% ifequal menu_module.name module_name %}{{ nav2_modules_module }}{% endifequal %}">{{ menu_module.description }}
+                    {% ifequal menu_module.status "ON" %}
                         <div class='status icon16-status-active'></div>
                     {% else %}
                         <div class='status icon16-status-inactive'></div>                        
