@@ -519,7 +519,8 @@ def admin_organization_rooms(request):
     resultAllRooms = Rooms.getAll()
     resultAllRooms.merge_uiconfig()
     resultUnattribuedRooms = Rooms.getWithoutArea()
-    resultAllAreas = Areas.getAll()
+    resultAllAreas = Areas.getAllWithRooms()
+    resultAllAreas.merge_uiconfig()
     resultAllModules = Modules.getAll()
     page_title = _("Room organization")
     return __go_to_page(

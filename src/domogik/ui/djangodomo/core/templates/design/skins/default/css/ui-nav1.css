@@ -2,33 +2,33 @@
 #logo {
     float:left;
     margin:0 1em 0 0;
-	background-image: -webkit-gradient(linear, 0% 0%, 0% 60%, from(#BDCB2F), to(#9BB528));
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 60%, from(#BDCB2F), to(#9BB528));
     background-image: -moz-linear-gradient(100% 60% 270deg, #BDCB2F, #9BB528);
-	border: #B9C2481px solid;
-	padding:0.5em;
-	-moz-border-radius: 0.8em;
-	-webkit-border-radius: 0.8em;
+    border: #B9C248 1px solid;
+    padding:0.5em;
+    -moz-border-radius: 0.8em;
+    -webkit-border-radius: 0.8em;
 }
 
 #header {
     padding:1em 0 0 1em;
-	background-image: -webkit-gradient(linear, 0% 0%, 0% 80%, from(#000000), to(#403E3F));
-	background-image: -moz-linear-gradient(100% 80% 90deg, #403E3F, #000000);
-	color:#EEEBE2;
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 80%, from(#000000), to(#403E3F));
+    background-image: -moz-linear-gradient(100% 80% 90deg, #403E3F, #000000);
+    color:#EEEBE2;
 }
 
 #header #title {
-	color: #EEEBE2;
-	font-size:3em;
-	font-family: Impact;
+    color: #EEEBE2;
+    font-size:3em;
+    font-family: Impact;
 }
 
 #header #subtitle {
-	color: #C6C1AE;
-	display:block;
+    color: #C6C1AE;
+    display:block;
     font-size:0.6em;
     font-style:italic;
-	font-family:Arial;
+    font-family:Arial;
 }
 
 /* Nav 1 */
@@ -37,7 +37,7 @@ ul#nav1 {
     padding: 0.2em 0.2em 0 0.2em;
     border-top: #B9C248 1px solid;
     border-bottom: #B9C248 1px solid;
-	background-image: -webkit-gradient(linear, 0% 0%, 0% 60%, from(#BDCB2F), to(#9BB528));
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 60%, from(#BDCB2F), to(#9BB528));
     background-image: -moz-linear-gradient(100% 60% 270deg, #BDCB2F, #9BB528);
     color: #ffffff;
     margin:0;
@@ -50,8 +50,8 @@ ul#nav1 li {
     line-height:2.5em;
 }
 ul#nav1 li a {
-	font-family:Impact;
-	font-size:2em;
+    font-family:Impact;
+    font-size:2em;
     display:inline-block;
     text-decoration:none;
     padding: 0 1em 16px 1em;
@@ -59,12 +59,12 @@ ul#nav1 li a {
 }
 
 ul#nav1 li a .description {
-	font-size:0.6em;
+    font-size:0.6em;
     display:block;
-	color:#6F7718;
-	font-family:Arial;
-	font-style:italic;
-	line-height:0.8em;
+    color:#6F7718;
+    font-family:Arial;
+    font-style:italic;
+    line-height:0.8em;
 }
 
 ul#nav1 li a:hover, ul#nav1 li a:focus, ul#nav1 li a:active {
@@ -77,7 +77,7 @@ ul#nav1 li a:hover .description, ul#nav1 li a:focus .description, ul#nav1 li a:a
 
 ul#nav1 li a.selected {
     color: #28281E;
-	background: url(../images/decoration/nav1_selector_black.png) 50% 100% no-repeat;
+    background: url(../images/decoration/nav1_selector_black.png) 50% 100% no-repeat;
 }
 
 ul#nav1 li a.selected .description {
@@ -85,5 +85,5 @@ ul#nav1 li a.selected .description {
 }
 
 ul#nav1 .login {
-	float:right;
+    float:right;
 }

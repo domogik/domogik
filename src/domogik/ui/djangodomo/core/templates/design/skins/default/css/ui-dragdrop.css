@@ -7,29 +7,34 @@ ul.draggables {
     padding:0;
 }
 
-.areadrop {
+.targetdrop {
     margin:0.2em;
     padding:0.2em;
-    border:2px solid #1c94c4;
+    border:2px solid #BDCB2F;
     -moz-border-radius: 0.8em;
     -webkit-border-radius: 0.8em;
 }
 
-.areadrop legend {
+.targetdrop legend {
 	font-weight:bold;
 	margin-left:2em;
+    background-position: left 50%;
+    background-repeat: no-repeat;
+    display:inline-block;
+    line-height:16px;
+    padding-left:20px;
 }
 
 li.draggable, li.empty
 {
     position: relative;
     border: 1px solid #666;
-    padding: 0.5em;
+    padding: 0.5em 0.5em 0.5em 1em;
     margin:0.1em;
-    width: 10em;
+    width: 13em;
     text-align: center;
     color: #000;
-    background: #fff;
+    background-color: #fff;
     display:inline-block;
     -moz-border-radius: 1em;
     -webkit-border-radius: 1em;
@@ -38,6 +43,8 @@ li.draggable, li.empty
 li.draggable
 {
     cursor: move;
+    background-position: left 50%;
+    background-repeat: no-repeat;
 }
 
 li.dragged
@@ -46,19 +53,19 @@ li.dragged
     -webkit-box-shadow: 5px 5px 5px #888;
 }
 
-ul.draggables li.hover, ul.draggables li.focused
+li.draggable:hover
 {
-    background: #f6a828;
+    background-color: #BDCB2F;
 }
 
-ul.highlight
+li.draggable:focus
 {
-    background: #1c94c4;
+    background-color: #f6a828;
 }
 
-ul.highlight.hover
+.highlight
 {
-    background: #f6a828;
+    background-color: #DFFFB3;
 }
 
 ul#popup
@@ -67,9 +74,9 @@ ul#popup
     position: absolute;
     width: 10em;
     padding: 0.3em;
-    background:#CCC;
     color: #000;
-    border: 2px solid #f6a828;
+	border: #979387 1px solid;
+	background-color: #D2CDBC;
     top: 1em;
     left: 1em;
     cursor: default;
@@ -78,15 +85,16 @@ ul#popup
     -webkit-border-radius: 0.5em;
 }
 
-ul#popup li
-{
+ul#popup li {
     text-align: left;
     margin: 0.3em 0;
     padding: 0.4em;
 }
 
-ul#popup li.focus, ul#popup li.hover
-{
-    background: #f6a828;
-    color: #fff;
+ul#popup li:focus {
+    background-color: #f6a828;
+}
+
+ul#popup li:hover {
+    background-color: #BDCB2F;
 }

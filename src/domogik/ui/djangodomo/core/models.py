@@ -47,6 +47,12 @@ class Areas(pipes.DmgPipe):
             return resp
 
     @staticmethod
+    def getAllWithRooms():
+        resp = Areas.objects.get({'parameters':"list-with-rooms/"})
+        if resp :
+            return resp
+        
+    @staticmethod
     def getById(id):
         resp = Areas.objects.get({'parameters':"list/by-id/"+id})
         if resp :
@@ -58,6 +64,14 @@ class Areas(pipes.DmgPipe):
             area.config = {}
             for uiconfig in uiconfigs.ui_config:
                 area.config[uiconfig.key] = uiconfig.value
+            
+            # If has rooms
+            if hasattr(area, 'room') :
+                for room in area.room:
+                    uiconfigs = UIConfigs.getByReference('room', room.id)
+                    room.config = {}
+                    for uiconfig in uiconfigs.ui_config:
+                        room.config[uiconfig.key] = uiconfig.value
 
 class Rooms(pipes.DmgPipe):
     uri = "http://127.0.0.1:8080/base/room"
@@ -92,11 +106,13 @@ class Rooms(pipes.DmgPipe):
             room.config = {}
             for uiconfig in uiconfigs.ui_config:
                 room.config[uiconfig.key] = uiconfig.value
+
             # If is associated with area
-            uiconfigs = UIConfigs.getByReference('area', room.area.id)
-            room.area.config = {}
-            for uiconfig in uiconfigs.ui_config:
-                room.area.config[uiconfig.key] = uiconfig.value
+            if room.area != 'None' :
+                uiconfigs = UIConfigs.getByReference('area', room.area.id)
+                room.area.config = {}
+                for uiconfig in uiconfigs.ui_config:
+                    room.area.config[uiconfig.key] = uiconfig.value
 
 class UIConfigs(pipes.DmgPipe):
     uri = "http://127.0.0.1:8080/base/ui_config"
