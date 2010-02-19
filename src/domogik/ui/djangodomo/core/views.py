@@ -125,7 +125,7 @@ def login(request):
 
     else:
         # User asked to log in
-        account_list = __db.list_system_accounts()
+        account_list = __db.list_user_accounts()
         return __go_to_page(request, 'login.html', page_title,
                            account_list=account_list)
 
