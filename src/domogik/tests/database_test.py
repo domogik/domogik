@@ -41,7 +41,7 @@ from domogik.common.sql_schema import ActuatorFeature, Area, Device, DeviceUsage
                                       DeviceConfig, DeviceStats, DeviceStatsValue, \
                                       DeviceTechnology, DeviceTechnologyConfig, \
                                       DeviceType, UIItemConfig, Room, \
-                                      SensorReferenceData, SystemAccount, \
+                                      SensorReferenceData, UserAccount, \
                                       SystemConfig, SystemStats, SystemStatsValue, \
                                       Trigger, Person
 
@@ -152,13 +152,13 @@ class GenericTestCase(unittest.TestCase):
         for person in self.db.list_persons():
             self.db.del_person(person.id)
 
-    def remove_all_system_accounts(self, db):
+    def remove_all_user_accounts(self, db):
         """
-        Remove all system accounts
+        Remove all user accounts
         @param db : db API instance
         """
-        for sys in self.db.list_system_accounts():
-            self.db.del_system_account(sys.id)
+        for user in self.db.list_user_accounts():
+            self.db.del_user_account(user.id)
 
     def remove_all_ui_item_config(self, db):
         """
@@ -1288,57 +1288,57 @@ class TriggersTestCase(GenericTestCase):
             pass
 
 
-class PersonAndSystemAccountsTestCase(GenericTestCase):
+class PersonAndUserAccountsTestCase(GenericTestCase):
     """
-    Test person and system accounts
+    Test person and user accounts
     """
 
     def setUp(self):
         self.db = DbHelper(use_test_db=True)
         self.remove_all_persons(self.db)
-        self.remove_all_system_accounts(self.db)
+        self.remove_all_user_accounts(self.db)
 
     def tearDown(self):
         self.remove_all_persons(self.db)
-        self.remove_all_system_accounts(self.db)
+        self.remove_all_user_accounts(self.db)
         del self.db
 
     def testEmptyList(self):
-        assert len(self.db.list_system_accounts()) == 0
+        assert len(self.db.list_user_accounts()) == 0
         assert len(self.db.list_persons()) == 0
 
     def testAdd(self):
-        sys1 = self.db.add_system_account(a_login='mschneider',
-                                          a_password='IwontGiveIt',
-                                          a_is_admin=True)
-        assert self.db.is_system_account('mschneider', 'IwontGiveIt')
-        assert not self.db.is_system_account('mschneider', 'plop')
-        assert not self.db.is_system_account('hello', 'boy')
-        sys1 = self.db.get_system_account_by_login_and_pass('mschneider',
-                                                            'IwontGiveIt')
-        assert sys1 is not None
-        assert sys1.login == 'mschneider'
-        assert sys1.password == ''
+        user1 = self.db.add_user_account(a_login='mschneider',
+                                         a_password='IwontGiveIt',
+                                         a_is_admin=True)
+        assert self.db.authenticate('mschneider', 'IwontGiveIt')
+        assert not self.db.authenticate('mschneider', 'plop')
+        assert not self.db.authenticate('hello', 'boy')
+        user1 = self.db.get_user_account_by_login_and_pass('mschneider',
+                                                           'IwontGiveIt')
+        assert user1 is not None
+        assert user1.login == 'mschneider'
+        assert user1.password == ''
         try:
-            self.db.add_system_account(a_login='mschneider', a_password='plop',
-                                       a_is_admin = True)
+            self.db.add_user_account(a_login='mschneider', a_password='plop',
+                                     a_is_admin = True)
             TestCase.fail(self, "It shouldn't have been possible to add \
                           login %s. It already exists!" % 'mschneider')
         except DbHelperException:
             pass
-        sys2 = self.db.add_system_account(a_login='lonely', a_password='boy',
-                                          a_is_admin=True, a_skin_used='myskin')
-        sys3 = self.db.add_system_account(a_login='domo', a_password='gik',
-                                          a_is_admin=True)
-        for sys_acc in self.db.list_system_accounts():
-            assert sys_acc.password == ""
+        user2 = self.db.add_user_account(a_login='lonely', a_password='boy',
+                                         a_is_admin=True, a_skin_used='myskin')
+        user3 = self.db.add_user_account(a_login='domo', a_password='gik',
+                                         a_is_admin=True)
+        for user_acc in self.db.list_user_accounts():
+            assert user_acc.password == ""
         person1 = self.db.add_person(p_first_name='Marc', p_last_name='SCHNEIDER',
                                      p_birthdate=datetime.date(1973, 4, 24),
-                                     p_system_account_id = sys1.id)
+                                     p_user_account_id = user1.id)
         try:
             self.db.add_person(p_first_name='Marc', p_last_name='SCHNEIDER',
                                p_birthdate=datetime.date(1973, 4, 24),
-                               p_system_account_id=99999999999)
+                               p_user_account_id=99999999999)
             TestCase.fail(self, "An exception should have been raised : \
                           account id does not exist")
         except DbHelperException:
@@ -1346,29 +1346,31 @@ class PersonAndSystemAccountsTestCase(GenericTestCase):
         person2 = self.db.add_person(p_first_name='Monthy', p_last_name='PYTHON',
                                      p_birthdate=datetime.date(1981, 4, 24))
         assert len(self.db.list_persons()) == 2
-        assert len(self.db.list_system_accounts()) == 3
+        assert len(self.db.list_user_accounts()) == 3
 
     def testUpdate(self):
-        sys_acc = self.db.add_system_account(a_login='mschneider',
-                        a_password='IwontGiveIt', a_is_admin=True)
-        sys_acc_u = self.db.update_system_account(a_login='mschneider',
+        user_acc = self.db.add_user_account(a_login='mschneider',
+                                            a_password='IwontGiveIt',
+                                            a_is_admin=True)
+        user_acc_u = self.db.update_user_account(
+                        a_login='mschneider',
                         a_new_login='mschneider2', a_password='ItWasWrong',
                         a_is_admin=False)
-        sys_acc_msc = self.db.get_system_account_by_login_and_pass(
+        user_acc_msc = self.db.get_user_account_by_login_and_pass(
                         'mschneider2', 'ItWasWrong')
-        assert sys_acc_msc is not None
-        assert sys_acc.password == ''
-        assert sys_acc_u.is_admin == False
+        assert user_acc_msc is not None
+        assert user_acc.password == ''
+        assert user_acc_u.is_admin == False
         person = self.db.add_person(p_first_name='Marc', p_last_name='SCHNEIDER',
                                     p_birthdate=datetime.date(1973, 4, 24),
-                                    p_system_account_id = sys_acc.id)
+                                    p_user_account_id = user_acc.id)
         person_u = self.db.update_person(p_id=person.id, p_first_name='Marco',
                                          p_last_name='SCHNEIDERO',
                                          p_birthdate=datetime.date(1981, 4, 24),
-                                         p_system_account_id = sys_acc_u.id)
+                                         p_user_account_id = user_acc_u.id)
         try:
             self.db.update_person(p_id=person.id,
-                                  p_system_account_id=99999999999)
+                                  p_user_account_id=99999999999)
             TestCase.fail(self, "An exception should have been raised : \
                           account id does not exist")
         except DbHelperException:
@@ -1376,67 +1378,68 @@ class PersonAndSystemAccountsTestCase(GenericTestCase):
         assert person_u.first_name == 'Marco'
         assert person_u.last_name == 'SCHNEIDERO'
         assert person_u.birthdate == datetime.date(1981, 4, 24)
-        assert person_u.system_account_id == sys_acc_u.id
+        assert person_u.user_account_id == user_acc_u.id
 
     def testGet(self):
-        sys1 = self.db.add_system_account(a_login='mschneider',
-                                          a_password='IwontGiveIt', a_is_admin=True)
-        sys2 = self.db.add_system_account(a_login='lonely', a_password='boy',
-                                          a_is_admin = True, a_skin_used='myskin')
-        sys3 = self.db.add_system_account(a_login='domo', a_password='gik',
-                                          a_is_admin=True)
+        user1 = self.db.add_user_account(a_login='mschneider',
+                                         a_password='IwontGiveIt', a_is_admin=True)
+        user2 = self.db.add_user_account(a_login='lonely', a_password='boy',
+                                         a_is_admin = True, a_skin_used='myskin')
+        user3 = self.db.add_user_account(a_login='domo', a_password='gik',
+                                         a_is_admin=True)
         person1 = self.db.add_person(p_first_name='Marc', p_last_name='SCHNEIDER',
                                      p_birthdate=datetime.date(1973, 4, 24),
-                                     p_system_account_id = sys1.id)
+                                     p_user_account_id = user1.id)
         person2 = self.db.add_person(p_first_name='Monthy',
                                      p_last_name='PYTHON',
                                      p_birthdate=datetime.date(1981, 4, 24))
-        sys_acc = self.db.get_system_account(sys1.id)
-        assert sys_acc.login == 'mschneider'
-        assert sys_acc.password == ''
-        sys_acc = self.db.get_system_account_by_login('mschneider')
-        assert sys_acc is not None
-        assert sys_acc.password == ''
-        assert self.db.get_system_account_by_login('mschneider').id == sys1.id
-        assert self.db.get_system_account_by_login('lucyfer') is None
+        user_acc = self.db.get_user_account(user1.id)
+        assert user_acc.login == 'mschneider'
+        assert user_acc.password == ''
+        user_acc = self.db.get_user_account_by_login('mschneider')
+        assert user_acc is not None
+        assert user_acc.password == ''
+        assert self.db.get_user_account_by_login('mschneider').id == user1.id
+        assert self.db.get_user_account_by_login('lucyfer') is None
 
-        sys_acc = self.db.get_system_account_by_person(person1.id)
-        assert sys_acc.login == 'mschneider'
-        assert sys_acc.password == ''
+        user_acc = self.db.get_user_account_by_person(person1.id)
+        assert user_acc.login == 'mschneider'
+        assert user_acc.password == ''
         assert self.db.get_person(person1.id).first_name == 'Marc'
         assert self.db.get_person(person2.id).last_name == 'PYTHON'
-        assert self.db.get_person_by_system_account(sys1.id) is not None
-        assert self.db.get_person_by_system_account(sys1.id).first_name == 'Marc'
-        assert self.db.get_person_by_system_account(sys3.id) is None
+        assert self.db.get_person_by_user_account(user1.id) is not None
+        assert self.db.get_person_by_user_account(user1.id).first_name == 'Marc'
+        assert self.db.get_person_by_user_account(user3.id) is None
 
     def testDel(self):
-        sys1 = self.db.add_system_account(a_login='mschneider', a_password='IwontGiveIt',
-                                          a_is_admin=True)
-        sys2 = self.db.add_system_account(a_login='lonely', a_password='boy',
-                                          a_is_admin=True, a_skin_used='myskin')
-        sys3 = self.db.add_system_account(a_login='domo', a_password='gik',
-                                          a_is_admin=True)
+        user1 = self.db.add_user_account(a_login='mschneider', a_password='IwontGiveIt',
+                                         a_is_admin=True)
+        user2 = self.db.add_user_account(a_login='lonely', a_password='boy',
+                                         a_is_admin=True, a_skin_used='myskin')
+        user3 = self.db.add_user_account(a_login='domo', a_password='gik',
+                                         a_is_admin=True)
         person1 = self.db.add_person(p_first_name='Marc',
                                      p_last_name='SCHNEIDER',
                                      p_birthdate=datetime.date(1973, 4, 24),
-                                     p_system_account_id = sys1.id)
+                                     p_user_account_id = user1.id)
         try:
-            self.db.del_system_account(sys1.id)
-            TestCase.fail(self, "It shouldn't have been possible to delete this system account, a person has a reference to it")
+            self.db.del_user_account(user1.id)
+            TestCase.fail(self, "It shouldn't have been possible to delete this"
+                               +" user account, a person has a reference to it")
         except DbHelperException:
             pass
         person2 = self.db.add_person(p_first_name='Monthy',
                                      p_last_name='PYTHON',
                                      p_birthdate=datetime.date(1981, 4, 24))
-        sys_temp = self.db.add_system_account(a_login='fantom', a_password='as',
-                                              a_is_admin = False)
-        sys_temp_id = sys_temp.id
-        sys_acc_del = self.db.del_system_account(sys_temp.id)
-        assert sys_acc_del.id == sys_temp.id
-        l_sys = self.db.list_system_accounts()
-        assert len(l_sys) > 0
-        for sys in l_sys:
-            assert sys.login != 'fantom'
+        user_temp = self.db.add_user_account(a_login='fantom', a_password='as',
+                                             a_is_admin = False)
+        user_temp_id = user_temp.id
+        user_acc_del = self.db.del_user_account(user_temp.id)
+        assert user_acc_del.id == user_temp.id
+        l_user = self.db.list_user_accounts()
+        assert len(l_user) > 0
+        for user in l_user:
+            assert user.login != 'fantom'
         person1_id = person1.id
         person_del = self.db.del_person(person1.id)
         assert person_del.id == person1_id
@@ -1445,19 +1448,21 @@ class PersonAndSystemAccountsTestCase(GenericTestCase):
             assert person.id != person1.id
             found_person2 = (person.id == person2.id)
         assert found_person2
-        # Make sure associated system account has been deleted
-        l_sys = self.db.list_system_accounts()
-        assert len(l_sys) > 0
-        for sys in l_sys:
-            assert sys.login != 'mschneider'
+        # Make sure associated user account has been deleted
+        l_user = self.db.list_user_accounts()
+        assert len(l_user) > 0
+        for user in l_user:
+            assert user.login != 'mschneider'
         try:
             self.db.del_person(12345678910)
-            TestCase.fail(self, "Person does not exist, an exception should have been raised")
+            TestCase.fail(self, "Person does not exist, an exception should "
+                               +"have been raised")
         except DbHelperException:
             pass
         try:
-            self.db.del_system_account(12345678910)
-            TestCase.fail(self, "System account does not exist, an exception should have been raised")
+            self.db.del_user_account(12345678910)
+            TestCase.fail(self, "User account does not exist, an exception "
+                               +"should have been raised")
         except DbHelperException:
             pass
 

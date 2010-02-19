@@ -692,11 +692,11 @@ class Trigger(Base):
         return Trigger.__tablename__
 
 
-class SystemAccount(Base):
+class UserAccount(Base):
     """
-    System account for users : it is only used by the UI
+    User account for persons : it is only used by the UI
     """
-    __tablename__ = '%s_system_account' % _db_prefix
+    __tablename__ = '%s_user_account' % _db_prefix
     id = Column(Integer, primary_key=True)
     login = Column(String(20), nullable=False, unique=True)
     password = Column(Text, nullable=False)
@@ -721,7 +721,7 @@ class SystemAccount(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<SystemAccount(id=%s, login='%s', pass='%s' is_admin='%s')>" \
+        return "<UserAccount(id=%s, login='%s', pass='%s' is_admin='%s')>" \
                % (self.id, self.login, self. password, self.is_admin)
 
     @staticmethod
@@ -730,7 +730,7 @@ class SystemAccount(Base):
         Return the table name associated to the class
         @return table name
         """
-        return SystemAccount.__tablename__
+        return UserAccount.__tablename__
 
 
 class Person(Base):
@@ -742,29 +742,29 @@ class Person(Base):
     first_name = Column(String(50), nullable=False)
     last_name = Column(String(60), nullable=False)
     birthdate = Column(Date, nullable=False)
-    system_account_id = Column(Integer,
-                               ForeignKey('%s.id' % SystemAccount.get_tablename()))
-    system_account = relation(SystemAccount, backref=backref(__tablename__))
+    user_account_id = Column(Integer,
+                             ForeignKey('%s.id' % UserAccount.get_tablename()))
+    user_account = relation(UserAccount, backref=backref(__tablename__))
 
-    def __init__(self, first_name, last_name, birthdate, system_account_id):
+    def __init__(self, first_name, last_name, birthdate, user_account_id):
         """
         Class constructor
         @param first_name : first name
         @param last_name : last name
         @param birthdate : birthdate
-        @param system_account_id : link to the system account (optional)
+        @param user_account_id : link to the user account (optional)
         """
         self.first_name = first_name
         self.last_name = last_name
         self.birthdate = birthdate
-        self.system_account_id = system_account_id
+        self.user_account_id = user_account_id
 
     def __repr__(self):
         """
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<Person(id=%s, first_name='%s', last_name='%s', system_account=%s)>" % (self.id, self.first_name, self.last_name, self.system_account)
+        return "<Person(id=%s, first_name='%s', last_name='%s', user_account=%s)>" % (self.id, self.first_name, self.last_name, self.user_account)
 
     @staticmethod
     def get_tablename():

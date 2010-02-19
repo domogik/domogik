@@ -53,7 +53,7 @@ from domogik.common.sql_schema import ActuatorFeature, Area, Device, DeviceUsage
                                       DeviceConfig, DeviceStats, DeviceStatsValue, \
                                       DeviceTechnology, DeviceTechnologyConfig, \
                                       DeviceType, UIItemConfig, Room, Person, \
-                                      SensorReferenceData, SystemAccount, SystemConfig, \
+                                      SensorReferenceData, UserAccount, SystemConfig, \
                                       SystemStats, SystemStatsValue, Trigger
 from domogik.common.sql_schema import DEVICE_TECHNOLOGY_LIST, \
                                       UNIT_OF_STORED_VALUE_LIST
@@ -1538,68 +1538,68 @@ class DbHelper():
                                     it doesn't exist" % t_id)
 
 ####
-# System accounts
+# User accounts
 ####
-    def list_system_accounts(self):
+    def list_user_accounts(self):
         """
         Returns a list of all accounts
-        @return a list of SystemAccount objects
+        @return a list of UserAccount objects
         """
-        list_sa = self._session.query(SystemAccount).all()
+        list_sa = self._session.query(UserAccount).all()
         for sys_acc in list_sa:
             # I won't send the password, right?
             sys_acc.password = ""
         return list_sa
 
-    def get_system_account(self, a_id):
+    def get_user_account(self, a_id):
         """
-        Return system account information from id
+        Return user account information from id
         @param a_id : account id
-        @return a SystemAccount object
+        @return a UserAccount object
         """
-        sys_acc = self._session.query(SystemAccount).filter_by(id=a_id).first()
+        sys_acc = self._session.query(UserAccount).filter_by(id=a_id).first()
         if sys_acc is not None:
             sys_acc.password = ""
         return sys_acc
 
-    def get_system_account_by_login(self, a_login):
+    def get_user_account_by_login(self, a_login):
         """
-        Return system account information from login
+        Return user account information from login
         @param a_login : login
-        @return a SystemAccount object
+        @return a UserAccount object
         """
-        sys_acc = self._session.query(SystemAccount).filter_by(login=a_login)\
+        sys_acc = self._session.query(UserAccount).filter_by(login=a_login)\
                                                     .first()
         if sys_acc is not None:
             sys_acc.password = ""
         return sys_acc
 
-    def get_system_account_by_login_and_pass(self, a_login, a_password):
+    def get_user_account_by_login_and_pass(self, a_login, a_password):
         """
-        Return system account information from login
+        Return user account information from login
         @param a_login : login
         @param a_pass : password (clear text)
-        @return a SystemAccount object or None if login / password is wrong
+        @return a UserAccount object or None if login / password is wrong
         """
         crypted_pass = self.__make_crypted_password(a_password)
-        sys_acc = self._session.query(SystemAccount)\
+        sys_acc = self._session.query(UserAccount)\
                                .filter_by(login=a_login, password=crypted_pass)\
                                .first()
         if sys_acc is not None:
             sys_acc.password = ""
         return sys_acc
 
-    def get_system_account_by_person(self, p_id):
+    def get_user_account_by_person(self, p_id):
         """
-        Return a system account associated to a person, if existing
+        Return a user account associated to a person, if existing
         @param p_id : The person id
-        @return a SystemAccount object
+        @return a UserAccount object
         """
         person = self._session.query(Person).filter_by(id=p_id).first()
         if person is not None:
             try:
-                sys_acc = self._session.query(SystemAccount)\
-                                       .filter_by(id=person.system_account_id)\
+                sys_acc = self._session.query(UserAccount)\
+                                       .filter_by(id=person.user_account_id)\
                                        .one()
                 sys_acc.password = ""
                 return sys_acc
@@ -1609,14 +1609,14 @@ class DbHelper():
         else:
             return None
 
-    def is_system_account(self, a_login, a_password):
+    def authenticate(self, a_login, a_password):
         """
-        Check if a system account with a_login, a_password exists
+        Check if a user account with a_login, a_password exists
         @param a_login : Account login
         @param a_password : Account password (clear)
         @return True or False
         """
-        sys_acc = self._session.query(SystemAccount).filter_by(login=a_login)\
+        sys_acc = self._session.query(UserAccount).filter_by(login=a_login)\
                                                     .first()
         if sys_acc is not None:
             password = hashlib.sha256()
@@ -1625,42 +1625,42 @@ class DbHelper():
                 return True
         return False
 
-    def add_system_account(self, a_login, a_password, a_is_admin=False,
-                           a_skin_used='skins/default'):
+    def add_user_account(self, a_login, a_password, a_is_admin=False,
+                         a_skin_used='skins/default'):
         """
-        Add a system_account
+        Add a user account
         @param a_login : Account login
         @param a_password : Account clear text password (will be hashed in sha256)
         @param a_is_admin : True if it is an admin account, False otherwise (optional, default=False)
-        @return the new SystemAccount object or raise a DbHelperException if it already exists
+        @return the new UserAccount object or raise a DbHelperException if it already exists
         """
-        system_account = self.get_system_account_by_login(a_login)
-        if system_account is not None:
+        user_account = self.get_user_account_by_login(a_login)
+        if user_account is not None:
             raise DbHelperException("Error %s login already exists" % a_login)
-        system_account = SystemAccount(login=a_login,
-                                password=self.__make_crypted_password(a_password),
-                                is_admin=a_is_admin, skin_used=a_skin_used)
-        self._session.add(system_account)
+        user_account = UserAccount(login=a_login,
+                                   password=self.__make_crypted_password(a_password),
+                                   is_admin=a_is_admin, skin_used=a_skin_used)
+        self._session.add(user_account)
         try:
             self._session.commit()
         except Exception, sql_exception:
             self._session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-        return system_account
+        return user_account
 
-    def update_system_account(self, a_login, a_new_login=None, a_password=None,
-                              a_is_admin=None, a_skin_used=None):
+    def update_user_account(self, a_login, a_new_login=None, a_password=None,
+                            a_is_admin=None, a_skin_used=None):
         """
-        Update a system account
+        Update a user account
         @param a_login : Account login to be updated
         @param a_new_login : The new login (optional)
         @param a_password : Account clear text password (will be hashed in sha256, optional)
         @param a_is_admin : True if it is an admin account, False otherwise (optional)
-        @return a SystemAccount object
+        @return a UserAccount object
         """
-        sys_acc = self.get_system_account_by_login(a_login)
+        sys_acc = self.get_user_account_by_login(a_login)
         if sys_acc is None:
-            raise DbHelperException("SystemAccount with login %s \
+            raise DbHelperException("UserAccount with login %s \
                                     couldn't be found" % a_login)
         if a_new_login is not None:
             sys_acc.login = a_new_login
@@ -1688,38 +1688,35 @@ class DbHelper():
         password.update(clear_text_password)
         return password.hexdigest()
 
-    def add_default_system_account(self):
+    def add_default_user_account(self):
         """
-        Add a default system account (login = admin, password = domogik, is_admin = True)
-        @return a SystemAccount object
+        Add a default user account (login = admin, password = domogik, is_admin = True)
+        @return a UserAccount object
         """
-        return self.add_system_account(a_login='admin', a_password='123',
-                                       a_is_admin=True)
+        return self.add_user_account(a_login='admin', a_password='123',
+                                     a_is_admin=True)
 
-    def del_system_account(self, a_id):
+    def del_user_account(self, a_id):
         """
-        Delete a system account
+        Delete a user account
         @param a_id : account id
-        @return the deleted SystemAccount object
+        @return the deleted UserAccount object
         """
-        system_account = self._session.query(SystemAccount).filter_by(id=a_id).first()
-        if system_account:
-            system_account_d = system_account
-            user = self.get_person_by_system_account(system_account.id)
+        user_account = self._session.query(UserAccount).filter_by(id=a_id).first()
+        if user_account:
+            user_account_d = user_account
+            user = self.get_person_by_user_account(user_account.id)
             if user is not None:
-                raise DbHelperException("Couldn't delete system account '%s' : \
-                        '%s %s' user has a reference to it" \
-                        % (system_account.login, user.first_name, user.last_name))
-            self._session.delete(system_account)
+                raise DbHelperException("Couldn't delete user account '%s' : '%s %s' user has a reference to it" % (user_account.login, user.first_name, user.last_name))
+            self._session.delete(user_account)
             try:
                 self._session.commit()
             except Exception, sql_exception:
                 self._session.rollback()
                 raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-            return system_account_d
+            return user_account_d
         else:
-            raise DbHelperException("Couldn't delete system account with \
-                                    id %s : it doesn't exist" % a_id)
+            raise DbHelperException("Couldn't delete user account with id %s : it doesn't exist" % a_id)
 
 ####
 # Persons
@@ -1739,40 +1736,40 @@ class DbHelper():
         """
         return self._session.query(Person).filter_by(id=p_id).first()
 
-    def get_person_by_system_account(self, s_id):
+    def get_person_by_user_account(self, u_id):
         """
-        Return a person associated to a system account, if existing
-        @param s_id : the system account id
+        Return a person associated to a user account, if existing
+        @param u_id : the user account id
         @return a Person object or None
         """
         try:
             return self._session.query(Person)\
-                                .filter_by(system_account_id=s_id).one()
+                                .filter_by(user_account_id=u_id).one()
         except NoResultFound:
             return None
         except MultipleResultsFound:
             raise DbHelperException("Database may be incoherent, person with \
-                                    id %s has more than one account" % s_id)
+                                    id %s has more than one account" % u_id)
 
     def add_person(self, p_first_name, p_last_name, p_birthdate,
-                         p_system_account_id=None):
+                   p_user_account_id=None):
         """
         Add a person
         @param p_first_name     : first name
         @param p_last_name      : last name
         @param p_birthdate      : birthdate
-        @param p_system_account : Person account on the system (optional)
+        @param p_user_account   : Person account on the user (optional)
         @return the new Person object
         """
-        if p_system_account_id is not None:
+        if p_user_account_id is not None:
             try:
-                self._session.query(SystemAccount)\
-                             .filter_by(id=p_system_account_id).one()
+                self._session.query(UserAccount)\
+                             .filter_by(id=p_user_account_id).one()
             except NoResultFound:
-                raise DbHelperException("Couldn't add person with account id %s : it doesn't exist" % p_system_account_id)
+                raise DbHelperException("Couldn't add person with account id %s : it doesn't exist" % p_user_account_id)
         person = Person(first_name=p_first_name, last_name=p_last_name,
                         birthdate=p_birthdate,
-                        system_account_id=p_system_account_id)
+                        user_account_id=p_user_account_id)
         self._session.add(person)
         try:
             self._session.commit()
@@ -1782,14 +1779,14 @@ class DbHelper():
         return person
 
     def update_person(self, p_id, p_first_name=None, p_last_name=None,
-                      p_birthdate=None, p_system_account_id=None):
+                      p_birthdate=None, p_user_account_id=None):
         """
         Update a person
         @param p_id             : person id to be updated
         @param p_first_name     : first name (optional)
         @param p_last_name      : last name (optional)
         @param p_birthdate      : birthdate (optional)
-        @param p_system_account : person account on the system (optional)
+        @param p_user_account   : person account on the user (optional)
         @return a Person object
         """
         person = self._session.query(Person).filter_by(id=p_id).first()
@@ -1801,14 +1798,13 @@ class DbHelper():
             person.last_name = p_last_name
         if p_birthdate is not None:
             person.birthdate = p_birthdate
-        if p_system_account_id is not None:
+        if p_user_account_id is not None:
             try:
-                self._session.query(SystemAccount)\
-                             .filter_by(id=p_system_account_id).one()
+                self._session.query(UserAccount)\
+                             .filter_by(id=p_user_account_id).one()
             except NoResultFound:
-                raise DbHelperException("Couldn't find account id %s \
-                                         It does not exist" % p_system_account_id)
-            person.system_account_id = p_system_account_id
+                raise DbHelperException("Couldn't find account id %s It does not exist" % p_user_account_id)
+            person.user_account_id = p_user_account_id
         self._session.add(person)
         try:
             self._session.commit()
@@ -1819,7 +1815,7 @@ class DbHelper():
 
     def del_person(self, p_id):
         """
-        Delete a person and the associated system account if it exists
+        Delete a person and the associated user account if it exists
         @param p_id : person account id
         @return the deleted Person object
         """
@@ -1832,8 +1828,8 @@ class DbHelper():
                 self._session.rollback()
                 raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
             person_d = person
-            if person.system_account_id is not None:
-                self.del_system_account(person.system_account_id)
+            if person.user_account_id is not None:
+                self.del_user_account(person.user_account_id)
             return person_d
         else:
             raise DbHelperException("Couldn't delete person with id %s : it doesn't exist" % p_id)

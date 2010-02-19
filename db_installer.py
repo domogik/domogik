@@ -75,8 +75,8 @@ _db = database.DbHelper()
 # Initialize default system configuration
 _db.update_system_config()
 
-# Create a default system account
-_db.add_default_system_account()
+# Create a default user account
+_db.add_default_user_account()
 
 # Create supported device technologies
 _db.add_device_technology(dt_name=u"x10", dt_description="x10 techno")
