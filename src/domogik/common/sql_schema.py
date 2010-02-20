@@ -864,7 +864,7 @@ class UIItemConfig(Base):
     item_name =  Column(String(30), nullable=False, primary_key=True)
     item_reference = Column(String(30), nullable=False, primary_key=True)
     key = Column(String(30), nullable=False, primary_key=True)
-    value = Column(String(30), nullable=False)
+    value = Column(String(), nullable=False)
 
     def __init__(self, item_name, item_reference, key, value):
         """
