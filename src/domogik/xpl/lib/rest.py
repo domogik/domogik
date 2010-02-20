@@ -1981,13 +1981,22 @@ target=*
 
         ### list #####################################
         if self.rest_request[0] == "list":
-
             if len(self.rest_request) == 1:
                 self._rest_account_list()
             else:
                 self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
                                                   self.jsonp, self.jsonp_cb)
                 return
+
+        elif self.rest_request[0] == "auth":
+            if len(self.rest_request) == 3:
+                self._rest_account_auth(self.rest_request[1], self.rest_request[2])
+            else:
+                self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
+                                                  self.jsonp, self.jsonp_cb)
+                return
+
+
 
         ### others ###################################
         else:
@@ -2002,15 +2011,22 @@ target=*
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("account")
-        for account in self._db.list_system_accounts():
+        for account in self._db.list_user_accounts():
             json_data.add_data(account)
         self.send_http_response_ok(json_data.get())
 
         
-
-
-
-
+    def _rest_account_auth(self, login, password):
+        """ check authentification
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        login_ok = self._db.authenticate(login, password)
+        if login_ok == True:
+            json_data.set_error(description = "Authentification granted")
+        else:
+            json_data.set_error(999, "Authentification refused")
+        self.send_http_response_ok(json_data.get())
 
 
 
@@ -2044,17 +2060,17 @@ class JSonHelper():
         self._jsonp = jsonp
         self._jsonp_cb = jsonp_cb
 
-    def set_ok(self):
+    def set_ok(self, code=0, description=None):
         """ set ok status
         """
-        self._status = '"status" : "OK", "code" : 0, "description" : "",'
+        self._status = '"status" : "OK", "code" : ' + str(code) + ', "description" : "' + str(description) + '",'
 
     def set_error(self, code=0, description=None):
         """ set error status
             @param code : error code
             @param description : error description
         """
-        self._status = '"status" : "ERROR", "code" : ' + str(code) + ', "description" : "' + description + '",'
+        self._status = '"status" : "ERROR", "code" : ' + str(code) + ', "description" : "' + str(description) + '",'
 
     def set_data_type(self, type):
         """ set data type
