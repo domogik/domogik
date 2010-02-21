@@ -42,15 +42,12 @@ Implements
 
 import os
 import sys
-import signal
-import time
 from socket import gethostname
 
-from domogik.xpl.lib.xplconnector import *
+from domogik.xpl.lib.xplconnector import Listener 
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.lib.module import *
-from domogik.xpl.lib.queryconfig import *
-from domogik.common.configloader import *
+from domogik.xpl.lib.module import xPLModule, xPLResult
+from domogik.xpl.lib.queryconfig import Query
 
 
 class SysManager(xPLModule):
@@ -160,8 +157,8 @@ class SysManager(xPLModule):
         '''
         pidfile = os.path.join(self._pid_dir_path,
                 component + ".pid")
-        f = open(pidfile, "w")
-        f.write(str(pid))
+        fil = open(pidfile, "w")
+        fil.write(str(pid))
 
 if __name__ == "__main__":
-    s = SysManager()
+    SYS = SysManager()
