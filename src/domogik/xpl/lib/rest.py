@@ -2003,6 +2003,14 @@ target=*
             else:
                 self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
+        elif self.rest_request[0] == "update":
+            offset = 1
+            if self.set_parameters(offset):
+                self._rest_account_update()
+            else:
+                self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
+
+
 
 
         ### others ###################################
@@ -2053,6 +2061,27 @@ target=*
         except:
             json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
         self.send_http_response_ok(json_data.get())
+
+
+
+    def _rest_account_update(self):
+        """ update user account
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("account")
+        try:
+            account = self._db.update_user_account(self.get_parameters("id"), \
+                                                self.get_parameters("login"), \
+                                                self.get_parameters("password"), \
+                                                self.get_parameters("is_admin"), \
+                                                self.get_parameters("skin_used"))
+            json_data.add_data(account)
+        except:
+            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+        self.send_http_response_ok(json_data.get())
+
+
 
 
 
