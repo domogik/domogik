@@ -36,12 +36,10 @@ Implements
 @organization: Domogik
 """
 
-from domogik.xpl.lib.xplconnector import *
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.lib.module import *
-from domogik.xpl.lib.onewire import *
-from domogik.common import configloader
-from domogik.xpl.lib.queryconfig import *
+from domogik.xpl.lib.module import xPLModule, xPLResult, xPLTimer
+from domogik.xpl.lib.onewire import OneWire
+from domogik.xpl.lib.queryconfig import Query
 
 
 class OneWireTemp(xPLModule):
@@ -54,8 +52,6 @@ class OneWireTemp(xPLModule):
         Starts some timers to check temperature
         '''
         xPLModule.__init__(self, name='onewire')
-        config = {"source":"dmg-onewire"}
-        self._myxpl = Manager()
         self._config = Query(self._myxpl)
         res = xPLResult()
         self._config.query('onewire', 'temperature_refresh_delay', res)
@@ -65,17 +61,19 @@ class OneWireTemp(xPLModule):
         t_temp = xPLTimer(temp_delay, self._gettemp)
         t_temp.start()
 
-    def _gettemp():
-        for (i, t, v) in self._myow.get_temperature():
+    def _gettemp(self):
+        ''' Get the value of all 1wire components
+        '''
+        for (_id, _type, _val) in self._myow.get_temperatures():
             my_temp_message = XplMessage()
             my_temp_message.set_type("xpl-trig")
             my_temp_message.set_schema("sensor.basic")
-            my_temp_message.add_data({"device" :  i})
+            my_temp_message.add_data({"device" :  _id})
             #type should be the model of the o1wire component.
             #Anyway, because we need a way to determine which is the 
             #technology of the device, we use it with value 'onewire'
             my_temp_message.add_data({"type" :  "onewire"})
-            my_temp_message.add_data({"current" :  v})
+            my_temp_message.add_data({"current" :  _val})
             self._myxpl.send(my_temp_message)
 
 
