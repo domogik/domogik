@@ -40,17 +40,17 @@ Implements
 import os
 
 if os.name == 'nt':
-    from domogik.xpl.lib.win_x10 import *
+    from domogik.xpl.lib.win_x10 import X10API
 else:
-    from domogik.xpl.lib.x10 import *
-from domogik.xpl.lib.xplconnector import *
+    from domogik.xpl.lib.x10 import X10API, HeyuManager
+from domogik.xpl.lib.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.lib.module import *
-from domogik.common.configloader import Loader
-from domogik.common import logger
-from domogik.xpl.lib.queryconfig import *
+from domogik.xpl.lib.module import xPLModule, xPLResult
+from domogik.xpl.lib.queryconfig import Query
 
-class x10Main(xPLModule):
+class X10Main(xPLModule):
+    '''Manage x10 technology using heyu
+    '''
 
     def __init__(self):
         '''
@@ -64,9 +64,8 @@ class x10Main(xPLModule):
         self._config.query('x10', 'heyu-cfg-path', res)
         self._heyu_cfg_path_res = res.get_value()['heyu-cfg-path']
         try:
-            pass
             self.__myx10 = X10API(self._heyu_cfg_path_res)
-        except:
+        except Exception:
             print "Something went wrong during heyu init, check logs"
             exit(1)
         #Create listeners
@@ -93,7 +92,7 @@ class x10Main(xPLModule):
         #Heyu config items
         res = xPLResult()
 #        self._config = Query(self._myxpl)
-        self._config.query('x10','', res)
+        self._config.query('x10', '', res)
         result = res.get_value()
         if result is not None:
             heyu_config_items = filter(lambda k : k.startswith("heyu-file-"), result.keys())
@@ -118,20 +117,19 @@ class x10Main(xPLModule):
         '''
         Send the heyu config file on the network
         '''
-        res = xPLResult()
         #Heyu path
         myheyu = HeyuManager(self._heyu_cfg_path_res)
         lines = myheyu.load()
-        m = XplMessage()
-        m.set_type('xpl-trig')
-        m.set_schema('domogik.config')
+        mess = XplMessage()
+        mess.set_type('xpl-trig')
+        mess.set_schema('domogik.config')
         count = 0
         for line in lines:
             key = "heyu_file_%s" % count
             count = count + 1
-            m.add_data({key :  line})
+            mess.add_data({key :  line})
         #print "Message is : %s" % m
-        self._myxpl.send(m)
+        self._myxpl.send(mess)
 
 
     def x10_cmnd_cb(self, message):
@@ -183,4 +181,4 @@ class x10Main(xPLModule):
         self._myxpl.send(mess)
 
 if __name__ == "__main__":
-    x = x10Main()
+    X10Main()
