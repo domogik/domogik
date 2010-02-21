@@ -28,7 +28,7 @@ Implements
 ==========
 
 - xPLDateTime.__init__(self)
-- xPLDateTime._f(self, nb)
+- xPLDateTime._format(self, nb)
 - xPLDateTime._send_datetime(self)
 
 @author: Maxence Dunnewind <maxence@dunnewind.net>
@@ -38,44 +38,41 @@ Implements
 """
 
 from time import localtime
-from domogik.xpl.lib.xplconnector import *
+from domogik.xpl.lib.xplconnector import xPLTimer
 from domogik.xpl.lib.module import xPLModule
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.common.configloader import *
-import time
-import signal
 
 
-class xPLDateTime(xPLModule):
+class XPLDateTime(xPLModule):
     '''
     Send date and time on the xPL network every minute
     '''
 
     def __init__(self):
-        xPLModule.__init__(self, name = 'dtmgr')
+        xPLModule.__init__(self, name = 'ldtmgr')
         
         self._timer = xPLTimer(10, self._send_datetime, self.get_stop())
         self.register_timer(self._timer)
         self._timer.start()
 
-    def _f(self, nb):
+    def _format(self, number):
         '''
         Format the number
         '''
-        if int(nb) < 10:
-            return "0%s" % nb
+        if int(number) < 10:
+            return "0%s" % number
         else:
-            return nb
+            return number
 
     def _send_datetime(self):
         '''
         Send date and time on xPL network
         '''
-        dt = localtime()
-        date = "%s%s%s" % (dt[0], self._f(dt[1]), self._f(dt[2]))
-        time = "%s%s%s" % (self._f(dt[3]), self._f(dt[4]), self._f(dt[5]))
+        ldt = localtime()
+        date = "%s%s%s" % (ldt[0], self._format(ldt[1]), self._format(ldt[2]))
+        time = "%s%s%s" % (self._format(ldt[3]), self._format(ldt[4]), self._format(ldt[5]))
         datetime = "%s%s" % (date, time)
-        datetimedaynumber = "%s%s" % (datetime, dt[6])
+        datetimedaynumber = "%s%s" % (datetime, ldt[6])
         mess = XplMessage()
         mess.set_type("xpl-trig")
         mess.set_schema("datetime.basic")
@@ -86,4 +83,4 @@ class xPLDateTime(xPLModule):
         self._myxpl.send(mess)
 
 if __name__ == "__main__":
-    xPLDateTime()
+    XPLDateTime()
