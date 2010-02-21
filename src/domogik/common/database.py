@@ -1546,9 +1546,9 @@ class DbHelper():
         @return a list of UserAccount objects
         """
         list_sa = self._session.query(UserAccount).all()
-        for sys_acc in list_sa:
+        for user_acc in list_sa:
             # I won't send the password, right?
-            sys_acc.password = ""
+            user_acc.password = ""
         return list_sa
 
     def get_user_account(self, a_id):
@@ -1557,10 +1557,10 @@ class DbHelper():
         @param a_id : account id
         @return a UserAccount object
         """
-        sys_acc = self._session.query(UserAccount).filter_by(id=a_id).first()
-        if sys_acc is not None:
-            sys_acc.password = ""
-        return sys_acc
+        user_acc = self._session.query(UserAccount).filter_by(id=a_id).first()
+        if user_acc is not None:
+            user_acc.password = ""
+        return user_acc
 
     def get_user_account_by_login(self, a_login):
         """
@@ -1568,11 +1568,11 @@ class DbHelper():
         @param a_login : login
         @return a UserAccount object
         """
-        sys_acc = self._session.query(UserAccount).filter_by(login=a_login)\
-                                                    .first()
-        if sys_acc is not None:
-            sys_acc.password = ""
-        return sys_acc
+        user_acc = self._session.query(UserAccount).filter_by(login=a_login)\
+                                                   .first()
+        if user_acc is not None:
+            user_acc.password = ""
+        return user_acc
 
     def get_user_account_by_login_and_pass(self, a_login, a_password):
         """
@@ -1582,12 +1582,12 @@ class DbHelper():
         @return a UserAccount object or None if login / password is wrong
         """
         crypted_pass = self.__make_crypted_password(a_password)
-        sys_acc = self._session.query(UserAccount)\
+        user_acc = self._session.query(UserAccount)\
                                .filter_by(login=a_login, password=crypted_pass)\
                                .first()
-        if sys_acc is not None:
-            sys_acc.password = ""
-        return sys_acc
+        if user_acc is not None:
+            user_acc.password = ""
+        return user_acc
 
     def get_user_account_by_person(self, p_id):
         """
@@ -1598,11 +1598,11 @@ class DbHelper():
         person = self._session.query(Person).filter_by(id=p_id).first()
         if person is not None:
             try:
-                sys_acc = self._session.query(UserAccount)\
-                                       .filter_by(id=person.user_account_id)\
-                                       .one()
-                sys_acc.password = ""
-                return sys_acc
+                user_acc = self._session.query(UserAccount)\
+                                        .filter_by(id=person.user_account_id)\
+                                        .one()
+                user_acc.password = ""
+                return user_acc
             except MultipleResultsFound:
                 raise DbHelperException("Database may be incoherent, person with \
                                         id %s has more than one account" % p_id)
@@ -1616,12 +1616,12 @@ class DbHelper():
         @param a_password : Account password (clear)
         @return True or False
         """
-        sys_acc = self._session.query(UserAccount).filter_by(login=a_login)\
-                                                    .first()
-        if sys_acc is not None:
+        user_acc = self._session.query(UserAccount).filter_by(login=a_login)\
+                                                   .first()
+        if user_acc is not None:
             password = hashlib.sha256()
             password.update(a_password)
-            if sys_acc.password == password.hexdigest():
+            if user_acc.password == password.hexdigest():
                 return True
         return False
 
