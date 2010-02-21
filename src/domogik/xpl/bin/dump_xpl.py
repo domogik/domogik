@@ -37,12 +37,13 @@ Implements
 @organization: Domogik
 """
 
-from domogik.xpl.lib.xplconnector import *
-from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.lib.module import *
+from domogik.xpl.lib.xplconnector import Listener
+from domogik.xpl.lib.module import xPLModule
 
 
 class Sniffer(xPLModule):
+    '''Sniff xpl network and dump all messages
+    '''
 
 
     def __init__(self):
@@ -57,4 +58,4 @@ class Sniffer(xPLModule):
         print message
 
 if __name__ == "__main__":
-    s = Sniffer()
+    S = Sniffer()
