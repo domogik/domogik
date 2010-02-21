@@ -57,7 +57,7 @@ class PlcBusMain(xPLModule):
         xPLModule.__init__(self, name = 'plcbus')
         self._config = Query(self._myxpl)
         # Create listeners
-        Listener(self.plcbus_cmnd_cb, self._myxpl, {
+        Listener(self._plcbus_cmnd_cb, self._myxpl, {
             'schema': 'control.basic',
             'xpltype': 'xpl-cmnd',
         })
@@ -68,7 +68,7 @@ class PlcBusMain(xPLModule):
         # Create log instance
         self._log = self.get_my_logger()
 
-    def plcbus_cmnd_cb(self, message):
+    def _plcbus_cmnd_cb(self, message):
         '''
         General callback for all command messages
         '''
@@ -93,21 +93,6 @@ class PlcBusMain(xPLModule):
             self.api.get_all_on_id(dev, user)
         else:
             self.api.send(cmd.upper(), dev, user, level, rate)
-
-    def plcbus_send_ack(self, message):
-        '''
-        General ack sending over xpl network
-        '''
-        cmd = message.data["command"]
-        dev = message.data["device"]
-        mess = XplMessage()
-        mess.set_type("xpl-trig")
-        mess.set_schema("sensor.basic")
-        mess.add_data({"type" :  "plcbus"})
-        mess.add_data({"command" :  cmd})
-        mess.add_data({"device" :  dev})
-        self._myxpl.send(mess)
-
 
 if __name__ == "__main__":
     PlcBusMain()
