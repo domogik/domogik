@@ -35,12 +35,10 @@ Implements
 @organization: Domogik
 """
 
-from domogik.xpl.lib.xplconnector import *
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.lib.module import *
-from domogik.xpl.lib.teleinfo import *
-from domogik.common import configloader
-from domogik.xpl.lib.queryconfig import *
+from domogik.xpl.lib.module import xPLModule, xPLResult
+from domogik.xpl.lib.teleinfo import TeleInfo
+from domogik.xpl.lib.queryconfig import Query
 
 
 class TeleinfoManager(xPLModule):
@@ -53,7 +51,6 @@ class TeleinfoManager(xPLModule):
         Start teleinfo device handler
         '''
         xPLModule.__init__(self, name='teleinfo')
-        self._myxpl = Manager()
         self._config = Query(self._myxpl)
         res = xPLResult()
         self._config.query('teleinfo', 'device', res)
@@ -66,6 +63,9 @@ class TeleinfoManager(xPLModule):
         self._myteleinfo.start()
 
     def _broadcastframe(self, frame):
+        ''' Send a frame from teleinfo device to xpl
+        @param frame : a dictionnary mapping teleinfo informations
+        '''
         my_temp_message = XplMessage()
         my_temp_message.set_type("xpl-stat")
         my_temp_message.set_schema("teleinfo.basic")
