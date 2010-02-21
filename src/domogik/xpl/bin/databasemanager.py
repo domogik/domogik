@@ -40,21 +40,15 @@ Implements
 @organization: Domogik
 """
 
-from datetime import datetime 
-from xml.dom import minidom
-import glob
-
-from domogik.xpl.lib.xplconnector import *
+from domogik.xpl.lib.xplconnector import Listener
 from domogik.xpl.lib.module import xPLModule
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.common.configloader import *
 from domogik.common.database import DbHelper
-from domogik.common.configloader import Loader
 
 class DBConnector(xPLModule):
     '''
     Manage the connection between database and the xPL stuff
-    Should be the *only* object to access the database in the core side
+    Should be the *only* object with StatsManager to access the database in the core side
     '''
 
     def __init__(self):
@@ -66,7 +60,6 @@ class DBConnector(xPLModule):
         self._log.debug("Init database_manager instance")
         
         self._db = DbHelper()
-        self._stats = StatsManager()
         Listener(self._request_config_cb, self._myxpl,
                 {'schema': 'domogik.config', 'xpltype': 'xpl-cmnd'})
 
@@ -90,27 +83,26 @@ class DBConnector(xPLModule):
             key))
         if element:
             self._send_config(techno, key, self._fetch_elmt_config(techno,
-            element, key), message.source, element)
+            element, key), element)
         else:
             if not key:
                 keys = self._fetch_techno_config(techno, key).keys()
                 values = self._fetch_techno_config(techno, key).values()
-                self._send_config(techno, keys, values,
-                message.source)
+                self._send_config(techno, keys, values)
+                
             else:
                 self._send_config(techno, key, self._fetch_techno_config(techno,
-                key), message.source)
+                key))
         #except KeyError:
          #   self._log.warning("A request for configuration has been received, but it was misformatted")
 
-    def _send_config(self, technology, key, value, module, element = None):
+    def _send_config(self, technology, key, value, element = None):
         '''
         Send a config value message for an element's config item
         @param technology : the technology of the element
         @param element :  the name of the element
         @param key : the key or list of keys of the config tuple(s) to fetch
         @param value : the value or list of values corresponding to the key(s)
-        @param module : the name of the module which requested the value
         '''
         self._log.debug("Send config response %s : %s" % (key, value))
         mess = XplMessage()
@@ -121,8 +113,8 @@ class DBConnector(xPLModule):
             mess.add_data({'element' :  element})
         #If key/value are lists, then we add a key=value for each item
         if isinstance(key, list):
-            for (k, v) in zip(key, value):
-                mess.add_data({k :  v})
+            for (_key, _val) in zip(key, value):
+                mess.add_data({_key :  _val})
         else:
             mess.add_data({key :  value})
 #        mess.set_conf_key('target', module)
@@ -175,9 +167,9 @@ class DBConnector(xPLModule):
                     'interval' : '30'},
                 }
         try:
-            id = self._db.get_device_technology_by_name(techno).id
+            _id = self._db.get_device_technology_by_name(techno).id
             if key:
-                return self._db.get_device_technology_config(id, key).value
+                return self._db.get_device_technology_config(_id, key).value
             else:
                 vals = self._db.list_device_technology_config(id)
                 res = {}
@@ -189,4 +181,4 @@ class DBConnector(xPLModule):
             return None
 
 if __name__ == "__main__":
-    d = DBConnector()
+    DBC = DBConnector()
