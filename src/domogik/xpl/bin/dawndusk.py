@@ -43,7 +43,7 @@ from domogik.xpl.common.xplmessage import XplMessage
 import datetime
 from domogik.common.configloader import Loader
 
-
+#TODO : rewrite this module to use database query
 cfgloader = Loader('dawndusk')
 config = cfgloader.load()
 
