@@ -1093,7 +1093,11 @@ target=*
             else:
                 # wrong number of arguments
                 return False
-            self.parameters[key] = value
+            # specific process for False
+            if value == "False":
+                self.parameters[key] = False
+            else:
+                self.parameters[key] = value
             iii += 2
         # no parameters
         if iii == 0:
