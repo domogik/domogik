@@ -62,7 +62,8 @@ Implements
 @organization: Domogik
 """
 
-from domogik.xpl.lib.xplconnector import *
+from domogik.xpl.lib.xplconnector import Listener
+from domogik.xpl.lib.module import xPLModule
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.common.configloader import Loader
 from domogik.common import logger
@@ -305,7 +306,7 @@ class StateCond(Condition):
 # Methods to catch informations
 ####
 
-class ListenerBuilder():
+class ListenerBuilder(xPLModule):
     '''
     Class to parse an expression and create appropriated listener
     '''
@@ -315,12 +316,11 @@ class ListenerBuilder():
         @param listitems a dictionnary discribing items used in the condition
         @param expr : the condition
         '''
-        l = logger.Logger('trigger')
-        self._log = l.get_logger()
+        xPLModule.__init__(self, 'dbmgr')
+        self._log = self.get_my_logger()
         self.listitems = listitems
         loader = Loader('trigger')
         config = loader.load()[1]
-        self._myxpl = Manager(source=config["source"], module_name='trigger')
         self.__expr = expr
 
         #We should try/catch this bloc in case of undefined method
