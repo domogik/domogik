@@ -37,16 +37,16 @@ Implements
 @organization: Domogik
 """
 
-from domogik.xpl.lib.xplconnector import *
-from domogik.xpl.lib.module import *
+from domogik.xpl.lib.xplconnector import Listener
+from domogik.xpl.lib.module import xPLModule, xPLResult
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.lib.plcbus import *
-from domogik.common.configloader import Loader
-from domogik.common import logger
-from domogik.xpl.lib.queryconfig import *
+from domogik.xpl.lib.plcbus import PLCBUSAPI
+from domogik.xpl.lib.queryconfig import Query
 
 
-class plcbusMain(xPLModule):
+class PlcBusMain(xPLModule):
+    ''' Manage PLCBus technology, send and receive order/state
+    '''
 
     def __init__(self):
         '''
@@ -62,7 +62,7 @@ class plcbusMain(xPLModule):
             'xpltype': 'xpl-cmnd',
         })
         res = xPLResult()
-        self._config.query('plcbus','device', res)
+        self._config.query('plcbus', 'device', res)
         device = res.get_value()['device']
         self.api = PLCBUSAPI(device) #need to be updated with dynamic config
         # Create log instance
@@ -92,13 +92,14 @@ class plcbusMain(xPLModule):
         if cmd == 'GET_ALL_ON_ID_PULSE':
             self.api.get_all_on_id(dev, user)
         else:
-            self.api._send(cmd.upper(), dev, user, level, rate)
+            self.api.send(cmd.upper(), dev, user, level, rate)
 
     def plcbus_send_ack(self, message):
         '''
         General ack sending over xpl network
         '''
-        dt = localtime()
+        cmd = message.data["command"]
+        dev = message.data["device"]
         mess = XplMessage()
         mess.set_type("xpl-trig")
         mess.set_schema("sensor.basic")
@@ -109,4 +110,4 @@ class plcbusMain(xPLModule):
 
 
 if __name__ == "__main__":
-    x = plcbusMain()
+    PlcBusMain()
