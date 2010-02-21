@@ -28,8 +28,8 @@ Implements
 ==========
 
 - dateFromTuple(tuple)
-- getDawn(message)
-- getDusk(message)
+- get_dawn(message)
+- get_dusk(message)
 
 @author: Maxence Dunnewind <maxence@dunnewind.net>
 @copyright: (C) 2007-2009 Domogik project
@@ -38,10 +38,10 @@ Implements
 """
 
 from domogik.xpl.lib.dawndusk import DawnDusk
-from domogik.xpl.lib.xplconnector import *
+from domogik.xpl.lib.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
 import datetime
-from domogik.common.configloader import *
+from domogik.common.configloader import Loader
 
 
 cfgloader = Loader('dawndusk')
@@ -51,7 +51,7 @@ myxpl = Manager(source = config["source"], module_name = 'dawndusk')
 mydawndusk = DawnDusk()
 
 #Parameters definitions
-long = -1.59
+longi = -1.59
 lat = 48.07
 fh = 1
 #Waiting for the reception of a message of the type DAWNDUSK.REQUEST
@@ -75,11 +75,11 @@ def dateFromTuple(tuple):
     return date
 
 
-def getDawn(message):
+def get_dawn(message):
     """
     Send a xPL message of the type DATETIME.BASIC with sunrise hour
     """
-    dawn, dusk = mydawndusk.get_dawn_dusk(long, lat, fh)
+    dawn, dusk = mydawndusk.get_dawn_dusk(longi, lat, fh)
     date = dateFromTuple(dawn)
     mess = XplMessage()
     mess.set_type("xpl-stat")
@@ -88,11 +88,11 @@ def getDawn(message):
     myxpl.send(mess)
 
 
-def getDusk(message):
+def get_dusk(message):
     """
     Send a xPL message of the type DATETIME.BASIC with sunset hour
     """
-    dawn, dusk = mydawndusk.get_dawn_dusk(long, lat, fh)
+    dawn, dusk = mydawndusk.get_dawn_dusk(longi, lat, fh)
     date = dateFromTuple(dusk)
     mess = XplMessage()
     mess.set_type("xpl-stat")
@@ -101,14 +101,14 @@ def getDusk(message):
     myxpl.send(mess)
 
 #Listener for the dawn
-dawnL = Listener(getDawn, myxpl, {
+dawnL = Listener(get_dawn, myxpl, {
     'schema': 'dawndusk.request',
     'xpltype': 'xpl-cmnd',
     'command': 'status',
     'query': 'day',
 })
 #Listener for the dusk
-duskL = Listener(getDusk, myxpl, {
+duskL = Listener(get_dusk, myxpl, {
     'schema': 'dawndusk.request',
     'xpltype': 'xpl-cmnd',
     'command': 'status',
