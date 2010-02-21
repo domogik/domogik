@@ -41,9 +41,9 @@ from xml.dom import minidom
 import glob
 
 from domogik.xpl.lib.module import xPLModule
+from domogik.xpl.lib.xplconnector import Listener
 from domogik.common.database import DbHelper
 from domogik.common.configloader import Loader
-from domogik.xpl.lib.xplconnector import *
 
 class StatsManager(xPLModule):
     """
@@ -53,8 +53,8 @@ class StatsManager(xPLModule):
         xPLModule.__init__(self, 'statmgr')
         cfg = Loader('domogik')
         config = cfg.load()
-        db = dict(config[1])
-        directory = "%s/share/domogik/listeners/" % db['custom_prefix']
+        cfg_db = dict(config[1])
+        directory = "%s/share/domogik/listeners/" % cfg_db['custom_prefix']
 
         files = glob.glob("%s/*xml" % directory)
         stats = {}
@@ -84,29 +84,29 @@ class StatsManager(xPLModule):
         #    </mapping>
         #</statistic>
 
-        for file in files :
-            self._log.info("Parse file %s" % file)
-            doc = minidom.parse(file)
+        for _file in files :
+            self._log.info("Parse file %s" % _file)
+            doc = minidom.parse(_file)
             res = {}
             res["technology"] = doc.documentElement.attributes.get("technology").value
             res.update(self.parse_listener(doc.documentElement.getElementsByTagName("listener")[0]))
             res.update(self.parse_mapping(doc.documentElement.getElementsByTagName("mapping")[0]))
-            stat = self.__Stat(self._myxpl, res, self._db, self._log)
+            stat = self._Stat(self._myxpl, res, self._db, self._log)
             stats[file] = stat
 
-    def parse_listener(self,node):
+    def parse_listener(self, node):
         """ Parse the "listener" node
         """
         res = {}
         res["schema"] = node.getElementsByTagName("schema")[0].firstChild.nodeValue
         res["xpltype"] = node.getElementsByTagName("xpltype")[0].firstChild.nodeValue
         filters = {}
-        for filter in node.getElementsByTagName("filter")[0].getElementsByTagName("key"):
-            filters[filter.attributes["name"].value] = filter.attributes["value"].value
+        for _filter in node.getElementsByTagName("filter")[0].getElementsByTagName("key"):
+            filters[_filter.attributes["name"].value] = _filter.attributes["value"].value
         res["filter"] = filters
         return res
         
-    def parse_mapping(self,node):
+    def parse_mapping(self, node):
         """ Parse the "mapping" node
         """
         res = {}
@@ -122,12 +122,12 @@ class StatsManager(xPLModule):
         return res
 
 
-    class __Stat:
+    class _Stat:
         """ This class define a statistic parser and logger instance
         Each instance create a Listener and the associated callbacks
         """
 
-        def __init__(self, xpl, res, db, log):
+        def __init__(self, xpl, res, database, log):
             """ Initialize a stat instance 
             @param xpl : A xpl manager instance
             @param res : The result of xml parsing
@@ -135,7 +135,7 @@ class StatsManager(xPLModule):
             @param log : the module logger (from self.get_my_logger())
             """
             self._res = res
-            self._db = db
+            self._db = database
             params = {'schema':res["schema"], 'xpltype':res["xpltype"]}
             params.update(res["filter"])
             self._listener = Listener(self._callback, xpl, params)
@@ -167,4 +167,4 @@ class StatsManager(xPLModule):
                 self._db.add_device_stat(d_id, datetime.today(), datas)
 
 if __name__ == "__main__":
-    s = StatsManager()
+    StatsManager()
