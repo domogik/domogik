@@ -91,9 +91,6 @@ class SampleDataHelper:
         for user_acc in self.__db.list_user_accounts():
             self.__db.del_user_account(user_acc.id)
 
-        for sys_acc in self.__db.list_system_accounts():
-            self.__db.del_system_account(sys_acc.id)
-
         self.__db.del_all_system_stats()
 
     def create(self):
@@ -103,7 +100,7 @@ class SampleDataHelper:
         self.remove()
 
         # Add default administrator
-        self.__db.add_default_system_account()
+        self.__db.add_default_user_account()
 
         self.__db.update_system_config(s_simulation_mode=True, s_debug_mode=True)
 
