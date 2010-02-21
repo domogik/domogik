@@ -1648,35 +1648,34 @@ class DbHelper():
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return user_account
 
-    def update_user_account(self, a_login, a_new_login=None, a_password=None,
+    def update_user_account(self, a_id, a_new_login=None, a_password=None,
                             a_is_admin=None, a_skin_used=None):
         """
         Update a user account
-        @param a_login : Account login to be updated
+        @param a_id : Account id to be updated
         @param a_new_login : The new login (optional)
         @param a_password : Account clear text password (will be hashed in sha256, optional)
         @param a_is_admin : True if it is an admin account, False otherwise (optional)
         @return a UserAccount object
         """
-        sys_acc = self.get_user_account_by_login(a_login)
-        if sys_acc is None:
-            raise DbHelperException("UserAccount with login %s \
-                                    couldn't be found" % a_login)
+        user_acc = self.get_user_account(a_id)
+        if user_acc is None:
+            raise DbHelperException("UserAccount with id %s couldn't be found" % a_id)
         if a_new_login is not None:
-            sys_acc.login = a_new_login
+            user_acc.login = a_new_login
         if a_password is not None:
-            sys_acc.password = self.__make_crypted_password(a_password)
+            user_acc.password = self.__make_crypted_password(a_password)
         if a_is_admin is not None:
-            sys_acc.is_admin = a_is_admin
+            user_acc.is_admin = a_is_admin
         if a_skin_used is not None:
-            sys_acc.skin_used = a_skin_used
-        self._session.add(sys_acc)
+            user_acc.skin_used = a_skin_used
+        self._session.add(user_acc)
         try:
             self._session.commit()
         except Exception, sql_exception:
             self._session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-        return sys_acc
+        return user_acc
 
     def __make_crypted_password(self, clear_text_password):
         """

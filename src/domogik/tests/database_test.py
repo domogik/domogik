@@ -1353,7 +1353,7 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
                                             a_password='IwontGiveIt',
                                             a_is_admin=True)
         user_acc_u = self.db.update_user_account(
-                        a_login='mschneider',
+                        a_id=user_acc.id,
                         a_new_login='mschneider2', a_password='ItWasWrong',
                         a_is_admin=False)
         user_acc_msc = self.db.get_user_account_by_login_and_pass(
