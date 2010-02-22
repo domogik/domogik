@@ -49,6 +49,9 @@ from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.lib.module import xPLModule, xPLResult
 from domogik.xpl.lib.queryconfig import Query
 
+import domogik.xpl.bin
+import pkgutil
+
 
 class SysManager(xPLModule):
     '''
@@ -60,70 +63,151 @@ class SysManager(xPLModule):
         Init manager and start listeners
         '''
         xPLModule.__init__(self, name = 'sysmgr')
-        self._components = {
-            'x10': 'x10Main()',
-            'dtmgr': 'xPLDateTime()',
-            'onewire': 'OneWireTemp()',
-            'trigger': 'main()',
-            'dawndusk': 'main()'}
+
+        # Logger init
         self._log = self.get_my_logger()
         self._log.debug("Init system manager")
-        
-        Listener(self._sys_cb, self._myxpl, {
-            'schema': 'domogik.system',
-            'xpltype': 'xpl-cmnd',
-        })
+        self._log.debug("Host : %s" % gethostname())
+
+        # Get config
         self._config = Query(self._myxpl)
         res = xPLResult()
         self._config.query('global', 'pid-dir-path', res)
         self._pid_dir_path = res.get_value()['pid-dir-path']
+
+        # Get components
+        self._list_components(gethostname())
+
+        # Start modules at manager startup
+        self._log.debug("Check modules to start at manager startup...")
+        for component in self._components:
+            self._log.debug("%s..." % component["name"])
+            self._config = Query(self._myxpl)
+            res = xPLResult()
+            self._config.query(component["name"], 'startup-module', res)
+            startup = res.get_value()['startup-module']
+            # start module
+            if startup == True:
+                self._log.debug("            starting")
+                self._log.debug("Starting %s" % component["name"])
+                self._start_module(component["name"], gethostname(), 0)
+        
+        # Define listener
+        Listener(self._sys_cb, self._myxpl, {
+            'schema': 'domogik.system',
+            'xpltype': 'xpl-cmnd',
+        })
 
         self._log.info("System manager initialized")
 
     def _sys_cb(self, message):
         '''
         Internal callback for receiving system messages
+        @param message : xpl message received
         '''
+        self._log.debug("Call _sys_cb")
+
         cmd = message.data['command']
-        mod = message.data['module']
+        try:
+           mod = message.data['module']
+        except KeyError:
+           mod = "*"
         host = message.data["host"]
+
+        # force command indicator
         force = 0
         if "force" in message.data:
             force = int(message.data['force'])
+
+        # error if no module in list
         error = ""
-        if mod not in self._components and mod != "*":
-            error = "Invalid component.\n"
+        if self._is_component(mod) == False and mod != "*":
+            error = "Invalid component : %s.\n" % mod
+
+        # if no error at this point, process
         if error == "":
             self._log.debug("System request %s for host %s, module %s" % (cmd, host, mod))
+
+            # start module
             if cmd == "start" and host == gethostname():
-                if not force and self._is_component_running(mod):
-                    error = "Component is already running"
-                    self._log.info(error)
-                else:
-                    pid = self._start_comp(mod)
-                    if pid:
-                        self._write_pid_file(mod, pid)
-                        self._log.debug("Component %s started with pid %i" % (mod,
-                                pid))
-                        mess = XplMessage()
-                        mess.set_type('xpl-trig')
-                        mess.set_schema('domogik.system')
-                        message.add_data({'host' : gethostname()})
-                        mess.add_data({'command' :  cmd})
-                        mess.add_data({'module' :  mod})
-                        mess.add_data({'force' :  force})
-                        if error:
-                            mess.add_data({'error' :  error})
-                        self._myxpl.send(mess)
+                self._start_module(mod, host, force)
+
+            # stop module
+            elif cmd == "stop" and host == gethostname():
+                self._start_module(mod, host, force)
+
+            # list module
+            elif cmd == "list" and host == gethostname():
+                # first : we refresh list
+                self._list_components(gethostname())
+                self._send_component_list()
+
+            # host ping
             elif cmd == "host-ping":
+                self._ping(host)
+
+        # if error
+        else:
+            self._log.info("Error detected : %s, request %s has been cancelled" % (error, cmd))
+
+
+
+    def _start_module(self, mod, host, force):
+        self._log.debug("Ask to start %s on %s" % (mod, host))
+        if not force and self._is_component_running(mod):
+            error = "Component is already running"
+            self._log.info(error)
+        else:
+            pid = self._start_comp(mod)
+            if pid:
+                self._write_pid_file(mod, pid)
+                self._log.debug("Component %s started with pid %i" % (mod,
+                        pid))
                 mess = XplMessage()
                 mess.set_type('xpl-trig')
                 mess.set_schema('domogik.system')
-                mess.add_data({'command' :  cmd})
-                mess.add_data({'host' : gethostname()})
+                message.add_data({'host' : host})
+                mess.add_data({'command' :  'start'})
+                mess.add_data({'module' :  mod})
+                mess.add_data({'force' :  force})
+                if error:
+                    mess.add_data({'error' :  error})
                 self._myxpl.send(mess)
+
+
+
+    def _stop_module(self, mod, host, force):
+        self._log.debug("Ask to stop %s on %s" % (mod, host))
+        if not force and self._is_component_running(mod) == False:
+            error = "Component is not running"
+            self._log.info(error)
         else:
-            self._log.info("Error detected : %s, request %s has been cancelled" % (error, cmd))
+            stopped = self._stop_comp(mod)
+            if stopped:
+                self._write_pid_file(mod, pid)
+                self._log.debug("Component %s stopped" % mod)
+                mess = XplMessage()
+                mess.set_type('xpl-trig')
+                mess.set_schema('domogik.system')
+                message.add_data({'host' : host})
+                mess.add_data({'command' :  'stop'})
+                mess.add_data({'module' :  mod})
+                mess.add_data({'force' :  force})
+                if error:
+                    mess.add_data({'error' :  error})
+                self._myxpl.send(mess)
+
+
+    def _ping(self, host):
+        self._log.debug("Ask to ping on %s" % (host))
+        mess = XplMessage()
+        mess.set_type('xpl-trig')
+        mess.set_schema('domogik.system')
+        mess.add_data({'command' : 'host-ping'})
+        mess.add_data({'host' : gethostname()})
+        self._myxpl.send(mess)
+
+    
 
     def _start_comp(self, name):
         '''
@@ -139,7 +223,10 @@ class SysManager(xPLModule):
         lastpid = os.fork()
         if not lastpid:
             os.execlp(sys.executable, sys.executable, module.__file__)
+            self._set_component_status(name, "ON")
         return lastpid
+
+
 
     def _is_component_running(self, component):
         '''
@@ -159,6 +246,63 @@ class SysManager(xPLModule):
                 component + ".pid")
         fil = open(pidfile, "w")
         fil.write(str(pid))
+
+    def _list_components(self, host):
+        '''
+        List domogik modules
+        '''
+        self._log.debug("Ask to list on %s" % (host))
+        self._components = []
+        package = domogik.xpl.bin
+        for importer, modname, ispkg in pkgutil.iter_modules(package.__path__):
+            try:
+                module = __import__(modname, fromlist="dummy")
+                self._log.debug("Module : %s" % modname)
+                if module.IS_DOMOGIK_MODULE is True:
+                    if module.DOMOGIK_MODULE_DESCRIPTION == None:
+                        moddesc = modname
+                    else:
+                        moddesc = module.DOMOGIK_MODULE_DESCRIPTION
+                    self._log.debug("  => Domogik module (%s) :)" % moddesc)
+                    self._components.append({"name" : modname, "description" : moddesc, "status" : "OFF", "host" : gethostname()})
+            except:
+                pass
+
+    def _is_component(self, name):
+        '''
+        Is a component a module ?
+        @param name : component name to check
+        '''
+        for component in self._components:
+            if component["name"] == name:
+                return True
+        return False
+
+    def _set_component_status(self, name, status):
+        '''
+        Set a component status in component list
+        '''
+        for component in self._components:
+            if component["name"] == name:
+                component["status"] = status
+
+    def _send_component_list(self):
+        mess = XplMessage()
+        mess.set_type('xpl-trig')
+        mess.set_schema('domogik.system')
+        mess.add_data({'command' :  'list'})
+        idx = 0
+        for component in self._components:
+            mod_content = "%s,%s,%s" % (component["name"],
+                                        component["status"],
+                                        component["description"])
+            mess.add_data({'module'+str(idx) : mod_content})
+            idx += 1
+        mess.add_data({'host' : gethostname()})
+        self._myxpl.send(mess)
+
+
+
 
 if __name__ == "__main__":
     SYS = SysManager()
