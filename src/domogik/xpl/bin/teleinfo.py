@@ -40,6 +40,9 @@ from domogik.xpl.lib.module import xPLModule, xPLResult
 from domogik.xpl.lib.teleinfo import TeleInfo
 from domogik.xpl.lib.queryconfig import Query
 
+IS_DOMOGIK_MODULE = True
+DOMOGIK_MODULE_DESCRIPTION = "Get electricity consumption with teleinfo"
+
 
 class TeleinfoManager(xPLModule):
     '''

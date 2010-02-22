@@ -43,6 +43,9 @@ from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.lib.plcbus import PLCBUSAPI
 from domogik.xpl.lib.queryconfig import Query
 
+IS_DOMOGIK_MODULE = True
+DOMOGIK_MODULE_DESCRIPTION = "Manage Plcbus devices"
+
 
 class PlcBusMain(xPLModule):
     ''' Manage PLCBus technology, send and receive order/state

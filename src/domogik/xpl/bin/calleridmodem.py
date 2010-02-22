@@ -41,6 +41,9 @@ from domogik.xpl.lib.module import xPLResult
 from domogik.xpl.lib.calleridmodem import CallerIdModem
 from domogik.xpl.lib.queryconfig import Query
 
+IS_DOMOGIK_MODULE = True
+DOMOGIK_MODULE_DESCRIPTION = "Get caller id with a modem"
+
 
 class CallerIdModemManager(xPLModule):
     '''

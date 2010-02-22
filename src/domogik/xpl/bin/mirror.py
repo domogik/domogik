@@ -41,6 +41,8 @@ from domogik.xpl.lib.module import xPLResult
 from domogik.xpl.lib.mirror import Mirror
 from domogik.xpl.lib.queryconfig import Query
 
+IS_DOMOGIK_MODULE = True
+DOMOGIK_MODULE_DESCRIPTION = "Use Mir:ror device"
 
 
 class MirrorManager(xPLModule):

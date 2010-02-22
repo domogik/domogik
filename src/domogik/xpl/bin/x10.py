@@ -48,6 +48,10 @@ from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.lib.module import xPLModule, xPLResult
 from domogik.xpl.lib.queryconfig import Query
 
+IS_DOMOGIK_MODULE = True
+DOMOGIK_MODULE_DESCRIPTION = "Manage x10 devices"
+
+
 class X10Main(xPLModule):
     '''Manage x10 technology using heyu
     '''

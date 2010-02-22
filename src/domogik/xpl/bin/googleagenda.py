@@ -42,6 +42,9 @@ from domogik.xpl.lib.module import xPLModule
 from domogik.xpl.lib.module import xPLResult
 from domogik.xpl.lib.queryconfig import Query
 
+IS_DOMOGIK_MODULE = True
+DOMOGIK_MODULE_DESCRIPTION = "Get events from a Google agenda"
+
 
 class GAgendaListener(xPLModule):
     """ Listen for xPL messages to get infos from agenda

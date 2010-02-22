@@ -41,6 +41,9 @@ from domogik.xpl.lib.xbmcnotification import XBMCNotification
 from domogik.xpl.lib.module import xPLResult
 from domogik.xpl.lib.queryconfig import Query
 
+IS_DOMOGIK_MODULE = True
+DOMOGIK_MODULE_DESCRIPTION = "Send notifications to XBMC"
+
 
 class XBMCNotificationListener(xPLModule):
     """ Create listener for xPL messages about xbmc notifications

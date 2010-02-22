@@ -39,6 +39,9 @@ from domogik.xpl.lib.xplconnector import Listener
 from domogik.xpl.lib.module import xPLModule
 from domogik.xpl.lib.wol import WOL
 
+IS_DOMOGIK_MODULE = True
+DOMOGIK_MODULE_DESCRIPTION = "Wake on lan"
+
 
 class WOLListener(xPLModule):
     """ Implements a listener for wol messages on xPL network
