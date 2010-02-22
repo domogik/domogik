@@ -56,7 +56,7 @@ from sqlalchemy.orm import relation, backref
 from domogik.common.configloader import Loader
 
 UNIT_OF_STORED_VALUE_LIST = [u'Volt', u'Celsius', u'Farenheit', u'Percent', u'Boolean', None]
-DEVICE_TECHNOLOGY_LIST = [u'x10',u'1wire',u'PLCBus',u'RFXCom',u'IR',u'EIB/KNX']
+DEVICE_TECHNOLOGY_LIST = [u'x10',u'1wire',u'PLCBus',u'RFXCom',u'IR',u'EIB/KNX', u'Computer']
 DEVICE_TYPE_LIST = [u'appliance', u'lamp', u'music', u'sensor']
 ITEM_TYPE_LIST = [u'area', u'room', u'device']
 
