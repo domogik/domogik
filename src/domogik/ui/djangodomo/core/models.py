@@ -137,3 +137,9 @@ class Modules(pipes.DmgPipe):
         resp = Modules.objects.get({'parameters':"list/"})
         if resp :
             return resp
+    
+    @staticmethod
+    def getByName(name):
+        resp = Modules.objects.get({'parameters':"list/by-name/" + name})
+        if resp :
+            return resp

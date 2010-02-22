@@ -25,6 +25,34 @@
 $(function(){
     // Accordion
 	$("#nav2").accordion({ header: ".subnav2", active:2});
+    
+    {% ifequal module.status "ON" %}
+        $("#buttonstatus").click(function() {
+            getREST('/module/stop/{{ module.name }}',
+                function(data) {
+                    var status = (data.status).toLowerCase();
+                    if (status == 'ok') {
+                        $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Module" %}\'' + {{ module.name }} + '\' {% trans "successfully stopped" %}'});
+                    } else {
+                        $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Module not stopped" %} (' + data.description + ')'});
+                    }
+                }
+            );
+        });
+    {% else %}
+        $("#buttonstatus").click(function() {
+            getREST('/module/start/{{ module.name }}',
+                function(data) {
+                    var status = (data.status).toLowerCase();
+                    if (status == 'ok') {
+                        $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Module" %}\'' + {{ module.name }} + '\' {% trans "successfully started" %}'});
+                    } else {
+                        $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Module not started" %} (' + data.description + ')'});
+                    }
+                }
+            );
+        });
+    {% endifequal %}
 });
 {% endblock %}
 {% block css %}
@@ -35,16 +63,30 @@ $(function(){
 
 {% block banner %}
     <div class="section">
-        <h1 class="ident"><span class="title">{% trans "Module" %} '{{ module_name }}'</span></h1>
+        <h1 class="ident icon64-module-{{ module.name }}"><span class="title">{% trans "Module" %} '{{ module.name }}'</span></h1>
         {% ifnotequal status "" %}
         <div id='messages' class='{{status}}'>{{msg}}</div>
         {% endifnotequal %}
-        <ul class="actions"></ul>
+        <ul class="actions">
+            <li>{% trans "Status" %}:&nbsp;
+            {% ifequal module.status "ON" %}
+                <div class='status icon16-status-active'></div>
+            {% else %}
+                <div class='status icon16-status-inactive'></div>                        
+            {% endifequal %}
+            </li>
+            <li>{% trans "Host" %}: {{ module.host }}</li>
+        </ul>
     </div>
 {% endblock %}
 
 {% block right %}
     <div class="subsection">
         <h2>{% trans "Basic Control" %}</h2>
+        {% ifequal module.status "ON" %}
+            <a href="#" id='buttonstatus' class='button'>{% trans "Stop" %}</a>
+        {% else %}
+            <a href="#" id='buttonstatus' class='button'>{% trans "Start" %}</a>
+        {% endifequal %}
     </div>
 {% endblock %}

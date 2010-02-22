@@ -392,7 +392,7 @@ def admin_modules_module(request, module_name):
 
     status = request.GET.get('status', '')
     msg = request.GET.get('msg', '')
-    
+    resultModuleByName = Modules.getByName(module_name)
     resultAllModules = Modules.getAll()
     page_title = _("Module")
     return __go_to_page(
@@ -403,7 +403,7 @@ def admin_modules_module(request, module_name):
         modules_list=resultAllModules.module,
         status=status,
         msg=msg,
-        module_name=module_name
+        module=resultModuleByName.module[0]
     )
     
 def show_index(request):

@@ -78,11 +78,3 @@
     color:#ffffff;
     background-color: #403E3F;
 }
-
-#nav2 .status {
-    height:16px;
-    width:16px;
-    background-position:50% 50%;
-    background-repeat:no-repeat;
-    float:right;
-}
