@@ -47,7 +47,8 @@ from xml.dom import minidom
 import time
 import urllib
 import sys
-
+from socket import gethostname
+from Queue import *
 
 
 
@@ -85,6 +86,39 @@ class Rest(xPLModule):
         conf = dict(config[1])
         self._xml_directory = "%s/xml/rest/" % conf['cfg_path']
 
+        # Queues for xPL
+        self._queue_system_list = Queue()
+        self._queue_system_start = Queue()
+        self._queue_system_stop = Queue()
+
+        # define listeners for queues
+        Listener(self._add_to_queue_system_list, self._myxpl, \
+                 {'schema': 'domogik.system',
+                  'xpltype': 'xpl-trig',
+                  'command' : 'list',
+                  'host' : gethostname()})
+        Listener(self._add_to_queue_system_start, self._myxpl, \
+                 {'schema': 'domogik.system',
+                  'xpltype': 'xpl-trig',
+                  'command' : 'start',
+                  'host' : gethostname()})
+        Listener(self._add_to_queue_system_stop, self._myxpl, \
+                 {'schema': 'domogik.system',
+                  'xpltype': 'xpl-trig',
+                  'command' : 'stop',
+                  'host' : gethostname()})
+
+
+    def _add_to_queue_system_list(self, message):
+        self._queue_system_list.put(message)
+
+    def _add_to_queue_system_start(self, message):
+        self._queue_system_start.put(message)
+
+    def _add_to_queue_system_stop(self, message):
+        self._queue_system_stop.put(message)
+
+
 
     def start(self):
         """ Start HTTP Server
@@ -108,6 +142,8 @@ class HTTPServerWithParam(HTTPServer):
         HTTPServer.__init__(self, server_address, request_handler_class, \
                             bind_and_activate)
         self.handler_params = handler_params
+        # dirty issue
+        self.timeout = None
 
 
 
@@ -151,6 +187,12 @@ class RestHandler(BaseHTTPRequestHandler):
         """ Create an object for each request. This object will process 
             the REST url
         """
+
+        # dirty issue to force HTTP/1.1 
+        self.protocol_version = 'HTTP/1.1'
+        self.request_version = 'HTTP/1.1'
+
+
         request = ProcessRequest(self.server.handler_params, self.path, \
                                  self.send_http_response_ok, \
                                  self.send_http_response_error)
@@ -169,10 +211,12 @@ class RestHandler(BaseHTTPRequestHandler):
             Send also json data
             @param data : json data to display
         """
+        print "HTTP VERSION = %s " % self.protocol_version 
         self.send_response(200)
         self.send_header('Content-type',  'application/json')
         self.send_header('Expires', '-1')
         self.send_header('Cache-control', 'no-cache')
+        self.send_header('Content-Length', len(data))
         self.end_headers()
         if data:
             self.wfile.write(data.encode("utf-8"))
@@ -231,6 +275,9 @@ class ProcessRequest():
         self._myxpl = self.handler_params[0]._myxpl
         self._log = self.handler_params[0]._log
         self._xml_directory = self.handler_params[0]._xml_directory
+        self._queue_system_list =  self.handler_params[0]._queue_system_list
+        self._queue_system_start =  self.handler_params[0]._queue_system_start
+        self._queue_system_stop =  self.handler_params[0]._queue_system_stop
 
         # global init
         self.jsonp = False
@@ -1874,12 +1921,13 @@ target=*
                 else:
                     self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                               self.jsonp, self.jsonp_cb)
+                    return
 
         elif self.rest_request[0] == "start":
             if len(self.rest_request) < 2:
                 self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
                 return
-            self._rest_module_start(module =  self.rest_request[1], \
+            self._rest_module_start_stop(module =  self.rest_request[1], \
                                    command = "start")
         elif self.rest_request[0] == "stop":
             if len(self.rest_request) < 2:
@@ -1889,6 +1937,7 @@ target=*
             # TODO when start will be OK
         else:
             self.send_http_response_error(999, "Bad operation for /module", self.jsonp, self.jsonp_cb)
+            return
 
 
 
@@ -1897,23 +1946,64 @@ target=*
             Display this list as json
             @param name : name of module
         """
+        print "Call rest_module_list"
+
+        ### Send xpl message to get list
+
+        #DOMOGIK.SYSTEM
+        #{
+        #COMMAND=command to send
+        #HOST=name of the host where a component should be started/stopped|*
+        #}
+
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("domogik.system")
+        message.add_data({"command" : "list"})
+        # TODO : ask for good host
+        message.add_data({"host" : gethostname()})
+        self._myxpl.send(message)
+        print "Message sent : " + str(message)
+
+        ### Wait for answer
+
+        #DOMOGIK.SYSTEM
+        #{
+        #COMMAND=command to send
+        #HOST=Host sending the message|*
+        #[MODULE0]=<name>,<status>,<description>
+        #[ERROR=error message if error occurs, 255 char max]
+        #}
+
+        # get xpl message from queue
+        message = self._queue_system_list.get()
+
+        # process message
+        cmd = message.data['command']
+        host = message.data["host"]
+    
+        print "Message received : " + str(message)
+
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("module")
-        if name == None:
-            json_data.add_data({"name" : "x10", "description" : "X10 module", "status" : "ON", "host" : "lightstar"})
-            json_data.add_data({"name" : "onewire", "description" : "1 wire", "status" : "OFF", "host" : "lightstar"})
-            json_data.add_data({"name" : "wol", "description" : "Wake on lan", "status" : "ON", "host" : "lightstar"})
-            json_data.add_data({"name" : "teleinfo", "description" : "Teleinfo", "status" : "ON", "host" : "lightstar"})
-            json_data.add_data({"name" : "onewire", "description" : "1 wire", "status" : "ON", "host" : "dyonisos"})
-            json_data.add_data({"name" : "callerid", "description" : "Caller ID", "status" : "OFF", "host" : "dyonisos"})
-        else:
-            json_data.add_data({"name" : name, "description" : "bla bla",  "status" : "OFF", "host" : "dyonisos"})
+
+        idx = 0
+        loop_again = True
+        while loop_again:
+            try:
+                data = message.data["module"+str(idx)].split(",")
+                if name == None or name == data[0]:
+                    json_data.add_data({"name" : data[0], "description" : data[2], "status" : data[1], "host" : host})
+                idx += 1
+            except:
+                loop_again = False
+
         self.send_http_response_ok(json_data.get())
 
 
 
-    def _rest_module_start(self, command, host = "127.0.0.1", module = None, force = 0):
+    def _rest_module_start_stop(self, command, host = "127.0.0.1", module = None, force = 0):
         """ Send start xpl message to manager
             Then, listen for a response
             @param host : host to which we send command
@@ -1952,7 +2042,7 @@ target=*
         #[ERROR=error message if error occurs, 255 char max]
         #}
 
-        Listener(self.rest_module_start_response, self._myxpl, \
+        Listener(self._rest_module_start_response, self._myxpl, \
                  {'schema': 'domogik.system', 
                   'xpltype': 'xpl-trig', 
                   'command' : command, 
@@ -1961,8 +2051,7 @@ target=*
                   'force' : force})
 
 
-
-    def rest_module_start_response(self, message):
+    def _rest_module_start_response(self, message):
         """ Process xpl manager response to make a json
             @param message : xpl message received
         """
