@@ -1862,13 +1862,24 @@ target=*
 
         ### start #####################################
         if self.rest_request[0] == "list":
-            self.rest_module_list()
-            return
+
+            if len(self.rest_request) == 1:
+                self._rest_module_list()
+            elif len(self.rest_request) == 2:
+                self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
+                                              self.jsonp, self.jsonp_cb)
+            else:
+                if self.rest_request[1] == "by-name":
+                    self._rest_module_list(name=self.rest_request[2])
+                else:
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                              self.jsonp, self.jsonp_cb)
+
         elif self.rest_request[0] == "start":
             if len(self.rest_request) < 2:
                 self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
                 return
-            self.rest_module_start(module =  self.rest_request[1], \
+            self._rest_module_start(module =  self.rest_request[1], \
                                    command = "start")
         elif self.rest_request[0] == "stop":
             if len(self.rest_request) < 2:
@@ -1881,24 +1892,28 @@ target=*
 
 
 
-    def rest_module_list(self):
+    def _rest_module_list(self, name = None):
         """ Send a xpl message to manager to get module list
             Display this list as json
+            @param name : name of module
         """
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("module")
-        json_data.add_data({"name" : "x10", "description" : "X10 module", "status" : "ON", "host" : "lightstar"})
-        json_data.add_data({"name" : "onewire", "description" : "1 wire", "status" : "OFF", "host" : "lightstar"})
-        json_data.add_data({"name" : "wol", "description" : "Wake on lan", "status" : "ON", "host" : "lightstar"})
-        json_data.add_data({"name" : "teleinfo", "description" : "Teleinfo", "status" : "ON", "host" : "lightstar"})
-        json_data.add_data({"name" : "onewire", "description" : "1 wire", "status" : "ON", "host" : "dyonisos"})
-        json_data.add_data({"name" : "callerid", "description" : "Caller ID", "status" : "OFF", "host" : "dyonisos"})
+        if name == None:
+            json_data.add_data({"name" : "x10", "description" : "X10 module", "status" : "ON", "host" : "lightstar"})
+            json_data.add_data({"name" : "onewire", "description" : "1 wire", "status" : "OFF", "host" : "lightstar"})
+            json_data.add_data({"name" : "wol", "description" : "Wake on lan", "status" : "ON", "host" : "lightstar"})
+            json_data.add_data({"name" : "teleinfo", "description" : "Teleinfo", "status" : "ON", "host" : "lightstar"})
+            json_data.add_data({"name" : "onewire", "description" : "1 wire", "status" : "ON", "host" : "dyonisos"})
+            json_data.add_data({"name" : "callerid", "description" : "Caller ID", "status" : "OFF", "host" : "dyonisos"})
+        else:
+            json_data.add_data({"name" : name, "description" : "bla bla",  "status" : "OFF", "host" : "dyonisos"})
         self.send_http_response_ok(json_data.get())
 
 
 
-    def rest_module_start(self, command, host = "127.0.0.1", module = None, force = 0):
+    def _rest_module_start(self, command, host = "127.0.0.1", module = None, force = 0):
         """ Send start xpl message to manager
             Then, listen for a response
             @param host : host to which we send command
