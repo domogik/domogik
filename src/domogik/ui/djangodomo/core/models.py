@@ -143,3 +143,12 @@ class Modules(pipes.DmgPipe):
         resp = Modules.objects.get({'parameters':"list/by-name/" + name})
         if resp :
             return resp
+        
+class Accounts(pipes.DmgPipe):
+    uri = "http://127.0.0.1:8080/account"
+    
+    @staticmethod
+    def getAll():
+        resp = Accounts.objects.get({'parameters':"list/"})
+        if resp :
+            return resp

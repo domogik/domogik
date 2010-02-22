@@ -63,7 +63,11 @@ $(function(){
 
 {% block banner %}
     <div class="section">
-        <h1 class="ident icon64-module-{{ module.name }}"><span class="title">{% trans "Module" %} '{{ module.name }}'</span></h1>
+        <h1 class="ident icon64-module-{{ module.name }}">
+            <span class="title">{% trans "Module" %} '{{ module.name }}'</span>
+            <br />
+            <span class="subtitle">{{ module.description }}</span>
+        </h1>
         {% ifnotequal status "" %}
         <div id='messages' class='{{status}}'>{{msg}}</div>
         {% endifnotequal %}

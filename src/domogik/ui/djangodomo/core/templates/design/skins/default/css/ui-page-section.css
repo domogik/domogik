@@ -7,7 +7,19 @@
     background-position:top left;
     background-repeat:no-repeat;
     -webkit-box-reflect:below -30px -webkit-gradient(linear, left top, left bottom, from(transparent), color-stop(0.5, transparent), to(white));
-    line-height:64px;
+    min-height:64px;
+}
+
+.section .title {
+    color:#000000;
+}
+
+.section .subtitle {
+    font-style:italic;
+    color:#666;
+    padding-left:20px;
+    background-position:left 50%;
+    background-repeat:no-repeat;
 }
 
 .section .actions {

@@ -61,7 +61,7 @@
             <ul>
                 {% spaceless %}
                 {% for menu_module in modules_list %}
-                    <li><a href="{% url admin_modules_module_view menu_module.name %}" class="icon16-module-{{ menu_module.name }} {% ifequal menu_module.name module.name %}{{ nav2_modules_module }}{% endifequal %}">{{ menu_module.description }}
+                    <li><a href="{% url admin_modules_module_view menu_module.name %}" class="icon16-module-{{ menu_module.name }} {% ifequal menu_module.name module.name %}{{ nav2_modules_module }}{% endifequal %}">{{ menu_module.name }}
                     {% ifequal menu_module.status "ON" %}
                         <div class='status icon16-status-active'></div>
                     {% else %}
