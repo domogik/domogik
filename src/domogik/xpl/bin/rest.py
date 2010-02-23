@@ -52,6 +52,10 @@ from Queue import *
 
 
 
+QUEUE_TIMEOUT = 10
+
+
+
 ################################################################################
 class Rest(xPLModule):
     """ REST Server 
@@ -1994,7 +1998,14 @@ target=*
         #}
 
         # get xpl message from queue
-        message = self._queue_system_list.get()
+        try:
+            message = self._queue_system_list.get(True, QUEUE_TIMEOUT)
+        except Empty:
+            json_data = JSonHelper("ERROR", 999, "Timeout on getting module list")
+            json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+            json_data.set_data_type("module")
+            self.send_http_response_ok(json_data.get())
+            return
 
         # process message
         cmd = message.data['command']
