@@ -84,7 +84,7 @@ class Rest(xPLModule):
         cfg = Loader('domogik')
         config = cfg.load()
         conf = dict(config[1])
-        self._xml_directory = "%s/xml/rest/" % conf['cfg_path']
+        self._xml_directory = "%s/share/domogik/rest/" % conf['custom_prefix']
 
         # Queues for xPL
         self._queue_system_list = Queue()
@@ -423,8 +423,8 @@ class ProcessRequest():
         print "Others    : %s" % str(others)
 
         # open xml file
-        #xml_file = "%s/%s.xml" % (self._xml_directory, techno)
-        xml_file = "%s/%s.xml" % ("../xml/", techno)
+        xml_file = "%s/%s.xml" % (self._xml_directory, techno)
+        #xml_file = "%s/%s.xml" % ("../xml/", techno)
         # process xml
         message = self._parse_xml(xml_file, techno, address, order, others)
         if message == None:
