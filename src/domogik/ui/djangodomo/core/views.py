@@ -55,6 +55,7 @@ from djangodomo.core.sample_data_helper import SampleDataHelper
 from djangodomo.core.XPLHelper import XPLHelper
 
 from django.views.decorators.cache import never_cache
+from django_pipes.exceptions import ResourceNotAvailableException
 
 __ADMIN_MANAGEMENT_DOMOGIK = 'admin/management/domogik.html'
 __db = database.DbHelper()
@@ -66,9 +67,13 @@ def index(request):
     @return an HttpResponse object
     """
     page_title = _("Domogik Homepage")
-    resultAllRooms = Rooms.getAll()
-    resultAllRooms.merge_uiconfig()
-        
+
+    try:
+        resultAllRooms = Rooms.getAll()
+        resultAllRooms.merge_uiconfig()
+    except ResourceNotAvailableException:
+        return render_to_response('error/ResourceNotAvailableException.html')
+
     device_list = []
     for device in __db.list_devices():
       device_list.append({'room': device.room_id, 'device': device})
@@ -125,7 +130,10 @@ def login(request):
 
     else:
         # User asked to log in
-        resultAllAccounts = Accounts.getAll()
+        try:
+            resultAllAccounts = Accounts.getAll()
+        except ResourceNotAvailableException:
+            return render_to_response('error/ResourceNotAvailableException.html')
         return __go_to_page(
             request, 'login.html',
             page_title,
@@ -309,8 +317,11 @@ def admin_organization_devices(request):
 
 #    rooms_list = __db.list_rooms()
 #    device_usage_list = __db.list_device_usages()
-    devices_list = __db.list_devices()
-    resultAllDevices = Devices.getAll()
+    try:
+        devices_list = __db.list_devices()
+        resultAllDevices = Devices.getAll()
+    except ResourceNotAvailableException:
+        return render_to_response('error/ResourceNotAvailableException.html')
 #    device_tech_list = __db.list_device_technologies()
     
  #   resultAllModules = Modules.getAll()
@@ -338,12 +349,15 @@ def admin_organization_rooms(request):
 
     status = request.GET.get('status', '')
     msg = request.GET.get('msg', '')
-
-    resultAllRooms = Rooms.getAll()
-    resultAllRooms.merge_uiconfig()
-    resultUnattribuedRooms = Rooms.getWithoutArea()
-    resultAllAreas = Areas.getAllWithRooms()
-    resultAllAreas.merge_uiconfig()
+    try:
+        resultAllRooms = Rooms.getAll()
+        resultAllRooms.merge_uiconfig()
+        resultUnattribuedRooms = Rooms.getWithoutArea()
+        resultAllAreas = Areas.getAllWithRooms()
+        resultAllAreas.merge_uiconfig()
+    except ResourceNotAvailableException:
+        return render_to_response('error/ResourceNotAvailableException.html')
+        
 #    resultAllModules = Modules.getAll()
     page_title = _("Room organization")
     return __go_to_page(
@@ -370,9 +384,11 @@ def admin_organization_areas(request):
 
     status = request.GET.get('status', '')
     msg = request.GET.get('msg', '')
-
-    resultAllAreas = Areas.getAll()
-    resultAllAreas.merge_uiconfig()
+    try:
+        resultAllAreas = Areas.getAll()
+        resultAllAreas.merge_uiconfig()
+    except ResourceNotAvailableException:
+        return render_to_response('error/ResourceNotAvailableException.html')
 #    resultAllModules = Modules.getAll()
     page_title = _("Area organization")
     return __go_to_page(
@@ -397,8 +413,11 @@ def admin_modules_module(request, module_name):
 
     status = request.GET.get('status', '')
     msg = request.GET.get('msg', '')
-    resultModuleByName = Modules.getByName(module_name)
-    resultAllModules = Modules.getAll()
+    try:
+        resultModuleByName = Modules.getByName(module_name)
+        resultAllModules = Modules.getAll()
+    except ResourceNotAvailableException:
+        return render_to_response('error/ResourceNotAvailableException.html')
     page_title = _("Module")
     return __go_to_page(
         request, 'admin/modules/module.html',
@@ -418,9 +437,11 @@ def show_index(request):
     @return an HttpResponse object
     """
     page_title = _("View House")
-    resultAllAreas = Areas.getAll()
-    resultAllAreas.merge_uiconfig()
-    
+    try:
+        resultAllAreas = Areas.getAll()
+        resultAllAreas.merge_uiconfig()
+    except ResourceNotAvailableException:
+        return render_to_response('error/ResourceNotAvailableException.html')    
     return __go_to_page(
         request, 'show/index.html',
         page_title,
@@ -435,11 +456,14 @@ def show_area(request, area_id):
     @param request : HTTP request
     @return an HttpResponse object
     """
-    resultAreaById = Areas.getById(area_id)
-    resultAreaById.merge_uiconfig()
-    resultRoomsByArea = Rooms.getByArea(area_id)
-    resultRoomsByArea.merge_uiconfig()
-
+    try:
+        resultAreaById = Areas.getById(area_id)
+        resultAreaById.merge_uiconfig()
+        resultRoomsByArea = Rooms.getByArea(area_id)
+        resultRoomsByArea.merge_uiconfig()
+    except ResourceNotAvailableException:
+        return render_to_response('error/ResourceNotAvailableException.html')
+        
     page_title = _("View ") + resultAreaById.area[0].name
     return __go_to_page(
         request, 'show/area.html',
@@ -455,9 +479,12 @@ def show_room(request, room_id):
     @param request : HTTP request
     @return an HttpResponse object
     """
-    resultRoomById = Rooms.getById(room_id)
-    resultRoomById.merge_uiconfig()
-    
+    try:
+        resultRoomById = Rooms.getById(room_id)
+        resultRoomById.merge_uiconfig()
+    except ResourceNotAvailableException:
+        return render_to_response('error/ResourceNotAvailableException.html')
+        
     devices_list = __db.search_devices({'room_id':room_id})
 
     page_title = _("View ") + resultRoomById.room[0].name

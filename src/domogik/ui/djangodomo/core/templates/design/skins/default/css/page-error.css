@@ -1,0 +1,15 @@
+#content-bgnd {
+    margin:auto;
+    width:55em;
+}
+
+#error {
+    background-color:#eeeeee;
+    border: 1px solid #979387;
+    -moz-border-radius: 0.8em;
+    -webkit-border-radius: 0.8em;
+    min-height:35em;
+    padding:1em;
+    margin:1em;
+}
+
