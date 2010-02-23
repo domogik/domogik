@@ -46,6 +46,7 @@ from django_pipes.main import PipeBase
 from django_pipes.main import PipeResultSet
 from django_pipes.main import _log
 
+from django_pipes.exceptions import ResourceNotAvailableException
 
 if hasattr(settings, "PIPES_CACHE_EXPIRY"):
     default_cache_expiry = settings.PIPES_CACHE_EXPIRY
