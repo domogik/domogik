@@ -4,12 +4,15 @@
 /base/room/add/name/Cuisine/area_id/1/description/la%20cuisine
 # room : id 2
 /base/room/add/name/Salon/area_id/1
+# device : id 1
+/base/device/add/name/Lampe/address/A1/type_id/1/usage_id/1/room_id/2/description/Lampe%20murale/reference/AM12/is_resetable/True/initial_value/0/value_changeable_by_user/True/unit_of_stored_values/Boolean
+
 # room : id 3
 /base/room/add/name/Sejour/area_id/1
 # room : id 4
 /base/room/add/name/Cellier/area_id/1
 # room : id 5
-/base/room/add/name/Salle%20d%20eau/area_id/1/description/la%20o20se%20lave
+/base/room/add/name/Salle%20d%20eau/area_id/1/description/la%20ou%20on%20se%20lave
 
 # area : id 2
 /base/area/add/name/Etage/description/Premier%20etage

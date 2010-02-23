@@ -21,233 +21,62 @@
 
 {% load i18n %}
 {% block js_script %}
-$(function(){
-    // Accordion
-    $("#nav2").accordion({ header: ".section", active:1});
-
-    // Add new form
-      		var name = $("#name"),
-			description = $("#description"),
-			address = $("#address"),
-			reference = $("#reference"),
-                        allFields = $([]).add(name).add(description).add(reference),
-
-			tips = $("#validateTips");
-
-		function updateTips(t) {
-			tips.text(t).effect("highlight",{},1500);
-		}
-
-		function checkLength(o,n,min,max) {
-
-			if ( o.val().length > max || o.val().length < min ) {
-				o.addClass('ui-state-error');
-				updateTips("La longueur de " + n + " doit être comprise entre "+min+" et "+max+".");
-				return false;
-			} else {
-				return true;
-			}
-
-		}
-
-		$("#addnewdialog").dialog({
-			bgiframe: true,
-			autoOpen: false,
-			height: 400,
-			modal: true,
-			buttons: {
-				'Ajouter': function() {
-					var bValid = true;
-					allFields.removeClass('ui-state-error');
-
-					bValid = bValid && checkLength(name,"nom",1,80);
-					bValid = bValid && checkLength(address,"adresse",1,80);
-					bValid = bValid && checkLength(reference,"référence",1,80);
-
-					if (bValid) {
-                                        	// Submit form
-						$(this).dialog('close');
-					}
-				},
-				Cancel: function() {
-					$(this).dialog('close');
-				}
-			},
-			close: function() {
-				allFields.val('').removeClass('ui-state-error');
-			}
-		});
-
-                $("#devices").hide();
-                $("button#showdevices").click(function () {
-            $("#devices").toggle();
-        });
-
-		$('#addnew').click(function() {
-			$('#addnewdialog').dialog('open');
-		})
-});
-
 {% endblock %}
 {% block css %}
-<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-selectmenu.css" rel="stylesheet" type="text/css" />
-<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-elements.css" rel="stylesheet" type="text/css" />
-<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-buttons.css" rel="stylesheet" type="text/css" />
-<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-forms.css" rel="stylesheet" type="text/css" />
-<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-nav2.css" rel="stylesheet" type="text/css" />
-<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-tables.css" rel="stylesheet" type="text/css" />
-<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/page-admin-organization.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/page-admin-organization.css" rel="stylesheet" type="text/css" />
 {% endblock %}
-{% block include_js_script %}
-<script type="text/javascript" src="/design/js/ui.selectmenu.js"></script>
-<script type="text/javascript" src="/design/js/page-admin.js"></script>
+{% block js_include %}
 {% endblock %}
 {% block title %}{% trans page_title %}{% endblock %}
 
+{% block banner %}
+    <div class="section">
+        <h1 class="ident"><span class="title">{% trans "Devices" %}</span></h1>
+        {% ifnotequal status "" %}
+        <div id='messages' class='{{status}}'>{{msg}}</div>
+        {% endifnotequal %}
+        <ul class="actions"></ul>
+    </div>
+{% endblock %}
+
 {% block right %}
-<div class="element-main">
-    <h1 class="element-ident"><span class="element-title">Organisations des dispositifs</span></h1>
-    <ul class="element-actions">
-        <li>
-            <button id="addnew" class="button">Ajouter nouveau</button>
-        </li>
-        <li><a href="#" class="button">Tout supprimer</a></li>
-                    <li><button id="showdevices" class="button">Dispositifs</a></li>
-
-    </ul>
-    <div id="addnewdialog" title="Ajouter nouveau dispositif">
-        <p id="validateTips">Tous les champs (sauf description) sont requis.</p>
-        <form>
-            <fieldset>
-                <label class="medium" for="name">Nom</label>
-                <input type="text" class="medium" id="name" name="name" />
-                <label class="medium" for="description">Description</label>
-                <textarea class="medium" id="description" name="description"></textarea>
-                <label class="medium" for="address">Adresse</label>
-                <input type="text" class="medium" id="address" name="address" />
-                <label class="medium" for="reference">Référence</label>
-                <input type="text" class="medium" id="reference" name="reference" />
-                <label class="medium" for="technology">Technologie</label>
-                <select class="medium" id="technology" name="technology">
-
-
-                {% regroup device_tech_list|dictsort:"type" by type as types_list %}
-
-{% for type in types_list %}
-
-
-                    <optgroup label="{{ type.grouper }}">
-        {% for technology in type.list %}
-
-
-                    <option value="{{ technology.id }}">{{ technology.name }}</option>
-
-
-        {% endfor %}
-    </optgroup>
-
-
-{% endfor %}
-
-
-                </select>
-                <label class="medium" for="usage">Usage</label>
-                <select class="medium" id="usage" name="usage">
-
-
-                {% for usage in device_usage_list %}
-
-
-                    <option value="{{ usage.id }}">{{ usage.name }}</option>
-
-
-                    {% endfor %}
-
-
-                </select>
-            </fieldset>
-        </form>
-        
-                <div id="devices">
-            <h2 class="splitter">Dispositifs</h2>
-            <a href="#" class="action" id="btinstructions">(Instructions Drag &amp; Drop)</a>
-            <div id="instructions" title="Instructions Drag &amp; Drop">
-                <h3>Utilisation de la souris</h3>
-                <h3>Utilisation du clavier</h3>
-                <ul>
-                    <li>Use the <kbd>Tab</kbd> to move to the artist you want to move.</li>
-                    <li>Select the item you want to move with the <kbd>Spacebar</kbd>.</li>
-                    <li>Use the <kbd>Up</kbd> and <kbd>Down</kbd> cursor keys to select a target in the context menu.</li>
-                    <li>Press <kbd>Enter</kbd> to move the artist to the target list.</li>
+    <div class="subsection">
+        <h2>{% trans "Areas list" %}</h2>
+        <div id="tabs">
+            {% spaceless %}
+            <ul>
+                {% for area in areas_list %}
+                    <li><a id="tab{{ area.id }}" href="#element{{ area.id }}" class="icon16-area-{{ area.config.icon }}">{{ area.name }}</a></li>
+                {% endfor %}
+            </ul>
+            {% endspaceless %}
+            {% for area in areas_list %}
+            <div id="element{{ area.id }}" class="tabelement">
+                <ul class="actions">
+                    <li><button id='del{{ area.id }}' class='icon16-action-del buttonside' title="{% trans "Delete" %} '{{ area.name }}'"><span class='offscreen'>{% trans "Delete" %} {{ area.name }}</span></button></li>
+                    <li><button id="update{{ area.id }}" class="icon16-action-update buttonside" title="{% trans "Modify" %} '{{ area.name }}'"><span class='offscreen'>{% trans "Modify" %} {{ area.name }}</span></button></li>
                 </ul>
+                <div class="content">
+                    <div id="icon{{ area.id }}"></div>
+                    <h2>{{ area.name }}</h2>
+                    <p>{{ area.description }}</p>
+                </div>
+                <div id="update_dialog_{{ area.id }}" title="{% trans "Modify" %} {{ area.name }}">
+                    <p id="validateTips{{ area.id }}">{% trans "All fields are required." %}</p>
+                    <form >
+                        <fieldset>
+                            <label class="medium" for="area{{ area.id }}-newname">{% trans "New name" %}</label>
+                            <input type="text" class="medium" id="area{{ area.id }}-newname" name="area{{ area.id }}-newname" />
+                            <label class="medium" for="area{{ area.id }}-newdescription">{% trans "New description" %}</label>
+                            <textarea type="text" class="medium" id="area{{ area.id }}-newdescription" name="area{{ area.id }}-newdescription"></textarea>
+                        </fieldset>'
+                    </form>
+                </div>
+                <div id="delete_confirmation_{{ area.id }}" title="{% trans "Delete" %} {{ area.name }}">
+                    <p>{% trans "Please confirm to delete" %} '{{ area.name }}'</p>
+                </div>
             </div>
-            <fieldset class="areadrop">
-                <legend id="roomnah" class="choice">Dispositifs non attribuées</legend>
-                <ul id="roomna" class="draggables">
-                    {% for device in unattribued_devices %}
-                    <li class="draggable" title="{{ device.technology.name }}.{{ device.address }}">{{ device.name }}<span class="description">{{ device.description }}</span></li>
-                    {% empty %}
-                    <li class="empty">Vide</li>
-                    {% endfor %}
-                </ul>
-            </fieldset>
-            {% regroup devices_list|dictsort:"room" by room as rooms %}
-            {% for room in rooms %}
-            <fieldset class="areadrop">
-                <legend id="room{{ room.grouper.id }}h" class="choice">{{ room.grouper.name }}</legend>
-                <ul id="room{{ room.grouper.id }}" class="draggables">
-                    {% for device in room.list %}
-                    <li class="draggable" title="{{ device.technology.name }}.{{device.address }}">{{ device.name }}<span class="description">{{ device.description }}</span></li>
-                    {% empty %}
-                    <li class="empty">Vide</li>
-                    {% endfor %}
-                </ul>
-            </fieldset>
             {% endfor %}
-          </div>
+        </div>
     </div>
-</div>
-<div class="nocolumns"> {% regroup devices_list|dictsort:"room" by room as rooms_list %}
-    {% for room in rooms_list %}
-    <div class="element">
-        <h2>{{ room.grouper.name }}</h2>
-        <table class="devices-list">
-            <thead>
-                <tr>
-                    <th>Nom</th>
-                    <th>Adresse</th>
-                    <th>Référence</th>
-                    <th>Type</th>
-                    <th>Description</th>
-                    <th>Technologie</th>
-                    <th>Usage</th>
-                    <th>Reinitialisable</th>
-                    <th>Modifiable</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-
-            {% for device in room.list %}
-            <tr class="{% cycle odd,even %}">
-                <td>{{device.name}}</td>
-                <td>{{device.address}}</td>
-                <td>{{device.reference}}</td>
-                <td>{{device.type}}</td>
-                <td>{{device.description}}</td>
-                <td>{{device.technology.name}}</td>
-                <td>{{device.usage.name}}</td>
-                <td>{{device.is_resetable}}</td>
-                <td>{{device.is_value_changeable_by_user}}</td>
-                <td><ul class="actions">
-                        <li><a href="#" class="buttonsmall">Effacer</a></li>
-                        <li><a href="#" class="buttonsmall">Modifier</a></li>
-                    </ul></td>
-            </tr>
-            {% endfor %}
-            </tbody>
-
-        </table>
-    </div>
-    {% endfor %} </div>
 {% endblock %}

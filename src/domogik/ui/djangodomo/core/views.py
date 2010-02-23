@@ -307,22 +307,24 @@ def admin_organization_devices(request):
     if not __is_user_admin(request):
         return index(request)
 
-    rooms_list = __db.list_rooms()
-    device_usage_list = __db.list_device_usages()
+#    rooms_list = __db.list_rooms()
+#    device_usage_list = __db.list_device_usages()
     devices_list = __db.list_devices()
-    device_tech_list = __db.list_device_technologies()
-    resultAllModules = Modules.getAll()
+    resultAllDevices = Devices.getAll()
+#    device_tech_list = __db.list_device_technologies()
+    
+ #   resultAllModules = Modules.getAll()
     page_title = _("Devices organization")
     return __go_to_page(
         request, 'admin/organization/devices.html',
         page_title,
         nav1_admin = "selected",
         nav2_organization_devices = "selected",
-        modules_list=resultAllModules.module,
-        device_usage_list=device_usage_list,
-        rooms_list=rooms_list,
-        devices_list=devices_list,
-        device_tech_list=device_tech_list
+        modules_list=None, #resultAllModules.module,
+ #       device_usage_list=device_usage_list,
+ #       rooms_list=rooms_list,
+        devices_list=resultAllDevices.device,
+ #       device_tech_list=device_tech_list
     )
 
 def admin_organization_rooms(request):
@@ -342,14 +344,14 @@ def admin_organization_rooms(request):
     resultUnattribuedRooms = Rooms.getWithoutArea()
     resultAllAreas = Areas.getAllWithRooms()
     resultAllAreas.merge_uiconfig()
-    resultAllModules = Modules.getAll()
+#    resultAllModules = Modules.getAll()
     page_title = _("Room organization")
     return __go_to_page(
         request, 'admin/organization/rooms.html',
         page_title,
         nav1_admin = "selected",
         nav2_organization_rooms = "selected",
-        modules_list=resultAllModules.module,
+#        modules_list=resultAllModules.module,
         status=status,
         msg=msg,
         unattribued_rooms=resultUnattribuedRooms.room,
@@ -371,14 +373,14 @@ def admin_organization_areas(request):
 
     resultAllAreas = Areas.getAll()
     resultAllAreas.merge_uiconfig()
-    resultAllModules = Modules.getAll()
+#    resultAllModules = Modules.getAll()
     page_title = _("Area organization")
     return __go_to_page(
         request, 'admin/organization/areas.html',
         page_title,
         nav1_admin = "selected",
         nav2_organization_areas = "selected",
-        modules_list=resultAllModules.module,
+#        modules_list=resultAllModules.module,
         status=status,
         msg=msg,
         areas_list=resultAllAreas.area

@@ -51,7 +51,7 @@
             <ul>
                 <li><a href="{% url admin_organization_areas_view %}" class='{{ nav2_organization_areas }}'>{% trans "Areas" %}</a></li>
                 <li><a href="{% url admin_organization_rooms_view %}" class='{{ nav2_organization_rooms }}'>{% trans "Rooms" %}</a></li>
-                <!--li><a href="{% url admin_organization_devices_view %}" class='{{ nav2_organization_devices }}'>{% trans "Devices" %}</a></li-->
+                <!--in_organization_devices_view %}" class='{{ nav2_organization_devices }}'>{% trans "Devices" %}</a></li-->
             </ul>
             <div class="subnav2"><a href="#">{% trans "Management" %}</a></div>
             <ul>
@@ -59,6 +59,7 @@
             </ul>
             <div class="subnav2"><a href="#">{% trans "Modules" %}</a></div>
             <ul>
+                {% comment %}
                 {% spaceless %}
                 {% for menu_module in modules_list %}
                     <li><a href="{% url admin_modules_module_view menu_module.name %}" class="icon16-module-{{ menu_module.name }} {% ifequal menu_module.name module.name %}{{ nav2_modules_module }}{% endifequal %}">{{ menu_module.name }}
@@ -70,6 +71,7 @@
                     </a></li>
                 {% endfor %}
                 {% endspaceless %}
+                {% endcomment %}
             </ul>
         </div>
     </div>
