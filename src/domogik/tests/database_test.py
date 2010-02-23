@@ -342,19 +342,13 @@ class RoomTestCase(GenericTestCase):
                                        dty_description='desc1', dt_id=dt1.id)
         device1 = self.db.add_device(d_name='Toaster', d_address='A1',
                     d_type_id=dty1.id, d_usage_id=du1.id,
-                    d_room_id=room1.id, d_description='My new toaster',
-                    d_is_resetable=True,
-                    d_is_value_changeable_by_user = False)
+                    d_room_id=room1.id, d_description='My new toaster')
         device2 = self.db.add_device(d_name='Washing machine', d_address='A1',
                     d_type_id=dty1.id, d_usage_id=du1.id,
-                    d_room_id=room1.id, d_description='Laden',
-                    d_is_resetable=True,
-                    d_is_value_changeable_by_user = False)
+                    d_room_id=room1.id, d_description='Laden')
         device3 = self.db.add_device(d_name='Mixer', d_address='A2',
                     d_type_id=dty1.id, d_usage_id=du1.id,
-                    d_room_id=room2.id, d_description='Moulinex',
-                    d_is_resetable=True,
-                    d_is_value_changeable_by_user = False)
+                    d_room_id=room2.id, d_description='Moulinex')
         for room in self.db.list_rooms_with_devices():
             if room.id == room1.id:
                 assert len(room.Device) == 2
@@ -894,47 +888,30 @@ class DeviceTestCase(GenericTestCase):
         try:
             self.db.add_device(d_name='device1', d_address = 'A1',
                     d_type_id = 9999999999, d_usage_id = du1.id,
-                    d_room_id = room1.id, d_description = 'desc1',
-                    d_is_resetable = True, d_initial_value = 30,
-                    d_is_value_changeable_by_user = False,
-                        d_unit_of_stored_values = u'Percent')
+                    d_room_id = room1.id, d_description = 'desc1')
             TestCase.fail(self, "Device type does not exist, \
                                  an exception should have been raised")
             self.db.add_device(d_name='device1', d_address = 'A1',
                     d_type_id = dty1.id, d_usage_id = 9999999999999,
-                    d_room_id = room1.id, d_description = 'desc1',
-                    d_is_resetable = True, d_initial_value = 30,
-                    d_is_value_changeable_by_user = False,
-                    d_unit_of_stored_values = u'Percent')
+                    d_room_id = room1.id, d_description = 'desc1')
             TestCase.fail(self, "Device usage does not exist, \
                                  an exception should have been raised")
             self.db.add_device(d_name='device1', d_address = 'A1',
                     d_type_id = dty1.id, d_usage_id = du1.id,
-                    d_room_id = 9999999999999, d_description = 'desc1',
-                    d_is_resetable = True, d_initial_value = 30,
-                    d_is_value_changeable_by_user = False,
-                    d_unit_of_stored_values = u'Percent')
+                    d_room_id = 9999999999999, d_description = 'desc1')
             TestCase.fail(self, "Room does not exist, \
                                  an exception should have been raised")
         except DbHelperException:
             pass
         device1 = self.db.add_device(d_name='device1', d_address = 'A1',
                     d_type_id = dty1.id, d_usage_id = du1.id,
-                    d_room_id = room1.id, d_description = 'desc1',
-                    d_is_resetable = True, d_initial_value = 30,
-                    d_is_value_changeable_by_user = False,
-                    d_unit_of_stored_values = u'Percent')
+                    d_room_id = room1.id, d_description = 'desc1')
         print device1
         assert len(self.db.list_devices()) == 1, "Device was NOT added"
         device2 = self.db.add_device(d_name='device2', d_address = 'A2',
                     d_type_id = dty1.id, d_usage_id = du1.id,
-                    d_room_id = room1.id, d_description = 'desc1',
-                    d_is_resetable = None, d_initial_value = 30,
-                    d_is_value_changeable_by_user = None,
-                    d_unit_of_stored_values = u'Percent')
+                    d_room_id = room1.id, d_description = 'desc1')
         assert len(self.db.list_devices()) == 2
-        assert not device2.is_resetable
-        assert not device2.is_value_changeable_by_user
         # TODO see if these methods are still used
         # assert device1.is_lamp(), "device1.is_lamp() returns False.
         # Should have returned True"
@@ -954,19 +931,13 @@ class DeviceTestCase(GenericTestCase):
                                        dty_description='Another beautiful switch')
         device1 = self.db.add_device(d_name='Toaster', d_address='A1',
                     d_type_id=dty1.id, d_usage_id=du1.id,
-                    d_room_id=room1.id, d_description='My new toaster',
-                    d_is_resetable=True,
-                    d_is_value_changeable_by_user = False)
+                    d_room_id=room1.id, d_description='My new toaster')
         device2 = self.db.add_device(d_name='Washing machine', d_address='A1',
                     d_type_id=dty2.id, d_usage_id=du1.id,
-                    d_room_id=room1.id, d_description='Laden',
-                    d_is_resetable=True,
-                    d_is_value_changeable_by_user = False)
+                    d_room_id=room1.id, d_description='Laden')
         device3 = self.db.add_device(d_name='Mixer', d_address='A2',
                     d_type_id=dty2.id, d_usage_id=du1.id,
-                    d_room_id=room1.id, d_description='Moulinex',
-                    d_is_resetable=True,
-                    d_is_value_changeable_by_user = False)
+                    d_room_id=room1.id, d_description='Moulinex')
         search_dev1 =self.db.get_device_by_technology_and_address(dt1.name, 'A1')
         assert search_dev1.name == 'Toaster'
         search_dev2 =self.db.get_device_by_technology_and_address(dt1.name, 'A2')
@@ -981,10 +952,7 @@ class DeviceTestCase(GenericTestCase):
         du1 = self.db.add_device_usage('du1')
         device1 = self.db.add_device(d_name='device1', d_address = 'A1',
                     d_type_id = dty1.id, d_usage_id = du1.id,
-                    d_room_id = room1.id, d_description = 'desc1',
-                    d_is_resetable = True, d_initial_value = 30,
-                    d_is_value_changeable_by_user = False,
-                    d_unit_of_stored_values = u'Percent')
+                    d_room_id = room1.id, d_description = 'desc1')
         device_id = device1.id
         try:
             self.db.update_device(d_id = device1.id, d_type_id = 9999999999)
@@ -1018,10 +986,7 @@ class DeviceTestCase(GenericTestCase):
         du2 = self.db.add_device_usage('du2')
         device1 = self.db.add_device(d_name='device1', d_address = 'A1',
                     d_type_id = dty1.id, d_usage_id = du1.id,
-                    d_room_id = room1.id, d_description = 'desc1',
-                    d_is_resetable = True, d_initial_value = 30,
-                    d_is_value_changeable_by_user = False,
-                    d_unit_of_stored_values = u'Percent')
+                    d_room_id = room1.id, d_description = 'desc1')
         device2 = self.db.add_device(d_name='device2', d_address='A2',
                     d_type_id = dty2.id, d_usage_id=du1.id, d_room_id=room1.id)
         device3 = self.db.add_device(d_name='device3', d_address='A3',
@@ -1060,10 +1025,7 @@ class DeviceTestCase(GenericTestCase):
         du2 = self.db.add_device_usage('du2')
         device1 = self.db.add_device(d_name='device1', d_address = 'A1',
                     d_type_id = dty1.id, d_usage_id = du1.id,
-                    d_room_id = room1.id, d_description = 'desc1',
-                    d_is_resetable = True, d_initial_value = 30,
-                    d_is_value_changeable_by_user = False,
-                    d_unit_of_stored_values = u'Percent')
+                    d_room_id = room1.id, d_description = 'desc1')
         device2 = self.db.add_device(d_name='device2', d_address='A2',
                     d_type_id = dty1.id, d_usage_id=du1.id, d_room_id=room1.id)
         device3 = self.db.add_device(d_name='device3', d_address='A3',
@@ -1144,7 +1106,8 @@ class DeviceStatsTestCase(GenericTestCase):
         area1 = self.db.add_area('area1','description 1')
         room1 = self.db.add_room('room1', area1.id)
         device1 = self.db.add_device(d_name='device1', d_address = "A1",
-                    d_type_id = dty1.id, d_usage_id = du1.id, d_room_id = room1.id)
+                                     d_type_id = dty1.id, d_usage_id = du1.id,
+                                     d_room_id = room1.id)
         now = datetime.datetime.now()
         d_stat1_1 = self.db.add_device_stat(device1.id, now,
                                             {'val1': '10', 'val2': '10.5' })
