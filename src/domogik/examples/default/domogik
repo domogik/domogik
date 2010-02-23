@@ -3,5 +3,6 @@
 #Start domogik daemon under this user
 USER=domogik
 
-
+#Set to 1 if the database manager should be started on this host
+START_DB=1
 
