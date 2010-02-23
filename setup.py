@@ -70,8 +70,8 @@ setup(
         'domogik.ui.djangodomo': ['locale/*.po', 'locale/*.mo'],
                 'domogik.ui.djangodomo.core': rec_glob_get_files('src/domogik/ui/djangodomo/core/templates/'),
         },
-    data_files = [('share/domogik/listeners/', rec_glob_get_files('src/data/xml/')),
-        ('share/domogik/rest/', rec_glob_get_files('src/domogik/xpl/xml/')),
+    data_files = [('share/domogik/listeners/', rec_glob_get_files('src/share/domogik/listeners/')),
+        ('share/domogik/rest/', rec_glob_get_files('src/share/domogik/rest/')),
         ('share/doc/schemas', rec_glob_get_files('src/domogik/xpl/schema/')),
         ('bin/', ['src/domogik/xpl/tools/xPL_Hub']),
         ('/etc/init.d/', ['src/domogik/init/domogik']),
@@ -80,8 +80,6 @@ setup(
     entry_points = {
         'console_scripts': [
             """
-            dmgstart = domogik.bin.dmgstart:main
-            generate_config = domogik.bin.generate_config:main
             dmg_manager = domogik.bin.manager:main
             django = domogik.ui.djangodomo.manage:run_manager
             """

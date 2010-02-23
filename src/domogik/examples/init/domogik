@@ -1,39 +1,141 @@
-#!/bin/sh    
+#!/bin/bash
+#
+#This file is part of B{Domogik} project (U{http://www.domogik.org}).
+#
+#License
+#=======
+#
+#B{Domogik} is free software: you can redistribute it and/or modify
+#it under the terms of the GNU General Public License as published by
+#the Free Software Foundation, either version 3 of the License, or
+#(at your option) any later version.
+#
+#B{Domogik} is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#GNU General Public License for more details.
+#
+#You should have received a copy of the GNU General Public License
+#along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-PATH=/sbin:/bin:/usr/sbin:/usr/bin
+# source application-specific settings
+[ -f /etc/conf.d/domogik ] && . /etc/conf.d/domogik
+[ -f /etc/default/domogik ] && . /etc/default/domogik
 
-. /etc/default/domogik
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:
 
-USER=${USER:-domogik}
+function start_django {
+    echo -n " * Starting Django..."
+    /bin/su - ${DOMOGIK_USER} -c "django runserver 2>/dev/null 1>&2 &"
+    if [ $? -gt 0 ]; then
+        echo " An error occured during Django startup."
+        exit 1
+    else
+        echo " Done."
+    fi
+}
+function start_xpl {
+    echo -n "* Starting XPL..."
+    /bin/su - ${DOMOGIK_USER} -c "xPL_Hub -interface lo 2>/dev/null 1>&2"
+    if [ $? -gt 0 ]; then
+        echo " An error occured during Xpl startup."
+        exit 1
+    else
+        echo " Done."
+    fi
+}
+function start_manager {
+    ATTRS=""
+    if [ $START_DB -eq 1 ];then
+        ATTRS+="database_manager"
+    fi
+    if [ $START_REST -eq 1 ];then
+        ATTRS+=" rest"
+    fi
+    echo -n "* Starting Manager (with $ATTRS)..."
+    /bin/su - ${DOMOGIK_USER} -c "dmg_manager $ATTRS 2>/dev/null 1>&2 &"
+    if [ $? -gt 0 ]; then
+        echo " Done."
+        exit 0
+    else
+        echo " An error occured during manager startup."
+        exit 1
+    fi
+}
 
-pidfile=/var/run/domogik.pid
+function stop_django {
+    for pid in `ps ax | grep "manage.py runserver" | grep -v grep | awk '{print $1}'`; do
+        kill -15 $pid 2>/dev/null 1>&2
+    done
+}
 
+    
 case "$1" in
     start)
-        echo -n "Starting domogik manager"
-        start-stop-daemon -S -p ${pidfile} -c $USER -b -m -x $(which dmg_manager)
-        echo "."    
+    if [ $# -eq 1 ];then
+        start_django
+        start_xpl
+        start_manager 
+    else;
+        case "$2" in
+            django)
+            start_django
+            ;;
+            xpl)
+            start_xpl
+            ;;
+            manager)
+            start_manager
+            ;;
+        esac
+    fi
+    
     ;;
-
     stop)
-        echo -n "Stopping domogik manager"
-        start-stop-daemon --stop -p ${pidfile} -u $USER -x /usr/bin/python
-        echo "."    
+    if [ $# -eq 1 ];then
+        stop_django
+        stop_xpl
+        stop_manager 
+    else;
+        case "$2" in
+            django)
+            stop_django
+            ;;
+            xpl)
+            stop_xpl
+            ;;
+            manager)
+            stop_manager
+            ;;
+        esac
+    fi
+    stat_done
+    
+    stat_busy "Stopping XPL"
+    for pid in `ps ax | grep "xPL_Hub" | grep -v grep | awk '{print $1}'`; do
+        kill -9 $pid 2>/dev/null 1>&2
+    done
+    stat_done
+    
+    stat_busy "Stopping REST"
+    for pid in `ps ax | grep "rest.py" | grep -v grep | awk '{print $1}'`; do
+        kill -9 $pid 2>/dev/null 1>&2
+    done
+    stat_done
+    
+    
+    rm_daemon domogik
     ;;
-
     restart)
-        $0 stop
-        $0 start
+    $0 stop
+    sleep 2
+    $0 start
     ;;
-
-    force-reload)
-        $0 restart
-    ;;
-
     *)
-        echo "Usage: $0 {start|stop|restart|force-reload}" >&2
-        exit 1
-    ;;
+    echo "usage: $0 {start|stop|restart}"
 esac
-
 exit 0
+
+
+DOMOGIK_PATH="/home/domogik/bin"
+

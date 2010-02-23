@@ -1,8 +1,11 @@
 # This file define config parameters for domogik 
 
 #Start domogik daemon under this user
-USER=domogik
+DOMOGIK_USER=domogik
 
 #Set to 1 if the database manager should be started on this host
 START_DB=1
+
+#Set to 1 if the web server which is used for IHMs should be started on this host
+START_REST=1
 
