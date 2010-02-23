@@ -55,8 +55,7 @@ from domogik.common.sql_schema import ActuatorFeature, Area, Device, DeviceUsage
                                       DeviceType, UIItemConfig, Room, Person, \
                                       SensorReferenceData, UserAccount, SystemConfig, \
                                       SystemStats, SystemStatsValue, Trigger
-from domogik.common.sql_schema import DEVICE_TECHNOLOGY_LIST, \
-                                      UNIT_OF_STORED_VALUE_LIST
+from domogik.common.sql_schema import DEVICE_TECHNOLOGY_LIST
 
 
 class DbHelperException(Exception):
@@ -1159,9 +1158,7 @@ class DbHelper():
         return self._session.query(Device).filter_by(technology_id=dt_id).all()
 
     def add_device(self, d_name, d_address, d_type_id, d_usage_id, d_room_id,
-        d_description=None, d_reference=None, d_is_resetable=False,
-        d_initial_value=None, d_is_value_changeable_by_user=False,
-        d_unit_of_stored_values=None):
+        d_description=None, d_reference=None):
         """
         Add a device item
         @param d_name : name of the device
@@ -1171,16 +1168,8 @@ class DbHelper():
         @param d_room_id : room id
         @param d_description : Extended item description (100 char max)
         @param d_reference : device reference (ex. AM12 for x10)
-        @param d_is_resetable : Can the item be reseted to some initial state, optional, default=False. If None value is passed then it is automatically set to False.
-        @param d_initial_value : What's the initial value of the item, should be
-            the state when the item is created (except for sensors, music) (optional, default=None)
-        @param d_is_value_changeable_by_user : Can a user change item state (ex : false for sensor), optional, default=False. If None value is passed then it is automatically set to False.
-        @param d_unit_of_stored_values : What is the unit of item values,
-                must be one of 'Volt', 'Celsius', 'Fahrenheit', 'Percent', 'Boolean' (optional, default=None)
         @return the new Device object
         """
-        if d_unit_of_stored_values not in UNIT_OF_STORED_VALUE_LIST:
-            raise ValueError, "d_unit_of_stored_values must be one of %s" % UNIT_OF_STORED_VALUE_LIST
         try:
             self._session.query(DeviceType).filter_by(id=d_type_id).one()
         except NoResultFound:
@@ -1196,16 +1185,9 @@ class DbHelper():
         except NoResultFound:
             raise DbHelperException("Couldn't add device with room id %s \
                                     It does not exist" % d_room_id)
-        if d_is_resetable == None:
-            d_is_resetable = False
-        if d_is_value_changeable_by_user == None:
-            d_is_value_changeable_by_user = False
         device = Device(name=d_name, address=d_address, description=d_description,
                         reference=d_reference, type_id=d_type_id,
-                        usage_id=d_usage_id, room_id=d_room_id,
-                        is_resetable=d_is_resetable, initial_value=d_initial_value,
-                        is_value_changeable_by_user=d_is_value_changeable_by_user,
-                        unit_of_stored_values=d_unit_of_stored_values)
+                        usage_id=d_usage_id, room_id=d_room_id)
         self._session.add(device)
         try:
             self._session.commit()
@@ -1216,8 +1198,7 @@ class DbHelper():
 
     def update_device(self, d_id, d_name=None, d_address=None,
         d_type_id=None, d_usage_id=None, d_room_id=None, d_description=None,
-        d_reference=None, d_is_resetable=None, d_initial_value=None,
-        d_is_value_changeable_by_user=None, d_unit_of_stored_values=None):
+        d_reference=None):
         """
         Update a device item
         If a param is None, then the old value will be kept
@@ -1228,16 +1209,8 @@ class DbHelper():
         @param d_type_id : type id (x10.Switch, x10.Dimmer, Computer.WOL...)
         @param d_usage : Item usage id (optional)
         @param d_room : Item room id (optional)
-        @param d_is_resetable : Can the item be reseted to some initial state (optional)
-        @param d_initial_value : What's the initial value of the item, should be
-            the state when the item is created (except for sensors, music) (optional)
-        @param d_is_value_changeable_by_user : Can a user change item state (ex : false for sensor) (optional)
-        @param d_unit_of_stored_values : What is the unit of item values,
-            must be one of 'Volt', 'Celsius', 'Fahrenheit', 'Percent', 'Boolean' (optional)
         @return the updated Device object
         """
-        if d_unit_of_stored_values not in [UNIT_OF_STORED_VALUE_LIST, None]:
-            raise ValueError, "d_unit_of_stored_values must be one of %s" % UNIT_OF_STORED_VALUE_LIST
         device = self._session.query(Device).filter_by(id=d_id).first()
         if device is None:
             raise DbHelperException("Device with id %s couldn't be found" % d_id)
@@ -1270,15 +1243,6 @@ class DbHelper():
             except NoResultFound:
                 raise DbHelperException("Couldn't find room \
                                         id %s. It does not exist" % d_room_id)
-        if d_is_resetable is not None:
-            device.is_resetable = d_is_resetable
-        if d_initial_value is not None:
-            device.initial_value = d_initial_value
-        if d_is_value_changeable_by_user is not None:
-            device.is_value_changeable_by_user = d_is_value_changeable_by_user
-        if d_unit_of_stored_values is not None:
-            device.unit_of_stored_values = d_unit_of_stored_values
-
         self._session.add(device)
         try:
             self._session.commit()

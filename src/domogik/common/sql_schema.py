@@ -55,7 +55,6 @@ from sqlalchemy.orm import relation, backref
 
 from domogik.common.configloader import Loader
 
-UNIT_OF_STORED_VALUE_LIST = [u'Volt', u'Celsius', u'Farenheit', u'Percent', u'Boolean', None]
 DEVICE_TECHNOLOGY_LIST = [u'x10',u'1wire',u'PLCBus',u'RFXCom',u'IR',u'EIB/KNX', u'Computer']
 DEVICE_TYPE_LIST = [u'appliance', u'lamp', u'music', u'sensor']
 ITEM_TYPE_LIST = [u'area', u'room', u'device']
@@ -456,15 +455,10 @@ class Device(Base):
     type = relation(DeviceType, backref=backref(__tablename__))
     room_id = Column(Integer, ForeignKey('%s.id' % Room.get_tablename()))
     room = relation(Room, backref=backref(__tablename__))
-    is_resetable = Column(Boolean, nullable=False)
-    initial_value = Column(String(10))
-    is_value_changeable_by_user = Column(Boolean, nullable=False)
-    unit_of_stored_values = Column(Enum(UNIT_OF_STORED_VALUE_LIST))
     _stats = relation("DeviceStats", order_by="DeviceStats.date.desc()", backref=__tablename__)
 
-    def __init__(self, name, address, description, reference, usage_id, type_id,\
-        room_id, is_resetable, initial_value, is_value_changeable_by_user, \
-        unit_of_stored_values):
+    def __init__(self, name, address, description, reference, usage_id, type_id,
+                 room_id):
         """
         Class constructor
         @param name : short name of the device
@@ -474,11 +468,6 @@ class Device(Base):
         @param usage_id : link to the device usage
         @param type_id : 'link to the device type (x10.Switch, x10.Dimmer, Computer.WOL...)
         @param room_id : link to the room where the device is
-        @param is_resetable : True if a default value can be set to the device
-        @param initial_value : initial value set to the device when it is switched on
-        @param is_value_changeable_by_user : True if the user can set a value to the device
-        @param unit_of_stored_values : unit associated to the value
-                                       (Volt, Celsius, Farenheit, Percent, Boolean)
         """
         self.name = name
         self.address = address
@@ -487,10 +476,6 @@ class Device(Base):
         self.type_id = type_id
         self.usage_id = usage_id
         self.room_id = room_id
-        self.is_resetable = is_resetable
-        self.initial_value = initial_value
-        self.is_value_changeable_by_user = is_value_changeable_by_user
-        self.unit_of_stored_values = unit_of_stored_values
 
     # TODO see if following methods are still useful
     def is_lamp(self):
@@ -522,10 +507,9 @@ class Device(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<Device(id=%s, name='%s', addr='%s', desc='%s', ref='%s', type='%s', usage=%s, room=%s, is_reset='%s', initial_val='%s', is_value_change='%s', unit='%s')>" \
-               % (self.id, self.name, self.address, self.description, self.reference, \
-               self.type, self.usage, self.room, self.is_resetable, self.initial_value,\
-               self.is_value_changeable_by_user, self.unit_of_stored_values)
+        return "<Device(id=%s, name='%s', addr='%s', desc='%s', ref='%s', type='%s', usage=%s, room=%s)>" \
+               % (self.id, self.name, self.address, self.description, \
+                  self.reference, self.type, self.usage, self.room)
 
     @staticmethod
     def get_tablename():
