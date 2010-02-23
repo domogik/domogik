@@ -1877,15 +1877,33 @@ target=*
                                          self.get_parameters("usage_id"), \
                                          self.get_parameters("room_id"), \
                                          self.get_parameters("description"), \
-                                         self.get_parameters("reference"), \
-                                         self.get_parameters("is_resetable"), \
-                                         self.get_parameters("initial_value"), \
-                                         self.get_parameters("is_value_changeable_by_user"), \
-                                         self.get_parameters("unit_of_stored_values"))
+                                         self.get_parameters("reference"))
             json_data.add_data(device)
         except:
             json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
         self.send_http_response_ok(json_data.get())
+
+
+    def _rest_base_device_update(self):
+        """ update devices
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("device")
+        try:
+            device = self._db.update_device(self.get_parameters("id"), \
+                                         self.get_parameters("name"), \
+                                         self.get_parameters("address"), \
+                                         self.get_parameters("type_id"), \
+                                         self.get_parameters("usage_id"), \
+                                         self.get_parameters("room_id"), \
+                                         self.get_parameters("description"), \
+                                         self.get_parameters("reference"))
+            json_data.add_data(device)
+        except:
+            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+        self.send_http_response_ok(json_data.get())
+
 
 
 
