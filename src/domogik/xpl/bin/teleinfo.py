@@ -42,6 +42,16 @@ from domogik.xpl.lib.queryconfig import Query
 
 IS_DOMOGIK_MODULE = True
 DOMOGIK_MODULE_DESCRIPTION = "Get power consumption with teleinfo"
+DOMOGIK_MODULE_CONFIGURATION=[
+      {"id" : 0,
+       "key" : "device",
+       "description" : "Teleinfo device (ex : /dev/ttyUSB0 for an usb model)",
+       "default" : "/dev/ttyUSB0"},
+      {"id" : 1,
+       "key" : "interval",
+       "description" : "Interval between each request (seconds)",
+       "default" : 60}]
+
 
 
 class TeleinfoManager(xPLModule):
