@@ -90,7 +90,7 @@ echo "...ok"
 echo ""
 echo ""
 echo "Starting REST module..."
-nohup ../../domogik/xpl/lib/rest.py > /tmp/demo.log &
+nohup ../../domogik/xpl/bin/rest.py > /tmp/demo.log &
 sleep 10
 if [[ $? -ne 0 ]] ; then
     echo "Error... exiting."
