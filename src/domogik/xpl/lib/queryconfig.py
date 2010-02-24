@@ -79,7 +79,12 @@ class Query():
             mess.add_data({'element': element})
         mess.add_data({'key': key})
         self.__myxpl.send(mess)
-        self._keys[key].get_lock().wait()
+        #the key may already be removed if the network is really fast
+        if key in self._keys:
+            try:
+                self._keys[key].get_lock().wait()
+            except KeyError:
+                pass
         print "finish query"
 
     def _query_cb(self, message):
