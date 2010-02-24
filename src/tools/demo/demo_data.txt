@@ -5,7 +5,7 @@
 # room : id 2
 /base/room/add/name/Salon/area_id/1
 # device : id 1
-/base/device/add/name/Lampe/address/A1/type_id/1/usage_id/1/room_id/2/description/Lampe%20murale/reference/AM12/is_resetable/True/initial_value/0/value_changeable_by_user/True/unit_of_stored_values/Boolean
+/base/device/add/name/Lampe/address/A1/type_id/1/usage_id/1/room_id/2/description/Lampe%20murale/reference/AM12
 
 # room : id 3
 /base/room/add/name/Sejour/area_id/1

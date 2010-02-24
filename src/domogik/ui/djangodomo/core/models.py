@@ -115,7 +115,7 @@ class Rooms(pipes.DmgPipe):
                     room.area.config[uiconfig.key] = uiconfig.value
 
 class Devices(pipes.DmgPipe):
-    uri = "http://127.0.0.1:8080/device"
+    uri = "http://127.0.0.1:8080/base/device"
 
     @staticmethod
     def getAll():
