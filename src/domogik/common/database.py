@@ -212,6 +212,7 @@ class DbHelper():
         if a_name is not None:
             area.name = a_name
         if a_description is not None:
+            if a_description == '': a_description = None
             area.description = a_description
         self._session.add(area)
         try:
@@ -342,13 +343,16 @@ class DbHelper():
         if r_name is not None:
             room.name = r_name
         if r_description is not None:
+            if r_description == '': r_description = None
             room.description = r_description
         if r_area_id is not None:
-            try:
-                self._session.query(Area).filter_by(id=r_area_id).one()
-            except NoResultFound:
-                raise DbHelperException("Couldn't find area id %s. \
-                                        It does not exist" % r_area_id)
+            if r_area_id != '':
+                try:
+                    self._session.query(Area).filter_by(id=r_area_id).one()
+                except NoResultFound:
+                    raise DbHelperException("Couldn't find area id %s. It does not exist" % r_area_id)
+            else:
+                r_area_id = None
             room.area_id = r_area_id
         self._session.add(room)
         try:
@@ -442,6 +446,7 @@ class DbHelper():
         if du_name is not None:
             device_usage.name = du_name
         if du_description is not None:
+            if du_description == '': du_description = None
             device_usage.description = du_description
         self._session.add(device_usage)
         try:
@@ -544,11 +549,11 @@ class DbHelper():
             try:
                 self._session.query(DeviceTechnology).filter_by(id=dt_id).one()
             except NoResultFound:
-                raise DbHelperException("Couldn't find technology id %s. \
-                                        It does not exist" % dt_id)
+                raise DbHelperException("Couldn't find technology id %s. It does not exist" % dt_id)
             device_type.technology_id = dt_id
         self._session.add(device_type)
         if dty_description is not None:
+            if dty_description == '': dty_description = None
             device_type.description = dty_description
         try:
             self._session.commit()
@@ -667,8 +672,7 @@ class DbHelper():
                            .filter_by(id=srd_id)\
                            .first()
         if srd is None:
-            raise DbHelperException("SensorReferenceData with id %s \
-                                    couldn't be found" % srd_id)
+            raise DbHelperException("SensorReferenceData with id %s couldn't be found" % srd_id)
         if srd_name is not None:
             srd.name = srd_name
         if srd_value is not None:
@@ -677,12 +681,13 @@ class DbHelper():
             try:
                 self._session.query(DeviceType).filter_by(id=dty_id).one()
             except NoResultFound:
-                raise DbHelperException("Couldn't find device type id %s. \
-                                        It does not exist" % dty_id)
+                raise DbHelperException("Couldn't find device type id %s. It does not exist" % dty_id)
             srd.device_type_id = dty_id
         if srd_unit is not None:
+            if srd_unit == '': srd_unit = None
             srd.unit = srd_unit
         if srd_stat_key is not None:
+            if srd_stat_key == '': srd_stat_key = None
             srd.stat_key = srd_stat_key
         self._session.add(srd)
         try:
@@ -789,17 +794,19 @@ class DbHelper():
         if af_name is not None:
             af.name = af_name
         if af_value is not None:
+            if af_value == '': af_value = None
             af.value = af_value
         if dty_id is not None:
             try:
                 self._session.query(DeviceType).filter_by(id=dty_id).one()
             except NoResultFound:
-                raise DbHelperException("Couldn't find device type id %s. \
-                                        It does not exist" % dty_id)
+                raise DbHelperException("Couldn't find device type id %s. It does not exist" % dty_id)
             af.device_type_id = dty_id
         if af_unit is not None:
+            if af_unit == '': af_unit = None
             af.unit = af_unit
         if af_configurable_states is not None:
+            if af_configurable_states == '': af_configurable_states = None
             af.configurable_states = af_configurable_states
         if af_return_confirmation is not None:
             af.return_confirmation = af_return_confirmation
@@ -880,11 +887,11 @@ class DbHelper():
                                    .filter_by(id=dt_id)\
                                    .first()
         if device_tech is None:
-            raise DbHelperException("DeviceTechnology with id %s \
-                                    couldn't be found" % dt_id)
+            raise DbHelperException("DeviceTechnology with id %s couldn't be found" % dt_id)
         if dt_name is not None:
             device_tech.name = dt_name
         if dt_description is not None:
+            if dt_description == '': dt_description = None
             device_tech.description = dt_description
         self._session.add(device_tech)
         try:
@@ -1004,20 +1011,19 @@ class DbHelper():
         """
         dtc = self._session.query(DeviceTechnologyConfig).filter_by(id=dtc_id).first()
         if dtc is None:
-            raise DbHelperException("DeviceTypeConfig with id %s couldn't \
-                                    be found" % dtc_id)
+            raise DbHelperException("DeviceTypeConfig with id %s couldn't be found" % dtc_id)
         if dt_id is not None:
             try:
                 self._session.query(DeviceTechnology).filter_by(id=dt_id).one()
             except NoResultFound:
-                raise DbHelperException("Couldn't find device technology id %s. \
-                                        It does not exist" % dt_id)
+                raise DbHelperException("Couldn't find device technology id %s. It does not exist" % dt_id)
             dtc.technology_id = dt_id
         if dtc_key is not None:
             dtc.key = dtc_key
         if dtc_value is not None:
             dtc.value = dtc_value
         if dtc_description is not None:
+            if dtc_description == '': dtc_description = None
             dtc.description = dtc_description
         self._session.add(dtc)
         try:
@@ -1196,9 +1202,9 @@ class DbHelper():
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return device
 
-    def update_device(self, d_id, d_name=None, d_address=None,
-        d_type_id=None, d_usage_id=None, d_room_id=None, d_description=None,
-        d_reference=None):
+    def update_device(self, d_id, d_name=None, d_address=None, d_type_id=None,
+            d_usage_id=None, d_room_id=None, d_description=None,
+            d_reference=None):
         """
         Update a device item
         If a param is None, then the old value will be kept
@@ -1219,30 +1225,32 @@ class DbHelper():
         if d_address is not None:
             device.address = d_address
         if d_description is not None:
+            if d_description == '': d_description = None
             device.description = d_description
         if d_reference is not None:
+            if d_reference == '': d_reference = None
             device.reference = d_reference
         if d_type_id is not None:
             try:
                 self._session.query(DeviceType).filter_by(id=d_type_id).one()
             except NoResultFound:
-                raise DbHelperException("Couldn't find device type id %s \
-                                        It does not exist" % d_type_id)
+                raise DbHelperException("Couldn't find device type id %s. It does not exist" % d_type_id)
             device.type_id = d_type_id
         if d_usage_id is not None:
-          try:
-              self._session.query(DeviceUsage).filter_by(id=d_usage_id).one()
-              device.usage = d_usage_id
-          except NoResultFound:
-              raise DbHelperException("Couldn't find device usage \
-                                      id %s. It does not exist" % d_usage_id)
-        if d_room_id is not None:
             try:
-                self._session.query(Room).filter_by(id=d_room_id).one()
-                device.room = d_room_id
+              self._session.query(DeviceUsage).filter_by(id=d_usage_id).one()
             except NoResultFound:
-                raise DbHelperException("Couldn't find room \
-                                        id %s. It does not exist" % d_room_id)
+              raise DbHelperException("Couldn't find device usage id %s. It does not exist" % d_usage_id)
+            device.usage = d_usage_id
+        if d_room_id is not None:
+            if d_room_id != '':
+                try:
+                    self._session.query(Room).filter_by(id=d_room_id).one()
+                except NoResultFound:
+                    raise DbHelperException("Couldn't find room id %s. It does not exist" % d_room_id)
+            else:
+                d_room_id = None
+            device.room = d_room_id
         self._session.add(device)
         try:
             self._session.commit()
@@ -1468,6 +1476,7 @@ class DbHelper():
         if trigger is None:
             raise DbHelperException("Trigger with id %s couldn't be found" % t_id)
         if t_description is not None:
+            if t_description == '': t_description = None
             trigger.description = t_description
         if t_rule is not None:
             trigger.rule = t_rule
@@ -1762,11 +1771,14 @@ class DbHelper():
         if p_birthdate is not None:
             person.birthdate = p_birthdate
         if p_user_account_id is not None:
-            try:
-                self._session.query(UserAccount)\
-                             .filter_by(id=p_user_account_id).one()
-            except NoResultFound:
-                raise DbHelperException("Couldn't find account id %s It does not exist" % p_user_account_id)
+            if p_user_account_id != '':
+                try:
+                    self._session.query(UserAccount)\
+                                 .filter_by(id=p_user_account_id).one()
+                except NoResultFound:
+                    raise DbHelperException("Couldn't find account id %s It does not exist" % p_user_account_id)
+            else:
+                p_user_account_id = None
             person.user_account_id = p_user_account_id
         self._session.add(person)
         try:
