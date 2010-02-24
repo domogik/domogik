@@ -300,6 +300,8 @@ class RoomTestCase(GenericTestCase):
         assert room_u.name == 'room2'
         assert room_u.description == 'description 2'
         assert room_u.area_id == area2.id
+        room_u = self.db.update_room(room.id, r_area_id='')
+        assert room_u.area_id == None
 
     def testDel(self):
         area1 = self.db.add_area('area1','description 1')
@@ -967,10 +969,15 @@ class DeviceTestCase(GenericTestCase):
         except DbHelperException:
             pass
         device1 = self.db.update_device(d_id = device1.id,
-                                        d_description = 'desc2')
+                                        d_description = 'desc2', d_reference='A1')
         self.db._session.expunge(device1) # Remove object from session
         device1 = self.db.get_device(device_id)
         assert device1.description == 'desc2'
+        assert device1.reference == 'A1'
+        device1 = self.db.update_device(d_id = device1.id, d_reference='',
+                                        d_room_id='')
+        assert device1.reference == None
+        assert device1.room_id == None
 
     def testFindAndSearch(self):
         area1 = self.db.add_area('area1','description 1')
@@ -1326,11 +1333,11 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
         assert user_acc_u.is_admin == False
         person = self.db.add_person(p_first_name='Marc', p_last_name='SCHNEIDER',
                                     p_birthdate=datetime.date(1973, 4, 24),
-                                    p_user_account_id = user_acc.id)
+                                    p_user_account_id=user_acc.id)
         person_u = self.db.update_person(p_id=person.id, p_first_name='Marco',
                                          p_last_name='SCHNEIDERO',
                                          p_birthdate=datetime.date(1981, 4, 24),
-                                         p_user_account_id = user_acc_u.id)
+                                         p_user_account_id=user_acc_u.id)
         try:
             self.db.update_person(p_id=person.id,
                                   p_user_account_id=99999999999)
@@ -1342,6 +1349,8 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
         assert person_u.last_name == 'SCHNEIDERO'
         assert person_u.birthdate == datetime.date(1981, 4, 24)
         assert person_u.user_account_id == user_acc_u.id
+        person_u = self.db.update_person(p_id=person.id, p_user_account_id='')
+        assert person_u.user_account_id == None
 
     def testGet(self):
         user1 = self.db.add_user_account(a_login='mschneider',

@@ -38,11 +38,25 @@ Implements
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.lib.module import xPLModule
 from domogik.xpl.lib.module import xPLResult
-from domogik.xpl.lib.calleridmodem import CallerIdModem
+from domogik.xpl.lib.cidmodem import CallerIdModem
 from domogik.xpl.lib.queryconfig import Query
 
 IS_DOMOGIK_MODULE = True
 DOMOGIK_MODULE_DESCRIPTION = "Get caller id with a modem"
+DOMOGIK_MODULE_CONFIGURATION=[
+      {"id" : 1,
+       "name" : "device", 
+       "description" : "Modem device (ex : /dev/ttyUSB0 for an usb modem)", 
+       "default" : "/dev/ttyUSB0"},
+      {"id" : 2,
+       "name" : "nbmaxtry", 
+       "description" : "Max number of tries to open modem device",
+       "default" : 5},
+      {"id" : 3,
+       "name" : "interval", 
+       "description" : "Delay between each try to open modem device",
+       "default" : 10}]
+     
 
 
 class CallerIdModemManager(xPLModule):
@@ -58,15 +72,15 @@ class CallerIdModemManager(xPLModule):
         #   - serial port
         self._config = Query(self._myxpl)
         res = xPLResult()
-        self._config.query('calleridmodem', 'device', res)
+        self._config.query('cidmodem', 'device', res)
         device = res.get_value()['device']
         self._config = Query(self._myxpl)
         res = xPLResult()
-        self._config.query('calleridmodem', 'interval', res)
+        self._config.query('cidmodem', 'interval', res)
         interval = res.get_value()['interval']
         self._config = Query(self._myxpl)
         res = xPLResult()
-        self._config.query('calleridmodem', 'nbmaxtry', res)
+        self._config.query('cidmodem', 'nbmaxtry', res)
         nbmaxtry = res.get_value()['nbmaxtry']
         # Call Library
         self._mycalleridmodem  = CallerIdModem(device, nbmaxtry, \

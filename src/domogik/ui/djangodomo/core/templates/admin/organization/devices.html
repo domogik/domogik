@@ -20,12 +20,17 @@
 
 
 {% load i18n %}
-{% block js_script %}
-{% endblock %}
 {% block css %}
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-tables.css" rel="stylesheet" type="text/css" />
     <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/page-admin-organization.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block js_include %}
+{% endblock %}
+{% block js_script %}
+    $(function(){
+        // Accordion
+        $("#nav2").accordion({ header: ".subnav2", active:0});
+    });
 {% endblock %}
 {% block title %}{% trans page_title %}{% endblock %}
 
@@ -41,42 +46,53 @@
 
 {% block right %}
     <div class="subsection">
-        <h2>{% trans "Areas list" %}</h2>
+        <h2>{% trans "Devices list" %}</h2>
         <div id="tabs">
             {% spaceless %}
             <ul>
-                {% for area in areas_list %}
-                    <li><a id="tab{{ area.id }}" href="#element{{ area.id }}" class="icon16-area-{{ area.config.icon }}">{{ area.name }}</a></li>
+                {% regroup devices_list|dictsort:"room" by room as rooms_list %}
+                {% for room in rooms_list %}
+                    <li><a id="tab{{ room.grouper.id }}" href="#element{{ room.grouper.id }}" class="icon16-area-{{ room.grouper.config.icon }}">{{ room.grouper.name }}</a></li>
                 {% endfor %}
             </ul>
             {% endspaceless %}
             {% for area in areas_list %}
             <div id="element{{ area.id }}" class="tabelement">
-                <ul class="actions">
-                    <li><button id='del{{ area.id }}' class='icon16-action-del buttonside' title="{% trans "Delete" %} '{{ area.name }}'"><span class='offscreen'>{% trans "Delete" %} {{ area.name }}</span></button></li>
-                    <li><button id="update{{ area.id }}" class="icon16-action-update buttonside" title="{% trans "Modify" %} '{{ area.name }}'"><span class='offscreen'>{% trans "Modify" %} {{ area.name }}</span></button></li>
-                </ul>
-                <div class="content">
-                    <div id="icon{{ area.id }}"></div>
-                    <h2>{{ area.name }}</h2>
-                    <p>{{ area.description }}</p>
-                </div>
-                <div id="update_dialog_{{ area.id }}" title="{% trans "Modify" %} {{ area.name }}">
-                    <p id="validateTips{{ area.id }}">{% trans "All fields are required." %}</p>
-                    <form >
-                        <fieldset>
-                            <label class="medium" for="area{{ area.id }}-newname">{% trans "New name" %}</label>
-                            <input type="text" class="medium" id="area{{ area.id }}-newname" name="area{{ area.id }}-newname" />
-                            <label class="medium" for="area{{ area.id }}-newdescription">{% trans "New description" %}</label>
-                            <textarea type="text" class="medium" id="area{{ area.id }}-newdescription" name="area{{ area.id }}-newdescription"></textarea>
-                        </fieldset>'
-                    </form>
-                </div>
-                <div id="delete_confirmation_{{ area.id }}" title="{% trans "Delete" %} {{ area.name }}">
-                    <p>{% trans "Please confirm to delete" %} '{{ area.name }}'</p>
-                </div>
+                <table>
+                    <tr>
+                        <th>{% trans "Name" %}</th>
+                        <th>{% trans "Description" %}</th>
+                        <th>{% trans "Address" %}</th>
+                        <th>{% trans "Reference" %}</th>
+                        <th>{% trans "Usage" %}</th>
+                        <th>{% trans "Type" %}</th>
+                        <th>{% trans "Room" %}</th>
+                    </tr>
+                    {% for device in devices_list %}
+                    <tr>
+                        <td>{{ device.name }}</td>
+                        <td>{{ device.description }}</td>
+                        <td>{{ device.address }}</td>
+                        <td>{{ device.reference }}</td>
+                        <td>{{ device.usage_id }}</td>
+                        <td>{{ device.type_id }}</td>
+                        <td>{{ device.room_id }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
             </div>
             {% endfor %}
+        </div>
+        <div id="addnewdialog" title='{% trans "Create new area" %}'>
+            <p id="validateTips">{% trans "All fields are required." %}</p>
+            <form>
+                <fieldset>
+                    <label class="medium" for="new_name">{% trans "Name" %}</label>
+                    <input type="text" class="medium" id="new_name" name="new_name" />
+                    <label class="medium" for="new_description">{% trans "Description" %}</label>
+                    <textarea type="text" class="medium" id="new_description" name="new_description"></textarea>
+                </fieldset>
+            </form>
         </div>
     </div>
 {% endblock %}

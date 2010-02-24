@@ -37,7 +37,7 @@ Implements
 
 from domogik.xpl.lib.xplconnector import Listener
 from domogik.xpl.lib.module import xPLModule
-from domogik.xpl.lib.xbmcnotification import XBMCNotification
+from domogik.xpl.lib.xbmc_not import XBMCNotification
 from domogik.xpl.lib.module import xPLResult
 from domogik.xpl.lib.queryconfig import Query
 
@@ -52,22 +52,22 @@ class XBMCNotificationListener(xPLModule):
     def __init__(self):
         """ Create lister for XBMC notifications
         """
-        xPLModule.__init__(self, name = 'xbmcmsg')
+        xPLModule.__init__(self, name = 'xbmc_not')
         # Create logger
         self._log.debug("Listener for XBMC notifications created")
 
         # Get configuration
         self._config = Query(self._myxpl)
         res = xPLResult()
-        self._config.query('xbmc', 'address', res)
+        self._config.query('xbmc_not', 'address', res)
         address = res.get_value()['address']
         self._config = Query(self._myxpl)
         res = xPLResult()
-        self._config.query('xbmc', 'delay', res)
+        self._config.query('xbmc_not', 'delay', res)
         delay = res.get_value()['delay']
         self._config = Query(self._myxpl)
         res = xPLResult()
-        self._config.query('xbmc', 'maxdelay', res)
+        self._config.query('xbmc_not', 'maxdelay', res)
         maxdelay = res.get_value()['maxdelay']
 
         self._log.debug("Config : address = " + address)

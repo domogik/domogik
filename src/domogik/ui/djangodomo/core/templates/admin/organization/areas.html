@@ -21,6 +21,11 @@
 
 
 {% load i18n %}
+{% block css %}
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/page-admin-organization.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+{% block js_include %}
+{% endblock %}
 {% block js_script %}
     $(function(){
         // Accordion
@@ -98,11 +103,6 @@
             }
         });
     });
-{% endblock %}
-{% block css %}
-    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/page-admin-organization.css" rel="stylesheet" type="text/css" />
-{% endblock %}
-{% block js_include %}
 {% endblock %}
 {% block title %}{% trans page_title %}{% endblock %}
 

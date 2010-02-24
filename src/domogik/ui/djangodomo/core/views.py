@@ -318,7 +318,6 @@ def admin_organization_devices(request):
 #    rooms_list = __db.list_rooms()
 #    device_usage_list = __db.list_device_usages()
     try:
-        devices_list = __db.list_devices()
         resultAllDevices = Devices.getAll()
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
