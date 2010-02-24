@@ -58,15 +58,15 @@ class CallerIdModemManager(xPLModule):
         #   - serial port
         self._config = Query(self._myxpl)
         res = xPLResult()
-        self._config.query('calleridmodem', 'device', res)
+        self._config.query('cidmodem', 'device', res)
         device = res.get_value()['device']
         self._config = Query(self._myxpl)
         res = xPLResult()
-        self._config.query('calleridmodem', 'interval', res)
+        self._config.query('cidmodem', 'interval', res)
         interval = res.get_value()['interval']
         self._config = Query(self._myxpl)
         res = xPLResult()
-        self._config.query('calleridmodem', 'nbmaxtry', res)
+        self._config.query('cidmodem', 'nbmaxtry', res)
         nbmaxtry = res.get_value()['nbmaxtry']
         # Call Library
         self._mycalleridmodem  = CallerIdModem(device, nbmaxtry, \
