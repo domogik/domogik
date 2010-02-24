@@ -44,16 +44,16 @@ from domogik.xpl.lib.queryconfig import Query
 IS_DOMOGIK_MODULE = True
 DOMOGIK_MODULE_DESCRIPTION = "Get caller id with a modem"
 DOMOGIK_MODULE_CONFIGURATION=[
-      {"id" : 1,
-       "name" : "device", 
+      {"id" : 0,
+       "key" : "device", 
        "description" : "Modem device (ex : /dev/ttyUSB0 for an usb modem)", 
        "default" : "/dev/ttyUSB0"},
-      {"id" : 2,
-       "name" : "nbmaxtry", 
+      {"id" : 1,
+       "key" : "nbmaxtry", 
        "description" : "Max number of tries to open modem device",
        "default" : 5},
-      {"id" : 3,
-       "name" : "interval", 
+      {"id" : 2,
+       "key" : "interval", 
        "description" : "Delay between each try to open modem device",
        "default" : 10}]
      

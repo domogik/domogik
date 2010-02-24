@@ -53,6 +53,7 @@ from Queue import *
 
 
 QUEUE_TIMEOUT = 10
+QUEUE_SIZE = 10
 
 
 
@@ -91,15 +92,21 @@ class Rest(xPLModule):
         self._xml_directory = "%s/share/domogik/rest/" % conf['custom_prefix']
 
         # Queues for xPL
-        self._queue_system_list = Queue()
-        self._queue_system_start = Queue()
-        self._queue_system_stop = Queue()
+        self._queue_system_list = Queue(QUEUE_SIZE)
+        self._queue_system_detail = Queue(QUEUE_SIZE)
+        self._queue_system_start = Queue(QUEUE_SIZE)
+        self._queue_system_stop = Queue(QUEUE_SIZE)
 
         # define listeners for queues
         Listener(self._add_to_queue_system_list, self._myxpl, \
                  {'schema': 'domogik.system',
                   'xpltype': 'xpl-trig',
                   'command' : 'list',
+                  'host' : gethostname()})
+        Listener(self._add_to_queue_system_detail, self._myxpl, \
+                 {'schema': 'domogik.system',
+                  'xpltype': 'xpl-trig',
+                  'command' : 'detail',
                   'host' : gethostname()})
         Listener(self._add_to_queue_system_start, self._myxpl, \
                  {'schema': 'domogik.system',
@@ -114,13 +121,16 @@ class Rest(xPLModule):
 
 
     def _add_to_queue_system_list(self, message):
-        self._queue_system_list.put(message)
+        self._queue_system_list.put(message, True, QUEUE_TIMEOUT)
+
+    def _add_to_queue_system_detail(self, message):
+        self._queue_system_detail.put(message, True, QUEUE_TIMEOUT)
 
     def _add_to_queue_system_start(self, message):
-        self._queue_system_start.put(message)
+        self._queue_system_start.put(message, True, QUEUE_TIMEOUT)
 
     def _add_to_queue_system_stop(self, message):
-        self._queue_system_stop.put(message)
+        self._queue_system_stop.put(message, True, QUEUE_TIMEOUT)
 
 
 
@@ -279,6 +289,7 @@ class ProcessRequest():
         self._log = self.handler_params[0]._log
         self._xml_directory = self.handler_params[0]._xml_directory
         self._queue_system_list =  self.handler_params[0]._queue_system_list
+        self._queue_system_detail =  self.handler_params[0]._queue_system_detail
         self._queue_system_start =  self.handler_params[0]._queue_system_start
         self._queue_system_stop =  self.handler_params[0]._queue_system_stop
 
@@ -1928,7 +1939,7 @@ target=*
             self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
             return
 
-        ### start #####################################
+        ### list ######################################
         if self.rest_request[0] == "list":
 
             if len(self.rest_request) == 1:
@@ -1944,18 +1955,31 @@ target=*
                                               self.jsonp, self.jsonp_cb)
                     return
 
+        ### detail ####################################
+        elif self.rest_request[0] == "detail":
+            if len(self.rest_request) < 2:
+                self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
+                return
+            self._rest_module_detail(self.rest_request[1])
+
+
+        ### start #####################################
         elif self.rest_request[0] == "start":
             if len(self.rest_request) < 2:
                 self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
                 return
             self._rest_module_start_stop(module =  self.rest_request[1], \
                                    command = "start")
+
+        ### stop ######################################
         elif self.rest_request[0] == "stop":
             if len(self.rest_request) < 2:
                 self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
                 return
             print "stop!!"
             # TODO when start will be OK
+ 
+        ### others ####################################
         else:
             self.send_http_response_error(999, "Bad operation for /module", self.jsonp, self.jsonp_cb)
             return
@@ -1970,13 +1994,6 @@ target=*
         print "Call rest_module_list"
 
         ### Send xpl message to get list
-
-        #DOMOGIK.SYSTEM
-        #{
-        #COMMAND=command to send
-        #HOST=name of the host where a component should be started/stopped|*
-        #}
-
         message = XplMessage()
         message.set_type("xpl-cmnd")
         message.set_schema("domogik.system")
@@ -1987,15 +2004,6 @@ target=*
         print "Message sent : " + str(message)
 
         ### Wait for answer
-
-        #DOMOGIK.SYSTEM
-        #{
-        #COMMAND=command to send
-        #HOST=Host sending the message|*
-        #[MODULE0]=<name>,<status>,<description>
-        #[ERROR=error message if error occurs, 255 char max]
-        #}
-
         # get xpl message from queue
         try:
             message = self._queue_system_list.get(True, QUEUE_TIMEOUT)
@@ -2006,11 +2014,12 @@ target=*
             self.send_http_response_ok(json_data.get())
             return
 
+        print "Message received : " + str(message)
+
         # process message
         cmd = message.data['command']
         host = message.data["host"]
     
-        print "Message received : " + str(message)
 
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
@@ -2028,6 +2037,74 @@ target=*
                 loop_again = False
 
         self.send_http_response_ok(json_data.get())
+
+
+
+    def _rest_module_detail(self, name):
+        """ Send a xpl message to manager to get module list
+            Display this list as json
+            @param name : name of module
+        """
+        print "Call rest_module_detail"
+
+        ### Send xpl message to get detail
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("domogik.system")
+        message.add_data({"command" : "detail"})
+        message.add_data({"module" : name})
+        # TODO : ask for good host
+        message.add_data({"host" : gethostname()})
+        self._myxpl.send(message)
+        print "Message sent : " + str(message)
+
+        ### Wait for answer
+        # get xpl message from queue
+        try:
+            message = self._queue_system_detail.get(True, QUEUE_TIMEOUT)
+            # verify is data has a goog module name
+            if message.data['module'] != name:
+                try:
+                    self._queue_system_detail.put(message, True, QUEUE_TIMEOUT)
+                except Full:
+                    json_data = JSonHelper("ERROR", 999, "Timeout on putting bad module detail for %s (%s)" % (name, message.data['module']))
+                    json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+                    json_data.set_data_type("module")
+                    self.send_http_response_ok(json_data.get())
+                    return
+
+        except Empty:
+            json_data = JSonHelper("ERROR", 999, "Timeout on getting module detail for %s" % name)
+            json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+            json_data.set_data_type("module")
+            self.send_http_response_ok(json_data.get())
+            return
+
+        print "Message received : " + str(message)
+
+        # process message
+        cmd = message.data['command']
+        host = message.data["host"]
+        modinfo = message.data["module"]
+        data = message.data["module"].split(",")
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("module")
+
+        idx = 0
+        loop_again = True
+        config_data = []
+        while loop_again:
+            try:
+                data_conf = message.data["config"+str(idx)].split(",")
+                config_data.append({"id" : idx+1, "key" : data_conf[0], "description" : data_conf[1], "default" : data_conf[2]})
+                idx += 1
+            except:
+                loop_again = False
+
+        json_data.add_data({"name" : data[0], "description" : data[2], "status" : data[1], "host" : host, "configuration" : config_data})
+        self.send_http_response_ok(json_data.get())
+
 
 
 
@@ -2293,8 +2370,8 @@ class JSonHelper():
             
 
 
-    def _process_data(self, data, idx = 0):
-        print "==== PROCESS DATA " + str(idx) + " ===="
+    def _process_data(self, data, idx = 0, key = None):
+        #print "==== PROCESS DATA " + str(idx) + " ===="
         db_type = ("ActuatorFeature", "Area", "Device", "DeviceUsage", \
                    "DeviceConfig", "DeviceStats", "DeviceStatsValue", \
                    "DeviceTechnology", "DeviceTechnologyConfig", \
@@ -2317,7 +2394,9 @@ class JSonHelper():
         data_type = type(data).__name__
 
         # dirty issue to force cache of __dict__ : make a print of data
-        print "DATA : " + str(data)
+        if idx == 0:
+            print "DATA : " + str(data)
+        #print "DATA TYPE : " + data_type
 
         # type : tuple 
         if data_type in tuple_type:
@@ -2355,8 +2434,11 @@ class JSonHelper():
                 return data_json
 
             # start table
-            data_json += '"%s" : [' % sub_data_elt0_type.lower()
-            print "SUB DATA TYPE : " + str(sub_data_elt0_type)
+            if sub_data_elt0_type == "dict":
+                data_json += '"%s" : [' % key
+            else:
+                data_json += '"%s" : [' % sub_data_elt0_type.lower()
+
             # process each data
             for sub_data in data:
                 sub_data_key  = "???(2)"
@@ -2393,6 +2475,8 @@ class JSonHelper():
                 data_tmp = '"%s" : ' % sub_data_type.lower()
             data_tmp += self._process_data(sub_data, 1)
         elif sub_data_type in list_type:
+            data_tmp += self._process_data(sub_data, 1, sub_data_key)
+        elif sub_data_type in dict_type:
             data_tmp += self._process_data(sub_data, 1)
         elif sub_data_type in num_type:
             data_tmp = '"%s" : %s,' % (sub_data_key, sub_data)

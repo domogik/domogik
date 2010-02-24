@@ -77,6 +77,7 @@ class SysManager(xPLModule):
 
         # Get components
         self._list_components(gethostname())
+        print self._components
 
         # Start modules at manager startup
         self._log.debug("Check modules to start at manager startup...")
@@ -141,6 +142,12 @@ class SysManager(xPLModule):
                 # first : we refresh list
                 self._list_components(gethostname())
                 self._send_component_list()
+
+            # detail module
+            elif cmd == "detail" and host == gethostname():
+                # first : we refresh list
+                self._list_components(gethostname())
+                self._send_component_detail(mod, host)
 
             # host ping
             elif cmd == "host-ping":
@@ -263,8 +270,16 @@ class SysManager(xPLModule):
                         moddesc = modname
                     else:
                         moddesc = module.DOMOGIK_MODULE_DESCRIPTION
+                    try:
+                        modconf = module.DOMOGIK_MODULE_CONFIGURATION
+                    except:
+                        modconf = []
                     self._log.debug("  => Domogik module (%s) :)" % moddesc)
-                    self._components.append({"name" : modname, "description" : moddesc, "status" : "OFF", "host" : gethostname()})
+                    self._components.append({"name" : modname, 
+                                             "description" : moddesc, 
+                                             "status" : "OFF", 
+                                             "host" : gethostname(), 
+                                             "configuration" : modconf})
             except:
                 pass
 
@@ -301,6 +316,27 @@ class SysManager(xPLModule):
         mess.add_data({'host' : gethostname()})
         self._myxpl.send(mess)
 
+    def _send_component_detail(self, mod, host):
+        mess = XplMessage()
+        mess.set_type('xpl-trig')
+        mess.set_schema('domogik.system')
+        mess.add_data({'command' :  'detail'})
+        print "mod=%s" % mod
+        for component in self._components:
+            if component["name"] == mod:
+                mod_content = "%s,%s,%s" % (component["name"],
+                                            component["status"],
+                                            component["description"])
+                for conf in component["configuration"]:
+                    conf_content = "%s,%s,%s" % (conf["key"],
+                                                conf["description"],
+                                                conf["default"])
+                    mess.add_data({'config'+str(conf["id"]) : conf_content})
+        mess.add_data({'module' :  mod_content})
+        mess.add_data({'host' : gethostname()})
+
+        print mess
+        self._myxpl.send(mess)
 
 
 
