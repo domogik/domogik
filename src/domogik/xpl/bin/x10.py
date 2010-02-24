@@ -50,6 +50,12 @@ from domogik.xpl.lib.queryconfig import Query
 
 IS_DOMOGIK_MODULE = True
 DOMOGIK_MODULE_DESCRIPTION = "Manage x10 devices"
+DOMOGIK_MODULE_CONFIGURATION=[
+      {"id" : 0,
+       "key" : "heyu-cfg-path",
+       "description" : "Heyu configuration path",
+       "default" : "??? TODO ???"}]
+
 
 
 class X10Main(xPLModule):
