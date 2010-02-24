@@ -35,7 +35,7 @@ Implements
 @organization: Domogik
 """
 
-from domogik.xpl.lib.googleagenda import GAgenda
+from domogik.xpl.lib.gagenda import GAgenda
 from domogik.xpl.lib.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.lib.module import xPLModule
