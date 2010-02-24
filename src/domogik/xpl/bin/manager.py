@@ -77,7 +77,6 @@ class SysManager(xPLModule):
 
         # Get components
         self._list_components(gethostname())
-        print self._components
 
         # Start modules at manager startup
         self._log.debug("Check modules to start at manager startup...")
