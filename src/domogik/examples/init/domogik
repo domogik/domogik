@@ -24,6 +24,10 @@
 
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:
 
+if [ $UID != 0 ];then
+    echo "Must be started as root";
+    exit 1;
+fi
 function start_django {
     echo -n " * Starting Django..."
     /bin/su - ${DOMOGIK_USER} -c "django runserver 2>/dev/null 1>&2 &"
@@ -68,6 +72,17 @@ function stop_django {
         kill -15 $pid 2>/dev/null 1>&2
     done
 }
+function stop_xpl {
+    for pid in `ps ax | grep "xPL_Hub" | grep -v grep | awk '{print $1}'`; do
+        kill -15 $pid 2>/dev/null 1>&2
+    done
+}
+function stop_manager {
+    for pid in `ps ax | grep "dmg_manager" | grep -v grep | awk '{print $1}'`; do
+        kill -9 $pid 2>/dev/null 1>&2
+    done
+}
+
 
     
 case "$1" in
@@ -76,7 +91,7 @@ case "$1" in
         start_django
         start_xpl
         start_manager 
-    else;
+    else
         case "$2" in
             django)
             start_django
@@ -96,7 +111,7 @@ case "$1" in
         stop_django
         stop_xpl
         stop_manager 
-    else;
+    else
         case "$2" in
             django)
             stop_django
@@ -109,33 +124,15 @@ case "$1" in
             ;;
         esac
     fi
-    stat_done
     
-    stat_busy "Stopping XPL"
-    for pid in `ps ax | grep "xPL_Hub" | grep -v grep | awk '{print $1}'`; do
-        kill -9 $pid 2>/dev/null 1>&2
-    done
-    stat_done
-    
-    stat_busy "Stopping REST"
-    for pid in `ps ax | grep "rest.py" | grep -v grep | awk '{print $1}'`; do
-        kill -9 $pid 2>/dev/null 1>&2
-    done
-    stat_done
-    
-    
-    rm_daemon domogik
     ;;
     restart)
-    $0 stop
+    $0 stop $1 $2
     sleep 2
-    $0 start
+    $0 start $1 $2
     ;;
     *)
-    echo "usage: $0 {start|stop|restart}"
+    echo "usage: $0 {start|stop|restart} [(django|xpl|manager)]"
 esac
 exit 0
-
-
-DOMOGIK_PATH="/home/domogik/bin"
 
