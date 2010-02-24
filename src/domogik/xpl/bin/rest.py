@@ -215,7 +215,6 @@ class RestHandler(BaseHTTPRequestHandler):
             Send also json data
             @param data : json data to display
         """
-        print "HTTP VERSION = %s " % self.protocol_version 
         self.send_response(200)
         self.send_header('Content-type',  'application/json')
         self.send_header('Expires', '-1')
@@ -2316,7 +2315,9 @@ class JSonHelper():
 
         # get data type
         data_type = type(data).__name__
-        print "DATA TYPE : " + str(data_type)
+
+        # dirty issue to force cache of __dict__ : make a print of data
+        print "DATA : " + str(data)
 
         # type : tuple 
         if data_type in tuple_type:
