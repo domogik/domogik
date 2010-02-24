@@ -7,7 +7,7 @@ function getModulesList() {
 				$.each(data.module, function() {
 					var li = $("<li></li>");
 					var a = $("<a>" + this.name + "</a>");
-					a.attr('href', server_url + '/admin/modules/' + this.name);
+					a.attr('href', server_url + '/admin/module/' + this.name);
 					a.addClass("icon16-module-" + this.name);
 					if (this.status == 'ON') {
 						a.append("<div class='status icon16-status-active'></div>");
