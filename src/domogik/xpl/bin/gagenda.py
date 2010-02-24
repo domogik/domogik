@@ -49,11 +49,11 @@ DOMOGIK_MODULE_CONFIGURATION=[
        "key" : "email",
        "description" : "Google amail account",
        "default" : ""},
-      {"id" : 0,
+      {"id" : 1,
        "key" : "password",
        "description" : "Password for email account",
        "default" : ""},
-      {"id" : 0,
+      {"id" : 2,
        "key" : "calendarname",
        "description" : "Calendar name (default : your email)",
        "default" : ""}]
