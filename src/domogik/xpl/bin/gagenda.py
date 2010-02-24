@@ -44,6 +44,20 @@ from domogik.xpl.lib.queryconfig import Query
 
 IS_DOMOGIK_MODULE = True
 DOMOGIK_MODULE_DESCRIPTION = "Get events from a Google agenda"
+DOMOGIK_MODULE_CONFIGURATION=[
+      {"id" : 0,
+       "key" : "email",
+       "description" : "Google amail account",
+       "default" : ""},
+      {"id" : 0,
+       "key" : "password",
+       "description" : "Password for email account",
+       "default" : ""},
+      {"id" : 0,
+       "key" : "calendarname",
+       "description" : "Calendar name (default : your email)",
+       "default" : ""}]
+
 
 
 class GAgendaListener(xPLModule):
