@@ -24,7 +24,7 @@
 {% block js_script %}
 $(function(){
     // Accordion
-	$("#nav2").accordion({ header: ".subnav2", active:2});
+	$("#nav2").accordion({ autoHeight: false, header: ".subnav2", active:2});
     
     {% ifequal module.status "ON" %}
         $("#buttonstatus").click(function() {

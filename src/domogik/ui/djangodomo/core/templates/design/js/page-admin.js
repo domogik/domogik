@@ -1,5 +1,5 @@
-$(document).ready(function(){
-
+function getModulesList() {
+	$("#modules_list li").remove();
 	getREST('/module/list/',
 		function(data) {
 			var status = (data.status).toLowerCase();
@@ -7,7 +7,7 @@ $(document).ready(function(){
 				$.each(data.module, function() {
 					var li = $("<li></li>");
 					var a = $("<a>" + this.name + "</a>");
-					a.attr('href', '');
+					a.attr('href', '//domogik/admin/modules/this.name');
 					a.addClass("icon16-module-" + this.name);
 					if (this.status == 'ON') {
 						a.append("<div class='status icon16-status-active'></div>");
@@ -18,8 +18,18 @@ $(document).ready(function(){
 					$("#modules_list").append(li);	
 				});
 			} else {
-				display_message('error', data.description);                                          
+				var li = $("<li></li>");
+				var a = $("<a>" + data.description + " <br />Click to reload</a>");
+				a.attr('href', '#');
+				a.addClass("icon16-status-error");
+				a.click(function(){getModulesList();})
+				li.append(a);
+				$("#modules_list").append(li);	
 			}
 		}
-	)
+	)	
+}
+
+$(document).ready(function(){
+	getModulesList();
 });

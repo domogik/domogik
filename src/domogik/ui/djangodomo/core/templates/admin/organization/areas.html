@@ -29,7 +29,7 @@
 {% block js_script %}
     $(function(){
         // Accordion
-        $("#nav2").accordion({ header: ".subnav2", active:0});
+        $("#nav2").accordion({ autoHeight: false, header: ".subnav2", active:0});
     
         // Add form
         var new_name = $("#new_name"),

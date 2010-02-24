@@ -92,13 +92,13 @@
 .icon16-status-soundplaying { background-image:url(../images/tmp/sound_play_green.png);}
 
 
-
 .icon64-module-x10 {background-image:url(../../../images/modules/x10_64.png);}
 .icon32-module-x10 {background-image:url(../../../images/modules/x10_32.png);}
 .icon16-module-x10 {background-image:url(../../../images/modules/x10_16.png);}
 
 .icon16-status-active {background-image:url(../images/status/green_indicator_16.png);}
 .icon16-status-inactive {background-image:url(../images/status/grey_indicator_16.png);}
+.icon16-status-error {background-image:url(../images/error_16.png);}
 
 /* JQUERY ICONS */
 
