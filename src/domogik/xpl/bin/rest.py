@@ -1725,7 +1725,7 @@ target=*
             @param name : device technology name
         """
         json_data = JSonHelper("OK")
-        json_data.set_json(self.jsonp, self.jsonp_cb)
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("device_technology")
         if name == None:
             for device_technology in self._db.list_device_technologies():
