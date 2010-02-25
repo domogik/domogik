@@ -138,15 +138,16 @@ class DbHelper():
         Return all areas with associated rooms
         @return a list of Area objects containing the associated room list
         """
-        area_list = self.list_areas()
+        area_list = self._session.query(Area).all()
         area_rooms_list = []
         for area in area_list:
             # to avoid creating a join with following request
             room_list = self._session.query(Room)\
                             .filter_by(area_id=area.id).all()
+            area_c = copy.copy(area)
             # set Room in area object
-            area.Room = copy.copy(room_list)
-            area_rooms_list.append((area))
+            area_c.Room = copy.copy(room_list)
+            area_rooms_list.append(area_c)
         return area_rooms_list
 
     def search_areas(self, filters):
@@ -264,14 +265,15 @@ class DbHelper():
         Return all rooms with associated devices
         @return a list of Room objects containing the associated device list
         """
-        room_list = self.list_rooms()
+        room_list = self._session.query(Room).all()
         room_devices_list = []
         for room in room_list:
             device_list = self._session.query(Device)\
                               .filter_by(room_id=room.id).all()
+            room_c = copy.copy(room)
             # set Room in area object
-            room.Device = copy.copy(device_list)
-            room_devices_list.append((room))
+            room_c.Device = copy.copy(device_list)
+            room_devices_list.append(room_c)
         return room_devices_list
 
     def search_rooms(self, filters):
