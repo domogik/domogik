@@ -2134,7 +2134,7 @@ class DbHelper():
         @param s_debug_mode : True if the system is running in debug mode (optional)
         @return a SystemConfig object
         """
-        system_config = self._session.query(SystemConfig).one()
+        system_config = self._session.query(SystemConfig).first()
         if system_config is not None:
             if s_simulation_mode is not None:
                 system_config.simulation_mode = s_simulation_mode
@@ -2142,7 +2142,7 @@ class DbHelper():
                 system_config.debug_mode = s_debug_mode
         else:
             system_config = SystemConfig(simulation_mode=s_simulation_mode,
-                                        debug_mode=s_debug_mode)
+                                         debug_mode=s_debug_mode)
         self._session.add(system_config)
         try:
             self._session.commit()
