@@ -1593,7 +1593,7 @@ class DbHelper():
         list_sa = make_object_list_copy(self._session.query(UserAccount).all())
         for user_acc in list_sa:
             # I won't send the password, right?
-            user_acc.password = ""
+            user_acc.password = None
         return list_sa
 
     def get_user_account(self, a_id):
@@ -1607,7 +1607,7 @@ class DbHelper():
                                 .filter_by(id=a_id).first()
         if user_acc is not None:
             user_acc_c = make_object_copy(user_acc)
-            user_acc_c.password = ""
+            user_acc_c.password = None
         return user_acc_c
 
     def get_user_account_by_login(self, a_login):
@@ -1621,7 +1621,7 @@ class DbHelper():
                                                    .first()
         if user_acc is not None:
             user_acc_c = make_object_copy(user_acc)
-            user_acc_c.password = ""
+            user_acc_c.password = None
         return user_acc_c
 
     def get_user_account_by_login_and_pass(self, a_login, a_password):
@@ -1638,7 +1638,7 @@ class DbHelper():
                                 .first()
         if user_acc is not None:
             user_acc_c = make_object_copy(user_acc)
-            user_acc_c.password = ""
+            user_acc_c.password = None
         return user_acc_c
 
     def get_user_account_by_person(self, p_id):
@@ -1654,7 +1654,7 @@ class DbHelper():
                                         .filter_by(id=person.user_account_id)\
                                         .one()
                 user_acc_c = make_object_copy(user_acc)
-                user_acc_c.password = ""
+                user_acc_c.password = None
                 return user_acc_c
             except MultipleResultsFound:
                 raise DbHelperException("Database may be incoherent, person with \
@@ -1700,7 +1700,7 @@ class DbHelper():
             self._session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         user_acc_c = make_object_copy(user_account)
-        user_acc_c.password = ""
+        user_acc_c.password = None
         return user_acc_c
 
     def update_user_account(self, a_id, a_new_login=None, a_password=None,
@@ -1731,7 +1731,7 @@ class DbHelper():
             self._session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         user_acc_c = make_object_copy(user_acc)
-        user_acc_c.password = ""
+        user_acc_c.password = None
         return user_acc_c
         return user_acc
 

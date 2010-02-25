@@ -1289,7 +1289,7 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
                                                            'IwontGiveIt')
         assert user1 is not None
         assert user1.login == 'mschneider'
-        assert user1.password == ''
+        assert user1.password == None
         try:
             self.db.add_user_account(a_login='mschneider', a_password='plop',
                                      a_is_admin = True)
@@ -1302,7 +1302,7 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
         user3 = self.db.add_user_account(a_login='domo', a_password='gik',
                                          a_is_admin=True)
         for user_acc in self.db.list_user_accounts():
-            assert user_acc.password == ""
+            assert user_acc.password == None
         person1 = self.db.add_person(p_first_name='Marc', p_last_name='SCHNEIDER',
                                      p_birthdate=datetime.date(1973, 4, 24),
                                      p_user_account_id = user1.id)
@@ -1367,16 +1367,16 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
                                      p_birthdate=datetime.date(1981, 4, 24))
         user_acc = self.db.get_user_account(user1.id)
         assert user_acc.login == 'mschneider'
-        assert user_acc.password == ''
+        assert user_acc.password == None
         user_acc = self.db.get_user_account_by_login('mschneider')
         assert user_acc is not None
-        assert user_acc.password == ''
+        assert user_acc.password == None
         assert self.db.get_user_account_by_login('mschneider').id == user1.id
         assert self.db.get_user_account_by_login('lucyfer') is None
 
         user_acc = self.db.get_user_account_by_person(person1.id)
         assert user_acc.login == 'mschneider'
-        assert user_acc.password == ''
+        assert user_acc.password == None
         assert self.db.get_person(person1.id).first_name == 'Marc'
         assert self.db.get_person(person2.id).last_name == 'PYTHON'
         assert self.db.get_person_by_user_account(user1.id) is not None
