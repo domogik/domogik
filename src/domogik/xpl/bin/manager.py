@@ -43,9 +43,12 @@ Implements
 import os
 import sys
 from socket import gethostname
+from threading import Event
+from optparse import OptionParser
 
 from domogik.xpl.lib.xplconnector import Listener 
 from domogik.xpl.common.xplmessage import XplMessage
+from domogik.common.daemonize import createDaemon
 from domogik.xpl.lib.module import xPLModule, xPLResult
 from domogik.xpl.lib.queryconfig import Query
 
@@ -78,6 +81,13 @@ class SysManager(xPLModule):
         # Get components
         self._list_components(gethostname())
 
+        # Check parameters 
+        parser = OptionParser()
+        parser.add_option("-d", action="store_true", dest="start_dbmgr", default=False, \
+                help="Start database manager if not already running.")
+        parser.add_option("-r", action="store_true", dest="start_rest", default=False, \
+                help="Start REST interface manager if not already running.")
+
         # Start modules at manager startup
         self._log.debug("Check modules to start at manager startup...")
         for component in self._components:
@@ -87,7 +97,7 @@ class SysManager(xPLModule):
             self._config.query(component["name"], 'startup-module', res)
             startup = res.get_value()['startup-module']
             # start module
-            if startup == True:
+            if startup == 'True':
                 self._log.debug("            starting")
                 self._log.debug("Starting %s" % component["name"])
                 self._start_module(component["name"], gethostname(), 0)
@@ -213,10 +223,53 @@ class SysManager(xPLModule):
         mess.add_data({'host' : gethostname()})
         self._myxpl.send(mess)
 
-    def check_dbmgr_is_running(self):
+    def _check_dbmgr_is_running(self):
         ''' This method will send a ping request to dbmgr component
         and wait 5 seconds for the answer.
         '''
+        self._dbmgr = Event()
+        mess = XplMessage()
+        mess.set_type('xpl-cmnd')
+        mess.set_schema('domogik.system')
+        mess.add_data({'command' : 'ping'})
+        mess.add_data({'host' : gethostname()})
+        mess.add_data({'module' : 'dbmgr'})
+        Listener(self._cb_check_dbmgr_is_running, self._myxpl, {'schema':'domogik.system', \
+                'xpltype':'xpl-trig','command':'ping','module':'dbmgr','host':gethostname()})
+        self._myxpl.send(mess)
+        self._dbmgr.wait(5) #Wait 5 seconds 
+        return self._dbmgr.isSet() #Will be set only if an answer was received
+
+    def _cb_check_dbmgr_is_running(self, message):
+        ''' Set the Event to true if an answer was received
+        The use of the Event instead of time.sleep(5) ensure not to wait 5 seconds
+        if the database manager answers before
+        '''
+        self._dbmgr.set()
+
+    def _check_rest_is_running(self):
+        ''' This method will send a ping request to rest component
+        and wait 5 seconds for the answer.
+        '''
+        self._rest= Event()
+        mess = XplMessage()
+        mess.set_type('xpl-cmnd')
+        mess.set_schema('domogik.system')
+        mess.add_data({'command' : 'ping'})
+        mess.add_data({'host' : gethostname()})
+        mess.add_data({'module' : 'rest'})
+        Listener(self._cb_check_dbmgr_is_running, self._myxpl, {'schema':'domogik.system',\
+                'xpltype':'xpl-trig','command':'ping','module':'rest','host':gethostname()})
+        self._myxpl.send(mess)
+        self._dbmgr.wait(5) #Wait 5 seconds 
+        return self._rest.isSet() #Will be set only if an answer was received
+
+    def _cb_check_rest_is_running(self, message):
+        ''' Set the Event to true if an answer was received
+        The use of the Event instead of time.sleep(5) ensure not to wait 5 seconds
+        if the rest answers before
+        '''
+        self._rest.set()
 
     def _start_comp(self, name):
         '''
@@ -231,6 +284,7 @@ class SysManager(xPLModule):
         module = sys.modules[mod_path]
         lastpid = os.fork()
         if not lastpid:
+            createDaemon()
             os.execlp(sys.executable, sys.executable, module.__file__)
             self._set_component_status(name, "ON")
         return lastpid

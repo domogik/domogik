@@ -162,9 +162,11 @@ class DBConnector(xPLModule):
                          'maxdelay' : '20'},
                 'gagenda': {'email' : "fritz.smh@gmail.com",
                          'password' : 'XXXXXXXX',
-                         'calendarname' : 'fritz.smh@gmail.com'},
+                         'calendarname' : 'fritz.smh@gmail.com',
+                         'startup-module':'True'},
                 'teleinfo' : {'device' : '/dev/ttyUSB0',
                     'interval' : '30'},
+                    'dawndusk' : {'startup-module':'True'},
                 }
         try:
             _id = self._db.get_device_technology_by_name(techno).id
