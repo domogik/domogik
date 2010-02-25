@@ -126,7 +126,7 @@
                 name: 'dark' // Inherit the rest of the attributes from the preset dark style
             },
             
-            content: '<h3>Mouse usage</h3><h3>Keyboard usage</h3><ul><li>Use the <kbd>Tab</kbd> to move to the artist you want to move.</li><li>Select the item you want to move with the <kbd>Spacebar</kbd>.</li><li>Use the <kbd>Up</kbd> and <kbd>Down</kbd> cursor keys to select a target in the context menu.</li><li>Press <kbd>Enter</kbd> to move the artist to the target list.</li></ul>'
+            content: '<h3>Mouse usage</h3><h3>Keyboard usage</h3><ul><li>Use the <kbd>Tab</kbd> to move to the room you want to organize.</li><li>Select the room you want to move with the <kbd>Spacebar</kbd>.</li><li>Use the <kbd>Up</kbd> and <kbd>Down</kbd> cursor keys to select a area in the context menu.</li><li>Press <kbd>Enter</kbd> to move the room to the area.</li></ul>'
 
         });
         
@@ -335,7 +335,7 @@
         </fieldset>
         {% for area in areas_list %}
         <fieldset class="targetdrop">
-            <legend class="choice icon16-area-{{ area.config.icon }}"">{{ area.name }}</legend>
+            <legend class="choice icon16-area-{{ area.config.icon }}">{{ area.name }}</legend>
             <ul class="draggables" value='{{ area.id }}'>
                 {% for room in area.room %}
                 <li class="draggable icon32-room-{{ room.config.icon }}" value="{{ room.id }}">{{ room.name }}<span class="description">{{ room.description }}</span></li>

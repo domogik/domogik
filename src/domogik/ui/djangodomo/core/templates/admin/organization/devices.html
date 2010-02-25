@@ -30,6 +30,142 @@
     $(function(){
         // Accordion
         $("#nav2").accordion({ autoHeight: false, header: ".subnav2", active:0});
+        
+        $("#tabs").tabs().domogik_tabs({
+            addTitle: "{% trans "Add new device" %}",
+            addCallback: function() {
+                $('#addnewdialog').dialog('open');
+            }
+        });
+        
+        // Add form  
+        var new_name = $("#new_name"),
+            new_description = $("#new_description"),
+            allFields = $([]).add(new_name).add(new_description),
+            tips = $("#validateTips");
+		
+		$("#addnewdialog").dialog({
+			bgiframe: true,
+			autoOpen: false,
+			height: 420,
+			modal: true,
+			buttons: {
+				'{% trans "Create" %}': function() {
+					var bValid = true;
+					allFields.removeClass('ui-state-error');
+
+					bValid = bValid && checkLength(new_name,"nom",1,80);
+                    bValid = bValid && checkLength(new_description,"description",1,80);                    				
+					if (bValid) {						
+                        // Submit form
+                        getREST('/base/device/add/name/' + new_name.val() + '/description/' + new_description.val(),
+                            function(data) {
+                                var status = (data.status).toLowerCase();
+                                if (status == 'ok') {
+                                    $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "New device added" %} \'' + data.room[0].name + '\''});                                   
+                                } else {
+                                    $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "device not created" %} (' + data.description + ')'});                                                                      
+                                }
+                            }
+                        );
+                    }
+				},
+				'{% trans "Cancel" %}': function() {
+					$(this).dialog('close');
+				}
+			},
+			close: function() {
+				allFields.val('').removeClass('ui-state-error');
+			}
+		});
+        
+        $('#dragdropdevices').dragdrop({
+            dropcallback: function(self, element, target) {
+                getREST('/base/device/update/id/' + element + '/room_id/' + target,
+                    function(data) {
+                        var status = (data.status).toLowerCase();
+                        if (status == 'ok') {
+                            self.valid();
+                        } else {
+                            self.cancel();
+                            display_message('error', data.description);                                          
+                        }
+                    }
+                )
+            }
+        });
+        
+        $('.add').qtip({
+            position: {
+                corner: {
+                    target: 'leftMiddle',
+                    tooltip: 'rightMiddle'
+                }
+            },
+
+            style: {
+                padding: 5,
+                background: '#A2D959',
+                color: 'black',
+                textAlign: 'center',
+                border: {
+                    width: 7,
+                    radius: 5,
+                    color: '#A2D959'
+                },
+                tip: 'rightMiddle',
+                name: 'dark' // Inherit the rest of the attributes from the preset dark style
+            }
+        });
+
+        $('.button[title]').qtip({
+            position: {
+                corner: {
+                    target: 'topMiddle',
+                    tooltip: 'bottomMiddle'
+                }
+            },
+
+            style: {
+                padding: 5,
+                background: '#A2D959',
+                color: 'black',
+                textAlign: 'center',
+                border: {
+                    width: 7,
+                    radius: 5,
+                    color: '#A2D959'
+                },
+                tip: 'bottomMiddle',
+                name: 'dark' // Inherit the rest of the attributes from the preset dark style
+            }
+        });
+        
+        $('#help_dragdrop').qtip({
+            position: {
+                corner: {
+                    target: 'rightBottom',
+                    tooltip: 'leftTop'
+                }
+            },
+
+            style: {
+                padding: 5,
+                background: '#A2D959',
+                color: 'black',
+                textAlign: 'left',
+                border: {
+                    width: 7,
+                    radius: 5,
+                    color: '#A2D959'
+                },
+                tip: 'leftTop',
+                name: 'dark' // Inherit the rest of the attributes from the preset dark style
+            },
+            
+            content: '<h3>Mouse usage</h3><h3>Keyboard usage</h3><ul><li>Use the <kbd>Tab</kbd> to move to the device you want to organize.</li><li>Select the device you want to move with the <kbd>Spacebar</kbd>.</li><li>Use the <kbd>Up</kbd> and <kbd>Down</kbd> cursor keys to select a room in the context menu.</li><li>Press <kbd>Enter</kbd> to move the device to the room.</li></ul>'
+
+        });
     });
 {% endblock %}
 {% block title %}{% trans page_title %}{% endblock %}
@@ -50,14 +186,15 @@
         <div id="tabs">
             {% spaceless %}
             <ul>
-                {% regroup devices_list|dictsort:"room" by room as rooms_list %}
-                {% for room in rooms_list %}
-                    <li><a id="tab{{ room.grouper.id }}" href="#element{{ room.grouper.id }}" class="icon16-area-{{ room.grouper.config.icon }}">{{ room.grouper.name }}</a></li>
+                {% regroup devices_list|dictsort:"room" by room as rooms_list2 %}
+                {% for room in rooms_list2 %}
+                    <li><a id="tab{{ room.grouper.id }}" href="#element{{ room.grouper.id }}" class="icon16-room-{{ room.grouper.config.icon }}">{{ room.grouper.name }}</a></li>
                 {% endfor %}
             </ul>
             {% endspaceless %}
-            {% for area in areas_list %}
-            <div id="element{{ area.id }}" class="tabelement">
+            {% regroup devices_list|dictsort:"room" by room as rooms_list2 %}
+            {% for room in rooms_list2 %}
+            <div id="element{{ room.id }}" class="tabelement">
                 <table>
                     <tr>
                         <th>{% trans "Name" %}</th>
@@ -66,17 +203,22 @@
                         <th>{% trans "Reference" %}</th>
                         <th>{% trans "Usage" %}</th>
                         <th>{% trans "Type" %}</th>
-                        <th>{% trans "Room" %}</th>
+                        <th>Actions</th>
                     </tr>
-                    {% for device in devices_list %}
+                    {% for device in room.list %}
                     <tr>
                         <td>{{ device.name }}</td>
                         <td>{{ device.description }}</td>
                         <td>{{ device.address }}</td>
                         <td>{{ device.reference }}</td>
-                        <td>{{ device.usage_id }}</td>
-                        <td>{{ device.type_id }}</td>
-                        <td>{{ device.room_id }}</td>
+                        <td><div class='icon16-text icon16-usage-{{ device.deviceusage.id }}'>{{ device.deviceusage.name }}</div></td>
+                        <td><div class='icon16-text icon16-technology-{{ device.devicetype.devicetechnology.name }}'>{{ device.devicetype.devicetechnology.name }}.{{ device.devicetype.name }}</td>
+                        <td>
+                            <ul class="actions">
+                                <li><button id='del{{ device.id }}' class='icon16-action-del buttonicon' title="{% trans "Delete" %} '{{ device.name }}'"><span class='offscreen'>{% trans "Delete" %} {{ device.name }}</span></button></li>
+                                <li><button id="update{{ device.id }}" class="icon16-action-update buttonicon" title="{% trans "Modify" %} '{{ device.name }}'"><span class='offscreen'>{% trans "Modify" %} {{ device.name }}</span></button></li>
+                            </ul>
+                        </td>
                     </tr>
                     {% endfor %}
                 </table>
@@ -91,8 +233,53 @@
                     <input type="text" class="medium" id="new_name" name="new_name" />
                     <label class="medium" for="new_description">{% trans "Description" %}</label>
                     <textarea type="text" class="medium" id="new_description" name="new_description"></textarea>
+                    <label class="medium" for="new_address">{% trans "Address" %}</label>
+                    <input type="text" class="medium" id="new_address" name="new_address" />
+                    <label class="medium" for="new_reference">{% trans "Reference" %}</label>
+                    <input type="text" class="medium" id="new_reference" name="new_reference" />
+                    <label class="medium" for="new_usage">{% trans "Usage" %}</label>
+                    <select class="medium" id="new_usage" name="new_usage">
+                    {% for usage in usages_list %}
+                        <option>{{ usage.name }}</option>
+                    {% endfor %}
+                    </select>
+                    <label class="medium" for="new_technology">{% trans "Technology" %}</label>
+                    <select class="medium" id="new_technology" name="new_technology">
+                    {% for technology in technologies_list %}
+                        <option>{{ technology.name }}</option>
+                    {% endfor %}
+                    </select>
+                    <label class="medium" for="new_type">{% trans "Type" %}</label>
+                    <select class="medium" id="new_type" name="new_type" disabled='disabled'>
+                    </select>
                 </fieldset>
             </form>
         </div>
+    </div>
+    
+    <div class="subsection" id="dragdropdevices">
+        <h2 class='help' id='help_dragdrop'>{% trans "Devices organisation" %} <span class='offscreen'>{% trans "Drag &amp; Drop instructions" %}</span></h2>
+        <fieldset class="targetdrop">
+            <legend class="choice">{% trans "Unattributed devices" %}</legend>
+            <ul class="draggables" value="None">
+                {% for device in unattribued_devices %}
+                <li class="draggable icon32-usage-{{ device.usage_id }}" value="{{ device.id }}">{{ device.name }}<span class="description">{{ device.description }}</span></li>
+                {% empty %}
+                <li class="empty">{% trans "Empty" %}</li>
+                {% endfor %}
+            </ul>
+        </fieldset>
+        {% for room in rooms_list %}
+        <fieldset class="targetdrop">
+            <legend class="choice icon16-room-{{ room.config.icon }}">{{ room.name }}</legend>
+            <ul class="draggables" value='{{ room.id }}'>
+                {% for device in room.device %}
+                <li class="draggable icon32-usage-{{ device.usage_id }}" value="{{ device.id }}">{{ device.name }}<span class="description">{{ device.description }}</span></li>
+                {% empty %}
+                <li class="empty">{% trans "Empty" %}</li>
+                {% endfor %}
+            </ul>
+        </fieldset>
+        {% endfor %}
     </div>
 {% endblock %}
