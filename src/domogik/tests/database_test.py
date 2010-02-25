@@ -1282,6 +1282,7 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
         user1 = self.db.add_user_account(a_login='mschneider',
                                          a_password='IwontGiveIt',
                                          a_is_admin=True)
+        assert user1.password is None
         assert self.db.authenticate('mschneider', 'IwontGiveIt')
         assert not self.db.authenticate('mschneider', 'plop')
         assert not self.db.authenticate('hello', 'boy')
@@ -1327,6 +1328,7 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
                         a_id=user_acc.id,
                         a_new_login='mschneider2', a_password='ItWasWrong',
                         a_is_admin=False)
+        assert user_acc_u.password is None
         user_acc_msc = self.db.get_user_account_by_login_and_pass(
                         'mschneider2', 'ItWasWrong')
         assert user_acc_msc is not None
