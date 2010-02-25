@@ -138,7 +138,7 @@ class DbHelper():
         Return all areas with associated rooms
         @return a list of Area objects containing the associated room list
         """
-        area_list = copy.copy(self.list_areas())
+        area_list = self.list_areas()
         area_rooms_list = []
         for area in area_list:
             # to avoid creating a join with following request
@@ -264,7 +264,7 @@ class DbHelper():
         Return all rooms with associated devices
         @return a list of Room objects containing the associated device list
         """
-        room_list = copy.copy(self.list_rooms())
+        room_list = self.list_rooms()
         room_devices_list = []
         for room in room_list:
             device_list = self._session.query(Device)\
@@ -1159,8 +1159,8 @@ class DbHelper():
         @return a list of Device objects
         """
         device_list = []
-        for room in self.get_all_rooms_of_area(d_area_id):
-            for device in self.get_all_devices_of_room(room.id):
+        for room in self._session.query(Room).filter_by(area_id=d_area_id).all():
+            for device in self._session.query(Device).filter_by(room_id=room.id).all():
                 device_list.append(device)
         return copy.copy(device_list)
 
@@ -1285,7 +1285,7 @@ class DbHelper():
         @param d_id : item id
         @return the deleted Device object
         """
-        device = self.get_device(d_id)
+        device = self._session.query(Device).filter_by(id=d_id).first()
         if device is None:
             raise DbHelperException("Device with id %s couldn't be found" % d_id)
 
@@ -1631,7 +1631,7 @@ class DbHelper():
         @param a_is_admin : True if it is an admin account, False otherwise (optional, default=False)
         @return the new UserAccount object or raise a DbHelperException if it already exists
         """
-        user_account = self.get_user_account_by_login(a_login)
+        user_account = self._session.query(UserAccount).filter_by(login=a_login).first()
         if user_account is not None:
             raise DbHelperException("Error %s login already exists" % a_login)
         user_account = UserAccount(login=a_login,
@@ -1655,7 +1655,7 @@ class DbHelper():
         @param a_is_admin : True if it is an admin account, False otherwise (optional)
         @return a UserAccount object
         """
-        user_acc = self.get_user_account(a_id)
+        user_acc = self._session.query(UserAccount).filter_by(id=a_id).first()
         if user_acc is None:
             raise DbHelperException("UserAccount with id %s couldn't be found" % a_id)
         if a_new_login is not None:
@@ -1901,7 +1901,7 @@ class DbHelper():
         if system_stat:
             system_stat_d = copy.copy(system_stat)
             system_stats_values = self._session.query(SystemStatsValue)\
-                                      .filter_by(system_stats_id=system_stat.id).all()
+                                               .filter_by(system_stats_id=system_stat.id).all()
             for ssv in system_stats_values:
                 self._session.delete(ssv)
             self._session.delete(system_stat)
@@ -1951,8 +1951,8 @@ class DbHelper():
         @param ui_value : key value we want to add / update
         @return : the updated UIItemConfig item
         """
-        ui_item_config = self.get_ui_item_config(ui_item_name,
-                                                 ui_item_reference, ui_key)
+        ui_item_config = self.__get_ui_item_config(ui_item_name,
+                                                   ui_item_reference, ui_key)
         if ui_item_config is None:
             ui_item_config = UIItemConfig(item_name=ui_item_name,
                                           item_reference=ui_item_reference,
@@ -2068,7 +2068,7 @@ class DbHelper():
         @param s_debug_mode : True if the system is running in debug mode (optional)
         @return a SystemConfig object
         """
-        system_config = self.get_system_config()
+        system_config = self._session.query(SystemConfig).one()
         if system_config is not None:
             if s_simulation_mode is not None:
                 system_config.simulation_mode = s_simulation_mode
