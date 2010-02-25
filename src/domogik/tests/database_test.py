@@ -1329,7 +1329,6 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
         user_acc_msc = self.db.get_user_account_by_login_and_pass(
                         'mschneider2', 'ItWasWrong')
         assert user_acc_msc is not None
-        assert user_acc.password == ''
         assert user_acc_u.is_admin == False
         person = self.db.add_person(p_first_name='Marc', p_last_name='SCHNEIDER',
                                     p_birthdate=datetime.date(1973, 4, 24),
