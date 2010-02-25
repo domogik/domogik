@@ -97,7 +97,7 @@ class Manager(BaseModule):
     # _network = None
     # _UDPSock = None
 
-    def __init__(self, ip=gethostbyname(gethostname()), port=0):
+    def __init__(self, ip=gethostbyname(gethostname()), port=0, broadcast="255.255.255.255"):
         """
         Create a new manager instance
         @param ip : IP to listen to (default real ip address)
@@ -116,6 +116,7 @@ class Manager(BaseModule):
         self._UDPSock = socket(AF_INET, SOCK_DGRAM)
         #Set broadcast flag
         self._UDPSock.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
+        self._broadcast = broadcast
         #xPL plugins only needs to connect on local xPL Hub on localhost
         addr = (ip, port)
 
@@ -175,7 +176,7 @@ class Manager(BaseModule):
                 message.set_source(self._source)
             if not message.target:
                 message.set_target("*")
-            self._UDPSock.sendto(message.__str__(), ("255.255.255.255", 3865))
+            self._UDPSock.sendto(message.__str__(), (self._broadcast, 3865))
             self._log.debug("xPL Message sent")
         except:
             self._log.warning("Error during send of message")
@@ -206,7 +207,7 @@ remote-ip=%s
 }
 """ % (self._source, target, self._port, self._ip)
         if not self.should_stop():
-            self._UDPSock.sendto(mess, ("255.255.255.255", 3865))
+            self._UDPSock.sendto(mess, (self._broadcast, 3865))
 
     def got_hbeat(self, message):
         if(message.target != self._source ):

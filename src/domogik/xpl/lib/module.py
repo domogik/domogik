@@ -102,10 +102,14 @@ class xPLModule():
             self._is_manager = is_manager
             cfg = Loader('domogik')
             config = dict(cfg.load()[1])
-            if 'bind_interface' in config:
-                self._myxpl = Manager(config['bind_interface'])
+            if 'broadcast' in config:
+                broadcast = config['broadcast']
             else:
-                self._myxpl = Manager()
+                broadcast = "255.255.255.255"
+            if 'bind_interface' in config:
+                self._myxpl = Manager(config['bind_interface'], broadcast = broadcast)
+            else:
+                self._myxpl = Manager(broadcast = broadcast)
             self._l = Listener(self._system_handler, self._myxpl, {'schema' : 'domogik.system',
                 'xpltype':'xpl-cmnd'})
             self._reload_cb = reload_cb 
