@@ -71,6 +71,7 @@
 .icon16-action-previous { background-image:url(../images/action/left_16.png);}
 .icon16-action-submit { background-image:url(../images/status/check_16.png);}
 .icon16-action-cancel { background-image:url(../images/status/wrong_16.png);}
+.icon16-action-password { background-image:url(../images/action/key_16.png);}
 
 /* technology icons */
 .icon64-technology-x10 {background-image:url(../../../images/modules/x10_64.png);}

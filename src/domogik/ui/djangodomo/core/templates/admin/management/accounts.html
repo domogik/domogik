@@ -26,7 +26,7 @@
         // Accordion
         $("#nav2").accordion({ autoHeight: false, header: ".subnav2", active:1});
     
-            // Add form
+        // Add form
         var new_login = $("#new_login"),
             new_password = $("#new_password"),
             new_admin = $("#new_admin"),
@@ -55,7 +55,7 @@
                             function(data) {
                                 var status = (data.status).toLowerCase();
                                 if (status == 'ok') {
-                                    $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "New account added" %} \'' + data.area[0].name + '\''});
+                                    $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "New account added" %} \'' + data.account[0].login + '\''});
                                 } else {
                                     $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Account not created" %} (' + data.description + ')'});
                                 }
@@ -166,6 +166,110 @@
                             close: function() {
                             }
                         });
+                        
+                        $('#update{{ account.id }}').click(function() {
+                            $('#update_dialog_{{ account.id }}').dialog('open');
+                        });
+                        
+                        var account{{ account.id }}_login = $("#account{{ account.id }}_login"),
+                            account{{ account.id }}_admin = $("#account{{ account.id }}_admin"),
+                            allFields = $([]).add(account{{ account.id }}_login).add(account{{ account.id }}_admin),
+                            tips = $("#validateTips{{ account.id }}");
+
+                        account{{ account.id }}_login.val("{{ account.login }}");
+                        {% ifequal account.is_admin "True" %}
+                        account{{ account.id }}_admin.attr('checked', 'checked');
+                        {% endifequal %}
+                        
+                        $("#update_dialog_{{ account.id }}").dialog({
+                            bgiframe: true,
+                            autoOpen: false,
+                            height: 300,
+                            modal: true,
+                            buttons: {
+                                '{% trans "Modify" %}': function() {
+                                    var bValid = true;
+                                    allFields.removeClass('ui-state-error');
+                                    bValid = bValid && checkLength(account{{ account.id }}_login, "Login",1,20);
+                                    if (bValid) {
+                                        // Submit form
+                                        var is_admin = "False";
+                                        if ($('#account{{ account.id }}_admin').attr('checked')) {
+                                            is_admin = "True";
+                                        }
+                                        getREST('/account/update/id/{{ account.id }}/login/' + account{{ account.id }}_login.val() + '/is_admin/' + is_admin + '/skin_used/default',
+                                            function(data) {
+                                                var status = (data.status).toLowerCase();
+                                                if (status == 'ok') {
+                                                    $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Account" %} \'' + data.account[0].login + '\' {% trans "successfully updated" %}'});
+                                                } else {
+                                                    $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Account not updated" %} (' + data.description + ')'});
+                                                }
+                                            }
+                                        );
+                                    }
+                                },
+                                '{% trans "Cancel" %}': function() {
+                                    $(this).dialog('close');
+                                }
+                            },
+                            close: function() {
+                                allFields.val('').removeClass('ui-state-error');
+                            }
+                        });
+                        
+                        $('#password{{ account.id }}').click(function() {
+                            $('#password_dialog_{{ account.id }}').dialog('open');
+                        });
+                                                
+                        var account{{ account.id }}_oldpassword = $("#account{{ account.id }}_oldpassword"),
+                            account{{ account.id }}_newpassword = $("#account{{ account.id }}_newpassword"),
+                            allFields2 = $([]).add(account{{ account.id }}_oldpassword)
+                            .add(account{{ account.id }}_newpassword),
+                            tips2 = $("#validateTips2{{ account.id }}");
+
+                        $("#password_dialog_{{ account.id }}").dialog({
+                            bgiframe: true,
+                            autoOpen: false,
+                            height: 300,
+                            modal: true,
+                            buttons: {
+                                '{% trans "Modify" %}': function() {
+                                    var bValid = true;
+                                    allFields2.removeClass('ui-state-error');
+                                    bValid = bValid && checkLength(account{{ account.id }}_oldpassword, "Old Password",1,80);
+                                    bValid = bValid && checkLength(account{{ account.id }}_newpassword, "New Password",1,80);
+                                    if (bValid) {
+                                        // Submit form
+                                        getREST('/account/auth/{{ account.login }}/' + account{{ account.id }}_oldpassword.val(),
+                                            function(data) {
+                                                var status = (data.status).toLowerCase();
+                                                if (status == 'ok') {
+                                                    getREST('/account/update/id/{{ account.id }}/password/' + account{{ account.id }}_newpassword.val(),
+                                                        function(data) {
+                                                            var status = (data.status).toLowerCase();
+                                                            if (status == 'ok') {
+                                                                $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : ' + data.account[0].login + '\' {% trans "Password" %} {% trans "successfully updated" %}'});
+                                                            } else {
+                                                                $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Password not updated" %} (' + data.description + ')'});
+                                                            }
+                                                        }
+                                                    );
+                                                } else {
+                                                    $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Old Password not correct" %}'});
+                                                }
+                                            }
+                                        );
+                                    }
+                                },
+                                '{% trans "Cancel" %}': function() {
+                                    $(this).dialog('close');
+                                }
+                            },
+                            close: function() {
+                                allFields2.val('').removeClass('ui-state-error');
+                            }
+                        });
                     });
                 // ]]>
                 </script>
@@ -177,10 +281,34 @@
                         <ul class="actions">
                             <li><button id='del{{ account.id }}' class='icon16-action-del buttonicon' title="{% trans "Delete" %} '{{ account.login }}'"><span class='offscreen'>{% trans "Delete" %} {{ account.login }}</span></button></li>
                             <li><button id="update{{ account.id }}" class="icon16-action-update buttonicon" title="{% trans "Modify" %} '{{ account.login }}'"><span class='offscreen'>{% trans "Modify" %} {{ account.login }}</span></button></li>
+                            <li><button id="password{{ account.id }}" class="icon16-action-password buttonicon" title="{% trans "Change password for" %} '{{ account.login }}'"><span class='offscreen'>{% trans "Change password for" %} {{ account.login }}</span></button></li>
                         </ul>
                         <div id="delete_confirmation_{{ account.id }}" title="{% trans "Delete" %} {{ account.login }}">
                             <p>{% trans "Please confirm to delete" %} '{{ account.login }}'</p>
                         </div>
+                        <div id="update_dialog_{{ account.id }}" title="{% trans "Modify" %} {{ account.name }}">
+                            <p id="validateTips{{ account.id }}">{% trans "All fields are required." %}</p>
+                            <form >
+                                <fieldset>
+                                    <label class="medium" for="account{{ account.id }}_login">{% trans "Login" %}</label>
+                                    <input type="text" class="medium" id="account{{ account.id }}_login" name="account{{ account.id }}_login" />
+                                    <label class="medium" for="account{{ account.id }}_admin">{% trans "Is Admin" %}</label>
+                                    <input type="checkbox" id="account{{ account.id }}_admin" name="account{{ account.id }}_admin" value="True" />
+                                </fieldset>'
+                            </form>
+                        </div>
+                        <div id="password_dialog_{{ account.id }}" title="{% trans "Change password for" %} {{ account.name }}">
+                            <p id="validateTips2{{ account.id }}">{% trans "All fields are required." %}</p>
+                            <form >
+                                <fieldset>
+                                    <label class="medium" for="account{{ account.id }}_oldpassword">{% trans "Old Password" %}</label>
+                                    <input type="text" class="medium" id="account{{ account.id }}_oldpassword" name="account{{ account.id }}_oldpassword" />
+                                    <label class="medium" for="account{{ account.id }}_newpassword">{% trans "New Password" %}</label>
+                                    <input type="text" class="medium" id="account{{ account.id }}_newpassword" name="account{{ account.id }}_newpassword" />
+                                </fieldset>'
+                            </form>
+                        </div>
+
                     </td>
                 </tr>
             {% endfor %}
