@@ -586,8 +586,7 @@ class DeviceStats(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<DeviceStats(id=%s, device=%s, date='%s')>" \
-               % (self.id, self.device, self.date)
+        return "<DeviceStats(id=%s, device=%s, date='%s')>" % (self.id, self.device, self.date)
 
     @staticmethod
     def get_tablename():
