@@ -1968,6 +1968,9 @@ class DbHelper():
         return ui_item_config
 
     def get_ui_item_config(self, ui_item_name, ui_item_reference=None, ui_key=None):
+        return copy.copy(self.__get_ui_item_config(ui_item_name, ui_item_reference, ui_key))
+
+    def __get_ui_item_config(self, ui_item_name, ui_item_reference=None, ui_key=None):
         """
         Get a UI parameter of an item
         @param ui_item_name : item name
@@ -1994,7 +1997,7 @@ class DbHelper():
                                           item_reference=ui_item_reference,
                                           key=ui_key)\
                                .first()
-        return copy.copy(uic)
+        return uic
 
     def list_ui_item_config(self, ui_item_name, ui_item_reference):
         """
@@ -2026,12 +2029,11 @@ class DbHelper():
         @param ui_key : key of the item, optinal
         @return the deleted UIItemConfig object(s)
         """
-        ui_item_config_list = self.get_ui_item_config(ui_item_name,
-                                                      ui_item_reference, ui_key)
+        ui_item_config_list = self.__get_ui_item_config(ui_item_name, ui_item_reference, ui_key)
         if ui_item_config_list is None:
             raise DbHelperException("Can't find item for (%s, %s, %s)" \
                                     % (ui_item_name, ui_item_reference, ui_key))
-        ui_item_config_list_d = copy.copy(ui_item_config_list)
+        ui_item_config_list_d = ui_item_config_list
         if isinstance(ui_item_config_list, list):
             for item in ui_item_config_list:
                 self._session.delete(item)
