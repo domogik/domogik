@@ -972,7 +972,6 @@ class DeviceTestCase(GenericTestCase):
             pass
         device1 = self.db.update_device(d_id = device1.id,
                                         d_description = 'desc2', d_reference='A1')
-        self.db._session.expunge(device1) # Remove object from session
         device1 = self.db.get_device(device_id)
         assert device1.description == 'desc2'
         assert device1.reference == 'A1'
