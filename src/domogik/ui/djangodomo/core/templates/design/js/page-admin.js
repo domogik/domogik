@@ -8,7 +8,7 @@ function getModulesList() {
 					var li = $("<li></li>");
 					var a = $("<a>" + this.name + "</a>");
 					a.attr('href', server_url + '/admin/module/' + this.name);
-					a.addClass("icon16-module-" + this.name);
+					a.addClass("icon16-technology-" + this.name);
 					if (this.status == 'ON') {
 						a.append("<div class='status icon16-status-active'></div>");
 					} else {

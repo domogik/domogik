@@ -88,9 +88,9 @@ $(function(){
     <div class="subsection">
         <h2>{% trans "Basic Control" %}</h2>
         {% ifequal module.status "ON" %}
-            <a href="#" id='buttonstatus' class='button'>{% trans "Stop" %}</a>
+            <button id='buttonstatus' class='button icon16-status-inactive'>{% trans "Stop" %}</button>
         {% else %}
-            <a href="#" id='buttonstatus' class='button'>{% trans "Start" %}</a>
+            <button id='buttonstatus' class='button icon16-status-active'>{% trans "Start" %}</button>
         {% endifequal %}
     </div>
 {% endblock %}

@@ -100,6 +100,12 @@ class Rooms(pipes.DmgPipe):
         if resp :
             return resp
 
+    @staticmethod
+    def getAllWithDevices():
+        resp = Rooms.objects.get({'parameters':"list-with-devices/"})
+        if resp :
+            return resp
+        
     def merge_uiconfig(self):
         for room in self.room:
             uiconfigs = UIConfigs.getByReference('room', room.id)
@@ -122,7 +128,40 @@ class Devices(pipes.DmgPipe):
         resp = Devices.objects.get({'parameters':"list/"})
         if resp :
             return resp
-        
+    
+    @staticmethod
+    def getWithoutRoom():
+        resp = Devices.objects.get({'parameters':"list/by-room/null"})
+        if resp :
+            return resp
+
+    def merge_uiconfig(self):
+        for device in self.device:
+            # If is associated with room
+            if device.room != 'None' :
+                uiconfigs = UIConfigs.getByReference('room', device.room.id)
+                device.room.config = {}
+                for uiconfig in uiconfigs.ui_config:
+                    device.room.config[uiconfig.key] = uiconfig.value
+
+class DeviceUsages(pipes.DmgPipe):
+    uri = "http://127.0.0.1:8080/base/device_usage"
+
+    @staticmethod
+    def getAll():
+        resp = DeviceUsages.objects.get({'parameters':"list/"})
+        if resp :
+            return resp
+
+class DeviceTechnologies(pipes.DmgPipe):
+    uri = "http://127.0.0.1:8080/base/device_technology"
+
+    @staticmethod
+    def getAll():
+        resp = DeviceTechnologies.objects.get({'parameters':"list/"})
+        if resp :
+            return resp
+
 class UIConfigs(pipes.DmgPipe):
     uri = "http://127.0.0.1:8080/base/ui_config"
     

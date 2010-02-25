@@ -12,6 +12,7 @@ table th {
 
 table td {
     padding:1em;
+    text-align:center;
 }
 
 table tr.odd {

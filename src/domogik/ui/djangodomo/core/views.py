@@ -315,26 +315,34 @@ def admin_organization_devices(request):
     if not __is_user_admin(request):
         return index(request)
 
-#    rooms_list = __db.list_rooms()
-#    device_usage_list = __db.list_device_usages()
+    status = request.GET.get('status', '')
+    msg = request.GET.get('msg', '')
+    
     try:
         resultAllDevices = Devices.getAll()
+        resultAllDevices.merge_uiconfig()
+#        resultUnattribuedDevices = Devices.getWithoutRoom()
+        resultAllRooms = Rooms.getAllWithDevices()
+        resultAllRooms.merge_uiconfig()
+        resultAllUsages = DeviceUsages.getAll()
+#        resultAllTechnologies = DeviceTechnologies.getAll()
+
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
-#    device_tech_list = __db.list_device_technologies()
     
- #   resultAllModules = Modules.getAll()
     page_title = _("Devices organization")
     return __go_to_page(
         request, 'admin/organization/devices.html',
         page_title,
         nav1_admin = "selected",
         nav2_organization_devices = "selected",
-        modules_list=None, #resultAllModules.module,
- #       device_usage_list=device_usage_list,
- #       rooms_list=rooms_list,
+        status=status,
+        msg=msg,
+#        unattribued_devices=resultUnattribuedDevices.device,
+        rooms_list=resultAllRooms.room,
         devices_list=resultAllDevices.device,
- #       device_tech_list=device_tech_list
+        usages_list=resultAllUsages.device_usage,
+#        technologies_list=resultAllTechnologies.device_technology
     )
 
 def admin_organization_rooms(request):
@@ -357,14 +365,12 @@ def admin_organization_rooms(request):
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
         
-#    resultAllModules = Modules.getAll()
     page_title = _("Room organization")
     return __go_to_page(
         request, 'admin/organization/rooms.html',
         page_title,
         nav1_admin = "selected",
         nav2_organization_rooms = "selected",
-#        modules_list=resultAllModules.module,
         status=status,
         msg=msg,
         unattribued_rooms=resultUnattribuedRooms.room,
@@ -388,14 +394,12 @@ def admin_organization_areas(request):
         resultAllAreas.merge_uiconfig()
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
-#    resultAllModules = Modules.getAll()
     page_title = _("Area organization")
     return __go_to_page(
         request, 'admin/organization/areas.html',
         page_title,
         nav1_admin = "selected",
         nav2_organization_areas = "selected",
-#        modules_list=resultAllModules.module,
         status=status,
         msg=msg,
         areas_list=resultAllAreas.area

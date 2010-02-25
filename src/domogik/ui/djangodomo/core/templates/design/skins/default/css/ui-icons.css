@@ -43,19 +43,25 @@
 .icon16-room-bathroom { background-image:url(../images/room/default_room_16.png);}
 .icon16-room-office { background-image:url(../images/room/default_room_16.png);}
 
-/* Widget icons */
-.icon32-widget-light { background-image:url(../images/device_usage/light/lamp_32.png);}
-.icon32-widget-light.binary_0 { background-image:url(../images/device_usage/light/binary/0_32.png);}
-.icon32-widget-light.binary_1 { background-image:url(../images/device_usage/light/binary/1_32.png);}
-.icon32-widget-light.range_0 { background-image:url(../images/device_usage/light/range/0_32.png);}
-.icon32-widget-light.range_30 { background-image:url(../images/device_usage/light/range/30_32.png);}
-.icon32-widget-light.range_60 { background-image:url(../images/device_usage/light/range/60_32.png);}
-.icon32-widget-light.range_100 { background-image:url(../images/device_usage/light/range/100_32.png);}
+/* Usage icons */
+.icon64-usage- { background-image:url(../images/unknown_64.png);}
+.icon32-usage- { background-image:url(../images/unknown_32.png);}
+.icon16-usage- { background-image:url(../images/unknown_16.png);}
+.icon64-usage-1 { background-image:url(../images/device_usage/light/lamp_64.png);}
+.icon32-usage-1 { background-image:url(../images/device_usage/light/lamp_32.png);}
+.icon16-usage-1 { background-image:url(../images/device_usage/light/lamp_16.png);}
+.icon32-usage-shutter { background-image:url(../images/device_usage/light/shutter_down_32.png);}
 
-.icon32-widget-shutter { background-image:url(../images/device_usage/light/shutter_down_32.png);}
-.icon32-widget-shutter.binary_0 { background-image:url(../images/device_usage/shutter/binary/0_32.png);}
-.icon32-widget-shutter.binary_1 { background-image:url(../images/device_usage/shutter/binary/1_32.png);}
+/* State icons */
+.icon32-state-1.binary_0 { background-image:url(../images/device_usage/light/binary/0_32.png);}
+.icon32-state-1.binary_1 { background-image:url(../images/device_usage/light/binary/1_32.png);}
+.icon32-state-1.range_0 { background-image:url(../images/device_usage/light/range/0_32.png);}
+.icon32-state-1.range_30 { background-image:url(../images/device_usage/light/range/30_32.png);}
+.icon32-state-1.range_60 { background-image:url(../images/device_usage/light/range/60_32.png);}
+.icon32-state-1.range_100 { background-image:url(../images/device_usage/light/range/100_32.png);}
 
+.icon32-state-shutter.binary_0 { background-image:url(../images/device_usage/shutter/binary/0_32.png);}
+.icon32-state-shutter.binary_1 { background-image:url(../images/device_usage/shutter/binary/1_32.png);}
 
 /* Action */
 .icon24-processing { background-image:url(../images/processing_24.gif);}
@@ -66,6 +72,16 @@
 .icon16-action-previous { background-image:url(../images/left_16.png);}
 .icon16-action-submit { background-image:url(../images/success_16.png);}
 .icon16-action-cancel { background-image:url(../images/error_16.png);}
+
+/* technology icons */
+.icon64-technology-x10 {background-image:url(../../../images/modules/x10_64.png);}
+.icon32-technology-x10 {background-image:url(../../../images/modules/x10_32.png);}
+.icon16-technology-x10 {background-image:url(../../../images/modules/x10_16.png);}
+
+/* Status icons */
+.icon16-status-active {background-image:url(../images/status/green_indicator_16.png);}
+.icon16-status-inactive {background-image:url(../images/status/grey_indicator_16.png);}
+.icon16-status-error {background-image:url(../images/error_16.png);}
 
 /* Tmp icons */
 .icon64-device-coffeemachine { background-image:url(../images/tmp/coffee_machine_64.png);}
@@ -91,14 +107,14 @@
 .icon16-status-airconditioningoff { background-image:url(../images/tmp/aircond_black_16.png);}
 .icon16-status-soundplaying { background-image:url(../images/tmp/sound_play_green.png);}
 
-
-.icon64-module-x10 {background-image:url(../../../images/modules/x10_64.png);}
-.icon32-module-x10 {background-image:url(../../../images/modules/x10_32.png);}
-.icon16-module-x10 {background-image:url(../../../images/modules/x10_16.png);}
-
-.icon16-status-active {background-image:url(../images/status/green_indicator_16.png);}
-.icon16-status-inactive {background-image:url(../images/status/grey_indicator_16.png);}
-.icon16-status-error {background-image:url(../images/error_16.png);}
+.icon16-text {
+    display:inline-block;
+    background-position: 50% left;
+    background-repeat:no-repeat;
+    min-height:16px;
+    padding-left:18px;
+    line-height:16px;
+}
 
 /* JQUERY ICONS */
 
