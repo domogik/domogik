@@ -213,7 +213,10 @@ class SysManager(xPLModule):
         mess.add_data({'host' : gethostname()})
         self._myxpl.send(mess)
 
-    
+    def check_dbmgr_is_running(self):
+        ''' This method will send a ping request to dbmgr component
+        and wait 5 seconds for the answer.
+        '''
 
     def _start_comp(self, name):
         '''
