@@ -39,7 +39,7 @@ Implements
 @organization: Domogik
 """
 
-import hashlib
+import copy, hashlib
 from types import DictType, ListType, NoneType
 
 import sqlalchemy
@@ -131,21 +131,21 @@ class DbHelper():
         Return all areas
         @return list of Area objects
         """
-        return self._session.query(Area).all()
+        return copy.copy(self._session.query(Area).all())
 
     def list_areas_with_rooms(self):
         """
         Return all areas with associated rooms
         @return a list of Area objects containing the associated room list
         """
-        area_list = self.list_areas()
+        area_list = copy.copy(self.list_areas())
         area_rooms_list = []
         for area in area_list:
             # to avoid creating a join with following request
             room_list = self._session.query(Room)\
                             .filter_by(area_id=area.id).all()
             # set Room in area object
-            area.Room = room_list
+            area.Room = copy.copy(room_list)
             area_rooms_list.append((area))
         return area_rooms_list
 
@@ -161,7 +161,7 @@ class DbHelper():
         for filter in filters:
             filter_arg = "%s = '%s'" % (filter, filters[filter])
             area_list = area_list.filter(filter_arg)
-        return area_list.all()
+        return copy.copy(area_list.all())
 
     def get_area_by_id(self, area_id):
         """
@@ -169,7 +169,7 @@ class DbHelper():
         @param area_id : The area id
         @return an area object
         """
-        return self._session.query(Area).filter_by(id=area_id).first()
+        return copy.copy(self._session.query(Area).filter_by(id=area_id).first())
 
 
     def get_area_by_name(self, area_name):
@@ -178,9 +178,11 @@ class DbHelper():
         @param area_name : The area name
         @return an area object
         """
-        return self._session.query(Area)\
-                            .filter(func.lower(Area.name)==area_name.lower())\
-                            .first()
+        return copy.copy(
+            self._session.query(Area)\
+                         .filter(func.lower(Area.name)==area_name.lower())\
+                         .first()
+        )
 
     def add_area(self, a_name, a_description=None):
         """
@@ -231,7 +233,7 @@ class DbHelper():
         """
         area = self._session.query(Area).filter_by(id=area_del_id).first()
         if area:
-            area_d = area
+            area_d = copy.copy(area)
             if cascade_delete:
                 for room in self._session.query(Room)\
                                          .filter_by(area_id=area_del_id).all():
@@ -255,20 +257,20 @@ class DbHelper():
         Return a list of rooms
         @return list of Room objects
         """
-        return self._session.query(Room).all()
+        return copy.copy(self._session.query(Room).all())
 
     def list_rooms_with_devices(self):
         """
         Return all rooms with associated devices
         @return a list of Room objects containing the associated device list
         """
-        room_list = self.list_rooms()
+        room_list = copy.copy(self.list_rooms())
         room_devices_list = []
         for room in room_list:
             device_list = self._session.query(Device)\
                               .filter_by(room_id=room.id).all()
             # set Room in area object
-            room.Device = device_list
+            room.Device = copy.copy(device_list)
             room_devices_list.append((room))
         return room_devices_list
 
@@ -284,7 +286,7 @@ class DbHelper():
         for filter in filters:
             filter_arg = "%s = '%s'" % (filter, filters[filter])
             room_list = room_list.filter(filter_arg)
-        return room_list.all()
+        return copy.copy(room_list.all())
 
     def get_room_by_name(self, r_name):
         """
@@ -292,9 +294,11 @@ class DbHelper():
         @param r_name : The room name
         @return a room object
         """
-        return self._session.query(Room)\
-                            .filter(func.lower(Room.name)==r_name.lower())\
-                            .first()
+        return copy.copy(
+                self._session.query(Room)\
+                             .filter(func.lower(Room.name)==r_name.lower())\
+                             .first()
+        )
 
     def get_room_by_id(self, r_id):
         """
@@ -302,7 +306,7 @@ class DbHelper():
         @param r_id : The room id
         @return a room object
         """
-        return self._session.query(Room).filter_by(id=r_id).first()
+        return copy.copy(self._session.query(Room).filter_by(id=r_id).first())
 
     def add_room(self, r_name, r_area_id=None, r_description=None):
         """
@@ -316,9 +320,7 @@ class DbHelper():
             try:
                 self._session.query(Area).filter_by(id=r_area_id).one()
             except NoResultFound:
-                raise DbHelperException("Couldn't add room with area id %s. \
-                                        It does not exist" % r_area_id)
-
+                raise DbHelperException("Couldn't add room with area id %s. It does not exist" % r_area_id)
         room = Room(name=r_name, description=r_description, area_id=r_area_id)
         self._session.add(room)
         try:
@@ -371,7 +373,7 @@ class DbHelper():
         """
         room = self._session.query(Room).filter_by(id=r_id).first()
         if room:
-            room_d = room
+            room_d = copy.copy(room)
             if cascade_delete:
                 for device in self._session.query(Device)\
                                            .filter_by(room_id=r_id).all():
@@ -393,7 +395,7 @@ class DbHelper():
         @param a_area_id : the area id
         @return a list of Room objects
         """
-        return self._session.query(Room).filter_by(area_id=a_area_id).all()
+        return copy.copy(self._session.query(Room).filter_by(area_id=a_area_id).all())
 
 ####
 # Device usage
@@ -403,7 +405,7 @@ class DbHelper():
         Return a list of device usages
         @return a list of DeviceUsage objects
         """
-        return self._session.query(DeviceUsage).all()
+        return copy.copy(self._session.query(DeviceUsage).all())
 
     def get_device_usage_by_name(self, du_name,):
         """
@@ -411,9 +413,11 @@ class DbHelper():
         @param du_name : The device usage name
         @return a DeviceUsage object
         """
-        return self._session.query(DeviceUsage)\
-                            .filter(func.lower(DeviceUsage.name)==du_name.lower())\
-                            .first()
+        return copy.copy(
+            self._session.query(DeviceUsage)\
+                        .filter(func.lower(DeviceUsage.name)==du_name.lower())\
+                        .first()
+        )
 
     def add_device_usage(self, du_name, du_description=None):
         """
@@ -464,7 +468,7 @@ class DbHelper():
         """
         du = self._session.query(DeviceUsage).filter_by(id=du_id).first()
         if du:
-            du_d = du
+            du_d = copy.copy(du)
             if cascade_delete:
                 for device in self._session.query(Device)\
                                            .filter_by(usage_id=du.id).all():
@@ -495,7 +499,7 @@ class DbHelper():
         Return a list of device types
         @return a list of DeviceType objects
         """
-        return self._session.query(DeviceType).all()
+        return copy.copy(self._session.query(DeviceType).all())
 
     def get_device_type_by_name(self, dty_name):
         """
@@ -503,9 +507,11 @@ class DbHelper():
         @param dty_name : The device type name
         @return a DeviceType object
         """
-        return self._session.query(DeviceType)\
-                            .filter(func.lower(DeviceType.name)==dty_name.lower())\
-                            .first()
+        return copy.copy(
+            self._session.query(DeviceType)\
+                        .filter(func.lower(DeviceType.name)==dty_name.lower())\
+                        .first()
+        )
 
     def add_device_type(self, dty_name, dt_id, dty_description=None):
         """
@@ -570,7 +576,7 @@ class DbHelper():
         """
         dty = self._session.query(DeviceType).filter_by(id=dty_id).first()
         if dty:
-            dty_d = dty
+            dty_d = copy.copy(dty)
             if cascade_delete:
                 for device in self._session.query(Device)\
                                            .filter_by(type_id=dty.id).all():
@@ -617,7 +623,7 @@ class DbHelper():
         Return a list of sensor reference data
         @return a list of SensorReferenceData objects
         """
-        return self._session.query(SensorReferenceData).all()
+        return copy.copy(self._session.query(SensorReferenceData).all())
 
     def get_sensor_reference_data_by_name(self, srd_name):
         """
@@ -625,9 +631,11 @@ class DbHelper():
         @param srd_name : The sensor reference data name
         @return a SensorReferenceData object
         """
-        return self._session.query(SensorReferenceData)\
-                            .filter(func.lower(SensorReferenceData.name)==srd_name.lower())\
-                            .first()
+        return copy.copy(
+            self._session.query(SensorReferenceData)\
+                         .filter(func.lower(SensorReferenceData.name)==srd_name.lower())\
+                         .first()
+        )
 
     def add_sensor_reference_data(self, srd_name, srd_value, dty_id,
                                   srd_unit=None, srd_stat_key=None):
@@ -707,7 +715,7 @@ class DbHelper():
                            .filter_by(id=srd_id)\
                            .first()
         if srd:
-            srd_d = srd
+            srd_d = copy.copy(srd)
             self._session.delete(srd)
             try:
                 self._session.commit()
@@ -728,7 +736,7 @@ class DbHelper():
         Return a list of actuator features
         @return a list of ActuatorFeature objects
         """
-        return self._session.query(ActuatorFeature).all()
+        return copy.copy(self._session.query(ActuatorFeature).all())
 
     def get_actuator_feature_by_name(self, af_name):
         """
@@ -736,9 +744,11 @@ class DbHelper():
         @param af_name : The name of the actuator feature
         @return an ActuatorFeature object
         """
-        return self._session.query(ActuatorFeature)\
-                            .filter(func.lower(ActuatorFeature.name)==af_name.lower())\
-                            .first()
+        return copy.copy(
+            self._session.query(ActuatorFeature)\
+                         .filter(func.lower(ActuatorFeature.name)==af_name.lower())\
+                         .first()
+        )
 
     def add_actuator_feature(self, af_name, af_value, dty_id, af_unit=None,
                              af_configurable_states=None,
@@ -826,7 +836,7 @@ class DbHelper():
         """
         af = self._session.query(ActuatorFeature).filter_by(id=af_id).first()
         if af:
-            af_d = af
+            af_d = copy.copy(af)
             self._session.delete(af)
             try:
                 self._session.commit()
@@ -846,7 +856,7 @@ class DbHelper():
         Return a list of device technologies
         @return a list of DeviceTechnology objects
         """
-        return self._session.query(DeviceTechnology).all()
+        return copy.copy(self._session.query(DeviceTechnology).all())
 
     def get_device_technology_by_name(self, dt_name):
         """
@@ -854,9 +864,11 @@ class DbHelper():
         @param dt_name : the device technology name
         @return a DeviceTechnology object
         """
-        return self._session.query(DeviceTechnology)\
-                            .filter(func.lower(DeviceTechnology.name)==dt_name.lower())\
-                            .first()
+        return copy.copy(
+            self._session.query(DeviceTechnology)\
+                         .filter(func.lower(DeviceTechnology.name)==dt_name.lower())\
+                         .first()
+        )
 
     def add_device_technology(self, dt_name, dt_description):
         """
@@ -909,7 +921,7 @@ class DbHelper():
         """
         dt = self._session.query(DeviceTechnology).filter_by(id=dt_id).first()
         if dt:
-            dt_d = dt
+            dt_d = copy.copy(dt)
             if cascade_delete:
                 for device_type in self._session.query(DeviceType)\
                                                 .filter_by(technology_id=dt.id).all():
@@ -945,8 +957,10 @@ class DbHelper():
         @param dt_id : id of the device technology
         @return a list of DeviceTechnologyConfig objects
         """
-        return self._session.query(DeviceTechnologyConfig)\
-                            .filter_by(technology_id=dt_id).all()
+        return copy.copy(
+            self._session.query(DeviceTechnologyConfig)\
+                         .filter_by(technology_id=dt_id).all()
+        )
 
     def list_all_device_technology_config(self):
         """
@@ -954,7 +968,7 @@ class DbHelper():
         @param dt_id : id of the device technology
         @return a list of DeviceTechnologyConfig objects
         """
-        return self._session.query(DeviceTechnologyConfig).all()
+        return copy.copy(self._session.query(DeviceTechnologyConfig).all())
 
     def get_device_technology_config(self, dt_id, dtc_key):
         """
@@ -963,10 +977,12 @@ class DbHelper():
         @param dtc_key : key of the device technology config
         @return a DeviceTechnologyConfig object
         """
-        return self._session.query(DeviceTechnologyConfig)\
-                            .filter_by(technology_id=dt_id)\
-                            .filter_by(key=dtc_key)\
-                            .first()
+        return copy.copy(
+            self._session.query(DeviceTechnologyConfig)\
+                         .filter_by(technology_id=dt_id)\
+                         .filter_by(key=dtc_key)\
+                         .first()
+        )
 
     def add_device_technology_config(self, dt_id, dtc_key, dtc_value,
                                      dtc_description):
@@ -1042,7 +1058,7 @@ class DbHelper():
         dtc = self._session.query(DeviceTechnologyConfig)\
                            .filter_by(id=dtc_id).first()
         if dtc:
-            dtc_d = dtc
+            dtc_d = copy.copy(dtc)
             self._session.delete(dtc)
             try:
                 self._session.commit()
@@ -1062,7 +1078,7 @@ class DbHelper():
         Returns a list of devices
         @return a list of Device objects
         """
-        return self._session.query(Device).all()
+        return copy.copy(self._session.query(Device).all())
 
     def search_devices(self, filters):
         """
@@ -1077,7 +1093,7 @@ class DbHelper():
         for filter in filters:
             filter_arg = "%s = '%s'" % (filter, filters[filter])
             device_list = device_list.filter(filter_arg)
-        return device_list.all()
+        return copy.copy(device_list.all())
 
     def find_devices(self, d_room_id_list, d_usage_id_list):
         """
@@ -1094,7 +1110,7 @@ class DbHelper():
             device_list = device_list.filter(Device.room_id.in_(d_room_id_list))
         if d_usage_id_list is not None and len(d_usage_id_list) != 0:
             device_list = device_list.filter(Device.usage_id.in_(d_usage_id_list))
-        return device_list.all()
+        return copy.copy(device_list.all())
 
     def get_device(self, d_id):
         """
@@ -1102,7 +1118,7 @@ class DbHelper():
         @param d_id : The device id
         @return a Device object
         """
-        return self._session.query(Device).filter_by(id=d_id).first()
+        return copy.copy(self._session.query(Device).filter_by(id=d_id).first())
 
     def get_device_by_technology_and_address(self, techno_name, device_address):
         """
@@ -1124,7 +1140,7 @@ class DbHelper():
                                        .filter_by(id=device_type.technology_id)\
                                        .first()
             if device_tech.name.lower() == techno_name.lower():
-                return device
+                return copy.copy(device)
         return None
 
     def get_all_devices_of_room(self, d_room_id):
@@ -1133,7 +1149,8 @@ class DbHelper():
         @param d_room_id: room id
         @return a list of Device objects
         """
-        return self._session.query(Device).filter_by(room_id=d_room_id).all()
+        return copy.copy(self._session.query(Device)\
+                                      .filter_by(room_id=d_room_id).all())
 
     def get_all_devices_of_area(self, d_area_id):
         """
@@ -1145,7 +1162,7 @@ class DbHelper():
         for room in self.get_all_rooms_of_area(d_area_id):
             for device in self.get_all_devices_of_room(room.id):
                 device_list.append(device)
-        return device_list
+        return copy.copy(device_list)
 
     def get_all_devices_of_usage(self, du_id):
         """
@@ -1153,7 +1170,8 @@ class DbHelper():
         @param du_id: usage id
         @return a list of Device objects
         """
-        return self._session.query(Device).filter_by(usage_id=du_id).all()
+        return copy.copy(self._session.query(Device)\
+                                      .filter_by(usage_id=du_id).all())
 
     def get_all_devices_of_technology(self, dt_id):
         """
@@ -1161,7 +1179,8 @@ class DbHelper():
         @param dt_id : technology id
         @return a list of Device objects
         """
-        return self._session.query(Device).filter_by(technology_id=dt_id).all()
+        return copy.copy(self._session.query(Device)\
+                                      .filter_by(technology_id=dt_id).all())
 
     def add_device(self, d_name, d_address, d_type_id, d_usage_id, d_room_id,
         d_description=None, d_reference=None):
@@ -1270,7 +1289,7 @@ class DbHelper():
         if device is None:
             raise DbHelperException("Device with id %s couldn't be found" % d_id)
 
-        device_d = device
+        device_d = copy.copy(device)
         for device_conf in self._session.query(DeviceConfig)\
                                         .filter_by(device_id=d_id).all():
             self._session.delete(device_conf)
@@ -1297,15 +1316,15 @@ class DbHelper():
         @param d_device_id : the device id
         @return a list of DeviceStats objects
         """
-        return self._session.query(DeviceStats)\
-                            .filter_by(device_id=d_device_id).all()
+        return copy.copy(self._session.query(DeviceStats)\
+                                      .filter_by(device_id=d_device_id).all())
 
     def list_all_device_stats(self):
         """
         Return a list of all device stats
         @return a list of DeviceStats objects
         """
-        return self._session.query(DeviceStats).all()
+        return copy.copy(self._session.query(DeviceStats).all())
 
     def list_device_stats_values(self, d_device_stats_id):
         """
@@ -1313,8 +1332,10 @@ class DbHelper():
         @param d_device_stats_id : the device statistic id
         @return a list of DeviceStatsValue objects
         """
-        return self._session.query(DeviceStatsValue)\
-                            .filter_by(device_stats_id=d_device_stats_id).all()
+        return copy.copy(
+            self._session.query(DeviceStatsValue)\
+                         .filter_by(device_stats_id=d_device_stats_id).all()
+        )
 
     def get_last_stat_of_device(self, d_device_id):
         """
@@ -1322,9 +1343,11 @@ class DbHelper():
         @param d_device_id : device id
         @return a DeviceStat object
         """
-        return self._session.query(DeviceStats)\
-                            .filter_by(device_id=d_device_id)\
-                            .order_by(sqlalchemy.desc(DeviceStats.date)).first()
+        return copy.copy(
+            self._session.query(DeviceStats)\
+                         .filter_by(device_id=d_device_id)\
+                         .order_by(sqlalchemy.desc(DeviceStats.date)).first()
+        )
 
     def get_last_stat_of_devices(self, device_list):
         """
@@ -1339,7 +1362,7 @@ class DbHelper():
             last_record = self._session.query(DeviceStats)\
                               .filter_by(device_id=d_id)\
                               .order_by(sqlalchemy.desc(DeviceStats.date)).first()
-            result.append(last_record)
+            result.append(copy.copy(last_record))
         return result
 
     def device_has_stats(self, d_device_id):
@@ -1390,7 +1413,7 @@ class DbHelper():
         """
         device_stat = self._session.query(DeviceStats).filter_by(id=ds_id).first()
         if device_stat:
-            device_stat_d = device_stat
+            device_stat_d = copy.copy(device_stat)
             self._session.delete(device_stat)
             for device_stats_value in self._session.query(DeviceStatsValue) \
                                           .filter_by(device_stats_id=device_stat.id).all():
@@ -1418,7 +1441,7 @@ class DbHelper():
             for device_stats_value in self._session.query(DeviceStatsValue) \
                                           .filter_by(device_stats_id=device_stat.id).all():
                 self._session.delete(device_stats_value)
-            device_stats_d_list.append(device_stat)
+            device_stats_d_list.append(copy.copy(device_stat))
             self._session.delete(device_stat)
         try:
             self._session.commit()
@@ -1435,7 +1458,7 @@ class DbHelper():
         Returns a list of all triggers
         @return a list of Trigger objects
         """
-        return self._session.query(Trigger).all()
+        return copy.copy(self._session.query(Trigger).all())
 
     def get_trigger(self, t_id):
         """
@@ -1443,7 +1466,7 @@ class DbHelper():
         @param t_id : trigger id
         @return a Trigger object
         """
-        return self._session.query(Trigger).filter_by(id=t_id).first()
+        return copy.copy(self._session.query(Trigger).filter_by(id=t_id).first())
 
     def add_trigger(self, t_description, t_rule, t_result):
         """
@@ -1498,7 +1521,7 @@ class DbHelper():
         """
         trigger = self._session.query(Trigger).filter_by(id=t_id).first()
         if trigger:
-            trigger_d = trigger
+            trigger_d = copy.copy(trigger)
             self._session.delete(trigger)
             try:
                 self._session.commit()
@@ -1518,7 +1541,7 @@ class DbHelper():
         Returns a list of all accounts
         @return a list of UserAccount objects
         """
-        list_sa = self._session.query(UserAccount).all()
+        list_sa = copy.copy(self._session.query(UserAccount).all())
         for user_acc in list_sa:
             # I won't send the password, right?
             user_acc.password = ""
@@ -1530,7 +1553,8 @@ class DbHelper():
         @param a_id : account id
         @return a UserAccount object
         """
-        user_acc = self._session.query(UserAccount).filter_by(id=a_id).first()
+        user_acc = self._session.query(UserAccount)\
+                                .filter_by(id=a_id).first()
         if user_acc is not None:
             user_acc.password = ""
         return user_acc
@@ -1556,8 +1580,8 @@ class DbHelper():
         """
         crypted_pass = self.__make_crypted_password(a_password)
         user_acc = self._session.query(UserAccount)\
-                               .filter_by(login=a_login, password=crypted_pass)\
-                               .first()
+                                .filter_by(login=a_login, password=crypted_pass)\
+                                .first()
         if user_acc is not None:
             user_acc.password = ""
         return user_acc
@@ -1676,7 +1700,7 @@ class DbHelper():
         """
         user_account = self._session.query(UserAccount).filter_by(id=a_id).first()
         if user_account:
-            user_account_d = user_account
+            user_account_d = copy.copy(user_account)
             user = self.get_person_by_user_account(user_account.id)
             if user is not None:
                 raise DbHelperException("Couldn't delete user account '%s' : '%s %s' user has a reference to it" % (user_account.login, user.first_name, user.last_name))
@@ -1698,7 +1722,7 @@ class DbHelper():
         Returns the list of all persons
         @return a list of Person objects
         """
-        return self._session.query(Person).all()
+        return copy.copy(self._session.query(Person).all())
 
     def get_person(self, p_id):
         """
@@ -1706,7 +1730,7 @@ class DbHelper():
         @param p_id : person id
         @return a Person object
         """
-        return self._session.query(Person).filter_by(id=p_id).first()
+        return copy.copy(self._session.query(Person).filter_by(id=p_id).first())
 
     def get_person_by_user_account(self, u_id):
         """
@@ -1715,8 +1739,10 @@ class DbHelper():
         @return a Person object or None
         """
         try:
-            return self._session.query(Person)\
-                                .filter_by(user_account_id=u_id).one()
+            return copy.copy(
+                self._session.query(Person)\
+                             .filter_by(user_account_id=u_id).one()
+            )
         except NoResultFound:
             return None
         except MultipleResultsFound:
@@ -1796,13 +1822,13 @@ class DbHelper():
         """
         person = self._session.query(Person).filter_by(id=p_id).first()
         if person is not None:
+            person_d = copy.copy(person)
             self._session.delete(person)
             try:
                 self._session.commit()
             except Exception, sql_exception:
                 self._session.rollback()
                 raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-            person_d = person
             if person.user_account_id is not None:
                 self.del_user_account(person.user_account_id)
             return person_d
@@ -1817,7 +1843,7 @@ class DbHelper():
         Return a list of all system stats
         @return a list of SystemStats objects
         """
-        return self._session.query(SystemStats).all()
+        return copy.copy(self._session.query(SystemStats).all())
 
     def list_system_stats_values(self, s_system_stats_id):
         """
@@ -1825,8 +1851,10 @@ class DbHelper():
         @param s_system_stats_id : the system statistic id
         @return a list of SystemStatsValue objects
         """
-        return self._session.query(SystemStatsValue)\
-                   .filter_by(system_stats_id=s_system_stats_id).all()
+        return copy.copy(
+            self._session.query(SystemStatsValue)\
+                         .filter_by(system_stats_id=s_system_stats_id).all()
+        )
 
     def get_system_stat(self, s_id):
         """
@@ -1834,7 +1862,7 @@ class DbHelper():
         @param s_name : the name of the stat to be retrieved
         @return a SystemStats object
         """
-        return self._session.query(SystemStats).filter_by(id=s_id).first()
+        return copy.copy(self._session.query(SystemStats).filter_by(id=s_id).first())
 
     def add_system_stat(self, s_name, s_hostname, s_date, s_values):
         """
@@ -1871,7 +1899,7 @@ class DbHelper():
         """
         system_stat = self._session.query(SystemStats).filter_by(name=s_name).first()
         if system_stat:
-            system_stat_d = system_stat
+            system_stat_d = copy.copy(system_stat)
             system_stats_values = self._session.query(SystemStatsValue)\
                                       .filter_by(system_stats_id=system_stat.id).all()
             for ssv in system_stats_values:
@@ -1899,7 +1927,7 @@ class DbHelper():
                                       .filter_by(system_stats_id=system_stat.id).all()
             for ssv in system_stats_values:
                 self._session.delete(ssv)
-            system_stats_d_list.append(system_stat)
+            system_stats_d_list.append(copy.copy(system_stat))
             self._session.delete(system_stat)
         try:
             self._session.commit()
@@ -1948,24 +1976,25 @@ class DbHelper():
         @return a (list of) UIItemConfig object(s)
         """
         if ui_item_reference == None and ui_key == None:
-            return self._session.query(UIItemConfig)\
-                                .filter_by(item_name=ui_item_name).all()
+            uic = self._session.query(UIItemConfig)\
+                               .filter_by(item_name=ui_item_name).all()
         elif ui_item_reference == None:
-            return self._session.query(UIItemConfig)\
-                                .filter_by(item_name=ui_item_name,
-                                           key=ui_key)\
-                                .all()
+            uic = self._session.query(UIItemConfig)\
+                               .filter_by(item_name=ui_item_name,
+                                          key=ui_key)\
+                               .all()
         elif ui_key == None:
-            return self._session.query(UIItemConfig)\
-                                .filter_by(item_name=ui_item_name,
-                                           item_reference=ui_item_reference)\
-                                .all()
+            uic = self._session.query(UIItemConfig)\
+                               .filter_by(item_name=ui_item_name,
+                                          item_reference=ui_item_reference)\
+                               .all()
         else:
-            return self._session.query(UIItemConfig)\
-                                .filter_by(item_name=ui_item_name,
-                                           item_reference=ui_item_reference,
-                                           key=ui_key)\
-                                .first()
+            uic = self._session.query(UIItemConfig)\
+                               .filter_by(item_name=ui_item_name,
+                                          item_reference=ui_item_reference,
+                                          key=ui_key)\
+                               .first()
+        return copy.copy(uic)
 
     def list_ui_item_config(self, ui_item_name, ui_item_reference):
         """
@@ -1974,17 +2003,19 @@ class DbHelper():
         @param ui_item_reference : item reference
         @return a list of UIItemConfig objects
         """
-        return self._session.query(UIItemConfig)\
-                            .filter_by(item_name=ui_item_name,
-                                       item_reference=ui_item_reference)\
-                            .all()
+        return copy.copy(
+            self._session.query(UIItemConfig)\
+                         .filter_by(item_name=ui_item_name,
+                                    item_reference=ui_item_reference)\
+                         .all()
+        )
 
     def list_all_ui_item_config(self):
         """
         List all UI parameters
         @return a list of UIItemConfig objects
         """
-        return self._session.query(UIItemConfig).all()
+        return copy.copy(self._session.query(UIItemConfig).all())
 
     def delete_ui_item_config(self, ui_item_name, ui_item_reference=None,
                               ui_key=None):
@@ -2000,7 +2031,7 @@ class DbHelper():
         if ui_item_config_list is None:
             raise DbHelperException("Can't find item for (%s, %s, %s)" \
                                     % (ui_item_name, ui_item_reference, ui_key))
-        ui_item_config_list_d = ui_item_config_list
+        ui_item_config_list_d = copy.copy(ui_item_config_list)
         if isinstance(ui_item_config_list, list):
             for item in ui_item_config_list:
                 self._session.delete(item)
@@ -2022,7 +2053,7 @@ class DbHelper():
         @return a SystemConfig object
         """
         try:
-            return self._session.query(SystemConfig).one()
+            return copy.copy(self._session.query(SystemConfig).one())
         except MultipleResultsFound:
             raise DbHelperException("Error : SystemConfig has more than one line")
         except NoResultFound:
