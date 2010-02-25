@@ -175,7 +175,7 @@
             {% for room in rooms_list %}
             <div id="element{{ room.id }}" class="tabelement">
                 <script type="text/javascript">
-                    // Update form
+                    // <![CDATA[
                     $(function(){      
                         var room{{ room.id }}newname = $("#room{{ room.id }}-newname"),
                             room{{ room.id }}newdescription = $("#room{{ room.id }}-newdescription"),

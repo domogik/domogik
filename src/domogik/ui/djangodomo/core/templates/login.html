@@ -33,9 +33,9 @@
 {% block content %}
 
         <h1>{% trans "Identification" %}</h1>
-        {% if error_msg %}
-            <p class="error_msg">{{ error_msg }}</p>
-        {% endif %}
+        {% ifnotequal status "" %}
+        <div id='messages' class='{{status}}'>{{msg}}</div>
+        {% endifnotequal %}
         <form name="loginForm" method="POST" action="{% url login_view %}"/>
             <div class="left">
                 <h2>1. {% trans "Select a user" %}</h2>

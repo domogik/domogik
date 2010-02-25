@@ -18,13 +18,13 @@
     background-repeat:no-repeat;
 }
 
-.section .actions {
+.section > .actions {
     list-style:none;
     margin:0;
     padding:0;
 }
 
-.section .actions li {
+.section > .actions li {
     display:inline-block;
     margin:0;
     padding:0;
@@ -44,13 +44,11 @@
 
 #messages.ok {
     background-color:#99FF66;
-    background-image: url(../images/success_32.png);
     border:1px solid #339900;
 }
 
 #messages.error {
     background-color:#FF6666;
-    background-image: url(../images/error_32.png);
     border:1px solid #993300;
 }
 
@@ -63,4 +61,15 @@
     -moz-border-radius: 0.8em;
     -webkit-border-radius: 0.8em;
     background-color:#eeeeee;
+}
+
+.subsection > .actions {
+    list-style:none;
+    padding:0;
+}
+
+.subsection > .actions li {
+    display:inline-block;
+    margin:0;
+    padding:0;
 }

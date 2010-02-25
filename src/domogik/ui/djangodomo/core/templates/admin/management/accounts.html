@@ -1,0 +1,202 @@
+{% extends "layout_admin.html" %}
+{% comment %}
+# Copyright 2008 Domogik project
+
+# This file is part of Domogik.
+# Domogik is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Domogik is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+
+# Author : Cédric Trévisan <cedric@domogik.org>
+{% endcomment %}
+
+
+{% load i18n %}
+{% block js_script %}
+    $(function(){
+        // Accordion
+        $("#nav2").accordion({ autoHeight: false, header: ".subnav2", active:1});
+    
+            // Add form
+        var new_login = $("#new_login"),
+            new_password = $("#new_password"),
+            new_admin = $("#new_admin"),
+            allFields = $([]).add(new_login).add(new_password).add(new_admin),
+            tips = $("#validateTips");
+
+		$("#addnewdialog").dialog({
+			bgiframe: true,
+			autoOpen: false,
+			height: 250,
+			modal: true,
+			buttons: {
+				'{% trans "Create" %}': function() {
+					var bValid = true;
+					allFields.removeClass('ui-state-error');
+
+					bValid = bValid && checkLength(new_login,"Login",1,20);
+                    bValid = bValid && checkLength(new_password,"Password",1,80);
+					if (bValid) {
+                        var is_admin = "False";
+                        if ($('#new_admin').attr('checked')) {
+                            is_admin = "True";
+                        }
+                        // Submit form
+                        getREST('/account/add/login/' + new_login.val() + '/password/' + new_password.val() + '/is_admin/' + is_admin + '/skin_used/default',
+                            function(data) {
+                                var status = (data.status).toLowerCase();
+                                if (status == 'ok') {
+                                    $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "New account added" %} \'' + data.area[0].name + '\''});
+                                } else {
+                                    $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Account not created" %} (' + data.description + ')'});
+                                }
+                            }
+                        );
+                    }
+				},
+				'{% trans "Cancel" %}': function() {
+					$(this).dialog('close');
+				}
+			},
+			close: function() {
+				allFields.val('').removeClass('ui-state-error');
+			}
+		});
+        
+        $("#add").click(function() {
+            $('#addnewdialog').dialog('open');
+        });
+        
+        $('.buttonicon[title]').qtip({
+            position: {
+                corner: {
+                    target: 'topMiddle',
+                    tooltip: 'bottomMiddle'
+                }
+            },
+
+            style: {
+                padding: 5,
+                background: '#A2D959',
+                color: 'black',
+                textAlign: 'center',
+                border: {
+                    width: 7,
+                    radius: 5,
+                    color: '#A2D959'
+                },
+                tip: 'bottomMiddle',
+                name: 'dark' // Inherit the rest of the attributes from the preset dark style
+            }
+        });
+    });
+{% endblock %}
+{% block css %}
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-tables.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+{% block js_include %}
+{% endblock %}
+{% block title %}{% trans page_title %}{% endblock %}
+
+{% block banner %}
+    <div class="section">
+        <h1 class="ident">
+            <span class="title">{% trans page_title %}</span>
+        </h1>
+        {% ifnotequal status "" %}
+        <div id='messages' class='{{status}}'>{{msg}}</div>
+        {% endifnotequal %}
+        <ul class="actions">
+        </ul>
+    </div>
+{% endblock %}
+
+{% block right %}
+    <div class="subsection">
+        <h2>{% trans "Accounts list" %}</h2>
+        <ul class="actions">
+            <li><button id="add" class="icon16-action-add button">{% trans "Add new account" %}</button></li>
+        </ul>
+        <table>
+            <tr>
+                <th scope='col'>{% trans "Login" %}</th>
+                <th scope='col'>{% trans "Admin" %}</th>
+                <th scope='col'>{% trans "Skin" %}</th>
+                <th scope='col'>Actions</th>
+            </tr>
+            {% for account in accounts_list %}
+                <script type="text/javascript">
+                // <![CDATA[
+                    $(function(){
+                        /* Add a onclick function to delete the current account */
+                        $('#del{{ account.id }}').click(function() {
+                            $('#delete_confirmation_{{ account.id }}').dialog('open');
+                        });
+                        $("#delete_confirmation_{{ account.id }}").dialog({
+                            bgiframe: true,
+                            autoOpen: false,
+                            height: 100,
+                            modal: true,
+                            buttons: {
+                                '{% trans "Delete" %}': function() {
+                                    getREST('/account/del/{{ account.id }}',
+                                        function(data) {
+                                            var status = (data.status).toLowerCase();
+                                            if (status == 'ok') {
+                                                $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Account" %} \'' + data.account[0].login + '\' {% trans "successfully deleted" %}'});
+                                            } else {
+                                                $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Account not deleted" %} (' + data.description + ')'});
+                                            }
+                                        }
+                                    );
+                                },
+                                '{% trans "Cancel" %}': function() {
+                                    $(this).dialog('close');
+                                }
+                            },
+                            close: function() {
+                            }
+                        });
+                    });
+                // ]]>
+                </script>
+                <tr>
+                    <td>{{ account.login }}</td>
+                    <td><div class='icon16-text icon16-status-{{ account.is_admin|lower }}'><span class='offscreen'>{{ account.is_admin }}</span></div></td>
+                    <td>{{ account.skin_used }}</td>
+                    <td>
+                        <ul class="actions">
+                            <li><button id='del{{ account.id }}' class='icon16-action-del buttonicon' title="{% trans "Delete" %} '{{ account.login }}'"><span class='offscreen'>{% trans "Delete" %} {{ account.login }}</span></button></li>
+                            <li><button id="update{{ account.id }}" class="icon16-action-update buttonicon" title="{% trans "Modify" %} '{{ account.login }}'"><span class='offscreen'>{% trans "Modify" %} {{ account.login }}</span></button></li>
+                        </ul>
+                        <div id="delete_confirmation_{{ account.id }}" title="{% trans "Delete" %} {{ account.login }}">
+                            <p>{% trans "Please confirm to delete" %} '{{ account.login }}'</p>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+        <div id="addnewdialog" title='{% trans "Create new account" %}'>
+            <p id="validateTips">{% trans "All fields are required." %}</p>
+            <form>
+                <fieldset>
+                    <label class="medium" for="new_login">{% trans "Login" %}</label>
+                    <input type="text" class="medium" id="new_login" name="new_login" />
+                    <label class="medium" for="new_password">{% trans "Password" %}</label>
+                    <input type="text" class="medium" id="new_password" name="new_password" />
+                    <label class="medium" for="new_admin">{% trans "Is Admin" %}</label>
+                    <input type="checkbox" id="new_admin" name="new_admin" value="True" />
+                </fieldset>
+            </form>
+        </div>
+    </div>
+{% endblock %}

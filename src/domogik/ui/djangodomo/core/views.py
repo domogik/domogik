@@ -91,7 +91,8 @@ def login(request):
     @return an HttpResponse object
     """
     page_title = _("Login page")
-    error_msg = ""
+    status = ''
+    msg = ''
     if request.method == 'POST':
         # An action was submitted => login action
         login = QueryDict.get(request.POST, "login", False)
@@ -306,6 +307,32 @@ def __is_user_admin(request):
     user = __get_user_connected(request)
     return user is not None and user['is_admin']
 
+def admin_management_accounts(request):
+    """
+    Method called when the admin accounts page is accessed
+    @param request : HTTP request
+    @return an HttpResponse object
+    """
+    if not __is_user_admin(request):
+        return index(request)
+
+    status = request.GET.get('status', '')
+    msg = request.GET.get('msg', '')
+    try:
+        resultAllAccounts = Accounts.getAll()
+    except ResourceNotAvailableException:
+        return render_to_response('error/ResourceNotAvailableException.html')
+    page_title = _("Accounts management")
+    return __go_to_page(
+        request, 'admin/management/accounts.html',
+        page_title,
+        nav1_admin = "selected",
+        nav2_management_accounts = "selected",
+        status=status,
+        msg=msg,
+        accounts_list=resultAllAccounts.account
+    )
+    
 def admin_organization_devices(request):
     """
     Method called when the admin devices organization page is accessed
