@@ -3,9 +3,13 @@
 #Start domogik daemon under this user
 DOMOGIK_USER=domogik
 
-#Set to 1 if the database manager should be started on this host
-START_DB=1
-
-#Set to 1 if the web server which is used for IHMs should be started on this host
-START_REST=1
+# This vairable can take 2 parameters : 
+# -d to start the database manager
+# -r to start the rest component
+# Remember : Your domogik installation must have *one* and *only one* 
+# instance of the database manager and the rest manager running
+# Your domogik installation won't start on this computer if :
+#  - The database manager is not already running elsewhere on the network
+#  - You do not pass -d parameter to the manager
+MANAGER_PARAMS="-d -r"
 
