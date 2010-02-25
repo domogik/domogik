@@ -43,6 +43,7 @@ import os
 from socket import gethostname
 from domogik.xpl.lib.xplconnector import *
 from domogik.xpl.lib.basemodule import BaseModule
+from domogik.common.configloader import Loader
 
 class xPLModule():
     '''
@@ -99,7 +100,12 @@ class xPLModule():
             Watcher(self)
             self._log.debug("New system manager instance for %s" % name)
             self._is_manager = is_manager
-            self._myxpl = Manager()
+            cfg = Loader('domogik')
+            config = dict(cfg.load()[1])
+            if 'bind_interface' in config:
+                self._myxpl = Manager(config['bind_interface'])
+            else:
+                self._myxpl = Manager()
             self._l = Listener(self._system_handler, self._myxpl, {'schema' : 'domogik.system',
                 'xpltype':'xpl-cmnd'})
             self._reload_cb = reload_cb 

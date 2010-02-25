@@ -129,7 +129,7 @@ class Manager(BaseModule):
             self._UDPSock.bind(addr)
         except:
             # Smthg is already running on this port
-            self._log.error("Can't bind to the port %i" % port)
+            self._log.error("Can't bind to the interface %s, port %i" % (ip,port))
             exit(1)
         else:
             self.add_stop_cb(self.leave)
