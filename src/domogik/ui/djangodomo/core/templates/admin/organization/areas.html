@@ -79,28 +79,13 @@
             }
         });
 
-        $('.buttonside[title], .add').qtip({
-            position: {
-                corner: {
-                    target: 'leftMiddle',
-                    tooltip: 'rightMiddle'
-                }
-            },
-
-            style: {
-
-                padding: 5,
-                background: '#A2D959',
-                color: 'black',
-                textAlign: 'center',
-                border: {
-                    width: 7,
-                    radius: 5,
-                    color: '#A2D959'
-                },
-                tip: 'rightMiddle',
-                name: 'dark' // Inherit the rest of the attributes from the preset dark style
-            }
+        /* Tooltips */
+        $('.buttonside[title], .add').tooltip_left();
+        
+        /* Dialogs */
+        $('#delete_confirmation').dialog_confirmation({
+            title: "{% trans 'Delete' %}",
+            content: "{% trans "Please confirm to delete" %}"
         });
     });
 {% endblock %}
@@ -179,34 +164,21 @@
                             $('#update_dialog_{{ area.id }}').dialog('open');
                         });
 
-                        /* Add a onclick function to delete the current area */
-                        $('#del{{ area.id }}').click(function() {
-                            $('#delete_confirmation_{{ area.id }}').dialog('open');
-                        });
-                        
-                        $("#delete_confirmation_{{ area.id }}").dialog({
-                            bgiframe: true,
-                            autoOpen: false,
-                            height: 100,
-                            modal: true,
-                            buttons: {
-                                '{% trans "Delete" %}': function() {
-                                    getREST('/base/area/del/{{ area.id }}',
-                                        function(data) {
-                                            var status = (data.status).toLowerCase();
-                                            if (status == 'ok') {
-                                                $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Area" %}\'' + data.area[0].name + '\' {% trans "successfully deleted" %}'});
-                                            } else {
-                                                $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Area not deleted" %} (' + data.description + ')'});
-                                            }
+                        /* Add a function to delete the current area */
+                        $('#delete_confirmation').dialog_confirmation('addbutton', {
+                            button: "#del{{ area.id }}",
+                            name: "'{{ area.name }}'",
+                            onok: function() {
+                                getREST('/base/area/del/{{ area.id }}',
+                                    function(data) {
+                                        var status = (data.status).toLowerCase();
+                                        if (status == 'ok') {
+                                            $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Area" %}\'' + data.area[0].name + '\' {% trans "successfully deleted" %}'});
+                                        } else {
+                                            $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Area not deleted" %} (' + data.description + ')'});
                                         }
-                                    );
-                                },
-                                '{% trans "Cancel" %}': function() {
-                                    $(this).dialog('close');
-                                }
-                            },
-                            close: function() {
+                                    }
+                                );
                             }
                         });
                                                 
@@ -234,6 +206,7 @@
                         });
                         
                         $( "#icon{{ area.id }}").processing();
+                        
                     });
                     // ]]>
                 </script>
@@ -257,9 +230,6 @@
                         </fieldset>'
                     </form>
                 </div>
-                <div id="delete_confirmation_{{ area.id }}" title="{% trans "Delete" %} {{ area.name }}">
-                    <p>{% trans "Please confirm to delete" %} '{{ area.name }}'</p>
-                </div>
             </div>
             {% endfor %}
         </div>
@@ -275,4 +245,5 @@
             </form>
         </div>
     </div>
+    <div id="delete_confirmation"></div>
 {% endblock %}
