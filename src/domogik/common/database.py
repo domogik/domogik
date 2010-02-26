@@ -2028,45 +2028,31 @@ class DbHelper():
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return make_object_copy(ui_item_config)
 
-    def get_ui_item_config(self, ui_item_name, ui_item_reference=None, ui_key=None):
+    def get_ui_item_config(self, ui_item_name, ui_item_reference, ui_key):
         """
         Get a UI parameter of an item
         @param ui_item_name : item name
-        @param ui_item_reference : item reference, optional
-        @param ui_key : key, optional
-        @return a (list of) UIItemConfig object(s) (copy)
+        @param ui_item_reference : item reference
+        @param ui_key : key
+        @return an UIItemConfig object (copy)
         """
         return self.__get_ui_item_config(ui_item_name, ui_item_reference, ui_key)
 
-    def __get_ui_item_config(self, ui_item_name, ui_item_reference=None, ui_key=None):
+    def __get_ui_item_config(self, ui_item_name, ui_item_reference, ui_key):
         """
         Get a UI parameter of an item
         @param ui_item_name : item name
-        @param ui_item_reference : item reference, optional
-        @param ui_key : key, optional
-        @return a (list of) UIItemConfig object(s)
+        @param ui_item_reference : item reference
+        @param ui_key : key
+        @return an UIItemConfig object
         """
-        if ui_item_reference == None and ui_key == None:
-            return self._session.query(UIItemConfig)\
-                                    .filter_by(item_name=ui_item_name).all()
-        elif ui_item_reference == None:
-            return self._session.query(UIItemConfig)\
-                                    .filter_by(item_name=ui_item_name,
-                                               key=ui_key)\
-                                    .all()
-        elif ui_key == None:
-            return self._session.query(UIItemConfig)\
-                                    .filter_by(item_name=ui_item_name,
-                                          item_reference=ui_item_reference)\
-                                    .all()
-        else:
-            return self._session.query(UIItemConfig)\
-                               .filter_by(item_name=ui_item_name,
-                                          item_reference=ui_item_reference,
-                                          key=ui_key)\
-                               .first()
+        return self._session.query(UIItemConfig)\
+                            .filter_by(item_name=ui_item_name,
+                                       item_reference=ui_item_reference,
+                                       key=ui_key)\
+                            .first()
 
-    def list_ui_item_config(self, ui_item_name, ui_item_reference):
+    def list_ui_item_config_by_ref(self, ui_item_name, ui_item_reference):
         """
         List all UI parameters of an item
         @param ui_item_name : item name
@@ -2080,6 +2066,31 @@ class DbHelper():
                          .all()
         )
 
+    def list_ui_item_config_by_key(self, ui_item_name, ui_key):
+        """
+        List all UI parameters of an item
+        @param ui_item_name : item name
+        @param ui_key : item key
+        @return a list of UIItemConfig objects
+        """
+        return make_object_list_copy(
+            self._session.query(UIItemConfig)\
+                         .filter_by(item_name=ui_item_name, key=ui_key)
+                         .all()
+        )
+
+    def list_ui_item_config(self, ui_item_name):
+        """
+        List all UI parameters of an item
+        @param ui_item_name : item name
+        @return a list of UIItemConfig objects
+        """
+        return make_object_list_copy(
+            self._session.query(UIItemConfig)\
+                         .filter_by(item_name=ui_item_name)
+                         .all()
+        )
+
     def list_all_ui_item_config(self):
         """
         List all UI parameters
@@ -2087,25 +2098,38 @@ class DbHelper():
         """
         return make_object_list_copy(self._session.query(UIItemConfig).all())
 
-    def delete_ui_item_config(self, ui_item_name, ui_item_reference=None,
-                              ui_key=None):
+    def delete_ui_item_config(self, ui_item_name, ui_item_reference=None, ui_key=None):
         """
         Delete a UI parameter of an item
         @param ui_item_name : item name
         @param ui_item_reference : item reference, optional
-        @param ui_key : key of the item, optinal
+        @param ui_key : key of the item, optional
         @return the deleted UIItemConfig object(s)
         """
-        ui_item_config_list = self.__get_ui_item_config(ui_item_name, ui_item_reference, ui_key)
-        if ui_item_config_list is None:
-            raise DbHelperException("Can't find item for (%s, %s, %s)" \
-                                    % (ui_item_name, ui_item_reference, ui_key))
-        ui_item_config_list_d = ui_item_config_list
-        if isinstance(ui_item_config_list, list):
-           for item in ui_item_config_list:
-                self._session.delete(item)
+        ui_item_config_list = []
+        if ui_item_reference == None and ui_key == None:
+            ui_item_config_list = self._session.query(UIItemConfig)\
+                                               .filter_by(item_name=ui_item_name).all()
+        elif ui_key is None:
+            ui_item_config_list = self._session.query(UIItemConfig)\
+                                               .filter_by(item_name=ui_item_name,
+                                                          item_reference=ui_item_reference)\
+                                               .all()
+        elif ui_item_reference is None:
+            ui_item_config_list = self._session.query(UIItemConfig)\
+                                               .filter_by(item_name=ui_item_name,
+                                                          key=ui_key)\
+                                               .all()
         else:
-            self._session.delete(ui_item_config_list)
+            ui_item_config = self.__get_ui_item_config(ui_item_name, ui_item_reference, ui_key)
+            if ui_item_config is not None:
+                ui_item_config_list.append(ui_item_config)
+
+        if len(ui_item_config_list) == 0:
+            raise DbHelperException("Can't find item for (%s, %s, %s)" % (ui_item_name, ui_item_reference, ui_key))
+        ui_item_config_list_d = make_object_list_copy(ui_item_config_list)
+        for item in ui_item_config_list:
+            self._session.delete(item)
         try:
             self._session.commit()
         except Exception, sql_exception:
