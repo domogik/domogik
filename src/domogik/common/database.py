@@ -73,6 +73,9 @@ def make_object_copy(obj):
     instances = [int, float, str, unicode, long, bool, datetime.datetime, datetime.date]
     copy = Generic()
     setattr(copy, "_type", obj.__class__.__name__)
+    # TODO : remove this way to force cache
+    # dirty issue to force in cache
+    print "OBJ=%s" % str(obj)
     obj_dict = obj.__dict__
     # Don't consider attibutes starting with '_'
     attributes =  filter(lambda x: x[0] != '_', obj_dict)

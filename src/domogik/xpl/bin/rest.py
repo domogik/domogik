@@ -121,6 +121,8 @@ class Rest(xPLModule):
 
 
     def _add_to_queue_system_list(self, message):
+        # dirty way to empty queue
+        self._truncate_queue(self._queue_system_list.put)
         self._queue_system_list.put(message, True, QUEUE_TIMEOUT)
 
     def _add_to_queue_system_detail(self, message):
@@ -131,6 +133,15 @@ class Rest(xPLModule):
 
     def _add_to_queue_system_stop(self, message):
         self._queue_system_stop.put(message, True, QUEUE_TIMEOUT)
+
+    def _truncate_queue(queue):
+        # dirty way to empty queue
+        for idx in range(QUEUE_SIZE):
+            try:
+                foo = queue.get()
+            except:
+                pass
+
 
 
 
