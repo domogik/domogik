@@ -1127,6 +1127,7 @@ class DeviceStatsTestCase(GenericTestCase):
         stat = self.db.get_last_stat_of_device(device1.id)
         dsv = self.db.list_device_stats_values(stat.id)
         for item in dsv:
+            print item
             if item.name == 'val1':
                 assert item.value == '11'
             elif item.name == 'val2':

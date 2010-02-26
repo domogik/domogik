@@ -606,6 +606,7 @@ class DeviceStatsValue(Base):
     device_stats_id = Column(Integer,
                              ForeignKey('%s.id' % DeviceStats.get_tablename()),
                              nullable=False)
+    device_stats = relation(DeviceStats, backref=backref(__tablename__))
     name = Column(String(30), nullable=False)
     value = Column(String(80), nullable=False)
 
@@ -625,8 +626,8 @@ class DeviceStatsValue(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<DeviceStatsValue(id=%s, name=%s, value=%s, stat_id=%s)>" \
-               % (self.id, self.name, self.value, self.device_stat)
+        return "<DeviceStatsValue(id=%s, name=%s, value=%s, stats=%s)>" \
+               % (self.id, self.name, self.value, self.device_stats)
 
     @staticmethod
     def get_tablename():
