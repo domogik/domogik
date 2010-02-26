@@ -121,20 +121,22 @@ class Rest(xPLModule):
 
 
     def _add_to_queue_system_list(self, message):
-        # dirty way to empty queue
-        self._truncate_queue(self._queue_system_list.put)
+        #self._truncate_queue(self._queue_system_list)
         self._queue_system_list.put(message, True, QUEUE_TIMEOUT)
 
     def _add_to_queue_system_detail(self, message):
+        #self._truncate_queue(self._queue_system_detail)
         self._queue_system_detail.put(message, True, QUEUE_TIMEOUT)
 
     def _add_to_queue_system_start(self, message):
+        #self._truncate_queue(self._queue_system_start)
         self._queue_system_start.put(message, True, QUEUE_TIMEOUT)
 
     def _add_to_queue_system_stop(self, message):
+        #self._truncate_queue(self._queue_system_stop)
         self._queue_system_stop.put(message, True, QUEUE_TIMEOUT)
 
-    def _truncate_queue(queue):
+    def _truncate_queue(self, queue):
         # dirty way to empty queue
         for idx in range(QUEUE_SIZE):
             try:
@@ -2419,127 +2421,6 @@ class JSonHelper():
             
 
 
-    def _process_data_old(self, data, idx = 0, key = None):
-        #print "==== PROCESS DATA " + str(idx) + " ===="
-        #db_type = ("ActuatorFeature", "Area", "Device", "DeviceUsage", \
-        #           "DeviceConfig", "DeviceStats", "DeviceStatsValue", \
-        #           "DeviceTechnology", "DeviceTechnologyConfig", \
-        #           "DeviceType", "UIItemConfig", "Room", "UserAccount", \
-        #           "SensorReferenceData", "SystemAccount", "SystemConfig", \
-        #           "SystemStats", "SystemStatsValue", "Trigger")
-        instance_type = ("instance")
-        num_type = ("int", "float")
-        str_type = ("str", "unicode", "bool")
-        none_type = ("NoneType")
-        tuple_type = ("tuple")
-        list_type = ("list")
-        dict_type = ("dict")
-
-        data_json = ""
-
-        #if idx == 0:
-        #    data_json += '"%s" : [' % self._data_type
-
-        # get data type
-        data_type = type(data).__name__
-
-        # dirty issue to force cache of __dict__ : make a print of data
-        if idx == 0:
-            print "DATA : " + str(data)
-        else:
-            print "DATA : " + str(data)
-
-        #print "DATA TYPE : " + data_type
-
-        # type : tuple 
-        if data_type in tuple_type:
-            if idx > 0:
-                data_json += "{"
-            for idy in range(len(data)):
-                sub_data_key = "???"
-                sub_data = data[idy]
-                sub_data_type = type(data[idy]).__name__
-                #print "    DATA KEY : " + str(sub_data_key)
-                #print "    DATA : " + str(sub_data)
-                #print "    DATA TYPE : " + str(sub_data_type)
-                data_json += self._process_sub_data(idx, False, sub_data_key, sub_data, sub_data_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type)
-            if idx > 0:
-                data_json = data_json[0:len(data_json)-1] + "},"
-
-        # type : Area, Room, Device, etc
-        #elif data_type in db_type:
-        #    data_json += "{"
-        #    for key in data.__dict__:
-        #        sub_data_key = key
-        #        sub_data = data.__dict__[key]
-        #        sub_data_type = type(sub_data).__name__
-        #        #print "    DATA KEY : " + str(sub_data_key)
-        #        #print "    DATA : " + str(sub_data)
-        #        #print "    DATA TYPE : " + str(sub_data_type)
-        #        data_json += self._process_sub_data(idx, False, sub_data_key, sub_data, sub_data_type, db_type, num_type, str_type, none_type, tuple_type, list_type, dict_type)
-        #    data_json = data_json[0:len(data_json)-1] + "},"
-
-        # type : instance
-        elif data_type in instance_type:
-            # get first data type
-            if len(data) > 0:
-                sub_data_elt0_type = type(data[0]).__name__
-            else:
-                return data_json
-
-            #data_json += "{"
-            data_json += '"%s" : {' % sub_data_elt0_type.lower()
-            for key in data.__dict__:
-                sub_data_key = key
-                sub_data = data.__dict__[key]
-                sub_data_type = type(sub_data).__name__
-                print "    DATA KEY : " + str(sub_data_key)
-                print "    DATA : " + str(sub_data)
-                print "    DATA TYPE : " + str(sub_data_type)
-                data_json += self._process_sub_data(idx, False, sub_data_key, sub_data, sub_data_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type)
-            data_json = data_json[0:len(data_json)-1] + "},"
-
-        elif data_type in list_type:
-            # get first data type
-            if len(data) > 0:
-                sub_data_elt0_type = type(data[0]).__name__
-            else:
-                return data_json
-
-            # start table
-            if sub_data_elt0_type == "dict":
-                data_json += '"%s" : [' % key
-            else:
-                data_json += '"%s" : [' % sub_data_elt0_type.lower()
-
-            # process each data
-            for sub_data in data:
-                sub_data_key  = "???(2)"
-                sub_data_type = type(sub_data).__name__
-                #print "    DATA KEY : " + str(sub_data_key)
-                #print "    DATA : " + str(sub_data)
-                #print "    DATA TYPE : " + str(sub_data_type)
-                data_json += self._process_sub_data(idx, True, sub_data_key, sub_data, sub_data_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type)
-            # finish table
-            data_json = data_json[0:len(data_json)-1] + "],"
-
-        elif data_type in dict_type:
-            data_json += "{"
-            for key in data:
-                sub_data_key = key
-                sub_data = data[key]
-                sub_data_type = type(sub_data).__name__
-                #print "    DATA KEY : " + str(sub_data_key)
-                #print "    DATA : " + str(sub_data)
-                #print "    DATA TYPE : " + str(sub_data_type)
-                data_json += self._process_sub_data(idx, False, sub_data_key, sub_data, sub_data_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type)
-            data_json = data_json[0:len(data_json)-1] + "},"
-
-        #print "========================="
-        return data_json
-
-
-
 
 
     def _process_data(self, data, idx = 0, key = None):
@@ -2574,7 +2455,7 @@ class JSonHelper():
             if idx == 0:
                 data_json += "{"
             else:
-                data_json += "%s : {" % sub_data_type
+                data_json += '"%s" : {' % sub_data_type
 
             for key in data.__dict__:
                 sub_data_key = key
@@ -2642,25 +2523,15 @@ class JSonHelper():
                 data_json += self._process_sub_data(False, sub_data_key, sub_data, sub_data_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type)
             data_json = data_json[0:len(data_json)-1] + "},"
 
-
-
-
-
-
-
-
-
-
         return data_json
-
 
 
 
     def _process_sub_data(self, is_table, sub_data_key, sub_data, sub_data_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type):
         data_tmp = ""
         if sub_data_type in instance_type:
-            if is_table is False: 
-                data_tmp = '"%s" : ' % sub_data_type.lower()
+            #if is_table is False: 
+            #    data_tmp = '"!!!%s" : ' % sub_data_type.lower()
             data_tmp += self._process_data(sub_data, 1)
         elif sub_data_type in list_type:
             data_tmp += self._process_data(sub_data, 1, sub_data_key)
@@ -2689,12 +2560,6 @@ class JSonHelper():
             json_buf = "%s (" % self._jsonp_cb
         else:
             json_buf = ""
-
-        #if self._data_type != "":
-        #    json_buf += '{' + self._status + '"' + self._data_type + '" : [' + \
-        #           self._data_values[0:len(self._data_values)-1] + ']' + '}'
-        #else:
-        #    json_buf += '{' + self._status[0:len(self._status)-1] + '}'
 
         if self._data_type != "":
             json_buf += '{%s "%s" : [%s]}' % (self._status,   self._data_type, self._data_values[0:len(self._data_values)-1])
