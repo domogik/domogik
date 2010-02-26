@@ -193,6 +193,7 @@ class AreaTestCase(GenericTestCase):
         except DbHelperException:
             pass
         area0 = self.db.add_area('area0','description 0')
+        assert area0._type == 'Area'
         print area0
         assert self.db.list_areas()[0].name == 'area0'
 

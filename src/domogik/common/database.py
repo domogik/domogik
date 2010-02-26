@@ -71,6 +71,7 @@ def make_object_copy(obj):
         return None
     instances = [int, float, str, unicode, long, bool, datetime.datetime, datetime.date]
     copy = Generic()
+    setattr(copy, "_type", obj.__class__.__name__)
     obj_dict = obj.__dict__
     # Don't consider attibutes starting with '_'
     attributes =  filter(lambda x: x[0] != '_', obj_dict)
