@@ -65,7 +65,8 @@ def make_object_copy(obj):
     @return a copy of the object
     """
     class Generic:
-        pass
+        def __repr__(self):
+            return str(self.__dict__)
 
     if obj is None:
         return None
