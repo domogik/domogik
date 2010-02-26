@@ -48,7 +48,7 @@ DOMOGIK_MODULE_DESCRIPTION = "Manage Plcbus devices"
 DOMOGIK_MODULE_CONFIGURATION=[
       {"id" : 0,
        "key" : "device",
-       "description" : "Plcbus device (ex : ??? TODO ???)",
+       "description" : "Plcbus device (ex : TODO )",
        "default" : "??? TODO ???"}]
 
 
