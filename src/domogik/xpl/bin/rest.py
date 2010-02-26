@@ -1399,11 +1399,11 @@ target=*
         elif name != None and reference != None:
             if key == None:
                 # by-reference
-                for ui_item_config in self._db.list_ui_item_config(name, reference):
+                for ui_item_config in self._db.list_ui_item_config_by_ref(ui_item_name = name, ui_item_reference = reference):
                     json_data.add_data(ui_item_config)
             else:
                 # by-key
-                for ui_item_config in self._db.get_ui_item_config(ui_item_name = name, ui_key= key):
+                for ui_item_config in self._db.list_ui_item_config_by_key(ui_item_name = name, ui_key= key):
                     json_data.add_data(ui_item_config)
         elif name != None and key != None and reference != None:
             # by-element
