@@ -1894,18 +1894,22 @@ target=*
 # /base/device processing
 ######
 
-    def _rest_base_device_list(self, room_id = None):
+    def _rest_base_device_list(self, room_id = None, device_id = None):
         """ list devices
         """
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("device")
-        if room_id == None:
+        if room_id == None and device_id == None:
             for device in self._db.list_devices():
                 json_data.add_data(device)
-        else:
-            device = self._db.get_all_devices_of_room(room_id)
-            if device is not None:
+        elif device_id == None:
+            # by-room
+            for device in self._db.get_all_devices_of_room(room_id):
+                json_data.add_data(device)
+        elif room_id == None:
+            # by-device
+            for device in self._db.get_all_devices_of_room(room_id):
                 json_data.add_data(device)
         self.send_http_response_ok(json_data.get())
 
@@ -2461,9 +2465,9 @@ class JSonHelper():
                 sub_data_key = key
                 sub_data = data.__dict__[key]
                 sub_data_type = type(sub_data).__name__
-                print "    DATA KEY : " + str(sub_data_key)
-                print "    DATA : " + str(sub_data)
-                print "    DATA TYPE : " + str(sub_data_type)
+                #print "    DATA KEY : " + str(sub_data_key)
+                #print "    DATA : " + str(sub_data)
+                #print "    DATA TYPE : " + str(sub_data_type)
                 data_json += self._process_sub_data(False, sub_data_key, sub_data, sub_data_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type)
             data_json = data_json[0:len(data_json)-1] + "},"
 
