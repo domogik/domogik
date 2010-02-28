@@ -2335,7 +2335,12 @@ target=*
             else:
                 self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
-
+        elif self.rest_request[0] == "del":
+            if len(self.rest_request) == 2:
+                self._rest_account_del(id=self.rest_request[1])
+            else:
+                self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
+                                                  self.jsonp, self.jsonp_cb)
 
 
         ### others ###################################
@@ -2406,6 +2411,21 @@ target=*
             json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
         self.send_http_response_ok(json_data.get())
 
+
+
+    def _rest_account_del(self, id):
+        """ delete user account
+            @param id : account id
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("account")
+        try:
+            account = self._db.del_user_account(id)
+            json_data.add_data(account)
+        except:
+            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+        self.send_http_response_ok(json_data.get())
 
 
 
