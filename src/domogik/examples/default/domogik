@@ -13,3 +13,11 @@ DOMOGIK_USER=domogik
 #  - You do not pass -d parameter to the manager
 MANAGER_PARAMS="-d -r"
 
+# You can define one or many extra path(s) for Domogik startup scripts.
+# This should only be useful if you use Domogik in developement mode (with setup.py develop)
+# or if you  have a custom path install.
+# PATH is needed to locate 3 applications :
+#  - django : a script to run the domogik's ui, installed by setup.py develop 
+#  - xPL_Hub : the xPL hub, *not* installed by setup.py develop 
+#  - dmg_manager : Domogik's manager, installed by setup.py develop
+CUSTOM_PATH=
