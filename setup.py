@@ -81,7 +81,7 @@ setup(
         'console_scripts': [
             """
             dmg_manager = domogik.bin.manager:main
-            django = domogik.ui.djangodomo.manage:run_manager
+            dmg_django = domogik.ui.djangodomo.manage:run_manager
             """
         ],
     },
