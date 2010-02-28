@@ -49,11 +49,16 @@ import urllib
 import sys
 from socket import gethostname
 from Queue import *
+from domogik.xpl.lib.queryconfig import Query
+from domogik.xpl.lib.module import xPLResult
+
+
 
 
 
 QUEUE_TIMEOUT = 10
 QUEUE_SIZE = 10
+QUEUE_LIFE_EXPECTANCY = 3
 
 
 
@@ -91,11 +96,33 @@ class Rest(xPLModule):
         conf = dict(config[1])
         self._xml_directory = "%s/share/domogik/rest/" % conf['custom_prefix']
 
+        self._config = Query(self._myxpl)
+        res = xPLResult()
+        self._config.query('rest', 'queue-timeout', res)
+        self._queue_timeout = res.get_value()['queue-timeout']
+        if self._queue_timeout == "None":
+            self._queue_timeout = QUEUE_TIMEOUT
+        self._queue_timeout = float(self._queue_timeout)
+        self._config = Query(self._myxpl)
+        res = xPLResult()
+        self._config.query('rest', 'queue-size', res)
+        self._queue_size = res.get_value()['queue-size']
+        if self._queue_size == "None":
+            self._queue_size = QUEUE_SIZE
+        self._queue_size = float(self._queue_size)
+        self._config = Query(self._myxpl)
+        res = xPLResult()
+        self._config.query('rest', 'queue-life-exp', res)
+        self._queue_life_expectancy = res.get_value()['queue-life-exp']
+        if self._queue_life_expectancy == "None":
+            self._queue_life_expectancy = QUEUE_LIFE_EXPECTANCY
+        self._queue_life_expectancy = float(self._queue_life_expectancy)
+
         # Queues for xPL
-        self._queue_system_list = Queue(QUEUE_SIZE)
-        self._queue_system_detail = Queue(QUEUE_SIZE)
-        self._queue_system_start = Queue(QUEUE_SIZE)
-        self._queue_system_stop = Queue(QUEUE_SIZE)
+        self._queue_system_list = Queue(self._queue_size)
+        self._queue_system_detail = Queue(self._queue_size)
+        self._queue_system_start = Queue(self._queue_size)
+        self._queue_system_stop = Queue(self._queue_size)
 
         # define listeners for queues
         Listener(self._add_to_queue_system_list, self._myxpl, \
@@ -121,29 +148,81 @@ class Rest(xPLModule):
 
 
     def _add_to_queue_system_list(self, message):
-        #self._truncate_queue(self._queue_system_list)
-        self._queue_system_list.put(message, True, QUEUE_TIMEOUT)
+        self._put_in_queue(self._queue_system_list, message)
 
     def _add_to_queue_system_detail(self, message):
-        #self._truncate_queue(self._queue_system_detail)
-        self._queue_system_detail.put(message, True, QUEUE_TIMEOUT)
+        self._put_in_queue(self._queue_system_detail, message)
 
     def _add_to_queue_system_start(self, message):
-        #self._truncate_queue(self._queue_system_start)
-        self._queue_system_start.put(message, True, QUEUE_TIMEOUT)
+        self._put_in_queue(self._queue_system_start, message)
 
     def _add_to_queue_system_stop(self, message):
-        #self._truncate_queue(self._queue_system_stop)
-        self._queue_system_stop.put(message, True, QUEUE_TIMEOUT)
+        self._put_in_queue(self._queue_system_stop, message)
 
-    def _truncate_queue(self, queue):
-        # dirty way to empty queue
-        for idx in range(QUEUE_SIZE):
-            try:
-                foo = queue.get()
-            except:
-                pass
+    def _get_from_queue(self, my_queue, filter = None, nb_rec = 0):
+        """ Get an item from queue (recursive function)
+            Checks are made on : 
+            - life expectancy of message
+            - filter given
+            - size of queue
+            If necessary, each item of queue is read.
+            @param my_queue : queue to get data from
+            @param filter : dictionnay of filters. Examples :
+                - {"command" : "start", ...}
+                - {"module" : "wol%", ...} : here "%" indicate that we search for something starting with "wol"
+            @param nb_rec : internal parameter (do not use it for first call). Used to check recursivity VS queue size
+        """
+        # check if recursivity doesn't exceed queue size
+        if nb_rec > self._queue_size:
+            print "_get_from_queue : number of call exceed queue size (%s) : return None" % self._queue_size
+            # we raise an "Empty" exception because we consider that if we don't find
+            # the good data, it is as if it was "empty"
+            raise Empty
 
+        msg_time, message = my_queue.get(True, self._queue_timeout)
+
+        # if message not too old, we process it
+        if time.time() - msg_time < self._queue_life_expectancy:
+            # no filter defined
+            if filter == None: 
+                return message
+
+            # we want to filter data
+            else:
+                keep_data = True
+                print "FILTER---------------------"
+                for key in filter:
+                    print "key=%s, val=%s" % (key, filter[key])
+                    print "msg[key]=%s" % message.data[key]
+                    # take care of final "%" in order to search data starting by filter[key]
+                    if filter[key][-1] == "%":
+                        msg_data = str(message.data[key])
+                        filter_data = str(filter[key])
+                        len_data = len(filter_data) - 1
+                        if msg_data[0:len_data] != filter_data[0:-1]:
+                            print "Bad data!"
+                            keep_data = False
+                    # normal search
+                    else:
+                        if message.data[key] != filter[key]:
+                            print "Bad data!"
+                            keep_data = False
+
+                # if message is ok for us, return it
+                if keep_data == True:
+                    return message
+
+                # else, message get back in queue and get another one
+                else:
+                    self._put_in_queue(my_queue, message)
+                    return self._get_from_queue(my_queue, filter, nb_rec + 1)
+
+        # if message too old : get an other message
+        else:
+            return self._get_from_queue(my_queue, filter, nb_rec + 1)
+
+    def _put_in_queue(self, my_queue, message):
+        my_queue.put((time.time(), message), True, self._queue_timeout) 
 
 
 
@@ -301,6 +380,14 @@ class ProcessRequest():
         self._myxpl = self.handler_params[0]._myxpl
         self._log = self.handler_params[0]._log
         self._xml_directory = self.handler_params[0]._xml_directory
+
+        self._queue_timeout =  self.handler_params[0]._queue_timeout
+        self._queue_size =  self.handler_params[0]._queue_size
+        self._queue_life_expectancy = self.handler_params[0]._queue_life_expectancy
+      
+        self._get_from_queue = self.handler_params[0]._get_from_queue
+        self._put_in_queue = self.handler_params[0]._put_in_queue
+
         self._queue_system_list =  self.handler_params[0]._queue_system_list
         self._queue_system_detail =  self.handler_params[0]._queue_system_detail
         self._queue_system_start =  self.handler_params[0]._queue_system_start
@@ -337,6 +424,10 @@ class ProcessRequest():
             self.rest_request = []
         print "TYPE    : " + self.rest_type
         print "Request : " + str(self.rest_request)
+
+
+
+
 
 
 
@@ -2058,9 +2149,9 @@ target=*
         ### Wait for answer
         # get xpl message from queue
         try:
-            message = self._queue_system_list.get(True, QUEUE_TIMEOUT)
+            message = self._get_from_queue(self._queue_system_list)
         except Empty:
-            json_data = JSonHelper("ERROR", 999, "Timeout on getting module list")
+            json_data = JSonHelper("ERROR", 999, "No data or timeout on getting module list")
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
             json_data.set_data_type("module")
             self.send_http_response_ok(json_data.get())
@@ -2113,23 +2204,10 @@ target=*
         ### Wait for answer
         # get xpl message from queue
         try:
-            message = self._queue_system_detail.get(True, QUEUE_TIMEOUT)
-            # verify is data has a goog module name
-            if message.data['module'] != name:
-                try:
-                    self._queue_system_detail.put(message, True, QUEUE_TIMEOUT)
-                except Full:
-                    json_data = JSonHelper("ERROR", 999, "Timeout on putting bad module detail for %s (%s)" % (name, message.data['module']))
-                    json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-                    json_data.set_data_type("module")
-                    self.send_http_response_ok(json_data.get())
-                    return
-            else:
-                # TODO : make something to reread queue!!!!
-                pass
-
+            # in filter, "%" means, that we check for something starting with name
+            message = self._get_from_queue(self._queue_system_detail, filter = {"command" : "detail", "module" : name + "%"})
         except Empty:
-            json_data = JSonHelper("ERROR", 999, "Timeout on getting module detail for %s" % name)
+            json_data = JSonHelper("ERROR", 999, "No data or timeout on getting module detail for %s" % name)
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
             json_data.set_data_type("module")
             self.send_http_response_ok(json_data.get())
@@ -2186,29 +2264,11 @@ target=*
         # get xpl message from queue
         try:
             if command == "start":
-                message = self._queue_system_start.get(True, QUEUE_TIMEOUT)
+                message = self._get_from_queue(self._queue_system_start, filter = {"command" : "start", "module" : module})
             elif command == "stop":
-                message = self._queue_system_stop.get(True, QUEUE_TIMEOUT)
-            # verify is data has a goog module name
-            if message.data['module'] != module:
-                try:
-                    if command == "start":
-                        self._queue_system_start.put(message, True, QUEUE_TIMEOUT)
-                    elif command == "start":
-                        self._queue_system_stop.put(message, True, QUEUE_TIMEOUT)
-                except Full:
-                    json_data = JSonHelper("ERROR", 999, "Timeout on putting bad module %s for %s (%s)" % (command, module, message.data['module']))
-                    json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-                    json_data.set_data_type("module")
-                    self.send_http_response_ok(json_data.get())
-                    return
-            else:
-                # TODO : make something to reread queue!!!!
-                pass
-
-
+                message = self._get_from_queue(self._queue_system_stop, filter= {"command" : "stop", "module" : module})
         except Empty:
-            json_data = JSonHelper("ERROR", 999, "Timeout on getting module detail for %s" % module)
+            json_data = JSonHelper("ERROR", 999, "No data or timeout on %s module %s" % (command, module))
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
             json_data.set_data_type("module")
             self.send_http_response_ok(json_data.get())
