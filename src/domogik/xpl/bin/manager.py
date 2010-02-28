@@ -92,9 +92,30 @@ class SysManager(xPLModule):
                 help="Start database manager if not already running.")
         parser.add_option("-r", action="store_true", dest="start_rest", default=False, \
                 help="Start REST interface manager if not already running.")
+        
+        (options, args) = parser.parse_args()
+
+        print options
+        if options.start_dbmgr:
+            if self._check_dbmgr_is_running():
+                self._log.warning("Manager started with -d, but a database manager is already running")
+            else:
+                self._start_module("dbmgr", gethostname(), 0)
+                if not self._check_dbmgr_is_running():
+                    self._log.error("Manager started with -d, but database manager not available after a startup.\
+                            Please check dbmgr.log file")
+
+        if options.start_rest:
+            if self._check_rest_is_running():
+                self._log.warning("Manager started with -r, but a REST manager is already running")
+            else:
+                self._start_module("rest", gethostname(), 0)
+                if not self._check_rest_is_running():
+                    self._log.error("Manager started with -r, but REST manager not available after a startup.\
+                            Please check rest.log file")
 
         # Start modules at manager startup
-        self._log.debug("Check modules to start at manager startup...")
+        self._log.debug("Check non-system modules to start at manager startup...")
         for component in self._components:
             self._log.debug("%s..." % component["name"])
             self._config = Query(self._myxpl)
@@ -220,7 +241,6 @@ class SysManager(xPLModule):
         else:
             self._log.info("Error detected : %s, request %s has been cancelled" % (error, cmd))
 
-
     def _invalid_component(self, cmd, mod, host):
         error = "Component %s doesn't exists on %s" % (mod, host)
         self._log.debug(error)
@@ -232,10 +252,6 @@ class SysManager(xPLModule):
         mess.add_data({'module' :  mod})
         mess.add_data({'error' :  error})
         self._myxpl.send(mess)
-
-
-
-
 
     def _start_module(self, mod, host, force):
         error = ""
@@ -260,8 +276,6 @@ class SysManager(xPLModule):
                 if error != "":
                     mess.add_data({'error' :  error})
         self._myxpl.send(mess)
-
-
 
     def _stop_module(self, mod, host, force, error):
         self._log.debug("Check module stops : %s on %s" % (mod, host))
@@ -349,10 +363,10 @@ class SysManager(xPLModule):
         mess.add_data({'command' : 'ping'})
         mess.add_data({'host' : gethostname()})
         mess.add_data({'module' : 'rest'})
-        Listener(self._cb_check_dbmgr_is_running, self._myxpl, {'schema':'domogik.system',\
+        Listener(self._cb_check_rest_is_running, self._myxpl, {'schema':'domogik.system',\
                 'xpltype':'xpl-trig','command':'ping','module':'rest','host':gethostname()})
         self._myxpl.send(mess)
-        self._dbmgr.wait(5) #Wait 5 seconds 
+        self._rest.wait(5) #Wait 5 seconds 
         return self._rest.isSet() #Will be set only if an answer was received
 
     def _cb_check_rest_is_running(self, message):
@@ -381,8 +395,6 @@ class SysManager(xPLModule):
             #self._set_component_status(name, "ON")
         return lastpid
 
-
-
     def _is_component_running(self, component):
         '''
         Check if one component is still running == the pid file exists
@@ -401,8 +413,6 @@ class SysManager(xPLModule):
         pidfile = os.path.join(self._pid_dir_path,
                 component + ".pid")
         return os.remove(pidfile)
-
-
 
     def _write_pid_file(self, component, pid):
         '''
@@ -515,6 +525,11 @@ class SysManager(xPLModule):
         self._myxpl.send(mess)
 
 
+def main():
+    ''' Called by the easyinstall mapping script
+    '''
+    SYS = SysManager()
+
 
 if __name__ == "__main__":
-    SYS = SysManager()
+    main()

@@ -57,7 +57,7 @@ function start_xpl {
 }
 function start_manager {
     echo -n "* Starting Manager (with $MANAGER_PARAMS)..."
-    /bin/su - ${DOMOGIK_USER} -c "dmg_manager $MANAGER_PARAMS >  /dev/null &"
+    /bin/su - ${DOMOGIK_USER} -c "dmg_manager $MANAGER_PARAMS  &"
     if [ $? -gt 0 ]; then
         echo " An error occured during manager startup."
         exit 1
