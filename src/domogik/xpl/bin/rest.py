@@ -2429,6 +2429,12 @@ class JSonHelper():
 
     def _process_data(self, data, idx = 0, key = None):
         print "==== PROCESS DATA " + str(idx) + " ===="
+        db_type = ("ActuatorFeature", "Area", "Device", "DeviceUsage", \
+                   "DeviceConfig", "DeviceStats", "DeviceStatsValue", \
+                   "DeviceTechnology", "DeviceTechnologyConfig", \
+                   "DeviceType", "UIItemConfig", "Room", "UserAccount", \
+                   "SensorReferenceData", "SystemAccount", "SystemConfig", \
+                   "SystemStats", "SystemStatsValue", "Trigger") 
         instance_type = ("instance")
         num_type = ("int", "float")
         str_type = ("str", "unicode", "bool")
@@ -2468,9 +2474,21 @@ class JSonHelper():
                 #print "    DATA KEY : " + str(sub_data_key)
                 #print "    DATA : " + str(sub_data)
                 #print "    DATA TYPE : " + str(sub_data_type)
-                data_json += self._process_sub_data(False, sub_data_key, sub_data, sub_data_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type)
+                data_json += self._process_sub_data(False, sub_data_key, sub_data, sub_data_type, db_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type)
             data_json = data_json[0:len(data_json)-1] + "},"
 
+        ### type : SQL table
+        elif data_type in db_type: 
+            data_json += "{" 
+            for key in data.__dict__: 
+                sub_data_key = key 
+                sub_data = data.__dict__[key] 
+                sub_data_type = type(sub_data).__name__ 
+                #print "    DATA KEY : " + str(sub_data_key) 
+                #print "    DATA : " + str(sub_data) 
+                #print "    DATA TYPE : " + str(sub_data_type) 
+                data_json += self._process_sub_data(False, sub_data_key, sub_data, sub_data_type, db_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type) 
+            data_json = data_json[0:len(data_json)-1] + "}," 
 
         ### type : tuple
         elif data_type in tuple_type:
@@ -2483,7 +2501,7 @@ class JSonHelper():
                 #print "    DATA KEY : " + str(sub_data_key)
                 #print "    DATA : " + str(sub_data)
                 #print "    DATA TYPE : " + str(sub_data_type)
-                data_json += self._process_sub_data(False, sub_data_key, sub_data, sub_data_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type)
+                data_json += self._process_sub_data(False, sub_data_key, sub_data, sub_data_type, db_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type)
             if idx > 0:
                 data_json = data_json[0:len(data_json)-1] + "},"
 
@@ -2509,7 +2527,7 @@ class JSonHelper():
                 #print "    DATA KEY : " + str(sub_data_key)
                 #print "    DATA : " + str(sub_data)
                 #print "    DATA TYPE : " + str(sub_data_type)
-                data_json += self._process_sub_data(True, sub_data_key, sub_data, sub_data_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type)
+                data_json += self._process_sub_data(True, sub_data_key, sub_data, sub_data_type, db_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type)
             # finish table
             data_json = data_json[0:len(data_json)-1] + "],"
 
@@ -2524,18 +2542,20 @@ class JSonHelper():
                 #print "    DATA KEY : " + str(sub_data_key)
                 #print "    DATA : " + str(sub_data)
                 #print "    DATA TYPE : " + str(sub_data_type)
-                data_json += self._process_sub_data(False, sub_data_key, sub_data, sub_data_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type)
+                data_json += self._process_sub_data(False, sub_data_key, sub_data, sub_data_type, db_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type)
             data_json = data_json[0:len(data_json)-1] + "},"
 
         return data_json
 
 
 
-    def _process_sub_data(self, is_table, sub_data_key, sub_data, sub_data_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type):
+    def _process_sub_data(self, is_table, sub_data_key, sub_data, sub_data_type, db_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type):
         data_tmp = ""
+        if sub_data_type in db_type: 
+            if is_table is False:  # and idx != 0: 
+                data_tmp = '"%s" : ' % sub_data_type.lower() 
+            data_tmp += self._process_data(sub_data, 1)
         if sub_data_type in instance_type:
-            #if is_table is False: 
-            #    data_tmp = '"!!!%s" : ' % sub_data_type.lower()
             data_tmp += self._process_data(sub_data, 1)
         elif sub_data_type in list_type:
             data_tmp += self._process_data(sub_data, 1, sub_data_key)
