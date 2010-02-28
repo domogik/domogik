@@ -19,18 +19,21 @@
 #along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
 # source application-specific settings
+CUSTOM_PATH=""
+
 [ -f /etc/conf.d/domogik ] && . /etc/conf.d/domogik
 [ -f /etc/default/domogik ] && . /etc/default/domogik
 
-PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$CUSTOM_PATH
 
 if [ $UID != 0 ];then
-    echo "Must be started as root";
+    echo "Must be started with root privileges";
     exit 1;
 fi
+
 function start_django {
     echo -n " * Starting Django..."
-    /bin/su - ${DOMOGIK_USER} -c "django runserver 2>/dev/null 1>&2 &"
+    /bin/su - ${DOMOGIK_USER} -c "dmg_django runserver >/dev/null  &"
     if [ $? -gt 0 ]; then
         echo " An error occured during Django startup."
         exit 1
@@ -39,8 +42,12 @@ function start_django {
     fi
 }
 function start_xpl {
+    if [ -z "$(which xPL_Hub)" ];then
+        echo "ERROR : xPL_Hub not in path, please install it somewhere in the path, or add CUSTOM_PATH to domogik system config file."
+        exit 1
+    fi
     echo -n "* Starting XPL..."
-    /bin/su - ${DOMOGIK_USER} -c "xPL_Hub -interface lo 2>/dev/null 1>&2"
+    /bin/su - ${DOMOGIK_USER} -c "xPL_Hub -interface lo >/dev/null &"
     if [ $? -gt 0 ]; then
         echo " An error occured during Xpl startup."
         exit 1
@@ -49,37 +56,30 @@ function start_xpl {
     fi
 }
 function start_manager {
-    ATTRS=""
-    if [ $START_DB -eq 1 ];then
-        ATTRS+="database_manager"
-    fi
-    if [ $START_REST -eq 1 ];then
-        ATTRS+=" rest"
-    fi
-    echo -n "* Starting Manager (with $ATTRS)..."
-    /bin/su - ${DOMOGIK_USER} -c "dmg_manager $ATTRS 2>/dev/null 1>&2 &"
+    echo -n "* Starting Manager (with $MANAGER_PARAMS)..."
+    /bin/su - ${DOMOGIK_USER} -c "dmg_manager $MANAGER_PARAMS >  /dev/null &"
     if [ $? -gt 0 ]; then
-        echo " Done."
-        exit 0
-    else
         echo " An error occured during manager startup."
         exit 1
+    else
+        echo " Done."
     fi
 }
 
 function stop_django {
-    for pid in `ps ax | grep "manage.py runserver" | grep -v grep | awk '{print $1}'`; do
+    for pid in `ps ax | grep "dmg_django runserver" | grep -v grep | awk '{print $1}'`; do
         kill -15 $pid 2>/dev/null 1>&2
     done
 }
 function stop_xpl {
     for pid in `ps ax | grep "xPL_Hub" | grep -v grep | awk '{print $1}'`; do
         kill -15 $pid 2>/dev/null 1>&2
+        kill -9 $pid 2>/dev/null 1>&2
     done
 }
 function stop_manager {
     for pid in `ps ax | grep "dmg_manager" | grep -v grep | awk '{print $1}'`; do
-        kill -9 $pid 2>/dev/null 1>&2
+        kill -15 $pid 2>/dev/null 1>&2
     done
 }
 
