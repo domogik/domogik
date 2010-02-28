@@ -2370,7 +2370,11 @@ target=*
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         login_ok = self._db.authenticate(login, password)
         if login_ok == True:
-            json_data.set_error(description = "Authentification granted")
+            json_data.set_ok(description = "Authentification granted")
+            json_data.set_data_type("account")
+            account = self._db.get_user_account_by_login(login)
+            if account is not None:
+                json_data.add_data(account)
         else:
             json_data.set_error(999, "Authentification refused")
         self.send_http_response_ok(json_data.get())
