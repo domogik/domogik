@@ -80,7 +80,7 @@ setup(
     entry_points = {
         'console_scripts': [
             """
-            dmg_manager = domogik.bin.manager:main
+            dmg_manager = domogik.xpl.bin.manager:main
             dmg_django = domogik.ui.djangodomo.manage:run_manager
             """
         ],
