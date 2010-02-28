@@ -190,10 +190,7 @@ class Rest(xPLModule):
             # we want to filter data
             else:
                 keep_data = True
-                print "FILTER---------------------"
                 for key in filter:
-                    print "key=%s, val=%s" % (key, filter[key])
-                    print "msg[key]=%s" % message.data[key]
                     # take care of final "%" in order to search data starting by filter[key]
                     if filter[key][-1] == "%":
                         msg_data = str(message.data[key])
