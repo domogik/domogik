@@ -54,7 +54,7 @@ DOMOGIK_MODULE_CONFIGURATION=[
       {"id" : 0,
        "key" : "heyu-cfg-path",
        "description" : "Heyu configuration path",
-       "default" : "??? TODO ???"}]
+       "default" : "TODO"}]
 
 
 

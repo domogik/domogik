@@ -81,55 +81,13 @@
             }
         });
         
-        $('.buttonside[title], .add').qtip({
-            position: {
-                corner: {
-                    target: 'leftMiddle',
-                    tooltip: 'rightMiddle'
-                }
-            },
-
-            style: {
-                padding: 5,
-                background: '#A2D959',
-                color: 'black',
-                textAlign: 'center',
-                border: {
-                    width: 7,
-                    radius: 5,
-                    color: '#A2D959'
-                },
-                tip: 'rightMiddle',
-                name: 'dark' // Inherit the rest of the attributes from the preset dark style
-            }
-        });
-        
-        $('#help_dragdrop').qtip({
-            position: {
-                corner: {
-                    target: 'rightBottom',
-                    tooltip: 'leftTop'
-                }
-            },
-
-            style: {
-                padding: 5,
-                background: '#A2D959',
-                color: 'black',
-                textAlign: 'left',
-                border: {
-                    width: 7,
-                    radius: 5,
-                    color: '#A2D959'
-                },
-                tip: 'leftTop',
-                name: 'dark' // Inherit the rest of the attributes from the preset dark style
-            },
-            
+        /* Tooltips */
+        $('.buttonside[title], .add').tooltip_left();
+        $('#help_dragdrop').tooltip_right({            
             content: '<h3>Mouse usage</h3><h3>Keyboard usage</h3><ul><li>Use the <kbd>Tab</kbd> to move to the room you want to organize.</li><li>Select the room you want to move with the <kbd>Spacebar</kbd>.</li><li>Use the <kbd>Up</kbd> and <kbd>Down</kbd> cursor keys to select a area in the context menu.</li><li>Press <kbd>Enter</kbd> to move the room to the area.</li></ul>'
-
         });
         
+        /* Drag & Drop */
         $('#dragdroprooms').dragdrop({
             dropcallback: function(self, element, target) {
                 getREST('/base/room/update/id/' + element + '/area_id/' + target,
@@ -144,6 +102,12 @@
                     }
                 )
             }
+        });
+        
+        /* Dialogs */
+        $('#delete_confirmation').dialog_confirmation({
+            title: "{% trans 'Delete' %}",
+            content: "{% trans "Please confirm to delete" %}"
         });
     });
 
@@ -175,7 +139,7 @@
             {% for room in rooms_list %}
             <div id="element{{ room.id }}" class="tabelement">
                 <script type="text/javascript">
-                    // Update form
+                    // <![CDATA[
                     $(function(){      
                         var room{{ room.id }}newname = $("#room{{ room.id }}-newname"),
                             room{{ room.id }}newdescription = $("#room{{ room.id }}-newdescription"),
@@ -223,34 +187,21 @@
                             $('#update_dialog_{{ room.id }}').dialog('open');
                         });
         
-                        /* Add a onclick function to delete the current area */
-                        $('#del{{ room.id }}').click(function() {
-                            $('#delete_confirmation_{{ room.id }}').dialog('open');
-                        });
-                        
-                        $("#delete_confirmation_{{ room.id }}").dialog({
-                            bgiframe: true,
-                            autoOpen: false,
-                            height: 100,
-                            modal: true,
-                            buttons: {
-                                '{% trans "Delete" %}': function() {
-                                    getREST('/base/room/del/{{ room.id }}',
-                                        function(data) {
-                                            var status = (data.status).toLowerCase();
-                                            if (status == 'ok') {
-                                                $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Room" %} \'' + data.room[0].name + '\' {% trans "successfully deleted" %}'});                                   
-                                            } else {
-                                                $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Room not deleted" %} (' + data.description + ')'});                                                                      
-                                            }
+                        /* Add a function to delete the current room */
+                        $('#delete_confirmation').dialog_confirmation('addbutton', {
+                            button: "#del{{ room.id }}",
+                            name: "'{{ room.name }}'",
+                            onok: function() {
+                                getREST('/base/room/del/{{ room.id }}',
+                                    function(data) {
+                                        var status = (data.status).toLowerCase();
+                                        if (status == 'ok') {
+                                            $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Room" %} \'' + data.room[0].name + '\' {% trans "successfully deleted" %}'});                                   
+                                        } else {
+                                            $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Room not deleted" %} (' + data.description + ')'});                                                                      
                                         }
-                                    );
-                                },
-                                '{% trans "Cancel" %}': function() {
-                                    $(this).dialog('close');
-                                }
-                            },
-                            close: function() {
+                                    }
+                                );
                             }
                         });
                         
@@ -302,9 +253,6 @@
                         </fieldset>
                     </form>
                 </div>
-                <div id="delete_confirmation_{{ room.id }}" title="{% trans "Delete" %} {{ room.name }}">
-                    <p>{% trans "Please confirm to delete" %} '{{ room.name }}'</p>
-                </div>
             </div>
             {% endfor %}
         </div>
@@ -320,7 +268,8 @@
             </form>
         </div>
     </div>
-
+    <div id="delete_confirmation"></div>
+    
     <div class="subsection" id="dragdroprooms">
         <h2 class='help' id='help_dragdrop'>{% trans "Rooms organisation" %} <span class='offscreen'>{% trans "Drag &amp; Drop instructions" %}</span></h2>
         <fieldset class="targetdrop">
@@ -346,5 +295,4 @@
         </fieldset>
         {% endfor %}
     </div>
-
 {% endblock %}

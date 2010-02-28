@@ -64,14 +64,14 @@
 .icon32-state-shutter.binary_1 { background-image:url(../images/device_usage/shutter/binary/1_32.png);}
 
 /* Action */
-.icon24-processing { background-image:url(../images/processing_24.gif);}
-.icon16-action-add { background-image:url(../images/plus_16.png);}
-.icon16-action-del { background-image:url(../images/minus_16.png);}
-.icon16-action-update { background-image:url(../images/update_16.png);}
-.icon16-action-next { background-image:url(../images/right_16.png);}
-.icon16-action-previous { background-image:url(../images/left_16.png);}
-.icon16-action-submit { background-image:url(../images/success_16.png);}
-.icon16-action-cancel { background-image:url(../images/error_16.png);}
+.icon16-action-add { background-image:url(../images/action/plus_16.png);}
+.icon16-action-del { background-image:url(../images/action/minus_16.png);}
+.icon16-action-update { background-image:url(../images/action/update_16.png);}
+.icon16-action-next { background-image:url(../images/action/right_16.png);}
+.icon16-action-previous { background-image:url(../images/action/left_16.png);}
+.icon16-action-submit { background-image:url(../images/status/check_16.png);}
+.icon16-action-cancel { background-image:url(../images/status/wrong_16.png);}
+.icon16-action-password { background-image:url(../images/action/key_16.png);}
 
 /* technology icons */
 .icon64-technology-x10 {background-image:url(../../../images/modules/x10_64.png);}
@@ -79,9 +79,12 @@
 .icon16-technology-x10 {background-image:url(../../../images/modules/x10_16.png);}
 
 /* Status icons */
+.icon16-status-true {background-image:url(../images/status/check_16.png);}
+.icon16-status-false {background-image:url(../images/status/wrong_16.png);}
 .icon16-status-active {background-image:url(../images/status/green_indicator_16.png);}
 .icon16-status-inactive {background-image:url(../images/status/grey_indicator_16.png);}
-.icon16-status-error {background-image:url(../images/error_16.png);}
+.icon16-status-error {background-image:url(../images/status/wrong_16.png);}
+.icon16-status-ok {background-image:url(../images/status/check_16.png);}
 
 /* Tmp icons */
 .icon64-device-coffeemachine { background-image:url(../images/tmp/coffee_machine_64.png);}
@@ -92,7 +95,6 @@
 .icon16-device-water { background-image:url(../images/tmp/water_16.png);}
 .icon16-device-message { background-image:url(../images/tmp/message_16.png);}
 .icon16-device-notification { background-image:url(../images/tmp/notify_16.png);}
-.icon16-device-error { background-image:url(../images/tmp/error_16.png);}
 .icon32-device-temp { background-image:url(../images/tmp/temperature_32.png);}
 .icon32-device-tv { background-image:url(../images/tmp/tv_32.png);}
 .icon32-device-ventilation { background-image:url(../images/tmp/fan_white_32.png);}

@@ -95,76 +95,17 @@
             }
         });
         
-        $('.add').qtip({
-            position: {
-                corner: {
-                    target: 'leftMiddle',
-                    tooltip: 'rightMiddle'
-                }
-            },
-
-            style: {
-                padding: 5,
-                background: '#A2D959',
-                color: 'black',
-                textAlign: 'center',
-                border: {
-                    width: 7,
-                    radius: 5,
-                    color: '#A2D959'
-                },
-                tip: 'rightMiddle',
-                name: 'dark' // Inherit the rest of the attributes from the preset dark style
-            }
-        });
-
-        $('.button[title]').qtip({
-            position: {
-                corner: {
-                    target: 'topMiddle',
-                    tooltip: 'bottomMiddle'
-                }
-            },
-
-            style: {
-                padding: 5,
-                background: '#A2D959',
-                color: 'black',
-                textAlign: 'center',
-                border: {
-                    width: 7,
-                    radius: 5,
-                    color: '#A2D959'
-                },
-                tip: 'bottomMiddle',
-                name: 'dark' // Inherit the rest of the attributes from the preset dark style
-            }
+        /* Tooltips */
+        $('.add').tooltip_left();
+        $('.buttonicon[title]').tooltip_top();
+        $('#help_dragdrop').tooltip_right({
+            content: '<h3>Mouse usage</h3><h3>Keyboard usage</h3><ul><li>Use the <kbd>Tab</kbd> to move to the device you want to organize.</li><li>Select the device you want to move with the <kbd>Spacebar</kbd>.</li><li>Use the <kbd>Up</kbd> and <kbd>Down</kbd> cursor keys to select a room in the context menu.</li><li>Press <kbd>Enter</kbd> to move the device to the room.</li></ul>'
         });
         
-        $('#help_dragdrop').qtip({
-            position: {
-                corner: {
-                    target: 'rightBottom',
-                    tooltip: 'leftTop'
-                }
-            },
-
-            style: {
-                padding: 5,
-                background: '#A2D959',
-                color: 'black',
-                textAlign: 'left',
-                border: {
-                    width: 7,
-                    radius: 5,
-                    color: '#A2D959'
-                },
-                tip: 'leftTop',
-                name: 'dark' // Inherit the rest of the attributes from the preset dark style
-            },
-            
-            content: '<h3>Mouse usage</h3><h3>Keyboard usage</h3><ul><li>Use the <kbd>Tab</kbd> to move to the device you want to organize.</li><li>Select the device you want to move with the <kbd>Spacebar</kbd>.</li><li>Use the <kbd>Up</kbd> and <kbd>Down</kbd> cursor keys to select a room in the context menu.</li><li>Press <kbd>Enter</kbd> to move the device to the room.</li></ul>'
-
+        /* Dialogs */
+        $('#delete_confirmation').dialog_confirmation({
+            title: "{% trans 'Delete' %}",
+            content: "{% trans "Please confirm to delete" %}"
         });
     });
 {% endblock %}
@@ -206,6 +147,29 @@
                         <th>Actions</th>
                     </tr>
                     {% for device in room.list %}
+                    <script type="text/javascript">
+                        // <![CDATA[
+                        $(function(){
+                            /* Add a function to delete the current device */
+                            $('#delete_confirmation').dialog_confirmation('addbutton', {
+                                button: "#del{{ device.id }}",
+                                name: "'{{ device.name }}'",
+                                onok: function() {
+                                    getREST('/base/device/del/{{ device.id }}',
+                                        function(data) {
+                                            var status = (data.status).toLowerCase();
+                                            if (status == 'ok') {
+                                                $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Device" %}\'' + data.device[0].name + '\' {% trans "successfully deleted" %}'});
+                                            } else {
+                                                $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Device not deleted" %} (' + data.description + ')'});
+                                            }
+                                        }
+                                    );
+                                }
+                            });
+                        });
+                        // ]]>
+                    </script>
                     <tr>
                         <td>{{ device.name }}</td>
                         <td>{{ device.description }}</td>
@@ -220,6 +184,7 @@
                             </ul>
                         </td>
                     </tr>
+                    
                     {% endfor %}
                 </table>
             </div>
@@ -256,7 +221,8 @@
             </form>
         </div>
     </div>
-    
+    <div id="delete_confirmation"></div>
+        
     <div class="subsection" id="dragdropdevices">
         <h2 class='help' id='help_dragdrop'>{% trans "Devices organisation" %} <span class='offscreen'>{% trans "Drag &amp; Drop instructions" %}</span></h2>
         <fieldset class="targetdrop">

@@ -166,7 +166,7 @@ class GenericTestCase(unittest.TestCase):
         @param db : db API instance
         """
         for uic in db.list_all_ui_item_config():
-            db.delete_ui_item_config(uic.item_name, uic.item_reference)
+            db.delete_ui_item_config(uic.item_name, uic.item_reference, uic.key)
 
 
 class AreaTestCase(GenericTestCase):
@@ -193,6 +193,7 @@ class AreaTestCase(GenericTestCase):
         except DbHelperException:
             pass
         area0 = self.db.add_area('area0','description 0')
+        assert area0._type == 'Area'
         print area0
         assert self.db.list_areas()[0].name == 'area0'
 
@@ -972,7 +973,6 @@ class DeviceTestCase(GenericTestCase):
             pass
         device1 = self.db.update_device(d_id = device1.id,
                                         d_description = 'desc2', d_reference='A1')
-        self.db._session.expunge(device1) # Remove object from session
         device1 = self.db.get_device(device_id)
         assert device1.description == 'desc2'
         assert device1.reference == 'A1'
@@ -1127,6 +1127,7 @@ class DeviceStatsTestCase(GenericTestCase):
         stat = self.db.get_last_stat_of_device(device1.id)
         dsv = self.db.list_device_stats_values(stat.id)
         for item in dsv:
+            print item
             if item.name == 'val1':
                 assert item.value == '11'
             elif item.name == 'val2':
@@ -1283,6 +1284,7 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
         user1 = self.db.add_user_account(a_login='mschneider',
                                          a_password='IwontGiveIt',
                                          a_is_admin=True)
+        assert user1.password is None
         assert self.db.authenticate('mschneider', 'IwontGiveIt')
         assert not self.db.authenticate('mschneider', 'plop')
         assert not self.db.authenticate('hello', 'boy')
@@ -1290,7 +1292,7 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
                                                            'IwontGiveIt')
         assert user1 is not None
         assert user1.login == 'mschneider'
-        assert user1.password == ''
+        assert user1.password == None
         try:
             self.db.add_user_account(a_login='mschneider', a_password='plop',
                                      a_is_admin = True)
@@ -1303,7 +1305,7 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
         user3 = self.db.add_user_account(a_login='domo', a_password='gik',
                                          a_is_admin=True)
         for user_acc in self.db.list_user_accounts():
-            assert user_acc.password == ""
+            assert user_acc.password == None
         person1 = self.db.add_person(p_first_name='Marc', p_last_name='SCHNEIDER',
                                      p_birthdate=datetime.date(1973, 4, 24),
                                      p_user_account_id = user1.id)
@@ -1328,6 +1330,7 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
                         a_id=user_acc.id,
                         a_new_login='mschneider2', a_password='ItWasWrong',
                         a_is_admin=False)
+        assert user_acc_u.password is None
         user_acc_msc = self.db.get_user_account_by_login_and_pass(
                         'mschneider2', 'ItWasWrong')
         assert user_acc_msc is not None
@@ -1368,16 +1371,16 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
                                      p_birthdate=datetime.date(1981, 4, 24))
         user_acc = self.db.get_user_account(user1.id)
         assert user_acc.login == 'mschneider'
-        assert user_acc.password == ''
+        assert user_acc.password == None
         user_acc = self.db.get_user_account_by_login('mschneider')
         assert user_acc is not None
-        assert user_acc.password == ''
+        assert user_acc.password == None
         assert self.db.get_user_account_by_login('mschneider').id == user1.id
         assert self.db.get_user_account_by_login('lucyfer') is None
 
         user_acc = self.db.get_user_account_by_person(person1.id)
         assert user_acc.login == 'mschneider'
-        assert user_acc.password == ''
+        assert user_acc.password == None
         assert self.db.get_person(person1.id).first_name == 'Marc'
         assert self.db.get_person(person2.id).last_name == 'PYTHON'
         assert self.db.get_person_by_user_account(user1.id) is not None
@@ -1529,9 +1532,8 @@ class UIItemConfigTestCase(GenericTestCase):
         self.db.set_ui_item_config('room', 4, 'param_r2', 'value_r2')
         ui_config_list_all = self.db.list_all_ui_item_config()
         assert len(ui_config_list_all) == 4, len(ui_config_list_all)
-        assert len(self.db.get_ui_item_config(ui_item_name='room', ui_key='icon')) == 2
-        ui_config_list_r = self.db.get_ui_item_config(ui_item_name='room',
-                                                      ui_item_reference=4)
+        assert len(self.db.list_ui_item_config_by_key(ui_item_name='room', ui_key='icon')) == 2
+        ui_config_list_r = self.db.list_ui_item_config_by_ref(ui_item_name='room', ui_item_reference=4)
         assert len(ui_config_list_r) == 2 \
                and ui_config_list_r[0].item_name == 'room' \
                and ui_config_list_r[0].item_reference == '4' \
@@ -1560,9 +1562,8 @@ class UIItemConfigTestCase(GenericTestCase):
         self.db.set_ui_item_config('room', 1, 'param_r2', 'value_r2')
         self.db.set_ui_item_config('room', 2, 'icon', 'kitchen')
         assert len(self.db.list_all_ui_item_config()) == 4
-        assert len(self.db.get_ui_item_config(ui_item_name='room')) == 3
-        assert len(self.db.get_ui_item_config(ui_item_name='room',
-                                              ui_item_reference=1)) == 2
+        assert len(self.db.list_ui_item_config(ui_item_name='room')) == 3
+        assert len(self.db.list_ui_item_config_by_ref(ui_item_name='room', ui_item_reference=1)) == 2
         item=self.db.get_ui_item_config(ui_item_name='room',
                                         ui_item_reference=2, ui_key='icon')
         assert item.value == 'kitchen'
@@ -1582,9 +1583,9 @@ class UIItemConfigTestCase(GenericTestCase):
         self.db.set_ui_item_config('room', 2, 'icon', 'kitchen')
         self.db.set_ui_item_config('room', 2, 'pr1', 'vr1')
         self.db.delete_ui_item_config(ui_item_name='area', ui_item_reference=2)
-        assert len(self.db.get_ui_item_config(ui_item_name='area')) == 0
+        assert len(self.db.list_ui_item_config(ui_item_name='area')) == 0
         self.db.delete_ui_item_config(ui_item_name='room', ui_key='icon')
-        ui_item_list = self.db.get_ui_item_config(ui_item_name='room')
+        ui_item_list = self.db.list_ui_item_config(ui_item_name='room')
         assert len(ui_item_list) == 1
         assert ui_item_list[0].key == 'pr1'
 

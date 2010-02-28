@@ -121,16 +121,29 @@ class Rest(xPLModule):
 
 
     def _add_to_queue_system_list(self, message):
+        #self._truncate_queue(self._queue_system_list)
         self._queue_system_list.put(message, True, QUEUE_TIMEOUT)
 
     def _add_to_queue_system_detail(self, message):
+        #self._truncate_queue(self._queue_system_detail)
         self._queue_system_detail.put(message, True, QUEUE_TIMEOUT)
 
     def _add_to_queue_system_start(self, message):
+        #self._truncate_queue(self._queue_system_start)
         self._queue_system_start.put(message, True, QUEUE_TIMEOUT)
 
     def _add_to_queue_system_stop(self, message):
+        #self._truncate_queue(self._queue_system_stop)
         self._queue_system_stop.put(message, True, QUEUE_TIMEOUT)
+
+    def _truncate_queue(self, queue):
+        # dirty way to empty queue
+        for idx in range(QUEUE_SIZE):
+            try:
+                foo = queue.get()
+            except:
+                pass
+
 
 
 
@@ -1086,7 +1099,7 @@ target=*
             ### del
             elif self.rest_request[1] == "del":
                 if len(self.rest_request) == 3:
-                    self._rest_base_device_technology_config__del(tc_id=self.rest_request[2])
+                    self._rest_base_device_technology_config_del(tc_id=self.rest_request[2])
                 else:
                     self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
@@ -1107,9 +1120,16 @@ target=*
             if self.rest_request[1] == "list":
                 if len(self.rest_request) == 2:
                     self._rest_base_device_list()
-                else:
+                elif len(self.rest_request) == 3:
                     self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
+                else:
+                    if self.rest_request[2] == "by-room":
+                        self._rest_base_device_list(room_id=self.rest_request[3])
+                    else:
+                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
+
 
             ### add
             elif self.rest_request[1] == "add":
@@ -1126,6 +1146,14 @@ target=*
                     self._rest_base_device_update()
                 else:
                     self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
+
+            ### del
+            elif self.rest_request[1] == "del":
+                if len(self.rest_request) == 3:
+                    self._rest_base_device_del(id=self.rest_request[2])
+                else:
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
 
             ### others
             else:
@@ -1371,11 +1399,11 @@ target=*
         elif name != None and reference != None:
             if key == None:
                 # by-reference
-                for ui_item_config in self._db.list_ui_item_config(name, reference):
+                for ui_item_config in self._db.list_ui_item_config_by_ref(ui_item_name = name, ui_item_reference = reference):
                     json_data.add_data(ui_item_config)
             else:
                 # by-key
-                for ui_item_config in self._db.get_ui_item_config(ui_item_name = name, ui_key= key):
+                for ui_item_config in self._db.list_ui_item_config_by_key(ui_item_name = name, ui_key= key):
                     json_data.add_data(ui_item_config)
         elif name != None and key != None and reference != None:
             # by-element
@@ -1725,7 +1753,7 @@ target=*
             @param name : device technology name
         """
         json_data = JSonHelper("OK")
-        json_data.set_json(self.jsonp, self.jsonp_cb)
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("device_technology")
         if name == None:
             for device_technology in self._db.list_device_technologies():
@@ -1866,14 +1894,23 @@ target=*
 # /base/device processing
 ######
 
-    def _rest_base_device_list(self):
+    def _rest_base_device_list(self, room_id = None, device_id = None):
         """ list devices
         """
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("device")
-        for device in self._db.list_devices():
-            json_data.add_data(device)
+        if room_id == None and device_id == None:
+            for device in self._db.list_devices():
+                json_data.add_data(device)
+        elif device_id == None:
+            # by-room
+            for device in self._db.get_all_devices_of_room(room_id):
+                json_data.add_data(device)
+        elif room_id == None:
+            # by-device
+            for device in self._db.get_all_devices_of_room(room_id):
+                json_data.add_data(device)
         self.send_http_response_ok(json_data.get())
 
 
@@ -1913,6 +1950,21 @@ target=*
                                          self.get_parameters("room_id"), \
                                          self.get_parameters("description"), \
                                          self.get_parameters("reference"))
+            json_data.add_data(device)
+        except:
+            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+        self.send_http_response_ok(json_data.get())
+
+
+    def _rest_base_device_del(self, id):
+        """ delete device 
+            @param id : device id
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("device")
+        try:
+            device = self._db.del_device(id)
             json_data.add_data(device)
         except:
             json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
@@ -1976,8 +2028,8 @@ target=*
             if len(self.rest_request) < 2:
                 self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
                 return
-            print "stop!!"
-            # TODO when start will be OK
+            self._rest_module_start_stop(module =  self.rest_request[1], \
+                                   command = "stop")
  
         ### others ####################################
         else:
@@ -2040,7 +2092,7 @@ target=*
 
 
 
-    def _rest_module_detail(self, name):
+    def _rest_module_detail(self, name, host = gethostname()):
         """ Send a xpl message to manager to get module list
             Display this list as json
             @param name : name of module
@@ -2054,7 +2106,7 @@ target=*
         message.add_data({"command" : "detail"})
         message.add_data({"module" : name})
         # TODO : ask for good host
-        message.add_data({"host" : gethostname()})
+        message.add_data({"host" : host})
         self._myxpl.send(message)
         print "Message sent : " + str(message)
 
@@ -2072,6 +2124,9 @@ target=*
                     json_data.set_data_type("module")
                     self.send_http_response_ok(json_data.get())
                     return
+            else:
+                # TODO : make something to reread queue!!!!
+                pass
 
         except Empty:
             json_data = JSonHelper("ERROR", 999, "Timeout on getting module detail for %s" % name)
@@ -2108,7 +2163,7 @@ target=*
 
 
 
-    def _rest_module_start_stop(self, command, host = "127.0.0.1", module = None, force = 0):
+    def _rest_module_start_stop(self, command, host = gethostname(), module = None, force = 0):
         """ Send start xpl message to manager
             Then, listen for a response
             @param host : host to which we send command
@@ -2117,61 +2172,61 @@ target=*
         """
 
         ### Send xpl message
-
-        #DOMOGIK.SYSTEM
-        #{
-        #COMMAND=command to send
-        #HOST=name of the host where a component should be started/stopped|*
-        #[MODULE]=name of the module concerned by the command|*
-        #[FORCE=0|1]
-        #}
-
-        my_temp_message = XplMessage()
-        my_temp_message.set_type("xpl-cmnd")
-        my_temp_message.set_schema("domogik.system")
-        my_temp_message.add_data({"command" : command})
-        my_temp_message.add_data({"host" : host})
-        my_temp_message.add_data({"module" : module})
-        my_temp_message.add_data({"force" : force})
-        self._myxpl.send(my_temp_message)
-        print "Message sent : " + str(my_temp_message)
+        cmd_message = XplMessage()
+        cmd_message.set_type("xpl-cmnd")
+        cmd_message.set_schema("domogik.system")
+        cmd_message.add_data({"command" : command})
+        cmd_message.add_data({"host" : host})
+        cmd_message.add_data({"module" : module})
+        cmd_message.add_data({"force" : force})
+        self._myxpl.send(cmd_message)
+        print "Message sent : " + str(cmd_message)
 
         ### Listen for response
+        # get xpl message from queue
+        try:
+            if command == "start":
+                message = self._queue_system_start.get(True, QUEUE_TIMEOUT)
+            elif command == "stop":
+                message = self._queue_system_stop.get(True, QUEUE_TIMEOUT)
+            # verify is data has a goog module name
+            if message.data['module'] != module:
+                try:
+                    if command == "start":
+                        self._queue_system_start.put(message, True, QUEUE_TIMEOUT)
+                    elif command == "start":
+                        self._queue_system_stop.put(message, True, QUEUE_TIMEOUT)
+                except Full:
+                    json_data = JSonHelper("ERROR", 999, "Timeout on putting bad module %s for %s (%s)" % (command, module, message.data['module']))
+                    json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+                    json_data.set_data_type("module")
+                    self.send_http_response_ok(json_data.get())
+                    return
+            else:
+                # TODO : make something to reread queue!!!!
+                pass
 
-        #DOMOGIK.SYSTEM
-        #{
-        #COMMAND=command to send
-        #HOST=Host sending the message|*
-        #[MODULE]=name of the module concerned by the command|*
-        #[FORCE=0|1]
-        #[ERROR=error message if error occurs, 255 char max]
-        #}
 
-        Listener(self._rest_module_start_response, self._myxpl, \
-                 {'schema': 'domogik.system', 
-                  'xpltype': 'xpl-trig', 
-                  'command' : command, 
-                  'host' : host, 
-                  'module' : module, 
-                  'force' : force})
+        except Empty:
+            json_data = JSonHelper("ERROR", 999, "Timeout on getting module detail for %s" % module)
+            json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+            json_data.set_data_type("module")
+            self.send_http_response_ok(json_data.get())
+            return
 
-
-    def _rest_module_start_response(self, message):
-        """ Process xpl manager response to make a json
-            @param message : xpl message received
-        """
+        print "Message received : " + str(message)
 
         # an error happens
         if 'error' in message.data:
             error_msg = message.data['error']
-
-            json_data = JSonHelper("OK")
+            json_data = JSonHelper("ERROR", 999, error_msg)
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
             self.send_http_response_ok(json_data.get())
 
+
         # no error
         else:
-            json_data = JSonHelper("ERROR", 999, error)
+            json_data = JSonHelper("OK")
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
             self.send_http_response_ok(json_data.get())
 
@@ -2370,14 +2425,11 @@ class JSonHelper():
             
 
 
+
+
     def _process_data(self, data, idx = 0, key = None):
-        #print "==== PROCESS DATA " + str(idx) + " ===="
-        db_type = ("ActuatorFeature", "Area", "Device", "DeviceUsage", \
-                   "DeviceConfig", "DeviceStats", "DeviceStatsValue", \
-                   "DeviceTechnology", "DeviceTechnologyConfig", \
-                   "DeviceType", "UIItemConfig", "Room", "UserAccount", \
-                   "SensorReferenceData", "SystemAccount", "SystemConfig", \
-                   "SystemStats", "SystemStatsValue", "Trigger")
+        print "==== PROCESS DATA " + str(idx) + " ===="
+        instance_type = ("instance")
         num_type = ("int", "float")
         str_type = ("str", "unicode", "bool")
         none_type = ("NoneType")
@@ -2387,19 +2439,41 @@ class JSonHelper():
 
         data_json = ""
 
-        #if idx == 0:
-        #    data_json += '"%s" : [' % self._data_type
-
         # get data type
         data_type = type(data).__name__
 
         # dirty issue to force cache of __dict__ : make a print of data
-        if idx == 0:
-            print "DATA : " + str(data)
-        #print "DATA TYPE : " + data_type
+        print "DATA : " + str(data)
+        print "DATA TYPE : " + data_type
 
-        # type : tuple 
-        if data_type in tuple_type:
+
+        ### type instance (sql object)
+        if data_type in instance_type:
+            # get <object>._type value
+            try:
+                sub_data_type = data._type.lower()
+            except:
+                sub_data_type = "???"
+            print "SUB TYPE = %s" % sub_data_type
+
+            if idx == 0:
+                data_json += "{"
+            else:
+                data_json += '"%s" : {' % sub_data_type
+
+            for key in data.__dict__:
+                sub_data_key = key
+                sub_data = data.__dict__[key]
+                sub_data_type = type(sub_data).__name__
+                #print "    DATA KEY : " + str(sub_data_key)
+                #print "    DATA : " + str(sub_data)
+                #print "    DATA TYPE : " + str(sub_data_type)
+                data_json += self._process_sub_data(False, sub_data_key, sub_data, sub_data_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type)
+            data_json = data_json[0:len(data_json)-1] + "},"
+
+
+        ### type : tuple
+        elif data_type in tuple_type:
             if idx > 0:
                 data_json += "{"
             for idy in range(len(data)):
@@ -2409,23 +2483,12 @@ class JSonHelper():
                 #print "    DATA KEY : " + str(sub_data_key)
                 #print "    DATA : " + str(sub_data)
                 #print "    DATA TYPE : " + str(sub_data_type)
-                data_json += self._process_sub_data(idx, False, sub_data_key, sub_data, sub_data_type, db_type, num_type, str_type, none_type, tuple_type, list_type, dict_type)
+                data_json += self._process_sub_data(False, sub_data_key, sub_data, sub_data_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type)
             if idx > 0:
                 data_json = data_json[0:len(data_json)-1] + "},"
 
-        # type : Area, Room, Device, etc
-        elif data_type in db_type:
-            data_json += "{"
-            for key in data.__dict__:
-                sub_data_key = key
-                sub_data = data.__dict__[key]
-                sub_data_type = type(sub_data).__name__
-                #print "    DATA KEY : " + str(sub_data_key)
-                #print "    DATA : " + str(sub_data)
-                #print "    DATA TYPE : " + str(sub_data_type)
-                data_json += self._process_sub_data(idx, False, sub_data_key, sub_data, sub_data_type, db_type, num_type, str_type, none_type, tuple_type, list_type, dict_type)
-            data_json = data_json[0:len(data_json)-1] + "},"
 
+        ### type : list
         elif data_type in list_type:
             # get first data type
             if len(data) > 0:
@@ -2446,10 +2509,12 @@ class JSonHelper():
                 #print "    DATA KEY : " + str(sub_data_key)
                 #print "    DATA : " + str(sub_data)
                 #print "    DATA TYPE : " + str(sub_data_type)
-                data_json += self._process_sub_data(idx, True, sub_data_key, sub_data, sub_data_type, db_type, num_type, str_type, none_type, tuple_type, list_type, dict_type)
+                data_json += self._process_sub_data(True, sub_data_key, sub_data, sub_data_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type)
             # finish table
             data_json = data_json[0:len(data_json)-1] + "],"
 
+
+        ### type : dict
         elif data_type in dict_type:
             data_json += "{"
             for key in data:
@@ -2459,20 +2524,18 @@ class JSonHelper():
                 #print "    DATA KEY : " + str(sub_data_key)
                 #print "    DATA : " + str(sub_data)
                 #print "    DATA TYPE : " + str(sub_data_type)
-                data_json += self._process_sub_data(idx, False, sub_data_key, sub_data, sub_data_type, db_type, num_type, str_type, none_type, tuple_type, list_type, dict_type)
+                data_json += self._process_sub_data(False, sub_data_key, sub_data, sub_data_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type)
             data_json = data_json[0:len(data_json)-1] + "},"
 
-        #print "========================="
         return data_json
 
 
 
-    def _process_sub_data(self, idx, is_table, sub_data_key, sub_data, sub_data_type, db_type, num_type, str_type, none_type, tuple_type, list_type, dict_type):
-        ### TODO : it seems we could remove idx
+    def _process_sub_data(self, is_table, sub_data_key, sub_data, sub_data_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type):
         data_tmp = ""
-        if sub_data_type in db_type:
-            if is_table is False:  # and idx != 0:
-                data_tmp = '"%s" : ' % sub_data_type.lower()
+        if sub_data_type in instance_type:
+            #if is_table is False: 
+            #    data_tmp = '"!!!%s" : ' % sub_data_type.lower()
             data_tmp += self._process_data(sub_data, 1)
         elif sub_data_type in list_type:
             data_tmp += self._process_data(sub_data, 1, sub_data_key)
@@ -2501,12 +2564,6 @@ class JSonHelper():
             json_buf = "%s (" % self._jsonp_cb
         else:
             json_buf = ""
-
-        #if self._data_type != "":
-        #    json_buf += '{' + self._status + '"' + self._data_type + '" : [' + \
-        #           self._data_values[0:len(self._data_values)-1] + ']' + '}'
-        #else:
-        #    json_buf += '{' + self._status[0:len(self._status)-1] + '}'
 
         if self._data_type != "":
             json_buf += '{%s "%s" : [%s]}' % (self._status,   self._data_type, self._data_values[0:len(self._data_values)-1])
