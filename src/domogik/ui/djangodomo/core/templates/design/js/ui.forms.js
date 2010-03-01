@@ -13,12 +13,12 @@ function checkLength(tips, o, n, min, max) {
     }
 
 }
-
+/*
 function updateTips(t) {
     tips.text(t).effect("highlight", {},
     1500);
 }
-
+ */
 function checkLength(o, n, min, max) {
 
     if (o.val().length > max || o.val().length < min) {
@@ -30,7 +30,7 @@ function checkLength(o, n, min, max) {
     }
 
 }
-
+ 
 (function($) {
     $.widget("ui.editable_icon", {
         _init: function() {

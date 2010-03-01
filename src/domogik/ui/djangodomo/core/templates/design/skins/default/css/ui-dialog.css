@@ -13,6 +13,7 @@
 	color: #333333;
 	-moz-border-radius: 0.8em;
     -webkit-border-radius: 0.8em;
+	overflow: visible;
 }
 .ui-dialog .ui-dialog-titlebar {
 	padding: .5em .3em .3em 1em;

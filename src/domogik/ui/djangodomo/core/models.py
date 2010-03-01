@@ -162,6 +162,15 @@ class DeviceTechnologies(pipes.DmgPipe):
         if resp :
             return resp
 
+class DeviceTypes(pipes.DmgPipe):
+    uri = "http://127.0.0.1:8080/base/device_type"
+
+    @staticmethod
+    def getAll():
+        resp = DeviceTypes.objects.get({'parameters':"list/"})
+        if resp :
+            return resp
+        
 class UIConfigs(pipes.DmgPipe):
     uri = "http://127.0.0.1:8080/base/ui_config"
     

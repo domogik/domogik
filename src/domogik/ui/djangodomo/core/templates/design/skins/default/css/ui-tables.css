@@ -11,11 +11,11 @@ table th {
 }
 
 table td {
-    padding:1em;
+    padding:0.2em;
     text-align:center;
 }
 
-table tr.odd {
+table tr.even {
     background-color:#FFF;
 }
 

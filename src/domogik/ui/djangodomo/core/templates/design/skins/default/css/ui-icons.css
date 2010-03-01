@@ -74,9 +74,12 @@
 .icon16-action-password { background-image:url(../images/action/key_16.png);}
 
 /* technology icons */
-.icon64-technology-x10 {background-image:url(../../../images/modules/x10_64.png);}
-.icon32-technology-x10 {background-image:url(../../../images/modules/x10_32.png);}
-.icon16-technology-x10 {background-image:url(../../../images/modules/x10_16.png);}
+.icon64-technology-x10 {background-image:url(../../../images/technologies/x10_64.png);}
+.icon32-technology-x10 {background-image:url(../../../images/technologies/x10_32.png);}
+.icon16-technology-x10 {background-image:url(../../../images/technologies/x10_16.png);}
+.icon64-technology-plcbus {background-image:url(../../../images/technologies/plcbus_64.png);}
+.icon32-technology-plcbus {background-image:url(../../../images/technologies/plcbus_32.png);}
+.icon16-technology-plcbus {background-image:url(../../../images/technologies/plcbus_16.png);}
 
 /* Status icons */
 .icon16-status-true {background-image:url(../images/status/check_16.png);}

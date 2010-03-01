@@ -349,10 +349,10 @@ def admin_organization_devices(request):
         resultAllDevices = Devices.getAll()
         resultAllDevices.merge_uiconfig()
 #        resultUnattribuedDevices = Devices.getWithoutRoom()
-        resultAllRooms = Rooms.getAllWithDevices()
-        resultAllRooms.merge_uiconfig()
+#        resultAllRooms = Rooms.getAllWithDevices()
+#        resultAllRooms.merge_uiconfig()
         resultAllUsages = DeviceUsages.getAll()
-#        resultAllTechnologies = DeviceTechnologies.getAll()
+        resultAllTypes = DeviceTypes.getAll()
 
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
@@ -366,10 +366,10 @@ def admin_organization_devices(request):
         status=status,
         msg=msg,
 #        unattribued_devices=resultUnattribuedDevices.device,
-        rooms_list=resultAllRooms.room,
+#        rooms_list=resultAllRooms.room,
         devices_list=resultAllDevices.device,
         usages_list=resultAllUsages.device_usage,
-#        technologies_list=resultAllTechnologies.device_technology
+        types_list=resultAllTypes.device_type
     )
 
 def admin_organization_rooms(request):

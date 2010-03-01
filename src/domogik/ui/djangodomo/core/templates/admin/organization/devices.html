@@ -23,8 +23,10 @@
 {% block css %}
     <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-tables.css" rel="stylesheet" type="text/css" />
     <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/page-admin-organization.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/fg.menu.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block js_include %}
+    <script type="text/javascript" src="/design/js/fg.menu.js"></script>
 {% endblock %}
 {% block js_script %}
     $(function(){
@@ -41,7 +43,11 @@
         // Add form  
         var new_name = $("#new_name"),
             new_description = $("#new_description"),
-            allFields = $([]).add(new_name).add(new_description),
+            new_address = $("#new_address"),
+            new_type = $("#new_type"),
+            new_usage = $("#new_usage"),
+            new_reference = $("#new_reference"),
+            allFields = $([]).add(new_name).add(new_description).add(new_address).add(new_type).add(new_usage).add(new_reference),
             tips = $("#validateTips");
 		
 		$("#addnewdialog").dialog({
@@ -58,7 +64,7 @@
                     bValid = bValid && checkLength(new_description,"description",1,80);                    				
 					if (bValid) {						
                         // Submit form
-                        getREST('/base/device/add/name/' + new_name.val() + '/description/' + new_description.val(),
+                        getREST('/base/device/add/name/' + new_name.val() + '/address/' + new_address.val() + '/type_id/' + new_type.val() + '/usage_id/' + new_usage.val() + '/description/' + new_description.val() + '/reference/' + new_reference.val(),
                             function(data) {
                                 var status = (data.status).toLowerCase();
                                 if (status == 'ok') {
@@ -107,6 +113,15 @@
             title: "{% trans 'Delete' %}",
             content: "{% trans "Please confirm to delete" %}"
         });
+        
+        $('#new_type_button').menu({
+			content: $('#new_type_list').html(),
+			backLink: false,
+            crumbDefaultText: 'Choose an technologie:',
+            resultValueField: '#new_type',
+            resultTextElement: '#new_type_button'
+		});
+
     });
 {% endblock %}
 {% block title %}{% trans page_title %}{% endblock %}
@@ -170,7 +185,7 @@
                         });
                         // ]]>
                     </script>
-                    <tr>
+                    <tr class="{% cycle 'odd' 'even' %}">
                         <td>{{ device.name }}</td>
                         <td>{{ device.description }}</td>
                         <td>{{ device.address }}</td>
@@ -198,6 +213,23 @@
                     <input type="text" class="medium" id="new_name" name="new_name" />
                     <label class="medium" for="new_description">{% trans "Description" %}</label>
                     <textarea type="text" class="medium" id="new_description" name="new_description"></textarea>
+                    <label class="medium" for="new_type">{% trans "Type" %}</label>
+                    <input type='hidden' id="new_type" name="new_type" />
+                    <a tabindex="0" href="#new_type_list" class="fg-button" id="new_type_button">Choose device type</a> 
+                    <div id="new_type_list" class="offscreen">
+                        <ul>
+                        {% regroup types_list|dictsort:"technology_id" by devicetechnology as technologies_list %}
+                        {% for technology in technologies_list %}
+                            <li><a href="#"><div class="icon16-text icon16-technology-{{ technology.grouper.name|lower }}">{{ technology.grouper.name }}</div></a>
+                                <ul>
+                                {% for type in technology.list %}
+                                    <li><a href="#" value="{{ type.id }}">{{ type.name }}</a></li>
+                                {% endfor %}
+                                </ul>
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    </div>
                     <label class="medium" for="new_address">{% trans "Address" %}</label>
                     <input type="text" class="medium" id="new_address" name="new_address" />
                     <label class="medium" for="new_reference">{% trans "Reference" %}</label>
@@ -205,18 +237,10 @@
                     <label class="medium" for="new_usage">{% trans "Usage" %}</label>
                     <select class="medium" id="new_usage" name="new_usage">
                     {% for usage in usages_list %}
-                        <option>{{ usage.name }}</option>
+                        <option value="{{ usage.id }}">{{ usage.name }}</option>
                     {% endfor %}
                     </select>
-                    <label class="medium" for="new_technology">{% trans "Technology" %}</label>
-                    <select class="medium" id="new_technology" name="new_technology">
-                    {% for technology in technologies_list %}
-                        <option>{{ technology.name }}</option>
-                    {% endfor %}
-                    </select>
-                    <label class="medium" for="new_type">{% trans "Type" %}</label>
-                    <select class="medium" id="new_type" name="new_type" disabled='disabled'>
-                    </select>
+
                 </fieldset>
             </form>
         </div>

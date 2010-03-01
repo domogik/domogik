@@ -31,7 +31,7 @@ a.button, .button {
 a.buttonicon, .buttonicon {
 	border: 1px solid #cccccc;
 	height:2em;
-	width: 2.5em;
+	width: 3em;
 	-moz-border-radius: 1.4em;
     -webkit-border-radius: 1.4em;
 	background-color:#f6f6f6;
@@ -40,7 +40,7 @@ a.buttonicon, .buttonicon {
 	outline:none;
 	cursor: pointer;
 	text-decoration:none;
-    padding:0.2em;
+    padding:0;
     margin:0;
     display:inline-block;
 	font-size: 1em;
