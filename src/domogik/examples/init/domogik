@@ -88,9 +88,9 @@ function stop_manager {
 case "$1" in
     start)
     if [ $# -eq 1 ];then
-        start_django
         start_xpl
         start_manager 
+        start_django
     else
         case "$2" in
             django)
