@@ -330,7 +330,7 @@ class SysManager(xPLModule):
 
     def _check_dbmgr_is_running(self):
         ''' This method will send a ping request to dbmgr component
-        and wait 5 seconds for the answer.
+        and wait for the answer (max 5 seconds).
         '''
         self._dbmgr = Event()
         mess = XplMessage()
@@ -341,20 +341,23 @@ class SysManager(xPLModule):
         mess.add_data({'module' : 'dbmgr'})
         Listener(self._cb_check_dbmgr_is_running, self._myxpl, {'schema':'domogik.system', \
                 'xpltype':'xpl-trig','command':'ping','module':'dbmgr','host':gethostname()})
-        self._myxpl.send(mess)
-        self._dbmgr.wait(5) #Wait 5 seconds 
+        max=5
+        while max != 0:
+            self._myxpl.send(mess)
+            time.sleep(1)
+            max = max - 1
+            if self._dbmgr.isSet():
+                break
         return self._dbmgr.isSet() #Will be set only if an answer was received
 
     def _cb_check_dbmgr_is_running(self, message):
         ''' Set the Event to true if an answer was received
-        The use of the Event instead of time.sleep(5) ensure not to wait 5 seconds
-        if the database manager answers before
         '''
         self._dbmgr.set()
 
     def _check_rest_is_running(self):
-        ''' This method will send a ping request to rest component
-        and wait 5 seconds for the answer.
+        ''' This method will send a ping request every second to rest component
+        and wait for the answer (max 5 seconds).
         '''
         self._rest= Event()
         mess = XplMessage()
@@ -365,14 +368,17 @@ class SysManager(xPLModule):
         mess.add_data({'module' : 'rest'})
         Listener(self._cb_check_rest_is_running, self._myxpl, {'schema':'domogik.system',\
                 'xpltype':'xpl-trig','command':'ping','module':'rest','host':gethostname()})
-        self._myxpl.send(mess)
-        self._rest.wait(5) #Wait 5 seconds 
+        max=5
+        while max != 0:
+            self._myxpl.send(mess)
+            time.sleep(1)
+            max = max - 1
+            if self._rest.isSet():
+                break
         return self._rest.isSet() #Will be set only if an answer was received
 
     def _cb_check_rest_is_running(self, message):
         ''' Set the Event to true if an answer was received
-        The use of the Event instead of time.sleep(5) ensure not to wait 5 seconds
-        if the rest answers before
         '''
         self._rest.set()
 
