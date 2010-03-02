@@ -100,7 +100,7 @@ class SysManager(xPLModule):
             if self._check_dbmgr_is_running():
                 self._log.warning("Manager started with -d, but a database manager is already running")
             else:
-                self._start_module("dbmgr", gethostname(), 0)
+                self._start_module("dbmgr", gethostname(), 1)
                 if not self._check_dbmgr_is_running():
                     self._log.error("Manager started with -d, but database manager not available after a startup.\
                             Please check dbmgr.log file")
@@ -109,7 +109,7 @@ class SysManager(xPLModule):
             if self._check_rest_is_running():
                 self._log.warning("Manager started with -r, but a REST manager is already running")
             else:
-                self._start_module("rest", gethostname(), 0)
+                self._start_module("rest", gethostname(), 1)
                 if not self._check_rest_is_running():
                     self._log.error("Manager started with -r, but REST manager not available after a startup.\
                             Please check rest.log file")
