@@ -1,12 +1,12 @@
-# This file define config parameters for domogik 
+# This file defines config parameters for domogik
 
 #Start domogik daemon under this user
 DOMOGIK_USER=domogik
 
-# This vairable can take 2 parameters : 
+# This variable can take 2 parameters :
 # -d to start the database manager
 # -r to start the rest component
-# Remember : Your domogik installation must have *one* and *only one* 
+# Remember : Your domogik installation must have *one* and *only one*
 # instance of the database manager and the rest manager running
 # Your domogik installation won't start on this computer if :
 #  - The database manager is not already running elsewhere on the network
@@ -15,9 +15,9 @@ MANAGER_PARAMS="-d -r"
 
 # You can define one or many extra path(s) for Domogik startup scripts.
 # This should only be useful if you use Domogik in developement mode (with setup.py develop)
-# or if you  have a custom path install.
+# or if you have a custom path install.
 # PATH is needed to locate 3 applications :
-#  - django : a script to run the domogik's ui, installed by setup.py develop 
-#  - xPL_Hub : the xPL hub, *not* installed by setup.py develop 
+#  - django : a script to run the domogik's ui, installed by setup.py develop
+#  - xPL_Hub : the xPL hub, *not* installed by setup.py develop
 #  - dmg_manager : Domogik's manager, installed by setup.py develop
 CUSTOM_PATH=
