@@ -46,7 +46,7 @@ function start_xpl {
         exit 1
     fi
     echo -n "* Starting XPL..."
-    /bin/su - ${DOMOGIK_USER} -m -c "xPL_Hub -interface lo >/dev/null &"
+    /bin/su - ${DOMOGIK_USER} -m -c "$(which xPL_Hub) -interface lo >/dev/null &"
     if [ $? -gt 0 ]; then
         echo " An error occured during Xpl startup."
         exit 1
