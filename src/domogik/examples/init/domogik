@@ -24,8 +24,7 @@ CUSTOM_PATH=""
 [ -f /etc/conf.d/domogik ] && . /etc/conf.d/domogik
 [ -f /etc/default/domogik ] && . /etc/default/domogik
 
-PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$CUSTOM_PATH
-
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$CUSTOM_PATH:
 if [ $UID != 0 ];then
     echo "Must be started with root privileges";
     exit 1;
@@ -33,7 +32,7 @@ fi
 
 function start_django {
     echo -n " * Starting Django..."
-    /bin/su - ${DOMOGIK_USER} -c "dmg_django runserver >/dev/null  &"
+    /bin/su - ${DOMOGIK_USER} -m -c "dmg_django runserver >/dev/null  &"
     if [ $? -gt 0 ]; then
         echo " An error occured during Django startup."
         exit 1
@@ -47,7 +46,7 @@ function start_xpl {
         exit 1
     fi
     echo -n "* Starting XPL..."
-    /bin/su - ${DOMOGIK_USER} -c "xPL_Hub -interface lo >/dev/null &"
+    /bin/su - ${DOMOGIK_USER} -m -c "xPL_Hub -interface lo >/dev/null &"
     if [ $? -gt 0 ]; then
         echo " An error occured during Xpl startup."
         exit 1
@@ -57,7 +56,7 @@ function start_xpl {
 }
 function start_manager {
     echo -n "* Starting Manager (with $MANAGER_PARAMS)..."
-    /bin/su - ${DOMOGIK_USER} -c "dmg_manager $MANAGER_PARAMS  &"
+    /bin/su - ${DOMOGIK_USER} -m -c "dmg_manager $MANAGER_PARAMS  &"
     if [ $? -gt 0 ]; then
         echo " An error occured during manager startup."
         exit 1
