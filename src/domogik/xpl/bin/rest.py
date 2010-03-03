@@ -2580,13 +2580,12 @@ class JSonHelper():
 
         ### type : SQL table
         elif data_type in db_type: 
-            print "# db_type!"
             data_json += "{" 
             for key in data.__dict__: 
                 sub_data_key = key 
                 sub_data = data.__dict__[key] 
                 sub_data_type = type(sub_data).__name__ 
-                #print "    DATA KEY : " + str(sub_data_key) 
+                print "    DATA KEY : " + str(sub_data_key) 
                 #print "    DATA : " + unicode(sub_data) 
                 #print "    DATA TYPE : " + str(sub_data_type) 
                 data_json += self._process_sub_data(False, sub_data_key, sub_data, sub_data_type, db_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type) 
@@ -2657,7 +2656,7 @@ class JSonHelper():
             if is_table is False:  # and idx != 0: 
                 data_tmp = '"%s" : ' % sub_data_type.lower() 
             data_tmp += self._process_data(sub_data, 1)
-        if sub_data_type in instance_type:
+        elif sub_data_type in instance_type:
             data_tmp += self._process_data(sub_data, 1)
         elif sub_data_type in list_type:
             data_tmp += self._process_data(sub_data, 1, sub_data_key)
@@ -2671,6 +2670,7 @@ class JSonHelper():
             data_tmp = '"%s" : "None",' % (sub_data_key)
         else: 
             data_tmp = ""
+        
         return data_tmp
 
 
