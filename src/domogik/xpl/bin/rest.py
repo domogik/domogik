@@ -410,8 +410,13 @@ class ProcessRequest():
         self.jsonp_cb = ""
 
         # url processing
-        self.path = str(urllib.unquote(self.path))
-        self.path = unicode(self.path, "utf-8")
+        print type(self.path).__name__
+        print self.path
+        #self.path = str(urllib.unquote(self.path))
+        self.path = urllib.unquote(unicode(self.path))
+        print type(self.path).__name__
+        print self.path
+        #self.path = unicode(self.path, "utf-8")
 
         tab_url = self.path.split("?")
         self.path = tab_url[0]
@@ -2524,7 +2529,7 @@ class JSonHelper():
 
 
     def _process_data(self, data, idx = 0, key = None):
-        print "==== PROCESS DATA " + str(idx) + " ===="
+        #print "==== PROCESS DATA " + str(idx) + " ===="
         db_type = ("ActuatorFeature", "Area", "Device", "DeviceUsage", \
                    "DeviceConfig", "DeviceStats", "DeviceStatsValue", \
                    "DeviceTechnology", "DeviceTechnologyConfig", \
@@ -2545,8 +2550,8 @@ class JSonHelper():
         data_type = type(data).__name__
 
         # dirty issue to force cache of __dict__ : make a print of data
-        print "DATA : " + str(data)
-        print "DATA TYPE : " + data_type
+        print "DATA : " + unicode(data)
+        #print "DATA TYPE : " + data_type
 
 
         ### type instance (sql object)
@@ -2575,13 +2580,14 @@ class JSonHelper():
 
         ### type : SQL table
         elif data_type in db_type: 
+            print "# db_type!"
             data_json += "{" 
             for key in data.__dict__: 
                 sub_data_key = key 
                 sub_data = data.__dict__[key] 
                 sub_data_type = type(sub_data).__name__ 
                 #print "    DATA KEY : " + str(sub_data_key) 
-                #print "    DATA : " + str(sub_data) 
+                #print "    DATA : " + unicode(sub_data) 
                 #print "    DATA TYPE : " + str(sub_data_type) 
                 data_json += self._process_sub_data(False, sub_data_key, sub_data, sub_data_type, db_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type) 
             data_json = data_json[0:len(data_json)-1] + "}," 
