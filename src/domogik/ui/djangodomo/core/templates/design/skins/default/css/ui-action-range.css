@@ -6,7 +6,10 @@
     -moz-border-radius: 0.8em;
     -webkit-border-radius: 0.8em;
     outline: none;
-    background: transparent url('../images/background_blue.png') bottom left no-repeat;
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 60%, from(#BDCB2F), to(#9BB528));
+    background-image: -moz-linear-gradient(100% 60% 270deg, #BDCB2F, #9BB528);
+    background-position: bottom left;
+    background-repeat: no-repeat;
 }
 
 .widgetmini_range:hover, .widgetmini_range:focus {
