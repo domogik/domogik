@@ -333,7 +333,7 @@ class RestHandler(BaseHTTPRequestHandler):
         self.send_header('Content-type',  'application/json')
         self.send_header('Expires', '-1')
         self.send_header('Cache-control', 'no-cache')
-        self.send_header('Content-Length', len(data))
+        self.send_header('Content-Length', len(data.encode("utf-8")))
         self.end_headers()
         if data:
             self.wfile.write(data.encode("utf-8"))
