@@ -705,8 +705,8 @@ class UserAccount(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<UserAccount(id=%s, login='%s', pass='%s' is_admin='%s')>" \
-               % (self.id, self.login, self. password, self.is_admin)
+        return "<UserAccount(id=%s, login='%s', is_admin='%s')>" \
+               % (self.id, self.login, self.is_admin)
 
     @staticmethod
     def get_tablename():
