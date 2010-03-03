@@ -38,6 +38,8 @@ Implements
 import threading
 
 from domogik.common import logger
+from optparse import OptionParser
+from domogik.common.daemonize import createDaemon
 
 class BaseModule():
     """ Basic module class, manage common part of all modules.
@@ -47,11 +49,14 @@ class BaseModule():
 
     __instance = None 
 
-    def __init__(self, name = None, stop_cb = None):
+    def __init__(self, name = None, stop_cb = None, parser = None):
         """ @param name : Name of current module 
+            @param parser : An instance of OptionParser. If you want to add extra options to the generic option parser,
+            create your own optionparser instance, use parser.addoption and then pass your parser instance as parameter.
+            Your options/params will then be available on self.options and self.params
         """
         if BaseModule.__instance is None:
-            BaseModule.__instance = BaseModule.__Singl_BaseModule(name, stop_cb)
+            BaseModule.__instance = BaseModule.__Singl_BaseModule(name, stop_cb, parser)
 
     def __getattr__(self, attr):
         """ Delegate access to implementation """
@@ -66,14 +71,34 @@ class BaseModule():
 
     class __Singl_BaseModule:
 
-        def __init__(self, name, stop_cb = None):
+        def __init__(self, name, stop_cb = None, p = None):
+            ''' singleton instance
+            @param p : An instance of OptionParser. If you want to add extra options to the generic option parser,
+            create your own optionparser instance, use parser.addoption and then pass your parser instance as parameter.
+            Your options/params will then be available on self.options and self.params
+            '''
+            print "create Base module instance"
+            if p is not None and isinstance(p, OptionParser):
+                parser = p
+            else:
+                parser = OptionParser()
+            parser.add_option("-f", action="store_true", dest="run_in_foreground", default=False, \
+                    help="Run the module in foreground, default to background.")
+            (self.options, self.args) = parser.parse_args()
+            if not self.options.run_in_foreground:
+                createDaemon()
+                l = logger.Logger(name)
+                self._log = l.get_logger()
+                self._log.info("Daemonize module %s" % name)
+                self.is_daemon = True
+            else:
+                l = logger.Logger(name)
+                self._log = l.get_logger()
+                self.is_daemon = False
             self._threads = []
             self._timers = []
-            print "create Base module instance"
             if name is not None:
                 self._module_name = name
-            l = logger.Logger(name)
-            self._log = l.get_logger()
             self._stop = threading.Event()
             self._lock_add_thread = threading.Semaphore()
             self._lock_add_timer = threading.Semaphore()
@@ -115,7 +140,7 @@ class BaseModule():
             @param thread : the thread to add
             '''
             self._lock_add_thread.acquire()
-            self._log.debug('New thread registered')
+            #self._log.debug('New thread registered : %s' % thread)
             self._threads.append(thread)
             self._lock_add_thread.release()
 
@@ -138,7 +163,7 @@ class BaseModule():
             @param timer : the timer to add
             '''
             self._lock_add_timer.acquire()
-            self._log.debug('New timer registered')
+            self._log.debug('New timer registered : %s' % timer)
             self._timers.append(timer)
             self._lock_add_timer.release()
 
@@ -162,5 +187,8 @@ class BaseModule():
             self._lock_add_cb.acquire()
             self._stop_cb.append(cb)
             self._lock_add_cb.release()
+
+        def __del__(self):
+            self._log.debug("__del__ basemodule")
 
 

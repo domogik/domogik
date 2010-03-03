@@ -44,13 +44,13 @@ import os
 import sys
 import time
 from socket import gethostname
-from threading import Event
+from threading import Event, currentThread
 from optparse import OptionParser
+import traceback
 
 from domogik.common.configloader import Loader
 from domogik.xpl.lib.xplconnector import Listener 
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.common.daemonize import createDaemon
 from domogik.xpl.lib.module import xPLModule, xPLResult
 from domogik.xpl.lib.queryconfig import Query
 
@@ -70,7 +70,13 @@ class SysManager(xPLModule):
         '''
         Init manager and start listeners
         '''
-        xPLModule.__init__(self, name = 'sysmgr')
+        # Check parameters 
+        parser = OptionParser()
+        parser.add_option("-d", action="store_true", dest="start_dbmgr", default=False, \
+                help="Start database manager if not already running.")
+        parser.add_option("-r", action="store_true", dest="start_rest", default=False, \
+                help="Start REST interface manager if not already running.")
+        xPLModule.__init__(self, name = 'sysmgr', parser=parser)
 
         # Logger init
         self._log = self.get_my_logger()
@@ -86,17 +92,7 @@ class SysManager(xPLModule):
         # Get components
         self._list_components(gethostname())
 
-        # Check parameters 
-        parser = OptionParser()
-        parser.add_option("-d", action="store_true", dest="start_dbmgr", default=False, \
-                help="Start database manager if not already running.")
-        parser.add_option("-r", action="store_true", dest="start_rest", default=False, \
-                help="Start REST interface manager if not already running.")
-        
-        (options, args) = parser.parse_args()
-
-        print options
-        if options.start_dbmgr:
+        if self.options.start_dbmgr:
             if self._check_dbmgr_is_running():
                 self._log.warning("Manager started with -d, but a database manager is already running")
             else:
@@ -105,7 +101,7 @@ class SysManager(xPLModule):
                     self._log.error("Manager started with -d, but database manager not available after a startup.\
                             Please check dbmgr.log file")
 
-        if options.start_rest:
+        if self.options.start_rest:
             if self._check_rest_is_running():
                 self._log.warning("Manager started with -r, but a REST manager is already running")
             else:
@@ -140,6 +136,8 @@ class SysManager(xPLModule):
             'command': 'stop',
         })
         self._log.info("System manager initialized")
+        self.get_stop().wait()
+
 
     def _sys_cb(self, message):
         '''
@@ -395,7 +393,6 @@ class SysManager(xPLModule):
         module = sys.modules[mod_path]
         lastpid = os.fork()
         if not lastpid:
-            createDaemon()
             os.execlp(sys.executable, sys.executable, module.__file__)
             # TODO : delete
             #self._set_component_status(name, "ON")
@@ -450,9 +447,9 @@ class SysManager(xPLModule):
         package = domogik.xpl.bin
         for importer, modname, ispkg in pkgutil.iter_modules(package.__path__):
             try:
-                module = __import__(modname, fromlist="dummy")
+                module = __import__('domogik.xpl.bin.%s' % modname, fromlist="dummy")
                 self._log.debug("Module : %s" % modname)
-                if module.IS_DOMOGIK_MODULE is True:
+                if hasattr(module,'IS_DOMOGIK_MODULE') and module.IS_DOMOGIK_MODULE is True:
                     if module.DOMOGIK_MODULE_DESCRIPTION == None:
                         moddesc = modname
                     else:
@@ -472,7 +469,7 @@ class SysManager(xPLModule):
                                              "host" : gethostname(), 
                                              "configuration" : modconf})
             except:
-                pass
+                self._log.error("Error during %s module import" % modname)
 
     def _is_component(self, name):
         '''
@@ -535,7 +532,6 @@ def main():
     ''' Called by the easyinstall mapping script
     '''
     SYS = SysManager()
-
 
 if __name__ == "__main__":
     main()
