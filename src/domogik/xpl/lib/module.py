@@ -44,6 +44,7 @@ from socket import gethostname
 from domogik.xpl.lib.xplconnector import *
 from domogik.xpl.lib.basemodule import BaseModule
 from domogik.common.configloader import Loader
+import pycallgraph
 
 class xPLModule():
     '''
@@ -53,7 +54,7 @@ class xPLModule():
     '''
     __instance = None
 
-    def __init__(self, name = None, stop_cb = None, is_manager = False, reload_cb = None, dump_cb = None):
+    def __init__(self, name = None, stop_cb = None, is_manager = False, reload_cb = None, dump_cb = None, parser = None):
         '''
         Create xPLModule instance, which defines signal handlers
         @param name : The n,ame of the current module
@@ -64,16 +65,20 @@ class xPLModule():
         nothing will happen
         @param dump_cb : Callback to call when a "DUMP" order is received, if None, 
         nothing will happen
+        @param parser : An instance of OptionParser. If you want to add extra options to the generic option parser,
+        create your own optionparser instance, use parser.addoption and then pass your parser instance as parameter.
+        Your options/params will then be available on self.options and self.params
         '''
         if len(name) > 8:
             raise IoError, "The name must be 8 chars max"
         if xPLModule.__instance is None and name is None:
             raise AttributeError, "'name' attribute is mandatory for the first instance"
         if xPLModule.__instance is None:
-            xPLModule.__instance = xPLModule.__Singl_xPLModule(name, stop_cb, is_manager, reload_cb, dump_cb)
+            xPLModule.__instance = xPLModule.__Singl_xPLModule(name, stop_cb, is_manager, reload_cb, dump_cb, parser)
             self.__dict__['_xPLModule__instance'] = xPLModule.__instance
         elif stop_cb is not None:
             xPLModule.__instance.add_stop_cb(stop_cb)
+        self._log.debug("after watcher")
 
     def __getattr__(self, attr):
         """ Delegate access to implementation """
@@ -84,7 +89,7 @@ class xPLModule():
         return setattr(self.__instance, attr, value)
 
     class __Singl_xPLModule(BaseModule):
-        def __init__(self, name, stop_cb = None, is_manager = False, reload_cb = None, dump_cb = None):
+        def __init__(self, name, stop_cb = None, is_manager = False, reload_cb = None, dump_cb = None, parser = None):
             '''
             Create xPLModule instance, which defines system handlers
             @param name : The name of the current module
@@ -95,9 +100,14 @@ class xPLModule():
             nothing will happen
             @param dump_cb : Callback to call when a "DUMP" order is received, if None, 
             nothing will happen
+            @param parser : An instance of OptionParser. If you want to add extra options to the generic option parser,
+            create your own optionparser instance, use parser.addoption and then pass your parser instance as parameter.
+            Your options/params will then be available on self.options and self.params
             '''
-            BaseModule.__init__(self, name, stop_cb)
-            Watcher(self)
+            BaseModule.__init__(self, name, stop_cb, parser)
+            if not self.is_daemon:
+                # If we are in foreground, manage top handle ctrl+c
+                Watcher(self)
             self._log.debug("New system manager instance for %s" % name)
             self._is_manager = is_manager
             cfg = Loader('domogik')
@@ -114,6 +124,7 @@ class xPLModule():
                 'xpltype':'xpl-cmnd'})
             self._reload_cb = reload_cb 
             self._dump_cb = dump_cb
+            self._log.debug("end single xplmodule")
 
         def _system_handler(self, message):
             """ Handler for domogik system messages
@@ -149,6 +160,10 @@ class xPLModule():
             else: #cmd == ping 
                 if message.data["module"] in [self.get_module_name(), "*"]:
                     self._answer_ping()
+        
+        def __del__(self):
+            self._log.debug("__del__ Single xplmodule")
+            self.force_leave()
 
         def _answer_stop(self):
             """ Ack a stop request
@@ -180,14 +195,15 @@ class xPLModule():
             '''
             Leave threads & timers
             '''
-            self._stop.set()
+            self._log.debug("force_leave called")
+            self.get_stop().set()
+            for t in self._timers:
+                t.stop()
+                self._log.debug("Timer stopped %s" % t)
             for t in self._threads:
                 t.join()
                 self._log.debug("Thread stopped %s" % t)
                 #t._Thread__stop()
-            for t in self._timers:
-                t.stop()
-                self._log.debug("Timer stopped %s" % t)
             for cb in self._stop_cb:
                 self._log.debug("Calling stop additionnal method : %s " % cb.__name__)
                 cb()
@@ -247,6 +263,7 @@ class Watcher:
             return
         else:
             self._module = module
+            self._module._log.debug("watcher fork")
             signal.signal(signal.SIGTERM, self._signal_handler)
             self.watch()
 
@@ -267,6 +284,7 @@ class Watcher:
             self._module.force_leave()
             self.kill()
         except OSError:
+            print "OSError"
             pass
         sys.exit()
 
