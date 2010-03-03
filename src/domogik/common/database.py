@@ -114,7 +114,7 @@ class DbHelper():
         # Connecting to the database
         self.__dbprefix = db['db_prefix']
         self.__engine = sqlalchemy.create_engine(url, echo=echo_output)
-        Session = sessionmaker(bind=self.__engine)
+        Session = sessionmaker(bind=self.__engine, autoflush=False)
         self._session = Session()
 
     def __rollback(self):
@@ -944,7 +944,8 @@ class DbHelper():
             dtc_list = self._session.query(DeviceTechnologyConfig)\
                                     .filter_by(technology_id=dt.id).all()
             for dtc in dtc_list:
-                self.del_device_technology_config(dtc.id)
+                self._session.delete(dtc)
+                #self.del_device_technology_config(dtc.id)
 
             self._session.delete(dt)
             try:
@@ -1552,7 +1553,6 @@ class DbHelper():
         Returns a list of all accounts
         @return a list of UserAccount objects
         """
-        self._session.expire_all()
         list_sa = self._session.query(UserAccount).all()
         for user_acc in list_sa:
             # I won't send the password, right?
@@ -1565,7 +1565,6 @@ class DbHelper():
         @param a_id : account id
         @return a UserAccount object
         """
-        self._session.expire_all()
         user_acc = self._session.query(UserAccount)\
                                 .filter_by(id=a_id).first()
         if user_acc is not None:
@@ -1578,7 +1577,6 @@ class DbHelper():
         @param a_login : login
         @return a UserAccount object
         """
-        self._session.expire_all()
         user_acc = self._session.query(UserAccount).filter_by(login=a_login)\
                                                    .first()
         if user_acc is not None:
@@ -1592,7 +1590,6 @@ class DbHelper():
         @param a_pass : password (clear text)
         @return a UserAccount object or None if login / password is wrong
         """
-        self._session.expire_all()
         crypted_pass = self.__make_crypted_password(a_password)
         user_acc = self._session.query(UserAccount)\
                                 .filter_by(login=a_login, password=crypted_pass)\
@@ -1607,7 +1604,6 @@ class DbHelper():
         @param p_id : The person id
         @return a UserAccount object
         """
-        self._session.expire_all()
         person = self._session.query(Person).filter_by(id=p_id).first()
         if person is not None:
             try:
@@ -1740,7 +1736,6 @@ class DbHelper():
         Returns the list of all persons
         @return a list of Person objects
         """
-        self._session.expire_all()
         return self._session.query(Person).all()
 
     def get_person(self, p_id):
@@ -1749,7 +1744,6 @@ class DbHelper():
         @param p_id : person id
         @return a Person object
         """
-        self._session.expire_all()
         return self._session.query(Person).filter_by(id=p_id).first()
 
     def get_person_by_user_account(self, u_id):
@@ -1758,7 +1752,6 @@ class DbHelper():
         @param u_id : the user account id
         @return a Person object or None
         """
-        self._session.expire_all()
         try:
             return self._session.query(Person)\
                                 .filter_by(user_account_id=u_id).one()
