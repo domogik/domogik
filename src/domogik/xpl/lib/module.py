@@ -105,9 +105,7 @@ class xPLModule():
             Your options/params will then be available on self.options and self.params
             '''
             BaseModule.__init__(self, name, stop_cb, parser)
-            if not self.is_daemon:
-                # If we are in foreground, manage top handle ctrl+c
-                Watcher(self)
+            Watcher(self)
             self._log.debug("New system manager instance for %s" % name)
             self._is_manager = is_manager
             cfg = Loader('domogik')
