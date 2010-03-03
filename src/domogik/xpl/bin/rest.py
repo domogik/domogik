@@ -51,6 +51,7 @@ from socket import gethostname
 from Queue import *
 from domogik.xpl.lib.queryconfig import Query
 from domogik.xpl.lib.module import xPLResult
+import re
 
 
 
@@ -2517,7 +2518,7 @@ class JSonHelper():
         if hasattr(data, 'area'):  # for room
             pass
 
-        print "T=" + str(type(data))
+        #print "T=" + str(type(data))
         if data == None:
             return
 
@@ -2530,6 +2531,12 @@ class JSonHelper():
 
     def _process_data(self, data, idx = 0, key = None):
         #print "==== PROCESS DATA " + str(idx) + " ===="
+
+        # check deepth in recursivity
+        if idx > 2:
+            return "#MAX_DEPTH#"
+
+        # define data types
         db_type = ("ActuatorFeature", "Area", "Device", "DeviceUsage", \
                    "DeviceConfig", "DeviceStats", "DeviceStatsValue", \
                    "DeviceTechnology", "DeviceTechnologyConfig", \
@@ -2550,7 +2557,7 @@ class JSonHelper():
         data_type = type(data).__name__
 
         # dirty issue to force cache of __dict__ : make a print of data
-        print "DATA : " + unicode(data)
+        #print "DATA : " + unicode(data)
         #print "DATA TYPE : " + data_type
 
 
@@ -2575,7 +2582,7 @@ class JSonHelper():
                 #print "    DATA KEY : " + str(sub_data_key)
                 #print "    DATA : " + str(sub_data)
                 #print "    DATA TYPE : " + str(sub_data_type)
-                data_json += self._process_sub_data(False, sub_data_key, sub_data, sub_data_type, db_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type)
+                data_json += self._process_sub_data(idx + 1, False, sub_data_key, sub_data, sub_data_type, db_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type)
             data_json = data_json[0:len(data_json)-1] + "},"
 
         ### type : SQL table
@@ -2585,10 +2592,13 @@ class JSonHelper():
                 sub_data_key = key 
                 sub_data = data.__dict__[key] 
                 sub_data_type = type(sub_data).__name__ 
-                print "    DATA KEY : " + str(sub_data_key) 
+                #print "    DATA KEY : " + str(sub_data_key) 
                 #print "    DATA : " + unicode(sub_data) 
                 #print "    DATA TYPE : " + str(sub_data_type) 
-                data_json += self._process_sub_data(False, sub_data_key, sub_data, sub_data_type, db_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type) 
+                buffer = self._process_sub_data(idx + 1, False, sub_data_key, sub_data, sub_data_type, db_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type) 
+                # if max depth in recursivity, we don't display "foo : {}"
+                if re.match(".*#MAX_DEPTH#.*", buffer) is None:
+                    data_json += buffer
             data_json = data_json[0:len(data_json)-1] + "}," 
 
         ### type : tuple
@@ -2602,7 +2612,7 @@ class JSonHelper():
                 #print "    DATA KEY : " + str(sub_data_key)
                 #print "    DATA : " + str(sub_data)
                 #print "    DATA TYPE : " + str(sub_data_type)
-                data_json += self._process_sub_data(False, sub_data_key, sub_data, sub_data_type, db_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type)
+                data_json += self._process_sub_data(idx + 1, False, sub_data_key, sub_data, sub_data_type, db_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type)
             if idx > 0:
                 data_json = data_json[0:len(data_json)-1] + "},"
 
@@ -2628,7 +2638,7 @@ class JSonHelper():
                 #print "    DATA KEY : " + str(sub_data_key)
                 #print "    DATA : " + str(sub_data)
                 #print "    DATA TYPE : " + str(sub_data_type)
-                data_json += self._process_sub_data(True, sub_data_key, sub_data, sub_data_type, db_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type)
+                data_json += self._process_sub_data(idx + 1, True, sub_data_key, sub_data, sub_data_type, db_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type)
             # finish table
             data_json = data_json[0:len(data_json)-1] + "],"
 
@@ -2643,25 +2653,25 @@ class JSonHelper():
                 #print "    DATA KEY : " + str(sub_data_key)
                 #print "    DATA : " + str(sub_data)
                 #print "    DATA TYPE : " + str(sub_data_type)
-                data_json += self._process_sub_data(False, sub_data_key, sub_data, sub_data_type, db_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type)
+                data_json += self._process_sub_data(idx + 1, False, sub_data_key, sub_data, sub_data_type, db_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type)
             data_json = data_json[0:len(data_json)-1] + "},"
 
         return data_json
 
 
 
-    def _process_sub_data(self, is_table, sub_data_key, sub_data, sub_data_type, db_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type):
+    def _process_sub_data(self, idx, is_table, sub_data_key, sub_data, sub_data_type, db_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type):
         data_tmp = ""
         if sub_data_type in db_type: 
             if is_table is False:  # and idx != 0: 
                 data_tmp = '"%s" : ' % sub_data_type.lower() 
-            data_tmp += self._process_data(sub_data, 1)
+            data_tmp += self._process_data(sub_data, idx)
         elif sub_data_type in instance_type:
-            data_tmp += self._process_data(sub_data, 1)
+            data_tmp += self._process_data(sub_data, idx)
         elif sub_data_type in list_type:
-            data_tmp += self._process_data(sub_data, 1, sub_data_key)
+            data_tmp += self._process_data(sub_data, idx, sub_data_key)
         elif sub_data_type in dict_type:
-            data_tmp += self._process_data(sub_data, 1)
+            data_tmp += self._process_data(sub_data, idx)
         elif sub_data_type in num_type:
             data_tmp = '"%s" : %s,' % (sub_data_key, sub_data)
         elif sub_data_type in str_type:
