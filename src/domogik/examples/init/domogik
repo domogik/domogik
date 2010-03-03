@@ -32,7 +32,7 @@ fi
 
 function start_django {
     echo -n " * Starting Django..."
-    /bin/su - ${DOMOGIK_USER} -m -c "dmg_django runserver >/dev/null  &"
+    /bin/su - ${DOMOGIK_USER} -m -c "dmg_django runserver >/dev/null &"
     if [ $? -gt 0 ]; then
         echo " An error occured during Django startup."
         exit 1
@@ -46,7 +46,7 @@ function start_xpl {
         exit 1
     fi
     echo -n "* Starting XPL..."
-    /bin/su - ${DOMOGIK_USER} -m -c "$(which xPL_Hub) -interface lo >/dev/null &"
+    /bin/su - ${DOMOGIK_USER} -m -c "$(which xPL_Hub) -interface lo >/dev/null "
     if [ $? -gt 0 ]; then
         echo " An error occured during Xpl startup."
         exit 1
@@ -56,7 +56,7 @@ function start_xpl {
 }
 function start_manager {
     echo -n "* Starting Manager (with $MANAGER_PARAMS)..."
-    /bin/su - ${DOMOGIK_USER} -m -c "dmg_manager $MANAGER_PARAMS  &"
+    /bin/su - ${DOMOGIK_USER} -m -c "dmg_manager $MANAGER_PARAMS"
     if [ $? -gt 0 ]; then
         echo " An error occured during manager startup."
         exit 1
@@ -81,8 +81,11 @@ function stop_manager {
         kill -15 $pid 2>/dev/null 1>&2
     done
 }
-
-
+function stop_modules {
+for pid in `ps ax | egrep "(rest.py|dbmgr.py)" | grep -v grep | awk '{print $1}'`; do
+        kill -15 $pid 2>/dev/null 1>&2
+    done
+}
     
 case "$1" in
     start)
@@ -120,6 +123,9 @@ case "$1" in
             ;;
             manager)
             stop_manager
+            ;;
+            modules)
+            stop_modules
             ;;
         esac
     fi
