@@ -30,53 +30,10 @@
     $(function(){
         // Accordion
         $("#nav2").accordion({ autoHeight: false, header: ".subnav2", active:0});
-    
-        // Add form
-        var new_name = $("#new_name"),
-            new_description = $("#new_description"),
-            allFields = $([]).add(new_name).add(new_description),
-            tips = $("#validateTips");
-
-		$("#addnewdialog").dialog({
-			bgiframe: true,
-			autoOpen: false,
-			height: 250,
-			modal: true,
-			buttons: {
-				'{% trans "Create" %}': function() {
-					var bValid = true;
-					allFields.removeClass('ui-state-error');
-
-					bValid = bValid && checkLength(new_name,"nom",1,80);
-                    bValid = bValid && checkLength(new_description,"description",1,80);
-					if (bValid) {
-                        // Submit form
-                        getREST('/base/area/add/name/' + new_name.val() + '/description/' + new_description.val(),
-                            function(data) {
-                                var status = (data.status).toLowerCase();
-                                if (status == 'ok') {
-                                    $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "New area added" %} \'' + data.area[0].name + '\''});
-                                } else {
-                                    $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Area not created" %} (' + data.description + ')'});
-                                }
-                            }
-                        );
-                    }
-				},
-				'{% trans "Cancel" %}': function() {
-					$(this).dialog('close');
-				}
-			},
-			close: function() {
-				allFields.val('').removeClass('ui-state-error');
-			}
-		});
 
         $("#tabs").tabs().domogik_tabs({
             addTitle: "{% trans "Add new area" %}",
-            addCallback: function() {
-                $('#addnewdialog').dialog('open');
-            }
+            addId: "addDialogButton"
         });
 
         /* Tooltips */
@@ -86,6 +43,34 @@
         $('#delete_confirmation').dialog_confirmation({
             title: "{% trans 'Delete' %}",
             content: "{% trans "Please confirm to delete" %}"
+        });
+        
+        $('#areadialog').dialog_form({
+            tips: "{% trans "All fields are required." %}",
+            tipsid: 'tipsArea',
+            fields: [
+                {name : 'areaname', type:'text', label:'Name', required: true, option: {min: 1, max: 80}},
+                {name : 'areadescription', type:'text', label:'Description', required: true, option: {min: 1, max: 80}}
+            ]
+        });
+
+        /* Add a function to create an area */
+        $('#areadialog').dialog_form('addbutton', {
+            title: "{% trans "Create new area" %}",
+            button: "#addDialogButton",
+            onok: function(values) {
+                // Submit form
+                getREST('/base/area/add/name/' + values.areaname + '/description/' + values.areadescription,
+                    function(data) {
+                        var status = (data.status).toLowerCase();
+                        if (status == 'ok') {
+                            $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "New area added" %} \'' + data.area[0].name + '\''});
+                        } else {
+                            $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Area not created" %} (' + data.description + ')'});
+                        }
+                    }
+                );
+            }
         });
     });
 {% endblock %}
@@ -118,52 +103,6 @@
                 <script type="text/javascript">
                     // <![CDATA[
                     $(function(){
-                        var area{{ area.id }}newname = $("#area{{ area.id }}-newname"),
-                            area{{ area.id }}newdescription = $("#area{{ area.id }}-newdescription"),
-                            allFields = $([]).add(area{{ area.id }}newname),
-                            tips{{ area.id }} = $("#validateTips{{ area.id }}");
-
-                        area{{ area.id }}newname.val("{{ area.name }}");
-                        area{{ area.id }}newdescription.val("{{ area.description }}");
-
-                        $("#update_dialog_{{ area.id }}").dialog({
-                            bgiframe: true,
-                            autoOpen: false,
-                            height: 300,
-                            modal: true,
-                            buttons: {
-                                '{% trans "Modify" %}': function() {
-                                    var bValid = true;
-                                    allFields.removeClass('ui-state-error');
-                                    bValid = bValid && checkLength(tips{{ area.id }}, area{{ area.id }}newname,"nom",1,80);
-                                    bValid = bValid && checkLength(tips{{ area.id }}, area{{ area.id }}newdescription,"description",1,80);
-                                    if (bValid) {
-                                        // Submit form
-                                        getREST('/base/area/update/id/' + {{ area.id }} + '/name/' + area{{ area.id }}newname.val() + '/description/' + area{{ area.id }}newdescription.val(),
-                                            function(data) {
-                                                var status = (data.status).toLowerCase();
-                                                if (status == 'ok') {
-                                                    $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Area" %} \'' + data.area[0].name + '\' {% trans "successfully updated" %}'});
-                                                } else {
-                                                    $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Area not updated" %} (' + data.description + ')'});
-                                                }
-                                            }
-                                        );
-                                    }
-                                },
-                                '{% trans "Cancel" %}': function() {
-                                    $(this).dialog('close');
-                                }
-                            },
-                            close: function() {
-                                allFields.val('').removeClass('ui-state-error');
-                            }
-                        });
-
-                        $('#update{{ area.id }}').click(function() {
-                            $('#update_dialog_{{ area.id }}').dialog('open');
-                        });
-
                         /* Add a function to delete the current area */
                         $('#delete_confirmation').dialog_confirmation('addbutton', {
                             button: "#del{{ area.id }}",
@@ -207,6 +146,25 @@
                         
                         $( "#icon{{ area.id }}").processing();
                         
+                        /* Add a function to update an area */
+                        $('#areadialog').dialog_form('updbutton', {
+                            title: "{% trans "Update area" %} '{{ area.name }}'",
+                            button: "#update{{ area.id }}",
+                            values: {areaname : '{{ area.name }}', areadescription : '{{ area.description }}'},
+                            onok: function(values) {
+                                // Submit form
+                                getREST('/base/area/update/id/' + {{ area.id }} + '/name/' + values.areaname + '/description/' + values.areadescription,
+                                    function(data) {
+                                        var status = (data.status).toLowerCase();
+                                        if (status == 'ok') {
+                                            $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Area" %} \'' + data.area[0].name + '\' {% trans "successfully updated" %}'});
+                                        } else {
+                                            $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Area not updated" %} (' + data.description + ')'});
+                                        }
+                                    }
+                                );
+                            }
+                        });
                     });
                     // ]]>
                 </script>
@@ -219,31 +177,10 @@
                     <h2>{{ area.name }}</h2>
                     <p>{{ area.description }}</p>
                 </div>
-                <div id="update_dialog_{{ area.id }}" title="{% trans "Modify" %} {{ area.name }}">
-                    <p id="validateTips{{ area.id }}">{% trans "All fields are required." %}</p>
-                    <form >
-                        <fieldset>
-                            <label class="medium" for="area{{ area.id }}-newname">{% trans "New name" %}</label>
-                            <input type="text" class="medium" id="area{{ area.id }}-newname" name="area{{ area.id }}-newname" />
-                            <label class="medium" for="area{{ area.id }}-newdescription">{% trans "New description" %}</label>
-                            <textarea type="text" class="medium" id="area{{ area.id }}-newdescription" name="area{{ area.id }}-newdescription"></textarea>
-                        </fieldset>'
-                    </form>
-                </div>
             </div>
             {% endfor %}
         </div>
-        <div id="addnewdialog" title='{% trans "Create new area" %}'>
-            <p id="validateTips">{% trans "All fields are required." %}</p>
-            <form>
-                <fieldset>
-                    <label class="medium" for="new_name">{% trans "Name" %}</label>
-                    <input type="text" class="medium" id="new_name" name="new_name" />
-                    <label class="medium" for="new_description">{% trans "Description" %}</label>
-                    <textarea type="text" class="medium" id="new_description" name="new_description"></textarea>
-                </fieldset>
-            </form>
-        </div>
     </div>
+    <div id="areadialog"></div>
     <div id="delete_confirmation"></div>
 {% endblock %}

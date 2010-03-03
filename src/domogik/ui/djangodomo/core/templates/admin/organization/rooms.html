@@ -31,54 +31,10 @@
     $(function(){
         // Accordion
         $("#nav2").accordion({ autoHeight: false, header: ".subnav2", active:0});
-
-        // Add form  
-        var new_name = $("#new_name"),
-            new_description = $("#new_description"),
-            allFields = $([]).add(new_name).add(new_description),
-            tips = $("#validateTips");
-		
-		$("#addnewdialog").dialog({
-			bgiframe: true,
-			autoOpen: false,
-			height: 250,
-			modal: true,
-			buttons: {
-				'{% trans "Create" %}': function() {
-					var bValid = true;
-					allFields.removeClass('ui-state-error');
-
-					bValid = bValid && checkLength(new_name,"nom",1,80);
-                    bValid = bValid && checkLength(new_description,"description",1,80);                    				
-					if (bValid) {						
-                        // Submit form
-                        getREST('/base/room/add/name/' + new_name.val() + '/description/' + new_description.val(),
-                            function(data) {
-                                var status = (data.status).toLowerCase();
-                                if (status == 'ok') {
-                                    $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "New room added" %} \'' + data.room[0].name + '\''});                                   
-                                } else {
-                                    $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Room not created" %} (' + data.description + ')'});                                                                      
-                                }
-                            }
-                        );
-                    }
-				},
-				'{% trans "Cancel" %}': function() {
-					$(this).dialog('close');
-				}
-			},
-			close: function() {
-				allFields.val('').removeClass('ui-state-error');
-			}
-		});
-
         
         $("#tabs").tabs().domogik_tabs({
             addTitle: "{% trans "Add new room" %}",
-            addCallback: function() {
-                $('#addnewdialog').dialog('open');
-            }
+            addId: "addDialogButton"
         });
         
         /* Tooltips */
@@ -108,6 +64,34 @@
         $('#delete_confirmation').dialog_confirmation({
             title: "{% trans 'Delete' %}",
             content: "{% trans "Please confirm to delete" %}"
+        });
+        
+        $('#roomdialog').dialog_form({
+            tips: "{% trans "All fields are required." %}",
+            tipsid: 'tipsRoom',
+            fields: [
+                {name : 'roomname', type:'text', label:'Name', required: true, option: {min: 1, max: 80}},
+                {name : 'roomdescription', type:'text', label:'Description', required: true, option: {min: 1, max: 80}}
+            ]
+        });
+        
+        /* Add a function to create an room */
+        $('#roomdialog').dialog_form('addbutton', {
+            title: "{% trans "Create new room" %}",
+            button: "#addDialogButton",
+            onok: function(values) {
+                // Submit form
+                getREST('/base/room/add/name/' + values.roomname + '/description/' + values.roomdescription,
+                    function(data) {
+                        var status = (data.status).toLowerCase();
+                        if (status == 'ok') {
+                            $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "New room added" %} \'' + data.room[0].name + '\''});                                   
+                        } else {
+                            $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Room not created" %} (' + data.description + ')'});                                                                      
+                        }
+                    }
+                );
+            }
         });
     });
 
@@ -140,53 +124,7 @@
             <div id="element{{ room.id }}" class="tabelement">
                 <script type="text/javascript">
                     // <![CDATA[
-                    $(function(){      
-                        var room{{ room.id }}newname = $("#room{{ room.id }}-newname"),
-                            room{{ room.id }}newdescription = $("#room{{ room.id }}-newdescription"),
-                            allFields = $([]).add(room{{ room.id }}newname),
-                            tips{{ room.id }} = $("#validateTips{{ room.id }}");
-                        
-                        room{{ room.id }}newname.val("{{ room.name }}");
-                        room{{ room.id }}newdescription.val("{{ room.description }}");
-                        
-                        $("#update_dialog_{{ room.id }}").dialog({
-                            bgiframe: true,
-                            autoOpen: false,
-                            height: 300,
-                            modal: true,
-                            buttons: {
-                                '{% trans "Modify" %}': function() {
-                                    var bValid = true;
-                                    allFields.removeClass('ui-state-error');
-                                    bValid = bValid && checkLength(tips{{ room.id }}, room{{ room.id }}newname,"nom",1,80);
-                                    bValid = bValid && checkLength(tips{{ room.id }}, room{{ room.id }}newdescription,"description",1,80);
-                                    if (bValid) {
-                                        // Submit form
-                                        getREST('/base/room/update/id/' + {{ room.id }} + '/name/' + room{{ room.id }}newname.val() + '/description/' + room{{ room.id }}newdescription.val(),
-                                            function(data) {
-                                                var status = (data.status).toLowerCase();
-                                                if (status == 'ok') {
-                                                    $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Room" %} \'' + data.room[0].name + '\' {% trans "successfully updated" %}'});                                   
-                                                } else {
-                                                    $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Room not updated" %} (' + data.description + ')'});                                                                      
-                                                }
-                                            }
-                                        );
-                                    }
-                                },
-                                '{% trans "Cancel" %}': function() {
-                                    $(this).dialog('close');
-                                }
-                            },
-                            close: function() {
-                                allFields.val('').removeClass('ui-state-error');
-                            }
-                        });
-
-                        $('#update{{ room.id }}').click(function() {
-                            $('#update_dialog_{{ room.id }}').dialog('open');
-                        });
-        
+                    $(function(){
                         /* Add a function to delete the current room */
                         $('#delete_confirmation').dialog_confirmation('addbutton', {
                             button: "#del{{ room.id }}",
@@ -229,6 +167,27 @@
                         });
                         
                         $( "#icon{{ room.id }}").processing();
+                        
+                        /* Add a function to update an room */
+                        $('#roomdialog').dialog_form('updbutton', {
+                            title: "{% trans "Update room" %} '{{ room.name }}'",
+                            button: "#update{{ room.id }}",
+                            values: {roomname : '{{ room.name }}', roomdescription : '{{ room.description }}'},
+                            onok: function(values) {
+                                // Submit form
+                                getREST('/base/room/update/id/' + {{ area.id }} + '/name/' + values.areaname + '/description/' + values.areadescription,
+                                    function(data) {
+                                        var status = (data.status).toLowerCase();
+                                        if (status == 'ok') {
+                                            $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Room" %} \'' + data.room[0].name + '\' {% trans "successfully updated" %}'});                                   
+                                        } else {
+                                            $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Room not updated" %} (' + data.description + ')'});                                                                      
+                                        }
+                                    }
+                                );
+                            }
+                        });
+                        
                     });
                     // ]]>
                 </script>
@@ -242,32 +201,11 @@
                     <p>{{ room.description }}</p>
 
                 </div>
-                <div id="update_dialog_{{ room.id }}" title="{% trans "Modify" %} {{ room.name }}">
-                    <p id="validateTips{{ room.id }}">{% trans "All fields are required." %}</p>
-                    <form >
-                        <fieldset>
-                            <label class="medium" for="room{{ room.id }}-newname">{% trans "New name" %}</label>
-                            <input type="text" class="medium" id="room{{ room.id }}-newname" name="room{{ room.id }}-newname" />
-                            <label class="medium" for="room{{ room.id }}-newdescription">{% trans "New description" %}</label>
-                            <textarea type="text" class="medium" id="room{{ room.id }}-newdescription" name="room{{ room.id }}-newdescription"></textarea>
-                        </fieldset>
-                    </form>
-                </div>
             </div>
             {% endfor %}
         </div>
-        <div id="addnewdialog" title="{% trans "Create new room" %}">
-            <p id="validateTips">{% trans "All fields are required." %}</p>
-            <form>
-                <fieldset>
-                    <label class="medium" for="new_name">{% trans "Name" %}</label>
-                    <input type="text" class="medium" id="new_name" name="new_name" />
-                    <label class="medium" for="new_description">{% trans "Description" %}</label>
-                    <textarea type="text" class="medium" id="new_description" name="new_description"></textarea>
-                </fieldset>
-            </form>
-        </div>
     </div>
+    <div id="roomdialog"></div>
     <div id="delete_confirmation"></div>
     
     <div class="subsection" id="dragdroprooms">

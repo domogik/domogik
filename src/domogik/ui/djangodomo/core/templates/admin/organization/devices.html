@@ -35,56 +35,9 @@
         
         $("#tabs").tabs().domogik_tabs({
             addTitle: "{% trans "Add new device" %}",
-            addCallback: function() {
-                $('#addnewdialog').dialog('open');
-            }
+            addId: "addDialogButton"
         });
-        
-        // Add form  
-        var new_name = $("#new_name"),
-            new_description = $("#new_description"),
-            new_address = $("#new_address"),
-            new_type = $("#new_type"),
-            new_usage = $("#new_usage"),
-            new_reference = $("#new_reference"),
-            allFields = $([]).add(new_name).add(new_description).add(new_address).add(new_type).add(new_usage).add(new_reference),
-            tips = $("#validateTips");
-		
-		$("#addnewdialog").dialog({
-			bgiframe: true,
-			autoOpen: false,
-			height: 420,
-			modal: true,
-			buttons: {
-				'{% trans "Create" %}': function() {
-					var bValid = true;
-					allFields.removeClass('ui-state-error');
 
-					bValid = bValid && checkLength(new_name,"nom",1,80);
-                    bValid = bValid && checkLength(new_description,"description",1,80);                    				
-					if (bValid) {						
-                        // Submit form
-                        getREST('/base/device/add/name/' + new_name.val() + '/address/' + new_address.val() + '/type_id/' + new_type.val() + '/usage_id/' + new_usage.val() + '/description/' + new_description.val() + '/reference/' + new_reference.val(),
-                            function(data) {
-                                var status = (data.status).toLowerCase();
-                                if (status == 'ok') {
-                                    $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "New device added" %} \'' + data.room[0].name + '\''});                                   
-                                } else {
-                                    $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "device not created" %} (' + data.description + ')'});                                                                      
-                                }
-                            }
-                        );
-                    }
-				},
-				'{% trans "Cancel" %}': function() {
-					$(this).dialog('close');
-				}
-			},
-			close: function() {
-				allFields.val('').removeClass('ui-state-error');
-			}
-		});
-        
         $('#dragdropdevices').dragdrop({
             dropcallback: function(self, element, target) {
                 getREST('/base/device/update/id/' + element + '/room_id/' + target,
@@ -113,15 +66,59 @@
             title: "{% trans 'Delete' %}",
             content: "{% trans "Please confirm to delete" %}"
         });
-        
-        $('#new_type_button').menu({
-			content: $('#new_type_list').html(),
-			backLink: false,
-            crumbDefaultText: 'Choose an technologie:',
-            resultValueField: '#new_type',
-            resultTextElement: '#new_type_button'
-		});
 
+        $('#devicedialog').dialog_form({
+            tips: "{% trans "All fields are required." %}",
+            tipsid: 'tipsDevice',
+            fields: [
+                {name : 'devicename', type:'text', label:'Name', required: true, option: {min: 1, max: 80}},
+                {name : 'devicedescription', type:'text', label:'Description', required: true, option: {min: 1, max: 80}},
+                {name : 'deviceaddress', type:'text', label:'Address', required: true, option: {min: 1, max: 80}},
+                {name : 'devicereference', type:'text', label:'Reference', required: true, option: {min: 1, max: 80}},
+                {name : 'deviceusage', type:'select', label:'Usage', required: true, option: {
+                    initial: {value:'0', label:'Choose an usage'},
+                    options: [
+                    {% for usage in usages_list %}
+                        {value:'{{ usage.id }}', label: '{{ usage.name }}'},
+                    {% endfor %}
+                    ]
+                }},
+                {name : 'devicetype', type:'selectipod', label:'Type', required: true, option: {
+                    initial: {value:'0', label:'Choose a device type'},
+                    options: [
+                        {% regroup types_list|dictsort:"technology_id" by devicetechnology as technologies_list %}
+                        {% for technology in technologies_list %}
+                            { label: '{{ technology.grouper.name }}', icon:'icon16-technology-{{ technology.grouper.name|lower }}',
+                                submenu: [
+                                {% for type in technology.list %}
+                                    {value:'{{ type.id }}', label:'{{ type.name }}'},
+                                {% endfor %}
+                                ]
+                            },
+                        {% endfor %}
+                    ]
+                }}
+            ]
+        });
+
+        /* Add a function to create a device */
+        $('#devicedialog').dialog_form('addbutton', {
+            title: "{% trans "Add new device" %}",
+            button: "#addDialogButton",
+            onok: function(values) {
+                // Submit form
+                getREST('/base/device/add/name/' + values.devicename + '/address/' + values.deviceaddress + '/type_id/' + values.devicetype + '/usage_id/' + values.deviceusage + '/description/' + values.devicedescription + '/reference/' + values.devicereference,
+                    function(data) {
+                        var status = (data.status).toLowerCase();
+                        if (status == 'ok') {
+                            $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "New device added" %} \'' + data.room[0].name + '\''});                                   
+                        } else {
+                            $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "device not created" %} (' + data.description + ')'});                                                                      
+                        }
+                    }
+                );
+            }
+        });
     });
 {% endblock %}
 {% block title %}{% trans page_title %}{% endblock %}
@@ -182,6 +179,27 @@
                                     );
                                 }
                             });
+                            
+                            /* Add a function to create a device */
+                            $('#devicedialog').dialog_form('updbutton', {
+                                title: "{% trans "Add new device" %}",
+                                button: "#update{{ device.id }}",
+                                values: {devicename : '{{ device.name }}', devicedescription : '{{ device.description }}', deviceaddress : '{{ device.address }}', devicereference : '{{ device.reference }}', devicetype : '{{ device.type_id }}', deviceusage : '{{ device.usage_id }}'},
+                                onok: function(values) {
+                                    // Submit form
+                                    getREST('/base/device/update/id/{{ device.id }}/name/' + values.devicename + '/address/' + values.deviceaddress + '/type_id/' + values.devicetype + '/usage_id/' + values.deviceusage + '/description/' + values.devicedescription + '/reference/' + values.devicereference,
+                                        function(data) {
+                                            var status = (data.status).toLowerCase();
+                                            if (status == 'ok') {
+                                                $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Device" %} \'' + data.device[0].name + '\' {% trans "successfully updated" %}'});
+                                            } else {
+                                                $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Device not updated" %} (' + data.description + ')'});
+                                            }
+                                        }
+                                    );
+                                }
+                            });
+
                         });
                         // ]]>
                     </script>
@@ -205,46 +223,8 @@
             </div>
             {% endfor %}
         </div>
-        <div id="addnewdialog" title='{% trans "Create new area" %}'>
-            <p id="validateTips">{% trans "All fields are required." %}</p>
-            <form>
-                <fieldset>
-                    <label class="medium" for="new_name">{% trans "Name" %}</label>
-                    <input type="text" class="medium" id="new_name" name="new_name" />
-                    <label class="medium" for="new_description">{% trans "Description" %}</label>
-                    <textarea type="text" class="medium" id="new_description" name="new_description"></textarea>
-                    <label class="medium" for="new_type">{% trans "Type" %}</label>
-                    <input type='hidden' id="new_type" name="new_type" />
-                    <a tabindex="0" href="#new_type_list" class="fg-button" id="new_type_button">Choose device type</a> 
-                    <div id="new_type_list" class="offscreen">
-                        <ul>
-                        {% regroup types_list|dictsort:"technology_id" by devicetechnology as technologies_list %}
-                        {% for technology in technologies_list %}
-                            <li><a href="#"><div class="icon16-text icon16-technology-{{ technology.grouper.name|lower }}">{{ technology.grouper.name }}</div></a>
-                                <ul>
-                                {% for type in technology.list %}
-                                    <li><a href="#" value="{{ type.id }}">{{ type.name }}</a></li>
-                                {% endfor %}
-                                </ul>
-                            </li>
-                        {% endfor %}
-                        </ul>
-                    </div>
-                    <label class="medium" for="new_address">{% trans "Address" %}</label>
-                    <input type="text" class="medium" id="new_address" name="new_address" />
-                    <label class="medium" for="new_reference">{% trans "Reference" %}</label>
-                    <input type="text" class="medium" id="new_reference" name="new_reference" />
-                    <label class="medium" for="new_usage">{% trans "Usage" %}</label>
-                    <select class="medium" id="new_usage" name="new_usage">
-                    {% for usage in usages_list %}
-                        <option value="{{ usage.id }}">{{ usage.name }}</option>
-                    {% endfor %}
-                    </select>
-
-                </fieldset>
-            </form>
-        </div>
     </div>
+    <div id="devicedialog"></div>
     <div id="delete_confirmation"></div>
         
     <div class="subsection" id="dragdropdevices">

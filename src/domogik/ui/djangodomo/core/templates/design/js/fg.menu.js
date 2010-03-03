@@ -27,7 +27,7 @@ $.fn.menu = function(options){
 		if (m.menuOpen == false) { m.showMenu(); }
 		else { m.kill(); };
 		return false;
-	});	
+	});
 };
 
 function Menu(caller, options){
@@ -244,14 +244,8 @@ function Menu(caller, options){
 
 		// edit this for your own custom function/callback:
         $(options.resultValueField).val($(item).attr('value'));
-        
-        var txt = '';
-        container.find('.fg-menu-crumb').each(function() {
-            txt += $(this).text() + '.';
-        });
-        txt += $(item).text();
-        $(options.resultTextElement).text(txt);
-        		menu.kill();
+        $(options.resultTextElement).text($(item).attr('valuetxt'));
+        menu.kill();
 	};
 };
 

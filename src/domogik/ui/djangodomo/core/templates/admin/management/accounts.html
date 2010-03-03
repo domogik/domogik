@@ -25,78 +25,60 @@
     $(function(){
         // Accordion
         $("#nav2").accordion({ autoHeight: false, header: ".subnav2", active:1});
-    
-        // Add form
-        var new_login = $("#new_login"),
-            new_password = $("#new_password"),
-            new_admin = $("#new_admin"),
-            allFields = $([]).add(new_login).add(new_password).add(new_admin),
-            tips = $("#validateTips");
-
-		$("#addnewdialog").dialog({
-			bgiframe: true,
-			autoOpen: false,
-			height: 250,
-			modal: true,
-			buttons: {
-				'{% trans "Create" %}': function() {
-					var bValid = true;
-					allFields.removeClass('ui-state-error');
-
-					bValid = bValid && checkLength(new_login,"Login",1,20);
-                    bValid = bValid && checkLength(new_password,"Password",1,80);
-					if (bValid) {
-                        var is_admin = "False";
-                        if ($('#new_admin').attr('checked')) {
-                            is_admin = "True";
-                        }
-                        // Submit form
-                        getREST('/account/add/login/' + new_login.val() + '/password/' + new_password.val() + '/is_admin/' + is_admin + '/skin_used/default',
-                            function(data) {
-                                var status = (data.status).toLowerCase();
-                                if (status == 'ok') {
-                                    $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "New account added" %} \'' + data.account[0].login + '\''});
-                                } else {
-                                    $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Account not created" %} (' + data.description + ')'});
-                                }
-                            }
-                        );
-                    }
-				},
-				'{% trans "Cancel" %}': function() {
-					$(this).dialog('close');
-				}
-			},
-			close: function() {
-				allFields.val('').removeClass('ui-state-error');
-			}
-		});
         
-        $("#add").click(function() {
-            $('#addnewdialog').dialog('open');
+        /* Tooltips */
+        $('.buttonside[title]').tooltip_top();
+        
+        $('#delete_confirmation').dialog_confirmation({
+            title: "{% trans 'Delete' %}",
+            content: "{% trans "Please confirm to delete" %}"
         });
         
-        $('.buttonicon[title]').qtip({
-            position: {
-                corner: {
-                    target: 'topMiddle',
-                    tooltip: 'bottomMiddle'
-                }
-            },
-
-            style: {
-                padding: 5,
-                background: '#A2D959',
-                color: 'black',
-                textAlign: 'center',
-                border: {
-                    width: 7,
-                    radius: 5,
-                    color: '#A2D959'
-                },
-                tip: 'bottomMiddle',
-                name: 'dark' // Inherit the rest of the attributes from the preset dark style
+        $('#addaccountdialog').dialog_form({
+            tips: "{% trans "All fields are required." %}",
+            tipsid: 'tipsAddAccount',
+            fields: [
+                {name : 'addlogin', type:'text', label:'Login', required: true, option: {min: 1, max: 80}},
+                {name : 'addpassword', type:'numericpassword', label:'Access code (numeric only)', required: true, option: {min: 1, max: 80}},
+                {name : 'addadmin', type:'checkbox', label:'Is admin', required: true}
+            ]
+        });
+        
+        /* Add a function to create an account */
+        $('#addaccountdialog').dialog_form('addbutton', {
+            title: "{% trans "Create new account" %}",
+            button: "#addDialogButton",
+            onok: function(values) {
+                // Submit form
+                getREST('/account/add/login/' + values.addlogin + '/password/' + values.addpassword + '/is_admin/' + values.addadmin + '/skin_used/default',
+                    function(data) {
+                        var status = (data.status).toLowerCase();
+                        if (status == 'ok') {
+                            $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "New account added" %} \'' + data.account[0].login + '\''});
+                        } else {
+                            $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Account not created" %} (' + data.description + ')'});
+                        }
+                    }
+                );
             }
+        });
+        
+        $('#updaccountdialog').dialog_form({
+            tips: "{% trans "All fields are required." %}",
+            tipsid: 'tipsUpdateAccount',
+            fields: [
+                {name : 'updlogin', type:'text', label:'Login', required: true, option: {min: 1, max: 80}},
+                {name : 'updadmin', type:'checkbox', label:'Is admin', required: true}
+            ]
+        });
+        
+        $('#passwordaccountdialog').dialog_form({
+            tips: "{% trans "All fields are required." %}",
+            tipsid: 'tipsPasswordAccount',
+            fields: [
+                {name : 'oldpassword', type:'numericpassword', label:'Old access code', required: true, option: {min: 1, max: 80}},
+                {name : 'newpassword', type:'numericpassword', label:'New access code (numeric only)', required: true, option: {min: 1, max: 80}},
+            ]
         });
     });
 {% endblock %}
@@ -124,7 +106,7 @@
     <div class="subsection">
         <h2>{% trans "Accounts list" %}</h2>
         <ul class="actions">
-            <li><button id="add" class="icon16-action-add button">{% trans "Add new account" %}</button></li>
+            <li><button id="addDialogButton" class="icon16-action-add button">{% trans "Add new account" %}</button></li>
         </ul>
         <table>
             <tr>
@@ -138,136 +120,59 @@
                 // <![CDATA[
                     $(function(){
                         /* Add a onclick function to delete the current account */
-                        $('#del{{ account.id }}').click(function() {
-                            $('#delete_confirmation_{{ account.id }}').dialog('open');
-                        });
-                        $("#delete_confirmation_{{ account.id }}").dialog({
-                            bgiframe: true,
-                            autoOpen: false,
-                            height: 100,
-                            modal: true,
-                            buttons: {
-                                '{% trans "Delete" %}': function() {
-                                    getREST('/account/del/{{ account.id }}',
-                                        function(data) {
-                                            var status = (data.status).toLowerCase();
-                                            if (status == 'ok') {
-                                                $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Account" %} \'' + data.account[0].login + '\' {% trans "successfully deleted" %}'});
-                                            } else {
-                                                $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Account not deleted" %} (' + data.description + ')'});
-                                            }
+                        $('#delete_confirmation').dialog_confirmation('addbutton', {
+                            button: "#del{{ account.id }}",
+                            name: "'{{ account.login }}'",
+                            onok: function() {
+                                getREST('/account/del/{{ account.id }}',
+                                    function(data) {
+                                        var status = (data.status).toLowerCase();
+                                        if (status == 'ok') {
+                                            $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Account" %} \'' + data.account[0].login + '\' {% trans "successfully deleted" %}'});
+                                        } else {
+                                            $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Account not deleted" %} (' + data.description + ')'});
                                         }
-                                    );
-                                },
-                                '{% trans "Cancel" %}': function() {
-                                    $(this).dialog('close');
-                                }
-                            },
-                            close: function() {
+                                    }
+                                );
                             }
                         });
-                        
-                        $('#update{{ account.id }}').click(function() {
-                            $('#update_dialog_{{ account.id }}').dialog('open');
-                        });
-                        
-                        var account{{ account.id }}_login = $("#account{{ account.id }}_login"),
-                            account{{ account.id }}_admin = $("#account{{ account.id }}_admin"),
-                            allFields = $([]).add(account{{ account.id }}_login).add(account{{ account.id }}_admin),
-                            tips = $("#validateTips{{ account.id }}");
 
-                        account{{ account.id }}_login.val("{{ account.login }}");
-                        {% ifequal account.is_admin "True" %}
-                        account{{ account.id }}_admin.attr('checked', 'checked');
-                        {% endifequal %}
-                        
-                        $("#update_dialog_{{ account.id }}").dialog({
-                            bgiframe: true,
-                            autoOpen: false,
-                            height: 300,
-                            modal: true,
-                            buttons: {
-                                '{% trans "Modify" %}': function() {
-                                    var bValid = true;
-                                    allFields.removeClass('ui-state-error');
-                                    bValid = bValid && checkLength(account{{ account.id }}_login, "Login",1,20);
-                                    if (bValid) {
-                                        // Submit form
-                                        var is_admin = "False";
-                                        if ($('#account{{ account.id }}_admin').attr('checked')) {
-                                            is_admin = "True";
+                        /* Add a function to update an account */
+                        $('#updaccountdialog').dialog_form('updbutton', {
+                            title: "{% trans "Update account" %} '{{ account.login }}'",
+                            button: "#update{{ account.id }}",
+                            values: {updlogin : '{{ account.login }}', updadmin : {{ account.is_admin|lower }} },
+                            onok: function(values) {
+                                // Submit form
+                                getREST('/account/update/id/{{ account.id }}/login/' + values.updlogin + '/is_admin/' + values.updadmin + '/skin_used/default',
+                                    function(data) {
+                                        var status = (data.status).toLowerCase();
+                                        if (status == 'ok') {
+                                            $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Account" %} \'' + data.account[0].login + '\' {% trans "successfully updated" %}'});
+                                        } else {
+                                            $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Account not updated" %} (' + data.description + ')'});
                                         }
-                                        getREST('/account/update/id/{{ account.id }}/login/' + account{{ account.id }}_login.val() + '/is_admin/' + is_admin + '/skin_used/default',
-                                            function(data) {
-                                                var status = (data.status).toLowerCase();
-                                                if (status == 'ok') {
-                                                    $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Account" %} \'' + data.account[0].login + '\' {% trans "successfully updated" %}'});
-                                                } else {
-                                                    $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Account not updated" %} (' + data.description + ')'});
-                                                }
-                                            }
-                                        );
                                     }
-                                },
-                                '{% trans "Cancel" %}': function() {
-                                    $(this).dialog('close');
-                                }
-                            },
-                            close: function() {
-                                allFields.val('').removeClass('ui-state-error');
+                                );
                             }
                         });
-                        
-                        $('#password{{ account.id }}').click(function() {
-                            $('#password_dialog_{{ account.id }}').dialog('open');
-                        });
-                                                
-                        var account{{ account.id }}_oldpassword = $("#account{{ account.id }}_oldpassword"),
-                            account{{ account.id }}_newpassword = $("#account{{ account.id }}_newpassword"),
-                            allFields2 = $([]).add(account{{ account.id }}_oldpassword)
-                            .add(account{{ account.id }}_newpassword),
-                            tips2 = $("#validateTips2{{ account.id }}");
 
-                        $("#password_dialog_{{ account.id }}").dialog({
-                            bgiframe: true,
-                            autoOpen: false,
-                            height: 300,
-                            modal: true,
-                            buttons: {
-                                '{% trans "Modify" %}': function() {
-                                    var bValid = true;
-                                    allFields2.removeClass('ui-state-error');
-                                    bValid = bValid && checkLength(account{{ account.id }}_oldpassword, "Old Password",1,80);
-                                    bValid = bValid && checkLength(account{{ account.id }}_newpassword, "New Password",1,80);
-                                    if (bValid) {
-                                        // Submit form
-                                        getREST('/account/auth/{{ account.login }}/' + account{{ account.id }}_oldpassword.val(),
-                                            function(data) {
-                                                var status = (data.status).toLowerCase();
-                                                if (status == 'ok') {
-                                                    getREST('/account/update/id/{{ account.id }}/password/' + account{{ account.id }}_newpassword.val(),
-                                                        function(data) {
-                                                            var status = (data.status).toLowerCase();
-                                                            if (status == 'ok') {
-                                                                $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : ' + data.account[0].login + '\' {% trans "Password" %} {% trans "successfully updated" %}'});
-                                                            } else {
-                                                                $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Password not updated" %} (' + data.description + ')'});
-                                                            }
-                                                        }
-                                                    );
-                                                } else {
-                                                    $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Old Password not correct" %}'});
-                                                }
-                                            }
-                                        );
+                        /* Add a function to update an password */
+                        $('#passwordaccountdialog').dialog_form('addbutton', {
+                            title: "{% trans "Change password for" %} '{{ account.login }}'",
+                            button: "#password{{ account.id }}",
+                            onok: function(values) {
+                                // Submit form
+                                getREST('/account/password/id/{{ account.id }}/old/' + values.oldpassword + '/new/' + values.newpassword,
+                                    function(data) {
+                                        var status = (data.status).toLowerCase();
+                                        if (status == 'ok') {
+                                            $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : ' + data.account[0].login + '\' {% trans "Password" %} {% trans "successfully updated" %}'});
+                                        } else {
+                                            $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Password not updated" %} (' + data.description + ')'});
+                                        }
                                     }
-                                },
-                                '{% trans "Cancel" %}': function() {
-                                    $(this).dialog('close');
-                                }
-                            },
-                            close: function() {
-                                allFields2.val('').removeClass('ui-state-error');
+                                );
                             }
                         });
                     });
@@ -283,48 +188,13 @@
                             <li><button id="update{{ account.id }}" class="icon16-action-update buttonicon" title="{% trans "Modify" %} '{{ account.login }}'"><span class='offscreen'>{% trans "Modify" %} {{ account.login }}</span></button></li>
                             <li><button id="password{{ account.id }}" class="icon16-action-password buttonicon" title="{% trans "Change password for" %} '{{ account.login }}'"><span class='offscreen'>{% trans "Change password for" %} {{ account.login }}</span></button></li>
                         </ul>
-                        <div id="delete_confirmation_{{ account.id }}" title="{% trans "Delete" %} {{ account.login }}">
-                            <p>{% trans "Please confirm to delete" %} '{{ account.login }}'</p>
-                        </div>
-                        <div id="update_dialog_{{ account.id }}" title="{% trans "Modify" %} {{ account.name }}">
-                            <p id="validateTips{{ account.id }}">{% trans "All fields are required." %}</p>
-                            <form >
-                                <fieldset>
-                                    <label class="medium" for="account{{ account.id }}_login">{% trans "Login" %}</label>
-                                    <input type="text" class="medium" id="account{{ account.id }}_login" name="account{{ account.id }}_login" />
-                                    <label class="medium" for="account{{ account.id }}_admin">{% trans "Is Admin" %}</label>
-                                    <input type="checkbox" id="account{{ account.id }}_admin" name="account{{ account.id }}_admin" value="True" />
-                                </fieldset>'
-                            </form>
-                        </div>
-                        <div id="password_dialog_{{ account.id }}" title="{% trans "Change password for" %} {{ account.name }}">
-                            <p id="validateTips2{{ account.id }}">{% trans "All fields are required." %}</p>
-                            <form >
-                                <fieldset>
-                                    <label class="medium" for="account{{ account.id }}_oldpassword">{% trans "Old Password" %}</label>
-                                    <input type="text" class="medium" id="account{{ account.id }}_oldpassword" name="account{{ account.id }}_oldpassword" />
-                                    <label class="medium" for="account{{ account.id }}_newpassword">{% trans "New Password" %}</label>
-                                    <input type="text" class="medium" id="account{{ account.id }}_newpassword" name="account{{ account.id }}_newpassword" />
-                                </fieldset>'
-                            </form>
-                        </div>
-
                     </td>
                 </tr>
             {% endfor %}
         </table>
-        <div id="addnewdialog" title='{% trans "Create new account" %}'>
-            <p id="validateTips">{% trans "All fields are required." %}</p>
-            <form>
-                <fieldset>
-                    <label class="medium" for="new_login">{% trans "Login" %}</label>
-                    <input type="text" class="medium" id="new_login" name="new_login" />
-                    <label class="medium" for="new_password">{% trans "Password" %}</label>
-                    <input type="text" class="medium" id="new_password" name="new_password" />
-                    <label class="medium" for="new_admin">{% trans "Is Admin" %}</label>
-                    <input type="checkbox" id="new_admin" name="new_admin" value="True" />
-                </fieldset>
-            </form>
-        </div>
     </div>
+    <div id="addaccountdialog"></div>
+    <div id="updaccountdialog"></div>
+    <div id="passwordaccountdialog"></div>
+    <div id="delete_confirmation"></div>
 {% endblock %}

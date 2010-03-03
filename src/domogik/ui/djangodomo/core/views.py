@@ -387,8 +387,8 @@ def admin_organization_rooms(request):
         resultAllRooms = Rooms.getAll()
         resultAllRooms.merge_uiconfig()
         resultUnattribuedRooms = Rooms.getWithoutArea()
-        resultAllAreas = Areas.getAllWithRooms()
-        resultAllAreas.merge_uiconfig()
+#        resultAllAreas = Areas.getAllWithRooms()
+#        resultAllAreas.merge_uiconfig()
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
         
@@ -402,7 +402,7 @@ def admin_organization_rooms(request):
         msg=msg,
         unattribued_rooms=resultUnattribuedRooms.room,
         rooms_list=resultAllRooms.room,
-        areas_list=resultAllAreas.area
+#        areas_list=resultAllAreas.area
     )
 
 def admin_organization_areas(request):
