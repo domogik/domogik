@@ -193,7 +193,6 @@ class AreaTestCase(GenericTestCase):
         except DbHelperException:
             pass
         area0 = self.db.add_area('area0','description 0')
-        assert area0._type == 'Area'
         print area0
         assert self.db.list_areas()[0].name == 'area0'
 
@@ -1398,12 +1397,6 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
                                      p_last_name='SCHNEIDER',
                                      p_birthdate=datetime.date(1973, 4, 24),
                                      p_user_account_id = user1.id)
-        try:
-            self.db.del_user_account(user1.id)
-            TestCase.fail(self, "It shouldn't have been possible to delete this"
-                               +" user account, a person has a reference to it")
-        except DbHelperException:
-            pass
         person2 = self.db.add_person(p_first_name='Monthy',
                                      p_last_name='PYTHON',
                                      p_birthdate=datetime.date(1981, 4, 24))
