@@ -116,8 +116,9 @@ class GenericTestCase(unittest.TestCase):
         Remove all configurations of device technologies
         @param db : db API instance
         """
-        for dtc in db._session.query(DeviceTechnologyConfig).all():
-            db._session.delete(dtc)
+        dbsession = db._DbHelper__session
+        for dtc in dbsession.query(DeviceTechnologyConfig).all():
+            dbsession.delete(dtc)
 
     def remove_all_device_technologies(self, db):
         """
@@ -1427,6 +1428,7 @@ class SystemStatsTestCase(GenericTestCase):
 
     def setUp(self):
         self.db = DbHelper(use_test_db=True)
+        self.dbsession = self.db._DbHelper__session
         self.db.del_all_system_stats()
 
     def tearDown(self):
@@ -1481,7 +1483,7 @@ class SystemStatsTestCase(GenericTestCase):
         ss_list_del = self.db.del_all_system_stats()
         assert len(ss_list) == len(ss_list_del)
         assert len(self.db.list_system_stats()) == 0
-        ssv = self.db._session.query(SystemStatsValue).all()
+        ssv = self.dbsession.query(SystemStatsValue).all()
         assert len(ssv) == 0
 
 
