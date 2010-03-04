@@ -131,11 +131,11 @@ class SysManager(xPLModule):
             'xpltype': 'xpl-cmnd',
         })
 
-        Listener(self._sys_cb_stop, self._myxpl, {
-            'schema': 'domogik.system',
-            'xpltype': 'xpl-trig',
-            'command': 'stop',
-        })
+#        Listener(self._sys_cb_stop, self._myxpl, {
+#            'schema': 'domogik.system',
+#            'xpltype': 'xpl-trig',
+#            'command': 'stop',
+#        })
         self._log.info("System manager initialized")
         self.get_stop().wait()
 
