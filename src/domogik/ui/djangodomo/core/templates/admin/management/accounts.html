@@ -39,6 +39,8 @@
             tipsid: 'tipsAddAccount',
             fields: [
                 {name : 'addlogin', type:'text', label:'Login', required: true, option: {min: 1, max: 80}},
+                {name : 'addfirstname', type:'text', label:'Firstname', required: true, option: {min: 1, max: 80}},
+                {name : 'addlastname', type:'text', label:'Lastname', required: true, option: {min: 1, max: 80}},
                 {name : 'addpassword', type:'numericpassword', label:'Access code (numeric only)', required: true, option: {min: 1, max: 80}},
                 {name : 'addadmin', type:'checkbox', label:'Is admin', required: true}
             ]
@@ -50,7 +52,7 @@
             button: "#addDialogButton",
             onok: function(values) {
                 // Submit form
-                getREST('/account/add/login/' + values.addlogin + '/password/' + values.addpassword + '/is_admin/' + values.addadmin + '/skin_used/default',
+                getREST('/account/user/add/login/' + values.addlogin + '/password/' + values.addpassword + '/is_admin/' + values.addadmin + '/skin_used/default/first_name/' + values.addfirstname + '/last_name/' + values.addlastname,
                     function(data) {
                         var status = (data.status).toLowerCase();
                         if (status == 'ok') {
@@ -68,6 +70,8 @@
             tipsid: 'tipsUpdateAccount',
             fields: [
                 {name : 'updlogin', type:'text', label:'Login', required: true, option: {min: 1, max: 80}},
+                {name : 'updfirstname', type:'text', label:'Firstname', required: true, option: {min: 1, max: 80}},
+                {name : 'updlastname', type:'text', label:'Lastname', required: true, option: {min: 1, max: 80}},
                 {name : 'updadmin', type:'checkbox', label:'Is admin', required: true}
             ]
         });
@@ -111,6 +115,7 @@
         <table>
             <tr>
                 <th scope='col'>{% trans "Login" %}</th>
+                <th scope='col'>{% trans "Real name" %}</th>
                 <th scope='col'>{% trans "Admin" %}</th>
                 <th scope='col'>{% trans "Skin" %}</th>
                 <th scope='col'>Actions</th>
@@ -124,7 +129,7 @@
                             button: "#del{{ account.id }}",
                             name: "'{{ account.login }}'",
                             onok: function() {
-                                getREST('/account/del/{{ account.id }}',
+                                getREST('/account/user/del/{{ account.id }}',
                                     function(data) {
                                         var status = (data.status).toLowerCase();
                                         if (status == 'ok') {
@@ -144,7 +149,7 @@
                             values: {updlogin : '{{ account.login }}', updadmin : {{ account.is_admin|lower }} },
                             onok: function(values) {
                                 // Submit form
-                                getREST('/account/update/id/{{ account.id }}/login/' + values.updlogin + '/is_admin/' + values.updadmin + '/skin_used/default',
+                                getREST('/account/user/update/id/{{ account.id }}/login/' + values.updlogin + '/is_admin/' + values.updadmin +  + '/skin_used/default/first_name/' + values.updfirstname + '/last_name/' + values.updlastname,
                                     function(data) {
                                         var status = (data.status).toLowerCase();
                                         if (status == 'ok') {
@@ -163,7 +168,7 @@
                             button: "#password{{ account.id }}",
                             onok: function(values) {
                                 // Submit form
-                                getREST('/account/password/id/{{ account.id }}/old/' + values.oldpassword + '/new/' + values.newpassword,
+                                getREST('/account/user/password/id/{{ account.id }}/old/' + values.oldpassword + '/new/' + values.newpassword,
                                     function(data) {
                                         var status = (data.status).toLowerCase();
                                         if (status == 'ok') {
@@ -180,6 +185,7 @@
                 </script>
                 <tr>
                     <td>{{ account.login }}</td>
+                    <td>{{ account.person.firstname }} {{ account.person.lastname }}</td>
                     <td><div class='icon16-text icon16-status-{{ account.is_admin|lower }}'><span class='offscreen'>{{ account.is_admin }}</span></div></td>
                     <td>{{ account.skin_used }}</td>
                     <td>
