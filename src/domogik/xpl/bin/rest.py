@@ -2322,51 +2322,65 @@ target=*
         print "Call rest_action"
 
         # Check url length
-        if len(self.rest_request) < 1:
+        if len(self.rest_request) < 2:
             self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
             return
 
         # parameters initialisation
         self.parameters = {}
 
-        ### list #####################################
-        if self.rest_request[0] == "list":
-            if len(self.rest_request) == 1:
-                self._rest_account_list()
+        ### user #####################################
+        if self.rest_request[0] == "user":
+
+            ### list #####################################
+            if self.rest_request[1] == "list":
+                if len(self.rest_request) == 2:
+                    self._rest_account_list()
+                else:
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                      self.jsonp, self.jsonp_cb)
+                    return
+    
+            elif self.rest_request[1] == "auth":
+                if len(self.rest_request) == 4:
+                    self._rest_account_auth(self.rest_request[2], self.rest_request[3])
+                else:
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                      self.jsonp, self.jsonp_cb)
+                    return
+    
+            elif self.rest_request[1] == "add":
+                offset = 2
+                if self.set_parameters(offset):
+                    self._rest_account_add()
+                else:
+                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
+    
+            elif self.rest_request[1] == "update":
+                offset = 2
+                if self.set_parameters(offset):
+                    self._rest_account_update()
+                else:
+                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
+    
+            elif self.res2_request[1] == "password":
+                offset = 2
+                if self.set_parameters(offset):
+                    self._rest_account_password()
+                else:
+                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
+    
+            elif self.rest_request[1] == "del":
+                if len(self.rest_request) == 3:
+                    self._rest_account_del(id=self.rest_request[2])
+                else:
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                      self.jsonp, self.jsonp_cb)
+
+            ### others ###################################
             else:
-                self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
-                                                  self.jsonp, self.jsonp_cb)
+                self.send_http_response_error(999, self.rest_request[1] + " not allowed", self.jsonp, self.jsonp_cb)
                 return
-
-        elif self.rest_request[0] == "auth":
-            if len(self.rest_request) == 3:
-                self._rest_account_auth(self.rest_request[1], self.rest_request[2])
-            else:
-                self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
-                                                  self.jsonp, self.jsonp_cb)
-                return
-
-        elif self.rest_request[0] == "add":
-            offset = 1
-            if self.set_parameters(offset):
-                self._rest_account_add()
-            else:
-                self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
-
-        elif self.rest_request[0] == "update":
-            offset = 1
-            if self.set_parameters(offset):
-                self._rest_account_update()
-            else:
-                self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
-
-        elif self.rest_request[0] == "del":
-            if len(self.rest_request) == 2:
-                self._rest_account_del(id=self.rest_request[1])
-            else:
-                self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
-                                                  self.jsonp, self.jsonp_cb)
-
 
         ### others ###################################
         else:
@@ -2438,6 +2452,27 @@ target=*
             json_data.add_data(account)
         except:
             json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+        self.send_http_response_ok(json_data.get())
+
+
+
+    def _rest_account_password(self):
+        """ update user password
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("account")
+        change_ok = self._db.change_password(self.get_parameters("id"), \
+                                          self.get_parameters("old"), \
+                                          self.get_parameters("new"))
+        if change_ok == True:
+            json_data.set_ok(description = "Password updated")
+            json_data.set_data_type("account")
+            account = self._db.get_user_account(self.get_parameters("id"))
+            if account is not None:
+                json_data.add_data(account)
+        else:
+            json_data.set_error(999, "Error in updating password")
         self.send_http_response_ok(json_data.get())
 
 
