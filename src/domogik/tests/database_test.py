@@ -1493,8 +1493,11 @@ class UIItemConfigTestCase(GenericTestCase):
         assert len(self.db.list_all_ui_item_config()) == 0
 
     def testAdd(self):
-        ui_config = self.db.set_ui_item_config('area', 2, 'icon',
-                                                      'basement')
+        ui_config = self.db.set_ui_item_config('area', 2, 'icon', 'basement')
+        assert ui_config.name == 'area'
+        assert ui_config.reference == '2'
+        assert ui_config.key == 'icon'
+        assert ui_config.value == 'basement'
         print ui_config
         self.db.set_ui_item_config('room', 1, 'icon', 'kitchen')
         self.db.set_ui_item_config('room', 4, 'icon', 'bathroom')
@@ -1524,6 +1527,8 @@ class UIItemConfigTestCase(GenericTestCase):
         self.db.set_ui_item_config('room', 1, 'param_r2', 'value_r2')
         uic = self.db.set_ui_item_config('area', 1, 'icon', 'first_floor')
         assert uic.value == 'first_floor'
+        self.db.set_ui_item_config('room', 1, 'icon', 'kitchen')
+        assert self.db.get_ui_item_config('room', 1, 'icon').value == 'kitchen'
 
     def testListAndGet(self):
         self.db.set_ui_item_config('area', 1, 'icon', 'basement')
