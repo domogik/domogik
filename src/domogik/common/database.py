@@ -1190,7 +1190,7 @@ class DbHelper():
         return self._session.query(Device)\
                             .filter_by(technology_id=dt_id).all()
 
-    def add_device(self, d_name, d_address, d_type_id, d_usage_id, d_room_id,
+    def add_device(self, d_name, d_address, d_type_id, d_usage_id, d_room_id=None,
         d_description=None, d_reference=None):
         """
         Add a device item
@@ -1214,11 +1214,12 @@ class DbHelper():
         except NoResultFound:
             raise DbHelperException("Couldn't add device with device usage id %s \
                                     It does not exist" % d_usage_id)
-        try:
-            self._session.query(Room).filter_by(id=d_room_id).one()
-        except NoResultFound:
-            raise DbHelperException("Couldn't add device with room id %s \
-                                    It does not exist" % d_room_id)
+        if d_room_id is not None:
+            try:
+                self._session.query(Room).filter_by(id=d_room_id).one()
+            except NoResultFound:
+                raise DbHelperException("Couldn't add device with room id %s \
+                                        It does not exist" % d_room_id)
         device = Device(name=d_name, address=d_address, description=d_description,
                         reference=d_reference, type_id=d_type_id,
                         usage_id=d_usage_id, room_id=d_room_id)

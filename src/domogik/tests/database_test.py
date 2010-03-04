@@ -916,6 +916,9 @@ class DeviceTestCase(GenericTestCase):
                     d_type_id = dty1.id, d_usage_id = du1.id,
                     d_room_id = room1.id, d_description = 'desc1')
         assert len(self.db.list_devices()) == 2
+        device3 = self.db.add_device(d_name='device3', d_address = 'A3',
+                    d_type_id = dty1.id, d_usage_id = du1.id)
+        assert device3.room_id is None
         # TODO see if these methods are still used
         # assert device1.is_lamp(), "device1.is_lamp() returns False.
         # Should have returned True"
