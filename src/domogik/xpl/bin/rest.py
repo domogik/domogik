@@ -52,6 +52,7 @@ from Queue import *
 from domogik.xpl.lib.queryconfig import Query
 from domogik.xpl.lib.module import xPLResult
 import re
+import traceback
 
 
 
@@ -1414,19 +1415,22 @@ target=*
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("room")
-        if room_id == None and area_id == None:
-            for room in self._db.list_rooms():
-                json_data.add_data(room)
-        elif room_id != None:
-            room = self._db.get_room_by_id(room_id)
-            if room is not None:
-                json_data.add_data(room)
-        elif area_id != None:
-            if area_id == "null":
-                area_id = None
-            for room in self._db.get_all_rooms_of_area(area_id):
-                json_data.add_data(room)
-        self.send_http_response_ok(json_data.get())
+        try:
+            if room_id == None and area_id == None:
+                for room in self._db.list_rooms():
+                    json_data.add_data(room)
+            elif room_id != None:
+                room = self._db.get_room_by_id(room_id)
+                if room is not None:
+                    json_data.add_data(room)
+            elif area_id != None:
+                if area_id == "null":
+                    area_id = None
+                for room in self._db.get_all_rooms_of_area(area_id):
+                    json_data.add_data(room)
+            self.send_http_response_ok(json_data.get())
+        except:
+            self._log.error("Exception : %s" % traceback.format_exc())
 
 
 
