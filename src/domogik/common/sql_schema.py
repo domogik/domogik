@@ -684,7 +684,7 @@ class Person(Base):
     id = Column(Integer, primary_key=True)
     first_name = Column(String(50), nullable=False)
     last_name = Column(String(60), nullable=False)
-    birthdate = Column(Date, nullable=False)
+    birthdate = Column(Date)
 
     def __init__(self, first_name, last_name, birthdate):
         """

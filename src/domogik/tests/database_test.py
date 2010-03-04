@@ -1314,8 +1314,7 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
                                      p_birthdate=datetime.date(1981, 4, 24))
         user2 = self.db.add_user_account(a_login='lonely', a_password='boy',
                                          a_person_id=person2.id, a_is_admin=True)
-        person3 = self.db.add_person(p_first_name='Ali', p_last_name='CANTE',
-                                     p_birthdate=datetime.date(1945, 4, 18))
+        person3 = self.db.add_person(p_first_name='Ali', p_last_name='CANTE')
         assert len(self.db.list_persons()) == 3
         user3 = self.db.add_user_account(a_login='domo', a_password='gik',
                                          a_person_id=person3.id, a_is_admin=True)

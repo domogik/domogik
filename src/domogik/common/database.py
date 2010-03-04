@@ -1771,12 +1771,12 @@ class DbHelper():
         """
         return self._session.query(Person).filter_by(id=p_id).first()
 
-    def add_person(self, p_first_name, p_last_name, p_birthdate):
+    def add_person(self, p_first_name, p_last_name, p_birthdate=None):
         """
         Add a person
         @param p_first_name     : first name
         @param p_last_name      : last name
-        @param p_birthdate      : birthdate
+        @param p_birthdate      : birthdate, optional
         @param p_user_account   : Person account on the user (optional)
         @return the new Person object
         """
@@ -1810,6 +1810,8 @@ class DbHelper():
         if p_last_name is not None:
             person.last_name = p_last_name
         if p_birthdate is not None:
+            if p_birthdate == '':
+                p_birthdate = None
             person.birthdate = p_birthdate
         self._session.add(person)
         try:
