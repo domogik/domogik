@@ -1659,13 +1659,11 @@ class DbHelper():
         user_account.password = None
         return user_account
 
-    def update_user_account(self, a_id, a_new_login=None, a_password=None,
-                            a_is_admin=None, a_skin_used=None):
+    def update_user_account(self, a_id, a_new_login=None, a_is_admin=None, a_skin_used=None):
         """
         Update a user account
         @param a_id : Account id to be updated
         @param a_new_login : The new login (optional)
-        @param a_password : Account clear text password (will be hashed in sha256, optional)
         @param a_is_admin : True if it is an admin account, False otherwise (optional)
         @return a UserAccount object
         """
@@ -1675,8 +1673,6 @@ class DbHelper():
             raise DbHelperException("UserAccount with id %s couldn't be found" % a_id)
         if a_new_login is not None:
             user_acc.login = a_new_login
-        if a_password is not None:
-            user_acc.password = self.__make_crypted_password(a_password)
         if a_is_admin is not None:
             user_acc.is_admin = a_is_admin
         if a_skin_used is not None:
@@ -1694,16 +1690,21 @@ class DbHelper():
         """
         Change the password
         @param a_login : account login
-        @param a_old_password : the password to change (the old one)
-        @param a_new_password : the new password
+        @param a_old_password : the password to change (the old one, in clear text)
+        @param a_new_password : the new password, in clear text (will be hashed in sha256)
         @return True if the password could be changed, False otherwise (login or old_password is wrong)
         """
+        self._session.expire_all()
         user_acc = self.get_user_account_by_login_and_pass(a_login, a_old_password)
-        if user_acc is None:
+        if user_acc is None :
             return False
-        user_acc = self.update_user_account(user_acc.id, a_password=a_new_password)
-        if user_acc is None:
-            return False
+        user_acc.password = self.__make_crypted_password(a_new_password)
+        self._session.add(user_acc)
+        try:
+            self._session.commit()
+        except Exception, sql_exception:
+            self._session.rollback()
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return True
 
     def __make_crypted_password(self, clear_text_password):
