@@ -47,6 +47,7 @@ from socket import gethostname
 from threading import Event, currentThread
 from optparse import OptionParser
 import traceback
+from subprocess import Popen
 
 from domogik.common.configloader import Loader
 from domogik.xpl.lib.xplconnector import Listener 
@@ -391,12 +392,8 @@ class SysManager(xPLModule):
         mod_path = "domogik.xpl.bin." + name
         __import__(mod_path)
         module = sys.modules[mod_path]
-        lastpid = os.fork()
-        if not lastpid:
-            os.execlp(sys.executable, sys.executable, module.__file__)
-            # TODO : delete
-            #self._set_component_status(name, "ON")
-        return lastpid
+        subp = Popen("/usr/bin/python %s" % module.__file__, shell=True)
+        return subp.pid
 
     def _is_component_running(self, component):
         '''
