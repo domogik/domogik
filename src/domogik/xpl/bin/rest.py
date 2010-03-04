@@ -2612,7 +2612,9 @@ class JSonHelper():
         # dirty issue to force cache of __dict__  (done for ui_config)
         if hasattr(data, 'reference'):
             pass
-        #print "DATA : " + unicode(data)
+        if hasattr(data, 'id'):
+            pass
+        print "DATA : " + unicode(data)
         #print "DATA TYPE : " + data_type
 
 
