@@ -1325,6 +1325,8 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
         user_acc = self.db.add_user_account(a_login='mschneider',
                                             a_password='IwontGiveIt',
                                             a_is_admin=True)
+        assert self.db.change_password('mschneider', 'IwontGiveIt', 'OkIWill')
+        assert not self.db.change_password('mschneider', 'DontKnow', 'foo')
         user_acc_u = self.db.update_user_account(
                         a_id=user_acc.id,
                         a_new_login='mschneider2', a_password='ItWasWrong',

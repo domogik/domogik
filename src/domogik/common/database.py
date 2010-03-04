@@ -1690,6 +1690,22 @@ class DbHelper():
         user_acc.password = None
         return user_acc
 
+    def change_password(self, a_login, a_old_password, a_new_password):
+        """
+        Change the password
+        @param a_login : account login
+        @param a_old_password : the password to change (the old one)
+        @param a_new_password : the new password
+        @return True if the password could be changed, False otherwise (login or old_password is wrong)
+        """
+        user_acc = self.get_user_account_by_login_and_pass(a_login, a_old_password)
+        if user_acc is None:
+            return False
+        user_acc = self.update_user_account(user_acc.id, a_password=a_new_password)
+        if user_acc is None:
+            return False
+        return True
+
     def __make_crypted_password(self, clear_text_password):
         """
         Make a crypted password (using sha256)
