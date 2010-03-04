@@ -205,7 +205,7 @@ class Accounts(pipes.DmgPipe):
     uri = "http://127.0.0.1:8080/account"
     
     @staticmethod
-    def getAll():
+    def getAllUsers():
         resp = Accounts.objects.get({'parameters':"user/list/"})
         if resp :
             return resp
