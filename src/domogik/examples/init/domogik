@@ -82,7 +82,9 @@ function stop_manager {
     done
 }
 function stop_modules {
-for pid in `ps ax | egrep "(rest.py|dbmgr.py)" | grep -v grep | awk '{print $1}'`; do
+    /bin/su - ${DOMOGIK_USER} -m -c "dmg_send  xpl-cmnd domogik.system 'command=stop,module=*,host=$HOSTNAME'"
+    sleep 2          
+    for pid in `ps ax | egrep "domogik.*\.pyc$" | grep -v grep | awk '{print $1}'`; do
         kill -15 $pid 2>/dev/null 1>&2
     done
 }
@@ -111,6 +113,7 @@ case "$1" in
     stop)
     if [ $# -eq 1 ];then
         stop_django
+        stop_modules
         stop_xpl
         stop_manager 
     else
