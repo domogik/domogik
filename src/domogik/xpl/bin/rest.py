@@ -1512,16 +1512,16 @@ target=*
         elif name != None and reference != None:
             if key == None:
                 # by-reference
-                for ui_item_config in self._db.list_ui_item_config_by_ref(ui_item_name = name, ui_item_reference = reference):
+                for ui_item_config in self._db.list_ui_item_config_by_ref(ui_name = name, ui_reference = reference):
                     json_data.add_data(ui_item_config)
             else:
                 # by-key
-                for ui_item_config in self._db.list_ui_item_config_by_key(ui_item_name = name, ui_key= key):
+                for ui_item_config in self._db.list_ui_item_config_by_key(ui_name = name, ui_key= key):
                     json_data.add_data(ui_item_config)
         elif name != None and key != None and reference != None:
             # by-element
-            ui_item_config = self._db.get_ui_item_config(self, ui_item_name = name, \
-                                                         ui_item_reference = reference, ui_key = key)
+            ui_item_config = self._db.get_ui_item_config(self, ui_name = name, \
+                                                         ui_reference = reference, ui_key = key)
             if ui_item_config is not None:
                 json_data.add_data(ui_item_config)
         self.send_http_response_ok(json_data.get())
@@ -1553,8 +1553,8 @@ target=*
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("ui_config")
         try:
-            for ui_item_config in self._db.delete_ui_item_config(ui_item_name = name, \
-                                                         ui_item_reference = reference, ui_key = key):
+            for ui_item_config in self._db.delete_ui_item_config(ui_name = name, \
+                                                         ui_reference = reference, ui_key = key):
                 json_data.add_data(ui_item_config)
         except:
             json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
@@ -2560,7 +2560,9 @@ class JSonHelper():
         # get data type
         data_type = type(data).__name__
 
-        # dirty issue to force cache of __dict__ : make a print of data
+        # dirty issue to force cache of __dict__  (done for ui_config)
+        if hasattr(data, 'reference'):
+            pass
         #print "DATA : " + unicode(data)
         #print "DATA TYPE : " + data_type
 
