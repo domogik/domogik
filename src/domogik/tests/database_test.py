@@ -1335,8 +1335,10 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
         user_acc = self.db.add_user_account(a_login='mschneider',
                                             a_password='IwontGiveIt',
                                             a_person_id=person_u.id, a_is_admin=True)
-        assert self.db.change_password('mschneider', 'IwontGiveIt', 'OkIWill')
-        assert not self.db.change_password('mschneider', 'DontKnow', 'foo')
+        assert not self.db.change_password(999999999, 'IwontGiveIt', 'foo')
+        assert self.db.change_password(user_acc.id, 'IwontGiveIt', 'OkIWill')
+        assert not self.db.change_password(user_acc.id, 'DontKnow', 'foo')
+
         user_acc_u = self.db.update_user_account(a_id=user_acc.id, a_new_login='mschneider2',
                                                  a_is_admin=False)
         assert user_acc_u.password is None

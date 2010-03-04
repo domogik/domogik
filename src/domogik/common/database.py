@@ -1691,17 +1691,18 @@ class DbHelper():
         user_acc.password = None
         return user_acc
 
-    def change_password(self, a_login, a_old_password, a_new_password):
+    def change_password(self, a_id, a_old_password, a_new_password):
         """
         Change the password
-        @param a_login : account login
+        @param a_id : account id
         @param a_old_password : the password to change (the old one, in clear text)
         @param a_new_password : the new password, in clear text (will be hashed in sha256)
         @return True if the password could be changed, False otherwise (login or old_password is wrong)
         """
         self._session.expire_all()
-        user_acc = self.get_user_account_by_login_and_pass(a_login, a_old_password)
-        if user_acc is None :
+        old_pass = self.__make_crypted_password(a_old_password)
+        user_acc = self._session.query(UserAccount).filter_by(id=a_id, password=old_pass).first()
+        if user_acc is None:
             return False
         user_acc.password = self.__make_crypted_password(a_new_password)
         self._session.add(user_acc)
