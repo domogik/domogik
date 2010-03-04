@@ -1416,7 +1416,6 @@ target=*
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("room")
-        print "a_id=%s" % area_id
         try:
             if room_id == None and area_id == None:
                 for room in self._db.list_rooms():
@@ -2020,6 +2019,8 @@ target=*
                 json_data.add_data(device)
         elif device_id == None:
             # by-room
+            if room_id == "":
+                room_id = None
             for device in self._db.get_all_devices_of_room(room_id):
                 json_data.add_data(device)
         elif room_id == None:
