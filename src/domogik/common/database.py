@@ -85,7 +85,7 @@ class DbHelper():
     """
     __dbprefix = None
     __engine = None
-    _session = None
+    __session = None
 
     def __init__(self, echo_output=False, use_test_db=False):
         """
@@ -115,13 +115,13 @@ class DbHelper():
         self.__dbprefix = db['db_prefix']
         self.__engine = sqlalchemy.create_engine(url, echo=echo_output)
         Session = sessionmaker(bind=self.__engine, autoflush=False)
-        self._session = Session()
+        self.__session = Session()
 
     def __rollback(self):
         """
         Issue a rollback to a SQL transaction (for dev purposes only)
         """
-        self._session.rollback()
+        self.__session.rollback()
 
 ####
 # Areas
@@ -131,18 +131,18 @@ class DbHelper():
         Return all areas
         @return list of Area objects
         """
-        return self._session.query(Area).all()
+        return self.__session.query(Area).all()
 
     def list_areas_with_rooms(self):
         """
         Return all areas with associated rooms
         @return a list of Area objects containing the associated room list
         """
-        area_list = self._session.query(Area).all()
+        area_list = self.__session.query(Area).all()
         area_rooms_list = []
         for area in area_list:
             # to avoid creating a join with following request
-            room_list = self._session.query(Room)\
+            room_list = self.__session.query(Room)\
                             .filter_by(area_id=area.id).all()
             # set Room in area object
             area.Room = room_list
@@ -157,7 +157,7 @@ class DbHelper():
         """
         if type(filters) is not DictType:
             raise DbHelperException("Wrong type of 'filters', Should be a dictionnary")
-        area_list = self._session.query(Area)
+        area_list = self.__session.query(Area)
         for filter in filters:
             filter_arg = "%s = '%s'" % (filter, filters[filter])
             area_list = area_list.filter(filter_arg)
@@ -169,7 +169,7 @@ class DbHelper():
         @param area_id : The area id
         @return an area object
         """
-        return self._session.query(Area).filter_by(id=area_id).first()
+        return self.__session.query(Area).filter_by(id=area_id).first()
 
 
     def get_area_by_name(self, area_name):
@@ -178,7 +178,7 @@ class DbHelper():
         @param area_name : The area name
         @return an area object
         """
-        return self._session.query(Area)\
+        return self.__session.query(Area)\
                             .filter(func.lower(Area.name)==area_name.lower())\
                             .first()
 
@@ -189,13 +189,13 @@ class DbHelper():
         @param a_description : area detailed description (optional)
         @return an Area object
         """
-        self._session.expire_all()
+        self.__session.expire_all()
         area = Area(name=a_name, description=a_description)
-        self._session.add(area)
+        self.__session.add(area)
         try:
-            self._session.commit()
+            self.__session.commit()
         except Exception, sql_exception:
-            self._session.rollback()
+            self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return area
 
@@ -207,8 +207,8 @@ class DbHelper():
         @param a_description : area detailed description (optional)
         @return an Area object
         """
-        self._session.expire_all()
-        area = self._session.query(Area).filter_by(id=a_id).first()
+        self.__session.expire_all()
+        area = self.__session.query(Area).filter_by(id=a_id).first()
         if area is None:
             raise DbHelperException("Area with id %s couldn't be found" % a_id)
         if a_name is not None:
@@ -216,11 +216,11 @@ class DbHelper():
         if a_description is not None:
             if a_description == '': a_description = None
             area.description = a_description
-        self._session.add(area)
+        self.__session.add(area)
         try:
-            self._session.commit()
+            self.__session.commit()
         except Exception, sql_exception:
-            self._session.rollback()
+            self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return area
 
@@ -231,19 +231,19 @@ class DbHelper():
         @param cascade_delete : True if we wish to delete associated items
         @return the deleted Area object
         """
-        self._session.expire_all()
-        area = self._session.query(Area).filter_by(id=area_del_id).first()
+        self.__session.expire_all()
+        area = self.__session.query(Area).filter_by(id=area_del_id).first()
         if area:
             area_d = area
             if cascade_delete:
-                for room in self._session.query(Room)\
-                                         .filter_by(area_id=area_del_id).all():
+                for room in self.__session.query(Room)\
+                                          .filter_by(area_id=area_del_id).all():
                     self.del_room(room.id, True)
-            self._session.delete(area)
+            self.__session.delete(area)
             try:
-                self._session.commit()
+                self.__session.commit()
             except Exception, sql_exception:
-                self._session.rollback()
+                self.__session.rollback()
                 raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
             return area_d
         else:
@@ -258,17 +258,17 @@ class DbHelper():
         Return a list of rooms
         @return list of Room objects
         """
-        return self._session.query(Room).all()
+        return self.__session.query(Room).all()
 
     def list_rooms_with_devices(self):
         """
         Return all rooms with associated devices
         @return a list of Room objects containing the associated device list
         """
-        room_list = self._session.query(Room).all()
+        room_list = self.__session.query(Room).all()
         room_devices_list = []
         for room in room_list:
-            device_list = self._session.query(Device)\
+            device_list = self.__session.query(Device)\
                               .filter_by(room_id=room.id).all()
             # set Room in area object
             room.Device = device_list
@@ -283,7 +283,7 @@ class DbHelper():
         """
         if type(filters) is not DictType:
             raise DbHelperException("Wrong type of 'filters', Should be a dictionnary")
-        room_list = self._session.query(Room)
+        room_list = self.__session.query(Room)
         for filter in filters:
             filter_arg = "%s = '%s'" % (filter, filters[filter])
             room_list = room_list.filter(filter_arg)
@@ -295,9 +295,9 @@ class DbHelper():
         @param r_name : The room name
         @return a room object
         """
-        return self._session.query(Room)\
-                            .filter(func.lower(Room.name)==r_name.lower())\
-                            .first()
+        return self.__session.query(Room)\
+                             .filter(func.lower(Room.name)==r_name.lower())\
+                             .first()
 
     def get_room_by_id(self, r_id):
         """
@@ -305,7 +305,7 @@ class DbHelper():
         @param r_id : The room id
         @return a room object
         """
-        return self._session.query(Room).filter_by(id=r_id).first()
+        return self.__session.query(Room).filter_by(id=r_id).first()
 
     def add_room(self, r_name, r_area_id=None, r_description=None):
         """
@@ -315,18 +315,18 @@ class DbHelper():
         @param r_description : room detailed description, optional
         @return : a room object
         """
-        self._session.expire_all()
+        self.__session.expire_all()
         if r_area_id != None:
             try:
-                self._session.query(Area).filter_by(id=r_area_id).one()
+                self.__session.query(Area).filter_by(id=r_area_id).one()
             except NoResultFound:
                 raise DbHelperException("Couldn't add room with area id %s. It does not exist" % r_area_id)
         room = Room(name=r_name, description=r_description, area_id=r_area_id)
-        self._session.add(room)
+        self.__session.add(room)
         try:
-            self._session.commit()
+            self.__session.commit()
         except Exception, sql_exception:
-            self._session.rollback()
+            self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return room
 
@@ -339,8 +339,8 @@ class DbHelper():
         @param r_area_id : id of the area the room belongs to (optional)
         @return a Room object
         """
-        self._session.expire_all()
-        room = self._session.query(Room).filter_by(id=r_id).first()
+        self.__session.expire_all()
+        room = self.__session.query(Room).filter_by(id=r_id).first()
         if room is None:
             raise DbHelperException("Room with id %s couldn't be found" % r_id)
         if r_name is not None:
@@ -351,17 +351,17 @@ class DbHelper():
         if r_area_id is not None:
             if r_area_id != '':
                 try:
-                    self._session.query(Area).filter_by(id=r_area_id).one()
+                    self.__session.query(Area).filter_by(id=r_area_id).one()
                 except NoResultFound:
                     raise DbHelperException("Couldn't find area id %s. It does not exist" % r_area_id)
             else:
                 r_area_id = None
             room.area_id = r_area_id
-        self._session.add(room)
+        self.__session.add(room)
         try:
-            self._session.commit()
+            self.__session.commit()
         except Exception, sql_exception:
-            self._session.rollback()
+            self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return room
 
@@ -372,19 +372,19 @@ class DbHelper():
         @param cascade_delete : True if we wish to delete associated items
         @return the deleted Room object
         """
-        self._session.expire_all()
-        room = self._session.query(Room).filter_by(id=r_id).first()
+        self.__session.expire_all()
+        room = self.__session.query(Room).filter_by(id=r_id).first()
         if room:
             room_d = room
             if cascade_delete:
-                for device in self._session.query(Device)\
-                                           .filter_by(room_id=r_id).all():
+                for device in self.__session.query(Device)\
+                                            .filter_by(room_id=r_id).all():
                     self.del_device(device.id)
-            self._session.delete(room)
+            self.__session.delete(room)
             try:
-                self._session.commit()
+                self.__session.commit()
             except Exception, sql_exception:
-                self._session.rollback()
+                self.__session.rollback()
                 raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
             return room_d
         else:
@@ -397,8 +397,8 @@ class DbHelper():
         @param a_area_id : the area id
         @return a list of Room objects
         """
-        return self._session.query(Room)\
-                            .filter_by(area_id=a_area_id).all()
+        return self.__session.query(Room)\
+                             .filter_by(area_id=a_area_id).all()
 
 ####
 # Device usage
@@ -408,7 +408,7 @@ class DbHelper():
         Return a list of device usages
         @return a list of DeviceUsage objects
         """
-        return self._session.query(DeviceUsage).all()
+        return self.__session.query(DeviceUsage).all()
 
     def get_device_usage_by_name(self, du_name,):
         """
@@ -416,9 +416,9 @@ class DbHelper():
         @param du_name : The device usage name
         @return a DeviceUsage object
         """
-        return self._session.query(DeviceUsage)\
-                            .filter(func.lower(DeviceUsage.name)==du_name.lower())\
-                            .first()
+        return self.__session.query(DeviceUsage)\
+                             .filter(func.lower(DeviceUsage.name)==du_name.lower())\
+                             .first()
 
     def add_device_usage(self, du_name, du_description=None):
         """
@@ -427,13 +427,13 @@ class DbHelper():
         @param du_description : device usage description (optional)
         @return a DeviceUsage (the newly created one)
         """
-        self._session.expire_all()
+        self.__session.expire_all()
         du = DeviceUsage(name=du_name, description=du_description)
-        self._session.add(du)
+        self.__session.add(du)
         try:
-            self._session.commit()
+            self.__session.commit()
         except Exception, sql_exception:
-            self._session.rollback()
+            self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return du
 
@@ -445,9 +445,9 @@ class DbHelper():
         @param du_description : device usage detailed description (optional)
         @return a DeviceUsage object
         """
-        self._session.expire_all()
-        device_usage = self._session.query(DeviceUsage)\
-                                    .filter_by(id=du_id).first()
+        self.__session.expire_all()
+        device_usage = self.__session.query(DeviceUsage)\
+                                     .filter_by(id=du_id).first()
         if device_usage is None:
             raise DbHelperException("DeviceUsage with id %s couldn't be found" % du_id)
         if du_name is not None:
@@ -455,11 +455,11 @@ class DbHelper():
         if du_description is not None:
             if du_description == '': du_description = None
             device_usage.description = du_description
-        self._session.add(device_usage)
+        self.__session.add(device_usage)
         try:
-            self._session.commit()
+            self.__session.commit()
         except Exception, sql_exception:
-            self._session.rollback()
+            self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return device_usage
 
@@ -469,26 +469,26 @@ class DbHelper():
         @param dc_id : id of the device usage to delete
         @return the deleted DeviceUsage object
         """
-        self._session.expire_all()
-        du = self._session.query(DeviceUsage).filter_by(id=du_id).first()
+        self.__session.expire_all()
+        du = self.__session.query(DeviceUsage).filter_by(id=du_id).first()
         if du:
             du_d = du
             if cascade_delete:
-                for device in self._session.query(Device)\
-                                           .filter_by(usage_id=du.id).all():
+                for device in self.__session.query(Device)\
+                                            .filter_by(usage_id=du.id).all():
                     self.del_device(device.id)
             else:
-                device_list = self._session.query(Device)\
-                                           .filter_by(usage_id=du.id).all()
+                device_list = self.__session.query(Device)\
+                                            .filter_by(usage_id=du.id).all()
                 if len(device_list) > 0:
                     raise DbHelperException("Couldn't delete device usage %s : \
                                             there are associated devices" % du_id)
 
-            self._session.delete(du)
+            self.__session.delete(du)
             try:
-                self._session.commit()
+                self.__session.commit()
             except Exception, sql_exception:
-                self._session.rollback()
+                self.__session.rollback()
                 raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
             return du_d
         else:
@@ -503,7 +503,7 @@ class DbHelper():
         Return a list of device types
         @return a list of DeviceType objects
         """
-        return self._session.query(DeviceType).all()
+        return self.__session.query(DeviceType).all()
 
     def get_device_type_by_name(self, dty_name):
         """
@@ -511,9 +511,9 @@ class DbHelper():
         @param dty_name : The device type name
         @return a DeviceType object
         """
-        return self._session.query(DeviceType)\
-                            .filter(func.lower(DeviceType.name)==dty_name.lower())\
-                            .first()
+        return self.__session.query(DeviceType)\
+                             .filter(func.lower(DeviceType.name)==dty_name.lower())\
+                             .first()
 
     def add_device_type(self, dty_name, dt_id, dty_description=None):
         """
@@ -523,19 +523,19 @@ class DbHelper():
         @param dty_description : device type description (optional)
         @return a DeviceType (the newly created one)
         """
-        self._session.expire_all()
+        self.__session.expire_all()
         try:
-            self._session.query(DeviceTechnology).filter_by(id=dt_id).one()
+            self.__session.query(DeviceTechnology).filter_by(id=dt_id).one()
         except NoResultFound:
             raise DbHelperException("Couldn't add device type with technology id %s. \
                                     It does not exist" % dt_id)
         dty = DeviceType(name=dty_name, description=dty_description,
                          technology_id=dt_id)
-        self._session.add(dty)
+        self.__session.add(dty)
         try:
-            self._session.commit()
+            self.__session.commit()
         except Exception, sql_exception:
-            self._session.rollback()
+            self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return dty
 
@@ -549,26 +549,26 @@ class DbHelper():
         @param dty_description : device type detailed description (optional)
         @return a DeviceType object
         """
-        self._session.expire_all()
-        device_type = self._session.query(DeviceType).filter_by(id=dty_id).first()
+        self.__session.expire_all()
+        device_type = self.__session.query(DeviceType).filter_by(id=dty_id).first()
         if device_type is None:
             raise DbHelperException("DeviceType with id %s couldn't be found" % dty_id)
         if dty_name is not None:
             device_type.name = dty_name
         if dt_id is not None:
             try:
-                self._session.query(DeviceTechnology).filter_by(id=dt_id).one()
+                self.__session.query(DeviceTechnology).filter_by(id=dt_id).one()
             except NoResultFound:
                 raise DbHelperException("Couldn't find technology id %s. It does not exist" % dt_id)
             device_type.technology_id = dt_id
-        self._session.add(device_type)
+        self.__session.add(device_type)
         if dty_description is not None:
             if dty_description == '': dty_description = None
             device_type.description = dty_description
         try:
-            self._session.commit()
+            self.__session.commit()
         except Exception, sql_exception:
-            self._session.rollback()
+            self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return device_type
 
@@ -578,42 +578,42 @@ class DbHelper():
         @param dty_id : id of the device type to delete
         @return the deleted DeviceType object
         """
-        self._session.expire_all()
-        dty = self._session.query(DeviceType).filter_by(id=dty_id).first()
+        self.__session.expire_all()
+        dty = self.__session.query(DeviceType).filter_by(id=dty_id).first()
         if dty:
             dty_d = dty
             if cascade_delete:
-                for device in self._session.query(Device)\
-                                           .filter_by(type_id=dty.id).all():
+                for device in self.__session.query(Device)\
+                                            .filter_by(type_id=dty.id).all():
                     self.del_device(device.id)
-                for srd in self._session.query(SensorReferenceData)\
-                                        .filter_by(device_type_id=dty.id).all():
+                for srd in self.__session.query(SensorReferenceData)\
+                                         .filter_by(device_type_id=dty.id).all():
                     self.del_sensor_reference_data(srd.id)
-                for af in self._session.query(ActuatorFeature)\
+                for af in self.__session.query(ActuatorFeature)\
                                         .filter_by(device_type_id=dty.id).all():
                     self.del_actuator_feature(af.id)
             else:
-                device_list = self._session.query(Device).filter_by(type_id=dty.id).all()
+                device_list = self.__session.query(Device).filter_by(type_id=dty.id).all()
                 if len(device_list) > 0:
                     raise DbHelperException("Couldn't delete device type %s : \
                                              there are associated device(s)" % dty_id)
-                srd_list = self._session.query(SensorReferenceData)\
-                                        .filter_by(device_type_id=dty.id).all()
+                srd_list = self.__session.query(SensorReferenceData)\
+                                         .filter_by(device_type_id=dty.id).all()
                 if len(srd_list) > 0:
                     raise DbHelperException("Couldn't delete device type %s : \
                                              there are associated sensor \
                                              reference data" % dty_id)
-                af_list = self._session.query(ActuatorFeature)\
-                                       .filter_by(device_type_id=dty.id).all()
+                af_list = self.__session.query(ActuatorFeature)\
+                                        .filter_by(device_type_id=dty.id).all()
                 if len(af_list) > 0:
                     raise DbHelperException("Couldn't delete device type %s : \
                                              there are associated actuator\
                                              feature(s)" % dty_id)
-            self._session.delete(dty)
+            self.__session.delete(dty)
             try:
-                self._session.commit()
+                self.__session.commit()
             except Exception, sql_exception:
-                self._session.rollback()
+                self.__session.rollback()
                 raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
             return dty_d
         else:
@@ -628,7 +628,7 @@ class DbHelper():
         Return a list of sensor reference data
         @return a list of SensorReferenceData objects
         """
-        return self._session.query(SensorReferenceData).all()
+        return self.__session.query(SensorReferenceData).all()
 
     def get_sensor_reference_data_by_name(self, srd_name):
         """
@@ -636,9 +636,9 @@ class DbHelper():
         @param srd_name : The sensor reference data name
         @return a SensorReferenceData object
         """
-        return self._session.query(SensorReferenceData)\
-                            .filter(func.lower(SensorReferenceData.name)==srd_name.lower())\
-                            .first()
+        return self.__session.query(SensorReferenceData)\
+                             .filter(func.lower(SensorReferenceData.name)==srd_name.lower())\
+                             .first()
 
     def add_sensor_reference_data(self, srd_name, srd_value, dty_id,
                                   srd_unit=None, srd_stat_key=None):
@@ -651,19 +651,19 @@ class DbHelper():
         @param srd_stat_key : reference to a stat, optional
         @return a SensorReferenceData (the newly created one)
         """
-        self._session.expire_all()
+        self.__session.expire_all()
         try:
-            self._session.query(DeviceType).filter_by(id=dty_id).one()
+            self.__session.query(DeviceType).filter_by(id=dty_id).one()
         except NoResultFound:
             raise DbHelperException("Couldn't add sensor reference with device type id %s. \
                                     It does not exist" % dty_id)
         srd = SensorReferenceData(name=srd_name, value=srd_value,
                     device_type_id=dty_id, unit=srd_unit, stat_key=srd_stat_key)
-        self._session.add(srd)
+        self.__session.add(srd)
         try:
-            self._session.commit()
+            self.__session.commit()
         except Exception, sql_exception:
-            self._session.rollback()
+            self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return srd
 
@@ -680,10 +680,10 @@ class DbHelper():
         @param srd_stat_key : reference to a stat, optional
         @return a SensorReferenceData (the updated one)
         """
-        self._session.expire_all()
-        srd = self._session.query(SensorReferenceData)\
-                           .filter_by(id=srd_id)\
-                           .first()
+        self.__session.expire_all()
+        srd = self.__session.query(SensorReferenceData)\
+                            .filter_by(id=srd_id)\
+                            .first()
         if srd is None:
             raise DbHelperException("SensorReferenceData with id %s couldn't be found" % srd_id)
         if srd_name is not None:
@@ -692,7 +692,7 @@ class DbHelper():
             srd.value = srd_value
         if dty_id is not None:
             try:
-                self._session.query(DeviceType).filter_by(id=dty_id).one()
+                self.__session.query(DeviceType).filter_by(id=dty_id).one()
             except NoResultFound:
                 raise DbHelperException("Couldn't find device type id %s. It does not exist" % dty_id)
             srd.device_type_id = dty_id
@@ -702,11 +702,11 @@ class DbHelper():
         if srd_stat_key is not None:
             if srd_stat_key == '': srd_stat_key = None
             srd.stat_key = srd_stat_key
-        self._session.add(srd)
+        self.__session.add(srd)
         try:
-            self._session.commit()
+            self.__session.commit()
         except Exception, sql_exception:
-            self._session.rollback()
+            self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return srd
 
@@ -716,17 +716,17 @@ class DbHelper():
         @param srd_id : id of the sensor reference data to delete
         @return the deleted SensorReferenceData object
         """
-        self._session.expire_all()
-        srd = self._session.query(SensorReferenceData)\
-                           .filter_by(id=srd_id)\
-                           .first()
+        self.__session.expire_all()
+        srd = self.__session.query(SensorReferenceData)\
+                            .filter_by(id=srd_id)\
+                            .first()
         if srd:
             srd_d = srd
-            self._session.delete(srd)
+            self.__session.delete(srd)
             try:
-                self._session.commit()
+                self.__session.commit()
             except Exception, sql_exception:
-                self._session.rollback()
+                self.__session.rollback()
                 raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
             return srd_d
         else:
@@ -742,7 +742,7 @@ class DbHelper():
         Return a list of actuator features
         @return a list of ActuatorFeature objects
         """
-        return self._session.query(ActuatorFeature).all()
+        return self.__session.query(ActuatorFeature).all()
 
     def get_actuator_feature_by_name(self, af_name):
         """
@@ -750,9 +750,9 @@ class DbHelper():
         @param af_name : The name of the actuator feature
         @return an ActuatorFeature object
         """
-        return self._session.query(ActuatorFeature)\
-                            .filter(func.lower(ActuatorFeature.name)==af_name.lower())\
-                            .first()
+        return self.__session.query(ActuatorFeature)\
+                             .filter(func.lower(ActuatorFeature.name)==af_name.lower())\
+                             .first()
 
     def add_actuator_feature(self, af_name, af_value, dty_id, af_unit=None,
                              af_configurable_states=None,
@@ -769,9 +769,9 @@ class DbHelper():
                                      after executing a command, default is false
         @return an ActuatorFeature (the newly created one)
         """
-        self._session.expire_all()
+        self.__session.expire_all()
         try:
-            self._session.query(DeviceType).filter_by(id=dty_id).one()
+            self.__session.query(DeviceType).filter_by(id=dty_id).one()
         except NoResultFound:
             raise DbHelperException("Couldn't add actuator feature with device type id %s. \
                                     It does not exist" % dty_id)
@@ -779,11 +779,11 @@ class DbHelper():
                     device_type_id=dty_id, unit=af_unit,
                     configurable_states=af_configurable_states,
                     return_confirmation=af_return_confirmation)
-        self._session.add(af)
+        self.__session.add(af)
         try:
-            self._session.commit()
+            self.__session.commit()
         except Exception, sql_exception:
-            self._session.rollback()
+            self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return af
 
@@ -802,8 +802,8 @@ class DbHelper():
         @param af_return_confirmation : True if the device returns a confirmation after executing a command, optional
         @return an ActuatorFeature (the updated one)
         """
-        self._session.expire_all()
-        af = self._session.query(ActuatorFeature).filter_by(id=af_id).first()
+        self.__session.expire_all()
+        af = self.__session.query(ActuatorFeature).filter_by(id=af_id).first()
         if af is None:
             raise DbHelperException("ActuatorFeature with id %s \
                                     couldn't be found" % af_id)
@@ -814,7 +814,7 @@ class DbHelper():
             af.value = af_value
         if dty_id is not None:
             try:
-                self._session.query(DeviceType).filter_by(id=dty_id).one()
+                self.__session.query(DeviceType).filter_by(id=dty_id).one()
             except NoResultFound:
                 raise DbHelperException("Couldn't find device type id %s. It does not exist" % dty_id)
             af.device_type_id = dty_id
@@ -826,11 +826,11 @@ class DbHelper():
             af.configurable_states = af_configurable_states
         if af_return_confirmation is not None:
             af.return_confirmation = af_return_confirmation
-        self._session.add(af)
+        self.__session.add(af)
         try:
-            self._session.commit()
+            self.__session.commit()
         except Exception, sql_exception:
-            self._session.rollback()
+            self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return af
 
@@ -840,15 +840,15 @@ class DbHelper():
         @param srd_id : id of the actuator feature to delete
         @return the deleted ActuatorFeature object
         """
-        self._session.expire_all()
-        af = self._session.query(ActuatorFeature).filter_by(id=af_id).first()
+        self.__session.expire_all()
+        af = self.__session.query(ActuatorFeature).filter_by(id=af_id).first()
         if af:
             af_d = af
-            self._session.delete(af)
+            self.__session.delete(af)
             try:
-                self._session.commit()
+                self.__session.commit()
             except Exception, sql_exception:
-                self._session.rollback()
+                self.__session.rollback()
                 raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
             return af_d
         else:
@@ -863,7 +863,7 @@ class DbHelper():
         Return a list of device technologies
         @return a list of DeviceTechnology objects
         """
-        return self._session.query(DeviceTechnology).all()
+        return self.__session.query(DeviceTechnology).all()
 
     def get_device_technology_by_name(self, dt_name):
         """
@@ -871,9 +871,9 @@ class DbHelper():
         @param dt_name : the device technology name
         @return a DeviceTechnology object
         """
-        return self._session.query(DeviceTechnology)\
-                            .filter(func.lower(DeviceTechnology.name)==dt_name.lower())\
-                            .first()
+        return self.__session.query(DeviceTechnology)\
+                             .filter(func.lower(DeviceTechnology.name)==dt_name.lower())\
+                             .first()
 
     def add_device_technology(self, dt_name, dt_description):
         """
@@ -881,16 +881,16 @@ class DbHelper():
         @param dt_name : device technology name, one of 'x10', '1wire', 'PLCBus', 'RFXCom', 'IR'
         @param dt_description : extended description of the technology
         """
-        self._session.expire_all()
-        self._session.expire_all()
+        self.__session.expire_all()
+        self.__session.expire_all()
         if dt_name not in DEVICE_TECHNOLOGY_LIST:
             raise ValueError, "dt_name must be one of %s" % DEVICE_TECHNOLOGY_LIST
         dt = DeviceTechnology(name=dt_name, description=dt_description)
-        self._session.add(dt)
+        self.__session.add(dt)
         try:
-            self._session.commit()
+            self.__session.commit()
         except Exception, sql_exception:
-            self._session.rollback()
+            self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return dt
 
@@ -902,10 +902,10 @@ class DbHelper():
         @param dt_description : device technology detailed description (optional)
         @return a DeviceTechnology object
         """
-        self._session.expire_all()
-        device_tech = self._session.query(DeviceTechnology)\
-                                   .filter_by(id=dt_id)\
-                                   .first()
+        self.__session.expire_all()
+        device_tech = self.__session.query(DeviceTechnology)\
+                                    .filter_by(id=dt_id)\
+                                    .first()
         if device_tech is None:
             raise DbHelperException("DeviceTechnology with id %s couldn't be found" % dt_id)
         if dt_name is not None:
@@ -913,11 +913,11 @@ class DbHelper():
         if dt_description is not None:
             if dt_description == '': dt_description = None
             device_tech.description = dt_description
-        self._session.add(device_tech)
+        self.__session.add(device_tech)
         try:
-            self._session.commit()
+            self.__session.commit()
         except Exception, sql_exception:
-            self._session.rollback()
+            self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return device_tech
 
@@ -927,31 +927,31 @@ class DbHelper():
         @param dt_id : id of the device technology to delete
         @return the deleted DeviceTechnology object
         """
-        self._session.expire_all()
-        dt = self._session.query(DeviceTechnology).filter_by(id=dt_id).first()
+        self.__session.expire_all()
+        dt = self.__session.query(DeviceTechnology).filter_by(id=dt_id).first()
         if dt:
             dt_d = dt
             if cascade_delete:
-                for device_type in self._session.query(DeviceType)\
-                                                .filter_by(technology_id=dt.id).all():
+                for device_type in self.__session.query(DeviceType)\
+                                                 .filter_by(technology_id=dt.id).all():
                     self.del_device_type(device_type.id, cascade_delete=True)
             else:
-                device_type_list = self._session.query(DeviceType)\
-                                                .filter_by(technology_id=dt.id).all()
+                device_type_list = self.__session.query(DeviceType)\
+                                                 .filter_by(technology_id=dt.id).all()
                 if len(device_type_list) > 0:
                     raise DbHelperException("Couldn't delete device technology \
                             %s : there are associated device types" % dt_id)
-            dtc_list = self._session.query(DeviceTechnologyConfig)\
-                                    .filter_by(technology_id=dt.id).all()
+            dtc_list = self.__session.query(DeviceTechnologyConfig)\
+                                     .filter_by(technology_id=dt.id).all()
             for dtc in dtc_list:
-                self._session.delete(dtc)
+                self.__session.delete(dtc)
                 #self.del_device_technology_config(dtc.id)
 
-            self._session.delete(dt)
+            self.__session.delete(dt)
             try:
-                self._session.commit()
+                self.__session.commit()
             except Exception, sql_exception:
-                self._session.rollback()
+                self.__session.rollback()
                 raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
             return dt_d
         else:
@@ -967,8 +967,8 @@ class DbHelper():
         @param dt_id : id of the device technology
         @return a list of DeviceTechnologyConfig objects
         """
-        return self._session.query(DeviceTechnologyConfig)\
-                            .filter_by(technology_id=dt_id).all()
+        return self.__session.query(DeviceTechnologyConfig)\
+                             .filter_by(technology_id=dt_id).all()
 
     def list_all_device_technology_config(self):
         """
@@ -976,7 +976,7 @@ class DbHelper():
         @param dt_id : id of the device technology
         @return a list of DeviceTechnologyConfig objects
         """
-        return self._session.query(DeviceTechnologyConfig).all()
+        return self.__session.query(DeviceTechnologyConfig).all()
 
     def get_device_technology_config(self, dt_id, dtc_key):
         """
@@ -985,10 +985,10 @@ class DbHelper():
         @param dtc_key : key of the device technology config
         @return a DeviceTechnologyConfig object
         """
-        return self._session.query(DeviceTechnologyConfig)\
-                            .filter_by(technology_id=dt_id)\
-                            .filter_by(key=dtc_key)\
-                            .first()
+        return self.__session.query(DeviceTechnologyConfig)\
+                             .filter_by(technology_id=dt_id)\
+                             .filter_by(key=dtc_key)\
+                             .first()
 
     def add_device_technology_config(self, dt_id, dtc_key, dtc_value,
                                      dtc_description):
@@ -1000,9 +1000,9 @@ class DbHelper():
         @param dtc_description : The device technology config description
         @return the new DeviceTechnologyConfig item
         """
-        self._session.expire_all()
+        self.__session.expire_all()
         try:
-            self._session.query(DeviceTechnology).filter_by(id=dt_id).one()
+            self.__session.query(DeviceTechnology).filter_by(id=dt_id).one()
         except NoResultFound:
             raise DbHelperException("Couldn't add device technology config \
                                     with device technology id %s. \
@@ -1013,11 +1013,11 @@ class DbHelper():
         dtc = DeviceTechnologyConfig(technology_id=dt_id, key=dtc_key,
                                      value=dtc_value,
                                      description=dtc_description)
-        self._session.add(dtc)
+        self.__session.add(dtc)
         try:
-            self._session.commit()
+            self.__session.commit()
         except Exception, sql_exception:
-            self._session.rollback()
+            self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return dtc
 
@@ -1032,13 +1032,13 @@ class DbHelper():
         @param dtc_description : device technology config detailed description (optional)
         @return a DeviceTechnologyConfig object
         """
-        self._session.expire_all()
-        dtc = self._session.query(DeviceTechnologyConfig).filter_by(id=dtc_id).first()
+        self.__session.expire_all()
+        dtc = self.__session.query(DeviceTechnologyConfig).filter_by(id=dtc_id).first()
         if dtc is None:
             raise DbHelperException("DeviceTypeConfig with id %s couldn't be found" % dtc_id)
         if dt_id is not None:
             try:
-                self._session.query(DeviceTechnology).filter_by(id=dt_id).one()
+                self.__session.query(DeviceTechnology).filter_by(id=dt_id).one()
             except NoResultFound:
                 raise DbHelperException("Couldn't find device technology id %s. It does not exist" % dt_id)
             dtc.technology_id = dt_id
@@ -1049,11 +1049,11 @@ class DbHelper():
         if dtc_description is not None:
             if dtc_description == '': dtc_description = None
             dtc.description = dtc_description
-        self._session.add(dtc)
+        self.__session.add(dtc)
         try:
-            self._session.commit()
+            self.__session.commit()
         except Exception, sql_exception:
-            self._session.rollback()
+            self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return dtc
 
@@ -1063,16 +1063,16 @@ class DbHelper():
         @param dtc_id : config item id
         @return the deleted DeviceTechnologyConfig object
         """
-        self._session.expire_all()
-        dtc = self._session.query(DeviceTechnologyConfig)\
-                           .filter_by(id=dtc_id).first()
+        self.__session.expire_all()
+        dtc = self.__session.query(DeviceTechnologyConfig)\
+                            .filter_by(id=dtc_id).first()
         if dtc:
             dtc_d = dtc
-            self._session.delete(dtc)
+            self.__session.delete(dtc)
             try:
-                self._session.commit()
+                self.__session.commit()
             except Exception, sql_exception:
-                self._session.rollback()
+                self.__session.rollback()
                 raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
             return dtc_d
         else:
@@ -1086,7 +1086,7 @@ class DbHelper():
         Returns a list of devices
         @return a list of Device objects
         """
-        return self._session.query(Device).all()
+        return self.__session.query(Device).all()
 
     def search_devices(self, filters):
         """
@@ -1097,7 +1097,7 @@ class DbHelper():
         """
         assert type(filters) is DictType
 
-        device_list = self._session.query(Device)
+        device_list = self.__session.query(Device)
         for filter in filters:
             filter_arg = "%s = '%s'" % (filter, filters[filter])
             device_list = device_list.filter(filter_arg)
@@ -1113,7 +1113,7 @@ class DbHelper():
         assert type(d_room_id_list) is ListType or type(d_room_id_list) is NoneType
         assert type(d_usage_id_list) is ListType or type(d_usage_id_list) is NoneType
 
-        device_list = self._session.query(Device)
+        device_list = self.__session.query(Device)
         if d_room_id_list is not None and len(d_room_id_list) != 0:
             device_list = device_list.filter(Device.room_id.in_(d_room_id_list))
         if d_usage_id_list is not None and len(d_usage_id_list) != 0:
@@ -1126,7 +1126,7 @@ class DbHelper():
         @param d_id : The device id
         @return a Device object
         """
-        return self._session.query(Device).filter_by(id=d_id).first()
+        return self.__session.query(Device).filter_by(id=d_id).first()
 
     def get_device_by_technology_and_address(self, techno_name, device_address):
         """
@@ -1135,18 +1135,18 @@ class DbHelper():
         @param device address : device address
         @return a device object
         """
-        device_list = self._session.query(Device)\
-                                   .filter_by(address=device_address)\
-                                   .all()
+        device_list = self.__session.query(Device)\
+                                    .filter_by(address=device_address)\
+                                    .all()
         if len(device_list) == 0:
             return None
         device = []
         for device in device_list:
-            device_type = self._session.query(DeviceType)\
-                                       .filter_by(id=device.type_id).first()
-            device_tech = self._session.query(DeviceTechnology)\
-                                       .filter_by(id=device_type.technology_id)\
-                                       .first()
+            device_type = self.__session.query(DeviceType)\
+                                        .filter_by(id=device.type_id).first()
+            device_tech = self.__session.query(DeviceTechnology)\
+                                        .filter_by(id=device_type.technology_id)\
+                                        .first()
             if device_tech.name.lower() == techno_name.lower():
                 return device
         return None
@@ -1157,8 +1157,8 @@ class DbHelper():
         @param d_room_id: room id
         @return a list of Device objects
         """
-        return self._session.query(Device)\
-                            .filter_by(room_id=d_room_id).all()
+        return self.__session.query(Device)\
+                             .filter_by(room_id=d_room_id).all()
 
     def get_all_devices_of_area(self, d_area_id):
         """
@@ -1167,8 +1167,8 @@ class DbHelper():
         @return a list of Device objects
         """
         device_list = []
-        for room in self._session.query(Room).filter_by(area_id=d_area_id).all():
-            for device in self._session.query(Device).filter_by(room_id=room.id).all():
+        for room in self.__session.query(Room).filter_by(area_id=d_area_id).all():
+            for device in self.__session.query(Device).filter_by(room_id=room.id).all():
                 device_list.append(device)
         return device_list
 
@@ -1178,8 +1178,8 @@ class DbHelper():
         @param du_id: usage id
         @return a list of Device objects
         """
-        return self._session.query(Device)\
-                            .filter_by(usage_id=du_id).all()
+        return self.__session.query(Device)\
+                             .filter_by(usage_id=du_id).all()
 
     def get_all_devices_of_technology(self, dt_id):
         """
@@ -1187,8 +1187,8 @@ class DbHelper():
         @param dt_id : technology id
         @return a list of Device objects
         """
-        return self._session.query(Device)\
-                            .filter_by(technology_id=dt_id).all()
+        return self.__session.query(Device)\
+                             .filter_by(technology_id=dt_id).all()
 
     def add_device(self, d_name, d_address, d_type_id, d_usage_id, d_room_id=None,
         d_description=None, d_reference=None):
@@ -1203,31 +1203,31 @@ class DbHelper():
         @param d_reference : device reference (ex. AM12 for x10)
         @return the new Device object
         """
-        self._session.expire_all()
+        self.__session.expire_all()
         try:
-            self._session.query(DeviceType).filter_by(id=d_type_id).one()
+            self.__session.query(DeviceType).filter_by(id=d_type_id).one()
         except NoResultFound:
             raise DbHelperException("Couldn't add device with device type id %s \
                                     It does not exist" % d_type_id)
         try:
-            self._session.query(DeviceUsage).filter_by(id=d_usage_id).one()
+            self.__session.query(DeviceUsage).filter_by(id=d_usage_id).one()
         except NoResultFound:
             raise DbHelperException("Couldn't add device with device usage id %s \
                                     It does not exist" % d_usage_id)
         if d_room_id is not None:
             try:
-                self._session.query(Room).filter_by(id=d_room_id).one()
+                self.__session.query(Room).filter_by(id=d_room_id).one()
             except NoResultFound:
                 raise DbHelperException("Couldn't add device with room id %s \
                                         It does not exist" % d_room_id)
         device = Device(name=d_name, address=d_address, description=d_description,
                         reference=d_reference, type_id=d_type_id,
                         usage_id=d_usage_id, room_id=d_room_id)
-        self._session.add(device)
+        self.__session.add(device)
         try:
-            self._session.commit()
+            self.__session.commit()
         except Exception, sql_exception:
-            self._session.rollback()
+            self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return device
 
@@ -1246,8 +1246,8 @@ class DbHelper():
         @param d_room : Item room id (optional)
         @return the updated Device object
         """
-        self._session.expire_all()
-        device = self._session.query(Device).filter_by(id=d_id).first()
+        self.__session.expire_all()
+        device = self.__session.query(Device).filter_by(id=d_id).first()
         if device is None:
             raise DbHelperException("Device with id %s couldn't be found" % d_id)
         if d_name is not None:
@@ -1262,30 +1262,30 @@ class DbHelper():
             device.reference = d_reference
         if d_type_id is not None:
             try:
-                self._session.query(DeviceType).filter_by(id=d_type_id).one()
+                self.__session.query(DeviceType).filter_by(id=d_type_id).one()
             except NoResultFound:
                 raise DbHelperException("Couldn't find device type id %s. It does not exist" % d_type_id)
             device.type_id = d_type_id
         if d_usage_id is not None:
             try:
-              self._session.query(DeviceUsage).filter_by(id=d_usage_id).one()
+              self.__session.query(DeviceUsage).filter_by(id=d_usage_id).one()
             except NoResultFound:
               raise DbHelperException("Couldn't find device usage id %s. It does not exist" % d_usage_id)
             device.usage = d_usage_id
         if d_room_id is not None:
             if d_room_id != '':
                 try:
-                    self._session.query(Room).filter_by(id=d_room_id).one()
+                    self.__session.query(Room).filter_by(id=d_room_id).one()
                 except NoResultFound:
                     raise DbHelperException("Couldn't find room id %s. It does not exist" % d_room_id)
             else:
                 d_room_id = None
             device.room = d_room_id
-        self._session.add(device)
+        self.__session.add(device)
         try:
-            self._session.commit()
+            self.__session.commit()
         except Exception, sql_exception:
-            self._session.rollback()
+            self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return device
 
@@ -1296,26 +1296,26 @@ class DbHelper():
         @param d_id : item id
         @return the deleted Device object
         """
-        self._session.expire_all()
-        device = self._session.query(Device).filter_by(id=d_id).first()
+        self.__session.expire_all()
+        device = self.__session.query(Device).filter_by(id=d_id).first()
         if device is None:
             raise DbHelperException("Device with id %s couldn't be found" % d_id)
 
         device_d = device
-        for device_conf in self._session.query(DeviceConfig)\
-                                        .filter_by(device_id=d_id).all():
-            self._session.delete(device_conf)
+        for device_conf in self.__session.query(DeviceConfig)\
+                                         .filter_by(device_id=d_id).all():
+            self.__session.delete(device_conf)
 
-        for device_stats in self._session.query(DeviceStats).filter_by(device_id=d_id).all():
-            for device_stats_value in self._session.query(DeviceStatsValue)\
-                                                   .filter_by(device_stats_id=device_stats.id).all():
-                self._session.delete(device_stats_value)
-            self._session.delete(device_stats)
-        self._session.delete(device)
+        for device_stats in self.__session.query(DeviceStats).filter_by(device_id=d_id).all():
+            for device_stats_value in self.__session.query(DeviceStatsValue)\
+                                                    .filter_by(device_stats_id=device_stats.id).all():
+                self.__session.delete(device_stats_value)
+            self.__session.delete(device_stats)
+        self.__session.delete(device)
         try:
-            self._session.commit()
+            self.__session.commit()
         except Exception, sql_exception:
-            self._session.rollback()
+            self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return device_d
 
@@ -1328,15 +1328,15 @@ class DbHelper():
         @param d_device_id : the device id
         @return a list of DeviceStats objects
         """
-        return self._session.query(DeviceStats)\
-                            .filter_by(device_id=d_device_id).all()
+        return self.__session.query(DeviceStats)\
+                             .filter_by(device_id=d_device_id).all()
 
     def list_all_device_stats(self):
         """
         Return a list of all device stats
         @return a list of DeviceStats objects
         """
-        return self._session.query(DeviceStats).all()
+        return self.__session.query(DeviceStats).all()
 
     def list_device_stats_values(self, d_device_stats_id):
         """
@@ -1344,8 +1344,8 @@ class DbHelper():
         @param d_device_stats_id : the device statistic id
         @return a list of DeviceStatsValue objects
         """
-        return self._session.query(DeviceStatsValue)\
-                            .filter_by(device_stats_id=d_device_stats_id).all()
+        return self.__session.query(DeviceStatsValue)\
+                             .filter_by(device_stats_id=d_device_stats_id).all()
 
     def get_last_stat_of_device(self, d_device_id):
         """
@@ -1353,9 +1353,9 @@ class DbHelper():
         @param d_device_id : device id
         @return a DeviceStat object
         """
-        return self._session.query(DeviceStats)\
-                            .filter_by(device_id=d_device_id)\
-                            .order_by(sqlalchemy.desc(DeviceStats.date)).first()
+        return self.__session.query(DeviceStats)\
+                             .filter_by(device_id=d_device_id)\
+                             .order_by(sqlalchemy.desc(DeviceStats.date)).first()
 
     def get_last_stat_of_devices(self, device_list):
         """
@@ -1366,9 +1366,9 @@ class DbHelper():
         assert type(device_list) is ListType
         result = []
         for d_id in device_list:
-            last_record = self._session.query(DeviceStats)\
-                              .filter_by(device_id=d_id)\
-                              .order_by(sqlalchemy.desc(DeviceStats.date)).first()
+            last_record = self.__session.query(DeviceStats)\
+                                        .filter_by(device_id=d_id)\
+                                        .order_by(sqlalchemy.desc(DeviceStats.date)).first()
             result.append(last_record)
         return result
 
@@ -1378,8 +1378,8 @@ class DbHelper():
         @param d_device_id : device id
         @return True or False
         """
-        return self._session.query(DeviceStats)\
-                            .filter_by(device_id=d_device_id).count() > 0
+        return self.__session.query(DeviceStats)\
+                             .filter_by(device_id=d_device_id).count() > 0
 
     def add_device_stat(self, d_id, ds_date, ds_values):
         """
@@ -1389,27 +1389,27 @@ class DbHelper():
         @param ds_value : dictionnary of statistics values
         @return the new DeviceStats object
         """
-        self._session.expire_all()
+        self.__session.expire_all()
         try:
-            self._session.query(Device).filter_by(id=d_id).one()
+            self.__session.query(Device).filter_by(id=d_id).one()
         except NoResultFound:
             raise DbHelperException("Couldn't add device stat with device id %s \
                                     It does not exist" % d_id)
         device_stat = DeviceStats(device_id=d_id, date=ds_date)
-        self._session.add(device_stat)
+        self.__session.add(device_stat)
         try:
-            self._session.commit()
+            self.__session.commit()
         except Exception, sql_exception:
-            self._session.rollback()
+            self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         for ds_name in ds_values.keys():
             dsv = DeviceStatsValue(name=ds_name, value=ds_values[ds_name],
                                    device_stats_id=device_stat.id)
-            self._session.add(dsv)
+            self.__session.add(dsv)
         try:
-            self._session.commit()
+            self.__session.commit()
         except Exception, sql_exception:
-            self._session.rollback()
+            self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return device_stat
 
@@ -1419,18 +1419,18 @@ class DbHelper():
         @param ds_id : record id
         @return the deleted DeviceStat object
         """
-        self._session.expire_all()
-        device_stat = self._session.query(DeviceStats).filter_by(id=ds_id).first()
+        self.__session.expire_all()
+        device_stat = self.__session.query(DeviceStats).filter_by(id=ds_id).first()
         if device_stat:
             device_stat_d = device_stat
-            self._session.delete(device_stat)
-            for device_stats_value in self._session.query(DeviceStatsValue) \
-                                          .filter_by(device_stats_id=device_stat.id).all():
-                self._session.delete(device_stats_value)
+            self.__session.delete(device_stat)
+            for device_stats_value in self.__session.query(DeviceStatsValue) \
+                                                    .filter_by(device_stats_id=device_stat.id).all():
+                self.__session.delete(device_stats_value)
             try:
-                self._session.commit()
+                self.__session.commit()
             except Exception, sql_exception:
-                self._session.rollback()
+                self.__session.rollback()
                 raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
             return device_stat_d
         else:
@@ -1443,20 +1443,20 @@ class DbHelper():
         @param d_id : device id
         @return the list of DeviceStatsValue objects that were deleted
         """
-        self._session.expire_all()
+        self.__session.expire_all()
         #TODO : this could be optimized
-        device_stats = self._session.query(DeviceStats).filter_by(device_id=d_id).all()
+        device_stats = self.__session.query(DeviceStats).filter_by(device_id=d_id).all()
         device_stats_d_list = []
         for device_stat in device_stats:
-            for device_stats_value in self._session.query(DeviceStatsValue) \
-                                                   .filter_by(device_stats_id=device_stat.id).all():
-                self._session.delete(device_stats_value)
+            for device_stats_value in self.__session.query(DeviceStatsValue) \
+                                                    .filter_by(device_stats_id=device_stat.id).all():
+                self.__session.delete(device_stats_value)
             device_stats_d_list.append(device_stat)
-            self._session.delete(device_stat)
+            self.__session.delete(device_stat)
         try:
-            self._session.commit()
+            self.__session.commit()
         except Exception, sql_exception:
-            self._session.rollback()
+            self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return device_stats_d_list
 
@@ -1468,7 +1468,7 @@ class DbHelper():
         Returns a list of all triggers
         @return a list of Trigger objects
         """
-        return self._session.query(Trigger).all()
+        return self.__session.query(Trigger).all()
 
     def get_trigger(self, t_id):
         """
@@ -1476,7 +1476,7 @@ class DbHelper():
         @param t_id : trigger id
         @return a Trigger object
         """
-        return self._session.query(Trigger).filter_by(id=t_id).first()
+        return self.__session.query(Trigger).filter_by(id=t_id).first()
 
     def add_trigger(self, t_description, t_rule, t_result):
         """
@@ -1486,14 +1486,14 @@ class DbHelper():
         @param t_result : trigger result (list of strings)
         @return the new Trigger object
         """
-        self._session.expire_all()
+        self.__session.expire_all()
         trigger = Trigger(description=t_description, rule=t_rule,
                           result=';'.join(t_result))
-        self._session.add(trigger)
+        self.__session.add(trigger)
         try:
-            self._session.commit()
+            self.__session.commit()
         except Exception, sql_exception:
-            self._session.rollback()
+            self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return trigger
 
@@ -1506,8 +1506,8 @@ class DbHelper():
         @param t_result : trigger result (list of strings)
         @return a Trigger object
         """
-        self._session.expire_all()
-        trigger = self._session.query(Trigger).filter_by(id=t_id).first()
+        self.__session.expire_all()
+        trigger = self.__session.query(Trigger).filter_by(id=t_id).first()
         if trigger is None:
             raise DbHelperException("Trigger with id %s couldn't be found" % t_id)
         if t_description is not None:
@@ -1517,11 +1517,11 @@ class DbHelper():
             trigger.rule = t_rule
         if t_result is not None:
             trigger.result = ';'.join(t_result)
-        self._session.add(trigger)
+        self.__session.add(trigger)
         try:
-            self._session.commit()
+            self.__session.commit()
         except Exception, sql_exception:
-            self._session.rollback()
+            self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return trigger
 
@@ -1531,15 +1531,15 @@ class DbHelper():
         @param t_id : trigger id
         @return the deleted Trigger object
         """
-        self._session.expire_all()
-        trigger = self._session.query(Trigger).filter_by(id=t_id).first()
+        self.__session.expire_all()
+        trigger = self.__session.query(Trigger).filter_by(id=t_id).first()
         if trigger:
             trigger_d = trigger
-            self._session.delete(trigger)
+            self.__session.delete(trigger)
             try:
-                self._session.commit()
+                self.__session.commit()
             except Exception, sql_exception:
-                self._session.rollback()
+                self.__session.rollback()
                 raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
             return trigger_d
         else:
@@ -1554,7 +1554,7 @@ class DbHelper():
         Returns a list of all accounts
         @return a list of UserAccount objects
         """
-        list_sa = self._session.query(UserAccount).all()
+        list_sa = self.__session.query(UserAccount).all()
         for user_acc in list_sa:
             # I won't send the password, right?
             user_acc.password = None
@@ -1566,8 +1566,8 @@ class DbHelper():
         @param a_id : account id
         @return a UserAccount object
         """
-        user_acc = self._session.query(UserAccount)\
-                                .filter_by(id=a_id).first()
+        user_acc = self.__session.query(UserAccount)\
+                                 .filter_by(id=a_id).first()
         if user_acc is not None:
             user_acc.password = None
         return user_acc
@@ -1578,8 +1578,8 @@ class DbHelper():
         @param a_login : login
         @return a UserAccount object
         """
-        user_acc = self._session.query(UserAccount).filter_by(login=a_login)\
-                                                   .first()
+        user_acc = self.__session.query(UserAccount).filter_by(login=a_login)\
+                                                    .first()
         if user_acc is not None:
             user_acc.password = None
         return user_acc
@@ -1592,9 +1592,9 @@ class DbHelper():
         @return a UserAccount object or None if login / password is wrong
         """
         crypted_pass = self.__make_crypted_password(a_password)
-        user_acc = self._session.query(UserAccount)\
-                                .filter_by(login=a_login, password=crypted_pass)\
-                                .first()
+        user_acc = self.__session.query(UserAccount)\
+                                 .filter_by(login=a_login, password=crypted_pass)\
+                                 .first()
         if user_acc is not None:
             user_acc.password = None
         return user_acc
@@ -1605,7 +1605,7 @@ class DbHelper():
         @param p_id : The person id
         @return a UserAccount object
         """
-        user = self._session.query(UserAccount).filter_by(person_id=p_id).first()
+        user = self.__session.query(UserAccount).filter_by(person_id=p_id).first()
         if user is not None:
             user.password = None
         return user
@@ -1617,9 +1617,9 @@ class DbHelper():
         @param a_password : Account password (clear)
         @return True or False
         """
-        self._session.expire_all()
-        user_acc = self._session.query(UserAccount).filter_by(login=a_login)\
-                                                   .first()
+        self.__session.expire_all()
+        user_acc = self.__session.query(UserAccount).filter_by(login=a_login)\
+                                                    .first()
         if user_acc is not None:
             password = hashlib.sha256()
             password.update(a_password)
@@ -1637,25 +1637,41 @@ class DbHelper():
         @param a_is_admin : True if it is an admin account, False otherwise (optional, default=False)
         @return the new UserAccount object or raise a DbHelperException if it already exists
         """
-        self._session.expire_all()
-        user_account = self._session.query(UserAccount).filter_by(login=a_login).first()
+        self.__session.expire_all()
+        user_account = self.__session.query(UserAccount).filter_by(login=a_login).first()
         if user_account is not None:
             raise DbHelperException("Error %s login already exists" % a_login)
-        person = self._session.query(Person).filter_by(id=a_person_id).first()
+        person = self.__session.query(Person).filter_by(id=a_person_id).first()
         if person is None:
             raise DbHelperException("Person id '%s' does not exist" % a_person_id)
         user_account = UserAccount(login=a_login,
                                    password=self.__make_crypted_password(a_password),
                                    person_id=a_person_id,
                                    is_admin=a_is_admin, skin_used=a_skin_used)
-        self._session.add(user_account)
+        self.__session.add(user_account)
         try:
-            self._session.commit()
+            self.__session.commit()
         except Exception, sql_exception:
-            self._session.rollback()
+            self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         user_account.password = None
         return user_account
+
+    def add_user_account_with_person(self, a_login, a_password, a_person_first_name,
+                                     a_person_last_name, a_person_birthdate=None,
+                                     a_is_admin=False, a_skin_used='skins/default'):
+        """
+        Add a user account and a person
+        @param a_login : Account login
+        @param a_password : Account clear text password (will be hashed in sha256)
+        @param a_person_first_name : first name of the person associated to the account
+        @param a_person_last_name : last name of the person associated to the account
+        @param a_person_birthdate : birthdate of the person associated to the account, optional
+        @param a_is_admin : True if it is an admin account, False otherwise (optional, default=False)
+        @return the new UserAccount object or raise a DbHelperException if it already exists
+        """
+        person = self.add_person(a_person_first_name, a_person_last_name, a_person_birthdate)
+        return self.add_user_account(a_login, a_password, person.id, a_is_admin, a_skin_used)
 
     def update_user_account(self, a_id, a_new_login=None, a_person_id=None,
                             a_is_admin=None, a_skin_used=None):
@@ -1667,14 +1683,14 @@ class DbHelper():
         @param a_is_admin : True if it is an admin account, False otherwise (optional)
         @return a UserAccount object
         """
-        self._session.expire_all()
-        user_acc = self._session.query(UserAccount).filter_by(id=a_id).first()
+        self.__session.expire_all()
+        user_acc = self.__session.query(UserAccount).filter_by(id=a_id).first()
         if user_acc is None:
             raise DbHelperException("UserAccount with id %s couldn't be found" % a_id)
         if a_new_login is not None:
             user_acc.login = a_new_login
         if a_person_id is not None:
-            person = self._session.query(Person).filter_by(id=a_person_id).first()
+            person = self.__session.query(Person).filter_by(id=a_person_id).first()
             if person is None:
                 raise DbHelperException("Person id '%s' does not exist" % a_person_id)
             user_acc.person_id = a_person_id
@@ -1682,33 +1698,34 @@ class DbHelper():
             user_acc.is_admin = a_is_admin
         if a_skin_used is not None:
             user_acc.skin_used = a_skin_used
-        self._session.add(user_acc)
+        self.__session.add(user_acc)
         try:
-            self._session.commit()
+            self.__session.commit()
         except Exception, sql_exception:
-            self._session.rollback()
+            self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         user_acc.password = None
         return user_acc
 
-    def change_password(self, a_login, a_old_password, a_new_password):
+    def change_password(self, a_id, a_old_password, a_new_password):
         """
         Change the password
-        @param a_login : account login
+        @param a_id : account id
         @param a_old_password : the password to change (the old one, in clear text)
         @param a_new_password : the new password, in clear text (will be hashed in sha256)
         @return True if the password could be changed, False otherwise (login or old_password is wrong)
         """
-        self._session.expire_all()
-        user_acc = self.get_user_account_by_login_and_pass(a_login, a_old_password)
-        if user_acc is None :
+        self.__session.expire_all()
+        old_pass = self.__make_crypted_password(a_old_password)
+        user_acc = self.__session.query(UserAccount).filter_by(id=a_id, password=old_pass).first()
+        if user_acc is None:
             return False
         user_acc.password = self.__make_crypted_password(a_new_password)
-        self._session.add(user_acc)
+        self.__session.add(user_acc)
         try:
-            self._session.commit()
+            self.__session.commit()
         except Exception, sql_exception:
-            self._session.rollback()
+            self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return True
 
@@ -1738,15 +1755,15 @@ class DbHelper():
         @param a_id : account id
         @return the deleted UserAccount object
         """
-        self._session.expire_all()
-        user_account = self._session.query(UserAccount).filter_by(id=a_id).first()
+        self.__session.expire_all()
+        user_account = self.__session.query(UserAccount).filter_by(id=a_id).first()
         if user_account:
             user_account_d = user_account
-            self._session.delete(user_account)
+            self.__session.delete(user_account)
             try:
-                self._session.commit()
+                self.__session.commit()
             except Exception, sql_exception:
-                self._session.rollback()
+                self.__session.rollback()
                 raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
             return user_account_d
         else:
@@ -1760,7 +1777,7 @@ class DbHelper():
         Returns the list of all persons
         @return a list of Person objects
         """
-        return self._session.query(Person).all()
+        return self.__session.query(Person).all()
 
     def get_person(self, p_id):
         """
@@ -1768,25 +1785,25 @@ class DbHelper():
         @param p_id : person id
         @return a Person object
         """
-        return self._session.query(Person).filter_by(id=p_id).first()
+        return self.__session.query(Person).filter_by(id=p_id).first()
 
-    def add_person(self, p_first_name, p_last_name, p_birthdate):
+    def add_person(self, p_first_name, p_last_name, p_birthdate=None):
         """
         Add a person
         @param p_first_name     : first name
         @param p_last_name      : last name
-        @param p_birthdate      : birthdate
+        @param p_birthdate      : birthdate, optional
         @param p_user_account   : Person account on the user (optional)
         @return the new Person object
         """
-        self._session.expire_all()
+        self.__session.expire_all()
         person = Person(first_name=p_first_name, last_name=p_last_name,
                         birthdate=p_birthdate)
-        self._session.add(person)
+        self.__session.add(person)
         try:
-            self._session.commit()
+            self.__session.commit()
         except Exception, sql_exception:
-            self._session.rollback()
+            self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return person
 
@@ -1800,8 +1817,8 @@ class DbHelper():
         @param p_birthdate      : birthdate (optional)
         @return a Person object
         """
-        self._session.expire_all()
-        person = self._session.query(Person).filter_by(id=p_id).first()
+        self.__session.expire_all()
+        person = self.__session.query(Person).filter_by(id=p_id).first()
         if person is None:
             raise DbHelperException("Person with id %s couldn't be found" % p_id)
         if p_first_name is not None:
@@ -1809,12 +1826,14 @@ class DbHelper():
         if p_last_name is not None:
             person.last_name = p_last_name
         if p_birthdate is not None:
+            if p_birthdate == '':
+                p_birthdate = None
             person.birthdate = p_birthdate
-        self._session.add(person)
+        self.__session.add(person)
         try:
-            self._session.commit()
+            self.__session.commit()
         except Exception, sql_exception:
-            self._session.rollback()
+            self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return person
 
@@ -1824,18 +1843,18 @@ class DbHelper():
         @param p_id : person account id
         @return the deleted Person object
         """
-        self._session.expire_all()
-        person = self._session.query(Person).filter_by(id=p_id).first()
+        self.__session.expire_all()
+        person = self.__session.query(Person).filter_by(id=p_id).first()
         if person is not None:
-            user = self._session.query(UserAccount).filter_by(person_id=p_id).first()
+            user = self.__session.query(UserAccount).filter_by(person_id=p_id).first()
             if user is not None:
-                self._session.delete(user)
+                self.__session.delete(user)
             person_d = person
-            self._session.delete(person)
+            self.__session.delete(person)
             try:
-                self._session.commit()
+                self.__session.commit()
             except Exception, sql_exception:
-                self._session.rollback()
+                self.__session.rollback()
                 raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
             return person_d
         else:
@@ -1849,7 +1868,7 @@ class DbHelper():
         Return a list of all system stats
         @return a list of SystemStats objects
         """
-        return self._session.query(SystemStats).all()
+        return self.__session.query(SystemStats).all()
 
     def list_system_stats_values(self, s_system_stats_id):
         """
@@ -1857,8 +1876,8 @@ class DbHelper():
         @param s_system_stats_id : the system statistic id
         @return a list of SystemStatsValue objects
         """
-        return self._session.query(SystemStatsValue)\
-                            .filter_by(system_stats_id=s_system_stats_id).all()
+        return self.__session.query(SystemStatsValue)\
+                             .filter_by(system_stats_id=s_system_stats_id).all()
 
     def get_system_stat(self, s_id):
         """
@@ -1866,7 +1885,7 @@ class DbHelper():
         @param s_name : the name of the stat to be retrieved
         @return a SystemStats object
         """
-        return self._session.query(SystemStats).filter_by(id=s_id).first()
+        return self.__session.query(SystemStats).filter_by(id=s_id).first()
 
     def add_system_stat(self, s_name, s_hostname, s_date, s_values):
         """
@@ -1877,22 +1896,22 @@ class DbHelper():
         @param s_values : a dictionnary of system statistics values
         @return the new SystemStats object
         """
-        self._session.expire_all()
+        self.__session.expire_all()
         system_stat = SystemStats(module_name=s_name, host_name=s_hostname, date=s_date)
-        self._session.add(system_stat)
+        self.__session.add(system_stat)
         try:
-            self._session.commit()
+            self.__session.commit()
         except Exception, sql_exception:
-            self._session.rollback()
+            self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         for stat_value_name in s_values.keys():
             ssv = SystemStatsValue(name=stat_value_name, value=s_values[stat_value_name],
                                   system_stats_id=system_stat.id)
-            self._session.add(ssv)
+            self.__session.add(ssv)
         try:
-            self._session.commit()
+            self.__session.commit()
         except Exception, sql_exception:
-            self._session.rollback()
+            self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return system_stat
 
@@ -1902,19 +1921,19 @@ class DbHelper():
         @param s_name : name of the stat that has to be deleted
         @return the deleted SystemStats object
         """
-        self._session.expire_all()
-        system_stat = self._session.query(SystemStats).filter_by(name=s_name).first()
+        self.__session.expire_all()
+        system_stat = self.__session.query(SystemStats).filter_by(name=s_name).first()
         if system_stat:
             system_stat_d = system_stat
-            system_stats_values = self._session.query(SystemStatsValue)\
-                                               .filter_by(system_stats_id=system_stat.id).all()
+            system_stats_values = self.__session.query(SystemStatsValue)\
+                                                .filter_by(system_stats_id=system_stat.id).all()
             for ssv in system_stats_values:
-                self._session.delete(ssv)
-            self._session.delete(system_stat)
+                self.__session.delete(ssv)
+            self.__session.delete(system_stat)
             try:
-                self._session.commit()
+                self.__session.commit()
             except Exception, sql_exception:
-                self._session.rollback()
+                self.__session.rollback()
                 raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
             return system_stat_d
         else:
@@ -1925,20 +1944,20 @@ class DbHelper():
         Delete all stats of the system
         @return the list of deleted SystemStats objects
         """
-        self._session.expire_all()
-        system_stats_list = self._session.query(SystemStats).all()
+        self.__session.expire_all()
+        system_stats_list = self.__session.query(SystemStats).all()
         system_stats_d_list = []
         for system_stat in system_stats_list:
-            system_stats_values = self._session.query(SystemStatsValue)\
-                                      .filter_by(system_stats_id=system_stat.id).all()
+            system_stats_values = self.__session.query(SystemStatsValue)\
+                                                .filter_by(system_stats_id=system_stat.id).all()
             for ssv in system_stats_values:
-                self._session.delete(ssv)
+                self.__session.delete(ssv)
             system_stats_d_list.append(system_stat)
-            self._session.delete(system_stat)
+            self.__session.delete(system_stat)
         try:
-            self._session.commit()
+            self.__session.commit()
         except Exception, sql_exception:
-            self._session.rollback()
+            self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return system_stats_d_list
 
@@ -1956,18 +1975,18 @@ class DbHelper():
         @param ui_item_value : key value we want to add / update
         @return : the updated UIItemConfig item
         """
-        self._session.expire_all()
+        self.__session.expire_all()
         ui_item_config = self.get_ui_item_config(ui_item_name, ui_item_reference, ui_item_key)
         if ui_item_config is None:
             ui_item_config = UIItemConfig(name=ui_item_name, reference=ui_item_reference,
                                           key=ui_item_key, value=ui_item_value)
         else:
             ui_item_config.value = ui_item_value
-        self._session.add(ui_item_config)
+        self.__session.add(ui_item_config)
         try:
-            self._session.commit()
+            self.__session.commit()
         except Exception, sql_exception:
-            self._session.rollback()
+            self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return ui_item_config
 
@@ -1979,10 +1998,10 @@ class DbHelper():
         @param ui_item_key : key
         @return an UIItemConfig object
         """
-        return self._session.query(UIItemConfig)\
-                            .filter_by(name=ui_item_name,
-                                       reference=ui_item_reference, key=ui_item_key)\
-                            .first()
+        return self.__session.query(UIItemConfig)\
+                             .filter_by(name=ui_item_name,
+                                        reference=ui_item_reference, key=ui_item_key)\
+                             .first()
 
     def list_ui_item_config_by_ref(self, ui_item_name, ui_item_reference):
         """
@@ -1991,10 +2010,10 @@ class DbHelper():
         @param ui_item_reference : item reference
         @return a list of UIItemConfig objects
         """
-        return self._session.query(UIItemConfig)\
-                            .filter_by(name=ui_item_name,
-                                       reference=ui_item_reference)\
-                            .all()
+        return self.__session.query(UIItemConfig)\
+                             .filter_by(name=ui_item_name,
+                                        reference=ui_item_reference)\
+                             .all()
 
     def list_ui_item_config_by_key(self, ui_item_name, ui_item_key):
         """
@@ -2003,9 +2022,9 @@ class DbHelper():
         @param ui_item_key : item key
         @return a list of UIItemConfig objects
         """
-        return self._session.query(UIItemConfig)\
-                            .filter_by(name=ui_item_name, key=ui_item_key)\
-                            .all()
+        return self.__session.query(UIItemConfig)\
+                             .filter_by(name=ui_item_name, key=ui_item_key)\
+                             .all()
 
     def list_ui_item_config(self, ui_item_name):
         """
@@ -2013,16 +2032,16 @@ class DbHelper():
         @param ui_item_name : item name
         @return a list of UIItemConfig objects
         """
-        return self._session.query(UIItemConfig)\
-                            .filter_by(name=ui_item_name)\
-                            .all()
+        return self.__session.query(UIItemConfig)\
+                             .filter_by(name=ui_item_name)\
+                             .all()
 
     def list_all_ui_item_config(self):
         """
         List all UI parameters
         @return a list of UIItemConfig objects
         """
-        return self._session.query(UIItemConfig).all()
+        return self.__session.query(UIItemConfig).all()
 
     def delete_ui_item_config(self, ui_item_name, ui_item_reference=None, ui_item_key=None):
         """
@@ -2032,21 +2051,21 @@ class DbHelper():
         @param ui_item_key : key of the item, optional
         @return the deleted UIItemConfig object(s)
         """
-        self._session.expire_all()
+        self.__session.expire_all()
         ui_item_config_list = []
         if ui_item_reference == None and ui_item_key == None:
-            ui_item_config_list = self._session.query(UIItemConfig)\
-                                               .filter_by(name=ui_item_name).all()
+            ui_item_config_list = self.__session.query(UIItemConfig)\
+                                                .filter_by(name=ui_item_name).all()
         elif ui_item_key is None:
-            ui_item_config_list = self._session.query(UIItemConfig)\
-                                               .filter_by(name=ui_item_name,
-                                                          reference=ui_item_reference)\
-                                               .all()
+            ui_item_config_list = self.__session.query(UIItemConfig)\
+                                                .filter_by(name=ui_item_name,
+                                                           reference=ui_item_reference)\
+                                                .all()
         elif ui_item_reference is None:
-            ui_item_config_list = self._session.query(UIItemConfig)\
-                                               .filter_by(name=ui_item_name,
-                                                          key=ui_item_key)\
-                                               .all()
+            ui_item_config_list = self.__session.query(UIItemConfig)\
+                                                .filter_by(name=ui_item_name,
+                                                           key=ui_item_key)\
+                                                .all()
         else:
             ui_item_config = self.get_ui_item_config(ui_item_name, ui_item_reference, ui_item_key)
             if ui_item_config is not None:
@@ -2056,11 +2075,11 @@ class DbHelper():
             raise DbHelperException("Can't find item for (%s, %s, %s)" % (ui_item_name, ui_item_reference, ui_item_key))
         ui_item_config_list_d = ui_item_config_list
         for item in ui_item_config_list:
-            self._session.delete(item)
+            self.__session.delete(item)
         try:
-            self._session.commit()
+            self.__session.commit()
         except Exception, sql_exception:
-            self._session.rollback()
+            self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return ui_item_config_list_d
 
@@ -2073,7 +2092,7 @@ class DbHelper():
         @return a SystemConfig object
         """
         try:
-            return self._session.query(SystemConfig).one()
+            return self.__session.query(SystemConfig).one()
         except MultipleResultsFound:
             raise DbHelperException("Error : SystemConfig has more than one line")
         except NoResultFound:
@@ -2086,8 +2105,8 @@ class DbHelper():
         @param s_debug_mode : True if the system is running in debug mode (optional)
         @return a SystemConfig object
         """
-        self._session.expire_all()
-        system_config = self._session.query(SystemConfig).first()
+        self.__session.expire_all()
+        system_config = self.__session.query(SystemConfig).first()
         if system_config is not None:
             if s_simulation_mode is not None:
                 system_config.simulation_mode = s_simulation_mode
@@ -2096,10 +2115,10 @@ class DbHelper():
         else:
             system_config = SystemConfig(simulation_mode=s_simulation_mode,
                                          debug_mode=s_debug_mode)
-        self._session.add(system_config)
+        self.__session.add(system_config)
         try:
-            self._session.commit()
+            self.__session.commit()
         except Exception, sql_exception:
-            self._session.rollback()
+            self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return system_config

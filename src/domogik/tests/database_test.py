@@ -116,8 +116,9 @@ class GenericTestCase(unittest.TestCase):
         Remove all configurations of device technologies
         @param db : db API instance
         """
-        for dtc in db._session.query(DeviceTechnologyConfig).all():
-            db._session.delete(dtc)
+        dbsession = db._DbHelper__session
+        for dtc in dbsession.query(DeviceTechnologyConfig).all():
+            dbsession.delete(dtc)
 
     def remove_all_device_technologies(self, db):
         """
@@ -1314,12 +1315,16 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
                                      p_birthdate=datetime.date(1981, 4, 24))
         user2 = self.db.add_user_account(a_login='lonely', a_password='boy',
                                          a_person_id=person2.id, a_is_admin=True)
-        person3 = self.db.add_person(p_first_name='Ali', p_last_name='CANTE',
-                                     p_birthdate=datetime.date(1945, 4, 18))
+        person3 = self.db.add_person(p_first_name='Ali', p_last_name='CANTE')
         assert len(self.db.list_persons()) == 3
         user3 = self.db.add_user_account(a_login='domo', a_password='gik',
                                          a_person_id=person3.id, a_is_admin=True)
-        assert len(self.db.list_user_accounts()) == 3
+        user4 = self.db.add_user_account_with_person('jsteed', 'theavengers', 'John', 'STEED')
+        assert user4.login == 'jsteed'
+        assert user4.password is None
+        assert user4.person.first_name == 'John'
+        assert user4.person.last_name == 'STEED'
+        assert len(self.db.list_user_accounts()) == 4
         for user_acc in self.db.list_user_accounts():
             assert user_acc.password == None
 
@@ -1335,8 +1340,10 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
         user_acc = self.db.add_user_account(a_login='mschneider',
                                             a_password='IwontGiveIt',
                                             a_person_id=person_u.id, a_is_admin=True)
-        assert self.db.change_password('mschneider', 'IwontGiveIt', 'OkIWill')
-        assert not self.db.change_password('mschneider', 'DontKnow', 'foo')
+        assert not self.db.change_password(999999999, 'IwontGiveIt', 'foo')
+        assert self.db.change_password(user_acc.id, 'IwontGiveIt', 'OkIWill')
+        assert not self.db.change_password(user_acc.id, 'DontKnow', 'foo')
+
         user_acc_u = self.db.update_user_account(a_id=user_acc.id, a_new_login='mschneider2',
                                                  a_is_admin=False)
         assert user_acc_u.password is None
@@ -1421,6 +1428,7 @@ class SystemStatsTestCase(GenericTestCase):
 
     def setUp(self):
         self.db = DbHelper(use_test_db=True)
+        self.dbsession = self.db._DbHelper__session
         self.db.del_all_system_stats()
 
     def tearDown(self):
@@ -1475,7 +1483,7 @@ class SystemStatsTestCase(GenericTestCase):
         ss_list_del = self.db.del_all_system_stats()
         assert len(ss_list) == len(ss_list_del)
         assert len(self.db.list_system_stats()) == 0
-        ssv = self.db._session.query(SystemStatsValue).all()
+        ssv = self.dbsession.query(SystemStatsValue).all()
         assert len(ssv) == 0
 
 
