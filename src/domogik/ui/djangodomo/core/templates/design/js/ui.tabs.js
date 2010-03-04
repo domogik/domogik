@@ -3,8 +3,7 @@
         _init: function() {
             var self = this, o = this.options;
             this.list = this.element.children("ul:first");
-            var addButton = $("<li><a href='#' class='add icon16-action-add' title='"+ o.addTitle + "'>&nbsp;<span class='offscreen'>"+ o.addTitle + "</span></a></li>");
-            addButton.click(o.addCallback);
+            var addButton = $("<li><a href='#' id='" + o.addId + "' class='add icon16-action-add' title='"+ o.addTitle + "'>&nbsp;<span class='offscreen'>"+ o.addTitle + "</span></a></li>");
             this.list.prepend(addButton);
         }
     });

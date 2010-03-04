@@ -1190,7 +1190,7 @@ class DbHelper():
         return self._session.query(Device)\
                             .filter_by(technology_id=dt_id).all()
 
-    def add_device(self, d_name, d_address, d_type_id, d_usage_id, d_room_id,
+    def add_device(self, d_name, d_address, d_type_id, d_usage_id, d_room_id=None,
         d_description=None, d_reference=None):
         """
         Add a device item
@@ -1214,11 +1214,12 @@ class DbHelper():
         except NoResultFound:
             raise DbHelperException("Couldn't add device with device usage id %s \
                                     It does not exist" % d_usage_id)
-        try:
-            self._session.query(Room).filter_by(id=d_room_id).one()
-        except NoResultFound:
-            raise DbHelperException("Couldn't add device with room id %s \
-                                    It does not exist" % d_room_id)
+        if d_room_id is not None:
+            try:
+                self._session.query(Room).filter_by(id=d_room_id).one()
+            except NoResultFound:
+                raise DbHelperException("Couldn't add device with room id %s \
+                                        It does not exist" % d_room_id)
         device = Device(name=d_name, address=d_address, description=d_description,
                         reference=d_reference, type_id=d_type_id,
                         usage_id=d_usage_id, room_id=d_room_id)
@@ -1604,18 +1605,10 @@ class DbHelper():
         @param p_id : The person id
         @return a UserAccount object
         """
-        person = self._session.query(Person).filter_by(id=p_id).first()
-        if person is not None:
-            try:
-                user_acc = self._session.query(UserAccount)\
-                                        .filter_by(id=person.user_account_id)\
-                                        .one()
-                user_acc.password = None
-                return user_acc
-            except MultipleResultsFound:
-                raise DbHelperException("Database may be incoherent, person with id %s has more than one account" % p_id)
-        else:
-            return None
+        user = self._session.query(UserAccount).filter_by(person_id=p_id).first()
+        if user is not None:
+            user.password = None
+        return user
 
     def authenticate(self, a_login, a_password):
         """
@@ -1634,12 +1627,13 @@ class DbHelper():
                 return True
         return False
 
-    def add_user_account(self, a_login, a_password, a_is_admin=False,
+    def add_user_account(self, a_login, a_password, a_person_id, a_is_admin=False,
                          a_skin_used='skins/default'):
         """
         Add a user account
         @param a_login : Account login
         @param a_password : Account clear text password (will be hashed in sha256)
+        @param a_person_id : id of the person associated to the account
         @param a_is_admin : True if it is an admin account, False otherwise (optional, default=False)
         @return the new UserAccount object or raise a DbHelperException if it already exists
         """
@@ -1647,8 +1641,12 @@ class DbHelper():
         user_account = self._session.query(UserAccount).filter_by(login=a_login).first()
         if user_account is not None:
             raise DbHelperException("Error %s login already exists" % a_login)
+        person = self._session.query(Person).filter_by(id=a_person_id).first()
+        if person is None:
+            raise DbHelperException("Person id '%s' does not exist" % a_person_id)
         user_account = UserAccount(login=a_login,
                                    password=self.__make_crypted_password(a_password),
+                                   person_id=a_person_id,
                                    is_admin=a_is_admin, skin_used=a_skin_used)
         self._session.add(user_account)
         try:
@@ -1659,13 +1657,13 @@ class DbHelper():
         user_account.password = None
         return user_account
 
-    def update_user_account(self, a_id, a_new_login=None, a_password=None,
+    def update_user_account(self, a_id, a_new_login=None, a_person_id=None,
                             a_is_admin=None, a_skin_used=None):
         """
         Update a user account
         @param a_id : Account id to be updated
         @param a_new_login : The new login (optional)
-        @param a_password : Account clear text password (will be hashed in sha256, optional)
+        @param a_person_id : id of the person associated to the account
         @param a_is_admin : True if it is an admin account, False otherwise (optional)
         @return a UserAccount object
         """
@@ -1675,8 +1673,11 @@ class DbHelper():
             raise DbHelperException("UserAccount with id %s couldn't be found" % a_id)
         if a_new_login is not None:
             user_acc.login = a_new_login
-        if a_password is not None:
-            user_acc.password = self.__make_crypted_password(a_password)
+        if a_person_id is not None:
+            person = self._session.query(Person).filter_by(id=a_person_id).first()
+            if person is None:
+                raise DbHelperException("Person id '%s' does not exist" % a_person_id)
+            user_acc.person_id = a_person_id
         if a_is_admin is not None:
             user_acc.is_admin = a_is_admin
         if a_skin_used is not None:
@@ -1689,6 +1690,27 @@ class DbHelper():
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         user_acc.password = None
         return user_acc
+
+    def change_password(self, a_login, a_old_password, a_new_password):
+        """
+        Change the password
+        @param a_login : account login
+        @param a_old_password : the password to change (the old one, in clear text)
+        @param a_new_password : the new password, in clear text (will be hashed in sha256)
+        @return True if the password could be changed, False otherwise (login or old_password is wrong)
+        """
+        self._session.expire_all()
+        user_acc = self.get_user_account_by_login_and_pass(a_login, a_old_password)
+        if user_acc is None :
+            return False
+        user_acc.password = self.__make_crypted_password(a_new_password)
+        self._session.add(user_acc)
+        try:
+            self._session.commit()
+        except Exception, sql_exception:
+            self._session.rollback()
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
+        return True
 
     def __make_crypted_password(self, clear_text_password):
         """
@@ -1705,8 +1727,10 @@ class DbHelper():
         Add a default user account (login = admin, password = domogik, is_admin = True)
         @return a UserAccount object
         """
+        person = self.add_person(p_first_name='Admin', p_last_name='Admin',
+                                 p_birthdate=datetime.date(1900, 01, 01))
         return self.add_user_account(a_login='admin', a_password='123',
-                                     a_is_admin=True)
+                                     a_person_id=person.id, a_is_admin=True)
 
     def del_user_account(self, a_id):
         """
@@ -1746,23 +1770,7 @@ class DbHelper():
         """
         return self._session.query(Person).filter_by(id=p_id).first()
 
-    def get_person_by_user_account(self, u_id):
-        """
-        Return a person associated to a user account, if existing
-        @param u_id : the user account id
-        @return a Person object or None
-        """
-        try:
-            return self._session.query(Person)\
-                                .filter_by(user_account_id=u_id).one()
-        except NoResultFound:
-            return None
-        except MultipleResultsFound:
-            raise DbHelperException("Database may be incoherent, person with \
-                                    id %s has more than one account" % u_id)
-
-    def add_person(self, p_first_name, p_last_name, p_birthdate,
-                   p_user_account_id=None):
+    def add_person(self, p_first_name, p_last_name, p_birthdate):
         """
         Add a person
         @param p_first_name     : first name
@@ -1772,15 +1780,8 @@ class DbHelper():
         @return the new Person object
         """
         self._session.expire_all()
-        if p_user_account_id is not None:
-            try:
-                self._session.query(UserAccount)\
-                             .filter_by(id=p_user_account_id).one()
-            except NoResultFound:
-                raise DbHelperException("Couldn't add person with account id %s : it doesn't exist" % p_user_account_id)
         person = Person(first_name=p_first_name, last_name=p_last_name,
-                        birthdate=p_birthdate,
-                        user_account_id=p_user_account_id)
+                        birthdate=p_birthdate)
         self._session.add(person)
         try:
             self._session.commit()
@@ -1790,14 +1791,13 @@ class DbHelper():
         return person
 
     def update_person(self, p_id, p_first_name=None, p_last_name=None,
-                      p_birthdate=None, p_user_account_id=None):
+                      p_birthdate=None):
         """
         Update a person
         @param p_id             : person id to be updated
         @param p_first_name     : first name (optional)
         @param p_last_name      : last name (optional)
         @param p_birthdate      : birthdate (optional)
-        @param p_user_account   : person account on the user (optional)
         @return a Person object
         """
         self._session.expire_all()
@@ -1810,16 +1810,6 @@ class DbHelper():
             person.last_name = p_last_name
         if p_birthdate is not None:
             person.birthdate = p_birthdate
-        if p_user_account_id is not None:
-            if p_user_account_id != '':
-                try:
-                    self._session.query(UserAccount)\
-                                 .filter_by(id=p_user_account_id).one()
-                except NoResultFound:
-                    raise DbHelperException("Couldn't find account id %s It does not exist" % p_user_account_id)
-            else:
-                p_user_account_id = None
-            person.user_account_id = p_user_account_id
         self._session.add(person)
         try:
             self._session.commit()
@@ -1837,8 +1827,9 @@ class DbHelper():
         self._session.expire_all()
         person = self._session.query(Person).filter_by(id=p_id).first()
         if person is not None:
-            if person.user_account_id is not None:
-                self.del_user_account(person.user_account_id)
+            user = self._session.query(UserAccount).filter_by(person_id=p_id).first()
+            if user is not None:
+                self._session.delete(user)
             person_d = person
             self._session.delete(person)
             try:
@@ -1956,24 +1947,22 @@ class DbHelper():
 # UIItemConfig
 ###
 
-    def set_ui_item_config(self, ui_item_name, ui_item_reference, ui_key,
-                           ui_value):
+    def set_ui_item_config(self, ui_item_name, ui_item_reference, ui_item_key, ui_item_value):
         """
         Add / update an UI parameter
         @param ui_item_name : item name
         @param ui_item_reference : the item reference
-        @param ui_key : key we want to add / update
-        @param ui_value : key value we want to add / update
+        @param ui_item_key : key we want to add / update
+        @param ui_item_value : key value we want to add / update
         @return : the updated UIItemConfig item
         """
         self._session.expire_all()
-        ui_item_config = self.get_ui_item_config(ui_item_name, ui_item_reference, ui_key)
+        ui_item_config = self.get_ui_item_config(ui_item_name, ui_item_reference, ui_item_key)
         if ui_item_config is None:
-            ui_item_config = UIItemConfig(item_name=ui_item_name,
-                                          item_reference=ui_item_reference,
-                                          key=ui_key, value=ui_value)
+            ui_item_config = UIItemConfig(name=ui_item_name, reference=ui_item_reference,
+                                          key=ui_item_key, value=ui_item_value)
         else:
-            ui_item_config.value = ui_value
+            ui_item_config.value = ui_item_value
         self._session.add(ui_item_config)
         try:
             self._session.commit()
@@ -1982,18 +1971,17 @@ class DbHelper():
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return ui_item_config
 
-    def get_ui_item_config(self, ui_item_name, ui_item_reference, ui_key):
+    def get_ui_item_config(self, ui_item_name, ui_item_reference, ui_item_key):
         """
         Get a UI parameter of an item
         @param ui_item_name : item name
         @param ui_item_reference : item reference
-        @param ui_key : key
+        @param ui_item_key : key
         @return an UIItemConfig object
         """
         return self._session.query(UIItemConfig)\
-                            .filter_by(item_name=ui_item_name,
-                                       item_reference=ui_item_reference,
-                                       key=ui_key)\
+                            .filter_by(name=ui_item_name,
+                                       reference=ui_item_reference, key=ui_item_key)\
                             .first()
 
     def list_ui_item_config_by_ref(self, ui_item_name, ui_item_reference):
@@ -2004,19 +1992,19 @@ class DbHelper():
         @return a list of UIItemConfig objects
         """
         return self._session.query(UIItemConfig)\
-                            .filter_by(item_name=ui_item_name,
-                                       item_reference=ui_item_reference)\
+                            .filter_by(name=ui_item_name,
+                                       reference=ui_item_reference)\
                             .all()
 
-    def list_ui_item_config_by_key(self, ui_item_name, ui_key):
+    def list_ui_item_config_by_key(self, ui_item_name, ui_item_key):
         """
         List all UI parameters of an item
         @param ui_item_name : item name
-        @param ui_key : item key
+        @param ui_item_key : item key
         @return a list of UIItemConfig objects
         """
         return self._session.query(UIItemConfig)\
-                            .filter_by(item_name=ui_item_name, key=ui_key)\
+                            .filter_by(name=ui_item_name, key=ui_item_key)\
                             .all()
 
     def list_ui_item_config(self, ui_item_name):
@@ -2026,7 +2014,7 @@ class DbHelper():
         @return a list of UIItemConfig objects
         """
         return self._session.query(UIItemConfig)\
-                            .filter_by(item_name=ui_item_name)\
+                            .filter_by(name=ui_item_name)\
                             .all()
 
     def list_all_ui_item_config(self):
@@ -2036,36 +2024,36 @@ class DbHelper():
         """
         return self._session.query(UIItemConfig).all()
 
-    def delete_ui_item_config(self, ui_item_name, ui_item_reference=None, ui_key=None):
+    def delete_ui_item_config(self, ui_item_name, ui_item_reference=None, ui_item_key=None):
         """
         Delete a UI parameter of an item
         @param ui_item_name : item name
         @param ui_item_reference : item reference, optional
-        @param ui_key : key of the item, optional
+        @param ui_item_key : key of the item, optional
         @return the deleted UIItemConfig object(s)
         """
         self._session.expire_all()
         ui_item_config_list = []
-        if ui_item_reference == None and ui_key == None:
+        if ui_item_reference == None and ui_item_key == None:
             ui_item_config_list = self._session.query(UIItemConfig)\
-                                               .filter_by(item_name=ui_item_name).all()
-        elif ui_key is None:
+                                               .filter_by(name=ui_item_name).all()
+        elif ui_item_key is None:
             ui_item_config_list = self._session.query(UIItemConfig)\
-                                               .filter_by(item_name=ui_item_name,
-                                                          item_reference=ui_item_reference)\
+                                               .filter_by(name=ui_item_name,
+                                                          reference=ui_item_reference)\
                                                .all()
         elif ui_item_reference is None:
             ui_item_config_list = self._session.query(UIItemConfig)\
-                                               .filter_by(item_name=ui_item_name,
-                                                          key=ui_key)\
+                                               .filter_by(name=ui_item_name,
+                                                          key=ui_item_key)\
                                                .all()
         else:
-            ui_item_config = self.get_ui_item_config(ui_item_name, ui_item_reference, ui_key)
+            ui_item_config = self.get_ui_item_config(ui_item_name, ui_item_reference, ui_item_key)
             if ui_item_config is not None:
                 ui_item_config_list.append(ui_item_config)
 
         if len(ui_item_config_list) == 0:
-            raise DbHelperException("Can't find item for (%s, %s, %s)" % (ui_item_name, ui_item_reference, ui_key))
+            raise DbHelperException("Can't find item for (%s, %s, %s)" % (ui_item_name, ui_item_reference, ui_item_key))
         ui_item_config_list_d = ui_item_config_list
         for item in ui_item_config_list:
             self._session.delete(item)

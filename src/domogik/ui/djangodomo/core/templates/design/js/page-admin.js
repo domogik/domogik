@@ -7,8 +7,10 @@ function getModulesList() {
 				$.each(data.module, function() {
 					var li = $("<li></li>");
 					var a = $("<a>" + this.name + "</a>");
-					a.attr('href', server_url + '/admin/module/' + this.name);
-					a.addClass("icon16-technology-" + this.name);
+					a.attr('href', server_url + '/admin/module/' + this.name)
+						.attr('title', this.description)
+						.addClass("icon16-technology-" + this.name)
+						.tooltip_right();
 					if (this.status == 'ON') {
 						a.append("<div class='status icon16-status-active'></div>");
 					} else {
@@ -32,4 +34,5 @@ function getModulesList() {
 
 $(document).ready(function(){
 	getModulesList();
+	$('#modules_list li a[title]').tooltip_right();
 });

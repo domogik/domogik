@@ -66,7 +66,7 @@ class Areas(pipes.DmgPipe):
                 area.config[uiconfig.key] = uiconfig.value
             
             # If has rooms
-            if hasattr(area, 'room') :
+            if hasattr(area, 'room') and (area.room != 'None'):
                 for room in area.room:
                     uiconfigs = UIConfigs.getByReference('room', room.id)
                     room.config = {}
@@ -114,7 +114,7 @@ class Rooms(pipes.DmgPipe):
                 room.config[uiconfig.key] = uiconfig.value
 
             # If is associated with area
-            if room.area != 'None' :
+            if hasattr(room, 'area') and (room.area != 'None') :
                 uiconfigs = UIConfigs.getByReference('area', room.area.id)
                 room.area.config = {}
                 for uiconfig in uiconfigs.ui_config:
@@ -138,7 +138,7 @@ class Devices(pipes.DmgPipe):
     def merge_uiconfig(self):
         for device in self.device:
             # If is associated with room
-            if device.room != 'None' :
+            if hasattr(device, 'room') and (device.room != 'None') :
                 uiconfigs = UIConfigs.getByReference('room', device.room.id)
                 device.room.config = {}
                 for uiconfig in uiconfigs.ui_config:

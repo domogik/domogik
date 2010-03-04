@@ -166,7 +166,7 @@ class GenericTestCase(unittest.TestCase):
         @param db : db API instance
         """
         for uic in db.list_all_ui_item_config():
-            db.delete_ui_item_config(uic.item_name, uic.item_reference, uic.key)
+            db.delete_ui_item_config(uic.name, uic.reference, uic.key)
 
 
 class AreaTestCase(GenericTestCase):
@@ -916,6 +916,9 @@ class DeviceTestCase(GenericTestCase):
                     d_type_id = dty1.id, d_usage_id = du1.id,
                     d_room_id = room1.id, d_description = 'desc1')
         assert len(self.db.list_devices()) == 2
+        device3 = self.db.add_device(d_name='device3', d_address = 'A3',
+                    d_type_id = dty1.id, d_usage_id = du1.id)
+        assert device3.room_id is None
         # TODO see if these methods are still used
         # assert device1.is_lamp(), "device1.is_lamp() returns False.
         # Should have returned True"
@@ -1268,109 +1271,100 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
     def setUp(self):
         self.db = DbHelper(use_test_db=True)
         self.remove_all_persons(self.db)
-        self.remove_all_user_accounts(self.db)
 
     def tearDown(self):
         self.remove_all_persons(self.db)
-        self.remove_all_user_accounts(self.db)
         del self.db
 
     def testEmptyList(self):
-        assert len(self.db.list_user_accounts()) == 0
         assert len(self.db.list_persons()) == 0
+        assert len(self.db.list_user_accounts()) == 0
 
     def testAdd(self):
+        person1 = self.db.add_person(p_first_name='Marc', p_last_name='SCHNEIDER',
+                                     p_birthdate=datetime.date(1973, 4, 24))
+        assert person1.last_name == 'SCHNEIDER'
+        print person1
         user1 = self.db.add_user_account(a_login='mschneider',
                                          a_password='IwontGiveIt',
-                                         a_is_admin=True)
+                                         a_person_id=person1.id, a_is_admin=True)
+        print user1
         assert user1.password is None
+        assert user1.person.first_name == 'Marc'
         assert self.db.authenticate('mschneider', 'IwontGiveIt')
         assert not self.db.authenticate('mschneider', 'plop')
         assert not self.db.authenticate('hello', 'boy')
-        user1 = self.db.get_user_account_by_login_and_pass('mschneider',
-                                                           'IwontGiveIt')
+        user1 = self.db.get_user_account_by_login_and_pass('mschneider', 'IwontGiveIt')
         assert user1 is not None
         assert user1.login == 'mschneider'
         assert user1.password == None
         try:
             self.db.add_user_account(a_login='mschneider', a_password='plop',
-                                     a_is_admin = True)
-            TestCase.fail(self, "It shouldn't have been possible to add \
-                          login %s. It already exists!" % 'mschneider')
+                                     a_person_id=person1.id)
+            TestCase.fail(self, "It shouldn't have been possible to add login %s. It already exists!" % 'mschneider')
         except DbHelperException:
             pass
+        try:
+            self.db.add_user_account(a_login='mygod', a_password='plop',
+                                     a_person_id=999999999)
+            TestCase.fail(self, "It shouldn't have been possible to add login %s. : associated person does not exist")
+        except DbHelperException:
+            pass
+        person2 = self.db.add_person(p_first_name='Marc', p_last_name='DELAMAIN',
+                                     p_birthdate=datetime.date(1981, 4, 24))
         user2 = self.db.add_user_account(a_login='lonely', a_password='boy',
-                                         a_is_admin=True, a_skin_used='myskin')
+                                         a_person_id=person2.id, a_is_admin=True)
+        person3 = self.db.add_person(p_first_name='Ali', p_last_name='CANTE',
+                                     p_birthdate=datetime.date(1945, 4, 18))
+        assert len(self.db.list_persons()) == 3
         user3 = self.db.add_user_account(a_login='domo', a_password='gik',
-                                         a_is_admin=True)
+                                         a_person_id=person3.id, a_is_admin=True)
+        assert len(self.db.list_user_accounts()) == 3
         for user_acc in self.db.list_user_accounts():
             assert user_acc.password == None
-        person1 = self.db.add_person(p_first_name='Marc', p_last_name='SCHNEIDER',
-                                     p_birthdate=datetime.date(1973, 4, 24),
-                                     p_user_account_id = user1.id)
-        try:
-            self.db.add_person(p_first_name='Marc', p_last_name='SCHNEIDER',
-                               p_birthdate=datetime.date(1973, 4, 24),
-                               p_user_account_id=99999999999)
-            TestCase.fail(self, "An exception should have been raised : \
-                          account id does not exist")
-        except DbHelperException:
-            pass
-        person2 = self.db.add_person(p_first_name='Monthy', p_last_name='PYTHON',
-                                     p_birthdate=datetime.date(1981, 4, 24))
-        assert len(self.db.list_persons()) == 2
-        assert len(self.db.list_user_accounts()) == 3
 
     def testUpdate(self):
-        user_acc = self.db.add_user_account(a_login='mschneider',
-                                            a_password='IwontGiveIt',
-                                            a_is_admin=True)
-        user_acc_u = self.db.update_user_account(
-                        a_id=user_acc.id,
-                        a_new_login='mschneider2', a_password='ItWasWrong',
-                        a_is_admin=False)
-        assert user_acc_u.password is None
-        user_acc_msc = self.db.get_user_account_by_login_and_pass(
-                        'mschneider2', 'ItWasWrong')
-        assert user_acc_msc is not None
-        assert user_acc_u.is_admin == False
         person = self.db.add_person(p_first_name='Marc', p_last_name='SCHNEIDER',
-                                    p_birthdate=datetime.date(1973, 4, 24),
-                                    p_user_account_id=user_acc.id)
+                                    p_birthdate=datetime.date(1973, 4, 24))
         person_u = self.db.update_person(p_id=person.id, p_first_name='Marco',
                                          p_last_name='SCHNEIDERO',
-                                         p_birthdate=datetime.date(1981, 4, 24),
-                                         p_user_account_id=user_acc_u.id)
+                                         p_birthdate=datetime.date(1981, 4, 24))
+        assert person_u.birthdate == datetime.date(1981, 4, 24)
+        assert person_u.last_name == 'SCHNEIDERO'
+        assert person_u.first_name == 'Marco'
+        user_acc = self.db.add_user_account(a_login='mschneider',
+                                            a_password='IwontGiveIt',
+                                            a_person_id=person_u.id, a_is_admin=True)
+        assert self.db.change_password('mschneider', 'IwontGiveIt', 'OkIWill')
+        assert not self.db.change_password('mschneider', 'DontKnow', 'foo')
+        user_acc_u = self.db.update_user_account(a_id=user_acc.id, a_new_login='mschneider2',
+                                                 a_is_admin=False)
+        assert user_acc_u.password is None
+        user_acc_msc = self.db.get_user_account_by_login_and_pass('mschneider2', 'OkIWill')
+        assert user_acc_msc is not None
+        assert not user_acc_u.is_admin
         try:
-            self.db.update_person(p_id=person.id,
-                                  p_user_account_id=99999999999)
-            TestCase.fail(self, "An exception should have been raised : \
-                          account id does not exist")
+            self.db.update_user_account(a_id=user_acc.id, a_person_id=999999999)
+            TestCase.fail(self, "An exception should have been raised : person id does not exist")
         except DbHelperException:
             pass
-        assert person_u.first_name == 'Marco'
-        assert person_u.last_name == 'SCHNEIDERO'
-        assert person_u.birthdate == datetime.date(1981, 4, 24)
-        assert person_u.user_account_id == user_acc_u.id
-        person_u = self.db.update_person(p_id=person.id, p_user_account_id='')
-        assert person_u.user_account_id == None
 
     def testGet(self):
-        user1 = self.db.add_user_account(a_login='mschneider',
-                                         a_password='IwontGiveIt', a_is_admin=True)
-        user2 = self.db.add_user_account(a_login='lonely', a_password='boy',
-                                         a_is_admin = True, a_skin_used='myskin')
-        user3 = self.db.add_user_account(a_login='domo', a_password='gik',
-                                         a_is_admin=True)
         person1 = self.db.add_person(p_first_name='Marc', p_last_name='SCHNEIDER',
-                                     p_birthdate=datetime.date(1973, 4, 24),
-                                     p_user_account_id = user1.id)
-        person2 = self.db.add_person(p_first_name='Monthy',
-                                     p_last_name='PYTHON',
+                                     p_birthdate=datetime.date(1973, 4, 24))
+        person2 = self.db.add_person(p_first_name='Monthy', p_last_name='PYTHON',
                                      p_birthdate=datetime.date(1981, 4, 24))
+        person3 = self.db.add_person(p_first_name='Alberto', p_last_name='MATE',
+                                     p_birthdate=datetime.date(1947, 8, 6))
+        user1 = self.db.add_user_account(a_login='mschneider', a_password='IwontGiveIt',
+                                         a_person_id=person1.id, a_is_admin=True)
+        user2 = self.db.add_user_account(a_login='lonely', a_password='boy',
+                                         a_person_id=person2.id, a_is_admin=True)
+        assert self.db.get_user_account_by_person(person3.id) is None
         user_acc = self.db.get_user_account(user1.id)
         assert user_acc.login == 'mschneider'
         assert user_acc.password == None
+        assert user_acc.person.last_name == 'SCHNEIDER'
         user_acc = self.db.get_user_account_by_login('mschneider')
         assert user_acc is not None
         assert user_acc.password == None
@@ -1382,56 +1376,41 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
         assert user_acc.password == None
         assert self.db.get_person(person1.id).first_name == 'Marc'
         assert self.db.get_person(person2.id).last_name == 'PYTHON'
-        assert self.db.get_person_by_user_account(user1.id) is not None
-        assert self.db.get_person_by_user_account(user1.id).first_name == 'Marc'
-        assert self.db.get_person_by_user_account(user3.id) is None
 
     def testDel(self):
-        user1 = self.db.add_user_account(a_login='mschneider', a_password='IwontGiveIt',
-                                         a_is_admin=True)
-        user2 = self.db.add_user_account(a_login='lonely', a_password='boy',
-                                         a_is_admin=True, a_skin_used='myskin')
-        user3 = self.db.add_user_account(a_login='domo', a_password='gik',
-                                         a_is_admin=True)
-        person1 = self.db.add_person(p_first_name='Marc',
-                                     p_last_name='SCHNEIDER',
-                                     p_birthdate=datetime.date(1973, 4, 24),
-                                     p_user_account_id = user1.id)
-        person2 = self.db.add_person(p_first_name='Monthy',
-                                     p_last_name='PYTHON',
+        person1 = self.db.add_person(p_first_name='Marc', p_last_name='SCHNEIDER',
+                                     p_birthdate=datetime.date(1973, 4, 24))
+        person2 = self.db.add_person(p_first_name='Monthy', p_last_name='PYTHON',
                                      p_birthdate=datetime.date(1981, 4, 24))
-        user_temp = self.db.add_user_account(a_login='fantom', a_password='as',
-                                             a_is_admin = False)
-        user_temp_id = user_temp.id
-        user_acc_del = self.db.del_user_account(user_temp.id)
-        assert user_acc_del.id == user_temp.id
+        person3 = self.db.add_person(p_first_name='Alberto', p_last_name='MATE',
+                                     p_birthdate=datetime.date(1947, 8, 6))
+        user1 = self.db.add_user_account(a_login='mschneider', a_password='IwontGiveIt',
+                                         a_person_id=person1.id)
+        user2 = self.db.add_user_account(a_login='lonely', a_password='boy',
+                                         a_person_id=person2.id)
+        user3 = self.db.add_user_account(a_login='domo', a_password='gik',
+                                         a_person_id=person3.id)
+        user3_id = user3.id
+        user_acc_del = self.db.del_user_account(user3.id)
+        assert user_acc_del.id == user3_id
+        assert len(self.db.list_persons()) == 3
         l_user = self.db.list_user_accounts()
-        assert len(l_user) > 0
+        assert len(l_user) == 2
         for user in l_user:
-            assert user.login != 'fantom'
+            assert user.login != 'domo'
         person1_id = person1.id
         person_del = self.db.del_person(person1.id)
         assert person_del.id == person1_id
-        found_person2 = False
-        for person in self.db.list_persons():
-            assert person.id != person1.id
-            found_person2 = (person.id == person2.id)
-        assert found_person2
-        # Make sure associated user account has been deleted
-        l_user = self.db.list_user_accounts()
-        assert len(l_user) > 0
-        for user in l_user:
-            assert user.login != 'mschneider'
+        assert len(self.db.list_persons()) == 2
+        assert len(self.db.list_user_accounts()) == 1
         try:
             self.db.del_person(12345678910)
-            TestCase.fail(self, "Person does not exist, an exception should "
-                               +"have been raised")
+            TestCase.fail(self, "Person does not exist, an exception should have been raised")
         except DbHelperException:
             pass
         try:
             self.db.del_user_account(12345678910)
-            TestCase.fail(self, "User account does not exist, an exception "
-                               +"should have been raised")
+            TestCase.fail(self, "User account does not exist, an exception should have been raised")
         except DbHelperException:
             pass
 
@@ -1517,23 +1496,26 @@ class UIItemConfigTestCase(GenericTestCase):
         assert len(self.db.list_all_ui_item_config()) == 0
 
     def testAdd(self):
-        ui_config = self.db.set_ui_item_config('area', 2, 'icon',
-                                                      'basement')
+        ui_config = self.db.set_ui_item_config('area', 2, 'icon', 'basement')
+        assert ui_config.name == 'area'
+        assert ui_config.reference == '2'
+        assert ui_config.key == 'icon'
+        assert ui_config.value == 'basement'
         print ui_config
         self.db.set_ui_item_config('room', 1, 'icon', 'kitchen')
         self.db.set_ui_item_config('room', 4, 'icon', 'bathroom')
         self.db.set_ui_item_config('room', 4, 'param_r2', 'value_r2')
         ui_config_list_all = self.db.list_all_ui_item_config()
         assert len(ui_config_list_all) == 4, len(ui_config_list_all)
-        assert len(self.db.list_ui_item_config_by_key(ui_item_name='room', ui_key='icon')) == 2
+        assert len(self.db.list_ui_item_config_by_key(ui_item_name='room', ui_item_key='icon')) == 2
         ui_config_list_r = self.db.list_ui_item_config_by_ref(ui_item_name='room', ui_item_reference=4)
         assert len(ui_config_list_r) == 2 \
-               and ui_config_list_r[0].item_name == 'room' \
-               and ui_config_list_r[0].item_reference == '4' \
+               and ui_config_list_r[0].name == 'room' \
+               and ui_config_list_r[0].reference == '4' \
                and ui_config_list_r[0].key == 'icon' \
                and ui_config_list_r[0].value == 'bathroom' \
-               and ui_config_list_r[1].item_name == 'room' \
-               and ui_config_list_r[1].item_reference == '4' \
+               and ui_config_list_r[1].name == 'room' \
+               and ui_config_list_r[1].reference == '4' \
                and ui_config_list_r[1].key == 'param_r2' \
                and ui_config_list_r[1].value == 'value_r2', "%s" % ui_config_list_r
         uic = self.db.get_ui_item_config('room', 4, 'param_r2')
@@ -1548,6 +1530,8 @@ class UIItemConfigTestCase(GenericTestCase):
         self.db.set_ui_item_config('room', 1, 'param_r2', 'value_r2')
         uic = self.db.set_ui_item_config('area', 1, 'icon', 'first_floor')
         assert uic.value == 'first_floor'
+        self.db.set_ui_item_config('room', 1, 'icon', 'kitchen')
+        assert self.db.get_ui_item_config('room', 1, 'icon').value == 'kitchen'
 
     def testListAndGet(self):
         self.db.set_ui_item_config('area', 1, 'icon', 'basement')
@@ -1558,7 +1542,7 @@ class UIItemConfigTestCase(GenericTestCase):
         assert len(self.db.list_ui_item_config(ui_item_name='room')) == 3
         assert len(self.db.list_ui_item_config_by_ref(ui_item_name='room', ui_item_reference=1)) == 2
         item=self.db.get_ui_item_config(ui_item_name='room',
-                                        ui_item_reference=2, ui_key='icon')
+                                        ui_item_reference=2, ui_item_key='icon')
         assert item.value == 'kitchen'
 
     def testDel(self):
@@ -1577,7 +1561,7 @@ class UIItemConfigTestCase(GenericTestCase):
         self.db.set_ui_item_config('room', 2, 'pr1', 'vr1')
         self.db.delete_ui_item_config(ui_item_name='area', ui_item_reference=2)
         assert len(self.db.list_ui_item_config(ui_item_name='area')) == 0
-        self.db.delete_ui_item_config(ui_item_name='room', ui_key='icon')
+        self.db.delete_ui_item_config(ui_item_name='room', ui_item_key='icon')
         ui_item_list = self.db.list_ui_item_config(ui_item_name='room')
         assert len(ui_item_list) == 1
         assert ui_item_list[0].key == 'pr1'
