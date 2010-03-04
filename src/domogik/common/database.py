@@ -1604,18 +1604,10 @@ class DbHelper():
         @param p_id : The person id
         @return a UserAccount object
         """
-        person = self._session.query(Person).filter_by(id=p_id).first()
-        if person is not None:
-            try:
-                user_acc = self._session.query(UserAccount)\
-                                        .filter_by(id=person.user_account_id)\
-                                        .one()
-                user_acc.password = None
-                return user_acc
-            except MultipleResultsFound:
-                raise DbHelperException("Database may be incoherent, person with id %s has more than one account" % p_id)
-        else:
-            return None
+        user = self._session.query(UserAccount).filter_by(person_id=p_id).first()
+        if user is not None:
+            user.password = None
+        return user
 
     def authenticate(self, a_login, a_password):
         """
@@ -1634,12 +1626,13 @@ class DbHelper():
                 return True
         return False
 
-    def add_user_account(self, a_login, a_password, a_is_admin=False,
+    def add_user_account(self, a_login, a_password, a_person_id, a_is_admin=False,
                          a_skin_used='skins/default'):
         """
         Add a user account
         @param a_login : Account login
         @param a_password : Account clear text password (will be hashed in sha256)
+        @param a_person_id : id of the person associated to the account
         @param a_is_admin : True if it is an admin account, False otherwise (optional, default=False)
         @return the new UserAccount object or raise a DbHelperException if it already exists
         """
@@ -1647,8 +1640,12 @@ class DbHelper():
         user_account = self._session.query(UserAccount).filter_by(login=a_login).first()
         if user_account is not None:
             raise DbHelperException("Error %s login already exists" % a_login)
+        person = self._session.query(Person).filter_by(id=a_person_id).first()
+        if person is None:
+            raise DbHelperException("Person id '%s' does not exist" % a_person_id)
         user_account = UserAccount(login=a_login,
                                    password=self.__make_crypted_password(a_password),
+                                   person_id=a_person_id,
                                    is_admin=a_is_admin, skin_used=a_skin_used)
         self._session.add(user_account)
         try:
@@ -1659,11 +1656,13 @@ class DbHelper():
         user_account.password = None
         return user_account
 
-    def update_user_account(self, a_id, a_new_login=None, a_is_admin=None, a_skin_used=None):
+    def update_user_account(self, a_id, a_new_login=None, a_person_id=None,
+                            a_is_admin=None, a_skin_used=None):
         """
         Update a user account
         @param a_id : Account id to be updated
         @param a_new_login : The new login (optional)
+        @param a_person_id : id of the person associated to the account
         @param a_is_admin : True if it is an admin account, False otherwise (optional)
         @return a UserAccount object
         """
@@ -1673,6 +1672,11 @@ class DbHelper():
             raise DbHelperException("UserAccount with id %s couldn't be found" % a_id)
         if a_new_login is not None:
             user_acc.login = a_new_login
+        if a_person_id is not None:
+            person = self._session.query(Person).filter_by(id=a_person_id).first()
+            if person is None:
+                raise DbHelperException("Person id '%s' does not exist" % a_person_id)
+            user_acc.person_id = a_person_id
         if a_is_admin is not None:
             user_acc.is_admin = a_is_admin
         if a_skin_used is not None:
@@ -1722,8 +1726,10 @@ class DbHelper():
         Add a default user account (login = admin, password = domogik, is_admin = True)
         @return a UserAccount object
         """
+        person = self.add_person(p_first_name='Admin', p_last_name='Admin',
+                                 p_birthdate=datetime.date(1900, 01, 01))
         return self.add_user_account(a_login='admin', a_password='123',
-                                     a_is_admin=True)
+                                     a_person_id=person.id, a_is_admin=True)
 
     def del_user_account(self, a_id):
         """
@@ -1763,23 +1769,7 @@ class DbHelper():
         """
         return self._session.query(Person).filter_by(id=p_id).first()
 
-    def get_person_by_user_account(self, u_id):
-        """
-        Return a person associated to a user account, if existing
-        @param u_id : the user account id
-        @return a Person object or None
-        """
-        try:
-            return self._session.query(Person)\
-                                .filter_by(user_account_id=u_id).one()
-        except NoResultFound:
-            return None
-        except MultipleResultsFound:
-            raise DbHelperException("Database may be incoherent, person with \
-                                    id %s has more than one account" % u_id)
-
-    def add_person(self, p_first_name, p_last_name, p_birthdate,
-                   p_user_account_id=None):
+    def add_person(self, p_first_name, p_last_name, p_birthdate):
         """
         Add a person
         @param p_first_name     : first name
@@ -1789,15 +1779,8 @@ class DbHelper():
         @return the new Person object
         """
         self._session.expire_all()
-        if p_user_account_id is not None:
-            try:
-                self._session.query(UserAccount)\
-                             .filter_by(id=p_user_account_id).one()
-            except NoResultFound:
-                raise DbHelperException("Couldn't add person with account id %s : it doesn't exist" % p_user_account_id)
         person = Person(first_name=p_first_name, last_name=p_last_name,
-                        birthdate=p_birthdate,
-                        user_account_id=p_user_account_id)
+                        birthdate=p_birthdate)
         self._session.add(person)
         try:
             self._session.commit()
@@ -1807,14 +1790,13 @@ class DbHelper():
         return person
 
     def update_person(self, p_id, p_first_name=None, p_last_name=None,
-                      p_birthdate=None, p_user_account_id=None):
+                      p_birthdate=None):
         """
         Update a person
         @param p_id             : person id to be updated
         @param p_first_name     : first name (optional)
         @param p_last_name      : last name (optional)
         @param p_birthdate      : birthdate (optional)
-        @param p_user_account   : person account on the user (optional)
         @return a Person object
         """
         self._session.expire_all()
@@ -1827,16 +1809,6 @@ class DbHelper():
             person.last_name = p_last_name
         if p_birthdate is not None:
             person.birthdate = p_birthdate
-        if p_user_account_id is not None:
-            if p_user_account_id != '':
-                try:
-                    self._session.query(UserAccount)\
-                                 .filter_by(id=p_user_account_id).one()
-                except NoResultFound:
-                    raise DbHelperException("Couldn't find account id %s It does not exist" % p_user_account_id)
-            else:
-                p_user_account_id = None
-            person.user_account_id = p_user_account_id
         self._session.add(person)
         try:
             self._session.commit()
@@ -1854,8 +1826,9 @@ class DbHelper():
         self._session.expire_all()
         person = self._session.query(Person).filter_by(id=p_id).first()
         if person is not None:
-            if person.user_account_id is not None:
-                self.del_user_account(person.user_account_id)
+            user = self._session.query(UserAccount).filter_by(person_id=p_id).first()
+            if user is not None:
+                self._session.delete(user)
             person_d = person
             self._session.delete(person)
             try:

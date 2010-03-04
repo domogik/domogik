@@ -676,47 +676,6 @@ class Trigger(Base):
         return Trigger.__tablename__
 
 
-class UserAccount(Base):
-    """
-    User account for persons : it is only used by the UI
-    """
-    __tablename__ = '%s_user_account' % _db_prefix
-    id = Column(Integer, primary_key=True)
-    login = Column(String(20), nullable=False, unique=True)
-    password = Column(Text, nullable=False)
-    is_admin = Column(Boolean, nullable=False, default=False)
-    skin_used = Column(String(80), nullable=False)
-
-    def __init__(self, login, password, is_admin, skin_used):
-        """
-        Class constructor
-        @param login : login
-        @param password : password
-        @param is_admin : True if the user has administrator privileges
-        @param skin_used : skin used in the UI (default value = 'default')
-        """
-        self.login = login
-        self.password = password
-        self.is_admin = is_admin
-        self.skin_used = skin_used
-
-    def __repr__(self):
-        """
-        Print an internal representation of the class
-        @return an internal representation
-        """
-        return "<UserAccount(id=%s, login='%s', is_admin='%s')>" \
-               % (self.id, self.login, self.is_admin)
-
-    @staticmethod
-    def get_tablename():
-        """
-        Return the table name associated to the class
-        @return table name
-        """
-        return UserAccount.__tablename__
-
-
 class Person(Base):
     """
     Persons registered in the app
@@ -726,29 +685,24 @@ class Person(Base):
     first_name = Column(String(50), nullable=False)
     last_name = Column(String(60), nullable=False)
     birthdate = Column(Date, nullable=False)
-    user_account_id = Column(Integer,
-                             ForeignKey('%s.id' % UserAccount.get_tablename()))
-    user_account = relation(UserAccount, backref=backref(__tablename__))
 
-    def __init__(self, first_name, last_name, birthdate, user_account_id):
+    def __init__(self, first_name, last_name, birthdate):
         """
         Class constructor
         @param first_name : first name
         @param last_name : last name
         @param birthdate : birthdate
-        @param user_account_id : link to the user account (optional)
         """
         self.first_name = first_name
         self.last_name = last_name
         self.birthdate = birthdate
-        self.user_account_id = user_account_id
 
     def __repr__(self):
         """
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<Person(id=%s, first_name='%s', last_name='%s', user_account=%s)>" % (self.id, self.first_name, self.last_name, self.user_account)
+        return "<Person(id=%s, first_name='%s', last_name='%s')>" % (self.id, self.first_name, self.last_name)
 
     @staticmethod
     def get_tablename():
@@ -757,6 +711,50 @@ class Person(Base):
         @return table name
         """
         return Person.__tablename__
+
+
+class UserAccount(Base):
+    """
+    User account for persons : it is only used by the UI
+    """
+    __tablename__ = '%s_user_account' % _db_prefix
+    id = Column(Integer, primary_key=True)
+    login = Column(String(20), nullable=False, unique=True)
+    password = Column(Text, nullable=False)
+    person_id = Column(Integer, ForeignKey('%s.id' % Person.get_tablename()))
+    person = relation(Person, backref=backref(__tablename__))
+    is_admin = Column(Boolean, nullable=False, default=False)
+    skin_used = Column(String(80), nullable=False)
+
+    def __init__(self, login, password, is_admin, skin_used, person_id):
+        """
+        Class constructor
+        @param login : login
+        @param password : password
+        @param person_id : id of the person associated to this account
+        @param is_admin : True if the user has administrator privileges
+        @param skin_used : skin used in the UI (default value = 'default')
+        """
+        self.login = login
+        self.password = password
+        self.person_id = person_id
+        self.is_admin = is_admin
+        self.skin_used = skin_used
+
+    def __repr__(self):
+        """
+        Print an internal representation of the class
+        @return an internal representation
+        """
+        return "<UserAccount(id=%s, login='%s', is_admin=%s, person=%s)>" % (self.id, self.login, self.is_admin, self.person)
+
+    @staticmethod
+    def get_tablename():
+        """
+        Return the table name associated to the class
+        @return table name
+        """
+        return UserAccount.__tablename__
 
 
 class SystemStats(Base):
