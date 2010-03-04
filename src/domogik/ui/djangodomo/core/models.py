@@ -206,6 +206,6 @@ class Accounts(pipes.DmgPipe):
     
     @staticmethod
     def getAll():
-        resp = Accounts.objects.get({'parameters':"list/"})
+        resp = Accounts.objects.get({'parameters':"user/list/"})
         if resp :
             return resp
