@@ -117,6 +117,8 @@ schemas
 \tExample (x10): ./sendXPL.py xpl-cmnd x10.basic "device=a1,command=on"
 """
 
+def main():
+    Sender()
 
 if __name__ == "__main__":
-    Sender()
+    main()
