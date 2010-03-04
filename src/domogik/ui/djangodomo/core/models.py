@@ -96,7 +96,7 @@ class Rooms(pipes.DmgPipe):
     
     @staticmethod
     def getWithoutArea():
-        resp = Rooms.objects.get({'parameters':"list/by-area/null"})
+        resp = Rooms.objects.get({'parameters':"list/by-area//"})
         if resp :
             return resp
 
@@ -131,7 +131,7 @@ class Devices(pipes.DmgPipe):
     
     @staticmethod
     def getWithoutRoom():
-        resp = Devices.objects.get({'parameters':"list/by-room/null"})
+        resp = Devices.objects.get({'parameters':"list/by-room//"})
         if resp :
             return resp
 

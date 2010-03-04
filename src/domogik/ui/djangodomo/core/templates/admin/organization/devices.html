@@ -111,7 +111,7 @@
                     function(data) {
                         var status = (data.status).toLowerCase();
                         if (status == 'ok') {
-                            $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "New device added" %} \'' + data.room[0].name + '\''});                                   
+                            $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "New device added" %} \'' + data.device[0].name + '\''});                                   
                         } else {
                             $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "device not created" %} (' + data.description + ')'});                                                                      
                         }
@@ -139,15 +139,23 @@
         <div id="tabs">
             {% spaceless %}
             <ul>
-                {% regroup devices_list|dictsort:"room" by room as rooms_list2 %}
+                {% regroup devices_list|dictsort:"room_id" by room as rooms_list2 %}
                 {% for room in rooms_list2 %}
-                    <li><a id="tab{{ room.grouper.id }}" href="#element{{ room.grouper.id }}" class="icon16-room-{{ room.grouper.config.icon }}">{{ room.grouper.name }}</a></li>
+                    {% if room.grouper.id %}
+                        <li><a id="tab{{ room.grouper.id }}" href="#element{{ room.grouper.id }}" class="icon16-room-{{ room.grouper.config.icon }}">{{ room.grouper.name }}</a></li>
+                    {% else %}
+                        <li><a id="tab0" href="#element0" class="icon16-room-">{% trans "Unattribued" %}</a></li>
+                    {% endif %}
                 {% endfor %}
             </ul>
             {% endspaceless %}
             {% regroup devices_list|dictsort:"room" by room as rooms_list2 %}
             {% for room in rooms_list2 %}
-            <div id="element{{ room.id }}" class="tabelement">
+                {% if room.grouper.id %}
+                    <div id="element{{ room.grouper.id }}" class="tabelement">
+                {% else %}
+                    <div id="element0" class="tabelement">
+                {% endif %}
                 <table>
                     <tr>
                         <th>{% trans "Name" %}</th>
