@@ -47,6 +47,7 @@ from xml.dom import minidom
 import time
 import urllib
 import sys
+import locale
 from socket import gethostname
 from Queue import *
 from domogik.xpl.lib.queryconfig import Query
@@ -84,7 +85,7 @@ class Rest(xPLModule):
         log = logger.Logger('REST')
         self._log = log.get_logger()
         self._log.info("Rest Server initialisation...")
-
+        self._log.debug("locale : %s %s" % locale.getdefaultlocale())
         # DB Helper
         self._db = DbHelper()
 
@@ -2708,7 +2709,7 @@ class JSonHelper():
 
         if self._jsonp is True and self._jsonp_cb != "":
             json_buf += ")"
-        print json_buf
+        print json_buf.encode("utf-8")
         return json_buf
         
     
