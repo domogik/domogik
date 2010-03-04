@@ -1318,7 +1318,12 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
         assert len(self.db.list_persons()) == 3
         user3 = self.db.add_user_account(a_login='domo', a_password='gik',
                                          a_person_id=person3.id, a_is_admin=True)
-        assert len(self.db.list_user_accounts()) == 3
+        user4 = self.db.add_user_account_with_person('jsteed', 'theavengers', 'John', 'STEED')
+        assert user4.login == 'jsteed'
+        assert user4.password is None
+        assert user4.person.first_name == 'John'
+        assert user4.person.last_name == 'STEED'
+        assert len(self.db.list_user_accounts()) == 4
         for user_acc in self.db.list_user_accounts():
             assert user_acc.password == None
 

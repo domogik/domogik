@@ -1657,6 +1657,22 @@ class DbHelper():
         user_account.password = None
         return user_account
 
+    def add_user_account_with_person(self, a_login, a_password, a_person_first_name,
+                                     a_person_last_name, a_person_birthdate=None,
+                                     a_is_admin=False, a_skin_used='skins/default'):
+        """
+        Add a user account and a person
+        @param a_login : Account login
+        @param a_password : Account clear text password (will be hashed in sha256)
+        @param a_person_first_name : first name of the person associated to the account
+        @param a_person_last_name : last name of the person associated to the account
+        @param a_person_birthdate : birthdate of the person associated to the account, optional
+        @param a_is_admin : True if it is an admin account, False otherwise (optional, default=False)
+        @return the new UserAccount object or raise a DbHelperException if it already exists
+        """
+        person = self.add_person(a_person_first_name, a_person_last_name, a_person_birthdate)
+        return self.add_user_account(a_login, a_password, person.id, a_is_admin, a_skin_used)
+
     def update_user_account(self, a_id, a_new_login=None, a_person_id=None,
                             a_is_admin=None, a_skin_used=None):
         """
