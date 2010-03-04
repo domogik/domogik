@@ -1512,16 +1512,16 @@ target=*
         elif name != None and reference != None:
             if key == None:
                 # by-reference
-                for ui_item_config in self._db.list_ui_item_config_by_ref(ui_name = name, ui_reference = reference):
+                for ui_item_config in self._db.list_ui_item_config_by_ref(ui_item_name = name, ui_item_reference = reference):
                     json_data.add_data(ui_item_config)
             else:
                 # by-key
-                for ui_item_config in self._db.list_ui_item_config_by_key(ui_name = name, ui_key= key):
+                for ui_item_config in self._db.list_ui_item_config_by_key(ui_item_name = name, ui_item_key= key):
                     json_data.add_data(ui_item_config)
         elif name != None and key != None and reference != None:
             # by-element
-            ui_item_config = self._db.get_ui_item_config(self, ui_name = name, \
-                                                         ui_reference = reference, ui_key = key)
+            ui_item_config = self._db.get_ui_item_config(self, ui_item_name = name, \
+                                                         ui_item_reference = reference, ui_key = key)
             if ui_item_config is not None:
                 json_data.add_data(ui_item_config)
         self.send_http_response_ok(json_data.get())
