@@ -348,9 +348,9 @@ def admin_organization_devices(request):
     try:
         resultAllDevices = Devices.getAll()
         resultAllDevices.merge_uiconfig()
-#        resultUnattribuedDevices = Devices.getWithoutRoom()
-#        resultAllRooms = Rooms.getAllWithDevices()
-#        resultAllRooms.merge_uiconfig()
+        resultUnattribuedDevices = Devices.getWithoutRoom()
+        resultAllRooms = Rooms.getAllWithDevices()
+        resultAllRooms.merge_uiconfig()
         resultAllUsages = DeviceUsages.getAll()
         resultAllTypes = DeviceTypes.getAll()
 
@@ -365,8 +365,8 @@ def admin_organization_devices(request):
         nav2_organization_devices = "selected",
         status=status,
         msg=msg,
-#        unattribued_devices=resultUnattribuedDevices.device,
-#        rooms_list=resultAllRooms.room,
+        unattribued_devices=resultUnattribuedDevices.device,
+        rooms_list=resultAllRooms.room,
         devices_list=resultAllDevices.device,
         usages_list=resultAllUsages.device_usage,
         types_list=resultAllTypes.device_type
