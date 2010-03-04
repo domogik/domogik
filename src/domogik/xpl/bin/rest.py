@@ -2462,7 +2462,6 @@ target=*
         try:
             account = self._db.update_user_account(self.get_parameters("id"), \
                                                 self.get_parameters("login"), \
-                                                self.get_parameters("password"), \
                                                 self.get_parameters("is_admin"), \
                                                 self.get_parameters("skin_used"))
             json_data.add_data(account)
