@@ -166,7 +166,7 @@ class GenericTestCase(unittest.TestCase):
         @param db : db API instance
         """
         for uic in db.list_all_ui_item_config():
-            db.delete_ui_item_config(uic.item_name, uic.item_reference, uic.key)
+            db.delete_ui_item_config(uic.name, uic.reference, uic.key)
 
 
 class AreaTestCase(GenericTestCase):
@@ -1525,15 +1525,15 @@ class UIItemConfigTestCase(GenericTestCase):
         self.db.set_ui_item_config('room', 4, 'param_r2', 'value_r2')
         ui_config_list_all = self.db.list_all_ui_item_config()
         assert len(ui_config_list_all) == 4, len(ui_config_list_all)
-        assert len(self.db.list_ui_item_config_by_key(ui_item_name='room', ui_key='icon')) == 2
+        assert len(self.db.list_ui_item_config_by_key(ui_item_name='room', ui_item_key='icon')) == 2
         ui_config_list_r = self.db.list_ui_item_config_by_ref(ui_item_name='room', ui_item_reference=4)
         assert len(ui_config_list_r) == 2 \
-               and ui_config_list_r[0].item_name == 'room' \
-               and ui_config_list_r[0].item_reference == '4' \
+               and ui_config_list_r[0].name == 'room' \
+               and ui_config_list_r[0].reference == '4' \
                and ui_config_list_r[0].key == 'icon' \
                and ui_config_list_r[0].value == 'bathroom' \
-               and ui_config_list_r[1].item_name == 'room' \
-               and ui_config_list_r[1].item_reference == '4' \
+               and ui_config_list_r[1].name == 'room' \
+               and ui_config_list_r[1].reference == '4' \
                and ui_config_list_r[1].key == 'param_r2' \
                and ui_config_list_r[1].value == 'value_r2', "%s" % ui_config_list_r
         uic = self.db.get_ui_item_config('room', 4, 'param_r2')
@@ -1558,7 +1558,7 @@ class UIItemConfigTestCase(GenericTestCase):
         assert len(self.db.list_ui_item_config(ui_item_name='room')) == 3
         assert len(self.db.list_ui_item_config_by_ref(ui_item_name='room', ui_item_reference=1)) == 2
         item=self.db.get_ui_item_config(ui_item_name='room',
-                                        ui_item_reference=2, ui_key='icon')
+                                        ui_item_reference=2, ui_item_key='icon')
         assert item.value == 'kitchen'
 
     def testDel(self):
@@ -1577,7 +1577,7 @@ class UIItemConfigTestCase(GenericTestCase):
         self.db.set_ui_item_config('room', 2, 'pr1', 'vr1')
         self.db.delete_ui_item_config(ui_item_name='area', ui_item_reference=2)
         assert len(self.db.list_ui_item_config(ui_item_name='area')) == 0
-        self.db.delete_ui_item_config(ui_item_name='room', ui_key='icon')
+        self.db.delete_ui_item_config(ui_item_name='room', ui_item_key='icon')
         ui_item_list = self.db.list_ui_item_config(ui_item_name='room')
         assert len(ui_item_list) == 1
         assert ui_item_list[0].key == 'pr1'
