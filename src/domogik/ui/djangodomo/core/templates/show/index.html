@@ -22,9 +22,6 @@
 {% load i18n %}
 {% block js_script %}
 // <![CDATA[
-    $(function(){
-		$(".extended").hide();
-    });
 // ]]>
 {% endblock %}
 
@@ -51,13 +48,10 @@
 					<script type="text/javascript">
 					// <![CDATA[
 						$(function() {
-                            $("#openextended_{{ area.id }}").click(function() {
-                                $(".extended").hide();
-                                $("#extended_{{ area.id }}").show();
-                            });
-                            $("#closeextended_{{ area.id }}").click(function() {
-                                $("#extended_{{ area.id }}").hide();                                    
-                            });
+							$("#extended_{{ area.id }}").leftpanel({
+								closetext: "Close",
+								openbutton: "#openextended_{{ area.id }}",
+							});
 						});
 					// ]]>
 					</script>
@@ -78,7 +72,6 @@
                         <div class='footer'><button class='button_bottomright' id='openextended_{{ area.id }}'>Full commands</button></div>
 					</div>
 					<div class='extended' id='extended_{{ area.id }}'>
-						<button class='leftpanelbutton' id='closeextended_{{ area.id }}'>Close</button>
 					</div>
 				</div>
 		{% if forloop.counter0|divisibleby:"3" %}

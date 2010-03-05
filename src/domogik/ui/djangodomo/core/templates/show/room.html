@@ -22,9 +22,6 @@
 {% load i18n %}
 {% block js_script %}
 // <![CDATA[
-    $(function(){
-    $(".extended").hide();
-    });
 // ]]>
 {% endblock %}
 
@@ -59,13 +56,10 @@
                     <script type="text/javascript">
                     // <![CDATA[
                         $(function() {
-                            $("#openextended_{{ device.id }}").click(function() {
-                                $(".extended").hide();
-                                $("#extended_{{ device.id }}").show();
-                            });
-                            $("#closeextended_{{ device.id }}").click(function() {
-                                $("#extended_{{ device.id }}").hide();                                    
-                            });
+							$("#extended_{{ device.id }}").leftpanel({
+								closetext: "Close",
+								openbutton: "#openextended_{{ device.id }}",
+							});
                             widgetmini_binary("widgetmini_{{ device.id }}1", "{{ device.id }}1", "light");
                             widget_binary("widget_{{ device.id }}1", "{{ device.id }}1", "light");
                             widgetmini_range("widgetmini_{{ device.id }}2", "{{ device.id }}2", "light", 0, 100, 12, '%');
@@ -93,7 +87,6 @@
                     </div>
                     
                     <div class='extended' id='extended_{{ device.id }}'>
-                        <button class='leftpanelbutton' id='closeextended_{{ device.id }}'>Close</button>
                         <h3>Commandes</h3>
                         <ul class='commands'>
                         <li>

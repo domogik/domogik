@@ -21,9 +21,8 @@
 
 {% load i18n %}
 {% block js_script %}
-    $(function(){
-		$(".extended").hide();
-    });
+// <![CDATA[
+// ]]>
 {% endblock %}
 
 {% block css %}
@@ -54,13 +53,10 @@
 					<script type="text/javascript">
 					// <![CDATA[
 						$(function() {
-                            $("#openextended_{{ room.id }}").click(function() {
-                                $(".extended").hide();
-                                $("#extended_{{ room.id }}").show();
-                            });
-                            $("#closeextended_{{ room.id }}").click(function() {
-                                $("#extended_{{ room.id }}").hide();                                    
-                            });
+							$("#extended_{{ room.id }}").leftpanel({
+								closetext: "Close",
+								openbutton: "#openextended_{{ room.id }}",
+							});
 						});
 					// ]]>
 					</script>
@@ -79,7 +75,6 @@
 					</div>
 
 					<div class='extended' id='extended_{{ room.id }}'>
-						<button class='leftpanelbutton' id='closeextended_{{ room.id }}'>Close</button>
 					</div>
 				</div>
 		{% if forloop.counter0|divisibleby:"3" %}
