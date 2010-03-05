@@ -22,7 +22,7 @@
 {% load i18n %}
 {% block js_script %}
     $(function(){
-		$(".block .extended").hide();
+		$(".extended").hide();
     });
 {% endblock %}
 
@@ -46,42 +46,44 @@
 {% endblock %}
 
 {% block content %}
-    <dl>
 {% for room in rooms_list %}
 		{% if forloop.counter0|divisibleby:"3" %}
             <div class='row'>
         {% endif %}
 				<div class='column'>
+					<script type="text/javascript">
+					// <![CDATA[
+						$(function() {
+                            $("#openextended_{{ room.id }}").click(function() {
+                                $(".extended").hide();
+                                $("#extended_{{ room.id }}").show();
+                            });
+                            $("#closeextended_{{ room.id }}").click(function() {
+                                $("#extended_{{ room.id }}").hide();                                    
+                            });
+						});
+					// ]]>
+					</script>
+
 					<div class='block'>
-						<script type="text/javascript">
-						// <![CDATA[
-							$(function() {
-								$("#button_{{ room.id }}").click(function() {
-									$(".section .extended[id!='extended_{{ room.id }}']").hide();
-									$("#extended_{{ room.id }}").toggle();
-								})
-							});
-						// ]]>
-						</script>
-						<dt class='header icon64-room-{{ room.config.icon }}'>
+						
+						<h2 class='header icon64-room-{{ room.config.icon }}'>
 							<a href='{% url show_room_view room.id %}' class="ident">
 								<span class="title">{{ room.name }}</span>
 								<br />
 								<span class="subtitle">{{ room.description }}</span>
 							</a>
-							<span class='temp icon32-device-temp'>21 &#176;C</span>
-						</dt>
-						<dd class='actions'>
-							<ul>
-							</ul>
-						</dd>
-						<dd  class='extended' id='extended_{{ room.id }}'></dd>
-						<dd class='footer'><a id='button_{{ room.id }}' href='#'>&#187;</a></dd>
+						</h2>
+							<!--span class='temp icon32-device-temp'>21 &#176;C</span-->
+                        <div class='footer'><button class='button_bottomright' id='openextended_{{ room.id }}'>Full commands</button></div>
+					</div>
+
+					<div class='extended' id='extended_{{ room.id }}'>
+						<button class='leftpanelbutton' id='closeextended_{{ room.id }}'>Close</button>
 					</div>
 				</div>
 		{% if forloop.counter0|divisibleby:"3" %}
             </div>
 		{% endif %}
 	{% endfor %}
-</dl>
 {% endblock %}

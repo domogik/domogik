@@ -23,7 +23,7 @@
 {% block js_script %}
 // <![CDATA[
     $(function(){
-		$(".block .extended").hide();
+		$(".extended").hide();
     });
 // ]]>
 {% endblock %}
@@ -43,42 +43,46 @@
 	</div>
 {% endblock %}
 {% block content %}
-	<dl>
 	{% for area in areas_list %}
 		{% if forloop.counter0|divisibleby:"3" %}
 			<div class='row'>
 		{% endif %}
 				<div class='column'>
+					<script type="text/javascript">
+					// <![CDATA[
+						$(function() {
+                            $("#openextended_{{ area.id }}").click(function() {
+                                $(".extended").hide();
+                                $("#extended_{{ area.id }}").show();
+                            });
+                            $("#closeextended_{{ area.id }}").click(function() {
+                                $("#extended_{{ area.id }}").hide();                                    
+                            });
+						});
+					// ]]>
+					</script>
+
 					<div class='block'>
-						<script type="text/javascript">
-						// <![CDATA[
-							$(function() {
-								$("#button_{{ area.id }}").click(function() {
-									$(".section .extended[id!='extended_{{ area.id }}']").hide();
-									$("#extended_{{ area.id }}").toggle();
-								});
-							});
-						// ]]>
-						</script>
-						<dt class='header icon64-area-{{ area.config.icon}}'>
+						<h2 class='header icon64-area-{{ area.config.icon}}'>
 							<a href='{% url show_area_view area.id %}' class="ident">
 								<span class="title">{{ area.name }}</span>
 								<br />
 								<span class="subtitle">{{ area.description }}</span>
 							</a>
 							<!--span class='temp icon32-device-temp'>21 &#176;C</span-->
-						</dt>
-						<dd class='actions'>
+						</h2>
+						<div class='actions'>
 							<ul>
 							</ul>
-						</dd>
-						<dd  class='extended' id='extended_{{ area.id }}'></dd>
-						<dd class='footer'><a id='button_{{ area.id }}' href='#'>&#187;</a></dd>
+						</div>
+                        <div class='footer'><button class='button_bottomright' id='openextended_{{ area.id }}'>Full commands</button></div>
+					</div>
+					<div class='extended' id='extended_{{ area.id }}'>
+						<button class='leftpanelbutton' id='closeextended_{{ area.id }}'>Close</button>
 					</div>
 				</div>
 		{% if forloop.counter0|divisibleby:"3" %}
 			</div>
 		{% endif %}
 	{% endfor %}
-	</dl>
 {% endblock %}

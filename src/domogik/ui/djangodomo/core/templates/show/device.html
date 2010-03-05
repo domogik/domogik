@@ -37,14 +37,14 @@
 {% block title %}{% trans page_title %}{% endblock %}
 
 {% block breadcrumb %}
-		<li><a href='{% url show_view %}' class='home'>My House</a></li>
-		<li><a href='{% url show_area_view area_id %}' class='icon16-area-grndfloor'>{{ area_name }}</a></li>
-		<li><a href='{% url show_room_view room_id %}' class='icon16-room-kitchen'>{{ room_name }}</a></li>
+	<li><a href='{% url show_view %}' class='home'>My House</a></li>
+	<li><a href='{% url show_area_view area_id %}' class='icon16-area-grndfloor'>{{ area_name }}</a></li>
+	<li><a href='{% url show_room_view room_id %}' class='icon16-room-kitchen'>{{ room_name }}</a></li>
 {% endblock %}
 
 {% block banner %}
     <div class="section">
-	    <h1 class="ident icon64-device-coffeemachine"><span class="title">{{ device.name }}</span></h1>
+	    <h1 class="ident icon64-usage-{{ device.usage_id }}"><span class="title">{{ device.name }}</span></h1>
 	    <ul class="actions"></ul>
     </div>
 {% endblock %}
