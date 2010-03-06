@@ -135,6 +135,12 @@ class Devices(pipes.DmgPipe):
         if resp :
             return resp
 
+    @staticmethod
+    def getByRoom(id):
+        resp = Devices.objects.get({'parameters':"list/by-room/"+id})
+        if resp :
+            return resp
+
     def merge_uiconfig(self):
         for device in self.device:
             # If is associated with room

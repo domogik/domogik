@@ -544,19 +544,18 @@ def show_room(request, room_id):
     try:
         resultRoomById = Rooms.getById(room_id)
         resultRoomById.merge_uiconfig()
+        resultDevicesByRoom = Devices.getByRoom(room_id)
         resultHouse = UIConfigs.getGeneral('house')
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
-        
-    devices_list = __db.search_devices({'room_id':room_id})
-
+    
     page_title = _("View ") + resultRoomById.room[0].name
     return __go_to_page(
         request, 'show/room.html',
         page_title,
         nav1_show = "selected",
         room=resultRoomById.room[0],
-        devices_list=devices_list,
+        devices_list=resultDevicesByRoom.device,
         house=resultHouse
     )
 
