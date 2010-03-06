@@ -185,6 +185,15 @@ class UIConfigs(pipes.DmgPipe):
         resp = UIConfigs.objects.get({'parameters':"list/by-reference/" + name + "/" + str(reference)})
         if resp :
             return resp
+
+    @staticmethod    
+    def getGeneral(reference):
+        resp = {}
+        uiconfigs = UIConfigs.objects.get({'parameters':"list/by-reference/general/" + str(reference)})
+        if uiconfigs :
+            for uiconfig in uiconfigs.ui_config:
+                resp[uiconfig.key] = uiconfig.value
+            return resp
         
 class Modules(pipes.DmgPipe):
     uri = "http://127.0.0.1:8080/module"

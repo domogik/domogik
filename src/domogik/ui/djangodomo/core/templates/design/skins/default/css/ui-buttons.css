@@ -10,6 +10,9 @@ a:hover, a:active, a:focus {
     color:#eb8f00;
 }
 
+button::-moz-focus-inner { border: 0; }
+input::-moz-focus-inner { border: 0; }
+
 /* Button */
 a.button, .button {
 	border: 1px solid #cccccc;
@@ -26,6 +29,16 @@ a.button, .button {
     margin:0;
     display:inline-block;
 	font-size: 1em;
+}
+
+.button:hover, .button.on:hover, .button.off:hover {
+	background-color:#FFFFFF;
+}
+
+.button:focus, .button.on:focus, .button.off:focus,
+.button:active, .button.on:active, .button.off:active {
+	color:#FFFFFF;
+	background-color:#9BB528;
 }
 
 .leftpanelbutton {
@@ -88,12 +101,6 @@ a.buttonicon, .buttonicon {
     margin:0;
     display:inline-block;
 	font-size: 1em;
-}
-
-.button:hover, .button.on:hover, .button.off:hover,
-.button:focus, .button.on:focus, .button.off:focus,
-.button:active, .button.on:active, .button.off:active {
-	background-color:#FFFFFF;
 }
 
 a.buttonsmall {

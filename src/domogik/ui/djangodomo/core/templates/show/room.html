@@ -34,7 +34,7 @@
 {% block title %}{% trans page_title %}{% endblock %}
 
 {% block breadcrumb %}
-    <li><a href='{% url show_view %}' class='home'>My House</a></li>
+    <li><a href='{% url show_view %}' class='home'>{{ house.name }}</a></li>
     <li><a href='{% url show_area_view room.area.id %}' class='icon16-area-{{ room.area.config.icon }}'>{{ room.area.name }}</a></li>
 {% endblock %}
 

@@ -1,0 +1,79 @@
+{% extends "layout_admin.html" %}
+{% comment %}
+# Copyright 2008 Domogik project
+
+# This file is part of Domogik.
+# Domogik is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Domogik is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+
+# Author : Cédric Trévisan <cedric@domogik.org>
+{% endcomment %}
+
+
+{% load i18n %}
+{% block css %}
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/page-admin-organization.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+{% block js_include %}
+{% endblock %}
+{% block js_script %}
+    $(function(){
+        // Accordion
+        $("#nav2").accordion({ autoHeight: false, header: ".subnav2", active:0});
+        $("#housename").val('{{ house.name }}');
+        $("#generalsubmit").click(function(){
+            var name = $("#housename").val();
+            if (name) {
+                getREST('/base/ui_config/set/name/general/reference/house/key/name/value/' + name,
+                    function(data) {
+                        var status = (data.status).toLowerCase();
+                        if (status == 'ok') {
+                            $("#housename").addClass('icon16-status-true');
+                        } else {
+                            $("#housename").addClass('icon16-status-false');
+                        }
+                    }
+                );            
+            } else {
+                $("#housename").addClass('icon16-status-false');  
+            }
+        });
+    });
+{% endblock %}
+{% block title %}{% trans page_title %}{% endblock %}
+
+{% block banner %}
+    <div class="section">
+        <h1 class="ident"><span class="title">{% trans "Home" %}</span></h1>
+        {% ifnotequal status "" %}
+        <div id='messages' class='{{status}}'>{{msg}}</div>
+        {% endifnotequal %}
+        <ul class="actions"></ul>
+    </div>
+{% endblock %}
+
+{% block right %}
+    <div class="subsection">
+        <h2>{% trans "Configuration" %}</h2>
+        <form id='generalhouse'>
+            <fieldset>
+                <legend>House</legend>
+                <label for='housename'>{% trans "Name" %}</label>
+                <input type='text' id='housename' name='housename'>
+            </fieldset>
+        </form>
+        <p>
+            <button id='generalsubmit' class='button icon16-action-save'>{% trans "Save" %}</button>
+        </p>
+    </div>
+{% endblock %}

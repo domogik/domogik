@@ -21,7 +21,7 @@ img {
 	overflow:hidden;
 }
 
-* {
+*, input {
 	outline: none;
 }
 /*
