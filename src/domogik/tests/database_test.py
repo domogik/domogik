@@ -573,6 +573,7 @@ class SensorReferenceDataTestCase(GenericTestCase):
                     srd_value='number', dty_id=dty2.id, srd_unit='V',
                     srd_stat_key='key2')
         assert self.db.get_sensor_reference_data_by_name('temperature').unit == srd1.unit
+        assert self.db.get_sensor_reference_data_by_typeid(dty1.id)[0].device_type_id == dty1.id
 
     def testDel(self):
         dt1 = self.db.add_device_technology(u'1wire', 'desc dt1')
@@ -685,6 +686,7 @@ class ActuatorFeatureTestCase(GenericTestCase):
                     af_value='binary', dty_id=dty1.id,
                     af_configurable_states='off/on', af_return_confirmation=True)
         assert self.db.get_actuator_feature_by_name('dimmer').unit == af1.unit
+        assert self.db.get_actuator_feature_by_typeid(dty1.id)[0].device_type_id == dty1.id
 
     def testDel(self):
         dt1 = self.db.add_device_technology(u'PLCBus', 'desc dt1')

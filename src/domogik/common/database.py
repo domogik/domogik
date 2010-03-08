@@ -640,6 +640,15 @@ class DbHelper():
                              .filter(func.lower(SensorReferenceData.name)==srd_name.lower())\
                              .first()
 
+    def get_sensor_reference_data_by_typeid(self, srd_typeid):
+        """
+        Return a list of sensor reference data for a device type id
+        @param srd_typeid : device type id
+        """
+        return self.__session.query(SensorReferenceData)\
+                             .filter_by(device_type_id=srd_typeid)\
+                             .all()
+
     def add_sensor_reference_data(self, srd_name, srd_value, dty_id,
                                   srd_unit=None, srd_stat_key=None):
         """
@@ -753,6 +762,15 @@ class DbHelper():
         return self.__session.query(ActuatorFeature)\
                              .filter(func.lower(ActuatorFeature.name)==af_name.lower())\
                              .first()
+
+    def get_actuator_feature_by_typeid(self, af_typeid):
+        """
+        Return a list of actuator features for a device type id
+        @param af_typeid : device type id
+        """
+        return self.__session.query(ActuatorFeature)\
+                             .filter_by(device_type_id=af_typeid)\
+                             .all()
 
     def add_actuator_feature(self, af_name, af_value, dty_id, af_unit=None,
                              af_configurable_states=None,
