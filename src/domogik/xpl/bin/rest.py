@@ -1035,8 +1035,8 @@ target=*
                     self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
                 else:
-                    if self.rest_request[2] == "by-name":
-                        self._rest_base_sensor_reference_list(name=self.rest_request[3])
+                    if self.rest_request[2] == "by-type_id":
+                        self._rest_base_sensor_reference_list(type_id=self.rest_request[3])
                     else:
                         self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
@@ -1083,8 +1083,8 @@ target=*
                     self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
                 else:
-                    if self.rest_request[2] == "by-name":
-                        self._rest_base_actuator_feature_list(name=self.rest_request[3])
+                    if self.rest_request[2] == "by-type_id":
+                        self._rest_base_actuator_feature_list(type_id=self.rest_request[3])
                     else:
                         self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
@@ -1707,18 +1707,18 @@ target=*
 # /base/sensor_reference processing
 ######
 
-    def _rest_base_sensor_reference_list(self, name = None):
+    def _rest_base_sensor_reference_list(self, type_id = None):
         """ list sensor references
             @param name : sensor reference name
         """ 
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("sensor_reference")
-        if name == None:
+        if type_id == None:
             for sensor_reference in self._db.list_sensor_reference_data():
                 json_data.add_data(sensor_reference)
         else:
-            sensor_reference = self._db.get_sensor_reference_data_by_name(name)
+            sensor_reference = self._db.get_sensor_reference_data_by_typeid(type_id)
             if sensor_reference is not None:
                 json_data.add_data(sensor_reference)
         self.send_http_response_ok(json_data.get())
@@ -1785,18 +1785,18 @@ target=*
 # /base/actuator_feature processing
 ######
 
-    def _rest_base_actuator_feature_list(self, name = None):
+    def _rest_base_actuator_feature_list(self, type_id = None):
         """ list actuator features
             @param name : actuator feature name
         """
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("actuator_feature")
-        if name == None:
+        if type_id == None:
             for actuator_feature in self._db.list_actuator_features():
                 json_data.add_data(actuator_feature)
         else:
-            actuator_feature = self._db.get_actuator_feature_by_name(name)
+            actuator_feature = self._db.get_actuator_feature_by_typeid(type_id)
             if actuator_feature is not None:
                 json_data.add_data(actuator_feature)
         self.send_http_response_ok(json_data.get())
