@@ -702,7 +702,7 @@ class Person(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<Person(id=%s, first_name='%s', last_name='%s')>" % (self.id, self.first_name, self.last_name)
+        return "<Person(id=%s, first_name='%s', last_name='%s', birthdate='%s')>" % (self.id, self.first_name, self.last_name, self.birthdate)
 
     @staticmethod
     def get_tablename():
