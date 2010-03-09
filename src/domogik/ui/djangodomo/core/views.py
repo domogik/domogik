@@ -318,6 +318,7 @@ def admin_management_accounts(request):
     msg = request.GET.get('msg', '')
     try:
         resultAllAccounts = Accounts.getAllUsers()
+        resultAllPeoples = Accounts.getAllPeoples()
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
     page_title = _("Accounts management")
@@ -328,7 +329,8 @@ def admin_management_accounts(request):
         nav2_management_accounts = "selected",
         status=status,
         msg=msg,
-        accounts_list=resultAllAccounts.account
+        accounts_list=resultAllAccounts.account,
+        peoples_list=resultAllPeoples.person
     )
     
 def admin_organization_devices(request):
