@@ -87,6 +87,11 @@ class Rest(xPLModule):
         self._log = log.get_logger()
         self._log.info("Rest Server initialisation...")
         self._log.debug("locale : %s %s" % locale.getdefaultlocale())
+        # logging data manipulation initialization
+        log_dm = logger.Logger('REST-DM')
+        self._log_dm = log_dm.get_logger()
+        self._log_dm.info("#Rest Server Data Manipulation...")
+        self._log_dm.debug("locale : %s %s" % locale.getdefaultlocale())
         # DB Helper
         self._db = DbHelper()
 
@@ -109,9 +114,11 @@ class Rest(xPLModule):
             # default parameters
             self.server_ip = server_ip
             self.server_port = server_port
+        self._log.info("Configuration : ip:port = %s:%s" % (self.server_ip, self.server_port))
 
 
         # Queues config
+        self._log.debug("Get queues configuration")
         self._config = Query(self._myxpl)
         res = xPLResult()
         self._config.query('rest', 'queue-timeout', res)
@@ -141,6 +148,7 @@ class Rest(xPLModule):
         self._queue_system_stop = Queue(self._queue_size)
 
         # define listeners for queues
+        self._log.debug("Create listeners")
         Listener(self._add_to_queue_system_list, self._myxpl, \
                  {'schema': 'domogik.system',
                   'xpltype': 'xpl-trig',
@@ -161,6 +169,8 @@ class Rest(xPLModule):
                   'xpltype': 'xpl-trig',
                   'command' : 'stop',
                   'host' : gethostname()})
+
+        self._log.info("Initialisation OK")
 
 
     def _add_to_queue_system_list(self, message):
@@ -188,9 +198,10 @@ class Rest(xPLModule):
                 - {"module" : "wol%", ...} : here "%" indicate that we search for something starting with "wol"
             @param nb_rec : internal parameter (do not use it for first call). Used to check recursivity VS queue size
         """
+        self._log.debug("Get from queue : %s (recursivity deepth : %s)" % (str(my_queue), nb_rec))
         # check if recursivity doesn't exceed queue size
         if nb_rec > self._queue_size:
-            print "_get_from_queue : number of call exceed queue size (%s) : return None" % self._queue_size
+            self._log.warning("Get from queue %s : number of call exceed queue size (%s) : return None" % (str(my_queue), self._queue_size))
             # we raise an "Empty" exception because we consider that if we don't find
             # the good data, it is as if it was "empty"
             raise Empty
@@ -201,6 +212,7 @@ class Rest(xPLModule):
         if time.time() - msg_time < self._queue_life_expectancy:
             # no filter defined
             if filter == None: 
+                self._log.debug("Get from queue %s : return %s" % (str(my_queue), str(message)))
                 return message
 
             # we want to filter data
@@ -213,28 +225,30 @@ class Rest(xPLModule):
                         filter_data = str(filter[key])
                         len_data = len(filter_data) - 1
                         if msg_data[0:len_data] != filter_data[0:-1]:
-                            print "Bad data!"
                             keep_data = False
                     # normal search
                     else:
                         if message.data[key] != filter[key]:
-                            print "Bad data!"
                             keep_data = False
 
                 # if message is ok for us, return it
                 if keep_data == True:
+                    self._log.debug("Get from queue %s : return %s" % (str(my_queue), str(message)))
                     return message
 
                 # else, message get back in queue and get another one
                 else:
+                    self._log.debug("Get from queue %s : bad data, check another one..." % (str(my_queue)))
                     self._put_in_queue(my_queue, message)
                     return self._get_from_queue(my_queue, filter, nb_rec + 1)
 
         # if message too old : get an other message
         else:
+            self._log.debug("Get from queue %s : data too old, check another one..." % (str(my_queue)))
             return self._get_from_queue(my_queue, filter, nb_rec + 1)
 
     def _put_in_queue(self, my_queue, message):
+        self._log.debug("Put in queue %s : %s" % (str(my_queue), str(message)))
         my_queue.put((time.time(), message), True, self._queue_timeout) 
 
 
@@ -243,9 +257,9 @@ class Rest(xPLModule):
         """ Start HTTP Server
         """
         # Start HTTP server
+        self._log.info("Start HTTP Server on %s:%s..." % (self.server_ip, self.server_port))
         server = HTTPServerWithParam((self.server_ip, int(self.server_port)), RestHandler, \
                                      handler_params = [self])
-        print 'Start REST server on %s:%s...' % (self.server_ip, self.server_port)
         server.serve_forever()
 
 
@@ -285,37 +299,34 @@ class RestHandler(BaseHTTPRequestHandler):
         """ Process GET requests
             Call directly .do_for_all_methods()
         """
-        print "==== GET ============================================"
         self.do_for_all_methods()
 
     def do_POST(self):
         """ Process POST requests
             Call directly .do_for_all_methods()
         """
-        print "==== POST ==========================================="
         self.do_for_all_methods()
 
     def do_OPTIONS(self):
         """ Process OPTIONS requests
             Call directly .do_for_all_methods()
         """
-        print "==== OPTIONS ==========================================="
         self.do_for_all_methods()
 
     def do_for_all_methods(self):
         """ Create an object for each request. This object will process 
             the REST url
         """
-
         # dirty issue to force HTTP/1.1 
         self.protocol_version = 'HTTP/1.1'
         self.request_version = 'HTTP/1.1'
 
-
+        # TODO : create a thread here
         request = ProcessRequest(self.server.handler_params, self.path, \
                                  self.send_http_response_ok, \
                                  self.send_http_response_error)
         request.do_for_all_methods()
+        
 
 
 
@@ -330,6 +341,8 @@ class RestHandler(BaseHTTPRequestHandler):
             Send also json data
             @param data : json data to display
         """
+        # TODO : log!!
+        #self._log.debug("Send HTTP header for OK")
         self.send_response(200)
         self.send_header('Content-type',  'application/json')
         self.send_header('Expires', '-1')
@@ -337,6 +350,8 @@ class RestHandler(BaseHTTPRequestHandler):
         self.send_header('Content-Length', len(data.encode("utf-8")))
         self.end_headers()
         if data:
+            # TODO : log!!
+            #self._log.debug("Send HTTP data : %s" % data.encode("utf-8"))
             self.wfile.write(data.encode("utf-8"))
 
 
@@ -351,12 +366,16 @@ class RestHandler(BaseHTTPRequestHandler):
             @param jsonp_cb : if jsonp is True, name of callback to use 
                               in jsonp format
         """
+        # TODO : log!!
+        #self._log.debug("Send HTTP header for ERROR : code=%s ; msg=%s" % (err_code, err_msg))
         self.send_response(200)
         self.send_header('Content-type',    'text/html')
         self.end_headers()
         json_data = JSonHelper("ERROR", err_code, err_msg)
         json_data.set_jsonp(jsonp, jsonp_cb)
         self.wfile.write(json_data.get())
+        # TODO : log!!
+        #self._log.warning("Error reply : %s" % json_data.get())
 
 
 
@@ -394,6 +413,8 @@ class ProcessRequest():
         self._log = self.handler_params[0]._log
         self._xml_directory = self.handler_params[0]._xml_directory
 
+        self._log.debug("Process request : init")
+
         self._queue_timeout =  self.handler_params[0]._queue_timeout
         self._queue_size =  self.handler_params[0]._queue_size
         self._queue_life_expectancy = self.handler_params[0]._queue_life_expectancy
@@ -411,13 +432,11 @@ class ProcessRequest():
         self.jsonp_cb = ""
 
         # url processing
-        print type(self.path).__name__
         print self.path
-        #self.path = str(urllib.unquote(self.path))
         self.path = urllib.unquote(unicode(self.path))
-        print type(self.path).__name__
-        print self.path
-        #self.path = unicode(self.path, "utf-8")
+        self._log.info("Request : %s" % self.path)
+
+        # TODO log data manipulation here
 
         tab_url = self.path.split("?")
         self.path = tab_url[0]
@@ -427,7 +446,6 @@ class ProcessRequest():
 
         if self.path[-1:] == "/":
             self.path = self.path[0:len(self.path)-1]
-        print "PATH : " + self.path
         tab_path = self.path.split("/")
 
         # Get type of request : /command, /xpl-cmnd, /base, etc
@@ -440,13 +458,6 @@ class ProcessRequest():
             self.rest_request = tab_path[2:]
         else:
             self.rest_request = []
-        print "TYPE    : " + self.rest_type
-        print "Request : " + str(self.rest_request)
-
-
-
-
-
 
 
 
@@ -476,6 +487,7 @@ class ProcessRequest():
     def _parse_options(self):
         """ Process parameters : ...?param1=val1&param2=val2&....
         """
+        self._log.debug("Parse request options")
 
         # for each debug option
         for opt in self.parameters.split("&"):
@@ -489,6 +501,7 @@ class ProcessRequest():
 
             # call json specific options
             if opt_key == "callback" and opt_value != None:
+                self._log.debug("Option : jsonp mode")
                 self.jsonp = True
                 self.jsonp_cb = opt_value
 
@@ -501,9 +514,9 @@ class ProcessRequest():
     def _debug_sleep(self, duration):
         """ Sleep process for 15 seconds
         """
-        print "DEBUG : start sleeping for " + str(duration)
+        self._log.debug("Start sleeping for " + str(duration))
         time.sleep(float(duration))
-        print "DEBUG : end sleeping"
+        self._log.debug("End sleeping")
 
 
 
@@ -523,10 +536,6 @@ class ProcessRequest():
 
 
 
-
-
-
-
 ######
 # /command processing
 ######
@@ -537,7 +546,7 @@ class ProcessRequest():
             - call a xml parser for the technology (self.rest_request[0])
            - send appropriate xPL message on network
         """
-        print "Call rest_command"
+        self._log.debug("Process command")
 
         # parse data in URL
         if len(self.rest_request) >= 3:
@@ -553,10 +562,10 @@ class ProcessRequest():
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
             self.send_http_response_ok(json_data.get())
             return
-        print "Techno    : %s" % techno
-        print "Address   : %s" % address
-        print "Order     : %s" % order
-        print "Others    : %s" % str(others)
+        self._log.debug("Techno    : %s" % techno)
+        self._log.debug("Address   : %s" % address)
+        self._log.debug("Order     : %s" % order)
+        self._log.debug("Others    : %s" % str(others))
 
         # open xml file
         xml_file = "%s/%s.xml" % (self._xml_directory, techno)
@@ -566,7 +575,7 @@ class ProcessRequest():
         if message == None:
             return
 
-        print "Send message : %s" % message
+        self._log.debug("Process command > send message : %s" % str(message))
         self._myxpl.send(message)
 
         # REST processing finished and OK
@@ -575,9 +584,6 @@ class ProcessRequest():
         self.send_http_response_ok(json_data.get())
 
         
-
-
-
 
 
     def _parse_xml(self, xml_file, techno, address, order, others):
@@ -703,8 +709,8 @@ target=*
             - Decode and check URL
             - Send message
         """
+        self._log.debug("Send xpl message")
 
-        print "Call rest_xpl_cmnd"
         if len(self.rest_request) == 0:
             self.send_http_response_error(999, "Schema not given", self.jsonp, self.jsonp_cb)
             return
@@ -739,7 +745,7 @@ target=*
             self.send_http_response_error(999, "Value missing for last parameter", self.jsonp, self.jsonp_cb)
             return
 
-        print "Send message : %s" % message
+        self._log.debug("Send message : %s" % str(message))
         self._myxpl.send(message)
 
         # REST processing finished and OK
@@ -759,7 +765,7 @@ target=*
             - Decode and check URL format
             - call the good fonction to get data from database
         """
-        print "Call rest_base_get"
+        self._log.debug("Process base request")
         # parameters initialisation
         self.parameters = {}
 
@@ -1327,12 +1333,15 @@ target=*
         year = int(date[0:4])
         month = int(date[4:6])
         day = int(date[6:8])
-        my_date = datetime.date(year, month, day)
+        try:
+            my_date = datetime.date(year, month, day)
+        except:
+            self.send_http_response_error(999, str(sys.exc_info()[1].replace('"', "'")), self.jsonp, self.jsonp_cb)
         return my_date
 
 
 
-
+### TODO j'en suis ici pour les _log !!
 
 ######
 # /base/area processing
@@ -2345,6 +2354,15 @@ target=*
         # parameters initialisation
         self.parameters = {}
 
+        ### auth #####################################
+        if self.rest_request[0] == "auth":
+            if len(self.rest_request) == 3:
+                self._rest_account_auth(self.rest_request[1], self.rest_request[2])
+            else:
+                self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
+                                                  self.jsonp, self.jsonp_cb)
+                return
+    
         ### user #####################################
         if self.rest_request[0] == "user":
 
@@ -2361,16 +2379,6 @@ target=*
                     else:
                         self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
-    
-    
-            ### auth
-            elif self.rest_request[1] == "auth":
-                if len(self.rest_request) == 4:
-                    self._rest_account_auth(self.rest_request[2], self.rest_request[3])
-                else:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                      self.jsonp, self.jsonp_cb)
-                    return
     
             ### add
             elif self.rest_request[1] == "add":
@@ -2389,7 +2397,7 @@ target=*
                     self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
     
             ### password
-            elif self.res2_request[1] == "password":
+            elif self.rest_request[1] == "password":
                 offset = 2
                 if self.set_parameters(offset):
                     self._rest_account_password()
