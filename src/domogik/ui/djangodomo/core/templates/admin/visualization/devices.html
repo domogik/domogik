@@ -1,0 +1,112 @@
+{% extends "layout_admin.html" %}
+{% comment %}
+# Copyright 2008 Domogik project
+
+# This file is part of Domogik.
+# Domogik is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Domogik is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+
+# Author : Cédric Trévisan <cedric@domogik.org>
+{% endcomment %}
+
+
+{% load i18n %}
+{% block css %}
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/page-admin-visualization.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+{% block js_include %}
+{% endblock %}
+{% block js_script %}
+    $(function(){
+        // Accordion
+        $("#nav2").accordion({ autoHeight: false, header: ".subnav2", active:3});
+        
+        $("#tabs").tabs();
+    });
+{% endblock %}
+
+{% block title %}{% trans page_title %}{% endblock %}
+
+{% block banner %}
+        <div class="section">
+            <h1 class="ident"><span class="title">{% trans page_title %}</span><br /><span class="subtitle">{% trans "Customize your device interfaces" %}</span></h1>
+            {% ifnotequal status "" %}
+            <div id='messages' class='{{status}} icon32-status-{{status}}'>{{msg}}</div>
+            {% endifnotequal %}
+            <div class='instructions'>Drag and drop the features you want displayed on the views</div>
+            <ul class="actions"></ul>
+        </div>
+{% endblock %}
+
+{% block right %}
+    {% for room in rooms_list %}
+        <script type="text/javascript">
+            // <![CDATA[
+            $(function(){
+                $("#tabs{{ room.id }}").tabs();
+            });
+            // ]]>
+        </script>
+        <div class="subsection">
+            <h2 class="icon16-room-{{ room.config.icon }}">{{ room.name }}</h2>
+            <div id="tabs{{ room.id }}">
+                {% spaceless %}
+                    <ul>
+                        {% for device in room.device %}
+                            <li><a id="tab{{ device.id }}" href="#element{{ device.id }}" class="icon16-usage-{{ device.usage_id }}">{{ device.name }}</a></li>
+                        {% endfor %}
+                    </ul>
+                {% endspaceless %}
+                {% for device in room.device %}
+                <div id="element{{ device.id }}" class="tabelement">
+
+                    <ul class="actions">
+                    </ul>
+                    <div class="content">
+                        <h3>'{{ room.name }}' minimal view</h3>
+                        <div class='block'>
+                            <div class='header icon64-usage-{{ device.usage_id }}'>
+                                <div class="ident">
+                                    <span class="title">{{ device.name }}</span>
+                                    <br />
+                                    <span class="subtitle">{{ device.description }}</span>
+                                </div>
+                            </div>
+                            <div class='actions'>
+                                <ul>
+                                    <li><div class='empty'></div></li>
+                                    <li><div class='empty'></div></li>
+                                    <li><div class='empty'></div></li>
+                                    <li><div class='empty'></div></li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h3>'{{ room.name }}' Actuators</h3>                    
+                        <div>
+                            <ul>
+                            </ul>
+                        </div>
+
+                        <h3>'{{ room.name }}' Sensors</h3>                    
+                        <div>
+                            <ul>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}

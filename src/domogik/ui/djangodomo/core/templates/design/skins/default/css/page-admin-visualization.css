@@ -1,5 +1,5 @@
 .block {
-    background-color:#eeeeee;
+    background-color:#ffffff;
     width:30em;
     margin:1em 0 1em 0;
     border: 1px solid #979387;
@@ -7,19 +7,13 @@
     -webkit-border-radius: 0.8em;
 }
 
-.block:hover {
-	-moz-box-shadow: 5px 5px 10px #999;
-	-webkit-box-shadow: 5px 5px 10px #999;    
-}
-
-/* Header section */
-
 .block .header {
     background-position: 5px 5px;
     background-repeat:no-repeat;
     min-height: 64px;
     padding-bottom: 1em;
-    font-weight:normal;
+    font-size:1.5em;
+    opacity: 0.5;
 }
 
 .block .ident {
@@ -58,47 +52,14 @@
     padding: 0;
 }
 
-/* Colapsable section */
-
-.extended {
-    position:absolute;
-    left:0;
-    top:10%;
-    width:400px;
-    height:80%;
-    padding:1em;
-    background:rgba(0,0,0,0.8);
-    -moz-border-radius: 0 0.8em 0.8em 0;
-    -webkit-border-radius: 0 0.8em 0.8em 0;
-    color:#ffffff;
-}
-
-.extended ul.commands {
-    list-style:none;
-    margin:0;
-    padding:0;
-    color:#000000;
-}
-
-.extended ul.commands > li {
-    display:block;
-    margin: 0;
-    padding: 1em 0 0 0;
-}
-
-.extended .commands .name {
-    padding: 0.2em 1em 0.2em 1em;
-    border: 1px solid #cccccc;
+.block .actions ul > li .empty {
+    display:inline-block;
+    width: 45px;
+    height: 45px;
+    border: 1px dashed #000000;
     -moz-border-radius: 0.8em;
     -webkit-border-radius: 0.8em;
-    background-color: #FFFFFF;
-    position: relative;
-    top: -1em;
-    left: 32px;
-}
-
-/* Footer section */
-
-.block .footer {
-    text-align:right;
+    background-position: center center;
+    background-repeat: no-repeat;
+    outline: none;
 }

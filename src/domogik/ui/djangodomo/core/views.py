@@ -576,7 +576,7 @@ def show_device(request, device_id):
     room_name = room.name
     area_id = room.area_id
     area_name = (__db.get_area_by_id(area_id)).name
-    page_title = _("Visualisation Dispositif")
+    page_title = _("View")
     return __go_to_page(
         request, 'show/device.html',
         page_title,
@@ -587,4 +587,32 @@ def show_device(request, device_id):
         room_id=room_id,
         room_name=room_name,
         house=resultHouse
+    )
+
+def admin_visualization_devices(request):
+    """
+    Method called when the admin devices visualization page is accessed
+    @param request : HTTP request
+    @return an HttpResponse object
+    """
+    if not __is_user_admin(request):
+        return index(request)
+
+    status = request.GET.get('status', '')
+    msg = request.GET.get('msg', '')
+    try:
+        resultAllRooms = Rooms.getAllWithDevices()
+        resultAllRooms.merge_uiconfig()
+    except ResourceNotAvailableException:
+        return render_to_response('error/ResourceNotAvailableException.html')
+        
+    page_title = _("Devices visualization")
+    return __go_to_page(
+        request, 'admin/visualization/devices.html',
+        page_title,
+        nav1_admin = "selected",
+        nav2_visualization_devices = "selected",
+        status=status,
+        msg=msg,
+        rooms_list=resultAllRooms.room,
     )

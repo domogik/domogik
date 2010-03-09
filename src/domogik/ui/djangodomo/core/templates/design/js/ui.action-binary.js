@@ -1,15 +1,15 @@
-function widgetmini_binary(widgetmini_id, function_id, widget_type) {
+function widgetmini_binary(widgetmini_id, function_id, widget_usage) {
     $('#' + widgetmini_id).addClass('widgetmini_binary')
         .click(function () {process_binary(function_id)})
         .keypress(function (e) {if (e.which == 13 || e.which == 32) {process_binary(function_id);}})
-        .addClass('icon32-widget-' + widget_type)
+        .addClass('icon32-usage-' + widget_usage)
         .addClass('binary_0')
         .attr("tabindex", 0);
 }
 
-function widget_binary(widget_id, function_id, widget_type) {
+function widget_binary(widget_id, function_id, widget_usage) {
     $('#' + widget_id).addClass('widget_binary')
-        .addClass('icon32-widget-' + widget_type)
+        .addClass('icon32-usage-' + widget_usage)
         .addClass('binary_0');
     $('#' + widget_id + " .on").click(function () {process_binary(function_id, 1)});
     $('#' + widget_id + " .off").click(function () {process_binary(function_id, 0)});

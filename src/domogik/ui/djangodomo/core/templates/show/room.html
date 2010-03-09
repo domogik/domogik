@@ -60,10 +60,10 @@
 								closetext: "Close",
 								openbutton: "#openextended_{{ device.id }}",
 							});
-                            widgetmini_binary("widgetmini_{{ device.id }}1", "{{ device.id }}1", "light");
-                            widget_binary("widget_{{ device.id }}1", "{{ device.id }}1", "light");
-                            widgetmini_range("widgetmini_{{ device.id }}2", "{{ device.id }}2", "light", 0, 100, 12, '%');
-                            widget_range("widget_{{ device.id }}2", "{{ device.id }}2", "light", 0, 100, 12, '%');
+                            widgetmini_binary("widgetmini_{{ device.id }}1", "{{ device.id }}1", 1);
+                            widget_binary("widget_{{ device.id }}1", "{{ device.id }}1", 1);
+                            widgetmini_range("widgetmini_{{ device.id }}2", "{{ device.id }}2", 1, 0, 100, 12, '%');
+                            widget_range("widget_{{ device.id }}2", "{{ device.id }}2", 1, 0, 100, 12, '%');
                         });
                     // ]]>
                     </script>
