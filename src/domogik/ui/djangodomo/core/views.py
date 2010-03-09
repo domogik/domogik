@@ -99,38 +99,34 @@ def login(request):
         # An action was submitted => login action
         login = QueryDict.get(request.POST, "login", False)
         password = QueryDict.get(request.POST, "password", False)
-        #sys_account = __db.get_system_account_by_login_and_pass(login, password)
-        #if sys_account is not None:
-        #    user_account = __db.get_user_account_by_system_account(sys_account.id)
-        #    if user_account is not None:
-        #        first_name = user_account.first_name
-        #        last_name = user_account.last_name
-        #    else:
-        #        first_name = login
-        #        last_name = login
-        #    request.session['user'] = {
-        #        'login': sys_account.login,
-        #        'is_admin': sys_account.is_admin,
-        ##        'first_name': first_name,
-        #        'last_name': last_name,
-        #        'skin_used': sys_account.skin_used,
-        #    }
-        #    return index(request)
-        #else:
-        #    # User not found, ask again to log in
-        #    account_list = __db.list_system_accounts()
-        #    error_msg = _("Sorry unable to log in. Please check login name / password and try again.")
-        #    return __go_to_page(request, 'login.html', page_title,
-        #                       account_list=account_list, error_msg=error_msg)
-        request.session['user'] = {
-                'login': 'admin',
-                'is_admin': True,
-                'first_name': 'jojo',
-                'last_name': 'lapin',
-                'skin_used': 'skins/default'
+        try:
+            resultAuth = Accounts.Auth(login, password)
+        except ResourceNotAvailableException:
+            return render_to_response('error/ResourceNotAvailableException.html')
+            
+        if resultAuth.status == 'OK':
+            account = resultAuth.account[0]
+            request.session['user'] = {
+                'login': account.login,
+                'is_admin': (account.is_admin == "True"),
+                'first_name': account.person.first_name,
+                'last_name': account.person.last_name,
+                'skin_used': account.skin_used
             }
-        return index(request)
-
+            return index(request)
+        else:
+            # User not found, ask again to log in
+            error_msg = _("Sorry unable to log in. Please check login name / password and try again.")
+            try:
+                resultAllAccounts = Accounts.getAllUsers()
+            except ResourceNotAvailableException:
+                return render_to_response('error/ResourceNotAvailableException.html')
+            return __go_to_page(
+                request, 'login.html',
+                page_title,
+                error_msg=error_msg,
+                account_list=resultAllAccounts.account
+            )
     else:
         # User asked to log in
         try:
@@ -322,6 +318,7 @@ def admin_management_accounts(request):
     msg = request.GET.get('msg', '')
     try:
         resultAllAccounts = Accounts.getAllUsers()
+        resultAllPeoples = Accounts.getAllPeoples()
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
     page_title = _("Accounts management")
@@ -332,7 +329,8 @@ def admin_management_accounts(request):
         nav2_management_accounts = "selected",
         status=status,
         msg=msg,
-        accounts_list=resultAllAccounts.account
+        accounts_list=resultAllAccounts.account,
+        peoples_list=resultAllPeoples.person
     )
     
 def admin_organization_devices(request):
@@ -576,7 +574,7 @@ def show_device(request, device_id):
     room_name = room.name
     area_id = room.area_id
     area_name = (__db.get_area_by_id(area_id)).name
-    page_title = _("Visualisation Dispositif")
+    page_title = _("View")
     return __go_to_page(
         request, 'show/device.html',
         page_title,
@@ -587,4 +585,32 @@ def show_device(request, device_id):
         room_id=room_id,
         room_name=room_name,
         house=resultHouse
+    )
+
+def admin_visualization_devices(request):
+    """
+    Method called when the admin devices visualization page is accessed
+    @param request : HTTP request
+    @return an HttpResponse object
+    """
+    if not __is_user_admin(request):
+        return index(request)
+
+    status = request.GET.get('status', '')
+    msg = request.GET.get('msg', '')
+    try:
+        resultAllRooms = Rooms.getAllWithDevices()
+        resultAllRooms.merge_uiconfig()
+    except ResourceNotAvailableException:
+        return render_to_response('error/ResourceNotAvailableException.html')
+        
+    page_title = _("Devices visualization")
+    return __go_to_page(
+        request, 'admin/visualization/devices.html',
+        page_title,
+        nav1_admin = "selected",
+        nav2_visualization_devices = "selected",
+        status=status,
+        msg=msg,
+        rooms_list=resultAllRooms.room,
     )

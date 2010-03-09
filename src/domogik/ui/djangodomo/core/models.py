@@ -218,9 +218,21 @@ class Modules(pipes.DmgPipe):
         
 class Accounts(pipes.DmgPipe):
     uri = "http://127.0.0.1:8080/account"
-    
+
+    @staticmethod
+    def Auth(login, password):
+        resp = Accounts.objects.get({'parameters':"auth/" + login + "/" + password})
+        if resp :
+            return resp
+        
     @staticmethod
     def getAllUsers():
         resp = Accounts.objects.get({'parameters':"user/list/"})
         if resp :
             return resp
+
+    @staticmethod
+    def getAllPeoples():
+        resp = Accounts.objects.get({'parameters':"person/list/"})
+        if resp :
+            return resp  

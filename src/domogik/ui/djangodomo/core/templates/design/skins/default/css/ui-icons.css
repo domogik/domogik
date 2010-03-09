@@ -28,6 +28,7 @@
 .icon64-room-tvlounge { background-image:url(../images/room/tvlounge_64.png);}
 .icon64-room-bathroom { background-image:url(../images/room/bathroom_64.png);}
 .icon64-room-office { background-image:url(../images/room/office_64.png);}
+.icon64-room-kidsroom { background-image:url(../images/room/kidsroom_64.png);}
 
 .icon32-room- { background-image:url(../images/unknown_32.png);}
 .icon32-room-kitchen { background-image:url(../images/room/kitchen_32.png);}
@@ -35,6 +36,7 @@
 .icon32-room-tvlounge { background-image:url(../images/room/tvlounge_32.png);}
 .icon32-room-bathroom { background-image:url(../images/room/default_room_32.png);}
 .icon32-room-office { background-image:url(../images/room/default_room_32.png);}
+.icon32-room-kidsroom { background-image:url(../images/room/kidsroom_32.png);}
 
 .icon16-room- { background-image:url(../images/unknown_16.png);}
 .icon16-room-kitchen { background-image:url(../images/room/kitchen_16.png);}
@@ -42,6 +44,7 @@
 .icon16-room-tvlounge { background-image:url(../images/room/tvlounge_16.png);}
 .icon16-room-bathroom { background-image:url(../images/room/default_room_16.png);}
 .icon16-room-office { background-image:url(../images/room/default_room_16.png);}
+.icon16-room-kidsroom { background-image:url(../images/room/kidsroom_16.png);}
 
 /* Usage icons */
 .icon64-usage- { background-image:url(../images/unknown_64.png);}
@@ -86,12 +89,29 @@
 .icon16-technology-computer {background-image:url(../../../images/technologies/computer_16.png);}
 
 /* Status icons */
+.icon64-status-true {background-image:url(../images/status/check_64.png);}
+.icon64-status-false {background-image:url(../images/status/wrong_64.png);}
+.icon64-status-active {background-image:url(../images/status/green_indicator_64.png);}
+.icon64-status-inactive {background-image:url(../images/status/grey_indicator_64.png);}
+.icon64-status-error {background-image:url(../images/status/wrong_64.png);}
+.icon64-status-ok {background-image:url(../images/status/check_64.png);}
+.icon64-status-info {background-image:url(../images/status/info_64.png);}
+
+.icon32-status-true {background-image:url(../images/status/check_32.png);}
+.icon32-status-false {background-image:url(../images/status/wrong_32.png);}
+.icon32-status-active {background-image:url(../images/status/green_indicator_32.png);}
+.icon32-status-inactive {background-image:url(../images/status/grey_indicator_32.png);}
+.icon32-status-error {background-image:url(../images/status/wrong_32.png);}
+.icon32-status-ok {background-image:url(../images/status/check_32.png);}
+.icon32-status-info {background-image:url(../images/status/info_32.png);}
+
 .icon16-status-true {background-image:url(../images/status/check_16.png);}
 .icon16-status-false {background-image:url(../images/status/wrong_16.png);}
 .icon16-status-active {background-image:url(../images/status/green_indicator_16.png);}
 .icon16-status-inactive {background-image:url(../images/status/grey_indicator_16.png);}
 .icon16-status-error {background-image:url(../images/status/wrong_16.png);}
 .icon16-status-ok {background-image:url(../images/status/check_16.png);}
+.icon16-status-info {background-image:url(../images/status/info_16.png);}
 
 /* Tmp icons */
 .icon64-device-coffeemachine { background-image:url(../images/tmp/coffee_machine_64.png);}

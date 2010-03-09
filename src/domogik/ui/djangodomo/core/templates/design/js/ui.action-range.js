@@ -1,4 +1,4 @@
-function widgetmini_range(widgetmini_id, function_id, widget_type, min_value, max_value, default_value, unit) {
+function widgetmini_range(widgetmini_id, function_id, widget_usage, min_value, max_value, default_value, unit) {
     var percent_value = (default_value / (max_value - min_value)) * 100;
     $("#range_data").data(function_id, {min : min_value, max : max_value, value : default_value, unit : unit});
     $('#' + widgetmini_id).addClass('widgetmini_range')
@@ -22,16 +22,16 @@ function widgetmini_range(widgetmini_id, function_id, widget_type, min_value, ma
         });
 
         $('#' + widgetmini_id + ' .range_value')
-            .addClass('icon32-widget-' + widget_type)
+            .addClass('icon32-usage-' + widget_usage)
             .toggle(function () {open_range(function_id)},
                 function () {close_range(function_id)});
         $('#' + widgetmini_id + ' .range_plus').click(function () {plus_range(function_id)});
         $('#' + widgetmini_id + ' .range_minus').click(function () {minus_range(function_id)});
 }
 
-function widget_range(widget_id, function_id, widget_type, min_value, max_value, default_value, unit) {
+function widget_range(widget_id, function_id, widget_usage, min_value, max_value, default_value, unit) {
     $('#' + widget_id).addClass('widget_range')
-        .addClass('icon32-widget-' + widget_type);
+        .addClass('icon32-usage-' + widget_usage);
     $('#' + widget_id + " .up").click(function () {plus_range(function_id)});
     $('#' + widget_id + " .down").click(function () {minus_range(function_id)});
     
