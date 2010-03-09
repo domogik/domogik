@@ -2746,7 +2746,7 @@ class JSonHelper():
                    "SystemStats", "SystemStatsValue", "Trigger") 
         instance_type = ("instance")
         num_type = ("int", "float")
-        str_type = ("str", "unicode", "bool")
+        str_type = ("str", "unicode", "bool", "datetime", "date")
         none_type = ("NoneType")
         tuple_type = ("tuple")
         list_type = ("list")
