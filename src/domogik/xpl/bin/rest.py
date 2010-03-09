@@ -54,6 +54,7 @@ from domogik.xpl.lib.queryconfig import Query
 from domogik.xpl.lib.module import xPLResult
 import re
 import traceback
+import datetime
 
 
 
@@ -1320,6 +1321,21 @@ target=*
 
 
 
+    def to_date(self, date):
+        """ Transform YYYYMMDD date in datatime object
+            @param date : date
+        """
+        if date == None:
+            return None
+        year = int(date[0:4])
+        month = int(date[4:6])
+        day = int(date[6:8])
+        my_date = datetime.date(year, month, day)
+        return my_date
+
+
+
+
 
 ######
 # /base/area processing
@@ -2335,15 +2351,22 @@ target=*
         ### user #####################################
         if self.rest_request[0] == "user":
 
-            ### list #####################################
+            ### list 
             if self.rest_request[1] == "list":
                 if len(self.rest_request) == 2:
-                    self._rest_account_list()
-                else:
+                    self._rest_account_user_list()
+                elif len(self.rest_request) == 3:
                     self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                      self.jsonp, self.jsonp_cb)
-                    return
+                                                  self.jsonp, self.jsonp_cb)
+                else:
+                    if self.rest_request[2] == "by-id":
+                        self._rest_account_user_list(id=self.rest_request[3])
+                    else:
+                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
     
+    
+            ### auth
             elif self.rest_request[1] == "auth":
                 if len(self.rest_request) == 4:
                     self._rest_account_auth(self.rest_request[2], self.rest_request[3])
@@ -2352,20 +2375,23 @@ target=*
                                                       self.jsonp, self.jsonp_cb)
                     return
     
+            ### add
             elif self.rest_request[1] == "add":
                 offset = 2
                 if self.set_parameters(offset):
-                    self._rest_account_add()
+                    self._rest_account_user_add()
                 else:
                     self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
     
+            ### update
             elif self.rest_request[1] == "update":
                 offset = 2
                 if self.set_parameters(offset):
-                    self._rest_account_update()
+                    self._rest_account_user_update()
                 else:
                     self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
     
+            ### password
             elif self.res2_request[1] == "password":
                 offset = 2
                 if self.set_parameters(offset):
@@ -2373,9 +2399,56 @@ target=*
                 else:
                     self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
     
+            ### del
             elif self.rest_request[1] == "del":
                 if len(self.rest_request) == 3:
-                    self._rest_account_del(id=self.rest_request[2])
+                    self._rest_account_user_del(id=self.rest_request[2])
+                else:
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                      self.jsonp, self.jsonp_cb)
+
+            ### others ###################################
+            else:
+                self.send_http_response_error(999, self.rest_request[1] + " not allowed", self.jsonp, self.jsonp_cb)
+                return
+
+        ### person ###################################
+        elif self.rest_request[0] == "person":
+
+            ### list #####################################
+            if self.rest_request[1] == "list":
+                if len(self.rest_request) == 2:
+                    self._rest_account_person_list()
+                elif len(self.rest_request) == 3:
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
+                else:
+                    if self.rest_request[2] == "by-id":
+                        self._rest_account_person_list(id=self.rest_request[3])
+                    else:
+                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
+    
+            ### add
+            elif self.rest_request[1] == "add":
+                offset = 2
+                if self.set_parameters(offset):
+                    self._rest_account_person_add()
+                else:
+                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
+    
+            ### update
+            elif self.rest_request[1] == "update":
+                offset = 2
+                if self.set_parameters(offset):
+                    self._rest_account_person_update()
+                else:
+                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
+    
+            ### del
+            elif self.rest_request[1] == "del":
+                if len(self.rest_request) == 3:
+                    self._rest_account_person_del(id=self.rest_request[2])
                 else:
                     self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                       self.jsonp, self.jsonp_cb)
@@ -2392,14 +2465,20 @@ target=*
 
 
 
-    def _rest_account_list(self):
+    def _rest_account_user_list(self, id = None):
         """ list accounts
+            @param id : id of account
         """
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("account")
-        for account in self._db.list_user_accounts():
-            json_data.add_data(account)
+        if id == None:
+            for account in self._db.list_user_accounts():
+                json_data.add_data(account)
+        else:
+            account = self._db.get_user_account(id)
+            if account is not None:
+                json_data.add_data(account)
         self.send_http_response_ok(json_data.get())
 
         
@@ -2422,7 +2501,7 @@ target=*
         self.send_http_response_ok(json_data.get())
 
 
-    def _rest_account_add(self):
+    def _rest_account_user_add(self):
         """ add user account
         """
         json_data = JSonHelper("OK")
@@ -2435,7 +2514,7 @@ target=*
                                                     self.get_parameters("password"), \
                                                     self.get_parameters("first_name"), \
                                                     self.get_parameters("last_name"), \
-                                                    self.get_parameters("birthday"), \
+                                                    self.to_date(self.get_parameters("birthday")), \
                                                     self.get_parameters("is_admin"), \
                                                     self.get_parameters("skin_used"))
                 json_data.add_data(account)
@@ -2453,7 +2532,7 @@ target=*
 
 
 
-    def _rest_account_update(self):
+    def _rest_account_user_update(self):
         """ update user account
         """
         json_data = JSonHelper("OK")
@@ -2492,7 +2571,7 @@ target=*
 
 
 
-    def _rest_account_del(self, id):
+    def _rest_account_user_del(self, id):
         """ delete user account
             @param id : account id
         """
@@ -2506,6 +2585,74 @@ target=*
             json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
         self.send_http_response_ok(json_data.get())
 
+
+
+    def _rest_account_person_list(self, id = None):
+        """ list persons
+            @param id : id of person
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("person")
+        if id == None:
+            for person in self._db.list_persons():
+                json_data.add_data(person)
+        else:
+            person = self._db.get_person(id)
+            if person is not None:
+                json_data.add_data(person)
+        self.send_http_response_ok(json_data.get())
+
+
+
+    def _rest_account_person_add(self):
+        """ add person
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("person")
+        try:
+            person = self._db.add_person(self.get_parameters("first_name"), \
+                                         self.get_parameters("last_name"), \
+                                         self.to_date(self.get_parameters("birthday")))
+            json_data.add_data(person)
+        except:
+            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+        self.send_http_response_ok(json_data.get())
+
+
+
+    def _rest_account_person_update(self):
+        """ update person
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("person")
+        try:
+            person = self._db.update_person(self.get_parameters("id"), \
+                                            self.get_parameters("first_name"), \
+                                            self.get_parameters("last_name"), \
+                                            self.to_date(self.get_parameters("birthday")))
+            json_data.add_data(person)
+        except:
+            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+        self.send_http_response_ok(json_data.get())
+
+
+
+    def _rest_account_person_del(self, id):
+        """ delete person
+            @param id : person id
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("person")
+        try:
+            person = self._db.del_person(id)
+            json_data.add_data(person)
+        except:
+            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+        self.send_http_response_ok(json_data.get())
 
 
 
@@ -2595,7 +2742,7 @@ class JSonHelper():
                    "DeviceConfig", "DeviceStats", "DeviceStatsValue", \
                    "DeviceTechnology", "DeviceTechnologyConfig", \
                    "DeviceType", "UIItemConfig", "Room", "UserAccount", \
-                   "SensorReferenceData", "SystemAccount", "SystemConfig", \
+                   "SensorReferenceData", "Person", "SystemConfig", \
                    "SystemStats", "SystemStatsValue", "Trigger") 
         instance_type = ("instance")
         num_type = ("int", "float")
