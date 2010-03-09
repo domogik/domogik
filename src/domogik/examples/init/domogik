@@ -88,9 +88,20 @@ function stop_modules {
         kill -15 $pid 2>/dev/null 1>&2
     done
 }
+
+# Check if the directory for lock exists
+function check_lock_dir {
+    USER_HOME=$(grep $DOMOGIK_USER /etc/passwd | cut -d":" -f6)
+    DIRECTORY=$(grep "pid_dir_path" ${USER_HOME}/.domogik.cfg | cut -d " " -f 3)
+    if [ ! -d $DIRECTORY ];then
+        mkdir $DIRECTORY
+        chown ${DOMOGIK_USER}: $DIRECTORY
+    fi
+}
     
 case "$1" in
     start)
+    check_lock_dir
     if [ $# -eq 1 ];then
         start_xpl
         start_manager 
