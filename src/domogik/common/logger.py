@@ -48,66 +48,42 @@ class Logger():
     Logger for the xPL system.
     Define main config parameters to help scripts to use logging facilities
     with a minimum of config
-    This class is a singleton
     '''
 
-    __instance = None
-
-    def __init__(self, module_name = None):
+    def __init__(self, module_name):
         '''
         Get a logger with provided parameters and set config
         @param file : the file to record logs into with the path
         @param level : min level of the message to record, can be one of
         'debug', 'info', 'warning', 'error', 'critical'
         '''
-        if Logger.__instance is None:
-            Logger.__instance = Logger.__singl_logger(module_name)
-            self.__dict__['_Logger__instance'] = Logger.__instance
+        LEVELS = {'debug': logging.DEBUG,
+              'info': logging.INFO,
+              'warning': logging.WARNING,
+              'error': logging.ERROR,
+              'critical': logging.CRITICAL}
 
-    def __getattr__(self, attr):
-        """ Delegate access to implementation """
-        return getattr(self.__instance, attr)
+        cfg = Loader()
+        config = cfg.load()[0]
+        file = "%s/%s.log" % (config['log_dir_path'], module_name)
+        level = config['log_level']
 
-    def __setattr__(self, attr, value):
-        """ Delegate access to implementation """
-        return setattr(self.__instance, attr, value)
+        if level not in LEVELS:
+            raise ValueError("level must be one of 'debug','info','warning',"\
+                    "'error','critical'. Check your config.")
 
-    class __singl_logger:
+        logger = logging.getLogger('domogik-%s' % module_name)
+        hdlr = logging.FileHandler(file)
+        formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s "\
+                "%(message)s')
+        hdlr.setFormatter(formatter)
+        logger.addHandler(hdlr)
+        logger.setLevel(LEVELS[level])
 
-        def __init__(self, module_name):
-            '''
-            Get a logger with provided parameters and set config
-            @param file : the file to record logs into with the path
-            @param level : min level of the message to record, can be one of
-            'debug', 'info', 'warning', 'error', 'critical'
-            '''
-            LEVELS = {'debug': logging.DEBUG,
-                  'info': logging.INFO,
-                  'warning': logging.WARNING,
-                  'error': logging.ERROR,
-                  'critical': logging.CRITICAL}
+        self.logger = logger
 
-            cfg = Loader()
-            config = cfg.load()[0]
-            file = "%s/%s.log" % (config['log_dir_path'], module_name)
-            level = config['log_level']
-
-            if level not in LEVELS:
-                raise ValueError("level must be one of 'debug','info','warning',"\
-                        "'error','critical'. Check your config.")
-
-            logger = logging.getLogger('domogik-%s' % module_name)
-            hdlr = logging.FileHandler(file)
-            formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s "\
-                    "%(message)s')
-            hdlr.setFormatter(formatter)
-            logger.addHandler(hdlr)
-            logger.setLevel(LEVELS[level])
-
-            self.logger = logger
-
-        def get_logger(self):
-            '''
-            returns the configured logger instance
-            '''
-            return self.logger
+    def get_logger(self):
+        '''
+        returns the configured logger instance
+        '''
+        return self.logger
