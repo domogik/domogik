@@ -224,3 +224,9 @@ class Accounts(pipes.DmgPipe):
         resp = Accounts.objects.get({'parameters':"user/list/"})
         if resp :
             return resp
+    
+    @staticmethod
+    def Auth(login, password):
+        resp = Accounts.objects.get({'parameters':"auth/" + login + "/" + password})
+        if resp :
+            return resp

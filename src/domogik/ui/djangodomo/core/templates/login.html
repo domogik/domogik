@@ -44,7 +44,7 @@
                     {% for account in account_list %}
                         <li>
                             <a href="#" id="id{{ account.login }}" onclick="chooseUser('id{{ account.login }}', '{{ account.login }}');">
-                                <img src="/design/{{ request.session.user.skin_used|default:'skins/default' }}/images/userid.jpg" alt="" width="64" height="64" />{{ account.login }}
+                                <img src="/design/{{ request.session.user.skin_used|default:'skins/default' }}/images/userid.jpg" alt="" width="64" height="64" />{{ account.person.first_name }}
                             </a>
                         </li>
                     {% endfor %}
