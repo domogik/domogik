@@ -84,7 +84,7 @@
                     function(data) {
                         var status = (data.status).toLowerCase();
                         if (status == 'ok') {
-                            $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "New person added" %} \'' + data.person[0].first_name + ' ' + data.person[0].first_name + '\''});
+                            $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "New person added" %} \'' + data.person[0].first_name + ' ' + data.person[0].last_name + '\''});
                         } else {
                             $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Person not created" %} (' + data.description + ')'});
                         }
@@ -273,7 +273,7 @@
                                     function(data) {
                                         var status = (data.status).toLowerCase();
                                         if (status == 'ok') {
-                                            $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Person " %} \'' + data.person[0].first_name + ' ' + data.person[0].first_name + '\' updated'});
+                                            $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Person " %} \'' + data.person[0].first_name + ' ' + data.person[0].last_name + '\' updated'});
                                         } else {
                                             $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Person not updated" %} (' + data.description + ')'});
                                         }
