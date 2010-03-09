@@ -2615,7 +2615,7 @@ class JSonHelper():
             pass
         if hasattr(data, 'id'):
             pass
-#        print "DATA : " + data.encode('utf-8')
+        print "DATA : " + unicode(data).encode('utf-8')
         #print "DATA TYPE : " + data_type
 
 
