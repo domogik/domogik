@@ -32,7 +32,7 @@ fi
 
 function start_django {
     echo -n " * Starting Django..."
-    /bin/su - ${DOMOGIK_USER} -m -c "dmg_django runserver >/dev/null &"
+    /bin/su - ${DOMOGIK_USER} -m -c "dmg_django runserver >/dev/null 2>&1 &"
     if [ $? -gt 0 ]; then
         echo " An error occured during Django startup."
         exit 1
@@ -151,7 +151,7 @@ case "$1" in
     $0 start $1 $2
     ;;
     *)
-    echo "usage: $0 {start|stop|restart} [(django|xpl|manager)]"
+    echo "usage: $0 {start|stop|restart} [(django|xpl|manager|modules)]"
 esac
 exit 0
 
