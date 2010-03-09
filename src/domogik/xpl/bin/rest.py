@@ -99,14 +99,17 @@ class Rest(xPLModule):
         self._xml_directory = "%s/share/domogik/rest/" % conf['custom_prefix']
 
         # HTTP server ip and port
-        self._config = Query(self._myxpl)
-        res = xPLResult()
-        self._config.query('rest', 'ip', res)
-        self.server_ip = res.get_value()['ip']
-        self._config = Query(self._myxpl)
-        res = xPLResult()
-        self._config.query('rest', 'port', res)
-        self.server_port = res.get_value()['port']
+        try:
+            cfg_rest = Loader('rest')
+            config_rest = cfg_rest.load()
+            conf_rest = dict(config_rest[1])
+            self.server_ip = conf_rest['rest_server_ip']
+            self.server_port = conf_rest['rest_server_port']
+        except KeyError:
+            # default parameters
+            self.server_ip = server_ip
+            self.server_port = server_port
+
 
         # Queues config
         self._config = Query(self._myxpl)
@@ -130,12 +133,6 @@ class Rest(xPLModule):
         if self._queue_life_expectancy == "None":
             self._queue_life_expectancy = QUEUE_LIFE_EXPECTANCY
         self._queue_life_expectancy = float(self._queue_life_expectancy)
-
-        # parameters
-        if self.server_ip == "None":
-            self.server_ip = server_ip
-        if self.server_port == "None":
-            self.server_port = server_port
 
         # Queues for xPL
         self._queue_system_list = Queue(self._queue_size)
@@ -2917,11 +2914,9 @@ class JSonHelper():
 
 
 if __name__ == '__main__':
-    #main()
-    # Create REST server with default values (could be overriden by database)
+    # Create REST server with default values (overriden by ~/.domogik.cfg)
     http_server = Rest("127.0.0.1", "8080")
     http_server.start()
-    #serv = Rest("192.168.0.10", "80")
 
 
 
