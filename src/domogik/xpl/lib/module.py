@@ -138,7 +138,7 @@ class xPLModule():
             """
             cmd = message.data["command"]
             module = message.data["module"]
-            if cmd == "stop" and module == self.get_module_name():
+            if cmd == "stop" and module in ['*',self.get_module_name()]:
                 self._log.info("Someone asked to stop %s, doing." % self.get_module_name())
                 self._answer_stop()
                 self.force_leave()
@@ -198,6 +198,7 @@ class xPLModule():
                 t.stop()
                 self._log.debug("Timer stopped %s" % t)
             for t in self._threads:
+                self._log.debug("Try to stop thread %s" % t)
                 t.join()
                 self._log.debug("Thread stopped %s" % t)
                 #t._Thread__stop()
