@@ -435,11 +435,13 @@ class ProcessRequest():
 
         # url processing
         self.path = urllib.unquote(unicode(self.path))
-        self._log.info("Request : %s" % self.path)
+        # replace password by "***". 
+        path_without_passwd = re.sub("password/.*/", "password/***/", self.path + "/")
+        self._log.info("Request : %s" % path_without_passwd)
 
         # TODO log data manipulation here
-        if re.match(".*(add|update|del|set).*", self.path) is not None:
-            self._log_dm.info("REQUEST=%s" % self.path)
+        if re.match(".*(add|update|del|set).*", path_without_passwd) is not None:
+            self._log_dm.info("REQUEST=%s" % path_without_passwd)
 
         tab_url = self.path.split("?")
         self.path = tab_url[0]
