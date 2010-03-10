@@ -90,7 +90,7 @@ class Rest(xPLModule):
         # logging data manipulation initialization
         log_dm = logger.Logger('REST-DM')
         self._log_dm = log_dm.get_logger()
-        self._log_dm.info("#Rest Server Data Manipulation...")
+        self._log_dm.info("Rest Server Data Manipulation...")
         self._log_dm.debug("locale : %s %s" % locale.getdefaultlocale())
         # DB Helper
         self._db = DbHelper()
@@ -368,11 +368,14 @@ class RestHandler(BaseHTTPRequestHandler):
         """
         # TODO : log!!
         #self._log.debug("Send HTTP header for ERROR : code=%s ; msg=%s" % (err_code, err_msg))
-        self.send_response(200)
-        self.send_header('Content-type',    'text/html')
-        self.end_headers()
         json_data = JSonHelper("ERROR", err_code, err_msg)
         json_data.set_jsonp(jsonp, jsonp_cb)
+        self.send_response(200)
+        self.send_header('Content-type',    'text/html')
+        self.send_header('Expires', '-1')
+        self.send_header('Cache-control', 'no-cache')
+        self.send_header('Content-Length', len(json_data.get().encode("utf-8")))
+        self.end_headers()
         self.wfile.write(json_data.get())
         # TODO : log!!
         #self._log.warning("Error reply : %s" % json_data.get())
@@ -411,6 +414,7 @@ class ProcessRequest():
         self._db = self.handler_params[0]._db
         self._myxpl = self.handler_params[0]._myxpl
         self._log = self.handler_params[0]._log
+        self._log_dm = self.handler_params[0]._log_dm
         self._xml_directory = self.handler_params[0]._xml_directory
 
         self._log.debug("Process request : init")
@@ -432,11 +436,12 @@ class ProcessRequest():
         self.jsonp_cb = ""
 
         # url processing
-        print self.path
         self.path = urllib.unquote(unicode(self.path))
         self._log.info("Request : %s" % self.path)
 
         # TODO log data manipulation here
+        if re.match(".*(add|update|del|set).*", self.path) is not None:
+            self._log_dm.info("REQUEST=%s" % self.path)
 
         tab_url = self.path.split("?")
         self.path = tab_url[0]
