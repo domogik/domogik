@@ -57,6 +57,8 @@ import traceback
 import datetime
 
 
+REST_API_VERSION = "0.1"
+REST_DESCRIPTION = "REST module is part of Domogik project. See http://trac.domogik.org/domogik/wiki/modules/REST.en for REST API documentation"
 
 
 
@@ -531,8 +533,8 @@ class ProcessRequest():
         json_data = JSonHelper("OK", 0, "REST server available")
         json_data.set_data_type("rest")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        # TODO : get version by a better way
-        json_data.add_data(("Version : 0.1.x", "Status : UP"))
+        json_data.add_data({"Version" : REST_API_VERSION})
+        json_data.add_data({"Description" : REST_DESCRIPTION})
         self.send_http_response_ok(json_data.get())
 
 
