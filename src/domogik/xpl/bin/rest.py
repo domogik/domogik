@@ -2752,7 +2752,7 @@ class JSonHelper():
 
         # check deepth in recursivity
         if idx > 2:
-            return "#MAX_DEPTH#"
+            return "#MAX_DEPTH# "
 
         # define data types
         db_type = ("ActuatorFeature", "Area", "Device", "DeviceUsage", \
