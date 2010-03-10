@@ -1341,7 +1341,6 @@ target=*
 
 
 
-### TODO j'en suis ici pour les _log !!
 
 ######
 # /base/area processing
@@ -2122,7 +2121,7 @@ target=*
     def rest_module(self):
         """ /module processing
         """
-        print "Call rest_module"
+        self._log.debug("Module action")
         if len(self.rest_request) < 1:
             self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
             return
@@ -2174,12 +2173,12 @@ target=*
 
 
 
-    def _rest_module_list(self, name = None):
+    def _rest_module_list(self, name = None, host = gethostname()):
         """ Send a xpl message to manager to get module list
             Display this list as json
             @param name : name of module
         """
-        print "Call rest_module_list"
+        self._log.debug("Module : ask for module list on %s." % host)
 
         ### Send xpl message to get list
         message = XplMessage()
@@ -2189,20 +2188,22 @@ target=*
         # TODO : ask for good host
         message.add_data({"host" : gethostname()})
         self._myxpl.send(message)
-        print "Message sent : " + str(message)
+        self._log.debug("Module : send message : %s" % str(message))
 
         ### Wait for answer
         # get xpl message from queue
         try:
+            self._log.debug("Module : wait for answer...")
             message = self._get_from_queue(self._queue_system_list)
         except Empty:
+            self._log.debug("Module : no answer")
             json_data = JSonHelper("ERROR", 999, "No data or timeout on getting module list")
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
             json_data.set_data_type("module")
             self.send_http_response_ok(json_data.get())
             return
 
-        print "Message received : " + str(message)
+        self._log.debug("Module : message received : %s" % str(message))
 
         # process message
         cmd = message.data['command']
@@ -2233,7 +2234,7 @@ target=*
             Display this list as json
             @param name : name of module
         """
-        print "Call rest_module_detail"
+        self._log.debug("Module : ask for module detail : %s on %s." % (name, host))
 
         ### Send xpl message to get detail
         message = XplMessage()
@@ -2244,11 +2245,12 @@ target=*
         # TODO : ask for good host
         message.add_data({"host" : host})
         self._myxpl.send(message)
-        print "Message sent : " + str(message)
+        self._log.debug("Module : send message : %s" % str(message))
 
         ### Wait for answer
         # get xpl message from queue
         try:
+            self._log.debug("Module : wait for answer...")
             # in filter, "%" means, that we check for something starting with name
             message = self._get_from_queue(self._queue_system_detail, filter = {"command" : "detail", "module" : name + "%"})
         except Empty:
@@ -2258,7 +2260,7 @@ target=*
             self.send_http_response_ok(json_data.get())
             return
 
-        print "Message received : " + str(message)
+        self._log.debug("Module : message received : %s" % str(message))
 
         # process message
         cmd = message.data['command']
@@ -2293,6 +2295,7 @@ target=*
             @param module : name of module
             @param force : force (or not) action. 0/1. 1 : force
         """
+        self._log.debug("Module : ask for %s %s on %s (force=%s)" % (command, module, host, force))
 
         ### Send xpl message
         cmd_message = XplMessage()
@@ -2303,11 +2306,12 @@ target=*
         cmd_message.add_data({"module" : module})
         cmd_message.add_data({"force" : force})
         self._myxpl.send(cmd_message)
-        print "Message sent : " + str(cmd_message)
+        self._log.debug("Module : send message : " % str(cmd_message))
 
         ### Listen for response
         # get xpl message from queue
         try:
+            self._log.debug("Module : wait for answer...")
             if command == "start":
                 message = self._get_from_queue(self._queue_system_start, filter = {"command" : "start", "module" : module})
             elif command == "stop":
@@ -2319,7 +2323,7 @@ target=*
             self.send_http_response_ok(json_data.get())
             return
 
-        print "Message received : " + str(message)
+        self._log.debug("Module : message received : " % str(message))
 
         # an error happens
         if 'error' in message.data:
@@ -2342,7 +2346,7 @@ target=*
 ######
 
     def rest_account(self):
-        print "Call rest_action"
+        self._log.debug("Account action")
 
         # Check url length
         if len(self.rest_request) < 2:
@@ -2490,16 +2494,19 @@ target=*
             @param login : login
             @param password : password
         """
+        self._log.info("Try to authenticate as %s" % login)
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         login_ok = self._db.authenticate(login, password)
         if login_ok == True:
+            self._log.info("Authentication OK")
             json_data.set_ok(description = "Authentification granted")
             json_data.set_data_type("account")
             account = self._db.get_user_account_by_login(login)
             if account is not None:
                 json_data.add_data(account)
         else:
+            self._log.warning("Authentication refused")
             json_data.set_error(999, "Authentification refused")
         self.send_http_response_ok(json_data.get())
 
@@ -2556,6 +2563,7 @@ target=*
     def _rest_account_password(self):
         """ update user password
         """
+        self._log.info("Try to change password for account id %s" % self.get_parameters("id"))
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("account")
@@ -2563,12 +2571,14 @@ target=*
                                           self.get_parameters("old"), \
                                           self.get_parameters("new"))
         if change_ok == True:
+            self._log.info("Password updated")
             json_data.set_ok(description = "Password updated")
             json_data.set_data_type("account")
             account = self._db.get_user_account(self.get_parameters("id"))
             if account is not None:
                 json_data.add_data(account)
         else:
+            self._log.warning("Password not updated : error")
             json_data.set_error(999, "Error in updating password")
         self.send_http_response_ok(json_data.get())
 
@@ -2722,7 +2732,6 @@ class JSonHelper():
         if hasattr(data, 'area'):  # for room
             pass
 
-        #print "T=" + str(type(data))
         if data == None:
             return
 
@@ -2760,14 +2769,9 @@ class JSonHelper():
         # get data type
         data_type = type(data).__name__
 
-        # dirty issue to force cache of __dict__  (done for ui_config)
-        if hasattr(data, 'reference'):
-            pass
-        if hasattr(data, 'id'):
-            pass
+        # dirty issue to force cache of __dict__  
         print "DATA : " + unicode(data).encode('utf-8')
         #print "DATA TYPE : " + data_type
-
 
         ### type instance (sql object)
         if data_type in instance_type:
@@ -2776,7 +2780,7 @@ class JSonHelper():
                 sub_data_type = data._type.lower()
             except:
                 sub_data_type = "???"
-            print "SUB TYPE = %s" % sub_data_type
+            #print "SUB TYPE = %s" % sub_data_type
 
             if idx == 0:
                 data_json += "{"
@@ -2912,7 +2916,7 @@ class JSonHelper():
 
         if self._jsonp is True and self._jsonp_cb != "":
             json_buf += ")"
-        print json_buf.encode("utf-8")
+        #print json_buf.encode("utf-8")
         return json_buf
         
     
