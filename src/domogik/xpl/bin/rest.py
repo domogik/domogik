@@ -1818,8 +1818,7 @@ target=*
             for actuator_feature in self._db.list_actuator_features():
                 json_data.add_data(actuator_feature)
         else:
-            actuator_feature = self._db.get_actuator_feature_by_typeid(type_id)
-            if actuator_feature is not None:
+            for actuator_feature in self._db.get_actuator_feature_by_typeid(type_id):
                 json_data.add_data(actuator_feature)
         self.send_http_response_ok(json_data.get())
 
