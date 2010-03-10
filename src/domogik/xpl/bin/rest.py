@@ -1740,8 +1740,7 @@ target=*
             for sensor_reference in self._db.list_sensor_reference_data():
                 json_data.add_data(sensor_reference)
         else:
-            sensor_reference = self._db.get_sensor_reference_data_by_typeid(type_id)
-            if sensor_reference is not None:
+            for sensor_reference in self._db.get_sensor_reference_data_by_typeid(type_id):
                 json_data.add_data(sensor_reference)
         self.send_http_response_ok(json_data.get())
 
