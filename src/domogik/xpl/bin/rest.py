@@ -341,8 +341,7 @@ class RestHandler(BaseHTTPRequestHandler):
             Send also json data
             @param data : json data to display
         """
-        # TODO : log!!
-        #self._log.debug("Send HTTP header for OK")
+        self.server.handler_params[0]._log.debug("Send HTTP header for OK")
         self.send_response(200)
         self.send_header('Content-type',  'application/json')
         self.send_header('Expires', '-1')
@@ -350,8 +349,7 @@ class RestHandler(BaseHTTPRequestHandler):
         self.send_header('Content-Length', len(data.encode("utf-8")))
         self.end_headers()
         if data:
-            # TODO : log!!
-            #self._log.debug("Send HTTP data : %s" % data.encode("utf-8"))
+            self.server.handler_params[0]._log.debug("Send HTTP data : %s" % data.encode("utf-8"))
             self.wfile.write(data.encode("utf-8"))
 
 
@@ -367,7 +365,7 @@ class RestHandler(BaseHTTPRequestHandler):
                               in jsonp format
         """
         # TODO : log!!
-        #self._log.debug("Send HTTP header for ERROR : code=%s ; msg=%s" % (err_code, err_msg))
+        self.server.handler_params[0]._log.warning("Send HTTP header for ERROR : code=%s ; msg=%s" % (err_code, err_msg))
         json_data = JSonHelper("ERROR", err_code, err_msg)
         json_data.set_jsonp(jsonp, jsonp_cb)
         self.send_response(200)
@@ -377,8 +375,6 @@ class RestHandler(BaseHTTPRequestHandler):
         self.send_header('Content-Length', len(json_data.get().encode("utf-8")))
         self.end_headers()
         self.wfile.write(json_data.get())
-        # TODO : log!!
-        #self._log.warning("Error reply : %s" % json_data.get())
 
 
 
