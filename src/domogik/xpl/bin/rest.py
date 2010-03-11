@@ -436,7 +436,7 @@ class ProcessRequest():
         # url processing
         self.path = urllib.unquote(unicode(self.path))
         # replace password by "***". 
-        path_without_passwd = re.sub("password/.*/", "password/***/", self.path + "/")
+        path_without_passwd = re.sub("password/[^/]+/", "password/***/", self.path + "/")
         self._log.info("Request : %s" % path_without_passwd)
 
         # TODO log data manipulation here
