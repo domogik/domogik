@@ -543,6 +543,7 @@ def show_room(request, room_id):
         resultRoomById = Rooms.getById(room_id)
         resultRoomById.merge_uiconfig()
         resultDevicesByRoom = Devices.getByRoom(room_id)
+        resultDevicesByRoom.merge_actuators()
         resultHouse = UIConfigs.getGeneral('house')
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
@@ -601,6 +602,7 @@ def admin_visualization_devices(request):
     try:
         resultAllRooms = Rooms.getAllWithDevices()
         resultAllRooms.merge_uiconfig()
+        resultAllRooms.merge_actuators()
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
         

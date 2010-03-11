@@ -119,6 +119,13 @@ class Rooms(pipes.DmgPipe):
                 room.area.config = {}
                 for uiconfig in uiconfigs.ui_config:
                     room.area.config[uiconfig.key] = uiconfig.value
+    
+    def merge_actuators(self):
+        for room in self.room:
+            if hasattr(room, 'device') and (room.device != 'None') :
+                for device in room.device:
+                    actuators = DeviceActuators.getByType(device.type_id)
+                    device.actuator = actuators.actuator_feature
 
 class Devices(pipes.DmgPipe):
     uri = "http://127.0.0.1:8080/base/device"
@@ -150,6 +157,11 @@ class Devices(pipes.DmgPipe):
                 for uiconfig in uiconfigs.ui_config:
                     device.room.config[uiconfig.key] = uiconfig.value
 
+    def merge_actuators(self):
+        for device in self.device:
+            actuators = DeviceActuators.getByType(device.type_id)
+            device.actuator = actuators.actuator_feature
+                    
 class DeviceUsages(pipes.DmgPipe):
     uri = "http://127.0.0.1:8080/base/device_usage"
 
@@ -174,6 +186,21 @@ class DeviceTypes(pipes.DmgPipe):
     @staticmethod
     def getAll():
         resp = DeviceTypes.objects.get({'parameters':"list/"})
+        if resp :
+            return resp
+
+class DeviceActuators(pipes.DmgPipe):
+    uri = "http://127.0.0.1:8080/base/actuator_feature"
+
+    @staticmethod
+    def getAll():
+        resp = DeviceActuators.objects.get({'parameters':"list/"})
+        if resp :
+            return resp
+
+    @staticmethod
+    def getByType(type_id):
+        resp = DeviceActuators.objects.get({'parameters':"list/by-type_id/" + str(type_id)})
         if resp :
             return resp
         

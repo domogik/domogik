@@ -53,7 +53,9 @@
 .icon64-usage-1 { background-image:url(../images/device_usage/light/lamp_64.png);}
 .icon32-usage-1 { background-image:url(../images/device_usage/light/lamp_32.png);}
 .icon16-usage-1 { background-image:url(../images/device_usage/light/lamp_16.png);}
-.icon32-usage-shutter { background-image:url(../images/device_usage/light/shutter_down_32.png);}
+.icon64-usage-2 { background-image:url(../images/device_usage/socket/socket_64.png);}
+.icon32-usage-2 { background-image:url(../images/device_usage/socket/socket_32.png);}
+.icon16-usage-2 { background-image:url(../images/device_usage/socket/socket_16.png);}
 
 /* State icons */
 .icon32-state-1.binary_0 { background-image:url(../images/device_usage/light/binary/0_32.png);}
@@ -63,8 +65,20 @@
 .icon32-state-1.range_60 { background-image:url(../images/device_usage/light/range/60_32.png);}
 .icon32-state-1.range_100 { background-image:url(../images/device_usage/light/range/100_32.png);}
 
-.icon32-state-shutter.binary_0 { background-image:url(../images/device_usage/shutter/binary/0_32.png);}
-.icon32-state-shutter.binary_1 { background-image:url(../images/device_usage/shutter/binary/1_32.png);}
+.icon32-state-2.binary_0 { background-image:url(../images/device_usage/socket/binary/0_32.png);}
+.icon32-state-2.binary_1 { background-image:url(../images/device_usage/socket/binary/1_32.png);}
+.icon32-state-2.range_0 { background-image:url(../images/device_usage/socket/range/0_32.png);}
+.icon32-state-2.range_10 { background-image:url(../images/device_usage/socket/range/10_32.png);}
+.icon32-state-2.range_20 { background-image:url(../images/device_usage/socket/range/20_32.png);}
+.icon32-state-2.range_30 { background-image:url(../images/device_usage/socket/range/30_32.png);}
+.icon32-state-2.range_40 { background-image:url(../images/device_usage/socket/range/40_32.png);}
+.icon32-state-2.range_50 { background-image:url(../images/device_usage/socket/range/50_32.png);}
+.icon32-state-2.range_60 { background-image:url(../images/device_usage/socket/range/60_32.png);}
+.icon32-state-2.range_70 { background-image:url(../images/device_usage/socket/range/70_32.png);}
+.icon32-state-2.range_80 { background-image:url(../images/device_usage/socket/range/80_32.png);}
+.icon32-state-2.range_90 { background-image:url(../images/device_usage/socket/range/90_32.png);}
+.icon32-state-2.range_100 { background-image:url(../images/device_usage/socket/range/100_32.png);}
+
 
 /* Action */
 .icon16-action-add { background-image:url(../images/action/plus_16.png);}
