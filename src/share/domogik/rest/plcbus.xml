@@ -1,6 +1,6 @@
 <mapping>
   <technology name="plcbus">
-        <schema>plcbus.basic</schema>
+        <schema>control.basic</schema>
 
         <device>
             <key>device</key>
