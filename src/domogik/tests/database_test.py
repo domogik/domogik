@@ -183,10 +183,10 @@ class AreaTestCase(GenericTestCase):
         self.remove_all_areas(self.db)
         del self.db
 
-    def testEmptyList(self):
+    def test_empty_list(self):
         assert len(self.db.list_areas()) == 0
 
-    def testAdd(self):
+    def test_add(self):
         try:
             self.db.add_area(None, None)
             TestCase.fail(self, "An exception should have been raised : impossible to create an area without a name")
@@ -196,13 +196,13 @@ class AreaTestCase(GenericTestCase):
         print area0
         assert self.db.list_areas()[0].name == 'area0'
 
-    def testUpdate(self):
+    def test_update(self):
         area = self.db.add_area('area0','description 0')
         area_u = self.db.update_area(area.id, 'area1','description 1')
         assert area_u.name == 'area1'
         assert area_u.description == 'description 1'
 
-    def testFetchInformation(self):
+    def test_fetch_information(self):
         area = self.db.add_area('area0','description 0')
         area0 = self.db.get_area_by_name('Area0')
         assert area0.name == 'area0', 'area0 not found'
@@ -224,7 +224,7 @@ class AreaTestCase(GenericTestCase):
                 for room in my_area.Room:
                     assert room.name in ['Bedroom1', 'Bedroom2']
 
-    def testDel(self):
+    def test_del(self):
         area0 = self.db.add_area('area0','description 0')
         area0_id = area0.id
         area_d = self.db.del_area(area0.id)
@@ -253,10 +253,10 @@ class RoomTestCase(GenericTestCase):
         self.remove_all_areas(self.db)
         del self.db
 
-    def testEmptyList(self):
+    def test_empty_list(self):
         assert len(self.db.list_rooms()) == 0
 
-    def testAdd(self):
+    def test_add(self):
         try:
             self.db.add_room(r_name='foo', r_area_id=99999999999,
                              r_description='foo')
@@ -281,7 +281,7 @@ class RoomTestCase(GenericTestCase):
         assert len(self.db.list_rooms()) == 4
         room4 = self.db.add_room(r_name='room4')
 
-    def testUpdate(self):
+    def test_update(self):
         area1 = self.db.add_area('area1','description 1')
         area2 = self.db.add_area('area2','description 2')
         room = self.db.add_room(r_name='room1', r_description='description 1',
@@ -303,7 +303,7 @@ class RoomTestCase(GenericTestCase):
         room_u = self.db.update_room(room.id, r_area_id='')
         assert room_u.area_id == None
 
-    def testDel(self):
+    def test_del(self):
         area1 = self.db.add_area('area1','description 1')
         area2 = self.db.add_area('area2','description 2')
         room1 = self.db.add_room(r_name='room1', r_description='description 1',
@@ -324,7 +324,7 @@ class RoomTestCase(GenericTestCase):
         except DbHelperException:
             pass
 
-    def testListAndGet(self):
+    def test_list_and_get(self):
         area1 = self.db.add_area('area1','description 1')
         room1 = self.db.add_room(r_name='room1', r_description='description 1',
                                  r_area_id=area1.id)
@@ -374,10 +374,10 @@ class DeviceUsageTestCase(GenericTestCase):
         self.remove_all_device_usages(self.db)
         del self.db
 
-    def testEmptyList(self):
+    def test_empty_list(self):
         assert len(self.db.list_device_usages()) == 0
 
-    def testAdd(self):
+    def test_add(self):
         du1 = self.db.add_device_usage('du1')
         print du1
         assert du1.name == 'du1'
@@ -385,18 +385,18 @@ class DeviceUsageTestCase(GenericTestCase):
         assert len(self.db.list_device_usages()) == 2
         assert self.has_item(self.db.list_device_usages(), ['du1', 'du2'])
 
-    def testUpdate(self):
+    def test_update(self):
         du = self.db.add_device_usage('du1')
         du_u = self.db.update_device_usage(du_id=du.id, du_name='du2',
                                            du_description='description 2')
         assert du_u.name == 'du2'
         assert du_u.description == 'description 2'
 
-    def testFetchInformation(self):
+    def test_list_and_get(self):
         du1 = self.db.add_device_usage('du1')
         assert self.db.get_device_usage_by_name('Du1').name == 'du1'
 
-    def testDel(self):
+    def test_del(self):
         du1 = self.db.add_device_usage('du1')
         du2 = self.db.add_device_usage('du2')
         du2_id = du2.id
@@ -424,10 +424,10 @@ class DeviceTypeTestCase(GenericTestCase):
         self.remove_all_device_types(self.db)
         del self.db
 
-    def testEmptyList(self):
+    def test_empty_list(self):
         assert len(self.db.list_device_types()) == 0
 
-    def testAdd(self):
+    def test_add(self):
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
         try:
             self.db.add_device_type(dty_name='x10 Switch',
@@ -447,7 +447,7 @@ class DeviceTypeTestCase(GenericTestCase):
         assert len(self.db.list_device_types()) == 2
         assert self.has_item(self.db.list_device_types(), ['x10 Switch', 'x10 Dimmer'])
 
-    def testUpdate(self):
+    def test_update(self):
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
         dt2 = self.db.add_device_technology(u'PLCBus', 'desc dt2')
         dty = self.db.add_device_type(dty_name='x10 Switch',
@@ -465,13 +465,13 @@ class DeviceTypeTestCase(GenericTestCase):
         assert dty_u.description == 'desc2'
         assert dty_u.technology_id == dt2.id
 
-    def testFetchInformation(self):
+    def test_list_and_get(self):
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
         dty1 = self.db.add_device_type(dty_name='x10 Switch',
                                        dty_description='desc1', dt_id=dt1.id)
         assert self.db.get_device_type_by_name('x10 switch').name == 'x10 Switch'
 
-    def testDel(self):
+    def test_del(self):
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
         dty1 = self.db.add_device_type(dty_name='x10 Switch', dt_id=dt1.id)
         dty2 = self.db.add_device_type(dty_name='x10 Dimmer', dt_id=dt1.id)
@@ -500,10 +500,10 @@ class SensorReferenceDataTestCase(GenericTestCase):
         self.remove_all_sensor_reference_data(self.db)
         del self.db
 
-    def testEmptyList(self):
+    def test_empty_list(self):
         assert len(self.db.list_sensor_reference_data()) == 0
 
-    def testAdd(self):
+    def test_add(self):
         dt1 = self.db.add_device_technology(u'1wire', 'desc dt1')
         dty1 = self.db.add_device_type(dty_name='1wire.Temperature',
                                        dty_description='desc1', dt_id=dt1.id)
@@ -533,7 +533,7 @@ class SensorReferenceDataTestCase(GenericTestCase):
         assert self.has_item(self.db.list_sensor_reference_data(), \
                ['Temperature', 'Voltage'])
 
-    def testUpdate(self):
+    def test_update(self):
         dt1 = self.db.add_device_technology(u'1wire', 'desc dt1')
         dty1 = self.db.add_device_type(dty_name='1wire.Temperature',
                                        dty_description='desc1', dt_id=dt1.id)
@@ -559,7 +559,7 @@ class SensorReferenceDataTestCase(GenericTestCase):
         assert srd_u.unit == 'V'
         assert srd_u.stat_key == 'key2'
 
-    def testFetchInformation(self):
+    def test_list_and_get(self):
         dt1 = self.db.add_device_technology(u'1wire', 'desc dt1')
         dty1 = self.db.add_device_type(dty_name='1wire.Temperature',
                                        dty_description='desc1', dt_id=dt1.id)
@@ -574,7 +574,7 @@ class SensorReferenceDataTestCase(GenericTestCase):
         assert self.db.get_sensor_reference_data_by_name('temperature').unit == srd1.unit
         assert self.db.get_sensor_reference_data_by_typeid(dty1.id)[0].device_type_id == dty1.id
 
-    def testDel(self):
+    def test_del(self):
         dt1 = self.db.add_device_technology(u'1wire', 'desc dt1')
         dty1 = self.db.add_device_type(dty_name='1wire.Temperature',
                                        dty_description='desc1', dt_id=dt1.id)
@@ -611,10 +611,10 @@ class ActuatorFeatureTestCase(GenericTestCase):
         self.remove_all_actuator_features(self.db)
         del self.db
 
-    def testEmptyList(self):
+    def test_empty_list(self):
         assert len(self.db.list_actuator_features()) == 0
 
-    def testAdd(self):
+    def test_add(self):
         dt1 = self.db.add_device_technology(u'PLCBus', 'desc dt1')
         dty1 = self.db.add_device_type(dty_name='PLCBus Switch',
                                        dty_description='desc1', dt_id=dt1.id)
@@ -644,7 +644,7 @@ class ActuatorFeatureTestCase(GenericTestCase):
         assert len(self.db.list_actuator_features()) == 2
         assert self.has_item(self.db.list_actuator_features(), ['Switch', 'Dimmer'])
 
-    def testUpdate(self):
+    def test_update(self):
         dt1 = self.db.add_device_technology(u'PLCBus', 'desc dt1')
         dt2 = self.db.add_device_technology(u'x10', 'desc dt2')
         dty1 = self.db.add_device_type(dty_name='PLCBus Switch',
@@ -672,7 +672,7 @@ class ActuatorFeatureTestCase(GenericTestCase):
         assert af_u.configurable_states == '0,100,10'
         assert af_u.return_confirmation == False
 
-    def testFetchInformation(self):
+    def test_list_and_get(self):
         dt1 = self.db.add_device_technology(u'PLCBus', 'desc dt1')
         dty1 = self.db.add_device_type(dty_name='PLCBus Switch',
                                        dty_description='desc1', dt_id=dt1.id)
@@ -687,7 +687,7 @@ class ActuatorFeatureTestCase(GenericTestCase):
         assert self.db.get_actuator_feature_by_name('dimmer').unit == af1.unit
         assert self.db.get_actuator_feature_by_typeid(dty1.id)[0].device_type_id == dty1.id
 
-    def testDel(self):
+    def test_del(self):
         dt1 = self.db.add_device_technology(u'PLCBus', 'desc dt1')
         dty1 = self.db.add_device_type(dty_name='PLCBus Switch',
                                        dty_description='desc1', dt_id=dt1.id)
@@ -724,10 +724,10 @@ class DeviceTechnologyTestCase(GenericTestCase):
         self.remove_all_device_technologies(self.db)
         del self.db
 
-    def testEmptyList(self):
+    def test_empty_list(self):
         assert len(self.db.list_device_technologies()) == 0
 
-    def testAdd(self):
+    def test_add(self):
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
         print dt1
         assert dt1.name == 'x10'
@@ -738,17 +738,17 @@ class DeviceTechnologyTestCase(GenericTestCase):
         assert self.has_item(self.db.list_device_technologies(),
                              [u'x10', u'1wire', u'PLCBus'])
 
-    def testUpdate(self):
+    def test_update(self):
         dt = self.db.add_device_technology(u'x10', 'desc dt1')
         dt_u = self.db.update_device_technology(dt.id, u'PLCBus', 'desc dt2')
         assert dt_u.name == 'PLCBus'
         assert dt_u.description == 'desc dt2'
 
-    def testFetchInformation(self):
+    def test_list_and_get(self):
         dt2 = self.db.add_device_technology(u'1wire', 'desc dt2')
         assert self.db.get_device_technology_by_name(u'1Wire').name == u'1wire'
 
-    def testDel(self):
+    def test_del(self):
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
         dt2 = self.db.add_device_technology(u'1wire', 'desc dt2')
         dt_del = dt2
@@ -780,10 +780,10 @@ class DeviceTechnologyConfigTestCase(GenericTestCase):
         self.remove_all_device_technologies(self.db)
         del self.db
 
-    def testEmptyList(self):
+    def test_empty_list(self):
         assert len(self.db.list_all_device_technology_config()) == 0
 
-    def testAdd(self):
+    def test_add(self):
         dt1 = self.db.add_device_technology('x10', 'desc dt1')
         dt3 = self.db.add_device_technology('PLCBus', 'desc dt3')
         try:
@@ -803,7 +803,7 @@ class DeviceTechnologyConfigTestCase(GenericTestCase):
         assert len(self.db.list_device_technology_config(dt1.id)) == 2
         assert len(self.db.list_device_technology_config(dt3.id)) == 3
 
-    def testUpdate(self):
+    def test_update(self):
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
         dt2 = self.db.add_device_technology(u'PLCBus', 'desc dt2')
         dtc = self.db.set_device_technology_config(dt1.id, 'key1', 'val1')
@@ -819,7 +819,7 @@ class DeviceTechnologyConfigTestCase(GenericTestCase):
         dtc = self.db.get_device_technology_config(dt3.id, 'key3_2')
         assert dtc.value == 'val3_2'
 
-    def testDel(self):
+    def test_del(self):
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
         dt3 = self.db.add_device_technology(u'PLCBus', 'desc dt3')
         dtc1_1 = self.db.set_device_technology_config(dt1.id, 'key1_1', 'val1_1')
@@ -850,10 +850,10 @@ class DeviceTestCase(GenericTestCase):
         self.remove_all_devices(self.db)
         del self.db
 
-    def testEmptyList(self):
+    def test_empty_list(self):
         assert len(self.db.list_devices()) == 0
 
-    def testAdd(self):
+    def test_add(self):
         area1 = self.db.add_area('area1','description 1')
         room1 = self.db.add_room('room1', area1.id)
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
@@ -896,7 +896,7 @@ class DeviceTestCase(GenericTestCase):
         # assert not device1.is_appliance(), "device1.is_appliance()
         # returns True. Should have returned False"
 
-    def testListAndGet(self):
+    def test_list_and_get(self):
         area1 = self.db.add_area('Basement','description 1')
         room1 = self.db.add_room('Kitchen', area1.id)
         room2 = self.db.add_room('Bathroom', area1.id)
@@ -921,7 +921,7 @@ class DeviceTestCase(GenericTestCase):
         search_dev2 =self.db.get_device_by_technology_and_address(dt1.name, 'A2')
         assert search_dev2 == None
 
-    def testUpdate(self):
+    def test_update(self):
         area1 = self.db.add_area('area1','description 1')
         room1 = self.db.add_room('room1', area1.id)
         room2 = self.db.add_room('room2', area1.id)
@@ -997,7 +997,7 @@ class DeviceTestCase(GenericTestCase):
         assert len(self.db.find_devices([room1.id], [du2.id])) == 0
         assert len(self.db.find_devices([room1.id, room2.id], [du2.id])) == 1
 
-    def testDel(self):
+    def test_del(self):
         area1 = self.db.add_area('area1','description 1')
         area2 = self.db.add_area('area2','description 2')
         room1 = self.db.add_room('room1', area1.id)
@@ -1041,10 +1041,10 @@ class DeviceStatsTestCase(GenericTestCase):
         self.remove_all_device_stats(self.db)
         del self.db
 
-    def testEmptyList(self):
+    def test_empty_list(self):
         assert len(self.db.list_all_device_stats()) == 0
 
-    def testAdd(self):
+    def test_add(self):
         dt1 = self.db.add_device_technology(u"x10", "this is x10")
         du1 = self.db.add_device_usage("lighting")
         dty1 = self.db.add_device_type(dty_name='x10 Switch',
@@ -1150,7 +1150,7 @@ class DeviceStatsTestCase(GenericTestCase):
         assert device1.id in device_id_list
         assert device2.id in device_id_list
 
-    def testDel(self):
+    def test_del(self):
         dt1 = self.db.add_device_technology(u"x10", "this is x10")
         dty1 = self.db.add_device_type(dty_name='x10 Switch',
                                        dty_description='desc1', dt_id=dt1.id)
@@ -1191,10 +1191,10 @@ class TriggersTestCase(GenericTestCase):
         self.remove_all_triggers(self.db)
         del self.db
 
-    def testEmptyList(self):
+    def test_empty_list(self):
         assert len(self.db.list_triggers()) == 0
 
-    def testAdd(self):
+    def test_add(self):
         trigger1 = self.db.add_trigger(t_description='desc1',
                                        t_rule='AND(x,OR(y,z))',
                                        t_result=['x10_on("a3")','1wire()'])
@@ -1205,7 +1205,7 @@ class TriggersTestCase(GenericTestCase):
         assert len(self.db.list_triggers()) == 2
         assert self.db.get_trigger(trigger1.id).description == 'desc1'
 
-    def testUpdate(self):
+    def test_update(self):
         trigger = self.db.add_trigger(t_description='desc1', t_rule='AND(x,OR(y,z))',
                                       t_result=['x10_on("a3")','1wire()'])
         trigger_u = self.db.update_trigger(t_id=trigger.id, t_description='desc2',
@@ -1215,7 +1215,7 @@ class TriggersTestCase(GenericTestCase):
         assert trigger_u.rule == 'OR(x,AND(y,z))'
         assert trigger_u.result == 'x10_on("a2");1wire()'
 
-    def testDel(self):
+    def test_del(self):
         trigger1 = self.db.add_trigger(t_description = 'desc1',
                                        t_rule = 'AND(x,OR(y,z))',
                                        t_result= ['x10_on("a3")','1wire()'])
@@ -1249,11 +1249,11 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
         self.remove_all_persons(self.db)
         del self.db
 
-    def testEmptyList(self):
+    def test_empty_list(self):
         assert len(self.db.list_persons()) == 0
         assert len(self.db.list_user_accounts()) == 0
 
-    def testAdd(self):
+    def test_add(self):
         person1 = self.db.add_person(p_first_name='Marc', p_last_name='SCHNEIDER',
                                      p_birthdate=datetime.date(1973, 4, 24))
         assert person1.last_name == 'SCHNEIDER'
@@ -1300,7 +1300,7 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
         for user_acc in self.db.list_user_accounts():
             assert user_acc.password == None
 
-    def testUpdate(self):
+    def test_update(self):
         person = self.db.add_person(p_first_name='Marc', p_last_name='SCHNEIDER',
                                     p_birthdate=datetime.date(1973, 4, 24))
         person_u = self.db.update_person(p_id=person.id, p_first_name='Marco',
@@ -1366,7 +1366,7 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
         assert self.db.get_person(person1.id).first_name == 'Marc'
         assert self.db.get_person(person2.id).last_name == 'PYTHON'
 
-    def testDel(self):
+    def test_del(self):
         person1 = self.db.add_person(p_first_name='Marc', p_last_name='SCHNEIDER',
                                      p_birthdate=datetime.date(1973, 4, 24))
         person2 = self.db.add_person(p_first_name='Monthy', p_last_name='PYTHON',
@@ -1417,10 +1417,10 @@ class SystemStatsTestCase(GenericTestCase):
         self.db.del_all_system_stats()
         del self.db
 
-    def testEmptyList(self):
+    def test_empty_list(self):
         assert len(self.db.list_system_stats()) == 0
 
-    def testAdd(self):
+    def test_add(self):
         now = datetime.datetime.now()
         sstat_list = []
         for i in range(4):
@@ -1433,7 +1433,7 @@ class SystemStatsTestCase(GenericTestCase):
                    "List of system stats should have 4 items : %s" \
                    % self.db.list_system_stats()
 
-    def testListAndGet(self):
+    def test_list_and_get(self):
         now = datetime.datetime.now()
         sstat_list = []
         for i in range(4):
@@ -1445,7 +1445,7 @@ class SystemStatsTestCase(GenericTestCase):
         assert len(ssv) == 2
         assert ssv[0].value == '2'
 
-    def testDel(self):
+    def test_del(self):
         now = datetime.datetime.now()
         sstat_list = []
         for i in range(4):
@@ -1482,10 +1482,10 @@ class UIItemConfigTestCase(GenericTestCase):
         self.remove_all_ui_item_config(self.db)
         del self.db
 
-    def testEmptyList(self):
+    def test_empty_list(self):
         assert len(self.db.list_all_ui_item_config()) == 0
 
-    def testAdd(self):
+    def test_add(self):
         ui_config = self.db.set_ui_item_config('area', 2, 'icon', 'basement')
         assert ui_config.name == 'area'
         assert ui_config.reference == '2'
@@ -1514,7 +1514,7 @@ class UIItemConfigTestCase(GenericTestCase):
         assert uic.value == 'basement'
         assert self.db.get_ui_item_config('foo', 13, 'param_a1') is None
 
-    def testUpdate(self):
+    def test_update(self):
         self.db.set_ui_item_config('area', 1, 'icon', 'basement')
         self.db.set_ui_item_config('room', 1, 'icon', 'bathroom')
         self.db.set_ui_item_config('room', 1, 'param_r2', 'value_r2')
@@ -1523,7 +1523,7 @@ class UIItemConfigTestCase(GenericTestCase):
         self.db.set_ui_item_config('room', 1, 'icon', 'kitchen')
         assert self.db.get_ui_item_config('room', 1, 'icon').value == 'kitchen'
 
-    def testListAndGet(self):
+    def test_list_and_get(self):
         self.db.set_ui_item_config('area', 1, 'icon', 'basement')
         self.db.set_ui_item_config('room', 1, 'icon', 'bathroom')
         self.db.set_ui_item_config('room', 1, 'param_r2', 'value_r2')
@@ -1535,7 +1535,7 @@ class UIItemConfigTestCase(GenericTestCase):
                                         ui_item_reference=2, ui_item_key='icon')
         assert item.value == 'kitchen'
 
-    def testDel(self):
+    def test_del(self):
         self.db.set_ui_item_config('area', 1, 'icon', 'basement')
         self.db.set_ui_item_config('room', 1, 'icon', 'bathroom')
         self.db.set_ui_item_config('room', 1, 'param_r2', 'value_r2')
@@ -1568,7 +1568,7 @@ class SystemConfigTestCase(GenericTestCase):
     def tearDown(self):
         del self.db
 
-    def testUpdate(self):
+    def test_update(self):
         system_config = self.db.update_system_config(s_simulation_mode=True,
                                                      s_debug_mode=True)
         assert system_config.simulation_mode
