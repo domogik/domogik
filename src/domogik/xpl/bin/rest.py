@@ -36,7 +36,7 @@ TODO when finished ;)
 @license: GPL(v3)
 @organization: Domogik
 """
-from domogik.xpl.lib.xplconnector import Listener
+from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.module import xPLModule
 from domogik.common import logger

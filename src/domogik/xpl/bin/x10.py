@@ -43,7 +43,7 @@ if os.name == 'nt':
     from domogik.xpl.lib.win_x10 import X10API
 else:
     from domogik.xpl.lib.x10 import X10API, HeyuManager
-from domogik.xpl.lib.xplconnector import Listener
+from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.module import xPLModule, xPLResult
 from domogik.xpl.common.queryconfig import Query

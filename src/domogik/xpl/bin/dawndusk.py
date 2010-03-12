@@ -38,7 +38,7 @@ Implements
 """
 
 from domogik.xpl.lib.dawndusk import DawnDusk
-from domogik.xpl.lib.xplconnector import Listener
+from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
 import datetime
 from domogik.common.configloader import Loader
