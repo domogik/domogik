@@ -1325,6 +1325,7 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
         assert user_acc_u.person.birthdate == datetime.date(1991, 4, 24)
         assert user_acc_u.is_admin
         assert user_acc_u.skin_used == 'skins/crocodile'
+        assert user_acc.password is None
 
     def testGet(self):
         person1 = self.db.add_person(p_first_name='Marc', p_last_name='SCHNEIDER',

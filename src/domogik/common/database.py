@@ -1703,6 +1703,7 @@ class DbHelper():
         except Exception, sql_exception:
             self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
+        user_acc.password = None
         return user_acc
 
     def change_password(self, a_id, a_old_password, a_new_password):
