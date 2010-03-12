@@ -27,7 +27,7 @@ Mock for X10 event on x10 network
 Implements
 ==========
 
-TODO !
+X10EvtMock.__init__
 
 
 @author: Fritz <fritz.smh@gmail.com>
@@ -44,7 +44,7 @@ from optparse import OptionParser
 
 
 
-class Mock(xPLModule):
+class X10EvtMock(xPLModule):
     ''' 
     '''
 
@@ -92,4 +92,4 @@ class Mock(xPLModule):
 
 
 if __name__ == "__main__":
-    Mock()
+    X10EvtMock()
