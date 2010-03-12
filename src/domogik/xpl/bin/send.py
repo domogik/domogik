@@ -39,7 +39,7 @@ Implements
 """
 
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.lib.module import xPLModule
+from domogik.xpl.common.module import xPLModule
 import optparse
 
 

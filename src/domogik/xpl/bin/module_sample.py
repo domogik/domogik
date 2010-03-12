@@ -37,7 +37,7 @@ Implements
 @organization: Domogik
 """
 
-from domogik.xpl.lib.module import xPLModule
+from domogik.xpl.common.module import xPLModule
 
 
 class ModuleSample(xPLModule):

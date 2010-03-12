@@ -42,7 +42,7 @@ import threading
 import os
 from socket import gethostname
 from domogik.xpl.lib.xplconnector import *
-from domogik.xpl.lib.basemodule import BaseModule
+from domogik.xpl.common.basemodule import BaseModule
 from domogik.common.configloader import Loader
 
 class xPLModule():

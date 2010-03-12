@@ -52,8 +52,8 @@ from subprocess import Popen
 from domogik.common.configloader import Loader
 from domogik.xpl.lib.xplconnector import Listener 
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.lib.module import xPLModule, xPLResult
-from domogik.xpl.lib.queryconfig import Query
+from domogik.xpl.common.module import xPLModule, xPLResult
+from domogik.xpl.common.queryconfig import Query
 
 import domogik.xpl.bin
 import pkgutil

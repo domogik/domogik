@@ -45,8 +45,8 @@ else:
     from domogik.xpl.lib.x10 import X10API, HeyuManager
 from domogik.xpl.lib.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.lib.module import xPLModule, xPLResult
-from domogik.xpl.lib.queryconfig import Query
+from domogik.xpl.common.module import xPLModule, xPLResult
+from domogik.xpl.common.queryconfig import Query
 
 IS_DOMOGIK_MODULE = True
 DOMOGIK_MODULE_DESCRIPTION = "Manage x10 devices"
