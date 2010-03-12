@@ -37,7 +37,7 @@ Implements
 @organization: Domogik
 """
 
-from domogik.xpl.lib.xplconnector import *
+from domogik.xpl.common.xplconnector import *
 import domogik.common.logger
 
 class Query():

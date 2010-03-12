@@ -36,7 +36,7 @@ TODO when finished ;)
 @license: GPL(v3)
 @organization: Domogik
 """
-from domogik.xpl.lib.xplconnector import Listener
+from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.module import xPLModule
 from domogik.common import logger
@@ -1200,21 +1200,14 @@ target=*
                     self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
 
-            ### add
-            elif self.rest_request[1] == "add":
+            ### set
+            elif self.rest_request[1] == "set":
                 offset = 2
                 if self.set_parameters(offset):
-                    self._rest_base_device_technology_config_add()
+                    self._rest_base_device_technology_config_set()
                 else:
                     self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
-            ### update
-            elif self.rest_request[1] == "update":
-                offset = 2
-                if self.set_parameters(offset):
-                    self._rest_base_device_technology_config_update()
-                else:
-                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
             ### del
             elif self.rest_request[1] == "del":
@@ -1977,39 +1970,21 @@ target=*
 
 
 
-    def _rest_base_device_technology_config_add(self):
-        """ add device technology config
+    def _rest_base_device_technology_config_set(self):
+        """ set device technology config
         """
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("device_technology_config")
         try:
-            device_technology_config = self._db.add_device_technology_config(self.get_parameters("technology_id"), \
+            device_technology_config = self._db.set_device_technology_config(self.get_parameters("technology_id"), \
                                                                              self.get_parameters("key"), \
-                                                                             self.get_parameters("value"), \
-                                                                             self.get_parameters("description"))
+                                                                             self.get_parameters("value"))
             json_data.add_data(device_technology_config)
         except:
             json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
         self.send_http_response_ok(json_data.get())
 
-
-    def _rest_base_device_technology_config_update(self):
-        """ update device technology config
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("device_technology_config")
-        try:
-            device_technology_config = self._db.update_device_technology_config(self.get_parameters("id"), \
-                                                                             self.get_parameters("technology_id"), \
-                                                                             self.get_parameters("key"), \
-                                                                             self.get_parameters("value"), \
-                                                                             self.get_parameters("description"))
-            json_data.add_data(device_technology_config)
-        except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
-        self.send_http_response_ok(json_data.get())
 
 
     def _rest_base_device_technology_config_del(self, tc_id=None):
