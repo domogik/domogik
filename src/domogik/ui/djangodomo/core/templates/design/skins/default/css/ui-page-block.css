@@ -5,6 +5,10 @@
     border: 1px solid #979387;
     -moz-border-radius: 0.8em;
     -webkit-border-radius: 0.8em;
+    display:inline-block;
+    	margin-left: auto;
+	margin-right: auto;
+
 }
 
 .block:hover {
