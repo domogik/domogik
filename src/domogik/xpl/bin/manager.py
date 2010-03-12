@@ -27,12 +27,7 @@ Manage xPL clients on each host
 Implements
 ==========
 
-- SysManager.__init__(self)
-- SysManager._sys_cb(self, message)
-- SysManager._stop_comp(self, name)
-- SysManager._start_comp(self, name)
-- SysManager._is_component_running(self, component)
-- SysManager._write_pid_file(self, component, pid)
+# TODO : update
 
 @author: Maxence Dunnewind <maxence@dunnewind.net>
 @copyright: (C) 2007-2009 Domogik project
