@@ -41,7 +41,7 @@ Implements
 """
 
 from domogik.xpl.lib.xplconnector import Listener
-from domogik.xpl.lib.module import xPLModule
+from domogik.xpl.common.module import xPLModule
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.common.database import DbHelper
 

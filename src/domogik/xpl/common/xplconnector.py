@@ -80,7 +80,7 @@ import time
 import signal
 import os
 from domogik.common import logger
-from domogik.xpl.lib.basemodule import BaseModule
+from domogik.xpl.common.basemodule import BaseModule
 from domogik.xpl.common.xplmessage import XplMessage
 
 class Manager(BaseModule):

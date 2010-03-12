@@ -38,9 +38,9 @@ Implements
 from domogik.xpl.lib.gagenda import GAgenda
 from domogik.xpl.lib.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.lib.module import xPLModule
-from domogik.xpl.lib.module import xPLResult
-from domogik.xpl.lib.queryconfig import Query
+from domogik.xpl.common.module import xPLModule
+from domogik.xpl.common.module import xPLResult
+from domogik.xpl.common.queryconfig import Query
 
 IS_DOMOGIK_MODULE = True
 DOMOGIK_MODULE_DESCRIPTION = "Get events from a Google agenda"

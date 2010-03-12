@@ -38,7 +38,7 @@ TODO when finished ;)
 """
 from domogik.xpl.lib.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.lib.module import xPLModule
+from domogik.xpl.common.module import xPLModule
 from domogik.common import logger
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from domogik.common.database import DbHelper
@@ -50,8 +50,8 @@ import sys
 import locale
 from socket import gethostname
 from Queue import *
-from domogik.xpl.lib.queryconfig import Query
-from domogik.xpl.lib.module import xPLResult
+from domogik.xpl.common.queryconfig import Query
+from domogik.xpl.common.module import xPLResult
 import re
 import traceback
 import datetime

@@ -36,10 +36,10 @@ Implements
 """
 
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.lib.module import xPLModule
-from domogik.xpl.lib.module import xPLResult
+from domogik.xpl.common.module import xPLModule
+from domogik.xpl.common.module import xPLResult
 from domogik.xpl.lib.cidmodem import CallerIdModem
-from domogik.xpl.lib.queryconfig import Query
+from domogik.xpl.common.queryconfig import Query
 
 IS_DOMOGIK_MODULE = True
 DOMOGIK_MODULE_DESCRIPTION = "Get caller id with a modem"
