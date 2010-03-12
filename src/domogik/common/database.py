@@ -1018,57 +1018,25 @@ class DbHelper():
                              .filter_by(key=self.__to_unicode(dtc_key))\
                              .first()
 
-    def add_device_technology_config(self, dt_id, dtc_key, dtc_value):
+    def set_device_technology_config(self, dt_id, dtc_key, dtc_value):
         """
-        Add a device's technology config item
-        @param dt_id : the device technology id
-        @param dtc_key : The device technology config key
-        @param dtc_value : The device technology config value
-        @return the new DeviceTechnologyConfig item
-        """
-        self.__session.expire_all()
-        try:
-            self.__session.query(DeviceTechnology).filter_by(id=dt_id).one()
-        except NoResultFound:
-            raise DbHelperException("Couldn't add device technology config \
-                                    with device technology id %s. \
-                                    It does not exist" % dt_id)
-        if self.get_device_technology_config(dt_id, self.__to_unicode(dtc_key)):
-            raise DbHelperException("This key '%s' already exists for device \
-                                    technology %s" % (dtc_key, dt_id))
-        dtc = DeviceTechnologyConfig(technology_id=dt_id, key=self.__to_unicode(dtc_key),
-                                     value=self.__to_unicode(dtc_value))
-        self.__session.add(dtc)
-        try:
-            self.__session.commit()
-        except Exception, sql_exception:
-            self.__session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-        return dtc
-
-    def update_device_technology_config(self, dtc_id, dt_id=None, dtc_key=None,
-                                        dtc_value=None):
-        """
-        Update a device technology config
-        @param dtc_id : device technology config id to be updated
-        @param dt_id : device technology id (optional)
-        @param dtc_key : parameter key (optional)
-        @param dtc_value : parameter value (optional)
-        @return a DeviceTechnologyConfig object
+        Add / update an device technology config parameter
+        @param dt_id : id of the associated technology
+        @param dtc_key : key we want to add / update
+        @param dtc_value : key value we want to add / update
+        @return : the updated DeviceTechnologyConfig item
         """
         self.__session.expire_all()
-        dtc = self.__session.query(DeviceTechnologyConfig).filter_by(id=dtc_id).first()
+        dt = self.__session.query(DeviceTechnology).filter_by(id=dt_id).first()
+        if dt is None:
+            raise DbHelperException("Technology id %s does NOT exist" % dt_id)
+        dtc = self.__session.query(DeviceTechnologyConfig)\
+                            .filter_by(technology_id=dt_id, key=self.__to_unicode(dtc_key))\
+                            .first()
         if dtc is None:
-            raise DbHelperException("DeviceTypeConfig with id %s couldn't be found" % dtc_id)
-        if dt_id is not None:
-            try:
-                self.__session.query(DeviceTechnology).filter_by(id=dt_id).one()
-            except NoResultFound:
-                raise DbHelperException("Couldn't find device technology id %s. It does not exist" % dt_id)
-            dtc.technology_id = dt_id
-        if dtc_key is not None:
-            dtc.key = self.__to_unicode(dtc_key)
-        if dtc_value is not None:
+            dtc = DeviceTechnologyConfig(technology_id=dt_id, key=self.__to_unicode(dtc_key),
+                                         value=self.__to_unicode(dtc_value))
+        else:
             dtc.value = self.__to_unicode(dtc_value)
         self.__session.add(dtc)
         try:

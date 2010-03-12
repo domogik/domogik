@@ -787,67 +787,53 @@ class DeviceTechnologyConfigTestCase(GenericTestCase):
         dt1 = self.db.add_device_technology('x10', 'desc dt1')
         dt3 = self.db.add_device_technology('PLCBus', 'desc dt3')
         try:
-            self.db.add_device_technology_config(99999999999, 'key1_1', 'val1_1')
-            TestCase.fail(self, "An exception should have been raised : \
-                          device technology id does not exist")
+            self.db.set_device_technology_config(99999999999, 'key1_1', 'val1_1')
+            TestCase.fail(self, "An exception should have been raised : device technology id does not exist")
         except DbHelperException:
             pass
-        dtc1_1 = self.db.add_device_technology_config(dt1.id, 'key1_1', 'val1_1')
+        dtc1_1 = self.db.set_device_technology_config(dt1.id, 'key1_1', 'val1_1')
         print dtc1_1
         assert dtc1_1.technology_id == dt1.id
         assert dtc1_1.key == 'key1_1'
         assert dtc1_1.value == 'val1_1'
-        dtc1_2 = self.db.add_device_technology_config(dt1.id, 'key1_2', 'val1_2')
-        dtc3_1 = self.db.add_device_technology_config(dt3.id, 'key3_1', 'val3_1')
-        dtc3_2 = self.db.add_device_technology_config(dt3.id, 'key3_2', 'val3_2')
-        dtc3_3 = self.db.add_device_technology_config(dt3.id, 'key3_3', 'val3_3')
-        try:
-            dtc = self.db.add_device_technology_config(dt3.id, 'key3_3', 'val3_3')
-            TestCase.fail(self, "It shouldn't have been possible to add 'key3_3'\
-                          for device technology %s : it already exists" % dt3.id)
-        except DbHelperException:
-            pass
-        assert len(self.db.list_device_technology_config(dt1.id)) == 2, \
-                "%s devices technologies config found, instead of 2 " \
-                % len(self.db.list_device_technology_config(dt1.id))
-        assert len(self.db.list_device_technology_config(dt3.id)) == 3, \
-                "%s devices technologies config found, instead of 3 " \
-                % len(self.db.list_device_technology_config(dt3.id))
+        dtc1_2 = self.db.set_device_technology_config(dt1.id, 'key1_2', 'val1_2')
+        dtc3_1 = self.db.set_device_technology_config(dt3.id, 'key3_1', 'val3_1')
+        dtc3_2 = self.db.set_device_technology_config(dt3.id, 'key3_2', 'val3_2')
+        dtc3_3 = self.db.set_device_technology_config(dt3.id, 'key3_3', 'val3_3')
+        assert len(self.db.list_device_technology_config(dt1.id)) == 2
+        assert len(self.db.list_device_technology_config(dt3.id)) == 3
 
     def testUpdate(self):
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
         dt2 = self.db.add_device_technology(u'PLCBus', 'desc dt2')
-        dtc = self.db.add_device_technology_config(dt1.id, 'key1', 'val1')
-        dtc_u = self.db.update_device_technology_config(dtc.id, dt_id=dt2.id,
-                      dtc_key='key2', dtc_value='val2')
-        assert dtc_u.technology_id == dt2.id
-        assert dtc_u.key == 'key2'
-        assert dtc_u.value == 'val2'
+        dtc = self.db.set_device_technology_config(dt1.id, 'key1', 'val1')
+        dtc_u = self.db.set_device_technology_config(dt_id=dt1.id, dtc_key='key1', dtc_value='val11')
+        assert dtc_u.key == 'key1'
+        assert dtc_u.value == 'val11'
 
     def testGet(self):
         dt3 = self.db.add_device_technology(u'PLCBus', 'desc dt3')
-        dtc3_1 = self.db.add_device_technology_config(dt3.id, 'key3_1', 'val3_1')
-        dtc3_2 = self.db.add_device_technology_config(dt3.id, 'key3_2', 'val3_2')
-        dtc3_3 = self.db.add_device_technology_config(dt3.id, 'key3_3', 'val3_3')
+        dtc3_1 = self.db.set_device_technology_config(dt3.id, 'key3_1', 'val3_1')
+        dtc3_2 = self.db.set_device_technology_config(dt3.id, 'key3_2', 'val3_2')
+        dtc3_3 = self.db.set_device_technology_config(dt3.id, 'key3_3', 'val3_3')
         dtc = self.db.get_device_technology_config(dt3.id, 'key3_2')
         assert dtc.value == 'val3_2'
 
     def testDel(self):
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
         dt3 = self.db.add_device_technology(u'PLCBus', 'desc dt3')
-        dtc1_1 = self.db.add_device_technology_config(dt1.id, 'key1_1', 'val1_1')
-        dtc1_2 = self.db.add_device_technology_config(dt1.id, 'key1_2', 'val1_2')
-        dtc3_1 = self.db.add_device_technology_config(dt3.id, 'key3_1', 'val3_1')
-        dtc3_2 = self.db.add_device_technology_config(dt3.id, 'key3_2', 'val3_2')
-        dtc3_3 = self.db.add_device_technology_config(dt3.id, 'key3_3', 'val3_3')
+        dtc1_1 = self.db.set_device_technology_config(dt1.id, 'key1_1', 'val1_1')
+        dtc1_2 = self.db.set_device_technology_config(dt1.id, 'key1_2', 'val1_2')
+        dtc3_1 = self.db.set_device_technology_config(dt3.id, 'key3_1', 'val3_1')
+        dtc3_2 = self.db.set_device_technology_config(dt3.id, 'key3_2', 'val3_2')
+        dtc3_3 = self.db.set_device_technology_config(dt3.id, 'key3_3', 'val3_3')
         dtc3_2_id = dtc3_2.id
         dtc_del = self.db.del_device_technology_config(dtc3_2.id)
         assert self.db.get_device_technology_config(dt3.id, 'key3_2') == None
         assert dtc_del.id == dtc3_2_id
         try:
             self.db.del_device_technology_config(12345678910)
-            TestCase.fail(self, "Device technology config does not exist, \
-                                 an exception should have been raised")
+            TestCase.fail(self, "Device technology config does not exist, an exception should have been raised")
         except DbHelperException:
             pass
 
