@@ -1622,7 +1622,8 @@ class DbHelper():
         """
         crypted_pass = self.__make_crypted_password(a_password)
         user_acc = self.__session.query(UserAccount)\
-                                 .filter_by(login=self.__to_unicode(a_login), password=crypted_pass)\
+                                 .filter_by(login=self.__to_unicode(a_login),
+                                            password=self.__to_unicode(crypted_pass))\
                                  .first()
         if user_acc is not None:
             user_acc.password = None
@@ -1651,7 +1652,7 @@ class DbHelper():
                                                     .first()
         if user_acc is not None:
             password = hashlib.sha256()
-            password.update(a_password)
+            password.update(self.__to_unicode(a_password))
             if user_acc.password == password.hexdigest():
                 return True
         return False
@@ -1674,7 +1675,7 @@ class DbHelper():
         if person is None:
             raise DbHelperException("Person id '%s' does not exist" % a_person_id)
         user_account = UserAccount(login=self.__to_unicode(a_login),
-                                   password=self.__make_crypted_password(a_password),
+                                   password=self.__to_unicode(self.__make_crypted_password(a_password)),
                                    person_id=a_person_id,
                                    is_admin=a_is_admin, skin_used=self.__to_unicode(a_skin_used))
         self.__session.add(user_account)
@@ -1746,10 +1747,10 @@ class DbHelper():
         """
         self.__session.expire_all()
         old_pass = self.__make_crypted_password(a_old_password)
-        user_acc = self.__session.query(UserAccount).filter_by(id=a_id, password=old_pass).first()
+        user_acc = self.__session.query(UserAccount).filter_by(id=a_id, password=self.__to_unicode(old_pass)).first()
         if user_acc is None:
             return False
-        user_acc.password = self.__make_crypted_password(a_new_password)
+        user_acc.password = self.__to_unicode(self.__make_crypted_password(a_new_password))
         self.__session.add(user_acc)
         try:
             self.__session.commit()

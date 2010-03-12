@@ -711,7 +711,7 @@ class UserAccount(Base):
     __tablename__ = '%s_user_account' % _db_prefix
     id = Column(Integer, primary_key=True)
     login = Column(Unicode(20), nullable=False, unique=True)
-    password = Column(Text, nullable=False)
+    password = Column(Unicode(255), nullable=False)
     person_id = Column(Integer, ForeignKey('%s.id' % Person.get_tablename()))
     person = relation(Person, backref=backref(__tablename__))
     is_admin = Column(Boolean, nullable=False, default=False)
