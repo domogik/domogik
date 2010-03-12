@@ -1309,7 +1309,7 @@ class DbHelper():
                     raise DbHelperException("Couldn't find room id %s. It does not exist" % d_room_id)
             else:
                 d_room_id = None
-            device.room = d_room_id
+            device.room_id = d_room_id
         self.__session.add(device)
         try:
             self.__session.commit()

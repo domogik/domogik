@@ -954,6 +954,7 @@ class DeviceTestCase(GenericTestCase):
     def testUpdate(self):
         area1 = self.db.add_area('area1','description 1')
         room1 = self.db.add_room('room1', area1.id)
+        room2 = self.db.add_room('room2', area1.id)
         dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
         dty1 = self.db.add_device_type(dty_name='x10 Switch',
                                        dty_description='desc1', dt_id=dt1.id)
@@ -974,9 +975,10 @@ class DeviceTestCase(GenericTestCase):
                                  an exception should have been raised")
         except DbHelperException:
             pass
-        device1 = self.db.update_device(d_id = device1.id,
+        device1 = self.db.update_device(d_id = device1.id, d_room_id = room2.id,
                                         d_description = 'desc2', d_reference='A1')
         device1 = self.db.get_device(device_id)
+        assert device1.room.name == 'room2'
         assert device1.description == 'desc2'
         assert device1.reference == 'A1'
         device1 = self.db.update_device(d_id = device1.id, d_reference='',
