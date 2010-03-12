@@ -1327,6 +1327,16 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
             TestCase.fail(self, "An exception should have been raised : person id does not exist")
         except DbHelperException:
             pass
+        user_acc_u = self.db.update_user_account_with_person(a_id=user_acc.id, a_login='mschneider3',
+                                                             p_first_name='Bob', p_last_name='Marley',
+                                                             p_birthdate=datetime.date(1991, 4, 24),
+                                                             a_is_admin=True, a_skin_used='skins/crocodile')
+        assert user_acc_u.login == 'mschneider3'
+        assert user_acc_u.person.first_name == 'Bob'
+        assert user_acc_u.person.last_name == 'Marley'
+        assert user_acc_u.person.birthdate == datetime.date(1991, 4, 24)
+        assert user_acc_u.is_admin
+        assert user_acc_u.skin_used == 'skins/crocodile'
 
     def testGet(self):
         person1 = self.db.add_person(p_first_name='Marc', p_last_name='SCHNEIDER',

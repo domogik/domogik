@@ -1659,6 +1659,7 @@ class DbHelper():
         @param a_person_last_name : last name of the person associated to the account
         @param a_person_birthdate : birthdate of the person associated to the account, optional
         @param a_is_admin : True if it is an admin account, False otherwise (optional, default=False)
+        @param a_skin_used : name of the skin choosen by the user (optional, default='skins/default')
         @return the new UserAccount object or raise a DbHelperException if it already exists
         """
         person = self.add_person(a_person_first_name, a_person_last_name, a_person_birthdate)
@@ -1672,6 +1673,7 @@ class DbHelper():
         @param a_new_login : The new login (optional)
         @param a_person_id : id of the person associated to the account
         @param a_is_admin : True if it is an admin account, False otherwise (optional)
+        @param a_skin_used : name of the skin choosen by the user (optional, default='skins/default')
         @return a UserAccount object
         """
         self.__session.expire_all()
@@ -1696,6 +1698,37 @@ class DbHelper():
             self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         user_acc.password = None
+        return user_acc
+
+    def update_user_account_with_person(self, a_id, a_login=None, p_first_name=None,
+                            p_last_name=None, p_birthdate=None, a_is_admin=None,
+                            a_skin_used=None):
+        """
+        Update a user account a person information
+        @param a_id : Account id to be updated
+        @param a_login : The new login (optional)
+        @param p_first_name : first name of the person associated to the account, optional
+        @param p_last_name : last name of the person associated to the account, optional
+        @param p_birthdate : birthdate of the person associated to the account, optional
+        @param a_is_admin : True if it is an admin account, False otherwise, optional
+        @param a_skin_used : name of the skin choosen by the user (optional, default='skins/default')
+        @return a UserAccount object
+        """
+        user_acc = self.update_user_account(a_id, a_login, None, a_is_admin, a_skin_used)
+        self.__session.expire_all()
+        person = user_acc.person
+        if p_first_name is not None:
+            person.first_name = self.__to_unicode(p_first_name)
+        if p_last_name is not None:
+            person.last_name = self.__to_unicode(p_last_name)
+        if p_birthdate is not None:
+            person.birthdate = p_birthdate
+        self.__session.add(person)
+        try:
+            self.__session.commit()
+        except Exception, sql_exception:
+            self.__session.rollback()
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return user_acc
 
     def change_password(self, a_id, a_old_password, a_new_password):
