@@ -530,8 +530,7 @@ class SensorReferenceDataTestCase(GenericTestCase):
                     srd_value='number', dty_id=dty2.id, srd_unit='V',
                     srd_stat_key='key2')
         assert len(self.db.list_sensor_reference_data()) == 2
-        assert self.has_item(self.db.list_sensor_reference_data(), \
-               ['Temperature', 'Voltage'])
+        assert self.has_item(self.db.list_sensor_reference_data(), ['Temperature', 'Voltage'])
 
     def test_update(self):
         dt1 = self.db.add_device_technology(u'1wire', 'desc dt1')
@@ -760,8 +759,7 @@ class DeviceTechnologyTestCase(GenericTestCase):
         assert dt_del.id == dt2_id
         try:
             self.db.del_device_technology(12345678910)
-            TestCase.fail(self, "Device technology does not exist, an exception \
-                                 should have been raised")
+            TestCase.fail(self, "Device technology does not exist, an exception should have been raised")
         except DbHelperException:
             pass
 
@@ -864,18 +862,15 @@ class DeviceTestCase(GenericTestCase):
             self.db.add_device(d_name='device1', d_address = 'A1',
                     d_type_id = 9999999999, d_usage_id = du1.id,
                     d_room_id = room1.id, d_description = 'desc1')
-            TestCase.fail(self, "Device type does not exist, \
-                                 an exception should have been raised")
+            TestCase.fail(self, "Device type does not exist, an exception should have been raised")
             self.db.add_device(d_name='device1', d_address = 'A1',
                     d_type_id = dty1.id, d_usage_id = 9999999999999,
                     d_room_id = room1.id, d_description = 'desc1')
-            TestCase.fail(self, "Device usage does not exist, \
-                                 an exception should have been raised")
+            TestCase.fail(self, "Device usage does not exist, an exception should have been raised")
             self.db.add_device(d_name='device1', d_address = 'A1',
                     d_type_id = dty1.id, d_usage_id = du1.id,
                     d_room_id = 9999999999999, d_description = 'desc1')
-            TestCase.fail(self, "Room does not exist, \
-                                 an exception should have been raised")
+            TestCase.fail(self, "Room does not exist, an exception should have been raised")
         except DbHelperException:
             pass
         device1 = self.db.add_device(d_name='device1', d_address = 'A1',
@@ -935,14 +930,11 @@ class DeviceTestCase(GenericTestCase):
         device_id = device1.id
         try:
             self.db.update_device(d_id = device1.id, d_type_id = 9999999999)
-            TestCase.fail(self, "Device type does not exist, \
-                                 an exception should have been raised")
+            TestCase.fail(self, "Device type does not exist, an exception should have been raised")
             self.db.update_device(d_id = device1.id, d_usage_id = 9999999999999)
-            TestCase.fail(self, "Device usage does not exist, \
-                                 an exception should have been raised")
+            TestCase.fail(self, "Device usage does not exist, an exception should have been raised")
             self.db.update_device(d_id = device1.id, d_room_id = 9999999999999)
-            TestCase.fail(self, "Room does not exist, \
-                                 an exception should have been raised")
+            TestCase.fail(self, "Room does not exist, an exception should have been raised")
         except DbHelperException:
             pass
         device1 = self.db.update_device(d_id = device1.id, d_room_id = room2.id,
@@ -951,8 +943,7 @@ class DeviceTestCase(GenericTestCase):
         assert device1.room.name == 'room2'
         assert device1.description == 'desc2'
         assert device1.reference == 'A1'
-        device1 = self.db.update_device(d_id = device1.id, d_reference='',
-                                        d_room_id='')
+        device1 = self.db.update_device(d_id = device1.id, d_reference='', d_room_id='')
         assert device1.reference == None
         assert device1.room_id == None
 
@@ -1022,8 +1013,7 @@ class DeviceTestCase(GenericTestCase):
         assert device_del.id == device2.id
         try:
             self.db.del_device(12345678910)
-            TestCase.fail(self, "Device does not exist, an exception should \
-                          have been raised")
+            TestCase.fail(self, "Device does not exist, an exception should have been raised")
         except DbHelperException:
             pass
 
@@ -1066,8 +1056,7 @@ class DeviceStatsTestCase(GenericTestCase):
         try:
             self.db.add_device_stat(99999999999, now,
                                     {'val1': '10', 'val2': '10.5' })
-            TestCase.fail(self, "An exception should have been raised : \
-                          device id does not exist")
+            TestCase.fail(self, "An exception should have been raised : device id does not exist")
         except DbHelperException:
             pass
         d_stat1_2 = self.db.add_device_stat(device1.id,
@@ -1230,8 +1219,7 @@ class TriggersTestCase(GenericTestCase):
         assert len(self.db.list_triggers()) == 0
         try:
             self.db.del_trigger(12345678910)
-            TestCase.fail(self, "Trigger does not exist, an exception should \
-                                 have been raised")
+            TestCase.fail(self, "Trigger does not exist, an exception should have been raised")
         except DbHelperException:
             pass
 
@@ -1429,9 +1417,7 @@ class SystemStatsTestCase(GenericTestCase):
                                 now + datetime.timedelta(seconds=i), ssv)
             print sstat
             sstat_list.append(sstat)
-        assert len(self.db.list_system_stats()) == 4, \
-                   "List of system stats should have 4 items : %s" \
-                   % self.db.list_system_stats()
+        assert len(self.db.list_system_stats()) == 4
 
     def test_list_and_get(self):
         now = datetime.datetime.now()
@@ -1451,14 +1437,13 @@ class SystemStatsTestCase(GenericTestCase):
         for i in range(4):
             ssv = {'ssv1': (i*2), 'ssv2': (i*3),}
             sstat_list.append(self.db.add_system_stat("sstat%s" %i, 'localhost',
-                                now + datetime.timedelta(seconds=i), ssv))
+                              now + datetime.timedelta(seconds=i), ssv))
         sstat_del = self.db.del_system_stat("sstat0")
         assert sstat_del.name == "sstat0"
         assert len(self.db.list_system_stats()) == 3
         try:
             self.db.del_system_stat("i_dont_exist")
-            TestCase.fail(self, "System stat does not exist, an exception \
-                                 should have been raised")
+            TestCase.fail(self, "System stat does not exist, an exception should have been raised")
         except DbHelperException:
             pass
         ss_list = self.db.list_system_stats()
