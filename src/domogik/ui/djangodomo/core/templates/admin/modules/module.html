@@ -53,15 +53,138 @@ $(function(){
             );
         });
     {% endifequal %}
+    
+    function resetKey(key, value) {
+        $("#value_" + key).val(value);
+        $("#value_" + key).attr('class', 'medium icon16-status-warning');
+    }
+    
+    function deleteConfig(id) {
+        getREST('/base/device_technology_config/del/' + id,
+            function(data) {
+                var status = (data.status).toLowerCase();
+                if (status == 'ok') {
+                        $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Configuration deleted" %}'});
+                } else {
+                    /* Error */
+                    display_message(data.status, data.description);
+                }
+            }
+        );
+    }
+    
+    function saveConfig(id, configuration) {
+        for each (item in configuration) {
+            var value = $('#value_' + item.key).val();
+            getREST('/base/device_technology_config/set/technology_id/' + id + '/key/' + item.key + '/value/' + value,
+                function(data) {
+                    var status = (data.status).toLowerCase();
+                    if (status == 'ok') {
+                        $('#value_' + item.key).attr('class', 'medium icon16-status-true');
+                    } else {
+                        // Error
+                        $('#value_' + item.key).attr('class', 'medium icon16-status-false');
+                        display_message(data.status, data.description);
+                    }
+                }
+            );
+        }
+    }
+    
+    /* Check if the technologie exist in the database */
+    getREST('/base/device_technology/list/by-name/{{ module.name }}',
+        function(data) {
+            var status = (data.status).toLowerCase();
+            if (status == 'ok') {
+                var technology_id = data.device_technology[0].id;
+                var technology_description = data.device_technology[0].description;
+                $("#configuration").append("<ul><li>{% trans "Technology" %} :" + technology_description + "</li></ul>");                
+                $("#configuration").append("<p><button id='configurationdelete' class='button icon16-action-del'>{% trans "Delete configuration" %}</button></p>");
+                $("#configurationdelete").click(function(event) {
+                    deleteConfig(technology_id);
+                });
+
+                var configuration = null;
+                /* Check if the module is configured */
+                getREST('/base/device_technology_config/list/by-technology-id/' + technology_id,
+                    function(data) {
+                        var status = (data.status).toLowerCase();
+                        if (status == 'ok') {
+                            var is_configured = (data.device_technology_config.length > 0);
+                            /* Get the list of configuration items */
+                            getREST('/module/detail/{{ module.name }}',
+                                function(data) {
+                                    var status = (data.status).toLowerCase();
+                                    if (status == 'ok') {
+                                        var header = $("<form><table id='configuration_items'><tr><th scope='col'>{% trans "Key" %}</th><th scope='col'>{% trans "Description" %}</th><th scope='col'>{% trans "value" %}</th><th>{% trans "Actions" %}</th></tr></table></form>");
+                                        if (is_configured) {
+                                            $("#configuration").append(header);
+                                            /* Already configured */
+                                            configuration = data.module[0].configuration;
+                                            for each (item in configuration) {
+                                                getREST('/base/device_technology_config/list/by-technology-id/' + technology_id + '/by-key/' + item.key,
+                                                    function(data) {
+                                                        var status = (data.status).toLowerCase();
+                                                        if (status == 'ok') {
+                                                            if (data.device_technology_config.length > 0) {
+                                                                $("#configuration_items").append("<tr><td>" +  item.key + "</td><td>" +  item.description + "</td><td><input type='text' name='value_" + item.key + "' id='value_" + item.key + "' class='medium' value='" +  data.device_technology_config[0].value + "' /></td><td><ul class='actions'><li><a href='#' id='reset" + item.key + "' class='icon16-action-reset buttonicon' title='{% trans "Reset" %} " + item.key + "'><span class='offscreen'>{% trans "Reset" %} " + item.key + "</span></a></li></ul></td></li>");                                                                            
+                                                            } else {
+                                                                $("#configuration_items").append("<tr><td>" +  item.key + "</td><td>" +  item.description + "</td><td><input type='text' name='value_" + item.key + "' id='value_" + item.key + "' class='medium icon16-status-warning' title='Default value' value='" +  item.default + "' /></td><td><ul class='actions'><li><a href='#' id='reset" + item.key + "' class='icon16-action-reset buttonicon' title='{% trans "Reset" %} " + item.key + "'><span class='offscreen'>{% trans "Reset" %} " + item.key + "</span></a></li></ul></td></li>");                                                                            
+                                                            }
+                                                            $("#reset" + item.key).click(function(event) {
+                                                                resetKey(item.key, item.default);
+                                                            });
+                                                        } else {
+                                                            /* Error */
+                                                            display_message(data.status, data.description);
+                                                        }
+                                                    }
+                                                );
+                                            }
+                                        } else {
+                                            $("#configuration").append("<p class='icon32-text icon32-status-warning'><span class='offscreen'>{% trans "Warning" %}</span>{% trans "This module has not been configured yet" %}</p>");                
+                                            $("#configuration").append(header);
+                                            /* Not configured */
+                                            for each (item in data.module[0].configuration) {
+                                                $("#configuration_items").append("<tr><td>" +  item.key + "</td><td>" +  item.description + "</td><td><input type='text' name='value_" + item.key + "' id='value_" + item.key + "' class='medium' value='" +  item.default + "' /></td><td><ul class='actions'><li><a href='#' id='reset" + item.key + "' class='icon16-action-reset buttonicon' title='{% trans "Reset" %} " + item.key + "'><span class='offscreen'>{% trans "Reset" %} " + item.key + "</span></a></li></ul></td></li>");                
+                                                $("#reset" + item.key).click(function(event) {
+                                                    resetKey(item.key, item.default);
+                                                });
+                                            }
+                                        }
+                                        $("#configuration").append("<p><button id='configurationsubmit' class='button icon16-action-save'>{% trans "Save" %}</button></p>");
+                                        $("#configurationsubmit").click(function(event) {
+                                            saveConfig(technology_id, configuration);
+                                        });
+                                    } else {
+                                        /* Error */
+                                        display_message(data.status, data.description);
+                                    }
+                                }
+                            );
+                        } else {
+                            /* Error */
+                            display_message(data.status, data.description);
+                        }
+                    }
+                );
+            } else {
+                /* Error */
+                display_message(data.status, data.description);
+            }
+        }
+    );
 });
 {% endblock %}
 {% block css %}
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-tables.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block js_include %}
 {% endblock %}
 {% block title %}{% trans page_title %}{% endblock %}
 
 {% block banner %}
+    <div id='configuration_data'></div>
     <div class="section">
         <h1 class="ident icon64-module-{{ module.name }}">
             <span class="title">{% trans "Module" %} '{{ module.name }}'</span>
@@ -92,5 +215,11 @@ $(function(){
         {% else %}
             <button id='buttonstatus' class='button icon16-status-active'>{% trans "Start" %}</button>
         {% endifequal %}
+    </div>
+    <div class="subsection">
+        <h2>{% trans "Configuration" %}</h2>
+        <div id='configuration'>
+        
+        </div>
     </div>
 {% endblock %}
