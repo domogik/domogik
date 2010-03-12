@@ -189,8 +189,7 @@ class AreaTestCase(GenericTestCase):
     def testAdd(self):
         try:
             self.db.add_area(None, None)
-            TestCase.fail(self, "An exception should have been raised : \
-                          impossible to create an area without a name")
+            TestCase.fail(self, "An exception should have been raised : impossible to create an area without a name")
         except DbHelperException:
             pass
         area0 = self.db.add_area('area0','description 0')
@@ -785,8 +784,8 @@ class DeviceTechnologyConfigTestCase(GenericTestCase):
         assert len(self.db.list_all_device_technology_config()) == 0
 
     def testAdd(self):
-        dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
-        dt3 = self.db.add_device_technology(u'PLCBus', 'desc dt3')
+        dt1 = self.db.add_device_technology('x10', 'desc dt1')
+        dt3 = self.db.add_device_technology('PLCBus', 'desc dt3')
         try:
             self.db.add_device_technology_config(99999999999, 'key1_1', 'val1_1',
                                                  'desc1')

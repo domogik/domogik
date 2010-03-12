@@ -123,6 +123,17 @@ class DbHelper():
         """
         self.__session.rollback()
 
+    def __to_unicode(self, my_string):
+        """
+        Convert a string into unicode or return None if None value is passed
+        @param my_string : string value to convert
+        @return a unicode string
+        """
+        if my_string is not None:
+            return unicode(my_string)
+        else:
+            return None
+
 ####
 # Areas
 ####
@@ -190,7 +201,7 @@ class DbHelper():
         @return an Area object
         """
         self.__session.expire_all()
-        area = Area(name=a_name, description=a_description)
+        area = Area(name=self.__to_unicode(a_name), description=self.__to_unicode(a_description))
         self.__session.add(area)
         try:
             self.__session.commit()
@@ -212,10 +223,10 @@ class DbHelper():
         if area is None:
             raise DbHelperException("Area with id %s couldn't be found" % a_id)
         if a_name is not None:
-            area.name = a_name
+            area.name = self.__to_unicode(a_name)
         if a_description is not None:
             if a_description == '': a_description = None
-            area.description = a_description
+            area.description = self.__to_unicode(a_description)
         self.__session.add(area)
         try:
             self.__session.commit()
@@ -321,7 +332,7 @@ class DbHelper():
                 self.__session.query(Area).filter_by(id=r_area_id).one()
             except NoResultFound:
                 raise DbHelperException("Couldn't add room with area id %s. It does not exist" % r_area_id)
-        room = Room(name=r_name, description=r_description, area_id=r_area_id)
+        room = Room(name=self.__to_unicode(r_name), description=self.__to_unicode(r_description), area_id=r_area_id)
         self.__session.add(room)
         try:
             self.__session.commit()
@@ -344,10 +355,10 @@ class DbHelper():
         if room is None:
             raise DbHelperException("Room with id %s couldn't be found" % r_id)
         if r_name is not None:
-            room.name = r_name
+            room.name = self.__to_unicode(r_name)
         if r_description is not None:
             if r_description == '': r_description = None
-            room.description = r_description
+            room.description = self.__to_unicode(r_description)
         if r_area_id is not None:
             if r_area_id != '':
                 try:
@@ -428,7 +439,7 @@ class DbHelper():
         @return a DeviceUsage (the newly created one)
         """
         self.__session.expire_all()
-        du = DeviceUsage(name=du_name, description=du_description)
+        du = DeviceUsage(name=self.__to_unicode(du_name), description=self.__to_unicode(du_description))
         self.__session.add(du)
         try:
             self.__session.commit()
@@ -451,10 +462,10 @@ class DbHelper():
         if device_usage is None:
             raise DbHelperException("DeviceUsage with id %s couldn't be found" % du_id)
         if du_name is not None:
-            device_usage.name = du_name
+            device_usage.name = self.__to_unicode(du_name)
         if du_description is not None:
             if du_description == '': du_description = None
-            device_usage.description = du_description
+            device_usage.description = self.__to_unicode(du_description)
         self.__session.add(device_usage)
         try:
             self.__session.commit()
@@ -529,7 +540,7 @@ class DbHelper():
         except NoResultFound:
             raise DbHelperException("Couldn't add device type with technology id %s. \
                                     It does not exist" % dt_id)
-        dty = DeviceType(name=dty_name, description=dty_description,
+        dty = DeviceType(name=self.__to_unicode(dty_name), description=self.__to_unicode(dty_description),
                          technology_id=dt_id)
         self.__session.add(dty)
         try:
@@ -554,7 +565,7 @@ class DbHelper():
         if device_type is None:
             raise DbHelperException("DeviceType with id %s couldn't be found" % dty_id)
         if dty_name is not None:
-            device_type.name = dty_name
+            device_type.name = self.__to_unicode(dty_name)
         if dt_id is not None:
             try:
                 self.__session.query(DeviceTechnology).filter_by(id=dt_id).one()
@@ -564,7 +575,7 @@ class DbHelper():
         self.__session.add(device_type)
         if dty_description is not None:
             if dty_description == '': dty_description = None
-            device_type.description = dty_description
+            device_type.description = self.__to_unicode(dty_description)
         try:
             self.__session.commit()
         except Exception, sql_exception:
@@ -666,8 +677,8 @@ class DbHelper():
         except NoResultFound:
             raise DbHelperException("Couldn't add sensor reference with device type id %s. \
                                     It does not exist" % dty_id)
-        srd = SensorReferenceData(name=srd_name, value=srd_value,
-                    device_type_id=dty_id, unit=srd_unit, stat_key=srd_stat_key)
+        srd = SensorReferenceData(name=self.__to_unicode(srd_name), value=self.__to_unicode(srd_value),
+                    device_type_id=dty_id, unit=self.__to_unicode(srd_unit), stat_key=self.__to_unicode(srd_stat_key))
         self.__session.add(srd)
         try:
             self.__session.commit()
@@ -696,9 +707,9 @@ class DbHelper():
         if srd is None:
             raise DbHelperException("SensorReferenceData with id %s couldn't be found" % srd_id)
         if srd_name is not None:
-            srd.name = srd_name
+            srd.name = self.__to_unicode(srd_name)
         if srd_value is not None:
-            srd.value = srd_value
+            srd.value = self.__to_unicode(srd_value)
         if dty_id is not None:
             try:
                 self.__session.query(DeviceType).filter_by(id=dty_id).one()
@@ -707,10 +718,10 @@ class DbHelper():
             srd.device_type_id = dty_id
         if srd_unit is not None:
             if srd_unit == '': srd_unit = None
-            srd.unit = srd_unit
+            srd.unit = self.__to_unicode(srd_unit)
         if srd_stat_key is not None:
             if srd_stat_key == '': srd_stat_key = None
-            srd.stat_key = srd_stat_key
+            srd.stat_key = self.__to_unicode(srd_stat_key)
         self.__session.add(srd)
         try:
             self.__session.commit()
@@ -793,9 +804,9 @@ class DbHelper():
         except NoResultFound:
             raise DbHelperException("Couldn't add actuator feature with device type id %s. \
                                     It does not exist" % dty_id)
-        af = ActuatorFeature(name=af_name, value=af_value,
-                    device_type_id=dty_id, unit=af_unit,
-                    configurable_states=af_configurable_states,
+        af = ActuatorFeature(name=self.__to_unicode(af_name), value=self.__to_unicode(af_value),
+                    device_type_id=dty_id, unit=self.__to_unicode(af_unit),
+                    configurable_states=self.__to_unicode(af_configurable_states),
                     return_confirmation=af_return_confirmation)
         self.__session.add(af)
         try:
@@ -826,10 +837,10 @@ class DbHelper():
             raise DbHelperException("ActuatorFeature with id %s \
                                     couldn't be found" % af_id)
         if af_name is not None:
-            af.name = af_name
+            af.name = self.__to_unicode(af_name)
         if af_value is not None:
             if af_value == '': af_value = None
-            af.value = af_value
+            af.value = self.__to_unicode(af_value)
         if dty_id is not None:
             try:
                 self.__session.query(DeviceType).filter_by(id=dty_id).one()
@@ -838,10 +849,10 @@ class DbHelper():
             af.device_type_id = dty_id
         if af_unit is not None:
             if af_unit == '': af_unit = None
-            af.unit = af_unit
+            af.unit = self.__to_unicode(af_unit)
         if af_configurable_states is not None:
             if af_configurable_states == '': af_configurable_states = None
-            af.configurable_states = af_configurable_states
+            af.configurable_states = self.__to_unicode(af_configurable_states)
         if af_return_confirmation is not None:
             af.return_confirmation = af_return_confirmation
         self.__session.add(af)
@@ -900,10 +911,9 @@ class DbHelper():
         @param dt_description : extended description of the technology
         """
         self.__session.expire_all()
-        self.__session.expire_all()
         if dt_name not in DEVICE_TECHNOLOGY_LIST:
             raise ValueError, "dt_name must be one of %s" % DEVICE_TECHNOLOGY_LIST
-        dt = DeviceTechnology(name=dt_name, description=dt_description)
+        dt = DeviceTechnology(name=self.__to_unicode(dt_name), description=self.__to_unicode(dt_description))
         self.__session.add(dt)
         try:
             self.__session.commit()
@@ -927,10 +937,10 @@ class DbHelper():
         if device_tech is None:
             raise DbHelperException("DeviceTechnology with id %s couldn't be found" % dt_id)
         if dt_name is not None:
-            device_tech.name = dt_name
+            device_tech.name = self.__to_unicode(dt_name)
         if dt_description is not None:
             if dt_description == '': dt_description = None
-            device_tech.description = dt_description
+            device_tech.description = self.__to_unicode(dt_description)
         self.__session.add(device_tech)
         try:
             self.__session.commit()
@@ -1028,9 +1038,9 @@ class DbHelper():
         if self.get_device_technology_config(dt_id, dtc_key):
             raise DbHelperException("This key '%s' already exists for device \
                                     technology %s" % (dtc_key, dt_id))
-        dtc = DeviceTechnologyConfig(technology_id=dt_id, key=dtc_key,
-                                     value=dtc_value,
-                                     description=dtc_description)
+        dtc = DeviceTechnologyConfig(technology_id=dt_id, key=self.__to_unicode(dtc_key),
+                                     value=self.__to_unicode(dtc_value),
+                                     description=self.__to_unicode(dtc_description))
         self.__session.add(dtc)
         try:
             self.__session.commit()
@@ -1061,12 +1071,12 @@ class DbHelper():
                 raise DbHelperException("Couldn't find device technology id %s. It does not exist" % dt_id)
             dtc.technology_id = dt_id
         if dtc_key is not None:
-            dtc.key = dtc_key
+            dtc.key = self.__to_unicode(dtc_key)
         if dtc_value is not None:
-            dtc.value = dtc_value
+            dtc.value = self.__to_unicode(dtc_value)
         if dtc_description is not None:
             if dtc_description == '': dtc_description = None
-            dtc.description = dtc_description
+            dtc.description = self.__to_unicode(dtc_description)
         self.__session.add(dtc)
         try:
             self.__session.commit()
@@ -1209,7 +1219,7 @@ class DbHelper():
                              .filter_by(technology_id=dt_id).all()
 
     def add_device(self, d_name, d_address, d_type_id, d_usage_id, d_room_id=None,
-        d_description=None, d_reference=None):
+                   d_description=None, d_reference=None):
         """
         Add a device item
         @param d_name : name of the device
@@ -1238,8 +1248,9 @@ class DbHelper():
             except NoResultFound:
                 raise DbHelperException("Couldn't add device with room id %s \
                                         It does not exist" % d_room_id)
-        device = Device(name=d_name, address=d_address, description=d_description,
-                        reference=d_reference, type_id=d_type_id,
+        device = Device(name=self.__to_unicode(d_name), address=self.__to_unicode(d_address),
+                        description=self.__to_unicode(d_description),
+                        reference=self.__to_unicode(d_reference), type_id=d_type_id,
                         usage_id=d_usage_id, room_id=d_room_id)
         self.__session.add(device)
         try:
@@ -1269,15 +1280,15 @@ class DbHelper():
         if device is None:
             raise DbHelperException("Device with id %s couldn't be found" % d_id)
         if d_name is not None:
-            device.name = d_name
+            device.name = self.__to_unicode(d_name)
         if d_address is not None:
-            device.address = d_address
+            device.address = self.__to_unicode(d_address)
         if d_description is not None:
             if d_description == '': d_description = None
-            device.description = d_description
+            device.description = self.__to_unicode(d_description)
         if d_reference is not None:
             if d_reference == '': d_reference = None
-            device.reference = d_reference
+            device.reference = self.__to_unicode(d_reference)
         if d_type_id is not None:
             try:
                 self.__session.query(DeviceType).filter_by(id=d_type_id).one()
@@ -1421,7 +1432,7 @@ class DbHelper():
             self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         for ds_name in ds_values.keys():
-            dsv = DeviceStatsValue(name=ds_name, value=ds_values[ds_name],
+            dsv = DeviceStatsValue(name=self.__to_unicode(ds_name), value=self.__to_unicode(ds_values[ds_name]),
                                    device_stats_id=device_stat.id)
             self.__session.add(dsv)
         try:
@@ -1505,8 +1516,8 @@ class DbHelper():
         @return the new Trigger object
         """
         self.__session.expire_all()
-        trigger = Trigger(description=t_description, rule=t_rule,
-                          result=';'.join(t_result))
+        trigger = Trigger(description=self.__to_unicode(t_description), rule=self.__to_unicode(t_rule),
+                          result=self.__to_unicode(';'.join(t_result)))
         self.__session.add(trigger)
         try:
             self.__session.commit()
@@ -1530,11 +1541,11 @@ class DbHelper():
             raise DbHelperException("Trigger with id %s couldn't be found" % t_id)
         if t_description is not None:
             if t_description == '': t_description = None
-            trigger.description = t_description
+            trigger.description = self.__to_unicode(t_description)
         if t_rule is not None:
-            trigger.rule = t_rule
+            trigger.rule = self.__to_unicode(t_rule)
         if t_result is not None:
-            trigger.result = ';'.join(t_result)
+            trigger.result = self.__to_unicode(';'.join(t_result))
         self.__session.add(trigger)
         try:
             self.__session.commit()
@@ -1662,10 +1673,10 @@ class DbHelper():
         person = self.__session.query(Person).filter_by(id=a_person_id).first()
         if person is None:
             raise DbHelperException("Person id '%s' does not exist" % a_person_id)
-        user_account = UserAccount(login=a_login,
+        user_account = UserAccount(login=self.__to_unicode(a_login),
                                    password=self.__make_crypted_password(a_password),
                                    person_id=a_person_id,
-                                   is_admin=a_is_admin, skin_used=a_skin_used)
+                                   is_admin=a_is_admin, skin_used=self.__to_unicode(a_skin_used))
         self.__session.add(user_account)
         try:
             self.__session.commit()
@@ -1706,7 +1717,7 @@ class DbHelper():
         if user_acc is None:
             raise DbHelperException("UserAccount with id %s couldn't be found" % a_id)
         if a_new_login is not None:
-            user_acc.login = a_new_login
+            user_acc.login = self.__to_unicode(a_new_login)
         if a_person_id is not None:
             person = self.__session.query(Person).filter_by(id=a_person_id).first()
             if person is None:
@@ -1715,7 +1726,7 @@ class DbHelper():
         if a_is_admin is not None:
             user_acc.is_admin = a_is_admin
         if a_skin_used is not None:
-            user_acc.skin_used = a_skin_used
+            user_acc.skin_used = self.__to_unicode(a_skin_used)
         self.__session.add(user_acc)
         try:
             self.__session.commit()
@@ -1815,7 +1826,7 @@ class DbHelper():
         @return the new Person object
         """
         self.__session.expire_all()
-        person = Person(first_name=p_first_name, last_name=p_last_name,
+        person = Person(first_name=self.__to_unicode(p_first_name), last_name=self.__to_unicode(p_last_name),
                         birthdate=p_birthdate)
         self.__session.add(person)
         try:
@@ -1840,9 +1851,9 @@ class DbHelper():
         if person is None:
             raise DbHelperException("Person with id %s couldn't be found" % p_id)
         if p_first_name is not None:
-            person.first_name = p_first_name
+            person.first_name = self.__to_unicode(p_first_name)
         if p_last_name is not None:
-            person.last_name = p_last_name
+            person.last_name = self.__to_unicode(p_last_name)
         if p_birthdate is not None:
             if p_birthdate == '':
                 p_birthdate = None
@@ -1915,7 +1926,8 @@ class DbHelper():
         @return the new SystemStats object
         """
         self.__session.expire_all()
-        system_stat = SystemStats(module_name=s_name, host_name=s_hostname, date=s_date)
+        system_stat = SystemStats(module_name=self.__to_unicode(s_name), host_name=self.__to_unicode(s_hostname),
+                                  date=s_date)
         self.__session.add(system_stat)
         try:
             self.__session.commit()
@@ -1923,8 +1935,9 @@ class DbHelper():
             self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         for stat_value_name in s_values.keys():
-            ssv = SystemStatsValue(name=stat_value_name, value=s_values[stat_value_name],
-                                  system_stats_id=system_stat.id)
+            ssv = SystemStatsValue(name=self.__to_unicode(stat_value_name),
+                                   value=self.__to_unicode(s_values[stat_value_name]),
+                                   system_stats_id=system_stat.id)
             self.__session.add(ssv)
         try:
             self.__session.commit()
@@ -1996,10 +2009,11 @@ class DbHelper():
         self.__session.expire_all()
         ui_item_config = self.get_ui_item_config(ui_item_name, ui_item_reference, ui_item_key)
         if ui_item_config is None:
-            ui_item_config = UIItemConfig(name=ui_item_name, reference=ui_item_reference,
-                                          key=ui_item_key, value=ui_item_value)
+            ui_item_config = UIItemConfig(name=self.__to_unicode(ui_item_name),
+                                          reference=self.__to_unicode(ui_item_reference),
+                                          key=self.__to_unicode(ui_item_key), value=self.__to_unicode(ui_item_value))
         else:
-            ui_item_config.value = ui_item_value
+            ui_item_config.value = self.__to_unicode(ui_item_value)
         self.__session.add(ui_item_config)
         try:
             self.__session.commit()

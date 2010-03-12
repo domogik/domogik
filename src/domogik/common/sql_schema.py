@@ -49,7 +49,7 @@ Implements
 from exceptions import AssertionError
 
 from sqlalchemy import types, create_engine, Table, Column, Integer, String, \
-      MetaData, ForeignKey, Boolean, DateTime, Date, Text, UniqueConstraint
+      MetaData, ForeignKey, Boolean, DateTime, Date, Text, Unicode, UniqueConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relation, backref
 
@@ -117,8 +117,8 @@ class Area(Base):
     __tablename__ = '%s_area' % _db_prefix
 
     id = Column(Integer, primary_key=True)
-    name = Column(String(30), nullable=False)
-    description = Column(String(255))
+    name = Column(Unicode(30), nullable=False)
+    description = Column(Unicode(255))
 
     def __init__(self, name, description):
         """
@@ -134,8 +134,7 @@ class Area(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<Area(id=%s, name='%s', desc='%s')>" \
-               % (self.id, self.name, self.description)
+        return "<Area(id=%s, name='%s', desc='%s')>" % (self.id, self.name, self.description)
 
     @staticmethod
     def get_tablename():
@@ -152,8 +151,8 @@ class Room(Base):
     """
     __tablename__ = '%s_room' % _db_prefix
     id = Column(Integer, primary_key=True)
-    name = Column(String(30), nullable=False)
-    description = Column(String(255))
+    name = Column(Unicode(30), nullable=False)
+    description = Column(Unicode(255))
     area_id = Column(Integer, ForeignKey('%s.id' % Area.get_tablename()))
     area = relation(Area, backref=backref(__tablename__, order_by=id))
 
@@ -173,8 +172,7 @@ class Room(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<Room(id=%s, name='%s', desc='%s', area=%s)>" \
-               % (self.id, self.name, self.description, self.area)
+        return "<Room(id=%s, name='%s', desc='%s', area=%s)>" % (self.id, self.name, self.description, self.area)
 
     @staticmethod
     def get_tablename():
@@ -191,8 +189,8 @@ class DeviceUsage(Base):
     """
     __tablename__ = '%s_device_usage' % _db_prefix
     id = Column(Integer, primary_key=True)
-    name = Column(String(30), nullable=False)
-    description = Column(String(255))
+    name = Column(Unicode(30), nullable=False)
+    description = Column(Unicode(255))
 
     def __init__(self, name, description):
         """
@@ -208,8 +206,7 @@ class DeviceUsage(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<DeviceUsage(id=%s, name='%s', desc='%s')>" \
-               % (self.id, self.name, self.description)
+        return "<DeviceUsage(id=%s, name='%s', desc='%s')>" % (self.id, self.name, self.description)
 
     @staticmethod
     def get_tablename():
@@ -227,7 +224,7 @@ class DeviceTechnology(Base):
     __tablename__ = '%s_device_technology' % _db_prefix
     id = Column(Integer, primary_key=True)
     name = Column(Enum(DEVICE_TECHNOLOGY_LIST), nullable=False)
-    description = Column(String(255))
+    description = Column(Unicode(255))
 
     def __init__(self, name, description):
         """
@@ -243,8 +240,7 @@ class DeviceTechnology(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<DeviceTechnology(id=%s, name='%s', desc='%s')>" \
-               % (self.id, self.name, self.description)
+        return "<DeviceTechnology(id=%s, name='%s', desc='%s')>" % (self.id, self.name, self.description)
 
     @staticmethod
     def get_tablename():
@@ -265,9 +261,9 @@ class DeviceTechnologyConfig(Base):
                            ForeignKey('%s.id' % DeviceTechnology.get_tablename()),
                            nullable=False)
     technology = relation(DeviceTechnology, backref=backref(__tablename__))
-    key = Column(String(30), nullable=False)
-    value = Column(String(80), nullable=False)
-    description = Column(String(255), nullable=True)
+    key = Column(Unicode(30), nullable=False)
+    value = Column(Unicode(80), nullable=False)
+    description = Column(Unicode(255), nullable=True)
 
     def __init__(self, technology_id, key, value, description):
         """
@@ -278,8 +274,8 @@ class DeviceTechnologyConfig(Base):
         @param description : description of the ocnfiguration item
         """
         self.technology_id = technology_id
-        self.key = key
-        self.value = value
+        self.key = unicode(key)
+        self.value = unicode(value)
         self.description = description
         UniqueConstraint(technology_id, key)
 
@@ -288,8 +284,7 @@ class DeviceTechnologyConfig(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<DeviceTechnologyConfig(id=%s, techno=%s, ('%s', '%s'))>" \
-               % (self.id, self.technology, self.key, self.value)
+        return "<DeviceTechnologyConfig(id=%s, techno=%s, ('%s', '%s'))>" % (self.id, self.technology, self.key, self.value)
 
     @staticmethod
     def get_tablename():
@@ -309,8 +304,8 @@ class DeviceType(Base):
     technology_id = Column(Integer, ForeignKey('%s.id' % \
                            DeviceTechnology.get_tablename()), nullable=False)
     technology = relation(DeviceTechnology, backref=backref(__tablename__))
-    name = Column(String(30), nullable=False)
-    description = Column(String(255))
+    name = Column(Unicode(30), nullable=False)
+    description = Column(Unicode(255))
 
     def __init__(self, name, description, technology_id):
         """
@@ -327,8 +322,7 @@ class DeviceType(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<DeviceType(id=%s, name='%s', desc='%s', device techno='%s')>" \
-               % (self.id, self.name, self.description, self.technology)
+        return "<DeviceType(id=%s, name='%s', desc='%s', device techno='%s')>" % (self.id, self.name, self.description, self.technology)
 
     @staticmethod
     def get_tablename():
@@ -345,10 +339,10 @@ class SensorReferenceData(Base):
     """
     __tablename__ = '%s_sensor_reference_data' % _db_prefix
     id = Column(Integer, primary_key=True)
-    name = Column(String(30), nullable=False)
-    value = Column(String(30), nullable=False)
-    unit = Column(String(30))
-    stat_key = Column(String(30))
+    name = Column(Unicode(30), nullable=False)
+    value = Column(Unicode(30), nullable=False)
+    unit = Column(Unicode(30))
+    stat_key = Column(Unicode(30))
     device_type_id = Column(Integer, ForeignKey('%s.id' % \
                            DeviceType.get_tablename()), nullable=False)
     device_type = relation(DeviceType, backref=backref(__tablename__))
@@ -392,13 +386,13 @@ class ActuatorFeature(Base):
     """
     __tablename__ = '%s_actuator_feature' % _db_prefix
     id = Column(Integer, primary_key=True)
-    name = Column(String(30), nullable=False)
-    value = Column(String(30), nullable=False)
+    name = Column(Unicode(30), nullable=False)
+    value = Column(Unicode(30), nullable=False)
     device_type_id = Column(Integer, ForeignKey('%s.id' % \
                            DeviceType.get_tablename()), nullable=False)
     device_type = relation(DeviceType, backref=backref(__tablename__))
-    unit = Column(String(30))
-    configurable_states = Column(String(255))
+    unit = Column(Unicode(30))
+    configurable_states = Column(Unicode(255))
     return_confirmation = Column(Boolean(), nullable=False)
 
     def __init__(self, name, device_type_id, value=None, unit=None,
@@ -445,10 +439,10 @@ class Device(Base):
     """
     __tablename__ = '%s_device' % _db_prefix
     id = Column(Integer, primary_key=True)
-    name = Column(String(30), nullable=False)
-    description = Column(String(255))
-    address = Column(String(30), nullable=False)
-    reference = Column(String(30))
+    name = Column(Unicode(30), nullable=False)
+    description = Column(Unicode(255))
+    address = Column(Unicode(30), nullable=False)
+    reference = Column(Unicode(30))
     usage_id = Column(Integer, ForeignKey('%s.id' % DeviceUsage.get_tablename()), nullable=False)
     usage = relation(DeviceUsage, backref=backref(__tablename__))
     type_id = Column(Integer, ForeignKey('%s.id' % DeviceType.get_tablename()), nullable=False)
@@ -529,9 +523,9 @@ class DeviceConfig(Base):
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()),
                        nullable=False)
     device = relation(Device, backref=backref(__tablename__))
-    key = Column(String(30), nullable=False)
-    value = Column(String(80), nullable=False)
-    description = Column(String(255), nullable=True)
+    key = Column(Unicode(30), nullable=False)
+    value = Column(Unicode(80), nullable=False)
+    description = Column(Unicode(255), nullable=True)
 
     def __init__(self, device_id, key, value):
         """
@@ -549,8 +543,7 @@ class DeviceConfig(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<DeviceConfig(id=%s, device=%s, ('%s', '%s'))>" \
-               % (self.id, self.device, self.key, self.value)
+        return "<DeviceConfig(id=%s, device=%s, ('%s', '%s'))>" % (self.id, self.device, self.key, self.value)
 
     @staticmethod
     def get_tablename():
@@ -607,8 +600,8 @@ class DeviceStatsValue(Base):
                              ForeignKey('%s.id' % DeviceStats.get_tablename()),
                              nullable=False)
     device_stats = relation(DeviceStats, backref=backref(__tablename__))
-    name = Column(String(30), nullable=False)
-    value = Column(String(80), nullable=False)
+    name = Column(Unicode(30), nullable=False)
+    value = Column(Unicode(80), nullable=False)
 
     def __init__(self, name, value, device_stats_id):
         """
@@ -626,8 +619,7 @@ class DeviceStatsValue(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<DeviceStatsValue(id=%s, name=%s, value=%s, stats=%s)>" \
-               % (self.id, self.name, self.value, self.device_stats)
+        return "<DeviceStatsValue(id=%s, name=%s, value=%s, stats=%s)>" % (self.id, self.name, self.value, self.device_stats)
 
     @staticmethod
     def get_tablename():
@@ -644,7 +636,7 @@ class Trigger(Base):
     """
     __tablename__ = '%s_trigger' % _db_prefix
     id = Column(Integer, primary_key=True)
-    description = Column(String(255))
+    description = Column(Unicode(255))
     rule = Column(Text, nullable=False)
     result = Column(Text, nullable=False)
 
@@ -664,8 +656,7 @@ class Trigger(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<Trigger(id=%s, desc='%s', rule='%s', result='%s')>" \
-               % (self.id, self.description, self.rule, self.result)
+        return "<Trigger(id=%s, desc='%s', rule='%s', result='%s')>" % (self.id, self.description, self.rule, self.result)
 
     @staticmethod
     def get_tablename():
@@ -682,8 +673,8 @@ class Person(Base):
     """
     __tablename__ = '%s_person' % _db_prefix
     id = Column(Integer, primary_key=True)
-    first_name = Column(String(50), nullable=False)
-    last_name = Column(String(60), nullable=False)
+    first_name = Column(Unicode(50), nullable=False)
+    last_name = Column(Unicode(60), nullable=False)
     birthdate = Column(Date)
 
     def __init__(self, first_name, last_name, birthdate):
@@ -719,12 +710,12 @@ class UserAccount(Base):
     """
     __tablename__ = '%s_user_account' % _db_prefix
     id = Column(Integer, primary_key=True)
-    login = Column(String(20), nullable=False, unique=True)
+    login = Column(Unicode(20), nullable=False, unique=True)
     password = Column(Text, nullable=False)
     person_id = Column(Integer, ForeignKey('%s.id' % Person.get_tablename()))
     person = relation(Person, backref=backref(__tablename__))
     is_admin = Column(Boolean, nullable=False, default=False)
-    skin_used = Column(String(80), nullable=False)
+    skin_used = Column(Unicode(80), nullable=False)
 
     def __init__(self, login, password, is_admin, skin_used, person_id):
         """
@@ -763,8 +754,8 @@ class SystemStats(Base):
     """
     __tablename__ = '%s_system_stats' % _db_prefix
     id = Column(Integer, primary_key=True)
-    name = Column(String(30), nullable=False)
-    hostname = Column(String(40), nullable=False)
+    name = Column(Unicode(30), nullable=False)
+    hostname = Column(Unicode(40), nullable=False)
     date = Column(DateTime, nullable=False)
 
     def __init__(self, module_name, host_name, date):
@@ -783,8 +774,7 @@ class SystemStats(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<SystemStats(id=%s, module_name=%s, host_name=%s, date=%s)>" \
-               % (self.id, self.name, self.hostname, self.date)
+        return "<SystemStats(id=%s, module_name=%s, host_name=%s, date=%s)>" % (self.id, self.name, self.hostname, self.date)
 
     @staticmethod
     def get_tablename():
@@ -805,8 +795,8 @@ class SystemStatsValue(Base):
                              ForeignKey('%s.id' % SystemStats.get_tablename()),
                              nullable=False)
     system_stats = relation(SystemStats, backref=backref(__tablename__))
-    name = Column(String(30), nullable=False)
-    value = Column(String(80), nullable=False)
+    name = Column(Unicode(30), nullable=False)
+    value = Column(Unicode(80), nullable=False)
 
     def __init__(self, name, value, system_stats_id):
         """
@@ -824,8 +814,7 @@ class SystemStatsValue(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<SystemStatsValue(id=%s, name=%s, value=%s, stat_id=%s)>" \
-               % (self.id, self.name, self.value, self.system_stats)
+        return "<SystemStatsValue(id=%s, name=%s, value=%s, stat_id=%s)>" % (self.id, self.name, self.value, self.system_stats)
 
     @staticmethod
     def get_tablename():
@@ -843,10 +832,10 @@ class UIItemConfig(Base):
     """
     __tablename__ = '%s_ui_item_config' % _db_prefix
 
-    name =  Column(String(30), nullable=False, primary_key=True)
-    reference = Column(String(30), nullable=False, primary_key=True)
-    key = Column(String(30), nullable=False, primary_key=True)
-    value = Column(String(), nullable=False)
+    name =  Column(Unicode(30), nullable=False, primary_key=True)
+    reference = Column(Unicode(30), nullable=False, primary_key=True)
+    key = Column(Unicode(30), nullable=False, primary_key=True)
+    value = Column(Unicode(), nullable=False)
 
     def __init__(self, name, reference, key, value):
         """
@@ -901,8 +890,7 @@ class SystemConfig(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<SystemConfig(id=%s, simulation=%s, debug=%s)>" \
-               % (self.id, self.simulation_mode, self.debug_mode)
+        return "<SystemConfig(id=%s, simulation=%s, debug=%s)>" % (self.id, self.simulation_mode, self.debug_mode)
 
     @staticmethod
     def get_tablename():
