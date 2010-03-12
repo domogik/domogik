@@ -1035,7 +1035,7 @@ class DbHelper():
             raise DbHelperException("Couldn't add device technology config \
                                     with device technology id %s. \
                                     It does not exist" % dt_id)
-        if self.get_device_technology_config(dt_id, dtc_key):
+        if self.get_device_technology_config(dt_id, self.__to_unicode(dtc_key)):
             raise DbHelperException("This key '%s' already exists for device \
                                     technology %s" % (dtc_key, dt_id))
         dtc = DeviceTechnologyConfig(technology_id=dt_id, key=self.__to_unicode(dtc_key),
