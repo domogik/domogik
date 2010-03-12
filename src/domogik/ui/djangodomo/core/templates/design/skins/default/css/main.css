@@ -79,21 +79,16 @@ body {
 
 #content-bgnd {
 	border: #979387 1px solid;
-	margin-top: 1em;
-	margin-left: auto;
-	margin-right: auto;
+	margin: 1em 5% 0 5%;
 	background-image: -webkit-gradient(linear, 0% 0%, 0% 30%, from(#908D6F), to(#D2CDBC));
 	background-image: -moz-linear-gradient(0% 5% 270deg,#908D6F, #D2CDBC);
 	-moz-border-radius: 0.8em ;
     -webkit-border-radius: 0.8em;	
-	min-width:30em;
-	max-width:97em;	
 }
 
 #content {
 	min-height:40em;
 }
-
 #footer {
     clear:both;
     margin:0.5em;
@@ -103,6 +98,14 @@ body {
 }
 
 /* Content Layouts */
+
+.left {
+    float:left;
+    width: 20em;
+}
+.right {
+    margin-left: 21em;
+}
 
 .column {
 	float:left;
