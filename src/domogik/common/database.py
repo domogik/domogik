@@ -1018,14 +1018,12 @@ class DbHelper():
                              .filter_by(key=self.__to_unicode(dtc_key))\
                              .first()
 
-    def add_device_technology_config(self, dt_id, dtc_key, dtc_value,
-                                     dtc_description):
+    def add_device_technology_config(self, dt_id, dtc_key, dtc_value):
         """
         Add a device's technology config item
         @param dt_id : the device technology id
         @param dtc_key : The device technology config key
         @param dtc_value : The device technology config value
-        @param dtc_description : The device technology config description
         @return the new DeviceTechnologyConfig item
         """
         self.__session.expire_all()
@@ -1039,8 +1037,7 @@ class DbHelper():
             raise DbHelperException("This key '%s' already exists for device \
                                     technology %s" % (dtc_key, dt_id))
         dtc = DeviceTechnologyConfig(technology_id=dt_id, key=self.__to_unicode(dtc_key),
-                                     value=self.__to_unicode(dtc_value),
-                                     description=self.__to_unicode(dtc_description))
+                                     value=self.__to_unicode(dtc_value))
         self.__session.add(dtc)
         try:
             self.__session.commit()
@@ -1050,14 +1047,13 @@ class DbHelper():
         return dtc
 
     def update_device_technology_config(self, dtc_id, dt_id=None, dtc_key=None,
-                                        dtc_value=None, dtc_description=None):
+                                        dtc_value=None):
         """
         Update a device technology config
         @param dtc_id : device technology config id to be updated
         @param dt_id : device technology id (optional)
         @param dtc_key : parameter key (optional)
         @param dtc_value : parameter value (optional)
-        @param dtc_description : device technology config detailed description (optional)
         @return a DeviceTechnologyConfig object
         """
         self.__session.expire_all()
@@ -1074,9 +1070,6 @@ class DbHelper():
             dtc.key = self.__to_unicode(dtc_key)
         if dtc_value is not None:
             dtc.value = self.__to_unicode(dtc_value)
-        if dtc_description is not None:
-            if dtc_description == '': dtc_description = None
-            dtc.description = self.__to_unicode(dtc_description)
         self.__session.add(dtc)
         try:
             self.__session.commit()

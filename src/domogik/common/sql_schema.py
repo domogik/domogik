@@ -263,20 +263,17 @@ class DeviceTechnologyConfig(Base):
     technology = relation(DeviceTechnology, backref=backref(__tablename__))
     key = Column(Unicode(30), nullable=False)
     value = Column(Unicode(80), nullable=False)
-    description = Column(Unicode(255), nullable=True)
 
-    def __init__(self, technology_id, key, value, description):
+    def __init__(self, technology_id, key, value):
         """
         Class constructor
         @param technology_id : link to the device technology
         @param key : configuration item
         @param value : configuration value
-        @param description : description of the ocnfiguration item
         """
         self.technology_id = technology_id
         self.key = unicode(key)
         self.value = unicode(value)
-        self.description = description
         UniqueConstraint(technology_id, key)
 
     def __repr__(self):
