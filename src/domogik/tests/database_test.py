@@ -804,8 +804,7 @@ class DeviceTechnologyConfigTestCase(GenericTestCase):
                                                      'desc2')
         dtc3_1 = self.db.add_device_technology_config(dt3.id, 'key3_1', 'val3_1',
                                                       'desc3')
-        dtc3_2 = self.db.add_device_technology_config(dt3.id, 'key3_2', 'val3_2',
-                                                      'desc4')
+        dtc3_2 = self.db.add_device_technology_config(dt3.id, 'key3_2', 'val3_2','desc4')
         dtc3_3 = self.db.add_device_technology_config(dt3.id, 'key3_3', 'val3_3',
                                                       'desc5')
         try:

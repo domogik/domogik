@@ -170,7 +170,7 @@ class DbHelper():
             raise DbHelperException("Wrong type of 'filters', Should be a dictionnary")
         area_list = self.__session.query(Area)
         for filter in filters:
-            filter_arg = "%s = '%s'" % (filter, filters[filter])
+            filter_arg = "%s = '%s'" % (filter, self.__to_unicode(filters[filter]))
             area_list = area_list.filter(filter_arg)
         return area_list.all()
 
@@ -190,7 +190,7 @@ class DbHelper():
         @return an area object
         """
         return self.__session.query(Area)\
-                            .filter(func.lower(Area.name)==area_name.lower())\
+                            .filter(func.lower(Area.name)==self.__to_unicode(area_name.lower()))\
                             .first()
 
     def add_area(self, a_name, a_description=None):
@@ -296,7 +296,7 @@ class DbHelper():
             raise DbHelperException("Wrong type of 'filters', Should be a dictionnary")
         room_list = self.__session.query(Room)
         for filter in filters:
-            filter_arg = "%s = '%s'" % (filter, filters[filter])
+            filter_arg = "%s = '%s'" % (filter, self.__to_unicode(filters[filter]))
             room_list = room_list.filter(filter_arg)
         return room_list.all()
 
@@ -307,7 +307,7 @@ class DbHelper():
         @return a room object
         """
         return self.__session.query(Room)\
-                             .filter(func.lower(Room.name)==r_name.lower())\
+                             .filter(func.lower(Room.name)==self.__to_unicode(r_name.lower()))\
                              .first()
 
     def get_room_by_id(self, r_id):
@@ -428,7 +428,7 @@ class DbHelper():
         @return a DeviceUsage object
         """
         return self.__session.query(DeviceUsage)\
-                             .filter(func.lower(DeviceUsage.name)==du_name.lower())\
+                             .filter(func.lower(DeviceUsage.name)==self.__to_unicode(du_name.lower()))\
                              .first()
 
     def add_device_usage(self, du_name, du_description=None):
@@ -523,7 +523,7 @@ class DbHelper():
         @return a DeviceType object
         """
         return self.__session.query(DeviceType)\
-                             .filter(func.lower(DeviceType.name)==dty_name.lower())\
+                             .filter(func.lower(DeviceType.name)==self.__to_unicode(dty_name.lower()))\
                              .first()
 
     def add_device_type(self, dty_name, dt_id, dty_description=None):
@@ -648,7 +648,7 @@ class DbHelper():
         @return a SensorReferenceData object
         """
         return self.__session.query(SensorReferenceData)\
-                             .filter(func.lower(SensorReferenceData.name)==srd_name.lower())\
+                             .filter(func.lower(SensorReferenceData.name)==self.__to_unicode(srd_name.lower()))\
                              .first()
 
     def get_sensor_reference_data_by_typeid(self, srd_typeid):
@@ -771,7 +771,7 @@ class DbHelper():
         @return an ActuatorFeature object
         """
         return self.__session.query(ActuatorFeature)\
-                             .filter(func.lower(ActuatorFeature.name)==af_name.lower())\
+                             .filter(func.lower(ActuatorFeature.name)==self.__to_unicode(af_name.lower()))\
                              .first()
 
     def get_actuator_feature_by_typeid(self, af_typeid):
@@ -901,7 +901,7 @@ class DbHelper():
         @return a DeviceTechnology object
         """
         return self.__session.query(DeviceTechnology)\
-                             .filter(func.lower(DeviceTechnology.name)==dt_name.lower())\
+                             .filter(func.lower(DeviceTechnology.name)==self.__to_unicode(dt_name.lower()))\
                              .first()
 
     def add_device_technology(self, dt_name, dt_description):
@@ -1015,7 +1015,7 @@ class DbHelper():
         """
         return self.__session.query(DeviceTechnologyConfig)\
                              .filter_by(technology_id=dt_id)\
-                             .filter_by(key=dtc_key)\
+                             .filter_by(key=self.__to_unicode(dtc_key))\
                              .first()
 
     def add_device_technology_config(self, dt_id, dtc_key, dtc_value,
@@ -1127,7 +1127,7 @@ class DbHelper():
 
         device_list = self.__session.query(Device)
         for filter in filters:
-            filter_arg = "%s = '%s'" % (filter, filters[filter])
+            filter_arg = "%s = '%s'" % (filter, self.__to_unicode(filters[filter]))
             device_list = device_list.filter(filter_arg)
         return device_list.all()
 
@@ -1164,7 +1164,7 @@ class DbHelper():
         @return a device object
         """
         device_list = self.__session.query(Device)\
-                                    .filter_by(address=device_address)\
+                                    .filter_by(address=self.__to_unicode(device_address))\
                                     .all()
         if len(device_list) == 0:
             return None
@@ -1175,7 +1175,7 @@ class DbHelper():
             device_tech = self.__session.query(DeviceTechnology)\
                                         .filter_by(id=device_type.technology_id)\
                                         .first()
-            if device_tech.name.lower() == techno_name.lower():
+            if device_tech.name.lower() == self.__to_unicode(techno_name.lower()):
                 return device
         return None
 
@@ -1607,7 +1607,7 @@ class DbHelper():
         @param a_login : login
         @return a UserAccount object
         """
-        user_acc = self.__session.query(UserAccount).filter_by(login=a_login)\
+        user_acc = self.__session.query(UserAccount).filter_by(login=self.__to_unicode(a_login))\
                                                     .first()
         if user_acc is not None:
             user_acc.password = None
@@ -1622,7 +1622,7 @@ class DbHelper():
         """
         crypted_pass = self.__make_crypted_password(a_password)
         user_acc = self.__session.query(UserAccount)\
-                                 .filter_by(login=a_login, password=crypted_pass)\
+                                 .filter_by(login=self.__to_unicode(a_login), password=crypted_pass)\
                                  .first()
         if user_acc is not None:
             user_acc.password = None
@@ -1647,7 +1647,7 @@ class DbHelper():
         @return True or False
         """
         self.__session.expire_all()
-        user_acc = self.__session.query(UserAccount).filter_by(login=a_login)\
+        user_acc = self.__session.query(UserAccount).filter_by(login=self.__to_unicode(a_login))\
                                                     .first()
         if user_acc is not None:
             password = hashlib.sha256()
@@ -1667,7 +1667,7 @@ class DbHelper():
         @return the new UserAccount object or raise a DbHelperException if it already exists
         """
         self.__session.expire_all()
-        user_account = self.__session.query(UserAccount).filter_by(login=a_login).first()
+        user_account = self.__session.query(UserAccount).filter_by(login=self.__to_unicode(a_login)).first()
         if user_account is not None:
             raise DbHelperException("Error %s login already exists" % a_login)
         person = self.__session.query(Person).filter_by(id=a_person_id).first()
@@ -1953,7 +1953,7 @@ class DbHelper():
         @return the deleted SystemStats object
         """
         self.__session.expire_all()
-        system_stat = self.__session.query(SystemStats).filter_by(name=s_name).first()
+        system_stat = self.__session.query(SystemStats).filter_by(name=self.__to_unicode(s_name)).first()
         if system_stat:
             system_stat_d = system_stat
             system_stats_values = self.__session.query(SystemStatsValue)\
@@ -2031,8 +2031,9 @@ class DbHelper():
         @return an UIItemConfig object
         """
         return self.__session.query(UIItemConfig)\
-                             .filter_by(name=ui_item_name,
-                                        reference=ui_item_reference, key=ui_item_key)\
+                             .filter_by(name=self.__to_unicode(ui_item_name),
+                                        reference=self.__to_unicode(ui_item_reference),
+                                        key=self.__to_unicode(ui_item_key))\
                              .first()
 
     def list_ui_item_config_by_ref(self, ui_item_name, ui_item_reference):
@@ -2043,8 +2044,8 @@ class DbHelper():
         @return a list of UIItemConfig objects
         """
         return self.__session.query(UIItemConfig)\
-                             .filter_by(name=ui_item_name,
-                                        reference=ui_item_reference)\
+                             .filter_by(name=self.__to_unicode(ui_item_name),
+                                        reference=self.__to_unicode(ui_item_reference))\
                              .all()
 
     def list_ui_item_config_by_key(self, ui_item_name, ui_item_key):
@@ -2055,7 +2056,8 @@ class DbHelper():
         @return a list of UIItemConfig objects
         """
         return self.__session.query(UIItemConfig)\
-                             .filter_by(name=ui_item_name, key=ui_item_key)\
+                             .filter_by(name=self.__to_unicode(ui_item_name),
+                                        key=self.__to_unicode(ui_item_key))\
                              .all()
 
     def list_ui_item_config(self, ui_item_name):
@@ -2065,7 +2067,7 @@ class DbHelper():
         @return a list of UIItemConfig objects
         """
         return self.__session.query(UIItemConfig)\
-                             .filter_by(name=ui_item_name)\
+                             .filter_by(name=self.__to_unicode(ui_item_name))\
                              .all()
 
     def list_all_ui_item_config(self):
@@ -2087,16 +2089,16 @@ class DbHelper():
         ui_item_config_list = []
         if ui_item_reference == None and ui_item_key == None:
             ui_item_config_list = self.__session.query(UIItemConfig)\
-                                                .filter_by(name=ui_item_name).all()
+                                                .filter_by(name=self.__to_unicode(ui_item_name)).all()
         elif ui_item_key is None:
             ui_item_config_list = self.__session.query(UIItemConfig)\
-                                                .filter_by(name=ui_item_name,
-                                                           reference=ui_item_reference)\
+                                                .filter_by(name=self.__to_unicode(ui_item_name),
+                                                           reference=self.__to_unicode(ui_item_reference))\
                                                 .all()
         elif ui_item_reference is None:
             ui_item_config_list = self.__session.query(UIItemConfig)\
-                                                .filter_by(name=ui_item_name,
-                                                           key=ui_item_key)\
+                                                .filter_by(name=self.__to_unicode(ui_item_name),
+                                                           key=self.__to_unicode(ui_item_key))\
                                                 .all()
         else:
             ui_item_config = self.get_ui_item_config(ui_item_name, ui_item_reference, ui_item_key)
