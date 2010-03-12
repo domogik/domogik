@@ -41,7 +41,7 @@ from xml.dom import minidom
 import glob
 
 from domogik.xpl.common.module import xPLModule
-from domogik.xpl.lib.xplconnector import Listener
+from domogik.xpl.common.xplconnector import Listener
 from domogik.common.database import DbHelper
 from domogik.common.configloader import Loader
 

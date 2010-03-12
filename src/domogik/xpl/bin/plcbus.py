@@ -37,7 +37,7 @@ Implements
 @organization: Domogik
 """
 
-from domogik.xpl.lib.xplconnector import Listener
+from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.module import xPLModule, xPLResult
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.lib.plcbus import PLCBUSAPI
