@@ -1,3 +1,5 @@
+
+
 function widgetmini_binary(widgetmini_id, function_id, widget_usage) {
     $('#' + widgetmini_id).addClass('widgetmini_binary')
         .click(function () {process_binary(function_id)})
