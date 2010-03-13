@@ -1212,7 +1212,7 @@ target=*
             ### del
             elif self.rest_request[1] == "del":
                 if len(self.rest_request) == 3:
-                    self._rest_base_device_technology_config_del(tc_id=self.rest_request[2])
+                    self._rest_base_device_technology_config_del(id=self.rest_request[2])
                 else:
                     self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
@@ -1987,16 +1987,16 @@ target=*
 
 
 
-    def _rest_base_device_technology_config_del(self, tc_id=None):
+    def _rest_base_device_technology_config_del(self, id=None):
         """ delete device technology config
-            @param tc_id : device technology config id
+            @param id : i of technology type
         """
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("device_technology_config")
         try:
-            device_technology_config = self._db.del_device_technology_config(tc_id)
-            json_data.add_data(device_technology_config)
+            for device_technology_config in self._db.del_device_technology_config(id):
+                json_data.add_data(device_technology_config)
         except:
             json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
         self.send_http_response_ok(json_data.get())
