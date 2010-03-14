@@ -55,12 +55,17 @@ from domogik.xpl.common.module import xPLResult
 import re
 import traceback
 import datetime
+import socket
+from OpenSSL import SSL
+
 
 
 REST_API_VERSION = "0.1"
 REST_DESCRIPTION = "REST module is part of Domogik project. See http://trac.domogik.org/domogik/wiki/modules/REST.en for REST API documentation"
 
-
+### parameters that can be overidden by Domogik config file
+USE_SSL = False
+SSL_CERTIFICATE = "/dev/null"
 
 QUEUE_TIMEOUT = 10
 QUEUE_SIZE = 10
@@ -118,6 +123,25 @@ class Rest(xPLModule):
             self.server_port = server_port
         self._log.info("Configuration : ip:port = %s:%s" % (self.server_ip, self.server_port))
 
+        # SSL configuration
+        try:
+            cfg_rest = Loader('rest')
+            config_rest = cfg_rest.load()
+            conf_rest = dict(config_rest[1])
+            self.use_ssl = conf_rest['rest_use_ssl']
+            if self.use_ssl == "True":
+                self.use_ssl = True
+            else:
+                self.use_ssl = False
+            self.ssl_certificate = conf_rest['rest_ssl_certificate']
+        except KeyError:
+            # default parameters
+            self.use_ssl = USE_SSL
+            self.ssl_certificate = SSL_CERTIFICATE
+        if self.use_ssl == True:
+            self._log.info("Configuration : SSL support activated (certificate : %s)" % self.ssl_certificate)
+        else:
+            self._log.info("Configuration : SSL support not activated")
 
         # Queues config
         self._log.debug("Get queues configuration")
@@ -260,14 +284,26 @@ class Rest(xPLModule):
         """
         # Start HTTP server
         self._log.info("Start HTTP Server on %s:%s..." % (self.server_ip, self.server_port))
-        server = HTTPServerWithParam((self.server_ip, int(self.server_port)), RestHandler, \
-                                     handler_params = [self])
+        # debug for HTTPS : TODO : delete
+        print "use_ssl = %s" % self.use_ssl
+
+        if self.use_ssl:
+            server = HTTPSServerWithParam((self.server_ip, int(self.server_port)), RestHandler, \
+                                         handler_params = [self])
+            #sa = server.socket.getsocketname()
+            # debug for HTTPS : TODO : delete
+            #print "Serving HTTP(S) on", sa[0], "port", sa[1], "..."
+        else:
+            server = HTTPServerWithParam((self.server_ip, int(self.server_port)), RestHandler, \
+                                         handler_params = [self])
+
         server.serve_forever()
 
 
 
 
 ################################################################################
+# HTTP
 class HTTPServerWithParam(HTTPServer):
     """ Extends HTTPServer to allow send params to the Handler.
     """
@@ -279,6 +315,44 @@ class HTTPServerWithParam(HTTPServer):
         self.handler_params = handler_params
         # dirty issue
         self.timeout = None
+
+
+
+################################################################################
+# HTTPS
+class HTTPSServerWithParam(HTTPServer):
+    """ Extends HTTPServer to allow send params to the Handler.
+    """
+
+    def __init__(self, server_address, request_handler_class, \
+                 bind_and_activate=True, handler_params = []):
+        HTTPServer.__init__(self, server_address, request_handler_class, \
+                            bind_and_activate)
+        self.handler_params = handler_params
+        # dirty issue
+        self.timeout = None
+
+        ### SSL specific
+        ssl_certificate = self.handler_params[0].ssl_certificate
+        #if 1 == 1:
+        try:
+            ctx = SSL.Context(SSL.SSLv23_METHOD)
+            ctx.use_privatekey_file (ssl_certificate)
+            ctx.use_certificate_file(ssl_certificate)
+            self.socket = SSL.Connection(ctx, socket.socket(self.address_family,
+                                                        self.socket_type))
+        except:
+            error = "SSL error : %s. Did you generate certificate ?" % sys.exc_info()[1]
+            print error
+            self.handler_params[0]._log.error(error)
+            # force exiting
+            self.handler_params[0].force_leave()
+            return
+        self.server_bind()
+        self.server_activate()
+
+
+
 
 
 
@@ -296,6 +370,20 @@ class RestHandler(BaseHTTPRequestHandler):
 ######
 # GET/POST/OPTIONS processing
 ######
+
+
+    def setup(self):
+        """ Function only for SSL
+        """
+        use_ssl = self.server.handler_params[0].use_ssl
+        if use_ssl == True:
+            print "(!)"
+            self.connection = self.request
+            self.rfile = socket._fileobject(self.request, "rb", self.rbufsize)
+            self.wfile = socket._fileobject(self.request, "wb", self.wbufsize)
+        else:
+            BaseHTTPRequestHandler.setup(self)
+
 
     def do_GET(self):
         """ Process GET requests
