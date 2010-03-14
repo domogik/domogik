@@ -69,7 +69,7 @@ def index(request):
 
     device_list = []
     for device in __db.list_devices():
-      device_list.append({'room': device.room_id, 'device': device})
+        device_list.append({'room': device.room_id, 'device': device})
 
     return __go_to_page(request, 'index.html',
         page_title,
