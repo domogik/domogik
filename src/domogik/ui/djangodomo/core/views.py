@@ -34,16 +34,8 @@ Implements
 @organization: Domogik
 """
 
-import datetime
-import math
-import os
-import simplejson
-from subprocess import *
-
-from django.core import serializers
-from django.db.models import Q
 from django.http import QueryDict
-from django.http import Http404, HttpResponse
+from django.http import Http404
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.utils.translation import ugettext_lazy as _
@@ -53,10 +45,9 @@ from djangodomo.core.models import Areas, Rooms, Devices, DeviceUsages, DeviceTe
                                    DeviceActuators, UIConfigs, Modules, Accounts
 
 from djangodomo.core.sample_data_helper import SampleDataHelper
-from djangodomo.core.XPLHelper import XPLHelper
 
-from django.views.decorators.cache import never_cache
 from django_pipes.exceptions import ResourceNotAvailableException
+
 
 __ADMIN_MANAGEMENT_DOMOGIK = 'admin/management/domogik.html'
 __db = database.DbHelper()
@@ -217,7 +208,7 @@ def load_sample_data(request):
     if sys_config.simulation_mode != True:
         error_msg = _("The application is not running in simulation mode : can't load sample data")
         return __go_to_page(request, __ADMIN_MANAGEMENT_DOMOGIK,
-                           page_title, action=action, error_msg=error_msg)
+                            page_title, action=action, error_msg=error_msg)
 
     sample_data_helper = SampleDataHelper(__db)
     sample_data_helper.create()
