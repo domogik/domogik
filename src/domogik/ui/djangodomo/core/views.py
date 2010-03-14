@@ -35,7 +35,6 @@ Implements
 """
 
 from django.http import QueryDict
-from django.http import Http404
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.utils.translation import ugettext_lazy as _
