@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-                                                                           
+# -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -59,23 +59,26 @@ setup(
     install_requires=['setuptools','django >=1.1','sqlalchemy >= 0.5.4', 'simplejson >= 1.9.2'],
     zip_safe = False,
     license = 'GPL v3',
-    #namespace_packages = ['domogik', 'mpris', 'tools'],
-#    include_package_data = True,
+    # namespace_packages = ['domogik', 'mpris', 'tools'],
+    # include_package_data = True,
     packages = find_packages('src', exclude=["mpris"]),
     package_dir = {'': 'src'},
     test_suite = 'domogik.tests',
-    #Include all files of the ui/djangodomo directory
-    #in data files.
-    package_data = {'domogik.ui.djangodomo': rec_glob_get_files('src/domogik/ui/djangodomo/'),
+    # Include all files of the ui/djangodomo directory
+    # in data files.
+    package_data = {
+        'domogik.ui.djangodomo': rec_glob_get_files('src/domogik/ui/djangodomo/'),
         'domogik.ui.djangodomo': ['locale/*.po', 'locale/*.mo'],
-                'domogik.ui.djangodomo.core': rec_glob_get_files('src/domogik/ui/djangodomo/core/templates/'),
-        },
-    data_files = [('share/domogik/listeners/', rec_glob_get_files('src/share/domogik/listeners/')),
+        'domogik.ui.djangodomo.core': rec_glob_get_files('src/domogik/ui/djangodomo/core/templates/'),
+    },
+    data_files = [
+        ('share/domogik/listeners/', rec_glob_get_files('src/share/domogik/listeners/')),
         ('share/domogik/rest/', rec_glob_get_files('src/share/domogik/rest/')),
         ('share/doc/schemas', rec_glob_get_files('src/domogik/xpl/schema/')),
         ('bin/', ['src/domogik/xpl/tools/xPL_Hub']),
         ('/etc/init.d/', ['src/domogik/init/domogik']),
-        ('/etc/default/', ['src/domogik/default/domogik'])],
+        ('/etc/default/', ['src/domogik/default/domogik'])
+    ],
 
     entry_points = {
         'console_scripts': [
@@ -87,4 +90,3 @@ setup(
         ],
     },
 )
-
