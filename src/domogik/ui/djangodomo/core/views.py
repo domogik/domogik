@@ -330,7 +330,7 @@ def admin_management_accounts(request):
         status=status,
         msg=msg,
         accounts_list=result_all_accounts.account,
-        peoples_list=result_all_people.person
+        people_list=result_all_people.person
     )
 
 def admin_organization_devices(request):
