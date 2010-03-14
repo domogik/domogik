@@ -49,7 +49,8 @@ from django.template import RequestContext
 from django.utils.translation import ugettext_lazy as _
 
 from domogik.common import database
-from djangodomo.core.models import *
+from djangodomo.core.models import Areas, Rooms, Devices, DeviceUsages, DeviceTechnologies, DeviceTypes, \
+                                   DeviceActuators, UIConfigs, Modules, Accounts
 
 from djangodomo.core.sample_data_helper import SampleDataHelper
 from djangodomo.core.XPLHelper import XPLHelper
