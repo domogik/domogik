@@ -85,8 +85,6 @@ def login(request):
     @return an HttpResponse object
     """
     page_title = _("Login page")
-    status = ''
-    msg = ''
     if request.method == 'POST':
         # An action was submitted => login action
         user_login = QueryDict.get(request.POST, "login", False)
