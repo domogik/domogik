@@ -89,10 +89,10 @@ def login(request):
     msg = ''
     if request.method == 'POST':
         # An action was submitted => login action
-        login = QueryDict.get(request.POST, "login", False)
-        password = QueryDict.get(request.POST, "password", False)
+        user_login = QueryDict.get(request.POST, "login", False)
+        user_password = QueryDict.get(request.POST, "password", False)
         try:
-            result_auth = Accounts.auth(login, password)
+            result_auth = Accounts.auth(user_login, user_password)
         except ResourceNotAvailableException:
             return render_to_response('error/ResourceNotAvailableException.html')
 
