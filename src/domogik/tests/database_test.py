@@ -825,15 +825,9 @@ class DeviceTechnologyConfigTestCase(GenericTestCase):
         dtc3_1 = self.db.set_device_technology_config(dt3.id, 'key3_1', 'val3_1')
         dtc3_2 = self.db.set_device_technology_config(dt3.id, 'key3_2', 'val3_2')
         dtc3_3 = self.db.set_device_technology_config(dt3.id, 'key3_3', 'val3_3')
-        dtc3_2_id = dtc3_2.id
-        dtc_del = self.db.del_device_technology_config(dtc3_2.id)
+        dtc_del_list = self.db.del_device_technology_config(dt3.id)
         assert self.db.get_device_technology_config(dt3.id, 'key3_2') == None
-        assert dtc_del.id == dtc3_2_id
-        try:
-            self.db.del_device_technology_config(12345678910)
-            TestCase.fail(self, "Device technology config does not exist, an exception should have been raised")
-        except DbHelperException:
-            pass
+        assert len(dtc_del_list) == 3
 
 class DeviceTestCase(GenericTestCase):
     """

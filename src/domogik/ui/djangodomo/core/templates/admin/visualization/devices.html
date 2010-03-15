@@ -22,6 +22,8 @@
 
 {% load i18n %}
 {% block css %}
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-action-binary.css" rel="stylesheet" type="text/css" />
+    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-action-range.css" rel="stylesheet" type="text/css" />
     <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/page-admin-visualization.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block js_include %}
@@ -73,7 +75,7 @@
                     <ul class="actions">
                     </ul>
                     <div class="content">
-                        <h3>'{{ room.name }}' minimal view</h3>
+                        <h3>'{{ device.name }}' minimal view</h3>
                         <div class='block'>
                             <div class='header icon64-usage-{{ device.usage_id }}'>
                                 <div class="ident">
@@ -92,13 +94,16 @@
                             </div>
                         </div>
 
-                        <h3>'{{ room.name }}' Actuators</h3>                    
+                        <h3>'{{ device.name }}' Actuators</h3>                    
                         <div>
                             <ul>
+                                {% for actuator in device.actuator %}
+                                    <li><div class='widgetmini_{{ actuator.value }}'>{{ actuator.name }}</div></li>
+                                {% endfor %}
                             </ul>
                         </div>
 
-                        <h3>'{{ room.name }}' Sensors</h3>                    
+                        <h3>'{{ device.name }}' Sensors</h3>                    
                         <div>
                             <ul>
                             </ul>

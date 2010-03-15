@@ -79,7 +79,7 @@ body {
 
 #content-bgnd {
 	border: #979387 1px solid;
-	margin: 1em 5em 0 5em;
+	margin: 1em 5% 0 5%;
 	background-image: -webkit-gradient(linear, 0% 0%, 0% 30%, from(#908D6F), to(#D2CDBC));
 	background-image: -moz-linear-gradient(0% 5% 270deg,#908D6F, #D2CDBC);
 	-moz-border-radius: 0.8em ;

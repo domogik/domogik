@@ -47,6 +47,10 @@ IS_DOMOGIK_MODULE = True
 DOMOGIK_MODULE_DESCRIPTION = "Manage Plcbus devices"
 DOMOGIK_MODULE_CONFIGURATION=[
       {"id" : 0,
+       "key" : "startup-module",
+       "description" : "Automatically start module at Domogik startup",
+       "default" : "True"},
+      {"id" : 1,
        "key" : "device",
        "description" : "Plcbus device (ex : TODO )",
        "default" : "??? TODO ???"}]

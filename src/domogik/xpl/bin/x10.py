@@ -52,6 +52,14 @@ IS_DOMOGIK_MODULE = True
 DOMOGIK_MODULE_DESCRIPTION = "Manage x10 devices"
 DOMOGIK_MODULE_CONFIGURATION=[
       {"id" : 0,
+       "key" : "startup-module",
+       "description" : "Automatically start module at Domogik startup",
+       "default" : "True"},
+      {"id" : 1,
+       "key" : "startup-module",
+       "description" : "Automatically start module at Domogik startup",
+       "default" : "True"},
+      {"id" : 2,
        "key" : "heyu-cfg-path",
        "description" : "Heyu configuration path",
        "default" : "TODO"}]

@@ -1026,26 +1026,26 @@ class DbHelper():
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return dtc
 
-    def del_device_technology_config(self, dtc_id):
+    def del_device_technology_config(self, dt_id):
         """
-        Delete a device technology config record
-        @param dtc_id : config item id
-        @return the deleted DeviceTechnologyConfig object
+        Delete all device technology config records
+        @param dt_id : the technology id
+        @return the deleted DeviceTechnologyConfig objects (list)
         """
         self.__session.expire_all()
-        dtc = self.__session.query(DeviceTechnologyConfig)\
-                            .filter_by(id=dtc_id).first()
-        if dtc:
+        dtc_list = self.__session.query(DeviceTechnologyConfig)\
+                                 .filter_by(technology_id=dt_id).all()
+        dtc_deleted_list = []
+        for dtc in dtc_list:
             dtc_d = dtc
+            dtc_deleted_list.append(dtc_d)
             self.__session.delete(dtc)
             try:
                 self.__session.commit()
             except Exception, sql_exception:
                 self.__session.rollback()
                 raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-            return dtc_d
-        else:
-            raise DbHelperException("Couldn't delete device technology config with id %s : it doesn't exist" % dtc_id)
+        return dtc_deleted_list
 
 ###
 # Devices

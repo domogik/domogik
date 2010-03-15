@@ -41,34 +41,34 @@ class Areas(pipes.DmgPipe):
     uri = "http://127.0.0.1:8080/base/area"
 
     @staticmethod
-    def getAll():
+    def get_all():
         resp = Areas.objects.get({'parameters':"list/"})
         if resp :
             return resp
 
     @staticmethod
-    def getAllWithRooms():
+    def get_all_with_rooms():
         resp = Areas.objects.get({'parameters':"list-with-rooms/"})
         if resp :
             return resp
-        
+
     @staticmethod
-    def getById(id):
+    def get_by_id(id):
         resp = Areas.objects.get({'parameters':"list/by-id/"+id})
         if resp :
             return resp
 
     def merge_uiconfig(self):
         for area in self.area:
-            uiconfigs = UIConfigs.getByReference('area', area.id)
+            uiconfigs = UIConfigs.get_by_reference('area', area.id)
             area.config = {}
             for uiconfig in uiconfigs.ui_config:
                 area.config[uiconfig.key] = uiconfig.value
-            
+
             # If has rooms
             if hasattr(area, 'room') and (area.room != 'None'):
                 for room in area.room:
-                    uiconfigs = UIConfigs.getByReference('room', room.id)
+                    uiconfigs = UIConfigs.get_by_reference('room', room.id)
                     room.config = {}
                     for uiconfig in uiconfigs.ui_config:
                         room.config[uiconfig.key] = uiconfig.value
@@ -77,73 +77,73 @@ class Rooms(pipes.DmgPipe):
     uri = "http://127.0.0.1:8080/base/room"
 
     @staticmethod
-    def getAll():
+    def get_all():
         resp = Rooms.objects.get({'parameters':"list/"})
         if resp :
             return resp
-    
+
     @staticmethod
-    def getById(id):
+    def get_by_id(id):
         resp = Rooms.objects.get({'parameters':"list/by-id/"+id})
         if resp :
             return resp
-        
+
     @staticmethod
-    def getByArea(id):
+    def get_by_area(id):
         resp = Rooms.objects.get({'parameters':"list/by-area/"+id})
         if resp :
             return resp
-    
+
     @staticmethod
-    def getWithoutArea():
+    def get_without_area():
         resp = Rooms.objects.get({'parameters':"list/by-area//"})
         if resp :
             return resp
 
     @staticmethod
-    def getAllWithDevices():
+    def get_all_with_devices():
         resp = Rooms.objects.get({'parameters':"list-with-devices/"})
         if resp :
             return resp
-        
+
     def merge_uiconfig(self):
         for room in self.room:
-            uiconfigs = UIConfigs.getByReference('room', room.id)
+            uiconfigs = UIConfigs.get_by_reference('room', room.id)
             room.config = {}
             for uiconfig in uiconfigs.ui_config:
                 room.config[uiconfig.key] = uiconfig.value
 
             # If is associated with area
             if hasattr(room, 'area') and (room.area != 'None') :
-                uiconfigs = UIConfigs.getByReference('area', room.area.id)
+                uiconfigs = UIConfigs.get_by_reference('area', room.area.id)
                 room.area.config = {}
                 for uiconfig in uiconfigs.ui_config:
                     room.area.config[uiconfig.key] = uiconfig.value
-    
+
     def merge_actuators(self):
         for room in self.room:
             if hasattr(room, 'device') and (room.device != 'None') :
                 for device in room.device:
-                    actuators = DeviceActuators.getByType(device.type_id)
+                    actuators = DeviceActuators.get_by_type(device.type_id)
                     device.actuator = actuators.actuator_feature
 
 class Devices(pipes.DmgPipe):
     uri = "http://127.0.0.1:8080/base/device"
 
     @staticmethod
-    def getAll():
+    def get_all():
         resp = Devices.objects.get({'parameters':"list/"})
         if resp :
             return resp
-    
+
     @staticmethod
-    def getWithoutRoom():
+    def get_without_room():
         resp = Devices.objects.get({'parameters':"list/by-room//"})
         if resp :
             return resp
 
     @staticmethod
-    def getByRoom(id):
+    def get_by_room(id):
         resp = Devices.objects.get({'parameters':"list/by-room/"+id})
         if resp :
             return resp
@@ -152,21 +152,21 @@ class Devices(pipes.DmgPipe):
         for device in self.device:
             # If is associated with room
             if hasattr(device, 'room') and (device.room != 'None') :
-                uiconfigs = UIConfigs.getByReference('room', device.room.id)
+                uiconfigs = UIConfigs.get_by_reference('room', device.room.id)
                 device.room.config = {}
                 for uiconfig in uiconfigs.ui_config:
                     device.room.config[uiconfig.key] = uiconfig.value
 
     def merge_actuators(self):
         for device in self.device:
-            actuators = DeviceActuators.getByType(device.type_id)
+            actuators = DeviceActuators.get_by_type(device.type_id)
             device.actuator = actuators.actuator_feature
-                    
+
 class DeviceUsages(pipes.DmgPipe):
     uri = "http://127.0.0.1:8080/base/device_usage"
 
     @staticmethod
-    def getAll():
+    def get_all():
         resp = DeviceUsages.objects.get({'parameters':"list/"})
         if resp :
             return resp
@@ -175,7 +175,7 @@ class DeviceTechnologies(pipes.DmgPipe):
     uri = "http://127.0.0.1:8080/base/device_technology"
 
     @staticmethod
-    def getAll():
+    def get_all():
         resp = DeviceTechnologies.objects.get({'parameters':"list/"})
         if resp :
             return resp
@@ -184,7 +184,7 @@ class DeviceTypes(pipes.DmgPipe):
     uri = "http://127.0.0.1:8080/base/device_type"
 
     @staticmethod
-    def getAll():
+    def get_all():
         resp = DeviceTypes.objects.get({'parameters':"list/"})
         if resp :
             return resp
@@ -193,73 +193,73 @@ class DeviceActuators(pipes.DmgPipe):
     uri = "http://127.0.0.1:8080/base/actuator_feature"
 
     @staticmethod
-    def getAll():
+    def get_all():
         resp = DeviceActuators.objects.get({'parameters':"list/"})
         if resp :
             return resp
 
     @staticmethod
-    def getByType(type_id):
+    def get_by_type(type_id):
         resp = DeviceActuators.objects.get({'parameters':"list/by-type_id/" + str(type_id)})
         if resp :
             return resp
-        
+
 class UIConfigs(pipes.DmgPipe):
     uri = "http://127.0.0.1:8080/base/ui_config"
-    
+
     @staticmethod
-    def getByKey(name, key):
+    def get_by_key(name, key):
         resp = UIConfigs.objects.get({'parameters':"list/by-key/" + name + "/" + key})
         if resp :
             return resp
-    
+
     @staticmethod
-    def getByReference(name, reference):
+    def get_by_reference(name, reference):
         resp = UIConfigs.objects.get({'parameters':"list/by-reference/" + name + "/" + str(reference)})
         if resp :
             return resp
 
-    @staticmethod    
-    def getGeneral(reference):
+    @staticmethod
+    def get_general(reference):
         resp = {}
         uiconfigs = UIConfigs.objects.get({'parameters':"list/by-reference/general/" + str(reference)})
         if uiconfigs :
             for uiconfig in uiconfigs.ui_config:
                 resp[uiconfig.key] = uiconfig.value
             return resp
-        
+
 class Modules(pipes.DmgPipe):
     uri = "http://127.0.0.1:8080/module"
 
     @staticmethod
-    def getAll():
+    def get_all():
         resp = Modules.objects.get({'parameters':"list/"})
         if resp :
             return resp
-    
+
     @staticmethod
-    def getByName(name):
+    def get_by_name(name):
         resp = Modules.objects.get({'parameters':"list/by-name/" + name})
         if resp :
             return resp
-        
+
 class Accounts(pipes.DmgPipe):
     uri = "http://127.0.0.1:8080/account"
 
     @staticmethod
-    def Auth(login, password):
+    def auth(login, password):
         resp = Accounts.objects.get({'parameters':"auth/" + login + "/" + password})
         if resp :
             return resp
-        
+
     @staticmethod
-    def getAllUsers():
+    def get_all_users():
         resp = Accounts.objects.get({'parameters':"user/list/"})
         if resp :
             return resp
 
     @staticmethod
-    def getAllPeoples():
+    def get_all_people():
         resp = Accounts.objects.get({'parameters':"person/list/"})
         if resp :
-            return resp  
+            return resp

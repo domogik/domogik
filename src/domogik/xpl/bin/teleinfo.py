@@ -44,10 +44,14 @@ IS_DOMOGIK_MODULE = True
 DOMOGIK_MODULE_DESCRIPTION = "Get power consumption with teleinfo"
 DOMOGIK_MODULE_CONFIGURATION=[
       {"id" : 0,
+       "key" : "startup-module",
+       "description" : "Automatically start module at Domogik startup",
+       "default" : "True"},
+      {"id" : 1,
        "key" : "device",
        "description" : "Teleinfo device (ex : /dev/ttyUSB0 for an usb model)",
        "default" : "/dev/ttyUSB0"},
-      {"id" : 1,
+      {"id" : 2,
        "key" : "interval",
        "description" : "Interval between each request (seconds)",
        "default" : 60}]
