@@ -167,8 +167,10 @@ class DBConnector(xPLModule):
                 'teleinfo' : {'device' : '/dev/ttyUSB0',
                     'interval' : '30'},
                     'dawndusk' : {'startup-module':'True'},
+                    'plcbus' : {'device':'/dev/ttyUSB0'},
                 }
         try:
+            return vals[techno][key]
             _id = self._db.get_device_technology_by_name(techno).id
             if key:
                 return self._db.get_device_technology_config(_id, key).value

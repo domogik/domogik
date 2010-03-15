@@ -140,7 +140,7 @@ class BaseModule():
             @param thread : the thread to add
             '''
             self._lock_add_thread.acquire()
-            #self._log.debug('New thread registered : %s' % thread)
+           # self._log.debug('New thread registered : %s' % thread)
             self._threads.append(thread)
             self._lock_add_thread.release()
 

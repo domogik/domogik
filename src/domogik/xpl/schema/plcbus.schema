@@ -1,0 +1,73 @@
+""" This file is part of B{Domogik} project (U{http://www.domogik.org}).
+
+License
+=======
+
+B{Domogik} is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+B{Domogik} is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Domogik. If not, see U{http://www.gnu.org/licenses}.
+
+@author: Maxence Dunnewind <maxence@dunnewind.net>
+@copyright: (C) 2007-2009 Domogik project
+@license: GPL(v3)
+@organization: Domogik
+"""
+
+
+PLCBUS.BASIC Message Specification
+
+    * Class = PLCBUS
+    * Type = BASIC
+
+=== XPL-CMND Structure ===
+Send a command to plcbus "plugin". Usercode used to always be the same in one house (it is only used to install plcbus in many house near from each others). ACK may be ignored if not usuable with the defined COMMAND.
+
+
+PLCBUS.BASIC
+{
+USERCODE=<plcbus network usercode>
+DEVICE=<sensor name>
+COMMAND=<value to which device should be set>
+[ACK=<0|1>]
+[DATA1=<additional data>]
+[DATA2=<additional data>]
+}
+
+
+
+=== XPL-TRIG Structure ===
+Use to send acknowledge when a ack command is received.
+
+PLCBUS.BASIC
+{
+USERCODE=<plcbus network usercode>
+DEVICE=<sensor name>
+COMMAND=<value to which device should be set>
+ACK=1
+[DATA1=<additional data>]
+[DATA2=<additional data>]
+}
+
+
+I think there is no need to define "flags" value in the message (the ack/id/itself/risc bits), since they should only be used by the "low level" manager.
+
+=== XPL-STAT Structure ===
+Use to send message when command is received *from* the plcbus network (for ex, is sent by a remote).
+
+PLCBUS.BASIC
+{
+USERCODE=<plcbus network usercode>
+DEVICE=<sensor name>
+COMMAND=<value to which device should be set>
+[DATA1=<additional data>]
+[DATA2=<additional data>]
+}

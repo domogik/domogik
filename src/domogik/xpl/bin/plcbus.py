@@ -67,13 +67,13 @@ class PlcBusMain(xPLModule):
         self._config = Query(self._myxpl)
         # Create listeners
         Listener(self._plcbus_cmnd_cb, self._myxpl, {
-            'schema': 'control.basic',
+            'schema': 'plcbus.basic',
             'xpltype': 'xpl-cmnd',
         })
         res = xPLResult()
         self._config.query('plcbus', 'device', res)
         device = res.get_value()['device']
-        self.api = PLCBUSAPI(device) #TODO :need to be updated with dynamic config
+        self.api = PLCBUSAPI(device, self._command_cb, self._message_cb) 
         # Create log instance
         self._log = self.get_my_logger()
 
@@ -83,25 +83,40 @@ class PlcBusMain(xPLModule):
         '''
         cmd = None
         dev = None
-        user = None
+        user = '00'
         level = 0
         rate = 0
-        if message.has_key('command'):
+        if 'command' in message.data:
             cmd = message.data['command']
-        if message.has_key('device'):
+        if 'device' in message.data:
             dev = message.data['device']
-        if message.has_key('usercode'):
+        if 'usercode' in message.data:
             user = message.data['usercode']
-        if message.has_key('level'):
-            level = message.data['level']
-        if message.has_key('rate'):
-            rate = message.data['rate']
+        if 'data1' in message.data:
+            level = message.data['data1']
+        if 'data2' in message.data:
+            rate = message.data['data2']
         self._log.debug("%s received : device = %s, user code = %s, level = "\
                 "%s, rate = %s" % (cmd.upper(), dev, user, level, rate))
         if cmd == 'GET_ALL_ON_ID_PULSE':
-            self.api.get_all_on_id(dev, user)
+            self.api.get_all_on_id(user, dev)
         else:
             self.api.send(cmd.upper(), dev, user, level, rate)
+
+    def _command_cb(self, f):
+        ''' Called by the plcbus library when a command has been sent.
+        If the commands need an ack, this callback will be called only after the ACK has been received
+        @param : plcbus frame as an array
+        '''
+        mess = XplMessage()
+        mess.set_type('xpl-trig')
+        mess.set_schema('plcbus.basic')
+        mess.add_data({"usercode" : f["d_user_code"], "device": f["d_home_unit"],
+            "command": f["d_command"], "data1": f["d_data1"], "data2": f["d_data2"]})
+        self._myxpl.send(mess) 
+
+    def _message_cb(self, message):
+        print "Message : %s " % message
 
 if __name__ == "__main__":
     PlcBusMain()

@@ -78,9 +78,12 @@ class serialHandler():
         self._writer.start()
         self._reader.start()
 
+    def get_from_answer_queue(self):
+        '''Calls self._reader.get_from_answer_queue
+        '''
+        return self._reader.get_from_answer_queue()
+
     def add_to_send_queue(self, frame):
-        """ Add a frame to the send queue
-        """
         self._writer.add_to_send_queue(frame)
 
     def stop(self):
@@ -184,6 +187,12 @@ class serialHandler():
                 return (int(m1[14:16], 16) & 0x20) #test only one bit
             return False
 
+        def _flush_queue(self):
+            """Send all frame in the queue
+            """
+            while not self._send_queue.empty():
+                self._send(self._send_queue.get_nowait())
+
         
         def _basic_write(self, frame):
             """Write a frame on serial port
@@ -192,12 +201,6 @@ class serialHandler():
             """
             self.__myser.write(frame.decode("HEX"))
 
-        def _flush_queue(self):
-            """Send all frame in the queue
-            """
-            while not self._send_queue.empty():
-                self._send(self._send_queue.get_nowait())
-
         def add_to_send_queue(self, trame):
             self._send_queue.put(trame)
             self._has_message_to_send.set()
@@ -205,14 +208,48 @@ class serialHandler():
         def explicit_message(self, message):
             """ Parse a frame 
             """
+            cmdplcbus = {
+            '00': 'ALL_UNITS_OFF',
+            '01': 'ALL_LIGHTS_ON',
+            '22': 'ON', #ON and ask to send ACK (instead of '02')
+            '23': 'OFF', #OFF and send ACK
+            '24': 'DIM',
+            '25': 'BRIGHT',
+            '06': 'ALL_LIGHTS_OFF',
+            '07': 'ALL_USER_LTS_ON',
+            '08': 'ALL_USER_UNIT_OFF',
+            '09': 'ALL_USER_LIGHT_OFF',
+            '2a': 'BLINK',
+            '2b': 'FADE_STOP',
+            '2c': 'PRESET_DIM',
+            '0d': 'STATUS_ON',
+            '0e': 'STATUS_OFF',
+            '0f': 'STATUS_REQUEST',
+            '30': 'REC_MASTER_ADD_SETUP',
+            '31': 'TRA_MASTER_ADD_SETUP',
+            '12': 'SCENE_ADR_SETUP',
+            '13': 'SCENE_ADR_ERASE',
+            '34': 'ALL_SCENES_ADD_ERASE',
+            '15': 'FOR FUTURE',
+            '16': 'FOR FUTURE',
+            '17': 'FOR FUTURE',
+            '18': 'GET_SIGNAL_STRENGTH',
+            '19': 'GET_NOISE_STRENGTH',
+            '1a': 'REPORT_SIGNAL_STREN',
+            '1b': 'REPORT_NOISE_STREN',
+            '1c': 'GET_ALL_ID_PULSE',
+            '1d': 'GET_ALL_ON_ID_PULSE',
+            '1e': 'REPORT_ALL_ID_PULSE',
+            '1f': 'REPORT_ONLY_ON_PULSE'}
+            home = "ABCDEFGHIJKLMNOP"
             r = {}
             r["start_bit"] = message[0:2]
             r["data_length"] = int(message[2:4])
             int_length = int(message[2:4])*2
             r["data"] = message[4:5+int_length]
             r["d_user_code"] = r["data"][0:2]
-            r["d_home_unit"] = r["data"][2:4]
-            r["d_command"] = r["data"][4:6]
+            r["d_home_unit"] = "%s%s" % (home[int(r["data"][2:3], 16)],int(r["data"][3:4], 16)+1)
+            r["d_command"] = cmdplcbus[r["data"][4:6]]
             r["d_data1"] = r["data"][6:8]
             r["d_data2"] = r["data"][8:10]
             if r["data_length"] == 6:
@@ -226,6 +263,7 @@ class serialHandler():
             while not self._stop.isSet():
                 if not self._send_queue.empty():
                     self._flush_queue()
+
 
 
 
@@ -258,7 +296,7 @@ class serialHandler():
             # maybe pass this list to the _init_ of this handler to make it
             # compatible with other protocols
             if((int(message[14:15], 16) >> 2 & 1) and message[8:10].upper() in
-                    self._need_answer):
+                    ["1C","1D"]):
                 return True
             return False
 
@@ -281,7 +319,6 @@ class serialHandler():
             return r
 
         def receive(self):
-            #not tested
             message=self.__myser.read(9)
             #put frame_PLCbus in receivedqueue
             if(message):
