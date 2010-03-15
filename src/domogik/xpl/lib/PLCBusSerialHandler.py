@@ -190,8 +190,9 @@ class serialHandler():
         def _flush_queue(self):
             """Send all frame in the queue
             """
+            self._send(self._send_queue.get())
             while not self._send_queue.empty():
-                self._send(self._send_queue.get_nowait())
+                self._send(self._send_queue.get())
 
         
         def _basic_write(self, frame):
@@ -261,8 +262,9 @@ class serialHandler():
             """ Start writer thread 
             """
             while not self._stop.isSet():
-                if not self._send_queue.empty():
-                    self._flush_queue()
+                self._send(self._send_queue.get())
+            while not self._send_queue.empty():
+                self._send(self._send_queue.get())
 
 
 
