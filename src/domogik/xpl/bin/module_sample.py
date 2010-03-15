@@ -40,6 +40,18 @@ Implements
 from domogik.xpl.common.module import xPLModule
 
 
+###
+# Uncomment the next lines to let your module be autodetected by the manager
+#
+#IS_DOMOGIK_MODULE = True
+#DOMOGIK_MODULE_DESCRIPTION = "My short module description"
+#DOMOGIK_MODULE_CONFIGURATION=[
+#      {"id" : 0,
+#       "key" : "startup-module",
+#       "description" : "Automatically start module at Domogik startup",
+#       "default" : "False"},
+#       ]
+
 class ModuleSample(xPLModule):
     '''
     Send date and time on the xPL network every minute

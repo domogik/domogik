@@ -47,7 +47,7 @@ DOMOGIK_MODULE_CONFIGURATION=[
       {"id" : 0,
        "key" : "startup-module",
        "description" : "Automatically start module at Domogik startup",
-       "default" : "True"},
+       "default" : "False"},
       {"id" : 1,
        "key" : "device",
        "description" : "Mir:ror device (ex : /dev/hidraw0)",
