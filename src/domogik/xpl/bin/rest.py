@@ -57,6 +57,7 @@ import traceback
 import datetime
 import socket
 from OpenSSL import SSL
+import SocketServer
 
 
 
@@ -320,7 +321,7 @@ class HTTPServerWithParam(HTTPServer):
 
 ################################################################################
 # HTTPS
-class HTTPSServerWithParam(HTTPServer):
+class HTTPSServerWithParam(SocketServer.ThreadingMixIn, HTTPServer):
     """ Extends HTTPServer to allow send params to the Handler.
     """
 
@@ -581,11 +582,14 @@ class ProcessRequest():
     def _parse_options(self):
         """ Process parameters : ...?param1=val1&param2=val2&....
         """
-        self._log.debug("Parse request options")
+        self._log.debug("Parse request options : %s" % self.parameters)
+
+        if self.parameters[-1:] == "/":
+            self.parameters = self.parameters[0:len(self.parameters)-1]
 
         # for each debug option
         for opt in self.parameters.split("&"):
-            print "OPT :" + opt
+            self._log.debug("OPT : %s" % opt)
             tab_opt = opt.split("=")
             opt_key = tab_opt[0]
             if len(tab_opt) > 1:
