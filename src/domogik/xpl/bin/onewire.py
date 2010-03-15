@@ -45,6 +45,10 @@ IS_DOMOGIK_MODULE = True
 DOMOGIK_MODULE_DESCRIPTION = "Manage 1 wire devices"
 DOMOGIK_MODULE_CONFIGURATION=[
       {"id" : 0,
+       "key" : "startup-module",
+       "description" : "Automatically start module at Domogik startup",
+       "default" : "True"},
+      {"id" : 1,
        "key" : "temperature_refresh_delay",
        "description" : "Temperature refresh delay (seconds)",
        "default" : 60}]

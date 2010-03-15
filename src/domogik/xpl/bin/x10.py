@@ -56,6 +56,10 @@ DOMOGIK_MODULE_CONFIGURATION=[
        "description" : "Automatically start module at Domogik startup",
        "default" : "True"},
       {"id" : 1,
+       "key" : "startup-module",
+       "description" : "Automatically start module at Domogik startup",
+       "default" : "True"},
+      {"id" : 2,
        "key" : "heyu-cfg-path",
        "description" : "Heyu configuration path",
        "default" : "TODO"}]

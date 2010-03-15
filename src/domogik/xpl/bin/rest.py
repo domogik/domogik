@@ -502,6 +502,7 @@ class ProcessRequest():
         self._log = self.handler_params[0]._log
         self._log_dm = self.handler_params[0]._log_dm
         self._xml_directory = self.handler_params[0]._xml_directory
+        self.use_ssl = self.handler_params[0].use_ssl
 
         self._log.debug("Process request : init")
 
@@ -625,6 +626,7 @@ class ProcessRequest():
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.add_data({"Version" : REST_API_VERSION})
         json_data.add_data({"Description" : REST_DESCRIPTION})
+        json_data.add_data({"SSL" : self.use_ssl})
         self.send_http_response_ok(json_data.get())
 
 

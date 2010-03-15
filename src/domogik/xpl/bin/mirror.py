@@ -45,14 +45,18 @@ IS_DOMOGIK_MODULE = True
 DOMOGIK_MODULE_DESCRIPTION = "Use Mir:ror device"
 DOMOGIK_MODULE_CONFIGURATION=[
       {"id" : 0,
+       "key" : "startup-module",
+       "description" : "Automatically start module at Domogik startup",
+       "default" : "True"},
+      {"id" : 1,
        "key" : "device",
        "description" : "Mir:ror device (ex : /dev/hidraw0)",
        "default" : "/dev/hidraw0"},
-      {"id" : 1,
+      {"id" : 2,
        "key" : "nbmaxtry",
        "description" : "Max number of tries to open Mir:ror device",
        "default" : 5,
-      {"id" : 2,
+      {"id" : 3,
        "key" : "interval",
        "description" : "Delay between each try to open Mir:ror device",
        "default" : 10}]

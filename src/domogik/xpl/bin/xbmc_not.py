@@ -45,14 +45,18 @@ IS_DOMOGIK_MODULE = True
 DOMOGIK_MODULE_DESCRIPTION = "Send notifications to XBMC"
 DOMOGIK_MODULE_CONFIGURATION=[
       {"id" : 0,
+       "key" : "startup-module",
+       "description" : "Automatically start module at Domogik startup",
+       "default" : "True"},
+      {"id" : 1,
        "key" : "address",
        "description" : "XBMC Media center HTTP API address(ip:port)",)
        "default" : ""},
-      {"id" : 1,
+      {"id" : 2,
        "key" : "delay",
        "description" : "Default delay for displaying a notification (seconds)",
        "default" : 15},
-      {"id" : 2,
+      {"id" : 3,
        "key" : "maxdelay",
        "description" : "Max delay between sending title and message with osd.basic xpl message (seconds)",
        "default" : 10}]

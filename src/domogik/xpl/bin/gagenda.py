@@ -46,14 +46,18 @@ IS_DOMOGIK_MODULE = True
 DOMOGIK_MODULE_DESCRIPTION = "Get events from a Google agenda"
 DOMOGIK_MODULE_CONFIGURATION=[
       {"id" : 0,
+       "key" : "startup-module",
+       "description" : "Automatically start module at Domogik startup",
+       "default" : "True"},
+      {"id" : 1,
        "key" : "email",
        "description" : "Google amail account",
        "default" : ""},
-      {"id" : 1,
+      {"id" : 2,
        "key" : "password",
        "description" : "Password for email account",
        "default" : ""},
-      {"id" : 2,
+      {"id" : 3,
        "key" : "calendarname",
        "description" : "Calendar name (default : your email)",
        "default" : ""}]

@@ -45,14 +45,18 @@ IS_DOMOGIK_MODULE = True
 DOMOGIK_MODULE_DESCRIPTION = "Get caller id with a modem"
 DOMOGIK_MODULE_CONFIGURATION=[
       {"id" : 0,
+       "key" : "startup-module",
+       "description" : "Automatically start module at Domogik startup",
+       "default" : "True"},
+      {"id" : 1,
        "key" : "device", 
        "description" : "Modem device (ex : /dev/ttyUSB0 for an usb modem)", 
        "default" : "/dev/ttyUSB0"},
-      {"id" : 1,
+      {"id" : 2,
        "key" : "nbmaxtry", 
        "description" : "Max number of tries to open modem device",
        "default" : 5},
-      {"id" : 2,
+      {"id" : 3,
        "key" : "interval", 
        "description" : "Delay between each try to open modem device",
        "default" : 10}]
