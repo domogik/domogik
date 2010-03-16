@@ -195,15 +195,12 @@ class PLCBUSAPI:
                 plcbus_frame = '0205%s%s%s%s%s03' % (ucod,
                     self._convert_device_to_hex(item), self._cmdplcbus[cmd],
                     self._convert_data(data1), self._convert_data(data2))
-            print plcbus_frame
             try:
                 message = plcbus_frame.decode('HEX')
             except TypeError:
                 print "PLCBUS Frame generation error, does not result in a "\
                         "HEX string ", plcbus_frame
             else:
-            #exept
-                print "putting in send queue ", plcbus_frame
                 self._ser_handler.add_to_send_queue(plcbus_frame)
 
     def get_all_on_id(self, usercode, housecode):
@@ -230,29 +227,29 @@ class PLCBUSAPI:
         """
         self._ser_handler.stop()
 
-#test
-a = PLCBUSAPI("/dev/ttyUSB0")
-#a.get_all_on_id("00","B")
-print "--------------ON------------------"
-a.send("ON", "B2", "00") 
-time.sleep(3)
-print "--------------STATUS------------------"
-a.send("STATUS_REQUEST", "B2", "00") 
-time.sleep(3)
-print "----------------OFF----------------"
-a.send("OFF", "B2", "00") 
-time.sleep(3)
-print "---------------STATUS-----------------"
-a.send("STATUS_REQUEST", "B2", "00") 
-time.sleep(3)
-#print "---------------BRIGHT-----------------"
-#a.send("BRIGHT", "B2", "00", "100","100")
-#time.sleep(10)
-#print "---------------DIM-----------------"
-#a.send("DIM", "B2", "00", "50","0")
+##test
+#a = PLCBUSAPI("/dev/ttyUSB0")
+##a.get_all_on_id("00","B")
+#print "--------------ON------------------"
+#a.send("ON", "B2", "00") 
 #time.sleep(3)
-print "---------------STATUS-----------------"
-a.send("STATUS_REQUEST", "B2", "00") 
-time.sleep(5)
-a.stop()
-
+#print "--------------STATUS------------------"
+#a.send("STATUS_REQUEST", "B2", "00") 
+#time.sleep(3)
+#print "----------------OFF----------------"
+#a.send("OFF", "B2", "00") 
+#time.sleep(3)
+#print "---------------STATUS-----------------"
+#a.send("STATUS_REQUEST", "B2", "00") 
+#time.sleep(3)
+##print "---------------BRIGHT-----------------"
+##a.send("BRIGHT", "B2", "00", "100","100")
+##time.sleep(10)
+##print "---------------DIM-----------------"
+##a.send("DIM", "B2", "00", "50","0")
+##time.sleep(3)
+#print "---------------STATUS-----------------"
+#a.send("STATUS_REQUEST", "B2", "00") 
+#time.sleep(5)
+#a.stop()
+#

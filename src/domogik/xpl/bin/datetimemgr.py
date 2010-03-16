@@ -43,6 +43,14 @@ from domogik.xpl.common.module import xPLModule
 from domogik.xpl.common.xplmessage import XplMessage
 
 
+IS_DOMOGIK_MODULE = True
+DOMOGIK_MODULE_DESCRIPTION = "Send date and time on the xPL network every minute"
+DOMOGIK_MODULE_CONFIGURATION=[
+      {"id" : 0,
+       "key" : "startup-module",
+       "description" : "Automatically start module at Domogik startup",
+       "default" : "False"},
+      ]
 class XPLDateTime(xPLModule):
     '''
     Send date and time on the xPL network every minute
