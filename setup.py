@@ -40,15 +40,19 @@ ez_setup.use_setuptools()
 import os
 from setuptools import setup, find_packages
 
-
-def rec_glob_get_files(path):
+def list_all_files(path):
+    """
+    List all files and subdirectories contained in a path
+    @param path : the path from where to get files and subdirectories
+    """
     d=[]
     for i in os.listdir(path):
         if not os.path.isdir(path+i):
             d.append(path+i)
         else:
-            d.extend(rec_glob_get_files(path+i))
+            d.extend(list_all_files(path+i))
     return d
+
 setup(
     name = 'Domogik',
     version = '0.1.0',
@@ -67,14 +71,14 @@ setup(
     # Include all files of the ui/djangodomo directory
     # in data files.
     package_data = {
-        'domogik.ui.djangodomo': rec_glob_get_files('src/domogik/ui/djangodomo/'),
+        'domogik.ui.djangodomo': list_all_files('src/domogik/ui/djangodomo/'),
         'domogik.ui.djangodomo': ['locale/*.po', 'locale/*.mo'],
-        'domogik.ui.djangodomo.core': rec_glob_get_files('src/domogik/ui/djangodomo/core/templates/'),
+        'domogik.ui.djangodomo.core': list_all_files('src/domogik/ui/djangodomo/core/templates/'),
     },
     data_files = [
-        ('share/domogik/listeners/', rec_glob_get_files('src/share/domogik/listeners/')),
-        ('share/domogik/rest/', rec_glob_get_files('src/share/domogik/rest/')),
-        ('share/doc/schemas', rec_glob_get_files('src/domogik/xpl/schema/')),
+        ('share/domogik/listeners/', list_all_files('src/share/domogik/listeners/')),
+        ('share/domogik/rest/', list_all_files('src/share/domogik/rest/')),
+        ('share/doc/schemas', list_all_files('src/domogik/xpl/schema/')),
         ('bin/', ['src/domogik/xpl/tools/xPL_Hub']),
         ('/etc/init.d/', ['src/domogik/init/domogik']),
         ('/etc/default/', ['src/domogik/default/domogik'])
