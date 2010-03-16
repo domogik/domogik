@@ -74,8 +74,7 @@ class Logger():
 
         logger = logging.getLogger('domogik-%s' % module_name)
         hdlr = logging.FileHandler(file)
-        formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s "\
-                "%(message)s')
+        formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s')
         hdlr.setFormatter(formatter)
         logger.addHandler(hdlr)
         logger.setLevel(LEVELS[level])

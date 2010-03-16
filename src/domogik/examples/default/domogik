@@ -3,15 +3,17 @@
 #Start domogik daemon under this user
 DOMOGIK_USER=domogik
 
-# This variable can take 2 parameters :
+# This variable can take 4 parameters :
 # -d to start the database manager
 # -r to start the rest component
+# -s to start the statistic manager
+# -t to start the scenarios manager
 # Remember : Your domogik installation must have *one* and *only one*
-# instance of the database manager and the rest manager running
+# instance of each manager running.
 # Your domogik installation won't start on this computer if :
 #  - The database manager is not already running elsewhere on the network
 #  - You do not pass -d parameter to the manager
-MANAGER_PARAMS="-d -r"
+MANAGER_PARAMS="-d -r -s -t"
 
 # You can define one or many extra path(s) for Domogik startup scripts.
 # This should only be useful if you use Domogik in developement mode (with setup.py develop)
