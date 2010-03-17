@@ -1273,7 +1273,10 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
         assert len(self.db.list_persons()) == 3
         user3 = self.db.add_user_account(a_login='domo', a_password='gik',
                                          a_person_id=person3.id, a_is_admin=True)
-        user4 = self.db.add_user_account_with_person('jsteed', 'theavengers', 'John', 'STEED')
+        user4 = self.db.add_user_account_with_person(
+                            a_login='jsteed', a_password='theavengers', a_person_first_name='John',
+                            a_person_last_name='STEED', a_person_birthdate=datetime.date(1931, 4, 24),
+                            a_is_admin=True, a_skin_used='skins/hat')
         assert user4.login == 'jsteed'
         assert user4.password is None
         assert user4.person.first_name == 'John'
