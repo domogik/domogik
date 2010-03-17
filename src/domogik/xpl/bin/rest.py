@@ -1389,9 +1389,11 @@ target=*
             else:
                 # wrong number of arguments
                 return False
-            # specific process for False
-            if value == "False":
+            # specific process for False/True
+            if value == "False" or value == "false":
                 self.parameters[key] = False
+            elif value == "True" or value == "true":
+                self.parameters[key] = True
             else:
                 self.parameters[key] = value
             iii += 2
