@@ -63,7 +63,7 @@ Implements
 """
 
 from domogik.xpl.common.xplconnector import Listener
-from domogik.xpl.common.module import xPLModule
+from domogik.xpl.common.plugin import xPLPlugin
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.common.configloader import Loader
 from domogik.common import logger
@@ -306,7 +306,7 @@ class StateCond(Condition):
 # Methods to catch informations
 ####
 
-class ListenerBuilder(xPLModule):
+class ListenerBuilder(xPLPlugin):
     '''
     Class to parse an expression and create appropriated listener
     '''
@@ -316,7 +316,7 @@ class ListenerBuilder(xPLModule):
         @param listitems a dictionnary discribing items used in the condition
         @param expr : the condition
         '''
-        xPLModule.__init__(self, 'dbmgr')
+        xPLPlugin.__init__(self, 'dbmgr')
         self._log = self.get_my_logger()
         self.listitems = listitems
         loader = Loader('trigger')

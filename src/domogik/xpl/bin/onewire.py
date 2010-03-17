@@ -37,7 +37,7 @@ Implements
 """
 
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.common.module import xPLModule, xPLResult, xPLTimer
+from domogik.xpl.common.plugin import xPLPlugin, xPLResult, xPLTimer
 from domogik.xpl.lib.onewire import OneWire
 from domogik.xpl.common.queryconfig import Query
 
@@ -55,7 +55,7 @@ DOMOGIK_MODULE_CONFIGURATION=[
 
 
 
-class OneWireTemp(xPLModule):
+class OneWireTemp(xPLPlugin):
     '''
     Manage the One-Wire stuff and connect it to xPL
     '''
@@ -64,7 +64,7 @@ class OneWireTemp(xPLModule):
         '''
         Starts some timers to check temperature
         '''
-        xPLModule.__init__(self, name='onewire')
+        xPLPlugin.__init__(self, name='onewire')
         self._config = Query(self._myxpl)
         res = xPLResult()
         self._config.query('onewire', 'temperature_refresh_delay', res)

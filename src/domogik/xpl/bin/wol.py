@@ -36,7 +36,7 @@ Implements
 """
 
 from domogik.xpl.common.xplconnector import Listener
-from domogik.xpl.common.module import xPLModule
+from domogik.xpl.common.plugin import xPLPlugin
 from domogik.xpl.lib.wol import WOL
 
 IS_DOMOGIK_MODULE = True
@@ -48,14 +48,14 @@ DOMOGIK_MODULE_CONFIGURATION = [
        "default" : "False"}]
 
 
-class WOLListener(xPLModule):
+class WOLListener(xPLPlugin):
     """ Implements a listener for wol messages on xPL network
     """
 
     def __init__(self):
         """ Create lister for wake on lan
         """
-        xPLModule.__init__(self, name = 'wol')
+        xPLPlugin.__init__(self, name = 'wol')
         # Create logger
         self._log.debug("Listener for wake on lan created")
         # Create WOL object

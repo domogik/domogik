@@ -38,7 +38,7 @@ TODO when finished ;)
 """
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.common.module import xPLModule
+from domogik.xpl.common.plugin import xPLPlugin
 from domogik.common import logger
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from domogik.common.database import DbHelper
@@ -51,7 +51,7 @@ import locale
 from socket import gethostname
 from Queue import *
 from domogik.xpl.common.queryconfig import Query
-from domogik.xpl.common.module import xPLResult
+from domogik.xpl.common.plugin import xPLResult
 import re
 import traceback
 import datetime
@@ -75,7 +75,7 @@ QUEUE_LIFE_EXPECTANCY = 3
 
 
 ################################################################################
-class Rest(xPLModule):
+class Rest(xPLPlugin):
     """ REST Server 
         - create a HTTP server 
         - process REST requests
@@ -88,7 +88,7 @@ class Rest(xPLModule):
             @param server_ip :  ip of HTTP server
             @param server_port :  port of HTTP server
         """
-        xPLModule.__init__(self, name = 'rest')
+        xPLPlugin.__init__(self, name = 'rest')
 
         # logging initialization
         log = logger.Logger('REST')

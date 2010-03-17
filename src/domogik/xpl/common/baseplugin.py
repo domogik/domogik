@@ -19,7 +19,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-Module purpose
+Plugin purpose
 ==============
 
 Base class for all clients
@@ -27,7 +27,7 @@ Base class for all clients
 Implements
 ==========
 
-- BaseModule
+- BasePlugin
 
 @author: Maxence Dunnewind <maxence@dunnewind.net>
 @copyright: (C) 2007-2009 Domogik project
@@ -41,9 +41,9 @@ from domogik.common import logger
 from optparse import OptionParser
 from domogik.common.daemonize import createDaemon
 
-class BaseModule():
+class BasePlugin():
     """ Basic module class, manage common part of all modules.
-    For all xPL modules, the xPLModule class must be use as a basis, not this one.
+    For all xPL modules, the xPLPlugin class must be use as a basis, not this one.
     This class is a Singleton
     """
 
@@ -57,8 +57,8 @@ class BaseModule():
             @param daemonize : If set to False, force the instance *not* to daemonize, even if '-f' is not passed 
             on the command line. If set to True (default), will check if -f was added.
         """
-        if BaseModule.__instance is None:
-            BaseModule.__instance = BaseModule.__Singl_BaseModule(name, stop_cb, parser, daemonize)
+        if BasePlugin.__instance is None:
+            BasePlugin.__instance = BasePlugin.__Singl_BasePlugin(name, stop_cb, parser, daemonize)
 
     def __getattr__(self, attr):
         """ Delegate access to implementation """
@@ -71,7 +71,7 @@ class BaseModule():
         """ Delegate access to implementation """
         return setattr(self.__instance, attr, value)
 
-    class __Singl_BaseModule:
+    class __Singl_BasePlugin:
 
         def __init__(self, name, stop_cb = None, p = None, daemonize = True):
             ''' singleton instance
@@ -193,6 +193,6 @@ class BaseModule():
             self._lock_add_cb.release()
 
         def __del__(self):
-            self._log.debug("__del__ basemodule")
+            self._log.debug("__del__ baseplugin")
 
 

@@ -37,7 +37,7 @@ Implements
 @organization: Domogik
 """
 
-from domogik.xpl.common.module import xPLModule
+from domogik.xpl.common.plugin import xPLPlugin
 
 
 ###
@@ -52,13 +52,13 @@ from domogik.xpl.common.module import xPLModule
 #       "default" : "False"},
 #       ]
 
-class ModuleSample(xPLModule):
+class ModuleSample(xPLPlugin):
     '''
     Send date and time on the xPL network every minute
     '''
 
     def __init__(self):
-        xPLModule.__init__(self, name = 'mdspl')
+        xPLPlugin.__init__(self, name = 'mdspl')
 
 if __name__ == "__main__":
     ModuleSample()
