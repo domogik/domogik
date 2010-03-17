@@ -511,7 +511,7 @@ class SysManager(xPLPlugin):
         print "plg=%s" % plg
         for component in self._components:
             if component["name"] == plg:
-                plg_content = "%s,%s,%s" % (component["name"],
+                plg_content = "%s,%s,%s,%s" % (component["name"],
                                             component["technology"],
                                             component["status"],
                                             component["description"])
