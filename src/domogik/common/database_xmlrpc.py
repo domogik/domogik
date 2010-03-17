@@ -19,7 +19,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-Module purpose
+Plugin purpose
 ==============
 
 Mapping of database API for use with XMLRPC
@@ -838,7 +838,7 @@ class XmlRpcDbHelper():
     def add_system_stat(self, s_name, s_hostname, s_date, s_values):
         """
         Add a system stat record
-        @param s_name : name of the  module
+        @param s_name : name of the  plugin
         @param s_hostname : name of the  host
         @param s_date : when the stat was gathered (timestamp)
         @param s_values : a dictionnary of system statistics values

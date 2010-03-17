@@ -19,7 +19,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-Module purpose
+Plugin purpose
 ==============
 
 Mock for X10 event on x10 network
@@ -37,14 +37,14 @@ X10EvtMock.__init__
 """
 
 from domogik.xpl.common.xplconnector import Listener
-from domogik.xpl.common.module import xPLModule, xPLResult
+from domogik.xpl.common.module import xPLPlugin, xPLResult
 from domogik.xpl.common.xplmessage import XplMessage
 from optparse import OptionParser
 
 
 
 
-class X10EvtMock(xPLModule):
+class X10EvtMock(xPLPlugin):
     ''' 
     '''
 
@@ -63,7 +63,7 @@ class X10EvtMock(xPLModule):
         parser.add_option("--level", action="store", dest="level", type="string", \
                 help="Level (0...100)")
 
-        xPLModule.__init__(self, name = "x10evt", parser = parser)
+        xPLPlugin.__init__(self, name = "x10evt", parser = parser)
 
         # Logger init
         self._log = self.get_my_logger()

@@ -19,7 +19,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-Module purpose
+Plugin purpose
 ==============
 
 xPL X10 client
@@ -53,12 +53,12 @@ DOMOGIK_PLUGIN_TECHNOLOGY = "X10"
 DOMOGIK_PLUGIN_DESCRIPTION = "Manage x10 devices"
 DOMOGIK_PLUGIN_CONFIGURATION=[
       {"id" : 0,
-       "key" : "startup-module",
-       "description" : "Automatically start module at Domogik startup",
+       "key" : "startup-plugin",
+       "description" : "Automatically start plugin at Domogik startup",
        "default" : "False"},
       {"id" : 1,
-       "key" : "startup-module",
-       "description" : "Automatically start module at Domogik startup",
+       "key" : "startup-plugin",
+       "description" : "Automatically start plugin at Domogik startup",
        "default" : "True"},
       {"id" : 2,
        "key" : "heyu-cfg-path",
@@ -92,10 +92,10 @@ class X10Main(xPLPlugin):
                 'xpltype': 'xpl-cmnd'})
         #One listener for system schema, allowing to reload config
         Listener(self.heyu_reload_config, self._myxpl, {'schema': 'domogik.system',
-           'xpltype': 'xpl-cmnd', 'command': 'reload', 'module': 'x10'})
+           'xpltype': 'xpl-cmnd', 'command': 'reload', 'plugin': 'x10'})
         #One listener for system schema, allowing to dump config
         Listener(self.heyu_dump_config, self._myxpl, {'schema': 'domogik.system',
-            'xpltype': 'xpl-cmnd', 'command': 'push_config', 'module': 'x10'})
+            'xpltype': 'xpl-cmnd', 'command': 'push_config', 'plugin': 'x10'})
         self._log = self.get_my_logger()
 #        self._monitor = X10Monitor(self._heyu_cfg_path_res)
 #        self._monitor.get_monitor().add_cb(self.x10_monitor_cb)

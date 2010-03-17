@@ -19,7 +19,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-Module purpose
+Plugin purpose
 ==============
 
 X10 technology support using serial a CM11 controller
@@ -476,7 +476,7 @@ class X10Monitor:
         def add_cb(self, cb):
             """
             Add a callback method
-            The callback needs to have 3 parameters : module name, command value and parameter
+            The callback needs to have 3 parameters : plugin name, command value and parameter
             """
             self._cbs.append(cb)
 

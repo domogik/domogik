@@ -18,7 +18,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-Module purpose
+Plugin purpose
 ==============
 
 Provide configuration management classes.
@@ -59,18 +59,18 @@ class ConfigManager(object):
         self.__dict__ = cls.__state
         return self
 
-    def __init__(self, module_name=None):
+    def __init__(self, plugin_name=None):
         """ Init the config manager.
 
-        @param module_name: name of the module which loads the configuration
-        @type module_name: str
+        @param plugin_name: name of the plugin which loads the configuration
+        @type plugin_name: str
 
         @raise ValueError: bad usage or no configuration found
         """
         super(ConfigManager, self).__init__()
         if ConfigManager.__init:
-            if module_name is None:
-                raise ValueError("Module name is mandatory in the first call")
+            if plugin_name is None:
+                raise ValueError("Plugin name is mandatory in the first call")
 
             # Create user config dir if needed
             user_config_dir = os.path.join(os.path.expanduser("~"), ".config", "domogik")

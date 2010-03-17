@@ -42,15 +42,15 @@ from optparse import OptionParser
 from domogik.common.daemonize import createDaemon
 
 class BasePlugin():
-    """ Basic module class, manage common part of all modules.
-    For all xPL modules, the xPLPlugin class must be use as a basis, not this one.
+    """ Basic plugin class, manage common part of all plugins.
+    For all xPL plugins, the xPLPlugin class must be use as a basis, not this one.
     This class is a Singleton
     """
 
     __instance = None 
 
     def __init__(self, name = None, stop_cb = None, parser = None, daemonize = True):
-        """ @param name : Name of current module 
+        """ @param name : Name of current plugin 
             @param parser : An instance of OptionParser. If you want to add extra options to the generic option parser,
             create your own optionparser instance, use parser.addoption and then pass your parser instance as parameter.
             Your options/params will then be available on self.options and self.params
@@ -81,19 +81,19 @@ class BasePlugin():
             @param daemonize : If set to False, force the instance *not* to daemonize, even if '-f' is not passed 
             on the command line. If set to True (default), will check if -f was added.
             '''
-            print "create Base module instance"
+            print "create Base plugin instance"
             if p is not None and isinstance(p, OptionParser):
                 parser = p
             else:
                 parser = OptionParser()
             parser.add_option("-f", action="store_true", dest="run_in_foreground", default=False, \
-                    help="Run the module in foreground, default to background.")
+                    help="Run the plugin in foreground, default to background.")
             (self.options, self.args) = parser.parse_args()
             if not self.options.run_in_foreground and daemonize:
                 createDaemon()
                 l = logger.Logger(name)
                 self._log = l.get_logger()
-                self._log.info("Daemonize module %s" % name)
+                self._log.info("Daemonize plugin %s" % name)
                 self.is_daemon = True
             else:
                 l = logger.Logger(name)
@@ -102,7 +102,7 @@ class BasePlugin():
             self._threads = []
             self._timers = []
             if name is not None:
-                self._module_name = name
+                self._plugin_name = name
             self._stop = threading.Event()
             self._lock_add_thread = threading.Semaphore()
             self._lock_add_timer = threading.Semaphore()
@@ -120,7 +120,7 @@ class BasePlugin():
 
         def should_stop(self):
             '''
-            Check if the module should stop
+            Check if the plugin should stop
             This method should be called to check loop condition in threads
             '''
             return self._stop.isSet()
@@ -131,11 +131,11 @@ class BasePlugin():
             '''
             return self._stop
 
-        def get_module_name(self):
+        def get_plugin_name(self):
             """
-            Returns the name of the current module
+            Returns the name of the current plugin
             """
-            return self._module_name
+            return self._plugin_name
 
         def register_thread(self, thread):
             '''

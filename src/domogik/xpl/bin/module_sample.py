@@ -19,7 +19,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-Module purpose
+Plugin purpose
 ==============
 
 Send time informations on the network
@@ -39,19 +39,19 @@ from domogik.xpl.common.plugin import xPLPlugin
 
 
 ###
-# Uncomment the next lines to let your module be autodetected by the manager
+# Uncomment the next lines to let your plugin be autodetected by the manager
 #
 #IS_DOMOGIK_PLUGIN = True
 #DOMOGIK_PLUGIN_TECHNOLOGY = "RFID, X10, Communication, etc"
 #DOMOGIK_PLUGIN_DESCRIPTION = "My short module description"
 #DOMOGIK_PLUGIN_CONFIGURATION=[
 #      {"id" : 0,
-#       "key" : "startup-module",
-#       "description" : "Automatically start module at Domogik startup",
+#       "key" : "startup-plugin",
+#       "description" : "Automatically start plugin at Domogik startup",
 #       "default" : "False"},
 #       ]
 
-class ModuleSample(xPLPlugin):
+class PluginSample(xPLPlugin):
     '''
     Module description
     '''
@@ -60,4 +60,4 @@ class ModuleSample(xPLPlugin):
         xPLPlugin.__init__(self, name = 'mdspl')
 
 if __name__ == "__main__":
-    ModuleSample()
+    PluginSample()

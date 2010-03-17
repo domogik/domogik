@@ -18,7 +18,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-Module purpose
+Plugin purpose
 ==============
 
 Provide some advanced logging services.
@@ -62,8 +62,8 @@ class Logger(object):
     def __init__(self, name=None):
         """ Init the logger object.
 
-        @param module_name: name of the module which uses this logger
-        @type module_name: str
+        @param plugin_name: name of the plugin which uses this logger
+        @type plugin_name: str
 
         @raise ValueError: bad usage
         """

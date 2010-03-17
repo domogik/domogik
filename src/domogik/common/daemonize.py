@@ -22,7 +22,7 @@ __copyright__ = "Copyright (C) 2005 Chad J. Schroeder"
 __revision__ = "$Id$"
 __version__ = "0.2"
 
-# Standard Python modules.
+# Standard Python plugins.
 import os               # Miscellaneous OS interfaces.
 import sys              # System-specific parameters and functions.
 

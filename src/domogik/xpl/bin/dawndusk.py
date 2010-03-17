@@ -19,7 +19,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-Module purpose
+Plugin purpose
 ==============
 
 xPL Dawndusk client
@@ -43,11 +43,11 @@ from domogik.xpl.common.xplmessage import XplMessage
 import datetime
 from domogik.common.configloader import Loader
 
-#TODO : rewrite this module to use database query
+#TODO : rewrite this plugin to use database query
 cfgloader = Loader('dawndusk')
 config = cfgloader.load()
 
-myxpl = Manager(source = config["source"], module_name = 'dawndusk')
+myxpl = Manager(source = config["source"], plugin_name = 'dawndusk')
 mydawndusk = DawnDusk()
 
 #Parameters definitions
