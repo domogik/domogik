@@ -62,7 +62,7 @@ import SocketServer
 
 
 REST_API_VERSION = "0.1"
-REST_DESCRIPTION = "REST plugin is part of Domogik project. See http://trac.domogik.org/domogik/wiki/plugins/REST.en for REST API documentation"
+REST_DESCRIPTION = "REST plugin is part of Domogik project. See http://trac.domogik.org/domogik/wiki/modules/REST.en for REST API documentation"
 
 ### parameters that can be overidden by Domogik config file
 USE_SSL = False
@@ -1389,9 +1389,11 @@ target=*
             else:
                 # wrong number of arguments
                 return False
-            # specific process for False
-            if value == "False":
+            # specific process for False/True
+            if value == "False" or value == "false":
                 self.parameters[key] = False
+            elif value == "True" or value == "true":
+                self.parameters[key] = True
             else:
                 self.parameters[key] = value
             iii += 2
@@ -2294,7 +2296,7 @@ target=*
             try:
                 data = message.data["plugin"+str(idx)].split(",")
                 if name == None or name == data[0]:
-                    json_data.add_data({"name" : data[0], "description" : data[2], "status" : data[1], "host" : host})
+                    json_data.add_data({"name" : data[0], "technology" : data[1], "description" : data[3], "status" : data[2], "host" : host})
                 idx += 1
             except:
                 loop_again = False
@@ -2339,7 +2341,7 @@ target=*
         # process message
         cmd = message.data['command']
         host = message.data["host"]
-        modinfo = message.data["plugin"]
+        plginfo = message.data["plugin"]
         data = message.data["plugin"].split(",")
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
@@ -2356,7 +2358,7 @@ target=*
             except:
                 loop_again = False
 
-        json_data.add_data({"name" : data[0], "description" : data[2], "status" : data[1], "host" : host, "configuration" : config_data})
+        json_data.add_data({"name" : data[0], "technology" : data[1], "description" : data[3], "status" : data[2], "host" : host, "configuration" : config_data})
         self.send_http_response_ok(json_data.get())
 
 
@@ -2380,7 +2382,7 @@ target=*
         cmd_message.add_data({"plugin" : plugin})
         cmd_message.add_data({"force" : force})
         self._myxpl.send(cmd_message)
-        self._log.debug("Plugin : send message : " % str(cmd_message))
+        self._log.debug("Plugin : send message : %s" % str(cmd_message))
 
         ### Listen for response
         # get xpl message from queue
@@ -2397,7 +2399,7 @@ target=*
             self.send_http_response_ok(json_data.get())
             return
 
-        self._log.debug("Plugin : message received : " % str(message))
+        self._log.debug("Plugin : message received : %s" % str(message))
 
         # an error happens
         if 'error' in message.data:

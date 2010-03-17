@@ -42,6 +42,7 @@ from domogik.xpl.lib.onewire import OneWire
 from domogik.xpl.common.queryconfig import Query
 
 IS_DOMOGIK_PLUGIN = True
+DOMOGIK_PLUGIN_TECHNOLOGY = "1wire"
 DOMOGIK_PLUGIN_DESCRIPTION = "Manage 1 wire devices"
 DOMOGIK_PLUGIN_CONFIGURATION=[
       {"id" : 0,

@@ -144,9 +144,9 @@ class SysManager(xPLPlugin):
 
         cmd = message.data['command']
         try:
-           mod = message.data['plugin']
+           plg = message.data['plugin']
         except KeyError:
-           mod = "*"
+           plg = "*"
         host = message.data["host"]
 
         # force command indicator
@@ -156,16 +156,16 @@ class SysManager(xPLPlugin):
 
         # error if no plugin in list
         error = ""
-        if self._is_component(mod) == False and mod != "*":
-            self._invalid_component(cmd, mod, host)
+        if self._is_component(plg) == False and plg != "*":
+            self._invalid_component(cmd, plg, host)
 
         # if no error at this point, process
         if error == "":
-            self._log.debug("System request %s for host %s, plugin %s. current hostname : %s" % (cmd, host, mod, gethostname()))
+            self._log.debug("System request %s for host %s, plugin %s. current hostname : %s" % (cmd, host, plg, gethostname()))
 
             # start plugin
             if cmd == "start" and host == gethostname():
-                self._start_plugin(mod, host, force)
+                self._start_plugin(plg, host, force)
 
             # stop plugin
             if cmd == "stop" and host == gethostname():
@@ -173,7 +173,7 @@ class SysManager(xPLPlugin):
                     error_msg = message.data["error"]
                 except KeyError:
                     error_msg = ""
-                self._stop_plugin(mod, host, force, error_msg)
+                self._stop_plugin(plg, host, force, error_msg)
 
             # list plugin
             elif cmd == "list" and host == gethostname():
@@ -185,7 +185,7 @@ class SysManager(xPLPlugin):
             elif cmd == "detail" and host == gethostname():
                 # first : we refresh list
                 self._list_components(gethostname())
-                self._send_component_detail(mod, host)
+                self._send_component_detail(plg, host)
 
             # host ping
             elif cmd == "host-ping":
@@ -204,9 +204,9 @@ class SysManager(xPLPlugin):
 
         cmd = message.data['command']
         try:
-           mod = message.data['plugin']
+           plg = message.data['plugin']
         except KeyError:
-           mod = "*"
+           plg = "*"
         host = message.data["host"]
 
         # force command indicator
@@ -216,12 +216,12 @@ class SysManager(xPLPlugin):
 
         # error if no plugin in list
         error = ""
-        if self._is_component(mod) == False and mod != "*":
-            self._invalid_component(cmd, mod, host)
+        if self._is_component(plg) == False and plg != "*":
+            self._invalid_component(cmd, plg, host)
 
         # if no error at this point, process
         if error == "":
-            self._log.debug("System request %s for host %s, plugin %s. current hostname : %s" % (cmd, host, mod, gethostname()))
+            self._log.debug("System request %s for host %s, plugin %s. current hostname : %s" % (cmd, host, plg, gethostname()))
 
             # stop plugin
             if cmd == "stop" and host == gethostname():
@@ -229,66 +229,66 @@ class SysManager(xPLPlugin):
                     error_msg = message.data["error"]
                 except KeyError:
                     error_msg = ""
-                    self._stop_plugin(mod, host, force, error_msg)
+                    self._stop_plugin(plg, host, force, error_msg)
 
         # if error
         else:
             self._log.info("Error detected : %s, request %s has been cancelled" % (error, cmd))
 
-    def _invalid_component(self, cmd, mod, host):
-        error = "Component %s doesn't exists on %s" % (mod, host)
+    def _invalid_component(self, cmd, plg, host):
+        error = "Component %s doesn't exists on %s" % (plg, host)
         self._log.debug(error)
         mess = XplMessage()
         mess.set_type('xpl-trig')
         mess.set_schema('domogik.system')
         mess.add_data({'host' : host})
         mess.add_data({'command' :  cmd})
-        mess.add_data({'plugin' :  mod})
+        mess.add_data({'plugin' :  plg})
         mess.add_data({'error' :  error})
         self._myxpl.send(mess)
 
-    def _start_plugin(self, mod, host, force):
+    def _start_plugin(self, plg, host, force):
         error = ""
-        self._log.debug("Ask to start %s on %s" % (mod, host))
+        self._log.debug("Ask to start %s on %s" % (plg, host))
         mess = XplMessage()
         mess.set_type('xpl-trig')
         mess.set_schema('domogik.system')
         mess.add_data({'host' : host})
         mess.add_data({'command' :  'start'})
-        mess.add_data({'plugin' :  mod})
-        if not force and self._is_component_running(mod):
-            error = "Component %s is already running on %s" % (mod, host)
+        mess.add_data({'plugin' :  plg})
+        if not force and self._is_component_running(plg):
+            error = "Component %s is already running on %s" % (plg, host)
             self._log.info(error)
             mess.add_data({'error' : error})
         else:
-            pid = self._start_comp(mod)
+            pid = self._start_comp(plg)
             if pid:
-                self._write_pid_file(mod, pid)
-                self._log.debug("Component %s started with pid %i" % (mod,
+                self._write_pid_file(plg, pid)
+                self._log.debug("Component %s started with pid %i" % (plg,
                         pid))
                 mess.add_data({'force' :  force})
                 if error != "":
                     mess.add_data({'error' :  error})
         self._myxpl.send(mess)
 
-    def _stop_plugin(self, mod, host, force, error):
-        self._log.debug("Check plugin stops : %s on %s" % (mod, host))
-        if not force and self._is_component_running(mod) == False:
-            error = "Component %s is not running on %s" % (mod, host)
+    def _stop_plugin(self, plg, host, force, error):
+        self._log.debug("Check plugin stops : %s on %s" % (plg, host))
+        if not force and self._is_component_running(plg) == False:
+            error = "Component %s is not running on %s" % (plg, host)
             self._log.info(error)
             mess = XplMessage()
             mess.set_type('xpl-trig')
             mess.set_schema('domogik.system')
             mess.add_data({'command' : 'stop'})
             mess.add_data({'host' : host})
-            mess.add_data({'plugin' : mod})
+            mess.add_data({'plugin' : plg})
             mess.add_data({'error' : error})
             self._myxpl.send(mess)
         else:
             # TODO : delete
-            #self._set_component_status(mod, "OFF")
-            pid = int(self._read_pid_file(mod))
-            self._delete_pid_file(mod)
+            #self._set_component_status(plg, "OFF")
+            pid = int(self._read_pid_file(plg))
+            self._delete_pid_file(plg)
             self._log.debug("Check if process (pid %s) is down" % pid)
             if pid != 0:
                 try:
@@ -384,9 +384,9 @@ class SysManager(xPLPlugin):
         This method does *not* check if the component exists
         '''
         self._log.info("Start the component %s" % name)
-        mod_path = "domogik.xpl.bin." + name
-        __import__(mod_path)
-        plugin = sys.modules[mod_path]
+        plg_path = "domogik.xpl.bin." + name
+        __import__(plg_path)
+        plugin = sys.modules[plg_path]
         subp = Popen("/usr/bin/python %s" % plugin.__file__, shell=True)
         return subp.pid
 
@@ -437,31 +437,36 @@ class SysManager(xPLPlugin):
         self._log.debug("Ask to list on %s" % (host))
         self._components = []
         package = domogik.xpl.bin
-        for importer, modname, ispkg in pkgutil.iter_modules(package.__path__):
+        for importer, plgname, ispkg in pkgutil.iter_modules(package.__path__):
             try:
-                plugin = __import__('domogik.xpl.bin.%s' % modname, fromlist="dummy")
-                self._log.debug("Plugin : %s" % modname)
+                plugin = __import__('domogik.xpl.bin.%s' % plgname, fromlist="dummy")
+                self._log.debug("Plugin : %s" % plgname)
                 if hasattr(plugin,'IS_DOMOGIK_PLUGIN') and plugin.IS_DOMOGIK_PLUGIN is True:
                     if plugin.DOMOGIK_PLUGIN_DESCRIPTION == None:
-                        moddesc = modname
+                        plgdesc = plgname
                     else:
-                        moddesc = plugin.DOMOGIK_PLUGIN_DESCRIPTION
+                        plgdesc = plugin.DOMOGIK_PLUGIN_DESCRIPTION
                     try:
-                        modconf = plugin.DOMOGIK_PLUGIN_CONFIGURATION
+                        plgtech = plugin.DOMOGIK_PLUGIN_TECHNOLOGY
                     except:
-                        modconf = []
-                    if self._is_component_running(modname):
+                        plgtech = "Unknown"
+                    try:
+                        plgconf = plugin.DOMOGIK_PLUGIN_CONFIGURATION
+                    except:
+                        plgconf = []
+                    if self._is_component_running(plgname):
                         status = "ON"
                     else:
                         status = "OFF"
-                    self._log.debug("  => Domogik plugin (%s) :)" % moddesc)
-                    self._components.append({"name" : modname, 
-                                             "description" : moddesc, 
+                    self._log.debug("  => Domogik plugin (%s) :)" % plgdesc)
+                    self._components.append({"name" : plgname, 
+                                             "description" : plgdesc, 
+                                             "technology" : plgtech, 
                                              "status" : status,
                                              "host" : gethostname(), 
-                                             "configuration" : modconf})
+                                             "configuration" : plgconf})
             except:
-                self._log.error("Error during %s plugin import" % modname)
+                self._log.error("Error during %s plugin import" % plgname)
 
     def _is_component(self, name):
         '''
@@ -489,23 +494,25 @@ class SysManager(xPLPlugin):
         mess.add_data({'command' :  'list'})
         idx = 0
         for component in self._components:
-            mod_content = "%s,%s,%s" % (component["name"],
+            plg_content = "%s,%s,%s,%s" % (component["name"],
+                                        component["technology"],
                                         component["status"],
                                         component["description"])
-            mess.add_data({'plugin'+str(idx) : mod_content})
+            mess.add_data({'plugin'+str(idx) : plg_content})
             idx += 1
         mess.add_data({'host' : gethostname()})
         self._myxpl.send(mess)
 
-    def _send_component_detail(self, mod, host):
+    def _send_component_detail(self, plg, host):
         mess = XplMessage()
         mess.set_type('xpl-trig')
         mess.set_schema('domogik.system')
         mess.add_data({'command' :  'detail'})
-        print "mod=%s" % mod
+        print "plg=%s" % plg
         for component in self._components:
-            if component["name"] == mod:
-                mod_content = "%s,%s,%s" % (component["name"],
+            if component["name"] == plg:
+                plg_content = "%s,%s,%s,%s" % (component["name"],
+                                            component["technology"],
                                             component["status"],
                                             component["description"])
                 for conf in component["configuration"]:
@@ -513,7 +520,7 @@ class SysManager(xPLPlugin):
                                                 conf["description"],
                                                 conf["default"])
                     mess.add_data({'config'+str(conf["id"]) : conf_content})
-        mess.add_data({'plugin' :  mod_content})
+        mess.add_data({'plugin' :  plg_content})
         mess.add_data({'host' : gethostname()})
 
         print mess
