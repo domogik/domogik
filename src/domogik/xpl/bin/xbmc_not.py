@@ -42,6 +42,7 @@ from domogik.xpl.common.plugin import xPLResult
 from domogik.xpl.common.queryconfig import Query
 
 IS_DOMOGIK_PLUGIN = True
+DOMOGIK_PLUGIN_TECHNOLOGY = "Media"
 DOMOGIK_PLUGIN_DESCRIPTION = "Send notifications to XBMC"
 DOMOGIK_PLUGIN_CONFIGURATION=[
       {"id" : 0,

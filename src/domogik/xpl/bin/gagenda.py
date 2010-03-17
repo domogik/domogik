@@ -43,6 +43,7 @@ from domogik.xpl.common.plugin import xPLResult
 from domogik.xpl.common.queryconfig import Query
 
 IS_DOMOGIK_PLUGIN = True
+DOMOGIK_PLUGIN_TECHNOLOGY = "Communication"
 DOMOGIK_PLUGIN_DESCRIPTION = "Get events from a Google agenda"
 DOMOGIK_PLUGIN_CONFIGURATION=[
       {"id" : 0,

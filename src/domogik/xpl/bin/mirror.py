@@ -42,6 +42,7 @@ from domogik.xpl.lib.mirror import Mirror
 from domogik.xpl.common.queryconfig import Query
 
 IS_DOMOGIK_PLUGIN = True
+DOMOGIK_PLUGIN_TECHNOLOGY = "RFID"
 DOMOGIK_PLUGIN_DESCRIPTION = "Use Mir:ror device"
 DOMOGIK_PLUGIN_CONFIGURATION=[
       {"id" : 0,

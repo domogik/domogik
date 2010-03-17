@@ -44,6 +44,7 @@ from domogik.xpl.lib.plcbus import PLCBUSAPI
 from domogik.xpl.common.queryconfig import Query
 
 IS_DOMOGIK_PLUGIN = True
+DOMOGIK_PLUGIN_TECHNOLOGY = "PLCBus"
 DOMOGIK_PLUGIN_DESCRIPTION = "Manage Plcbus devices"
 DOMOGIK_PLUGIN_CONFIGURATION=[
       {"id" : 0,
