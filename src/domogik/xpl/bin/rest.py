@@ -2382,7 +2382,7 @@ target=*
         cmd_message.add_data({"plugin" : plugin})
         cmd_message.add_data({"force" : force})
         self._myxpl.send(cmd_message)
-        self._log.debug("Plugin : send message : " % str(cmd_message))
+        self._log.debug("Plugin : send message : %s" % str(cmd_message))
 
         ### Listen for response
         # get xpl message from queue
@@ -2399,7 +2399,7 @@ target=*
             self.send_http_response_ok(json_data.get())
             return
 
-        self._log.debug("Plugin : message received : " % str(message))
+        self._log.debug("Plugin : message received : %s" % str(message))
 
         # an error happens
         if 'error' in message.data:
