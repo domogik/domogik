@@ -2296,7 +2296,7 @@ target=*
             try:
                 data = message.data["plugin"+str(idx)].split(",")
                 if name == None or name == data[0]:
-                    json_data.add_data({"name" : data[0], "description" : data[2], "status" : data[1], "host" : host})
+                    json_data.add_data({"name" : data[0], "technology" : data[1], "description" : data[3], "status" : data[2], "host" : host})
                 idx += 1
             except:
                 loop_again = False
@@ -2358,7 +2358,7 @@ target=*
             except:
                 loop_again = False
 
-        json_data.add_data({"name" : data[0], "description" : data[2], "status" : data[1], "host" : host, "configuration" : config_data})
+        json_data.add_data({"name" : data[0], "technology" : data[1], "description" : data[3], "status" : data[2], "host" : host, "configuration" : config_data})
         self.send_http_response_ok(json_data.get())
 
 
