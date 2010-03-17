@@ -447,6 +447,10 @@ class SysManager(xPLPlugin):
                     else:
                         plgdesc = plugin.DOMOGIK_PLUGIN_DESCRIPTION
                     try:
+                        plgtech = plugin.DOMOGIK_PLUGIN_TECHNOLOGY
+                    except:
+                        plgtech = "Unknown"
+                    try:
                         plgconf = plugin.DOMOGIK_PLUGIN_CONFIGURATION
                     except:
                         plgconf = []
@@ -457,6 +461,7 @@ class SysManager(xPLPlugin):
                     self._log.debug("  => Domogik plugin (%s) :)" % plgdesc)
                     self._components.append({"name" : plgname, 
                                              "description" : plgdesc, 
+                                             "technology" : plgtech, 
                                              "status" : status,
                                              "host" : gethostname(), 
                                              "configuration" : plgconf})
@@ -490,6 +495,7 @@ class SysManager(xPLPlugin):
         idx = 0
         for component in self._components:
             plg_content = "%s,%s,%s" % (component["name"],
+                                        component["technology"],
                                         component["status"],
                                         component["description"])
             mess.add_data({'plugin'+str(idx) : plg_content})
@@ -506,6 +512,7 @@ class SysManager(xPLPlugin):
         for component in self._components:
             if component["name"] == plg:
                 plg_content = "%s,%s,%s" % (component["name"],
+                                            component["technology"],
                                             component["status"],
                                             component["description"])
                 for conf in component["configuration"]:
