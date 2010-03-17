@@ -19,7 +19,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-Module purpose
+Plugin purpose
 ==============
 
 Manage connection to the xPL network
@@ -80,10 +80,10 @@ import time
 import signal
 import os
 from domogik.common import logger
-from domogik.xpl.common.basemodule import BaseModule
+from domogik.xpl.common.baseplugin import BasePlugin
 from domogik.xpl.common.xplmessage import XplMessage
 
-class Manager(BaseModule):
+class Manager(BasePlugin):
     """
     Manager is the main component of the system
     You can run many managers on different port
@@ -103,7 +103,7 @@ class Manager(BaseModule):
         @param ip : IP to listen to (default real ip address)
         @param port : port to listen to (default 0)
         """
-        BaseModule.__init__(self, stop_cb = self.leave)
+        BasePlugin.__init__(self, stop_cb = self.leave)
         source = "xpl-%s.domogik" % self.get_module_name()
         # Define maximum xPL message size
         self._buff = 1500

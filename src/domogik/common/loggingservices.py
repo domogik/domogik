@@ -107,7 +107,7 @@ class Logger(object):
             fileHandler = logging.handlers.RotatingFileHandler(log_file, 'w',
                                                                log_file_max_size,
                                                                log_file_max_backup)
-            fileHandler.setFormatter(space_formatter)
+            fileHandler.setFormatter(default_formatter)
             self.__logger_instance.addHandler(fileHandler)
 
             Logger.__init = False

@@ -41,11 +41,11 @@ Implements
 """
 
 from domogik.xpl.common.xplconnector import Listener
-from domogik.xpl.common.module import xPLModule
+from domogik.xpl.common.plugin import xPLPlugin
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.common.database import DbHelper
 
-class DBConnector(xPLModule):
+class DBConnector(xPLPlugin):
     '''
     Manage the connection between database and the xPL stuff
     Should be the *only* object with StatsManager to access the database in the core side
@@ -55,7 +55,7 @@ class DBConnector(xPLModule):
         '''
         Initialize database and xPL connection
         '''
-        xPLModule.__init__(self, 'dbmgr')
+        xPLPlugin.__init__(self, 'dbmgr')
         self._log = self.get_my_logger()
         self._log.debug("Init database_manager instance")
         

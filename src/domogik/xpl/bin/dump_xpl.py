@@ -38,16 +38,16 @@ Implements
 """
 
 from domogik.xpl.common.xplconnector import Listener
-from domogik.xpl.common.module import xPLModule
+from domogik.xpl.common.plugin import xPLPlugin
 
 
-class Sniffer(xPLModule):
+class Sniffer(xPLPlugin):
     '''Sniff xpl network and dump all messages
     '''
 
 
     def __init__(self):
-        xPLModule.__init__(self, name = 'sniffer')
+        xPLPlugin.__init__(self, name = 'sniffer')
         
         Listener(self._sniffer_cb, self._myxpl)
 

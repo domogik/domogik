@@ -19,7 +19,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-Module purpose
+Plugin purpose
 ==============
 
 Base class for all xPL clients
@@ -27,7 +27,7 @@ Base class for all xPL clients
 Implements
 ==========
 
-- xPLModule
+- xPLPlugin
 - xPLResult
 
 @author: Maxence Dunnewind <maxence@dunnewind.net>
@@ -42,10 +42,10 @@ import threading
 import os
 from socket import gethostname
 from domogik.xpl.common.xplconnector import *
-from domogik.xpl.common.basemodule import BaseModule
+from domogik.xpl.common.baseplugin import BasePlugin
 from domogik.common.configloader import Loader
 
-class xPLModule():
+class xPLPlugin():
     '''
     Global module class, manage signal handlers.
     This class shouldn't be used as-it but should be extended by xPL module
@@ -53,9 +53,9 @@ class xPLModule():
     '''
     __instance = None
 
-    def __init__(self, name = None, stop_cb = None, is_manager = False, reload_cb = None, dump_cb = None, parser = None):
+    def __init__(self, name = None, stop_cb = None, is_manager = False, reload_cb = None, dump_cb = None, parser = None, daemonize = True):
         '''
-        Create xPLModule instance, which defines signal handlers
+        Create xPLPlugin instance, which defines signal handlers
         @param name : The n,ame of the current module
         @param stop_cb : Method to call when a stop request is received
         @param is_manager : Must be True if the child script is a Domogik Manager process 
@@ -67,16 +67,18 @@ class xPLModule():
         @param parser : An instance of OptionParser. If you want to add extra options to the generic option parser,
         create your own optionparser instance, use parser.addoption and then pass your parser instance as parameter.
         Your options/params will then be available on self.options and self.params
+        @param daemonize : If set to False, force the instance *not* to daemonize, even if '-f' is not passed 
+        on the command line. If set to True (default), will check if -f was added.
         '''
         if len(name) > 8:
             raise IoError, "The name must be 8 chars max"
-        if xPLModule.__instance is None and name is None:
+        if xPLPlugin.__instance is None and name is None:
             raise AttributeError, "'name' attribute is mandatory for the first instance"
-        if xPLModule.__instance is None:
-            xPLModule.__instance = xPLModule.__Singl_xPLModule(name, stop_cb, is_manager, reload_cb, dump_cb, parser)
-            self.__dict__['_xPLModule__instance'] = xPLModule.__instance
+        if xPLPlugin.__instance is None:
+            xPLPlugin.__instance = xPLPlugin.__Singl_xPLPlugin(name, stop_cb, is_manager, reload_cb, dump_cb, parser, daemonize)
+            self.__dict__['_xPLPlugin__instance'] = xPLPlugin.__instance
         elif stop_cb is not None:
-            xPLModule.__instance.add_stop_cb(stop_cb)
+            xPLPlugin.__instance.add_stop_cb(stop_cb)
         self._log.debug("after watcher")
 
     def __getattr__(self, attr):
@@ -87,10 +89,10 @@ class xPLModule():
         """ Delegate access to implementation """
         return setattr(self.__instance, attr, value)
 
-    class __Singl_xPLModule(BaseModule):
-        def __init__(self, name, stop_cb = None, is_manager = False, reload_cb = None, dump_cb = None, parser = None):
+    class __Singl_xPLPlugin(BasePlugin):
+        def __init__(self, name, stop_cb = None, is_manager = False, reload_cb = None, dump_cb = None, parser = None, daemonize = True):
             '''
-            Create xPLModule instance, which defines system handlers
+            Create xPLPlugin instance, which defines system handlers
             @param name : The name of the current module
             @param stop_cb : Additionnal method to call when a stop request is received
             @param is_manager : Must be True if the child script is a Domogik Manager process 
@@ -102,8 +104,10 @@ class xPLModule():
             @param parser : An instance of OptionParser. If you want to add extra options to the generic option parser,
             create your own optionparser instance, use parser.addoption and then pass your parser instance as parameter.
             Your options/params will then be available on self.options and self.params
+            @param daemonize : If set to False, force the instance *not* to daemonize, even if '-f' is not passed 
+            on the command line. If set to True (default), will check if -f was added.
             '''
-            BaseModule.__init__(self, name, stop_cb, parser)
+            BasePlugin.__init__(self, name, stop_cb, parser, daemonize)
             Watcher(self)
             self._log.debug("New system manager instance for %s" % name)
             self._is_manager = is_manager
@@ -121,7 +125,7 @@ class xPLModule():
                 'xpltype':'xpl-cmnd'})
             self._reload_cb = reload_cb 
             self._dump_cb = dump_cb
-            self._log.debug("end single xplmodule")
+            self._log.debug("end single xpl plugin")
 
         def _system_handler(self, message):
             """ Handler for domogik system messages
@@ -159,7 +163,7 @@ class xPLModule():
                     self._answer_ping()
         
         def __del__(self):
-            self._log.debug("__del__ Single xplmodule")
+            self._log.debug("__del__ Single xpl plugin")
             self.force_leave()
 
         def _answer_stop(self):

@@ -32,7 +32,7 @@ Implements
 - class Room(Base) : rooms of the house
 - class Deviceategory(Base) : temperature, lighting, heating, music...
 - class DeviceTechnology(Base) : cpl, wired, wireless, wifi, ir...
-- class DeviceTechnologyConfig(Base) : list of parameters for the device technology
+- class ModuleConfig(Base) : list of parameters for the device technology
 - class Device(Base) : devices which are manages by the automation system
 - class DeviceConfig(Base) : list of parameters for the device
 - class DeviceStats(Base) : statistics associated to the device (history of values stored)
@@ -251,37 +251,32 @@ class DeviceTechnology(Base):
         return DeviceTechnology.__tablename__
 
 
-class DeviceTechnologyConfig(Base):
+class PluginConfig(Base):
     """
-    Configuration for device technology
+    Configuration for a plugin (x10, plcbus, ...)
     """
-    __tablename__ = '%s_device_technology_config' % _db_prefix
-    id = Column(Integer, primary_key=True)
-    technology_id = Column(Integer,
-                           ForeignKey('%s.id' % DeviceTechnology.get_tablename()),
-                           nullable=False)
-    technology = relation(DeviceTechnology, backref=backref(__tablename__))
-    key = Column(Unicode(30), nullable=False)
+    __tablename__ = '%s_plugin_config' % _db_prefix
+    plugin_name = Column(Unicode(80), nullable=False, primary_key=True)
+    key = Column(Unicode(30), nullable=False, primary_key=True)
     value = Column(Unicode(80), nullable=False)
 
-    def __init__(self, technology_id, key, value):
+    def __init__(self, plugin_name, key, value):
         """
         Class constructor
-        @param technology_id : link to the device technology
+        @param plugin_name : plugin name
         @param key : configuration item
         @param value : configuration value
         """
-        self.technology_id = technology_id
+        self.plugin_name = plugin_name
         self.key = unicode(key)
         self.value = unicode(value)
-        UniqueConstraint(technology_id, key)
 
     def __repr__(self):
         """
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<DeviceTechnologyConfig(id=%s, techno=%s, ('%s', '%s'))>" % (self.id, self.technology, self.key, self.value)
+        return "<PluginConfig(name=%s, ('%s', '%s'))>" % (self.plugin_name, self.key, self.value)
 
     @staticmethod
     def get_tablename():
@@ -289,7 +284,7 @@ class DeviceTechnologyConfig(Base):
         Return the table name associated to the class
         @return table name
         """
-        return DeviceTechnologyConfig.__tablename__
+        return PluginConfig.__tablename__
 
 
 class DeviceType(Base):

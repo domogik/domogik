@@ -47,7 +47,7 @@ from subprocess import Popen
 from domogik.common.configloader import Loader
 from domogik.xpl.common.xplconnector import Listener 
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.common.module import xPLModule, xPLResult
+from domogik.xpl.common.plugin import xPLPlugin, xPLResult
 from domogik.xpl.common.queryconfig import Query
 
 import domogik.xpl.bin
@@ -57,7 +57,7 @@ import pkgutil
 KILL_TIMEOUT = 2
 
 
-class SysManager(xPLModule):
+class SysManager(xPLPlugin):
     '''
     System management from domogik
     '''
@@ -72,7 +72,7 @@ class SysManager(xPLModule):
                 help="Start database manager if not already running.")
         parser.add_option("-r", action="store_true", dest="start_rest", default=False, \
                 help="Start REST interface manager if not already running.")
-        xPLModule.__init__(self, name = 'sysmgr', parser=parser)
+        xPLPlugin.__init__(self, name = 'sysmgr', parser=parser)
 
         # Logger init
         self._log = self.get_my_logger()

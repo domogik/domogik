@@ -39,11 +39,11 @@ Implements
 """
 
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.common.module import xPLModule
+from domogik.xpl.common.plugin import xPLPlugin
 import optparse
 
 
-class Sender(xPLModule):
+class Sender(xPLPlugin):
     ''' Send an xpl message
     usage : sendXPL.py message_type message_contents"
     message_type: Type of the message, must correspond to one of the supported schemas
@@ -54,7 +54,7 @@ class Sender(xPLModule):
             "sensor.basic", "domogik.system","domogik.config"]
 
     def __init__(self, schema=None, message=None):
-        xPLModule.__init__(self, name = 'send')
+        xPLPlugin.__init__(self, name = 'send')
         self._schema = schema
         self._message = message
         self._log = self.get_my_logger()

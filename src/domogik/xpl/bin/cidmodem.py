@@ -36,8 +36,8 @@ Implements
 """
 
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.common.module import xPLModule
-from domogik.xpl.common.module import xPLResult
+from domogik.xpl.common.plugin import xPLPlugin
+from domogik.xpl.common.plugin import xPLResult
 from domogik.xpl.lib.cidmodem import CallerIdModem
 from domogik.xpl.common.queryconfig import Query
 
@@ -63,7 +63,7 @@ DOMOGIK_PLUGIN_CONFIGURATION=[
      
 
 
-class CallerIdModemManager(xPLModule):
+class CallerIdModemManager(xPLPlugin):
     '''
     Manage the Caller ID with Modem stuff and connect it to xPL
     '''
@@ -71,7 +71,7 @@ class CallerIdModemManager(xPLModule):
     def __init__(self):
         """ Init module
         """
-        xPLModule.__init__(self, name='cidmodem')
+        xPLPlugin.__init__(self, name='cidmodem')
         # Get config
         #   - serial port
         self._config = Query(self._myxpl)

@@ -51,7 +51,7 @@ from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 from domogik.common.configloader import Loader
 from domogik.common.sql_schema import ActuatorFeature, Area, Device, DeviceUsage, \
                                       DeviceConfig, DeviceStats, DeviceStatsValue, \
-                                      DeviceTechnology, DeviceTechnologyConfig, \
+                                      DeviceTechnology, PluginConfig, \
                                       DeviceType, UIItemConfig, Room, Person, \
                                       SensorReferenceData, UserAccount, SystemConfig, \
                                       SystemStats, SystemStatsValue, Trigger
@@ -950,11 +950,6 @@ class DbHelper():
                                                  .filter_by(technology_id=dt.id).all()
                 if len(device_type_list) > 0:
                     raise DbHelperException("Couldn't delete device technology %s : there are associated device types" % dt_id)
-            dtc_list = self.__session.query(DeviceTechnologyConfig)\
-                                     .filter_by(technology_id=dt.id).all()
-            for dtc in dtc_list:
-                self.__session.delete(dtc)
-                #self.del_device_technology_config(dtc.id)
 
             self.__session.delete(dt)
             try:
@@ -967,85 +962,81 @@ class DbHelper():
             raise DbHelperException("Couldn't delete device technology with id %s : it doesn't exist" % dt_id)
 
 ####
-# Device technology config
+# Plugin config
 ####
-    def list_device_technology_config(self, dt_id):
+    def list_plugin_config(self, pl_name):
         """
-        Return all keys and values of a device technology
-        @param dt_id : id of the device technology
-        @return a list of DeviceTechnologyConfig objects
+        Return all keys and values of a plugin
+        @param pl_name : plugin name
+        @return a list of PluginConfig objects
         """
-        return self.__session.query(DeviceTechnologyConfig)\
-                             .filter_by(technology_id=dt_id).all()
+        return self.__session.query(PluginConfig)\
+                             .filter_by(plugin_name=self.__to_unicode(pl_name)).all()
 
-    def list_all_device_technology_config(self):
+    def list_all_plugin_config(self):
         """
-        Return a list of all device technology configuration
-        @param dt_id : id of the device technology
-        @return a list of DeviceTechnologyConfig objects
+        Return a list of all plugin parameters
+        @return a list of PluginConfig objects
         """
-        return self.__session.query(DeviceTechnologyConfig).all()
+        return self.__session.query(PluginConfig).all()
 
-    def get_device_technology_config(self, dt_id, dtc_key):
+    def get_plugin_config(self, pl_name, pl_key):
         """
-        Return information about a device technology config item
-        @param dt_id : id of the device technology
-        @param dtc_key : key of the device technology config
-        @return a DeviceTechnologyConfig object
+        Return information about a plugin parameter
+        @param pl_name : plugin name
+        @param pl_key : key we want the value from
+        @return a PluginConfig object
         """
-        return self.__session.query(DeviceTechnologyConfig)\
-                             .filter_by(technology_id=dt_id)\
-                             .filter_by(key=self.__to_unicode(dtc_key))\
+        return self.__session.query(PluginConfig)\
+                             .filter_by(plugin_name=self.__to_unicode(pl_name))\
+                             .filter_by(key=self.__to_unicode(pl_key))\
                              .first()
 
-    def set_device_technology_config(self, dt_id, dtc_key, dtc_value):
+    def set_plugin_config(self, pl_name, pl_key, pl_value):
         """
-        Add / update an device technology config parameter
-        @param dt_id : id of the associated technology
-        @param dtc_key : key we want to add / update
-        @param dtc_value : key value we want to add / update
-        @return : the updated DeviceTechnologyConfig item
+        Add / update a plugin parameter
+        @param pl_name : plugin name
+        @param pl_key : key we want to add / update
+        @param pl_value : key value we want to add / update
+        @return : the added / updated PluginConfig item
         """
         self.__session.expire_all()
-        dt = self.__session.query(DeviceTechnology).filter_by(id=dt_id).first()
-        if dt is None:
-            raise DbHelperException("Technology id %s does NOT exist" % dt_id)
-        dtc = self.__session.query(DeviceTechnologyConfig)\
-                            .filter_by(technology_id=dt_id, key=self.__to_unicode(dtc_key))\
-                            .first()
-        if dtc is None:
-            dtc = DeviceTechnologyConfig(technology_id=dt_id, key=self.__to_unicode(dtc_key),
-                                         value=self.__to_unicode(dtc_value))
+        plugin_key = self.__session.query(PluginConfig)\
+                                   .filter_by(plugin_name=self.__to_unicode(pl_name), key=self.__to_unicode(pl_key))\
+                                   .first()
+        if plugin_key is None:
+            plugin_key = PluginConfig(plugin_name=self.__to_unicode(pl_name), key=self.__to_unicode(pl_key),
+                                      value=self.__to_unicode(pl_value))
         else:
-            dtc.value = self.__to_unicode(dtc_value)
-        self.__session.add(dtc)
+            plugin_key.value = self.__to_unicode(pl_value)
+        self.__session.add(plugin_key)
         try:
             self.__session.commit()
         except Exception, sql_exception:
             self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-        return dtc
+        return plugin_key
 
-    def del_device_technology_config(self, dt_id):
+    def del_plugin_config(self, pl_name):
         """
-        Delete all device technology config records
-        @param dt_id : the technology id
-        @return the deleted DeviceTechnologyConfig objects (list)
+        Delete all parameters of a plugin
+        @param pl_name : plugin name
+        @return the deleted PluginConfig objects (list)
         """
         self.__session.expire_all()
-        dtc_list = self.__session.query(DeviceTechnologyConfig)\
-                                 .filter_by(technology_id=dt_id).all()
-        dtc_deleted_list = []
-        for dtc in dtc_list:
-            dtc_d = dtc
-            dtc_deleted_list.append(dtc_d)
-            self.__session.delete(dtc)
+        plugin_key_list = self.__session.query(PluginConfig)\
+                              .filter_by(plugin_name=self.__to_unicode(pl_name)).all()
+        pl_key_deleted_list = []
+        for plugin_key in plugin_key_list:
+            plugin_key_d = plugin_key
+            pl_key_deleted_list.append(plugin_key_d)
+            self.__session.delete(plugin_key)
             try:
                 self.__session.commit()
             except Exception, sql_exception:
                 self.__session.rollback()
                 raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-        return dtc_deleted_list
+        return pl_key_deleted_list
 
 ###
 # Devices
