@@ -81,8 +81,8 @@ function stop_manager {
         kill -15 $pid 2>/dev/null 1>&2
     done
 }
-function stop_modules {
-    /bin/su - ${DOMOGIK_USER} -m -c "dmg_send  xpl-cmnd domogik.system 'command=stop,module=*,host=$HOSTNAME'"
+function stop_plugins {
+    /bin/su - ${DOMOGIK_USER} -m -c "dmg_send  xpl-cmnd domogik.system 'command=stop,plugin=*,host=$HOSTNAME'"
     sleep 2          
     for pid in `ps ax | egrep "domogik.*\.pyc$" | grep -v grep | awk '{print $1}'`; do
         kill -15 $pid 2>/dev/null 1>&2
@@ -124,7 +124,7 @@ case "$1" in
     stop)
     if [ $# -eq 1 ];then
         stop_django
-        stop_modules
+        stop_plugins
         stop_xpl
         stop_manager 
     else
@@ -138,8 +138,8 @@ case "$1" in
             manager)
             stop_manager
             ;;
-            modules)
-            stop_modules
+            plugins)
+            stop_plugins
             ;;
         esac
     fi
@@ -151,7 +151,7 @@ case "$1" in
     $0 start $1 $2
     ;;
     *)
-    echo "usage: $0 {start|stop|restart} [(django|xpl|manager|modules)]"
+    echo "usage: $0 {start|stop|restart} [(django|xpl|manager|plugins)]"
 esac
 exit 0
 
