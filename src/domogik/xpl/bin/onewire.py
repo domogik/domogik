@@ -41,9 +41,9 @@ from domogik.xpl.common.module import xPLModule, xPLResult, xPLTimer
 from domogik.xpl.lib.onewire import OneWire
 from domogik.xpl.common.queryconfig import Query
 
-IS_DOMOGIK_MODULE = True
-DOMOGIK_MODULE_DESCRIPTION = "Manage 1 wire devices"
-DOMOGIK_MODULE_CONFIGURATION=[
+IS_DOMOGIK_PLUGIN = True
+DOMOGIK_PLUGIN_DESCRIPTION = "Manage 1 wire devices"
+DOMOGIK_PLUGIN_CONFIGURATION=[
       {"id" : 0,
        "key" : "startup-module",
        "description" : "Automatically start module at Domogik startup",

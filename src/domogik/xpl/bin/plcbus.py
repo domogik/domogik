@@ -43,9 +43,9 @@ from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.lib.plcbus import PLCBUSAPI
 from domogik.xpl.common.queryconfig import Query
 
-IS_DOMOGIK_MODULE = True
-DOMOGIK_MODULE_DESCRIPTION = "Manage Plcbus devices"
-DOMOGIK_MODULE_CONFIGURATION=[
+IS_DOMOGIK_PLUGIN = True
+DOMOGIK_PLUGIN_DESCRIPTION = "Manage Plcbus devices"
+DOMOGIK_PLUGIN_CONFIGURATION=[
       {"id" : 0,
        "key" : "startup-module",
        "description" : "Automatically start module at Domogik startup",

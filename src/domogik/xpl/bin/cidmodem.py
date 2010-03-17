@@ -41,9 +41,9 @@ from domogik.xpl.common.module import xPLResult
 from domogik.xpl.lib.cidmodem import CallerIdModem
 from domogik.xpl.common.queryconfig import Query
 
-IS_DOMOGIK_MODULE = True
-DOMOGIK_MODULE_DESCRIPTION = "Get caller id with a modem"
-DOMOGIK_MODULE_CONFIGURATION=[
+IS_DOMOGIK_PLUGIN = True
+DOMOGIK_PLUGIN_DESCRIPTION = "Get caller id with a modem"
+DOMOGIK_PLUGIN_CONFIGURATION=[
       {"id" : 0,
        "key" : "startup-module",
        "description" : "Automatically start module at Domogik startup",

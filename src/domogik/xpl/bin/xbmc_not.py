@@ -41,9 +41,9 @@ from domogik.xpl.lib.xbmc_not import XBMCNotification
 from domogik.xpl.common.module import xPLResult
 from domogik.xpl.common.queryconfig import Query
 
-IS_DOMOGIK_MODULE = True
-DOMOGIK_MODULE_DESCRIPTION = "Send notifications to XBMC"
-DOMOGIK_MODULE_CONFIGURATION=[
+IS_DOMOGIK_PLUGIN = True
+DOMOGIK_PLUGIN_DESCRIPTION = "Send notifications to XBMC"
+DOMOGIK_PLUGIN_CONFIGURATION=[
       {"id" : 0,
        "key" : "startup-module",
        "description" : "Automatically start module at Domogik startup",

@@ -27,9 +27,7 @@ Send time informations on the network
 Implements
 ==========
 
-- xPLDateTime.__init__(self)
-- xPLDateTime._f(self, nb)
-- xPLDateTime._send_datetime(self)
+- ModuleSample.__init__(self)
 
 @author: Maxence Dunnewind <maxence@dunnewind.net>
 @copyright: (C) 2007-2009 Domogik project
@@ -43,9 +41,9 @@ from domogik.xpl.common.module import xPLModule
 ###
 # Uncomment the next lines to let your module be autodetected by the manager
 #
-#IS_DOMOGIK_MODULE = True
-#DOMOGIK_MODULE_DESCRIPTION = "My short module description"
-#DOMOGIK_MODULE_CONFIGURATION=[
+#IS_DOMOGIK_PLUGIN = True
+#DOMOGIK_PLUGIN_DESCRIPTION = "My short module description"
+#DOMOGIK_PLUGIN_CONFIGURATION=[
 #      {"id" : 0,
 #       "key" : "startup-module",
 #       "description" : "Automatically start module at Domogik startup",
@@ -54,7 +52,7 @@ from domogik.xpl.common.module import xPLModule
 
 class ModuleSample(xPLModule):
     '''
-    Send date and time on the xPL network every minute
+    Module description
     '''
 
     def __init__(self):

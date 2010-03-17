@@ -39,9 +39,9 @@ from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.module import xPLModule
 from domogik.xpl.lib.wol import WOL
 
-IS_DOMOGIK_MODULE = True
-DOMOGIK_MODULE_DESCRIPTION = "Wake on lan"
-DOMOGIK_MODULE_CONFIGURATION = [
+IS_DOMOGIK_PLUGIN = True
+DOMOGIK_PLUGIN_DESCRIPTION = "Wake on lan"
+DOMOGIK_PLUGIN_CONFIGURATION = [
       {"id" : 0,
        "key" : "startup-module",
        "description" : "Automatically start module at Domogik startup",
