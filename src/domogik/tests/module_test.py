@@ -36,7 +36,7 @@ Implements
 import unittest
 import re
 
-from domogik.xpl.lib.module import xPLModule
+from domogik.xpl.common.module import xPLModule
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.common.dmg_exceptions import XplMessageError
 from domogik.common.ordereddict import OrderedDict
@@ -50,7 +50,7 @@ class xPLModuleTest(unittest.TestCase):
         """ Setup context.
         The context is setup before each call to a test method.
         """
-        self.__xpl_module = xPLModule('test')
+        self.__xpl_module = xPLModule('test', daemonize = False)
         self.__xpl_message = XplMessage()
 
     def tearDown(self):

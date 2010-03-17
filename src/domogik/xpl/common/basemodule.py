@@ -49,14 +49,16 @@ class BaseModule():
 
     __instance = None 
 
-    def __init__(self, name = None, stop_cb = None, parser = None):
+    def __init__(self, name = None, stop_cb = None, parser = None, daemonize = True):
         """ @param name : Name of current module 
             @param parser : An instance of OptionParser. If you want to add extra options to the generic option parser,
             create your own optionparser instance, use parser.addoption and then pass your parser instance as parameter.
             Your options/params will then be available on self.options and self.params
+            @param daemonize : If set to False, force the instance *not* to daemonize, even if '-f' is not passed 
+            on the command line. If set to True (default), will check if -f was added.
         """
         if BaseModule.__instance is None:
-            BaseModule.__instance = BaseModule.__Singl_BaseModule(name, stop_cb, parser)
+            BaseModule.__instance = BaseModule.__Singl_BaseModule(name, stop_cb, parser, daemonize)
 
     def __getattr__(self, attr):
         """ Delegate access to implementation """
@@ -71,11 +73,13 @@ class BaseModule():
 
     class __Singl_BaseModule:
 
-        def __init__(self, name, stop_cb = None, p = None):
+        def __init__(self, name, stop_cb = None, p = None, daemonize = True):
             ''' singleton instance
             @param p : An instance of OptionParser. If you want to add extra options to the generic option parser,
             create your own optionparser instance, use parser.addoption and then pass your parser instance as parameter.
             Your options/params will then be available on self.options and self.params
+            @param daemonize : If set to False, force the instance *not* to daemonize, even if '-f' is not passed 
+            on the command line. If set to True (default), will check if -f was added.
             '''
             print "create Base module instance"
             if p is not None and isinstance(p, OptionParser):
@@ -85,7 +89,7 @@ class BaseModule():
             parser.add_option("-f", action="store_true", dest="run_in_foreground", default=False, \
                     help="Run the module in foreground, default to background.")
             (self.options, self.args) = parser.parse_args()
-            if not self.options.run_in_foreground:
+            if not self.options.run_in_foreground and daemonize:
                 createDaemon()
                 l = logger.Logger(name)
                 self._log = l.get_logger()

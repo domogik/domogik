@@ -53,7 +53,7 @@ class xPLModule():
     '''
     __instance = None
 
-    def __init__(self, name = None, stop_cb = None, is_manager = False, reload_cb = None, dump_cb = None, parser = None):
+    def __init__(self, name = None, stop_cb = None, is_manager = False, reload_cb = None, dump_cb = None, parser = None, daemonize = True):
         '''
         Create xPLModule instance, which defines signal handlers
         @param name : The n,ame of the current module
@@ -67,13 +67,15 @@ class xPLModule():
         @param parser : An instance of OptionParser. If you want to add extra options to the generic option parser,
         create your own optionparser instance, use parser.addoption and then pass your parser instance as parameter.
         Your options/params will then be available on self.options and self.params
+        @param daemonize : If set to False, force the instance *not* to daemonize, even if '-f' is not passed 
+        on the command line. If set to True (default), will check if -f was added.
         '''
         if len(name) > 8:
             raise IoError, "The name must be 8 chars max"
         if xPLModule.__instance is None and name is None:
             raise AttributeError, "'name' attribute is mandatory for the first instance"
         if xPLModule.__instance is None:
-            xPLModule.__instance = xPLModule.__Singl_xPLModule(name, stop_cb, is_manager, reload_cb, dump_cb, parser)
+            xPLModule.__instance = xPLModule.__Singl_xPLModule(name, stop_cb, is_manager, reload_cb, dump_cb, parser, daemonize)
             self.__dict__['_xPLModule__instance'] = xPLModule.__instance
         elif stop_cb is not None:
             xPLModule.__instance.add_stop_cb(stop_cb)
@@ -88,7 +90,7 @@ class xPLModule():
         return setattr(self.__instance, attr, value)
 
     class __Singl_xPLModule(BaseModule):
-        def __init__(self, name, stop_cb = None, is_manager = False, reload_cb = None, dump_cb = None, parser = None):
+        def __init__(self, name, stop_cb = None, is_manager = False, reload_cb = None, dump_cb = None, parser = None, daemonize = True):
             '''
             Create xPLModule instance, which defines system handlers
             @param name : The name of the current module
@@ -102,8 +104,10 @@ class xPLModule():
             @param parser : An instance of OptionParser. If you want to add extra options to the generic option parser,
             create your own optionparser instance, use parser.addoption and then pass your parser instance as parameter.
             Your options/params will then be available on self.options and self.params
+            @param daemonize : If set to False, force the instance *not* to daemonize, even if '-f' is not passed 
+            on the command line. If set to True (default), will check if -f was added.
             '''
-            BaseModule.__init__(self, name, stop_cb, parser)
+            BaseModule.__init__(self, name, stop_cb, parser, daemonize)
             Watcher(self)
             self._log.debug("New system manager instance for %s" % name)
             self._is_manager = is_manager
