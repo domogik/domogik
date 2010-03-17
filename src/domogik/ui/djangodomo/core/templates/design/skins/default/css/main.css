@@ -52,6 +52,10 @@ h2.splitter, h3.splitter {
 	padding-right:32px;
 }
 
+.capitalletter {
+	text-transform: capitalize; 
+}
+
 /* Main Layout */
 body {
     font: 65% Arial, Helvetica, sans-serif;

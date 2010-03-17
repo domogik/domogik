@@ -1,6 +1,23 @@
 /* Mini widget */
-.widgetmini_binary {
+.widget_binary {
     display:inline-block;
+    outline: none;
+    text-align:center;
+    height: 9em;
+}
+
+.widget_binary:hover .widget_icon,
+.widget_binary:focus .widget_icon {
+    background-color:#FFFFFF;
+    cursor: pointer;
+}
+
+.widget_binary .widget_state {
+    display:block;
+}
+
+.widget_binary .widget_icon {
+    display:block;
     width: 45px;
     height: 45px;
     border: 1px solid #cccccc;
@@ -8,33 +25,31 @@
     -webkit-border-radius: 0.8em;
     background-position: center center;
     background-repeat: no-repeat;
-    outline: none;
+    margin:0.5em 1em 0 1em;
 }
 
-.widgetmini_binary:hover, .widgetmini_binary:focus {
-    background-color:#FFFFFF;
-    cursor: pointer;
-}
-
-.widgetmini_binary.processing_state, .widget_binary.processing_state {
+/*
+.widget_binary.processing_state, .widget_binary.processing_state {
     background-color:#FFFFFF;
     background-image : url('../images/processing_24.gif');
 }
 
-.widgetmini_binary.ok_state {
+.widget_binary.ok_state {
     border: 1px solid #098876;
 }
 
-.widgetmini_binary.error_state {
+.widget_binary.error_state {
     border: 1px solid #098876;
 }
 
-.widgetmini_binary.unknown_state {
+.widget_binary.unknown_state {
     border: 1px solid #098876;
 }
+*/
 
-/* Widget */
-.widget_binary {
+/* Command */
+
+.command_binary {
     display:block;
     border: 1px solid #cccccc;
     -moz-border-radius: 0.8em;
@@ -45,19 +60,19 @@
     padding:0.5em;
 }
 
-.widget_binary ul {
+.command_binary ul {
     list-style:none;
     margin:0;
     padding:0;
     text-align:right;
 }
 
-.widget_binary li {
+.command_binary li {
     display:inline-block;
     margin: 0;
     padding: 0;
 }
-
+/*
 .widget_binary.ok_state .name {
     border: 1px solid #098876;
 }
@@ -69,3 +84,4 @@
 .widget_binary.unknown_state .name {
     border: 1px solid #098876;
 }
+*/

@@ -21,8 +21,6 @@
 
 {% load i18n %}
 {% block js_script %}
-// <![CDATA[
-// ]]>
 {% endblock %}
 
 {% block css %}
@@ -60,10 +58,35 @@
 								closetext: "Close",
 								openbutton: "#openextended_{{ device.id }}",
 							});
-                            widgetmini_binary("widgetmini_{{ device.id }}1", "{{ device.id }}1", 1);
-                            widget_binary("widget_{{ device.id }}1", "{{ device.id }}1", 1);
-                            widgetmini_range("widgetmini_{{ device.id }}2", "{{ device.id }}2", 1, 0, 100, 12, '%');
-                            widget_range("widget_{{ device.id }}2", "{{ device.id }}2", 1, 0, 100, 12, '%');
+                            
+                            {% for actuator in device.actuator %}
+                                {% ifequal actuator.value 'binary' %}
+                                    $("#command_{{ device.id }}_{{ actuator.id }}").binary_command({
+                                        usage: {{ device.usage_id }},
+                                        states: '{{ actuator.configurable_states }}',
+                                        action: function(self, command) {
+                                            alert(command);
+                                            self.setState(command);
+                                        }
+                                    })
+                                        .binary_command('setState', 'Off')
+                                        .binary_command('registerWidget', '#widget_{{ device.id }}_{{ actuator.id }}');
+                                {% endifequal %}
+
+                                {% ifequal actuator.value 'range' %}
+                                    $("#command_{{ device.id }}_{{ actuator.id }}").range_command({
+                                        usage: {{ device.usage_id }},
+                                        states: '{{ actuator.configurable_states }}',
+                                        unit: '{{ actuator.unit }}',
+                                        action: function(self, command) {
+                                            alert(command);
+                                            self.setState(command);
+                                        }
+                                    })
+                                        .range_command('setValue', 50)
+                                        .range_command('registerWidget', '#widget_{{ device.id }}_{{ actuator.id }}');
+                                {% endifequal %}
+                            {% endfor %}
                         });
                     // ]]>
                     </script>
@@ -78,8 +101,9 @@
                         </h2>
                         <div class='actions'>
                             <ul>
-                                <li><div id="widgetmini_{{ device.id }}1"></div></li>
-                                <li><div id="widgetmini_{{ device.id }}2"></div></li>
+                                {% for actuator in device.actuator %}
+                                    <li><div id="widget_{{ device.id }}_{{ actuator.id }}">{{ actuator.name }}</div></li>
+                                {% endfor %}
                             </ul>
                         </div>
 
@@ -89,16 +113,14 @@
                     <div class='extended' id='extended_{{ device.id }}'>
                         <h3>Commandes</h3>
                         <ul class='commands'>
-                        <li>
-                            <div id="widget_{{ device.id }}1">
-                                <span class='name'>Switch</span>
-                                <ul>
-                                    <li><a href='#' class='buttonsmall off'>Off</a></li>
-                                    <li><a href='#' class='buttonsmall on'>On</a></li>
-                                </ul>
-                            </div>
-                        </li>
-                        <li>
+                        {% for actuator in device.actuator %}
+                            <li>
+                                <div id="command_{{ device.id }}_{{ actuator.id }}">
+                                    <span class='name'>{{ actuator.name }}</span>
+                                </div>
+                            </li>
+                        {% endfor %}
+                        <!--li>
                             <div id="widget_{{ device.id }}2">
                                 <label class='name'>Dimmer</label>
                                 <input type="text" class="value" title="Variation in %"/>
@@ -108,7 +130,7 @@
                                 </ul>
                                 <div class="slider"></div>
                             </div>
-                        </li>
+                        </li-->
                         </ul>
                     </div>
 
@@ -116,6 +138,5 @@
         {% if forloop.counter0|divisibleby:"3" %}
             </div>
         {% endif %}
-
     {% endfor %}
 {% endblock %}

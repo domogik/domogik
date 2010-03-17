@@ -56,6 +56,9 @@
 .icon64-usage-2 { background-image:url(../images/device_usage/socket/socket_64.png);}
 .icon32-usage-2 { background-image:url(../images/device_usage/socket/socket_32.png);}
 .icon16-usage-2 { background-image:url(../images/device_usage/socket/socket_16.png);}
+.icon64-usage-3 { background-image:url(../images/device_usage/shutter/shutter_64.png);}
+.icon32-usage-3 { background-image:url(../images/device_usage/shutter/shutter_32.png);}
+.icon16-usage-3 { background-image:url(../images/device_usage/shutter/shutter_16.png);}
 
 /* State icons */
 .icon32-state-1.binary_0 { background-image:url(../images/device_usage/light/binary/0_32.png);}
@@ -78,7 +81,6 @@
 .icon32-state-2.range_80 { background-image:url(../images/device_usage/socket/range/80_32.png);}
 .icon32-state-2.range_90 { background-image:url(../images/device_usage/socket/range/90_32.png);}
 .icon32-state-2.range_100 { background-image:url(../images/device_usage/socket/range/100_32.png);}
-
 
 /* Action */
 .icon16-action-add { background-image:url(../images/action/plus_16.png);}

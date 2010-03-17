@@ -1,33 +1,37 @@
-.widgetmini_range {
+.widget_range {
     display:inline-block;
+    outline: none;
+    text-align:center;
+    height: 9em;
+}
+
+.widget_range:hover .widget_icon,
+.widget_range:focus .widget_icon {
+    background-color:#FFFFFF;
+    cursor: pointer;
+}
+
+.widget_range .widget_state {
+    display:block;
+}
+
+.widget_range .widget_icon {
+    display:block;
     width: 45px;
     height: 45px;
     border: 1px solid #cccccc;
     -moz-border-radius: 0.8em;
     -webkit-border-radius: 0.8em;
-    outline: none;
-    background-image: -webkit-gradient(linear, 0% 0%, 0% 60%, from(#BDCB2F), to(#9BB528));
-    background-image: -moz-linear-gradient(100% 60% 270deg, #BDCB2F, #9BB528);
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 60%, from(#908D6F), to(#D2CDBC));
+    background-image: -moz-linear-gradient(100% 60% 270deg, #908D6F, #D2CDBC);
+    -moz-background-size: '0% 0%';
+    -webkit-background-size: '0% 0%';
     background-position: bottom left;
     background-repeat: no-repeat;
+    margin:0.5em 1em 0 1em;
 }
 
-.widgetmini_range:hover, .widgetmini_range:focus {
-    background-color:#FFFFFF;
-    cursor: pointer;
-}
-
-.opened {
-    border-top: 1px solid #cccccc;
-    border-bottom: 1px solid #cccccc;
-    border-left: 1px dashed #cccccc;
-    border-right: 1px dashed #cccccc;
-    -moz-border-radius: 0;
-    -webkit-border-radius: 0;
-    background-color: #FFFFFF;
-}
-
-.range_value {
+.widget_value {
     float:left;
     display:inline-block;
     width: 45px;
@@ -39,7 +43,17 @@
     line-height:45px;
 }
 
-.range_plus {
+.widget_range.opened .widget_icon {
+    border-top: 1px solid #cccccc;
+    border-bottom: 1px solid #cccccc;
+    border-left: 1px dashed #cccccc;
+    border-right: 1px dashed #cccccc;
+    -moz-border-radius: 0;
+    -webkit-border-radius: 0;
+    background-color: #FFFFFF;
+}
+
+.widget_range .range_plus {
     width: 45px;
     height: 45px;
     position:relative;
@@ -54,7 +68,7 @@
     -webkit-border-radius: 0.8em 0 0 0.8em;
 }
 
-.range_minus {
+.widget_range .range_minus {
     width: 45px;
     height: 45px;
     position:relative;
@@ -70,7 +84,7 @@
     -webkit-border-radius: 0 0.8em 0.8em 0;
 }
 
-.widget_range {
+.command_range {
     display:block;
     border: 1px solid #cccccc;
     -moz-border-radius: 0.8em;
@@ -81,19 +95,19 @@
     padding:0.5em;
 }
 
-.widget_range ul {
+.command_range ul {
     list-style:none;
     margin:0;
     padding:0;
     text-align:right;
 }
 
-.widget_range li {
+.command_range li {
     display:inline-block;
     margin: 0;
     padding: 0;
 }
-
+/*
 .widget_range.ok_state .name {
     border: 1px solid #098876;
 }
@@ -118,3 +132,4 @@
 .widget_range .slider {
     margin-top: 1em;
 }
+*/

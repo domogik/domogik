@@ -200,7 +200,7 @@ function numbersonly(e) {
                     result[value.name] = $('#' + value.name).val();
                     break;
                 case 'checkbox':
-                    result[value.name] = $('#' + value.name).is(':checked');
+                    result[value.name] = ($('#' + value.name).is(':checked'))?'True':'False';
                     break;
                 }
             });
