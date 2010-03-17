@@ -494,7 +494,7 @@ class SysManager(xPLPlugin):
         mess.add_data({'command' :  'list'})
         idx = 0
         for component in self._components:
-            plg_content = "%s,%s,%s" % (component["name"],
+            plg_content = "%s,%s,%s,%s" % (component["name"],
                                         component["technology"],
                                         component["status"],
                                         component["description"])
