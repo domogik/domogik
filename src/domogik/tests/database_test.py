@@ -39,7 +39,7 @@ import datetime
 from domogik.common.database import DbHelper, DbHelperException
 from domogik.common.sql_schema import ActuatorFeature, Area, Device, DeviceUsage, \
                                       DeviceConfig, DeviceStats, DeviceStatsValue, \
-                                      DeviceTechnology, DeviceTechnologyConfig, \
+                                      DeviceTechnology, PluginConfig, \
                                       DeviceType, UIItemConfig, Room, \
                                       SensorReferenceData, UserAccount, \
                                       SystemConfig, SystemStats, SystemStatsValue, \
@@ -111,21 +111,19 @@ class GenericTestCase(unittest.TestCase):
         for af in db.list_actuator_features():
             db.del_actuator_feature(af.id)
 
-    def remove_all_device_technology_config(self, db):
+    def remove_all_plugin_config(self, db):
         """
         Remove all configurations of device technologies
         @param db : db API instance
         """
-        dbsession = db._DbHelper__session
-        for dtc in dbsession.query(DeviceTechnologyConfig).all():
-            dbsession.delete(dtc)
+        for plc in db.list_all_plugin_config():
+            db.del_plugin_config(plc.plugin_name)
 
     def remove_all_device_technologies(self, db):
         """
         Remove all device technologies
         @param db : db API instance
         """
-        self.remove_all_device_technology_config(db)
         for dt in db.list_device_technologies():
             db.del_device_technology(dt.id, cascade_delete=True)
 
@@ -763,71 +761,57 @@ class DeviceTechnologyTestCase(GenericTestCase):
         except DbHelperException:
             pass
 
-class DeviceTechnologyConfigTestCase(GenericTestCase):
+class PluginConfigTestCase(GenericTestCase):
     """
-    Test device technology configurations
+    Test plugin configuration
     """
 
     def setUp(self):
         self.db = DbHelper(use_test_db=True)
-        self.remove_all_device_technology_config(self.db)
-        self.remove_all_device_technologies(self.db)
+        self.remove_all_plugin_config(self.db)
 
     def tearDown(self):
-        self.remove_all_device_technology_config(self.db)
-        self.remove_all_device_technologies(self.db)
+        self.remove_all_plugin_config(self.db)
         del self.db
 
     def test_empty_list(self):
-        assert len(self.db.list_all_device_technology_config()) == 0
+        assert len(self.db.list_all_plugin_config()) == 0
 
     def test_add(self):
-        dt1 = self.db.add_device_technology('x10', 'desc dt1')
-        dt3 = self.db.add_device_technology('PLCBus', 'desc dt3')
-        try:
-            self.db.set_device_technology_config(99999999999, 'key1_1', 'val1_1')
-            TestCase.fail(self, "An exception should have been raised : device technology id does not exist")
-        except DbHelperException:
-            pass
-        dtc1_1 = self.db.set_device_technology_config(dt1.id, 'key1_1', 'val1_1')
-        print dtc1_1
-        assert dtc1_1.technology_id == dt1.id
-        assert dtc1_1.key == 'key1_1'
-        assert dtc1_1.value == 'val1_1'
-        dtc1_2 = self.db.set_device_technology_config(dt1.id, 'key1_2', 'val1_2')
-        dtc3_1 = self.db.set_device_technology_config(dt3.id, 'key3_1', 'val3_1')
-        dtc3_2 = self.db.set_device_technology_config(dt3.id, 'key3_2', 'val3_2')
-        dtc3_3 = self.db.set_device_technology_config(dt3.id, 'key3_3', 'val3_3')
-        assert len(self.db.list_device_technology_config(dt1.id)) == 2
-        assert len(self.db.list_device_technology_config(dt3.id)) == 3
+        pc1_1 = self.db.set_plugin_config('x10', 'key1_1', 'val1_1')
+        print pc1_1
+        assert pc1_1.plugin_name == 'x10'
+        assert pc1_1.key == 'key1_1'
+        assert pc1_1.value == 'val1_1'
+        pc1_2 = self.db.set_plugin_config('x10', 'key1_2', 'val1_2')
+        pc3_1 = self.db.set_plugin_config('plcbus', 'key3_1', 'val3_1')
+        pc3_2 = self.db.set_plugin_config('plcbus', 'key3_2', 'val3_2')
+        pc3_3 = self.db.set_plugin_config('plcbus', 'key3_3', 'val3_3')
+        assert len(self.db.list_plugin_config('x10')) == 2
+        assert len(self.db.list_plugin_config('plcbus')) == 3
 
     def test_update(self):
-        dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
-        dt2 = self.db.add_device_technology(u'PLCBus', 'desc dt2')
-        dtc = self.db.set_device_technology_config(dt1.id, 'key1', 'val1')
-        dtc_u = self.db.set_device_technology_config(dt_id=dt1.id, dtc_key='key1', dtc_value='val11')
-        assert dtc_u.key == 'key1'
-        assert dtc_u.value == 'val11'
+        plc = self.db.set_plugin_config('x10', 'key1', 'val1')
+        plc_u = self.db.set_plugin_config('x10', 'key1', 'val11')
+        assert plc_u.key == 'key1'
+        assert plc_u.value == 'val11'
 
     def testGet(self):
-        dt3 = self.db.add_device_technology(u'PLCBus', 'desc dt3')
-        dtc3_1 = self.db.set_device_technology_config(dt3.id, 'key3_1', 'val3_1')
-        dtc3_2 = self.db.set_device_technology_config(dt3.id, 'key3_2', 'val3_2')
-        dtc3_3 = self.db.set_device_technology_config(dt3.id, 'key3_3', 'val3_3')
-        dtc = self.db.get_device_technology_config(dt3.id, 'key3_2')
-        assert dtc.value == 'val3_2'
+        plc3_1 = self.db.set_plugin_config('x10', 'key3_1', 'val3_1')
+        plc3_2 = self.db.set_plugin_config('x10', 'key3_2', 'val3_2')
+        plc3_3 = self.db.set_plugin_config('x10', 'key3_3', 'val3_3')
+        plc = self.db.get_plugin_config('x10', 'key3_2')
+        assert plc.value == 'val3_2'
 
     def test_del(self):
-        dt1 = self.db.add_device_technology(u'x10', 'desc dt1')
-        dt3 = self.db.add_device_technology(u'PLCBus', 'desc dt3')
-        dtc1_1 = self.db.set_device_technology_config(dt1.id, 'key1_1', 'val1_1')
-        dtc1_2 = self.db.set_device_technology_config(dt1.id, 'key1_2', 'val1_2')
-        dtc3_1 = self.db.set_device_technology_config(dt3.id, 'key3_1', 'val3_1')
-        dtc3_2 = self.db.set_device_technology_config(dt3.id, 'key3_2', 'val3_2')
-        dtc3_3 = self.db.set_device_technology_config(dt3.id, 'key3_3', 'val3_3')
-        dtc_del_list = self.db.del_device_technology_config(dt3.id)
-        assert self.db.get_device_technology_config(dt3.id, 'key3_2') == None
-        assert len(dtc_del_list) == 3
+        plc1_1 = self.db.set_plugin_config('x10', 'key1_1', 'val1_1')
+        plc1_2 = self.db.set_plugin_config('x10', 'key1_2', 'val1_2')
+        plc3_1 = self.db.set_plugin_config('plcbus', 'key3_1', 'val3_1')
+        plc3_2 = self.db.set_plugin_config('plcbus', 'key3_2', 'val3_2')
+        plc3_3 = self.db.set_plugin_config('plcbus', 'key3_3', 'val3_3')
+        plc_del_list = self.db.del_plugin_config('plcbus')
+        assert self.db.get_plugin_config('plcbus', 'key3_2') == None
+        assert len(plc_del_list) == 3
 
 class DeviceTestCase(GenericTestCase):
     """
