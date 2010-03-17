@@ -19,7 +19,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-Module purpose
+Plugin purpose
 ==============
 
 Start an xPL client
@@ -104,17 +104,17 @@ def start_one_component(name):
         log.warning("%s is not an existing component !" % name)
         raise ValueError
     else:
-        myxpl = Manager(module_name = 'dmgstart')
+        myxpl = Manager(plugin_name = 'dmgstart')
         log.debug("*Asking to start %s by sending xPL request" % name)
         message = Message()
         message.set_type("xpl-cmnd")
         message.set_schema("domogik.system")
-        message.set_data_key("module", name)
+        message.set_data_key("plugin", name)
         message.set_data_key("command", "start")
         message.set_data_key("force", "1") #TODO
         #Create a listener to check the result
         l = Listener(wait_ack, myxpl, {'schema': 'domogik.system',
-                'type': 'xpl-trig', 'command': 'start', 'module': name})
+                'type': 'xpl-trig', 'command': 'start', 'plugin': name})
         myxpl.send(message)
         time.sleep(5) #Wait 5 seconds for a message
         print "No ack has been received during the last 5 seconds. It means " \

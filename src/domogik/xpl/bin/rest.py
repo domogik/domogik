@@ -19,7 +19,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-Module purpose
+Plugin purpose
 ==============
 
 REST support for Domogik project
@@ -62,7 +62,7 @@ import SocketServer
 
 
 REST_API_VERSION = "0.1"
-REST_DESCRIPTION = "REST module is part of Domogik project. See http://trac.domogik.org/domogik/wiki/modules/REST.en for REST API documentation"
+REST_DESCRIPTION = "REST plugin is part of Domogik project. See http://trac.domogik.org/domogik/wiki/plugins/REST.en for REST API documentation"
 
 ### parameters that can be overidden by Domogik config file
 USE_SSL = False
@@ -222,7 +222,7 @@ class Rest(xPLPlugin):
             @param my_queue : queue to get data from
             @param filter : dictionnay of filters. Examples :
                 - {"command" : "start", ...}
-                - {"module" : "wol%", ...} : here "%" indicate that we search for something starting with "wol"
+                - {"plugin" : "wol%", ...} : here "%" indicate that we search for something starting with "wol"
             @param nb_rec : internal parameter (do not use it for first call). Used to check recursivity VS queue size
         """
         self._log.debug("Get from queue : %s (recursivity deepth : %s)" % (str(my_queue), nb_rec))
@@ -567,8 +567,8 @@ class ProcessRequest():
             self.rest_xpl_cmnd()
         elif self.rest_type == "base":
             self.rest_base()
-        elif self.rest_type == "module":
-            self.rest_module()
+        elif self.rest_type == "plugin":
+            self.rest_plugin()
         elif self.rest_type == "account":
             self.rest_account()
         elif self.rest_type == None:
@@ -2189,13 +2189,13 @@ target=*
 
 
 ######
-# /module processing
+# /plugin processing
 ######
 
-    def rest_module(self):
-        """ /module processing
+    def rest_plugin(self):
+        """ /plugin processing
         """
-        self._log.debug("Module action")
+        self._log.debug("Plugin action")
         if len(self.rest_request) < 1:
             self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
             return
@@ -2204,13 +2204,13 @@ target=*
         if self.rest_request[0] == "list":
 
             if len(self.rest_request) == 1:
-                self._rest_module_list()
+                self._rest_plugin_list()
             elif len(self.rest_request) == 2:
                 self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
                                               self.jsonp, self.jsonp_cb)
             else:
                 if self.rest_request[1] == "by-name":
-                    self._rest_module_list(name=self.rest_request[2])
+                    self._rest_plugin_list(name=self.rest_request[2])
                 else:
                     self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                               self.jsonp, self.jsonp_cb)
@@ -2221,7 +2221,7 @@ target=*
             if len(self.rest_request) < 2:
                 self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
                 return
-            self._rest_module_detail(self.rest_request[1])
+            self._rest_plugin_detail(self.rest_request[1])
 
 
         ### start #####################################
@@ -2229,7 +2229,7 @@ target=*
             if len(self.rest_request) < 2:
                 self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
                 return
-            self._rest_module_start_stop(module =  self.rest_request[1], \
+            self._rest_plugin_start_stop(plugin =  self.rest_request[1], \
                                    command = "start")
 
         ### stop ######################################
@@ -2237,22 +2237,22 @@ target=*
             if len(self.rest_request) < 2:
                 self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
                 return
-            self._rest_module_start_stop(module =  self.rest_request[1], \
+            self._rest_plugin_start_stop(plugin =  self.rest_request[1], \
                                    command = "stop")
  
         ### others ####################################
         else:
-            self.send_http_response_error(999, "Bad operation for /module", self.jsonp, self.jsonp_cb)
+            self.send_http_response_error(999, "Bad operation for /plugin", self.jsonp, self.jsonp_cb)
             return
 
 
 
-    def _rest_module_list(self, name = None, host = gethostname()):
-        """ Send a xpl message to manager to get module list
+    def _rest_plugin_list(self, name = None, host = gethostname()):
+        """ Send a xpl message to manager to get plugin list
             Display this list as json
-            @param name : name of module
+            @param name : name of plugin
         """
-        self._log.debug("Module : ask for module list on %s." % host)
+        self._log.debug("Plugin : ask for plugin list on %s." % host)
 
         ### Send xpl message to get list
         message = XplMessage()
@@ -2262,22 +2262,22 @@ target=*
         # TODO : ask for good host
         message.add_data({"host" : gethostname()})
         self._myxpl.send(message)
-        self._log.debug("Module : send message : %s" % str(message))
+        self._log.debug("Plugin : send message : %s" % str(message))
 
         ### Wait for answer
         # get xpl message from queue
         try:
-            self._log.debug("Module : wait for answer...")
+            self._log.debug("Plugin : wait for answer...")
             message = self._get_from_queue(self._queue_system_list)
         except Empty:
-            self._log.debug("Module : no answer")
-            json_data = JSonHelper("ERROR", 999, "No data or timeout on getting module list")
+            self._log.debug("Plugin : no answer")
+            json_data = JSonHelper("ERROR", 999, "No data or timeout on getting plugin list")
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-            json_data.set_data_type("module")
+            json_data.set_data_type("plugin")
             self.send_http_response_ok(json_data.get())
             return
 
-        self._log.debug("Module : message received : %s" % str(message))
+        self._log.debug("Plugin : message received : %s" % str(message))
 
         # process message
         cmd = message.data['command']
@@ -2286,13 +2286,13 @@ target=*
 
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("module")
+        json_data.set_data_type("plugin")
 
         idx = 0
         loop_again = True
         while loop_again:
             try:
-                data = message.data["module"+str(idx)].split(",")
+                data = message.data["plugin"+str(idx)].split(",")
                 if name == None or name == data[0]:
                     json_data.add_data({"name" : data[0], "description" : data[2], "status" : data[1], "host" : host})
                 idx += 1
@@ -2303,47 +2303,47 @@ target=*
 
 
 
-    def _rest_module_detail(self, name, host = gethostname()):
-        """ Send a xpl message to manager to get module list
+    def _rest_plugin_detail(self, name, host = gethostname()):
+        """ Send a xpl message to manager to get plugin list
             Display this list as json
-            @param name : name of module
+            @param name : name of plugin
         """
-        self._log.debug("Module : ask for module detail : %s on %s." % (name, host))
+        self._log.debug("Plugin : ask for plugin detail : %s on %s." % (name, host))
 
         ### Send xpl message to get detail
         message = XplMessage()
         message.set_type("xpl-cmnd")
         message.set_schema("domogik.system")
         message.add_data({"command" : "detail"})
-        message.add_data({"module" : name})
+        message.add_data({"plugin" : name})
         # TODO : ask for good host
         message.add_data({"host" : host})
         self._myxpl.send(message)
-        self._log.debug("Module : send message : %s" % str(message))
+        self._log.debug("Plugin : send message : %s" % str(message))
 
         ### Wait for answer
         # get xpl message from queue
         try:
-            self._log.debug("Module : wait for answer...")
+            self._log.debug("Plugin : wait for answer...")
             # in filter, "%" means, that we check for something starting with name
-            message = self._get_from_queue(self._queue_system_detail, filter = {"command" : "detail", "module" : name + "%"})
+            message = self._get_from_queue(self._queue_system_detail, filter = {"command" : "detail", "plugin" : name + "%"})
         except Empty:
-            json_data = JSonHelper("ERROR", 999, "No data or timeout on getting module detail for %s" % name)
+            json_data = JSonHelper("ERROR", 999, "No data or timeout on getting plugin detail for %s" % name)
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-            json_data.set_data_type("module")
+            json_data.set_data_type("plugin")
             self.send_http_response_ok(json_data.get())
             return
 
-        self._log.debug("Module : message received : %s" % str(message))
+        self._log.debug("Plugin : message received : %s" % str(message))
 
         # process message
         cmd = message.data['command']
         host = message.data["host"]
-        modinfo = message.data["module"]
-        data = message.data["module"].split(",")
+        modinfo = message.data["plugin"]
+        data = message.data["plugin"].split(",")
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("module")
+        json_data.set_data_type("plugin")
 
         idx = 0
         loop_again = True
@@ -2362,14 +2362,14 @@ target=*
 
 
 
-    def _rest_module_start_stop(self, command, host = gethostname(), module = None, force = 0):
+    def _rest_plugin_start_stop(self, command, host = gethostname(), plugin = None, force = 0):
         """ Send start xpl message to manager
             Then, listen for a response
             @param host : host to which we send command
-            @param module : name of module
+            @param plugin : name of plugin
             @param force : force (or not) action. 0/1. 1 : force
         """
-        self._log.debug("Module : ask for %s %s on %s (force=%s)" % (command, module, host, force))
+        self._log.debug("Plugin : ask for %s %s on %s (force=%s)" % (command, plugin, host, force))
 
         ### Send xpl message
         cmd_message = XplMessage()
@@ -2377,27 +2377,27 @@ target=*
         cmd_message.set_schema("domogik.system")
         cmd_message.add_data({"command" : command})
         cmd_message.add_data({"host" : host})
-        cmd_message.add_data({"module" : module})
+        cmd_message.add_data({"plugin" : plugin})
         cmd_message.add_data({"force" : force})
         self._myxpl.send(cmd_message)
-        self._log.debug("Module : send message : " % str(cmd_message))
+        self._log.debug("Plugin : send message : " % str(cmd_message))
 
         ### Listen for response
         # get xpl message from queue
         try:
-            self._log.debug("Module : wait for answer...")
+            self._log.debug("Plugin : wait for answer...")
             if command == "start":
-                message = self._get_from_queue(self._queue_system_start, filter = {"command" : "start", "module" : module})
+                message = self._get_from_queue(self._queue_system_start, filter = {"command" : "start", "plugin" : plugin})
             elif command == "stop":
-                message = self._get_from_queue(self._queue_system_stop, filter= {"command" : "stop", "module" : module})
+                message = self._get_from_queue(self._queue_system_stop, filter= {"command" : "stop", "plugin" : plugin})
         except Empty:
-            json_data = JSonHelper("ERROR", 999, "No data or timeout on %s module %s" % (command, module))
+            json_data = JSonHelper("ERROR", 999, "No data or timeout on %s plugin %s" % (command, plugin))
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-            json_data.set_data_type("module")
+            json_data.set_data_type("plugin")
             self.send_http_response_ok(json_data.get())
             return
 
-        self._log.debug("Module : message received : " % str(message))
+        self._log.debug("Plugin : message received : " % str(message))
 
         # an error happens
         if 'error' in message.data:

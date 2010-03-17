@@ -19,7 +19,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-Module purpose
+Plugin purpose
 ==============
 
 xPL Téléinfo client
@@ -40,12 +40,12 @@ from domogik.xpl.common.plugin import xPLPlugin, xPLResult
 from domogik.xpl.lib.teleinfo import TeleInfo
 from domogik.xpl.common.queryconfig import Query
 
-IS_DOMOGIK_MODULE = True
-DOMOGIK_MODULE_DESCRIPTION = "Get power consumption with teleinfo"
-DOMOGIK_MODULE_CONFIGURATION=[
+IS_DOMOGIK_PLUGIN = True
+DOMOGIK_PLUGIN_DESCRIPTION = "Get power consumption with teleinfo"
+DOMOGIK_PLUGIN_CONFIGURATION=[
       {"id" : 0,
-       "key" : "startup-module",
-       "description" : "Automatically start module at Domogik startup",
+       "key" : "startup-plugin",
+       "description" : "Automatically start plugin at Domogik startup",
        "default" : "False"},
       {"id" : 1,
        "key" : "device",

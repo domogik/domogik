@@ -19,7 +19,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-Module purpose
+Plugin purpose
 ==============
 
 Helper to send xPL messages
@@ -44,13 +44,13 @@ from domogik.xpl.lib.xplconnector import Manager
 from domogik.common.configloader import Loader
 
 
-class xPLSendHelper(xPLModule):
+class xPLSendHelper(xPLPlugin):
     """ Helper to send basic xPL messages.
     """
     def __init__(self):
         """ Init helper.
         """
-        xPLModule.__init__(self, name="xplsendhelper")
+        xPLPlugin.__init__(self, name="xplsendhelper")
         self.__xpl_manager = Manager()
         self._log = self.get_my_logger()
         self.x10 = X10SendHelper(self.__xpl_manager)

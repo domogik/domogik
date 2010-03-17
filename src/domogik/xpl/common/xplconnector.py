@@ -104,7 +104,7 @@ class Manager(BasePlugin):
         @param port : port to listen to (default 0)
         """
         BasePlugin.__init__(self, stop_cb = self.leave)
-        source = "xpl-%s.domogik" % self.get_module_name()
+        source = "xpl-%s.domogik" % self.get_plugin_name()
         # Define maximum xPL message size
         self._buff = 1500
         # Define xPL base port
@@ -137,7 +137,7 @@ class Manager(BasePlugin):
             self._port = self._UDPSock.getsockname()[1]
             #Get the port number assigned by the system
             self._ip, self._port = self._UDPSock.getsockname()
-            self._log.debug("xPL module %s socket bound to %s, port %s" % (self.get_module_name(), self._ip, self._port))
+            self._log.debug("xPL plugin %s socket bound to %s, port %s" % (self.get_plugin_name(), self._ip, self._port))
             # All is good, we start sending Heartbeat every 5 minutes using
             # xPLTimer
             self._SendHeartbeat()
@@ -151,7 +151,7 @@ class Manager(BasePlugin):
                     "thread-monitor", (), {})
             self.register_thread(self._network)
             self._network.start()
-            self._log.debug("xPL thread started for %s " % self.get_module_name())
+            self._log.debug("xPL thread started for %s " % self.get_plugin_name())
 
     def leave(self):
         """
@@ -164,7 +164,7 @@ class Manager(BasePlugin):
         """
         This function allows you to send an xPL message on the Bus
         Be carreful, there is no check on message correctness
-        This method is protected by semaphore because in some module (REST for example)
+        This method is protected by semaphore because in some plugin (REST for example)
         many threads can call it.
         """
         self._lock_send.acquire()

@@ -19,7 +19,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-Module purpose
+Plugin purpose
 ==============
 
 Defines the sql schema used by Domogik
@@ -32,7 +32,7 @@ Implements
 - class Room(Base) : rooms of the house
 - class Deviceategory(Base) : temperature, lighting, heating, music...
 - class DeviceTechnology(Base) : cpl, wired, wireless, wifi, ir...
-- class ModuleConfig(Base) : list of parameters for the device technology
+- class PluginConfig(Base) : list of parameters for the device technology
 - class Device(Base) : devices which are manages by the automation system
 - class DeviceConfig(Base) : list of parameters for the device
 - class DeviceStats(Base) : statistics associated to the device (history of values stored)
@@ -750,14 +750,14 @@ class SystemStats(Base):
     hostname = Column(Unicode(40), nullable=False)
     date = Column(DateTime, nullable=False)
 
-    def __init__(self, module_name, host_name, date):
+    def __init__(self, plugin_name, host_name, date):
         """
         Class constructor
-        @param module_name : module name
+        @param plugin_name : plugin name
         @param host_name : host name
         @param date : datetime when the statistic was recorded
         """
-        self.name = module_name
+        self.name = plugin_name
         self.hostname = host_name
         self.date = date
 
@@ -766,7 +766,7 @@ class SystemStats(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<SystemStats(id=%s, module_name=%s, host_name=%s, date=%s)>" % (self.id, self.name, self.hostname, self.date)
+        return "<SystemStats(id=%s, plugin_name=%s, host_name=%s, date=%s)>" % (self.id, self.name, self.hostname, self.date)
 
     @staticmethod
     def get_tablename():

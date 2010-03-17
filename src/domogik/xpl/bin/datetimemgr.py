@@ -19,7 +19,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-Module purpose
+Plugin purpose
 ==============
 
 Send time informations on the network
@@ -43,12 +43,12 @@ from domogik.xpl.common.plugin import xPLPlugin
 from domogik.xpl.common.xplmessage import XplMessage
 
 
-IS_DOMOGIK_MODULE = True
-DOMOGIK_MODULE_DESCRIPTION = "Send date and time on the xPL network every minute"
-DOMOGIK_MODULE_CONFIGURATION=[
+IS_DOMOGIK_PLUGIN = True
+DOMOGIK_PLUGIN_DESCRIPTION = "Send date and time on the xPL network every minute"
+DOMOGIK_PLUGIN_CONFIGURATION=[
       {"id" : 0,
-       "key" : "startup-module",
-       "description" : "Automatically start module at Domogik startup",
+       "key" : "startup-plugin",
+       "description" : "Automatically start plugin at Domogik startup",
        "default" : "False"},
       ]
 class XPLDateTime(xPLPlugin):

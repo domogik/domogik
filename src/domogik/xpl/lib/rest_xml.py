@@ -5,7 +5,7 @@ from xml.dom import minidom
 import glob
 import os.path
 
-from domogik.xpl.lib.module import *
+from domogik.xpl.lib.plugin import *
 from domogik.common.database import DbHelper
 from domogik.common.configloader import Loader
 
@@ -104,7 +104,7 @@ target=*
         fields = url.split('/')
         command = fields[0]
         if command != 'command':
-            raise AttributeError, "This module must not be used for anything else than 'command' requests"
+            raise AttributeError, "This plugin must not be used for anything else than 'command' requests"
         technology = fields[1]
         if not os.path.isfile('%s/%s.xml' % (directory, technology) ):
             raise ValueError, "This technology is not known (no xml file with its name)"

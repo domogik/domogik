@@ -19,7 +19,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-Module purpose
+Plugin purpose
 ==============
 
 Wake on lan client
@@ -39,12 +39,12 @@ from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.plugin import xPLPlugin
 from domogik.xpl.lib.wol import WOL
 
-IS_DOMOGIK_MODULE = True
-DOMOGIK_MODULE_DESCRIPTION = "Wake on lan"
-DOMOGIK_MODULE_CONFIGURATION = [
+IS_DOMOGIK_PLUGIN = True
+DOMOGIK_PLUGIN_DESCRIPTION = "Wake on lan"
+DOMOGIK_PLUGIN_CONFIGURATION = [
       {"id" : 0,
-       "key" : "startup-module",
-       "description" : "Automatically start module at Domogik startup",
+       "key" : "startup-plugin",
+       "description" : "Automatically start plugin at Domogik startup",
        "default" : "False"}]
 
 

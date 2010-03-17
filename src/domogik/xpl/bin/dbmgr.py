@@ -19,7 +19,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-Module purpose
+Plugin purpose
 ==============
 
 Manage connection to the database
@@ -29,7 +29,7 @@ Implements
 
 - DBConnector.__init__(self)
 - DBConnector._request_config_cb(self, message)
-- DBConnector._send_config(self, technology, key, value, module, element = None)
+- DBConnector._send_config(self, technology, key, value, plugin, element = None)
 - DBConnector._fetch_elmt_config(self, techno, element, key)
 - DBConnector._fetch_techno_config(self, techno, key)
 - DBConnector._update_stat(self, message)
@@ -117,7 +117,7 @@ class DBConnector(xPLPlugin):
                 mess.add_data({_key :  _val})
         else:
             mess.add_data({key :  value})
-#        mess.set_conf_key('target', module)
+#        mess.set_conf_key('target', plugin)
         self._myxpl.send(mess)
 
     def _fetch_elmt_config(self, techno, element, key):
@@ -163,10 +163,10 @@ class DBConnector(xPLPlugin):
                 'gagenda': {'email' : "fritz.smh@gmail.com",
                          'password' : 'XXXXXXXX',
                          'calendarname' : 'fritz.smh@gmail.com',
-                         'startup-module':'True'},
+                         'startup-plugin':'True'},
                 'teleinfo' : {'device' : '/dev/ttyUSB0',
                     'interval' : '30'},
-                    'dawndusk' : {'startup-module':'True'},
+                    'dawndusk' : {'startup-plugin':'True'},
                     'plcbus' : {'device':'/dev/ttyUSB0'},
                 }
         try:

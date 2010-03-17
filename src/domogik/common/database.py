@@ -19,7 +19,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-Module purpose
+Plugin purpose
 ==============
 
 API to use Domogik database.
@@ -1880,14 +1880,14 @@ class DbHelper():
     def add_system_stat(self, s_name, s_hostname, s_date, s_values):
         """
         Add a system stat record
-        @param s_name : name of the  module
+        @param s_name : name of the  plugin
         @param s_hostname : name of the  host
         @param s_date : when the stat was gathered (timestamp)
         @param s_values : a dictionnary of system statistics values
         @return the new SystemStats object
         """
         self.__session.expire_all()
-        system_stat = SystemStats(module_name=self.__to_unicode(s_name), host_name=self.__to_unicode(s_hostname),
+        system_stat = SystemStats(plugin_name=self.__to_unicode(s_name), host_name=self.__to_unicode(s_hostname),
                                   date=s_date)
         self.__session.add(system_stat)
         try:

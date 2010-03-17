@@ -19,7 +19,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-Module purpose
+Plugin purpose
 ==============
 
 Load config from file
@@ -50,13 +50,13 @@ class Loader():
     Parse Domogik config files
     '''
 
-    def __init__(self, module_name=None):
+    def __init__(self, plugin_name=None):
         '''
         Load the configuration for a part of the Domogik system
-        @param module_name name of the module to load config from
+        @param plugin_name name of the plugin to load config from
         '''
         self.main_conf_name = "domogik.cfg"
-        self.module_name = module_name
+        self.plugin_name = plugin_name
 
     def load(self):
         '''
@@ -73,11 +73,11 @@ class Loader():
         for k, v in result:
             main_result[k] = v
         #Check the plugin conf file if defined
-        if self.module_name == None:
+        if self.plugin_name == None:
             return (main_result, None)
 
-        if self.module_name:
-            return (main_result, config.items(self.module_name))
+        if self.plugin_name:
+            return (main_result, config.items(self.plugin_name))
         else:
             #If we're here, there is no plugin config
             return (main_result, None)

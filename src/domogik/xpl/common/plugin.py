@@ -47,8 +47,8 @@ from domogik.common.configloader import Loader
 
 class xPLPlugin():
     '''
-    Global module class, manage signal handlers.
-    This class shouldn't be used as-it but should be extended by xPL module
+    Global plugin class, manage signal handlers.
+    This class shouldn't be used as-it but should be extended by xPL plugin
     This class is a Singleton
     '''
     __instance = None
@@ -56,7 +56,7 @@ class xPLPlugin():
     def __init__(self, name = None, stop_cb = None, is_manager = False, reload_cb = None, dump_cb = None, parser = None, daemonize = True):
         '''
         Create xPLPlugin instance, which defines signal handlers
-        @param name : The n,ame of the current module
+        @param name : The n,ame of the current plugin
         @param stop_cb : Method to call when a stop request is received
         @param is_manager : Must be True if the child script is a Domogik Manager process 
         You should never need to set it to True
@@ -93,7 +93,7 @@ class xPLPlugin():
         def __init__(self, name, stop_cb = None, is_manager = False, reload_cb = None, dump_cb = None, parser = None, daemonize = True):
             '''
             Create xPLPlugin instance, which defines system handlers
-            @param name : The name of the current module
+            @param name : The name of the current plugin
             @param stop_cb : Additionnal method to call when a stop request is received
             @param is_manager : Must be True if the child script is a Domogik Manager process 
             You should never need to set it to True unless you develop your own manager
@@ -141,25 +141,25 @@ class xPLPlugin():
             @param message : the Xpl message received 
             """
             cmd = message.data["command"]
-            module = message.data["module"]
-            if cmd == "stop" and module in ['*',self.get_module_name()]:
-                self._log.info("Someone asked to stop %s, doing." % self.get_module_name())
+            plugin = message.data["plugin"]
+            if cmd == "stop" and plugin in ['*',self.get_plugin_name()]:
+                self._log.info("Someone asked to stop %s, doing." % self.get_plugin_name())
                 self._answer_stop()
                 self.force_leave()
             elif cmd == "reload":
                 if self._reload_cb is None:
-                    log.info("Someone asked to reload config of %s, but the module \
-                    isn't able to do it." % self.get_module_name())
+                    log.info("Someone asked to reload config of %s, but the plugin \
+                    isn't able to do it." % self.get_plugin_name())
                 else:
                     self._reload_cb()
             elif cmd == "dump":
                 if self._dump_cb is None:
-                    log.info("Someone asked to dump config of %s, but the module \
-                    isn't able to do it." % self.get_module_name())
+                    log.info("Someone asked to dump config of %s, but the plugin \
+                    isn't able to do it." % self.get_plugin_name())
                 else:
                     self._dump_cb()
             else: #cmd == ping 
-                if message.data["module"] in [self.get_module_name(), "*"]:
+                if message.data["plugin"] in [self.get_plugin_name(), "*"]:
                     self._answer_ping()
         
         def __del__(self):
@@ -172,7 +172,7 @@ class xPLPlugin():
             mess = XplMessage()
             mess.set_type("xpl-trig")
             mess.set_schema("domogik.system")
-            mess.add_data({"command":"stop", "module": self.get_module_name(), 
+            mess.add_data({"command":"stop", "plugin": self.get_plugin_name(), 
                 "host": gethostname()})
             self._myxpl.send(mess)
 
@@ -182,7 +182,7 @@ class xPLPlugin():
             mess = XplMessage()
             mess.set_type("xpl-trig")
             mess.set_schema("domogik.system")
-            mess.add_data({"command":"ping", "module": self.get_module_name(), 
+            mess.add_data({"command":"ping", "plugin": self.get_plugin_name(), 
                 "host": gethostname()})
             self._myxpl.send(mess)
 
@@ -255,7 +255,7 @@ class Watcher:
     Tip found at http://code.activestate.com/recipes/496735/
     """
     
-    def __init__(self, module):
+    def __init__(self, plugin):
         """ Creates a child thread, which returns.  The parent
             thread waits for a KeyboardInterrupt and then kills
             the child thread.
@@ -264,17 +264,17 @@ class Watcher:
         if self.child == 0:
             return
         else:
-            self._module = module
-            self._module._log.debug("watcher fork")
+            self._plugin = plugin
+            self._plugin._log.debug("watcher fork")
             signal.signal(signal.SIGTERM, self._signal_handler)
             self.watch()
 
     def _signal_handler(self, signum, frame):
         """ Handler called when a SIGTERM is received 
-        Stop the module 
+        Stop the plugin 
         """
-        self._module._log.info("SIGTERM receive, stopping module")
-        self._module.force_leave()
+        self._plugin._log.info("SIGTERM receive, stopping plugin")
+        self._plugin.force_leave()
         self.kill()
 
     def watch(self):
@@ -282,8 +282,8 @@ class Watcher:
             os.wait()
         except KeyboardInterrupt:
             print 'KeyBoardInterrupt'
-            self._module._log.info("Keyoard Interrupt detected, leave now.")
-            self._module.force_leave()
+            self._plugin._log.info("Keyoard Interrupt detected, leave now.")
+            self._plugin.force_leave()
             self.kill()
         except OSError:
             print "OSError"

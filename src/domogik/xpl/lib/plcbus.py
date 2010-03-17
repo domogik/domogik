@@ -19,7 +19,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-Module purpose
+Plugin purpose
 ==============
 
 Support PLCBUS power-based technology
@@ -177,7 +177,7 @@ class PLCBUSAPI:
         # after cmd add level, rate : put in data1 and data2
         # (just data1 for these cases)
         '''
-        Send a command PLCBUS to 1141 module
+        Send a command PLCBUS to 1141 plugin
         @param cmd : Command to send ('ON','OFF', etc)
         @param item : Item to send order to (must be "HU" format)
         @param ucod : User code of item (must be 'H' syntax between 00 to FF)
@@ -205,7 +205,7 @@ class PLCBUSAPI:
 
     def get_all_on_id(self, usercode, housecode):
         '''
-        Fastpoll the housecode and return every on modules
+        Fastpoll the housecode and return every on plugins
         @param usercode : User code of item (must be 'H' syntax between 00 to
         FF)
         @param housecode : one or more housecodes

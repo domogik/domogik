@@ -19,7 +19,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-Module purpose
+Plugin purpose
 ==============
 
 Manage logs
@@ -27,10 +27,10 @@ Manage logs
 Implements
 ==========
 
-- Logger.__init__(self, module_name = None)
+- Logger.__init__(self, plugin_name = None)
 - Logger.__getattr__(self, attr)
 - Logger.__setattr__(self, attr, value)
-- Logger.__init__(self, module_name)
+- Logger.__init__(self, plugin_name)
 - Logger.get_logger(self)
 
 @author: Maxence Dunnewind <maxence@dunnewind.net>
@@ -50,7 +50,7 @@ class Logger():
     with a minimum of config
     '''
 
-    def __init__(self, module_name):
+    def __init__(self, plugin_name):
         '''
         Get a logger with provided parameters and set config
         @param file : the file to record logs into with the path
@@ -65,14 +65,14 @@ class Logger():
 
         cfg = Loader()
         config = cfg.load()[0]
-        file = "%s/%s.log" % (config['log_dir_path'], module_name)
+        file = "%s/%s.log" % (config['log_dir_path'], plugin_name)
         level = config['log_level']
 
         if level not in LEVELS:
             raise ValueError("level must be one of 'debug','info','warning',"\
                     "'error','critical'. Check your config.")
 
-        logger = logging.getLogger('domogik-%s' % module_name)
+        logger = logging.getLogger('domogik-%s' % plugin_name)
         hdlr = logging.FileHandler(file)
         formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s')
         hdlr.setFormatter(formatter)
