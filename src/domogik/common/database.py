@@ -884,7 +884,7 @@ class DbHelper():
         """
         return self.__session.query(DeviceTechnology).filter_by(id=dt_id).first()
 
-    def add_device_technology(self, dt_id, dt_name, dt_description):
+    def add_device_technology(self, dt_id, dt_name, dt_description=None):
         """
         Add a device_technology
         @param dt_id : technology id (ie x10, plcbus, eibknx...) with no spaces / accents or special characters
