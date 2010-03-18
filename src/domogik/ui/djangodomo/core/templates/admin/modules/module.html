@@ -198,7 +198,7 @@ $(function(){
 });
 {% endblock %}
 {% block css %}
-    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-tables.css" rel="stylesheet" type="text/css" />
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-tables.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block js_include %}
 {% endblock %}

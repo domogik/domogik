@@ -1584,7 +1584,7 @@ class DbHelper():
         return False
 
     def add_user_account(self, a_login, a_password, a_person_id, a_is_admin=False,
-                         a_skin_used='skins/default'):
+                         a_skin_used=''):
         """
         Add a user account
         @param a_login : Account login
@@ -1615,7 +1615,7 @@ class DbHelper():
 
     def add_user_account_with_person(self, a_login, a_password, a_person_first_name,
                                      a_person_last_name, a_person_birthdate=None,
-                                     a_is_admin=False, a_skin_used='skins/default'):
+                                     a_is_admin=False, a_skin_used=''):
         """
         Add a user account and a person
         @param a_login : Account login

@@ -61,7 +61,7 @@
             button: "#addaccountButton",
             onok: function(values) {
                 // Submit form
-                getREST('/account/user/add/login/' + values.adduserlogin + '/password/' + values.adduserpassword + '/is_admin/' + values.adduseradmin + '/skin_used/default/first_name/' + values.adduserfirstname + '/last_name/' + values.adduserlastname,
+                getREST('/account/user/add/login/' + values.adduserlogin + '/password/' + values.adduserpassword + '/is_admin/' + values.adduseradmin + '/skin_used//first_name/' + values.adduserfirstname + '/last_name/' + values.adduserlastname,
                     function(data) {
                         var status = (data.status).toLowerCase();
                         if (status == 'ok') {
@@ -115,7 +115,7 @@
     });
 {% endblock %}
 {% block css %}
-    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-tables.css" rel="stylesheet" type="text/css" />
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-tables.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block js_include %}
 {% endblock %}
