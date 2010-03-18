@@ -184,6 +184,15 @@
     line-height:16px;
 }
 
+.icon16-text-right {
+    display:inline-block;
+    background-position: right 50%;
+    background-repeat:no-repeat;
+    min-height:16px;
+    padding-right:18px;
+    line-height:16px;
+}
+
 .icon32-text {
     display:inline-block;
     background-position: 50% left;

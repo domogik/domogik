@@ -41,7 +41,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from domogik.common import database
 from djangodomo.core.models import Areas, Rooms, Devices, DeviceUsages, DeviceTechnologies, DeviceTypes, \
-                                   DeviceActuators, UIConfigs, Modules, Accounts
+                                   DeviceActuators, UIConfigs, Plugins, Accounts
 
 from djangodomo.core.sample_data_helper import SampleDataHelper
 
@@ -447,9 +447,9 @@ def admin_organization_house(request):
         house=result_house
     )
 
-def admin_modules_module(request, module_name):
+def admin_plugins_plugin(request, plugin_name):
     """
-    Method called when the admin module command page is accessed
+    Method called when the admin plugin command page is accessed
     @param request : HTTP request
     @return an HttpResponse object
     """
@@ -459,20 +459,20 @@ def admin_modules_module(request, module_name):
     status = request.GET.get('status', '')
     msg = request.GET.get('msg', '')
     try:
-        result_module_by_name = Modules.get_by_name(module_name)
-        result_all_modules = Modules.get_all()
+        result_plugin_by_name = Plugins.get_by_name(plugin_name)
+        result_all_plugins = Plugins.get_all()
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
-    page_title = _("Module")
+    page_title = _("Plugin")
     return __go_to_page(
-        request, 'admin/modules/module.html',
+        request, 'admin/plugins/plugin.html',
         page_title,
         nav1_admin = "selected",
-        nav2_modules_module = "selected",
-        modules_list=result_all_modules.module,
+        nav2_plugins_plugin = "selected",
+        plugins_list=result_all_plugins.plugin,
         status=status,
         msg=msg,
-        module=result_module_by_name.module[0]
+        plugin=result_plugin_by_name.plugin[0]
     )
 
 def show_house(request):
