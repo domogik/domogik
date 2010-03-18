@@ -876,15 +876,13 @@ class DbHelper():
         """
         return self.__session.query(DeviceTechnology).all()
 
-    def get_device_technology_by_name(self, dt_name):
+    def get_device_technology_by_id(self, dt_id):
         """
         Return information about a device technology
-        @param dt_name : the device technology name
+        @param dt_id : the device technology id
         @return a DeviceTechnology object
         """
-        return self.__session.query(DeviceTechnology)\
-                             .filter(func.lower(DeviceTechnology.name)==self.__to_unicode(dt_name.lower()))\
-                             .first()
+        return self.__session.query(DeviceTechnology).filter_by(id=dt_id).first()
 
     def add_device_technology(self, dt_id, dt_name, dt_description):
         """

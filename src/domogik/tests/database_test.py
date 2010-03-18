@@ -747,7 +747,7 @@ class DeviceTechnologyTestCase(GenericTestCase):
 
     def test_list_and_get(self):
         dt2 = self.db.add_device_technology('1wire', '1-Wire', 'desc dt2')
-        assert self.db.get_device_technology_by_name('1-Wire').name == '1-Wire'
+        assert self.db.get_device_technology_by_id('1wire').id == '1wire'
 
     def test_del(self):
         dt1 = self.db.add_device_technology('x10', 'x10', 'desc dt1')
