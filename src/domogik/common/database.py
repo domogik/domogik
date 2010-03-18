@@ -886,16 +886,17 @@ class DbHelper():
                              .filter(func.lower(DeviceTechnology.name)==self.__to_unicode(dt_name.lower()))\
                              .first()
 
-    def add_device_technology(self, dt_name, dt_description):
+    def add_device_technology(self, dt_id, dt_name, dt_description):
         """
         Add a device_technology
+        @param dt_id : technology id (ie x10, plcbus, eibknx...) with no spaces / accents or special characters
         @param dt_name : device technology name, one of 'x10', '1wire', 'PLCBus', 'RFXCom', 'IR'
         @param dt_description : extended description of the technology
         """
         self.__session.expire_all()
         if dt_name not in DEVICE_TECHNOLOGY_LIST:
             raise ValueError, "dt_name must be one of %s" % DEVICE_TECHNOLOGY_LIST
-        dt = DeviceTechnology(name=self.__to_unicode(dt_name), description=self.__to_unicode(dt_description))
+        dt = DeviceTechnology(id=dt_id, name=self.__to_unicode(dt_name), description=self.__to_unicode(dt_description))
         self.__session.add(dt)
         try:
             self.__session.commit()

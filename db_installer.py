@@ -79,7 +79,7 @@ _db.update_system_config()
 _db.add_default_user_account()
 
 # Create device technologie features for X10
-device_technology = _db.add_device_technology(dt_name=u"x10", dt_description="x10 techno")
+device_technology = _db.add_device_technology(dt_id='x10', dt_name=u"x10", dt_description="x10 techno")
 device_type = _db.add_device_type(dty_name=u"Switch", dt_id=device_technology.id)
 _db.add_actuator_feature(af_name=u"Switch", af_value="binary", dty_id=device_type.id, af_unit=None,
                         af_configurable_states="off, on",
@@ -91,9 +91,9 @@ _db.add_actuator_feature(af_name=u"Switch", af_value="binary", dty_id=device_typ
 _db.add_actuator_feature(af_name=u"Dimmer", af_value="range", dty_id=device_type.id, af_unit="%",
                         af_configurable_states="0, 100, 10",
                         af_return_confirmation=False)
-    
+
 # Create device technologie features for PLCBus
-device_technology = _db.add_device_technology(dt_name=u"PLCBus", dt_description="plcbus techno")
+device_technology = _db.add_device_technology(dt_id='plcbus', dt_name=u"PLCBus", dt_description="plcbus techno")
 device_type = _db.add_device_type(dty_name=u"Switch", dt_id=device_technology.id)
 _db.add_actuator_feature(af_name=u"Switch", af_value="binary", dty_id=device_type.id, af_unit=None,
                         af_configurable_states="off, on",
@@ -107,16 +107,16 @@ _db.add_actuator_feature(af_name=u"Dimmer", af_value="range", dty_id=device_type
                         af_return_confirmation=True)
 
 # Create device technologie features for EIB/KNX
-_db.add_device_technology(dt_name=u"EIB/KNX", dt_description="EIB/KNX techno")
+_db.add_device_technology(dt_id='eibknx', dt_name=u"EIB/KNX", dt_description="EIB/KNX techno")
 # Create device technologie features for 1wire
-_db.add_device_technology(dt_name=u"1wire", dt_description="1-wire techno")
+_db.add_device_technology(dt_id='1wire', dt_name=u"1-Wire", dt_description="1-wire techno")
 # Create device technologie features for RFXCOM
-_db.add_device_technology(dt_name=u"RFXCom", dt_description="RFXCom techno")
+_db.add_device_technology(dt_id='rfxcom', dt_name=u"RFXCom", dt_description="RFXCom techno")
 # Create device technologie features for IR
-_db.add_device_technology(dt_name=u"IR", dt_description="IR techno")
+_db.add_device_technology(dt_id='ir', dt_name=u"IR", dt_description="IR techno")
 
 # Create device technologie features for Computer
-device_technology = _db.add_device_technology(dt_name=u"Computer", dt_description="Computer or Server hardware")
+device_technology = _db.add_device_technology(dt_id='computer', dt_name=u"Computer", dt_description="Computer or Server hardware")
 device_type = _db.add_device_type(dty_name=u"WOL", dt_id=device_technology.id)
 _db.add_actuator_feature(af_name=u"Activation", af_value="trigger", dty_id=device_type.id, af_unit=None,
                         af_configurable_states=None,

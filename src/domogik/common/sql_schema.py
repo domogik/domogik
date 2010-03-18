@@ -55,7 +55,7 @@ from sqlalchemy.orm import relation, backref
 
 from domogik.common.configloader import Loader
 
-DEVICE_TECHNOLOGY_LIST = [u'x10',u'1wire',u'PLCBus',u'RFXCom',u'IR',u'EIB/KNX', u'Computer']
+DEVICE_TECHNOLOGY_LIST = [u'x10',u'1-Wire',u'PLCBus',u'RFXCom',u'IR',u'EIB/KNX', u'Computer']
 DEVICE_TYPE_LIST = [u'appliance', u'lamp', u'music', u'sensor']
 ITEM_TYPE_LIST = [u'area', u'room', u'device']
 
@@ -222,16 +222,18 @@ class DeviceTechnology(Base):
     Technology of a device (X10, PLCBus, 1wire, RFXCOM,...)
     """
     __tablename__ = '%s_device_technology' % _db_prefix
-    id = Column(Integer, primary_key=True)
+    id = Column(String(80), primary_key=True)
     name = Column(Enum(DEVICE_TECHNOLOGY_LIST), nullable=False)
     description = Column(Unicode(255))
 
-    def __init__(self, name, description):
+    def __init__(self, id, name, description):
         """
         Class constructor
+        @param id : technology id (ie x10, plcbus, eibknx...) with no spaces / accents or special characters
         @param name : short name of the technology
         @param description : extended description
         """
+        self.id = id
         self.name = name
         self.description = description
 
