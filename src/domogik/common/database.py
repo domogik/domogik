@@ -55,7 +55,6 @@ from domogik.common.sql_schema import ActuatorFeature, Area, Device, DeviceUsage
                                       DeviceType, UIItemConfig, Room, Person, \
                                       SensorReferenceData, UserAccount, SystemConfig, \
                                       SystemStats, SystemStatsValue, Trigger
-from domogik.common.sql_schema import DEVICE_TECHNOLOGY_LIST
 
 
 class DbHelperException(Exception):
@@ -892,8 +891,6 @@ class DbHelper():
         @param dt_description : extended description of the technology
         """
         self.__session.expire_all()
-        if dt_name not in DEVICE_TECHNOLOGY_LIST:
-            raise ValueError, "dt_name must be one of %s" % DEVICE_TECHNOLOGY_LIST
         dt = DeviceTechnology(id=dt_id, name=self.__to_unicode(dt_name), description=self.__to_unicode(dt_description))
         self.__session.add(dt)
         try:

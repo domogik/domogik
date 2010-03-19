@@ -55,7 +55,6 @@ from sqlalchemy.orm import relation, backref
 
 from domogik.common.configloader import Loader
 
-DEVICE_TECHNOLOGY_LIST = [u'x10',u'1-Wire',u'PLCBus',u'RFXCom',u'IR',u'EIB/KNX', u'Computer']
 DEVICE_TYPE_LIST = [u'appliance', u'lamp', u'music', u'sensor']
 ITEM_TYPE_LIST = [u'area', u'room', u'device']
 
@@ -223,7 +222,7 @@ class DeviceTechnology(Base):
     """
     __tablename__ = '%s_device_technology' % _db_prefix
     id = Column(String(80), primary_key=True)
-    name = Column(Enum(DEVICE_TECHNOLOGY_LIST), nullable=False)
+    name = Column(Unicode(30), nullable=False)
     description = Column(Unicode(255))
 
     def __init__(self, id, name, description):
