@@ -49,7 +49,7 @@ from domogik.xpl.common.plugin import xPLPlugin, xPLResult
 from domogik.xpl.common.queryconfig import Query
 
 IS_DOMOGIK_PLUGIN = True
-DOMOGIK_PLUGIN_TECHNOLOGY = "X10"
+DOMOGIK_PLUGIN_TECHNOLOGY = "x10"
 DOMOGIK_PLUGIN_DESCRIPTION = "Manage x10 devices"
 DOMOGIK_PLUGIN_CONFIGURATION=[
       {"id" : 0,
