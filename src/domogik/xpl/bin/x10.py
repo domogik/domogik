@@ -57,10 +57,6 @@ DOMOGIK_PLUGIN_CONFIGURATION=[
        "description" : "Automatically start plugin at Domogik startup",
        "default" : "False"},
       {"id" : 1,
-       "key" : "startup-plugin",
-       "description" : "Automatically start plugin at Domogik startup",
-       "default" : "True"},
-      {"id" : 2,
        "key" : "heyu-cfg-path",
        "description" : "Heyu configuration path",
        "default" : "TODO"}]
