@@ -705,7 +705,7 @@ class ProcessRequest():
             return None
 
         mapping = xml_doc.documentElement
-        if mapping.getElementsByTagName("technology")[0].attributes.get("name").value != techno:
+        if mapping.getElementsByTagName("technology")[0].attributes.get("id").value != techno:
             self.send_http_response_error(999, "'technology' attribute must be the same as file name !", \
                                           self.jsonp, self.jsonp_cb)
             return
