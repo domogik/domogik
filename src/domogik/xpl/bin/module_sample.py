@@ -42,7 +42,7 @@ from domogik.xpl.common.plugin import xPLPlugin
 # Uncomment the next lines to let your plugin be autodetected by the manager
 #
 #IS_DOMOGIK_PLUGIN = True
-#DOMOGIK_PLUGIN_TECHNOLOGY = "RFID, X10, Communication, etc"
+#DOMOGIK_PLUGIN_TECHNOLOGY = "rfid, x10, communication, etc"
 #DOMOGIK_PLUGIN_DESCRIPTION = "My short module description"
 #DOMOGIK_PLUGIN_CONFIGURATION=[
 #      {"id" : 0,

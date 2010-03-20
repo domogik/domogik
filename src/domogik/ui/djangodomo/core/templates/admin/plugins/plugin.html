@@ -1,0 +1,222 @@
+{% extends "layout_admin.html" %}
+{% comment %}
+# Copyright 2008 Domogik project
+
+# This file is part of Domogik.
+# Domogik is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Domogik is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+
+# Author : Cédric Trévisan <cedric@domogik.org>
+{% endcomment %}
+
+
+{% load i18n %}
+{% block js_script %}
+$(function(){
+    // Accordion
+	$("#nav2").accordion({ autoHeight: false, header: ".subnav2", active:2});
+    
+    {% ifequal plugin.status "ON" %}
+        $("#buttonstatus").click(function() {
+            getREST('/module/stop/{{ plugin.name }}',
+                function(data) {
+                    var status = (data.status).toLowerCase();
+                    if (status == 'ok') {
+                        $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Plugin" %}\'' + {{ plugin.name }} + '\' {% trans "successfully stopped" %}'});
+                    } else {
+                        $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Plugin not stopped" %} (' + data.description + ')'});
+                    }
+                }
+            );
+        });
+    {% else %}
+        $("#buttonstatus").click(function() {
+            getREST('/module/start/{{ plugin.name }}',
+                function(data) {
+                    var status = (data.status).toLowerCase();
+                    if (status == 'ok') {
+                        $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Plugin" %}\'' + {{ plugin.name }} + '\' {% trans "successfully started" %}'});
+                    } else {
+                        $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Plugin not started" %} (' + data.description + ')'});
+                    }
+                }
+            );
+        });
+    {% endifequal %}
+    
+    function resetKey(key, value) {
+        $("#value_" + key).val(value);
+        $("#value_" + key).attr('class', 'medium icon16-status-warning');
+    }
+    
+    function deleteConfig(name) {
+        getREST('/plugin/config/del/' + name,
+            function(data) {
+                var status = (data.status).toLowerCase();
+                if (status == 'ok') {
+                    $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Configuration deleted" %}'});
+                } else {
+                    /* Error */
+                    display_message(data.status, data.description);
+                }
+            }
+        );
+    }
+    
+    function saveConfig(id, configuration) {
+        for each (item in configuration) {
+            var value = $('#value_' + item.key).val();
+            getREST('/base/device_technology_config/set/technology_id/' + id + '/key/' + item.key + '/value/' + value,
+                function(data) {
+                    var status = (data.status).toLowerCase();
+                    if (status == 'ok') {
+                        $('#value_' + item.key).attr('class', 'medium icon16-status-true');
+                    } else {
+                        // Error
+                        $('#value_' + item.key).attr('class', 'medium icon16-status-false');
+                        display_message(data.status, data.description);
+                    }
+                }
+            );
+        }
+    }
+
+    function registerTechnology(name, description) {
+        getREST('/base/device_technology/add/name/' + name + '/description/' + description,
+            function(data) {
+                var status = (data.status).toLowerCase();
+                if (status == 'ok') {
+                    $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Technology registered" %}'});
+                } else {
+                    // Error
+                    display_message(data.status, data.description);
+                }
+            }
+        );
+    }
+    
+    
+    var configuration = null;
+    /* Check if the module is configured */
+    getREST('/plugin/config/list/by-name/{{ plugin.name }}',
+        function(data) {
+            var status = (data.status).toLowerCase();
+            if (status == 'ok') {
+                var is_configured = (data.config.length > 0);
+                /* Get the list of configuration items */
+                getREST('/plugin/detail/{{ plugin.name }}',
+                    function(data) {
+                        var status = (data.status).toLowerCase();
+                        if (status == 'ok') {
+                            var header = $("<form><table id='configuration_items'><tr><th scope='col'>{% trans "Key" %}</th><th scope='col'>{% trans "Description" %}</th><th scope='col'>{% trans "value" %}</th><th>{% trans "Actions" %}</th></tr></table></form>");
+                            if (is_configured) {
+                                $("#configuration").append(header);
+                                /* Already configured */
+                                configuration = data.module[0].configuration;
+                                for each (item in configuration) {
+                                    getREST('/plugin/config/list/by-name/{{ plugin.name }}/by-key/' + item.key,
+                                        function(data) {
+                                            var status = (data.status).toLowerCase();
+                                            if (status == 'ok') {
+                                                if (data.config.length > 0) {
+                                                    $("#configuration_items").append("<tr><td>" +  item.key + "</td><td>" +  item.description + "</td><td><input type='text' name='value_" + item.key + "' id='value_" + item.key + "' class='medium' value='" +  data.device_technology_config[0].value + "' /></td><td><ul class='actions'><li><a href='#' id='reset" + item.key + "' class='icon16-action-reset buttonicon' title='{% trans "Reset" %} " + item.key + "'><span class='offscreen'>{% trans "Reset" %} " + item.key + "</span></a></li></ul></td></li>");                                                                            
+                                                } else {
+                                                    $("#configuration_items").append("<tr><td>" +  item.key + "</td><td>" +  item.description + "</td><td><input type='text' name='value_" + item.key + "' id='value_" + item.key + "' class='medium icon16-status-warning' title='Default value' value='" +  item.default + "' /></td><td><ul class='actions'><li><a href='#' id='reset" + item.key + "' class='icon16-action-reset buttonicon' title='{% trans "Reset" %} " + item.key + "'><span class='offscreen'>{% trans "Reset" %} " + item.key + "</span></a></li></ul></td></li>");                                                                            
+                                                }
+                                                $("#reset" + item.key).click(function(event) {
+                                                    resetKey(item.key, item.default);
+                                                });
+                                            } else {
+                                                /* Error */
+                                                display_message(data.status, data.description);
+                                            }
+                                        }
+                                    );
+                                }
+                            } else {
+                                $("#configuration").append("<p class='icon32-text icon32-status-warning'><span class='offscreen'>{% trans "Warning" %}</span>{% trans "This module has not been configured yet" %}</p>");                
+                                $("#configuration").append(header);
+                                /* Not configured */
+                                for each (item in data.module[0].configuration) {
+                                    $("#configuration_items").append("<tr><td>" +  item.key + "</td><td>" +  item.description + "</td><td><input type='text' name='value_" + item.key + "' id='value_" + item.key + "' class='medium' value='" +  item.default + "' /></td><td><ul class='actions'><li><a href='#' id='reset" + item.key + "' class='icon16-action-reset buttonicon' title='{% trans "Reset" %} " + item.key + "'><span class='offscreen'>{% trans "Reset" %} " + item.key + "</span></a></li></ul></td></li>");                
+                                    $("#reset" + item.key).click(function(event) {
+                                        resetKey(item.key, item.default);
+                                    });
+                                }
+                            }
+                            $("#configuration").append("<p><button id='configurationsubmit' class='button icon16-action-save'>{% trans "Save" %}</button></p>");
+                            $("#configurationsubmit").click(function(event) {
+                                saveConfig(technology_id, configuration);
+                            });
+                        } else {
+                            /* Error */
+                            display_message(data.status, data.description);
+                        }
+                    }
+                );
+            } else {
+                /* Error */
+                display_message(data.status, data.description);
+            }
+        }
+    );
+});
+{% endblock %}
+{% block css %}
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-tables.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+{% block js_include %}
+{% endblock %}
+{% block title %}{% trans page_title %}{% endblock %}
+
+{% block banner %}
+    <div id='configuration_data'></div>
+    <div class="section">
+        <h1 class="ident icon64-plugin-{{ plugin.name }}">
+            <span class="title">{% trans "Plugin" %} '{{ plugin.name }}'</span>
+            <br />
+            <span class="subtitle">{{ plugin.description }}</span>
+        </h1>
+        {% ifnotequal status "" %}
+        <div id='messages' class='{{status}}'>{{msg}}</div>
+        {% endifnotequal %}
+    </div>
+{% endblock %}
+
+{% block right %}
+    <div class="subsection">
+        <h2>{% trans "Basic Control" %}</h2>
+        <ul>
+            <li>{% trans "Host" %}: {{ plugin.host }}</li>
+            <li>{% trans "Technology" %}: {{ plugin.technology }}</li>
+            <li>
+            {% ifequal plugin.status "ON" %}
+                <div class='icon16-text-right icon16-status-active'>{% trans "Status" %}:<span class='offscreen'>{% trans "Running" %}</span></div>
+            {% else %}
+                <div class='icon16-text-right icon16-status-inactive'>{% trans "Status" %}:<span class='offscreen'>{% trans "Stopped" %}</span></div>                        
+            {% endifequal %}
+            </li>
+        </ul>
+        {% ifequal plugin.status "ON" %}
+            <button id='buttonstatus' class='button icon16-status-inactive'>{% trans "Stop" %}</button>
+        {% else %}
+            <button id='buttonstatus' class='button icon16-status-active'>{% trans "Start" %}</button>
+        {% endifequal %}
+    </div>
+    <div class="subsection">
+        <h2>{% trans "Configuration" %}</h2>
+        <div id='configuration'>
+            <p><button id='configurationdelete' class='button icon16-action-del'>{% trans "Delete configuration" %}</button></p>
+        </div>
+    </div>
+{% endblock %}

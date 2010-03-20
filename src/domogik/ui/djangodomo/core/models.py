@@ -228,18 +228,18 @@ class UIConfigs(pipes.DmgPipe):
                 resp[uiconfig.key] = uiconfig.value
             return resp
 
-class Modules(pipes.DmgPipe):
-    uri = "http://127.0.0.1:8080/module"
+class Plugins(pipes.DmgPipe):
+    uri = "http://127.0.0.1:8080/plugin"
 
     @staticmethod
     def get_all():
-        resp = Modules.objects.get({'parameters':"list/"})
+        resp = Plugins.objects.get({'parameters':"list/"})
         if resp :
             return resp
 
     @staticmethod
     def get_by_name(name):
-        resp = Modules.objects.get({'parameters':"list/by-name/" + name})
+        resp = Plugins.objects.get({'parameters':"list/by-name/" + name})
         if resp :
             return resp
 

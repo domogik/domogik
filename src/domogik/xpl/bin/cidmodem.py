@@ -42,7 +42,7 @@ from domogik.xpl.lib.cidmodem import CallerIdModem
 from domogik.xpl.common.queryconfig import Query
 
 IS_DOMOGIK_PLUGIN = True
-DOMOGIK_PLUGIN_TECHNOLOGY = "Communication"
+DOMOGIK_PLUGIN_TECHNOLOGY = "communication"
 DOMOGIK_PLUGIN_DESCRIPTION = "Get caller id with a modem"
 DOMOGIK_PLUGIN_CONFIGURATION=[
       {"id" : 0,
