@@ -2380,7 +2380,7 @@ target=*
         """
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("plugin")
+        json_data.set_data_type("config")
         if name == None:
             for plugin in self._db.list_all_plugin_config():
                 json_data.add_data(plugin)
@@ -2400,7 +2400,7 @@ target=*
         """
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("plugin")
+        json_data.set_data_type("config")
         try:
             plugin = self._db.set_plugin_config(self.get_parameters("name"), \
                                                 self.get_parameters("key"), \
@@ -2418,7 +2418,7 @@ target=*
         """
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("plugin")
+        json_data.set_data_type("config")
         try:
             for plugin in self._db.del_plugin_config(name):
                 json_data.add_data(plugin)
