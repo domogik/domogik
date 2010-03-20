@@ -1,3 +1,6 @@
+const close_without_change = 10000; // 10 seconds
+const close_with_change = 3000; // 3 seconds
+
 (function($) {
 	$.widget("ui.range_command", {
         _init: function() {
@@ -32,27 +35,45 @@
 			} else if (value > this.max_value) {
 				this.currentValue = this.max_value
 			}
-			
+			this.processingValue = this.currentValue;
             this.displayValue(this.currentValue);
             for each (widget in this.widgets) {
                 $(widget).range_widget('setValue', this.currentValue);
             }
         },
 
+		setProcessingValue: function(value) {
+			if (value >= this.min_value && value <= this.max_value) {
+				this.processingValue = value;
+			} else if (value < this.min_value) {
+				this.processingValue = this.min_value;
+			} else if (value > this.max_value) {
+				this.processingValue = this.max_value
+			}
+            this.displayProcessingValue(this.processingValue);
+            for each (widget in this.widgets) {
+                $(widget).range_widget('setProcessingValue', this.processingValue);
+            }
+		},
+		
+		processValue: function() {
+			this.options.action(this, this.processingValue);
+		},
+		
         displayValue: function(value) {
 
         },
-		
-		plus_range: function(event) {
-			this.currentValue = Math.floor((this.currentValue + 10) / 10) * 10;
-			this.setValue(this.currentValue);
-			event.stopPropagation();
+        displayProcessingValue: function(value) {
+
+        },		
+		plus_range: function() {
+			var value = Math.floor((this.processingValue + 10) / 10) * 10;
+			this.setProcessingValue(value);
 		},
 		
-		minus_range: function(event) {
-			this.currentValue = Math.floor((this.currentValue - 10) / 10) * 10;
-			this.setValue(this.currentValue);
-			event.stopPropagation();
+		minus_range: function() {
+			var value = Math.floor((this.processingValue - 10) / 10) * 10;
+			this.setProcessingValue(value);
 		}
     });
     
@@ -76,14 +97,22 @@
 			this.elementicon.append(this.elementvalue);				
             this.element.append(this.elementicon);
         },
-		
-		displayValue: function(value, min_value, max_value, unit) {
+
+		displayBackground: function(value, min_value, max_value) {
 			var percent_value = (value / (max_value - min_value)) * 100;
 			this.elementicon.css('-moz-background-size', '100% ' + percent_value + '%');
-			this.elementstate.text(value + unit);
 			var percent_icon = findRangeIcon(this.options.usage, percent_value);
 			this.elementvalue.addClass('range_' + percent_icon);
-        }
+        },
+		
+		displayValue: function(value, unit) {
+			this.elementstate.text(value + unit);
+			this.elementvalue.text('');
+        },
+		
+		displayProcessingValue: function(value, unit) {
+			this.elementvalue.text(value + unit);
+		}
     });
     
     $.extend($.ui.range_widget_core, {
@@ -98,45 +127,82 @@
                 usage: o.usage
             });
 			this.button_plus = $("<div class='range_plus' style='display:none'></div>");
-			this.button_plus.click(function (e) {self.options.command.plus_range(e)});
+			this.button_plus.click(function (e) {self.plus();e.stopPropagation()});
 			this.button_minus = $("<div class='range_minus' style='display:none'></div>");
-			this.button_minus.click(function (e) {self.options.command.minus_range(e)});
+			this.button_minus.click(function (e) {self.minus();e.stopPropagation()});
 			this.element.addClass('closed');
 			this.element.find('.widget_icon').append(this.button_plus)
 				.append(this.button_minus)
-				.toggle(function (e) {self.open(e)}, function (e) {self.close(e)});
+				.click(function (e) {
+						if (self.openflag) {
+							self.close();
+							self.options.command.processValue();							
+						} else {
+							self.open();							
+						}
+						e.stopPropagation();
+					});
 			this.element.keypress(function (e) {
 					switch(e.keyCode) { 
 					// User pressed "up" arrow
 					case 38:
-						self.options.command.plus_range();
+						self.plus();
 						break;
 					// User pressed "down" arrow
 					case 40:
-						self.options.command.minus_range();
+						self.minus();
 						break;
 					}
+					e.stopPropagation();
 				});
         },
 		
 		setValue: function(value) {
-            this.element.range_widget_core('displayValue', value, this.options.min_value, this.options.max_value, this.options.unit);                
+            this.element.range_widget_core('displayBackground', value, this.options.min_value, this.options.max_value);                
+            this.element.range_widget_core('displayValue', value, this.options.unit);                
+        },
+
+		setProcessingValue: function(value) {
+            this.element.range_widget_core('displayBackground', value, this.options.min_value, this.options.max_value);                
+            this.element.range_widget_core('displayProcessingValue', value, this.options.unit);                
         },
 		
-		open: function(event) {
-			this.element.removeClass('closed')
-			.addClass('opened');
-			this.button_plus.show();
-			this.button_minus.show();
-			event.stopPropagation();
+		plus: function() {
+			var self = this;
+			this.element.doTimeout( 'timeout', close_with_change, function(){
+				self.close();
+				self.options.command.processValue();
+			});
+			this.options.command.plus_range();
+		},
+
+		minus: function() {
+			var self = this;
+			this.element.doTimeout( 'timeout', close_with_change, function(){
+				self.close();
+				self.options.command.processValue();
+			});
+			this.options.command.minus_range();
 		},
 		
-		close: function(event) {
+		open: function() {
+			var self = this;
+			this.openflag = true;
+			this.element.removeClass('closed')
+				.addClass('opened');
+			this.button_plus.show();
+			this.button_minus.show();
+			this.element.doTimeout( 'timeout', close_without_change, function(){
+				self.close();
+			});
+		},
+		
+		close: function() {
+			this.openflag = false;
 			this.element.removeClass('opened')
-			.addClass('closed');
+				.addClass('closed');
 			this.button_plus.hide();
 			this.button_minus.hide();
-			event.stopPropagation();
 		}
     });
 	
