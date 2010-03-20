@@ -1344,12 +1344,13 @@ target=*
                 # wrong number of arguments
                 return False
             # specific process for False/True
-            if value == "False" or value == "false":
-                self.parameters[key] = False
-            elif value == "True" or value == "true":
-                self.parameters[key] = True
-            else:
-                self.parameters[key] = value
+            #if value == "False" or value == "false":
+            #    self.parameters[key] = False
+            #elif value == "True" or value == "true":
+            #    self.parameters[key] = True
+            #else:
+            #    self.parameters[key] = value
+            self.parameters[key] = value
             iii += 2
         # no parameters
         if iii == 0:
@@ -2096,6 +2097,10 @@ target=*
         """ /plugin processing
         """
         self._log.debug("Plugin action")
+
+        # parameters initialisation
+        self.parameters = {}
+
         if len(self.rest_request) < 1:
             self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
             return
@@ -2397,9 +2402,9 @@ target=*
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("plugin")
         try:
-            plugin = self._db.set_device_technology_config(self.get_parameters("name"), \
-                                                           self.get_parameters("key"), \
-                                                           self.get_parameters("value"))
+            plugin = self._db.set_plugin_config(self.get_parameters("name"), \
+                                                self.get_parameters("key"), \
+                                                self.get_parameters("value"))
             json_data.add_data(plugin)
         except:
             json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
@@ -2855,7 +2860,7 @@ class JSonHelper():
         # define data types
         db_type = ("ActuatorFeature", "Area", "Device", "DeviceUsage", \
                    "DeviceConfig", "DeviceStats", "DeviceStatsValue", \
-                   "DeviceTechnology", "DeviceTechnologyConfig", \
+                   "DeviceTechnology", "PluginConfig", \
                    "DeviceType", "UIItemConfig", "Room", "UserAccount", \
                    "SensorReferenceData", "Person", "SystemConfig", \
                    "SystemStats", "SystemStatsValue", "Trigger") 
