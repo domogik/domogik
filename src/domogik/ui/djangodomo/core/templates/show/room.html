@@ -80,7 +80,7 @@
                                         unit: '{{ actuator.unit }}',
                                         action: function(self, command) {
                                             alert(command);
-                                            self.setState(command);
+                                            self.setValue(command);
                                         }
                                     })
                                         .range_command('setValue', 50)
