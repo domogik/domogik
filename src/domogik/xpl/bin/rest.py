@@ -2157,11 +2157,11 @@ target=*
                     self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
                 elif len(self.rest_request) == 4:
-                    if self.rest_request[2] == "by-name-id":
-                        self._rest_plugin_config_list(technology_id=self.rest_request[3])
+                    if self.rest_request[2] == "by-name":
+                        self._rest_plugin_config_list(name=self.rest_request[3])
                 elif len(self.rest_request) == 6:
-                    if self.rest_request[2] == "by-name-id" and self.rest_request[4] == "by-key":
-                        self._rest_plugin_config_list(technology_id = self.rest_request[3], key = self.rest_request[5])
+                    if self.rest_request[2] == "by-name" and self.rest_request[4] == "by-key":
+                        self._rest_plugin_config_list(name = self.rest_request[3], key = self.rest_request[5])
                     else:
                         self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
