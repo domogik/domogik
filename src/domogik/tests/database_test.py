@@ -64,42 +64,22 @@ class GenericTestCase(unittest.TestCase):
         return found == len(item_name_list)
 
     def remove_all_areas(self, db):
-        """
-        Remove all areas
-        @param db : db API instance
-        """
         for area in db.list_areas():
             db.del_area(area.id)
 
     def remove_all_rooms(self, db):
-        """
-        Remove all rooms
-        @param db : db API instance
-        """
         for room in db.list_rooms():
             db.del_room(room.id)
 
     def remove_all_devices(self, db):
-        """
-        Remove all devices
-        @param db : db API instance
-        """
         for device in db.list_devices():
             db.del_device(device.id)
 
     def remove_all_device_usages(self, db):
-        """
-        Remove all device usages
-        @param db : db API instance
-        """
         for du in db.list_device_usages():
             db.del_device_usage(du.id, cascade_delete=True)
 
     def remove_all_device_types(self, db):
-        """
-        Remove all device types
-        @param db : db API instance
-        """
         for dty in db.list_device_types():
             db.del_device_type(dty.id, cascade_delete=True)
 
@@ -117,58 +97,30 @@ class GenericTestCase(unittest.TestCase):
             db.del_actuator_feature(af.id)
 
     def remove_all_plugin_config(self, db):
-        """
-        Remove all configurations of device technologies
-        @param db : db API instance
-        """
         for plc in db.list_all_plugin_config():
             db.del_plugin_config(plc.plugin_name)
 
     def remove_all_device_technologies(self, db):
-        """
-        Remove all device technologies
-        @param db : db API instance
-        """
         for dt in db.list_device_technologies():
             db.del_device_technology(dt.id, cascade_delete=True)
 
     def remove_all_device_stats(self, db):
-        """
-        Remove all device stats
-        @param db : db API instance
-        """
         for device in db.list_devices():
             db.del_all_device_stats(device.id)
 
     def remove_all_triggers(self, db):
-        """
-        Remove all triggers
-        @param db : db API instance
-        """
         for trigger in db.list_triggers():
             db.del_trigger(trigger.id)
 
     def remove_all_persons(self, db):
-        """
-        Remove all person accounts
-        @param db : db API instance
-        """
         for person in self.db.list_persons():
             self.db.del_person(person.id)
 
     def remove_all_user_accounts(self, db):
-        """
-        Remove all user accounts
-        @param db : db API instance
-        """
         for user in self.db.list_user_accounts():
             self.db.del_user_account(user.id)
 
     def remove_all_ui_item_config(self, db):
-        """
-        Remove all ui configuration parameters of all items (area, room, device)
-        @param db : db API instance
-        """
         for uic in db.list_all_ui_item_config():
             db.delete_ui_item_config(uic.name, uic.reference, uic.key)
 
