@@ -427,15 +427,17 @@ class DbHelper():
                              .filter(func.lower(DeviceUsage.name)==self.__to_unicode(du_name.lower()))\
                              .first()
 
-    def add_device_usage(self, du_name, du_description=None):
+    def add_device_usage(self, du_name, du_description=None, du_default_options=None):
         """
         Add a device_usage (temperature, heating, lighting, music, ...)
         @param du_name : device usage name
         @param du_description : device usage description (optional)
+        @param du_default_options : default options (optional)
         @return a DeviceUsage (the newly created one)
         """
         self.__session.expire_all()
-        du = DeviceUsage(name=self.__to_unicode(du_name), description=self.__to_unicode(du_description))
+        du = DeviceUsage(name=self.__to_unicode(du_name), description=self.__to_unicode(du_description),
+                         default_options=self.__to_unicode(du_default_options))
         self.__session.add(du)
         try:
             self.__session.commit()
@@ -444,12 +446,13 @@ class DbHelper():
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return du
 
-    def update_device_usage(self, du_id, du_name=None, du_description=None):
+    def update_device_usage(self, du_id, du_name=None, du_description=None, du_default_options=None):
         """
         Update a device usage
         @param du_id : device usage id to be updated
         @param du_name : device usage name (optional)
         @param du_description : device usage detailed description (optional)
+        @param du_default_options : default options (optional)
         @return a DeviceUsage object
         """
         self.__session.expire_all()
@@ -462,6 +465,9 @@ class DbHelper():
         if du_description is not None:
             if du_description == '': du_description = None
             device_usage.description = self.__to_unicode(du_description)
+        if du_default_options is not None:
+            if du_default_options == '': du_default_options = None
+            device_usage.default_options = self.__to_unicode(du_default_options)
         self.__session.add(device_usage)
         try:
             self.__session.commit()

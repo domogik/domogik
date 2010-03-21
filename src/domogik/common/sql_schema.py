@@ -190,22 +190,25 @@ class DeviceUsage(Base):
     id = Column(Integer, primary_key=True)
     name = Column(Unicode(30), nullable=False)
     description = Column(UnicodeText())
+    default_options = Column(UnicodeText())
 
-    def __init__(self, name, description):
+    def __init__(self, name, description, default_options):
         """
         Class constructor
         @param name : short name of the usage
         @param description : extended description
+        @param default_options : default options
         """
         self.name = name
         self.description = description
+        self.default_options = default_options
 
     def __repr__(self):
         """
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<DeviceUsage(id=%s, name='%s', desc='%s')>" % (self.id, self.name, self.description)
+        return "<DeviceUsage(id=%s, name='%s', desc='%s', default opt='%s')>" % (self.id, self.name, self.description, self.default_options)
 
     @staticmethod
     def get_tablename():

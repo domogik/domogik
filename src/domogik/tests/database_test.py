@@ -382,9 +382,11 @@ class DeviceUsageTestCase(GenericTestCase):
         assert len(self.db.list_device_usages()) == 0
 
     def test_add(self):
-        du1 = self.db.add_device_usage('du1')
+        du1 = self.db.add_device_usage(du_name='du1', du_description='desc1', du_default_options='def opt1')
         print du1
         assert du1.name == 'du1'
+        assert du1.description == 'desc1'
+        assert du1.default_options == 'def opt1'
         du2 = self.db.add_device_usage('du2')
         assert len(self.db.list_device_usages()) == 2
         assert self.has_item(self.db.list_device_usages(), ['du1', 'du2'])
@@ -392,9 +394,14 @@ class DeviceUsageTestCase(GenericTestCase):
     def test_update(self):
         du = self.db.add_device_usage('du1')
         du_u = self.db.update_device_usage(du_id=du.id, du_name='du2',
-                                           du_description='description 2')
+                                           du_description='description 2',
+                                           du_default_options='def opt2')
         assert du_u.name == 'du2'
         assert du_u.description == 'description 2'
+        assert du_u.default_options == 'def opt2'
+        du_u = self.db.update_device_usage(du_id=du.id, du_description='', du_default_options='')
+        assert du_u.description is None
+        assert du_u.default_options is None
 
     def test_list_and_get(self):
         du1 = self.db.add_device_usage('du1')
