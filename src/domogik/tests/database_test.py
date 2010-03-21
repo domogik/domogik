@@ -103,6 +103,11 @@ class GenericTestCase(unittest.TestCase):
         for dty in db.list_device_types():
             db.del_device_type(dty.id, cascade_delete=True)
 
+    def remove_all_device_config(self, db):
+        device_list = db.list_devices()
+        for device in device_list:
+            db.del_device_config(device.id)
+
     def remove_all_sensor_reference_data(self, db):
         for srd in db.list_sensor_reference_data():
             db.del_sensor_reference_data(srd.id)
@@ -999,6 +1004,79 @@ class DeviceTestCase(GenericTestCase):
             TestCase.fail(self, "Device does not exist, an exception should have been raised")
         except DbHelperException:
             pass
+
+
+class DeviceConfigTestCase(GenericTestCase):
+    """
+    Test Device config
+    """
+
+    def create_sample_device(self, device_name, device_technology_name):
+        dt = self.db.add_device_technology(device_technology_name, 'a name', 'this is my device tech')
+        du = self.db.add_device_usage("lighting")
+        dty = self.db.add_device_type(dty_name='x10 Switch',
+                                      dty_description='desc1', dt_id=dt.id)
+        area = self.db.add_area('area1','description 1')
+        room = self.db.add_room('room1', area.id)
+        device = self.db.add_device(d_name=device_name, d_address = "A1",
+                                     d_type_id = dty.id, d_usage_id = du.id, d_room_id = room.id)
+        return device
+
+    def setUp(self):
+        self.db = DbHelper(use_test_db=True)
+        self.remove_all_device_config(self.db)
+        self.remove_all_device_technologies(self.db)
+
+    def tearDown(self):
+        self.remove_all_device_config(self.db)
+        del self.db
+
+    def test_empty_list(self):
+        assert len(self.db.list_all_device_config()) == 0
+
+    def test_add(self):
+        device1 = self.create_sample_device('device1', 'dt1')
+        device2 = self.create_sample_device('device2', 'dt2')
+        device_config1_1 = self.db.set_device_config('key1_1', 'val1_1', device1.id)
+        print device_config1_1
+        assert device_config1_1.key == 'key1_1'
+        assert device_config1_1.value == 'val1_1'
+        device_config2_1 = self.db.set_device_config('key2_1', 'val2_1', device1.id)
+        device_config3_1 = self.db.set_device_config('key3_1', 'val3_1', device1.id)
+        device_config1_2 = self.db.set_device_config('key1_2', 'val1_2', device2.id)
+        device_config2_2 = self.db.set_device_config('key2_2', 'val2_2', device2.id)
+        assert len(self.db.list_device_config(device1.id)) == 3
+        assert len(self.db.list_device_config(device2.id)) == 2
+
+    def test_update(self):
+        device1 = self.create_sample_device('device1', 'dt1')
+        device_config1_1 = self.db.set_device_config('key1_1', 'val1_1', device1.id)
+        device_config1_1 = self.db.set_device_config('key1_1', 'val1_1_u', device1.id)
+        assert device_config1_1.value == 'val1_1_u'
+
+    def test_get(self):
+        device1 = self.create_sample_device('device1', 'dt1')
+        device2 = self.create_sample_device('device2', 'dt2')
+        device_config1_1 = self.db.set_device_config('key1_1', 'val1_1', device1.id)
+        device_config2_1 = self.db.set_device_config('key2_1', 'val2_1', device1.id)
+        device_config3_1 = self.db.set_device_config('key3_1', 'val3_1', device1.id)
+        device_config1_2 = self.db.set_device_config('key1_2', 'val1_2', device2.id)
+        device_config2_2 = self.db.set_device_config('key2_2', 'val2_2', device2.id)
+        assert self.db.get_device_config_by_key('key3_1', device1.id).value == 'val3_1'
+        assert self.db.get_device_config_by_key('key1_2', device2.id).value == 'val1_2'
+
+    def test_del(self):
+        device1 = self.create_sample_device('device1', 'dt1')
+        device2 = self.create_sample_device('device2', 'dt2')
+        device_config1_1 = self.db.set_device_config('key1_1', 'val1_1', device1.id)
+        device_config2_1 = self.db.set_device_config('key2_1', 'val2_1', device1.id)
+        device_config3_1 = self.db.set_device_config('key3_1', 'val3_1', device1.id)
+        device_config1_2 = self.db.set_device_config('key1_2', 'val1_2', device2.id)
+        device_config2_2 = self.db.set_device_config('key2_2', 'val2_2', device2.id)
+        assert len(self.db.del_device_config(device1.id)) == 3
+        assert len(self.db.list_all_device_config()) == 2
+        assert len(self.db.del_device_config(device2.id)) == 2
+        assert len(self.db.list_all_device_config()) == 0
 
 
 class DeviceStatsTestCase(GenericTestCase):

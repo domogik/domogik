@@ -512,31 +512,29 @@ class DeviceConfig(Base):
     Device configuration
     """
     __tablename__ = '%s_device_config' % _db_prefix
-    id = Column(Integer, primary_key=True)
-    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()),
-                       nullable=False)
-    device = relation(Device, backref=backref(__tablename__))
-    key = Column(Unicode(30), nullable=False)
+    key = Column(String(30), primary_key=True)
     value = Column(Unicode(255), nullable=False)
-    description = Column(UnicodeText(), nullable=True)
+    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()),
+                       primary_key=True)
+    device = relation(Device, backref=backref(__tablename__))
 
-    def __init__(self, device_id, key, value):
+    def __init__(self, key, device_id, value):
         """
         Class constructor
-        @param device_id : device id
         @param key : configuration item
         @param value : configuration value
+        @param device_id : device id
         """
-        self.device_id = device_id
         self.key = key
         self.value = value
+        self.device_id = device_id
 
     def __repr__(self):
         """
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<DeviceConfig(id=%s, device=%s, ('%s', '%s'))>" % (self.id, self.device, self.key, self.value)
+        return "<DeviceConfig(('%s', '%s'), device=%s)>" % (self.key, self.value, self.device)
 
     @staticmethod
     def get_tablename():

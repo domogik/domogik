@@ -1274,6 +1274,77 @@ class DbHelper():
         return device_d
 
 ####
+# Device config
+####
+    def list_all_device_config(self):
+        """
+        List all device config parameters
+        @return A list of DeviceConfig objects
+        """
+        return self.__session.query(DeviceConfig).all()
+
+    def list_device_config(self, dc_device_id):
+        """
+        List all config keys of a device
+        @param dc_device_id : device id
+        @return A list of DeviceConfig objects
+        """
+        return self.__session.query(DeviceConfig).filter_by(device_id=dc_device_id).all()
+
+    def get_device_config_by_key(self, dc_key, dc_device_id):
+        """
+        Get a key of a device configuration
+        @param dc_key : key name
+        @param dc_device_id : device id
+        @return A DeviceConfig object
+        """
+        return self.__session.query(DeviceConfig).filter_by(key=dc_key, device_id=dc_device_id).first()
+
+
+    def set_device_config(self, dc_key, dc_value, dc_device_id):
+        """
+        Add / update an device config key
+        @param dc_key : key name
+        @param dc_value : associated value
+        @param dc_device_id : device id
+        @return : the added/updated DeviceConfig object
+        """
+        self.__session.expire_all()
+        device_config = self.__session.query(DeviceConfig).filter_by(key=dc_key, device_id=dc_device_id).first()
+        if device_config is None:
+            device_config = DeviceConfig(key=dc_key, value=self.__to_unicode(dc_value), device_id=dc_device_id)
+        else:
+            device_config.value = self.__to_unicode(dc_value)
+        self.__session.add(device_config)
+        try:
+            self.__session.commit()
+        except Exception, sql_exception:
+            self.__session.rollback()
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
+        return device_config
+
+    def del_device_config(self, dc_device_id):
+        """
+        Delete a device configuration key
+        @param dc_device_id : device id
+        @return The DeviceConfig object which was deleted
+        """
+        self.__session.expire_all()
+        dc_list = self.__session.query(DeviceConfig).filter_by(device_id=dc_device_id).all()
+        if dc_list is None:
+            raise DbHelperException("Couldnt delete device config for device id %s : it doesn't exist" % dc_device_id)
+        dc_list_d = []
+        for device_config in dc_list:
+            dc_list_d.append(device_config)
+            self.__session.delete(device_config)
+        try:
+            self.__session.commit()
+        except Exception, sql_exception:
+            self.__session.rollback()
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
+        return dc_list_d
+
+####
 # Device stats
 ####
     def list_device_stats(self, d_device_id):
