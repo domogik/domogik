@@ -40,7 +40,7 @@ from django.template import RequestContext
 from django.utils.translation import ugettext_lazy as _
 
 from domogik.common import database
-from djangodomo.core.models import Areas, Rooms, Devices, DeviceUsages, DeviceTechnologies, DeviceTypes, \
+from djangodomo.core.models import REST, Areas, Rooms, Devices, DeviceUsages, DeviceTechnologies, DeviceTypes, \
                                    DeviceActuators, UIConfigs, Plugins, Accounts
 
 from djangodomo.core.sample_data_helper import SampleDataHelper
@@ -51,6 +51,27 @@ from django_pipes.exceptions import ResourceNotAvailableException
 __ADMIN_MANAGEMENT_DOMOGIK = 'admin/management/domogik.html'
 __db = database.DbHelper()
 
+def __go_to_page(request, html_page, page_title, **attribute_list):
+    """
+    Common method called to go to an html page
+    @param request : HTTP request
+    @param html_page : the page to go to
+    @param page_title : page title
+    @param **attribute_list : list of attributes (dictionnary) that need to be
+           put in the HTTP response
+    @return an HttpResponse object
+    """
+    response_attr_list = {}
+    response_attr_list['rest_ip'] = REST.getIP()
+    response_attr_list['rest_port'] = REST.getPort()
+    response_attr_list['page_title'] = page_title
+    response_attr_list['sys_config'] = __db.get_system_config()
+    response_attr_list['is_user_connected'] = __is_user_connected(request)
+    for attribute in attribute_list:
+        response_attr_list[attribute] = attribute_list[attribute]
+    return render_to_response(html_page, response_attr_list,
+                              context_instance=RequestContext(request))
+    
 def index(request):
     """
     Method called when the main page is accessed
@@ -242,25 +263,6 @@ def clear_data(request):
     sample_data_helper.remove()
     return __go_to_page(request, __ADMIN_MANAGEMENT_DOMOGIK, page_title,
                         action=action)
-
-def __go_to_page(request, html_page, page_title, **attribute_list):
-    """
-    Common method called to go to an html page
-    @param request : HTTP request
-    @param html_page : the page to go to
-    @param page_title : page title
-    @param **attribute_list : list of attributes (dictionnary) that need to be
-           put in the HTTP response
-    @return an HttpResponse object
-    """
-    response_attr_list = {}
-    response_attr_list['page_title'] = page_title
-    response_attr_list['sys_config'] = __db.get_system_config()
-    response_attr_list['is_user_connected'] = __is_user_connected(request)
-    for attribute in attribute_list:
-        response_attr_list[attribute] = attribute_list[attribute]
-    return render_to_response(html_page, response_attr_list,
-                              context_instance=RequestContext(request))
 
 def __get_user_connected(request):
     """

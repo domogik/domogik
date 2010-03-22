@@ -59,7 +59,9 @@ const close_with_change = 3000; // 3 seconds
 		},
 		
 		processValue: function() {
-			this.options.action(this, this.processingValue);
+			if (this.processingValue != this.currentValue) { // If the value was changed
+				this.options.action(this, this.processingValue);				
+			}
 		},
 		
         displayValue: function(value) {
