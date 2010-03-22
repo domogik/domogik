@@ -26,15 +26,16 @@
         },
         
         setState: function(state) {
+            var self = this;
             if (state == 1 || state.toLowerCase() == this.states[1]) {
                 this.currentState = 1;
             } else {
                 this.currentState = 0;
             }
             this.displayState(this.currentState);
-            for each (widget in this.widgets) {
-                $(widget).binary_widget('setState', this.currentState);
-            }
+            $.each(this.widgets, function(index, value) {
+                $(value).binary_widget('setState', self.currentState);
+            });
         },
         
         displayState: function(state) {

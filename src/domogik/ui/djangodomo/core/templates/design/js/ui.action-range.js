@@ -28,6 +28,7 @@ const close_with_change = 3000; // 3 seconds
         },
 		
 		setValue: function(value) {
+			var self = this;
 			if (value >= this.min_value && value <= this.max_value) {
 				this.currentValue = value;
 			} else if (value < this.min_value) {
@@ -37,12 +38,13 @@ const close_with_change = 3000; // 3 seconds
 			}
 			this.processingValue = this.currentValue;
             this.displayValue(this.currentValue);
-            for each (widget in this.widgets) {
-                $(widget).range_widget('setValue', this.currentValue);
-            }
+			$.each(this.widgets, function(index, value) {
+                $(value).range_widget('setValue', self.currentValue);
+            });
         },
 
 		setProcessingValue: function(value) {
+			var self = this;
 			if (value >= this.min_value && value <= this.max_value) {
 				this.processingValue = value;
 			} else if (value < this.min_value) {
@@ -51,9 +53,9 @@ const close_with_change = 3000; // 3 seconds
 				this.processingValue = this.max_value
 			}
             this.displayProcessingValue(this.processingValue);
-            for each (widget in this.widgets) {
-                $(widget).range_widget('setProcessingValue', this.processingValue);
-            }
+			$.each(this.widgets, function(index, value) {
+                $(value).range_widget('setProcessingValue', self.processingValue);
+            });
 		},
 		
 		processValue: function() {
@@ -110,6 +112,7 @@ const close_with_change = 3000; // 3 seconds
 		displayBackground: function(value, min_value, max_value) {
 			var percent_value = (value / (max_value - min_value)) * 100;
 			this.elementicon.css('-moz-background-size', '100% ' + percent_value + '%');
+			this.elementicon.css('-webkit-background-size', '100% ' + percent_value + '%');
 			var percent_icon = findRangeIcon(this.options.usage, percent_value);
 			this.elementvalue.addClass('range_' + percent_icon);
         },
