@@ -74,8 +74,17 @@ const close_with_change = 3000; // 3 seconds
 		minus_range: function() {
 			var value = Math.floor((this.processingValue - 10) / 10) * 10;
 			this.setProcessingValue(value);
+		},
+		
+		max_range: function() {
+			this.setProcessingValue(this.max_value);
+		},
+		
+		min_range: function() {
+			this.setProcessingValue(this.min_value);
 		}
-    });
+		
+	});
     
     $.extend($.ui.range_command, {
         defaults: {
@@ -130,9 +139,15 @@ const close_with_change = 3000; // 3 seconds
 			this.button_plus.click(function (e) {self.plus();e.stopPropagation()});
 			this.button_minus = $("<div class='range_minus' style='display:none'></div>");
 			this.button_minus.click(function (e) {self.minus();e.stopPropagation()});
+			this.button_max = $("<div class='range_max' style='display:none'></div>");
+			this.button_max.click(function (e) {self.max();e.stopPropagation()});
+			this.button_min = $("<div class='range_min' style='display:none'></div>");
+			this.button_min.click(function (e) {self.min();e.stopPropagation()});
 			this.element.addClass('closed');
 			this.element.find('.widget_icon').append(this.button_plus)
 				.append(this.button_minus)
+				.append(this.button_max)
+				.append(this.button_min)
 				.click(function (e) {
 						if (self.openflag) {
 							self.close();
@@ -144,6 +159,14 @@ const close_with_change = 3000; // 3 seconds
 					});
 			this.element.keypress(function (e) {
 					switch(e.keyCode) { 
+					// User pressed "home" key
+					case 36:
+						self.max();
+						break;
+					// User pressed "end" key
+					case 35:
+						self.min();
+						break;
 					// User pressed "up" arrow
 					case 38:
 						self.plus();
@@ -168,21 +191,31 @@ const close_with_change = 3000; // 3 seconds
         },
 		
 		plus: function() {
-			var self = this;
-			this.element.doTimeout( 'timeout', close_with_change, function(){
-				self.close();
-				self.options.command.processValue();
-			});
+			this.resetAutoClose();
 			this.options.command.plus_range();
 		},
 
 		minus: function() {
+			this.resetAutoClose();
+			this.options.command.minus_range();
+		},
+		
+		max: function() {
+			this.resetAutoClose();
+			this.options.command.max_range();
+		},
+		
+		min: function() {
+			this.resetAutoClose();
+			this.options.command.min_range();
+		},
+		
+		resetAutoClose: function() {
 			var self = this;
 			this.element.doTimeout( 'timeout', close_with_change, function(){
 				self.close();
 				self.options.command.processValue();
-			});
-			this.options.command.minus_range();
+			});	
 		},
 		
 		open: function() {
@@ -192,6 +225,8 @@ const close_with_change = 3000; // 3 seconds
 				.addClass('opened');
 			this.button_plus.show();
 			this.button_minus.show();
+			this.button_max.show();
+			this.button_min.show();
 			this.element.doTimeout( 'timeout', close_without_change, function(){
 				self.close();
 			});
@@ -203,6 +238,8 @@ const close_with_change = 3000; // 3 seconds
 				.addClass('closed');
 			this.button_plus.hide();
 			this.button_minus.hide();
+			this.button_max.hide();
+			this.button_min.hide();
 		}
     });
 	
