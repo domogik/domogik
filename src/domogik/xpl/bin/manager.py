@@ -508,7 +508,6 @@ class SysManager(xPLPlugin):
         mess.set_type('xpl-trig')
         mess.set_schema('domogik.system')
         mess.add_data({'command' :  'detail'})
-        print "plg=%s" % plg
         for component in self._components:
             if component["name"] == plg:
                 plg_content = "%s,%s,%s,%s" % (component["name"],
@@ -523,7 +522,6 @@ class SysManager(xPLPlugin):
         mess.add_data({'plugin' :  plg_content})
         mess.add_data({'host' : gethostname()})
 
-        print mess
         self._myxpl.send(mess)
 
 
