@@ -113,13 +113,23 @@ const close_with_change = 3000; // 3 seconds
 			var percent_value = (value / (max_value - min_value)) * 100;
 			this.elementicon.css('-moz-background-size', '100% ' + percent_value + '%');
 			this.elementicon.css('-webkit-background-size', '100% ' + percent_value + '%');
+        },
+
+		displayRangeIcon: function(value, min_value, max_value) {
+			var percent_value = (value / (max_value - min_value)) * 100;
 			var percent_icon = findRangeIcon(this.options.usage, percent_value);
+			if (this.previousIcon) {
+				this.elementvalue.removeClass(this.previousIcon);				
+			}
 			this.elementvalue.addClass('range_' + percent_icon);
+			this.previousIcon = 'range_' + percent_icon;
         },
 		
 		displayValue: function(value, unit) {
 			this.elementstate.text(value + unit);
 			this.elementvalue.text('');
+			this.elementicon.css('-moz-background-size', '0');
+			this.elementicon.css('-webkit-background-size', '0');
         },
 		
 		displayProcessingValue: function(value, unit) {
@@ -184,7 +194,7 @@ const close_with_change = 3000; // 3 seconds
         },
 		
 		setValue: function(value) {
-            this.element.range_widget_core('displayBackground', value, this.options.min_value, this.options.max_value);                
+            this.element.range_widget_core('displayRangeIcon', value, this.options.min_value, this.options.max_value);                
             this.element.range_widget_core('displayValue', value, this.options.unit);                
         },
 
@@ -230,6 +240,7 @@ const close_with_change = 3000; // 3 seconds
 			this.button_minus.show();
 			this.button_max.show();
 			this.button_min.show();
+			this.setProcessingValue(this.options.command.currentValue);
 			this.element.doTimeout( 'timeout', close_without_change, function(){
 				self.close();
 			});
