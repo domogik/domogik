@@ -1234,8 +1234,8 @@ target=*
                     self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
                 else:
-                    if self.rest_request[2] == "by-name":
-                        self._rest_base_device_technology_list(name=self.rest_request[3])
+                    if self.rest_request[2] == "by-id":
+                        self._rest_base_device_technology_list(id=self.rest_request[3])
                     else:
                         self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
@@ -1930,18 +1930,18 @@ target=*
 # /base/device_technology processing
 ######
 
-    def _rest_base_device_technology_list(self, name = None):
+    def _rest_base_device_technology_list(self, id = None):
         """ list device technologies
             @param name : device technology name
         """
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("device_technology")
-        if name == None:
+        if id == None:
             for device_technology in self._db.list_device_technologies():
                 json_data.add_data(device_technology)
         else:
-            device_technology = self._db.get_device_technology_by_name(name)
+            device_technology = self._db.get_device_technology_by_id(id)
             if device_technology is not None:
                 json_data.add_data(device_technology)
         self.send_http_response_ok(json_data.get())
