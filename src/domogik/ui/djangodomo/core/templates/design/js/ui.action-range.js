@@ -12,6 +12,38 @@ const close_with_change = 3000; // 3 seconds
             this.widgets = new Array();
             this.element.addClass('command_range')
                 .addClass('icon32-state-' + o.usage);
+				
+			var ul = $("<ul></ul>");
+            var limin = $("<li></li>");
+            var amin = $("<button class='buttontext capitalletter'>Min</button>");
+            amin.click(function() {
+//                    self.runAction(0);
+                });
+            var limax = $("<li></li>");
+            var amax = $("<button class='buttontext capitalletter'>Max</button>");
+            amax.click(function() {
+//                    self.runAction(1);
+                });
+            limin.append(amin);
+            limax.append(amax);
+            ul.append(limin);
+            ul.append(limax);
+            this.element.append(ul);
+			var id = this.element.attr('id');
+			this.element.append("<label id='" + id + "_label' for='" + id + "_input'>Dim</label>");
+			this.sliderInput = $("<input id='" + id + "_input' type='text' maxlength='3' class='' />");
+			this.element.append(this.sliderInput);
+			this.slider = $("<div id='" + id + "_slider'></div>");
+			this.element.append(this.slider);
+
+			this.slider.slider({
+				range: "min",
+				min: this.min_value,
+				max: this.max_value,
+				slide: function(event, ui) {
+					self.setProcessingValue(ui.value);
+				}
+			});
         },
                 
         registerWidget: function(id) {
@@ -24,7 +56,7 @@ const close_with_change = 3000; // 3 seconds
 				steps: this.steps,
 				unit: this.options.unit
             })
-			.range_widget('setValue', this.currentValue);
+			.range_widget('displayValue', this.currentValue, this.currentIcon, null);
         },
 		
 		setValue: function(value) {
@@ -37,10 +69,14 @@ const close_with_change = 3000; // 3 seconds
 				this.currentValue = this.max_value
 			}
 			this.processingValue = this.currentValue;
-            this.displayValue(this.currentValue);
+			var percent = (this.currentValue / (this.max_value - this.min_value)) * 100;
+			var icon = 'range_' + findRangeIcon(this.options.usage, percent);
+
+            this.displayValue(this.currentValue, icon, this.currentIcon);
 			$.each(this.widgets, function(index, value) {
-                $(value).range_widget('setValue', self.currentValue);
+                $(value).range_widget('displayValue', self.currentValue, icon, this.currentIcon);
             });
+			this.currentIcon = icon;
         },
 
 		setProcessingValue: function(value) {
@@ -52,9 +88,11 @@ const close_with_change = 3000; // 3 seconds
 			} else if (value > this.max_value) {
 				this.processingValue = this.max_value
 			}
-            this.displayProcessingValue(this.processingValue);
+			var percent = (this.processingValue / (this.max_value - this.min_value)) * 100;
+
+            this.displayProcessingValue(this.processingValue, percent);
 			$.each(this.widgets, function(index, value) {
-                $(value).range_widget('setProcessingValue', self.processingValue);
+                $(value).range_widget('displayProcessingValue', self.processingValue, percent);
             });
 		},
 		
@@ -64,12 +102,28 @@ const close_with_change = 3000; // 3 seconds
 			}
 		},
 		
-        displayValue: function(value) {
-
+		displayRangeIcon: function(newIcon, previousIcon) {
+			if (this.previousIcon) {
+				this.element.removeClass(this.previousIcon);				
+			}
+			this.element.addClass(newIcon);
         },
-        displayProcessingValue: function(value) {
-
-        },		
+		
+        displayValue: function(value, newIcon, previousIcon) {
+            this.displayRangeIcon(newIcon, previousIcon);
+			this.sliderInput.val(value);
+			if (this.slider.slider( "option", "value") != value ) {
+				this.slider.slider( "option", "value", value );				
+			}
+        },
+		
+        displayProcessingValue: function(value, percent) {
+			this.sliderInput.val(value);
+			if (this.slider.slider( "option", "value") != value ) {
+				this.slider.slider( "option", "value", value );				
+			}
+        },
+		
 		plus_range: function() {
 			var value = Math.floor((this.processingValue + 10) / 10) * 10;
 			this.setProcessingValue(value);
@@ -111,20 +165,16 @@ const close_with_change = 3000; // 3 seconds
             this.element.append(this.elementicon);
         },
 
-		displayBackground: function(value, min_value, max_value) {
-			var percent_value = (value / (max_value - min_value)) * 100;
-			this.elementicon.css('-moz-background-size', '100% ' + percent_value + '%');
-			this.elementicon.css('-webkit-background-size', '100% ' + percent_value + '%');
+		displayBackground: function(percent) {
+			this.elementicon.css('-moz-background-size', '100% ' + percent + '%');
+			this.elementicon.css('-webkit-background-size', '100% ' + percent + '%');
         },
 
-		displayRangeIcon: function(value, min_value, max_value) {
-			var percent_value = (value / (max_value - min_value)) * 100;
-			var percent_icon = findRangeIcon(this.options.usage, percent_value);
+		displayRangeIcon: function(newIcon, previousIcon) {
 			if (this.previousIcon) {
 				this.elementvalue.removeClass(this.previousIcon);				
 			}
-			this.elementvalue.addClass('range_' + percent_icon);
-			this.previousIcon = 'range_' + percent_icon;
+			this.elementvalue.addClass(newIcon);
         },
 		
 		displayValue: function(value, unit) {
@@ -195,13 +245,13 @@ const close_with_change = 3000; // 3 seconds
 				});
         },
 		
-		setValue: function(value) {
-            this.element.range_widget_core('displayRangeIcon', value, this.options.min_value, this.options.max_value);                
+		displayValue: function(value, newIcon, previousIcon) {
+            this.element.range_widget_core('displayRangeIcon', newIcon, previousIcon);                
             this.element.range_widget_core('displayValue', value, this.options.unit);                
         },
 
-		setProcessingValue: function(value) {
-            this.element.range_widget_core('displayBackground', value, this.options.min_value, this.options.max_value);                
+		displayProcessingValue: function(value, percent) {
+            this.element.range_widget_core('displayBackground', percent);
             this.element.range_widget_core('displayProcessingValue', value, this.options.unit);                
         },
 		
@@ -242,7 +292,7 @@ const close_with_change = 3000; // 3 seconds
 			this.button_minus.show();
 			this.button_max.show();
 			this.button_min.show();
-			this.setProcessingValue(this.options.command.currentValue);
+			this.displayProcessingValue(this.options.command.currentValue);
 			this.element.doTimeout( 'timeout', close_without_change, function(){
 				self.close();
 			});

@@ -21,12 +21,17 @@
 
 {% load i18n %}
 {% block js_script %}
+// <![CDATA[
+// ]]>
 {% endblock %}
 
 {% block css %}
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.slider.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 
 {% block js_include %}
+    <script type="text/javascript" src="/design/js/tpg.utilities.js"></script>
+    <script type="text/javascript" src="/design/js/tpg.slider.js"></script>
 {% endblock %}
 
 {% block title %}{% trans page_title %}{% endblock %}
