@@ -1,5 +1,21 @@
 /* Slider
 ----------------------------------*/
+.ui-slider-input {
+    color: #333333;
+    margin-left:1em;
+    width:3em;
+    border:none;
+}
+
+.ui-slider-value {
+    border: 1px solid #cccccc;
+	-moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    margin:auto;
+    width: 10em;
+    text-align: center;
+}
+
 .ui-slider {
     position: relative;
     text-align: left;

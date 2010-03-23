@@ -7,6 +7,7 @@
             this.widgets = new Array();
             this.element.addClass('command_binary')
                 .addClass('icon32-state-' + o.usage);
+            this.name = this.element.find('.name').text();
             var ul = $("<ul></ul>");
             var li0 = $("<li></li>");
             var a0 = $("<button class='buttontext capitalletter'>" + this.states[0] + "</button>");
@@ -39,6 +40,7 @@
         },
         
         displayState: function(state) {
+            this.element.find('.name').text(this.name + ' - ' + this.states[state]);
             if (state == 1) {
                 this.element.addClass('binary_1');                
                 this.element.removeClass('binary_0');                                
@@ -135,26 +137,3 @@
     });
     
 })(jQuery);
-
-/*
-function process_binary(function_id, force) {
-    $('#widgetmini_' + function_id).addClass('processing_state');
-    $('#widget_' + function_id).addClass('processing_state');
-    var status = (force == null) ? 1 : force; 
-    setTimeout("feedback_binary(" + function_id + ", " + status + ")",3000);
-}
-
-function feedback_binary(function_id, status) {
-    var widgetmini_id = 'widgetmini_' + function_id;
-    var widget_id = 'widget_' + function_id;
-    var oldstatus = (status == 0) ? 1 : 0 ;
-    $('#' + widgetmini_id).removeClass('processing_state')
-        .addClass('ok_state')
-        .removeClass('binary_' + oldstatus)
-        .addClass('binary_' + status);
-    $('#' + widget_id).removeClass('processing_state')
-        .addClass('ok_state')
-        .removeClass('binary_' + oldstatus)
-        .addClass('binary_' + status);
-}
-*/

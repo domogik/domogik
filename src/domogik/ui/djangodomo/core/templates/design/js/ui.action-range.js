@@ -12,17 +12,19 @@ const close_with_change = 3000; // 3 seconds
             this.widgets = new Array();
             this.element.addClass('command_range')
                 .addClass('icon32-state-' + o.usage);
-				
+			this.name = this.element.find('.name').text();
 			var ul = $("<ul></ul>");
             var limin = $("<li></li>");
             var amin = $("<button class='buttontext capitalletter'>Min</button>");
             amin.click(function() {
-//                    self.runAction(0);
+                    self.min_range();
+					self.processValue();
                 });
             var limax = $("<li></li>");
             var amax = $("<button class='buttontext capitalletter'>Max</button>");
             amax.click(function() {
-//                    self.runAction(1);
+                    self.max_range();
+					self.processValue();
                 });
             limin.append(amin);
             limax.append(amax);
@@ -30,9 +32,11 @@ const close_with_change = 3000; // 3 seconds
             ul.append(limax);
             this.element.append(ul);
 			var id = this.element.attr('id');
-			this.element.append("<label id='" + id + "_label' for='" + id + "_input'>Dim</label>");
-			this.sliderInput = $("<input id='" + id + "_input' type='text' maxlength='3' class='' />");
-			this.element.append(this.sliderInput);
+			var divValue = $("<div class='ui-slider-value'/>");
+			divValue.append("<label id='" + id + "_label' for='" + id + "_input'>Dim:</label>");
+			this.sliderInput = $("<input id='" + id + "_input' type='text' maxlength='3' class='ui-slider-input' />");
+			divValue.append(this.sliderInput);
+			this.element.append(divValue);	
 			this.slider = $("<div id='" + id + "_slider'></div>");
 			this.element.append(this.slider);
 
@@ -40,9 +44,14 @@ const close_with_change = 3000; // 3 seconds
 				range: "min",
 				min: this.min_value,
 				max: this.max_value,
+//				step: this.steps, //bug
 				slide: function(event, ui) {
 					self.setProcessingValue(ui.value);
+				},
+				stop: function(event, ui) {
+					self.resetAutoClose();
 				}
+
 			});
         },
                 
@@ -103,15 +112,16 @@ const close_with_change = 3000; // 3 seconds
 		},
 		
 		displayRangeIcon: function(newIcon, previousIcon) {
-			if (this.previousIcon) {
-				this.element.removeClass(this.previousIcon);				
+			if (previousIcon) {
+				this.element.removeClass(previousIcon);				
 			}
 			this.element.addClass(newIcon);
         },
 		
         displayValue: function(value, newIcon, previousIcon) {
+			var self = this, o = this.options;
             this.displayRangeIcon(newIcon, previousIcon);
-			this.sliderInput.val(value);
+			this.element.find('.name').text(this.name + ' - ' + value + o.unit)
 			if (this.slider.slider( "option", "value") != value ) {
 				this.slider.slider( "option", "value", value );				
 			}
@@ -125,12 +135,12 @@ const close_with_change = 3000; // 3 seconds
         },
 		
 		plus_range: function() {
-			var value = Math.floor((this.processingValue + 10) / 10) * 10;
+			var value = Math.floor((this.processingValue + this.steps) / this.steps) * this.steps;
 			this.setProcessingValue(value);
 		},
 		
 		minus_range: function() {
-			var value = Math.floor((this.processingValue - 10) / 10) * 10;
+			var value = Math.floor((this.processingValue - this.steps) / this.steps) * this.steps;
 			this.setProcessingValue(value);
 		},
 		
@@ -140,6 +150,16 @@ const close_with_change = 3000; // 3 seconds
 		
 		min_range: function() {
 			this.setProcessingValue(this.min_value);
+		},
+		
+		resetAutoClose: function() {
+			var self = this;
+			this.element.doTimeout( 'timeout', close_with_change, function(){
+				$.each(self.widgets, function(index, value) {
+					$(value).range_widget('close');
+				});
+				self.processValue();
+			});	
 		}
 		
 	});
@@ -171,8 +191,8 @@ const close_with_change = 3000; // 3 seconds
         },
 
 		displayRangeIcon: function(newIcon, previousIcon) {
-			if (this.previousIcon) {
-				this.elementvalue.removeClass(this.previousIcon);				
+			if (previousIcon) {
+				this.elementvalue.removeClass(previousIcon);				
 			}
 			this.elementvalue.addClass(newIcon);
         },
@@ -256,31 +276,23 @@ const close_with_change = 3000; // 3 seconds
         },
 		
 		plus: function() {
-			this.resetAutoClose();
+			this.options.command.resetAutoClose();
 			this.options.command.plus_range();
 		},
 
 		minus: function() {
-			this.resetAutoClose();
+			this.options.command.resetAutoClose();
 			this.options.command.minus_range();
 		},
 		
 		max: function() {
-			this.resetAutoClose();
+			this.options.command.resetAutoClose();
 			this.options.command.max_range();
 		},
 		
 		min: function() {
-			this.resetAutoClose();
+			this.options.command.resetAutoClose();
 			this.options.command.min_range();
-		},
-		
-		resetAutoClose: function() {
-			var self = this;
-			this.element.doTimeout( 'timeout', close_with_change, function(){
-				self.close();
-				self.options.command.processValue();
-			});	
 		},
 		
 		open: function() {
