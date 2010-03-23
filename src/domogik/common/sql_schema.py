@@ -55,8 +55,8 @@ from sqlalchemy.orm import relation, backref
 
 from domogik.common.configloader import Loader
 
-DEVICE_TYPE_LIST = [u'appliance', u'lamp', u'music', u'sensor']
-ITEM_TYPE_LIST = [u'area', u'room', u'device']
+DEVICE_TYPE_LIST = ['appliance', 'lamp', 'music', 'sensor']
+ITEM_TYPE_LIST = ['area', 'room', 'device']
 
 Base = declarative_base()
 metadata = Base.metadata
