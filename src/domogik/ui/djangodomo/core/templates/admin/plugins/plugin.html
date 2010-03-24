@@ -75,7 +75,13 @@ $(function(){
     
     function saveConfig(name, configuration) {
         for each (item in configuration) {
-            var value = $('#value_' + item.key).val();
+            var value = null;
+            if (item.key == 'startup-plugin') {
+                value = ($('#value_' + item.key + ':checked').length > 0)? 'True':'False';
+            } else {
+                value = $('#value_' + item.key).val();
+            
+            }
             getREST('/plugin/config/set/name/' + name + '/key/' + item.key + '/value/' + value,
                 function(data) {
                     var status = (data.status).toLowerCase();
@@ -118,9 +124,20 @@ $(function(){
                                             var status = (data.status).toLowerCase();
                                             if (status == 'ok') {
                                                 if (data.config.length > 0) {
-                                                    $("#configuration_items").append("<tr><td>" +  item.key + "</td><td>" +  item.description + "</td><td><input type='text' name='value_" + item.key + "' id='value_" + item.key + "' class='medium' value='" +  data.config[0].value + "' /></td><td><ul class='actions'><li><a href='#' id='reset" + item.key + "' class='icon16-action-reset buttonicon' title='{% trans "Reset" %} " + item.key + "'><span class='offscreen'>{% trans "Reset" %} " + item.key + "</span></a></li></ul></td></li>");                                                                            
+                                                    if (item.key == 'startup-plugin') {
+                                                        $("#configuration_items").append("<tr><td>" +  item.key + "</td><td><label for='value_" + item.key + "'>" +  item.description + "</label></td><td><input type='checkbox' name='value_" + item.key + "' id='value_" + item.key + "' /></td><td></td></li>");
+                                                        if (data.config[0].value  == "True") {
+                                                            $("#value_" + item.key).attr('checked', 'checked');
+                                                        }
+                                                    } else {
+                                                        $("#configuration_items").append("<tr><td>" +  item.key + "</td><td><label for='value_" + item.key + "'>" +  item.description + "</label></td><td><input type='text' name='value_" + item.key + "' id='value_" + item.key + "' class='medium' value='" +  data.config[0].value + "' /></td><td><ul class='actions'><li><a href='#' id='reset" + item.key + "' class='icon16-action-reset buttonicon' title='{% trans "Reset" %} " + item.key + "'><span class='offscreen'>{% trans "Reset" %} " + item.key + "</span></a></li></ul></td></li>");                                                                            
+                                                    }
                                                 } else {
-                                                    $("#configuration_items").append("<tr><td>" +  item.key + "</td><td>" +  item.description + "</td><td><input type='text' name='value_" + item.key + "' id='value_" + item.key + "' class='medium icon16-status-warning' title='Default value' value='" +  item.default + "' /></td><td><ul class='actions'><li><a href='#' id='reset" + item.key + "' class='icon16-action-reset buttonicon' title='{% trans "Reset" %} " + item.key + "'><span class='offscreen'>{% trans "Reset" %} " + item.key + "</span></a></li></ul></td></li>");                                                                            
+                                                    if (item.key == 'startup-plugin') {
+                                                        $("#configuration_items").append("<tr><td>" +  item.key + "</td><td><label for='value_" + item.key + "'>" +  item.description + "</label></td><td><input type='checkbox' name='value_" + item.key + "' id='value_" + item.key + "' /></td><td></td></li>");
+                                                    } else {
+                                                        $("#configuration_items").append("<tr><td>" +  item.key + "</td><td><label for='value_" + item.key + "'>" +  item.description + "</label></td><td><input type='text' name='value_" + item.key + "' id='value_" + item.key + "' class='medium icon16-status-warning' title='Default value' value='" +  item.default + "' /></td><td><ul class='actions'><li><a href='#' id='reset" + item.key + "' class='icon16-action-reset buttonicon' title='{% trans "Reset" %} " + item.key + "'><span class='offscreen'>{% trans "Reset" %} " + item.key + "</span></a></li></ul></td></li>");
+                                                    }
                                                 }
                                                 $("#reset" + item.key).click(function(event) {
                                                     resetKey(item.key, item.default);
@@ -138,11 +155,15 @@ $(function(){
                                 $("#configuration").append(header);
                                 /* Not configured */
                                 for each (item in configuration) {
-                                    $("#configuration_items").append("<tr><td>" +  item.key + "</td><td>" +  item.description + "</td><td><input type='text' name='value_" + item.key + "' id='value_" + item.key + "' class='medium' value='" +  item.default + "' /></td><td><ul class='actions'><li><a href='#' id='reset" + item.key + "' class='icon16-action-reset buttonicon' title='{% trans "Reset" %} " + item.key + "'><span class='offscreen'>{% trans "Reset" %} " + item.key + "</span></a></li></ul></td></li>");                
-                                    $("#reset" + item.key).click(function(event) {
-                                        resetKey(item.key, item.default);
-                                        event.stopPropagation();
-                                    });
+                                    if (item.key == 'startup-plugin') {
+                                        $("#configuration_items").append("<tr><td>" +  item.key + "</td><td><label for='value_" + item.key + "'>" +  item.description + "</label></td><td><input type='checkbox' name='value_" + item.key + "' id='value_" + item.key + "' /></td><td></td></li>");
+                                    } else {
+                                        $("#configuration_items").append("<tr><td>" +  item.key + "</td><td><label for='value_" + item.key + "'>" +  item.description + "</label></td><td><input type='text' name='value_" + item.key + "' id='value_" + item.key + "' class='medium' value='" +  item.default + "' /></td><td><ul class='actions'><li><a href='#' id='reset" + item.key + "' class='icon16-action-reset buttonicon' title='{% trans "Reset" %} " + item.key + "'><span class='offscreen'>{% trans "Reset" %} " + item.key + "</span></a></li></ul></td></li>");                
+                                        $("#reset" + item.key).click(function(event) {
+                                            resetKey(item.key, item.default);
+                                            event.stopPropagation();
+                                        });                                    
+                                    }
                                 }
                             }
                             $("#configuration").append("<p><button id='configurationsubmit' class='button icon16-action-save'>{% trans "Save" %}</button></p>");
