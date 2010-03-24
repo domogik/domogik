@@ -179,10 +179,15 @@ const close_with_change = 3000; // 3 seconds
 			this.elementstate = $("<div class='widget_state'></div>");
             this.elementicon = $("<div class='widget_icon'></div>");
 			this.elementvalue = $("<div class='widget_value'></div>");
-			this.elementvalue.addClass('icon32-state-' + o.usage);
+            if(o.isCommand) {
+                this.elementvalue.addClass('icon32-usage-' + o.usage);                
+            } else {
+                this.elementvalue.addClass('icon32-state-' + o.usage);                
+            }
 			this.element.append(this.elementstate);
 			this.elementicon.append(this.elementvalue);				
             this.element.append(this.elementicon);
+			this.displayBackground(0);
         },
 
 		displayBackground: function(percent) {
@@ -211,6 +216,7 @@ const close_with_change = 3000; // 3 seconds
     
     $.extend($.ui.range_widget_core, {
         defaults: {
+			isCommand: false
         }
     });
     

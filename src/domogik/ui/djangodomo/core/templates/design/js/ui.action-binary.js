@@ -85,7 +85,11 @@
                 .attr("tabindex", 0);
             this.elementstate = $("<div class='widget_state'></div>");
             this.elementicon = $("<div class='widget_icon'></div>");
-            this.elementicon.addClass('icon32-state-' + o.usage);
+            if(o.isCommand) {
+                this.elementicon.addClass('icon32-usage-' + o.usage);                
+            } else {
+                this.elementicon.addClass('icon32-state-' + o.usage);                
+            }
             this.element.append(this.elementstate);
             this.element.append(this.elementicon);
             
@@ -105,6 +109,7 @@
     
     $.extend($.ui.binary_widget_core, {
         defaults: {
+            isCommand: false
         }
     });
     

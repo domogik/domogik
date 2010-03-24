@@ -22,10 +22,10 @@
     border: 1px solid #cccccc;
     -moz-border-radius: 0.8em;
     -webkit-border-radius: 0.8em;
+    -moz-background-size: '100% 0%';
+    -webkit-background-size: '100% 0%';
     background-image: -webkit-gradient(linear, 0% 0%, 0% 60%, from(#908D6F), to(#D2CDBC));
     background-image: -moz-linear-gradient(100% 60% 270deg, #908D6F, #D2CDBC);
-    -moz-background-size: '0% 0%';
-    -webkit-background-size: '0% 0%';
     background-position: bottom left;
     background-repeat: no-repeat;
     margin:0.5em 1em 0 1em;
