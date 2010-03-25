@@ -56,6 +56,9 @@
 .icon64-usage-2 { background-image:url(../images/device_usage/socket/socket_64.png);}
 .icon32-usage-2 { background-image:url(../images/device_usage/socket/socket_32.png);}
 .icon16-usage-2 { background-image:url(../images/device_usage/socket/socket_16.png);}
+.icon64-usage-3 { background-image:url(../images/device_usage/shutter/shutter_64.png);}
+.icon32-usage-3 { background-image:url(../images/device_usage/shutter/shutter_32.png);}
+.icon16-usage-3 { background-image:url(../images/device_usage/shutter/shutter_16.png);}
 .icon64-usage-4 { background-image:url(../images/device_usage/airconditionning/airconditionning_64.png);}
 .icon32-usage-4 { background-image:url(../images/device_usage/airconditionning/airconditionning_32.png);}
 .icon16-usage-4 { background-image:url(../images/device_usage/airconditionning/airconditionning_16.png);}
@@ -91,6 +94,20 @@
 .icon32-state-2.range_80 { background-image:url(../images/device_usage/socket/range/80_32.png);}
 .icon32-state-2.range_90 { background-image:url(../images/device_usage/socket/range/90_32.png);}
 .icon32-state-2.range_100 { background-image:url(../images/device_usage/socket/range/100_32.png);}
+
+.icon32-state-3.binary_0 { background-image:url(../images/device_usage/shutter/binary/0_32.png);}
+.icon32-state-3.binary_1 { background-image:url(../images/device_usage/shutter/binary/1_32.png);}
+.icon32-state-3.range_0 { background-image:url(../images/device_usage/shutter/range/0_32.png);}
+.icon32-state-3.range_10 { background-image:url(../images/device_usage/shutter/range/10_32.png);}
+.icon32-state-3.range_20 { background-image:url(../images/device_usage/shutter/range/20_32.png);}
+.icon32-state-3.range_30 { background-image:url(../images/device_usage/shutter/range/30_32.png);}
+.icon32-state-3.range_40 { background-image:url(../images/device_usage/shutter/range/40_32.png);}
+.icon32-state-3.range_50 { background-image:url(../images/device_usage/shutter/range/50_32.png);}
+.icon32-state-3.range_60 { background-image:url(../images/device_usage/shutter/range/60_32.png);}
+.icon32-state-3.range_70 { background-image:url(../images/device_usage/shutter/range/70_32.png);}
+.icon32-state-3.range_80 { background-image:url(../images/device_usage/shutter/range/80_32.png);}
+.icon32-state-3.range_90 { background-image:url(../images/device_usage/shutter/range/90_32.png);}
+.icon32-state-3.range_100 { background-image:url(../images/device_usage/shutter/range/100_32.png);}
 
 .icon32-state-4.binary_0 { background-image:url(../images/device_usage/airconditionning/binary/0_32.png);}
 .icon32-state-4.binary_1 { background-image:url(../images/device_usage/airconditionning/binary/1_32.png);}
