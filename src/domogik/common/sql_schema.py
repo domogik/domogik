@@ -236,7 +236,7 @@ class DeviceTechnology(Base):
     Technology of a device (X10, PLCBus, 1wire, RFXCOM,...)
     """
     __tablename__ = '%s_device_technology' % _db_prefix
-    id = Column(String(80), primary_key=True)
+    id = Column(String(30), primary_key=True)
     name = Column(Unicode(30), nullable=False)
     description = Column(UnicodeText())
 
@@ -309,7 +309,7 @@ class DeviceType(Base):
     """
     __tablename__ = '%s_device_type' % _db_prefix
     id = Column(Integer, primary_key=True)
-    technology_id = Column(Integer, ForeignKey('%s.id' % \
+    technology_id = Column(Unicode(30), ForeignKey('%s.id' % \
                            DeviceTechnology.get_tablename()), nullable=False)
     technology = relation(DeviceTechnology, backref=backref(__tablename__))
     name = Column(Unicode(30), nullable=False)
