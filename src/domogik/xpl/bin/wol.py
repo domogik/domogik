@@ -40,7 +40,7 @@ from domogik.xpl.common.plugin import xPLPlugin
 from domogik.xpl.lib.wol import WOL
 
 IS_DOMOGIK_PLUGIN = True
-DOMOGIK_PLUGIN_TECHNOLOGY = "Computer"
+DOMOGIK_PLUGIN_TECHNOLOGY = "computer"
 DOMOGIK_PLUGIN_DESCRIPTION = "Wake on lan"
 DOMOGIK_PLUGIN_CONFIGURATION = [
       {"id" : 0,

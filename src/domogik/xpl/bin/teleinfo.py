@@ -41,7 +41,7 @@ from domogik.xpl.lib.teleinfo import TeleInfo
 from domogik.xpl.common.queryconfig import Query
 
 IS_DOMOGIK_PLUGIN = True
-DOMOGIK_PLUGIN_TECHNOLOGY = "Services"
+DOMOGIK_PLUGIN_TECHNOLOGY = "service"
 DOMOGIK_PLUGIN_DESCRIPTION = "Get power consumption with teleinfo"
 DOMOGIK_PLUGIN_CONFIGURATION=[
       {"id" : 0,

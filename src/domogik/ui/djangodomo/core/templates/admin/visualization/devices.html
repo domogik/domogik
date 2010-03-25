@@ -22,11 +22,13 @@
 
 {% load i18n %}
 {% block css %}
-    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-action-binary.css" rel="stylesheet" type="text/css" />
-    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-action-range.css" rel="stylesheet" type="text/css" />
-    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/page-admin-visualization.css" rel="stylesheet" type="text/css" />
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-action-binary.css" rel="stylesheet" type="text/css" />
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-action-range.css" rel="stylesheet" type="text/css" />
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/page-admin-visualization.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block js_include %}
+    <script type="text/javascript" src="/design/js/ui.action-binary.js"></script>
+    <script type="text/javascript" src="/design/js/ui.action-range.js"></script>
 {% endblock %}
 {% block js_script %}
     $(function(){
@@ -94,11 +96,33 @@
                             </div>
                         </div>
 
-                        <h3>'{{ device.name }}' Actuators</h3>                    
-                        <div>
-                            <ul>
+                        <h3>'{{ device.name }}' Actuators</h3>
+                        <script type="text/javascript">
+                        // <![CDATA[
+                            $(function() {                                
                                 {% for actuator in device.actuator %}
-                                    <li><div class='widgetmini_{{ actuator.value }}'>{{ actuator.name }}</div></li>
+                                    {% ifequal actuator.value 'binary' %}
+                                        $("#widgetmini_{{ device.id }}_{{ actuator.id }}").binary_widget_core({
+                                            usage: {{ device.usage_id }},
+                                            isCommand: true
+                                        });
+                                    {% endifequal %}
+    
+                                    {% ifequal actuator.value 'range' %}
+                                        $("#widgetmini_{{ device.id }}_{{ actuator.id }}").range_widget_core({
+                                            usage: {{ device.usage_id }},
+                                            isCommand: true
+                                        });
+                                    {% endifequal %}
+                                {% endfor %}
+                            });
+                        // ]]>
+                        </script>
+
+                        <div>
+                            <ul class='actuators'>
+                                {% for actuator in device.actuator %}
+                                    <li><div id='widgetmini_{{ device.id }}_{{ actuator.id }}'>{{ actuator.name }}</div></li>
                                 {% endfor %}
                             </ul>
                         </div>

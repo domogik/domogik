@@ -21,9 +21,9 @@
 
 {% load i18n %}
 {% block css %}
-    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-tables.css" rel="stylesheet" type="text/css" />
-    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/page-admin-organization.css" rel="stylesheet" type="text/css" />
-    <link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/fg.menu.css" rel="stylesheet" type="text/css" />
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-tables.css" rel="stylesheet" type="text/css" />
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/page-admin-organization.css" rel="stylesheet" type="text/css" />
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/fg.menu.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block js_include %}
     <script type="text/javascript" src="/design/js/fg.menu.js"></script>
@@ -37,29 +37,10 @@
             addTitle: "{% trans "Add new device" %}",
             addId: "addDialogButton"
         });
-
-        $('#dragdropdevices').dragdrop({
-            dropcallback: function(self, element, target) {
-                getREST('/base/device/update/id/' + element + '/room_id/' + target,
-                    function(data) {
-                        var status = (data.status).toLowerCase();
-                        if (status == 'ok') {
-                            self.valid();
-                        } else {
-                            self.cancel();
-                            display_message('error', data.description);                                          
-                        }
-                    }
-                )
-            }
-        });
         
         /* Tooltips */
         $('.add').tooltip_left();
         $('.buttonicon[title]').tooltip_top();
-        $('#help_dragdrop').tooltip_content_right({
-            content: '<h3>Mouse usage</h3><h3>Keyboard usage</h3><ul><li>Use the <kbd>Tab</kbd> to move to the device you want to organize.</li><li>Select the device you want to move with the <kbd>Spacebar</kbd>.</li><li>Use the <kbd>Up</kbd> and <kbd>Down</kbd> cursor keys to select a room in the context menu.</li><li>Press <kbd>Enter</kbd> to move the device to the room.</li></ul>'
-        });
         
         /* Dialogs */
         $('#delete_confirmation').dialog_confirmation({
@@ -139,22 +120,18 @@
         <div id="tabs">
             {% spaceless %}
             <ul>
-                {% regroup devices_list|dictsort:"room_id" by room as rooms_list2 %}
-                {% for room in rooms_list2 %}
-                    {% if room.grouper.id %}
-                        <li><a id="tab{{ room.grouper.id }}" href="#element{{ room.grouper.id }}" class="icon16-room-{{ room.grouper.config.icon }}">{{ room.grouper.name }}</a></li>
-                    {% else %}
-                        <li><a id="tab0" href="#element0" class="icon16-room-">{% trans "Unattribued" %}</a></li>
+                {% regroup devices_list|dictsort:"deviceusage" by deviceusage as usages_list %}
+                {% for usage in usages_list %}
+                    {% if usage.grouper.id %}
+                        <li><a id="tab{{ usage.grouper.id }}" href="#element{{ usage.grouper.id }}" class="icon16-usage-{{ usage.grouper.id }}">{{ usage.grouper.name }}</a></li>
                     {% endif %}
                 {% endfor %}
             </ul>
             {% endspaceless %}
-            {% regroup devices_list|dictsort:"room" by room as rooms_list2 %}
-            {% for room in rooms_list2 %}
-                {% if room.grouper.id %}
-                    <div id="element{{ room.grouper.id }}" class="tabelement">
-                {% else %}
-                    <div id="element0" class="tabelement">
+            {% regroup devices_list|dictsort:"deviceusage" by deviceusage as usages_list %}
+            {% for usage in usages_list %}
+                {% if usage.grouper.id %}
+                    <div id="element{{ usage.grouper.id }}" class="tabelement">
                 {% endif %}
                 <table>
                     <tr>
@@ -162,11 +139,10 @@
                         <th>{% trans "Description" %}</th>
                         <th>{% trans "Address" %}</th>
                         <th>{% trans "Reference" %}</th>
-                        <th>{% trans "Usage" %}</th>
                         <th>{% trans "Type" %}</th>
                         <th>Actions</th>
                     </tr>
-                    {% for device in room.list %}
+                    {% for device in usage.list %}
                     <script type="text/javascript">
                         // <![CDATA[
                         $(function(){
@@ -216,8 +192,7 @@
                         <td>{{ device.description }}</td>
                         <td>{{ device.address }}</td>
                         <td>{{ device.reference }}</td>
-                        <td><div class='icon16-text icon16-usage-{{ device.deviceusage.id }}'>{{ device.deviceusage.name }}</div></td>
-                        <td><div class='icon16-text icon16-technology-{{ device.devicetype.devicetechnology.name }}'>{{ device.devicetype.devicetechnology.name }}.{{ device.devicetype.name }}</td>
+                        <td><div class='icon16-text icon16-technology-{{ device.devicetype.devicetechnology.id }}'>{{ device.devicetype.devicetechnology.name }}.{{ device.devicetype.name }}</td>
                         <td>
                             <ul class="actions">
                                 <li><button id='del{{ device.id }}' class='icon16-action-del buttonicon' title="{% trans "Delete" %} '{{ device.name }}'"><span class='offscreen'>{% trans "Delete" %} {{ device.name }}</span></button></li>
@@ -234,30 +209,4 @@
     </div>
     <div id="devicedialog"></div>
     <div id="delete_confirmation"></div>
-        
-    <div class="subsection" id="dragdropdevices">
-        <h2 class='help' id='help_dragdrop'>{% trans "Devices organisation" %} <span class='offscreen'>{% trans "Drag &amp; Drop instructions" %}</span></h2>
-        <fieldset class="targetdrop">
-            <legend class="choice">{% trans "Unattributed devices" %}</legend>
-            <ul class="draggables" value="None">
-                {% for device in unattribued_devices %}
-                <li class="draggable icon32-usage-{{ device.usage_id }}" value="{{ device.id }}">{{ device.name }}<span class="description">{{ device.description }}</span></li>
-                {% empty %}
-                <li class="empty">{% trans "Empty" %}</li>
-                {% endfor %}
-            </ul>
-        </fieldset>
-        {% for room in rooms_list %}
-        <fieldset class="targetdrop">
-            <legend class="choice icon16-room-{{ room.config.icon }}">{{ room.name }}</legend>
-            <ul class="draggables" value='{{ room.id }}'>
-                {% for device in room.device %}
-                <li class="draggable icon32-usage-{{ device.usage_id }}" value="{{ device.id }}">{{ device.name }}<span class="description">{{ device.description }}</span></li>
-                {% empty %}
-                <li class="empty">{% trans "Empty" %}</li>
-                {% endfor %}
-            </ul>
-        </fieldset>
-        {% endfor %}
-    </div>
 {% endblock %}

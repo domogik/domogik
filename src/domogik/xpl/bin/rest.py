@@ -705,7 +705,7 @@ class ProcessRequest():
             return None
 
         mapping = xml_doc.documentElement
-        if mapping.getElementsByTagName("technology")[0].attributes.get("name").value != techno:
+        if mapping.getElementsByTagName("technology")[0].attributes.get("id").value != techno:
             self.send_http_response_error(999, "'technology' attribute must be the same as file name !", \
                                           self.jsonp, self.jsonp_cb)
             return
@@ -1234,8 +1234,8 @@ target=*
                     self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
                 else:
-                    if self.rest_request[2] == "by-name":
-                        self._rest_base_device_technology_list(name=self.rest_request[3])
+                    if self.rest_request[2] == "by-id":
+                        self._rest_base_device_technology_list(id=self.rest_request[3])
                     else:
                         self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
@@ -1270,52 +1270,6 @@ target=*
                                                   self.jsonp, self.jsonp_cb)
                 return
 
-
-        ### device technology config #################
-        elif self.rest_request[0] == "device_technology_config":
-
-            ### list
-            if self.rest_request[1] == "list":
-                if len(self.rest_request) == 2:
-                    self._rest_base_device_technology_config_list()
-                elif len(self.rest_request) == 3 or len(self.rest_request) == 5:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-                elif len(self.rest_request) == 4:
-                    if self.rest_request[2] == "by-technology-id":
-                        self._rest_base_device_technology_config_list(technology_id=self.rest_request[3])
-                elif len(self.rest_request) == 6:
-                    if self.rest_request[2] == "by-technology-id" and self.rest_request[4] == "by-key":
-                        self._rest_base_device_technology_config_list(technology_id = self.rest_request[3], key = self.rest_request[5])
-                    else:
-                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-                else:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-
-            ### set
-            elif self.rest_request[1] == "set":
-                offset = 2
-                if self.set_parameters(offset):
-                    self._rest_base_device_technology_config_set()
-                else:
-                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
-
-
-            ### del
-            elif self.rest_request[1] == "del":
-                if len(self.rest_request) == 3:
-                    self._rest_base_device_technology_config_del(id=self.rest_request[2])
-                else:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-
-            ### others
-            else:
-                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], \
-                                                  self.jsonp, self.jsonp_cb)
-                return
 
 
 
@@ -1390,12 +1344,13 @@ target=*
                 # wrong number of arguments
                 return False
             # specific process for False/True
-            if value == "False" or value == "false":
-                self.parameters[key] = False
-            elif value == "True" or value == "true":
-                self.parameters[key] = True
-            else:
-                self.parameters[key] = value
+            #if value == "False" or value == "false":
+            #    self.parameters[key] = False
+            #elif value == "True" or value == "true":
+            #    self.parameters[key] = True
+            #else:
+            #    self.parameters[key] = value
+            self.parameters[key] = value
             iii += 2
         # no parameters
         if iii == 0:
@@ -1975,18 +1930,18 @@ target=*
 # /base/device_technology processing
 ######
 
-    def _rest_base_device_technology_list(self, name = None):
+    def _rest_base_device_technology_list(self, id = None):
         """ list device technologies
             @param name : device technology name
         """
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("device_technology")
-        if name == None:
+        if id == None:
             for device_technology in self._db.list_device_technologies():
                 json_data.add_data(device_technology)
         else:
-            device_technology = self._db.get_device_technology_by_name(name)
+            device_technology = self._db.get_device_technology_by_id(id)
             if device_technology is not None:
                 json_data.add_data(device_technology)
         self.send_http_response_ok(json_data.get())
@@ -2040,62 +1995,6 @@ target=*
 
 
 
-######
-# /base/device_technology_config processing
-######
-
-    def _rest_base_device_technology_config_list(self, technology_id = None, key = None):
-        """ list device technology config
-            @param technology_id : device technology config id
-            @param key : key of config
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("device_technology_config")
-        if technology_id == None:
-            for device_technology_config in self._db.list_all_device_technology_config():
-                json_data.add_data(device_technology_config)
-        elif key == None:
-            for device_technology_config in self._db.list_device_technology_config(technology_id):
-                json_data.add_data(device_technology_config)
-        else:
-            device_technology_config = self._db.get_device_technology_config(technology_id, key)
-            if device_technology_config is not None:
-                json_data.add_data(device_technology_config)
-        self.send_http_response_ok(json_data.get())
-
-
-
-    def _rest_base_device_technology_config_set(self):
-        """ set device technology config
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("device_technology_config")
-        try:
-            device_technology_config = self._db.set_device_technology_config(self.get_parameters("technology_id"), \
-                                                                             self.get_parameters("key"), \
-                                                                             self.get_parameters("value"))
-            json_data.add_data(device_technology_config)
-        except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
-        self.send_http_response_ok(json_data.get())
-
-
-
-    def _rest_base_device_technology_config_del(self, id=None):
-        """ delete device technology config
-            @param id : i of technology type
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("device_technology_config")
-        try:
-            for device_technology_config in self._db.del_device_technology_config(id):
-                json_data.add_data(device_technology_config)
-        except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
-        self.send_http_response_ok(json_data.get())
 
 
 
@@ -2198,6 +2097,10 @@ target=*
         """ /plugin processing
         """
         self._log.debug("Plugin action")
+
+        # parameters initialisation
+        self.parameters = {}
+
         if len(self.rest_request) < 1:
             self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
             return
@@ -2241,7 +2144,55 @@ target=*
                 return
             self._rest_plugin_start_stop(plugin =  self.rest_request[1], \
                                    command = "stop")
- 
+
+
+        ### plugin config ############################
+        elif self.rest_request[0] == "config":
+
+            ### list
+            if self.rest_request[1] == "list":
+                if len(self.rest_request) == 2:
+                    self._rest_plugin_config_list()
+                elif len(self.rest_request) == 3 or len(self.rest_request) == 5:
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
+                elif len(self.rest_request) == 4:
+                    if self.rest_request[2] == "by-name":
+                        self._rest_plugin_config_list(name=self.rest_request[3])
+                elif len(self.rest_request) == 6:
+                    if self.rest_request[2] == "by-name" and self.rest_request[4] == "by-key":
+                        self._rest_plugin_config_list(name = self.rest_request[3], key = self.rest_request[5])
+                    else:
+                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
+                else:
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
+
+            ### set
+            elif self.rest_request[1] == "set":
+                offset = 2
+                if self.set_parameters(offset):
+                    self._rest_plugin_config_set()
+                else:
+                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
+
+
+            ### del
+            elif self.rest_request[1] == "del":
+                if len(self.rest_request) == 3:
+                    self._rest_plugin_config_del(id=self.rest_request[2])
+                else:
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
+
+
+            ### others
+            else:
+                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], \
+                                                  self.jsonp, self.jsonp_cb)
+                return
+
         ### others ####################################
         else:
             self.send_http_response_error(999, "Bad operation for /plugin", self.jsonp, self.jsonp_cb)
@@ -2414,6 +2365,74 @@ target=*
             json_data = JSonHelper("OK")
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
             self.send_http_response_ok(json_data.get())
+
+
+
+
+######
+# /plugin/config/ processing
+######
+
+    def _rest_plugin_config_list(self, name = None, key = None):
+        """ list device technology config
+            @param name : name of module
+            @param key : key of config
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("config")
+        if name == None:
+            for plugin in self._db.list_all_plugin_config():
+                json_data.add_data(plugin)
+        elif key == None:
+            for plugin in self._db.list_plugin_config(name):
+                json_data.add_data(plugin)
+        else:
+            plugin = self._db.get_plugin_config(name, key)
+            if plugin is not None:
+                json_data.add_data(plugin)
+        self.send_http_response_ok(json_data.get())
+
+
+
+    def _rest_plugin_config_set(self):
+        """ set device technology config
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("config")
+        try:
+            plugin = self._db.set_plugin_config(self.get_parameters("name"), \
+                                                self.get_parameters("key"), \
+                                                self.get_parameters("value"))
+            json_data.add_data(plugin)
+        except:
+            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+        self.send_http_response_ok(json_data.get())
+
+
+
+    def _rest_plugin_config_del(self, name=None):
+        """ delete device technology config
+            @param name : module name
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("config")
+        try:
+            for plugin in self._db.del_plugin_config(name):
+                json_data.add_data(plugin)
+        except:
+            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+        self.send_http_response_ok(json_data.get())
+
+
+
+
+
+
+
+
 
 
 
@@ -2841,7 +2860,7 @@ class JSonHelper():
         # define data types
         db_type = ("ActuatorFeature", "Area", "Device", "DeviceUsage", \
                    "DeviceConfig", "DeviceStats", "DeviceStatsValue", \
-                   "DeviceTechnology", "DeviceTechnologyConfig", \
+                   "DeviceTechnology", "PluginConfig", \
                    "DeviceType", "UIItemConfig", "Room", "UserAccount", \
                    "SensorReferenceData", "Person", "SystemConfig", \
                    "SystemStats", "SystemStatsValue", "Trigger") 

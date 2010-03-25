@@ -1,5 +1,5 @@
 <mapping>
-    <technology name="x10">
+    <technology id="x10">
         <schema>x10.basic</schema>
         
         <device>

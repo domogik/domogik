@@ -40,8 +40,8 @@ from django.template import RequestContext
 from django.utils.translation import ugettext_lazy as _
 
 from domogik.common import database
-from djangodomo.core.models import Areas, Rooms, Devices, DeviceUsages, DeviceTechnologies, DeviceTypes, \
-                                   DeviceActuators, UIConfigs, Modules, Accounts
+from djangodomo.core.models import REST, Areas, Rooms, Devices, DeviceUsages, DeviceTechnologies, DeviceTypes, \
+                                   DeviceActuators, UIConfigs, Plugins, Accounts
 
 from djangodomo.core.sample_data_helper import SampleDataHelper
 
@@ -51,6 +51,27 @@ from django_pipes.exceptions import ResourceNotAvailableException
 __ADMIN_MANAGEMENT_DOMOGIK = 'admin/management/domogik.html'
 __db = database.DbHelper()
 
+def __go_to_page(request, html_page, page_title, **attribute_list):
+    """
+    Common method called to go to an html page
+    @param request : HTTP request
+    @param html_page : the page to go to
+    @param page_title : page title
+    @param **attribute_list : list of attributes (dictionnary) that need to be
+           put in the HTTP response
+    @return an HttpResponse object
+    """
+    response_attr_list = {}
+    response_attr_list['rest_ip'] = REST.getIP()
+    response_attr_list['rest_port'] = REST.getPort()
+    response_attr_list['page_title'] = page_title
+    response_attr_list['sys_config'] = __db.get_system_config()
+    response_attr_list['is_user_connected'] = __is_user_connected(request)
+    for attribute in attribute_list:
+        response_attr_list[attribute] = attribute_list[attribute]
+    return render_to_response(html_page, response_attr_list,
+                              context_instance=RequestContext(request))
+    
 def index(request):
     """
     Method called when the main page is accessed
@@ -243,25 +264,6 @@ def clear_data(request):
     return __go_to_page(request, __ADMIN_MANAGEMENT_DOMOGIK, page_title,
                         action=action)
 
-def __go_to_page(request, html_page, page_title, **attribute_list):
-    """
-    Common method called to go to an html page
-    @param request : HTTP request
-    @param html_page : the page to go to
-    @param page_title : page title
-    @param **attribute_list : list of attributes (dictionnary) that need to be
-           put in the HTTP response
-    @return an HttpResponse object
-    """
-    response_attr_list = {}
-    response_attr_list['page_title'] = page_title
-    response_attr_list['sys_config'] = __db.get_system_config()
-    response_attr_list['is_user_connected'] = __is_user_connected(request)
-    for attribute in attribute_list:
-        response_attr_list[attribute] = attribute_list[attribute]
-    return render_to_response(html_page, response_attr_list,
-                              context_instance=RequestContext(request))
-
 def __get_user_connected(request):
     """
     Get current user connected
@@ -447,9 +449,9 @@ def admin_organization_house(request):
         house=result_house
     )
 
-def admin_modules_module(request, module_name):
+def admin_plugins_plugin(request, plugin_name):
     """
-    Method called when the admin module command page is accessed
+    Method called when the admin plugin command page is accessed
     @param request : HTTP request
     @return an HttpResponse object
     """
@@ -459,20 +461,20 @@ def admin_modules_module(request, module_name):
     status = request.GET.get('status', '')
     msg = request.GET.get('msg', '')
     try:
-        result_module_by_name = Modules.get_by_name(module_name)
-        result_all_modules = Modules.get_all()
+        result_plugin_by_name = Plugins.get_by_name(plugin_name)
+        result_all_plugins = Plugins.get_all()
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
-    page_title = _("Module")
+    page_title = _("Plugin")
     return __go_to_page(
-        request, 'admin/modules/module.html',
+        request, 'admin/plugins/plugin.html',
         page_title,
         nav1_admin = "selected",
-        nav2_modules_module = "selected",
-        modules_list=result_all_modules.module,
+        nav2_plugins_plugin = "selected",
+        plugins_list=result_all_plugins.plugin,
         status=status,
         msg=msg,
-        module=result_module_by_name.module[0]
+        plugin=result_plugin_by_name.plugin[0]
     )
 
 def show_house(request):

@@ -49,15 +49,14 @@ Implements
 from exceptions import AssertionError
 
 from sqlalchemy import types, create_engine, Table, Column, Integer, String, \
-      MetaData, ForeignKey, Boolean, DateTime, Date, Text, Unicode, UniqueConstraint
+                MetaData, ForeignKey, Boolean, DateTime, Date, Text, Unicode, UnicodeText, UniqueConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relation, backref
 
 from domogik.common.configloader import Loader
 
-DEVICE_TECHNOLOGY_LIST = [u'x10',u'1wire',u'PLCBus',u'RFXCom',u'IR',u'EIB/KNX', u'Computer']
-DEVICE_TYPE_LIST = [u'appliance', u'lamp', u'music', u'sensor']
-ITEM_TYPE_LIST = [u'area', u'room', u'device']
+DEVICE_TYPE_LIST = ['appliance', 'lamp', 'music', 'sensor']
+ITEM_TYPE_LIST = ['area', 'room', 'device']
 
 Base = declarative_base()
 metadata = Base.metadata
@@ -118,7 +117,7 @@ class Area(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(Unicode(30), nullable=False)
-    description = Column(Unicode(255))
+    description = Column(UnicodeText())
 
     def __init__(self, name, description):
         """
@@ -152,7 +151,7 @@ class Room(Base):
     __tablename__ = '%s_room' % _db_prefix
     id = Column(Integer, primary_key=True)
     name = Column(Unicode(30), nullable=False)
-    description = Column(Unicode(255))
+    description = Column(UnicodeText())
     area_id = Column(Integer, ForeignKey('%s.id' % Area.get_tablename()))
     area = relation(Area, backref=backref(__tablename__, order_by=id))
 
@@ -190,23 +189,26 @@ class DeviceUsage(Base):
     __tablename__ = '%s_device_usage' % _db_prefix
     id = Column(Integer, primary_key=True)
     name = Column(Unicode(30), nullable=False)
-    description = Column(Unicode(255))
+    description = Column(UnicodeText())
+    default_options = Column(UnicodeText())
 
-    def __init__(self, name, description):
+    def __init__(self, name, description, default_options):
         """
         Class constructor
         @param name : short name of the usage
         @param description : extended description
+        @param default_options : default options
         """
         self.name = name
         self.description = description
+        self.default_options = default_options
 
     def __repr__(self):
         """
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<DeviceUsage(id=%s, name='%s', desc='%s')>" % (self.id, self.name, self.description)
+        return "<DeviceUsage(id=%s, name='%s', desc='%s', default opt='%s')>" % (self.id, self.name, self.description, self.default_options)
 
     @staticmethod
     def get_tablename():
@@ -222,16 +224,18 @@ class DeviceTechnology(Base):
     Technology of a device (X10, PLCBus, 1wire, RFXCOM,...)
     """
     __tablename__ = '%s_device_technology' % _db_prefix
-    id = Column(Integer, primary_key=True)
-    name = Column(Enum(DEVICE_TECHNOLOGY_LIST), nullable=False)
-    description = Column(Unicode(255))
+    id = Column(String(80), primary_key=True)
+    name = Column(Unicode(30), nullable=False)
+    description = Column(UnicodeText())
 
-    def __init__(self, name, description):
+    def __init__(self, id, name, description):
         """
         Class constructor
+        @param id : technology id (ie x10, plcbus, eibknx...) with no spaces / accents or special characters
         @param name : short name of the technology
         @param description : extended description
         """
+        self.id = id
         self.name = name
         self.description = description
 
@@ -256,9 +260,9 @@ class PluginConfig(Base):
     Configuration for a plugin (x10, plcbus, ...)
     """
     __tablename__ = '%s_plugin_config' % _db_prefix
-    plugin_name = Column(Unicode(80), nullable=False, primary_key=True)
-    key = Column(Unicode(30), nullable=False, primary_key=True)
-    value = Column(Unicode(80), nullable=False)
+    plugin_name = Column(Unicode(30), primary_key=True)
+    key = Column(Unicode(30), primary_key=True)
+    value = Column(Unicode(255), nullable=False)
 
     def __init__(self, plugin_name, key, value):
         """
@@ -297,7 +301,7 @@ class DeviceType(Base):
                            DeviceTechnology.get_tablename()), nullable=False)
     technology = relation(DeviceTechnology, backref=backref(__tablename__))
     name = Column(Unicode(30), nullable=False)
-    description = Column(Unicode(255))
+    description = Column(UnicodeText())
 
     def __init__(self, name, description, technology_id):
         """
@@ -332,8 +336,8 @@ class SensorReferenceData(Base):
     __tablename__ = '%s_sensor_reference_data' % _db_prefix
     id = Column(Integer, primary_key=True)
     name = Column(Unicode(30), nullable=False)
-    value = Column(Unicode(30), nullable=False)
-    unit = Column(Unicode(30))
+    value = Column(Unicode(255), nullable=False)
+    unit = Column(Unicode(10))
     stat_key = Column(Unicode(30))
     device_type_id = Column(Integer, ForeignKey('%s.id' % \
                            DeviceType.get_tablename()), nullable=False)
@@ -379,11 +383,11 @@ class ActuatorFeature(Base):
     __tablename__ = '%s_actuator_feature' % _db_prefix
     id = Column(Integer, primary_key=True)
     name = Column(Unicode(30), nullable=False)
-    value = Column(Unicode(30), nullable=False)
+    value = Column(Unicode(255), nullable=False)
     device_type_id = Column(Integer, ForeignKey('%s.id' % \
                            DeviceType.get_tablename()), nullable=False)
     device_type = relation(DeviceType, backref=backref(__tablename__))
-    unit = Column(Unicode(30))
+    unit = Column(Unicode(10))
     configurable_states = Column(Unicode(255))
     return_confirmation = Column(Boolean(), nullable=False)
 
@@ -432,7 +436,7 @@ class Device(Base):
     __tablename__ = '%s_device' % _db_prefix
     id = Column(Integer, primary_key=True)
     name = Column(Unicode(30), nullable=False)
-    description = Column(Unicode(255))
+    description = Column(UnicodeText())
     address = Column(Unicode(30), nullable=False)
     reference = Column(Unicode(30))
     usage_id = Column(Integer, ForeignKey('%s.id' % DeviceUsage.get_tablename()), nullable=False)
@@ -511,31 +515,29 @@ class DeviceConfig(Base):
     Device configuration
     """
     __tablename__ = '%s_device_config' % _db_prefix
-    id = Column(Integer, primary_key=True)
+    key = Column(String(30), primary_key=True)
+    value = Column(Unicode(255), nullable=False)
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()),
-                       nullable=False)
+                       primary_key=True)
     device = relation(Device, backref=backref(__tablename__))
-    key = Column(Unicode(30), nullable=False)
-    value = Column(Unicode(80), nullable=False)
-    description = Column(Unicode(255), nullable=True)
 
-    def __init__(self, device_id, key, value):
+    def __init__(self, key, device_id, value):
         """
         Class constructor
-        @param device_id : device id
         @param key : configuration item
         @param value : configuration value
+        @param device_id : device id
         """
-        self.device_id = device_id
         self.key = key
         self.value = value
+        self.device_id = device_id
 
     def __repr__(self):
         """
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<DeviceConfig(id=%s, device=%s, ('%s', '%s'))>" % (self.id, self.device, self.key, self.value)
+        return "<DeviceConfig(('%s', '%s'), device=%s)>" % (self.key, self.value, self.device)
 
     @staticmethod
     def get_tablename():
@@ -593,7 +595,7 @@ class DeviceStatsValue(Base):
                              nullable=False)
     device_stats = relation(DeviceStats, backref=backref(__tablename__))
     name = Column(Unicode(30), nullable=False)
-    value = Column(Unicode(80), nullable=False)
+    value = Column(Unicode(255), nullable=False)
 
     def __init__(self, name, value, device_stats_id):
         """
@@ -628,7 +630,7 @@ class Trigger(Base):
     """
     __tablename__ = '%s_trigger' % _db_prefix
     id = Column(Integer, primary_key=True)
-    description = Column(Unicode(255))
+    description = Column(UnicodeText())
     rule = Column(Text, nullable=False)
     result = Column(Text, nullable=False)
 
@@ -665,8 +667,8 @@ class Person(Base):
     """
     __tablename__ = '%s_person' % _db_prefix
     id = Column(Integer, primary_key=True)
-    first_name = Column(Unicode(50), nullable=False)
-    last_name = Column(Unicode(60), nullable=False)
+    first_name = Column(Unicode(20), nullable=False)
+    last_name = Column(Unicode(20), nullable=False)
     birthdate = Column(Date)
 
     def __init__(self, first_name, last_name, birthdate):
@@ -788,7 +790,7 @@ class SystemStatsValue(Base):
                              nullable=False)
     system_stats = relation(SystemStats, backref=backref(__tablename__))
     name = Column(Unicode(30), nullable=False)
-    value = Column(Unicode(80), nullable=False)
+    value = Column(Unicode(255), nullable=False)
 
     def __init__(self, name, value, system_stats_id):
         """
@@ -824,10 +826,10 @@ class UIItemConfig(Base):
     """
     __tablename__ = '%s_ui_item_config' % _db_prefix
 
-    name =  Column(Unicode(30), nullable=False, primary_key=True)
-    reference = Column(Unicode(30), nullable=False, primary_key=True)
-    key = Column(Unicode(30), nullable=False, primary_key=True)
-    value = Column(Unicode(), nullable=False)
+    name =  Column(Unicode(30), primary_key=True)
+    reference = Column(Unicode(30), primary_key=True)
+    key = Column(Unicode(30), primary_key=True)
+    value = Column(Unicode(255), nullable=False)
 
     def __init__(self, name, reference, key, value):
         """

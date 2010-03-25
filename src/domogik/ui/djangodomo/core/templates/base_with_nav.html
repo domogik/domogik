@@ -26,16 +26,20 @@
 <meta http-equiv="Cache-Control" content="no-cache" />
 <meta http-equiv="Pragma" content="no-cache" />
 
-<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/jquery-ui-1.7.2.custom.css" rel="stylesheet" type="text/css"/>
-<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/main.css" rel="stylesheet" type="text/css" />
-<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-icons.css" rel="stylesheet" type="text/css" />
-<link href="/design/{{ request.session.user.skin_used|default:'skins/default' }}/css/ui-nav1.css" rel="stylesheet" type="text/css" />
+<link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/jquery-ui-1.7.2.custom.css" rel="stylesheet" type="text/css"/>
+<link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/main.css" rel="stylesheet" type="text/css" />
+<link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-icons.css" rel="stylesheet" type="text/css" />
+<link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-nav1.css" rel="stylesheet" type="text/css" />
 {% block global_css %}{% endblock %}
 {% block css %}{% endblock %}
-<script type="text/javascript" src="/design/js/jquery-1.4.1.min.js"></script>
-<script type="text/javascript" src="/design/js/jquery-ui-1.7.2.custom.min.js"></script>
+<script type="text/javascript" src="/design/js/jquery-1.4.2.min.js"></script>
+<script type="text/javascript" src="/design/js/jquery-ui-1.8.custom.min.js"></script>
 <script type="text/javascript" src="/design/js/jquery.qtip-1.0.0-rc3.min.js"></script>
 <script type="text/javascript" src="/design/js/main.js"></script>
+<script type="text/javascript"> 
+   var rest_ip = "{{ rest_ip }}";
+   var rest_port = "{{ rest_port }}";
+</script>
 <script type="text/javascript" src="/design/js/rest.js"></script>
 <script type="text/javascript" src="/design/js/ui.icons.js"></script>
 {% block global_js_include %}{% endblock %}

@@ -63,3 +63,16 @@
     background-repeat: no-repeat;
     outline: none;
 }
+
+ul.actuators {
+    list-style:none;
+    margin:0;
+    padding:0;
+    text-align:center;
+}
+
+ul.actuators > li {
+    display:inline-block;
+    margin: 0;
+    padding: 0;
+}

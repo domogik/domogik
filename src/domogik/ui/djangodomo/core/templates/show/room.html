@@ -21,12 +21,17 @@
 
 {% load i18n %}
 {% block js_script %}
+// <![CDATA[
+// ]]>
 {% endblock %}
 
 {% block css %}
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.slider.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 
 {% block js_include %}
+    <script type="text/javascript" src="/design/js/tpg.utilities.js"></script>
+    <script type="text/javascript" src="/design/js/tpg.slider.js"></script>
 {% endblock %}
 
 {% block title %}{% trans page_title %}{% endblock %}
@@ -80,7 +85,7 @@
                                         unit: '{{ actuator.unit }}',
                                         action: function(self, command) {
                                             alert(command);
-                                            self.setState(command);
+                                            self.setValue(command);
                                         }
                                     })
                                         .range_command('setValue', 50)
@@ -120,20 +125,8 @@
                                 </div>
                             </li>
                         {% endfor %}
-                        <!--li>
-                            <div id="widget_{{ device.id }}2">
-                                <label class='name'>Dimmer</label>
-                                <input type="text" class="value" title="Variation in %"/>
-                                <ul>
-                                    <li><a href='#' class='buttonsmall down'>Down</a></li>
-                                    <li><a href='#' class='buttonsmall up'>Up</a></li>
-                                </ul>
-                                <div class="slider"></div>
-                            </div>
-                        </li-->
                         </ul>
                     </div>
-
                 </div>
         {% if forloop.counter0|divisibleby:"3" %}
             </div>

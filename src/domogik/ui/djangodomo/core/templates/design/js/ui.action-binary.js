@@ -7,6 +7,7 @@
             this.widgets = new Array();
             this.element.addClass('command_binary')
                 .addClass('icon32-state-' + o.usage);
+            this.name = this.element.find('.name').text();
             var ul = $("<ul></ul>");
             var li0 = $("<li></li>");
             var a0 = $("<button class='buttontext capitalletter'>" + this.states[0] + "</button>");
@@ -26,18 +27,20 @@
         },
         
         setState: function(state) {
+            var self = this;
             if (state == 1 || state.toLowerCase() == this.states[1]) {
                 this.currentState = 1;
             } else {
                 this.currentState = 0;
             }
             this.displayState(this.currentState);
-            for each (widget in this.widgets) {
-                $(widget).binary_widget('setState', this.currentState);
-            }
+            $.each(this.widgets, function(index, value) {
+                $(value).binary_widget('setState', self.currentState);
+            });
         },
         
         displayState: function(state) {
+            this.element.find('.name').text(this.name + ' - ' + this.states[state]);
             if (state == 1) {
                 this.element.addClass('binary_1');                
                 this.element.removeClass('binary_0');                                
@@ -82,7 +85,11 @@
                 .attr("tabindex", 0);
             this.elementstate = $("<div class='widget_state'></div>");
             this.elementicon = $("<div class='widget_icon'></div>");
-            this.elementicon.addClass('icon32-state-' + o.usage);
+            if(o.isCommand) {
+                this.elementicon.addClass('icon32-usage-' + o.usage);                
+            } else {
+                this.elementicon.addClass('icon32-state-' + o.usage);                
+            }
             this.element.append(this.elementstate);
             this.element.append(this.elementicon);
             
@@ -102,6 +109,7 @@
     
     $.extend($.ui.binary_widget_core, {
         defaults: {
+            isCommand: false
         }
     });
     
@@ -134,26 +142,3 @@
     });
     
 })(jQuery);
-
-/*
-function process_binary(function_id, force) {
-    $('#widgetmini_' + function_id).addClass('processing_state');
-    $('#widget_' + function_id).addClass('processing_state');
-    var status = (force == null) ? 1 : force; 
-    setTimeout("feedback_binary(" + function_id + ", " + status + ")",3000);
-}
-
-function feedback_binary(function_id, status) {
-    var widgetmini_id = 'widgetmini_' + function_id;
-    var widget_id = 'widget_' + function_id;
-    var oldstatus = (status == 0) ? 1 : 0 ;
-    $('#' + widgetmini_id).removeClass('processing_state')
-        .addClass('ok_state')
-        .removeClass('binary_' + oldstatus)
-        .addClass('binary_' + status);
-    $('#' + widget_id).removeClass('processing_state')
-        .addClass('ok_state')
-        .removeClass('binary_' + oldstatus)
-        .addClass('binary_' + status);
-}
-*/

@@ -78,3 +78,11 @@
     color:#ffffff;
     background-color: #403E3F;
 }
+
+.menu-indicator {
+    background-position: right 50%;
+    background-repeat:no-repeat;
+    min-height:16px;
+    padding-right:18px;
+    line-height:16px;
+}

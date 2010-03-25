@@ -55,7 +55,6 @@ from domogik.common.sql_schema import ActuatorFeature, Area, Device, DeviceUsage
                                       DeviceType, UIItemConfig, Room, Person, \
                                       SensorReferenceData, UserAccount, SystemConfig, \
                                       SystemStats, SystemStatsValue, Trigger
-from domogik.common.sql_schema import DEVICE_TECHNOLOGY_LIST
 
 
 class DbHelperException(Exception):
@@ -428,15 +427,17 @@ class DbHelper():
                              .filter(func.lower(DeviceUsage.name)==self.__to_unicode(du_name.lower()))\
                              .first()
 
-    def add_device_usage(self, du_name, du_description=None):
+    def add_device_usage(self, du_name, du_description=None, du_default_options=None):
         """
         Add a device_usage (temperature, heating, lighting, music, ...)
         @param du_name : device usage name
         @param du_description : device usage description (optional)
+        @param du_default_options : default options (optional)
         @return a DeviceUsage (the newly created one)
         """
         self.__session.expire_all()
-        du = DeviceUsage(name=self.__to_unicode(du_name), description=self.__to_unicode(du_description))
+        du = DeviceUsage(name=self.__to_unicode(du_name), description=self.__to_unicode(du_description),
+                         default_options=self.__to_unicode(du_default_options))
         self.__session.add(du)
         try:
             self.__session.commit()
@@ -445,12 +446,13 @@ class DbHelper():
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return du
 
-    def update_device_usage(self, du_id, du_name=None, du_description=None):
+    def update_device_usage(self, du_id, du_name=None, du_description=None, du_default_options=None):
         """
         Update a device usage
         @param du_id : device usage id to be updated
         @param du_name : device usage name (optional)
         @param du_description : device usage detailed description (optional)
+        @param du_default_options : default options (optional)
         @return a DeviceUsage object
         """
         self.__session.expire_all()
@@ -463,6 +465,9 @@ class DbHelper():
         if du_description is not None:
             if du_description == '': du_description = None
             device_usage.description = self.__to_unicode(du_description)
+        if du_default_options is not None:
+            if du_default_options == '': du_default_options = None
+            device_usage.default_options = self.__to_unicode(du_default_options)
         self.__session.add(device_usage)
         try:
             self.__session.commit()
@@ -876,26 +881,23 @@ class DbHelper():
         """
         return self.__session.query(DeviceTechnology).all()
 
-    def get_device_technology_by_name(self, dt_name):
+    def get_device_technology_by_id(self, dt_id):
         """
         Return information about a device technology
-        @param dt_name : the device technology name
+        @param dt_id : the device technology id
         @return a DeviceTechnology object
         """
-        return self.__session.query(DeviceTechnology)\
-                             .filter(func.lower(DeviceTechnology.name)==self.__to_unicode(dt_name.lower()))\
-                             .first()
+        return self.__session.query(DeviceTechnology).filter_by(id=dt_id).first()
 
-    def add_device_technology(self, dt_name, dt_description):
+    def add_device_technology(self, dt_id, dt_name, dt_description=None):
         """
         Add a device_technology
+        @param dt_id : technology id (ie x10, plcbus, eibknx...) with no spaces / accents or special characters
         @param dt_name : device technology name, one of 'x10', '1wire', 'PLCBus', 'RFXCom', 'IR'
         @param dt_description : extended description of the technology
         """
         self.__session.expire_all()
-        if dt_name not in DEVICE_TECHNOLOGY_LIST:
-            raise ValueError, "dt_name must be one of %s" % DEVICE_TECHNOLOGY_LIST
-        dt = DeviceTechnology(name=self.__to_unicode(dt_name), description=self.__to_unicode(dt_description))
+        dt = DeviceTechnology(id=dt_id, name=self.__to_unicode(dt_name), description=self.__to_unicode(dt_description))
         self.__session.add(dt)
         try:
             self.__session.commit()
@@ -1278,6 +1280,77 @@ class DbHelper():
         return device_d
 
 ####
+# Device config
+####
+    def list_all_device_config(self):
+        """
+        List all device config parameters
+        @return A list of DeviceConfig objects
+        """
+        return self.__session.query(DeviceConfig).all()
+
+    def list_device_config(self, dc_device_id):
+        """
+        List all config keys of a device
+        @param dc_device_id : device id
+        @return A list of DeviceConfig objects
+        """
+        return self.__session.query(DeviceConfig).filter_by(device_id=dc_device_id).all()
+
+    def get_device_config_by_key(self, dc_key, dc_device_id):
+        """
+        Get a key of a device configuration
+        @param dc_key : key name
+        @param dc_device_id : device id
+        @return A DeviceConfig object
+        """
+        return self.__session.query(DeviceConfig).filter_by(key=dc_key, device_id=dc_device_id).first()
+
+
+    def set_device_config(self, dc_key, dc_value, dc_device_id):
+        """
+        Add / update an device config key
+        @param dc_key : key name
+        @param dc_value : associated value
+        @param dc_device_id : device id
+        @return : the added/updated DeviceConfig object
+        """
+        self.__session.expire_all()
+        device_config = self.__session.query(DeviceConfig).filter_by(key=dc_key, device_id=dc_device_id).first()
+        if device_config is None:
+            device_config = DeviceConfig(key=dc_key, value=self.__to_unicode(dc_value), device_id=dc_device_id)
+        else:
+            device_config.value = self.__to_unicode(dc_value)
+        self.__session.add(device_config)
+        try:
+            self.__session.commit()
+        except Exception, sql_exception:
+            self.__session.rollback()
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
+        return device_config
+
+    def del_device_config(self, dc_device_id):
+        """
+        Delete a device configuration key
+        @param dc_device_id : device id
+        @return The DeviceConfig object which was deleted
+        """
+        self.__session.expire_all()
+        dc_list = self.__session.query(DeviceConfig).filter_by(device_id=dc_device_id).all()
+        if dc_list is None:
+            raise DbHelperException("Couldnt delete device config for device id %s : it doesn't exist" % dc_device_id)
+        dc_list_d = []
+        for device_config in dc_list:
+            dc_list_d.append(device_config)
+            self.__session.delete(device_config)
+        try:
+            self.__session.commit()
+        except Exception, sql_exception:
+            self.__session.rollback()
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
+        return dc_list_d
+
+####
 # Device stats
 ####
     def list_device_stats(self, d_device_id):
@@ -1584,7 +1657,7 @@ class DbHelper():
         return False
 
     def add_user_account(self, a_login, a_password, a_person_id, a_is_admin=False,
-                         a_skin_used='skins/default'):
+                         a_skin_used=''):
         """
         Add a user account
         @param a_login : Account login
@@ -1615,7 +1688,7 @@ class DbHelper():
 
     def add_user_account_with_person(self, a_login, a_password, a_person_first_name,
                                      a_person_last_name, a_person_birthdate=None,
-                                     a_is_admin=False, a_skin_used='skins/default'):
+                                     a_is_admin=False, a_skin_used=''):
         """
         Add a user account and a person
         @param a_login : Account login

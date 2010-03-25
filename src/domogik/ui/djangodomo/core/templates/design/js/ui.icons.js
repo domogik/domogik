@@ -10,9 +10,11 @@ range[5] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
 
 function findRangeIcon(usage, percent) {
 	var nearest, last_d_memorized = 101;
+	var set = range[usage];
 	// We iterate on the array...
-	for each(value in range[usage]) {
+	for (var i = 0; i < set.length ;i++) {
 		// if we found the desired number, we return it.
+		var value = set[i];
 		if (value == percent) {
 			return value;
 		} else {

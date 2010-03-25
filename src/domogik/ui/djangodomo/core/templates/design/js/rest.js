@@ -63,9 +63,14 @@ $.extend({
 });
 
 function getREST(url, callback) {
+    var rest_url = "http://127.0.0.1:8080";  
+    if (rest_ip && rest_port) {
+        rest_url = "http://" + rest_ip + ":" + rest_port;  
+    }
+    
     $.ajax({
         type: "GET",
-        url: "http://127.0.0.1:8080" + url,
+        url: rest_url + url,
         dataType: "jsonp",
         success:
             callback,

@@ -35,10 +35,38 @@ Implements
 """
 
 from django.db import models
+from domogik.common.configloader import Loader
+
 import dmg_pipes as pipes
 
+# HTTP server ip and port
+try:
+    cfg_rest = Loader('rest')
+    config_rest = cfg_rest.load()
+    conf_rest = dict(config_rest[1])
+    rest_ip = conf_rest['rest_server_ip']
+    rest_port = conf_rest['rest_server_port']
+    print "REST config found : (" + rest_ip + ":" + rest_port + ")"
+except KeyError:
+    # default parameters
+    rest_ip = "127.0.0.1"
+    rest_port = "8080"
+    print "REST config not found : using default (127.0.0.1:8080)"
+
+rest_url = "http://" + rest_ip + ":" + rest_port
+
+class REST():
+    
+    @staticmethod
+    def getIP():
+        return rest_ip
+    
+    @staticmethod
+    def getPort():
+        return rest_port
+    
 class Areas(pipes.DmgPipe):
-    uri = "http://127.0.0.1:8080/base/area"
+    uri = rest_url + "/base/area"
 
     @staticmethod
     def get_all():
@@ -74,7 +102,7 @@ class Areas(pipes.DmgPipe):
                         room.config[uiconfig.key] = uiconfig.value
 
 class Rooms(pipes.DmgPipe):
-    uri = "http://127.0.0.1:8080/base/room"
+    uri = rest_url + "/base/room"
 
     @staticmethod
     def get_all():
@@ -128,7 +156,7 @@ class Rooms(pipes.DmgPipe):
                     device.actuator = actuators.actuator_feature
 
 class Devices(pipes.DmgPipe):
-    uri = "http://127.0.0.1:8080/base/device"
+    uri = rest_url + "/base/device"
 
     @staticmethod
     def get_all():
@@ -163,7 +191,7 @@ class Devices(pipes.DmgPipe):
             device.actuator = actuators.actuator_feature
 
 class DeviceUsages(pipes.DmgPipe):
-    uri = "http://127.0.0.1:8080/base/device_usage"
+    uri = rest_url + "/base/device_usage"
 
     @staticmethod
     def get_all():
@@ -172,7 +200,7 @@ class DeviceUsages(pipes.DmgPipe):
             return resp
 
 class DeviceTechnologies(pipes.DmgPipe):
-    uri = "http://127.0.0.1:8080/base/device_technology"
+    uri = rest_url + "/base/device_technology"
 
     @staticmethod
     def get_all():
@@ -181,7 +209,7 @@ class DeviceTechnologies(pipes.DmgPipe):
             return resp
 
 class DeviceTypes(pipes.DmgPipe):
-    uri = "http://127.0.0.1:8080/base/device_type"
+    uri = rest_url + "/base/device_type"
 
     @staticmethod
     def get_all():
@@ -190,7 +218,7 @@ class DeviceTypes(pipes.DmgPipe):
             return resp
 
 class DeviceActuators(pipes.DmgPipe):
-    uri = "http://127.0.0.1:8080/base/actuator_feature"
+    uri = rest_url + "/base/actuator_feature"
 
     @staticmethod
     def get_all():
@@ -205,7 +233,7 @@ class DeviceActuators(pipes.DmgPipe):
             return resp
 
 class UIConfigs(pipes.DmgPipe):
-    uri = "http://127.0.0.1:8080/base/ui_config"
+    uri = rest_url + "/base/ui_config"
 
     @staticmethod
     def get_by_key(name, key):
@@ -228,23 +256,23 @@ class UIConfigs(pipes.DmgPipe):
                 resp[uiconfig.key] = uiconfig.value
             return resp
 
-class Modules(pipes.DmgPipe):
-    uri = "http://127.0.0.1:8080/module"
+class Plugins(pipes.DmgPipe):
+    uri = rest_url + "/plugin"
 
     @staticmethod
     def get_all():
-        resp = Modules.objects.get({'parameters':"list/"})
+        resp = Plugins.objects.get({'parameters':"list/"})
         if resp :
             return resp
 
     @staticmethod
     def get_by_name(name):
-        resp = Modules.objects.get({'parameters':"list/by-name/" + name})
+        resp = Plugins.objects.get({'parameters':"list/by-name/" + name})
         if resp :
             return resp
 
 class Accounts(pipes.DmgPipe):
-    uri = "http://127.0.0.1:8080/account"
+    uri = rest_url + "/account"
 
     @staticmethod
     def auth(login, password):
