@@ -72,6 +72,10 @@ class SysManager(xPLPlugin):
                 help="Start database manager if not already running.")
         parser.add_option("-r", action="store_true", dest="start_rest", default=False, \
                 help="Start REST interface manager if not already running.")
+        parser.add_option("-s", action="store_true", dest="start_stat", default=False, \
+                help="Start statistics manager if not already running.")
+        parser.add_option("-t", action="store_true", dest="start_trigger", default=False, \
+                help="Start scenario manager if not already running.")
         xPLPlugin.__init__(self, name = 'sysmgr', parser=parser)
 
         # Logger init
@@ -88,6 +92,7 @@ class SysManager(xPLPlugin):
         # Get components
         self._list_components(gethostname())
 
+        #Start dbmgr
         if self.options.start_dbmgr:
             if self._check_dbmgr_is_running():
                 self._log.warning("Manager started with -d, but a database manager is already running")
@@ -97,6 +102,7 @@ class SysManager(xPLPlugin):
                     self._log.error("Manager started with -d, but database manager not available after a startup.\
                             Please check dbmgr.log file")
 
+        #Start rest
         if self.options.start_rest:
             if self._check_rest_is_running():
                 self._log.warning("Manager started with -r, but a REST manager is already running")
@@ -105,6 +111,26 @@ class SysManager(xPLPlugin):
                 if not self._check_rest_is_running():
                     self._log.error("Manager started with -r, but REST manager not available after a startup.\
                             Please check rest.log file")
+
+        #Start stat
+        if self.options.start_stat:
+            if self._check_stat_is_running():
+                self._log.warning("Manager started with -s, but a statistic manager is already running")
+            else:
+                self._start_plugin("statmgr", gethostname(), 1)
+                if not self._check_stat_is_running():
+                    self._log.error("Manager started with -s, but statistic manager not available after a startup.\
+                            Please check statmgr.log file")
+
+        #Start trigger
+        if self.options.start_trigger:
+            if self._check_trigger_is_running():
+                self._log.warning("Manager started with -t, but a trigger manager is already running")
+            else:
+                self._start_plugin("trigger", gethostname(), 1)
+                if not self._check_trigger_is_running():
+                    self._log.error("Manager started with -t, but trigger manager not available after a startup.\
+                            Please check trigger.log file")
 
         # Start plugins at manager startup
         self._log.debug("Check non-system plugins to start at manager startup...")
@@ -195,45 +221,46 @@ class SysManager(xPLPlugin):
         else:
             self._log.info("Error detected : %s, request %s has been cancelled" % (error, cmd))
 
-    def _sys_cb_stop(self, message):
-        '''
-        Internal callback for receiving 'stop' system messages
-        @param message : xpl message received
-        '''
-        self._log.debug("Call _sys_cb_stop")
-
-        cmd = message.data['command']
-        try:
-           plg = message.data['plugin']
-        except KeyError:
-           plg = "*"
-        host = message.data["host"]
-
-        # force command indicator
-        force = 0
-        if "force" in message.data:
-            force = int(message.data['force'])
-
-        # error if no plugin in list
-        error = ""
-        if self._is_component(plg) == False and plg != "*":
-            self._invalid_component(cmd, plg, host)
-
-        # if no error at this point, process
-        if error == "":
-            self._log.debug("System request %s for host %s, plugin %s. current hostname : %s" % (cmd, host, plg, gethostname()))
-
-            # stop plugin
-            if cmd == "stop" and host == gethostname():
-                try:
-                    error_msg = message.data["error"]
-                except KeyError:
-                    error_msg = ""
-                    self._stop_plugin(plg, host, force, error_msg)
-
-        # if error
-        else:
-            self._log.info("Error detected : %s, request %s has been cancelled" % (error, cmd))
+#DEPRECATED
+#    def _sys_cb_stop(self, message):
+#        '''
+#        Internal callback for receiving 'stop' system messages
+#        @param message : xpl message received
+#        '''
+#        self._log.debug("Call _sys_cb_stop")
+#
+#        cmd = message.data['command']
+#        try:
+#           plg = message.data['plugin']
+#        except KeyError:
+#           plg = "*"
+#        host = message.data["host"]
+#
+#        # force command indicator
+#        force = 0
+#        if "force" in message.data:
+#            force = int(message.data['force'])
+#
+#        # error if no plugin in list
+#        error = ""
+#        if self._is_component(plg) == False and plg != "*":
+#            self._invalid_component(cmd, plg, host)
+#
+#        # if no error at this point, process
+#        if error == "":
+#            self._log.debug("System request %s for host %s, plugin %s. current hostname : %s" % (cmd, host, plg, gethostname()))
+#
+#            # stop plugin
+#            if cmd == "stop" and host == gethostname():
+#                try:
+#                    error_msg = message.data["error"]
+#                except KeyError:
+#                    error_msg = ""
+#                    self._stop_plugin(plg, host, force, error_msg)
+#
+#        # if error
+#        else:
+#            self._log.info("Error detected : %s, request %s has been cancelled" % (error, cmd))
 
     def _invalid_component(self, cmd, plg, host):
         error = "Component %s doesn't exists on %s" % (plg, host)

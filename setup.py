@@ -89,6 +89,8 @@ setup(
             """
             dmg_manager = domogik.xpl.bin.manager:main
             dmg_send = domogik.xpl.bin.send:main
+            dmg_stats = domogik.xpl.bin.statmgr:main
+            dmg_trigger = domogik.xpl.bin.trigger:main
             dmg_django = domogik.ui.djangodomo.manage:run_manager
             """
         ],
