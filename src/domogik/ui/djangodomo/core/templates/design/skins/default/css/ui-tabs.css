@@ -36,6 +36,11 @@
     background-color:#FFFFFF;
 }
 
+.ui-tabs .ui-tabs-nav li a:focus {
+    color:#FFFFFF;
+    background-color:#BDCB2F;
+}
+
 .ui-tabs .ui-tabs-nav li a.add {
     padding: 1em 2em 1em 2em;
     background-position:50% 50%;

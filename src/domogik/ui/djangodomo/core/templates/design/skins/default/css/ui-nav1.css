@@ -67,14 +67,6 @@ ul#nav1 li a .description {
     line-height:0.8em;
 }
 
-ul#nav1 li a:hover, ul#nav1 li a:focus, ul#nav1 li a:active {
-    color: #28281E;
-}
-
-ul#nav1 li a:hover .description, ul#nav1 li a:focus .description, ul#nav1 li a:active .description {
-    color: #444432;
-}
-
 ul#nav1 li a.selected {
     color: #28281E;
     background: url(../images/decoration/nav1_selector_black.png) 50% 100% no-repeat;
@@ -83,6 +75,24 @@ ul#nav1 li a.selected {
 ul#nav1 li a.selected .description {
     color: #444432;
 }
+
+ul#nav1 li a:hover{
+    color: #28281E;
+}
+
+ul#nav1 li a:hover .description {
+    color: #444432;
+}
+
+ul#nav1 li a:focus {
+    color: #FFFFFF;
+}
+
+ul#nav1 li a:focus .description{
+    color: #FFFFFF;
+}
+
+
 
 ul#nav1 .login {
     float:right;
