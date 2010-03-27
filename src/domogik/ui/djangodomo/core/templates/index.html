@@ -24,9 +24,6 @@
 {% block title %}{% trans page_title %}{% endblock %}
 {% block css %}
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-page-section.css" rel="stylesheet" type="text/css" />
-    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-page-block.css" rel="stylesheet" type="text/css" />
-    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-action-binary.css" rel="stylesheet" type="text/css" />
-    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-action-range.css" rel="stylesheet" type="text/css" />
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/page-home.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block include_js_script %}
@@ -62,39 +59,25 @@
         </div>
     </div>
     <dl>
-    {% for room in rooms_list %}
-        {% if forloop.counter0|divisibleby:"3" %}
-        <div class="row">
-        {% endif %}
-            <div class='column'>
-                <div class="block">
-                    <dt class='header icon64-room-{{ room.config.icon }}'>
-                        <div class="ident">
-                            <span class="title">{{ room.name }}</span>
-                            <br />
-                            <span class="subtitle icon16-area-{{ room.area.config.icon }}">{{ room.area.name }}</span>
-                        </div>
-                    </dt>
-                        <dd>
-                            <ul>
-                                {% regroup device_list|dictsort:"room" by room as d_list_by_room %}
-                                {% for device in d_list_by_room %}
-                                    {% ifequal device.grouper room.id %}
-                                        {% for item in device.list %}
-                                            <li>{{ item.device.name }}</li>
-                                        {% endfor %}
-                                    {% endifequal %}
-                                {% endfor %}
-                            </ul>
-                        </dd>
-                    <dd class='footer'></dd>
-                </div>
-            </div>
-        {% if forloop.counter0|divisibleby:"3" %}
-        </div>
-        {% endif %}
+    {% for area in areas_list %}
+        <ul class='areaslist'>
+            <li class='areaitem'>
+                <a href='{% url show_area_view area.id %}' class="ident icon64-area-{{ area.config.icon }}">
+                    <span class="title">{{ area.name }}</span>
+                </a>
+                <ul class='roomslist'>
+                    {% for room in area.room %}
+                        <li class='roomitem'>
+                            <a href='{% url show_room_view room.id %}' class="ident icon64-room-{{ room.config.icon }}">
+                                <span class="title">{{ room.name }}</span>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+        </ul>
     {% empty %}
-        <p>{% trans "No rooms configured yet" %}</p>
+        <p>{% trans "No areas or rooms configured yet" %}</p>
     {% endfor %}
         </dl>
 {% endblock %}
