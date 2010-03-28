@@ -47,7 +47,7 @@ if __name__ == '__main__':
         print request[0:1]
         if request[0:1] != "#" and len(request) != 0:
             print "[ " + request + " ]"
-            data = urllib.urlopen("https://%s:%s%s" % (ip, port, request))
+            data = urllib.urlopen("http://%s:%s%s" % (ip, port, request))
             print data.read()
     file.close()
 
