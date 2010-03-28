@@ -74,7 +74,7 @@ $(function(){
     }
     
     function saveConfig(name, configuration) {
-        for each (item in configuration) {
+        $.each(configuration, function(index, item) {
             var value = null;
             if (item.key == 'startup-plugin') {
                 value = ($('#value_' + item.key + ':checked').length > 0)? 'True':'False';
@@ -94,95 +94,81 @@ $(function(){
                     }
                 }
             );
-        }
+        });
     }
-    
-    var configuration = null;
-    /* Check if the module is configured */
-    getREST('/plugin/config/list/by-name/{{ plugin.name }}',
+
+    /* Get the list of configuration items */
+    getREST('/plugin/detail/{{ plugin.name }}',
         function(data) {
             var status = (data.status).toLowerCase();
             if (status == 'ok') {
-                var is_configured = (data.config.length > 0);
-                /* Get the list of configuration items */
-                getREST('/plugin/detail/{{ plugin.name }}',
+                var num_items = data.plugin[0].configuration.length;
+                $.each(data.plugin[0].configuration, function(index, item) {
+                    var ikey = item.key;
+                    var idescription = item.description;
+                    var idefault = item.default;
+                    getREST('/plugin/config/list/by-name/{{ plugin.name }}/by-key/' + ikey,
+                        function(data) {
+                            var status = (data.status).toLowerCase();
+                            if (status == 'ok') {
+                                var tr = $("<tr></tr>");
+                                tr.append("<td>" +  ikey + "</td><td><label for='value_" + ikey + "'>" +  idescription + "</label></td>");
+                                if (ikey == 'startup-plugin') {
+                                    $(tr).append("<td><input type='checkbox' name='value_" + ikey + "' id='value_" + ikey + "' /></td><td></td>");
+                                    if (data.config.length > 0) { // If already configured
+                                        if (data.config[0].value  == "True") {
+                                            $("#value_" + ikey).attr('checked', 'checked');
+                                        }
+                                    }
+                                } else {
+                                    if (data.config.length > 0) { // If already configured
+                                        $(tr).append("<td><input type='text' name='value_" + ikey + "' id='value_" + ikey + "' class='medium' value='" +  data.config[0].value + "' /></td>");                                                                            
+                                    } else { // If not configured
+                                        $(tr).append("<td><input type='text' name='value_" + ikey + "' id='value_" + ikey + "' class='medium icon16-status-warning' title='Default value' value='" +  idefault + "' /></td>");
+                                    }
+                                    $(tr).append("<td><ul class='actions'><li><button id='reset" + ikey + "' class='icon16-action-reset buttonicon' title='{% trans "Reset" %} " + ikey + "'><span class='offscreen'>{% trans "Reset" %} " + ikey + "</span></button></li></ul></td>");                                    
+                                }
+                                $("#configuration_items").append(tr);
+                                $("#reset" + ikey).click(function(event) {
+                                    resetKey(ikey, idefault);
+                                    event.stopPropagation();
+                                });
+                            } else {
+                                /* Error retreving plugin item config */
+                                display_message(data.status, data.description);
+                            }
+                        }
+                    );
+                });
+                
+                getREST('/plugin/config/list/by-name/{{ plugin.name }}',
                     function(data) {
                         var status = (data.status).toLowerCase();
                         if (status == 'ok') {
-                            configuration = data.plugin[0].configuration;
-                            var header = $("<form><table id='configuration_items'><tr><th scope='col'>{% trans "Key" %}</th><th scope='col'>{% trans "Description" %}</th><th scope='col'>{% trans "value" %}</th><th>{% trans "Actions" %}</th></tr></table></form>");
-                            if (is_configured) {
-                                $("#configuration").append("<p><button id='configurationdelete' class='button icon16-action-del'>{% trans 'Delete configuration' %}</button></p>")
-                                $("#configurationdelete").click(function(event) {
-                                    deleteConfig('{{ plugin.name }}');
-                                });
-                                $("#configuration").append(header);
-                                /* Already configured */
-                                for each (item in configuration) {
-                                    getREST('/plugin/config/list/by-name/{{ plugin.name }}/by-key/' + item.key,
-                                        function(data) {
-                                            var status = (data.status).toLowerCase();
-                                            if (status == 'ok') {
-                                                if (data.config.length > 0) {
-                                                    if (item.key == 'startup-plugin') {
-                                                        $("#configuration_items").append("<tr><td>" +  item.key + "</td><td><label for='value_" + item.key + "'>" +  item.description + "</label></td><td><input type='checkbox' name='value_" + item.key + "' id='value_" + item.key + "' /></td><td></td></li>");
-                                                        if (data.config[0].value  == "True") {
-                                                            $("#value_" + item.key).attr('checked', 'checked');
-                                                        }
-                                                    } else {
-                                                        $("#configuration_items").append("<tr><td>" +  item.key + "</td><td><label for='value_" + item.key + "'>" +  item.description + "</label></td><td><input type='text' name='value_" + item.key + "' id='value_" + item.key + "' class='medium' value='" +  data.config[0].value + "' /></td><td><ul class='actions'><li><a href='#' id='reset" + item.key + "' class='icon16-action-reset buttonicon' title='{% trans "Reset" %} " + item.key + "'><span class='offscreen'>{% trans "Reset" %} " + item.key + "</span></a></li></ul></td></li>");                                                                            
-                                                    }
-                                                } else {
-                                                    if (item.key == 'startup-plugin') {
-                                                        $("#configuration_items").append("<tr><td>" +  item.key + "</td><td><label for='value_" + item.key + "'>" +  item.description + "</label></td><td><input type='checkbox' name='value_" + item.key + "' id='value_" + item.key + "' /></td><td></td></li>");
-                                                    } else {
-                                                        $("#configuration_items").append("<tr><td>" +  item.key + "</td><td><label for='value_" + item.key + "'>" +  item.description + "</label></td><td><input type='text' name='value_" + item.key + "' id='value_" + item.key + "' class='medium icon16-status-warning' title='Default value' value='" +  item.default + "' /></td><td><ul class='actions'><li><a href='#' id='reset" + item.key + "' class='icon16-action-reset buttonicon' title='{% trans "Reset" %} " + item.key + "'><span class='offscreen'>{% trans "Reset" %} " + item.key + "</span></a></li></ul></td></li>");
-                                                    }
-                                                }
-                                                $("#reset" + item.key).click(function(event) {
-                                                    resetKey(item.key, item.default);
-                                                    event.stopPropagation();
-                                                });
-                                            } else {
-                                                /* Error */
-                                                display_message(data.status, data.description);
-                                            }
-                                        }
-                                    );
-                                }
-                            } else {
-                                $("#configuration").append("<p class='icon32-text icon32-status-warning'><span class='offscreen'>{% trans "Warning" %}</span>{% trans "This module has not been configured yet" %}</p>");                
-                                $("#configuration").append(header);
-                                /* Not configured */
-                                for each (item in configuration) {
-                                    if (item.key == 'startup-plugin') {
-                                        $("#configuration_items").append("<tr><td>" +  item.key + "</td><td><label for='value_" + item.key + "'>" +  item.description + "</label></td><td><input type='checkbox' name='value_" + item.key + "' id='value_" + item.key + "' /></td><td></td></li>");
-                                    } else {
-                                        $("#configuration_items").append("<tr><td>" +  item.key + "</td><td><label for='value_" + item.key + "'>" +  item.description + "</label></td><td><input type='text' name='value_" + item.key + "' id='value_" + item.key + "' class='medium' value='" +  item.default + "' /></td><td><ul class='actions'><li><a href='#' id='reset" + item.key + "' class='icon16-action-reset buttonicon' title='{% trans "Reset" %} " + item.key + "'><span class='offscreen'>{% trans "Reset" %} " + item.key + "</span></a></li></ul></td></li>");                
-                                        $("#reset" + item.key).click(function(event) {
-                                            resetKey(item.key, item.default);
-                                            event.stopPropagation();
-                                        });                                    
-                                    }
-                                }
+                            var never_configured = num_items - data.config.length;
+                            if (never_configured > 0) {
+                                display_message('WARNING', never_configured + " item(s) not configured yet");                                            
                             }
-                            $("#configuration").append("<p><button id='configurationsubmit' class='button icon16-action-save'>{% trans "Save" %}</button></p>");
-                            $("#configurationsubmit").click(function(event) {
-                                saveConfig('{{ plugin.name }}', configuration);
-                                event.stopPropagation();
-                            });
                         } else {
-                            /* Error */
+                            /* Error retreving plugin config */
                             display_message(data.status, data.description);
                         }
-                    }
-                );
+                    });
+                $("#configuration").append("<p><button id='configurationsubmit' class='button icon16-action-save'>{% trans "Save" %}</button></p>");
+                $("#configurationsubmit").click(function(event) {
+                    saveConfig('{{ plugin.name }}', data.plugin[0].configuration);
+                    event.stopPropagation();
+                });
             } else {
-                /* Error */
+                /* Error to get plugin default config */
                 display_message(data.status, data.description);
             }
         }
     );
+
+    $("#configurationdelete").click(function(event) {
+        deleteConfig('{{ plugin.name }}');
+    });
 });
 {% endblock %}
 {% block css %}
@@ -193,7 +179,6 @@ $(function(){
 {% block title %}{% trans page_title %}{% endblock %}
 
 {% block banner %}
-    <div id='configuration_data'></div>
     <div class="section">
         <h1 class="ident icon64-plugin-{{ plugin.name }}">
             <span class="title">{% trans "Plugin" %} '{{ plugin.name }}'</span>
@@ -228,6 +213,11 @@ $(function(){
     </div>
     <div class="subsection">
         <h2>{% trans "Configuration" %}</h2>
-        <div id='configuration'></div>
+        <div id='configuration'>
+            <p><button id='configurationdelete' class='button icon16-action-del'>{% trans 'Delete configuration' %}</button></p>
+            <table id='configuration_items'>
+                <tr><th scope='col'>{% trans "Key" %}</th><th scope='col'>{% trans "Description" %}</th><th scope='col'>{% trans "value" %}</th><th>{% trans "Actions" %}</th></tr>
+            </table>
+        </div>
     </div>
 {% endblock %}
