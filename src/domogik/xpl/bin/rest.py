@@ -1186,34 +1186,35 @@ target=*
                     self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
                 else:
-                    if self.rest_request[2] == "by-type_id":
-                        self._rest_base_actuator_feature_list(type_id=self.rest_request[3])
+                    if self.rest_request[2] == "by-id":
+                        self._rest_base_actuator_feature_list(id=self.rest_request[3])
                     else:
                         self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
 
-            ### add
-            elif self.rest_request[1] == "add_OFF":
-                offset = 2
-                if self.set_parameters(offset):
-                    self._rest_base_actuator_feature_add()
-                else:
-                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
+            ### others
+            else:
+                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], \
+                                                  self.jsonp, self.jsonp_cb)
+                return
 
-            ### update
-            elif self.rest_request[1] == "update_OFF":
-                offset = 2
-                if self.set_parameters(offset):
-                    self._rest_base_actuator_feature_update()
-                else:
-                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
-            ### del
-            elif self.rest_request[1] == "del_OFF":
-                if len(self.rest_request) == 3:
-                    self._rest_base_actuator_feature__del(af_id=self.rest_request[2])
-                else:
+
+        ### sensor feature ###########################
+        elif self.rest_request[0] == "sensor_feature":
+
+            ### list
+            if self.rest_request[1] == "list":
+                if len(self.rest_request) == 2:
+                    self._rest_base_sensor_feature_list()
+                elif len(self.rest_request) == 3:
                     self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
+                else:
+                    if self.rest_request[2] == "by-id":
+                        self._rest_base_sensor_feature_list(id=self.rest_request[3])
+                    else:
+                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
 
             ### others
@@ -1854,74 +1855,40 @@ target=*
 # /base/actuator_feature processing
 ######
 
-    def _rest_base_actuator_feature_list(self, type_id = None):
+    def _rest_base_actuator_feature_list(self, id = None):
         """ list actuator features
-            @param name : actuator feature name
+            @param id : id of actuator feature 
         """
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("actuator_feature")
-        if type_id == None:
+        if id == None:
             for actuator_feature in self._db.list_actuator_features():
                 json_data.add_data(actuator_feature)
         else:
-            for actuator_feature in self._db.get_actuator_feature_by_typeid(type_id):
+            actuator_feature = self._db.get_actuator_feature_by_id(id)
+            if actuator_feature is not None:
                 json_data.add_data(actuator_feature)
         self.send_http_response_ok(json_data.get())
 
+######
+# /base/sensor_feature processing
+######
 
-
-    def _rest_base_actuator_feature_add(self):
-        """ add actuator feature
+    def _rest_base_sensor_feature_list(self, id = None):
+        """ list sensor features
+            @param id : id of sensor feature 
         """
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("actuator_feature")
-        try:
-            actuator_feature = self._db.add_actuator_feature(self.get_parameters("name"), \
-                                                                  self.get_parameters("value"), \
-                                                                  self.get_parameters("type_id"), \
-                                                                  self.get_parameters("unit"), \
-                                                                  self.get_parameters("configurable_states"), \
-                                                                  self.get_parameters("return_confirmation"))
-            json_data.add_data(actuator_feature)
-        except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
-        self.send_http_response_ok(json_data.get())
-
-
-    def _rest_base_actuator_feature_update(self):
-        """ update actuator feature
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("actuator_feature")
-        try:
-            actuator_feature = self._db.update_actuator_feature(self.get_parameters("id"), \
-                                                                  self.get_parameters("name"), \
-                                                                  self.get_parameters("value"), \
-                                                                  self.get_parameters("type_id"), \
-                                                                  self.get_parameters("unit"), \
-                                                                  self.get_parameters("configurable_states"), \
-                                                                  self.get_parameters("return_confirmation"))
-            json_data.add_data(actuator_feature)
-        except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
-        self.send_http_response_ok(json_data.get())
-
-
-    def _rest_base_actuator_feature_del(self, af_id=None):
-        """ delete actuator feature
-            @param af_id : actuator feature id to delete
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("actuator_feature")
-        try:
-            actuator_feature = self._db.del_actuator_feature(af_id)
-            json_data.add_data(actuator_feature)
-        except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+        json_data.set_data_type("sensor_feature")
+        if id == None:
+            for sensor_feature in self._db.list_sensor_features():
+                json_data.add_data(sensor_feature)
+        else:
+            sensor_feature = self._db.get_sensor_feature_by_id(id)
+            if sensor_feature is not None:
+                json_data.add_data(sensor_feature)
         self.send_http_response_ok(json_data.get())
 
 
