@@ -1611,7 +1611,8 @@ target=*
         json_data.set_data_type("device_usage")
         try:
             device_usage = self._db.add_device_usage(self.get_parameters("name"), \
-                                                     self.get_parameters("description"))
+                                                     self.get_parameters("description"), \
+                                                     self.get_parameters("default_options"))
             json_data.add_data(device_usage)
         except:
             json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
@@ -1628,7 +1629,8 @@ target=*
         try:
             device_usage = self._db.update_device_usage(self.get_parameters("id"), \
                                                         self.get_parameters("name"), \
-                                                        self.get_parameters("description"))
+                                                        self.get_parameters("description"), \
+                                                        self.get_parameters("default_options"))
             json_data.add_data(device_usage)
         except:
             json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
