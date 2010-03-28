@@ -1127,53 +1127,6 @@ target=*
                                                   self.jsonp, self.jsonp_cb)
                 return
 
-        ### sensor reference #########################
-        elif self.rest_request[0] == "sensor_reference":
-
-            ### list
-            if self.rest_request[1] == "list":
-                if len(self.rest_request) == 2:
-                    self._rest_base_sensor_reference_list()
-                elif len(self.rest_request) == 3:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-                else:
-                    if self.rest_request[2] == "by-type_id":
-                        self._rest_base_sensor_reference_list(type_id=self.rest_request[3])
-                    else:
-                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-
-            ### add
-            elif self.rest_request[1] == "add_OFF":
-                offset = 2
-                if self.set_parameters(offset):
-                    self._rest_base_sensor_reference_add()
-                else:
-                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
-
-            ### update
-            elif self.rest_request[1] == "update_OFF":
-                offset = 2
-                if self.set_parameters(offset):
-                    self._rest_base_sensor_reference_update()
-                else:
-                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
-
-            ### del
-            elif self.rest_request[1] == "del_OFF":
-                if len(self.rest_request) == 3:
-                    self._rest_base_sensor_reference_del(sr_id=self.rest_request[2])
-                else:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-
-            ### others
-            else:
-                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], \
-                                                  self.jsonp, self.jsonp_cb)
-                return
-
 
         ### actuator feature #########################
         elif self.rest_request[0] == "actuator_feature":
@@ -1765,82 +1718,6 @@ target=*
             json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
         self.send_http_response_ok(json_data.get())
 
-
-
-######
-# /base/sensor_reference processing
-######
-
-    def _rest_base_sensor_reference_list(self, type_id = None):
-        """ list sensor references
-            @param name : sensor reference name
-        """ 
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("sensor_reference")
-        if type_id == None:
-            for sensor_reference in self._db.list_sensor_reference_data():
-                json_data.add_data(sensor_reference)
-        else:
-            for sensor_reference in self._db.get_sensor_reference_data_by_typeid(type_id):
-                json_data.add_data(sensor_reference)
-        self.send_http_response_ok(json_data.get())
-
-
-
-    def _rest_base_sensor_reference_add(self):
-        """ add sensor reference
-        """ 
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("sensor_reference")
-        try:
-            sensor_reference = self._db.add_sensor_reference_data(self.get_parameters("name"), \
-                                                                  self.get_parameters("value"), \
-                                                                  self.get_parameters("type_id"), \
-                                                                  self.get_parameters("unit"), \
-                                                                  self.get_parameters("stat_key"))
-            json_data.add_data(sensor_reference)
-        except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
-        self.send_http_response_ok(json_data.get())
-
-
-
-    def _rest_base_sensor_reference_update(self):
-        """ update sensor_reference
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("sensor_reference")
-        try:
-            sensor_reference = self._db.update_sensor_reference_data(self.get_parameters("id"), \
-                                                                  self.get_parameters("name"), \
-                                                                  self.get_parameters("value"), \
-                                                                  self.get_parameters("type_id"), \
-                                                                  self.get_parameters("unit"), \
-                                                                  self.get_parameters("stat_key"))
-            json_data.add_data(sensor_reference)
-        except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
-        self.send_http_response_ok(json_data.get())
-
-
-
-
-    def _rest_base_sensor_reference_del(self, sr_id=None):
-        """ delete sensor reference
-            @param sr_id : sensor reference id to delete
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("sensor_reference")
-        try:
-            sensor_reference = self._db.del_sensor_reference_data(sr_id)
-            json_data.add_data(sensor_reference)
-        except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
-        self.send_http_response_ok(json_data.get())
 
 
 
