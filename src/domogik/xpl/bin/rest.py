@@ -2239,7 +2239,7 @@ target=*
 
 
 
-    def _rest_plugin_config_del(self, name=None):
+    def _rest_plugin_config_del(self, id=None):
         """ delete device technology config
             @param name : module name
         """
@@ -2247,7 +2247,7 @@ target=*
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("config")
         try:
-            for plugin in self._db.del_plugin_config(name):
+            for plugin in self._db.del_plugin_config(id):
                 json_data.add_data(plugin)
         except:
             json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
