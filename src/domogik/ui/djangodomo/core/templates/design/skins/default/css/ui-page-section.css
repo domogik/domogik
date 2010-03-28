@@ -57,6 +57,11 @@
     border:1px solid #003E99;
 }
 
+#messages.warning {
+    background-color:#FFB57D;
+    border:1px solid #992800;
+}
+
 .instructions {
     padding:1em 1em 1em 50px;
     margin:1em 0 1em 0;
