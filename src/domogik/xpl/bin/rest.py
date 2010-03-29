@@ -58,6 +58,7 @@ import datetime
 import socket
 from OpenSSL import SSL
 import SocketServer
+import os
 
 
 
@@ -201,9 +202,16 @@ class Rest(xPLPlugin):
     
             self._log.info("Initialisation OK")
 
+
+
         except:
             self._log.error("%s" % sys.exc_info()[1])
+            print("%s" % str(sys.exc_info()[0]))
             print("%s" % sys.exc_info()[1])
+            print("%s" % str(sys.exc_info()[2]))
+  
+        # tests
+        self.load_xml()
   
 
 
@@ -306,6 +314,20 @@ class Rest(xPLPlugin):
                                          handler_params = [self])
 
         server.serve_forever()
+
+
+
+    def load_xml(self):
+        """ Load XML files for /command
+        """
+        # list technologies folders
+        self.xml = {}
+        for techno in os.listdir(self._xml_directory):
+            for command in os.listdir(self._xml_directory + "/" + techno):
+                xml_file = self._xml_directory + "/" + techno + "/" + command
+                self._log.info("Load XML file for %s>%s : %s" % (techno, command, xml_file))
+                self.xml["%s-%s" % (techno, command)] = minidom.parse(xml_file)
+        self.xml_date = datetime.datetime.now()
 
 
 
@@ -526,6 +548,9 @@ class ProcessRequest():
         self._queue_system_start =  self.handler_params[0]._queue_system_start
         self._queue_system_stop =  self.handler_params[0]._queue_system_stop
 
+        self.xml =  self.handler_params[0].xml
+        self.xml_date =  self.handler_params[0].xml_date
+
         # global init
         self.jsonp = False
         self.jsonp_cb = ""
@@ -635,9 +660,20 @@ class ProcessRequest():
         json_data = JSonHelper("OK", 0, "REST server available")
         json_data.set_data_type("rest")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+
+        # Description and parameters
         json_data.add_data({"Version" : REST_API_VERSION})
         json_data.add_data({"Description" : REST_DESCRIPTION})
         json_data.add_data({"SSL" : self.use_ssl})
+
+        # Xml data
+        xml_info = ""
+        for key in self.xml:
+            xml_info += key + ", "
+        xml_info = xml_info[0:len(xml_info)-2]
+        json_data.add_data({"XML files loaded" : xml_info})
+        json_data.add_data({"XML files last load" : self.xml_date})
+
         self.send_http_response_ok(json_data.get())
 
 
@@ -2713,7 +2749,7 @@ class JSonHelper():
 
         # dirty issue to force cache of __dict__  
         print "DATA : " + unicode(data).encode('utf-8')
-        #print "DATA TYPE : " + data_type
+        print "DATA TYPE : " + data_type
 
         ### type instance (sql object)
         if data_type in instance_type:
