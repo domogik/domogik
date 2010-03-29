@@ -1,0 +1,17 @@
+<technology id="x10">
+  <command name="off">
+    <schema>x10.basic</schema>
+    <command-key>command</command-key>	
+    <adress-key>device</adress-key>	
+    <value>off</value>
+    <parameters/>                                                                                          
+  </command>	
+  <listener>
+    <schema>x10.basic</schema>
+    <xpltype>xpl-trig</xpltype>
+    <filter>
+      <key name="command" value="off" />
+      <key name="device" value="@address@"/>
+    </filter>
+  </listener>
+</technology>
