@@ -88,116 +88,123 @@ class Rest(xPLPlugin):
             @param server_ip :  ip of HTTP server
             @param server_port :  port of HTTP server
         """
-        xPLPlugin.__init__(self, name = 'rest')
 
-        # logging initialization
-        log = logger.Logger('REST')
-        self._log = log.get_logger()
-        self._log.info("Rest Server initialisation...")
-        self._log.debug("locale : %s %s" % locale.getdefaultlocale())
-        # logging data manipulation initialization
-        log_dm = logger.Logger('REST-DM')
-        self._log_dm = log_dm.get_logger()
-        self._log_dm.info("Rest Server Data Manipulation...")
-        self._log_dm.debug("locale : %s %s" % locale.getdefaultlocale())
-        # DB Helper
-        self._db = DbHelper()
-
-        ### Config
-
-        # directory data in ~/.domogik.cfg
-        cfg = Loader('domogik')
-        config = cfg.load()
-        conf = dict(config[1])
-        self._xml_directory = "%s/share/domogik/rest/" % conf['custom_prefix']
-
-        # HTTP server ip and port
         try:
-            cfg_rest = Loader('rest')
-            config_rest = cfg_rest.load()
-            conf_rest = dict(config_rest[1])
-            self.server_ip = conf_rest['rest_server_ip']
-            self.server_port = conf_rest['rest_server_port']
-        except KeyError:
-            # default parameters
-            self.server_ip = server_ip
-            self.server_port = server_port
-        self._log.info("Configuration : ip:port = %s:%s" % (self.server_ip, self.server_port))
-
-        # SSL configuration
-        try:
-            cfg_rest = Loader('rest')
-            config_rest = cfg_rest.load()
-            conf_rest = dict(config_rest[1])
-            self.use_ssl = conf_rest['rest_use_ssl']
-            if self.use_ssl == "True":
-                self.use_ssl = True
+            xPLPlugin.__init__(self, name = 'rest')
+    
+            # logging initialization
+            log = logger.Logger('REST')
+            self._log = log.get_logger()
+            self._log.info("Rest Server initialisation...")
+            self._log.debug("locale : %s %s" % locale.getdefaultlocale())
+            # logging data manipulation initialization
+            log_dm = logger.Logger('REST-DM')
+            self._log_dm = log_dm.get_logger()
+            self._log_dm.info("Rest Server Data Manipulation...")
+            self._log_dm.debug("locale : %s %s" % locale.getdefaultlocale())
+            # DB Helper
+            self._db = DbHelper()
+    
+            ### Config
+    
+            # directory data in ~/.domogik.cfg
+            cfg = Loader('domogik')
+            config = cfg.load()
+            conf = dict(config[1])
+            self._xml_directory = "%s/share/domogik/rest/" % conf['custom_prefix']
+    
+            # HTTP server ip and port
+            try:
+                cfg_rest = Loader('rest')
+                config_rest = cfg_rest.load()
+                conf_rest = dict(config_rest[1])
+                self.server_ip = conf_rest['rest_server_ip']
+                self.server_port = conf_rest['rest_server_port']
+            except KeyError:
+                # default parameters
+                self.server_ip = server_ip
+                self.server_port = server_port
+            self._log.info("Configuration : ip:port = %s:%s" % (self.server_ip, self.server_port))
+    
+            # SSL configuration
+            try:
+                cfg_rest = Loader('rest')
+                config_rest = cfg_rest.load()
+                conf_rest = dict(config_rest[1])
+                self.use_ssl = conf_rest['rest_use_ssl']
+                if self.use_ssl == "True":
+                    self.use_ssl = True
+                else:
+                    self.use_ssl = False
+                self.ssl_certificate = conf_rest['rest_ssl_certificate']
+            except KeyError:
+                # default parameters
+                self.use_ssl = USE_SSL
+                self.ssl_certificate = SSL_CERTIFICATE
+            if self.use_ssl == True:
+                self._log.info("Configuration : SSL support activated (certificate : %s)" % self.ssl_certificate)
             else:
-                self.use_ssl = False
-            self.ssl_certificate = conf_rest['rest_ssl_certificate']
-        except KeyError:
-            # default parameters
-            self.use_ssl = USE_SSL
-            self.ssl_certificate = SSL_CERTIFICATE
-        if self.use_ssl == True:
-            self._log.info("Configuration : SSL support activated (certificate : %s)" % self.ssl_certificate)
-        else:
-            self._log.info("Configuration : SSL support not activated")
+                self._log.info("Configuration : SSL support not activated")
+    
+            # Queues config
+            self._log.debug("Get queues configuration")
+            self._config = Query(self._myxpl)
+            res = xPLResult()
+            self._config.query('rest', 'queue-timeout', res)
+            self._queue_timeout = res.get_value()['queue-timeout']
+            if self._queue_timeout == "None":
+                self._queue_timeout = QUEUE_TIMEOUT
+            self._queue_timeout = float(self._queue_timeout)
+            self._config = Query(self._myxpl)
+            res = xPLResult()
+            self._config.query('rest', 'queue-size', res)
+            self._queue_size = res.get_value()['queue-size']
+            if self._queue_size == "None":
+                self._queue_size = QUEUE_SIZE
+            self._queue_size = float(self._queue_size)
+            self._config = Query(self._myxpl)
+            res = xPLResult()
+            self._config.query('rest', 'queue-life-exp', res)
+            self._queue_life_expectancy = res.get_value()['queue-life-exp']
+            if self._queue_life_expectancy == "None":
+                self._queue_life_expectancy = QUEUE_LIFE_EXPECTANCY
+            self._queue_life_expectancy = float(self._queue_life_expectancy)
+    
+            # Queues for xPL
+            self._queue_system_list = Queue(self._queue_size)
+            self._queue_system_detail = Queue(self._queue_size)
+            self._queue_system_start = Queue(self._queue_size)
+            self._queue_system_stop = Queue(self._queue_size)
+    
+            # define listeners for queues
+            self._log.debug("Create listeners")
+            Listener(self._add_to_queue_system_list, self._myxpl, \
+                     {'schema': 'domogik.system',
+                      'xpltype': 'xpl-trig',
+                      'command' : 'list',
+                      'host' : gethostname()})
+            Listener(self._add_to_queue_system_detail, self._myxpl, \
+                     {'schema': 'domogik.system',
+                      'xpltype': 'xpl-trig',
+                      'command' : 'detail',
+                      'host' : gethostname()})
+            Listener(self._add_to_queue_system_start, self._myxpl, \
+                     {'schema': 'domogik.system',
+                      'xpltype': 'xpl-trig',
+                      'command' : 'start',
+                      'host' : gethostname()})
+            Listener(self._add_to_queue_system_stop, self._myxpl, \
+                     {'schema': 'domogik.system',
+                      'xpltype': 'xpl-trig',
+                      'command' : 'stop',
+                      'host' : gethostname()})
+    
+            self._log.info("Initialisation OK")
 
-        # Queues config
-        self._log.debug("Get queues configuration")
-        self._config = Query(self._myxpl)
-        res = xPLResult()
-        self._config.query('rest', 'queue-timeout', res)
-        self._queue_timeout = res.get_value()['queue-timeout']
-        if self._queue_timeout == "None":
-            self._queue_timeout = QUEUE_TIMEOUT
-        self._queue_timeout = float(self._queue_timeout)
-        self._config = Query(self._myxpl)
-        res = xPLResult()
-        self._config.query('rest', 'queue-size', res)
-        self._queue_size = res.get_value()['queue-size']
-        if self._queue_size == "None":
-            self._queue_size = QUEUE_SIZE
-        self._queue_size = float(self._queue_size)
-        self._config = Query(self._myxpl)
-        res = xPLResult()
-        self._config.query('rest', 'queue-life-exp', res)
-        self._queue_life_expectancy = res.get_value()['queue-life-exp']
-        if self._queue_life_expectancy == "None":
-            self._queue_life_expectancy = QUEUE_LIFE_EXPECTANCY
-        self._queue_life_expectancy = float(self._queue_life_expectancy)
-
-        # Queues for xPL
-        self._queue_system_list = Queue(self._queue_size)
-        self._queue_system_detail = Queue(self._queue_size)
-        self._queue_system_start = Queue(self._queue_size)
-        self._queue_system_stop = Queue(self._queue_size)
-
-        # define listeners for queues
-        self._log.debug("Create listeners")
-        Listener(self._add_to_queue_system_list, self._myxpl, \
-                 {'schema': 'domogik.system',
-                  'xpltype': 'xpl-trig',
-                  'command' : 'list',
-                  'host' : gethostname()})
-        Listener(self._add_to_queue_system_detail, self._myxpl, \
-                 {'schema': 'domogik.system',
-                  'xpltype': 'xpl-trig',
-                  'command' : 'detail',
-                  'host' : gethostname()})
-        Listener(self._add_to_queue_system_start, self._myxpl, \
-                 {'schema': 'domogik.system',
-                  'xpltype': 'xpl-trig',
-                  'command' : 'start',
-                  'host' : gethostname()})
-        Listener(self._add_to_queue_system_stop, self._myxpl, \
-                 {'schema': 'domogik.system',
-                  'xpltype': 'xpl-trig',
-                  'command' : 'stop',
-                  'host' : gethostname()})
-
-        self._log.info("Initialisation OK")
+        except:
+            self._log.error("%s" % sys.exc_info()[1])
+            print("%s" % sys.exc_info()[1])
+  
 
 
     def _add_to_queue_system_list(self, message):
