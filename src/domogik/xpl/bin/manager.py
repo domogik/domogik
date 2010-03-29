@@ -66,73 +66,75 @@ class SysManager(xPLPlugin):
         '''
         Init manager and start listeners
         '''
-        # Check parameters 
-        parser = OptionParser()
-        parser.add_option("-d", action="store_true", dest="start_dbmgr", default=False, \
-                help="Start database manager if not already running.")
-        parser.add_option("-r", action="store_true", dest="start_rest", default=False, \
-                help="Start REST interface manager if not already running.")
-        xPLPlugin.__init__(self, name = 'sysmgr', parser=parser)
 
-        # Logger init
-        self._log = self.get_my_logger()
-        self._log.debug("Init system manager")
-        self._log.debug("Host : %s" % gethostname())
+        try:
+            # Check parameters 
+            parser = OptionParser()
+            parser.add_option("-d", action="store_true", dest="start_dbmgr", default=False, \
+                    help="Start database manager if not already running.")
+            parser.add_option("-r", action="store_true", dest="start_rest", default=False, \
+                    help="Start REST interface manager if not already running.")
+            xPLPlugin.__init__(self, name = 'sysmgr', parser=parser)
+    
+            # Logger init
+            self._log = self.get_my_logger()
+            self._log.debug("Init system manager")
+            self._log.debug("Host : %s" % gethostname())
+    
+            # Get config
+            cfg = Loader('domogik')
+            config = cfg.load()
+            conf = dict(config[1])
+            self._pid_dir_path = conf['pid_dir_path']
+    
+            # Get components
+            self._list_components(gethostname())
+    
+            if self.options.start_dbmgr:
+                if self._check_dbmgr_is_running():
+                    self._log.warning("Manager started with -d, but a database manager is already running")
+                else:
+                    self._start_plugin("dbmgr", gethostname(), 1)
+                    if not self._check_dbmgr_is_running():
+                        self._log.error("Manager started with -d, but database manager not available after a startup.\
+                                Please check dbmgr.log file")
+    
+            if self.options.start_rest:
+                if self._check_rest_is_running():
+                    self._log.warning("Manager started with -r, but a REST manager is already running")
+                else:
+                    self._start_plugin("rest", gethostname(), 1)
+                    if not self._check_rest_is_running():
+                        self._log.error("Manager started with -r, but REST manager not available after a startup.\
+                                Please check rest.log file")
+    
+            # Start plugins at manager startup
+            self._log.debug("Check non-system plugins to start at manager startup...")
+            for component in self._components:
+                self._log.debug("%s..." % component["name"])
+                self._config = Query(self._myxpl)
+                res = xPLResult()
+                self._config.query(component["name"], 'startup-plugin', res)
+                startup = res.get_value()['startup-plugin']
+                # start plugin
+                if startup == 'True':
+                    self._log.debug("            starting")
+                    self._log.debug("Starting %s" % component["name"])
+                    self._start_plugin(component["name"], gethostname(), 0)
+            
+            # Define listener
+            Listener(self._sys_cb, self._myxpl, {
+                'schema': 'domogik.system',
+                'xpltype': 'xpl-cmnd',
+            })
+    
+            self._log.info("System manager initialized")
+            self.get_stop().wait()
 
-        # Get config
-        cfg = Loader('domogik')
-        config = cfg.load()
-        conf = dict(config[1])
-        self._pid_dir_path = conf['pid_dir_path']
+        except:
+            self._log.error("%s" % sys.exc_info()[1])
+            print("%s" % sys.exc_info()[1])
 
-        # Get components
-        self._list_components(gethostname())
-
-        if self.options.start_dbmgr:
-            if self._check_dbmgr_is_running():
-                self._log.warning("Manager started with -d, but a database manager is already running")
-            else:
-                self._start_plugin("dbmgr", gethostname(), 1)
-                if not self._check_dbmgr_is_running():
-                    self._log.error("Manager started with -d, but database manager not available after a startup.\
-                            Please check dbmgr.log file")
-
-        if self.options.start_rest:
-            if self._check_rest_is_running():
-                self._log.warning("Manager started with -r, but a REST manager is already running")
-            else:
-                self._start_plugin("rest", gethostname(), 1)
-                if not self._check_rest_is_running():
-                    self._log.error("Manager started with -r, but REST manager not available after a startup.\
-                            Please check rest.log file")
-
-        # Start plugins at manager startup
-        self._log.debug("Check non-system plugins to start at manager startup...")
-        for component in self._components:
-            self._log.debug("%s..." % component["name"])
-            self._config = Query(self._myxpl)
-            res = xPLResult()
-            self._config.query(component["name"], 'startup-plugin', res)
-            startup = res.get_value()['startup-plugin']
-            # start plugin
-            if startup == 'True':
-                self._log.debug("            starting")
-                self._log.debug("Starting %s" % component["name"])
-                self._start_plugin(component["name"], gethostname(), 0)
-        
-        # Define listener
-        Listener(self._sys_cb, self._myxpl, {
-            'schema': 'domogik.system',
-            'xpltype': 'xpl-cmnd',
-        })
-
-#        Listener(self._sys_cb_stop, self._myxpl, {
-#            'schema': 'domogik.system',
-#            'xpltype': 'xpl-trig',
-#            'command': 'stop',
-#        })
-        self._log.info("System manager initialized")
-        self.get_stop().wait()
 
 
     def _sys_cb(self, message):
