@@ -74,6 +74,7 @@ $(function(){
     }
     
     function saveConfig(name, configuration) {
+        var itemSaved = 0;
         $.each(configuration, function(index, item) {
             var value = null;
             if (item.key == 'startup-plugin') {
@@ -87,6 +88,10 @@ $(function(){
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
                         $('#value_' + item.key).attr('class', 'medium icon16-status-true');
+                        itemSaved++;
+                        if (itemSaved == configuration.length) { // All saved without error
+                            display_message('OK', "Configuration saved successfully");
+                        }
                     } else {
                         // Error
                         $('#value_' + item.key).attr('class', 'medium icon16-status-false');
