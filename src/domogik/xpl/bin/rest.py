@@ -58,6 +58,7 @@ import datetime
 import socket
 from OpenSSL import SSL
 import SocketServer
+import os
 
 
 
@@ -68,10 +69,14 @@ REST_DESCRIPTION = "REST plugin is part of Domogik project. See http://trac.domo
 USE_SSL = False
 SSL_CERTIFICATE = "/dev/null"
 
+# global queues config (plugins, etcàOB
 QUEUE_TIMEOUT = 10
 QUEUE_SIZE = 10
 QUEUE_LIFE_EXPECTANCY = 3
+QUEUE_SLEEP = 0.1 # sleep time between reading all queue content
 
+# /command queue config
+QUEUE_COMMAND_SIZE = 1000
 
 
 ################################################################################
@@ -146,7 +151,7 @@ class Rest(xPLPlugin):
             else:
                 self._log.info("Configuration : SSL support not activated")
     
-            # Queues config
+            # Gloal Queues config
             self._log.debug("Get queues configuration")
             self._config = Query(self._myxpl)
             res = xPLResult()
@@ -169,12 +174,31 @@ class Rest(xPLPlugin):
             if self._queue_life_expectancy == "None":
                 self._queue_life_expectancy = QUEUE_LIFE_EXPECTANCY
             self._queue_life_expectancy = float(self._queue_life_expectancy)
+            self._config = Query(self._myxpl)
+            res = xPLResult()
+            self._config.query('rest', 'queue-sleep', res)
+            self._queue_sleep = res.get_value()['queue-sleep']
+            if self._queue_sleep == "None":
+                self._queue_sleep = QUEUE_SLEEP
+            self._queue_sleep = float(self._queue_sleep)
+
+            # /command Queues config
+            self._config = Query(self._myxpl)
+            res = xPLResult()
+            self._config.query('rest', 'queue-cmd-size', res)
+            self._queue_command_size = res.get_value()['queue-cmd-size']
+            if self._queue_command_size == "None":
+                self._queue_command_size = QUEUE_COMMAND_SIZE
+            self._queue_command_size = float(self._queue_command_size)
     
             # Queues for xPL
             self._queue_system_list = Queue(self._queue_size)
             self._queue_system_detail = Queue(self._queue_size)
             self._queue_system_start = Queue(self._queue_size)
             self._queue_system_stop = Queue(self._queue_size)
+
+            # Queues for /command
+            self._queue_command = Queue(self._queue_command_size)
     
             # define listeners for queues
             self._log.debug("Create listeners")
@@ -198,12 +222,20 @@ class Rest(xPLPlugin):
                       'xpltype': 'xpl-trig',
                       'command' : 'stop',
                       'host' : gethostname()})
+            Listener(self._add_to_queue_command, self._myxpl, \
+                     {'xpltype': 'xpl-trig'})
     
+            # Load xml files for /command
+            self.load_xml()
+
             self._log.info("Initialisation OK")
 
-        except:
+
+
+        except KeyError:
             self._log.error("%s" % sys.exc_info()[1])
             print("%s" % sys.exc_info()[1])
+  
   
 
 
@@ -219,7 +251,31 @@ class Rest(xPLPlugin):
     def _add_to_queue_system_stop(self, message):
         self._put_in_queue(self._queue_system_stop, message)
 
+    def _add_to_queue_command(self, message):
+        self._put_in_queue(self._queue_command, message)
+
     def _get_from_queue(self, my_queue, filter = None, nb_rec = 0):
+        """ Encapsulation for _get_from_queue_in
+            If timeout not elapsed and _get_from_queue didn't find a valid data
+            call again _get_from_queue until timeout
+            This encapsulation is used to process case where queue is not empty but there is
+            no valid data in it and we want to wait for timeout
+        """
+        start_time = time.time()
+        ok = False
+        while time.time() - start_time < self._queue_timeout:
+            try:
+                return self._get_from_queue_without_waiting(my_queue, filter, nb_rec)
+            except Empty:
+                # no data in queue for us.... let's continue until time elapsed
+                # in order not rest not working so much, let it make a pause
+                time.sleep(self._queue_sleep)
+        # time elapsed... we can raise the Empty exception
+        raise Empty
+
+
+
+    def _get_from_queue_without_waiting(self, my_queue, filter = None, nb_rec = 0):
         """ Get an item from queue (recursive function)
             Checks are made on : 
             - life expectancy of message
@@ -234,8 +290,8 @@ class Rest(xPLPlugin):
         """
         self._log.debug("Get from queue : %s (recursivity deepth : %s)" % (str(my_queue), nb_rec))
         # check if recursivity doesn't exceed queue size
-        if nb_rec > self._queue_size:
-            self._log.warning("Get from queue %s : number of call exceed queue size (%s) : return None" % (str(my_queue), self._queue_size))
+        if nb_rec > my_queue.qsize():
+            self._log.warning("Get from queue %s : number of call exceed queue size (%s) : return None" % (str(my_queue), my_queue.qsize()))
             # we raise an "Empty" exception because we consider that if we don't find
             # the good data, it is as if it was "empty"
             raise Empty
@@ -274,12 +330,12 @@ class Rest(xPLPlugin):
                 else:
                     self._log.debug("Get from queue %s : bad data, check another one..." % (str(my_queue)))
                     self._put_in_queue(my_queue, message)
-                    return self._get_from_queue(my_queue, filter, nb_rec + 1)
+                    return self._get_from_queue_without_waiting(my_queue, filter, nb_rec + 1)
 
         # if message too old : get an other message
         else:
             self._log.debug("Get from queue %s : data too old, check another one..." % (str(my_queue)))
-            return self._get_from_queue(my_queue, filter, nb_rec + 1)
+            return self._get_from_queue_without_waiting(my_queue, filter, nb_rec + 1)
 
     def _put_in_queue(self, my_queue, message):
         self._log.debug("Put in queue %s : %s" % (str(my_queue), str(message)))
@@ -306,6 +362,20 @@ class Rest(xPLPlugin):
                                          handler_params = [self])
 
         server.serve_forever()
+
+
+
+    def load_xml(self):
+        """ Load XML files for /command
+        """
+        # list technologies folders
+        self.xml = {}
+        for techno in os.listdir(self._xml_directory):
+            for command in os.listdir(self._xml_directory + "/" + techno):
+                xml_file = self._xml_directory + "/" + techno + "/" + command
+                self._log.info("Load XML file for %s>%s : %s" % (techno, command, xml_file))
+                self.xml["%s-%s" % (techno, command)] = minidom.parse(xml_file)
+        self.xml_date = datetime.datetime.now()
 
 
 
@@ -525,6 +595,10 @@ class ProcessRequest():
         self._queue_system_detail =  self.handler_params[0]._queue_system_detail
         self._queue_system_start =  self.handler_params[0]._queue_system_start
         self._queue_system_stop =  self.handler_params[0]._queue_system_stop
+        self._queue_command =  self.handler_params[0]._queue_command
+
+        self.xml =  self.handler_params[0].xml
+        self.xml_date =  self.handler_params[0].xml_date
 
         # global init
         self.jsonp = False
@@ -635,9 +709,20 @@ class ProcessRequest():
         json_data = JSonHelper("OK", 0, "REST server available")
         json_data.set_data_type("rest")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+
+        # Description and parameters
         json_data.add_data({"Version" : REST_API_VERSION})
         json_data.add_data({"Description" : REST_DESCRIPTION})
         json_data.add_data({"SSL" : self.use_ssl})
+
+        # Xml data
+        xml_info = ""
+        for key in self.xml:
+            xml_info += key + ", "
+        xml_info = xml_info[0:len(xml_info)-2]
+        json_data.add_data({"XML files loaded" : xml_info})
+        json_data.add_data({"XML files last load" : self.xml_date})
+
         self.send_http_response_ok(json_data.get())
 
 
@@ -652,134 +737,108 @@ class ProcessRequest():
             - call a xml parser for the technology (self.rest_request[0])
            - send appropriate xPL message on network
         """
-        self._log.debug("Process command")
+        self._log.debug("Process /command")
 
-        # parse data in URL
-        if len(self.rest_request) >= 3:
-            techno = self.rest_request[0]
-            address = self.rest_request[1]
-            order = self.rest_request[2]
-            if len(self.rest_request) > 3:
-                others = self.rest_request[3:]
-            else:
-                others = None
-        else:
+        ### Check url length
+        if len(self.rest_request) < 3:
             json_data = JSonHelper("ERROR", 999, "Url too short for /command")
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
             self.send_http_response_ok(json_data.get())
             return
-        self._log.debug("Techno    : %s" % techno)
-        self._log.debug("Address   : %s" % address)
-        self._log.debug("Order     : %s" % order)
-        self._log.debug("Others    : %s" % str(others))
 
-        # open xml file
-        xml_file = "%s/%s.xml" % (self._xml_directory, techno)
-        #xml_file = "%s/%s.xml" % ("../xml/", techno)
-        # process xml
-        message = self._parse_xml(xml_file, techno, address, order, others)
-        if message == None:
-            return
+        ### Get parameters
+        techno = self.rest_request[0]
+        address = self.rest_request[1]
+        command = self.rest_request[2]
+        if len(self.rest_request) > 3:
+            params = self.rest_requests[3:]
+        else:
+            params = None
 
-        self._log.debug("Process command > send message : %s" % str(message))
+        self._log.debug("Techno  : %s" % techno)
+        self._log.debug("Address : %s" % address)
+        self._log.debug("Command : %s" % command)
+        self._log.debug("Params  : %s" % str(params))
+
+        ### Get message 
+        message = self._rest_command_get_message(techno, address, command, params)
+
+        ### Get listener
+        (schema, xpl_type, filters) = self._rest_command_get_listener(techno, address, command, params)
+
+        ### Send xpl message
         self._myxpl.send(message)
 
-        # REST processing finished and OK
+        ### Wait for answer
+        # get xpl message from queue
+        try:
+            self._log.debug("Command : wait for answer...")
+            msg_cmd = self._get_from_queue(self._queue_command, filters)
+        except Empty:
+            self._log.debug("Command (%s, %s, %s, %s) : no answer" % (techno, address, command, params))
+            json_data = JSonHelper("ERROR", 999, "No data or timeout on getting command response")
+            json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+            json_data.set_data_type("response")
+            self.send_http_response_ok(json_data.get())
+            return
+
+        self._log.debug("Command : message received : %s" % str(msg_cmd))
+
+        ### REST processing finished and OK
         json_data = JSonHelper("OK")
+        json_data.set_data_type("response")
+        json_data.add_data({"xpl" : str(msg_cmd)})
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         self.send_http_response_ok(json_data.get())
 
-        
 
 
-    def _parse_xml(self, xml_file, techno, address, order, others):
-        """ xml parser for a technology file
-            Generation of a xPL message by processing REST request and XML file
-            @param xml_file : xml file defining how to construct message
-            @param techno : technology (x10, etc)
-            @param address : address of device
-            @param order : order to send
-            @param others : other parameters
-            @return None if a problem occurs or a xPL message if ok
-        """
-        try:
-            xml_doc = minidom.parse(xml_file)
-        except:
-            json_data = JSonHelper("ERROR", 999, \
-                                   "Error while reading xml file : " + xml_file)
-            json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-            self.send_http_response_ok(json_data.get())
-            return None
 
-        mapping = xml_doc.documentElement
-        if mapping.getElementsByTagName("technology")[0].attributes.get("id").value != techno:
-            self.send_http_response_error(999, "'technology' attribute must be the same as file name !", \
+    def _rest_command_get_message(self, techno, address, command, params):
+        xml_data = self.xml["%s-%s.xml" % (techno,command)]
+
+        ### Check xml validity
+        if xml_data.getElementsByTagName("technology")[0].attributes.get("id").value != techno:
+            self.send_http_response_error(999, "'technology' attribute in xml file must be '%s'" % techno, \
                                           self.jsonp, self.jsonp_cb)
             return
-        
-        #Schema
-        schema = mapping.getElementsByTagName("schema")[0].firstChild.nodeValue
-
-        #Device key name
-        device = mapping.getElementsByTagName("device")[0]
-        if device.getElementsByTagName("key") != []:
-            device_address_key = device.getElementsByTagName("key")[0].firstChild.nodeValue
-        else:
-            device_address_key = None
-
-        #Orders
-        orders = mapping.getElementsByTagName("orders")[0]
-        order_key = orders.getElementsByTagName("key")[0].firstChild.nodeValue
-
-        #Get the good order bloc :
-        the_order = None
-        for an_order in orders.getElementsByTagName("order"):
-            if an_order.getElementsByTagName("name")[0].firstChild.nodeValue == order:
-                the_order = an_order
-        if the_order == None:
-            self.send_http_response_error(999, "Order can't be found", self.jsonp, self.jsonp_cb)
+        if xml_data.getElementsByTagName("command")[0].attributes.get("name").value != command:
+            self.send_http_response_error(999, "'command' attribute in xml file must be '%s'" % command, \
+                                          self.jsonp, self.jsonp_cb)
             return
 
-        #Parse the order bloc
-        order_value = the_order.getElementsByTagName("value")[0].firstChild.nodeValue
-        #mandatory parameters
-        mandatory_parameters_value = {}
-        optional_parameters_value = {}
-        if the_order.getElementsByTagName("parameters")[0].hasChildNodes():
-            mandatory_parameters = the_order.getElementsByTagName("parameters")[0].getElementsByTagName("mandatory")[0]
-            count_mandatory_parameters = len(mandatory_parameters.getElementsByTagName("parameter"))
-            mandatory_parameters_from_url = others[3:3+count_mandatory_parameters]
-            for mandatory_param in mandatory_parameters.getElementsByTagName("parameter"):
-                key = mandatory_param.attributes.get("key").value
-                value = mandatory_parameters_from_url[int(mandatory_param.attributes.get("location").value) - 1]
-                mandatory_parameters_value[key] = value
-            #optional parameters
-            if the_order.getElementsByTagName("parameters")[0].getElementsByTagName("optional") != []:
-                optional_parameters =  the_order.getElementsByTagName( \
-                                                   "parameters")[0].getElementsByTagName("optional")[0]
-                for opt_param in optional_parameters.getElementsByTagName("parameter"):
-                    ind = others.index(opt_param.getElementsByTagName("name")[0])
-                    optional_parameters_value[url[ind]] = url[ind + 1]
+        ### Get only <command...> part
+        xml_command = xml_data.getElementsByTagName("command")[0]
 
-        return self._forge_msg(schema, device_address_key, address, order_key, order_value, \
-                               mandatory_parameters_value, optional_parameters_value)
+        ### Get data from xml
+        # Schema
+        schema = xml_command.getElementsByTagName("schema")[0].firstChild.nodeValue
+        # command key name 
+        command_key = xml_command.getElementsByTagName("command-key")[0].firstChild.nodeValue
+        #address key name (device)
+        address_key = xml_command.getElementsByTagName("address-key")[0].firstChild.nodeValue
+        # real command value in xpl message
+        command_xpl_value = xml_command.getElementsByTagName("command-xpl-value")[0].firstChild.nodeValue
 
+        # Parameters
+        #get and count parameters in xml file
+        parameters = xml_command.getElementsByTagName("parameters")[0]
+        count_parameters = len(parameters.getElementsByTagName("parameter"))
+        #do the association between url and xml
+        parameters_value = {}
+        for param in parameters.getElementsByTagName("parameter"):
+            key = param.attributes.get("key").value
+            loc = param.attributes.get("location")
+            static_value = param.attributes.get("value")
+            if static_value is None:
+                if loc is None:
+                    loc.value = 0
+                value = params[int(loc.value) - 1]
+            else:
+                value = static_value.value
+            parameters_value[key] = value
 
-
-
-
-    def _forge_msg(self, schema, device_address_key, address, order_key, order_value, \
-                   mandatory_parameters_value, optional_parameters_value):
-        """ forge xpl message
-            @param schema : xpl schema
-            @param device_address_key : key for address in xpl message
-            @param address : value for address in xpl message
-            @param order_key : key for order in xpl message
-            @param order_value : value for order in xpl message
-            @param mandatory_parameters_value : mandatory params
-            @param optional_parameters_value : optionnal params
-            @return xPL message
-        """
+        ### Create xpl message
         msg = """xpl-cmnd
 {
 hop=1
@@ -790,19 +849,44 @@ target=*
 {
 %s=%s
 %s=%s
-""" % (schema, device_address_key, address, order_key, order_value)
-        for m_param in mandatory_parameters_value.keys():
-            msg += "%s=%s\n" % (m_param, mandatory_parameters_value[m_param])
-        for o_param in optional_parameters_value.keys():
-            msg += "%s=%s\n" % (o_param, optional_parameters_value[o_param])
+""" % (schema, address_key, address, command_key, command_xpl_value)
+        for m_param in parameters_value.keys():
+            msg += "%s=%s\n" % (m_param, parameters_value[m_param])
         msg += "}"
         return msg
 
 
 
 
+    def _rest_command_get_listener(self, techno, address, command, params):
+        xml_data = self.xml["%s-%s.xml" % (techno,command)]
 
-        
+        ### Get only <command...> part
+        # nothing to do, tests have be done in get_command
+
+        xml_listener = xml_data.getElementsByTagName("listener")[0]
+
+        ### Get data from xml
+        # Schema
+        schema = xml_listener.getElementsByTagName("schema")[0].firstChild.nodeValue
+        # xpl type
+        xpl_type = xml_listener.getElementsByTagName("xpltype")[0].firstChild.nodeValue
+
+        # Filters
+        filters = xml_listener.getElementsByTagName("filter")[0]
+        filters_value = {}
+        for filter in filters.getElementsByTagName("key"):
+            name = filter.attributes.get("name").value
+            value = filter.attributes.get("value").value
+            if value == "@address@":
+                value = address
+            filters_value[name] = value
+
+        return schema, xpl_type, filters_value
+
+
+
+
 
 
 
@@ -2713,7 +2797,7 @@ class JSonHelper():
 
         # dirty issue to force cache of __dict__  
         print "DATA : " + unicode(data).encode('utf-8')
-        #print "DATA TYPE : " + data_type
+        print "DATA TYPE : " + data_type
 
         ### type instance (sql object)
         if data_type in instance_type:
