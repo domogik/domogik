@@ -2,8 +2,8 @@
   <command name="wol">
     <schema>command.basic</schema>
     <command-key>current</command-key>    
-    <adress-key>device</adress-key>    
-    <value>on</value>                                                                                       
+    <address-key>device</address-key>    
+    <command-xpl-value>on</command-xpl-value>
     <parameters>
       <parameter key="type" value="wakeonlan"/>          
     </parameters>

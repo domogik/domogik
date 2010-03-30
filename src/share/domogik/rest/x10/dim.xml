@@ -2,8 +2,8 @@
   <command name="dim">
     <schema>x10.basic</schema>
     <command-key>command</command-key>	
-    <adress-key>device</adress-key>	
-    <value>dim</value>                                                                                       
+    <address-key>device</address-key>	
+    <command-xpl-value>dim</command-xpl-value>  
     <parameters>                                                                                            
       <parameter key="value" location="1"/>                                                           
     </parameters>                                                                                           

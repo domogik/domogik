@@ -37,7 +37,7 @@ X10EvtMock.__init__
 """
 
 from domogik.xpl.common.xplconnector import Listener
-from domogik.xpl.common.module import xPLPlugin, xPLResult
+from domogik.xpl.common.plugin import xPLPlugin, xPLResult
 from domogik.xpl.common.xplmessage import XplMessage
 from optparse import OptionParser
 

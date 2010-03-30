@@ -2,8 +2,8 @@
   <command name="on">
     <schema>x10.basic</schema>
     <command-key>command</command-key>	
-    <adress-key>device</adress-key>	
-    <value>on</value>
+    <address-key>device</address-key>	
+    <command-xpl-value>on</command-xpl-value>
     <parameters/>                                                                                          
   </command>	
   <listener>
