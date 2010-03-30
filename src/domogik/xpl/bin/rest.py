@@ -767,7 +767,7 @@ class ProcessRequest():
         (schema, xpl_type, filters) = self._rest_command_get_listener(techno, address, command, params)
 
         ### Send xpl message
-        self._myxpl.send(message)
+        self._myxpl.send(XplMessage(message))
 
         ### Wait for answer
         # get xpl message from queue
@@ -842,7 +842,7 @@ class ProcessRequest():
         msg = """xpl-cmnd
 {
 hop=1
-source=rest
+source=xpl-rest.domogik
 target=*
 }
 %s
