@@ -180,7 +180,7 @@ class Manager(BasePlugin):
             self._log.debug("xPL Message sent by thread %s" % threading.currentThread().getName())
         except:
             self._log.warning("Error during send of message")
-            self._log.debug(sys.exc_info()[2])
+            self._log.debug(traceback.format_exc())
         self._lock_send.release()
 
     def _SendHeartbeat(self, target='*', test=""):

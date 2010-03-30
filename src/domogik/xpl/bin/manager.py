@@ -74,9 +74,9 @@ class SysManager(xPLPlugin):
                     help="Start database manager if not already running.")
             parser.add_option("-r", action="store_true", dest="start_rest", default=False, \
                     help="Start REST interface manager if not already running.")
-        parser.add_option("-s", action="store_true", dest="start_stat", default=False, \
+            parser.add_option("-s", action="store_true", dest="start_stat", default=False, \
                 help="Start statistics manager if not already running.")
-        parser.add_option("-t", action="store_true", dest="start_trigger", default=False, \
+            parser.add_option("-t", action="store_true", dest="start_trigger", default=False, \
                 help="Start scenario manager if not already running.")
             xPLPlugin.__init__(self, name = 'sysmgr', parser=parser)
     
@@ -94,7 +94,7 @@ class SysManager(xPLPlugin):
             # Get components
             self._list_components(gethostname())
     
-        #Start dbmgr
+            #Start dbmgr
             if self.options.start_dbmgr:
                 if self._check_dbmgr_is_running():
                     self._log.warning("Manager started with -d, but a database manager is already running")
@@ -104,7 +104,7 @@ class SysManager(xPLPlugin):
                         self._log.error("Manager started with -d, but database manager not available after a startup.\
                                 Please check dbmgr.log file")
     
-        #Start rest
+            #Start rest
             if self.options.start_rest:
                 if self._check_rest_is_running():
                     self._log.warning("Manager started with -r, but a REST manager is already running")
@@ -114,25 +114,25 @@ class SysManager(xPLPlugin):
                         self._log.error("Manager started with -r, but REST manager not available after a startup.\
                                 Please check rest.log file")
     
-        #Start stat
-        if self.options.start_stat:
-            if self._check_stat_is_running():
-                self._log.warning("Manager started with -s, but a statistic manager is already running")
-            else:
-                self._start_plugin("statmgr", gethostname(), 1)
-                if not self._check_stat_is_running():
-                    self._log.error("Manager started with -s, but statistic manager not available after a startup.\
-                            Please check statmgr.log file")
+            #Start stat
+            if self.options.start_stat:
+                if self._check_stat_is_running():
+                    self._log.warning("Manager started with -s, but a statistic manager is already running")
+                else:
+                    self._start_plugin("statmgr", gethostname(), 1)
+                    if not self._check_stat_is_running():
+                        self._log.error("Manager started with -s, but statistic manager not available after a startup.\
+                                Please check statmgr.log file")
 
-        #Start trigger
-        if self.options.start_trigger:
-            if self._check_trigger_is_running():
-                self._log.warning("Manager started with -t, but a trigger manager is already running")
-            else:
-                self._start_plugin("trigger", gethostname(), 1)
-                if not self._check_trigger_is_running():
-                    self._log.error("Manager started with -t, but trigger manager not available after a startup.\
-                            Please check trigger.log file")
+            #Start trigger
+            if self.options.start_trigger:
+                if self._check_trigger_is_running():
+                    self._log.warning("Manager started with -t, but a trigger manager is already running")
+                else:
+                    self._start_plugin("trigger", gethostname(), 1)
+                    if not self._check_trigger_is_running():
+                        self._log.error("Manager started with -t, but trigger manager not available after a startup.\
+                                Please check trigger.log file")
 
             # Start plugins at manager startup
             self._log.debug("Check non-system plugins to start at manager startup...")
@@ -156,11 +156,6 @@ class SysManager(xPLPlugin):
     
             self._log.info("System manager initialized")
             self.get_stop().wait()
-
-        except:
-            self._log.error("%s" % sys.exc_info()[1])
-            print("%s" % sys.exc_info()[1])
-
 
         except:
             self._log.error("%s" % sys.exc_info()[1])
