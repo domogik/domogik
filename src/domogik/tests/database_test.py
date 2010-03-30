@@ -37,12 +37,11 @@ import time
 import datetime
 
 from domogik.common.database import DbHelper, DbHelperException
-from domogik.common.sql_schema import ActuatorFeature, Area, Device, DeviceUsage, \
-                                      DeviceConfig, DeviceStats, DeviceStatsValue, \
+from domogik.common.sql_schema import Area, Device, ActuatorFeature, DeviceTypeFeature, DeviceUsage, \
+                                      DeviceConfig, SensorFeature, DeviceStats, DeviceStatsValue, \
                                       DeviceTechnology, PluginConfig, \
                                       DeviceType, UIItemConfig, Room, \
-                                      SensorReferenceData, UserAccount, \
-                                      SystemConfig, SystemStats, SystemStatsValue, \
+                                      UserAccount, SystemConfig, SystemStats, SystemStatsValue, \
                                       Trigger, Person
 
 class GenericTestCase(unittest.TestCase):
@@ -88,13 +87,9 @@ class GenericTestCase(unittest.TestCase):
         for device in device_list:
             db.del_device_config(device.id)
 
-    def remove_all_sensor_reference_data(self, db):
-        for srd in db.list_sensor_reference_data():
-            db.del_sensor_reference_data(srd.id)
-
-    def remove_all_actuator_features(self, db):
-        for af in db.list_actuator_features():
-            db.del_actuator_feature(af.id)
+    def remove_all_device_type_features(self, db):
+        for df in db.list_device_type_features():
+            db.del_device_type_feature(df.id)
 
     def remove_all_plugin_config(self, db):
         for plc in db.list_all_plugin_config():
@@ -451,230 +446,115 @@ class DeviceTypeTestCase(GenericTestCase):
         except DbHelperException:
             pass
 
-class SensorReferenceDataTestCase(GenericTestCase):
+class DeviceTypeFeatureTestCase(GenericTestCase):
     """
-    Test sensor reference data
-    """
-
-    def setUp(self):
-        self.db = DbHelper(use_test_db=True)
-        self.remove_all_sensor_reference_data(self.db)
-        self.remove_all_device_technologies(self.db)
-
-    def tearDown(self):
-        self.remove_all_sensor_reference_data(self.db)
-        del self.db
-
-    def test_empty_list(self):
-        assert len(self.db.list_sensor_reference_data()) == 0
-
-    def test_add(self):
-        dt1 = self.db.add_device_technology('1wire', '1-Wire', 'desc dt1')
-        dty1 = self.db.add_device_type(dty_name='1wire.Temperature',
-                                       dty_description='desc1', dt_id=dt1.id)
-        dty2 = self.db.add_device_type(dty_name='1wire.Voltmeter',
-                                       dty_description='desc2', dt_id=dt1.id)
-        try:
-            self.db.add_sensor_reference_data(srd_name='Temperature',
-                    srd_value='number', dty_id=99999999999, srd_unit='degreeC',
-                    srd_stat_key='key1')
-            TestCase.fail(self, "An exception should have been raised : \
-                          device type id does not exist")
-        except DbHelperException:
-            pass
-        srd1 = self.db.add_sensor_reference_data(srd_name='Temperature',
-                    srd_value='number', dty_id=dty1.id, srd_unit='degreeC',
-                    srd_stat_key='key1')
-        print srd1
-        assert srd1.name == 'Temperature'
-        assert srd1.value == 'number'
-        assert srd1.device_type_id == dty1.id
-        assert srd1.unit == 'degreeC'
-        assert srd1.stat_key == 'key1'
-        srd2 = self.db.add_sensor_reference_data(srd_name='Voltage',
-                    srd_value='number', dty_id=dty2.id, srd_unit='V',
-                    srd_stat_key='key2')
-        assert len(self.db.list_sensor_reference_data()) == 2
-        assert self.has_item(self.db.list_sensor_reference_data(), ['Temperature', 'Voltage'])
-
-    def test_update(self):
-        dt1 = self.db.add_device_technology('1wire', '1-Wire', 'desc dt1')
-        dty1 = self.db.add_device_type(dty_name='1wire.Temperature',
-                                       dty_description='desc1', dt_id=dt1.id)
-        dty2 = self.db.add_device_type(dty_name='1wire.Voltmeter',
-                                       dty_description='desc2', dt_id=dt1.id)
-        srd = self.db.add_sensor_reference_data(srd_name='Temperature',
-                    srd_value='number', dty_id=dty1.id, srd_unit='degreeC',
-                    srd_stat_key='key1')
-        srd_u = self.db.update_sensor_reference_data(srd_id=srd.id, srd_name='Voltage',
-                    srd_value='number', dty_id=dty2.id, srd_unit='V',
-                    srd_stat_key='key2')
-        try:
-            self.db.update_sensor_reference_data(srd_id=srd.id, srd_name='Voltage',
-                    srd_value='number', dty_id=99999999999, srd_unit='V',
-                    srd_stat_key='key2')
-            TestCase.fail(self, "An exception should have been raised : \
-                          device type id does not exist")
-        except DbHelperException:
-            pass
-        assert srd_u.name == 'Voltage'
-        assert srd_u.value == 'number'
-        assert srd_u.device_type_id == dty2.id
-        assert srd_u.unit == 'V'
-        assert srd_u.stat_key == 'key2'
-
-    def test_list_and_get(self):
-        dt1 = self.db.add_device_technology('1wire', '1-Wire', 'desc dt1')
-        dty1 = self.db.add_device_type(dty_name='1wire.Temperature',
-                                       dty_description='desc1', dt_id=dt1.id)
-        dty2 = self.db.add_device_type(dty_name='1wire.Voltmeter',
-                                       dty_description='desc2', dt_id=dt1.id)
-        srd1 = self.db.add_sensor_reference_data(srd_name='Temperature',
-                    srd_value='number', dty_id=dty1.id, srd_unit='degreeC',
-                    srd_stat_key='key1')
-        srd2 = self.db.add_sensor_reference_data(srd_name='Voltage',
-                    srd_value='number', dty_id=dty2.id, srd_unit='V',
-                    srd_stat_key='key2')
-        assert self.db.get_sensor_reference_data_by_name('temperature').unit == srd1.unit
-        assert self.db.get_sensor_reference_data_by_typeid(dty1.id)[0].device_type_id == dty1.id
-
-    def test_del(self):
-        dt1 = self.db.add_device_technology('1wire', '1-Wire', 'desc dt1')
-        dty1 = self.db.add_device_type(dty_name='1wire.Temperature',
-                                       dty_description='desc1', dt_id=dt1.id)
-        dty2 = self.db.add_device_type(dty_name='1wire.Voltmeter',
-                                       dty_description='desc2', dt_id=dt1.id)
-        srd1 = self.db.add_sensor_reference_data(srd_name='Temperature',
-                    srd_value='number', dty_id=dty1.id, srd_unit='degreeC',
-                    srd_stat_key='key1')
-        srd1_id = srd1.id
-        srd2 = self.db.add_sensor_reference_data(srd_name='Voltage',
-                    srd_value='number', dty_id=dty2.id, srd_unit='V',
-                    srd_stat_key='key2')
-        srd_del = self.db.del_sensor_reference_data(srd1.id)
-        assert self.has_item(self.db.list_sensor_reference_data(), ['Voltage'])
-        assert not self.has_item(self.db.list_device_usages(), ['Temperature'])
-        assert srd_del.id == srd1_id
-        try:
-            self.db.del_sensor_reference_data(12345678910)
-            TestCase.fail(self, "SensorReferenceData does not exist, an \
-                                 exception should have been raised")
-        except DbHelperException:
-            pass
-
-class ActuatorFeatureTestCase(GenericTestCase):
-    """
-    Test actuator features
+    Test device type, actuator and sensor features
     """
 
     def setUp(self):
         self.db = DbHelper(use_test_db=True)
-        self.remove_all_actuator_features(self.db)
+        self.remove_all_device_type_features(self.db)
         self.remove_all_device_technologies(self.db)
 
     def tearDown(self):
-        self.remove_all_actuator_features(self.db)
+        self.remove_all_device_type_features(self.db)
+        self.remove_all_device_technologies(self.db)
         del self.db
 
     def test_empty_list(self):
-        assert len(self.db.list_actuator_features()) == 0
+        assert len(self.db.list_device_type_features()) == 0
 
-    def test_add(self):
-        dt1 = self.db.add_device_technology('plcbus', 'PLCBus', 'desc dt1')
-        dty1 = self.db.add_device_type(dty_name='PLCBus Switch',
-                                       dty_description='desc1', dt_id=dt1.id)
-        dty2 = self.db.add_device_type(dty_name='PLCBus.Dimmer',
-                                       dty_description='desc2', dt_id=dt1.id)
-        try:
-            self.db.add_actuator_feature(af_name='Dimmer',
-                    af_value='range', dty_id=99999999999, af_unit='Percent',
-                    af_configurable_states='0,100,10', af_return_confirmation=True)
-            TestCase.fail(self, "An exception should have been raised : \
-                          device type id does not exist")
-        except DbHelperException:
-            pass
-        af1 = self.db.add_actuator_feature(af_name='Dimmer',
-                    af_value='range', dty_id=dty2.id, af_unit='Percent',
-                    af_configurable_states='0,100,10', af_return_confirmation=True)
+    def test_add_get_list(self):
+        dt1 = self.db.add_device_technology('x10', 'x10', 'desc dt1')
+        dt2 = self.db.add_device_technology('1wire', '1-Wire', 'desc dt2')
+        dty1 = self.db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
+        dty2 = self.db.add_device_type(dty_name='x10 Dimmer', dty_description='desc2', dt_id=dt1.id)
+        dty3 = self.db.add_device_type(dty_name='1wire.Temperature', dty_description='desc3', dt_id=dt2.id)
+        dtf1 = self.db.add_device_type_feature(dtf_name='Switch', dtf_feature_type='actuator',
+                                               dtf_device_type_id=dty1.id, dtf_parameters='myparams1')
+        print dtf1
+        assert dtf1.name == 'Switch'
+        assert dtf1.feature_type == 'actuator'
+        assert dtf1.device_type_id == dty1.id
+        assert dtf1.parameters == 'myparams1'
+        assert self.db.get_device_type_feature_by_id(dtf1.id).name == 'Switch'
+        dtf2 = self.db.add_device_type_feature(dtf_name='Dimmer', dtf_feature_type='actuator',
+                                               dtf_device_type_id=dty2.id, dtf_parameters='myparams2')
+        dtf3 = self.db.add_device_type_feature(dtf_name='Thermometer', dtf_feature_type='sensor',
+                                               dtf_device_type_id=dty3.id, dtf_parameters='myparams3')
+        assert len(self.db.list_device_type_features()) == 3
+        assert self.has_item(self.db.list_device_type_features(), ['Switch', 'Dimmer', 'Thermometer'])
+        af1 = self.db.add_actuator_feature(af_id=dtf1.id, af_value_type='binary', af_return_confirmation=True)
         print af1
-        assert af1.name == 'Dimmer'
-        assert af1.value == 'range'
-        assert af1.device_type_id == dty2.id
-        assert af1.unit == 'Percent'
-        assert af1.configurable_states == '0,100,10'
-        assert af1.return_confirmation == True
-        af2 = self.db.add_actuator_feature(af_name='Switch',
-                    af_value='binary', dty_id=dty1.id,
-                    af_configurable_states='off/on', af_return_confirmation=True)
+        assert af1.device_type_feature_id == dtf1.id
+        assert af1.value_type == 'binary'
+        assert af1.return_confirmation
+        af2 = self.db.add_actuator_feature(af_id=dtf2.id, af_value_type='number', af_return_confirmation=True)
         assert len(self.db.list_actuator_features()) == 2
-        assert self.has_item(self.db.list_actuator_features(), ['Switch', 'Dimmer'])
+        assert self.db.get_actuator_feature_by_id(af2.device_type_feature_id).device_type_feature_id == dtf2.id
+        try:
+            self.db.add_sensor_feature(sf_id=dtf1.id, sf_value_type='number')
+            TestCase.fail(self, "An exception should have been raised : this id is already used by an actuator feature")
+        except DbHelperException:
+            pass
+        sf1 = self.db.add_sensor_feature(sf_id=dtf3.id, sf_value_type='number')
+        print sf1
+        assert sf1.device_type_feature_id == dtf3.id
+        assert sf1.value_type == 'number'
+        assert len(self.db.list_sensor_features()) == 1
+        assert self.db.get_sensor_feature_by_id(sf1.device_type_feature_id).device_type_feature_id == dtf3.id
+        try:
+            self.db.add_actuator_feature(af_id=dtf3.id, af_value_type='number')
+            TestCase.fail(self, "An exception should have been raised : this id is already used by a sensor feature")
+        except DbHelperException:
+            pass
 
     def test_update(self):
-        dt1 = self.db.add_device_technology('plcbus', 'PLCBus', 'desc dt1')
-        dt2 = self.db.add_device_technology('x10', 'x10', 'desc dt2')
-        dty1 = self.db.add_device_type(dty_name='PLCBus Switch',
-                                       dty_description='desc1', dt_id=dt1.id)
-        dty2 = self.db.add_device_type(dty_name='x10.Dimmer',
-                                       dty_description='desc2', dt_id=dt2.id)
-        af = self.db.add_actuator_feature(af_name='Switch',
-                    af_value='binary', dty_id=dty1.id,
-                    af_configurable_states='off/on', af_return_confirmation=True)
-        try:
-            self.db.update_actuator_feature(af_id=af.id, af_name='Dimmer',
-                    af_value='range', dty_id=99999999999, af_unit='Percent',
-                    af_configurable_states='0,100,10', af_return_confirmation=False)
-            TestCase.fail(self, "An exception should have been raised : \
-                          device type id does not exist")
-        except DbHelperException:
-            pass
-        af_u = self.db.update_actuator_feature(af_id=af.id, af_name='Dimmer',
-                    af_value='range', dty_id=dty2.id, af_unit='Percent',
-                    af_configurable_states='0,100,10', af_return_confirmation=False)
-        assert af_u.name == 'Dimmer'
-        assert af_u.value == 'range'
-        assert af_u.device_type_id == dty2.id
-        assert af_u.unit == 'Percent'
-        assert af_u.configurable_states == '0,100,10'
-        assert af_u.return_confirmation == False
-
-    def test_list_and_get(self):
-        dt1 = self.db.add_device_technology('plcbus', 'PLCBus', 'desc dt1')
-        dty1 = self.db.add_device_type(dty_name='PLCBus Switch',
-                                       dty_description='desc1', dt_id=dt1.id)
-        dty2 = self.db.add_device_type(dty_name='PLCBus.Dimmer',
-                                       dty_description='desc2', dt_id=dt1.id)
-        af1 = self.db.add_actuator_feature(af_name='Dimmer',
-                    af_value='range', dty_id=dty2.id, af_unit='Percent',
-                    af_configurable_states='0,100,10', af_return_confirmation=True)
-        af2 = self.db.add_actuator_feature(af_name='Switch',
-                    af_value='binary', dty_id=dty1.id,
-                    af_configurable_states='off/on', af_return_confirmation=True)
-        assert self.db.get_actuator_feature_by_name('dimmer').unit == af1.unit
-        assert self.db.get_actuator_feature_by_typeid(dty1.id)[0].device_type_id == dty1.id
+        dt1 = self.db.add_device_technology('x10', 'x10', 'desc dt1')
+        dt2 = self.db.add_device_technology('1wire', '1-Wire', 'desc dt2')
+        dty1 = self.db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
+        dty2 = self.db.add_device_type(dty_name='1wire.Temperature', dty_description='desc3', dt_id=dt2.id)
+        dtf1 = self.db.add_device_type_feature(dtf_name='Switch', dtf_feature_type='actuator',
+                                               dtf_device_type_id=dty1.id, dtf_parameters='myparams1')
+        dtf1_u = self.db.update_device_type_feature(dtf_id=dtf1.id, dtf_name='Big switch', dtf_parameters='myparams_u')
+        assert dtf1_u.name == 'Big switch'
+        assert dtf1_u.parameters == 'myparams_u'
+        af1 = self.db.add_actuator_feature(af_id=dtf1.id, af_value_type='binary', af_return_confirmation=True)
+        af1_u = self.db.update_actuator_feature(af_id=dtf1.id, af_value_type='number', af_return_confirmation=False)
+        assert af1_u.value_type == 'number'
+        assert not af1_u.return_confirmation
+        dtf2 = self.db.add_device_type_feature(dtf_name='Thermometer', dtf_feature_type='sensor',
+                                               dtf_device_type_id=dty2.id, dtf_parameters='myparams2')
+        sf1 = self.db.add_sensor_feature(sf_id=dtf2.id, sf_value_type='number')
+        sf1_u = self.db.update_sensor_feature(sf_id=dtf2.id, sf_value_type='string')
+        assert sf1_u.value_type == 'string'
 
     def test_del(self):
-        dt1 = self.db.add_device_technology('plcbus', 'PLCBus', 'desc dt1')
-        dty1 = self.db.add_device_type(dty_name='PLCBus Switch',
-                                       dty_description='desc1', dt_id=dt1.id)
-        dty2 = self.db.add_device_type(dty_name='PLCBus.Dimmer',
-                                       dty_description='desc2', dt_id=dt1.id)
-        af1 = self.db.add_actuator_feature(af_name='Dimmer',
-                    af_value='range', dty_id=dty2.id, af_unit='Percent',
-                    af_configurable_states='0,100,10', af_return_confirmation=True)
-        af2 = self.db.add_actuator_feature(af_name='Switch',
-                    af_value='binary', dty_id=dty1.id,
-                    af_configurable_states='off/on', af_return_confirmation=True)
-        af1_id = af1.id
-        af_del = self.db.del_actuator_feature(af1.id)
-        assert self.has_item(self.db.list_actuator_features(), ['Switch'])
-        assert not self.has_item(self.db.list_actuator_features(), ['Dimmer'])
-        assert af_del.id == af1_id
-        try:
-            self.db.del_actuator_feature(12345678910)
-            TestCase.fail(self, "ActuatorFeature does not exist, an \
-                                 exception should have been raised")
-        except DbHelperException:
-            pass
+        dt1 = self.db.add_device_technology('x10', 'x10', 'desc dt1')
+        dt2 = self.db.add_device_technology('1wire', '1-Wire', 'desc dt2')
+        dty1 = self.db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
+        dty2 = self.db.add_device_type(dty_name='x10 Dimmer', dty_description='desc2', dt_id=dt1.id)
+        dty3 = self.db.add_device_type(dty_name='1wire.Temperature', dty_description='desc3', dt_id=dt2.id)
+        dtf1 = self.db.add_device_type_feature(dtf_name='Switch', dtf_feature_type='actuator',
+                                               dtf_device_type_id=dty1.id, dtf_parameters='myparams1')
+        dtf2 = self.db.add_device_type_feature(dtf_name='Dimmer', dtf_feature_type='actuator',
+                                               dtf_device_type_id=dty2.id, dtf_parameters='myparams2')
+        dtf3 = self.db.add_device_type_feature(dtf_name='Thermometer', dtf_feature_type='sensor',
+                                               dtf_device_type_id=dty3.id, dtf_parameters='myparams3')
+        af1 = self.db.add_actuator_feature(af_id=dtf1.id, af_value_type='binary', af_return_confirmation=True)
+        af2 = self.db.add_actuator_feature(af_id=dtf2.id, af_value_type='number', af_return_confirmation=True)
+        sf1 = self.db.add_sensor_feature(sf_id=dtf3.id, sf_value_type='number')
+        dtf_d = self.db.del_device_type_feature(dtf1.id)
+        assert dtf_d.name == 'Switch'
+        assert len(self.db.list_device_type_features()) == 2
+        assert len(self.db.list_actuator_features()) == 1
+        af_d = self.db.del_actuator_feature(af_id=af2.device_type_feature_id)
+        assert af_d.device_type_feature_id == dtf2.id
+        assert len(self.db.list_actuator_features()) == 0
+        sf_d = self.db.del_sensor_feature(sf_id=sf1.device_type_feature_id)
+        assert sf_d.device_type_feature_id == dtf3.id
+        assert len(self.db.list_sensor_features()) == 0
+
 
 class DeviceTechnologyTestCase(GenericTestCase):
     """

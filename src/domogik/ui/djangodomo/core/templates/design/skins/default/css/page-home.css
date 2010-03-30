@@ -78,3 +78,40 @@ ul#nav1 {
   background-position:top left;
   background-repeat:no-repeat;
 }
+
+
+
+.ident {
+    background-position: 5px 5px;
+    background-repeat:no-repeat;
+    min-height: 64px;
+    min-width:15em;
+    font-size:1em;
+    padding:0.5em 0 0 70px;
+    display:inline-block;
+    text-decoration:none;
+}
+
+ul.areaslist, ul.roomslist {
+    list-style:none;
+    margin:0;
+    padding:0;
+}
+
+li.areaitem {
+    background-color:#eeeeee;
+    margin:1em;
+    border: 1px solid #979387;
+    -moz-border-radius: 0.8em;
+    -webkit-border-radius: 0.8em;
+    display:block;
+}
+
+li.roomitem {
+    background-color:#eeeeee;
+    margin:1em;
+    border: 1px solid #979387;
+    -moz-border-radius: 0.8em;
+    -webkit-border-radius: 0.8em;
+    display:inline-block;
+}

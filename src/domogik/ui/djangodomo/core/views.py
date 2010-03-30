@@ -81,20 +81,19 @@ def index(request):
     page_title = _("Domogik Homepage")
 
     try:
-        result_all_rooms = Rooms.get_all()
-        result_all_rooms.merge_uiconfig()
+        result_all_areas = Areas.get_all_with_rooms()
+        result_all_areas.merge_uiconfig()
         result_house = UIConfigs.get_general('house')
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
-
+    """
     device_list = []
     for device in __db.list_devices():
         device_list.append({'room': device.room_id, 'device': device})
-
+    """
     return __go_to_page(request, 'index.html',
         page_title,
-        rooms_list=result_all_rooms.room,
-        device_list=device_list,
+        areas_list=result_all_areas.area,
         house=result_house
     )
 

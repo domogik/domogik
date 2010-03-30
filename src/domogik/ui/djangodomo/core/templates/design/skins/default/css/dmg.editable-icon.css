@@ -1,0 +1,105 @@
+@charset "UTF-8";
+/* CSS Document */
+
+.editable_icon {
+    margin:0 10px 10px 10px;
+    float:left;
+    width:98px;
+    height:98px;
+    border:2px #cccccc dashed;
+    -moz-border-radius: 0.8em;
+    -webkit-border-radius: 0.8em;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    display:inline-block;
+}
+
+.button-edit, .editable_icon.edited .button-edit {
+    display:none;
+}
+
+.editable_icon:not(.edited):hover .button-edit {
+    display:block;
+}
+.editable_icon:focus {
+    border-color:#BDCB2F;
+}
+.editable_icon:not(.edited):focus .button-edit {
+    display:block;
+}
+
+.button-edit, .button-submit, .button-previous, .button-next, .button-cancel {
+    position:relative;
+    width:24px;
+    height:24px;
+    background-color:#f6f6f6;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    outline:none;
+    cursor: pointer;
+}
+
+.button-submit:hover, .button-previous:hover, .button-next:hover, .button-cancel:hover {
+    background-color:#FFFFFF;
+}
+
+.button-edit {
+    border-right: 1px solid #cccccc;
+    border-bottom: 1px solid #cccccc;
+    border-top:none;
+    border-left:none;
+    -moz-border-radius: 0.8em 0 1.4em 0;
+    -webkit-border-radius: 0.8em 0 1.4em 0;
+}
+
+.button-edit:hover {
+    width:34px;
+    height:34px;
+    background-color:#FFFFFF;
+}
+
+.button-submit {
+    border-right: 1px solid #cccccc;
+    border-bottom: 1px solid #cccccc;
+    border-top:none;
+    border-left:none;
+    -moz-border-radius: 0.8em 0 1.4em 0;
+    -webkit-border-radius: 0.8em 0 1.4em 0;
+    float:left;
+    left:-24px;
+}
+
+.button-cancel {
+    border-left: 1px solid #cccccc;
+    border-bottom: 1px solid #cccccc;
+    border-right:none;
+    border-top:none;
+    -moz-border-radius: 0 0.8em 0 1.4em;
+    -webkit-border-radius: 0 0.8em 0 1.4em;
+    float:right;
+    top:-24px;
+}
+
+.button-previous {
+    border-right: 1px solid #cccccc;
+    border-top: 1px solid #cccccc;
+    border-bottom: none;
+    border-left:none;
+    -moz-border-radius: 0 1.4em 0 0.8em;
+    -webkit-border-radius: 0 1.4em 0 0.8em;
+    float:left;
+    top:74px;
+        z-index:103;
+}
+
+.button-next {
+    border-left: 1px solid #cccccc;
+    border-top: 1px solid #cccccc;
+    border-bottom: none;
+    border-right:none;
+    -moz-border-radius: 1.4em 0 0.8em 0;
+    -webkit-border-radius: 1.4em 0 0.8em 0;
+    float:right;
+    top:74px;
+        z-index:104;
+}
