@@ -88,116 +88,123 @@ class Rest(xPLPlugin):
             @param server_ip :  ip of HTTP server
             @param server_port :  port of HTTP server
         """
-        xPLPlugin.__init__(self, name = 'rest')
 
-        # logging initialization
-        log = logger.Logger('REST')
-        self._log = log.get_logger()
-        self._log.info("Rest Server initialisation...")
-        self._log.debug("locale : %s %s" % locale.getdefaultlocale())
-        # logging data manipulation initialization
-        log_dm = logger.Logger('REST-DM')
-        self._log_dm = log_dm.get_logger()
-        self._log_dm.info("Rest Server Data Manipulation...")
-        self._log_dm.debug("locale : %s %s" % locale.getdefaultlocale())
-        # DB Helper
-        self._db = DbHelper()
-
-        ### Config
-
-        # directory data in ~/.domogik.cfg
-        cfg = Loader('domogik')
-        config = cfg.load()
-        conf = dict(config[1])
-        self._xml_directory = "%s/share/domogik/rest/" % conf['custom_prefix']
-
-        # HTTP server ip and port
         try:
-            cfg_rest = Loader('rest')
-            config_rest = cfg_rest.load()
-            conf_rest = dict(config_rest[1])
-            self.server_ip = conf_rest['rest_server_ip']
-            self.server_port = conf_rest['rest_server_port']
-        except KeyError:
-            # default parameters
-            self.server_ip = server_ip
-            self.server_port = server_port
-        self._log.info("Configuration : ip:port = %s:%s" % (self.server_ip, self.server_port))
-
-        # SSL configuration
-        try:
-            cfg_rest = Loader('rest')
-            config_rest = cfg_rest.load()
-            conf_rest = dict(config_rest[1])
-            self.use_ssl = conf_rest['rest_use_ssl']
-            if self.use_ssl == "True":
-                self.use_ssl = True
+            xPLPlugin.__init__(self, name = 'rest')
+    
+            # logging initialization
+            log = logger.Logger('REST')
+            self._log = log.get_logger()
+            self._log.info("Rest Server initialisation...")
+            self._log.debug("locale : %s %s" % locale.getdefaultlocale())
+            # logging data manipulation initialization
+            log_dm = logger.Logger('REST-DM')
+            self._log_dm = log_dm.get_logger()
+            self._log_dm.info("Rest Server Data Manipulation...")
+            self._log_dm.debug("locale : %s %s" % locale.getdefaultlocale())
+            # DB Helper
+            self._db = DbHelper()
+    
+            ### Config
+    
+            # directory data in ~/.domogik.cfg
+            cfg = Loader('domogik')
+            config = cfg.load()
+            conf = dict(config[1])
+            self._xml_directory = "%s/share/domogik/rest/" % conf['custom_prefix']
+    
+            # HTTP server ip and port
+            try:
+                cfg_rest = Loader('rest')
+                config_rest = cfg_rest.load()
+                conf_rest = dict(config_rest[1])
+                self.server_ip = conf_rest['rest_server_ip']
+                self.server_port = conf_rest['rest_server_port']
+            except KeyError:
+                # default parameters
+                self.server_ip = server_ip
+                self.server_port = server_port
+            self._log.info("Configuration : ip:port = %s:%s" % (self.server_ip, self.server_port))
+    
+            # SSL configuration
+            try:
+                cfg_rest = Loader('rest')
+                config_rest = cfg_rest.load()
+                conf_rest = dict(config_rest[1])
+                self.use_ssl = conf_rest['rest_use_ssl']
+                if self.use_ssl == "True":
+                    self.use_ssl = True
+                else:
+                    self.use_ssl = False
+                self.ssl_certificate = conf_rest['rest_ssl_certificate']
+            except KeyError:
+                # default parameters
+                self.use_ssl = USE_SSL
+                self.ssl_certificate = SSL_CERTIFICATE
+            if self.use_ssl == True:
+                self._log.info("Configuration : SSL support activated (certificate : %s)" % self.ssl_certificate)
             else:
-                self.use_ssl = False
-            self.ssl_certificate = conf_rest['rest_ssl_certificate']
-        except KeyError:
-            # default parameters
-            self.use_ssl = USE_SSL
-            self.ssl_certificate = SSL_CERTIFICATE
-        if self.use_ssl == True:
-            self._log.info("Configuration : SSL support activated (certificate : %s)" % self.ssl_certificate)
-        else:
-            self._log.info("Configuration : SSL support not activated")
+                self._log.info("Configuration : SSL support not activated")
+    
+            # Queues config
+            self._log.debug("Get queues configuration")
+            self._config = Query(self._myxpl)
+            res = xPLResult()
+            self._config.query('rest', 'queue-timeout', res)
+            self._queue_timeout = res.get_value()['queue-timeout']
+            if self._queue_timeout == "None":
+                self._queue_timeout = QUEUE_TIMEOUT
+            self._queue_timeout = float(self._queue_timeout)
+            self._config = Query(self._myxpl)
+            res = xPLResult()
+            self._config.query('rest', 'queue-size', res)
+            self._queue_size = res.get_value()['queue-size']
+            if self._queue_size == "None":
+                self._queue_size = QUEUE_SIZE
+            self._queue_size = float(self._queue_size)
+            self._config = Query(self._myxpl)
+            res = xPLResult()
+            self._config.query('rest', 'queue-life-exp', res)
+            self._queue_life_expectancy = res.get_value()['queue-life-exp']
+            if self._queue_life_expectancy == "None":
+                self._queue_life_expectancy = QUEUE_LIFE_EXPECTANCY
+            self._queue_life_expectancy = float(self._queue_life_expectancy)
+    
+            # Queues for xPL
+            self._queue_system_list = Queue(self._queue_size)
+            self._queue_system_detail = Queue(self._queue_size)
+            self._queue_system_start = Queue(self._queue_size)
+            self._queue_system_stop = Queue(self._queue_size)
+    
+            # define listeners for queues
+            self._log.debug("Create listeners")
+            Listener(self._add_to_queue_system_list, self._myxpl, \
+                     {'schema': 'domogik.system',
+                      'xpltype': 'xpl-trig',
+                      'command' : 'list',
+                      'host' : gethostname()})
+            Listener(self._add_to_queue_system_detail, self._myxpl, \
+                     {'schema': 'domogik.system',
+                      'xpltype': 'xpl-trig',
+                      'command' : 'detail',
+                      'host' : gethostname()})
+            Listener(self._add_to_queue_system_start, self._myxpl, \
+                     {'schema': 'domogik.system',
+                      'xpltype': 'xpl-trig',
+                      'command' : 'start',
+                      'host' : gethostname()})
+            Listener(self._add_to_queue_system_stop, self._myxpl, \
+                     {'schema': 'domogik.system',
+                      'xpltype': 'xpl-trig',
+                      'command' : 'stop',
+                      'host' : gethostname()})
+    
+            self._log.info("Initialisation OK")
 
-        # Queues config
-        self._log.debug("Get queues configuration")
-        self._config = Query(self._myxpl)
-        res = xPLResult()
-        self._config.query('rest', 'queue-timeout', res)
-        self._queue_timeout = res.get_value()['queue-timeout']
-        if self._queue_timeout == "None":
-            self._queue_timeout = QUEUE_TIMEOUT
-        self._queue_timeout = float(self._queue_timeout)
-        self._config = Query(self._myxpl)
-        res = xPLResult()
-        self._config.query('rest', 'queue-size', res)
-        self._queue_size = res.get_value()['queue-size']
-        if self._queue_size == "None":
-            self._queue_size = QUEUE_SIZE
-        self._queue_size = float(self._queue_size)
-        self._config = Query(self._myxpl)
-        res = xPLResult()
-        self._config.query('rest', 'queue-life-exp', res)
-        self._queue_life_expectancy = res.get_value()['queue-life-exp']
-        if self._queue_life_expectancy == "None":
-            self._queue_life_expectancy = QUEUE_LIFE_EXPECTANCY
-        self._queue_life_expectancy = float(self._queue_life_expectancy)
-
-        # Queues for xPL
-        self._queue_system_list = Queue(self._queue_size)
-        self._queue_system_detail = Queue(self._queue_size)
-        self._queue_system_start = Queue(self._queue_size)
-        self._queue_system_stop = Queue(self._queue_size)
-
-        # define listeners for queues
-        self._log.debug("Create listeners")
-        Listener(self._add_to_queue_system_list, self._myxpl, \
-                 {'schema': 'domogik.system',
-                  'xpltype': 'xpl-trig',
-                  'command' : 'list',
-                  'host' : gethostname()})
-        Listener(self._add_to_queue_system_detail, self._myxpl, \
-                 {'schema': 'domogik.system',
-                  'xpltype': 'xpl-trig',
-                  'command' : 'detail',
-                  'host' : gethostname()})
-        Listener(self._add_to_queue_system_start, self._myxpl, \
-                 {'schema': 'domogik.system',
-                  'xpltype': 'xpl-trig',
-                  'command' : 'start',
-                  'host' : gethostname()})
-        Listener(self._add_to_queue_system_stop, self._myxpl, \
-                 {'schema': 'domogik.system',
-                  'xpltype': 'xpl-trig',
-                  'command' : 'stop',
-                  'host' : gethostname()})
-
-        self._log.info("Initialisation OK")
+        except:
+            self._log.error("%s" % sys.exc_info()[1])
+            print("%s" % sys.exc_info()[1])
+  
 
 
     def _add_to_queue_system_list(self, message):
@@ -1127,53 +1134,6 @@ target=*
                                                   self.jsonp, self.jsonp_cb)
                 return
 
-        ### sensor reference #########################
-        elif self.rest_request[0] == "sensor_reference":
-
-            ### list
-            if self.rest_request[1] == "list":
-                if len(self.rest_request) == 2:
-                    self._rest_base_sensor_reference_list()
-                elif len(self.rest_request) == 3:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-                else:
-                    if self.rest_request[2] == "by-type_id":
-                        self._rest_base_sensor_reference_list(type_id=self.rest_request[3])
-                    else:
-                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-
-            ### add
-            elif self.rest_request[1] == "add_OFF":
-                offset = 2
-                if self.set_parameters(offset):
-                    self._rest_base_sensor_reference_add()
-                else:
-                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
-
-            ### update
-            elif self.rest_request[1] == "update_OFF":
-                offset = 2
-                if self.set_parameters(offset):
-                    self._rest_base_sensor_reference_update()
-                else:
-                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
-
-            ### del
-            elif self.rest_request[1] == "del_OFF":
-                if len(self.rest_request) == 3:
-                    self._rest_base_sensor_reference_del(sr_id=self.rest_request[2])
-                else:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-
-            ### others
-            else:
-                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], \
-                                                  self.jsonp, self.jsonp_cb)
-                return
-
 
         ### actuator feature #########################
         elif self.rest_request[0] == "actuator_feature":
@@ -1186,34 +1146,35 @@ target=*
                     self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
                 else:
-                    if self.rest_request[2] == "by-type_id":
-                        self._rest_base_actuator_feature_list(type_id=self.rest_request[3])
+                    if self.rest_request[2] == "by-id":
+                        self._rest_base_actuator_feature_list(id=self.rest_request[3])
                     else:
                         self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
 
-            ### add
-            elif self.rest_request[1] == "add_OFF":
-                offset = 2
-                if self.set_parameters(offset):
-                    self._rest_base_actuator_feature_add()
-                else:
-                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
+            ### others
+            else:
+                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], \
+                                                  self.jsonp, self.jsonp_cb)
+                return
 
-            ### update
-            elif self.rest_request[1] == "update_OFF":
-                offset = 2
-                if self.set_parameters(offset):
-                    self._rest_base_actuator_feature_update()
-                else:
-                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
 
-            ### del
-            elif self.rest_request[1] == "del_OFF":
-                if len(self.rest_request) == 3:
-                    self._rest_base_actuator_feature__del(af_id=self.rest_request[2])
-                else:
+
+        ### sensor feature ###########################
+        elif self.rest_request[0] == "sensor_feature":
+
+            ### list
+            if self.rest_request[1] == "list":
+                if len(self.rest_request) == 2:
+                    self._rest_base_sensor_feature_list()
+                elif len(self.rest_request) == 3:
                     self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
+                else:
+                    if self.rest_request[2] == "by-id":
+                        self._rest_base_sensor_feature_list(id=self.rest_request[3])
+                    else:
+                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
 
             ### others
@@ -1281,16 +1242,9 @@ target=*
             if self.rest_request[1] == "list":
                 if len(self.rest_request) == 2:
                     self._rest_base_device_list()
-                elif len(self.rest_request) == 3:
+                else:
                     self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
-                else:
-                    if self.rest_request[2] == "by-room":
-                        self._rest_base_device_list(room_id=self.rest_request[3])
-                    else:
-                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-
 
             ### add
             elif self.rest_request[1] == "add":
@@ -1664,7 +1618,8 @@ target=*
         json_data.set_data_type("device_usage")
         try:
             device_usage = self._db.add_device_usage(self.get_parameters("name"), \
-                                                     self.get_parameters("description"))
+                                                     self.get_parameters("description"), \
+                                                     self.get_parameters("default_options"))
             json_data.add_data(device_usage)
         except:
             json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
@@ -1681,7 +1636,8 @@ target=*
         try:
             device_usage = self._db.update_device_usage(self.get_parameters("id"), \
                                                         self.get_parameters("name"), \
-                                                        self.get_parameters("description"))
+                                                        self.get_parameters("description"), \
+                                                        self.get_parameters("default_options"))
             json_data.add_data(device_usage)
         except:
             json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
@@ -1773,155 +1729,45 @@ target=*
 
 
 
-######
-# /base/sensor_reference processing
-######
-
-    def _rest_base_sensor_reference_list(self, type_id = None):
-        """ list sensor references
-            @param name : sensor reference name
-        """ 
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("sensor_reference")
-        if type_id == None:
-            for sensor_reference in self._db.list_sensor_reference_data():
-                json_data.add_data(sensor_reference)
-        else:
-            for sensor_reference in self._db.get_sensor_reference_data_by_typeid(type_id):
-                json_data.add_data(sensor_reference)
-        self.send_http_response_ok(json_data.get())
-
-
-
-    def _rest_base_sensor_reference_add(self):
-        """ add sensor reference
-        """ 
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("sensor_reference")
-        try:
-            sensor_reference = self._db.add_sensor_reference_data(self.get_parameters("name"), \
-                                                                  self.get_parameters("value"), \
-                                                                  self.get_parameters("type_id"), \
-                                                                  self.get_parameters("unit"), \
-                                                                  self.get_parameters("stat_key"))
-            json_data.add_data(sensor_reference)
-        except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
-        self.send_http_response_ok(json_data.get())
-
-
-
-    def _rest_base_sensor_reference_update(self):
-        """ update sensor_reference
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("sensor_reference")
-        try:
-            sensor_reference = self._db.update_sensor_reference_data(self.get_parameters("id"), \
-                                                                  self.get_parameters("name"), \
-                                                                  self.get_parameters("value"), \
-                                                                  self.get_parameters("type_id"), \
-                                                                  self.get_parameters("unit"), \
-                                                                  self.get_parameters("stat_key"))
-            json_data.add_data(sensor_reference)
-        except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
-        self.send_http_response_ok(json_data.get())
-
-
-
-
-    def _rest_base_sensor_reference_del(self, sr_id=None):
-        """ delete sensor reference
-            @param sr_id : sensor reference id to delete
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("sensor_reference")
-        try:
-            sensor_reference = self._db.del_sensor_reference_data(sr_id)
-            json_data.add_data(sensor_reference)
-        except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
-        self.send_http_response_ok(json_data.get())
-
-
 
 ######
 # /base/actuator_feature processing
 ######
 
-    def _rest_base_actuator_feature_list(self, type_id = None):
+    def _rest_base_actuator_feature_list(self, id = None):
         """ list actuator features
-            @param name : actuator feature name
+            @param id : id of actuator feature 
         """
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("actuator_feature")
-        if type_id == None:
+        if id == None:
             for actuator_feature in self._db.list_actuator_features():
                 json_data.add_data(actuator_feature)
         else:
-            for actuator_feature in self._db.get_actuator_feature_by_typeid(type_id):
+            actuator_feature = self._db.get_actuator_feature_by_id(id)
+            if actuator_feature is not None:
                 json_data.add_data(actuator_feature)
         self.send_http_response_ok(json_data.get())
 
+######
+# /base/sensor_feature processing
+######
 
-
-    def _rest_base_actuator_feature_add(self):
-        """ add actuator feature
+    def _rest_base_sensor_feature_list(self, id = None):
+        """ list sensor features
+            @param id : id of sensor feature 
         """
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("actuator_feature")
-        try:
-            actuator_feature = self._db.add_actuator_feature(self.get_parameters("name"), \
-                                                                  self.get_parameters("value"), \
-                                                                  self.get_parameters("type_id"), \
-                                                                  self.get_parameters("unit"), \
-                                                                  self.get_parameters("configurable_states"), \
-                                                                  self.get_parameters("return_confirmation"))
-            json_data.add_data(actuator_feature)
-        except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
-        self.send_http_response_ok(json_data.get())
-
-
-    def _rest_base_actuator_feature_update(self):
-        """ update actuator feature
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("actuator_feature")
-        try:
-            actuator_feature = self._db.update_actuator_feature(self.get_parameters("id"), \
-                                                                  self.get_parameters("name"), \
-                                                                  self.get_parameters("value"), \
-                                                                  self.get_parameters("type_id"), \
-                                                                  self.get_parameters("unit"), \
-                                                                  self.get_parameters("configurable_states"), \
-                                                                  self.get_parameters("return_confirmation"))
-            json_data.add_data(actuator_feature)
-        except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
-        self.send_http_response_ok(json_data.get())
-
-
-    def _rest_base_actuator_feature_del(self, af_id=None):
-        """ delete actuator feature
-            @param af_id : actuator feature id to delete
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("actuator_feature")
-        try:
-            actuator_feature = self._db.del_actuator_feature(af_id)
-            json_data.add_data(actuator_feature)
-        except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+        json_data.set_data_type("sensor_feature")
+        if id == None:
+            for sensor_feature in self._db.list_sensor_features():
+                json_data.add_data(sensor_feature)
+        else:
+            sensor_feature = self._db.get_sensor_feature_by_id(id)
+            if sensor_feature is not None:
+                json_data.add_data(sensor_feature)
         self.send_http_response_ok(json_data.get())
 
 
@@ -2002,25 +1848,14 @@ target=*
 # /base/device processing
 ######
 
-    def _rest_base_device_list(self, room_id = None, device_id = None):
+    def _rest_base_device_list(self):
         """ list devices
         """
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("device")
-        if room_id == None and device_id == None:
-            for device in self._db.list_devices():
-                json_data.add_data(device)
-        elif device_id == None:
-            # by-room
-            if room_id == "":
-                room_id = None
-            for device in self._db.get_all_devices_of_room(room_id):
-                json_data.add_data(device)
-        elif room_id == None:
-            # by-device
-            for device in self._db.get_all_devices_of_room(room_id):
-                json_data.add_data(device)
+        for device in self._db.list_devices():
+            json_data.add_data(device)
         self.send_http_response_ok(json_data.get())
 
 
@@ -2055,7 +1890,6 @@ target=*
             device = self._db.update_device(self.get_parameters("id"), \
                                          self.get_parameters("name"), \
                                          self.get_parameters("address"), \
-                                         self.get_parameters("type_id"), \
                                          self.get_parameters("usage_id"), \
                                          self.get_parameters("room_id"), \
                                          self.get_parameters("description"), \
@@ -2412,7 +2246,7 @@ target=*
 
 
 
-    def _rest_plugin_config_del(self, name=None):
+    def _rest_plugin_config_del(self, id=None):
         """ delete device technology config
             @param name : module name
         """
@@ -2420,7 +2254,7 @@ target=*
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("config")
         try:
-            for plugin in self._db.del_plugin_config(name):
+            for plugin in self._db.del_plugin_config(id):
                 json_data.add_data(plugin)
         except:
             json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))

@@ -162,6 +162,11 @@ class SysManager(xPLPlugin):
             print("%s" % sys.exc_info()[1])
 
 
+        except:
+            self._log.error("%s" % sys.exc_info()[1])
+            print("%s" % sys.exc_info()[1])
+
+
 
     def _sys_cb(self, message):
         '''
