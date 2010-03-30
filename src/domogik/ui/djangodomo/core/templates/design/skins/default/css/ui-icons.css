@@ -148,6 +148,7 @@
 .icon16-action-password { background-image:url(../images/action/key_16.png);}
 .icon16-action-save { background-image:url(../images/action/save_16.png);}
 .icon16-action-reset { background-image:url(../images/action/refresh_16.png);}
+.icon16-action-loading { background-image:url(../images/action/loading_16.gif);}
 
 /* technology icons */
 .icon64-technology-x10 {background-image:url(../../../images/technologies/x10_64.png);}

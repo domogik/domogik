@@ -28,11 +28,12 @@ $(function(){
     
     {% ifequal plugin.status "ON" %}
         $("#buttonstatus").click(function() {
-            getREST('/module/stop/{{ plugin.name }}',
+            $("#buttonstatus").attr('className', 'button icon16-action-loading');
+            getREST('/plugin/stop/{{ plugin.name }}',
                 function(data) {
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
-                        $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Plugin" %}\'' + {{ plugin.name }} + '\' {% trans "successfully stopped" %}'});
+                        $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Plugin" %}\'{{ plugin.name }}\' {% trans "successfully stopped" %}'});
                     } else {
                         $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Plugin not stopped" %} (' + data.description + ')'});
                     }
@@ -41,11 +42,12 @@ $(function(){
         });
     {% else %}
         $("#buttonstatus").click(function() {
-            getREST('/module/start/{{ plugin.name }}',
+            $("#buttonstatus").attr('className', 'button icon16-action-loading');
+            getREST('/plugin/start/{{ plugin.name }}',
                 function(data) {
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
-                        $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Plugin" %}\'' + {{ plugin.name }} + '\' {% trans "successfully started" %}'});
+                        $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Plugin" %}\'{{ plugin.name }}\' {% trans "successfully started" %}'});
                     } else {
                         $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Plugin not started" %} (' + data.description + ')'});
                     }
@@ -122,7 +124,7 @@ $(function(){
                                     $(tr).append("<td><input type='checkbox' name='value_" + ikey + "' id='value_" + ikey + "' /></td><td></td>");
                                     if (data.config.length > 0) { // If already configured
                                         if (data.config[0].value  == "True") {
-                                            $("#value_" + ikey).attr('checked', 'checked');
+                                            $("#value_" + ikey, tr).attr('checked', true);
                                         }
                                     }
                                 } else {
