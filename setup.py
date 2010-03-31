@@ -80,8 +80,8 @@ setup(
         ('share/domogik/rest/', list_all_files('src/share/domogik/rest/')),
         ('share/doc/schemas', list_all_files('src/domogik/xpl/schema/')),
         ('bin/', ['src/domogik/xpl/tools/xPL_Hub']),
-        ('/etc/init.d/', ['src/domogik/init/domogik']),
-        ('/etc/default/', ['src/domogik/default/domogik'])
+        ('/etc/init.d/', ['src/domogik/examples/init/domogik']),
+        ('/etc/default/', ['src/domogik/examples/default/domogik'])
     ],
 
     entry_points = {
@@ -89,8 +89,6 @@ setup(
             """
             dmg_manager = domogik.xpl.bin.manager:main
             dmg_send = domogik.xpl.bin.send:main
-            dmg_stats = domogik.xpl.bin.statmgr:main
-            dmg_trigger = domogik.xpl.bin.trigger:main
             dmg_django = domogik.ui.djangodomo.manage:run_manager
             """
         ],
