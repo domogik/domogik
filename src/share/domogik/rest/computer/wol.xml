@@ -1,6 +1,6 @@
 <technology id="computer">
   <command name="wol">
-    <schema>command.basic</schema>
+    <schema>control.basic</schema>
     <command-key>current</command-key>    
     <address-key>device</address-key>    
     <command-xpl-value>on</command-xpl-value>

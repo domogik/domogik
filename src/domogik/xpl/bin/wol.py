@@ -37,6 +37,7 @@ Implements
 
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.plugin import xPLPlugin
+from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.lib.wol import WOL
 
 IS_DOMOGIK_PLUGIN = True
@@ -63,7 +64,7 @@ class WOLListener(xPLPlugin):
         self._wolmanager = WOL()
         # Create listeners
         Listener(self.wol_cb, self._myxpl, {'schema': 'control.basic',
-                'xpltype': 'xpl-cmnd'})
+                'xpltype': 'xpl-cmnd', 'type': 'wakeonlan', 'current': 'on'})
 
     def wol_cb(self, message):
         """ Call wake on lan lib
@@ -72,16 +73,19 @@ class WOLListener(xPLPlugin):
         self._log.debug("Call wol_cb")
         if 'device' in message.data:
             device = message.data['device']
-        if 'type' in message.data:
-            xpl_type = message.data['type']
-        if 'current' in message.data:
-            current = message.data['current']
-        mac = current
+        mac = device
         port = 7
-        # if it is a wol message for computer
-        if device == "computer" and xpl_type == "wakeonlan":
-            self._log.debug("Wake on lan command received for " + mac)
-            self._wolmanager.wake_up(mac, port)
+        self._log.debug("Wake on lan command received for " + mac)
+        self._wolmanager.wake_up(mac, port)
+
+        # Send xpl-trig to say plugin receive command
+        mess = XplMessage()
+        mess.set_type('xpl-trig')
+        mess.set_schema('sensor.basic')
+        mess.add_data({'device' :  mac})
+        mess.add_data({'type' :  'wakeonlan'})
+        mess.add_data({'current' :  'on'})
+        self._myxpl.send(mess)
 
 
 if __name__ == "__main__":
