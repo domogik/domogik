@@ -177,7 +177,7 @@ class Manager(BasePlugin):
             if not message.target:
                 message.set_target("*")
             self._UDPSock.sendto(message.__str__(), (self._broadcast, 3865))
-            self._log.debug("xPL Message sent by thread %s" % threading.currentThread().getName())
+            self._log.debug("xPL Message sent by thread %s : %s" % (threading.currentThread().getName(), message))
         except:
             self._log.warning("Error during send of message")
             self._log.debug(traceback.format_exc())
