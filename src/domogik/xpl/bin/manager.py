@@ -192,11 +192,11 @@ class SysManager(xPLPlugin):
             self._log.debug("System request %s for host %s, plugin %s. current hostname : %s" % (cmd, host, plg, gethostname()))
 
             # start plugin
-            if cmd == "start" and host == gethostname():
+            if cmd == "start" and host == gethostname() and plg != "rest":
                 self._start_plugin(plg, host, force)
 
             # stop plugin
-            if cmd == "stop" and host == gethostname():
+            if cmd == "stop" and host == gethostname() and plg != "rest":
                 try:
                     error_msg = message.data["error"]
                 except KeyError:
@@ -465,6 +465,8 @@ class SysManager(xPLPlugin):
         '''
         self._log.debug("Ask to list on %s" % (host))
         self._components = []
+
+        # List real plugins
         package = domogik.xpl.bin
         for importer, plgname, ispkg in pkgutil.iter_modules(package.__path__):
             try:
