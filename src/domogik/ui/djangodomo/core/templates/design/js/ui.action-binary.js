@@ -81,18 +81,17 @@
     $.widget("ui.binary_widget_core", {
         _init: function() {
             var self = this, o = this.options;
-            this.element.addClass('widget_binary')
-                .attr("tabindex", 0);
-            this.elementstate = $("<div class='widget_state'></div>");
+            this.element.addClass('widget_binary');
             this.elementicon = $("<div class='widget_icon'></div>");
+            this.elementicon.addClass('icon32-state-' + o.usage);                
             if(o.isCommand) {
-                this.elementicon.addClass('icon32-usage-' + o.usage);                
+                this.elementstate = $("<div class='widget_state'></div>");
+                this.element.append(this.elementstate);
+                this.element.addClass('command');
             } else {
-                this.elementicon.addClass('icon32-state-' + o.usage);                
+                this.elementicon.addClass('binary_1');                
             }
-            this.element.append(this.elementstate);
-            this.element.append(this.elementicon);
-            
+            this.element.append(this.elementicon);            
         },
         
         displayState: function(state) {
@@ -109,7 +108,7 @@
     
     $.extend($.ui.binary_widget_core, {
         defaults: {
-            isCommand: false
+            isCommand: true
         }
     });
     
@@ -120,6 +119,7 @@
                 usage: o.usage,
                 states: o.states
             })
+                .attr("tabindex", 0)
                 .click(function () {self.switchState()})
                 .keypress(function (e) {if (e.which == 13 || e.which == 32) {self.switchState()}});
         },

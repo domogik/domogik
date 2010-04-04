@@ -2,34 +2,56 @@
     $.widget("ui.dragdrop", {
         previous_idZone : null,
         current_element : null,
-        
-        _init: function() {
-            var main = this;
-        	$("ul.draggables", this.element).each(function() {
-                var zone = $(this);
-                var idZone = "target_" + zone.attr('value');        
-                zone.attr('id', idZone);
-                zone.attr('aria-labelledby', idZone + '_header');
-                zone.attr('role', 'list');
-                zone.prev(".choice").attr('id', idZone + '_header');
-                $("li.draggable", this).each(function() {
-                    var element = $(this);
-        
-                    // Set initial values so can be moved
-                    element.css('top', '0px');
-                    element.css('left', '0px');
-        
-                    // Put the list items into the keyboard tab order
-                    element.attr('tabIndex', '0');
-               
-                    // Set ARIA attributes for elements
-                    element.attr('aria-grabbed', 'false');
-                    element.attr('aria-haspopup', 'true');
-                    element.attr('role', 'listitem');
-                       
+        _init:function() {
+            var self = this, o = this.options;
+            this.zones = new Array;
+        },
+
+        addzones: function(parameters) {
+            var self = this, o = this.options;
+            $(parameters.zonesid).find("ul.draggables").each(function() {
+                var zone = new Object;
+                var element = $(this);
+                var idZone = "target_" + element.attr('value');        
+                element.attr('id', idZone);
+                element.attr('role', 'list');
+                var choice = element.prev(o.choice);
+                zone.name = choice.text();
+                zone.id = idZone;
+                zone.element = element;
+                zone.dom = this;
+                zone.drag = parameters.zonedrag;
+                zone.drop = parameters.zonedrop;
+                zone.droporigin = parameters.zonedroporigin;
+                self.zones.push(zone);
+                choice.attr('id', zone.id + '_header');
+                element.attr('aria-labelledby', zone.id + '_header');
+                
+                if ($("li.draggable", this).length > 0) {
+                    $("li.draggable", this).each(function() {
+                        var element = $(this);
+                        element.addClass('draggable');
+                        
+                        // Set initial values so can be moved
+                        element.css('top', '0px');
+                        element.css('left', '0px');
+            
+                        // Put the list items into the keyboard tab order
+                        element.attr('tabIndex', '0');
+                   
+                        // Set ARIA attributes for elements
+                        element.attr('aria-grabbed', 'false');
+                        element.attr('aria-haspopup', 'true');
+                        element.attr('role', 'listitem');
+
+                        element.attr('zoneorigin', zone.id);
+
                         // Add event handlers
-                    main._initialise(this);
-                });
+                        self._initialise(this);
+                    });                    
+                } else {
+                    $(this).append("<li class='empty'>Empty</li>");
+                }
             });
         },
     
@@ -45,19 +67,20 @@
         },
         
         _initialise : function(objNode) {
-            var main = this;
+            var self = this;
             // Add event handlers
-            objNode.onmousedown = function(e) { main._dragStart(e, objNode);return false;};
+            objNode.onmousedown = function(e) { self._dragStart(e, objNode);return false;};
             objNode.onclick = function() {this.focus();};
-            objNode.onkeydown = function(e) { main._keyboardDragDrop(e, objNode);};
-            document.body.onclick = main._removePopup;
+            objNode.onkeydown = function(e) { self._keyboardDragDrop(e, objNode);};
+            document.body.onclick = self._removePopup;
         },
     
         _dragStart : function(objEvent, objNode) {
-            var main = this;
+            var self = this;
             objEvent = objEvent || window.event;
             var idFrom = objNode.parentNode.getAttribute('id');
-
+            var idOrigin = objNode.getAttribute('zoneorigin');
+            
             this.previous_idZone = idFrom;
             this.current_element = objNode;
 
@@ -69,11 +92,11 @@
             objNode.style.zIndex = '2';
             objNode.setAttribute('aria-grabbed', 'true');
             
-            $(main.objCurrent).addClass('dragged');
+            $(self.objCurrent).addClass('dragged');
             
-            document.onmousemove = function(e) { main._dragMove(e, objNode);return false;};
-            document.onmouseup = function(e) { main._dragEnd(e, objNode);return false;};
-            this._showTargets(idFrom);
+            document.onmousemove = function(e) { self._dragMove(e, objNode);return false;};
+            document.onmouseup = function(e) { self._dragEnd(e, objNode);return false;};
+            this._showTargets(idFrom, idOrigin);
         },
     
         _dragMove : function(objEvent, objNode) {
@@ -96,56 +119,62 @@
         },
     
         _dragEnd : function(objEvent, objNode) {
-            var main = this;
+            var self = this;
             var idFrom = objNode.parentNode.getAttribute('id');
             var iPosition = calculatePosition(objNode);
+            var idOrigin = objNode.getAttribute('zoneorigin');
 
-            var idTarget = main._getTarget(iPosition, idFrom);
+            var idTarget = self._getTarget(iPosition, idFrom, idOrigin);
     
-            main._dropObject(objNode, idTarget);
+            self._dropObject(objNode, idTarget);
     
             document.onmousemove = null;
             document.onmouseup   = null;
-            main.objCurrent = null;
+            self.objCurrent = null;
         },
         
-        _showTargets : function (idFrom) {
+        _showTargets : function (idFrom, idOrigin) {
             // Highlight the targets for the current drag item
-            $('ul.draggables[id!='+idFrom+']').each(function(i) {
-                    $(this).parent()
+            $.each(this.zones, function() {
+                if (this.id != idFrom && (this.drop || (this.droporigin && this.id == idOrigin))) {
+                    this.element.parent()
                         .addClass('highlight')
                         .attr('aria-dropeffect', 'move');
+                }
             });
         },
 
         _hideTargets : function () {
             // Highlight the targets for the current drag item
-            $("ul.draggables").each(function(i) {
-                $(this).parent()
+            $.each(this.zones, function() {
+                this.element.parent()
                     .removeClass('highlight')
                     .removeAttr('aria-dropeffect');
             });
         },
         
-        _getTarget : function(iPosition, idFrom) {
+        _getTarget : function(iPosition, idFrom, idOrigin) {
             var iTolerance = 40;
             var iLeft, iRight, iTop, iBottom;
             var res ='';
-        
-            $('ul.draggables[id!='+idFrom+']').each(function(i) {
-                var zPosition = calculatePosition(this);
-                // Get position of the list
-                iLeft = zPosition.offsetLeft - iTolerance;
-                iRight = iLeft + this.offsetWidth + iTolerance;
-                iTop = zPosition.offsetTop - iTolerance;
-                iBottom = iTop + this.offsetHeight + iTolerance;
-                // Determine if current object is over the target
-                if (iPosition.offsetLeft > iLeft && iPosition.offsetLeft < iRight && iPosition.offsetTop > iTop && iPosition.offsetTop < iBottom)
-                {
-                    res = this.id;
-                    return false;
+
+            $.each(this.zones, function() {
+                if (this.id != idFrom && (this.drop || (this.droporigin && this.id == idOrigin))) {
+                    var zPosition = calculatePosition(this.dom);
+                    // Get position of the list
+                    iLeft = zPosition.offsetLeft - iTolerance;
+                    iRight = iLeft + this.dom.offsetWidth + iTolerance;
+                    iTop = zPosition.offsetTop - iTolerance;
+                    iBottom = iTop + this.dom.offsetHeight + iTolerance;
+                    // Determine if current object is over the target
+                    if (iPosition.offsetLeft > iLeft && iPosition.offsetLeft < iRight && iPosition.offsetTop > iTop && iPosition.offsetTop < iBottom)
+                    {
+                        res = this.id;
+                        return false;
+                    }
                 }
             });
+
             // Current object is not over a target
             return res;
         },
@@ -159,16 +188,17 @@
         
         _moveObject : function(objNode, idTarget) {
             if (idTarget.length > 0) {
+                var element_value = objNode.getAttribute('value');
                 var element = $(objNode).detach();
                 var target = $('#' + idTarget).append(element);
+                var target_value = target.attr('value');
+
                 this._initialise(objNode);
     
                 // Remove empty node if there are artists in list
                 $('li.empty', target).remove();
     
                 $('ul.draggables:not(:has(li))').html("<li class='empty'>Empty</li>");
-                var element_value = element.attr('value');
-                var target_value = target.attr('value');
                 if(this.options.dropcallback) this.options.dropcallback(this, element_value, target_value);
             } else {
                 this.valid();
@@ -187,11 +217,13 @@
         },
         
         _keyboardDragDrop : function(objEvent, objNode) {
-            var main = this;
+            var self = this, o = this.options;
+
             objEvent = objEvent || window.event;
             var iKey = objEvent.keyCode;
     
             var idFrom = objNode.parentNode.getAttribute('id');
+            var idOrigin = objNode.getAttribute('zoneorigin');
             
             if (iKey == 32) { // Space
                 document.onkeydown = function(){return objEvent.keyCode==38 || objEvent.keyCode==40 ? false : true;};
@@ -201,20 +233,20 @@
                 
                 // Build context menu
                 var objMenu = $("<ul id='popup' role='menu'></ul>");
-                
-                $('ul.draggables[id!='+idFrom+']').each(function(i) {
-                    var self = this;
-                    var objChoice = $("<li>" + $(this).prev(".choice").text() + "</li>")
-                    objChoice.attr('tabIndex', -1);
-                    objChoice.attr('role', 'menuitem');
-                    objChoice.mousedown(function(e) {main._dropObject(objNode, self.id); return false;});
-                    objChoice.keydown(function(e) {main._handleContext(e, objNode, self.id)});
-                    objMenu.append(objChoice);
+                $.each(this.zones, function() {
+                    if (this.id != idFrom && (this.drop || (this.droporigin && this.id == idOrigin))) {
+                        var objChoice = $("<li>" + this.name + "</li>")
+                        objChoice.attr('tabIndex', -1);
+                        objChoice.attr('role', 'menuitem');
+                        objChoice.mousedown(function(e) {self._dropObject(objNode, this.id); return false;});
+                        objChoice.keydown(function(e) {self._handleContext(e, objNode, this.id)});
+                        objMenu.append(objChoice);
+                    }
                 });
             
                 $(objNode).append(objMenu);
                 objMenu.find(":first").focus();
-                main._showTargets(idFrom);
+                self._showTargets(idFrom);
             }
         },
     
@@ -282,6 +314,7 @@
     
     $.extend($.ui.dragdrop, {
         defaults: {
+            choice: ".choice",
             dropcallback: null
         }
     });

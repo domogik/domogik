@@ -25,10 +25,8 @@ ul.draggables {
     padding-left:20px;
 }
 
-li.draggable, li.empty
-{
+li.draggable, li.empty {
     position: relative;
-    border: 1px solid #666;
     padding: 0.5em 0.5em 0.5em 1em;
     margin:0.1em;
     width: 13em;
@@ -38,6 +36,14 @@ li.draggable, li.empty
     display:inline-block;
     -moz-border-radius: 1em;
     -webkit-border-radius: 1em;
+}
+
+li.draggable {
+    border: 1px solid #666666;
+}
+
+li.empty {
+    border: 1px dashed #cccccc;
 }
 
 li.draggable

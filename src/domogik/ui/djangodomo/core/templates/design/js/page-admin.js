@@ -7,7 +7,7 @@ function getPluginsList() {
 				$.each(data.plugin, function() {
 					var li = $("<li></li>");
 					var a = $("<a></a>");
-					a.attr('href', server_url + '/admin/plugin/' + this.name)
+					a.attr('href', '/domogik/admin/plugin/' + this.name)
 						.attr('title', this.description)
 						.addClass("icon16-technology-" + this.technology)
 						.tooltip_right();
@@ -36,8 +36,3 @@ function getPluginsList() {
 		}
 	)	
 }
-
-$(document).ready(function(){
-	getPluginsList();
-	$('#plugins_list li a[title]').tooltip_right();
-});

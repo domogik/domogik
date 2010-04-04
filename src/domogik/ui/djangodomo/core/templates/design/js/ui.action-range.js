@@ -174,17 +174,17 @@ const close_with_change = 3000; // 3 seconds
     $.widget("ui.range_widget_core", {
         _init: function() {
             var self = this, o = this.options;
-            this.element.addClass('widget_range')
-                .attr("tabindex", 0);
-			this.elementstate = $("<div class='widget_state'></div>");
+            this.element.addClass('widget_range');
             this.elementicon = $("<div class='widget_icon'></div>");
 			this.elementvalue = $("<div class='widget_value'></div>");
+            this.elementvalue.addClass('icon32-state-' + o.usage);                
             if(o.isCommand) {
-                this.elementvalue.addClass('icon32-usage-' + o.usage);                
+    			this.elementstate = $("<div class='widget_state'></div>");
+    			this.element.append(this.elementstate);
+                this.element.addClass('command');
             } else {
-                this.elementvalue.addClass('icon32-state-' + o.usage);                
+    			this.elementvalue.addClass('range_100');
             }
-			this.element.append(this.elementstate);
 			this.elementicon.append(this.elementvalue);				
             this.element.append(this.elementicon);
 			this.displayBackground(0);
@@ -216,7 +216,7 @@ const close_with_change = 3000; // 3 seconds
     
     $.extend($.ui.range_widget_core, {
         defaults: {
-			isCommand: false
+			isCommand: true
         }
     });
     
@@ -225,7 +225,8 @@ const close_with_change = 3000; // 3 seconds
             var self = this, o = this.options;
             this.element.range_widget_core({
                 usage: o.usage
-            });
+            })
+                .attr("tabindex", 0);
 			this.button_plus = $("<div class='range_plus' style='display:none'></div>");
 			this.button_plus.click(function (e) {self.plus();e.stopPropagation()});
 			this.button_minus = $("<div class='range_minus' style='display:none'></div>");

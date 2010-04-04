@@ -22,9 +22,11 @@
 
 {% load i18n %}
 {% block css %}
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg-dragdrop.css" rel="stylesheet" type="text/css" />
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/page-admin-organization.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block js_include %}
+    <script type="text/javascript" src="/design/js/dmg.dragdrop.js"></script>
 {% endblock %}
 {% block js_script %}
     $(function(){
@@ -44,6 +46,7 @@
         
         /* Drag & Drop */
         $('#dragdroprooms').dragdrop({
+            choice: "legend",
             dropcallback: function(self, element, target) {
                 getREST('/base/room/update/id/' + element + '/area_id/' + target,
                     function(data) {
@@ -210,7 +213,7 @@
     <div class="subsection" id="dragdroprooms">
         <h2 class='help' id='help_dragdrop'>{% trans "Rooms organisation" %} <span class='offscreen'>{% trans "Drag &amp; Drop instructions" %}</span></h2>
         <fieldset class="targetdrop">
-            <legend class="choice">{% trans "Unattributed rooms" %}</legend>
+            <legend>{% trans "Unattributed rooms" %}</legend>
             <ul class="draggables" value="None">
                 {% for room in unattribued_rooms %}
                 <li class="draggable icon32-room-{{ room.config.icon }}" value="{{ room.id }}">{{ room.name }}<span class="description">{{ room.description }}</span></li>
@@ -221,7 +224,7 @@
         </fieldset>
         {% for area in areas_list %}
         <fieldset class="targetdrop">
-            <legend class="choice icon16-area-{{ area.config.icon }}">{{ area.name }}</legend>
+            <legend class="icon16-area-{{ area.config.icon }}">{{ area.name }}</legend>
             <ul class="draggables" value='{{ area.id }}'>
                 {% for room in area.room %}
                 <li class="draggable icon32-room-{{ room.config.icon }}" value="{{ room.id }}">{{ room.name }}<span class="description">{{ room.description }}</span></li>
