@@ -70,6 +70,20 @@
     background-repeat:no-repeat;
 }
 
+#nav2 .titlenav2 {
+    color:#000;
+    background-color:#ffffff;
+    margin: 0 1px 0 1px;
+    padding: 0.2em 0.5em 0.2em 25px;
+    border-top:#CCC solid 1px;
+    display:block;
+    text-decoration:none;
+    background-position:left 50%;
+    background-repeat:no-repeat;
+    font-style: italic;
+    font-weight: bold;
+}
+
 #nav2 li a.selected {
     font-weight:bold;
 }
