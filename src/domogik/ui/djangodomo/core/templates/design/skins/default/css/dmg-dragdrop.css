@@ -25,25 +25,33 @@ ul.draggables {
     padding-left:20px;
 }
 
-li.draggable, li.empty {
+li.draggable, li.empty, li.trace {
     position: relative;
     padding: 0.5em 0.5em 0.5em 1em;
     margin:0.1em;
     width: 13em;
     text-align: center;
-    color: #000;
-    background-color: #fff;
     display:inline-block;
     -moz-border-radius: 1em;
     -webkit-border-radius: 1em;
+    float:left;
 }
 
 li.draggable {
+    background-color: #fff;
+    color: #000;
     border: 1px solid #666666;
 }
 
 li.empty {
+    background-color: #fff;
+    color: #000;
     border: 1px dashed #cccccc;
+}
+
+li.trace {
+    background-color: #cccccc;
+    color: #000;
 }
 
 li.draggable

@@ -9,26 +9,29 @@
 
         addzones: function(parameters) {
             var self = this, o = this.options;
-            $(parameters.zonesid).find("ul.draggables").each(function() {
+            $(parameters.id).find(o.target).each(function() {
                 var zone = new Object;
                 var element = $(this);
                 var idZone = "target_" + element.attr('value');        
                 element.attr('id', idZone);
-                element.attr('role', 'list');
-                var choice = element.prev(o.choice);
+                var choice = element.children(o.choice + ":first");
+                choice.attr('id', idZone + '_header');
                 zone.name = choice.text();
                 zone.id = idZone;
                 zone.element = element;
                 zone.dom = this;
-                zone.drag = parameters.zonedrag;
-                zone.drop = parameters.zonedrop;
-                zone.droporigin = parameters.zonedroporigin;
-                self.zones.push(zone);
-                choice.attr('id', zone.id + '_header');
-                element.attr('aria-labelledby', zone.id + '_header');
+                zone.drag = parameters.drag;
+                zone.drop = parameters.drop;
+                zone.droporigin = parameters.droporigin;
+                zone.keeptrace = parameters.keeptrace;
+                zone.list = element.children("ul:first");
+                self.zones.push(zone); // Add the zone to the list
                 
-                if ($("li.draggable", this).length > 0) {
-                    $("li.draggable", this).each(function() {
+                zone.list.attr('role', 'list')
+                    .attr('aria-labelledby', zone.id + '_header');
+
+                if ($("li.draggable", zone.list).length > 0) {
+                    $("li.draggable", zone.list).each(function() {
                         var element = $(this);
                         element.addClass('draggable');
                         
@@ -50,7 +53,7 @@
                         self._initialise(this);
                     });                    
                 } else {
-                    $(this).append("<li class='empty'>Empty</li>");
+                    zone.list.append("<li class='empty'><p>Empty</p></li>");
                 }
             });
         },
@@ -76,12 +79,11 @@
         },
     
         _dragStart : function(objEvent, objNode) {
-            var self = this;
+            var self = this, o = this.options;
             objEvent = objEvent || window.event;
-            var idFrom = objNode.parentNode.getAttribute('id');
-            var idOrigin = objNode.getAttribute('zoneorigin');
-            
-            this.previous_idZone = idFrom;
+            var zoneFrom = $(objNode).parents(o.target + ":first");
+            var idOrigin = $(objNode).attr('zoneorigin');
+            var idFrom = zoneFrom.attr('id');
             this.current_element = objNode;
 
             this._removePopup();
@@ -119,10 +121,12 @@
         },
     
         _dragEnd : function(objEvent, objNode) {
-            var self = this;
-            var idFrom = objNode.parentNode.getAttribute('id');
+            var self = this, o = this.options;
+            var zoneFrom = $(objNode).parents(o.target + ":first");
+            var idFrom = zoneFrom.attr('id');
+
             var iPosition = calculatePosition(objNode);
-            var idOrigin = objNode.getAttribute('zoneorigin');
+            var idOrigin = $(objNode).attr('zoneorigin');
 
             var idTarget = self._getTarget(iPosition, idFrom, idOrigin);
     
@@ -137,8 +141,7 @@
             // Highlight the targets for the current drag item
             $.each(this.zones, function() {
                 if (this.id != idFrom && (this.drop || (this.droporigin && this.id == idOrigin))) {
-                    this.element.parent()
-                        .addClass('highlight')
+                    this.element.addClass('highlight')
                         .attr('aria-dropeffect', 'move');
                 }
             });
@@ -147,10 +150,17 @@
         _hideTargets : function () {
             // Highlight the targets for the current drag item
             $.each(this.zones, function() {
-                this.element.parent()
-                    .removeClass('highlight')
+                this.element.removeClass('highlight')
                     .removeAttr('aria-dropeffect');
             });
+        },
+        
+        _getZone : function (id) {
+            var ret = null
+            $.each(this.zones, function() {
+                if (this.id == id) ret = this;
+            });
+            return ret;
         },
         
         _getTarget : function(iPosition, idFrom, idOrigin) {
@@ -187,18 +197,40 @@
         },
         
         _moveObject : function(objNode, idTarget) {
+            var self = this, o = this.options;
             if (idTarget.length > 0) {
                 var element_value = objNode.getAttribute('value');
+                var element_origin = objNode.getAttribute('zoneorigin');
+                var zone_origin = this._getZone(element_origin);
+                var zone_target = this._getZone(idTarget);
+                var zoneFrom = $(objNode).parents(o.target + ":first");
+                var idFrom = zoneFrom.attr('id');
+                this.previous_idZone = idFrom;
+                var zone_from = this._getZone(idFrom);
+                if (zone_origin && zone_origin.keeptrace) {
+                    $("#"+element_value+"_trace",zone_origin.element).remove();
+                    if (idTarget != element_origin) { // If we are back to the original zone
+                        var text = null;
+                        if (o.featurename) {
+                            text = $(o.featurename, objNode).html();
+                        } else {
+                            text = $(objNode).text() 
+                        }
+                        text += "<br/>Associated<br/>with<br/>" + zone_target.name;                  
+                        zone_origin.list.append("<li id='" + element_value + "_trace' class='trace'><p>" + text + "</p></li>");
+                    }
+                }
                 var element = $(objNode).detach();
-                var target = $('#' + idTarget).append(element);
-                var target_value = target.attr('value');
-
+                zone_target.list.append(element);                    
+                var target_value = zone_target.element.attr('value');
                 this._initialise(objNode);
+                
+                // Remove empty node if there are element in list
+                $('li.empty', zone_target.element).remove();
     
-                // Remove empty node if there are artists in list
-                $('li.empty', target).remove();
-    
-                $('ul.draggables:not(:has(li))').html("<li class='empty'>Empty</li>");
+                if ($('li', zone_from.list).length == 0) {
+                    zone_from.list.html("<li class='empty'><p>Empty</p></li>");
+                }
                 if(this.options.dropcallback) this.options.dropcallback(this, element_value, target_value);
             } else {
                 this.valid();
@@ -222,8 +254,9 @@
             objEvent = objEvent || window.event;
             var iKey = objEvent.keyCode;
     
-            var idFrom = objNode.parentNode.getAttribute('id');
-            var idOrigin = objNode.getAttribute('zoneorigin');
+            var zoneFrom = $(objNode).parents(o.target + ":first");
+            var idFrom = zoneFrom.attr('id');
+            var idOrigin = $(objNode).attr('zoneorigin');
             
             if (iKey == 32) { // Space
                 document.onkeydown = function(){return objEvent.keyCode==38 || objEvent.keyCode==40 ? false : true;};
@@ -234,12 +267,17 @@
                 // Build context menu
                 var objMenu = $("<ul id='popup' role='menu'></ul>");
                 $.each(this.zones, function() {
+                    var zone = this;
                     if (this.id != idFrom && (this.drop || (this.droporigin && this.id == idOrigin))) {
-                        var objChoice = $("<li>" + this.name + "</li>")
+                        var name = this.name
+                        if (this.id == idOrigin) {
+                            name = "Remove association";                            
+                        }
+                        var objChoice = $("<li>" + name + "</li>")
                         objChoice.attr('tabIndex', -1);
                         objChoice.attr('role', 'menuitem');
-                        objChoice.mousedown(function(e) {self._dropObject(objNode, this.id); return false;});
-                        objChoice.keydown(function(e) {self._handleContext(e, objNode, this.id)});
+                        objChoice.mousedown(function(e) {self._dropObject(objNode, zone.id); return false;});
+                        objChoice.keydown(function(e) {self._handleContext(e, objNode, zone.id)});
                         objMenu.append(objChoice);
                     }
                 });
@@ -256,7 +294,7 @@
         },
     
         _handleContext : function(objEvent, objNode, idTarget) {
-            var main = this;
+            var self = this;
             objEvent = objEvent || window.event;
             var objItem = objEvent.target || objEvent.srcElement;
             var iKey = objEvent.keyCode;
@@ -299,13 +337,14 @@
                    objFocus.focus();
                    break;
                 case 13 : // Enter
-                    main._dropObject(objNode, idTarget);
+                    self.current_element = objNode;
+                    self._dropObject(objNode, idTarget);
                     break;
                 case 27 : // Escape
                 case 9  : // Tab
-                    this._removePopup();
-                    this._reset(objNode);
-                    this._hideTargets();
+                    self._removePopup();
+                    self._reset(objNode);
+                    self._hideTargets();
                     break;
             }
         }

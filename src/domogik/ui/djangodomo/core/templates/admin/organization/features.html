@@ -45,23 +45,30 @@
         
         /* Drag & Drop */
         $('#dragdropfeatures').dragdrop({
+            target: ".targetdrop",
             choice: "legend",
+            featurename : ".name",
             dropcallback: function(self, element, target) {
 //                alert(element + " -> " + target);
             }
         });
-        
+
         $('#dragdropfeatures').dragdrop('addzones', {
-            zonesid : "#tabsassociations",
-            zonedrag: true,
-            zonedrop: true
+            id: "#tabsfeatures",
+            drag: true,
+            drop: false,
+            droporigin : true,
+            keeptrace: true
         });
+
         $('#dragdropfeatures').dragdrop('addzones', {
-            zonesid: "#tabsfeatures",
-            zonedrag: true,
-            zonedrop: false,
-            zonedroporigin : true,
+            id : "#tabsassociations",
+            drag: true,
+            drop: true,
+            droporigin : false,
+            keeptrace: false
         });
+
     });
 {% endblock %}
 {% block title %}{% trans page_title %}{% endblock %}
@@ -95,7 +102,7 @@
             {% for usage in usages_list %}
                 <div id="element{{ usage.grouper.id }}" class="tabelement">
                     {% for device in usage.list %}
-                        <fieldset class="targetdrop">
+                        <fieldset class="targetdrop" value='device-{{ device.id }}'>
                             <script type="text/javascript">
                             // <![CDATA[
                                 $(function() {
@@ -111,9 +118,9 @@
                             // ]]>
                             </script>
                             <legend>{{ device.name }} ({{ device.address }})</legend>
-                            <ul class="draggables" value='device-{{ device.id }}'>
-                                <li class="draggable" value="feature-{{ device.id }}_1"><div id="command_{{ device.id }}_1"><span class='name'>Test 1</span></div></li>
-                                <li class="draggable" value="feature-{{ device.id }}_2"><div id="command_{{ device.id }}_2"><span class='name'>Test 2</span></div></li>
+                            <ul class="draggables">
+                                <li class="draggable" value="feature-{{ device.id }}_1"><div id="command_{{ device.id }}_1"><span class='name'>{{ device.name }}<br/>Test 1</span></div></li>
+                                <li class="draggable" value="feature-{{ device.id }}_2"><div id="command_{{ device.id }}_2"><span class='name'>{{ device.name }}<br/>Test 2</span></div></li>
                             </ul>
                         </fieldset>
                     {% endfor %}
@@ -130,24 +137,24 @@
             </ul>
             {% endspaceless %}
             <div id="elementhouse" class="tabelement">
-                <fieldset class="targetdrop">
+                <fieldset class="targetdrop" value='house-0'>
                     <legend class="choice icon16-house-default">{{ house.name }}</legend>
-                    <ul class="draggables" value='house-0'></ul>
+                    <ul class="draggables"></ul>
                 </fieldset>
             </div>
             <div id="elementareas" class="tabelement">
                 {% for area in areas_list %}
-                <fieldset class="targetdrop">
+                <fieldset class="targetdrop" value='area-{{ area.id }}'>
                     <legend class="choice icon16-area-{{ area.config.icon }}">{{ area.name }}</legend>
-                    <ul class="draggables" value='area-{{ area.id }}'></ul>
+                    <ul class="draggables"></ul>
                 </fieldset>
                 {% endfor %}
             </div>
             <div id="elementrooms" class="tabelement">
                 {% for room in rooms_list %}
-                <fieldset class="targetdrop">
+                <fieldset class="targetdrop" value='room-{{ room.id }}'>
                     <legend class="choice icon16-room-{{ room.config.icon }}">{{ room.name }}</legend>
-                    <ul class="draggables" value='room-{{ room.id }}'></ul>
+                    <ul class="draggables"></ul>
                 </fieldset>
                 {% endfor %}
             </div>

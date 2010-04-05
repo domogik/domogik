@@ -5,27 +5,22 @@
 }
 
 #tabsassociations li.draggable, #tabsassociations li.empty,
-#tabsfeatures li.draggable, #tabsfeatures li.empty {
-    position: relative;
+#tabsfeatures li.draggable, #tabsfeatures li.empty, #tabsfeatures li.trace {
     padding: 0;
     margin:0.1em;
     width: auto;
-    text-align: center;
-    color: #000;
-    background-color: #fff;
-    display:inline-block;
-    -moz-border-radius: 1em;
-    -webkit-border-radius: 1em;
 }
 #tabsassociations li.draggable,
 #tabsfeatures li.draggable {
     border:none;
 }
 #tabsassociations li.empty,
-#tabsfeatures li.empty {
+#tabsfeatures li.empty,
+#tabsfeatures li.trace {
     height: 9em;
     width:7em;
 }
+
 
 a.customicons {
 	height: 5em;

@@ -163,7 +163,7 @@
                 var target = $('#' + idTarget).append(element);
                 this._initialise(objNode);
     
-                // Remove empty node if there are artists in list
+                // Remove empty node if there are elements in list
                 $('li.empty', target).remove();
     
                 $('ul.draggables:not(:has(li))').html("<li class='empty'>Empty</li>");
