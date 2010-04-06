@@ -32,7 +32,16 @@ fi
 
 function start_django {
     echo -n " * Starting Django..."
-    /bin/su - ${DOMOGIK_USER} -m -c "dmg_django runserver >/dev/null 2>&1 &"
+    USER_HOME=$(grep $DOMOGIK_USER /etc/passwd | cut -d":" -f6)
+    DJANGO_SERVER_IP=$(grep "django_server_ip" ${USER_HOME}/.domogik.cfg | cut -d " " -f 3)
+    if [ ${DJANGO_SERVER_IP} == "" ] ; then
+        DJANGO_SERVER_IP=127.0.0.1
+    fi
+    DJANGO_SERVER_PORT=$(grep "django_server_port" ${USER_HOME}/.domogik.cfg | cut -d " " -f 3)
+    if [ ${DJANGO_SERVER_PORT} == "" ] ; then
+        DJANGO_SERVER_PORT=8000
+    fi
+    /bin/su - ${DOMOGIK_USER} -m -c "dmg_django runserver ${DJANGO_SERVER_IP}:${DJANGO_SERVER_PORT}>/dev/null 2>&1 &"
     if [ $? -gt 0 ]; then
         echo " An error occured during Django startup."
         exit 1
