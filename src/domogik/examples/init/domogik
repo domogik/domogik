@@ -33,12 +33,12 @@ fi
 function start_django {
     echo -n " * Starting Django..."
     USER_HOME=$(grep $DOMOGIK_USER /etc/passwd | cut -d":" -f6)
-    DJANGO_SERVER_IP=$(grep "django_server_ip" ${USER_HOME}/.domogik.cfg | cut -d " " -f 3)
-    if [ ${DJANGO_SERVER_IP} == "" ] ; then
+    DJANGO_SERVER_IP=$(grep "^django_server_ip" ${USER_HOME}/.domogik.cfg | cut -d " " -f 3)
+    if [ -z ${DJANGO_SERVER_IP} ] ; then
         DJANGO_SERVER_IP=127.0.0.1
     fi
-    DJANGO_SERVER_PORT=$(grep "django_server_port" ${USER_HOME}/.domogik.cfg | cut -d " " -f 3)
-    if [ ${DJANGO_SERVER_PORT} == "" ] ; then
+    DJANGO_SERVER_PORT=$(grep "^django_server_port" ${USER_HOME}/.domogik.cfg | cut -d " " -f 3)
+    if [ -z ${DJANGO_SERVER_PORT} ] ; then
         DJANGO_SERVER_PORT=8000
     fi
     /bin/su - ${DOMOGIK_USER} -m -c "dmg_django runserver ${DJANGO_SERVER_IP}:${DJANGO_SERVER_PORT}>/dev/null 2>&1 &"
@@ -75,22 +75,26 @@ function start_manager {
 }
 
 function stop_django {
+    echo -n " * Stopping Django..."
     for pid in `ps ax | grep "dmg_django runserver" | grep -v grep | awk '{print $1}'`; do
         kill -15 $pid 2>/dev/null 1>&2
     done
 }
 function stop_xpl {
+    echo -n " * Stopping XPL..."
     for pid in `ps ax | grep "xPL_Hub" | grep -v grep | awk '{print $1}'`; do
         kill -15 $pid 2>/dev/null 1>&2
         kill -9 $pid 2>/dev/null 1>&2
     done
 }
 function stop_manager {
+    echo -n " * Stopping Manager..."
     for pid in `ps ax | grep "dmg_manager" | grep -v grep | awk '{print $1}'`; do
         kill -15 $pid 2>/dev/null 1>&2
     done
 }
 function stop_plugins {
+    echo -n " * Stopping Plugins..."
     /bin/su - ${DOMOGIK_USER} -m -c "dmg_send  xpl-cmnd domogik.system 'command=stop,plugin=*,host=$HOSTNAME'"
     sleep 2          
     for pid in `ps ax | egrep "domogik.*\.pyc$" | grep -v grep | awk '{print $1}'`; do
@@ -101,7 +105,7 @@ function stop_plugins {
 # Check if the directory for lock exists
 function check_lock_dir {
     USER_HOME=$(grep $DOMOGIK_USER /etc/passwd | cut -d":" -f6)
-    DIRECTORY=$(grep "pid_dir_path" ${USER_HOME}/.domogik.cfg | cut -d " " -f 3)
+    DIRECTORY=$(grep "^pid_dir_path" ${USER_HOME}/.domogik.cfg | cut -d " " -f 3)
     if [ ! -d $DIRECTORY ];then
         mkdir $DIRECTORY
         chown ${DOMOGIK_USER}: $DIRECTORY
@@ -155,9 +159,9 @@ case "$1" in
     
     ;;
     restart)
-    $0 stop $1 $2
+    $0 stop $2
     sleep 2
-    $0 start $1 $2
+    $0 start $2
     ;;
     *)
     echo "usage: $0 {start|stop|restart} [(django|xpl|manager|plugins)]"
