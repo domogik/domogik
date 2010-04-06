@@ -122,20 +122,16 @@
 {% block title %}{% trans page_title %}{% endblock %}
 
 {% block banner %}
-    <div class="section">
-        <h1 class="ident">
-            <span class="title">{% trans page_title %}</span>
-        </h1>
-        {% ifnotequal status "" %}
-        <div id='messages' class='{{status}}'>{{msg}}</div>
-        {% endifnotequal %}
-        <ul class="actions">
-        </ul>
-    </div>
+    <h1 class="ident">
+        <span class="title">{% trans page_title %}</span>
+    </h1>
+    {% ifnotequal status "" %}
+    <div id='messages' class='{{status}}'>{{msg}}</div>
+    {% endifnotequal %}
 {% endblock %}
 
 {% block right %}
-    <div class="subsection">
+    <section class="subsection">
         <h2>{% trans "Accounts list" %}</h2>
         <ul class="actions">
             <li><button id="addaccountButton" class="icon16-action-add button">{% trans "Add new account" %}</button></li>
@@ -226,9 +222,9 @@
                 </tr>
             {% endfor %}
         </table>
-    </div>
+    </section>
 
-    <div class="subsection">
+    <section class="subsection">
         <h2>{% trans "Peoples list" %}</h2>
         <ul class="actions">
             <li><button id="addpersonButton" class="icon16-action-add button">{% trans "Add new person" %}</button></li>
@@ -297,7 +293,7 @@
                 </tr>
             {% endfor %}
         </table>
-    </div>
+    </section>
 
     <div id="addaccountdialog"></div>
     <div id="updaccountdialog"></div>

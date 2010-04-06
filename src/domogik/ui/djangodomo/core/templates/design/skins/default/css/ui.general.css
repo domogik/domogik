@@ -1,0 +1,57 @@
+@font-face {
+	font-family: Impact;
+	src: url('impact.ttf');
+}
+
+
+img {
+    border:none;
+}
+
+.hidden {
+    display:none;
+}
+
+.offscreen {
+	position:absolute;
+	left:-10000px;
+	top:auto;
+	width:1px;
+	height:1px;
+	overflow:hidden;
+}
+
+*, input {
+	outline: none;
+}
+/*
+button::-moz-focus-inner,
+input[type="reset"]::-moz-focus-inner,
+input[type="button"]::-moz-focus-inner,
+input[type="submit"]::-moz-focus-inner,
+input[type="file"] > input[type="button"]::-moz-focus-inner {
+    border: none;
+}*/
+
+button::-moz-focus-inner{
+	border: none;
+}
+
+h2 {
+    margin-top:0;
+}
+
+h2.splitter, h3.splitter {
+    border-top:1px solid #999;
+}
+
+.help {
+	display:inline-block;
+	line-height:32px;
+	background: url(../images/action/help_32.png) right 50% no-repeat;
+	padding-right:32px;
+}
+
+.capitalletter {
+	text-transform: capitalize; 
+}

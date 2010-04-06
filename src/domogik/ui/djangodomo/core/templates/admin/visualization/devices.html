@@ -42,14 +42,11 @@
 {% block title %}{% trans page_title %}{% endblock %}
 
 {% block banner %}
-        <div class="section">
-            <h1 class="ident"><span class="title">{% trans page_title %}</span><br /><span class="subtitle">{% trans "Customize your device interfaces" %}</span></h1>
-            {% ifnotequal status "" %}
-            <div id='messages' class='{{status}} icon32-status-{{status}}'>{{msg}}</div>
-            {% endifnotequal %}
-            <div class='instructions'>Drag and drop the features you want displayed on the views</div>
-            <ul class="actions"></ul>
-        </div>
+    <h1 class="ident"><span class="title">{% trans page_title %}</span><br /><span class="subtitle">{% trans "Customize your device interfaces" %}</span></h1>
+    {% ifnotequal status "" %}
+    <div id='messages' class='{{status}} icon32-status-{{status}}'>{{msg}}</div>
+    {% endifnotequal %}
+    <div class='instructions'>Drag and drop the features you want displayed on the views</div>
 {% endblock %}
 
 {% block right %}
@@ -61,7 +58,7 @@
             });
             // ]]>
         </script>
-        <div class="subsection">
+        <section class="subsection">
             <h2 class="icon16-room-{{ room.config.icon }}">{{ room.name }}</h2>
             <div id="tabs{{ room.id }}">
                 {% spaceless %}
@@ -136,6 +133,6 @@
                 </div>
                 {% endfor %}
             </div>
-        </div>
+        </section>
     {% endfor %}
 {% endblock %}

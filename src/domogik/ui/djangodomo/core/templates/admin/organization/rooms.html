@@ -102,17 +102,14 @@
 {% block title %}{% trans page_title %}{% endblock %}
 
 {% block banner %}
-        <div class="section">
-            <h1 class="ident"><span class="title">{% trans "Rooms" %}</span></h1>
-            {% ifnotequal status "" %}
-            <div id='messages' class='{{status}}'>{{msg}}</div>
-            {% endifnotequal %}
-            <ul class="actions"></ul>
-        </div>
+    <h1 class="ident"><span class="title">{% trans "Rooms" %}</span></h1>
+    {% ifnotequal status "" %}
+    <div id='messages' class='{{status}}'>{{msg}}</div>
+    {% endifnotequal %}
 {% endblock %}
 
 {% block right %}
-    <div class="subsection">
+    <section class="subsection">
         <h2>{% trans "Rooms list" %}</h2>
         <div id="tabs">
             {% spaceless %}
@@ -206,11 +203,11 @@
             </div>
             {% endfor %}
         </div>
-    </div>
+    </section>
     <div id="roomdialog"></div>
     <div id="delete_confirmation"></div>
     
-    <div class="subsection" id="dragdroprooms">
+    <section class="subsection" id="dragdroprooms">
         <h2 class='help' id='help_dragdrop'>{% trans "Rooms organisation" %} <span class='offscreen'>{% trans "Drag &amp; Drop instructions" %}</span></h2>
         <fieldset class="targetdrop">
             <legend>{% trans "Unattributed rooms" %}</legend>
@@ -234,5 +231,5 @@
             </ul>
         </fieldset>
         {% endfor %}
-    </div>
+    </section>
 {% endblock %}

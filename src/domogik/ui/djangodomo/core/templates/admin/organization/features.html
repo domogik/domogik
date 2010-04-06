@@ -74,17 +74,14 @@
 {% block title %}{% trans page_title %}{% endblock %}
 
 {% block banner %}
-    <div class="section">
-        <h1 class="ident"><span class="title">{% trans page_title %}</span></h1>
-        {% ifnotequal status "" %}
-        <div id='messages' class='{{status}}'>{{msg}}</div>
-        {% endifnotequal %}
-        <ul class="actions"></ul>
-    </div>
+    <h1 class="ident"><span class="title">{% trans page_title %}</span></h1>
+    {% ifnotequal status "" %}
+    <div id='messages' class='{{status}}'>{{msg}}</div>
+    {% endifnotequal %}
 {% endblock %}
 
 {% block right %}
-    <div class="subsection">
+    <section class="subsection">
         <div id="dragdropfeatures"/>
         <h2>{% trans "Features list" %}</h2>
         <div id="tabsfeatures">
@@ -159,5 +156,5 @@
                 {% endfor %}
             </div>
         </div>
-    </div>
+    </section>
 {% endblock %}

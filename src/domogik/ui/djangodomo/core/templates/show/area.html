@@ -34,14 +34,11 @@
 {% block title %}{% trans page_title %}{% endblock %}
 
 {% block breadcrumb %}
-		<li><a href='{% url show_view %}' class='home'>{{ house.name }}</a></li>
+	<li><a href='{% url show_view %}' class='home'>{{ house.name }}</a></li>
 {% endblock %}
 
 {% block banner %}
-	<div class="section">
-		<h1 class="ident icon64-area-{{ area.config.icon }}"><span class="title">{{ area.name }}</span></h1>
-		<ul class="actions"></ul>
-	</div>
+    <h1 class="ident icon64-area-{{ area.config.icon }}"><span class="title">{{ area.name }}</span></h1>
 {% endblock %}
 
 {% block content %}

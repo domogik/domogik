@@ -27,7 +27,8 @@
 <meta http-equiv="Pragma" content="no-cache" />
 
 <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/jquery-ui-1.7.2.custom.css" rel="stylesheet" type="text/css"/>
-<link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/main.css" rel="stylesheet" type="text/css" />
+<link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui.general.css" rel="stylesheet" type="text/css" />
+<link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/layout.without_nav.css" rel="stylesheet" type="text/css" />
 <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-icons.css" rel="stylesheet" type="text/css" />
 {% block global_css %}{% endblock %}
 {% block css %}{% endblock %}
@@ -51,13 +52,14 @@
 </head>
 <body>
     <div id="content-bgnd">
-		<div id="content">
-			<div id="banner">
-                    <a href="/domogik" id="logo"><img src="/design/images/logo_domogik.png" width="131" height="37" alt="Domogik logo" /></a>
-                    <div id="title">{% trans "Welcome to Domogik" %}<span id="subtitle">{% trans "Free home automation under Linux" %}</span></div></div>
-			{% block content %}{% endblock %}
-		</div>
-		<div id="footer">Copyright 2009 Domogik project - GNU/GPL v3 license</div>
+        <header id="mainheader">
+            <a href="/domogik" id="logo"><img src="/design/images/logo_domogik.png" width="131" height="37" alt="Domogik logo" /></a>
+            <div id="title">{% trans "Welcome to Domogik" %}<span id="subtitle">{% trans "Free home automation under Linux" %}</span></div>
+        </header>
+        <section id="mainsection">
+            {% block content %}{% endblock %}
+        </section>
+		<footer>Copyright 2009 Domogik project - GNU/GPL v3 license</footer>
 	</div>
 </body>
 </html>

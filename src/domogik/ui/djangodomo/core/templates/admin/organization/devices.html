@@ -105,17 +105,14 @@
 {% block title %}{% trans page_title %}{% endblock %}
 
 {% block banner %}
-    <div class="section">
-        <h1 class="ident"><span class="title">{% trans "Devices" %}</span></h1>
-        {% ifnotequal status "" %}
-        <div id='messages' class='{{status}}'>{{msg}}</div>
-        {% endifnotequal %}
-        <ul class="actions"></ul>
-    </div>
+    <h1 class="ident"><span class="title">{% trans "Devices" %}</span></h1>
+    {% ifnotequal status "" %}
+    <div id='messages' class='{{status}}'>{{msg}}</div>
+    {% endifnotequal %}
 {% endblock %}
 
 {% block right %}
-    <div class="subsection">
+    <section class="subsection">
         <h2>{% trans "Devices list" %}</h2>
         <div id="tabs">
             {% spaceless %}
@@ -206,7 +203,7 @@
             </div>
             {% endfor %}
         </div>
-    </div>
+    </section>
     <div id="devicedialog"></div>
     <div id="delete_confirmation"></div>
 {% endblock %}

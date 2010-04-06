@@ -186,20 +186,18 @@ $(function(){
 {% block title %}{% trans page_title %}{% endblock %}
 
 {% block banner %}
-    <div class="section">
-        <h1 class="ident icon64-plugin-{{ plugin.name }}">
-            <span class="title">{% trans "Plugin" %} '{{ plugin.name }}'</span>
-            <br />
-            <span class="subtitle">{{ plugin.description }}</span>
-        </h1>
-        {% ifnotequal status "" %}
-        <div id='messages' class='{{status}}'>{{msg}}</div>
-        {% endifnotequal %}
-    </div>
+    <h1 class="ident icon64-plugin-{{ plugin.name }}">
+        <span class="title">{% trans "Plugin" %} '{{ plugin.name }}'</span>
+        <br />
+        <span class="subtitle">{{ plugin.description }}</span>
+    </h1>
+    {% ifnotequal status "" %}
+    <div id='messages' class='{{status}}'>{{msg}}</div>
+    {% endifnotequal %}
 {% endblock %}
 
 {% block right %}
-    <div class="subsection">
+    <section class="subsection">
         <h2>{% trans "Basic Control" %}</h2>
         <ul>
             <li>{% trans "Version" %}: {{ plugin.version }}</li>
@@ -221,8 +219,8 @@ $(function(){
         {% else %}
             <button id='buttonstatus' class='button icon16-status-active'>{% trans "Start" %}</button>
         {% endifequal %}
-    </div>
-    <div class="subsection">
+    </section>
+    <section class="subsection">
         <h2>{% trans "Configuration" %}</h2>
         <div id='configuration'>
             <p><button id='configurationdelete' class='button icon16-action-del'>{% trans 'Delete configuration' %}</button></p>
@@ -230,5 +228,5 @@ $(function(){
                 <tr><th scope='col'>{% trans "Key" %}</th><th scope='col'>{% trans "Description" %}</th><th scope='col'>{% trans "value" %}</th><th>{% trans "Actions" %}</th></tr>
             </table>
         </div>
-    </div>
+    </section>
 {% endblock %}

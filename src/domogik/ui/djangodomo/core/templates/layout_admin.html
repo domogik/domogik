@@ -56,7 +56,7 @@
 
 {% block content %}
     <div class="left">
-        <div id="nav2">
+        <nav id="nav2">
             <div class="subnav2"><a href="#">{% trans "Organization" %}</a></div>
             <ul>
                 <li><a href="{% url admin_organization_house_view %}" class='{{ nav2_organization_house }}'>{% trans "House" %}</a></li>
@@ -77,10 +77,10 @@
             <ul>
                 <li><a href="{% url admin_visualization_devices_view %}" class='{{ nav2_visualization_devices }}'>{% trans "Devices" %}</a></li>
             </ul>
-        </div>
+        </nav>
     </div>
     <div class="right">
-        <div id="banner">{% block banner %}{% endblock %}</div>
+        <header id='contentheader'>{% block banner %}{% endblock %}</header>
         {% block right %}{% endblock %}
     </div>
 {% endblock %}

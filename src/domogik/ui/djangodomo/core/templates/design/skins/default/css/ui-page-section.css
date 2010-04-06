@@ -1,34 +1,4 @@
-.section .ident {
-    padding:0 0 0 70px;
-    background-position:top left;
-    background-repeat:no-repeat;
-    -webkit-box-reflect:below -30px -webkit-gradient(linear, left top, left bottom, from(transparent), color-stop(0.5, transparent), to(white));
-    min-height:64px;
-}
 
-.section .title {
-    color:#000000;
-}
-
-.section .subtitle {
-    font-style:italic;
-    color:#666;
-    padding-left:20px;
-    background-position:left 50%;
-    background-repeat:no-repeat;
-}
-
-.section > .actions {
-    list-style:none;
-    margin:0;
-    padding:0;
-}
-
-.section > .actions li {
-    display:inline-block;
-    margin:0;
-    padding:0;
-}
 
 /* Action message */
 #messages {
@@ -78,6 +48,7 @@
 /* Subsection */
 
 .subsection {
+    display:block;
     margin:1em;
     padding:1em;
     border: 1px solid #979387;
