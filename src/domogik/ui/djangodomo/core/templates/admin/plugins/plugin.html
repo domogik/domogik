@@ -113,7 +113,7 @@ $(function(){
                 $.each(data.plugin[0].configuration, function(index, item) {
                     var ikey = item.key;
                     var idescription = item.description;
-                    var idefault = item.default;
+                    var idefault = item['default'];
                     getREST('/plugin/config/list/by-name/{{ plugin.name }}/by-key/' + ikey,
                         function(data) {
                             var status = (data.status).toLowerCase();
@@ -202,15 +202,19 @@ $(function(){
     <div class="subsection">
         <h2>{% trans "Basic Control" %}</h2>
         <ul>
+            <li>{% trans "Version" %}: {{ plugin.version }}</li>
+            <li>{% trans "Documentation" %}: <a href='{{ plugin.documentation }}'>Wiki</a></li>
             <li>{% trans "Host" %}: {{ plugin.host }}</li>
-            <li>{% trans "Technology" %}: {{ plugin.technology }}</li>
-            <li>
-            {% ifequal plugin.status "ON" %}
-                <div class='icon16-text-right icon16-status-active'>{% trans "Status" %}:<span class='offscreen'>{% trans "Running" %}</span></div>
-            {% else %}
-                <div class='icon16-text-right icon16-status-inactive'>{% trans "Status" %}:<span class='offscreen'>{% trans "Stopped" %}</span></div>                        
-            {% endifequal %}
-            </li>
+            {% ifnotequal plugin.name "rest" %}
+                <li>{% trans "Technology" %}: {{ plugin.technology }}</li>
+                <li>
+                {% ifequal plugin.status "ON" %}
+                    <div class='icon16-text-right icon16-status-active'>{% trans "Status" %}:<span class='offscreen'>{% trans "Running" %}</span></div>
+                {% else %}
+                    <div class='icon16-text-right icon16-status-inactive'>{% trans "Status" %}:<span class='offscreen'>{% trans "Stopped" %}</span></div>                        
+                {% endifequal %}
+                </li>
+            {% endifnotequal %}
         </ul>
         {% ifequal plugin.status "ON" %}
             <button id='buttonstatus' class='button icon16-status-inactive'>{% trans "Stop" %}</button>

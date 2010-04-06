@@ -15,13 +15,15 @@ function getPluginsList() {
 						.attr('title', this.description)
 						.tooltip_right();
 					var status = $("<div>" + this.name + "</div>");
-					status.addClass("menu-indicator")
-					if (this.status == 'ON') {
-						status.addClass("icon16-status-active");
-						status.append("<span class='offscreen'>Running</span>");
-					} else {
-						status.addClass("icon16-status-inactive");
-						status.append("<span class='offscreen'>Stopped</span>");
+					if (this.name != 'rest') {
+						status.addClass("menu-indicator")
+						if (this.status == 'ON') {
+							status.addClass("icon16-status-active");
+							status.append("<span class='offscreen'>Running</span>");
+						} else {
+							status.addClass("icon16-status-inactive");
+							status.append("<span class='offscreen'>Stopped</span>");
+						}
 					}
 					a.append(status);
 					li.append(a);

@@ -492,7 +492,7 @@ def admin_plugins_plugin(request, plugin_name):
     status = request.GET.get('status', '')
     msg = request.GET.get('msg', '')
     try:
-        result_plugin_by_name = Plugins.get_by_name(plugin_name)
+        result_plugin_detail = Plugins.get_detail(plugin_name)
         result_all_plugins = Plugins.get_all()
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
@@ -505,7 +505,7 @@ def admin_plugins_plugin(request, plugin_name):
         plugins_list=result_all_plugins.plugin,
         status=status,
         msg=msg,
-        plugin=result_plugin_by_name.plugin[0]
+        plugin=result_plugin_detail.plugin[0]
     )
 
 def show_house(request):

@@ -259,6 +259,12 @@ class Plugins(pipes.DmgPipe):
         if resp :
             return resp
 
+    @staticmethod
+    def get_detail(name):
+        resp = Plugins.objects.get({'parameters':"detail/" + name})
+        if resp :
+            return resp
+
 class Accounts(pipes.DmgPipe):
     uri = rest_url + "/account"
 
