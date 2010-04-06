@@ -44,6 +44,8 @@ from domogik.xpl.common.queryconfig import Query
 IS_DOMOGIK_PLUGIN = True
 DOMOGIK_PLUGIN_TECHNOLOGY = "multimedia"
 DOMOGIK_PLUGIN_DESCRIPTION = "Send notifications to XBMC"
+DOMOGIK_PLUGIN_VERSION = "0.1"
+DOMOGIK_PLUGIN_DOCUMENTATION_LINK = "http://wiki.domogik.org/tiki-index.php?page=plugins/XBMCNotification"
 DOMOGIK_PLUGIN_CONFIGURATION=[
       {"id" : 0,
        "key" : "startup-plugin",

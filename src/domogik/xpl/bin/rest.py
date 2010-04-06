@@ -61,7 +61,6 @@ import SocketServer
 import os
 
 
-
 REST_API_VERSION = "0.1"
 REST_DESCRIPTION = "REST plugin is part of Domogik project. See http://trac.domogik.org/domogik/wiki/modules/REST.en for REST API documentation"
 
@@ -77,6 +76,36 @@ QUEUE_SLEEP = 0.1 # sleep time between reading all queue content
 
 # /command queue config
 QUEUE_COMMAND_SIZE = 1000
+
+
+# Domogik plugin informations for manager
+IS_DOMOGIK_PLUGIN = True
+DOMOGIK_PLUGIN_TECHNOLOGY = "domogik"
+DOMOGIK_PLUGIN_DESCRIPTION = "REST Server"
+DOMOGIK_PLUGIN_VERSION = "0.1"
+DOMOGIK_PLUGIN_DOCUMENTATION_LINK = "http://wiki.domogik.org/tiki-index.php?page=plugins/REST"
+DOMOGIK_PLUGIN_CONFIGURATION = [
+      {"id" : 0,
+       "key" : "queue-timeout",
+       "description" : "Maximum wait time for getting data froma queue",
+       "default" : QUEUE_TIMEOUT},
+      {"id" : 1,
+       "key" : "queue-size",
+       "description" : "Size for 'classic' queues. You should not have to change this value",
+       "default" : QUEUE_SIZE},
+      {"id" : 2,
+       "key" : "queue-cmd-size",
+       "description" : "Size for /command queue",
+       "default" : QUEUE_COMMAND_SIZE},
+      {"id" : 3,
+       "key" : "queue-life-exp",
+       "description" : "Life expectancy for a xpl message in queues. You sould not have to change this value",
+       "default" : QUEUE_LIFE_EXPECTANCY},
+      {"id" : 4,
+       "key" : "queue-sleep",
+       "description" : "Time between each unsuccessfull look for a xpl data in a queue",
+       "default" : QUEUE_SLEEP}]
+
 
 
 ################################################################################
@@ -2210,8 +2239,12 @@ target=*
         # process message
         cmd = message.data['command']
         host = message.data["host"]
-        plginfo = message.data["plugin"]
-        data = message.data["plugin"].split(",")
+        name = message.data["plugin"]
+        description = message.data["description"]
+        technology = message.data["technology"]
+        status = message.data["status"]
+        version = message.data["version"]
+        documentation = message.data["documentation"]
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("plugin")
@@ -2227,7 +2260,7 @@ target=*
             except:
                 loop_again = False
 
-        json_data.add_data({"name" : data[0], "technology" : data[1], "description" : data[3], "status" : data[2], "host" : host, "configuration" : config_data})
+        json_data.add_data({"name" : name, "technology" : technology, "description" : description, "status" : status, "host" : host, "version" : version, "documentation" : documentation, "configuration" : config_data})
         self.send_http_response_ok(json_data.get())
 
 

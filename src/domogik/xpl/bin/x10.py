@@ -51,6 +51,8 @@ from domogik.xpl.common.queryconfig import Query
 IS_DOMOGIK_PLUGIN = True
 DOMOGIK_PLUGIN_TECHNOLOGY = "x10"
 DOMOGIK_PLUGIN_DESCRIPTION = "Manage x10 devices"
+DOMOGIK_PLUGIN_VERSION = "0.1"
+DOMOGIK_PLUGIN_DOCUMENTATION_LINK = "http://wiki.domogik.org/tiki-index.php?page=plugins/X10"
 DOMOGIK_PLUGIN_CONFIGURATION=[
       {"id" : 0,
        "key" : "startup-plugin",
