@@ -482,6 +482,14 @@ class SysManager(xPLPlugin):
                     except:
                         plgtech = "Unknown"
                     try:
+                        plgver = plugin.DOMOGIK_PLUGIN_VERSION
+                    except:
+                        plgver = "Unknown"
+                    try:
+                        plgdoc = plugin.DOMOGIK_PLUGIN_DOCUMENTATION_LINK
+                    except:
+                        plgdoc = "#"
+                    try:
                         plgconf = plugin.DOMOGIK_PLUGIN_CONFIGURATION
                     except:
                         plgconf = []
@@ -495,6 +503,8 @@ class SysManager(xPLPlugin):
                                              "technology" : plgtech, 
                                              "status" : status,
                                              "host" : gethostname(), 
+                                             "version" : plgver,
+                                             "documentation" : plgdoc,
                                              "configuration" : plgconf})
             except:
                 self._log.error("Error during %s plugin import" % plgname)
@@ -541,17 +551,18 @@ class SysManager(xPLPlugin):
         mess.add_data({'command' :  'detail'})
         for component in self._components:
             if component["name"] == plg:
-                plg_content = "%s,%s,%s,%s" % (component["name"],
-                                            component["technology"],
-                                            component["status"],
-                                            component["description"])
                 for conf in component["configuration"]:
                     conf_content = "%s,%s,%s" % (conf["key"],
                                                 conf["description"],
                                                 conf["default"])
                     mess.add_data({'config'+str(conf["id"]) : conf_content})
-        mess.add_data({'plugin' :  plg_content})
-        mess.add_data({'host' : gethostname()})
+                mess.add_data({'plugin' :  component["name"]})
+                mess.add_data({'description' :  component["description"]})
+                mess.add_data({'technology' :  component["technology"]})
+                mess.add_data({'status' :  component["status"]})
+                mess.add_data({'version' :  component["version"]})
+                mess.add_data({'documentation' :  component["documentation"]})
+                mess.add_data({'host' : gethostname()})
 
         self._myxpl.send(mess)
 
