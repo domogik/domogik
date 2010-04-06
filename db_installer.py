@@ -83,22 +83,22 @@ _db.add_default_user_account()
 device_technology = _db.add_device_technology(dt_id='x10', dt_name='X10', dt_description='')
 device_type = _db.add_device_type(dty_name='Switch', dt_id=device_technology.id)
 device_type_feature = _db.add_device_type_feature(dtf_name='Switch', dtf_feature_type='actuator',
-                                                  dtf_device_type_id=device_type.id, dtf_parameters='{"command0":"off", "command1":"on"}')
+                                                  dtf_device_type_id=device_type.id, dtf_parameters='{&quot;command0&quot;:&quot;off&quot;, &quot;command1&quot;:&quot;on&quot;}')
 _db.add_actuator_feature(af_id=device_type_feature.id, af_value_type='binary')
 device_type = _db.add_device_type(dty_name='Dimmer', dt_id=device_technology.id)
 device_type_feature = _db.add_device_type_feature(dtf_name='Dimmer', dtf_feature_type='actuator',
-                                                  dtf_device_type_id=device_type.id, dtf_parameters='{"commandMin":0, "commandMax":100}')
+                                                  dtf_device_type_id=device_type.id, dtf_parameters='{&quot;commandMin&quot;:0, &quot;commandMax&quot;:100}')
 _db.add_actuator_feature(af_id=device_type_feature.id, af_value_type='range')
 
 # Create device technologie features for PLCBus
 device_technology = _db.add_device_technology(dt_id='plcbus', dt_name='PLCBus', dt_description='')
 device_type = _db.add_device_type(dty_name='Switch', dt_id=device_technology.id)
 device_type_feature = _db.add_device_type_feature(dtf_name='Switch', dtf_feature_type='actuator',
-                                                  dtf_device_type_id=device_type.id, dtf_parameters='{"command0":"off", "command1":"on"}')
+                                                  dtf_device_type_id=device_type.id, dtf_parameters='{&quot;command0&quot;:&quot;off&quot;, &quot;command1&quot;:&quot;on&quot;}')
 _db.add_actuator_feature(af_id=device_type_feature.id, af_value_type='binary', af_return_confirmation=True)
 device_type = _db.add_device_type(dty_name='Dimmer', dt_id=device_technology.id)
 device_type_feature = _db.add_device_type_feature(dtf_name='Dimmer', dtf_feature_type='actuator',
-                                                  dtf_device_type_id=device_type.id, dtf_parameters='{"commandMin":0, "commandMax":100}')
+                                                  dtf_device_type_id=device_type.id, dtf_parameters='{&quot;commandMin&quot;:0, &quot;commandMax&quot;:100}')
 _db.add_actuator_feature(af_id=device_type_feature.id, af_value_type='range', af_return_confirmation=True)
 
 # Create device technology features for EIB/KNX
@@ -129,23 +129,23 @@ _db.add_device_technology(dt_id='communication', dt_name='Communication',
 
 # Create device usages
 _db.add_device_usage(du_name='Light', du_description='Lamp, light usage',
-                     du_default_options='{ "binary": {"state0":"Off", "state1":"On"}, "range": {"step":10, "unit":"%"} }')
+                     du_default_options='{ &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;}, &quot;range&quot;: {&quot;step&quot;:10, &quot;unit&quot;:&quot;%&quot;} }')
 _db.add_device_usage(du_name='Socket', du_description='Socket usage',
-                     du_default_options='{ "binary": {"state0":"Off", "state1":"On"}, "range": {"step":10, "unit":"%"} }')
+                     du_default_options='{ &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;}, &quot;range&quot;: {&quot;step&quot;:10, &quot;unit&quot;:&quot;%&quot;} }')
 _db.add_device_usage(du_name='Shutter', du_description='Shutter usage',
-                     du_default_options='{ "binary": {"state0":"Down", "state1":"Up"}, "range": {"step":10, "unit":"%"} }')
+                     du_default_options='{ &quot;binary&quot;: {&quot;state0&quot;:&quot;Down&quot;, &quot;state1&quot;:&quot;Up&quot;}, &quot;range&quot;: {&quot;step&quot;:10, &quot;unit&quot;:&quot;%&quot;} }')
 _db.add_device_usage(du_name='Air conditioning', du_description='Air conditioning usage',
-                     du_default_options='{ "binary": {"state0":"Off", "state1":"On"}, "range": {"step":1, "unit":"&deg;C"} }')
+                     du_default_options='{ &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;}, &quot;range&quot;: {&quot;step&quot;:1, &quot;unit&quot;:&quot;&deg;C&quot;} }')
 _db.add_device_usage(du_name='Ventilation', du_description='Ventilation usage',
-                     du_default_options='{ "binary": {"state0":"Off", "state1":"On"}, "range": {"step":10, "unit":"%"} }')
+                     du_default_options='{ &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;}, &quot;range&quot;: {&quot;step&quot;:10, &quot;unit&quot;:&quot;%&quot;} }')
 _db.add_device_usage(du_name='Heating', du_description='Heating',
-                     du_default_options='{ "binary": {"state0":"Off", "state1":"On"}, "range": {"step":1, "unit":"&deg;C"} }')
+                     du_default_options='{ &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;}, &quot;range&quot;: {&quot;step&quot;:1, &quot;unit&quot;:&quot;&deg;C&quot;} }')
 _db.add_device_usage(du_name='Appliance', du_description='Appliance usage',
-                     du_default_options='{ "binary": {"state0":"Off", "state1":"On"} }')
+                     du_default_options='{ &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;} }')
 _db.add_device_usage(du_name='Desktop Computer', du_description='Desktop computer usage',
-                     du_default_options='{ "binary": {"state0":"Off", "state1":"On"} }')
+                     du_default_options='{ &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;} }')
 _db.add_device_usage(du_name='Server', du_description='Server usage',
-                     du_default_options='{ "binary": {"state0":"Off", "state1":"On"} }')
+                     du_default_options='{ &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;} }')
 _db.add_device_usage(du_name='Phone', du_description='Phone usage', du_default_options='{ }')
 _db.add_device_usage(du_name='TV', du_description='Television usage',
-                     du_default_options='{ "binary": {"state0":"Off", "state1":"On"} }')
+                     du_default_options='{ &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;} }')

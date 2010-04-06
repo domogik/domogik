@@ -1,0 +1,30 @@
+dl.collabsible_list {
+    margin:0 0 1em 0;
+    padding:0;
+}
+
+dl.collabsible_list dt {
+    margin:0;
+    padding:1em;
+    background-color:#FFFFFF;
+    border-top:1px solid #cccccc;
+}
+
+dl.collabsible_list dd {
+    margin:0;
+    padding:0;
+    background-color:#FFFFFF;
+    border-top:1px solid #cccccc;
+}
+
+dl.collabsible_list dd ul {
+    margin:0;
+    padding:0;
+    list-style:none;
+}
+
+dl.collabsible_list dd li {
+    margin:0;
+    padding:0;
+    display: inline-block;
+}

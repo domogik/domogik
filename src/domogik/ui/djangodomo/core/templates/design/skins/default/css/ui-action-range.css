@@ -8,6 +8,10 @@
 .widget_range:hover .widget_icon,
 .widget_range:focus .widget_icon {
     background-color:#FFFFFF;
+}
+
+.widget_range.command:hover .widget_icon,
+.widget_range.command:focus .widget_icon {
     cursor: pointer;
 }
 

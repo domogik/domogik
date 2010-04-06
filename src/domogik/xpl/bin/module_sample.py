@@ -44,6 +44,8 @@ from domogik.xpl.common.plugin import xPLPlugin
 #IS_DOMOGIK_PLUGIN = True
 #DOMOGIK_PLUGIN_TECHNOLOGY = "rfid, x10, communication, etc"
 #DOMOGIK_PLUGIN_DESCRIPTION = "My short module description"
+#DOMOGIK_PLUGIN_VERSION = "0.1"
+#DOMOGIK_PLUGIN_DOCUMENTATION_LINK = "http://wiki.domogik.org/tiki-index.php?page=plugins/MyPluginDocumentation"
 #DOMOGIK_PLUGIN_CONFIGURATION=[
 #      {"id" : 0,
 #       "key" : "startup-plugin",

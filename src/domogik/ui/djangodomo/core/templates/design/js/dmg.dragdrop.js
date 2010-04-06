@@ -4,14 +4,14 @@
         current_element : null,
         
         _init: function() {
-            var main = this;
+            var self = this, o = this.options;
         	$("ul.draggables", this.element).each(function() {
                 var zone = $(this);
                 var idZone = "target_" + zone.attr('value');        
                 zone.attr('id', idZone);
                 zone.attr('aria-labelledby', idZone + '_header');
                 zone.attr('role', 'list');
-                zone.prev(".choice").attr('id', idZone + '_header');
+                zone.prev(o.choice).attr('id', idZone + '_header');
                 $("li.draggable", this).each(function() {
                     var element = $(this);
         
@@ -27,8 +27,8 @@
                     element.attr('aria-haspopup', 'true');
                     element.attr('role', 'listitem');
                        
-                        // Add event handlers
-                    main._initialise(this);
+                    // Add event handlers
+                    self._initialise(this);
                 });
             });
         },
@@ -163,7 +163,7 @@
                 var target = $('#' + idTarget).append(element);
                 this._initialise(objNode);
     
-                // Remove empty node if there are artists in list
+                // Remove empty node if there are elements in list
                 $('li.empty', target).remove();
     
                 $('ul.draggables:not(:has(li))').html("<li class='empty'>Empty</li>");
@@ -187,7 +187,8 @@
         },
         
         _keyboardDragDrop : function(objEvent, objNode) {
-            var main = this;
+            var main = this, o = this.options;
+
             objEvent = objEvent || window.event;
             var iKey = objEvent.keyCode;
     
@@ -204,7 +205,7 @@
                 
                 $('ul.draggables[id!='+idFrom+']').each(function(i) {
                     var self = this;
-                    var objChoice = $("<li>" + $(this).prev(".choice").text() + "</li>")
+                    var objChoice = $("<li>" + $(this).prev(o.choice).text() + "</li>")
                     objChoice.attr('tabIndex', -1);
                     objChoice.attr('role', 'menuitem');
                     objChoice.mousedown(function(e) {main._dropObject(objNode, self.id); return false;});
@@ -282,6 +283,7 @@
     
     $.extend($.ui.dragdrop, {
         defaults: {
+            choice: ".choice",
             dropcallback: null
         }
     });

@@ -44,6 +44,8 @@ from domogik.xpl.common.queryconfig import Query
 IS_DOMOGIK_PLUGIN = True
 DOMOGIK_PLUGIN_TECHNOLOGY = "rfid"
 DOMOGIK_PLUGIN_DESCRIPTION = "Use Mir:ror device"
+DOMOGIK_PLUGIN_VERSION = "0.1"
+DOMOGIK_PLUGIN_DOCUMENTATION_LINK = "http://wiki.domogik.org/tiki-index.php?page=plugins/Mirror"
 DOMOGIK_PLUGIN_CONFIGURATION=[
       {"id" : 0,
        "key" : "startup-plugin",

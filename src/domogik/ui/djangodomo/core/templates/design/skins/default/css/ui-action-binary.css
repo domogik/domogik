@@ -9,6 +9,10 @@
 .widget_binary:hover .widget_icon,
 .widget_binary:focus .widget_icon {
     background-color:#FFFFFF;
+}
+
+.widget_binary.command:hover .widget_icon,
+.widget_binary.command:focus .widget_icon {
     cursor: pointer;
 }
 

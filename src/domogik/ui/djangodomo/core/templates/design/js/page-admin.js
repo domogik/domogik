@@ -5,24 +5,29 @@ function getPluginsList() {
 			var status = (data.status).toLowerCase();
 			if (status == 'ok') {
 				$.each(data.plugin, function() {
+					var technology = this.technology.replace(' ', '');
+					if ($("#plugins_list ul#menu_" + technology).length == 0) {
+						$("#plugins_list").append("<li><div class='titlenav2 icon16-technology-" + technology + "'>" + technology + "</div><ul id='menu_" + technology + "'></ul></li>")
+					}
 					var li = $("<li></li>");
 					var a = $("<a></a>");
-					a.attr('href', server_url + '/admin/plugin/' + this.name)
+					a.attr('href', '/domogik/admin/plugin/' + this.name)
 						.attr('title', this.description)
-						.addClass("icon16-technology-" + this.technology)
 						.tooltip_right();
 					var status = $("<div>" + this.name + "</div>");
-					status.addClass("menu-indicator")
-					if (this.status == 'ON') {
-						status.addClass("icon16-status-active");
-						status.append("<span class='offscreen'>Running</span>");
-					} else {
-						status.addClass("icon16-status-inactive");
-						status.append("<span class='offscreen'>Stopped</span>");
+					if (this.name != 'rest') {
+						status.addClass("menu-indicator")
+						if (this.status == 'ON') {
+							status.addClass("icon16-status-active");
+							status.append("<span class='offscreen'>Running</span>");
+						} else {
+							status.addClass("icon16-status-inactive");
+							status.append("<span class='offscreen'>Stopped</span>");
+						}
 					}
-					li.append(a);
 					a.append(status);
-					$("#plugins_list").append(li);	
+					li.append(a);
+					$("#plugins_list ul#menu_" + technology).append(li);	
 				});
 			} else {
 				var li = $("<li></li>");
@@ -36,8 +41,3 @@ function getPluginsList() {
 		}
 	)	
 }
-
-$(document).ready(function(){
-	getPluginsList();
-	$('#plugins_list li a[title]').tooltip_right();
-});

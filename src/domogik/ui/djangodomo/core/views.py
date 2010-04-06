@@ -338,9 +338,6 @@ def admin_organization_devices(request):
     try:
         result_all_devices = Devices.get_all()
         result_all_devices.merge_uiconfig()
-        result_unattributed_devices = Devices.get_without_room()
-        result_all_rooms = Rooms.get_all_with_devices()
-        result_all_rooms.merge_uiconfig()
         result_all_usages = DeviceUsages.get_all()
         result_all_types = DeviceTypes.get_all()
 
@@ -355,8 +352,6 @@ def admin_organization_devices(request):
         nav2_organization_devices = "selected",
         status=status,
         msg=msg,
-        unattribued_devices=result_unattributed_devices.device,
-        rooms_list=result_all_rooms.room,
         devices_list=result_all_devices.device,
         usages_list=result_all_usages.device_usage,
         types_list=result_all_types.device_type
@@ -448,6 +443,43 @@ def admin_organization_house(request):
         house=result_house
     )
 
+def admin_organization_features(request):
+    """
+    Method called when the admin features organization page is accessed
+    @param request : HTTP request
+    @return an HttpResponse object
+    """
+    if not __is_user_admin(request):
+        return index(request)
+
+    status = request.GET.get('status', '')
+    msg = request.GET.get('msg', '')
+
+    try:
+        result_all_devices = Devices.get_all()
+        result_all_devices.merge_uiconfig()
+        result_all_rooms = Rooms.get_all()
+        result_all_rooms.merge_uiconfig()
+        result_all_areas = Areas.get_all()
+        result_all_areas.merge_uiconfig()
+        result_house = UIConfigs.get_general('house')
+    except ResourceNotAvailableException:
+        return render_to_response('error/ResourceNotAvailableException.html')
+
+    page_title = _("Features organization")
+    return __go_to_page(
+        request, 'admin/organization/features.html',
+        page_title,
+        nav1_admin = "selected",
+        nav2_organization_features = "selected",
+        status=status,
+        msg=msg,
+        areas_list=result_all_areas.area,
+        rooms_list=result_all_rooms.room,
+        devices_list=result_all_devices.device,
+        house=result_house
+    )
+    
 def admin_plugins_plugin(request, plugin_name):
     """
     Method called when the admin plugin command page is accessed
@@ -460,7 +492,7 @@ def admin_plugins_plugin(request, plugin_name):
     status = request.GET.get('status', '')
     msg = request.GET.get('msg', '')
     try:
-        result_plugin_by_name = Plugins.get_by_name(plugin_name)
+        result_plugin_detail = Plugins.get_detail(plugin_name)
         result_all_plugins = Plugins.get_all()
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
@@ -473,7 +505,7 @@ def admin_plugins_plugin(request, plugin_name):
         plugins_list=result_all_plugins.plugin,
         status=status,
         msg=msg,
-        plugin=result_plugin_by_name.plugin[0]
+        plugin=result_plugin_detail.plugin[0]
     )
 
 def show_house(request):
