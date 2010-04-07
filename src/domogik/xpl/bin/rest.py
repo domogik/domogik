@@ -561,7 +561,6 @@ class RestHandler(BaseHTTPRequestHandler):
             @param jsonp_cb : if jsonp is True, name of callback to use 
                               in jsonp format
         """
-        # TODO : log!!
         self.server.handler_params[0]._log.warning("Send HTTP header for ERROR : code=%s ; msg=%s" % (err_code, err_msg))
         json_data = JSonHelper("ERROR", err_code, err_msg)
         json_data.set_jsonp(jsonp, jsonp_cb)
@@ -634,12 +633,13 @@ class ProcessRequest():
         self.jsonp_cb = ""
 
         # url processing
-        self.path = urllib.unquote(unicode(self.path))
+        #self.path = urllib.unquote(unicode(self.path))
+
         # replace password by "***". 
         path_without_passwd = re.sub("password/[^/]+/", "password/***/", self.path + "/")
         self._log.info("Request : %s" % path_without_passwd)
 
-        # TODO log data manipulation here
+        # log data manipulation here
         if re.match(".*(add|update|del|set).*", path_without_passwd) is not None:
             self._log_dm.info("REQUEST=%s" % path_without_passwd)
 
@@ -663,7 +663,6 @@ class ProcessRequest():
             self.rest_request = tab_path[2:]
         else:
             self.rest_request = []
-
 
 
 
@@ -1489,7 +1488,8 @@ target=*
             @return parameter value or None if parameter doesn't exist
         """
         try:
-            return self.parameters[name]
+            return urllib.unquote(unicode(self.parameters[name]))
+            #return self.parameters[name]
         except KeyError:
             return None
 
