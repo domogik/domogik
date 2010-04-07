@@ -53,7 +53,7 @@ DOMOGIK_PLUGIN_CONFIGURATION=[
       {"id" : 1,
        "key" : "device",
        "description" : "Teleinfo device (ex : /dev/ttyUSB0 for an usb model)",
-       "default" : "/dev/ttyUSB0"},
+       "default" : "/dev/teleinfo"},
       {"id" : 2,
        "key" : "interval",
        "description" : "Interval between each request (seconds)",
@@ -87,14 +87,14 @@ class TeleinfoManager(xPLPlugin):
         '''
         my_temp_message = XplMessage()
         my_temp_message.set_type("xpl-stat")
-        if "ADIR1" in frame.data:
+        if "ADIR1" in frame:
             my_temp_message.set_schema("teleinfo.short")
         else:
             my_temp_message.set_schema("teleinfo.basic")
 
         for entry in frame:
             my_temp_message.add_data({entry["name"].lower() : entry["value"]})
-        my_temp_message.add_data({"DEVICE": self._device})
+        my_temp_message.add_data({"device": self._device})
 
         self._myxpl.send(my_temp_message)
 

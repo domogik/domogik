@@ -164,7 +164,7 @@ class DBConnector(xPLPlugin):
                          'password' : 'XXXXXXXX',
                          'calendarname' : 'fritz.smh@gmail.com',
                          'startup-plugin':'True'},
-                'teleinfo' : {'device' : '/dev/ttyUSB0',
+                'teleinfo' : {'device' : '/dev/teleinfo',
                     'interval' : '30'},
                     'dawndusk' : {'startup-plugin':'True'},
                     'plcbus' : {'device':'/dev/ttyUSB0'},

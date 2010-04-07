@@ -540,11 +540,17 @@ class RestHandler(BaseHTTPRequestHandler):
         """
         self.server.handler_params[0]._log.debug("Send HTTP header for OK")
         self.send_response(200)
+	self.server.handler_params[0]._log.debug("DEBUG 1")
         self.send_header('Content-type',  'application/json')
+	self.server.handler_params[0]._log.debug("DEBUG 2")
         self.send_header('Expires', '-1')
+	self.server.handler_params[0]._log.debug("DEBUG 3")
         self.send_header('Cache-control', 'no-cache')
+	self.server.handler_params[0]._log.debug("DEBUG 4")
         self.send_header('Content-Length', len(data.encode("utf-8")))
+	self.server.handler_params[0]._log.debug("DEBUG 5")
         self.end_headers()
+	self.server.handler_params[0]._log.debug("DEBUG 6")
         if data:
             self.server.handler_params[0]._log.debug("Send HTTP data : %s" % data.encode("utf-8"))
             self.wfile.write(data.encode("utf-8"))

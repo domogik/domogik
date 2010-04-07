@@ -160,11 +160,11 @@ class StatsManager(xPLPlugin):
         """ Parse the "mapping" node
         """
         values = {}
-        device = node.getElementsByTagName("device")[0].attributes["field"].value
+        device = node.getElementsByTagName("device")[0].attributes["field"].value.lower()
         for value in node.getElementsByTagName("value"):
             #If a "name" attribute is defined, use it as vallue, else value is empty
             if value.attributes.has_key("name"):
-                values[value.attributes["field"].value] = value.attributes["name"].value
+                values[value.attributes["field"].value] = value.attributes["name"].value.lower()
             else:
                 values[value.attributes["field"].value] = None
         return device, values
