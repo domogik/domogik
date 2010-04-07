@@ -955,6 +955,17 @@ target=*
                 return
             self._rest_stats_last(device_id, key, int(self.rest_request[3]))
 
+        ### from #####################################
+        elif self.rest_request[2] == "from":
+            if len(self.rest_request) < 4:
+                self.send_http_response_error(999, "Wrong syntax for %s" % self.rest_request[2], self.jsonp, self.jsonp_cb)
+                return
+            offset = 2
+            if self.set_parameters(offset):
+                self._rest_stats_from(device_id, key)
+            else:
+                self.send_http_response_error(999, "Error in parameters", \
+                                              self.jsonp, self.jsonp_cb)
 
 
         ### others ###################################
@@ -970,6 +981,30 @@ target=*
              @param key : key for device
              @param num : number of data to return
         """
+
+        # TODO
+        json_data = JSonHelper("OK")
+        json_data.set_data_type("stats")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        self.send_http_response_ok(json_data.get())
+
+
+
+    def _rest_stats_from(self, device_id, key):
+        """ Get the values for device/key in database for an start time to ...
+             @param device_id : device id
+             @param key : key for device
+             @param others params : will be get with get_parameters (dynamic params)
+        """
+
+        st_from = self.to_date(self.get_parameters("from"))
+        st_to = self.to_date(self.get_parameters("to"))
+        st_interval = self.get_parameters("interval")
+        st_number = self.get_parameters("number")
+        print "from=%s" % st_from
+        print "to=%s" % st_to
+        print "interval=%s" % st_interval
+        print "number=%s" % st_number
 
         # TODO
         json_data = JSonHelper("OK")
@@ -1503,17 +1538,32 @@ target=*
 
     def to_date(self, date):
         """ Transform YYYYMMDD date in datatime object
+                      YYYYMMDD-HHMM ....
             @param date : date
         """
         if date == None:
             return None
-        year = int(date[0:4])
-        month = int(date[4:6])
-        day = int(date[6:8])
-        try:
-            my_date = datetime.date(year, month, day)
-        except:
-            self.send_http_response_error(999, str(sys.exc_info()[1].replace('"', "'")), self.jsonp, self.jsonp_cb)
+        my_date = None
+        if len(date) == 8:  # YYYYMDD
+            year = int(date[0:4])
+            month = int(date[4:6])
+            day = int(date[6:8])
+            try:
+                my_date = datetime.date(year, month, day)
+            except:
+                self.send_http_response_error(999, str(sys.exc_info()[1]).replace('"', "'"), self.jsonp, self.jsonp_cb)
+        elif len(date) == 13:  # YYYYMMDD-HHMM
+            year = int(date[0:4])
+            month = int(date[4:6])
+            day = int(date[6:8])
+            hour = int(date[9:11])
+            minute = int(date[11:13])
+            try:
+                my_date = datetime.datetime(year, month, day, hour, minute)
+            except:
+                self.send_http_response_error(999, str(sys.exc_info()[1]).replace('"', "'"), self.jsonp, self.jsonp_cb)
+        else:
+                self.send_http_response_error(999, "Bad date format (YYYYMMDD or YYYYMMDD-HHMM required", self.jsonp, self.jsonp_cb)
         return my_date
 
 
