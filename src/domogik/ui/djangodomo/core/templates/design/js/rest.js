@@ -69,7 +69,6 @@ $.extend({
             rest_url += '/' + this;     
         });
         
-        alert(rest_url);
         $.ajax({
             type: "GET",
             url: rest_url,
