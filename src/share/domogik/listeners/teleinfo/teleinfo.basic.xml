@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<statistic technology="teleinfo">
+    <schema name="teleinfo.basic">
+        <xpltype type="xpl-stat">
+            <listener>
+                <filter/>
+            </listener>
+            <mapping>
+                <device field="DEVICE"/>
+                <value field="ADCO" />
+                <value field="OPTARIF" />
+                <value field="ISOUSC" />
+                <value field="BASE" />
+                <value field="IINST" />
+                <value field="IMAX" />
+                <value field="MOTDETAT" />
+                <value field="HCHC" />
+                <value field="HCHP" />
+                <value field="EJPHN" />
+                <value field="EJPHPM" />
+                <value field="BBRHCJB" />
+                <value field="BBRHPJB" />
+                <value field="BBRHCJW" />
+                <value field="BBRHPJW" />
+                <value field="BBRHCJR" />
+                <value field="BBRHPJR" />
+                <value field="PEJP" />
+                <value field="PTEC" />
+                <value field="DEMAIN" />
+                <value field="ADPS" />
+                <value field="PAPP" />
+                <value field="HHPHC" />
+                <value field="PPOT" />
+                <value field="IINST1" />
+                <value field="IINST2" />
+                <value field="IINST3" />
+                <value field="IMAX1" />
+                <value field="IMAX2" />
+                <value field="IMAX3" />
+                <value field="PMAX" />
+            </mapping>
+        </xpltype>
+    </schema>
+</statistic>
+
+
