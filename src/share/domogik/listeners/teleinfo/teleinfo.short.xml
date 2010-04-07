@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<statistic technology="teleinfo">
+    <schema name="teleinfo.short">
+        <xpltype type="xpl-stat">
+            <listener>
+                <filter/>
+            </listener>
+            <mapping>
+                <device field="DEVICE"/>
+                <value field="IINST1" />
+                <value field="IINST2" />
+                <value field="IINST3" />
+                <value field="ADIR1" />
+                <value field="ADIR2" />
+                <value field="ADIR3" />
+                <value field="ADCO" />
+            </mapping>
+        </xpltype>
+    </schema>
+</statistic>
+
+
+

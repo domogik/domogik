@@ -40,6 +40,7 @@ Full-length :
 
 TELEINFO.BASIC
 {
+DEVICE=<Adresse du device>
 ADCO=<Adresse du compteur>
 OPTARIF=<Option tarifaire>
 ISOUSC=<Intensité souscrite>
@@ -77,8 +78,9 @@ Short message :
 
 Dans le cas d'un compteur triphasé, si il y a dépassement d'intensité sur une des phases, les trames émises sont modifiées et formatées de la façon suivante :
 
-TELEINFO.BASIC
+TELEINFO.SHORT
 {
+DEVICE=<Adresse du device>
 ADIR1=<Dépassement d'intensité sur la phase 1>
 ADIR2=<Dépassement d'intensité sur la phase 2>
 ADIR3=<Dépassement d'intensité sur la phase 3>

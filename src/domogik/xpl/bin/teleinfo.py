@@ -59,8 +59,6 @@ DOMOGIK_PLUGIN_CONFIGURATION=[
        "description" : "Interval between each request (seconds)",
        "default" : 60}]
 
-
-
 class TeleinfoManager(xPLPlugin):
     '''
     Manage the Téléinfo stuff and connect it to xPL
@@ -78,6 +76,7 @@ class TeleinfoManager(xPLPlugin):
         res = xPLResult()
         self._config.query('teleinfo', 'interval', res)
         interval = res.get_value()['interval']
+        self._device = device
         self._myteleinfo  = TeleInfo(device, self._broadcastframe, interval)
         self.add_stop_cb(self._myteleinfo.stop)
         self._myteleinfo.start()
@@ -88,11 +87,16 @@ class TeleinfoManager(xPLPlugin):
         '''
         my_temp_message = XplMessage()
         my_temp_message.set_type("xpl-stat")
-        my_temp_message.set_schema("teleinfo.basic")
+        if "ADIR1" in frame.data:
+            my_temp_message.set_schema("teleinfo.short")
+        else:
+            my_temp_message.set_schema("teleinfo.basic")
+
         for entry in frame:
             my_temp_message.add_data({entry["name"].lower() : entry["value"]})
-        self._myxpl.send(my_temp_message)
+        my_temp_message.add_data({"DEVICE": self._device})
 
+        self._myxpl.send(my_temp_message)
 
 if __name__ == "__main__":
     TeleinfoManager()
