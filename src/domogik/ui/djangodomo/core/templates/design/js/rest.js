@@ -21,6 +21,7 @@ $.extend({
         }
         return o;
     },
+    
     URLDecode: function(s) {
         var o = s;
         var binVal, t;
@@ -31,27 +32,24 @@ $.extend({
             o = o.replace(m[1], t);
         }
         return o;
-    }
-});
+    },
 
-$.extend({
-  getUrlVars: function(){
-    var vars = [], hash;
-    var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
-    for(var i = 0; i < hashes.length; i++)
-    {
-      hash = hashes[i].split('=');
-      vars.push(hash[0]);
-      vars[hash[0]] = $.URLDecode(hash[1]);
-    }
-    return vars;
-  },
-  getUrlVar: function(name){
-    return $.getUrlVars()[name];
-  }
-});
+    getUrlVars: function(){
+        var vars = [], hash;
+        var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+        for(var i = 0; i < hashes.length; i++)
+        {
+            hash = hashes[i].split('=');
+            vars.push(hash[0]);
+            vars[hash[0]] = $.URLDecode(hash[1]);
+        }
+        return vars;
+    },
+  
+    getUrlVar: function(name){
+        return $.getUrlVars()[name];
+    },
 
-$.extend({
     reloadPage: function(data) {
         var newlocation = window.location.href.substring(0, window.location.href.indexOf('?'));
         newlocation += "?";
@@ -59,24 +57,29 @@ $.extend({
             newlocation += key + "=" + value + "&";
         });
         window.location = newlocation;
+    },
+
+    getREST: function(parameters, callback) {
+        var rest_url = "http://127.0.0.1:8080";  
+        if (rest_ip && rest_port) {
+            rest_url = "http://" + rest_ip + ":" + rest_port;  
+        }
+        // Build the REST url
+        $.each(parameters, function(){
+            rest_url += '/' + this;     
+        });
+        
+        alert(rest_url);
+        $.ajax({
+            type: "GET",
+            url: rest_url,
+            dataType: "jsonp",
+            success:
+                callback,
+            error:
+                function(XMLHttpRequest, textStatus, errorThrown) {
+                    $.reloadPage({'status': 'error', 'msg': 'REST Error : ' + XMLHttpRequest.readyState + ' ' + XMLHttpRequest.status + ' ' + textStatus + ' ' + errorThrown});
+                }
+        });
     }
 });
-
-function getREST(url, callback) {
-    var rest_url = "http://127.0.0.1:8080";  
-    if (rest_ip && rest_port) {
-        rest_url = "http://" + rest_ip + ":" + rest_port;  
-    }
-    
-    $.ajax({
-        type: "GET",
-        url: rest_url + url,
-        dataType: "jsonp",
-        success:
-            callback,
-        error:
-            function(XMLHttpRequest, textStatus, errorThrown) {
-                $.reloadPage({'status': 'error', 'msg': 'REST Error : ' + XMLHttpRequest.readyState + ' ' + XMLHttpRequest.status + ' ' + textStatus + ' ' + errorThrown});
-            }
-    });
-}

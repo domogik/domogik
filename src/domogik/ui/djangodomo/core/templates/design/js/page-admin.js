@@ -1,6 +1,6 @@
 function getPluginsList() {
 	$("#plugins_list li").remove();
-	getREST('/plugin/list/',
+	$.getREST(['plugin', 'list'],
 		function(data) {
 			var status = (data.status).toLowerCase();
 			if (status == 'ok') {

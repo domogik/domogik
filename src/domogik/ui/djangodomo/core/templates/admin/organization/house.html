@@ -34,7 +34,7 @@
         $("#generalsubmit").click(function(){
             var name = $("#housename").val();
             if (name) {
-                getREST('/base/ui_config/set/name/general/reference/house/key/name/value/' + name,
+                $.getREST(['base', 'ui_config', 'set', 'name', 'general', 'reference', 'house', 'key', 'name', 'value', name],
                     function(data) {
                         var status = (data.status).toLowerCase();
                         if (status == 'ok') {

@@ -88,7 +88,7 @@
             button: "#addDialogButton",
             onok: function(values) {
                 // Submit form
-                getREST('/base/device/add/name/' + values.devicename + '/address/' + values.deviceaddress + '/type_id/' + values.devicetype + '/usage_id/' + values.deviceusage + '/description/' + values.devicedescription + '/reference/' + values.devicereference,
+                $.getREST(['base', 'device', 'add', 'name', values.devicename, 'address', values.deviceaddress, 'type_id', values.devicetype, 'usage_id', values.deviceusage, 'description', values.devicedescription, 'reference', values.devicereference],
                     function(data) {
                         var status = (data.status).toLowerCase();
                         if (status == 'ok') {
@@ -148,7 +148,7 @@
                                 button: "#del{{ device.id }}",
                                 name: "'{{ device.name }}'",
                                 onok: function() {
-                                    getREST('/base/device/del/{{ device.id }}',
+                                    $.getREST(['base', 'device', 'del', '{{ device.id }}'],
                                         function(data) {
                                             var status = (data.status).toLowerCase();
                                             if (status == 'ok') {
@@ -168,7 +168,7 @@
                                 values: {devicename : '{{ device.name }}', devicedescription : '{{ device.description }}', deviceaddress : '{{ device.address }}', devicereference : '{{ device.reference }}', devicetype : '{{ device.type_id }}', deviceusage : '{{ device.usage_id }}'},
                                 onok: function(values) {
                                     // Submit form
-                                    getREST('/base/device/update/id/{{ device.id }}/name/' + values.devicename + '/address/' + values.deviceaddress + '/type_id/' + values.devicetype + '/usage_id/' + values.deviceusage + '/description/' + values.devicedescription + '/reference/' + values.devicereference,
+                                    $.getREST(['base', 'device', 'update', 'id', '{{ device.id }}', 'name', values.devicename, 'address', values.deviceaddress, 'type_id', values.devicetype, 'usage_id', values.deviceusage, 'description', values.devicedescription, 'reference', values.devicereference],
                                         function(data) {
                                             var status = (data.status).toLowerCase();
                                             if (status == 'ok') {

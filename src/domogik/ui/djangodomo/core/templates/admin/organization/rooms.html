@@ -48,7 +48,7 @@
         $('#dragdroprooms').dragdrop({
             choice: "legend",
             dropcallback: function(self, element, target) {
-                getREST('/base/room/update/id/' + element + '/area_id/' + target,
+                $.getREST(['base', 'room', 'update', 'id', element, 'area_id', target],
                     function(data) {
                         var status = (data.status).toLowerCase();
                         if (status == 'ok') {
@@ -83,7 +83,7 @@
             button: "#addDialogButton",
             onok: function(values) {
                 // Submit form
-                getREST('/base/room/add/name/' + values.roomname + '/description/' + values.roomdescription,
+                $.getREST(['base', 'room', 'add', 'name', values.roomname, 'description', values.roomdescription],
                     function(data) {
                         var status = (data.status).toLowerCase();
                         if (status == 'ok') {
@@ -129,7 +129,7 @@
                             button: "#del{{ room.id }}",
                             name: "'{{ room.name }}'",
                             onok: function() {
-                                getREST('/base/room/del/{{ room.id }}',
+                                $.getREST(['base', 'room', 'del', '{{ room.id }}'],
                                     function(data) {
                                         var status = (data.status).toLowerCase();
                                         if (status == 'ok') {
@@ -148,7 +148,7 @@
                             icon: "{{ room.config.icon }}",
                             validCallback: function(self, icon) {
                                 $('#icon{{ room.id }}').processing('start');
-                                getREST('/base/ui_config/set/name/room/reference/{{ room.id }}/key/icon/value/' + icon,
+                                $.getREST(['base', 'ui_config', 'set', 'name', 'room', 'reference', '{{ room.id }}', 'key', 'icon', 'value', icon],
                                     function(data) {
                                         $('#icon{{ room.id }}').processing('stop');
                                         var status = (data.status).toLowerCase();
@@ -174,7 +174,7 @@
                             values: {roomname : '{{ room.name }}', roomdescription : '{{ room.description }}'},
                             onok: function(values) {
                                 // Submit form
-                                getREST('/base/room/update/id/' + {{ area.id }} + '/name/' + values.areaname + '/description/' + values.areadescription,
+                                $.getREST(['base', 'room', 'update', 'id', '{{ area.id }}', 'name', values.areaname, 'description', values.areadescription],
                                     function(data) {
                                         var status = (data.status).toLowerCase();
                                         if (status == 'ok') {

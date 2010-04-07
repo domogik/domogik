@@ -29,7 +29,7 @@ $(function(){
     {% ifequal plugin.status "ON" %}
         $("#buttonstatus").click(function() {
             $("#buttonstatus").attr('className', 'button icon16-action-loading');
-            getREST('/plugin/stop/{{ plugin.name }}',
+            $.getREST(['plugin', 'stop', '{{ plugin.name }}'],
                 function(data) {
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
@@ -43,7 +43,7 @@ $(function(){
     {% else %}
         $("#buttonstatus").click(function() {
             $("#buttonstatus").attr('className', 'button icon16-action-loading');
-            getREST('/plugin/start/{{ plugin.name }}',
+            $.getREST(['plugin', 'start', '{{ plugin.name }}'],
                 function(data) {
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
@@ -62,7 +62,7 @@ $(function(){
     }
     
     function deleteConfig(name) {
-        getREST('/plugin/config/del/' + name,
+        $.getREST(['plugin', 'config', 'del', name],
             function(data) {
                 var status = (data.status).toLowerCase();
                 if (status == 'ok') {
@@ -85,7 +85,7 @@ $(function(){
                 value = $('#value_' + item.key).val();
             
             }
-            getREST('/plugin/config/set/name/' + name + '/key/' + item.key + '/value/' + value,
+            $.getREST(['plugin', 'config', 'set', 'name', name, 'key', item.key, 'value', value],
                 function(data) {
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
@@ -105,7 +105,7 @@ $(function(){
     }
 
     /* Get the list of configuration items */
-    getREST('/plugin/detail/{{ plugin.name }}',
+    $.getREST(['plugin', 'detail', '{{ plugin.name }}'],
         function(data) {
             var status = (data.status).toLowerCase();
             if (status == 'ok') {
@@ -114,7 +114,7 @@ $(function(){
                     var ikey = item.key;
                     var idescription = item.description;
                     var idefault = item['default'];
-                    getREST('/plugin/config/list/by-name/{{ plugin.name }}/by-key/' + ikey,
+                    $.getREST(['plugin', 'config', 'list', 'by-name' , '{{ plugin.name }}' , 'by-key', ikey],
                         function(data) {
                             var status = (data.status).toLowerCase();
                             if (status == 'ok') {
@@ -148,7 +148,7 @@ $(function(){
                     );
                 });
                 
-                getREST('/plugin/config/list/by-name/{{ plugin.name }}',
+                $.getREST(['plugin', 'config', 'list' ,'by-name', '{{ plugin.name }}'],
                     function(data) {
                         var status = (data.status).toLowerCase();
                         if (status == 'ok') {
