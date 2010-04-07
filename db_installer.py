@@ -110,8 +110,10 @@ _db.add_device_technology(dt_id='rfxcom', dt_name='RFXCom', dt_description='')
 # Create device technology features for IR
 _db.add_device_technology(dt_id='ir', dt_name='Infra Red', dt_description='')
 # Create device technology features for Service
-_db.add_device_technology(dt_id='service', dt_name='Service',
-                          dt_description='Distributed services, water, gaz, electricity')
+device_technology = _db.add_device_technology(dt_id='service', dt_name='Service',
+                          dt_description='Distributed services, water, gas, electricity')
+device_type = _db.add_device_type(dty_name='Teleinfo', dt_id=device_technology.id)
+
 # Create device technology features for RFID
 _db.add_device_technology(dt_id='rfid', dt_name='RFID', dt_description='')
 # Create device technology features for Computer
@@ -149,3 +151,6 @@ _db.add_device_usage(du_name='Server', du_description='Server usage',
 _db.add_device_usage(du_name='Phone', du_description='Phone usage', du_default_options='{ }')
 _db.add_device_usage(du_name='TV', du_description='Television usage',
                      du_default_options='{ &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;} }')
+_db.add_device_usage(du_name='Water', du_description='Water service', du_default_options='{ }')
+_db.add_device_usage(du_name='Gas', du_description='Gas service', du_default_options='{ }')
+_db.add_device_usage(du_name='Electricity', du_description='Electricity service', du_default_options='{ }')
