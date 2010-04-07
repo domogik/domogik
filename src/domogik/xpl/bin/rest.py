@@ -68,7 +68,7 @@ REST_DESCRIPTION = "REST plugin is part of Domogik project. See http://trac.domo
 USE_SSL = False
 SSL_CERTIFICATE = "/dev/null"
 
-# global queues config (plugins, etcàOB
+# global queues config (plugins, etc)
 QUEUE_TIMEOUT = 10
 QUEUE_SIZE = 10
 QUEUE_LIFE_EXPECTANCY = 3
@@ -561,7 +561,6 @@ class RestHandler(BaseHTTPRequestHandler):
             @param jsonp_cb : if jsonp is True, name of callback to use 
                               in jsonp format
         """
-        # TODO : log!!
         self.server.handler_params[0]._log.warning("Send HTTP header for ERROR : code=%s ; msg=%s" % (err_code, err_msg))
         json_data = JSonHelper("ERROR", err_code, err_msg)
         json_data.set_jsonp(jsonp, jsonp_cb)
@@ -634,12 +633,13 @@ class ProcessRequest():
         self.jsonp_cb = ""
 
         # url processing
-        self.path = urllib.unquote(unicode(self.path))
+        #self.path = urllib.unquote(unicode(self.path))
+
         # replace password by "***". 
         path_without_passwd = re.sub("password/[^/]+/", "password/***/", self.path + "/")
         self._log.info("Request : %s" % path_without_passwd)
 
-        # TODO log data manipulation here
+        # log data manipulation here
         if re.match(".*(add|update|del|set).*", path_without_passwd) is not None:
             self._log_dm.info("REQUEST=%s" % path_without_passwd)
 
@@ -666,13 +666,14 @@ class ProcessRequest():
 
 
 
-
     def do_for_all_methods(self):
         """ Process request
             This function call appropriate functions for processing path
         """
         if self.rest_type == "command":
             self.rest_command()
+        elif self.rest_type == "stats":
+            self.rest_stats()
         elif self.rest_type == "xpl-cmnd":
             self.rest_xpl_cmnd()
         elif self.rest_type == "base":
@@ -916,7 +917,60 @@ target=*
 
 
 
+######
+# /stats processing
+######
 
+    def rest_stats(self):
+        """ Get stats in database
+            - Decode and check URL format
+            - call the good fonction to get stats from database
+        """
+        self._log.debug("Process stats request")
+        # parameters initialisation
+        self.parameters = {}
+
+        # Check url length
+        if len(self.rest_request) < 3:
+            self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
+            return
+
+        device_id = self.rest_request[0]
+        key = self.rest_request[1]
+
+        ### latest ###################################
+        if self.rest_request[2] == "latest":
+            self._rest_stats_last(device_id, key)
+
+        ### last #####################################
+        elif self.rest_request[2] == "last":
+            if len(self.rest_request) < 4:
+                self.send_http_response_error(999, "Wrong syntax for %s" % self.rest_request[2], self.jsonp, self.jsonp_cb)
+                return
+            self._rest_stats_last(device_id, key, int(self.rest_request[3]))
+
+
+
+        ### others ###################################
+        else:
+            self.send_http_response_error(999, self.rest_request[0] + " not allowed", self.jsonp, self.jsonp_cb)
+            return
+
+
+
+    def _rest_stats_last(self, device_id, key, num = 1):
+        """ Get the last values for device/key in database
+             @param device_id : device id
+             @param key : key for device
+             @param num : number of data to return
+        """
+
+        # TODO
+        json_data = JSonHelper("OK")
+        json_data.set_data_type("stats")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        self.send_http_response_ok(json_data.get())
+    
 
 
 ######
@@ -1434,7 +1488,8 @@ target=*
             @return parameter value or None if parameter doesn't exist
         """
         try:
-            return self.parameters[name]
+            return urllib.unquote(unicode(self.parameters[name]))
+            #return self.parameters[name]
         except KeyError:
             return None
 
