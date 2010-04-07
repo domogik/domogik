@@ -214,11 +214,13 @@ $(function(){
                 </li>
             {% endifnotequal %}
         </ul>
-        {% ifequal plugin.status "ON" %}
-            <button id='buttonstatus' class='button icon16-status-inactive'>{% trans "Stop" %}</button>
-        {% else %}
-            <button id='buttonstatus' class='button icon16-status-active'>{% trans "Start" %}</button>
-        {% endifequal %}
+        {% ifnotequal plugin.name "rest" %}
+            {% ifequal plugin.status "ON" %}
+                <button id='buttonstatus' class='button icon16-status-inactive'>{% trans "Stop" %}</button>
+            {% else %}
+                <button id='buttonstatus' class='button icon16-status-active'>{% trans "Start" %}</button>
+            {% endifequal %}
+        {% endifnotequal %}
     </section>
     <section class="subsection">
         <h2>{% trans "Configuration" %}</h2>
