@@ -66,7 +66,7 @@ $.extend({
         }
         // Build the REST url
         $.each(parameters, function(){
-            rest_url += '/' + this;     
+            rest_url += '/' + encodeURIComponent(this);     
         });
         
         $.ajax({
