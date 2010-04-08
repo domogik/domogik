@@ -47,7 +47,7 @@ class Sniffer(xPLPlugin):
 
 
     def __init__(self):
-        xPLPlugin.__init__(self, name = 'sniffer')
+        xPLPlugin.__init__(self, name = 'sniffer', daemonize = False)
         
         Listener(self._sniffer_cb, self._myxpl)
 
