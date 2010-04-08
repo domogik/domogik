@@ -1523,8 +1523,7 @@ target=*
             @return parameter value or None if parameter doesn't exist
         """
         try:
-            return urllib.unquote(unicode(self.parameters[name]))
-            #return self.parameters[name]
+            return unicode(urllib.unquote(self.parameters[name]), sys.stdin.encoding)
         except KeyError:
             return None
 
@@ -1624,7 +1623,8 @@ target=*
                                         self.get_parameters("description"))
             json_data.add_data(area)
         except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+            # TODO make a function to get arranged trace and use it everywhere :)
+            json_data.set_error(code = 999, description = str(traceback.format_exc()).replace('"', "'").replace('\n', '      '))
         self.send_http_response_ok(json_data.get())
 
 
