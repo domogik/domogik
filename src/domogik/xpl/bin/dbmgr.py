@@ -40,6 +40,8 @@ Implements
 @organization: Domogik
 """
 
+import traceback
+
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.plugin import xPLPlugin
 from domogik.xpl.common.xplmessage import XplMessage
@@ -170,17 +172,17 @@ class DBConnector(xPLPlugin):
                     'plcbus' : {'device':'/dev/ttyUSB0'},
                 }
         try:
-            return vals[techno][key]
-            _id = self._db.get_device_technology_by_name(techno).id
             if key:
-                return self._db.get_device_technology_config(_id, key).value
+                val = self._db.get_plugin_config(techno, key).value
+                return val
             else:
-                vals = self._db.list_device_technology_config(id)
+                vals = self._db.list_lis_plugin_config(techno)
                 res = {}
                 for val in vals:
                     res[val.key] = val.value
                 return res
         except:
+            traceback.print_exc()
             self._log.warn("No config found for technolgy %s, key %s" % (techno, key))
             return None
 
