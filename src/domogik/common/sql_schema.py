@@ -38,6 +38,7 @@ Implements
 -class DeviceTypeFeature
 -class ActuatorFeature
 -class SensorFeature
+-class DeviceFeatureAssociation
 -class DeviceUsage
 -class DeviceTechnology
 -class PluginConfig
@@ -65,7 +66,7 @@ from sqlalchemy.orm import relation, backref
 from domogik.common.configloader import Loader
 
 DEVICE_TYPE_LIST = ['appliance', 'lamp', 'music', 'sensor']
-ITEM_TYPE_LIST = ['area', 'room', 'device']
+DEVICE_FEATURE_ASSOCIATION_LIST = [None, 'room', 'area', 'house']
 FEATURE_TYPE_LIST = ['actuator', 'sensor']
 ACTUATOR_VALUE_TYPE_LIST = ['binary', 'complex', 'list', 'number', 'range', 'string', 'trigger']
 SENSOR_VALUE_TYPE_LIST = ['binary', 'complex', 'number', 'string', 'trigger']
@@ -355,12 +356,9 @@ class Device(Base):
     usage = relation(DeviceUsage, backref=backref(__tablename__))
     type_id = Column(Integer, ForeignKey('%s.id' % DeviceType.get_tablename()), nullable=False)
     type = relation(DeviceType, backref=backref(__tablename__))
-    room_id = Column(Integer, ForeignKey('%s.id' % Room.get_tablename()))
-    room = relation(Room, backref=backref(__tablename__))
     _stats = relation("DeviceStats", order_by="DeviceStats.date.desc()", backref=__tablename__)
 
-    def __init__(self, name, address, description, reference, usage_id, type_id,
-                 room_id):
+    def __init__(self, name, address, description, reference, usage_id, type_id):
         """
         Class constructor
         @param name : short name of the device
@@ -369,7 +367,6 @@ class Device(Base):
         @param reference : internal reference of the device (like AM12 for a X10 device)
         @param usage_id : link to the device usage
         @param type_id : 'link to the device type (x10.Switch, x10.Dimmer, Computer.WOL...)
-        @param room_id : link to the room where the device is
         """
         self.name = name
         self.address = address
@@ -377,7 +374,6 @@ class Device(Base):
         self.reference = reference
         self.type_id = type_id
         self.usage_id = usage_id
-        self.room_id = room_id
 
     # TODO see if following methods are still useful
     def is_lamp(self):
@@ -409,9 +405,8 @@ class Device(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<Device(id=%s, name='%s', addr='%s', desc='%s', ref='%s', type='%s', usage=%s, room=%s)>" \
-               % (self.id, self.name, self.address, self.description, \
-                  self.reference, self.type, self.usage, self.room)
+        return "<Device(id=%s, name='%s', addr='%s', desc='%s', ref='%s', type='%s', usage=%s)>" \
+               % (self.id, self.name, self.address, self.description, self.reference, self.type, self.usage)
 
     @staticmethod
     def get_tablename():
@@ -532,6 +527,48 @@ class SensorFeature(Base):
         @return table name
         """
         return SensorFeature.__tablename__
+
+
+class DeviceFeatureAssociation(Base):
+    """
+    Association between devices, features and an item (room, area, house)
+    """
+
+    __tablename__ = '%s_device_feature_association' % _db_prefix
+    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), primary_key=True)
+    device = relation(Device, backref=backref(__tablename__))
+    device_type_feature_id = Column(Integer, ForeignKey('%s.id' % DeviceTypeFeature.get_tablename()), primary_key=True)
+    device_type_feature = relation(DeviceTypeFeature, backref=backref(__tablename__))
+    place_type = Column(Enum(DEVICE_FEATURE_ASSOCIATION_LIST), nullable=True)
+    place_id = Column(Integer, nullable=True)
+
+    def __init__(self, device_id, device_type_feature_id, place_type=None, place_id=None):
+        """
+        Class constructor
+        @param device_id : device id
+        @param device_type_feature_id : id of device type feature
+        @param place_type : room, area or house, optional (None if the feature is not associated to one of the places)
+        @param place_id : place id (None if it is the house, or if the feature is not associated to one of the places)
+        """
+        self.device_id = device_id
+        self.device_type_feature_id = device_type_feature_id
+        self.place_type = place_type
+        self.place_id = place_id
+
+    def __repr__(self):
+        """
+        Print an internal representation of the class
+        @return an internal representation
+        """
+        return "<DeviceFeatureAssociation(%s, %s, %s, place_id=%s)>" % (self.device, self.device_type_feature, self.place_type, self.place_id)
+
+    @staticmethod
+    def get_tablename():
+        """
+        Return the table name associated to the class
+        @return table name
+        """
+        return DeviceFeatureAssociation.__tablename__
 
 
 class DeviceConfig(Base):

@@ -50,7 +50,8 @@ from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
 from domogik.common.configloader import Loader
 from domogik.common.sql_schema import ACTUATOR_VALUE_TYPE_LIST, Area, Device, DeviceTypeFeature, \
-                                      ActuatorFeature, SensorFeature, DeviceUsage, \
+                                      ActuatorFeature, SensorFeature, DeviceUsage, DeviceFeatureAssociation, \
+                                      DEVICE_FEATURE_ASSOCIATION_LIST, \
                                       DeviceConfig, DeviceStats, DeviceStatsValue, DeviceTechnology, PluginConfig, \
                                       DeviceType, UIItemConfig, Room, Person, UserAccount, SENSOR_VALUE_TYPE_LIST, \
                                       SystemConfig, SystemStats, SystemStatsValue, Trigger
@@ -881,6 +882,112 @@ class DbHelper():
         return sensor_feature
 
 ####
+# Device feature association
+####
+    def list_device_feature_association(self):
+        """
+        List all records for the device / feature association
+        @return a list of DeviceFeatureAssociation objects
+        """
+        return self.__session.query(DeviceFeatureAssociation).all()
+
+    def list_device_feature_association_by_house(self):
+        """
+        List device / feature association for the house
+        @return a list of DeviceFeatureAssociation objects
+        """
+        return self.__session.query(DeviceFeatureAssociation).filter_by(place_type=u'house').all()
+
+    def list_device_feature_association_by_room_id(self, room_id):
+        """
+        List device / feature association for a room
+        @param room_id : room id
+        @return a list of DeviceFeatureAssociation objects
+        """
+        return self.__session.query(DeviceFeatureAssociation).filter_by(place_id=room_id, place_type=u'room').all()
+
+    def list_device_feature_association_by_area_id(self, area_id):
+        """
+        List device / feature association for an area
+        @param area_id : area id
+        @return a list of DeviceFeatureAssociation objects
+        """
+        return self.__session.query(DeviceFeatureAssociation).filter_by(place_id=area_id, place_type=u'area').all()
+
+    def list_device_feature_association_by_feature_id(self, feature_id):
+        """
+        List device / feature association for an id of a feature of a device type
+        @param feature_id : feature id
+        @return a list of DeviceFeatureAssociation objects
+        """
+        return self.__session.query(DeviceFeatureAssociation).filter_by(device_type_feature_id=feature_id).all()
+
+    def list_device_feature_association_by_device_id(self, d_device_id):
+        """
+        List device / feature association for a device id
+        @param device_id : device id
+        @return a list of DeviceFeatureAssociation objects
+        """
+        return self.__session.query(DeviceFeatureAssociation).filter_by(device_id=d_device_id).all()
+
+    def add_device_type_feature_association(self, d_device_id, d_type_feature_id, d_place_type=None, d_place_id=None):
+        """
+        Add a device feature association
+        @param d_device_id : device id
+        @param d_type_feature_id : feature id of the device type (switch, dimmer)
+        @param d_place_id : room id, area id or None for the house the device is associated to
+        @param d_place_type : room, area or house (None means the device is not associated)
+        @return the DeviceFeatureAssociation object
+        """
+        self.__session.expire_all()
+        if d_place_type not in DEVICE_FEATURE_ASSOCIATION_LIST:
+            raise DbHelperException("Place type should be one of : %s" % DEVICE_FEATURE_ASSOCIATION_LIST)
+        if d_place_type is None and d_place_id is not None:
+            raise DbHelperException("Place id should be None as item type is None")
+        if (d_place_type == 'room' or d_place_type == 'area') and d_place_id is None:
+            raise DbHelperException("A place id should have been provided, place type is %s" % d_place_type)
+        if d_place_id is not None and d_place_type != 'house':
+            if d_place_type == 'room':
+                try:
+                    self.__session.query(Room).filter_by(id=d_place_id).one()
+                except NoResultFound:
+                    raise DbHelperException("Couldn't add device with room id %s It does not exist" % d_place_id)
+            else: # it is an area
+                try:
+                    self.__session.query(Area).filter_by(id=d_place_id).one()
+                except NoResultFound:
+                    raise DbHelperException("Couldn't add device with area id %s It does not exist" % d_place_id)
+        device_feature_asso = DeviceFeatureAssociation(device_id=d_device_id, device_type_feature_id=d_type_feature_id,
+                                                       place_type=self.__to_unicode(d_place_type), place_id=d_place_id)
+        self.__session.add(device_feature_asso)
+        try:
+            self.__session.commit()
+        except Exception, sql_exception:
+            self.__session.rollback()
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
+        return device_feature_asso
+
+    def del_device_feature_association(self, d_device_id, d_type_feature_id):
+        """
+        Delete a device feature association
+        @param d_device_id : device id
+        @param d_type_feature_id : feature id of the device type (switch, dimmer)
+        @return the DeviceFeatureAssociation object which was deleted
+        """
+        self.__session.expire_all()
+        dfa = self.__session.query(DeviceFeatureAssociation)\
+                            .filter_by(device_id=d_device_id, device_type_feature_id=d_type_feature_id).first()
+        if dfa is None:
+            raise DbHelperException("DeviceFeatureAssociation to be deleted not found")
+        self.__session.delete(dfa)
+        try:
+            self.__session.commit()
+        except Exception, sql_exception:
+            self.__session.rollback()
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
+        return dfa
+
+####
 # Device technology
 ####
     def list_device_technologies(self):
@@ -924,9 +1031,7 @@ class DbHelper():
         @return a DeviceTechnology object
         """
         self.__session.expire_all()
-        device_tech = self.__session.query(DeviceTechnology)\
-                                    .filter_by(id=dt_id)\
-                                    .first()
+        device_tech = self.__session.query(DeviceTechnology).filter_by(id=dt_id).first()
         if device_tech is None:
             raise DbHelperException("DeviceTechnology with id %s couldn't be found" % dt_id)
         if dt_name is not None:
@@ -1161,17 +1266,15 @@ class DbHelper():
         return self.__session.query(Device)\
                              .filter_by(technology_id=dt_id).all()
 
-    def add_device(self, d_name, d_address, d_type_id, d_usage_id, d_room_id=None,
-                   d_description=None, d_reference=None):
+    def add_device(self, d_name, d_address, d_type_id, d_usage_id, d_description=None, d_reference=None):
         """
         Add a device item
         @param d_name : name of the device
         @param d_address : address (ex : 'A3' for x10/plcbus, '111.111111111' for 1wire)
-        @param d_type_id : type id (x10.Switch, x10.Dimmer, Computer.WOL...)
-        @param d_usage_id : usage id
-        @param d_room_id : room id
-        @param d_description : Extended item description (100 char max)
-        @param d_reference : device reference (ex. AM12 for x10)
+        @param d_type_id : device type id (x10.Switch, x10.Dimmer, Computer.WOL...)
+        @param d_usage_id : usage id (ex. temperature)
+        @param d_description : extended device description, optional
+        @param d_reference : device reference (ex. AM12 for x10), optional
         @return the new Device object
         """
         self.__session.expire_all()
@@ -1183,15 +1286,9 @@ class DbHelper():
             self.__session.query(DeviceUsage).filter_by(id=d_usage_id).one()
         except NoResultFound:
             raise DbHelperException("Couldn't add device with device usage id %s It does not exist" % d_usage_id)
-        if d_room_id is not None:
-            try:
-                self.__session.query(Room).filter_by(id=d_room_id).one()
-            except NoResultFound:
-                raise DbHelperException("Couldn't add device with room id %s It does not exist" % d_room_id)
         device = Device(name=self.__to_unicode(d_name), address=self.__to_unicode(d_address),
                         description=self.__to_unicode(d_description),
-                        reference=self.__to_unicode(d_reference), type_id=d_type_id,
-                        usage_id=d_usage_id, room_id=d_room_id)
+                        reference=self.__to_unicode(d_reference), type_id=d_type_id, usage_id=d_usage_id)
         self.__session.add(device)
         try:
             self.__session.commit()
@@ -1201,8 +1298,7 @@ class DbHelper():
         return device
 
     def update_device(self, d_id, d_name=None, d_address=None, d_type_id=None,
-            d_usage_id=None, d_room_id=None, d_description=None,
-            d_reference=None):
+                      d_usage_id=None, d_description=None, d_reference=None):
         """
         Update a device item
         If a param is None, then the old value will be kept
@@ -1241,15 +1337,6 @@ class DbHelper():
             except NoResultFound:
               raise DbHelperException("Couldn't find device usage id %s. It does not exist" % d_usage_id)
             device.usage = d_usage_id
-        if d_room_id is not None:
-            if d_room_id != '':
-                try:
-                    self.__session.query(Room).filter_by(id=d_room_id).one()
-                except NoResultFound:
-                    raise DbHelperException("Couldn't find room id %s. It does not exist" % d_room_id)
-            else:
-                d_room_id = None
-            device.room_id = d_room_id
         self.__session.add(device)
         try:
             self.__session.commit()
@@ -1280,6 +1367,8 @@ class DbHelper():
                                                     .filter_by(device_stats_id=device_stats.id).all():
                 self.__session.delete(device_stats_value)
             self.__session.delete(device_stats)
+        for device_feat_asso in self.__session.query(DeviceFeatureAssociation).filter_by(device_id=d_id).all():
+            self.__session.delete(device_feat_asso)
         self.__session.delete(device)
         try:
             self.__session.commit()

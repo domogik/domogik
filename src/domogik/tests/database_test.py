@@ -39,7 +39,7 @@ import datetime
 from domogik.common.database import DbHelper, DbHelperException
 from domogik.common.sql_schema import Area, Device, ActuatorFeature, DeviceTypeFeature, DeviceUsage, \
                                       DeviceConfig, SensorFeature, DeviceStats, DeviceStatsValue, \
-                                      DeviceTechnology, PluginConfig, \
+                                      DeviceFeatureAssociation, DeviceTechnology, PluginConfig, \
                                       DeviceType, UIItemConfig, Room, \
                                       UserAccount, SystemConfig, SystemStats, SystemStatsValue, \
                                       Trigger, Person
@@ -90,6 +90,10 @@ class GenericTestCase(unittest.TestCase):
     def remove_all_device_type_features(self, db):
         for df in db.list_device_type_features():
             db.del_device_type_feature(df.id)
+
+    def remove_all_device_feature_associations(self, db):
+        for dfa in db.list_device_feature_association():
+            db.del_device_feature_association(dfa.device_id, dfa.device_type_feature_id)
 
     def remove_all_plugin_config(self, db):
         for plc in db.list_all_plugin_config():
@@ -288,28 +292,6 @@ class RoomTestCase(GenericTestCase):
                                  r_area_id=area2.id)
         assert len(self.db.get_all_rooms_of_area(area1.id)) == 2
         assert len(self.db.get_all_rooms_of_area(area2.id)) == 1
-
-        dt1 = self.db.add_device_technology('x10', 'x10', 'desc dt1')
-        du1 = self.db.add_device_usage('du1')
-        dty1 = self.db.add_device_type(dty_name='x10 Switch',
-                                       dty_description='desc1', dt_id=dt1.id)
-        device1 = self.db.add_device(d_name='Toaster', d_address='A1',
-                    d_type_id=dty1.id, d_usage_id=du1.id,
-                    d_room_id=room1.id, d_description='My new toaster')
-        device2 = self.db.add_device(d_name='Washing machine', d_address='A1',
-                    d_type_id=dty1.id, d_usage_id=du1.id,
-                    d_room_id=room1.id, d_description='Laden')
-        device3 = self.db.add_device(d_name='Mixer', d_address='A2',
-                    d_type_id=dty1.id, d_usage_id=du1.id,
-                    d_room_id=room2.id, d_description='Moulinex')
-        for room in self.db.list_rooms_with_devices():
-            if room.id == room1.id:
-                assert len(room.Device) == 2
-            if room.id == room2.id:
-                assert len(room.Device) == 1
-        #print room2
-        #print room3
-        #assert len(room3.Device) == 0
 
 
 class DeviceUsageTestCase(GenericTestCase):
@@ -556,6 +538,95 @@ class DeviceTypeFeatureTestCase(GenericTestCase):
         assert len(self.db.list_sensor_features()) == 0
 
 
+class DeviceFeatureAssociationTestCase(GenericTestCase):
+    """
+    Test device / feature association
+    """
+
+    def setUp(self):
+        self.db = DbHelper(use_test_db=True)
+        self.remove_all_device_feature_associations(self.db)
+        self.remove_all_device_technologies(self.db)
+
+    def tearDown(self):
+        self.remove_all_device_feature_associations(self.db)
+        self.remove_all_device_technologies(self.db)
+        del self.db
+
+    def test_empty_list(self):
+        assert len(self.db.list_device_feature_association()) == 0
+
+    def test_add(self):
+        area1 = self.db.add_area('Basement')
+        area2 = self.db.add_area('First floor')
+        room1 = self.db.add_room('Kitchen', area1.id)
+        room2 = self.db.add_room('Room', area1.id)
+        dt1 = self.db.add_device_technology('x10', 'x10', 'x10 device type')
+        dt2 = self.db.add_device_technology('plcbus', 'PLCBus', 'PLCBus device type')
+        du1 = self.db.add_device_usage('Appliance')
+        dty1 = self.db.add_device_type(dty_name='x10 Switch', dt_id=dt1.id,
+                                       dty_description='My beautiful switch')
+        dty2 = self.db.add_device_type(dty_name='PLCBus Switch', dt_id=dt2.id,
+                                       dty_description='Another beautiful switch')
+        device1 = self.db.add_device(d_name='Toaster', d_address='A1',
+                    d_type_id=dty1.id, d_usage_id=du1.id, d_description='My new toaster')
+        device2 = self.db.add_device(d_name='Washing machine', d_address='A1',
+                    d_type_id=dty2.id, d_usage_id=du1.id, d_description='Laden')
+        device3 = self.db.add_device(d_name='Mixer', d_address='A2',
+                    d_type_id=dty2.id, d_usage_id=du1.id, d_description='Moulinex')
+        dtf1 = self.db.add_device_type_feature(dtf_name='Switch', dtf_feature_type='actuator',
+                                               dtf_device_type_id=dty1.id, dtf_parameters='myparams1')
+        dtf2 = self.db.add_device_type_feature(dtf_name='Dimmer', dtf_feature_type='actuator',
+                                               dtf_device_type_id=dty2.id, dtf_parameters='myparams2')
+        dfa = self.db.add_device_type_feature_association(d_device_id=device1.id, d_type_feature_id=dtf1.id,
+                                                          d_place_type='house')
+        print dfa
+        self.db.add_device_type_feature_association(d_device_id=device2.id, d_type_feature_id=dtf2.id,
+                                                    d_place_id=room1.id, d_place_type='room')
+        self.db.add_device_type_feature_association(d_device_id=device3.id, d_type_feature_id=dtf2.id,
+                                                    d_place_id=area1.id, d_place_type='area')
+        assert len(self.db.list_device_feature_association()) == 3
+        assert len(self.db.list_device_feature_association_by_house()) == 1
+        assert len(self.db.list_device_feature_association_by_room_id(room1.id)) == 1
+        assert len(self.db.list_device_feature_association_by_room_id(room2.id)) == 0
+        assert len(self.db.list_device_feature_association_by_area_id(area1.id)) == 1
+        assert len(self.db.list_device_feature_association_by_area_id(area2.id)) == 0
+
+    def test_del(self):
+        area1 = self.db.add_area('Basement')
+        area2 = self.db.add_area('First floor')
+        room1 = self.db.add_room('Kitchen', area1.id)
+        room2 = self.db.add_room('Room', area1.id)
+        dt1 = self.db.add_device_technology('x10', 'x10', 'x10 device type')
+        dt2 = self.db.add_device_technology('plcbus', 'PLCBus', 'PLCBus device type')
+        du1 = self.db.add_device_usage('Appliance')
+        dty1 = self.db.add_device_type(dty_name='x10 Switch', dt_id=dt1.id,
+                                       dty_description='My beautiful switch')
+        dty2 = self.db.add_device_type(dty_name='PLCBus Switch', dt_id=dt2.id,
+                                       dty_description='Another beautiful switch')
+        device1 = self.db.add_device(d_name='Toaster', d_address='A1',
+                    d_type_id=dty1.id, d_usage_id=du1.id, d_description='My new toaster')
+        device2 = self.db.add_device(d_name='Washing machine', d_address='A1',
+                    d_type_id=dty2.id, d_usage_id=du1.id, d_description='Laden')
+        device3 = self.db.add_device(d_name='Mixer', d_address='A2',
+                    d_type_id=dty2.id, d_usage_id=du1.id, d_description='Moulinex')
+        dtf1 = self.db.add_device_type_feature(dtf_name='Switch', dtf_feature_type='actuator',
+                                               dtf_device_type_id=dty1.id, dtf_parameters='myparams1')
+        dtf2 = self.db.add_device_type_feature(dtf_name='Dimmer', dtf_feature_type='actuator',
+                                               dtf_device_type_id=dty2.id, dtf_parameters='myparams2')
+        dfa1 = self.db.add_device_type_feature_association(d_device_id=device1.id, d_type_feature_id=dtf1.id,
+                                                           d_place_type='house')
+        dfa2 = self.db.add_device_type_feature_association(d_device_id=device2.id, d_type_feature_id=dtf2.id,
+                                                           d_place_id=room1.id, d_place_type='room')
+        dfa3 = self.db.add_device_type_feature_association(d_device_id=device3.id, d_type_feature_id=dtf2.id,
+                                                           d_place_id=area1.id, d_place_type='area')
+        dfa = self.db.del_device_feature_association(d_device_id=dfa1.device_id,
+                                                     d_type_feature_id=dfa1.device_type_feature_id)
+        assert len(self.db.list_device_feature_association()) == 2
+        assert len(self.db.list_device_feature_association_by_room_id(room1.id)) == 1
+        assert len(self.db.list_device_feature_association_by_area_id(area1.id)) == 1
+
+
 class DeviceTechnologyTestCase(GenericTestCase):
     """
     Test device technologies
@@ -686,37 +757,19 @@ class DeviceTestCase(GenericTestCase):
         dty1 = self.db.add_device_type(dty_name='x10 Switch',
                                        dty_description='desc1', dt_id=dt1.id)
         try:
-            self.db.add_device(d_name='device1', d_address = 'A1',
-                    d_type_id = 9999999999, d_usage_id = du1.id,
-                    d_room_id = room1.id, d_description = 'desc1')
+            self.db.add_device(d_name='device1', d_address = 'A1', d_type_id = 9999999999, d_usage_id = du1.id)
             TestCase.fail(self, "Device type does not exist, an exception should have been raised")
-            self.db.add_device(d_name='device1', d_address = 'A1',
-                    d_type_id = dty1.id, d_usage_id = 9999999999999,
-                    d_room_id = room1.id, d_description = 'desc1')
+            self.db.add_device(d_name='device1', d_address = 'A1', d_type_id = dty1.id, d_usage_id = 9999999999999)
             TestCase.fail(self, "Device usage does not exist, an exception should have been raised")
-            self.db.add_device(d_name='device1', d_address = 'A1',
-                    d_type_id = dty1.id, d_usage_id = du1.id,
-                    d_room_id = 9999999999999, d_description = 'desc1')
-            TestCase.fail(self, "Room does not exist, an exception should have been raised")
         except DbHelperException:
             pass
-        device1 = self.db.add_device(d_name='device1', d_address = 'A1',
-                    d_type_id = dty1.id, d_usage_id = du1.id,
-                    d_room_id = room1.id, d_description = 'desc1')
+        device1 = self.db.add_device(d_name='device1', d_address='A1',
+                    d_type_id=dty1.id, d_usage_id=du1.id, d_description='desc1')
         print device1
-        assert len(self.db.list_devices()) == 1, "Device was NOT added"
-        device2 = self.db.add_device(d_name='device2', d_address = 'A2',
-                    d_type_id = dty1.id, d_usage_id = du1.id,
-                    d_room_id = room1.id, d_description = 'desc1')
+        assert len(self.db.list_devices()) == 1
+        device2 = self.db.add_device(d_name='device2', d_address='A2',
+                    d_type_id=dty1.id, d_usage_id=du1.id, d_description='desc1')
         assert len(self.db.list_devices()) == 2
-        device3 = self.db.add_device(d_name='device3', d_address = 'A3',
-                    d_type_id = dty1.id, d_usage_id = du1.id)
-        assert device3.room_id is None
-        # TODO see if these methods are still used
-        # assert device1.is_lamp(), "device1.is_lamp() returns False.
-        # Should have returned True"
-        # assert not device1.is_appliance(), "device1.is_appliance()
-        # returns True. Should have returned False"
 
     def test_list_and_get(self):
         area1 = self.db.add_area('Basement','description 1')
@@ -730,17 +783,14 @@ class DeviceTestCase(GenericTestCase):
         dty2 = self.db.add_device_type(dty_name='PLCBus Switch', dt_id=dt2.id,
                                        dty_description='Another beautiful switch')
         device1 = self.db.add_device(d_name='Toaster', d_address='A1',
-                    d_type_id=dty1.id, d_usage_id=du1.id,
-                    d_room_id=room1.id, d_description='My new toaster')
+                    d_type_id=dty1.id, d_usage_id=du1.id, d_description='My new toaster')
         device2 = self.db.add_device(d_name='Washing machine', d_address='A1',
-                    d_type_id=dty2.id, d_usage_id=du1.id,
-                    d_room_id=room1.id, d_description='Laden')
+                    d_type_id=dty2.id, d_usage_id=du1.id, d_description='Laden')
         device3 = self.db.add_device(d_name='Mixer', d_address='A2',
-                    d_type_id=dty2.id, d_usage_id=du1.id,
-                    d_room_id=room1.id, d_description='Moulinex')
-        search_dev1 =self.db.get_device_by_technology_and_address(dt1.name, 'A1')
+                    d_type_id=dty2.id, d_usage_id=du1.id, d_description='Moulinex')
+        search_dev1 = self.db.get_device_by_technology_and_address(dt1.name, 'A1')
         assert search_dev1.name == 'Toaster'
-        search_dev2 =self.db.get_device_by_technology_and_address(dt1.name, 'A2')
+        search_dev2 = self.db.get_device_by_technology_and_address(dt1.name, 'A2')
         assert search_dev2 == None
 
     def test_update(self):
@@ -751,30 +801,25 @@ class DeviceTestCase(GenericTestCase):
         dty1 = self.db.add_device_type(dty_name='x10 Switch',
                                        dty_description='desc1', dt_id=dt1.id)
         du1 = self.db.add_device_usage('du1')
-        device1 = self.db.add_device(d_name='device1', d_address = 'A1',
-                    d_type_id = dty1.id, d_usage_id = du1.id,
-                    d_room_id = room1.id, d_description = 'desc1')
+        device1 = self.db.add_device(d_name='device1', d_address='A1',
+                    d_type_id=dty1.id, d_usage_id=du1.id, d_description='desc1')
         device_id = device1.id
         try:
-            self.db.update_device(d_id = device1.id, d_type_id = 9999999999)
+            self.db.update_device(d_id=device1.id, d_type_id=9999999999)
             TestCase.fail(self, "Device type does not exist, an exception should have been raised")
-            self.db.update_device(d_id = device1.id, d_usage_id = 9999999999999)
+            self.db.update_device(d_id=device1.id, d_usage_id=9999999999999)
             TestCase.fail(self, "Device usage does not exist, an exception should have been raised")
-            self.db.update_device(d_id = device1.id, d_room_id = 9999999999999)
-            TestCase.fail(self, "Room does not exist, an exception should have been raised")
         except DbHelperException:
             pass
-        device1 = self.db.update_device(d_id = device1.id, d_room_id = room2.id,
-                                        d_description = 'desc2', d_reference='A1')
+        device1 = self.db.update_device(d_id=device1.id, d_description='desc2', d_reference='A1')
         device1 = self.db.get_device(device_id)
-        assert device1.room.name == 'room2'
         assert device1.description == 'desc2'
         assert device1.reference == 'A1'
-        device1 = self.db.update_device(d_id = device1.id, d_reference='', d_room_id='')
+        device1 = self.db.update_device(d_id=device1.id, d_reference='')
         assert device1.reference == None
-        assert device1.room_id == None
 
     def testFindAndSearch(self):
+        """
         area1 = self.db.add_area('area1','description 1')
         area2 = self.db.add_area('area2','description 2')
         room1 = self.db.add_room('room1', area1.id)
@@ -786,6 +831,8 @@ class DeviceTestCase(GenericTestCase):
                                        dty_description='desc1', dt_id=dt1.id)
         du1 = self.db.add_device_usage('du1')
         du2 = self.db.add_device_usage('du2')
+        dtf1 = self.db.add_device_type_feature(dtf_name='Switch', dtf_feature_type='actuator',
+                                               dtf_device_type_id=dty1.id, dtf_parameters='myparams1')
         device1 = self.db.add_device(d_name='device1', d_address = 'A1',
                     d_type_id = dty1.id, d_usage_id = du1.id,
                     d_room_id = room1.id, d_description = 'desc1')
@@ -814,6 +861,7 @@ class DeviceTestCase(GenericTestCase):
         assert len(self.db.find_devices([room2.id], [])) == 1
         assert len(self.db.find_devices([room1.id], [du2.id])) == 0
         assert len(self.db.find_devices([room1.id, room2.id], [du2.id])) == 1
+        """
 
     def test_del(self):
         area1 = self.db.add_area('area1','description 1')
@@ -825,13 +873,11 @@ class DeviceTestCase(GenericTestCase):
                                        dty_description='desc1', dt_id=dt1.id)
         du1 = self.db.add_device_usage('du1')
         du2 = self.db.add_device_usage('du2')
-        device1 = self.db.add_device(d_name='device1', d_address = 'A1',
-                    d_type_id = dty1.id, d_usage_id = du1.id,
-                    d_room_id = room1.id, d_description = 'desc1')
+        device1 = self.db.add_device(d_name='device1', d_address='A1',
+                    d_type_id=dty1.id, d_usage_id=du1.id, d_description='desc1')
         device2 = self.db.add_device(d_name='device2', d_address='A2',
-                    d_type_id = dty1.id, d_usage_id=du1.id, d_room_id=room1.id)
-        device3 = self.db.add_device(d_name='device3', d_address='A3',
-                    d_type_id = dty1.id, d_usage_id=du2.id, d_room_id=room2.id)
+                    d_type_id=dty1.id, d_usage_id=du1.id, d_description='desc1')
+        device3 = self.db.add_device(d_name='device3', d_address='A3', d_type_id=dty1.id, d_usage_id=du1.id)
         device_del = device2
         device2_id = device2.id
         self.db.del_device(device2.id)
@@ -857,8 +903,7 @@ class DeviceConfigTestCase(GenericTestCase):
                                       dty_description='desc1', dt_id=dt.id)
         area = self.db.add_area('area1','description 1')
         room = self.db.add_room('room1', area.id)
-        device = self.db.add_device(d_name=device_name, d_address = "A1",
-                                     d_type_id = dty.id, d_usage_id = du.id, d_room_id = room.id)
+        device = self.db.add_device(d_name=device_name, d_address = "A1", d_type_id=dty.id, d_usage_id=du.id)
         return device
 
     def setUp(self):
@@ -942,14 +987,10 @@ class DeviceStatsTestCase(GenericTestCase):
                                        dty_description='desc1', dt_id=dt1.id)
         area1 = self.db.add_area('area1','description 1')
         room1 = self.db.add_room('room1', area1.id)
-        device1 = self.db.add_device(d_name='device1', d_address = "A1",
-                    d_type_id = dty1.id, d_usage_id = du1.id, d_room_id = room1.id)
-        device2 = self.db.add_device(d_name='device2', d_address = "A2",
-                    d_type_id = dty1.id, d_usage_id = du1.id, d_room_id = room1.id)
-        device3 = self.db.add_device(d_name='device3', d_address = "A3",
-                    d_type_id = dty1.id, d_usage_id = du1.id, d_room_id = room1.id)
-        device4 = self.db.add_device(d_name='device4', d_address = "A4",
-                    d_type_id = dty1.id, d_usage_id = du1.id, d_room_id = room1.id)
+        device1 = self.db.add_device(d_name='device1', d_address='A1', d_type_id = dty1.id, d_usage_id = du1.id)
+        device2 = self.db.add_device(d_name='device2', d_address='A2', d_type_id = dty1.id, d_usage_id = du1.id)
+        device3 = self.db.add_device(d_name='device3', d_address='A3', d_type_id = dty1.id, d_usage_id = du1.id)
+        device4 = self.db.add_device(d_name='device4', d_address='A4', d_type_id = dty1.id, d_usage_id = du1.id)
         now = datetime.datetime.now()
         d_stat1_1 = self.db.add_device_stat(device1.id, now,
                                             {'val1': '10', 'val2': '10.5' })
@@ -979,12 +1020,9 @@ class DeviceStatsTestCase(GenericTestCase):
         du1 = self.db.add_device_usage("lighting")
         area1 = self.db.add_area('area1','description 1')
         room1 = self.db.add_room('room1', area1.id)
-        device1 = self.db.add_device(d_name='device1', d_address = "A1",
-                                     d_type_id = dty1.id, d_usage_id = du1.id,
-                                     d_room_id = room1.id)
+        device1 = self.db.add_device(d_name='device1', d_address = "A1", d_type_id = dty1.id, d_usage_id = du1.id)
         now = datetime.datetime.now()
-        d_stat1_1 = self.db.add_device_stat(device1.id, now,
-                                            {'val1': '10', 'val2': '10.5' })
+        d_stat1_1 = self.db.add_device_stat(device1.id, now, {'val1': '10', 'val2': '10.5' })
         d_stat1_2 = self.db.add_device_stat(device1.id,
                                             now + datetime.timedelta(seconds=1),
                                             {'val1': '11', 'val2': '12' })
@@ -1005,14 +1043,10 @@ class DeviceStatsTestCase(GenericTestCase):
         du1 = self.db.add_device_usage("lighting")
         area1 = self.db.add_area('area1','description 1')
         room1 = self.db.add_room('room1', area1.id)
-        device1 = self.db.add_device(d_name='device1', d_address = "A1",
-                    d_type_id = dty1.id, d_usage_id = du1.id, d_room_id = room1.id)
-        device2 = self.db.add_device(d_name='device2', d_address = "A2",
-                    d_type_id = dty1.id, d_usage_id = du1.id, d_room_id = room1.id)
-        device3 = self.db.add_device(d_name='device3', d_address = "A3",
-                    d_type_id = dty1.id, d_usage_id = du1.id, d_room_id = room1.id)
-        device4 = self.db.add_device(d_name='device4', d_address = "A4",
-                    d_type_id = dty1.id, d_usage_id = du1.id, d_room_id = room1.id)
+        device1 = self.db.add_device(d_name='device1', d_address='A1', d_type_id=dty1.id, d_usage_id=du1.id)
+        device2 = self.db.add_device(d_name='device2', d_address='A2', d_type_id=dty1.id, d_usage_id=du1.id)
+        device3 = self.db.add_device(d_name='device3', d_address='A3', d_type_id=dty1.id, d_usage_id=du1.id)
+        device4 = self.db.add_device(d_name='device4', d_address='A4', d_type_id=dty1.id, d_usage_id=du1.id)
         now = datetime.datetime.now()
         d_stat1_1 = self.db.add_device_stat(device1.id,
                                             now, {'val1': '10', 'val2': '10.5' })
@@ -1047,10 +1081,8 @@ class DeviceStatsTestCase(GenericTestCase):
         du1 = self.db.add_device_usage("lighting")
         area1 = self.db.add_area('area1','description 1')
         room1 = self.db.add_room('room1', area1.id)
-        device1 = self.db.add_device(d_name='device1', d_address = "A1",
-                    d_type_id = dty1.id, d_usage_id = du1.id, d_room_id = room1.id)
-        device2 = self.db.add_device(d_name='device2', d_address = "A2",
-                    d_type_id = dty1.id, d_usage_id = du1.id, d_room_id = room1.id)
+        device1 = self.db.add_device(d_name='device1', d_address='A1', d_type_id=dty1.id, d_usage_id=du1.id)
+        device2 = self.db.add_device(d_name='device2', d_address='A2', d_type_id=dty1.id, d_usage_id=du1.id)
         now = datetime.datetime.now()
         d_stat1_1 = self.db.add_device_stat(device1.id,
                                             now, {'val1': '10', 'val2': '10.5' })
