@@ -352,28 +352,28 @@ class Device(Base):
     description = Column(UnicodeText())
     address = Column(Unicode(30), nullable=False)
     reference = Column(Unicode(30))
-    usage_id = Column(Integer, ForeignKey('%s.id' % DeviceUsage.get_tablename()), nullable=False)
-    usage = relation(DeviceUsage, backref=backref(__tablename__))
-    type_id = Column(Integer, ForeignKey('%s.id' % DeviceType.get_tablename()), nullable=False)
-    type = relation(DeviceType, backref=backref(__tablename__))
+    device_usage_id = Column(Integer, ForeignKey('%s.id' % DeviceUsage.get_tablename()), nullable=False)
+    device_usage = relation(DeviceUsage, backref=backref(__tablename__))
+    device_type_id = Column(Integer, ForeignKey('%s.id' % DeviceType.get_tablename()), nullable=False)
+    device_type = relation(DeviceType, backref=backref(__tablename__))
     _stats = relation("DeviceStats", order_by="DeviceStats.date.desc()", backref=__tablename__)
 
-    def __init__(self, name, address, description, reference, usage_id, type_id):
+    def __init__(self, name, address, description, reference, device_usage_id, device_type_id):
         """
         Class constructor
         @param name : short name of the device
         @param description : extended description
         @param address : device address (like 'A3' for x10, or '01.123456789ABC' for 1wire)
         @param reference : internal reference of the device (like AM12 for a X10 device)
-        @param usage_id : link to the device usage
-        @param type_id : 'link to the device type (x10.Switch, x10.Dimmer, Computer.WOL...)
+        @param device_usage_id : link to the device usage
+        @param device_type_id : 'link to the device type (x10.Switch, x10.Dimmer, Computer.WOL...)
         """
         self.name = name
         self.address = address
         self.description = description
         self.reference = reference
-        self.type_id = type_id
-        self.usage_id = usage_id
+        self.device_type_id = device_type_id
+        self.device_usage_id = device_usage_id
 
     # TODO see if following methods are still useful
     def is_lamp(self):
@@ -406,7 +406,7 @@ class Device(Base):
         @return an internal representation
         """
         return "<Device(id=%s, name='%s', addr='%s', desc='%s', ref='%s', type='%s', usage=%s)>" \
-               % (self.id, self.name, self.address, self.description, self.reference, self.type, self.usage)
+               % (self.id, self.name, self.address, self.description, self.reference, self.device_type, self.device_usage)
 
     @staticmethod
     def get_tablename():
