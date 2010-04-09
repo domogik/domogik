@@ -310,28 +310,29 @@ class DeviceType(Base):
     """
     __tablename__ = '%s_device_type' % _db_prefix
     id = Column(Integer, primary_key=True)
-    technology_id = Column(Unicode(30), ForeignKey('%s.id' % \
+    device_technology_id = Column(Unicode(30), ForeignKey('%s.id' % \
                            DeviceTechnology.get_tablename()), nullable=False)
-    technology = relation(DeviceTechnology, backref=backref(__tablename__))
+    device_technology = relation(DeviceTechnology, backref=backref(__tablename__))
     name = Column(Unicode(30), nullable=False)
     description = Column(UnicodeText())
 
-    def __init__(self, name, description, technology_id):
+    def __init__(self, name, description, device_technology_id):
         """
         Class constructor
         @param name : short name of the type
-        @param description : extended description
+        @param description : extended description, optional
+        @param device_technology_id : technology id
         """
         self.name = name
         self.description = description
-        self.technology_id = technology_id
+        self.device_technology_id = device_technology_id
 
     def __repr__(self):
         """
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<DeviceType(id=%s, name='%s', desc='%s', device techno='%s')>" % (self.id, self.name, self.description, self.technology)
+        return "<DeviceType(id=%s, name='%s', desc='%s', device techno='%s')>" % (self.id, self.name, self.description, self.device_technology)
 
     @staticmethod
     def get_tablename():

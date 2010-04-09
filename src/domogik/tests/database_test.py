@@ -383,7 +383,7 @@ class DeviceTypeTestCase(GenericTestCase):
         print dty1
         assert dty1.name == 'x10 Switch'
         assert dty1.description == 'desc1'
-        assert dty1.technology_id == dt1.id
+        assert dty1.device_technology_id == dt1.id
         dty2 = self.db.add_device_type(dty_name='x10 Dimmer',
                                        dty_description='desc2', dt_id=dt1.id)
         assert len(self.db.list_device_types()) == 2
@@ -405,7 +405,7 @@ class DeviceTypeTestCase(GenericTestCase):
                                            dt_id=dt2.id, dty_description='desc2')
         assert dty_u.name == 'x10 Dimmer'
         assert dty_u.description == 'desc2'
-        assert dty_u.technology_id == dt2.id
+        assert dty_u.device_technology_id == dt2.id
 
     def test_list_and_get(self):
         dt1 = self.db.add_device_technology('x10', 'x10', 'desc dt1')

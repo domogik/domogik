@@ -543,7 +543,7 @@ class DbHelper():
         except NoResultFound:
             raise DbHelperException("Couldn't add device type with technology id %s. It does not exist" % dt_id)
         dty = DeviceType(name=self.__to_unicode(dty_name), description=self.__to_unicode(dty_description),
-                         technology_id=dt_id)
+                         device_technology_id=dt_id)
         self.__session.add(dty)
         try:
             self.__session.commit()
@@ -573,7 +573,7 @@ class DbHelper():
                 self.__session.query(DeviceTechnology).filter_by(id=dt_id).one()
             except NoResultFound:
                 raise DbHelperException("Couldn't find technology id %s. It does not exist" % dt_id)
-            device_type.technology_id = dt_id
+            device_type.device_technology_id = dt_id
         self.__session.add(device_type)
         if dty_description is not None:
             if dty_description == '': dty_description = None
@@ -1063,10 +1063,10 @@ class DbHelper():
         if dt:
             dt_d = dt
             if cascade_delete:
-                for device_type in self.__session.query(DeviceType).filter_by(technology_id=dt.id).all():
+                for device_type in self.__session.query(DeviceType).filter_by(device_technology_id=dt.id).all():
                     self.del_device_type(device_type.id, cascade_delete=True)
             else:
-                device_type_list = self.__session.query(DeviceType).filter_by(technology_id=dt.id).all()
+                device_type_list = self.__session.query(DeviceType).filter_by(device_technology_id=dt.id).all()
                 if len(device_type_list) > 0:
                     raise DbHelperException("Couldn't delete device technology %s : there are associated device types" % dt_id)
 
@@ -1190,7 +1190,7 @@ class DbHelper():
         device = []
         for device in device_list:
             device_type = self.__session.query(DeviceType).filter_by(id=device.device_type_id).first()
-            device_tech = self.__session.query(DeviceTechnology).filter_by(id=device_type.technology_id).first()
+            device_tech = self.__session.query(DeviceTechnology).filter_by(id=device_type.device_technology_id).first()
             if device_tech.name.lower() == self.__to_unicode(techno_name.lower()):
                 return device
         return None
