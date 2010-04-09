@@ -213,45 +213,33 @@ class RoomTestCase(GenericTestCase):
 
     def test_add(self):
         try:
-            self.db.add_room(r_name='foo', r_area_id=99999999999,
-                             r_description='foo')
-            TestCase.fail(self, "An exception should have been raised : \
-                          area id does not exist")
+            self.db.add_room(r_name='foo', r_area_id=99999999999, r_description='foo')
+            TestCase.fail(self, "An exception should have been raised : area id does not exist")
         except DbHelperException:
             pass
-        room = self.db.add_room(r_name='my_room', r_area_id=None,
-                                r_description='my_description')
+        room = self.db.add_room(r_name='my_room', r_area_id=None, r_description='my_description')
         print room
         area1 = self.db.add_area('area1','description 1')
         area2 = self.db.add_area('area2','description 2')
-        room1 = self.db.add_room(r_name='room1', r_description='description 1',
-                                 r_area_id=area1.id)
+        room1 = self.db.add_room(r_name='room1', r_description='description 1', r_area_id=area1.id)
         assert room1.name == 'room1'
         assert room1.description == 'description 1'
         assert room1.area_id == area1.id
-        room2 = self.db.add_room(r_name='room2', r_description='description 2',
-                                 r_area_id=area1.id)
-        room3 = self.db.add_room(r_name='room3', r_description='description 3',
-                                 r_area_id=area2.id)
+        room2 = self.db.add_room(r_name='room2', r_description='description 2', r_area_id=area1.id)
+        room3 = self.db.add_room(r_name='room3', r_description='description 3', r_area_id=area2.id)
         assert len(self.db.list_rooms()) == 4
         room4 = self.db.add_room(r_name='room4')
 
     def test_update(self):
         area1 = self.db.add_area('area1','description 1')
         area2 = self.db.add_area('area2','description 2')
-        room = self.db.add_room(r_name='room1', r_description='description 1',
-                                r_area_id=area1.id)
+        room = self.db.add_room(r_name='room1', r_description='description 1', r_area_id=area1.id)
         try:
-            self.db.update_room(room.id, r_name='room2',
-                                r_description='description 2',
-                                r_area_id=99999999999)
-            TestCase.fail(self, "An exception should have been raised : \
-                          area id does not exist")
+            self.db.update_room(room.id, r_name='room2', r_description='description 2', r_area_id=99999999999)
+            TestCase.fail(self, "An exception should have been raised : area id does not exist")
         except DbHelperException:
             pass
-        room_u = self.db.update_room(room.id, r_name='room2',
-                                     r_description='description 2',
-                                     r_area_id=area2.id)
+        room_u = self.db.update_room(room.id, r_name='room2', r_description='description 2', r_area_id=area2.id)
         assert room_u.name == 'room2'
         assert room_u.description == 'description 2'
         assert room_u.area_id == area2.id
@@ -261,12 +249,9 @@ class RoomTestCase(GenericTestCase):
     def test_del(self):
         area1 = self.db.add_area('area1','description 1')
         area2 = self.db.add_area('area2','description 2')
-        room1 = self.db.add_room(r_name='room1', r_description='description 1',
-                                 r_area_id=area1.id)
-        room2 = self.db.add_room(r_name='room2', r_description='description 2',
-                                 r_area_id=area1.id)
-        room3 = self.db.add_room(r_name='room3', r_description='description 3',
-                                 r_area_id=area2.id)
+        room1 = self.db.add_room(r_name='room1', r_description='description 1', r_area_id=area1.id)
+        room2 = self.db.add_room(r_name='room2', r_description='description 2', r_area_id=area1.id)
+        room3 = self.db.add_room(r_name='room3', r_description='description 3', r_area_id=area2.id)
         room1_id = room1.id
         room_deleted = self.db.del_room(room1.id)
         assert not self.has_item(self.db.list_rooms(), ['room1'])
@@ -275,22 +260,18 @@ class RoomTestCase(GenericTestCase):
         assert len(self.db.list_device_feature_association_by_room_id(room_deleted.id)) == 0
         try:
             self.db.del_room(12345678910)
-            TestCase.fail(self, "Room does not exist, an exception \
-                                 should have been raised")
+            TestCase.fail(self, "Room does not exist, an exception should have been raised")
         except DbHelperException:
             pass
 
     def test_list_and_get(self):
         area1 = self.db.add_area('area1','description 1')
-        room1 = self.db.add_room(r_name='room1', r_description='description 1',
-                                 r_area_id=area1.id)
+        room1 = self.db.add_room(r_name='room1', r_description='description 1', r_area_id=area1.id)
         assert self.db.get_room_by_name('Room1').name == 'room1'
 
         area2 = self.db.add_area('area2','description 2')
-        room2 = self.db.add_room(r_name='room2', r_description='description 2',
-                                 r_area_id=area1.id)
-        room3 = self.db.add_room(r_name='room3', r_description='description 3',
-                                 r_area_id=area2.id)
+        room2 = self.db.add_room(r_name='room2', r_description='description 2', r_area_id=area1.id)
+        room3 = self.db.add_room(r_name='room3', r_description='description 3',r_area_id=area2.id)
         assert len(self.db.get_all_rooms_of_area(area1.id)) == 2
         assert len(self.db.get_all_rooms_of_area(area2.id)) == 1
 
@@ -347,8 +328,7 @@ class DeviceUsageTestCase(GenericTestCase):
         assert du_del.id == du2_id
         try:
             self.db.del_device_usage(12345678910)
-            TestCase.fail(self, "Device usage does not exist, an exception \
-                                 should have been raised")
+            TestCase.fail(self, "Device usage does not exist, an exception should have been raised")
         except DbHelperException:
             pass
 
@@ -372,45 +352,36 @@ class DeviceTypeTestCase(GenericTestCase):
     def test_add(self):
         dt1 = self.db.add_device_technology('x10', 'x10', 'desc dt1')
         try:
-            self.db.add_device_type(dty_name='x10 Switch',
-                                    dty_description='desc1', dt_id=99999999999)
-            TestCase.fail(self, "An exception should have been raised : \
-                          device techno id does not exist")
+            self.db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=99999999999)
+            TestCase.fail(self, "An exception should have been raised : device techno id does not exist")
         except DbHelperException:
             pass
-        dty1 = self.db.add_device_type(dty_name='x10 Switch',
-                                       dty_description='desc1', dt_id=dt1.id)
+        dty1 = self.db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
         print dty1
         assert dty1.name == 'x10 Switch'
         assert dty1.description == 'desc1'
         assert dty1.device_technology_id == dt1.id
-        dty2 = self.db.add_device_type(dty_name='x10 Dimmer',
-                                       dty_description='desc2', dt_id=dt1.id)
+        dty2 = self.db.add_device_type(dty_name='x10 Dimmer', dty_description='desc2', dt_id=dt1.id)
         assert len(self.db.list_device_types()) == 2
         assert self.has_item(self.db.list_device_types(), ['x10 Switch', 'x10 Dimmer'])
 
     def test_update(self):
         dt1 = self.db.add_device_technology('x10', 'x10', 'desc dt1')
         dt2 = self.db.add_device_technology('plcbus', 'PLCBus', 'desc dt2')
-        dty = self.db.add_device_type(dty_name='x10 Switch',
-                                      dty_description='desc1', dt_id=dt1.id)
+        dty = self.db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
         try:
-            self.db.update_device_type(dty_id=dty.id, dty_name='x10 Dimmer',
-                                       dt_id=99999999999)
-            TestCase.fail(self, "An exception should have been raised : \
-                          device techno id does not exist")
+            self.db.update_device_type(dty_id=dty.id, dty_name='x10 Dimmer', dt_id=99999999999)
+            TestCase.fail(self, "An exception should have been raised : device techno id does not exist")
         except DbHelperException:
             pass
-        dty_u = self.db.update_device_type(dty_id=dty.id, dty_name='x10 Dimmer',
-                                           dt_id=dt2.id, dty_description='desc2')
+        dty_u = self.db.update_device_type(dty_id=dty.id, dty_name='x10 Dimmer', dt_id=dt2.id, dty_description='desc2')
         assert dty_u.name == 'x10 Dimmer'
         assert dty_u.description == 'desc2'
         assert dty_u.device_technology_id == dt2.id
 
     def test_list_and_get(self):
         dt1 = self.db.add_device_technology('x10', 'x10', 'desc dt1')
-        dty1 = self.db.add_device_type(dty_name='x10 Switch',
-                                       dty_description='desc1', dt_id=dt1.id)
+        dty1 = self.db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
         assert self.db.get_device_type_by_name('x10 switch').name == 'x10 Switch'
 
     def test_del(self):
@@ -424,8 +395,7 @@ class DeviceTypeTestCase(GenericTestCase):
         assert dty_del.id == dty2_id
         try:
             self.db.del_device_type(12345678910)
-            TestCase.fail(self, "Device type does not exist, an exception \
-                                 should have been raised")
+            TestCase.fail(self, "Device type does not exist, an exception should have been raised")
         except DbHelperException:
             pass
 
@@ -655,8 +625,7 @@ class DeviceTechnologyTestCase(GenericTestCase):
         dt2 = self.db.add_device_technology('x10', 'x10', 'desc dt2')
         dt3 = self.db.add_device_technology('plcbus', 'PLCBus', 'desc dt3')
         assert len(self.db.list_device_technologies()) == 3
-        assert self.has_item(self.db.list_device_technologies(),
-                             ['x10', '1-Wire', 'PLCBus'])
+        assert self.has_item(self.db.list_device_technologies(), ['x10', '1-Wire', 'PLCBus'])
 
     def test_update(self):
         dt = self.db.add_device_technology('x10', 'x10', 'desc dt1')
@@ -767,7 +736,7 @@ class DeviceTestCase(GenericTestCase):
         except DbHelperException:
             pass
         device1 = self.db.add_device(d_name='device1', d_address='A1',
-                    d_type_id=dty1.id, d_usage_id=du1.id, d_description='desc1')
+                                     d_type_id=dty1.id, d_usage_id=du1.id, d_description='desc1')
         print device1
         assert len(self.db.list_devices()) == 1
         device2 = self.db.add_device(d_name='device2', d_address='A2',
@@ -786,11 +755,11 @@ class DeviceTestCase(GenericTestCase):
         dty2 = self.db.add_device_type(dty_name='PLCBus Switch', dt_id=dt2.id,
                                        dty_description='Another beautiful switch')
         device1 = self.db.add_device(d_name='Toaster', d_address='A1',
-                    d_type_id=dty1.id, d_usage_id=du1.id, d_description='My new toaster')
+                                     d_type_id=dty1.id, d_usage_id=du1.id, d_description='My new toaster')
         device2 = self.db.add_device(d_name='Washing machine', d_address='A1',
-                    d_type_id=dty2.id, d_usage_id=du1.id, d_description='Laden')
+                                     d_type_id=dty2.id, d_usage_id=du1.id, d_description='Laden')
         device3 = self.db.add_device(d_name='Mixer', d_address='A2',
-                    d_type_id=dty2.id, d_usage_id=du1.id, d_description='Moulinex')
+                                     d_type_id=dty2.id, d_usage_id=du1.id, d_description='Moulinex')
         search_dev1 = self.db.get_device_by_technology_and_address(dt1.name, 'A1')
         assert search_dev1.name == 'Toaster'
         search_dev2 = self.db.get_device_by_technology_and_address(dt1.name, 'A2')
@@ -801,8 +770,7 @@ class DeviceTestCase(GenericTestCase):
         room1 = self.db.add_room('room1', area1.id)
         room2 = self.db.add_room('room2', area1.id)
         dt1 = self.db.add_device_technology('x10', 'x10', 'desc dt1')
-        dty1 = self.db.add_device_type(dty_name='x10 Switch',
-                                       dty_description='desc1', dt_id=dt1.id)
+        dty1 = self.db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
         du1 = self.db.add_device_usage('du1')
         device1 = self.db.add_device(d_name='device1', d_address='A1',
                     d_type_id=dty1.id, d_usage_id=du1.id, d_description='desc1')
@@ -831,9 +799,9 @@ class DeviceTestCase(GenericTestCase):
         du1 = self.db.add_device_usage('du1')
         du2 = self.db.add_device_usage('du2')
         device1 = self.db.add_device(d_name='device1', d_address='A1',
-                    d_type_id=dty1.id, d_usage_id=du1.id, d_description='desc1')
+                                     d_type_id=dty1.id, d_usage_id=du1.id, d_description='desc1')
         device2 = self.db.add_device(d_name='device2', d_address='A2',
-                    d_type_id=dty1.id, d_usage_id=du1.id, d_description='desc1')
+                                     d_type_id=dty1.id, d_usage_id=du1.id, d_description='desc1')
         device3 = self.db.add_device(d_name='device3', d_address='A3', d_type_id=dty1.id, d_usage_id=du1.id)
         device_del = device2
         device2_id = device2.id
@@ -857,8 +825,7 @@ class DeviceConfigTestCase(GenericTestCase):
     def __create_sample_device(self, device_name, device_technology_name):
         dt = self.db.add_device_technology(device_technology_name, 'a name', 'this is my device tech')
         du = self.db.add_device_usage("lighting")
-        dty = self.db.add_device_type(dty_name='x10 Switch',
-                                      dty_description='desc1', dt_id=dt.id)
+        dty = self.db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt.id)
         area = self.db.add_area('area1','description 1')
         room = self.db.add_room('room1', area.id)
         device = self.db.add_device(d_name=device_name, d_address = "A1", d_type_id=dty.id, d_usage_id=du.id)
@@ -1040,8 +1007,7 @@ class DeviceStatsTestCase(GenericTestCase):
 
     def test_del(self):
         dt1 = self.db.add_device_technology('x10', 'x10', 'this is x10')
-        dty1 = self.db.add_device_type(dty_name='x10 Switch',
-                                       dty_description='desc1', dt_id=dt1.id)
+        dty1 = self.db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
         du1 = self.db.add_device_usage("lighting")
         area1 = self.db.add_area('area1','description 1')
         room1 = self.db.add_room('room1', area1.id)
@@ -1170,12 +1136,10 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
             pass
         person2 = self.db.add_person(p_first_name='Marc', p_last_name='DELAMAIN',
                                      p_birthdate=datetime.date(1981, 4, 24))
-        user2 = self.db.add_user_account(a_login='lonely', a_password='boy',
-                                         a_person_id=person2.id, a_is_admin=True)
+        user2 = self.db.add_user_account(a_login='lonely', a_password='boy', a_person_id=person2.id, a_is_admin=True)
         person3 = self.db.add_person(p_first_name='Ali', p_last_name='CANTE')
         assert len(self.db.list_persons()) == 3
-        user3 = self.db.add_user_account(a_login='domo', a_password='gik',
-                                         a_person_id=person3.id, a_is_admin=True)
+        user3 = self.db.add_user_account(a_login='domo', a_password='gik', a_person_id=person3.id, a_is_admin=True)
         user4 = self.db.add_user_account_with_person(
                             a_login='jsteed', a_password='theavengers', a_person_first_name='John',
                             a_person_last_name='STEED', a_person_birthdate=datetime.date(1931, 4, 24),
@@ -1204,8 +1168,7 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
         assert self.db.change_password(user_acc.id, 'IwontGiveIt', 'OkIWill')
         assert not self.db.change_password(user_acc.id, 'DontKnow', 'foo')
 
-        user_acc_u = self.db.update_user_account(a_id=user_acc.id, a_new_login='mschneider2',
-                                                 a_is_admin=False)
+        user_acc_u = self.db.update_user_account(a_id=user_acc.id, a_new_login='mschneider2', a_is_admin=False)
         assert user_acc_u.password is None
         user_acc_msc = self.db.get_user_account_by_login_and_pass('mschneider2', 'OkIWill')
         assert user_acc_msc is not None
@@ -1262,12 +1225,9 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
                                      p_birthdate=datetime.date(1981, 4, 24))
         person3 = self.db.add_person(p_first_name='Alberto', p_last_name='MATE',
                                      p_birthdate=datetime.date(1947, 8, 6))
-        user1 = self.db.add_user_account(a_login='mschneider', a_password='IwontGiveIt',
-                                         a_person_id=person1.id)
-        user2 = self.db.add_user_account(a_login='lonely', a_password='boy',
-                                         a_person_id=person2.id)
-        user3 = self.db.add_user_account(a_login='domo', a_password='gik',
-                                         a_person_id=person3.id)
+        user1 = self.db.add_user_account(a_login='mschneider', a_password='IwontGiveIt', a_person_id=person1.id)
+        user2 = self.db.add_user_account(a_login='lonely', a_password='boy', a_person_id=person2.id)
+        user3 = self.db.add_user_account(a_login='domo', a_password='gik', a_person_id=person3.id)
         user3_id = user3.id
         user_acc_del = self.db.del_user_account(user3.id)
         assert user_acc_del.id == user3_id
@@ -1314,8 +1274,7 @@ class SystemStatsTestCase(GenericTestCase):
         sstat_list = []
         for i in range(4):
             ssv = {'ssv1': (i*2), 'ssv2': (i*3),}
-            sstat = self.db.add_system_stat("sstat%s" %i, 'localhost',
-                                now + datetime.timedelta(seconds=i), ssv)
+            sstat = self.db.add_system_stat("sstat%s" %i, 'localhost', now + datetime.timedelta(seconds=i), ssv)
             print sstat
             sstat_list.append(sstat)
         assert len(self.db.list_system_stats()) == 4
@@ -1417,8 +1376,7 @@ class UIItemConfigTestCase(GenericTestCase):
         assert len(self.db.list_all_ui_item_config()) == 4
         assert len(self.db.list_ui_item_config(ui_item_name='room')) == 3
         assert len(self.db.list_ui_item_config_by_ref(ui_item_name='room', ui_item_reference=1)) == 2
-        item=self.db.get_ui_item_config(ui_item_name='room',
-                                        ui_item_reference=2, ui_item_key='icon')
+        item=self.db.get_ui_item_config(ui_item_name='room', ui_item_reference=2, ui_item_key='icon')
         assert item.value == 'kitchen'
 
     def test_del(self):
@@ -1455,8 +1413,7 @@ class SystemConfigTestCase(GenericTestCase):
         del self.db
 
     def test_update(self):
-        system_config = self.db.update_system_config(s_simulation_mode=True,
-                                                     s_debug_mode=True)
+        system_config = self.db.update_system_config(s_simulation_mode=True, s_debug_mode=True)
         assert system_config.simulation_mode
         assert system_config.debug_mode
         system_config = self.db.update_system_config(s_simulation_mode=False)
