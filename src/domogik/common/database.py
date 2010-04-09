@@ -622,7 +622,7 @@ class DbHelper():
     def get_device_type_feature_by_id(self, dtf_id):
         """
         Return information about a device type feature
-        @param dtf_device_type_id : device type id
+        @param dtf_id : device type id
         @return a DeviceTypeFeature object
         """
         return self.__session.query(DeviceTypeFeature).filter_by(id=dtf_id).first()
@@ -1401,6 +1401,13 @@ class DbHelper():
 ####
 # Device stats
 ####
+    def list_all_device_stats(self):
+        """
+        Return a list of all device stats
+        @return a list of DeviceStats objects
+        """
+        return self.__session.query(DeviceStats).all()
+
     def list_device_stats(self, d_device_id):
         """
         Return a list of all stats for a device
@@ -1408,13 +1415,6 @@ class DbHelper():
         @return a list of DeviceStats objects
         """
         return self.__session.query(DeviceStats).filter_by(device_id=d_device_id).all()
-
-    def list_all_device_stats(self):
-        """
-        Return a list of all device stats
-        @return a list of DeviceStats objects
-        """
-        return self.__session.query(DeviceStats).all()
 
     def list_device_stats_values(self, d_device_stats_id):
         """
@@ -1424,6 +1424,37 @@ class DbHelper():
         """
         return self.__session.query(DeviceStatsValue)\
                              .filter_by(device_stats_id=d_device_stats_id).all()
+
+    def list_last_n_stats_of_device(self, d_device_id, number):
+        """
+        Get the N latest statistics of a device
+        @param d_device_id : device id
+        @param number : the number of statistics we want to retreive
+        @return a list of DeviceStat objects
+        """
+        return self.__session.query(DeviceStats)\
+                             .filter_by(device_id=d_device_id)\
+                             .order_by(sqlalchemy.desc(DeviceStats.date)).limit(number).all()
+
+    def list_stats_of_device_between(self, d_device_id, s_datetime=None, e_datetime=None):
+        """
+        Get statistics of a device between two dates (datetime format)
+        @param d_device_id : device id
+        @param s_datetime : datetime start, optional
+        @param e_datetime : datetime end, optional
+        @return a list of DeviceStat objects
+        """
+        query = self.__session.query(DeviceStats).filter_by(device_id=d_device_id)
+        if s_datetime:
+            query = query.filter("date >= '" + str(s_datetime) + "'")
+        if e_datetime:
+            # This is really ugly but if we don't do it d2 is excluded from the interval
+            # I suspect this is because the date is stored like this in the DB : '2010-04-09 12:04:00.000000'
+            # But in Python we have '2010-04-09 12:04:00', so maybe there is a precision problem
+            d2 = "'" + str(e_datetime + datetime.timedelta(microseconds=1)) + "'"
+            query = query.filter('date <= ' + d2)
+        query = query.order_by(sqlalchemy.desc(DeviceStats.date))
+        return query.all()
 
     def get_last_stat_of_device(self, d_device_id):
         """
