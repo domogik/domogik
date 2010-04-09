@@ -376,15 +376,10 @@ class Rest(xPLPlugin):
         """
         # Start HTTP server
         self._log.info("Start HTTP Server on %s:%s..." % (self.server_ip, self.server_port))
-        # debug for HTTPS : TODO : delete
-        print "use_ssl = %s" % self.use_ssl
 
         if self.use_ssl:
             server = HTTPSServerWithParam((self.server_ip, int(self.server_port)), RestHandler, \
                                          handler_params = [self])
-            #sa = server.socket.getsocketname()
-            # debug for HTTPS : TODO : delete
-            #print "Serving HTTP(S) on", sa[0], "port", sa[1], "..."
         else:
             server = HTTPServerWithParam((self.server_ip, int(self.server_port)), RestHandler, \
                                          handler_params = [self])
@@ -1587,7 +1582,11 @@ target=*
             @return parameter value or None if parameter doesn't exist
         """
         try:
-            return unicode(urllib.unquote(self.parameters[name]), sys.stdin.encoding)
+            data = self.parameters[name]
+            if data == None:
+                return None
+            else:
+                return unicode(urllib.unquote(data), sys.stdin.encoding)
         except KeyError:
             return None
 
@@ -2153,7 +2152,6 @@ target=*
                                          self.get_parameters("address"), \
                                          self.get_parameters("type_id"), \
                                          self.get_parameters("usage_id"), \
-                                         self.get_parameters("room_id"), \
                                          self.get_parameters("description"), \
                                          self.get_parameters("reference"))
             json_data.add_data(device)
@@ -2174,7 +2172,6 @@ target=*
                                          self.get_parameters("address"), \
                                          self.get_parameters("type_id"), \
                                          self.get_parameters("usage_id"), \
-                                         self.get_parameters("room_id"), \
                                          self.get_parameters("description"), \
                                          self.get_parameters("reference"))
             json_data.add_data(device)
@@ -2289,11 +2286,11 @@ target=*
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("feature_association")
         try:
-            device = self._db.add_device_type_feature_association(self.get_parameters("device_id"), \
-                                                                  self.get_parameters("feature_id"), \
-                                                                  self.get_parameters("association_type"), \
-                                                                  self.get_parameters("association_id"))
-            json_data.add_data(device)
+            ass = self._db.add_device_type_feature_association(self.get_parameters("device_id"), \
+                                                               self.get_parameters("feature_id"), \
+                                                               self.get_parameters("association_type"), \
+                                                               self.get_parameters("association_id"))
+            json_data.add_data(ass)
         except:
             json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
@@ -3071,29 +3068,33 @@ class JSonHelper():
 
         # issue to force data not to be in cache
         # TODO : update when all tables will be defined!!!
-        if hasattr(data, "id") \
-           or hasattr(data, "actuatorfeature") \
-           or hasattr(data, "area") \
-           or hasattr(data, "device") \
-           or hasattr(data, "deviceusage") \
-           or hasattr(data, "deviceconfig") \
-           or hasattr(data, "devicestats") \
-           or hasattr(data, "devicestatsvalue") \
-           or hasattr(data, "devicetechnology") \
-           or hasattr(data, "pluginconfig") \
-           or hasattr(data, "devicetype") \
-           or hasattr(data, "uiitemconfig") \
-           or hasattr(data, "room") \
-           or hasattr(data, "useraccount") \
-           or hasattr(data, "sensorreferencedata") \
-           or hasattr(data, "person") \
-           or hasattr(data, "systemconfig") \
-           or hasattr(data, "systemstats") \
-           or hasattr(data, "systemstatsvalue") \
-           or hasattr(data, "trigger"):
-            print "(!2)"
-            pass
+        table_list = ["actuator_feature",  \
+                     "area",  \
+                     "device",  \
+                     "device_usage",  \
+                     "device_config",  \
+                     "device_feature_association",  \
+                     "devicestats",  \
+                     "device_stats_value",  \
+                     "device_technology",  \
+                     "plugin_config",  \
+                     "device_type",  \
+                     "uiitemconfig",  \
+                     "room",  \
+                     "useraccount",  \
+                     "sensor_reference_data",  \
+                     "person",  \
+                     "system_config",  \
+                     "system_stats",  \
+                     "system_statsvalue", \
+                     "id", \
+                     "device_id", \
+                     "name"]
 
+        for table in table_list:
+            if hasattr(data, table):
+                pass
+      
         if data == None:
             return
 
@@ -3117,7 +3118,8 @@ class JSonHelper():
                    "DeviceTechnology", "PluginConfig", \
                    "DeviceType", "UIItemConfig", "Room", "UserAccount", \
                    "SensorReferenceData", "Person", "SystemConfig", \
-                   "SystemStats", "SystemStatsValue", "Trigger") 
+                   "SystemStats", "SystemStatsValue", "Trigger", \
+                   "DeviceFeatureAssociation") 
         instance_type = ("instance")
         num_type = ("int", "float")
         str_type = ("str", "unicode", "bool", "datetime", "date")
@@ -3130,12 +3132,6 @@ class JSonHelper():
 
         # get data type
         data_type = type(data).__name__
-
-        # dirty issue to force cache of __dict__  
-        #print "DATA : " + unicode(data).encode('utf-8')
-        #print "DATA : " + unicode(data, sys.stdin.encoding).encode('utf-8')
-        #print "DATA : " + str(data)
-        #print "DATA TYPE : " + data_type
 
         ### type instance (sql object)
         if data_type in instance_type:
@@ -3280,7 +3276,6 @@ class JSonHelper():
 
         if self._jsonp is True and self._jsonp_cb != "":
             json_buf += ")"
-        #print json_buf.encode("utf-8")
         return json_buf
         
     
