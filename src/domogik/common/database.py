@@ -1187,8 +1187,7 @@ class DbHelper():
         @param d_room_id: room id
         @return a list of Device objects
         """
-        return self.__session.query(Device)\
-                             .filter_by(room_id=d_room_id).all()
+        return self.__session.query(Device).filter_by(room_id=d_room_id).all()
 
     def get_all_devices_of_area(self, d_area_id):
         """
@@ -1208,17 +1207,7 @@ class DbHelper():
         @param du_id: usage id
         @return a list of Device objects
         """
-        return self.__session.query(Device)\
-                             .filter_by(usage_id=du_id).all()
-
-    def get_all_devices_of_technology(self, dt_id):
-        """
-        Returns all the devices of a technology
-        @param dt_id : technology id
-        @return a list of Device objects
-        """
-        return self.__session.query(Device)\
-                             .filter_by(technology_id=dt_id).all()
+        return self.__session.query(Device).filter_by(usage_id=du_id).all()
 
     def add_device(self, d_name, d_address, d_type_id, d_usage_id, d_description=None, d_reference=None):
         """
