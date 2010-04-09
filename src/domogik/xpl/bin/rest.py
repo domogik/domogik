@@ -261,9 +261,8 @@ class Rest(xPLPlugin):
 
 
 
-        except KeyError:
-            self._log.error("%s" % sys.exc_info()[1])
-            print("%s" % sys.exc_info()[1])
+        except :
+            self._log.error("%s" % self.get_exception())
   
   
 
@@ -409,6 +408,17 @@ class Rest(xPLPlugin):
 
 
 
+    def get_exception(self):
+        # TODO : finish exception take in count
+        my_exception =  str(traceback.format_exc()).replace('"', "'").replace('\n', '      ')
+        print "==== Error in REST ===="
+        print my_exception
+        print "======================="
+        return my_exception
+
+
+
+
 ################################################################################
 # HTTP
 class HTTPServerWithParam(HTTPServer):
@@ -449,7 +459,7 @@ class HTTPSServerWithParam(SocketServer.ThreadingMixIn, HTTPServer):
             self.socket = SSL.Connection(ctx, socket.socket(self.address_family,
                                                         self.socket_type))
         except:
-            error = "SSL error : %s. Did you generate certificate ?" % sys.exc_info()[1]
+            error = "SSL error : %s. Did you generate certificate ?" % self.handler_params[0].get_exception()
             print error
             self.handler_params[0]._log.error(error)
             # force exiting
@@ -484,7 +494,6 @@ class RestHandler(BaseHTTPRequestHandler):
         """
         use_ssl = self.server.handler_params[0].use_ssl
         if use_ssl == True:
-            print "(!)"
             self.connection = self.request
             self.rfile = socket._fileobject(self.request, "rb", self.rbufsize)
             self.wfile = socket._fileobject(self.request, "wb", self.wbufsize)
@@ -1544,7 +1553,7 @@ target=*
             try:
                 my_date = datetime.date(year, month, day)
             except:
-                self.send_http_response_error(999, str(sys.exc_info()[1]).replace('"', "'"), self.jsonp, self.jsonp_cb)
+                self.send_http_response_error(999, self.get_exception(), self.jsonp, self.jsonp_cb)
         elif len(date) == 13:  # YYYYMMDD-HHMM
             year = int(date[0:4])
             month = int(date[4:6])
@@ -1554,7 +1563,7 @@ target=*
             try:
                 my_date = datetime.datetime(year, month, day, hour, minute)
             except:
-                self.send_http_response_error(999, str(sys.exc_info()[1]).replace('"', "'"), self.jsonp, self.jsonp_cb)
+                self.send_http_response_error(999, self.get_exception(), self.jsonp, self.jsonp_cb)
         else:
                 self.send_http_response_error(999, "Bad date format (YYYYMMDD or YYYYMMDD-HHMM required", self.jsonp, self.jsonp_cb)
         return my_date
@@ -1606,7 +1615,7 @@ target=*
             area = self._db.add_area(self.get_parameters("name"), self.get_parameters("description"))
             json_data.add_data(area)
         except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+            json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
 
 
@@ -1641,7 +1650,7 @@ target=*
             area = self._db.del_area(area_id)
             json_data.add_data(area)
         except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+            json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
 
 
@@ -1700,7 +1709,7 @@ target=*
                                      self.get_parameters("description"))
             json_data.add_data(room)
         except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+            json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
 
 
@@ -1716,7 +1725,7 @@ target=*
                                         self.get_parameters("area_id"), self.get_parameters("description"))
             json_data.add_data(room)
         except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+            json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
 
 
@@ -1732,7 +1741,7 @@ target=*
             room = self._db.del_room(room_id)
             json_data.add_data(room)
         except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+            json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
 
 
@@ -1784,7 +1793,7 @@ target=*
                                                          self.get_parameters("value"))
             json_data.add_data(ui_item_config)
         except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+            json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
 
 
@@ -1800,7 +1809,7 @@ target=*
                                                          ui_reference = reference, ui_key = key):
                 json_data.add_data(ui_item_config)
         except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+            json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
 
 
@@ -1840,7 +1849,7 @@ target=*
                                                      self.get_parameters("default_options"))
             json_data.add_data(device_usage)
         except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+            json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
 
 
@@ -1858,7 +1867,7 @@ target=*
                                                         self.get_parameters("default_options"))
             json_data.add_data(device_usage)
         except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+            json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
 
 
@@ -1875,7 +1884,7 @@ target=*
             device_usage = self._db.del_device_usage(du_id)
             json_data.add_data(device_usage)
         except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+            json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
 
 
@@ -1907,7 +1916,7 @@ target=*
                                                    self.get_parameters("description"))
             json_data.add_data(device_type)
         except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+            json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
 
 
@@ -1925,7 +1934,7 @@ target=*
                                                self.get_parameters("description"))
             json_data.add_data(area)
         except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+            json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
 
 
@@ -1942,7 +1951,7 @@ target=*
             device_type = self._db.del_device_type(dt_id)
             json_data.add_data(device_type)
         except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+            json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
 
 
@@ -2023,7 +2032,7 @@ target=*
                                                                   self.get_parameters("description"))
             json_data.add_data(device_technology)
         except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+            json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
 
 
@@ -2039,7 +2048,7 @@ target=*
                                                                   self.get_parameters("description"))
             json_data.add_data(device_technology)
         except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+            json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
 
 
@@ -2054,7 +2063,7 @@ target=*
             device_technology = self._db.del_device_technology(dt_id)
             json_data.add_data(device_technology)
         except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+            json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
 
 
@@ -2094,7 +2103,7 @@ target=*
                                          self.get_parameters("reference"))
             json_data.add_data(device)
         except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+            json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
 
 
@@ -2115,7 +2124,7 @@ target=*
                                          self.get_parameters("reference"))
             json_data.add_data(device)
         except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+            json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
 
 
@@ -2130,7 +2139,7 @@ target=*
             device = self._db.del_device(id)
             json_data.add_data(device)
         except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+            json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
 
 
@@ -2464,7 +2473,7 @@ target=*
                                                 self.get_parameters("value"))
             json_data.add_data(plugin)
         except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+            json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
 
 
@@ -2480,7 +2489,7 @@ target=*
             for plugin in self._db.del_plugin_config(id):
                 json_data.add_data(plugin)
         except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+            json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
 
 
@@ -2689,7 +2698,7 @@ target=*
                                                     self.get_parameters("skin_used"))
                 json_data.add_data(account)
         except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+            json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
 
 
@@ -2720,7 +2729,7 @@ target=*
                                                     self.get_parameters("skin_used"))
                 json_data.add_data(account)
         except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+            json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
 
 
@@ -2760,7 +2769,7 @@ target=*
             account = self._db.del_user_account(id)
             json_data.add_data(account)
         except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+            json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
 
 
@@ -2795,7 +2804,7 @@ target=*
                                          self.to_date(self.get_parameters("birthday")))
             json_data.add_data(person)
         except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+            json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
 
 
@@ -2813,7 +2822,7 @@ target=*
                                             self.to_date(self.get_parameters("birthday")))
             json_data.add_data(person)
         except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+            json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
 
 
@@ -2829,7 +2838,7 @@ target=*
             person = self._db.del_person(id)
             json_data.add_data(person)
         except:
-            json_data.set_error(code = 999, description = str(sys.exc_info()[1]).replace('"', "'"))
+            json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
 
 
@@ -2891,10 +2900,29 @@ class JSonHelper():
         data_out = ""
         self._nb_data_values += 1
 
-        # dirty issue to force data not to be in cache
-        if hasattr(data, 'id') or hasattr(data, 'item_reference'):    # for all
-            pass
-        if hasattr(data, 'area'):  # for room
+        # issue to force data not to be in cache
+        # TODO : update when all tables will be defined!!!
+        if hasattr(data, "id") \
+           or hasattr(data, "actuatorfeature") \
+           or hasattr(data, "area") \
+           or hasattr(data, "device") \
+           or hasattr(data, "deviceusage") \
+           or hasattr(data, "deviceconfig") \
+           or hasattr(data, "devicestats") \
+           or hasattr(data, "devicestatsvalue") \
+           or hasattr(data, "devicetechnology") \
+           or hasattr(data, "pluginconfig") \
+           or hasattr(data, "devicetype") \
+           or hasattr(data, "uiitemconfig") \
+           or hasattr(data, "room") \
+           or hasattr(data, "useraccount") \
+           or hasattr(data, "sensorreferencedata") \
+           or hasattr(data, "person") \
+           or hasattr(data, "systemconfig") \
+           or hasattr(data, "systemstats") \
+           or hasattr(data, "systemstatsvalue") \
+           or hasattr(data, "trigger"):
+            print "(!2)"
             pass
 
         if data == None:
@@ -2935,8 +2963,10 @@ class JSonHelper():
         data_type = type(data).__name__
 
         # dirty issue to force cache of __dict__  
-        print "DATA : " + unicode(data).encode('utf-8')
-        print "DATA TYPE : " + data_type
+        #print "DATA : " + unicode(data).encode('utf-8')
+        #print "DATA : " + unicode(data, sys.stdin.encoding).encode('utf-8')
+        #print "DATA : " + str(data)
+        #print "DATA TYPE : " + data_type
 
         ### type instance (sql object)
         if data_type in instance_type:
