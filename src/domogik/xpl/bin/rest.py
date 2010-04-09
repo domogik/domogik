@@ -3250,7 +3250,10 @@ class JSonHelper():
         data_tmp = ""
         if sub_data_type in db_type: 
             if is_table is False:  # and idx != 0: 
-                data_tmp = '"%s" : ' % sub_data_type.lower() 
+                display_sub_data_type = re.sub(r"([^^])([A-Z][a-z])",
+                             r"\1_\2",
+                             sub_data_type).lower()
+                data_tmp = '"%s" : ' % display_sub_data_type
             data_tmp += self._process_data(sub_data, idx)
         elif sub_data_type in instance_type:
             data_tmp += self._process_data(sub_data, idx)
