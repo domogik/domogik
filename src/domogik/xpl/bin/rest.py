@@ -619,6 +619,7 @@ class ProcessRequest():
 
         self._queue_timeout =  self.handler_params[0]._queue_timeout
         self._queue_size =  self.handler_params[0]._queue_size
+        self._queue_command_size =  self.handler_params[0]._queue_command_size
         self._queue_life_expectancy = self.handler_params[0]._queue_life_expectancy
       
         self._get_from_queue = self.handler_params[0]._get_from_queue
@@ -757,6 +758,19 @@ class ProcessRequest():
         xml_info = xml_info[0:len(xml_info)-2]
         json_data.add_data({"XML files loaded" : xml_info})
         json_data.add_data({"XML files last load" : self.xml_date})
+
+        # Queues stats
+
+        json_data.add_data({"Queue 'system_list' usage" : "%s/%s" \
+            % (self._queue_system_list.qsize(), int(self._queue_size))})
+        json_data.add_data({"Queue 'system_detail' usage" : "%s/%s" \
+            % (self._queue_system_detail.qsize(), int(self._queue_size))})
+        json_data.add_data({"Queue 'system_start' usage" : "%s/%s" \
+            % (self._queue_system_start.qsize(), int(self._queue_size))})
+        json_data.add_data({"Queue 'system_stop' usage" : "%s/%s" \
+            % (self._queue_system_stop.qsize(), int(self._queue_size))})
+        json_data.add_data({"Queue 'command' usage" : "%s/%s" \
+            % (self._queue_command.qsize(), int(self._queue_command_size))})
 
         self.send_http_response_ok(json_data.get())
 
