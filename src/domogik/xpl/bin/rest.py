@@ -618,6 +618,7 @@ class ProcessRequest():
         self._log_dm = self.handler_params[0]._log_dm
         self._xml_directory = self.handler_params[0]._xml_directory
         self.use_ssl = self.handler_params[0].use_ssl
+        self.get_exception = self.handler_params[0].get_exception
 
         self._log.debug("Process request : init")
 
