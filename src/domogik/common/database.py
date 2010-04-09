@@ -937,6 +937,10 @@ class DbHelper():
         @return the DeviceFeatureAssociation object
         """
         self.__session.expire_all()
+        if not self.__session.query(Device).filter_by(id=d_device_id).first():
+            raise DbHelperException("Device id %s doesn't exist" % d_device_id)
+        if not self.__session.query(DeviceTypeFeature).filter_by(id=d_type_feature_id).first():
+            raise DbHelperException("DeviceTypeFeature id %s doesn't exist" % d_type_feature_id)
         if d_place_type not in DEVICE_FEATURE_ASSOCIATION_LIST:
             raise DbHelperException("Place type should be one of : %s" % DEVICE_FEATURE_ASSOCIATION_LIST)
         if d_place_type is None and d_place_id is not None:
@@ -945,15 +949,12 @@ class DbHelper():
             raise DbHelperException("A place id should have been provided, place type is %s" % d_place_type)
         if d_place_id is not None and d_place_type != 'house':
             if d_place_type == 'room':
-                try:
-                    self.__session.query(Room).filter_by(id=d_place_id).one()
-                except NoResultFound:
-                    raise DbHelperException("Couldn't add device with room id %s It does not exist" % d_place_id)
+                if not self.__session.query(Room).filter_by(id=d_place_id).first():
+                    raise DbHelperException("Room id %s It does not exist" % d_place_id)
             else: # it is an area
-                try:
-                    self.__session.query(Area).filter_by(id=d_place_id).one()
-                except NoResultFound:
+                if not self.__session.query(Area).filter_by(id=d_place_id).first():
                     raise DbHelperException("Couldn't add device with area id %s It does not exist" % d_place_id)
+
         device_feature_asso = DeviceFeatureAssociation(device_id=d_device_id, device_type_feature_id=d_type_feature_id,
                                                        place_type=ucode(d_place_type), place_id=d_place_id)
         self.__session.add(device_feature_asso)
