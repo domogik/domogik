@@ -244,7 +244,6 @@ class DbHelper():
         self.__session.expire_all()
         area = self.__session.query(Area).filter_by(id=area_del_id).first()
         if area:
-            area_d = area
             if cascade_delete:
                 for room in self.__session.query(Room).filter_by(area_id=area_del_id).all():
                     self.del_room(room.id, True)
@@ -258,7 +257,7 @@ class DbHelper():
             except Exception, sql_exception:
                 self.__session.rollback()
                 raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-            return area_d
+            return area
         else:
             raise DbHelperException("Couldn't delete area with id %s : it doesn't exist" % area_del_id)
 
@@ -387,7 +386,6 @@ class DbHelper():
         self.__session.expire_all()
         room = self.__session.query(Room).filter_by(id=r_id).first()
         if room:
-            room_d = room
             if cascade_delete:
                 for device in self.__session.query(Device).filter_by(room_id=r_id).all():
                     self.del_device(device.id)
@@ -401,7 +399,7 @@ class DbHelper():
             except Exception, sql_exception:
                 self.__session.rollback()
                 raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-            return room_d
+            return room
         else:
             raise DbHelperException("Couldn't delete room with id %s : it doesn't exist" % r_id)
 
@@ -490,7 +488,6 @@ class DbHelper():
         self.__session.expire_all()
         du = self.__session.query(DeviceUsage).filter_by(id=du_id).first()
         if du:
-            du_d = du
             if cascade_delete:
                 for device in self.__session.query(Device).filter_by(device_usage_id=du.id).all():
                     self.del_device(device.id)
@@ -505,7 +502,7 @@ class DbHelper():
             except Exception, sql_exception:
                 self.__session.rollback()
                 raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-            return du_d
+            return du
         else:
             raise DbHelperException("Couldn't delete device usage with id %s : it doesn't exist" % du_id)
 
@@ -590,7 +587,6 @@ class DbHelper():
         self.__session.expire_all()
         dty = self.__session.query(DeviceType).filter_by(id=dty_id).first()
         if dty:
-            dty_d = dty
             if cascade_delete:
                 for device in self.__session.query(Device).filter_by(device_type_id=dty.id).all():
                     self.del_device(device.id)
@@ -609,7 +605,7 @@ class DbHelper():
             except Exception, sql_exception:
                 self.__session.rollback()
                 raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-            return dty_d
+            return dty
         else:
             raise DbHelperException("Couldn't delete device type with id %s : it doesn't exist" % dty_id)
 
@@ -1057,7 +1053,6 @@ class DbHelper():
         self.__session.expire_all()
         dt = self.__session.query(DeviceTechnology).filter_by(id=dt_id).first()
         if dt:
-            dt_d = dt
             if cascade_delete:
                 for device_type in self.__session.query(DeviceType).filter_by(device_technology_id=dt.id).all():
                     self.del_device_type(device_type.id, cascade_delete=True)
@@ -1072,7 +1067,7 @@ class DbHelper():
             except Exception, sql_exception:
                 self.__session.rollback()
                 raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-            return dt_d
+            return dt
         else:
             raise DbHelperException("Couldn't delete device technology with id %s : it doesn't exist" % dt_id)
 
@@ -1140,8 +1135,7 @@ class DbHelper():
         plugin_key_list = self.__session.query(PluginConfig).filter_by(plugin_name=ucode(pl_name)).all()
         pl_key_deleted_list = []
         for plugin_key in plugin_key_list:
-            plugin_key_d = plugin_key
-            pl_key_deleted_list.append(plugin_key_d)
+            pl_key_deleted_list.append(plugin_key)
             self.__session.delete(plugin_key)
             try:
                 self.__session.commit()
@@ -1316,12 +1310,8 @@ class DbHelper():
         device = self.__session.query(Device).filter_by(id=d_id).first()
         if device is None:
             raise DbHelperException("Device with id %s couldn't be found" % d_id)
-
-        device_d = device
-        for device_conf in self.__session.query(DeviceConfig)\
-                                         .filter_by(device_id=d_id).all():
+        for device_conf in self.__session.query(DeviceConfig).filter_by(device_id=d_id).all():
             self.__session.delete(device_conf)
-
         for device_stats in self.__session.query(DeviceStats).filter_by(device_id=d_id).all():
             for device_stats_value in self.__session.query(DeviceStatsValue)\
                                                     .filter_by(device_stats_id=device_stats.id).all():
@@ -1335,7 +1325,7 @@ class DbHelper():
         except Exception, sql_exception:
             self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-        return device_d
+        return device
 
 ####
 # Device config
@@ -1417,8 +1407,7 @@ class DbHelper():
         @param d_device_id : the device id
         @return a list of DeviceStats objects
         """
-        return self.__session.query(DeviceStats)\
-                             .filter_by(device_id=d_device_id).all()
+        return self.__session.query(DeviceStats).filter_by(device_id=d_device_id).all()
 
     def list_all_device_stats(self):
         """
@@ -1510,7 +1499,6 @@ class DbHelper():
         self.__session.expire_all()
         device_stat = self.__session.query(DeviceStats).filter_by(id=ds_id).first()
         if device_stat:
-            device_stat_d = device_stat
             self.__session.delete(device_stat)
             for device_stats_value in self.__session.query(DeviceStatsValue) \
                                                     .filter_by(device_stats_id=device_stat.id).all():
@@ -1520,7 +1508,7 @@ class DbHelper():
             except Exception, sql_exception:
                 self.__session.rollback()
                 raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-            return device_stat_d
+            return device_stat
         else:
             raise DbHelperException("Couldn't delete device stat with id %s : it doesn't exist" % ds_id)
 
@@ -1621,14 +1609,13 @@ class DbHelper():
         self.__session.expire_all()
         trigger = self.__session.query(Trigger).filter_by(id=t_id).first()
         if trigger:
-            trigger_d = trigger
             self.__session.delete(trigger)
             try:
                 self.__session.commit()
             except Exception, sql_exception:
                 self.__session.rollback()
                 raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-            return trigger_d
+            return trigger
         else:
             raise DbHelperException("Couldn't delete trigger with id %s : it doesn't exist" % t_id)
 
@@ -1875,14 +1862,13 @@ class DbHelper():
         self.__session.expire_all()
         user_account = self.__session.query(UserAccount).filter_by(id=a_id).first()
         if user_account:
-            user_account_d = user_account
             self.__session.delete(user_account)
             try:
                 self.__session.commit()
             except Exception, sql_exception:
                 self.__session.rollback()
                 raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-            return user_account_d
+            return user_account
         else:
             raise DbHelperException("Couldn't delete user account with id %s : it doesn't exist" % a_id)
 
@@ -1964,14 +1950,13 @@ class DbHelper():
             user = self.__session.query(UserAccount).filter_by(person_id=p_id).first()
             if user is not None:
                 self.__session.delete(user)
-            person_d = person
             self.__session.delete(person)
             try:
                 self.__session.commit()
             except Exception, sql_exception:
                 self.__session.rollback()
                 raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-            return person_d
+            return person
         else:
             raise DbHelperException("Couldn't delete person with id %s : it doesn't exist" % p_id)
 
@@ -2040,7 +2025,6 @@ class DbHelper():
         self.__session.expire_all()
         system_stat = self.__session.query(SystemStats).filter_by(name=ucode(s_name)).first()
         if system_stat:
-            system_stat_d = system_stat
             system_stats_values = self.__session.query(SystemStatsValue)\
                                                 .filter_by(system_stats_id=system_stat.id).all()
             for ssv in system_stats_values:
@@ -2051,7 +2035,7 @@ class DbHelper():
             except Exception, sql_exception:
                 self.__session.rollback()
                 raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-            return system_stat_d
+            return system_stat
         else:
             raise DbHelperException("Couldn't delete system stat %s : it doesn't exist" % s_name)
 
