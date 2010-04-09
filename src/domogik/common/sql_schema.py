@@ -579,8 +579,7 @@ class DeviceConfig(Base):
     __tablename__ = '%s_device_config' % _db_prefix
     key = Column(String(30), primary_key=True)
     value = Column(Unicode(255), nullable=False)
-    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()),
-                       primary_key=True)
+    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), primary_key=True)
     device = relation(Device, backref=backref(__tablename__))
 
     def __init__(self, key, device_id, value):
@@ -616,8 +615,7 @@ class DeviceStats(Base):
     """
     __tablename__ = '%s_device_stats' % _db_prefix
     id = Column(Integer, primary_key=True)
-    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()),
-                       nullable=False)
+    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), nullable=False)
     device = relation(Device, backref=backref(__tablename__))
     date = Column(DateTime, nullable=False)
 
