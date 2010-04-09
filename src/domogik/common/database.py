@@ -1167,38 +1167,6 @@ class DbHelper():
         """
         return self.__session.query(Device).all()
 
-    def search_devices(self, filters):
-        """
-        Look for device(s) with filter on their attributes
-        @param filters :  filter fields can be one of id, address, type, room, initial_value,
-                          is_value_changeable_by_user, unit_of_stored_values.
-        @return a list of Device objects
-        """
-        assert type(filters) is DictType
-
-        device_list = self.__session.query(Device)
-        for filter in filters:
-            filter_arg = "%s = '%s'" % (filter, self.__to_unicode(filters[filter]))
-            device_list = device_list.filter(filter_arg)
-        return device_list.all()
-
-    def find_devices(self, d_room_id_list, d_usage_id_list):
-        """
-        Look for devices that have at least 1 item in room_id_list AND 1 item in usage_id_list
-        @param room_id_list : list of room ids
-        @param usage_id_list : list of usage ids
-        @return a list of DeviceObject items
-        """
-        assert type(d_room_id_list) is ListType or type(d_room_id_list) is NoneType
-        assert type(d_usage_id_list) is ListType or type(d_usage_id_list) is NoneType
-
-        device_list = self.__session.query(Device)
-        if d_room_id_list is not None and len(d_room_id_list) != 0:
-            device_list = device_list.filter(Device.room_id.in_(d_room_id_list))
-        if d_usage_id_list is not None and len(d_usage_id_list) != 0:
-            device_list = device_list.filter(Device.device_usage_id.in_(d_usage_id_list))
-        return device_list.all()
-
     def get_device(self, d_id):
         """
         Return a device by its id

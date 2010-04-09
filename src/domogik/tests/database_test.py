@@ -820,51 +820,6 @@ class DeviceTestCase(GenericTestCase):
         device1 = self.db.update_device(d_id=device1.id, d_reference='')
         assert device1.reference == None
 
-    def testFindAndSearch(self):
-        """
-        area1 = self.db.add_area('area1','description 1')
-        area2 = self.db.add_area('area2','description 2')
-        room1 = self.db.add_room('room1', area1.id)
-        room2 = self.db.add_room('room2', area2.id)
-        dt1 = self.db.add_device_technology('x10', 'x10', 'desc dt1')
-        dty1 = self.db.add_device_type(dty_name='x10 Switch',
-                                       dty_description='desc1', dt_id=dt1.id)
-        dty2 = self.db.add_device_type(dty_name='x10 Dimmer',
-                                       dty_description='desc1', dt_id=dt1.id)
-        du1 = self.db.add_device_usage('du1')
-        du2 = self.db.add_device_usage('du2')
-        dtf1 = self.db.add_device_type_feature(dtf_name='Switch', dtf_feature_type='actuator',
-                                               dtf_device_type_id=dty1.id, dtf_parameters='myparams1')
-        device1 = self.db.add_device(d_name='device1', d_address = 'A1',
-                    d_type_id = dty1.id, d_usage_id = du1.id,
-                    d_room_id = room1.id, d_description = 'desc1')
-        device2 = self.db.add_device(d_name='device2', d_address='A2',
-                    d_type_id = dty2.id, d_usage_id=du1.id, d_room_id=room1.id)
-        device3 = self.db.add_device(d_name='device3', d_address='A3',
-                    d_type_id = dty2.id, d_usage_id=du2.id, d_room_id=room2.id)
-
-        assert len(self.db.list_devices()) == 3
-        assert len(self.db.get_all_devices_of_room(room1.id)) == 2
-        assert len(self.db.get_all_devices_of_room(room2.id)) == 1
-        assert len(self.db.get_all_devices_of_area(area1.id)) == 2
-        assert len(self.db.get_all_devices_of_area(area2.id)) == 1
-
-        assert len(self.db.search_devices({'usage_id':du1.id,
-                                          'room_id':room1.id})) == 2
-        assert len(self.db.search_devices({'address':'A2'})) == 1
-        assert len(self.db.search_devices({'address':'A1544'})) == 0
-
-        assert len(self.db.find_devices(None, None)) == 3
-        assert len(self.db.find_devices([], [])) == 3
-        assert len(self.db.find_devices([room1.id, room2.id],
-                                        [du1.id, du2.id])) == 3
-        assert len(self.db.find_devices([room1.id], [du1.id, du2.id])) == 2
-        assert len(self.db.find_devices([room2.id], None)) == 1
-        assert len(self.db.find_devices([room2.id], [])) == 1
-        assert len(self.db.find_devices([room1.id], [du2.id])) == 0
-        assert len(self.db.find_devices([room1.id, room2.id], [du2.id])) == 1
-        """
-
     def test_del(self):
         area1 = self.db.add_area('area1','description 1')
         area2 = self.db.add_area('area2','description 2')
