@@ -624,6 +624,7 @@ class DeviceFeatureAssociationTestCase(GenericTestCase):
                                                            d_place_id=area1.id, d_place_type='area')
         dfa = self.db.del_device_feature_association(d_device_id=dfa1.device_id,
                                                      d_type_feature_id=dfa1.device_type_feature_id)
+        assert dfa.device_id == dfa1.device_id and dfa.device_type_feature_id == dfa1.device_type_feature_id
         assert len(self.db.list_device_feature_association()) == 2
         assert len(self.db.list_device_feature_association_by_room_id(room1.id)) == 1
         assert len(self.db.list_device_feature_association_by_area_id(area1.id)) == 1
