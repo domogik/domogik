@@ -48,7 +48,7 @@
             content: "{% trans "Please confirm to delete" %}"
         });
 
-        $('#devicedialog').dialog_form({
+        $('#deviceadddialog').dialog_form({
             tips: "{% trans "All fields are required." %}",
             tipsid: 'tipsDevice',
             fields: [
@@ -81,9 +81,28 @@
                 }}
             ]
         });
+        
+        $('#deviceupddialog').dialog_form({
+            tips: "{% trans "All fields are required." %}",
+            tipsid: 'tipsDevice',
+            fields: [
+                {name : 'devicename', type:'text', label:'Name', required: true, option: {min: 1, max: 80}},
+                {name : 'devicedescription', type:'text', label:'Description', required: true, option: {min: 1, max: 80}},
+                {name : 'deviceaddress', type:'text', label:'Address', required: true, option: {min: 1, max: 80}},
+                {name : 'devicereference', type:'text', label:'Reference', required: true, option: {min: 1, max: 80}},
+                {name : 'deviceusage', type:'select', label:'Usage', required: true, option: {
+                    initial: {value:'0', label:'Choose an usage'},
+                    options: [
+                    {% for usage in usages_list %}
+                        {value:'{{ usage.id }}', label: '{{ usage.name }}'},
+                    {% endfor %}
+                    ]
+                }}
+            ]
+        });
 
         /* Add a function to create a device */
-        $('#devicedialog').dialog_form('addbutton', {
+        $('#deviceadddialog').dialog_form('addbutton', {
             title: "{% trans "Add new device" %}",
             button: "#addDialogButton",
             onok: function(values) {
@@ -162,13 +181,13 @@
                             });
                             
                             /* Add a function to create a device */
-                            $('#devicedialog').dialog_form('updbutton', {
+                            $('#deviceupddialog').dialog_form('updbutton', {
                                 title: "{% trans "Add new device" %}",
                                 button: "#update{{ device.id }}",
-                                values: {devicename : '{{ device.name }}', devicedescription : '{{ device.description }}', deviceaddress : '{{ device.address }}', devicereference : '{{ device.reference }}', devicetype : '{{ device.type_id }}', deviceusage : '{{ device.usage_id }}'},
+                                values: {devicename : '{{ device.name }}', devicedescription : '{{ device.description }}', deviceaddress : '{{ device.address }}', devicereference : '{{ device.reference }}', deviceusage : '{{ device.device_usage_id }}'},
                                 onok: function(values) {
                                     // Submit form
-                                    $.getREST(['base', 'device', 'update', 'id', '{{ device.id }}', 'name', values.devicename, 'address', values.deviceaddress, 'type_id', values.devicetype, 'usage_id', values.deviceusage, 'description', values.devicedescription, 'reference', values.devicereference],
+                                    $.getREST(['base', 'device', 'update', 'id', '{{ device.id }}', 'name', values.devicename, 'address', values.deviceaddress, 'type_id', values.deviceusage, 'description', values.devicedescription, 'reference', values.devicereference],
                                         function(data) {
                                             var status = (data.status).toLowerCase();
                                             if (status == 'ok') {
@@ -204,6 +223,7 @@
             {% endfor %}
         </div>
     </section>
-    <div id="devicedialog"></div>
+    <div id="deviceaddialog"></div>
+    <div id="deviceupddialog"></div>
     <div id="delete_confirmation"></div>
 {% endblock %}
