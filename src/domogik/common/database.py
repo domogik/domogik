@@ -246,9 +246,12 @@ class DbHelper():
         if area:
             area_d = area
             if cascade_delete:
-                for room in self.__session.query(Room)\
-                                          .filter_by(area_id=area_del_id).all():
+                for room in self.__session.query(Room).filter_by(area_id=area_del_id).all():
                     self.del_room(room.id, True)
+            dfa_list = self.__session.query(DeviceFeatureAssociation)\
+                                     .filter_by(place_id=area.id, place_type=u'area').all()
+            for dfa in dfa_list:
+                self.__session.delete(dfa)
             self.__session.delete(area)
             try:
                 self.__session.commit()
@@ -386,9 +389,12 @@ class DbHelper():
         if room:
             room_d = room
             if cascade_delete:
-                for device in self.__session.query(Device)\
-                                            .filter_by(room_id=r_id).all():
+                for device in self.__session.query(Device).filter_by(room_id=r_id).all():
                     self.del_device(device.id)
+            dfa_list = self.__session.query(DeviceFeatureAssociation)\
+                                     .filter_by(place_id=room.id, place_type=u'room').all()
+            for dfa in dfa_list:
+                self.__session.delete(dfa)
             self.__session.delete(room)
             try:
                 self.__session.commit()
@@ -695,6 +701,10 @@ class DbHelper():
         sensor_feature = self.__session.query(SensorFeature).filter_by(device_type_feature_id=dtf_id).first()
         if sensor_feature is not None:
             self.__session.delete(sensor_feature)
+        dfa_list = self.__session.query(DeviceFeatureAssociation)\
+                                 .filter_by(device_type_feature_id=device_type_feature.id).all()
+        for dfa in dfa_list:
+            self.__session.delete(dfa)
         self.__session.delete(device_type_feature)
         try:
             self.__session.commit()
