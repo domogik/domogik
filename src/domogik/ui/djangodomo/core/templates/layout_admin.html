@@ -22,7 +22,6 @@
 {% load i18n %}
 
 {% block global_css %}
-    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-selectmenu.css" rel="stylesheet" type="text/css" />
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-buttons.css" rel="stylesheet" type="text/css" />
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-forms.css" rel="stylesheet" type="text/css" />
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.editable-icon.css" rel="stylesheet" type="text/css" />
