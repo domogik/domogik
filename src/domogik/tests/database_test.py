@@ -184,10 +184,10 @@ class AreaTestCase(GenericTestCase):
         area_d = self.db.del_area(area0.id)
         assert not self.has_item(self.db.list_areas(), ['area0'])
         assert area_d.id == area0.id
+        assert len(self.db.list_device_feature_association_by_area_id(area_d.id)) == 0
         try:
             self.db.del_area(12345678910)
-            TestCase.fail(self, "Area does not exist, an exception \
-                                 should have been raised")
+            TestCase.fail(self, "Area does not exist, an exception should have been raised")
         except DbHelperException:
             pass
 
@@ -272,6 +272,7 @@ class RoomTestCase(GenericTestCase):
         assert not self.has_item(self.db.list_rooms(), ['room1'])
         assert self.has_item(self.db.list_rooms(), ['room2', 'room3'])
         assert room_deleted.id == room1_id
+        assert len(self.db.list_device_feature_association_by_room_id(room_deleted.id)) == 0
         try:
             self.db.del_room(12345678910)
             TestCase.fail(self, "Room does not exist, an exception \
@@ -528,6 +529,7 @@ class DeviceTypeFeatureTestCase(GenericTestCase):
         sf1 = self.db.add_sensor_feature(sf_id=dtf3.id, sf_value_type='number')
         dtf_d = self.db.del_device_type_feature(dtf1.id)
         assert dtf_d.name == 'Switch'
+        assert len(self.db.list_device_feature_association_by_feature_id(dtf_d.id)) == 0
         assert len(self.db.list_device_type_features()) == 2
         assert len(self.db.list_actuator_features()) == 1
         af_d = self.db.del_actuator_feature(af_id=af2.device_type_feature_id)
@@ -869,8 +871,7 @@ class DeviceTestCase(GenericTestCase):
         room1 = self.db.add_room('room1', area1.id)
         room2 = self.db.add_room('room2', area2.id)
         dt1 = self.db.add_device_technology('x10', 'x10', 'desc dt1')
-        dty1 = self.db.add_device_type(dty_name='x10 Switch',
-                                       dty_description='desc1', dt_id=dt1.id)
+        dty1 = self.db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
         du1 = self.db.add_device_usage('du1')
         du2 = self.db.add_device_usage('du2')
         device1 = self.db.add_device(d_name='device1', d_address='A1',
@@ -884,6 +885,7 @@ class DeviceTestCase(GenericTestCase):
         assert len(self.db.list_devices()) == 2
         assert self.db.list_devices()[0].address == 'A1'
         assert device_del.id == device2.id
+        assert len(self.db.list_device_feature_association_by_device_id(device_del.id)) == 0
         try:
             self.db.del_device(12345678910)
             TestCase.fail(self, "Device does not exist, an exception should have been raised")

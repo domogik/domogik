@@ -246,9 +246,12 @@ class DbHelper():
         if area:
             area_d = area
             if cascade_delete:
-                for room in self.__session.query(Room)\
-                                          .filter_by(area_id=area_del_id).all():
+                for room in self.__session.query(Room).filter_by(area_id=area_del_id).all():
                     self.del_room(room.id, True)
+            dfa_list = self.__session.query(DeviceFeatureAssociation)\
+                                     .filter_by(place_id=area.id, place_type=u'area').all()
+            for dfa in dfa_list:
+                self.__session.delete(dfa)
             self.__session.delete(area)
             try:
                 self.__session.commit()
@@ -386,9 +389,12 @@ class DbHelper():
         if room:
             room_d = room
             if cascade_delete:
-                for device in self.__session.query(Device)\
-                                            .filter_by(room_id=r_id).all():
+                for device in self.__session.query(Device).filter_by(room_id=r_id).all():
                     self.del_device(device.id)
+            dfa_list = self.__session.query(DeviceFeatureAssociation)\
+                                     .filter_by(place_id=room.id, place_type=u'room').all()
+            for dfa in dfa_list:
+                self.__session.delete(dfa)
             self.__session.delete(room)
             try:
                 self.__session.commit()
@@ -456,8 +462,7 @@ class DbHelper():
         @return a DeviceUsage object
         """
         self.__session.expire_all()
-        device_usage = self.__session.query(DeviceUsage)\
-                                     .filter_by(id=du_id).first()
+        device_usage = self.__session.query(DeviceUsage).filter_by(id=du_id).first()
         if device_usage is None:
             raise DbHelperException("DeviceUsage with id %s couldn't be found" % du_id)
         if du_name is not None:
@@ -487,12 +492,10 @@ class DbHelper():
         if du:
             du_d = du
             if cascade_delete:
-                for device in self.__session.query(Device)\
-                                            .filter_by(usage_id=du.id).all():
+                for device in self.__session.query(Device).filter_by(device_usage_id=du.id).all():
                     self.del_device(device.id)
             else:
-                device_list = self.__session.query(Device)\
-                                            .filter_by(usage_id=du.id).all()
+                device_list = self.__session.query(Device).filter_by(device_usage_id=du.id).all()
                 if len(device_list) > 0:
                     raise DbHelperException("Couldn't delete device usage %s : there are associated devices" % du_id)
 
@@ -593,14 +596,12 @@ class DbHelper():
         if dty:
             dty_d = dty
             if cascade_delete:
-                for device in self.__session.query(Device)\
-                                            .filter_by(type_id=dty.id).all():
+                for device in self.__session.query(Device).filter_by(device_type_id=dty.id).all():
                     self.del_device(device.id)
-                for df in self.__session.query(DeviceTypeFeature)\
-                                        .filter_by(device_type_id=dty.id).all():
+                for df in self.__session.query(DeviceTypeFeature).filter_by(device_type_id=dty.id).all():
                     self.del_device_type_feature(df.id)
             else:
-                device_list = self.__session.query(Device).filter_by(type_id=dty.id).all()
+                device_list = self.__session.query(Device).filter_by(device_type_id=dty.id).all()
                 if len(device_list) > 0:
                     raise DbHelperException("Couldn't delete device type %s : there are associated device(s)" % dty_id)
                 df_list = self.__session.query(DeviceTypeFeature).filter_by(device_type_id=dty.id).all()
@@ -700,6 +701,10 @@ class DbHelper():
         sensor_feature = self.__session.query(SensorFeature).filter_by(device_type_feature_id=dtf_id).first()
         if sensor_feature is not None:
             self.__session.delete(sensor_feature)
+        dfa_list = self.__session.query(DeviceFeatureAssociation)\
+                                 .filter_by(device_type_feature_id=device_type_feature.id).all()
+        for dfa in dfa_list:
+            self.__session.delete(dfa)
         self.__session.delete(device_type_feature)
         try:
             self.__session.commit()
@@ -1058,12 +1063,10 @@ class DbHelper():
         if dt:
             dt_d = dt
             if cascade_delete:
-                for device_type in self.__session.query(DeviceType)\
-                                                 .filter_by(technology_id=dt.id).all():
+                for device_type in self.__session.query(DeviceType).filter_by(technology_id=dt.id).all():
                     self.del_device_type(device_type.id, cascade_delete=True)
             else:
-                device_type_list = self.__session.query(DeviceType)\
-                                                 .filter_by(technology_id=dt.id).all()
+                device_type_list = self.__session.query(DeviceType).filter_by(technology_id=dt.id).all()
                 if len(device_type_list) > 0:
                     raise DbHelperException("Couldn't delete device technology %s : there are associated device types" % dt_id)
 
@@ -1193,7 +1196,7 @@ class DbHelper():
         if d_room_id_list is not None and len(d_room_id_list) != 0:
             device_list = device_list.filter(Device.room_id.in_(d_room_id_list))
         if d_usage_id_list is not None and len(d_usage_id_list) != 0:
-            device_list = device_list.filter(Device.usage_id.in_(d_usage_id_list))
+            device_list = device_list.filter(Device.device_usage_id.in_(d_usage_id_list))
         return device_list.all()
 
     def get_device(self, d_id):
@@ -1218,11 +1221,8 @@ class DbHelper():
             return None
         device = []
         for device in device_list:
-            device_type = self.__session.query(DeviceType)\
-                                        .filter_by(id=device.type_id).first()
-            device_tech = self.__session.query(DeviceTechnology)\
-                                        .filter_by(id=device_type.technology_id)\
-                                        .first()
+            device_type = self.__session.query(DeviceType).filter_by(id=device.device_type_id).first()
+            device_tech = self.__session.query(DeviceTechnology).filter_by(id=device_type.technology_id).first()
             if device_tech.name.lower() == self.__to_unicode(techno_name.lower()):
                 return device
         return None
@@ -1288,7 +1288,8 @@ class DbHelper():
             raise DbHelperException("Couldn't add device with device usage id %s It does not exist" % d_usage_id)
         device = Device(name=self.__to_unicode(d_name), address=self.__to_unicode(d_address),
                         description=self.__to_unicode(d_description),
-                        reference=self.__to_unicode(d_reference), type_id=d_type_id, usage_id=d_usage_id)
+                        reference=self.__to_unicode(d_reference), device_type_id=d_type_id,
+                        device_usage_id=d_usage_id)
         self.__session.add(device)
         try:
             self.__session.commit()
@@ -1330,13 +1331,13 @@ class DbHelper():
                 self.__session.query(DeviceType).filter_by(id=d_type_id).one()
             except NoResultFound:
                 raise DbHelperException("Couldn't find device type id %s. It does not exist" % d_type_id)
-            device.type_id = d_type_id
+            device.device_type_id = d_type_id
         if d_usage_id is not None:
             try:
               self.__session.query(DeviceUsage).filter_by(id=d_usage_id).one()
             except NoResultFound:
               raise DbHelperException("Couldn't find device usage id %s. It does not exist" % d_usage_id)
-            device.usage = d_usage_id
+            device.device_usage = d_usage_id
         self.__session.add(device)
         try:
             self.__session.commit()
