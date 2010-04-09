@@ -1438,7 +1438,7 @@ class DbHelper():
 
     def get_last_stat_of_device(self, d_device_id):
         """
-        Fetch the last record of stats for a device
+        Get the latest statistic of a device
         @param d_device_id : device id
         @return a DeviceStat object
         """
