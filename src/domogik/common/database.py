@@ -57,6 +57,17 @@ from domogik.common.sql_schema import ACTUATOR_VALUE_TYPE_LIST, Area, Device, De
                                       SystemConfig, SystemStats, SystemStatsValue, Trigger
 
 
+def ucode(my_string):
+    """
+    Convert a string into unicode or return None if None value is passed
+    @param my_string : string value to convert
+    @return a unicode string
+    """
+    if my_string is not None:
+        return unicode(my_string)
+    else:
+        return None
+
 class DbHelperException(Exception):
     """
     This class provides exceptions related to the DbHelper class
@@ -122,17 +133,6 @@ class DbHelper():
         """
         self.__session.rollback()
 
-    def __to_unicode(self, my_string):
-        """
-        Convert a string into unicode or return None if None value is passed
-        @param my_string : string value to convert
-        @return a unicode string
-        """
-        if my_string is not None:
-            return unicode(my_string)
-        else:
-            return None
-
 ####
 # Areas
 ####
@@ -169,7 +169,7 @@ class DbHelper():
             raise DbHelperException("Wrong type of 'filters', Should be a dictionnary")
         area_list = self.__session.query(Area)
         for filter in filters:
-            filter_arg = "%s = '%s'" % (filter, self.__to_unicode(filters[filter]))
+            filter_arg = "%s = '%s'" % (filter, ucode(filters[filter]))
             area_list = area_list.filter(filter_arg)
         return area_list.all()
 
@@ -189,7 +189,7 @@ class DbHelper():
         @return an area object
         """
         return self.__session.query(Area)\
-                             .filter(func.lower(Area.name)==self.__to_unicode(area_name.lower()))\
+                             .filter(func.lower(Area.name)==ucode(area_name.lower()))\
                              .first()
 
     def add_area(self, a_name, a_description=None):
@@ -200,7 +200,7 @@ class DbHelper():
         @return an Area object
         """
         self.__session.expire_all()
-        area = Area(name=self.__to_unicode(a_name), description=self.__to_unicode(a_description))
+        area = Area(name=ucode(a_name), description=ucode(a_description))
         self.__session.add(area)
         try:
             self.__session.commit()
@@ -222,10 +222,10 @@ class DbHelper():
         if area is None:
             raise DbHelperException("Area with id %s couldn't be found" % a_id)
         if a_name is not None:
-            area.name = self.__to_unicode(a_name)
+            area.name = ucode(a_name)
         if a_description is not None:
             if a_description == '': a_description = None
-            area.description = self.__to_unicode(a_description)
+            area.description = ucode(a_description)
         self.__session.add(area)
         try:
             self.__session.commit()
@@ -297,7 +297,7 @@ class DbHelper():
             raise DbHelperException("Wrong type of 'filters', Should be a dictionnary")
         room_list = self.__session.query(Room)
         for filter in filters:
-            filter_arg = "%s = '%s'" % (filter, self.__to_unicode(filters[filter]))
+            filter_arg = "%s = '%s'" % (filter, ucode(filters[filter]))
             room_list = room_list.filter(filter_arg)
         return room_list.all()
 
@@ -308,7 +308,7 @@ class DbHelper():
         @return a room object
         """
         return self.__session.query(Room)\
-                             .filter(func.lower(Room.name)==self.__to_unicode(r_name.lower()))\
+                             .filter(func.lower(Room.name)==ucode(r_name.lower()))\
                              .first()
 
     def get_room_by_id(self, r_id):
@@ -333,7 +333,7 @@ class DbHelper():
                 self.__session.query(Area).filter_by(id=r_area_id).one()
             except NoResultFound:
                 raise DbHelperException("Couldn't add room with area id %s. It does not exist" % r_area_id)
-        room = Room(name=self.__to_unicode(r_name), description=self.__to_unicode(r_description), area_id=r_area_id)
+        room = Room(name=ucode(r_name), description=ucode(r_description), area_id=r_area_id)
         self.__session.add(room)
         try:
             self.__session.commit()
@@ -356,10 +356,10 @@ class DbHelper():
         if room is None:
             raise DbHelperException("Room with id %s couldn't be found" % r_id)
         if r_name is not None:
-            room.name = self.__to_unicode(r_name)
+            room.name = ucode(r_name)
         if r_description is not None:
             if r_description == '': r_description = None
-            room.description = self.__to_unicode(r_description)
+            room.description = ucode(r_description)
         if r_area_id is not None:
             if r_area_id != '':
                 try:
@@ -430,7 +430,7 @@ class DbHelper():
         @return a DeviceUsage object
         """
         return self.__session.query(DeviceUsage)\
-                             .filter(func.lower(DeviceUsage.name)==self.__to_unicode(du_name.lower()))\
+                             .filter(func.lower(DeviceUsage.name)==ucode(du_name.lower()))\
                              .first()
 
     def add_device_usage(self, du_name, du_description=None, du_default_options=None):
@@ -442,8 +442,8 @@ class DbHelper():
         @return a DeviceUsage (the newly created one)
         """
         self.__session.expire_all()
-        du = DeviceUsage(name=self.__to_unicode(du_name), description=self.__to_unicode(du_description),
-                         default_options=self.__to_unicode(du_default_options))
+        du = DeviceUsage(name=ucode(du_name), description=ucode(du_description),
+                         default_options=ucode(du_default_options))
         self.__session.add(du)
         try:
             self.__session.commit()
@@ -466,13 +466,13 @@ class DbHelper():
         if device_usage is None:
             raise DbHelperException("DeviceUsage with id %s couldn't be found" % du_id)
         if du_name is not None:
-            device_usage.name = self.__to_unicode(du_name)
+            device_usage.name = ucode(du_name)
         if du_description is not None:
             if du_description == '': du_description = None
-            device_usage.description = self.__to_unicode(du_description)
+            device_usage.description = ucode(du_description)
         if du_default_options is not None:
             if du_default_options == '': du_default_options = None
-            device_usage.default_options = self.__to_unicode(du_default_options)
+            device_usage.default_options = ucode(du_default_options)
         self.__session.add(device_usage)
         try:
             self.__session.commit()
@@ -525,9 +525,7 @@ class DbHelper():
         @param dty_name : The device type name
         @return a DeviceType object
         """
-        return self.__session.query(DeviceType)\
-                             .filter(func.lower(DeviceType.name)==self.__to_unicode(dty_name.lower()))\
-                             .first()
+        return self.__session.query(DeviceType).filter(func.lower(DeviceType.name)==ucode(dty_name.lower())).first()
 
     def add_device_type(self, dty_name, dt_id, dty_description=None):
         """
@@ -542,8 +540,7 @@ class DbHelper():
             self.__session.query(DeviceTechnology).filter_by(id=dt_id).one()
         except NoResultFound:
             raise DbHelperException("Couldn't add device type with technology id %s. It does not exist" % dt_id)
-        dty = DeviceType(name=self.__to_unicode(dty_name), description=self.__to_unicode(dty_description),
-                         device_technology_id=dt_id)
+        dty = DeviceType(name=ucode(dty_name), description=ucode(dty_description), device_technology_id=dt_id)
         self.__session.add(dty)
         try:
             self.__session.commit()
@@ -552,8 +549,7 @@ class DbHelper():
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return dty
 
-    def update_device_type(self, dty_id, dty_name=None, dt_id=None,
-                           dty_description=None):
+    def update_device_type(self, dty_id, dty_name=None, dt_id=None, dty_description=None):
         """
         Update a device type
         @param dty_id : device type id to be updated
@@ -567,7 +563,7 @@ class DbHelper():
         if device_type is None:
             raise DbHelperException("DeviceType with id %s couldn't be found" % dty_id)
         if dty_name is not None:
-            device_type.name = self.__to_unicode(dty_name)
+            device_type.name = ucode(dty_name)
         if dt_id is not None:
             try:
                 self.__session.query(DeviceTechnology).filter_by(id=dt_id).one()
@@ -577,7 +573,7 @@ class DbHelper():
         self.__session.add(device_type)
         if dty_description is not None:
             if dty_description == '': dty_description = None
-            device_type.description = self.__to_unicode(dty_description)
+            device_type.description = ucode(dty_description)
         try:
             self.__session.commit()
         except Exception, sql_exception:
@@ -647,10 +643,10 @@ class DbHelper():
         self.__session.expire_all()
         if self.__session.query(DeviceType).filter_by(id=dtf_device_type_id).first() is None:
             raise DbHelperException("Can't add device type feature : device type id '%s' doesn't exist" % dtf_device_type_id)
-        device_type_feature = DeviceTypeFeature(name=self.__to_unicode(dtf_name),
-                                                feature_type=self.__to_unicode(dtf_feature_type),
+        device_type_feature = DeviceTypeFeature(name=ucode(dtf_name),
+                                                feature_type=ucode(dtf_feature_type),
                                                 device_type_id=dtf_device_type_id,
-                                                parameters=self.__to_unicode(dtf_parameters))
+                                                parameters=ucode(dtf_parameters))
         self.__session.add(device_type_feature)
         try:
             self.__session.commit()
@@ -672,11 +668,11 @@ class DbHelper():
         if device_type_feature is None:
             raise DbHelperException("DeviceTypeFeature with id %s couldn't be found - can't update it" % dtf_id)
         if dtf_name is not None:
-            device_type_feature.name = self.__to_unicode(dtf_name)
+            device_type_feature.name = ucode(dtf_name)
         if dtf_parameters is not None:
             if dtf_parameters == '':
                 dtf_parameters = None
-            device_type_feature.parameters = self.__to_unicode(dtf_parameters)
+            device_type_feature.parameters = ucode(dtf_parameters)
         self.__session.add(device_type_feature)
         try:
             self.__session.commit()
@@ -748,7 +744,7 @@ class DbHelper():
         if af_value_type not in ACTUATOR_VALUE_TYPE_LIST:
             raise DbHelperException("Value type (%s) is not in the allowed item list : %s" % (af_value_type, ACTUATOR_VALUE_TYPE_LIST))
         self.__session.expire_all()
-        actuator_feature = ActuatorFeature(device_type_feature_id=af_id, value_type=self.__to_unicode(af_value_type),
+        actuator_feature = ActuatorFeature(device_type_feature_id=af_id, value_type=ucode(af_value_type),
                                            return_confirmation=af_return_confirmation)
         self.__session.add(actuator_feature)
         try:
@@ -773,7 +769,7 @@ class DbHelper():
         if af_value_type is not None:
             if af_value_type not in ACTUATOR_VALUE_TYPE_LIST:
                 raise DbHelperException("Value type (%s) is not in the allowed item list : %s" % (af_value_type, ACTUATOR_VALUE_TYPE_LIST))
-            actuator_feature.value_type = self.__to_unicode(af_value_type)
+            actuator_feature.value_type = ucode(af_value_type)
         if af_return_confirmation is not None:
             actuator_feature.return_confirmation = af_return_confirmation
         self.__session.add(actuator_feature)
@@ -836,7 +832,7 @@ class DbHelper():
         if sf_value_type not in SENSOR_VALUE_TYPE_LIST:
             raise DbHelperException("Value type (%s) is not in the allowed item list : %s" % (sf_value_type, SENSOR_VALUE_TYPE_LIST))
         self.__session.expire_all()
-        sensor_feature = SensorFeature(device_type_feature_id=sf_id, value_type=self.__to_unicode(sf_value_type))
+        sensor_feature = SensorFeature(device_type_feature_id=sf_id, value_type=ucode(sf_value_type))
         self.__session.add(sensor_feature)
         try:
             self.__session.commit()
@@ -859,7 +855,7 @@ class DbHelper():
         if sf_value_type is not None:
             if sf_value_type not in SENSOR_VALUE_TYPE_LIST:
                 raise DbHelperException("Value type (%s) is not in the allowed item list : %s" % (sf_value_type, SENSOR_VALUE_TYPE_LIST))
-            sensor_feature.value_type = self.__to_unicode(sf_value_type)
+            sensor_feature.value_type = ucode(sf_value_type)
         self.__session.add(sensor_feature)
         try:
             self.__session.commit()
@@ -963,7 +959,7 @@ class DbHelper():
                 except NoResultFound:
                     raise DbHelperException("Couldn't add device with area id %s It does not exist" % d_place_id)
         device_feature_asso = DeviceFeatureAssociation(device_id=d_device_id, device_type_feature_id=d_type_feature_id,
-                                                       place_type=self.__to_unicode(d_place_type), place_id=d_place_id)
+                                                       place_type=ucode(d_place_type), place_id=d_place_id)
         self.__session.add(device_feature_asso)
         try:
             self.__session.commit()
@@ -1018,7 +1014,7 @@ class DbHelper():
         @param dt_description : extended description of the technology
         """
         self.__session.expire_all()
-        dt = DeviceTechnology(id=dt_id, name=self.__to_unicode(dt_name), description=self.__to_unicode(dt_description))
+        dt = DeviceTechnology(id=dt_id, name=ucode(dt_name), description=ucode(dt_description))
         self.__session.add(dt)
         try:
             self.__session.commit()
@@ -1040,10 +1036,10 @@ class DbHelper():
         if device_tech is None:
             raise DbHelperException("DeviceTechnology with id %s couldn't be found" % dt_id)
         if dt_name is not None:
-            device_tech.name = self.__to_unicode(dt_name)
+            device_tech.name = ucode(dt_name)
         if dt_description is not None:
             if dt_description == '': dt_description = None
-            device_tech.description = self.__to_unicode(dt_description)
+            device_tech.description = ucode(dt_description)
         self.__session.add(device_tech)
         try:
             self.__session.commit()
@@ -1089,8 +1085,7 @@ class DbHelper():
         @param pl_name : plugin name
         @return a list of PluginConfig objects
         """
-        return self.__session.query(PluginConfig)\
-                             .filter_by(plugin_name=self.__to_unicode(pl_name)).all()
+        return self.__session.query(PluginConfig).filter_by(plugin_name=ucode(pl_name)).all()
 
     def list_all_plugin_config(self):
         """
@@ -1107,8 +1102,8 @@ class DbHelper():
         @return a PluginConfig object
         """
         return self.__session.query(PluginConfig)\
-                             .filter_by(plugin_name=self.__to_unicode(pl_name))\
-                             .filter_by(key=self.__to_unicode(pl_key))\
+                             .filter_by(plugin_name=ucode(pl_name))\
+                             .filter_by(key=ucode(pl_key))\
                              .first()
 
     def set_plugin_config(self, pl_name, pl_key, pl_value):
@@ -1121,13 +1116,12 @@ class DbHelper():
         """
         self.__session.expire_all()
         plugin_key = self.__session.query(PluginConfig)\
-                                   .filter_by(plugin_name=self.__to_unicode(pl_name), key=self.__to_unicode(pl_key))\
+                                   .filter_by(plugin_name=ucode(pl_name), key=ucode(pl_key))\
                                    .first()
         if plugin_key is None:
-            plugin_key = PluginConfig(plugin_name=self.__to_unicode(pl_name), key=self.__to_unicode(pl_key),
-                                      value=self.__to_unicode(pl_value))
+            plugin_key = PluginConfig(plugin_name=ucode(pl_name), key=ucode(pl_key), value=ucode(pl_value))
         else:
-            plugin_key.value = self.__to_unicode(pl_value)
+            plugin_key.value = ucode(pl_value)
         self.__session.add(plugin_key)
         try:
             self.__session.commit()
@@ -1143,8 +1137,7 @@ class DbHelper():
         @return the deleted PluginConfig objects (list)
         """
         self.__session.expire_all()
-        plugin_key_list = self.__session.query(PluginConfig)\
-                              .filter_by(plugin_name=self.__to_unicode(pl_name)).all()
+        plugin_key_list = self.__session.query(PluginConfig).filter_by(plugin_name=ucode(pl_name)).all()
         pl_key_deleted_list = []
         for plugin_key in plugin_key_list:
             plugin_key_d = plugin_key
@@ -1182,16 +1175,14 @@ class DbHelper():
         @param device address : device address
         @return a device object
         """
-        device_list = self.__session.query(Device)\
-                                    .filter_by(address=self.__to_unicode(device_address))\
-                                    .all()
+        device_list = self.__session.query(Device).filter_by(address=ucode(device_address)).all()
         if len(device_list) == 0:
             return None
         device = []
         for device in device_list:
             device_type = self.__session.query(DeviceType).filter_by(id=device.device_type_id).first()
             device_tech = self.__session.query(DeviceTechnology).filter_by(id=device_type.device_technology_id).first()
-            if device_tech.name.lower() == self.__to_unicode(techno_name.lower()):
+            if device_tech.name.lower() == ucode(techno_name.lower()):
                 return device
         return None
 
@@ -1254,9 +1245,9 @@ class DbHelper():
             self.__session.query(DeviceUsage).filter_by(id=d_usage_id).one()
         except NoResultFound:
             raise DbHelperException("Couldn't add device with device usage id %s It does not exist" % d_usage_id)
-        device = Device(name=self.__to_unicode(d_name), address=self.__to_unicode(d_address),
-                        description=self.__to_unicode(d_description),
-                        reference=self.__to_unicode(d_reference), device_type_id=d_type_id,
+        device = Device(name=ucode(d_name), address=ucode(d_address),
+                        description=ucode(d_description),
+                        reference=ucode(d_reference), device_type_id=d_type_id,
                         device_usage_id=d_usage_id)
         self.__session.add(device)
         try:
@@ -1285,15 +1276,15 @@ class DbHelper():
         if device is None:
             raise DbHelperException("Device with id %s couldn't be found" % d_id)
         if d_name is not None:
-            device.name = self.__to_unicode(d_name)
+            device.name = ucode(d_name)
         if d_address is not None:
-            device.address = self.__to_unicode(d_address)
+            device.address = ucode(d_address)
         if d_description is not None:
             if d_description == '': d_description = None
-            device.description = self.__to_unicode(d_description)
+            device.description = ucode(d_description)
         if d_reference is not None:
             if d_reference == '': d_reference = None
-            device.reference = self.__to_unicode(d_reference)
+            device.reference = ucode(d_reference)
         if d_type_id is not None:
             try:
                 self.__session.query(DeviceType).filter_by(id=d_type_id).one()
@@ -1385,9 +1376,9 @@ class DbHelper():
         self.__session.expire_all()
         device_config = self.__session.query(DeviceConfig).filter_by(key=dc_key, device_id=dc_device_id).first()
         if device_config is None:
-            device_config = DeviceConfig(key=dc_key, value=self.__to_unicode(dc_value), device_id=dc_device_id)
+            device_config = DeviceConfig(key=dc_key, value=ucode(dc_value), device_id=dc_device_id)
         else:
-            device_config.value = self.__to_unicode(dc_value)
+            device_config.value = ucode(dc_value)
         self.__session.add(device_config)
         try:
             self.__session.commit()
@@ -1500,7 +1491,7 @@ class DbHelper():
             self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         for ds_name in ds_values.keys():
-            dsv = DeviceStatsValue(name=self.__to_unicode(ds_name), value=self.__to_unicode(ds_values[ds_name]),
+            dsv = DeviceStatsValue(name=ucode(ds_name), value=ucode(ds_values[ds_name]),
                                    device_stats_id=device_stat.id)
             self.__session.add(dsv)
         try:
@@ -1583,8 +1574,8 @@ class DbHelper():
         @return the new Trigger object
         """
         self.__session.expire_all()
-        trigger = Trigger(description=self.__to_unicode(t_description), rule=self.__to_unicode(t_rule),
-                          result=self.__to_unicode(';'.join(t_result)))
+        trigger = Trigger(description=ucode(t_description), rule=ucode(t_rule),
+                          result=ucode(';'.join(t_result)))
         self.__session.add(trigger)
         try:
             self.__session.commit()
@@ -1608,11 +1599,11 @@ class DbHelper():
             raise DbHelperException("Trigger with id %s couldn't be found" % t_id)
         if t_description is not None:
             if t_description == '': t_description = None
-            trigger.description = self.__to_unicode(t_description)
+            trigger.description = ucode(t_description)
         if t_rule is not None:
-            trigger.rule = self.__to_unicode(t_rule)
+            trigger.rule = ucode(t_rule)
         if t_result is not None:
-            trigger.result = self.__to_unicode(';'.join(t_result))
+            trigger.result = ucode(';'.join(t_result))
         self.__session.add(trigger)
         try:
             self.__session.commit()
@@ -1673,8 +1664,7 @@ class DbHelper():
         @param a_login : login
         @return a UserAccount object
         """
-        user_acc = self.__session.query(UserAccount).filter_by(login=self.__to_unicode(a_login))\
-                                                    .first()
+        user_acc = self.__session.query(UserAccount).filter_by(login=ucode(a_login)).first()
         if user_acc is not None:
             user_acc.password = None
         return user_acc
@@ -1688,8 +1678,7 @@ class DbHelper():
         """
         crypted_pass = self.__make_crypted_password(a_password)
         user_acc = self.__session.query(UserAccount)\
-                                 .filter_by(login=self.__to_unicode(a_login),
-                                            password=self.__to_unicode(crypted_pass))\
+                                 .filter_by(login=ucode(a_login),password=ucode(crypted_pass))\
                                  .first()
         if user_acc is not None:
             user_acc.password = None
@@ -1714,11 +1703,10 @@ class DbHelper():
         @return True or False
         """
         self.__session.expire_all()
-        user_acc = self.__session.query(UserAccount).filter_by(login=self.__to_unicode(a_login))\
-                                                    .first()
+        user_acc = self.__session.query(UserAccount).filter_by(login=ucode(a_login)).first()
         if user_acc is not None:
             password = hashlib.sha256()
-            password.update(self.__to_unicode(a_password))
+            password.update(ucode(a_password))
             if user_acc.password == password.hexdigest():
                 return True
         return False
@@ -1734,16 +1722,16 @@ class DbHelper():
         @return the new UserAccount object or raise a DbHelperException if it already exists
         """
         self.__session.expire_all()
-        user_account = self.__session.query(UserAccount).filter_by(login=self.__to_unicode(a_login)).first()
+        user_account = self.__session.query(UserAccount).filter_by(login=ucode(a_login)).first()
         if user_account is not None:
             raise DbHelperException("Error %s login already exists" % a_login)
         person = self.__session.query(Person).filter_by(id=a_person_id).first()
         if person is None:
             raise DbHelperException("Person id '%s' does not exist" % a_person_id)
-        user_account = UserAccount(login=self.__to_unicode(a_login),
-                                   password=self.__to_unicode(self.__make_crypted_password(a_password)),
+        user_account = UserAccount(login=ucode(a_login),
+                                   password=ucode(self.__make_crypted_password(a_password)),
                                    person_id=a_person_id,
-                                   is_admin=a_is_admin, skin_used=self.__to_unicode(a_skin_used))
+                                   is_admin=a_is_admin, skin_used=ucode(a_skin_used))
         self.__session.add(user_account)
         try:
             self.__session.commit()
@@ -1770,8 +1758,7 @@ class DbHelper():
         person = self.add_person(a_person_first_name, a_person_last_name, a_person_birthdate)
         return self.add_user_account(a_login, a_password, person.id, a_is_admin, a_skin_used)
 
-    def update_user_account(self, a_id, a_new_login=None, a_person_id=None,
-                            a_is_admin=None, a_skin_used=None):
+    def update_user_account(self, a_id, a_new_login=None, a_person_id=None, a_is_admin=None, a_skin_used=None):
         """
         Update a user account
         @param a_id : Account id to be updated
@@ -1786,7 +1773,7 @@ class DbHelper():
         if user_acc is None:
             raise DbHelperException("UserAccount with id %s couldn't be found" % a_id)
         if a_new_login is not None:
-            user_acc.login = self.__to_unicode(a_new_login)
+            user_acc.login = ucode(a_new_login)
         if a_person_id is not None:
             person = self.__session.query(Person).filter_by(id=a_person_id).first()
             if person is None:
@@ -1795,7 +1782,7 @@ class DbHelper():
         if a_is_admin is not None:
             user_acc.is_admin = a_is_admin
         if a_skin_used is not None:
-            user_acc.skin_used = self.__to_unicode(a_skin_used)
+            user_acc.skin_used = ucode(a_skin_used)
         self.__session.add(user_acc)
         try:
             self.__session.commit()
@@ -1823,9 +1810,9 @@ class DbHelper():
         self.__session.expire_all()
         person = user_acc.person
         if p_first_name is not None:
-            person.first_name = self.__to_unicode(p_first_name)
+            person.first_name = ucode(p_first_name)
         if p_last_name is not None:
-            person.last_name = self.__to_unicode(p_last_name)
+            person.last_name = ucode(p_last_name)
         if p_birthdate is not None:
             person.birthdate = p_birthdate
         self.__session.add(person)
@@ -1847,10 +1834,10 @@ class DbHelper():
         """
         self.__session.expire_all()
         old_pass = self.__make_crypted_password(a_old_password)
-        user_acc = self.__session.query(UserAccount).filter_by(id=a_id, password=self.__to_unicode(old_pass)).first()
+        user_acc = self.__session.query(UserAccount).filter_by(id=a_id, password=ucode(old_pass)).first()
         if user_acc is None:
             return False
-        user_acc.password = self.__to_unicode(self.__make_crypted_password(a_new_password))
+        user_acc.password = ucode(self.__make_crypted_password(a_new_password))
         self.__session.add(user_acc)
         try:
             self.__session.commit()
@@ -1927,8 +1914,7 @@ class DbHelper():
         @return the new Person object
         """
         self.__session.expire_all()
-        person = Person(first_name=self.__to_unicode(p_first_name), last_name=self.__to_unicode(p_last_name),
-                        birthdate=p_birthdate)
+        person = Person(first_name=ucode(p_first_name), last_name=ucode(p_last_name), birthdate=p_birthdate)
         self.__session.add(person)
         try:
             self.__session.commit()
@@ -1937,8 +1923,7 @@ class DbHelper():
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return person
 
-    def update_person(self, p_id, p_first_name=None, p_last_name=None,
-                      p_birthdate=None):
+    def update_person(self, p_id, p_first_name=None, p_last_name=None, p_birthdate=None):
         """
         Update a person
         @param p_id             : person id to be updated
@@ -1952,9 +1937,9 @@ class DbHelper():
         if person is None:
             raise DbHelperException("Person with id %s couldn't be found" % p_id)
         if p_first_name is not None:
-            person.first_name = self.__to_unicode(p_first_name)
+            person.first_name = ucode(p_first_name)
         if p_last_name is not None:
-            person.last_name = self.__to_unicode(p_last_name)
+            person.last_name = ucode(p_last_name)
         if p_birthdate is not None:
             if p_birthdate == '':
                 p_birthdate = None
@@ -2027,8 +2012,7 @@ class DbHelper():
         @return the new SystemStats object
         """
         self.__session.expire_all()
-        system_stat = SystemStats(plugin_name=self.__to_unicode(s_name), host_name=self.__to_unicode(s_hostname),
-                                  date=s_date)
+        system_stat = SystemStats(plugin_name=ucode(s_name), host_name=ucode(s_hostname), date=s_date)
         self.__session.add(system_stat)
         try:
             self.__session.commit()
@@ -2036,8 +2020,8 @@ class DbHelper():
             self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         for stat_value_name in s_values.keys():
-            ssv = SystemStatsValue(name=self.__to_unicode(stat_value_name),
-                                   value=self.__to_unicode(s_values[stat_value_name]),
+            ssv = SystemStatsValue(name=ucode(stat_value_name),
+                                   value=ucode(s_values[stat_value_name]),
                                    system_stats_id=system_stat.id)
             self.__session.add(ssv)
         try:
@@ -2054,7 +2038,7 @@ class DbHelper():
         @return the deleted SystemStats object
         """
         self.__session.expire_all()
-        system_stat = self.__session.query(SystemStats).filter_by(name=self.__to_unicode(s_name)).first()
+        system_stat = self.__session.query(SystemStats).filter_by(name=ucode(s_name)).first()
         if system_stat:
             system_stat_d = system_stat
             system_stats_values = self.__session.query(SystemStatsValue)\
@@ -2110,11 +2094,11 @@ class DbHelper():
         self.__session.expire_all()
         ui_item_config = self.get_ui_item_config(ui_item_name, ui_item_reference, ui_item_key)
         if ui_item_config is None:
-            ui_item_config = UIItemConfig(name=self.__to_unicode(ui_item_name),
-                                          reference=self.__to_unicode(ui_item_reference),
-                                          key=self.__to_unicode(ui_item_key), value=self.__to_unicode(ui_item_value))
+            ui_item_config = UIItemConfig(name=ucode(ui_item_name),
+                                          reference=ucode(ui_item_reference),
+                                          key=ucode(ui_item_key), value=ucode(ui_item_value))
         else:
-            ui_item_config.value = self.__to_unicode(ui_item_value)
+            ui_item_config.value = ucode(ui_item_value)
         self.__session.add(ui_item_config)
         try:
             self.__session.commit()
@@ -2132,9 +2116,9 @@ class DbHelper():
         @return an UIItemConfig object
         """
         return self.__session.query(UIItemConfig)\
-                             .filter_by(name=self.__to_unicode(ui_item_name),
-                                        reference=self.__to_unicode(ui_item_reference),
-                                        key=self.__to_unicode(ui_item_key))\
+                             .filter_by(name=ucode(ui_item_name),
+                                        reference=ucode(ui_item_reference),
+                                        key=ucode(ui_item_key))\
                              .first()
 
     def list_ui_item_config_by_ref(self, ui_item_name, ui_item_reference):
@@ -2145,8 +2129,7 @@ class DbHelper():
         @return a list of UIItemConfig objects
         """
         return self.__session.query(UIItemConfig)\
-                             .filter_by(name=self.__to_unicode(ui_item_name),
-                                        reference=self.__to_unicode(ui_item_reference))\
+                             .filter_by(name=ucode(ui_item_name), reference=ucode(ui_item_reference))\
                              .all()
 
     def list_ui_item_config_by_key(self, ui_item_name, ui_item_key):
@@ -2157,8 +2140,7 @@ class DbHelper():
         @return a list of UIItemConfig objects
         """
         return self.__session.query(UIItemConfig)\
-                             .filter_by(name=self.__to_unicode(ui_item_name),
-                                        key=self.__to_unicode(ui_item_key))\
+                             .filter_by(name=ucode(ui_item_name), key=ucode(ui_item_key))\
                              .all()
 
     def list_ui_item_config(self, ui_item_name):
@@ -2167,9 +2149,7 @@ class DbHelper():
         @param ui_item_name : item name
         @return a list of UIItemConfig objects
         """
-        return self.__session.query(UIItemConfig)\
-                             .filter_by(name=self.__to_unicode(ui_item_name))\
-                             .all()
+        return self.__session.query(UIItemConfig).filter_by(name=ucode(ui_item_name)).all()
 
     def list_all_ui_item_config(self):
         """
@@ -2189,17 +2169,15 @@ class DbHelper():
         self.__session.expire_all()
         ui_item_config_list = []
         if ui_item_reference == None and ui_item_key == None:
-            ui_item_config_list = self.__session.query(UIItemConfig)\
-                                                .filter_by(name=self.__to_unicode(ui_item_name)).all()
+            ui_item_config_list = self.__session.query(UIItemConfig).filter_by(name=ucode(ui_item_name)).all()
         elif ui_item_key is None:
             ui_item_config_list = self.__session.query(UIItemConfig)\
-                                                .filter_by(name=self.__to_unicode(ui_item_name),
-                                                           reference=self.__to_unicode(ui_item_reference))\
+                                                .filter_by(name=ucode(ui_item_name),
+                                                           reference=ucode(ui_item_reference))\
                                                 .all()
         elif ui_item_reference is None:
             ui_item_config_list = self.__session.query(UIItemConfig)\
-                                                .filter_by(name=self.__to_unicode(ui_item_name),
-                                                           key=self.__to_unicode(ui_item_key))\
+                                                .filter_by(name=ucode(ui_item_name), key=ucode(ui_item_key))\
                                                 .all()
         else:
             ui_item_config = self.get_ui_item_config(ui_item_name, ui_item_reference, ui_item_key)
