@@ -1438,7 +1438,7 @@ class DbHelper():
         if s_datetime:
             query = query.filter("date >= '" + str(s_datetime) + "'")
         if e_datetime:
-            # This is really ugly but if we don't do it d2 is excluded from the interval
+            # TODO : This is really ugly but if we don't do it d2 is excluded from the interval
             # I suspect this is because the date is stored like this in the DB : '2010-04-09 12:04:00.000000'
             # But in Python we have '2010-04-09 12:04:00', so maybe there is a precision problem
             d2 = "'" + str(e_datetime + datetime.timedelta(microseconds=1)) + "'"
