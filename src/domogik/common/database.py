@@ -619,6 +619,25 @@ class DbHelper():
         """
         return self.__session.query(DeviceTypeFeature).all()
 
+    def list_device_type_feature_by_device_type_id(self, dtf_device_type_id):
+        """
+        Return a list of device type feature (actuator, sensor) knowing the device type id
+        @param dtf_device_type_id : device type id
+        @return a dictionnary with 2 keywords : 'actuator_list' and 'sensor_list'
+        """
+        actuator_f_list, sensor_f_list = [], []
+        query = self.__session.query(DeviceTypeFeature, ActuatorFeature)\
+                              .filter(DeviceTypeFeature.id==ActuatorFeature.device_type_feature_id)
+        query = query.filter(DeviceTypeFeature.device_type_id==dtf_device_type_id)
+        for dtf, af in query.all():
+            actuator_f_list.append(af)
+        query = self.__session.query(DeviceTypeFeature, SensorFeature)\
+                              .filter(DeviceTypeFeature.id==SensorFeature.device_type_feature_id)
+        query = query.filter(DeviceTypeFeature.device_type_id==dtf_device_type_id)
+        for dtf, sf in query.all():
+            sensor_f_list.append(sf)
+        return {'actuator_list': actuator_f_list, 'sensor_list': sensor_f_list}
+
     def get_device_type_feature_by_id(self, dtf_id):
         """
         Return information about a device type feature

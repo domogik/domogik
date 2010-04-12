@@ -461,6 +461,9 @@ class DeviceTypeFeatureTestCase(GenericTestCase):
             TestCase.fail(self, "An exception should have been raised : this id is already used by a sensor feature")
         except DbHelperException:
             pass
+        feature_list = self.db.list_device_type_feature_by_device_type_id(dtf1.id)
+        assert len(feature_list['actuator_list']) == 1
+        assert len(feature_list['sensor_list']) == 0
 
     def test_update(self):
         dt1 = self.db.add_device_technology('x10', 'x10', 'desc dt1')
