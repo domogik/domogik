@@ -550,7 +550,12 @@ class RestHandler(BaseHTTPRequestHandler):
         self.send_header('Content-Length', len(data.encode("utf-8")))
         self.end_headers()
         if data:
-            self.server.handler_params[0]._log.debug("Send HTTP data : %s" % data.encode("utf-8"))
+            # if big data, log only start of data
+            if len(data) > 1000:
+                self.server.handler_params[0]._log.debug("Send HTTP data : %s... [truncated because data too long for logs]" % data[0:1000].encode("utf-8"))
+            # else log all data
+            else:
+                self.server.handler_params[0]._log.debug("Send HTTP data : %s" % data.encode("utf-8"))
             self.wfile.write(data.encode("utf-8"))
 
 
@@ -957,8 +962,12 @@ target=*
         device_id = self.rest_request[0]
         key = self.rest_request[1]
 
+        ### all ######################################
+        if self.rest_request[2] == "all":
+            self._rest_stats_all(device_id, key)
+
         ### latest ###################################
-        if self.rest_request[2] == "latest":
+        elif self.rest_request[2] == "latest":
             self._rest_stats_last(device_id, key)
 
         ### last #####################################
@@ -988,6 +997,22 @@ target=*
 
 
 
+    def _rest_stats_all(self, device_id, key):
+        """ Get all values for device/key in database
+             @param device_id : device id
+             @param key : key for device
+        """
+
+        json_data = JSonHelper("OK")
+        json_data.set_data_type("stats")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        for data in self._db.list_device_stats(device_id):
+            # TODO : filter by key
+            json_data.add_data(data)
+        self.send_http_response_ok(json_data.get())
+
+
+
     def _rest_stats_last(self, device_id, key, num = 1):
         """ Get the last values for device/key in database
              @param device_id : device id
@@ -999,6 +1024,12 @@ target=*
         json_data = JSonHelper("OK")
         json_data.set_data_type("stats")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        # only last value
+        if num == 1:
+            data = self._db.get_last_stat_of_device(device_id)
+            if data is not None:
+                # TODO :filter by key
+                json_data.add_data(data)
         self.send_http_response_ok(json_data.get())
 
 
@@ -2184,7 +2215,6 @@ target=*
             device = self._db.update_device(self.get_parameters("id"), \
                                          self.get_parameters("name"), \
                                          self.get_parameters("address"), \
-                                         self.get_parameters("type_id"), \
                                          self.get_parameters("usage_id"), \
                                          self.get_parameters("description"), \
                                          self.get_parameters("reference"))
@@ -3088,7 +3118,7 @@ class JSonHelper():
                      "device_usage",  \
                      "device_config",  \
                      "device_feature_association",  \
-                     "devicestats",  \
+                     "device_stats",  \
                      "device_stats_value",  \
                      "device_technology",  \
                      "plugin_config",  \
