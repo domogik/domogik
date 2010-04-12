@@ -2184,7 +2184,6 @@ target=*
             device = self._db.update_device(self.get_parameters("id"), \
                                          self.get_parameters("name"), \
                                          self.get_parameters("address"), \
-                                         self.get_parameters("type_id"), \
                                          self.get_parameters("usage_id"), \
                                          self.get_parameters("description"), \
                                          self.get_parameters("reference"))
