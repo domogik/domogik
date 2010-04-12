@@ -1241,8 +1241,7 @@ class DbHelper():
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return device
 
-    def update_device(self, d_id, d_name=None, d_address=None, d_type_id=None,
-                      d_usage_id=None, d_description=None, d_reference=None):
+    def update_device(self, d_id, d_name=None, d_address=None, d_usage_id=None, d_description=None, d_reference=None):
         """
         Update a device item
         If a param is None, then the old value will be kept
@@ -1250,7 +1249,6 @@ class DbHelper():
         @param d_name : device name (optional)
         @param d_address : Item address (ex : 'A3' for x10/plcbus, '111.111111111' for 1wire) (optional)
         @param d_description : Extended item description (optional)
-        @param d_type_id : type id (x10.Switch, x10.Dimmer, Computer.WOL...)
         @param d_usage : Item usage id (optional)
         @param d_room : Item room id (optional)
         @return the updated Device object
@@ -1269,12 +1267,6 @@ class DbHelper():
         if d_reference is not None:
             if d_reference == '': d_reference = None
             device.reference = ucode(d_reference)
-        if d_type_id is not None:
-            try:
-                self.__session.query(DeviceType).filter_by(id=d_type_id).one()
-            except NoResultFound:
-                raise DbHelperException("Couldn't find device type id %s. It does not exist" % d_type_id)
-            device.device_type_id = d_type_id
         if d_usage_id is not None:
             try:
               self.__session.query(DeviceUsage).filter_by(id=d_usage_id).one()
