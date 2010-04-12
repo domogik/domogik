@@ -1387,6 +1387,24 @@ target=*
                 return
 
 
+        ### device_type_feature ######################
+        elif self.rest_request[0] == "device_type_feature":
+
+            ### list
+            if self.rest_request[1] == "list":
+                if len(self.rest_request) == 4 and self.rest_request[2] == "by-type_id":
+                    self._rest_base_device_type_feature_list(type_id = self.rest_request[3])
+                else:
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
+
+            ### others
+            else:
+                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], \
+                                                  self.jsonp, self.jsonp_cb)
+                return
+
+
         ### actuator feature #########################
         elif self.rest_request[0] == "actuator_feature":
 
@@ -2052,6 +2070,26 @@ target=*
         except:
             json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
+
+
+
+
+######
+# /base/device_type_feature processing
+######
+
+    def _rest_base_device_type_feature_list(self, type_id):
+        """ list device type features
+            @param id : id of device type id
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("device_type_feature")
+        features = self._db.list_device_type_feature_by_device_type_id(type_id)
+        if features is not None:
+            json_data.add_data(features)
+        self.send_http_response_ok(json_data.get())
+
 
 
 
@@ -3113,6 +3151,7 @@ class JSonHelper():
         # issue to force data not to be in cache
         # TODO : update when all tables will be defined!!!
         table_list = ["actuator_feature",  \
+                     "sensor_feature",  \
                      "area",  \
                      "device",  \
                      "device_usage",  \
@@ -3157,7 +3196,7 @@ class JSonHelper():
             return "#MAX_DEPTH# "
 
         # define data types
-        db_type = ("ActuatorFeature", "Area", "Device", "DeviceUsage", \
+        db_type = ("ActuatorFeature", "SensorFeature", "Area", "Device", "DeviceUsage", \
                    "DeviceConfig", "DeviceStats", "DeviceStatsValue", \
                    "DeviceTechnology", "PluginConfig", \
                    "DeviceType", "UIItemConfig", "Room", "UserAccount", \
@@ -3176,6 +3215,8 @@ class JSonHelper():
 
         # get data type
         data_type = type(data).__name__
+        #print "TYPE=%s" % data_type
+        #print data
 
         ### type instance (sql object)
         if data_type in instance_type:
@@ -3245,7 +3286,10 @@ class JSonHelper():
             if sub_data_elt0_type == "dict":
                 data_json += '"%s" : [' % key
             else:
-                data_json += '"%s" : [' % sub_data_elt0_type.lower()
+                display_sub_data_elt0_type = re.sub(r"([^^])([A-Z][a-z])",
+                             r"\1_\2",
+                             sub_data_elt0_type).lower()
+                data_json += '"%s" : [' % display_sub_data_elt0_type
 
             # process each data
             for sub_data in data:
