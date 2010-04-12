@@ -82,24 +82,16 @@ _db.add_default_user_account()
 
 device_technology = _db.add_device_technology(dt_id='x10', dt_name='X10', dt_description='')
 device_type = _db.add_device_type(dty_name='Switch', dt_id=device_technology.id)
-device_type_feature = _db.add_device_type_feature(dtf_name='Switch', dtf_feature_type='actuator',
-                                                  dtf_device_type_id=device_type.id, dtf_parameters='{&quot;command0&quot;:&quot;off&quot;, &quot;command1&quot;:&quot;on&quot;}')
-_db.add_actuator_feature(af_id=device_type_feature.id, af_value_type='binary')
+_db.add_actuator_feature(af_name='Switch', af_device_type_id=device_type.id, af_parameters='{&quot;command0&quot;:&quot;off&quot;, &quot;command1&quot;:&quot;on&quot;}', af_value_type='binary')
 device_type = _db.add_device_type(dty_name='Dimmer', dt_id=device_technology.id)
-device_type_feature = _db.add_device_type_feature(dtf_name='Dimmer', dtf_feature_type='actuator',
-                                                  dtf_device_type_id=device_type.id, dtf_parameters='{&quot;commandMin&quot;:0, &quot;commandMax&quot;:100}')
-_db.add_actuator_feature(af_id=device_type_feature.id, af_value_type='range')
+_db.add_actuator_feature(af_name='Dimmer', af_device_type_id=device_type.id, af_parameters='{&quot;commandMin&quot;:0, &quot;commandMax&quot;:100}', af_value_type='range')
 
 # Create device technologie features for PLCBus
 device_technology = _db.add_device_technology(dt_id='plcbus', dt_name='PLCBus', dt_description='')
 device_type = _db.add_device_type(dty_name='Switch', dt_id=device_technology.id)
-device_type_feature = _db.add_device_type_feature(dtf_name='Switch', dtf_feature_type='actuator',
-                                                  dtf_device_type_id=device_type.id, dtf_parameters='{&quot;command0&quot;:&quot;off&quot;, &quot;command1&quot;:&quot;on&quot;}')
-_db.add_actuator_feature(af_id=device_type_feature.id, af_value_type='binary', af_return_confirmation=True)
+_db.add_actuator_feature(af_name='Switch', af_device_type_id=device_type.id, af_parameters='{&quot;command0&quot;:&quot;off&quot;, &quot;command1&quot;:&quot;on&quot;}', af_value_type='binary', af_return_confirmation=True)
 device_type = _db.add_device_type(dty_name='Dimmer', dt_id=device_technology.id)
-device_type_feature = _db.add_device_type_feature(dtf_name='Dimmer', dtf_feature_type='actuator',
-                                                  dtf_device_type_id=device_type.id, dtf_parameters='{&quot;commandMin&quot;:0, &quot;commandMax&quot;:100}')
-_db.add_actuator_feature(af_id=device_type_feature.id, af_value_type='range', af_return_confirmation=True)
+_db.add_actuator_feature(af_name='Dimmer', af_device_type_id=device_type.id, af_parameters='{&quot;commandMin&quot;:0, &quot;commandMax&quot;:100}', af_value_type='range', af_return_confirmation=True)
 
 # Create device technology features for EIB/KNX
 _db.add_device_technology(dt_id='eibknx', dt_name='EIB/KNX', dt_description='')
@@ -120,9 +112,8 @@ _db.add_device_technology(dt_id='rfid', dt_name='RFID', dt_description='')
 device_technology = _db.add_device_technology(dt_id='computer', dt_name='Computer',
                                               dt_description='Computers monitoring and controling ')
 device_type = _db.add_device_type(dty_name='WOL', dt_id=device_technology.id)
-device_type_feature = _db.add_device_type_feature(dtf_name='Activation', dtf_feature_type='actuator',
-                                                  dtf_device_type_id=device_type.id)
-_db.add_actuator_feature(af_id=device_type_feature.id, af_value_type='trigger', af_return_confirmation=False)
+_db.add_actuator_feature(af_name='Activation', af_device_type_id=device_type.id, af_value_type='trigger',
+                         af_return_confirmation=False)
 # Create device technologie features for MultiMedia
 _db.add_device_technology(dt_id='multimedia', dt_name='MultiMedia', dt_description='Music, Video')
 # Create device technologie features for Communication

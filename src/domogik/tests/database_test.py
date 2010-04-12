@@ -88,8 +88,10 @@ class GenericTestCase(unittest.TestCase):
             db.del_device_config(device.id)
 
     def remove_all_device_type_features(self, db):
-        for df in db.list_device_type_features():
-            db.del_device_type_feature(df.id)
+        for af in db.list_actuator_features():
+            db.del_actuator_feature(af.device_type_feature_id)
+        for sf in db.list_sensor_features():
+            db.del_sensor_feature(sf.device_type_feature_id)
 
     def remove_all_device_feature_associations(self, db):
         for dfa in db.list_device_feature_association():
@@ -423,45 +425,31 @@ class DeviceTypeFeatureTestCase(GenericTestCase):
         dty1 = self.db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
         dty2 = self.db.add_device_type(dty_name='x10 Dimmer', dty_description='desc2', dt_id=dt1.id)
         dty3 = self.db.add_device_type(dty_name='1wire.Temperature', dty_description='desc3', dt_id=dt2.id)
-        dtf1 = self.db.add_device_type_feature(dtf_name='Switch', dtf_feature_type='actuator',
-                                               dtf_device_type_id=dty1.id, dtf_parameters='myparams1')
-        print dtf1
-        assert dtf1.name == 'Switch'
-        assert dtf1.feature_type == 'actuator'
-        assert dtf1.device_type_id == dty1.id
-        assert dtf1.parameters == 'myparams1'
-        assert self.db.get_device_type_feature_by_id(dtf1.id).name == 'Switch'
-        dtf2 = self.db.add_device_type_feature(dtf_name='Dimmer', dtf_feature_type='actuator',
-                                               dtf_device_type_id=dty2.id, dtf_parameters='myparams2')
-        dtf3 = self.db.add_device_type_feature(dtf_name='Thermometer', dtf_feature_type='sensor',
-                                               dtf_device_type_id=dty3.id, dtf_parameters='myparams3')
-        assert len(self.db.list_device_type_features()) == 3
-        assert self.has_item(self.db.list_device_type_features(), ['Switch', 'Dimmer', 'Thermometer'])
-        af1 = self.db.add_actuator_feature(af_id=dtf1.id, af_value_type='binary', af_return_confirmation=True)
+        af1 = self.db.add_actuator_feature(af_name='Switch', af_device_type_id=dty1.id, af_parameters='myparams1',
+                                           af_value_type='binary', af_return_confirmation=True)
         print af1
-        assert af1.device_type_feature_id == dtf1.id
+        assert af1.device_type_feature.name == 'Switch'
+        assert af1.device_type_feature.device_type_id == dty1.id
+        assert af1.device_type_feature.parameters == 'myparams1'
         assert af1.value_type == 'binary'
         assert af1.return_confirmation
-        af2 = self.db.add_actuator_feature(af_id=dtf2.id, af_value_type='number', af_return_confirmation=True)
-        assert len(self.db.list_actuator_features()) == 2
-        assert self.db.get_actuator_feature_by_id(af2.device_type_feature_id).device_type_feature_id == dtf2.id
-        try:
-            self.db.add_sensor_feature(sf_id=dtf1.id, sf_value_type='number')
-            TestCase.fail(self, "An exception should have been raised : this id is already used by an actuator feature")
-        except DbHelperException:
-            pass
-        sf1 = self.db.add_sensor_feature(sf_id=dtf3.id, sf_value_type='number')
+        assert self.db.get_device_type_feature_by_id(af1.device_type_feature_id).name == 'Switch'
+        af2 = self.db.add_actuator_feature(af_name='Dimmer', af_device_type_id=dty2.id, af_parameters='myparams2',
+                                           af_value_type='number', af_return_confirmation=True)
+        sf1 = self.db.add_sensor_feature(sf_name='Thermometer', sf_device_type_id=dty3.id, sf_parameters='myparams3',
+                                         sf_value_type='number')
         print sf1
-        assert sf1.device_type_feature_id == dtf3.id
+        assert sf1.device_type_feature.name == 'Thermometer'
+        assert sf1.device_type_feature.device_type_id == dty3.id
+        assert sf1.device_type_feature.parameters == 'myparams3'
         assert sf1.value_type == 'number'
+        assert len(self.db.list_device_type_features()) == 3
+        assert self.has_item(self.db.list_device_type_features(), ['Switch', 'Dimmer', 'Thermometer'])
+        assert len(self.db.list_actuator_features()) == 2
+        assert self.db.get_actuator_feature_by_id(af2.device_type_feature_id).device_type_feature.name == 'Dimmer'
         assert len(self.db.list_sensor_features()) == 1
-        assert self.db.get_sensor_feature_by_id(sf1.device_type_feature_id).device_type_feature_id == dtf3.id
-        try:
-            self.db.add_actuator_feature(af_id=dtf3.id, af_value_type='number')
-            TestCase.fail(self, "An exception should have been raised : this id is already used by a sensor feature")
-        except DbHelperException:
-            pass
-        feature_list = self.db.list_device_type_feature_by_device_type_id(dtf1.id)
+        assert self.db.get_sensor_feature_by_id(sf1.device_type_feature_id).device_type_feature.name == 'Thermometer'
+        feature_list = self.db.list_device_type_feature_by_device_type_id(dty1.id)
         assert len(feature_list['actuator_list']) == 1
         assert len(feature_list['sensor_list']) == 0
 
@@ -470,19 +458,17 @@ class DeviceTypeFeatureTestCase(GenericTestCase):
         dt2 = self.db.add_device_technology('1wire', '1-Wire', 'desc dt2')
         dty1 = self.db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
         dty2 = self.db.add_device_type(dty_name='1wire.Temperature', dty_description='desc3', dt_id=dt2.id)
-        dtf1 = self.db.add_device_type_feature(dtf_name='Switch', dtf_feature_type='actuator',
-                                               dtf_device_type_id=dty1.id, dtf_parameters='myparams1')
-        dtf1_u = self.db.update_device_type_feature(dtf_id=dtf1.id, dtf_name='Big switch', dtf_parameters='myparams_u')
-        assert dtf1_u.name == 'Big switch'
-        assert dtf1_u.parameters == 'myparams_u'
-        af1 = self.db.add_actuator_feature(af_id=dtf1.id, af_value_type='binary', af_return_confirmation=True)
-        af1_u = self.db.update_actuator_feature(af_id=dtf1.id, af_value_type='number', af_return_confirmation=False)
+        af1 = self.db.add_actuator_feature(af_name='Switch', af_device_type_id=dty1.id, af_value_type='number',
+                                           af_parameters='myparams1')
+        af1_u = self.db.update_actuator_feature(af_id=af1.device_type_feature_id, af_name='Big switch',
+                                                af_parameters='myparams_u', af_return_confirmation=True)
+        assert af1_u.device_type_feature.name == 'Big switch'
+        assert af1_u.device_type_feature.parameters == 'myparams_u'
         assert af1_u.value_type == 'number'
-        assert not af1_u.return_confirmation
-        dtf2 = self.db.add_device_type_feature(dtf_name='Thermometer', dtf_feature_type='sensor',
-                                               dtf_device_type_id=dty2.id, dtf_parameters='myparams2')
-        sf1 = self.db.add_sensor_feature(sf_id=dtf2.id, sf_value_type='number')
-        sf1_u = self.db.update_sensor_feature(sf_id=dtf2.id, sf_value_type='string')
+        assert af1_u.return_confirmation
+        sf1 = self.db.add_sensor_feature(sf_name='Thermometer', sf_device_type_id=dty2.id, sf_parameters='myparams2',
+                                         sf_value_type='number')
+        sf1_u = self.db.update_sensor_feature(sf_id=sf1.device_type_feature_id, sf_value_type='string')
         assert sf1_u.value_type == 'string'
 
     def test_del(self):
@@ -491,25 +477,21 @@ class DeviceTypeFeatureTestCase(GenericTestCase):
         dty1 = self.db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
         dty2 = self.db.add_device_type(dty_name='x10 Dimmer', dty_description='desc2', dt_id=dt1.id)
         dty3 = self.db.add_device_type(dty_name='1wire.Temperature', dty_description='desc3', dt_id=dt2.id)
-        dtf1 = self.db.add_device_type_feature(dtf_name='Switch', dtf_feature_type='actuator',
-                                               dtf_device_type_id=dty1.id, dtf_parameters='myparams1')
-        dtf2 = self.db.add_device_type_feature(dtf_name='Dimmer', dtf_feature_type='actuator',
-                                               dtf_device_type_id=dty2.id, dtf_parameters='myparams2')
-        dtf3 = self.db.add_device_type_feature(dtf_name='Thermometer', dtf_feature_type='sensor',
-                                               dtf_device_type_id=dty3.id, dtf_parameters='myparams3')
-        af1 = self.db.add_actuator_feature(af_id=dtf1.id, af_value_type='binary', af_return_confirmation=True)
-        af2 = self.db.add_actuator_feature(af_id=dtf2.id, af_value_type='number', af_return_confirmation=True)
-        sf1 = self.db.add_sensor_feature(sf_id=dtf3.id, sf_value_type='number')
-        dtf_d = self.db.del_device_type_feature(dtf1.id)
-        assert dtf_d.name == 'Switch'
-        assert len(self.db.list_device_feature_association_by_feature_id(dtf_d.id)) == 0
+        af1 = self.db.add_actuator_feature(af_name='Switch', af_device_type_id=dty1.id, af_parameters='myparams1',
+                                           af_value_type='binary', af_return_confirmation=True)
+        af2 = self.db.add_actuator_feature(af_name='Dimmer', af_device_type_id=dty2.id, af_parameters='myparams2',
+                                           af_value_type='number', af_return_confirmation=True)
+        sf1 = self.db.add_sensor_feature(sf_name='Thermometer', sf_device_type_id=dty3.id, sf_parameters='myparams3',
+                                         sf_value_type='number')
+        af_d = self.db.del_actuator_feature(af1.device_type_feature_id)
+        assert af_d.device_type_feature_id == af1.device_type_feature_id
+        assert len(self.db.list_device_feature_association_by_feature_id(af_d.device_type_feature_id)) == 0
         assert len(self.db.list_device_type_features()) == 2
         assert len(self.db.list_actuator_features()) == 1
-        af_d = self.db.del_actuator_feature(af_id=af2.device_type_feature_id)
-        assert af_d.device_type_feature_id == dtf2.id
+        assert len(self.db.list_sensor_features()) == 1
+        af_d = self.db.del_actuator_feature(af2.device_type_feature_id)
         assert len(self.db.list_actuator_features()) == 0
-        sf_d = self.db.del_sensor_feature(sf_id=sf1.device_type_feature_id)
-        assert sf_d.device_type_feature_id == dtf3.id
+        sf_d = self.db.del_sensor_feature(sf1.device_type_feature_id)
         assert len(self.db.list_sensor_features()) == 0
 
 
@@ -549,16 +531,19 @@ class DeviceFeatureAssociationTestCase(GenericTestCase):
                     d_type_id=dty2.id, d_usage_id=du1.id, d_description='Laden')
         device3 = self.db.add_device(d_name='Mixer', d_address='A2',
                     d_type_id=dty2.id, d_usage_id=du1.id, d_description='Moulinex')
-        dtf1 = self.db.add_device_type_feature(dtf_name='Switch', dtf_feature_type='actuator',
-                                               dtf_device_type_id=dty1.id, dtf_parameters='myparams1')
-        dtf2 = self.db.add_device_type_feature(dtf_name='Dimmer', dtf_feature_type='actuator',
-                                               dtf_device_type_id=dty2.id, dtf_parameters='myparams2')
-        dfa = self.db.add_device_type_feature_association(d_device_id=device1.id, d_type_feature_id=dtf1.id,
+        af1 = self.db.add_actuator_feature(af_name='Switch', af_device_type_id=dty1.id, af_parameters='myparams1',
+                                           af_value_type='binary')
+        af2 = self.db.add_actuator_feature(af_name='Dimmer', af_device_type_id=dty2.id, af_parameters='myparams2',
+                                           af_value_type='number')
+        dfa = self.db.add_device_type_feature_association(d_device_id=device1.id,
+                                                          d_type_feature_id=af1.device_type_feature_id,
                                                           d_place_type='house')
         print dfa
-        self.db.add_device_type_feature_association(d_device_id=device2.id, d_type_feature_id=dtf2.id,
+        self.db.add_device_type_feature_association(d_device_id=device2.id,
+                                                    d_type_feature_id=af2.device_type_feature_id,
                                                     d_place_id=room1.id, d_place_type='room')
-        self.db.add_device_type_feature_association(d_device_id=device3.id, d_type_feature_id=dtf2.id,
+        self.db.add_device_type_feature_association(d_device_id=device3.id,
+                                                    d_type_feature_id=af2.device_type_feature_id,
                                                     d_place_id=area1.id, d_place_type='area')
         assert len(self.db.list_device_feature_association()) == 3
         assert len(self.db.list_device_feature_association_by_house()) == 1
@@ -585,15 +570,18 @@ class DeviceFeatureAssociationTestCase(GenericTestCase):
                     d_type_id=dty2.id, d_usage_id=du1.id, d_description='Laden')
         device3 = self.db.add_device(d_name='Mixer', d_address='A2',
                     d_type_id=dty2.id, d_usage_id=du1.id, d_description='Moulinex')
-        dtf1 = self.db.add_device_type_feature(dtf_name='Switch', dtf_feature_type='actuator',
-                                               dtf_device_type_id=dty1.id, dtf_parameters='myparams1')
-        dtf2 = self.db.add_device_type_feature(dtf_name='Dimmer', dtf_feature_type='actuator',
-                                               dtf_device_type_id=dty2.id, dtf_parameters='myparams2')
-        dfa1 = self.db.add_device_type_feature_association(d_device_id=device1.id, d_type_feature_id=dtf1.id,
+        af1 = self.db.add_actuator_feature(af_name='Switch', af_device_type_id=dty1.id, af_value_type='binary',
+                                           af_parameters='myparams1')
+        af2 = self.db.add_actuator_feature(af_name='Dimmer', af_device_type_id=dty2.id, af_value_type='number',
+                                           af_parameters='myparams2')
+        dfa1 = self.db.add_device_type_feature_association(d_device_id=device1.id,
+                                                           d_type_feature_id=af1.device_type_feature_id,
                                                            d_place_type='house')
-        dfa2 = self.db.add_device_type_feature_association(d_device_id=device2.id, d_type_feature_id=dtf2.id,
+        dfa2 = self.db.add_device_type_feature_association(d_device_id=device2.id,
+                                                           d_type_feature_id=af2.device_type_feature_id,
                                                            d_place_id=room1.id, d_place_type='room')
-        dfa3 = self.db.add_device_type_feature_association(d_device_id=device3.id, d_type_feature_id=dtf2.id,
+        dfa3 = self.db.add_device_type_feature_association(d_device_id=device3.id,
+                                                           d_type_feature_id=af2.device_type_feature_id,
                                                            d_place_id=area1.id, d_place_type='area')
         dfa = self.db.del_device_feature_association(d_device_id=dfa1.device_id,
                                                      d_type_feature_id=dfa1.device_type_feature_id)
