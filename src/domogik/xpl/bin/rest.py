@@ -3150,8 +3150,7 @@ class JSonHelper():
 
         # issue to force data not to be in cache
         # TODO : update when all tables will be defined!!!
-        table_list = ["actuator_feature",  \
-                     "sensor_feature",  \
+        table_list = ["device_type_feature",  \
                      "area",  \
                      "device",  \
                      "device_usage",  \
@@ -3196,7 +3195,7 @@ class JSonHelper():
             return "#MAX_DEPTH# "
 
         # define data types
-        db_type = ("ActuatorFeature", "SensorFeature", "Area", "Device", "DeviceUsage", \
+        db_type = ("DeviceTypeFeature", "Area", "Device", "DeviceUsage", \
                    "DeviceConfig", "DeviceStats", "DeviceStatsValue", \
                    "DeviceTechnology", "PluginConfig", \
                    "DeviceType", "UIItemConfig", "Room", "UserAccount", \
