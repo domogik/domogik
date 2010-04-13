@@ -932,7 +932,8 @@ class DbHelper():
         if not device_type_feature:
             raise DbHelperException("DeviceTypeFeature id %s doesn't exist" % d_type_feature_id)
         if device.device_type_id != device_type_feature.device_type_id:
-            raise DbHelperException("device_type_id of device and device_type_id of device_type_feature are not the same!")
+            raise DbHelperException("device_type_id (%s) of device and device_type_id (%s) of device_type_feature " +\
+                                    "are not the same!" % (device.device_type_id, device_type_feature.device_type_id))
         if d_place_type not in DEVICE_FEATURE_ASSOCIATION_LIST:
             raise DbHelperException("Place type should be one of : %s" % DEVICE_FEATURE_ASSOCIATION_LIST)
         if d_place_type is None and d_place_id is not None:

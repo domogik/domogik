@@ -222,7 +222,8 @@ class DeviceUsage(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<DeviceUsage(id=%s, name='%s', desc='%s', default opt='%s')>" % (self.id, self.name, self.description, self.default_options)
+        return "<DeviceUsage(id=%s, name='%s', desc='%s', default opt='%s')>" \
+               % (self.id, self.name, self.description, self.default_options)
 
     @staticmethod
     def get_tablename():
@@ -364,7 +365,8 @@ class DeviceType(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<DeviceType(id=%s, name='%s', desc='%s', device techno='%s')>" % (self.id, self.name, self.description, self.device_technology)
+        return "<DeviceType(id=%s, name='%s', desc='%s', device techno='%s')>" \
+               % (self.id, self.name, self.description, self.device_technology)
 
     @staticmethod
     def get_tablename():
@@ -439,7 +441,8 @@ class Device(Base):
         @return an internal representation
         """
         return "<Device(id=%s, name='%s', addr='%s', desc='%s', ref='%s', type='%s', usage=%s)>" \
-               % (self.id, self.name, self.address, self.description, self.reference, self.device_type, self.device_usage)
+               % (self.id, self.name, self.address, self.description, self.reference, \
+                  self.device_type, self.device_usage)
 
     @staticmethod
     def get_tablename():
@@ -480,9 +483,11 @@ class DeviceTypeFeature(Base):
             raise Exception("Feature type must me either 'actuator' or 'sensor' but NOT %s" % feature_type)
         self.feature_type = feature_type
         if self.feature_type == 'actuator' and value_type not in ACTUATOR_VALUE_TYPE_LIST:
-            raise Exception("Can't add value type %s to an actuator it doesn't belong to list %s" % (value_type, ACTUATOR_VALUE_TYPE_LIST))
+            raise Exception("Can't add value type %s to an actuator it doesn't belong to list %s" \
+                            % (value_type, ACTUATOR_VALUE_TYPE_LIST))
         elif self.feature_type == 'sensor' and value_type not in SENSOR_VALUE_TYPE_LIST:
-            raise Exception("Can't add value type %s to a sensor it doesn't belong to list %s" % (value_type, SENSOR_VALUE_TYPE_LIST))
+            raise Exception("Can't add value type %s to a sensor it doesn't belong to list %s" \
+                            % (value_type, SENSOR_VALUE_TYPE_LIST))
         self.device_type_id = device_type_id
         self.value_type = value_type
         self.parameters = parameters
@@ -493,7 +498,9 @@ class DeviceTypeFeature(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<DeviceTypeFeature(%s, %s, device_type=%s, parameters=%s)>" % (self.id, self.feature_type, self.device_type, self.parameters)
+        return "<DeviceTypeFeature(%s, %s, device_type=%s, parameters=%s, value_type=%s, return_confirmation=%s)>" \
+               % (self.id, self.feature_type, self.device_type, self.parameters, self.value_type, \
+                  self.return_confirmation)
 
     @staticmethod
     def get_tablename():
@@ -535,7 +542,8 @@ class DeviceFeatureAssociation(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<DeviceFeatureAssociation(%s, %s, %s, place_id=%s)>" % (self.device, self.device_type_feature, self.place_type, self.place_id)
+        return "<DeviceFeatureAssociation(%s, %s, %s, place_id=%s)>" \
+               % (self.device, self.device_type_feature, self.place_type, self.place_id)
 
     @staticmethod
     def get_tablename():
@@ -645,7 +653,8 @@ class DeviceStatsValue(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<DeviceStatsValue(id=%s, name=%s, value=%s, stats=%s)>" % (self.id, self.name, self.value, self.device_stats)
+        return "<DeviceStatsValue(id=%s, name=%s, value=%s, stats=%s)>" \
+               % (self.id, self.name, self.value, self.device_stats)
 
     @staticmethod
     def get_tablename():
@@ -682,7 +691,8 @@ class Trigger(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<Trigger(id=%s, desc='%s', rule='%s', result='%s')>" % (self.id, self.description, self.rule, self.result)
+        return "<Trigger(id=%s, desc='%s', rule='%s', result='%s')>" \
+                % (self.id, self.description, self.rule, self.result)
 
     @staticmethod
     def get_tablename():
@@ -719,7 +729,8 @@ class Person(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<Person(id=%s, first_name='%s', last_name='%s', birthdate='%s')>" % (self.id, self.first_name, self.last_name, self.birthdate)
+        return "<Person(id=%s, first_name='%s', last_name='%s', birthdate='%s')>" \
+               % (self.id, self.first_name, self.last_name, self.birthdate)
 
     @staticmethod
     def get_tablename():
@@ -763,7 +774,8 @@ class UserAccount(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<UserAccount(id=%s, login='%s', is_admin=%s, person=%s)>" % (self.id, self.login, self.is_admin, self.person)
+        return "<UserAccount(id=%s, login='%s', is_admin=%s, person=%s)>" \
+                % (self.id, self.login, self.is_admin, self.person)
 
     @staticmethod
     def get_tablename():
