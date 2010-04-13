@@ -444,7 +444,13 @@ class DeviceTypeFeature(Base):
                                      Only relevant for actuators
         """
         self.name = name
+        if feature_type != 'actuator' and feature_type != 'sensor':
+            raise Exception("Feature type must me either 'actuator' or 'sensor' but NOT %s" % feature_type)
         self.feature_type = feature_type
+        if self.feature_type == 'actuator' and value_type not in ACTUATOR_VALUE_TYPE_LIST:
+            raise Exception("Can't add value type %s to an actuator it doesn't belong to list %s" % (value_type, ACTUATOR_VALUE_TYPE_LIST))
+        elif self.feature_type == 'sensor' and value_type not in SENSOR_VALUE_TYPE_LIST:
+            raise Exception("Can't add value type %s to a sensor it doesn't belong to list %s" % (value_type, SENSOR_VALUE_TYPE_LIST))
         self.device_type_id = device_type_id
         self.value_type = value_type
         self.parameters = parameters
