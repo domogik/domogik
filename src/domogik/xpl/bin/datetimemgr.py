@@ -51,6 +51,7 @@ DOMOGIK_PLUGIN_DOCUMENTATION_LINK = "TODO"
 DOMOGIK_PLUGIN_CONFIGURATION=[
       {"id" : 0,
        "key" : "startup-plugin",
+       "type" : "boolean",
        "description" : "Automatically start plugin at Domogik startup",
        "default" : "False"},
       ]

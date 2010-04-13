@@ -48,14 +48,17 @@ DOMOGIK_PLUGIN_DOCUMENTATION_LINK = "http://wiki.domogik.org/tiki-index.php?page
 DOMOGIK_PLUGIN_CONFIGURATION=[
       {"id" : 0,
        "key" : "startup-plugin",
+       "type" : "boolean",
        "description" : "Automatically start plugin at Domogik startup",
        "default" : "False"},
       {"id" : 1,
        "key" : "device",
+       "type" : "string",
        "description" : "Teleinfo device (ex : /dev/ttyUSB0 for an usb model)",
        "default" : "/dev/teleinfo"},
       {"id" : 2,
        "key" : "interval",
+       "type" : "number",
        "description" : "Interval between each request (seconds)",
        "default" : 60}]
 

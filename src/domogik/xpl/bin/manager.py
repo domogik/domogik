@@ -552,7 +552,8 @@ class SysManager(xPLPlugin):
         for component in self._components:
             if component["name"] == plg:
                 for conf in component["configuration"]:
-                    conf_content = "%s,%s,%s" % (conf["key"],
+                    conf_content = "%s,%s,%s,%s" % (conf["key"],
+                                                conf["type"],
                                                 conf["description"],
                                                 conf["default"])
                     mess.add_data({'config'+str(conf["id"]) : conf_content})

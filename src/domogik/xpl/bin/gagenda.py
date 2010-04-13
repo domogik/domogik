@@ -50,18 +50,22 @@ DOMOGIK_PLUGIN_DOCUMENTATION_LINK = "http://wiki.domogik.org/tiki-index.php?page
 DOMOGIK_PLUGIN_CONFIGURATION=[
       {"id" : 0,
        "key" : "startup-plugin",
+       "type" : "boolean",
        "description" : "Automatically start plugin at Domogik startup",
        "default" : "False"},
       {"id" : 1,
        "key" : "email",
+       "type" : "string",
        "description" : "Google email account",
        "default" : ""},
       {"id" : 2,
        "key" : "password",
+       "type" : "string",
        "description" : "Password for email account",
        "default" : ""},
       {"id" : 3,
        "key" : "calendarname",
+       "type" : "string",
        "description" : "Calendar name (default : your email)",
        "default" : ""}]
 

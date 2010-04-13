@@ -87,22 +87,27 @@ DOMOGIK_PLUGIN_DOCUMENTATION_LINK = "http://wiki.domogik.org/tiki-index.php?page
 DOMOGIK_PLUGIN_CONFIGURATION = [
       {"id" : 0,
        "key" : "queue-timeout",
+       "type" : "number",
        "description" : "Maximum wait time for getting data froma queue",
        "default" : QUEUE_TIMEOUT},
       {"id" : 1,
        "key" : "queue-size",
+       "type" : "number",
        "description" : "Size for 'classic' queues. You should not have to change this value",
        "default" : QUEUE_SIZE},
       {"id" : 2,
        "key" : "queue-cmd-size",
+       "type" : "number",
        "description" : "Size for /command queue",
        "default" : QUEUE_COMMAND_SIZE},
       {"id" : 3,
        "key" : "queue-life-exp",
+       "type" : "number",
        "description" : "Life expectancy for a xpl message in queues. You sould not have to change this value",
        "default" : QUEUE_LIFE_EXPECTANCY},
       {"id" : 4,
        "key" : "queue-sleep",
+       "type" : "number",
        "description" : "Time between each unsuccessfull look for a xpl data in a queue",
        "default" : QUEUE_SLEEP}]
 
@@ -2603,6 +2608,14 @@ target=*
         cmd = message.data['command']
         host = message.data["host"]
         name = message.data["plugin"]
+        try:
+            error = message.data["error"]
+            self.send_http_response_error(999, "Error on detail request : %s" % error,
+                                          self.jsonp, self.jsonp_cb)
+            return
+        except:
+            # no error, everything is alright
+            pass 
         description = message.data["description"]
         technology = message.data["technology"]
         status = message.data["status"]
@@ -2618,7 +2631,7 @@ target=*
         while loop_again:
             try:
                 data_conf = message.data["config"+str(idx)].split(",")
-                config_data.append({"id" : idx+1, "key" : data_conf[0], "description" : data_conf[1], "default" : data_conf[2]})
+                config_data.append({"id" : idx+1, "key" : data_conf[0], "type" : data_conf[1], "description" : data_conf[2], "default" : data_conf[3]})
                 idx += 1
             except:
                 loop_again = False
