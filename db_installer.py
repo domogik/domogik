@@ -45,17 +45,17 @@ config = cfg.load()
 test_url = ''
 
 try:
-    db = dict(config[1])
-    url = "%s:///" % db['db_type']
-    if db['db_type'] == 'sqlite':
-        url = "%s%s" % (url,db['db_path'])
+    db_config = dict(config[1])
+    url = "%s:///" % db_config['db_type']
+    if db_config['db_type'] == 'sqlite':
+        url = "%s%s" % (url,db_config['db_path'])
     else:
-        if db['db_port'] != '':
-            url = "%s%s:%s@%s:%s/%s" % (url, db['db_user'], db['db_password'], \
-              db['db_host'], db['db_port'], db['db_name'])
+        if db_config['db_port'] != '':
+            url = "%s%s:%s@%s:%s/%s" % (url, db_config['db_user'], db_config['db_password'], \
+              db_config['db_host'], db_config['db_port'], db_config['db_name'])
         else:
-            url = "%s%s:%s@%s/%s" % (url, db['db_user'], db['db_password'], \
-              db['db_host'], db['db_name'])
+            url = "%s%s:%s@%s/%s" % (url, db_config['db_user'], db_config['db_password'], \
+              db_config['db_host'], db_config['db_name'])
     test_url = '%s_test' % url
 except:
     print "Some errors appears during connection to the database : Can't fetch informations from config file"
@@ -70,78 +70,78 @@ sql_schema.metadata.create_all(engine)
 # For unit tests
 sql_schema.metadata.create_all(engine_test)
 
-_db = database.DbHelper()
+db = database.DbHelper()
 
 # Initialize default system configuration
-_db.update_system_config()
+db.update_system_config()
 
 # Create a default user account
-_db.add_default_user_account()
+db.add_default_user_account()
 
 # Create device technologie features for X10
 
-device_technology = _db.add_device_technology(dt_id='x10', dt_name='X10', dt_description='')
-device_type = _db.add_device_type(dty_name='Switch', dt_id=device_technology.id)
-_db.add_actuator_feature(af_name='Switch', af_device_type_id=device_type.id, af_parameters='{&quot;command0&quot;:&quot;off&quot;, &quot;command1&quot;:&quot;on&quot;}', af_value_type='binary')
-device_type = _db.add_device_type(dty_name='Dimmer', dt_id=device_technology.id)
-_db.add_actuator_feature(af_name='Dimmer', af_device_type_id=device_type.id, af_parameters='{&quot;commandMin&quot;:0, &quot;commandMax&quot;:100}', af_value_type='range')
+device_technology = db.add_device_technology(dt_id='x10', dt_name='X10', dt_description='')
+device_type = db.add_device_type(dty_name='Switch', dt_id=device_technology.id)
+db.add_actuator_feature(af_name='Switch', af_device_type_id=device_type.id, af_parameters='{&quot;command0&quot;:&quot;off&quot;, &quot;command1&quot;:&quot;on&quot;}', af_value_type='binary')
+device_type = db.add_device_type(dty_name='Dimmer', dt_id=device_technology.id)
+db.add_actuator_feature(af_name='Dimmer', af_device_type_id=device_type.id, af_parameters='{&quot;commandMin&quot;:0, &quot;commandMax&quot;:100}', af_value_type='range')
 
 # Create device technologie features for PLCBus
-device_technology = _db.add_device_technology(dt_id='plcbus', dt_name='PLCBus', dt_description='')
-device_type = _db.add_device_type(dty_name='Switch', dt_id=device_technology.id)
-_db.add_actuator_feature(af_name='Switch', af_device_type_id=device_type.id, af_parameters='{&quot;command0&quot;:&quot;off&quot;, &quot;command1&quot;:&quot;on&quot;}', af_value_type='binary', af_return_confirmation=True)
-device_type = _db.add_device_type(dty_name='Dimmer', dt_id=device_technology.id)
-_db.add_actuator_feature(af_name='Dimmer', af_device_type_id=device_type.id, af_parameters='{&quot;commandMin&quot;:0, &quot;commandMax&quot;:100}', af_value_type='range', af_return_confirmation=True)
+device_technology = db.add_device_technology(dt_id='plcbus', dt_name='PLCBus', dt_description='')
+device_type = db.add_device_type(dty_name='Switch', dt_id=device_technology.id)
+db.add_actuator_feature(af_name='Switch', af_device_type_id=device_type.id, af_parameters='{&quot;command0&quot;:&quot;off&quot;, &quot;command1&quot;:&quot;on&quot;}', af_value_type='binary', af_return_confirmation=True)
+device_type = db.add_device_type(dty_name='Dimmer', dt_id=device_technology.id)
+db.add_actuator_feature(af_name='Dimmer', af_device_type_id=device_type.id, af_parameters='{&quot;commandMin&quot;:0, &quot;commandMax&quot;:100}', af_value_type='range', af_return_confirmation=True)
 
 # Create device technology features for EIB/KNX
-_db.add_device_technology(dt_id='eibknx', dt_name='EIB/KNX', dt_description='')
+db.add_device_technology(dt_id='eibknx', dt_name='EIB/KNX', dt_description='')
 # Create device technology features for 1wire
-_db.add_device_technology(dt_id='1wire', dt_name='1-Wire', dt_description='')
+db.add_device_technology(dt_id='1wire', dt_name='1-Wire', dt_description='')
 # Create device technology features for RFXCom
-_db.add_device_technology(dt_id='rfxcom', dt_name='RFXCom', dt_description='')
+db.add_device_technology(dt_id='rfxcom', dt_name='RFXCom', dt_description='')
 # Create device technology features for IR
-_db.add_device_technology(dt_id='ir', dt_name='Infra Red', dt_description='')
+db.add_device_technology(dt_id='ir', dt_name='Infra Red', dt_description='')
 # Create device technology features for Service
-device_technology = _db.add_device_technology(dt_id='service', dt_name='Service',
+device_technology = db.add_device_technology(dt_id='service', dt_name='Service',
                           dt_description='Distributed services, water, gas, electricity')
-device_type = _db.add_device_type(dty_name='Teleinfo', dt_id=device_technology.id)
+device_type = db.add_device_type(dty_name='Teleinfo', dt_id=device_technology.id)
 
 # Create device technology features for RFID
-_db.add_device_technology(dt_id='rfid', dt_name='RFID', dt_description='')
+db.add_device_technology(dt_id='rfid', dt_name='RFID', dt_description='')
 # Create device technology features for Computer
-device_technology = _db.add_device_technology(dt_id='computer', dt_name='Computer',
+device_technology = db.add_device_technology(dt_id='computer', dt_name='Computer',
                                               dt_description='Computers monitoring and controling ')
-device_type = _db.add_device_type(dty_name='WOL', dt_id=device_technology.id)
-_db.add_actuator_feature(af_name='Activation', af_device_type_id=device_type.id, af_value_type='trigger',
+device_type = db.add_device_type(dty_name='WOL', dt_id=device_technology.id)
+db.add_actuator_feature(af_name='Activation', af_device_type_id=device_type.id, af_value_type='trigger',
                          af_return_confirmation=False)
 # Create device technologie features for MultiMedia
-_db.add_device_technology(dt_id='multimedia', dt_name='MultiMedia', dt_description='Music, Video')
+db.add_device_technology(dt_id='multimedia', dt_name='MultiMedia', dt_description='Music, Video')
 # Create device technologie features for Communication
-_db.add_device_technology(dt_id='communication', dt_name='Communication',
+db.add_device_technology(dt_id='communication', dt_name='Communication',
                           dt_description='Telephony, videophone, mails, messaging')
 
 # Create device usages
-_db.add_device_usage(du_name='Light', du_description='Lamp, light usage',
+db.add_device_usage(du_name='Light', du_description='Lamp, light usage',
                      du_default_options='{ &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;}, &quot;range&quot;: {&quot;step&quot;:10, &quot;unit&quot;:&quot;%&quot;} }')
-_db.add_device_usage(du_name='Socket', du_description='Socket usage',
+db.add_device_usage(du_name='Socket', du_description='Socket usage',
                      du_default_options='{ &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;}, &quot;range&quot;: {&quot;step&quot;:10, &quot;unit&quot;:&quot;%&quot;} }')
-_db.add_device_usage(du_name='Shutter', du_description='Shutter usage',
+db.add_device_usage(du_name='Shutter', du_description='Shutter usage',
                      du_default_options='{ &quot;binary&quot;: {&quot;state0&quot;:&quot;Down&quot;, &quot;state1&quot;:&quot;Up&quot;}, &quot;range&quot;: {&quot;step&quot;:10, &quot;unit&quot;:&quot;%&quot;} }')
-_db.add_device_usage(du_name='Air conditioning', du_description='Air conditioning usage',
+db.add_device_usage(du_name='Air conditioning', du_description='Air conditioning usage',
                      du_default_options='{ &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;}, &quot;range&quot;: {&quot;step&quot;:1, &quot;unit&quot;:&quot;&deg;C&quot;} }')
-_db.add_device_usage(du_name='Ventilation', du_description='Ventilation usage',
+db.add_device_usage(du_name='Ventilation', du_description='Ventilation usage',
                      du_default_options='{ &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;}, &quot;range&quot;: {&quot;step&quot;:10, &quot;unit&quot;:&quot;%&quot;} }')
-_db.add_device_usage(du_name='Heating', du_description='Heating',
+db.add_device_usage(du_name='Heating', du_description='Heating',
                      du_default_options='{ &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;}, &quot;range&quot;: {&quot;step&quot;:1, &quot;unit&quot;:&quot;&deg;C&quot;} }')
-_db.add_device_usage(du_name='Appliance', du_description='Appliance usage',
+db.add_device_usage(du_name='Appliance', du_description='Appliance usage',
                      du_default_options='{ &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;} }')
-_db.add_device_usage(du_name='Desktop Computer', du_description='Desktop computer usage',
+db.add_device_usage(du_name='Desktop Computer', du_description='Desktop computer usage',
                      du_default_options='{ &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;} }')
-_db.add_device_usage(du_name='Server', du_description='Server usage',
+db.add_device_usage(du_name='Server', du_description='Server usage',
                      du_default_options='{ &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;} }')
-_db.add_device_usage(du_name='Phone', du_description='Phone usage', du_default_options='{ }')
-_db.add_device_usage(du_name='TV', du_description='Television usage',
+db.add_device_usage(du_name='Phone', du_description='Phone usage', du_default_options='{ }')
+db.add_device_usage(du_name='TV', du_description='Television usage',
                      du_default_options='{ &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;} }')
-_db.add_device_usage(du_name='Water', du_description='Water service', du_default_options='{ }')
-_db.add_device_usage(du_name='Gas', du_description='Gas service', du_default_options='{ }')
-_db.add_device_usage(du_name='Electricity', du_description='Electricity service', du_default_options='{ }')
+db.add_device_usage(du_name='Water', du_description='Water service', du_default_options='{ }')
+db.add_device_usage(du_name='Gas', du_description='Gas service', du_default_options='{ }')
+db.add_device_usage(du_name='Electricity', du_description='Electricity service', du_default_options='{ }')
