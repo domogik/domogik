@@ -1410,56 +1410,8 @@ target=*
                 return
 
 
-        ### actuator feature #########################
-        elif self.rest_request[0] == "actuator_feature":
 
-            ### list
-            if self.rest_request[1] == "list":
-                if len(self.rest_request) == 2:
-                    self._rest_base_actuator_feature_list()
-                elif len(self.rest_request) == 3:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-                else:
-                    if self.rest_request[2] == "by-id":
-                        self._rest_base_actuator_feature_list(id=self.rest_request[3])
-                    else:
-                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-
-            ### others
-            else:
-                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], \
-                                                  self.jsonp, self.jsonp_cb)
-                return
-
-
-
-        ### sensor feature ###########################
-        elif self.rest_request[0] == "sensor_feature":
-
-            ### list
-            if self.rest_request[1] == "list":
-                if len(self.rest_request) == 2:
-                    self._rest_base_sensor_feature_list()
-                elif len(self.rest_request) == 3:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-                else:
-                    if self.rest_request[2] == "by-id":
-                        self._rest_base_sensor_feature_list(id=self.rest_request[3])
-                    else:
-                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-
-            ### others
-            else:
-                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], \
-                                                  self.jsonp, self.jsonp_cb)
-                return
-
-
-        ### device technology ########################
+        ### device technology ##########################
         elif self.rest_request[0] == "device_technology":
 
             ### list
@@ -2095,49 +2047,6 @@ target=*
             json_data.add_data(features)
         self.send_http_response_ok(json_data.get())
 
-
-
-
-
-######
-# /base/actuator_feature processing
-######
-
-    def _rest_base_actuator_feature_list(self, id = None):
-        """ list actuator features
-            @param id : id of actuator feature 
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("actuator_feature")
-        if id == None:
-            for actuator_feature in self._db.list_actuator_features():
-                json_data.add_data(actuator_feature)
-        else:
-            actuator_feature = self._db.get_actuator_feature_by_id(id)
-            if actuator_feature is not None:
-                json_data.add_data(actuator_feature)
-        self.send_http_response_ok(json_data.get())
-
-######
-# /base/sensor_feature processing
-######
-
-    def _rest_base_sensor_feature_list(self, id = None):
-        """ list sensor features
-            @param id : id of sensor feature 
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("sensor_feature")
-        if id == None:
-            for sensor_feature in self._db.list_sensor_features():
-                json_data.add_data(sensor_feature)
-        else:
-            sensor_feature = self._db.get_sensor_feature_by_id(id)
-            if sensor_feature is not None:
-                json_data.add_data(sensor_feature)
-        self.send_http_response_ok(json_data.get())
 
 
 
