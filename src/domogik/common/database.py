@@ -52,6 +52,7 @@ from domogik.common.configloader import Loader
 from domogik.common.sql_schema import ACTUATOR_VALUE_TYPE_LIST, Area, Device, DeviceTypeFeature, \
                                       DeviceUsage, DeviceFeatureAssociation, DEVICE_FEATURE_ASSOCIATION_LIST, \
                                       DeviceConfig, DeviceStats, DeviceStatsValue, DeviceTechnology, PluginConfig, \
+                                      PluginConfigParam, \
                                       DeviceType, UIItemConfig, Room, Person, UserAccount, SENSOR_VALUE_TYPE_LIST, \
                                       SystemConfig, SystemStats, SystemStatsValue, Trigger
 
@@ -1070,29 +1071,37 @@ class DbHelper():
 ####
 # Plugin config
 ####
-    def list_plugin_config(self, pl_name):
-        """
-        Return all keys and values of a plugin
-        @param pl_name : plugin name
-        @return a list of PluginConfig objects
-        """
-        return self.__session.query(PluginConfig).filter_by(plugin_name=ucode(pl_name)).all()
-
     def list_all_plugin_config(self):
         """
-        Return a list of all plugin parameters
+        Return a list of all plugin config
         @return a list of PluginConfig objects
         """
         return self.__session.query(PluginConfig).all()
 
-    def get_plugin_config(self, pl_name, pl_key):
+    def list_plugin_config_param(self, pl_name):
+        """
+        Return all keys and values of a plugin
+        @param pl_name : plugin name
+        @return a list of PluginConfigParam objects
+        """
+        return self.__session.query(PluginConfigParam).filter_by(plugin_name=ucode(pl_name)).all()
+
+    def get_plugin_config(self, pl_name):
+        """
+        Return information about a plugin config
+        @param pl_name : plugin name
+        @return a PluginConfig object
+        """
+        return self.__session.query(PluginConfig).filter_by(plugin_name=ucode(pl_name)).first()
+
+    def get_plugin_config_param(self, pl_name, pl_key):
         """
         Return information about a plugin parameter
         @param pl_name : plugin name
         @param pl_key : key we want the value from
-        @return a PluginConfig object
+        @return a PluginConfigParam object
         """
-        return self.__session.query(PluginConfig)\
+        return self.__session.query(PluginConfigParam)\
                              .filter_by(plugin_name=ucode(pl_name))\
                              .filter_by(key=ucode(pl_key))\
                              .first()
@@ -1107,40 +1116,49 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        plugin_key = self.__session.query(PluginConfig)\
-                                   .filter_by(plugin_name=ucode(pl_name), key=ucode(pl_key))\
-                                   .first()
-        if plugin_key is None:
-            plugin_key = PluginConfig(plugin_name=ucode(pl_name), key=ucode(pl_key), value=ucode(pl_value))
+        plugin_config = self.__session.query(PluginConfig).filter_by(plugin_name=ucode(pl_name)).first()
+        if not plugin_config:
+            plugin_config = PluginConfig(plugin_name=ucode(pl_name))
+            self.__session.add(plugin_config)
+            plugin_config_param = PluginConfigParam(plugin_name=ucode(pl_name),
+                                                    key=ucode(pl_key), value=ucode(pl_value))
         else:
-            plugin_key.value = ucode(pl_value)
-        self.__session.add(plugin_key)
+            plugin_config_param = self.__session.query(PluginConfigParam)\
+                                      .filter_by(plugin_name=ucode(pl_name), key=ucode(pl_key)).first()
+            if not plugin_config_param:
+                plugin_config_param = PluginConfigParam(plugin_name=ucode(pl_name),
+                                                        key=ucode(pl_key), value=ucode(pl_value))
+            else:
+                plugin_config_param.value = ucode(pl_value)
+        self.__session.add(plugin_config_param)
         try:
             self.__session.commit()
         except Exception, sql_exception:
             self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-        return plugin_key
+        return plugin_config
 
     def del_plugin_config(self, pl_name):
         """
-        Delete all parameters of a plugin
+        Delete all parameters of a plugin config
         @param pl_name : plugin name
-        @return the deleted PluginConfig objects (list)
+        @return the deleted PluginConfig object
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        plugin_key_list = self.__session.query(PluginConfig).filter_by(plugin_name=ucode(pl_name)).all()
-        pl_key_deleted_list = []
-        for plugin_key in plugin_key_list:
-            pl_key_deleted_list.append(plugin_key)
-            self.__session.delete(plugin_key)
-            try:
-                self.__session.commit()
-            except Exception, sql_exception:
-                self.__session.rollback()
-                raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-        return pl_key_deleted_list
+        plugin_config = self.__session.query(PluginConfig).filter_by(plugin_name=ucode(pl_name)).first()
+        if not plugin_config:
+            raise DbHelperException("Plugin config for plugin name %s doesn't exist" % pl_name)
+        plugin_config_param_list = self.__session.query(PluginConfigParam).filter_by(plugin_name=ucode(pl_name)).all()
+        for param in plugin_config_param_list:
+            self.__session.delete(param)
+        self.__session.delete(plugin_config)
+        try:
+            self.__session.commit()
+        except Exception, sql_exception:
+            self.__session.rollback()
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
+        return plugin_config
 
 ###
 # Devices
