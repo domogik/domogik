@@ -924,10 +924,14 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        if not self.__session.query(Device).filter_by(id=d_device_id).first():
+        device = self.__session.query(Device).filter_by(id=d_device_id).first()
+        if not device:
             raise DbHelperException("Device id %s doesn't exist" % d_device_id)
-        if not self.__session.query(DeviceTypeFeature).filter_by(id=d_type_feature_id).first():
+        device_type_feature = self.__session.query(DeviceTypeFeature).filter_by(id=d_type_feature_id).first()
+        if not device_type_feature:
             raise DbHelperException("DeviceTypeFeature id %s doesn't exist" % d_type_feature_id)
+        if device.device_type_id != device_type_feature.device_type_id:
+            raise DbHelperException("device_type_id of device and device_type_id of device_type_feature are not the same!")
         if d_place_type not in DEVICE_FEATURE_ASSOCIATION_LIST:
             raise DbHelperException("Place type should be one of : %s" % DEVICE_FEATURE_ASSOCIATION_LIST)
         if d_place_type is None and d_place_id is not None:
