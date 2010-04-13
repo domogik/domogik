@@ -131,6 +131,7 @@ class Area(Base):
     id = Column(Integer, primary_key=True)
     name = Column(Unicode(30), nullable=False)
     description = Column(UnicodeText())
+    rooms = relation('Room', backref=__tablename__)
 
     def __init__(self, name, description=None):
         """
@@ -166,7 +167,7 @@ class Room(Base):
     name = Column(Unicode(30), nullable=False)
     description = Column(UnicodeText())
     area_id = Column(Integer, ForeignKey('%s.id' % Area.get_tablename()))
-    area = relation(Area, backref=backref(__tablename__, order_by=id))
+    area = relation(Area)
 
     def __init__(self, name, description=None, area_id=None):
         """
@@ -312,7 +313,7 @@ class DeviceType(Base):
     id = Column(Integer, primary_key=True)
     device_technology_id = Column(Unicode(30), ForeignKey('%s.id' % \
                            DeviceTechnology.get_tablename()), nullable=False)
-    device_technology = relation(DeviceTechnology, backref=backref(__tablename__))
+    device_technology = relation(DeviceTechnology)
     name = Column(Unicode(30), nullable=False)
     description = Column(UnicodeText())
 
@@ -354,9 +355,9 @@ class Device(Base):
     address = Column(Unicode(30), nullable=False)
     reference = Column(Unicode(30))
     device_usage_id = Column(Integer, ForeignKey('%s.id' % DeviceUsage.get_tablename()), nullable=False)
-    device_usage = relation(DeviceUsage, backref=backref(__tablename__))
+    device_usage = relation(DeviceUsage)
     device_type_id = Column(Integer, ForeignKey('%s.id' % DeviceType.get_tablename()), nullable=False)
-    device_type = relation(DeviceType, backref=backref(__tablename__))
+    device_type = relation(DeviceType)
     device_stats = relation("DeviceStats", order_by="DeviceStats.date.desc()", backref=__tablename__)
 
     def __init__(self, name, address, reference, device_usage_id, device_type_id, description=None):
@@ -427,7 +428,7 @@ class DeviceTypeFeature(Base):
     name = Column(Unicode(30), nullable=False)
     feature_type = Column(Enum(FEATURE_TYPE_LIST), nullable=False)
     device_type_id = Column(Integer, ForeignKey('%s.id' % DeviceType.get_tablename()), nullable=False)
-    device_type = relation(DeviceType, backref=backref(__tablename__))
+    device_type = relation(DeviceType)
     parameters = Column(UnicodeText())
     value_type = Column(Unicode(30), nullable=False)
     return_confirmation = Column(Boolean, nullable=False)
@@ -481,7 +482,7 @@ class DeviceFeatureAssociation(Base):
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), primary_key=True)
     device = relation(Device, backref=backref(__tablename__))
     device_type_feature_id = Column(Integer, ForeignKey('%s.id' % DeviceTypeFeature.get_tablename()), primary_key=True)
-    device_type_feature = relation(DeviceTypeFeature, backref=backref(__tablename__))
+    device_type_feature = relation(DeviceTypeFeature)
     place_type = Column(Enum(DEVICE_FEATURE_ASSOCIATION_LIST), nullable=True)
     place_id = Column(Integer, nullable=True)
 
@@ -522,7 +523,7 @@ class DeviceConfig(Base):
     key = Column(String(30), primary_key=True)
     value = Column(Unicode(255), nullable=False)
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), primary_key=True)
-    device = relation(Device, backref=backref(__tablename__))
+    device = relation(Device)
 
     def __init__(self, key, device_id, value):
         """
@@ -558,7 +559,7 @@ class DeviceStats(Base):
     __tablename__ = '%s_device_stats' % _db_prefix
     id = Column(Integer, primary_key=True)
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), nullable=False)
-    device = relation(Device, backref=backref(__tablename__))
+    device = relation(Device)
     date = Column(DateTime, nullable=False)
 
     def __init__(self, device_id, date):
@@ -593,7 +594,7 @@ class DeviceStatsValue(Base):
     __tablename__ = '%s_device_stats_value' % _db_prefix
     id = Column(Integer, primary_key=True)
     device_stats_id = Column(Integer, ForeignKey('%s.id' % DeviceStats.get_tablename()), nullable=False)
-    device_stats = relation(DeviceStats, backref=backref(__tablename__))
+    device_stats = relation(DeviceStats)
     name = Column(Unicode(30), nullable=False)
     value = Column(Unicode(255), nullable=False)
 
@@ -707,7 +708,7 @@ class UserAccount(Base):
     login = Column(Unicode(20), nullable=False, unique=True)
     password = Column(Unicode(255), nullable=False)
     person_id = Column(Integer, ForeignKey('%s.id' % Person.get_tablename()))
-    person = relation(Person, backref=backref(__tablename__))
+    person = relation(Person)
     is_admin = Column(Boolean, nullable=False, default=False)
     skin_used = Column(Unicode(80), nullable=False)
 
@@ -786,7 +787,7 @@ class SystemStatsValue(Base):
     __tablename__ = '%s_system_stats_value' % _db_prefix
     id = Column(Integer, primary_key=True)
     system_stats_id = Column(Integer, ForeignKey('%s.id' % SystemStats.get_tablename()), nullable=False)
-    system_stats = relation(SystemStats, backref=backref(__tablename__))
+    system_stats = relation(SystemStats)
     name = Column(Unicode(30), nullable=False)
     value = Column(Unicode(255), nullable=False)
 
