@@ -132,11 +132,11 @@ class Area(Base):
     name = Column(Unicode(30), nullable=False)
     description = Column(UnicodeText())
 
-    def __init__(self, name, description):
+    def __init__(self, name, description=None):
         """
         Class constructor
         @param name : short name of the area
-        @param description : extended description
+        @param description : extended description, optional
         """
         self.name = name
         self.description = description
@@ -168,11 +168,11 @@ class Room(Base):
     area_id = Column(Integer, ForeignKey('%s.id' % Area.get_tablename()))
     area = relation(Area, backref=backref(__tablename__, order_by=id))
 
-    def __init__(self, name, description, area_id=None):
+    def __init__(self, name, description=None, area_id=None):
         """
         Class constructor
         @param name : short name of the area
-        @param description : extended description
+        @param description : extended description, optional
         @param area_id : id of the area where the room is, optional
         """
         self.name = name
@@ -205,12 +205,12 @@ class DeviceUsage(Base):
     description = Column(UnicodeText())
     default_options = Column(UnicodeText())
 
-    def __init__(self, name, description, default_options):
+    def __init__(self, name, description=None, default_options=None):
         """
         Class constructor
         @param name : short name of the usage
-        @param description : extended description
-        @param default_options : default options
+        @param description : extended description, optional
+        @param default_options : default options, optional
         """
         self.name = name
         self.description = description
@@ -241,12 +241,12 @@ class DeviceTechnology(Base):
     name = Column(Unicode(30), nullable=False)
     description = Column(UnicodeText())
 
-    def __init__(self, id, name, description):
+    def __init__(self, id, name, description=None):
         """
         Class constructor
         @param id : technology id (ie x10, plcbus, eibknx...) with no spaces / accents or special characters
         @param name : short name of the technology
-        @param description : extended description
+        @param description : extended description, optional
         """
         self.id = id
         self.name = name
@@ -316,7 +316,7 @@ class DeviceType(Base):
     name = Column(Unicode(30), nullable=False)
     description = Column(UnicodeText())
 
-    def __init__(self, name, description, device_technology_id):
+    def __init__(self, name, device_technology_id, description=None):
         """
         Class constructor
         @param name : short name of the type
@@ -359,22 +359,22 @@ class Device(Base):
     device_type = relation(DeviceType, backref=backref(__tablename__))
     device_stats = relation("DeviceStats", order_by="DeviceStats.date.desc()", backref=__tablename__)
 
-    def __init__(self, name, address, description, reference, device_usage_id, device_type_id):
+    def __init__(self, name, address, reference, device_usage_id, device_type_id, description=None):
         """
         Class constructor
         @param name : short name of the device
-        @param description : extended description
         @param address : device address (like 'A3' for x10, or '01.123456789ABC' for 1wire)
         @param reference : internal reference of the device (like AM12 for a X10 device)
         @param device_usage_id : link to the device usage
         @param device_type_id : 'link to the device type (x10.Switch, x10.Dimmer, Computer.WOL...)
+        @param description : extended description, optional
         """
         self.name = name
         self.address = address
-        self.description = description
         self.reference = reference
         self.device_type_id = device_type_id
         self.device_usage_id = device_usage_id
+        self.description = description
 
     # TODO see if following methods are still useful
     def is_lamp(self):
@@ -592,9 +592,7 @@ class DeviceStatsValue(Base):
     """
     __tablename__ = '%s_device_stats_value' % _db_prefix
     id = Column(Integer, primary_key=True)
-    device_stats_id = Column(Integer,
-                             ForeignKey('%s.id' % DeviceStats.get_tablename()),
-                             nullable=False)
+    device_stats_id = Column(Integer, ForeignKey('%s.id' % DeviceStats.get_tablename()), nullable=False)
     device_stats = relation(DeviceStats, backref=backref(__tablename__))
     name = Column(Unicode(30), nullable=False)
     value = Column(Unicode(255), nullable=False)
@@ -636,16 +634,16 @@ class Trigger(Base):
     rule = Column(Text, nullable=False)
     result = Column(Text, nullable=False)
 
-    def __init__(self, description, rule, result):
+    def __init__(self, rule, result, description=None):
         """
         Class constructor
-        @param description : long description of the rule
         @param rule : formatted trigger rule
         @param result : list of xpl message to send when the rule is met
+        @param description : long description of the rule, optional
         """
-        self.description = description
         self.rule = rule
         self.result = result
+        self.description = description
 
     def __repr__(self):
         """
@@ -787,9 +785,7 @@ class SystemStatsValue(Base):
     """
     __tablename__ = '%s_system_stats_value' % _db_prefix
     id = Column(Integer, primary_key=True)
-    system_stats_id = Column(Integer,
-                             ForeignKey('%s.id' % SystemStats.get_tablename()),
-                             nullable=False)
+    system_stats_id = Column(Integer, ForeignKey('%s.id' % SystemStats.get_tablename()), nullable=False)
     system_stats = relation(SystemStats, backref=backref(__tablename__))
     name = Column(Unicode(30), nullable=False)
     value = Column(Unicode(255), nullable=False)
@@ -827,7 +823,6 @@ class UIItemConfig(Base):
     class name for icons
     """
     __tablename__ = '%s_ui_item_config' % _db_prefix
-
     name =  Column(Unicode(30), primary_key=True)
     reference = Column(Unicode(30), primary_key=True)
     key = Column(Unicode(30), primary_key=True)
