@@ -429,19 +429,26 @@ class DeviceTypeFeature(Base):
     device_type_id = Column(Integer, ForeignKey('%s.id' % DeviceType.get_tablename()), nullable=False)
     device_type = relation(DeviceType, backref=backref(__tablename__))
     parameters = Column(UnicodeText())
+    value_type = Column(Unicode(30), nullable=False)
+    return_confirmation = Column(Boolean, nullable=False)
 
-    def __init__(self, name, feature_type, device_type_id, parameters=None):
+    def __init__(self, name, feature_type, device_type_id, value_type, parameters=None, return_confirmation=False):
         """
         Class constructor
         @param name : device feature name (Switch, Dimmer, Thermometer, Voltmeter...)
         @param feature_type : device feature type
         @param device_type_id : device type id
+        @param value_type : value type the actuator can accept / the sensor can return
         @param parameters : parameters about the command or the returned data associated to the device, optional
+        @param return_confirmation : True if the device returns a confirmation after having executed a command ,optional (default False)
+                                     Only relevant for actuators
         """
         self.name = name
         self.feature_type = feature_type
         self.device_type_id = device_type_id
+        self.value_type = value_type
         self.parameters = parameters
+        self.return_confirmation = return_confirmation
 
     def __repr__(self):
         """
@@ -457,77 +464,6 @@ class DeviceTypeFeature(Base):
         @return table name
         """
         return DeviceTypeFeature.__tablename__
-
-
-class ActuatorFeature(Base):
-    """
-    Actuator features (device type feature specialization)
-    """
-    __tablename__ = '%s_actuator_feature' % _db_prefix
-    device_type_feature_id = Column(Integer, ForeignKey('%s.id' % DeviceTypeFeature.get_tablename()), primary_key=True)
-    device_type_feature = relation(DeviceTypeFeature, backref=backref(__tablename__))
-    value_type = Column(Enum(ACTUATOR_VALUE_TYPE_LIST), nullable=False)
-    return_confirmation = Column(Boolean, nullable=False)
-
-    def __init__(self, device_type_feature_id, value_type, return_confirmation=False):
-        """
-        Class constructor
-        @param device_type_feature_id : corresponding device type feature id
-        @param value_type : value type the actuator can accept
-        @param return_confirmation : True if the device returns a confirmation after having executed a command ,optional (default False)
-        """
-        self.device_type_feature_id = device_type_feature_id
-        self.value_type = value_type
-        self.return_confirmation = return_confirmation
-
-    def __repr__(self):
-        """
-        Print an internal representation of the class
-        @return an internal representation
-        """
-        return "<ActuatorFeature(%s, %s, %s)>" % (self.device_type_feature_id, self.value_type, self.return_confirmation)
-
-    @staticmethod
-    def get_tablename():
-        """
-        Return the table name associated to the class
-        @return table name
-        """
-        return ActuatorFeature.__tablename__
-
-
-class SensorFeature(Base):
-    """
-    Sensor features (device type feature specialization)
-    """
-    __tablename__ = '%s_sensor_feature' % _db_prefix
-    device_type_feature_id = Column(Integer, ForeignKey('%s.id' % DeviceTypeFeature.get_tablename()), primary_key=True)
-    device_type_feature = relation(DeviceTypeFeature, backref=backref(__tablename__))
-    value_type = Column(Enum(ACTUATOR_VALUE_TYPE_LIST), nullable=False)
-
-    def __init__(self, device_type_feature_id, value_type):
-        """
-        Class constructor
-        @param device_type_feature_id : corresponding device type feature id
-        @param value_type : value type of the data returned by the sensor
-        """
-        self.device_type_feature_id = device_type_feature_id
-        self.value_type = value_type
-
-    def __repr__(self):
-        """
-        Print an internal representation of the class
-        @return an internal representation
-        """
-        return "<SensorFeature(%s, %s)>" % (self.device_type_feature_id, self.value_type)
-
-    @staticmethod
-    def get_tablename():
-        """
-        Return the table name associated to the class
-        @return table name
-        """
-        return SensorFeature.__tablename__
 
 
 class DeviceFeatureAssociation(Base):
