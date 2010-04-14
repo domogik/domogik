@@ -52,7 +52,6 @@ from domogik.common.configloader import Loader
 from domogik.common.sql_schema import ACTUATOR_VALUE_TYPE_LIST, Area, Device, DeviceTypeFeature, \
                                       DeviceUsage, DeviceFeatureAssociation, DEVICE_FEATURE_ASSOCIATION_LIST, \
                                       DeviceConfig, DeviceStats, DeviceStatsValue, DeviceTechnology, PluginConfig, \
-                                      PluginConfigParam, \
                                       DeviceType, UIItemConfig, Room, Person, UserAccount, SENSOR_VALUE_TYPE_LIST, \
                                       SystemConfig, SystemStats, SystemStatsValue, Trigger
 
@@ -1066,64 +1065,56 @@ class DbHelper():
 ####
     def list_all_plugin_config(self):
         """
-        Return a list of all plugin config
+        Return a list of all plugin config parameters
         @return a list of PluginConfig objects
         """
         return self.__session.query(PluginConfig).all()
 
-    def list_plugin_config_param(self, pl_name):
+    def list_plugin_config(self, pl_name, pl_hostname):
         """
-        Return all keys and values of a plugin
+        Return all parameters of a plugin
         @param pl_name : plugin name
-        @return a list of PluginConfigParam objects
+        @param pl_hostname : hostname the plugin is installed on
+        @return a list of PluginConfig objects
         """
-        return self.__session.query(PluginConfigParam).filter_by(plugin_name=ucode(pl_name)).all()
+        return self.__session.query(PluginConfig).filter_by(name=ucode(pl_name))\
+                                                 .filter_by(hostname=ucode(pl_hostname)).all()
 
-    def get_plugin_config(self, pl_name):
-        """
-        Return information about a plugin config
-        @param pl_name : plugin name
-        @return a PluginConfig object
-        """
-        return self.__session.query(PluginConfig).filter_by(plugin_name=ucode(pl_name)).first()
-
-    def get_plugin_config_param(self, pl_name, pl_key):
+    def get_plugin_config(self, pl_name, pl_hostname, pl_key):
         """
         Return information about a plugin parameter
         @param pl_name : plugin name
+        @param pl_hostname : hostname the plugin is installed on
         @param pl_key : key we want the value from
-        @return a PluginConfigParam object
+        @return a PluginConfig object
         """
-        return self.__session.query(PluginConfigParam)\
-                             .filter_by(plugin_name=ucode(pl_name))\
+        return self.__session.query(PluginConfig)\
+                             .filter_by(name=ucode(pl_name))\
+                             .filter_by(hostname=ucode(pl_hostname))\
                              .filter_by(key=ucode(pl_key))\
                              .first()
 
-    def set_plugin_config(self, pl_name, pl_key, pl_value):
+    def set_plugin_config(self, pl_name, pl_hostname, pl_key, pl_value):
         """
         Add / update a plugin parameter
         @param pl_name : plugin name
+        @param pl_hostname : hostname the plugin is installed on
         @param pl_key : key we want to add / update
         @param pl_value : key value we want to add / update
         @return : the added / updated PluginConfig item
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        plugin_config = self.__session.query(PluginConfig).filter_by(plugin_name=ucode(pl_name)).first()
+        plugin_config = self.__session.query(PluginConfig)\
+                                      .filter_by(name=ucode(pl_name))\
+                                      .filter_by(hostname=ucode(pl_hostname))\
+                                      .filter_by(key=ucode(pl_key)).first()
         if not plugin_config:
-            plugin_config = PluginConfig(plugin_name=ucode(pl_name))
-            self.__session.add(plugin_config)
-            plugin_config_param = PluginConfigParam(plugin_name=ucode(pl_name),
-                                                    key=ucode(pl_key), value=ucode(pl_value))
+            plugin_config = PluginConfig(name=ucode(pl_name), hostname=ucode(pl_hostname),
+                                         key=ucode(pl_key), value=ucode(pl_value))
         else:
-            plugin_config_param = self.__session.query(PluginConfigParam)\
-                                      .filter_by(plugin_name=ucode(pl_name), key=ucode(pl_key)).first()
-            if not plugin_config_param:
-                plugin_config_param = PluginConfigParam(plugin_name=ucode(pl_name),
-                                                        key=ucode(pl_key), value=ucode(pl_value))
-            else:
-                plugin_config_param.value = ucode(pl_value)
-        self.__session.add(plugin_config_param)
+            plugin_config.value = ucode(pl_value)
+        self.__session.add(plugin_config)
         try:
             self.__session.commit()
         except Exception, sql_exception:
@@ -1131,27 +1122,25 @@ class DbHelper():
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return plugin_config
 
-    def del_plugin_config(self, pl_name):
+    def del_plugin_config(self, pl_name, pl_hostname):
         """
         Delete all parameters of a plugin config
         @param pl_name : plugin name
-        @return the deleted PluginConfig object
+        @param pl_hostname : hostname the plugin is installed on
+        @return the deleted PluginConfig objects
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        plugin_config = self.__session.query(PluginConfig).filter_by(plugin_name=ucode(pl_name)).first()
-        if not plugin_config:
-            raise DbHelperException("Plugin config for plugin name %s doesn't exist" % pl_name)
-        plugin_config_param_list = self.__session.query(PluginConfigParam).filter_by(plugin_name=ucode(pl_name)).all()
-        for param in plugin_config_param_list:
-            self.__session.delete(param)
-        self.__session.delete(plugin_config)
+        plugin_config_list = self.__session.query(PluginConfig).filter_by(name=ucode(pl_name))\
+                                                               .filter_by(hostname=ucode(pl_hostname)).all()
+        for plc in plugin_config_list:
+            self.__session.delete(plc)
         try:
             self.__session.commit()
         except Exception, sql_exception:
             self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-        return plugin_config
+        return plugin_config_list
 
 ###
 # Devices
