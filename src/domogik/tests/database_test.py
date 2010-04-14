@@ -449,12 +449,8 @@ class DeviceTypeFeatureTestCase(GenericTestCase):
         assert self.db.get_actuator_feature_by_id(af2.id).name == 'Dimmer'
         assert len(self.db.list_sensor_features()) == 1
         assert self.db.get_sensor_feature_by_id(sf1.id).name == 'Thermometer'
-        feature_list = self.db.list_device_type_feature_by_device_type_id(dty1.id)
-        assert len(feature_list['actuator_list']) == 1
-        assert len(feature_list['sensor_list']) == 0
-        feature_list = self.db.list_device_type_feature_by_device_type_id(dty3.id)
-        assert len(feature_list['actuator_list']) == 0
-        assert len(feature_list['sensor_list']) == 1
+        assert len(self.db.list_device_type_feature_by_device_type_id(dty1.id)) == 1
+        assert len(self.db.list_device_type_feature_by_device_type_id(dty3.id)) == 1
 
     def test_update(self):
         dt1 = self.db.add_device_technology('x10', 'x10', 'desc dt1')
