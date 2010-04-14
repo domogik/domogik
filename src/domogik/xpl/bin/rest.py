@@ -527,7 +527,6 @@ class RestHandler(BaseHTTPRequestHandler):
         self.protocol_version = 'HTTP/1.1'
         self.request_version = 'HTTP/1.1'
 
-        # TODO : create a thread here
         request = ProcessRequest(self.server.handler_params, self.path, \
                                  self.send_http_response_ok, \
                                  self.send_http_response_error)
