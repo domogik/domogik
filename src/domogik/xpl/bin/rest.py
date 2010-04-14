@@ -2621,10 +2621,10 @@ target=*
             for plugin in self._db.list_all_plugin_config():
                 json_data.add_data(plugin)
         elif key == None:
-            for plugin in self._db.list_plugin_config(name):
+            for plugin in self._db.list_plugin_config_param(name):
                 json_data.add_data(plugin)
         else:
-            plugin = self._db.get_plugin_config(name, key)
+            plugin = self._db.get_plugin_config_param(name, key)
             if plugin is not None:
                 json_data.add_data(plugin)
         self.send_http_response_ok(json_data.get())
@@ -3082,6 +3082,7 @@ class JSonHelper():
                      "device_stats_value",  \
                      "device_technology",  \
                      "plugin_config",  \
+                     "plugin_config_param",  \
                      "device_type",  \
                      "uiitemconfig",  \
                      "room",  \
@@ -3119,7 +3120,7 @@ class JSonHelper():
         # define data types
         db_type = ("DeviceTypeFeature", "Area", "Device", "DeviceUsage", \
                    "DeviceConfig", "DeviceStats", "DeviceStatsValue", \
-                   "DeviceTechnology", "PluginConfig", \
+                   "DeviceTechnology", "PluginConfig", "PluginConfigParam",  \
                    "DeviceType", "UIItemConfig", "Room", "UserAccount", \
                    "SensorReferenceData", "Person", "SystemConfig", \
                    "SystemStats", "SystemStatsValue", "Trigger", \
@@ -3136,8 +3137,8 @@ class JSonHelper():
 
         # get data type
         data_type = type(data).__name__
-        #print "TYPE=%s" % data_type
-        #print data
+        print "TYPE=%s" % data_type
+        print data
 
         ### type instance (sql object)
         if data_type in instance_type:
