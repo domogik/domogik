@@ -37,12 +37,10 @@ import time
 import datetime
 
 from domogik.common.database import DbHelper, DbHelperException
-from domogik.common.sql_schema import Area, Device, DeviceTypeFeature, DeviceUsage, \
-                                      DeviceConfig, DeviceStats, DeviceStatsValue, \
+from domogik.common.sql_schema import Area, Device, DeviceTypeFeature, DeviceUsage, DeviceConfig, DeviceStats, \
                                       DeviceFeatureAssociation, DeviceTechnology, PluginConfig, \
-                                      DeviceType, UIItemConfig, Room, \
-                                      UserAccount, SystemConfig, SystemStats, SystemStatsValue, \
-                                      Trigger, Person
+                                      DeviceType, UIItemConfig, Room, UserAccount, SystemConfig, SystemStats, \
+                                      SystemStatsValue, Trigger, Person
 
 class GenericTestCase(unittest.TestCase):
     """
@@ -107,7 +105,7 @@ class GenericTestCase(unittest.TestCase):
 
     def remove_all_device_stats(self, db):
         for device in db.list_devices():
-            db.del_all_device_stats(device.id)
+            db.del_device_stats(device.id)
 
     def remove_all_triggers(self, db):
         for trigger in db.list_triggers():
@@ -896,6 +894,7 @@ class DeviceStatsTestCase(GenericTestCase):
         assert len(self.db.list_all_device_stats()) == 0
 
     def test_add(self):
+        """
         dt1 = self.db.add_device_technology('x10', 'x10', 'this is x10')
         du1 = self.db.add_device_usage("lighting")
         dty1 = self.db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
@@ -921,6 +920,7 @@ class DeviceStatsTestCase(GenericTestCase):
         assert len(self.db.list_device_stats(device2.id)) == 1
         assert self.db.device_has_stats(device1.id)
         assert not self.db.device_has_stats(device4.id)
+        """
 
     def __has_stat_values(self, device_stats_values, expected_values):
         if len(device_stats_values) != len(expected_values): return False
@@ -928,72 +928,52 @@ class DeviceStatsTestCase(GenericTestCase):
             if item.value not in expected_values: return False
         return True
 
-    def testStatsOfOneDevice(self):
+    def test_add_list_get(self):
         dt1 = self.db.add_device_technology('x10', 'x10', 'this is x10')
         dty1 = self.db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
         du1 = self.db.add_device_usage("lighting")
         area1 = self.db.add_area('area1','description 1')
         room1 = self.db.add_room('room1', area1.id)
         device1 = self.db.add_device(d_name='device1', d_address = "A1", d_type_id = dty1.id, d_usage_id = du1.id)
-        sdate = datetime.datetime(2010, 04, 9, 12, 0, 0)
-        self.db.add_device_stat(device1.id, sdate, {'val1':0, 'val2':1 })
-        self.db.add_device_stat(device1.id, sdate + datetime.timedelta(minutes=1), {'val1': 2, 'val2': 3 })
-        self.db.add_device_stat(device1.id, sdate + datetime.timedelta(minutes=2), {'val1': 4, 'val2': 5 })
-        self.db.add_device_stat(device1.id, sdate + datetime.timedelta(minutes=3), {'val1': 6, 'val2': 7 })
-        self.db.add_device_stat(device1.id, sdate + datetime.timedelta(minutes=4), {'val1': 8, 'val2': 9 })
-        stat = self.db.get_last_stat_of_device(device1.id)
-        assert self.__has_stat_values(self.db.list_device_stats_values(stat.id), ['8','9'])
-
-        stats = self.db.list_last_n_stats_of_device(device1.id, 3)
-        assert self.__has_stat_values(self.db.list_device_stats_values(stats[0].id), ['8','9'])
-        assert self.__has_stat_values(self.db.list_device_stats_values(stats[1].id), ['6','7'])
-        assert self.__has_stat_values(self.db.list_device_stats_values(stats[2].id), ['4','5'])
-
-        stats = self.db.list_stats_of_device_between(device1.id, sdate + datetime.timedelta(minutes=3),
-                                                                 sdate + datetime.timedelta(minutes=4))
-        assert self.__has_stat_values(self.db.list_device_stats_values(stats[0].id), ['8','9'])
-        assert self.__has_stat_values(self.db.list_device_stats_values(stats[1].id), ['6','7'])
-
-        stats = self.db.list_stats_of_device_between(device1.id, sdate + datetime.timedelta(minutes=3))
-        assert self.__has_stat_values(self.db.list_device_stats_values(stats[0].id), ['8','9'])
-        assert self.__has_stat_values(self.db.list_device_stats_values(stats[1].id), ['6','7'])
-
-        stats = self.db.list_stats_of_device_between(device1.id, e_datetime=sdate + datetime.timedelta(minutes=1))
-        assert self.__has_stat_values(self.db.list_device_stats_values(stats[0].id), ['2','3'])
-        assert self.__has_stat_values(self.db.list_device_stats_values(stats[1].id), ['0','1'])
-
-    def testLastStatOfDevices(self):
-        dt1 = self.db.add_device_technology('x10', 'x10', 'this is x10')
-        dty1 = self.db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
-        du1 = self.db.add_device_usage("lighting")
-        area1 = self.db.add_area('area1','description 1')
-        room1 = self.db.add_room('room1', area1.id)
-        device1 = self.db.add_device(d_name='device1', d_address='A1', d_type_id=dty1.id, d_usage_id=du1.id)
         device2 = self.db.add_device(d_name='device2', d_address='A2', d_type_id=dty1.id, d_usage_id=du1.id)
-        device3 = self.db.add_device(d_name='device3', d_address='A3', d_type_id=dty1.id, d_usage_id=du1.id)
-        device4 = self.db.add_device(d_name='device4', d_address='A4', d_type_id=dty1.id, d_usage_id=du1.id)
-        now = datetime.datetime.now()
-        d_stat1_1 = self.db.add_device_stat(device1.id, now, {'val1': '10', 'val2': '10.5' })
-        d_stat1_2 = self.db.add_device_stat(device1.id, now + datetime.timedelta(seconds=1),
-                                                        {'val1': '11', 'val2': '12' })
-        d_stat2_1 = self.db.add_device_stat(device2.id, now, {'val1': '40', 'val2': '41' })
-        d_stat3_1 = self.db.add_device_stat(device3.id, now, {'val1': '100', 'val2': '101' })
-        #l_stats = self.db.list_device_stats(device1.id)
+        sdate = datetime.datetime(2010, 04, 9, 12, 0, 0)
+        ds1 = self.db.add_device_stat(sdate, 'val1', 0, device1.id)
+        print ds1
+        assert ds1.key == 'val1' and ds1.value == '0'
+        self.db.add_device_stat(sdate, 'val2', 1, device1.id)
+        self.db.add_device_stat(sdate + datetime.timedelta(minutes=1), 'val1', 2, device1.id)
+        self.db.add_device_stat(sdate + datetime.timedelta(minutes=1), 'val2', 3, device1.id)
+        self.db.add_device_stat(sdate + datetime.timedelta(minutes=2), 'val1', 4, device1.id)
+        self.db.add_device_stat(sdate + datetime.timedelta(minutes=2), 'val2', 5, device1.id)
+        self.db.add_device_stat(sdate + datetime.timedelta(minutes=3), 'val1', 6, device1.id)
+        self.db.add_device_stat(sdate + datetime.timedelta(minutes=3), 'val2', 7, device1.id)
+        self.db.add_device_stat(sdate + datetime.timedelta(minutes=4), 'val1', 8, device1.id)
+        self.db.add_device_stat(sdate + datetime.timedelta(minutes=4), 'val2', 9, device1.id)
 
-        l_stats = self.db.get_last_stat_of_devices([device1.id, device2.id])
-        assert len(l_stats) == 2
-        device_id_list = []
-        for stat in l_stats:
-            device_id_list.append(stat.device_id)
-            if stat.device_id == device1.id:
-                # Make sure we get the LAST stat for device1
-                dsv = self.db.list_device_stats_values(stat.id)
-                value_list = []
-                for item in dsv:
-                    value_list.append(item.value)
-                assert '11' in value_list and '12' in value_list
-        assert device1.id in device_id_list
-        assert device2.id in device_id_list
+        self.db.add_device_stat(sdate + datetime.timedelta(minutes=0), 'val1', 100, device2.id)
+        self.db.add_device_stat(sdate + datetime.timedelta(minutes=0), 'val2', 200, device2.id)
+        self.db.add_device_stat(sdate + datetime.timedelta(minutes=1), 'val1', 300, device2.id)
+        self.db.add_device_stat(sdate + datetime.timedelta(minutes=1), 'val2', 400, device2.id)
+
+        assert len(self.db.list_device_stats(device1.id)) == 10
+        assert self.db.get_last_stat_of_device_by_key('val1', device1.id).value == '8'
+        assert self.db.get_last_stat_of_device_by_key('val2', device1.id).value == '9'
+
+        stats_l = self.db.list_last_n_stats_of_device_by_key('val1', device1.id, 3)
+        assert len(stats_l) == 3
+        assert stats_l[0].value == '8' and stats_l[1].value == '6' and stats_l[2].value == '4'
+
+        stats_l = self.db.list_stats_of_device_between_by_key('val1', device1.id, sdate + datetime.timedelta(minutes=2),
+                                                              sdate + datetime.timedelta(minutes=4))
+        assert len(stats_l) == 3
+        assert stats_l[0].value == '8' and stats_l[1].value == '6' and stats_l[2].value == '4'
+        stats_l = self.db.list_stats_of_device_between_by_key('val1', device1.id, sdate + datetime.timedelta(minutes=3))
+        assert len(stats_l) == 2
+        assert stats_l[0].value == '8' and stats_l[1].value == '6'
+        stats_l = self.db.list_stats_of_device_between_by_key('val1', device1.id,
+                                                              end_datetime=sdate + datetime.timedelta(minutes=2))
+        assert len(stats_l) == 3
+        assert stats_l[0].value == '4' and stats_l[1].value == '2' and stats_l[2].value == '0'
 
     def test_del(self):
         dt1 = self.db.add_device_technology('x10', 'x10', 'this is x10')
@@ -1004,21 +984,24 @@ class DeviceStatsTestCase(GenericTestCase):
         device1 = self.db.add_device(d_name='device1', d_address='A1', d_type_id=dty1.id, d_usage_id=du1.id)
         device2 = self.db.add_device(d_name='device2', d_address='A2', d_type_id=dty1.id, d_usage_id=du1.id)
         now = datetime.datetime.now()
-        d_stat1_1 = self.db.add_device_stat(device1.id,
-                                            now, {'val1': '10', 'val2': '10.5' })
-        d_stat1_2 = self.db.add_device_stat(device1.id,
-                                            now + datetime.timedelta(seconds=1),
-                                            {'val1': '11', 'val2': '12' })
-        d_stat2_1 = self.db.add_device_stat(device2.id, now,
-                                            {'val1': '40', 'val2': '41' })
+        self.db.add_device_stat(now, 'val1', '10', device1.id)
+        self.db.add_device_stat(now, 'val2', '10.5' , device1.id)
+        self.db.add_device_stat(now + datetime.timedelta(seconds=1), 'val1', '10', device1.id)
+        self.db.add_device_stat(now + datetime.timedelta(seconds=1), 'val2', '10.5' , device1.id)
+
+        self.db.add_device_stat(now, 'val1', '40', device2.id)
+        self.db.add_device_stat(now, 'val2', '41' , device2.id)
+
         l_stats = self.db.list_device_stats(device1.id)
-        d_stats_list_d = self.db.del_all_device_stats(device1.id)
+        d_stats_list_d = self.db.del_device_stats(device1.id)
         assert len(d_stats_list_d) == len(l_stats)
         l_stats = self.db.list_device_stats(device1.id)
         assert len(l_stats) == 0
         l_stats = self.db.list_device_stats(device2.id)
-        assert len(l_stats) == 1
-
+        assert len(l_stats) == 2
+        self.db.del_device_stats(device2.id, 'val2')
+        assert len(self.db.list_device_stats(device2.id)) == 1
+        assert self.db.list_device_stats(device2.id)[0].value == '40'
 
 class TriggersTestCase(GenericTestCase):
     """

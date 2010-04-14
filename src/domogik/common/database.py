@@ -51,7 +51,7 @@ from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 from domogik.common.configloader import Loader
 from domogik.common.sql_schema import ACTUATOR_VALUE_TYPE_LIST, Area, Device, DeviceTypeFeature, \
                                       DeviceUsage, DeviceFeatureAssociation, DEVICE_FEATURE_ASSOCIATION_LIST, \
-                                      DeviceConfig, DeviceStats, DeviceStatsValue, DeviceTechnology, PluginConfig, \
+                                      DeviceConfig, DeviceStats, DeviceTechnology, PluginConfig, \
                                       DeviceType, UIItemConfig, Room, Person, UserAccount, SENSOR_VALUE_TYPE_LIST, \
                                       SystemConfig, SystemStats, SystemStatsValue, Trigger
 
@@ -1283,7 +1283,7 @@ class DbHelper():
     def del_device(self, d_id):
         """
         Delete a device
-        Warning : this deletes also the associated objects (DeviceConfig, DeviceStats, DeviceStatsValue)
+        Warning : this deletes also the associated objects (DeviceConfig, DeviceStats)
         @param d_id : item id
         @return the deleted Device object
         """
@@ -1295,9 +1295,6 @@ class DbHelper():
         for device_conf in self.__session.query(DeviceConfig).filter_by(device_id=d_id).all():
             self.__session.delete(device_conf)
         for device_stats in self.__session.query(DeviceStats).filter_by(device_id=d_id).all():
-            for device_stats_value in self.__session.query(DeviceStatsValue)\
-                                                    .filter_by(device_stats_id=device_stats.id).all():
-                self.__session.delete(device_stats_value)
             self.__session.delete(device_stats)
         for device_feat_asso in self.__session.query(DeviceFeatureAssociation).filter_by(device_id=d_id).all():
             self.__session.delete(device_feat_asso)
@@ -1392,113 +1389,84 @@ class DbHelper():
         """
         return self.__session.query(DeviceStats).all()
 
-    def list_device_stats(self, d_device_id):
+    def list_device_stats(self, ds_device_id):
         """
         Return a list of all stats for a device
-        @param d_device_id : the device id
+        @param ds_device_id : the device id
         @return a list of DeviceStats objects
         """
-        return self.__session.query(DeviceStats).filter_by(device_id=d_device_id).all()
+        return self.__session.query(DeviceStats).filter_by(device_id=ds_device_id).all()
 
-    def list_device_stats_values(self, d_device_stats_id):
+    def list_last_n_stats_of_device_by_key(self, ds_key, ds_device_id, ds_number):
         """
-        Return a list of all values associated to a device statistic
-        @param d_device_stats_id : the device statistic id
-        @return a list of DeviceStatsValue objects
-        """
-        return self.__session.query(DeviceStatsValue)\
-                             .filter_by(device_stats_id=d_device_stats_id).all()
-
-    def list_last_n_stats_of_device(self, d_device_id, number):
-        """
-        Get the N latest statistics of a device
-        @param d_device_id : device id
-        @param number : the number of statistics we want to retreive
-        @return a list of DeviceStat objects
+        Get the N latest statistics of a device for a given key
+        @param ds_key : statistic key
+        @param ds_device_id : device id
+        @param ds_number : the number of statistics we want to retreive
+        @return a list of DeviceStats objects
         """
         return self.__session.query(DeviceStats)\
-                             .filter_by(device_id=d_device_id)\
-                             .order_by(sqlalchemy.desc(DeviceStats.date)).limit(number).all()
+                             .filter_by(key=ucode(ds_key))\
+                             .filter_by(device_id=ds_device_id)\
+                             .order_by(sqlalchemy.desc(DeviceStats.date)).limit(ds_number).all()
 
-    def list_stats_of_device_between(self, d_device_id, s_datetime=None, e_datetime=None):
+    def list_stats_of_device_between_by_key(self, ds_key, ds_device_id, start_datetime=None, end_datetime=None):
         """
-        Get statistics of a device between two dates (datetime format)
-        @param d_device_id : device id
-        @param s_datetime : datetime start, optional
-        @param e_datetime : datetime end, optional
-        @return a list of DeviceStat objects
+        Get statistics of a device between two dates (datetime format) for a given key
+        @param ds_key : statistic key
+        @param ds_device_id : device id
+        @param start_datetime : datetime start, optional
+        @param end_datetime : datetime end, optional
+        @return a list of DeviceStats objects
         """
-        query = self.__session.query(DeviceStats).filter_by(device_id=d_device_id)
-        if s_datetime:
-            query = query.filter("date >= '" + str(s_datetime) + "'")
-        if e_datetime:
+        query = self.__session.query(DeviceStats).filter_by(key=ucode(ds_key)).filter_by(device_id=ds_device_id)
+        if start_datetime:
+            query = query.filter("date >= '" + str(start_datetime) + "'")
+        if end_datetime:
             # TODO : This is really ugly but if we don't do it d2 is excluded from the interval
             # I suspect this is because the date is stored like this in the DB : '2010-04-09 12:04:00.000000'
             # But in Python we have '2010-04-09 12:04:00', so maybe there is a precision problem
-            d2 = "'" + str(e_datetime + datetime.timedelta(microseconds=1)) + "'"
+            d2 = "'" + str(end_datetime + datetime.timedelta(microseconds=1)) + "'"
             query = query.filter('date <= ' + d2)
         query = query.order_by(sqlalchemy.desc(DeviceStats.date))
         return query.all()
 
-    def get_last_stat_of_device(self, d_device_id):
+    def get_last_stat_of_device_by_key(self, ds_key, ds_device_id):
         """
-        Get the latest statistic of a device
-        @param d_device_id : device id
-        @return a DeviceStat object
+        Get the latest statistic of a device for a given key
+        @param ds_key : statistic key
+        @param ds_device_id : device id
+        @return a DeviceStats object
         """
         return self.__session.query(DeviceStats)\
-                             .filter_by(device_id=d_device_id)\
+                             .filter_by(key=ucode(ds_key))\
+                             .filter_by(device_id=ds_device_id)\
                              .order_by(sqlalchemy.desc(DeviceStats.date)).first()
 
-    def get_last_stat_of_devices(self, device_list):
-        """
-        Fetch the last record for all devices in d_list
-        @param device_list : list of device ids
-        @return a list of DeviceStats objects
-        """
-        assert type(device_list) is ListType
-        result = []
-        for d_id in device_list:
-            last_record = self.__session.query(DeviceStats)\
-                                        .filter_by(device_id=d_id)\
-                                        .order_by(sqlalchemy.desc(DeviceStats.date)).first()
-            result.append(last_record)
-        return result
-
-    def device_has_stats(self, d_device_id):
+    def device_has_stats(self, ds_device_id):
         """
         Check if the device has stats that were recorded
         @param d_device_id : device id
         @return True or False
         """
         return self.__session.query(DeviceStats)\
-                             .filter_by(device_id=d_device_id).count() > 0
+                             .filter_by(device_id=ds_device_id).count() > 0
 
-    def add_device_stat(self, d_id, ds_date, ds_values):
+    def add_device_stat(self, ds_date, ds_key, ds_value, ds_device_id):
         """
         Add a device stat record
-        @param d_id : device id
+        @param ds_key : key for the stat
         @param ds_date : when the stat was gathered (timestamp)
-        @param ds_value : dictionnary of statistics values
+        @param ds_value : stat value
+        @param ds_device_id : device id
         @return the new DeviceStats object
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        try:
-            self.__session.query(Device).filter_by(id=d_id).one()
-        except NoResultFound:
-            raise DbHelperException("Couldn't add device stat with device id %s. It does not exist" % d_id)
-        device_stat = DeviceStats(device_id=d_id, date=ds_date)
+        if not self.__session.query(Device).filter_by(id=ds_device_id).first():
+            raise DbHelperException("Couldn't add device stat with device id %s. It does not exist" % ds_device_id)
+        device_stat = DeviceStats(date=ds_date, key=ucode(ds_key), value=ucode(ds_value), device_id=ds_device_id)
         self.__session.add(device_stat)
-        try:
-            self.__session.commit()
-        except Exception, sql_exception:
-            self.__session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-        for ds_name in ds_values.keys():
-            dsv = DeviceStatsValue(name=ucode(ds_name), value=ucode(ds_values[ds_name]),
-                                   device_stats_id=device_stat.id)
-            self.__session.add(dsv)
         try:
             self.__session.commit()
         except Exception, sql_exception:
@@ -1506,52 +1474,27 @@ class DbHelper():
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return device_stat
 
-    def del_device_stat(self, ds_id):
+    def del_device_stats(self, ds_device_id, ds_key=None):
         """
-        Delete a stat record
-        @param ds_id : record id
-        @return the deleted DeviceStat object
-        """
-        # Make sure previously modified objects outer of this method won't be commited
-        self.__session.expire_all()
-        device_stat = self.__session.query(DeviceStats).filter_by(id=ds_id).first()
-        if device_stat:
-            self.__session.delete(device_stat)
-            for device_stats_value in self.__session.query(DeviceStatsValue) \
-                                                    .filter_by(device_stats_id=device_stat.id).all():
-                self.__session.delete(device_stats_value)
-            try:
-                self.__session.commit()
-            except Exception, sql_exception:
-                self.__session.rollback()
-                raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-            return device_stat
-        else:
-            raise DbHelperException("Couldn't delete device stat with id %s : it doesn't exist" % ds_id)
-
-    def del_all_device_stats(self, d_id):
-        """
-        Delete all stats for a device
-        @param d_id : device id
-        @return the list of DeviceStatsValue objects that were deleted
+        Delete a stat record for a given key and device
+        @param ds_device_id : device id
+        @param ds_key : stat key, optional
+        @return list of deleted DeviceStat objects
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        #TODO : this could be optimized
-        device_stats = self.__session.query(DeviceStats).filter_by(device_id=d_id).all()
-        device_stats_d_list = []
-        for device_stat in device_stats:
-            for device_stats_value in self.__session.query(DeviceStatsValue) \
-                                                    .filter_by(device_stats_id=device_stat.id).all():
-                self.__session.delete(device_stats_value)
-            device_stats_d_list.append(device_stat)
-            self.__session.delete(device_stat)
+        query = self.__session.query(DeviceStats).filter_by(device_id=ds_device_id)
+        if ds_key:
+            query = query.filter_by(key=ucode(ds_key))
+        device_stats_l = query.all()
+        for ds in device_stats_l:
+            self.__session.delete(ds)
         try:
             self.__session.commit()
         except Exception, sql_exception:
             self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-        return device_stats_d_list
+        return device_stats_l
 
 ####
 # Triggers

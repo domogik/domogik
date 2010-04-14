@@ -568,26 +568,31 @@ class DeviceStats(Base):
     Device stats (values that were associated to the device)
     """
     __tablename__ = '%s_device_stats' % _db_prefix
-    id = Column(Integer, primary_key=True)
+    date = Column(DateTime, primary_key=True)
+    key = Column(Unicode(30), primary_key=True)
+    value = Column(Unicode(255), primary_key=True)
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), nullable=False)
     device = relation(Device)
-    date = Column(DateTime, nullable=False)
 
-    def __init__(self, device_id, date):
+    def __init__(self, date, key, value, device_id):
         """
         Class constructor
         @param device_id : device id
         @param date : datetime when the stat was recorded
+        @param key : key
+        @param value : value
         """
-        self.device_id = device_id
         self.date = date
+        self.key = key
+        self.value = value
+        self.device_id = device_id
 
     def __repr__(self):
         """
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<DeviceStats(id=%s, device=%s, date='%s')>" % (self.id, self.device, self.date)
+        return "<DeviceStats(date='%s', (%s, %s), device=%s)>" % (self.date, self.key, self.value, self.device)
 
     @staticmethod
     def get_tablename():
@@ -596,45 +601,6 @@ class DeviceStats(Base):
         @return table name
         """
         return DeviceStats.__tablename__
-
-
-class DeviceStatsValue(Base):
-    """
-    Value(s) associated to a device statistic
-    """
-    __tablename__ = '%s_device_stats_value' % _db_prefix
-    id = Column(Integer, primary_key=True)
-    device_stats_id = Column(Integer, ForeignKey('%s.id' % DeviceStats.get_tablename()), nullable=False)
-    device_stats = relation(DeviceStats)
-    name = Column(Unicode(30), nullable=False)
-    value = Column(Unicode(255), nullable=False)
-
-    def __init__(self, name, value, device_stats_id):
-        """
-        Class constructor
-        @param name : value name
-        @param value : value
-        @param device_stats_id : id of the device statistic
-        """
-        self.name = name
-        self.value = value
-        self.device_stats_id = device_stats_id
-
-    def __repr__(self):
-        """
-        Print an internal representation of the class
-        @return an internal representation
-        """
-        return "<DeviceStatsValue(id=%s, name=%s, value=%s, stats=%s)>" \
-               % (self.id, self.name, self.value, self.device_stats)
-
-    @staticmethod
-    def get_tablename():
-        """
-        Return the table name associated to the class
-        @return table name
-        """
-        return DeviceStatsValue.__tablename__
 
 
 class Trigger(Base):
