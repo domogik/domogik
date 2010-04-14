@@ -41,7 +41,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from domogik.common import database
 from djangodomo.core.models import REST, Areas, Rooms, Devices, DeviceUsages, DeviceTechnologies, DeviceTypes, \
-                                   DeviceActuators, UIConfigs, Plugins, Accounts
+                                   DeviceFeatures, UIConfigs, Plugins, Accounts
 
 from djangodomo.core.sample_data_helper import SampleDataHelper
 
@@ -458,6 +458,7 @@ def admin_organization_features(request):
     try:
         result_all_devices = Devices.get_all()
         result_all_devices.merge_uiconfig()
+        result_all_devices.merge_features()
         result_all_rooms = Rooms.get_all()
         result_all_rooms.merge_uiconfig()
         result_all_areas = Areas.get_all()
