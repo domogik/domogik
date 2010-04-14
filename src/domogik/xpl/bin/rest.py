@@ -2637,6 +2637,7 @@ target=*
         json_data.set_data_type("config")
         try:
             plugin = self._db.set_plugin_config(self.get_parameters("name"), \
+                                                self.get_parameters("hostname"), \
                                                 self.get_parameters("key"), \
                                                 self.get_parameters("value"))
             json_data.add_data(plugin)
