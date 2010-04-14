@@ -275,22 +275,30 @@ class PluginConfig(Base):
     Configuration for a plugin (x10, plcbus, ...)
     """
     __tablename__ = '%s_plugin_config' % _db_prefix
-    plugin_name = Column(Unicode(30), primary_key=True)
-    params = relation('PluginConfigParam', backref=__tablename__)
+    name = Column(Unicode(30), primary_key=True)
+    hostname = Column(Unicode(40), primary_key=True)
+    key = Column(Unicode(30), primary_key=True)
+    value = Column(Unicode(255), nullable=False)
 
-    def __init__(self, plugin_name):
+    def __init__(self, name, hostname, key, value):
         """
         Class constructor
-        @param plugin_name : plugin name
+        @param name : plugin name
+        @param hostname : hostname the plugin is installed on
+        @param key : key
+        @param value : value
         """
-        self.plugin_name = plugin_name
+        self.name = name
+        self.hostname = hostname
+        self.key = key
+        self.value = value
 
     def __repr__(self):
         """
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<PluginConfig(name=%s)>" % (self.plugin_name)
+        return "<PluginConfig(name=%s, hostname=%s, (%s, %s))>" % (self.name, self.hostname, self.key, self.value)
 
     @staticmethod
     def get_tablename():
@@ -299,42 +307,6 @@ class PluginConfig(Base):
         @return table name
         """
         return PluginConfig.__tablename__
-
-
-class PluginConfigParam(Base):
-    """
-    Configuration parameters for a plugin
-    """
-    __tablename__ = '%s_plugin_config_param' % _db_prefix
-    key = Column(Unicode(30), primary_key=True)
-    value = Column(Unicode(255), nullable=False)
-    plugin_name = Column(Unicode(30), ForeignKey('%s.plugin_name' % PluginConfig.get_tablename()), nullable=False)
-
-    def __init__(self, key, value, plugin_name):
-        """
-        Class constructor
-        @param key : configuration item
-        @param value : configuration value
-        @param plugin_name : plugin name
-        """
-        self.key = unicode(key)
-        self.value = unicode(value)
-        self.plugin_name = plugin_name
-
-    def __repr__(self):
-        """
-        Print an internal representation of the class
-        @return an internal representation
-        """
-        return "<PluginConfigParam(name=%s, ('%s', '%s'))>" % (self.plugin_name, self.key, self.value)
-
-    @staticmethod
-    def get_tablename():
-        """
-        Return the table name associated to the class
-        @return table name
-        """
-        return PluginConfigParam.__tablename__
 
 
 class DeviceType(Base):

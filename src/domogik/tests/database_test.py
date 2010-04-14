@@ -99,7 +99,7 @@ class GenericTestCase(unittest.TestCase):
 
     def remove_all_plugin_config(self, db):
         for plc in db.list_all_plugin_config():
-            db.del_plugin_config(plc.plugin_name)
+            db.del_plugin_config(plc.name, plc.hostname)
 
     def remove_all_device_technologies(self, db):
         for dt in db.list_device_technologies():
@@ -652,44 +652,48 @@ class PluginConfigTestCase(GenericTestCase):
     def test_empty_list(self):
         assert len(self.db.list_all_plugin_config()) == 0
 
-    def test_add(self):
-        pc1_1 = self.db.set_plugin_config('x10', 'key1_1', 'val1_1')
+    def test_add_get_list(self):
+        pc1_1 = self.db.set_plugin_config(pl_name='x10', pl_hostname='192.168.0.1', pl_key='key1_1', pl_value='val1_1')
         print pc1_1
-        assert pc1_1.plugin_name == 'x10'
-        assert pc1_1.params[0].key == 'key1_1'
-        assert pc1_1.params[0].value == 'val1_1'
-        pc1_2 = self.db.set_plugin_config('x10', 'key1_2', 'val1_2')
-        pc3_1 = self.db.set_plugin_config('plcbus', 'key3_1', 'val3_1')
-        pc3_2 = self.db.set_plugin_config('plcbus', 'key3_2', 'val3_2')
-        pc3_3 = self.db.set_plugin_config('plcbus', 'key3_3', 'val3_3')
-        assert len(self.db.list_all_plugin_config()) == 2
-        assert len(self.db.list_plugin_config_param('x10')) == 2
-        assert len(self.db.list_plugin_config_param('plcbus')) == 3
+        assert pc1_1.name == 'x10'
+        assert pc1_1.key == 'key1_1'
+        assert pc1_1.value == 'val1_1'
+        pc1_2 = self.db.set_plugin_config(pl_name='x10', pl_hostname='192.168.0.1', pl_key='key1_2', pl_value='val1_2')
+        pc3_1 = self.db.set_plugin_config(pl_name='plcbus', pl_hostname='192.168.0.1', pl_key='key3_1',
+                                          pl_value='val3_1')
+        pc3_2 = self.db.set_plugin_config(pl_name='plcbus', pl_hostname='192.168.0.1', pl_key='key3_2',
+                                          pl_value='val3_2')
+        pc3_3 = self.db.set_plugin_config(pl_name='plcbus', pl_hostname='192.168.0.1', pl_key='key3_3',
+                                          pl_value='val3_3')
+        pc4_1 = self.db.set_plugin_config(pl_name='x10', pl_hostname='192.168.0.2', pl_key='key4_1', pl_value='val4_1')
+        assert len(self.db.list_all_plugin_config()) == 6
+        assert len(self.db.list_plugin_config('x10', '192.168.0.1')) == 2
+        assert len(self.db.list_plugin_config('plcbus', '192.168.0.1')) == 3
+        assert len(self.db.list_plugin_config('x10', '192.168.0.2')) == 1
+        assert len(self.db.list_plugin_config('plcbus', '192.168.0.2')) == 0
+        assert self.db.get_plugin_config('x10', '192.168.0.1', 'key1_2').value == 'val1_2'
 
     def test_update(self):
-        plc = self.db.set_plugin_config('x10', 'key1', 'val1')
-        plc_u = self.db.set_plugin_config('x10', 'key1', 'val11')
-        assert plc_u.params[0].key == 'key1'
-        assert plc_u.params[0].value == 'val11'
-
-    def test_get_and_list(self):
-        x10_3_1 = self.db.set_plugin_config('x10', 'key3_1', 'val3_1')
-        assert self.db.get_plugin_config('x10').plugin_name == 'x10'
-        x10_3_2 = self.db.set_plugin_config('x10', 'key3_2', 'val3_2')
-        x10_3_3 = self.db.set_plugin_config('x10', 'key3_3', 'val3_3')
-        x10 = self.db.get_plugin_config_param('x10', 'key3_2')
-        assert x10.value == 'val3_2'
+        plc = self.db.set_plugin_config(pl_name='x10', pl_hostname='192.168.0.1', pl_key='key1', pl_value='val1')
+        plc_u = self.db.set_plugin_config(pl_name='x10', pl_hostname='192.168.0.1', pl_key='key1', pl_value='val11')
+        assert plc_u.key == 'key1'
+        assert plc_u.value == 'val11'
+        assert self.db.get_plugin_config('x10', '192.168.0.1', 'key1').value == 'val11'
 
     def test_del(self):
-        plc1_1 = self.db.set_plugin_config('x10', 'key1_1', 'val1_1')
-        plc1_2 = self.db.set_plugin_config('x10', 'key1_2', 'val1_2')
-        plc3_1 = self.db.set_plugin_config('plcbus', 'key3_1', 'val3_1')
-        plc3_2 = self.db.set_plugin_config('plcbus', 'key3_2', 'val3_2')
-        plc3_3 = self.db.set_plugin_config('plcbus', 'key3_3', 'val3_3')
-        plc_del = self.db.del_plugin_config('plcbus')
-        assert plc_del.plugin_name == 'plcbus'
-        assert len(self.db.list_plugin_config_param('plcbus')) == 0
-        assert self.db.get_plugin_config_param('plcbus', 'key3_2') == None
+        plc1_1 = self.db.set_plugin_config(pl_name='x10', pl_hostname='192.168.0.1', pl_key='key1_1', pl_value='val1_1')
+        plc1_2 = self.db.set_plugin_config(pl_name='x10', pl_hostname='192.168.0.1', pl_key='key1_2', pl_value='val1_2')
+        plc3_1 = self.db.set_plugin_config(pl_name='plcbus', pl_hostname='192.168.0.1', pl_key='key3_1',
+                                           pl_value='val3_1')
+        plc3_2 = self.db.set_plugin_config(pl_name='plcbus', pl_hostname='192.168.0.1', pl_key='key3_2',
+                                           pl_value='val3_2')
+        plc3_3 = self.db.set_plugin_config(pl_name='plcbus', pl_hostname='192.168.0.1', pl_key='key3_3',
+                                           pl_value='val3_3')
+        pc4_1 = self.db.set_plugin_config(pl_name='x10', pl_hostname='192.168.0.2', pl_key='key4_1', pl_value='val4_1')
+        assert len(self.db.del_plugin_config('x10', '192.168.0.1')) == 2
+        assert len(self.db.list_plugin_config('x10', '192.168.0.1')) == 0
+        assert len(self.db.list_plugin_config('plcbus', '192.168.0.1')) == 3
+        assert len(self.db.list_plugin_config('x10', '192.168.0.2')) == 1
 
 
 class DeviceTestCase(GenericTestCase):
