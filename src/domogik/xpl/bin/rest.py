@@ -2375,15 +2375,15 @@ target=*
             if self.rest_request[1] == "list":
                 if len(self.rest_request) == 2:
                     self._rest_plugin_config_list()
-                elif len(self.rest_request) == 3 or len(self.rest_request) == 5:
+                elif len(self.rest_request) == 4 or len(self.rest_request) == 6:
                     self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
-                elif len(self.rest_request) == 4:
+                elif len(self.rest_request) == 5:
                     if self.rest_request[2] == "by-name":
-                        self._rest_plugin_config_list(name=self.rest_request[3])
-                elif len(self.rest_request) == 6:
-                    if self.rest_request[2] == "by-name" and self.rest_request[4] == "by-key":
-                        self._rest_plugin_config_list(name = self.rest_request[3], key = self.rest_request[5])
+                        self._rest_plugin_config_list(name=self.rest_request[3], hostname=self.rest_request[4])
+                elif len(self.rest_request) == 7:
+                    if self.rest_request[2] == "by-name" and self.rest_request[5] == "by-key":
+                        self._rest_plugin_config_list(name = self.rest_request[3], hostname=self.rest_request[4], key = self.rest_request[6])
                     else:
                         self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
@@ -2607,7 +2607,7 @@ target=*
 # /plugin/config/ processing
 ######
 
-    def _rest_plugin_config_list(self, name = None, key = None):
+    def _rest_plugin_config_list(self, name = None, hostname = None, key = None):
         """ list device technology config
             @param name : name of module
             @param key : key of config
@@ -2619,10 +2619,10 @@ target=*
             for plugin in self._db.list_all_plugin_config():
                 json_data.add_data(plugin)
         elif key == None:
-            for plugin in self._db.list_plugin_config_param(name):
+            for plugin in self._db.list_plugin_config(name, hostname):
                 json_data.add_data(plugin)
         else:
-            plugin = self._db.get_plugin_config_param(name, key)
+            plugin = self._db.get_plugin_config(name, hostname, key)
             if plugin is not None:
                 json_data.add_data(plugin)
         self.send_http_response_ok(json_data.get())
