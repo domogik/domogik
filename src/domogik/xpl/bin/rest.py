@@ -2041,8 +2041,7 @@ target=*
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("device_type_feature")
-        features = self._db.list_device_type_feature_by_device_type_id(type_id)
-        if features is not None:
+        for features in self._db.list_device_type_feature_by_device_type_id(type_id):
             json_data.add_data(features)
         self.send_http_response_ok(json_data.get())
 
@@ -3136,8 +3135,8 @@ class JSonHelper():
 
         # get data type
         data_type = type(data).__name__
-        print "TYPE=%s" % data_type
-        print data
+        #print "TYPE=%s" % data_type
+        #print data
 
         ### type instance (sql object)
         if data_type in instance_type:
