@@ -639,7 +639,7 @@ class DbHelper():
         """
         Return a list of device type feature (actuator, sensor) knowing the device type id
         @param dtf_device_type_id : device type id
-        @return a dictionnary with 2 keywords : 'actuator_list' and 'sensor_list'
+        @return a dictionnary with 2 keywords : 'actuator_list' and 'sensor_list' (both are DeviceTypeFeature objects)
         """
         actuator_f_list, sensor_f_list = [], []
         query = self.__session.query(DeviceTypeFeature).filter_by(device_type_id=dtf_device_type_id)
