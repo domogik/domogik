@@ -29,9 +29,9 @@ Implements
 
 - DBConnector.__init__(self)
 - DBConnector._request_config_cb(self, message)
-- DBConnector._send_config(self, technology, key, value, plugin, element = None)
+- DBConnector._send_config(self, technology, hostname, key, value, plugin, element = None)
 - DBConnector._fetch_elmt_config(self, techno, element, key)
-- DBConnector._fetch_techno_config(self, techno, key)
+- DBConnector._fetch_techno_config(self, hostname, techno, key)
 - DBConnector._update_stat(self, message)
 
 @author: Maxence Dunnewind <maxence@dunnewind.net>
@@ -72,6 +72,7 @@ class DBConnector(xPLPlugin):
         '''
         #try:
         techno = message.data['technology']
+        hostname = message.data['hostname']
         key = message.data['key']
         if "element" in message.data:
             element = message.data['element']
@@ -84,33 +85,35 @@ class DBConnector(xPLPlugin):
             self._log.debug("New request config received for %s : %s" % (techno,
             key))
         if element:
-            self._send_config(techno, key, self._fetch_elmt_config(techno,
+            self._send_config(techno, hostname, key, self._fetch_elmt_config(techno,
             element, key), element)
         else:
             if not key:
-                keys = self._fetch_techno_config(techno, key).keys()
-                values = self._fetch_techno_config(techno, key).values()
-                self._send_config(techno, keys, values)
+                keys = self._fetch_techno_config(techno, hostname, key).keys()
+                values = self._fetch_techno_config(techno, hostname, key).values()
+                self._send_config(techno, hostname, keys, values)
                 
             else:
-                self._send_config(techno, key, self._fetch_techno_config(techno,
+                self._send_config(techno, hostname, key, self._fetch_techno_config(techno, hostname,
                 key))
         #except KeyError:
          #   self._log.warning("A request for configuration has been received, but it was misformatted")
 
-    def _send_config(self, technology, key, value, element = None):
+    def _send_config(self, technology, hostname, key, value, element = None):
         '''
         Send a config value message for an element's config item
         @param technology : the technology of the element
+        @param hostname : hostname
         @param element :  the name of the element
         @param key : the key or list of keys of the config tuple(s) to fetch
         @param value : the value or list of values corresponding to the key(s)
         '''
-        self._log.debug("Send config response %s : %s" % (key, value))
+        self._log.debug("Send config response for %s on %s : %s = %s" % (technology, hostname, key, value))
         mess = XplMessage()
         mess.set_type('xpl-stat')
         mess.set_schema('domogik.config')
         mess.add_data({'technology' :  technology})
+        mess.add_data({'hostname' :  hostname})
         if element:
             mess.add_data({'element' :  element})
         #If key/value are lists, then we add a key=value for each item
@@ -137,10 +140,11 @@ class DBConnector(xPLPlugin):
                 }
         return vals[techno][element][key]
 
-    def _fetch_techno_config(self, techno, key):
+    def _fetch_techno_config(self, techno, hostname, key):
         '''
         Fetch a technology global config value in the database
         @param techno : the technology of the element
+        @param hostname : hostname
         @param key : the key of the config tuple to fetch
         '''
         #Get technology id 
@@ -173,17 +177,17 @@ class DBConnector(xPLPlugin):
                 }
         try:
             if key:
-                val = self._db.get_plugin_config(techno, key).value
+                val = self._db.get_plugin_config(techno, hostname, key).value
                 return val
             else:
-                vals = self._db.list_lis_plugin_config(techno)
+                vals = self._db.list_plugin_config(techno, hostname)
                 res = {}
                 for val in vals:
                     res[val.key] = val.value
                 return res
         except:
             traceback.print_exc()
-            self._log.warn("No config found for technolgy %s, key %s" % (techno, key))
+            self._log.warn("No config found for technolgy %s on %s, key %s" % (techno, hostname, key))
             return None
 
 if __name__ == "__main__":
