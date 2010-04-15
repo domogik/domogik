@@ -231,7 +231,7 @@
                 if ($('li', zone_from.list).length == 0) {
                     zone_from.list.html("<li class='empty'><p>Empty</p></li>");
                 }
-                if(this.options.dropcallback) this.options.dropcallback(this, element_value, target_value);
+                if(this.options.generaldropcallback) this.options.generaldropcallback(this, element_value, target_value);
             } else {
                 this.valid();
             }
@@ -354,7 +354,7 @@
     $.extend($.ui.dragdrop, {
         defaults: {
             choice: ".choice",
-            dropcallback: null
+            generaldropcallback: null
         }
     });
 })(jQuery);

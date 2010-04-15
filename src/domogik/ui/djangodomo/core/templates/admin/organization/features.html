@@ -58,7 +58,10 @@
             drag: true,
             drop: false,
             droporigin : true,
-            keeptrace: true
+            keeptrace: true,
+            dropcallback: function(self, element, target) {
+//                alert(element + " -> " + target);
+            }            
         });
 
         $('#dragdropfeatures').dragdrop('addzones', {
@@ -66,7 +69,10 @@
             drag: true,
             drop: true,
             droporigin : false,
-            keeptrace: false
+            keeptrace: false,
+            dropcallback: function(self, element, target) {
+//                alert(element + " -> " + target);
+            }
         });
 
     });
