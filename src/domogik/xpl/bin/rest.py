@@ -1673,8 +1673,9 @@ target=*
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("area")
-        for area in self._db.list_areas_with_rooms():
-            json_data.add_data(area)
+        # TODO : reactivate
+        #for area in self._db.list_areas_with_rooms():
+        #    json_data.add_data(area)
         self.send_http_response_ok(json_data.get())
 
 
