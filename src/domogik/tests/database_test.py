@@ -727,6 +727,7 @@ class DeviceTestCase(GenericTestCase):
             pass
         device1 = self.db.add_device(d_name='device1', d_address='A1',
                                      d_type_id=dty1.id, d_usage_id=du1.id, d_description='desc1')
+        assert device1.name == 'device1' and device1.description == 'desc1'
         print device1
         assert len(self.db.list_devices()) == 1
         device2 = self.db.add_device(d_name='device2', d_address='A2',
@@ -1020,33 +1021,30 @@ class TriggersTestCase(GenericTestCase):
         assert len(self.db.list_triggers()) == 0
 
     def test_add(self):
-        trigger1 = self.db.add_trigger(t_description='desc1',
-                                       t_rule='AND(x,OR(y,z))',
-                                       t_result=['x10_on("a3")','1wire()'])
+        trigger1 = self.db.add_trigger(t_description='desc1', t_rule='AND(x,OR(y,z))',
+                                       t_result=['x10_on("a3")', '1wire()'])
         print trigger1
-        trigger2 = self.db.add_trigger(t_description = 'desc2',
-                                       t_rule='OR(x,AND(y,z))',
-                                       t_result=['x10_on("a2")','1wire()'])
+        assert trigger1.description == 'desc1'
+        assert trigger1.rule == 'AND(x,OR(y,z))'
+        trigger2 = self.db.add_trigger(t_description = 'desc2', t_rule='OR(x,AND(y,z))',
+                                       t_result=['x10_on("a2")', '1wire()'])
         assert len(self.db.list_triggers()) == 2
         assert self.db.get_trigger(trigger1.id).description == 'desc1'
 
     def test_update(self):
         trigger = self.db.add_trigger(t_description='desc1', t_rule='AND(x,OR(y,z))',
-                                      t_result=['x10_on("a3")','1wire()'])
-        trigger_u = self.db.update_trigger(t_id=trigger.id, t_description='desc2',
-                                      t_rule='OR(x,AND(y,z))',
-                                      t_result=['x10_on("a2")','1wire()'])
+                                      t_result=['x10_on("a3")', '1wire()'])
+        trigger_u = self.db.update_trigger(t_id=trigger.id, t_description='desc2', t_rule='OR(x,AND(y,z))',
+                                      t_result=['x10_on("a2")', '1wire()'])
         assert trigger_u.description == 'desc2'
         assert trigger_u.rule == 'OR(x,AND(y,z))'
         assert trigger_u.result == 'x10_on("a2");1wire()'
 
     def test_del(self):
-        trigger1 = self.db.add_trigger(t_description = 'desc1',
-                                       t_rule = 'AND(x,OR(y,z))',
-                                       t_result= ['x10_on("a3")','1wire()'])
-        trigger2 = self.db.add_trigger(t_description = 'desc2',
-                                       t_rule = 'OR(x,AND(y,z))',
-                                       t_result= ['x10_on("a2")','1wire()'])
+        trigger1 = self.db.add_trigger(t_description = 'desc1', t_rule = 'AND(x,OR(y,z))',
+                                       t_result= ['x10_on("a3")', '1wire()'])
+        trigger2 = self.db.add_trigger(t_description = 'desc2', t_rule = 'OR(x,AND(y,z))',
+                                       t_result= ['x10_on("a2")', '1wire()'])
         for trigger in self.db.list_triggers():
             trigger_id = trigger.id
             trigger_del = trigger
@@ -1082,8 +1080,7 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
                                      p_birthdate=datetime.date(1973, 4, 24))
         assert person1.last_name == 'SCHNEIDER'
         print person1
-        user1 = self.db.add_user_account(a_login='mschneider',
-                                         a_password='IwontGiveIt',
+        user1 = self.db.add_user_account(a_login='mschneider', a_password='IwontGiveIt',
                                          a_person_id=person1.id, a_is_admin=True)
         print user1
         assert user1.password is None
@@ -1096,14 +1093,12 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
         assert user1.login == 'mschneider'
         assert user1.password == None
         try:
-            self.db.add_user_account(a_login='mschneider', a_password='plop',
-                                     a_person_id=person1.id)
+            self.db.add_user_account(a_login='mschneider', a_password='plop', a_person_id=person1.id)
             TestCase.fail(self, "It shouldn't have been possible to add login %s. It already exists!" % 'mschneider')
         except DbHelperException:
             pass
         try:
-            self.db.add_user_account(a_login='mygod', a_password='plop',
-                                     a_person_id=999999999)
+            self.db.add_user_account(a_login='mygod', a_password='plop', a_person_id=999999999)
             TestCase.fail(self, "It shouldn't have been possible to add login %s. : associated person does not exist")
         except DbHelperException:
             pass
@@ -1128,14 +1123,12 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
     def test_update(self):
         person = self.db.add_person(p_first_name='Marc', p_last_name='SCHNEIDER',
                                     p_birthdate=datetime.date(1973, 4, 24))
-        person_u = self.db.update_person(p_id=person.id, p_first_name='Marco',
-                                         p_last_name='SCHNEIDERO',
+        person_u = self.db.update_person(p_id=person.id, p_first_name='Marco', p_last_name='SCHNEIDERO',
                                          p_birthdate=datetime.date(1981, 4, 24))
         assert person_u.birthdate == datetime.date(1981, 4, 24)
         assert person_u.last_name == 'SCHNEIDERO'
         assert person_u.first_name == 'Marco'
-        user_acc = self.db.add_user_account(a_login='mschneider',
-                                            a_password='IwontGiveIt',
+        user_acc = self.db.add_user_account(a_login='mschneider', a_password='IwontGiveIt',
                                             a_person_id=person_u.id, a_is_admin=True)
         assert not self.db.change_password(999999999, 'IwontGiveIt', 'foo')
         assert self.db.change_password(user_acc.id, 'IwontGiveIt', 'OkIWill')
