@@ -274,21 +274,6 @@ class DbHelper():
         """
         return self.__session.query(Room).all()
 
-    def list_rooms_with_devices(self):
-        """
-        Return all rooms with associated devices
-        @return a list of Room objects containing the associated device list
-        """
-        room_list = self.__session.query(Room).all()
-        room_devices_list = []
-        for room in room_list:
-            device_list = self.__session.query(Device)\
-                              .filter_by(room_id=room.id).all()
-            # set Room in area object
-            room.Device = device_list
-            room_devices_list.append(room)
-        return room_devices_list
-
     def search_rooms(self, filters):
         """
         Look for room(s) with filter on their attributes
