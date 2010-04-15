@@ -131,6 +131,7 @@ class Area(Base):
     id = Column(Integer, primary_key=True)
     name = Column(Unicode(30), nullable=False)
     description = Column(UnicodeText())
+    rooms = relation('Room', backref=__tablename__)
 
     def __init__(self, name, description=None):
         """
@@ -166,7 +167,7 @@ class Room(Base):
     name = Column(Unicode(30), nullable=False)
     description = Column(UnicodeText())
     area_id = Column(Integer, ForeignKey('%s.id' % Area.get_tablename()))
-    area = relation(Area, backref=backref(__tablename__, order_by=id))
+    area = relation(Area)
 
     def __init__(self, name, description=None, area_id=None):
         """
@@ -221,7 +222,8 @@ class DeviceUsage(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<DeviceUsage(id=%s, name='%s', desc='%s', default opt='%s')>" % (self.id, self.name, self.description, self.default_options)
+        return "<DeviceUsage(id=%s, name='%s', desc='%s', default opt='%s')>" \
+               % (self.id, self.name, self.description, self.default_options)
 
     @staticmethod
     def get_tablename():
@@ -273,27 +275,30 @@ class PluginConfig(Base):
     Configuration for a plugin (x10, plcbus, ...)
     """
     __tablename__ = '%s_plugin_config' % _db_prefix
-    plugin_name = Column(Unicode(30), primary_key=True)
+    name = Column(Unicode(30), primary_key=True)
+    hostname = Column(Unicode(40), primary_key=True)
     key = Column(Unicode(30), primary_key=True)
     value = Column(Unicode(255), nullable=False)
 
-    def __init__(self, plugin_name, key, value):
+    def __init__(self, name, hostname, key, value):
         """
         Class constructor
-        @param plugin_name : plugin name
-        @param key : configuration item
-        @param value : configuration value
+        @param name : plugin name
+        @param hostname : hostname the plugin is installed on
+        @param key : key
+        @param value : value
         """
-        self.plugin_name = plugin_name
-        self.key = unicode(key)
-        self.value = unicode(value)
+        self.name = name
+        self.hostname = hostname
+        self.key = key
+        self.value = value
 
     def __repr__(self):
         """
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<PluginConfig(name=%s, ('%s', '%s'))>" % (self.plugin_name, self.key, self.value)
+        return "<PluginConfig(name=%s, hostname=%s, (%s, %s))>" % (self.name, self.hostname, self.key, self.value)
 
     @staticmethod
     def get_tablename():
@@ -312,7 +317,7 @@ class DeviceType(Base):
     id = Column(Integer, primary_key=True)
     device_technology_id = Column(Unicode(30), ForeignKey('%s.id' % \
                            DeviceTechnology.get_tablename()), nullable=False)
-    device_technology = relation(DeviceTechnology, backref=backref(__tablename__))
+    device_technology = relation(DeviceTechnology)
     name = Column(Unicode(30), nullable=False)
     description = Column(UnicodeText())
 
@@ -332,7 +337,8 @@ class DeviceType(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<DeviceType(id=%s, name='%s', desc='%s', device techno='%s')>" % (self.id, self.name, self.description, self.device_technology)
+        return "<DeviceType(id=%s, name='%s', desc='%s', device techno='%s')>" \
+               % (self.id, self.name, self.description, self.device_technology)
 
     @staticmethod
     def get_tablename():
@@ -354,9 +360,9 @@ class Device(Base):
     address = Column(Unicode(30), nullable=False)
     reference = Column(Unicode(30))
     device_usage_id = Column(Integer, ForeignKey('%s.id' % DeviceUsage.get_tablename()), nullable=False)
-    device_usage = relation(DeviceUsage, backref=backref(__tablename__))
+    device_usage = relation(DeviceUsage)
     device_type_id = Column(Integer, ForeignKey('%s.id' % DeviceType.get_tablename()), nullable=False)
-    device_type = relation(DeviceType, backref=backref(__tablename__))
+    device_type = relation(DeviceType)
     device_stats = relation("DeviceStats", order_by="DeviceStats.date.desc()", backref=__tablename__)
 
     def __init__(self, name, address, reference, device_usage_id, device_type_id, description=None):
@@ -407,7 +413,8 @@ class Device(Base):
         @return an internal representation
         """
         return "<Device(id=%s, name='%s', addr='%s', desc='%s', ref='%s', type='%s', usage=%s)>" \
-               % (self.id, self.name, self.address, self.description, self.reference, self.device_type, self.device_usage)
+               % (self.id, self.name, self.address, self.description, self.reference, \
+                  self.device_type, self.device_usage)
 
     @staticmethod
     def get_tablename():
@@ -427,7 +434,7 @@ class DeviceTypeFeature(Base):
     name = Column(Unicode(30), nullable=False)
     feature_type = Column(Enum(FEATURE_TYPE_LIST), nullable=False)
     device_type_id = Column(Integer, ForeignKey('%s.id' % DeviceType.get_tablename()), nullable=False)
-    device_type = relation(DeviceType, backref=backref(__tablename__))
+    device_type = relation(DeviceType)
     parameters = Column(UnicodeText())
     value_type = Column(Unicode(30), nullable=False)
     return_confirmation = Column(Boolean, nullable=False)
@@ -448,9 +455,11 @@ class DeviceTypeFeature(Base):
             raise Exception("Feature type must me either 'actuator' or 'sensor' but NOT %s" % feature_type)
         self.feature_type = feature_type
         if self.feature_type == 'actuator' and value_type not in ACTUATOR_VALUE_TYPE_LIST:
-            raise Exception("Can't add value type %s to an actuator it doesn't belong to list %s" % (value_type, ACTUATOR_VALUE_TYPE_LIST))
+            raise Exception("Can't add value type %s to an actuator it doesn't belong to list %s" \
+                            % (value_type, ACTUATOR_VALUE_TYPE_LIST))
         elif self.feature_type == 'sensor' and value_type not in SENSOR_VALUE_TYPE_LIST:
-            raise Exception("Can't add value type %s to a sensor it doesn't belong to list %s" % (value_type, SENSOR_VALUE_TYPE_LIST))
+            raise Exception("Can't add value type %s to a sensor it doesn't belong to list %s" \
+                            % (value_type, SENSOR_VALUE_TYPE_LIST))
         self.device_type_id = device_type_id
         self.value_type = value_type
         self.parameters = parameters
@@ -461,7 +470,9 @@ class DeviceTypeFeature(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<DeviceTypeFeature(%s, %s, device_type=%s, parameters=%s)>" % (self.id, self.feature_type, self.device_type, self.parameters)
+        return "<DeviceTypeFeature(%s, %s, device_type=%s, parameters=%s, value_type=%s, return_confirmation=%s)>" \
+               % (self.id, self.feature_type, self.device_type, self.parameters, self.value_type, \
+                  self.return_confirmation)
 
     @staticmethod
     def get_tablename():
@@ -481,7 +492,7 @@ class DeviceFeatureAssociation(Base):
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), primary_key=True)
     device = relation(Device, backref=backref(__tablename__))
     device_type_feature_id = Column(Integer, ForeignKey('%s.id' % DeviceTypeFeature.get_tablename()), primary_key=True)
-    device_type_feature = relation(DeviceTypeFeature, backref=backref(__tablename__))
+    device_type_feature = relation(DeviceTypeFeature)
     place_type = Column(Enum(DEVICE_FEATURE_ASSOCIATION_LIST), nullable=True)
     place_id = Column(Integer, nullable=True)
 
@@ -503,7 +514,8 @@ class DeviceFeatureAssociation(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<DeviceFeatureAssociation(%s, %s, %s, place_id=%s)>" % (self.device, self.device_type_feature, self.place_type, self.place_id)
+        return "<DeviceFeatureAssociation(%s, %s, %s, place_id=%s)>" \
+               % (self.device, self.device_type_feature, self.place_type, self.place_id)
 
     @staticmethod
     def get_tablename():
@@ -522,7 +534,7 @@ class DeviceConfig(Base):
     key = Column(String(30), primary_key=True)
     value = Column(Unicode(255), nullable=False)
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), primary_key=True)
-    device = relation(Device, backref=backref(__tablename__))
+    device = relation(Device)
 
     def __init__(self, key, device_id, value):
         """
@@ -556,26 +568,31 @@ class DeviceStats(Base):
     Device stats (values that were associated to the device)
     """
     __tablename__ = '%s_device_stats' % _db_prefix
-    id = Column(Integer, primary_key=True)
+    date = Column(DateTime, primary_key=True)
+    key = Column(Unicode(30), primary_key=True)
+    value = Column(Unicode(255), primary_key=True)
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), nullable=False)
-    device = relation(Device, backref=backref(__tablename__))
-    date = Column(DateTime, nullable=False)
+    device = relation(Device)
 
-    def __init__(self, device_id, date):
+    def __init__(self, date, key, value, device_id):
         """
         Class constructor
         @param device_id : device id
         @param date : datetime when the stat was recorded
+        @param key : key
+        @param value : value
         """
-        self.device_id = device_id
         self.date = date
+        self.key = key
+        self.value = value
+        self.device_id = device_id
 
     def __repr__(self):
         """
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<DeviceStats(id=%s, device=%s, date='%s')>" % (self.id, self.device, self.date)
+        return "<DeviceStats(date='%s', (%s, %s), device=%s)>" % (self.date, self.key, self.value, self.device)
 
     @staticmethod
     def get_tablename():
@@ -584,44 +601,6 @@ class DeviceStats(Base):
         @return table name
         """
         return DeviceStats.__tablename__
-
-
-class DeviceStatsValue(Base):
-    """
-    Value(s) associated to a device statistic
-    """
-    __tablename__ = '%s_device_stats_value' % _db_prefix
-    id = Column(Integer, primary_key=True)
-    device_stats_id = Column(Integer, ForeignKey('%s.id' % DeviceStats.get_tablename()), nullable=False)
-    device_stats = relation(DeviceStats, backref=backref(__tablename__))
-    name = Column(Unicode(30), nullable=False)
-    value = Column(Unicode(255), nullable=False)
-
-    def __init__(self, name, value, device_stats_id):
-        """
-        Class constructor
-        @param name : value name
-        @param value : value
-        @param device_stats_id : id of the device statistic
-        """
-        self.name = name
-        self.value = value
-        self.device_stats_id = device_stats_id
-
-    def __repr__(self):
-        """
-        Print an internal representation of the class
-        @return an internal representation
-        """
-        return "<DeviceStatsValue(id=%s, name=%s, value=%s, stats=%s)>" % (self.id, self.name, self.value, self.device_stats)
-
-    @staticmethod
-    def get_tablename():
-        """
-        Return the table name associated to the class
-        @return table name
-        """
-        return DeviceStatsValue.__tablename__
 
 
 class Trigger(Base):
@@ -650,7 +629,8 @@ class Trigger(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<Trigger(id=%s, desc='%s', rule='%s', result='%s')>" % (self.id, self.description, self.rule, self.result)
+        return "<Trigger(id=%s, desc='%s', rule='%s', result='%s')>" \
+                % (self.id, self.description, self.rule, self.result)
 
     @staticmethod
     def get_tablename():
@@ -687,7 +667,8 @@ class Person(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<Person(id=%s, first_name='%s', last_name='%s', birthdate='%s')>" % (self.id, self.first_name, self.last_name, self.birthdate)
+        return "<Person(id=%s, first_name='%s', last_name='%s', birthdate='%s')>" \
+               % (self.id, self.first_name, self.last_name, self.birthdate)
 
     @staticmethod
     def get_tablename():
@@ -707,7 +688,7 @@ class UserAccount(Base):
     login = Column(Unicode(20), nullable=False, unique=True)
     password = Column(Unicode(255), nullable=False)
     person_id = Column(Integer, ForeignKey('%s.id' % Person.get_tablename()))
-    person = relation(Person, backref=backref(__tablename__))
+    person = relation(Person)
     is_admin = Column(Boolean, nullable=False, default=False)
     skin_used = Column(Unicode(80), nullable=False)
 
@@ -731,7 +712,8 @@ class UserAccount(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<UserAccount(id=%s, login='%s', is_admin=%s, person=%s)>" % (self.id, self.login, self.is_admin, self.person)
+        return "<UserAccount(id=%s, login='%s', is_admin=%s, person=%s)>" \
+                % (self.id, self.login, self.is_admin, self.person)
 
     @staticmethod
     def get_tablename():
@@ -786,7 +768,7 @@ class SystemStatsValue(Base):
     __tablename__ = '%s_system_stats_value' % _db_prefix
     id = Column(Integer, primary_key=True)
     system_stats_id = Column(Integer, ForeignKey('%s.id' % SystemStats.get_tablename()), nullable=False)
-    system_stats = relation(SystemStats, backref=backref(__tablename__))
+    system_stats = relation(SystemStats)
     name = Column(Unicode(30), nullable=False)
     value = Column(Unicode(255), nullable=False)
 

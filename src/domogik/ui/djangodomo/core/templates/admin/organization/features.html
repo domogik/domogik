@@ -103,21 +103,24 @@
                             <script type="text/javascript">
                             // <![CDATA[
                                 $(function() {
-                                    $("#command_{{ device.id }}_1").binary_widget_core({
-                                        usage: 1,
-                                        isCommand: false
-                                    });
-                                    $("#command_{{ device.id }}_2").range_widget_core({
-                                        usage: 1,
-                                        isCommand: false
-                                    });
+                                    {% for feature in device.feature %}
+                                        {% ifequal feature.feature_type "actuator" %}
+                                            $("#command_{{ device.id }}_{{ feature.id }}").{{ feature.value_type }}_widget_core({
+                                                usage: {{ device.device_type_id }},
+                                                isCommand: false
+                                            });
+                                        {% endifequal %}
+                                    {% endfor %}
                                 });
                             // ]]>
                             </script>
                             <legend>{{ device.name }} ({{ device.address }})</legend>
                             <ul class="draggables">
-                                <li class="draggable" value="feature-{{ device.id }}_1"><div id="command_{{ device.id }}_1"><span class='name'>{{ device.name }}<br/>Test 1</span></div></li>
-                                <li class="draggable" value="feature-{{ device.id }}_2"><div id="command_{{ device.id }}_2"><span class='name'>{{ device.name }}<br/>Test 2</span></div></li>
+                                {% for feature in device.feature %}
+                                    {% ifequal feature.feature_type "actuator" %}
+                                        <li class="draggable" value="feature-{{ device.id }}_{{ feature.id }}"><div id="command_{{ device.id }}_{{ feature.id }}"><span class='name'>{{ device.name }}<br/>{{ feature.name }}</span></div></li>
+                                    {% endifequal %}
+                                {% endfor %}
                             </ul>
                         </fieldset>
                     {% endfor %}

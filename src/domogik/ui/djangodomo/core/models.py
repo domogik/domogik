@@ -148,13 +148,6 @@ class Rooms(pipes.DmgPipe):
                 for uiconfig in uiconfigs.ui_config:
                     room.area.config[uiconfig.key] = uiconfig.value
 
-    def merge_actuators(self):
-        for room in self.room:
-            if hasattr(room, 'device') and (room.device != 'None') :
-                for device in room.device:
-                    actuators = DeviceActuators.get_by_type(device.type_id)
-                    device.actuator = actuators.actuator_feature
-
 class Devices(pipes.DmgPipe):
     uri = rest_url + "/base/device"
 
@@ -173,10 +166,10 @@ class Devices(pipes.DmgPipe):
                 for uiconfig in uiconfigs.ui_config:
                     device.room.config[uiconfig.key] = uiconfig.value
 
-    def merge_actuators(self):
+    def merge_features(self):
         for device in self.device:
-            actuators = DeviceActuators.get_by_type(device.type_id)
-            device.actuator = actuators.actuator_feature
+            features = DeviceFeatures.get_by_type(device.device_type_id)
+            device.feature = features.device_type_feature
 
 class DeviceUsages(pipes.DmgPipe):
     uri = rest_url + "/base/device_usage"
@@ -205,18 +198,12 @@ class DeviceTypes(pipes.DmgPipe):
         if resp :
             return resp
 
-class DeviceActuators(pipes.DmgPipe):
-    uri = rest_url + "/base/actuator_feature"
-
-    @staticmethod
-    def get_all():
-        resp = DeviceActuators.objects.get({'parameters':"list/"})
-        if resp :
-            return resp
+class DeviceFeatures(pipes.DmgPipe):
+    uri = rest_url + "/base/device_type_feature"
 
     @staticmethod
     def get_by_type(type_id):
-        resp = DeviceActuators.objects.get({'parameters':"list/by-type_id/" + str(type_id)})
+        resp = DeviceFeatures.objects.get({'parameters':"list/by-type_id/" + str(type_id)})
         if resp :
             return resp
 
