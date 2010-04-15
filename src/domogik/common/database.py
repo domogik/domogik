@@ -143,22 +143,6 @@ class DbHelper():
         """
         return self.__session.query(Area).all()
 
-    def list_areas_with_rooms(self):
-        """
-        Return all areas with associated rooms
-        @return a list of Area objects containing the associated room list
-        """
-        area_list = self.__session.query(Area).all()
-        area_rooms_list = []
-        for area in area_list:
-            # to avoid creating a join with following request
-            room_list = self.__session.query(Room)\
-                            .filter_by(area_id=area.id).all()
-            # set Room in area object
-            area.Room = room_list
-            area_rooms_list.append(area)
-        return area_rooms_list
-
     def search_areas(self, filters):
         """
         Look for area(s) with filter on their attributes
