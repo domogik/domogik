@@ -47,10 +47,7 @@
         $('#dragdropfeatures').dragdrop({
             target: ".targetdrop",
             choice: "legend",
-            featurename : ".name",
-            dropcallback: function(self, element, target) {
-//                alert(element + " -> " + target);
-            }
+            featurename : ".name"
         });
 
         $('#dragdropfeatures').dragdrop('addzones', {
@@ -60,7 +57,18 @@
             droporigin : true,
             keeptrace: true,
             dropcallback: function(self, element, target) {
-//                alert(element + " -> " + target);
+                var subelement = /feature-(\d+)_(\d+)/g.exec(element);
+                $.getREST(['base', 'feature_association', 'del', 'device_id', subelement[1], 'feature_id', subelement[2]],
+                    function(data) {
+                        var status = (data.status).toLowerCase();
+                        if (status == 'ok') {
+                            self.valid();
+                        } else {
+                            self.cancel();
+                            display_message('error', data.description);                                          
+                        }
+                    }
+                );
             }            
         });
 
@@ -71,7 +79,29 @@
             droporigin : false,
             keeptrace: false,
             dropcallback: function(self, element, target) {
-//                alert(element + " -> " + target);
+                var subelement = /feature-(\d+)_(\d+)/g.exec(element);
+                var subtarget = /(house|area|room)-(\d+)/g.exec(target);
+                $.getREST(['base', 'feature_association', 'del', 'device_id', subelement[1], 'feature_id', subelement[2]],
+                    function(data) {
+                        var status = (data.status).toLowerCase();
+                        if (status == 'ok') {
+                            $.getREST(['base', 'feature_association', 'add', 'device_id', subelement[1], 'feature_id', subelement[2], 'association_type', subtarget[1], 'association_id', subtarget[2]],
+                                function(data) {
+                                    var status = (data.status).toLowerCase();
+                                    if (status == 'ok') {
+                                        self.valid();
+                                    } else {
+                                        self.cancel();
+                                        display_message('error', data.description);                                          
+                                    }
+                                }
+                            );
+                        } else {
+                            self.cancel();
+                            display_message('error', data.description);                                          
+                        }
+                    }
+                );
             }
         });
 

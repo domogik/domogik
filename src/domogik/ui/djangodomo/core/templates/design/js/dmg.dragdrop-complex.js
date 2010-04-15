@@ -24,6 +24,7 @@
                 zone.drop = parameters.drop;
                 zone.droporigin = parameters.droporigin;
                 zone.keeptrace = parameters.keeptrace;
+                zone.dropcallback = parameters.dropcallback;
                 zone.list = element.children("ul:first");
                 self.zones.push(zone); // Add the zone to the list
                 
@@ -59,7 +60,7 @@
         },
     
         cancel: function() {
-            this._moveObject(this.current_element, this.previous_idZone);
+            this._moveObject(this.current_element, this.previous_idZone, false);
             this.current_element = null;
             this.previous_idZone = null;
         },
@@ -191,12 +192,12 @@
     
         _dropObject : function(objNode, idTarget) {
             this._removePopup();
-            this._moveObject(objNode, idTarget);
+            this._moveObject(objNode, idTarget, true);
             this._hideTargets();
             this._reset(objNode);
         },
         
-        _moveObject : function(objNode, idTarget) {
+        _moveObject : function(objNode, idTarget, runcallback) {
             var self = this, o = this.options;
             if (idTarget.length > 0) {
                 var element_value = objNode.getAttribute('value');
@@ -231,10 +232,20 @@
                 if ($('li', zone_from.list).length == 0) {
                     zone_from.list.html("<li class='empty'><p>Empty</p></li>");
                 }
-                if(this.options.generaldropcallback) this.options.generaldropcallback(this, element_value, target_value);
+                if (runcallback) {
+                    if (zone_target.dropcallback) {
+                        zone_target.dropcallback(this, element_value, target_value);
+                    } else if (this.options.generaldropcallback) {
+                        this.options.generaldropcallback(this, element_value, target_value);                    
+                    }                    
+                }
             } else {
                 this.valid();
             }
+        },
+        
+        _dropcallback: function() {
+            
         },
         
         _reset: function(objNode) {
