@@ -1605,7 +1605,8 @@ target=*
             if data == None:
                 return None
             else:
-                return unicode(urllib.unquote(data), sys.stdin.encoding)
+                #return unicode(urllib.unquote(data), sys.stdin.encoding)
+                return unicode(urllib.unquote(data), "UTF-8")
         except KeyError:
             return None
 
