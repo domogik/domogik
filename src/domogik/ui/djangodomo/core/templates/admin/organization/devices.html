@@ -48,15 +48,15 @@
             content: "{% trans "Please confirm to delete" %}"
         });
 
-        $('#deviceadddialog').dialog_form({
+        $('#adddevicedialog').dialog_form({
             tips: "{% trans "All fields are required." %}",
-            tipsid: 'tipsDevice',
+            tipsid: 'tipsAddDevice',
             fields: [
-                {name : 'devicename', type:'text', label:'Name', required: true, option: {min: 1, max: 80}},
-                {name : 'devicedescription', type:'text', label:'Description', required: true, option: {min: 1, max: 80}},
-                {name : 'deviceaddress', type:'text', label:'Address', required: true, option: {min: 1, max: 80}},
-                {name : 'devicereference', type:'text', label:'Reference', required: true, option: {min: 1, max: 80}},
-                {name : 'deviceusage', type:'select', label:'Usage', required: true, option: {
+                {name : 'adddevicename', type:'text', label:'Name', required: true, option: {min: 1, max: 80}},
+                {name : 'adddevicedescription', type:'text', label:'Description', required: true, option: {min: 1, max: 80}},
+                {name : 'adddeviceaddress', type:'text', label:'Address', required: true, option: {min: 1, max: 80}},
+                {name : 'adddevicereference', type:'text', label:'Reference', required: true, option: {min: 1, max: 80}},
+                {name : 'adddeviceusage', type:'select', label:'Usage', required: true, option: {
                     initial: {value:'0', label:'Choose an usage'},
                     options: [
                     {% for usage in usages_list %}
@@ -64,7 +64,7 @@
                     {% endfor %}
                     ]
                 }},
-                {name : 'devicetype', type:'selectipod', label:'Type', required: true, option: {
+                {name : 'adddevicetype', type:'selectipod', label:'Type', required: true, option: {
                     initial: {value:'0', label:'Choose a device type'},
                     options: [
                         {% regroup types_list|dictsort:"device_technology_id" by device_technology as technologies_list %}
@@ -81,16 +81,16 @@
                 }}
             ]
         });
-        
-        $('#deviceupddialog').dialog_form({
+
+        $('#upddevicedialog').dialog_form({
             tips: "{% trans "All fields are required." %}",
-            tipsid: 'tipsDevice',
+            tipsid: 'tipsUpdDevice',
             fields: [
-                {name : 'devicename', type:'text', label:'Name', required: true, option: {min: 1, max: 80}},
-                {name : 'devicedescription', type:'text', label:'Description', required: true, option: {min: 1, max: 80}},
-                {name : 'deviceaddress', type:'text', label:'Address', required: true, option: {min: 1, max: 80}},
-                {name : 'devicereference', type:'text', label:'Reference', required: true, option: {min: 1, max: 80}},
-                {name : 'deviceusage', type:'select', label:'Usage', required: true, option: {
+                {name : 'upddevicename', type:'text', label:'Name', required: true, option: {min: 1, max: 80}},
+                {name : 'upddevicedescription', type:'text', label:'Description', required: true, option: {min: 1, max: 80}},
+                {name : 'upddeviceaddress', type:'text', label:'Address', required: true, option: {min: 1, max: 80}},
+                {name : 'upddevicereference', type:'text', label:'Reference', required: true, option: {min: 1, max: 80}},
+                {name : 'upddeviceusage', type:'select', label:'Usage', required: true, option: {
                     initial: {value:'0', label:'Choose an usage'},
                     options: [
                     {% for usage in usages_list %}
@@ -100,14 +100,14 @@
                 }}
             ]
         });
-
+        
         /* Add a function to create a device */
-        $('#deviceadddialog').dialog_form('addbutton', {
+        $('#adddevicedialog').dialog_form('addbutton', {
             title: "{% trans "Add new device" %}",
             button: "#addDialogButton",
             onok: function(values) {
                 // Submit form
-                $.getREST(['base', 'device', 'add', 'name', values.devicename, 'address', values.deviceaddress, 'type_id', values.devicetype, 'usage_id', values.deviceusage, 'description', values.devicedescription, 'reference', values.devicereference],
+                $.getREST(['base', 'device', 'add', 'name', values.adddevicename, 'address', values.adddeviceaddress, 'type_id', values.adddevicetype, 'usage_id', values.adddeviceusage, 'description', values.adddevicedescription, 'reference', values.adddevicereference],
                     function(data) {
                         var status = (data.status).toLowerCase();
                         if (status == 'ok') {
@@ -181,13 +181,13 @@
                             });
                             
                             /* Add a function to create a device */
-                            $('#deviceupddialog').dialog_form('updbutton', {
+                            $('#upddevicedialog').dialog_form('updbutton', {
                                 title: "{% trans "Add new device" %}",
                                 button: "#update{{ device.id }}",
-                                values: {devicename : '{{ device.name }}', devicedescription : '{{ device.description }}', deviceaddress : '{{ device.address }}', devicereference : '{{ device.reference }}', deviceusage : '{{ device.device_usage_id }}'},
+                                values: {upddevicename : '{{ device.name }}', upddevicedescription : '{{ device.description }}', upddeviceaddress : '{{ device.address }}', upddevicereference : '{{ device.reference }}', upddeviceusage : '{{ device.device_usage_id }}'},
                                 onok: function(values) {
                                     // Submit form
-                                    $.getREST(['base', 'device', 'update', 'id', '{{ device.id }}', 'name', values.devicename, 'address', values.deviceaddress, 'type_id', values.deviceusage, 'description', values.devicedescription, 'reference', values.devicereference],
+                                    $.getREST(['base', 'device', 'update', 'id', '{{ device.id }}', 'name', values.upddevicename, 'address', values.upddeviceaddress, 'type_id', values.upddeviceusage, 'description', values.upddevicedescription, 'reference', values.upddevicereference],
                                         function(data) {
                                             var status = (data.status).toLowerCase();
                                             if (status == 'ok') {
@@ -216,14 +216,13 @@
                             </ul>
                         </td>
                     </tr>
-                    
                     {% endfor %}
                 </table>
             </div>
             {% endfor %}
         </div>
     </section>
-    <div id="deviceaddialog"></div>
-    <div id="deviceupddialog"></div>
+    <div id="adddevicedialog"></div>
+    <div id="upddevicedialog"></div>
     <div id="delete_confirmation"></div>
 {% endblock %}

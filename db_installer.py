@@ -85,6 +85,11 @@ device_type = db.add_device_type(dty_name='Switch', dt_id=device_technology.id)
 db.add_actuator_feature(af_name='Switch', af_device_type_id=device_type.id,
                         af_parameters='{&quot;command0&quot;:&quot;off&quot;, &quot;command1&quot;:&quot;on&quot;}',
                         af_value_type='binary')
+### temp fritz - a supprimer
+db.add_sensor_feature(sf_name='Switch', sf_device_type_id=device_type.id,
+                        sf_parameters='{&quot;command0&quot;:&quot;off&quot;, &quot;command1&quot;:&quot;on&quot;}',
+                        sf_value_type='binary')
+### fin temp
 device_type = db.add_device_type(dty_name='Dimmer', dt_id=device_technology.id)
 db.add_actuator_feature(af_name='Dimmer', af_device_type_id=device_type.id,
                         af_parameters='{&quot;commandMin&quot;:0, &quot;commandMax&quot;:100}', af_value_type='range')

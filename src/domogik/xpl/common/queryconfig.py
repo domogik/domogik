@@ -39,6 +39,7 @@ Implements
 
 from domogik.xpl.common.xplconnector import *
 import domogik.common.logger
+from socket import gethostname
 
 class Query():
     '''
@@ -69,12 +70,13 @@ class Query():
         all the config items for this technology will be fetched
         '''
         print "new query"
-        Listener(self._query_cb, self.__myxpl,{'schema': 'domogik.config', 'xpltype': 'xpl-stat', 'technology': technology})
+        Listener(self._query_cb, self.__myxpl,{'schema': 'domogik.config', 'xpltype': 'xpl-stat', 'technology': technology, 'hostname' : gethostname()})
         self._keys[key] = result
         mess = XplMessage()
         mess.set_type('xpl-cmnd')
         mess.set_schema('domogik.config')
         mess.add_data({'technology': technology})
+        mess.add_data({'hostname': gethostname()})
         if element:
             mess.add_data({'element': element})
         mess.add_data({'key': key})
