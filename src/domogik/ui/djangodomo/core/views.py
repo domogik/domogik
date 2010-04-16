@@ -81,7 +81,8 @@ def index(request):
     page_title = _("Domogik Homepage")
 
     try:
-        result_all_areas = Areas.get_all_with_rooms()
+        result_all_areas = Areas.get_all()
+        result_all_areas.merge_rooms()
         result_all_areas.merge_uiconfig()
         result_house = UIConfigs.get_general('house')
     except ResourceNotAvailableException:
@@ -372,7 +373,8 @@ def admin_organization_rooms(request):
         result_all_rooms = Rooms.get_all()
         result_all_rooms.merge_uiconfig()
         result_unattributed_rooms = Rooms.get_without_area()
-        result_all_areas = Areas.get_all_with_rooms()
+        result_all_areas = Areas.get_all()
+        result_all_areas.merge_rooms()
         result_all_areas.merge_uiconfig()
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')

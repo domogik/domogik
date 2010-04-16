@@ -70,22 +70,21 @@ class Areas(pipes.DmgPipe):
 
     @staticmethod
     def get_all():
-        resp = Areas.objects.get({'parameters':"list/"})
-        if resp :
-            return resp
-
-    @staticmethod
-    def get_all_with_rooms():
-        resp = Areas.objects.get({'parameters':"list-with-rooms/"})
+        resp = Areas.objects.get({'parameters':"list"})
         if resp :
             return resp
 
     @staticmethod
     def get_by_id(id):
-        resp = Areas.objects.get({'parameters':"list/by-id/"+id})
+        resp = Areas.objects.get({'parameters':"list/by-id/" + str(id)})
         if resp :
             return resp
 
+    def merge_rooms(self):
+        for area in self.area:
+            rooms = Rooms.get_by_area(area.id)
+            area.room = rooms.room
+            
     def merge_uiconfig(self):
         for area in self.area:
             uiconfigs = UIConfigs.get_by_reference('area', area.id)
@@ -106,31 +105,25 @@ class Rooms(pipes.DmgPipe):
 
     @staticmethod
     def get_all():
-        resp = Rooms.objects.get({'parameters':"list/"})
+        resp = Rooms.objects.get({'parameters':"list"})
         if resp :
             return resp
 
     @staticmethod
     def get_by_id(id):
-        resp = Rooms.objects.get({'parameters':"list/by-id/"+id})
+        resp = Rooms.objects.get({'parameters':"list/by-id/" + str(id)})
         if resp :
             return resp
 
     @staticmethod
     def get_by_area(id):
-        resp = Rooms.objects.get({'parameters':"list/by-area/"+id})
+        resp = Rooms.objects.get({'parameters':"list/by-area/" + str(id)})
         if resp :
             return resp
 
     @staticmethod
     def get_without_area():
         resp = Rooms.objects.get({'parameters':"list/by-area//"})
-        if resp :
-            return resp
-
-    @staticmethod
-    def get_all_with_devices():
-        resp = Rooms.objects.get({'parameters':"list-with-devices/"})
         if resp :
             return resp
 
@@ -153,7 +146,7 @@ class Devices(pipes.DmgPipe):
 
     @staticmethod
     def get_all():
-        resp = Devices.objects.get({'parameters':"list/"})
+        resp = Devices.objects.get({'parameters':"list"})
         if resp :
             return resp
 
@@ -176,7 +169,7 @@ class DeviceUsages(pipes.DmgPipe):
 
     @staticmethod
     def get_all():
-        resp = DeviceUsages.objects.get({'parameters':"list/"})
+        resp = DeviceUsages.objects.get({'parameters':"list"})
         if resp :
             return resp
 
@@ -185,7 +178,7 @@ class DeviceTechnologies(pipes.DmgPipe):
 
     @staticmethod
     def get_all():
-        resp = DeviceTechnologies.objects.get({'parameters':"list/"})
+        resp = DeviceTechnologies.objects.get({'parameters':"list"})
         if resp :
             return resp
 
@@ -194,7 +187,7 @@ class DeviceTypes(pipes.DmgPipe):
 
     @staticmethod
     def get_all():
-        resp = DeviceTypes.objects.get({'parameters':"list/"})
+        resp = DeviceTypes.objects.get({'parameters':"list"})
         if resp :
             return resp
 
@@ -236,7 +229,7 @@ class Plugins(pipes.DmgPipe):
 
     @staticmethod
     def get_all():
-        resp = Plugins.objects.get({'parameters':"list/"})
+        resp = Plugins.objects.get({'parameters':"list"})
         if resp :
             return resp
 
@@ -263,12 +256,12 @@ class Accounts(pipes.DmgPipe):
 
     @staticmethod
     def get_all_users():
-        resp = Accounts.objects.get({'parameters':"user/list/"})
+        resp = Accounts.objects.get({'parameters':"user/list"})
         if resp :
             return resp
 
     @staticmethod
     def get_all_people():
-        resp = Accounts.objects.get({'parameters':"person/list/"})
+        resp = Accounts.objects.get({'parameters':"person/list"})
         if resp :
             return resp
