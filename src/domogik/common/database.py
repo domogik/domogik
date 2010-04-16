@@ -930,8 +930,8 @@ class DbHelper():
         self.__session.expire_all()
         dfa = self.__session.query(DeviceFeatureAssociation)\
                             .filter_by(device_id=d_device_id, device_type_feature_id=d_type_feature_id).first()
-        if dfa is None:
-            raise DbHelperException("DeviceFeatureAssociation to be deleted not found")
+        if not dfa:
+            return None
         self.__session.delete(dfa)
         try:
             self.__session.commit()
