@@ -75,7 +75,7 @@ $(function(){
         );
     }
     
-    function saveConfig(name, configuration) {
+    function saveConfig(name, host, configuration) {
         var itemSaved = 0;
         $.each(configuration, function(index, item) {
             var value = null;
@@ -85,7 +85,7 @@ $(function(){
                 value = $('#value_' + item.key).val();
             
             }
-            $.getREST(['plugin', 'config', 'set', 'name', name, 'key', item.key, 'value', value],
+            $.getREST(['plugin', 'config', 'set', 'name', name, 'hostname', host, 'key', item.key, 'value', value],
                 function(data) {
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
@@ -114,7 +114,7 @@ $(function(){
                     var ikey = item.key;
                     var idescription = item.description;
                     var idefault = item['default'];
-                    $.getREST(['plugin', 'config', 'list', 'by-name' , '{{ plugin.name }}' , 'by-key', ikey],
+                    $.getREST(['plugin', 'config', 'list', 'by-name' , '{{ plugin.name }}', '{{ plugin.host }}' , 'by-key', ikey],
                         function(data) {
                             var status = (data.status).toLowerCase();
                             if (status == 'ok') {
@@ -148,7 +148,7 @@ $(function(){
                     );
                 });
                 
-                $.getREST(['plugin', 'config', 'list' ,'by-name', '{{ plugin.name }}'],
+                $.getREST(['plugin', 'config', 'list' ,'by-name', '{{ plugin.name }}', '{{ plugin.host }}'],
                     function(data) {
                         var status = (data.status).toLowerCase();
                         if (status == 'ok') {
@@ -163,7 +163,7 @@ $(function(){
                     });
                 $("#configuration").append("<p><button id='configurationsubmit' class='button icon16-action-save'>{% trans "Save" %}</button></p>");
                 $("#configurationsubmit").click(function(event) {
-                    saveConfig('{{ plugin.name }}', data.plugin[0].configuration);
+                    saveConfig('{{ plugin.name }}', '{{ plugin.host }}', data.plugin[0].configuration);
                     event.stopPropagation();
                 });
             } else {
