@@ -39,8 +39,8 @@ Implements
 @organization: Domogik
 """
 
-import copy, datetime, hashlib
-from types import DictType, ListType, NoneType
+import datetime, hashlib
+from types import DictType
 
 import sqlalchemy
 from sqlalchemy.sql.expression import func
@@ -580,7 +580,8 @@ class DbHelper():
                     raise DbHelperException("Couldn't delete device type %s : there are associated device(s)" % dty_id)
                 df_list = self.__session.query(DeviceTypeFeature).filter_by(device_type_id=dty.id).all()
                 if len(df_list) > 0:
-                    raise DbHelperException("Couldn't delete device type %s : there are associated device type feature(s)" % dty_id)
+                    raise DbHelperException("Couldn't delete device type %s : there are associated device type " +\
+                                            "feature(s)" % dty_id)
             self.__session.delete(dty)
             try:
                 self.__session.commit()
@@ -649,9 +650,11 @@ class DbHelper():
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
         if af_value_type not in ACTUATOR_VALUE_TYPE_LIST:
-            raise DbHelperException("Value type (%s) is not in the allowed item list : %s" % (af_value_type, ACTUATOR_VALUE_TYPE_LIST))
+            raise DbHelperException("Value type (%s) is not in the allowed item list : %s" \
+                                    % (af_value_type, ACTUATOR_VALUE_TYPE_LIST))
         if self.__session.query(DeviceType).filter_by(id=af_device_type_id).first() is None:
-            raise DbHelperException("Can't add actuator feature : device type id '%s' doesn't exist" % dtf_device_type_id)
+            raise DbHelperException("Can't add actuator feature : device type id '%s' doesn't exist" \
+                                    % dtf_device_type_id)
         device_type_feature = DeviceTypeFeature(name=ucode(af_name), feature_type=u'actuator',
                                                 device_type_id=af_device_type_id, value_type=ucode(af_value_type),
                                                 return_confirmation=af_return_confirmation,
@@ -680,7 +683,8 @@ class DbHelper():
         device_type_feature = self.__session.query(DeviceTypeFeature)\
                                             .filter_by(id=af_id).filter_by(feature_type=u'actuator').first()
         if device_type_feature is None:
-            raise DbHelperException("DeviceTypeFeature with id %s (actuator) couldn't be found - can't update it" % af_id)
+            raise DbHelperException("DeviceTypeFeature with id %s (actuator) couldn't be found - can't update it" \
+                                    % af_id)
         if af_name is not None:
             device_type_feature.name = ucode(af_name)
         if af_parameters is not None:
@@ -689,7 +693,8 @@ class DbHelper():
             device_type_feature.parameters = ucode(af_parameters)
         if af_value_type is not None:
             if af_value_type not in ACTUATOR_VALUE_TYPE_LIST:
-                raise DbHelperException("Value type (%s) is not in the allowed item list : %s" % (af_value_type, ACTUATOR_VALUE_TYPE_LIST))
+                raise DbHelperException("Value type (%s) is not in the allowed item list : %s" \
+                                        % (af_value_type, ACTUATOR_VALUE_TYPE_LIST))
             device_type_feature.value_type = ucode(af_value_type)
         if af_return_confirmation is not None:
             device_type_feature.return_confirmation = af_return_confirmation
