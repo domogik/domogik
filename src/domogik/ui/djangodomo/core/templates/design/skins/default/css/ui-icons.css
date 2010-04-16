@@ -29,22 +29,25 @@
 .icon64-room-bathroom { background-image:url(../images/room/bathroom_64.png);}
 .icon64-room-office { background-image:url(../images/room/office_64.png);}
 .icon64-room-kidsroom { background-image:url(../images/room/kidsroom_64.png);}
+.icon64-room-garage { background-image:url(../images/room/garage_64.png);}
 
 .icon32-room- { background-image:url(../images/unknown_32.png);}
 .icon32-room-kitchen { background-image:url(../images/room/kitchen_32.png);}
 .icon32-room-bedroom { background-image:url(../images/room/bedroom_32.png);}
 .icon32-room-tvlounge { background-image:url(../images/room/tvlounge_32.png);}
-.icon32-room-bathroom { background-image:url(../images/room/default_room_32.png);}
-.icon32-room-office { background-image:url(../images/room/default_room_32.png);}
+.icon32-room-bathroom { background-image:url(../images/room/bathroom_32.png);}
+.icon32-room-office { background-image:url(../images/room/office_32.png);}
 .icon32-room-kidsroom { background-image:url(../images/room/kidsroom_32.png);}
+.icon32-room-garage { background-image:url(../images/room/garage_32.png);}
 
 .icon16-room- { background-image:url(../images/unknown_16.png);}
 .icon16-room-kitchen { background-image:url(../images/room/kitchen_16.png);}
 .icon16-room-bedroom { background-image:url(../images/room/bedroom_16.png);}
 .icon16-room-tvlounge { background-image:url(../images/room/tvlounge_16.png);}
-.icon16-room-bathroom { background-image:url(../images/room/default_room_16.png);}
-.icon16-room-office { background-image:url(../images/room/default_room_16.png);}
+.icon16-room-bathroom { background-image:url(../images/room/bathroom_16.png);}
+.icon16-room-office { background-image:url(../images/room/office_16.png);}
 .icon16-room-kidsroom { background-image:url(../images/room/kidsroom_16.png);}
+.icon16-room-garage { background-image:url(../images/room/garage_16.png);}
 
 /* Usage icons */
 .icon64-usage- { background-image:url(../images/unknown_64.png);}
