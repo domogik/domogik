@@ -148,6 +148,7 @@ class AreaTestCase(GenericTestCase):
             pass
         area0 = self.db.add_area('area0','description 0')
         print area0
+        assert area0.name == 'area0'
         assert self.db.list_areas()[0].name == 'area0'
 
     def test_update(self):
@@ -176,6 +177,9 @@ class AreaTestCase(GenericTestCase):
                 assert len(area.rooms) == 2
                 for room in area.rooms:
                     assert room.name in ['Bedroom1', 'Bedroom2']
+        area_list = self.db.list_areas_with_rooms()
+        assert len(area_list) == 3
+        assert area_list[0].Room == area_list[0].rooms # Only needed for REST
 
     def test_del(self):
         area0 = self.db.add_area('area0','description 0')

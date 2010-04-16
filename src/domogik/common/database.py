@@ -139,9 +139,21 @@ class DbHelper():
     def list_areas(self):
         """
         Return all areas
-        @return list of Area objects
+        @return a list of Area objects
         """
         return self.__session.query(Area).all()
+
+    def list_areas_with_rooms(self):
+        """
+        Return areas with associated rooms
+        @return a list of Area objects
+        """
+        area_list = []
+        for area in self.__session.query(Area).all():
+            # Needed only for REST compatibility
+            area.Room = area.rooms
+            area_list.append(area)
+        return area_list
 
     def search_areas(self, filters):
         """
