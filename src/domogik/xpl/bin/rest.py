@@ -1152,13 +1152,6 @@ target=*
                     else:
                         self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
-            elif self.rest_request[1] == "list-with-rooms":
-                if len(self.rest_request) == 2:
-                    self._rest_base_area_list_with_rooms()
-                else:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-
 
             ### add
             elif self.rest_request[1] == "add":
@@ -1210,13 +1203,6 @@ target=*
                     else:
                         self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
-            elif self.rest_request[1] == "list-with-devices":
-                if len(self.rest_request) == 2:
-                    self._rest_base_room_list_with_devices()
-                else:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-
 
             ### add
             elif self.rest_request[1] == "add":
@@ -1667,18 +1653,6 @@ target=*
 
 
 
-    def _rest_base_area_list_with_rooms(self):
-        """ list areas and associated rooms
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("area")
-        # TODO : reactivate
-        #for area in self._db.list_areas_with_rooms():
-        #    json_data.add_data(area)
-        self.send_http_response_ok(json_data.get())
-
-
 
     def _rest_base_area_add(self):
         """ add areas
@@ -1758,19 +1732,6 @@ target=*
             self.send_http_response_ok(json_data.get())
         except:
             self._log.error("Exception : %s" % traceback.format_exc())
-
-
-
-    def _rest_base_room_list_with_devices(self):
-        """ list rooms and associated devices
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("room")
-        for room in self._db.list_rooms_with_devices():
-            json_data.add_data(room)
-        self.send_http_response_ok(json_data.get())
-
 
 
     def _rest_base_room_add(self):
