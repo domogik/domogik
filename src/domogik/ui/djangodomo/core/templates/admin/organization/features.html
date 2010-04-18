@@ -154,7 +154,11 @@
                             <ul class="draggables">
                                 {% for feature in device.feature %}
                                     {% ifequal feature.feature_type "actuator" %}
-                                        <li class="draggable" value="feature-{{ device.id }}_{{ feature.id }}"><div id="command_{{ device.id }}_{{ feature.id }}"><span class='name'>{{ device.name }}<br/>{{ feature.name }}</span></div></li>
+                                        {% if feature.association %}
+                                            <li id='feature-{{ device.id }}_{{ feature.id }}_trace' class='trace'><p>text</p></li>
+                                        {% else %}
+                                            <li class="draggable" value="feature-{{ device.id }}_{{ feature.id }}"><div id="command_{{ device.id }}_{{ feature.id }}"><span class='name'>{{ device.name }}<br/>{{ feature.name }}</span></div></li>
+                                        {% endif %}
                                     {% endifequal %}
                                 {% endfor %}
                             </ul>

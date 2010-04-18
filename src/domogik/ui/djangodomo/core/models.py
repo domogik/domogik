@@ -100,6 +100,11 @@ class Areas(pipes.DmgPipe):
                     for uiconfig in uiconfigs.ui_config:
                         room.config[uiconfig.key] = uiconfig.value
 
+    def merge_feature_associations(self):
+        for area in self.area:
+            associations = FeatureAssociations.get_by_room(area.id)
+            area.feature = associations.feature_association
+
 class Rooms(pipes.DmgPipe):
     uri = rest_url + "/base/room"
 
@@ -141,6 +146,11 @@ class Rooms(pipes.DmgPipe):
                 for uiconfig in uiconfigs.ui_config:
                     room.area.config[uiconfig.key] = uiconfig.value
 
+    def merge_feature_associations(self):
+        for room in self.room:
+            associations = FeatureAssociations.get_by_room(room.id)
+            room.feature = associations.feature_association
+
 class Devices(pipes.DmgPipe):
     uri = rest_url + "/base/device"
 
@@ -162,7 +172,12 @@ class Devices(pipes.DmgPipe):
     def merge_features(self):
         for device in self.device:
             features = DeviceFeatures.get_by_type(device.device_type_id)
+            associations = FeatureAssociations.get_by_device(device.id)
             device.feature = features.device_type_feature
+            for feature in device.feature:
+                for association in associations.feature_association:
+                    if (feature.id == association.device_type_feature_id):
+                        feature.association = association
 
 class DeviceUsages(pipes.DmgPipe):
     uri = rest_url + "/base/device_usage"
@@ -200,6 +215,33 @@ class DeviceFeatures(pipes.DmgPipe):
         if resp :
             return resp
 
+class FeatureAssociations(pipes.DmgPipe):
+    uri = rest_url + "/base/feature_association"
+
+    @staticmethod
+    def get_by_house():
+        resp = FeatureAssociations.objects.get({'parameters':"list/by-house"})
+        if resp :
+            return resp
+
+    @staticmethod
+    def get_by_area(area_id):
+        resp = FeatureAssociations.objects.get({'parameters':"list/by-area/" + str(area_id)})
+        if resp :
+            return resp
+
+    @staticmethod
+    def get_by_room(room_id):
+        resp = FeatureAssociations.objects.get({'parameters':"list/by-room/" + str(room_id)})
+        if resp :
+            return resp
+        
+    @staticmethod
+    def get_by_device(device_id):
+        resp = FeatureAssociations.objects.get({'parameters':"list/by-device/" + str(device_id)})
+        if resp :
+            return resp
+    
 class UIConfigs(pipes.DmgPipe):
     uri = rest_url + "/base/ui_config"
 
