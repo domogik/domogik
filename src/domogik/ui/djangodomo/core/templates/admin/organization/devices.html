@@ -57,7 +57,7 @@
                 {name : 'adddeviceaddress', type:'text', label:'Address', required: true, option: {min: 1, max: 80}},
                 {name : 'adddevicereference', type:'text', label:'Reference', required: true, option: {min: 1, max: 80}},
                 {name : 'adddeviceusage', type:'select', label:'Usage', required: true, option: {
-                    initial: {value:'0', label:'Choose an usage'},
+                    initial: {value:'0', label:'Choose a usage'},
                     options: [
                     {% for usage in usages_list %}
                         {value:'{{ usage.id }}', label: '{{ usage.name }}'},
@@ -91,7 +91,7 @@
                 {name : 'upddeviceaddress', type:'text', label:'Address', required: true, option: {min: 1, max: 80}},
                 {name : 'upddevicereference', type:'text', label:'Reference', required: true, option: {min: 1, max: 80}},
                 {name : 'upddeviceusage', type:'select', label:'Usage', required: true, option: {
-                    initial: {value:'0', label:'Choose an usage'},
+                    initial: {value:'0', label:'Choose a usage'},
                     options: [
                     {% for usage in usages_list %}
                         {value:'{{ usage.id }}', label: '{{ usage.name }}'},
