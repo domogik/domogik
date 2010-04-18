@@ -31,7 +31,7 @@
                 zone.list.attr('role', 'list')
                     .attr('aria-labelledby', zone.id + '_header');
 
-                if ($("li.draggable", zone.list).length > 0) {
+                if ($("li.draggable, li.trace", zone.list).length > 0) {
                     $("li.draggable", zone.list).each(function() {
                         var element = $(this);
                         element.addClass('draggable');

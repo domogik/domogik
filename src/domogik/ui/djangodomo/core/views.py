@@ -41,7 +41,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from domogik.common import database
 from djangodomo.core.models import REST, Areas, Rooms, Devices, DeviceUsages, DeviceTechnologies, DeviceTypes, \
-                                   DeviceFeatures, UIConfigs, Plugins, Accounts
+                                   DeviceFeatures, FeatureAssociations, UIConfigs, Plugins, Accounts
 
 from djangodomo.core.sample_data_helper import SampleDataHelper
 
@@ -463,9 +463,14 @@ def admin_organization_features(request):
         result_all_devices.merge_features()
         result_all_rooms = Rooms.get_all()
         result_all_rooms.merge_uiconfig()
+        result_all_rooms.merge_feature_associations()
         result_all_areas = Areas.get_all()
         result_all_areas.merge_uiconfig()
+        result_all_areas.merge_feature_associations()
+        
         result_house = UIConfigs.get_general('house')
+        result_house_features_associations = FeatureAssociations.get_by_house()
+        
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
 
@@ -480,7 +485,8 @@ def admin_organization_features(request):
         areas_list=result_all_areas.area,
         rooms_list=result_all_rooms.room,
         devices_list=result_all_devices.device,
-        house=result_house
+        house=result_house,
+        house_features_associations=result_house_features_associations.feature_association
     )
     
 def admin_plugins_plugin(request, plugin_name):

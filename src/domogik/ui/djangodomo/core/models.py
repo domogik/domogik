@@ -102,8 +102,8 @@ class Areas(pipes.DmgPipe):
 
     def merge_feature_associations(self):
         for area in self.area:
-            associations = FeatureAssociations.get_by_room(area.id)
-            area.feature = associations.feature_association
+            associations = FeatureAssociations.get_by_area(area.id)
+            area.feature_association = associations.feature_association
 
 class Rooms(pipes.DmgPipe):
     uri = rest_url + "/base/room"
@@ -149,7 +149,7 @@ class Rooms(pipes.DmgPipe):
     def merge_feature_associations(self):
         for room in self.room:
             associations = FeatureAssociations.get_by_room(room.id)
-            room.feature = associations.feature_association
+            room.feature_association = associations.feature_association
 
 class Devices(pipes.DmgPipe):
     uri = rest_url + "/base/device"
