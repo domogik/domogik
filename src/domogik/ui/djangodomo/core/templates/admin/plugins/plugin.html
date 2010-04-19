@@ -61,8 +61,8 @@ $(function(){
         $("#value_" + key).attr('class', 'medium icon16-status-warning');
     }
     
-    function deleteConfig(name) {
-        $.getREST(['plugin', 'config', 'del', name],
+    function deleteConfig(name, host) {
+        $.getREST(['plugin', 'config', 'del', name, host],
             function(data) {
                 var status = (data.status).toLowerCase();
                 if (status == 'ok') {
@@ -174,7 +174,7 @@ $(function(){
     );
 
     $("#configurationdelete").click(function(event) {
-        deleteConfig('{{ plugin.name }}');
+        deleteConfig('{{ plugin.name }}', '{{ plugin.host }}');
     });
 });
 {% endblock %}
