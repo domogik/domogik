@@ -1006,6 +1006,7 @@ target=*
              @param device_id : device id
              @param key : key for device
         """
+        # TODO
 
         json_data = JSonHelper("OK")
         json_data.set_data_type("stats")
@@ -1024,16 +1025,11 @@ target=*
              @param num : number of data to return
         """
 
-        # TODO
         json_data = JSonHelper("OK")
         json_data.set_data_type("stats")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        # only last value
-        if num == 1:
-            data = self._db.get_last_stat_of_device(device_id)
-            if data is not None:
-                # TODO :filter by key
-                json_data.add_data(data)
+        for data in self._db.list_last_n_stats_of_device_by_key(device_id, key, num):
+            json_data.add_data(data)
         self.send_http_response_ok(json_data.get())
 
 
@@ -1047,17 +1043,15 @@ target=*
 
         st_from = self.to_date(self.get_parameters("from"))
         st_to = self.to_date(self.get_parameters("to"))
-        st_interval = self.get_parameters("interval")
-        st_number = self.get_parameters("number")
         print "from=%s" % st_from
         print "to=%s" % st_to
-        print "interval=%s" % st_interval
-        print "number=%s" % st_number
 
         # TODO
         json_data = JSonHelper("OK")
         json_data.set_data_type("stats")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        for data in self._db.list_stats_of_device_between_by_key(device_id, key, st_from, st_to):
+            json_data.add_data(data)
         self.send_http_response_ok(json_data.get())
     
 
@@ -2365,8 +2359,8 @@ target=*
 
             ### del
             elif self.rest_request[1] == "del":
-                if len(self.rest_request) == 3:
-                    self._rest_plugin_config_del(id=self.rest_request[2])
+                if len(self.rest_request) == 4:
+                    self._rest_plugin_config_del(name=self.rest_request[2], hostname=self.rest_request[3])
                 else:
                     self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
@@ -2610,7 +2604,7 @@ target=*
 
 
 
-    def _rest_plugin_config_del(self, id=None):
+    def _rest_plugin_config_del(self, name, hostname):
         """ delete device technology config
             @param name : module name
         """
@@ -2618,7 +2612,7 @@ target=*
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("config")
         try:
-            for plugin in self._db.del_plugin_config(id):
+            for plugin in self._db.del_plugin_config(name, hostname):
                 json_data.add_data(plugin)
         except:
             json_data.set_error(code = 999, description = self.get_exception())
