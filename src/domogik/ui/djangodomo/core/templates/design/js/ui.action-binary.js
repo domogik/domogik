@@ -4,26 +4,15 @@
         _init: function() {
             var self = this, o = this.options;
             this.states = o.states.toLowerCase().split(/\s*,\s*/);
-            this.widgets = new Array();
-            this.element.addClass('command_binary')
-                .addClass('icon32-state-' + o.usage);
-            this.name = this.element.find('.name').text();
-            var ul = $("<ul></ul>");
-            var li0 = $("<li></li>");
-            var a0 = $("<button class='buttontext capitalletter'>" + this.states[0] + "</button>");
-            a0.click(function() {
-                    self.runAction(0);
-                });
-            var li1 = $("<li></li>");
-            var a1 = $("<button class='buttontext capitalletter'>" + this.states[1] + "</button>");
-            a1.click(function() {
-                    self.runAction(1);
-                });
-            li0.append(a0);
-            li1.append(a1);
-            ul.append(li0);
-            ul.append(li1);
-            this.element.append(ul);
+            this.element.binary_widget_core({
+                usage: o.usage,
+                states: this.states,
+                isCommand: true
+            })
+                .attr("tabindex", 0)
+                .click(function () {self.switchState()})
+                .keypress(function (e) {if (e.which == 13 || e.which == 32) {self.switchState()}});
+
         },
         
         setState: function(state) {
@@ -34,19 +23,13 @@
                 this.currentState = 0;
             }
             this.displayState(this.currentState);
-            $.each(this.widgets, function(index, value) {
-                $(value).binary_widget('setState', self.currentState);
-            });
         },
         
         displayState: function(state) {
-            this.element.find('.name').text(this.name + ' - ' + this.states[state]);
             if (state == 1) {
-                this.element.addClass('binary_1');                
-                this.element.removeClass('binary_0');                                
+                this.element.binary_widget_core('displayState', 1);
             } else {
-                this.element.addClass('binary_0');                                
-                this.element.removeClass('binary_1');                                
+                this.element.binary_widget_core('displayState', 0);                
             }
         },
         
@@ -57,18 +40,7 @@
         
         runAction: function(state) {
             this.options.action(this, this.states[state]);
-        },
-        
-        registerWidget: function(id) {
-            this.widgets.push(id);
-            $(id).binary_widget({
-                command: this,
-                usage: this.options.usage,
-                states: this.states
-            })
-            .binary_widget('setState', this.currentState);
         }
-
     });
     
     $.extend($.ui.binary_command, {
@@ -84,6 +56,7 @@
             this.element.addClass('widget_binary');
             this.elementicon = $("<div class='widget_icon'></div>");
             this.elementicon.addClass('icon32-state-' + o.usage);                
+            this.element.append(this.elementicon);            
             if(o.isCommand) {
                 this.elementstate = $("<div class='widget_state'></div>");
                 this.element.append(this.elementstate);
@@ -91,7 +64,6 @@
             } else {
                 this.elementicon.addClass('binary_1');                
             }
-            this.element.append(this.elementicon);            
         },
         
         displayState: function(state) {
@@ -110,35 +82,5 @@
         defaults: {
             isCommand: true
         }
-    });
-    
-    $.widget("ui.binary_widget", {
-        _init: function() {
-            var self = this, o = this.options;
-            this.element.binary_widget_core({
-                usage: o.usage,
-                states: o.states
-            })
-                .attr("tabindex", 0)
-                .click(function () {self.switchState()})
-                .keypress(function (e) {if (e.which == 13 || e.which == 32) {self.switchState()}});
-        },
-        
-        switchState: function() {
-            this.options.command.switchState();
-        },
-        
-        setState: function(state) {
-            if (state == 1) {
-                this.element.binary_widget_core('displayState', 1);
-            } else {
-                this.element.binary_widget_core('displayState', 0);                
-            }
-        }
-    });
-    $.extend($.ui.binary_widget, {
-        defaults: {
-        }
-    });
-    
+    });    
 })(jQuery);

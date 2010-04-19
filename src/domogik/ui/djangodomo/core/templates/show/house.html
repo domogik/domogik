@@ -34,45 +34,86 @@
 {% block title %}{% trans page_title %}{% endblock %}
 
 {% block banner %}
-    <h1 class="ident icon64-house-default"><span class="title">{{ house.name }}</span></h1>
+<h1 class="ident icon64-house-default"><span class="title">{{ house.name }}</span></h1>
 {% endblock %}
 {% block content %}
-	{% for area in areas_list %}
-		{% if forloop.counter0|divisibleby:"3" %}
-			<div class='row'>
-		{% endif %}
-				<div class='column'>
-					<script type="text/javascript">
-					// <![CDATA[
-						$(function() {
-							$("#extended_{{ area.id }}").leftpanel({
-								closetext: "Close",
-								openbutton: "#openextended_{{ area.id }}",
-							});
-						});
-					// ]]>
-					</script>
+    <script type="text/javascript">
+    // <![CDATA[
+        $(function() {
+            {% for feature in house_features_associations %}
+                {% ifequal feature.device_type_feature.value_type 'binary' %}
+                    $("#command_{{ feature.device_id }}_{{ feature.device_type_feature_id }}").binary_command({
+                        usage: {{ feature.device.device_usage_id }},
+                        states: 'Off, On',
+                        action: function(self, command) {
+                            alert(command);
+                            self.setState(command);
+                        }
+                    })
+                        .binary_command('setState', 'Off');
+                {% endifequal %}
 
-					<div class='block'>
-						<h2 class='header icon64-area-{{ area.config.icon}}'>
-							<a href='{% url show_area_view area.id %}' class="ident">
-								<span class="title">{{ area.name }}</span>
-								<br />
-								<span class="subtitle">{{ area.description }}</span>
-							</a>
-							<!--span class='temp icon32-device-temp'>21 &#176;C</span-->
-						</h2>
-						<div class='actions'>
-							<ul>
-							</ul>
-						</div>
-                        <div class='footer'><button class='button_bottomright' id='openextended_{{ area.id }}'>Full commands</button></div>
-					</div>
-					<div class='extended' id='extended_{{ area.id }}'>
-					</div>
-				</div>
-		{% if forloop.counter0|divisibleby:"3" %}
-			</div>
-		{% endif %}
-	{% endfor %}
+                {% ifequal feature.device_type_feature.value_type 'range' %}
+                    $("#command_{{ feature.device_id }}_{{ feature.device_type_feature_id }}").range_command({
+                        usage: {{ feature.device.device_usage_id }},
+                        states: '0, 100, 10',
+                        unit: '%',
+                        action: function(self, command) {
+                            alert(command);
+                            self.setValue(command);
+                        }
+                    })
+                        .range_command('setValue', 50);
+                {% endifequal %}
+            {% endfor %}
+        });
+    // ]]>
+    </script>
+    <div class='actions'>
+        <ul>
+            {% for association in house_features_associations %}
+                <li><div id="command_{{ association.device_id }}_{{ association.device_type_feature_id }}"><span class='name'>{{ association.device.name }}<br/>{{ association.device_type_feature.name }}</span></div></li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    {% for area in areas_list %}
+	    {% if forloop.counter0|divisibleby:"3" %}
+		    <div class='row'>
+	    {% endif %}
+			    <div class='column'>
+				    <script type="text/javascript">
+				    // <![CDATA[
+					    $(function() {
+						    /*$("#extended_{{ area.id }}").leftpanel({
+							    closetext: "Close",
+							    openbutton: "#openextended_{{ area.id }}",
+						    });*/
+					    });
+				    // ]]>
+				    </script>
+
+				    <div class='block'>
+					    <h2 class='header icon64-area-{{ area.config.icon}}'>
+						    <a href='{% url show_area_view area.id %}' class="ident">
+							    <span class="title">{{ area.name }}</span>
+							    <br />
+							    <span class="subtitle">{{ area.description }}</span>
+						    </a>
+						    <!--span class='temp icon32-device-temp'>21 &#176;C</span-->
+					    </h2>
+                        <div class='actions'>
+                        </div>
+            		    <!--div class='footer'><button class='button_bottomright' id='openextended_{{ area.id }}'>Full commands</button></div-->
+				    </div>
+				    <!--div class='extended' id='extended_{{ area.id }}'>
+                        <h3>Commandes</h3>
+                        <ul class='commands'>
+                        </ul>
+                    </div-->
+			    </div>
+	    {% if forloop.counter0|divisibleby:"3" %}
+		    </div>
+	    {% endif %}
+    {% endfor %}
 {% endblock %}

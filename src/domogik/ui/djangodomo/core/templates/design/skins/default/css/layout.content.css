@@ -49,3 +49,18 @@ header#contentheader .subtitle {
     background-position:left 50%;
     background-repeat:no-repeat;
 }
+
+/* Actions section */
+
+#mainsection .actions ul {
+    list-style:none;
+    margin:0;
+    padding:0;
+    text-align:center;
+}
+
+#mainsection .actions ul > li {
+    display:inline-block;
+    margin: 0;
+    padding: 0;
+}

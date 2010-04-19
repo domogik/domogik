@@ -48,7 +48,7 @@
                         element.attr('aria-haspopup', 'true');
                         element.attr('role', 'listitem');
 
-                        element.attr('zoneorigin', zone.id);
+                        //element.attr('zoneorigin', zone.id);
 
                         // Add event handlers
                         self._initialise(this);

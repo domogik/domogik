@@ -62,5 +62,4 @@ urlpatterns = patterns('djangodomo.core.views',
     url(r'show/house/$', 'show_house', name="show_house_view"),
     url(r'show/area/(?P<area_id>\d+)/$', 'show_area', name='show_area_view'),
     url(r'show/room/(?P<room_id>\d+)/$', 'show_room', name='show_room_view'),
-    url(r'show/device/(?P<device_id>\d+)/$', 'show_device', name='show_device_view'),
 )

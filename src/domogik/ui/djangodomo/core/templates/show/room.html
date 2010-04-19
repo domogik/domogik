@@ -30,8 +30,6 @@
 {% endblock %}
 
 {% block js_include %}
-    <script type="text/javascript" src="/design/js/tpg.utilities.js"></script>
-    <script type="text/javascript" src="/design/js/tpg.slider.js"></script>
 {% endblock %}
 
 {% block title %}{% trans page_title %}{% endblock %}
@@ -46,85 +44,44 @@
 {% endblock %}
 
 {% block content %}
-    {% for device in devices_list %}
-        {% if forloop.counter0|divisibleby:"3" %}
-            <div class='row'>
-        {% endif %}
-                <div class='column'>
-                    <script type="text/javascript">
-                    // <![CDATA[
-                        $(function() {
-							$("#extended_{{ device.id }}").leftpanel({
-								closetext: "Close",
-								openbutton: "#openextended_{{ device.id }}",
-							});
-                            
-                            {% for actuator in device.actuator %}
-                                {% ifequal actuator.value 'binary' %}
-                                    $("#command_{{ device.id }}_{{ actuator.id }}").binary_command({
-                                        usage: {{ device.usage_id }},
-                                        states: '{{ actuator.configurable_states }}',
-                                        action: function(self, command) {
-                                            alert(command);
-                                            self.setState(command);
-                                        }
-                                    })
-                                        .binary_command('setState', 'Off')
-                                        .binary_command('registerWidget', '#widget_{{ device.id }}_{{ actuator.id }}');
-                                {% endifequal %}
+    <script type="text/javascript">
+    // <![CDATA[
+        $(function() {
+            {% for feature in room.feature_association %}
+                {% ifequal feature.device_type_feature.value_type 'binary' %}
+                    $("#command_{{ feature.device_id }}_{{ feature.device_type_feature_id }}").binary_command({
+                        usage: {{ feature.device.device_usage_id }},
+                        states: 'Off, On',
+                        action: function(self, command) {
+                            alert(command);
+                            self.setState(command);
+                        }
+                    })
+                        .binary_command('setState', 'Off');
+                {% endifequal %}
 
-                                {% ifequal actuator.value 'range' %}
-                                    $("#command_{{ device.id }}_{{ actuator.id }}").range_command({
-                                        usage: {{ device.usage_id }},
-                                        states: '{{ actuator.configurable_states }}',
-                                        unit: '{{ actuator.unit }}',
-                                        action: function(self, command) {
-                                            alert(command);
-                                            self.setValue(command);
-                                        }
-                                    })
-                                        .range_command('setValue', 50)
-                                        .range_command('registerWidget', '#widget_{{ device.id }}_{{ actuator.id }}');
-                                {% endifequal %}
-                            {% endfor %}
-                        });
-                    // ]]>
-                    </script>
-
-                    <div class='block'>
-                        <h2 class='header icon64-usage-{{ device.usage_id }}'>
-                            <a href='{% url show_device_view device.id %}' class="ident">
-                                <span class="title">{{ device.name }}</span>
-                                <br />
-                                <span class="subtitle">{{ device.description }}</span>
-                            </a>
-                        </h2>
-                        <div class='actions'>
-                            <ul>
-                                {% for actuator in device.actuator %}
-                                    <li><div id="widget_{{ device.id }}_{{ actuator.id }}">{{ actuator.name }}</div></li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-
-                        <div class='footer'><button class='button_bottomright' id='openextended_{{ device.id }}'>Full commands</button></div>
-                    </div>
-                    
-                    <div class='extended' id='extended_{{ device.id }}'>
-                        <h3>Commandes</h3>
-                        <ul class='commands'>
-                        {% for actuator in device.actuator %}
-                            <li>
-                                <div id="command_{{ device.id }}_{{ actuator.id }}">
-                                    <span class='name'>{{ actuator.name }}</span>
-                                </div>
-                            </li>
-                        {% endfor %}
-                        </ul>
-                    </div>
-                </div>
-        {% if forloop.counter0|divisibleby:"3" %}
-            </div>
-        {% endif %}
-    {% endfor %}
+                {% ifequal feature.device_type_feature.value_type 'range' %}
+                    $("#command_{{ feature.device_id }}_{{ feature.device_type_feature_id }}").range_command({
+                        usage: {{ feature.device.device_usage_id }},
+                        states: '0, 100, 10',
+                        unit: '%',
+                        action: function(self, command) {
+                            alert(command);
+                            self.setValue(command);
+                        }
+                    })
+                        .range_command('setValue', 50);
+                {% endifequal %}
+            {% endfor %}
+        });
+    // ]]>
+    </script>
+    
+    <div class='actions'>
+        <ul>
+            {% for feature in room.feature_association %}
+                <li><div id="command_{{ feature.device_id }}_{{ feature.device_type_feature_id }}"><span class='name'>{{ feature.device.name }}<br/>{{ feature.device_type_feature.name }}</span></div></li>
+            {% endfor %}
+        </ul>
+    </div>
 {% endblock %}

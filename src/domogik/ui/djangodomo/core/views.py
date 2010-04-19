@@ -527,7 +527,10 @@ def show_house(request):
     try:
         result_all_areas = Areas.get_all()
         result_all_areas.merge_uiconfig()
+
         result_house = UIConfigs.get_general('house')
+        result_house_features_associations = FeatureAssociations.get_by_house()
+
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
     return __go_to_page(
@@ -535,7 +538,8 @@ def show_house(request):
         page_title,
         nav1_show = "selected",
         areas_list=result_all_areas.area,
-        house=result_house
+        house=result_house,
+        house_features_associations=result_house_features_associations.feature_association
     )
 
 def show_area(request, area_id):
@@ -547,6 +551,8 @@ def show_area(request, area_id):
     try:
         result_area_by_id = Areas.get_by_id(area_id)
         result_area_by_id.merge_uiconfig()
+        result_area_by_id.merge_feature_associations()
+
         result_rooms_by_area = Rooms.get_by_area(area_id)
         result_rooms_by_area.merge_uiconfig()
         result_house = UIConfigs.get_general('house')
@@ -572,8 +578,8 @@ def show_room(request, room_id):
     try:
         result_room_by_id = Rooms.get_by_id(room_id)
         result_room_by_id.merge_uiconfig()
-        result_devices_by_room = Devices.get_by_room(room_id)
-        result_devices_by_room.merge_actuators()
+        result_room_by_id.merge_feature_associations()
+
         result_house = UIConfigs.get_general('house')
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
@@ -584,37 +590,6 @@ def show_room(request, room_id):
         page_title,
         nav1_show = "selected",
         room=result_room_by_id.room[0],
-        devices_list=result_devices_by_room.device,
-        house=result_house
-    )
-
-def show_device(request, device_id):
-    """
-    Method called when the show device page is accessed
-    @param request : HTTP request
-    @return an HttpResponse object
-    """
-    try:
-        result_house = UIConfigs.get_general('house')
-    except ResourceNotAvailableException:
-        return render_to_response('error/ResourceNotAvailableException.html')
-
-    device = __db.get_device(device_id)
-    room_id = device.room_id
-    room = __db.get_room_by_id(room_id)
-    room_name = room.name
-    area_id = room.area_id
-    area_name = (__db.get_area_by_id(area_id)).name
-    page_title = _("View")
-    return __go_to_page(
-        request, 'show/device.html',
-        page_title,
-        nav1_show = "selected",
-        device=device,
-        area_id=area_id,
-        area_name=area_name,
-        room_id=room_id,
-        room_name=room_name,
         house=result_house
     )
 

@@ -155,9 +155,9 @@
                                 {% for feature in device.feature %}
                                     {% ifequal feature.feature_type "actuator" %}
                                         {% if feature.association %}
-                                            <li id='feature-{{ device.id }}_{{ feature.id }}_trace' class='trace'><p>{{ device.name }}<br/>{{ feature.name }}<br/>associated<br />with<br />{{ feature.association.place_type }} {{ feature.association.place_id }}</p></li>
+                                            <li class='trace' id='feature-{{ device.id }}_{{ feature.id }}_trace'><p>{{ device.name }}<br/>{{ feature.name }}<br/>associated<br />with<br />{{ feature.association.place_type }} {{ feature.association.place_id }}</p></li>
                                         {% else %}
-                                            <li class="draggable" value="feature-{{ device.id }}_{{ feature.id }}"><div id="command_{{ device.id }}_{{ feature.id }}"><span class='name'>{{ device.name }}<br/>{{ feature.name }}</span></div></li>
+                                            <li class="draggable" value="feature-{{ device.id }}_{{ feature.id }}" zoneorigin='device-{{ device.id }}'><div id="command_{{ device.id }}_{{ feature.id }}"><span class='name'>{{ device.name }}<br/>{{ feature.name }}</span></div></li>
                                         {% endif %}
                                     {% endifequal %}
                                 {% endfor %}
@@ -181,7 +181,7 @@
                     <legend class="choice icon16-house-default">{{ house.name }}</legend>
                     <ul class="draggables">
                         {% for association in house_features_associations %}
-                            <li class="draggable" value="feature-{{ association.device_id }}_{{ association.device_type_feature_id }}"><div id="command_{{ association.device_id }}_{{ association.device_type_feature_id }}"><span class='name'>{{ association.device.name }}<br/>{{ association.device_type_feature.name }}</span></div></li>
+                            <li class="draggable" value="feature-{{ association.device_id }}_{{ association.device_type_feature_id }}" zoneorigin='device-{{ association.device_id }}'><div id="command_{{ association.device_id }}_{{ association.device_type_feature_id }}"><span class='name'>{{ association.device.name }}<br/>{{ association.device_type_feature.name }}</span></div></li>
                         {% endfor %}
                     </ul>
                 </fieldset>
@@ -192,7 +192,7 @@
                     <legend class="choice icon16-area-{{ area.config.icon }}">{{ area.name }}</legend>
                     <ul class="draggables">
                         {% for association in area.feature_association %}
-                            <li class="draggable" value="feature-{{ association.device_id }}_{{ association.device_type_feature_id }}"><div id="command_{{ association.device_id }}_{{ association.device_type_feature_id }}"><span class='name'>{{ association.device.name }}<br/>{{ association.device_type_feature.name }}</span></div></li>
+                            <li class="draggable" value="feature-{{ association.device_id }}_{{ association.device_type_feature_id }}" zoneorigin='device-{{ association.device_id }}'><div id="command_{{ association.device_id }}_{{ association.device_type_feature_id }}"><span class='name'>{{ association.device.name }}<br/>{{ association.device_type_feature.name }}</span></div></li>
                         {% endfor %}
                     </ul>
                 </fieldset>
@@ -204,7 +204,7 @@
                     <legend class="choice icon16-room-{{ room.config.icon }}">{{ room.name }}</legend>
                     <ul class="draggables">
                         {% for association in room.feature_association %}
-                            <li class="draggable" value="feature-{{ association.device_id }}_{{ association.device_type_feature_id }}"><div id="command_{{ association.device_id }}_{{ association.device_type_feature_id }}"><span class='name'>{{ association.device.name }}<br/>{{ association.device_type_feature.name }}</span></div></li>
+                            <li class="draggable" value="feature-{{ association.device_id }}_{{ association.device_type_feature_id }}" zoneorigin='device-{{ association.device_id }}'><div id="command_{{ association.device_id }}_{{ association.device_type_feature_id }}"><span class='name'>{{ association.device.name }}<br/>{{ association.device_type_feature.name }}</span></div></li>
                         {% endfor %}
                     </ul>
                 </fieldset>
