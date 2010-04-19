@@ -54,9 +54,13 @@ header#contentheader .subtitle {
 
 #mainsection .actions ul {
     list-style:none;
-    margin:0;
-    padding:0;
-    text-align:center;
+    margin:1em;
+    padding:1em;
+    background-color:#eeeeee;
+    border: 1px solid #979387;
+    -moz-border-radius: 0.8em;
+    -webkit-border-radius: 0.8em;
+
 }
 
 #mainsection .actions ul > li {
