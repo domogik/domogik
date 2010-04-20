@@ -57,7 +57,7 @@
             droporigin : true,
             keeptrace: true,
             dropcallback: function(self, element, target) {
-                var subelement = /feature-(\d+)_(\d+)/g.exec(element);
+                var subelement = element.split('-');
                 $.getREST(['base', 'feature_association', 'del', 'device_id', subelement[1], 'feature_id', subelement[2]],
                     function(data) {
                         var status = (data.status).toLowerCase();
