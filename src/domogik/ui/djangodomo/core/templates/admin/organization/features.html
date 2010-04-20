@@ -142,7 +142,7 @@
                                     {% for feature in device.feature %}
                                         {% ifequal feature.feature_type "actuator" %}
                                             $("#command_{{ device.id }}_{{ feature.id }}").{{ feature.value_type }}_widget_core({
-                                                usage: {{ device.device_type_id }},
+                                                usage: {{ device.device_usage_id }},
                                                 isCommand: false
                                             });
                                         {% endifequal %}
