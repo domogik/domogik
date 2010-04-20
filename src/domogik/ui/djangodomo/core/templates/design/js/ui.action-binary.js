@@ -59,7 +59,7 @@
             this.element.append(this.elementicon);            
             if(o.isCommand) {
                 this.elementstate = $("<div class='widget_state'></div>");
-                this.element.append(this.elementstate);
+                this.elementicon.append(this.elementstate);
                 this.element.addClass('command');
             } else {
                 this.elementicon.addClass('binary_1');                

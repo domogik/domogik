@@ -6,9 +6,9 @@ const close_with_change = 3000; // 3 seconds
         _init: function() {
             var self = this, o = this.options;
 			var states = o.states.toLowerCase().split(/\s*,\s*/);
-			this.min_value = states[0];
-			this.max_value = states[1];
-			this.steps = states[2];
+			this.min_value = parseInt(states[0]);
+			this.max_value = parseInt(states[1]);
+			this.steps = parseInt(states[2]);
             this.element.range_widget_core({
                 usage: o.usage,
                 isCommand: true
@@ -115,13 +115,13 @@ const close_with_change = 3000; // 3 seconds
         },
 		
 		plus_range: function() {
-			var value = Math.floor((this.processingValue + this.steps) / this.steps) * this.steps;
+			var value = ((this.processingValue + this.steps) / this.steps) * this.steps;
       		this.resetAutoClose();
 			this.setProcessingValue(value);
 		},
 		
 		minus_range: function() {
-			var value = Math.floor((this.processingValue - this.steps) / this.steps) * this.steps;
+			var value = ((this.processingValue - this.steps) / this.steps) * this.steps;
       		this.resetAutoClose();
 			this.setProcessingValue(value);
 		},
@@ -189,7 +189,7 @@ const close_with_change = 3000; // 3 seconds
             this.element.append(this.elementicon);
             if(o.isCommand) {
     			this.elementstate = $("<div class='widget_state'></div>");
-    			this.element.append(this.elementstate);
+    			this.elementvalue.append(this.elementstate);
                 this.element.addClass('command');
             } else {
     			this.elementvalue.addClass('range_100');
@@ -211,13 +211,12 @@ const close_with_change = 3000; // 3 seconds
 		
 		displayValue: function(value, unit) {
 			this.elementstate.text(value + unit);
-			this.elementvalue.text('');
 			this.elementicon.css('-moz-background-size', '0');
 			this.elementicon.css('-webkit-background-size', '0');
         },
 		
 		displayProcessingValue: function(value, unit) {
-			this.elementvalue.text(value + unit);
+			this.elementstate.text(value + unit);
 		}
     });
     

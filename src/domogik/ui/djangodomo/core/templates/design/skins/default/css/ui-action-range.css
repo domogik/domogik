@@ -5,6 +5,15 @@
     height: 9em;
 }
 
+.widget_range .name {
+    color:#FFFFFF;
+    background-color:#000000;
+    -moz-border-radius: 0.8em;
+    -webkit-border-radius: 0.8em;
+    display:block;
+    font-weight:bold;
+}
+
 .widget_range:hover .widget_icon,
 .widget_range:focus .widget_icon {
     background-color:#FFFFFF;
@@ -16,7 +25,17 @@
 }
 
 .widget_range .widget_state {
-    display:block;
+    background-color:rgba(255,255,255,0.6);
+    display:inline-block;
+    vertical-align:text-bottom;
+    height:10px;
+    border-top: 1px solid #cccccc;
+    border-left: 1px solid #cccccc;
+    -moz-border-radius: 0.8em 0 0.8em 0;
+    -webkit-border-radius: 0.8em 0 0.8em 0;
+    float:right;
+    padding: 0.2em 0.5em 0.2em 0.5em;
+    margin-top:30px;
 }
 
 .widget_range .widget_icon {
@@ -40,11 +59,9 @@
     display:inline-block;
     width: 45px;
     height: 45px;
-    text-align:center;
-    font-weight: bold;
+    text-align:right;
     background-position: center center;
     background-repeat: no-repeat;
-    line-height:45px;
 }
 
 .widget_range.opened .widget_icon {

@@ -6,6 +6,15 @@
     height: 9em;
 }
 
+.widget_binary .name {
+    color:#FFFFFF;
+    background-color:#000000;
+    -moz-border-radius: 0.8em;
+    -webkit-border-radius: 0.8em;
+    display:block;
+    font-weight:bold;
+}
+
 .widget_binary:hover .widget_icon,
 .widget_binary:focus .widget_icon {
     background-color:#FFFFFF;
@@ -17,7 +26,17 @@
 }
 
 .widget_binary .widget_state {
-    display:block;
+    background-color:rgba(255,255,255,0.6);
+    display:inline-block;
+    vertical-align:text-bottom;
+    height:10px;
+    border-top: 1px solid #cccccc;
+    border-left: 1px solid #cccccc;
+    -moz-border-radius: 0.8em 0 0.8em 0;
+    -webkit-border-radius: 0.8em 0 0.8em 0;
+    float:right;
+    padding: 0.2em 0.5em 0.2em 0.5em;
+    margin-top:30px;
 }
 
 .widget_binary .widget_icon {
@@ -30,6 +49,7 @@
     background-position: center center;
     background-repeat: no-repeat;
     margin:0.5em 1em 0 1em;
+    text-align:right;
 }
 
 /*
