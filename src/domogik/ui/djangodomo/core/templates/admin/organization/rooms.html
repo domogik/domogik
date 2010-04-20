@@ -26,7 +26,7 @@
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/page-admin-organization.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block js_include %}
-    <script type="text/javascript" src="/design/js/dmg.dragdrop.js"></script>
+    <script type="text/javascript" src="/design/js/dmg.dragdrop-complex.js"></script>
 {% endblock %}
 {% block js_script %}
     $(function(){
@@ -46,7 +46,17 @@
         
         /* Drag & Drop */
         $('#dragdroprooms').dragdrop({
+            target: ".targetdrop",
             choice: "legend",
+            featurename : ".description"
+        });
+
+        $('#dragdroprooms').dragdrop('addzones', {
+            id: "#dragdroprooms",
+            drag: true,
+            drop: true,
+            droporigin : false,
+            keeptrace: false,
             dropcallback: function(self, element, target) {
                 $.getREST(['base', 'room', 'update', 'id', element, 'area_id', target],
                     function(data) {
@@ -59,7 +69,7 @@
                         }
                     }
                 )
-            }
+            }            
         });
         
         /* Dialogs */
@@ -209,24 +219,20 @@
     
     <section class="subsection" id="dragdroprooms">
         <h2 class='help' id='help_dragdrop'>{% trans "Rooms organisation" %} <span class='offscreen'>{% trans "Drag &amp; Drop instructions" %}</span></h2>
-        <fieldset class="targetdrop">
+        <fieldset class="targetdrop" value="None">
             <legend>{% trans "Unattributed rooms" %}</legend>
-            <ul class="draggables" value="None">
+            <ul class="draggables">
                 {% for room in unattribued_rooms %}
                 <li class="draggable icon32-room-{{ room.config.icon }}" value="{{ room.id }}">{{ room.name }}<span class="description">{{ room.description }}</span></li>
-                {% empty %}
-                <li class="empty">{% trans "Empty" %}</li>
                 {% endfor %}
             </ul>
         </fieldset>
         {% for area in areas_list %}
-        <fieldset class="targetdrop">
+        <fieldset class="targetdrop" value='{{ area.id }}'>
             <legend class="icon16-area-{{ area.config.icon }}">{{ area.name }}</legend>
-            <ul class="draggables" value='{{ area.id }}'>
+            <ul class="draggables">
                 {% for room in area.room %}
                 <li class="draggable icon32-room-{{ room.config.icon }}" value="{{ room.id }}">{{ room.name }}<span class="description">{{ room.description }}</span></li>
-                {% empty %}
-                <li class="empty">{% trans "Empty" %}</li>
                 {% endfor %}
             </ul>
         </fieldset>
