@@ -3,10 +3,10 @@
     $.widget("ui.binary_command", {
         _init: function() {
             var self = this, o = this.options;
-            this.states = o.states.toLowerCase().split(/\s*,\s*/);
+            this.values = [o.value0, o.value1];
             this.element.binary_widget_core({
                 usage: o.usage,
-                states: this.states,
+                values: this.values,
                 isCommand: true
             })
                 .attr("tabindex", 0)
@@ -17,7 +17,7 @@
         
         setState: function(state) {
             var self = this;
-            if (state == 1 || state.toLowerCase() == this.states[1]) {
+            if (state == 1 || state.toLowerCase() == this.values[1]) {
                 this.currentState = 1;
             } else {
                 this.currentState = 0;
@@ -39,7 +39,8 @@
         },
         
         runAction: function(state) {
-            this.options.action(this, this.states[state]);
+            var self = this, o = this.options;
+            o.action(this, this.values[state]);
         }
     });
     
@@ -67,6 +68,7 @@
         },
         
         displayState: function(state) {
+            var self = this, o = this.options;
             if (state == 1) {
                 this.elementicon.addClass('binary_1');                
                 this.elementicon.removeClass('binary_0');
@@ -74,7 +76,7 @@
                 this.elementicon.addClass('binary_0');                                
                 this.elementicon.removeClass('binary_1');                                
             }
-            this.elementstate.text(this.options.states[state]);
+            this.elementstate.text(o.values[state]);
         }
     });
     

@@ -5,10 +5,9 @@ const close_with_change = 3000; // 3 seconds
 	$.widget("ui.range_command", {
         _init: function() {
             var self = this, o = this.options;
-			var states = o.states.toLowerCase().split(/\s*,\s*/);
-			this.min_value = parseInt(states[0]);
-			this.max_value = parseInt(states[1]);
-			this.steps = parseInt(states[2]);
+            this.min_value = parseInt(o.min_value);
+            this.max_value = parseInt(o.max_value);
+            this.steps = parseInt(o.steps);
             this.element.range_widget_core({
                 usage: o.usage,
                 isCommand: true
@@ -60,7 +59,7 @@ const close_with_change = 3000; // 3 seconds
         },
 
 		setValue: function(value) {
-			var self = this;
+            var self = this, o = this.options;
 			if (value >= this.min_value && value <= this.max_value) {
 				this.currentValue = value;
 			} else if (value < this.min_value) {
@@ -70,14 +69,14 @@ const close_with_change = 3000; // 3 seconds
 			}
 			this.processingValue = this.currentValue;
 			var percent = (this.currentValue / (this.max_value - this.min_value)) * 100;
-			var icon = 'range_' + findRangeIcon(this.options.usage, percent);
+			var icon = 'range_' + findRangeIcon(o.usage, percent);
 
             this.displayValue(this.currentValue, icon, this.currentIcon);
 			this.currentIcon = icon;
         },
 
 		setProcessingValue: function(value) {
-			var self = this;
+            var self = this, o = this.options;
 			if (value >= this.min_value && value <= this.max_value) {
 				this.processingValue = value;
 			} else if (value < this.min_value) {
@@ -115,23 +114,27 @@ const close_with_change = 3000; // 3 seconds
         },
 		
 		plus_range: function() {
+            var self = this, o = this.options;
 			var value = ((this.processingValue + this.steps) / this.steps) * this.steps;
       		this.resetAutoClose();
 			this.setProcessingValue(value);
 		},
 		
 		minus_range: function() {
+            var self = this, o = this.options;
 			var value = ((this.processingValue - this.steps) / this.steps) * this.steps;
       		this.resetAutoClose();
 			this.setProcessingValue(value);
 		},
 		
 		max_range: function() {
+            var self = this, o = this.options;
       		this.resetAutoClose();
 			this.setProcessingValue(this.max_value);
 		},
 		
 		min_range: function() {
+            var self = this, o = this.options;
       		this.resetAutoClose();
 			this.setProcessingValue(this.min_value);
 		},

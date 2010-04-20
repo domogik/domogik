@@ -48,10 +48,12 @@
     // <![CDATA[
         $(function() {
             {% for feature in room.feature_association %}
+                var parameters = $.getJson("{{ feature.device_type_feature.parameters|safe }}");
                 {% ifequal feature.device_type_feature.value_type 'binary' %}
                     $("#command_{{ feature.device_id }}_{{ feature.device_type_feature_id }}").binary_command({
                         usage: {{ feature.device.device_usage_id }},
-                        states: 'Off, On',
+                        value0: parameters.command0,
+                        value1: parameters.command1,
                         action: function(self, command) {
                             alert(command);
                             self.setState(command);
@@ -63,7 +65,9 @@
                 {% ifequal feature.device_type_feature.value_type 'range' %}
                     $("#command_{{ feature.device_id }}_{{ feature.device_type_feature_id }}").range_command({
                         usage: {{ feature.device.device_usage_id }},
-                        states: '0, 100, 10',
+                        min_value: parameters.commandMin,
+                        max_value: parameters.commandMax,
+                        steps: '10',
                         unit: '%',
                         action: function(self, command) {
                             alert(command);
