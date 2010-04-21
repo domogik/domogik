@@ -530,7 +530,6 @@ def show_house(request):
 
         result_house = UIConfigs.get_general('house')
         result_house_features_associations = FeatureAssociations.get_by_house()
-
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
     return __go_to_page(

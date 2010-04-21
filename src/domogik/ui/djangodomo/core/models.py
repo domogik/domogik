@@ -199,12 +199,22 @@ class DeviceTechnologies(pipes.DmgPipe):
 
 class DeviceTypes(pipes.DmgPipe):
     uri = rest_url + "/base/device_type"
-
+    dict = None
+    
     @staticmethod
     def get_all():
         resp = DeviceTypes.objects.get({'parameters':"list"})
         if resp :
             return resp
+        
+    @staticmethod
+    def get_dict():
+        if (dict == None):
+            resp = DeviceTypes.objects.get({'parameters':"list"})
+            if resp :
+                for type in resp.device_type:
+                    dict[type.id] = type
+        return dict
 
 class DeviceFeatures(pipes.DmgPipe):
     uri = rest_url + "/base/device_type_feature"

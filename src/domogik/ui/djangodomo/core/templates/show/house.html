@@ -20,6 +20,8 @@
 {% endcomment %}
 
 {% load i18n %}
+{% load elements %}
+
 {% block js_script %}
 // <![CDATA[
 // ]]>
@@ -42,14 +44,25 @@
         $(function() {
             {% for feature in house_features_associations %}
                 var parameters = $.getJson("{{ feature.device_type_feature.parameters|safe }}");
-                {% ifequal feature.device_type_feature.value_type 'binary' %}
+                
+                {% get_device_type feature.device.device_type_id as device_type %}
+                {% ifequal feature.device_type_feature.value_type 'binary' %}                
                     $("#command_{{ feature.device_id }}_{{ feature.device_type_feature_id }}").binary_command({
                         usage: {{ feature.device.device_usage_id }},
                         value0: parameters.command0,
                         value1: parameters.command1,
                         action: function(self, command) {
-                            alert(command);
-                            self.setState(command);
+                            $.getREST(['command', '{{device_type.device_technology_id}}', '{{ feature.device.address }}', command],
+                                function(data) {
+                                    var status = (data.status).toLowerCase();
+                                    if (status == 'ok') {
+                                        self.setState(command);
+                                    } else {
+                                        /* Error */
+                                        display_message(data.status, data.description);
+                                    }
+                                }
+                            );
                         }
                     })
                         .binary_command('setState', 'Off');
@@ -62,9 +75,18 @@
                         max_value: parameters.commandMax,
                         steps: '10',
                         unit: '%',
-                        action: function(self, command) {
-                            alert(command);
-                            self.setValue(command);
+                        action: function(self, value) {
+                            $.getREST(['command', '{{device_type.device_technology_id}}', '{{ feature.device.address }}', 'dim', value],
+                                function(data) {
+                                    var status = (data.status).toLowerCase();
+                                    if (status == 'ok') {
+                                        self.setValue(command);
+                                    } else {
+                                        /* Error */
+                                        display_message(data.status, data.description);
+                                    }
+                                }
+                            );
                         }
                     })
                         .range_command('setValue', 50);
