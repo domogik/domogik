@@ -28,7 +28,9 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
 from django import template
 from django.template import Node
-from djangodomo.core.models import DeviceTypes
+from django.utils import simplejson
+from django.utils.html import escape
+from djangodomo.core.models import DeviceTypes, DeviceUsages
 
 register = template.Library()
 
@@ -50,14 +52,33 @@ class DeviceType(Node):
         id = self.id.resolve(context)
         context[self.variable] = DeviceType._dict[id]
         return ''
+
+class DeviceUsage(Node):
+    _dict = None
+    def __init__(self, id, variable):
+        self.id = template.Variable(id)
+        self.variable = variable
+
+    def render(self, context):
+        if DeviceUsage._dict is None:
+            print "device usage downloading"
+            usages = DeviceUsages.get_all()
+            DeviceUsage._dict = {}
+            for usage in usages.device_usage:
+                DeviceUsage._dict[usage.id] = usage
+        else:
+            print "device usage already downloaded"
+        id = self.id.resolve(context)
+        context[self.variable] = DeviceUsage._dict[id]
+        return ''
     
 def do_get_device_type(parser, token):
     """
-    This generate the javascript command button script.
+    This returns the device type object.
 
     Usage::
 
-        {% get_device_type device_id as variable%}
+        {% get_device_type type_id as variable%}
     """
     args = token.contents.split()
     if len(args) != 4:
@@ -65,3 +86,18 @@ def do_get_device_type(parser, token):
     return DeviceType(args[1], args[3])
 
 register.tag('get_device_type', do_get_device_type)
+
+def do_get_device_usage(parser, token):
+    """
+    This returns the device usage object.
+
+    Usage::
+
+        {% get_device_usage usage_id as variable%}
+    """
+    args = token.contents.split()
+    if len(args) != 4:
+        raise TemplateSyntaxError, "'get_device_usage' requires 'id' and 'as variable' arguments"
+    return DeviceUsage(args[1], args[3])
+
+register.tag('get_device_usage', do_get_device_usage)

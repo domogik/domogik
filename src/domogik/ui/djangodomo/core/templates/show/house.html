@@ -46,6 +46,7 @@
                 var parameters = $.getJson("{{ feature.device_type_feature.parameters|safe }}");
                 
                 {% get_device_type feature.device.device_type_id as device_type %}
+                {% get_device_type feature.device.device_usage_id as device_usage %}
                 {% ifequal feature.device_type_feature.value_type 'binary' %}                
                     $("#command_{{ feature.device_id }}_{{ feature.device_type_feature_id }}").binary_command({
                         usage: {{ feature.device.device_usage_id }},
