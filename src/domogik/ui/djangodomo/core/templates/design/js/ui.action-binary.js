@@ -4,9 +4,10 @@
         _init: function() {
             var self = this, o = this.options;
             this.values = [o.value0, o.value1];
+            this.texts = [o.text0, o.text1];
             this.element.binary_widget_core({
                 usage: o.usage,
-                values: this.values,
+                texts: this.texts,
                 isCommand: true
             })
                 .attr("tabindex", 0)
@@ -76,7 +77,7 @@
                 this.elementicon.addClass('binary_0');                                
                 this.elementicon.removeClass('binary_1');                                
             }
-            this.elementstate.text(o.values[state]);
+            this.elementstate.text(o.texts[state]);
         }
     });
     

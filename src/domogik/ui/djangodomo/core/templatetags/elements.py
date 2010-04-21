@@ -28,8 +28,6 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
 from django import template
 from django.template import Node
-from django.utils import simplejson
-from django.utils.html import escape
 from djangodomo.core.models import DeviceTypes, DeviceUsages
 
 register = template.Library()
