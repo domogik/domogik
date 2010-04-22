@@ -64,6 +64,7 @@ def __go_to_page(request, html_page, page_title, **attribute_list):
     response_attr_list = {}
     response_attr_list['rest_ip'] = REST.getIP()
     response_attr_list['rest_port'] = REST.getPort()
+    response_attr_list['rest_prefix'] = REST.getPrefix()
     response_attr_list['page_title'] = page_title
     response_attr_list['sys_config'] = __db.get_system_config()
     response_attr_list['is_user_connected'] = __is_user_connected(request)

@@ -64,6 +64,10 @@ $.extend({
         if (rest_ip && rest_port) {
             rest_url = "http://" + rest_ip + ":" + rest_port;  
         }
+        if (rest_prefix) {
+            rest_url += '/' + rest_prefix;
+        }
+
         // Build the REST url
         $.each(parameters, function(){
             rest_url += '/' + encodeURIComponent(this);     
