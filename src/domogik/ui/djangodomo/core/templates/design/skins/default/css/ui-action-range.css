@@ -38,6 +38,14 @@
     margin-top:30px;
 }
 
+.widget_range .widget_state.error {
+    background-color:rgba(191,84,46,0.6);
+}
+
+.widget_range .widget_state.ok {
+    background-color:rgba(144,178,71,0.6);
+}
+
 .widget_range .widget_icon {
     display:block;
     width: 45px;

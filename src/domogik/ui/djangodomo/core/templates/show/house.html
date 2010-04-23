@@ -60,10 +60,11 @@
                                 function(data) {
                                     var status = (data.status).toLowerCase();
                                     if (status == 'ok') {
-                                        self.setState(command);
+                                        self.valid({{feature.device_type_feature.return_confirmation|lower}});
                                     } else {
                                         /* Error */
-                                        display_message(data.status, data.description);
+                                        self.cancel();
+//                                        display_message(data.status, data.description);
                                     }
                                 }
                             );
@@ -77,17 +78,18 @@
                         usage: {{ feature.device.device_usage_id }},
                         min_value: parameters_type.commandMin,
                         max_value: parameters_type.commandMax,
-                        steps: parameters_usage.range.steps,
+                        step: parameters_usage.range.step,
                         unit: parameters_usage.range.unit,
                         action: function(self, value) {
                             $.getREST(['command', '{{device_type.device_technology_id}}', '{{ feature.device.address }}', 'dim', value],
                                 function(data) {
                                     var status = (data.status).toLowerCase();
                                     if (status == 'ok') {
-                                        self.setValue(command);
+                                        self.valid({{feature.device_type_feature.return_confirmation|lower}});
                                     } else {
                                         /* Error */
-                                        display_message(data.status, data.description);
+                                        self.cancel();
+//                                        display_message(data.status, data.description);
                                     }
                                 }
                             );

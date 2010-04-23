@@ -1,5 +1,6 @@
 const close_without_change = 10000; // 10 seconds
 const close_with_change = 3000; // 3 seconds
+const range_reset_status = 4000; // 4 seconds
 
 (function($) {
 	$.widget("ui.range_command", {
@@ -7,7 +8,7 @@ const close_with_change = 3000; // 3 seconds
             var self = this, o = this.options;
             this.min_value = parseInt(o.min_value);
             this.max_value = parseInt(o.max_value);
-            this.steps = parseInt(o.steps);
+            this.step = parseInt(o.step);
             this.element.range_widget_core({
                 usage: o.usage,
                 isCommand: true
@@ -85,12 +86,12 @@ const close_with_change = 3000; // 3 seconds
 				this.processingValue = this.max_value
 			}
 			var percent = (this.processingValue / (this.max_value - this.min_value)) * 100;
-
             this.displayProcessingValue(this.processingValue, percent);
 		},
 		
 		processValue: function() {
 			if (this.processingValue != this.currentValue) { // If the value was changed
+                this.element.range_widget_core('startProcessingState');
 				this.options.action(this, this.processingValue);				
 			}
 		},
@@ -115,14 +116,14 @@ const close_with_change = 3000; // 3 seconds
 		
 		plus_range: function() {
             var self = this, o = this.options;
-			var value = ((this.processingValue + this.steps) / this.steps) * this.steps;
+			var value = ((this.processingValue + this.step) / this.step) * this.step;
       		this.resetAutoClose();
 			this.setProcessingValue(value);
 		},
 		
 		minus_range: function() {
             var self = this, o = this.options;
-			var value = ((this.processingValue - this.steps) / this.steps) * this.steps;
+			var value = ((this.processingValue - this.step) / this.step) * this.step;
       		this.resetAutoClose();
 			this.setProcessingValue(value);
 		},
@@ -170,7 +171,27 @@ const close_with_change = 3000; // 3 seconds
 			this.button_minus.hide();
 			this.button_max.hide();
 			this.button_min.hide();
-		}
+		},
+        
+        cancel: function() {
+			this.processingValue = this.currentValue;
+            this.element.range_widget_core('stopProcessingState');
+            setValue(this.currentValue);
+            this.element.range_widget_core('displayStatusError');
+        },
+        
+        /* Valid the processing state */
+        valid: function(confirmed) {
+            var self = this, o = this.options;
+            this.element.range_widget_core('stopProcessingState');
+            if (confirmed) {
+                this.element.range_widget_core('displayStatusOk');
+                this.element.doTimeout( 'resetStatus', range_reset_status, function(){
+                    self.element.range_widget_core('displayResetStatus');
+    			});
+            }
+            setValue(this.processingValue);
+        }
 		
 	});
     
@@ -194,6 +215,7 @@ const close_with_change = 3000; // 3 seconds
     			this.elementstate = $("<div class='widget_state'></div>");
     			this.elementvalue.append(this.elementstate);
                 this.element.addClass('command');
+                this.elementicon.processing();
             } else {
     			this.elementvalue.addClass('range_100');
             }
@@ -220,7 +242,28 @@ const close_with_change = 3000; // 3 seconds
 		
 		displayProcessingValue: function(value, unit) {
 			this.elementstate.text(value + unit);
-		}
+		},
+        
+        displayStatusError: function() {
+            this.elementstate.addClass('error');
+        },
+        
+        displayStatusOk: function() {
+            this.elementstate.addClass('ok');
+        },
+        
+        displayResetStatus: function() {
+            this.elementstate.removeClass('ok');
+        },
+        
+        startProcessingState: function() {
+            this.elementicon.processing('start');
+        },
+        
+        stopProcessingState: function() {
+            this.elementicon.processing('stop');
+        }
+
     });
     
     $.extend($.ui.range_widget_core, {
