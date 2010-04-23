@@ -809,7 +809,7 @@ class ProcessRequest():
         address = self.rest_request[1]
         command = self.rest_request[2]
         if len(self.rest_request) > 3:
-            params = self.rest_requests[3:]
+            params = self.rest_request[3:]
         else:
             params = None
 
