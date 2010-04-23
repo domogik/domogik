@@ -625,7 +625,7 @@ class DbHelper():
         return self.__session.query(DeviceTypeFeature).filter_by(id=af_id).filter_by(feature_type=u'actuator').first()
 
     def add_actuator_feature(self, af_name, af_device_type_id, af_value_type, af_return_confirmation=False,
-                             af_parameters=None):
+                             af_parameters=None, af_stat_key=None):
         """
         Add an actuator
         @param af_name : actuator name
@@ -633,6 +633,7 @@ class DbHelper():
         @param af_value_type : value type the actuator can accept
         @param af_return_confirmation : True if the actuator returns a confirmation after having executed a command ,optional (default False)
         @param af_parameters : parameters about the command or the returned data associated to the device, optional
+        @param af_stat_key : key reference in the core_device_stats table
         @return an DeviceTypeFeature object (the newly created one)
         """
         # Make sure previously modified objects outer of this method won't be commited
@@ -646,7 +647,7 @@ class DbHelper():
         device_type_feature = DeviceTypeFeature(name=ucode(af_name), feature_type=u'actuator',
                                                 device_type_id=af_device_type_id, value_type=ucode(af_value_type),
                                                 return_confirmation=af_return_confirmation,
-                                                parameters=ucode(af_parameters))
+                                                parameters=ucode(af_parameters), stat_key=ucode(af_stat_key))
         self.__session.add(device_type_feature)
         try:
             self.__session.commit()
@@ -656,7 +657,7 @@ class DbHelper():
         return device_type_feature
 
     def update_actuator_feature(self, af_id, af_name=None, af_parameters=None, af_value_type=None,
-                                af_return_confirmation=None):
+                                af_return_confirmation=None, af_stat_key=None):
         """
         Update an actuator feature
         @param af_id : actuator feature id (which is a device type feature id)
@@ -664,6 +665,7 @@ class DbHelper():
         @param af_parameters : parameters about the command or the returned data associated to the device, optional
         @param af_value_type : value type the actuator can accept, optional
         @param af_return_confirmation : True if the actuator returns a confirmation after having executed a command ,optional
+        @param af_stat_key : key reference in the core_device_stats table
         @return an DeviceTypeFeature object (the newly updated one)
         """
         # Make sure previously modified objects outer of this method won't be commited
@@ -686,6 +688,8 @@ class DbHelper():
             device_type_feature.value_type = ucode(af_value_type)
         if af_return_confirmation is not None:
             device_type_feature.return_confirmation = af_return_confirmation
+        if af_stat_key is not None:
+            device_type_feature.stat_key = ucode(af_stat_key)
         self.__session.add(device_type_feature)
         try:
             self.__session.commit()
@@ -735,13 +739,14 @@ class DbHelper():
         """
         return self.__session.query(DeviceTypeFeature).filter_by(id=sf_id).filter_by(feature_type=u'sensor').first()
 
-    def add_sensor_feature(self, sf_name, sf_device_type_id, sf_value_type, sf_parameters=None):
+    def add_sensor_feature(self, sf_name, sf_device_type_id, sf_value_type, sf_parameters=None, sf_stat_key=None):
         """
         Add a sensor
         @param sf_name : sensor feature name (Thermometer, Voltmeter...)
         @param sf_device_type_id : device type id
         @param sf_value_type : value type the sensor can return
         @param sf_parameters : parameters about the command or the returned data associated to the device, optional
+        @param sf_stat_key : key reference in the core_device_stats table
         @return a DeviceTypeFeature object (the newly created one)
         """
         # Make sure previously modified objects outer of this method won't be commited
@@ -753,7 +758,7 @@ class DbHelper():
             raise DbHelperException("Can't add sensor : device type id '%s' doesn't exist" % dtf_device_type_id)
         device_type_feature = DeviceTypeFeature(name=ucode(sf_name), feature_type=u'sensor',
                                                 device_type_id=sf_device_type_id, value_type=ucode(sf_value_type),
-                                                parameters=ucode(sf_parameters))
+                                                parameters=ucode(sf_parameters), stat_key=ucode(sf_stat_key))
         self.__session.add(device_type_feature)
         try:
             self.__session.commit()
@@ -762,13 +767,14 @@ class DbHelper():
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return device_type_feature
 
-    def update_sensor_feature(self, sf_id, sf_name=None, sf_parameters=None, sf_value_type=None):
+    def update_sensor_feature(self, sf_id, sf_name=None, sf_parameters=None, sf_value_type=None, sf_stat_key=None):
         """
         Update a sensor feature
         @param sf_id : sensor feature id (which is a device type feature id)
         @param sf_name : sensor feature name (Thermometer, Voltmeter...), optional
         @param sf_parameters : parameters about the command or the returned data associated to the device, optional
         @param sf_value_type : value type the sensor can return, optional
+        @param sf_stat_key : key reference in the core_device_stats table
         @return a DeviceTypeFeature object (the newly updated one)
         """
         # Make sure previously modified objects outer of this method won't be commited
@@ -788,6 +794,8 @@ class DbHelper():
                 raise DbHelperException("Value type (%s) is not in the allowed item list : %s" \
                                         % (sf_value_type, SENSOR_VALUE_TYPE_LIST))
             device_type_feature.value_type = ucode(sf_value_type)
+        if sf_stat_key is not None:
+            device_type_feature.stat_key = ucode(sf_stat_key)
         self.__session.add(device_type_feature)
         try:
             self.__session.commit()

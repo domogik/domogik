@@ -36,8 +36,6 @@ Implements
 -class DeviceStatsValue
 -class DeviceType
 -class DeviceTypeFeature
--class ActuatorFeature
--class SensorFeature
 -class DeviceFeatureAssociation
 -class DeviceUsage
 -class DeviceTechnology
@@ -437,15 +435,17 @@ class DeviceTypeFeature(Base):
     device_type = relation(DeviceType)
     parameters = Column(UnicodeText())
     value_type = Column(Unicode(30), nullable=False)
+    stat_key = Column(Unicode(30))
     return_confirmation = Column(Boolean, nullable=False)
 
-    def __init__(self, name, feature_type, device_type_id, value_type, parameters=None, return_confirmation=False):
+    def __init__(self, name, feature_type, device_type_id, value_type, parameters=None, stat_key=None, return_confirmation=False):
         """
         Class constructor
         @param name : device feature name (Switch, Dimmer, Thermometer, Voltmeter...)
         @param feature_type : device feature type
         @param device_type_id : device type id
         @param value_type : value type the actuator can accept / the sensor can return
+        @param stat_key : key reference in the core_device_stats table
         @param parameters : parameters about the command or the returned data associated to the device, optional
         @param return_confirmation : True if the device returns a confirmation after having executed a command ,optional (default False)
                                      Only relevant for actuators
@@ -470,9 +470,9 @@ class DeviceTypeFeature(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<DeviceTypeFeature(%s, %s, device_type=%s, parameters=%s, value_type=%s, return_confirmation=%s)>" \
+        return "<DeviceTypeFeature(%s, %s, device_type=%s, parameters=%s, value_type=%s, stat_key=%s, return_confirmation=%s)>" \
                % (self.id, self.feature_type, self.device_type, self.parameters, self.value_type, \
-                  self.return_confirmation)
+                  self.stat_key, self.return_confirmation)
 
     @staticmethod
     def get_tablename():
