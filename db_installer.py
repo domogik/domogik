@@ -114,10 +114,18 @@ db.add_device_technology(dt_id='1wire', dt_name='1-Wire', dt_description='')
 db.add_device_technology(dt_id='rfxcom', dt_name='RFXCom', dt_description='')
 # Create device technology features for IR
 db.add_device_technology(dt_id='ir', dt_name='Infra Red', dt_description='')
+
 # Create device technology features for Service
 device_technology = db.add_device_technology(dt_id='service', dt_name='Service',
                                              dt_description='Distributed services, water, gas, electricity')
 device_type = db.add_device_type(dty_name='Teleinfo', dt_id=device_technology.id)
+db.add_sensor_feature(sf_name='Instantaneous intensity', sf_device_type_id=device_type.id, sf_value_type='number', sf_parameters='{&quot;unit&quot;:&quot;A&quot;}', sf_stat_key='iinst')
+db.add_sensor_feature(sf_name='Off peak', sf_device_type_id=device_type.id, sf_value_type='number', sf_parameters='{&quot;unit&quot;:&quot;Wh&quot;}', sf_stat_key='hchc')
+db.add_sensor_feature(sf_name='Maximum intensity', sf_device_type_id=device_type.id, sf_value_type='number', sf_parameters='{&quot;unit&quot;:&quot;A&quot;}', sf_stat_key='imax')
+db.add_sensor_feature(sf_name='Tariff Period', sf_device_type_id=device_type.id, sf_value_type='string', sf_parameters=None, sf_stat_key='ptec')
+db.add_sensor_feature(sf_name='Power', sf_device_type_id=device_type.id, sf_value_type='number', sf_parameters='{&quot;unit&quot;:&quot;Va&quot;}', sf_stat_key='papp')
+db.add_sensor_feature(sf_name='Group schedule', sf_device_type_id=device_type.id, sf_value_type='string', sf_parameters=None, sf_stat_key='hhphc')
+db.add_sensor_feature(sf_name='On Peak', sf_device_type_id=device_type.id, sf_value_type='number', sf_parameters='{&quot;unit&quot;:&quot;Wh&quot;}', sf_stat_key='hchp')
 
 # Create device technology features for RFID
 db.add_device_technology(dt_id='rfid', dt_name='RFID', dt_description='')
