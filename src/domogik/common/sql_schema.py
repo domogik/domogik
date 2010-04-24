@@ -570,7 +570,7 @@ class DeviceStats(Base):
     __tablename__ = '%s_device_stats' % _db_prefix
     date = Column(DateTime, primary_key=True)
     key = Column(Unicode(30), primary_key=True)
-    value = Column(Unicode(255), primary_key=True)
+    value = Column(Unicode(255), nullable=False)
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), nullable=False)
     device = relation(Device)
 
