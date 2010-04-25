@@ -54,7 +54,7 @@ class Sender(xPLPlugin):
             "sensor.basic", "domogik.system","domogik.config"]
 
     def __init__(self, schema=None, message=None):
-        xPLPlugin.__init__(self, name = 'send')
+        xPLPlugin.__init__(self, name = 'send', daemonize = False)
         self._schema = schema
         self._message = message
         self._log = self.get_my_logger()
