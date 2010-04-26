@@ -26,14 +26,14 @@
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/page-admin-organization.css" rel="stylesheet" type="text/css" />
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.collabsible-list.css" rel="stylesheet" type="text/css" />
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/fg.menu.css" rel="stylesheet" type="text/css" />
-    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-action-binary.css" rel="stylesheet" type="text/css" />
-    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-action-range.css" rel="stylesheet" type="text/css" />
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.command-binary.css" rel="stylesheet" type="text/css" />
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.command-range.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block js_include %}
     <script type="text/javascript" src="/design/js/dmg.dragdrop-complex.js"></script>
     <script type="text/javascript" src="/design/js/fg.menu.js"></script>
-    <script type="text/javascript" src="/design/js/ui.action-binary.js"></script>
-    <script type="text/javascript" src="/design/js/ui.action-range.js"></script>
+    <script type="text/javascript" src="/design/js/dmg.command-binary.js"></script>
+    <script type="text/javascript" src="/design/js/dmg.command-range.js"></script>
 {% endblock %}
 {% block js_script %}
     $(function(){
