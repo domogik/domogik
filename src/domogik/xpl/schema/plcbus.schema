@@ -29,14 +29,14 @@ PLCBUS.BASIC Message Specification
     * Type = BASIC
 
 === XPL-CMND Structure ===
-Send a command to plcbus "plugin". Usercode used to always be the same in one house (it is only used to install plcbus in many house near from each others). ACK may be ignored if not usuable with the defined COMMAND.
+Sends a command to plcbus "plugin". Usercode used is always the same in one house (it only changes if we manage a plcbus system in many houses near from each others). ACK may be ignored if not usuable with the defined COMMAND.
 
 
 PLCBUS.BASIC
 {
 USERCODE=<plcbus network usercode>
 DEVICE=<sensor name>
-COMMAND=<value to which device should be set>
+COMMAND=<value sent to the device>
 [ACK=<0|1>]
 [DATA1=<additional data>]
 [DATA2=<additional data>]
@@ -45,13 +45,13 @@ COMMAND=<value to which device should be set>
 
 
 === XPL-TRIG Structure ===
-Use to send acknowledge when a ack command is received.
+Used to send an acknowledge when an ack command is received.
 
 PLCBUS.BASIC
 {
 USERCODE=<plcbus network usercode>
-DEVICE=<sensor name>
-COMMAND=<value to which device should be set>
+DEVICE=<device name>
+COMMAND=<value sent to the device>
 ACK=1
 [DATA1=<additional data>]
 [DATA2=<additional data>]
@@ -61,13 +61,13 @@ ACK=1
 I think there is no need to define "flags" value in the message (the ack/id/itself/risc bits), since they should only be used by the "low level" manager.
 
 === XPL-STAT Structure ===
-Use to send message when command is received *from* the plcbus network (for ex, is sent by a remote).
+Used to send a message when command is received *from* the plcbus network (for ex, is sent by a remote).
 
 PLCBUS.BASIC
 {
 USERCODE=<plcbus network usercode>
-DEVICE=<sensor name>
-COMMAND=<value to which device should be set>
+DEVICE=<device name>
+COMMAND=<value sent to the device>
 [DATA1=<additional data>]
 [DATA2=<additional data>]
 }
