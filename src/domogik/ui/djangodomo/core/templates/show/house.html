@@ -20,7 +20,7 @@
 {% endcomment %}
 
 {% load i18n %}
-{% load elements %}
+{% load commands %}
 
 {% block js_script %}
 // <![CDATA[
@@ -42,61 +42,8 @@
     <script type="text/javascript">
     // <![CDATA[
         $(function() {
-            {% for feature in house_features_associations %}
-                {% get_device_type feature.device.device_type_id as device_type %}
-                {% get_device_usage feature.device.device_usage_id as device_usage %}
-                var parameters_type = $.getJson("{{ feature.device_type_feature.parameters|safe }}");
-                var parameters_usage = $.getJson("{{ device_usage.default_options|safe }}");
-                
-                {% ifequal feature.device_type_feature.value_type 'binary' %}                
-                    $("#command_{{ feature.device_id }}_{{ feature.device_type_feature_id }}").binary_command({
-                        usage: {{ feature.device.device_usage_id }},
-                        value0: parameters_type.command0,
-                        value1: parameters_type.command1,
-                        text0: parameters_usage.binary.state0,
-                        text1: parameters_usage.binary.state1,
-                        action: function(self, command) {
-                            $.getREST(['command', '{{device_type.device_technology_id}}', '{{ feature.device.address }}', command],
-                                function(data) {
-                                    var status = (data.status).toLowerCase();
-                                    if (status == 'ok') {
-                                        self.valid({{feature.device_type_feature.return_confirmation|lower}});
-                                    } else {
-                                        /* Error */
-                                        self.cancel();
-//                                        display_message(data.status, data.description);
-                                    }
-                                }
-                            );
-                        }
-                    })
-                        .binary_command('setState', 'Off');
-                {% endifequal %}
-
-                {% ifequal feature.device_type_feature.value_type 'range' %}
-                    $("#command_{{ feature.device_id }}_{{ feature.device_type_feature_id }}").range_command({
-                        usage: {{ feature.device.device_usage_id }},
-                        min_value: parameters_type.commandMin,
-                        max_value: parameters_type.commandMax,
-                        step: parameters_usage.range.step,
-                        unit: parameters_usage.range.unit,
-                        action: function(self, value) {
-                            $.getREST(['command', '{{device_type.device_technology_id}}', '{{ feature.device.address }}', 'dim', value],
-                                function(data) {
-                                    var status = (data.status).toLowerCase();
-                                    if (status == 'ok') {
-                                        self.valid({{feature.device_type_feature.return_confirmation|lower}});
-                                    } else {
-                                        /* Error */
-                                        self.cancel();
-//                                        display_message(data.status, data.description);
-                                    }
-                                }
-                            );
-                        }
-                    })
-                        .range_command('setValue', 50);
-                {% endifequal %}
+            {% for feature in house_features_associations %}                
+                {% get_command feature %}
             {% endfor %}
         });
     // ]]>

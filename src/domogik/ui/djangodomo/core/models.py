@@ -190,15 +190,6 @@ class Devices(pipes.DmgPipe):
                     if (feature.id == association.device_type_feature_id):
                         feature.association = association
 
-class DeviceUsages(pipes.DmgPipe):
-    uri = rest_url + "/base/device_usage"
-
-    @staticmethod
-    def get_all():
-        resp = DeviceUsages.objects.get({'parameters':"list"})
-        if resp :
-            return resp
-
 class DeviceTechnologies(pipes.DmgPipe):
     uri = rest_url + "/base/device_technology"
 
@@ -210,7 +201,7 @@ class DeviceTechnologies(pipes.DmgPipe):
 
 class DeviceTypes(pipes.DmgPipe):
     uri = rest_url + "/base/device_type"
-    dict = None
+    _dict = None
     
     @staticmethod
     def get_all():
@@ -220,12 +211,47 @@ class DeviceTypes(pipes.DmgPipe):
         
     @staticmethod
     def get_dict():
-        if (dict == None):
-            resp = DeviceTypes.objects.get({'parameters':"list"})
-            if resp :
-                for type in resp.device_type:
-                    dict[type.id] = type
-        return dict
+        if DeviceTypes._dict is None:
+            print "device types downloading"
+            types = DeviceTypes.get_all()
+            DeviceTypes._dict = {}
+            for type in types.device_type:
+                DeviceTypes._dict[type.id] = type
+        else:
+            print "device types already downloaded"
+        return DeviceTypes._dict
+
+    @staticmethod
+    def get_dict_item(key):
+        dict = DeviceTypes.get_dict()
+        return dict[key]
+
+class DeviceUsages(pipes.DmgPipe):
+    uri = rest_url + "/base/device_usage"
+    _dict = None
+
+    @staticmethod
+    def get_all():
+        resp = DeviceUsages.objects.get({'parameters':"list"})
+        if resp :
+            return resp
+    
+    @staticmethod
+    def get_dict():
+        if DeviceUsages._dict is None:
+            print "device usages downloading"
+            usages = DeviceUsages.get_all()
+            DeviceUsages._dict = {}
+            for usage in usages.device_usage:
+                DeviceUsages._dict[usage.id] = usage
+        else:
+            print "device usages already downloaded"
+        return DeviceUsages._dict
+
+    @staticmethod
+    def get_dict_item(key):
+        dict = DeviceUsages.get_dict()
+        return dict[key]
 
 class DeviceFeatures(pipes.DmgPipe):
     uri = rest_url + "/base/device_type_feature"

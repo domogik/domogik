@@ -176,7 +176,7 @@ const range_reset_status = 4000; // 4 seconds
         cancel: function() {
 			this.processingValue = this.currentValue;
             this.element.range_widget_core('stopProcessingState');
-            setValue(this.currentValue);
+            this.setValue(this.currentValue);
             this.element.range_widget_core('displayStatusError');
         },
         

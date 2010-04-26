@@ -27,28 +27,25 @@ Defines the sql schema used by Domogik
 Implements
 ==========
 
--class Enum
--class Area
--class Room
--class Device
--class DeviceConfig
--class DeviceStats
--class DeviceStatsValue
--class DeviceType
--class DeviceTypeFeature
--class ActuatorFeature
--class SensorFeature
--class DeviceFeatureAssociation
--class DeviceUsage
--class DeviceTechnology
--class PluginConfig
--class Trigger
--class Person
--class UserAccount
--class SystemStats
--class SystemStatsValue
--class UIItemConfig
--class SystemConfig
+- class Enum
+- class Area
+- class Room
+- class DeviceUsage
+- class DeviceTechnology
+- class PluginConfig
+- class DeviceType(Base):
+- class Device
+- class DeviceTypeFeature
+- class DeviceFeatureAssociation
+- class DeviceConfig
+- class DeviceStats
+- class Trigger
+- class Person
+- class UserAccount
+- class SystemStats(Base):
+- class SystemStatsValue
+- class UIItemConfig
+- class SystemConfig
 
 @author: Marc SCHNEIDER <marc@domogik.org>
 @copyright: (C) 2007-2009 Domogik project
@@ -437,15 +434,17 @@ class DeviceTypeFeature(Base):
     device_type = relation(DeviceType)
     parameters = Column(UnicodeText())
     value_type = Column(Unicode(30), nullable=False)
+    stat_key = Column(Unicode(30))
     return_confirmation = Column(Boolean, nullable=False)
 
-    def __init__(self, name, feature_type, device_type_id, value_type, parameters=None, return_confirmation=False):
+    def __init__(self, name, feature_type, device_type_id, value_type, parameters=None, stat_key=None, return_confirmation=False):
         """
         Class constructor
         @param name : device feature name (Switch, Dimmer, Thermometer, Voltmeter...)
         @param feature_type : device feature type
         @param device_type_id : device type id
         @param value_type : value type the actuator can accept / the sensor can return
+        @param stat_key : key reference in the core_device_stats table
         @param parameters : parameters about the command or the returned data associated to the device, optional
         @param return_confirmation : True if the device returns a confirmation after having executed a command ,optional (default False)
                                      Only relevant for actuators
@@ -470,9 +469,9 @@ class DeviceTypeFeature(Base):
         Print an internal representation of the class
         @return an internal representation
         """
-        return "<DeviceTypeFeature(%s, %s, device_type=%s, parameters=%s, value_type=%s, return_confirmation=%s)>" \
+        return "<DeviceTypeFeature(%s, %s, device_type=%s, parameters=%s, value_type=%s, stat_key=%s, return_confirmation=%s)>" \
                % (self.id, self.feature_type, self.device_type, self.parameters, self.value_type, \
-                  self.return_confirmation)
+                  self.stat_key, self.return_confirmation)
 
     @staticmethod
     def get_tablename():
@@ -570,7 +569,7 @@ class DeviceStats(Base):
     __tablename__ = '%s_device_stats' % _db_prefix
     date = Column(DateTime, primary_key=True)
     key = Column(Unicode(30), primary_key=True)
-    value = Column(Unicode(255), primary_key=True)
+    value = Column(Unicode(255), nullable=False)
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), nullable=False)
     device = relation(Device)
 

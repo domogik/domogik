@@ -1,0 +1,61 @@
+/* Mini widget */
+.widget_trigger {
+    display:inline-block;
+    outline: none;
+    text-align:center;
+    height: 9em;
+}
+
+.widget_trigger .name {
+    color:#FFFFFF;
+    background-color:#000000;
+    -moz-border-radius: 0.8em;
+    -webkit-border-radius: 0.8em;
+    display:block;
+    font-weight:bold;
+}
+
+.widget_trigger:hover .widget_icon,
+.widget_trigger:focus .widget_icon {
+    background-color:#FFFFFF;
+}
+
+.widget_trigger.command:hover .widget_icon,
+.widget_trigger.command:focus .widget_icon {
+    cursor: pointer;
+}
+
+.widget_trigger .widget_state {
+    background-color:rgba(255,255,255,0.6);
+    display:inline-block;
+    vertical-align:text-bottom;
+    height:10px;
+    border-top: 1px solid #cccccc;
+    border-left: 1px solid #cccccc;
+    -moz-border-radius: 0.8em 0 0.8em 0;
+    -webkit-border-radius: 0.8em 0 0.8em 0;
+    float:right;
+    padding: 0.2em 0.5em 0.2em 0.5em;
+    margin-top:30px;
+}
+
+.widget_trigger .widget_state.error {
+    background-color:rgba(191,84,46,0.6);
+}
+
+.widget_trigger .widget_state.ok {
+    background-color:rgba(144,178,71,0.6);
+}
+
+.widget_trigger .widget_icon {
+    display:block;
+    width: 45px;
+    height: 45px;
+    border: 1px solid #cccccc;
+    -moz-border-radius: 0.8em;
+    -webkit-border-radius: 0.8em;
+    background-position: center center;
+    background-repeat: no-repeat;
+    margin:0.5em 1em 0 1em;
+    text-align:right;
+}

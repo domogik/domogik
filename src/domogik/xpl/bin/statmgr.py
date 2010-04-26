@@ -209,15 +209,15 @@ class StatsManager(xPLPlugin):
                 self._log.debug("Stat received for %s - %s." \
                         % (self._technology, message.data[self._res["device"]]))
                 datas = {}
+                timestamp = datetime.today()
                 for key in self._res["mapping"].keys():
                     if message.data.has_key(key):
                         #Check if a name has been chosen for this value entry
                         if self._res["mapping"][key] == None:
                             #If not, keep the one from message
-                            datas[key] = message.data[key]
+                            self._db.add_device_stat(timestamp, key, message.data[key], d_id)
                         else:
-                            datas[self._res["mapping"][key]] = message.data[key]
-                self._db.add_device_stat(d_id, datetime.today(), datas)
+                            self._db.add_device_stat(timestamp, self._res["mapping"][key], message.data[key], d_id)
 
 def main():
     StatsManager()
