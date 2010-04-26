@@ -47,18 +47,8 @@
     <script type="text/javascript">
     // <![CDATA[
         $(function() {
-              {% for feature in house_features_associations %}                
-                {% ifequal feature.device_type_feature.value_type 'binary' %}
-                    {% get_command_binary feature %}
-                {% endifequal %}
-
-                {% ifequal feature.device_type_feature.value_type 'range' %}
-                    {% get_command_range feature %}
-                {% endifequal %}
-
-                {% ifequal feature.device_type_feature.value_type 'trigger' %}
-                    {% get_command_trigger feature %}
-                {% endifequal %}
+            {% for feature in house_features_associations %}                
+                {% get_command feature %}
             {% endfor %}
         });
     // ]]>
