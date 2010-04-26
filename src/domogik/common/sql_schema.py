@@ -27,26 +27,25 @@ Defines the sql schema used by Domogik
 Implements
 ==========
 
--class Enum
--class Area
--class Room
--class Device
--class DeviceConfig
--class DeviceStats
--class DeviceStatsValue
--class DeviceType
--class DeviceTypeFeature
--class DeviceFeatureAssociation
--class DeviceUsage
--class DeviceTechnology
--class PluginConfig
--class Trigger
--class Person
--class UserAccount
--class SystemStats
--class SystemStatsValue
--class UIItemConfig
--class SystemConfig
+- class Enum
+- class Area
+- class Room
+- class DeviceUsage
+- class DeviceTechnology
+- class PluginConfig
+- class DeviceType(Base):
+- class Device
+- class DeviceTypeFeature
+- class DeviceFeatureAssociation
+- class DeviceConfig
+- class DeviceStats
+- class Trigger
+- class Person
+- class UserAccount
+- class SystemStats(Base):
+- class SystemStatsValue
+- class UIItemConfig
+- class SystemConfig
 
 @author: Marc SCHNEIDER <marc@domogik.org>
 @copyright: (C) 2007-2009 Domogik project
