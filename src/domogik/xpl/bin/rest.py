@@ -140,7 +140,6 @@ class Rest(xPLPlugin):
             log_dm = logger.Logger('REST-DM')
             self._log_dm = log_dm.get_logger()
             self._log_dm.info("Rest Server Data Manipulation...")
-            self._log_dm.debug("locale : %s %s" % locale.getdefaultlocale())
             # DB Helper
             self._db = DbHelper()
     
@@ -431,7 +430,7 @@ class HTTPServerWithParam(HTTPServer):
                             bind_and_activate)
         self.handler_params = handler_params
         # dirty issue
-        self.timeout = None
+        #self.timeout = None
 
 
 
@@ -447,7 +446,7 @@ class HTTPSServerWithParam(SocketServer.ThreadingMixIn, HTTPServer):
                             bind_and_activate)
         self.handler_params = handler_params
         # dirty issue
-        self.timeout = None
+        #self.timeout = None
 
         ### SSL specific
         ssl_certificate = self.handler_params[0].ssl_certificate
@@ -524,8 +523,8 @@ class RestHandler(BaseHTTPRequestHandler):
             the REST url
         """
         # dirty issue to force HTTP/1.1 
-        self.protocol_version = 'HTTP/1.1'
-        self.request_version = 'HTTP/1.1'
+        #self.protocol_version = 'HTTP/1.1'
+        #self.request_version = 'HTTP/1.1'
 
         request = ProcessRequest(self.server.handler_params, self.path, \
                                  self.send_http_response_ok, \
