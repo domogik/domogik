@@ -55,3 +55,8 @@ urlpatterns = patterns('',
     (r'^design/(?P<path>.*)$', 'django.views.static.serve',
         {'document_root': settings.STATIC_DOC_ROOT}),
 )
+
+# http proxy
+urlpatterns += patterns('',
+    (r'^rest/(?P<url>.*)$', 'httpproxy.views.proxy'),
+)

@@ -35,6 +35,7 @@ Implements
 """
 
 import os
+from domogik.common.configloader import Loader
 
 PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
 
@@ -60,6 +61,20 @@ DATABASE_HOST = ''          # Set to empty string for localhost.
                             # ( Not used with sqlite3. )
 DATABASE_PORT = ''          # Set to empty string for default.
                             # ( Not used with sqlite3. )
+
+### Proxy settings
+try:
+    cfg_rest = Loader('rest')
+    config_rest = cfg_rest.load()
+    conf_rest = dict(config_rest[1])
+    rest_ip = conf_rest['rest_server_ip']
+    rest_port = conf_rest['rest_server_port']
+except KeyError:
+    # default parameters
+    rest_ip = "127.0.0.1"
+    rest_port = "8080"
+PROXY_DOMAIN = rest_ip
+PROXY_PORT = int(rest_port)
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -133,6 +148,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.admin',
     'django_pipes',
+    'httpproxy',
     'djangodomo.core',
 )
 
