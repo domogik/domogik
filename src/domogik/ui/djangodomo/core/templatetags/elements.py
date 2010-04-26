@@ -32,7 +32,7 @@ from djangodomo.core.models import DeviceTypes, DeviceUsages
 
 register = template.Library()
 
-class DeviceType(Node):
+class GetDeviceType(Node):
     _dict = None
     def __init__(self, id, variable):
         self.id = template.Variable(id)
@@ -51,7 +51,7 @@ class DeviceType(Node):
         context[self.variable] = DeviceType._dict[id]
         return ''
 
-class DeviceUsage(Node):
+class GetDeviceUsage(Node):
     _dict = None
     def __init__(self, id, variable):
         self.id = template.Variable(id)
