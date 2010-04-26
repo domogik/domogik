@@ -33,18 +33,9 @@ from djangodomo.core.models import DeviceTypes, DeviceUsages
 register = template.Library()
 
 class GetCommandBinary(Node):
-    _dict = None
-    def __init__(self, feature):
-        self.feature = template.Variable(feature)
-
-    def render(self, context):
-        feature = self.feature.resolve(context)
-        device_type = DeviceTypes.get_dict_item(feature.device.device_type_id)
-        device_usage = DeviceUsages.get_dict_item(feature.device.device_usage_id)
-        script = """var parameters_type = $.getJson('%s');
-                    var parameters_usage = $.getJson('%s');
-                    
-                    $('#command_%s_%s').binary_command({
+    @staticmethod
+    def get_script(feature, device_type, device_usage):
+        script = """$('#command_%s_%s').binary_command({
                         usage: %s,
                         value0: parameters_type.value0,
                         value1: parameters_type.value1,
@@ -65,21 +56,13 @@ class GetCommandBinary(Node):
                         }
                     })
                         .binary_command('setState', 'Off');
-                    """ % (feature.device_type_feature.parameters, device_usage.default_options, feature.device_id, feature.device_type_feature_id, feature.device.device_usage_id, device_type.device_technology_id, feature.device.address, feature.device_type_feature.return_confirmation)
+                    """ % (feature.device_id, feature.device_type_feature_id, feature.device.device_usage_id, device_type.device_technology_id, feature.device.address, feature.device_type_feature.return_confirmation)
         return script
 
 class GetCommandRange(Node):
-    _dict = None
-    def __init__(self, feature):
-        self.feature = template.Variable(feature)
-
-    def render(self, context):
-        feature = self.feature.resolve(context)
-        device_type = DeviceTypes.get_dict_item(feature.device.device_type_id)
-        device_usage = DeviceUsages.get_dict_item(feature.device.device_usage_id)
-        script = """var parameters_type = $.getJson('%s');
-                    var parameters_usage = $.getJson('%s');
-                    $("#command_%s_%s").range_command({
+    @staticmethod
+    def get_script(feature, device_type, device_usage):
+        script = """$("#command_%s_%s").range_command({
                         usage: %s,
                         min_value: parameters_type.valueMin,
                         max_value: parameters_type.valueMax,
@@ -100,35 +83,63 @@ class GetCommandRange(Node):
                         }
                     })
                         .range_command('setValue', 50);
-                    """ % (feature.device_type_feature.parameters, device_usage.default_options, feature.device_id, feature.device_type_feature_id, feature.device.device_usage_id, device_type.device_technology_id, feature.device.address, feature.device_type_feature.return_confirmation)
+                    """ % (feature.device_id, feature.device_type_feature_id, feature.device.device_usage_id, device_type.device_technology_id, feature.device.address, feature.device_type_feature.return_confirmation)
+        return script
+
+class GetCommandTrigger():
+    @staticmethod
+    def get_script(feature, device_type, device_usage):
+        script = """$('#command_%s_%s').trigger_command({
+                        usage: %s,
+                        action: function(self) {
+                            $.getREST(['command', '%s', '%s', parameters_type.command],
+                                function(data) {
+                                    var status = (data.status).toLowerCase();
+                                    if (status == 'ok') {
+                                        self.valid(%s);
+                                    } else {
+                                        /* Error */
+                                        self.cancel();
+                                    }
+                                }
+                            );
+                        }
+                    });
+                    """ % (feature.device_id, feature.device_type_feature_id, feature.device.device_usage_id, device_type.device_technology_id, feature.device.address, feature.device_type_feature.return_confirmation)
+        return script
+
+class GetCommand(Node):
+    def __init__(self, feature):
+        self.feature = template.Variable(feature)
+
+    def render(self, context):
+        feature = self.feature.resolve(context)
+        device_type = DeviceTypes.get_dict_item(feature.device.device_type_id)
+        device_usage = DeviceUsages.get_dict_item(feature.device.device_usage_id)
+        script = """var parameters_type = $.getJson('%s');
+                    var parameters_usage = $.getJson('%s');
+                    """ % (feature.device_type_feature.parameters, device_usage.default_options)
+
+        if feature.device_type_feature.value_type == "binary":
+            script += GetCommandBinary.get_script(feature, device_type, device_usage)
+        if feature.device_type_feature.value_type == "range":
+            script += GetCommandRange.get_script(feature, device_type, device_usage)
+        if feature.device_type_feature.value_type == "trigger":
+            script += GetCommandTrigger.get_script(feature, device_type, device_usage)
+            
         return script
     
-def do_get_command_binary(parser, token):
+def do_get_command(parser, token):
     """
-    This returns the jquery function for creating a binary command.
+    This returns the jquery function for creating a command button.
 
     Usage::
 
-        {% get_command_binary feature %}
+        {% get_command feature %}
     """
     args = token.contents.split()
     if len(args) != 2:
-        raise TemplateSyntaxError, "'get_command_binary' requires 'feature' argument"
-    return GetCommandBinary(args[1])
+        raise TemplateSyntaxError, "'get_command' requires 'feature' argument"
+    return GetCommand(args[1])
 
-register.tag('get_command_binary', do_get_command_binary)
-
-def do_get_command_range(parser, token):
-    """
-    This returns the jquery function for creating a range command.
-
-    Usage::
-
-        {% get_command_range feature %}
-    """
-    args = token.contents.split()
-    if len(args) != 2:
-        raise TemplateSyntaxError, "'get_command_range' requires 'feature' argument"
-    return GetCommandRange(args[1])
-
-register.tag('get_command_range', do_get_command_range)
+register.tag('get_command', do_get_command)

@@ -55,6 +55,10 @@
                 {% ifequal feature.device_type_feature.value_type 'range' %}
                     {% get_command_range feature %}
                 {% endifequal %}
+
+                {% ifequal feature.device_type_feature.value_type 'trigger' %}
+                    {% get_command_trigger feature %}
+                {% endifequal %}
             {% endfor %}
         });
     // ]]>

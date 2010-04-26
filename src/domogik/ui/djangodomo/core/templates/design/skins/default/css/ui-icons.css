@@ -70,6 +70,7 @@
 .icon16-usage-5 { background-image:url(../images/device_usage/5.ventilation/ventilation_16.png);}
 
 /* State icons */
+.icon32-state-1.trigger { background-image:url(../images/device_usage/1.light/trigger/32.png);}
 .icon32-state-1.binary_0 { background-image:url(../images/device_usage/1.light/binary/0_32.png);}
 .icon32-state-1.binary_1 { background-image:url(../images/device_usage/1.light/binary/1_32.png);}
 .icon32-state-1.range_0 { background-image:url(../images/device_usage/1.light/range/0_32.png);}
@@ -84,6 +85,7 @@
 .icon32-state-1.range_90 { background-image:url(../images/device_usage/1.light/range/90_32.png);}
 .icon32-state-1.range_100 { background-image:url(../images/device_usage/1.light/range/100_32.png);}
 
+.icon32-state-2.trigger { background-image:url(../images/device_usage/2.socket/trigger/32.png);}
 .icon32-state-2.binary_0 { background-image:url(../images/device_usage/2.socket/binary/0_32.png);}
 .icon32-state-2.binary_1 { background-image:url(../images/device_usage/2.socket/binary/1_32.png);}
 .icon32-state-2.range_0 { background-image:url(../images/device_usage/2.socket/range/0_32.png);}
@@ -98,6 +100,7 @@
 .icon32-state-2.range_90 { background-image:url(../images/device_usage/2.socket/range/90_32.png);}
 .icon32-state-2.range_100 { background-image:url(../images/device_usage/2.socket/range/100_32.png);}
 
+.icon32-state-3.trigger { background-image:url(../images/device_usage/3.shutter/trigger/32.png);}
 .icon32-state-3.binary_0 { background-image:url(../images/device_usage/3.shutter/binary/0_32.png);}
 .icon32-state-3.binary_1 { background-image:url(../images/device_usage/3.shutter/binary/1_32.png);}
 .icon32-state-3.range_0 { background-image:url(../images/device_usage/3.shutter/range/0_32.png);}
@@ -112,6 +115,7 @@
 .icon32-state-3.range_90 { background-image:url(../images/device_usage/3.shutter/range/90_32.png);}
 .icon32-state-3.range_100 { background-image:url(../images/device_usage/3.shutter/range/100_32.png);}
 
+.icon32-state-4.trigger { background-image:url(../images/device_usage/4.airconditionning/trigger/32.png);}
 .icon32-state-4.binary_0 { background-image:url(../images/device_usage/4.airconditionning/binary/0_32.png);}
 .icon32-state-4.binary_1 { background-image:url(../images/device_usage/4.airconditionning/binary/1_32.png);}
 .icon32-state-4.range_0 { background-image:url(../images/device_usage/4.airconditionning/range/0_32.png);}
@@ -126,6 +130,7 @@
 .icon32-state-4.range_90 { background-image:url(../images/device_usage/4.airconditionning/range/90_32.png);}
 .icon32-state-4.range_100 { background-image:url(../images/device_usage/4.airconditionning/range/100_32.png);}
 
+.icon32-state-5.trigger { background-image:url(../images/device_usage/5.ventilation/trigger/32.png);}
 .icon32-state-5.binary_0 { background-image:url(../images/device_usage/5.ventilation/binary/0_32.png);}
 .icon32-state-5.binary_1 { background-image:url(../images/device_usage/5.ventilation/binary/1_32.png);}
 .icon32-state-5.range_0 { background-image:url(../images/device_usage/5.ventilation/range/0_32.png);}

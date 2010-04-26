@@ -43,13 +43,7 @@
     // <![CDATA[
         $(function() {
             {% for feature in house_features_associations %}                
-                {% ifequal feature.device_type_feature.value_type 'binary' %}
-                    {% get_command_binary feature %}
-                {% endifequal %}
-
-                {% ifequal feature.device_type_feature.value_type 'range' %}
-                    {% get_command_range feature %}
-                {% endifequal %}
+                {% get_command feature %}
             {% endfor %}
         });
     // ]]>
