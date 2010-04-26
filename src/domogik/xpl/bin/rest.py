@@ -285,7 +285,11 @@ class Rest(xPLPlugin):
             # Load xml files for /command
             self.load_xml()
 
-            self._log.info("Initialisation OK")
+            self._log.info("REST Initialisation OK")
+
+            ### Start statmgr
+            self._log.info("Starting statistics manager")
+            StatsManager()
 
 
 
@@ -3454,12 +3458,6 @@ class StatsManager(xPLPlugin):
                         else:
                             datas[self._res["mapping"][key]] = message.data[key]
                 self._db.add_device_stat(d_id, datetime.today(), datas)
-
-def main():
-    StatsManager()
-
-if __name__ == "__main__":
-    main()
 
 
 if __name__ == '__main__':
