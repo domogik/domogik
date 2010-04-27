@@ -177,8 +177,11 @@ class DBConnector(xPLPlugin):
                 }
         try:
             if key:
-                val = self._db.get_plugin_config(techno, hostname, key).value
-                return val
+                try:
+                    val = self._db.get_plugin_config(techno, hostname, key).value
+                    return val
+                except AttributeError:
+                    return "None"
             else:
                 vals = self._db.list_plugin_config(techno, hostname)
                 res = {}
