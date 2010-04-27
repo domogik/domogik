@@ -6,10 +6,9 @@ const binary_reset_status = 4000; // 4 seconds
             var self = this, o = this.options;
             this.values = [o.value0, o.value1];
             this.texts = [o.text0, o.text1];
-            this.element.binary_widget_core({
+            this.element.binary_command_widget_core({
                 usage: o.usage,
-                texts: this.texts,
-                isCommand: true
+                texts: this.texts
             })
                 .attr("tabindex", 0)
                 .click(function () {self.switchState()})
@@ -32,7 +31,7 @@ const binary_reset_status = 4000; // 4 seconds
         },
         
         displayValue: function(value) {
-            this.element.binary_widget_core('displayValue', value);                
+            this.element.binary_command_widget_core('displayValue', value);                
         },
                 
         switchState: function() {
@@ -46,24 +45,24 @@ const binary_reset_status = 4000; // 4 seconds
         
         runAction: function(state) {
             var self = this, o = this.options;
-            this.element.binary_widget_core('startProcessingState');
+            this.element.binary_command_widget_core('startProcessingState');
             o.action(this, this.values[state]);
         },
         
         cancel: function() {
             this.processingState = null;
-            this.element.binary_widget_core('stopProcessingState');
-            this.element.binary_widget_core('displayStatusError');
+            this.element.binary_command_widget_core('stopProcessingState');
+            this.element.binary_command_widget_core('displayStatusError');
         },
         
         /* Valid the processing state */
         valid: function(confirmed) {
             var self = this, o = this.options;
-            this.element.binary_widget_core('stopProcessingState');
+            this.element.binary_command_widget_core('stopProcessingState');
             if (confirmed) {
-                this.element.binary_widget_core('displayStatusOk');
+                this.element.binary_command_widget_core('displayStatusOk');
                 this.element.doTimeout( 'resetStatus', binary_reset_status, function(){
-                    self.element.binary_widget_core('displayResetStatus');
+                    self.element.binary_command_widget_core('displayResetStatus');
     			});
             }
             setState(this.processingState);
@@ -77,19 +76,19 @@ const binary_reset_status = 4000; // 4 seconds
     
     /* Widget */
     
-    $.widget("ui.binary_widget_core", {
+    $.widget("ui.binary_command_widget_core", {
         _init: function() {
             var self = this, o = this.options;
             this.element.addClass('widget_binary');
             this.elementicon = $("<div class='widget_icon icon32-state-" + o.usage + "'></div>");
             this.element.append(this.elementicon);            
-            if(o.isCommand) {
+            if(o.inactive) {
+                this.elementicon.addClass('inactive');                
+            } else {
                 this.elementstate = $("<div class='widget_state'></div>");
                 this.elementicon.append(this.elementstate);
                 this.element.addClass('command');
                 this.elementicon.processing();
-            } else {
-                this.elementicon.addClass('binary_1');                
             }
         },
         
@@ -129,7 +128,7 @@ const binary_reset_status = 4000; // 4 seconds
         }
     });
     
-    $.extend($.ui.binary_widget_core, {
+    $.extend($.ui.binary_command_widget_core, {
         defaults: {
             isCommand: true
         }

@@ -9,9 +9,8 @@ const range_reset_status = 4000; // 4 seconds
             this.min_value = parseInt(o.min_value);
             this.max_value = parseInt(o.max_value);
             this.step = parseInt(o.step);
-            this.element.range_widget_core({
-                usage: o.usage,
-                isCommand: true
+            this.element.range_command_widget_core({
+                usage: o.usage
             })
                 .attr("tabindex", 0);
 			this.button_plus = $("<div class='range_plus' style='display:none'></div>");
@@ -97,7 +96,7 @@ const range_reset_status = 4000; // 4 seconds
 		
 		processValue: function() {
 			if (this.processingValue != this.currentValue) { // If the value was changed
-                this.element.range_widget_core('startProcessingState');
+                this.element.range_command_widget_core('startProcessingState');
 				this.options.action(this, this.processingValue);				
 			}
 		},
@@ -110,13 +109,13 @@ const range_reset_status = 4000; // 4 seconds
         },
 		
         displayValue: function(value, newIcon, previousIcon) {
-            this.element.range_widget_core('displayRangeIcon', newIcon, previousIcon);                
-            this.element.range_widget_core('displayValue', value, this.options.unit);                
+            this.element.range_command_widget_core('displayRangeIcon', newIcon, previousIcon);                
+            this.element.range_command_widget_core('displayValue', value, this.options.unit);                
         },
 		
         displayProcessingValue: function(value, percent) {
-            this.element.range_widget_core('displayBackground', percent);
-            this.element.range_widget_core('displayProcessingValue', value, this.options.unit);                
+            this.element.range_command_widget_core('displayBackground', percent);
+            this.element.range_command_widget_core('displayProcessingValue', value, this.options.unit);                
         },
 		
 		plus_range: function() {
@@ -179,19 +178,19 @@ const range_reset_status = 4000; // 4 seconds
 		},
         
         cancel: function() {
-            this.element.range_widget_core('stopProcessingState');
+            this.element.range_command_widget_core('stopProcessingState');
             this.setValue(this.currentValue);
-            this.element.range_widget_core('displayStatusError');
+            this.element.range_command_widget_core('displayStatusError');
         },
         
         /* Valid the processing state */
         valid: function(confirmed) {
             var self = this, o = this.options;
-            this.element.range_widget_core('stopProcessingState');
+            this.element.range_command_widget_core('stopProcessingState');
             if (confirmed) {
-                this.element.range_widget_core('displayStatusOk');
+                this.element.range_command_widget_core('displayStatusOk');
                 this.element.doTimeout( 'resetStatus', range_reset_status, function(){
-                    self.element.range_widget_core('displayResetStatus');
+                    self.element.range_command_widget_core('displayResetStatus');
     			});
             }
             setValue(this.processingValue);
@@ -206,22 +205,21 @@ const range_reset_status = 4000; // 4 seconds
 	
 	/* Widget */
     
-    $.widget("ui.range_widget_core", {
+    $.widget("ui.range_command_widget_core", {
         _init: function() {
             var self = this, o = this.options;
             this.element.addClass('widget_range');
             this.elementicon = $("<div class='widget_icon'></div>");
-			this.elementvalue = $("<div class='widget_value'></div>");
-            this.elementvalue.addClass('icon32-state-' + o.usage);                
+			this.elementvalue = $("<div class='widget_value icon32-state-" + o.usage + "'></div>");
 			this.elementicon.append(this.elementvalue);				
             this.element.append(this.elementicon);
-            if(o.isCommand) {
+            if(o.inactive) {
+    			this.elementvalue.addClass('inactive');
+            } else {
     			this.elementstate = $("<div class='widget_state'></div>");
     			this.elementvalue.append(this.elementstate);
                 this.element.addClass('command');
                 this.elementicon.processing();
-            } else {
-    			this.elementvalue.addClass('range_100');
             }
 			this.displayBackground(0);
         },
@@ -274,7 +272,7 @@ const range_reset_status = 4000; // 4 seconds
 
     });
     
-    $.extend($.ui.range_widget_core, {
+    $.extend($.ui.range_command_widget_core, {
         defaults: {
 			isCommand: true
         }

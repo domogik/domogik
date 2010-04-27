@@ -1,0 +1,31 @@
+/* Mini widget */
+.widget_info_number {
+    display:inline-block;
+    outline: none;
+    text-align:center;
+    height: 9em;
+}
+
+.widget_info_number .name {
+    color:#FFFFFF;
+    background-color:#000000;
+    -moz-border-radius: 0.8em;
+    -webkit-border-radius: 0.8em;
+    display:block;
+    font-weight:bold;
+}
+
+.widget_info_number .widget_icon {
+    display:block;
+    width: 45px;
+    height: 45px;
+    border: 1px solid #cccccc;
+    -moz-border-radius: 0.8em;
+    -webkit-border-radius: 0.8em;
+    background-position: center center;
+    background-repeat: no-repeat;
+    margin:0.5em 1em 0 1em;
+    text-align:center;
+    line-height:45px;
+    font-weight:bold;
+}

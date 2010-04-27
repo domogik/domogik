@@ -43,8 +43,14 @@
     // <![CDATA[
         $(function() {
             {% for feature in house_features_associations %}
-                {% get_command_button feature %}
-                {% get_command_init feature %}
+                {% ifequal feature.device_type_feature.feature_type "actuator" %}
+                    {% get_command_widget feature %}
+                    {% get_command_init feature %}
+                {% endifequal %}
+                {% ifequal feature.device_type_feature.feature_type "sensor" %}
+                    {% get_info_widget feature %}
+                    {% get_info_init feature %}
+                {% endifequal %}
             {% endfor %}
         });
     // ]]>
@@ -52,7 +58,7 @@
     <div class='actions'>
         <ul>
             {% for association in house_features_associations %}
-                <li><div id="command_{{ association.device_id }}_{{ association.device_type_feature_id }}"><span class='name'>{{ association.device.name }}<br/>{{ association.device_type_feature.name }}</span></div></li>
+                <li><div id="widget_{{ association.device_id }}_{{ association.device_type_feature_id }}"><span class='name'>{{ association.device.name }}<br/>{{ association.device_type_feature.name }}</span></div></li>
             {% endfor %}
         </ul>
     </div>
