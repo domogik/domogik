@@ -571,7 +571,7 @@ class DeviceStats(Base):
     date = Column(DateTime, primary_key=True)
     key = Column(Unicode(30), primary_key=True)
     value = Column(Unicode(255), nullable=False)
-    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), nullable=False)
+    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), nullable=False, primary_key=True)
     device = relation(Device)
 
     def __init__(self, date, key, value, device_id):
