@@ -115,14 +115,14 @@ class SysManager(xPLPlugin):
                                 Please check rest.log file")
     
             #Start stat
-            if self.options.start_stat:
-                if self._check_stat_is_running():
-                    self._log.warning("Manager started with -s, but a statistic manager is already running")
-                else:
-                    self._start_plugin("statmgr", gethostname(), 1)
-                    if not self._check_stat_is_running():
-                        self._log.error("Manager started with -s, but statistic manager not available after a startup.\
-                                Please check statmgr.log file")
+            #if self.options.start_stat:
+            #    if self._check_stat_is_running():
+            #        self._log.warning("Manager started with -s, but a statistic manager is already running")
+            #    else:
+            #        self._start_plugin("statmgr", gethostname(), 1)
+            #        if not self._check_stat_is_running():
+            #            self._log.error("Manager started with -s, but statistic manager not available after a startup.\
+            #                    Please check statmgr.log file")
 
             #Start trigger
             if self.options.start_trigger:
