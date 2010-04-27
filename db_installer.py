@@ -84,13 +84,14 @@ device_technology = db.add_device_technology(dt_id='x10', dt_name='X10', dt_desc
 device_type = db.add_device_type(dty_name='Switch', dt_id=device_technology.id)
 db.add_actuator_feature(af_name='Switch', af_device_type_id=device_type.id,
                         af_parameters='{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}',
-                        af_value_type='binary')
+                        af_value_type='binary', af_stat_key='command')
 device_type = db.add_device_type(dty_name='Dimmer', dt_id=device_technology.id)
 db.add_actuator_feature(af_name='Switch', af_device_type_id=device_type.id,
                         af_parameters='{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}',
-                        af_value_type='binary')
+                        af_value_type='binary', af_stat_key='command')
 db.add_actuator_feature(af_name='Dimmer', af_device_type_id=device_type.id,
-                        af_parameters='{&quot;command&quot;:&quot;dim&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:100}', af_value_type='range')
+                        af_parameters='{&quot;command&quot;:&quot;dim&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:100}',
+                        af_value_type='range', af_stat_key='level')
 
 # Create device technologie features for PLCBus
 device_technology = db.add_device_technology(dt_id='plcbus', dt_name='PLCBus', dt_description='')
