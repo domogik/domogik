@@ -14,29 +14,33 @@ const binary_reset_status = 4000; // 4 seconds
                 .attr("tabindex", 0)
                 .click(function () {self.switchState()})
                 .keypress(function (e) {if (e.which == 13 || e.which == 32) {self.switchState()}});
-
+            this.setValue(null);
         },
         
-        setState: function(state) {
-            if (state == 1 || state.toLowerCase() == this.values[1]) {
-                this.currentState = 1;
-            } else {
-                this.currentState = 0;
+        setValue: function(value) {
+            if (value) {
+                if (value == 1 || value.toLowerCase() == this.values[1]) {
+                    this.currentState = 1;
+                } else {
+                    this.currentState = 0;
+                }                
+            } else { // Unknown
+                this.currentState = null;
             }
             this.processingState = null;
-            this.displayState(this.currentState);
+            this.displayValue(this.currentState);
         },
         
-        displayState: function(state) {
-            if (state == 1) {
-                this.element.binary_widget_core('displayState', 1);
-            } else {
-                this.element.binary_widget_core('displayState', 0);                
-            }
+        displayValue: function(value) {
+            this.element.binary_widget_core('displayValue', value);                
         },
                 
         switchState: function() {
-            this.processingState = (this.currentState == 0)?1:0;
+            if (this.currentState) {
+                this.processingState = (this.currentState == 0)?1:0;                
+            } else { // Current state unknown
+                this.processingState = 0;
+            }
             this.runAction(this.processingState);
         },
         
@@ -77,8 +81,7 @@ const binary_reset_status = 4000; // 4 seconds
         _init: function() {
             var self = this, o = this.options;
             this.element.addClass('widget_binary');
-            this.elementicon = $("<div class='widget_icon'></div>");
-            this.elementicon.addClass('icon32-state-' + o.usage);                
+            this.elementicon = $("<div class='widget_icon icon32-state-" + o.usage + "'></div>");
             this.element.append(this.elementicon);            
             if(o.isCommand) {
                 this.elementstate = $("<div class='widget_state'></div>");
@@ -90,16 +93,19 @@ const binary_reset_status = 4000; // 4 seconds
             }
         },
         
-        displayState: function(state) {
+        displayValue: function(value) {
             var self = this, o = this.options;
-            if (state == 1) {
-                this.elementicon.addClass('binary_1');                
-                this.elementicon.removeClass('binary_0');
-            } else {
-                this.elementicon.addClass('binary_0');                                
-                this.elementicon.removeClass('binary_1');                                
+            if (value) {
+                if (value == 1) {
+                    this.elementicon.attr('class', 'widget_icon icon32-state-' + o.usage + ' binary_1');             
+                } else {
+                    this.elementicon.attr('class', 'widget_icon icon32-state-' + o.usage + ' binary_0');                
+                }
+                this.elementstate.text(o.texts[value]);
+            } else { // Unknown
+                this.elementicon.attr('class', 'widget_icon icon32-state-' + o.usage + ' unknown');                             
+                this.elementstate.text('---');
             }
-            this.elementstate.text(o.texts[state]);
         },
         
         displayStatusError: function() {

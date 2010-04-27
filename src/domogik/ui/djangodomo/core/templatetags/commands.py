@@ -62,8 +62,7 @@ class GetCommandBinary(Node):
                                 }
                             );
                         }
-                    })
-                        .binary_command('setState', 'Off');
+                    });
                     """ % (feature.device_id, feature.device_type_feature_id, feature.device.device_usage_id,
                            parameters_type['value0'], parameters_type['value1'],
                            parameters_usage['binary']['state0'], parameters_usage['binary']['state1'],
@@ -92,8 +91,7 @@ class GetCommandRange(Node):
                                 }
                             );
                         }
-                    })
-                        .range_command('setValue', 50);
+                    });
                     """ % (feature.device_id, feature.device_type_feature_id, feature.device.device_usage_id,
                            parameters_type['valueMin'], parameters_type['valueMax'],
                            parameters_usage['range']['step'], parameters_usage['range']['unit'],
@@ -135,8 +133,6 @@ class GetCommand(Node):
         device_usage = DeviceUsages.get_dict_item(feature.device.device_usage_id)
         parameters_type = simplejson.loads(unescape(feature.device_type_feature.parameters))
         parameters_usage = simplejson.loads(unescape(device_usage.default_options))
-        print parameters_type
-        print parameters_usage
         if feature.device_type_feature.value_type == "binary":
             script = GetCommandBinary.get_script(feature, device_type, device_usage, parameters_type, parameters_usage)
         if feature.device_type_feature.value_type == "range":

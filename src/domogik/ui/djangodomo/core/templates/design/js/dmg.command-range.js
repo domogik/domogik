@@ -57,23 +57,29 @@ const range_reset_status = 4000; // 4 seconds
 					}
 					e.stopPropagation();
 				});
+            this.setValue(null);
         },
 
 		setValue: function(value) {
             var self = this, o = this.options;
-			if (value >= this.min_value && value <= this.max_value) {
-				this.currentValue = value;
-			} else if (value < this.min_value) {
-				this.currentValue = this.min_value;
-			} else if (value > this.max_value) {
-				this.currentValue = this.max_value
-			}
-			this.processingValue = this.currentValue;
-			var percent = (this.currentValue / (this.max_value - this.min_value)) * 100;
-			var icon = 'range_' + findRangeIcon(o.usage, percent);
-
-            this.displayValue(this.currentValue, icon, this.currentIcon);
-			this.currentIcon = icon;
+            if (value) {
+                if (value >= this.min_value && value <= this.max_value) {
+                    this.currentValue = value;
+                } else if (value < this.min_value) {
+                    this.currentValue = this.min_value;
+                } else if (value > this.max_value) {
+                    this.currentValue = this.max_value
+                }
+                this.processingValue = this.currentValue;
+                var percent = (this.currentValue / (this.max_value - this.min_value)) * 100;
+                var icon = 'range_' + findRangeIcon(o.usage, percent);
+                this.displayValue(this.currentValue, icon, this.currentIcon);
+            } else { // unknown
+                this.processingValue = 0;
+                var icon = 'unknown';
+                this.displayValue(null, icon, this.currentIcon);
+            }
+            this.currentIcon = icon;    
         },
 
 		setProcessingValue: function(value) {
@@ -103,7 +109,6 @@ const range_reset_status = 4000; // 4 seconds
 			this.element.addClass(newIcon);
         },
 		
-
         displayValue: function(value, newIcon, previousIcon) {
             this.element.range_widget_core('displayRangeIcon', newIcon, previousIcon);                
             this.element.range_widget_core('displayValue', value, this.options.unit);                
@@ -157,7 +162,7 @@ const range_reset_status = 4000; // 4 seconds
 			this.button_minus.show();
 			this.button_max.show();
 			this.button_min.show();
-			this.displayProcessingValue(this.currentValue);
+			this.displayProcessingValue(this.processingValue);
 			this.element.doTimeout( 'timeout', close_without_change, function(){
 				self.close();
 			});
@@ -174,7 +179,6 @@ const range_reset_status = 4000; // 4 seconds
 		},
         
         cancel: function() {
-			this.processingValue = this.currentValue;
             this.element.range_widget_core('stopProcessingState');
             this.setValue(this.currentValue);
             this.element.range_widget_core('displayStatusError');
@@ -235,7 +239,11 @@ const range_reset_status = 4000; // 4 seconds
         },
 		
 		displayValue: function(value, unit) {
-			this.elementstate.text(value + unit);
+            if (value) {
+    			this.elementstate.text(value + unit);                
+            } else { // Unknown
+    			this.elementstate.text('---' + unit);                                
+            }
 			this.elementicon.css('-moz-background-size', '0');
 			this.elementicon.css('-webkit-background-size', '0');
         },
