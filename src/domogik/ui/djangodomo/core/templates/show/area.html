@@ -48,7 +48,8 @@
     // <![CDATA[
         $(function() {
             {% for feature in house_features_associations %}                
-                {% get_command feature %}
+                {% get_command_button feature %}
+                {% get_command_init feature %}
             {% endfor %}
         });
     // ]]>

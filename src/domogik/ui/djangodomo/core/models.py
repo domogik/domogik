@@ -354,3 +354,12 @@ class Accounts(pipes.DmgPipe):
         resp = Accounts.objects.get({'parameters':"person/list"})
         if resp :
             return resp
+
+class Stats(pipes.DmgPipe):
+    uri = rest_url + "/stats"
+
+    @staticmethod
+    def get_latest(id, key):
+        resp = Stats.objects.get({'parameters':str(id) + "/" + key + "/latest"})
+        if resp :
+            return resp

@@ -28,7 +28,7 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
 from django import template
 from django.template import Node
-from djangodomo.core.models import DeviceTypes, DeviceUsages
+from djangodomo.core.models import DeviceTypes, DeviceUsages, Stats
 from htmlentitydefs import name2codepoint
 import re
 import simplejson
@@ -42,7 +42,7 @@ def unescape(s):
 
 class GetCommandBinary(Node):
     @staticmethod
-    def get_script(feature, device_type, device_usage, parameters_type, parameters_usage):
+    def get_button(feature, device_type, device_usage, parameters_type, parameters_usage):
         script = """$('#command_%s_%s').binary_command({
                         usage: %s,
                         value0: '%s',
@@ -69,9 +69,15 @@ class GetCommandBinary(Node):
                            device_type.device_technology_id, feature.device.address, feature.device_type_feature.return_confirmation)
         return script
 
+    @staticmethod
+    def get_init(feature, value):
+        script = """$("#command_%s_%s").binary_command('setValue', '%s');
+                    """ % (feature.device_id, feature.device_type_feature_id, value)
+        return script
+
 class GetCommandRange(Node):
     @staticmethod
-    def get_script(feature, device_type, device_usage, parameters_type, parameters_usage):
+    def get_button(feature, device_type, device_usage, parameters_type, parameters_usage):
         script = """$("#command_%s_%s").range_command({
                         usage: %s,
                         min_value: %s,
@@ -99,9 +105,15 @@ class GetCommandRange(Node):
                            parameters_type['command'], feature.device_type_feature.return_confirmation)
         return script
 
+    @staticmethod
+    def get_init(feature, value):
+        script = """$("#command_%s_%s").range_command('setValue', '%s');
+                    """ % (feature.device_id, feature.device_type_feature_id, value)
+        return script
+
 class GetCommandTrigger():
     @staticmethod
-    def get_script(feature, device_type, device_usage, parameters_type, parameters_usage):
+    def get_button(feature, device_type, device_usage, parameters_type, parameters_usage):
         script = """$('#command_%s_%s').trigger_command({
                         usage: %s,
                         action: function(self) {
@@ -123,7 +135,7 @@ class GetCommandTrigger():
                            parameters_type['command'], feature.device_type_feature.return_confirmation)
         return script
 
-class GetCommand(Node):
+class GetCommandButton(Node):
     def __init__(self, feature):
         self.feature = template.Variable(feature)
 
@@ -134,25 +146,54 @@ class GetCommand(Node):
         parameters_type = simplejson.loads(unescape(feature.device_type_feature.parameters))
         parameters_usage = simplejson.loads(unescape(device_usage.default_options))
         if feature.device_type_feature.value_type == "binary":
-            script = GetCommandBinary.get_script(feature, device_type, device_usage, parameters_type, parameters_usage)
+            script = GetCommandBinary.get_button(feature, device_type, device_usage, parameters_type, parameters_usage)
         if feature.device_type_feature.value_type == "range":
-            script = GetCommandRange.get_script(feature, device_type, device_usage, parameters_type, parameters_usage)
+            script = GetCommandRange.get_button(feature, device_type, device_usage, parameters_type, parameters_usage)
         if feature.device_type_feature.value_type == "trigger":
-            script = GetCommandTrigger.get_script(feature, device_type, device_usage, parameters_type, parameters_usage)
+            script = GetCommandTrigger.get_button(feature, device_type, device_usage, parameters_type, parameters_usage)
             
         return script
+
+class GetCommandInit(Node):
+    def __init__(self, feature):
+        self.feature = template.Variable(feature)
+
+    def render(self, context):
+        feature = self.feature.resolve(context)
+        stat = Stats.get_latest(feature.device_id, feature.device_type_feature.stat_key)
+        if len(stat.stats) > 0 :
+            if feature.device_type_feature.value_type == "binary":
+                script = GetCommandBinary.get_init(feature, stat.stats[0].value)
+            if feature.device_type_feature.value_type == "range":
+                script = GetCommandRange.get_init(feature, stat.stats[0].value)
+        return script
     
-def do_get_command(parser, token):
+def do_get_command_button(parser, token):
     """
     This returns the jquery function for creating a command button.
 
     Usage::
 
-        {% get_command feature %}
+        {% get_command_button feature %}
     """
     args = token.contents.split()
     if len(args) != 2:
-        raise TemplateSyntaxError, "'get_command' requires 'feature' argument"
-    return GetCommand(args[1])
+        raise TemplateSyntaxError, "'get_command_button' requires 'feature' argument"
+    return GetCommandButton(args[1])
 
-register.tag('get_command', do_get_command)
+register.tag('get_command_button', do_get_command_button)
+
+def do_get_command_init(parser, token):
+    """
+    This returns the jquery function to init a command button.
+
+    Usage::
+
+        {% get_command_init feature %}
+    """
+    args = token.contents.split()
+    if len(args) != 2:
+        raise TemplateSyntaxError, "'get_command_init' requires 'feature' argument"
+    return GetCommandInit(args[1])
+
+register.tag('get_command_init', do_get_command_init)

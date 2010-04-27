@@ -462,6 +462,7 @@ class DeviceTypeFeature(Base):
         self.device_type_id = device_type_id
         self.value_type = value_type
         self.parameters = parameters
+        self.stat_key = stat_key
         self.return_confirmation = return_confirmation
 
     def __repr__(self):
