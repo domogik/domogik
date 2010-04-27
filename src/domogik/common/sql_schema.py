@@ -56,7 +56,7 @@ Implements
 from exceptions import AssertionError
 
 from sqlalchemy import types, create_engine, Table, Column, Integer, String, \
-                MetaData, ForeignKey, Boolean, DateTime, Date, Text, Unicode, UnicodeText, UniqueConstraint
+                       MetaData, ForeignKey, Boolean, DateTime, Date, Text, Unicode, UnicodeText, UniqueConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relation, backref
 
@@ -88,9 +88,9 @@ class Enum(types.TypeDecorator):
         @param values : a list of valid values for this column
         @param empty_to_none : treat the empty string '' as None (optional default = False)
         @param strict : also insist that columns read from the database are in the
-           list of valid values.  Note that, with strict=True, you won't
-           be able to clean out bad data from the database through your
-           code. (optional default = False)
+                        list of valid values.  Note that, with strict=True, you won't
+                        be able to clean out bad data from the database through your
+                        code. (optional default = False)
         """
 
         if values is None or len(values) is 0:

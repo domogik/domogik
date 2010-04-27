@@ -990,8 +990,8 @@ class DeviceStatsTestCase(GenericTestCase):
         self.db.add_device_stat(now + datetime.timedelta(seconds=1), 'val1', '10', device1.id)
         self.db.add_device_stat(now + datetime.timedelta(seconds=1), 'val2', '10.5' , device1.id)
 
-        self.db.add_device_stat(now, 'val1', '40', device2.id)
-        self.db.add_device_stat(now, 'val2', '41' , device2.id)
+        self.db.add_device_stat(now + datetime.timedelta(seconds=2), 'val1', '40', device2.id)
+        self.db.add_device_stat(now + datetime.timedelta(seconds=2), 'val2', '41' , device2.id)
 
         l_stats = self.db.list_device_stats(device1.id)
         d_stats_list_d = self.db.del_device_stats(device1.id)
