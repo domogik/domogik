@@ -287,9 +287,6 @@ class Rest(xPLPlugin):
 
             self._log.info("REST Initialisation OK")
 
-            ### Start statmgr
-            self._log.info("Starting statistics manager")
-            StatsManager()
 
 
 
@@ -406,7 +403,7 @@ class Rest(xPLPlugin):
 
 
 
-    def start(self):
+    def start_http(self):
         """ Start HTTP Server
         """
         # Start HTTP server
@@ -420,6 +417,17 @@ class Rest(xPLPlugin):
                                          handler_params = [self])
 
         server.serve_forever()
+
+
+
+
+    def start_stats(self):
+        """ Start Statistics manager
+        """
+        print "Start Stats"
+        self._log.info("Starting statistics manager")
+        StatsManager(handler_params = [self])
+
 
 
 
@@ -658,6 +666,7 @@ class ProcessRequest():
 
         self._queue_timeout =  self.handler_params[0]._queue_timeout
         self._queue_size =  self.handler_params[0]._queue_size
+        self._queue_event_size =  self.handler_params[0]._queue_event_size
         self._queue_command_size =  self.handler_params[0]._queue_command_size
         self._queue_life_expectancy = self.handler_params[0]._queue_life_expectancy
       
@@ -668,6 +677,7 @@ class ProcessRequest():
         self._queue_system_detail =  self.handler_params[0]._queue_system_detail
         self._queue_system_start =  self.handler_params[0]._queue_system_start
         self._queue_system_stop =  self.handler_params[0]._queue_system_stop
+        self._queue_event =  self.handler_params[0]._queue_event
         self._queue_command =  self.handler_params[0]._queue_command
 
         self.xml =  self.handler_params[0].xml
@@ -810,6 +820,8 @@ class ProcessRequest():
             % (self._queue_system_stop.qsize(), int(self._queue_size))})
         json_data.add_data({"Queue 'command' usage" : "%s/%s" \
             % (self._queue_command.qsize(), int(self._queue_command_size))})
+        json_data.add_data({"Queue 'event' usage" : "%s/%s" \
+            % (self._queue_event.qsize(), int(self._queue_event_size))})
 
         self.send_http_response_ok(json_data.get())
 
@@ -3289,7 +3301,7 @@ class StatsManager(xPLPlugin):
     """
     Listen on the xPL network and keep stats of device and system state
     """
-    def __init__(self):
+    def __init__(self, handler_params):
         xPLPlugin.__init__(self, 'statmgr')
         cfg = Loader('domogik')
         config = cfg.load()
@@ -3301,33 +3313,15 @@ class StatsManager(xPLPlugin):
         self._log = self.get_my_logger()
         self._db = DbHelper()
 
-        # See http://wiki.domogik.org/tiki-index.php?page=xPLStatManager&bl=y for xml format
-        # Formay of res :
-        #{'techno_name': {
-        #    'schema_name': {
-            #    'xpltype': {
-                #    'listener':{
-                #       'key1':'value1',
-                #       'key2':'value2'
-                #     },
-                #     'mapping': {
-                #       'device':'field1',
-                #       'field2':'None',
-                #       'field3':'custom_name'
-                #     },
-            #    },
-            #    'xpltype2':{
-        #     etc ...
-        #   }
-        #  },
-        #   'schema_name2': [
-        #   'xpltype' : {
-        #       ...
-        #   }
-        #  'techno_name2': { 
-        #   etc...
-        #
+        ### Rest data
+        self.handler_params = handler_params
 
+        self._queue_event = self.handler_params[0]._queue_event
+        self._queue_event_size = self.handler_params[0]._queue_event_size
+        self._get_from_queue = self.handler_params[0]._get_from_queue
+        self._put_in_queue = self.handler_params[0]._put_in_queue
+
+        ### Read xml files
         res = {}
         for _file in files :
             self._log.info("Parse file %s" % _file)
@@ -3357,7 +3351,7 @@ class StatsManager(xPLPlugin):
                             "mapping": mapping,
                             "device": device}
             
-                    stats[technology][schema][type] = self._Stat(self._myxpl, res[technology][schema][type], technology, schema, type, self._db, self._log)
+                    stats[technology][schema][type] = self._Stat(self._myxpl, res[technology][schema][type], technology, schema, type, self._db, self._log, self.handler_params)
 
     def get_schemas_and_types(self, node):
         """ Get the schema and the xpl message type
@@ -3415,7 +3409,7 @@ class StatsManager(xPLPlugin):
         Each instance create a Listener and the associated callbacks
         """
 
-        def __init__(self, xpl, res, technology, schema, type, database, log):
+        def __init__(self, xpl, res, technology, schema, type, database, log, handler_params):
             """ Initialize a stat instance 
             @param xpl : A xpl manager instance
             @param res : The result of xml parsing for this techno/schema/type
@@ -3424,7 +3418,16 @@ class StatsManager(xPLPlugin):
             @param type : the xpl type to listen for
             @param db : a DbHelper instance 
             @param log : the plugin logger (from self.get_my_logger())
+            @param handler_params : handler_params from rest
             """
+            ### Rest data
+            self.handler_params = handler_params
+
+            self._queue_event = self.handler_params[0]._queue_event
+            self._queue_event_size = self.handler_params[0]._queue_event_size
+            self._get_from_queue = self.handler_params[0]._get_from_queue
+            self._put_in_queue = self.handler_params[0]._put_in_queue
+
             self._res = res
             self._db = database
             params = {'schema':schema, 'xpltype': type}
@@ -3437,11 +3440,25 @@ class StatsManager(xPLPlugin):
             """ Callback for the xpl message
             @param message : the Xpl message received 
             """
+
+            print "STATS : %s" % str(message)
+            ### First, we put message in event queue (for /events)
+
+            # TODO 1: put in queue the entire xpl message
+            self._put_in_queue(self._queue_event, message)
+
+            # TODO 2: put in queue the good data (extract from xpl)
+
+            ### Next, we put data in database
             self._db = DbHelper()
             self._log.debug("message catcher : %s" % message)
-            d_id = self._db.get_device_by_technology_and_address(self._technology, \
+            try:
+                d_id = self._db.get_device_by_technology_and_address(self._technology, \
                     message.data[self._res["device"]]).id
+            except AttributeError:
+                d_id = None
             if d_id == None:
+                print "unreferenced device '%s-%s': don't log" % (self._technology, message.data[self._res["device"]])
                 self._log.warning("Received a stat for an unreferenced device : %s - %s" \
                         % (self._technology, message.data[self._res["device"]]))
                 return
@@ -3462,8 +3479,9 @@ class StatsManager(xPLPlugin):
 
 if __name__ == '__main__':
     # Create REST server with default values (overriden by ~/.domogik.cfg)
-    http_server = Rest("127.0.0.1", "8080")
-    http_server.start()
+    rest_server = Rest("127.0.0.1", "8080")
+    rest_server.start_stats()
+    rest_server.start_http()
 
 
 

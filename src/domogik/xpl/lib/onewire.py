@@ -117,9 +117,9 @@ class OneWire:
         Return list of all temperature indicated by DS18B20 and DS18S20 sensors
         @return list of (id, temperature)
         """
-        return get_temperatures('DS18S20') + get_temperatures('DS18B20')
+        return self.get_temperature('DS18S20') + self.get_temperature('DS18B20')
 
-    def get_temperatures(t):
+    def get_temperature(self, t):
         return [(i.id, i.type, i.temperature.replace(" ", "")) for i in
                 self.exec_type(t=t)]
 
