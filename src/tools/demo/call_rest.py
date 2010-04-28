@@ -36,7 +36,7 @@ import urllib
 
 
 if __name__ == '__main__':
-    ip = "127.0.0.1"
+    ip = "192.168.0.10"
     port = "8080"
     data_file = "./demo_data.txt"
 
