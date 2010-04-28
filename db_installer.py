@@ -109,9 +109,15 @@ db.add_actuator_feature(af_name='Dimmer', af_device_type_id=device_type.id,
 
 # Create device technology features for EIB/KNX
 db.add_device_technology(dt_id='eibknx', dt_name='EIB/KNX', dt_description='')
+
 # Create device technology features for 1wire
 device_technology = db.add_device_technology(dt_id='onewire', dt_name='1-Wire', dt_description='')
 device_type = db.add_device_type(dty_name='Temperature', dt_id=device_technology.id)
+db.add_sensor_feature(sf_name='Temperature',
+                   sf_device_type_id=device_type.id, sf_value_type='number',
+                   sf_parameters='{&quot;unit&quot;:&quot;&deg;C&quot;}',
+                   sf_stat_key='current')
+
 
 # Create device technology features for RFXCom
 db.add_device_technology(dt_id='rfxcom', dt_name='RFXCom', dt_description='')
