@@ -2,7 +2,8 @@
     $.widget("ui.number_info_widget", {
         _init: function() {
             var self = this, o = this.options;
-            this.element.addClass('widget_info_number');
+            this.element.addClass('widget');
+            this.element.addClass('info_number');
             this.elementicon = $("<div class='widget_icon'></div>");
             this.element.append(this.elementicon);
             if (o.inactive) {

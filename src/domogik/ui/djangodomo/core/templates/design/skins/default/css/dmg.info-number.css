@@ -1,21 +1,5 @@
 /* Mini widget */
-.widget_info_number {
-    display:inline-block;
-    outline: none;
-    text-align:center;
-    height: 9em;
-}
-
-.widget_info_number .name {
-    color:#FFFFFF;
-    background-color:#000000;
-    -moz-border-radius: 0.8em;
-    -webkit-border-radius: 0.8em;
-    display:block;
-    font-weight:bold;
-}
-
-.widget_info_number .widget_icon {
+.widget.info_number .widget_icon {
     display:block;
     width: 45px;
     height: 45px;

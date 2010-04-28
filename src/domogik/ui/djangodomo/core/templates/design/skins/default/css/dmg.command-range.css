@@ -1,30 +1,14 @@
-.widget_range {
-    display:inline-block;
-    outline: none;
-    text-align:center;
-    height: 9em;
-}
-
-.widget_range .name {
-    color:#FFFFFF;
-    background-color:#000000;
-    -moz-border-radius: 0.8em;
-    -webkit-border-radius: 0.8em;
-    display:block;
-    font-weight:bold;
-}
-
-.widget_range:hover .widget_icon,
-.widget_range:focus .widget_icon {
+.widget.command_range:hover .widget_icon,
+.widget.command_range:focus .widget_icon {
     background-color:#FFFFFF;
 }
 
-.widget_range.command:hover .widget_icon,
-.widget_range.command:focus .widget_icon {
+.widget.command_range.command:hover .widget_icon,
+.widget.command_range.command:focus .widget_icon {
     cursor: pointer;
 }
 
-.widget_range .widget_state {
+.widget.command_range .widget_state {
     background-color:rgba(255,255,255,0.6);
     display:inline-block;
     vertical-align:text-bottom;
@@ -38,15 +22,15 @@
     margin-top:30px;
 }
 
-.widget_range .widget_state.error {
+.widget.command_range .widget_state.error {
     background-color:rgba(191,84,46,0.6);
 }
 
-.widget_range .widget_state.ok {
+.widget.command_range .widget_state.ok {
     background-color:rgba(144,178,71,0.6);
 }
 
-.widget_range .widget_icon {
+.widget.command_range .widget_icon {
     display:block;
     width: 45px;
     height: 45px;
@@ -72,14 +56,14 @@
     background-repeat: no-repeat;
 }
 
-.widget_range.opened .widget_icon {
+.widget.command_range.opened .widget_icon {
     border: 1px dashed #cccccc;
     -moz-border-radius: 0;
     -webkit-border-radius: 0;
     background-color: #FFFFFF;
 }
 
-.widget_range .range_plus {
+.widget.command_range .range_plus {
     width: 45px;
     height: 45px;
     position:relative;
@@ -94,7 +78,7 @@
     -webkit-border-radius: 0.8em 0 0 0.8em;
 }
 
-.widget_range .range_minus {
+.widget.command_range .range_minus {
     width: 45px;
     height: 45px;
     position:relative;
@@ -110,7 +94,7 @@
     -webkit-border-radius: 0 0.8em 0.8em 0;
 }
 
-.widget_range .range_min {
+.widget.command_range .range_min {
     width: 45px;
     height: 45px;
     position:relative;
@@ -125,7 +109,7 @@
     -webkit-border-radius: 0 0 0.8em 0.8em;
 }
 
-.widget_range .range_max {
+.widget.command_range .range_max {
     width: 45px;
     height: 45px;
     position:relative;

@@ -62,6 +62,7 @@
                 <li><div id="widget_{{ association.device_id }}_{{ association.device_type_feature_id }}">
                     <span class='name'>{{ association.device.name|truncchar:10 }}<br/>{{ association.device_type_feature.name|truncchar:10 }}</span></div></li>
             {% endfor %}
+            <div class='clear' />
         </ul>
     </div>
 

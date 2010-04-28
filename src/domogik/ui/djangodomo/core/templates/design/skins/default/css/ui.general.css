@@ -24,6 +24,11 @@ img {
 *, input {
 	outline: none;
 }
+
+.clear {
+    clear:both;
+}
+
 /*
 button::-moz-focus-inner,
 input[type="reset"]::-moz-focus-inner,

@@ -50,7 +50,8 @@ const trigger_reset_status = 4000; // 4 seconds
     $.widget("ui.trigger_command_widget_core", {
         _init: function() {
             var self = this, o = this.options;
-            this.element.addClass('widget_trigger');
+            this.element.addClass('widget');
+            this.element.addClass('command_trigger');
             this.elementicon = $("<div class='widget_icon icon32-state-" + o.usage + "'></div>");
             this.element.append(this.elementicon);            
             if(o.inactive) {

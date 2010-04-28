@@ -60,11 +60,10 @@ header#contentheader .subtitle {
     border: 1px solid #979387;
     -moz-border-radius: 0.8em;
     -webkit-border-radius: 0.8em;
-
 }
 
 #mainsection .actions ul > li {
-    display:inline-block;
-    margin: 0;
     padding: 0;
+    margin: 0.1em;
+    float:left;
 }
