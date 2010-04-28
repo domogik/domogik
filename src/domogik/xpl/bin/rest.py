@@ -3452,11 +3452,12 @@ class StatsManager(xPLPlugin):
             ### Next, we put data in database
             self._db = DbHelper()
             self._log.debug("message catcher : %s" % message)
-            try:
-                d_id = self._db.get_device_by_technology_and_address(self._technology, \
+            print "techno '%s' / adress '%s'" % (self._technology, message.data[self._res["device"]])
+            #try:
+            d_id = self._db.get_device_by_technology_and_address(self._technology, \
                     message.data[self._res["device"]]).id
-            except AttributeError:
-                d_id = None
+            #except AttributeError:
+            #    d_id = None
             if d_id == None:
                 print "unreferenced device '%s-%s': don't log" % (self._technology, message.data[self._res["device"]])
                 self._log.warning("Received a stat for an unreferenced device : %s - %s" \
@@ -3465,16 +3466,17 @@ class StatsManager(xPLPlugin):
             else:
                 self._log.debug("Stat received for %s - %s." \
                         % (self._technology, message.data[self._res["device"]]))
-                datas = {}
+                current_date = datetime.datetime.today()
                 for key in self._res["mapping"].keys():
+                    data = ""
                     if message.data.has_key(key):
                         #Check if a name has been chosen for this value entry
                         if self._res["mapping"][key] == None:
                             #If not, keep the one from message
-                            datas[key] = message.data[key]
+                            value = message.data[key]
                         else:
-                            datas[self._res["mapping"][key]] = message.data[key]
-                self._db.add_device_stat(d_id, datetime.today(), datas)
+                            value = message.data[key]
+                    self._db.add_device_stat(current_date, key, value, d_id)
 
 
 if __name__ == '__main__':
