@@ -1,31 +1,15 @@
 /* Mini widget */
-.widget_binary {
-    display:inline-block;
-    outline: none;
-    text-align:center;
-    height: 9em;
-}
-
-.widget_binary .name {
-    color:#FFFFFF;
-    background-color:#000000;
-    -moz-border-radius: 0.8em;
-    -webkit-border-radius: 0.8em;
-    display:block;
-    font-weight:bold;
-}
-
-.widget_binary:hover .widget_icon,
-.widget_binary:focus .widget_icon {
+.widget.command_binary:hover .widget_icon,
+.widget.command_binary:focus .widget_icon {
     background-color:#FFFFFF;
 }
 
-.widget_binary.command:hover .widget_icon,
-.widget_binary.command:focus .widget_icon {
+.widget.command_binary.command:hover .widget_icon,
+.widget.command_binary.command:focus .widget_icon {
     cursor: pointer;
 }
 
-.widget_binary .widget_state {
+.widget.command_binary .widget_state {
     background-color:rgba(255,255,255,0.6);
     display:inline-block;
     vertical-align:text-bottom;
@@ -39,15 +23,15 @@
     margin-top:30px;
 }
 
-.widget_binary .widget_state.error {
+.widget.command_binary .widget_state.error {
     background-color:rgba(191,84,46,0.6);
 }
 
-.widget_binary .widget_state.ok {
+.widget.command_binary .widget_state.ok {
     background-color:rgba(144,178,71,0.6);
 }
 
-.widget_binary .widget_icon {
+.widget.command_binary .widget_icon {
     display:block;
     width: 45px;
     height: 45px;

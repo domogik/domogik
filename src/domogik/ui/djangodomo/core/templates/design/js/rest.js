@@ -60,13 +60,7 @@ $.extend({
     },
 
     getREST: function(parameters, callback) {
-        var rest_url = "http://127.0.0.1:8080";  
-        if (rest_ip && rest_port) {
-            rest_url = "http://" + rest_ip + ":" + rest_port;  
-        }
-        if (rest_prefix) {
-            rest_url += '/' + rest_prefix;
-        }
+        var rest_url = "/rest";  
 
         // Build the REST url
         $.each(parameters, function(){
@@ -76,12 +70,12 @@ $.extend({
         $.ajax({
             type: "GET",
             url: rest_url,
-            dataType: "jsonp",
+            dataType: "json",
             success:
                 callback,
             error:
                 function(XMLHttpRequest, textStatus, errorThrown) {
-                    $.reloadPage({'status': 'error', 'msg': 'REST Error : ' + XMLHttpRequest.readyState + ' ' + XMLHttpRequest.status + ' ' + textStatus + ' ' + errorThrown});
+                    //$.reloadPage({'status': 'error', 'msg': 'REST Error : ' + XMLHttpRequest.readyState + ' ' + XMLHttpRequest.status + ' ' + textStatus + ' ' + errorThrown});
                 }
         });
     }

@@ -67,14 +67,14 @@ try:
     cfg_rest = Loader('rest')
     config_rest = cfg_rest.load()
     conf_rest = dict(config_rest[1])
-    rest_ip = conf_rest['rest_server_ip']
-    rest_port = conf_rest['rest_server_port']
+    REST_IP = conf_rest['rest_server_ip']
+    REST_PORT = conf_rest['rest_server_port']
 except KeyError:
     # default parameters
-    rest_ip = "127.0.0.1"
-    rest_port = "8080"
-PROXY_DOMAIN = rest_ip
-PROXY_PORT = int(rest_port)
+    REST_IP = "127.0.0.1"
+    REST_PORT = "8080"
+PROXY_DOMAIN = REST_IP
+PROXY_PORT = int(REST_PORT)
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name

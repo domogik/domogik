@@ -208,7 +208,8 @@ const range_reset_status = 4000; // 4 seconds
     $.widget("ui.range_command_widget_core", {
         _init: function() {
             var self = this, o = this.options;
-            this.element.addClass('widget_range');
+            this.element.addClass('widget');
+            this.element.addClass('command_range');
             this.elementicon = $("<div class='widget_icon'></div>");
 			this.elementvalue = $("<div class='widget_value icon32-state-" + o.usage + "'></div>");
 			this.elementicon.append(this.elementvalue);				

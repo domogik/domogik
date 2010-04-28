@@ -21,6 +21,7 @@
 
 {% load i18n %}
 {% load commands %}
+{% load text %}
 
 {% block js_script %}
 // <![CDATA[
@@ -58,8 +59,10 @@
     <div class='actions'>
         <ul>
             {% for association in house_features_associations %}
-                <li><div id="widget_{{ association.device_id }}_{{ association.device_type_feature_id }}"><span class='name'>{{ association.device.name }}<br/>{{ association.device_type_feature.name }}</span></div></li>
+                <li><div id="widget_{{ association.device_id }}_{{ association.device_type_feature_id }}">
+                    <span class='name'>{{ association.device.name|truncchar:10 }}<br/>{{ association.device_type_feature.name|truncchar:10 }}</span></div></li>
             {% endfor %}
+            <div class='clear' />
         </ul>
     </div>
 
