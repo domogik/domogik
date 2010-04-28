@@ -40,7 +40,7 @@ from django.template import RequestContext
 from django.utils.translation import ugettext_lazy as _
 
 from domogik.common import database
-from djangodomo.core.models import REST, Areas, Rooms, Devices, DeviceUsages, DeviceTechnologies, DeviceTypes, \
+from djangodomo.core.models import Areas, Rooms, Devices, DeviceUsages, DeviceTechnologies, DeviceTypes, \
                                    DeviceFeatures, FeatureAssociations, UIConfigs, Plugins, Accounts
 
 from djangodomo.core.sample_data_helper import SampleDataHelper
@@ -62,9 +62,6 @@ def __go_to_page(request, html_page, page_title, **attribute_list):
     @return an HttpResponse object
     """
     response_attr_list = {}
-    response_attr_list['rest_ip'] = REST.getIP()
-    response_attr_list['rest_port'] = REST.getPort()
-    response_attr_list['rest_prefix'] = REST.getPrefix()
     response_attr_list['page_title'] = page_title
     response_attr_list['sys_config'] = __db.get_system_config()
     response_attr_list['is_user_connected'] = __is_user_connected(request)

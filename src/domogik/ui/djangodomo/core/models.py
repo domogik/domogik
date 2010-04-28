@@ -36,45 +36,13 @@ Implements
 
 from django.db import models
 from domogik.common.configloader import Loader
+from django.conf import settings
 
 import dmg_pipes as pipes
 
-# HTTP server ip and port
-try:
-    cfg_rest = Loader('rest')
-    config_rest = cfg_rest.load()
-    conf_rest = dict(config_rest[1])
-    rest_ip = conf_rest['rest_server_ip']
-    rest_port = conf_rest['rest_server_port']
-    print "REST config found"
-except KeyError:
-    # default parameters
-    rest_ip = "127.0.0.1"
-    rest_port = "8080"
-    print "REST config not found"
-
-rest_url = "http://" + rest_ip + ":" + rest_port
-
-if ('rest_server_prefix' in conf_rest) and (conf_rest['rest_server_prefix'] != ''):
-    rest_prefix = conf_rest['rest_server_prefix']
-    rest_url += '/' + rest_prefix
-else:
-    rest_prefix = ''
+rest_url = "http://" + settings.REST_IP + ":" + settings.REST_PORT
     
 print "using REST url : " + rest_url
-class REST():
-    
-    @staticmethod
-    def getIP():
-        return rest_ip
-    
-    @staticmethod
-    def getPort():
-        return rest_port
-    
-    @staticmethod
-    def getPrefix():
-        return rest_prefix
     
 class Areas(pipes.DmgPipe):
     uri = rest_url + "/base/area"
