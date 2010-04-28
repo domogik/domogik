@@ -61,7 +61,7 @@ setup(
     author = 'Domogik team',
     author_email = 'domogik-general@lists.labs.libre-entreprise.org',
     install_requires=['setuptools','django >=1.1','sqlalchemy >= 0.5.8', 'simplejson >= 1.9.2', 'pyOpenSSL >= 0.10',
-                      'django-http-proxy >= 0.3.2'],
+                      'django-http-proxy >= 0.3.2', 'httplib2 >= 0.6.0', 'django-pipes >= 0.2'],
     zip_safe = False,
     license = 'GPL v3',
     # namespace_packages = ['domogik', 'mpris', 'tools'],
