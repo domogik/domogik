@@ -139,14 +139,15 @@ class Rest(xPLPlugin):
             @param server_port :  port of HTTP server
         """
 
+        xPLPlugin.__init__(self, name = 'rest')
+        # logging initialization
+        log = logger.Logger('REST')
+        self._log = log.get_logger()
+        self._log.info("Rest Server initialisation...")
+        self._log.debug("locale : %s %s" % locale.getdefaultlocale())
+
         try:
-            xPLPlugin.__init__(self, name = 'rest')
     
-            # logging initialization
-            log = logger.Logger('REST')
-            self._log = log.get_logger()
-            self._log.info("Rest Server initialisation...")
-            self._log.debug("locale : %s %s" % locale.getdefaultlocale())
             # logging data manipulation initialization
             log_dm = logger.Logger('REST-DM')
             self._log_dm = log_dm.get_logger()
