@@ -1132,10 +1132,10 @@ class DbHelper():
         """
         return self.__session.query(Device).filter_by(id=d_id).first()
 
-    def get_device_by_technology_and_address(self, techno_name, device_address):
+    def get_device_by_technology_and_address(self, techno_id, device_address):
         """
         Return a device by its technology and address
-        @param techno_name : technology name
+        @param techno_id : technology id
         @param device address : device address
         @return a device object
         """
@@ -1146,7 +1146,7 @@ class DbHelper():
         for device in device_list:
             device_type = self.__session.query(DeviceType).filter_by(id=device.device_type_id).first()
             device_tech = self.__session.query(DeviceTechnology).filter_by(id=device_type.device_technology_id).first()
-            if device_tech.name.lower() == ucode(techno_name.lower()):
+            if device_tech.id.lower() == ucode(techno_id.lower()):
                 return device
         return None
 
