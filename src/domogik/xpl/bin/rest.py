@@ -1071,7 +1071,7 @@ target=*
         json_data = JSonHelper("OK")
         json_data.set_data_type("stats")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        for data in self._db.list_last_n_stats_of_device_by_key(device_id, key, num):
+        for data in self._db.list_last_n_stats_of_device_by_key(key, device_id,  num):
             json_data.add_data(data)
         self.send_http_response_ok(json_data.get())
 
