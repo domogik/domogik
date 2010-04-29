@@ -65,9 +65,9 @@
                     function(data) {
                         var status = (data.status).toLowerCase();
                         if (status == 'ok') {
-                            $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "New account added" %} \'' + data.account[0].login + '\''});
+                            $.reloadPage({'status': 'ok', 'msg': '{% trans "New account added" %} \'' + data.account[0].login + '\''});
                         } else {
-                            $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Account not created" %} (' + data.description + ')'});
+                            $.notification({'status': 'error', 'msg': '{% trans "Account not created" %} (' + data.description + ')'});
                         }
                     }
                 );
@@ -84,9 +84,9 @@
                     function(data) {
                         var status = (data.status).toLowerCase();
                         if (status == 'ok') {
-                            $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "New person added" %} \'' + data.person[0].first_name + ' ' + data.person[0].last_name + '\''});
+                            $.reloadPage({'status': 'ok', 'msg': '{% trans "New person added" %} \'' + data.person[0].first_name + ' ' + data.person[0].last_name + '\''});
                         } else {
-                            $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Person not created" %} (' + data.description + ')'});
+                            $.notification({'status': 'error', 'msg': '{% trans "Person not created" %} (' + data.description + ')'});
                         }
                     }
                 );
@@ -125,9 +125,6 @@
     <h1 class="ident">
         <span class="title">{% trans page_title %}</span>
     </h1>
-    {% ifnotequal status "" %}
-    <div id='messages' class='{{status}}'>{{msg}}</div>
-    {% endifnotequal %}
 {% endblock %}
 
 {% block right %}
@@ -157,9 +154,9 @@
                                     function(data) {
                                         var status = (data.status).toLowerCase();
                                         if (status == 'ok') {
-                                            $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Account" %} \'' + data.account[0].login + '\' {% trans "successfully deleted" %}'});
+                                            $.reloadPage({'status': 'ok', 'msg': '{% trans "Account" %} \'' + data.account[0].login + '\' {% trans "successfully deleted" %}'});
                                         } else {
-                                            $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Account not deleted" %} (' + data.description + ')'});
+                                            $.notification({'status': 'error', 'msg': '{% trans "Account not deleted" %} (' + data.description + ')'});
                                         }
                                     }
                                 );
@@ -177,9 +174,9 @@
                                     function(data) {
                                         var status = (data.status).toLowerCase();
                                         if (status == 'ok') {
-                                            $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Account" %} \'' + data.account[0].login + '\' {% trans "successfully updated" %}'});
+                                            $.reloadPage({'status': 'ok', 'msg': '{% trans "Account" %} \'' + data.account[0].login + '\' {% trans "successfully updated" %}'});
                                         } else {
-                                            $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Account not updated" %} (' + data.description + ')'});
+                                            $.notification({'status': 'error', 'msg': '{% trans "Account not updated" %} (' + data.description + ')'});
                                         }
                                     }
                                 );
@@ -196,9 +193,9 @@
                                     function(data) {
                                         var status = (data.status).toLowerCase();
                                         if (status == 'ok') {
-                                            $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : ' + data.account[0].login + '\' {% trans "Password" %} {% trans "successfully updated" %}'});
+                                            $.reloadPage({'status': 'ok', 'msg': data.account[0].login + '\' {% trans "Password" %} {% trans "successfully updated" %}'});
                                         } else {
-                                            $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Password not updated" %} (' + data.description + ')'});
+                                            $.notification({'status': 'error', 'msg': '{% trans "Password not updated" %} (' + data.description + ')'});
                                         }
                                     }
                                 );
@@ -249,9 +246,9 @@
                                     function(data) {
                                         var status = (data.status).toLowerCase();
                                         if (status == 'ok') {
-                                            $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Person" %} \'' + data.person[0].first_name + ' ' + data.person[0].last_name + '\' {% trans "successfully deleted" %}'});
+                                            $.reloadPage({'status': 'ok', 'msg': '{% trans "Person" %} \'' + data.person[0].first_name + ' ' + data.person[0].last_name + '\' {% trans "successfully deleted" %}'});
                                         } else {
-                                            $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Person not deleted" %} (' + data.description + ')'});
+                                            $.notification({'status': 'error', 'msg': '{% trans "Person not deleted" %} (' + data.description + ')'});
                                         }
                                     }
                                 );
@@ -269,9 +266,9 @@
                                     function(data) {
                                         var status = (data.status).toLowerCase();
                                         if (status == 'ok') {
-                                            $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Person " %} \'' + data.person[0].first_name + ' ' + data.person[0].last_name + '\' updated'});
+                                            $.reloadPage({'status': 'ok', 'msg': '{% trans "Person " %} \'' + data.person[0].first_name + ' ' + data.person[0].last_name + '\' updated'});
                                         } else {
-                                            $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Person not updated" %} (' + data.description + ')'});
+                                            $.notification({'status': 'error', 'msg': '{% trans "Person not updated" %} (' + data.description + ')'});
                                         }
                                     }
                                 );

@@ -65,7 +65,7 @@
                             self.valid();
                         } else {
                             self.cancel();
-                            display_message('error', data.description);                                          
+                            $.notification('error', data.description);                                          
                         }
                     }
                 )
@@ -97,9 +97,9 @@
                     function(data) {
                         var status = (data.status).toLowerCase();
                         if (status == 'ok') {
-                            $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "New room added" %} \'' + data.room[0].name + '\''});                                   
+                            $.reloadPage({'status': 'ok', 'msg': '{% trans "New room added" %} \'' + data.room[0].name + '\''});                                   
                         } else {
-                            $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Room not created" %} (' + data.description + ')'});                                                                      
+                            $.notification({'status': 'error', 'msg': '{% trans "Room not created" %} (' + data.description + ')'});                                                                      
                         }
                     }
                 );
@@ -113,9 +113,6 @@
 
 {% block banner %}
     <h1 class="ident"><span class="title">{% trans "Rooms" %}</span></h1>
-    {% ifnotequal status "" %}
-    <div id='messages' class='{{status}}'>{{msg}}</div>
-    {% endifnotequal %}
 {% endblock %}
 
 {% block right %}
@@ -143,9 +140,9 @@
                                     function(data) {
                                         var status = (data.status).toLowerCase();
                                         if (status == 'ok') {
-                                            $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Room" %} \'' + data.room[0].name + '\' {% trans "successfully deleted" %}'});                                   
+                                            $.reloadPage({'status': 'ok', 'msg': '{% trans "Room" %} \'' + data.room[0].name + '\' {% trans "successfully deleted" %}'});                                   
                                         } else {
-                                            $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Room not deleted" %} (' + data.description + ')'});                                                                      
+                                            $.notification({'status': 'error', 'msg': '{% trans "Room not deleted" %} (' + data.description + ')'});                                                                      
                                         }
                                     }
                                 );
@@ -168,7 +165,7 @@
                                             $("#tab{{ room.id }}").addClass("icon16-room-" + icon);
                                         } else {
                                             self.cancel();
-                                            display_message('error', data.description);                                          
+                                            $.notification('error', data.description);                                          
                                         }
                                     }
                                 )
@@ -188,9 +185,9 @@
                                     function(data) {
                                         var status = (data.status).toLowerCase();
                                         if (status == 'ok') {
-                                            $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Room" %} \'' + data.room[0].name + '\' {% trans "successfully updated" %}'});                                   
+                                            $.reloadPage({'status': 'ok', 'msg': '{% trans "Room" %} \'' + data.room[0].name + '\' {% trans "successfully updated" %}'});                                   
                                         } else {
-                                            $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Room not updated" %} (' + data.description + ')'});                                                                      
+                                            $.notification({'status': 'error', 'msg': '{% trans "Room not updated" %} (' + data.description + ')'});                                                                      
                                         }
                                     }
                                 );
