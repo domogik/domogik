@@ -41,7 +41,7 @@ function start_django {
     if [ -z ${DJANGO_SERVER_PORT} ] ; then
         DJANGO_SERVER_PORT=8000
     fi
-    /bin/su - ${DOMOGIK_USER} -m -c "dmg_django runserver ${DJANGO_SERVER_IP}:${DJANGO_SERVER_PORT}>/dev/null 2>&1 &"
+    /bin/su - ${DOMOGIK_USER} -c "dmg_django runserver ${DJANGO_SERVER_IP}:${DJANGO_SERVER_PORT}>/dev/null 2>&1 &"
     if [ $? -gt 0 ]; then
         echo " An error occured during Django startup."
         exit 1
@@ -55,7 +55,7 @@ function start_xpl {
         exit 1
     fi
     echo -n "* Starting XPL..."
-    /bin/su - ${DOMOGIK_USER} -m -c "$(which xPL_Hub) -interface lo >/dev/null "
+    /bin/su - ${DOMOGIK_USER} -c "$(which xPL_Hub) -interface lo >/dev/null "
     if [ $? -gt 0 ]; then
         echo " An error occured during Xpl startup."
         exit 1
@@ -65,7 +65,7 @@ function start_xpl {
 }
 function start_manager {
     echo -n "* Starting Manager (with $MANAGER_PARAMS)..."
-    /bin/su - ${DOMOGIK_USER} -m -c "dmg_manager $MANAGER_PARAMS"
+    /bin/su - ${DOMOGIK_USER} -c "dmg_manager $MANAGER_PARAMS"
     if [ $? -gt 0 ]; then
         echo " An error occured during manager startup."
         exit 1
@@ -95,8 +95,8 @@ function stop_manager {
 }
 function stop_plugins {
     echo -n " * Stopping Plugins..."
-    /bin/su - ${DOMOGIK_USER} -m -c "dmg_send  xpl-cmnd domogik.system 'command=stop,plugin=*,host=$HOSTNAME'"
-    sleep 2          
+    /bin/su - ${DOMOGIK_USER} -c "dmg_send  xpl-cmnd domogik.system 'command=stop,plugin=*,host=$HOSTNAME'"
+    sleep 2
     for pid in `ps ax | egrep "domogik.*\.pyc$" | grep -v grep | awk '{print $1}'`; do
         kill -15 $pid 2>/dev/null 1>&2
     done
@@ -111,13 +111,13 @@ function check_lock_dir {
         chown ${DOMOGIK_USER}: $DIRECTORY
     fi
 }
-    
+
 case "$1" in
     start)
     check_lock_dir
     if [ $# -eq 1 ];then
         start_xpl
-        start_manager 
+        start_manager
         start_django
     else
         case "$2" in
@@ -132,14 +132,14 @@ case "$1" in
             ;;
         esac
     fi
-    
+
     ;;
     stop)
     if [ $# -eq 1 ];then
         stop_django
         stop_plugins
         stop_xpl
-        stop_manager 
+        stop_manager
     else
         case "$2" in
             django)
@@ -156,7 +156,7 @@ case "$1" in
             ;;
         esac
     fi
-    
+
     ;;
     restart)
     $0 stop $2
@@ -167,4 +167,3 @@ case "$1" in
     echo "usage: $0 {start|stop|restart} [(django|xpl|manager|plugins)]"
 esac
 exit 0
-
