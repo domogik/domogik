@@ -751,9 +751,9 @@ class DeviceTestCase(GenericTestCase):
                                      d_type_id=dty2.id, d_usage_id=du1.id, d_description='Laden')
         device3 = self.db.add_device(d_name='Mixer', d_address='A2',
                                      d_type_id=dty2.id, d_usage_id=du1.id, d_description='Moulinex')
-        search_dev1 = self.db.get_device_by_technology_and_address(dt1.name, 'A1')
+        search_dev1 = self.db.get_device_by_technology_and_address(dt1.id, 'A1')
         assert search_dev1.name == 'Toaster'
-        search_dev2 = self.db.get_device_by_technology_and_address(dt1.name, 'A2')
+        search_dev2 = self.db.get_device_by_technology_and_address(dt1.id, 'A2')
         assert search_dev2 == None
 
     def test_update(self):
