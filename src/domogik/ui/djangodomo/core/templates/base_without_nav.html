@@ -30,18 +30,25 @@
 <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui.general.css" rel="stylesheet" type="text/css" />
 <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/layout.without_nav.css" rel="stylesheet" type="text/css" />
 <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-icons.css" rel="stylesheet" type="text/css" />
+<link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.notifications.css" rel="stylesheet" type="text/css" />
 {% block global_css %}{% endblock %}
 {% block css %}{% endblock %}
 <script type="text/javascript" src="/design/js/jquery-1.4.2.min.js"></script>
 <script type="text/javascript" src="/design/js/jquery-ui-1.8.custom.min.js"></script>
 <script type="text/javascript" src="/design/js/jquery.qtip-1.0.0-rc3.min.js"></script>
+<script type="text/javascript" src="/design/js/jquery.jgrowl_minimized.js"></script>
 <script type="text/javascript" src="/design/js/main.js"></script>
 <script type="text/javascript" src="/design/js/rest.js"></script>
+<script type="text/javascript" src="/design/js/dmg.notifications.js"></script>
+
 {% block global_js_include %}{% endblock %}
 {% block js_include %}{% endblock %}
 <script type="text/javascript">
     // <![CDATA[
     {% block js_script %}{% endblock %}
+    {% ifnotequal status "" %}
+    	$.notification("{{status}}", "{{msg}}");
+    {% endifnotequal %}   
     // ]]>
 </script>
 <title>{% block title %}Domogik{% endblock %}</title>

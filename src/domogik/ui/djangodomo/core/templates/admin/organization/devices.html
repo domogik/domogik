@@ -111,9 +111,9 @@
                     function(data) {
                         var status = (data.status).toLowerCase();
                         if (status == 'ok') {
-                            $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "New device added" %} \'' + data.device[0].name + '\''});                                   
+                            $.reloadPage({'status': 'ok', 'msg': '{% trans "New device added" %} \'' + data.device[0].name + '\''});                                   
                         } else {
-                            $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "device not created" %} (' + data.description + ')'});                                                                      
+                            $.notification({'status': 'error', 'msg': '{% trans "device not created" %} (' + data.description + ')'});                                                                      
                         }
                     }
                 );
@@ -125,9 +125,6 @@
 
 {% block banner %}
     <h1 class="ident"><span class="title">{% trans "Devices" %}</span></h1>
-    {% ifnotequal status "" %}
-    <div id='messages' class='{{status}}'>{{msg}}</div>
-    {% endifnotequal %}
 {% endblock %}
 
 {% block right %}
@@ -171,9 +168,9 @@
                                         function(data) {
                                             var status = (data.status).toLowerCase();
                                             if (status == 'ok') {
-                                                $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Device" %}\'' + data.device[0].name + '\' {% trans "successfully deleted" %}'});
+                                                $.reloadPage({'status': 'ok', 'msg': '{% trans "Device" %}\'' + data.device[0].name + '\' {% trans "successfully deleted" %}'});
                                             } else {
-                                                $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Device not deleted" %} (' + data.description + ')'});
+                                                $.notification({'status': 'error', 'msg': '{% trans "Device not deleted" %} (' + data.description + ')'});
                                             }
                                         }
                                     );
@@ -191,9 +188,9 @@
                                         function(data) {
                                             var status = (data.status).toLowerCase();
                                             if (status == 'ok') {
-                                                $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Device" %} \'' + data.device[0].name + '\' {% trans "successfully updated" %}'});
+                                                $.reloadPage({'status': 'ok', 'msg': '{% trans "Device" %} \'' + data.device[0].name + '\' {% trans "successfully updated" %}'});
                                             } else {
-                                                $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Device not updated" %} (' + data.description + ')'});
+                                                $.notification({'status': 'error', 'msg': '{% trans "Device not updated" %} (' + data.description + ')'});
                                             }
                                         }
                                     );

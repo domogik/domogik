@@ -73,7 +73,7 @@
                             self.valid();
                         } else {
                             self.cancel();
-                            display_message('error', data.description);                                          
+                            $.notification('error', data.description);                                          
                         }
                     }
                 );
@@ -100,13 +100,13 @@
                                         self.valid();
                                     } else {
                                         self.cancel();
-                                        display_message('error', data.description);                                          
+                                        $.notification('error', data.description);                                          
                                     }
                                 }
                             );
                         } else {
                             self.cancel();
-                            display_message('error', data.description);                                          
+                            $.notification('error', data.description);                                          
                         }
                     }
                 );
@@ -119,9 +119,6 @@
 
 {% block banner %}
     <h1 class="ident"><span class="title">{% trans page_title %}</span></h1>
-    {% ifnotequal status "" %}
-    <div id='messages' class='{{status}}'>{{msg}}</div>
-    {% endifnotequal %}
 {% endblock %}
 
 {% block right %}

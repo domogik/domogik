@@ -33,9 +33,9 @@ $(function(){
                 function(data) {
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
-                        $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Plugin" %}\'{{ plugin.name }}\' {% trans "successfully stopped" %}'});
+                        $.reloadPage({'status': 'ok', 'msg': '{% trans "Plugin" %}\'{{ plugin.name }}\' {% trans "successfully stopped" %}'});
                     } else {
-                        $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Plugin not stopped" %} (' + data.description + ')'});
+                        $.notification({'status': 'error', 'msg': '{% trans "Plugin not stopped" %} (' + data.description + ')'});
                     }
                 }
             );
@@ -47,9 +47,9 @@ $(function(){
                 function(data) {
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
-                        $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Plugin" %}\'{{ plugin.name }}\' {% trans "successfully started" %}'});
+                        $.reloadPage({'status': 'ok', 'msg': '{% trans "Plugin" %}\'{{ plugin.name }}\' {% trans "successfully started" %}'});
                     } else {
-                        $.reloadPage({'status': 'error', 'msg': '{% trans "Error" %} : {% trans "Plugin not started" %} (' + data.description + ')'});
+                        $.notification({'status': 'error', 'msg': '{% trans "Plugin not started" %} (' + data.description + ')'});
                     }
                 }
             );
@@ -66,10 +66,10 @@ $(function(){
             function(data) {
                 var status = (data.status).toLowerCase();
                 if (status == 'ok') {
-                    $.reloadPage({'status': 'ok', 'msg': '{% trans "Success" %} : {% trans "Configuration deleted" %}'});
+                    $.reloadPage({'status': 'ok', 'msg': '{% trans "Configuration deleted" %}'});
                 } else {
                     /* Error */
-                    display_message(data.status, data.description);
+                    $.notification(data.status, data.description);
                 }
             }
         );
@@ -92,12 +92,12 @@ $(function(){
                         $('#value_' + item.key).attr('class', 'medium icon16-status-true');
                         itemSaved++;
                         if (itemSaved == configuration.length) { // All saved without error
-                            display_message('OK', "Configuration saved successfully");
+                            $.notification('ok', "Configuration saved successfully");
                         }
                     } else {
                         // Error
                         $('#value_' + item.key).attr('class', 'medium icon16-status-false');
-                        display_message(data.status, data.description);
+                        $.notification(data.status, data.description);
                     }
                 }
             );
@@ -142,7 +142,7 @@ $(function(){
                                 });
                             } else {
                                 /* Error retreving plugin item config */
-                                display_message(data.status, data.description);
+                                $.notification(data.status, data.description);
                             }
                         }
                     );
@@ -154,11 +154,11 @@ $(function(){
                         if (status == 'ok') {
                             var never_configured = num_items - data.config.length;
                             if (never_configured > 0) {
-                                display_message('WARNING', never_configured + " item(s) not configured yet");                                            
+                                $.notification('warning', never_configured + " item(s) not configured yet");                                            
                             }
                         } else {
                             /* Error retreving plugin config */
-                            display_message(data.status, data.description);
+                            $.notification(data.status, data.description);
                         }
                     });
                 $("#configuration").append("<p><button id='configurationsubmit' class='button icon16-action-save'>{% trans "Save" %}</button></p>");
@@ -168,7 +168,7 @@ $(function(){
                 });
             } else {
                 /* Error to get plugin default config */
-                display_message(data.status, data.description);
+                $.notification(data.status, data.description);
             }
         }
     );
@@ -191,9 +191,6 @@ $(function(){
         <br />
         <span class="subtitle">{{ plugin.description }}</span>
     </h1>
-    {% ifnotequal status "" %}
-    <div id='messages' class='{{status}}'>{{msg}}</div>
-    {% endifnotequal %}
 {% endblock %}
 
 {% block right %}
