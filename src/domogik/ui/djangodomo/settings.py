@@ -69,10 +69,23 @@ try:
     conf_rest = dict(config_rest[1])
     REST_IP = conf_rest['rest_server_ip']
     REST_PORT = conf_rest['rest_server_port']
+    REST_PREFIX = conf_rest['rest_server_prefix']
+    if ('rest_server_prefix' in conf_rest) and (conf_rest['rest_server_prefix'] != ''): 
+        REST_PREFIX = conf_rest['rest_server_prefix']
+        REST_URL = "http://" + REST_IP + ":" + REST_PORT + "/" + REST_PREFIX
+    else: 
+        REST_PREFIX = ''
+        REST_URL = "http://" + REST_IP + ":" + REST_PORT
+
 except KeyError:
     # default parameters
     REST_IP = "127.0.0.1"
     REST_PORT = "8080"
+    REST_PREFIX = ''
+    REST_URL = "http://" + REST_IP + ":" + REST_PORT
+
+print "using REST url : " + REST_URL
+
 PROXY_DOMAIN = REST_IP
 PROXY_PORT = int(REST_PORT)
 

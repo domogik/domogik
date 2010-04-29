@@ -38,6 +38,7 @@ from django.http import QueryDict
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 
 from domogik.common import database
 from djangodomo.core.models import Areas, Rooms, Devices, DeviceUsages, DeviceTechnologies, DeviceTypes, \
@@ -63,6 +64,7 @@ def __go_to_page(request, html_page, page_title, **attribute_list):
     """
     response_attr_list = {}
     response_attr_list['page_title'] = page_title
+    response_attr_list['rest_url'] = settings.REST_URL
     response_attr_list['sys_config'] = __db.get_system_config()
     response_attr_list['is_user_connected'] = __is_user_connected(request)
     for attribute in attribute_list:

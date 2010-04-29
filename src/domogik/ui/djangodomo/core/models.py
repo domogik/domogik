@@ -39,13 +39,9 @@ from domogik.common.configloader import Loader
 from django.conf import settings
 
 import dmg_pipes as pipes
-
-rest_url = "http://" + settings.REST_IP + ":" + settings.REST_PORT
-    
-print "using REST url : " + rest_url
     
 class Areas(pipes.DmgPipe):
-    uri = rest_url + "/base/area"
+    uri = settings.REST_URL + "/base/area"
 
     @staticmethod
     def get_all():
@@ -85,7 +81,7 @@ class Areas(pipes.DmgPipe):
             area.feature_association = associations.feature_association
 
 class Rooms(pipes.DmgPipe):
-    uri = rest_url + "/base/room"
+    uri = settings.REST_URL + "/base/room"
 
     @staticmethod
     def get_all():
@@ -131,7 +127,7 @@ class Rooms(pipes.DmgPipe):
             room.feature_association = associations.feature_association
 
 class Devices(pipes.DmgPipe):
-    uri = rest_url + "/base/device"
+    uri = settings.REST_URL + "/base/device"
 
     @staticmethod
     def get_all():
@@ -159,7 +155,7 @@ class Devices(pipes.DmgPipe):
                         feature.association = association
 
 class DeviceTechnologies(pipes.DmgPipe):
-    uri = rest_url + "/base/device_technology"
+    uri = settings.REST_URL + "/base/device_technology"
 
     @staticmethod
     def get_all():
@@ -168,7 +164,7 @@ class DeviceTechnologies(pipes.DmgPipe):
             return resp
 
 class DeviceTypes(pipes.DmgPipe):
-    uri = rest_url + "/base/device_type"
+    uri = settings.REST_URL + "/base/device_type"
     _dict = None
     
     @staticmethod
@@ -195,7 +191,7 @@ class DeviceTypes(pipes.DmgPipe):
         return dict[key]
 
 class DeviceUsages(pipes.DmgPipe):
-    uri = rest_url + "/base/device_usage"
+    uri = settings.REST_URL + "/base/device_usage"
     _dict = None
 
     @staticmethod
@@ -222,7 +218,7 @@ class DeviceUsages(pipes.DmgPipe):
         return dict[key]
 
 class DeviceFeatures(pipes.DmgPipe):
-    uri = rest_url + "/base/device_type_feature"
+    uri = settings.REST_URL + "/base/device_type_feature"
 
     @staticmethod
     def get_by_type(type_id):
@@ -231,7 +227,7 @@ class DeviceFeatures(pipes.DmgPipe):
             return resp
 
 class FeatureAssociations(pipes.DmgPipe):
-    uri = rest_url + "/base/feature_association"
+    uri = settings.REST_URL + "/base/feature_association"
 
     @staticmethod
     def get_by_house():
@@ -258,7 +254,7 @@ class FeatureAssociations(pipes.DmgPipe):
             return resp
     
 class UIConfigs(pipes.DmgPipe):
-    uri = rest_url + "/base/ui_config"
+    uri = settings.REST_URL + "/base/ui_config"
 
     @staticmethod
     def get_by_key(name, key):
@@ -282,7 +278,7 @@ class UIConfigs(pipes.DmgPipe):
             return resp
 
 class Plugins(pipes.DmgPipe):
-    uri = rest_url + "/plugin"
+    uri = settings.REST_URL + "/plugin"
 
     @staticmethod
     def get_all():
@@ -303,7 +299,7 @@ class Plugins(pipes.DmgPipe):
             return resp
 
 class Accounts(pipes.DmgPipe):
-    uri = rest_url + "/account"
+    uri = settings.REST_URL + "/account"
 
     @staticmethod
     def auth(login, password):
@@ -324,7 +320,7 @@ class Accounts(pipes.DmgPipe):
             return resp
 
 class Stats(pipes.DmgPipe):
-    uri = rest_url + "/stats"
+    uri = settings.REST_URL + "/stats"
 
     @staticmethod
     def get_latest(id, key):

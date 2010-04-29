@@ -60,8 +60,6 @@ $.extend({
     },
 
     getREST: function(parameters, callback) {
-        var rest_url = "/rest";  
-
         // Build the REST url
         $.each(parameters, function(){
             rest_url += '/' + encodeURIComponent(this);     
@@ -70,12 +68,12 @@ $.extend({
         $.ajax({
             type: "GET",
             url: rest_url,
-            dataType: "json",
+            dataType: "jsonp",
             success:
                 callback,
             error:
                 function(XMLHttpRequest, textStatus, errorThrown) {
-                    //$.reloadPage({'status': 'error', 'msg': 'REST Error : ' + XMLHttpRequest.readyState + ' ' + XMLHttpRequest.status + ' ' + textStatus + ' ' + errorThrown});
+                    $.notification({'status': 'error', 'msg': XMLHttpRequest.readyState + ' ' + XMLHttpRequest.status + ' ' + textStatus + ' ' + errorThrown});
                 }
         });
     }

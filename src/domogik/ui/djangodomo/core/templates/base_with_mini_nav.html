@@ -34,6 +34,9 @@
 <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.notifications.css" rel="stylesheet" type="text/css" />
 {% block global_css %}{% endblock %}
 {% block css %}{% endblock %}
+<script type="text/javascript">  
+    var rest_url = "{{ rest_url }}"; 
+</script> 
 <script type="text/javascript" src="/design/js/jquery-1.4.2.min.js"></script>
 <script type="text/javascript" src="/design/js/jquery-ui-1.8.custom.min.js"></script>
 <script type="text/javascript" src="/design/js/jquery.qtip-1.0.0-rc3.min.js"></script>

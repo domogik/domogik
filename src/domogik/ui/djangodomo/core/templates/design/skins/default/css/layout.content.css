@@ -31,7 +31,7 @@ header#contentheader {
 }
 
 header#contentheader .ident {
-    margin:0;
+    margin:0;   
     padding:0 0 0 70px;
     background-position:top left;
     background-repeat:no-repeat;
