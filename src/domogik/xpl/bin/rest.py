@@ -1089,11 +1089,10 @@ target=*
         print "from=%s" % st_from
         print "to=%s" % st_to
 
-        # TODO
         json_data = JSonHelper("OK")
         json_data.set_data_type("stats")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        for data in self._db.list_stats_of_device_between_by_key(device_id, key, st_from, st_to):
+        for data in self._db.list_stats_of_device_between_by_key(key, device_id, st_from, st_to):
             json_data.add_data(data)
         self.send_http_response_ok(json_data.get())
     
