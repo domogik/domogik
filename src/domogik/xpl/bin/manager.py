@@ -67,30 +67,30 @@ class SysManager(xPLPlugin):
         Init manager and start listeners
         '''
 
+        # Check parameters 
+        parser = OptionParser()
+        parser.add_option("-d", action="store_true", dest="start_dbmgr", default=False, \
+                help="Start database manager if not already running.")
+        parser.add_option("-r", action="store_true", dest="start_rest", default=False, \
+                help="Start REST interface manager if not already running.")
+        parser.add_option("-s", action="store_true", dest="start_stat", default=False, \
+            help="Start statistics manager if not already running.")
+        parser.add_option("-t", action="store_true", dest="start_trigger", default=False, \
+            help="Start scenario manager if not already running.")
+        xPLPlugin.__init__(self, name = 'sysmgr', parser=parser)
+
+        # Logger init
+        self._log = self.get_my_logger()
+        self._log.debug("Init system manager")
+        self._log.debug("Host : %s" % gethostname())
+    
+        # Get config
+        cfg = Loader('domogik')
+        config = cfg.load()
+        conf = dict(config[1])
+        self._pid_dir_path = conf['pid_dir_path']
+    
         try:
-            # Check parameters 
-            parser = OptionParser()
-            parser.add_option("-d", action="store_true", dest="start_dbmgr", default=False, \
-                    help="Start database manager if not already running.")
-            parser.add_option("-r", action="store_true", dest="start_rest", default=False, \
-                    help="Start REST interface manager if not already running.")
-            parser.add_option("-s", action="store_true", dest="start_stat", default=False, \
-                help="Start statistics manager if not already running.")
-            parser.add_option("-t", action="store_true", dest="start_trigger", default=False, \
-                help="Start scenario manager if not already running.")
-            xPLPlugin.__init__(self, name = 'sysmgr', parser=parser)
-    
-            # Logger init
-            self._log = self.get_my_logger()
-            self._log.debug("Init system manager")
-            self._log.debug("Host : %s" % gethostname())
-    
-            # Get config
-            cfg = Loader('domogik')
-            config = cfg.load()
-            conf = dict(config[1])
-            self._pid_dir_path = conf['pid_dir_path']
-    
             # Get components
             self._list_components(gethostname())
     
