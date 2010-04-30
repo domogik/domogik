@@ -4,7 +4,7 @@
     $.extend({
         notification: function(status, msg) {
             var header = null;
-            var theme = status.toLowerCase();;
+            var theme = status;
             var sticky = false;
             switch (theme) {
                 case 'ok':

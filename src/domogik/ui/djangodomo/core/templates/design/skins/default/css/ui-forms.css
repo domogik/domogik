@@ -2,7 +2,6 @@
 /* CSS Document */
 
 label {
-    font-weight:bold;
     display:block;
     height:1.6em;
     line-height:1.6em;
@@ -12,8 +11,8 @@ label.inline {
     display:inline-block;
 }
 
-label.medium {
-    width: 10em;
+label.required {
+    font-weight:bold;    
 }
 
 input[type='text'] {
@@ -54,4 +53,12 @@ fieldset {
     border:1px solid #999;
     -moz-border-radius: 0.4em;
     -webkit-border-radius: 0.4em;
+}
+
+input[type='text'].required {
+    border:2px solid #000000;
+}
+
+input[type='text'].state-error {
+    border:2px solid #991A1A;    
 }

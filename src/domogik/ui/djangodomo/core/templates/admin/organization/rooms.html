@@ -79,11 +79,11 @@
         });
         
         $('#roomdialog').dialog_form({
-            tips: "{% trans "All fields are required." %}",
+            tips: "{% trans "Room name is required." %}",
             tipsid: 'tipsRoom',
             fields: [
                 {name : 'roomname', type:'text', label:'Name', required: true, option: {min: 1, max: 80}},
-                {name : 'roomdescription', type:'text', label:'Description', required: true, option: {min: 1, max: 80}}
+                {name : 'roomdescription', type:'text', label:'Description', required: false, option: {min: 1, max: 80}}
             ]
         });
         

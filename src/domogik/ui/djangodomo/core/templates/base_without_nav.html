@@ -49,9 +49,11 @@
 <script type="text/javascript">
     // <![CDATA[
     {% block js_script %}{% endblock %}
-    {% ifnotequal status "" %}
-    	$.notification("{{status}}", "{{msg}}");
-    {% endifnotequal %}   
+    {% if status %}
+        $(function(){ 
+        	$.notification("{{status}}", "{{msg}}");
+        });
+    {% endif %}   
     // ]]>
 </script>
 <title>{% block title %}Domogik{% endblock %}</title>

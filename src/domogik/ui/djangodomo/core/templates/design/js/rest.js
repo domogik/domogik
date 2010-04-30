@@ -60,14 +60,15 @@ $.extend({
     },
 
     getREST: function(parameters, callback) {
+        url = rest_url + '/';
         // Build the REST url
         $.each(parameters, function(){
-            rest_url += '/' + encodeURIComponent(this);     
+            url += encodeURIComponent(this) + '/';     
         });
         
         $.ajax({
             type: "GET",
-            url: rest_url,
+            url: url,
             dataType: "jsonp",
             success:
                 callback,

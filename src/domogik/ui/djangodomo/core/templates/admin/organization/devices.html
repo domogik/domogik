@@ -49,13 +49,13 @@
         });
 
         $('#adddevicedialog').dialog_form({
-            tips: "{% trans "All fields are required." %}",
+            tips: "{% trans "All fields in bold are required." %}",
             tipsid: 'tipsAddDevice',
             fields: [
                 {name : 'adddevicename', type:'text', label:'Name', required: true, option: {min: 1, max: 80}},
-                {name : 'adddevicedescription', type:'text', label:'Description', required: true, option: {min: 1, max: 80}},
+                {name : 'adddevicedescription', type:'text', label:'Description', required: false, option: {min: 1, max: 80}},
                 {name : 'adddeviceaddress', type:'text', label:'Address', required: true, option: {min: 1, max: 80}},
-                {name : 'adddevicereference', type:'text', label:'Reference', required: true, option: {min: 1, max: 80}},
+                {name : 'adddevicereference', type:'text', label:'Reference', required: false, option: {min: 1, max: 80}},
                 {name : 'adddeviceusage', type:'select', label:'Usage', required: true, option: {
                     initial: {value:'0', label:'Choose a usage'},
                     options: [
@@ -83,13 +83,13 @@
         });
 
         $('#upddevicedialog').dialog_form({
-            tips: "{% trans "All fields are required." %}",
+            tips: "{% trans "All fields in bold are required." %}",
             tipsid: 'tipsUpdDevice',
             fields: [
                 {name : 'upddevicename', type:'text', label:'Name', required: true, option: {min: 1, max: 80}},
-                {name : 'upddevicedescription', type:'text', label:'Description', required: true, option: {min: 1, max: 80}},
+                {name : 'upddevicedescription', type:'text', label:'Description', required: false, option: {min: 1, max: 80}},
                 {name : 'upddeviceaddress', type:'text', label:'Address', required: true, option: {min: 1, max: 80}},
-                {name : 'upddevicereference', type:'text', label:'Reference', required: true, option: {min: 1, max: 80}},
+                {name : 'upddevicereference', type:'text', label:'Reference', required: false, option: {min: 1, max: 80}},
                 {name : 'upddeviceusage', type:'select', label:'Usage', required: true, option: {
                     initial: {value:'0', label:'Choose a usage'},
                     options: [
@@ -106,6 +106,7 @@
             title: "{% trans "Add new device" %}",
             button: "#addDialogButton",
             onok: function(values) {
+                var self = this;
                 // Submit form
                 $.getREST(['base', 'device', 'add', 'name', values.adddevicename, 'address', values.adddeviceaddress, 'type_id', values.adddevicetype, 'usage_id', values.adddeviceusage, 'description', values.adddevicedescription, 'reference', values.adddevicereference],
                     function(data) {

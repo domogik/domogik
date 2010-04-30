@@ -46,11 +46,11 @@
         });
         
         $('#areadialog').dialog_form({
-            tips: "{% trans "All fields are required." %}",
+            tips: "{% trans "Area name is required." %}",
             tipsid: 'tipsArea',
             fields: [
                 {name : 'areaname', type:'text', label:'Name', required: true, option: {min: 1, max: 80}},
-                {name : 'areadescription', type:'text', label:'Description', required: true, option: {min: 1, max: 80}}
+                {name : 'areadescription', type:'text', label:'Description', required: false, option: {min: 1, max: 80}}
             ]
         });
 
