@@ -3050,7 +3050,7 @@ target=*
     def rest_queuecontent_display(self, my_queue):
         # Queue size
         queue_size = my_queue.qsize()
-        queue_data = "{{'size' : %s}, [" % queue_size
+        queue_data = '{{"size" : %s}, [' % queue_size
 
         # Queue elements
         if queue_size > 0:
@@ -3060,7 +3060,7 @@ target=*
                 # Queue content
                 elt_time, elt_data = my_queue.get_nowait()
                 my_queue.put((elt_time, elt_data))
-                queue_data += "{'time' : %s, 'message' : '%s'}," % (time.ctime(elt_time), elt_data)
+                queue_data += '{"time" : %s, "message" : "%s"},' % (time.ctime(elt_time), elt_data)
 
         queue_data = queue_data[0:len(queue_data)-1]
         queue_data += "]}"
