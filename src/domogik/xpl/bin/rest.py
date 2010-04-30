@@ -3078,7 +3078,7 @@ target=*
         self._log.debug("Testing long poll action")
         num = random.randint(1, 15)
         time.sleep(num)
-        self.send_http_response_ok("{'number' : %s}" % str(num))
+        self.send_http_response_ok('{"number" : %s}' % str(num))
 
 
 
