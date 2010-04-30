@@ -739,6 +739,8 @@ class ProcessRequest():
             self.rest_plugin()
         elif self.rest_type == "account":
             self.rest_account()
+        elif self.rest_type == "queuecontent":
+            self.rest_queuecontent()
         elif self.rest_type == "testlongpoll":
             self.rest_testlongpoll()
         elif self.rest_type == None:
@@ -3016,6 +3018,55 @@ target=*
 
 
 
+
+
+
+######
+# /queeucontent processing
+######
+
+    def rest_queuecontent(self):
+        self._log.debug("Display queue content")
+        
+        # Check url length
+        if len(self.rest_request) != 1:
+            self.send_http_response_error(999, "Bad url", self.jsonp, self.jsonp_cb)
+            return
+
+        if self.rest_request[0] == "system_list":
+            self.rest_queuecontent_display(self._queue_system_list)
+        elif self.rest_request[0] == "system_detail":
+            self.rest_queuecontent_display(self._queue_system_detail)
+        elif self.rest_request[0] == "system_start":
+            self.rest_queuecontent_display(self._queue_system_start)
+        elif self.rest_request[0] == "system_stop":
+            self.rest_queuecontent_display(self._queue_system_stop)
+        elif self.rest_request[0] == "command":
+            self.rest_queuecontent_display(self._queue_command)
+        elif self.rest_request[0] == "event":
+            self.rest_queuecontent_display(self._queue_event)
+
+
+    def rest_queuecontent_display(self, my_queue):
+        # Queue size
+        queue_size = my_queue.qsize()
+        queue_data = "{{'size' : %s}, [" % queue_size
+
+        # Queue elements
+        if queue_size > 0:
+            idx = 0
+            while idx < queue_size:
+                idx += 1
+                # Queue content
+                elt_time, elt_data = my_queue.get_nowait()
+                my_queue.put((elt_time, elt_data))
+                queue_data += "{'time' : %s, 'message' : '%s'}," % (time.ctime(elt_time), elt_data)
+
+        queue_data = queue_data[0:len(queue_data)-1]
+        queue_data += "]}"
+
+        # Send result
+        self.send_http_response_ok(queue_data)
 
 
 
