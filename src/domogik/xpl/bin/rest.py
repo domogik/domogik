@@ -61,6 +61,7 @@ from OpenSSL import SSL
 import SocketServer
 import os
 import glob
+import random
 
 
 
@@ -738,6 +739,8 @@ class ProcessRequest():
             self.rest_plugin()
         elif self.rest_type == "account":
             self.rest_account()
+        elif self.rest_type == "testlongpoll":
+            self.rest_testlongpoll()
         elif self.rest_type == None:
             self.rest_status()
         else:
@@ -3011,6 +3014,20 @@ target=*
 
 
 
+
+
+
+
+
+######
+# /testlongpol processing
+######
+
+    def rest_testlongpoll(self):
+        self._log.debug("Testing long poll action")
+        num = random.randint(1, 15)
+        time.sleep(num)
+        self.send_http_response_ok("{'number' : %s}" % str(num))
 
 
 
