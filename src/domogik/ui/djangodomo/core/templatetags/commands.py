@@ -28,7 +28,7 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
 from django import template
 from django.template import Node
-from djangodomo.core.models import DeviceTypes, DeviceUsages, Stats
+from domogik.ui.djangodomo.core.models import DeviceTypes, DeviceUsages, Stats
 from htmlentitydefs import name2codepoint
 import re
 import simplejson

@@ -41,10 +41,10 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
 from domogik.common import database
-from djangodomo.core.models import Areas, Rooms, Devices, DeviceUsages, DeviceTechnologies, DeviceTypes, \
+from domogik.ui.djangodomo.core.models import Areas, Rooms, Devices, DeviceUsages, DeviceTechnologies, DeviceTypes, \
                                    DeviceFeatures, FeatureAssociations, UIConfigs, Plugins, Accounts
 
-from djangodomo.core.sample_data_helper import SampleDataHelper
+from domogik.ui.djangodomo.core.sample_data_helper import SampleDataHelper
 
 from django_pipes.exceptions import ResourceNotAvailableException
 

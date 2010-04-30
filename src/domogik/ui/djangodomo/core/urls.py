@@ -37,7 +37,7 @@ Implements
 from django.conf.urls.defaults import *
 
 
-urlpatterns = patterns('djangodomo.core.views',
+urlpatterns = patterns('domogik.ui.djangodomo.core.views',
     url(r'^$', 'index', name="index_view"),
 
     url(r'login/$', 'login', name='login_view'),
