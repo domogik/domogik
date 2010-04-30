@@ -64,14 +64,14 @@ DATABASE_PORT = ''          # Set to empty string for default.
 
 ### Proxy settings
 try:
-    cfg_rest = Loader('rest')
-    config_rest = cfg_rest.load()
-    conf_rest = dict(config_rest[1])
-    REST_IP = conf_rest['rest_server_ip']
-    REST_PORT = conf_rest['rest_server_port']
-    REST_PREFIX = conf_rest['rest_server_prefix']
-    if ('rest_server_prefix' in conf_rest) and (conf_rest['rest_server_prefix'] != ''): 
-        REST_PREFIX = conf_rest['rest_server_prefix']
+    cfg_rest = Loader('django')
+    config_django = cfg_rest.load()
+    conf_django = dict(config_django[1])
+    REST_IP = conf_django['django_rest_server_ip']
+    REST_PORT = conf_django['django_rest_server_port']
+    REST_PREFIX = conf_django['django_rest_server_prefix']
+    if ('django_rest_server_prefix' in conf_django) and (conf_django['django_rest_server_prefix'] != ''): 
+        REST_PREFIX = conf_django['django_rest_server_prefix']
         REST_URL = "http://" + REST_IP + ":" + REST_PORT + "/" + REST_PREFIX
     else: 
         REST_PREFIX = ''
@@ -161,7 +161,6 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.admin',
     'django_pipes',
-    'httpproxy',
     'djangodomo.core',
 )
 

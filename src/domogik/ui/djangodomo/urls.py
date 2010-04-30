@@ -56,7 +56,3 @@ urlpatterns = patterns('',
         {'document_root': settings.STATIC_DOC_ROOT}),
 )
 
-# http proxy
-urlpatterns += patterns('',
-    (r'^rest/(?P<url>.*)$', 'httpproxy.views.proxy'),
-)
