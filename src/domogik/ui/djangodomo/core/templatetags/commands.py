@@ -246,8 +246,12 @@ class GetInfoWidget(Node):
         feature = self.feature.resolve(context)
         device_type = DeviceTypes.get_dict_item(feature.device.device_type_id)
         device_usage = DeviceUsages.get_dict_item(feature.device.device_usage_id)
-        parameters_type = simplejson.loads(unescape(feature.device_type_feature.parameters))
-        parameters_usage = simplejson.loads(unescape(device_usage.default_options))
+        parameters_type = None;
+        if feature.device_type_feature.parameters != 'None':
+            parameters_type = simplejson.loads(unescape(feature.device_type_feature.parameters))
+        parameters_usage = None;
+        if device_usage.default_options != 'None':
+            parameters_usage = simplejson.loads(unescape(device_usage.default_options))
         if feature.device_type_feature.value_type == "number":
             script = GetInfoNumber.get_widget(feature, device_type, device_usage, parameters_type, parameters_usage)
         if feature.device_type_feature.value_type == "string":
