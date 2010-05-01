@@ -26,8 +26,13 @@
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-page-section.css" rel="stylesheet" type="text/css" />
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/page-home.css" rel="stylesheet" type="text/css" />
 {% endblock %}
-{% block include_js_script %}
+{% block js_include %}
     <script type="text/javascript" src="/design/js/page-home.js"></script>
+{% endblock %}
+{% block js_script %}
+    $(function(){
+//        $.longPoll();
+    });
 {% endblock %}
 {% block content %}
     <header id="contentheader">

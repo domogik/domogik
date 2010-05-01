@@ -67,6 +67,7 @@ $.extend({
         });
         
         $.ajax({
+            cache: false,
             type: "GET",
             url: url,
             dataType: "jsonp",
@@ -76,6 +77,30 @@ $.extend({
                 function(XMLHttpRequest, textStatus, errorThrown) {
                     $.notification({'status': 'error', 'msg': XMLHttpRequest.readyState + ' ' + XMLHttpRequest.status + ' ' + textStatus + ' ' + errorThrown});
                 }
+        });
+    },
+
+    longPoll: function(d) {
+        url = rest_url + '/';
+        if (data && data.number) {
+            console.debug(data.number);
+        }
+
+        $.ajax({
+            cache: false,
+            type: "GET",
+            url: url + 'testlongpoll',
+            dataType: "jsonp",
+            error: function () {
+                transmission_errors += 1;
+                setTimeout(longPoll, 10*1000);
+            },
+            success: function (data) {
+                setTimeout(function () {
+                transmission_errors = 0;
+                longPoll(data);
+                }, 100);
+            }
         });
     }
 });
