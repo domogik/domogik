@@ -176,10 +176,12 @@ class GetInfoNumber():
     def get_widget(feature, device_type, device_usage, parameters_type, parameters_usage):
         script = """$("#widget_%s_%s").number_info_widget({
                             usage: %s,
-                            unit: '%s'
+                            unit: '%s',
+                            deviceid: %s,
+                            key: '%s'
                         });
                  """ % (feature.device_id, feature.device_type_feature_id, feature.device.device_usage_id,
-                           parameters_type['unit'])
+                           parameters_type['unit'], feature.device_id, feature.device_type_feature.stat_key)
         return script
 
     @staticmethod

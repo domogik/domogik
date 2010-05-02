@@ -4,11 +4,6 @@
     background-color:#FFFFFF;
 }
 
-.widget.command_trigger.command:hover .widget_icon,
-.widget.command_trigger.command:focus .widget_icon {
-    cursor: pointer;
-}
-
 .widget.command_trigger .widget_state {
     background-color:rgba(255,255,255,0.6);
     display:inline-block;

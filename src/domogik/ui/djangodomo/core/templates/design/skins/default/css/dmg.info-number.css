@@ -1,4 +1,9 @@
 /* Mini widget */
+.widget.info_number:hover .widget_icon,
+.widget.info_number:focus .widget_icon {
+    background-color:#FFFFFF;
+}
+
 .widget.info_number .widget_icon {
     display:block;
     width: 45px;
