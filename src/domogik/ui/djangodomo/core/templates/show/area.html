@@ -48,7 +48,7 @@
     <script type="text/javascript">
     // <![CDATA[
         $(function() {
-            {% for feature in house_features_associations %}        
+            {% for feature in area.feature_association %}        
                 {% ifequal feature.device_type_feature.feature_type "actuator" %}
                     {% get_command_widget feature %}
                     {% get_command_init feature %}
