@@ -3050,9 +3050,9 @@ target=*
     def rest_queuecontent_display(self, my_queue):
         # Queue size
         queue_size = my_queue.qsize()
-        queue_data = '{{"size" : %s}, [' % queue_size
 
         # Queue elements
+        queue_data = []
         if queue_size > 0:
             idx = 0
             while idx < queue_size:
@@ -3060,13 +3060,16 @@ target=*
                 # Queue content
                 elt_time, elt_data = my_queue.get_nowait()
                 my_queue.put((elt_time, elt_data))
-                queue_data += '{"time" : %s, "message" : "%s"},' % (time.ctime(elt_time), elt_data)
+                queue_data.append({"time" : time.ctime(elt_time), "content" : str(elt_data)})
 
-        queue_data = queue_data[0:len(queue_data)-1]
-        queue_data += "]}"
+        data = {"size" : queue_size, "data" : queue_data}
 
         # Send result
-        self.send_http_response_ok(queue_data)
+        json_data = JSonHelper("OK")
+        json_data.set_data_type("queue %s" % self.rest_request[0])
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.add_data(queue_data)
+        self.send_http_response_ok(json_data.get())
 
 
 
@@ -3078,7 +3081,13 @@ target=*
         self._log.debug("Testing long poll action")
         num = random.randint(1, 15)
         time.sleep(num)
-        self.send_http_response_ok('{"number" : %s}' % str(num))
+        data = {"number" : num}
+        json_data = JSonHelper("OK")
+        json_data.set_data_type("longpoll")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.add_data(data)
+        self.send_http_response_ok(json_data.get())
+
 
 
 
