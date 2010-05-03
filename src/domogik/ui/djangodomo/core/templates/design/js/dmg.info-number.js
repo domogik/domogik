@@ -38,7 +38,7 @@
                     if (status == 'ok') {
                         var d = [];
                         $.each(data.stats, function(index, stat) {
-                            d.push([index, parseInt(stat.value,10)]);
+                            d.push([index, stat.value]);
                         });
                         var dialog = $("<div id='dialog' title='Graph Test'><div id='graph' style='width:600px;height:300px;'></div></div>");
                         $('body').append(dialog);
