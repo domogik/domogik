@@ -38,14 +38,19 @@
                     function(data) {
                         var status = (data.status).toLowerCase();
                         if (status == 'ok') {
+                            $("#housename").removeClass('icon16-status-false');
                             $("#housename").addClass('icon16-status-true');
                         } else {
+                            $("#housename").removeClass('icon16-status-true');
                             $("#housename").addClass('icon16-status-false');
+                            $.notification({'status': 'error', 'msg': '{% trans "house name not updated" %} (' + data.description + ')'});                                                                      
                         }
                     }
                 );            
             } else {
+                $("#housename").removeClass('icon16-status-true');
                 $("#housename").addClass('icon16-status-false');  
+                $.notification({'status': 'error', 'msg': '{% trans "house name can not be empty" %}'});                                                                      
             }
         });
     });
