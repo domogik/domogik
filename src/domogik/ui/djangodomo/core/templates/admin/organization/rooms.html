@@ -99,7 +99,7 @@
                         if (status == 'ok') {
                             $.reloadPage({'status': 'ok', 'msg': '{% trans "New room added" %} \'' + data.room[0].name + '\''});                                   
                         } else {
-                            $.notification({'status': 'error', 'msg': '{% trans "Room not created" %} (' + data.description + ')'});                                                                      
+                            $.notification('error', '{% trans "Room not created" %} (' + data.description + ')');                                                                      
                         }
                     }
                 );
@@ -142,7 +142,7 @@
                                         if (status == 'ok') {
                                             $.reloadPage({'status': 'ok', 'msg': '{% trans "Room" %} \'' + data.room[0].name + '\' {% trans "successfully deleted" %}'});                                   
                                         } else {
-                                            $.notification({'status': 'error', 'msg': '{% trans "Room not deleted" %} (' + data.description + ')'});                                                                      
+                                            $.notification('error', '{% trans "Room not deleted" %} (' + data.description + ')');                                                                      
                                         }
                                     }
                                 );
@@ -187,7 +187,7 @@
                                         if (status == 'ok') {
                                             $.reloadPage({'status': 'ok', 'msg': '{% trans "Room" %} \'' + data.room[0].name + '\' {% trans "successfully updated" %}'});                                   
                                         } else {
-                                            $.notification({'status': 'error', 'msg': '{% trans "Room not updated" %} (' + data.description + ')'});                                                                      
+                                            $.notification('error', '{% trans "Room not updated" %} (' + data.description + ')');                                                                      
                                         }
                                     }
                                 );

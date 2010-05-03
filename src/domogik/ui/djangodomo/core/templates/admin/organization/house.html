@@ -43,14 +43,14 @@
                         } else {
                             $("#housename").removeClass('icon16-status-true');
                             $("#housename").addClass('icon16-status-false');
-                            $.notification({'status': 'error', 'msg': '{% trans "house name not updated" %} (' + data.description + ')'});                                                                      
+                            $.notification('error', '{% trans "house name not updated" %} (' + data.description + ')');                                                                      
                         }
                     }
                 );            
             } else {
                 $("#housename").removeClass('icon16-status-true');
                 $("#housename").addClass('icon16-status-false');  
-                $.notification({'status': 'error', 'msg': '{% trans "house name can not be empty" %}'});                                                                      
+                $.notification('error', '{% trans "house name can not be empty" %}');                                                                      
             }
         });
     });

@@ -51,7 +51,7 @@
                               }*/
                         });
                     } else {
-                        $.notification({'status': 'error', 'msg': '{% trans "data creation failed" %} (' + data.description + ')'});                                                                      
+                        $.notification('error', '{% trans "data creation failed" %} (' + data.description + ')');                                                                      
                     }
                 }
             );

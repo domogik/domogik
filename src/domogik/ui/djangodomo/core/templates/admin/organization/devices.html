@@ -114,7 +114,7 @@
                         if (status == 'ok') {
                             $.reloadPage({'status': 'ok', 'msg': '{% trans "New device added" %} \'' + data.device[0].name + '\''});                                   
                         } else {
-                            $.notification({'status': 'error', 'msg': '{% trans "device not created" %} (' + data.description + ')'});                                                                      
+                            $.notification('error', '{% trans "device not created" %} (' + data.description + ')');                                                                      
                         }
                     }
                 );
@@ -171,7 +171,7 @@
                                             if (status == 'ok') {
                                                 $.reloadPage({'status': 'ok', 'msg': '{% trans "Device" %}\'' + data.device[0].name + '\' {% trans "successfully deleted" %}'});
                                             } else {
-                                                $.notification({'status': 'error', 'msg': '{% trans "Device not deleted" %} (' + data.description + ')'});
+                                                $.notification('error', '{% trans "Device not deleted" %} (' + data.description + ')');
                                             }
                                         }
                                     );
@@ -191,7 +191,7 @@
                                             if (status == 'ok') {
                                                 $.reloadPage({'status': 'ok', 'msg': '{% trans "Device" %} \'' + data.device[0].name + '\' {% trans "successfully updated" %}'});
                                             } else {
-                                                $.notification({'status': 'error', 'msg': '{% trans "Device not updated" %} (' + data.description + ')'});
+                                                $.notification('error', '{% trans "Device not updated" %} (' + data.description + ')');
                                             }
                                         }
                                     );

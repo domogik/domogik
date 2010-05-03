@@ -35,7 +35,7 @@ $(function(){
                     if (status == 'ok') {
                         $.reloadPage({'status': 'ok', 'msg': '{% trans "Plugin" %}\'{{ plugin.name }}\' {% trans "successfully stopped" %}'});
                     } else {
-                        $.notification({'status': 'error', 'msg': '{% trans "Plugin not stopped" %} (' + data.description + ')'});
+                        $.notification('error', '{% trans "Plugin not stopped" %} (' + data.description + ')');
                     }
                 }
             );
@@ -49,7 +49,7 @@ $(function(){
                     if (status == 'ok') {
                         $.reloadPage({'status': 'ok', 'msg': '{% trans "Plugin" %}\'{{ plugin.name }}\' {% trans "successfully started" %}'});
                     } else {
-                        $.notification({'status': 'error', 'msg': '{% trans "Plugin not started" %} (' + data.description + ')'});
+                        $.notification('error', '{% trans "Plugin not started" %} (' + data.description + ')');
                     }
                 }
             );

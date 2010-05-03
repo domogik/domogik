@@ -67,7 +67,7 @@
                         if (status == 'ok') {
                             $.reloadPage({'status': 'ok', 'msg': '{% trans "New account added" %} \'' + data.account[0].login + '\''});
                         } else {
-                            $.notification({'status': 'error', 'msg': '{% trans "Account not created" %} (' + data.description + ')'});
+                            $.notification('error', '{% trans "Account not created" %} (' + data.description + ')');
                         }
                     }
                 );
@@ -86,7 +86,7 @@
                         if (status == 'ok') {
                             $.reloadPage({'status': 'ok', 'msg': '{% trans "New person added" %} \'' + data.person[0].first_name + ' ' + data.person[0].last_name + '\''});
                         } else {
-                            $.notification({'status': 'error', 'msg': '{% trans "Person not created" %} (' + data.description + ')'});
+                            $.notification('error', '{% trans "Person not created" %} (' + data.description + ')');
                         }
                     }
                 );
@@ -156,7 +156,7 @@
                                         if (status == 'ok') {
                                             $.reloadPage({'status': 'ok', 'msg': '{% trans "Account" %} \'' + data.account[0].login + '\' {% trans "successfully deleted" %}'});
                                         } else {
-                                            $.notification({'status': 'error', 'msg': '{% trans "Account not deleted" %} (' + data.description + ')'});
+                                            $.notification('error', '{% trans "Account not deleted" %} (' + data.description + ')');
                                         }
                                     }
                                 );
@@ -176,7 +176,7 @@
                                         if (status == 'ok') {
                                             $.reloadPage({'status': 'ok', 'msg': '{% trans "Account" %} \'' + data.account[0].login + '\' {% trans "successfully updated" %}'});
                                         } else {
-                                            $.notification({'status': 'error', 'msg': '{% trans "Account not updated" %} (' + data.description + ')'});
+                                            $.notification('error', '{% trans "Account not updated" %} (' + data.description + ')');
                                         }
                                     }
                                 );
@@ -195,7 +195,7 @@
                                         if (status == 'ok') {
                                             $.reloadPage({'status': 'ok', 'msg': data.account[0].login + '\' {% trans "Password" %} {% trans "successfully updated" %}'});
                                         } else {
-                                            $.notification({'status': 'error', 'msg': '{% trans "Password not updated" %} (' + data.description + ')'});
+                                            $.notification('error', '{% trans "Password not updated" %} (' + data.description + ')');
                                         }
                                     }
                                 );
@@ -248,7 +248,7 @@
                                         if (status == 'ok') {
                                             $.reloadPage({'status': 'ok', 'msg': '{% trans "Person" %} \'' + data.person[0].first_name + ' ' + data.person[0].last_name + '\' {% trans "successfully deleted" %}'});
                                         } else {
-                                            $.notification({'status': 'error', 'msg': '{% trans "Person not deleted" %} (' + data.description + ')'});
+                                            $.notification({'error', '{% trans "Person not deleted" %} (' + data.description + ')');
                                         }
                                     }
                                 );
@@ -268,7 +268,7 @@
                                         if (status == 'ok') {
                                             $.reloadPage({'status': 'ok', 'msg': '{% trans "Person " %} \'' + data.person[0].first_name + ' ' + data.person[0].last_name + '\' updated'});
                                         } else {
-                                            $.notification({'status': 'error', 'msg': '{% trans "Person not updated" %} (' + data.description + ')'});
+                                            $.notification('error', '{% trans "Person not updated" %} (' + data.description + ')');
                                         }
                                     }
                                 );
