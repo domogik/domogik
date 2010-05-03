@@ -15,6 +15,9 @@
     background-repeat: no-repeat;
     margin:0.5em 1em 0 1em;
     text-align:center;
-    line-height:45px;
     font-weight:bold;
+}
+
+.widget.info_number .widget_value {
+    margin-top:30%;
 }

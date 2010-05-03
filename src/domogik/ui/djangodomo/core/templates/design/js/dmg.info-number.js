@@ -5,6 +5,8 @@
             this.element.addClass('widget');
             this.element.addClass('info_number');
             this.elementicon = $("<div class='widget_icon'></div>");
+            this.elementvalue =  $("<div class='widget_value'></div>");
+            this.elementicon.append(this.elementvalue);
             this.element.append(this.elementicon)
                 .attr("tabindex", 0)
                 .click(function () {self.showGraph()})
@@ -21,10 +23,10 @@
             var self = this, o = this.options;
             if (value) {
                 this.elementicon.attr('class', 'widget_icon icon32-info-' + o.usage + ' number');             
-                this.elementicon.text(value + ' ' + o.unit)
+                this.elementvalue.html(value + '<br />' + o.unit)
             } else { // Unknown
                 this.elementicon.attr('class', 'widget_icon icon32-info-' + o.usage + ' unknown');
-                this.elementicon.text('?? ' + o.unit)
+                this.elementvalue.html('??<br />' + o.unit)
             }
         },
         

@@ -46,7 +46,7 @@
     margin:0.5em 1em 0 1em;
 }
 
-.widget_value {
+.widget.command_range .widget_value {
     float:left;
     display:inline-block;
     width: 45px;
