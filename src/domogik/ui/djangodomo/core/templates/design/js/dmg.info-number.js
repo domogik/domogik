@@ -37,11 +37,9 @@
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
                         var d = [];
-                        var c = 1;
-                        for each (var stat in data.stats) {
-                            d.push([c, parseInt(stat.value,10)]);
-                            c++;
-                        }                        
+                        $.each(data.stats, function(index, stat) {
+                            d.push([index, parseInt(stat.value,10)]);
+                        });
                         var dialog = $("<div id='dialog' title='Graph Test'><div id='graph' style='width:600px;height:300px;'></div></div>");
                         $('body').append(dialog);
                         dialog.dialog({ height: 340, width:640, resizable: false });
