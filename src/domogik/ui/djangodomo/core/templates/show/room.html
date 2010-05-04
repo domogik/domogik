@@ -25,6 +25,45 @@
 
 {% block js_script %}
 // <![CDATA[
+    $(function() {
+        {% for feature in room.feature_association %}
+            {% ifequal feature.device_type_feature.feature_type "actuator" %}
+                {% get_command_widget feature %}
+                {% get_command_init feature %}
+            {% endifequal %}
+            {% ifequal feature.device_type_feature.feature_type "sensor" %}
+                {% get_info_widget feature %}
+                {% get_info_init feature %}
+            {% endifequal %}
+        {% endfor %}
+
+        {% regroup room.feature_association|dictsort:"device_id" by device as devices %}
+        var devices = [{% for device in devices %}{{ device.grouper.id }}{% if not forloop.last %},{% endif %}{% endfor %}];
+        
+        $.eventRequest(devices, function(event) {
+            switch(event.device_id) {
+            {% regroup room.feature_association|dictsort:"device_id" by device as devices %}
+            {% for device in devices %}
+                case {{ device.grouper.id }}:
+                    $.each(event.data, function(index, item) {
+                        switch (item.key) {                        
+                        {% for association in device.list %}
+                            case '{{ association.device_type_feature.stat_key }}':
+                                {% ifequal association.device_type_feature.feature_type "actuator" %}
+                                    {% get_command_update association 'item.value' %}
+                                {% endifequal %}
+                                {% ifequal association.device_type_feature.feature_type "sensor" %}
+                                    {% get_info_update association 'item.value' %}
+                                {% endifequal %}                            
+                                break;
+                        {% endfor %}                    
+                        }
+                    });
+                    break;
+            {% endfor %}
+            }
+        });
+    });
 // ]]>
 {% endblock %}
 
@@ -46,24 +85,7 @@
     <h1 class="ident icon64-room-{{ room.config.icon }}"><span class="title">{{ room.name }}</span></h1>
 {% endblock %}
 
-{% block content %}
-    <script type="text/javascript">
-    // <![CDATA[
-        $(function() {
-            {% for feature in room.feature_association %}
-                {% ifequal feature.device_type_feature.feature_type "actuator" %}
-                    {% get_command_widget feature %}
-                    {% get_command_init feature %}
-                {% endifequal %}
-                {% ifequal feature.device_type_feature.feature_type "sensor" %}
-                    {% get_info_widget feature %}
-                    {% get_info_init feature %}
-                {% endifequal %}
-            {% endfor %}
-        });
-    // ]]>
-    </script>
-    
+{% block content %}    
     <div class='actions'>
         <ul>
             {% for feature in room.feature_association %}
