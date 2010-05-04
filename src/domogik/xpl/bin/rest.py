@@ -3522,7 +3522,7 @@ class StatsManager(xPLPlugin):
             ### First, we put message in event queue (for /events)
 
             # TODO 1: put in queue the entire xpl message
-            self._put_in_queue(self._queue_event, message)
+            #self._put_in_queue(self._queue_event, message)
 
             # TODO 2: put in queue the good data (extract from xpl)
 
@@ -3553,6 +3553,11 @@ class StatsManager(xPLPlugin):
                             value = message.data[key]
                         else:
                             value = message.data[key]
+                    # put data in queue for REST (/events)
+                    self._put_in_queue(self._queue_event, {"key" : key, 
+                                                           "value" : value, 
+                                                           "id" : d_id})
+                    # put data in database
                     self._db.add_device_stat(current_date, key, value, d_id)
 
 
