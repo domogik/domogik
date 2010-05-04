@@ -82,7 +82,9 @@ QUEUE_SLEEP = 0.1 # sleep time between reading all queue content
 QUEUE_COMMAND_SIZE = 1000
 
 # /event queue config
-QUEUE_EVENT_SIZE = 1000
+QUEUE_EVENT_TIMEOUT = 0   # If 0, no timeout is set
+QUEUE_EVENT_LIFE_EXPECTANCY = 3
+QUEUE_EVENT_SIZE = 100
 
 
 # Domogik plugin informations for manager
@@ -93,35 +95,45 @@ DOMOGIK_PLUGIN_VERSION = "0.1"
 DOMOGIK_PLUGIN_DOCUMENTATION_LINK = "http://wiki.domogik.org/tiki-index.php?page=plugins/REST"
 DOMOGIK_PLUGIN_CONFIGURATION = [
       {"id" : 0,
-       "key" : "queue-timeout",
+       "key" : "q-timeout",
        "type" : "number",
        "description" : "Maximum wait time for getting data froma queue",
        "default" : QUEUE_TIMEOUT},
       {"id" : 1,
-       "key" : "queue-size",
+       "key" : "q-size",
        "type" : "number",
        "description" : "Size for 'classic' queues. You should not have to change this value",
        "default" : QUEUE_SIZE},
       {"id" : 2,
-       "key" : "queue-cmd-size",
+       "key" : "q-cmd-size",
        "type" : "number",
        "description" : "Size for /command queue",
        "default" : QUEUE_COMMAND_SIZE},
       {"id" : 3,
-       "key" : "queue-evt-size",
-       "type" : "number",
-       "description" : "Size for /event queue",
-       "default" : QUEUE_EVENT_SIZE},
-      {"id" : 4,
-       "key" : "queue-life-exp",
+       "key" : "q-life-exp",
        "type" : "number",
        "description" : "Life expectancy for a xpl message in queues. You sould not have to change this value",
        "default" : QUEUE_LIFE_EXPECTANCY},
-      {"id" : 5,
-       "key" : "queue-sleep",
+      {"id" : 4,
+       "key" : "q-sleep",
        "type" : "number",
        "description" : "Time between each unsuccessfull look for a xpl data in a queue",
-       "default" : QUEUE_SLEEP}]
+       "default" : QUEUE_SLEEP},
+      {"id" : 5,
+       "key" : "q-evt-timeout",
+       "type" : "number",
+       "description" : "Maximum wait time for getting event from queue (0 : no timeout)",
+       "default" : QUEUE_EVENT_TIMEOUT},
+      {"id" : 6,
+       "key" : "q-evt-size",
+       "type" : "number",
+       "description" : "Size for /event queue",
+       "default" : QUEUE_EVENT_SIZE},
+      {"id" : 7,
+       "key" : "q-evt-life-exp",
+       "type" : "number",
+       "description" : "Life expectancy for an event in event queues",
+       "default" : QUEUE_EVENT_LIFE_EXPECTANCY}]
 
 
 
@@ -201,29 +213,29 @@ class Rest(xPLPlugin):
             self._log.debug("Get queues configuration")
             self._config = Query(self._myxpl)
             res = xPLResult()
-            self._config.query('rest', 'queue-timeout', res)
-            self._queue_timeout = res.get_value()['queue-timeout']
+            self._config.query('rest', 'q-timeout', res)
+            self._queue_timeout = res.get_value()['q-timeout']
             if self._queue_timeout == "None":
                 self._queue_timeout = QUEUE_TIMEOUT
             self._queue_timeout = float(self._queue_timeout)
             self._config = Query(self._myxpl)
             res = xPLResult()
-            self._config.query('rest', 'queue-size', res)
-            self._queue_size = res.get_value()['queue-size']
+            self._config.query('rest', 'q-size', res)
+            self._queue_size = res.get_value()['q-size']
             if self._queue_size == "None":
                 self._queue_size = QUEUE_SIZE
             self._queue_size = float(self._queue_size)
             self._config = Query(self._myxpl)
             res = xPLResult()
-            self._config.query('rest', 'queue-life-exp', res)
-            self._queue_life_expectancy = res.get_value()['queue-life-exp']
+            self._config.query('rest', 'q-life-exp', res)
+            self._queue_life_expectancy = res.get_value()['q-life-exp']
             if self._queue_life_expectancy == "None":
                 self._queue_life_expectancy = QUEUE_LIFE_EXPECTANCY
             self._queue_life_expectancy = float(self._queue_life_expectancy)
             self._config = Query(self._myxpl)
             res = xPLResult()
-            self._config.query('rest', 'queue-sleep', res)
-            self._queue_sleep = res.get_value()['queue-sleep']
+            self._config.query('rest', 'q-sleep', res)
+            self._queue_sleep = res.get_value()['q-sleep']
             if self._queue_sleep == "None":
                 self._queue_sleep = QUEUE_SLEEP
             self._queue_sleep = float(self._queue_sleep)
@@ -231,8 +243,8 @@ class Rest(xPLPlugin):
             # /command Queues config
             self._config = Query(self._myxpl)
             res = xPLResult()
-            self._config.query('rest', 'queue-cmd-size', res)
-            self._queue_command_size = res.get_value()['queue-cmd-size']
+            self._config.query('rest', 'q-cmd-size', res)
+            self._queue_command_size = res.get_value()['q-cmd-size']
             if self._queue_command_size == "None":
                 self._queue_command_size = QUEUE_COMMAND_SIZE
             self._queue_command_size = float(self._queue_command_size)
@@ -240,11 +252,25 @@ class Rest(xPLPlugin):
             # /event Queues config
             self._config = Query(self._myxpl)
             res = xPLResult()
-            self._config.query('rest', 'queue-evt-size', res)
-            self._queue_event_size = res.get_value()['queue-evt-size']
+            self._config.query('rest', 'q-evt-size', res)
+            self._queue_event_size = res.get_value()['q-evt-size']
             if self._queue_event_size == "None":
                 self._queue_event_size = QUEUE_EVENT_SIZE
             self._queue_event_size = float(self._queue_event_size)
+            self._config = Query(self._myxpl)
+            res = xPLResult()
+            self._config.query('rest', 'q-evt-timeout', res)
+            self._queue_event_timeout = res.get_value()['q-evt-timeout']
+            if self._queue_event_timeout == "None":
+                self._queue_event_timeout = QUEUE_EVENT_TIMEOUT
+            self._queue_event_timeout = float(self._queue_event_timeout)
+            self._config = Query(self._myxpl)
+            res = xPLResult()
+            self._config.query('rest', 'q-evt-life-exp', res)
+            self._queue_event_life_expectancy = res.get_value()['q-evt-life-exp']
+            if self._queue_event_life_expectancy == "None":
+                self._queue_event_life_expectancy = QUEUE_EVENT_LIFE_EXPECTANCY
+            self._queue_event_life_expectancy = float(self._queue_event_life_expectancy)
     
             # Queues for xPL
             self._queue_system_list = Queue(self._queue_size)
@@ -257,7 +283,9 @@ class Rest(xPLPlugin):
     
             # Queues for /event
             # this queue will be fill by stat manager
-            self._queue_event = Queue(self._queue_event_size)
+            self._event_requests = EventRequests(self._queue_event_size,
+                                                 self._queue_event_timeout,
+                                                 self._queue_event_life_expectancy)
     
             # define listeners for queues
             self._log.debug("Create listeners")
@@ -312,9 +340,6 @@ class Rest(xPLPlugin):
 
     def _add_to_queue_command(self, message):
         self._put_in_queue(self._queue_command, message)
-
-    def _add_to_queue_event(self, message):
-        self._put_in_queue(self._queue_event, message)
 
     def _get_from_queue(self, my_queue, filter = None, nb_rec = 0):
         """ Encapsulation for _get_from_queue_in
@@ -668,10 +693,9 @@ class ProcessRequest():
 
         self._queue_timeout =  self.handler_params[0]._queue_timeout
         self._queue_size =  self.handler_params[0]._queue_size
-        self._queue_event_size =  self.handler_params[0]._queue_event_size
         self._queue_command_size =  self.handler_params[0]._queue_command_size
         self._queue_life_expectancy = self.handler_params[0]._queue_life_expectancy
-      
+        self._queue_event_size =  self.handler_params[0]._queue_event_size
         self._get_from_queue = self.handler_params[0]._get_from_queue
         self._put_in_queue = self.handler_params[0]._put_in_queue
 
@@ -679,8 +703,9 @@ class ProcessRequest():
         self._queue_system_detail =  self.handler_params[0]._queue_system_detail
         self._queue_system_start =  self.handler_params[0]._queue_system_start
         self._queue_system_stop =  self.handler_params[0]._queue_system_stop
-        self._queue_event =  self.handler_params[0]._queue_event
         self._queue_command =  self.handler_params[0]._queue_command
+
+        self._event_requests =  self.handler_params[0]._event_requests
 
         self.xml =  self.handler_params[0].xml
         self.xml_date =  self.handler_params[0].xml_date
@@ -731,6 +756,8 @@ class ProcessRequest():
             self.rest_command()
         elif self.rest_type == "stats":
             self.rest_stats()
+        elif self.rest_type == "events":
+            self.rest_events()
         elif self.rest_type == "xpl-cmnd":
             self.rest_xpl_cmnd()
         elif self.rest_type == "base":
@@ -826,8 +853,11 @@ class ProcessRequest():
             % (self._queue_system_stop.qsize(), int(self._queue_size))})
         json_data.add_data({"Queue 'command' usage" : "%s/%s" \
             % (self._queue_command.qsize(), int(self._queue_command_size))})
-        json_data.add_data({"Queue 'event' usage" : "%s/%s" \
-            % (self._queue_event.qsize(), int(self._queue_event_size))})
+
+        # Events stats
+        json_data.add_data({"Events requests count" : self._event_requests.count()})
+        json_data.add_data({"Events queues max size count" : int(self._queue_event_size)})
+        json_data.add_data({"Events requests" : self._event_requests.list()})
 
         self.send_http_response_ok(json_data.get())
 
@@ -1102,6 +1132,99 @@ target=*
         self.send_http_response_ok(json_data.get())
     
 
+
+######
+# /events processing
+######
+
+    def rest_events(self):
+        """ Events processing
+        """
+        self._log.debug("Process events request")
+
+        # Check url length
+        if len(self.rest_request) < 2:
+            self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
+            return
+
+        ### request  ######################################
+        if self.rest_request[0] == "request":
+
+            #### new
+            if self.rest_request[1] == "new":
+                new_idx = 2
+                device_id_list = []
+                while new_idx < len(self.rest_request):
+                    device_id_list.append(int(self.rest_request[new_idx]))
+                    new_idx += 1
+                if new_idx == 2:
+                    self.send_http_response_error(999, "No device id given", self.jsonp, self.jsonp_cb)
+                    return
+                self._rest_events_request_new(device_id_list)
+
+            #### get
+            elif self.rest_request[1] == "get" and len(self.rest_request) == 3:
+                self._rest_events_request_get(self.rest_request[2])
+
+            #### free
+            elif self.rest_request[1] == "free" and len(self.rest_request) == 3:
+                self._rest_events_request_free(self.rest_request[2])
+
+            ### others
+            else:
+                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], \
+                                                  self.jsonp, self.jsonp_cb)
+                return
+
+        ### others ###################################
+        else:
+            self.send_http_response_error(999, self.rest_request[0] + " not allowed", self.jsonp, self.jsonp_cb)
+            return
+
+
+
+    def _rest_events_request_new(self, device_id_list):
+        """ Create new event request and send data for event
+            @param device_id_list : list of devices to check for events
+        """
+        ticket_id = self._event_requests.new(device_id_list)
+        data = self._event_requests.get(ticket_id)
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("event")
+        json_data.add_data(data)
+        self.send_http_response_ok(json_data.get())
+
+
+
+
+    def _rest_events_request_get(self, ticket_id):
+        """ Get data from event associated to ticket id
+            @param ticket_id : ticket id
+        """
+        data = self._event_requests.get(ticket_id)
+        if data == False:
+            json_data = JSonHelper("ERROR", 999, "Error in getting event in queue")
+        else:
+            json_data = JSonHelper("OK")
+            json_data.set_data_type("event")
+            json_data.add_data(data)
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        self.send_http_response_ok(json_data.get())
+
+
+
+
+    def _rest_events_request_free(self, ticket_id):
+        """ Free event queue for ticket id
+            @param ticket_id : ticket id
+        """
+        if self._event_requests.free(ticket_id):
+            json_data = JSonHelper("OK")
+        else:
+            json_data = JSonHelper("ERROR", 999, "Error when trying to free queue for event")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        self.send_http_response_ok(json_data.get())
 
 ######
 # /xpl-cmnd processing
@@ -3393,10 +3516,7 @@ class StatsManager(xPLPlugin):
         ### Rest data
         self.handler_params = handler_params
 
-        self._queue_event = self.handler_params[0]._queue_event
-        self._queue_event_size = self.handler_params[0]._queue_event_size
-        self._get_from_queue = self.handler_params[0]._get_from_queue
-        self._put_in_queue = self.handler_params[0]._put_in_queue
+        self._event_requests = self.handler_params[0]._event_requests
 
         ### Read xml files
         res = {}
@@ -3500,10 +3620,7 @@ class StatsManager(xPLPlugin):
             ### Rest data
             self.handler_params = handler_params
 
-            self._queue_event = self.handler_params[0]._queue_event
-            self._queue_event_size = self.handler_params[0]._queue_event_size
-            self._get_from_queue = self.handler_params[0]._get_from_queue
-            self._put_in_queue = self.handler_params[0]._put_in_queue
+            self._event_requests = self.handler_params[0]._event_requests
 
             self._res = res
             self._db = database
@@ -3529,12 +3646,9 @@ class StatsManager(xPLPlugin):
             ### Next, we put data in database
             self._db = DbHelper()
             self._log.debug("message catcher : %s" % message)
-            print "techno '%s' / adress '%s'" % (self._technology, message.data[self._res["device"]])
-            #try:
             d_id = self._db.get_device_by_technology_and_address(self._technology, \
                     message.data[self._res["device"]]).id
-            #except AttributeError:
-            #    d_id = None
+            print "techno '%s' / adress '%s' / id '%s'" % (self._technology, message.data[self._res["device"]], d_id)
             if d_id == None:
                 print "unreferenced device '%s-%s': don't log" % (self._technology, message.data[self._res["device"]])
                 self._log.warning("Received a stat for an unreferenced device : %s - %s" \
@@ -3544,6 +3658,7 @@ class StatsManager(xPLPlugin):
                 self._log.debug("Stat received for %s - %s." \
                         % (self._technology, message.data[self._res["device"]]))
                 current_date = datetime.datetime.today()
+                device_data = []
                 for key in self._res["mapping"].keys():
                     data = ""
                     if message.data.has_key(key):
@@ -3553,12 +3668,118 @@ class StatsManager(xPLPlugin):
                             value = message.data[key]
                         else:
                             value = message.data[key]
-                    # put data in queue for REST (/events)
-                    self._put_in_queue(self._queue_event, {"key" : key, 
-                                                           "value" : value, 
-                                                           "id" : d_id})
+                    device_data.append({"key" : key, "value" : value})
                     # put data in database
                     self._db.add_device_stat(current_date, key, value, d_id)
+
+                # Put data in events queues
+                self._event_requests.add_in_queues(d_id, 
+                        {"device_id" : d_id, "data" : device_data})
+
+
+
+
+
+
+################################################################################
+class EventRequests():
+    """
+    Object where all events queues and ticket id will be stored
+    """
+    def __init__(self, queue_size, queue_timeout, queue_life_expectancy):
+        """ Init Event Requests
+            @param queue_size : size of queues for events
+        """
+        self.requests = {}
+        self.queue_size = queue_size
+        if queue_timeout == 0:
+            self.queue_timeout = None
+        else:
+            self.queue_timeout = queue_timeout
+        self.queue_life_expectancy = queue_life_expectancy
+        self.ticket = 0
+        self.count_request = 0
+
+    def new(self, device_id_list):
+        """ Add a new queue and ticket id for a new event
+            @param device_id : id of device to get events from
+            @return ticket_id : ticket id
+        """
+        print "---- NEW ----"
+        new_queue = Queue(self.queue_size)
+        ticket_id = self.generate_ticket()
+        new_data = {"creation_date" :  datetime.datetime.now(),
+                    "device_id_list" : device_id_list,
+                    "queue" : new_queue,
+                    "queue_size" : 0}
+        self.requests[ticket_id] = new_data
+        self.count_request += 1
+        return ticket_id
+
+    def free(self, ticket_id):
+        """ End request for a ticket id : remove queue
+            @param ticket_id : ticket id of queue to remove
+            @return True if succcess, False if ticket doesn't exists
+        """
+        try:
+            del self.requests[ticket_id]
+        # ticket doesn't exists
+        except KeyError:
+            return False
+        self.count_request -= 1
+        return True
+
+    def generate_ticket(self):
+        """ Generate a ticket id for an event request
+        """
+        # TODO : make something random for ticket generation
+        self.ticket += 1
+        return str(self.ticket)
+ 
+    def count(self):
+        """ Return number of event requests
+        """
+        return self.count_request
+
+    def add_in_queues(self, device_id, data):
+        """ Add data in each queue linked to device id
+            @param data : data to put in queues
+        """
+        print "---- ADD ----"
+        for req in self.requests:
+            if device_id in self.requests[req]["device_id_list"]:
+                self.requests[req]["queue"].put((time.time(), data), 
+                                                True, self.queue_timeout) 
+                self.requests[req]["queue_size"] += 1
+
+
+    def get(self, ticket_id):
+        """ Get data from queue linked to ticket id. 
+            If no data, wait until queue timeout
+            @param ticket_id : id of ticket
+            @return data in queue or False if ticket doesn't exists
+        """
+        print "---- GET ----"
+        try:
+            (elt_time, elt_data) = self.requests[ticket_id]["queue"].get(True, self.queue_timeout)
+            self.requests[ticket_id]["queue_size"] -= 1
+            # TODO : use queue_life_expectancy in order not to get old data
+
+            # Add ticket id to answer
+            elt_data["ticket_id"] = str(ticket_id)
+
+        # Ticket doesn't exists
+        except KeyError:
+            return False
+        return elt_data
+
+    def list(self):
+        """ List queues (used by rest status)
+        """
+        return str(self.requests)
+
+
+
 
 
 if __name__ == '__main__':
