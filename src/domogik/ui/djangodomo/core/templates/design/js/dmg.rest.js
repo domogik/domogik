@@ -99,10 +99,9 @@ $.extend({
             success: function (data) {
                 var status = (data.status).toLowerCase();
                 if (status == 'ok') {
-                    console.log(data.event[0].data);
                     // Free the ticket when page unload
                     $(window).unload( function () { $.eventCancel(data.event[0].ticket_id); } );
-                    callback(event[0]);
+                    callback(data.event[0]);
                     $.eventUpdate(data.event[0].ticket_id, callback);
                 } else {
                     $.notification('error', 'Event request  (' + data.description + ')');
@@ -128,10 +127,8 @@ $.extend({
                 }
             },
             success: function (data) {
-                console.log('success');
                 var status = (data.status).toLowerCase();
                 if (status == 'ok') {
-                    console.log(data.event[0].data);
                     callback(event[0]);
                     $.eventUpdate(data.event[0].ticket_id, callback);
                 } else {
