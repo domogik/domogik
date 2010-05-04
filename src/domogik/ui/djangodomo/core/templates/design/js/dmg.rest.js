@@ -84,6 +84,7 @@ $.extend({
         url = rest_url + '/events/request/new/' + devices.join('/') + '/';
         $.jsonp({
             cache: false,
+            callbackParameter: "callback",
             type: "GET",
             url: url,
             dataType: "jsonp",
@@ -114,6 +115,7 @@ $.extend({
         url = rest_url + '/events/request/get/' + ticket + '/';
         $.jsonp({
             cache: false,
+            callbackParameter: "callback",
             type: "GET",
             url: url,
             dataType: "jsonp",
