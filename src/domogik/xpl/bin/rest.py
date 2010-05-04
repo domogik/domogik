@@ -486,7 +486,7 @@ class Rest(xPLPlugin):
 
 ################################################################################
 # HTTP
-class HTTPServerWithParam(HTTPServer):
+class HTTPServerWithParam(SocketServer.ThreadingMixIn, HTTPServer):
     """ Extends HTTPServer to allow send params to the Handler.
     """
 
