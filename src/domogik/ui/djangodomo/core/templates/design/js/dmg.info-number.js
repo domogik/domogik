@@ -29,7 +29,12 @@
                         });
                         var dialog = $("<div id='dialog' title='Graph Test'><div id='graph' style='width:600px;height:300px;'></div></div>");
                         $('body').append(dialog);
-                        dialog.dialog({ height: 340, width:640, resizable: false });
+                        dialog.dialog({ height: 340, width:640,
+                                        resizable: false,
+                                        close: function(ev, ui) {
+                                            $(this).remove();
+                                        }
+                                    });
                         
                         $.plot($("#graph"), [d], {
                              /* xaxis: {
