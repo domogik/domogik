@@ -38,13 +38,29 @@
 
         {% regroup house_features_associations|dictsort:"device_id" by device as devices %}
         var devices = [{% for device in devices %}{{ device.grouper.id }}{% if not forloop.last %},{% endif %}{% endfor %}];
+        
         $.eventRequest(devices, function(event) {
-        {% regroup house_features_associations|dictsort:"device_id" by device as devices %}
-        {% for device in devices %}
-            {% for association in device.list %}
-
+            switch(event.device_id) {
+            {% regroup house_features_associations|dictsort:"device_id" by device as devices %}
+            {% for device in devices %}
+                case {{ device.grouper.id }}:
+                    $.each(event.data, function(index, item) {
+                        switch (item.key) {                        
+                        {% for association in device.list %}
+                            case '{{ association.device_type_feature.stat_key }}':
+                                {% ifequal association.device_type_feature.feature_type "actuator" %}
+                                    {% get_command_update association 'item.value' %}
+                                {% endifequal %}
+                                {% ifequal association.device_type_feature.feature_type "sensor" %}
+                                    {% get_info_update association 'item.value' %}
+                                {% endifequal %}                            
+                                break;
+                        {% endfor %}                    
+                        }
+                    });
+                    break;
             {% endfor %}
-        {% endfor %}
+            }
         });
     });
 {% endblock %}

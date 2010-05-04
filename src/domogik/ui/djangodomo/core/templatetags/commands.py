@@ -79,8 +79,8 @@ class GetCommandBinary(Node):
         return script
 
     @staticmethod
-    def get_init(feature, value):
-        script = """$("#widget_%s_%s").binary_command('setValue', '%s');
+    def get_setValue(feature, value):
+        script = """$("#widget_%s_%s").binary_command('setValue', %s);
                     """ % (feature.device_id, feature.device_type_feature_id, value)
         return script
 
@@ -124,8 +124,8 @@ class GetCommandRange(Node):
         return script
 
     @staticmethod
-    def get_init(feature, value):
-        script = """$("#widget_%s_%s").range_command('setValue', '%s');
+    def get_setValue(feature, value):
+        script = """$("#widget_%s_%s").range_command('setValue', %s);
                     """ % (feature.device_id, feature.device_type_feature_id, value)
         return script
 
@@ -185,8 +185,8 @@ class GetInfoNumber():
         return script
 
     @staticmethod
-    def get_init(feature, value):
-        script = """$("#widget_%s_%s").number_info_widget('setValue', '%s');
+    def get_setValue(feature, value):
+        script = """$("#widget_%s_%s").number_info_widget('setValue', %s);
                  """ % (feature.device_id, feature.device_type_feature_id, value)
 
         return script
@@ -203,7 +203,7 @@ class GetInfoString():
         return script
 
     @staticmethod
-    def get_init(feature, value):
+    def get_setValue(feature, value):
         script = ""
         return script
     
@@ -235,11 +235,26 @@ class GetCommandInit(Node):
         script = ""
         if len(stat.stats) > 0 :
             if feature.device_type_feature.value_type == "binary":
-                script = GetCommandBinary.get_init(feature, stat.stats[0].value)
+                script = GetCommandBinary.get_setValue(feature, "'" + stat.stats[0].value + "'")
             if feature.device_type_feature.value_type == "range":
-                script = GetCommandRange.get_init(feature, stat.stats[0].value)
+                script = GetCommandRange.get_setValue(feature, "'" + stat.stats[0].value + "'")
         return script
 
+class GetCommandUpdate(Node):
+    def __init__(self, feature, value):
+        self.feature = template.Variable(feature)
+        self.value = template.Variable(value)
+
+    def render(self, context):
+        feature = self.feature.resolve(context)
+        value = self.value.resolve(context)
+        script = ""
+        if feature.device_type_feature.value_type == "binary":
+            script = GetCommandBinary.get_setValue(feature, value)
+        if feature.device_type_feature.value_type == "range":
+            script = GetCommandRange.get_setValue(feature, value)
+        return script
+    
 class GetInfoWidget(Node):
     def __init__(self, feature):
         self.feature = template.Variable(feature)
@@ -270,9 +285,24 @@ class GetInfoInit(Node):
         script = ""
         if len(stat.stats) > 0 :
             if feature.device_type_feature.value_type == "number":
-                script = GetInfoNumber.get_init(feature, stat.stats[0].value)
+                script = GetInfoNumber.get_setValue(feature, "'" + stat.stats[0].value + "'")
             if feature.device_type_feature.value_type == "string":
-                script = GetInfoString.get_init(feature, stat.stats[0].value)
+                script = GetInfoString.get_setValue(feature, "'" + stat.stats[0].value + "'")
+        return script
+
+class GetInfoUpdate(Node):
+    def __init__(self, feature, value):
+        self.feature = template.Variable(feature)
+        self.value = template.Variable(value)
+
+    def render(self, context):
+        feature = self.feature.resolve(context)
+        value = self.value.resolve(context)
+        script = ""
+        if feature.device_type_feature.value_type == "number":
+            script = GetInfoNumber.get_setValue(feature, value)
+        if feature.device_type_feature.value_type == "string":
+            script = GetInfoString.get_setValue(feature, value)
         return script
     
 class GetFeature(Node):
@@ -327,6 +357,21 @@ def do_get_command_init(parser, token):
 
 register.tag('get_command_init', do_get_command_init)
 
+def do_get_command_update(parser, token):
+    """
+    This returns the jquery function to update a command widget.
+
+    Usage::
+
+        {% get_command_update feature js_var %}
+    """
+    args = token.contents.split()
+    if len(args) != 3:
+        raise TemplateSyntaxError, "'get_command_update' requires 'feature' argument and the js var name for value"
+    return GetCommandUpdate(args[1], args[2])
+
+register.tag('get_command_update', do_get_command_update)
+
 def do_get_info_widget(parser, token):
     """
     This returns the jquery function for creating a info widget.
@@ -356,6 +401,21 @@ def do_get_info_init(parser, token):
     return GetInfoInit(args[1])
 
 register.tag('get_info_init', do_get_info_init)
+
+def do_get_info_update(parser, token):
+    """
+    This returns the jquery function to update a info widget.
+
+    Usage::
+
+        {% get_info_update feature js_var %}
+    """
+    args = token.contents.split()
+    if len(args) != 3:
+        raise TemplateSyntaxError, "'get_info_update' requires 'feature' argument and the js var name for value"
+    return GetInfoUpdate(args[1], args[2])
+
+register.tag('get_info_update', do_get_info_update)
 
 def do_get_feature(parser, token):
     """
