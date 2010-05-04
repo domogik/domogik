@@ -24,8 +24,29 @@
 {% load text %}
 
 {% block js_script %}
-// <![CDATA[
-// ]]>
+    $(function() {
+        {% for association in house_features_associations %}
+            {% ifequal association.device_type_feature.feature_type "actuator" %}
+                {% get_command_widget association %}
+                {% get_command_init association %}
+            {% endifequal %}
+            {% ifequal association.device_type_feature.feature_type "sensor" %}
+                {% get_info_widget association %}
+                {% get_info_init association %}
+            {% endifequal %}
+        {% endfor %}
+
+        {% regroup house_features_associations|dictsort:"device_id" by device as devices %}
+        var devices = [{% for device in devices %}{{ device.grouper.id }}{% if not forloop.last %},{% endif %}{% endfor %}];
+        $.eventRequest(devices, function(event) {
+        {% regroup house_features_associations|dictsort:"device_id" by device as devices %}
+        {% for device in devices %}
+            {% for association in device.list %}
+
+            {% endfor %}
+        {% endfor %}
+        });
+    });
 {% endblock %}
 
 {% block css %}
@@ -40,22 +61,6 @@
 <h1 class="ident icon64-house-default"><span class="title">{{ house.name }}</span></h1>
 {% endblock %}
 {% block content %}
-    <script type="text/javascript">
-    // <![CDATA[
-        $(function() {
-            {% for feature in house_features_associations %}
-                {% ifequal feature.device_type_feature.feature_type "actuator" %}
-                    {% get_command_widget feature %}
-                    {% get_command_init feature %}
-                {% endifequal %}
-                {% ifequal feature.device_type_feature.feature_type "sensor" %}
-                    {% get_info_widget feature %}
-                    {% get_info_init feature %}
-                {% endifequal %}
-            {% endfor %}
-        });
-    // ]]>
-    </script>
     <div class='actions'>
         <ul>
             {% for association in house_features_associations %}
