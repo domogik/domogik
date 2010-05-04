@@ -87,7 +87,6 @@ const trigger_reset_status = 4000; // 4 seconds
     
     $.extend($.ui.trigger_command_widget_core, {
         defaults: {
-            isCommand: true
         }
     });    
 })(jQuery);

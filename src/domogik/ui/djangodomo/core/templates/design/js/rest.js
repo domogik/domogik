@@ -80,10 +80,10 @@ $.extend({
         });
     },
 
-    longPoll: function(d) {
+    longPoll: function(data) {
         url = rest_url + '/';
-        if (data && data.number) {
-            console.debug(data.number);
+        if (data && data.longpoll) {
+            console.log(data.longpoll[0].number);
         }
 
         $.ajax({
@@ -97,8 +97,8 @@ $.extend({
             },
             success: function (data) {
                 setTimeout(function () {
-                transmission_errors = 0;
-                longPoll(data);
+                    transmission_errors = 0;
+                    $.longPoll(data);
                 }, 100);
             }
         });

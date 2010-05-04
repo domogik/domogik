@@ -165,7 +165,7 @@ class GetCommandTrigger():
 class GetInfoNumber():
     @staticmethod
     def get_feature(device, feature):
-        script = """$("#feature_%s_%s").number_info_widget({
+        script = """$("#feature_%s_%s").number_info_widget_core({
                             usage: %s,
                             inactive: true
                         });

@@ -2,32 +2,19 @@
     $.widget("ui.number_info_widget", {
         _init: function() {
             var self = this, o = this.options;
-            this.element.addClass('widget');
-            this.element.addClass('info_number');
-            this.elementicon = $("<div class='widget_icon'></div>");
-            this.elementvalue =  $("<div class='widget_value'></div>");
-            this.elementicon.append(this.elementvalue);
-            this.element.append(this.elementicon)
+            this.element.number_info_widget_core({
+                usage: o.usage
+            })
                 .attr("tabindex", 0)
                 .click(function () {self.showGraph()})
                 .keypress(function (e) {if (e.which == 13 || e.which == 32) {self.showGraph()}});
+            
 
-            if (o.inactive) {
-                this.elementicon.attr('class', 'widget_icon icon32-info-' + o.usage + ' inactive');                             
-            } else {
-                this.setValue(null);                
-            }
         },
         
         setValue: function(value) {
             var self = this, o = this.options;
-            if (value) {
-                this.elementicon.attr('class', 'widget_icon icon32-info-' + o.usage + ' number');             
-                this.elementvalue.html(value + '<br />' + o.unit)
-            } else { // Unknown
-                this.elementicon.attr('class', 'widget_icon icon32-info-' + o.usage + ' unknown');
-                this.elementvalue.html('??<br />' + o.unit)
-            }
+            this.element.number_info_widget_core('setValue', value, o.unit);
         },
         
         showGraph: function() {
@@ -59,6 +46,39 @@
     });
     
     $.extend($.ui.number_info_widget, {
+        defaults: {
+        }
+    });
+    
+    $.widget("ui.number_info_widget_core", {
+        _init: function() {
+            var self = this, o = this.options;
+            this.element.addClass('widget');
+            this.element.addClass('info_number');
+            this.elementicon = $("<div class='widget_icon'></div>");
+            this.elementvalue =  $("<div class='widget_value'></div>");
+            this.elementicon.append(this.elementvalue);
+            this.element.append(this.elementicon);
+            if (o.inactive) {
+                this.elementicon.attr('class', 'widget_icon icon32-info-' + o.usage + ' inactive');                             
+            } else {
+                this.setValue(null);                
+            }
+        },
+        
+        setValue: function(value, unit) {
+            var self = this, o = this.options;
+            if (value) {
+                this.elementicon.attr('class', 'widget_icon icon32-info-' + o.usage + ' number');             
+                this.elementvalue.html(value + '<br />' + unit)
+            } else { // Unknown
+                this.elementicon.attr('class', 'widget_icon icon32-info-' + o.usage + ' unknown');
+                this.elementvalue.html('--<br />' + unit)
+            }
+        }
+    });
+    
+    $.extend($.ui.number_info_widget_core, {
         defaults: {
         }
     });    
