@@ -129,7 +129,7 @@ $.extend({
             success: function (data) {
                 var status = (data.status).toLowerCase();
                 if (status == 'ok') {
-                    callback(event[0]);
+                    callback(data.event[0]);
                     $.eventUpdate(data.event[0].ticket_id, callback);
                 } else {
                     $.notification('error', 'Event update  (' + data.description + ')');
