@@ -54,6 +54,7 @@ a.fg-button {
 .fg-menu-header {  margin-bottom: .4em; padding: .4em; }
 
 .fg-menu-breadcrumb {
+    background-color: #403E3F;
     background-image: -webkit-gradient(linear, 0% 0%, 0% 95%, from(#000000), to(#403E3F));
     background-image: -moz-linear-gradient(100% 95% 90deg, #403E3F, #000000);
     color:#EEEBE2;

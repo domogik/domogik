@@ -16,6 +16,7 @@ body {
     background-image: -webkit-gradient(linear, 0% 0%, 0% 60%, from(#BDCB2F), to(#9BB528));
     background-image: -moz-linear-gradient(100% 60% 270deg, #BDCB2F, #9BB528);
     border: #B9C248 1px solid;
+    background-color:#9BB528;
     padding:0.5em;
     -moz-border-radius: 0.8em;
     -webkit-border-radius: 0.8em;
@@ -27,6 +28,7 @@ header#mainheader {
     background-image: -webkit-gradient(linear, 0% 0%, 0% 80%, from(#000000), to(#403E3F));
     background-image: -moz-linear-gradient(100% 80% 90deg, #403E3F, #000000);
     color:#EEEBE2;
+    background-color:#403E3F;
 }
 
 header#mainheader #title {
@@ -51,9 +53,11 @@ header#mainheader #subtitle {
     border-bottom: #B9C248 1px solid;
     background-image: -webkit-gradient(linear, 0% 0%, 0% 60%, from(#BDCB2F), to(#9BB528));
     background-image: -moz-linear-gradient(100% 60% 270deg, #BDCB2F, #9BB528);
+    background-color:#9BB528;
     color: #ffffff;
     margin:0;
     padding:0 0.5em 0 0.5em;
+    text-align:right;
 }
 
 #nav1 li {
@@ -61,6 +65,7 @@ header#mainheader #subtitle {
     padding:0;
     margin:0;
     line-height:2.5em;
+    float:left;
 }
 
 #nav1 li a {
@@ -107,7 +112,7 @@ header#mainheader #subtitle {
 }
 
 #nav1 .login {
-    float:right;
+    float:none;
 }
 
 /* Main section */
@@ -115,6 +120,7 @@ header#mainheader #subtitle {
 #content-bgnd {
 	border: #979387 1px solid;
 	margin: 1em 5% 0 5%;
+    background-color:#D2CDBC;
 	background-image: -webkit-gradient(linear, 0% 0%, 0% 30%, from(#908D6F), to(#D2CDBC));
 	background-image: -moz-linear-gradient(0% 5% 270deg,#908D6F, #D2CDBC);
 	-moz-border-radius: 0.8em ;

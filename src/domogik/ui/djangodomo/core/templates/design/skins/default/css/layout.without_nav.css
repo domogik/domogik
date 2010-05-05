@@ -12,6 +12,7 @@ body {
 header#mainheader {
     display:block;
     border: #B9C248 1px solid;
+    background-color:#9BB528;
 	background-image: -webkit-gradient(linear, 0% 0%, 0% 80%, from(#BDCB2F), to(#9BB528));
     background-image: -moz-linear-gradient(100% 80% 270deg, #BDCB2F, #9BB528);
     padding: 1em;
@@ -23,6 +24,7 @@ header#mainheader {
 #content-bgnd {
 	border: #979387 1px solid;
 	margin: 1em 5% 0 5%;
+    background-color:#D2CDBC;
 	background-image: -webkit-gradient(linear, 0% 0%, 0% 30%, from(#908D6F), to(#D2CDBC));
 	background-image: -moz-linear-gradient(0% 5% 270deg,#908D6F, #D2CDBC);
 	-moz-border-radius: 0.8em ;
