@@ -83,7 +83,7 @@ QUEUE_COMMAND_SIZE = 1000
 
 # /event queue config
 QUEUE_EVENT_TIMEOUT = 0   # If 0, no timeout is set
-QUEUE_EVENT_LIFE_EXPECTANCY = 3
+QUEUE_EVENT_LIFE_EXPECTANCY = 5
 QUEUE_EVENT_SIZE = 50
 
 
@@ -3751,11 +3751,26 @@ class EventRequests():
                 ### clean queue
                 idx = 0
                 queue_size = self.requests[req]["queue"].qsize()
+                actual_time = time.time()
                 while idx < queue_size:
                     if self.requests[req]["queue"].empty() == False:
                         (elt_time, elt_data) = self.requests[req]["queue"].get_nowait()
                         # if there is already data about device_id, we clean it (we don't put it back in queue)
-                        if elt_data["device_id"] != device_id:
+                        # or if data is too old
+                        # Note : if we get new stats only each 2 minutes, 
+                        #     cleaning about life expectancy will only happen 
+                        #     every 2 minutes instead of every 'life_expectancy'
+                        #     seconds. I supposed that when you got several 
+                        #     technologies, you pass throug this code several 
+                        #     times in a minute. More over,  events are
+                        #     actually (0.1) used only by UI and when you use
+                        #     UI, events are read immediatly. So, I think
+                        #     that cleaning queues here instead of creating
+                        #     a dedicated process which will run in background
+                        #     is a good thing for the moment
+                        if elt_data["device_id"] != device_id and \
+                           actual_time - elt_time < self.queue_life_expectancy:
+
                             self.requests[req]["queue"].put((elt_time, elt_data),
                                                             True, self.queue_timeout) 
                         else:
