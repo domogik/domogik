@@ -84,7 +84,7 @@ QUEUE_COMMAND_SIZE = 1000
 # /event queue config
 QUEUE_EVENT_TIMEOUT = 0   # If 0, no timeout is set
 QUEUE_EVENT_LIFE_EXPECTANCY = 3
-QUEUE_EVENT_SIZE = 100
+QUEUE_EVENT_SIZE = 50
 
 
 # Domogik plugin informations for manager
@@ -3748,9 +3748,29 @@ class EventRequests():
         print "---- ADD ----"
         for req in self.requests:
             if device_id in self.requests[req]["device_id_list"]:
-                self.requests[req]["queue"].put((time.time(), data), 
-                                                True, self.queue_timeout) 
-                self.requests[req]["queue_size"] += 1
+                ### clean queue
+                idx = 0
+                queue_size = self.requests[req]["queue"].qsize()
+                while idx < queue_size:
+                    if self.requests[req]["queue"].empty() == False:
+                        (elt_time, elt_data) = self.requests[req]["queue"].get_nowait()
+                        # if there is already data about device_id, we clean it (we don't put it back in queue)
+                        if elt_data["device_id"] != device_id:
+                            self.requests[req]["queue"].put((elt_time, elt_data),
+                                                            True, self.queue_timeout) 
+                        else:
+                            # one data suppressed from queue
+                            self.requests[req]["queue_size"] -= 1
+                        
+                    idx += 1
+
+                ### put data in queue
+                try:
+                    self.requests[req]["queue"].put((time.time(), data), 
+                                                    True, self.queue_timeout) 
+                    self.requests[req]["queue_size"] += 1
+                except Full:
+                    print "ERROR : queue for ticket id '%s' is full. Feel free to adjust Event queues size"
 
 
     def get(self, ticket_id):
