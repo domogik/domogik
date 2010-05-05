@@ -19,5 +19,23 @@
 }
 
 .widget.info_number .widget_value {
-    margin-top:30%;
+    position:fixed;
+    text-align:center;
+    width:45px;
+}
+
+.widget.info_number .widget_state {
+    background-color:rgba(255,255,255,0.6);
+    display:inline-block;
+    height:14px;
+    width:15px;
+    border-top: 1px solid #cccccc;
+    border-left: 1px solid #cccccc;
+    -moz-border-radius: 0.8em 0 0.8em 0;
+    -webkit-border-radius: 0.8em 0 0.8em 0;
+    padding: 0;
+    margin-top:30px;
+    float:right;
+    background-position: center center;
+    background-repeat: no-repeat;
 }

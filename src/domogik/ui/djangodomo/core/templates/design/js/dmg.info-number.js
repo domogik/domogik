@@ -8,13 +8,12 @@
                 .attr("tabindex", 0)
                 .click(function () {self.showGraph()})
                 .keypress(function (e) {if (e.which == 13 || e.which == 32) {self.showGraph()}});
-            
-
         },
         
         setValue: function(value) {
             var self = this, o = this.options;
-            this.element.number_info_widget_core('setValue', value, o.unit);
+            this.element.number_info_widget_core('setValue', value, o.unit, this.previousValue);
+            this.previousValue = value;
         },
         
         showGraph: function() {
@@ -61,21 +60,36 @@
             this.element.addClass('widget');
             this.element.addClass('info_number');
             this.elementicon = $("<div class='widget_icon'></div>");
-            this.elementvalue =  $("<div class='widget_value'></div>");
-            this.elementicon.append(this.elementvalue);
             this.element.append(this.elementicon);
             if (o.inactive) {
                 this.elementicon.attr('class', 'widget_icon icon32-info-' + o.usage + ' inactive');                             
             } else {
+                this.elementvalue =  $("<div class='widget_value'></div>");
+                this.elementicon.append(this.elementvalue);
+                this.elementstate = $("<div class='widget_state'></div>");
+                this.elementicon.append(this.elementstate);
                 this.setValue(null);                
             }
         },
         
-        setValue: function(value, unit) {
+        setValue: function(value, unit, previous) {
             var self = this, o = this.options;
             if (value) {
                 this.elementicon.attr('class', 'widget_icon icon32-info-' + o.usage + ' number');             
                 this.elementvalue.html(value + '<br />' + unit)
+                if (previous) {
+                    if (value == previous) {
+                        this.elementstate.attr('class', 'widget_state icon8-status-equal')
+                        this.elementstate.html("<span class='offscreen'>linear</span>");
+                        
+                    } else if (value > previous) {
+                        this.elementstate.attr('class', 'widget_state icon8-status-up')
+                        this.elementstate.html("<span class='offscreen'>going up</span>");
+                    } else {
+                        this.elementstate.attr('class', 'widget_state icon8-status-down')
+                        this.elementstate.html("<span class='offscreen'>going down</span>");
+                    }
+                }
             } else { // Unknown
                 this.elementicon.attr('class', 'widget_icon icon32-info-' + o.usage + ' unknown');
                 this.elementvalue.html('--<br />' + unit)
