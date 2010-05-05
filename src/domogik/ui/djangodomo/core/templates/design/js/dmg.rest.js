@@ -89,11 +89,11 @@ $.extend({
             url: url,
             dataType: "jsonp",
             timeout: 120000, // 2 minute
-            error: function (XMLHttpRequest, textStatus, errorThrown) {
+            error: function (xOptions, textStatus) {
                 if (textStatus == 'timeout') {
                     $.eventRequest(devices, callback);                    
                 } else {
-                    $.notification('error', 'Event request  :' + XMLHttpRequest.readyState + ' ' + XMLHttpRequest.status + ' ' + textStatus + ' ' + errorThrown);
+                    $.notification('error', 'Event update : Lost REST server connection');
                 }
             },
             success: function (data) {
@@ -104,7 +104,7 @@ $.extend({
                     callback(data.event[0]);
                     $.eventUpdate(data.event[0].ticket_id, callback);
                 } else {
-                    $.notification('error', 'Event request  (' + data.description + ')');
+                    $.notification('error', 'Event request  : ' + data.description);
                 }
             }
         });
@@ -119,11 +119,11 @@ $.extend({
             url: url,
             dataType: "jsonp",
             timeout: 120000, // 2 minute
-            error: function (XMLHttpRequest, textStatus, errorThrown) {
+            error: function (xOptions, textStatus) {
                 if (textStatus == 'timeout') {
                     $.eventUpdate(devices, callback);                    
                 } else {
-                    $.notification('error', 'Event update  :' + XMLHttpRequest.readyState + ' ' + XMLHttpRequest.status + ' ' + textStatus + ' ' + errorThrown);
+                    $.notification('error', 'Event update : Lost REST server connection');
                 }
             },
             success: function (data) {
@@ -132,7 +132,7 @@ $.extend({
                     callback(data.event[0]);
                     $.eventUpdate(data.event[0].ticket_id, callback);
                 } else {
-                    $.notification('error', 'Event update  (' + data.description + ')');
+                    $.notification('error', 'Event update : ' + data.description);
                 }
             }
         });
