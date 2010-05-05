@@ -281,7 +281,8 @@ class Rest(xPLPlugin):
     
             # Queues for /event
             # this queue will be fill by stat manager
-            self._event_requests = EventRequests(self._queue_event_size,
+            self._event_requests = EventRequests(self._log,
+                                                 self._queue_event_size,
                                                  self._queue_event_timeout,
                                                  self._queue_event_life_expectancy)
     
@@ -3686,11 +3687,12 @@ class EventRequests():
     """
     Object where all events queues and ticket id will be stored
     """
-    def __init__(self, queue_size, queue_timeout, queue_life_expectancy):
+    def __init__(self, log, queue_size, queue_timeout, queue_life_expectancy):
         """ Init Event Requests
             @param queue_size : size of queues for events
         """
         self.requests = {}
+        self._log = log
         self.queue_size = queue_size
         if queue_timeout == 0:
             self.queue_timeout = None
@@ -3714,6 +3716,7 @@ class EventRequests():
                     "queue_size" : 0}
         self.requests[ticket_id] = new_data
         self.count_request += 1
+        self._log.debug("New event request created (ticket_id=%s) for device(s) : %s" % (ticket_id, str(device_id_list)))
         return ticket_id
 
     def free(self, ticket_id):
@@ -3725,6 +3728,7 @@ class EventRequests():
             del self.requests[ticket_id]
         # ticket doesn't exists
         except KeyError:
+            self._log.warning("Trying to free an unknown event request (ticket_id=%s)" % ticket_id)
             return False
         self.count_request -= 1
         return True
@@ -3785,7 +3789,7 @@ class EventRequests():
                                                     True, self.queue_timeout) 
                     self.requests[req]["queue_size"] += 1
                 except Full:
-                    print "ERROR : queue for ticket id '%s' is full. Feel free to adjust Event queues size"
+                    self._log.error("Queue for ticket_id '%s' is full. Feel free to adjust Event queues size" % ticket_id)
 
 
     def get(self, ticket_id):
@@ -3805,6 +3809,7 @@ class EventRequests():
 
         # Ticket doesn't exists
         except KeyError:
+            self._log.warning("Trying to get an unknown event request (ticket_id=%s)" % ticket_id)
             return False
         return elt_data
 
