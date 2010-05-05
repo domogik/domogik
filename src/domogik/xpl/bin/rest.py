@@ -165,8 +165,6 @@ class Rest(xPLPlugin):
             log_dm = logger.Logger('REST-DM')
             self._log_dm = log_dm.get_logger()
             self._log_dm.info("Rest Server Data Manipulation...")
-            # DB Helper
-            self._db = DbHelper()
     
             ### Config
     
@@ -681,7 +679,6 @@ class ProcessRequest():
         self.send_http_response_error = cb_send_http_response_error
 
         # shorter access
-        self._db = self.handler_params[0]._db
         self._myxpl = self.handler_params[0]._myxpl
         self._log = self.handler_params[0]._log
         self._log_dm = self.handler_params[0]._log_dm
@@ -745,6 +742,9 @@ class ProcessRequest():
             self.rest_request = tab_path[2:]
         else:
             self.rest_request = []
+
+        # DB Helper
+        self._db = DbHelper()
 
 
 
