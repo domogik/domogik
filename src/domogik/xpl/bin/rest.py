@@ -1790,7 +1790,7 @@ target=*
             except:
                 self.send_http_response_error(999, self.get_exception(), self.jsonp, self.jsonp_cb)
         else:
-                self.send_http_response_error(999, "Bad date format (YYYYMMDD or YYYYMMDD-HHMM required", self.jsonp, self.jsonp_cb)
+            self.send_http_response_error(999, "Bad date format (YYYYMMDD or YYYYMMDD-HHMM required", self.jsonp, self.jsonp_cb)
         return my_date
 
 
