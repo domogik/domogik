@@ -159,12 +159,12 @@ class Rest(xPLPlugin):
         self._log.info("Rest Server initialisation...")
         self._log.debug("locale : %s %s" % locale.getdefaultlocale())
 
-        try:
+        # logging data manipulation initialization
+        log_dm = logger.Logger('REST-DM')
+        self._log_dm = log_dm.get_logger()
+        self._log_dm.info("Rest Server Data Manipulation...")
     
-            # logging data manipulation initialization
-            log_dm = logger.Logger('REST-DM')
-            self._log_dm = log_dm.get_logger()
-            self._log_dm.info("Rest Server Data Manipulation...")
+        try:
     
             ### Config
     
@@ -451,7 +451,7 @@ class Rest(xPLPlugin):
         """ Start Statistics manager
         """
         print "Start Stats"
-        self._log.info("Starting statistics manager")
+        self._log.info("Starting statistics manager. His logs will be in a dedicated log file")
         StatsManager(handler_params = [self])
 
 
@@ -3509,9 +3509,17 @@ class StatsManager(xPLPlugin):
         cfg_db = dict(config[1])
         directory = "%s/share/domogik/listeners/" % cfg_db['custom_prefix']
 
+        # logging initialization
+        log = logger.Logger('REST-STAT')
+        self._log = log.get_logger()
+        self._log.info("Rest Stat Manager initialisation...")
+
+        # logging initialization for unkwnon devices
+        log_unknown = logger.Logger('REST-STAT-UNKNOWN-DEVICES')
+        self._log_unknown = log_unknown.get_logger()
+
         files = glob.glob("%s/*/*xml" % directory)
         stats = {}
-        self._log = self.get_my_logger()
         self._db = DbHelper()
 
         ### Rest data
@@ -3549,7 +3557,7 @@ class StatsManager(xPLPlugin):
                             "mapping": mapping,
                             "device": device}
             
-                    stats[technology][schema][type] = self._Stat(self._myxpl, res[technology][schema][type], technology, schema, type, self._db, self._log, self.handler_params)
+                    stats[technology][schema][type] = self._Stat(self._myxpl, res[technology][schema][type], technology, schema, type, self.handler_params)
 
     def get_schemas_and_types(self, node):
         """ Get the schema and the xpl message type
@@ -3607,28 +3615,27 @@ class StatsManager(xPLPlugin):
         Each instance create a Listener and the associated callbacks
         """
 
-        def __init__(self, xpl, res, technology, schema, type, database, log, handler_params):
+        def __init__(self, xpl, res, technology, schema, type, handler_params):
             """ Initialize a stat instance 
             @param xpl : A xpl manager instance
             @param res : The result of xml parsing for this techno/schema/type
             @params technology : The technology monitored
             @param schema : the schema to listen for
             @param type : the xpl type to listen for
-            @param db : a DbHelper instance 
-            @param log : the plugin logger (from self.get_my_logger())
             @param handler_params : handler_params from rest
             """
             ### Rest data
             self.handler_params = handler_params
 
             self._event_requests = self.handler_params[0]._event_requests
+            self._log = self.handler_params[0]._log
+            self._log_unknown = self.handler_params[0]._log_unknown
+            self._db = self.handler_params[0]._db
 
             self._res = res
-            self._db = database
             params = {'schema':schema, 'xpltype': type}
             params.update(res["filter"])
             self._listener = Listener(self._callback, xpl, params)
-            self._log = log
             self._technology = technology
 
         def _callback(self, message):
@@ -3637,45 +3644,38 @@ class StatsManager(xPLPlugin):
             """
 
             print "STATS : %s" % str(message)
-            ### First, we put message in event queue (for /events)
 
-            # TODO 1: put in queue the entire xpl message
-            #self._put_in_queue(self._queue_event, message)
-
-            # TODO 2: put in queue the good data (extract from xpl)
-
-            ### Next, we put data in database
+            ### we put data in database
             self._db = DbHelper()
             self._log.debug("message catcher : %s" % message)
-            d_id = self._db.get_device_by_technology_and_address(self._technology, \
+            try:
+                d_id = self._db.get_device_by_technology_and_address(self._technology, \
                     message.data[self._res["device"]]).id
-            print "techno '%s' / adress '%s' / id '%s'" % (self._technology, message.data[self._res["device"]], d_id)
-            if d_id == None:
-                print "unreferenced device '%s-%s': don't log" % (self._technology, message.data[self._res["device"]])
-                self._log.warning("Received a stat for an unreferenced device : %s - %s" \
+                print "techno '%s' / adress '%s' / id '%s'" % (self._technology, message.data[self._res["device"]], d_id)
+            except AttributeError:
+                self._log_unknown.warning("Received a stat for an unreferenced device : %s - %s" \
                         % (self._technology, message.data[self._res["device"]]))
                 return
-            else:
-                self._log.debug("Stat received for %s - %s." \
-                        % (self._technology, message.data[self._res["device"]]))
-                current_date = datetime.datetime.today()
-                device_data = []
-                for key in self._res["mapping"].keys():
-                    data = ""
-                    if message.data.has_key(key):
-                        #Check if a name has been chosen for this value entry
-                        if self._res["mapping"][key] == None:
-                            #If not, keep the one from message
-                            value = message.data[key]
-                        else:
-                            value = message.data[key]
-                    device_data.append({"key" : key, "value" : value})
-                    # put data in database
-                    self._db.add_device_stat(current_date, key, value, d_id)
+            self._log.debug("Stat received for %s - %s." \
+                    % (self._technology, message.data[self._res["device"]]))
+            current_date = datetime.datetime.today()
+            device_data = []
+            for key in self._res["mapping"].keys():
+                data = ""
+                if message.data.has_key(key):
+                    #Check if a name has been chosen for this value entry
+                    if self._res["mapping"][key] == None:
+                        #If not, keep the one from message
+                        value = message.data[key]
+                    else:
+                        value = message.data[key]
+                device_data.append({"key" : key, "value" : value})
+                # put data in database
+                self._db.add_device_stat(current_date, key, value, d_id)
 
-                # Put data in events queues
-                self._event_requests.add_in_queues(d_id, 
-                        {"device_id" : d_id, "data" : device_data})
+            # Put data in events queues
+            self._event_requests.add_in_queues(d_id, 
+                    {"device_id" : d_id, "data" : device_data})
 
 
 
