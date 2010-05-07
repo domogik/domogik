@@ -3511,12 +3511,12 @@ class StatsManager(xPLPlugin):
 
         # logging initialization
         log = logger.Logger('REST-STAT')
-        self._log = log.get_logger()
-        self._log.info("Rest Stat Manager initialisation...")
+        self._log_stats = log.get_logger()
+        self._log_stats.info("Rest Stat Manager initialisation...")
 
         # logging initialization for unkwnon devices
         log_unknown = logger.Logger('REST-STAT-UNKNOWN-DEVICES')
-        self._log_unknown = log_unknown.get_logger()
+        self._log_stats_unknown = log_unknown.get_logger()
 
         files = glob.glob("%s/*/*xml" % directory)
         stats = {}
@@ -3530,17 +3530,17 @@ class StatsManager(xPLPlugin):
         ### Read xml files
         res = {}
         for _file in files :
-            self._log.info("Parse file %s" % _file)
+            self._log_stats.info("Parse file %s" % _file)
             doc = minidom.parse(_file)
             #Statistic/root node
             technology = doc.documentElement.attributes.get("technology").value
             schema_types = self.get_schemas_and_types(doc.documentElement)
-            self._log.debug("Parsed : %s" % schema_types)
+            self._log_stats.debug("Parsed : %s" % schema_types)
             for schema in schema_types:
                 for type in schema_types[schema]:
                     is_uniq = self.check_config_uniqueness(res, schema, type)
                     if not is_uniq:
-                        self._log.warning("Schema %s, type %s is already defined ! check your config." % (schema, type))
+                        self._log_stats.warning("Schema %s, type %s is already defined ! check your config." % (schema, type))
                         self.force_leave()
             if technology not in res:
                 res[technology] = {}
@@ -3628,8 +3628,8 @@ class StatsManager(xPLPlugin):
             self.handler_params = handler_params
 
             self._event_requests = self.handler_params[0]._event_requests
-            self._log = self.handler_params[0]._log
-            self._log_unknown = self.handler_params[0]._log_unknown
+            self._log_stats = self.handler_params[0]._log_stats
+            self._log_stats_unknown = self.handler_params[0]._log_stats_unknown
             self._db = self.handler_params[0]._db
 
             self._res = res
@@ -3647,16 +3647,16 @@ class StatsManager(xPLPlugin):
 
             ### we put data in database
             self._db = DbHelper()
-            self._log.debug("message catcher : %s" % message)
+            self._log_stats.debug("message catcher : %s" % message)
             try:
                 d_id = self._db.get_device_by_technology_and_address(self._technology, \
                     message.data[self._res["device"]]).id
                 print "techno '%s' / adress '%s' / id '%s'" % (self._technology, message.data[self._res["device"]], d_id)
             except AttributeError:
-                self._log_unknown.warning("Received a stat for an unreferenced device : %s - %s" \
+                self._log_stats_unknown.warning("Received a stat for an unreferenced device : %s - %s" \
                         % (self._technology, message.data[self._res["device"]]))
                 return
-            self._log.debug("Stat received for %s - %s." \
+            self._log_stats.debug("Stat received for %s - %s." \
                     % (self._technology, message.data[self._res["device"]]))
             current_date = datetime.datetime.today()
             device_data = []
