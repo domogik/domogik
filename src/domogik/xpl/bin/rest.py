@@ -729,7 +729,7 @@ class ProcessRequest():
             self.parameters = tab_url[1]
             self._parse_options()
 
-        if self.path[-1:] == "/":
+        while self.path[-1:] == "/":
             self.path = self.path[0:len(self.path)-1]
         tab_path = self.path.split("/")
 
