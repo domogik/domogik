@@ -12,19 +12,19 @@
             this.min_value = parseInt(o.min_value);
             this.max_value = parseInt(o.max_value);
             this.step = parseInt(o.step);
-            this._rangeFront = $("<div class='front rangeleft' style='display:none'></div>");
-            this._rangeLeft = $("<div style='display:none;' class='rotate rangeleft'><div class='bg rangeleft'></div></div>");
+            this._rangeFront = $("<div class='front rangeleft'></div>");
+            this._rangeLeft = $("<div class='rotate rangeleft'><div class='bg rangeleft'></div></div>");
             this._rangeRight = $("<div style='display:none; -moz-transform: rotate(0deg);' class='rotate rangeright'><div class='bg rangeright'></div></div>");
             this.element.append(this._rangeFront)
                 .append(this._rangeLeft)
                 .append(this._rangeRight);
-			this._button_plus = $("<div class='widget_button range_plus icon16-action-up' style='display:none'></div>");
+			this._button_plus = $("<div class='widget_button range_plus icon16-action-up'></div>");
 			this._button_plus.click(function (e) {self.plus_range();e.stopPropagation()});
-			this._button_minus = $("<div class='widget_button range_minus icon16-action-down' style='display:none'></div>");
+			this._button_minus = $("<div class='widget_button range_minus icon16-action-down'></div>");
 			this._button_minus.click(function (e) {self.minus_range();e.stopPropagation()});
-			this._button_max = $("<div class='widget_button range_max icon16-action-max' style='display:none'></div>");
+			this._button_max = $("<div class='widget_button range_max icon16-action-max'></div>");
 			this._button_max.click(function (e) {self.max_range();e.stopPropagation()});
-			this._button_min = $("<div class='widget_button range_min icon16-action-min' style='display:none'></div>");
+			this._button_min = $("<div class='widget_button range_min icon16-action-min'></div>");
 			this._button_min.click(function (e) {self.min_range();e.stopPropagation()});
 			this.element.addClass('closed');
 			this.element.append(this._button_plus)
@@ -68,26 +68,14 @@
         open: function() {
             if (!this.isOpen) {
                 this._open();
-                this._rangeFront.show();
-                this._rangeLeft.show();
                 this._setProcessingValue(this._processingValue);
-                this._button_plus.show();
-                this._button_minus.show();
-                this._button_max.show();
-                this._button_min.show();
             }
 		},
 		
 		close: function() {
             if (this.isOpen) {
                 this._close();
-                this._rangeFront.hide();
-                this._rangeLeft.hide();
                 this._rangeRight.hide();
-                this._button_plus.hide();
-                this._button_minus.hide();
-                this._button_max.hide();
-                this._button_min.hide();
             }
 		},
         

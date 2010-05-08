@@ -37,13 +37,11 @@
 	left:-33px;
 }
 
-.widget_mini.command_range .rotate.rangeleft{
-	z-index:20;
-}
+.widget_mini.command_range .rangeleft { display:none; }
+.widget_mini.opened.command_range .rangeleft { display:block; }
 
-.widget_mini.command_range .rotate.rangeright{
-	z-index:22;
-}
+.widget_mini.command_range .rotate.rangeleft { z-index:20; }
+.widget_mini.command_range .rotate.rangeright { z-index:22; }
 
 .widget_mini.command_range .bg, .widget_mini.command_range .front{
 	width:55px;
