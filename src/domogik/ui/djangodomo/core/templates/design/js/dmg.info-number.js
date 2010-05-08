@@ -1,22 +1,54 @@
 (function($) {    
-    $.widget("ui.number_info_widget", {
+    $.ui.widget_mini_core.subclass ('ui.widget_mini_info_number', {
+        // default options
+        options: {
+            widgettype: 'info_number',
+            nameposition: 'top'
+        },
+
         _init: function() {
             var self = this, o = this.options;
-            this.element.number_info_widget_core({
-                usage: o.usage
-            })
-                .attr("tabindex", 0)
-                .click(function () {self.showGraph()})
-                .keypress(function (e) {if (e.which == 13 || e.which == 32) {self.showGraph()}});
+            this.element.click(function (e) {self._onclick();e.stopPropagation();})
+                .keypress(function (e) {if (e.which == 13 || e.which == 32) {self._onclick()}});
+            this._elementValue =  $("<div class='widget_value'></div>");
+            this.element.append(this._elementValue);
+            this.setValue(null);                
         },
         
-        setValue: function(value) {
+        _onclick: function() {
+            if (this.isOpen) {
+                this.close();
+                this._showGraph();
+            } else {
+                this.open();
+            }
+        },
+
+        setValue: function(value, unit, previous) {
             var self = this, o = this.options;
-            this.element.number_info_widget_core('setValue', value, o.unit, this.previousValue);
+            if (value) {
+                this._displayIcon('number');             
+                this._elementValue.html(value + '<br />' + o.unit)
+                if (this.previousValue) {
+                    if (value == this.previousValue) {
+                        this._elementStatus.attr('class', 'widget_state icon8-status-equal')
+                        this._elementStatus.html("<span class='offscreen'>linear</span>");
+                    } else if (value > this.previousValue) {
+                        this._elementStatus.attr('class', 'widget_state icon8-status-up')
+                        this._elementStatus.html("<span class='offscreen'>going up</span>");
+                    } else {
+                        this._elementStatus.attr('class', 'widget_state icon8-status-down')
+                        this._elementStatus.html("<span class='offscreen'>going down</span>");
+                    }
+                }
+            } else { // Unknown
+                this._displayIcon('unknown');             
+                this._elementValue.html('--<br />' + o.unit)
+            }
             this.previousValue = value;
         },
-        
-        showGraph: function() {
+
+        _showGraph: function() {
             var self = this, o = this.options;
             $.getREST(['stats', o.deviceid, o.key, 'from', '20100401'],
                 function(data) {
@@ -47,58 +79,5 @@
                 }
             );
         }
-    });
-    
-    $.extend($.ui.number_info_widget, {
-        defaults: {
-        }
-    });
-    
-    $.widget("ui.number_info_widget_core", {
-        _init: function() {
-            var self = this, o = this.options;
-            this.element.addClass('widget');
-            this.element.addClass('info_number');
-            this.elementicon = $("<div class='widget_icon'></div>");
-            this.element.append(this.elementicon);
-            if (o.inactive) {
-                this.elementicon.attr('class', 'widget_icon icon32-info-' + o.usage + ' inactive');                             
-            } else {
-                this.elementvalue =  $("<div class='widget_value'></div>");
-                this.elementicon.append(this.elementvalue);
-                this.elementstate = $("<div class='widget_state'></div>");
-                this.elementicon.append(this.elementstate);
-                this.setValue(null);                
-            }
-        },
-        
-        setValue: function(value, unit, previous) {
-            var self = this, o = this.options;
-            if (value) {
-                this.elementicon.attr('class', 'widget_icon icon32-info-' + o.usage + ' number');             
-                this.elementvalue.html(value + '<br />' + unit)
-                if (previous) {
-                    if (value == previous) {
-                        this.elementstate.attr('class', 'widget_state icon8-status-equal')
-                        this.elementstate.html("<span class='offscreen'>linear</span>");
-                        
-                    } else if (value > previous) {
-                        this.elementstate.attr('class', 'widget_state icon8-status-up')
-                        this.elementstate.html("<span class='offscreen'>going up</span>");
-                    } else {
-                        this.elementstate.attr('class', 'widget_state icon8-status-down')
-                        this.elementstate.html("<span class='offscreen'>going down</span>");
-                    }
-                }
-            } else { // Unknown
-                this.elementicon.attr('class', 'widget_icon icon32-info-' + o.usage + ' unknown');
-                this.elementvalue.html('--<br />' + unit)
-            }
-        }
-    });
-    
-    $.extend($.ui.number_info_widget_core, {
-        defaults: {
-        }
-    });    
+    });  
 })(jQuery);

@@ -2,14 +2,79 @@
     display:block;
     outline: none;
     text-align:center;
-    height: 9em;
+    position:relative;
+    width: 45px;
+    height: 45px;
+    border: 1px solid #cccccc;
+    -moz-border-radius: 0.8em;
+    -webkit-border-radius: 0.8em;
+    margin:0.5em 1em 0 1em;
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+
+.widget:hover,
+.widget:focus,
+.widget.opened {
+    background-color:#FFFFFF;
+}
+
+.widget:hover {
+    cursor: pointer;
 }
 
 .widget .name {
     color:#FFFFFF;
-    background-color:#000000;
+/*    background-color:rgba(0,0,0,0.6);
     -moz-border-radius: 0.8em;
-    -webkit-border-radius: 0.8em;
+    -webkit-border-radius: 0.8em;*/
     display:block;
     font-weight:bold;
+    position:absolute;
+    width:10em;
+}
+
+.top {
+    top: -4em;
+    left: -3em;
+}
+
+.topleft {
+    top: -4em;
+    left: -10em;
+}
+
+.widget_status {
+    background-color:rgba(255,255,255,0.6);
+    display:inline-block;
+    vertical-align:text-bottom;
+    height:10px;
+    border-top: 1px solid #cccccc;
+    border-left: 1px solid #cccccc;
+    -moz-border-radius: 0.8em 0 0.8em 0;
+    -webkit-border-radius: 0.8em 0 0.8em 0;
+    float:right;
+    padding: 0.2em 0.5em 0.2em 0.5em;
+    margin-top:30px;
+}
+
+.widget_status.error {
+    background-color:rgba(191,84,46,0.6);
+}
+
+.widget_status.ok {
+    background-color:rgba(144,178,71,0.6);
+}
+
+.blur {
+    position:absolute;
+    float:left;
+    -moz-box-shadow: 0 0 150px 150px #000000;
+    -webkit-box-shadow: 0 0 150px 150px #000000;
+    -moz-border-radius: 0.8em;
+    -webkit-border-radius: 0.8em;
+    width:47px;
+    height:47px;
+    top:-1px;
+    left:-1px
 }

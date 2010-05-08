@@ -1,22 +1,4 @@
 /* Mini widget */
-.widget.info_number:hover .widget_icon,
-.widget.info_number:focus .widget_icon {
-    background-color:#FFFFFF;
-}
-
-.widget.info_number .widget_icon {
-    display:block;
-    width: 45px;
-    height: 45px;
-    border: 1px solid #cccccc;
-    -moz-border-radius: 0.8em;
-    -webkit-border-radius: 0.8em;
-    background-position: center center;
-    background-repeat: no-repeat;
-    margin:0.5em 1em 0 1em;
-    text-align:center;
-    font-weight:bold;
-}
 
 .widget.info_number .widget_value {
     position:fixed;
@@ -25,17 +7,6 @@
 }
 
 .widget.info_number .widget_state {
-    background-color:rgba(255,255,255,0.6);
-    display:inline-block;
     height:14px;
-    width:15px;
-    border-top: 1px solid #cccccc;
-    border-left: 1px solid #cccccc;
-    -moz-border-radius: 0.8em 0 0.8em 0;
-    -webkit-border-radius: 0.8em 0 0.8em 0;
-    padding: 0;
-    margin-top:30px;
-    float:right;
-    background-position: center center;
-    background-repeat: no-repeat;
+    width:15px;    
 }

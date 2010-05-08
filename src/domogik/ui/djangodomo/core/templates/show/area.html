@@ -24,7 +24,6 @@
 {% load text %}
 
 {% block js_script %}
-// <![CDATA[
     $(function() {
         {% for feature in area.feature_association %}        
             {% ifequal feature.device_type_feature.feature_type "actuator" %}
@@ -37,34 +36,35 @@
             {% endifequal %}
         {% endfor %}
         
-        {% regroup area.feature_association|dictsort:"device_id" by device as devices %}
-        var devices = [{% for device in devices %}{{ device.grouper.id }}{% if not forloop.last %},{% endif %}{% endfor %}];
-        
-        $.eventRequest(devices, function(event) {
-            switch(event.device_id) {
+        {% if area.feature_association %}
             {% regroup area.feature_association|dictsort:"device_id" by device as devices %}
-            {% for device in devices %}
-                case {{ device.grouper.id }}:
-                    $.each(event.data, function(index, item) {
-                        switch (item.key) {                        
-                        {% for association in device.list %}
-                            case '{{ association.device_type_feature.stat_key }}':
-                                {% ifequal association.device_type_feature.feature_type "actuator" %}
-                                    {% get_command_update association 'item.value' %}
-                                {% endifequal %}
-                                {% ifequal association.device_type_feature.feature_type "sensor" %}
-                                    {% get_info_update association 'item.value' %}
-                                {% endifequal %}                            
-                                break;
-                        {% endfor %}                    
-                        }
-                    });
-                    break;
-            {% endfor %}
-            }
-        });
+            var devices = [{% for device in devices %}{{ device.grouper.id }}{% if not forloop.last %},{% endif %}{% endfor %}];
+        
+            $.eventRequest(devices, function(event) {
+                switch(event.device_id) {
+                {% regroup area.feature_association|dictsort:"device_id" by device as devices %}
+                {% for device in devices %}
+                    case {{ device.grouper.id }}:
+                        $.each(event.data, function(index, item) {
+                            switch (item.key) {                        
+                            {% for association in device.list %}
+                                case '{{ association.device_type_feature.stat_key }}':
+                                    {% ifequal association.device_type_feature.feature_type "actuator" %}
+                                        {% get_command_update association 'item.value' %}
+                                    {% endifequal %}
+                                    {% ifequal association.device_type_feature.feature_type "sensor" %}
+                                        {% get_info_update association 'item.value' %}
+                                    {% endifequal %}                            
+                                    break;
+                            {% endfor %}                    
+                            }
+                        });
+                        break;
+                {% endfor %}
+                }
+            });
+        {% endif %}        
     });
-// ]]>
 {% endblock %}
 
 {% block css %}
@@ -87,8 +87,7 @@
     <div class='actions'>
         <ul>
             {% for feature in area.feature_association %}
-                <li><div id="widget_{{ feature.device_id }}_{{ feature.device_type_feature_id }}">
-                    <span class='name'>{{ feature.device.name|truncchar:10 }}<br/>{{ feature.device_type_feature.name|truncchar:10 }}</span></div></li>
+                <li><div id="widget_{{ feature.device_id }}_{{ feature.device_type_feature_id }}"></div></li>
             {% endfor %}
             <div class='clear' />
         </ul>
