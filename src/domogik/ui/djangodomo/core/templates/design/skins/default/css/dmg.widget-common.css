@@ -11,6 +11,8 @@
     margin:0.5em 1em 0 1em;
     background-position: center center;
     background-repeat: no-repeat;
+    -moz-user-select:none;
+    -webkit-user-select:none;
 }
 
 .widget_mini:hover,

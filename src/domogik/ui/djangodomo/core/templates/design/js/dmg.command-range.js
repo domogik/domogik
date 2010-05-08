@@ -14,7 +14,7 @@
             this.step = parseInt(o.step);
             this._rangeFront = $("<div class='front rangeleft'></div>");
             this._rangeLeft = $("<div class='rotate rangeleft'><div class='bg rangeleft'></div></div>");
-            this._rangeRight = $("<div style='display:none; -moz-transform: rotate(0deg);' class='rotate rangeright'><div class='bg rangeright'></div></div>");
+            this._rangeRight = $("<div style='display:none;' class='rotate rangeright'><div class='bg rangeright'></div></div>");
             this.element.append(this._rangeFront)
                 .append(this._rangeLeft)
                 .append(this._rangeRight);
@@ -167,11 +167,14 @@
             var self = this, o = this.options;
             if (percent < 50) {
                 var deg = (percent * 180) / 50;
+                this._rangeLeft.css('-webkit-transform', 'rotate(-' + deg + 'deg)');
                 this._rangeLeft.css('-moz-transform', 'rotate(-' + deg + 'deg)');
                 this._rangeRight.hide();
             } else {
                 var deg = ((percent-50) * 180) / 50;
+                this._rangeLeft.css('-webkit-transform', 'rotate(-180deg)');
                 this._rangeLeft.css('-moz-transform', 'rotate(-180deg)');
+                this._rangeRight.css('-webkit-transform', 'rotate(-' + deg + 'deg)');
                 this._rangeRight.css('-moz-transform', 'rotate(-' + deg + 'deg)');
                 this._rangeRight.show();
             }
