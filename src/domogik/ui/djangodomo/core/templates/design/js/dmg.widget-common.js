@@ -12,38 +12,65 @@ const state_reset_status = 4000; // 4 seconds
         _init: function() {
             var self = this, o = this.options;
             this.isOpen = false;
-            this.element.addClass('widget')
+            this.element.addClass('widget_mini')
                 .addClass(o.widgettype)
                 .addClass("icon32-usage-" + o.usage)
                 .attr("tabindex", 0)
                 .processing();
-            this._elementName = $("<span class='name " + o.nameposition + "'>" + o.devicename + "<br/>" + o.featurename + "</span>");
-            this._elementName.hide();
+            this._elementName = $("<span class='name " + o.nameposition + "' style='display:none'>" + o.devicename + "<br/>" + o.featurename + "</span>");
             this.element.append(this._elementName);
-            this._elementStatus = $("<div class='widget_status'></div>");
+            this._elementStatus = $("<div class='status'></div>");
             this.element.append(this._elementStatus);
+            this._elementClose = $("<div class='widget_button widget_close icon32-action-cancel' style='display:none'></div>")
+                .click(function (e) {self.close();e.stopPropagation();});
+            this.element.append(this._elementClose);
+            this.element.keypress(function (e) {
+					switch(e.keyCode) { 
+					case 27: // Esc
+						self.close();
+						break;
+					}
+					e.stopPropagation();
+				});
+
+        },
+        
+        _open: function() {
+            var self = this, o = this.options;
+            if (!this.isOpen) {
+                // Close all openned widgets
+                $('.widget_mini').widget_mini_core('close');
+                this.isOpen = true;
+                this._elementBlur = $("<div class='blur'></div>");
+                this.element.prepend(this._elementBlur);
+                this._elementName.show();
+                this._elementClose.show();
+                this.element.removeClass('closed')
+                    .addClass('opened');    
+                this.element.doTimeout( 'timeout', close_without_change, function(){
+                    self.close();
+                });
+            }
+        },
+        
+        _close: function() {
+            if (this.isOpen) {
+                this.isOpen = false;
+                this._elementBlur.remove();
+                this._elementName.hide();
+                this._elementClose.hide();
+                this.element.removeClass('opened')
+                    .addClass('closed');                
+            }
         },
         
         open: function() {
-            var self = this, o = this.options;
-            this.isOpen = true;
-            this._elementBlur = $("<div class='blur'></div>");
-            this.element.prepend(this._elementBlur);
-            this._elementName.show();
-            this.element.removeClass('closed')
-				.addClass('opened');    
-            this.element.doTimeout( 'timeout', close_without_change, function(){
-				self.close();
-			});
-        },
-        
-        close: function() {
-            this.isOpen = false;
-            this._elementBlur.remove();
-            this._elementName.hide();
-            this.element.removeClass('opened')
-				.addClass('closed');
-        },
+            this._open();
+		},
+		
+		close: function() {
+            this._close();
+		},
         
         runAction: function(data) {
             var self = this, o = this.options;

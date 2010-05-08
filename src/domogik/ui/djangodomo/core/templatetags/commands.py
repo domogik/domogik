@@ -51,8 +51,8 @@ class GetCommandBinary(Node):
                         value1: '%s',
                         text0: '%s',
                         text1: '%s',
-                        action: function(self, value) {
-                            $.getREST(['command', '%s', '%s', value],
+                        action: function(self, values) {
+                            $.getREST(['command', '%s', '%s', values.value],
                                 function(data) {
                                     var status = (data.status).toLowerCase();
                                     if (status == 'ok') {
@@ -89,8 +89,8 @@ class GetCommandRange(Node):
                         max_value: %s,
                         step: %s,
                         unit: '%s',
-                        action: function(self, value) {
-                            $.getREST(['command', '%s', '%s', '%s', value],
+                        action: function(self, values) {
+                            $.getREST(['command', '%s', '%s', '%s', values.value],
                                 function(data) {
                                     var status = (data.status).toLowerCase();
                                     if (status == 'ok') {

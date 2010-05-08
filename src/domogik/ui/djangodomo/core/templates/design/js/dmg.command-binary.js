@@ -69,9 +69,10 @@
             if (this.currentValue) {
                 this.processingValue = (this.currentValue == 0)?1:0;                
             } else { // Current state unknown
-                this.processingValue = 0;
+                // Suppose the switch currently off
+                this.processingValue = 1;
             }
-            this.runAction({value : this.processingValue});
+            this.runAction({value : this.values[this.processingValue]});
         }
     });
 })(jQuery);

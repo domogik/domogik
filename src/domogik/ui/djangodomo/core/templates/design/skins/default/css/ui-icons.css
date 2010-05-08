@@ -164,10 +164,15 @@
 .icon16-action-previous { background-image:url(../images/action/left_16.png);}
 .icon16-action-submit { background-image:url(../images/status/check_16.png);}
 .icon16-action-cancel { background-image:url(../images/status/wrong_16.png);}
+.icon32-action-cancel { background-image:url(../images/status/wrong_32.png);}
 .icon16-action-password { background-image:url(../images/action/key_16.png);}
 .icon16-action-save { background-image:url(../images/action/save_16.png);}
 .icon16-action-reset { background-image:url(../images/action/refresh_16.png);}
 .icon16-action-loading { background-image:url(../images/action/loading_16.gif);}
+.icon16-action-up { background-image:url(../images/action/up_16.png);}
+.icon16-action-down { background-image:url(../images/action/down_16.png);}
+.icon16-action-max { background-image:url(../images/action/max_16.png);}
+.icon16-action-min { background-image:url(../images/action/min_16.png);}
 
 
 /* technology icons */

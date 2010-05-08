@@ -1,14 +1,4 @@
-/*
-.widget.command_range .blur {
-    -moz-background-size: '100% 0%';
-    -webkit-background-size: '100% 0%';
-    background-image: -webkit-gradient(linear, 0% 0%, 0% 60%, from(#908D6F), to(#D2CDBC));
-    background-image: -moz-linear-gradient(100% 60% 270deg, #908D6F, #D2CDBC);
-    background-position: bottom left;
-    background-repeat: no-repeat;
-}*/
-
-.widget.command_range .widget_value {
+.widget_mini.command_range .widget_value {
     float:left;
     display:inline-block;
     width: 45px;
@@ -18,44 +8,27 @@
     background-repeat: no-repeat;
 }
 
-.widget.command_range .range_button {
-    width: 32px;
-    height: 32px;
-    position: absolute;
-    background-position: 50% 50%;
-    background-repeat: no-repeat;
-    background-color: #FFFFFF;
-    border: 1px solid #cccccc;
-    -moz-border-radius: 32px;
-    -webkit-border-radius: 32px;
-    z-index:21;
-}
-
-.widget.command_range .range_plus {
-    background-image: url('../images/action/up_16.png');
-    top:-30px;
+.widget_mini.command_range .range_plus {
+    top:-24px;
     right:-80px;
 }
 
-.widget.command_range .range_minus {
-    background-image: url('../images/action/down_16.png');
+.widget_mini.command_range .range_minus {
     top:30px;
     right:-80px;
 }
 
-.widget.command_range .range_min {
-    background-image: url('../images/action/min_16.png');
+.widget_mini.command_range .range_min {
     top:80px;
     right:-40px;
 }
 
-.widget.command_range .range_max {
-    background-image: url('../images/action/max_16.png');
-    top:-80px;
+.widget_mini.command_range .range_max {
+    top:-74px;
     right:-40px;
 }
 
-.rotate{
+.widget_mini.command_range .rotate{
 	/* There are two .rotate divs - one for each half of the background */
 	position:absolute;
 	width:110px;
@@ -64,31 +37,30 @@
 	left:-33px;
 }
 
-.rotate.rangeleft{
+.widget_mini.command_range .rotate.rangeleft{
 	z-index:20;
 }
 
-.rotate.rangeright{
+.widget_mini.command_range .rotate.rangeright{
 	z-index:22;
 }
 
-.bg, .front{
+.widget_mini.command_range .bg, .widget_mini.command_range .front{
 	width:55px;
 	height:110px;
 	position:absolute;
 	top:0;
 }
 
-.bg.rangeleft{ left:0; }
+.widget_mini.command_range .bg.rangeleft{ left:0; }
 
-/* Individual styles for each color: */
-.bg.rangeleft{ background:url('../images/status/range_bg_green.png') no-repeat left top; }
+.widget_mini.command_range .bg.rangeleft{ background:url('../images/status/range_bg_green.png') no-repeat left top; }
 
 /* The right part of the background: */
-.bg.rangeright{ left:55px; }
-.bg.rangeright{ background:url('../images/status/range_bg_green.png') no-repeat right top; }
+.widget_mini.command_range .bg.rangeright{ left:55px; }
+.widget_mini.command_range .bg.rangeright{ background:url('../images/status/range_bg_green.png') no-repeat right top; }
 
-.front.rangeleft{
+.widget_mini.command_range .front.rangeleft{
 	left:-33px;
     top:-33px;
 	z-index:21;

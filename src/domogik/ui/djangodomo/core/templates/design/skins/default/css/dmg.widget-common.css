@@ -1,4 +1,4 @@
-.widget {
+.widget_mini {
     display:block;
     outline: none;
     text-align:center;
@@ -13,17 +13,17 @@
     background-repeat: no-repeat;
 }
 
-.widget:hover,
-.widget:focus,
-.widget.opened {
+.widget_mini:hover,
+.widget_mini:focus,
+.widget_mini.opened {
     background-color:#FFFFFF;
 }
 
-.widget:hover {
+.widget_mini:hover {
     cursor: pointer;
 }
 
-.widget .name {
+.widget_mini .name {
     color:#FFFFFF;
 /*    background-color:rgba(0,0,0,0.6);
     -moz-border-radius: 0.8em;
@@ -45,7 +45,7 @@
     left: -10em;
 }
 
-.widget_status {
+.widget_mini .status {
     background-color:rgba(255,255,255,0.6);
     display:inline-block;
     vertical-align:text-bottom;
@@ -59,15 +59,15 @@
     margin-top:30px;
 }
 
-.widget_status.error {
+.widget_mini .status.error {
     background-color:rgba(191,84,46,0.6);
 }
 
-.widget_status.ok {
+.widget_mini .status.ok {
     background-color:rgba(144,178,71,0.6);
 }
 
-.blur {
+.widget_mini .blur {
     position:absolute;
     float:left;
     -moz-box-shadow: 0 0 150px 150px #000000;
@@ -79,4 +79,22 @@
     top:-1px;
     left:-1px;
     z-index:10;
+}
+
+.widget_mini .widget_button {
+    width: 32px;
+    height: 32px;
+    position: absolute;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    background-color: #FFFFFF;
+    border: 1px solid #cccccc;
+    -moz-border-radius: 32px;
+    -webkit-border-radius: 32px;
+    z-index:21;
+}
+
+.widget_mini .widget_close {
+    top:6px;
+    left:-80px;
 }
