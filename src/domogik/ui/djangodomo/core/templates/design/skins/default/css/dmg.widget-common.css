@@ -32,6 +32,7 @@
     font-weight:bold;
     position:absolute;
     width:10em;
+    z-index:20;
 }
 
 .top {
@@ -76,5 +77,6 @@
     width:47px;
     height:47px;
     top:-1px;
-    left:-1px
+    left:-1px;
+    z-index:10;
 }

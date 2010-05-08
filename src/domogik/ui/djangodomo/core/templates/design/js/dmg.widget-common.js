@@ -1,3 +1,5 @@
+const close_without_change = 10000; // 10 seconds
+const close_with_change = 3000; // 3 seconds
 const state_reset_status = 4000; // 4 seconds
 
 (function($) {
@@ -23,12 +25,16 @@ const state_reset_status = 4000; // 4 seconds
         },
         
         open: function() {
+            var self = this, o = this.options;
             this.isOpen = true;
             this._elementBlur = $("<div class='blur'></div>");
             this.element.prepend(this._elementBlur);
             this._elementName.show();
             this.element.removeClass('closed')
-				.addClass('opened');
+				.addClass('opened');    
+            this.element.doTimeout( 'timeout', close_without_change, function(){
+				self.close();
+			});
         },
         
         close: function() {

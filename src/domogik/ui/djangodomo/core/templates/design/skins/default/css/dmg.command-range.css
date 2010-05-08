@@ -28,6 +28,7 @@
     border: 1px solid #cccccc;
     -moz-border-radius: 32px;
     -webkit-border-radius: 32px;
+    z-index:21;
 }
 
 .widget.command_range .range_plus {
@@ -63,8 +64,12 @@
 	left:-33px;
 }
 
+.rotate.rangeleft{
+	z-index:20;
+}
+
 .rotate.rangeright{
-	z-index:11;
+	z-index:22;
 }
 
 .bg, .front{
@@ -86,6 +91,6 @@
 .front.rangeleft{
 	left:-33px;
     top:-33px;
-	z-index:10;
-     background:url('../images/status/range_bg_black.png') no-repeat left top; 
+	z-index:21;
+    background:url('../images/status/range_bg_black.png') no-repeat left top; 
 }

@@ -1,5 +1,3 @@
-const close_without_change = 10000; // 10 seconds
-const close_with_change = 3000; // 3 seconds
 
 (function($) {
     $.ui.widget_mini_core.subclass ('ui.widget_mini_command_range', {
@@ -77,9 +75,6 @@ const close_with_change = 3000; // 3 seconds
 			this._button_minus.show();
 			this._button_max.show();
 			this._button_min.show();
-			this.element.doTimeout( 'timeout', close_without_change, function(){
-				self.close();
-			});
 		},
 		
 		close: function() {
