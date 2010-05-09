@@ -57,6 +57,7 @@ const state_reset_status = 4000; // 4 seconds
                 this.element.removeClass('opened')
                     .addClass('closed');                
             }
+            this.element.doTimeout( 'timeout');
         },
         
         open: function() {

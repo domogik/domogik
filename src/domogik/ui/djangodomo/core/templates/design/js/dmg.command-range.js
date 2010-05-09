@@ -76,6 +76,7 @@
             if (this.isOpen) {
                 this._close();
                 this._rangeRight.hide();
+                this.setValue(this.currentValue);
             }
 		},
         
