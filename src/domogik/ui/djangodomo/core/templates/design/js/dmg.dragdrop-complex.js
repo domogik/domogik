@@ -217,8 +217,8 @@
                         } else {
                             text = $(objNode).text() 
                         }
-                        text += "<br/>Associated<br/>with<br/>" + zone_target.name;                  
-                        zone_origin.list.append("<li id='" + element_value + "_trace' class='trace'><p>" + text + "</p></li>");
+                        text += "<br />Associated with " + zone_target.name;                  
+                        zone_origin.list.append("<li id='" + element_value + "_trace' class='trace'>" + text + "</li>");
                     }
                 }
                 var element = $(objNode).detach();

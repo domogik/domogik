@@ -29,19 +29,10 @@
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/page-admin-organization.css" rel="stylesheet" type="text/css" />
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.collabsible-list.css" rel="stylesheet" type="text/css" />
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/fg.menu.css" rel="stylesheet" type="text/css" />
-    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.widget-common.css" rel="stylesheet" type="text/css" />
-    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.command-binary.css" rel="stylesheet" type="text/css" />
-    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.command-range.css" rel="stylesheet" type="text/css" />
-    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.command-trigger.css" rel="stylesheet" type="text/css" />
-    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.info-number.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block js_include %}
     <script type="text/javascript" src="/design/js/dmg.dragdrop-complex.js"></script>
     <script type="text/javascript" src="/design/js/fg.menu.js"></script>
-    <script type="text/javascript" src="/design/js/dmg.command-binary.js"></script>
-    <script type="text/javascript" src="/design/js/dmg.command-range.js"></script>
-    <script type="text/javascript" src="/design/js/dmg.command-trigger.js"></script>
-    <script type="text/javascript" src="/design/js/dmg.info-number.js"></script>
 {% endblock %}
 {% block js_script %}
     $(function(){
@@ -141,22 +132,13 @@
                 <div id="element{{ usage.grouper.id }}" class="tabelement">
                     {% for device in usage.list %}
                         <fieldset class="targetdrop" value='device-{{ device.id }}'>
-                            <script type="text/javascript">
-                            // <![CDATA[
-                                $(function() {
-                                    {% for feature in device.feature %}
-                                        {% get_feature device feature %}
-                                    {% endfor %}
-                                });
-                            // ]]>
-                            </script>
                             <legend>{{ device.name }} ({{ device.address }})</legend>
                             <ul class="draggables">
                                 {% for feature in device.feature %}
                                     {% if feature.association %}
-                                        <li class='trace' id='feature-{{ device.id }}-{{ feature.id }}_trace'><p>{{ device.name }}<br/>{{ feature.name }}<br/>associated<br />with<br />{{ feature.association.place_type }} {{ feature.association.place_id }}</p></li>
+                                        <li class='trace' id='feature-{{ device.id }}-{{ feature.id }}_trace'>{{ device.name }} {{ feature.name }}<br/>associated with {{ feature.association.place_type }} {{ feature.association.place_id }}</li>
                                     {% else %}
-                                        <li class="draggable" value="feature-{{ device.id }}-{{ feature.id }}" zoneorigin='target_device-{{ device.id }}'><div id="feature_{{ device.id }}_{{ feature.id }}"><span class='name'>{{ device.name|truncchar:10 }}<br/>{{ feature.name|truncchar:10 }}</span></div></li>
+                                        <li class="draggable icon32-usage-{{ usage.grouper.id }} unknown" value="feature-{{ device.id }}-{{ feature.id }}" zoneorigin='target_device-{{ device.id }}'><div id="feature_{{ device.id }}_{{ feature.id }}"><span class='name'>{{ device.name|truncchar:10 }}<br/>{{ feature.name|truncchar:10 }}</span></div></li>
                                     {% endif %}
                                 {% endfor %}
                             </ul>
@@ -179,7 +161,7 @@
                     <legend class="choice icon16-house-default">{{ house.name }}</legend>
                     <ul class="draggables">
                         {% for association in house_features_associations %}
-                            <li class="draggable" value="feature-{{ association.device_id }}-{{ association.device_type_feature_id }}" zoneorigin='target_device-{{ association.device_id }}'>
+                            <li class="draggable icon32-usage-{{ association.device.device_usage_id }} unknown" value="feature-{{ association.device_id }}-{{ association.device_type_feature_id }}" zoneorigin='target_device-{{ association.device_id }}'>
                                 <div id="feature_{{ association.device_id }}_{{ association.device_type_feature_id }}">
                                     <span class='name'>{{ association.device.name|truncchar:10 }}<br/>{{ association.device_type_feature.name|truncchar:10 }}</span></div></li>
                         {% endfor %}
@@ -192,7 +174,7 @@
                     <legend class="choice icon16-area-{{ area.config.icon }}">{{ area.name }}</legend>
                     <ul class="draggables">
                         {% for association in area.feature_association %}
-                            <li class="draggable" value="feature-{{ association.device_id }}-{{ association.device_type_feature_id }}" zoneorigin='target_device-{{ association.device_id }}'>
+                            <li class="draggable icon32-usage-{{ association.device.device_usage_id }} unknown" value="feature-{{ association.device_id }}-{{ association.device_type_feature_id }}" zoneorigin='target_device-{{ association.device_id }}'>
                                 <div id="feature_{{ association.device_id }}_{{ association.device_type_feature_id }}">
                                     <span class='name'>{{ association.device.name|truncchar:10 }}<br/>{{ association.device_type_feature.name|truncchar:10 }}</span></div></li>
                         {% endfor %}
@@ -206,7 +188,7 @@
                     <legend class="choice icon16-room-{{ room.config.icon }}">{{ room.name }}</legend>
                     <ul class="draggables">
                         {% for association in room.feature_association %}
-                            <li class="draggable" value="feature-{{ association.device_id }}-{{ association.device_type_feature_id }}" zoneorigin='target_device-{{ association.device_id }}'>
+                            <li class="draggable icon32-usage-{{ association.device.device_usage_id }} unknown" value="feature-{{ association.device_id }}-{{ association.device_type_feature_id }}" zoneorigin='target_device-{{ association.device_id }}'>
                                 <div id="feature_{{ association.device_id }}_{{ association.device_type_feature_id }}">
                                     <span class='name'>{{ association.device.name }}<br/>{{ association.device_type_feature.name }}</span></div></li>
                         {% endfor %}

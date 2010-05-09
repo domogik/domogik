@@ -387,8 +387,8 @@ def admin_organization_rooms(request):
         nav2_organization_rooms = "selected",
         status=status,
         msg=msg,
-        unattribued_rooms=result_unattributed_rooms.room,
         rooms_list=result_all_rooms.room,
+        unattribued_rooms=result_unattributed_rooms.room,
         areas_list=result_all_areas.area
     )
 

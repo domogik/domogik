@@ -42,24 +42,17 @@ def unescape(s):
 
 class GetCommandBinary(Node):
     @staticmethod
-    def get_feature(device, feature):
-        script = """$("#feature_%s_%s").binary_command_widget_core({
-                            usage: %s,
-                            inactive: true
-                        });
-                    """ % (device.id, feature.id, device.device_usage_id)
-        return script
-
-    @staticmethod
-    def get_widget(feature, device_type, device_usage, parameters_type, parameters_usage):
-        script = """$('#widget_%s_%s').binary_command({
+    def get_widget_mini(feature, device_type, device_usage, parameters_type, parameters_usage):
+        script = """$('#widget_%s_%s').widget_mini_command_binary({
                         usage: %s,
+                        devicename: '%s',
+                        featurename: '%s',
                         value0: '%s',
                         value1: '%s',
                         text0: '%s',
                         text1: '%s',
-                        action: function(self, value) {
-                            $.getREST(['command', '%s', '%s', value],
+                        action: function(self, values) {
+                            $.getREST(['command', '%s', '%s', values.value],
                                 function(data) {
                                     var status = (data.status).toLowerCase();
                                     if (status == 'ok') {
@@ -73,6 +66,7 @@ class GetCommandBinary(Node):
                         }
                     });
                     """ % (feature.device_id, feature.device_type_feature_id, feature.device.device_usage_id,
+                           feature.device.name, feature.device_type_feature.name,
                            parameters_type['value0'], parameters_type['value1'],
                            parameters_usage['binary']['state0'], parameters_usage['binary']['state1'],
                            device_type.device_technology_id, feature.device.address, feature.device_type_feature.return_confirmation)
@@ -80,30 +74,23 @@ class GetCommandBinary(Node):
 
     @staticmethod
     def get_setValue(feature, value):
-        script = """$("#widget_%s_%s").binary_command('setValue', %s);
+        script = """$("#widget_%s_%s").widget_mini_command_binary('setValue', %s);
                     """ % (feature.device_id, feature.device_type_feature_id, value)
         return script
 
 class GetCommandRange(Node):
     @staticmethod
-    def get_feature(device, feature):
-        script = """$("#feature_%s_%s").range_command_widget_core({
-                            usage: %s,
-                            inactive: true
-                        });
-                    """ % (device.id, feature.id, device.device_usage_id)
-        return script
-
-    @staticmethod
-    def get_widget(feature, device_type, device_usage, parameters_type, parameters_usage):
-        script = """$("#widget_%s_%s").range_command({
+    def get_widget_mini(feature, device_type, device_usage, parameters_type, parameters_usage):
+        script = """$("#widget_%s_%s").widget_mini_command_range({
                         usage: %s,
+                        devicename: '%s',
+                        featurename: '%s',
                         min_value: %s,
                         max_value: %s,
                         step: %s,
                         unit: '%s',
-                        action: function(self, value) {
-                            $.getREST(['command', '%s', '%s', '%s', value],
+                        action: function(self, values) {
+                            $.getREST(['command', '%s', '%s', '%s', values.value],
                                 function(data) {
                                     var status = (data.status).toLowerCase();
                                     if (status == 'ok') {
@@ -117,6 +104,7 @@ class GetCommandRange(Node):
                         }
                     });
                     """ % (feature.device_id, feature.device_type_feature_id, feature.device.device_usage_id,
+                           feature.device.name, feature.device_type_feature.name,
                            parameters_type['valueMin'], parameters_type['valueMax'],
                            parameters_usage['range']['step'], parameters_usage['range']['unit'],
                            device_type.device_technology_id, feature.device.address,
@@ -125,24 +113,17 @@ class GetCommandRange(Node):
 
     @staticmethod
     def get_setValue(feature, value):
-        script = """$("#widget_%s_%s").range_command('setValue', %s);
+        script = """$("#widget_%s_%s").widget_mini_command_range('setValue', %s);
                     """ % (feature.device_id, feature.device_type_feature_id, value)
         return script
 
 class GetCommandTrigger():
     @staticmethod
-    def get_feature(device, feature):
-        script = """$("#feature_%s_%s").trigger_command_widget_core({
-                            usage: %s,
-                            inactive: true
-                        });
-                    """ % (device.id, feature.id, device.device_usage_id)
-        return script
-
-    @staticmethod
-    def get_widget(feature, device_type, device_usage, parameters_type, parameters_usage):
-        script = """$('#widget_%s_%s').trigger_command({
+    def get_widget_mini(feature, device_type, device_usage, parameters_type, parameters_usage):
+        script = """$('#widget_%s_%s').widget_mini_command_trigger({
                         usage: %s,
+                        devicename: '%s',
+                        featurename: '%s',
                         action: function(self) {
                             $.getREST(['command', '%s', '%s', '%s'],
                                 function(data) {
@@ -158,47 +139,37 @@ class GetCommandTrigger():
                         }
                     });
                     """ % (feature.device_id, feature.device_type_feature_id, feature.device.device_usage_id,
+                           feature.device.name, feature.device_type_feature.name,
                            device_type.device_technology_id, feature.device.address,
                            parameters_type['command'], feature.device_type_feature.return_confirmation)
         return script
 
 class GetInfoNumber():
     @staticmethod
-    def get_feature(device, feature):
-        script = """$("#feature_%s_%s").number_info_widget_core({
+    def get_widget_mini(feature, device_type, device_usage, parameters_type, parameters_usage):
+        script = """$("#widget_%s_%s").widget_mini_info_number({
                             usage: %s,
-                            inactive: true
-                        });
-                 """ % (device.id, feature.id, device.device_usage_id)
-        return script
-
-    @staticmethod
-    def get_widget(feature, device_type, device_usage, parameters_type, parameters_usage):
-        script = """$("#widget_%s_%s").number_info_widget({
-                            usage: %s,
+                            devicename: '%s',
+                            featurename: '%s',
                             unit: '%s',
                             deviceid: %s,
                             key: '%s'
                         });
                  """ % (feature.device_id, feature.device_type_feature_id, feature.device.device_usage_id,
-                           parameters_type['unit'], feature.device_id, feature.device_type_feature.stat_key)
+                        feature.device.name, feature.device_type_feature.name,
+                        parameters_type['unit'], feature.device_id, feature.device_type_feature.stat_key)
         return script
 
     @staticmethod
     def get_setValue(feature, value):
-        script = """$("#widget_%s_%s").number_info_widget('setValue', %s);
+        script = """$("#widget_%s_%s").widget_mini_info_number('setValue', %s);
                  """ % (feature.device_id, feature.device_type_feature_id, value)
 
         return script
 
 class GetInfoString():
     @staticmethod
-    def get_feature(device, feature):
-        script = ""
-        return script
-
-    @staticmethod
-    def get_widget(feature, device_type, device_usage, parameters_type, parameters_usage):
+    def get_widget_mini(feature, device_type, device_usage, parameters_type, parameters_usage):
         script = ""
         return script
 
@@ -224,11 +195,11 @@ class GetCommandWidget(Node):
             parameters_usage = simplejson.loads(unescape(device_usage.default_options))
         
         if feature.device_type_feature.value_type == "binary":
-            script = GetCommandBinary.get_widget(feature, device_type, device_usage, parameters_type, parameters_usage)
+            script = GetCommandBinary.get_widget_mini(feature, device_type, device_usage, parameters_type, parameters_usage)
         if feature.device_type_feature.value_type == "range":
-            script = GetCommandRange.get_widget(feature, device_type, device_usage, parameters_type, parameters_usage)
+            script = GetCommandRange.get_widget_mini(feature, device_type, device_usage, parameters_type, parameters_usage)
         if feature.device_type_feature.value_type == "trigger":
-            script = GetCommandTrigger.get_widget(feature, device_type, device_usage, parameters_type, parameters_usage)
+            script = GetCommandTrigger.get_widget_mini(feature, device_type, device_usage, parameters_type, parameters_usage)
         return script
 
 class GetCommandInit(Node):
@@ -276,9 +247,9 @@ class GetInfoWidget(Node):
         if device_usage.default_options != 'None':
             parameters_usage = simplejson.loads(unescape(device_usage.default_options))
         if feature.device_type_feature.value_type == "number":
-            script = GetInfoNumber.get_widget(feature, device_type, device_usage, parameters_type, parameters_usage)
+            script = GetInfoNumber.get_widget_mini(feature, device_type, device_usage, parameters_type, parameters_usage)
         if feature.device_type_feature.value_type == "string":
-            script = GetInfoString.get_widget(feature, device_type, device_usage, parameters_type, parameters_usage)
+            script = GetInfoString.get_widget_mini(feature, device_type, device_usage, parameters_type, parameters_usage)
         return script
 
 class GetInfoInit(Node):
@@ -310,29 +281,7 @@ class GetInfoUpdate(Node):
         if feature.device_type_feature.value_type == "string":
             script = GetInfoString.get_setValue(feature, value)
         return script
-    
-class GetFeature(Node):
-    def __init__(self, device, feature):
-        self.device = template.Variable(device)
-        self.feature = template.Variable(feature)
-
-    def render(self, context):
-        device = self.device.resolve(context)
-        feature = self.feature.resolve(context)
-        if feature.feature_type == "actuator":
-            if feature.value_type == "binary":
-                script = GetCommandBinary.get_feature(device, feature)
-            if feature.value_type == "range":
-                script = GetCommandRange.get_feature(device, feature)
-            if feature.value_type == "trigger":
-                script = GetCommandTrigger.get_feature(device, feature)
-        elif feature.feature_type == "sensor":
-            if feature.value_type == "number":
-                script = GetInfoNumber.get_feature(device, feature)                
-            if feature.value_type == "string":
-                script = GetInfoString.get_feature(device, feature)                
-        return script
-    
+        
 def do_get_command_widget(parser, token):
     """
     This returns the jquery function for creating a command widget.
@@ -422,18 +371,3 @@ def do_get_info_update(parser, token):
     return GetInfoUpdate(args[1], args[2])
 
 register.tag('get_info_update', do_get_info_update)
-
-def do_get_feature(parser, token):
-    """
-    This returns the jquery function for creating a feature element.
-
-    Usage::
-
-        {% get_feature device feature %}
-    """
-    args = token.contents.split()
-    if len(args) != 3:
-        raise TemplateSyntaxError, "'get_feature' requires 'device' and 'feature' argument"
-    return GetFeature(args[1], args[2])
-    
-register.tag('get_feature', do_get_feature)
