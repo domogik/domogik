@@ -95,6 +95,7 @@ class OneWireNetwork:
             print "[ %s ]" % component
             print " - Important data"
             print "   - Temperature = %s" % comp.temperature
+            print "   - Powered (1) or parasit (0) = %s" % comp.power
             print " - All data"
             self.show_all_attributes(comp)
 
@@ -105,7 +106,7 @@ class OneWireNetwork:
             name = str(comp).split(" - ")[0]
             print "[ %s ]" % name
             print " - Important data"
-            print "   - n/a"
+            print "   - Present = %s" % comp.present
             print " - All data"
             self.show_all_attributes(comp)
 
