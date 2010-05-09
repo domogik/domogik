@@ -161,17 +161,6 @@ def logout(request):
     request.session.clear()
     return index(request)
 
-def admin_index(request):
-    """
-    Method called when the admin page is accessed
-    @param request : HTTP request
-    @return an HttpResponse object
-    """
-    if not __is_user_admin(request):
-        return index(request)
-    page_title = _("Admin page")
-    return __go_to_page(request, 'admin/index.html', page_title)
-
 def __get_user_connected(request):
     """
     Get current user connected
