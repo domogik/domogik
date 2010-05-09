@@ -85,13 +85,16 @@
     <h1 class="ident icon64-room-{{ room.config.icon }}"><span class="title">{{ room.name }}</span></h1>
 {% endblock %}
 
-{% block content %}    
+{% block contentleft %}
+    <div class='mainactions'>
+        <ul>
+        </ul>
+    </div>
     <div class='actions'>
         <ul>
-            {% for feature in room.feature_association %}
-                <li><div id="widget_{{ feature.device_id }}_{{ feature.device_type_feature_id }}"></div></li>
+            {% for association in room.feature_association %}
+                <li><div id="widget_{{ association.device_id }}_{{ association.device_type_feature_id }}"></div></li>
             {% endfor %}
-            <div class='clear' />
         </ul>
     </div>
 {% endblock %}

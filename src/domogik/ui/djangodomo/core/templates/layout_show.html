@@ -22,6 +22,7 @@
 {% load i18n %}
 
 {% block global_css %}
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/page-show.css" rel="stylesheet" type="text/css" />
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-breadcrumb.css" rel="stylesheet" type="text/css" />
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-buttons.css" rel="stylesheet" type="text/css" />
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-processing.css" rel="stylesheet" type="text/css" />

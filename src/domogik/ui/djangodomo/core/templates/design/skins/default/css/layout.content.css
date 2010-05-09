@@ -1,10 +1,10 @@
 /* Content Layouts */
 
-.left {
+.columnleft {
     float:left;
     width: 20em;
 }
-.right {
+.columnright {
     margin-left: 21em;
 }
 
@@ -28,7 +28,6 @@ header#contentheader {
     padding: 1em;
 	-moz-border-radius: 0.8em;
     -webkit-border-radius: 0.8em;
-	margin:-1px;
 }
 
 header#contentheader .ident {
@@ -50,22 +49,4 @@ header#contentheader .subtitle {
     padding-left:20px;
     background-position:left 50%;
     background-repeat:no-repeat;
-}
-
-/* Actions section */
-
-#mainsection .actions ul {
-    list-style:none;
-    margin:1em;
-    padding:1em;
-    background-color:#eeeeee;
-    border: 1px solid #979387;
-    -moz-border-radius: 0.8em;
-    -webkit-border-radius: 0.8em;
-}
-
-#mainsection .actions ul > li {
-    padding: 0;
-    margin: 0.1em;
-    float:left;
 }

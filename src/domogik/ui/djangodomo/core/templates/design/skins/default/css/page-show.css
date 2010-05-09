@@ -1,0 +1,47 @@
+@charset "UTF-8";
+/* CSS Document */
+
+.columnleft {
+    float:left;
+    width: 30em;
+}
+
+.columnright {
+    margin-left: 35em;
+}
+
+
+header#contentheader {
+	-moz-border-radius: 0.8em 0 0 0;
+    -webkit-border-radius: 0.8em 0 0 0;
+}
+
+#mainsection {
+    margin:0;
+}
+
+/* Actions section */
+
+#mainsection .mainactions {
+    margin:0;
+    padding:1em;
+    background-color:#eeeeee;
+    height:6em;
+    border-right: #cccccc 1px solid;
+    text-align:center;
+}
+
+#mainsection .mainactions ul > li, #mainsection .actions ul > li {
+    display:inline-block;
+}
+
+#mainsection .actions {
+    margin:0;
+    padding:1em;
+    background-color:#eeeeee;
+    min-height:40em;
+    border-right: #cccccc 1px solid;
+    border-top: #cccccc 1px dashed;
+	-moz-border-radius: 0 0 0 0.8em;
+    -webkit-border-radius: 0 0 0 0.8em;
+}

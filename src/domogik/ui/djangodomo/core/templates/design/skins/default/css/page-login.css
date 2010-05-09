@@ -4,7 +4,7 @@
     padding:1em;
 }
 
-.left, .right {
+.columnleft, .columnright {
     background-color:#eeeeee;
     border: 1px solid #979387;
     -moz-border-radius: 0.8em;
@@ -13,11 +13,11 @@
     padding:1em;
 }
 
-.left {
+.columnleft {
     width:18em;
 }
 
-.right {
+.columnright {
 }
 
 input {

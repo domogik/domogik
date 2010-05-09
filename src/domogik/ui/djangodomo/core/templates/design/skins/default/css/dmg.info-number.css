@@ -1,12 +1,12 @@
 /* Mini widget */
 
-.widget.info_number .widget_value {
-    position:fixed;
+.widget_mini.info_number .widget_value {
+    position:absolute;
     text-align:center;
     width:45px;
 }
 
-.widget.info_number .widget_state {
+.widget_mini.info_number .widget_state {
     height:14px;
     width:15px;    
 }

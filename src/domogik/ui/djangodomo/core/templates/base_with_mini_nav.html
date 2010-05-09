@@ -86,11 +86,17 @@
     </div>
 	<ul class="breadcrumb">{% block breadcrumb %}{% endblock %}</ul>
 	<div id="content-bgnd">
-		<section id="mainsection">
-			<header id="contentheader">{% block banner %}{% endblock %}</header>
-			{% block content %}{% endblock %}
-		</section>
-		<footer>Copyright 2009 Domogik project - GNU/GPL v3 license</footer>
+        <div class="columnleft">
+            <section id="mainsection">
+                <header id="contentheader">{% block banner %}{% endblock %}</header>
+                {% block contentleft %}{% endblock %}
+            </section>
+        </div>
+        <div class="columnright">
+                {% block contentright %}{% endblock %}
+        </div>
+        <div class='clear'></div>
 	</div>
+	<footer>Copyright 2010 Domogik project - GNU/GPL v3 license</footer>
 </body>
 </html>

@@ -83,21 +83,26 @@
     <h1 class="ident icon64-area-{{ area.config.icon }}"><span class="title">{{ area.name }}</span></h1>
 {% endblock %}
 
-{% block content %}
-    <div class='actions'>
+{% block contentleft %}
+    <div class='mainactions'>
         <ul>
-            {% for feature in area.feature_association %}
-                <li><div id="widget_{{ feature.device_id }}_{{ feature.device_type_feature_id }}"></div></li>
-            {% endfor %}
-            <div class='clear' />
         </ul>
     </div>
+    <div class='actions'>
+        <ul>
+            {% for association in area.feature_association %}
+                <li><div id="widget_{{ association.device_id }}_{{ association.device_type_feature_id }}"></div></li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
 
-{% for room in rooms_list %}
+{% block contentright %}
+    {% for room in rooms_list %}
 		{% if forloop.counter0|divisibleby:"3" %}
-            <div class='row'>
+            <!--div class='row'-->
         {% endif %}
-				<div class='column'>
+				<!--div class='column'-->
 					<div class='block'>
 						<h2 class='header icon64-room-{{ room.config.icon }}'>
 							<a href='{% url show_room_view room.id %}' class="ident">
@@ -108,9 +113,9 @@
 						</h2>
 							<!--span class='temp icon32-device-temp'>21 &#176;C</span-->
 					</div>
-				</div>
+				<!--/div-->
 		{% if forloop.counter0|divisibleby:"3" %}
-            </div>
+            <!--/div-->
 		{% endif %}
 	{% endfor %}
 {% endblock %}

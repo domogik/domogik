@@ -39,7 +39,6 @@
         {% if house_features_associations %}
             {% regroup house_features_associations|dictsort:"device_id" by device as devices %}
             var devices = [{% for device in devices %}{{ device.grouper.id }}{% if not forloop.last %},{% endif %}{% endfor %}];
-            
             $.eventRequest(devices, function(event) {
                 switch(event.device_id) {
                 {% regroup house_features_associations|dictsort:"device_id" by device as devices %}
@@ -78,21 +77,26 @@
 {% block banner %}
 <h1 class="ident icon64-house-default"><span class="title">{{ house.name }}</span></h1>
 {% endblock %}
-{% block content %}
+{% block contentleft %}
+    <div class='mainactions'>
+        <ul>
+        </ul>
+    </div>
     <div class='actions'>
         <ul>
             {% for association in house_features_associations %}
                 <li><div id="widget_{{ association.device_id }}_{{ association.device_type_feature_id }}"></div></li>
             {% endfor %}
-            <div class='clear' />
         </ul>
     </div>
+{% endblock %}
 
+{% block contentright %}
     {% for area in areas_list %}
 	    {% if forloop.counter0|divisibleby:"3" %}
-		    <div class='row'>
+		    <!--div class='row'-->
 	    {% endif %}
-			    <div class='column'>
+			    <!--div class='column'-->
 				    <script type="text/javascript">
 				    // <![CDATA[
 					    $(function() {
@@ -122,9 +126,9 @@
                         <ul class='commands'>
                         </ul>
                     </div-->
-			    </div>
+			    <!--/div-->
 	    {% if forloop.counter0|divisibleby:"3" %}
-		    </div>
+		    <!--/div-->
 	    {% endif %}
     {% endfor %}
 {% endblock %}

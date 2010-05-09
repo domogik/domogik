@@ -37,7 +37,7 @@
         <div id='messages' class='{{status}}'>{{msg}}</div>
         {% endifnotequal %}
         <form name="loginForm" method="POST" action="{% url login_view %}"/>
-            <div class="left">
+            <div class="columnleft">
                 <h2>1. {% trans "Select a user" %}</h2>
                 <input id="loginname" name="login" type="text" />
                 <ul id="users">
@@ -50,7 +50,7 @@
                     {% endfor %}
                 </ul>
             </div>
-            <div class="right">
+            <div class="columnright">
                 <h2>2. {% trans "Enter your code" %}</h2>
                 {% spaceless %}
                 <div id="code">
