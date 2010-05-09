@@ -52,33 +52,35 @@
 {% endblock %}
 
 {% block content %}
-    <div class="columnleft">
-        <nav id="nav2">
-            <div class="subnav2"><a href="#">{% trans "Organization" %}</a></div>
-            <ul>
-                <li><a href="{% url admin_organization_house_view %}" class='{{ nav2_organization_house }}'>{% trans "House" %}</a></li>
-                <li><a href="{% url admin_organization_areas_view %}" class='{{ nav2_organization_areas }}'>{% trans "Areas" %}</a></li>
-                <li><a href="{% url admin_organization_rooms_view %}" class='{{ nav2_organization_rooms }}'>{% trans "Rooms" %}</a></li>
-                <li><a href="{% url admin_organization_devices_view %}" class='{{ nav2_organization_devices }}'>{% trans "Devices" %}</a></li>
-                <li><a href="{% url admin_organization_features_view %}" class='{{ nav2_organization_features }}'>{% trans "Features" %}</a></li>
-            </ul>
-            <div class="subnav2"><a href="#">{% trans "Management" %}</a></div>
-            <ul>
-                <!--li><a href="{% url admin_management_domogik_view %}">{% trans "Database" %}</a></li-->
-                <li><a href="{% url admin_management_accounts_view %}" class='{{ nav2_management_accounts }}'>{% trans "Accounts" %}</a></li>
-            </ul>
-            <div class="subnav2"><a href="#">{% trans "Plugins" %}</a></div>
-            <ul id="plugins_list">
-            </ul>
-            <!--div class="subnav2"><a href="#">{% trans "Visualization" %}</a></div>
-            <ul>
-                <li><a href="{% url admin_visualization_devices_view %}" class='{{ nav2_visualization_devices }}'>{% trans "Devices" %}</a></li>
-            </ul-->
-        </nav>
-    </div>
-    <div class="columnright">
-        <header id='contentheader'>{% block banner %}{% endblock %}</header>
-        {% block right %}{% endblock %}
-    </div>
+    <section id="mainsection">
+        <div class="columnleft">
+            <nav id="nav2">
+                <div class="subnav2"><a href="#">{% trans "Organization" %}</a></div>
+                <ul>
+                    <li><a href="{% url admin_organization_house_view %}" class='{{ nav2_organization_house }}'>{% trans "House" %}</a></li>
+                    <li><a href="{% url admin_organization_areas_view %}" class='{{ nav2_organization_areas }}'>{% trans "Areas" %}</a></li>
+                    <li><a href="{% url admin_organization_rooms_view %}" class='{{ nav2_organization_rooms }}'>{% trans "Rooms" %}</a></li>
+                    <li><a href="{% url admin_organization_devices_view %}" class='{{ nav2_organization_devices }}'>{% trans "Devices" %}</a></li>
+                    <li><a href="{% url admin_organization_features_view %}" class='{{ nav2_organization_features }}'>{% trans "Features" %}</a></li>
+                </ul>
+                <div class="subnav2"><a href="#">{% trans "Management" %}</a></div>
+                <ul>
+                    <!--li><a href="{% url admin_management_domogik_view %}">{% trans "Database" %}</a></li-->
+                    <li><a href="{% url admin_management_accounts_view %}" class='{{ nav2_management_accounts }}'>{% trans "Accounts" %}</a></li>
+                </ul>
+                <div class="subnav2"><a href="#">{% trans "Plugins" %}</a></div>
+                <ul id="plugins_list">
+                </ul>
+                <!--div class="subnav2"><a href="#">{% trans "Visualization" %}</a></div>
+                <ul>
+                    <li><a href="{% url admin_visualization_devices_view %}" class='{{ nav2_visualization_devices }}'>{% trans "Devices" %}</a></li>
+                </ul-->
+            </nav>
+        </div>
+        <div class="columnright">
+            <header id='contentheader'>{% block banner %}{% endblock %}</header>
+            {% block right %}{% endblock %}
+        </div>
+    </section>
 {% endblock %}
 

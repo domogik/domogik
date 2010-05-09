@@ -85,6 +85,8 @@ def index(request):
         result_all_areas.merge_rooms()
         result_all_areas.merge_uiconfig()
         result_house = UIConfigs.get_general('house')
+        result_house_features_associations = FeatureAssociations.get_by_house()
+
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
     """
@@ -95,7 +97,8 @@ def index(request):
     return __go_to_page(request, 'index.html',
         page_title,
         areas_list=result_all_areas.area,
-        house=result_house
+        house=result_house,
+        house_features_associations=result_house_features_associations.feature_association
     )
 
 def login(request):

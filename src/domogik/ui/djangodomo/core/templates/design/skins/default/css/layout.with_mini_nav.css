@@ -95,7 +95,7 @@ section#mainsection {
 footer {
     display:block;
     clear:both;
-    margin:0;
+    margin: 0 5% 0 5%;
     padding:0.5em;
     text-align:right;
 }

@@ -103,7 +103,7 @@ class Rooms(pipes.DmgPipe):
 
     @staticmethod
     def get_without_area():
-        resp = Rooms.objects.get({'parameters':"list/by-area/"})
+        resp = Rooms.objects.get({'parameters':"list/by-area//"})
         if resp :
             return resp
 
