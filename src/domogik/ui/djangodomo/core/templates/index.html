@@ -119,28 +119,26 @@
         </section>
     </div>
     <div class="columnright">
-        <dl>
-        {% for area in areas_list %}
-            <ul class='areaslist'>
-                <li class='areaitem'>
-                    <a href='{% url show_area_view area.id %}' class="identelement icon64-area-{{ area.config.icon }}">
-                        <span class="title">{{ area.name }}</span>
-                    </a>
-                    <ul class='roomslist'>
-                        {% for room in area.room %}
-                            <li class='roomitem'>
-                                <a href='{% url show_room_view room.id %}' class="identelement icon64-room-{{ room.config.icon }}">
-                                    <span class="title">{{ room.name }}</span>
-                                </a>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </li>
-            </ul>
-        {% empty %}
-            <p>{% trans "No areas or rooms configured yet" %}</p>
-        {% endfor %}
-            </dl>
+    {% for area in areas_list %}
+        <ul class='areaslist'>
+            <li class='areaitem'>
+                <a href='{% url show_area_view area.id %}' class="identelement icon64-area-{{ area.config.icon }}">
+                    <span class="title">{{ area.name }}</span>
+                </a>
+                <ul class='roomslist'>
+                    {% for room in area.room %}
+                        <li class='roomitem'>
+                            <a href='{% url show_room_view room.id %}' class="identelement icon64-room-{{ room.config.icon }}">
+                                <span class="title">{{ room.name }}</span>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+        </ul>
+    {% empty %}
+        <p>{% trans "No areas or rooms configured yet" %}</p>
+    {% endfor %}
     </div>
     <div class='clear'></div>
 {% endblock %}

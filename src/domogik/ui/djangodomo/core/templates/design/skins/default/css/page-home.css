@@ -11,10 +11,13 @@
 header#contentheader {
 	-moz-border-radius: 0.8em 0 0 0;
     -webkit-border-radius: 0.8em 0 0 0;
+    border-right: #979387 1px solid;
 }
 
 #mainsection {
     margin:0;
+    -webkit-box-shadow: 1px 0 5px #000000;
+    -moz-box-shadow: 1px 0 5px #000000;
 }
 
 /* Actions section */
@@ -24,7 +27,7 @@ header#contentheader {
     padding:1em;
     background-color:#eeeeee;
     height:6em;
-    border-right: #cccccc 1px solid;
+    border-right: #979387 1px solid;
     text-align:center;
 }
 
@@ -37,7 +40,7 @@ header#contentheader {
     padding:1em;
     background-color:#eeeeee;
     min-height:40em;
-    border-right: #cccccc 1px solid;
+    border-right: #979387 1px solid;
     border-top: #cccccc 1px dashed;
 	-moz-border-radius: 0 0 0 0.8em;
     -webkit-border-radius: 0 0 0 0.8em;
@@ -86,37 +89,62 @@ header#contentheader {
 
 /* Area/room list */
 
+a.identelement:hover, a.identelement:focus {
+    background-color: #ffffff !important;
+    color:#000000 !important;
+}
 
-.identelement {
+a.identelement {
     background-position: 5px 5px;
     background-repeat:no-repeat;
     min-height: 64px;
-    min-width:15em;
+    width:150px;
     padding:0.5em 0 0 70px;
     display:inline-block;
+    font-size:1.4em;
+    color:#000000;
     text-decoration:none;
 }
 
-ul.areaslist, ul.roomslist {
-    list-style:none;
+li.areaitem > a.identelement {
+    border-right: 1px solid #979387;
+    border-bottom: 1px solid #979387;
+    -moz-border-radius: 0.8em 0 0.8em 0;
+    -webkit-border-radius: 0.8em 0 0.8em 0;
     margin:0;
-    padding:0;
+    position:absolute;
+    background-color:#403E3F;
+    color:#ffffff;
+}
+
+li.roomitem > a.identelement {
+    border: 1px solid #979387;
+    -moz-border-radius: 0.8em;
+    -webkit-border-radius: 0.8em;
+    margin:1em;
+    background-color:#BDCB2F;
+}
+
+ul.areaslist {
+    position:relative;
+}
+
+ul.roomslist {
+    display:inline-block;
+    margin-left:240px;
 }
 
 li.areaitem {
     background-color:#eeeeee;
     margin:1em;
+    padding:0;
     border: 1px solid #979387;
     -moz-border-radius: 0.8em;
     -webkit-border-radius: 0.8em;
     display:block;
+    min-height: 8em;
 }
 
 li.roomitem {
-    background-color:#eeeeee;
-    margin:1em;
-    border: 1px solid #979387;
-    -moz-border-radius: 0.8em;
-    -webkit-border-radius: 0.8em;
     display:inline-block;
 }
