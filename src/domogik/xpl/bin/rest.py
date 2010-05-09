@@ -729,7 +729,7 @@ class ProcessRequest():
             self.parameters = tab_url[1]
             self._parse_options()
 
-        while self.path[-1:] == "/":
+        if self.path[-1:] == "/":
             self.path = self.path[0:len(self.path)-1]
         tab_path = self.path.split("/")
 
@@ -1156,7 +1156,12 @@ target=*
                 new_idx = 2
                 device_id_list = []
                 while new_idx < len(self.rest_request):
-                    device_id_list.append(int(self.rest_request[new_idx]))
+                    try:
+                        device_id_list.append(int(self.rest_request[new_idx]))
+                    except ValueError:
+                        self.send_http_response_error(999, "Bad value for device id '%s'" % self.rest_request[new_idx], self.jsonp, self.jsonp_cb)
+                        return
+                        
                     new_idx += 1
                 if new_idx == 2:
                     self.send_http_response_error(999, "No device id given", self.jsonp, self.jsonp_cb)
