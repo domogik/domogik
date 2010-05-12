@@ -962,19 +962,19 @@ class DeviceStatsTestCase(GenericTestCase):
 
         stats_l = self.db.list_last_n_stats_of_device_by_key('val1', device1.id, 3)
         assert len(stats_l) == 3
-        assert stats_l[0].value == '8' and stats_l[1].value == '6' and stats_l[2].value == '4'
+        assert stats_l[0].value == '4' and stats_l[1].value == '6' and stats_l[2].value == '8'
 
         stats_l = self.db.list_stats_of_device_between_by_key('val1', device1.id, sdate + datetime.timedelta(minutes=2),
                                                               sdate + datetime.timedelta(minutes=4))
         assert len(stats_l) == 3
-        assert stats_l[0].value == '8' and stats_l[1].value == '6' and stats_l[2].value == '4'
+        assert stats_l[0].value == '4' and stats_l[1].value == '6' and stats_l[2].value == '8'
         stats_l = self.db.list_stats_of_device_between_by_key('val1', device1.id, sdate + datetime.timedelta(minutes=3))
         assert len(stats_l) == 2
-        assert stats_l[0].value == '8' and stats_l[1].value == '6'
+        assert stats_l[0].value == '6' and stats_l[1].value == '8'
         stats_l = self.db.list_stats_of_device_between_by_key('val1', device1.id,
                                                               end_datetime=sdate + datetime.timedelta(minutes=2))
         assert len(stats_l) == 3
-        assert stats_l[0].value == '4' and stats_l[1].value == '2' and stats_l[2].value == '0'
+        assert stats_l[0].value == '0' and stats_l[1].value == '2' and stats_l[2].value == '4'
 
     def test_del(self):
         dt1 = self.db.add_device_technology('x10', 'x10', 'this is x10')

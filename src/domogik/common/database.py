@@ -1359,10 +1359,12 @@ class DbHelper():
         @param ds_number : the number of statistics we want to retreive
         @return a list of DeviceStats objects
         """
-        return self.__session.query(DeviceStats)\
-                             .filter_by(key=ucode(ds_key))\
-                             .filter_by(device_id=ds_device_id)\
-                             .order_by(sqlalchemy.desc(DeviceStats.date)).limit(ds_number).all()
+        list_s = self.__session.query(DeviceStats)\
+                               .filter_by(key=ucode(ds_key))\
+                               .filter_by(device_id=ds_device_id)\
+                               .order_by(sqlalchemy.desc(DeviceStats.date)).limit(ds_number).all()
+        list_s.reverse()
+        return list_s
 
     def list_stats_of_device_between_by_key(self, ds_key, ds_device_id, start_datetime=None, end_datetime=None):
         """
@@ -1382,8 +1384,9 @@ class DbHelper():
             # But in Python we have '2010-04-09 12:04:00', so maybe there is a precision problem
             d2 = "'" + str(end_datetime + datetime.timedelta(microseconds=1)) + "'"
             query = query.filter('date <= ' + d2)
-        query = query.order_by(sqlalchemy.desc(DeviceStats.date))
-        return query.all()
+        list_s = query.order_by(sqlalchemy.desc(DeviceStats.date)).all()
+        list_s.reverse()
+        return list_s
 
     def get_last_stat_of_device_by_key(self, ds_key, ds_device_id):
         """
