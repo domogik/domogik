@@ -894,35 +894,6 @@ class DeviceStatsTestCase(GenericTestCase):
     def test_empty_list(self):
         assert len(self.db.list_all_device_stats()) == 0
 
-    def test_add(self):
-        """
-        dt1 = self.db.add_device_technology('x10', 'x10', 'this is x10')
-        du1 = self.db.add_device_usage("lighting")
-        dty1 = self.db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
-        area1 = self.db.add_area('area1','description 1')
-        room1 = self.db.add_room('room1', area1.id)
-        device1 = self.db.add_device(d_name='device1', d_address='A1', d_type_id = dty1.id, d_usage_id = du1.id)
-        device2 = self.db.add_device(d_name='device2', d_address='A2', d_type_id = dty1.id, d_usage_id = du1.id)
-        device3 = self.db.add_device(d_name='device3', d_address='A3', d_type_id = dty1.id, d_usage_id = du1.id)
-        device4 = self.db.add_device(d_name='device4', d_address='A4', d_type_id = dty1.id, d_usage_id = du1.id)
-        now = datetime.datetime.now()
-        d_stat1_1 = self.db.add_device_stat(device1.id, now, {'val1': '10', 'val2': '10.5' })
-        print d_stat1_1
-        try:
-            self.db.add_device_stat(99999999999, now, {'val1': '10', 'val2': '10.5' })
-            TestCase.fail(self, "An exception should have been raised : device id does not exist")
-        except DbHelperException:
-            pass
-        d_stat1_2 = self.db.add_device_stat(device1.id,
-                                            now + datetime.timedelta(seconds=1), {'val1': '11', 'val2': '12' })
-        d_stat2_1 = self.db.add_device_stat(device2.id, now, {'val1': '40', 'val2': '41' })
-        d_stat3_1 = self.db.add_device_stat(device3.id, now, {'val1': '100', 'val2': '101' })
-        assert len(self.db.list_device_stats(device1.id)) == 2
-        assert len(self.db.list_device_stats(device2.id)) == 1
-        assert self.db.device_has_stats(device1.id)
-        assert not self.db.device_has_stats(device4.id)
-        """
-
     def __has_stat_values(self, device_stats_values, expected_values):
         if len(device_stats_values) != len(expected_values): return False
         for item in device_stats_values:
