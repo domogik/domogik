@@ -2988,7 +2988,7 @@ target=*
                                                     self.get_parameters("first_name"), \
                                                     self.get_parameters("last_name"), \
                                                     self.to_date(self.get_parameters("birthday")), \
-                                                    self.get_parameters("is_admin"), \
+                                                    bool(self.get_parameters("is_admin")), \
                                                     self.get_parameters("skin_used"))
                 json_data.add_data(account)
             # create an user and attach it to a person
@@ -2996,7 +2996,7 @@ target=*
                 account = self._db.add_user_account(self.get_parameters("login"), \
                                                     self.get_parameters("password"), \
                                                     self.get_parameters("person_id"), \
-                                                    self.get_parameters("is_admin"), \
+                                                    bool(self.get_parameters("is_admin")), \
                                                     self.get_parameters("skin_used"))
                 json_data.add_data(account)
         except:
