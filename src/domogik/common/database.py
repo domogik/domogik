@@ -1634,7 +1634,7 @@ class DbHelper():
         if person is None:
             raise DbHelperException("Person id '%s' does not exist" % a_person_id)
         user_account = UserAccount(login=ucode(a_login), password=ucode(self.__make_crypted_password(a_password)),
-                                   person_id=a_person_id, is_admin=True, skin_used=ucode(a_skin_used))
+                                   person_id=a_person_id, is_admin=a_is_admin, skin_used=ucode(a_skin_used))
         self.__session.add(user_account)
         try:
             self.__session.commit()
