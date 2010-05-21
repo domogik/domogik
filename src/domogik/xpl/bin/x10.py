@@ -154,6 +154,7 @@ class X10Main(xPLPlugin):
     def x10_cmnd_cb(self, message):
         '''
         General callback for all command messages
+        @param message : an XplMessage object
         '''
         commands = {
             'on': lambda d, h, l: self.__myx10.on(d),
@@ -171,16 +172,15 @@ class X10Main(xPLPlugin):
         dev = None
         house = None
         level = None
-        if 'command' in message:
+        if 'command' in message.data:
             cmd = message.data['command']
-        if 'device' in message:
+        if 'device' in message.data:
             dev = message.data['device']
-        if 'house' in message:
+        if 'house' in message.data:
             house = message.data['house']
-        if 'level' in message:
+        if 'level' in message.data:
             level = message.data['level']
-        self._log.debug("%s received : device = %s, house = %s, level = %s" % (
-                cmd, dev, house, level))
+        self._log.debug("%s received : device = %s, house = %s, level = %s" % (cmd, dev, house, level))
         commands[cmd](dev, house, level)
 
     def x10_monitor_cb(self, unit, order, args = None):
