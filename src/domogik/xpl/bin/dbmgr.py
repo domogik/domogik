@@ -73,7 +73,6 @@ class DBConnector(xPLPlugin):
         techno = message.data['technology']
         hostname = message.data['hostname']
         key = message.data['key']
-        print "********** key _request_config_cb : %s" % key
         if "element" in message.data:
             element = message.data['element']
         else:
@@ -143,7 +142,6 @@ class DBConnector(xPLPlugin):
         '''
         # This array is here for information only but is not used anymore
         # Values are now on the database
-        print "****** key = " % key
         vals = {'x10': {'heyu-cfg-path':'/etc/heyu/x10.conf',
                         'heyu-file-0': 'TTY /dev/ttyUSB0',
                         'heyu-file-1': 'TTY_AUX /dev/ttyUSB0 RFXCOM',
