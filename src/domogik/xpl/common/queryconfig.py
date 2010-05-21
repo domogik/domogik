@@ -37,9 +37,11 @@ Implements
 @organization: Domogik
 """
 
-from domogik.xpl.common.xplconnector import *
-import domogik.common.logger
+from domogik.common import logger
+from domogik.xpl.common.xplconnector import Listener
+from domogik.xpl.common.xplmessage import XplMessage
 from socket import gethostname
+
 
 class Query():
     '''
