@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-                                                                           
+# -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -61,10 +61,10 @@ global myxpl
 
 lastpid = 0
 components = {'x10': 'x10Main()',
-                'datetime': 'xPLDateTime()',
-                'onewire': 'OneWireTemp()',
-                'trigger': 'main()',
-                'dawndusk': 'main()'}
+              'datetime': 'xPLDateTime()',
+              'onewire': 'OneWireTemp()',
+              'trigger': 'main()',
+              'dawndusk': 'main()'}
 
 
 def parse_command_line():
@@ -74,7 +74,6 @@ def parse_command_line():
     global arguments
     parser = optparse.OptionParser()
     (options, arguments) = parser.parse_args()
-
 
 def start_from_config():
     '''
@@ -86,7 +85,6 @@ def start_from_config():
     log.debug('Start components from config : %s' % config['components_list'])
     for c in lst:
         start_one_component(c)
-
 
 def start_one_component(name):
     '''
@@ -124,7 +122,6 @@ def start_one_component(name):
         myxpl.leave()
         exit(1)
 
-
 def wait_ack(message):
     """
     Callback method to check the contents of an ack message (domogik.system)
@@ -138,7 +135,6 @@ def wait_ack(message):
         print error
         exit(1)
 
-
 def write_pid_file(component, pid):
     '''
     Write the a pid in a file
@@ -149,14 +145,12 @@ def write_pid_file(component, pid):
     f.write(pid)
     f.close()
 
-
 def is_component_running(component):
     '''
     Check if one component is still running == the pid file exists
     '''
     global config
     return False
-
 
 def init_config():
     '''
@@ -166,7 +160,6 @@ def init_config():
     cfgloader = Loader()
     config = cfgloader.load()[0]
 
-
 def init_log():
     '''
     Initialize the logger
@@ -175,14 +168,12 @@ def init_log():
     l = logger.Logger('dmgstart')
     log = l.get_logger()
 
-
 def usage():
     '''
     Display usage informations
     '''
     print "dmgstart.py <comp_name>\n"
-    print "\t - comp_name : The name of the component you would start. Can be"\
-            " 'auto' to use the config file."
+    print "\t - comp_name : The name of the component you would start. Can be 'auto' to use the config file."
 
 def main():
     init_log()
@@ -200,4 +191,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
