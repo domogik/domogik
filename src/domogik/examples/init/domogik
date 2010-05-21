@@ -49,6 +49,7 @@ function start_django {
         echo " Done."
     fi
 }
+
 function start_xpl {
     if [ -z "$(which xPL_Hub)" ];then
         echo "ERROR : xPL_Hub not in path, please install it somewhere in the path, or add CUSTOM_PATH to domogik system config file."
@@ -63,6 +64,7 @@ function start_xpl {
         echo " Done."
     fi
 }
+
 function start_manager {
     echo -n "* Starting Manager (with $MANAGER_PARAMS)..."
     /bin/su - ${DOMOGIK_USER} -c "dmg_manager $MANAGER_PARAMS"
@@ -80,6 +82,7 @@ function stop_django {
         kill -15 $pid 2>/dev/null 1>&2
     done
 }
+
 function stop_xpl {
     echo -n " * Stopping XPL..."
     for pid in `ps ax | grep "xPL_Hub" | grep -v grep | awk '{print $1}'`; do
@@ -87,12 +90,14 @@ function stop_xpl {
         kill -9 $pid 2>/dev/null 1>&2
     done
 }
+
 function stop_manager {
     echo -n " * Stopping Manager..."
     for pid in `ps ax | grep "dmg_manager" | grep -v grep | awk '{print $1}'`; do
         kill -15 $pid 2>/dev/null 1>&2
     done
 }
+
 function stop_plugins {
     echo -n " * Stopping Plugins..."
     /bin/su - ${DOMOGIK_USER} -c "dmg_send  xpl-cmnd domogik.system 'command=stop,plugin=*,host=$HOSTNAME'"
