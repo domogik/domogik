@@ -333,6 +333,8 @@ class X10Monitor:
             threading.Thread.__init__(self)
             self._pipe = pipe
             self._cbs = []
+            log = logger.Logger(self.__class__.__name__)
+            self._log = log.get_logger()
 
         def add_cb(self, cb):
             """
