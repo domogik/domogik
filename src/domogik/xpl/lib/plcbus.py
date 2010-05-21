@@ -45,12 +45,10 @@ Implements
 """
 
 import sys
-import serial
 
-from struct import *
 from time import localtime, strftime
 from domogik.common import logger
-from domogik.xpl.lib.PLCBusSerialHandler import *
+from domogik.xpl.lib.PLCBusSerialHandler import serialHandler
 
 
 class PLCBUSException:
