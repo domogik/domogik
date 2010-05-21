@@ -66,7 +66,6 @@ DOMOGIK_PLUGIN_CONFIGURATION=[
        "default" : "TODO"}]
 
 
-
 class X10Main(xPLPlugin):
     '''Manage x10 technology using heyu
     '''
@@ -88,14 +87,13 @@ class X10Main(xPLPlugin):
             print "Something went wrong during heyu init, check logs"
             exit(1)
         #Create listeners
-        Listener(self.x10_cmnd_cb, self._myxpl, {'schema': 'x10.basic',
-                'xpltype': 'xpl-cmnd'})
+        Listener(self.x10_cmnd_cb, self._myxpl, {'schema': 'x10.basic', 'xpltype': 'xpl-cmnd'})
         #One listener for system schema, allowing to reload config
-        Listener(self.heyu_reload_config, self._myxpl, {'schema': 'domogik.system',
-           'xpltype': 'xpl-cmnd', 'command': 'reload', 'plugin': 'x10'})
+        Listener(self.heyu_reload_config, self._myxpl, {'schema': 'domogik.system', 'xpltype': 'xpl-cmnd',
+                                                        'command': 'reload', 'plugin': 'x10'})
         #One listener for system schema, allowing to dump config
-        Listener(self.heyu_dump_config, self._myxpl, {'schema': 'domogik.system',
-            'xpltype': 'xpl-cmnd', 'command': 'push_config', 'plugin': 'x10'})
+        Listener(self.heyu_dump_config, self._myxpl, {'schema': 'domogik.system', 'xpltype': 'xpl-cmnd',
+                                                      'command': 'push_config', 'plugin': 'x10'})
         self._log = self.get_my_logger()
 #        self._monitor = X10Monitor(self._heyu_cfg_path_res)
 #        self._monitor.get_monitor().add_cb(self.x10_monitor_cb)
@@ -127,10 +125,8 @@ class X10Main(xPLPlugin):
             res = myheyu.restart()
             if res:
                 self._log.warning("Error during heyu restart : %s" % res)
-
         else:
             print "empty res"
-
 
     def heyu_dump_config(self, message):
         '''
@@ -149,7 +145,6 @@ class X10Main(xPLPlugin):
             mess.add_data({key :  line})
         #print "Message is : %s" % m
         self._myxpl.send(mess)
-
 
     def x10_cmnd_cb(self, message):
         '''
@@ -198,6 +193,7 @@ class X10Main(xPLPlugin):
         if args:
             mess.add_data({"level" : args})
         self._myxpl.send(mess)
+
 
 if __name__ == "__main__":
     X10Main()
