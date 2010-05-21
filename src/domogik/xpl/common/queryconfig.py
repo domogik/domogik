@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-                                                                           
+# -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -45,11 +45,11 @@ class Query():
     '''
     Query throw xPL network to get a config item
     '''
+
     def __init__(self, xpl):
         '''
         Init the query system and connect it to xPL network
         '''
-
         l = logger.Logger('queryconfig')
         self._log = l.get_logger()
         self.__myxpl = xpl
@@ -57,7 +57,7 @@ class Query():
         self._keys = {}
 
     def __del__(self):
-        print "fin query"
+        print "End query"
 
     def query(self, technology, key, result, element = ''):
         '''
@@ -70,7 +70,8 @@ class Query():
         all the config items for this technology will be fetched
         '''
         print "new query"
-        Listener(self._query_cb, self.__myxpl,{'schema': 'domogik.config', 'xpltype': 'xpl-stat', 'technology': technology, 'hostname' : gethostname()})
+        Listener(self._query_cb, self.__myxpl, {'schema': 'domogik.config', 'xpltype': 'xpl-stat',
+                                                'technology': technology, 'hostname' : gethostname()})
         self._keys[key] = result
         mess = XplMessage()
         mess.set_type('xpl-cmnd')
@@ -81,7 +82,7 @@ class Query():
             mess.add_data({'element': element})
         mess.add_data({'key': key})
         self.__myxpl.send(mess)
-        #the key may already be removed if the network is really fast
+        # The key may already be removed if the network is really fast
         if key in self._keys:
             try:
                 self._keys[key].get_lock().wait()
