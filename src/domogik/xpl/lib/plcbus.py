@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-                                                                           
+# -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -62,7 +62,7 @@ class PLCBUSException:
         self.value = value
 
     def __str__(self):
-        return self.repr(self.value)
+        return repr(self.value)
 
 
 class PLCBUSAPI:
@@ -72,9 +72,9 @@ class PLCBUSAPI:
     '''
 
     def __init__(self, serial_port_no, command_cb, message_cb):
-        """ Main PLCBus manager 
+        """ Main PLCBus manager
         Use serialHandler for low-level serial management
-        @param serial_port_no : Number or path of the serial port 
+        @param serial_port_no : Number or path of the serial port
         @param command_cb: callback called when a command has been succesfully sent
         @param message_cb: called when a message is received from somewhere else on the network
         """
@@ -231,16 +231,16 @@ class PLCBUSAPI:
 #a = PLCBUSAPI("/dev/ttyUSB0")
 ##a.get_all_on_id("00","B")
 #print "--------------ON------------------"
-#a.send("ON", "B2", "00") 
+#a.send("ON", "B2", "00")
 #time.sleep(3)
 #print "--------------STATUS------------------"
-#a.send("STATUS_REQUEST", "B2", "00") 
+#a.send("STATUS_REQUEST", "B2", "00")
 #time.sleep(3)
 #print "----------------OFF----------------"
-#a.send("OFF", "B2", "00") 
+#a.send("OFF", "B2", "00")
 #time.sleep(3)
 #print "---------------STATUS-----------------"
-#a.send("STATUS_REQUEST", "B2", "00") 
+#a.send("STATUS_REQUEST", "B2", "00")
 #time.sleep(3)
 ##print "---------------BRIGHT-----------------"
 ##a.send("BRIGHT", "B2", "00", "100","100")
@@ -249,7 +249,7 @@ class PLCBUSAPI:
 ##a.send("DIM", "B2", "00", "50","0")
 ##time.sleep(3)
 #print "---------------STATUS-----------------"
-#a.send("STATUS_REQUEST", "B2", "00") 
+#a.send("STATUS_REQUEST", "B2", "00")
 #time.sleep(5)
 #a.stop()
 #
