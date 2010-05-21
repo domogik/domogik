@@ -44,9 +44,6 @@ Implements
 @organization: Domogik
 """
 
-import sys
-
-from time import localtime, strftime
 from domogik.common import logger
 from domogik.xpl.lib.PLCBusSerialHandler import serialHandler
 
@@ -207,12 +204,12 @@ class PLCBUSAPI:
         FF)
         @param housecode : one or more housecodes
         '''
-        onlist=[]
+        onlist = []
         self.send("GET_ALL_ON_ID_PULSE", housecode + "1", usercode)
-        response=self._ser_handler.get_from_answer_queue()
+        response = self._ser_handler.get_from_answer_queue()
         if(response):
             print "Hoora response received", response
-            data=int(response[10:14], 16)
+            data = int(response[10:14], 16)
             for i in range(0, 16):
                 if data >> i & 1:
                     onlist.append(housecode + str(self._unitcodes[i]))
