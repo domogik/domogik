@@ -45,7 +45,7 @@ else:
     from domogik.xpl.lib.x10 import X10API, HeyuManager
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.common.plugin import xPLPlugin, xPLResult
+from domogik.xpl.common.plugin import XplPlugin, xPLResult
 from domogik.xpl.common.queryconfig import Query
 
 IS_DOMOGIK_PLUGIN = True
@@ -66,7 +66,7 @@ DOMOGIK_PLUGIN_CONFIGURATION=[
        "default" : "TODO"}]
 
 
-class X10Main(xPLPlugin):
+class X10Main(XplPlugin):
     '''Manage x10 technology using heyu
     '''
 
@@ -75,7 +75,7 @@ class X10Main(xPLPlugin):
         Create the X10Main class
         This class is used to connect x10 (through heyu) to the xPL Network
         '''
-        xPLPlugin.__init__(self, name = 'x10')
+        XplPlugin.__init__(self, name = 'x10')
         self._heyu_cfg_path_res = ""
         self._config = Query(self._myxpl)
         res = xPLResult()

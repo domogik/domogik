@@ -39,7 +39,7 @@ TODO when finished ;)
 """
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.common.plugin import xPLPlugin
+from domogik.xpl.common.plugin import XplPlugin
 from domogik.common import logger
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from domogik.common.database import DbHelper
@@ -138,7 +138,7 @@ DOMOGIK_PLUGIN_CONFIGURATION = [
 
 
 ################################################################################
-class Rest(xPLPlugin):
+class Rest(XplPlugin):
     """ REST Server 
         - create a HTTP server 
         - process REST requests
@@ -152,7 +152,7 @@ class Rest(xPLPlugin):
             @param server_port :  port of HTTP server
         """
 
-        xPLPlugin.__init__(self, name = 'rest')
+        XplPlugin.__init__(self, name = 'rest')
         # logging initialization
         log = logger.Logger('REST')
         self._log = log.get_logger()
@@ -3503,12 +3503,12 @@ class JSonHelper():
 
 
 ################################################################################
-class StatsManager(xPLPlugin):
+class StatsManager(XplPlugin):
     """
     Listen on the xPL network and keep stats of device and system state
     """
     def __init__(self, handler_params):
-        xPLPlugin.__init__(self, 'statmgr')
+        XplPlugin.__init__(self, 'statmgr')
         cfg = Loader('domogik')
         config = cfg.load()
         cfg_db = dict(config[1])

@@ -43,11 +43,11 @@ Implements
 import traceback
 
 from domogik.xpl.common.xplconnector import Listener
-from domogik.xpl.common.plugin import xPLPlugin
+from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.common.database import DbHelper
 
-class DBConnector(xPLPlugin):
+class DBConnector(XplPlugin):
     '''
     Manage the connection between database and the xPL stuff
     Should be the *only* object with StatsManager to access the database in the core side
@@ -57,7 +57,7 @@ class DBConnector(xPLPlugin):
         '''
         Initialize database and xPL connection
         '''
-        xPLPlugin.__init__(self, 'dbmgr')
+        XplPlugin.__init__(self, 'dbmgr')
         self._log = self.get_my_logger()
         self._log.debug("Init database_manager instance")
 
@@ -142,6 +142,7 @@ class DBConnector(xPLPlugin):
         '''
         # This array is here for information only but is not used anymore
         # Values are now on the database
+        print "****** key = %s" % key
         vals = {'x10': {'heyu-cfg-path':'/etc/heyu/x10.conf',
                         'heyu-file-0': 'TTY /dev/ttyUSB0',
                         'heyu-file-1': 'TTY_AUX /dev/ttyUSB0 RFXCOM',

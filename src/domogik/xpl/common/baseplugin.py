@@ -43,7 +43,7 @@ from domogik.common.daemonize import createDaemon
 
 class BasePlugin():
     """ Basic plugin class, manage common part of all plugins.
-    For all xPL plugins, the xPLPlugin class must be use as a basis, not this one.
+    For all xPL plugins, the XplPlugin class must be use as a basis, not this one.
     This class is a Singleton
     """
 

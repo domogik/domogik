@@ -44,13 +44,13 @@ from domogik.xpl.lib.xplconnector import *
 from domogik.common.configloader import *
 import re
 
-class xPLSendHelper(xPLPlugin):
+class xPLSendHelper(XplPlugin):
     """
     Helper to send basic xPL messages
     """
 
     def __init__(self):
-        xPLPlugin.__init__(self, name = 'xplsendhelper')
+        XplPlugin.__init__(self, name = 'xplsendhelper')
         self.__myxpl = Manager()
         self._log = self.get_my_logger()
         self.x10 = self.X10(self.__myxpl)

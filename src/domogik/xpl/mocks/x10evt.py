@@ -37,14 +37,14 @@ X10EvtMock.__init__
 """
 
 from domogik.xpl.common.xplconnector import Listener
-from domogik.xpl.common.plugin import xPLPlugin, xPLResult
+from domogik.xpl.common.plugin import XplPlugin, xPLResult
 from domogik.xpl.common.xplmessage import XplMessage
 from optparse import OptionParser
 
 
 
 
-class X10EvtMock(xPLPlugin):
+class X10EvtMock(XplPlugin):
     ''' 
     '''
 
@@ -63,7 +63,7 @@ class X10EvtMock(xPLPlugin):
         parser.add_option("--level", action="store", dest="level", type="string", \
                 help="Level (0...100)")
 
-        xPLPlugin.__init__(self, name = "x10evt", parser = parser)
+        XplPlugin.__init__(self, name = "x10evt", parser = parser)
 
         # Logger init
         self._log = self.get_my_logger()

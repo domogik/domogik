@@ -36,7 +36,7 @@ Implements
 """
 
 from domogik.xpl.common.xplconnector import Listener
-from domogik.xpl.common.plugin import xPLPlugin
+from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.lib.xbmc_not import XBMCNotification
 from domogik.xpl.common.plugin import xPLResult
 from domogik.xpl.common.queryconfig import Query
@@ -70,14 +70,14 @@ DOMOGIK_PLUGIN_CONFIGURATION=[
 
 
 
-class XBMCNotificationListener(xPLPlugin):
+class XBMCNotificationListener(XplPlugin):
     """ Create listener for xPL messages about xbmc notifications
     """
 
     def __init__(self):
         """ Create lister for XBMC notifications
         """
-        xPLPlugin.__init__(self, name = 'xbmc_not')
+        XplPlugin.__init__(self, name = 'xbmc_not')
         # Create logger
         self._log.debug("Listener for XBMC notifications created")
 

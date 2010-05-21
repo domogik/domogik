@@ -40,17 +40,17 @@ from datetime import datetime
 from xml.dom import minidom
 import glob
 
-from domogik.xpl.common.plugin import xPLPlugin
+from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.xplconnector import Listener
 from domogik.common.database import DbHelper
 from domogik.common.configloader import Loader
 
-class StatsManager(xPLPlugin):
+class StatsManager(XplPlugin):
     """
     Listen on the xPL network and keep stats of device and system state
     """
     def __init__(self):
-        xPLPlugin.__init__(self, 'statmgr')
+        XplPlugin.__init__(self, 'statmgr')
         cfg = Loader('domogik')
         config = cfg.load()
         cfg_db = dict(config[1])

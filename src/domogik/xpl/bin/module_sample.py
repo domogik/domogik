@@ -35,7 +35,7 @@ Implements
 @organization: Domogik
 """
 
-from domogik.xpl.common.plugin import xPLPlugin
+from domogik.xpl.common.plugin import XplPlugin
 
 
 ###
@@ -54,13 +54,13 @@ from domogik.xpl.common.plugin import xPLPlugin
 #       "default" : "False"},
 #       ]
 
-class PluginSample(xPLPlugin):
+class PluginSample(XplPlugin):
     '''
     Module description
     '''
 
     def __init__(self):
-        xPLPlugin.__init__(self, name = 'mdspl')
+        XplPlugin.__init__(self, name = 'mdspl')
 
 if __name__ == "__main__":
     PluginSample()

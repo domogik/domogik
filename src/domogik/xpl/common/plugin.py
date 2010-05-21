@@ -27,7 +27,7 @@ Base class for all xPL clients
 Implements
 ==========
 
-- xPLPlugin
+- XplPlugin
 - xPLResult
 
 @author: Maxence Dunnewind <maxence@dunnewind.net>
@@ -45,7 +45,7 @@ from domogik.xpl.common.xplconnector import *
 from domogik.xpl.common.baseplugin import BasePlugin
 from domogik.common.configloader import Loader
 
-class xPLPlugin():
+class XplPlugin():
     '''
     Global plugin class, manage signal handlers.
     This class shouldn't be used as-it but should be extended by xPL plugin
@@ -56,7 +56,7 @@ class xPLPlugin():
     def __init__(self, name = None, stop_cb = None, is_manager = False, reload_cb = None, dump_cb = None, parser = None,
                  daemonize = True):
         '''
-        Create xPLPlugin instance, which defines signal handlers
+        Create XplPlugin instance, which defines signal handlers
         @param name : The n,ame of the current plugin
         @param stop_cb : Method to call when a stop request is received
         @param is_manager : Must be True if the child script is a Domogik Manager process
@@ -73,14 +73,14 @@ class xPLPlugin():
         '''
         if len(name) > 8:
             raise IoError, "The name must be 8 chars max"
-        if xPLPlugin.__instance is None and name is None:
+        if XplPlugin.__instance is None and name is None:
             raise AttributeError, "'name' attribute is mandatory for the first instance"
-        if xPLPlugin.__instance is None:
-            xPLPlugin.__instance = xPLPlugin.__Singl_xPLPlugin(name, stop_cb, is_manager, reload_cb, dump_cb, parser,
+        if XplPlugin.__instance is None:
+            XplPlugin.__instance = XplPlugin.__Singl_XplPlugin(name, stop_cb, is_manager, reload_cb, dump_cb, parser,
                                                                daemonize)
-            self.__dict__['_xPLPlugin__instance'] = xPLPlugin.__instance
+            self.__dict__['_XplPlugin__instance'] = XplPlugin.__instance
         elif stop_cb is not None:
-            xPLPlugin.__instance.add_stop_cb(stop_cb)
+            XplPlugin.__instance.add_stop_cb(stop_cb)
         self._log.debug("after watcher")
 
     def __getattr__(self, attr):
@@ -91,11 +91,11 @@ class xPLPlugin():
         """ Delegate access to implementation """
         return setattr(self.__instance, attr, value)
 
-    class __Singl_xPLPlugin(BasePlugin):
+    class __Singl_XplPlugin(BasePlugin):
         def __init__(self, name, stop_cb = None, is_manager = False, reload_cb = None, dump_cb = None, parser = None,
                      daemonize = True):
             '''
-            Create xPLPlugin instance, which defines system handlers
+            Create XplPlugin instance, which defines system handlers
             @param name : The name of the current plugin
             @param stop_cb : Additionnal method to call when a stop request is received
             @param is_manager : Must be True if the child script is a Domogik Manager process

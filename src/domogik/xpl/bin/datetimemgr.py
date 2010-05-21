@@ -39,7 +39,7 @@ Implements
 
 from time import localtime
 from domogik.xpl.common.xplconnector import xPLTimer
-from domogik.xpl.common.plugin import xPLPlugin
+from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.xplmessage import XplMessage
 
 
@@ -55,13 +55,13 @@ DOMOGIK_PLUGIN_CONFIGURATION=[
        "description" : "Automatically start plugin at Domogik startup",
        "default" : "False"},
       ]
-class XPLDateTime(xPLPlugin):
+class XPLDateTime(XplPlugin):
     '''
     Send date and time on the xPL network every minute
     '''
 
     def __init__(self):
-        xPLPlugin.__init__(self, name = 'ldtmgr')
+        XplPlugin.__init__(self, name = 'ldtmgr')
         
         self._timer = xPLTimer(10, self._send_datetime, self.get_stop())
         self.register_timer(self._timer)

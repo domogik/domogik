@@ -36,7 +36,7 @@ Implements
 """
 
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.common.plugin import xPLPlugin, xPLResult
+from domogik.xpl.common.plugin import XplPlugin, xPLResult
 from domogik.xpl.lib.teleinfo import TeleInfo
 from domogik.xpl.common.queryconfig import Query
 
@@ -62,7 +62,7 @@ DOMOGIK_PLUGIN_CONFIGURATION=[
        "description" : "Interval between each request (seconds)",
        "default" : 60}]
 
-class TeleinfoManager(xPLPlugin):
+class TeleinfoManager(XplPlugin):
     '''
     Manage the Téléinfo stuff and connect it to xPL
     '''
@@ -71,7 +71,7 @@ class TeleinfoManager(xPLPlugin):
         '''
         Start teleinfo device handler
         '''
-        xPLPlugin.__init__(self, name='teleinfo')
+        XplPlugin.__init__(self, name='teleinfo')
         self._config = Query(self._myxpl)
         res = xPLResult()
         self._config.query('teleinfo', 'device', res)

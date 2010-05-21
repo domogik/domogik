@@ -47,7 +47,7 @@ from subprocess import Popen
 from domogik.common.configloader import Loader
 from domogik.xpl.common.xplconnector import Listener 
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.common.plugin import xPLPlugin, xPLResult
+from domogik.xpl.common.plugin import XplPlugin, xPLResult
 from domogik.xpl.common.queryconfig import Query
 
 import domogik.xpl.bin
@@ -57,7 +57,7 @@ import pkgutil
 KILL_TIMEOUT = 2
 
 
-class SysManager(xPLPlugin):
+class SysManager(XplPlugin):
     '''
     System management from domogik
     '''
@@ -77,7 +77,7 @@ class SysManager(xPLPlugin):
             help="Start statistics manager if not already running.")
         parser.add_option("-t", action="store_true", dest="start_trigger", default=False, \
             help="Start scenario manager if not already running.")
-        xPLPlugin.__init__(self, name = 'sysmgr', parser=parser)
+        XplPlugin.__init__(self, name = 'sysmgr', parser=parser)
 
         # Logger init
         self._log = self.get_my_logger()

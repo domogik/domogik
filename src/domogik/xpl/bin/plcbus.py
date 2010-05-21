@@ -38,7 +38,7 @@ Implements
 """
 
 from domogik.xpl.common.xplconnector import Listener
-from domogik.xpl.common.plugin import xPLPlugin, xPLResult
+from domogik.xpl.common.plugin import XplPlugin, xPLResult
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.lib.plcbus import PLCBUSAPI
 from domogik.xpl.common.queryconfig import Query
@@ -62,7 +62,7 @@ DOMOGIK_PLUGIN_CONFIGURATION=[
 
 
 
-class PlcBusMain(xPLPlugin):
+class PlcBusMain(XplPlugin):
     ''' Manage PLCBus technology, send and receive order/state
     '''
 
@@ -72,7 +72,7 @@ class PlcBusMain(xPLPlugin):
         This class is used to connect PLCBUS to the xPL Network
         '''
         # Load config
-        xPLPlugin.__init__(self, name = 'plcbus')
+        XplPlugin.__init__(self, name = 'plcbus')
         self._config = Query(self._myxpl)
         # Create listeners
         Listener(self._plcbus_cmnd_cb, self._myxpl, {

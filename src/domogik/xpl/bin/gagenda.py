@@ -38,7 +38,7 @@ Implements
 from domogik.xpl.lib.gagenda import GAgenda
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.common.plugin import xPLPlugin
+from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.plugin import xPLResult
 from domogik.xpl.common.queryconfig import Query
 
@@ -71,14 +71,14 @@ DOMOGIK_PLUGIN_CONFIGURATION=[
 
 
 
-class GAgendaListener(xPLPlugin):
+class GAgendaListener(XplPlugin):
     """ Listen for xPL messages to get infos from agenda
     """
 
     def __init__(self):
         """ Create lister for google agenda requets
         """
-        xPLPlugin.__init__(self, name = 'gagenda')
+        XplPlugin.__init__(self, name = 'gagenda')
 
         # Create logger
         self._log.debug("Listener for Google agenda created")

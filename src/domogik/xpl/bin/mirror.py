@@ -36,7 +36,7 @@ Implements
 """
 
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.common.plugin import xPLPlugin
+from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.plugin import xPLResult
 from domogik.xpl.lib.mirror import Mirror
 from domogik.xpl.common.queryconfig import Query
@@ -70,14 +70,14 @@ DOMOGIK_PLUGIN_CONFIGURATION=[
 
 
 
-class MirrorManager(xPLPlugin):
+class MirrorManager(XplPlugin):
     """ Manage the Mir:ror device and connect it to xPL
     """
 
     def __init__(self):
         """ Init plugin
         """
-        xPLPlugin.__init__(self, name='mirror')
+        XplPlugin.__init__(self, name='mirror')
         # Get config
         #   - device
         self._config = Query(self._myxpl)
