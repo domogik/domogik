@@ -78,6 +78,8 @@ class PLCBUSAPI:
         @param command_cb: callback called when a command has been succesfully sent
         @param message_cb: called when a message is received from somewhere else on the network
         """
+        log = logger.Logger('x10API')
+        self._log = log.get_logger(self.__class__.__name__)
         #For these 2 callbacks, the param is sent as an array
         self._housecodes = list('ABCDEFGHIJKLMNOP')
         self._valuecode = enumerate(self._housecodes)
@@ -142,8 +144,7 @@ class PLCBUSAPI:
             if house[0] not in self._housecodes:
                 raise AttributeError
         except:
-            self._log.warning("Invalid house %s, must be 'H' format, between "
-                    "A and P" % house[0].upper())
+            self._log.warning("Invalid house %s, must be 'H' format, between A and P" % house[0].upper())
 
     def _valid_usercode(self, item):
         '''
@@ -155,8 +156,7 @@ class PLCBUSAPI:
             if not (h in self._usercodes and int(u) in self._usercodes):
                 raise AttributeError
         except:
-            self._log.warning("Invalid user code %s, must be 'H' format, "
-                    "between 00 and FF" % h)
+            self._log.warning("Invalid user code %s, must be 'H' format, between 00 and FF" % h)
 
     def _convert_device_to_hex(self, item):
         var1 = int(item[1:]) - 1
@@ -198,8 +198,7 @@ class PLCBUSAPI:
             try:
                 message = plcbus_frame.decode('HEX')
             except TypeError:
-                print "PLCBUS Frame generation error, does not result in a "\
-                        "HEX string ", plcbus_frame
+                print "PLCBUS Frame generation error, does not result in a HEX string ", plcbus_frame
             else:
                 self._ser_handler.add_to_send_queue(plcbus_frame)
 
