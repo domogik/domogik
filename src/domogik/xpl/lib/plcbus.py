@@ -78,8 +78,8 @@ class PLCBUSAPI:
         @param command_cb: callback called when a command has been succesfully sent
         @param message_cb: called when a message is received from somewhere else on the network
         """
-        log = logger.Logger('x10API')
-        self._log = log.get_logger(self.__class__.__name__)
+        log = logger.Logger(self.__class__.__name__)
+        self._log = log.get_logger()
         #For these 2 callbacks, the param is sent as an array
         self._housecodes = list('ABCDEFGHIJKLMNOP')
         self._valuecode = enumerate(self._housecodes)
@@ -185,7 +185,7 @@ class PLCBUSAPI:
         # TODO : test on ALL_USER_UNIT_OFF
         #try:
         try:
-            command=self._cmdplcbus[cmd]
+            command = self._cmdplcbus[cmd]
         except KeyError:
             print "PLCBUS Frame generation error, command does not exist ", cmd
         else:
