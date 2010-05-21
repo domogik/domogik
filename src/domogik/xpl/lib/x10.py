@@ -69,12 +69,13 @@ from domogik.common import logger
 from domogik.common.ordereddict import OrderedDict
 
 
-class X10Exception:
+class X10Exception(Exception):
     """
     X10 exception
     """
 
     def __init__(self, value):
+        Exception.__init__()
         self.value = value
 
     def __str__(self):
