@@ -110,11 +110,11 @@ def start_one_component(name):
         message.set_data_key("plugin", name)
         message.set_data_key("command", "start")
         message.set_data_key("force", "1") #TODO
-        #Create a listener to check the result
-        l = Listener(wait_ack, myxpl, {'schema': 'domogik.system',
-                'type': 'xpl-trig', 'command': 'start', 'plugin': name})
+        # Create a listener to check the result
+        l = Listener(wait_ack, myxpl, {'schema': 'domogik.system', 'type': 'xpl-trig', 'command': 'start',
+                                       'plugin': name})
         myxpl.send(message)
-        time.sleep(5) #Wait 5 seconds for a message
+        time.sleep(5) # Wait 5 seconds for a message
         print "No ack has been received during the last 5 seconds. It means that :\n"
         print "\t - No manager have been found on the network"
         print "\t - The manager has some issues"
