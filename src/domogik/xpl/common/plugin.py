@@ -28,7 +28,7 @@ Implements
 ==========
 
 - XplPlugin
-- xPLResult
+- XplResult
 
 @author: Maxence Dunnewind <maxence@dunnewind.net>
 @copyright: (C) 2007-2009 Domogik project
@@ -213,7 +213,7 @@ class XplPlugin():
                 self._log.debug("Calling stop additionnal method : %s " % cb.__name__)
                 cb()
 
-class xPLResult():
+class XplResult():
     '''
     This object just provides a way to get and set a value between threads
     '''

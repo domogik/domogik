@@ -47,7 +47,7 @@ from subprocess import Popen
 from domogik.common.configloader import Loader
 from domogik.xpl.common.xplconnector import Listener 
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.common.plugin import XplPlugin, xPLResult
+from domogik.xpl.common.plugin import XplPlugin, XplResult
 from domogik.xpl.common.queryconfig import Query
 
 import domogik.xpl.bin
@@ -139,7 +139,7 @@ class SysManager(XplPlugin):
             for component in self._components:
                 self._log.debug("%s..." % component["name"])
                 self._config = Query(self._myxpl)
-                res = xPLResult()
+                res = XplResult()
                 self._config.query(component["name"], 'startup-plugin', res)
                 startup = res.get_value()['startup-plugin']
                 # start plugin

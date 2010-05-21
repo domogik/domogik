@@ -37,7 +37,7 @@ Implements
 
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin
-from domogik.xpl.common.plugin import xPLResult
+from domogik.xpl.common.plugin import XplResult
 from domogik.xpl.lib.mirror import Mirror
 from domogik.xpl.common.queryconfig import Query
 
@@ -81,15 +81,15 @@ class MirrorManager(XplPlugin):
         # Get config
         #   - device
         self._config = Query(self._myxpl)
-        res = xPLResult()
+        res = XplResult()
         self._config.query('mirror', 'device', res)
         device = res.get_value()['device']
         self._config = Query(self._myxpl)
-        res = xPLResult()
+        res = XplResult()
         self._config.query('mirror', 'interval', res)
         interval = res.get_value()['interval']
         self._config = Query(self._myxpl)
-        res = xPLResult()
+        res = XplResult()
         self._config.query('mirror', 'nbmaxtry', res)
         nbmaxtry = res.get_value()['nbmaxtry']
         # Call Library

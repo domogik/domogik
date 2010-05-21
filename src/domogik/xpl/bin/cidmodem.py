@@ -37,7 +37,7 @@ Implements
 
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin
-from domogik.xpl.common.plugin import xPLResult
+from domogik.xpl.common.plugin import XplResult
 from domogik.xpl.lib.cidmodem import CallerIdModem
 from domogik.xpl.common.queryconfig import Query
 
@@ -82,15 +82,15 @@ class CallerIdModemManager(XplPlugin):
         # Get config
         #   - serial port
         self._config = Query(self._myxpl)
-        res = xPLResult()
+        res = XplResult()
         self._config.query('cidmodem', 'device', res)
         device = res.get_value()['device']
         self._config = Query(self._myxpl)
-        res = xPLResult()
+        res = XplResult()
         self._config.query('cidmodem', 'interval', res)
         interval = res.get_value()['interval']
         self._config = Query(self._myxpl)
-        res = xPLResult()
+        res = XplResult()
         self._config.query('cidmodem', 'nbmaxtry', res)
         nbmaxtry = res.get_value()['nbmaxtry']
         # Call Library

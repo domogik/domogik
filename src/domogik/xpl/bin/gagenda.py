@@ -39,7 +39,7 @@ from domogik.xpl.lib.gagenda import GAgenda
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin
-from domogik.xpl.common.plugin import xPLResult
+from domogik.xpl.common.plugin import XplResult
 from domogik.xpl.common.queryconfig import Query
 
 IS_DOMOGIK_PLUGIN = True
@@ -85,15 +85,15 @@ class GAgendaListener(XplPlugin):
 
         # Get config
         self._config = Query(self._myxpl)
-        res = xPLResult()
+        res = XplResult()
         self._config.query('gagenda', 'email', res)
         self._email = res.get_value()['email']
         self._config = Query(self._myxpl)
-        res = xPLResult()
+        res = XplResult()
         self._config.query('gagenda', 'password', res)
         self._password = res.get_value()['password']
         self._config = Query(self._myxpl)
-        res = xPLResult()
+        res = XplResult()
         self._config.query('gagenda', 'calendarname', res)
         self._calendar_name = res.get_value()['calendarname']
 

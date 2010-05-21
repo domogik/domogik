@@ -38,7 +38,7 @@ Implements
 """
 
 from domogik.xpl.common.xplconnector import Listener
-from domogik.xpl.common.plugin import XplPlugin, xPLResult
+from domogik.xpl.common.plugin import XplPlugin, XplResult
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.lib.plcbus import PLCBUSAPI
 from domogik.xpl.common.queryconfig import Query
@@ -79,7 +79,7 @@ class PlcBusMain(XplPlugin):
             'schema': 'plcbus.basic',
             'xpltype': 'xpl-cmnd',
         })
-        res = xPLResult()
+        res = XplResult()
         self._config.query('plcbus', 'device', res)
         device = res.get_value()['device']
         self.api = PLCBUSAPI(device, self._command_cb, self._message_cb) 

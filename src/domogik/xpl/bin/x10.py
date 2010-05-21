@@ -45,7 +45,7 @@ else:
     from domogik.xpl.lib.x10 import X10API, HeyuManager
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.common.plugin import XplPlugin, xPLResult
+from domogik.xpl.common.plugin import XplPlugin, XplResult
 from domogik.xpl.common.queryconfig import Query
 
 IS_DOMOGIK_PLUGIN = True
@@ -78,7 +78,7 @@ class X10Main(XplPlugin):
         XplPlugin.__init__(self, name = 'x10')
         self._heyu_cfg_path_res = ""
         self._config = Query(self._myxpl)
-        res = xPLResult()
+        res = XplResult()
         self._config.query('x10', 'heyu-cfg-path', res)
         self._heyu_cfg_path_res = res.get_value()['heyu-cfg-path']
         try:
@@ -107,7 +107,7 @@ class X10Main(XplPlugin):
         and finally restart heyu
         '''
         #Heyu config items
-        res = xPLResult()
+        res = XplResult()
 #        self._config = Query(self._myxpl)
         self._config.query('x10', '', res)
         result = res.get_value()
