@@ -62,9 +62,8 @@ Implements
 @organization: Domogik
 """
 
-import os
 import re
-from subprocess import *
+from subprocess import Popen, PIPE
 import threading
 from domogik.common import logger
 from domogik.common.ordereddict import OrderedDict
