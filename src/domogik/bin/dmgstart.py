@@ -99,7 +99,7 @@ def start_one_component(name):
 
     log.debug('Try to start component %s' % name)
     if name not in components:
-        log.warning("%s is not an existing component !" % name)
+        log.warning("%s is not an existing component!" % name)
         raise ValueError
     else:
         myxpl = Manager(plugin_name = 'dmgstart')
@@ -115,8 +115,7 @@ def start_one_component(name):
                 'type': 'xpl-trig', 'command': 'start', 'plugin': name})
         myxpl.send(message)
         time.sleep(5) #Wait 5 seconds for a message
-        print "No ack has been received during the last 5 seconds. It means " \
-                "that :\n"
+        print "No ack has been received during the last 5 seconds. It means that :\n"
         print "\t - No manager have been found on the network"
         print "\t - The manager has some issues"
         myxpl.leave()
