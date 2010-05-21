@@ -37,7 +37,7 @@ Implements
 """
 
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.common.plugin import XplPlugin, XplResult, xPLTimer
+from domogik.xpl.common.plugin import XplPlugin, XplResult, XplTimer
 from domogik.xpl.lib.onewire import OneWire
 from domogik.xpl.common.queryconfig import Query
 import threading
@@ -83,7 +83,7 @@ class OneWireTemp(XplPlugin):
         self._myow = OneWire()
         self._myow.set_cache_use(False)
         stop = threading.Event()
-        t_temp = xPLTimer(float(temp_delay), self._gettemp, stop, self._myxpl)
+        t_temp = XplTimer(float(temp_delay), self._gettemp, stop, self._myxpl)
         t_temp.start()
 
     def _gettemp(self):

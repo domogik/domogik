@@ -58,12 +58,12 @@ Implements
 - Message:.get_all_keys(self)
 - Message:.self, key
 - Message:.__str__(self)
-- xPLTimer.__init__(self, time, cb, stop)
-- xPLTimer.start(self)
-- xPLTimer.getTimer(self)
-- xPLTimer.stop(self)
-- xPLTimer.__init__(self, time, cb, stop)
-- xPLTimer.run(self)
+- XplTimer.__init__(self, time, cb, stop)
+- XplTimer.start(self)
+- XplTimer.getTimer(self)
+- XplTimer.stop(self)
+- XplTimer.__init__(self, time, cb, stop)
+- XplTimer.run(self)
 
 @author: Maxence Dunnewind <maxence@dunnewind.net>
 @copyright: (C) 2007-2009 Domogik project
@@ -140,9 +140,9 @@ class Manager(BasePlugin):
             self._ip, self._port = self._UDPSock.getsockname()
             self._log.debug("xPL plugin %s socket bound to %s, port %s" % (self.get_plugin_name(), self._ip, self._port))
             # All is good, we start sending Heartbeat every 5 minutes using
-            # xPLTimer
+            # XplTimer
             self._SendHeartbeat()
-            self._h_timer = xPLTimer(300, self._SendHeartbeat, self.get_stop(), self)
+            self._h_timer = XplTimer(300, self._SendHeartbeat, self.get_stop(), self)
             self._h_timer.start()
             #We add a listener in order to answer to the hbeat requests
             Listener(cb = self.got_hbeat, manager = self, filter = {'schema':'hbeat.app','xpltype':'xpl-stat'})
@@ -349,9 +349,9 @@ class XPLException(Exception):
         return self.repr(self.value)
 
 
-class xPLTimer():
+class XplTimer():
     """
-    xPLTimer will call a callback function each n seconds
+    XplTimer will call a callback function each n seconds
     """
 #    _time = 0
 #    _callback = None
@@ -372,7 +372,7 @@ class xPLTimer():
     def __repr__(self):
         """ Representation of the Timer
         """
-        return "<domogik.xpl.lib.xplconnector.xPLTimer> name : %s" % self._timer.name
+        return "<domogik.xpl.lib.xplconnector.XplTimer> name : %s" % self._timer.name
 
     def start(self):
         """

@@ -38,7 +38,7 @@ Implements
 """
 
 from time import localtime
-from domogik.xpl.common.xplconnector import xPLTimer
+from domogik.xpl.common.xplconnector import XplTimer
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.xplmessage import XplMessage
 
@@ -63,7 +63,7 @@ class XPLDateTime(XplPlugin):
     def __init__(self):
         XplPlugin.__init__(self, name = 'ldtmgr')
         
-        self._timer = xPLTimer(10, self._send_datetime, self.get_stop())
+        self._timer = XplTimer(10, self._send_datetime, self.get_stop())
         self.register_timer(self._timer)
         self._timer.start()
 
