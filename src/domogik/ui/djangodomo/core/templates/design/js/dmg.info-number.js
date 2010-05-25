@@ -31,13 +31,13 @@
                 this._elementValue.html(value + '<br />' + o.unit)
                 if (this.previousValue) {
                     if (value == this.previousValue) {
-                        this._elementStatus.attr('class', 'widget_state icon8-status-equal')
+                        this._elementStatus.attr('class', 'status icon8-status-equal')
                         this._elementStatus.html("<span class='offscreen'>linear</span>");
                     } else if (value > this.previousValue) {
-                        this._elementStatus.attr('class', 'widget_state icon8-status-up')
+                        this._elementStatus.attr('class', 'status icon8-status-up')
                         this._elementStatus.html("<span class='offscreen'>going up</span>");
                     } else {
-                        this._elementStatus.attr('class', 'widget_state icon8-status-down')
+                        this._elementStatus.attr('class', 'status icon8-status-down')
                         this._elementStatus.html("<span class='offscreen'>going down</span>");
                     }
                 }

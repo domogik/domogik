@@ -16,8 +16,8 @@ header#contentheader {
 
 #mainsection {
     margin:0;
-    -webkit-box-shadow: 1px 0 5px #000000;
     -moz-box-shadow: 1px 0 5px #000000;
+    -webkit-box-shadow: 1px 0 5px #000000;
 }
 
 /* Actions section */
