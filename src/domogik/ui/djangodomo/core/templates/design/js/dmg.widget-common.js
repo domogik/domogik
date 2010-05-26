@@ -23,9 +23,7 @@ const state_reset_status = 4000; // 4 seconds
             this.element.append(this._elementName);
             this._elementStatus = $("<div class='status'></div>");
             this.element.append(this._elementStatus);
-            this._elementClose = $("<div class='widget_button widget_close left icon32-action-cancel'></div>")
-                .click(function (e) {self.close();e.stopPropagation();});
-            this.element.append(this._elementClose);
+            this._elementClose = this._addButtonIcon("widget_close", "left", "icon32-action-cancel", function (e) {self.close();e.stopPropagation();});
             this.element.keypress(function (e) {
 					switch(e.keyCode) { 
 					case 27: // Esc
@@ -58,6 +56,20 @@ const state_reset_status = 4000; // 4 seconds
                     .addClass('closed');                
             }
             this.element.doTimeout( 'timeout');
+        },
+        
+        _addButtonIcon: function(css, position, icon, action) {
+            var element = $("<div class='widget_button_icon " + css + " " + position + " " + icon + "'></div>")
+                .click(action);
+            this.element.append(element);
+            return element;
+        },
+        
+        _addButtonText: function(css, position, icon, text, action) {
+            var element = $("<div class='widget_button_text " + css + " " + position + " " + icon + "'>" + text + "</div>")
+                .click(action);
+            this.element.append(element);
+            return element;
         },
         
         open: function() {
