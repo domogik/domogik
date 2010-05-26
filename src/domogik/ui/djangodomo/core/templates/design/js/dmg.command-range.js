@@ -4,7 +4,7 @@
         // default options
         options: {
             widgettype: 'command_range',
-            nameposition: 'topleft'
+            nameposition: 'nametopleft'
         },
 
         _init: function() {
@@ -18,13 +18,13 @@
             this.element.append(this._rangeFront)
                 .append(this._rangeLeft)
                 .append(this._rangeRight);
-			this._button_plus = $("<div class='widget_button range_plus icon16-action-up'></div>");
+			this._button_plus = $("<div class='widget_button range_plus icon16-action-up rightup'></div>");
 			this._button_plus.click(function (e) {self.plus_range();e.stopPropagation()});
-			this._button_minus = $("<div class='widget_button range_minus icon16-action-down'></div>");
+			this._button_minus = $("<div class='widget_button range_minus icon16-action-down rightdown'></div>");
 			this._button_minus.click(function (e) {self.minus_range();e.stopPropagation()});
-			this._button_max = $("<div class='widget_button range_max icon16-action-max'></div>");
+			this._button_max = $("<div class='widget_button range_max icon16-action-max upright'></div>");
 			this._button_max.click(function (e) {self.max_range();e.stopPropagation()});
-			this._button_min = $("<div class='widget_button range_min icon16-action-min'></div>");
+			this._button_min = $("<div class='widget_button range_min icon16-action-min downright'></div>");
 			this._button_min.click(function (e) {self.min_range();e.stopPropagation()});
 			this.element.addClass('closed');
 			this.element.append(this._button_plus)

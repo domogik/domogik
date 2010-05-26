@@ -3,7 +3,7 @@
         // default options
         options: {
             widgettype: 'info_number',
-            nameposition: 'top'
+            nameposition: 'nametop'
         },
 
         _init: function() {
@@ -56,7 +56,7 @@
                     if (status == 'ok') {
                         var d = [];
                         $.each(data.stats, function(index, stat) {
-                            d.push([index, stat.value]);
+                            d.push([stat.date, stat.value]);
                         });
                         var dialog = $("<div id='dialog' title='Graph Test'><div id='graph' style='width:600px;height:300px;'></div></div>");
                         $('body').append(dialog);
@@ -68,10 +68,10 @@
                                     });
                         
                         $.plot($("#graph"), [d], {
-                             /* xaxis: {
+                              xaxis: {
                                 mode: "time",
                                 timeformat: "%y/%m/%d"
-                              }*/
+                              }
                         });
                     } else {
                         $.notification('error', '{% trans "data creation failed" %} (' + data.description + ')');                                                                      

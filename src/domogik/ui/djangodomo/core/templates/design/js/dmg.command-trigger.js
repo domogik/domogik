@@ -3,7 +3,7 @@
         // default options
         options: {
             widgettype: 'command_trigger',
-            nameposition: 'top'
+            nameposition: 'nametop'
         },
 
         _init: function() {

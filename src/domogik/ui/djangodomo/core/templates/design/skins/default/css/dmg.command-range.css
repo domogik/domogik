@@ -8,26 +8,6 @@
     background-repeat: no-repeat;
 }
 
-.widget_mini.command_range .range_plus {
-    top:-24px;
-    right:-80px;
-}
-
-.widget_mini.command_range .range_minus {
-    top:30px;
-    right:-80px;
-}
-
-.widget_mini.command_range .range_min {
-    top:80px;
-    right:-40px;
-}
-
-.widget_mini.command_range .range_max {
-    top:-74px;
-    right:-40px;
-}
-
 .widget_mini.command_range .rotate{
 	/* There are two .rotate divs - one for each half of the background */
 	position:absolute;

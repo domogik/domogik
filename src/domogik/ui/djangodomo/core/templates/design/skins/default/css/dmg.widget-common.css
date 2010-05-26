@@ -41,14 +41,39 @@
     display:block;
 }
 
-.top {
+.nametop {
     top: -4em;
     left: -3em;
 }
 
-.topleft {
+.nametopleft {
     top: -4em;
     left: -10em;
+}
+
+.widget_mini .left {
+    top:8px;
+    left:-72px;
+}
+
+.widget_mini .rightup {
+    top:-32px;
+    left:77px;
+}
+
+.widget_mini .rightdown {
+    top:48px;
+    left:77px;
+}
+
+.widget_mini .downright {
+    top:77px;
+    left:48px;
+}
+
+.widget_mini .upright {
+    top:-61px;
+    left:48px;
 }
 
 .widget_mini .status {
@@ -110,9 +135,4 @@
 
 .widget_mini.opened .widget_button {
     display:block;
-}
-
-.widget_mini .widget_close {
-    top:6px;
-    left:-80px;
 }
