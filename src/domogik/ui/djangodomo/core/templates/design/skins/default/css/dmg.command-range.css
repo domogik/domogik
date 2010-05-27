@@ -8,39 +8,14 @@
     background-repeat: no-repeat;
 }
 
-.widget_mini.command_range .rotate{
-	/* There are two .rotate divs - one for each half of the background */
+.widget_mini.command_range #indicator {
 	position:absolute;
-	width:110px;
-	height:110px;
 	top:-33px;
-	left:-33px;
+	left:-32px;
+    display:none;
+    z-index:21;
 }
 
-.widget_mini.command_range .rangeleft { display:none; }
-.widget_mini.opened.command_range .rangeleft { display:block; }
-
-.widget_mini.command_range .rotate.rangeleft { z-index:20; }
-.widget_mini.command_range .rotate.rangeright { z-index:22; }
-
-.widget_mini.command_range .bg, .widget_mini.command_range .front{
-	width:55px;
-	height:110px;
-	position:absolute;
-	top:0;
-}
-
-.widget_mini.command_range .bg.rangeleft{ left:0; }
-
-.widget_mini.command_range .bg.rangeleft{ background:url('../images/status/range_bg_green.png') no-repeat left top; }
-
-/* The right part of the background: */
-.widget_mini.command_range .bg.rangeright{ left:55px; }
-.widget_mini.command_range .bg.rangeright{ background:url('../images/status/range_bg_green.png') no-repeat right top; }
-
-.widget_mini.command_range .front.rangeleft{
-	left:-33px;
-    top:-33px;
-	z-index:21;
-    background:url('../images/status/range_bg_black.png') no-repeat left top; 
+.widget_mini.command_range.opened #indicator {
+    display:block;
 }
