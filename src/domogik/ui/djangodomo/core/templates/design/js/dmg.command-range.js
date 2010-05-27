@@ -60,6 +60,7 @@
         open: function() {
             if (!this.isOpen) {
                 this._open();
+                this._processing_percent_current = 0;
                 this._setProcessingValue(this._processingValue);
             }
 		},
@@ -157,6 +158,21 @@
 
         _displayProcessingRange: function(percent) {
             var self = this, o = this.options;
+            this._processing_percent_final = percent;
+            if (!this._processing_animation) {
+                this._animateProcessingRange();
+            }
+        },
+
+        _animateProcessingRange: function() {
+            var self = this, o = this.options;            
+            this._processing_animation = true;
+            if (this._processing_percent_final < this._processing_percent_current) {
+                this._processing_percent_current--;
+            } else if (this._processing_percent_final > this._processing_percent_current) {
+                this._processing_percent_current++;                
+            }
+            
             var canvas = document.getElementById('indicator');
             if (canvas.getContext){
                 var ctx = canvas.getContext('2d');
@@ -164,17 +180,23 @@
                 ctx.beginPath();
                 ctx.clearRect(0,0, canvas.width, canvas.height);
 
-                if (percent > 0) {
+                if (this._processing_percent_current > 0) {
                     ctx.lineWidth = 10;
                     ctx.strokeStyle = "#BDCB2F";
-                    var deg = ((percent * 360) / 100) - 90;
+                    var deg = ((this._processing_percent_current * 360) / 100) - 90;
                     var angle = (Math.PI/180) * deg; // radian
                     ctx.arc(55,55,50,(Math.PI/2),-angle, true);
                     ctx.stroke();                
                 }
             }
+            
+            if (this._processing_percent_final == this._processing_percent_current) { // End animation
+                this._processing_animation = false;
+            } else {
+                setTimeout(function() {self._animateProcessingRange();}, 30);
+            }
         },
-
+        
         cancel: function() {
             this.setValue(this.currentValue);
             this._super();
