@@ -21,19 +21,6 @@ header#mainheader {
     float:left;
 }
 
-header#mainheader #logo {
-    display:block;
-    background: url(../../../images/logo_domogik_mini.png) 50% 50% no-repeat;
-    background-color:#9BB528;
-    background-image: -webkit-gradient(linear, 0% 0%, 0% 60%, from(#BDCB2F), to(#9BB528));
-    background-image: -moz-linear-gradient(100% 60% 270deg, #BDCB2F, #9BB528);
-	border: #B9C248 1px solid;
-	padding:0.3em;
-    margin:1em 0 0 1em;
-	-moz-border-radius: 0.4em;
-	-webkit-border-radius: 0.4em;
-}
-
 /* Nav menu */
 #nav1 ul {
     display:block;
