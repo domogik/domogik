@@ -8,7 +8,7 @@
     background-repeat: no-repeat;
 }
 
-.widget_mini.command_range #indicator {
+.widget_mini.command_range .indicator {
 	position:absolute;
 	top:-33px;
 	left:-32px;
@@ -16,6 +16,6 @@
     z-index:21;
 }
 
-.widget_mini.command_range.opened #indicator {
+.widget_mini.command_range.opened .indicator {
     display:block;
 }

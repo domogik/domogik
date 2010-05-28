@@ -17,6 +17,8 @@ const state_reset_status = 4000; // 4 seconds
                 .addClass("icon32-usage-" + o.usage)
                 .attr("tabindex", 0)
                 .processing();
+            this._identity = $("<canvas class='identity' width='60' height='60'></canvas>")
+            this.element.append(this._identity);
             this._elementBlur = $("<div class='blur'></div>");
             this.element.append(this._elementBlur);
             this._elementName = $("<span class='name " + o.nameposition + "'>" + o.devicename + "<br/>" + o.featurename + "</span>");
@@ -33,6 +35,18 @@ const state_reset_status = 4000; // 4 seconds
 					e.stopPropagation();
 				});
             this.element.blur(function () {self.close();});
+            
+            var canvas = this._identity.get(0);
+            if (canvas.getContext){
+                var ctx = canvas.getContext('2d');
+                ctx.beginPath();
+                ctx.font = "6pt Arial";
+                ctx.textBaseline = "top"
+                ctx.fillText(o.devicename, 15, 5);
+                ctx.translate(5,60);
+                ctx.rotate(-(Math.PI/2));
+                ctx.fillText(o.featurename, 0, 0);  
+            }
         },
         
         _open: function() {

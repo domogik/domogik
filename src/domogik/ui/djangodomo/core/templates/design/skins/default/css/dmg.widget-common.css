@@ -160,3 +160,9 @@
 .widget_mini.opened .widget_button_text {
     display:block;
 }
+
+.widget_mini .identity {
+    position:absolute;
+    top: -15px;
+    left: -15px;
+}

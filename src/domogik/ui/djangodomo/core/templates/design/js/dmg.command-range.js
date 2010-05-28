@@ -12,7 +12,8 @@
             this.min_value = parseInt(o.min_value);
             this.max_value = parseInt(o.max_value);
             this.step = parseInt(o.step);
-            this.element.append("<canvas id='indicator' width='110' height='110'></canvas>");
+            this._indicator = $("<canvas class='indicator' width='110' height='110'></canvas>");
+            this.element.append(this._indicator);
             this._button_max = this._addButtonIcon("range_max", "upright", "icon16-action-max", function (e) {self.max_range();e.stopPropagation();});
             this._button_plus = this._addButtonIcon("range_plus", "rightup", "icon16-action-up", function (e) {self.plus_range();e.stopPropagation();});
             this._button_minus = this._addButtonIcon("range_minus", "rightdown", "icon16-action-down", function (e) {self.minus_range();e.stopPropagation();});
@@ -173,7 +174,7 @@
                 this._processing_percent_current++;                
             }
             
-            var canvas = document.getElementById('indicator');
+            var canvas = this._indicator.get(0);
             if (canvas.getContext){
                 var ctx = canvas.getContext('2d');
                 canvas.width = canvas.width; //reset
