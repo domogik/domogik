@@ -32,7 +32,7 @@ const state_reset_status = 4000; // 4 seconds
 					}
 					e.stopPropagation();
 				});
-
+            this.element.blur(function () {self.close();});
         },
         
         _open: function() {
