@@ -61,7 +61,6 @@ class DBConnector(XplPlugin):
         self._log = self.get_my_logger()
         self._log.debug("Init database_manager instance")
 
-        self._db = DbHelper()
         Listener(self._request_config_cb, self._myxpl, {'schema': 'domogik.config', 'xpltype': 'xpl-cmnd'})
 
     def _request_config_cb(self, message):
@@ -70,6 +69,7 @@ class DBConnector(XplPlugin):
         @param message : the xPL message
         '''
         #try:
+        self._db = DbHelper()
         techno = message.data['technology']
         hostname = message.data['hostname']
         key = message.data['key']
