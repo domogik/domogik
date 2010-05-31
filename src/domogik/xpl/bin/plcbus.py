@@ -98,7 +98,7 @@ class PlcBusMain(XplPlugin):
         if 'command' in message.data:
             cmd = message.data['command']
         if 'device' in message.data:
-            dev = message.data['device']
+            dev = message.data['device'].upper()
         if 'usercode' in message.data:
             user = message.data['usercode']
         if 'data1' in message.data:
