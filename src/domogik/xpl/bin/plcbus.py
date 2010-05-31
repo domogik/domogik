@@ -58,8 +58,11 @@ DOMOGIK_PLUGIN_CONFIGURATION=[
        "key" : "device",
        "type" : "string",
        "description" : "Plcbus device (ex : TODO )",
-       "default" : "/dev/ttyUSB0"}]
-
+       "default" : "/dev/ttyUSB0"},
+      {"id" : 2,
+        "key" : "usercode",
+        "description" : "Usercode value (between 00 and FF), defaults to FF",
+        "default" : "FF"}]
 
 
 class PlcBusMain(XplPlugin):
