@@ -927,6 +927,9 @@ class DeviceStatsTestCase(GenericTestCase):
         self.db.add_device_stat(sdate + datetime.timedelta(minutes=1), 'val1', 300, device2.id)
         self.db.add_device_stat(sdate + datetime.timedelta(minutes=1), 'val2', 400, device2.id)
 
+        # Try to use a timestamp
+        self.db.add_device_stat(time.mktime(datetime.datetime.now().timetuple()), 'plop', 1000, device2.id)
+
         assert len(self.db.list_device_stats(device1.id)) == 10
         assert self.db.get_last_stat_of_device_by_key('val1', device1.id).value == '8'
         assert self.db.get_last_stat_of_device_by_key('val2', device1.id).value == '9'

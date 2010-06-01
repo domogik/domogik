@@ -47,7 +47,6 @@ from sqlalchemy.sql.expression import func
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
-
 from domogik.common.configloader import Loader
 from domogik.common.sql_schema import ACTUATOR_VALUE_TYPE_LIST, Area, Device, DeviceTypeFeature, \
                                       DeviceUsage, DeviceFeatureAssociation, DEVICE_FEATURE_ASSOCIATION_LIST, \
@@ -122,7 +121,7 @@ class DbHelper():
             url = '%s_test' % url
         # Connecting to the database
         self.__dbprefix = db['db_prefix']
-        self.__engine = sqlalchemy.create_engine(url, echo=echo_output)
+        self.__engine = sqlalchemy.create_engine(url, echo=echo_output, native_datetime=True)
         Session = sessionmaker(bind=self.__engine, autoflush=False)
         self.__session = Session()
 
