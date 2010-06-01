@@ -3663,7 +3663,8 @@ class StatsManager(XplPlugin):
                 return
             self._log_stats.debug("Stat received for %s - %s." \
                     % (self._technology, message.data[self._res["device"]]))
-            current_date = datetime.datetime.today()
+            current_date = time.mktime(datetime.datetime.now().timetuple())
+            #current_date = datetime.datetime.now()
             device_data = []
             for key in self._res["mapping"].keys():
                 data = ""
@@ -3676,6 +3677,7 @@ class StatsManager(XplPlugin):
                         value = message.data[key]
                 device_data.append({"key" : key, "value" : value})
                 # put data in database
+                print "self._db.add_device_stat(%s, %s, %s, %s)" % (str(current_date), str(key), str(value), str(d_id))
                 self._db.add_device_stat(current_date, key, value, d_id)
 
             # Put data in events queues
