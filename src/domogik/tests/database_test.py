@@ -42,6 +42,14 @@ from domogik.common.sql_schema import Area, Device, DeviceTypeFeature, DeviceUsa
                                       DeviceType, UIItemConfig, Room, UserAccount, SystemConfig, SystemStats, \
                                       SystemStatsValue, Trigger, Person
 
+
+def make_ts(year, month, day, hours=0, minutes=0, seconds=0):
+    """
+    Make a timestamp value
+    """
+    return time.mktime((year, month, day, hours, minutes, seconds, 0, 0, 0))
+
+
 class GenericTestCase(unittest.TestCase):
     """
     Main class for unit tests
@@ -908,27 +916,23 @@ class DeviceStatsTestCase(GenericTestCase):
         room1 = self.db.add_room('room1', area1.id)
         device1 = self.db.add_device(d_name='device1', d_address = "A1", d_type_id = dty1.id, d_usage_id = du1.id)
         device2 = self.db.add_device(d_name='device2', d_address='A2', d_type_id=dty1.id, d_usage_id=du1.id)
-        sdate = datetime.datetime(2010, 04, 9, 12, 0, 0)
-        ds1 = self.db.add_device_stat(sdate, 'val1', 0, device1.id)
+        ds1 = self.db.add_device_stat(make_ts(2010, 04, 9, 12), 'val1', 0, device1.id)
         print ds1
         assert ds1.key == 'val1' and ds1.value == '0'
-        self.db.add_device_stat(sdate, 'val2', 1, device1.id)
-        self.db.add_device_stat(sdate + datetime.timedelta(minutes=1), 'val1', 2, device1.id)
-        self.db.add_device_stat(sdate + datetime.timedelta(minutes=1), 'val2', 3, device1.id)
-        self.db.add_device_stat(sdate + datetime.timedelta(minutes=2), 'val1', 4, device1.id)
-        self.db.add_device_stat(sdate + datetime.timedelta(minutes=2), 'val2', 5, device1.id)
-        self.db.add_device_stat(sdate + datetime.timedelta(minutes=3), 'val1', 6, device1.id)
-        self.db.add_device_stat(sdate + datetime.timedelta(minutes=3), 'val2', 7, device1.id)
-        self.db.add_device_stat(sdate + datetime.timedelta(minutes=4), 'val1', 8, device1.id)
-        self.db.add_device_stat(sdate + datetime.timedelta(minutes=4), 'val2', 9, device1.id)
+        self.db.add_device_stat(make_ts(2010, 04, 9, 12, 0), 'val2', 1, device1.id)
+        self.db.add_device_stat(make_ts(2010, 04, 9, 12, 1), 'val1', 2, device1.id)
+        self.db.add_device_stat(make_ts(2010, 04, 9, 12, 1), 'val2', 3, device1.id)
+        self.db.add_device_stat(make_ts(2010, 04, 9, 12, 2), 'val1', 4, device1.id)
+        self.db.add_device_stat(make_ts(2010, 04, 9, 12, 2), 'val2', 5, device1.id)
+        self.db.add_device_stat(make_ts(2010, 04, 9, 12, 3), 'val1', 6, device1.id)
+        self.db.add_device_stat(make_ts(2010, 04, 9, 12, 3), 'val2', 7, device1.id)
+        self.db.add_device_stat(make_ts(2010, 04, 9, 12, 4), 'val1', 8, device1.id)
+        self.db.add_device_stat(make_ts(2010, 04, 9, 12, 4), 'val2', 9, device1.id)
 
-        self.db.add_device_stat(sdate + datetime.timedelta(minutes=0), 'val1', 100, device2.id)
-        self.db.add_device_stat(sdate + datetime.timedelta(minutes=0), 'val2', 200, device2.id)
-        self.db.add_device_stat(sdate + datetime.timedelta(minutes=1), 'val1', 300, device2.id)
-        self.db.add_device_stat(sdate + datetime.timedelta(minutes=1), 'val2', 400, device2.id)
-
-        # Try to use a timestamp
-        self.db.add_device_stat(time.mktime(datetime.datetime.now().timetuple()), 'plop', 1000, device2.id)
+        self.db.add_device_stat(make_ts(2010, 04, 9, 12, 0), 'val1', 100, device2.id)
+        self.db.add_device_stat(make_ts(2010, 04, 9, 12, 0), 'val2', 200, device2.id)
+        self.db.add_device_stat(make_ts(2010, 04, 9, 12, 1), 'val1', 300, device2.id)
+        self.db.add_device_stat(make_ts(2010, 04, 9, 12, 1), 'val2', 400, device2.id)
 
         assert len(self.db.list_device_stats(device1.id)) == 10
         assert self.db.get_last_stat_of_device_by_key('val1', device1.id).value == '8'
@@ -938,17 +942,17 @@ class DeviceStatsTestCase(GenericTestCase):
         assert len(stats_l) == 3
         assert stats_l[0].value == '4' and stats_l[1].value == '6' and stats_l[2].value == '8'
 
-        stats_l = self.db.list_stats_of_device_between_by_key('val1', device1.id, sdate + datetime.timedelta(minutes=2),
-                                                              sdate + datetime.timedelta(minutes=4))
+        stats_l = self.db.list_stats_of_device_between_by_key('val1', device1.id, make_ts(2010, 04, 9, 12, 2),
+                                                              make_ts(2010, 04, 9, 12, 4))
         assert len(stats_l) == 3
         assert stats_l[0].value == '4' and stats_l[1].value == '6' and stats_l[2].value == '8'
-        stats_l = self.db.list_stats_of_device_between_by_key('val1', device1.id, sdate + datetime.timedelta(minutes=3))
+        stats_l = self.db.list_stats_of_device_between_by_key('val1', device1.id,
+                                                              make_ts(2010, 04, 9, 12, 3))
         assert len(stats_l) == 2
         assert stats_l[0].value == '6' and stats_l[1].value == '8'
         stats_l = self.db.list_stats_of_device_between_by_key('val1', device1.id,
-                                                              end_datetime=sdate + datetime.timedelta(minutes=2))
+                                                              end_datetime=make_ts(2010, 04, 9, 12, 2))
         assert len(stats_l) == 3
-        assert stats_l[0].value == '0' and stats_l[1].value == '2' and stats_l[2].value == '4'
 
     def test_del(self):
         dt1 = self.db.add_device_technology('x10', 'x10', 'this is x10')

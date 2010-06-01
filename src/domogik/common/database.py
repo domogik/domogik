@@ -1370,19 +1370,15 @@ class DbHelper():
         Get statistics of a device between two dates (datetime format) for a given key
         @param ds_key : statistic key
         @param ds_device_id : device id
-        @param start_datetime : datetime start, optional
-        @param end_datetime : datetime end, optional
+        @param start_datetime : datetime start, optional (timestamp)
+        @param end_datetime : datetime end, optional (timestamp)
         @return a list of DeviceStats objects
         """
         query = self.__session.query(DeviceStats).filter_by(key=ucode(ds_key)).filter_by(device_id=ds_device_id)
         if start_datetime:
             query = query.filter("date >= '" + str(start_datetime) + "'")
         if end_datetime:
-            # TODO : This is really ugly but if we don't do it d2 is excluded from the interval
-            # I suspect this is because the date is stored like this in the DB : '2010-04-09 12:04:00.000000'
-            # But in Python we have '2010-04-09 12:04:00', so maybe there is a precision problem
-            d2 = "'" + str(end_datetime + datetime.timedelta(microseconds=1)) + "'"
-            query = query.filter('date <= ' + d2)
+            query = query.filter("date <= '" + str(end_datetime) + "'")
         list_s = query.order_by(sqlalchemy.desc(DeviceStats.date)).all()
         list_s.reverse()
         return list_s
