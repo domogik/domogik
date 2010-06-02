@@ -62,6 +62,7 @@ import SocketServer
 import os
 import glob
 import random
+import calendar
 
 
 
@@ -3664,7 +3665,8 @@ class StatsManager(XplPlugin):
                 return
             self._log_stats.debug("Stat received for %s - %s." \
                     % (self._technology, message.data[self._res["device"]]))
-            current_date = time.mktime(datetime.datetime.now().timetuple())
+            #current_date = time.mktime(calendar.timegm(datetime.datetime.now().timetuple()))
+            current_date = calendar.timegm(datetime.datetime.now().timetuple())
             #current_date = datetime.datetime.now()
             device_data = []
             for key in self._res["mapping"].keys():
