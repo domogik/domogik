@@ -56,14 +56,15 @@
             var self = this, o = this.options;
             this.close();
             var now = new Date();
-
-            $.getREST(['stats', o.deviceid, o.key, 'from', dateFormat(now, "yyyymmdd")],
+            var from = Math.round(new Date(now.getFullYear(), now.getMonth(), now.getDate(),0,0,0).getTime() / 1000);
+            var to = Math.round(new Date(now.getFullYear(), now.getMonth(), now.getDate(),23,59,59).getTime() / 1000);
+            $.getREST(['stats', o.deviceid, o.key, 'from', from],
                 function(data) {
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
                         var d = [];
                         $.each(data.stats, function(index, stat) {
-                            d.push([stat.date, stat.value]);
+                            d.push([(stat.date*1000), stat.value]);
                         });
                         var dialog = $("<div id='dialog' title='Graph Day'><div id='graph' style='width:600px;height:300px;'></div></div>");
                         $('body').append(dialog);
@@ -77,7 +78,9 @@
                         $.plot($("#graph"), [d], {
                               xaxis: {
                                 mode: "time",
-                                timeformat: "%y/%m/%d"
+                                timeformat: "%h:%M",
+                                min: (from*1000),
+                                max: (to*1000)
                               }
                         });
                     } else {
@@ -91,13 +94,15 @@
             var self = this, o = this.options;
             this.close();
             var now = new Date();
-            $.getREST(['stats', o.deviceid, o.key, 'from', dateFormat(now, "yyyymm") + "01"],
+            var from = Math.round(new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0).getTime() / 1000);
+            var to = Math.round(new Date(now.getFullYear(), now.getMonth(), 31 ,23,59,59).getTime() / 1000);
+            $.getREST(['stats', o.deviceid, o.key, 'from', from],
                 function(data) {
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
                         var d = [];
                         $.each(data.stats, function(index, stat) {
-                            d.push([stat.date, stat.value]);
+                            d.push([(stat.date*1000), stat.value]);
                         });
                         var dialog = $("<div id='dialog' title='Graph Month'><div id='graph' style='width:600px;height:300px;'></div></div>");
                         $('body').append(dialog);
@@ -111,7 +116,9 @@
                         $.plot($("#graph"), [d], {
                               xaxis: {
                                 mode: "time",
-                                timeformat: "%y/%m/%d"
+                                timeformat: "%d",
+                                min: (from*1000),
+                                max: (to*1000)
                               }
                         });
                     } else {
@@ -125,13 +132,15 @@
             var self = this, o = this.options;
             this.close();
             var now = new Date();
-            $.getREST(['stats', o.deviceid, o.key, 'from', dateFormat(now, "yyyy") + "0101"],
+            var from = Math.round(new Date(now.getFullYear(), 1, 1, 0, 0, 0).getTime() / 1000);
+            var to = Math.round(new Date(now.getFullYear(), 12, 31 ,23,59,59).getTime() / 1000);
+            $.getREST(['stats', o.deviceid, o.key, 'from', from],
                 function(data) {
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
                         var d = [];
                         $.each(data.stats, function(index, stat) {
-                            d.push([stat.date, stat.value]);
+                            d.push([(stat.date*1000), stat.value]);
                         });
                         var dialog = $("<div id='dialog' title='Graph Year'><div id='graph' style='width:600px;height:300px;'></div></div>");
                         $('body').append(dialog);
@@ -145,7 +154,9 @@
                         $.plot($("#graph"), [d], {
                               xaxis: {
                                 mode: "time",
-                                timeformat: "%y/%m/%d"
+                                timeformat: "%m",
+                                min: (from*1000),
+                                max: (to*1000)
                               }
                         });
                     } else {
