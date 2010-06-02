@@ -47,3 +47,10 @@
     padding-right: 10px;
     padding-left: 15px;
 }
+
+.breadcrumb li#customize {
+    float:right;
+    background: transparent url(../images/decoration/breadcrumb_separator_left.gif) left center no-repeat;
+    padding-right: 10px;
+    padding-left: 15px;
+}

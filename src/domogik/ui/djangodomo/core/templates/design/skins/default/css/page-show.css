@@ -25,6 +25,21 @@ header#contentheader {
 
 /* Actions section */
 
+#mainsection .maininfo {
+    display:block;
+    position:absolute;
+    top:1em;
+    right:1em;
+}
+
+#mainsection .maininfo.empty {
+    width: 45px;
+    height: 45px;
+    border: 1px dashed #000000;
+    -moz-border-radius: 0.8em;
+    -webkit-border-radius: 0.8em;
+}
+
 #mainsection .mainactions {
     margin:0;
     padding:1em;
@@ -32,6 +47,15 @@ header#contentheader {
     height:6em;
     border-right: #979387 1px solid;
     text-align:center;
+}
+
+#mainsection .mainactions li.empty {
+    width: 45px;
+    height: 45px;
+    border: 1px dashed #000000;
+    -moz-border-radius: 0.8em;
+    -webkit-border-radius: 0.8em;
+    margin:0.5em 1em 0 1em;
 }
 
 #mainsection .mainactions ul > li, #mainsection .actions ul > li {
