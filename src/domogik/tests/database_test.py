@@ -1074,7 +1074,7 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
                                     p_birthdate=datetime.date(1973, 4, 24))
         person_u = self.db.update_person(p_id=person.id, p_first_name='Marco', p_last_name='SCHNEIDERO',
                                          p_birthdate=datetime.date(1981, 4, 24))
-        assert person_u.birthdate == datetime.date(1981, 4, 24)
+        assert str(person_u.birthdate) == str(datetime.date(1981, 4, 24))
         assert person_u.last_name == 'SCHNEIDERO'
         assert person_u.first_name == 'Marco'
         user_acc = self.db.add_user_account(a_login='mschneider', a_password='IwontGiveIt',
@@ -1100,7 +1100,7 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
         assert user_acc_u.login == 'mschneider3'
         assert user_acc_u.person.first_name == 'Bob'
         assert user_acc_u.person.last_name == 'Marley'
-        assert user_acc_u.person.birthdate == datetime.date(1991, 4, 24)
+        assert str(user_acc_u.person.birthdate) == str(datetime.date(1991, 4, 24))
         assert user_acc_u.is_admin
         assert user_acc_u.skin_used == 'skins/crocodile'
         assert user_acc.password is None
