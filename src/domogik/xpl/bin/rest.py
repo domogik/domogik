@@ -1120,8 +1120,8 @@ target=*
              @param others params : will be get with get_parameters (dynamic params)
         """
 
-        st_from = self.to_date(self.get_parameters("from"))
-        st_to = self.to_date(self.get_parameters("to"))
+        st_from = self.get_parameters("from")
+        st_to = self.get_parameters("to")
         print "from=%s" % st_from
         print "to=%s" % st_to
 
@@ -1132,6 +1132,7 @@ target=*
             json_data.add_data(data)
         self.send_http_response_ok(json_data.get())
     
+
 
 
 ######
