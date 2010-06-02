@@ -44,23 +44,20 @@ from domogik.common.sql_schema import Area, Device, DeviceTypeFeature, DeviceUsa
 
 
 def make_ts(year, month, day, hours=0, minutes=0, seconds=0):
-    """
-    Make a timestamp value
-    """
+    """Make a timestamp value"""
     return time.mktime((year, month, day, hours, minutes, seconds, 0, 0, 0))
 
 
 class GenericTestCase(unittest.TestCase):
-    """
-    Main class for unit tests
-    """
+    """Main class for unit tests"""
 
     def has_item(self, item_list, item_name_list):
-        """
-        Check if a list of names are in a list (with objects having a 'name' attribute)
+        """Check if a list of names are in a list (with objects having a 'name' attribute)
+
         @param item_list : a list of objects having a 'name' attribute
         @param item_name_list : a list of names
         @return True if all names are in the list
+
         """
         found = 0
         for item in item_list:
@@ -133,9 +130,7 @@ class GenericTestCase(unittest.TestCase):
 
 
 class AreaTestCase(GenericTestCase):
-    """
-    Test areas
-    """
+    """Test areas"""
 
     def setUp(self):
         self.db = DbHelper(use_test_db=True)
@@ -201,9 +196,7 @@ class AreaTestCase(GenericTestCase):
 
 
 class RoomTestCase(GenericTestCase):
-    """
-    Test rooms
-    """
+    """Test rooms"""
 
     def setUp(self):
         self.db = DbHelper(use_test_db=True)
@@ -285,9 +278,7 @@ class RoomTestCase(GenericTestCase):
 
 
 class DeviceUsageTestCase(GenericTestCase):
-    """
-    Test device usages
-    """
+    """Test device usages"""
 
     def setUp(self):
         self.db = DbHelper(use_test_db=True)
@@ -341,9 +332,7 @@ class DeviceUsageTestCase(GenericTestCase):
             pass
 
 class DeviceTypeTestCase(GenericTestCase):
-    """
-    Test device types
-    """
+    """Test device types"""
 
     def setUp(self):
         self.db = DbHelper(use_test_db=True)
@@ -408,9 +397,7 @@ class DeviceTypeTestCase(GenericTestCase):
             pass
 
 class DeviceTypeFeatureTestCase(GenericTestCase):
-    """
-    Test device type, actuator and sensor features
-    """
+    """Test device type, actuator and sensor features"""
 
     def setUp(self):
         self.db = DbHelper(use_test_db=True)
@@ -501,9 +488,7 @@ class DeviceTypeFeatureTestCase(GenericTestCase):
 
 
 class DeviceFeatureAssociationTestCase(GenericTestCase):
-    """
-    Test device / feature association
-    """
+    """Test device / feature association"""
 
     def setUp(self):
         self.db = DbHelper(use_test_db=True)
@@ -591,9 +576,7 @@ class DeviceFeatureAssociationTestCase(GenericTestCase):
 
 
 class DeviceTechnologyTestCase(GenericTestCase):
-    """
-    Test device technologies
-    """
+    """Test device technologies"""
 
     def setUp(self):
         self.db = DbHelper(use_test_db=True)
@@ -643,9 +626,7 @@ class DeviceTechnologyTestCase(GenericTestCase):
             pass
 
 class PluginConfigTestCase(GenericTestCase):
-    """
-    Test plugin configuration
-    """
+    """Test plugin configuration"""
 
     def setUp(self):
         self.db = DbHelper(use_test_db=True)
@@ -703,9 +684,7 @@ class PluginConfigTestCase(GenericTestCase):
 
 
 class DeviceTestCase(GenericTestCase):
-    """
-    Test device
-    """
+    """Test device"""
 
     def setUp(self):
         self.db = DbHelper(use_test_db=True)
@@ -815,9 +794,7 @@ class DeviceTestCase(GenericTestCase):
 
 
 class DeviceConfigTestCase(GenericTestCase):
-    """
-    Test Device config
-    """
+    """Test Device config"""
 
     def __create_sample_device(self, device_name, device_technology_name):
         dt = self.db.add_device_technology(device_technology_name, 'a name', 'this is my device tech')
@@ -886,9 +863,7 @@ class DeviceConfigTestCase(GenericTestCase):
 
 
 class DeviceStatsTestCase(GenericTestCase):
-    """
-    Test device stats
-    """
+    """Test device stats"""
 
     def setUp(self):
         self.db = DbHelper(use_test_db=True)
@@ -983,9 +958,7 @@ class DeviceStatsTestCase(GenericTestCase):
         assert self.db.list_device_stats(device2.id)[0].value == '40'
 
 class TriggersTestCase(GenericTestCase):
-    """
-    Test triggers
-    """
+    """Test triggers"""
 
     def setUp(self):
         self.db = DbHelper(use_test_db=True)
@@ -1037,9 +1010,7 @@ class TriggersTestCase(GenericTestCase):
 
 
 class PersonAndUserAccountsTestCase(GenericTestCase):
-    """
-    Test person and user accounts
-    """
+    """Test person and user accounts"""
 
     def setUp(self):
         self.db = DbHelper(use_test_db=True)
@@ -1197,9 +1168,7 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
             pass
 
 class SystemStatsTestCase(GenericTestCase):
-    """
-    Test system stats
-    """
+    """Test system stats"""
 
     def setUp(self):
         self.db = DbHelper(use_test_db=True)
@@ -1259,9 +1228,7 @@ class SystemStatsTestCase(GenericTestCase):
 
 
 class UIItemConfigTestCase(GenericTestCase):
-    """
-    Test item UI config
-    """
+    """Test item UI config"""
 
     def setUp(self):
         self.db = DbHelper(use_test_db=True)
@@ -1346,9 +1313,7 @@ class UIItemConfigTestCase(GenericTestCase):
 
 
 class SystemConfigTestCase(GenericTestCase):
-    """
-    Test system config
-    """
+    """Test system config"""
 
     def setUp(self):
         self.db = DbHelper(use_test_db=True)
