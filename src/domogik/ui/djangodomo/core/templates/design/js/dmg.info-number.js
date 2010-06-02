@@ -70,6 +70,7 @@
                         $('body').append(dialog);
                         dialog.dialog({ height: 340, width:640,
                                         resizable: false,
+                                        modal: true,
                                         close: function(ev, ui) {
                                             $(this).remove();
                                         }
@@ -108,6 +109,7 @@
                         $('body').append(dialog);
                         dialog.dialog({ height: 340, width:640,
                                         resizable: false,
+                                        modal: true,
                                         close: function(ev, ui) {
                                             $(this).remove();
                                         }
@@ -132,8 +134,8 @@
             var self = this, o = this.options;
             this.close();
             var now = new Date();
-            var from = Math.round(new Date(now.getFullYear(), 1, 1, 0, 0, 0).getTime() / 1000);
-            var to = Math.round(new Date(now.getFullYear(), 12, 31 ,23,59,59).getTime() / 1000);
+            var from = Math.round(new Date(now.getFullYear(), 0, 1, 0, 0, 0).getTime() / 1000);
+            var to = Math.round(new Date(now.getFullYear(), 11, 31 ,23,59,59).getTime() / 1000);
             $.getREST(['stats', o.deviceid, o.key, 'from', from],
                 function(data) {
                     var status = (data.status).toLowerCase();
@@ -146,6 +148,7 @@
                         $('body').append(dialog);
                         dialog.dialog({ height: 340, width:640,
                                         resizable: false,
+                                        modal: true,
                                         close: function(ev, ui) {
                                             $(this).remove();
                                         }
@@ -154,7 +157,8 @@
                         $.plot($("#graph"), [d], {
                               xaxis: {
                                 mode: "time",
-                                timeformat: "%m",
+                                timeformat: "%b",
+                                monthNames: ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"],
                                 min: (from*1000),
                                 max: (to*1000)
                               }
