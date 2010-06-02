@@ -126,7 +126,13 @@ class DbHelper():
             url = '%s_test' % url
         # Connecting to the database
         self.__dbprefix = db['db_prefix']
-        self.__engine = sqlalchemy.create_engine(url, echo=echo_output, native_datetime=True)
+        if db['db_type'] == 'sqlite':
+            # We use native_datetime=True with sqlite to be able to use timestamps properly
+            # Otherwise we get this error : SQLite DateTime type only accepts Python datetime and date objects as input
+            native_dt = True
+        else:
+            native_dt = False
+        self.__engine = sqlalchemy.create_engine(url, echo=echo_output, native_datetime=native_dt)
         Session = sessionmaker(bind=self.__engine, autoflush=False)
         self.__session = Session()
 
