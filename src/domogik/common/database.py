@@ -129,6 +129,7 @@ class DbHelper():
         if db['db_type'] == 'sqlite':
             # We use native_datetime=True with sqlite to be able to use timestamps properly
             # Otherwise we get this error : SQLite DateTime type only accepts Python datetime and date objects as input
+            # See http://www.sqlalchemy.org/docs/reference/dialects/sqlite.html for more information
             native_dt = True
         else:
             native_dt = False
