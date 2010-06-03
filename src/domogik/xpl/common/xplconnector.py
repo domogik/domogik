@@ -278,10 +278,10 @@ class Listener:
     def __str__(self):
         return "Listener<%s>" % (self._filter)
 
-    def getFilter(self):
+    def get_filter(self):
         return self._filter
 
-    def getCb(self):
+    def get_cb(self):
         return self._callback
 
     def new_message(self, message):
