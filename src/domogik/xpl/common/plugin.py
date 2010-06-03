@@ -92,6 +92,7 @@ class XplPlugin():
         return setattr(self.__instance, attr, value)
 
     class __Singl_XplPlugin(BasePlugin):
+
         def __init__(self, name, stop_cb = None, is_manager = False, reload_cb = None, dump_cb = None, parser = None,
                      daemonize = True):
             '''
@@ -151,13 +152,13 @@ class XplPlugin():
                 self.force_leave()
             elif cmd == "reload":
                 if self._reload_cb is None:
-                    log.info("Someone asked to reload config of %s, but the plugin \
+                    self._log.info("Someone asked to reload config of %s, but the plugin \
                     isn't able to do it." % self.get_plugin_name())
                 else:
                     self._reload_cb()
             elif cmd == "dump":
                 if self._dump_cb is None:
-                    log.info("Someone asked to dump config of %s, but the plugin \
+                    self._log.info("Someone asked to dump config of %s, but the plugin \
                     isn't able to do it." % self.get_plugin_name())
                 else:
                     self._dump_cb()
