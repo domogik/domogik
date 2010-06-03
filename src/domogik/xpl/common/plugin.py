@@ -42,7 +42,7 @@ import threading
 import os
 import sys
 from socket import gethostname
-from domogik.xpl.common.xplconnector import *
+from domogik.xpl.common.xplconnector import XplMessage, Manager, Listener
 from domogik.xpl.common.baseplugin import BasePlugin
 from domogik.common.configloader import Loader
 
@@ -196,7 +196,6 @@ class XplPlugin():
             @param message : the Xpl message received
             """
 
-
         def force_leave(self):
             '''
             Leave threads & timers
@@ -214,6 +213,7 @@ class XplPlugin():
             for cb in self._stop_cb:
                 self._log.debug("Calling stop additionnal method : %s " % cb.__name__)
                 cb()
+
 
 class XplResult():
     '''
