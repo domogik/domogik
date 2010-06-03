@@ -22,7 +22,7 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 Plugin purpose
 ==============
 
-Téléinfo technology support 
+Téléinfo technology support
 
 Implements
 ==========
@@ -35,7 +35,7 @@ Implements
 @organization: Domogik
 """
 import serial
-import threading 
+import threading
 import time
 
 class TeleInfo:
@@ -53,9 +53,9 @@ class TeleInfo:
         self._thread = self.__TeleInfoHandler(serial_port, callback, float(interval), self._stop)
 
     def start(self):
-        """ Start the teleinfo handler thread 
+        """ Start the teleinfo handler thread
         """
-        self._thread.start() 
+        self._thread.start()
 
     def stop(self):
         """ Ask the thread to stop, it can take times
@@ -64,19 +64,19 @@ class TeleInfo:
 
 
     class __TeleInfoHandler(threading.Thread):
-        """ Internal class 
+        """ Internal class
         Read data on serial port
         """
-    
+
         def __init__(self, serial_port, callback, interval, lock):
-            """ Initialize thread 
+            """ Initialize thread
             """
             threading.Thread.__init__(self)
-            self._ser = serial.Serial(serial_port, 
+            self._ser = serial.Serial(serial_port,
                 1200, bytesize=7, parity = 'E',stopbits=1)
             self._lock = lock
             self._interval = interval
-            self._cb = callback 
+            self._cb = callback
 
         def __del__(self):
             if self._ser.isOpen():
@@ -91,15 +91,15 @@ class TeleInfo:
                 time.sleep(self._interval)
 
         def _fetch_one_frame(self):
-            """ Fetch one full frame for serial port 
-            If some part of the frame is corrupted, 
+            """ Fetch one full frame for serial port
+            If some part of the frame is corrupted,
             it waits until th enext one, so if you have corruption issue,
-            this method can take time, but it enures that the frame returned is valid 
+            this method can take time, but it enures that the frame returned is valid
             @return frame : list of dict {name, value, checksum}
             """
             #Get the begin of the frame, markde by \x02
             fr = self._ser.readline()
-            ok = False 
+            ok = False
             frame = []
             while not ok and not self._lock.isSet():
                 try:
@@ -107,7 +107,7 @@ class TeleInfo:
                         fr = self._ser.readline()
                     #\x02 is in the last line of a frame, so go until the next one
                     fr = self._ser.readline()
-                    #A new frame starts 
+                    #A new frame starts
                     #\x03 is the end of the frame
                     while '\x03' not in fr:
                         #Don't use strip() here because the checksum can be ' '
@@ -125,7 +125,7 @@ class TeleInfo:
                             while '\x02' not in fr:
                                 fr = self._ser.readline()
                         fr = self._ser.readline()
-                    #\x03 has been detected, that's the last line of the frame 
+                    #\x03 has been detected, that's the last line of the frame
                     if len(fr.replace('\r','').replace('\n','').split()) == 2:
                         #The checksum char is ' '
                         name, value = fr.replace('\r','').replace('\n','').replace('\x02','').replace('\x03','').split()
@@ -147,19 +147,19 @@ class TeleInfo:
 
         def _is_valid(self, frame, checksum):
             """ Check if a frame is valid
-            @param frame : the full frame 
-            @param checksum : the frame checksum 
+            @param frame : the full frame
+            @param checksum : the frame checksum
             """
             datas = ' '.join(frame.split()[0:2])
-            sum = 0
+            my_sum = 0
             for c in datas:
-                sum = sum + ord(c)
+                my_sum = my_sum + ord(c)
             computed_checksum = ( sum & int("111111", 2) ) + 0x20
             return chr(computed_checksum) == checksum
 
 ###Exemple
 def cb( frame):
-    """ Print a frame 
+    """ Print a frame
     """
     for entry in frame :
         print "%s : %s" % (entry["name"], entry["value"])
