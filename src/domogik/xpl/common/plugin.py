@@ -40,6 +40,7 @@ import time
 import signal
 import threading
 import os
+import sys
 from socket import gethostname
 from domogik.xpl.common.xplconnector import *
 from domogik.xpl.common.baseplugin import BasePlugin
@@ -72,7 +73,7 @@ class XplPlugin():
         on the command line. If set to True (default), will check if -f was added.
         '''
         if len(name) > 8:
-            raise IoError, "The name must be 8 chars max"
+            raise IOError, "The name must be 8 chars max"
         if XplPlugin.__instance is None and name is None:
             raise AttributeError, "'name' attribute is mandatory for the first instance"
         if XplPlugin.__instance is None:
