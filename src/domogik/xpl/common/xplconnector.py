@@ -72,14 +72,10 @@ Implements
 """
 
 import sys
-import string
 import select
 import threading
 import traceback
 from socket import socket, gethostbyname, gethostname, AF_INET, SOCK_DGRAM, SOL_SOCKET, SO_BROADCAST
-import time
-import signal
-import os
 from domogik.common import logger
 from domogik.xpl.common.baseplugin import BasePlugin
 from domogik.xpl.common.xplmessage import XplMessage
