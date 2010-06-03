@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-                                                                           
+# -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -48,7 +48,7 @@ DOMOGIK_PLUGIN_TECHNOLOGY = "plcbus"
 DOMOGIK_PLUGIN_DESCRIPTION = "Manage Plcbus devices"
 DOMOGIK_PLUGIN_VERSION = "0.1"
 DOMOGIK_PLUGIN_DOCUMENTATION_LINK = "http://wiki.domogik.org/tiki-index.php?page=plugins/Plcbus"
-DOMOGIK_PLUGIN_CONFIGURATION=[
+DOMOGIK_PLUGIN_CONFIGURATION = [
       {"id" : 0,
        "key" : "startup-plugin",
        "type" : "boolean",
@@ -85,7 +85,7 @@ class PlcBusMain(XplPlugin):
         res = XplResult()
         self._config.query('plcbus', 'device', res)
         device = res.get_value()['device']
-        self.api = PLCBUSAPI(device, self._command_cb, self._message_cb) 
+        self.api = PLCBUSAPI(device, self._command_cb, self._message_cb)
         # Create log instance
         self._log = self.get_my_logger()
 
@@ -124,8 +124,8 @@ class PlcBusMain(XplPlugin):
         mess.set_type('xpl-trig')
         mess.set_schema('plcbus.basic')
         mess.add_data({"usercode" : f["d_user_code"], "device": f["d_home_unit"],
-            "command": f["d_command"], "data1": f["d_data1"], "data2": f["d_data2"]})
-        self._myxpl.send(mess) 
+                       "command": f["d_command"], "data1": f["d_data1"], "data2": f["d_data2"]})
+        self._myxpl.send(mess)
 
     def _message_cb(self, message):
         print "Message : %s " % message
