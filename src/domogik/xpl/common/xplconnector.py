@@ -127,21 +127,22 @@ class Manager(BasePlugin):
             self._UDPSock.bind(addr)
         except:
             # Smthg is already running on this port
-            self._log.error("Can't bind to the interface %s, port %i" % (ip,port))
+            self._log.error("Can't bind to the interface %s, port %i" % (ip, port))
             exit(1)
         else:
             self.add_stop_cb(self.leave)
             self._port = self._UDPSock.getsockname()[1]
             #Get the port number assigned by the system
             self._ip, self._port = self._UDPSock.getsockname()
-            self._log.debug("xPL plugin %s socket bound to %s, port %s" % (self.get_plugin_name(), self._ip, self._port))
+            self._log.debug("xPL plugin %s socket bound to %s, port %s" \
+                            % (self.get_plugin_name(), self._ip, self._port))
             # All is good, we start sending Heartbeat every 5 minutes using
             # XplTimer
             self._SendHeartbeat()
             self._h_timer = XplTimer(300, self._SendHeartbeat, self.get_stop(), self)
             self._h_timer.start()
             #We add a listener in order to answer to the hbeat requests
-            Listener(cb = self.got_hbeat, manager = self, filter = {'schema':'hbeat.app','xpltype':'xpl-stat'})
+            Listener(cb = self.got_hbeat, manager = self, filter = {'schema':'hbeat.app', 'xpltype':'xpl-stat'})
             #And finally we start network listener in a thread
             self._stop_thread = False
             self._network = threading.Thread(None, self._run_thread_monitor,
@@ -301,9 +302,7 @@ class Listener:
 
             elif key == "xpltype":
                 ok = ok and (self._filter[key] == message.type)
-
-            elif not (key in message.data or key in (
-                    "xpltype", "schema")):
+            elif not (key in message.data or key in ("xpltype", "schema")):
                 ok = False
         #The message match the filter, we can call  the callback function
         if ok:
@@ -410,7 +409,6 @@ class XplTimer():
             self._stop = stop
             self.name = "internal-timer"
             self._log = log
-
 
         def run(self):
             '''
