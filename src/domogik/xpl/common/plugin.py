@@ -36,7 +36,6 @@ Implements
 @organization: Domogik
 """
 
-import time
 import signal
 import threading
 import os
@@ -147,7 +146,7 @@ class XplPlugin():
             """
             cmd = message.data["command"]
             plugin = message.data["plugin"]
-            if cmd == "stop" and plugin in ['*',self.get_plugin_name()]:
+            if cmd == "stop" and plugin in ['*', self.get_plugin_name()]:
                 self._log.info("Someone asked to stop %s, doing." % self.get_plugin_name())
                 self._answer_stop()
                 self.force_leave()
@@ -292,7 +291,6 @@ class Watcher:
             self.kill()
         except OSError:
             print "OSError"
-            pass
         sys.exit()
 
     def kill(self):
