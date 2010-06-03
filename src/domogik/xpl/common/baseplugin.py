@@ -58,7 +58,7 @@ class BasePlugin():
             on the command line. If set to True (default), will check if -f was added.
         """
         if BasePlugin.__instance is None:
-            BasePlugin.__instance = BasePlugin.__Singl_BasePlugin(name, stop_cb, parser, daemonize)
+            BasePlugin.__instance = BasePlugin.__SinglBasePlugin(name, stop_cb, parser, daemonize)
 
     def __getattr__(self, attr):
         """ Delegate access to implementation """
@@ -71,7 +71,7 @@ class BasePlugin():
         """ Delegate access to implementation """
         return setattr(self.__instance, attr, value)
 
-    class __Singl_BasePlugin:
+    class __SinglBasePlugin:
 
         def __init__(self, name, stop_cb = None, p = None, daemonize = True):
             ''' singleton instance
