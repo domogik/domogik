@@ -47,7 +47,7 @@ DOMOGIK_PLUGIN_TECHNOLOGY = "communication"
 DOMOGIK_PLUGIN_DESCRIPTION = "Get events from a Google agenda"
 DOMOGIK_PLUGIN_VERSION = "0.1"
 DOMOGIK_PLUGIN_DOCUMENTATION_LINK = "http://wiki.domogik.org/tiki-index.php?page=plugins/GoogleAgenda"
-DOMOGIK_PLUGIN_CONFIGURATION=[
+DOMOGIK_PLUGIN_CONFIGURATION = [
       {"id" : 0,
        "key" : "startup-plugin",
        "type" : "boolean",
