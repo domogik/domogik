@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-                                                                           
+# -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -45,7 +45,7 @@ DOMOGIK_PLUGIN_TECHNOLOGY = "service"
 DOMOGIK_PLUGIN_DESCRIPTION = "Get power consumption with teleinfo"
 DOMOGIK_PLUGIN_VERSION = "0.1"
 DOMOGIK_PLUGIN_DOCUMENTATION_LINK = "http://wiki.domogik.org/tiki-index.php?page=plugins/Teleinfo"
-DOMOGIK_PLUGIN_CONFIGURATION=[
+DOMOGIK_PLUGIN_CONFIGURATION = [
       {"id" : 0,
        "key" : "startup-plugin",
        "type" : "boolean",
