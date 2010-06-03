@@ -111,7 +111,7 @@ class Manager(BasePlugin):
         # Define xPL base port
         self._source = source
         self._listeners = []
-		#Not really usefull
+        #Not really usefull
         #self._port = port
         # Initialise the socket
         self._UDPSock = socket(AF_INET, SOCK_DGRAM)
@@ -357,7 +357,6 @@ class XplTimer():
 #    _callback = None
 #    _timer = None
 
-
     def __init__(self, time, cb, stop, manager):
         """
         Constructor : create the internal timer
@@ -366,6 +365,8 @@ class XplTimer():
         """
         self._timer = self.__internalTimer(time, cb, stop, manager._log)
         self._manager = manager
+        lg = logger.Logger(name)
+        self._log = lg.get_logger()
         manager.register_timer(self)
         manager.register_thread(self._timer)
 
