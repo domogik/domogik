@@ -365,7 +365,7 @@ class XplTimer():
         """
         self._timer = self.__internalTimer(time, cb, stop, manager._log)
         self._manager = manager
-        lg = logger.Logger(name)
+        lg = logger.Logger(self.__class__.__name__)
         self._log = lg.get_logger()
         manager.register_timer(self)
         manager.register_thread(self._timer)
