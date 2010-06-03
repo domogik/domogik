@@ -45,10 +45,8 @@ class Sniffer(XplPlugin):
     '''Sniff xpl network and dump all messages
     '''
 
-
     def __init__(self):
-        XplPlugin.__init__(self, name = 'sniffer', daemonize = False)
-        
+        XplPlugin.__init__(self, name='sniffer', daemonize=False)
         Listener(self._sniffer_cb, self._myxpl)
 
     def _sniffer_cb(self, message):
