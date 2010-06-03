@@ -65,7 +65,7 @@ class Logger():
 
         cfg = Loader()
         config = cfg.load()[0]
-        file = "%s/%s.log" % (config['log_dir_path'], plugin_name)
+        filename = "%s/%s.log" % (config['log_dir_path'], plugin_name)
         level = config['log_level']
 
         if level not in LEVELS:
@@ -73,7 +73,7 @@ class Logger():
                     "'error','critical'. Check your config.")
 
         logger = logging.getLogger('domogik-%s' % plugin_name)
-        hdlr = logging.FileHandler(file)
+        hdlr = logging.FileHandler(filename)
         formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s')
         hdlr.setFormatter(formatter)
         logger.addHandler(hdlr)
