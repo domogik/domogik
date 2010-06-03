@@ -359,7 +359,7 @@ class XplTimer():
         @param time : time of loop in second
         @param cb : callback function which will be call eact 'time' seconds
         """
-        self._timer = self.__internalTimer(time, cb, stop, manager._log)
+        self._timer = self.__InternalTimer(time, cb, stop, manager._log)
         self._manager = manager
         lg = logger.Logger(self.__class__.__name__)
         self._log = lg.get_logger()
@@ -377,7 +377,7 @@ class XplTimer():
         """
         self._timer.start()
 
-    def getTimer(self):
+    def get_timer(self):
         """
         Waits for the internal thread to finish
         """
@@ -394,7 +394,7 @@ class XplTimer():
         self._timer.join()
         self._manager.unregister_timer(self._timer)
 
-    class __internalTimer(threading.Thread):
+    class __InternalTimer(threading.Thread):
         '''
         Internal timer class
         '''
