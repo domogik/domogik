@@ -220,8 +220,7 @@ remote-ip=%s
         """
         while not self.should_stop():
             try:
-                readable, writeable, errored = select.select(
-                    [self._UDPSock], [], [], 10)
+                readable, writeable, errored = select.select([self._UDPSock], [], [], 10)
             except:
                 self._log.info("Error during the read of the socket : %s" % traceback.format_exc())
             else:
