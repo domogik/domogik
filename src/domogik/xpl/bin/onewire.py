@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-                                                                           
+# -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -50,7 +50,7 @@ DOMOGIK_PLUGIN_TECHNOLOGY = "onewire"
 DOMOGIK_PLUGIN_DESCRIPTION = "Manage 1 wire devices"
 DOMOGIK_PLUGIN_VERSION = "0.1"
 DOMOGIK_PLUGIN_DOCUMENTATION_LINK = "TODO"
-DOMOGIK_PLUGIN_CONFIGURATION=[
+DOMOGIK_PLUGIN_CONFIGURATION = [
       {"id" : 0,
        "key" : "startup-plugin",
        "type" : "boolean",
@@ -61,7 +61,6 @@ DOMOGIK_PLUGIN_CONFIGURATION=[
        "type" : "number",
        "description" : "Temperature refresh delay (seconds)",
        "default" : TEMP_DELAY}]
-
 
 
 class OneWireTemp(XplPlugin):
@@ -96,7 +95,7 @@ class OneWireTemp(XplPlugin):
             my_temp_message.set_schema("sensor.basic")
             my_temp_message.add_data({"device" :  _id})
             #type should be the model of the o1wire component.
-            #Anyway, because we need a way to determine which is the 
+            #Anyway, because we need a way to determine which is the
             #technology of the device, we use it with value 'onewire'
             my_temp_message.add_data({"type" :  "onewire"})
             my_temp_message.add_data({"current" :  _val})
