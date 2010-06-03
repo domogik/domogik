@@ -208,8 +208,7 @@ class StatsManager(XplPlugin):
                 return
             else:
                 self._log.debug("Stat received for %s - %s." \
-                        % (self._technology, message.data[self._res["device"]]))
-                datas = {}
+                                % (self._technology, message.data[self._res["device"]]))
                 timestamp = datetime.today()
                 for key in self._res["mapping"].keys():
                     if message.data.has_key(key):
