@@ -35,13 +35,13 @@ Implements
 @license: GPL(v3)
 @organization: Domogik
 """
-import threading 
+import threading
 import binascii
 import time
 from domogik.common import logger
 
 class Mirror:
-    """ Listen to mir:ror 
+    """ Listen to mir:ror
     """
 
     def __init__(self, mirror_device, nb_max_try, interval, callback):
@@ -50,13 +50,13 @@ class Mirror:
         """
         self._stop = threading.Event()
         self._thread = self._MirrorHandler(mirror_device, int(nb_max_try), \
-                                            float(interval), callback, 
+                                            float(interval), callback,
                                             self._stop)
 
     def start(self):
-        """ Start the mirror handler thread 
+        """ Start the mirror handler thread
         """
-        self._thread.start() 
+        self._thread.start()
 
     def stop(self):
         """ Ask the thread to stop, it can take times
@@ -65,7 +65,7 @@ class Mirror:
 
 
     class _MirrorHandler(threading.Thread):
-        """ Internal class 
+        """ Internal class
         Read data mir:ror device
         """
 
@@ -78,7 +78,7 @@ class Mirror:
             self._log.info("mir:ror initialisation...")
             self._lock = lock
             self.mirror_device = mirror_device
-            self._cb = callback 
+            self._cb = callback
             self._device_not_open = 1
             nb_try = 0
             while self._device_not_open and nb_try < nb_max_try:
@@ -97,9 +97,8 @@ class Mirror:
                     time.sleep(interval)
                     nb_try = nb_try + 1
 
-            # Initialize thread 
+            # Initialize thread
             threading.Thread.__init__(self)
-
 
         def __del__(self):
             if self._mirror.isOpen():
@@ -121,7 +120,7 @@ class Mirror:
                         if data[0] == '\x02':
                             ### action on ztamp
                             # data[0] and data[1] : action type
-                            # data[2...15] : ztamp identifier 
+                            # data[2...15] : ztamp identifier
                             #        (it seems that 2,3, 14,15 are always nulls)
                             self._log.debug("Action on : ztamp")
                             ztamp_id = binascii.hexlify(data[2]+data[3]+ \
@@ -130,12 +129,10 @@ class Mirror:
                                              data[10]+data[11]+data[12]+ \
                                              data[13]+data[14]+data[15])
                             if data[1] == '\x01':
-                                self._log.debug("ztamp near from mir:ror : "+ \
-                                                ztamp_id)
+                                self._log.debug("ztamp near from mir:ror : "+ ztamp_id)
                                 self._cb("ztamp_in", ztamp_id)
                             if data[1] == '\x02':
-                                self._log.debug("ztamp far from mir:ror : "+ \
-                                                ztamp_id)
+                                self._log.debug("ztamp far from mir:ror : "+ ztamp_id)
                                 self._cb("ztamp_out", ztamp_id)
 
                         if data[0] == '\x01':
@@ -151,9 +148,6 @@ class Mirror:
                                 self._cb("mirror_down", "0")
             else:
                 self._log.error("No mirror detected")
-
-
-
 
 
 ###Exemple
