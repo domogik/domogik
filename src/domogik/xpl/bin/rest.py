@@ -160,6 +160,11 @@ class Rest(XplPlugin):
         self._log.info("Rest Server initialisation...")
         self._log.debug("locale : %s %s" % locale.getdefaultlocale())
 
+        # logging Queue activities
+        log_queue = logger.Logger('REST-QUEUES')
+        self._log_queue = log_queue.get_logger()
+        self._log_queue.info("Rest's queues activities...")
+    
         # logging data manipulation initialization
         log_dm = logger.Logger('REST-DM')
         self._log_dm = log_dm.get_logger()
@@ -375,10 +380,10 @@ class Rest(XplPlugin):
                 - {"plugin" : "wol%", ...} : here "%" indicate that we search for something starting with "wol"
             @param nb_rec : internal parameter (do not use it for first call). Used to check recursivity VS queue size
         """
-        self._log.debug("Get from queue : %s (recursivity deepth : %s)" % (str(my_queue), nb_rec))
+        self._log_queue.debug("Get from queue : %s (recursivity deepth : %s)" % (str(my_queue), nb_rec))
         # check if recursivity doesn't exceed queue size
         if nb_rec > my_queue.qsize():
-            self._log.warning("Get from queue %s : number of call exceed queue size (%s) : return None" % (str(my_queue), my_queue.qsize()))
+            self._log_queue.warning("Get from queue %s : number of call exceed queue size (%s) : return None" % (str(my_queue), my_queue.qsize()))
             # we raise an "Empty" exception because we consider that if we don't find
             # the good data, it is as if it was "empty"
             raise Empty
@@ -389,7 +394,7 @@ class Rest(XplPlugin):
         if time.time() - msg_time < self._queue_life_expectancy:
             # no filter defined
             if filter == None: 
-                self._log.debug("Get from queue %s : return %s" % (str(my_queue), str(message)))
+                self._log_queue.debug("Get from queue %s : return %s" % (str(my_queue), str(message)))
                 return message
 
             # we want to filter data
@@ -410,22 +415,22 @@ class Rest(XplPlugin):
 
                 # if message is ok for us, return it
                 if keep_data == True:
-                    self._log.debug("Get from queue %s : return %s" % (str(my_queue), str(message)))
+                    self._log_queue.debug("Get from queue %s : return %s" % (str(my_queue), str(message)))
                     return message
 
                 # else, message get back in queue and get another one
                 else:
-                    self._log.debug("Get from queue %s : bad data, check another one..." % (str(my_queue)))
+                    self._log_queue.debug("Get from queue %s : bad data, check another one..." % (str(my_queue)))
                     self._put_in_queue(my_queue, message)
                     return self._get_from_queue_without_waiting(my_queue, filter, nb_rec + 1)
 
         # if message too old : get an other message
         else:
-            self._log.debug("Get from queue %s : data too old, check another one..." % (str(my_queue)))
+            self._log_queue.debug("Get from queue %s : data too old, check another one..." % (str(my_queue)))
             return self._get_from_queue_without_waiting(my_queue, filter, nb_rec + 1)
 
     def _put_in_queue(self, my_queue, message):
-        self._log.debug("Put in queue %s : %s" % (str(my_queue), str(message)))
+        self._log_queue.debug("Put in queue %s : %s" % (str(my_queue), str(message)))
         my_queue.put((time.time(), message), True, self._queue_timeout) 
 
 
