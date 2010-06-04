@@ -150,7 +150,7 @@ class AreaTestCase(GenericTestCase):
         except DbHelperException:
             pass
         area0 = self.db.add_area('area0','description 0')
-        print area0
+        print(area0)
         assert area0.name == 'area0'
         assert self.db.list_areas()[0].name == 'area0'
 
@@ -219,7 +219,7 @@ class RoomTestCase(GenericTestCase):
         except DbHelperException:
             pass
         room = self.db.add_room(r_name='my_room', r_area_id=None, r_description='my_description')
-        print room
+        print(room)
         area1 = self.db.add_area('area1','description 1')
         area2 = self.db.add_area('area2','description 2')
         room1 = self.db.add_room(r_name='room1', r_description='description 1', r_area_id=area1.id)
@@ -293,7 +293,7 @@ class DeviceUsageTestCase(GenericTestCase):
 
     def test_add(self):
         du1 = self.db.add_device_usage(du_name='du1', du_description='desc1', du_default_options='def opt1')
-        print du1
+        print(du1)
         assert du1.name == 'du1'
         assert du1.description == 'desc1'
         assert du1.default_options == 'def opt1'
@@ -354,7 +354,7 @@ class DeviceTypeTestCase(GenericTestCase):
         except DbHelperException:
             pass
         dty1 = self.db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
-        print dty1
+        print(dty1)
         assert dty1.name == 'x10 Switch'
         assert dty1.description == 'desc1'
         assert dty1.device_technology_id == dt1.id
@@ -420,7 +420,7 @@ class DeviceTypeFeatureTestCase(GenericTestCase):
         dty3 = self.db.add_device_type(dty_name='1wire.Temperature', dty_description='desc3', dt_id=dt2.id)
         af1 = self.db.add_actuator_feature(af_name='Switch', af_device_type_id=dty1.id, af_parameters='myparams1',
                                            af_value_type='binary', af_return_confirmation=True)
-        print af1
+        print(af1)
         assert af1.name == 'Switch'
         assert af1.id == dty1.id
         assert af1.parameters == 'myparams1'
@@ -431,7 +431,7 @@ class DeviceTypeFeatureTestCase(GenericTestCase):
                                            af_value_type='number', af_return_confirmation=True)
         sf1 = self.db.add_sensor_feature(sf_name='Thermometer', sf_device_type_id=dty3.id, sf_parameters='myparams3',
                                          sf_value_type='number')
-        print sf1
+        print(sf1)
         assert sf1.name == 'Thermometer'
         assert sf1.id == dty3.id
         assert sf1.parameters == 'myparams3'
@@ -527,7 +527,7 @@ class DeviceFeatureAssociationTestCase(GenericTestCase):
                                            af_value_type='number')
         dfa = self.db.add_device_type_feature_association(d_device_id=device1.id, d_type_feature_id=af1.id,
                                                           d_place_type='house')
-        print dfa
+        print(dfa)
         self.db.add_device_type_feature_association(d_device_id=device2.id, d_type_feature_id=af2.id,
                                                     d_place_id=room1.id, d_place_type='room')
         self.db.add_device_type_feature_association(d_device_id=device3.id, d_type_feature_id=af2.id,
@@ -591,7 +591,7 @@ class DeviceTechnologyTestCase(GenericTestCase):
 
     def test_add(self):
         dt1 = self.db.add_device_technology('1wire', '1-Wire', 'desc dt1')
-        print dt1
+        print(dt1)
         assert dt1.id == '1wire'
         assert dt1.name == '1-Wire'
         assert dt1.description == 'desc dt1'
@@ -641,7 +641,7 @@ class PluginConfigTestCase(GenericTestCase):
 
     def test_add_get_list(self):
         pc1_1 = self.db.set_plugin_config(pl_name='x10', pl_hostname='192.168.0.1', pl_key='key1_1', pl_value='val1_1')
-        print pc1_1
+        print(pc1_1)
         assert pc1_1.name == 'x10'
         assert pc1_1.key == 'key1_1'
         assert pc1_1.value == 'val1_1'
@@ -715,7 +715,7 @@ class DeviceTestCase(GenericTestCase):
         device1 = self.db.add_device(d_name='device1', d_address='A1',
                                      d_type_id=dty1.id, d_usage_id=du1.id, d_description='desc1')
         assert device1.name == 'device1' and device1.description == 'desc1'
-        print device1
+        print(device1)
         assert len(self.db.list_devices()) == 1
         device2 = self.db.add_device(d_name='device2', d_address='A2',
                     d_type_id=dty1.id, d_usage_id=du1.id, d_description='desc1')
@@ -821,7 +821,7 @@ class DeviceConfigTestCase(GenericTestCase):
         device1 = self.__create_sample_device('device1', 'dt1')
         device2 = self.__create_sample_device('device2', 'dt2')
         device_config1_1 = self.db.set_device_config('key1_1', 'val1_1', device1.id)
-        print device_config1_1
+        print(device_config1_1)
         assert device_config1_1.key == 'key1_1'
         assert device_config1_1.value == 'val1_1'
         device_config2_1 = self.db.set_device_config('key2_1', 'val2_1', device1.id)
@@ -892,7 +892,7 @@ class DeviceStatsTestCase(GenericTestCase):
         device1 = self.db.add_device(d_name='device1', d_address = "A1", d_type_id = dty1.id, d_usage_id = du1.id)
         device2 = self.db.add_device(d_name='device2', d_address='A2', d_type_id=dty1.id, d_usage_id=du1.id)
         ds1 = self.db.add_device_stat(make_ts(2010, 04, 9, 12), 'val1', 0, device1.id)
-        print ds1
+        print(ds1)
         assert ds1.key == 'val1' and ds1.value == '0'
         self.db.add_device_stat(make_ts(2010, 04, 9, 12, 0), 'val2', 1, device1.id)
         self.db.add_device_stat(make_ts(2010, 04, 9, 12, 1), 'val1', 2, device1.id)
@@ -974,7 +974,7 @@ class TriggersTestCase(GenericTestCase):
     def test_add(self):
         trigger1 = self.db.add_trigger(t_description='desc1', t_rule='AND(x,OR(y,z))',
                                        t_result=['x10_on("a3")', '1wire()'])
-        print trigger1
+        print(trigger1)
         assert trigger1.description == 'desc1'
         assert trigger1.rule == 'AND(x,OR(y,z))'
         trigger2 = self.db.add_trigger(t_description = 'desc2', t_rule='OR(x,AND(y,z))',
@@ -1028,10 +1028,10 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
         person1 = self.db.add_person(p_first_name='Marc', p_last_name='SCHNEIDER',
                                      p_birthdate=datetime.date(1973, 4, 24))
         assert person1.last_name == 'SCHNEIDER'
-        print person1
+        print(person1)
         user1 = self.db.add_user_account(a_login='mschneider', a_password='IwontGiveIt',
                                          a_person_id=person1.id, a_is_admin=True)
-        print user1
+        print(user1)
         assert user1.password is None
         assert user1.person.first_name == 'Marc'
         assert self.db.authenticate('mschneider', 'IwontGiveIt')
@@ -1188,7 +1188,7 @@ class SystemStatsTestCase(GenericTestCase):
         for i in range(4):
             ssv = {'ssv1': (i*2), 'ssv2': (i*3),}
             sstat = self.db.add_system_stat("sstat%s" %i, 'localhost', now + datetime.timedelta(seconds=i), ssv)
-            print sstat
+            print(sstat)
             sstat_list.append(sstat)
         assert len(self.db.list_system_stats()) == 4
 
@@ -1247,7 +1247,7 @@ class UIItemConfigTestCase(GenericTestCase):
         assert ui_config.reference == '2'
         assert ui_config.key == 'icon'
         assert ui_config.value == 'basement'
-        print ui_config
+        print(ui_config)
         self.db.set_ui_item_config('room', 1, 'icon', 'kitchen')
         self.db.set_ui_item_config('room', 4, 'icon', 'bathroom')
         self.db.set_ui_item_config('room', 4, 'param_r2', 'value_r2')
