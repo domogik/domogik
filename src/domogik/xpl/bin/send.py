@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-                                                                           
+# -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -39,11 +39,11 @@ Implements
 """
 
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.common.plugin import xPLPlugin
+from domogik.xpl.common.plugin import XplPlugin
 import optparse
 
 
-class Sender(xPLPlugin):
+class Sender(XplPlugin):
     ''' Send an xpl message
     usage : sendXPL.py message_type message_contents"
     message_type: Type of the message, must correspond to one of the supported schemas
@@ -51,10 +51,10 @@ class Sender(xPLPlugin):
     '''
 
     supported_schemas = ["datetime.basic", "dawndusk.request", "x10.basic",
-            "sensor.basic", "domogik.system","domogik.config"]
+                         "sensor.basic", "domogik.system","domogik.config"]
 
     def __init__(self, schema=None, message=None):
-        xPLPlugin.__init__(self, name = 'send', daemonize = False)
+        XplPlugin.__init__(self, name = 'send', daemonize = False)
         self._schema = schema
         self._message = message
         self._log = self.get_my_logger()

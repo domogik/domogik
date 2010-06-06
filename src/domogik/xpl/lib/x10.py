@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-                                                                           
+# -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -62,23 +62,24 @@ Implements
 @organization: Domogik
 """
 
-import os
 import re
-from subprocess import *
+from subprocess import Popen, PIPE
 import threading
 from domogik.common import logger
 from domogik.common.ordereddict import OrderedDict
 
-class X10Exception:
+
+class X10Exception(Exception):
     """
     X10 exception
     """
 
     def __init__(self, value):
+        Exception.__init__()
         self.value = value
 
     def __str__(self):
-        return self.repr(self.value)
+        return repr(self.value)
 
 
 class X10API:
@@ -95,8 +96,7 @@ class X10API:
         output = res.stderr.read()
         res.stderr.close()
         if output:
-            self._log.error("Output was : %s\nHeyu config file path is : %s" \
-                    % (output, heyuconf))
+            self._log.error("Output was : %s\nHeyu config file path is : %s" % (output, heyuconf))
             raise X10Exception("Something went wrong with heyu. check logs")
         self._housecodes = list('ABCDEFGHIJKLMNOP')
         self._unitcodes = range(1, 17)
@@ -123,8 +123,7 @@ class X10API:
             if house[0] not in self._housecodes:
                 raise AttributeError
         except:
-            self._log.warning("Invalid house %s, must be 'H' format, between "\
-                    "A and P" % (house[0].upper()))
+            self._log.warning("Invalid house %s, must be 'H' format, between A and P" % (house[0].upper()))
 
     def _send(self, cmd, item):
         """
@@ -175,8 +174,8 @@ class X10API:
         @Return True if order was sent, False in case of errors
         """
         try:
-                self._valid_item(item)
-                self._send("off", item)
+            self._valid_item(item)
+            self._send("off", item)
         except:
             return False
         else:
@@ -334,6 +333,8 @@ class X10Monitor:
             threading.Thread.__init__(self)
             self._pipe = pipe
             self._cbs = []
+            log = logger.Logger(self.__class__.__name__)
+            self._log = log.get_logger()
 
         def add_cb(self, cb):
             """
@@ -386,7 +387,7 @@ class X10Monitor:
 
         def _call_cbs(self, units, order, arg):
             """
-            Call all callbacks 
+            Call all callbacks
             """
             for cb in self._cbs:
                 for unit in units:
@@ -400,15 +401,15 @@ class HeyuManager:
 
     ITEMS_SECTION = OrderedDict()
     ITEMS_SECTION['general'] = ['TTY','TTY_AUX','LOG_DIR', 'HOUSECODE', 'REPORT_PATH',
-            'DEFAULT_MODULE','START_ENGINE','DATE_FORMAT','LOGDATE_YEAR','TAILPATH',
-            'HEYU_UMASK', 'STATUS_TIMEOUT', 'SPF_TIMEOUT','TRANS_DIMLEVEL']
+                                'DEFAULT_MODULE','START_ENGINE','DATE_FORMAT','LOGDATE_YEAR','TAILPATH',
+                                'HEYU_UMASK', 'STATUS_TIMEOUT', 'SPF_TIMEOUT','TRANS_DIMLEVEL']
     ITEMS_SECTION['aliases'] = ['ALIAS']
     ITEMS_SECTION['scenes'] = ['SCENE', 'USERSYN', 'MAX_PPARMS']
     ITEMS_SECTION['scripts'] = ['SCRIPT','SCRIPT_MODE', 'SCRIPT_CTRL']
     ITEMS_SECTION['scheduler'] = ['SCHEDULE_FILE','MODE','PROGRAM_DAYS','COMBINE_EVENTS',
-            'COMPRESS_MACROS','REPL_DELAYED_MACROS', 'WRITE_CHECK_FILES']
+                                  'COMPRESS_MACROS','REPL_DELAYED_MACROS', 'WRITE_CHECK_FILES']
     ITEMS_SECTION['dawnduk'] = ['LONGITUDE','LATITUDE','DAWN_OPTION','DUSK_OPTION',
-            'MIN_DAWN','MAX_DAWN','MIN_DUSK','MAX_DUSK']
+                                'MIN_DAWN','MAX_DAWN','MIN_DUSK','MAX_DUSK']
 
     def __init__(self, path):
         """
@@ -457,4 +458,3 @@ class HeyuManager:
         output = res.stderr.read()
         res.stderr.close()
         return output
-

@@ -42,17 +42,22 @@ from domogik.common.sql_schema import Area, Device, DeviceTypeFeature, DeviceUsa
                                       DeviceType, UIItemConfig, Room, UserAccount, SystemConfig, SystemStats, \
                                       SystemStatsValue, Trigger, Person
 
+
+def make_ts(year, month, day, hours=0, minutes=0, seconds=0):
+    """Make a timestamp value"""
+    return time.mktime((year, month, day, hours, minutes, seconds, 0, 0, 0))
+
+
 class GenericTestCase(unittest.TestCase):
-    """
-    Main class for unit tests
-    """
+    """Main class for unit tests"""
 
     def has_item(self, item_list, item_name_list):
-        """
-        Check if a list of names are in a list (with objects having a 'name' attribute)
+        """Check if a list of names are in a list (with objects having a 'name' attribute)
+
         @param item_list : a list of objects having a 'name' attribute
         @param item_name_list : a list of names
         @return True if all names are in the list
+
         """
         found = 0
         for item in item_list:
@@ -125,9 +130,7 @@ class GenericTestCase(unittest.TestCase):
 
 
 class AreaTestCase(GenericTestCase):
-    """
-    Test areas
-    """
+    """Test areas"""
 
     def setUp(self):
         self.db = DbHelper(use_test_db=True)
@@ -147,7 +150,7 @@ class AreaTestCase(GenericTestCase):
         except DbHelperException:
             pass
         area0 = self.db.add_area('area0','description 0')
-        print area0
+        print(area0)
         assert area0.name == 'area0'
         assert self.db.list_areas()[0].name == 'area0'
 
@@ -193,9 +196,7 @@ class AreaTestCase(GenericTestCase):
 
 
 class RoomTestCase(GenericTestCase):
-    """
-    Test rooms
-    """
+    """Test rooms"""
 
     def setUp(self):
         self.db = DbHelper(use_test_db=True)
@@ -218,7 +219,7 @@ class RoomTestCase(GenericTestCase):
         except DbHelperException:
             pass
         room = self.db.add_room(r_name='my_room', r_area_id=None, r_description='my_description')
-        print room
+        print(room)
         area1 = self.db.add_area('area1','description 1')
         area2 = self.db.add_area('area2','description 2')
         room1 = self.db.add_room(r_name='room1', r_description='description 1', r_area_id=area1.id)
@@ -277,9 +278,7 @@ class RoomTestCase(GenericTestCase):
 
 
 class DeviceUsageTestCase(GenericTestCase):
-    """
-    Test device usages
-    """
+    """Test device usages"""
 
     def setUp(self):
         self.db = DbHelper(use_test_db=True)
@@ -294,7 +293,7 @@ class DeviceUsageTestCase(GenericTestCase):
 
     def test_add(self):
         du1 = self.db.add_device_usage(du_name='du1', du_description='desc1', du_default_options='def opt1')
-        print du1
+        print(du1)
         assert du1.name == 'du1'
         assert du1.description == 'desc1'
         assert du1.default_options == 'def opt1'
@@ -333,9 +332,7 @@ class DeviceUsageTestCase(GenericTestCase):
             pass
 
 class DeviceTypeTestCase(GenericTestCase):
-    """
-    Test device types
-    """
+    """Test device types"""
 
     def setUp(self):
         self.db = DbHelper(use_test_db=True)
@@ -357,7 +354,7 @@ class DeviceTypeTestCase(GenericTestCase):
         except DbHelperException:
             pass
         dty1 = self.db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
-        print dty1
+        print(dty1)
         assert dty1.name == 'x10 Switch'
         assert dty1.description == 'desc1'
         assert dty1.device_technology_id == dt1.id
@@ -400,9 +397,7 @@ class DeviceTypeTestCase(GenericTestCase):
             pass
 
 class DeviceTypeFeatureTestCase(GenericTestCase):
-    """
-    Test device type, actuator and sensor features
-    """
+    """Test device type, actuator and sensor features"""
 
     def setUp(self):
         self.db = DbHelper(use_test_db=True)
@@ -425,7 +420,7 @@ class DeviceTypeFeatureTestCase(GenericTestCase):
         dty3 = self.db.add_device_type(dty_name='1wire.Temperature', dty_description='desc3', dt_id=dt2.id)
         af1 = self.db.add_actuator_feature(af_name='Switch', af_device_type_id=dty1.id, af_parameters='myparams1',
                                            af_value_type='binary', af_return_confirmation=True)
-        print af1
+        print(af1)
         assert af1.name == 'Switch'
         assert af1.id == dty1.id
         assert af1.parameters == 'myparams1'
@@ -436,7 +431,7 @@ class DeviceTypeFeatureTestCase(GenericTestCase):
                                            af_value_type='number', af_return_confirmation=True)
         sf1 = self.db.add_sensor_feature(sf_name='Thermometer', sf_device_type_id=dty3.id, sf_parameters='myparams3',
                                          sf_value_type='number')
-        print sf1
+        print(sf1)
         assert sf1.name == 'Thermometer'
         assert sf1.id == dty3.id
         assert sf1.parameters == 'myparams3'
@@ -493,9 +488,7 @@ class DeviceTypeFeatureTestCase(GenericTestCase):
 
 
 class DeviceFeatureAssociationTestCase(GenericTestCase):
-    """
-    Test device / feature association
-    """
+    """Test device / feature association"""
 
     def setUp(self):
         self.db = DbHelper(use_test_db=True)
@@ -534,7 +527,7 @@ class DeviceFeatureAssociationTestCase(GenericTestCase):
                                            af_value_type='number')
         dfa = self.db.add_device_type_feature_association(d_device_id=device1.id, d_type_feature_id=af1.id,
                                                           d_place_type='house')
-        print dfa
+        print(dfa)
         self.db.add_device_type_feature_association(d_device_id=device2.id, d_type_feature_id=af2.id,
                                                     d_place_id=room1.id, d_place_type='room')
         self.db.add_device_type_feature_association(d_device_id=device3.id, d_type_feature_id=af2.id,
@@ -583,9 +576,7 @@ class DeviceFeatureAssociationTestCase(GenericTestCase):
 
 
 class DeviceTechnologyTestCase(GenericTestCase):
-    """
-    Test device technologies
-    """
+    """Test device technologies"""
 
     def setUp(self):
         self.db = DbHelper(use_test_db=True)
@@ -600,7 +591,7 @@ class DeviceTechnologyTestCase(GenericTestCase):
 
     def test_add(self):
         dt1 = self.db.add_device_technology('1wire', '1-Wire', 'desc dt1')
-        print dt1
+        print(dt1)
         assert dt1.id == '1wire'
         assert dt1.name == '1-Wire'
         assert dt1.description == 'desc dt1'
@@ -635,9 +626,7 @@ class DeviceTechnologyTestCase(GenericTestCase):
             pass
 
 class PluginConfigTestCase(GenericTestCase):
-    """
-    Test plugin configuration
-    """
+    """Test plugin configuration"""
 
     def setUp(self):
         self.db = DbHelper(use_test_db=True)
@@ -652,7 +641,7 @@ class PluginConfigTestCase(GenericTestCase):
 
     def test_add_get_list(self):
         pc1_1 = self.db.set_plugin_config(pl_name='x10', pl_hostname='192.168.0.1', pl_key='key1_1', pl_value='val1_1')
-        print pc1_1
+        print(pc1_1)
         assert pc1_1.name == 'x10'
         assert pc1_1.key == 'key1_1'
         assert pc1_1.value == 'val1_1'
@@ -695,9 +684,7 @@ class PluginConfigTestCase(GenericTestCase):
 
 
 class DeviceTestCase(GenericTestCase):
-    """
-    Test device
-    """
+    """Test device"""
 
     def setUp(self):
         self.db = DbHelper(use_test_db=True)
@@ -728,7 +715,7 @@ class DeviceTestCase(GenericTestCase):
         device1 = self.db.add_device(d_name='device1', d_address='A1',
                                      d_type_id=dty1.id, d_usage_id=du1.id, d_description='desc1')
         assert device1.name == 'device1' and device1.description == 'desc1'
-        print device1
+        print(device1)
         assert len(self.db.list_devices()) == 1
         device2 = self.db.add_device(d_name='device2', d_address='A2',
                     d_type_id=dty1.id, d_usage_id=du1.id, d_description='desc1')
@@ -807,9 +794,7 @@ class DeviceTestCase(GenericTestCase):
 
 
 class DeviceConfigTestCase(GenericTestCase):
-    """
-    Test Device config
-    """
+    """Test Device config"""
 
     def __create_sample_device(self, device_name, device_technology_name):
         dt = self.db.add_device_technology(device_technology_name, 'a name', 'this is my device tech')
@@ -836,7 +821,7 @@ class DeviceConfigTestCase(GenericTestCase):
         device1 = self.__create_sample_device('device1', 'dt1')
         device2 = self.__create_sample_device('device2', 'dt2')
         device_config1_1 = self.db.set_device_config('key1_1', 'val1_1', device1.id)
-        print device_config1_1
+        print(device_config1_1)
         assert device_config1_1.key == 'key1_1'
         assert device_config1_1.value == 'val1_1'
         device_config2_1 = self.db.set_device_config('key2_1', 'val2_1', device1.id)
@@ -878,9 +863,7 @@ class DeviceConfigTestCase(GenericTestCase):
 
 
 class DeviceStatsTestCase(GenericTestCase):
-    """
-    Test device stats
-    """
+    """Test device stats"""
 
     def setUp(self):
         self.db = DbHelper(use_test_db=True)
@@ -893,35 +876,6 @@ class DeviceStatsTestCase(GenericTestCase):
 
     def test_empty_list(self):
         assert len(self.db.list_all_device_stats()) == 0
-
-    def test_add(self):
-        """
-        dt1 = self.db.add_device_technology('x10', 'x10', 'this is x10')
-        du1 = self.db.add_device_usage("lighting")
-        dty1 = self.db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
-        area1 = self.db.add_area('area1','description 1')
-        room1 = self.db.add_room('room1', area1.id)
-        device1 = self.db.add_device(d_name='device1', d_address='A1', d_type_id = dty1.id, d_usage_id = du1.id)
-        device2 = self.db.add_device(d_name='device2', d_address='A2', d_type_id = dty1.id, d_usage_id = du1.id)
-        device3 = self.db.add_device(d_name='device3', d_address='A3', d_type_id = dty1.id, d_usage_id = du1.id)
-        device4 = self.db.add_device(d_name='device4', d_address='A4', d_type_id = dty1.id, d_usage_id = du1.id)
-        now = datetime.datetime.now()
-        d_stat1_1 = self.db.add_device_stat(device1.id, now, {'val1': '10', 'val2': '10.5' })
-        print d_stat1_1
-        try:
-            self.db.add_device_stat(99999999999, now, {'val1': '10', 'val2': '10.5' })
-            TestCase.fail(self, "An exception should have been raised : device id does not exist")
-        except DbHelperException:
-            pass
-        d_stat1_2 = self.db.add_device_stat(device1.id,
-                                            now + datetime.timedelta(seconds=1), {'val1': '11', 'val2': '12' })
-        d_stat2_1 = self.db.add_device_stat(device2.id, now, {'val1': '40', 'val2': '41' })
-        d_stat3_1 = self.db.add_device_stat(device3.id, now, {'val1': '100', 'val2': '101' })
-        assert len(self.db.list_device_stats(device1.id)) == 2
-        assert len(self.db.list_device_stats(device2.id)) == 1
-        assert self.db.device_has_stats(device1.id)
-        assert not self.db.device_has_stats(device4.id)
-        """
 
     def __has_stat_values(self, device_stats_values, expected_values):
         if len(device_stats_values) != len(expected_values): return False
@@ -937,24 +891,23 @@ class DeviceStatsTestCase(GenericTestCase):
         room1 = self.db.add_room('room1', area1.id)
         device1 = self.db.add_device(d_name='device1', d_address = "A1", d_type_id = dty1.id, d_usage_id = du1.id)
         device2 = self.db.add_device(d_name='device2', d_address='A2', d_type_id=dty1.id, d_usage_id=du1.id)
-        sdate = datetime.datetime(2010, 04, 9, 12, 0, 0)
-        ds1 = self.db.add_device_stat(sdate, 'val1', 0, device1.id)
-        print ds1
+        ds1 = self.db.add_device_stat(make_ts(2010, 04, 9, 12), 'val1', 0, device1.id)
+        print(ds1)
         assert ds1.key == 'val1' and ds1.value == '0'
-        self.db.add_device_stat(sdate, 'val2', 1, device1.id)
-        self.db.add_device_stat(sdate + datetime.timedelta(minutes=1), 'val1', 2, device1.id)
-        self.db.add_device_stat(sdate + datetime.timedelta(minutes=1), 'val2', 3, device1.id)
-        self.db.add_device_stat(sdate + datetime.timedelta(minutes=2), 'val1', 4, device1.id)
-        self.db.add_device_stat(sdate + datetime.timedelta(minutes=2), 'val2', 5, device1.id)
-        self.db.add_device_stat(sdate + datetime.timedelta(minutes=3), 'val1', 6, device1.id)
-        self.db.add_device_stat(sdate + datetime.timedelta(minutes=3), 'val2', 7, device1.id)
-        self.db.add_device_stat(sdate + datetime.timedelta(minutes=4), 'val1', 8, device1.id)
-        self.db.add_device_stat(sdate + datetime.timedelta(minutes=4), 'val2', 9, device1.id)
+        self.db.add_device_stat(make_ts(2010, 04, 9, 12, 0), 'val2', 1, device1.id)
+        self.db.add_device_stat(make_ts(2010, 04, 9, 12, 1), 'val1', 2, device1.id)
+        self.db.add_device_stat(make_ts(2010, 04, 9, 12, 1), 'val2', 3, device1.id)
+        self.db.add_device_stat(make_ts(2010, 04, 9, 12, 2), 'val1', 4, device1.id)
+        self.db.add_device_stat(make_ts(2010, 04, 9, 12, 2), 'val2', 5, device1.id)
+        self.db.add_device_stat(make_ts(2010, 04, 9, 12, 3), 'val1', 6, device1.id)
+        self.db.add_device_stat(make_ts(2010, 04, 9, 12, 3), 'val2', 7, device1.id)
+        self.db.add_device_stat(make_ts(2010, 04, 9, 12, 4), 'val1', 8, device1.id)
+        self.db.add_device_stat(make_ts(2010, 04, 9, 12, 4), 'val2', 9, device1.id)
 
-        self.db.add_device_stat(sdate + datetime.timedelta(minutes=0), 'val1', 100, device2.id)
-        self.db.add_device_stat(sdate + datetime.timedelta(minutes=0), 'val2', 200, device2.id)
-        self.db.add_device_stat(sdate + datetime.timedelta(minutes=1), 'val1', 300, device2.id)
-        self.db.add_device_stat(sdate + datetime.timedelta(minutes=1), 'val2', 400, device2.id)
+        self.db.add_device_stat(make_ts(2010, 04, 9, 12, 0), 'val1', 100, device2.id)
+        self.db.add_device_stat(make_ts(2010, 04, 9, 12, 0), 'val2', 200, device2.id)
+        self.db.add_device_stat(make_ts(2010, 04, 9, 12, 1), 'val1', 300, device2.id)
+        self.db.add_device_stat(make_ts(2010, 04, 9, 12, 1), 'val2', 400, device2.id)
 
         assert len(self.db.list_device_stats(device1.id)) == 10
         assert self.db.get_last_stat_of_device_by_key('val1', device1.id).value == '8'
@@ -962,19 +915,19 @@ class DeviceStatsTestCase(GenericTestCase):
 
         stats_l = self.db.list_last_n_stats_of_device_by_key('val1', device1.id, 3)
         assert len(stats_l) == 3
-        assert stats_l[0].value == '8' and stats_l[1].value == '6' and stats_l[2].value == '4'
+        assert stats_l[0].value == '4' and stats_l[1].value == '6' and stats_l[2].value == '8'
 
-        stats_l = self.db.list_stats_of_device_between_by_key('val1', device1.id, sdate + datetime.timedelta(minutes=2),
-                                                              sdate + datetime.timedelta(minutes=4))
+        stats_l = self.db.list_stats_of_device_between_by_key('val1', device1.id, make_ts(2010, 04, 9, 12, 2),
+                                                              make_ts(2010, 04, 9, 12, 4))
         assert len(stats_l) == 3
-        assert stats_l[0].value == '8' and stats_l[1].value == '6' and stats_l[2].value == '4'
-        stats_l = self.db.list_stats_of_device_between_by_key('val1', device1.id, sdate + datetime.timedelta(minutes=3))
-        assert len(stats_l) == 2
-        assert stats_l[0].value == '8' and stats_l[1].value == '6'
+        assert stats_l[0].value == '4' and stats_l[1].value == '6' and stats_l[2].value == '8'
         stats_l = self.db.list_stats_of_device_between_by_key('val1', device1.id,
-                                                              end_datetime=sdate + datetime.timedelta(minutes=2))
+                                                              make_ts(2010, 04, 9, 12, 3))
+        assert len(stats_l) == 2
+        assert stats_l[0].value == '6' and stats_l[1].value == '8'
+        stats_l = self.db.list_stats_of_device_between_by_key('val1', device1.id,
+                                                              end_datetime=make_ts(2010, 04, 9, 12, 2))
         assert len(stats_l) == 3
-        assert stats_l[0].value == '4' and stats_l[1].value == '2' and stats_l[2].value == '0'
 
     def test_del(self):
         dt1 = self.db.add_device_technology('x10', 'x10', 'this is x10')
@@ -1005,9 +958,7 @@ class DeviceStatsTestCase(GenericTestCase):
         assert self.db.list_device_stats(device2.id)[0].value == '40'
 
 class TriggersTestCase(GenericTestCase):
-    """
-    Test triggers
-    """
+    """Test triggers"""
 
     def setUp(self):
         self.db = DbHelper(use_test_db=True)
@@ -1023,7 +974,7 @@ class TriggersTestCase(GenericTestCase):
     def test_add(self):
         trigger1 = self.db.add_trigger(t_description='desc1', t_rule='AND(x,OR(y,z))',
                                        t_result=['x10_on("a3")', '1wire()'])
-        print trigger1
+        print(trigger1)
         assert trigger1.description == 'desc1'
         assert trigger1.rule == 'AND(x,OR(y,z))'
         trigger2 = self.db.add_trigger(t_description = 'desc2', t_rule='OR(x,AND(y,z))',
@@ -1059,9 +1010,7 @@ class TriggersTestCase(GenericTestCase):
 
 
 class PersonAndUserAccountsTestCase(GenericTestCase):
-    """
-    Test person and user accounts
-    """
+    """Test person and user accounts"""
 
     def setUp(self):
         self.db = DbHelper(use_test_db=True)
@@ -1079,10 +1028,10 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
         person1 = self.db.add_person(p_first_name='Marc', p_last_name='SCHNEIDER',
                                      p_birthdate=datetime.date(1973, 4, 24))
         assert person1.last_name == 'SCHNEIDER'
-        print person1
+        print(person1)
         user1 = self.db.add_user_account(a_login='mschneider', a_password='IwontGiveIt',
                                          a_person_id=person1.id, a_is_admin=True)
-        print user1
+        print(user1)
         assert user1.password is None
         assert user1.person.first_name == 'Marc'
         assert self.db.authenticate('mschneider', 'IwontGiveIt')
@@ -1125,7 +1074,7 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
                                     p_birthdate=datetime.date(1973, 4, 24))
         person_u = self.db.update_person(p_id=person.id, p_first_name='Marco', p_last_name='SCHNEIDERO',
                                          p_birthdate=datetime.date(1981, 4, 24))
-        assert person_u.birthdate == datetime.date(1981, 4, 24)
+        assert str(person_u.birthdate) == str(datetime.date(1981, 4, 24))
         assert person_u.last_name == 'SCHNEIDERO'
         assert person_u.first_name == 'Marco'
         user_acc = self.db.add_user_account(a_login='mschneider', a_password='IwontGiveIt',
@@ -1151,7 +1100,7 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
         assert user_acc_u.login == 'mschneider3'
         assert user_acc_u.person.first_name == 'Bob'
         assert user_acc_u.person.last_name == 'Marley'
-        assert user_acc_u.person.birthdate == datetime.date(1991, 4, 24)
+        assert str(user_acc_u.person.birthdate) == str(datetime.date(1991, 4, 24))
         assert user_acc_u.is_admin
         assert user_acc_u.skin_used == 'skins/crocodile'
         assert user_acc.password is None
@@ -1219,9 +1168,7 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
             pass
 
 class SystemStatsTestCase(GenericTestCase):
-    """
-    Test system stats
-    """
+    """Test system stats"""
 
     def setUp(self):
         self.db = DbHelper(use_test_db=True)
@@ -1241,7 +1188,7 @@ class SystemStatsTestCase(GenericTestCase):
         for i in range(4):
             ssv = {'ssv1': (i*2), 'ssv2': (i*3),}
             sstat = self.db.add_system_stat("sstat%s" %i, 'localhost', now + datetime.timedelta(seconds=i), ssv)
-            print sstat
+            print(sstat)
             sstat_list.append(sstat)
         assert len(self.db.list_system_stats()) == 4
 
@@ -1281,9 +1228,7 @@ class SystemStatsTestCase(GenericTestCase):
 
 
 class UIItemConfigTestCase(GenericTestCase):
-    """
-    Test item UI config
-    """
+    """Test item UI config"""
 
     def setUp(self):
         self.db = DbHelper(use_test_db=True)
@@ -1302,7 +1247,7 @@ class UIItemConfigTestCase(GenericTestCase):
         assert ui_config.reference == '2'
         assert ui_config.key == 'icon'
         assert ui_config.value == 'basement'
-        print ui_config
+        print(ui_config)
         self.db.set_ui_item_config('room', 1, 'icon', 'kitchen')
         self.db.set_ui_item_config('room', 4, 'icon', 'bathroom')
         self.db.set_ui_item_config('room', 4, 'param_r2', 'value_r2')
@@ -1368,9 +1313,7 @@ class UIItemConfigTestCase(GenericTestCase):
 
 
 class SystemConfigTestCase(GenericTestCase):
-    """
-    Test system config
-    """
+    """Test system config"""
 
     def setUp(self):
         self.db = DbHelper(use_test_db=True)

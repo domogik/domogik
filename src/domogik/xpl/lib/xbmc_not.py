@@ -84,7 +84,7 @@ class XBMCNotification:
         self._current_action = time.time()
         time_between_actions = float(self._current_action - self._last_action)
 
-        # New notification 
+        # New notification
         self._log.debug("Time elapsed : " + str(time_between_actions))
         self._log.debug("Max delay : " + str(self._maxdelay_between_actions))
         if time_between_actions > self._maxdelay_between_actions:
@@ -109,25 +109,20 @@ class XBMCNotification:
                 self._text_received = 1
             if delay == 0:
                 self._delay = self._default_display_delay
-                self._log.debug("DELAY=0 : setting default value : " + \
-                                str(self._default_display_delay))
+                self._log.debug("DELAY=0 : setting default value : " + str(self._default_display_delay))
             else:
-                self._delay = delay 
+                self._delay = delay
 
             # All components of notification received
             if self._title_received and self._text_received:
                 self._stop = threading.Event()
-                self._thread = self._XBMCNotificationHandler( \
-                                                      self._xbmc_address, \
-                                                      self._title, self._text, \
-                                                      self._delay)
+                self._thread = self._XBMCNotificationHandler(self._xbmc_address, self._title, self._text, self._delay)
                 self._thread.run()
                 self._title = ""
                 self._text = ""
                 self._title_received = 0
                 self._text_received = 0
 
-            
         self._last_action = self._current_action
 
 
@@ -154,7 +149,6 @@ class XBMCNotification:
             # Initialize thread
             threading.Thread.__init__(self)
 
-
         def run(self):
             """ Call XBMC HTTP API to send notification
             """
@@ -164,14 +158,10 @@ class XBMCNotification:
             self._log.debug("NOTIF : delay " + self._delay)
             try:
                 self._log.debug("Call http://" + self._xbmc_address + \
-                           "/xbmcCmds/xbmcHttp?command=ExecBuiltIn&parameter=XBMC.Notification(" + \
-                           self._title + "," + self._text + "," + \
-                           self._delay + ")")
+                                "/xbmcCmds/xbmcHttp?command=ExecBuiltIn&parameter=XBMC.Notification(" + \
+                                self._title + "," + self._text + "," + self._delay + ")")
                 urllib.urlopen("http://" + self._xbmc_address + \
-                           "/xbmcCmds/xbmcHttp?command=ExecBuiltIn&parameter=XBMC.Notification(" + \
-                           self._title + "," + self._text + "," + \
-                           self._delay + ")")
+                               "/xbmcCmds/xbmcHttp?command=ExecBuiltIn&parameter=XBMC.Notification(" + \
+                               self._title + "," + self._text + "," + self._delay + ")")
             except:
                 self._log.error("Error while calling XBMC HTTP API")
-
-

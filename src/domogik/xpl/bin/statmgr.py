@@ -22,7 +22,7 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 Plugin purpose
 ==============
 
-Log device stats by listening xpl network
+Log device stats by listening to the xpl network
 
 Implements
 ==========
@@ -36,21 +36,21 @@ Implements
 """
 
 
-from datetime import datetime 
+from datetime import datetime
 from xml.dom import minidom
 import glob
 
-from domogik.xpl.common.plugin import xPLPlugin
+from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.xplconnector import Listener
 from domogik.common.database import DbHelper
 from domogik.common.configloader import Loader
 
-class StatsManager(xPLPlugin):
+class StatsManager(XplPlugin):
     """
     Listen on the xPL network and keep stats of device and system state
     """
     def __init__(self):
-        xPLPlugin.__init__(self, 'statmgr')
+        XplPlugin.__init__(self, 'statmgr')
         cfg = Loader('domogik')
         config = cfg.load()
         cfg_db = dict(config[1])
@@ -84,7 +84,7 @@ class StatsManager(xPLPlugin):
         #   'xpltype' : {
         #       ...
         #   }
-        #  'techno_name2': { 
+        #  'techno_name2': {
         #   etc...
         #
 
@@ -97,27 +97,28 @@ class StatsManager(xPLPlugin):
             schema_types = self.get_schemas_and_types(doc.documentElement)
             self._log.debug("Parsed : %s" % schema_types)
             for schema in schema_types:
-                for type in schema_types[schema]:
-                    is_uniq = self.check_config_uniqueness(res, schema, type)
+                for s_type in schema_types[schema]:
+                    is_uniq = self.check_config_uniqueness(res, schema, s_type)
                     if not is_uniq:
-                        self._log.warning("Schema %s, type %s is already defined ! check your config." % (schema, type))
+                        self._log.warning("Schema %s, type %s is already defined ! check your config." \
+                                          % (schema, s_type))
                         self.force_leave()
             if technology not in res:
                 res[technology] = {}
                 stats[technology] = {}
-            
+
             for schema in schema_types:
                 if schema not in res[technology]:
                     res[technology][schema] = {}
                     stats[technology][schema] = {}
-                for type in schema_types[schema]:
+                for s_type in schema_types[schema]:
                     device, mapping = self.parse_mapping(doc.documentElement.getElementsByTagName("mapping")[0])
-                    res[technology][schema][type] = {"filter": 
-                            self.parse_listener(schema_types[schema][type].getElementsByTagName("listener")[0]),
+                    res[technology][schema][s_type] = {"filter":
+                            self.parse_listener(schema_types[schema][s_type].getElementsByTagName("listener")[0]),
                             "mapping": mapping,
                             "device": device}
-            
-                    stats[technology][schema][type] = self._Stat(self._myxpl, res[technology][schema][type], technology, schema, type, self._db, self._log)
+                    stats[technology][schema][s_type] = self._Stat(self._myxpl, res[technology][schema][s_type],
+                                                                   technology, schema, s_type, self._db, self._log)
 
     def get_schemas_and_types(self, node):
         """ Get the schema and the xpl message type
@@ -132,19 +133,19 @@ class StatsManager(xPLPlugin):
                 res[schema.attributes.get("name").value][xpltype.attributes.get("type").value] = xpltype
         return res
 
-    def check_config_uniqueness(self, res, schema, type):
+    def check_config_uniqueness(self, res, schema, xpl_type):
         """ Check the schema/type is not already defined in res
         @param res : the array with all already-defined mapping
         @param schema : the current schema
-        @param type : the current xpl-type
+        @param xpl_type : the current xpl-type
         Return True if the schema/type is *not* already defined in res
         """
         print res
         for techno in res.keys():
-            for _schema in res[techno].keys(): 
+            for _schema in res[techno].keys():
                 if _schema == schema:
                     for _type in res[techno][schema].keys():
-                        if _type == type:
+                        if _type == xpl_type:
                             return False
         return True
 
@@ -155,7 +156,7 @@ class StatsManager(xPLPlugin):
         for _filter in node.getElementsByTagName("filter")[0].getElementsByTagName("key"):
             filters[_filter.attributes["name"].value] = _filter.attributes["value"].value
         return filters
-        
+
     def parse_mapping(self, node):
         """ Parse the "mapping" node
         """
@@ -175,19 +176,19 @@ class StatsManager(xPLPlugin):
         Each instance create a Listener and the associated callbacks
         """
 
-        def __init__(self, xpl, res, technology, schema, type, database, log):
-            """ Initialize a stat instance 
+        def __init__(self, xpl, res, technology, schema, xpl_type, database, log):
+            """ Initialize a stat instance
             @param xpl : A xpl manager instance
             @param res : The result of xml parsing for this techno/schema/type
             @params technology : The technology monitored
             @param schema : the schema to listen for
-            @param type : the xpl type to listen for
-            @param db : a DbHelper instance 
+            @param xpl_type : the xpl type to listen for
+            @param db : a DbHelper instance
             @param log : the plugin logger (from self.get_my_logger())
             """
             self._res = res
             self._db = database
-            params = {'schema':schema, 'xpltype': type}
+            params = {'schema':schema, 'xpltype': xpl_type}
             params.update(res["filter"])
             self._listener = Listener(self._callback, xpl, params)
             self._log = log
@@ -195,7 +196,7 @@ class StatsManager(xPLPlugin):
 
         def _callback(self, message):
             """ Callback for the xpl message
-            @param message : the Xpl message received 
+            @param message : the Xpl message received
             """
             self._db = DbHelper()
             self._log.debug("message catcher : %s" % message)
@@ -207,8 +208,7 @@ class StatsManager(xPLPlugin):
                 return
             else:
                 self._log.debug("Stat received for %s - %s." \
-                        % (self._technology, message.data[self._res["device"]]))
-                datas = {}
+                                % (self._technology, message.data[self._res["device"]]))
                 timestamp = datetime.today()
                 for key in self._res["mapping"].keys():
                     if message.data.has_key(key):

@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-                                                                           
+# -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -27,8 +27,8 @@ Base class for all xPL clients
 Implements
 ==========
 
-- xPLPlugin
-- xPLResult
+- XplPlugin
+- XplResult
 
 @author: Maxence Dunnewind <maxence@dunnewind.net>
 @copyright: (C) 2007-2009 Domogik project
@@ -36,16 +36,16 @@ Implements
 @organization: Domogik
 """
 
-import time
 import signal
 import threading
 import os
+import sys
 from socket import gethostname
-from domogik.xpl.common.xplconnector import *
+from domogik.xpl.common.xplconnector import XplMessage, Manager, Listener
 from domogik.xpl.common.baseplugin import BasePlugin
 from domogik.common.configloader import Loader
 
-class xPLPlugin():
+class XplPlugin():
     '''
     Global plugin class, manage signal handlers.
     This class shouldn't be used as-it but should be extended by xPL plugin
@@ -53,32 +53,34 @@ class xPLPlugin():
     '''
     __instance = None
 
-    def __init__(self, name = None, stop_cb = None, is_manager = False, reload_cb = None, dump_cb = None, parser = None, daemonize = True):
+    def __init__(self, name = None, stop_cb = None, is_manager = False, reload_cb = None, dump_cb = None, parser = None,
+                 daemonize = True):
         '''
-        Create xPLPlugin instance, which defines signal handlers
+        Create XplPlugin instance, which defines signal handlers
         @param name : The n,ame of the current plugin
         @param stop_cb : Method to call when a stop request is received
-        @param is_manager : Must be True if the child script is a Domogik Manager process 
+        @param is_manager : Must be True if the child script is a Domogik Manager process
         You should never need to set it to True
-        @param reload_cb : Callback to call when a "RELOAD" order is received, if None, 
+        @param reload_cb : Callback to call when a "RELOAD" order is received, if None,
         nothing will happen
-        @param dump_cb : Callback to call when a "DUMP" order is received, if None, 
+        @param dump_cb : Callback to call when a "DUMP" order is received, if None,
         nothing will happen
         @param parser : An instance of OptionParser. If you want to add extra options to the generic option parser,
         create your own optionparser instance, use parser.addoption and then pass your parser instance as parameter.
         Your options/params will then be available on self.options and self.params
-        @param daemonize : If set to False, force the instance *not* to daemonize, even if '-f' is not passed 
+        @param daemonize : If set to False, force the instance *not* to daemonize, even if '-f' is not passed
         on the command line. If set to True (default), will check if -f was added.
         '''
         if len(name) > 8:
-            raise IoError, "The name must be 8 chars max"
-        if xPLPlugin.__instance is None and name is None:
+            raise IOError, "The name must be 8 chars max"
+        if XplPlugin.__instance is None and name is None:
             raise AttributeError, "'name' attribute is mandatory for the first instance"
-        if xPLPlugin.__instance is None:
-            xPLPlugin.__instance = xPLPlugin.__Singl_xPLPlugin(name, stop_cb, is_manager, reload_cb, dump_cb, parser, daemonize)
-            self.__dict__['_xPLPlugin__instance'] = xPLPlugin.__instance
+        if XplPlugin.__instance is None:
+            XplPlugin.__instance = XplPlugin.__Singl_XplPlugin(name, stop_cb, is_manager, reload_cb, dump_cb, parser,
+                                                               daemonize)
+            self.__dict__['_XplPlugin__instance'] = XplPlugin.__instance
         elif stop_cb is not None:
-            xPLPlugin.__instance.add_stop_cb(stop_cb)
+            XplPlugin.__instance.add_stop_cb(stop_cb)
         self._log.debug("after watcher")
 
     def __getattr__(self, attr):
@@ -89,22 +91,24 @@ class xPLPlugin():
         """ Delegate access to implementation """
         return setattr(self.__instance, attr, value)
 
-    class __Singl_xPLPlugin(BasePlugin):
-        def __init__(self, name, stop_cb = None, is_manager = False, reload_cb = None, dump_cb = None, parser = None, daemonize = True):
+    class __Singl_XplPlugin(BasePlugin):
+
+        def __init__(self, name, stop_cb = None, is_manager = False, reload_cb = None, dump_cb = None, parser = None,
+                     daemonize = True):
             '''
-            Create xPLPlugin instance, which defines system handlers
+            Create XplPlugin instance, which defines system handlers
             @param name : The name of the current plugin
             @param stop_cb : Additionnal method to call when a stop request is received
-            @param is_manager : Must be True if the child script is a Domogik Manager process 
+            @param is_manager : Must be True if the child script is a Domogik Manager process
             You should never need to set it to True unless you develop your own manager
-            @param reload_cb : Callback to call when a "RELOAD" order is received, if None, 
+            @param reload_cb : Callback to call when a "RELOAD" order is received, if None,
             nothing will happen
-            @param dump_cb : Callback to call when a "DUMP" order is received, if None, 
+            @param dump_cb : Callback to call when a "DUMP" order is received, if None,
             nothing will happen
             @param parser : An instance of OptionParser. If you want to add extra options to the generic option parser,
             create your own optionparser instance, use parser.addoption and then pass your parser instance as parameter.
             Your options/params will then be available on self.options and self.params
-            @param daemonize : If set to False, force the instance *not* to daemonize, even if '-f' is not passed 
+            @param daemonize : If set to False, force the instance *not* to daemonize, even if '-f' is not passed
             on the command line. If set to True (default), will check if -f was added.
             '''
             BasePlugin.__init__(self, name, stop_cb, parser, daemonize)
@@ -122,8 +126,8 @@ class xPLPlugin():
             else:
                 self._myxpl = Manager(broadcast = broadcast)
             self._l = Listener(self._system_handler, self._myxpl, {'schema' : 'domogik.system',
-                'xpltype':'xpl-cmnd'})
-            self._reload_cb = reload_cb 
+                                                                   'xpltype':'xpl-cmnd'})
+            self._reload_cb = reload_cb
             self._dump_cb = dump_cb
             self._log.debug("end single xpl plugin")
 
@@ -137,31 +141,31 @@ class xPLPlugin():
                 self._manager_handler(message)
 
         def _client_handler(self, message):
-            """ Handle domogik system request for an xpl client 
-            @param message : the Xpl message received 
+            """ Handle domogik system request for an xpl client
+            @param message : the Xpl message received
             """
             cmd = message.data["command"]
             plugin = message.data["plugin"]
-            if cmd == "stop" and plugin in ['*',self.get_plugin_name()]:
+            if cmd == "stop" and plugin in ['*', self.get_plugin_name()]:
                 self._log.info("Someone asked to stop %s, doing." % self.get_plugin_name())
                 self._answer_stop()
                 self.force_leave()
             elif cmd == "reload":
                 if self._reload_cb is None:
-                    log.info("Someone asked to reload config of %s, but the plugin \
+                    self._log.info("Someone asked to reload config of %s, but the plugin \
                     isn't able to do it." % self.get_plugin_name())
                 else:
                     self._reload_cb()
             elif cmd == "dump":
                 if self._dump_cb is None:
-                    log.info("Someone asked to dump config of %s, but the plugin \
+                    self._log.info("Someone asked to dump config of %s, but the plugin \
                     isn't able to do it." % self.get_plugin_name())
                 else:
                     self._dump_cb()
-            else: #cmd == ping 
+            else: #cmd == ping
                 if message.data["plugin"] in [self.get_plugin_name(), "*"]:
                     self._answer_ping()
-        
+
         def __del__(self):
             self._log.debug("__del__ Single xpl plugin")
             self.force_leave()
@@ -172,7 +176,7 @@ class xPLPlugin():
             mess = XplMessage()
             mess.set_type("xpl-trig")
             mess.set_schema("domogik.system")
-            mess.add_data({"command":"stop", "plugin": self.get_plugin_name(), 
+            mess.add_data({"command":"stop", "plugin": self.get_plugin_name(),
                 "host": gethostname()})
             self._myxpl.send(mess)
 
@@ -182,15 +186,14 @@ class xPLPlugin():
             mess = XplMessage()
             mess.set_type("xpl-trig")
             mess.set_schema("domogik.system")
-            mess.add_data({"command":"ping", "plugin": self.get_plugin_name(), 
+            mess.add_data({"command":"ping", "plugin": self.get_plugin_name(),
                 "host": gethostname()})
             self._myxpl.send(mess)
 
         def _manager_handler(self, message):
             """ Handle domogik system request for the Domogik manager
-            @param message : the Xpl message received 
+            @param message : the Xpl message received
             """
-
 
         def force_leave(self):
             '''
@@ -210,7 +213,8 @@ class xPLPlugin():
                 self._log.debug("Calling stop additionnal method : %s " % cb.__name__)
                 cb()
 
-class xPLResult():
+
+class XplResult():
     '''
     This object just provides a way to get and set a value between threads
     '''
@@ -254,7 +258,7 @@ class Watcher:
     work on the Macintosh and not work on Windows.
     Tip found at http://code.activestate.com/recipes/496735/
     """
-    
+
     def __init__(self, plugin):
         """ Creates a child thread, which returns.  The parent
             thread waits for a KeyboardInterrupt and then kills
@@ -270,8 +274,8 @@ class Watcher:
             self.watch()
 
     def _signal_handler(self, signum, frame):
-        """ Handler called when a SIGTERM is received 
-        Stop the plugin 
+        """ Handler called when a SIGTERM is received
+        Stop the plugin
         """
         self._plugin._log.info("SIGTERM receive, stopping plugin")
         self._plugin.force_leave()
@@ -287,7 +291,6 @@ class Watcher:
             self.kill()
         except OSError:
             print "OSError"
-            pass
         sys.exit()
 
     def kill(self):

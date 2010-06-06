@@ -4,7 +4,7 @@
         // default options
         options: {
             widgettype: 'command_range',
-            nameposition: 'topleft'
+            nameposition: 'nametopleft'
         },
 
         _init: function() {
@@ -12,20 +12,13 @@
             this.min_value = parseInt(o.min_value);
             this.max_value = parseInt(o.max_value);
             this.step = parseInt(o.step);
-            this._rangeFront = $("<div class='front rangeleft'></div>");
-            this._rangeLeft = $("<div class='rotate rangeleft'><div class='bg rangeleft'></div></div>");
-            this._rangeRight = $("<div style='display:none;' class='rotate rangeright'><div class='bg rangeright'></div></div>");
-            this.element.append(this._rangeFront)
-                .append(this._rangeLeft)
-                .append(this._rangeRight);
-			this._button_plus = $("<div class='widget_button range_plus icon16-action-up'></div>");
-			this._button_plus.click(function (e) {self.plus_range();e.stopPropagation()});
-			this._button_minus = $("<div class='widget_button range_minus icon16-action-down'></div>");
-			this._button_minus.click(function (e) {self.minus_range();e.stopPropagation()});
-			this._button_max = $("<div class='widget_button range_max icon16-action-max'></div>");
-			this._button_max.click(function (e) {self.max_range();e.stopPropagation()});
-			this._button_min = $("<div class='widget_button range_min icon16-action-min'></div>");
-			this._button_min.click(function (e) {self.min_range();e.stopPropagation()});
+            this._indicator = $("<canvas class='indicator' width='110' height='110'></canvas>");
+            this.element.append(this._indicator);
+            this._button_max = this._addButtonIcon("range_max", "upright", "icon16-action-max", function (e) {self.max_range();e.stopPropagation();});
+            this._button_plus = this._addButtonIcon("range_plus", "rightup", "icon16-action-up", function (e) {self.plus_range();e.stopPropagation();});
+            this._button_minus = this._addButtonIcon("range_minus", "rightdown", "icon16-action-down", function (e) {self.minus_range();e.stopPropagation();});
+            this._button_min = this._addButtonIcon("range_min", "downright", "icon16-action-min", function (e) {self.min_range();e.stopPropagation();});
+
 			this.element.addClass('closed');
 			this.element.append(this._button_plus)
 				.append(this._button_minus)
@@ -68,6 +61,7 @@
         open: function() {
             if (!this.isOpen) {
                 this._open();
+                this._processing_percent_current = 0;
                 this._setProcessingValue(this._processingValue);
             }
 		},
@@ -75,7 +69,7 @@
 		close: function() {
             if (this.isOpen) {
                 this._close();
-                this._rangeRight.hide();
+                this.setValue(this.currentValue);
             }
 		},
         
@@ -165,21 +159,45 @@
 
         _displayProcessingRange: function(percent) {
             var self = this, o = this.options;
-            if (percent < 50) {
-                var deg = (percent * 180) / 50;
-                this._rangeLeft.css('-webkit-transform', 'rotate(-' + deg + 'deg)');
-                this._rangeLeft.css('-moz-transform', 'rotate(-' + deg + 'deg)');
-                this._rangeRight.hide();
-            } else {
-                var deg = ((percent-50) * 180) / 50;
-                this._rangeLeft.css('-webkit-transform', 'rotate(-180deg)');
-                this._rangeLeft.css('-moz-transform', 'rotate(-180deg)');
-                this._rangeRight.css('-webkit-transform', 'rotate(-' + deg + 'deg)');
-                this._rangeRight.css('-moz-transform', 'rotate(-' + deg + 'deg)');
-                this._rangeRight.show();
+            this._processing_percent_final = percent;
+            if (!this._processing_animation) {
+                this._animateProcessingRange();
             }
         },
 
+        _animateProcessingRange: function() {
+            var self = this, o = this.options;            
+            this._processing_animation = true;
+            if (this._processing_percent_final < this._processing_percent_current) {
+                this._processing_percent_current--;
+            } else if (this._processing_percent_final > this._processing_percent_current) {
+                this._processing_percent_current++;                
+            }
+            
+            var canvas = this._indicator.get(0);
+            if (canvas.getContext){
+                var ctx = canvas.getContext('2d');
+                canvas.width = canvas.width; //reset
+                ctx.beginPath();
+                ctx.clearRect(0,0, canvas.width, canvas.height);
+
+                if (this._processing_percent_current > 0) {
+                    ctx.lineWidth = 10;
+                    ctx.strokeStyle = "#BDCB2F";
+                    var deg = ((this._processing_percent_current * 360) / 100) - 90;
+                    var angle = (Math.PI/180) * deg; // radian
+                    ctx.arc(55,55,50,(Math.PI/2),-angle, true);
+                    ctx.stroke();                
+                }
+            }
+            
+            if (this._processing_percent_final == this._processing_percent_current) { // End animation
+                this._processing_animation = false;
+            } else {
+                setTimeout(function() {self._animateProcessingRange();}, 30);
+            }
+        },
+        
         cancel: function() {
             this.setValue(this.currentValue);
             this._super();

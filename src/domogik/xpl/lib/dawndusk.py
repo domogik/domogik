@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-                                                                           
+# -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -45,7 +45,7 @@ class DawnDusk:
     def __init__(self):
         pass
 
-    def get_dawn_dusk(self, long, lat, fh):
+    def get_dawn_dusk(self, lgt, lat, fh):
         k = .0172024
         jm = 308.67
         jl = 21.55
@@ -57,7 +57,7 @@ class DawnDusk:
         # Sunrise and sunset sun height
         ht = (-50 / 60) * dr
         # Longitude and Latitude
-        lo = long * dr
+        lo = lgt * dr
         la = lat * dr
         # Getting the current day of month
         today = datetime.date.today()

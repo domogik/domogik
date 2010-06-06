@@ -47,7 +47,6 @@ from sqlalchemy.sql.expression import func
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
-
 from domogik.common.configloader import Loader
 from domogik.common.sql_schema import ACTUATOR_VALUE_TYPE_LIST, Area, Device, DeviceTypeFeature, \
                                       DeviceUsage, DeviceFeatureAssociation, DEVICE_FEATURE_ASSOCIATION_LIST, \
@@ -57,10 +56,11 @@ from domogik.common.sql_schema import ACTUATOR_VALUE_TYPE_LIST, Area, Device, De
 
 
 def ucode(my_string):
-    """
-    Convert a string into unicode or return None if None value is passed
+    """Convert a string into unicode or return None if None value is passed
+
     @param my_string : string value to convert
     @return a unicode string
+
     """
     if my_string is not None:
         return unicode(my_string)
@@ -68,39 +68,43 @@ def ucode(my_string):
         return None
 
 class DbHelperException(Exception):
-    """
-    This class provides exceptions related to the DbHelper class
+    """This class provides exceptions related to the DbHelper class
+
     """
 
     def __init__(self, value):
-        """
-        Class constructor
+        """Class constructor
+
         @param value : value of the exception
+
         """
         self.value = value
 
     def __str__(self):
-        """
-        Return the object representation
+        """Return the object representation
+
         @return value of the exception
+
         """
         return repr(self.value)
 
 
 class DbHelper():
-    """
-    This class provides methods to fetch and put informations on the Domogik database
+    """This class provides methods to fetch and put informations on the Domogik database
+
     The user should only use methods from this class and don't access the database directly
+
     """
     __dbprefix = None
     __engine = None
     __session = None
 
     def __init__(self, echo_output=False, use_test_db=False):
-        """
-        Class constructor
+        """Class constructor
+
         @param echo_output : if True displays sqlAlchemy queries (optional, default False)
         @param use_test_db : if True use a test database (optional, default False)
+
         """
         cfg = Loader('database')
         config = cfg.load()
@@ -122,13 +126,20 @@ class DbHelper():
             url = '%s_test' % url
         # Connecting to the database
         self.__dbprefix = db['db_prefix']
-        self.__engine = sqlalchemy.create_engine(url, echo=echo_output)
+        if db['db_type'] == 'sqlite':
+            # We use native_datetime=True with sqlite to be able to use timestamps properly
+            # Otherwise we get this error : SQLite DateTime type only accepts Python datetime and date objects as input
+            # See http://www.sqlalchemy.org/docs/reference/dialects/sqlite.html for more information
+            native_dt = True
+        else:
+            native_dt = False
+        self.__engine = sqlalchemy.create_engine(url, echo=echo_output, native_datetime=native_dt)
         Session = sessionmaker(bind=self.__engine, autoflush=False)
         self.__session = Session()
 
     def __rollback(self):
-        """
-        Issue a rollback to a SQL transaction (for dev purposes only)
+        """Issue a rollback to a SQL transaction (for dev purposes only)
+
         """
         self.__session.rollback()
 
@@ -137,17 +148,19 @@ class DbHelper():
 # Areas
 ####
     def list_areas(self):
-        """
-        Return all areas
+        """Return all areas
+
         @return a list of Area objects
+
         """
         return self.__session.query(Area).all()
 
     def search_areas(self, filters):
-        """
-        Look for area(s) with filter on their attributes
+        """Look for area(s) with filter on their attributes
+
         @param filters :  filter fields can be one of
         @return a list of Area objects
+
         """
         if type(filters) is not DictType:
             raise DbHelperException("Wrong type of 'filters', Should be a dictionnary")
@@ -158,28 +171,31 @@ class DbHelper():
         return area_list.all()
 
     def get_area_by_id(self, area_id):
-        """
-        Fetch area information
+        """Fetch area information
+
         @param area_id : The area id
         @return an area object
+
         """
         return self.__session.query(Area).filter_by(id=area_id).first()
 
 
     def get_area_by_name(self, area_name):
-        """
-        Fetch area information
+        """Fetch area information
+
         @param area_name : The area name
         @return an area object
+
         """
         return self.__session.query(Area).filter(func.lower(Area.name)==ucode(area_name.lower())).first()
 
     def add_area(self, a_name, a_description=None):
-        """
-        Add an area
+        """Add an area
+
         @param a_name : area name
         @param a_description : area detailed description (optional)
         @return an Area object
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -193,12 +209,13 @@ class DbHelper():
         return area
 
     def update_area(self, a_id, a_name=None, a_description=None):
-        """
-        Update an area
+        """Update an area
+
         @param a_id : area id to be updated
         @param a_name : area name (optional)
         @param a_description : area detailed description (optional)
         @return an Area object
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -219,11 +236,12 @@ class DbHelper():
         return area
 
     def del_area(self, area_del_id, cascade_delete=False):
-        """
-        Delete an area record
+        """Delete an area record
+
         @param area_id : id of the area to delete
         @param cascade_delete : True if we wish to delete associated items
         @return the deleted Area object
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -250,17 +268,19 @@ class DbHelper():
 # Rooms
 ####
     def list_rooms(self):
-        """
-        Return a list of rooms
+        """Return a list of rooms
+
         @return list of Room objects
+
         """
         return self.__session.query(Room).all()
 
     def search_rooms(self, filters):
-        """
-        Look for room(s) with filter on their attributes
+        """Look for room(s) with filter on their attributes
+
         @param filters :  filter fields (dictionnary)
         @return a list of Room objects
+
         """
         if type(filters) is not DictType:
             raise DbHelperException("Wrong type of 'filters', Should be a dictionnary")
@@ -271,28 +291,31 @@ class DbHelper():
         return room_list.all()
 
     def get_room_by_name(self, r_name):
-        """
-        Return information about a room
+        """Return information about a room
+
         @param r_name : The room name
         @return a room object
+
         """
         return self.__session.query(Room).filter(func.lower(Room.name)==ucode(r_name.lower())).first()
 
     def get_room_by_id(self, r_id):
-        """
-        Return information about a room
+        """Return information about a room
+
         @param r_id : The room id
         @return a room object
+
         """
         return self.__session.query(Room).filter_by(id=r_id).first()
 
     def add_room(self, r_name, r_area_id=None, r_description=None):
-        """
-        Add a room
+        """Add a room
+
         @param r_name : room name
         @param area_id : id of the area where the room is, optional
         @param r_description : room detailed description, optional
         @return : a room object
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -309,13 +332,14 @@ class DbHelper():
         return room
 
     def update_room(self, r_id, r_name=None, r_area_id=None, r_description=None):
-        """
-        Update a room
+        """Update a room
+
         @param r_id : room id to be updated
         @param r_name : room name (optional)
         @param r_description : room detailed description (optional)
         @param r_area_id : id of the area the room belongs to (optional)
         @return a Room object
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -343,11 +367,12 @@ class DbHelper():
         return room
 
     def del_room(self, r_id, cascade_delete=False):
-        """
-        Delete a room record
+        """Delete a room record
+
         @param r_id : id of the room to delete
         @param cascade_delete : True if we wish to delete associated items
         @return the deleted Room object
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -371,10 +396,11 @@ class DbHelper():
             raise DbHelperException("Couldn't delete room with id %s : it doesn't exist" % r_id)
 
     def get_all_rooms_of_area(self, a_area_id):
-        """
-        Returns all the rooms of an area
+        """Return all the rooms of an area
+
         @param a_area_id : the area id
         @return a list of Room objects
+
         """
         return self.__session.query(Room).filter_by(area_id=a_area_id).all()
 
@@ -382,27 +408,30 @@ class DbHelper():
 # Device usage
 ####
     def list_device_usages(self):
-        """
-        Return a list of device usages
+        """Return a list of device usages
+
         @return a list of DeviceUsage objects
+
         """
         return self.__session.query(DeviceUsage).all()
 
     def get_device_usage_by_name(self, du_name,):
-        """
-        Return information about a device usage
+        """Return information about a device usage
+
         @param du_name : The device usage name
         @return a DeviceUsage object
+
         """
         return self.__session.query(DeviceUsage).filter(func.lower(DeviceUsage.name)==ucode(du_name.lower())).first()
 
     def add_device_usage(self, du_name, du_description=None, du_default_options=None):
-        """
-        Add a device_usage (temperature, heating, lighting, music, ...)
+        """Add a device_usage (temperature, heating, lighting, music, ...)
+
         @param du_name : device usage name
         @param du_description : device usage description (optional)
         @param du_default_options : default options (optional)
         @return a DeviceUsage (the newly created one)
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -417,13 +446,14 @@ class DbHelper():
         return du
 
     def update_device_usage(self, du_id, du_name=None, du_description=None, du_default_options=None):
-        """
-        Update a device usage
+        """Update a device usage
+
         @param du_id : device usage id to be updated
         @param du_name : device usage name (optional)
         @param du_description : device usage detailed description (optional)
         @param du_default_options : default options (optional)
         @return a DeviceUsage object
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -447,10 +477,11 @@ class DbHelper():
         return device_usage
 
     def del_device_usage(self, du_id, cascade_delete=False):
-        """
-        Delete a device usage record
+        """Delete a device usage record
+
         @param dc_id : id of the device usage to delete
         @return the deleted DeviceUsage object
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -478,27 +509,30 @@ class DbHelper():
 # Device type
 ####
     def list_device_types(self):
-        """
-        Return a list of device types
+        """Return a list of device types
+
         @return a list of DeviceType objects
+
         """
         return self.__session.query(DeviceType).all()
 
     def get_device_type_by_name(self, dty_name):
-        """
-        Return information about a device type
+        """Return information about a device type
+
         @param dty_name : The device type name
         @return a DeviceType object
+
         """
         return self.__session.query(DeviceType).filter(func.lower(DeviceType.name)==ucode(dty_name.lower())).first()
 
     def add_device_type(self, dty_name, dt_id, dty_description=None):
-        """
-        Add a device_type (x10.Switch, x10.Dimmer, Computer.WOL...)
+        """Add a device_type (x10.Switch, x10.Dimmer, Computer.WOL...)
+
         @param dty_name : device type name
         @param dt_id : technology id (x10, plcbus,...)
         @param dty_description : device type description (optional)
         @return a DeviceType (the newly created one)
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -514,13 +548,14 @@ class DbHelper():
         return dty
 
     def update_device_type(self, dty_id, dty_name=None, dt_id=None, dty_description=None):
-        """
-        Update a device type
+        """Update a device type
+
         @param dty_id : device type id to be updated
         @param dty_name : device type name (optional)
         @param dt_id : id of the associated technology (optional)
         @param dty_description : device type detailed description (optional)
         @return a DeviceType object
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -545,10 +580,11 @@ class DbHelper():
         return device_type
 
     def del_device_type(self, dty_id, cascade_delete=False):
-        """
-        Delete a device type record
+        """Delete a device type record
+
         @param dty_id : id of the device type to delete
         @return the deleted DeviceType object
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -568,7 +604,7 @@ class DbHelper():
                     raise DbHelperException("Couldn't delete device type %s : there are associated device(s)" % dty_id)
                 df_list = self.__session.query(DeviceTypeFeature).filter_by(device_type_id=dty.id).all()
                 if len(df_list) > 0:
-                    raise DbHelperException("Couldn't delete device type %s : there are associated device type " +\
+                    raise DbHelperException("Couldn't delete device type %s : there are associated device type " \
                                             "feature(s)" % dty_id)
             self.__session.delete(dty)
             try:
@@ -584,25 +620,28 @@ class DbHelper():
 # Device type features
 ####
     def list_device_type_features(self):
-        """
-        Return a list of device type features
+        """Return a list of device type features
+
         @return a list of DeviceTypeFeature objects
+
         """
         return self.__session.query(DeviceTypeFeature).all()
 
     def list_device_type_feature_by_device_type_id(self, dtf_device_type_id):
-        """
-        Return a list of device type features (actuator, sensor) knowing the device type id
+        """Return a list of device type features (actuator, sensor) knowing the device type id
+
         @param dtf_device_type_id : device type id
         @return a list of DeviceTypeFeature objects
+
         """
         return self.__session.query(DeviceTypeFeature).filter_by(device_type_id=dtf_device_type_id).all()
 
     def get_device_type_feature_by_id(self, dtf_id):
-        """
-        Return information about a device type feature
+        """Return information about a device type feature
+
         @param dtf_id : device type id
         @return a DeviceTypeFeature object
+
         """
         return self.__session.query(DeviceTypeFeature).filter_by(id=dtf_id).first()
 
@@ -610,24 +649,26 @@ class DbHelper():
 # Actuator features
 ####
     def list_actuator_features(self):
-        """
-        Return a list of actuator features
+        """Return a list of actuator features
+
         @return a list of DeviceTypeFeature objects
+
         """
         return self.__session.query(DeviceTypeFeature).filter_by(feature_type=u'actuator').all()
 
     def get_actuator_feature_by_id(self, af_id):
-        """
-        Return information about an actuator feature
+        """Return information about an actuator feature
+
         @param af_id : actuator feature id (which is a device type feature id)
         @return an DeviceTypeFeature object
+
         """
         return self.__session.query(DeviceTypeFeature).filter_by(id=af_id).filter_by(feature_type=u'actuator').first()
 
     def add_actuator_feature(self, af_name, af_device_type_id, af_value_type, af_return_confirmation=False,
                              af_parameters=None, af_stat_key=None):
-        """
-        Add an actuator
+        """Add an actuator
+
         @param af_name : actuator name
         @param af_device_type_id : device type id
         @param af_value_type : value type the actuator can accept
@@ -635,6 +676,7 @@ class DbHelper():
         @param af_parameters : parameters about the command or the returned data associated to the device, optional
         @param af_stat_key : key reference in the core_device_stats table
         @return an DeviceTypeFeature object (the newly created one)
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -658,8 +700,8 @@ class DbHelper():
 
     def update_actuator_feature(self, af_id, af_name=None, af_parameters=None, af_value_type=None,
                                 af_return_confirmation=None, af_stat_key=None):
-        """
-        Update an actuator feature
+        """Update an actuator feature
+
         @param af_id : actuator feature id (which is a device type feature id)
         @param af_name : actuator feature name (Switch, Dimmer, ...), optional
         @param af_parameters : parameters about the command or the returned data associated to the device, optional
@@ -667,6 +709,7 @@ class DbHelper():
         @param af_return_confirmation : True if the actuator returns a confirmation after having executed a command ,optional
         @param af_stat_key : key reference in the core_device_stats table
         @return an DeviceTypeFeature object (the newly updated one)
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -699,10 +742,11 @@ class DbHelper():
         return device_type_feature
 
     def del_actuator_feature(self, af_id):
-        """
-        Delete an actuator feature record
+        """Delete an actuator feature record
+
         @param af_id : actuator feature id (which is a device type feature id)
         @return the deleted DeviceTypeFeature object
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -725,29 +769,32 @@ class DbHelper():
 # Sensor features
 ####
     def list_sensor_features(self):
-        """
-        Return a list of sensor features
+        """Return a list of sensor features
+
         @return a list of DeviceTypeFeature objects
+
         """
         return self.__session.query(DeviceTypeFeature).filter_by(feature_type=u'sensor').all()
 
     def get_sensor_feature_by_id(self, sf_id):
-        """
-        Return information about a sensor feature
+        """Return information about a sensor feature
+
         @param df_id : sensor feature id (which is a device type feature id)
         @return a DeviceTypeFeature object
+
         """
         return self.__session.query(DeviceTypeFeature).filter_by(id=sf_id).filter_by(feature_type=u'sensor').first()
 
     def add_sensor_feature(self, sf_name, sf_device_type_id, sf_value_type, sf_parameters=None, sf_stat_key=None):
-        """
-        Add a sensor
+        """Add a sensor
+
         @param sf_name : sensor feature name (Thermometer, Voltmeter...)
         @param sf_device_type_id : device type id
         @param sf_value_type : value type the sensor can return
         @param sf_parameters : parameters about the command or the returned data associated to the device, optional
         @param sf_stat_key : key reference in the core_device_stats table
         @return a DeviceTypeFeature object (the newly created one)
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -768,14 +815,15 @@ class DbHelper():
         return device_type_feature
 
     def update_sensor_feature(self, sf_id, sf_name=None, sf_parameters=None, sf_value_type=None, sf_stat_key=None):
-        """
-        Update a sensor feature
+        """Update a sensor feature
+
         @param sf_id : sensor feature id (which is a device type feature id)
         @param sf_name : sensor feature name (Thermometer, Voltmeter...), optional
         @param sf_parameters : parameters about the command or the returned data associated to the device, optional
         @param sf_value_type : value type the sensor can return, optional
         @param sf_stat_key : key reference in the core_device_stats table
         @return a DeviceTypeFeature object (the newly updated one)
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -805,10 +853,11 @@ class DbHelper():
         return device_type_feature
 
     def del_sensor_feature(self, sf_id):
-        """
-        Delete a sensor feature record
+        """Delete a sensor feature record
+
         @param sf_id : sensor feature id (which is a device type feature id)
         @return the deleted DeviceTypeFeature object
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -831,59 +880,66 @@ class DbHelper():
 # Device feature association
 ####
     def list_device_feature_association(self):
-        """
-        List all records for the device / feature association
+        """List all records for the device / feature association
+
         @return a list of DeviceFeatureAssociation objects
+
         """
         return self.__session.query(DeviceFeatureAssociation).all()
 
     def list_device_feature_association_by_house(self):
-        """
-        List device / feature association for the house
+        """List device / feature association for the house
+
         @return a list of DeviceFeatureAssociation objects
+
         """
         return self.__session.query(DeviceFeatureAssociation).filter_by(place_type=u'house').all()
 
     def list_device_feature_association_by_room_id(self, room_id):
-        """
-        List device / feature association for a room
+        """List device / feature association for a room
+
         @param room_id : room id
         @return a list of DeviceFeatureAssociation objects
+
         """
         return self.__session.query(DeviceFeatureAssociation).filter_by(place_id=room_id, place_type=u'room').all()
 
     def list_device_feature_association_by_area_id(self, area_id):
-        """
-        List device / feature association for an area
+        """List device / feature association for an area
+
         @param area_id : area id
         @return a list of DeviceFeatureAssociation objects
+
         """
         return self.__session.query(DeviceFeatureAssociation).filter_by(place_id=area_id, place_type=u'area').all()
 
     def list_device_feature_association_by_feature_id(self, feature_id):
-        """
-        List device / feature association for an id of a feature of a device type
+        """List device / feature association for an id of a feature of a device type
+
         @param feature_id : feature id
         @return a list of DeviceFeatureAssociation objects
+
         """
         return self.__session.query(DeviceFeatureAssociation).filter_by(device_type_feature_id=feature_id).all()
 
     def list_device_feature_association_by_device_id(self, d_device_id):
-        """
-        List device / feature association for a device id
+        """List device / feature association for a device id
+
         @param device_id : device id
         @return a list of DeviceFeatureAssociation objects
+
         """
         return self.__session.query(DeviceFeatureAssociation).filter_by(device_id=d_device_id).all()
 
     def add_device_type_feature_association(self, d_device_id, d_type_feature_id, d_place_type=None, d_place_id=None):
-        """
-        Add a device feature association
+        """Add a device feature association
+
         @param d_device_id : device id
         @param d_type_feature_id : feature id of the device type (switch, dimmer)
         @param d_place_id : room id, area id or None for the house the device is associated to
         @param d_place_type : room, area or house (None means the device is not associated)
         @return the DeviceFeatureAssociation object
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -894,7 +950,7 @@ class DbHelper():
         if not device_type_feature:
             raise DbHelperException("DeviceTypeFeature id %s doesn't exist" % d_type_feature_id)
         if device.device_type_id != device_type_feature.device_type_id:
-            raise DbHelperException("device_type_id (%s) of device and device_type_id (%s) of device_type_feature " +\
+            raise DbHelperException("device_type_id (%s) of device and device_type_id (%s) of device_type_feature" \
                                     "are not the same!" % (device.device_type_id, device_type_feature.device_type_id))
         if d_place_type not in DEVICE_FEATURE_ASSOCIATION_LIST:
             raise DbHelperException("Place type should be one of : %s" % DEVICE_FEATURE_ASSOCIATION_LIST)
@@ -921,11 +977,12 @@ class DbHelper():
         return device_feature_asso
 
     def del_device_feature_association(self, d_device_id, d_type_feature_id):
-        """
-        Delete a device feature association
+        """Delete a device feature association
+
         @param d_device_id : device id
         @param d_type_feature_id : feature id of the device type (switch, dimmer)
         @return the DeviceFeatureAssociation object which was deleted
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -945,26 +1002,29 @@ class DbHelper():
 # Device technology
 ####
     def list_device_technologies(self):
-        """
-        Return a list of device technologies
+        """Return a list of device technologies
+
         @return a list of DeviceTechnology objects
+
         """
         return self.__session.query(DeviceTechnology).all()
 
     def get_device_technology_by_id(self, dt_id):
-        """
-        Return information about a device technology
+        """Return information about a device technology
+
         @param dt_id : the device technology id
         @return a DeviceTechnology object
+
         """
         return self.__session.query(DeviceTechnology).filter_by(id=dt_id).first()
 
     def add_device_technology(self, dt_id, dt_name, dt_description=None):
-        """
-        Add a device_technology
+        """Add a device_technology
+
         @param dt_id : technology id (ie x10, plcbus, eibknx...) with no spaces / accents or special characters
         @param dt_name : device technology name, one of 'x10', '1wire', 'PLCBus', 'RFXCom', 'IR'
         @param dt_description : extended description of the technology
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -978,12 +1038,13 @@ class DbHelper():
         return dt
 
     def update_device_technology(self, dt_id, dt_name=None, dt_description=None):
-        """
-        Update a device technology
+        """Update a device technology
+
         @param dt_id : device technology id to be updated
         @param dt_name : device technology name (optional)
         @param dt_description : device technology detailed description (optional)
         @return a DeviceTechnology object
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -1004,10 +1065,11 @@ class DbHelper():
         return device_tech
 
     def del_device_technology(self, dt_id, cascade_delete=False):
-        """
-        Delete a device technology record
+        """Delete a device technology record
+
         @param dt_id : id of the device technology to delete
         @return the deleted DeviceTechnology object
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -1036,29 +1098,32 @@ class DbHelper():
 # Plugin config
 ####
     def list_all_plugin_config(self):
-        """
-        Return a list of all plugin config parameters
+        """Return a list of all plugin config parameters
+
         @return a list of PluginConfig objects
+
         """
         return self.__session.query(PluginConfig).all()
 
     def list_plugin_config(self, pl_name, pl_hostname):
-        """
-        Return all parameters of a plugin
+        """Return all parameters of a plugin
+
         @param pl_name : plugin name
         @param pl_hostname : hostname the plugin is installed on
         @return a list of PluginConfig objects
+
         """
         return self.__session.query(PluginConfig).filter_by(name=ucode(pl_name))\
                                                  .filter_by(hostname=ucode(pl_hostname)).all()
 
     def get_plugin_config(self, pl_name, pl_hostname, pl_key):
-        """
-        Return information about a plugin parameter
+        """Return information about a plugin parameter
+
         @param pl_name : plugin name
         @param pl_hostname : hostname the plugin is installed on
         @param pl_key : key we want the value from
         @return a PluginConfig object
+
         """
         return self.__session.query(PluginConfig)\
                              .filter_by(name=ucode(pl_name))\
@@ -1067,13 +1132,14 @@ class DbHelper():
                              .first()
 
     def set_plugin_config(self, pl_name, pl_hostname, pl_key, pl_value):
-        """
-        Add / update a plugin parameter
+        """Add / update a plugin parameter
+
         @param pl_name : plugin name
         @param pl_hostname : hostname the plugin is installed on
         @param pl_key : key we want to add / update
         @param pl_value : key value we want to add / update
         @return : the added / updated PluginConfig item
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -1095,11 +1161,12 @@ class DbHelper():
         return plugin_config
 
     def del_plugin_config(self, pl_name, pl_hostname):
-        """
-        Delete all parameters of a plugin config
+        """Delete all parameters of a plugin config
+
         @param pl_name : plugin name
         @param pl_hostname : hostname the plugin is installed on
         @return the deleted PluginConfig objects
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -1118,26 +1185,29 @@ class DbHelper():
 # Devices
 ###
     def list_devices(self):
-        """
-        Returns a list of devices
+        """Return a list of devices
+
         @return a list of Device objects
+
         """
         return self.__session.query(Device).all()
 
     def get_device(self, d_id):
-        """
-        Return a device by its id
+        """Return a device by its id
+
         @param d_id : The device id
         @return a Device object
+
         """
         return self.__session.query(Device).filter_by(id=d_id).first()
 
     def get_device_by_technology_and_address(self, techno_id, device_address):
-        """
-        Return a device by its technology and address
+        """Return a device by its technology and address
+
         @param techno_id : technology id
         @param device address : device address
         @return a device object
+
         """
         device_list = self.__session.query(Device).filter_by(address=ucode(device_address)).all()
         if len(device_list) == 0:
@@ -1151,24 +1221,26 @@ class DbHelper():
         return None
 
     def get_all_devices_of_room(self, d_room_id):
-        """
-        Return all the devices of a room
+        """Return all the devices of a room
+
         @param d_room_id: room id
         @return a list of Device objects
+
         """
         return self.__session.query(Device).filter_by(room_id=d_room_id).all()
 
     def get_all_devices_of_usage(self, du_id):
-        """
-        Return all the devices of a usage
+        """Return all the devices of a usage
+
         @param du_id: usage id
         @return a list of Device objects
+
         """
         return self.__session.query(Device).filter_by(usage_id=du_id).all()
 
     def add_device(self, d_name, d_address, d_type_id, d_usage_id, d_description=None, d_reference=None):
-        """
-        Add a device item
+        """Add a device item
+
         @param d_name : name of the device
         @param d_address : address (ex : 'A3' for x10/plcbus, '111.111111111' for 1wire)
         @param d_type_id : device type id (x10.Switch, x10.Dimmer, Computer.WOL...)
@@ -1176,6 +1248,7 @@ class DbHelper():
         @param d_description : extended device description, optional
         @param d_reference : device reference (ex. AM12 for x10), optional
         @return the new Device object
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -1196,9 +1269,10 @@ class DbHelper():
         return device
 
     def update_device(self, d_id, d_name=None, d_address=None, d_usage_id=None, d_description=None, d_reference=None):
-        """
-        Update a device item
+        """Update a device item
+
         If a param is None, then the old value will be kept
+
         @param d_id : Device id
         @param d_name : device name (optional)
         @param d_address : Item address (ex : 'A3' for x10/plcbus, '111.111111111' for 1wire) (optional)
@@ -1206,6 +1280,7 @@ class DbHelper():
         @param d_usage : Item usage id (optional)
         @param d_room : Item room id (optional)
         @return the updated Device object
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -1235,11 +1310,12 @@ class DbHelper():
         return device
 
     def del_device(self, d_id):
-        """
-        Delete a device
+        """Delete a device
+
         Warning : this deletes also the associated objects (DeviceConfig, DeviceStats)
         @param d_id : item id
         @return the deleted Device object
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -1264,37 +1340,41 @@ class DbHelper():
 # Device config
 ####
     def list_all_device_config(self):
-        """
-        List all device config parameters
+        """List all device config parameters
+
         @return A list of DeviceConfig objects
+
         """
         return self.__session.query(DeviceConfig).all()
 
     def list_device_config(self, dc_device_id):
-        """
-        List all config keys of a device
+        """List all config keys of a device
+
         @param dc_device_id : device id
         @return A list of DeviceConfig objects
+
         """
         return self.__session.query(DeviceConfig).filter_by(device_id=dc_device_id).all()
 
     def get_device_config_by_key(self, dc_key, dc_device_id):
-        """
-        Get a key of a device configuration
+        """Get a key of a device configuration
+
         @param dc_key : key name
         @param dc_device_id : device id
         @return A DeviceConfig object
+
         """
         return self.__session.query(DeviceConfig).filter_by(key=dc_key, device_id=dc_device_id).first()
 
 
     def set_device_config(self, dc_key, dc_value, dc_device_id):
-        """
-        Add / update an device config key
+        """Add / update an device config key
+
         @param dc_key : key name
         @param dc_value : associated value
         @param dc_device_id : device id
         @return : the added/updated DeviceConfig object
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -1312,10 +1392,11 @@ class DbHelper():
         return device_config
 
     def del_device_config(self, dc_device_id):
-        """
-        Delete a device configuration key
+        """Delete a device configuration key
+
         @param dc_device_id : device id
         @return The DeviceConfig object which was deleted
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -1337,60 +1418,64 @@ class DbHelper():
 # Device stats
 ####
     def list_all_device_stats(self):
-        """
-        Return a list of all device stats
+        """Return a list of all device stats
+
         @return a list of DeviceStats objects
+
         """
         return self.__session.query(DeviceStats).all()
 
     def list_device_stats(self, ds_device_id):
-        """
-        Return a list of all stats for a device
+        """Return a list of all stats for a device
+
         @param ds_device_id : the device id
         @return a list of DeviceStats objects
+
         """
         return self.__session.query(DeviceStats).filter_by(device_id=ds_device_id).all()
 
     def list_last_n_stats_of_device_by_key(self, ds_key, ds_device_id, ds_number):
-        """
-        Get the N latest statistics of a device for a given key
+        """Get the N latest statistics of a device for a given key
+
         @param ds_key : statistic key
         @param ds_device_id : device id
         @param ds_number : the number of statistics we want to retreive
         @return a list of DeviceStats objects
+
         """
-        return self.__session.query(DeviceStats)\
-                             .filter_by(key=ucode(ds_key))\
-                             .filter_by(device_id=ds_device_id)\
-                             .order_by(sqlalchemy.desc(DeviceStats.date)).limit(ds_number).all()
+        list_s = self.__session.query(DeviceStats)\
+                               .filter_by(key=ucode(ds_key))\
+                               .filter_by(device_id=ds_device_id)\
+                               .order_by(sqlalchemy.desc(DeviceStats.date)).limit(ds_number).all()
+        list_s.reverse()
+        return list_s
 
     def list_stats_of_device_between_by_key(self, ds_key, ds_device_id, start_datetime=None, end_datetime=None):
-        """
-        Get statistics of a device between two dates (datetime format) for a given key
+        """Get statistics of a device between two dates (datetime format) for a given key
+
         @param ds_key : statistic key
         @param ds_device_id : device id
-        @param start_datetime : datetime start, optional
-        @param end_datetime : datetime end, optional
+        @param start_datetime : datetime start, optional (timestamp)
+        @param end_datetime : datetime end, optional (timestamp)
         @return a list of DeviceStats objects
+
         """
         query = self.__session.query(DeviceStats).filter_by(key=ucode(ds_key)).filter_by(device_id=ds_device_id)
         if start_datetime:
             query = query.filter("date >= '" + str(start_datetime) + "'")
         if end_datetime:
-            # TODO : This is really ugly but if we don't do it d2 is excluded from the interval
-            # I suspect this is because the date is stored like this in the DB : '2010-04-09 12:04:00.000000'
-            # But in Python we have '2010-04-09 12:04:00', so maybe there is a precision problem
-            d2 = "'" + str(end_datetime + datetime.timedelta(microseconds=1)) + "'"
-            query = query.filter('date <= ' + d2)
-        query = query.order_by(sqlalchemy.desc(DeviceStats.date))
-        return query.all()
+            query = query.filter("date <= '" + str(end_datetime) + "'")
+        list_s = query.order_by(sqlalchemy.desc(DeviceStats.date)).all()
+        list_s.reverse()
+        return list_s
 
     def get_last_stat_of_device_by_key(self, ds_key, ds_device_id):
-        """
-        Get the latest statistic of a device for a given key
+        """Get the latest statistic of a device for a given key
+
         @param ds_key : statistic key
         @param ds_device_id : device id
         @return a DeviceStats object
+
         """
         return self.__session.query(DeviceStats)\
                              .filter_by(key=ucode(ds_key))\
@@ -1398,21 +1483,23 @@ class DbHelper():
                              .order_by(sqlalchemy.desc(DeviceStats.date)).first()
 
     def device_has_stats(self, ds_device_id):
-        """
-        Check if the device has stats that were recorded
+        """Check if the device has stats that were recorded
+
         @param d_device_id : device id
         @return True or False
+
         """
         return self.__session.query(DeviceStats).filter_by(device_id=ds_device_id).count() > 0
 
     def add_device_stat(self, ds_date, ds_key, ds_value, ds_device_id):
-        """
-        Add a device stat record
+        """Add a device stat record
+
         @param ds_key : key for the stat
         @param ds_date : when the stat was gathered (timestamp)
         @param ds_value : stat value
         @param ds_device_id : device id
         @return the new DeviceStats object
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -1428,11 +1515,12 @@ class DbHelper():
         return device_stat
 
     def del_device_stats(self, ds_device_id, ds_key=None):
-        """
-        Delete a stat record for a given key and device
+        """Delete a stat record for a given key and device
+
         @param ds_device_id : device id
         @param ds_key : stat key, optional
         @return list of deleted DeviceStat objects
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -1453,27 +1541,30 @@ class DbHelper():
 # Triggers
 ####
     def list_triggers(self):
-        """
-        Returns a list of all triggers
+        """Return a list of all triggers
+
         @return a list of Trigger objects
+
         """
         return self.__session.query(Trigger).all()
 
     def get_trigger(self, t_id):
-        """
-        Returns a trigger information from id
+        """Return a trigger information from id
+
         @param t_id : trigger id
         @return a Trigger object
+
         """
         return self.__session.query(Trigger).filter_by(id=t_id).first()
 
     def add_trigger(self, t_description, t_rule, t_result):
-        """
-        Add a trigger
+        """Add a trigger
+
         @param t_description : trigger description
         @param t_rule : trigger rule
         @param t_result : trigger result (list of strings)
         @return the new Trigger object
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -1487,13 +1578,14 @@ class DbHelper():
         return trigger
 
     def update_trigger(self, t_id, t_description=None, t_rule=None, t_result=None):
-        """
-        Update a trigger
+        """Update a trigger
+
         @param dt_id : trigger id to be updated
         @param t_description : trigger description
         @param t_rule : trigger rule
         @param t_result : trigger result (list of strings)
         @return a Trigger object
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -1516,10 +1608,11 @@ class DbHelper():
         return trigger
 
     def del_trigger(self, t_id):
-        """
-        Delete a trigger
+        """Delete a trigger
+
         @param t_id : trigger id
         @return the deleted Trigger object
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -1539,9 +1632,10 @@ class DbHelper():
 # User accounts
 ####
     def list_user_accounts(self):
-        """
-        Returns a list of all accounts
+        """Return a list of all accounts
+
         @return a list of UserAccount objects
+
         """
         list_sa = self.__session.query(UserAccount).all()
         for user_acc in list_sa:
@@ -1550,10 +1644,11 @@ class DbHelper():
         return list_sa
 
     def get_user_account(self, a_id):
-        """
-        Return user account information from id
+        """Return user account information from id
+
         @param a_id : account id
         @return a UserAccount object
+
         """
         user_acc = self.__session.query(UserAccount).filter_by(id=a_id).first()
         if user_acc is not None:
@@ -1561,10 +1656,11 @@ class DbHelper():
         return user_acc
 
     def get_user_account_by_login(self, a_login):
-        """
-        Return user account information from login
+        """Return user account information from login
+
         @param a_login : login
         @return a UserAccount object
+
         """
         user_acc = self.__session.query(UserAccount).filter_by(login=ucode(a_login)).first()
         if user_acc is not None:
@@ -1572,11 +1668,12 @@ class DbHelper():
         return user_acc
 
     def get_user_account_by_login_and_pass(self, a_login, a_password):
-        """
-        Return user account information from login
+        """Return user account information from login
+
         @param a_login : login
         @param a_pass : password (clear text)
         @return a UserAccount object or None if login / password is wrong
+
         """
         crypted_pass = self.__make_crypted_password(a_password)
         user_acc = self.__session.query(UserAccount)\
@@ -1586,10 +1683,11 @@ class DbHelper():
         return user_acc
 
     def get_user_account_by_person(self, p_id):
-        """
-        Return a user account associated to a person, if existing
+        """Return a user account associated to a person, if existing
+
         @param p_id : The person id
         @return a UserAccount object
+
         """
         user = self.__session.query(UserAccount).filter_by(person_id=p_id).first()
         if user is not None:
@@ -1597,11 +1695,12 @@ class DbHelper():
         return user
 
     def authenticate(self, a_login, a_password):
-        """
-        Check if a user account with a_login, a_password exists
+        """Check if a user account with a_login, a_password exists
+
         @param a_login : Account login
         @param a_password : Account password (clear)
         @return True or False
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -1614,13 +1713,14 @@ class DbHelper():
         return False
 
     def add_user_account(self, a_login, a_password, a_person_id, a_is_admin=False, a_skin_used=''):
-        """
-        Add a user account
+        """Add a user account
+
         @param a_login : Account login
         @param a_password : Account clear text password (will be hashed in sha256)
         @param a_person_id : id of the person associated to the account
         @param a_is_admin : True if it is an admin account, False otherwise (optional, default=False)
         @return the new UserAccount object or raise a DbHelperException if it already exists
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -1643,8 +1743,8 @@ class DbHelper():
 
     def add_user_account_with_person(self, a_login, a_password, a_person_first_name, a_person_last_name,
                                      a_person_birthdate=None, a_is_admin=False, a_skin_used=''):
-        """
-        Add a user account and a person
+        """Add a user account and a person
+
         @param a_login : Account login
         @param a_password : Account clear text password (will be hashed in sha256)
         @param a_person_first_name : first name of the person associated to the account
@@ -1653,19 +1753,21 @@ class DbHelper():
         @param a_is_admin : True if it is an admin account, False otherwise (optional, default=False)
         @param a_skin_used : name of the skin choosen by the user (optional, default='skins/default')
         @return the new UserAccount object or raise a DbHelperException if it already exists
+
         """
         person = self.add_person(a_person_first_name, a_person_last_name, a_person_birthdate)
         return self.add_user_account(a_login, a_password, person.id, a_is_admin, a_skin_used)
 
     def update_user_account(self, a_id, a_new_login=None, a_person_id=None, a_is_admin=None, a_skin_used=None):
-        """
-        Update a user account
+        """Update a user account
+
         @param a_id : Account id to be updated
         @param a_new_login : The new login (optional)
         @param a_person_id : id of the person associated to the account
         @param a_is_admin : True if it is an admin account, False otherwise (optional)
         @param a_skin_used : name of the skin choosen by the user (optional, default='skins/default')
         @return a UserAccount object
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -1694,8 +1796,8 @@ class DbHelper():
 
     def update_user_account_with_person(self, a_id, a_login=None, p_first_name=None, p_last_name=None, p_birthdate=None,
                                         a_is_admin=None, a_skin_used=None):
-        """
-        Update a user account a person information
+        """Update a user account a person information
+
         @param a_id : Account id to be updated
         @param a_login : The new login (optional)
         @param p_first_name : first name of the person associated to the account, optional
@@ -1704,6 +1806,7 @@ class DbHelper():
         @param a_is_admin : True if it is an admin account, False otherwise, optional
         @param a_skin_used : name of the skin choosen by the user (optional, default='skins/default')
         @return a UserAccount object
+
         """
         user_acc = self.update_user_account(a_id, a_login, None, a_is_admin, a_skin_used)
         # Make sure previously modified objects outer of this method won't be commited
@@ -1725,12 +1828,13 @@ class DbHelper():
         return user_acc
 
     def change_password(self, a_id, a_old_password, a_new_password):
-        """
-        Change the password
+        """Change the password
+
         @param a_id : account id
         @param a_old_password : the password to change (the old one, in clear text)
         @param a_new_password : the new password, in clear text (will be hashed in sha256)
         @return True if the password could be changed, False otherwise (login or old_password is wrong)
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -1748,28 +1852,31 @@ class DbHelper():
         return True
 
     def __make_crypted_password(self, clear_text_password):
-        """
-        Make a crypted password (using sha256)
+        """Make a crypted password (using sha256)
+
         @param clear_text_password : password in clear text
         @return crypted password
+
         """
         password = hashlib.sha256()
         password.update(clear_text_password)
         return password.hexdigest()
 
     def add_default_user_account(self):
-        """
-        Add a default user account (login = admin, password = domogik, is_admin = True)
+        """Add a default user account (login = admin, password = domogik, is_admin = True)
+
         @return a UserAccount object
+
         """
         person = self.add_person(p_first_name='Admin', p_last_name='Admin', p_birthdate=datetime.date(1900, 01, 01))
         return self.add_user_account(a_login='admin', a_password='123', a_person_id=person.id, a_is_admin=True)
 
     def del_user_account(self, a_id):
-        """
-        Delete a user account
+        """Delete a user account
+
         @param a_id : account id
         @return the deleted UserAccount object
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -1789,28 +1896,31 @@ class DbHelper():
 # Persons
 ####
     def list_persons(self):
-        """
-        Returns the list of all persons
+        """Return the list of all persons
+
         @return a list of Person objects
+
         """
         return self.__session.query(Person).all()
 
     def get_person(self, p_id):
-        """
-        Returns person information
+        """Return person information
+
         @param p_id : person id
         @return a Person object
+
         """
         return self.__session.query(Person).filter_by(id=p_id).first()
 
     def add_person(self, p_first_name, p_last_name, p_birthdate=None):
-        """
-        Add a person
+        """Add a person
+
         @param p_first_name     : first name
         @param p_last_name      : last name
         @param p_birthdate      : birthdate, optional
         @param p_user_account   : Person account on the user (optional)
         @return the new Person object
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -1824,13 +1934,14 @@ class DbHelper():
         return person
 
     def update_person(self, p_id, p_first_name=None, p_last_name=None, p_birthdate=None):
-        """
-        Update a person
+        """Update a person
+
         @param p_id             : person id to be updated
         @param p_first_name     : first name (optional)
         @param p_last_name      : last name (optional)
         @param p_birthdate      : birthdate (optional)
         @return a Person object
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -1854,10 +1965,11 @@ class DbHelper():
         return person
 
     def del_person(self, p_id):
-        """
-        Delete a person and the associated user account if it exists
+        """Delete a person and the associated user account if it exists
+
         @param p_id : person account id
         @return the deleted Person object
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -1880,36 +1992,40 @@ class DbHelper():
 # System stats
 ####
     def list_system_stats(self):
-        """
-        Return a list of all system stats
+        """Return a list of all system stats
+
         @return a list of SystemStats objects
+
         """
         return self.__session.query(SystemStats).all()
 
     def list_system_stats_values(self, s_system_stats_id):
-        """
-        Return a list of all values associated to a system statistic
+        """Return a list of all values associated to a system statistic
+
         @param s_system_stats_id : the system statistic id
         @return a list of SystemStatsValue objects
+
         """
         return self.__session.query(SystemStatsValue).filter_by(system_stats_id=s_system_stats_id).all()
 
     def get_system_stat(self, s_id):
-        """
-        Return a system stat
+        """Return a system stat
+
         @param s_name : the name of the stat to be retrieved
         @return a SystemStats object
+
         """
         return self.__session.query(SystemStats).filter_by(id=s_id).first()
 
     def add_system_stat(self, s_name, s_hostname, s_date, s_values):
-        """
-        Add a system stat record
+        """Add a system stat record
+
         @param s_name : name of the  plugin
         @param s_hostname : name of the  host
         @param s_date : when the stat was gathered (timestamp)
         @param s_values : a dictionnary of system statistics values
         @return the new SystemStats object
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -1932,10 +2048,11 @@ class DbHelper():
         return system_stat
 
     def del_system_stat(self, s_name):
-        """
-        Delete a system stat record
+        """Delete a system stat record
+
         @param s_name : name of the stat that has to be deleted
         @return the deleted SystemStats object
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -1956,9 +2073,10 @@ class DbHelper():
             raise DbHelperException("Couldn't delete system stat %s : it doesn't exist" % s_name)
 
     def del_all_system_stats(self):
-        """
-        Delete all stats of the system
+        """Delete all stats of the system
+
         @return the list of deleted SystemStats objects
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -1984,13 +2102,14 @@ class DbHelper():
 ###
 
     def set_ui_item_config(self, ui_item_name, ui_item_reference, ui_item_key, ui_item_value):
-        """
-        Add / update an UI parameter
+        """Add / update an UI parameter
+
         @param ui_item_name : item name
         @param ui_item_reference : the item reference
         @param ui_item_key : key we want to add / update
         @param ui_item_value : key value we want to add / update
         @return : the updated UIItemConfig item
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -2009,12 +2128,13 @@ class DbHelper():
         return ui_item_config
 
     def get_ui_item_config(self, ui_item_name, ui_item_reference, ui_item_key):
-        """
-        Get a UI parameter of an item
+        """Get a UI parameter of an item
+
         @param ui_item_name : item name
         @param ui_item_reference : item reference
         @param ui_item_key : key
         @return an UIItemConfig object
+
         """
         return self.__session.query(UIItemConfig)\
                              .filter_by(name=ucode(ui_item_name), reference=ucode(ui_item_reference),
@@ -2022,46 +2142,51 @@ class DbHelper():
                              .first()
 
     def list_ui_item_config_by_ref(self, ui_item_name, ui_item_reference):
-        """
-        List all UI parameters of an item
+        """List all UI parameters of an item
+
         @param ui_item_name : item name
         @param ui_item_reference : item reference
         @return a list of UIItemConfig objects
+
         """
         return self.__session.query(UIItemConfig)\
                              .filter_by(name=ucode(ui_item_name), reference=ucode(ui_item_reference)).all()
 
     def list_ui_item_config_by_key(self, ui_item_name, ui_item_key):
-        """
-        List all UI parameters of an item
+        """List all UI parameters of an item
+
         @param ui_item_name : item name
         @param ui_item_key : item key
         @return a list of UIItemConfig objects
+
         """
         return self.__session.query(UIItemConfig).filter_by(name=ucode(ui_item_name), key=ucode(ui_item_key)).all()
 
     def list_ui_item_config(self, ui_item_name):
-        """
-        List all UI parameters of an item
+        """List all UI parameters of an item
+
         @param ui_item_name : item name
         @return a list of UIItemConfig objects
+
         """
         return self.__session.query(UIItemConfig).filter_by(name=ucode(ui_item_name)).all()
 
     def list_all_ui_item_config(self):
-        """
-        List all UI parameters
+        """List all UI parameters
+
         @return a list of UIItemConfig objects
+
         """
         return self.__session.query(UIItemConfig).all()
 
     def delete_ui_item_config(self, ui_item_name, ui_item_reference=None, ui_item_key=None):
-        """
-        Delete a UI parameter of an item
+        """Delete a UI parameter of an item
+
         @param ui_item_name : item name
         @param ui_item_reference : item reference, optional
         @param ui_item_key : key of the item, optional
         @return the deleted UIItemConfig object(s)
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -2097,9 +2222,10 @@ class DbHelper():
 # SystemConfig
 ###
     def get_system_config(self):
-        """
-        Get current system configuration
+        """Get current system configuration
+
         @return a SystemConfig object
+
         """
         try:
             return self.__session.query(SystemConfig).one()
@@ -2109,11 +2235,12 @@ class DbHelper():
             pass
 
     def update_system_config(self, s_simulation_mode=None, s_debug_mode=None):
-        """
-        Update (or create) system configuration
+        """Update (or create) system configuration
+
         @param s_simulation_mode : True if the system is running in simulation mode (optional)
         @param s_debug_mode : True if the system is running in debug mode (optional)
         @return a SystemConfig object
+
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()

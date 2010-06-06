@@ -64,17 +64,16 @@ class WOL:
         else:
             self._log.error("Wrong mac address : " + mac)
             return
-     
+
         # Create magic packet
         self._log.debug("Create magic packet")
         magic_packet = ''.join(['FFFFFFFFFFFF', mac * 20])
-        magic_hexa = '' 
-    
+        magic_hexa = ''
+
         # Convert magic packet in hexa
         for i in range(0, len(magic_packet), 2):
-            magic_hexa = ''.join([magic_hexa,
-                         struct.pack('B', int(magic_packet[i: i + 2], 16))])
-    
+            magic_hexa = ''.join([magic_hexa, struct.pack('B', int(magic_packet[i: i + 2], 16))])
+
         # Send magic packet
         self._log.debug("Send magic packet to broadcast")
         try:
@@ -84,4 +83,3 @@ class WOL:
             self._log.info("Magic packet send")
         except:
             self._log.error("Fail to send magic packet")
-    

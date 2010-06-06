@@ -22,7 +22,7 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 Plugin purpose
 ==============
 
-Send time informations on the network
+Send time informations on the xPL network
 
 Implements
 ==========
@@ -38,8 +38,8 @@ Implements
 """
 
 from time import localtime
-from domogik.xpl.common.xplconnector import xPLTimer
-from domogik.xpl.common.plugin import xPLPlugin
+from domogik.xpl.common.xplconnector import XplTimer
+from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.xplmessage import XplMessage
 
 
@@ -48,22 +48,24 @@ DOMOGIK_PLUGIN_TECHNOLOGY = "TO DEFINE"
 DOMOGIK_PLUGIN_DESCRIPTION = "Send date and time on the xPL network every minute"
 DOMOGIK_PLUGIN_VERSION = "0.1"
 DOMOGIK_PLUGIN_DOCUMENTATION_LINK = "TODO"
-DOMOGIK_PLUGIN_CONFIGURATION=[
+DOMOGIK_PLUGIN_CONFIGURATION = [
       {"id" : 0,
        "key" : "startup-plugin",
        "type" : "boolean",
        "description" : "Automatically start plugin at Domogik startup",
        "default" : "False"},
       ]
-class XPLDateTime(xPLPlugin):
+
+
+class XPLDateTime(XplPlugin):
     '''
     Send date and time on the xPL network every minute
     '''
 
     def __init__(self):
-        xPLPlugin.__init__(self, name = 'ldtmgr')
+        XplPlugin.__init__(self, name = 'ldtmgr')
         
-        self._timer = xPLTimer(10, self._send_datetime, self.get_stop())
+        self._timer = XplTimer(10, self._send_datetime, self.get_stop())
         self.register_timer(self._timer)
         self._timer.start()
 

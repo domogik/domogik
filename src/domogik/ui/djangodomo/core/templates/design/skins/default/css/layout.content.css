@@ -18,9 +18,9 @@
 	clear:both;
 }
 
-
 header#contentheader {
     display:block;
+    position:relative;
     border: #B9C248 1px solid;
 	background-image: -webkit-gradient(linear, 0% 0%, 0% 80%, from(#BDCB2F), to(#9BB528));
     background-image: -moz-linear-gradient(100% 80% 270deg, #BDCB2F, #9BB528);

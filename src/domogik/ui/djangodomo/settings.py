@@ -52,15 +52,24 @@ MANAGERS = ADMINS
                             # 'sqlite3' or 'oracle'.
 #DATABASE_NAME = 'domogik'   # Or path to database file if using sqlite3.
 
-DATABASE_ENGINE = 'sqlite3'
-DATABASE_NAME = "db.sqlite"
+#DATABASE_ENGINE = 'sqlite3'
+#DATABASE_NAME = "db.sqlite"
 
-DATABASE_USER = 'domogik'   # Not used with sqlite3.
-DATABASE_PASSWORD = ''      # Not used with sqlite3.
-DATABASE_HOST = ''          # Set to empty string for localhost.
+#DATABASE_USER = 'domogik'   # Not used with sqlite3.
+#DATABASE_PASSWORD = ''      # Not used with sqlite3.
+#DATABASE_HOST = ''          # Set to empty string for localhost.
                             # ( Not used with sqlite3. )
-DATABASE_PORT = ''          # Set to empty string for default.
+#DATABASE_PORT = ''          # Set to empty string for default.
                             # ( Not used with sqlite3. )
+
+DATABASES = {
+    'default': {
+        'NAME': 'db.sqlite',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'USER': '',
+        'PASSWORD': '',
+    }
+}
 
 ### Proxy settings
 try:

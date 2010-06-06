@@ -38,8 +38,8 @@ Implements
 from domogik.xpl.lib.gagenda import GAgenda
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.common.plugin import xPLPlugin
-from domogik.xpl.common.plugin import xPLResult
+from domogik.xpl.common.plugin import XplPlugin
+from domogik.xpl.common.plugin import XplResult
 from domogik.xpl.common.queryconfig import Query
 
 IS_DOMOGIK_PLUGIN = True
@@ -47,7 +47,7 @@ DOMOGIK_PLUGIN_TECHNOLOGY = "communication"
 DOMOGIK_PLUGIN_DESCRIPTION = "Get events from a Google agenda"
 DOMOGIK_PLUGIN_VERSION = "0.1"
 DOMOGIK_PLUGIN_DOCUMENTATION_LINK = "http://wiki.domogik.org/tiki-index.php?page=plugins/GoogleAgenda"
-DOMOGIK_PLUGIN_CONFIGURATION=[
+DOMOGIK_PLUGIN_CONFIGURATION = [
       {"id" : 0,
        "key" : "startup-plugin",
        "type" : "boolean",
@@ -71,29 +71,29 @@ DOMOGIK_PLUGIN_CONFIGURATION=[
 
 
 
-class GAgendaListener(xPLPlugin):
+class GAgendaListener(XplPlugin):
     """ Listen for xPL messages to get infos from agenda
     """
 
     def __init__(self):
         """ Create lister for google agenda requets
         """
-        xPLPlugin.__init__(self, name = 'gagenda')
+        XplPlugin.__init__(self, name = 'gagenda')
 
         # Create logger
         self._log.debug("Listener for Google agenda created")
 
         # Get config
         self._config = Query(self._myxpl)
-        res = xPLResult()
+        res = XplResult()
         self._config.query('gagenda', 'email', res)
         self._email = res.get_value()['email']
         self._config = Query(self._myxpl)
-        res = xPLResult()
+        res = XplResult()
         self._config.query('gagenda', 'password', res)
         self._password = res.get_value()['password']
         self._config = Query(self._myxpl)
-        res = xPLResult()
+        res = XplResult()
         self._config.query('gagenda', 'calendarname', res)
         self._calendar_name = res.get_value()['calendarname']
 

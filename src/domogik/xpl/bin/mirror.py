@@ -36,8 +36,8 @@ Implements
 """
 
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.common.plugin import xPLPlugin
-from domogik.xpl.common.plugin import xPLResult
+from domogik.xpl.common.plugin import XplPlugin
+from domogik.xpl.common.plugin import XplResult
 from domogik.xpl.lib.mirror import Mirror
 from domogik.xpl.common.queryconfig import Query
 
@@ -46,7 +46,7 @@ DOMOGIK_PLUGIN_TECHNOLOGY = "rfid"
 DOMOGIK_PLUGIN_DESCRIPTION = "Use Mir:ror device"
 DOMOGIK_PLUGIN_VERSION = "0.1"
 DOMOGIK_PLUGIN_DOCUMENTATION_LINK = "http://wiki.domogik.org/tiki-index.php?page=plugins/Mirror"
-DOMOGIK_PLUGIN_CONFIGURATION=[
+DOMOGIK_PLUGIN_CONFIGURATION = [
       {"id" : 0,
        "key" : "startup-plugin",
        "type" : "boolean",
@@ -70,31 +70,30 @@ DOMOGIK_PLUGIN_CONFIGURATION=[
 
 
 
-class MirrorManager(xPLPlugin):
+class MirrorManager(XplPlugin):
     """ Manage the Mir:ror device and connect it to xPL
     """
 
     def __init__(self):
         """ Init plugin
         """
-        xPLPlugin.__init__(self, name='mirror')
+        XplPlugin.__init__(self, name='mirror')
         # Get config
         #   - device
         self._config = Query(self._myxpl)
-        res = xPLResult()
+        res = XplResult()
         self._config.query('mirror', 'device', res)
         device = res.get_value()['device']
         self._config = Query(self._myxpl)
-        res = xPLResult()
+        res = XplResult()
         self._config.query('mirror', 'interval', res)
         interval = res.get_value()['interval']
         self._config = Query(self._myxpl)
-        res = xPLResult()
+        res = XplResult()
         self._config.query('mirror', 'nbmaxtry', res)
         nbmaxtry = res.get_value()['nbmaxtry']
         # Call Library
-        self._mymirror  = Mirror(device, nbmaxtry, interval, \
-                                 self._broadcastframe)
+        self._mymirror  = Mirror(device, nbmaxtry, interval, self._broadcastframe)
         self._mymirror.start()
 
     def _broadcastframe(self, action, ztamp_id):

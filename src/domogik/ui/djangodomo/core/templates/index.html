@@ -20,19 +20,76 @@
 {% endcomment %}
 
 {% load i18n %}
+{% load commands %}
+{% load text %}
 
 {% block title %}{% trans page_title %}{% endblock %}
 {% block css %}
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-processing.css" rel="stylesheet" type="text/css" />
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.widget-common.css" rel="stylesheet" type="text/css" />
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.command-binary.css" rel="stylesheet" type="text/css" />
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.command-range.css" rel="stylesheet" type="text/css" />
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.command-trigger.css" rel="stylesheet" type="text/css" />
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.info-number.css" rel="stylesheet" type="text/css" />
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-page-section.css" rel="stylesheet" type="text/css" />
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-dialog.css" rel="stylesheet" type="text/css" />
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/page-home.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block js_include %}
-    <script type="text/javascript" src="/design/js/page-home.js"></script>
+    <script type="text/javascript" src="/design/js/jquery.timers-1.2.js"></script>
+    <script type="text/javascript" src="/design/js/jquery.ba-dotimeout.min.js"></script>
+	<script type="text/javascript" src="/design/js/jquery.flot.js"></script>
+    <script type="text/javascript" src="/design/js/ui.processing.js"></script>
+    <script type="text/javascript" src="/design/js/dmg.jquery-subclass.js"></script>
+    <script type="text/javascript" src="/design/js/dmg.widget-common.js"></script>
+    <script type="text/javascript" src="/design/js/dmg.command-binary.js"></script>
+    <script type="text/javascript" src="/design/js/dmg.command-range.js"></script>
+    <script type="text/javascript" src="/design/js/dmg.command-trigger.js"></script>
+    <script type="text/javascript" src="/design/js/dmg.info-number.js"></script>
 {% endblock %}
 {% block js_script %}
+    $(function() {
+        {% for association in house_features_associations %}
+            {% ifequal association.device_type_feature.feature_type "actuator" %}
+                {% get_command_widget association %}
+                {% get_command_init association %}
+            {% endifequal %}
+            {% ifequal association.device_type_feature.feature_type "sensor" %}
+                {% get_info_widget association %}
+                {% get_info_init association %}
+            {% endifequal %}
+        {% endfor %}
+
+        {% if house_features_associations %}
+            {% regroup house_features_associations|dictsort:"device_id" by device as devices %}
+            var devices = [{% for device in devices %}{{ device.grouper.id }}{% if not forloop.last %},{% endif %}{% endfor %}];
+            $.eventRequest(devices, function(event) {
+                switch(event.device_id) {
+                {% regroup house_features_associations|dictsort:"device_id" by device as devices %}
+                {% for device in devices %}
+                    case {{ device.grouper.id }}:
+                        $.each(event.data, function(index, item) {
+                            switch (item.key) {                        
+                            {% for association in device.list %}
+                                case '{{ association.device_type_feature.stat_key }}':
+                                    {% ifequal association.device_type_feature.feature_type "actuator" %}
+                                        {% get_command_update association 'item.value' %}
+                                    {% endifequal %}
+                                    {% ifequal association.device_type_feature.feature_type "sensor" %}
+                                        {% get_info_update association 'item.value' %}
+                                    {% endifequal %}                            
+                                    break;
+                            {% endfor %}                    
+                            }
+                        });
+                        break;
+                {% endfor %}
+                }
+            });
+        {% endif %}
+    });
 {% endblock %}
 {% block content %}
-    <header id="contentheader">
         <!--div id="general-temp">
             <div class="widget">
                 <div id="general-tempcurrent">9&deg;</div>
@@ -46,29 +103,33 @@
             <span id="general-date">{% now "l j F Y" %}</span>
             <span id="general-time">{% now "H:i" %}</span>
         </div-->
-        
-            <h1 class="ident icon64-house-default"><span class="title">{{ house.name }}</span></h1>
-            <!--ul class="general-infos">
-                <li class="icon16-device-electricity">150 Kw/h</li>
-                <li class="icon16-device-water">1,7 l/h</li>
-            </ul>
-            <ul class="general-infos">
-                <li class="icon16-device-message">1 message</li>
-                <li class="icon16-device-notification">2 notifications</li>
-                <li class="icon16-device-error">Pas d'erreur</li>
-            </ul-->
-    </header>
-    <dl>
+    <div class="columnleft">
+        <section id="mainsection">
+            <header id="contentheader"><h1 class="ident icon64-house-default"><span class="title">{{ house.name }}</span></h1></header>
+            <div class='mainactions'>
+                <ul>
+                </ul>
+            </div>
+            <div class='actions'>
+                <ul>
+                    {% for association in house_features_associations %}
+                        <li><div id="widget_{{ association.device_id }}_{{ association.device_type_feature_id }}"></div></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </section>
+    </div>
+    <div class="columnright">
     {% for area in areas_list %}
         <ul class='areaslist'>
             <li class='areaitem'>
-                <a href='{% url show_area_view area.id %}' class="ident icon64-area-{{ area.config.icon }}">
+                <a href='{% url show_area_view area.id %}' class="identelement icon64-area-{{ area.config.icon }}">
                     <span class="title">{{ area.name }}</span>
                 </a>
                 <ul class='roomslist'>
                     {% for room in area.room %}
                         <li class='roomitem'>
-                            <a href='{% url show_room_view room.id %}' class="ident icon64-room-{{ room.config.icon }}">
+                            <a href='{% url show_room_view room.id %}' class="identelement icon64-room-{{ room.config.icon }}">
                                 <span class="title">{{ room.name }}</span>
                             </a>
                         </li>
@@ -79,5 +140,6 @@
     {% empty %}
         <p>{% trans "No areas or rooms configured yet" %}</p>
     {% endfor %}
-        </dl>
+    </div>
+    <div class='clear'></div>
 {% endblock %}

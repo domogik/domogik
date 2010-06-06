@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-                                                                           
+# -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -36,7 +36,7 @@ Implements
 """
 
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.common.plugin import xPLPlugin, xPLResult
+from domogik.xpl.common.plugin import XplPlugin, XplResult
 from domogik.xpl.lib.teleinfo import TeleInfo
 from domogik.xpl.common.queryconfig import Query
 
@@ -45,7 +45,7 @@ DOMOGIK_PLUGIN_TECHNOLOGY = "service"
 DOMOGIK_PLUGIN_DESCRIPTION = "Get power consumption with teleinfo"
 DOMOGIK_PLUGIN_VERSION = "0.1"
 DOMOGIK_PLUGIN_DOCUMENTATION_LINK = "http://wiki.domogik.org/tiki-index.php?page=plugins/Teleinfo"
-DOMOGIK_PLUGIN_CONFIGURATION=[
+DOMOGIK_PLUGIN_CONFIGURATION = [
       {"id" : 0,
        "key" : "startup-plugin",
        "type" : "boolean",
@@ -62,7 +62,7 @@ DOMOGIK_PLUGIN_CONFIGURATION=[
        "description" : "Interval between each request (seconds)",
        "default" : 60}]
 
-class TeleinfoManager(xPLPlugin):
+class TeleinfoManager(XplPlugin):
     '''
     Manage the Téléinfo stuff and connect it to xPL
     '''
@@ -71,12 +71,12 @@ class TeleinfoManager(xPLPlugin):
         '''
         Start teleinfo device handler
         '''
-        xPLPlugin.__init__(self, name='teleinfo')
+        XplPlugin.__init__(self, name='teleinfo')
         self._config = Query(self._myxpl)
-        res = xPLResult()
+        res = XplResult()
         self._config.query('teleinfo', 'device', res)
         device = res.get_value()['device']
-        res = xPLResult()
+        res = XplResult()
         self._config.query('teleinfo', 'interval', res)
         interval = res.get_value()['interval']
         self._device = device

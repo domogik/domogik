@@ -1,16 +1,52 @@
-/* Banner */
-.widget {
-    width:248px;
-    float:right;
-    border:2px solid #ccc;
-    text-align:left;
-    -moz-border-radius: 0.8em;
-    -webkit-border-radius: 0.8em;
-    background-color:#FCFCFC;
-    padding:4px;
-    margin:35px 4px;
+.columnleft {
+    float:left;
+    width: 30em;
 }
 
+.columnright {
+    margin-left: 30em;
+}
+
+
+header#contentheader {
+	-moz-border-radius: 0.8em 0 0 0;
+    -webkit-border-radius: 0.8em 0 0 0;
+    border-right: #979387 1px solid;
+}
+
+#mainsection {
+    margin:0;
+    -moz-box-shadow: 1px 0 5px #000000;
+    -webkit-box-shadow: 1px 0 5px #000000;
+}
+
+/* Actions section */
+
+#mainsection .mainactions {
+    margin:0;
+    padding:1em;
+    background-color:#eeeeee;
+    height:6em;
+    border-right: #979387 1px solid;
+    text-align:center;
+}
+
+#mainsection .mainactions ul > li, #mainsection .actions ul > li {
+    display:inline-block;
+}
+
+#mainsection .actions {
+    margin:0;
+    padding:1em;
+    background-color:#eeeeee;
+    min-height:40em;
+    border-right: #979387 1px solid;
+    border-top: #cccccc 1px dashed;
+	-moz-border-radius: 0 0 0 0.8em;
+    -webkit-border-radius: 0 0 0 0.8em;
+}
+
+/*
 #general-temp {
     width:264px;
     float:right;
@@ -48,60 +84,67 @@
     float:right;
     margin-top:1em;
 }
-/* General box */
+*/
 
-#general {
-    text-align:center;
+
+/* Area/room list */
+
+a.identelement:hover, a.identelement:focus {
+    background-color: #ffffff !important;
+    color:#000000 !important;
 }
 
-.general-infos {
-    list-style:none;
-}
-
-.general-infos li {
-    display:inline;
-    margin-left:1em;
-    padding-left:20px;
-}
-
-.general-infos li {
-  background-position:top left;
-  background-repeat:no-repeat;
-}
-
-
-
-.ident {
+a.identelement {
     background-position: 5px 5px;
     background-repeat:no-repeat;
     min-height: 64px;
-    min-width:15em;
-    font-size:1em;
+    width:150px;
     padding:0.5em 0 0 70px;
     display:inline-block;
+    font-size:1.4em;
+    color:#000000;
     text-decoration:none;
 }
 
-ul.areaslist, ul.roomslist {
-    list-style:none;
+li.areaitem > a.identelement {
+    border-right: 1px solid #979387;
+    border-bottom: 1px solid #979387;
+    -moz-border-radius: 0.8em 0 0.8em 0;
+    -webkit-border-radius: 0.8em 0 0.8em 0;
     margin:0;
-    padding:0;
+    position:absolute;
+    background-color:#403E3F;
+    color:#ffffff;
+}
+
+li.roomitem > a.identelement {
+    border: 1px solid #979387;
+    -moz-border-radius: 0.8em;
+    -webkit-border-radius: 0.8em;
+    margin:1em;
+    background-color:#BDCB2F;
+}
+
+ul.areaslist {
+    position:relative;
+}
+
+ul.roomslist {
+    display:inline-block;
+    margin-left:240px;
 }
 
 li.areaitem {
     background-color:#eeeeee;
     margin:1em;
+    padding:0;
     border: 1px solid #979387;
     -moz-border-radius: 0.8em;
     -webkit-border-radius: 0.8em;
     display:block;
+    min-height: 8em;
 }
 
 li.roomitem {
-    background-color:#eeeeee;
-    margin:1em;
-    border: 1px solid #979387;
-    -moz-border-radius: 0.8em;
-    -webkit-border-radius: 0.8em;
     display:inline-block;
 }

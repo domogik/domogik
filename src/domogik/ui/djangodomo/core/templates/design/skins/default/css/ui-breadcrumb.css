@@ -10,7 +10,7 @@
 
 .breadcrumb li {
     display: inline-block;
-    background: transparent url(../images/decoration/breadcrumb_separator.gif) right center no-repeat;
+    background: transparent url(../images/decoration/breadcrumb_separator_right.gif) right center no-repeat;
     padding-right: 15px;
     padding-left: 10px;
 }
@@ -27,10 +27,30 @@
     padding-left: 20px;
 }
 
-.breadcrumb li a.home {
+.breadcrumb li a.house {
     background-image: url(../images/home.gif);
 }
 
+.breadcrumb li a.homepage {
+    background-image: url(../../../images/logo_domogik_mini.png);
+    width:40px;
+    padding:0;
+}
+
 .breadcrumb li a:hover, .breadcrumb li a:focus, .breadcrumb li a:active  {
-    color:#9BB528;  
+    color:#9BB528;
+}
+
+.breadcrumb li#showmenu {
+    float:right;
+    background: transparent url(../images/decoration/breadcrumb_separator_left.gif) left center no-repeat;
+    padding-right: 10px;
+    padding-left: 15px;
+}
+
+.breadcrumb li#customize {
+    float:right;
+    background: transparent url(../images/decoration/breadcrumb_separator_left.gif) left center no-repeat;
+    padding-right: 10px;
+    padding-left: 15px;
 }

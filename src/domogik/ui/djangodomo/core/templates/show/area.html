@@ -76,7 +76,7 @@
 {% block title %}{% trans page_title %}{% endblock %}
 
 {% block breadcrumb %}
-	<li><a href='{% url show_view %}' class='home'>{{ house.name|default:'House' }}</a></li>
+	<li><a href='{% url show_view %}' class='house'>{{ house.name|default:'House' }}</a></li>
 {% endblock %}
 
 {% block banner %}

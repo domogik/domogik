@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-                                                                           
+# -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -37,7 +37,7 @@ Implements
 """
 
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.common.plugin import xPLPlugin, xPLResult, xPLTimer
+from domogik.xpl.common.plugin import XplPlugin, XplResult, XplTimer
 from domogik.xpl.lib.onewire import OneWire
 from domogik.xpl.common.queryconfig import Query
 import threading
@@ -50,7 +50,7 @@ DOMOGIK_PLUGIN_TECHNOLOGY = "onewire"
 DOMOGIK_PLUGIN_DESCRIPTION = "Manage 1 wire devices"
 DOMOGIK_PLUGIN_VERSION = "0.1"
 DOMOGIK_PLUGIN_DOCUMENTATION_LINK = "TODO"
-DOMOGIK_PLUGIN_CONFIGURATION=[
+DOMOGIK_PLUGIN_CONFIGURATION = [
       {"id" : 0,
        "key" : "startup-plugin",
        "type" : "boolean",
@@ -63,8 +63,7 @@ DOMOGIK_PLUGIN_CONFIGURATION=[
        "default" : TEMP_DELAY}]
 
 
-
-class OneWireTemp(xPLPlugin):
+class OneWireTemp(XplPlugin):
     '''
     Manage the One-Wire stuff and connect it to xPL
     '''
@@ -73,9 +72,9 @@ class OneWireTemp(xPLPlugin):
         '''
         Starts some timers to check temperature
         '''
-        xPLPlugin.__init__(self, name='onewire')
+        XplPlugin.__init__(self, name='onewire')
         self._config = Query(self._myxpl)
-        res = xPLResult()
+        res = XplResult()
         self._config.query('onewire', 'temp-refresh', res)
         temp_delay = res.get_value()['temp-refresh']
         if temp_delay == "None":
@@ -83,7 +82,7 @@ class OneWireTemp(xPLPlugin):
         self._myow = OneWire()
         self._myow.set_cache_use(False)
         stop = threading.Event()
-        t_temp = xPLTimer(float(temp_delay), self._gettemp, stop, self._myxpl)
+        t_temp = XplTimer(float(temp_delay), self._gettemp, stop, self._myxpl)
         t_temp.start()
 
     def _gettemp(self):
@@ -96,7 +95,7 @@ class OneWireTemp(xPLPlugin):
             my_temp_message.set_schema("sensor.basic")
             my_temp_message.add_data({"device" :  _id})
             #type should be the model of the o1wire component.
-            #Anyway, because we need a way to determine which is the 
+            #Anyway, because we need a way to determine which is the
             #technology of the device, we use it with value 'onewire'
             my_temp_message.add_data({"type" :  "onewire"})
             my_temp_message.add_data({"current" :  _val})

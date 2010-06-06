@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-                                                                           
+# -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -43,11 +43,11 @@ Implements
 import traceback
 
 from domogik.xpl.common.xplconnector import Listener
-from domogik.xpl.common.plugin import xPLPlugin
+from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.common.database import DbHelper
 
-class DBConnector(xPLPlugin):
+class DBConnector(XplPlugin):
     '''
     Manage the connection between database and the xPL stuff
     Should be the *only* object with StatsManager to access the database in the core side
@@ -57,13 +57,11 @@ class DBConnector(xPLPlugin):
         '''
         Initialize database and xPL connection
         '''
-        xPLPlugin.__init__(self, 'dbmgr')
+        XplPlugin.__init__(self, 'dbmgr')
         self._log = self.get_my_logger()
         self._log.debug("Init database_manager instance")
-        
-        self._db = DbHelper()
-        Listener(self._request_config_cb, self._myxpl,
-                {'schema': 'domogik.config', 'xpltype': 'xpl-cmnd'})
+
+        Listener(self._request_config_cb, self._myxpl, {'schema': 'domogik.config', 'xpltype': 'xpl-cmnd'})
 
     def _request_config_cb(self, message):
         '''
@@ -71,6 +69,7 @@ class DBConnector(xPLPlugin):
         @param message : the xPL message
         '''
         #try:
+        self._db = DbHelper()
         techno = message.data['technology']
         hostname = message.data['hostname']
         key = message.data['key']
@@ -79,25 +78,20 @@ class DBConnector(xPLPlugin):
         else:
             element = None
         if not key:
-            self._log.debug("New request config received for %s :\
-                    asked for all config items" % (techno))
+            self._log.debug("New request config received for %s : asked for all config items" % (techno))
         else:
-            self._log.debug("New request config received for %s : %s" % (techno,
-            key))
+            self._log.debug("New request config received for %s : %s" % (techno, key))
         if element:
-            self._send_config(techno, hostname, key, self._fetch_elmt_config(techno,
-            element, key), element)
+            self._send_config(techno, hostname, key, self._fetch_elmt_config(techno, element, key), element)
         else:
             if not key:
                 keys = self._fetch_techno_config(techno, hostname, key).keys()
                 values = self._fetch_techno_config(techno, hostname, key).values()
                 self._send_config(techno, hostname, keys, values)
-                
             else:
-                self._send_config(techno, hostname, key, self._fetch_techno_config(techno, hostname,
-                key))
+                self._send_config(techno, hostname, key, self._fetch_techno_config(techno, hostname, key))
         #except KeyError:
-         #   self._log.warning("A request for configuration has been received, but it was misformatted")
+        #    self._log.warning("A request for configuration has been received, but it was misformatted")
 
     def _send_config(self, technology, hostname, key, value, element = None):
         '''
@@ -116,13 +110,13 @@ class DBConnector(xPLPlugin):
         mess.add_data({'hostname' :  hostname})
         if element:
             mess.add_data({'element' :  element})
-        #If key/value are lists, then we add a key=value for each item
+        # If key/value are lists, then we add a key=value for each item
         if isinstance(key, list):
             for (_key, _val) in zip(key, value):
                 mess.add_data({_key :  _val})
         else:
             mess.add_data({key :  value})
-#        mess.set_conf_key('target', plugin)
+        # mess.set_conf_key('target', plugin)
         self._myxpl.send(mess)
 
     def _fetch_elmt_config(self, techno, element, key):
@@ -135,8 +129,7 @@ class DBConnector(xPLPlugin):
         #TODO : use the database
         vals = {'x10': {'a3': {},
                         'a2': {},
-                        }
-
+                       }
                 }
         return vals[techno][element][key]
 
@@ -147,14 +140,13 @@ class DBConnector(xPLPlugin):
         @param hostname : hostname
         @param key : the key of the config tuple to fetch
         '''
-        #Get technology id 
-
-        #This array is here for information only but is not used anymore
-        #Values are now on the database
+        # This array is here for information only but is not used anymore
+        # Values are now on the database
+        print "****** key = %s" % key
         vals = {'x10': {'heyu-cfg-path':'/etc/heyu/x10.conf',
-            'heyu-file-0': 'TTY /dev/ttyUSB0',
-            'heyu-file-1': 'TTY_AUX /dev/ttyUSB0 RFXCOM',
-            'heyu-file-2': 'ALIAS back_door D5 DS10A 0x677'},
+                        'heyu-file-0': 'TTY /dev/ttyUSB0',
+                        'heyu-file-1': 'TTY_AUX /dev/ttyUSB0 RFXCOM',
+                        'heyu-file-2': 'ALIAS back_door D5 DS10A 0x677'},
                 'global': {'pid-dir-path': '/tmp/'},
                 'onewire': {'temperature_refresh_delay' : '10'},
                 'cidmodem': {'device' : '/dev/ttyUSB1',
@@ -163,7 +155,7 @@ class DBConnector(xPLPlugin):
                 'mirror': {'device' : '/dev/hidraw0',
                            'nbmaxtry' : '10',
                            'interval' : '15'},
-                'xbmc_not': {'address' : '192.168.0.20:8080', 
+                'xbmc_not': {'address' : '192.168.0.20:8080',
                          'delay' : '15',
                          'maxdelay' : '20'},
                 'gagenda': {'email' : "fritz.smh@gmail.com",

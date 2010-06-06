@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-                                                                           
+# -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -38,7 +38,7 @@ Implements
 """
 
 from domogik.xpl.common.xplconnector import Listener
-from domogik.xpl.common.plugin import xPLPlugin, xPLResult
+from domogik.xpl.common.plugin import XplPlugin, XplResult
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.lib.plcbus import PLCBUSAPI
 from domogik.xpl.common.queryconfig import Query
@@ -48,7 +48,7 @@ DOMOGIK_PLUGIN_TECHNOLOGY = "plcbus"
 DOMOGIK_PLUGIN_DESCRIPTION = "Manage Plcbus devices"
 DOMOGIK_PLUGIN_VERSION = "0.1"
 DOMOGIK_PLUGIN_DOCUMENTATION_LINK = "http://wiki.domogik.org/tiki-index.php?page=plugins/Plcbus"
-DOMOGIK_PLUGIN_CONFIGURATION=[
+DOMOGIK_PLUGIN_CONFIGURATION = [
       {"id" : 0,
        "key" : "startup-plugin",
        "type" : "boolean",
@@ -58,11 +58,14 @@ DOMOGIK_PLUGIN_CONFIGURATION=[
        "key" : "device",
        "type" : "string",
        "description" : "Plcbus device (ex : TODO )",
-       "default" : "/dev/ttyUSB0"}]
+       "default" : "/dev/ttyUSB0"},
+      {"id" : 2,
+        "key" : "usercode",
+        "description" : "Usercode value (between 00 and FF), defaults to FF",
+        "default" : "FF"}]
 
 
-
-class PlcBusMain(xPLPlugin):
+class PlcBusMain(XplPlugin):
     ''' Manage PLCBus technology, send and receive order/state
     '''
 
@@ -72,17 +75,17 @@ class PlcBusMain(xPLPlugin):
         This class is used to connect PLCBUS to the xPL Network
         '''
         # Load config
-        xPLPlugin.__init__(self, name = 'plcbus')
+        XplPlugin.__init__(self, name = 'plcbus')
         self._config = Query(self._myxpl)
         # Create listeners
         Listener(self._plcbus_cmnd_cb, self._myxpl, {
             'schema': 'plcbus.basic',
             'xpltype': 'xpl-cmnd',
         })
-        res = xPLResult()
+        res = XplResult()
         self._config.query('plcbus', 'device', res)
         device = res.get_value()['device']
-        self.api = PLCBUSAPI(device, self._command_cb, self._message_cb) 
+        self.api = PLCBUSAPI(device, self._command_cb, self._message_cb)
         # Create log instance
         self._log = self.get_my_logger()
 
@@ -98,7 +101,7 @@ class PlcBusMain(xPLPlugin):
         if 'command' in message.data:
             cmd = message.data['command']
         if 'device' in message.data:
-            dev = message.data['device']
+            dev = message.data['device'].upper()
         if 'usercode' in message.data:
             user = message.data['usercode']
         if 'data1' in message.data:
@@ -121,8 +124,8 @@ class PlcBusMain(xPLPlugin):
         mess.set_type('xpl-trig')
         mess.set_schema('plcbus.basic')
         mess.add_data({"usercode" : f["d_user_code"], "device": f["d_home_unit"],
-            "command": f["d_command"], "data1": f["d_data1"], "data2": f["d_data2"]})
-        self._myxpl.send(mess) 
+                       "command": f["d_command"], "data1": f["d_data1"], "data2": f["d_data2"]})
+        self._myxpl.send(mess)
 
     def _message_cb(self, message):
         print "Message : %s " % message

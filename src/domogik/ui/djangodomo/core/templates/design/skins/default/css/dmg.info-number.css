@@ -6,7 +6,10 @@
     width:45px;
 }
 
-.widget_mini.info_number .widget_state {
+.widget_mini.info_number .status {
     height:14px;
-    width:15px;    
+    width:15px;
+    padding:0;
+    background-position: center center; 
+    background-repeat: no-repeat; 
 }

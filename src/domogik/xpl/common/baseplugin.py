@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-                                                                           
+# -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -43,22 +43,22 @@ from domogik.common.daemonize import createDaemon
 
 class BasePlugin():
     """ Basic plugin class, manage common part of all plugins.
-    For all xPL plugins, the xPLPlugin class must be use as a basis, not this one.
+    For all xPL plugins, the XplPlugin class must be use as a basis, not this one.
     This class is a Singleton
     """
 
-    __instance = None 
+    __instance = None
 
     def __init__(self, name = None, stop_cb = None, parser = None, daemonize = True):
-        """ @param name : Name of current plugin 
+        """ @param name : Name of current plugin
             @param parser : An instance of OptionParser. If you want to add extra options to the generic option parser,
             create your own optionparser instance, use parser.addoption and then pass your parser instance as parameter.
             Your options/params will then be available on self.options and self.params
-            @param daemonize : If set to False, force the instance *not* to daemonize, even if '-f' is not passed 
+            @param daemonize : If set to False, force the instance *not* to daemonize, even if '-f' is not passed
             on the command line. If set to True (default), will check if -f was added.
         """
         if BasePlugin.__instance is None:
-            BasePlugin.__instance = BasePlugin.__Singl_BasePlugin(name, stop_cb, parser, daemonize)
+            BasePlugin.__instance = BasePlugin.__SinglBasePlugin(name, stop_cb, parser, daemonize)
 
     def __getattr__(self, attr):
         """ Delegate access to implementation """
@@ -71,14 +71,14 @@ class BasePlugin():
         """ Delegate access to implementation """
         return setattr(self.__instance, attr, value)
 
-    class __Singl_BasePlugin:
+    class __SinglBasePlugin:
 
         def __init__(self, name, stop_cb = None, p = None, daemonize = True):
             ''' singleton instance
             @param p : An instance of OptionParser. If you want to add extra options to the generic option parser,
             create your own optionparser instance, use parser.addoption and then pass your parser instance as parameter.
             Your options/params will then be available on self.options and self.params
-            @param daemonize : If set to False, force the instance *not* to daemonize, even if '-f' is not passed 
+            @param daemonize : If set to False, force the instance *not* to daemonize, even if '-f' is not passed
             on the command line. If set to True (default), will check if -f was added.
             '''
             print "create Base plugin instance"
@@ -87,7 +87,7 @@ class BasePlugin():
             else:
                 parser = OptionParser()
             parser.add_option("-f", action="store_true", dest="run_in_foreground", default=False, \
-                    help="Run the plugin in foreground, default to background.")
+                              help="Run the plugin in foreground, default to background.")
             (self.options, self.args) = parser.parse_args()
             if not self.options.run_in_foreground and daemonize:
                 createDaemon()
@@ -144,7 +144,7 @@ class BasePlugin():
             @param thread : the thread to add
             '''
             self._lock_add_thread.acquire()
-           # self._log.debug('New thread registered : %s' % thread)
+            # self._log.debug('New thread registered : %s' % thread)
             self._threads.append(thread)
             self._lock_add_thread.release()
 
@@ -194,5 +194,3 @@ class BasePlugin():
 
         def __del__(self):
             self._log.debug("__del__ baseplugin")
-
-

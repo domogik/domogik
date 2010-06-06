@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-                                                                           
+# -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -44,13 +44,8 @@ Implements
 @organization: Domogik
 """
 
-import sys
-import serial
-
-from struct import *
-from time import localtime, strftime
 from domogik.common import logger
-from domogik.xpl.lib.PLCBusSerialHandler import *
+from domogik.xpl.lib.PLCBusSerialHandler import serialHandler
 
 
 class PLCBUSException:
@@ -62,7 +57,7 @@ class PLCBUSException:
         self.value = value
 
     def __str__(self):
-        return self.repr(self.value)
+        return repr(self.value)
 
 
 class PLCBUSAPI:
@@ -72,12 +67,14 @@ class PLCBUSAPI:
     '''
 
     def __init__(self, serial_port_no, command_cb, message_cb):
-        """ Main PLCBus manager 
+        """ Main PLCBus manager
         Use serialHandler for low-level serial management
-        @param serial_port_no : Number or path of the serial port 
+        @param serial_port_no : Number or path of the serial port
         @param command_cb: callback called when a command has been succesfully sent
         @param message_cb: called when a message is received from somewhere else on the network
         """
+        log = logger.Logger(self.__class__.__name__)
+        self._log = log.get_logger()
         #For these 2 callbacks, the param is sent as an array
         self._housecodes = list('ABCDEFGHIJKLMNOP')
         self._valuecode = enumerate(self._housecodes)
@@ -107,9 +104,9 @@ class PLCBUSAPI:
             'SCENE_ADR_SETUP': '12',
             'SCENE_ADR_ERASE': '13',
             'ALL_SCENES_ADD_ERASE': '34',
-            'FOR FUTURE': '15',
-            'FOR FUTURE': '16',
-            'FOR FUTURE': '17',
+            #'FOR FUTURE': '15',
+            #'FOR FUTURE': '16',
+            #'FOR FUTURE': '17',
             'GET_SIGNAL_STRENGTH': '18',
             'GET_NOISE_STRENGTH': '19',
             'REPORT_SIGNAL_STREN': '1a',
@@ -142,8 +139,7 @@ class PLCBUSAPI:
             if house[0] not in self._housecodes:
                 raise AttributeError
         except:
-            self._log.warning("Invalid house %s, must be 'H' format, between "
-                    "A and P" % house[0].upper())
+            self._log.warning("Invalid house %s, must be 'H' format, between A and P" % house[0].upper())
 
     def _valid_usercode(self, item):
         '''
@@ -155,8 +151,7 @@ class PLCBUSAPI:
             if not (h in self._usercodes and int(u) in self._usercodes):
                 raise AttributeError
         except:
-            self._log.warning("Invalid user code %s, must be 'H' format, "
-                    "between 00 and FF" % h)
+            self._log.warning("Invalid user code %s, must be 'H' format, between 00 and FF" % h)
 
     def _convert_device_to_hex(self, item):
         var1 = int(item[1:]) - 1
@@ -185,7 +180,7 @@ class PLCBUSAPI:
         # TODO : test on ALL_USER_UNIT_OFF
         #try:
         try:
-            command=self._cmdplcbus[cmd]
+            command = self._cmdplcbus[cmd]
         except KeyError:
             print "PLCBUS Frame generation error, command does not exist ", cmd
         else:
@@ -198,8 +193,7 @@ class PLCBUSAPI:
             try:
                 message = plcbus_frame.decode('HEX')
             except TypeError:
-                print "PLCBUS Frame generation error, does not result in a "\
-                        "HEX string ", plcbus_frame
+                print "PLCBUS Frame generation error, does not result in a HEX string ", plcbus_frame
             else:
                 self._ser_handler.add_to_send_queue(plcbus_frame)
 
@@ -210,12 +204,12 @@ class PLCBUSAPI:
         FF)
         @param housecode : one or more housecodes
         '''
-        onlist=[]
+        onlist = []
         self.send("GET_ALL_ON_ID_PULSE", housecode + "1", usercode)
-        response=self._ser_handler.get_from_answer_queue()
+        response = self._ser_handler.get_from_answer_queue()
         if(response):
             print "Hoora response received", response
-            data=int(response[10:14], 16)
+            data = int(response[10:14], 16)
             for i in range(0, 16):
                 if data >> i & 1:
                     onlist.append(housecode + str(self._unitcodes[i]))
@@ -231,16 +225,16 @@ class PLCBUSAPI:
 #a = PLCBUSAPI("/dev/ttyUSB0")
 ##a.get_all_on_id("00","B")
 #print "--------------ON------------------"
-#a.send("ON", "B2", "00") 
+#a.send("ON", "B2", "00")
 #time.sleep(3)
 #print "--------------STATUS------------------"
-#a.send("STATUS_REQUEST", "B2", "00") 
+#a.send("STATUS_REQUEST", "B2", "00")
 #time.sleep(3)
 #print "----------------OFF----------------"
-#a.send("OFF", "B2", "00") 
+#a.send("OFF", "B2", "00")
 #time.sleep(3)
 #print "---------------STATUS-----------------"
-#a.send("STATUS_REQUEST", "B2", "00") 
+#a.send("STATUS_REQUEST", "B2", "00")
 #time.sleep(3)
 ##print "---------------BRIGHT-----------------"
 ##a.send("BRIGHT", "B2", "00", "100","100")
@@ -249,7 +243,7 @@ class PLCBUSAPI:
 ##a.send("DIM", "B2", "00", "50","0")
 ##time.sleep(3)
 #print "---------------STATUS-----------------"
-#a.send("STATUS_REQUEST", "B2", "00") 
+#a.send("STATUS_REQUEST", "B2", "00")
 #time.sleep(5)
 #a.stop()
 #

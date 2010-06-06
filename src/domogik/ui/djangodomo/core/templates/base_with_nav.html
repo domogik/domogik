@@ -43,11 +43,12 @@
 <script type="text/javascript" src="/design/js/jquery-ui-1.8.custom.min.js"></script>
 <script type="text/javascript" src="/design/js/jquery.qtip-1.0.0-rc3.min.js"></script>
 <script type="text/javascript" src="/design/js/jquery.jgrowl_minimized.js"></script>
-<script type="text/javascript" src="/design/js/jquery.jsonp-1.1.4.min.js"></script>
+<script type="text/javascript" src="/design/js/jquery.jsonp-2.0.2.min.js"></script>
 <script type="text/javascript" src="/design/js/main.js"></script>
 <script type="text/javascript" src="/design/js/dmg.rest.js"></script>
 <script type="text/javascript" src="/design/js/ui.icons.js"></script>
 <script type="text/javascript" src="/design/js/dmg.notifications.js"></script>
+<script type="text/javascript" src="/design/js/dmg.browser.js"></script>
 
 {% block global_js_include %}{% endblock %}
 {% block js_include %}{% endblock %}
@@ -85,10 +86,8 @@
         </ul>
     </nav>
     <div id="content-bgnd"> 
-        <section id="mainsection">
-            {% block content %}{% endblock %}
-        </section>
-        <footer>Copyright 2010 Domogik project - GNU/GPL v3 license</footer>
+        {% block content %}{% endblock %}
     </div>
+    <footer>Copyright 2010 Domogik project - GNU/GPL v3 license</footer>
 </body>
 </html>

@@ -42,16 +42,23 @@
 <script type="text/javascript" src="/design/js/jquery-ui-1.8.custom.min.js"></script>
 <script type="text/javascript" src="/design/js/jquery.qtip-1.0.0-rc3.min.js"></script>
 <script type="text/javascript" src="/design/js/jquery.jgrowl_minimized.js"></script>
-<script type="text/javascript" src="/design/js/jquery.jsonp-1.1.4.min.js"></script>
+<script type="text/javascript" src="/design/js/jquery.jsonp-2.0.2.min.js"></script>
 <script type="text/javascript" src="/design/js/main.js"></script>
 <script type="text/javascript" src="/design/js/dmg.rest.js"></script>
 <script type="text/javascript" src="/design/js/ui.icons.js"></script>
 <script type="text/javascript" src="/design/js/dmg.notifications.js"></script>
+<script type="text/javascript" src="/design/js/dmg.browser.js"></script>
 
 {% block global_js_include %}{% endblock %}
 {% block js_include %}{% endblock %}
 <script type="text/javascript">
     // <![CDATA[
+    $(function(){ 
+        $("#mainbar").hide();
+        $("li#showmenu").click(function(){
+            $("#mainbar").toggle(500);        
+        });
+    });
     {% block js_script %}{% endblock %}
     {% if status %}
         $(function(){ 
@@ -64,9 +71,6 @@
 </head>
 <body>
     <div id="mainbar">
-        <header id="mainheader">
-            <a href="/domogik" id='logo'><img src="/design/images/logo_domogik_mini.png" alt="Domogik logo" /></a>
-        </header>
         <nav id="nav1">
             <ul>
                 <li><a href="{% url show_view %}" class="{{ nav1_show_class }}">{% trans "Visualization" %}</a></li>
@@ -84,7 +88,12 @@
             </ul>
         </nav>
     </div>
-	<ul class="breadcrumb">{% block breadcrumb %}{% endblock %}</ul>
+	<ul class="breadcrumb">
+        	<li><a href='{% url index_view %}' class='homepage'>&nbsp;<span class='offscreen'>Domogik homepage</span></a></li>
+            {% block breadcrumb %}{% endblock %}
+        	<li id='customize'><a href='#' class='icon16-action-customize'>Customize</a></li>
+        	<li id='showmenu'><a href='#' class='icon16-action-menu'>Menu</a></li>
+    </ul>
 	<div id="content-bgnd">
         <div class="columnleft">
             <section id="mainsection">

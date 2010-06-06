@@ -85,6 +85,8 @@ def index(request):
         result_all_areas.merge_rooms()
         result_all_areas.merge_uiconfig()
         result_house = UIConfigs.get_general('house')
+        result_house_features_associations = FeatureAssociations.get_by_house()
+
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
     """
@@ -95,7 +97,8 @@ def index(request):
     return __go_to_page(request, 'index.html',
         page_title,
         areas_list=result_all_areas.area,
-        house=result_house
+        house=result_house,
+        house_features_associations=result_house_features_associations.feature_association
     )
 
 def login(request):
@@ -157,112 +160,6 @@ def logout(request):
     """
     request.session.clear()
     return index(request)
-
-def admin_index(request):
-    """
-    Method called when the admin page is accessed
-    @param request : HTTP request
-    @return an HttpResponse object
-    """
-    if not __is_user_admin(request):
-        return index(request)
-    page_title = _("Admin page")
-    return __go_to_page(request, 'admin/index.html', page_title)
-
-def admin_management_domogik(request):
-    """
-    Method called when the admin domogik management page is accessed
-    @param request : HTTP request
-    @return an HttpResponse object
-    """
-    if not __is_user_admin(request):
-        return index(request)
-    simulation_mode = ""
-    admin_mode = ""
-    debug_mode = ""
-    page_title = _("Gestion de Domogik")
-    action = "index"
-    sys_config = __db.get_system_config()
-    if sys_config.simulation_mode:
-        simulation_mode = "checked"
-    if __is_user_admin(request):
-        admin_mode = "checked"
-    if sys_config.debug_mode:
-        debug_mode = "checked"
-    return __go_to_page(request, __ADMIN_MANAGEMENT_DOMOGIK, page_title,
-                       action=action, simulation_mode=simulation_mode,
-                       admin_mode=admin_mode, debug_mode=debug_mode)
-
-def save_admin_settings(request):
-    """
-    Save the administrator settings (admin, debug and simulation mode
-    @param request : HTTP request
-    @return an HttpResponse object
-    """
-    if not __is_user_admin(request):
-        return index(request)
-
-    if request.method == 'POST':
-        simulation_mode = QueryDict.get(request.POST, "simulation_mode", False)
-        admin_mode = QueryDict.get(request.POST, "admin_mode", False)
-        debug_mode = QueryDict.get(request.POST, "debug_mode", False)
-        __db.update_system_config(s_simulation_mode=simulation_mode,
-                                 s_debug_mode=debug_mode)
-    return admin_management_domogik(request)
-
-def load_sample_data(request):
-    """
-    Load sample data
-    @param request : HTTP request
-    @return an HttpResponse object
-    """
-    if not __is_user_admin(request):
-        return index(request)
-
-    page_title = _(u"Chargement d'un jeu de données de test")
-    action = "loadSampleData"
-
-    sys_config = __db.get_system_config()
-    if sys_config.simulation_mode != True:
-        error_msg = _("The application is not running in simulation mode : can't load sample data")
-        return __go_to_page(request, __ADMIN_MANAGEMENT_DOMOGIK,
-                            page_title, action=action, error_msg=error_msg)
-
-    sample_data_helper = SampleDataHelper(__db)
-    sample_data_helper.create()
-
-    area_list = __db.list_areas()
-    room_list = __db.list_rooms()
-    device_usage_list = __db.list_device_usages()
-    device_list = __db.list_devices()
-    device_tech_list = __db.list_device_technologies()
-    return __go_to_page(request, __ADMIN_MANAGEMENT_DOMOGIK, page_title,
-                        action=action, area_list=area_list, room_list=room_list,
-                        device_usage_list=device_usage_list,
-                        device_list=device_list, device_tech_list=device_tech_list)
-
-def clear_data(request):
-    """
-    Clear all data of the system (in the database). Please use with care!
-    @param request : HTTP request
-    @return an HttpResponse object
-    """
-    if not __is_user_admin(request):
-        return index(request)
-
-    page_title = _("Remove all data")
-    action = "clearData"
-
-    sys_config = __db.get_system_config()
-    if sys_config.simulation_mode != True:
-        error_msg = _("The application is not running in simulation mode : can't clear data")
-        return __go_to_page(request, __ADMIN_MANAGEMENT_DOMOGIK, page_title,
-                            action=action, error_msg=error_msg)
-
-    sample_data_helper = SampleDataHelper(__db)
-    sample_data_helper.remove()
-    return __go_to_page(request, __ADMIN_MANAGEMENT_DOMOGIK, page_title,
-                        action=action)
 
 def __get_user_connected(request):
     """

@@ -3,7 +3,7 @@
         // default options
         options: {
             widgettype: 'command_binary',
-            nameposition: 'top'
+            nameposition: 'nametop'
         },
 
         _init: function() {
