@@ -241,11 +241,18 @@ def test_init():
             Please copy src/domogik/examples/init/domogik to /etc/init.d or /etc/rc.d depending on your system, and chmod +x /etc/init.d/domogik"
     ok("/etc/init.d/domogik or /etc/rc.d/domogik found with good permissions")
 
+def test_version():
+    info("Check python version")
+    v = sys.version_info()
+    assert v[0] == 2 and v[1] < 6, "Python version is %s.%s, it must be >= 2.6, please upgrade" % (v[0], v[1])
+    ok("Python version is >= 2.6")
+
 try:
     am_i_root()
     test_imports()
     test_config_files()
     test_init()
+    test_version()
     print "\n\n"
     ok("================================================== <==")
     ok(" Everything seems ok, you should be able to start  <==")
