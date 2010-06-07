@@ -20,3 +20,6 @@ MANAGER_PARAMS="-d -r"
 # PATH is needed to locate 1 application :
 #  - xPL_Hub : the xPL hub, *not* installed by setup.py develop
 CUSTOM_PATH=
+
+# Interface where the xpl hub is supposed to listen for
+HUB_IFACE="lo"
