@@ -178,7 +178,7 @@ class Rest(XplPlugin):
             cfg = Loader('domogik')
             config = cfg.load()
             conf = dict(config[1])
-            self._xml_directory = "%s/share/domogik/rest/" % conf['custom_prefix']
+            self._xml_directory = "%s/share/domogik/url2xpl/" % conf['custom_prefix']
     
             # HTTP server ip and port
             try:
@@ -3519,7 +3519,7 @@ class StatsManager(XplPlugin):
         cfg = Loader('domogik')
         config = cfg.load()
         cfg_db = dict(config[1])
-        directory = "%s/share/domogik/listeners/" % cfg_db['custom_prefix']
+        directory = "%s/share/domogik/stats/" % cfg_db['custom_prefix']
 
         # logging initialization
         log = logger.Logger('REST-STAT')
