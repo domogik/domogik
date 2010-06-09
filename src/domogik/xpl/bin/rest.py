@@ -775,6 +775,8 @@ class ProcessRequest():
             self.rest_account()
         elif self.rest_type == "queuecontent":
             self.rest_queuecontent()
+        elif self.rest_type == "terminal":
+            self.rest_terminal()
         elif self.rest_type == "testlongpoll":
             self.rest_testlongpoll()
         elif self.rest_type == None:
@@ -3229,6 +3231,27 @@ target=*
 
 
 
+#####
+# /terminal processing
+#####
+
+    def rest_terminal(self):
+        print "Terminal action"
+
+        json_data = JSonHelper("OK")
+        json_data.set_data_type("terminal")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        
+        if len(self.rest_request) == 0:
+            json_data.add_data("command received!")
+            self.send_http_response_ok(json_data.get())
+            return
+
+        json_data.add_data("command received : %s" % str(self.rest_request))
+        self.send_http_response_ok(json_data.get())
+
+
+
 ################################################################################
 class JSonHelper():
     """ Easy way to create a json or jsonp structure
@@ -3448,6 +3471,10 @@ class JSonHelper():
                 #print "    DATA TYPE : " + str(sub_data_type)
                 data_json += self._process_sub_data(idx + 1, False, sub_data_key, sub_data, sub_data_type, db_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type)
             data_json = data_json[0:len(data_json)-1] + "},"
+
+        ### type : str
+        elif data_type in str_type:
+            data_json += '"%s",' % data
 
         return data_json
 
