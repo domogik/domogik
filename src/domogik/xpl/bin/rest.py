@@ -20,7 +20,7 @@ You should have received a copy of the GNU General Public License
 along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
 Plugin purpose
-==============
+=============
 
 - REST support for Domogik project
 - Log device stats by listening xpl network
@@ -845,8 +845,8 @@ class ProcessRequest():
         for key in self.xml:
             xml_info += key + ", "
         xml_info = xml_info[0:len(xml_info)-2]
-        json_data.add_data({"XML files loaded" : xml_info})
-        json_data.add_data({"XML files last load" : self.xml_date})
+        json_data.add_data({"/command : XML files loaded" : xml_info})
+        json_data.add_data({"/command : XML files last load" : self.xml_date})
 
         # Queues stats
 
