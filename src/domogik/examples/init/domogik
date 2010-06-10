@@ -1,5 +1,14 @@
 #!/bin/bash
-#
+
+### BEGIN INIT INFO
+# Provides:          domogik
+# Required-Start:    $local_fs $network
+# Required-Stop:     $local_fs $network
+# Default-Start:     2 3 4 5
+# Default-Stop:      1
+# Short-Description: Start Domogik daemons
+### END INIT INFO
+
 #This file is part of B{Domogik} project (U{http://www.domogik.org}).
 #
 #License
