@@ -81,6 +81,7 @@ class CallerIdModemManager(XplPlugin):
         try:
             # Get config
             #   - serial port
+            raise
             self._config = Query(self._myxpl)
             res = XplResult()
             self._config.query('cidmodem', 'device', res)
