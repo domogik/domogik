@@ -99,41 +99,31 @@ class SysManager(XplPlugin):
     
             #Start dbmgr
             if self.options.start_dbmgr:
-                if self._check_dbmgr_is_running():
+                if self._check_component_is_running("dbmgr"):
                     self._log.warning("Manager started with -d, but a database manager is already running")
                 else:
                     self._start_plugin("dbmgr", gethostname(), 1)
-                    if not self._check_dbmgr_is_running():
+                    if not self._check_component_is_running("dbmgr"):
                         self._log.error("Manager started with -d, but database manager not available after a startup.\
                                 Please check dbmgr.log file")
     
             #Start rest
             if self.options.start_rest:
-                if self._check_rest_is_running():
+                if self._check_component_is_running("rest"):
                     self._log.warning("Manager started with -r, but a REST manager is already running")
                 else:
                     self._start_plugin("rest", gethostname(), 1)
-                    if not self._check_rest_is_running():
+                    if not self._check_component_is_running("rest"):
                         self._log.error("Manager started with -r, but REST manager not available after a startup.\
                                 Please check rest.log file")
     
-            #Start stat
-            #if self.options.start_stat:
-            #    if self._check_stat_is_running():
-            #        self._log.warning("Manager started with -s, but a statistic manager is already running")
-            #    else:
-            #        self._start_plugin("statmgr", gethostname(), 1)
-            #        if not self._check_stat_is_running():
-            #            self._log.error("Manager started with -s, but statistic manager not available after a startup.\
-            #                    Please check statmgr.log file")
-
             #Start trigger
             if self.options.start_trigger:
-                if self._check_trigger_is_running():
+                if self._check_component_is_running("trigger"):
                     self._log.warning("Manager started with -t, but a trigger manager is already running")
                 else:
                     self._start_plugin("trigger", gethostname(), 1)
-                    if not self._check_trigger_is_running():
+                    if not self._check_component_is_running("trigger"):
                         self._log.error("Manager started with -t, but trigger manager not available after a startup.\
                                 Please check trigger.log file")
 
@@ -361,22 +351,23 @@ class SysManager(XplPlugin):
         mess.set_schema('domogik.system')
         mess.add_data({'command' : 'ping'})
         mess.add_data({'host' : gethostname()})
-        mess.add_data({'plugin' : 'dbmgr'})
-        Listener(self._cb_check_dbmgr_is_running, self._myxpl, {'schema':'domogik.system', \
-                'xpltype':'xpl-trig','command':'ping','plugin':'dbmgr','host':gethostname()})
+        mess.add_data({'plugin' : name})
+        Listener(self._cb_check_component_is_running, self._myxpl, {'schema':'domogik.system', \
+                'xpltype':'xpl-trig','command':'ping','plugin':name,'host':gethostname()}, \
+                cb_params = {'name' : name})
         max=5
         while max != 0:
             self._myxpl.send(mess)
             time.sleep(1)
             max = max - 1
-            if self._dbmgr.isSet():
+            if self._ping[name].isSet():
                 break
-        return self._dbmgr.isSet() #Will be set only if an answer was received
+        return self._ping[name].isSet() #Will be set only if an answer was received
 
-    def _cb_check_dbmgr_is_running(self, message):
+    def _cb_check_component_is_running(self, message, name):
         ''' Set the Event to true if an answer was received
         '''
-        self._dbmgr.set()
+        self._ping[name].set()
 
     def _check_rest_is_running(self):
         ''' This method will send a ping request every second to rest component
