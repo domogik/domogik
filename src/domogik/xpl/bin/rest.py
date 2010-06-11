@@ -77,7 +77,7 @@ USE_SSL = False
 SSL_CERTIFICATE = "/dev/null"
 
 # global queues config (plugins, etc)
-QUEUE_TIMEOUT = 10
+QUEUE_TIMEOUT = 15
 QUEUE_SIZE = 10
 QUEUE_LIFE_EXPECTANCY = 3
 QUEUE_SLEEP = 0.1 # sleep time between reading all queue content
