@@ -37,8 +37,7 @@ function run_setup_py {
     case $MODE in
         develop|install)
             if [ -f "setup.py" ];then
-                chmod +x setup.py
-                ./setup.py $MODE
+                python ./setup.py $MODE
                 if [ "x$?" != "x0" ];then
                     echo "setup.py script exists with a non 0 return value : $?"
                     exit 13
@@ -160,6 +159,7 @@ while [ "$MODE" != "develop" -a "$MODE" != "install" ];do
     read -p "Which install mode do you want ? [install/develop] : " MODE
 done
 read -p "If you want to use a proxy, please set it now (ex: http://1.2.3.4:8080)" http_proxy
+export $http_proxy
 run_setup_py $MODE
 copy_sample_files 
 update_default_config 
