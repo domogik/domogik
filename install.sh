@@ -52,10 +52,10 @@ function run_setup_py {
 
 function test_sources {
     FILENAME=$1
-    [ -d "$PWD/src" ] ||( echo "Can't find src/ directory, are you running this script from the sources main directory ? (with ./$FILENAME" && exit 2 )
+    [ -d "$PWD/src" ] ||( echo "Can't find src/ directory, are you running this script from the sources main directory ? (with ./$FILENAME" && exit 2 )
     [ -f "src/domogik/examples/config/domogik.cfg" ] ||( echo "Can't find src/domogik/examples/config/domogik.cfg file !" && exit 3 )
     [ -f "src/domogik/examples/default/domogik" ] ||( echo "Can't find src/domogik/examples/default/domogik file !" && exit 4 )
-    [ -f "src/domogik/examples/init/domogik" ] ||( echo "Can't find src/domogik//examples/init/domogik !" && exit 5 )
+    [ -f "src/domogik/examples/init/domogik" ] ||( echo "Can't find src/domogik//examples/init/domogik !" && exit 5 )
 }
 
 function copy_sample_files {
@@ -82,7 +82,7 @@ function update_default_config {
         exit 8
     fi
     read -p "Which user will run domogik ?" d_user
-    if ! getent passwd $d_user;then
+    if ! getent passwd $d_user >/dev/null;then
         echo "I can't find informations about this user !"
         read -p "Do you want to create it ? (y/n) " create
         if [ "$create" = "y" ];then
@@ -92,15 +92,16 @@ function update_default_config {
             exit 9
         fi
     fi
-    [ -f /etc/rc.d/domogik ] && sed -i "s/^DOMOGIK_USER.*$/DOMOGIK_USER=$d_user/" /etc/rc.d/domogik
-    [ -f /etc/default/domogik ] &&  sed -i "s/^DOMOGIK_USER.*$/DOMOGIK_USER=$d_user/" /etc/default/domogik
+    set -x
+    [ -f /etc/rc.d/domogik ] && sed -i "s;^DOMOGIK_USER.*$;DOMOGIK_USER=$d_user;" /etc/rc.d/domogik
+    [ -f /etc/default/domogik ] &&  sed -i "s;^DOMOGIK_USER.*$;DOMOGIK_USER=$d_user;" /etc/default/domogik
 
-    d_home=$(getent $d_user | cut -d ':' -f 6)
+    d_home=$(getent passwd $d_user |cut -d ':' -f 6)
 
     if [ "$MODE" = "develop" ];then
         d_custom_path=$PWD/src/domogik/xpl/tools/
-        [ -f /etc/default/domogik ] &&  sed -i "s/^CUSTOM_PATH.*$/CUSTOM_PATH=$d_custom_path/" /etc/default/domogik 
-        [ -f /etc/rc.d/domogik ] && sed -i "s/^CUSTOM_PATH.*$/CUSTOM_PATH=$d_custom_path/" /etc/default/domogik 
+        [ -f /etc/default/domogik ] &&  sed -i "s;^CUSTOM_PATH.*$;CUSTOM_PATH=$d_custom_path;" /etc/default/domogik 
+        [ -f /etc/rc.d/domogik ] && sed -i "s;^CUSTOM_PATH.*$;CUSTOM_PATH=$d_custom_path;" /etc/default/domogik 
     fi
 }
 
@@ -114,7 +115,7 @@ function update_user_config {
     else
         prefix=$PWD/src
     fi
-    sed -i "s/^custom_prefix.*$/custom_prefix=$prefix/" $d_home/.domogik.cfg
+    sed -i "s;^custom_prefix.*$;custom_prefix=$prefix;" $d_home/.domogik.cfg
 
     read -p "Which interface address do you want to bind to ? (default : 127.0.0.1) : " bind_addr
     if [ "x$bind_addr" = "x" ];then
@@ -129,7 +130,7 @@ function update_user_config {
 }
 
 function call_db_installer {
-    su -c $d_user "./db_installer.py"
+    su -c "$PWD/db_installer.py" $d_user
 }
 
 function check_python {
