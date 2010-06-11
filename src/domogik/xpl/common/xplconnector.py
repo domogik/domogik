@@ -260,7 +260,7 @@ class Listener:
     # _callback = None
     # _filter = None
 
-    def __init__(self, cb, manager, filter = {}):
+    def __init__(self, cb, manager, filter = {}, cb_params = {}):
         """
         The listener will get all messages from the manager and parse them.
         If a message match the filter, then the callback function will be
@@ -274,6 +274,7 @@ class Listener:
         self._filter = filter
         self._manager = manager
         manager.add_listener(self)
+        self._cb_params = cb_params
 
     def __str__(self):
         return "Listener<%s>" % (self._filter)
@@ -305,7 +306,10 @@ class Listener:
                 ok = False
         #The message match the filter, we can call  the callback function
         if ok:
-            thread = threading.Thread(target=self._callback, args = (message,), name="Manager-new-message-cb")
+            if self._cb_params == {} and self._callback.func_code.co_argcount == 1:
+                thread = threading.Thread(target=self._callback, args = (message,), name="Manager-new-message-cb")
+            else:
+                thread = threading.Thread(target=self._callback, args = (message, self._cb_params), name="Manager-new-message-cb")
             self._manager.register_thread(thread)
             thread.start()
 
