@@ -37,6 +37,7 @@ function run_setup_py {
     case $MODE in
         develop|install)
             if [ -f "setup.py" ];then
+                python ./ez_setup.py
                 python ./setup.py $MODE
                 if [ "x$?" != "x0" ];then
                     echo "setup.py script exists with a non 0 return value : $?"
