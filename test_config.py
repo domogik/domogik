@@ -195,6 +195,7 @@ def test_user_config_file(user_home, user_entry):
     dmg = dict(config.items('domogik'))
     database = dict(config.items('database'))
     rest = dict(config.items('rest'))
+    django = dict(config.items('django'))
     ok("Config file correctly loaded")
 
     info("Parse [domogik] section")
@@ -231,7 +232,7 @@ def test_user_config_file(user_home, user_entry):
     info("Parse [rest] section")
     _check_port_availability(rest['rest_server_ip'], rest['rest_server_port'])
     ok("Rest server IP/port is not bound by anything else")
-    _check_port_availability(rest['django_server_ip'], rest['django_server_port'])
+    _check_port_availability(django['django_server_ip'], django['django_server_port'])
     ok("Django server IP/port is not bound by anything else")
 
 def test_init():
