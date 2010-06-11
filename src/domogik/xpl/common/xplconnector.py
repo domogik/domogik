@@ -306,10 +306,10 @@ class Listener:
                 ok = False
         #The message match the filter, we can call  the callback function
         if ok:
-            if self._cb_params == {} and self._callback.func_code.co_argcount == 1:
-                thread = threading.Thread(target=self._callback, args = (message,), name="Manager-new-message-cb")
-            else:
+            if self._cb_params != {} and self._callback.func_code.co_argcount > 1:
                 thread = threading.Thread(target=self._callback, args = (message, self._cb_params), name="Manager-new-message-cb")
+            else:
+                thread = threading.Thread(target=self._callback, args = (message,), name="Manager-new-message-cb")
             self._manager.register_thread(thread)
             thread.start()
 
