@@ -33,5 +33,5 @@
       <description>Delay between each try to open modem device</description>
       <default-value>5</default-value>
     </key>
-  <configuration-keys>
+  </configuration-keys>
 </plugin>
