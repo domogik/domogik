@@ -36,6 +36,58 @@ TODO
 """
 
 import ow
+from domogik.xpl.common.helper import Helper
+from domogik.xpl.common.helper import HelperError
+
+
+class onewire(Helper):
+
+
+    def __init__(self):
+        """ Init onewire helper
+        """
+
+        self.commands =   \
+               { "all" : 
+                  {
+                    "cb" : self.all,
+                    "desc" : "Show all devices found on onewire network"
+                  },
+                  "detail" : 
+                  {
+                    "cb" : self.detail,
+                    "desc" : "Show detail for a device.",
+                    "min_args" : 1,
+                    "usage" : "detail <device id>"
+                  },
+                  "ds18b20" : 
+                  {
+                    "cb" : self.ds18b20,
+                    "desc" : "Show detail for all DS18B20 devices"
+                  },
+                  "ds2401" : 
+                  {
+                    "cb" : self.ds2401,
+                    "desc" : "Show detail for all DS2401 devices"
+                  }
+                }
+        try:
+            self.ow = OneWireNetwork()
+        except OneWireException:
+            raise HelperError("Access to onewire device is not possible. Does your user have the good permissions ? If so, check that you stopped onewire module and you don't have OWFS mounted")
+
+
+    def all(self, args = None):
+        return self.ow.show_all_components()
+
+    def detail(self, args = None):
+        return self.ow.show_component_detail(args[0])
+
+    def ds18b20(self, args = None):
+        return self.ow.show_ds18b20_detail()
+
+    def ds2401(self, args = None):
+        return self.ow.show_ds2401_detail()
 
 
 class OneWireException:
@@ -70,47 +122,55 @@ class OneWireNetwork:
         else:
             self._cache = True
             self._root = self._root_cached
-        
-        # display all onewire components
-        self.show_all_components()
-        self.show_ds18b20_detail()
-        self.show_ds2401_detail()
 
+        ### try to not have "...did not claim interface before use " in dmesg
+        #ow.detachKernelDriver(0)
+        
 
     def show_all_components(self):
-        print "---- Component list ------------------------------------------"
-        for component in self._root.find(all = True):
-            print component
+        ret = []
+        display = "| %-6s | %-12s | %-10s |"
+        sep = "--------------------------------------"
+        ret.append(display % ("Family", "Component id", "Type"))
+        ret.append(sep)
+        for comp in self._root.find(all = True):
+            ret.append(display % (comp.family, comp.id, comp.type))
+        return ret
 
 
-    def show_all_attributes(self, component):
-        for attr in component.entryList():
-            print "   - %s : %s" % (attr, component.__getattr__(attr))
+    def show_component_detail(self, id):
+        ret = []
+        for comp in self._root.find(id = id):
+            # component detail
+            display = " - %-20s : %s"
+            ret.append("%s attributes :" % id)
+            for attr in comp.entryList():
+                ret.append(display % (attr, comp.__getattr__(attr)))
+        return ret
 
 
     def show_ds18b20_detail(self):
-        print "---- DS18B20 details -----------------------------------------"
+        ret = []
+        display = " - %-30s : %s"
         for comp in self._root.find(type = "DS18B20"):
-            component = str(comp).split(" - ")[0]
-            print "[ %s ]" % component
-            print " - Important data"
-            print "   - Temperature = %s" % comp.temperature
-            print "   - Powered (1) or parasit (0) = %s" % comp.power
-            print " - All data"
-            self.show_all_attributes(comp)
+            ret.append("DS18B20 : id=%s" % comp.id)
+            ret.append(display % ("Temperature", comp.temperature))
+            ret.append(display % ("Powered (1) / parasit (0)", comp.power))
+        return ret
 
 
     def show_ds2401_detail(self):
-        print "---- DS2401 details ------------------------------------------"
+        ret = []
+        display = " - %-30s : %s"
         for comp in self._root.find(type = "DS2401"):
-            name = str(comp).split(" - ")[0]
-            print "[ %s ]" % name
-            print " - Important data"
-            print "   - Present = %s" % comp.present
-            print " - All data"
-            self.show_all_attributes(comp)
+            ret.append("DS2401 : id=%s" % comp.id)
+            ret.append(display % ("Present", comp.present))
+        return ret
 
 
+MY_CLASS = {"cb" : onewire}
 
 if __name__ == "__main__":
-    my_onewire = OneWireNetwork()
+    #my_onewire = OneWireNetwork()
+    ow = onewire()
+    ow.command("all")

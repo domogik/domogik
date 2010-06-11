@@ -43,6 +43,7 @@ from domogik.xpl.common.plugin import XplPlugin
 from domogik.common import logger
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from domogik.common.database import DbHelper
+from domogik.xpl.common.helper import HelperError
 from domogik.common.configloader import Loader
 from xml.dom import minidom
 import time
@@ -63,6 +64,8 @@ import os
 import glob
 import random
 import calendar
+import domogik.xpl.helpers
+import pkgutil
 
 
 
@@ -775,8 +778,8 @@ class ProcessRequest():
             self.rest_account()
         elif self.rest_type == "queuecontent":
             self.rest_queuecontent()
-        elif self.rest_type == "terminal":
-            self.rest_terminal()
+        elif self.rest_type == "helper":
+            self.rest_helper()
         elif self.rest_type == "testlongpoll":
             self.rest_testlongpoll()
         elif self.rest_type == None:
@@ -3232,23 +3235,56 @@ target=*
 
 
 #####
-# /terminal processing
+# /helper processing
 #####
 
-    def rest_terminal(self):
-        print "Terminal action"
+    def rest_helper(self):
+        print "Helper action"
 
         json_data = JSonHelper("OK")
-        json_data.set_data_type("terminal")
+        json_data.set_data_type("helper")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         
-        if len(self.rest_request) == 0:
-            json_data.add_data("command received!")
+        if len(self.rest_request) <= 1:
+            json_data.add_data("No command given or missing first option")
             self.send_http_response_ok(json_data.get())
             return
 
-        json_data.add_data("command received : %s" % str(self.rest_request))
+        command = self.rest_request[0]
+
+        ### load helper and create object
+        try:
+            package = domogik.xpl.helpers
+            for importer, plgname, ispkg in pkgutil.iter_modules(package.__path__):
+                if plgname == command:
+                    helper = __import__('domogik.xpl.helpers.%s' % plgname, fromlist="dummy")
+                    try:
+                        helper_object = helper.MY_CLASS["cb"]()
+                        if len(self.rest_request) == 2:
+                            output = helper_object.command(self.rest_request[1])
+                        else:
+                            output = helper_object.command(self.rest_request[1], \
+                                                           self.rest_request[2:])
+                    except HelperError as e:
+                       json_data.add_data("Error : %s " % e.value)
+                       self.send_http_response_ok(json_data.get())
+                       return
+                    
+                        
+
+        except:
+            json_data.add_data(self.get_exception())
+            self.send_http_response_ok(json_data.get())
+            return
+
+        if output != None:
+            for line in output:
+                json_data.add_data(line)
+        else:
+            json_data.add_data("<No result>")
         self.send_http_response_ok(json_data.get())
+
+
 
 
 
