@@ -38,7 +38,7 @@ function run_setup_py {
         develop|install)
             if [ -f "setup.py" ];then
                 python ./setup.py $MODE
-                if [ "x$?" != "x0" ];then
+                if [ "x$?" != "x0" ];then
                     echo "setup.py script exists with a non 0 return value : $?"
                     exit 13
                 fi
@@ -88,14 +88,13 @@ function update_default_config {
     if ! getent passwd $d_user >/dev/null;then
         echo "I can't find informations about this user !"
         read -p "Do you want to create it ? (y/n) " create
-        if [ "$create" = "y" ];then
+        if [ "$create" = "y" ];then
             adduser $d_user
         else
             echo "Please restart this script when the user $d_user will exists."
             exit 9
         fi
     fi
-    set -x
     [ -f /etc/rc.d/domogik ] && sed -i "s;^DOMOGIK_USER.*$;DOMOGIK_USER=$d_user;" /etc/rc.d/domogik
     [ -f /etc/default/domogik ] &&  sed -i "s;^DOMOGIK_USER.*$;DOMOGIK_USER=$d_user;" /etc/default/domogik
 
