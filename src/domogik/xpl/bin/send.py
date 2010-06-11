@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-                                                                           
+# -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -51,7 +51,7 @@ class Sender(XplPlugin):
     '''
 
     supported_schemas = ["datetime.basic", "dawndusk.request", "x10.basic",
-            "sensor.basic", "domogik.system","domogik.config"]
+                         "sensor.basic", "domogik.system","domogik.config"]
 
     def __init__(self, schema=None, message=None):
         XplPlugin.__init__(self, name = 'send', daemonize = False)

@@ -342,31 +342,6 @@ class Device(Base):
         self.device_usage_id = device_usage_id
         self.description = description
 
-    # TODO see if following methods are still useful
-    def is_lamp(self):
-        """
-        Check if the device is a lamp
-        @return True or False
-        """
-        return self.type.lower() == u'lamp'
-
-    def is_appliance(self):
-        """
-        Check if the device is an appliance
-        @return True or False
-        """
-        return self.type.lower() == u'appliance'
-
-    def get_last_value(self):
-        """
-        Return the last value that was recorded for the device
-        @return the value
-        """
-        if len(self._stats) == 0:
-            return self.initial_value
-        else:
-            return self._stats[0].value
-
     def __repr__(self):
         """Return an internal representation of the class"""
         return "<Device(id=%s, name='%s', addr='%s', desc='%s', ref='%s', type='%s', usage=%s)>" \

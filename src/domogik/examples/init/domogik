@@ -1,5 +1,14 @@
 #!/bin/bash
-#
+
+### BEGIN INIT INFO
+# Provides:          domogik
+# Required-Start:    $local_fs $network
+# Required-Stop:     $local_fs $network
+# Default-Start:     2 3 4 5
+# Default-Stop:      1
+# Short-Description: Start Domogik daemons
+### END INIT INFO
+
 #This file is part of B{Domogik} project (U{http://www.domogik.org}).
 #
 #License
@@ -20,6 +29,7 @@
 
 # source application-specific settings
 CUSTOM_PATH=""
+HUB_IFACE="lo"
 
 [ -f /etc/conf.d/domogik ] && . /etc/conf.d/domogik
 [ -f /etc/default/domogik ] && . /etc/default/domogik
@@ -56,7 +66,7 @@ function start_xpl {
         exit 1
     fi
     echo -n "* Starting XPL..."
-    /bin/su - ${DOMOGIK_USER} -c "$(which xPL_Hub) -interface lo >/dev/null "
+    /bin/su - ${DOMOGIK_USER} -c "$(which xPL_Hub) -interface ${HUB_IFACE} >/dev/null "
     if [ $? -gt 0 ]; then
         echo " An error occured during Xpl startup."
         exit 1

@@ -78,7 +78,6 @@ import re
 import copy
 
 from domogik.common.dmg_exceptions import XplMessageError
-from domogik.common.loggingservices import Logger
 from domogik.common.ordereddict import OrderedDict
 
 REGEXP_TYPE = r"""(?P<type_>xpl-cmnd | xpl-trig | xpl-stat)

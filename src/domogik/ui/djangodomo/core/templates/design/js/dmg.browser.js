@@ -121,6 +121,11 @@ $(function(){
                 $.notification("warning",  "Your Firefox version (" + BrowserDetect.version + ") is too old for Domogik<br/> Please upgrade to Firefox >3.6");                
             }
             break;
+        case 'Mozilla':
+            if (BrowserDetect.version < 1.9) {
+                $.notification("warning",  "Your Firefox version (" + BrowserDetect.version + ") is too old for Domogik<br/> Please upgrade to Firefox >3.6");                
+            }
+            break;
         case 'Chrome':
             if (BrowserDetect.version < 5.0) {
                 $.notification("warning",  "Your Chrome version (" + BrowserDetect.version + ") is too old for Domogik<br/> Please upgrade to Chrome >5.0");                

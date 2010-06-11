@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-                                                                           
+# -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -47,7 +47,7 @@ Implements
 import ow
 
 
-class OneWireException:
+class OneWireException(Exception):
     """
     OneWire exception
     """

@@ -46,7 +46,7 @@ DOMOGIK_PLUGIN_TECHNOLOGY = "rfid"
 DOMOGIK_PLUGIN_DESCRIPTION = "Use Mir:ror device"
 DOMOGIK_PLUGIN_VERSION = "0.1"
 DOMOGIK_PLUGIN_DOCUMENTATION_LINK = "http://wiki.domogik.org/tiki-index.php?page=plugins/Mirror"
-DOMOGIK_PLUGIN_CONFIGURATION=[
+DOMOGIK_PLUGIN_CONFIGURATION = [
       {"id" : 0,
        "key" : "startup-plugin",
        "type" : "boolean",
@@ -93,8 +93,7 @@ class MirrorManager(XplPlugin):
         self._config.query('mirror', 'nbmaxtry', res)
         nbmaxtry = res.get_value()['nbmaxtry']
         # Call Library
-        self._mymirror  = Mirror(device, nbmaxtry, interval, \
-                                 self._broadcastframe)
+        self._mymirror  = Mirror(device, nbmaxtry, interval, self._broadcastframe)
         self._mymirror.start()
 
     def _broadcastframe(self, action, ztamp_id):

@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-                                                                           
+# -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -45,7 +45,7 @@ import traceback
 from subprocess import Popen
 
 from domogik.common.configloader import Loader
-from domogik.xpl.common.xplconnector import Listener 
+from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin, XplResult
 from domogik.xpl.common.queryconfig import Query
@@ -67,33 +67,33 @@ class SysManager(XplPlugin):
         Init manager and start listeners
         '''
 
-        # Check parameters 
+        # Check parameters
         parser = OptionParser()
         parser.add_option("-d", action="store_true", dest="start_dbmgr", default=False, \
-                help="Start database manager if not already running.")
+                          help="Start database manager if not already running.")
         parser.add_option("-r", action="store_true", dest="start_rest", default=False, \
-                help="Start REST interface manager if not already running.")
+                          help="Start REST interface manager if not already running.")
         parser.add_option("-s", action="store_true", dest="start_stat", default=False, \
-            help="Start statistics manager if not already running.")
+                          help="Start statistics manager if not already running.")
         parser.add_option("-t", action="store_true", dest="start_trigger", default=False, \
-            help="Start scenario manager if not already running.")
+                          help="Start scenario manager if not already running.")
         XplPlugin.__init__(self, name = 'sysmgr', parser=parser)
 
         # Logger init
         self._log = self.get_my_logger()
         self._log.debug("Init system manager")
         self._log.debug("Host : %s" % gethostname())
-    
+
         # Get config
         cfg = Loader('domogik')
         config = cfg.load()
         conf = dict(config[1])
         self._pid_dir_path = conf['pid_dir_path']
-    
+
         try:
             # Get components
             self._list_components(gethostname())
-    
+
             #Start dbmgr
             if self.options.start_dbmgr:
                 if self._check_dbmgr_is_running():
@@ -102,8 +102,8 @@ class SysManager(XplPlugin):
                     self._start_plugin("dbmgr", gethostname(), 1)
                     if not self._check_dbmgr_is_running():
                         self._log.error("Manager started with -d, but database manager not available after a startup.\
-                                Please check dbmgr.log file")
-    
+                                        Please check dbmgr.log file")
+
             #Start rest
             if self.options.start_rest:
                 if self._check_rest_is_running():
@@ -112,8 +112,8 @@ class SysManager(XplPlugin):
                     self._start_plugin("rest", gethostname(), 1)
                     if not self._check_rest_is_running():
                         self._log.error("Manager started with -r, but REST manager not available after a startup.\
-                                Please check rest.log file")
-    
+                                        Please check rest.log file")
+
             #Start stat
             #if self.options.start_stat:
             #    if self._check_stat_is_running():
@@ -132,7 +132,7 @@ class SysManager(XplPlugin):
                     self._start_plugin("trigger", gethostname(), 1)
                     if not self._check_trigger_is_running():
                         self._log.error("Manager started with -t, but trigger manager not available after a startup.\
-                                Please check trigger.log file")
+                                        Please check trigger.log file")
 
             # Start plugins at manager startup
             self._log.debug("Check non-system plugins to start at manager startup...")
@@ -147,21 +147,19 @@ class SysManager(XplPlugin):
                     self._log.debug("            starting")
                     self._log.debug("Starting %s" % component["name"])
                     self._start_plugin(component["name"], gethostname(), 0)
-            
+
             # Define listener
             Listener(self._sys_cb, self._myxpl, {
                 'schema': 'domogik.system',
                 'xpltype': 'xpl-cmnd',
             })
-    
+
             self._log.info("System manager initialized")
             self.get_stop().wait()
 
         except:
             self._log.error("%s" % sys.exc_info()[1])
             print("%s" % sys.exc_info()[1])
-
-
 
     def _sys_cb(self, message):
         '''
@@ -172,9 +170,9 @@ class SysManager(XplPlugin):
 
         cmd = message.data['command']
         try:
-           plg = message.data['plugin']
+            plg = message.data['plugin']
         except KeyError:
-           plg = "*"
+            plg = "*"
         host = message.data["host"]
 
         # force command indicator
@@ -189,7 +187,8 @@ class SysManager(XplPlugin):
 
         # if no error at this point, process
         if error == "":
-            self._log.debug("System request %s for host %s, plugin %s. current hostname : %s" % (cmd, host, plg, gethostname()))
+            self._log.debug("System request %s for host %s, plugin %s. current hostname : %s" \
+                            % (cmd, host, plg, gethostname()))
 
             # start plugin
             if cmd == "start" and host == gethostname() and plg != "rest":
@@ -337,10 +336,8 @@ class SysManager(XplPlugin):
                         try:
                             os.kill(pid, 9)
                         except OSError:
-                            self._log.debug("Process %s resists again... Failed to stop process. Detail : %s" % (pid, str(sys.exc_info()[1])))
-
-
-
+                            self._log.debug("Process %s resists again... Failed to stop process. Detail : %s" \
+                                            % (pid, str(sys.exc_info()[1])))
 
     def _ping(self, host):
         self._log.debug("Ask to ping on %s" % (host))
@@ -364,11 +361,11 @@ class SysManager(XplPlugin):
         mess.add_data({'plugin' : 'dbmgr'})
         Listener(self._cb_check_dbmgr_is_running, self._myxpl, {'schema':'domogik.system', \
                 'xpltype':'xpl-trig','command':'ping','plugin':'dbmgr','host':gethostname()})
-        max=5
-        while max != 0:
+        max_val = 5
+        while max_val != 0:
             self._myxpl.send(mess)
             time.sleep(1)
-            max = max - 1
+            max_val = max_val - 1
             if self._dbmgr.isSet():
                 break
         return self._dbmgr.isSet() #Will be set only if an answer was received
@@ -382,20 +379,20 @@ class SysManager(XplPlugin):
         ''' This method will send a ping request every second to rest component
         and wait for the answer (max 5 seconds).
         '''
-        self._rest= Event()
+        self._rest = Event()
         mess = XplMessage()
         mess.set_type('xpl-cmnd')
         mess.set_schema('domogik.system')
         mess.add_data({'command' : 'ping'})
         mess.add_data({'host' : gethostname()})
         mess.add_data({'plugin' : 'rest'})
-        Listener(self._cb_check_rest_is_running, self._myxpl, {'schema':'domogik.system',\
+        Listener(self._cb_check_rest_is_running, self._myxpl, {'schema':'domogik.system', \
                 'xpltype':'xpl-trig','command':'ping','plugin':'rest','host':gethostname()})
-        max=5
-        while max != 0:
+        max_val = 5
+        while max_val != 0:
             self._myxpl.send(mess)
             time.sleep(1)
-            max = max - 1
+            max_val = max_val - 1
             if self._rest.isSet():
                 break
         return self._rest.isSet() #Will be set only if an answer was received
@@ -498,11 +495,11 @@ class SysManager(XplPlugin):
                     else:
                         status = "OFF"
                     self._log.debug("  => Domogik plugin (%s) :)" % plgdesc)
-                    self._components.append({"name" : plgname, 
-                                             "description" : plgdesc, 
-                                             "technology" : plgtech, 
+                    self._components.append({"name" : plgname,
+                                             "description" : plgdesc,
+                                             "technology" : plgtech,
                                              "status" : status,
-                                             "host" : gethostname(), 
+                                             "host" : gethostname(),
                                              "version" : plgver,
                                              "documentation" : plgdoc,
                                              "configuration" : plgconf})

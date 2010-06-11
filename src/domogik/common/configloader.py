@@ -40,7 +40,6 @@ global config_path
 ####################################################
 #       DON'T CHANGE ANYTHING AFTER THIS LINE      #
 ####################################################
-from os.path import *
 import os
 import ConfigParser
 

@@ -36,12 +36,12 @@ Implements
 @organization: Domogik
 """
 
-import time
 import signal
 import threading
 import os
+import sys
 from socket import gethostname
-from domogik.xpl.common.xplconnector import *
+from domogik.xpl.common.xplconnector import XplMessage, Manager, Listener
 from domogik.xpl.common.baseplugin import BasePlugin
 from domogik.common.configloader import Loader
 
@@ -72,7 +72,7 @@ class XplPlugin():
         on the command line. If set to True (default), will check if -f was added.
         '''
         if len(name) > 8:
-            raise IoError, "The name must be 8 chars max"
+            raise IOError, "The name must be 8 chars max"
         if XplPlugin.__instance is None and name is None:
             raise AttributeError, "'name' attribute is mandatory for the first instance"
         if XplPlugin.__instance is None:
@@ -92,6 +92,7 @@ class XplPlugin():
         return setattr(self.__instance, attr, value)
 
     class __Singl_XplPlugin(BasePlugin):
+
         def __init__(self, name, stop_cb = None, is_manager = False, reload_cb = None, dump_cb = None, parser = None,
                      daemonize = True):
             '''
@@ -145,19 +146,19 @@ class XplPlugin():
             """
             cmd = message.data["command"]
             plugin = message.data["plugin"]
-            if cmd == "stop" and plugin in ['*',self.get_plugin_name()]:
+            if cmd == "stop" and plugin in ['*', self.get_plugin_name()]:
                 self._log.info("Someone asked to stop %s, doing." % self.get_plugin_name())
                 self._answer_stop()
                 self.force_leave()
             elif cmd == "reload":
                 if self._reload_cb is None:
-                    log.info("Someone asked to reload config of %s, but the plugin \
+                    self._log.info("Someone asked to reload config of %s, but the plugin \
                     isn't able to do it." % self.get_plugin_name())
                 else:
                     self._reload_cb()
             elif cmd == "dump":
                 if self._dump_cb is None:
-                    log.info("Someone asked to dump config of %s, but the plugin \
+                    self._log.info("Someone asked to dump config of %s, but the plugin \
                     isn't able to do it." % self.get_plugin_name())
                 else:
                     self._dump_cb()
@@ -194,7 +195,6 @@ class XplPlugin():
             @param message : the Xpl message received
             """
 
-
         def force_leave(self):
             '''
             Leave threads & timers
@@ -212,6 +212,7 @@ class XplPlugin():
             for cb in self._stop_cb:
                 self._log.debug("Calling stop additionnal method : %s " % cb.__name__)
                 cb()
+
 
 class XplResult():
     '''
@@ -290,7 +291,6 @@ class Watcher:
             self.kill()
         except OSError:
             print "OSError"
-            pass
         sys.exit()
 
     def kill(self):

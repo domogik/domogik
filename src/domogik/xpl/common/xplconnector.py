@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-                                                                           
+# -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -72,14 +72,10 @@ Implements
 """
 
 import sys
-import string
 import select
 import threading
 import traceback
-from socket import *
-import time
-import signal
-import os
+from socket import socket, gethostbyname, gethostname, AF_INET, SOCK_DGRAM, SOL_SOCKET, SO_BROADCAST
 from domogik.common import logger
 from domogik.xpl.common.baseplugin import BasePlugin
 from domogik.xpl.common.xplmessage import XplMessage
@@ -111,7 +107,7 @@ class Manager(BasePlugin):
         # Define xPL base port
         self._source = source
         self._listeners = []
-		#Not really usefull
+        #Not really usefull
         #self._port = port
         # Initialise the socket
         self._UDPSock = socket(AF_INET, SOCK_DGRAM)
@@ -131,21 +127,22 @@ class Manager(BasePlugin):
             self._UDPSock.bind(addr)
         except:
             # Smthg is already running on this port
-            self._log.error("Can't bind to the interface %s, port %i" % (ip,port))
+            self._log.error("Can't bind to the interface %s, port %i" % (ip, port))
             exit(1)
         else:
             self.add_stop_cb(self.leave)
             self._port = self._UDPSock.getsockname()[1]
             #Get the port number assigned by the system
             self._ip, self._port = self._UDPSock.getsockname()
-            self._log.debug("xPL plugin %s socket bound to %s, port %s" % (self.get_plugin_name(), self._ip, self._port))
+            self._log.debug("xPL plugin %s socket bound to %s, port %s" \
+                            % (self.get_plugin_name(), self._ip, self._port))
             # All is good, we start sending Heartbeat every 5 minutes using
             # XplTimer
             self._SendHeartbeat()
             self._h_timer = XplTimer(300, self._SendHeartbeat, self.get_stop(), self)
             self._h_timer.start()
             #We add a listener in order to answer to the hbeat requests
-            Listener(cb = self.got_hbeat, manager = self, filter = {'schema':'hbeat.app','xpltype':'xpl-stat'})
+            Listener(cb = self.got_hbeat, manager = self, filter = {'schema':'hbeat.app', 'xpltype':'xpl-stat'})
             #And finally we start network listener in a thread
             self._stop_thread = False
             self._network = threading.Thread(None, self._run_thread_monitor,
@@ -223,8 +220,7 @@ remote-ip=%s
         """
         while not self.should_stop():
             try:
-                readable, writeable, errored = select.select(
-                    [self._UDPSock], [], [], 10)
+                readable, writeable, errored = select.select([self._UDPSock], [], [], 10)
             except:
                 self._log.info("Error during the read of the socket : %s" % traceback.format_exc())
             else:
@@ -264,7 +260,7 @@ class Listener:
     # _callback = None
     # _filter = None
 
-    def __init__(self, cb, manager, filter = {}):
+    def __init__(self, cb, manager, filter = {}, cb_params = {}):
         """
         The listener will get all messages from the manager and parse them.
         If a message match the filter, then the callback function will be
@@ -278,14 +274,15 @@ class Listener:
         self._filter = filter
         self._manager = manager
         manager.add_listener(self)
+        self._cb_params = cb_params
 
     def __str__(self):
         return "Listener<%s>" % (self._filter)
 
-    def getFilter(self):
+    def get_filter(self):
         return self._filter
 
-    def getCb(self):
+    def get_cb(self):
         return self._callback
 
     def new_message(self, message):
@@ -305,13 +302,14 @@ class Listener:
 
             elif key == "xpltype":
                 ok = ok and (self._filter[key] == message.type)
-
-            elif not (key in message.data or key in (
-                    "xpltype", "schema")):
+            elif not (key in message.data or key in ("xpltype", "schema")):
                 ok = False
         #The message match the filter, we can call  the callback function
         if ok:
-            thread = threading.Thread(target=self._callback, args = (message,), name="Manager-new-message-cb")
+            if self._cb_params == {} and self._callback.func_code.co_argcount == 1:
+                thread = threading.Thread(target=self._callback, args = (message,), name="Manager-new-message-cb")
+            else:
+                thread = threading.Thread(target=self._callback, args = (message, self._cb_params), name="Manager-new-message-cb")
             self._manager.register_thread(thread)
             thread.start()
 
@@ -357,15 +355,16 @@ class XplTimer():
 #    _callback = None
 #    _timer = None
 
-
     def __init__(self, time, cb, stop, manager):
         """
         Constructor : create the internal timer
         @param time : time of loop in second
         @param cb : callback function which will be call eact 'time' seconds
         """
-        self._timer = self.__internalTimer(time, cb, stop, manager._log)
+        self._timer = self.__InternalTimer(time, cb, stop, manager._log)
         self._manager = manager
+        lg = logger.Logger(self.__class__.__name__)
+        self._log = lg.get_logger()
         manager.register_timer(self)
         manager.register_thread(self._timer)
 
@@ -380,7 +379,7 @@ class XplTimer():
         """
         self._timer.start()
 
-    def getTimer(self):
+    def get_timer(self):
         """
         Waits for the internal thread to finish
         """
@@ -397,7 +396,7 @@ class XplTimer():
         self._timer.join()
         self._manager.unregister_timer(self._timer)
 
-    class __internalTimer(threading.Thread):
+    class __InternalTimer(threading.Thread):
         '''
         Internal timer class
         '''
@@ -413,7 +412,6 @@ class XplTimer():
             self._stop = stop
             self.name = "internal-timer"
             self._log = log
-
 
         def run(self):
             '''
