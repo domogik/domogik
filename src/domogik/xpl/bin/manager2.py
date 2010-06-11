@@ -350,11 +350,12 @@ class SysManager(XplPlugin):
         mess.add_data({'host' : gethostname()})
         self._myxpl.send(mess)
 
-    def _check_dbmgr_is_running(self):
-        ''' This method will send a ping request to dbmgr component
+    def _check_component_is_running(self, name):
+        ''' This method will send a ping request to a component
         and wait for the answer (max 5 seconds).
+        @param name : component name
         '''
-        self._dbmgr = Event()
+        self._ping[name] = Event()
         mess = XplMessage()
         mess.set_type('xpl-cmnd')
         mess.set_schema('domogik.system')
