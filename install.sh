@@ -39,6 +39,10 @@ function run_setup_py {
             if [ -f "setup.py" ];then
                 chmod +x setup.py
                 ./setup.py $MODE
+                if [ "x$?" != "x0" ];then
+                    echo "setup.py script exists with a non 0 return value : $?"
+                    exit 13
+                fi
             else
                 echo "Can't find setup.py, did you download the sources correctly ? "
                 exit 1
@@ -118,15 +122,13 @@ function update_user_config {
     sed -i "s;^custom_prefix.*$;custom_prefix=$prefix;" $d_home/.domogik.cfg
 
     read -p "Which interface address do you want to bind to ? (default : 127.0.0.1) : " bind_addr
-    if [ "x$bind_addr" = "x" ];then
-        bind_addr="127.0.0.1"
-    fi
+    bind_addr=${bind_addr:-127.0.0.1}
     sed -i "s/^bind_interface.*$/bind_interface = $bind_addr/" $d_home/.domogik.cfg
     sed -i "s/^rest_server_ip.*$/rest_server_ip = $bind_addr/" $d_home/.domogik.cfg
     sed -i "s/^django_server_ip.*$/django_server_ip = $bind_addr/" $d_home/.domogik.cfg
     sed -i "s/^django_rest_server_ip.*$/django_rest_server_ip = $bind_addr/" $d_home/.domogik.cfg
     echo "Info : Database will be created in $d_home/.domogik.sqlite"
-    sed -i "s/^db_path.*$/db_path = $d_home/.domogik.sqlite" $d_home/.domogik.cfg
+    sed -i "s;^db_path.*$;db_path = $d_home/.domogik.sqlite;" $d_home/.domogik.cfg
 }
 
 function call_db_installer {
@@ -140,7 +142,7 @@ function check_python {
     else
         if python -V 2>&1|grep -qs "Python 2.[345]";then
             echo "Bad python version used, please install at least 2.6, and check /usr/bin/python starts the good version."
-            exit 127
+            exit 12
         fi
     fi
 } 
@@ -154,6 +156,10 @@ fi
 check_python
 test_sources $0
 read -p "Which install mode do you want ? [install/develop] : " MODE
+while [ "$MODE" != "develop" -a "$MODE" != "install" ];do
+    read -p "Which install mode do you want ? [install/develop] : " MODE
+done
+read -p "If you want to use a proxy, please set it now (ex: http://1.2.3.4:8080)" http_proxy
 run_setup_py $MODE
 copy_sample_files 
 update_default_config 
