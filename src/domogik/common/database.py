@@ -110,9 +110,9 @@ class DbHelper():
         cfg = Loader('database')
         config = None
         if len(sys.argv) > 1:
-            _config = _cfg.load(sys.argv[1])
+            config = cfg.load(sys.argv[1])
         else:
-            _config = cfg.load()
+            config = cfg.load()
         db = dict(config[1])
         url = "%s://" % db['db_type']
         if db['db_type'] == 'sqlite':
