@@ -122,7 +122,7 @@ function update_user_config {
 
     read -p "Which interface do you want to bind to ? (default : lo) : " bind_iface
     bind_addr=$(ifconfig $bind_iface|grep "inet adr"|cut -d ":" -f 2|cut -d " " -f 1)
-    if [ "x$bind_addr" = "x"];then
+    if [ "x$bind_addr" = "x" ];then
         echo "Can't find the address associated to the interface !"
         exit 20 
     fi
@@ -136,7 +136,7 @@ function update_user_config {
 }
 
 function call_db_installer {
-    python ./db_installer.py
+    python ./db_installer.py $d_home/.domogik.cfg
     chown $d_user: $d_home/.domogik.sqlite
 }
 
