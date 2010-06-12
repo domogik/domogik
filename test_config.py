@@ -125,7 +125,7 @@ def test_config_files():
             manager_params = value
         elif item.strip() == "CUSTOM_PATH":
             custom_path = value
-        elif item.strip() == "HUB_IFACE"
+        elif item.strip() == "HUB_IFACE":
             hub_iface = value
         else:
             warning("Unknown config value in the main config file : %s" % item)

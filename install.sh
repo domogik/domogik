@@ -136,7 +136,8 @@ function update_user_config {
 }
 
 function call_db_installer {
-    su -c "$PWD/db_installer.py" $d_user
+    chown $d_user db_installer.py
+    su -c "python $PWD/db_installer.py" $d_user
 }
 
 function check_python {
@@ -152,6 +153,7 @@ function check_python {
 } 
 
 function modify_hosts {
+    [ -f "/etc/hosts" ] || touch /etc/hosts
     if ! grep localhost /etc/hosts|grep -qs 127.0.0.1;then
         sed -i 's/^\(.*localhost.*\)$/#\1/' /etc/hosts 
         echo "127.0.0.1 localhost" >> /etc/hosts 
