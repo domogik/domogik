@@ -136,8 +136,8 @@ function update_user_config {
 }
 
 function call_db_installer {
-    chown $d_user db_installer.py
-    su -c "python $PWD/db_installer.py" $d_user
+    python ./db_installer.py
+    chown $d_user: $d_home/.domogik.sqlite
 }
 
 function check_python {
