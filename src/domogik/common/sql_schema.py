@@ -53,6 +53,7 @@ Implements
 @organization: Domogik
 """
 
+import sys
 from exceptions import AssertionError
 
 from sqlalchemy import types, create_engine, Table, Column, Integer, String, \
