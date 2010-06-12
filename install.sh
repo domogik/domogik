@@ -120,9 +120,14 @@ function update_user_config {
     fi
     sed -i "s;^custom_prefix.*$;custom_prefix=$prefix;" $d_home/.domogik.cfg
 
-    read -p "Which interface address do you want to bind to ? (default : 127.0.0.1) : " bind_addr
-    bind_addr=${bind_addr:-127.0.0.1}
+    read -p "Which interface do you want to bind to ? (default : lo) : " bind_iface
+    bind_addr=$(ifconfig $bind_iface|grep "inet adr"|cut -d ":" -f 2|cut -d " " -f 1)
+    if [ "x$bind_addr" = "x"];then
+        echo "Can't find the address associated to the interface !"
+        exit 20 
+    fi
     sed -i "s/^bind_interface.*$/bind_interface = $bind_addr/" $d_home/.domogik.cfg
+    sed -i "s/^HUB_IFACE.*$/HUB_IFACE=$bind_iface/" /etc/default/domogik
     sed -i "s/^rest_server_ip.*$/rest_server_ip = $bind_addr/" $d_home/.domogik.cfg
     sed -i "s/^django_server_ip.*$/django_server_ip = $bind_addr/" $d_home/.domogik.cfg
     sed -i "s/^django_rest_server_ip.*$/django_rest_server_ip = $bind_addr/" $d_home/.domogik.cfg
@@ -178,5 +183,5 @@ modify_hosts
 
 echo "Everything seems to be good, Domogik should be installed correctly."
 echo "I will start the test_config.py script to check it."
-read "Please press a key when ready."
+read -p "Please press a key when ready."
 chmod +x ./test_config.py && ./test_config.py

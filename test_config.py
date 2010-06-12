@@ -116,6 +116,7 @@ def test_config_files():
     user = ''
     manager_params = ''
     custom_path = ''
+    hub_iface = ''
     for line in lines:
         item,value = line.strip().split("=")
         if item.strip() == "DOMOGIK_USER":
@@ -124,6 +125,8 @@ def test_config_files():
             manager_params = value
         elif item.strip() == "CUSTOM_PATH":
             custom_path = value
+        elif item.strip() == "HUB_IFACE"
+            hub_iface = value
         else:
             warning("Unknown config value in the main config file : %s" % item)
     ok("Global config file exists and contains right stuff")
