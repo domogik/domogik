@@ -78,7 +78,7 @@ _config = None
 if len(sys.argv) > 1:
     _config = _cfg.load(sys.argv[1])
 else:
-    _config = cfg.load()
+    _config = _cfg.load()
 _db_prefix = dict(_config[1])['db_prefix']
 
 
