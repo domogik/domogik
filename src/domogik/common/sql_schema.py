@@ -73,7 +73,11 @@ Base = declarative_base()
 metadata = Base.metadata
 
 _cfg = Loader('database')
-_config = _cfg.load()
+_config = None
+if len(sys.argv) > 1:
+    _config = cfg.load(sys.argv[1])
+else:
+    _config = cfg.load()
 _db_prefix = dict(_config[1])['db_prefix']
 
 
