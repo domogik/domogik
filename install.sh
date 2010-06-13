@@ -121,6 +121,7 @@ function update_user_config {
     sed -i "s;^custom_prefix.*$;custom_prefix=$prefix;" $d_home/.domogik.cfg
 
     read -p "Which interface do you want to bind to ? (default : lo) : " bind_iface
+    bind_iface=${bind_iface:-lo}
     bind_addr=$(ifconfig $bind_iface|grep "inet ad"|cut -d ":" -f 2|cut -d " " -f 1)
     if [ "x$bind_addr" = "x" ];then
         echo "Can't find the address associated to the interface !"
