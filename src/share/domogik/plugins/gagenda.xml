@@ -17,21 +17,21 @@
       <name>email</name>
       <type>string</type>
       <description>Google email account</description>
-      <default-value></default-value>
+      <default-value>john.doc@gmail.com</default-value>
     </key>
     <key>
       <order-id>2</order-id>
       <name>password</name>
       <type>string</type>
       <description>Password for email account</description>
-      <default-value></default-value>
+      <default-value>password</default-value>
     </key>
     <key>
       <order-id>3</order-id>
       <name>calendarname</name>
       <type>string</type>
       <description>Calendar name (default : your email)</description>
-      <default-value></default-value>
+      <default-value>john.doe@gmail.com</default-value>
     </key>
   </configuration-keys>
 </plugin>

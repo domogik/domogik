@@ -17,7 +17,7 @@
       <name>heyu-cfg-path</name>
       <type>string</type>
       <description>Heyu configuration path</description>
-      <default-value></default-value>
+      <default-value>TODO</default-value>
     </key>
   </configuration-keys>
 </plugin>
