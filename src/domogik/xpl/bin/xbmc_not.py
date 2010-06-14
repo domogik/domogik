@@ -55,7 +55,7 @@ DOMOGIK_PLUGIN_CONFIGURATION=[
       {"id" : 1,
        "key" : "address",
        "type" : "string",
-       "description" : "XBMC Media center HTTP API address(ip:port)",)
+       "description" : "XBMC Media center HTTP API address(ip:port)",
        "default" : ""},
       {"id" : 2,
        "key" : "delay",
