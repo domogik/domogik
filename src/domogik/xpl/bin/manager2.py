@@ -78,7 +78,7 @@ class SysManager(XplPlugin):
                 help="Start REST interface manager if not already running.")
         parser.add_option("-t", action="store_true", dest="start_trigger", default=False, \
             help="Start scenario manager if not already running.")
-        XplPlugin.__init__(self, name = 'sysmgr', parser=parser)
+        XplPlugin.__init__(self, name = 'manager', parser=parser)
 
         # Logger init
         self._log = self.get_my_logger()
@@ -242,15 +242,18 @@ class SysManager(XplPlugin):
             if pid:
                 self._write_pid_file(plg, pid)
                 # let's check if component successfully started
-                time.sleep(READ_NETWORK_TIMEOUT) # time a plugin took to die.
-
+                time.sleep(READ_NETWORK_TIMEOUT + 0.5) # time a plugin took to die.
+                # component started
                 if self._check_component_is_running(plg):
-                    self._log.debug("Component %s started with pid %i" % (plg,
+                    self._log.debug("Component %s started with pid %s" % (plg,
                             pid))
+                    self._set_status(plg, "ON")
+
+                # component failed to start
                 else:
-                    error = "Component %s failed to start. Please lok in this component logs files" % plg
+                    error = "Component %s failed to start. Please look in this component logs files" % plg
                     self._log.error(error)
-                    self._stop_plugin(plg, host, force)
+                    self._delete_pid_file(plg)
                 mess.add_data({'force' :  force})
                 if error != "":
                     mess.add_data({'error' :  error})
@@ -270,8 +273,6 @@ class SysManager(XplPlugin):
             mess.add_data({'error' : error})
             self._myxpl.send(mess)
         else:
-            # TODO : delete
-            #self._set_component_status(plg, "OFF")
             pid = int(self._read_pid_file(plg))
             self._delete_pid_file(plg)
             self._log.debug("Check if process (pid %s) is down" % pid)
@@ -294,6 +295,9 @@ class SysManager(XplPlugin):
                             os.kill(pid, 9)
                         except OSError:
                             self._log.debug("Process %s resists again... Failed to stop process. Detail : %s" % (pid, str(sys.exc_info()[1])))
+                            return
+                 
+                self._set_status(plg, "OFF")
 
 
 
@@ -354,7 +358,7 @@ class SysManager(XplPlugin):
         '''
         Check if one component is still running == the pid file exists
         '''
-        self._log.debug("Test if %s is running on %s" %
+        self._log.debug("Get %s pid in %s", 
                 (component, self._pid_dir_path))
         pidfile = os.path.join(self._pid_dir_path,
                 component + ".pid")
@@ -389,6 +393,17 @@ class SysManager(XplPlugin):
             return fil.read()
         except:
             return 0
+
+    def _set_status(self, plg, state):
+        """
+        Set status for a component
+        """ 
+        for comp in self._components:
+            if comp["name"] == plg:
+                comp["status"] = state
+
+
+
 
     def _list_components(self, host):
         '''
