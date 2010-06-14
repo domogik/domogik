@@ -78,25 +78,30 @@ class CallerIdModemManager(XplPlugin):
         """ Init plugin
         """
         XplPlugin.__init__(self, name='cidmodem')
-        # Get config
-        #   - serial port
-        self._config = Query(self._myxpl)
-        res = XplResult()
-        self._config.query('cidmodem', 'device', res)
-        device = res.get_value()['device']
-        self._config = Query(self._myxpl)
-        res = XplResult()
-        self._config.query('cidmodem', 'interval', res)
-        interval = res.get_value()['interval']
-        self._config = Query(self._myxpl)
-        res = XplResult()
-        self._config.query('cidmodem', 'nbmaxtry', res)
-        nbmaxtry = res.get_value()['nbmaxtry']
-        # Call Library
-        self._mycalleridmodem  = CallerIdModem(device, nbmaxtry, \
-                                               interval, \
-                                               self._broadcastframe)
-        self._mycalleridmodem.start()
+        try:
+            # Get config
+            #   - serial port
+            raise
+            self._config = Query(self._myxpl)
+            res = XplResult()
+            self._config.query('cidmodem', 'device', res)
+            device = res.get_value()['device']
+            self._config = Query(self._myxpl)
+            res = XplResult()
+            self._config.query('cidmodem', 'interval', res)
+            interval = res.get_value()['interval']
+            self._config = Query(self._myxpl)
+            res = XplResult()
+            self._config.query('cidmodem', 'nbmaxtry', res)
+            nbmaxtry = res.get_value()['nbmaxtry']
+            # Call Library
+            self._mycalleridmodem  = CallerIdModem(device, nbmaxtry, \
+                                                   interval, \
+                                                   self._broadcastframe)
+            self._mycalleridmodem.start()
+        except:
+            print "Zut alors!"
+            self.force_leave()
 
     def _broadcastframe(self, data):
         """ Send data on xPL network

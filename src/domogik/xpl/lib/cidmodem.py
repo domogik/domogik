@@ -35,7 +35,7 @@ Implements
 @license: GPL(v3)
 @organization: Domogik
 """
-import serial
+#import serial
 import threading 
 import time
 from domogik.common import logger

@@ -116,6 +116,7 @@ def test_config_files():
     user = ''
     manager_params = ''
     custom_path = ''
+    hub_iface = ''
     for line in lines:
         item,value = line.strip().split("=")
         if item.strip() == "DOMOGIK_USER":
@@ -124,6 +125,8 @@ def test_config_files():
             manager_params = value
         elif item.strip() == "CUSTOM_PATH":
             custom_path = value
+        elif item.strip() == "HUB_IFACE":
+            hub_iface = value
         else:
             warning("Unknown config value in the main config file : %s" % item)
     ok("Global config file exists and contains right stuff")
@@ -195,6 +198,7 @@ def test_user_config_file(user_home, user_entry):
     dmg = dict(config.items('domogik'))
     database = dict(config.items('database'))
     rest = dict(config.items('rest'))
+    django = dict(config.items('django'))
     ok("Config file correctly loaded")
 
     info("Parse [domogik] section")
@@ -231,7 +235,7 @@ def test_user_config_file(user_home, user_entry):
     info("Parse [rest] section")
     _check_port_availability(rest['rest_server_ip'], rest['rest_server_port'])
     ok("Rest server IP/port is not bound by anything else")
-    _check_port_availability(rest['django_server_ip'], rest['django_server_port'])
+    _check_port_availability(django['django_server_ip'], django['django_server_port'])
     ok("Django server IP/port is not bound by anything else")
 
 def test_init():
@@ -243,8 +247,8 @@ def test_init():
 
 def test_version():
     info("Check python version")
-    v = sys.version_info()
-    assert v[0] == 2 and v[1] < 6, "Python version is %s.%s, it must be >= 2.6, please upgrade" % (v[0], v[1])
+    v = sys.version_info
+    assert not (v[0] == 2 and v[1] < 6), "Python version is %s.%s, it must be >= 2.6, please upgrade" % (v[0], v[1])
     ok("Python version is >= 2.6")
 
 try:

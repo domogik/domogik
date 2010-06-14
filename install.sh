@@ -39,7 +39,7 @@ function run_setup_py {
             if [ -f "setup.py" ];then
                 python ./ez_setup.py
                 python ./setup.py $MODE
-                if [ "x$?" != "x0" ];then
+                if [ "x$?" != "x0" ];then
                     echo "setup.py script exists with a non 0 return value : $?"
                     exit 13
                 fi
@@ -59,45 +59,45 @@ function test_sources {
     [ -d "$PWD/src" ] ||( echo "Can't find src/ directory, are you running this script from the sources main directory ? (with ./$FILENAME" && exit 2 )
     [ -f "src/domogik/examples/config/domogik.cfg" ] ||( echo "Can't find src/domogik/examples/config/domogik.cfg file !" && exit 3 )
     [ -f "src/domogik/examples/default/domogik" ] ||( echo "Can't find src/domogik/examples/default/domogik file !" && exit 4 )
-    [ -f "src/domogik/examples/init/domogik" ] ||( echo "Can't find src/domogik//examples/init/domogik !" && exit 5 )
+    [ -f "src/domogik/examples/init/domogik" ] ||( echo "Can't find src/domogik/examples/init/domogik !" && exit 5 )
 }
 
 function copy_sample_files {
     if [ -d "/etc/default/" ];then
         cp src/domogik/examples/default/domogik /etc/default/
-    elif [ -d "/etc/rc.d/" ];then
-        cp src/domogik/examples/default/domogik /etc/rc.d/
     else
-        echo "Can't find the directory where I can copy system-wide config. Usually it is /etc/default/ or /etc/rc.d/"
+        echo "Can't find the directory where I can copy system-wide config. Usually it is /etc/default/"
         exit 6
     fi
     if [ -d "/etc/init.d/" ];then
         cp src/domogik/examples/init/domogik /etc/init.d/ 
         chmod +x /etc/init.d/domogik
+    elif [ -d "/etc/rc.d/" ];then
+        cp src/domogik/examples/init/domogik /etc/rc.d/ 
+        chmod +x /etc/rc.d/domogik
     else
-        echo "Init directory does not exists"
+        echo "Init directory does not exists (/etc/init.d or /etc/rc.d)"
         exit 7
     fi
 }
 
 function update_default_config {
-    if [ ! -f /etc/default/domogik -a ! -f /etc/rc.d/domogik ];then
-        echo "Can't find /etc/default/domogik neither /etc/rc.d/domogik"
+    if [ ! -f /etc/default/domogik ];then
+        echo "Can't find /etc/default/domogik !"
         exit 8
     fi
-    read -p "Which user will run domogik ?" d_user
+    read -p "Which user will run domogik, it will be created if it does not exist yet ? (default : domogik) " d_user
+    d_user=${d_user:-domogik}
     if ! getent passwd $d_user >/dev/null;then
         echo "I can't find informations about this user !"
         read -p "Do you want to create it ? (y/n) " create
-        if [ "$create" = "y" ];then
+        if [ "$create" = "y" ];then
             adduser $d_user
         else
             echo "Please restart this script when the user $d_user will exists."
             exit 9
         fi
     fi
-    set -x
-    [ -f /etc/rc.d/domogik ] && sed -i "s;^DOMOGIK_USER.*$;DOMOGIK_USER=$d_user;" /etc/rc.d/domogik
     [ -f /etc/default/domogik ] &&  sed -i "s;^DOMOGIK_USER.*$;DOMOGIK_USER=$d_user;" /etc/default/domogik
 
     d_home=$(getent passwd $d_user |cut -d ':' -f 6)
@@ -105,7 +105,6 @@ function update_default_config {
     if [ "$MODE" = "develop" ];then
         d_custom_path=$PWD/src/domogik/xpl/tools/
         [ -f /etc/default/domogik ] &&  sed -i "s;^CUSTOM_PATH.*$;CUSTOM_PATH=$d_custom_path;" /etc/default/domogik 
-        [ -f /etc/rc.d/domogik ] && sed -i "s;^CUSTOM_PATH.*$;CUSTOM_PATH=$d_custom_path;" /etc/default/domogik 
     fi
 }
 
@@ -121,9 +120,15 @@ function update_user_config {
     fi
     sed -i "s;^custom_prefix.*$;custom_prefix=$prefix;" $d_home/.domogik.cfg
 
-    read -p "Which interface address do you want to bind to ? (default : 127.0.0.1) : " bind_addr
-    bind_addr=${bind_addr:-127.0.0.1}
+    read -p "Which interface do you want to bind to ? (default : lo) : " bind_iface
+    bind_iface=${bind_iface:-lo}
+    bind_addr=$(ifconfig $bind_iface|grep "inet ad"|cut -d ":" -f 2|cut -d " " -f 1)
+    if [ "x$bind_addr" = "x" ];then
+        echo "Can't find the address associated to the interface !"
+        exit 20 
+    fi
     sed -i "s/^bind_interface.*$/bind_interface = $bind_addr/" $d_home/.domogik.cfg
+    sed -i "s/^HUB_IFACE.*$/HUB_IFACE=$bind_iface/" /etc/default/domogik
     sed -i "s/^rest_server_ip.*$/rest_server_ip = $bind_addr/" $d_home/.domogik.cfg
     sed -i "s/^django_server_ip.*$/django_server_ip = $bind_addr/" $d_home/.domogik.cfg
     sed -i "s/^django_rest_server_ip.*$/django_rest_server_ip = $bind_addr/" $d_home/.domogik.cfg
@@ -132,7 +137,8 @@ function update_user_config {
 }
 
 function call_db_installer {
-    su -c "$PWD/db_installer.py" $d_user
+    python ./db_installer.py $d_home/.domogik.cfg
+    chown $d_user: $d_home/.domogik.sqlite
 }
 
 function check_python {
@@ -147,6 +153,14 @@ function check_python {
     fi
 } 
 
+function modify_hosts {
+    [ -f "/etc/hosts" ] || touch /etc/hosts
+    if ! grep localhost /etc/hosts|grep -qs 127.0.0.1;then
+        sed -i 's/^\(.*localhost.*\)$/#\1/' /etc/hosts 
+        echo "127.0.0.1 localhost" >> /etc/hosts 
+    fi
+}
+
 #Main part
 if [ $UID -ne 0 ];then
     echo "Please restart this script as root !"
@@ -155,19 +169,22 @@ fi
 
 check_python
 test_sources $0
-read -p "Which install mode do you want ? [install/develop] : " MODE
+read -p "Which install mode do you want (choose develop if you don't know) ? [install/develop] : " MODE
 while [ "$MODE" != "develop" -a "$MODE" != "install" ];do
     read -p "Which install mode do you want ? [install/develop] : " MODE
 done
 read -p "If you want to use a proxy, please set it now (ex: http://1.2.3.4:8080)" http_proxy
-export $http_proxy
+if [ "x$http_proxy" != "x" ];then
+    export http_proxy
+fi
 run_setup_py $MODE
 copy_sample_files 
 update_default_config 
 update_user_config 
 call_db_installer 
+modify_hosts
 
 echo "Everything seems to be good, Domogik should be installed correctly."
 echo "I will start the test_config.py script to check it."
-read "Please press a key when ready."
+read -p "Please press a key when ready."
 chmod +x ./test_config.py && ./test_config.py
