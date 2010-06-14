@@ -43,27 +43,6 @@ from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.lib.plcbus import PLCBUSAPI
 from domogik.xpl.common.queryconfig import Query
 
-IS_DOMOGIK_PLUGIN = True
-DOMOGIK_PLUGIN_TECHNOLOGY = "plcbus"
-DOMOGIK_PLUGIN_DESCRIPTION = "Manage Plcbus devices"
-DOMOGIK_PLUGIN_VERSION = "0.1"
-DOMOGIK_PLUGIN_DOCUMENTATION_LINK = "http://wiki.domogik.org/tiki-index.php?page=plugins/Plcbus"
-DOMOGIK_PLUGIN_CONFIGURATION = [
-      {"id" : 0,
-       "key" : "startup-plugin",
-       "type" : "boolean",
-       "description" : "Automatically start plugin at Domogik startup",
-       "default" : "False"},
-      {"id" : 1,
-       "key" : "device",
-       "type" : "string",
-       "description" : "Plcbus device (ex : TODO )",
-       "default" : "/dev/ttyUSB0"},
-      {"id" : 2,
-        "key" : "usercode",
-        "description" : "Usercode value (between 00 and FF), defaults to FF",
-        "default" : "FF"}]
-
 
 class PlcBusMain(XplPlugin):
     ''' Manage PLCBus technology, send and receive order/state

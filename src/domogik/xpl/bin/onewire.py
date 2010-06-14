@@ -46,23 +46,6 @@ import threading
 
 TEMP_DELAY = 60
 
-IS_DOMOGIK_PLUGIN = True
-DOMOGIK_PLUGIN_TECHNOLOGY = "onewire"
-DOMOGIK_PLUGIN_DESCRIPTION = "Manage 1 wire devices"
-DOMOGIK_PLUGIN_VERSION = "0.1"
-DOMOGIK_PLUGIN_DOCUMENTATION_LINK = "TODO"
-DOMOGIK_PLUGIN_CONFIGURATION = [
-      {"id" : 0,
-       "key" : "startup-plugin",
-       "type" : "boolean",
-       "description" : "Automatically start plugin at Domogik startup",
-       "default" : "False"},
-      {"id" : 1,
-       "key" : "temp-refresh",
-       "type" : "number",
-       "description" : "Temperature refresh delay (seconds)",
-       "default" : TEMP_DELAY}]
-
 
 class OneWireTemp(XplPlugin):
     '''

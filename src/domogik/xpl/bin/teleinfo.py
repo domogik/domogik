@@ -40,27 +40,6 @@ from domogik.xpl.common.plugin import XplPlugin, XplResult
 from domogik.xpl.lib.teleinfo import TeleInfo
 from domogik.xpl.common.queryconfig import Query
 
-IS_DOMOGIK_PLUGIN = True
-DOMOGIK_PLUGIN_TECHNOLOGY = "service"
-DOMOGIK_PLUGIN_DESCRIPTION = "Get power consumption with teleinfo"
-DOMOGIK_PLUGIN_VERSION = "0.1"
-DOMOGIK_PLUGIN_DOCUMENTATION_LINK = "http://wiki.domogik.org/tiki-index.php?page=plugins/Teleinfo"
-DOMOGIK_PLUGIN_CONFIGURATION = [
-      {"id" : 0,
-       "key" : "startup-plugin",
-       "type" : "boolean",
-       "description" : "Automatically start plugin at Domogik startup",
-       "default" : "False"},
-      {"id" : 1,
-       "key" : "device",
-       "type" : "string",
-       "description" : "Teleinfo device (ex : /dev/ttyUSB0 for an usb model)",
-       "default" : "/dev/teleinfo"},
-      {"id" : 2,
-       "key" : "interval",
-       "type" : "number",
-       "description" : "Interval between each request (seconds)",
-       "default" : 60}]
 
 class TeleinfoManager(XplPlugin):
     '''

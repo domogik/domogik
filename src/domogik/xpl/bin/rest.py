@@ -91,55 +91,6 @@ QUEUE_EVENT_LIFE_EXPECTANCY = 5
 QUEUE_EVENT_SIZE = 50
 
 
-# Domogik plugin informations for manager
-IS_DOMOGIK_PLUGIN = True
-DOMOGIK_PLUGIN_TECHNOLOGY = "domogik"
-DOMOGIK_PLUGIN_DESCRIPTION = "REST Server"
-DOMOGIK_PLUGIN_VERSION = "0.1"
-DOMOGIK_PLUGIN_DOCUMENTATION_LINK = "http://wiki.domogik.org/tiki-index.php?page=plugins/REST"
-DOMOGIK_PLUGIN_CONFIGURATION = [
-      {"id" : 0,
-       "key" : "q-timeout",
-       "type" : "number",
-       "description" : "Maximum wait time for getting data froma queue",
-       "default" : QUEUE_TIMEOUT},
-      {"id" : 1,
-       "key" : "q-size",
-       "type" : "number",
-       "description" : "Size for 'classic' queues. You should not have to change this value",
-       "default" : QUEUE_SIZE},
-      {"id" : 2,
-       "key" : "q-cmd-size",
-       "type" : "number",
-       "description" : "Size for /command queue",
-       "default" : QUEUE_COMMAND_SIZE},
-      {"id" : 3,
-       "key" : "q-life-exp",
-       "type" : "number",
-       "description" : "Life expectancy for a xpl message in queues. You sould not have to change this value",
-       "default" : QUEUE_LIFE_EXPECTANCY},
-      {"id" : 4,
-       "key" : "q-sleep",
-       "type" : "number",
-       "description" : "Time between each unsuccessfull look for a xpl data in a queue",
-       "default" : QUEUE_SLEEP},
-      {"id" : 5,
-       "key" : "q-evt-timeout",
-       "type" : "number",
-       "description" : "Maximum wait time for getting event from queue (0 : no timeout)",
-       "default" : QUEUE_EVENT_TIMEOUT},
-      {"id" : 6,
-       "key" : "q-evt-size",
-       "type" : "number",
-       "description" : "Size for /event queue",
-       "default" : QUEUE_EVENT_SIZE},
-      {"id" : 7,
-       "key" : "q-evt-life-exp",
-       "type" : "number",
-       "description" : "Life expectancy for an event in event queues",
-       "default" : QUEUE_EVENT_LIFE_EXPECTANCY}]
-
-
 
 ################################################################################
 class Rest(XplPlugin):

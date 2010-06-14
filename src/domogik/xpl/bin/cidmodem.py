@@ -41,33 +41,6 @@ from domogik.xpl.common.plugin import XplResult
 from domogik.xpl.lib.cidmodem import CallerIdModem
 from domogik.xpl.common.queryconfig import Query
 
-IS_DOMOGIK_PLUGIN = True
-DOMOGIK_PLUGIN_TECHNOLOGY = "communication"
-DOMOGIK_PLUGIN_DESCRIPTION = "Get caller id with a modem"
-DOMOGIK_PLUGIN_VERSION = "0.1"
-DOMOGIK_PLUGIN_DOCUMENTATION_LINK = "http://wiki.domogik.org/tiki-index.php?page=plugins/CallerIdModem"
-DOMOGIK_PLUGIN_CONFIGURATION = [
-      {"id" : 0,
-       "key" : "startup-plugin",
-       "type" : "boolean",
-       "description" : "Automatically start plugin at Domogik startup",
-       "default" : "False"},
-      {"id" : 1,
-       "key" : "device",
-       "type" : "string",
-       "description" : "Modem device (ex : /dev/ttyUSB0 for an usb modem)",
-       "default" : "/dev/ttyUSB0"},
-      {"id" : 2,
-       "key" : "nbmaxtry",
-       "type" : "number",
-       "description" : "Max number of tries to open modem device",
-       "default" : 5},
-      {"id" : 3,
-       "key" : "interval",
-       "type" : "number",
-       "description" : "Delay between each try to open modem device",
-       "default" : 10}]
-
 
 class CallerIdModemManager(XplPlugin):
     '''

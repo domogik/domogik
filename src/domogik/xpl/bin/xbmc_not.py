@@ -41,34 +41,6 @@ from domogik.xpl.lib.xbmc_not import XBMCNotification
 from domogik.xpl.common.plugin import XplResult
 from domogik.xpl.common.queryconfig import Query
 
-IS_DOMOGIK_PLUGIN = True
-DOMOGIK_PLUGIN_TECHNOLOGY = "multimedia"
-DOMOGIK_PLUGIN_DESCRIPTION = "Send notifications to XBMC"
-DOMOGIK_PLUGIN_VERSION = "0.1"
-DOMOGIK_PLUGIN_DOCUMENTATION_LINK = "http://wiki.domogik.org/tiki-index.php?page=plugins/XBMCNotification"
-DOMOGIK_PLUGIN_CONFIGURATION=[
-      {"id" : 0,
-       "key" : "startup-plugin",
-       "type" : "boolean",
-       "description" : "Automatically start plugin at Domogik startup",
-       "default" : "False"},
-      {"id" : 1,
-       "key" : "address",
-       "type" : "string",
-       "description" : "XBMC Media center HTTP API address(ip:port)",)
-       "default" : ""},
-      {"id" : 2,
-       "key" : "delay",
-       "type" : "number",
-       "description" : "Default delay for displaying a notification (seconds)",
-       "default" : 15},
-      {"id" : 3,
-       "key" : "maxdelay",
-       "type" : "number",
-       "description" : "Max delay between sending title and message with osd.basic xpl message (seconds)",
-       "default" : 10}]
-
-
 
 class XBMCNotificationListener(XplPlugin):
     """ Create listener for xPL messages about xbmc notifications
