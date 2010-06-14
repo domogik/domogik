@@ -1,0 +1,23 @@
+<plugin>
+  <name>onewire</name>
+  <technology>onewire</technology>
+  <description>Manage Onewire devices</description>
+  <version>0.1</version>
+  <documentation>#TODO#</documentation>
+  <configuration-keys>
+    <key>
+      <order-id>0</order-id>
+      <name>startup-plugin</name>
+      <type>boolean</type>
+      <description>Automatically start plugin at Domogik startup</description>
+      <default-value>False</default-value>
+    </key>
+    <key>
+      <order-id>1</order-id>
+      <name>temp-refresh</name>
+      <type>number</type>
+      <description>Temperature refresh delay (seconds)</description>
+      <default-value>60</default-value>
+    </key>
+  </configuration-keys>
+</plugin>

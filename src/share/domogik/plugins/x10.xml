@@ -1,0 +1,23 @@
+<plugin>
+  <name>x10</name>
+  <technology>x10</technology>
+  <description>Manage x10 devices with Heyu</description>
+  <version>0.1</version>
+  <documentation>http://wiki.domogik.org/tiki-index.php?page=plugins/X10</documentation>
+  <configuration-keys>
+    <key>
+      <order-id>0</order-id>
+      <name>startup-plugin</name>
+      <type>boolean</type>
+      <description>Automatically start plugin at Domogik startup</description>
+      <default-value>False</default-value>
+    </key>
+    <key>
+      <order-id>1</order-id>
+      <name>heyu-cfg-path</name>
+      <type>string</type>
+      <description>Heyu configuration path</description>
+      <default-value></default-value>
+    </key>
+  </configuration-keys>
+</plugin>

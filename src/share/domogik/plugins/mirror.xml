@@ -1,9 +1,9 @@
 <plugin>
-  <name>cidmodem</name>
-  <technology>communication</technology>
-  <description>Set caller id with a modem</description>
+  <name>mirror</name>
+  <technology>rfid</technology>
+  <description>Use Mir:ror device</description>
   <version>0.1</version>
-  <documentation>http://wiki.domogik.org/tiki-index.php?page=plugins/CallerIdModem</documentation>
+  <documentation>http://wiki.domogik.org/tiki-index.php?page=plugins/Mirror</documentation>
   <configuration-keys>
     <key>
       <order-id>0</order-id>
@@ -16,22 +16,22 @@
       <order-id>1</order-id>
       <name>device</name>
       <type>string</type>
-      <description>Modem device (ex: /dev/ttyUSB0 for an usb modem)</description>
-      <default-value>/dev/ttyUSB0</default-value>
+      <description>Mir:ror device (ex : /dev/hidraw0)</description>
+      <default-value>/dev/hidraw0</default-value>
     </key>
     <key>
       <order-id>2</order-id>
       <name>nbmaxtry</name>
       <type>number</type>
-      <description>Maximum number of tries to open modem device</description>
+      <description>Max number of tries to open Mir:ror device</description>
       <default-value>3</default-value>
     </key>
     <key>
       <order-id>3</order-id>
       <name>interval</name>
       <type>number</type>
-      <description>Delay between each try to open modem device</description>
-      <default-value>5</default-value>
+      <description>Delay between each try to open Mir:ror device</description>
+      <default-value>3</default-value>
     </key>
   </configuration-keys>
 </plugin>
