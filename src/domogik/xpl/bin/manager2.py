@@ -46,6 +46,7 @@ from subprocess import Popen
 
 from domogik.common.configloader import Loader
 from domogik.xpl.common.xplconnector import Listener 
+from domogik.xpl.common.xplconnector import READ_NETWORK_TIMEOUT
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin, XplResult
 from domogik.xpl.common.queryconfig import Query
@@ -75,8 +76,6 @@ class SysManager(XplPlugin):
                 help="Start database manager if not already running.")
         parser.add_option("-r", action="store_true", dest="start_rest", default=False, \
                 help="Start REST interface manager if not already running.")
-        parser.add_option("-s", action="store_true", dest="start_stat", default=False, \
-            help="Start statistics manager if not already running.")
         parser.add_option("-t", action="store_true", dest="start_trigger", default=False, \
             help="Start scenario manager if not already running.")
         XplPlugin.__init__(self, name = 'sysmgr', parser=parser)
@@ -93,6 +92,7 @@ class SysManager(XplPlugin):
         self._pid_dir_path = conf['pid_dir_path']
     
         self._xml_plugin_directory = "%s/share/domogik/plugins/" % conf['custom_prefix']
+        self._pinglist = {}
         try:
             # Get components
             self._list_components(gethostname())
@@ -212,47 +212,6 @@ class SysManager(XplPlugin):
         else:
             self._log.info("Error detected : %s, request %s has been cancelled" % (error, cmd))
 
-#DEPRECATED
-#    def _sys_cb_stop(self, message):
-#        '''
-#        Internal callback for receiving 'stop' system messages
-#        @param message : xpl message received
-#        '''
-#        self._log.debug("Call _sys_cb_stop")
-#
-#        cmd = message.data['command']
-#        try:
-#           plg = message.data['plugin']
-#        except KeyError:
-#           plg = "*"
-#        host = message.data["host"]
-#
-#        # force command indicator
-#        force = 0
-#        if "force" in message.data:
-#            force = int(message.data['force'])
-#
-#        # error if no plugin in list
-#        error = ""
-#        if self._is_component(plg) == False and plg != "*":
-#            self._invalid_component(cmd, plg, host)
-#
-#        # if no error at this point, process
-#        if error == "":
-#            self._log.debug("System request %s for host %s, plugin %s. current hostname : %s" % (cmd, host, plg, gethostname()))
-#
-#            # stop plugin
-#            if cmd == "stop" and host == gethostname():
-#                try:
-#                    error_msg = message.data["error"]
-#                except KeyError:
-#                    error_msg = ""
-#                    self._stop_plugin(plg, host, force, error_msg)
-#
-#        # if error
-#        else:
-#            self._log.info("Error detected : %s, request %s has been cancelled" % (error, cmd))
-
     def _invalid_component(self, cmd, plg, host):
         error = "Component %s doesn't exists on %s" % (plg, host)
         self._log.debug(error)
@@ -282,8 +241,16 @@ class SysManager(XplPlugin):
             pid = self._start_comp(plg)
             if pid:
                 self._write_pid_file(plg, pid)
-                self._log.debug("Component %s started with pid %i" % (plg,
-                        pid))
+                # let's check if component successfully started
+                time.sleep(READ_NETWORK_TIMEOUT) # time a plugin took to die.
+
+                if self._check_component_is_running(plg):
+                    self._log.debug("Component %s started with pid %i" % (plg,
+                            pid))
+                else:
+                    error = "Component %s failed to start. Please lok in this component logs files" % plg
+                    self._log.error(error)
+                    self._stop_plugin(plg, host, force)
                 mess.add_data({'force' :  force})
                 if error != "":
                     mess.add_data({'error' :  error})
@@ -345,7 +312,7 @@ class SysManager(XplPlugin):
         and wait for the answer (max 5 seconds).
         @param name : component name
         '''
-        self._ping[name] = Event()
+        self._pinglist[name] = Event()
         mess = XplMessage()
         mess.set_type('xpl-cmnd')
         mess.set_schema('domogik.system')
@@ -360,41 +327,14 @@ class SysManager(XplPlugin):
             self._myxpl.send(mess)
             time.sleep(1)
             max = max - 1
-            if self._ping[name].isSet():
+            if self._pinglist[name].isSet():
                 break
-        return self._ping[name].isSet() #Will be set only if an answer was received
+        return self._pinglist[name].isSet() #Will be set only if an answer was received
 
-    def _cb_check_component_is_running(self, message, name):
+    def _cb_check_component_is_running(self, message, args):
         ''' Set the Event to true if an answer was received
         '''
-        self._ping[name].set()
-
-    def _check_rest_is_running(self):
-        ''' This method will send a ping request every second to rest component
-        and wait for the answer (max 5 seconds).
-        '''
-        self._rest= Event()
-        mess = XplMessage()
-        mess.set_type('xpl-cmnd')
-        mess.set_schema('domogik.system')
-        mess.add_data({'command' : 'ping'})
-        mess.add_data({'host' : gethostname()})
-        mess.add_data({'plugin' : 'rest'})
-        Listener(self._cb_check_rest_is_running, self._myxpl, {'schema':'domogik.system',\
-                'xpltype':'xpl-trig','command':'ping','plugin':'rest','host':gethostname()})
-        max=5
-        while max != 0:
-            self._myxpl.send(mess)
-            time.sleep(1)
-            max = max - 1
-            if self._rest.isSet():
-                break
-        return self._rest.isSet() #Will be set only if an answer was received
-
-    def _cb_check_rest_is_running(self, message):
-        ''' Set the Event to true if an answer was received
-        '''
-        self._rest.set()
+        self._pinglist[args["name"]].set()
 
     def _start_comp(self, name):
         '''
@@ -407,10 +347,7 @@ class SysManager(XplPlugin):
         plg_path = "domogik.xpl.bin." + name
         __import__(plg_path)
         plugin = sys.modules[plg_path]
-        subp = Popen("/usr/bin/python %s -f" % plugin.__file__, shell=True)
-        print "EXEC:"
-        print subp.communicate()
-        print "----"
+        subp = Popen("/usr/bin/python %s" % plugin.__file__, shell=True)
         return subp.pid
 
     def _is_component_running(self, component):
@@ -482,9 +419,7 @@ class SysManager(XplPlugin):
                     # config part
                     config = xml_content.getElementsByTagName("configuration-keys")[0]
                     plgconf = []
-                    print "C=%s" % config
                     for key in config.getElementsByTagName("key"):
-                        print "K=%s" % key
                         k_id = key.getElementsByTagName("order-id")[0].firstChild.nodeValue
                         k_key = key.getElementsByTagName("name")[0].firstChild.nodeValue
                         k_description = key.getElementsByTagName("description")[0].firstChild.nodeValue
@@ -518,58 +453,8 @@ class SysManager(XplPlugin):
                     self._log.error("Error reading xml file : %s. Detail : \n%s" % (xml_file, str(traceback.format_exc())))
 
                 # get data from xml file
-        print "---"
         return
 
-
-
-
-
-
-        self._components = []
-
-        # List real plugins
-        package = domogik.xpl.bin
-        for importer, plgname, ispkg in pkgutil.iter_modules(package.__path__):
-            try:
-                plugin = __import__('domogik.xpl.bin.%s' % plgname, fromlist="dummy")
-                self._log.debug("Plugin : %s" % plgname)
-                if hasattr(plugin,'IS_DOMOGIK_PLUGIN') and plugin.IS_DOMOGIK_PLUGIN is True:
-                    if plugin.DOMOGIK_PLUGIN_DESCRIPTION == None:
-                        plgdesc = plgname
-                    else:
-                        plgdesc = plugin.DOMOGIK_PLUGIN_DESCRIPTION
-                    try:
-                        plgtech = plugin.DOMOGIK_PLUGIN_TECHNOLOGY
-                    except:
-                        plgtech = "Unknown"
-                    try:
-                        plgver = plugin.DOMOGIK_PLUGIN_VERSION
-                    except:
-                        plgver = "Unknown"
-                    try:
-                        plgdoc = plugin.DOMOGIK_PLUGIN_DOCUMENTATION_LINK
-                    except:
-                        plgdoc = "#"
-                    try:
-                        plgconf = plugin.DOMOGIK_PLUGIN_CONFIGURATION
-                    except:
-                        plgconf = []
-                    if self._is_component_running(plgname):
-                        status = "ON"
-                    else:
-                        status = "OFF"
-                    self._log.debug("  => Domogik plugin (%s) :)" % plgdesc)
-                    self._components.append({"name" : plgname, 
-                                             "description" : plgdesc, 
-                                             "technology" : plgtech, 
-                                             "status" : status,
-                                             "host" : gethostname(), 
-                                             "version" : plgver,
-                                             "documentation" : plgdoc,
-                                             "configuration" : plgconf})
-            except:
-                self._log.error("Error during %s plugin import" % plgname)
 
     def _is_component(self, name):
         '''
@@ -580,15 +465,6 @@ class SysManager(XplPlugin):
             if component["name"] == name:
                 return True
         return False
-
-    # TODO : delete
-    #def _set_component_status(self, name, status):
-    #    '''
-    #    Set a component status in component list
-    #    '''
-    #    for component in self._components:
-    #        if component["name"] == name:
-    #            component["status"] = status
 
     def _send_component_list(self):
         mess = XplMessage()
