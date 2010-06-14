@@ -40,9 +40,9 @@ Implements
 import os
 
 if os.name == 'nt':
-    from domogik.xpl.lib.win_x10 import X10API
+    from domogik.xpl.lib.win_x10-heyu import X10API
 else:
-    from domogik.xpl.lib.x10 import X10API, HeyuManager
+    from domogik.xpl.lib.x10-heyu import X10API, HeyuManager
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin, XplResult
