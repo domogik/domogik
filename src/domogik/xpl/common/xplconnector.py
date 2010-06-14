@@ -80,6 +80,8 @@ from domogik.common import logger
 from domogik.xpl.common.baseplugin import BasePlugin
 from domogik.xpl.common.xplmessage import XplMessage
 
+READ_NETWORK_TIMEOUT = 2
+
 class Manager(BasePlugin):
     """
     Manager is the main component of the system
@@ -220,7 +222,7 @@ remote-ip=%s
         """
         while not self.should_stop():
             try:
-                readable, writeable, errored = select.select([self._UDPSock], [], [], 5)
+                readable, writeable, errored = select.select([self._UDPSock], [], [], READ_NETWORK_TIMEOUT)
             except:
                 self._log.info("Error during the read of the socket : %s" % traceback.format_exc())
             else:
