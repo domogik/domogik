@@ -48,9 +48,9 @@ def list_all_files(path):
     d=[]
     for i in os.listdir(path):
         if not os.path.isdir(path+i):
-            d.append(path+i)
+            d.append(path+'/'+i)
         else:
-            d.extend(list_all_files(path+i))
+            d.extend(list_all_files(path+'/'+i))
     return d
 
 setup(
