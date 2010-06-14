@@ -37,7 +37,8 @@ Implements
 """
 
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.common.plugin import XplPlugin, XplResult, XplTimer
+from domogik.xpl.common.plugin import XplPlugin, XplResult
+from domogik.xpl.common.xplconnector import XplTimer
 from domogik.xpl.lib.onewire import OneWire
 from domogik.xpl.common.queryconfig import Query
 import threading

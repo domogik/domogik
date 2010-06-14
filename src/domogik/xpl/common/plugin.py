@@ -204,14 +204,14 @@ class XplPlugin():
             for t in self._timers:
                 t.stop()
                 self._log.debug("Timer stopped %s" % t)
+            for cb in self._stop_cb:
+                self._log.debug("Calling stop additionnal method : %s " % cb.__name__)
+                cb()
             for t in self._threads:
                 self._log.debug("Try to stop thread %s" % t)
                 t.join()
                 self._log.debug("Thread stopped %s" % t)
                 #t._Thread__stop()
-            for cb in self._stop_cb:
-                self._log.debug("Calling stop additionnal method : %s " % cb.__name__)
-                cb()
 
 
 class XplResult():

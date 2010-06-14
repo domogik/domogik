@@ -34,6 +34,8 @@ Implements
 @organization: Domogik
 """
 
+import sys 
+
 from sqlalchemy import create_engine
 
 from domogik.common import sql_schema
@@ -41,7 +43,11 @@ from domogik.common import database
 from domogik.common.configloader import Loader
 
 cfg = Loader('database')
-config = cfg.load()
+config = None
+if len(sys.argv) > 1:
+    config = cfg.load(sys.argv[1])
+else:
+    config = cfg.load()
 test_url = ''
 
 try:
