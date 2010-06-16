@@ -1084,8 +1084,6 @@ target=*
 
         st_from = self.get_parameters("from")
         st_to = self.get_parameters("to")
-        print "from=%s" % st_from
-        print "to=%s" % st_to
 
         json_data = JSonHelper("OK")
         json_data.set_data_type("stats")
@@ -3605,7 +3603,6 @@ class StatsManager(XplPlugin):
         @param type : the current xpl-type
         Return True if the schema/type is *not* already defined in res
         """
-        print res
         for techno in res.keys():
             for _schema in res[techno].keys(): 
                 if _schema == schema:
@@ -3669,7 +3666,6 @@ class StatsManager(XplPlugin):
             @param message : the Xpl message received 
             """
 
-            print "STATS : %s" % str(message)
 
             ### we put data in database
             self._db = DbHelper()
@@ -3677,7 +3673,7 @@ class StatsManager(XplPlugin):
             try:
                 d_id = self._db.get_device_by_technology_and_address(self._technology, \
                     message.data[self._res["device"]]).id
-                print "techno '%s' / adress '%s' / id '%s'" % (self._technology, message.data[self._res["device"]], d_id)
+                print "Stat for techno '%s' / adress '%s' / id '%s'" % (self._technology, message.data[self._res["device"]], d_id)
             except AttributeError:
                 self._log_stats_unknown.warning("Received a stat for an unreferenced device : %s - %s" \
                         % (self._technology, message.data[self._res["device"]]))
@@ -3699,7 +3695,6 @@ class StatsManager(XplPlugin):
                         value = message.data[key]
                 device_data.append({"key" : key, "value" : value})
                 # put data in database
-                print "self._db.add_device_stat(%s, %s, %s, %s)" % (str(current_date), str(key), str(value), str(d_id))
                 self._db.add_device_stat(current_date, key, value, d_id)
 
             # Put data in events queues
