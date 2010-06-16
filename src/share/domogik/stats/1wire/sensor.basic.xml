@@ -4,7 +4,7 @@
         <xpltype type="xpl-trig">
             <listener>
                 <filter>
-                    <key name="type" value="onewire"/>
+                    <key name="type" value="temp"/>
                 </filter>
             </listener>
             <mapping>
@@ -16,7 +16,7 @@
         <xpltype type="xpl-stat">
             <listener>
                 <filter>
-                    <key name="type" value="onewire"/>
+                    <key name="type" value="temp"/>
                 </filter>
             </listener>
             <mapping>
