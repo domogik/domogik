@@ -277,6 +277,10 @@ class Rest(XplPlugin):
             self._log.info("REST Initialisation OK")
 
 
+            self.start_stats()
+            self.start_http()
+
+
 
 
         except :
@@ -3849,8 +3853,8 @@ class EventRequests():
 if __name__ == '__main__':
     # Create REST server with default values (overriden by ~/.domogik.cfg)
     rest_server = Rest("127.0.0.1", "8080")
-    rest_server.start_stats()
-    rest_server.start_http()
+    #rest_server.start_stats()
+    #rest_server.start_http()
 
 
 
