@@ -71,6 +71,7 @@ class ComponentDs18b20:
         self.interval = interval
         self.callback = callback
         self.root = self.onewire.get_root()
+        self.old_temp = 0
 
         self.start_waiting()
 
@@ -78,11 +79,16 @@ class ComponentDs18b20:
         while True:
             for comp in self.root.find(type = "DS18B20"):
                 id = comp.id
-                temperature = comp.temperature
-                print "id=%s, temp=%s" % (id, temperature)
-                self.callback("xpl-stat", {"device" : id,
-                                           "type" : "temp",
-                                           "current" : comp.temperature})
+                temperature = float(comp.temperature)
+                if temperature != self.old_temp:
+                    type = "xpl-trig"
+                else:
+                    type = "xpl-stat"
+                self.old_temp = temperature
+                print "type=%s, id=%s, temp=%s" % (type, id, temperature)
+                self.callback(type, {"device" : id,
+                                     "type" : "temp",
+                                     "current" : comp.temperature})
             time.sleep(self.interval)
     
 
@@ -113,46 +119,4 @@ class OneWireNetwork:
         Getter for self._root
         """
         return self._root 
-
-        
-
-    def helper_show_all_components(self):
-        ret = []
-        display = "| %-6s | %-12s | %-10s |"
-        sep = "--------------------------------------"
-        ret.append(display % ("Family", "Component id", "Type"))
-        ret.append(sep)
-        for comp in self._root.find(all = True):
-            ret.append(display % (comp.family, comp.id, comp.type))
-        return ret
-
-
-    def helper_show_component_detail(self, id):
-        ret = []
-        for comp in self._root.find(id = id):
-            # component detail
-            display = " - %-20s : %s"
-            ret.append("%s attributes :" % id)
-            for attr in comp.entryList():
-                ret.append(display % (attr, comp.__getattr__(attr)))
-        return ret
-
-
-    def helper_show_ds18b20_detail(self):
-        ret = []
-        display = " - %-30s : %s"
-        for comp in self._root.find(type = "DS18B20"):
-            ret.append("DS18B20 : id=%s" % comp.id)
-            ret.append(display % ("Temperature", comp.temperature))
-            ret.append(display % ("Powered (1) / parasit (0)", comp.power))
-        return ret
-
-
-    def helper_show_ds2401_detail(self):
-        ret = []
-        display = " - %-30s : %s"
-        for comp in self._root.find(type = "DS2401"):
-            ret.append("DS2401 : id=%s" % comp.id)
-            ret.append(display % ("Present", comp.present))
-        return ret
 

@@ -53,17 +53,17 @@ class OneWireManager(XplPlugin):
     def __init__(self):
         """ Init onewire 
         """
-        XplPlugin.__init__(self, name='1wire')
+        XplPlugin.__init__(self, name='onewire')
         try:
             ### get all config keys
             self._config = Query(self._myxpl)
             res = XplResult()
-            self._config.query('1wire', 'device', res)
+            self._config.query('onewire', 'device', res)
             device = res.get_value()['device']
 
             self._config = Query(self._myxpl)
             res = XplResult()
-            self._config.query('1wire', 'cache', res)
+            self._config.query('onewire', 'cache', res)
             if res.get_value()['cache'] == "True":
                 cache = True
             else:
@@ -71,12 +71,12 @@ class OneWireManager(XplPlugin):
 
             self._config = Query(self._myxpl)
             res = XplResult()
-            self._config.query('1wire', 'ds18b20-en', res)
+            self._config.query('onewire', 'ds18b20-en', res)
             ds18b20_enabled = res.get_value()['ds18b20-en']
 
             self._config = Query(self._myxpl)
             res = XplResult()
-            self._config.query('1wire', 'ds18b20-int', res)
+            self._config.query('onewire', 'ds18b20-int', res)
             ds18b20_interval = res.get_value()['ds18b20-int']
     
             ### Open one wire entwork
@@ -90,12 +90,13 @@ class OneWireManager(XplPlugin):
             
     
             ### DS18B20 support
-            if ds18b20_enabled == True:
+            if ds18b20_enabled == "True":
+                self._log.info("DS18B20 support enabled")
                 ds18b20 = threading.Thread(None, 
                                            ComponentDs18b20, 
                                            None,
                                            (ow, 
-                                            ds18b20_interval, 
+                                            float(ds18b20_interval), 
                                             self.send_xpl),
                                            {})
                 ds18b20.start()
@@ -114,12 +115,9 @@ class OneWireManager(XplPlugin):
         msg = XplMessage()
         msg.set_type(type)
         msg.set_schema("sensor.basic")
-        print "DATA=%s" % data
         for element in data:
-            print element
             msg.add_data({element : data[element]})
         self._log.debug("Send xpl message...")
-        print msg
         self._myxpl.send(msg)
 
 
