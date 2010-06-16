@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-                                                                           
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -22,70 +22,107 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 Plugin purpose
 ==============
 
-xPL OneWire client
+Get informations about one wire network
 
 Implements
 ==========
 
-- OneWireTemp.__init__(self)
-- OneWireTemp._gettemp()
+TODO
 
-@author: Maxence Dunnewind <maxence@dunnewind.net>
+@author: Fritz SMH <fritz.smh@gmail.com>
 @copyright: (C) 2007-2009 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """
 
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.common.plugin import XplPlugin, XplResult
-from domogik.xpl.common.xplconnector import XplTimer
-from domogik.xpl.lib.onewire import OneWire
+from domogik.xpl.common.plugin import XplPlugin
+from domogik.xpl.common.plugin import XplResult
 from domogik.xpl.common.queryconfig import Query
+from domogik.xpl.lib.onewire import OneWireException
+from domogik.xpl.lib.onewire import OneWireNetwork
+from domogik.xpl.lib.onewire import ComponentDs18b20
+import ow
+import traceback
+import time
 import threading
 
 
-TEMP_DELAY = 60
-
-
-class OneWireTemp(XplPlugin):
-    '''
-    Manage the One-Wire stuff and connect it to xPL
-    '''
+class OneWireManager(XplPlugin):
 
     def __init__(self):
-        '''
-        Starts some timers to check temperature
-        '''
-        XplPlugin.__init__(self, name='onewire')
-        self._config = Query(self._myxpl)
-        res = XplResult()
-        self._config.query('onewire', 'temp-refresh', res)
-        temp_delay = res.get_value()['temp-refresh']
-        if temp_delay == "None":
-            temp_delay = TEMP_DELAY
-        self._myow = OneWire()
-        self._myow.set_cache_use(False)
-        stop = threading.Event()
-        t_temp = XplTimer(float(temp_delay), self._gettemp, stop, self._myxpl)
-        t_temp.start()
+        """ Init onewire 
+        """
+        XplPlugin.__init__(self, name='1wire')
+        try:
+            ### get all config keys
+            self._config = Query(self._myxpl)
+            res = XplResult()
+            self._config.query('1wire', 'device', res)
+            device = res.get_value()['device']
 
-    def _gettemp(self):
-        ''' Get the value of all 1wire components
-        '''
-        for (_id, _type, _val) in self._myow.get_temperatures():
-            print "=> %s : %s : %s" % (_id, _type, _val)
-            my_temp_message = XplMessage()
-            my_temp_message.set_type("xpl-stat")
-            my_temp_message.set_schema("sensor.basic")
-            my_temp_message.add_data({"device" :  _id})
-            #type should be the model of the o1wire component.
-            #Anyway, because we need a way to determine which is the
-            #technology of the device, we use it with value 'onewire'
-            my_temp_message.add_data({"type" :  "onewire"})
-            my_temp_message.add_data({"current" :  _val})
-            print "msg = %s" % my_temp_message
-            self._myxpl.send(my_temp_message)
+            self._config = Query(self._myxpl)
+            res = XplResult()
+            self._config.query('1wire', 'cache', res)
+            if res.get_value()['cache'] == "True":
+                cache = True
+            else:
+                cache = False
+
+            self._config = Query(self._myxpl)
+            res = XplResult()
+            self._config.query('1wire', 'ds18b20-en', res)
+            ds18b20_enabled = res.get_value()['ds18b20-en']
+
+            self._config = Query(self._myxpl)
+            res = XplResult()
+            self._config.query('1wire', 'ds18b20-int', res)
+            ds18b20_interval = res.get_value()['ds18b20-int']
+    
+            ### Open one wire entwork
+            try:
+                ow = OneWireNetwork(device, cache)
+            except OneWireException:
+                error = "Access to onewire device is not possible. Does your user have the good permissions ? If so, check that you stopped onewire module and you don't have OWFS mounted"
+                self._log.error(error)
+                print error
+                self.force_leave()
+            
+    
+            ### DS18B20 support
+            if ds18b20_enabled == True:
+                ds18b20 = threading.Thread(None, 
+                                           ComponentDs18b20, 
+                                           None,
+                                           (ow, 
+                                            ds18b20_interval, 
+                                            self.send_xpl),
+                                           {})
+                ds18b20.start()
+    
+        except:
+            self._log.error("Plugin error : stopping plugin... Trace : %s" % traceback.format_exc())
+            print traceback.format_exc()
+            self.force_leave()
+
+
+
+    def send_xpl(self, type, data):
+        """ Send data on xPL network
+            @param data : data to send (dict)
+        """
+        msg = XplMessage()
+        msg.set_type(type)
+        msg.set_schema("sensor.basic")
+        print "DATA=%s" % data
+        for element in data:
+            print element
+            msg.add_data({element : data[element]})
+        self._log.debug("Send xpl message...")
+        print msg
+        self._myxpl.send(msg)
+
 
 
 if __name__ == "__main__":
-    OneWireTemp()
+    ow = OneWireManager()
