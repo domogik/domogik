@@ -1,5 +1,5 @@
 <plugin>
-  <name>1wire</name>
+  <name>onewire</name>
   <technology>1wire</technology>
   <description>Manage 1-wire devices</description>
   <version>0.1</version>
