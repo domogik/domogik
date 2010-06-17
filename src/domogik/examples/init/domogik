@@ -123,8 +123,8 @@ function check_lock_dir {
     DIRECTORY=$(grep "^pid_dir_path" ${USER_HOME}/.domogik.cfg | cut -d " " -f 3)
     if [ ! -d $DIRECTORY ];then
         mkdir $DIRECTORY
-        chown ${DOMOGIK_USER}: $DIRECTORY
     fi
+    chown ${DOMOGIK_USER}: $DIRECTORY
 }
 
 case "$1" in
