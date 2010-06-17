@@ -378,7 +378,7 @@ class DeviceTypeFeature(Base):
         """Class constructor
 
         @param name : device feature name (Switch, Dimmer, Thermometer, Voltmeter...)
-        @param feature_type : device feature type
+        @param feature_type : device feature type (actuator / sensor)
         @param device_type_id : device type id
         @param value_type : value type the actuator can accept / the sensor can return
         @param parameters : parameters about the command or the returned data associated to the device, optional
