@@ -280,40 +280,6 @@ class PluginConfig(Base):
         return PluginConfig.__tablename__
 
 
-class DeviceType(Base):
-    """Type of a device (x10.Switch, x10.Dimmer, Computer.WOL...)"""
-
-    __tablename__ = '%s_device_type' % _db_prefix
-    id = Column(Integer, primary_key=True)
-    device_technology_id = Column(Unicode(30), ForeignKey('%s.id' % \
-                           DeviceTechnology.get_tablename()), nullable=False)
-    device_technology = relation(DeviceTechnology)
-    name = Column(Unicode(30), nullable=False)
-    description = Column(UnicodeText())
-
-    def __init__(self, name, device_technology_id, description=None):
-        """Class constructor
-
-        @param name : short name of the type
-        @param description : extended description, optional
-        @param device_technology_id : technology id
-
-        """
-        self.name = name
-        self.description = description
-        self.device_technology_id = device_technology_id
-
-    def __repr__(self):
-        """Return an internal representation of the class"""
-        return "<DeviceType(id=%s, name='%s', desc='%s', device techno='%s')>" \
-               % (self.id, self.name, self.description, self.device_technology)
-
-    @staticmethod
-    def get_tablename():
-        """Return the table name associated to the class"""
-        return DeviceType.__tablename__
-
-
 class Device(Base):
     """Device"""
 
@@ -357,6 +323,40 @@ class Device(Base):
     def get_tablename():
         """Return the table name associated to the class"""
         return Device.__tablename__
+
+
+class DeviceType(Base):
+    """Type of a device (x10.Switch, x10.Dimmer, Computer.WOL...)"""
+
+    __tablename__ = '%s_device_type' % _db_prefix
+    id = Column(Integer, primary_key=True)
+    device_technology_id = Column(Unicode(30), ForeignKey('%s.id' % \
+                           DeviceTechnology.get_tablename()), nullable=False)
+    device_technology = relation(DeviceTechnology)
+    name = Column(Unicode(30), nullable=False)
+    description = Column(UnicodeText())
+
+    def __init__(self, name, device_technology_id, description=None):
+        """Class constructor
+
+        @param name : short name of the type
+        @param description : extended description, optional
+        @param device_technology_id : technology id
+
+        """
+        self.name = name
+        self.description = description
+        self.device_technology_id = device_technology_id
+
+    def __repr__(self):
+        """Return an internal representation of the class"""
+        return "<DeviceType(id=%s, name='%s', desc='%s', device techno='%s')>" \
+               % (self.id, self.name, self.description, self.device_technology)
+
+    @staticmethod
+    def get_tablename():
+        """Return the table name associated to the class"""
+        return DeviceType.__tablename__
 
 
 class DeviceTypeFeature(Base):
