@@ -34,7 +34,7 @@ Implements
 @organization: Domogik
 """
 
-import sys 
+import sys
 
 from sqlalchemy import create_engine
 
@@ -63,8 +63,8 @@ try:
             url = "%s%s:%s@%s/%s" % (url, db_config['db_user'], db_config['db_password'], \
               db_config['db_host'], db_config['db_name'])
     test_url = '%s_test' % url
-except:
-    print "Some errors appears during connection to the database : Can't fetch informations from config file"
+except Exception, e:
+    print "Some errors appears during connection to the database : %s" % e
 
 engine = create_engine(url)
 engine_test = create_engine(test_url)
