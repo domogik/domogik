@@ -109,18 +109,18 @@ class Rest(XplPlugin):
 
         XplPlugin.__init__(self, name = 'rest')
         # logging initialization
-        log = logger.Logger('REST')
+        log = logger.Logger('rest')
         self._log = log.get_logger()
         self._log.info("Rest Server initialisation...")
         self._log.debug("locale : %s %s" % locale.getdefaultlocale())
 
         # logging Queue activities
-        log_queue = logger.Logger('REST-QUEUES')
+        log_queue = logger.Logger('rest-queues')
         self._log_queue = log_queue.get_logger()
         self._log_queue.info("Rest's queues activities...")
     
         # logging data manipulation initialization
-        log_dm = logger.Logger('REST-DM')
+        log_dm = logger.Logger('rest-dm')
         self._log_dm = log_dm.get_logger()
         self._log_dm.info("Rest Server Data Manipulation...")
     
@@ -3538,12 +3538,12 @@ class StatsManager(XplPlugin):
         directory = "%s/share/domogik/stats/" % cfg_db['custom_prefix']
 
         # logging initialization
-        log = logger.Logger('REST-STAT')
+        log = logger.Logger('rest-stat')
         self._log_stats = log.get_logger()
         self._log_stats.info("Rest Stat Manager initialisation...")
 
         # logging initialization for unkwnon devices
-        log_unknown = logger.Logger('REST-STAT-UNKNOWN-DEVICES')
+        log_unknown = logger.Logger('rest-stat-unknown-devices')
         self._log_stats_unknown = log_unknown.get_logger()
 
         files = glob.glob("%s/*/*xml" % directory)
