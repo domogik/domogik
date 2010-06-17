@@ -37,7 +37,7 @@ import time
 import datetime
 
 from domogik.common.database import DbHelper, DbHelperException
-from domogik.common.sql_schema import Area, Device, DeviceTypeFeature, DeviceUsage, DeviceConfig, DeviceStats, \
+from domogik.common.sql_schema import Area, Device, DeviceFeature, DeviceUsage, DeviceConfig, DeviceStats, \
                                       DeviceFeatureAssociation, DeviceTechnology, PluginConfig, \
                                       DeviceType, UIItemConfig, Room, UserAccount, SystemConfig, SystemStats, \
                                       SystemStatsValue, Trigger, Person
@@ -90,7 +90,7 @@ class GenericTestCase(unittest.TestCase):
         for device in device_list:
             db.del_device_config(device.id)
 
-    def remove_all_device_type_features(self, db):
+    def remove_all_device_features(self, db):
         for af in db.list_actuator_features():
             db.del_actuator_feature(af.id)
         for sf in db.list_sensor_features():
@@ -98,7 +98,7 @@ class GenericTestCase(unittest.TestCase):
 
     def remove_all_device_feature_associations(self, db):
         for dfa in db.list_device_feature_association():
-            db.del_device_feature_association(dfa.device_id, dfa.device_type_feature_id)
+            db.del_device_feature_association(dfa.device_id, dfa.device_feature_id)
 
     def remove_all_plugin_config(self, db):
         for plc in db.list_all_plugin_config():
@@ -396,21 +396,21 @@ class DeviceTypeTestCase(GenericTestCase):
         except DbHelperException:
             pass
 
-class DeviceTypeFeatureTestCase(GenericTestCase):
+class DeviceFeatureTestCase(GenericTestCase):
     """Test device type, actuator and sensor features"""
 
     def setUp(self):
         self.db = DbHelper(use_test_db=True)
-        self.remove_all_device_type_features(self.db)
+        self.remove_all_device_features(self.db)
         self.remove_all_device_technologies(self.db)
 
     def tearDown(self):
-        self.remove_all_device_type_features(self.db)
+        self.remove_all_device_features(self.db)
         self.remove_all_device_technologies(self.db)
         del self.db
 
     def test_empty_list(self):
-        assert len(self.db.list_device_type_features()) == 0
+        assert len(self.db.list_device_features()) == 0
 
     def test_add_get_list(self):
         dt1 = self.db.add_device_technology('x10', 'x10', 'desc dt1')
@@ -426,7 +426,7 @@ class DeviceTypeFeatureTestCase(GenericTestCase):
         assert af1.parameters == 'myparams1'
         assert af1.value_type == 'binary'
         assert af1.return_confirmation
-        assert self.db.get_device_type_feature_by_id(af1.id).name == 'Switch'
+        assert self.db.get_device_feature_by_id(af1.id).name == 'Switch'
         af2 = self.db.add_actuator_feature(af_name='Dimmer', af_device_type_id=dty2.id, af_parameters='myparams2',
                                            af_value_type='number', af_return_confirmation=True)
         sf1 = self.db.add_sensor_feature(sf_name='Thermometer', sf_device_type_id=dty3.id, sf_parameters='myparams3',
@@ -436,14 +436,14 @@ class DeviceTypeFeatureTestCase(GenericTestCase):
         assert sf1.id == dty3.id
         assert sf1.parameters == 'myparams3'
         assert sf1.value_type == 'number'
-        assert len(self.db.list_device_type_features()) == 3
-        assert self.has_item(self.db.list_device_type_features(), ['Switch', 'Dimmer', 'Thermometer'])
+        assert len(self.db.list_device_features()) == 3
+        assert self.has_item(self.db.list_device_features(), ['Switch', 'Dimmer', 'Thermometer'])
         assert len(self.db.list_actuator_features()) == 2
         assert self.db.get_actuator_feature_by_id(af2.id).name == 'Dimmer'
         assert len(self.db.list_sensor_features()) == 1
         assert self.db.get_sensor_feature_by_id(sf1.id).name == 'Thermometer'
-        assert len(self.db.list_device_type_feature_by_device_type_id(dty1.id)) == 1
-        assert len(self.db.list_device_type_feature_by_device_type_id(dty3.id)) == 1
+        assert len(self.db.list_device_feature_by_device_type_id(dty1.id)) == 1
+        assert len(self.db.list_device_feature_by_device_type_id(dty3.id)) == 1
 
     def test_update(self):
         dt1 = self.db.add_device_technology('x10', 'x10', 'desc dt1')
@@ -478,7 +478,7 @@ class DeviceTypeFeatureTestCase(GenericTestCase):
         af_d = self.db.del_actuator_feature(af1.id)
         assert af_d.id == af1.id
         assert len(self.db.list_device_feature_association_by_feature_id(af_d.id)) == 0
-        assert len(self.db.list_device_type_features()) == 2
+        assert len(self.db.list_device_features()) == 2
         assert len(self.db.list_actuator_features()) == 1
         assert len(self.db.list_sensor_features()) == 1
         af_d = self.db.del_actuator_feature(af2.id)
@@ -525,12 +525,12 @@ class DeviceFeatureAssociationTestCase(GenericTestCase):
                                            af_value_type='binary')
         af2 = self.db.add_actuator_feature(af_name='Dimmer', af_device_type_id=dty2.id, af_parameters='myparams2',
                                            af_value_type='number')
-        dfa = self.db.add_device_type_feature_association(d_device_id=device1.id, d_type_feature_id=af1.id,
+        dfa = self.db.add_device_feature_association(d_device_id=device1.id, d_type_feature_id=af1.id,
                                                           d_place_type='house')
         print(dfa)
-        self.db.add_device_type_feature_association(d_device_id=device2.id, d_type_feature_id=af2.id,
+        self.db.add_device_feature_association(d_device_id=device2.id, d_type_feature_id=af2.id,
                                                     d_place_id=room1.id, d_place_type='room')
-        self.db.add_device_type_feature_association(d_device_id=device3.id, d_type_feature_id=af2.id,
+        self.db.add_device_feature_association(d_device_id=device3.id, d_type_feature_id=af2.id,
                                                     d_place_id=area1.id, d_place_type='area')
         assert len(self.db.list_device_feature_association()) == 3
         assert len(self.db.list_device_feature_association_by_house()) == 1
@@ -561,15 +561,15 @@ class DeviceFeatureAssociationTestCase(GenericTestCase):
                                            af_parameters='myparams1')
         af2 = self.db.add_actuator_feature(af_name='Dimmer', af_device_type_id=dty2.id, af_value_type='number',
                                            af_parameters='myparams2')
-        dfa1 = self.db.add_device_type_feature_association(d_device_id=device1.id, d_type_feature_id=af1.id,
-                                                           d_place_type='house')
-        dfa2 = self.db.add_device_type_feature_association(d_device_id=device2.id, d_type_feature_id=af2.id,
-                                                           d_place_id=room1.id, d_place_type='room')
-        dfa3 = self.db.add_device_type_feature_association(d_device_id=device3.id, d_type_feature_id=af2.id,
-                                                           d_place_id=area1.id, d_place_type='area')
+        dfa1 = self.db.add_device_feature_association(d_device_id=device1.id, d_type_feature_id=af1.id,
+                                                      d_place_type='house')
+        dfa2 = self.db.add_device_feature_association(d_device_id=device2.id, d_type_feature_id=af2.id,
+                                                      d_place_id=room1.id, d_place_type='room')
+        dfa3 = self.db.add_device_feature_association(d_device_id=device3.id, d_type_feature_id=af2.id,
+                                                      d_place_id=area1.id, d_place_type='area')
         dfa = self.db.del_device_feature_association(d_device_id=dfa1.device_id,
-                                                     d_type_feature_id=dfa1.device_type_feature_id)
-        assert dfa.device_id == dfa1.device_id and dfa.device_type_feature_id == dfa1.device_type_feature_id
+                                                     d_type_feature_id=dfa1.device_feature_id)
+        assert dfa.device_id == dfa1.device_id and dfa.device_feature_id == dfa1.device_feature_id
         assert len(self.db.list_device_feature_association()) == 2
         assert len(self.db.list_device_feature_association_by_room_id(room1.id)) == 1
         assert len(self.db.list_device_feature_association_by_area_id(area1.id)) == 1

@@ -35,7 +35,7 @@ Implements
 - class PluginConfig
 - class DeviceType(Base):
 - class Device
-- class DeviceTypeFeature
+- class DeviceFeature
 - class DeviceFeatureAssociation
 - class DeviceConfig
 - class DeviceStats
@@ -359,10 +359,10 @@ class Device(Base):
         return Device.__tablename__
 
 
-class DeviceTypeFeature(Base):
-    """Device type features (actuator, sensor)"""
+class DeviceFeature(Base):
+    """Device features (switch, dimmer, temperature)"""
 
-    __tablename__ = '%s_device_type_feature' % _db_prefix
+    __tablename__ = '%s_device_feature' % _db_prefix
     id = Column(Integer, primary_key=True)
     name = Column(Unicode(30), nullable=False)
     feature_type = Column(Enum(FEATURE_TYPE_LIST), nullable=False)
@@ -405,14 +405,14 @@ class DeviceTypeFeature(Base):
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<DeviceTypeFeature(%s, %s, device_type=%s, param=%s, value_type=%s, stat_key=%s, return_conf=%s)>" \
+        return "<DeviceFeature(%s, %s, device_type=%s, param=%s, value_type=%s, stat_key=%s, return_conf=%s)>" \
                % (self.id, self.feature_type, self.device_type, self.parameters, self.value_type, \
                   self.stat_key, self.return_confirmation)
 
     @staticmethod
     def get_tablename():
         """Return the table name associated to the class"""
-        return DeviceTypeFeature.__tablename__
+        return DeviceFeature.__tablename__
 
 
 class DeviceFeatureAssociation(Base):
@@ -421,29 +421,29 @@ class DeviceFeatureAssociation(Base):
     __tablename__ = '%s_device_feature_association' % _db_prefix
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), primary_key=True)
     device = relation(Device, backref=backref(__tablename__))
-    device_type_feature_id = Column(Integer, ForeignKey('%s.id' % DeviceTypeFeature.get_tablename()), primary_key=True)
-    device_type_feature = relation(DeviceTypeFeature)
+    device_feature_id = Column(Integer, ForeignKey('%s.id' % DeviceFeature.get_tablename()), primary_key=True)
+    device_feature = relation(DeviceFeature)
     place_type = Column(Enum(DEVICE_FEATURE_ASSOCIATION_LIST), nullable=True)
     place_id = Column(Integer, nullable=True)
 
-    def __init__(self, device_id, device_type_feature_id, place_type=None, place_id=None):
+    def __init__(self, device_id, device_feature_id, place_type=None, place_id=None):
         """Class constructor
 
         @param device_id : device id
-        @param device_type_feature_id : id of device type feature
+        @param device_feature_id : device feature id
         @param place_type : room, area or house, optional (None if the feature is not associated to one of the places)
         @param place_id : place id (None if it is the house, or if the feature is not associated to one of the places)
 
         """
         self.device_id = device_id
-        self.device_type_feature_id = device_type_feature_id
+        self.device_feature_id = device_feature_id
         self.place_type = place_type
         self.place_id = place_id
 
     def __repr__(self):
         """Return an internal representation of the class"""
         return "<DeviceFeatureAssociation(%s, %s, %s, place_id=%s)>" \
-               % (self.device, self.device_type_feature, self.place_type, self.place_id)
+               % (self.device, self.device_feature, self.place_type, self.place_id)
 
     @staticmethod
     def get_tablename():
