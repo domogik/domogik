@@ -44,22 +44,22 @@ function run_setup_py {
                     exit 13
                 fi
             else
-                echo "Can't find setup.py, did you download the sources correctly ? "
+                echo "Can't find setup.py, did you download the sources correctly? "
                 exit 1
-            fi 
+            fi
         ;;
         *)
-            echo "Only modes develop and install are available"
+            echo "Only develop and install modes are available"
         ;;
     esac
 }
 
 function test_sources {
     FILENAME=$1
-    [ -d "$PWD/src" ] ||( echo "Can't find src/ directory, are you running this script from the sources main directory ? (with ./$FILENAME" && exit 2 )
-    [ -f "src/domogik/examples/config/domogik.cfg" ] ||( echo "Can't find src/domogik/examples/config/domogik.cfg file !" && exit 3 )
-    [ -f "src/domogik/examples/default/domogik" ] ||( echo "Can't find src/domogik/examples/default/domogik file !" && exit 4 )
-    [ -f "src/domogik/examples/init/domogik" ] ||( echo "Can't find src/domogik/examples/init/domogik !" && exit 5 )
+    [ -d "$PWD/src" ] ||( echo "Can't find src/ directory, are you running this script from the sources main directory? (with ./$FILENAME" && exit 2 )
+    [ -f "src/domogik/examples/config/domogik.cfg" ] ||( echo "Can't find src/domogik/examples/config/domogik.cfg file!" && exit 3 )
+    [ -f "src/domogik/examples/default/domogik" ] ||( echo "Can't find src/domogik/examples/default/domogik file!" && exit 4 )
+    [ -f "src/domogik/examples/init/domogik" ] ||( echo "Can't find src/domogik/examples/init/domogik!" && exit 5 )
 }
 
 function copy_sample_files {
@@ -70,23 +70,23 @@ function copy_sample_files {
         exit 6
     fi
     if [ -d "/etc/init.d/" ];then
-        cp src/domogik/examples/init/domogik /etc/init.d/ 
+        cp src/domogik/examples/init/domogik /etc/init.d/
         chmod +x /etc/init.d/domogik
     elif [ -d "/etc/rc.d/" ];then
-        cp src/domogik/examples/init/domogik /etc/rc.d/ 
+        cp src/domogik/examples/init/domogik /etc/rc.d/
         chmod +x /etc/rc.d/domogik
     else
-        echo "Init directory does not exists (/etc/init.d or /etc/rc.d)"
+        echo "Init directory does not exist (/etc/init.d or /etc/rc.d)"
         exit 7
     fi
 }
 
 function update_default_config {
     if [ ! -f /etc/default/domogik ];then
-        echo "Can't find /etc/default/domogik !"
+        echo "Can't find /etc/default/domogik!"
         exit 8
     fi
-    read -p "Which user will run domogik, it will be created if it does not exist yet ? (default : domogik) " d_user
+    read -p "Which user will run domogik, it will be created if it does not exist yet? (default : domogik) " d_user
     d_user=${d_user:-domogik}
     if ! getent passwd $d_user >/dev/null;then
         echo "I can't find informations about this user !"
@@ -94,7 +94,7 @@ function update_default_config {
         if [ "$create" = "y" ];then
             adduser $d_user
         else
-            echo "Please restart this script when the user $d_user will exists."
+            echo "Please restart this script when the user $d_user will exist."
             exit 9
         fi
     fi
@@ -104,7 +104,7 @@ function update_default_config {
 
     if [ "$MODE" = "develop" ];then
         d_custom_path=$PWD/src/domogik/xpl/tools/
-        [ -f /etc/default/domogik ] &&  sed -i "s;^CUSTOM_PATH.*$;CUSTOM_PATH=$d_custom_path;" /etc/default/domogik 
+        [ -f /etc/default/domogik ] &&  sed -i "s;^CUSTOM_PATH.*$;CUSTOM_PATH=$d_custom_path;" /etc/default/domogik
     fi
 }
 
@@ -120,12 +120,12 @@ function update_user_config {
     fi
     sed -i "s;^custom_prefix.*$;custom_prefix=$prefix;" $d_home/.domogik.cfg
 
-    read -p "Which interface do you want to bind to ? (default : lo) : " bind_iface
+    read -p "Which interface do you want to bind to? (default : lo) : " bind_iface
     bind_iface=${bind_iface:-lo}
     bind_addr=$(ifconfig $bind_iface|grep "inet ad"|cut -d ":" -f 2|cut -d " " -f 1)
     if [ "x$bind_addr" = "x" ];then
-        echo "Can't find the address associated to the interface !"
-        exit 20 
+        echo "Can't find the address associated to the interface!"
+        exit 20
     fi
     sed -i "s/^bind_interface.*$/bind_interface = $bind_addr/" $d_home/.domogik.cfg
     sed -i "s/^HUB_IFACE.*$/HUB_IFACE=$bind_iface/" /etc/default/domogik
@@ -151,37 +151,37 @@ function check_python {
             exit 12
         fi
     fi
-} 
+}
 
 function modify_hosts {
     [ -f "/etc/hosts" ] || touch /etc/hosts
     if ! grep localhost /etc/hosts|grep -qs 127.0.0.1;then
-        sed -i 's/^\(.*localhost.*\)$/#\1/' /etc/hosts 
-        echo "127.0.0.1 localhost" >> /etc/hosts 
+        sed -i 's/^\(.*localhost.*\)$/#\1/' /etc/hosts
+        echo "127.0.0.1 localhost" >> /etc/hosts
     fi
 }
 
 #Main part
 if [ $UID -ne 0 ];then
-    echo "Please restart this script as root !"
+    echo "Please restart this script as root!"
     exit 10
 fi
 
 check_python
 test_sources $0
-read -p "Which install mode do you want (choose develop if you don't know) ? [install/develop] : " MODE
+read -p "Which install mode do you want (choose develop if you don't know)? [install/develop] : " MODE
 while [ "$MODE" != "develop" -a "$MODE" != "install" ];do
-    read -p "Which install mode do you want ? [install/develop] : " MODE
+    read -p "Which install mode do you want? [install/develop] : " MODE
 done
 read -p "If you want to use a proxy, please set it now (ex: http://1.2.3.4:8080)" http_proxy
 if [ "x$http_proxy" != "x" ];then
     export http_proxy
 fi
 run_setup_py $MODE
-copy_sample_files 
-update_default_config 
-update_user_config 
-call_db_installer 
+copy_sample_files
+update_default_config
+update_user_config
+call_db_installer
 modify_hosts
 
 echo "Everything seems to be good, Domogik should be installed correctly."
