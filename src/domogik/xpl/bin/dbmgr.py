@@ -58,7 +58,6 @@ class DBConnector(XplPlugin):
         Initialize database and xPL connection
         '''
         XplPlugin.__init__(self, 'dbmgr')
-        self._log = self.get_my_logger()
         self._log.debug("Init database_manager instance")
 
         Listener(self._request_config_cb, self._myxpl, {'schema': 'domogik.config', 'xpltype': 'xpl-cmnd'})

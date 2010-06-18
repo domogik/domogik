@@ -38,16 +38,14 @@ Implements
 
 import socket
 import struct
-from domogik.common import logger
 
 class WOL:
     """
     This class allow to use Wake on Lan
     """
 
-    def __init__(self):
-        my_logger = logger.Logger('WOL')
-        self._log = my_logger.get_logger()
+    def __init__(self, log):
+        self._log = log
 
     def wake_up(self, mac, port):
         """

@@ -72,7 +72,7 @@ class XBMCNotificationListener(XplPlugin):
         self._log.debug("Config : maxdelay = " + maxdelay)
 
         # Create XBMCNotification object
-        self.xbmc_notification_manager = XBMCNotification(address, delay, \
+        self.xbmc_notification_manager = XBMCNotification(self._log, address, delay, \
                                                          maxdelay)
 
         # Create listeners

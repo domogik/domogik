@@ -64,7 +64,7 @@ class PlcBusMain(XplPlugin):
         res = XplResult()
         self._config.query('plcbus', 'device', res)
         device = res.get_value()['device']
-        self.api = PLCBUSAPI(device, self._command_cb, self._message_cb)
+        self.api = PLCBUSAPI(log, device, self._command_cb, self._message_cb)
         # Create log instance
         self._log = self.get_my_logger()
 

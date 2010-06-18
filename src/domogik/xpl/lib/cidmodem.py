@@ -38,13 +38,12 @@ Implements
 #import serial
 import threading 
 import time
-from domogik.common import logger
 
 class CallerIdModem:
     """ Look for incoming calls with a modem
     """
 
-    def __init__(self, serial_port, nb_max_try, interval, callback):
+    def __init__(self, log, serial_port, nb_max_try, interval, callback):
         """ Create handler
         @param serial_port : The full path or number of the device where 
                              modem is connected
@@ -53,7 +52,8 @@ class CallerIdModem:
         @param callback : method to call each time all data are collected
         """
         self._stop = threading.Event()
-        self._thread = self._CallerIdModemHandler(serial_port, \
+        self._thread = self._CallerIdModemHandler(log, \
+                                                  serial_port, \
                                                   int(nb_max_try), \
                                                   float(interval), \
                                                   callback, \
@@ -75,11 +75,10 @@ class CallerIdModem:
         Read data on serial port
         """
 
-        def __init__(self, serial_port, nb_max_try, interval, callback, lock):
+        def __init__(self, log, serial_port, nb_max_try, interval, callback, lock):
 
             # logging initialization
-            my_logger = logger.Logger('CallerIdModem')
-            self._log = my_logger.get_logger()
+            self._log = log
 
             self._log.debug("cidmodem initialisation...")
             self.serial_port = serial_port

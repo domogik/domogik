@@ -49,13 +49,12 @@ class WOLListener(XplPlugin):
         """ Create lister for wake on lan
         """
         XplPlugin.__init__(self, name = 'wol')
-        # Create logger
-        self._log.debug("Listener for wake on lan created")
         # Create WOL object
-        self._wolmanager = WOL()
+        self._wolmanager = WOL(self._log)
         # Create listeners
         Listener(self.wol_cb, self._myxpl, {'schema': 'control.basic',
                 'xpltype': 'xpl-cmnd', 'type': 'wakeonlan', 'current': 'on'})
+        self._log.debug("Listener for wake on lan created")
 
     def wol_cb(self, message):
         """ Call wake on lan lib

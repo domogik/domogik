@@ -68,7 +68,8 @@ class CallerIdModemManager(XplPlugin):
             self._config.query('cidmodem', 'nbmaxtry', res)
             nbmaxtry = res.get_value()['nbmaxtry']
             # Call Library
-            self._mycalleridmodem  = CallerIdModem(device, nbmaxtry, \
+            self._mycalleridmodem  = CallerIdModem(self._log,\
+                                                   device, nbmaxtry, \
                                                    interval, \
                                                    self._broadcastframe)
             self._mycalleridmodem.start()
