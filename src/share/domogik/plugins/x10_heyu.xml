@@ -1,5 +1,5 @@
 <plugin>
-  <name>x10-heyu</name>
+  <name>x10_heyu</name>
   <technology>x10</technology>
   <description>Manage x10 devices with Heyu</description>
   <version>0.1</version>
