@@ -56,6 +56,8 @@ from domogik.common.sql_schema import ACTUATOR_VALUE_TYPE_LIST, Area, Device, De
                                       SystemConfig, SystemStats, SystemStatsValue, Trigger
 
 
+_db_config = None
+
 def ucode(my_string):
     """Convert a string into unicode or return None if None value is passed
 
@@ -67,6 +69,29 @@ def ucode(my_string):
         return unicode(my_string)
     else:
         return None
+
+def get_url_connection_string():
+    """Get url connection string to the database reading the configuration file"""
+
+    cfg = Loader('database')
+    config = None
+    if len(sys.argv) > 1:
+        config = cfg.load(sys.argv[1])
+    else:
+        config = cfg.load()
+    global _db_config
+    _db_config = dict(config[1])
+    url = "%s://" % _db_config['db_type']
+    if _db_config['db_type'] == 'sqlite':
+        url = "%s/%s" % (url, _db_config['db_path'])
+    else:
+        if __db_config['db_port'] != '':
+            url = "%s%s:%s@%s:%s/%s" % (url, _db_config['db_user'], _db_config['db_password'], _db_config['db_host'],
+                                        _db_config['db_port'], _db_config['db_name'])
+        else:
+            url = "%s%s:%s@%s/%s" % (url,_db_config['db_user'], _db_config['db_password'], _db_config['db_host'],
+                                     _db_config['db_name'])
+    return url
 
 class DbHelperException(Exception):
     """This class provides exceptions related to the DbHelper class
@@ -107,31 +132,12 @@ class DbHelper():
         @param use_test_db : if True use a test database (optional, default False)
 
         """
-        cfg = Loader('database')
-        config = None
-        if len(sys.argv) > 1:
-            config = cfg.load(sys.argv[1])
-        else:
-            config = cfg.load()
-        db = dict(config[1])
-        url = "%s://" % db['db_type']
-        if db['db_type'] == 'sqlite':
-            url = "%s/%s" % (url, db['db_path'])
-        else:
-            if db['db_port'] != '':
-                url = "%s%s:%s@%s:%s/%s" % (url, db['db_user'], \
-                                            db['db_password'],
-                                            db['db_host'], db['db_port'], \
-                                            db['db_name'])
-            else:
-                url = "%s%s:%s@%s/%s" % (url, db['db_user'], db['db_password'],
-                                         db['db_host'], db['db_name'])
-
+        url = get_url_connection_string()
         if use_test_db:
             url = '%s_test' % url
         # Connecting to the database
-        self.__dbprefix = db['db_prefix']
-        if db['db_type'] == 'sqlite':
+        self.__dbprefix = _db_config['db_prefix']
+        if _db_config['db_type'] == 'sqlite':
             # We use native_datetime=True with sqlite to be able to use timestamps properly
             # Otherwise we get this error : SQLite DateTime type only accepts Python datetime and date objects as input
             # See http://www.sqlalchemy.org/docs/reference/dialects/sqlite.html for more information

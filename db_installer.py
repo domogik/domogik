@@ -42,29 +42,9 @@ from domogik.common import sql_schema
 from domogik.common import database
 from domogik.common.configloader import Loader
 
-cfg = Loader('database')
-config = None
-if len(sys.argv) > 1:
-    config = cfg.load(sys.argv[1])
-else:
-    config = cfg.load()
-test_url = ''
 
-try:
-    db_config = dict(config[1])
-    url = "%s:///" % db_config['db_type']
-    if db_config['db_type'] == 'sqlite':
-        url = "%s%s" % (url,db_config['db_path'])
-    else:
-        if db_config['db_port'] != '':
-            url = "%s%s:%s@%s:%s/%s" % (url, db_config['db_user'], db_config['db_password'], \
-              db_config['db_host'], db_config['db_port'], db_config['db_name'])
-        else:
-            url = "%s%s:%s@%s/%s" % (url, db_config['db_user'], db_config['db_password'], \
-              db_config['db_host'], db_config['db_name'])
-    test_url = '%s_test' % url
-except Exception, e:
-    print "Some errors appears during connection to the database : %s (url : %s)" % (e, url)
+url = database.get_url_connection_string()
+test_url = '%s_test' % url
 
 engine = create_engine(url)
 engine_test = create_engine(test_url)
