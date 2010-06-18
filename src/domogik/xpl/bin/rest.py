@@ -109,8 +109,6 @@ class Rest(XplPlugin):
 
         XplPlugin.__init__(self, name = 'rest')
         # logging initialization
-        log = logger.Logger('rest')
-        self._log = log.get_logger()
         self._log.info("Rest Server initialisation...")
         self._log.debug("locale : %s %s" % locale.getdefaultlocale())
 
@@ -1512,13 +1510,13 @@ target=*
                 return
 
 
-        ### device_type_feature ######################
-        elif self.rest_request[0] == "device_type_feature":
+        ### device_feature ######################
+        elif self.rest_request[0] == "device_feature":
 
             ### list
             if self.rest_request[1] == "list":
                 if len(self.rest_request) == 4 and self.rest_request[2] == "by-type_id":
-                    self._rest_base_device_type_feature_list(type_id = self.rest_request[3])
+                    self._rest_base_device_feature_list(type_id = self.rest_request[3])
                 else:
                     self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
@@ -2129,17 +2127,17 @@ target=*
 
 
 ######
-# /base/device_type_feature processing
+# /base/device_feature processing
 ######
 
-    def _rest_base_device_type_feature_list(self, type_id):
+    def _rest_base_device_feature_list(self, type_id):
         """ list device type features
             @param id : id of device type id
         """
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("device_type_feature")
-        for features in self._db.list_device_type_feature_by_device_type_id(type_id):
+        json_data.set_data_type("device_feature")
+        for features in self._db.list_device_feature_by_device_type_id(type_id):
             json_data.add_data(features)
         self.send_http_response_ok(json_data.get())
 
@@ -2378,7 +2376,7 @@ target=*
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("feature_association")
         try:
-            ass = self._db.add_device_type_feature_association(self.get_parameters("device_id"), \
+            ass = self._db.add_device_feature_association(self.get_parameters("device_id"), \
                                                                self.get_parameters("feature_id"), \
                                                                self.get_parameters("association_type"), \
                                                                self.get_parameters("association_id"))
@@ -3295,7 +3293,7 @@ class JSonHelper():
 
         # issue to force data not to be in cache
         # TODO : update when all tables will be defined!!!
-        table_list = ["device_type_feature",  \
+        table_list = ["device_feature",  \
                      "area",  \
                      "device",  \
                      "device_usage",  \
@@ -3341,7 +3339,7 @@ class JSonHelper():
             return "#MAX_DEPTH# "
 
         # define data types
-        db_type = ("DeviceTypeFeature", "Area", "Device", "DeviceUsage", \
+        db_type = ("DeviceFeature", "Area", "Device", "DeviceUsage", \
                    "DeviceConfig", "DeviceStats", "DeviceStatsValue", \
                    "DeviceTechnology", "PluginConfig", "PluginConfigParam",  \
                    "DeviceType", "UIItemConfig", "Room", "UserAccount", \
