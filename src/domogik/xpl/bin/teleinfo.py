@@ -59,7 +59,7 @@ class TeleinfoManager(XplPlugin):
         self._config.query('teleinfo', 'interval', res)
         interval = res.get_value()['interval']
         self._device = device
-        self._myteleinfo  = TeleInfo(device, self._broadcastframe, interval)
+        self._myteleinfo  = TeleInfo(self._log, device, self._broadcastframe, interval)
         self.add_stop_cb(self._myteleinfo.stop)
         self._myteleinfo.start()
 

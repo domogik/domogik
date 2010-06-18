@@ -66,7 +66,7 @@ class MirrorManager(XplPlugin):
         self._config.query('mirror', 'nbmaxtry', res)
         nbmaxtry = res.get_value()['nbmaxtry']
         # Call Library
-        self._mymirror  = Mirror(device, nbmaxtry, interval, self._broadcastframe)
+        self._mymirror  = Mirror(self._log, device, nbmaxtry, interval, self._broadcastframe)
         self._mymirror.start()
 
     def _broadcastframe(self, action, ztamp_id):

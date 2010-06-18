@@ -38,18 +38,17 @@ Implements
 import threading
 import binascii
 import time
-from domogik.common import logger
 
 class Mirror:
     """ Listen to mir:ror
     """
 
-    def __init__(self, mirror_device, nb_max_try, interval, callback):
+    def __init__(self, log, mirror_device, nb_max_try, interval, callback):
         """ @param mirror_device : device of mir:ror (/dev/hidrawX)
         @param callback : method to call each time all data are collected
         """
         self._stop = threading.Event()
-        self._thread = self._MirrorHandler(mirror_device, int(nb_max_try), \
+        self._thread = self._MirrorHandler(log, mirror_device, int(nb_max_try), \
                                             float(interval), callback,
                                             self._stop)
 
@@ -69,11 +68,9 @@ class Mirror:
         Read data mir:ror device
         """
 
-        def __init__(self, mirror_device, nb_max_try, interval, callback, lock):
+        def __init__(self, log, mirror_device, nb_max_try, interval, callback, lock):
 
-            # logging initialization
-            my_logger = logger.Logger('Mirror')
-            self._log = my_logger.get_logger()
+            self._log = log
 
             self._log.info("mir:ror initialisation...")
             self._lock = lock

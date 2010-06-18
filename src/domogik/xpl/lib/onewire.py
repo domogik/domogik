@@ -59,14 +59,16 @@ class ComponentDs18b20:
     DS18B20 support
     """
 
-    def __init__(self, onewire, interval, callback):
+    def __init__(self, log, onewire, interval, callback):
         """
         Return temperature each <interval> seconds
+        @param log : log instance
         @param onewire : onewire network object
         @param interval : interval between each data sent
         @param callback : callback to return values
         """
         print "OW=%s" % onewire
+        self._log = log
         self.onewire = onewire
         self.interval = interval
         self.callback = callback
@@ -97,12 +99,13 @@ class OneWireNetwork:
     Get informations about 1wire network
     """
 
-    def __init__(self, dev = 'u', cache = False):
+    def __init__(self, log, dev = 'u', cache = False):
         """
         Create OneWire instance, allowing to use OneWire Network
         @param dev : device where the interface is connected to,
         default 'u' for USB
         """
+        self._log = log
         try:
             ow.init(dev)
             self._cache = cache

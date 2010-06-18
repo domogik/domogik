@@ -40,21 +40,20 @@ import threading
 import time
 import urllib
 
-from domogik.common import logger
 
 class XBMCNotification:
     """ This class allow to send notifications to XBMC
     """
 
-    def __init__(self, address, delay, maxdelay):
+    def __init__(self, log, address, delay, maxdelay):
         """ Init data
+            @param log : log instance
             @param address : XBMC HTTP server address
             @param delay : default display delay
             @param maxdelay : maxdelay between title and text messages
         """
         # Init logger
-        my_logger = logger.Logger('XBMC_MSG')
-        self._log = my_logger.get_logger()
+        self._log = log
         self._log.info("XBMCNotification:__init")
         # Config
         self._xbmc_address = address

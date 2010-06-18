@@ -82,8 +82,7 @@ class SysManager(XplPlugin):
 
         # Logger init
         self._log = self.get_my_logger()
-        self._log.debug("Init system manager")
-        self._log.debug("Host : %s" % gethostname())
+        self._log.info("Host : %s" % gethostname())
     
         # Get config
         cfg = Loader('domogik')

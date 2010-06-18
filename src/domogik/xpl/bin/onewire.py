@@ -81,7 +81,7 @@ class OneWireManager(XplPlugin):
     
             ### Open one wire entwork
             try:
-                ow = OneWireNetwork(device, cache)
+                ow = OneWireNetwork(self._log, device, cache)
             except OneWireException:
                 error = "Access to onewire device is not possible. Does your user have the good permissions ? If so, check that you stopped onewire module and you don't have OWFS mounted"
                 self._log.error(error)
@@ -95,7 +95,8 @@ class OneWireManager(XplPlugin):
                 ds18b20 = threading.Thread(None, 
                                            ComponentDs18b20, 
                                            None,
-                                           (ow, 
+                                           (self._log,
+                                            ow, 
                                             float(ds18b20_interval), 
                                             self.send_xpl),
                                            {})

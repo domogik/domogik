@@ -71,7 +71,8 @@ class GAgendaListener(XplPlugin):
         self._calendar_name = res.get_value()['calendarname']
 
         # Create object
-        self._gagenda_manager = GAgenda(self._email, \
+        self._gagenda_manager = GAgenda(self._log, \
+                                       self._email, \
                                        self._password, \
                                        self._calendar_name, \
                                        self._broadcast_events)

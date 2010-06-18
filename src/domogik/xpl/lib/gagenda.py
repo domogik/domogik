@@ -39,8 +39,6 @@ Implements
 @organization: Domogik
 """
 
-from domogik.common import logger
-
 import datetime
 import gdata.calendar.service
 
@@ -50,8 +48,9 @@ class GAgenda:
     This class allow to get events from Google Agenda
     """
 
-    def __init__(self, email, password, calendar_name, callback):
+    def __init__(self, log, email, password, calendar_name, callback):
         """ Init method
+            @param log : log instance
             @param email : email of gmail account
             @param password : password for account
             @param calendar_name : name of calendar to check
@@ -59,8 +58,7 @@ class GAgenda:
             @param callback : callback for sending events found
         """
         # Init logger
-        my_logger = logger.Logger('GAGENDA')
-        self._log = my_logger.get_logger()
+        self._log = log
         self._log.info("GAgenda:__init__")
         self._log.info("Email : " + email)
         self._log.info("Pass : " + password)

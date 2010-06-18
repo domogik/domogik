@@ -44,7 +44,6 @@ Implements
 @organization: Domogik
 """
 
-from domogik.common import logger
 from domogik.xpl.lib.PLCBusSerialHandler import serialHandler
 
 
@@ -66,15 +65,15 @@ class PLCBUSAPI:
     ALL_USER_UNIT_OFF must be with home unit=00.
     '''
 
-    def __init__(self, serial_port_no, command_cb, message_cb):
+    def __init__(self, log, serial_port_no, command_cb, message_cb):
         """ Main PLCBus manager
         Use serialHandler for low-level serial management
+        @param log : log instance
         @param serial_port_no : Number or path of the serial port
         @param command_cb: callback called when a command has been succesfully sent
         @param message_cb: called when a message is received from somewhere else on the network
         """
-        log = logger.Logger(self.__class__.__name__)
-        self._log = log.get_logger()
+        self._log = log
         #For these 2 callbacks, the param is sent as an array
         self._housecodes = list('ABCDEFGHIJKLMNOP')
         self._valuecode = enumerate(self._housecodes)

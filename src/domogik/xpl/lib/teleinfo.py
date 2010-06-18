@@ -43,12 +43,14 @@ class TeleInfo:
     each time all data are collected
     """
 
-    def __init__(self, serial_port, callback, interval = 60):
+    def __init__(self, log, serial_port, callback, interval = 60):
         """ @param serial_port : The full path or number of the device where teleinfo is connected
+        @param log : log instance
         @param callback : method to call each time all data are collected
         @param interval : seconds to wait between 2 data fetching
         The datas will be passed using a dictionnary
         """
+        self._log = log
         self._stop = threading.Event()
         self._thread = self.__TeleInfoHandler(serial_port, callback, float(interval), self._stop)
 
