@@ -173,7 +173,7 @@ read -p "Which install mode do you want (choose develop if you don't know)? [ins
 while [ "$MODE" != "develop" -a "$MODE" != "install" ];do
     read -p "Which install mode do you want? [install/develop] : " MODE
 done
-read -p "If you want to use a proxy, please set it now (ex: http://1.2.3.4:8080)" http_proxy
+read -p "If you want to use a proxy, please set it now. It will only be used during installation. (ex: http://1.2.3.4:8080)" http_proxy
 if [ "x$http_proxy" != "x" ];then
     export http_proxy
 fi
