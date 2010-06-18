@@ -122,7 +122,7 @@ function update_user_config {
 
     read -p "Which interface do you want to bind to? (default : lo) : " bind_iface
     bind_iface=${bind_iface:-lo}
-    bind_addr=$(ifconfig $bind_iface|grep "inet "|cut -d ":" -f 2|cut -d " " -f 1)
+    bind_addr=$(ifconfig $bind_iface|egrep -o "[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}"|head -1)
     if [ "x$bind_addr" = "x" ];then
         echo "Can't find the address associated to the interface!"
         exit 20
