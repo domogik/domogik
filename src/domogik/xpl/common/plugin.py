@@ -113,7 +113,8 @@ class XplPlugin():
             '''
             BasePlugin.__init__(self, name, stop_cb, parser, daemonize)
             Watcher(self)
-            self._log.debug("New system manager instance for %s" % name)
+            self._log.info("----------------------------------")
+            self._log.info("Starting plugin '%s' (new manager instance)" % name)
             self._is_manager = is_manager
             cfg = Loader('domogik')
             config = dict(cfg.load()[1])
