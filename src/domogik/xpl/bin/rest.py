@@ -109,8 +109,6 @@ class Rest(XplPlugin):
 
         XplPlugin.__init__(self, name = 'rest')
         # logging initialization
-        log = logger.Logger('rest')
-        self._log = log.get_logger()
         self._log.info("Rest Server initialisation...")
         self._log.debug("locale : %s %s" % locale.getdefaultlocale())
 
