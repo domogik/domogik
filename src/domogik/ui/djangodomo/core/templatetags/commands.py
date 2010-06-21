@@ -65,17 +65,17 @@ class GetCommandBinary(Node):
                             );
                         }
                     });
-                    """ % (feature.device_id, feature.device_type_feature_id, feature.device.device_usage_id,
-                           feature.device.name, feature.device_type_feature.name,
+                    """ % (feature.device_id, feature.device_feature_id, feature.device.device_usage_id,
+                           feature.device.name, feature.device_feature.name,
                            parameters_type['value0'], parameters_type['value1'],
                            parameters_usage['binary']['state0'], parameters_usage['binary']['state1'],
-                           device_type.device_technology_id, feature.device.address, feature.device_type_feature.return_confirmation)
+                           device_type.device_technology_id, feature.device.address, feature.device_feature.return_confirmation)
         return script
 
     @staticmethod
     def get_setValue(feature, value):
         script = """$("#widget_%s_%s").widget_mini_command_binary('setValue', %s);
-                    """ % (feature.device_id, feature.device_type_feature_id, value)
+                    """ % (feature.device_id, feature.device_feature_id, value)
         return script
 
 class GetCommandRange(Node):
@@ -103,18 +103,18 @@ class GetCommandRange(Node):
                             );
                         }
                     });
-                    """ % (feature.device_id, feature.device_type_feature_id, feature.device.device_usage_id,
-                           feature.device.name, feature.device_type_feature.name,
+                    """ % (feature.device_id, feature.device_feature_id, feature.device.device_usage_id,
+                           feature.device.name, feature.device_feature.name,
                            parameters_type['valueMin'], parameters_type['valueMax'],
                            parameters_usage['range']['step'], parameters_usage['range']['unit'],
                            device_type.device_technology_id, feature.device.address,
-                           parameters_type['command'], feature.device_type_feature.return_confirmation)
+                           parameters_type['command'], feature.device_feature.return_confirmation)
         return script
 
     @staticmethod
     def get_setValue(feature, value):
         script = """$("#widget_%s_%s").widget_mini_command_range('setValue', %s);
-                    """ % (feature.device_id, feature.device_type_feature_id, value)
+                    """ % (feature.device_id, feature.device_feature_id, value)
         return script
 
 class GetCommandTrigger():
@@ -138,10 +138,10 @@ class GetCommandTrigger():
                             );
                         }
                     });
-                    """ % (feature.device_id, feature.device_type_feature_id, feature.device.device_usage_id,
-                           feature.device.name, feature.device_type_feature.name,
+                    """ % (feature.device_id, feature.device_feature_id, feature.device.device_usage_id,
+                           feature.device.name, feature.device_feature.name,
                            device_type.device_technology_id, feature.device.address,
-                           parameters_type['command'], feature.device_type_feature.return_confirmation)
+                           parameters_type['command'], feature.device_feature.return_confirmation)
         return script
 
 class GetInfoNumber():
@@ -155,15 +155,15 @@ class GetInfoNumber():
                             deviceid: %s,
                             key: '%s'
                         });
-                 """ % (feature.device_id, feature.device_type_feature_id, feature.device.device_usage_id,
-                        feature.device.name, feature.device_type_feature.name,
-                        parameters_type['unit'], feature.device_id, feature.device_type_feature.stat_key)
+                 """ % (feature.device_id, feature.device_feature_id, feature.device.device_usage_id,
+                        feature.device.name, feature.device_feature.name,
+                        parameters_type['unit'], feature.device_id, feature.device_feature.stat_key)
         return script
 
     @staticmethod
     def get_setValue(feature, value):
         script = """$("#widget_%s_%s").widget_mini_info_number('setValue', %s);
-                 """ % (feature.device_id, feature.device_type_feature_id, value)
+                 """ % (feature.device_id, feature.device_feature_id, value)
 
         return script
 
@@ -188,17 +188,17 @@ class GetCommandWidget(Node):
         device_usage = DeviceUsages.get_dict_item(feature.device.device_usage_id)
         
         parameters_type = None;
-        if feature.device_type_feature.parameters != 'None':
-            parameters_type = simplejson.loads(unescape(feature.device_type_feature.parameters))
+        if feature.device_feature.parameters != 'None':
+            parameters_type = simplejson.loads(unescape(feature.device_feature.parameters))
         parameters_usage = None;
         if device_usage.default_options != 'None':
             parameters_usage = simplejson.loads(unescape(device_usage.default_options))
         
-        if feature.device_type_feature.value_type == "binary":
+        if feature.device_feature.value_type == "binary":
             script = GetCommandBinary.get_widget_mini(feature, device_type, device_usage, parameters_type, parameters_usage)
-        if feature.device_type_feature.value_type == "range":
+        if feature.device_feature.value_type == "range":
             script = GetCommandRange.get_widget_mini(feature, device_type, device_usage, parameters_type, parameters_usage)
-        if feature.device_type_feature.value_type == "trigger":
+        if feature.device_feature.value_type == "trigger":
             script = GetCommandTrigger.get_widget_mini(feature, device_type, device_usage, parameters_type, parameters_usage)
         return script
 
@@ -208,12 +208,12 @@ class GetCommandInit(Node):
 
     def render(self, context):
         feature = self.feature.resolve(context)
-        stat = Stats.get_latest(feature.device_id, feature.device_type_feature.stat_key)
+        stat = Stats.get_latest(feature.device_id, feature.device_feature.stat_key)
         script = ""
         if len(stat.stats) > 0 :
-            if feature.device_type_feature.value_type == "binary":
+            if feature.device_feature.value_type == "binary":
                 script = GetCommandBinary.get_setValue(feature, "'" + stat.stats[0].value + "'")
-            if feature.device_type_feature.value_type == "range":
+            if feature.device_feature.value_type == "range":
                 script = GetCommandRange.get_setValue(feature, "'" + stat.stats[0].value + "'")
         return script
 
@@ -226,9 +226,9 @@ class GetCommandUpdate(Node):
         feature = self.feature.resolve(context)
         value = self.value.resolve(context)
         script = ""
-        if feature.device_type_feature.value_type == "binary":
+        if feature.device_feature.value_type == "binary":
             script = GetCommandBinary.get_setValue(feature, value)
-        if feature.device_type_feature.value_type == "range":
+        if feature.device_feature.value_type == "range":
             script = GetCommandRange.get_setValue(feature, value)
         return script
     
@@ -241,14 +241,14 @@ class GetInfoWidget(Node):
         device_type = DeviceTypes.get_dict_item(feature.device.device_type_id)
         device_usage = DeviceUsages.get_dict_item(feature.device.device_usage_id)
         parameters_type = None;
-        if feature.device_type_feature.parameters != 'None':
-            parameters_type = simplejson.loads(unescape(feature.device_type_feature.parameters))
+        if feature.device_feature.parameters != 'None':
+            parameters_type = simplejson.loads(unescape(feature.device_feature.parameters))
         parameters_usage = None;
         if device_usage.default_options != 'None':
             parameters_usage = simplejson.loads(unescape(device_usage.default_options))
-        if feature.device_type_feature.value_type == "number":
+        if feature.device_feature.value_type == "number":
             script = GetInfoNumber.get_widget_mini(feature, device_type, device_usage, parameters_type, parameters_usage)
-        if feature.device_type_feature.value_type == "string":
+        if feature.device_feature.value_type == "string":
             script = GetInfoString.get_widget_mini(feature, device_type, device_usage, parameters_type, parameters_usage)
         return script
 
@@ -258,12 +258,12 @@ class GetInfoInit(Node):
 
     def render(self, context):
         feature = self.feature.resolve(context)
-        stat = Stats.get_latest(feature.device_id, feature.device_type_feature.stat_key)
+        stat = Stats.get_latest(feature.device_id, feature.device_feature.stat_key)
         script = ""
         if len(stat.stats) > 0 :
-            if feature.device_type_feature.value_type == "number":
+            if feature.device_feature.value_type == "number":
                 script = GetInfoNumber.get_setValue(feature, "'" + stat.stats[0].value + "'")
-            if feature.device_type_feature.value_type == "string":
+            if feature.device_feature.value_type == "string":
                 script = GetInfoString.get_setValue(feature, "'" + stat.stats[0].value + "'")
         return script
 
@@ -276,9 +276,9 @@ class GetInfoUpdate(Node):
         feature = self.feature.resolve(context)
         value = self.value.resolve(context)
         script = ""
-        if feature.device_type_feature.value_type == "number":
+        if feature.device_feature.value_type == "number":
             script = GetInfoNumber.get_setValue(feature, value)
-        if feature.device_type_feature.value_type == "string":
+        if feature.device_feature.value_type == "string":
             script = GetInfoString.get_setValue(feature, value)
         return script
         

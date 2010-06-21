@@ -148,10 +148,10 @@ class Devices(pipes.DmgPipe):
         for device in self.device:
             features = DeviceFeatures.get_by_type(device.device_type_id)
             associations = FeatureAssociations.get_by_device(device.id)
-            device.feature = features.device_type_feature
+            device.feature = features.device_feature
             for feature in device.feature:
                 for association in associations.feature_association:
-                    if (feature.id == association.device_type_feature_id):
+                    if (feature.id == association.device_feature_id):
                         feature.association = association
 
 class DeviceTechnologies(pipes.DmgPipe):
@@ -218,7 +218,7 @@ class DeviceUsages(pipes.DmgPipe):
         return dict[key]
 
 class DeviceFeatures(pipes.DmgPipe):
-    uri = settings.REST_URL + "/base/device_type_feature"
+    uri = settings.REST_URL + "/base/device_feature"
 
     @staticmethod
     def get_by_type(type_id):
