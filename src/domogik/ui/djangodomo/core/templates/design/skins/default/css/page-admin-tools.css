@@ -1,0 +1,27 @@
+#commandline {
+	width:90%;
+}
+
+ul#result {
+    list-style:none;
+    margin:0;
+    padding:0;
+	background-color:#000000;
+	height:40em;
+	overflow-y:scroll;
+}
+
+ul#result li {
+    display:block;
+    margin: 0;
+    padding: 0;
+	color:#ffffff;
+	padding:5px 2em 0 2em;
+}
+
+ul#result li.command {
+	border-top: #ffffff 1px solid;
+	color:#ffffff;
+	font-weight:bold;
+	font-style:italic;
+}

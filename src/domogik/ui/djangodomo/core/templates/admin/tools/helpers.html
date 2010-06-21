@@ -1,0 +1,86 @@
+{% extends "layout_admin.html" %}
+{% comment %}
+# Copyright 2008 Domogik project
+
+# This file is part of Domogik.
+# Domogik is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Domogik is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+
+# Author : Cédric Trévisan <cedric@domogik.org>
+{% endcomment %}
+
+
+{% load i18n %}
+{% block css %}
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/page-admin-tools.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+{% block js_include %}
+{% endblock %}
+{% block js_script %}
+    $(function(){
+        // Accordion
+        $("#nav2").accordion({ autoHeight: false, header: ".subnav2", active:3});
+        $("#commandsubmit").click(function(){
+            var commandline = $("#commandline").val();
+            if (commandline) {
+				var li = $("<li class='command'>" + commandline + "</li>");
+				li.focus();
+				$("#result").append(li);
+				$("#commandline").val('');
+				var commandarray = commandline.split(' ')
+				var command = ['helper'];
+				command = command.concat(commandarray);
+                $.getREST(command,
+                    function(data) {
+                        var status = (data.status).toLowerCase();
+                        if (status == 'ok') {
+//                            $("#housename").removeClass('icon16-status-false');
+//                            $("#housename").addClass('icon16-status-true');
+								$.each(data.helper, function(index, value) {
+									$("#result").append("<li>" + value + "</li>");									
+								});
+								console.log($("#result").height());
+								$("#result").scrollTop(200);
+                        } else {
+//                            $("#housename").removeClass('icon16-status-true');
+//                            $("#housename").addClass('icon16-status-false');
+                            $.notification('error', '{% trans "Helper " %} (' + data.description + ')');                                                                      
+                        }
+                    }
+                );            
+            } else {
+//                $("#housename").removeClass('icon16-status-true');
+//                $("#housename").addClass('icon16-status-false');  
+            }
+        });
+    });
+{% endblock %}
+{% block title %}{% trans page_title %}{% endblock %}
+
+{% block banner %}
+    <h1 class="ident"><span class="title">{% trans "Home" %}</span></h1>
+    {% ifnotequal status "" %}
+    <div id='messages' class='{{status}}'>{{msg}}</div>
+    {% endifnotequal %}
+{% endblock %}
+
+{% block right %}
+    <section class="subsection">
+        <h2>{% trans "Helpers" %}</h2>
+            <label for='commandline'>{% trans "Command" %}</label>
+            <input type='text' id='commandline' name='commandline'>
+            <button id='commandsubmit' class='button'>{% trans "Send" %}</button>
+		<ul id='result'>
+		</ul>
+    </section>
+{% endblock %}

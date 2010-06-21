@@ -414,6 +414,27 @@ def admin_plugins_plugin(request, plugin_name):
         plugin=result_plugin_detail.plugin[0]
     )
 
+def admin_tools_helpers(request):
+    """
+    Method called when the admin helpers tool page is accessed
+    @param request : HTTP request
+    @return an HttpResponse object
+    """
+    if not __is_user_admin(request):
+        return index(request)
+
+    status = request.GET.get('status', '')
+    msg = request.GET.get('msg', '')
+    page_title = _("Helpers tools")
+    return __go_to_page(
+        request, 'admin/tools/helpers.html',
+        page_title,
+        nav1_admin = "selected",
+        nav2_tools_helpers = "selected",
+        status=status,
+        msg=msg
+	)
+	
 def show_house(request):
     """
     Method called when the show index page is accessed
