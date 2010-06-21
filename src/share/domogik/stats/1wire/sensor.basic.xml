@@ -5,6 +5,7 @@
             <listener>
                 <filter>
                     <key name="type" value="temp"/>
+                    <key name="type" value="input"/>
                 </filter>
             </listener>
             <mapping>
