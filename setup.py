@@ -78,10 +78,10 @@ setup(
         'domogik.ui.djangodomo.core': list_all_files('src/domogik/ui/djangodomo/core/templates/'),
     },
     data_files = [
-        ('share/domogik/listeners/', list_all_files('src/share/domogik/stats/')),
-        ('share/domogik/rest/', list_all_files('src/share/domogik/url2xpl/')),
-        ('share/doc/schemas', list_all_files('src/domogik/xpl/schema/')),
-        ('bin/', ['src/domogik/xpl/tools/xPL_Hub']),
+        ('/usr/local/share/domogik/listeners/', list_all_files('src/share/domogik/stats/')),
+        ('/usr/local/share/domogik/rest/', list_all_files('src/share/domogik/url2xpl/')),
+        ('/usr/local/share/doc/schemas', list_all_files('src/domogik/xpl/schema/')),
+        ('/usr/local/bin/', ['src/domogik/xpl/tools/xPL_Hub']),
         ('/etc/init.d/', ['src/domogik/examples/init/domogik']),
         ('/etc/default/', ['src/domogik/examples/default/domogik'])
     ],
