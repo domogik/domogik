@@ -56,7 +56,7 @@ Implements
 import sys
 from exceptions import AssertionError
 
-from sqlalchemy import types, create_engine, Table, Column, Integer, String, \
+from sqlalchemy import types, create_engine, Table, Column, Integer, Float, String, \
                        MetaData, ForeignKey, Boolean, DateTime, Date, Text, Unicode, UnicodeText, UniqueConstraint
 from sqlalchemy.types import TIMESTAMP
 from sqlalchemy.ext.declarative import declarative_base
@@ -488,27 +488,40 @@ class DeviceStats(Base):
     __tablename__ = '%s_device_stats' % _db_prefix
     date = Column(TIMESTAMP, primary_key=True)
     key = Column(Unicode(30), primary_key=True)
-    value = Column(Unicode(255), nullable=False)
+    # We have both types for value field because we need an explicit numerical field in case we want to compute
+    # arithmetical operations (min/max/avg etc.)
+    __value_num = Column('value_num', Float)
+    __value_str = Column('value_str', Unicode(255))
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), nullable=False, primary_key=True)
     device = relation(Device)
 
-    def __init__(self, date, key, value, device_id):
+    def __init__(self, date, key, device_id, value):
         """Class constructor
 
-        @param device_id : device id
         @param date : timestamp when the stat was recorded
         @param key : key
-        @param value : value
+        @param device_id : device id
+        @param value : stat value (numerical or string)
 
         """
         self.date = date
         self.key = key
-        self.value = value
+        try:
+            self.__value_num = float(value)
+        except ValueError:
+            self.__value_str = value
         self.device_id = device_id
+
+    def get_value(self):
+        """Return the stat value"""
+        if self.__value_num is not None:
+            return self.__value_num
+        else:
+            return self.__value_str
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<DeviceStats(date='%s', (%s, %s), device=%s)>" % (self.date, self.key, self.value, self.device)
+        return "<DeviceStats(date='%s', (%s, %s), device=%s)>" % (self.date, self.key, self.get_value(), self.device)
 
     @staticmethod
     def get_tablename():
