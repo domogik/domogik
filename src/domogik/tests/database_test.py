@@ -526,12 +526,12 @@ class DeviceFeatureAssociationTestCase(GenericTestCase):
         af2 = self.db.add_actuator_feature(af_name='Dimmer', af_device_type_id=dty2.id, af_parameters='myparams2',
                                            af_value_type='number')
         dfa = self.db.add_device_feature_association(d_device_id=device1.id, d_type_feature_id=af1.id,
-                                                          d_place_type='house')
+                                                     d_place_type='house')
         print(dfa)
         self.db.add_device_feature_association(d_device_id=device2.id, d_type_feature_id=af2.id,
-                                                    d_place_id=room1.id, d_place_type='room')
+                                               d_place_id=room1.id, d_place_type='room')
         self.db.add_device_feature_association(d_device_id=device3.id, d_type_feature_id=af2.id,
-                                                    d_place_id=area1.id, d_place_type='area')
+                                               d_place_id=area1.id, d_place_type='area')
         assert len(self.db.list_device_feature_association()) == 3
         assert len(self.db.list_device_feature_association_by_house()) == 1
         assert len(self.db.list_device_feature_association_by_room_id(room1.id)) == 1
