@@ -67,17 +67,18 @@ class ComponentDs18b20:
         @param interval : interval between each data sent
         @param callback : callback to return values
         """
-        print "OW=%s" % onewire
         self._log = log
         self.onewire = onewire
         self.interval = interval
         self.callback = callback
         self.root = self.onewire.get_root()
         self.old_temp = 0
+        self.start_listening()
 
-        self.start_waiting()
-
-    def start_waiting(self):
+    def start_listening(self):
+        """ 
+        Start listening for onewire ds18b20
+        """
         while True:
             for comp in self.root.find(type = "DS18B20"):
                 id = comp.id
@@ -91,6 +92,48 @@ class ComponentDs18b20:
                 self.callback(type, {"device" : id,
                                      "type" : "temp",
                                      "current" : comp.temperature})
+            time.sleep(self.interval)
+
+
+class ComponentDs2401:
+    """
+    DS2401 support
+    """
+
+    def __init__(self, log, onewire, interval, callback):
+        """
+        Check component presence each <interval> seconds
+        @param log : log instance
+        @param onewire : onewire network object
+        @param interval : interval between each data sent
+        @param callback : callback to return values
+        """
+        self._log = log
+        self.onewire = onewire
+        self.interval = interval
+        self.callback = callback
+        self.root = self.onewire.get_root()
+        self.old_present = 2 # not 0, not 1 : to be sure to send a xpl-trig
+        self.start_listening()
+
+    def start_listening(self):
+        """ 
+        Start listening for onewire ds2401
+        """
+        while True:
+            for comp in self.root.find(type = "DS2401"):
+                id = comp.id
+                present = int(comp.present)
+                if present != self.old_present:
+                    if present == 1:
+                        status = "HIGH"
+                    else:
+                        status = "LOW"
+                    print "id=%s, status=%s" % (id, status)
+                    self.callback("xpl-trig", {"device" : id,
+                                         "type" : "input",
+                                         "current" : "HIGH"})
+                    self.old_present = present
             time.sleep(self.interval)
     
 

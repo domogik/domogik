@@ -42,6 +42,7 @@ from domogik.xpl.common.queryconfig import Query
 from domogik.xpl.lib.onewire import OneWireException
 from domogik.xpl.lib.onewire import OneWireNetwork
 from domogik.xpl.lib.onewire import ComponentDs18b20
+from domogik.xpl.lib.onewire import ComponentDs2401
 import ow
 import traceback
 import time
@@ -69,6 +70,7 @@ class OneWireManager(XplPlugin):
             else:
                 cache = False
 
+            ### DS18B20 config
             self._config = Query(self._myxpl)
             res = XplResult()
             self._config.query('onewire', 'ds18b20-en', res)
@@ -78,6 +80,17 @@ class OneWireManager(XplPlugin):
             res = XplResult()
             self._config.query('onewire', 'ds18b20-int', res)
             ds18b20_interval = res.get_value()['ds18b20-int']
+    
+            ### DS2401 config
+            self._config = Query(self._myxpl)
+            res = XplResult()
+            self._config.query('onewire', 'ds2401-en', res)
+            ds2401_enabled = res.get_value()['ds2401-en']
+
+            self._config = Query(self._myxpl)
+            res = XplResult()
+            self._config.query('onewire', 'ds2401-int', res)
+            ds2401_interval = res.get_value()['ds2401-int']
     
             ### Open one wire entwork
             try:
@@ -101,6 +114,19 @@ class OneWireManager(XplPlugin):
                                             self.send_xpl),
                                            {})
                 ds18b20.start()
+    
+            ### DS2401 support
+            if ds2401_enabled == "True":
+                self._log.info("DS2401 support enabled")
+                ds2401 = threading.Thread(None, 
+                                           ComponentDs2401, 
+                                           None,
+                                           (self._log,
+                                            ow, 
+                                            float(ds2401_interval), 
+                                            self.send_xpl),
+                                           {})
+                ds2401.start()
     
         except:
             self._log.error("Plugin error : stopping plugin... Trace : %s" % traceback.format_exc())
