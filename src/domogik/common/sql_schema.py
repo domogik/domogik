@@ -65,7 +65,6 @@ from domogik.common.configloader import Loader
 
 DEVICE_TYPE_LIST = ['appliance', 'lamp', 'music', 'sensor']
 DEVICE_FEATURE_ASSOCIATION_LIST = [None, 'room', 'area', 'house']
-FEATURE_TYPE_LIST = ['actuator', 'sensor']
 ACTUATOR_VALUE_TYPE_LIST = ['binary', 'complex', 'list', 'number', 'range', 'string', 'trigger']
 SENSOR_VALUE_TYPE_LIST = ['binary', 'complex', 'number', 'string', 'trigger']
 
