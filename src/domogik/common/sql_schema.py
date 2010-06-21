@@ -27,7 +27,6 @@ Defines the sql schema used by Domogik
 Implements
 ==========
 
-- class Enum
 - class Area
 - class Room
 - class DeviceUsage
@@ -56,7 +55,7 @@ Implements
 import sys
 from exceptions import AssertionError
 
-from sqlalchemy import types, create_engine, Table, Column, Integer, String, \
+from sqlalchemy import types, create_engine, Table, Column, Integer, Float, String, Enum, \
                        MetaData, ForeignKey, Boolean, DateTime, Date, Text, Unicode, UnicodeText, UniqueConstraint
 from sqlalchemy.types import TIMESTAMP
 from sqlalchemy.ext.declarative import declarative_base
@@ -65,8 +64,6 @@ from sqlalchemy.orm import relation, backref
 from domogik.common.configloader import Loader
 
 DEVICE_TYPE_LIST = ['appliance', 'lamp', 'music', 'sensor']
-DEVICE_FEATURE_ASSOCIATION_LIST = [None, 'room', 'area', 'house']
-FEATURE_TYPE_LIST = ['actuator', 'sensor']
 ACTUATOR_VALUE_TYPE_LIST = ['binary', 'complex', 'list', 'number', 'range', 'string', 'trigger']
 SENSOR_VALUE_TYPE_LIST = ['binary', 'complex', 'number', 'string', 'trigger']
 
@@ -80,46 +77,6 @@ if len(sys.argv) > 1:
 else:
     _config = _cfg.load()
 _db_prefix = dict(_config[1])['db_prefix']
-
-
-class Enum(types.TypeDecorator):
-    """Emulate an Enum type (see http://www.sqlalchemy.org/trac/wiki/UsageRecipes/Enum)"""
-    impl = types.Unicode
-
-    def __init__(self, values, empty_to_none=True, strict=False):
-        """Class constructor
-
-        @param values : a list of valid values for this column
-        @param empty_to_none : treat the empty string '' as None (optional default = False)
-        @param strict : also insist that columns read from the database are in the
-                        list of valid values.  Note that, with strict=True, you won't
-                        be able to clean out bad data from the database through your
-                        code. (optional default = False)
-
-        """
-
-        if values is None or len(values) is 0:
-            raise AssertionError('Enum requires a list of values')
-        self.empty_to_none = empty_to_none
-        self.strict = strict
-        self.values = values[:]
-
-        # The length of the string/unicode column should be the longest string
-        # in values
-        size = max([len(v) for v in values if v is not None])
-        super(Enum, self).__init__(size)
-
-    def process_bind_param(self, value, dialect):
-        if self.empty_to_none and value is '':
-            value = None
-        if value not in self.values:
-            raise AssertionError('"%s" not in Enum.values' % value)
-        return value
-
-    def process_result_value(self, value, dialect):
-        if self.strict and value not in self.values:
-            raise AssertionError('"%s" not in Enum.values' % value)
-        return value
 
 
 # Define objects
@@ -365,7 +322,7 @@ class DeviceFeature(Base):
     __tablename__ = '%s_device_feature' % _db_prefix
     id = Column(Integer, primary_key=True)
     name = Column(Unicode(30), nullable=False)
-    feature_type = Column(Enum(FEATURE_TYPE_LIST), nullable=False)
+    feature_type = Column(Enum('actuator', 'sensor'), nullable=False)
     device_type_id = Column(Integer, ForeignKey('%s.id' % DeviceType.get_tablename()), nullable=False)
     device_type = relation(DeviceType)
     parameters = Column(UnicodeText())
@@ -388,7 +345,7 @@ class DeviceFeature(Base):
 
         """
         self.name = name
-        if feature_type != 'actuator' and feature_type != 'sensor':
+        if feature_type not in ('actuator', 'sensor'):
             raise Exception("Feature type must me either 'actuator' or 'sensor' but NOT %s" % feature_type)
         self.feature_type = feature_type
         if self.feature_type == 'actuator' and value_type not in ACTUATOR_VALUE_TYPE_LIST:
@@ -423,7 +380,7 @@ class DeviceFeatureAssociation(Base):
     device = relation(Device, backref=backref(__tablename__))
     device_feature_id = Column(Integer, ForeignKey('%s.id' % DeviceFeature.get_tablename()), primary_key=True)
     device_feature = relation(DeviceFeature)
-    place_type = Column(Enum(DEVICE_FEATURE_ASSOCIATION_LIST), nullable=True)
+    place_type = Column(Enum('room', 'area', 'house'), nullable=True)
     place_id = Column(Integer, nullable=True)
 
     def __init__(self, device_id, device_feature_id, place_type=None, place_id=None):
@@ -435,6 +392,13 @@ class DeviceFeatureAssociation(Base):
         @param place_id : place id (None if it is the house, or if the feature is not associated to one of the places)
 
         """
+        device_feat_ass_list = [None, 'room', 'area', 'house']
+        if place_type not in device_feat_ass_list:
+            raise DbHelperException("Place type should be one of : %s" % device_feat_ass_list)
+        if place_type is None and place_id is not None:
+            raise DbHelperException("Place id should be None as item type is None")
+        if (place_type == 'room' or place_type == 'area') and place_id is None:
+            raise DbHelperException("A place id should have been provided, place type is %s" % place_type)
         self.device_id = device_id
         self.device_feature_id = device_feature_id
         self.place_type = place_type
@@ -488,27 +452,40 @@ class DeviceStats(Base):
     __tablename__ = '%s_device_stats' % _db_prefix
     date = Column(TIMESTAMP, primary_key=True)
     key = Column(Unicode(30), primary_key=True)
-    value = Column(Unicode(255), nullable=False)
+    # We have both types for value field because we need an explicit numerical field in case we want to compute
+    # arithmetical operations (min/max/avg etc.)
+    __value_num = Column('value_num', Float)
+    __value_str = Column('value_str', Unicode(255))
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), nullable=False, primary_key=True)
     device = relation(Device)
 
-    def __init__(self, date, key, value, device_id):
+    def __init__(self, date, key, device_id, value):
         """Class constructor
 
-        @param device_id : device id
         @param date : timestamp when the stat was recorded
         @param key : key
-        @param value : value
+        @param device_id : device id
+        @param value : stat value (numerical or string)
 
         """
         self.date = date
         self.key = key
-        self.value = value
+        try:
+            self.__value_num = float(value)
+        except ValueError:
+            self.__value_str = value
         self.device_id = device_id
+
+    def get_value(self):
+        """Return the stat value"""
+        if self.__value_num is not None:
+            return self.__value_num
+        else:
+            return self.__value_str
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<DeviceStats(date='%s', (%s, %s), device=%s)>" % (self.date, self.key, self.value, self.device)
+        return "<DeviceStats(date='%s', (%s, %s), device=%s)>" % (self.date, self.key, self.get_value(), self.device)
 
     @staticmethod
     def get_tablename():
