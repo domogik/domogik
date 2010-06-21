@@ -345,7 +345,7 @@ class DeviceFeature(Base):
 
         """
         self.name = name
-        if feature_type != 'actuator' and feature_type != 'sensor':
+        if feature_type not in ('actuator', 'sensor'):
             raise Exception("Feature type must me either 'actuator' or 'sensor' but NOT %s" % feature_type)
         self.feature_type = feature_type
         if self.feature_type == 'actuator' and value_type not in ACTUATOR_VALUE_TYPE_LIST:

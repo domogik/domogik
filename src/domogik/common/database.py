@@ -727,8 +727,7 @@ class DbHelper():
         device_feature = self.__session.query(DeviceFeature)\
                                        .filter_by(id=af_id).filter_by(feature_type=u'actuator').first()
         if device_feature is None:
-            raise DbHelperException("DeviceFeature with id %s (actuator) couldn't be found - can't update it" \
-                                    % af_id)
+            raise DbHelperException("DeviceFeature with id %s (actuator) couldn't be found - can't update it" % af_id)
         if af_name is not None:
             device_feature.name = ucode(af_name)
         if af_parameters is not None:
