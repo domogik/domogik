@@ -49,10 +49,10 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
 from domogik.common.configloader import Loader
-from domogik.common.sql_schema import ACTUATOR_VALUE_TYPE_LIST, Area, Device, DeviceFeature, \
-                                      DeviceUsage, DeviceFeatureAssociation, DEVICE_FEATURE_ASSOCIATION_LIST, \
-                                      DeviceConfig, DeviceStats, DeviceTechnology, PluginConfig, \
-                                      DeviceType, UIItemConfig, Room, Person, UserAccount, SENSOR_VALUE_TYPE_LIST, \
+from domogik.common.sql_schema import ACTUATOR_VALUE_TYPE_LIST, Area, Device, DeviceFeature,\
+                                      DeviceUsage, DeviceFeatureAssociation,\
+                                      DeviceConfig, DeviceStats, DeviceTechnology, PluginConfig,\
+                                      DeviceType, UIItemConfig, Room, Person, UserAccount, SENSOR_VALUE_TYPE_LIST,\
                                       SystemConfig, SystemStats, SystemStatsValue, Trigger
 
 
@@ -963,12 +963,6 @@ class DbHelper():
         if device.device_type_id != device_feature.device_type_id:
             raise DbHelperException("device_type_id (%s) of device and device_type_id (%s) of device_feature" \
                                     "are not the same!" % (device.device_type_id, device_feature.device_type_id))
-        if d_place_type not in DEVICE_FEATURE_ASSOCIATION_LIST:
-            raise DbHelperException("Place type should be one of : %s" % DEVICE_FEATURE_ASSOCIATION_LIST)
-        if d_place_type is None and d_place_id is not None:
-            raise DbHelperException("Place id should be None as item type is None")
-        if (d_place_type == 'room' or d_place_type == 'area') and d_place_id is None:
-            raise DbHelperException("A place id should have been provided, place type is %s" % d_place_type)
         if d_place_id is not None and d_place_type != 'house':
             if d_place_type == 'room':
                 if not self.__session.query(Room).filter_by(id=d_place_id).first():

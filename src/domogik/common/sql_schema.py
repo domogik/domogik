@@ -64,7 +64,6 @@ from sqlalchemy.orm import relation, backref
 from domogik.common.configloader import Loader
 
 DEVICE_TYPE_LIST = ['appliance', 'lamp', 'music', 'sensor']
-DEVICE_FEATURE_ASSOCIATION_LIST = [None, 'room', 'area', 'house']
 ACTUATOR_VALUE_TYPE_LIST = ['binary', 'complex', 'list', 'number', 'range', 'string', 'trigger']
 SENSOR_VALUE_TYPE_LIST = ['binary', 'complex', 'number', 'string', 'trigger']
 
@@ -393,6 +392,13 @@ class DeviceFeatureAssociation(Base):
         @param place_id : place id (None if it is the house, or if the feature is not associated to one of the places)
 
         """
+        device_feat_ass_list = [None, 'room', 'area', 'house']
+        if place_type not in device_feat_ass_list:
+            raise DbHelperException("Place type should be one of : %s" % device_feat_ass_list)
+        if place_type is None and place_id is not None:
+            raise DbHelperException("Place id should be None as item type is None")
+        if (place_type == 'room' or place_type == 'area') and place_id is None:
+            raise DbHelperException("A place id should have been provided, place type is %s" % place_type)
         self.device_id = device_id
         self.device_feature_id = device_feature_id
         self.place_type = place_type
