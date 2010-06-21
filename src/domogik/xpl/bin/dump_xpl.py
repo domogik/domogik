@@ -39,6 +39,7 @@ Implements
 
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.plugin import XplPlugin
+import datetime
 
 
 class Sniffer(XplPlugin):
@@ -53,7 +54,7 @@ class Sniffer(XplPlugin):
         '''
         Print received message
         '''
-        print message
+        print "%s - %s" % (datetime.datetime.now(), message)
 
 if __name__ == "__main__":
     S = Sniffer()
