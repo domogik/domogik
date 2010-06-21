@@ -931,6 +931,21 @@ class DeviceStatsTestCase(GenericTestCase):
                                                               end_datetime=make_ts(2010, 04, 9, 12, 2))
         assert len(stats_l) == 3
 
+    def test_filter(self):
+        dt1 = self.db.add_device_technology('x10', 'x10', 'this is x10')
+        dty1 = self.db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
+        du1 = self.db.add_device_usage("lighting")
+        area1 = self.db.add_area('area1','description 1')
+        room1 = self.db.add_room('room1', area1.id)
+        device1 = self.db.add_device(d_name='device1', d_address = "A1", d_type_id = dty1.id, d_usage_id = du1.id)
+
+        start_d = make_ts(2010, 6, 21, 15, 48, 0)
+        end_d = make_ts(2010, 6, 21, 16, 48, 0)
+        for i in range(100):
+            self.db.add_device_stat(start_d+(i*10), 'val', i, device1.id)
+        print self.db.filter_stats_of_device_by_key(ds_key='val', ds_device_id=device1.id, start_date=start_d,
+                                                    end_date=end_d, step='minute', function_used='avg')
+
     def test_del(self):
         dt1 = self.db.add_device_technology('x10', 'x10', 'this is x10')
         dty1 = self.db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)

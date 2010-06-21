@@ -72,7 +72,6 @@ def ucode(my_string):
 
 def get_url_connection_string():
     """Get url connection string to the database reading the configuration file"""
-
     cfg = Loader('database')
     config = None
     if len(sys.argv) > 1:
@@ -92,6 +91,10 @@ def get_url_connection_string():
             url = "%s%s:%s@%s/%s" % (url,_db_config['db_user'], _db_config['db_password'], _db_config['db_host'],
                                      _db_config['db_name'])
     return url
+
+def get_db_type():
+    """Return DB type which is currently used (sqlite, mysql, postgresql)"""
+    return _db_config['db_type']
 
 class DbHelperException(Exception):
     """This class provides exceptions related to the DbHelper class
@@ -1455,7 +1458,7 @@ class DbHelper():
         return list_s
 
     def list_stats_of_device_between_by_key(self, ds_key, ds_device_id, start_datetime=None, end_datetime=None):
-        """Get statistics of a device between two dates (datetime format) for a given key
+        """Get statistics of a device between two dates for a given key
 
         @param ds_key : statistic key
         @param ds_device_id : device id
@@ -1485,6 +1488,64 @@ class DbHelper():
                              .filter_by(key=ucode(ds_key))\
                              .filter_by(device_id=ds_device_id)\
                              .order_by(sqlalchemy.desc(DeviceStats.date)).first()
+
+    def filter_stats_of_device_by_key(self, ds_key, ds_device_id, start_date, end_date, step, function_used):
+        """Filter statistic values within a period for a given step (minute, hour, day, week, month, year). It then
+        applies a function (min, max, avg) for the values within the step.
+
+        @param ds_key : statistic key
+        @param ds_device_id : device_id
+        @param start_date : date representing the begin of the period
+        @param end_date : date reprensenting the end of the period
+        @param step : minute, hour, day, week, month, year
+        @param function_used : min, max, avg
+        @return a list of tuples (date, computed value)
+
+        """
+        if step is None or step.lower() not in ('minute', 'hour', 'day', 'week', 'month', 'year'):
+            raise DbHelperException("'period' parameter should be one of : minute, hour, day, week, month, year")
+        elif step == 'minute':
+            step_value = 60
+        elif step == 'hour':
+            step_value = 3600
+        elif step == 'day':
+            step_value = 3600 * 24
+        elif step == 'week':
+            step_value = 3600 * 24 * 7
+        elif step == 'month':
+            step_value = 3600 * 24 * 7 * 30
+        elif step == 'year':
+            step_value = 3600 * 24 * 7 * 30 * 365
+        if start_date > end_date:
+            raise DbHelperException("'end_date' can't be prior to 'start_date'")
+        if function_used is None or function_used.lower() not in ('min', 'max', 'avg'):
+            raise DbHelperException("'function_used' parameter should be one of : min, max, avg")
+
+        # TODO : remove once method is OK
+        """
+        for ds in self.__session.query(DeviceStats).all():
+            print("date=%s, val=%s" % (ds.date, ds.get_value()))
+        """
+
+        result_list = []
+        # TODO : for other DB use literal SQL to improve efficiency
+        query = ""
+        if function_used == 'min':
+            init_query = self.__session.query(DeviceStats.date, func.min(DeviceStats._DeviceStats__value_num))
+        elif function_used == 'max':
+            init_query = self.__session.query(DeviceStats.date, func.max(DeviceStats._DeviceStats__value_num))
+        elif function_used == 'avg':
+            init_query = self.__session.query(DeviceStats.date, func.max(DeviceStats._DeviceStats__value_num))
+
+        for time_cursor in range(int(start_date), int(end_date), step_value):
+            query = init_query.filter_by(key=ucode(ds_key)).filter_by(device_id=ds_device_id)\
+                              .filter("date >= '" + str(time_cursor) + "'")\
+                              .filter("date <= '" + str(time_cursor + step_value) + "'")
+            val = query.first()
+            if val[0] is None:
+                break
+            result_list.append(val)
+        return result_list
 
     def device_has_stats(self, ds_device_id):
         """Check if the device has stats that were recorded
