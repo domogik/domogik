@@ -72,7 +72,7 @@ class ComponentDs18b20:
         self.interval = interval
         self.callback = callback
         self.root = self.onewire.get_root()
-        self.old_temp = 0
+        self.old_temp = {}
         self.start_listening()
 
     def start_listening(self):
@@ -83,11 +83,11 @@ class ComponentDs18b20:
             for comp in self.root.find(type = "DS18B20"):
                 id = comp.id
                 temperature = float(comp.temperature)
-                if temperature != self.old_temp:
+                if hasattr(self.old_temp, id) == False or temperature != self.old_temp[id]:
                     type = "xpl-trig"
                 else:
                     type = "xpl-stat"
-                self.old_temp = temperature
+                self.old_temp[id] = temperature
                 print "type=%s, id=%s, temp=%s" % (type, id, temperature)
                 self.callback(type, {"device" : id,
                                      "type" : "temp",
@@ -113,7 +113,7 @@ class ComponentDs2401:
         self.interval = interval
         self.callback = callback
         self.root = self.onewire.get_root()
-        self.old_present = 2 # not 0, not 1 : to be sure to send a xpl-trig
+        self.old_present = {}
         self.start_listening()
 
     def start_listening(self):
@@ -124,7 +124,7 @@ class ComponentDs2401:
             for comp in self.root.find(type = "DS2401"):
                 id = comp.id
                 present = int(comp.present)
-                if present != self.old_present:
+                if hasattr(self.old_present, id) == False or present != self.old_present[id]:
                     if present == 1:
                         status = "HIGH"
                     else:
@@ -133,7 +133,7 @@ class ComponentDs2401:
                     self.callback("xpl-trig", {"device" : id,
                                          "type" : "input",
                                          "current" : "HIGH"})
-                    self.old_present = present
+                    self.old_present[id] = present
             time.sleep(self.interval)
     
 
