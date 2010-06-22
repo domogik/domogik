@@ -274,7 +274,7 @@ class DbHelper():
         if area:
             if cascade_delete:
                 for room in self.__session.query(Room).filter_by(area_id=area_del_id).all():
-                    self.del_room(room.id, True)
+                    self.__del_room(room.id, True)
             dfa_list = self.__session.query(DeviceFeatureAssociation)\
                                      .filter_by(place_id=area.id, place_type=u'area').all()
             for dfa in dfa_list:
@@ -401,21 +401,26 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        room = self.__session.query(Room).filter_by(id=r_id).first()
+        room = self.__del_room(r_id, cascade_delete)
         if room:
-            if cascade_delete:
-                for device in self.__session.query(Device).filter_by(room_id=r_id).all():
-                    self.del_device(device.id)
-            dfa_list = self.__session.query(DeviceFeatureAssociation)\
-                                     .filter_by(place_id=room.id, place_type=u'room').all()
-            for dfa in dfa_list:
-                self.__session.delete(dfa)
-            self.__session.delete(room)
             try:
                 self.__session.commit()
             except Exception, sql_exception:
                 self.__session.rollback()
                 raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
+            return room
+
+    def __del_room(self, r_id, cascade_delete=False):
+        room = self.__session.query(Room).filter_by(id=r_id).first()
+        if room:
+            if cascade_delete:
+                for device in self.__session.query(Device).filter_by(room_id=r_id).all():
+                    self.__del_device(device.id)
+            dfa_list = self.__session.query(DeviceFeatureAssociation)\
+                                     .filter_by(place_id=room.id, place_type=u'room').all()
+            for dfa in dfa_list:
+                self.__session.delete(dfa)
+            self.__session.delete(room)
             return room
         else:
             raise DbHelperException("Couldn't delete room with id %s : it doesn't exist" % r_id)
@@ -613,6 +618,16 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
+        dty = self.__del_device_type(dty_id, cascade_delete)
+        if dty:
+            try:
+                self.__session.commit()
+            except Exception, sql_exception:
+                self.__session.rollback()
+                raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
+            return dty
+
+    def __del_device_type(self, dty_id, cascade_delete=False):
         dty = self.__session.query(DeviceType).filter_by(id=dty_id).first()
         if dty:
             if cascade_delete:
@@ -620,9 +635,9 @@ class DbHelper():
                     self.del_device(device.id)
                 for df in self.__session.query(DeviceFeature).filter_by(device_type_id=dty.id).all():
                     if df.feature_type == 'actuator':
-                        self.del_actuator_feature(df.id)
+                        self.__del_actuator_feature(df.id)
                     elif df.feature_type == 'sensor':
-                        self.del_sensor_feature(df.id)
+                        self.__del_sensor_feature(df.id)
             else:
                 device_list = self.__session.query(Device).filter_by(device_type_id=dty.id).all()
                 if len(device_list) > 0:
@@ -632,11 +647,6 @@ class DbHelper():
                     raise DbHelperException("Couldn't delete device type %s : there are associated device type " \
                                             "feature(s)" % dty_id)
             self.__session.delete(dty)
-            try:
-                self.__session.commit()
-            except Exception, sql_exception:
-                self.__session.rollback()
-                raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
             return dty
         else:
             raise DbHelperException("Couldn't delete device type with id %s : it doesn't exist" % dty_id)
@@ -774,6 +784,16 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
+        df = self.__del_actuator_feature(af_id)
+        if df:
+            try:
+                self.__session.commit()
+            except Exception, sql_exception:
+                self.__session.rollback()
+                raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
+            return df
+
+    def __del_actuator_feature(self, af_id):
         dtf = self.__session.query(DeviceFeature).filter_by(id=af_id).filter_by(feature_type=u'actuator').first()
         if not dtf:
             raise DbHelperException("Can't delete device type feature %s (actuator) : it doesn't exist" % af_id)
@@ -782,11 +802,6 @@ class DbHelper():
         for dfa in dfa_list:
             self.__session.delete(dfa)
         self.__session.delete(dtf)
-        try:
-            self.__session.commit()
-        except Exception, sql_exception:
-            self.__session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return dtf
 
 ####
@@ -885,6 +900,16 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
+        df = self.__del_sensor_feature(sf_id)
+        if df:
+            try:
+                self.__session.commit()
+            except Exception, sql_exception:
+                self.__session.rollback()
+                raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
+            return df
+
+    def __del_sensor_feature(self, sf_id):
         dtf = self.__session.query(DeviceFeature).filter_by(id=sf_id).filter_by(feature_type=u'sensor').first()
         if dtf is None:
             raise DbHelperException("Couldn't delete device type feature (sensor) with id %s : it doesn't exist" \
@@ -893,11 +918,6 @@ class DbHelper():
         for dfa in dfa_list:
             self.__session.delete(dfa)
         self.__session.delete(dtf)
-        try:
-            self.__session.commit()
-        except Exception, sql_exception:
-            self.__session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return dtf
 
 ####
@@ -1095,7 +1115,7 @@ class DbHelper():
         if dt:
             if cascade_delete:
                 for device_type in self.__session.query(DeviceType).filter_by(device_technology_id=ucode(dt.id)).all():
-                    self.del_device_type(device_type.id, cascade_delete=True)
+                    self.__del_device_type(device_type.id, cascade_delete=True)
             else:
                 device_type_list = self.__session.query(DeviceType).filter_by(device_technology_id=ucode(dt.id)).all()
                 if len(device_type_list) > 0:
@@ -1337,6 +1357,16 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
+        device = self.__del_device(d_id)
+        if device:
+            try:
+                self.__session.commit()
+            except Exception, sql_exception:
+                self.__session.rollback()
+                raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
+            return device
+
+    def __del_device(self, d_id):
         device = self.__session.query(Device).filter_by(id=d_id).first()
         if device is None:
             raise DbHelperException("Device with id %s couldn't be found" % d_id)
@@ -1347,11 +1377,6 @@ class DbHelper():
         for device_feat_asso in self.__session.query(DeviceFeatureAssociation).filter_by(device_id=d_id).all():
             self.__session.delete(device_feat_asso)
         self.__session.delete(device)
-        try:
-            self.__session.commit()
-        except Exception, sql_exception:
-            self.__session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return device
 
 ####
