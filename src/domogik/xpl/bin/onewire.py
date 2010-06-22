@@ -100,6 +100,7 @@ class OneWireManager(XplPlugin):
                 self._log.error(error)
                 print error
                 self.force_leave()
+                return
             
     
             ### DS18B20 support
