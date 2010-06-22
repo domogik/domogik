@@ -121,9 +121,11 @@ class ComponentDs2401:
         Start listening for onewire ds2401
         """
         while True:
+            self.actual_present = []
             for comp in self.root.find(type = "DS2401"):
                 id = comp.id
                 present = int(comp.present)
+                self.actual_present.append(id)
                 if hasattr(self.old_present, id) == False or present != self.old_present[id]:
                     if present == 1:
                         status = "HIGH"
@@ -132,9 +134,17 @@ class ComponentDs2401:
                     print "id=%s, status=%s" % (id, status)
                     self.callback("xpl-trig", {"device" : id,
                                          "type" : "input",
-                                         "current" : "HIGH"})
+                                         "current" : status})
                     self.old_present[id] = present
+            for comp_id in self.old_present:
+                if comp_id not in self.actual_present:
+                    print "id=%s, status=LOW component disappeared)" % (comp_id)
+                    self.callback("xpl-trig", {"device" : comp_id,
+                                         "type" : "input",
+                                         "current" : "LOW"})
+                    
             time.sleep(self.interval)
+ 
     
 
 class OneWireNetwork:
