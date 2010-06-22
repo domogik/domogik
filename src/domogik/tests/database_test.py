@@ -422,7 +422,7 @@ class DeviceFeatureTestCase(GenericTestCase):
                                            af_value_type='binary', af_return_confirmation=True)
         print(af1)
         assert af1.name == 'Switch'
-        assert af1.id == dty1.id
+        assert af1.device_type_id == dty1.id
         assert af1.parameters == 'myparams1'
         assert af1.value_type == 'binary'
         assert af1.return_confirmation
@@ -433,7 +433,7 @@ class DeviceFeatureTestCase(GenericTestCase):
                                          sf_value_type='number')
         print(sf1)
         assert sf1.name == 'Thermometer'
-        assert sf1.id == dty3.id
+        assert sf1.device_type_id == dty3.id
         assert sf1.parameters == 'myparams3'
         assert sf1.value_type == 'number'
         assert len(self.db.list_device_features()) == 3
