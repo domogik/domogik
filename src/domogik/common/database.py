@@ -96,6 +96,18 @@ def get_db_type():
     """Return DB type which is currently used (sqlite, mysql, postgresql)"""
     return _db_config['db_type']
 
+def _make_crypted_password(clear_text_password):
+    """Make a crypted password (using sha256)
+
+    @param clear_text_password : password in clear text
+    @return crypted password
+
+    """
+    password = hashlib.sha256()
+    password.update(clear_text_password)
+    return password.hexdigest()
+
+
 class DbHelperException(Exception):
     """This class provides exceptions related to the DbHelper class
 
@@ -1744,7 +1756,7 @@ class DbHelper():
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
         user_acc = self.__session.query(UserAccount).filter_by(login=ucode(a_login)).first()
-        return user_acc is not None and user_acc._UserAccount__password == self.__make_crypted_password(a_password)
+        return user_acc is not None and user_acc._UserAccount__password == _make_crypted_password(a_password)
 
     def add_user_account(self, a_login, a_password, a_person_id, a_is_admin=False, a_skin_used=''):
         """Add a user account
@@ -1764,7 +1776,7 @@ class DbHelper():
         person = self.__session.query(Person).filter_by(id=a_person_id).first()
         if person is None:
             raise DbHelperException("Person id '%s' does not exist" % a_person_id)
-        user_account = UserAccount(login=ucode(a_login), password=ucode(self.__make_crypted_password(a_password)),
+        user_account = UserAccount(login=ucode(a_login), password=ucode(_make_crypted_password(a_password)),
                                    person_id=a_person_id, is_admin=a_is_admin, skin_used=ucode(a_skin_used))
         self.__session.add(user_account)
         try:
@@ -1871,12 +1883,12 @@ class DbHelper():
         self.__session.expire_all()
         user_acc = self.__session.query(UserAccount).filter_by(id=a_id).first()
         if user_acc is not None:
-            old_pass = ucode(self.__make_crypted_password(a_old_password))
+            old_pass = ucode(_make_crypted_password(a_old_password))
             if user_acc._UserAccount__password != old_pass:
                 return False
         else:
             return False
-        user_acc.set_password(ucode(self.__make_crypted_password(a_new_password)))
+        user_acc.set_password(ucode(_make_crypted_password(a_new_password)))
         self.__session.add(user_acc)
         try:
             self.__session.commit()
@@ -1884,17 +1896,6 @@ class DbHelper():
             self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return True
-
-    def __make_crypted_password(self, clear_text_password):
-        """Make a crypted password (using sha256)
-
-        @param clear_text_password : password in clear text
-        @return crypted password
-
-        """
-        password = hashlib.sha256()
-        password.update(clear_text_password)
-        return password.hexdigest()
 
     def add_default_user_account(self):
         """Add a default user account (login = admin, password = domogik, is_admin = True)
