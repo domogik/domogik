@@ -84,7 +84,7 @@ def get_url_connection_string():
     if _db_config['db_type'] == 'sqlite':
         url = "%s/%s" % (url, _db_config['db_path'])
     else:
-        if __db_config['db_port'] != '':
+        if _db_config['db_port'] != '':
             url = "%s%s:%s@%s:%s/%s" % (url, _db_config['db_user'], _db_config['db_password'], _db_config['db_host'],
                                         _db_config['db_port'], _db_config['db_name'])
         else:
