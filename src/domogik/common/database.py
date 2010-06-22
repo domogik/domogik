@@ -1744,12 +1744,7 @@ class DbHelper():
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
         user_acc = self.__session.query(UserAccount).filter_by(login=ucode(a_login)).first()
-        if user_acc is not None:
-            password = hashlib.sha256()
-            password.update(ucode(a_password))
-            if user_acc._UserAccount__password == password.hexdigest():
-                return True
-        return False
+        return user_acc is not None and user_acc._UserAccount__password == self.__make_crypted_password(a_password)
 
     def add_user_account(self, a_login, a_password, a_person_id, a_is_admin=False, a_skin_used=''):
         """Add a user account
