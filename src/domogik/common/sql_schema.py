@@ -178,7 +178,7 @@ class DeviceTechnology(Base):
     """Technology of a device (X10, PLCBus, 1wire, RFXCOM,...)"""
 
     __tablename__ = '%s_device_technology' % _db_prefix
-    id = Column(String(30), primary_key=True)
+    id = Column(Unicode(30), primary_key=True)
     name = Column(Unicode(30), nullable=False)
     description = Column(UnicodeText())
 

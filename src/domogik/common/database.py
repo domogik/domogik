@@ -144,10 +144,9 @@ class DbHelper():
             # We use native_datetime=True with sqlite to be able to use timestamps properly
             # Otherwise we get this error : SQLite DateTime type only accepts Python datetime and date objects as input
             # See http://www.sqlalchemy.org/docs/reference/dialects/sqlite.html for more information
-            native_dt = True
+            self.__engine = sqlalchemy.create_engine(url, echo=echo_output, native_datetime=True)
         else:
-            native_dt = False
-        self.__engine = sqlalchemy.create_engine(url, echo=echo_output, native_datetime=native_dt)
+            self.__engine = sqlalchemy.create_engine(url, echo=echo_output)
         Session = sessionmaker(bind=self.__engine, autoflush=False)
         self.__session = Session()
 
@@ -1023,7 +1022,7 @@ class DbHelper():
         @return a DeviceTechnology object
 
         """
-        return self.__session.query(DeviceTechnology).filter_by(id=dt_id).first()
+        return self.__session.query(DeviceTechnology).filter_by(id=ucode(dt_id)).first()
 
     def add_device_technology(self, dt_id, dt_name, dt_description=None):
         """Add a device_technology
@@ -1035,7 +1034,7 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        dt = DeviceTechnology(id=dt_id, name=ucode(dt_name), description=ucode(dt_description))
+        dt = DeviceTechnology(id=ucode(dt_id), name=ucode(dt_name), description=ucode(dt_description))
         self.__session.add(dt)
         try:
             self.__session.commit()
@@ -1055,7 +1054,7 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        device_tech = self.__session.query(DeviceTechnology).filter_by(id=dt_id).first()
+        device_tech = self.__session.query(DeviceTechnology).filter_by(id=ucode(dt_id)).first()
         if device_tech is None:
             raise DbHelperException("DeviceTechnology with id %s couldn't be found" % dt_id)
         if dt_name is not None:
@@ -1080,13 +1079,13 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        dt = self.__session.query(DeviceTechnology).filter_by(id=dt_id).first()
+        dt = self.__session.query(DeviceTechnology).filter_by(id=ucode(dt_id)).first()
         if dt:
             if cascade_delete:
-                for device_type in self.__session.query(DeviceType).filter_by(device_technology_id=dt.id).all():
+                for device_type in self.__session.query(DeviceType).filter_by(device_technology_id=ucode(dt.id)).all():
                     self.del_device_type(device_type.id, cascade_delete=True)
             else:
-                device_type_list = self.__session.query(DeviceType).filter_by(device_technology_id=dt.id).all()
+                device_type_list = self.__session.query(DeviceType).filter_by(device_technology_id=ucode(dt.id)).all()
                 if len(device_type_list) > 0:
                     raise DbHelperException("Couldn't delete device technology %s : there are associated device types" \
                                             % dt_id)
