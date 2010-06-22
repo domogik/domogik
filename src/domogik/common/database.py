@@ -1533,7 +1533,7 @@ class DbHelper():
         elif function_used == 'max':
             init_query = self.__session.query(DeviceStats.date, func.max(DeviceStats._DeviceStats__value_num))
         elif function_used == 'avg':
-            init_query = self.__session.query(DeviceStats.date, func.max(DeviceStats._DeviceStats__value_num))
+            init_query = self.__session.query(DeviceStats.date, func.avg(DeviceStats._DeviceStats__value_num))
 
         for time_cursor in range(int(start_date), int(end_date), step_value):
             query = init_query.filter_by(key=ucode(ds_key)).filter_by(device_id=ds_device_id)\
