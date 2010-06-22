@@ -1049,15 +1049,10 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
         user1 = self.db.add_user_account(a_login='mschneider', a_password='IwontGiveIt',
                                          a_person_id=person1.id, a_is_admin=True)
         print(user1)
-        assert user1.password is None
         assert user1.person.first_name == 'Marc'
         assert self.db.authenticate('mschneider', 'IwontGiveIt')
         assert not self.db.authenticate('mschneider', 'plop')
         assert not self.db.authenticate('hello', 'boy')
-        user1 = self.db.get_user_account_by_login_and_pass('mschneider', 'IwontGiveIt')
-        assert user1 is not None
-        assert user1.login == 'mschneider'
-        assert user1.password == None
         try:
             self.db.add_user_account(a_login='mschneider', a_password='plop', a_person_id=person1.id)
             TestCase.fail(self, "It shouldn't have been possible to add login %s. It already exists!" % 'mschneider')
@@ -1079,12 +1074,9 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
                             a_person_last_name='STEED', a_person_birthdate=datetime.date(1931, 4, 24),
                             a_is_admin=True, a_skin_used='skins/hat')
         assert user4.login == 'jsteed'
-        assert user4.password is None
         assert user4.person.first_name == 'John'
         assert user4.person.last_name == 'STEED'
         assert len(self.db.list_user_accounts()) == 4
-        for user_acc in self.db.list_user_accounts():
-            assert user_acc.password == None
 
     def test_update(self):
         person = self.db.add_person(p_first_name='Marc', p_last_name='SCHNEIDER',
@@ -1101,9 +1093,6 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
         assert not self.db.change_password(user_acc.id, 'DontKnow', 'foo')
 
         user_acc_u = self.db.update_user_account(a_id=user_acc.id, a_new_login='mschneider2', a_is_admin=False)
-        assert user_acc_u.password is None
-        user_acc_msc = self.db.get_user_account_by_login_and_pass('mschneider2', 'OkIWill')
-        assert user_acc_msc is not None
         assert not user_acc_u.is_admin
         try:
             self.db.update_user_account(a_id=user_acc.id, a_person_id=999999999)
@@ -1120,7 +1109,6 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
         assert str(user_acc_u.person.birthdate) == str(datetime.date(1991, 4, 24))
         assert user_acc_u.is_admin
         assert user_acc_u.skin_used == 'skins/crocodile'
-        assert user_acc.password is None
 
     def testGet(self):
         person1 = self.db.add_person(p_first_name='Marc', p_last_name='SCHNEIDER',
@@ -1136,17 +1124,14 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
         assert self.db.get_user_account_by_person(person3.id) is None
         user_acc = self.db.get_user_account(user1.id)
         assert user_acc.login == 'mschneider'
-        assert user_acc.password == None
         assert user_acc.person.last_name == 'SCHNEIDER'
         user_acc = self.db.get_user_account_by_login('mschneider')
         assert user_acc is not None
-        assert user_acc.password == None
         assert self.db.get_user_account_by_login('mschneider').id == user1.id
         assert self.db.get_user_account_by_login('lucyfer') is None
 
         user_acc = self.db.get_user_account_by_person(person1.id)
         assert user_acc.login == 'mschneider'
-        assert user_acc.password == None
         assert self.db.get_person(person1.id).first_name == 'Marc'
         assert self.db.get_person(person2.id).last_name == 'PYTHON'
 

@@ -1701,9 +1701,6 @@ class DbHelper():
 
         """
         list_sa = self.__session.query(UserAccount).all()
-        for user_acc in list_sa:
-            # I won't send the password, right?
-            user_acc.password = None
         return list_sa
 
     def get_user_account(self, a_id):
@@ -1714,8 +1711,6 @@ class DbHelper():
 
         """
         user_acc = self.__session.query(UserAccount).filter_by(id=a_id).first()
-        if user_acc is not None:
-            user_acc.password = None
         return user_acc
 
     def get_user_account_by_login(self, a_login):
@@ -1726,23 +1721,6 @@ class DbHelper():
 
         """
         user_acc = self.__session.query(UserAccount).filter_by(login=ucode(a_login)).first()
-        if user_acc is not None:
-            user_acc.password = None
-        return user_acc
-
-    def get_user_account_by_login_and_pass(self, a_login, a_password):
-        """Return user account information from login
-
-        @param a_login : login
-        @param a_pass : password (clear text)
-        @return a UserAccount object or None if login / password is wrong
-
-        """
-        crypted_pass = self.__make_crypted_password(a_password)
-        user_acc = self.__session.query(UserAccount)\
-                                 .filter_by(login=ucode(a_login),password=ucode(crypted_pass)).first()
-        if user_acc is not None:
-            user_acc.password = None
         return user_acc
 
     def get_user_account_by_person(self, p_id):
@@ -1753,8 +1731,6 @@ class DbHelper():
 
         """
         user = self.__session.query(UserAccount).filter_by(person_id=p_id).first()
-        if user is not None:
-            user.password = None
         return user
 
     def authenticate(self, a_login, a_password):
@@ -1771,7 +1747,7 @@ class DbHelper():
         if user_acc is not None:
             password = hashlib.sha256()
             password.update(ucode(a_password))
-            if user_acc.password == password.hexdigest():
+            if user_acc._UserAccount__password == password.hexdigest():
                 return True
         return False
 
@@ -1801,7 +1777,6 @@ class DbHelper():
         except Exception, sql_exception:
             self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-        user_account.password = None
         return user_account
 
     def add_user_account_with_person(self, a_login, a_password, a_person_first_name, a_person_last_name,
@@ -1854,7 +1829,6 @@ class DbHelper():
         except Exception, sql_exception:
             self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-        user_acc.password = None
         return user_acc
 
     def update_user_account_with_person(self, a_id, a_login=None, p_first_name=None, p_last_name=None, p_birthdate=None,
@@ -1887,7 +1861,6 @@ class DbHelper():
         except Exception, sql_exception:
             self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-        user_acc.password = None
         return user_acc
 
     def change_password(self, a_id, a_old_password, a_new_password):
@@ -1901,11 +1874,14 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        old_pass = self.__make_crypted_password(a_old_password)
-        user_acc = self.__session.query(UserAccount).filter_by(id=a_id, password=ucode(old_pass)).first()
-        if user_acc is None:
+        user_acc = self.__session.query(UserAccount).filter_by(id=a_id).first()
+        if user_acc is not None:
+            old_pass = ucode(self.__make_crypted_password(a_old_password))
+            if user_acc._UserAccount__password != old_pass:
+                return False
+        else:
             return False
-        user_acc.password = ucode(self.__make_crypted_password(a_new_password))
+        user_acc.set_password(ucode(self.__make_crypted_password(a_new_password)))
         self.__session.add(user_acc)
         try:
             self.__session.commit()
