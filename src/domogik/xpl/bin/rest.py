@@ -3197,8 +3197,9 @@ target=*
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         
         if len(self.rest_request) <= 1:
-            json_data.add_data("No command given or missing first option")
-            self.send_http_response_ok(json_data.get())
+            self.send_http_response_error(999, 
+                                         "No command given or missing first option", 
+                                         self.jsonp, self.jsonp_cb)
             return
 
         command = self.rest_request[0]
@@ -3217,9 +3218,10 @@ target=*
                             output = helper_object.command(self.rest_request[1], \
                                                            self.rest_request[2:])
                     except HelperError as e:
-                       json_data.add_data("Error : %s " % e.value)
-                       self.send_http_response_ok(json_data.get())
-                       return
+                        self.send_http_response_error(999, 
+                                                     "Error : %s" % e.value,
+                                                     self.jsonp, self.jsonp_cb)
+                        return
                     
                         
 
