@@ -1457,21 +1457,21 @@ class DbHelper():
         list_s.reverse()
         return list_s
 
-    def list_stats_of_device_between_by_key(self, ds_key, ds_device_id, start_datetime=None, end_datetime=None):
+    def list_stats_of_device_between_by_key(self, ds_key, ds_device_id, start_date=None, end_date=None):
         """Get statistics of a device between two dates for a given key
 
         @param ds_key : statistic key
         @param ds_device_id : device id
-        @param start_datetime : datetime start, optional (timestamp)
-        @param end_datetime : datetime end, optional (timestamp)
+        @param start_date : datetime start, optional (timestamp)
+        @param end_date : datetime end, optional (timestamp)
         @return a list of DeviceStats objects
 
         """
         query = self.__session.query(DeviceStats).filter_by(key=ucode(ds_key)).filter_by(device_id=ds_device_id)
-        if start_datetime:
-            query = query.filter("date >= '" + str(start_datetime) + "'")
-        if end_datetime:
-            query = query.filter("date <= '" + str(end_datetime) + "'")
+        if start_date:
+            query = query.filter("date >= '" + str(start_date) + "'")
+        if end_date:
+            query = query.filter("date <= '" + str(end_date) + "'")
         list_s = query.order_by(sqlalchemy.desc(DeviceStats.date)).all()
         list_s.reverse()
         return list_s

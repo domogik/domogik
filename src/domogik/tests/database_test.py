@@ -928,7 +928,7 @@ class DeviceStatsTestCase(GenericTestCase):
         assert len(stats_l) == 2
         assert stats_l[0].get_value() == 6 and stats_l[1].get_value() == 8
         stats_l = self.db.list_stats_of_device_between_by_key('val1', device1.id,
-                                                              end_datetime=make_ts(2010, 04, 9, 12, 2))
+                                                              end_date=make_ts(2010, 04, 9, 12, 2))
         assert len(stats_l) == 3
 
     def test_filter(self):
