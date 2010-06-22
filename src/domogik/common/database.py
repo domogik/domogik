@@ -1447,7 +1447,7 @@ class DbHelper():
         @param ds_key : statistic key
         @param ds_device_id : device id
         @param ds_number : the number of statistics we want to retreive
-        @return a list of DeviceStats objects
+        @return a list of DeviceStats objects (older records first)
 
         """
         list_s = self.__session.query(DeviceStats)\
@@ -1464,7 +1464,7 @@ class DbHelper():
         @param ds_device_id : device id
         @param start_date : datetime start, optional (timestamp)
         @param end_date : datetime end, optional (timestamp)
-        @return a list of DeviceStats objects
+        @return a list of DeviceStats objects (older records first)
 
         """
         query = self.__session.query(DeviceStats).filter_by(key=ucode(ds_key)).filter_by(device_id=ds_device_id)
@@ -1472,8 +1472,7 @@ class DbHelper():
             query = query.filter("date >= '" + str(start_date) + "'")
         if end_date:
             query = query.filter("date <= '" + str(end_date) + "'")
-        list_s = query.order_by(sqlalchemy.desc(DeviceStats.date)).all()
-        list_s.reverse()
+        list_s = query.order_by(sqlalchemy.asc(DeviceStats.date)).all()
         return list_s
 
     def get_last_stat_of_device_by_key(self, ds_key, ds_device_id):
