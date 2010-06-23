@@ -1327,6 +1327,7 @@ class SystemConfigTestCase(GenericTestCase):
 
     def test_update(self):
         system_config = self.db.update_system_config(s_simulation_mode=True, s_debug_mode=True)
+        print system_config
         assert system_config.simulation_mode
         assert system_config.debug_mode
         system_config = self.db.update_system_config(s_simulation_mode=False)
