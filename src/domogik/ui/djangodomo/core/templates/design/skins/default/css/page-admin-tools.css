@@ -15,15 +15,19 @@ ul#result li {
     display:block;
     margin: 0;
     padding: 0;
-	color:#ffffff;
+	color:#cccccc;
 	padding:5px 2em 0 2em;
-	font-family:Consolas,"Lucida Console",monospace,Verdana,sans-serif,"sans serif"
+	font-family:Consolas,"Lucida Console",monospace,Verdana,sans-serif,"sans serif";
+	white-space: pre;
 }
 
 ul#result li.command {
-	border-top: #ffffff 1px solid;
+	border-top: #cccccc 1px dashed;
 	color:#ffffff;
 	font-weight:bold;
+	font-style: italic;
+	list-style-type:disc;
+	margin-top:10px;
 }
 
 ul#result li.error {

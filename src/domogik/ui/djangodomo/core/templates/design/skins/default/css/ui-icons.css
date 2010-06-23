@@ -156,6 +156,9 @@
 .icon32-usage-14.unknown { background-image:url(../images/device_usage/14.electricity/unknown/32.png);}
 .icon32-usage-14.number { background-image:url(../images/device_usage/14.electricity/sensor/number/32.png);}
 
+/* Menu */
+.icon32-menu-helpers { background-image:url(../images/menu/terminal_32.png);}
+
 /* Action */
 .icon16-action-add { background-image:url(../images/action/plus_16.png);}
 .icon16-action-del { background-image:url(../images/action/minus_16.png);}
