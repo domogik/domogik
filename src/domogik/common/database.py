@@ -1531,8 +1531,8 @@ class DbHelper():
 
         @param ds_key : statistic key
         @param ds_device_id : device_id
-        @param start_date : date representing the begin of the period
-        @param end_date : date reprensenting the end of the period
+        @param start_date : date representing the begin of the period (timestamp)
+        @param end_date : date reprensenting the end of the period (timestamp)
         @param step : minute, hour, day, week, month, year
         @param function_used : min, max, avg
         @return a list of tuples (date, computed value)
@@ -1575,8 +1575,8 @@ class DbHelper():
 
         for time_cursor in range(int(start_date), int(end_date), step_value):
             query = init_query.filter_by(key=ucode(ds_key)).filter_by(device_id=ds_device_id)\
-                              .filter("date >= '" + str(time_cursor) + "'")\
-                              .filter("date <= '" + str(time_cursor + step_value) + "'")
+                              .filter("date >= '" + str(datetime.datetime.fromtimestamp(time_cursor)) + "'")\
+                              .filter("date <= '" + str(datetime.datetime.fromtimestamp(time_cursor + step_value))+"'")
             val = query.first()
             if val[0] is None:
                 break
