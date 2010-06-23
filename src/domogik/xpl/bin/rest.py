@@ -3196,39 +3196,46 @@ target=*
         json_data.set_data_type("helper")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         
-        if len(self.rest_request) <= 1:
+        command = self.rest_request[0]
+        if len(self.rest_request) <= 1 and command != "help":
             self.send_http_response_error(999, 
                                          "No command given or missing first option", 
                                          self.jsonp, self.jsonp_cb)
             return
 
-        command = self.rest_request[0]
 
-        ### load helper and create object
-        try:
-            package = domogik.xpl.helpers
+        package = domogik.xpl.helpers
+        if command == "help":
+            output = ["List of available helpers :"]
             for importer, plgname, ispkg in pkgutil.iter_modules(package.__path__):
-                if plgname == command:
-                    helper = __import__('domogik.xpl.helpers.%s' % plgname, fromlist="dummy")
-                    try:
-                        helper_object = helper.MY_CLASS["cb"]()
-                        if len(self.rest_request) == 2:
-                            output = helper_object.command(self.rest_request[1])
-                        else:
-                            output = helper_object.command(self.rest_request[1], \
-                                                           self.rest_request[2:])
-                    except HelperError as e:
-                        self.send_http_response_error(999, 
-                                                     "Error : %s" % e.value,
-                                                     self.jsonp, self.jsonp_cb)
-                        return
+                output.append(" - %s" % plgname)
+
+
+        else:
+            ### load helper and create object
+            try:
+                for importer, plgname, ispkg in pkgutil.iter_modules(package.__path__):
+                    if plgname == command:
+                        helper = __import__('domogik.xpl.helpers.%s' % plgname, fromlist="dummy")
+                        try:
+                            helper_object = helper.MY_CLASS["cb"]()
+                            if len(self.rest_request) == 2:
+                                output = helper_object.command(self.rest_request[1])
+                            else:
+                                output = helper_object.command(self.rest_request[1], \
+                                                               self.rest_request[2:])
+                        except HelperError as e:
+                            self.send_http_response_error(999, 
+                                                         "Error : %s" % e.value,
+                                                         self.jsonp, self.jsonp_cb)
+                            return
                     
                         
 
-        except:
-            json_data.add_data(self.get_exception())
-            self.send_http_response_ok(json_data.get())
-            return
+            except:
+                json_data.add_data(self.get_exception())
+                self.send_http_response_ok(json_data.get())
+                return
 
         if output != None:
             for line in output:
