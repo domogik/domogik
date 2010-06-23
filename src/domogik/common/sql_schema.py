@@ -178,7 +178,7 @@ class DeviceTechnology(Base):
     """Technology of a device (X10, PLCBus, 1wire, RFXCOM,...)"""
 
     __tablename__ = '%s_device_technology' % _db_prefix
-    id = Column(String(30), primary_key=True)
+    id = Column(Unicode(30), primary_key=True)
     name = Column(Unicode(30), nullable=False)
     description = Column(UnicodeText())
 
@@ -563,7 +563,7 @@ class UserAccount(Base):
     __tablename__ = '%s_user_account' % _db_prefix
     id = Column(Integer, primary_key=True)
     login = Column(Unicode(20), nullable=False, unique=True)
-    password = Column(Unicode(255), nullable=False)
+    __password = Column("password", Unicode(255), nullable=False)
     person_id = Column(Integer, ForeignKey('%s.id' % Person.get_tablename()))
     person = relation(Person)
     is_admin = Column(Boolean, nullable=False, default=False)
@@ -580,10 +580,14 @@ class UserAccount(Base):
 
         """
         self.login = login
-        self.password = password
+        self.__password = password
         self.person_id = person_id
         self.is_admin = is_admin
         self.skin_used = skin_used
+
+    def set_password(self, password):
+        """Set a password for the user"""
+        self.__password = password
 
     def __repr__(self):
         """Return an internal representation of the class"""

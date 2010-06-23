@@ -84,7 +84,7 @@ def get_url_connection_string():
     if _db_config['db_type'] == 'sqlite':
         url = "%s/%s" % (url, _db_config['db_path'])
     else:
-        if __db_config['db_port'] != '':
+        if _db_config['db_port'] != '':
             url = "%s%s:%s@%s:%s/%s" % (url, _db_config['db_user'], _db_config['db_password'], _db_config['db_host'],
                                         _db_config['db_port'], _db_config['db_name'])
         else:
@@ -95,6 +95,18 @@ def get_url_connection_string():
 def get_db_type():
     """Return DB type which is currently used (sqlite, mysql, postgresql)"""
     return _db_config['db_type']
+
+def _make_crypted_password(clear_text_password):
+    """Make a crypted password (using sha256)
+
+    @param clear_text_password : password in clear text
+    @return crypted password
+
+    """
+    password = hashlib.sha256()
+    password.update(clear_text_password)
+    return password.hexdigest()
+
 
 class DbHelperException(Exception):
     """This class provides exceptions related to the DbHelper class
@@ -140,14 +152,13 @@ class DbHelper():
             url = '%s_test' % url
         # Connecting to the database
         self.__dbprefix = _db_config['db_prefix']
-        if _db_config['db_type'] == 'sqlite':
+        if get_db_type() == 'sqlite':
             # We use native_datetime=True with sqlite to be able to use timestamps properly
             # Otherwise we get this error : SQLite DateTime type only accepts Python datetime and date objects as input
             # See http://www.sqlalchemy.org/docs/reference/dialects/sqlite.html for more information
-            native_dt = True
+            self.__engine = sqlalchemy.create_engine(url, echo=echo_output, native_datetime=True)
         else:
-            native_dt = False
-        self.__engine = sqlalchemy.create_engine(url, echo=echo_output, native_datetime=native_dt)
+            self.__engine = sqlalchemy.create_engine(url, echo=echo_output)
         Session = sessionmaker(bind=self.__engine, autoflush=False)
         self.__session = Session()
 
@@ -263,7 +274,7 @@ class DbHelper():
         if area:
             if cascade_delete:
                 for room in self.__session.query(Room).filter_by(area_id=area_del_id).all():
-                    self.del_room(room.id, True)
+                    self.__del_room(room.id, True)
             dfa_list = self.__session.query(DeviceFeatureAssociation)\
                                      .filter_by(place_id=area.id, place_type=u'area').all()
             for dfa in dfa_list:
@@ -390,21 +401,26 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        room = self.__session.query(Room).filter_by(id=r_id).first()
+        room = self.__del_room(r_id, cascade_delete)
         if room:
-            if cascade_delete:
-                for device in self.__session.query(Device).filter_by(room_id=r_id).all():
-                    self.del_device(device.id)
-            dfa_list = self.__session.query(DeviceFeatureAssociation)\
-                                     .filter_by(place_id=room.id, place_type=u'room').all()
-            for dfa in dfa_list:
-                self.__session.delete(dfa)
-            self.__session.delete(room)
             try:
                 self.__session.commit()
             except Exception, sql_exception:
                 self.__session.rollback()
                 raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
+            return room
+
+    def __del_room(self, r_id, cascade_delete=False):
+        room = self.__session.query(Room).filter_by(id=r_id).first()
+        if room:
+            if cascade_delete:
+                for device in self.__session.query(Device).filter_by(room_id=r_id).all():
+                    self.__del_device(device.id)
+            dfa_list = self.__session.query(DeviceFeatureAssociation)\
+                                     .filter_by(place_id=room.id, place_type=u'room').all()
+            for dfa in dfa_list:
+                self.__session.delete(dfa)
+            self.__session.delete(room)
             return room
         else:
             raise DbHelperException("Couldn't delete room with id %s : it doesn't exist" % r_id)
@@ -602,6 +618,16 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
+        dty = self.__del_device_type(dty_id, cascade_delete)
+        if dty:
+            try:
+                self.__session.commit()
+            except Exception, sql_exception:
+                self.__session.rollback()
+                raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
+            return dty
+
+    def __del_device_type(self, dty_id, cascade_delete=False):
         dty = self.__session.query(DeviceType).filter_by(id=dty_id).first()
         if dty:
             if cascade_delete:
@@ -609,9 +635,9 @@ class DbHelper():
                     self.del_device(device.id)
                 for df in self.__session.query(DeviceFeature).filter_by(device_type_id=dty.id).all():
                     if df.feature_type == 'actuator':
-                        self.del_actuator_feature(df.id)
+                        self.__del_actuator_feature(df.id)
                     elif df.feature_type == 'sensor':
-                        self.del_sensor_feature(df.id)
+                        self.__del_sensor_feature(df.id)
             else:
                 device_list = self.__session.query(Device).filter_by(device_type_id=dty.id).all()
                 if len(device_list) > 0:
@@ -621,11 +647,6 @@ class DbHelper():
                     raise DbHelperException("Couldn't delete device type %s : there are associated device type " \
                                             "feature(s)" % dty_id)
             self.__session.delete(dty)
-            try:
-                self.__session.commit()
-            except Exception, sql_exception:
-                self.__session.rollback()
-                raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
             return dty
         else:
             raise DbHelperException("Couldn't delete device type with id %s : it doesn't exist" % dty_id)
@@ -763,6 +784,16 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
+        df = self.__del_actuator_feature(af_id)
+        if df:
+            try:
+                self.__session.commit()
+            except Exception, sql_exception:
+                self.__session.rollback()
+                raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
+            return df
+
+    def __del_actuator_feature(self, af_id):
         dtf = self.__session.query(DeviceFeature).filter_by(id=af_id).filter_by(feature_type=u'actuator').first()
         if not dtf:
             raise DbHelperException("Can't delete device type feature %s (actuator) : it doesn't exist" % af_id)
@@ -771,11 +802,6 @@ class DbHelper():
         for dfa in dfa_list:
             self.__session.delete(dfa)
         self.__session.delete(dtf)
-        try:
-            self.__session.commit()
-        except Exception, sql_exception:
-            self.__session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return dtf
 
 ####
@@ -874,6 +900,16 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
+        df = self.__del_sensor_feature(sf_id)
+        if df:
+            try:
+                self.__session.commit()
+            except Exception, sql_exception:
+                self.__session.rollback()
+                raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
+            return df
+
+    def __del_sensor_feature(self, sf_id):
         dtf = self.__session.query(DeviceFeature).filter_by(id=sf_id).filter_by(feature_type=u'sensor').first()
         if dtf is None:
             raise DbHelperException("Couldn't delete device type feature (sensor) with id %s : it doesn't exist" \
@@ -882,11 +918,6 @@ class DbHelper():
         for dfa in dfa_list:
             self.__session.delete(dfa)
         self.__session.delete(dtf)
-        try:
-            self.__session.commit()
-        except Exception, sql_exception:
-            self.__session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return dtf
 
 ####
@@ -1023,7 +1054,7 @@ class DbHelper():
         @return a DeviceTechnology object
 
         """
-        return self.__session.query(DeviceTechnology).filter_by(id=dt_id).first()
+        return self.__session.query(DeviceTechnology).filter_by(id=ucode(dt_id)).first()
 
     def add_device_technology(self, dt_id, dt_name, dt_description=None):
         """Add a device_technology
@@ -1035,7 +1066,7 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        dt = DeviceTechnology(id=dt_id, name=ucode(dt_name), description=ucode(dt_description))
+        dt = DeviceTechnology(id=ucode(dt_id), name=ucode(dt_name), description=ucode(dt_description))
         self.__session.add(dt)
         try:
             self.__session.commit()
@@ -1055,7 +1086,7 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        device_tech = self.__session.query(DeviceTechnology).filter_by(id=dt_id).first()
+        device_tech = self.__session.query(DeviceTechnology).filter_by(id=ucode(dt_id)).first()
         if device_tech is None:
             raise DbHelperException("DeviceTechnology with id %s couldn't be found" % dt_id)
         if dt_name is not None:
@@ -1080,13 +1111,13 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        dt = self.__session.query(DeviceTechnology).filter_by(id=dt_id).first()
+        dt = self.__session.query(DeviceTechnology).filter_by(id=ucode(dt_id)).first()
         if dt:
             if cascade_delete:
-                for device_type in self.__session.query(DeviceType).filter_by(device_technology_id=dt.id).all():
-                    self.del_device_type(device_type.id, cascade_delete=True)
+                for device_type in self.__session.query(DeviceType).filter_by(device_technology_id=ucode(dt.id)).all():
+                    self.__del_device_type(device_type.id, cascade_delete=True)
             else:
-                device_type_list = self.__session.query(DeviceType).filter_by(device_technology_id=dt.id).all()
+                device_type_list = self.__session.query(DeviceType).filter_by(device_technology_id=ucode(dt.id)).all()
                 if len(device_type_list) > 0:
                     raise DbHelperException("Couldn't delete device technology %s : there are associated device types" \
                                             % dt_id)
@@ -1326,6 +1357,16 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
+        device = self.__del_device(d_id)
+        if device:
+            try:
+                self.__session.commit()
+            except Exception, sql_exception:
+                self.__session.rollback()
+                raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
+            return device
+
+    def __del_device(self, d_id):
         device = self.__session.query(Device).filter_by(id=d_id).first()
         if device is None:
             raise DbHelperException("Device with id %s couldn't be found" % d_id)
@@ -1336,11 +1377,6 @@ class DbHelper():
         for device_feat_asso in self.__session.query(DeviceFeatureAssociation).filter_by(device_id=d_id).all():
             self.__session.delete(device_feat_asso)
         self.__session.delete(device)
-        try:
-            self.__session.commit()
-        except Exception, sql_exception:
-            self.__session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return device
 
 ####
@@ -1534,7 +1570,7 @@ class DbHelper():
         elif function_used == 'max':
             init_query = self.__session.query(DeviceStats.date, func.max(DeviceStats._DeviceStats__value_num))
         elif function_used == 'avg':
-            init_query = self.__session.query(DeviceStats.date, func.max(DeviceStats._DeviceStats__value_num))
+            init_query = self.__session.query(DeviceStats.date, func.avg(DeviceStats._DeviceStats__value_num))
 
         for time_cursor in range(int(start_date), int(end_date), step_value):
             query = init_query.filter_by(key=ucode(ds_key)).filter_by(device_id=ds_device_id)\
@@ -1702,9 +1738,6 @@ class DbHelper():
 
         """
         list_sa = self.__session.query(UserAccount).all()
-        for user_acc in list_sa:
-            # I won't send the password, right?
-            user_acc.password = None
         return list_sa
 
     def get_user_account(self, a_id):
@@ -1715,8 +1748,6 @@ class DbHelper():
 
         """
         user_acc = self.__session.query(UserAccount).filter_by(id=a_id).first()
-        if user_acc is not None:
-            user_acc.password = None
         return user_acc
 
     def get_user_account_by_login(self, a_login):
@@ -1727,23 +1758,6 @@ class DbHelper():
 
         """
         user_acc = self.__session.query(UserAccount).filter_by(login=ucode(a_login)).first()
-        if user_acc is not None:
-            user_acc.password = None
-        return user_acc
-
-    def get_user_account_by_login_and_pass(self, a_login, a_password):
-        """Return user account information from login
-
-        @param a_login : login
-        @param a_pass : password (clear text)
-        @return a UserAccount object or None if login / password is wrong
-
-        """
-        crypted_pass = self.__make_crypted_password(a_password)
-        user_acc = self.__session.query(UserAccount)\
-                                 .filter_by(login=ucode(a_login),password=ucode(crypted_pass)).first()
-        if user_acc is not None:
-            user_acc.password = None
         return user_acc
 
     def get_user_account_by_person(self, p_id):
@@ -1754,8 +1768,6 @@ class DbHelper():
 
         """
         user = self.__session.query(UserAccount).filter_by(person_id=p_id).first()
-        if user is not None:
-            user.password = None
         return user
 
     def authenticate(self, a_login, a_password):
@@ -1769,12 +1781,7 @@ class DbHelper():
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
         user_acc = self.__session.query(UserAccount).filter_by(login=ucode(a_login)).first()
-        if user_acc is not None:
-            password = hashlib.sha256()
-            password.update(ucode(a_password))
-            if user_acc.password == password.hexdigest():
-                return True
-        return False
+        return user_acc is not None and user_acc._UserAccount__password == _make_crypted_password(a_password)
 
     def add_user_account(self, a_login, a_password, a_person_id, a_is_admin=False, a_skin_used=''):
         """Add a user account
@@ -1794,7 +1801,7 @@ class DbHelper():
         person = self.__session.query(Person).filter_by(id=a_person_id).first()
         if person is None:
             raise DbHelperException("Person id '%s' does not exist" % a_person_id)
-        user_account = UserAccount(login=ucode(a_login), password=ucode(self.__make_crypted_password(a_password)),
+        user_account = UserAccount(login=ucode(a_login), password=ucode(_make_crypted_password(a_password)),
                                    person_id=a_person_id, is_admin=a_is_admin, skin_used=ucode(a_skin_used))
         self.__session.add(user_account)
         try:
@@ -1802,7 +1809,6 @@ class DbHelper():
         except Exception, sql_exception:
             self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-        user_account.password = None
         return user_account
 
     def add_user_account_with_person(self, a_login, a_password, a_person_first_name, a_person_last_name,
@@ -1855,7 +1861,6 @@ class DbHelper():
         except Exception, sql_exception:
             self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-        user_acc.password = None
         return user_acc
 
     def update_user_account_with_person(self, a_id, a_login=None, p_first_name=None, p_last_name=None, p_birthdate=None,
@@ -1888,7 +1893,6 @@ class DbHelper():
         except Exception, sql_exception:
             self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-        user_acc.password = None
         return user_acc
 
     def change_password(self, a_id, a_old_password, a_new_password):
@@ -1902,11 +1906,14 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        old_pass = self.__make_crypted_password(a_old_password)
-        user_acc = self.__session.query(UserAccount).filter_by(id=a_id, password=ucode(old_pass)).first()
-        if user_acc is None:
+        user_acc = self.__session.query(UserAccount).filter_by(id=a_id).first()
+        if user_acc is not None:
+            old_pass = ucode(_make_crypted_password(a_old_password))
+            if user_acc._UserAccount__password != old_pass:
+                return False
+        else:
             return False
-        user_acc.password = ucode(self.__make_crypted_password(a_new_password))
+        user_acc.set_password(ucode(_make_crypted_password(a_new_password)))
         self.__session.add(user_acc)
         try:
             self.__session.commit()
@@ -1914,17 +1921,6 @@ class DbHelper():
             self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return True
-
-    def __make_crypted_password(self, clear_text_password):
-        """Make a crypted password (using sha256)
-
-        @param clear_text_password : password in clear text
-        @return crypted password
-
-        """
-        password = hashlib.sha256()
-        password.update(clear_text_password)
-        return password.hexdigest()
 
     def add_default_user_account(self):
         """Add a default user account (login = admin, password = domogik, is_admin = True)

@@ -75,7 +75,7 @@ setup(
     package_data = {
         'domogik.ui.djangodomo': list_all_files('src/domogik/ui/djangodomo/'),
         'domogik.ui.djangodomo': ['locale/*.po', 'locale/*.mo'],
-        'domogik.ui.djangodomo.core': list_all_files('src/domogik/ui/djangodomo/core/templates/'),
+#        'domogik.ui.djangodomo.core': list_all_files('src/domogik/ui/djangodomo/core/templates/'),
     },
     data_files = [
         ('/usr/local/share/domogik/listeners/', list_all_files('src/share/domogik/stats/')),

@@ -154,6 +154,7 @@ TEMPLATE_DIRS = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
     '%s/templates/' % PROJECT_PATH,
+    '%s/core/templates/' % PROJECT_PATH,
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
