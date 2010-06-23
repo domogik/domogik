@@ -39,8 +39,7 @@ import datetime
 from domogik.common.database import DbHelper, DbHelperException
 from domogik.common.sql_schema import Area, Device, DeviceFeature, DeviceUsage, DeviceConfig, DeviceStats, \
                                       DeviceFeatureAssociation, DeviceTechnology, PluginConfig, \
-                                      DeviceType, UIItemConfig, Room, UserAccount, SystemConfig, SystemStats, \
-                                      SystemStatsValue, Trigger, Person
+                                      DeviceType, UIItemConfig, Room, UserAccount, SystemConfig, Trigger, Person
 
 
 def make_ts(year, month, day, hours=0, minutes=0, seconds=0):
@@ -1172,66 +1171,6 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
             TestCase.fail(self, "User account does not exist, an exception should have been raised")
         except DbHelperException:
             pass
-
-class SystemStatsTestCase(GenericTestCase):
-    """Test system stats"""
-
-    def setUp(self):
-        self.db = DbHelper(use_test_db=True)
-        self.dbsession = self.db._DbHelper__session
-        self.db.del_all_system_stats()
-
-    def tearDown(self):
-        self.db.del_all_system_stats()
-        del self.db
-
-    def test_empty_list(self):
-        assert len(self.db.list_system_stats()) == 0
-
-    def test_add(self):
-        now = datetime.datetime.now()
-        sstat_list = []
-        for i in range(4):
-            ssv = {'ssv1': (i*2), 'ssv2': (i*3),}
-            sstat = self.db.add_system_stat("sstat%s" %i, 'localhost', now + datetime.timedelta(seconds=i), ssv)
-            print(sstat)
-            sstat_list.append(sstat)
-        assert len(self.db.list_system_stats()) == 4
-
-    def test_list_and_get(self):
-        now = datetime.datetime.now()
-        sstat_list = []
-        for i in range(4):
-            ssv = {'ssv1': (i*2), 'ssv2': (i*3),}
-            sstat_list.append(self.db.add_system_stat("sstat%s" %i, 'localhost',
-                              now + datetime.timedelta(seconds=i), ssv))
-        system_stat1 = self.db.get_system_stat(sstat_list[1].id)
-        ssv_list = self.db.list_system_stats_values(system_stat1.id)
-        for ssv in ssv_list:
-            assert ssv.value in ('2', '3')
-        assert len(ssv_list) == 2
-
-    def test_del(self):
-        now = datetime.datetime.now()
-        sstat_list = []
-        for i in range(4):
-            ssv = {'ssv1': (i*2), 'ssv2': (i*3),}
-            sstat_list.append(self.db.add_system_stat("sstat%s" %i, 'localhost',
-                              now + datetime.timedelta(seconds=i), ssv))
-        sstat_del = self.db.del_system_stat("sstat0")
-        assert sstat_del.name == "sstat0"
-        assert len(self.db.list_system_stats()) == 3
-        try:
-            self.db.del_system_stat("i_dont_exist")
-            TestCase.fail(self, "System stat does not exist, an exception should have been raised")
-        except DbHelperException:
-            pass
-        ss_list = self.db.list_system_stats()
-        ss_list_del = self.db.del_all_system_stats()
-        assert len(ss_list) == len(ss_list_del)
-        assert len(self.db.list_system_stats()) == 0
-        ssv = self.dbsession.query(SystemStatsValue).all()
-        assert len(ssv) == 0
 
 
 class UIItemConfigTestCase(GenericTestCase):

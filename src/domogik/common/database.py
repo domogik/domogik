@@ -53,7 +53,7 @@ from domogik.common.sql_schema import ACTUATOR_VALUE_TYPE_LIST, Area, Device, De
                                       DeviceUsage, DeviceFeatureAssociation,\
                                       DeviceConfig, DeviceStats, DeviceTechnology, PluginConfig,\
                                       DeviceType, UIItemConfig, Room, Person, UserAccount, SENSOR_VALUE_TYPE_LIST,\
-                                      SystemConfig, SystemStats, SystemStatsValue, Trigger
+                                      SystemConfig, Trigger
 
 
 _db_config = None
@@ -2049,115 +2049,6 @@ class DbHelper():
             return person
         else:
             raise DbHelperException("Couldn't delete person with id %s : it doesn't exist" % p_id)
-
-####
-# System stats
-####
-    def list_system_stats(self):
-        """Return a list of all system stats
-
-        @return a list of SystemStats objects
-
-        """
-        return self.__session.query(SystemStats).all()
-
-    def list_system_stats_values(self, s_system_stats_id):
-        """Return a list of all values associated to a system statistic
-
-        @param s_system_stats_id : the system statistic id
-        @return a list of SystemStatsValue objects
-
-        """
-        return self.__session.query(SystemStatsValue).filter_by(system_stats_id=s_system_stats_id).all()
-
-    def get_system_stat(self, s_id):
-        """Return a system stat
-
-        @param s_name : the name of the stat to be retrieved
-        @return a SystemStats object
-
-        """
-        return self.__session.query(SystemStats).filter_by(id=s_id).first()
-
-    def add_system_stat(self, s_name, s_hostname, s_date, s_values):
-        """Add a system stat record
-
-        @param s_name : name of the  plugin
-        @param s_hostname : name of the  host
-        @param s_date : when the stat was gathered (timestamp)
-        @param s_values : a dictionnary of system statistics values
-        @return the new SystemStats object
-
-        """
-        # Make sure previously modified objects outer of this method won't be commited
-        self.__session.expire_all()
-        system_stat = SystemStats(plugin_name=ucode(s_name), host_name=ucode(s_hostname), date=s_date)
-        self.__session.add(system_stat)
-        try:
-            self.__session.commit()
-        except Exception, sql_exception:
-            self.__session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-        for stat_value_name in s_values.keys():
-            ssv = SystemStatsValue(name=ucode(stat_value_name), value=ucode(s_values[stat_value_name]),
-                                   system_stats_id=system_stat.id)
-            self.__session.add(ssv)
-        try:
-            self.__session.commit()
-        except Exception, sql_exception:
-            self.__session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-        return system_stat
-
-    def del_system_stat(self, s_name):
-        """Delete a system stat record
-
-        @param s_name : name of the stat that has to be deleted
-        @return the deleted SystemStats object
-
-        """
-        # Make sure previously modified objects outer of this method won't be commited
-        self.__session.expire_all()
-        system_stat = self.__session.query(SystemStats).filter_by(name=ucode(s_name)).first()
-        if system_stat:
-            system_stats_values = self.__session.query(SystemStatsValue)\
-                                                .filter_by(system_stats_id=system_stat.id).all()
-            for ssv in system_stats_values:
-                self.__session.delete(ssv)
-            self.__session.delete(system_stat)
-            try:
-                self.__session.commit()
-            except Exception, sql_exception:
-                self.__session.rollback()
-                raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-            return system_stat
-        else:
-            raise DbHelperException("Couldn't delete system stat %s : it doesn't exist" % s_name)
-
-    def del_all_system_stats(self):
-        """Delete all stats of the system
-
-        @return the list of deleted SystemStats objects
-
-        """
-        # Make sure previously modified objects outer of this method won't be commited
-        self.__session.expire_all()
-        system_stats_list = self.__session.query(SystemStats).all()
-        system_stats_d_list = []
-        for system_stat in system_stats_list:
-            system_stats_values = self.__session.query(SystemStatsValue)\
-                                                .filter_by(system_stats_id=system_stat.id).all()
-            for ssv in system_stats_values:
-                self.__session.delete(ssv)
-            system_stats_d_list.append(system_stat)
-            self.__session.delete(system_stat)
-        try:
-            self.__session.commit()
-        except Exception, sql_exception:
-            self.__session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-        return system_stats_d_list
-
 
 ###
 # UIItemConfig

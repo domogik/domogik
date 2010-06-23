@@ -604,69 +604,6 @@ class UserAccount(Base):
         return UserAccount.__tablename__
 
 
-class SystemStats(Base):
-    """Statistics for the system"""
-
-    __tablename__ = '%s_system_stats' % _db_prefix
-    id = Column(Integer, primary_key=True)
-    name = Column(Unicode(30), nullable=False)
-    hostname = Column(Unicode(40), nullable=False)
-    date = Column(DateTime, nullable=False)
-
-    def __init__(self, plugin_name, host_name, date):
-        """Class constructor
-
-        @param plugin_name : plugin name
-        @param host_name : host name
-        @param date : datetime when the statistic was recorded
-
-        """
-        self.name = plugin_name
-        self.hostname = host_name
-        self.date = date
-
-    def __repr__(self):
-        """Return an internal representation of the class"""
-        return "<SystemStats(id=%s, plugin_name=%s, host_name=%s, date=%s)>" % (self.id, self.name, self.hostname, self.date)
-
-    @staticmethod
-    def get_tablename():
-        """Return the table name associated to the class"""
-        return SystemStats.__tablename__
-
-
-class SystemStatsValue(Base):
-    """Value(s) associated to a system statistic"""
-
-    __tablename__ = '%s_system_stats_value' % _db_prefix
-    id = Column(Integer, primary_key=True)
-    system_stats_id = Column(Integer, ForeignKey('%s.id' % SystemStats.get_tablename()), nullable=False)
-    system_stats = relation(SystemStats)
-    name = Column(Unicode(30), nullable=False)
-    value = Column(Unicode(255), nullable=False)
-
-    def __init__(self, name, value, system_stats_id):
-        """Class constructor
-
-        @param name : value name
-        @param value : value
-        @param system_stats_id : statistic id
-
-        """
-        self.name = name
-        self.value = value
-        self.system_stats_id = system_stats_id
-
-    def __repr__(self):
-        """Return an internal representation of the class"""
-        return "<SystemStatsValue(id=%s, name=%s, value=%s, stat_id=%s)>" % (self.id, self.name, self.value, self.system_stats)
-
-    @staticmethod
-    def get_tablename():
-        """Return the table name associated to the class"""
-        return SystemStatsValue.__tablename__
-
-
 class UIItemConfig(Base):
     """UI configuration parameters for items (area, room, device) such as css class name for icons"""
 
