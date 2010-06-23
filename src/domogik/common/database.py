@@ -1505,9 +1505,16 @@ class DbHelper():
         """
         query = self.__session.query(DeviceStats).filter_by(key=ucode(ds_key)).filter_by(device_id=ds_device_id)
         if start_date:
-            query = query.filter("date >= '" + str(start_date) + "'")
+            query = query.filter("date >= '" + str(datetime.datetime.fromtimestamp(start_date)) + "'")
         if end_date:
-            query = query.filter("date <= '" + str(end_date) + "'")
+            if get_db_type() == 'sqlite':
+                # TODO : This is really ugly but if we don't do it 'end_date' is excluded from the interval
+                # I suspect this is because the date is stored like this in the DB : '2010-04-09 12:04:00.000000'
+                # But in Python we have '2010-04-09 12:04:00', so maybe there is a precision problem
+                end_datetime = datetime.datetime.fromtimestamp(end_date) + datetime.timedelta(microseconds=1)
+            else:
+                end_datetime = datetime.fromtimestamp(end_date)
+            query = query.filter("date <= '" + str(end_datetime) + "'")
         list_s = query.order_by(sqlalchemy.asc(DeviceStats.date)).all()
         return list_s
 
@@ -1605,7 +1612,8 @@ class DbHelper():
         self.__session.expire_all()
         if not self.__session.query(Device).filter_by(id=ds_device_id).first():
             raise DbHelperException("Couldn't add device stat with device id %s. It does not exist" % ds_device_id)
-        device_stat = DeviceStats(date=ds_date, key=ucode(ds_key), value=ucode(ds_value), device_id=ds_device_id)
+        device_stat = DeviceStats(date=datetime.datetime.fromtimestamp(ds_date), key=ucode(ds_key),
+                                  value=ucode(ds_value), device_id=ds_device_id)
         self.__session.add(device_stat)
         try:
             self.__session.commit()

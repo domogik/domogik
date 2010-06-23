@@ -52,7 +52,7 @@ Implements
 @organization: Domogik
 """
 
-import sys
+import time, sys
 from exceptions import AssertionError
 
 from sqlalchemy import types, create_engine, Table, Column, Integer, Float, String, Enum, \
@@ -482,6 +482,10 @@ class DeviceStats(Base):
             return self.__value_num
         else:
             return self.__value_str
+
+    def get_date_as_timestamp(self):
+        """Convert DateTime value to timestamp"""
+        return time.mktime(self.date.timetuple())
 
     def __repr__(self):
         """Return an internal representation of the class"""
