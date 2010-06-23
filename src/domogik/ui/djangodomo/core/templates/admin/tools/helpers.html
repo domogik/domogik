@@ -45,7 +45,7 @@
                     function(data) {
                         var status = (data.status).toLowerCase();
 //                      $("#housename").addClass('icon16-status-true');
-						if (data.status == 'ok') {
+						if (status == 'ok') {
 							$.each(data.helper, function(index, value) {
 								var text = $("<div/>").text(value).html();
 								li = $("<li>" + text + "</li>");
