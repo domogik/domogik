@@ -3199,7 +3199,7 @@ target=*
         command = self.rest_request[0]
         if len(self.rest_request) <= 1 and command != "help":
             self.send_http_response_error(999, 
-                                         "No command given or missing first option", 
+                                         "Bad command, no command given or missing first option", 
                                          self.jsonp, self.jsonp_cb)
             return
 
