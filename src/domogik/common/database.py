@@ -1540,18 +1540,14 @@ class DbHelper():
         """
         if step is None or step.lower() not in ('minute', 'hour', 'day', 'week', 'month', 'year'):
             raise DbHelperException("'period' parameter should be one of : minute, hour, day, week, month, year")
-        elif step == 'minute':
-            step_value = 60
-        elif step == 'hour':
-            step_value = 3600
-        elif step == 'day':
-            step_value = 3600 * 24
-        elif step == 'week':
-            step_value = 3600 * 24 * 7
-        elif step == 'month':
-            step_value = 3600 * 24 * 7 * 30
-        elif step == 'year':
-            step_value = 3600 * 24 * 7 * 30 * 365
+        step_value = {
+            'minute': 60,
+            'hour'  : 3600,
+            'day'   : 3600 * 60,
+            'week'  : 3600 * 60 * 7,
+            'month' : 3600 * 24 * 7 * 30,
+            'year'  : 3600 * 24 * 7 * 30 * 365
+        }
         if start_date > end_date:
             raise DbHelperException("'end_date' can't be prior to 'start_date'")
         if function_used is None or function_used.lower() not in ('min', 'max', 'avg'):
@@ -1573,10 +1569,11 @@ class DbHelper():
         elif function_used == 'avg':
             init_query = self.__session.query(DeviceStats.date, func.avg(DeviceStats._DeviceStats__value_num))
 
-        for time_cursor in range(int(start_date), int(end_date), step_value):
+        for time_cursor in range(int(start_date), int(end_date), step_value[step]):
             query = init_query.filter_by(key=ucode(ds_key)).filter_by(device_id=ds_device_id)\
                               .filter("date >= '" + str(datetime.datetime.fromtimestamp(time_cursor)) + "'")\
-                              .filter("date <= '" + str(datetime.datetime.fromtimestamp(time_cursor + step_value))+"'")
+                              .filter("date <= '" + str(datetime.datetime.fromtimestamp(time_cursor + \
+                                                                                        step_value[step])) + "'")
             val = query.first()
             if val[0] is None:
                 break
