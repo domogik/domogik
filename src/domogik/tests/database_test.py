@@ -783,7 +783,8 @@ class DeviceTestCase(GenericTestCase):
         device2_id = device2.id
         self.db.del_device(device2.id)
         assert len(self.db.list_devices()) == 2
-        assert self.db.list_devices()[0].address == 'A1'
+        for dev in self.db.list_devices():
+            assert dev.address in ('A1', 'A3')
         assert device_del.id == device2.id
         assert len(self.db.list_device_feature_association_by_device_id(device_del.id)) == 0
         try:
