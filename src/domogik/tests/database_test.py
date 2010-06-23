@@ -1203,9 +1203,10 @@ class SystemStatsTestCase(GenericTestCase):
             sstat_list.append(self.db.add_system_stat("sstat%s" %i, 'localhost',
                               now + datetime.timedelta(seconds=i), ssv))
         system_stat1 = self.db.get_system_stat(sstat_list[1].id)
-        ssv = self.db.list_system_stats_values(system_stat1.id)
-        assert len(ssv) == 2
-        assert ssv[0].value == '2'
+        ssv_list = self.db.list_system_stats_values(system_stat1.id)
+        for ssv in ssv_list:
+            assert ssv.value in ('2', '3')
+        assert len(ssv_list) == 2
 
     def test_del(self):
         now = datetime.datetime.now()
