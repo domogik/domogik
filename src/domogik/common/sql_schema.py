@@ -450,14 +450,14 @@ class DeviceStats(Base):
     """Device stats (values that were associated to the device)"""
 
     __tablename__ = '%s_device_stats' % _db_prefix
-    date = Column(TIMESTAMP, primary_key=True)
+    date = Column(DateTime, primary_key=True)
     key = Column(Unicode(30), primary_key=True)
+    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), nullable=False, primary_key=True)
+    device = relation(Device)
     # We have both types for value field because we need an explicit numerical field in case we want to compute
     # arithmetical operations (min/max/avg etc.)
     __value_num = Column('value_num', Float)
     __value_str = Column('value_str', Unicode(255))
-    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), nullable=False, primary_key=True)
-    device = relation(Device)
 
     def __init__(self, date, key, device_id, value):
         """Class constructor

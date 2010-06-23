@@ -159,7 +159,7 @@ class DbHelper():
             self.__engine = sqlalchemy.create_engine(url, echo=echo_output, native_datetime=True)
         else:
             self.__engine = sqlalchemy.create_engine(url, echo=echo_output)
-        Session = sessionmaker(bind=self.__engine, autoflush=False)
+        Session = sessionmaker(bind=self.__engine, autoflush=True)
         self.__session = Session()
 
     def __rollback(self):
