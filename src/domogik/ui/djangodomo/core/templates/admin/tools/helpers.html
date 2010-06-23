@@ -30,12 +30,13 @@
     $(function(){
         // Accordion
         $("#nav2").accordion({ autoHeight: false, header: ".subnav2", active:3});
-        $("#commandsubmit").click(function(){
+		function sendfunction() {
             var commandline = $("#commandline").val();
             if (commandline) {
 				var li = $("<li class='command'>" + commandline + "</li>");
+				var last = li;
 				li.focus();
-				$("#result").append(li);
+				$("#result").prepend(li);
 				$("#commandline").val('');
 				var commandarray = commandline.split(' ')
 				var command = ['helper'];
@@ -43,26 +44,37 @@
                 $.getREST(command,
                     function(data) {
                         var status = (data.status).toLowerCase();
-                        if (status == 'ok') {
-//                            $("#housename").removeClass('icon16-status-false');
-//                            $("#housename").addClass('icon16-status-true');
-								$.each(data.helper, function(index, value) {
-									$("#result").append("<li>" + value + "</li>");									
-								});
-								console.log($("#result").height());
-								$("#result").scrollTop(200);
-                        } else {
-//                            $("#housename").removeClass('icon16-status-true');
-//                            $("#housename").addClass('icon16-status-false');
-                            $.notification('error', '{% trans "Helper " %} (' + data.description + ')');                                                                      
-                        }
+//                      $("#housename").addClass('icon16-status-true');
+						if (data.status == 'ok') {
+							$.each(data.helper, function(index, value) {
+								var text = $("<div/>").text(value).html();
+								li = $("<li>" + text + "</li>");
+								last.after(li);
+								last = li;						
+							});
+						} else {
+							var text = $("<div/>").text(data.description).html()
+							li = $("<li>" + text + "</li>");
+							li.addClass('error');
+							last.after(li);
+							last = li;						
+						}
                     }
                 );            
-            } else {
-//                $("#housename").removeClass('icon16-status-true');
-//                $("#housename").addClass('icon16-status-false');  
             }
-        });
+        }
+        $("#commandsubmit").click(sendfunction);
+		$("#commandline").keypress(function(e){
+			if (e.keyCode == 13) {
+		        sendfunction();
+			}
+			e.stopPropagation();
+		});
+		$("#resultclear").click(function(e){
+			$("#result").empty();
+			$("#commandline").val('');
+			$("#commandline").focus();
+		});
     });
 {% endblock %}
 {% block title %}{% trans page_title %}{% endblock %}
@@ -79,7 +91,8 @@
         <h2>{% trans "Helpers" %}</h2>
             <label for='commandline'>{% trans "Command" %}</label>
             <input type='text' id='commandline' name='commandline'>
-            <button id='commandsubmit' class='button'>{% trans "Send" %}</button>
+            <button id='commandsubmit' class='button icon16-action-down'>{% trans "Send" %}</button>
+            <button id='resultclear' class='button icon16-action-reset'>{% trans "clear" %}</button>
 		<ul id='result'>
 		</ul>
     </section>
