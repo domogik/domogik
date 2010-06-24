@@ -269,7 +269,8 @@ class Listener:
         called with the message as parameter
         @param cb : the callback function
         @param manager : the manager instance
-        @param filter : dictionnary { key : value }
+        @param filter : dictionnary { key : value }. If value is a list, then the 
+        listener will check if the key equals any of these values
         """
         manager._log.debug("New listener, filter : %s" % filter)
         self._callback = cb
@@ -297,18 +298,19 @@ class Listener:
         ok = True
         for key in self._filter:
             if key in message.data:
-                if (message.data[key] != self._filter[key]):
+                if isinstance(self._filter, list) and not (message.data[key] in self._filter):
+                    ok = False
+                elif (message.data[key] != self._filter[key]):
                     ok = False
             elif key == "schema":
                 ok = ok and (self._filter[key] == message.schema)
-
             elif key == "xpltype":
                 ok = ok and (self._filter[key] == message.type)
             elif not (key in message.data or key in ("xpltype", "schema")):
                 ok = False
         #The message match the filter, we can call  the callback function
         if ok:
-            if self._cb_params != {} and self._callback.func_code.co_argcount > 1:
+            if self._cb_params != {} and self._callback.func_code.co_argcount > 1:  
                 thread = threading.Thread(target=self._callback, args = (message, self._cb_params), name="Manager-new-message-cb")
             else:
                 thread = threading.Thread(target=self._callback, args = (message,), name="Manager-new-message-cb")
