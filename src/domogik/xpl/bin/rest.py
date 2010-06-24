@@ -3627,9 +3627,15 @@ class StatsManager(XplPlugin):
         """
         filters = {}
         for _filter in node.getElementsByTagName("filter")[0].getElementsByTagName("key"):
-            filters[_filter.attributes["name"].value] = _filter.attributes["value"].value
+            if _filter.attributes["name"].value in filters:
+                if not isinstance(filters[_filter.attributes["name"].value], list):
+                        filters[_filter.attributes["name"].value] = \
+                            [filters[_filter.attributes["name"].value]]
+                filters[_filter.attributes["name"].value].append(_filter.attributes["value"].value)
+            else:
+                filters[_filter.attributes["name"].value] = _filter.attributes["value"].value
         return filters
-        
+
     def parse_mapping(self, node):
         """ Parse the "mapping" node
         """
