@@ -38,9 +38,10 @@ Implements
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.plugin import XplResult
-from domogik.xpl.lib.mirror import Mirror
 from domogik.xpl.common.queryconfig import Query
-
+from domogik.xpl.lib.mirror import Mirror
+from domogik.xpl.lib.mirror import MirrorException
+import threading
 
 
 class MirrorManager(XplPlugin):
@@ -57,30 +58,43 @@ class MirrorManager(XplPlugin):
         res = XplResult()
         self._config.query('mirror', 'device', res)
         device = res.get_value()['device']
-        self._config = Query(self._myxpl)
-        res = XplResult()
-        self._config.query('mirror', 'interval', res)
-        interval = res.get_value()['interval']
-        self._config = Query(self._myxpl)
-        res = XplResult()
-        self._config.query('mirror', 'nbmaxtry', res)
-        nbmaxtry = res.get_value()['nbmaxtry']
-        # Call Library
-        self._mymirror  = Mirror(self._log, device, nbmaxtry, interval, self._broadcastframe)
-        self._mymirror.start()
 
-    def _broadcastframe(self, action, ztamp_id):
+        # TODO : delete
+        device = "/dev/hidraw1"
+        
+        # Init Mir:ror
+        mirror  = Mirror(self._log, self.send_xpl)
+        
+        # Open Mir:ror
+        try:
+            mirror.open(device)
+        except MirrorException as e:
+            self._log.error(e.value)
+            print e.value
+            self.force_leave()
+            return
+            
+        # Start reading Mir:ror
+        mirror_process = threading.Thread(None,
+                                   mirror.listen,
+                                   None,
+                                   (),
+                                   {})                                  
+        mirror_process.start()                              
+
+    def send_xpl(self, device, type, current):
         """ Send xPL message on network
             @param action : action done on mir:ror device
             @param ztamp_id : id of ztamp put on mir:ror
         """
-        my_temp_message = XplMessage()
-        my_temp_message.set_type("xpl-trig")
-        my_temp_message.set_schema("sensor.basic")
-        my_temp_message.add_data({"device" : "mirror"})
-        my_temp_message.add_data({"type" : action})
-        my_temp_message.add_data({"current" : ztamp_id})
-        self._myxpl.send(my_temp_message)
+        print "device:%s, type:%s, current:%s" % (device, type, current)
+        msg = XplMessage()
+        msg.set_type("xpl-trig")
+        msg.set_schema("sensor.basic")
+        msg.add_data({"device" : device})
+        msg.add_data({"type" : type})
+        msg.add_data({"current" : current})
+        self._myxpl.send(msg)
 
 
 if __name__ == "__main__":
