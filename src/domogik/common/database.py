@@ -107,6 +107,19 @@ def _make_crypted_password(clear_text_password):
     password.update(clear_text_password)
     return password.hexdigest()
 
+def _make_datetime_from_timestamp(ts):
+    """Make a date from a timestamp"""
+    date = str(datetime.datetime.fromtimestamp(ts))
+    if get_db_type() == 'sqlite':
+        # This is a hack to perform exact date comparisons
+        # sqlAlchemy doc : "In the case of SQLite, date and time types are stored as strings which are then converted
+        # back to datetime objects when rows are returned."
+        # With sqllite, DATETIME data is stored in this format : 2010-06-23 15:15:00.000000 (mysql:2010-06-23 15:15:00)
+        # If you don't add this string performing 'date <= 2010-06-23 15:15:00' will exlude 2010-06-23 15:15:00.000000
+        # values as they are considered as bigger
+        date += ".000000"
+    return date
+
 
 class DbHelperException(Exception):
     """This class provides exceptions related to the DbHelper class
@@ -1499,16 +1512,10 @@ class DbHelper():
         """
         query = self.__session.query(DeviceStats).filter_by(key=ucode(ds_key)).filter_by(device_id=ds_device_id)
         if start_date:
-            query = query.filter("date >= '" + str(datetime.datetime.fromtimestamp(start_date)) + "'")
+            query = query.filter("date >= '" + str(_make_datetime_from_timestamp(start_date)) + "'")
         if end_date:
-            if get_db_type() == 'sqlite':
-                # TODO : This is really ugly but if we don't do it 'end_date' is excluded from the interval
-                # I suspect this is because the date is stored like this in the DB : '2010-04-09 12:04:00.000000'
-                # But in Python we have '2010-04-09 12:04:00', so maybe there is a precision problem
-                end_datetime = datetime.datetime.fromtimestamp(end_date) + datetime.timedelta(microseconds=1)
-            else:
-                end_datetime = datetime.datetime.fromtimestamp(end_date)
-            query = query.filter("date <= '" + str(end_datetime) + "'")
+            query = query.filter("date <= '" + str(_make_datetime_from_timestamp(end_date)) + "'")
+        print query
         list_s = query.order_by(sqlalchemy.asc(DeviceStats.date)).all()
         return list_s
 
@@ -1571,9 +1578,9 @@ class DbHelper():
 
         for time_cursor in range(int(start_date), int(end_date), step_value[step]):
             query = init_query.filter_by(key=ucode(ds_key)).filter_by(device_id=ds_device_id)\
-                              .filter("date >= '" + str(datetime.datetime.fromtimestamp(time_cursor)) + "'")\
-                              .filter("date <= '" + str(datetime.datetime.fromtimestamp(time_cursor + \
-                                                                                        step_value[step])) + "'")
+                              .filter("date >= '" + str(_make_datetime_from_timestamp(time_cursor)) + "'")\
+                              .filter("date <= '" + str(_make_datetime_from_timestamp(time_cursor + \
+                                                                                      step_value[step])) + "'")
             val = query.first()
             if val[0] is None:
                 break
