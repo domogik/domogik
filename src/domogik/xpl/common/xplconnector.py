@@ -298,7 +298,7 @@ class Listener:
         ok = True
         for key in self._filter:
             if key in message.data:
-                if isinstance(self._filter, list) and not (message.data[key] in self._filter[key]):
+                if isinstance(self._filter[key], list) and not (message.data[key] in self._filter[key]):
                     ok = False
                 elif (message.data[key] != self._filter[key]):
                     ok = False
