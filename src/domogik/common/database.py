@@ -1500,21 +1500,21 @@ class DbHelper():
         list_s.reverse()
         return list_s
 
-    def list_stats_of_device_between_by_key(self, ds_key, ds_device_id, start_date=None, end_date=None):
+    def list_stats_of_device_between_by_key(self, ds_key, ds_device_id, start_date_ts=None, end_date_ts=None):
         """Get statistics of a device between two dates for a given key
 
         @param ds_key : statistic key
         @param ds_device_id : device id
-        @param start_date : datetime start, optional (timestamp)
-        @param end_date : datetime end, optional (timestamp)
+        @param start_date_ts : datetime start, optional (timestamp)
+        @param end_date_ts : datetime end, optional (timestamp)
         @return a list of DeviceStats objects (older records first)
 
         """
         query = self.__session.query(DeviceStats).filter_by(key=ucode(ds_key)).filter_by(device_id=ds_device_id)
-        if start_date:
-            query = query.filter("date >= '" + str(_make_datetime_from_timestamp(start_date)) + "'")
-        if end_date:
-            query = query.filter("date <= '" + str(_make_datetime_from_timestamp(end_date)) + "'")
+        if start_date_ts:
+            query = query.filter("date >= '" + str(_make_datetime_from_timestamp(start_date_ts)) + "'")
+        if end_date_ts:
+            query = query.filter("date <= '" + str(_make_datetime_from_timestamp(end_date_ts)) + "'")
         print query
         list_s = query.order_by(sqlalchemy.asc(DeviceStats.date)).all()
         return list_s
@@ -1532,14 +1532,14 @@ class DbHelper():
                              .filter_by(device_id=ds_device_id)\
                              .order_by(sqlalchemy.desc(DeviceStats.date)).first()
 
-    def filter_stats_of_device_by_key(self, ds_key, ds_device_id, start_date, end_date, step, function_used):
+    def filter_stats_of_device_by_key(self, ds_key, ds_device_id, start_date_ts, end_date_ts, step, function_used):
         """Filter statistic values within a period for a given step (minute, hour, day, week, month, year). It then
         applies a function (min, max, avg) for the values within the step.
 
         @param ds_key : statistic key
         @param ds_device_id : device_id
-        @param start_date : date representing the begin of the period (timestamp)
-        @param end_date : date reprensenting the end of the period (timestamp)
+        @param start_date_ts : date representing the begin of the period (timestamp)
+        @param end_date_ts : date reprensenting the end of the period (timestamp)
         @param step : minute, hour, day, week, month, year
         @param function_used : min, max, avg
         @return a list of tuples (date, computed value)
@@ -1555,7 +1555,7 @@ class DbHelper():
             'month' : 3600 * 24 * 7 * 30,
             'year'  : 3600 * 24 * 7 * 30 * 365
         }
-        if start_date > end_date:
+        if start_date_ts > end_date_ts:
             raise DbHelperException("'end_date' can't be prior to 'start_date'")
         if function_used is None or function_used.lower() not in ('min', 'max', 'avg'):
             raise DbHelperException("'function_used' parameter should be one of : min, max, avg")
@@ -1576,7 +1576,7 @@ class DbHelper():
         elif function_used == 'avg':
             init_query = self.__session.query(DeviceStats.date, func.avg(DeviceStats._DeviceStats__value_num))
 
-        for time_cursor in range(int(start_date), int(end_date), step_value[step]):
+        for time_cursor in range(int(start_date_ts), int(end_date_ts), step_value[step]):
             query = init_query.filter_by(key=ucode(ds_key)).filter_by(device_id=ds_device_id)\
                               .filter("date >= '" + str(_make_datetime_from_timestamp(time_cursor)) + "'")\
                               .filter("date <= '" + str(_make_datetime_from_timestamp(time_cursor + \

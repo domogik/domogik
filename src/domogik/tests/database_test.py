@@ -928,7 +928,7 @@ class DeviceStatsTestCase(GenericTestCase):
         assert len(stats_l) == 2
         assert stats_l[0].get_value() == 6 and stats_l[1].get_value() == 8
         stats_l = self.db.list_stats_of_device_between_by_key('val1', device1.id,
-                                                              end_date=make_ts(2010, 04, 9, 12, 2))
+                                                              end_date_ts=make_ts(2010, 04, 9, 12, 2))
         assert len(stats_l) == 3
         assert stats_l[0].get_date_as_timestamp() == 1270810800.0
 
@@ -944,8 +944,8 @@ class DeviceStatsTestCase(GenericTestCase):
         end_d = make_ts(2010, 6, 21, 16, 48, 0)
         for i in range(100):
             self.db.add_device_stat(start_d+(i*10), 'val', i, device1.id)
-        print self.db.filter_stats_of_device_by_key(ds_key='val', ds_device_id=device1.id, start_date=start_d,
-                                                    end_date=end_d, step='minute', function_used='avg')
+        print self.db.filter_stats_of_device_by_key(ds_key='val', ds_device_id=device1.id, start_date_ts=start_d,
+                                                    end_date_ts=end_d, step='minute', function_used='avg')
 
     def test_del(self):
         dt1 = self.db.add_device_technology('x10', 'x10', 'this is x10')
