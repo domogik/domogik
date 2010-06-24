@@ -94,7 +94,7 @@ def get_url_connection_string():
 
 def get_db_type():
     """Return DB type which is currently used (sqlite, mysql, postgresql)"""
-    return _db_config['db_type']
+    return _db_config['db_type'].lower()
 
 def _make_crypted_password(clear_text_password):
     """Make a crypted password (using sha256)
