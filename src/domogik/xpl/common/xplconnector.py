@@ -300,7 +300,7 @@ class Listener:
             if key in message.data:
                 if isinstance(self._filter[key], list) and not (message.data[key] in self._filter[key]):
                     ok = False
-                elif (message.data[key] != self._filter[key]):
+                elif not isinstance(self._filter[key], list) and (message.data[key] != self._filter[key]):
                     ok = False
             elif key == "schema":
                 ok = ok and (self._filter[key] == message.schema)
