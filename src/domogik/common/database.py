@@ -112,8 +112,8 @@ def _make_datetime_from_timestamp(ts):
     date = str(datetime.datetime.fromtimestamp(ts))
     if get_db_type() == 'sqlite':
         # This is a hack to perform exact date comparisons
-        # sqlAlchemy doc : "In the case of SQLite, date and time types are stored as strings which are then converted
-        # back to datetime objects when rows are returned."
+        # sqlAlchemy 0.6.1 doc : "In the case of SQLite, date and time types are stored as strings which are then
+        # converted back to datetime objects when rows are returned."
         # With sqllite, DATETIME data is stored in this format : 2010-06-23 15:15:00.000000 (mysql:2010-06-23 15:15:00)
         # If you don't add this string performing 'date <= 2010-06-23 15:15:00' will exlude 2010-06-23 15:15:00.000000
         # values as they are considered as bigger
