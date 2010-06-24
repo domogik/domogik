@@ -3684,7 +3684,7 @@ class StatsManager(XplPlugin):
             @param message : the Xpl message received 
             """
 
-
+            print "MSG=%s" % message
             ### we put data in database
             self._db = DbHelper()
             self._log_stats.debug("message catcher : %s" % message)
@@ -3870,6 +3870,4 @@ if __name__ == '__main__':
     rest_server = Rest("127.0.0.1", "8080")
     #rest_server.start_stats()
     #rest_server.start_http()
-
-
 
