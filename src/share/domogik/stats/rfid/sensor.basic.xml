@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<statistic technology="rfid">
+    <schema name="sensor.basic">
+        <xpltype type="xpl-trig">
+            <listener>
+                <filter>
+                    <key name="type" value="mirror"/>
+                    <key name="type" value="ztamp"/>
+                </filter>
+            </listener>
+            <mapping>
+                <device field="device"/>
+                <value field="type"/>
+                <value field="current" />
+            </mapping>
+        </xpltype>
+    </schema>
+</statistic>
+

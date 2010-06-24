@@ -19,19 +19,5 @@
       <description>Mir:ror device (ex : /dev/hidraw0)</description>
       <default-value>/dev/hidraw0</default-value>
     </key>
-    <key>
-      <order-id>2</order-id>
-      <name>nbmaxtry</name>
-      <type>number</type>
-      <description>Max number of tries to open Mir:ror device</description>
-      <default-value>3</default-value>
-    </key>
-    <key>
-      <order-id>3</order-id>
-      <name>interval</name>
-      <type>number</type>
-      <description>Delay between each try to open Mir:ror device</description>
-      <default-value>3</default-value>
-    </key>
   </configuration-keys>
 </plugin>
