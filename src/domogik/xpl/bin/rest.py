@@ -3676,6 +3676,7 @@ class StatsManager(XplPlugin):
             self._res = res
             params = {'schema':schema, 'xpltype': type}
             params.update(res["filter"])
+            print "self._listener = Listener(self._callback, xpl, params)"
             self._listener = Listener(self._callback, xpl, params)
             self._technology = technology
 
