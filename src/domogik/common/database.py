@@ -1507,7 +1507,7 @@ class DbHelper():
                 # But in Python we have '2010-04-09 12:04:00', so maybe there is a precision problem
                 end_datetime = datetime.datetime.fromtimestamp(end_date) + datetime.timedelta(microseconds=1)
             else:
-                end_datetime = datetime.fromtimestamp(end_date)
+                end_datetime = datetime.datetime.fromtimestamp(end_date)
             query = query.filter("date <= '" + str(end_datetime) + "'")
         list_s = query.order_by(sqlalchemy.asc(DeviceStats.date)).all()
         return list_s
