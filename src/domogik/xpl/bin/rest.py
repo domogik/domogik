@@ -3614,12 +3614,13 @@ class StatsManager(XplPlugin):
         @param type : the current xpl-type
         Return True if the schema/type is *not* already defined in res
         """
-        for techno in res.keys():
-            for _schema in res[techno].keys(): 
-                if _schema == schema:
-                    for _type in res[techno][schema].keys():
-                        if _type == type:
-                            return False
+        # TODO : delete this fucntion and its call ?
+        #for techno in res.keys():
+        #    for _schema in res[techno].keys(): 
+        #        if _schema == schema:
+        #            for _type in res[techno][schema].keys():
+        #                if _type == type:
+        #                    return False
         return True
 
     def parse_listener(self, node):
@@ -3694,6 +3695,7 @@ class StatsManager(XplPlugin):
             except AttributeError:
                 self._log_stats_unknown.warning("Received a stat for an unreferenced device : %s - %s" \
                         % (self._technology, message.data[self._res["device"]]))
+                print "=> unknown device"
                 return
             self._log_stats.debug("Stat received for %s - %s." \
                     % (self._technology, message.data[self._res["device"]]))
