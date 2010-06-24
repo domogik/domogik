@@ -171,7 +171,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.admin',
     'django_pipes',
-    'djangodomo.core',
+    'domogik.ui.djangodomo.core',
 )
 
 STATIC_DOC_ROOT = '%s/core/templates/design' % PROJECT_PATH
