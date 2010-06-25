@@ -322,7 +322,7 @@ class DeviceFeature(Base):
     __tablename__ = '%s_device_feature' % _db_prefix
     id = Column(Integer, primary_key=True)
     name = Column(Unicode(30), nullable=False)
-    feature_type = Column(Enum('actuator', 'sensor'), nullable=False)
+    feature_type = Column(Enum('actuator', 'sensor', name='feature_type_list'), nullable=False)
     device_type_id = Column(Integer, ForeignKey('%s.id' % DeviceType.get_tablename()), nullable=False)
     device_type = relation(DeviceType)
     parameters = Column(UnicodeText())
@@ -380,7 +380,7 @@ class DeviceFeatureAssociation(Base):
     device = relation(Device, backref=backref(__tablename__))
     device_feature_id = Column(Integer, ForeignKey('%s.id' % DeviceFeature.get_tablename()), primary_key=True)
     device_feature = relation(DeviceFeature)
-    place_type = Column(Enum('room', 'area', 'house'), nullable=True)
+    place_type = Column(Enum('room', 'area', 'house', name='place_type_list'), nullable=True)
     place_id = Column(Integer, nullable=True)
 
     def __init__(self, device_id, device_feature_id, place_type=None, place_id=None):
