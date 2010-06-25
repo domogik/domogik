@@ -161,10 +161,18 @@ function modify_hosts {
     fi
 }
 
+function add_plugins {
+    grep -lv "<technology>domogik</technology>" src/share/domogik/plugins/* |cut -d "." -f 1|sed 's/$/ = /' >> $d_home/.domogik.cfg
+}
+
 #Main part
 if [ $UID -ne 0 ];then
     echo "Please restart this script as root!"
     exit 10
+fi
+if [ "$(dirname $0)" != "." ];then
+    echo "Please run this script from main source directory (as ./install.sh"
+    exit 15
 fi
 
 check_python
@@ -183,6 +191,7 @@ update_default_config
 update_user_config
 call_db_installer
 modify_hosts
+add_plugins
 
 echo "Everything seems to be good, Domogik should be installed correctly."
 echo "I will start the test_config.py script to check it."
