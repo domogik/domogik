@@ -348,7 +348,7 @@ class DeviceTypeTestCase(GenericTestCase):
     def test_add(self):
         dt1 = self.db.add_device_technology('x10', 'x10', 'desc dt1')
         try:
-            self.db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=99999999999)
+            self.db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=u'99999999999')
             TestCase.fail(self, "An exception should have been raised : device techno id does not exist")
         except DbHelperException:
             pass
@@ -366,7 +366,7 @@ class DeviceTypeTestCase(GenericTestCase):
         dt2 = self.db.add_device_technology('plcbus', 'PLCBus', 'desc dt2')
         dty = self.db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
         try:
-            self.db.update_device_type(dty_id=dty.id, dty_name='x10 Dimmer', dt_id=99999999999)
+            self.db.update_device_type(dty_id=dty.id, dty_name='x10 Dimmer', dt_id=u'99999999999')
             TestCase.fail(self, "An exception should have been raised : device techno id does not exist")
         except DbHelperException:
             pass
