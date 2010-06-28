@@ -102,6 +102,8 @@ function update_default_config {
 
     d_home=$(getent passwd $d_user |cut -d ':' -f 6)
 
+    [ -f $d_home/.domogik.cfg ] && rm -f $d_home/.domogik.cfg
+
     if [ "$MODE" = "develop" ];then
         d_custom_path=$PWD/src/domogik/xpl/tools/
         [ -f /etc/default/domogik ] &&  sed -i "s;^CUSTOM_PATH.*$;CUSTOM_PATH=$d_custom_path;" /etc/default/domogik
@@ -162,7 +164,7 @@ function modify_hosts {
 }
 
 function add_plugins {
-grep -lv "<technology>domogik</technology>" src/share/domogik/plugins/* |cut -d "." -f 1|sed 's@^.*/\([^/]\+\)$@\1 = @' >> $d_home/.domogik.cfg
+    grep -lv "<technology>domogik</technology>" src/share/domogik/plugins/* |cut -d "." -f 1|sed 's@^.*/\([^/]\+\)$@\1 = @' >> $d_home/.domogik.cfg
 }
 
 #Main part
