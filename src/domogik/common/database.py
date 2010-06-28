@@ -1579,10 +1579,11 @@ class DbHelper():
             while (datetime_cursor < end_datetime):
                 datetime_max_in_the_period = step[step_used][2](datetime_cursor)
                 datetime_sup = min(datetime_max_in_the_period, end_datetime)
-                query = self.__session.query(DeviceStats.date, function[function_used])\
+                query = self.__session.query(func.min(DeviceStats.date), function[function_used])\
                                       .filter_by(key=ucode(ds_key)).filter_by(device_id=ds_device_id)\
                                       .filter("date >= '" + _datetime_to_string(datetime_cursor) + "'")\
                                       .filter("date < '" + _datetime_to_string(datetime_sup) + "'")
+                print "==> ", query
                 result = query.first()
                 cur_date = result[0]
                 if cur_date is not None:
