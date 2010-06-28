@@ -967,7 +967,7 @@ class DeviceStatsTestCase(GenericTestCase):
                                                             end_date_ts=make_ts(2010, 2, 21, 16, 3, 0),
                                                             step_used='minute', function_used=func)
             assert results == expected_results[func]
-            print "=====> Execution time = %s" % (time.time() - start_t)
+            print "Execution time = %s" % (time.time() - start_t)
 
         start_p = make_ts(2010, 6, 21, 15, 48, 0)
         end_p = make_ts(2010, 6, 25, 21, 48, 0)
@@ -998,9 +998,8 @@ class DeviceStatsTestCase(GenericTestCase):
                                                             start_date_ts=make_ts(2010, 6, 22, 17, 48, 0),
                                                             end_date_ts=make_ts(2010, 6, 23, 1, 48, 0),
                                                             step_used='hour', function_used=func)
-            print results
             assert results == expected_results[func]
-            print "=====> Execution time = %s" % (time.time() - start_t)
+            print "Execution time = %s" % (time.time() - start_t)
 
         # Days
         start_p = make_ts(2010, 6, 21, 15, 48, 0)
@@ -1029,7 +1028,7 @@ class DeviceStatsTestCase(GenericTestCase):
                                                             end_date_ts=make_ts(2010, 7, 26, 15, 48, 0),
                                                             step_used='day', function_used=func)
             assert results == expected_results[func]
-            print "=====> Execution time = %s" % (time.time() - start_t)
+            print "Execution time = %s" % (time.time() - start_t)
 
         # Weeks
         start_p = make_ts(2010, 6, 11, 15, 48, 0)
@@ -1057,9 +1056,8 @@ class DeviceStatsTestCase(GenericTestCase):
                                                             start_date_ts=make_ts(2010, 6, 22, 15, 48, 0),
                                                             end_date_ts=make_ts(2010, 7, 26, 15, 48, 0),
                                                             step_used='week', function_used=func)
-            print results
             assert results == expected_results[func]
-            print "=====> Execution time = %s" % (time.time() - start_t)
+            print "Execution time = %s" % (time.time() - start_t)
 
         # Months
         start_p = make_ts(2010, 6, 21, 15, 48, 0)
