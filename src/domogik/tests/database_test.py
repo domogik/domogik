@@ -944,7 +944,7 @@ class DeviceStatsTestCase(GenericTestCase):
         start_p = make_ts(2010, 2, 21, 15, 48, 0)
         end_p = make_ts(2010, 2, 21, 16, 8, 0)
         insert_step = 10
-        for i in range(0, int(end_p - start_p), 10):
+        for i in range(0, int(end_p - start_p), insert_step):
             self.db._DbHelper__session.add(
                 DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i),
                             key=u'valm', value=(i/insert_step), device_id=device1.id)
