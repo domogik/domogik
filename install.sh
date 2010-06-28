@@ -162,7 +162,7 @@ function modify_hosts {
 }
 
 function add_plugins {
-    grep -lv "<technology>domogik</technology>" src/share/domogik/plugins/* |cut -d "." -f 1|sed 's/$/ = /' >> $d_home/.domogik.cfg
+grep -lv "<technology>domogik</technology>" src/share/domogik/plugins/* |cut -d "." -f 1|sed 's@^.*/\([^/]\+\)$@\1 = @' >> $d_home/.domogik.cfg
 }
 
 #Main part
