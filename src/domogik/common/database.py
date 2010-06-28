@@ -1583,7 +1583,6 @@ class DbHelper():
                                       .filter_by(key=ucode(ds_key)).filter_by(device_id=ds_device_id)\
                                       .filter("date >= '" + _datetime_to_string(datetime_cursor) + "'")\
                                       .filter("date < '" + _datetime_to_string(datetime_sup) + "'")
-                print "==> ", query
                 result = query.first()
                 cur_date = result[0]
                 if cur_date is not None:
