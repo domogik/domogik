@@ -940,12 +940,173 @@ class DeviceStatsTestCase(GenericTestCase):
         room1 = self.db.add_room('room1', area1.id)
         device1 = self.db.add_device(d_name='device1', d_address = "A1", d_type_id = dty1.id, d_usage_id = du1.id)
 
-        start_d = make_ts(2010, 6, 21, 15, 48, 0)
-        end_d = make_ts(2010, 6, 21, 16, 48, 0)
-        for i in range(100):
-            self.db.add_device_stat(start_d+(i*10), 'val', i, device1.id)
-        print self.db.filter_stats_of_device_by_key(ds_key='val', ds_device_id=device1.id, start_date_ts=start_d,
-                                                    end_date_ts=end_d, step='minute', function_used='avg')
+        # Minutes
+        start_p = make_ts(2010, 2, 21, 15, 48, 0)
+        end_p = make_ts(2010, 2, 21, 16, 8, 0)
+        insert_step = 10
+        for i in range(0, int(end_p - start_p), 10):
+            self.db._DbHelper__session.add(
+                DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i),
+                            key=u'valm', value=(i/insert_step), device_id=device1.id)
+            )
+        self.db._DbHelper__session.commit()
+
+        expected_results = {
+            'avg': [(2010, 2, 7, 21, 15, 57, 56.5), (2010, 2, 7, 21, 15, 58, 62.5), (2010, 2, 7, 21, 15, 59, 68.5),
+                    (2010, 2, 7, 21, 16, 0, 74.5), (2010, 2, 7, 21, 16, 1, 80.5), (2010, 2, 7, 21, 16, 2, 86.5)],
+            'min': [(2010, 2, 7, 21, 15, 57, 54.0), (2010, 2, 7, 21, 15, 58, 60.0), (2010, 2, 7, 21, 15, 59, 66.0),
+                    (2010, 2, 7, 21, 16, 0, 72.0), (2010, 2, 7, 21, 16, 1, 78.0), (2010, 2, 7, 21, 16, 2, 84.0)],
+            'max': [(2010, 2, 7, 21, 15, 57, 59.0), (2010, 2, 7, 21, 15, 58, 65.0), (2010, 2, 7, 21, 15, 59, 71.0),
+                    (2010, 2, 7, 21, 16, 0, 77.0), (2010, 2, 7, 21, 16, 1, 83.0), (2010, 2, 7, 21, 16, 2, 89.0)]
+        }
+        for func in ('avg', 'min', 'max'):
+            print "=====> Executing (minute filter, function=%s)" % func
+            start_t = time.time()
+            results = self.db.filter_stats_of_device_by_key(ds_key='valm', ds_device_id=device1.id,
+                                                            start_date_ts=make_ts(2010, 2, 21, 15, 57, 0),
+                                                            end_date_ts=make_ts(2010, 2, 21, 16, 3, 0),
+                                                            step_used='minute', function_used=func)
+            assert results == expected_results[func]
+            print "=====> Execution time = %s" % (time.time() - start_t)
+
+        start_p = make_ts(2010, 6, 21, 15, 48, 0)
+        end_p = make_ts(2010, 6, 25, 21, 48, 0)
+        insert_step = 2500
+        for i in range(0, int(end_p - start_p), insert_step):
+            self.db._DbHelper__session.add(
+                DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i),
+                            key=u'valh', value=i/insert_step, device_id=device1.id)
+            )
+        self.db._DbHelper__session.commit()
+
+        # Hours
+        expected_results = {
+            'avg': [(2010, 6, 25, 22, 19, 38.5), (2010, 6, 25, 22, 20, 40.0), (2010, 6, 25, 22, 21, 41.5),
+                    (2010, 6, 25, 22, 22, 43.0), (2010, 6, 25, 22, 23, 44.0), (2010, 6, 25, 23, 0, 45.5),
+                    (2010, 6, 25, 23, 1, 47.0), (2010, 6, 25, 23, 2, 48.0)],
+            'min': [(2010, 6, 25, 22, 19, 38.0), (2010, 6, 25, 22, 20, 40.0), (2010, 6, 25, 22, 21, 41.0),
+                    (2010, 6, 25, 22, 22, 43.0), (2010, 6, 25, 22, 23, 44.0), (2010, 6, 25, 23, 0, 45.0),
+                    (2010, 6, 25, 23, 1, 47.0), (2010, 6, 25, 23, 2, 48.0)],
+            'max': [(2010, 6, 25, 22, 19, 39.0), (2010, 6, 25, 22, 20, 40.0), (2010, 6, 25, 22, 21, 42.0),
+                    (2010, 6, 25, 22, 22, 43.0), (2010, 6, 25, 22, 23, 44.0), (2010, 6, 25, 23, 0, 46.0),
+                    (2010, 6, 25, 23, 1, 47.0), (2010, 6, 25, 23, 2, 48.0)]
+        }
+        for func in ('avg', 'min', 'max'):
+            print "=====> Executing (hour filter, function=%s)" % func
+            start_t = time.time()
+            results = self.db.filter_stats_of_device_by_key(ds_key='valh', ds_device_id=device1.id,
+                                                            start_date_ts=make_ts(2010, 6, 22, 17, 48, 0),
+                                                            end_date_ts=make_ts(2010, 6, 23, 1, 48, 0),
+                                                            step_used='hour', function_used=func)
+            print results
+            assert results == expected_results[func]
+            print "=====> Execution time = %s" % (time.time() - start_t)
+
+        # Days
+        start_p = make_ts(2010, 6, 21, 15, 48, 0)
+        end_p = make_ts(2010, 6, 28, 21, 48, 0)
+        insert_step = 28000
+        for i in range(0, int(end_p - start_p), insert_step):
+            self.db._DbHelper__session.add(
+                DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i),
+                            key=u'vald', value=i/insert_step, device_id=device1.id)
+            )
+        self.db._DbHelper__session.commit()
+
+        expected_results = {
+            'avg': [(2010, 6, 25, 22, 4.0), (2010, 6, 25, 23, 6.0), (2010, 6, 25, 24, 9.0), (2010, 6, 25, 25, 12.0),
+                    (2010, 6, 25, 26, 15.0), (2010, 6, 25, 27, 18.0), (2010, 6, 26, 28, 21.0)],
+            'min': [(2010, 6, 25, 22, 4.0), (2010, 6, 25, 23, 5.0), (2010, 6, 25, 24, 8.0), (2010, 6, 25, 25, 11.0),
+                    (2010, 6, 25, 26, 14.0), (2010, 6, 25, 27, 17.0), (2010, 6, 26, 28, 20.0)],
+            'max': [(2010, 6, 25, 22, 4.0), (2010, 6, 25, 23, 7.0), (2010, 6, 25, 24, 10.0), (2010, 6, 25, 25, 13.0),
+                    (2010, 6, 25, 26, 16.0), (2010, 6, 25, 27, 19.0), (2010, 6, 26, 28, 22.0)]
+        }
+        for func in ('avg', 'min', 'max'):
+            print "=====> Executing (day filter, function=%s)" % func
+            start_t = time.time()
+            results = self.db.filter_stats_of_device_by_key(ds_key='vald', ds_device_id=device1.id,
+                                                            start_date_ts=make_ts(2010, 6, 22, 15, 48, 0),
+                                                            end_date_ts=make_ts(2010, 7, 26, 15, 48, 0),
+                                                            step_used='day', function_used=func)
+            assert results == expected_results[func]
+            print "=====> Execution time = %s" % (time.time() - start_t)
+
+        # Weeks
+        start_p = make_ts(2010, 6, 11, 15, 48, 0)
+        end_p = make_ts(2010, 7, 28, 21, 48, 0)
+        insert_step = 12 * 3600
+        for i in range(0, int(end_p - start_p), insert_step):
+            self.db._DbHelper__session.add(
+                DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i),
+                            key=u'valw', value=i/insert_step, device_id=device1.id)
+            )
+        self.db._DbHelper__session.commit()
+
+        expected_results = {
+            'avg': [(2010, 6, 25, 27.0), (2010, 6, 26, 39.5), (2010, 7, 27, 53.5), (2010, 7, 28, 67.5),
+                    (2010, 7, 29, 81.5), (2010, 7, 30, 89.0)],
+            'min': [(2010, 6, 25, 22.0), (2010, 6, 26, 33.0), (2010, 7, 27, 47.0), (2010, 7, 28, 61.0),
+                    (2010, 7, 29, 75.0), (2010, 7, 30, 89.0)],
+            'max': [(2010, 6, 25, 32.0), (2010, 6, 26, 46.0), (2010, 7, 27, 60.0), (2010, 7, 28, 74.0),
+                    (2010, 7, 29, 88.0), (2010, 7, 30, 89.0)]
+        }
+        for func in ('avg', 'min', 'max'):
+            print "=====> Executing (week filter, function=%s)" % func
+            start_t = time.time()
+            results = self.db.filter_stats_of_device_by_key(ds_key='valw', ds_device_id=device1.id,
+                                                            start_date_ts=make_ts(2010, 6, 22, 15, 48, 0),
+                                                            end_date_ts=make_ts(2010, 7, 26, 15, 48, 0),
+                                                            step_used='week', function_used=func)
+            print results
+            assert results == expected_results[func]
+            print "=====> Execution time = %s" % (time.time() - start_t)
+
+        # Months
+        start_p = make_ts(2010, 6, 21, 15, 48, 0)
+        end_p = make_ts(2013, 6, 21, 15, 48, 0)
+        insert_step = 3600 * 24 * 15
+        for i in range(0, int(end_p - start_p), insert_step):
+            self.db._DbHelper__session.add(
+                DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i),
+                            key=u'valmy', value=i/insert_step, device_id=device1.id)
+            )
+        self.db._DbHelper__session.commit()
+        expected_results = {
+            'avg': [(2010, 7, 1.5), (2010, 8, 3.5), (2010, 9, 5.5), (2010, 10, 7.5), (2010, 11, 9.5), (2010, 12, 11.5),
+                    (2011, 1, 13.5), (2011, 2, 15.5), (2011, 3, 17.5), (2011, 4, 19.5), (2011, 5, 21.5),
+                    (2011, 6, 23.5), (2011, 7, 25.5)],
+            'min': [(2010, 7, 1.0), (2010, 8, 3.0), (2010, 9, 5.0), (2010, 10, 7.0), (2010, 11, 9.0), (2010, 12, 11.0),
+                    (2011, 1, 13.0), (2011, 2, 15.0), (2011, 3, 17.0), (2011, 4, 19.0), (2011, 5, 21.0),
+                    (2011, 6, 23.0), (2011, 7, 25.0)],
+            'max': [(2010, 7, 2.0), (2010, 8, 4.0), (2010, 9, 6.0), (2010, 10, 8.0), (2010, 11, 10.0), (2010, 12, 12.0),
+                    (2011, 1, 14.0), (2011, 2, 16.0), (2011, 3, 18.0), (2011, 4, 20.0), (2011, 5, 22.0),
+                    (2011, 6, 24.0), (2011, 7, 26.0)]
+        }
+        for func in ('avg', 'min', 'max'):
+            print "=====> Executing (month filter, function=%s)" % func
+            start_t = time.time()
+            results =  self.db.filter_stats_of_device_by_key(ds_key='valmy', ds_device_id=device1.id,
+                                                             start_date_ts=make_ts(2010, 6, 25, 15, 48, 0),
+                                                             end_date_ts=make_ts(2011, 7, 29, 15, 48, 0),
+                                                             step_used='month', function_used=func)
+            assert results == expected_results[func]
+            print "Execution time = %s" % (time.time() - start_t)
+
+        # Years
+        expected_results = {
+            'avg': [(2010, 6.0), (2011, 25.0), (2012, 43.0)],
+            'min': [(2010, 0.0), (2011, 13.0), (2012, 38.0)],
+            'max': [(2010, 12.0), (2011, 37.0), (2012, 48.0)]
+        }
+        for func in ('avg', 'min', 'max'):
+            print "=====> Executing (year filter, function=%s)" % func
+            start_t = time.time()
+            results=  self.db.filter_stats_of_device_by_key(ds_key='valmy', ds_device_id=device1.id,
+                                                            start_date_ts=make_ts(2010, 6, 21, 15, 48, 0),
+                                                            end_date_ts=make_ts(2012, 6, 21, 15, 48, 0),
+                                                            step_used='year', function_used=func)
+            assert results == expected_results[func]
+            print "Execution time = %s" % (time.time() - start_t)
 
     def test_del(self):
         dt1 = self.db.add_device_technology('x10', 'x10', 'this is x10')

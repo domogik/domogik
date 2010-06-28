@@ -40,7 +40,7 @@ Implements
 """
 
 import sys
-import datetime, hashlib
+import calendar, datetime, hashlib
 from types import DictType
 
 import sqlalchemy
@@ -107,9 +107,9 @@ def _make_crypted_password(clear_text_password):
     password.update(clear_text_password)
     return password.hexdigest()
 
-def _make_datetime_from_timestamp(ts):
-    """Make a date from a timestamp"""
-    date = str(datetime.datetime.fromtimestamp(ts))
+def _datetime_to_string(dt):
+    """Convert a date to a string, according to the DB used"""
+    date = str(dt)
     if get_db_type() == 'sqlite':
         # This is a hack to perform exact date comparisons
         # sqlAlchemy 0.6.1 doc : "In the case of SQLite, date and time types are stored as strings which are then
@@ -120,6 +120,14 @@ def _make_datetime_from_timestamp(ts):
         date += ".000000"
     return date
 
+def _datetime_string_from_timestamp(ts):
+    """Make a date from a timestamp"""
+    return _datetime_to_string(datetime.datetime.fromtimestamp(ts))
+
+def _get_week_nb(dt):
+    """Return the week number of a datetime expression"""
+    #return (dt - datetime.datetime(dt.year, 1, 1)).days / 7
+    return dt.isocalendar()[1]
 
 class DbHelperException(Exception):
     """This class provides exceptions related to the DbHelper class
@@ -1512,9 +1520,9 @@ class DbHelper():
         """
         query = self.__session.query(DeviceStats).filter_by(key=ucode(ds_key)).filter_by(device_id=ds_device_id)
         if start_date_ts:
-            query = query.filter("date >= '" + str(_make_datetime_from_timestamp(start_date_ts)) + "'")
+            query = query.filter("date >= '" + str(_datetime_string_from_timestamp(start_date_ts)) + "'")
         if end_date_ts:
-            query = query.filter("date <= '" + str(_make_datetime_from_timestamp(end_date_ts)) + "'")
+            query = query.filter("date <= '" + str(_datetime_string_from_timestamp(end_date_ts)) + "'")
         print query
         list_s = query.order_by(sqlalchemy.asc(DeviceStats.date)).all()
         return list_s
@@ -1532,7 +1540,7 @@ class DbHelper():
                              .filter_by(device_id=ds_device_id)\
                              .order_by(sqlalchemy.desc(DeviceStats.date)).first()
 
-    def filter_stats_of_device_by_key(self, ds_key, ds_device_id, start_date_ts, end_date_ts, step, function_used):
+    def filter_stats_of_device_by_key(self, ds_key, ds_device_id, start_date_ts, end_date_ts, step_used, function_used):
         """Filter statistic values within a period for a given step (minute, hour, day, week, month, year). It then
         applies a function (min, max, avg) for the values within the step.
 
@@ -1540,51 +1548,104 @@ class DbHelper():
         @param ds_device_id : device_id
         @param start_date_ts : date representing the begin of the period (timestamp)
         @param end_date_ts : date reprensenting the end of the period (timestamp)
-        @param step : minute, hour, day, week, month, year
+        @param step_used : minute, hour, day, week, month, year
         @param function_used : min, max, avg
         @return a list of tuples (date, computed value)
 
         """
-        if step is None or step.lower() not in ('minute', 'hour', 'day', 'week', 'month', 'year'):
-            raise DbHelperException("'period' parameter should be one of : minute, hour, day, week, month, year")
-        step_value = {
-            'minute': 60,
-            'hour'  : 3600,
-            'day'   : 3600 * 60,
-            'week'  : 3600 * 60 * 7,
-            'month' : 3600 * 24 * 7 * 30,
-            'year'  : 3600 * 24 * 7 * 30 * 365
-        }
         if start_date_ts > end_date_ts:
             raise DbHelperException("'end_date' can't be prior to 'start_date'")
         if function_used is None or function_used.lower() not in ('min', 'max', 'avg'):
             raise DbHelperException("'function_used' parameter should be one of : min, max, avg")
-
-        # TODO : remove once method is OK
-        """
-        for ds in self.__session.query(DeviceStats).all():
-            print("date=%s, val=%s" % (ds.date, ds.get_value()))
-        """
+        if step_used is None or step_used.lower() not in ('minute', 'hour', 'day', 'week', 'month', 'year'):
+            raise DbHelperException("'period' parameter should be one of : minute, hour, day, week, month, year")
+        function = {
+            'min': func.min(DeviceStats._DeviceStats__value_num),
+            'max': func.max(DeviceStats._DeviceStats__value_num),
+            'avg': func.avg(DeviceStats._DeviceStats__value_num),
+        }
+        step = {
+            'minute' :
+                # Query for mysql
+                # func.week(DeviceStats.date, 3) is equivalent to python's isocalendar()[2] method
+                (self.__session.query(func.year(DeviceStats.date), func.month(DeviceStats.date),
+                                      func.week(DeviceStats.date, 3), func.day(DeviceStats.date),
+                                      func.hour(DeviceStats.date), func.minute(DeviceStats.date),
+                                      function[function_used])\
+                               .group_by(func.year(DeviceStats.date), func.month(DeviceStats.date),
+                                         func.day(DeviceStats.date), func.hour(DeviceStats.date),
+                                         func.minute(DeviceStats.date)),
+                 # Get result format of the query
+                 lambda dt : [dt.year, dt.month, _get_week_nb(dt), dt.day, dt.hour, dt.minute],
+                 # Get max date of the period
+                 lambda dt : datetime.datetime(dt.year, dt.month, dt.day, dt.hour, dt.minute, 59),
+                ),
+            'hour' :
+                (self.__session.query(func.year(DeviceStats.date), func.month(DeviceStats.date),
+                                      func.week(DeviceStats.date, 3), func.day(DeviceStats.date),
+                                      func.hour(DeviceStats.date), function[function_used])\
+                               .group_by(func.year(DeviceStats.date), func.month(DeviceStats.date),
+                                         func.day(DeviceStats.date), func.hour(DeviceStats.date)),
+                 lambda dt : [dt.year, dt.month, _get_week_nb(dt), dt.day, dt.hour],
+                 lambda dt : datetime.datetime(dt.year, dt.month, dt.day, dt.hour, 59, 59),
+                ),
+            'day' :
+                (self.__session.query(func.year(DeviceStats.date), func.month(DeviceStats.date),
+                                      func.week(DeviceStats.date, 3), func.day(DeviceStats.date),
+                                      function[function_used])\
+                               .group_by(func.year(DeviceStats.date), func.month(DeviceStats.date),
+                                         func.day(DeviceStats.date)),
+                 lambda dt : [dt.year, dt.month, _get_week_nb(dt), dt.day],
+                 lambda dt : datetime.datetime(dt.year, dt.month, dt.day, 23, 59, 59),
+                ),
+            'week' :
+                (self.__session.query(func.year(DeviceStats.date), func.month(DeviceStats.date),
+                                      func.week(DeviceStats.date, 3), function[function_used])\
+                               .group_by(func.year(DeviceStats.date), func.week(DeviceStats.date, 3)),
+                 lambda dt : [dt.year, dt.month, _get_week_nb(dt)],
+                 lambda dt : datetime.datetime(dt.year, dt.month, dt.day, 23, 59, 59) \
+                             + datetime.timedelta(days=6-dt.weekday()),
+                ),
+            'month' :
+                (self.__session.query(func.year(DeviceStats.date), func.month(DeviceStats.date),
+                                      function[function_used])\
+                               .group_by(func.year(DeviceStats.date), func.month(DeviceStats.date)),
+                 lambda dt : [dt.year, dt.month],
+                 lambda dt : datetime.datetime(dt.year, dt.month, calendar.monthrange(dt.year, dt.month)[1],
+                                                                                      23, 59, 59),
+                ),
+            'year' :
+                (self.__session.query(func.year(DeviceStats.date), function[function_used])\
+                               .group_by(func.year(DeviceStats.date)),
+                 lambda dt : [dt.year,],
+                 lambda dt : datetime.datetime(dt.year, 12, 31, 23, 59, 59),
+                ),
+        }
 
         result_list = []
-        # TODO : for other DB use literal SQL to improve efficiency
-        query = ""
-        if function_used == 'min':
-            init_query = self.__session.query(DeviceStats.date, func.min(DeviceStats._DeviceStats__value_num))
-        elif function_used == 'max':
-            init_query = self.__session.query(DeviceStats.date, func.max(DeviceStats._DeviceStats__value_num))
-        elif function_used == 'avg':
-            init_query = self.__session.query(DeviceStats.date, func.avg(DeviceStats._DeviceStats__value_num))
-
-        for time_cursor in range(int(start_date_ts), int(end_date_ts), step_value[step]):
-            query = init_query.filter_by(key=ucode(ds_key)).filter_by(device_id=ds_device_id)\
-                              .filter("date >= '" + str(_make_datetime_from_timestamp(time_cursor)) + "'")\
-                              .filter("date <= '" + str(_make_datetime_from_timestamp(time_cursor + \
-                                                                                      step_value[step])) + "'")
-            val = query.first()
-            if val[0] is None:
-                break
-            result_list.append(val)
+        if get_db_type() == 'mysql':
+            query = step[step_used][0]
+            query = query.filter_by(key=ucode(ds_key)).filter_by(device_id=ds_device_id)\
+                         .filter("date >= '" + _datetime_string_from_timestamp(start_date_ts) + "'")\
+                         .filter("date < '" + _datetime_string_from_timestamp(end_date_ts) + "'")
+            result_list = query.all()
+        else:
+            datetime_cursor = datetime.datetime.fromtimestamp(start_date_ts)
+            end_datetime = datetime.datetime.fromtimestamp(end_date_ts)
+            while (datetime_cursor < end_datetime):
+                datetime_max_in_the_period = step[step_used][2](datetime_cursor)
+                datetime_sup = min(datetime_max_in_the_period, end_datetime)
+                query = self.__session.query(DeviceStats.date, function[function_used])\
+                                      .filter_by(key=ucode(ds_key)).filter_by(device_id=ds_device_id)\
+                                      .filter("date >= '" + _datetime_to_string(datetime_cursor) + "'")\
+                                      .filter("date < '" + _datetime_to_string(datetime_sup) + "'")
+                result = query.first()
+                cur_date = result[0]
+                if cur_date is not None:
+                    values_returned = step[step_used][1](datetime_cursor)
+                    values_returned.append(result[1])
+                    result_list.append(tuple(values_returned))
+                datetime_cursor = datetime_sup + datetime.timedelta(seconds=1)
         return result_list
 
     def device_has_stats(self, ds_device_id):
