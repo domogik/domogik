@@ -42,13 +42,26 @@
     </key>
     <key>
       <order-id>5</order-id>
+      <name>ds18b20-res</name>
+      <type>list</type>
+      <list>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+      </list>
+      <description>Resolution to use in data reading for DS18b20 components</description>
+      <default-value>12</default-value>
+    </key>
+    <key>
+      <order-id>6</order-id>
       <name>ds2401-en</name>
       <type>boolean</type>
       <description>Enable DS2401 components</description>
       <default-value>False</default-value>
     </key>
     <key>
-      <order-id>6</order-id>
+      <order-id>7</order-id>
       <name>ds2401-int</name>
       <type>number</type>
       <description>Interval between each data reading for DS2401 components</description>
