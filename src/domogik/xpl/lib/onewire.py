@@ -102,7 +102,7 @@ class ComponentDs18b20:
                     print "type=%s, id=%s, temp=%s" % (type, id, temperature)
                     self.callback(type, {"device" : id,
                                          "type" : "temp",
-                                         "current" : comp.temperature})
+                                         "current" : temperature})
             time.sleep(self.interval)
 
 
