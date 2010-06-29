@@ -16,8 +16,8 @@
       <order-id>1</order-id>
       <name>device</name>
       <type>string</type>
-      <description>Mir:ror device (ex : /dev/hidraw0)</description>
-      <default-value>/dev/hidraw0</default-value>
+      <description>Mir:ror device</description>
+      <default-value>/dev/mirror</default-value>
     </key>
   </configuration-keys>
 </plugin>
