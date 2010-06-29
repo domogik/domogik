@@ -3,7 +3,7 @@ syntax: glob
 *.orig
 *.rej
 .DS_Store
-:2eDS_Store
+:2e*
 .AppleDouble
 *.pyc
 *.pyoeggs/*
