@@ -35,6 +35,8 @@ TODO
 @organization: Domogik
 """
 
+import urllib
+
 class HelperError(Exception):
     def __init__(self, value):
         self.value = value
@@ -48,16 +50,23 @@ class Helper():
     def __init__(self):
         """ Init helper
         """
+        print "Init !"
         self.commands =   {}
 
     def help(self):
         return self.commands
 
     def command(self, cmd, args = []):
+        print "Helper : %s %s" % (cmd, str(args))
         if cmd == "help":
             return self.help()
         if cmd == None:
             return self.help()
+
+        # unquote parameters
+        for idx, val in enumerate(args):
+            args[idx] = unicode(urllib.unquote(val), "UTF-8")
+            print "%s - %s - %s" % (str(idx), args[idx], unicode(urllib.unquote(val), "UTF-8"))
 
         try:
             if len(args) < self.commands[cmd]["min_args"]:

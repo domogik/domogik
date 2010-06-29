@@ -3212,10 +3212,13 @@ target=*
 
 
         else:
+            print "command=%s" % command
             ### load helper and create object
             try:
                 for importer, plgname, ispkg in pkgutil.iter_modules(package.__path__):
+                    print "%s / %s" % (plgname, command)
                     if plgname == command:
+                        print "Import..."
                         helper = __import__('domogik.xpl.helpers.%s' % plgname, fromlist="dummy")
                         try:
                             helper_object = helper.MY_CLASS["cb"]()

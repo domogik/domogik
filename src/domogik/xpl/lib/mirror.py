@@ -79,11 +79,11 @@ class Mirror:
             self._log.info("Start listening Mir:ror")
             # infinite 
             while True:
-                device, type, current = self._read()
+                device, type, current = self.read()
                 if device != None:
                     self._cb(device, type, current)
             
-    def _read(self):        
+    def read(self):        
         """ Read Mir:ror device once
         """        
         # We read 16 byte
