@@ -181,7 +181,7 @@
                             values: {roomname : '{{ room.name }}', roomdescription : '{{ room.description }}'},
                             onok: function(values) {
                                 // Submit form
-                                $.getREST(['base', 'room', 'update', 'id', '{{ area.id }}', 'name', values.areaname, 'description', values.areadescription],
+                                $.getREST(['base', 'room', 'update', 'id', '{{ room.id }}', 'name', values.roomname, 'description', values.roomdescription],
                                     function(data) {
                                         var status = (data.status).toLowerCase();
                                         if (status == 'ok') {

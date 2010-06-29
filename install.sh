@@ -102,6 +102,8 @@ function update_default_config {
 
     d_home=$(getent passwd $d_user |cut -d ':' -f 6)
 
+    [ -f $d_home/.domogik.cfg ] && rm -f $d_home/.domogik.cfg
+
     if [ "$MODE" = "develop" ];then
         d_custom_path=$PWD/src/domogik/xpl/tools/
         [ -f /etc/default/domogik ] &&  sed -i "s;^CUSTOM_PATH.*$;CUSTOM_PATH=$d_custom_path;" /etc/default/domogik
@@ -165,6 +167,10 @@ function modify_hosts {
 if [ $UID -ne 0 ];then
     echo "Please restart this script as root!"
     exit 10
+fi
+if [ "$(dirname $0)" != "." ];then
+    echo "Please run this script from main source directory (as ./install.sh"
+    exit 15
 fi
 
 check_python

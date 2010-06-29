@@ -322,7 +322,7 @@ class DeviceFeature(Base):
     __tablename__ = '%s_device_feature' % _db_prefix
     id = Column(Integer, primary_key=True)
     name = Column(Unicode(30), nullable=False)
-    feature_type = Column(Enum('actuator', 'sensor'), nullable=False)
+    feature_type = Column(Enum('actuator', 'sensor', name='feature_type_list'), nullable=False)
     device_type_id = Column(Integer, ForeignKey('%s.id' % DeviceType.get_tablename()), nullable=False)
     device_type = relation(DeviceType)
     parameters = Column(UnicodeText())
@@ -380,7 +380,7 @@ class DeviceFeatureAssociation(Base):
     device = relation(Device, backref=backref(__tablename__))
     device_feature_id = Column(Integer, ForeignKey('%s.id' % DeviceFeature.get_tablename()), primary_key=True)
     device_feature = relation(DeviceFeature)
-    place_type = Column(Enum('room', 'area', 'house'), nullable=True)
+    place_type = Column(Enum('room', 'area', 'house', name='place_type_list'), nullable=True)
     place_id = Column(Integer, nullable=True)
 
     def __init__(self, device_id, device_feature_id, place_type=None, place_id=None):
@@ -455,9 +455,10 @@ class DeviceStats(Base):
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), nullable=False, primary_key=True)
     device = relation(Device)
     # We have both types for value field because we need an explicit numerical field in case we want to compute
-    # arithmetical operations (min/max/avg etc.)
+    # arithmetical operations (min/max/avg etc.). If it is a numerical value, both fields are filled in. If it is a
+    # character value only 'value' field is filled in.
     __value_num = Column('value_num', Float)
-    __value_str = Column('value_str', Unicode(255))
+    value = Column('value_str', Unicode(255))
 
     def __init__(self, date, key, device_id, value):
         """Class constructor
@@ -473,15 +474,9 @@ class DeviceStats(Base):
         try:
             self.__value_num = float(value)
         except ValueError:
-            self.__value_str = value
+            pass
+        self.value = value
         self.device_id = device_id
-
-    def get_value(self):
-        """Return the stat value"""
-        if self.__value_num is not None:
-            return self.__value_num
-        else:
-            return self.__value_str
 
     def get_date_as_timestamp(self):
         """Convert DateTime value to timestamp"""
@@ -489,7 +484,7 @@ class DeviceStats(Base):
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<DeviceStats(date='%s', (%s, %s), device=%s)>" % (self.date, self.key, self.get_value(), self.device)
+        return "<DeviceStats(date='%s', (%s, %s), device=%s)>" % (self.date, self.key, self.value, self.device)
 
     @staticmethod
     def get_tablename():
