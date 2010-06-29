@@ -69,7 +69,7 @@ class Mirror:
             self._mirror = open(device, "rb")
             self._log.info("Mir:ror device opened")
         except:
-            error = "Error while opening Mir:ror device : %s" % device
+            error = "Error while opening Mir:ror device : %s. Check if it is the good device or if you have the good permissions on it." % device
             raise MirrorException(error)
             
     def listen(self):
