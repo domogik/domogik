@@ -81,6 +81,11 @@ class OneWireManager(XplPlugin):
             self._config.query('onewire', 'ds18b20-int', res)
             ds18b20_interval = res.get_value()['ds18b20-int']
     
+            self._config = Query(self._myxpl)
+            res = XplResult()
+            self._config.query('onewire', 'ds18b20-res', res)
+            ds18b20_resolution = res.get_value()['ds18b20-res']
+    
             ### DS2401 config
             self._config = Query(self._myxpl)
             res = XplResult()
@@ -95,10 +100,9 @@ class OneWireManager(XplPlugin):
             ### Open one wire entwork
             try:
                 ow = OneWireNetwork(self._log, device, cache)
-            except OneWireException:
-                error = "Access to onewire device is not possible. Does your user have the good permissions ? If so, check that you stopped onewire module and you don't have OWFS mounted"
-                self._log.error(error)
-                print error
+            except OneWireException as e:
+                self._log.error(e.value)
+                print e.value
                 self.force_leave()
                 return
             
@@ -112,6 +116,7 @@ class OneWireManager(XplPlugin):
                                            (self._log,
                                             ow, 
                                             float(ds18b20_interval), 
+                                            ds18b20_resolution,
                                             self.send_xpl),
                                            {})
                 ds18b20.start()
