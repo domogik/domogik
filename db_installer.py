@@ -43,7 +43,8 @@ from domogik.common import database
 from domogik.common.configloader import Loader
 
 
-url = database.get_url_connection_string()
+db = database.DbHelper()
+url = db.get_url_connection_string()
 test_url = '%s_test' % url
 
 engine = create_engine(url)
@@ -55,8 +56,6 @@ engine_test = create_engine(test_url)
 sql_schema.metadata.create_all(engine)
 # For unit tests
 sql_schema.metadata.create_all(engine_test)
-
-db = database.DbHelper()
 
 # Initialize default system configuration
 db.update_system_config()
