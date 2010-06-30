@@ -30,6 +30,7 @@ Benchmarks for the database API
 """
 
 
+import getopt, sys
 import datetime, time
 from domogik.common.database import DbHelper, DbHelperException
 from domogik.common.sql_schema import DeviceStats
@@ -38,96 +39,122 @@ from domogik.tests.database_test import make_ts
 
 _db = None
 _device1 = None
+_insert_data = True
 
-def run_stats_filter(insert_data=True, **period_filter):
+def run_stats_filter(period_filter_list):
     """Run various filtering function on statistics values
 
-    @param insert_data    : if False then don't insert sample data (default is True)
-    @param *period_filter : A dictionnary of filter(s) we wish ('minute', 'hour', 'day', 'week', 'month', 'year')
-                            Each item is set to True or False
+    @param period_filter_list : A list of filter(s) we wish ('minute', 'hour', 'day', 'week', 'month', 'year')
 
     """
+    print "Running stats filtering, with : %s" % period_filter_list
+    if _insert_data:
+        remove_all_stats()
+        init_required_data_for_stats()
+        add_data(start_p=make_ts(2010, 1, 1, 15, 48, 0), end_p=make_ts(2015, 6, 21, 15, 48, 0), insert_step=30,
+                 key='keysample')
+
     # Minutes
     start_p = make_ts(2010, 1, 1, 15, 48, 0)
     end_p = make_ts(2010, 1, 31, 16, 8, 0)
-    if (period_filter['minute'] or period_filter['hour']) and insert_data:
-        save_data(start_p, end_p, 30, 'valmh')
-
-    if period_filter['minute']:
-        print "=====> Executing minute filter"
+    if 'minute' in period_filter_list:
+        print "Executing minute filter : period = %s / %s" % (datetime.datetime.utcfromtimestamp(start_p),
+                                                              datetime.datetime.utcfromtimestamp(end_p))
         start_t = time.time()
-        results = _db.filter_stats_of_device_by_key(ds_key='valmh', ds_device_id=_device1.id, start_date_ts=start_p,
+        results = _db.filter_stats_of_device_by_key(ds_key='keysample', ds_device_id=_device1.id, start_date_ts=start_p,
                                                     end_date_ts=end_p, step_used='minute', function_used='avg')
-        print "Execution time = %s" % (time.time() - start_t)
+        print "\tExecution time = %s" % (time.time() - start_t)
 
     # Hours
-    if period_filter['hour']:
-        print "=====> Executing hour filter"
+    start_p = make_ts(2010, 1, 1, 15, 48, 0)
+    end_p = make_ts(2010, 3, 31, 16, 8, 0)
+    if 'hour' in period_filter_list:
+        print "Executing hour filter : period = %s / %s" % (datetime.datetime.utcfromtimestamp(start_p),
+                                                            datetime.datetime.utcfromtimestamp(end_p))
         start_t = time.time()
-        results = _db.filter_stats_of_device_by_key(ds_key='valmh', ds_device_id=_device1.id, start_date_ts=start_p,
+        results = _db.filter_stats_of_device_by_key(ds_key='keysample', ds_device_id=_device1.id, start_date_ts=start_p,
                                                     end_date_ts=end_p, step_used='hour', function_used='avg')
-        print "Execution time = %s" % (time.time() - start_t)
+        print "\tExecution time = %s" % (time.time() - start_t)
 
     # Days
     start_p = make_ts(2010, 1, 1, 15, 4, 0)
     end_p = make_ts(2010, 12, 31, 21, 48, 0)
-    if (period_filter['day'] or period_filter['week']) and insert_data:
-        save_data(start_p, end_p, 28000, 'valdw')
-
-    if period_filter['day']:
-        print "=====> Executing day filter"
+    if 'day' in period_filter_list:
+        print "Executing day filter : period = %s / %s" % (datetime.datetime.utcfromtimestamp(start_p),
+                                                           datetime.datetime.utcfromtimestamp(end_p))
         start_t = time.time()
-        results = _db.filter_stats_of_device_by_key(ds_key='valdw', ds_device_id=_device1.id, start_date_ts=start_p,
+        results = _db.filter_stats_of_device_by_key(ds_key='keysample', ds_device_id=_device1.id, start_date_ts=start_p,
                                                     end_date_ts=end_p, step_used='day', function_used='avg')
-        print "Execution time = %s" % (time.time() - start_t)
+        print "\tExecution time = %s" % (time.time() - start_t)
 
     # Weeks
-    if period_filter['week']:
-        print "=====> Executing week filter"
+    start_p = make_ts(2010, 1, 1, 15, 4, 0)
+    end_p = make_ts(2012, 1, 1, 21, 48, 0)
+    if 'week' in period_filter_list:
+        print "Executing week filter : period = %s / %s" % (datetime.datetime.utcfromtimestamp(start_p),
+                                                            datetime.datetime.utcfromtimestamp(end_p))
         start_t = time.time()
-        results = _db.filter_stats_of_device_by_key(ds_key='valdw', ds_device_id=_device1.id, start_date_ts=start_p,
+        results = _db.filter_stats_of_device_by_key(ds_key='keysample', ds_device_id=_device1.id, start_date_ts=start_p,
                                                     end_date_ts=end_p, step_used='week', function_used='avg')
-        print "Execution time = %s" % (time.time() - start_t)
+        print "\tExecution time = %s" % (time.time() - start_t)
 
     # Months
     start_p = make_ts(2010, 6, 21, 15, 48, 0)
-    end_p = make_ts(2020, 6, 21, 15, 48, 0)
-    if (period_filter['month'] or period_filter['year']) and insert_data:
-        save_data(start_p, end_p, 3600, 'valmy')
-
-    if period_filter['month']:
-        print "=====> Executing month filter"
+    end_p = make_ts(2015, 6, 21, 15, 48, 0)
+    if 'month' in period_filter_list:
+        print "Executing month filter : period = %s / %s" % (datetime.datetime.utcfromtimestamp(start_p),
+                                                             datetime.datetime.utcfromtimestamp(end_p))
         start_t = time.time()
-        results =  _db.filter_stats_of_device_by_key(ds_key='valmy', ds_device_id=_device1.id, start_date_ts=start_p,
+        results =  _db.filter_stats_of_device_by_key(ds_key='keysample', ds_device_id=_device1.id, start_date_ts=start_p,
                                                      end_date_ts=end_p, step_used='month', function_used='avg')
-        print "Execution time = %s" % (time.time() - start_t)
+        print "\tExecution time = %s" % (time.time() - start_t)
 
     # Years
-    if period_filter['year']:
-        print "=====> Executing year filter"
+    if 'year' in period_filter_list:
+        print "Executing year filter : period = %s / %s" % (datetime.datetime.utcfromtimestamp(start_p),
+                                                            datetime.datetime.utcfromtimestamp(end_p))
         start_t = time.time()
-        results=  _db.filter_stats_of_device_by_key(ds_key='valmy', ds_device_id=_device1.id, start_date_ts=start_p,
+        results=  _db.filter_stats_of_device_by_key(ds_key='keysample', ds_device_id=_device1.id, start_date_ts=start_p,
                                                     end_date_ts=end_p, step_used='year', function_used='avg')
         print "Execution time = %s" % (time.time() - start_t)
 
-def save_data(start_p, end_p, insert_step, key):
-    """Store sample data into the database"""
+def add_data(start_p, end_p, insert_step, key):
+    """Add sample data into the database
 
-    print "=====> Inserting data"
+    @param start_p  : start date (timestamp)
+    @param end_p    : end date (timestamp)
+    @insert_step    : step used when adding data (in secs)
+    @key            : key name to insert
+
+    """
+
+    print "Inserting sample stats data, period = %s / %s, step = %s secs (%s values)" \
+           % (datetime.datetime.utcfromtimestamp(start_p), datetime.datetime.utcfromtimestamp(end_p), insert_step,
+              (end_p - start_p) / insert_step)
     count = 0
+    start_t = time.time()
     for i in range(0, int(end_p - start_p), insert_step):
-        count = count + 1
+        count += 1
+        cur_date = start_p + i
         _db._DbHelper__session.add(
-            DeviceStats(date=datetime.datetime.utcfromtimestamp(start_p + i),
+            DeviceStats(date=datetime.datetime.utcfromtimestamp(cur_date),
                         key=u'valmy', value=i/insert_step, device_id=_device1.id)
         )
-    print "commiting..."
+        # To avoid memory overflow
+        if (count % 50000 == 0):
+            print "\tcommiting... (%s values inserted, date = %s)" % (count,
+                                                                      datetime.datetime.utcfromtimestamp(cur_date)),
+            _db._DbHelper__session.commit()
+            print "done!"
+
+    print "\tcommiting remaining data..."
     _db._DbHelper__session.commit()
-    print "%s values inserted" % count
+    print "\t%s values inserted" % count
+    print "\tExecution time = %s" % (time.time() - start_t)
 
 def init_required_data_for_stats():
-
-    """Add required data for stats (device)"""
+    """Add pre-required data to build stats samples (eg. device)"""
+    print init_required_data_for_stats.__doc__
     global _device1
     dt1 = _db.add_device_technology('x10', 'x10', 'this is x10')
     dty1 = _db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
@@ -149,10 +176,49 @@ def remove_all_stats():
     """
     _db._DbHelper__session.commit()
 
+def check_args(argv):
+    """Check arguments passed to the program"""
+
+
+def usage(prog_name):
+    """Print program usage"""
+    print "Usage : %s [-s [all|minute[,hour][,day][,week][,month[,year]]] [-I]" % prog_name
+    print "-s, --statistics=STATS_LIST\tSTATS_LIST can be : all or minute,hours,day,week,month,year"
+    print "-I, --noinsert\t\t\tUse existing data in the database"
+
 if __name__ == "__main__":
-    is_insert_data = True
-    _db = DbHelper(use_test_db=True)
-    if is_insert_data:
-        remove_all_stats()
-    init_required_data_for_stats()
-    run_stats_filter(insert_data=is_insert_data, minute=False, hour=False, day=False, week=False, month=True, year=True)
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "hs:I", ["help", "stats=", "noinsert"])
+        _db = DbHelper(use_test_db=True)
+        print "Using %s database" % _db.get_db_type()
+        for opt, arg_list in opts:
+            if opt in ("-I", "--noinsert"):
+                _insert_data = False
+
+        for opt, arg_list in opts:
+            if opt in ("-s", "--stats"):
+                possible_args = ['all', 'minute', 'hour', 'day', 'week', 'month', 'year']
+                if arg_list is not None:
+                    filter_list = arg_list.split(",")
+                    # Check args are ok for -s option
+                    for p_filter in filter_list:
+                        if p_filter not in filter_list:
+                            print "Wrong argument for statistics, must be one of : %s" % (",".join(possible_args))
+                            usage(sys.argv[0])
+                    if 'all' in filter_list:
+                        filter_list = possible_args[1:]
+                run_stats_filter(filter_list)
+            elif opt in ("-h", "--help"):
+                usage(sys.argv[0])
+                sys.exit()
+            else:
+                print "Unhandled option : %s" % opt
+                usage(sys.argv[0])
+                sys.exit(2)
+        if len(opts) == 0:
+            usage(sys.argv[0])
+            sys.exit(2)
+    except getopt.GetoptError, err:
+        print "Wrong arguments supplied : %s" % str(err)
+        usage(sys.argv[0])
+        sys.exit(2)
