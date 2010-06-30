@@ -34,7 +34,7 @@ import getopt, sys
 import datetime, time
 from domogik.common.database import DbHelper, DbHelperException
 from domogik.common.sql_schema import DeviceStats
-from domogik.tests.database_test import make_ts
+from domogik.tests.unittests.database_test import make_ts
 
 
 _db = None
