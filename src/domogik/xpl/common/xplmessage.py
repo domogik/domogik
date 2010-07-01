@@ -87,7 +87,7 @@ REGEXP_HOP_COUNT = r"""(?P<hop_count>[1-9]{1})$
 REGEXP_SOURCE = r"""(?P<source>
                         (?P<source_vendor_id>[a-z, 0-9]{1,8})
                         -
-                        (?P<source_device_id>[a-z, 0-9]{1,8})
+                        (?P<source_device_id>[a-z, 0-9, _]{1,8})
                         \.
                         (?P<source_instance_id>[a-z, 0-9, \-]{1,16})$
                     )
