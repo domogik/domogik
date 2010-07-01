@@ -69,7 +69,7 @@ class Mirror:
             self._mirror = open(device, "rb")
             self._log.info("Mir:ror device opened")
         except:
-            error = "Error while opening Mir:ror device : %s" % device
+            error = "Error while opening Mir:ror device : %s. Check if it is the good device or if you have the good permissions on it." % device
             raise MirrorException(error)
             
     def listen(self):
@@ -79,11 +79,11 @@ class Mirror:
             self._log.info("Start listening Mir:ror")
             # infinite 
             while True:
-                device, type, current = self._read()
+                device, type, current = self.read()
                 if device != None:
                     self._cb(device, type, current)
             
-    def _read(self):        
+    def read(self):        
         """ Read Mir:ror device once
         """        
         # We read 16 byte

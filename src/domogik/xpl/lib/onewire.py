@@ -59,17 +59,19 @@ class ComponentDs18b20:
     DS18B20 support
     """
 
-    def __init__(self, log, onewire, interval, callback):
+    def __init__(self, log, onewire, interval, resolution, callback):
         """
         Return temperature each <interval> seconds
         @param log : log instance
         @param onewire : onewire network object
         @param interval : interval between each data sent
+        @param resolution : resolution of data to read
         @param callback : callback to return values
         """
         self._log = log
         self.onewire = onewire
         self.interval = interval
+        self.resolution = resolution
         self.callback = callback
         self.root = self.onewire.get_root()
         self.old_temp = {}
@@ -82,16 +84,25 @@ class ComponentDs18b20:
         while True:
             for comp in self.root.find(type = "DS18B20"):
                 id = comp.id
-                temperature = float(comp.temperature)
-                if hasattr(self.old_temp, id) == False or temperature != self.old_temp[id]:
-                    type = "xpl-trig"
+                try:
+                    temperature = float(eval("comp.temperature"+self.resolution))
+                except AttributeError:
+                    error = "DS18B20 : bad resolution : %s. Setting resolution to 12 for next iterations." % self.resolution
+                    self._log.error(error)
+                    print error
+                    self.resolution = "12"
+
                 else:
-                    type = "xpl-stat"
-                self.old_temp[id] = temperature
-                print "type=%s, id=%s, temp=%s" % (type, id, temperature)
-                self.callback(type, {"device" : id,
-                                     "type" : "temp",
-                                     "current" : comp.temperature})
+
+                    if hasattr(self.old_temp, id) == False or temperature != self.old_temp[id]:
+                        type = "xpl-trig"
+                    else:
+                        type = "xpl-stat"
+                    self.old_temp[id] = temperature
+                    print "type=%s, id=%s, temp=%s" % (type, id, temperature)
+                    self.callback(type, {"device" : id,
+                                         "type" : "temp",
+                                         "current" : temperature})
             time.sleep(self.interval)
 
 
@@ -167,8 +178,7 @@ class OneWireNetwork:
             else:
                 self._root = ow.Sensor('/uncached')
         except:
-            raise OneWireException("Can't access device")
-
+            raise OneWireException("Access to onewire device is not possible. Does your user have the good permissions ? If so, check that you stopped onewire module and you don't have OWFS mounted")
 
     def get_root(self):
         """

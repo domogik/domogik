@@ -45,13 +45,17 @@ class WOL:
     """
 
     def __init__(self, log):
+        """
+        Init object
+        @param log : logger instance
+        """
         self._log = log
 
     def wake_up(self, mac, port):
         """
         Send a magic packet to wake a computer on lan
         """
-        self._log.info("Start process for wol on " + mac + " port:" + str(port))
+        self._log.debug("Start process for wol on " + mac + " port:" + str(port))
         # Verify and conveert mac format
         self._log.debug("Check mac format")
         if len(mac) == 12:
@@ -61,7 +65,7 @@ class WOL:
             mac = mac.replace(separator, '')
         else:
             self._log.error("Wrong mac address : " + mac)
-            return
+            return False
 
         # Create magic packet
         self._log.debug("Create magic packet")
@@ -79,5 +83,7 @@ class WOL:
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
             sock.sendto(magic_hexa, ('<broadcast>', port))
             self._log.info("Magic packet send")
+            return True
         except:
             self._log.error("Fail to send magic packet")
+            return False

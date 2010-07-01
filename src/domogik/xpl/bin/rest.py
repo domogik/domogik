@@ -3212,10 +3212,13 @@ target=*
 
 
         else:
+            print "command=%s" % command
             ### load helper and create object
             try:
                 for importer, plgname, ispkg in pkgutil.iter_modules(package.__path__):
+                    print "%s / %s" % (plgname, command)
                     if plgname == command:
+                        print "Import..."
                         helper = __import__('domogik.xpl.helpers.%s' % plgname, fromlist="dummy")
                         try:
                             helper_object = helper.MY_CLASS["cb"]()
@@ -3477,6 +3480,8 @@ class JSonHelper():
 
 
     def _process_sub_data(self, idx, is_table, sub_data_key, sub_data, sub_data_type, db_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type):
+        if sub_data_key[0] == "_":
+            return ""
         data_tmp = ""
         if sub_data_type in db_type: 
             if is_table is False:  # and idx != 0: 

@@ -56,8 +56,6 @@ from domogik.common.sql_schema import ACTUATOR_VALUE_TYPE_LIST, Area, Device, De
                                       SystemConfig, Trigger
 
 
-_db_config = None
-
 def ucode(my_string):
     """Convert a string into unicode or return None if None value is passed
 
@@ -70,32 +68,6 @@ def ucode(my_string):
     else:
         return None
 
-def get_url_connection_string():
-    """Get url connection string to the database reading the configuration file"""
-    cfg = Loader('database')
-    config = None
-    if len(sys.argv) > 1:
-        config = cfg.load(sys.argv[1])
-    else:
-        config = cfg.load()
-    global _db_config
-    _db_config = dict(config[1])
-    url = "%s://" % _db_config['db_type']
-    if _db_config['db_type'] == 'sqlite':
-        url = "%s/%s" % (url, _db_config['db_path'])
-    else:
-        if _db_config['db_port'] != '':
-            url = "%s%s:%s@%s:%s/%s" % (url, _db_config['db_user'], _db_config['db_password'], _db_config['db_host'],
-                                        _db_config['db_port'], _db_config['db_name'])
-        else:
-            url = "%s%s:%s@%s/%s" % (url,_db_config['db_user'], _db_config['db_password'], _db_config['db_host'],
-                                     _db_config['db_name'])
-    return url
-
-def get_db_type():
-    """Return DB type which is currently used (sqlite, mysql, postgresql)"""
-    return _db_config['db_type'].lower()
-
 def _make_crypted_password(clear_text_password):
     """Make a crypted password (using sha256)
 
@@ -107,10 +79,10 @@ def _make_crypted_password(clear_text_password):
     password.update(clear_text_password)
     return password.hexdigest()
 
-def _datetime_to_string(dt):
-    """Convert a date to a string, according to the DB used"""
+def _datetime_to_string(dt, db_used):
+    """Convert a date to a string according to the DB used"""
     date = str(dt)
-    if get_db_type() == 'sqlite':
+    if db_used == 'sqlite':
         # This is a hack to perform exact date comparisons
         # sqlAlchemy 0.6.1 doc : "In the case of SQLite, date and time types are stored as strings which are then
         # converted back to datetime objects when rows are returned."
@@ -120,9 +92,9 @@ def _datetime_to_string(dt):
         date += ".000000"
     return date
 
-def _datetime_string_from_timestamp(ts):
-    """Make a date from a timestamp"""
-    return _datetime_to_string(datetime.datetime.fromtimestamp(ts))
+def _datetime_string_from_tstamp(ts, db_used):
+    """Make a date from a timestamp according to the DB used"""
+    return _datetime_to_string(datetime.datetime.fromtimestamp(ts), db_used)
 
 def _get_week_nb(dt):
     """Return the week number of a datetime expression"""
@@ -168,11 +140,19 @@ class DbHelper():
         @param use_test_db : if True use a test database (optional, default False)
 
         """
-        url = get_url_connection_string()
+        cfg = Loader('database')
+        config = None
+        if len(sys.argv) > 1:
+            config = cfg.load(sys.argv[1])
+        else:
+            config = cfg.load()
+        self.__db_config = dict(config[1])
+
+        url = self.get_url_connection_string()
         if use_test_db:
             url = '%s_test' % url
         # Connecting to the database
-        self.__dbprefix = _db_config['db_prefix']
+        self.__dbprefix = self.__db_config['db_prefix']
         self.__engine = sqlalchemy.create_engine(url, echo=echo_output)
         Session = sessionmaker(bind=self.__engine, autoflush=True)
         self.__session = Session()
@@ -183,6 +163,24 @@ class DbHelper():
         """
         self.__session.rollback()
 
+    def get_url_connection_string(self):
+        """Get url connection string to the database reading the configuration file"""
+        url = "%s://" % self.__db_config['db_type']
+        if self.__db_config['db_type'] == 'sqlite':
+            url = "%s/%s" % (url, self.__db_config['db_path'])
+        else:
+            if self.__db_config['db_port'] != '':
+                url = "%s%s:%s@%s:%s/%s" % (url, self.__db_config['db_user'], self.__db_config['db_password'],
+                                            self.__db_config['db_host'], self.__db_config['db_port'],
+                                            self.__db_config['db_name'])
+            else:
+                url = "%s%s:%s@%s/%s" % (url, self.__db_config['db_user'], self.__db_config['db_password'],
+                                         self.__db_config['db_host'], self.__db_config['db_name'])
+        return url
+
+    def get_db_type(self):
+        """Return DB type which is currently used (sqlite, mysql, postgresql)"""
+        return self.__db_config['db_type'].lower()
 
 ####
 # Areas
@@ -1464,9 +1462,9 @@ class DbHelper():
         """
         query = self.__session.query(DeviceStats).filter_by(key=ucode(ds_key)).filter_by(device_id=ds_device_id)
         if start_date_ts:
-            query = query.filter("date >= '" + str(_datetime_string_from_timestamp(start_date_ts)) + "'")
+            query = query.filter("date >= '" + str(_datetime_string_from_tstamp(start_date_ts, self.get_db_type()))+"'")
         if end_date_ts:
-            query = query.filter("date <= '" + str(_datetime_string_from_timestamp(end_date_ts)) + "'")
+            query = query.filter("date <= '" + str(_datetime_string_from_tstamp(end_date_ts, self.get_db_type())) + "'")
         print query
         list_s = query.order_by(sqlalchemy.asc(DeviceStats.date)).all()
         return list_s
@@ -1567,11 +1565,11 @@ class DbHelper():
         }
 
         result_list = []
-        if get_db_type() == 'mysql':
+        if self.get_db_type() == 'mysql':
             query = step[step_used][0]
             query = query.filter_by(key=ucode(ds_key)).filter_by(device_id=ds_device_id)\
-                         .filter("date >= '" + _datetime_string_from_timestamp(start_date_ts) + "'")\
-                         .filter("date < '" + _datetime_string_from_timestamp(end_date_ts) + "'")
+                         .filter("date >= '" + _datetime_string_from_tstamp(start_date_ts, self.get_db_type()) + "'")\
+                         .filter("date < '" + _datetime_string_from_tstamp(end_date_ts, self.get_db_type()) + "'")
             result_list = query.all()
         else:
             datetime_cursor = datetime.datetime.fromtimestamp(start_date_ts)
@@ -1581,8 +1579,9 @@ class DbHelper():
                 datetime_sup = min(datetime_max_in_the_period, end_datetime)
                 query = self.__session.query(func.min(DeviceStats.date), function[function_used])\
                                       .filter_by(key=ucode(ds_key)).filter_by(device_id=ds_device_id)\
-                                      .filter("date >= '" + _datetime_to_string(datetime_cursor) + "'")\
-                                      .filter("date < '" + _datetime_to_string(datetime_sup) + "'")
+                                      .filter("date >= '" + _datetime_to_string(datetime_cursor, self.get_db_type()) +\
+                                              "'")\
+                                      .filter("date < '" + _datetime_to_string(datetime_sup, self.get_db_type()) + "'")
                 result = query.first()
                 cur_date = result[0]
                 if cur_date is not None:

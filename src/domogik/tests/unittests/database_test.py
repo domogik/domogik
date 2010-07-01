@@ -893,9 +893,9 @@ class DeviceStatsTestCase(GenericTestCase):
         device2 = self.db.add_device(d_name='device2', d_address='A2', d_type_id=dty1.id, d_usage_id=du1.id)
         ds1 = self.db.add_device_stat(make_ts(2010, 04, 9, 12), 'val1', 0, device1.id)
         print(ds1)
-        assert ds1.key == 'val1' and ds1.get_value() == 0
+        assert ds1.key == 'val1' and ds1.value == '0'
         ds2 = self.db.add_device_stat(make_ts(2010, 04, 9, 12), 'val_char', 'plop', device1.id)
-        assert ds2.key == 'val_char' and ds2.get_value() == 'plop'
+        assert ds2.key == 'val_char' and ds2.value == 'plop'
         self.db.add_device_stat(make_ts(2010, 04, 9, 12, 0), 'val2', 1, device1.id)
         self.db.add_device_stat(make_ts(2010, 04, 9, 12, 1), 'val1', 2, device1.id)
         self.db.add_device_stat(make_ts(2010, 04, 9, 12, 1), 'val2', 3, device1.id)
@@ -912,21 +912,21 @@ class DeviceStatsTestCase(GenericTestCase):
         self.db.add_device_stat(make_ts(2010, 04, 9, 12, 1), 'val2', 400, device2.id)
 
         assert len(self.db.list_device_stats(device1.id)) == 11
-        assert self.db.get_last_stat_of_device_by_key('val1', device1.id).get_value() == 8
-        assert self.db.get_last_stat_of_device_by_key('val2', device1.id).get_value() == 9
+        assert self.db.get_last_stat_of_device_by_key('val1', device1.id).value == '8'
+        assert self.db.get_last_stat_of_device_by_key('val2', device1.id).value == '9'
 
         stats_l = self.db.list_last_n_stats_of_device_by_key('val1', device1.id, 3)
         assert len(stats_l) == 3
-        assert stats_l[0].get_value() == 4 and stats_l[1].get_value() == 6 and stats_l[2].get_value() == 8
+        assert stats_l[0].value == '4' and stats_l[1].value == '6' and stats_l[2].value == '8'
 
         stats_l = self.db.list_stats_of_device_between_by_key('val1', device1.id, make_ts(2010, 04, 9, 12, 2),
                                                               make_ts(2010, 04, 9, 12, 4))
         assert len(stats_l) == 3
-        assert stats_l[0].get_value() == 4 and stats_l[1].get_value() == 6 and stats_l[2].get_value() == 8
+        assert stats_l[0].value == '4' and stats_l[1].value == '6' and stats_l[2].value == '8'
         stats_l = self.db.list_stats_of_device_between_by_key('val1', device1.id,
                                                               make_ts(2010, 04, 9, 12, 3))
         assert len(stats_l) == 2
-        assert stats_l[0].get_value() == 6 and stats_l[1].get_value() == 8
+        assert stats_l[0].value == '6' and stats_l[1].value == '8'
         stats_l = self.db.list_stats_of_device_between_by_key('val1', device1.id,
                                                               end_date_ts=make_ts(2010, 04, 9, 12, 2))
         assert len(stats_l) == 3
@@ -944,7 +944,7 @@ class DeviceStatsTestCase(GenericTestCase):
         start_p = make_ts(2010, 2, 21, 15, 48, 0)
         end_p = make_ts(2010, 2, 21, 16, 8, 0)
         insert_step = 10
-        for i in range(0, int(end_p - start_p), 10):
+        for i in range(0, int(end_p - start_p), insert_step):
             self.db._DbHelper__session.add(
                 DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i),
                             key=u'valm', value=(i/insert_step), device_id=device1.id)
@@ -1133,7 +1133,7 @@ class DeviceStatsTestCase(GenericTestCase):
         assert len(l_stats) == 2
         self.db.del_device_stats(device2.id, 'val2')
         assert len(self.db.list_device_stats(device2.id)) == 1
-        assert self.db.list_device_stats(device2.id)[0].get_value() == 40
+        assert self.db.list_device_stats(device2.id)[0].value == '40'
 
 
 class TriggersTestCase(GenericTestCase):

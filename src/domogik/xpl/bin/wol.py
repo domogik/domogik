@@ -60,22 +60,22 @@ class WOLListener(XplPlugin):
         """ Call wake on lan lib
             @param message : xPL message detected by listener
         """
-        self._log.debug("Call wol_cb")
         if 'device' in message.data:
             device = message.data['device']
         mac = device
         port = 7
-        self._log.debug("Wake on lan command received for " + mac)
-        self._wolmanager.wake_up(mac, port)
+        self._log.info("Wake on lan command received for " + mac)
+        status = self._wolmanager.wake_up(mac, port)
 
         # Send xpl-trig to say plugin receive command
-        mess = XplMessage()
-        mess.set_type('xpl-trig')
-        mess.set_schema('sensor.basic')
-        mess.add_data({'device' :  mac})
-        mess.add_data({'type' :  'wakeonlan'})
-        mess.add_data({'current' :  'on'})
-        self._myxpl.send(mess)
+        if status == True:
+            mess = XplMessage()
+            mess.set_type('xpl-trig')
+            mess.set_schema('sensor.basic')
+            mess.add_data({'device' :  mac})
+            mess.add_data({'type' :  'wakeonlan'})
+            mess.add_data({'current' :  'on'})
+            self._myxpl.send(mess)
 
 
 if __name__ == "__main__":
