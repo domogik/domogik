@@ -3,6 +3,8 @@ syntax: glob
 *.orig
 *.rej
 .DS_Store
+:2e*
+.AppleDouble
 *.pyc
 *.pyoeggs/*
 eggs
