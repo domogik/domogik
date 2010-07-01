@@ -212,9 +212,9 @@ class GetCommandInit(Node):
         script = ""
         if len(stat.stats) > 0 :
             if feature.device_feature.value_type == "binary":
-                script = GetCommandBinary.get_setValue(feature, "'" + stat.stats[0].value_str + "'")
+                script = GetCommandBinary.get_setValue(feature, "'" + stat.stats[0].value + "'")
             if feature.device_feature.value_type == "range":
-                script = GetCommandRange.get_setValue(feature, "'" + stat.stats[0].value_str + "'")
+                script = GetCommandRange.get_setValue(feature, "'" + stat.stats[0].value + "'")
         return script
 
 class GetCommandUpdate(Node):
@@ -262,9 +262,9 @@ class GetInfoInit(Node):
         script = ""
         if len(stat.stats) > 0 :
             if feature.device_feature.value_type == "number":
-                script = GetInfoNumber.get_setValue(feature, "'" + str(stat.stats[0]._DeviceStats__value_num) + "'")
+                script = GetInfoNumber.get_setValue(feature, "'" + stat.stats[0].value + "'")
             if feature.device_feature.value_type == "string":
-                script = GetInfoString.get_setValue(feature, "'" + stat.stats[0].value_str + "'")
+                script = GetInfoString.get_setValue(feature, "'" + stat.stats[0].value + "'")
         return script
 
 class GetInfoUpdate(Node):
