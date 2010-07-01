@@ -96,7 +96,7 @@ REGEXP_TARGET = r"""(?P<target>
                         (?:
                             (?P<target_vendor_id>[a-z, 0-9]{1,8})
                             -
-                            (?P<target_device_id>[a-z, 0-9]{1,8})
+                            (?P<target_device_id>[a-z, 0-9, _]{1,8})
                             \.
                             (?P<target_instance_id>[a-z, 0-9, \-]{1,16})$
                         ) |
