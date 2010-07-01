@@ -55,7 +55,7 @@ class WOL:
         """
         Send a magic packet to wake a computer on lan
         """
-        self._log.debug("Start process for wol on " + mac + " port:" + str(port))
+        self._log.debug("Start processing wol on %s port %s" % (mac, str(port)))
         # Verify and conveert mac format
         self._log.debug("Check mac format")
         if len(mac) == 12:
@@ -74,7 +74,8 @@ class WOL:
 
         # Convert magic packet in hexa
         for i in range(0, len(magic_packet), 2):
-            magic_hexa = ''.join([magic_hexa, struct.pack('B', int(magic_packet[i: i + 2], 16))])
+            magic_hexa = ''.join([magic_hexa, 
+                         struct.pack('B', int(magic_packet[i: i + 2], 16))])
 
         # Send magic packet
         self._log.debug("Send magic packet to broadcast")
