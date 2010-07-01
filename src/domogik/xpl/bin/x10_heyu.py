@@ -38,6 +38,7 @@ Implements
 """
 
 import os
+import traceback
 
 if os.name == 'nt':
     from domogik.xpl.lib.win_x10_heyu import X10API
@@ -69,6 +70,7 @@ class X10Main(XplPlugin):
             self.__myx10 = X10API(self._heyu_cfg_path_res)
         except Exception:
             print "Something went wrong during heyu init, check logs"
+            self._log.debug("Exception : %s" % traceback.format_exc())
             exit(1)
         #Create listeners
         Listener(self.x10_cmnd_cb, self._myxpl, {'schema': 'x10.basic', 'xpltype': 'xpl-cmnd'})
