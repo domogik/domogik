@@ -448,7 +448,7 @@ class SysManager(XplPlugin):
 
 
                     # check plugin state
-                    if self._is_component_running(plgname):
+                    if self._check_component_is_running(plgname):
                         status = "ON"
                     else:
                         status = "OFF"
