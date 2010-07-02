@@ -144,6 +144,28 @@ class GetCommandTrigger():
                            parameters_type['command'], feature.device_feature.return_confirmation)
         return script
 
+class GetInfoBoolean():
+    @staticmethod
+    def get_widget_mini(feature, device_type, device_usage, parameters_type, parameters_usage):
+        script = """$("#widget_%s_%s").widget_mini_info_boolean({
+                            usage: %s,
+                            devicename: '%s',
+                            featurename: '%s',
+                            deviceid: %s,
+                            key: '%s'
+                        });
+                 """ % (feature.device_id, feature.device_feature_id, feature.device.device_usage_id,
+                        feature.device.name, feature.device_feature.name,
+                        feature.device_id, feature.device_feature.stat_key)
+        return script
+
+    @staticmethod
+    def get_setValue(feature, value):
+        script = """$("#widget_%s_%s").widget_mini_info_boolean('setValue', %s);
+                 """ % (feature.device_id, feature.device_feature_id, value)
+
+        return script
+    
 class GetInfoNumber():
     @staticmethod
     def get_widget_mini(feature, device_type, device_usage, parameters_type, parameters_usage):
@@ -246,6 +268,8 @@ class GetInfoWidget(Node):
         parameters_usage = None;
         if device_usage.default_options != 'None':
             parameters_usage = simplejson.loads(unescape(device_usage.default_options))
+        if feature.device_feature.value_type == "boolean":
+            script = GetInfoBoolean.get_widget_mini(feature, device_type, device_usage, parameters_type, parameters_usage)
         if feature.device_feature.value_type == "number":
             script = GetInfoNumber.get_widget_mini(feature, device_type, device_usage, parameters_type, parameters_usage)
         if feature.device_feature.value_type == "string":
@@ -261,6 +285,8 @@ class GetInfoInit(Node):
         stat = Stats.get_latest(feature.device_id, feature.device_feature.stat_key)
         script = ""
         if len(stat.stats) > 0 :
+            if feature.device_feature.value_type == "boolean":
+                script = GetInfoBoolean.get_setValue(feature, "'" + stat.stats[0].value + "'")
             if feature.device_feature.value_type == "number":
                 script = GetInfoNumber.get_setValue(feature, "'" + stat.stats[0].value + "'")
             if feature.device_feature.value_type == "string":
@@ -276,6 +302,8 @@ class GetInfoUpdate(Node):
         feature = self.feature.resolve(context)
         value = self.value.resolve(context)
         script = ""
+        if feature.device_feature.value_type == "boolean":
+            script = GetInfoBoolean.get_setValue(feature, value)
         if feature.device_feature.value_type == "number":
             script = GetInfoNumber.get_setValue(feature, value)
         if feature.device_feature.value_type == "string":

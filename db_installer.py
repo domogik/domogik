@@ -122,14 +122,28 @@ db.add_sensor_feature(sf_name='Group schedule', sf_device_type_id=device_type.id
 db.add_sensor_feature(sf_name='On Peak', sf_device_type_id=device_type.id, sf_value_type='number', sf_parameters='{&quot;unit&quot;:&quot;Wh&quot;}', sf_stat_key='hchp')
 
 # Create device technology features for RFID
-db.add_device_technology(dt_id='rfid', dt_name='RFID', dt_description='')
+device_technology = db.add_device_technology(dt_id='rfid', dt_name='RFID', dt_description='')
+device_type = db.add_device_type(dty_name='Mirror_Base', dt_id=device_technology.id)
+db.add_sensor_feature(sf_name='Activated',
+                   sf_device_type_id=device_type.id, sf_value_type='boolean',
+                   sf_parameters='{}',
+                   sf_stat_key='activated')
+device_type = db.add_device_type(dty_name='Mirror_Tag', dt_id=device_technology.id)
+db.add_sensor_feature(sf_name='Present',
+                   sf_device_type_id=device_type.id, sf_value_type='boolean',
+                   sf_parameters='{}',
+                   sf_stat_key='present')
 # Create device technology features for Computer
 device_technology = db.add_device_technology(dt_id='computer', dt_name='Computer',
                                              dt_description='Computers monitoring and controling ')
-device_type = db.add_device_type(dty_name='WOL', dt_id=device_technology.id)
-db.add_actuator_feature(af_name='Activation', af_device_type_id=device_type.id,
+device_type = db.add_device_type(dty_name='Control', dt_id=device_technology.id)
+db.add_actuator_feature(af_name='WOL', af_device_type_id=device_type.id,
                         af_parameters='{&quot;command&quot;:&quot;wol&quot;}',af_value_type='trigger',
                         af_return_confirmation=False)
+db.add_sensor_feature(sf_name='Ping',
+                   sf_device_type_id=device_type.id, sf_value_type='boolean',
+                   sf_parameters='{}',
+                   sf_stat_key='ping')
 # Create device technologie features for MultiMedia
 db.add_device_technology(dt_id='multimedia', dt_name='MultiMedia', dt_description='Music, Video')
 # Create device technologie features for Communication
