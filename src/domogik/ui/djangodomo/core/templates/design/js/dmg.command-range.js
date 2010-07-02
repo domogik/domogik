@@ -64,14 +64,14 @@
                 this._processing_percent_current = 0;
                 this._setProcessingValue(this._processingValue);
             }
-		},
+	},
 		
-		close: function() {
+	close: function() {
             if (this.isOpen) {
                 this._close();
                 this.setValue(this.currentValue);
             }
-		},
+	},
         
         setValue: function(value) {
             var self = this, o = this.options;

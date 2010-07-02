@@ -88,11 +88,11 @@ const state_reset_status = 4000; // 4 seconds
         
         open: function() {
             this._open();
-		},
+	},
 		
-		close: function() {
+	close: function() {
             this._close();
-		},
+	},
         
         runAction: function(data) {
             var self = this, o = this.options;
@@ -115,7 +115,7 @@ const state_reset_status = 4000; // 4 seconds
                 this._displayStatusOk();
                 this.element.doTimeout( 'resetStatus', state_reset_status, function(){
                     self._displayResetStatus();
-    			});
+    		});
             }
         },
         

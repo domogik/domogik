@@ -1,0 +1,128 @@
+{% extends "layout_show.html" %}
+{% comment %}
+# Copyright 2008 Domogik project
+
+# This file is part of Domogik.
+# Domogik is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Domogik is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
+
+# Author : Cédric Trévisan <cedric@domogik.org>
+{% endcomment %}
+
+{% load i18n %}
+{% load commands %}
+{% load text %}
+
+{% block js_script %}
+    $(function() {
+        
+        /* Drag & Drop */
+        $('#dragdropwidgets').dragdrop({
+            zones: [
+                {
+                    id: "#maininfo",
+                    format: "mini",
+                    size: "1",
+                    name: "Main info",
+                    dropcallback: function(self, element, target) {}
+                },
+                {
+                    id: "#mainaction1",
+                    format: "mini",
+                    size: "1",
+                    name: "Main action 1",
+                    dropcallback: function(self, element, target) {}
+                },
+                {
+                    id: "#mainaction2",
+                    format: "mini",
+                    size: "1",
+                    name: "Main action 2",
+                    dropcallback: function(self, element, target) {}
+                },
+                {
+                    id: "#mainaction3",
+                    format: "mini",
+                    size: "1",
+                    name: "Main action 3",
+                    dropcallback: function(self, element, target) {}
+                },
+                {
+                    id: "#mainaction4",
+                    format: "mini",
+                    size: "1",
+                    name: "Main action 4",
+                    dropcallback: function(self, element, target) {}
+                }
+            ],
+            elements: [
+                {
+                    id: ".widget_mini"
+                
+                }
+            ]
+        });
+    });
+{% endblock %}
+
+{% block css %}
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/page-show-edit.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block js_include %}
+{% endblock %}
+
+{% block title %}{% trans page_title %}{% endblock %}
+
+{% block breadcrumb %}
+        <li id='customize'><a href='{% url show_house_view %}' class='icon16-action-customize'>Finish</a></li>
+{% endblock %}
+
+{% block banner %}
+<div id="dragdropwidgets"></div>
+<h1 class="ident icon64-house-default"><span class="title">{{ house.name }}</span></h1>
+<div id="maininfo" class="maininfo"></div>
+{% endblock %}
+
+{% block contentleft %}
+    <ul id='featureslist'>
+        {% regroup devices_list|dictsort:"device_usage_id" by device_usage as usages_list %}
+        {% for usage in usages_list %}
+            <li>{{usage.grouper.name }}
+                <ul>
+                    {% for device in usage.list %}
+                    <li>{{ device.name }}</li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
+    <div class='mainactions'>
+        <ul>
+            <li id="mainaction1"></li>
+            <li id="mainaction2"></li>
+            <li id="mainaction3"></li>
+            <li id="mainaction4"></li>
+        </ul>
+    </div>
+    <div class='actions'>
+        <ul>
+            {% for association in house_features_associations %}
+                <li><div id="widget_{{ association.device_id }}_{{ association.device_feature_id }}"></div></li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
+
+{% block contentright %}
+{% endblock %}

@@ -459,6 +459,28 @@ def show_house(request):
         house_features_associations=result_house_features_associations.feature_association
     )
 
+def show_house_edit(request):
+    """
+    Method called when the show index page is accessed
+    @param request : HTTP request
+    @return an HttpResponse object
+    """
+    page_title = _("Edit House")
+    try:
+        result_house = UIConfigs.get_general('house')
+        result_all_devices = Devices.get_all()
+        result_all_devices.merge_uiconfig()
+
+    except ResourceNotAvailableException:
+        return render_to_response('error/ResourceNotAvailableException.html')
+    return __go_to_page(
+        request, 'show/house.edit.html',
+        page_title,
+        nav1_show = "selected",
+        house=result_house,
+        devices_list=result_all_devices.device
+    )
+    
 def show_area(request, area_id):
     """
     Method called when the show area page is accessed

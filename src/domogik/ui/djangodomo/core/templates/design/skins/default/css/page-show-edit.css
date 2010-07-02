@@ -1,0 +1,20 @@
+@charset "UTF-8";
+/* CSS Document */
+
+ul#featureslist {
+    position:absolute;
+    right:0;
+    top:90px;
+    height:80%;
+    width:30em;
+    background-color:#000000;
+    background:rgba(0,0,0,0.8);
+    -moz-border-radius: 0.8em 0 0 0.8em;
+    -webkit-border-radius: 0.8em 0 0 0.8em;
+    padding:1em;
+    color:#ffffff;
+}
+
+ul#featureslist ul {
+    margin-left:1em;
+}

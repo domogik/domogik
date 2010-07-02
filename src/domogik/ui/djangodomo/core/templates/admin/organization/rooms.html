@@ -26,7 +26,8 @@
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/page-admin-organization.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block js_include %}
-    <script type="text/javascript" src="/design/js/dmg.dragdrop-complex.js"></script>
+    <script type="text/javascript" src="/design/js/dmg.dragdrop-common.js"></script>
+    <script type="text/javascript" src="/design/js/dmg.dragdrop-basic.js"></script>
 {% endblock %}
 {% block js_script %}
     $(function(){
@@ -45,33 +46,28 @@
         });
         
         /* Drag & Drop */
-        $('#dragdroprooms').dragdrop({
-            target: ".targetdrop",
-            choice: "legend",
-            featurename : ".description"
+        $('#dragdroprooms').dragdrop_basic({
+            zones : [{
+                zonesselector: ".targetdrop",
+                listselector: ".draggables",
+                itemselector: ".draggable",
+                labelselector: "legend",
+                dropcallback: function(self, element, target) {
+                    $.getREST(['base', 'room', 'update', 'id', element, 'area_id', target],
+                        function(data) {
+                            var status = (data.status).toLowerCase();
+                            if (status == 'ok') {
+                                self.valid();
+                            } else {
+                                self.cancel();
+                                $.notification('error', data.description);                                          
+                            }
+                        }
+                    )
+                }
+            }]
         });
 
-        $('#dragdroprooms').dragdrop('addzones', {
-            id: "#dragdroprooms",
-            drag: true,
-            drop: true,
-            droporigin : false,
-            keeptrace: false,
-            dropcallback: function(self, element, target) {
-                $.getREST(['base', 'room', 'update', 'id', element, 'area_id', target],
-                    function(data) {
-                        var status = (data.status).toLowerCase();
-                        if (status == 'ok') {
-                            self.valid();
-                        } else {
-                            self.cancel();
-                            $.notification('error', data.description);                                          
-                        }
-                    }
-                )
-            }            
-        });
-        
         /* Dialogs */
         $('#delete_confirmation').dialog_confirmation({
             title: "{% trans 'Delete' %}",
@@ -216,20 +212,20 @@
     
     <section class="subsection" id="dragdroprooms">
         <h2 class='help' id='help_dragdrop'>{% trans "Rooms organisation" %} <span class='offscreen'>{% trans "Drag &amp; Drop instructions" %}</span></h2>
-        <fieldset class="targetdrop" value="None">
+        <fieldset class="targetdrop" ddvalue="None" ddname="{% trans 'Unattributed rooms' %}">
             <legend>{% trans "Unattributed rooms" %}</legend>
             <ul class="draggables">
                 {% for room in unattribued_rooms %}
-                <li class="draggable icon32-room-{{ room.config.icon }}" value="{{ room.id }}">{{ room.name }}<span class="description">{{ room.description }}</span></li>
+                <li class="draggable icon32-room-{{ room.config.icon }}" ddvalue="{{ room.id }}" ddname='{{ room.description }}'>{{ room.name }}<span class="description">{{ room.description }}</span></li>
                 {% endfor %}
             </ul>
         </fieldset>
         {% for area in areas_list %}
-        <fieldset class="targetdrop" value='{{ area.id }}'>
+        <fieldset class="targetdrop" ddvalue='{{ area.id }}' ddname='{{ area.name }}'>
             <legend class="icon16-area-{{ area.config.icon }}">{{ area.name }}</legend>
             <ul class="draggables">
                 {% for room in area.room %}
-                <li class="draggable icon32-room-{{ room.config.icon }}" value="{{ room.id }}">{{ room.name }}<span class="description">{{ room.description }}</span></li>
+                <li class="draggable icon32-room-{{ room.config.icon }}" ddvalue="{{ room.id }}" ddname='{{ room.description }}'>{{ room.name }}<span class="description">{{ room.description }}</span></li>
                 {% endfor %}
             </ul>
         </fieldset>
