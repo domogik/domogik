@@ -65,7 +65,7 @@ from domogik.common.configloader import Loader
 
 DEVICE_TYPE_LIST = ['appliance', 'lamp', 'music', 'sensor']
 ACTUATOR_VALUE_TYPE_LIST = ['binary', 'complex', 'list', 'number', 'range', 'string', 'trigger']
-SENSOR_VALUE_TYPE_LIST = ['binary', 'complex', 'number', 'string', 'trigger']
+SENSOR_VALUE_TYPE_LIST = ['boolean', 'complex', 'number', 'string', 'trigger']
 
 Base = declarative_base()
 metadata = Base.metadata

@@ -131,7 +131,7 @@ db.add_actuator_feature(af_name='WOL', af_device_type_id=device_type.id,
                         af_parameters='{&quot;command&quot;:&quot;wol&quot;}',af_value_type='trigger',
                         af_return_confirmation=False)
 db.add_sensor_feature(sf_name='Ping',
-                   sf_device_type_id=device_type.id, sf_value_type='binary',
+                   sf_device_type_id=device_type.id, sf_value_type='boolean',
                    sf_parameters='{}',
                    sf_stat_key='ping')
 
