@@ -153,8 +153,149 @@
 .icon32-usage-5.range_90 { background-image:url(../images/device_usage/5.ventilation/actuator/range/90_32.png);}
 .icon32-usage-5.range_100 { background-image:url(../images/device_usage/5.ventilation/actuator/range/100_32.png);}
 
-.icon32-usage-14.unknown { background-image:url(../images/device_usage/14.electricity/unknown/32.png);}
-.icon32-usage-14.number { background-image:url(../images/device_usage/14.electricity/sensor/number/32.png);}
+.icon32-usage-6.unknown { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-6.trigger { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-6.binary_0 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-6.binary_1 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-6.range_0 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-6.range_10 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-6.range_20 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-6.range_30 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-6.range_40 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-6.range_50 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-6.range_60 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-6.range_70 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-6.range_80 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-6.range_90 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-6.range_100 { background-image:url(../images/device_usage/todo_32.png);}
+
+.icon32-usage-7.unknown { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-7.trigger { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-7.binary_0 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-7.binary_1 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-7.range_0 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-7.range_10 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-7.range_20 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-7.range_30 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-7.range_40 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-7.range_50 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-7.range_60 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-7.range_70 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-7.range_80 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-7.range_90 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-7.range_100 { background-image:url(../images/device_usage/todo_32.png);}
+
+.icon32-usage-8.unknown { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-8.trigger { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-8.binary_0 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-8.binary_1 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-8.range_0 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-8.range_10 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-8.range_20 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-8.range_30 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-8.range_40 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-8.range_50 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-8.range_60 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-8.range_70 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-8.range_80 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-8.range_90 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-8.range_100 { background-image:url(../images/device_usage/todo_32.png);}
+
+.icon32-usage-9.unknown { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-9.trigger { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-9.binary_0 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-9.binary_1 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-9.range_0 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-9.range_10 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-9.range_20 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-9.range_30 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-9.range_40 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-9.range_50 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-9.range_60 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-9.range_70 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-9.range_80 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-9.range_90 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-9.range_100 { background-image:url(../images/device_usage/todo_32.png);}
+
+.icon32-usage-10.unknown { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-10.trigger { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-10.binary_0 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-10.binary_1 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-10.range_0 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-10.range_10 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-10.range_20 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-10.range_30 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-10.range_40 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-10.range_50 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-10.range_60 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-10.range_70 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-10.range_80 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-10.range_90 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-10.range_100 { background-image:url(../images/device_usage/todo_32.png);}
+
+.icon32-usage-11.unknown { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-11.trigger { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-11.binary_0 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-11.binary_1 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-11.range_0 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-11.range_10 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-11.range_20 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-11.range_30 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-11.range_40 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-11.range_50 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-11.range_60 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-11.range_70 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-11.range_80 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-11.range_90 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-11.range_100 { background-image:url(../images/device_usage/todo_32.png);}
+
+.icon32-usage-12.unknown { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-12.trigger { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-12.binary_0 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-12.binary_1 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-12.range_0 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-12.range_10 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-12.range_20 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-12.range_30 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-12.range_40 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-12.range_50 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-12.range_60 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-12.range_70 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-12.range_80 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-12.range_90 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-12.range_100 { background-image:url(../images/device_usage/todo_32.png);}
+
+.icon32-usage-13.unknown { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-13.trigger { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-13.binary_0 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-13.binary_1 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-13.range_0 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-13.range_10 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-13.range_20 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-13.range_30 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-13.range_40 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-13.range_50 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-13.range_60 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-13.range_70 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-13.range_80 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-13.range_90 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-13.range_100 { background-image:url(../images/device_usage/todo_32.png);}
+
+.icon32-usage-14.unknown { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-14.trigger { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-14.binary_0 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-14.binary_1 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-14.range_0 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-14.range_10 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-14.range_20 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-14.range_30 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-14.range_40 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-14.range_50 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-14.range_60 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-14.range_70 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-14.range_80 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-14.range_90 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-14.range_100 { background-image:url(../images/device_usage/todo_32.png);}
 
 /* Menu */
 .icon32-menu-helpers { background-image:url(../images/menu/terminal_32.png);}
@@ -189,6 +330,12 @@
 .icon64-technology-computer {background-image:url(../../../images/technologies/computer_64.png);}
 .icon32-technology-computer {background-image:url(../../../images/technologies/computer_32.png);}
 .icon16-technology-computer {background-image:url(../../../images/technologies/computer_16.png);}
+.icon64-technology-onewire {background-image:url(../../../images/technologies/onewire_64.png);}
+.icon32-technology-onewire {background-image:url(../../../images/technologies/onewire_32.png);}
+.icon16-technology-onewire {background-image:url(../../../images/technologies/onewire_16.png);}
+.icon64-technology-rfid {background-image:url(../../../images/technologies/rfid_64.png);}
+.icon32-technology-rfid {background-image:url(../../../images/technologies/rfid_32.png);}
+.icon16-technology-rfid {background-image:url(../../../images/technologies/rfid_16.png);}
 
 /* Status icons */
 .icon64-status-true {background-image:url(../images/status/check_64.png);}

@@ -69,7 +69,7 @@
                     options: [
                         {% regroup types_list|dictsort:"device_technology_id" by device_technology as technologies_list %}
                         {% for technology in technologies_list %}
-                            { label: '{{ technology.grouper.name }}', icon:'icon16-technology-{{ technology.grouper.name|lower }}',
+                            { label: '{{ technology.grouper.name }}', icon:'icon16-technology-{{ technology.grouper.id }}',
                                 submenu: [
                                 {% for type in technology.list %}
                                     {value:'{{ type.id }}', label:'{{ type.name }}'},
