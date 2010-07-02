@@ -1,20 +1,66 @@
 @charset "UTF-8";
 /* CSS Document */
 
-ul#featureslist {
+#panel {
     position:absolute;
     right:0;
     top:90px;
     height:80%;
-    width:30em;
-    background-color:#000000;
-    background:rgba(0,0,0,0.8);
+    background-color:#ffffff;
+    background:rgba(255,255,255,0.8);
     -moz-border-radius: 0.8em 0 0 0.8em;
     -webkit-border-radius: 0.8em 0 0 0.8em;
-    padding:1em;
-    color:#ffffff;
+    padding:1em 0 1em 0;
+    color:#000000;
 }
 
-ul#featureslist ul {
-    margin-left:1em;
+ul#featureslist {
+    width:30em;
+    float:right;
+}
+
+ul#featureslist .usage { /* Usage level */
+    border-top: #cccccc solid 1px;
+    border-bottom: #cccccc solid 1px;
+    padding: 0.4em 0 0.4em 0;
+    background-color:#ffffff;
+    background-position: 3px 50%;
+    background-repeat:no-repeat;
+    text-align:center;
+    font-weight:bold;
+}
+
+ul#featureslist .device { /* Device level */
+    margin-left:10px;
+    padding: 0.4em 0 0.4em 25px;
+    background-position: 0% 50%;
+    background-repeat:no-repeat;
+}
+
+ul#featureslist .feature { /* Feature level */
+    margin-left:35px;
+    padding: 0.4em 0 0.4em 25px;
+    background-position: 0% 50%;
+    background-repeat:no-repeat;
+    cursor: pointer;
+}
+
+ul#widgetslist {
+    width:30em;
+    float:right;
+    border-right: 1px dashed #cccccc;
+    margin-right:1em;
+}
+
+.mainactions li {
+    width: 45px;
+    height: 45px;
+    border: 1px dashed #000000;
+    -moz-border-radius: 0.8em;
+    -webkit-border-radius: 0.8em;
+    margin:0.5em 1em 0 1em;
+}
+
+.mainactions li, .actions li {
+    display:inline-block;
 }

@@ -470,7 +470,7 @@ def show_house_edit(request):
         result_house = UIConfigs.get_general('house')
         result_all_devices = Devices.get_all()
         result_all_devices.merge_uiconfig()
-
+        result_all_devices.merge_features()
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
     return __go_to_page(
