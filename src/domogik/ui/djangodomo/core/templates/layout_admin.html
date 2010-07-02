@@ -22,6 +22,7 @@
 {% load i18n %}
 
 {% block global_css %}
+    <link rel="icon shortcut" type="image/png" href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/images/house/default_16.png" />
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-buttons.css" rel="stylesheet" type="text/css" />
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-forms.css" rel="stylesheet" type="text/css" />
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.editable-icon.css" rel="stylesheet" type="text/css" />

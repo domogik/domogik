@@ -331,6 +331,7 @@
 .icon16-action-next { background-image:url(../images/action/right_16.png);}
 .icon16-action-previous { background-image:url(../images/action/left_16.png);}
 .icon16-action-submit { background-image:url(../images/status/check_16.png);}
+.icon32-action-submit { background-image:url(../images/status/check_32.png);}
 .icon16-action-cancel { background-image:url(../images/status/wrong_16.png);}
 .icon32-action-cancel { background-image:url(../images/status/wrong_32.png);}
 .icon16-action-password { background-image:url(../images/action/key_16.png);}
@@ -343,6 +344,9 @@
 .icon16-action-min { background-image:url(../images/action/min_16.png);}
 .icon16-action-graph { background-image:url(../images/action/graph_16.png);}
 .icon16-action-menu { background-image:url(../images/action/menu_16.png);}
+.icon16-action-customize { background-image:url(../images/action/customize_16.png);}
+.icon32-action-customize { background-image:url(../images/action/customize_32.png);}
+.icon64-action-customize { background-image:url(../images/action/customize_64.png);}
 
 /* technology icons */
 .icon64-technology-x10 {background-image:url(../../../images/technologies/x10_64.png);}
