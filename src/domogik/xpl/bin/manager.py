@@ -438,7 +438,11 @@ class SysManager(XplPlugin):
                         k_key = key.getElementsByTagName("name")[0].firstChild.nodeValue
                         k_description = key.getElementsByTagName("description")[0].firstChild.nodeValue
                         k_type = key.getElementsByTagName("type")[0].firstChild.nodeValue
-                        k_default = key.getElementsByTagName("default-value")[0].firstChild.nodeValue
+                        try:
+                            k_default = key.getElementsByTagName("default-value")[0].firstChild.nodeValue
+                        except AttributeError:
+                            # no value in default
+                            k_default = ""
                         plgconf.append({"id" : k_id,
                                         "key" : k_key,
                                         "description" : k_description,
