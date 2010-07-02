@@ -144,7 +144,7 @@ function call_db_installer {
 }
 
 function check_python {
-    if [ ! -x "/usr/bin/python" ];then
+if [ ! -x "$(which python)" ];then
         echo "No python binary found, please install at least python2.6";
         exit 11
     else
