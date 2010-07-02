@@ -897,12 +897,12 @@ class ProcessRequest():
 
     def _rest_command_get_message(self, techno, address, command, params):
         ref = "%s-%s.xml" % (techno,command)
-        if hasattr(self.xml, ref) == False:
+        try:
+            xml_data = self.xml[ref]
+        except KeyError:
             self.send_http_response_error(999, "No xml file for '%s'" % ref, \
                                           self.jsonp, self.jsonp_cb)
-            return 
-        else: 
-            xml_data = self.xml[ref]
+            return
 
         ### Check xml validity
         if xml_data.getElementsByTagName("technology")[0].attributes.get("id").value != techno:
