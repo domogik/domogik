@@ -193,13 +193,11 @@ def usage(prog_name):
     print "-I, --noinsert\t\t\tUse existing data in the database"
 
 if __name__ == "__main__":
+    stats_filter = False
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hs:I", ["help", "stats=", "noinsert"])
         _db = DbHelper(use_test_db=True)
         print "Using %s database" % _db.get_db_type()
-        for opt, arg_list in opts:
-            if opt in ("-I", "--noinsert"):
-                _insert_data = False
 
         for opt, arg_list in opts:
             if opt in ("-s", "--stats"):
@@ -213,10 +211,12 @@ if __name__ == "__main__":
                             usage(sys.argv[0])
                     if 'all' in filter_list:
                         filter_list = possible_args[1:]
-                run_stats_filter(filter_list)
+                    stats_filter = True
             elif opt in ("-h", "--help"):
                 usage(sys.argv[0])
                 sys.exit()
+            elif opt in ("-I", "--noinsert"):
+                _insert_data = False
             else:
                 print "Unhandled option : %s" % opt
                 usage(sys.argv[0])
@@ -224,6 +224,8 @@ if __name__ == "__main__":
         if len(opts) == 0:
             usage(sys.argv[0])
             sys.exit(2)
+        if stats_filter:
+            run_stats_filter(filter_list)
     except getopt.GetoptError, err:
         print "Wrong arguments supplied : %s" % str(err)
         usage(sys.argv[0])
