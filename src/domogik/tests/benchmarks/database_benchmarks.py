@@ -147,9 +147,10 @@ def add_data(start_p, end_p, insert_step, key):
         ins = ds_table.insert().values(date=datetime.datetime.utcfromtimestamp(cur_date), key=u'val',
                                        value=i/insert_step, value_num=i/insert_step, device_id=_device1.id)
         conn.execute(ins)
+        """
         if (count % 50000 == 0):
             print "\t%s values inserted, date = %s" % (count, datetime.datetime.utcfromtimestamp(cur_date)),
-
+        """
     print "\t%s values inserted" % count
     print "\tExecution time = %s" % (time.time() - start_t)
 
