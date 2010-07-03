@@ -53,6 +53,12 @@ def run_stats_filter(period_filter_list):
         init_required_data_for_stats()
         add_data(start_p=make_ts(2010, 1, 1, 15, 48, 0), end_p=make_ts(2015, 6, 21, 15, 48, 0), insert_step=30,
                  key='keysample')
+    else:
+        # Just get device id that was used to record stats
+        global _device1
+        # All records have the same device id
+        ds = _db._DbHelper__session.query(DeviceStats).first()
+        _device1 = _db.get_device(ds.device_id)
 
     # Minutes
     start_p = make_ts(2010, 1, 1, 15, 48, 0)
