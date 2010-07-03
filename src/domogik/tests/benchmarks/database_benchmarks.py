@@ -137,24 +137,19 @@ def add_data(start_p, end_p, insert_step, key):
     print "Inserting sample stats data, period = %s / %s, step = %s secs (%s values)" \
            % (datetime.datetime.utcfromtimestamp(start_p), datetime.datetime.utcfromtimestamp(end_p), insert_step,
               (end_p - start_p) / insert_step)
+    conn = _db._DbHelper__engine.connect()
+    ds_table = DeviceStats.__table__
     count = 0
     start_t = time.time()
     for i in range(0, int(end_p - start_p), insert_step):
         count += 1
         cur_date = start_p + i
-        _db._DbHelper__session.add(
-            DeviceStats(date=datetime.datetime.utcfromtimestamp(cur_date),
-                        key=u'valmy', value=i/insert_step, device_id=_device1.id)
-        )
-        # To avoid memory overflow
+        ins = ds_table.insert().values(date=datetime.datetime.utcfromtimestamp(cur_date), key=u'val',
+                                       value=i/insert_step, value_num=i/insert_step, device_id=_device1.id)
+        conn.execute(ins)
         if (count % 50000 == 0):
-            print "\tcommiting... (%s values inserted, date = %s)" % (count,
-                                                                      datetime.datetime.utcfromtimestamp(cur_date)),
-            _db._DbHelper__session.commit()
-            print "done!"
+            print "\t%s values inserted, date = %s" % (count, datetime.datetime.utcfromtimestamp(cur_date)),
 
-    print "\tcommiting remaining data..."
-    _db._DbHelper__session.commit()
     print "\t%s values inserted" % count
     print "\tExecution time = %s" % (time.time() - start_t)
 
@@ -175,12 +170,16 @@ def remove_all_stats():
     print "Removing existing data"
     for dt in _db.list_device_technologies():
         _db.del_device_technology(dt.id, cascade_delete=True)
-    _db._DbHelper__session.query(DeviceStats).from_statement("DELETE FROM core_device_stats")
-    """
-    for ds in _db._DbHelper__session.query(DeviceStats).all():
-        _db._DbHelper__session.delete(ds)
-    """
     _db._DbHelper__session.commit()
+
+    engine = _db._DbHelper__engine
+    ds_table = DeviceStats.__table__
+    print "\tdropping DeviceStats table"
+    ds_table.drop(bind=engine)
+    print "\tcreating DeviceStats table"
+    ds_table.create(bind=engine)
+
+    #_db._DbHelper__session.query(DeviceStats).from_statement("DELETE FROM core_device_stats")
 
 def check_args(argv):
     """Check arguments passed to the program"""
