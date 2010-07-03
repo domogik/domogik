@@ -168,10 +168,6 @@ def init_required_data_for_stats():
 def remove_all_stats():
     """Remove all existing data"""
     print "Removing existing data"
-    for dt in _db.list_device_technologies():
-        _db.del_device_technology(dt.id, cascade_delete=True)
-    _db._DbHelper__session.commit()
-
     engine = _db._DbHelper__engine
     ds_table = DeviceStats.__table__
     print "\tdropping DeviceStats table"
@@ -179,7 +175,9 @@ def remove_all_stats():
     print "\tcreating DeviceStats table"
     ds_table.create(bind=engine)
 
-    #_db._DbHelper__session.query(DeviceStats).from_statement("DELETE FROM core_device_stats")
+    for dt in _db.list_device_technologies():
+        _db.del_device_technology(dt.id, cascade_delete=True)
+    _db._DbHelper__session.commit()
 
 def check_args(argv):
     """Check arguments passed to the program"""
