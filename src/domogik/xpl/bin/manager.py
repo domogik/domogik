@@ -232,7 +232,7 @@ class SysManager(XplPlugin):
         mess.add_data({'host' : host})
         mess.add_data({'command' :  'start'})
         mess.add_data({'plugin' :  plg})
-        if not force and self._is_component_running(plg):
+        if not force and self._check_component_is_running(plg):
             error = "Component %s is already running on %s" % (plg, host)
             self._log.info(error)
             mess.add_data({'error' : error})
