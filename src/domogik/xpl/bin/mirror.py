@@ -59,9 +59,6 @@ class MirrorManager(XplPlugin):
         self._config.query('mirror', 'device', res)
         device = res.get_value()['device']
 
-        # TODO : delete
-        device = "/dev/hidraw1"
-        
         # Init Mir:ror
         mirror  = Mirror(self._log, self.send_xpl)
         
