@@ -170,6 +170,8 @@ class DBConnector(XplPlugin):
             if key:
                 try:
                     val = self._db.get_plugin_config(techno, hostname, key).value
+                    if val == '':
+                        val = "None"
                     return val
                 except AttributeError:
                     return "None"
@@ -185,7 +187,7 @@ class DBConnector(XplPlugin):
         except:
             traceback.print_exc()
             self._log.warn("No config found for technolgy %s on %s, key %s" % (techno, hostname, key))
-            return None
+            return "None"
 
 if __name__ == "__main__":
     DBC = DBConnector()
