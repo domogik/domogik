@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<statistic technology="computer">
+    <schema name="sensor.basic">
+        <xpltype type="xpl-trig">
+            <listener>
+                <filter>
+                    <key name="type" value="ping"/>
+                </filter>
+            </listener>
+            <mapping>
+                <device field="device"/>
+                <value field="type"/>
+                <value field="current" />
+            </mapping>
+        </xpltype>
+    </schema>
+    <schema name="sensor.basic">
+        <xpltype type="xpl-stat">
+            <listener>
+                <filter>
+                    <key name="type" value="ping"/>
+                </filter>
+            </listener>
+            <mapping>
+                <device field="device"/>
+                <value field="type"/>
+                <value field="current" />
+            </mapping>
+        </xpltype>
+    </schema>
+</statistic>
