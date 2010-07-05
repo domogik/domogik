@@ -4,8 +4,8 @@
         <xpltype type="xpl-trig">
             <listener>
                 <filter>
-                    <key name="type" value="mirror"/>
-                    <key name="type" value="ztamp"/>
+                    <key name="type" value="present"/>
+                    <key name="type" value="activated"/>
                 </filter>
             </listener>
             <mapping>
