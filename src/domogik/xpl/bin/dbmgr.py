@@ -177,7 +177,10 @@ class DBConnector(XplPlugin):
                 vals = self._db.list_plugin_config(techno, hostname)
                 res = {}
                 for val in vals:
-                    res[val.key] = val.value
+                    if val == '':
+                        res[val.key] = "None"
+                    else:
+                        res[val.key] = val.value
                 return res
         except:
             traceback.print_exc()
