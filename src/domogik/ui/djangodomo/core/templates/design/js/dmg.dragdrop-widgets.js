@@ -1,5 +1,5 @@
 (function($) {
-    $.ui.dragdrop_core.subclass("ui.dragdrop_basic", {
+    $.ui.dragdrop_core.subclass("ui.dragdrop_widgets", {
         // default options
         options: {
         },
@@ -9,27 +9,8 @@
 
         _init:function() {
             var self = this, o = this.options;
-            $.each(this.zones, function(index, zone) {
-                zone.list = zone.element.children(zone.listselector + ":first");    
-                if ($("li" + zone.itemselector, zone.list).length == 0) {
-                    zone.list.append("<li class='empty'><p>Empty</p></li>");
-                }
-            });
         },
         
-        updatezone: function(selector) {
-            var self = this, o = this.options;
-            this._super();
-            $.each(this.zones, function(index, zone) {
-                if (zone.zonesselector == selector) {
-                    zone.list = zone.element.children(zone.listselector + ":first");    
-                    if ($("li" + zone.itemselector, zone.list).length == 0) {
-                        zone.list.append("<li class='empty'><p>Empty</p></li>");
-                    }
-                }
-            });
-        },
-
         cancel: function() {
             var zone_from_id = $(this.current_item).attr('ddfromid');
             var current_zone_id = $(this.current_zone).attr('id');
@@ -85,7 +66,10 @@
         
         _moveObject : function(objNode, target_id, runcallback) {
             var self = this, o = this.options;
-            if (target_id.length > 0) { // If we are above a target
+            // Get from zone
+            var from_id = $(objNode).attr('ddfromid');
+            
+            if (target_id.length > 0 && from_id != target_id) { // If we are above a target
                 // Get item
                 var item_value = $(objNode).attr('ddvalue');
                 var item = $(objNode).detach();
@@ -95,19 +79,9 @@
                 this.current_zone = zone_target;
                 zone_target.list.append(item);
                 var target_value = zone_target.element.attr('ddvalue');
-                
-                // Get from zone
-                var from_id = $(objNode).attr('ddfromid');
-                var zone_from = this._getZone(from_id);
-                
+
                 this._initialise(objNode);
-                
-                // Remove empty node if there are element in list
-                $('li.empty', zone_target.element).remove();
-    
-                if ($('li', zone_from.list).length == 0) {
-                    zone_from.list.html("<li class='empty'><p>Empty</p></li>");
-                }
+
                 if (runcallback) {
                     if (zone_target.dropcallback) {
                         zone_target.dropcallback(this, item_value, target_value);

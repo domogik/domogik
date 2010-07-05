@@ -14,12 +14,12 @@
     color:#000000;
 }
 
-ul#featureslist {
+#features {
     width:30em;
     float:right;
 }
 
-ul#featureslist .usage { /* Usage level */
+#featureslist .usage { /* Usage level */
     border-top: #cccccc solid 1px;
     border-bottom: #cccccc solid 1px;
     padding: 0.4em 0 0.4em 0;
@@ -30,14 +30,14 @@ ul#featureslist .usage { /* Usage level */
     font-weight:bold;
 }
 
-ul#featureslist .device { /* Device level */
+#featureslist .device { /* Device level */
     margin-left:10px;
     padding: 0.4em 0 0.4em 25px;
     background-position: 0% 50%;
     background-repeat:no-repeat;
 }
 
-ul#featureslist .feature { /* Feature level */
+#featureslist .feature { /* Feature level */
     margin-left:35px;
     padding: 0.4em 0 0.4em 25px;
     background-position: 0% 50%;
@@ -45,14 +45,14 @@ ul#featureslist .feature { /* Feature level */
     cursor: pointer;
 }
 
-ul#widgetslist {
+#widgets {
     width:30em;
     float:right;
     border-right: 1px dashed #cccccc;
     margin-right:1em;
 }
 
-.mainactions li {
+.mainactions li.empty {
     width: 45px;
     height: 45px;
     border: 1px dashed #000000;

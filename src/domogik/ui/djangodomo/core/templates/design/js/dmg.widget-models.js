@@ -7,7 +7,9 @@
 
         _init: function() {
             var self = this, o = this.options;
-	    var li = $("<li></li>");
+	    var li = $("<li class='widgetitem'></li>");
+	    li.attr('ddvalue', '11');
+	    li.attr('ddname', 'Creator - Name - 1x1');
 	    var widget = $("<div class='widget'>1x1</div>");
             var identity = $("<canvas class='identity' width='60' height='60'></canvas>")
 	    widget.append(identity);

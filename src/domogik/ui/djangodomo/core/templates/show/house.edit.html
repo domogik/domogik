@@ -28,21 +28,54 @@
         $(".feature").click(function(){
             var value = $(this).attr('value');
             $("#widgetslist").empty();
-            $("#widgetslist").show();
+            $("#widgets").attr('ddvalue', value);
+            $("#widgets").show();
             $("#widgetslist").widget_models();
+            $('#mainsection').dragdrop_widgets('updatezone', '#widgets');
         });
         
-        $("#widgetslist").hide();
+        $("#widgets").hide();
         
         /* Drag & Drop */
+        $('#mainsection').dragdrop_widgets({
+            zones : [{
+                zonesselector: "#widgets",
+                listselector: "#widgetslist",
+                itemselector: ".widgetitem",
+                labelselector: "h2",
+                dropcallback: function(self, element, target) {
+                    self.valid();
+                }
+            }, {
+                zonesselector: ".mainactions",
+                listselector: "ul",
+                itemselector: "li",
+                labelselector: "span.offscreen",
+                dropcallback: function(self, element, target) {
+                    self.valid();
+                }
+            }, {
+                zonesselector: ".maininfo",
+                listselector: "ul",
+                itemselector: "li",
+                labelselector: "span.offscreen",
+                dropcallback: function(self, element, target) {
+                    self.valid();
+                }
+            }]
+        });
     });
 {% endblock %}
 
 {% block css %}
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.dragdrop-common.css" rel="stylesheet" type="text/css" />
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.dragdrop-widgets.css" rel="stylesheet" type="text/css" />
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/page-show-edit.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 
 {% block js_include %}
+    <script type="text/javascript" src="/design/js/dmg.dragdrop-common.js"></script>
+    <script type="text/javascript" src="/design/js/dmg.dragdrop-widgets.js"></script>
 {% endblock %}
 
 {% block title %}{% trans page_title %}{% endblock %}
@@ -52,13 +85,18 @@
 {% endblock %}
 
 {% block banner %}
-<h1 class="ident icon64-house-default"><span class="title">{{ house.name }}</span></h1>
-<div id="maininfo" class="maininfo"></div>
+    <h1 class="ident icon64-house-default"><span class="title">{{ house.name }}</span></h1>
+    <div class="maininfo" ddvalue='maininfo' ddname='Main info'>
+        <span class='offscreen'>{% trans "Main info" %}</span>
+        <ul></ul>
+    </div>
 {% endblock %}
 
 {% block contentleft %}
     <div id='panel'>
-        <ul id='featureslist'>
+        <div id='features'>
+            <h2>Features</h2>
+            <ul id='featureslist'>
             {% regroup devices_list|dictsort:"device_usage_id" by device_usage as usages_list %}
             {% for usage in usages_list %}
                 <li><div class='usage icon16-usage-{{ usage.grouper.id }}'>{{usage.grouper.name }}</div>
@@ -75,23 +113,27 @@
                     </ul>
                 </li>
             {% endfor %}
-        </ul>
-        <ul id='widgetslist'></ul>
-    </div>
-    <div class='mainactions'>
-        <ul>
-            <li id="mainaction1"></li>
-            <li id="mainaction2"></li>
-            <li id="mainaction3"></li>
-            <li id="mainaction4"></li>
-        </ul>
+            </ul>
+        </div>
+        <div id='widgets' ddname="Widgets">
+            <h2>Widgets</h2>
+            <ul id='widgetslist'>
+            </ul>
+        </div>
     </div>
     <div class='actions'>
-        <ul>
-            {% for association in house_features_associations %}
-                <li><div id="widget_{{ association.device_id }}_{{ association.device_feature_id }}"></div></li>
-            {% endfor %}
-        </ul>
+        <div class='mainactions' ddvalue='mainactions' ddname='Main actions'>
+            <span class='offscreen'>{% trans "Main actions" %}</span>
+            <ul>
+            </ul>
+        </div>
+        <div class='otheractions'>
+            <ul>
+                {% for association in house_features_associations %}
+                    <li><div id="widget_{{ association.device_id }}_{{ association.device_feature_id }}"></div></li>
+                {% endfor %}
+            </ul>
+        </div>
     </div>
 {% endblock %}
 
