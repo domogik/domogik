@@ -3715,16 +3715,20 @@ class StatsManager(XplPlugin):
             current_date = calendar.timegm(datetime.datetime.now().timetuple())
             #current_date = datetime.datetime.now()
             device_data = []
+            print "RM=%s" %  str(self._res["mapping"])
             for key in self._res["mapping"].keys():
+                print "KM=%s" % key
                 data = ""
                 if message.data.has_key(key):
                     #Check if a name has been chosen for this value entry
+                    value = message.data[key]
                     if self._res["mapping"][key] == None:
                         #If not, keep the one from message
-                        value = message.data[key]
+                        key = message.data[key]
                     else:
-                        value = message.data[key]
+                        key = self._res["mapping"][key]
                 device_data.append({"key" : key, "value" : value})
+                print "DD=%s" % device_data
                 # put data in database
                 self._db.add_device_stat(current_date, key, value, d_id)
 
