@@ -109,14 +109,15 @@ class WolPing(XplPlugin):
 
         try:
             mac = self.computers[device]["mac"]
-            port = self.computers[device]["mac_port"]
+            port = int(self.computers[device]["mac_port"])
         except KeyError:
             self._log.warning("Computer named '%s' is not defined" % device)
             return
         
         self._log.info("Wake on lan command received for '%s' on port '%s'" %
                        (mac, port))
-        status = self._wolmanager.wake_up(mac, port)
+        #status = self._wolmanager.wake_up(mac, port)
+        status = self._wolmanager.wake_up(mac, 7)
 
         # Send xpl-trig to say plugin receive command
         if status == True:

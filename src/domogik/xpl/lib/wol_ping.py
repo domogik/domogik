@@ -84,8 +84,11 @@ class WOL:
         # Send magic packet
         self._log.debug("Send magic packet to broadcast")
         try:
+            self._log.debug("!!!!!1")
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            self._log.debug("!!!!!2")
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+            self._log.debug("!!!!!!3")
             sock.sendto(magic_hexa, ('<broadcast>', port))
             self._log.info("Magic packet send")
             return True
