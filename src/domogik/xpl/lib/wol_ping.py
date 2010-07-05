@@ -41,6 +41,7 @@ import struct
 from threading import Thread
 import subprocess
 from Queue import Queue
+import time
 
 class WOL:
     """
@@ -99,32 +100,45 @@ class Ping:
     This class allow to ping a computer
     """
 
-    def __init__(self, log):
+    def __init__(self, log, cb, interval, computers):
         """
         Init object
         @param log : logger instance
         """
         self._log = log
+        self._cb = cb
+        self._interval = interval
+        self._computers = computers
 
-    def ping(self, computers):
+    def ping(self):
         """ 
         Ping computers
-        @param computers : dictionnary : computers[<name>]["ip"]
         """
-        num_threads = len(computers)
+        num_threads = len(self._computers)
         queue = Queue()
-        #ips = ["10.0.1.1", "10.0.1.3", "10.0.1.11", "10.0.1.51"]
-        #wraps system ping command
-        #Spawn thread pool
-        for idx in range(num_threads):
-            worker = Thread(target=self.pinger, args=(idx, queue))
-            worker.setDaemon(True)
-            worker.start()
-        #Place work in queue
-        for computer in computers:
-            queue.put(computers[computer]["ip"])
-        #Wait until worker threads are done to exit    
-        queue.join()
+
+        while True:
+            #wraps system ping command
+            #Spawn thread pool
+            for idx in range(num_threads):
+                worker = Thread(target=self.pinger, args=(idx, queue))
+                worker.setDaemon(True)
+                worker.start()
+            #Place work in queue
+            for computer in self._computers:
+                try:
+                    old_status = self._computers[computer]["old_status"]
+                except KeyError:
+                    # First ping, no old status for ping
+                    old_status = None
+                queue.put({"name" : computer, 
+                           "ip" : self._computers[computer]["ip"], 
+                           "old_status" : old_status})
+            #Wait until worker threads are done to exit    
+            queue.join()
+
+            # interval between each ping
+            time.sleep(self._interval)
 
     def pinger(self, idx, ping_queue):
         """
@@ -133,23 +147,26 @@ class Ping:
         @param ping_queue : queue for ping
         """
         while True:
-            ip = ping_queue.get()
-            print "Thread %s: Pinging %s" % (idx, ip)
-            ret = subprocess.call("ping -c 1 %s" % ip,
+            data = ping_queue.get()
+            print "Thread %s: Pinging %s" % (idx, data["ip"])
+            ret = subprocess.call("ping -c 1 %s" % data["ip"],
                             shell=True,
                             stdout=open('/dev/null', 'w'),
                             stderr=subprocess.STDOUT)
             if ret == 0:
-                print "%s: is alive" % ip
+                print "%s: is alive" % data["name"]
+                status = "HIGH"
             else:
-                print "%s: did not respond" % ip
-            ping_queue.task_done()
+                print "%s: did not respond" % data["name"]
+                status = "LOW"
 
-if __name__ == "__main__":
-    comp = {}
-    comp["dyonisos"] = {"ip" : "192.168.0.20"}
-    comp["tutu"] = {"ip" : "192.168.0.50"}
-                      
-    p = Ping(None)
-    p.ping(comp)
+            if status != data["old_status"]:
+                type = "xpl-trig"
+            else:
+                type = "xpl-stat"
+            self._computers[data["name"]]["old_status"] = status
+  
+            # call callback
+            self._cb(type, data["name"], status)
+            ping_queue.task_done()
 

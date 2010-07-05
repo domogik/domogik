@@ -39,7 +39,7 @@ from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.plugin import XplPlugin, XplResult
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.queryconfig import Query
-from domogik.xpl.lib.wol_ping import WOL
+from domogik.xpl.lib.wol_ping import WOL, Ping
 
 
 class WolPing(XplPlugin):
@@ -50,6 +50,14 @@ class WolPing(XplPlugin):
         """ Create lister for wake on lan
         """
         XplPlugin.__init__(self, name = 'wol_ping')
+
+        # Configuration : interval between each ping
+        self._config = Query(self._myxpl)
+        res = XplResult()
+        self._config.query('wol_ping', 'ping-interval', res)
+        interval = res.get_value()['ping-interval']
+        if interval == "None":
+            interval = 60
 
         # Configuration : list of computers
         self.computers = {}
@@ -70,23 +78,27 @@ class WolPing(XplPlugin):
             mac = res.get_value()['cmp-%s-mac' % str(num)]
             self._config = Query(self._myxpl)
             res = XplResult()
-            self._config.query('wol_ping', 'cmp-%s-mac-port' % str(num), res)
-            mac_port = res.get_value()['cmp-%s-m-portac' % str(num)]
+            self._config.query('wol_ping', 'cmp-%s-macport' % str(num), res)
+            mac_port = res.get_value()['cmp-%s-macport' % str(num)]
             if name != "None":
-                self._log.info("Configuration : name=%s, ip=%s, mac=%s, mac port=%S" % 
-                                        (name, ip, mac, mac_port))
+                self._log.info("Configuration : name=%s, ip=%s, mac=%s, mac port=%s" % (name, ip, mac, mac_port))
                 self.computers[name] = {"ip" : ip, "mac" : mac, 
-                                        "mac_port" : mac_port}}
+                                        "mac_port" : mac_port}
             else:
                 loop = False
             num += 1
 
-        # Create WOL object
+        ### Create WOL object
         self._wolmanager = WOL(self._log)
         # Create listeners
         Listener(self.wol_cb, self._myxpl, {'schema': 'control.basic',
                 'xpltype': 'xpl-cmnd', 'type': 'wakeonlan', 'current': 'on'})
         self._log.debug("Listener for wake on lan created")
+
+        ### Create Ping object
+        self._pingmanager = Ping(self._log, self.ping_cb, float(interval),
+                                 self.computers)
+        self._pingmanager.ping()
 
     def wol_cb(self, message):
         """ Call wake on lan lib
@@ -113,8 +125,19 @@ class WolPing(XplPlugin):
             mess.set_schema('sensor.basic')
             mess.add_data({'device' :  device})
             mess.add_data({'type' :  'wakeonlan'})
-            mess.add_data({'current' :  'on'})
+            mess.add_data({'current' :  'HIGH'})
             self._myxpl.send(mess)
+
+
+    def ping_cb(self, type, computer, status):
+        # Send xpl-trig to say plugin receive command
+        msg = XplMessage()
+        msg.set_type(type)
+        msg.set_schema('sensor.basic')
+        msg.add_data({'device' :  computer})
+        msg.add_data({'type' :  'ping'})
+        msg.add_data({'current' :  status})
+        self._myxpl.send(msg)
 
 
 if __name__ == "__main__":
