@@ -68,10 +68,15 @@ class WolPing(XplPlugin):
             res = XplResult()
             self._config.query('wol_ping', 'cmp-%s-mac' % str(num), res)
             mac = res.get_value()['cmp-%s-mac' % str(num)]
+            self._config = Query(self._myxpl)
+            res = XplResult()
+            self._config.query('wol_ping', 'cmp-%s-mac-port' % str(num), res)
+            mac_port = res.get_value()['cmp-%s-m-portac' % str(num)]
             if name != "None":
-                self._log.info("Configuration : name=%s, ip=%s, mac=%s" % 
-                                        (name, ip, mac))
-                self.computers[name] = {"ip" : ip, "mac" : mac}
+                self._log.info("Configuration : name=%s, ip=%s, mac=%s, mac port=%S" % 
+                                        (name, ip, mac, mac_port))
+                self.computers[name] = {"ip" : ip, "mac" : mac, 
+                                        "mac_port" : mac_port}}
             else:
                 loop = False
             num += 1
@@ -92,12 +97,13 @@ class WolPing(XplPlugin):
 
         try:
             mac = self.computers[device]["mac"]
+            port = self.computers[device]["mac_port"]
         except KeyError:
             self._log.warning("Computer named '%s' is not defined" % device)
             return
         
-        port = 7
-        self._log.info("Wake on lan command received for " + mac)
+        self._log.info("Wake on lan command received for '%s' on port '%s'" %
+                       (mac, port))
         status = self._wolmanager.wake_up(mac, port)
 
         # Send xpl-trig to say plugin receive command

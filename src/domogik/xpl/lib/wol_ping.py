@@ -38,6 +38,9 @@ Implements
 
 import socket
 import struct
+from threading import Thread
+import subprocess
+from Queue import Queue
 
 class WOL:
     """
@@ -88,3 +91,65 @@ class WOL:
         except:
             self._log.error("Fail to send magic packet")
             return False
+
+
+
+class Ping:
+    """
+    This class allow to ping a computer
+    """
+
+    def __init__(self, log):
+        """
+        Init object
+        @param log : logger instance
+        """
+        self._log = log
+
+    def ping(self, computers):
+        """ 
+        Ping computers
+        @param computers : dictionnary : computers[<name>]["ip"]
+        """
+        num_threads = len(computers)
+        queue = Queue()
+        #ips = ["10.0.1.1", "10.0.1.3", "10.0.1.11", "10.0.1.51"]
+        #wraps system ping command
+        #Spawn thread pool
+        for idx in range(num_threads):
+            worker = Thread(target=self.pinger, args=(idx, queue))
+            worker.setDaemon(True)
+            worker.start()
+        #Place work in queue
+        for computer in computers:
+            queue.put(computers[computer]["ip"])
+        #Wait until worker threads are done to exit    
+        queue.join()
+
+    def pinger(self, idx, ping_queue):
+        """
+        Pings subnet
+        @param idx : thread number
+        @param ping_queue : queue for ping
+        """
+        while True:
+            ip = ping_queue.get()
+            print "Thread %s: Pinging %s" % (idx, ip)
+            ret = subprocess.call("ping -c 1 %s" % ip,
+                            shell=True,
+                            stdout=open('/dev/null', 'w'),
+                            stderr=subprocess.STDOUT)
+            if ret == 0:
+                print "%s: is alive" % ip
+            else:
+                print "%s: did not respond" % ip
+            ping_queue.task_done()
+
+if __name__ == "__main__":
+    comp = {}
+    comp["dyonisos"] = {"ip" : "192.168.0.20"}
+    comp["tutu"] = {"ip" : "192.168.0.50"}
+                      
+    p = Ping(None)
+    p.ping(comp)
+

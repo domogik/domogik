@@ -35,23 +35,37 @@
     </key>
     <key>
       <order-id>4</order-id>
+      <name>cmp-1-mac-port</name>
+      <type>string</type>
+      <description>Computer 1 port used for WOL</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>5</order-id>
       <name>cmp-2-name</name>
       <type>string</type>
       <description>Computer 2 name</description>
       <default-value></default-value>
     </key>
     <key>
-      <order-id>5</order-id>
+      <order-id>6</order-id>
       <name>cmp-2-ip</name>
       <type>string</type>
       <description>Computer 2 ip or dns</description>
       <default-value></default-value>
     </key>
     <key>
-      <order-id>6</order-id>
+      <order-id>7</order-id>
       <name>cmp-2-mac</name>
       <type>string</type>
       <description>Computer 2 mac address</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>8</order-id>
+      <name>cmp-2-mac-port</name>
+      <type>string</type>
+      <description>Computer 2 port used for WOL</description>
       <default-value></default-value>
     </key>
   </configuration-keys>
