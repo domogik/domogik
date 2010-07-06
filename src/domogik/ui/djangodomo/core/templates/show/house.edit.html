@@ -26,56 +26,68 @@
 {% block js_script %}
     $(function() {
         $(".feature").click(function(){
-            var value = $(this).attr('value');
+            $(".selected").removeClass('selected');
+            $(this).addClass('selected');
+            var featurevalue = $(this).attr('featurevalue');
+            var featurename = $(this).attr('featurename');
+            var devicevalue = $(this).attr('devicevalue');
+            var devicename = $(this).attr('devicename');
             $("#widgetslist").empty();
-            $("#widgets").attr('ddvalue', value);
             $("#widgets").show();
-            $("#widgetslist").widget_models();
-            $('#mainsection').dragdrop_widgets('updatezone', '#widgets');
+            $("#widgetslist").widget_models({
+                featurevalue: featurevalue,
+                featurename: featurename,
+                devicevalue: devicevalue,
+                devicename: devicename
+            });
         });
         
         $("#widgets").hide();
         
         /* Drag & Drop */
-        $('#mainsection').dragdrop_widgets({
-            zones : [{
-                zonesselector: "#widgets",
-                listselector: "#widgetslist",
-                itemselector: ".widgetitem",
-                labelselector: "h2",
-                dropcallback: function(self, element, target) {
-                    self.valid();
-                }
-            }, {
-                zonesselector: ".mainactions",
-                listselector: "ul",
-                itemselector: "li",
-                labelselector: "span.offscreen",
-                dropcallback: function(self, element, target) {
-                    self.valid();
-                }
-            }, {
-                zonesselector: ".maininfo",
-                listselector: "ul",
-                itemselector: "li",
-                labelselector: "span.offscreen",
-                dropcallback: function(self, element, target) {
-                    self.valid();
-                }
-            }]
+        $('.maininfo').droppable({
+                activeClass: 'state-active',
+                hoverClass: 'state-hover',
+                accept: function(draggable) {
+                    return ($("li", this).length  < 1);
+                },
+                drop: ondrop
         });
+        
+        $('.mainactions').droppable({
+                activeClass: 'state-active',
+                hoverClass: 'state-hover',
+                accept: function(draggable) {
+                    return ($("li", this).length  < 4);
+                },
+                drop: ondrop
+        });
+        
+        $('.otheractions').droppable({
+                activeClass: 'state-active',
+                hoverClass: 'state-hover',
+                drop: ondrop
+        });
+        
+        function ondrop(event, ui) {
+            var item = ui.draggable.detach();
+            item.removeAttr('style');
+            item.addClass('success');
+            item.draggable({
+                helper: false,
+                revert: false
+            });
+            $("ul", this).append(item);
+            return false;
+        }        
     });
 {% endblock %}
 
 {% block css %}
-    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.dragdrop-common.css" rel="stylesheet" type="text/css" />
-    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.dragdrop-widgets.css" rel="stylesheet" type="text/css" />
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/page-show-edit.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 
 {% block js_include %}
-    <script type="text/javascript" src="/design/js/dmg.dragdrop-common.js"></script>
-    <script type="text/javascript" src="/design/js/dmg.dragdrop-widgets.js"></script>
 {% endblock %}
 
 {% block title %}{% trans page_title %}{% endblock %}
@@ -105,7 +117,7 @@
                         <li><div class='device icon16-technology-{{ device.device_type.device_technology_id }}'>{{ device.name }} ({{ device.address }})</div>
                             <ul>
                                 {% for feature in device.feature %}
-                                <li><div class='feature' value='{{ device.id }}-{{ feature.id }}'>{{ feature.name }}</div></li>
+                                <li><div class='feature' devicevalue='{{ device.id }}' featurevalue='{{ feature.id }}' devicename='{{device.name }}' featurename='{{ feature.name }}'>{{ feature.name }}</div></li>
                                 {% endfor %}
                             </ul>
                         </li>
@@ -122,7 +134,7 @@
         </div>
     </div>
     <div class='actions'>
-        <div class='mainactions' ddvalue='mainactions' ddname='Main actions'>
+        <div class='mainactions'>
             <span class='offscreen'>{% trans "Main actions" %}</span>
             <ul>
             </ul>

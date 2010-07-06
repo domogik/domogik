@@ -24,8 +24,8 @@
 .ui-tabs .ui-tabs-nav li a {
     margin:0;
     display:inline-block;
-	background-position:3px 50%;
-	background-repeat:no-repeat;
+    background-position:3px 50%;
+    background-repeat:no-repeat;
     padding: 1em 1em 1em 25px;
     text-decoration:none;
     color:#000000;

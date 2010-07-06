@@ -5,7 +5,8 @@
             zonesselector: ".targetdrop",
             listselector: ".draggables",
             itemselector: ".draggable",
-            labelselector: "legend"
+            labelselector: "legend",
+            dragcopy: false
         },
 
         _init:function() {
@@ -24,6 +25,7 @@
                     zone.itemselector = value.itemselector;
                     zone.listselector = value.listselector;
                     zone.labelselector = value.labelselector;
+                    zone.dragcopy = value.dragcopy;
 
                     // Set zone id
                     zone.id = zone.element.attr('id');

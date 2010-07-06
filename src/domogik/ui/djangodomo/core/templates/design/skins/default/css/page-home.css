@@ -9,7 +9,7 @@
 
 
 header#contentheader {
-	-moz-border-radius: 0.8em 0 0 0;
+    -moz-border-radius: 0.8em 0 0 0;
     -webkit-border-radius: 0.8em 0 0 0;
     border-right: #979387 1px solid;
 }
@@ -31,7 +31,8 @@ header#contentheader {
     text-align:center;
 }
 
-#mainsection .mainactions ul > li, #mainsection .actions ul > li {
+#mainsection .mainactions ul > li,
+#mainsection .actions ul > li {
     display:inline-block;
 }
 
@@ -45,47 +46,6 @@ header#contentheader {
 	-moz-border-radius: 0 0 0 0.8em;
     -webkit-border-radius: 0 0 0 0.8em;
 }
-
-/*
-#general-temp {
-    width:264px;
-    float:right;
-    text-align:center;
-    height:100px;
-}
-
-#general-temp #general-templocation {
-    font-weight:bold;
-}
-
-#general-temp #general-tempcurrent {
-    float:right;
-    font-size:3em;
-}
-
-#general-tempicon {
-    position:relative;
-}
-
-.icon-weather-sun {
-    top:-135px;
-}
-
-.icon-weather-raincloud {
-    top:-131px;
-}
-
-#general-datetime #general-time {
-    font-size:3em;
-}
-
-#general-datetime #general-date {
-    font-style:italic;
-    float:right;
-    margin-top:1em;
-}
-*/
-
 
 /* Area/room list */
 

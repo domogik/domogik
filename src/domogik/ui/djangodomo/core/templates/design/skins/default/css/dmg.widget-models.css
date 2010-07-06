@@ -1,4 +1,5 @@
 .widget {
+    display:block;
     position:relative;
     width:46px;
     height:46px;

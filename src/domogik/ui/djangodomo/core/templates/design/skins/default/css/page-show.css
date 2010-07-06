@@ -49,14 +49,15 @@ header#contentheader {
 #mainsection .mainactions ul > li,
 #mainsection .otheractions ul > li {
     display:inline-block;
+    margin:1em;
 }
 
 #mainsection .otheractions {
     margin:0;
-    padding:1em;
+    padding: 1em 1em 1em 2em;
     min-height:40em;
     border-right: #979387 1px solid;
     border-top: #cccccc 1px dashed;
-	-moz-border-radius: 0 0 0 0.8em;
+    -moz-border-radius: 0 0 0 0.8em;
     -webkit-border-radius: 0 0 0 0.8em;
 }

@@ -8,8 +8,8 @@
 }
 
 .block:hover {
-	-moz-box-shadow: 5px 5px 10px #999;
-	-webkit-box-shadow: 5px 5px 10px #999;    
+    -moz-box-shadow: 5px 5px 10px #999;
+    -webkit-box-shadow: 5px 5px 10px #999;    
 }
 
 /* Header section */
