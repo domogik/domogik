@@ -436,7 +436,8 @@ class Rest(XplPlugin):
 
     def get_exception(self):
         # TODO : finish exception take in count
-        my_exception =  str(traceback.format_exc()).replace('"', "'").replace('\n', '      ')
+        #my_exception =  str(traceback.format_exc()).replace('"', "'").replace('\n', '      ')
+        my_exception =  str(traceback.format_exc()).replace('"', "'")
         print "==== Error in REST ===="
         print my_exception
         print "======================="
@@ -3651,14 +3652,30 @@ class StatsManager(XplPlugin):
     def parse_mapping(self, node):
         """ Parse the "mapping" node
         """
-        values = {}
+         
+        values = []
         device = node.getElementsByTagName("device")[0].attributes["field"].value.lower()
         for value in node.getElementsByTagName("value"):
+            name = value.attributes["field"].value
+            data = {}
+            data["name"] = name
             #If a "name" attribute is defined, use it as vallue, else value is empty
-            if value.attributes.has_key("name"):
-                values[value.attributes["field"].value] = value.attributes["name"].value.lower()
+            if value.attributes.has_key("new_name"):
+                data["new_name"] = value.attributes["new_name"].value.lower()
+                if value.attributes.has_key("filter_key"):
+                    data["filter_key"] = value.attributes["filter_key"].value.lower()
+                    if value.attributes.has_key("filter_value"):
+                        data["filter_value"] = value.attributes["filter_value"].value.lower()
+                    else:
+                        data["filter_value"] = None
+                else:
+                    data["filter_key"] = None
+                    data["filter_value"] = None
             else:
-                values[value.attributes["field"].value] = None
+                data["new_name"] = None
+                data["filter_key"] = None
+                data["filter_value"] = None
+            values.append(data)
         return device, values
 
 
@@ -3687,7 +3704,8 @@ class StatsManager(XplPlugin):
             self._res = res
             params = {'schema':schema, 'xpltype': type}
             params.update(res["filter"])
-            print "self._listener = Listener(self._callback, xpl, params)"
+            print "self._listener = Listener(self._callback, xpl, " + str(params)+ ")"
+            print str(res)
             self._listener = Listener(self._callback, xpl, params)
             self._technology = technology
 
@@ -3716,21 +3734,45 @@ class StatsManager(XplPlugin):
             #current_date = datetime.datetime.now()
             device_data = []
             print "RM=%s" %  str(self._res["mapping"])
-            for key in self._res["mapping"].keys():
-                print "KM=%s" % key
-                data = ""
-                if message.data.has_key(key):
-                    #Check if a name has been chosen for this value entry
-                    value = message.data[key]
-                    if self._res["mapping"][key] == None:
-                        #If not, keep the one from message
-                        key = message.data[key]
+
+            ### mapping processing
+            for map in self._res["mapping"]:
+                print "=>%s" % str(map)
+                # first : get value and default key
+                key = map["name"]
+                value = message.data[map["name"]]
+                if map["filter_key"] == None:
+                    key = map["name"]
+                    device_data.append({"key" : key, "value" : value})
+                    print "DD=%s" % device_data
+                    self._db.add_device_stat(current_date, key, value, d_id)
+                else:
+                    print "FILTER ON %s=%s" % (map["filter_key"], message.data[map["filter_key"]])
+                    if map["filter_value"] != None and \
+                       map["filter_value"] == message.data[map["filter_key"]]:
+                        print "yep!"
+                        key = map["new_name"]
+                        device_data.append({"key" : key, "value" : value})
+                        print "DD=%s" % device_data
+                        self._db.add_device_stat(current_date, key, value, d_id)
                     else:
-                        key = self._res["mapping"][key]
-                device_data.append({"key" : key, "value" : value})
-                print "DD=%s" % device_data
-                # put data in database
-                self._db.add_device_stat(current_date, key, value, d_id)
+                        if map["filter_value"] == None:
+                            self._log_stats.warning ("Stats : no filter_value defined in map : %s" % str(map))
+            #for key in self._res["mapping"].keys():
+            #    print "KM=%s" % key
+            #    data = ""
+            #    if message.data.has_key(key):
+            #        #Check if a name has been chosen for this value entry
+            #        value = message.data[key]
+            #        if self._res["mapping"][key] == None:
+            #            #If not, keep the one from message
+            #            key = message.data[key]
+            #        else:
+            #            key = self._res["mapping"][key]
+            #    device_data.append({"key" : key, "value" : value})
+            #    print "DD=%s" % device_data
+            #    # put data in database
+            #    self._db.add_device_stat(current_date, key, value, d_id)
 
             # Put data in events queues
             self._event_requests.add_in_queues(d_id, 
