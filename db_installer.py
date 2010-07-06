@@ -101,7 +101,12 @@ device_type = db.add_device_type(dty_name='Temperature', dt_id=device_technology
 db.add_sensor_feature(sf_name='Temperature',
                    sf_device_type_id=device_type.id, sf_value_type='number',
                    sf_parameters='{&quot;unit&quot;:&quot;&deg;C&quot;}',
-                   sf_stat_key='current')
+                   sf_stat_key='temperature')
+device_type = db.add_device_type(dty_name='ID', dt_id=device_technology.id)
+db.add_sensor_feature(sf_name='ID',
+                   sf_device_type_id=device_type.id, sf_value_type='boolean',
+                   sf_parameters='{}',
+                   sf_stat_key='present')
 
 
 # Create device technology features for RFXCom
