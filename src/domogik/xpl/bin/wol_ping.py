@@ -117,7 +117,7 @@ class WolPing(XplPlugin):
         self._log.info("Wake on lan command received for '%s' on port '%s'" %
                        (mac, port))
         #status = self._wolmanager.wake_up(mac, port)
-        status = self._wolmanager.wake_up(mac, 7)
+        status = self._wolmanager.wake_up(mac, port)
 
         # Send xpl-trig to say plugin receive command
         if status == True:

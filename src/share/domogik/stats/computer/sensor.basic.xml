@@ -9,7 +9,8 @@
             </listener>
             <mapping>
                 <device field="device"/>
-                <value field="current" name="ping"/>
+                <value field="current" new_name="ping"
+                       filter_key="type" filter_value="ping" />
             </mapping>
         </xpltype>
         <xpltype type="xpl-stat">
@@ -20,7 +21,8 @@
             </listener>
             <mapping>
                 <device field="device"/>
-                <value field="current" name="ping"/>
+                <value field="current" new_name="ping"
+                       filter_key="type" filter_value="ping" />
             </mapping>
         </xpltype>
     </schema>

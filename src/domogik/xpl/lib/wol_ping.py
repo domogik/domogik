@@ -42,6 +42,7 @@ from threading import Thread
 import subprocess
 from Queue import Queue
 import time
+import traceback
 
 class WOL:
     """
@@ -93,7 +94,7 @@ class WOL:
             self._log.info("Magic packet send")
             return True
         except:
-            self._log.error("Fail to send magic packet")
+            self._log.error("Fail to send magic packet : %s" % traceback.format_exc())
             return False
 
 
