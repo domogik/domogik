@@ -24,8 +24,8 @@
             </listener>
             <mapping>
                 <device field="device"/>
-                <value field="type"/>
-                <value field="current" />
+                <value field="current" new_name="temperature" 
+                       filter_key="type" filter_value="temp" />
             </mapping>
         </xpltype>
     </schema>
