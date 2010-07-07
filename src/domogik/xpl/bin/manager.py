@@ -325,7 +325,7 @@ class SysManager(XplPlugin):
         and wait for the answer (max 5 seconds).
         @param name : component name
         '''
-        self._log.debug("Check if '%s' is running... (thread)" % name)
+        self._log.info("Check if '%s' is running... (thread)" % name)
         self._pinglist[name] = Event()
         mess = XplMessage()
         mess.set_type('xpl-cmnd')
@@ -345,11 +345,11 @@ class SysManager(XplPlugin):
             if self._pinglist[name].isSet():
                 break
         if self._pinglist[name].isSet():
-            self._log.debug("'%s' is running" % name)
+            self._log.info("'%s' is running" % name)
             self._set_status(name, "ON")
             return True
         else:
-            self._log.debug("'%s' is not running" % name)
+            self._log.info("'%s' is not running" % name)
             self._set_status(name, "OFF")
             return False
 
