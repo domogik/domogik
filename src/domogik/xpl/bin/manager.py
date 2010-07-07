@@ -39,7 +39,7 @@ import os
 import sys
 import time
 from socket import gethostname
-from threading import Event, currentThread
+from threading import Event, currentThread, Thread
 from optparse import OptionParser
 import traceback
 from subprocess import Popen
@@ -58,6 +58,7 @@ import pkgutil
 
 
 KILL_TIMEOUT = 2
+PING_DURATION = 5
 
 
 class SysManager(XplPlugin):
@@ -138,7 +139,17 @@ class SysManager(XplPlugin):
                 if startup == 'True':
                     self._log.debug("            starting")
                     self._log.debug("Starting %s" % component["name"])
-                    self._start_plugin(component["name"], gethostname(), 0)
+                    ### old version : non threaded startup
+                    #self._start_plugin(component["name"], gethostname(), 0)
+                    ### new version : thread
+                    comp_thread = Thread(None,
+                                                   self._start_plugin,
+                                                   None,
+                                                   (component["name"],
+                                                    gethostname(),
+                                                    0),
+                                                   {})
+                    comp_thread.start()
             
             # Define listener
             Listener(self._sys_cb, self._myxpl, {
@@ -246,7 +257,6 @@ class SysManager(XplPlugin):
                 if self._check_component_is_running(plg):
                     self._log.debug("Component %s started with pid %s" % (plg,
                             pid))
-                    self._set_status(plg, "ON")
 
                 # component failed to start
                 else:
@@ -310,11 +320,12 @@ class SysManager(XplPlugin):
         mess.add_data({'host' : gethostname()})
         self._myxpl.send(mess)
 
-    def _check_component_is_running(self, name):
+    def _check_component_is_running(self, name, foo = None):
         ''' This method will send a ping request to a component
         and wait for the answer (max 5 seconds).
         @param name : component name
         '''
+        self._log.debug("Check if '%s' is running... (thread)" % name)
         self._pinglist[name] = Event()
         mess = XplMessage()
         mess.set_type('xpl-cmnd')
@@ -325,14 +336,22 @@ class SysManager(XplPlugin):
         Listener(self._cb_check_component_is_running, self._myxpl, {'schema':'domogik.system', \
                 'xpltype':'xpl-trig','command':'ping','plugin':name,'host':gethostname()}, \
                 cb_params = {'name' : name})
-        max=5
+        max = PING_DURATION
+        self._set_status(name, "OFF")
         while max != 0:
             self._myxpl.send(mess)
             time.sleep(1)
             max = max - 1
             if self._pinglist[name].isSet():
                 break
-        return self._pinglist[name].isSet() #Will be set only if an answer was received
+        if self._pinglist[name].isSet():
+            self._log.debug("'%s' is running" % name)
+            self._set_status(name, "ON")
+            return True
+        else:
+            self._log.debug("'%s' is not running" % name)
+            self._set_status(name, "OFF")
+            return False
 
     def _cb_check_component_is_running(self, message, args):
         ''' Set the Event to true if an answer was received
@@ -415,6 +434,7 @@ class SysManager(XplPlugin):
         # Getplugin list
         plugins = Loader('plugins')
         plugin_list = dict(plugins.load()[1])
+        state_thread = {}
         for plugin in plugin_list:
             print plugin
             self._log.info("==> %s (%s)" % (plugin, plugin_list[plugin]))
@@ -450,22 +470,24 @@ class SysManager(XplPlugin):
                                         "default" : k_default})
                     self._log.debug("  All elements from xml file found")
 
-
-                    # check plugin state
-                    if self._check_component_is_running(plgname):
-                        status = "ON"
-                    else:
-                        status = "OFF"
-
                     # register plugin
                     self._components.append({"name" : plgname, 
                                              "description" : plgdesc, 
                                              "technology" : plgtech, 
-                                             "status" : status,
+                                             "status" : "OFF",
                                              "host" : gethostname(), 
                                              "version" : plgver,
                                              "documentation" : plgdoc,
                                              "configuration" : plgconf})
+
+                    # check plugin state (will update component status)
+                    state_thread[plgname] = Thread(None,
+                                                   self._check_component_is_running,
+                                                   None,
+                                                   (plgname, None),
+                                                   {})
+                    state_thread[plgname].start()
+
                 except:
                     print("Error reading xml file : %s\n%s" % (xml_file, str(traceback.format_exc())))
                     self._log.error("Error reading xml file : %s. Detail : \n%s" % (xml_file, str(traceback.format_exc())))
