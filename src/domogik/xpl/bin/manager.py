@@ -59,6 +59,7 @@ import pkgutil
 
 KILL_TIMEOUT = 2
 PING_DURATION = 5
+WAIT_TIME_BETWEEN_PING = 30
 
 
 class SysManager(XplPlugin):
@@ -129,27 +130,29 @@ class SysManager(XplPlugin):
 
             # Start plugins at manager startup
             self._log.debug("Check non-system plugins to start at manager startup...")
+            comp_thread = {}
             for component in self._components:
-                self._log.debug("%s..." % component["name"])
+                name = component["name"]
+                self._log.debug("%s..." % name)
                 self._config = Query(self._myxpl)
                 res = XplResult()
-                self._config.query(component["name"], 'startup-plugin', res)
+                self._config.query(name, 'startup-plugin', res)
                 startup = res.get_value()['startup-plugin']
                 # start plugin
                 if startup == 'True':
                     self._log.debug("            starting")
-                    self._log.debug("Starting %s" % component["name"])
+                    self._log.debug("Starting %s" % name)
                     ### old version : non threaded startup
-                    #self._start_plugin(component["name"], gethostname(), 0)
+                    #self._start_plugin(name, gethostname(), 0)
                     ### new version : thread
-                    comp_thread = Thread(None,
+                    comp_thread[name] = Thread(None,
                                                    self._start_plugin,
                                                    None,
-                                                   (component["name"],
+                                                   (name,
                                                     gethostname(),
                                                     0),
                                                    {})
-                    comp_thread.start()
+                    comp_thread[name].start()
             
             # Define listener
             Listener(self._sys_cb, self._myxpl, {
@@ -158,7 +161,20 @@ class SysManager(XplPlugin):
             })
     
             self._log.info("System manager initialized")
-            self.get_stop().wait()
+
+            ### make an eternal loop to ping plugins
+            # the goal is to detect manually launched plugins
+            while True:
+                ping_thread = {}
+                for component in self._components:
+                    name = component["name"]
+                    ping_thread[name] = Thread(None,
+                                         self._check_component_is_running,
+                                         None,
+                                         (name, None),
+                                         {})
+                    ping_thread[name].start()
+                time.sleep(WAIT_TIME_BETWEEN_PING)
 
         except:
             self._log.error("%s" % sys.exc_info()[1])
