@@ -250,7 +250,6 @@ class SysManager(XplPlugin):
         else:
             pid = self._start_comp(plg)
             if pid:
-                self._write_pid_file(plg, pid)
                 # let's check if component successfully started
                 time.sleep(READ_NETWORK_TIMEOUT + 0.5) # time a plugin took to die.
                 # component started
@@ -270,7 +269,7 @@ class SysManager(XplPlugin):
 
     def _stop_plugin(self, plg, host, force, error):
         self._log.debug("Check plugin stops : %s on %s" % (plg, host))
-        if not force and self._is_component_running(plg) == False:
+        if not force and self._check_component_is_running(plg) == False:
             error = "Component %s is not running on %s" % (plg, host)
             self._log.info(error)
             mess = XplMessage()
@@ -283,7 +282,6 @@ class SysManager(XplPlugin):
             self._myxpl.send(mess)
         else:
             pid = int(self._read_pid_file(plg))
-            self._delete_pid_file(plg)
             self._log.debug("Check if process (pid %s) is down" % pid)
             if pid != 0:
                 try:
@@ -305,8 +303,11 @@ class SysManager(XplPlugin):
                         except OSError:
                             self._log.debug("Process %s resists again... Failed to stop process. Detail : %s" % (pid, str(sys.exc_info()[1])))
                             return
+                self._delete_pid_file(plg)
                  
                 self._set_status(plg, "OFF")
+            else:
+                self._log.warning("Pid file contains no pid!")
 
 
 
@@ -372,16 +373,6 @@ class SysManager(XplPlugin):
         subp = Popen("/usr/bin/python %s" % plugin.__file__, shell=True)
         return subp.pid
 
-    def _is_component_running(self, component):
-        '''
-        Check if one component is still running == the pid file exists
-        '''
-        self._log.debug("Get %s pid in %s", 
-                (component, self._pid_dir_path))
-        pidfile = os.path.join(self._pid_dir_path,
-                component + ".pid")
-        return os.path.isfile(pidfile)
-
     def _delete_pid_file(self, component):
         '''
         Delete pid file
@@ -390,15 +381,6 @@ class SysManager(XplPlugin):
         pidfile = os.path.join(self._pid_dir_path,
                 component + ".pid")
         return os.remove(pidfile)
-
-    def _write_pid_file(self, component, pid):
-        '''
-        Write the pid in a file
-        '''
-        pidfile = os.path.join(self._pid_dir_path,
-                component + ".pid")
-        fil = open(pidfile, "w")
-        fil.write(str(pid))
 
     def _read_pid_file(self, component):
         '''
