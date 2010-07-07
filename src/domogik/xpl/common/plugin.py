@@ -116,8 +116,14 @@ class XplPlugin():
             self._log.info("----------------------------------")
             self._log.info("Starting plugin '%s' (new manager instance)" % name)
             self._is_manager = is_manager
+            self._name = name
             cfg = Loader('domogik')
             config = dict(cfg.load()[1])
+
+            # Get pid and write it in a file
+            self._pid_dir_path = config['pid_dir_path']
+            self._get_pid()
+           
             if 'broadcast' in config:
                 broadcast = config['broadcast']
             else:
@@ -131,6 +137,17 @@ class XplPlugin():
             self._reload_cb = reload_cb
             self._dump_cb = dump_cb
             self._log.debug("end single xpl plugin")
+
+        def _get_pid(self):
+            """ Get current pid and write it to a file
+            """
+            pid = os.getpid()
+            pid_file = os.path.join(self._pid_dir_path, 
+                                    self._name + ".pid")
+            self._log.debug("Write pid file for pid '%s' in file '%s'" % (str(pid), pid_file))
+            fil = open(pid_file, "w")
+            fil.write(str(pid))
+            fil.close()
 
         def _system_handler(self, message):
             """ Handler for domogik system messages
