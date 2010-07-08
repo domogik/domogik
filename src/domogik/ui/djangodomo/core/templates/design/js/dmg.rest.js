@@ -65,7 +65,6 @@ $.extend({
         $.each(parameters, function(){
             url += encodeURIComponent(this) + '/';     
         });
-        
         $.ajax({
             cache: false,
             type: "GET",
