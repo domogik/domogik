@@ -255,6 +255,14 @@ remote-ip=%s
         self._listeners.append(listener)
         self._lock_list.release()
 
+    def del_listener(self, listener):
+        """
+        del a listener on the list of the manager
+        @param listener : the listener instance
+        """
+        self._lock_list.acquire()
+        self._listeners.remove(listener)
+        self._lock_list.release()
 
 class Listener:
     """
@@ -280,6 +288,14 @@ class Listener:
         self._manager = manager
         manager.add_listener(self)
         self._cb_params = cb_params
+
+    def __del__(self):
+        """ Unregister the listener from manager when it is deleted
+        """
+        self._unregister()
+
+    def _unregister(self):
+        self._manager.del_listener(self)
 
     def __str__(self):
         return "Listener<%s>" % (self._filter)
