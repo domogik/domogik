@@ -234,8 +234,8 @@ remote-ip=%s
                     else:
                         try:
                             mess = XplMessage(data)
-                            if mess.target == "*" or (
-                                    mess.target == self._source):
+                            if (mess.target == "*" or (mess.target == self._source)) and\
+                                (self._source != mess.source):
                                 [l.new_message(mess) for l in self._listeners]
                                 #Enabling this debug will really polute your logs
                                 #self._log.debug("New message received : %s" % \
