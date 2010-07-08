@@ -25,6 +25,146 @@
 
 {% block js_script %}
     $(function() {
+        $("#customize a").click(function() {
+        /*
+            $.getREST(['base', 'feature_association', 'del', 'association_type', 'house', 'association_id', '0'],
+                function(data) {
+                    var status = (data.status).toLowerCase();
+                    if (status != 'ok') {
+//                        self.cancel();
+                        $.notification('error', data.description);                                          
+                    }
+                }
+            );*/
+
+            var json = {};
+            // Main info
+            var maininfo = $(".maininfo li:first");
+            json.maininfo = {device:maininfo.attr('devicevalue'), feature:maininfo.attr('featurevalue')};
+//            addAssociation(maininfo.attr('devicevalue'), maininfo.attr('featurevalue'));
+
+            // Main actions
+            json.mainactions = [];
+            $(".mainactions li").each(function(index) {
+                var action = {device:$(this).attr('devicevalue'), feature:$(this).attr('featurevalue')};
+                json.mainactions.push(action);
+//                addAssociation($(this).attr('devicevalue'), $(this).attr('featurevalue'));
+            });
+            
+            // Other actions
+            json.otheractions = [];
+            $(".otheractions li").each(function(index) {
+                var action = {device:$(this).attr('devicevalue'), feature:$(this).attr('featurevalue')};
+                json.otheractions.push(action);
+//                addAssociation($(this).attr('devicevalue'), $(this).attr('featurevalue'));
+            });
+
+            // Save ui config
+            var jsonstr = JSON.stringify(json).replace(/"/g, '&quot;');
+            $.getREST(['base', 'ui_config', 'set', 'name', 'general', 'reference', 'house', 'key', 'widget_placement', 'value', jsonstr],
+                function(data) {
+                    var status = (data.status).toLowerCase();
+                    if (status == 'ok') {
+//                                  self.valid();
+                    } else {
+//                                  self.cancel();
+                        $.notification('error', data.description);                                          
+                    }
+                }
+            ); 
+        });
+        
+        function addAssociation(deviceid, featureid) {
+            $.getREST(['base', 'feature_association', 'add', 'device_id', deviceid, 'feature_id', featureid, 'association_type', 'house', 'association_id', '0'],
+                function(data) {
+                    var status = (data.status).toLowerCase();
+                    if (status == 'ok') {
+                    } else {
+//                        self.cancel();
+                        $.notification('error', data.description);                                          
+                    }
+                }
+            );        
+        }
+        
+        {% if house.widget_placement.maininfo %}
+            $(".maininfo ul").widget_model({
+                featurevalue: {{ house.widget_placement.maininfo.feature }},
+                featurename: 'featurename',
+                devicevalue: {{ house.widget_placement.maininfo.device }},
+                devicename: 'devicename',
+                draggable: {
+                    helper: false,
+                    revert: false,
+                    appendTo: 'body',
+		    drag: function(event, ui) {
+			$("#panel").hide();
+		    },
+		    stop: function(event, ui) {
+			$("#panel").show();
+                        $("#widgetslist").widget_models('update');
+			if($(this).hasClass("success")) {
+			    $(this).removeClass("success");
+			} else {
+			    $(this).remove();			
+			}
+		    }
+                }
+            });
+        {% endif %}
+        
+        {% for action in house.widget_placement.mainactions %}
+            $(".mainactions ul").widget_model({
+                featurevalue: {{ action.feature }},
+                featurename: 'featurename',
+                devicevalue: {{ action.device }},
+                devicename: 'devicename',
+                draggable: {
+                    helper: false,
+                    revert: false,
+                    appendTo: 'body',
+		    drag: function(event, ui) {
+			$("#panel").hide();
+		    },
+		    stop: function(event, ui) {
+			$("#panel").show();
+                        $("#widgetslist").widget_models('update');
+			if($(this).hasClass("success")) {
+			    $(this).removeClass("success");
+			} else {
+			    $(this).remove();			
+			}
+		    }
+                }
+            });
+        {% endfor %}
+        
+        {% for action in house.widget_placement.otheractions %}
+            $(".otheractions ul").widget_model({
+                featurevalue: {{ action.feature }},
+                featurename: 'featurename',
+                devicevalue: {{ action.device }},
+                devicename: 'devicename',
+                draggable: {
+                    helper: false,
+                    revert: false,
+                    appendTo: 'body',
+		    drag: function(event, ui) {
+			$("#panel").hide();
+		    },
+		    stop: function(event, ui) {
+			$("#panel").show();
+                        $("#widgetslist").widget_models('update');
+			if($(this).hasClass("success")) {
+			    $(this).removeClass("success");
+			} else {
+			    $(this).remove();			
+			}
+		    }
+                }
+            });
+        {% endfor %}
+        
         $(".feature").click(function(){
             $(".selected").removeClass('selected');
             $(this).addClass('selected');
@@ -79,7 +219,7 @@
             });
             $("ul", this).append(item);
             return false;
-        }        
+        }
     });
 {% endblock %}
 

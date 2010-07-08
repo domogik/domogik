@@ -8,27 +8,49 @@
         _init: function() {
             var self = this, o = this.options;
 	    this.element.empty();
-	    var widget = $("<li class='widget'>1x1</li>");
-	    widget.draggable({
-		helper: "clone",
-		revert: 'invalid',
-		appendTo: 'body',
-		drag: function(event, ui) {
-		    $("#panel").hide();
-		},
-		stop: function(event, ui) {
-		    $("#panel").show();
-		    self._init();
-		    if($(this).hasClass("success")) {
-			$(this).removeClass("success");
-		    } else {
-			$(this).remove();			
+	    this.element.widget_model({
+                featurevalue: o.featurevalue,
+                featurename: o.featurename,
+                devicevalue: o.devicevalue,
+                devicename: o.devicename,
+		draggable: {
+		    helper: "clone",
+		    revert: 'invalid',
+		    appendTo: 'body',
+		    drag: function(event, ui) {
+			$("#panel").hide();
+		    },
+		    stop: function(event, ui) {
+			$("#panel").show();
+			self._init();
+			if($(this).hasClass("success")) {
+			    $(this).removeClass("success");
+			} else {
+			    $(this).remove();			
+			}
 		    }
 		}
-	    });
+            });
+        },
+	
+	update: function() {
+	    this._init();
+	}
+    });
+    
+    $.ui.widget.subclass("ui.widget_model", {
+        // default options
+        options: {
+        },
+
+        _init: function() {
+            var self = this, o = this.options;
+	    var widget = $("<li class='widget'>1x1</li>")
+		.attr('devicevalue', o.devicevalue)
+		.attr('featurevalue', o.featurevalue);
+	    widget.draggable(o.draggable);
             var identity = $("<canvas class='identity' width='60' height='60'></canvas>")
 	    widget.append(identity);
-//	    li.append(widget);
 	    this.element.append(widget);
             var canvas = identity.get(0);
             if (canvas.getContext){
