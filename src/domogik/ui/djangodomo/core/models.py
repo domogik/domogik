@@ -37,8 +37,15 @@ Implements
 from django.db import models
 from domogik.common.configloader import Loader
 from django.conf import settings
-
+from htmlentitydefs import name2codepoint
+import re
+import simplejson
 import dmg_pipes as pipes
+
+def unescape(s):
+    "unescape HTML code refs; c.f. http://wiki.python.org/moin/EscapingHtml"
+    return re.sub('&(%s);' % '|'.join(name2codepoint),
+              lambda m: unichr(name2codepoint[m.group(1)]), s)
     
 class Areas(pipes.DmgPipe):
     uri = settings.REST_URL + "/base/area"
@@ -274,7 +281,10 @@ class UIConfigs(pipes.DmgPipe):
         uiconfigs = UIConfigs.objects.get({'parameters':"list/by-reference/general/" + str(reference)})
         if uiconfigs :
             for uiconfig in uiconfigs.ui_config:
-                resp[uiconfig.key] = uiconfig.value
+                if (uiconfig.value[0] == '{') : # json structure 
+                    resp[uiconfig.key] = simplejson.loads(unescape(uiconfig.value))
+                else :
+                    resp[uiconfig.key] = uiconfig.value
             return resp
 
 class Plugins(pipes.DmgPipe):
