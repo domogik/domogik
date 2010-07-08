@@ -7,72 +7,10 @@ ul.draggables {
     padding:0;
 }
 
-.targetdrop {
-    margin:0.2em;
-    padding:0.2em;
-    border:2px solid #BDCB2F;
-    -moz-border-radius: 0.8em;
-    -webkit-border-radius: 0.8em;
-}
 
-.targetdrop legend {
-	font-weight:bold;
-	margin-left:2em;
-    background-position: left 50%;
-    background-repeat: no-repeat;
-    display:inline-block;
-    line-height:16px;
-    padding-left:20px;
-}
-
-li.draggable, li.empty, li.trace {
-    position: relative;
-    padding: 0.5em 0.5em 0.5em 1em;
-    margin:0.1em;
-    width: 13em;
-    text-align: center;
-    display:inline-block;
-    -moz-border-radius: 1em;
-    -webkit-border-radius: 1em;
-    float:left;
-}
-
-li.draggable {
-    background-color: #fff;
-    color: #000;
-    border: 1px solid #666666;
-}
-
-li.empty {
-    background-color: #fff;
-    color: #000;
-    border: 1px dashed #cccccc;
-}
-
-li.trace {
-    background-color: #cccccc;
-    color: #000;
-}
-
-li.draggable
-{
-    cursor: move;
-    background-position: left 50%;
-    background-repeat: no-repeat;
-}
 
 li.dragged
 {
     -moz-box-shadow: 5px 5px 5px #888;
     -webkit-box-shadow: 5px 5px 5px #888;
-}
-
-li.draggable:hover
-{
-    background-color: #BDCB2F;
-}
-
-li.draggable:focus
-{
-    background-color: #f6a828;
 }

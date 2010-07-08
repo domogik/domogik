@@ -7,16 +7,67 @@ a.customicons {
 }
 
 .ui-selectmenu-item-icon {
-	height: 64px;
-	width: 64px;
-	background-position:0 0;
-	background-repeat:no-repeat;
-	display: block;
-	text-indent: -99999px;
-	overflow-x: hidden;
-	overflow-y: hidden;
-	position: absolute;
-	top: 1em;
-	margin-top: -8px;
-	left: 0pt;
+    height: 64px;
+    width: 64px;
+    background-position:0 0;
+    background-repeat:no-repeat;
+    display: block;
+    text-indent: -99999px;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    position: absolute;
+    top: 1em;
+    margin-top: -8px;
+    left: 0pt;
+}
+
+/* Room page */
+.targetdrop {
+    margin:0.2em;
+    padding:0.2em;
+    border:2px solid #BDCB2F;
+    -moz-border-radius: 0.8em;
+    -webkit-border-radius: 0.8em;
+}
+
+.targetdrop legend {
+    background-position: left 50%;
+    background-repeat: no-repeat;
+    display:inline-block;
+    line-height:16px;
+    padding-left:20px;
+    font-weight:bold;
+    margin-left:2em;
+}
+
+li.roomitem, li.empty{
+    position: relative;
+    padding: 0.5em 0.5em 0.5em 1em;
+    margin:0.1em;
+    width: 13em;
+    text-align: center;
+    display:inline-block;
+    -moz-border-radius: 1em;
+    -webkit-border-radius: 1em;
+    float:left;
+    min-height:3em;
+}
+
+.targetdrop.state-active {
+    background-color: #DFFFB3;
+}
+
+li.roomitem {
+    background-color: #fff;
+    color: #000;
+    border: 1px solid #666666;
+    cursor: move;
+    background-position: left 50%;
+    background-repeat: no-repeat;
+}
+
+li.empty {
+    background-color: #fff;
+    color: #000;
+    border: 1px dashed #cccccc;
 }

@@ -22,13 +22,9 @@
 
 {% load i18n %}
 {% block css %}
-    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.dragdrop-common.css" rel="stylesheet" type="text/css" />
-    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.dragdrop-basic.css" rel="stylesheet" type="text/css" />
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/page-admin-organization.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block js_include %}
-    <script type="text/javascript" src="/design/js/dmg.dragdrop-common.js"></script>
-    <script type="text/javascript" src="/design/js/dmg.dragdrop-basic.js"></script>
 {% endblock %}
 {% block js_script %}
     $(function(){
@@ -47,6 +43,50 @@
         });
         
         /* Drag & Drop */
+        
+        $(".targetdrop").droppable({
+            activeClass: 'state-active',
+            hoverClass: 'state-hover',
+            drop:function(event, ui) {
+                var itemid = ui.draggable.attr('ddvalue');
+                var targetid = $(this).attr('ddvalue');
+                $.getREST(['base', 'room', 'update', 'id', itemid, 'area_id', targetid],
+                    function(data) {
+                        var status = (data.status).toLowerCase();
+                        if (status == 'ok') {
+//                            self.valid();
+                        } else {
+//                            self.cancel();
+                            $.notification('error', data.description);                                          
+                        }
+                    }
+                );
+
+                // Remove Empty elment if exist
+                $(".empty", this).remove();
+                // Add Item element
+                var item = ui.draggable.detach();
+                item.removeAttr('style');
+                item.draggable({
+                    revert: 'invalid'
+                });
+                $("ul", this).append(item);
+                // Add empty element on empty lists
+                
+                $(".targetdrop ul").each(function(index){
+                if ($("li", this).length  == 0) {
+                    $(this).append("<li class='empty'>Empty</li>");
+                }
+                });
+                return false;
+            }
+        });
+        
+        $(".roomitem").draggable({
+            revert: 'invalid'
+        });
+        
+        /*
         $('#dragdroprooms').dragdrop_basic({
             zones : [{
                 zonesselector: ".targetdrop",
@@ -54,20 +94,10 @@
                 itemselector: ".roomitem",
                 labelselector: "legend",
                 dropcallback: function(self, element, target) {
-                    $.getREST(['base', 'room', 'update', 'id', element, 'area_id', target],
-                        function(data) {
-                            var status = (data.status).toLowerCase();
-                            if (status == 'ok') {
-                                self.valid();
-                            } else {
-                                self.cancel();
-                                $.notification('error', data.description);                                          
-                            }
-                        }
-                    )
+                    
                 }
             }]
-        });
+        });*/
 
         /* Dialogs */
         $('#delete_confirmation').dialog_confirmation({
@@ -218,6 +248,8 @@
             <ul class="roomslist">
                 {% for room in unattribued_rooms %}
                 <li class="roomitem icon32-room-{{ room.config.icon }}" ddvalue="{{ room.id }}" ddname='{{ room.description }}'>{{ room.name }}<span class="description">{{ room.description }}</span></li>
+                {% empty %}
+                <li class="empty">{% trans "Empty" %}</li>
                 {% endfor %}
             </ul>
         </fieldset>
@@ -227,6 +259,8 @@
             <ul class="roomslist">
                 {% for room in area.room %}
                 <li class="roomitem icon32-room-{{ room.config.icon }}" ddvalue="{{ room.id }}" ddname='{{ room.description }}'>{{ room.name }}<span class="description">{{ room.description }}</span></li>
+                {% empty %}
+                <li class="empty">{% trans "Empty" %}</li>
                 {% endfor %}
             </ul>
         </fieldset>
