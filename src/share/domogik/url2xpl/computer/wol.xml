@@ -3,7 +3,7 @@
     <schema>control.basic</schema>
     <command-key>current</command-key>    
     <address-key>device</address-key>    
-    <command-xpl-value>on</command-xpl-value>
+    <command-xpl-value>HIGH</command-xpl-value>
     <parameters>
       <parameter key="type" value="wakeonlan"/>          
     </parameters>
@@ -13,7 +13,7 @@
     <xpltype>xpl-trig</xpltype>
     <filter>
       <key name="type" value="wakeonlan" />
-      <key name="current" value="on" />
+      <key name="current" value="HIGH" />
       <key name="device" value="@address@"/>
     </filter>
   </listener>
