@@ -25,30 +25,30 @@
 
 {% block js_script %}
     $(function() {
+        var totalactions = 0;
+        var finishactions = 0;
+        var savetries = 0;
+        var json = {};
+        
         $("#customize a").click(function() {
-        /*
-            $.getREST(['base', 'feature_association', 'del', 'association_type', 'area', 'association_id', '{{ area.id }}'],
-                function(data) {
-                    var status = (data.status).toLowerCase();
-                    if (status != 'ok') {
-//                        self.cancel();
-                        $.notification('error', data.description);                                          
-                    }
-                }
-            );*/
+            totalactions = $(".maininfo li:first, .mainactions li, .otheractions li").length;
+            finishactions = 0;
+            savetries = 0;
+        
+            json = {};
 
-            var json = {};
             // Main info
-            var maininfo = $(".maininfo li:first");
-            json.maininfo = {device:maininfo.attr('devicevalue'), feature:maininfo.attr('featurevalue')};
-//            addAssociation(maininfo.attr('devicevalue'), maininfo.attr('featurevalue'));
+            $(".maininfo li:first").each(function(index) {
+                json.maininfo = {device:$(this).attr('devicevalue'), feature:$(this).attr('featurevalue')};
+                addAssociation($(this).attr('devicevalue'), $(this).attr('featurevalue'));
+            });
 
             // Main actions
             json.mainactions = [];
             $(".mainactions li").each(function(index) {
                 var action = {device:$(this).attr('devicevalue'), feature:$(this).attr('featurevalue')};
                 json.mainactions.push(action);
-//                addAssociation($(this).attr('devicevalue'), $(this).attr('featurevalue'));
+                addAssociation($(this).attr('devicevalue'), $(this).attr('featurevalue'));
             });
             
             // Other actions
@@ -56,42 +56,63 @@
             $(".otheractions li").each(function(index) {
                 var action = {device:$(this).attr('devicevalue'), feature:$(this).attr('featurevalue')};
                 json.otheractions.push(action);
-//                addAssociation($(this).attr('devicevalue'), $(this).attr('featurevalue'));
+                addAssociation($(this).attr('devicevalue'), $(this).attr('featurevalue'));
             });
-
+            
             // Save ui config
-            var jsonstr = JSON.stringify(json).replace(/"/g, '&quot;');
-            $.getREST(['base', 'ui_config', 'set', 'name', 'area', 'reference', '{{ area.name }}', 'key', 'widget_placement', 'value', jsonstr],
-                function(data) {
-                    var status = (data.status).toLowerCase();
-                    if (status == 'ok') {
-//                                  self.valid();
-                    } else {
-//                                  self.cancel();
-                        $.notification('error', data.description);                                          
-                    }
-                }
-            ); 
+            saveUIConfig();
         });
-        
-        function addAssociation(deviceid, featureid) {
-            $.getREST(['base', 'feature_association', 'add', 'device_id', deviceid, 'feature_id', featureid, 'association_type', 'area', 'association_id', '{{ area.name }}'],
-                function(data) {
-                    var status = (data.status).toLowerCase();
-                    if (status == 'ok') {
-                    } else {
-//                        self.cancel();
-                        $.notification('error', data.description);                                          
-                    }
+
+        function saveUIConfig() {
+            savetries++;
+            if (savetries < 5) {
+                if (finishactions < totalactions) {
+                    window.setTimeout(saveUIConfig, 1000);
+                } else {
+                    var jsonstr = JSON.stringify(json).replace(/"/g, '&quot;');
+                    $.getREST(['base', 'ui_config', 'set', 'name', 'area', 'reference', '{{ area.id }}', 'key', 'widget_placement', 'value', jsonstr],
+                        function(data) {
+                            var status = (data.status).toLowerCase();
+                            if (status == 'ok') {
+                                $.loadPage('{% url show_area_view area.id %}', {'status': 'ok', 'msg': '{% trans "Page successfully configured" %}'});
+                            } else {
+                                $.notification('error', data.description);                                          
+                            }
+                        }
+                    );                    
                 }
-            );        
+            } else {
+                $.notification('error', 'Impossible to save everything : some widgets returned errors');                                                      
+            }
         }
         
-        {% if house.widget_placement.maininfo %}
+        function addAssociation(deviceid, featureid) {
+            $.getREST(['base', 'feature_association', 'del', 'device_id', deviceid, 'feature_id', featureid],
+                function(data) {
+                    var status = (data.status).toLowerCase();
+                    if (status == 'ok') {
+                        $.getREST(['base', 'feature_association', 'add', 'device_id', deviceid, 'feature_id', featureid, 'association_type', 'area', 'association_id', '{{ area.id }}'],
+                            function(data) {
+                                var status = (data.status).toLowerCase();
+                                if (status == 'ok') {
+                                    finishactions++;
+                                } else {
+                                    $.notification('error', data.description);                                          
+                                }
+                            }
+                        );
+                    } else {
+                        $.notification('error', data.description);                                          
+                    }
+                }
+            );
+        }
+        
+        {% if area.config.widget_placement.maininfo %}
             $(".maininfo ul").widget_model({
-                featurevalue: {{ house.widget_placement.maininfo.feature }},
+                featurevalue: '{{ area.config.widget_placement.maininfo.feature }}',
                 featurename: 'featurename',
-                devicevalue: {{ house.widget_placement.maininfo.device }},
+                devicevalue: '{{ area.config.widget_placement.maininfo.device }}',
                 devicename: 'devicename',
                 draggable: {
                     helper: false,
@@ -113,11 +134,11 @@
             });
         {% endif %}
         
-        {% for action in house.widget_placement.mainactions %}
+        {% for action in area.config.widget_placement.mainactions %}
             $(".mainactions ul").widget_model({
-                featurevalue: {{ action.feature }},
+                featurevalue: '{{ action.feature }}',
                 featurename: 'featurename',
-                devicevalue: {{ action.device }},
+                devicevalue: '{{ action.device }}',
                 devicename: 'devicename',
                 draggable: {
                     helper: false,
@@ -139,11 +160,11 @@
             });
         {% endfor %}
         
-        {% for action in house.widget_placement.otheractions %}
+        {% for action in area.config.widget_placement.otheractions %}
             $(".otheractions ul").widget_model({
-                featurevalue: {{ action.feature }},
+                featurevalue: '{{ action.feature }}',
                 featurename: 'featurename',
-                devicevalue: {{ action.device }},
+                devicevalue: '{{ action.device }}',
                 devicename: 'devicename',
                 draggable: {
                     helper: false,
@@ -233,11 +254,11 @@
 {% block title %}{% trans page_title %}{% endblock %}
 
 {% block breadcrumb %}
-        <li id='customize'><a href='{% url show_house_view %}' class='icon16-action-submit'>Finish</a></li>
+        <li id='customize'><a href='#' class='icon16-action-submit'>{% trans "Finish" %}</a></li>
 {% endblock %}
 
 {% block banner %}
-    <h1 class="ident icon64-house-default"><span class="title">{{ house.name }}</span></h1>
+    <h1 class="ident icon64-area-{{ area.config.icon }}"><span class="title">{{ area.name }}</span></h1>
     <div class="maininfo" ddvalue='maininfo' ddname='Main info'>
         <span class='offscreen'>{% trans "Main info" %}</span>
         <ul></ul>

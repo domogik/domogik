@@ -59,6 +59,15 @@ $.extend({
         window.location = newlocation;
     },
 
+    loadPage: function(url, data) {
+        var newlocation = url;
+        newlocation += "?";
+        $.each(data, function(key, value) {
+            newlocation += key + "=" + value + "&";
+        });
+        window.location = newlocation;
+    },
+    
     getREST: function(parameters, callback) {
         url = rest_url + '/';
         // Build the REST url

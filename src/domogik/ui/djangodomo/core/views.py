@@ -518,7 +518,12 @@ def show_area_edit(request, area_id):
         result_area_by_id = Areas.get_by_id(area_id)
         result_area_by_id.merge_uiconfig()
         result_area_by_id.merge_feature_associations()
-        result_house = UIConfigs.get_general('house')
+        result_house = House.get()
+        
+        result_all_devices = Devices.get_all()
+        result_all_devices.merge_uiconfig()
+        result_all_devices.merge_features()
+
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
 
@@ -528,7 +533,8 @@ def show_area_edit(request, area_id):
         page_title,
         nav1_show = "selected",
         area=result_area_by_id.area[0],
-        house=result_house
+        house=result_house,
+        devices_list=result_all_devices.device
     )
     
 def show_room(request, room_id):
@@ -553,4 +559,34 @@ def show_room(request, room_id):
         nav1_show = "selected",
         room=result_room_by_id.room[0],
         house=result_house
+    )
+
+def show_room_edit(request, room_id):
+    """
+    Method called when the show room page is accessed
+    @param request : HTTP request
+    @return an HttpResponse object
+    """
+    try:
+        result_room_by_id = Rooms.get_by_id(room_id)
+        result_room_by_id.merge_uiconfig()
+        result_room_by_id.merge_feature_associations()
+
+        result_house = House.get()
+
+        result_all_devices = Devices.get_all()
+        result_all_devices.merge_uiconfig()
+        result_all_devices.merge_features()
+
+    except ResourceNotAvailableException:
+        return render_to_response('error/ResourceNotAvailableException.html')
+
+    page_title = _("Edit ") + result_room_by_id.room[0].name
+    return __go_to_page(
+        request, 'show/room.edit.html',
+        page_title,
+        nav1_show = "selected",
+        room=result_room_by_id.room[0],
+        house=result_house,
+        devices_list=result_all_devices.device
     )

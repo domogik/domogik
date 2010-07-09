@@ -60,5 +60,5 @@ urlpatterns = patterns('domogik.ui.djangodomo.core.views',
     url(r'show/area/(?P<area_id>\d+)/$', 'show_area', name='show_area_view'),
     url(r'show/area/edit/(?P<area_id>\d+)/$', 'show_area_edit', name='show_area_edit_view'),
     url(r'show/room/(?P<room_id>\d+)/$', 'show_room', name='show_room_view'),
-#    url(r'show/room/edit/(?P<room_id>\d+)/$', 'show_room_edit', name='show_room_edit_view')
+    url(r'show/room/edit/(?P<room_id>\d+)/$', 'show_room_edit', name='show_room_edit_view')
 )

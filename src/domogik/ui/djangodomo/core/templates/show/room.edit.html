@@ -35,17 +35,6 @@
             finishactions = 0;
             savetries = 0;
         
-        /*
-            $.getREST(['base', 'feature_association', 'del', 'association_type', 'house', 'association_id', '0'],
-                function(data) {
-                    var status = (data.status).toLowerCase();
-                    if (status != 'ok') {
-//                        self.cancel();
-                        $.notification('error', data.description);                                          
-                    }
-                }
-            );*/
-
             json = {};
 
             // Main info
@@ -81,11 +70,11 @@
                     window.setTimeout(saveUIConfig, 1000);
                 } else {
                     var jsonstr = JSON.stringify(json).replace(/"/g, '&quot;');
-                    $.getREST(['base', 'ui_config', 'set', 'name', 'house', 'reference', '0', 'key', 'widget_placement', 'value', jsonstr],
+                    $.getREST(['base', 'ui_config', 'set', 'name', 'room', 'reference', '{{ room.id }}', 'key', 'widget_placement', 'value', jsonstr],
                         function(data) {
                             var status = (data.status).toLowerCase();
                             if (status == 'ok') {
-                                $.loadPage('{% url show_house_view %}', {'status': 'ok', 'msg': '{% trans "Page successfully configured" %}'});
+                                $.loadPage('{% url show_room_view room.id %}', {'status': 'ok', 'msg': '{% trans "Page successfully configured" %}'});
                             } else {
                                 $.notification('error', data.description);                                          
                             }
@@ -102,7 +91,7 @@
                 function(data) {
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
-                        $.getREST(['base', 'feature_association', 'add', 'device_id', deviceid, 'feature_id', featureid, 'association_type', 'house', 'association_id', '0'],
+                        $.getREST(['base', 'feature_association', 'add', 'device_id', deviceid, 'feature_id', featureid, 'association_type', 'room', 'association_id', '{{ room.id }}'],
                             function(data) {
                                 var status = (data.status).toLowerCase();
                                 if (status == 'ok') {
@@ -119,11 +108,11 @@
             );
         }
         
-        {% if house.config.widget_placement.maininfo %}
+        {% if room.config.widget_placement.maininfo %}
             $(".maininfo ul").widget_model({
-                featurevalue: '{{ house.config.widget_placement.maininfo.feature }}',
+                featurevalue: '{{ room.config.widget_placement.maininfo.feature }}',
                 featurename: 'featurename',
-                devicevalue: '{{ house.config.widget_placement.maininfo.device }}',
+                devicevalue: '{{ room.config.widget_placement.maininfo.device }}',
                 devicename: 'devicename',
                 draggable: {
                     helper: false,
@@ -145,7 +134,7 @@
             });
         {% endif %}
         
-        {% for action in house.config.widget_placement.mainactions %}
+        {% for action in room.config.widget_placement.mainactions %}
             $(".mainactions ul").widget_model({
                 featurevalue: '{{ action.feature }}',
                 featurename: 'featurename',
@@ -171,7 +160,7 @@
             });
         {% endfor %}
         
-        {% for action in house.config.widget_placement.otheractions %}
+        {% for action in room.config.widget_placement.otheractions %}
             $(".otheractions ul").widget_model({
                 featurevalue: '{{ action.feature }}',
                 featurename: 'featurename',
@@ -253,7 +242,6 @@
             return false;
         }
     });
-
 {% endblock %}
 
 {% block css %}
@@ -268,8 +256,9 @@
 {% block breadcrumb %}
         <li id='customize'><a href='#' class='icon16-action-submit'>{% trans "Finish" %}</a></li>
 {% endblock %}
+
 {% block banner %}
-    <h1 class="ident icon64-house-default"><span class="title">{{ house.name }}</span></h1>
+    <h1 class="ident icon64-room-{{ room.config.icon }}"><span class="title">{{ room.name }}</span></h1>
     <div class="maininfo" ddvalue='maininfo' ddname='Main info'>
         <span class='offscreen'>{% trans "Main info" %}</span>
         <ul></ul>
