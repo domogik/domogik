@@ -34,6 +34,7 @@
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.info-boolean.css" rel="stylesheet" type="text/css" />
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-page-section.css" rel="stylesheet" type="text/css" />
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-dialog.css" rel="stylesheet" type="text/css" />
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/page-show.css" rel="stylesheet" type="text/css" />
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/page-home.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block js_include %}
@@ -52,14 +53,8 @@
 {% block js_script %}
     $(function() {
         {% for association in house_features_associations %}
-            {% ifequal association.device_feature.feature_type "actuator" %}
-                {% get_command_widget association %}
-                {% get_command_init association %}
-            {% endifequal %}
-            {% ifequal association.device_feature.feature_type "sensor" %}
-                {% get_info_widget association %}
-                {% get_info_init association %}
-            {% endifequal %}
+			{% get_widget association %}
+			{% get_widget_init association %}
         {% endfor %}
 
         {% if house_features_associations %}
@@ -74,12 +69,7 @@
                             switch (item.key) {                        
                             {% for association in device.list %}
                                 case '{{ association.device_feature.stat_key }}':
-                                    {% ifequal association.device_feature.feature_type "actuator" %}
-                                        {% get_command_update association 'item.value' %}
-                                    {% endifequal %}
-                                    {% ifequal association.device_feature.feature_type "sensor" %}
-                                        {% get_info_update association 'item.value' %}
-                                    {% endifequal %}                            
+									{% get_widget_update association 'item.value' %}
                                     break;
                             {% endfor %}                    
                             }
@@ -107,18 +97,32 @@
         </div-->
     <div class="columnleft">
         <section id="mainsection">
-            <header id="contentheader"><h1 class="ident icon64-house-default"><span class="title">{{ house.name }}</span></h1></header>
-            <div class='mainactions'>
-                <ul>
-                </ul>
-            </div>
-            <div class='actions'>
-                <ul>
-                    {% for association in house_features_associations %}
-                        <li><div id="widget_{{ association.device_id }}_{{ association.device_feature_id }}"></div></li>
-                    {% endfor %}
-                </ul>
-            </div>
+            <header id="contentheader">
+				<h1 class="ident icon64-house-default"><span class="title">{{ house.name }}</span></h1>
+				<div class="maininfo">
+					<ul>
+					{% if house.config.widget_placement.maininfo %}
+						<li><div id="widget_{{ house.config.widget_placement.maininfo.device }}_{{ house.config.widget_placement.maininfo.feature }}"></div></li>
+					{% endif %}    
+					</ul>
+				</div>
+			</header>
+			<div class='actions'>
+				<div class='mainactions'>
+					<ul>
+					{% for action in house.config.widget_placement.mainactions %}
+						<li><div id="widget_{{ action.device }}_{{ action.feature }}"></div></li>
+					{% endfor %}
+					</ul>
+				</div>
+				<div class='otheractions'>
+					<ul>
+					{% for action in house.config.widget_placement.otheractions %}
+						<li><div id="widget_{{ action.device }}_{{ action.feature }}"></div></li>
+					{% endfor %}
+					</ul>
+				</div>
+			</div>
         </section>
     </div>
     <div class="columnright">

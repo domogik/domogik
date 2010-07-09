@@ -46,7 +46,16 @@ def unescape(s):
     "unescape HTML code refs; c.f. http://wiki.python.org/moin/EscapingHtml"
     return re.sub('&(%s);' % '|'.join(name2codepoint),
               lambda m: unichr(name2codepoint[m.group(1)]), s)
-    
+
+class House():
+    @staticmethod
+    def get():
+        resp = {}
+        resp['config'] = UIConfigs.get_by_reference('house', '0')
+        if resp['config'].has_key('name') :
+            resp['name'] = resp['config']['name']
+        return resp
+        
 class Areas(pipes.DmgPipe):
     uri = settings.REST_URL + "/base/area"
 
@@ -69,18 +78,12 @@ class Areas(pipes.DmgPipe):
             
     def merge_uiconfig(self):
         for area in self.area:
-            uiconfigs = UIConfigs.get_by_reference('area', area.id)
-            area.config = {}
-            for uiconfig in uiconfigs.ui_config:
-                area.config[uiconfig.key] = uiconfig.value
+            area.config = UIConfigs.get_by_reference('area', area.id)
 
             # If has rooms
             if hasattr(area, 'room') and (area.room != 'None'):
                 for room in area.room:
-                    uiconfigs = UIConfigs.get_by_reference('room', room.id)
-                    room.config = {}
-                    for uiconfig in uiconfigs.ui_config:
-                        room.config[uiconfig.key] = uiconfig.value
+                    room.config = UIConfigs.get_by_reference('room', room.id)
 
     def merge_feature_associations(self):
         for area in self.area:
@@ -116,17 +119,11 @@ class Rooms(pipes.DmgPipe):
 
     def merge_uiconfig(self):
         for room in self.room:
-            uiconfigs = UIConfigs.get_by_reference('room', room.id)
-            room.config = {}
-            for uiconfig in uiconfigs.ui_config:
-                room.config[uiconfig.key] = uiconfig.value
+            room.config = UIConfigs.get_by_reference('room', room.id)
 
             # If is associated with area
             if hasattr(room, 'area') and (room.area != 'None') :
-                uiconfigs = UIConfigs.get_by_reference('area', room.area.id)
-                room.area.config = {}
-                for uiconfig in uiconfigs.ui_config:
-                    room.area.config[uiconfig.key] = uiconfig.value
+                room.area.config = UIConfigs.get_by_reference('area', room.area.id)
 
     def merge_feature_associations(self):
         for room in self.room:
@@ -146,10 +143,7 @@ class Devices(pipes.DmgPipe):
         for device in self.device:
             # If is associated with room
             if hasattr(device, 'room') and (device.room != 'None') :
-                uiconfigs = UIConfigs.get_by_reference('room', device.room.id)
-                device.room.config = {}
-                for uiconfig in uiconfigs.ui_config:
-                    device.room.config[uiconfig.key] = uiconfig.value
+                device.room.config = UIConfigs.get_by_reference('room', device.room.id)
 
     def merge_features(self):
         for device in self.device:
@@ -265,20 +259,8 @@ class UIConfigs(pipes.DmgPipe):
 
     @staticmethod
     def get_by_key(name, key):
-        resp = UIConfigs.objects.get({'parameters':"list/by-key/" + name + "/" + key})
-        if resp :
-            return resp
-
-    @staticmethod
-    def get_by_reference(name, reference):
-        resp = UIConfigs.objects.get({'parameters':"list/by-reference/" + name + "/" + str(reference)})
-        if resp :
-            return resp
-
-    @staticmethod
-    def get_general(reference):
         resp = {}
-        uiconfigs = UIConfigs.objects.get({'parameters':"list/by-reference/general/" + str(reference)})
+        uiconfigs = UIConfigs.objects.get({'parameters':"list/by-key/" + name + "/" + key})
         if uiconfigs :
             for uiconfig in uiconfigs.ui_config:
                 if (uiconfig.value[0] == '{') : # json structure 
@@ -287,6 +269,18 @@ class UIConfigs(pipes.DmgPipe):
                     resp[uiconfig.key] = uiconfig.value
             return resp
 
+    @staticmethod
+    def get_by_reference(name, reference):
+        resp = {}
+        uiconfigs = UIConfigs.objects.get({'parameters':"list/by-reference/" + name + "/" + str(reference)})
+        if uiconfigs :
+            for uiconfig in uiconfigs.ui_config:
+                if (uiconfig.value[0] == '{') : # json structure 
+                    resp[uiconfig.key] = simplejson.loads(unescape(uiconfig.value))
+                else :
+                    resp[uiconfig.key] = uiconfig.value
+            return resp
+    
 class Plugins(pipes.DmgPipe):
     uri = settings.REST_URL + "/plugin"
 

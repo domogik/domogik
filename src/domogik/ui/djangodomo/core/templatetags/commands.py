@@ -199,16 +199,18 @@ class GetInfoString():
     def get_setValue(feature, value):
         script = ""
         return script
+
     
-class GetCommandWidget(Node):
+class GetWidget(Node):
     def __init__(self, feature):
         self.feature = template.Variable(feature)
 
     def render(self, context):
         feature = self.feature.resolve(context)
+
         device_type = DeviceTypes.get_dict_item(feature.device.device_type_id)
         device_usage = DeviceUsages.get_dict_item(feature.device.device_usage_id)
-        
+
         parameters_type = None;
         if feature.device_feature.parameters != 'None':
             parameters_type = simplejson.loads(unescape(feature.device_feature.parameters))
@@ -216,67 +218,23 @@ class GetCommandWidget(Node):
         if device_usage.default_options != 'None':
             parameters_usage = simplejson.loads(unescape(device_usage.default_options))
         
-        if feature.device_feature.value_type == "binary":
-            script = GetCommandBinary.get_widget_mini(feature, device_type, device_usage, parameters_type, parameters_usage)
-        if feature.device_feature.value_type == "range":
-            script = GetCommandRange.get_widget_mini(feature, device_type, device_usage, parameters_type, parameters_usage)
-        if feature.device_feature.value_type == "trigger":
-            script = GetCommandTrigger.get_widget_mini(feature, device_type, device_usage, parameters_type, parameters_usage)
-        return script
-
-class GetCommandInit(Node):
-    def __init__(self, feature):
-        self.feature = template.Variable(feature)
-
-    def render(self, context):
-        feature = self.feature.resolve(context)
-        stat = Stats.get_latest(feature.device_id, feature.device_feature.stat_key)
-        script = ""
-        if len(stat.stats) > 0 :
+        if feature.device_feature.feature_type == "actuator":
             if feature.device_feature.value_type == "binary":
-                script = GetCommandBinary.get_setValue(feature, "'" + stat.stats[0].value + "'")
+                script = GetCommandBinary.get_widget_mini(feature, device_type, device_usage, parameters_type, parameters_usage)
             if feature.device_feature.value_type == "range":
-                script = GetCommandRange.get_setValue(feature, "'" + stat.stats[0].value + "'")
+                script = GetCommandRange.get_widget_mini(feature, device_type, device_usage, parameters_type, parameters_usage)
+            if feature.device_feature.value_type == "trigger":
+                script = GetCommandTrigger.get_widget_mini(feature, device_type, device_usage, parameters_type, parameters_usage)
+        else : # 'Sensor'
+            if feature.device_feature.value_type == "boolean":
+                script = GetInfoBoolean.get_widget_mini(feature, device_type, device_usage, parameters_type, parameters_usage)
+            if feature.device_feature.value_type == "number":
+                script = GetInfoNumber.get_widget_mini(feature, device_type, device_usage, parameters_type, parameters_usage)
+            if feature.device_feature.value_type == "string":
+                script = GetInfoString.get_widget_mini(feature, device_type, device_usage, parameters_type, parameters_usage)
         return script
 
-class GetCommandUpdate(Node):
-    def __init__(self, feature, value):
-        self.feature = template.Variable(feature)
-        self.value = template.Variable(value)
-
-    def render(self, context):
-        feature = self.feature.resolve(context)
-        value = self.value.resolve(context)
-        script = ""
-        if feature.device_feature.value_type == "binary":
-            script = GetCommandBinary.get_setValue(feature, value)
-        if feature.device_feature.value_type == "range":
-            script = GetCommandRange.get_setValue(feature, value)
-        return script
-    
-class GetInfoWidget(Node):
-    def __init__(self, feature):
-        self.feature = template.Variable(feature)
-
-    def render(self, context):
-        feature = self.feature.resolve(context)
-        device_type = DeviceTypes.get_dict_item(feature.device.device_type_id)
-        device_usage = DeviceUsages.get_dict_item(feature.device.device_usage_id)
-        parameters_type = None;
-        if feature.device_feature.parameters != 'None':
-            parameters_type = simplejson.loads(unescape(feature.device_feature.parameters))
-        parameters_usage = None;
-        if device_usage.default_options != 'None':
-            parameters_usage = simplejson.loads(unescape(device_usage.default_options))
-        if feature.device_feature.value_type == "boolean":
-            script = GetInfoBoolean.get_widget_mini(feature, device_type, device_usage, parameters_type, parameters_usage)
-        if feature.device_feature.value_type == "number":
-            script = GetInfoNumber.get_widget_mini(feature, device_type, device_usage, parameters_type, parameters_usage)
-        if feature.device_feature.value_type == "string":
-            script = GetInfoString.get_widget_mini(feature, device_type, device_usage, parameters_type, parameters_usage)
-        return script
-
-class GetInfoInit(Node):
+class GetWidgetInit(Node):
     def __init__(self, feature):
         self.feature = template.Variable(feature)
 
@@ -285,15 +243,21 @@ class GetInfoInit(Node):
         stat = Stats.get_latest(feature.device_id, feature.device_feature.stat_key)
         script = ""
         if len(stat.stats) > 0 :
-            if feature.device_feature.value_type == "boolean":
-                script = GetInfoBoolean.get_setValue(feature, "'" + stat.stats[0].value + "'")
-            if feature.device_feature.value_type == "number":
-                script = GetInfoNumber.get_setValue(feature, "'" + stat.stats[0].value + "'")
-            if feature.device_feature.value_type == "string":
-                script = GetInfoString.get_setValue(feature, "'" + stat.stats[0].value + "'")
+            if feature.device_feature.feature_type == "actuator":
+                if feature.device_feature.value_type == "binary":
+                    script = GetCommandBinary.get_setValue(feature, "'" + stat.stats[0].value + "'")
+                if feature.device_feature.value_type == "range":
+                    script = GetCommandRange.get_setValue(feature, "'" + stat.stats[0].value + "'")
+            else: # 'Sensor'
+                if feature.device_feature.value_type == "boolean":
+                    script = GetInfoBoolean.get_setValue(feature, "'" + stat.stats[0].value + "'")
+                if feature.device_feature.value_type == "number":
+                    script = GetInfoNumber.get_setValue(feature, "'" + stat.stats[0].value + "'")
+                if feature.device_feature.value_type == "string":
+                    script = GetInfoString.get_setValue(feature, "'" + stat.stats[0].value + "'")
         return script
 
-class GetInfoUpdate(Node):
+class GetWidgetUpdate(Node):
     def __init__(self, feature, value):
         self.feature = template.Variable(feature)
         self.value = template.Variable(value)
@@ -302,100 +266,61 @@ class GetInfoUpdate(Node):
         feature = self.feature.resolve(context)
         value = self.value.resolve(context)
         script = ""
-        if feature.device_feature.value_type == "boolean":
-            script = GetInfoBoolean.get_setValue(feature, value)
-        if feature.device_feature.value_type == "number":
-            script = GetInfoNumber.get_setValue(feature, value)
-        if feature.device_feature.value_type == "string":
-            script = GetInfoString.get_setValue(feature, value)
+        if feature.device_feature.feature_type == "actuator":
+            if feature.device_feature.value_type == "binary":
+                script = GetCommandBinary.get_setValue(feature, value)
+            if feature.device_feature.value_type == "range":
+                script = GetCommandRange.get_setValue(feature, value)
+        else: # 'Sensor'
+            if feature.device_feature.value_type == "boolean":
+                script = GetInfoBoolean.get_setValue(feature, value)
+            if feature.device_feature.value_type == "number":
+                script = GetInfoNumber.get_setValue(feature, value)
+            if feature.device_feature.value_type == "string":
+                script = GetInfoString.get_setValue(feature, value)
         return script
+    
+def do_get_widget(parser, token):
+    """
+    This returns the jquery function for creating a widget.
+
+    Usage::
+
+        {% get_widget feature %}
+    """
+    args = token.contents.split()
+    if len(args) != 2:
+        raise TemplateSyntaxError, "'get_widget' requires 'feature' argument"
+    return GetWidget(args[1])
+
+register.tag('get_widget', do_get_widget)
         
-def do_get_command_widget(parser, token):
+def do_get_widget_init(parser, token):
     """
-    This returns the jquery function for creating a command widget.
+    This returns the jquery function to init a widget.
 
     Usage::
 
-        {% get_command_widget feature %}
+        {% get_widget_init feature %}
     """
     args = token.contents.split()
     if len(args) != 2:
-        raise TemplateSyntaxError, "'get_command_widget' requires 'feature' argument"
-    return GetCommandWidget(args[1])
+        raise TemplateSyntaxError, "'get_widget_init' requires 'feature' argument"
+    return GetWidgetInit(args[1])
 
-register.tag('get_command_widget', do_get_command_widget)
+register.tag('get_widget_init', do_get_widget_init)
 
-def do_get_command_init(parser, token):
+def do_get_widget_update(parser, token):
     """
-    This returns the jquery function to init a command widget.
+    This returns the jquery function to update a widget.
 
     Usage::
 
-        {% get_command_init feature %}
-    """
-    args = token.contents.split()
-    if len(args) != 2:
-        raise TemplateSyntaxError, "'get_command_init' requires 'feature' argument"
-    return GetCommandInit(args[1])
-
-register.tag('get_command_init', do_get_command_init)
-
-def do_get_command_update(parser, token):
-    """
-    This returns the jquery function to update a command widget.
-
-    Usage::
-
-        {% get_command_update feature js_var %}
+        {% get_widget_update feature js_var %}
     """
     args = token.contents.split()
     if len(args) != 3:
-        raise TemplateSyntaxError, "'get_command_update' requires 'feature' argument and the js var name for value"
-    return GetCommandUpdate(args[1], args[2])
+        raise TemplateSyntaxError, "'get_widget_update' requires 'feature' argument and the js var name for value"
+    return GetWidgetUpdate(args[1], args[2])
 
-register.tag('get_command_update', do_get_command_update)
-
-def do_get_info_widget(parser, token):
-    """
-    This returns the jquery function for creating a info widget.
-
-    Usage::
-
-        {% get_info_widget feature %}
-    """
-    args = token.contents.split()
-    if len(args) != 2:
-        raise TemplateSyntaxError, "'get_info_widget' requires 'feature' argument"
-    return GetInfoWidget(args[1])
-
-register.tag('get_info_widget', do_get_info_widget)
-
-def do_get_info_init(parser, token):
-    """
-    This returns the jquery function to init a info widget.
-
-    Usage::
-
-        {% get_info_init feature %}
-    """
-    args = token.contents.split()
-    if len(args) != 2:
-        raise TemplateSyntaxError, "'get_info_init' requires 'feature' argument"
-    return GetInfoInit(args[1])
-
-register.tag('get_info_init', do_get_info_init)
-
-def do_get_info_update(parser, token):
-    """
-    This returns the jquery function to update a info widget.
-
-    Usage::
-
-        {% get_info_update feature js_var %}
-    """
-    args = token.contents.split()
-    if len(args) != 3:
-        raise TemplateSyntaxError, "'get_info_update' requires 'feature' argument and the js var name for value"
-    return GetInfoUpdate(args[1], args[2])
-
-register.tag('get_info_update', do_get_info_update)
+register.tag('get_widget_update', do_get_widget_update)
