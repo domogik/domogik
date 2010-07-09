@@ -8,7 +8,7 @@
                 </filter>
             </listener>
             <mapping>
-                <device name="phone"/>
+                <device static_name="phone"/>
                 <value field="phone" />
             </mapping>
         </xpltype>
