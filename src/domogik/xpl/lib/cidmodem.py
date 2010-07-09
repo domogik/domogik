@@ -88,6 +88,15 @@ class CallerIdModem:
             error = "Error while opening modem device : %s" % device
             raise CallerIdModemException(error)
 
+    def close(self):
+        """ close Modem device
+        """
+        self._log.info("Close modem device")
+        try:
+            self._ser.close()
+        except:
+            error = "Error while closing modem device"
+            raise CallerIdModemException(error)
 
     def listen(self):
         """ listen modem for incoming calls
