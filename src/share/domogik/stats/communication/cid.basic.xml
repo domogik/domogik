@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<statistic technology="communication">
+    <schema name="cid.basic">
+        <xpltype type="xpl-trig">
+            <listener>
+                <filter>
+                    <key name="calltype" value="inbound"/>
+                </filter>
+            </listener>
+            <mapping>
+                <device name="phone"/>
+                <value field="phone" />
+            </mapping>
+        </xpltype>
+    </schema>
+</statistic>
+
