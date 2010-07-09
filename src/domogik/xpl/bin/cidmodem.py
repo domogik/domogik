@@ -22,12 +22,12 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 Plugin purpose
 ==============
 
-Caller ID with modem support
+Caller id with a modem support
 
 Implements
 ==========
 
-- CallerIdModemManager
+- CIDManager
 
 @author: Fritz <fritz.smh@gmail.com>
 @copyright: (C) 2007-2009 Domogik project
@@ -38,56 +38,64 @@ Implements
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.plugin import XplResult
-from domogik.xpl.lib.cidmodem import CallerIdModem
 from domogik.xpl.common.queryconfig import Query
+from domogik.xpl.lib.cidmodem import CallerIdModem
+from domogik.xpl.lib.cidmodem import CallerIdModemException
+import threading
 
 
-class CallerIdModemManager(XplPlugin):
-    '''
-    Manage the Caller ID with Modem stuff and connect it to xPL
-    '''
+class CIDManager(XplPlugin):
+    """ Manage the modem to get CID
+    """
 
     def __init__(self):
         """ Init plugin
         """
         XplPlugin.__init__(self, name='cidmodem')
-        try:
-            # Get config
-            #   - serial port
-            raise
-            self._config = Query(self._myxpl)
-            res = XplResult()
-            self._config.query('cidmodem', 'device', res)
-            device = res.get_value()['device']
-            self._config = Query(self._myxpl)
-            res = XplResult()
-            self._config.query('cidmodem', 'interval', res)
-            interval = res.get_value()['interval']
-            self._config = Query(self._myxpl)
-            res = XplResult()
-            self._config.query('cidmodem', 'nbmaxtry', res)
-            nbmaxtry = res.get_value()['nbmaxtry']
-            # Call Library
-            self._mycalleridmodem  = CallerIdModem(self._log,\
-                                                   device, nbmaxtry, \
-                                                   interval, \
-                                                   self._broadcastframe)
-            self._mycalleridmodem.start()
-        except:
-            print "Zut alors!"
-            self.force_leave()
 
-    def _broadcastframe(self, data):
-        """ Send data on xPL network
-            @param data : data to send : phone number
+        # Configuration
+        self._config = Query(self._myxpl)
+        res = XplResult()
+        self._config.query('cidmodem', 'device', res)
+        device = res.get_value()['device']
+
+        self._config = Query(self._myxpl)
+        res = XplResult()
+        self._config.query('cidmodem', 'cid-command', res)
+        cid_command = res.get_value()['cid-command']
+
+        # Init Modem
+        cid  = CallerIdModem(self._log, self.send_xpl)
+        
+        # Open Modem
+        try:
+            cid.open(device, cid_command)
+        except CallerIdModemException as e:
+            self._log.error(e.value)
+            print e.value
+            self.force_leave()
+            return
+            
+        # Start reading Modem
+        cid_process = threading.Thread(None,
+                                   cid.listen,
+                                   None,
+                                   (),
+                                   {})                                  
+        cid_process.start()                              
+
+    def send_xpl(self, num):
+        """ Send xPL message on network
+            @param num : call number
         """
-        my_temp_message = XplMessage()
-        my_temp_message.set_type("xpl-trig")
-        my_temp_message.set_schema("cid.basic")
-        my_temp_message.add_data({"calltype" : "INBOUND"})
-        my_temp_message.add_data({"phone" : data})
-        self._myxpl.send(my_temp_message)
+        print "Input call : %s " % num
+        msg = XplMessage()
+        msg.set_type("xpl-trig")
+        msg.set_schema("cid.basic")
+        msg.add_data({"calltype" : "INBOUND"})
+        msg.add_data({"phone" : num})
+        self._myxpl.send(msg)
 
 
 if __name__ == "__main__":
-    CallerIdModemManager()
+    CIDManager()
