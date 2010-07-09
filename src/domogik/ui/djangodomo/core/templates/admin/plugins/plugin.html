@@ -79,11 +79,10 @@ $(function(){
         var itemSaved = 0;
         $.each(configuration, function(index, item) {
             var value = null;
-            if (item.key == 'startup-plugin') {
+            if (item.type == 'boolean') {
                 value = ($('#value_' + item.key + ':checked').length > 0)? 'True':'False';
             } else {
                 value = $('#value_' + item.key).val();
-            
             }
             $.getREST(['plugin', 'config', 'set', 'name', name, 'hostname', host, 'key', item.key, 'value', value],
                 function(data) {
@@ -114,13 +113,14 @@ $(function(){
                     var ikey = item.key;
                     var idescription = item.description;
                     var idefault = item['default'];
+                    var itype = item.type;
                     $.getREST(['plugin', 'config', 'list', 'by-name' , '{{ plugin.name }}', '{{ plugin.host }}' , 'by-key', ikey],
                         function(data) {
                             var status = (data.status).toLowerCase();
                             if (status == 'ok') {
                                 var tr = $("<tr></tr>");
                                 tr.append("<td>" +  ikey + "</td><td><label for='value_" + ikey + "'>" +  idescription + "</label></td>");
-                                if (ikey == 'startup-plugin') {
+                                if (itype == 'boolean') {
                                     $(tr).append("<td><input type='checkbox' name='value_" + ikey + "' id='value_" + ikey + "' /></td><td></td>");
                                     if (data.config.length > 0) { // If already configured
                                         if (data.config[0].value  == "True") {
