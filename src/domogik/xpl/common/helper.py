@@ -29,7 +29,7 @@ Implements
 
 TODO
 
-@author: Maxence Dunnewind <fritz.smh@gmail.com>
+@author: Fritz <fritz.smh@gmail.com>
 @copyright: (C) 2007-2009 Domogik project
 @license: GPL(v3)
 @organization: Domogik
