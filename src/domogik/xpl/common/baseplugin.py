@@ -145,6 +145,10 @@ class BasePlugin():
             '''
             self._lock_add_thread.acquire()
             # self._log.debug('New thread registered : %s' % thread)
+            #Remove all stopped thread from the list
+            for t in self._threads:
+                if not  t.isAlive():
+                    self._threads.remove(t)
             self._threads.append(thread)
             self._lock_add_thread.release()
 
@@ -158,6 +162,8 @@ class BasePlugin():
             if thread in self._threads:
                 self._log.debug('Unregister thread')
                 self._threads.remove(thread)
+            else:
+                self._log.warn('Asked to remove a thread not in the list')
             self._lock_add_thread.release()
 
         def register_timer(self, timer):
@@ -172,7 +178,6 @@ class BasePlugin():
             self._lock_add_timer.release()
 
         def unregister_timer(self, timer):
-
             '''
             Unregister a timer in the current instance
             Should be the last action of each timer
@@ -194,3 +199,4 @@ class BasePlugin():
 
         def __del__(self):
             self._log.debug("__del__ baseplugin")
+
