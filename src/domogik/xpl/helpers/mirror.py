@@ -96,6 +96,12 @@ class mirror(Helper):
                         "Type : %s" % type,
                         "Current : %s" % current]
 
+        # Close Mir:ror
+        try:
+            mirror.close()
+        except MirrorException as e:
+            return [e.value]
+
 
 MY_CLASS = {"cb" : mirror}
 
