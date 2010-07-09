@@ -436,8 +436,8 @@ class Rest(XplPlugin):
 
     def get_exception(self):
         # TODO : finish exception take in count
-        #my_exception =  str(traceback.format_exc()).replace('"', "'").replace('\n', '      ')
-        my_exception =  str(traceback.format_exc()).replace('"', "'")
+        my_exception =  str(traceback.format_exc()).replace('"', "'").replace('\n', '      ')
+        #my_exception =  str(traceback.format_exc()).replace('"', "'")
         print "==== Error in REST ===="
         print my_exception
         print "======================="
