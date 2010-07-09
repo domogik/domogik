@@ -26,14 +26,8 @@
 {% block js_script %}
     $(function() {
         {% for feature in area.feature_association %}        
-            {% ifequal feature.device_feature.feature_type "actuator" %}
-                {% get_command_widget feature %}
-                {% get_command_init feature %}
-            {% endifequal %}
-            {% ifequal feature.device_feature.feature_type "sensor" %}
-                {% get_info_widget feature %}
-                {% get_info_init feature %}
-            {% endifequal %}
+			{% get_widget feature %}
+			{% get_widget_init feature %}
         {% endfor %}
         
         {% if area.feature_association %}
@@ -49,12 +43,7 @@
                             switch (item.key) {                        
                             {% for association in device.list %}
                                 case '{{ association.device_feature.stat_key }}':
-                                    {% ifequal association.device_feature.feature_type "actuator" %}
-                                        {% get_command_update association 'item.value' %}
-                                    {% endifequal %}
-                                    {% ifequal association.device_feature.feature_type "sensor" %}
-                                        {% get_info_update association 'item.value' %}
-                                    {% endifequal %}                            
+                                    {% get_widget_update association 'item.value' %}
                                     break;
                             {% endfor %}                    
                             }
@@ -82,19 +71,31 @@
 
 {% block banner %}
     <h1 class="ident icon64-area-{{ area.config.icon }}"><span class="title">{{ area.name }}</span></h1>
+	<div class="maininfo">
+        <ul>
+        {% if area.config.widget_placement.maininfo %}
+            <li><div id="widget_{{ area.config.widget_placement.maininfo.device }}_{{ area.config.widget_placement.maininfo.feature }}"></div></li>
+        {% endif %}    
+        </ul>
+    </div>
 {% endblock %}
 
 {% block contentleft %}
-    <div class='mainactions'>
-        <ul>
-        </ul>
-    </div>
     <div class='actions'>
-        <ul>
-            {% for association in area.feature_association %}
-                <li><div id="widget_{{ association.device_id }}_{{ association.device_feature_id }}"></div></li>
+        <div class='mainactions'>
+            <ul>
+            {% for action in area.config.widget_placement.mainactions %}
+                <li><div id="widget_{{ action.device }}_{{ action.feature }}"></div></li>
             {% endfor %}
-        </ul>
+            </ul>
+        </div>
+        <div class='otheractions'>
+            <ul>
+            {% for action in area.config.widget_placement.otheractions %}
+                <li><div id="widget_{{ action.device }}_{{ action.feature }}"></div></li>
+            {% endfor %}
+            </ul>
+        </div>
     </div>
 {% endblock %}
 

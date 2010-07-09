@@ -27,7 +27,7 @@
     $(function() {
         $("#customize a").click(function() {
         /*
-            $.getREST(['base', 'feature_association', 'del', 'association_type', 'house', 'association_id', '0'],
+            $.getREST(['base', 'feature_association', 'del', 'association_type', 'area', 'association_id', '{{ area.id }}'],
                 function(data) {
                     var status = (data.status).toLowerCase();
                     if (status != 'ok') {
@@ -41,16 +41,14 @@
             // Main info
             var maininfo = $(".maininfo li:first");
             json.maininfo = {device:maininfo.attr('devicevalue'), feature:maininfo.attr('featurevalue')};
-            delAssociation(maininfo.attr('devicevalue'), maininfo.attr('featurevalue'));
-            addAssociation(maininfo.attr('devicevalue'), maininfo.attr('featurevalue'));
+//            addAssociation(maininfo.attr('devicevalue'), maininfo.attr('featurevalue'));
 
             // Main actions
             json.mainactions = [];
             $(".mainactions li").each(function(index) {
                 var action = {device:$(this).attr('devicevalue'), feature:$(this).attr('featurevalue')};
                 json.mainactions.push(action);
-                addAssociation($(this).attr('devicevalue'), $(this).attr('featurevalue'));
-                addAssociation($(this).attr('devicevalue'), $(this).attr('featurevalue'));
+//                addAssociation($(this).attr('devicevalue'), $(this).attr('featurevalue'));
             });
             
             // Other actions
@@ -58,13 +56,12 @@
             $(".otheractions li").each(function(index) {
                 var action = {device:$(this).attr('devicevalue'), feature:$(this).attr('featurevalue')};
                 json.otheractions.push(action);
-                delAssociation($(this).attr('devicevalue'), $(this).attr('featurevalue'));
-                addAssociation($(this).attr('devicevalue'), $(this).attr('featurevalue'));
+//                addAssociation($(this).attr('devicevalue'), $(this).attr('featurevalue'));
             });
 
             // Save ui config
             var jsonstr = JSON.stringify(json).replace(/"/g, '&quot;');
-            $.getREST(['base', 'ui_config', 'set', 'name', 'house', 'reference', '0', 'key', 'widget_placement', 'value', jsonstr],
+            $.getREST(['base', 'ui_config', 'set', 'name', 'area', 'reference', '{{ area.name }}', 'key', 'widget_placement', 'value', jsonstr],
                 function(data) {
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
@@ -77,33 +74,24 @@
             ); 
         });
         
-        function delAssociation(deviceid, featureid) {
-            $.getREST(['base', 'feature_association', 'del', 'device_id', deviceid, 'feature_id', featureid],
-                function(data) {
-                    var status = (data.status).toLowerCase();
-                    if (status != 'ok') {
-                        $.notification('error', data.description);                                          
-                    }
-                }
-            );
-        }
-        
         function addAssociation(deviceid, featureid) {
-            $.getREST(['base', 'feature_association', 'add', 'device_id', deviceid, 'feature_id', featureid, 'association_type', 'house', 'association_id', '0'],
+            $.getREST(['base', 'feature_association', 'add', 'device_id', deviceid, 'feature_id', featureid, 'association_type', 'area', 'association_id', '{{ area.name }}'],
                 function(data) {
                     var status = (data.status).toLowerCase();
-                    if (status != 'ok') {
+                    if (status == 'ok') {
+                    } else {
+//                        self.cancel();
                         $.notification('error', data.description);                                          
                     }
                 }
             );        
         }
         
-        {% if house.config.widget_placement.maininfo %}
+        {% if house.widget_placement.maininfo %}
             $(".maininfo ul").widget_model({
-                featurevalue: '{{ house.config.widget_placement.maininfo.feature }}',
+                featurevalue: {{ house.widget_placement.maininfo.feature }},
                 featurename: 'featurename',
-                devicevalue: '{{ house.config.widget_placement.maininfo.device }}',
+                devicevalue: {{ house.widget_placement.maininfo.device }},
                 devicename: 'devicename',
                 draggable: {
                     helper: false,
@@ -125,11 +113,11 @@
             });
         {% endif %}
         
-        {% for action in house.config.widget_placement.mainactions %}
+        {% for action in house.widget_placement.mainactions %}
             $(".mainactions ul").widget_model({
-                featurevalue: '{{ action.feature }}',
+                featurevalue: {{ action.feature }},
                 featurename: 'featurename',
-                devicevalue: '{{ action.device }}',
+                devicevalue: {{ action.device }},
                 devicename: 'devicename',
                 draggable: {
                     helper: false,
@@ -151,11 +139,11 @@
             });
         {% endfor %}
         
-        {% for action in house.config.widget_placement.otheractions %}
+        {% for action in house.widget_placement.otheractions %}
             $(".otheractions ul").widget_model({
-                featurevalue: '{{ action.feature }}',
+                featurevalue: {{ action.feature }},
                 featurename: 'featurename',
-                devicevalue: '{{ action.device }}',
+                devicevalue: {{ action.device }},
                 devicename: 'devicename',
                 draggable: {
                     helper: false,

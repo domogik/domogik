@@ -41,8 +41,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
 from domogik.common import database
-from domogik.ui.djangodomo.core.models import Areas, Rooms, Devices, DeviceUsages, DeviceTechnologies, DeviceTypes, \
-                                   DeviceFeatures, FeatureAssociations, UIConfigs, Plugins, Accounts
+from domogik.ui.djangodomo.core.models import House, Areas, Rooms, Devices, DeviceUsages, DeviceTechnologies, DeviceTypes, \
+                                   DeviceFeatures, FeatureAssociations, Plugins, Accounts
 
 from domogik.ui.djangodomo.core.sample_data_helper import SampleDataHelper
 
@@ -84,7 +84,7 @@ def index(request):
         result_all_areas = Areas.get_all()
         result_all_areas.merge_rooms()
         result_all_areas.merge_uiconfig()
-        result_house = UIConfigs.get_general('house')
+        result_house = House.get()
         result_house_features_associations = FeatureAssociations.get_by_house()
 
     except ResourceNotAvailableException:
@@ -328,7 +328,7 @@ def admin_organization_house(request):
     status = request.GET.get('status', '')
     msg = request.GET.get('msg', '')
     try:
-        result_house = UIConfigs.get_general('house')
+        result_house = House.get()
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
     page_title = _("House organization")
@@ -446,7 +446,7 @@ def show_house(request):
         result_all_areas = Areas.get_all()
         result_all_areas.merge_uiconfig()
 
-        result_house = UIConfigs.get_general('house')
+        result_house = House.get()
         result_house_features_associations = FeatureAssociations.get_by_house()
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
@@ -467,7 +467,7 @@ def show_house_edit(request):
     """
     page_title = _("Edit House")
     try:
-        result_house = UIConfigs.get_general('house')
+        result_house = House.get()
         result_all_devices = Devices.get_all()
         result_all_devices.merge_uiconfig()
         result_all_devices.merge_features()
@@ -494,7 +494,7 @@ def show_area(request, area_id):
 
         result_rooms_by_area = Rooms.get_by_area(area_id)
         result_rooms_by_area.merge_uiconfig()
-        result_house = UIConfigs.get_general('house')
+        result_house = House.get()
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
 
@@ -508,6 +508,29 @@ def show_area(request, area_id):
         house=result_house
     )
 
+def show_area_edit(request, area_id):
+    """
+    Method called when the show area page is accessed
+    @param request : HTTP request
+    @return an HttpResponse object
+    """
+    try:
+        result_area_by_id = Areas.get_by_id(area_id)
+        result_area_by_id.merge_uiconfig()
+        result_area_by_id.merge_feature_associations()
+        result_house = UIConfigs.get_general('house')
+    except ResourceNotAvailableException:
+        return render_to_response('error/ResourceNotAvailableException.html')
+
+    page_title = _("Edit ") + result_area_by_id.area[0].name
+    return __go_to_page(
+        request, 'show/area.edit.html',
+        page_title,
+        nav1_show = "selected",
+        area=result_area_by_id.area[0],
+        house=result_house
+    )
+    
 def show_room(request, room_id):
     """
     Method called when the show room page is accessed
@@ -519,7 +542,7 @@ def show_room(request, room_id):
         result_room_by_id.merge_uiconfig()
         result_room_by_id.merge_feature_associations()
 
-        result_house = UIConfigs.get_general('house')
+        result_house = House.get()
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
 
@@ -530,33 +553,4 @@ def show_room(request, room_id):
         nav1_show = "selected",
         room=result_room_by_id.room[0],
         house=result_house
-    )
-
-def admin_visualization_devices(request):
-    """
-    Method called when the admin devices visualization page is accessed
-    @param request : HTTP request
-    @return an HttpResponse object
-    """
-    if not __is_user_admin(request):
-        return index(request)
-
-    status = request.GET.get('status', '')
-    msg = request.GET.get('msg', '')
-    try:
-        result_all_rooms = Rooms.get_all_with_devices()
-        result_all_rooms.merge_uiconfig()
-        result_all_rooms.merge_actuators()
-    except ResourceNotAvailableException:
-        return render_to_response('error/ResourceNotAvailableException.html')
-
-    page_title = _("Devices visualization")
-    return __go_to_page(
-        request, 'admin/visualization/devices.html',
-        page_title,
-        nav1_admin = "selected",
-        nav2_visualization_devices = "selected",
-        status=status,
-        msg=msg,
-        rooms_list=result_all_rooms.room,
     )
