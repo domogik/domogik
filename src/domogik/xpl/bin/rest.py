@@ -436,8 +436,8 @@ class Rest(XplPlugin):
 
     def get_exception(self):
         # TODO : finish exception take in count
-        #my_exception =  str(traceback.format_exc()).replace('"', "'").replace('\n', '      ')
-        my_exception =  str(traceback.format_exc()).replace('"', "'")
+        my_exception =  str(traceback.format_exc()).replace('"', "'").replace('\n', '      ')
+        #my_exception =  str(traceback.format_exc()).replace('"', "'")
         print "==== Error in REST ===="
         print my_exception
         print "======================="
@@ -3598,11 +3598,12 @@ class StatsManager(XplPlugin):
                     res[technology][schema] = {}
                     stats[technology][schema] = {}
                 for type in schema_types[schema]:
-                    device, mapping = self.parse_mapping(doc.documentElement.getElementsByTagName("mapping")[0])
+                    device, mapping, static_device = self.parse_mapping(doc.documentElement.getElementsByTagName("mapping")[0])
                     res[technology][schema][type] = {"filter": 
                             self.parse_listener(schema_types[schema][type].getElementsByTagName("listener")[0]),
                             "mapping": mapping,
-                            "device": device}
+                            "device": device,
+                            "static_device": static_device}
             
                     stats[technology][schema][type] = self._Stat(self._myxpl, res[technology][schema][type], technology, schema, type, self.handler_params)
 
@@ -3654,7 +3655,15 @@ class StatsManager(XplPlugin):
         """
          
         values = []
-        device = node.getElementsByTagName("device")[0].attributes["field"].value.lower()
+        device_node = node.getElementsByTagName("device")[0]
+        device = None
+        static_device = None
+        if device_node.attributes.has_key("field"):
+            device = device_node.attributes["field"].value.lower()
+        elif device_node.attributes.has_key("static_name"):
+            static_device = device_node.attributes["static_name"].value.lower()
+ 
+        #device = node.getElementsByTagName("device")[0].attributes["field"].value.lower()
         for value in node.getElementsByTagName("value"):
             name = value.attributes["field"].value
             data = {}
@@ -3676,7 +3685,7 @@ class StatsManager(XplPlugin):
                 data["filter_key"] = None
                 data["filter_value"] = None
             values.append(data)
-        return device, values
+        return device, values, static_device
 
 
     class _Stat:
@@ -3717,8 +3726,15 @@ class StatsManager(XplPlugin):
             self._db = DbHelper()
             self._log_stats.debug("message catcher : %s" % message)
             try:
-                d_id = self._db.get_device_by_technology_and_address(self._technology, \
-                    message.data[self._res["device"]]).id
+                if self._res["device"] != None:
+                    d_id = self._db.get_device_by_technology_and_address(self._technology, \
+                        message.data[self._res["device"]]).id
+                elif self._res["static_device"] != None:
+                    d_id = self._db.get_device_by_technology_and_address(self._technology, \
+                        self._res["static_device"]).id
+                else:  # oups... something wrong in xml file ?
+                    self._log_stats.error("Device has no name... is there a problem in xml file ?")
+                    raise AttributeError
                 print "Stat for techno '%s' / adress '%s' / id '%s'" % (self._technology, message.data[self._res["device"]], d_id)
             except AttributeError:
                 self._log_stats_unknown.warning("Received a stat for an unreferenced device : %s - %s" \

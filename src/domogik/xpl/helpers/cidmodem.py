@@ -37,35 +37,29 @@ TODO
 
 from domogik.xpl.common.helper import Helper
 from domogik.xpl.common.helper import HelperError
-from domogik.xpl.lib.mirror import Mirror
-from domogik.xpl.lib.mirror import MirrorException
+from domogik.xpl.lib.cidmodem import CallerIdModem 
+from domogik.xpl.lib.cidmodem import CallerIdModemException
 from domogik.common import logger
-import binascii
 
 
-class mirror(Helper):
+class cidmodem(Helper):
 
 
     def __init__(self):
-        """ Init Mir:ror helper
+        """ Init Caller Id with a modem helper
         """
 
         self.commands =   \
                { "read" : 
                   {
                     "cb" : self.read,
-                    "desc" : "Wait for a Mir:ror event",
+                    "desc" : "Wait for a inbound call event",
                     "min_args" : 1,
                     "usage" : "read <device>"
                   },
-                 "find" : 
-                  {
-                    "cb" : self.find,
-                    "desc" : "Find Mir:ror device"
-                  }
                 }
 
-        log = logger.Logger('mirror-helper')
+        log = logger.Logger('cidmodem-helper')
         self._log = log.get_logger()
           
 
@@ -76,38 +70,34 @@ class mirror(Helper):
         return ["TODO"]
 
     def read(self, args = None):
-        """ Read Mir:ror device until an event occurs
+        """ Read Modem until an inbound call
         """
 
         # Init Mir:ror
-        mirror  = Mirror(self._log, None)
+        cid  = CallerIdModem(self._log, None)
         
-        # Open Mir:ror
+        # Open Modem
         try:
-            mirror.open(args[0])
-        except MirrorException as e:
+            cid.open(args[0])
+        except CallerIdModemException as e:
             return [e.value]
             
-        # read Mir:ror
+        # read Modem
         while True:
-            device, type, current = mirror.read()
-            if device != None:
-                return ["Device : %s" % device,
-                        "Type : %s" % type,
-                        "Current : %s" % current]
+            num = cid.read()
+            if num != None:
+                break
 
-        # Close Mir:ror
+        # Close Modem
         try:
-            mirror.close()
-        except MirrorException as e:
+            cid.close()
+        except CallerIdModemException as e:
             return [e.value]
 
+        return ["Phone number : %s" % num]
 
-MY_CLASS = {"cb" : mirror}
+MY_CLASS = {"cb" : cidmodem}
 
-if __name__ == "__main__":
-    mir = mirror()
-    mir.command("read", "%E9dev%E9hidraw1")
 
 
 

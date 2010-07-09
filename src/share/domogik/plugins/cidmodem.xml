@@ -21,17 +21,10 @@
     </key>
     <key>
       <order-id>2</order-id>
-      <name>nbmaxtry</name>
-      <type>number</type>
-      <description>Maximum number of tries to open modem device</description>
-      <default-value>3</default-value>
-    </key>
-    <key>
-      <order-id>3</order-id>
-      <name>interval</name>
-      <type>number</type>
-      <description>Delay between each try to open modem device</description>
-      <default-value>5</default-value>
+      <name>cid-command</name>
+      <type>string</type>
+      <description>AT CID command to be used by plugin to activate Caller Id mode on modem.</description>
+      <default-value>AT#CID=1</default-value>
     </key>
   </configuration-keys>
 </plugin>

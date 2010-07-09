@@ -72,6 +72,16 @@ class Mirror:
             error = "Error while opening Mir:ror device : %s. Check if it is the good device or if you have the good permissions on it." % device
             raise MirrorException(error)
             
+    def close(self):
+        """ close Mir:ror device
+        """
+        self._log.info("Close Mir:ror device")
+        try:
+            self._mirror.close()
+        except:
+            error = "Error while closing modem device"
+            raise MirrorException(error)
+
     def listen(self):
             """ Start listening to Mir:ror
             """

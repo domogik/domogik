@@ -30,6 +30,7 @@ Implements
 # TODO : update
 
 @author: Maxence Dunnewind <maxence@dunnewind.net>
+@        Fritz <fritz.smh@gmail.com>
 @copyright: (C) 2007-2009 Domogik project
 @license: GPL(v3)
 @organization: Domogik
@@ -59,7 +60,7 @@ import pkgutil
 
 KILL_TIMEOUT = 2
 PING_DURATION = 5
-WAIT_TIME_BETWEEN_PING = 30
+WAIT_TIME_BETWEEN_PING = 120
 
 
 class SysManager(XplPlugin):

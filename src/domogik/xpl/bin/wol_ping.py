@@ -92,7 +92,7 @@ class WolPing(XplPlugin):
         self._wolmanager = WOL(self._log)
         # Create listeners
         Listener(self.wol_cb, self._myxpl, {'schema': 'control.basic',
-                'xpltype': 'xpl-cmnd', 'type': 'wakeonlan', 'current': 'on'})
+                'xpltype': 'xpl-cmnd', 'type': 'wakeonlan', 'current': 'HIGH'})
         self._log.debug("Listener for wake on lan created")
 
         ### Create Ping object
