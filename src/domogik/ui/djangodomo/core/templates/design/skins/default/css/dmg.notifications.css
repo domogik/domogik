@@ -1,3 +1,7 @@
+body > div.jGrowl.top-right {
+    top:10px;
+}
+
 div.jGrowl div.header {
     background-position: center left;
     background-repeat: no-repeat;
