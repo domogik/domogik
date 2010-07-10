@@ -1981,8 +1981,10 @@ target=*
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("ui_config")
         try:
-            for ui_item_config in self._db.delete_ui_item_config(ui_name = name, \
-                                                         ui_reference = reference, ui_key = key):
+            for ui_item_config in self._db.delete_ui_item_config( \
+                               ui_name = self.get_parameters("name"), \
+                               ui_reference = self.get_parameters("reference"),\
+                               ui_key = self.get_parameters("key")):
                 json_data.add_data(ui_item_config)
         except:
             json_data.set_error(code = 999, description = self.get_exception())
