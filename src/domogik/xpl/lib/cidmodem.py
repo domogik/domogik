@@ -36,8 +36,9 @@ TODO
 @organization: Domogik
 """
 
-#import serial
+import serial
 import re
+import traceback
 
 
 
@@ -85,7 +86,7 @@ class CallerIdModem:
             self._log.info("Set modem to caller id mode : %s" % cid_command)
             self._ser.write("%s\r\n" % cid_command)
         except:
-            error = "Error while opening modem device : %s" % device
+            error = "Error while opening modem device : %s : %s" % (device, str(traceback.format_exc()))
             raise CallerIdModemException(error)
 
     def close(self):
@@ -115,7 +116,7 @@ class CallerIdModem:
         resp = self._ser.readline()
         if NUM_START_LINE in resp:
             # we get the third string's item (separator : blank)
-            num = res.sub(NUM_PATTERN, "", resp)
+            num = re.sub(NUM_PATTERN, "", resp).strip()
             self._log.debug("Incoming call from '%s'" % num)
             return num
         else:
