@@ -86,7 +86,7 @@ QUEUE_SLEEP = 0.1 # sleep time between reading all queue content
 QUEUE_COMMAND_SIZE = 1000
 
 # /event queue config
-QUEUE_EVENT_TIMEOUT = 0   # If 0, no timeout is set
+QUEUE_EVENT_TIMEOUT = 120   # If 0, no timeout is set
 QUEUE_EVENT_LIFE_EXPECTANCY = 5
 QUEUE_EVENT_SIZE = 50
 
