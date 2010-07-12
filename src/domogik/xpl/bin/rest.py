@@ -3739,8 +3739,12 @@ class StatsManager(XplPlugin):
                     raise AttributeError
                 print "Stat for techno '%s' / adress '%s' / id '%s'" % (self._technology, message.data[self._res["device"]], d_id)
             except AttributeError:
-                self._log_stats_unknown.warning("Received a stat for an unreferenced device : %s - %s" \
+                if self._res["device"] != None:
+                    self._log_stats_unknown.warning("Received a stat for an unreferenced device : %s - %s" \
                         % (self._technology, message.data[self._res["device"]]))
+                else:
+                    self._log_stats_unknown.warning("Received a stat for an unreferenced device : %s - %s" \
+                        % (self._technology, self._res["static_device"]))
                 print "=> unknown device"
                 return
             self._log_stats.debug("Stat received for %s - %s." \
