@@ -81,6 +81,8 @@ class SysManager(XplPlugin):
                 help="Start REST interface manager if not already running.")
         parser.add_option("-t", action="store_true", dest="start_trigger", default=False, \
             help="Start scenario manager if not already running.")
+        parser.add_option("-p", action="store_true", dest="allow_ping", default=False, \
+            help="Activate background ping for all plugins.")
         XplPlugin.__init__(self, name = 'manager', parser=parser)
 
         # Logger init
@@ -165,17 +167,18 @@ class SysManager(XplPlugin):
 
             ### make an eternal loop to ping plugins
             # the goal is to detect manually launched plugins
-            while True:
-                ping_thread = {}
-                for component in self._components:
-                    name = component["name"]
-                    ping_thread[name] = Thread(None,
-                                         self._check_component_is_running,
-                                         None,
-                                         (name, None),
-                                         {})
-                    ping_thread[name].start()
-                time.sleep(WAIT_TIME_BETWEEN_PING)
+            if self.options.allow_ping:
+                while True:
+                    time.sleep(WAIT_TIME_BETWEEN_PING)
+                    ping_thread = {}
+                    for component in self._components:
+                        name = component["name"]
+                        ping_thread[name] = Thread(None,
+                                             self._check_component_is_running,
+                                             None,
+                                             (name, None),
+                                             {})
+                        ping_thread[name].start()
 
         except:
             self._log.error("%s" % sys.exc_info()[1])
