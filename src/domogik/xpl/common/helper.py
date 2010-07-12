@@ -78,3 +78,5 @@ class Helper():
             return self.commands[cmd]["cb"](args)
         except KeyError:
             return ["Wrong option : %s" % cmd]
+        except IndexError:
+            return ["Missing argument"]

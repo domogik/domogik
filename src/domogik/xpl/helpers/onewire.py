@@ -38,7 +38,10 @@ TODO
 import ow
 from domogik.xpl.common.helper import Helper
 from domogik.xpl.common.helper import HelperError
+from domogik.common import logger
+import traceback
 
+ACCESS_ERROR = "Access to onewire device is not possible. Does your user have the good permissions ? If so, check that you stopped onewire module and you don't have OWFS mounted"
 
 class onewire(Helper):
 
@@ -71,22 +74,36 @@ class onewire(Helper):
                     "desc" : "Show detail for all DS2401 devices"
                   }
                 }
-        try:
-            self.ow = OneWireNetwork()
-        except OneWireException:
-            raise HelperError("Access to onewire device is not possible. Does your user have the good permissions ? If so, check that you stopped onewire module and you don't have OWFS mounted")
 
+        log = logger.Logger('onewire-helper')
+        self._log = log.get_logger()
 
     def all(self, args = None):
+        try:
+            self.ow = OneWireNetwork(args[0], self._log)
+        except OneWireException as e:
+            raise HelperError(e.value)
         return self.ow.show_all_components()
 
     def detail(self, args = None):
-        return self.ow.show_component_detail(args[0])
+        try:
+            self.ow = OneWireNetwork(args[0], self._log)
+        except OneWireException as e:
+            raise HelperError(e.value)
+        return self.ow.show_component_detail(args[1])
 
     def ds18b20(self, args = None):
+        try:
+            self.ow = OneWireNetwork(args[0], self._log)
+        except OneWireException as e:
+            raise HelperError(e.value)
         return self.ow.show_ds18b20_detail()
 
     def ds2401(self, args = None):
+        try:
+            self.ow = OneWireNetwork(args[0], self._log)
+        except OneWireException as e:
+            raise HelperError(e.value)
         return self.ow.show_ds2401_detail()
 
 
@@ -107,25 +124,24 @@ class OneWireNetwork:
     Get informations about 1wire network
     """
 
-    def __init__(self, dev = 'u'):
+    def __init__(self, dev, log):
         """
         Create OneWire instance, allowing to use OneWire Network
         @param dev : device where the interface is connected to,
         default 'u' for USB
         """
+        self._log = log
         try:
-            ow.init(dev)
+            ow.init(str(dev))
             self._root_cached = ow.Sensor('/')
             self._root_uncached = ow.Sensor('/uncached')
         except:
-            raise OneWireException("Can't access device")
+            self._log.error("%s : %s : %s" % (dev, ACCESS_ERROR, traceback.format_exc()))
+            raise OneWireException("%s. See log file for complete trace" % (ACCESS_ERROR))
         else:
             self._cache = True
             self._root = self._root_cached
 
-        ### try to not have "...did not claim interface before use " in dmesg
-        #ow.detachKernelDriver(0)
-        
 
     def show_all_components(self):
         ret = []
