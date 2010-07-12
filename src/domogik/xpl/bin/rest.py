@@ -3908,6 +3908,12 @@ class EventRequests():
             # Add ticket id to answer
             elt_data["ticket_id"] = str(ticket_id)
 
+        # Timeout
+        except Empty:
+            # Add ticket id to answer
+            elt_data = {}
+            elt_data["ticket_id"] = str(ticket_id)
+
         # Ticket doesn't exists
         except KeyError:
             self._log.warning("Trying to get an unknown event request (ticket_id=%s)" % ticket_id)
