@@ -3218,6 +3218,7 @@ target=*
             output = ["List of available helpers :"]
             for importer, plgname, ispkg in pkgutil.iter_modules(package.__path__):
                 output.append(" - %s" % plgname)
+            output.append("Type 'foo help' to get help on foo helper")
 
 
         else:
