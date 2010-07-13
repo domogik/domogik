@@ -138,6 +138,9 @@ class XplPlugin():
             self._dump_cb = dump_cb
             self._log.debug("end single xpl plugin")
 
+	def __del__(self):
+		self._log.shutdown()
+
         def _get_pid(self):
             """ Get current pid and write it to a file
             """
