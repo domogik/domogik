@@ -139,7 +139,7 @@ function update_user_config {
 }
 
 function call_db_installer {
-    python ./db_installer.py $d_home/.domogik.cfg
+    /bin/su -c $DOMOGIK_USER "python ./db_installer.py $d_home/.domogik.cfg"
     chown $d_user: $d_home/.domogik.sqlite
 }
 
@@ -152,7 +152,7 @@ if [ ! -x "$(which python)" ];then
             echo "Bad python version used, please install at least 2.6, and check /usr/bin/python starts the good version."
             exit 12
         fi
-    fi
+fi
 }
 
 function modify_hosts {
