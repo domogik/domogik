@@ -66,6 +66,10 @@ import random
 import calendar
 import domogik.xpl.helpers
 import pkgutil
+import uuid
+import stat
+import shutil
+import mimetypes
 
 
 
@@ -90,7 +94,8 @@ QUEUE_EVENT_TIMEOUT = 120   # If 0, no timeout is set
 QUEUE_EVENT_LIFE_EXPECTANCY = 5
 QUEUE_EVENT_SIZE = 50
 
-
+# Repository
+DEFAULT_REPO_DIR = "/tmp/"
 
 ################################################################################
 class Rest(XplPlugin):
@@ -165,6 +170,16 @@ class Rest(XplPlugin):
             else:
                 self._log.info("Configuration : SSL support not activated")
     
+            # File repository
+            try:
+                cfg_rest = Loader('rest')
+                config_rest = cfg_rest.load()
+                conf_rest = dict(config_rest[1])
+                self.repo_dir = conf_rest['rest_repository']
+            except KeyError:
+                # default parameters
+                self.repo_dir = DEFAULT_REPO_DIR
+
             # Gloal Queues config
             self._log.debug("Get queues configuration")
             self._config = Query(self._myxpl)
@@ -540,6 +555,12 @@ class RestHandler(BaseHTTPRequestHandler):
         """
         self.do_for_all_methods()
 
+    def do_PUT(self):
+        """ Process PUT requests
+            Call directly .do_for_all_methods()
+        """
+        self.do_for_all_methods()
+
     def do_OPTIONS(self):
         """ Process OPTIONS requests
             Call directly .do_for_all_methods()
@@ -550,11 +571,14 @@ class RestHandler(BaseHTTPRequestHandler):
         """ Create an object for each request. This object will process 
             the REST url
         """
-        # dirty issue to force HTTP/1.1 
-        #self.protocol_version = 'HTTP/1.1'
-        #self.request_version = 'HTTP/1.1'
-
         request = ProcessRequest(self.server.handler_params, self.path, \
+                                 self.command, \
+                                 self.headers, \
+                                 self.send_response, \
+                                 self.send_header, \
+                                 self.end_headers, \
+                                 self.wfile, \
+                                 self.rfile, \
                                  self.send_http_response_ok, \
                                  self.send_http_response_error)
         request.do_for_all_methods()
@@ -625,12 +649,19 @@ class ProcessRequest():
 ######
 
 
-    def __init__(self, handler_params, path, cb_send_http_response_ok, \
+    def __init__(self, handler_params, path, command, headers, \
+                 send_response, \
+                 send_header, \
+                 end_headers, \
+                 wfile, \
+                 rfile, \
+                 cb_send_http_response_ok, \
                  cb_send_http_response_error):
         """ Create shorter access : self.server.handler_params[0].* => self.*
             First processing on url given
             @param handler_params : parameters given to HTTPHandler
             @param path : path given to HTTP server : /base/area/... for example
+            @param command : GET, POST, PUT, OPTIONS, etc
             @param cb_send_http_response_ok : callback for function
                                               REST.send_http_response_ok 
             @param cb_send_http_response_error : callback for function
@@ -639,6 +670,14 @@ class ProcessRequest():
 
         self.handler_params = handler_params
         self.path = path
+        self.command = command
+        self.headers = headers
+        self.send_response = send_response
+        self.send_header = send_header
+        self.end_headers = end_headers
+        self.copyfile = self.handler_params[0].copyfile
+        self.wfile = wfile
+        self.rfile = rfile
         self.send_http_response_ok = cb_send_http_response_ok
         self.send_http_response_error = cb_send_http_response_error
 
@@ -647,6 +686,7 @@ class ProcessRequest():
         self._log = self.handler_params[0]._log
         self._log_dm = self.handler_params[0]._log_dm
         self._xml_directory = self.handler_params[0]._xml_directory
+        self.repo_dir = self.handler_params[0].repo_dir
         self.use_ssl = self.handler_params[0].use_ssl
         self.get_exception = self.handler_params[0].get_exception
 
@@ -736,6 +776,8 @@ class ProcessRequest():
             self.rest_helper()
         elif self.rest_type == "testlongpoll":
             self.rest_testlongpoll()
+        elif self.rest_type == "repo":
+            self.rest_repo()
         elif self.rest_type == None:
             self.rest_status()
         else:
@@ -769,8 +811,12 @@ class ProcessRequest():
                 self.jsonp_cb = opt_value
 
             # call debug functions
-            elif opt_key == "debug-sleep" and opt_value != None:
+            if opt_key == "debug-sleep" and opt_value != None:
                 self._debug_sleep(opt_value)
+
+            # name for PUT : /repo/put?filename=foo.txt
+            if opt_key == "filename" and opt_value != None:
+                self._put_filename = opt_value
 
 
 
@@ -3259,6 +3305,122 @@ target=*
 
 
 
+
+#####
+# /repo processing
+#####
+
+    def rest_repo(self):
+        print "Repository action"
+
+        ### put #####################################
+        if self.rest_request[0] == "put":
+            if self.command != "PUT":
+                self.send_http_response_error(999, "HTTP %s command not allowed. Use PUT." % self.command, \
+                                          self.jsonp, self.jsonp_cb)
+            else:
+                self._rest_repo_put()
+
+        ### get #####################################
+        elif self.rest_request[0] == "get":
+            if len(self.rest_request) != 2:
+                self.send_http_response_error(999, "Wrong number of parameters for %s" % self.rest_request[0],
+                                          self.jsonp, self.jsonp_cb)
+            else:
+                self._rest_repo_get(self.rest_request[1])
+            
+        ### others ##################################
+        else:
+            self.send_http_response_error(999, self.rest_request[0] + " not allowed", self.jsonp, self.jsonp_cb)
+
+
+    def _rest_repo_put(self):
+        """ Put a file on rest repository
+        """
+        self.headers.getheader('Content-type')
+        print self.headers
+        content_length = int(self.headers['Content-Length'])
+
+        if hasattr(self, "_put_filename") == False:
+            print "No file name given!!!"
+            self.send_http_response_error(999, "You must give a file name : ?filename=foo.txt",
+                                          self.jsonp, self.jsonp_cb)
+            return
+        self._log.info("PUT : uploading %s" % self._put_filename)
+
+        # TODO : check filename value (extension, etc)
+
+        # replace name (without extension) with an unique id
+        basename, extension = os.path.splitext(self._put_filename)
+        file_id = str(uuid.uuid4())
+        file = "%s/%s%s" % (self.repo_dir, 
+                             file_id,
+                             extension)
+
+        try:
+            sv = open(file, "w")
+            sv.write(self.rfile.read(content_length))
+            sv.close()
+        except IOError:
+            self._log.error("PUT : failed to upload %s : %s" % (self._put_filename, traceback.format_exc()))
+            print traceback.format_exc()
+            self.send_http_response_error(999, "Error while writing '%s' : %s" % (file, traceback.format_exc()),
+                                          self.jsonp, self.jsonp_cb)
+            return
+
+        self._log.info("PUT : %s uploaded as %s%s" % (self._put_filename,
+                                                   file_id, extension))
+        json_data = JSonHelper("OK")
+        json_data.set_data_type("repository")
+        json_data.add_data({"file" : "%s%s" % (file_id, extension)})
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        self.send_http_response_ok(json_data.get())
+
+
+    def _rest_repo_get(self, file):
+        """ Get a file from rest repository
+        """
+        # Check file opening
+        try:
+            f = open("%s/%s" % (self.repo_dir, file), "rb")
+        except IOError:
+            self.send_http_response_error(999, "No file % available" % file,
+                                          self.jsonp, self.jsonp_cb)
+            return
+
+        # Get informations on file
+        ctype = None
+        fs = os.fstat(f.fileno())
+        lm = os.stat("%s%s" % (self.repo_dir, file))[stat.ST_MTIME]
+
+        # Get mimetype information
+        if not mimetypes.inited:
+            mimetypes.init()
+        extension_map = mimetypes.types_map.copy()
+        extension_map.update({
+                '' : 'application/octet-stream', # default
+                '.py' : 'text/plain'})
+        basename, extension = os.path.splitext(file)
+        if extension in extension_map:
+            ctype = extension_map[extension] 
+        else:
+            extension = extension.lower()
+            if extension in extension_map:
+                ctype = extension_map[extension] 
+            else:
+                ctype = extension_map[''] 
+
+        # Send file
+        self.send_response(200)
+        self.send_header("Content-type", ctype)
+        self.send_header("Content-Length", str(fs[6]))
+        self.send_header("Last-Modified", lm)
+        self.end_headers()
+        #self.copyfile(f, self.wfile)
+        shutil.copyfileobj(f, self.wfile)
+        f.close(
+
+    )
 
 
 ################################################################################
