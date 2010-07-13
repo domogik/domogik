@@ -133,11 +133,12 @@ class DbHelper():
     __engine = None
     __session = None
 
-    def __init__(self, echo_output=False, use_test_db=False):
+    def __init__(self, echo_output=False, use_test_db=False, engine=None):
         """Class constructor
 
         @param echo_output : if True displays sqlAlchemy queries (optional, default False)
         @param use_test_db : if True use a test database (optional, default False)
+        @param engine : an existing engine, if not provided, a new one will be created
 
         """
         cfg = Loader('database')
@@ -153,9 +154,22 @@ class DbHelper():
             url = '%s_test' % url
         # Connecting to the database
         self.__dbprefix = self.__db_config['db_prefix']
-        self.__engine = sqlalchemy.create_engine(url, echo=echo_output)
+        if engine != None:
+            self.__engine = engine
+        else:
+            self.__engine = sqlalchemy.create_engine(url, echo = echo_output)
         Session = sessionmaker(bind=self.__engine, autoflush=True)
         self.__session = Session()
+
+    def get_engine(self):
+        """Return the existing engine or None if not set 
+        @return self.__engine
+
+        """
+        return self.__engine
+
+    def __del__(self):
+	self.__engine.dispose()
 
     def __rollback(self):
         """Issue a rollback to a SQL transaction (for dev purposes only)
