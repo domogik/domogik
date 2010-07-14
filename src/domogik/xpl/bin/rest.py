@@ -1460,11 +1460,32 @@ target=*
 
             ### delete
             elif self.rest_request[1] == "del":
-                offset = 2
-                if self.set_parameters(offset):
-                    self._rest_base_ui_item_config_del()
+                #offset = 2
+                #if self.set_parameters(offset):
+                #    self._rest_base_ui_item_config_del()
+                #else:
+                #    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
+
+                if len(self.rest_request) !=5 and len(self.rest_request) != 6:
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
+                elif len(self.rest_request) == 5:
+                    if self.rest_request[2] == "by-key":
+                        self._rest_base_ui_item_config_del(name = self.rest_request[3], key = self.rest_request[4])
+                    elif self.rest_request[2] == "by-reference":
+                        self._rest_base_ui_item_config_del(name = self.rest_request[3], reference = self.rest_request[4])
+                    else:
+                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
+                elif len(self.rest_request) == 6:
+                    if self.rest_request[2] == "by-element":
+                        self._rest_base_ui_item_config_del(name = self.rest_request[3], reference = self.rest_request[4], key = self.rest_request[5])
+                    else:
+                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
                 else:
-                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
 
             ### others
             else:
@@ -2020,22 +2041,36 @@ target=*
 
 
 
-    def _rest_base_ui_item_config_del(self):
-        """ del ui_item_config
+    #def _rest_base_ui_item_config_del(self):
+    #    """ del ui_item_config
+    #    """
+    #    json_data = JSonHelper("OK")
+    #    json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+    #    json_data.set_data_type("ui_config")
+    #    try:
+    #        for ui_item_config in self._db.delete_ui_item_config( \
+    #                           ui_name = self.get_parameters("name"), \
+    #                           ui_reference = self.get_parameters("reference"),\
+    #                           ui_key = self.get_parameters("key")):
+    #            json_data.add_data(ui_item_config)
+    #    except:
+    #        json_data.set_error(code = 999, description = self.get_exception())
+    #    self.send_http_response_ok(json_data.get())
+
+    def _rest_base_ui_item_config_del(self, name = None, reference = None, key = None):
+        """ delete ui_item_config
+            @param name : ui item config name
+            @param reference : ui item config reference
+            @param key : ui item config key
         """
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("ui_config")
-        try:
-            for ui_item_config in self._db.delete_ui_item_config( \
-                               ui_name = self.get_parameters("name"), \
-                               ui_reference = self.get_parameters("reference"),\
-                               ui_key = self.get_parameters("key")):
-                json_data.add_data(ui_item_config)
-        except:
-            json_data.set_error(code = 999, description = self.get_exception())
+        for ui_item_config in self._db.delete_ui_item_config(ui_item_name = name,
+                                                             ui_item_reference = reference,
+                                                             ui_item_key = key):
+            json_data.add_data(ui_item_config)
         self.send_http_response_ok(json_data.get())
-
 
 
 
