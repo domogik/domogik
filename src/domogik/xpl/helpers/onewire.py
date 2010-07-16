@@ -54,24 +54,30 @@ class onewire(Helper):
                { "all" : 
                   {
                     "cb" : self.all,
-                    "desc" : "Show all devices found on onewire network"
+                    "desc" : "Show all devices found on onewire network",
+                    "min_args" : 1,
+                    "usage" : "all <adaptator device>"
                   },
                   "detail" : 
                   {
                     "cb" : self.detail,
                     "desc" : "Show detail for a device.",
                     "min_args" : 1,
-                    "usage" : "detail <device id>"
+                    "usage" : "detail <adaptator device> <device id>"
                   },
                   "ds18b20" : 
                   {
                     "cb" : self.ds18b20,
-                    "desc" : "Show detail for all DS18B20 devices"
+                    "desc" : "Show detail for all DS18B20 devices",
+                    "min_args" : 1,
+                    "usage" : "all <adaptator device>"
                   },
                   "ds2401" : 
                   {
                     "cb" : self.ds2401,
-                    "desc" : "Show detail for all DS2401 devices"
+                    "desc" : "Show detail for all DS2401 devices",
+                    "min_args" : 1,
+                    "usage" : "all <adaptator device>"
                   }
                 }
 
