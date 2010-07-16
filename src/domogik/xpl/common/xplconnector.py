@@ -79,6 +79,7 @@ from socket import socket, gethostbyname, gethostname, AF_INET, SOCK_DGRAM, SOL_
 from domogik.common import logger
 from domogik.xpl.common.baseplugin import BasePlugin
 from domogik.xpl.common.xplmessage import XplMessage
+from domogik.common.dmg_exceptions import XplMessageError
 
 READ_NETWORK_TIMEOUT = 2
 
