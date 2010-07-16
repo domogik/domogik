@@ -319,7 +319,7 @@ class Listener:
         ok = True
         for key in self._filter:
             if key in message.data:
-                if isinstance(self._filter[key], list) and not (message.data[key].lower() in self._filter[key].lower()):
+                if isinstance(self._filter[key], list) and not (message.data[key].lower() in [s.lower() for s in self._filter[key]]):
                     ok = False
                 elif not isinstance(self._filter[key], list) and (message.data[key].lower() != self._filter[key].lower()):
                     ok = False
