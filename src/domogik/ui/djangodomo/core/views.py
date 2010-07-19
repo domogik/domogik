@@ -79,14 +79,14 @@ def index(request):
     @return an HttpResponse object
     """
     page_title = _("Domogik Homepage")
+    widgets_list = settings.WIDGETS_LIST
 
     try:
         result_all_areas = Areas.get_all()
         result_all_areas.merge_rooms()
         result_all_areas.merge_uiconfig()
-        result_house = House.get()
-        result_house_features_associations = FeatureAssociations.get_by_house()
-
+        result_house = House()
+        result_house.merge_feature_associations()
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
     """
@@ -96,9 +96,9 @@ def index(request):
     """
     return __go_to_page(request, 'index.html',
         page_title,
+        widgets=widgets_list,
         areas_list=result_all_areas.area,
-        house=result_house,
-        house_features_associations=result_house_features_associations.feature_association
+        house=result_house
     )
 
 def login(request):
@@ -328,7 +328,7 @@ def admin_organization_house(request):
     status = request.GET.get('status', '')
     msg = request.GET.get('msg', '')
     try:
-        result_house = House.get()
+        result_house = House()
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
     page_title = _("House organization")
@@ -442,21 +442,23 @@ def show_house(request):
     @return an HttpResponse object
     """
     page_title = _("View House")
+    widgets_list = settings.WIDGETS_LIST
+
     try:
         result_all_areas = Areas.get_all()
         result_all_areas.merge_uiconfig()
 
-        result_house = House.get()
-        result_house_features_associations = FeatureAssociations.get_by_house()
+        result_house = House()
+        result_house.merge_feature_associations()
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
     return __go_to_page(
         request, 'show/house.html',
         page_title,
+        widgets=widgets_list,
         nav1_show = "selected",
         areas_list=result_all_areas.area,
-        house=result_house,
-        house_features_associations=result_house_features_associations.feature_association
+        house=result_house
     )
 
 def show_house_edit(request):
@@ -466,8 +468,10 @@ def show_house_edit(request):
     @return an HttpResponse object
     """
     page_title = _("Edit House")
+    widgets_list = settings.WIDGETS_LIST
+
     try:
-        result_house = House.get()
+        result_house = House()
         result_all_devices = Devices.get_all()
         result_all_devices.merge_uiconfig()
         result_all_devices.merge_features()
@@ -476,6 +480,7 @@ def show_house_edit(request):
     return __go_to_page(
         request, 'show/house.edit.html',
         page_title,
+        widgets=widgets_list,
         nav1_show = "selected",
         house=result_house,
         devices_list=result_all_devices.device
@@ -487,6 +492,8 @@ def show_area(request, area_id):
     @param request : HTTP request
     @return an HttpResponse object
     """
+    widgets_list = settings.WIDGETS_LIST
+
     try:
         result_area_by_id = Areas.get_by_id(area_id)
         result_area_by_id.merge_uiconfig()
@@ -494,7 +501,7 @@ def show_area(request, area_id):
 
         result_rooms_by_area = Rooms.get_by_area(area_id)
         result_rooms_by_area.merge_uiconfig()
-        result_house = House.get()
+        result_house = House()
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
 
@@ -502,6 +509,7 @@ def show_area(request, area_id):
     return __go_to_page(
         request, 'show/area.html',
         page_title,
+        widgets=widgets_list,
         nav1_show = "selected",
         area=result_area_by_id.area[0],
         rooms_list=result_rooms_by_area.room,
@@ -514,11 +522,13 @@ def show_area_edit(request, area_id):
     @param request : HTTP request
     @return an HttpResponse object
     """
+    widgets_list = settings.WIDGETS_LIST
+
     try:
         result_area_by_id = Areas.get_by_id(area_id)
         result_area_by_id.merge_uiconfig()
         result_area_by_id.merge_feature_associations()
-        result_house = House.get()
+        result_house = House()
         
         result_all_devices = Devices.get_all()
         result_all_devices.merge_uiconfig()
@@ -531,6 +541,7 @@ def show_area_edit(request, area_id):
     return __go_to_page(
         request, 'show/area.edit.html',
         page_title,
+        widgets=widgets_list,
         nav1_show = "selected",
         area=result_area_by_id.area[0],
         house=result_house,
@@ -543,12 +554,14 @@ def show_room(request, room_id):
     @param request : HTTP request
     @return an HttpResponse object
     """
+    widgets_list = settings.WIDGETS_LIST
+
     try:
         result_room_by_id = Rooms.get_by_id(room_id)
         result_room_by_id.merge_uiconfig()
         result_room_by_id.merge_feature_associations()
 
-        result_house = House.get()
+        result_house = House()
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
 
@@ -556,6 +569,7 @@ def show_room(request, room_id):
     return __go_to_page(
         request, 'show/room.html',
         page_title,
+        widgets=widgets_list,
         nav1_show = "selected",
         room=result_room_by_id.room[0],
         house=result_house
@@ -567,12 +581,14 @@ def show_room_edit(request, room_id):
     @param request : HTTP request
     @return an HttpResponse object
     """
+    widgets_list = settings.WIDGETS_LIST
+
     try:
         result_room_by_id = Rooms.get_by_id(room_id)
         result_room_by_id.merge_uiconfig()
         result_room_by_id.merge_feature_associations()
 
-        result_house = House.get()
+        result_house = House()
 
         result_all_devices = Devices.get_all()
         result_all_devices.merge_uiconfig()
@@ -585,6 +601,7 @@ def show_room_edit(request, room_id):
     return __go_to_page(
         request, 'show/room.edit.html',
         page_title,
+        widgets=widgets_list,
         nav1_show = "selected",
         room=result_room_by_id.room[0],
         house=result_house,

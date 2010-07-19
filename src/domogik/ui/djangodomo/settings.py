@@ -174,7 +174,8 @@ INSTALLED_APPS = (
     'domogik.ui.djangodomo.core',
 )
 
-STATIC_DOC_ROOT = '%s/core/templates/design' % PROJECT_PATH
+STATIC_DESIGN_ROOT = '%s/core/templates/design' % PROJECT_PATH
+STATIC_WIDGETS_ROOT = '%s/core/templates/widgets' % PROJECT_PATH
 
 # Session stuff
 # Other options are : 
@@ -188,3 +189,12 @@ try:
     from settings_local import *
 except ImportError:
     pass
+
+# List the availables widgets
+WIDGETS_PATH = '%s/core/templates/widgets/' % PROJECT_PATH
+WIDGETS_LIST = []
+for file in os.listdir(WIDGETS_PATH):
+    main = os.path.join(WIDGETS_PATH, file, "main.js")
+    if os.path.isfile(main):
+        WIDGETS_LIST.append(file)
+print WIDGETS_LIST

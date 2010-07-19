@@ -75,8 +75,8 @@
     <h1 class="ident icon64-room-{{ room.config.icon }}"><span class="title">{{ room.name }}</span></h1>
     <div class="maininfo">
         <ul>
-        {% if room.config.widget_placement.maininfo %}
-            <li><div id="widget_{{ room.config.widget_placement.maininfo.device }}_{{ room.config.widget_placement.maininfo.feature }}"></div></li>
+        {% if room.config.widgets.maininfo %}
+            <li><div id="widget_{{ room.config.widgets.maininfo.device }}_{{ room.config.widgets.maininfo.feature }}"></div></li>
         {% endif %}    
         </ul>
     </div>
@@ -86,14 +86,14 @@
     <div class='actions'>
         <div class='mainactions'>
             <ul>
-            {% for action in room.config.widget_placement.mainactions %}
+            {% for action in room.config.widgets.mainactions %}
                 <li><div id="widget_{{ action.device }}_{{ action.feature }}"></div></li>
             {% endfor %}
             </ul>
         </div>
         <div class='otheractions'>
             <ul>
-            {% for action in room.config.widget_placement.otheractions %}
+            {% for action in room.config.widgets.otheractions %}
                 <li><div id="widget_{{ action.device }}_{{ action.feature }}"></div></li>
             {% endfor %}
             </ul>
