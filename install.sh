@@ -156,7 +156,7 @@ fi
 }
 
 function copy_tools {
-    [ -d "/usr/local/bin" ] && (cp -f src/domogik/tools/dmg* /usr/local/bin;chmod +x /usr/local/bin/dmg*)
+    [ -d "/usr/local/bin" ] && (cp -f src/tools/dmg* /usr/local/bin;chmod +x /usr/local/bin/dmg*)
 }
 
 function modify_hosts {
