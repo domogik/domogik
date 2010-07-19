@@ -1738,6 +1738,8 @@ target=*
                 if len(self.rest_request) == 6 and self.rest_request[2] == "device_id" and self.rest_request[4] == "feature_id":
                     self._rest_base_feature_association_del(device_id=self.rest_request[3], 
                                                             feature_id=self.rest_request[5])
+                elif len(self.rest_request) == 6 and self.rest_request[2] == "association_type" and self.rest_request[4] == "association_id":
+                    # TODO !!!!
                 else:
                     self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
