@@ -1,0 +1,34 @@
+.widget {
+    display:block;
+    outline: none;
+    position:relative;
+    border: 1px solid #cccccc;
+    -moz-border-radius: 0.8em;
+    -webkit-border-radius: 0.8em;
+    margin:0;
+    -moz-user-select:none;
+    -webkit-user-select:none;
+}
+
+.widget .identity, .model .identity {
+    position:absolute;
+    top: -15px;
+    left: -15px;
+}
+
+.size1x1 { width:5em; height:5em;}
+
+.model {
+    text-align:center;
+    display:block;
+    outline: none;
+    position:relative;
+    -moz-border-radius: 0.8em;
+    -webkit-border-radius: 0.8em;
+    margin:auto;
+    padding:1px;
+    -moz-user-select:none;
+    -webkit-user-select:none;
+    color:#ffffff;
+    background-color:#000000;
+}

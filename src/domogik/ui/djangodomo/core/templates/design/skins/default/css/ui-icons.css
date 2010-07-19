@@ -396,10 +396,6 @@
 .icon16-status-info {background-image:url(../images/status/info_16.png);}
 .icon16-status-warning {background-image:url(../images/status/warning_16.png);}
 
-.icon8-status-equal {background-image:url(../images/status/right_8.png);}
-.icon8-status-up {background-image:url(../images/status/up_8.png);}
-.icon8-status-down {background-image:url(../images/status/down_8.png);}
-
 .icon16-text {
     display:inline-block;
     background-position: 50% left;

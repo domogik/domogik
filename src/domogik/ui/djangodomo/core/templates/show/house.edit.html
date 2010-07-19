@@ -47,26 +47,30 @@
             );*/
 
             json = {};
-
+            json.list = []
             // Main info
             $(".maininfo li:first").each(function(index) {
-                json.maininfo = {device:$(this).attr('devicevalue'), feature:$(this).attr('featurevalue')};
+                var action = {widget:$(this).attr('widgetid'), device:$(this).attr('devicevalue'), feature:$(this).attr('featurevalue')};
+                json.maininfo = action;
+                json.list.push(action);
                 addAssociation($(this).attr('devicevalue'), $(this).attr('featurevalue'));
             });
 
             // Main actions
             json.mainactions = [];
             $(".mainactions li").each(function(index) {
-                var action = {device:$(this).attr('devicevalue'), feature:$(this).attr('featurevalue')};
+                var action = {widget:$(this).attr('widgetid'), device:$(this).attr('devicevalue'), feature:$(this).attr('featurevalue')};
                 json.mainactions.push(action);
+                json.list.push(action);
                 addAssociation($(this).attr('devicevalue'), $(this).attr('featurevalue'));
             });
             
             // Other actions
             json.otheractions = [];
             $(".otheractions li").each(function(index) {
-                var action = {device:$(this).attr('devicevalue'), feature:$(this).attr('featurevalue')};
+                var action = {widget:$(this).attr('widgetid'), device:$(this).attr('devicevalue'), feature:$(this).attr('featurevalue')};
                 json.otheractions.push(action);
+                json.list.push(action);
                 addAssociation($(this).attr('devicevalue'), $(this).attr('featurevalue'));
             });
             
@@ -81,7 +85,7 @@
                     window.setTimeout(saveUIConfig, 1000);
                 } else {
                     var jsonstr = JSON.stringify(json).replace(/"/g, '&quot;');
-                    $.getREST(['base', 'ui_config', 'set', 'name', 'house', 'reference', '0', 'key', 'widget_placement', 'value', jsonstr],
+                    $.getREST(['base', 'ui_config', 'set', 'name', 'house', 'reference', '0', 'key', 'widgets', 'value', jsonstr],
                         function(data) {
                             var status = (data.status).toLowerCase();
                             if (status == 'ok') {
@@ -118,12 +122,12 @@
                 }
             );
         }
-        
-        {% if house.config.widget_placement.maininfo %}
-            $(".maininfo ul").widget_model({
-                featurevalue: '{{ house.config.widget_placement.maininfo.feature }}',
+
+        {% if house.config.widgets.maininfo %}
+            $(".maininfo ul").{{ house.config.widgets.maininfo.widget }}({
+                featurevalue: '{{ house.config.widgets.maininfo.feature }}',
                 featurename: 'featurename',
-                devicevalue: '{{ house.config.widget_placement.maininfo.device }}',
+                devicevalue: '{{ house.config.widgets.maininfo.device }}',
                 devicename: 'devicename',
                 draggable: {
                     helper: false,
@@ -145,8 +149,8 @@
             });
         {% endif %}
         
-        {% for action in house.config.widget_placement.mainactions %}
-            $(".mainactions ul").widget_model({
+        {% for action in house.config.widgets.mainactions %}
+            $(".mainactions ul").{{ action.widget }}({
                 featurevalue: '{{ action.feature }}',
                 featurename: 'featurename',
                 devicevalue: '{{ action.device }}',
@@ -171,8 +175,8 @@
             });
         {% endfor %}
         
-        {% for action in house.config.widget_placement.otheractions %}
-            $(".otheractions ul").widget_model({
+        {% for action in house.config.widgets.otheractions %}
+            $(".otheractions ul").{{ action.widget }}({
                 featurevalue: '{{ action.feature }}',
                 featurename: 'featurename',
                 devicevalue: '{{ action.device }}',
@@ -200,6 +204,7 @@
         $(".feature").click(function(){
             $(".selected").removeClass('selected');
             $(this).addClass('selected');
+            var type = $(this).attr('type');
             var featurevalue = $(this).attr('featurevalue');
             var featurename = $(this).attr('featurename');
             var devicevalue = $(this).attr('devicevalue');
@@ -207,6 +212,7 @@
             $("#widgetslist").empty();
             $("#widgets").show();
             $("#widgetslist").widget_models({
+                type: type,
                 featurevalue: featurevalue,
                 featurename: featurename,
                 devicevalue: devicevalue,
@@ -289,7 +295,7 @@
                         <li><div class='device icon16-technology-{{ device.device_type.device_technology_id }}'>{{ device.name }} ({{ device.address }})</div>
                             <ul>
                                 {% for feature in device.feature %}
-                                <li><div class='feature' devicevalue='{{ device.id }}' featurevalue='{{ feature.id }}' devicename='{{device.name }}' featurename='{{ feature.name }}'>{{ feature.name }}</div></li>
+                                <li><div class='feature' devicevalue='{{ device.id }}' featurevalue='{{ feature.id }}' devicename='{{device.name }}' featurename='{{ feature.name }}' type='{{ feature.feature_type }}.{{ feature.value_type }}'>{{ feature.name }}</div></li>
                                 {% endfor %}
                             </ul>
                         </li>

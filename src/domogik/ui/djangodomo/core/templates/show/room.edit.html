@@ -70,7 +70,7 @@
                     window.setTimeout(saveUIConfig, 1000);
                 } else {
                     var jsonstr = JSON.stringify(json).replace(/"/g, '&quot;');
-                    $.getREST(['base', 'ui_config', 'set', 'name', 'room', 'reference', '{{ room.id }}', 'key', 'widget_placement', 'value', jsonstr],
+                    $.getREST(['base', 'ui_config', 'set', 'name', 'room', 'reference', '{{ room.id }}', 'key', 'widgets', 'value', jsonstr],
                         function(data) {
                             var status = (data.status).toLowerCase();
                             if (status == 'ok') {
@@ -108,11 +108,11 @@
             );
         }
         
-        {% if room.config.widget_placement.maininfo %}
+        {% if room.config.widgets.maininfo %}
             $(".maininfo ul").widget_model({
-                featurevalue: '{{ room.config.widget_placement.maininfo.feature }}',
+                featurevalue: '{{ room.config.widgets.maininfo.feature }}',
                 featurename: 'featurename',
-                devicevalue: '{{ room.config.widget_placement.maininfo.device }}',
+                devicevalue: '{{ room.config.widgets.maininfo.device }}',
                 devicename: 'devicename',
                 draggable: {
                     helper: false,
@@ -134,7 +134,7 @@
             });
         {% endif %}
         
-        {% for action in room.config.widget_placement.mainactions %}
+        {% for action in room.config.widgets.mainactions %}
             $(".mainactions ul").widget_model({
                 featurevalue: '{{ action.feature }}',
                 featurename: 'featurename',
@@ -160,7 +160,7 @@
             });
         {% endfor %}
         
-        {% for action in room.config.widget_placement.otheractions %}
+        {% for action in room.config.widgets.otheractions %}
             $(".otheractions ul").widget_model({
                 featurevalue: '{{ action.feature }}',
                 featurename: 'featurename',

@@ -47,14 +47,26 @@ def unescape(s):
     return re.sub('&(%s);' % '|'.join(name2codepoint),
               lambda m: unichr(name2codepoint[m.group(1)]), s)
 
-class House():
-    @staticmethod
-    def get():
-        resp = {}
-        resp['config'] = UIConfigs.get_by_reference('house', '0')
-        if resp['config'].has_key('name') :
-            resp['name'] = resp['config']['name']
-        return resp
+class House(object):
+    def __init__(self):
+        print(self)
+        self.config = UIConfigs.get_by_reference('house', '0')
+        if self.config.has_key('name') :
+            self.name = self.config['name']
+
+    def merge_feature_associations(self):
+        associations = FeatureAssociations.get_by_house()
+        self.feature_association = associations.feature_association
+        if self.config.has_key('widgets'):
+            for association in self.feature_association:
+                print association
+                for widget in self.config['widgets']['list']:
+                    print widget
+                    print association.device_id, " == ", widget['device']
+                    print int(association.device_id) == int(widget['device'])
+                    if int(association.device_id) == int(widget['device']) and int(association.device_feature_id) == int(widget['feature']):
+                        association['widget_id'] = widget['widget']
+
         
 class Areas(pipes.DmgPipe):
     uri = settings.REST_URL + "/base/area"

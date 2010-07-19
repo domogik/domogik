@@ -155,6 +155,10 @@ if [ ! -x "$(which python)" ];then
 fi
 }
 
+function copy_tools {
+    [ -d "/usr/local/bin" ] && (cp -f src/tools/dmg* /usr/local/bin;chmod +x /usr/local/bin/dmg*)
+}
+
 function modify_hosts {
     [ -f "/etc/hosts" ] || touch /etc/hosts
     if ! grep localhost /etc/hosts|grep -qs 127.0.0.1;then
@@ -187,6 +191,7 @@ run_setup_py $MODE
 copy_sample_files
 update_default_config
 update_user_config
+copy_tools
 call_db_installer
 modify_hosts
 

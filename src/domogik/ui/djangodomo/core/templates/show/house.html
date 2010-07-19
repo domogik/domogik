@@ -25,17 +25,17 @@
 
 {% block js_script %}
     $(function() {
-        {% for association in house_features_associations %}
-            {% get_widget association %}
-            {% get_widget_init association %}
+        {% for feature in house.feature_association %}
+            {% get_widget feature %}
+            {% get_widget_init feature %}
         {% endfor %}
 
-        {% if house_features_associations %}
-            {% regroup house_features_associations|dictsort:"device_id" by device as devices %}
+        {% if house.feature_association %}
+            {% regroup house.feature_association|dictsort:"device_id" by device as devices %}
             var devices = [{% for device in devices %}{{ device.grouper.id }}{% if not forloop.last %},{% endif %}{% endfor %}];
             $.eventRequest(devices, function(event) {
                 switch(event.device_id) {
-                {% regroup house_features_associations|dictsort:"device_id" by device as devices %}
+                {% regroup house.feature_association|dictsort:"device_id" by device as devices %}
                 {% for device in devices %}
                     case {{ device.grouper.id }}:
                         $.each(event.data, function(index, item) {
@@ -71,8 +71,8 @@
     <h1 class="ident icon64-house-default"><span class="title">{{ house.name }}</span></h1>
     <div class="maininfo">
         <ul>
-        {% if house.config.widget_placement.maininfo %}
-            <li><div id="widget_{{ house.config.widget_placement.maininfo.device }}_{{ house.config.widget_placement.maininfo.feature }}"></div></li>
+        {% if house.config.widgets.maininfo %}
+            <li><div id="widget_{{ house.config.widgets.maininfo.device }}_{{ house.config.widgets.maininfo.feature }}"></div></li>
         {% endif %}    
         </ul>
     </div>
@@ -82,14 +82,14 @@
     <div class='actions'>
         <div class='mainactions'>
             <ul>
-            {% for action in house.config.widget_placement.mainactions %}
+            {% for action in house.config.widgets.mainactions %}
                 <li><div id="widget_{{ action.device }}_{{ action.feature }}"></div></li>
             {% endfor %}
             </ul>
         </div>
         <div class='otheractions'>
             <ul>
-            {% for action in house.config.widget_placement.otheractions %}
+            {% for action in house.config.widgets.otheractions %}
                 <li><div id="widget_{{ action.device }}_{{ action.feature }}"></div></li>
             {% endfor %}
             </ul>
