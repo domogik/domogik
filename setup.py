@@ -83,6 +83,8 @@ setup(
         ('/usr/local/share/domogik/rest/', list_all_files('src/share/domogik/url2xpl/')),
         ('/usr/local/share/doc/schemas', list_all_files('src/domogik/xpl/schema/')),
         ('/usr/local/bin/', ['src/domogik/xpl/tools/xPL_Hub']),
+        ('/usr/local/bin/', ['src/domogik/tools/dmgenplug']),
+        ('/usr/local/bin/', ['src/domogik/tools/dmgdisplug']),
         ('/etc/init.d/', ['src/domogik/examples/init/domogik']),
         ('/etc/default/', ['src/domogik/examples/default/domogik'])
     ],
