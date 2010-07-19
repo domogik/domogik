@@ -147,22 +147,24 @@ class GetCommandTrigger():
 class GetInfoBoolean():
     @staticmethod
     def get_widget_mini(feature, device_type, device_usage, parameters_type, parameters_usage):
-        script = """$("#widget_%s_%s").widget_mini_info_boolean({
+        script = """$("#widget_%s_%s").%s().%s('widget',{
                             usage: %s,
                             devicename: '%s',
                             featurename: '%s',
                             deviceid: %s,
                             key: '%s'
                         });
-                 """ % (feature.device_id, feature.device_feature_id, feature.device.device_usage_id,
+                 """ % (feature.device_id, feature.device_feature_id, feature.widget_id,
+                        feature.widget_id, feature.device.device_usage_id,
                         feature.device.name, feature.device_feature.name,
                         feature.device_id, feature.device_feature.stat_key)
         return script
 
     @staticmethod
     def get_setValue(feature, value):
-        script = """$("#widget_%s_%s").widget_mini_info_boolean('setValue', %s);
-                 """ % (feature.device_id, feature.device_feature_id, value)
+        script = """$("#widget_%s_%s").%s('setValue', %s);
+                 """ % (feature.device_id, feature.device_feature_id,
+                        feature.widget_id, value)
 
         return script
     
@@ -185,8 +187,9 @@ class GetInfoNumber():
 
     @staticmethod
     def get_setValue(feature, value):
-        script = """$("#widget_%s_%s").widget_mini_info_number('setValue', %s);
-                 """ % (feature.device_id, feature.device_feature_id, value)
+        script = """$("#widget_%s_%s").%s('setValue', %s);
+                 """ % (feature.device_id, feature.device_feature_id,
+                        feature.widget_id, value)
 
         return script
 

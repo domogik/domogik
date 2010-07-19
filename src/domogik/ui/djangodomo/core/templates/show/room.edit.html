@@ -266,6 +266,18 @@
 {% endblock %}
 
 {% block contentleft %}
+    <div class='actions'>
+        <div class='mainactions'>
+            <span class='offscreen'>{% trans "Main actions" %}</span>
+            <ul>
+            </ul>
+        </div>
+        <div class='otheractions'>
+            <ul>
+            </ul>
+        </div>
+    </div>
+    
     <div id='panel'>
         <div id='features'>
             <h2>Features</h2>
@@ -294,17 +306,7 @@
             </ul>
         </div>
     </div>
-    <div class='actions'>
-        <div class='mainactions'>
-            <span class='offscreen'>{% trans "Main actions" %}</span>
-            <ul>
-            </ul>
-        </div>
-        <div class='otheractions'>
-            <ul>
-            </ul>
-        </div>
-    </div>
+
 {% endblock %}
 
 {% block contentright %}

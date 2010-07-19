@@ -66,6 +66,15 @@ li.roomitem {
     background-repeat: no-repeat;
 }
 
+li.roomitem:focus {
+    background-color: #000;
+    color: #fff;    
+}
+
+li.roomitem .description {
+    display:block;    
+}
+
 li.empty {
     background-color: #fff;
     color: #000;

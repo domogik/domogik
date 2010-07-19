@@ -251,7 +251,7 @@
             var item = ui.draggable.detach();
             item.removeAttr('style');
             item.addClass('success');
-            item.draggable({
+            item.dmg_draggable({
                 helper: false,
                 revert: false
             });
@@ -267,6 +267,7 @@
 {% endblock %}
 
 {% block js_include %}
+    <script type="text/javascript" src="/design/js/dmg.dragdrop.js"></script>
 {% endblock %}
 
 {% block title %}{% trans page_title %}{% endblock %}
@@ -283,6 +284,18 @@
 {% endblock %}
 
 {% block contentleft %}
+    <div class='actions'>
+        <div class='mainactions'>
+            <span class='offscreen'>{% trans "Main actions" %}</span>
+            <ul>
+            </ul>
+        </div>
+        <div class='otheractions'>
+            <ul>
+            </ul>
+        </div>
+    </div>
+    
     <div id='panel'>
         <div id='features'>
             <h2>Features</h2>
@@ -308,17 +321,6 @@
         <div id='widgets' ddname="Widgets">
             <h2>Widgets</h2>
             <ul id='widgetslist'>
-            </ul>
-        </div>
-    </div>
-    <div class='actions'>
-        <div class='mainactions'>
-            <span class='offscreen'>{% trans "Main actions" %}</span>
-            <ul>
-            </ul>
-        </div>
-        <div class='otheractions'>
-            <ul>
             </ul>
         </div>
     </div>
