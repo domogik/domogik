@@ -17,7 +17,7 @@
       <name>heyu-cfg-path</name>
       <type>string</type>
       <description>Heyu configuration path</description>
-      <default-value>TODO</default-value>
+      <default-value>/etc/heyu/x10.conf</default-value>
     </key>
   </configuration-keys>
 </plugin>
