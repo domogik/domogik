@@ -1738,6 +1738,9 @@ target=*
                 if len(self.rest_request) == 6 and self.rest_request[2] == "device_id" and self.rest_request[4] == "feature_id":
                     self._rest_base_feature_association_del(device_id=self.rest_request[3], 
                                                             feature_id=self.rest_request[5])
+                elif len(self.rest_request) == 6 and self.rest_request[2] == "association_type" and self.rest_request[4] == "association_id":
+                    self._rest_base_feature_association_del(association_type=self.rest_request[3], 
+                                                            association_id=self.rest_request[5])
                 else:
                     self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
@@ -2478,19 +2481,32 @@ target=*
 
 
 
-    def _rest_base_feature_association_del(self, device_id, feature_id):
+    def _rest_base_feature_association_del(self, device_id = None, 
+                                          feature_id = None,
+                                          association_type = None,
+                                          association_id = None):
         """ delete feature association
             @param device_id : device id
             @param feature_id : feature id
+            @param association_type : type of association (room, area, etc)
+            @param association_id : association id
         """
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("feature_association")
-        try:
-            device = self._db.del_device_feature_association(device_id, feature_id)
-            json_data.add_data(device)
-        except:
-            json_data.set_error(code = 999, description = self.get_exception())
+        if device_id != None:
+            try:
+                device = self._db.del_device_feature_association(device_id, feature_id)
+                json_data.add_data(device)
+            except:
+                json_data.set_error(code = 999, description = self.get_exception())
+        elif association_type != None:
+            try:
+                device = ["TODO"]
+                #device = self._db.del_device_feature_association(device_id, feature_id)
+                json_data.add_data(device)
+            except:
+                json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
 
 
