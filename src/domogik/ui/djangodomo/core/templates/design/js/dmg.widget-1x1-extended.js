@@ -29,18 +29,19 @@ const state_reset_status = 4000; // 4 seconds
                 this._elementClose = this._addButtonIcon("widget_close", "left", "icon32-action-cancel", function (e) {self.close();e.stopPropagation();});
                 this._elementName = $("<span class='name " + o.namePosition + "'>" + p.devicename + "<br/>" + p.featurename + "</span>");
                 this.element.append(this._elementName);
-                this.element.keypress(function (e) {if (e.keyCode == 27) {self.close(); e.stopPropagation();}});
+                this.element.click(function (e) {self._onclick();e.stopPropagation();})
+                    .keypress(function (e) {if (e.which == 13 || e.which == 32) {self._onclick(); e.stopPropagation();}
+                              else if (e.keyCode == 27) {self.close(); e.stopPropagation();}});
             } else {
-                
+                this.element.click(function (e) {self.action();e.stopPropagation();})
+                    .keypress(function (e) {if (e.which == 13 || e.which == 32) {self._action; e.stopPropagation();}});
             }
             if(o.hasStatus) {
                 this._elementStatus = $("<div class='status'></div>");
                 this.element.append(this._elementStatus);                
             }
-            this.element.click(function (e) {self._onclick();e.stopPropagation();})
-                .keypress(function (e) {if (e.which == 13 || e.which == 32) {self._onclick(); e.stopPropagation();}});
             },
-        
+
         _onclick: function() {
             var self = this, o = this.options;
             if (o.isOpenable) {
@@ -51,7 +52,7 @@ const state_reset_status = 4000; // 4 seconds
                 }
             }
         },
-        
+
         open: function() {
             var self = this, o = this.options;
             if (!this.isOpen) {
@@ -65,7 +66,7 @@ const state_reset_status = 4000; // 4 seconds
                 });
             }
         },
-        
+
         close: function() {
             if (this.isOpen) {
                 this.isOpen = false;
@@ -74,14 +75,14 @@ const state_reset_status = 4000; // 4 seconds
             }
             this.element.doTimeout( 'timeout');
         },
-        
+
         _addButtonIcon: function(css, position, icon, action) {
             var element = $("<div class='widget_button_icon " + css + " " + position + " " + icon + "'></div>")
                 .click(action);
             this.element.append(element);
             return element;
         },
-        
+
         _addButtonText: function(css, position, icon, text, action) {
             var element = $("<div class='widget_button_text " + css + " " + position + " " + icon + "'>" + text + "</div>")
                 .click(action);
@@ -89,20 +90,12 @@ const state_reset_status = 4000; // 4 seconds
             return element;
         },
 
-        runAction: function(data) {
-            var self = this, o = this.options;
-            if (o.action) {
-                this._startProcessingState();
-                o.action(this, data);                
-            }
-        },
-        
         cancel: function() {
             var self = this, o = this.options;
             this._stopProcessingState();
             this._displayStatusError();
         },
-        
+
         /* Valid the processing state */
         valid: function(confirmed) {
             var self = this, o = this.options;
@@ -114,22 +107,21 @@ const state_reset_status = 4000; // 4 seconds
                 });
             }
         },
-        
+
         _displayIcon: function(newIcon, previousIcon) {
             if (previousIcon) {
                 this.element.removeClass(previousIcon);
             }
             this.element.addClass(newIcon);
         },
-        
+
         _startProcessingState: function() {
             this.element.processing('start');
         },
-        
+
         _stopProcessingState: function() {
             this.element.processing('stop');
         },
-
 
         /* Status */
         _writeStatus: function(text) {
@@ -138,21 +130,21 @@ const state_reset_status = 4000; // 4 seconds
                 this._elementStatus.text(text);
             }
         },
-        
+
         _displayStatusError: function() {
             var self = this, o = this.options;
             if(o.hasStatus) {
                 this._elementStatus.addClass('error');
             }
         },
-        
+
         _displayStatusOk: function() {
             var self = this, o = this.options;
             if(o.hasStatus) {
                 this._elementStatus.addClass('ok');
             }
         },
-        
+
         _displayResetStatus: function() {
             var self = this, o = this.options;
             if(o.hasStatus) {

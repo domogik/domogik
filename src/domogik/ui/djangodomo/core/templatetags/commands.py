@@ -119,26 +119,18 @@ class GetCommandRange(Node):
 
 class GetCommandTrigger():
     @staticmethod
-    def get_widget_mini(feature, device_type, device_usage, parameters_type, parameters_usage):
-        script = """$('#widget_%s_%s').widget_mini_command_trigger({
+    def get_widget(feature, device_type, device_usage, parameters_type, parameters_usage):
+        script = """$('#widget_%s_%s').%s().%s('widget',{
                         usage: %s,
                         devicename: '%s',
                         featurename: '%s',
-                        action: function(self) {
-                            $.getREST(['command', '%s', '%s', '%s'],
-                                function(data) {
-                                    var status = (data.status).toLowerCase();
-                                    if (status == 'ok') {
-                                        self.valid(%s);
-                                    } else {
-                                        /* Error */
-                                        self.cancel();
-                                    }
-                                }
-                            );
-                        }
+                        devicetechnology: '%s',
+                        deviceaddress: '%s',
+                        featurecommand: '%s',
+                        featureconfirmation: '%s'
                     });
-                    """ % (feature.device_id, feature.device_feature_id, feature.device.device_usage_id,
+                    """ % (feature.device_id, feature.device_feature_id, feature.widget_id,
+                           feature.widget_id, feature.device.device_usage_id,
                            feature.device.name, feature.device_feature.name,
                            device_type.device_technology_id, feature.device.address,
                            parameters_type['command'], feature.device_feature.return_confirmation)
@@ -146,7 +138,7 @@ class GetCommandTrigger():
 
 class GetInfoBoolean():
     @staticmethod
-    def get_widget_mini(feature, device_type, device_usage, parameters_type, parameters_usage):
+    def get_widget(feature, device_type, device_usage, parameters_type, parameters_usage):
         script = """$("#widget_%s_%s").%s().%s('widget',{
                             usage: %s,
                             devicename: '%s',
@@ -228,10 +220,10 @@ class GetWidget(Node):
             if feature.device_feature.value_type == "range":
                 script = GetCommandRange.get_widget_mini(feature, device_type, device_usage, parameters_type, parameters_usage)
             if feature.device_feature.value_type == "trigger":
-                script = GetCommandTrigger.get_widget_mini(feature, device_type, device_usage, parameters_type, parameters_usage)
+                script = GetCommandTrigger.get_widget(feature, device_type, device_usage, parameters_type, parameters_usage)
         else : # 'Sensor'
             if feature.device_feature.value_type == "boolean":
-                script = GetInfoBoolean.get_widget_mini(feature, device_type, device_usage, parameters_type, parameters_usage)
+                script = GetInfoBoolean.get_widget(feature, device_type, device_usage, parameters_type, parameters_usage)
             if feature.device_feature.value_type == "number":
                 script = GetInfoNumber.get_widget(feature, device_type, device_usage, parameters_type, parameters_usage)
             if feature.device_feature.value_type == "string":

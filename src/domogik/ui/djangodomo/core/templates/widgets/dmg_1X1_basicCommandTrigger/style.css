@@ -1,0 +1,16 @@
+.dmg_1x1_basicInfoBoolean .status {
+    height:14px;
+    min-width:2em;
+    padding:0;
+    background-position: 50% 50%; 
+    background-repeat: no-repeat; 
+}
+
+.dmg_1x1_basicInfoBoolean .widget_value {
+    position:absolute;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    text-align:center;
+    width:5em;
+    height:5em;
+}
