@@ -473,6 +473,8 @@ def show_house_edit(request):
     try:
         result_house = House()
         result_house.merge_feature_associations()
+
+        result_all_devices = Devices.get_all()
         result_all_devices.merge_uiconfig()
         result_all_devices.merge_features()
     except ResourceNotAvailableException:
