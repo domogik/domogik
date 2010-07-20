@@ -376,9 +376,10 @@ class DeviceFeatureAssociation(Base):
     """Association between devices, features and an item (room, area, house)"""
 
     __tablename__ = '%s_device_feature_association' % _db_prefix
-    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), primary_key=True)
+    id = Column(Integer, primary_key=True)
+    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()))
     device = relation(Device, backref=backref(__tablename__))
-    device_feature_id = Column(Integer, ForeignKey('%s.id' % DeviceFeature.get_tablename()), primary_key=True)
+    device_feature_id = Column(Integer, ForeignKey('%s.id' % DeviceFeature.get_tablename()))
     device_feature = relation(DeviceFeature)
     place_type = Column(Enum('room', 'area', 'house', name='place_type_list'), nullable=True)
     place_id = Column(Integer, nullable=True)
