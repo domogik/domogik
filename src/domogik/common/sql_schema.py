@@ -382,6 +382,8 @@ class DeviceFeature(Base):
     device_feature_model_id = Column(Integer, ForeignKey('%s.id' % DeviceFeatureModel.get_tablename()))
     device_feature_model = relation(DeviceFeatureModel)
 
+    UniqueConstraint(device_id, device_feature_model_id)
+
     def __init__(self, device_id, device_feature_model_id):
         """Class constructor
 
