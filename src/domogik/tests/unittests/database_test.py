@@ -502,7 +502,7 @@ class DeviceFeatureAssociationTestCase(GenericTestCase):
     def test_empty_list(self):
         assert len(self.db.list_device_feature_association()) == 0
 
-    def test_add(self):
+    def test_add_get_list(self):
         area1 = self.db.add_area('Basement')
         area2 = self.db.add_area('First floor')
         room1 = self.db.add_room('Kitchen', area1.id)
@@ -520,10 +520,14 @@ class DeviceFeatureAssociationTestCase(GenericTestCase):
         af3 = self.db.add_actuator_feature_model(af_name='Switch', af_device_type_id=dty2.id, af_parameters='myparams3',
                                                  af_value_type='number')
         device1 = self.db.add_device(d_name='Toaster', d_address='A1', d_type_id=dty1.id, d_usage_id=du1.id)
+        #assert self.db.get_device_feature_by_id(
         device2 = self.db.add_device(d_name='Air conditioning', d_address='A2', d_type_id=dty1.id, d_usage_id=du1.id,
                                      d_description='Cold thing')
         device3 = self.db.add_device(d_name='Lamp', d_address='A1', d_type_id=dty2.id, d_usage_id=du2.id,
                                      d_description='')
+        df_list = self.db.list_device_features_by_device_id(device3.id)
+        assert len(df_list) == 2
+        assert self.db.get_device_feature_by_id(df_list[0].id) is not None
         df_list = self.db.list_device_feature_by_device_feature_model_id(af1.id)
         dfa = self.db.add_device_feature_association(d_feature_id=df_list[0].id, d_place_type='house')
         print(dfa)
