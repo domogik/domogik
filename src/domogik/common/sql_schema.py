@@ -407,11 +407,6 @@ class DeviceFeatureAssociation(Base):
 
     __tablename__ = '%s_device_feature_association' % _db_prefix
     id = Column(Integer, primary_key=True)
-<<<<<<< local
-=======
-    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()))
-    device = relation(Device, backref=backref(__tablename__))
->>>>>>> other
     device_feature_id = Column(Integer, ForeignKey('%s.id' % DeviceFeature.get_tablename()))
     device_feature = relation(DeviceFeature)
     place_type = Column(Enum('room', 'area', 'house', name='place_type_list'), nullable=True)
