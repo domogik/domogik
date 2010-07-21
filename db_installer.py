@@ -67,30 +67,30 @@ db.add_default_user_account()
 
 device_technology = db.add_device_technology(dt_id='x10', dt_name='X10', dt_description='')
 device_type = db.add_device_type(dty_name='Switch', dt_id=device_technology.id)
-db.add_actuator_feature(af_name='Switch', af_device_type_id=device_type.id,
-                        af_parameters='{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}',
-                        af_value_type='binary', af_stat_key='command')
+db.add_actuator_feature_model(af_name='Switch', af_device_type_id=device_type.id,
+                              af_parameters='{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}',
+                              af_value_type='binary', af_stat_key='command')
 device_type = db.add_device_type(dty_name='Dimmer', dt_id=device_technology.id)
-db.add_actuator_feature(af_name='Switch', af_device_type_id=device_type.id,
-                        af_parameters='{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}',
-                        af_value_type='binary', af_stat_key='command')
-db.add_actuator_feature(af_name='Dimmer', af_device_type_id=device_type.id,
-                        af_parameters='{&quot;command&quot;:&quot;dim&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:100}',
-                        af_value_type='range', af_stat_key='level')
+db.add_actuator_feature_model(af_name='Switch', af_device_type_id=device_type.id,
+                              af_parameters='{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}',
+                              af_value_type='binary', af_stat_key='command')
+db.add_actuator_feature_model(af_name='Dimmer', af_device_type_id=device_type.id,
+                              af_parameters='{&quot;command&quot;:&quot;dim&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:100}',
+                              af_value_type='range', af_stat_key='level')
 
 # Create device technologie features for PLCBus
 device_technology = db.add_device_technology(dt_id='plcbus', dt_name='PLCBus', dt_description='')
 device_type = db.add_device_type(dty_name='Switch', dt_id=device_technology.id)
-db.add_actuator_feature(af_name='Switch', af_device_type_id=device_type.id,
-                        af_parameters='{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}',
-                        af_value_type='binary', af_return_confirmation=True)
+db.add_actuator_feature_model(af_name='Switch', af_device_type_id=device_type.id,
+                              af_parameters='{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}',
+                              af_value_type='binary', af_return_confirmation=True)
 device_type = db.add_device_type(dty_name='Dimmer', dt_id=device_technology.id)
-db.add_actuator_feature(af_name='Switch', af_device_type_id=device_type.id,
-                        af_parameters='{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}',
-                        af_value_type='binary', af_return_confirmation=True)
-db.add_actuator_feature(af_name='Dimmer', af_device_type_id=device_type.id,
-                        af_parameters='{&quot;command&quot;:&quot;dim&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:100}', af_value_type='range',
-                        af_return_confirmation=True)
+db.add_actuator_feature_model(af_name='Switch', af_device_type_id=device_type.id,
+                              af_parameters='{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}',
+                              af_value_type='binary', af_return_confirmation=True)
+db.add_actuator_feature_model(af_name='Dimmer', af_device_type_id=device_type.id,
+                              af_parameters='{&quot;command&quot;:&quot;dim&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:100}',
+                              af_value_type='range', af_return_confirmation=True)
 
 # Create device technology features for EIB/KNX
 db.add_device_technology(dt_id='eibknx', dt_name='EIB/KNX', dt_description='')
@@ -98,16 +98,13 @@ db.add_device_technology(dt_id='eibknx', dt_name='EIB/KNX', dt_description='')
 # Create device technology features for 1wire
 device_technology = db.add_device_technology(dt_id='onewire', dt_name='1-Wire', dt_description='')
 device_type = db.add_device_type(dty_name='Temperature', dt_id=device_technology.id)
-db.add_sensor_feature(sf_name='Temperature',
-                   sf_device_type_id=device_type.id, sf_value_type='number',
-                   sf_parameters='{&quot;unit&quot;:&quot;&deg;C&quot;}',
-                   sf_stat_key='temperature')
+db.add_sensor_feature_model(sf_name='Temperature',
+                            sf_device_type_id=device_type.id, sf_value_type='number',
+                            sf_parameters='{&quot;unit&quot;:&quot;&deg;C&quot;}', sf_stat_key='temperature')
 device_type = db.add_device_type(dty_name='ID', dt_id=device_technology.id)
-db.add_sensor_feature(sf_name='ID',
-                   sf_device_type_id=device_type.id, sf_value_type='boolean',
-                   sf_parameters='{}',
-                   sf_stat_key='present')
-
+db.add_sensor_feature_model(sf_name='ID',
+                            sf_device_type_id=device_type.id, sf_value_type='boolean', sf_parameters='{}',
+                            sf_stat_key='present')
 
 # Create device technology features for RFXCom
 db.add_device_technology(dt_id='rfxcom', dt_name='RFXCom', dt_description='')
@@ -118,37 +115,38 @@ db.add_device_technology(dt_id='ir', dt_name='Infra Red', dt_description='')
 device_technology = db.add_device_technology(dt_id='service', dt_name='Service',
                                              dt_description='Distributed services, water, gas, electricity')
 device_type = db.add_device_type(dty_name='Teleinfo', dt_id=device_technology.id)
-db.add_sensor_feature(sf_name='Instantaneous intensity', sf_device_type_id=device_type.id, sf_value_type='number', sf_parameters='{&quot;unit&quot;:&quot;A&quot;}', sf_stat_key='iinst')
-db.add_sensor_feature(sf_name='Off peak', sf_device_type_id=device_type.id, sf_value_type='number', sf_parameters='{&quot;unit&quot;:&quot;Wh&quot;}', sf_stat_key='hchc')
-db.add_sensor_feature(sf_name='Maximum intensity', sf_device_type_id=device_type.id, sf_value_type='number', sf_parameters='{&quot;unit&quot;:&quot;A&quot;}', sf_stat_key='imax')
-db.add_sensor_feature(sf_name='Tariff Period', sf_device_type_id=device_type.id, sf_value_type='string', sf_parameters=None, sf_stat_key='ptec')
-db.add_sensor_feature(sf_name='Power', sf_device_type_id=device_type.id, sf_value_type='number', sf_parameters='{&quot;unit&quot;:&quot;Va&quot;}', sf_stat_key='papp')
-db.add_sensor_feature(sf_name='Group schedule', sf_device_type_id=device_type.id, sf_value_type='string', sf_parameters=None, sf_stat_key='hhphc')
-db.add_sensor_feature(sf_name='On Peak', sf_device_type_id=device_type.id, sf_value_type='number', sf_parameters='{&quot;unit&quot;:&quot;Wh&quot;}', sf_stat_key='hchp')
+db.add_sensor_feature_model(sf_name='Instantaneous intensity', sf_device_type_id=device_type.id, sf_value_type='number',
+                            sf_parameters='{&quot;unit&quot;:&quot;A&quot;}', sf_stat_key='iinst')
+db.add_sensor_feature_model(sf_name='Off peak', sf_device_type_id=device_type.id, sf_value_type='number',
+                            sf_parameters='{&quot;unit&quot;:&quot;Wh&quot;}', sf_stat_key='hchc')
+db.add_sensor_feature_model(sf_name='Maximum intensity', sf_device_type_id=device_type.id, sf_value_type='number',
+                            sf_parameters='{&quot;unit&quot;:&quot;A&quot;}', sf_stat_key='imax')
+db.add_sensor_feature_model(sf_name='Tariff Period', sf_device_type_id=device_type.id, sf_value_type='string',
+                            sf_parameters=None, sf_stat_key='ptec')
+db.add_sensor_feature_model(sf_name='Power', sf_device_type_id=device_type.id, sf_value_type='number',
+                            sf_parameters='{&quot;unit&quot;:&quot;Va&quot;}', sf_stat_key='papp')
+db.add_sensor_feature_model(sf_name='Group schedule', sf_device_type_id=device_type.id, sf_value_type='string',
+                            sf_parameters=None, sf_stat_key='hhphc')
+db.add_sensor_feature_model(sf_name='On Peak', sf_device_type_id=device_type.id, sf_value_type='number',
+                            sf_parameters='{&quot;unit&quot;:&quot;Wh&quot;}', sf_stat_key='hchp')
 
 # Create device technology features for RFID
 device_technology = db.add_device_technology(dt_id='rfid', dt_name='RFID', dt_description='')
 device_type = db.add_device_type(dty_name='Mirror_Base', dt_id=device_technology.id)
-db.add_sensor_feature(sf_name='Activated',
-                   sf_device_type_id=device_type.id, sf_value_type='boolean',
-                   sf_parameters='{}',
-                   sf_stat_key='activated')
+db.add_sensor_feature_model(sf_name='Activated', sf_device_type_id=device_type.id, sf_value_type='boolean',
+                            sf_parameters='{}', sf_stat_key='activated')
 device_type = db.add_device_type(dty_name='Mirror_Tag', dt_id=device_technology.id)
-db.add_sensor_feature(sf_name='Present',
-                   sf_device_type_id=device_type.id, sf_value_type='boolean',
-                   sf_parameters='{}',
-                   sf_stat_key='present')
+db.add_sensor_feature_model(sf_name='Present', sf_device_type_id=device_type.id, sf_value_type='boolean',
+                            sf_parameters='{}', sf_stat_key='present')
 # Create device technology features for Computer
 device_technology = db.add_device_technology(dt_id='computer', dt_name='Computer',
                                              dt_description='Computers monitoring and controling ')
 device_type = db.add_device_type(dty_name='Control', dt_id=device_technology.id)
-db.add_actuator_feature(af_name='WOL', af_device_type_id=device_type.id,
-                        af_parameters='{&quot;command&quot;:&quot;wol&quot;}',af_value_type='trigger',
-                        af_return_confirmation=False)
-db.add_sensor_feature(sf_name='Ping',
-                   sf_device_type_id=device_type.id, sf_value_type='boolean',
-                   sf_parameters='{}',
-                   sf_stat_key='ping')
+db.add_actuator_feature_model(af_name='WOL', af_device_type_id=device_type.id,
+                              af_parameters='{&quot;command&quot;:&quot;wol&quot;}',af_value_type='trigger',
+                              af_return_confirmation=False)
+db.add_sensor_feature_model(sf_name='Ping', sf_device_type_id=device_type.id, sf_value_type='boolean',
+                            sf_parameters='{}', sf_stat_key='ping')
 # Create device technologie features for MultiMedia
 db.add_device_technology(dt_id='multimedia', dt_name='MultiMedia', dt_description='Music, Video')
 # Create device technologie features for Communication

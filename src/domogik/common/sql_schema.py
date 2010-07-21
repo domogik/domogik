@@ -316,10 +316,10 @@ class Device(Base):
         return Device.__tablename__
 
 
-class DeviceFeature(Base):
-    """Device features (switch, dimmer, temperature)"""
+class DeviceFeatureModel(Base):
+    """Device features that can be associated to a device (type) : switch, dimmer, temperature..."""
 
-    __tablename__ = '%s_device_feature' % _db_prefix
+    __tablename__ = '%s_device_feature_model' % _db_prefix
     id = Column(Integer, primary_key=True)
     name = Column(Unicode(30), nullable=False)
     feature_type = Column(Enum('actuator', 'sensor', name='feature_type_list'), nullable=False)
@@ -362,9 +362,41 @@ class DeviceFeature(Base):
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<DeviceFeature(%s, %s, device_type=%s, param=%s, value_type=%s, stat_key=%s, return_conf=%s)>" \
+        return "<DeviceFeatureModel(%s, %s, device_type=%s, param=%s, value_type=%s, stat_key=%s, return_conf=%s)>" \
                % (self.id, self.feature_type, self.device_type, self.parameters, self.value_type, \
                   self.stat_key, self.return_confirmation)
+
+    @staticmethod
+    def get_tablename():
+        """Return the table name associated to the class"""
+        return DeviceFeatureModel.__tablename__
+
+
+class DeviceFeature(Base):
+    """Association between Device and DeviceFeatureModel entities"""
+
+    __tablename__ = '%s_device_feature' % _db_prefix
+    id = Column(Integer, primary_key=True)
+    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()))
+    device = relation(Device, backref=backref(__tablename__))
+    device_feature_model_id = Column(Integer, ForeignKey('%s.id' % DeviceFeatureModel.get_tablename()))
+    device_feature_model = relation(DeviceFeatureModel)
+
+    UniqueConstraint(device_id, device_feature_model_id)
+
+    def __init__(self, device_id, device_feature_model_id):
+        """Class constructor
+
+        @param device_id : device id
+        @param device_feature_model_id : device feature model id
+
+        """
+        self.device_id = device_id
+        self.device_feature_model_id = device_feature_model_id
+
+    def __repr__(self):
+        """Return an internal representation of the class"""
+        return "<DeviceFeature(%s, %s, %s)>" % (self.id, self.device, self.device_feature_model)
 
     @staticmethod
     def get_tablename():
@@ -377,17 +409,14 @@ class DeviceFeatureAssociation(Base):
 
     __tablename__ = '%s_device_feature_association' % _db_prefix
     id = Column(Integer, primary_key=True)
-    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()))
-    device = relation(Device, backref=backref(__tablename__))
     device_feature_id = Column(Integer, ForeignKey('%s.id' % DeviceFeature.get_tablename()))
     device_feature = relation(DeviceFeature)
     place_type = Column(Enum('room', 'area', 'house', name='place_type_list'), nullable=True)
     place_id = Column(Integer, nullable=True)
 
-    def __init__(self, device_id, device_feature_id, place_type=None, place_id=None):
+    def __init__(self, device_feature_id, place_type=None, place_id=None):
         """Class constructor
 
-        @param device_id : device id
         @param device_feature_id : device feature id
         @param place_type : room, area or house, optional (None if the feature is not associated to one of the places)
         @param place_id : place id (None if it is the house, or if the feature is not associated to one of the places)
@@ -400,7 +429,6 @@ class DeviceFeatureAssociation(Base):
             raise DbHelperException("Place id should be None as item type is None")
         if (place_type == 'room' or place_type == 'area') and place_id is None:
             raise DbHelperException("A place id should have been provided, place type is %s" % place_type)
-        self.device_id = device_id
         self.device_feature_id = device_feature_id
         self.place_type = place_type
         self.place_id = place_id
@@ -408,7 +436,7 @@ class DeviceFeatureAssociation(Base):
     def __repr__(self):
         """Return an internal representation of the class"""
         return "<DeviceFeatureAssociation(%s, %s, %s, place_id=%s)>" \
-               % (self.device, self.device_feature, self.place_type, self.place_id)
+               % (self.id, self.device_feature, self.place_type, self.place_id)
 
     @staticmethod
     def get_tablename():

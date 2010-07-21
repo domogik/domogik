@@ -37,7 +37,7 @@ import time
 import datetime
 
 from domogik.common.database import DbHelper, DbHelperException
-from domogik.common.sql_schema import Area, Device, DeviceFeature, DeviceUsage, DeviceConfig, DeviceStats, \
+from domogik.common.sql_schema import Area, Device, DeviceFeatureModel, DeviceUsage, DeviceConfig, DeviceStats, \
                                       DeviceFeatureAssociation, DeviceTechnology, PluginConfig, \
                                       DeviceType, UIItemConfig, Room, UserAccount, SystemConfig, Trigger, Person
 
@@ -89,15 +89,15 @@ class GenericTestCase(unittest.TestCase):
         for device in device_list:
             db.del_device_config(device.id)
 
-    def remove_all_device_features(self, db):
-        for af in db.list_actuator_features():
-            db.del_actuator_feature(af.id)
-        for sf in db.list_sensor_features():
-            db.del_sensor_feature(sf.id)
+    def remove_all_device_feature_models(self, db):
+        for af in db.list_actuator_feature_models():
+            db.del_actuator_feature_model(af.id)
+        for sf in db.list_sensor_feature_models():
+            db.del_sensor_feature_model(sf.id)
 
     def remove_all_device_feature_associations(self, db):
-        for dfa in db.list_device_feature_association():
-            db.del_device_feature_association(dfa.device_id, dfa.device_feature_id)
+        for dfa in db.list_device_feature_associations():
+            db.del_device_feature_association(dfa.id)
 
     def remove_all_plugin_config(self, db):
         for plc in db.list_all_plugin_config():
@@ -186,7 +186,7 @@ class AreaTestCase(GenericTestCase):
         area_d = self.db.del_area(area0.id)
         assert not self.has_item(self.db.list_areas(), ['area0'])
         assert area_d.id == area0.id
-        assert len(self.db.list_device_feature_association_by_area_id(area_d.id)) == 0
+        assert len(self.db.list_device_feature_associations_by_area_id(area_d.id)) == 0
         try:
             self.db.del_area(12345678910)
             TestCase.fail(self, "Area does not exist, an exception should have been raised")
@@ -257,7 +257,7 @@ class RoomTestCase(GenericTestCase):
         assert not self.has_item(self.db.list_rooms(), ['room1'])
         assert self.has_item(self.db.list_rooms(), ['room2', 'room3'])
         assert room_deleted.id == room1_id
-        assert len(self.db.list_device_feature_association_by_room_id(room_deleted.id)) == 0
+        assert len(self.db.list_device_feature_associations_by_room_id(room_deleted.id)) == 0
         try:
             self.db.del_room(12345678910)
             TestCase.fail(self, "Room does not exist, an exception should have been raised")
@@ -395,16 +395,16 @@ class DeviceTypeTestCase(GenericTestCase):
         except DbHelperException:
             pass
 
-class DeviceFeatureTestCase(GenericTestCase):
-    """Test device type, actuator and sensor features"""
+class DeviceFeatureModelTestCase(GenericTestCase):
+    """Test device feature models"""
 
     def setUp(self):
         self.db = DbHelper(use_test_db=True)
-        self.remove_all_device_features(self.db)
+        self.remove_all_device_feature_models(self.db)
         self.remove_all_device_technologies(self.db)
 
     def tearDown(self):
-        self.remove_all_device_features(self.db)
+        self.remove_all_device_feature_models(self.db)
         self.remove_all_device_technologies(self.db)
         del self.db
 
@@ -417,49 +417,49 @@ class DeviceFeatureTestCase(GenericTestCase):
         dty1 = self.db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
         dty2 = self.db.add_device_type(dty_name='x10 Dimmer', dty_description='desc2', dt_id=dt1.id)
         dty3 = self.db.add_device_type(dty_name='1wire.Temperature', dty_description='desc3', dt_id=dt2.id)
-        af1 = self.db.add_actuator_feature(af_name='Switch', af_device_type_id=dty1.id, af_parameters='myparams1',
-                                           af_value_type='binary', af_return_confirmation=True)
-        print(af1)
-        assert af1.name == 'Switch'
-        assert af1.device_type_id == dty1.id
-        assert af1.parameters == 'myparams1'
-        assert af1.value_type == 'binary'
-        assert af1.return_confirmation
-        assert self.db.get_device_feature_by_id(af1.id).name == 'Switch'
-        af2 = self.db.add_actuator_feature(af_name='Dimmer', af_device_type_id=dty2.id, af_parameters='myparams2',
-                                           af_value_type='number', af_return_confirmation=True)
-        sf1 = self.db.add_sensor_feature(sf_name='Thermometer', sf_device_type_id=dty3.id, sf_parameters='myparams3',
-                                         sf_value_type='number')
-        print(sf1)
-        assert sf1.name == 'Thermometer'
-        assert sf1.device_type_id == dty3.id
-        assert sf1.parameters == 'myparams3'
-        assert sf1.value_type == 'number'
-        assert len(self.db.list_device_features()) == 3
-        assert self.has_item(self.db.list_device_features(), ['Switch', 'Dimmer', 'Thermometer'])
-        assert len(self.db.list_actuator_features()) == 2
-        assert self.db.get_actuator_feature_by_id(af2.id).name == 'Dimmer'
-        assert len(self.db.list_sensor_features()) == 1
-        assert self.db.get_sensor_feature_by_id(sf1.id).name == 'Thermometer'
-        assert len(self.db.list_device_feature_by_device_type_id(dty1.id)) == 1
-        assert len(self.db.list_device_feature_by_device_type_id(dty3.id)) == 1
+        afm1 = self.db.add_actuator_feature_model(af_name='Switch', af_device_type_id=dty1.id, af_parameters='myparams1',
+                                                 af_value_type='binary', af_return_confirmation=True)
+        print(afm1)
+        assert afm1.name == 'Switch'
+        assert afm1.device_type_id == dty1.id
+        assert afm1.parameters == 'myparams1'
+        assert afm1.value_type == 'binary'
+        assert afm1.return_confirmation
+        assert self.db.get_device_feature_model_by_id(afm1.id).name == 'Switch'
+        afm2 = self.db.add_actuator_feature_model(af_name='Dimmer', af_device_type_id=dty2.id, af_parameters='myparams2',
+                                                  af_value_type='number', af_return_confirmation=True)
+        sfm1 = self.db.add_sensor_feature_model(sf_name='Thermometer', sf_device_type_id=dty3.id,
+                                                sf_parameters='myparams3', sf_value_type='number')
+        print(sfm1)
+        assert sfm1.name == 'Thermometer'
+        assert sfm1.device_type_id == dty3.id
+        assert sfm1.parameters == 'myparams3'
+        assert sfm1.value_type == 'number'
+        assert len(self.db.list_device_feature_models()) == 3
+        assert self.has_item(self.db.list_device_feature_models(), ['Switch', 'Dimmer', 'Thermometer'])
+        assert len(self.db.list_actuator_feature_models()) == 2
+        assert self.db.get_actuator_feature_model_by_id(afm2.id).name == 'Dimmer'
+        assert len(self.db.list_sensor_feature_models()) == 1
+        assert self.db.get_sensor_feature_model_by_id(sfm1.id).name == 'Thermometer'
+        assert len(self.db.list_device_feature_models_by_device_type_id(dty1.id)) == 1
+        assert len(self.db.list_device_feature_models_by_device_type_id(dty3.id)) == 1
 
     def test_update(self):
         dt1 = self.db.add_device_technology('x10', 'x10', 'desc dt1')
         dt2 = self.db.add_device_technology('1wire', '1-Wire', 'desc dt2')
         dty1 = self.db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
         dty2 = self.db.add_device_type(dty_name='1wire.Temperature', dty_description='desc3', dt_id=dt2.id)
-        af1 = self.db.add_actuator_feature(af_name='Switch', af_device_type_id=dty1.id, af_value_type='number',
-                                           af_parameters='myparams1')
-        af1_u = self.db.update_actuator_feature(af_id=af1.id, af_name='Big switch',
-                                                af_parameters='myparams_u', af_return_confirmation=True)
+        af1 = self.db.add_actuator_feature_model(af_name='Switch', af_device_type_id=dty1.id, af_value_type='number',
+                                                 af_parameters='myparams1')
+        af1_u = self.db.update_actuator_feature_model(af_id=af1.id, af_name='Big switch',
+                                                      af_parameters='myparams_u', af_return_confirmation=True)
         assert af1_u.name == 'Big switch'
         assert af1_u.parameters == 'myparams_u'
         assert af1_u.value_type == 'number'
         assert af1_u.return_confirmation
-        sf1 = self.db.add_sensor_feature(sf_name='Thermometer', sf_device_type_id=dty2.id, sf_parameters='myparams2',
-                                         sf_value_type='number')
-        sf1_u = self.db.update_sensor_feature(sf_id=sf1.id, sf_value_type='string')
+        sf1 = self.db.add_sensor_feature_model(sf_name='Thermometer', sf_device_type_id=dty2.id,
+                                               sf_parameters='myparams2', sf_value_type='number')
+        sf1_u = self.db.update_sensor_feature_model(sf_id=sf1.id, sf_value_type='string')
         assert sf1_u.value_type == 'string'
 
     def test_del(self):
@@ -468,22 +468,22 @@ class DeviceFeatureTestCase(GenericTestCase):
         dty1 = self.db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
         dty2 = self.db.add_device_type(dty_name='x10 Dimmer', dty_description='desc2', dt_id=dt1.id)
         dty3 = self.db.add_device_type(dty_name='1wire.Temperature', dty_description='desc3', dt_id=dt2.id)
-        af1 = self.db.add_actuator_feature(af_name='Switch', af_device_type_id=dty1.id, af_parameters='myparams1',
-                                           af_value_type='binary', af_return_confirmation=True)
-        af2 = self.db.add_actuator_feature(af_name='Dimmer', af_device_type_id=dty2.id, af_parameters='myparams2',
-                                           af_value_type='number', af_return_confirmation=True)
-        sf1 = self.db.add_sensor_feature(sf_name='Thermometer', sf_device_type_id=dty3.id, sf_parameters='myparams3',
-                                         sf_value_type='number')
-        af_d = self.db.del_actuator_feature(af1.id)
+        af1 = self.db.add_actuator_feature_model(af_name='Switch', af_device_type_id=dty1.id, af_parameters='myparams1',
+                                                 af_value_type='binary', af_return_confirmation=True)
+        af2 = self.db.add_actuator_feature_model(af_name='Dimmer', af_device_type_id=dty2.id, af_parameters='myparams2',
+                                                 af_value_type='number', af_return_confirmation=True)
+        sf1 = self.db.add_sensor_feature_model(sf_name='Thermometer', sf_device_type_id=dty3.id,
+                                               sf_parameters='myparams3', sf_value_type='number')
+        af_d = self.db.del_actuator_feature_model(af1.id)
         assert af_d.id == af1.id
-        assert len(self.db.list_device_feature_association_by_feature_id(af_d.id)) == 0
-        assert len(self.db.list_device_features()) == 2
-        assert len(self.db.list_actuator_features()) == 1
-        assert len(self.db.list_sensor_features()) == 1
-        af_d = self.db.del_actuator_feature(af2.id)
-        assert len(self.db.list_actuator_features()) == 0
-        sf_d = self.db.del_sensor_feature(sf1.id)
-        assert len(self.db.list_sensor_features()) == 0
+        assert len(self.db.list_device_feature_associations_by_feature_id(af_d.id)) == 0
+        assert len(self.db.list_device_feature_models()) == 2
+        assert len(self.db.list_actuator_feature_models()) == 1
+        assert len(self.db.list_sensor_feature_models()) == 1
+        af_d = self.db.del_actuator_feature_model(af2.id)
+        assert len(self.db.list_actuator_feature_models()) == 0
+        sf_d = self.db.del_sensor_feature_model(sf1.id)
+        assert len(self.db.list_sensor_feature_models()) == 0
 
 
 class DeviceFeatureAssociationTestCase(GenericTestCase):
@@ -500,9 +500,9 @@ class DeviceFeatureAssociationTestCase(GenericTestCase):
         del self.db
 
     def test_empty_list(self):
-        assert len(self.db.list_device_feature_association()) == 0
+        assert len(self.db.list_device_feature_associations()) == 0
 
-    def test_add(self):
+    def test_add_get_list(self):
         area1 = self.db.add_area('Basement')
         area2 = self.db.add_area('First floor')
         room1 = self.db.add_room('Kitchen', area1.id)
@@ -510,33 +510,40 @@ class DeviceFeatureAssociationTestCase(GenericTestCase):
         dt1 = self.db.add_device_technology('x10', 'x10', 'x10 device type')
         dt2 = self.db.add_device_technology('plcbus', 'PLCBus', 'PLCBus device type')
         du1 = self.db.add_device_usage('Appliance')
-        dty1 = self.db.add_device_type(dty_name='x10 Switch', dt_id=dt1.id,
-                                       dty_description='My beautiful switch')
-        dty2 = self.db.add_device_type(dty_name='PLCBus Switch', dt_id=dt2.id,
-                                       dty_description='Another beautiful switch')
-        device1 = self.db.add_device(d_name='Toaster', d_address='A1',
-                    d_type_id=dty1.id, d_usage_id=du1.id, d_description='My new toaster')
-        device2 = self.db.add_device(d_name='Washing machine', d_address='A1',
-                    d_type_id=dty2.id, d_usage_id=du1.id, d_description='Laden')
-        device3 = self.db.add_device(d_name='Mixer', d_address='A2',
-                    d_type_id=dty2.id, d_usage_id=du1.id, d_description='Moulinex')
-        af1 = self.db.add_actuator_feature(af_name='Switch', af_device_type_id=dty1.id, af_parameters='myparams1',
-                                           af_value_type='binary')
-        af2 = self.db.add_actuator_feature(af_name='Dimmer', af_device_type_id=dty2.id, af_parameters='myparams2',
-                                           af_value_type='number')
-        dfa = self.db.add_device_feature_association(d_device_id=device1.id, d_type_feature_id=af1.id,
-                                                     d_place_type='house')
+        du2 = self.db.add_device_usage('Lamp')
+        dty1 = self.db.add_device_type(dty_name='x10 Switch', dt_id=dt1.id, dty_description='My beautiful switch')
+        dty2 = self.db.add_device_type(dty_name='PLCBus Lamp', dt_id=dt2.id)
+        af1 = self.db.add_actuator_feature_model(af_name='Switch', af_device_type_id=dty1.id, af_parameters='myparams1',
+                                                 af_value_type='binary')
+        af2 = self.db.add_actuator_feature_model(af_name='Dimmer', af_device_type_id=dty2.id, af_parameters='myparams2',
+                                                 af_value_type='number')
+        af3 = self.db.add_actuator_feature_model(af_name='Switch', af_device_type_id=dty2.id, af_parameters='myparams3',
+                                                 af_value_type='number')
+        device1 = self.db.add_device(d_name='Toaster', d_address='A1', d_type_id=dty1.id, d_usage_id=du1.id)
+        #assert self.db.get_device_feature_by_id(
+        device2 = self.db.add_device(d_name='Air conditioning', d_address='A2', d_type_id=dty1.id, d_usage_id=du1.id,
+                                     d_description='Cold thing')
+        device3 = self.db.add_device(d_name='Lamp', d_address='A1', d_type_id=dty2.id, d_usage_id=du2.id,
+                                     d_description='')
+        df_list = self.db.list_device_features_by_device_id(device3.id)
+        assert len(df_list) == 2
+        assert self.db.get_device_feature_by_id(df_list[0].id) is not None
+        df_list = self.db.list_device_feature_by_device_feature_model_id(af1.id)
+        dfa = self.db.add_device_feature_association(d_feature_id=df_list[0].id, d_place_type='house')
+        assert self.db.get_device_feature_association_by_id(dfa.id) is not None
         print(dfa)
-        self.db.add_device_feature_association(d_device_id=device2.id, d_type_feature_id=af2.id,
-                                               d_place_id=room1.id, d_place_type='room')
-        self.db.add_device_feature_association(d_device_id=device3.id, d_type_feature_id=af2.id,
-                                               d_place_id=area1.id, d_place_type='area')
-        assert len(self.db.list_device_feature_association()) == 3
-        assert len(self.db.list_device_feature_association_by_house()) == 1
-        assert len(self.db.list_device_feature_association_by_room_id(room1.id)) == 1
-        assert len(self.db.list_device_feature_association_by_room_id(room2.id)) == 0
-        assert len(self.db.list_device_feature_association_by_area_id(area1.id)) == 1
-        assert len(self.db.list_device_feature_association_by_area_id(area2.id)) == 0
+        df_list = self.db.list_device_feature_by_device_feature_model_id(af2.id)
+        self.db.add_device_feature_association(d_feature_id=df_list[0].id, d_place_id=room1.id, d_place_type='room')
+        df_list = self.db.list_device_feature_by_device_feature_model_id(af3.id)
+        self.db.add_device_feature_association(d_feature_id=df_list[0].id, d_place_id=room1.id, d_place_type='room')
+        df_list = self.db.list_device_feature_by_device_id(device2.id)
+        self.db.add_device_feature_association(d_feature_id=df_list[0].id, d_place_id=area1.id, d_place_type='area')
+        assert len(self.db.list_device_feature_associations()) == 4
+        assert len(self.db.list_device_feature_associations_by_house()) == 1
+        assert len(self.db.list_device_feature_associations_by_room_id(room1.id)) == 2
+        assert len(self.db.list_device_feature_associations_by_room_id(room2.id)) == 0
+        assert len(self.db.list_device_feature_associations_by_area_id(area1.id)) == 1
+        assert len(self.db.list_device_feature_associations_by_area_id(area2.id)) == 0
 
     def test_del(self):
         area1 = self.db.add_area('Basement')
@@ -550,29 +557,30 @@ class DeviceFeatureAssociationTestCase(GenericTestCase):
                                        dty_description='My beautiful switch')
         dty2 = self.db.add_device_type(dty_name='PLCBus Switch', dt_id=dt2.id,
                                        dty_description='Another beautiful switch')
-        device1 = self.db.add_device(d_name='Toaster', d_address='A1',
-                    d_type_id=dty1.id, d_usage_id=du1.id, d_description='My new toaster')
-        device2 = self.db.add_device(d_name='Washing machine', d_address='A1',
-                    d_type_id=dty2.id, d_usage_id=du1.id, d_description='Laden')
-        device3 = self.db.add_device(d_name='Mixer', d_address='A2',
-                    d_type_id=dty2.id, d_usage_id=du1.id, d_description='Moulinex')
-        af1 = self.db.add_actuator_feature(af_name='Switch', af_device_type_id=dty1.id, af_value_type='binary',
-                                           af_parameters='myparams1')
-        af2 = self.db.add_actuator_feature(af_name='Dimmer', af_device_type_id=dty2.id, af_value_type='number',
-                                           af_parameters='myparams2')
-        dfa1 = self.db.add_device_feature_association(d_device_id=device1.id, d_type_feature_id=af1.id,
-                                                      d_place_type='house')
-        dfa2 = self.db.add_device_feature_association(d_device_id=device2.id, d_type_feature_id=af2.id,
-                                                      d_place_id=room1.id, d_place_type='room')
-        dfa3 = self.db.add_device_feature_association(d_device_id=device3.id, d_type_feature_id=af2.id,
-                                                      d_place_id=area1.id, d_place_type='area')
-        dfa = self.db.del_device_feature_association(d_device_id=dfa1.device_id,
-                                                     d_type_feature_id=dfa1.device_feature_id)
-        assert dfa.device_id == dfa1.device_id and dfa.device_feature_id == dfa1.device_feature_id
-        assert len(self.db.list_device_feature_association()) == 2
-        assert len(self.db.list_device_feature_association_by_room_id(room1.id)) == 1
-        assert len(self.db.list_device_feature_association_by_area_id(area1.id)) == 1
-
+        afm1 = self.db.add_actuator_feature_model(af_name='Switch', af_device_type_id=dty1.id, af_value_type='binary',
+                                                  af_parameters='myparams1')
+        afm2 = self.db.add_actuator_feature_model(af_name='Dimmer', af_device_type_id=dty2.id, af_value_type='number',
+                                                  af_parameters='myparams2')
+        device1 = self.db.add_device(d_name='Toaster', d_address='A1', d_type_id=dty1.id, d_usage_id=du1.id,
+                                     d_description='My new toaster')
+        device2 = self.db.add_device(d_name='Washing machine', d_address='A1', d_type_id=dty2.id, d_usage_id=du1.id,
+                                     d_description='Laden')
+        device3 = self.db.add_device(d_name='Mixer', d_address='A2', d_type_id=dty2.id, d_usage_id=du1.id,
+                                     d_description='Moulinex')
+        df1 = self.db.get_device_feature(device1.id, afm1.id)
+        dfa1 = self.db.add_device_feature_association(d_feature_id=df1.id, d_place_type='house')
+        df2 = self.db.get_device_feature(device2.id, afm2.id)
+        dfa2 = self.db.add_device_feature_association(d_feature_id=df2.id, d_place_id=room1.id, d_place_type='room')
+        df3 = self.db.get_device_feature(device3.id, afm2.id)
+        dfa3 = self.db.add_device_feature_association(d_feature_id=df3.id, d_place_id=area1.id, d_place_type='area')
+        dfa4 = self.db.add_device_feature_association(d_feature_id=df3.id, d_place_type='house')
+        dfa = self.db.del_device_feature_association(dfa1.id)
+        assert dfa.id == dfa1.id
+        assert len(self.db.list_device_feature_associations()) == 3
+        assert len(self.db.list_device_feature_associations_by_room_id(room1.id)) == 1
+        assert len(self.db.list_device_feature_associations_by_area_id(area1.id)) == 1
+        assert len(self.db.del_device_feature_association_by_device_feature_id(df3.id)) == 2
+        assert len(self.db.list_device_feature_associations()) == 1
 
 class DeviceTechnologyTestCase(GenericTestCase):
     """Test device technologies"""
@@ -785,7 +793,7 @@ class DeviceTestCase(GenericTestCase):
         for dev in self.db.list_devices():
             assert dev.address in ('A1', 'A3')
         assert device_del.id == device2.id
-        assert len(self.db.list_device_feature_association_by_device_id(device_del.id)) == 0
+        #assert len(self.db.list_device_feature_association_by_device_id(device_del.id)) == 0
         try:
             self.db.del_device(12345678910)
             TestCase.fail(self, "Device does not exist, an exception should have been raised")
@@ -960,14 +968,12 @@ class DeviceStatsTestCase(GenericTestCase):
                     (2010, 2, 7, 21, 16, 0, 77.0), (2010, 2, 7, 21, 16, 1, 83.0), (2010, 2, 7, 21, 16, 2, 89.0)]
         }
         for func in ('avg', 'min', 'max'):
-            print "=====> Executing (minute filter, function=%s)" % func
             start_t = time.time()
             results = self.db.filter_stats_of_device_by_key(ds_key='valm', ds_device_id=device1.id,
                                                             start_date_ts=make_ts(2010, 2, 21, 15, 57, 0),
                                                             end_date_ts=make_ts(2010, 2, 21, 16, 3, 0),
                                                             step_used='minute', function_used=func)
             assert results == expected_results[func]
-            print "Execution time = %s" % (time.time() - start_t)
 
         start_p = make_ts(2010, 6, 21, 15, 48, 0)
         end_p = make_ts(2010, 6, 25, 21, 48, 0)
@@ -992,14 +998,12 @@ class DeviceStatsTestCase(GenericTestCase):
                     (2010, 6, 25, 23, 1, 47.0), (2010, 6, 25, 23, 2, 48.0)]
         }
         for func in ('avg', 'min', 'max'):
-            print "=====> Executing (hour filter, function=%s)" % func
             start_t = time.time()
             results = self.db.filter_stats_of_device_by_key(ds_key='valh', ds_device_id=device1.id,
                                                             start_date_ts=make_ts(2010, 6, 22, 17, 48, 0),
                                                             end_date_ts=make_ts(2010, 6, 23, 1, 48, 0),
                                                             step_used='hour', function_used=func)
             assert results == expected_results[func]
-            print "Execution time = %s" % (time.time() - start_t)
 
         # Days
         start_p = make_ts(2010, 6, 21, 15, 48, 0)
@@ -1021,14 +1025,12 @@ class DeviceStatsTestCase(GenericTestCase):
                     (2010, 6, 25, 26, 16.0), (2010, 6, 25, 27, 19.0), (2010, 6, 26, 28, 22.0)]
         }
         for func in ('avg', 'min', 'max'):
-            print "=====> Executing (day filter, function=%s)" % func
             start_t = time.time()
             results = self.db.filter_stats_of_device_by_key(ds_key='vald', ds_device_id=device1.id,
                                                             start_date_ts=make_ts(2010, 6, 22, 15, 48, 0),
                                                             end_date_ts=make_ts(2010, 7, 26, 15, 48, 0),
                                                             step_used='day', function_used=func)
             assert results == expected_results[func]
-            print "Execution time = %s" % (time.time() - start_t)
 
         # Weeks
         start_p = make_ts(2010, 6, 11, 15, 48, 0)
@@ -1050,14 +1052,12 @@ class DeviceStatsTestCase(GenericTestCase):
                     (2010, 7, 29, 88.0), (2010, 7, 30, 89.0)]
         }
         for func in ('avg', 'min', 'max'):
-            print "=====> Executing (week filter, function=%s)" % func
             start_t = time.time()
             results = self.db.filter_stats_of_device_by_key(ds_key='valw', ds_device_id=device1.id,
                                                             start_date_ts=make_ts(2010, 6, 22, 15, 48, 0),
                                                             end_date_ts=make_ts(2010, 7, 26, 15, 48, 0),
                                                             step_used='week', function_used=func)
             assert results == expected_results[func]
-            print "Execution time = %s" % (time.time() - start_t)
 
         # Months
         start_p = make_ts(2010, 6, 21, 15, 48, 0)
@@ -1081,14 +1081,12 @@ class DeviceStatsTestCase(GenericTestCase):
                     (2011, 6, 24.0), (2011, 7, 26.0)]
         }
         for func in ('avg', 'min', 'max'):
-            print "=====> Executing (month filter, function=%s)" % func
             start_t = time.time()
             results =  self.db.filter_stats_of_device_by_key(ds_key='valmy', ds_device_id=device1.id,
                                                              start_date_ts=make_ts(2010, 6, 25, 15, 48, 0),
                                                              end_date_ts=make_ts(2011, 7, 29, 15, 48, 0),
                                                              step_used='month', function_used=func)
             assert results == expected_results[func]
-            print "Execution time = %s" % (time.time() - start_t)
 
         # Years
         expected_results = {
@@ -1097,14 +1095,12 @@ class DeviceStatsTestCase(GenericTestCase):
             'max': [(2010, 12.0), (2011, 37.0), (2012, 48.0)]
         }
         for func in ('avg', 'min', 'max'):
-            print "=====> Executing (year filter, function=%s)" % func
             start_t = time.time()
             results=  self.db.filter_stats_of_device_by_key(ds_key='valmy', ds_device_id=device1.id,
                                                             start_date_ts=make_ts(2010, 6, 21, 15, 48, 0),
                                                             end_date_ts=make_ts(2012, 6, 21, 15, 48, 0),
                                                             step_used='year', function_used=func)
             assert results == expected_results[func]
-            print "Execution time = %s" % (time.time() - start_t)
 
     def test_del(self):
         dt1 = self.db.add_device_technology('x10', 'x10', 'this is x10')
