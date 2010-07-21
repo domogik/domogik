@@ -451,8 +451,8 @@ class Rest(XplPlugin):
 
     def get_exception(self):
         # TODO : finish exception take in count
-        my_exception =  str(traceback.format_exc()).replace('"', "'").replace('\n', '      ')
-        #my_exception =  str(traceback.format_exc()).replace('"', "'")
+        #my_exception =  str(traceback.format_exc()).replace('"', "'").replace('\n', '      ')
+        my_exception =  str(traceback.format_exc()).replace('"', "'")
         print "==== Error in REST ===="
         print my_exception
         print "======================="
@@ -3509,6 +3509,7 @@ class JSonHelper():
             @param code : error code
             @param description : error description
         """
+        description = description.replace('\n', "\\n")
         self._status = '"status" : "ERROR", "code" : ' + str(code) + ', "description" : "' + str(description) + '",'
 
     def set_data_type(self, type):
@@ -3558,6 +3559,7 @@ class JSonHelper():
             return
 
         data_out += self._process_data(data)
+        data_out = data_out.replace('\n', "\\n")
         self._data_values += data_out
             
 
