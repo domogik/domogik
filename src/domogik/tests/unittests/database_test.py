@@ -961,14 +961,12 @@ class DeviceStatsTestCase(GenericTestCase):
                     (2010, 2, 7, 21, 16, 0, 77.0), (2010, 2, 7, 21, 16, 1, 83.0), (2010, 2, 7, 21, 16, 2, 89.0)]
         }
         for func in ('avg', 'min', 'max'):
-            print "=====> Executing (minute filter, function=%s)" % func
             start_t = time.time()
             results = self.db.filter_stats_of_device_by_key(ds_key='valm', ds_device_id=device1.id,
                                                             start_date_ts=make_ts(2010, 2, 21, 15, 57, 0),
                                                             end_date_ts=make_ts(2010, 2, 21, 16, 3, 0),
                                                             step_used='minute', function_used=func)
             assert results == expected_results[func]
-            print "Execution time = %s" % (time.time() - start_t)
 
         start_p = make_ts(2010, 6, 21, 15, 48, 0)
         end_p = make_ts(2010, 6, 25, 21, 48, 0)
@@ -993,14 +991,12 @@ class DeviceStatsTestCase(GenericTestCase):
                     (2010, 6, 25, 23, 1, 47.0), (2010, 6, 25, 23, 2, 48.0)]
         }
         for func in ('avg', 'min', 'max'):
-            print "=====> Executing (hour filter, function=%s)" % func
             start_t = time.time()
             results = self.db.filter_stats_of_device_by_key(ds_key='valh', ds_device_id=device1.id,
                                                             start_date_ts=make_ts(2010, 6, 22, 17, 48, 0),
                                                             end_date_ts=make_ts(2010, 6, 23, 1, 48, 0),
                                                             step_used='hour', function_used=func)
             assert results == expected_results[func]
-            print "Execution time = %s" % (time.time() - start_t)
 
         # Days
         start_p = make_ts(2010, 6, 21, 15, 48, 0)
@@ -1022,14 +1018,12 @@ class DeviceStatsTestCase(GenericTestCase):
                     (2010, 6, 25, 26, 16.0), (2010, 6, 25, 27, 19.0), (2010, 6, 26, 28, 22.0)]
         }
         for func in ('avg', 'min', 'max'):
-            print "=====> Executing (day filter, function=%s)" % func
             start_t = time.time()
             results = self.db.filter_stats_of_device_by_key(ds_key='vald', ds_device_id=device1.id,
                                                             start_date_ts=make_ts(2010, 6, 22, 15, 48, 0),
                                                             end_date_ts=make_ts(2010, 7, 26, 15, 48, 0),
                                                             step_used='day', function_used=func)
             assert results == expected_results[func]
-            print "Execution time = %s" % (time.time() - start_t)
 
         # Weeks
         start_p = make_ts(2010, 6, 11, 15, 48, 0)
@@ -1051,14 +1045,12 @@ class DeviceStatsTestCase(GenericTestCase):
                     (2010, 7, 29, 88.0), (2010, 7, 30, 89.0)]
         }
         for func in ('avg', 'min', 'max'):
-            print "=====> Executing (week filter, function=%s)" % func
             start_t = time.time()
             results = self.db.filter_stats_of_device_by_key(ds_key='valw', ds_device_id=device1.id,
                                                             start_date_ts=make_ts(2010, 6, 22, 15, 48, 0),
                                                             end_date_ts=make_ts(2010, 7, 26, 15, 48, 0),
                                                             step_used='week', function_used=func)
             assert results == expected_results[func]
-            print "Execution time = %s" % (time.time() - start_t)
 
         # Months
         start_p = make_ts(2010, 6, 21, 15, 48, 0)
@@ -1082,14 +1074,12 @@ class DeviceStatsTestCase(GenericTestCase):
                     (2011, 6, 24.0), (2011, 7, 26.0)]
         }
         for func in ('avg', 'min', 'max'):
-            print "=====> Executing (month filter, function=%s)" % func
             start_t = time.time()
             results =  self.db.filter_stats_of_device_by_key(ds_key='valmy', ds_device_id=device1.id,
                                                              start_date_ts=make_ts(2010, 6, 25, 15, 48, 0),
                                                              end_date_ts=make_ts(2011, 7, 29, 15, 48, 0),
                                                              step_used='month', function_used=func)
             assert results == expected_results[func]
-            print "Execution time = %s" % (time.time() - start_t)
 
         # Years
         expected_results = {
@@ -1098,14 +1088,12 @@ class DeviceStatsTestCase(GenericTestCase):
             'max': [(2010, 12.0), (2011, 37.0), (2012, 48.0)]
         }
         for func in ('avg', 'min', 'max'):
-            print "=====> Executing (year filter, function=%s)" % func
             start_t = time.time()
             results=  self.db.filter_stats_of_device_by_key(ds_key='valmy', ds_device_id=device1.id,
                                                             start_date_ts=make_ts(2010, 6, 21, 15, 48, 0),
                                                             end_date_ts=make_ts(2012, 6, 21, 15, 48, 0),
                                                             step_used='year', function_used=func)
             assert results == expected_results[func]
-            print "Execution time = %s" % (time.time() - start_t)
 
     def test_del(self):
         dt1 = self.db.add_device_technology('x10', 'x10', 'this is x10')
