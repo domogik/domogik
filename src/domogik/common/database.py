@@ -625,6 +625,13 @@ class DbHelper():
         return device_type
 
     def del_device_type(self, dty_id, cascade_delete=False):
+        """Delete a device type
+
+        @param dty_id : device type id
+        @param cascade_delete : if set to True records of binded tables will be deleted (default is False)
+        @return the deleted DeviceType object
+
+        """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
         dty = self.__session.query(DeviceType).filter_by(id=dty_id).first()
