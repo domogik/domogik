@@ -96,7 +96,7 @@ class GenericTestCase(unittest.TestCase):
             db.del_sensor_feature_model(sf.id)
 
     def remove_all_device_feature_associations(self, db):
-        for dfa in db.list_device_feature_association():
+        for dfa in db.list_device_feature_associations():
             db.del_device_feature_association(dfa.id)
 
     def remove_all_plugin_config(self, db):
@@ -186,7 +186,7 @@ class AreaTestCase(GenericTestCase):
         area_d = self.db.del_area(area0.id)
         assert not self.has_item(self.db.list_areas(), ['area0'])
         assert area_d.id == area0.id
-        assert len(self.db.list_device_feature_association_by_area_id(area_d.id)) == 0
+        assert len(self.db.list_device_feature_associations_by_area_id(area_d.id)) == 0
         try:
             self.db.del_area(12345678910)
             TestCase.fail(self, "Area does not exist, an exception should have been raised")
@@ -257,7 +257,7 @@ class RoomTestCase(GenericTestCase):
         assert not self.has_item(self.db.list_rooms(), ['room1'])
         assert self.has_item(self.db.list_rooms(), ['room2', 'room3'])
         assert room_deleted.id == room1_id
-        assert len(self.db.list_device_feature_association_by_room_id(room_deleted.id)) == 0
+        assert len(self.db.list_device_feature_associations_by_room_id(room_deleted.id)) == 0
         try:
             self.db.del_room(12345678910)
             TestCase.fail(self, "Room does not exist, an exception should have been raised")
@@ -476,7 +476,7 @@ class DeviceFeatureModelTestCase(GenericTestCase):
                                                sf_parameters='myparams3', sf_value_type='number')
         af_d = self.db.del_actuator_feature_model(af1.id)
         assert af_d.id == af1.id
-        assert len(self.db.list_device_feature_association_by_feature_id(af_d.id)) == 0
+        assert len(self.db.list_device_feature_associations_by_feature_id(af_d.id)) == 0
         assert len(self.db.list_device_feature_models()) == 2
         assert len(self.db.list_actuator_feature_models()) == 1
         assert len(self.db.list_sensor_feature_models()) == 1
@@ -500,7 +500,7 @@ class DeviceFeatureAssociationTestCase(GenericTestCase):
         del self.db
 
     def test_empty_list(self):
-        assert len(self.db.list_device_feature_association()) == 0
+        assert len(self.db.list_device_feature_associations()) == 0
 
     def test_add_get_list(self):
         area1 = self.db.add_area('Basement')
@@ -537,12 +537,12 @@ class DeviceFeatureAssociationTestCase(GenericTestCase):
         self.db.add_device_feature_association(d_feature_id=df_list[0].id, d_place_id=room1.id, d_place_type='room')
         df_list = self.db.list_device_feature_by_device_id(device2.id)
         self.db.add_device_feature_association(d_feature_id=df_list[0].id, d_place_id=area1.id, d_place_type='area')
-        assert len(self.db.list_device_feature_association()) == 4
-        assert len(self.db.list_device_feature_association_by_house()) == 1
-        assert len(self.db.list_device_feature_association_by_room_id(room1.id)) == 2
-        assert len(self.db.list_device_feature_association_by_room_id(room2.id)) == 0
-        assert len(self.db.list_device_feature_association_by_area_id(area1.id)) == 1
-        assert len(self.db.list_device_feature_association_by_area_id(area2.id)) == 0
+        assert len(self.db.list_device_feature_associations()) == 4
+        assert len(self.db.list_device_feature_associations_by_house()) == 1
+        assert len(self.db.list_device_feature_associations_by_room_id(room1.id)) == 2
+        assert len(self.db.list_device_feature_associations_by_room_id(room2.id)) == 0
+        assert len(self.db.list_device_feature_associations_by_area_id(area1.id)) == 1
+        assert len(self.db.list_device_feature_associations_by_area_id(area2.id)) == 0
 
     def test_del(self):
         area1 = self.db.add_area('Basement')
@@ -574,9 +574,9 @@ class DeviceFeatureAssociationTestCase(GenericTestCase):
         dfa3 = self.db.add_device_feature_association(d_feature_id=df3.id, d_place_id=area1.id, d_place_type='area')
         dfa = self.db.del_device_feature_association(dfa1.id)
         assert dfa.id == dfa1.id
-        assert len(self.db.list_device_feature_association()) == 2
-        assert len(self.db.list_device_feature_association_by_room_id(room1.id)) == 1
-        assert len(self.db.list_device_feature_association_by_area_id(area1.id)) == 1
+        assert len(self.db.list_device_feature_associations()) == 2
+        assert len(self.db.list_device_feature_associations_by_room_id(room1.id)) == 1
+        assert len(self.db.list_device_feature_associations_by_area_id(area1.id)) == 1
 
 
 class DeviceTechnologyTestCase(GenericTestCase):

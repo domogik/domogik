@@ -987,7 +987,7 @@ class DbHelper():
 ####
 # Device feature association
 ####
-    def list_device_feature_association(self):
+    def list_device_feature_associations(self):
         """List all records for the device / feature association
 
         @return a list of DeviceFeatureAssociation objects
@@ -995,7 +995,7 @@ class DbHelper():
         """
         return self.__session.query(DeviceFeatureAssociation).all()
 
-    def list_device_feature_association_by_house(self):
+    def list_device_feature_associations_by_house(self):
         """List device / feature association for the house
 
         @return a list of DeviceFeatureAssociation objects
@@ -1003,7 +1003,7 @@ class DbHelper():
         """
         return self.__session.query(DeviceFeatureAssociation).filter_by(place_type=u'house').all()
 
-    def list_device_feature_association_by_room_id(self, room_id):
+    def list_device_feature_associations_by_room_id(self, room_id):
         """List device / feature association for a room
 
         @param room_id : room id
@@ -1012,7 +1012,7 @@ class DbHelper():
         """
         return self.__session.query(DeviceFeatureAssociation).filter_by(place_id=room_id, place_type=u'room').all()
 
-    def list_device_feature_association_by_area_id(self, area_id):
+    def list_device_feature_associations_by_area_id(self, area_id):
         """List device / feature association for an area
 
         @param area_id : area id
@@ -1021,7 +1021,7 @@ class DbHelper():
         """
         return self.__session.query(DeviceFeatureAssociation).filter_by(place_id=area_id, place_type=u'area').all()
 
-    def list_device_feature_association_by_feature_id(self, feature_id):
+    def list_device_feature_associations_by_feature_id(self, feature_id):
         """List device / feature association for an id of a feature of a device type
 
         @param feature_id : feature id
