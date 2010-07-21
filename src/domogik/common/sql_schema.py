@@ -377,9 +377,9 @@ class DeviceFeature(Base):
 
     __tablename__ = '%s_device_feature' % _db_prefix
     id = Column(Integer, primary_key=True)
-    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), primary_key=True)
+    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()))
     device = relation(Device, backref=backref(__tablename__))
-    device_feature_model_id = Column(Integer, ForeignKey('%s.id' % DeviceFeatureModel.get_tablename()), primary_key=True)
+    device_feature_model_id = Column(Integer, ForeignKey('%s.id' % DeviceFeatureModel.get_tablename()))
     device_feature_model = relation(DeviceFeatureModel)
 
     def __init__(self, device_id, device_feature_model_id):
