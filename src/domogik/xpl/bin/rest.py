@@ -1267,8 +1267,6 @@ target=*
         # Init xpl message
         message = XplMessage()
         message.set_type('xpl-cmnd')
-        if self.xpl_target.lower() != "all":
-            message.set_header(target=self.xpl_target)
         message.set_schema(self.xpl_cmnd_schema)
   
         iii = 0
