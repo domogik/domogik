@@ -1091,6 +1091,23 @@ class DbHelper():
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return dfa
 
+    def del_device_feature_association_by_device_feature_id(self, dfa_device_feature_id):
+        """Delete device feature associations for a given device feature id
+
+        @param dfa_device_feature_id : device feature id
+        @return the list of DeviceFeatureAssociation object which were deleted
+
+        """
+        dfa_list = self.__session.query(DeviceFeatureAssociation)\
+                                 .filter_by(device_feature_id=dfa_device_feature_id).all()
+        for dfa in dfa_list:
+            self.__session.delete(dfa)
+        try:
+            self.__session.commit()
+        except Exception, sql_exception:
+            self.__session.rollback()
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
+        return dfa_list
 ####
 # Device technology
 ####

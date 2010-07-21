@@ -573,12 +573,14 @@ class DeviceFeatureAssociationTestCase(GenericTestCase):
         dfa2 = self.db.add_device_feature_association(d_feature_id=df2.id, d_place_id=room1.id, d_place_type='room')
         df3 = self.db.get_device_feature(device3.id, afm2.id)
         dfa3 = self.db.add_device_feature_association(d_feature_id=df3.id, d_place_id=area1.id, d_place_type='area')
+        dfa4 = self.db.add_device_feature_association(d_feature_id=df3.id, d_place_type='house')
         dfa = self.db.del_device_feature_association(dfa1.id)
         assert dfa.id == dfa1.id
-        assert len(self.db.list_device_feature_associations()) == 2
+        assert len(self.db.list_device_feature_associations()) == 3
         assert len(self.db.list_device_feature_associations_by_room_id(room1.id)) == 1
         assert len(self.db.list_device_feature_associations_by_area_id(area1.id)) == 1
-
+        assert len(self.db.del_device_feature_association_by_device_feature_id(df3.id)) == 2
+        assert len(self.db.list_device_feature_associations()) == 1
 
 class DeviceTechnologyTestCase(GenericTestCase):
     """Test device technologies"""
