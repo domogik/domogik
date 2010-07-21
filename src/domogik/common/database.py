@@ -1030,6 +1030,15 @@ class DbHelper():
         """
         return self.__session.query(DeviceFeatureAssociation).filter_by(device_feature_id=feature_id).all()
 
+    def get_device_feature_association_by_id(self, dfa_id):
+        """Get a device feature association
+
+        @param dfa_id : device feature association id
+        @return a DeviceFeatureAssociation object
+
+        """
+        return self.__session.query(DeviceFeatureAssociation).filter_by(id=dfa_id).first()
+
     def add_device_feature_association(self, d_feature_id, d_place_type=None, d_place_id=None):
         """Add a device feature association
 

@@ -530,6 +530,7 @@ class DeviceFeatureAssociationTestCase(GenericTestCase):
         assert self.db.get_device_feature_by_id(df_list[0].id) is not None
         df_list = self.db.list_device_feature_by_device_feature_model_id(af1.id)
         dfa = self.db.add_device_feature_association(d_feature_id=df_list[0].id, d_place_type='house')
+        assert self.db.get_device_feature_association_by_id(dfa.id) is not None
         print(dfa)
         df_list = self.db.list_device_feature_by_device_feature_model_id(af2.id)
         self.db.add_device_feature_association(d_feature_id=df_list[0].id, d_place_id=room1.id, d_place_type='room')
