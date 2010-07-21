@@ -49,7 +49,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
 from domogik.common.configloader import Loader
-from domogik.common.sql_schema import ACTUATOR_VALUE_TYPE_LIST, Area, Device, DeviceFeature,\
+from domogik.common.sql_schema import ACTUATOR_VALUE_TYPE_LIST, Area, Device, DeviceFeature, DeviceFeatureModel,\
                                       DeviceUsage, DeviceFeatureAssociation,\
                                       DeviceConfig, DeviceStats, DeviceTechnology, PluginConfig,\
                                       DeviceType, UIItemConfig, Room, Person, UserAccount, SENSOR_VALUE_TYPE_LIST,\
@@ -162,14 +162,14 @@ class DbHelper():
         self.__session = Session()
 
     def get_engine(self):
-        """Return the existing engine or None if not set 
+        """Return the existing engine or None if not set
         @return self.__engine
 
         """
         return self.__engine
 
     def __del__(self):
-	self.__engine.dispose()
+        self.__engine.dispose()
 
     def __rollback(self):
         """Issue a rollback to a SQL transaction (for dev purposes only)
@@ -632,16 +632,16 @@ class DbHelper():
             if cascade_delete:
                 for device in self.__session.query(Device).filter_by(device_type_id=dty.id).all():
                     self.del_device(device.id)
-                for df in self.__session.query(DeviceFeature).filter_by(device_type_id=dty.id).all():
+                for df in self.__session.query(DeviceFeatureModel).filter_by(device_type_id=dty.id).all():
                     if df.feature_type == 'actuator':
-                        self.del_actuator_feature(df.id)
+                        self.del_actuator_feature_model(df.id)
                     elif df.feature_type == 'sensor':
-                        self.del_sensor_feature(df.id)
+                        self.del_sensor_feature_model(df.id)
             else:
                 device_list = self.__session.query(Device).filter_by(device_type_id=dty.id).all()
                 if len(device_list) > 0:
                     raise DbHelperException("Couldn't delete device type %s : there are associated device(s)" % dty_id)
-                df_list = self.__session.query(DeviceFeature).filter_by(device_type_id=dty.id).all()
+                df_list = self.__session.query(DeviceFeatureModel).filter_by(device_type_id=dty.id).all()
                 if len(df_list) > 0:
                     raise DbHelperException("Couldn't delete device type %s : there are associated device type " \
                                             "feature(s)" % dty_id)
@@ -656,57 +656,71 @@ class DbHelper():
             raise DbHelperException("Couldn't delete device type with id %s : it doesn't exist" % dty_id)
 
 ####
-# Device type features
+# Device features
 ####
-    def list_device_features(self):
-        """Return a list of device type features
+    def get_device_feature(self, df_device_id, df_device_feature_model_id):
+        """Return a device feature
 
-        @return a list of DeviceFeature objects
-
-        """
-        return self.__session.query(DeviceFeature).all()
-
-    def list_device_feature_by_device_type_id(self, dtf_device_type_id):
-        """Return a list of device type features (actuator, sensor) knowing the device type id
-
-        @param dtf_device_type_id : device type id
-        @return a list of DeviceFeature objects
-
-        """
-        return self.__session.query(DeviceFeature).filter_by(device_type_id=dtf_device_type_id).all()
-
-    def get_device_feature_by_id(self, dtf_id):
-        """Return information about a device type feature
-
-        @param dtf_id : device type id
+        @param df_device_id : device id
+        @param df_device_feature_model_id : id of the device feature model
         @return a DeviceFeature object
 
         """
-        return self.__session.query(DeviceFeature).filter_by(id=dtf_id).first()
+        return self.__session.query(DeviceFeature).filter_by(device_id=df_device_id,
+                                                             device_feature_model_id=df_device_feature_model_id).first()
 
 ####
-# Actuator features
+# Device feature models
 ####
-    def list_actuator_features(self):
-        """Return a list of actuator features
+    def list_device_feature_models(self):
+        """Return a list of models for device type feature
 
-        @return a list of DeviceFeature objects
-
-        """
-        return self.__session.query(DeviceFeature).filter_by(feature_type=u'actuator').all()
-
-    def get_actuator_feature_by_id(self, af_id):
-        """Return information about an actuator feature
-
-        @param af_id : actuator feature id (which is a device type feature id)
-        @return an DeviceFeature object
+        @return a list of DeviceFeatureModel objects
 
         """
-        return self.__session.query(DeviceFeature).filter_by(id=af_id).filter_by(feature_type=u'actuator').first()
+        return self.__session.query(DeviceFeatureModel).all()
 
-    def add_actuator_feature(self, af_name, af_device_type_id, af_value_type, af_return_confirmation=False,
-                             af_parameters=None, af_stat_key=None):
-        """Add an actuator
+    def list_device_feature_models_by_device_type_id(self, dtf_device_type_id):
+        """Return a list of models for device type features (actuator, sensor) knowing the device type id
+
+        @param dtf_device_type_id : device type id
+        @return a list of DeviceFeatureModel objects
+
+        """
+        return self.__session.query(DeviceFeatureModel).filter_by(device_type_id=dtf_device_type_id).all()
+
+    def get_device_feature_model_by_id(self, dtf_id):
+        """Return information about a model for a device type feature
+
+        @param dtf_id : model id
+        @return a DeviceFeatureModel object
+
+        """
+        return self.__session.query(DeviceFeatureModel).filter_by(id=dtf_id).first()
+
+####
+# Actuator feature model
+####
+    def list_actuator_feature_models(self):
+        """Return a list of models for actuator features
+
+        @return a list of DeviceFeatureModel objects
+
+        """
+        return self.__session.query(DeviceFeatureModel).filter_by(feature_type=u'actuator').all()
+
+    def get_actuator_feature_model_by_id(self, af_id):
+        """Return information about a model for an actuator feature
+
+        @param af_id : actuator feature model id
+        @return an DeviceFeatureModel object
+
+        """
+        return self.__session.query(DeviceFeatureModel).filter_by(id=af_id).filter_by(feature_type=u'actuator').first()
+
+    def add_actuator_feature_model(self, af_name, af_device_type_id, af_value_type, af_return_confirmation=False,
+                                   af_parameters=None, af_stat_key=None):
+        """Add a model for an actuator feature
 
         @param af_name : actuator name
         @param af_device_type_id : device type id
@@ -714,7 +728,7 @@ class DbHelper():
         @param af_return_confirmation : True if the actuator returns a confirmation after having executed a command ,optional (default False)
         @param af_parameters : parameters about the command or the returned data associated to the device, optional
         @param af_stat_key : key reference in the core_device_stats table
-        @return a DeviceFeature object (the newly created one)
+        @return a DeviceFeatureModel object (the newly created one)
 
         """
         # Make sure previously modified objects outer of this method won't be commited
@@ -725,107 +739,116 @@ class DbHelper():
         if self.__session.query(DeviceType).filter_by(id=af_device_type_id).first() is None:
             raise DbHelperException("Can't add actuator feature : device type id '%s' doesn't exist" \
                                     % dtf_device_type_id)
-        device_feature = DeviceFeature(name=ucode(af_name), feature_type=u'actuator',
-                                       device_type_id=af_device_type_id, value_type=ucode(af_value_type),
-                                       return_confirmation=af_return_confirmation,
-                                       parameters=ucode(af_parameters), stat_key=ucode(af_stat_key))
-        self.__session.add(device_feature)
+        device_feature_m = DeviceFeatureModel(name=ucode(af_name), feature_type=u'actuator',
+                                              device_type_id=af_device_type_id, value_type=ucode(af_value_type),
+                                              return_confirmation=af_return_confirmation,
+                                              parameters=ucode(af_parameters), stat_key=ucode(af_stat_key))
+        self.__session.add(device_feature_m)
         try:
             self.__session.commit()
         except Exception, sql_exception:
             self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-        return device_feature
+        return device_feature_m
 
-    def update_actuator_feature(self, af_id, af_name=None, af_parameters=None, af_value_type=None,
-                                af_return_confirmation=None, af_stat_key=None):
-        """Update an actuator feature
+    def update_actuator_feature_model(self, af_id, af_name=None, af_parameters=None, af_value_type=None,
+                                      af_return_confirmation=None, af_stat_key=None):
+        """Update a model for an actuator feature
 
-        @param af_id : actuator feature id (which is a device type feature id)
+        @param af_id : actuator feature model id
         @param af_name : actuator feature name (Switch, Dimmer, ...), optional
         @param af_parameters : parameters about the command or the returned data associated to the device, optional
         @param af_value_type : value type the actuator can accept, optional
         @param af_return_confirmation : True if the actuator returns a confirmation after having executed a command ,optional
         @param af_stat_key : key reference in the core_device_stats table
-        @return a DeviceFeature object (the newly updated one)
+        @return a DeviceFeatureModel object (the newly updated one)
 
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        device_feature = self.__session.query(DeviceFeature)\
-                                       .filter_by(id=af_id).filter_by(feature_type=u'actuator').first()
-        if device_feature is None:
-            raise DbHelperException("DeviceFeature with id %s (actuator) couldn't be found - can't update it" % af_id)
+        device_feature_m = self.__session.query(DeviceFeatureModel)\
+                                         .filter_by(id=af_id).filter_by(feature_type=u'actuator').first()
+        if device_feature_m is None:
+            raise DbHelperException("DeviceFeatureModel with id %s (actuator) couldn't be found - can't update it" \
+                                    % af_id)
         if af_name is not None:
-            device_feature.name = ucode(af_name)
+            device_feature_m.name = ucode(af_name)
         if af_parameters is not None:
             if af_parameters == '':
                 af_parameters = None
-            device_feature.parameters = ucode(af_parameters)
+            device_feature_m.parameters = ucode(af_parameters)
         if af_value_type is not None:
             if af_value_type not in ACTUATOR_VALUE_TYPE_LIST:
                 raise DbHelperException("Value type (%s) is not in the allowed item list : %s" \
                                         % (af_value_type, ACTUATOR_VALUE_TYPE_LIST))
-            device_feature.value_type = ucode(af_value_type)
+            device_feature_m.value_type = ucode(af_value_type)
         if af_return_confirmation is not None:
-            device_feature.return_confirmation = af_return_confirmation
+            device_feature_m.return_confirmation = af_return_confirmation
         if af_stat_key is not None:
-            device_feature.stat_key = ucode(af_stat_key)
-        self.__session.add(device_feature)
+            device_feature_m.stat_key = ucode(af_stat_key)
+        self.__session.add(device_feature_m)
         try:
             self.__session.commit()
         except Exception, sql_exception:
             self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-        return device_feature
+        return device_feature_m
 
-    def del_actuator_feature(self, af_id):
+    def del_actuator_feature_model(self, afm_id):
+        """Delete a model for an actuator feature
+
+        @param afm_id : actuator feature model id
+        @return : the deleted object (DeviceFeatureModel)
+
+        """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        dtf = self.__session.query(DeviceFeature).filter_by(id=af_id).filter_by(feature_type=u'actuator').first()
-        if not dtf:
-            raise DbHelperException("Can't delete device type feature %s (actuator) : it doesn't exist" % af_id)
-        dfa_list = self.__session.query(DeviceFeatureAssociation)\
-                                 .filter_by(device_feature_id=dtf.id).all()
-        for dfa in dfa_list:
-            self.__session.delete(dfa)
-        self.__session.delete(dtf)
+        dfm = self.__session.query(DeviceFeatureModel).filter_by(id=afm_id).filter_by(feature_type=u'actuator').first()
+        if not dfm:
+            raise DbHelperException("Can't delete device feature model %s (actuator) : it doesn't exist" % afm_id)
+        df_list = self.__session.query(DeviceFeature)\
+                                .filter_by(device_feature_model_id=dfm.id).all()
+        for df in df_list:
+            for dfa in self.__session.query(DeviceFeatureAssociation).filter_by(device_feature_id=df.id).all():
+                self.__session.delete(dfa)
+            self.__session.delete(df)
+        self.__session.delete(dfm)
         try:
             self.__session.commit()
         except Exception, sql_exception:
             self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-        return dtf
+        return dfm
 
 ####
-# Sensor features
+# Sensor feature model
 ####
-    def list_sensor_features(self):
-        """Return a list of sensor features
+    def list_sensor_feature_models(self):
+        """Return a list of models for sensor features
 
-        @return a list of DeviceFeature objects
-
-        """
-        return self.__session.query(DeviceFeature).filter_by(feature_type=u'sensor').all()
-
-    def get_sensor_feature_by_id(self, sf_id):
-        """Return information about a sensor feature
-
-        @param df_id : sensor feature id (which is a device type feature id)
-        @return a DeviceFeature object
+        @return a list of DeviceFeatureModel objects
 
         """
-        return self.__session.query(DeviceFeature).filter_by(id=sf_id).filter_by(feature_type=u'sensor').first()
+        return self.__session.query(DeviceFeatureModel).filter_by(feature_type=u'sensor').all()
 
-    def add_sensor_feature(self, sf_name, sf_device_type_id, sf_value_type, sf_parameters=None, sf_stat_key=None):
-        """Add a sensor
+    def get_sensor_feature_model_by_id(self, sf_id):
+        """Return information about a model for a sensor feature
+
+        @param sf_id : sensor feature model id
+        @return a DeviceFeatureModel object
+
+        """
+        return self.__session.query(DeviceFeatureModel).filter_by(id=sf_id).filter_by(feature_type=u'sensor').first()
+
+    def add_sensor_feature_model(self, sf_name, sf_device_type_id, sf_value_type, sf_parameters=None, sf_stat_key=None):
+        """Add a model for sensor feature
 
         @param sf_name : sensor feature name (Thermometer, Voltmeter...)
         @param sf_device_type_id : device type id
         @param sf_value_type : value type the sensor can return
         @param sf_parameters : parameters about the command or the returned data associated to the device, optional
         @param sf_stat_key : key reference in the core_device_stats table
-        @return a DeviceFeature object (the newly created one)
+        @return a DeviceFeatureModel object (the newly created one)
 
         """
         # Make sure previously modified objects outer of this method won't be commited
@@ -835,72 +858,106 @@ class DbHelper():
                                     % (sf_value_type, SENSOR_VALUE_TYPE_LIST))
         if self.__session.query(DeviceType).filter_by(id=sf_device_type_id).first() is None:
             raise DbHelperException("Can't add sensor : device type id '%s' doesn't exist" % dtf_device_type_id)
-        device_feature = DeviceFeature(name=ucode(sf_name), feature_type=u'sensor',
-                                       device_type_id=sf_device_type_id, value_type=ucode(sf_value_type),
-                                       parameters=ucode(sf_parameters), stat_key=ucode(sf_stat_key))
-        self.__session.add(device_feature)
+        device_feature_m = DeviceFeatureModel(name=ucode(sf_name), feature_type=u'sensor',
+                                              device_type_id=sf_device_type_id, value_type=ucode(sf_value_type),
+                                              parameters=ucode(sf_parameters), stat_key=ucode(sf_stat_key))
+        self.__session.add(device_feature_m)
         try:
             self.__session.commit()
         except Exception, sql_exception:
             self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-        return device_feature
+        return device_feature_m
 
-    def update_sensor_feature(self, sf_id, sf_name=None, sf_parameters=None, sf_value_type=None, sf_stat_key=None):
-        """Update a sensor feature
+    def update_sensor_feature_model(self, sf_id, sf_name=None, sf_parameters=None, sf_value_type=None,
+                                    sf_stat_key=None):
+        """Update a model for a sensor feature
 
-        @param sf_id : sensor feature id (which is a device type feature id)
+        @param sf_id : sensor feature model id
         @param sf_name : sensor feature name (Thermometer, Voltmeter...), optional
         @param sf_parameters : parameters about the command or the returned data associated to the device, optional
         @param sf_value_type : value type the sensor can return, optional
         @param sf_stat_key : key reference in the core_device_stats table
-        @return a DeviceFeature object (the newly updated one)
+        @return a DeviceFeatureModel object (the newly updated one)
 
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        device_feature = self.__session.query(DeviceFeature)\
-                                       .filter_by(id=sf_id).filter_by(feature_type=u'sensor').first()
-        if device_feature is None:
-            raise DbHelperException("DeviceFeature with id %s couldn't be found - can't update it" % dtf_id)
+        device_feature_m = self.__session.query(DeviceFeatureModel)\
+                                         .filter_by(id=sf_id).filter_by(feature_type=u'sensor').first()
+        if device_feature_m is None:
+            raise DbHelperException("DeviceFeatureModel with id %s couldn't be found - can't update it" % dtf_id)
         if sf_name is not None:
-            device_feature.name = ucode(sf_name)
+            device_feature_m.name = ucode(sf_name)
         if sf_parameters is not None:
             if sf_parameters == '':
                 sf_parameters = None
-            device_feature.parameters = ucode(sf_parameters)
+            device_feature_m.parameters = ucode(sf_parameters)
         if sf_value_type is not None:
             if sf_value_type not in SENSOR_VALUE_TYPE_LIST:
                 raise DbHelperException("Value type (%s) is not in the allowed item list : %s" \
                                         % (sf_value_type, SENSOR_VALUE_TYPE_LIST))
-            device_feature.value_type = ucode(sf_value_type)
+            device_feature_m.value_type = ucode(sf_value_type)
         if sf_stat_key is not None:
-            device_feature.stat_key = ucode(sf_stat_key)
-        self.__session.add(device_feature)
+            device_feature_m.stat_key = ucode(sf_stat_key)
+        self.__session.add(device_feature_m)
         try:
             self.__session.commit()
         except Exception, sql_exception:
             self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-        return device_feature
+        return device_feature_m
 
-    def del_sensor_feature(self, sf_id):
+    def del_sensor_feature_model(self, sfm_id):
+        """Delete a model for a sensor feature
+
+        @param sfm_id : sensor feature model id
+        @return : the deleted object (DeviceFeatureModel)
+
+        """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        dtf = self.__session.query(DeviceFeature).filter_by(id=sf_id).filter_by(feature_type=u'sensor').first()
-        if dtf is None:
-            raise DbHelperException("Couldn't delete device type feature (sensor) with id %s : it doesn't exist" \
-                                    % sf_id)
-        dfa_list = self.__session.query(DeviceFeatureAssociation).filter_by(device_feature_id=dtf.id).all()
-        for dfa in dfa_list:
-            self.__session.delete(dfa)
-        self.__session.delete(dtf)
+        dfm = self.__session.query(DeviceFeatureModel).filter_by(id=sfm_id).filter_by(feature_type=u'sensor').first()
+        if not dfm:
+            raise DbHelperException("Can't delete device feature model %s (actuator) : it doesn't exist" % afm_id)
+        df_list = self.__session.query(DeviceFeature)\
+                                .filter_by(device_feature_model_id=dfm.id).all()
+        for df in df_list:
+            for dfa in self.__session.query(DeviceFeatureAssociation).filter_by(device_feature_id=df.id).all():
+                self.__session.delete(dfa)
+            self.__session.delete(df)
+        self.__session.delete(dfm)
         try:
             self.__session.commit()
         except Exception, sql_exception:
             self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-        return dtf
+        return dfm
+
+####
+# Device Feature
+####
+    def list_device_features(self):
+        """List all device features"""
+        return self.__session.query(DeviceFeature).all()
+
+    def list_device_feature_by_device_id(self, df_device_id):
+        """List device features for a given device id
+
+        @param df_device_id : device id
+        @return a list of DeviceFeature objects
+
+        """
+        return self.__session.query(DeviceFeature).filter_by(device_id=df_device_id).all()
+
+    def list_device_feature_by_device_feature_model_id(self, df_device_feature_model_id):
+        """List device features for a given device id
+
+        @param df_device_feature_model_id : device feature model id
+        @return a list of DeviceFeature objects
+
+        """
+        return self.__session.query(DeviceFeature).filter_by(device_feature_model_id=df_device_feature_model_id).all()
 
 ####
 # Device feature association
@@ -948,20 +1005,10 @@ class DbHelper():
         """
         return self.__session.query(DeviceFeatureAssociation).filter_by(device_feature_id=feature_id).all()
 
-    def list_device_feature_association_by_device_id(self, d_device_id):
-        """List device / feature association for a device id
-
-        @param device_id : device id
-        @return a list of DeviceFeatureAssociation objects
-
-        """
-        return self.__session.query(DeviceFeatureAssociation).filter_by(device_id=d_device_id).all()
-
-    def add_device_feature_association(self, d_device_id, d_type_feature_id, d_place_type=None, d_place_id=None):
+    def add_device_feature_association(self, d_feature_id, d_place_type=None, d_place_id=None):
         """Add a device feature association
 
-        @param d_device_id : device id
-        @param d_type_feature_id : feature id of the device type (switch, dimmer)
+        @param d_feature_id : device feature id
         @param d_place_id : room id, area id or None for the house the device is associated to
         @param d_place_type : room, area or house (None means the device is not associated)
         @return the DeviceFeatureAssociation object
@@ -969,15 +1016,9 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        device = self.__session.query(Device).filter_by(id=d_device_id).first()
-        if not device:
-            raise DbHelperException("Device id %s doesn't exist" % d_device_id)
-        device_feature = self.__session.query(DeviceFeature).filter_by(id=d_type_feature_id).first()
+        device_feature = self.__session.query(DeviceFeature).filter_by(id=d_feature_id).first()
         if not device_feature:
-            raise DbHelperException("DeviceFeature id %s doesn't exist" % d_type_feature_id)
-        if device.device_type_id != device_feature.device_type_id:
-            raise DbHelperException("device_type_id (%s) of device and device_type_id (%s) of device_feature" \
-                                    "are not the same!" % (device.device_type_id, device_feature.device_type_id))
+            raise DbHelperException("DeviceFeature id %s doesn't exist" % d_feature_id)
         if d_place_id is not None and d_place_type != 'house':
             if d_place_type == 'room':
                 if not self.__session.query(Room).filter_by(id=d_place_id).first():
@@ -986,8 +1027,8 @@ class DbHelper():
                 if not self.__session.query(Area).filter_by(id=d_place_id).first():
                     raise DbHelperException("Couldn't add device with area id %s It does not exist" % d_place_id)
 
-        device_feature_asso = DeviceFeatureAssociation(device_id=d_device_id, device_feature_id=d_type_feature_id,
-                                                       place_type=ucode(d_place_type), place_id=d_place_id)
+        device_feature_asso = DeviceFeatureAssociation(device_feature_id=d_feature_id, place_type=ucode(d_place_type),
+                                                       place_id=d_place_id)
         self.__session.add(device_feature_asso)
         try:
             self.__session.commit()
@@ -996,18 +1037,16 @@ class DbHelper():
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return device_feature_asso
 
-    def del_device_feature_association(self, d_device_id, d_type_feature_id):
+    def del_device_feature_association(self, dfa_id):
         """Delete a device feature association
 
-        @param d_device_id : device id
-        @param d_type_feature_id : feature id of the device type (switch, dimmer)
+        @param dfa_id : device feature association id
         @return the DeviceFeatureAssociation object which was deleted
 
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        dfa = self.__session.query(DeviceFeatureAssociation)\
-                            .filter_by(device_id=d_device_id, device_feature_id=d_type_feature_id).first()
+        dfa = self.__session.query(DeviceFeatureAssociation).filter_by(id=dfa_id).first()
         if not dfa:
             return None
         self.__session.delete(dfa)
@@ -1284,6 +1323,13 @@ class DbHelper():
         self.__session.add(device)
         try:
             self.__session.commit()
+            # Look up for device feature models according to the device type and create corresponding association
+            # between the device and the device feature model
+            dfm_list = self.__session.query(DeviceFeatureModel).filter_by(device_type_id=device.device_type_id).all()
+            for dfm in dfm_list:
+                df = DeviceFeature(device_id=device.id, device_feature_model_id=dfm.id)
+                self.__session.add(df)
+            self.__session.commit()
         except Exception, sql_exception:
             self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
@@ -1340,8 +1386,8 @@ class DbHelper():
             self.__session.delete(device_conf)
         for device_stats in self.__session.query(DeviceStats).filter_by(device_id=d_id).all():
             self.__session.delete(device_stats)
-        for device_feat_asso in self.__session.query(DeviceFeatureAssociation).filter_by(device_id=d_id).all():
-            self.__session.delete(device_feat_asso)
+        for device_feature in self.__session.query(DeviceFeature).filter_by(device_id=d_id).all():
+            self.__session.delete(device_feature)
         self.__session.delete(device)
         try:
             self.__session.commit()
