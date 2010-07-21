@@ -1559,7 +1559,6 @@ class DbHelper():
             query = query.filter("date >= '" + str(_datetime_string_from_tstamp(start_date_ts, self.get_db_type()))+"'")
         if end_date_ts:
             query = query.filter("date <= '" + str(_datetime_string_from_tstamp(end_date_ts, self.get_db_type())) + "'")
-        print query
         list_s = query.order_by(sqlalchemy.asc(DeviceStats.date)).all()
         return list_s
 
