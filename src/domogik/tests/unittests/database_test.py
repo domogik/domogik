@@ -395,8 +395,8 @@ class DeviceTypeTestCase(GenericTestCase):
         except DbHelperException:
             pass
 
-class DeviceFeatureTestCase(GenericTestCase):
-    """Test device type, actuator and sensor features"""
+class DeviceFeatureModelTestCase(GenericTestCase):
+    """Test device feature models"""
 
     def setUp(self):
         self.db = DbHelper(use_test_db=True)
