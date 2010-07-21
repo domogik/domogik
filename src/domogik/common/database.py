@@ -1021,14 +1021,14 @@ class DbHelper():
         """
         return self.__session.query(DeviceFeatureAssociation).filter_by(place_id=area_id, place_type=u'area').all()
 
-    def list_device_feature_associations_by_feature_id(self, feature_id):
-        """List device / feature association for an id of a feature of a device type
+    def list_device_feature_associations_by_feature_id(self, dfa_device_feature_id):
+        """List device / feature association for a device feature id
 
-        @param feature_id : feature id
+        @param dfa_device_feature_id : device feature id
         @return a list of DeviceFeatureAssociation objects
 
         """
-        return self.__session.query(DeviceFeatureAssociation).filter_by(device_feature_id=feature_id).all()
+        return self.__session.query(DeviceFeatureAssociation).filter_by(device_feature_id=dfa_device_feature_id).all()
 
     def get_device_feature_association_by_id(self, dfa_id):
         """Get a device feature association
