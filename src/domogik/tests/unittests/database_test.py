@@ -903,10 +903,10 @@ class DeviceStatsTestCase(GenericTestCase):
         room1 = self.db.add_room('room1', area1.id)
         device1 = self.db.add_device(d_name='device1', d_address = "A1", d_type_id = dty1.id, d_usage_id = du1.id)
         device2 = self.db.add_device(d_name='device2', d_address='A2', d_type_id=dty1.id, d_usage_id=du1.id)
-        ds1 = self.db.add_device_stat(make_ts(2010, 04, 9, 12), 'val1', 0, device1.id)
+        ds1 = self.db.add_device_stat(make_ts(2010, 04, 9, 12, 0), 'val1', 0, device1.id)
         print(ds1)
         assert ds1.key == 'val1' and ds1.value == '0'
-        ds2 = self.db.add_device_stat(make_ts(2010, 04, 9, 12), 'val_char', 'plop', device1.id)
+        ds2 = self.db.add_device_stat(make_ts(2010, 04, 9, 12, 0), 'val_char', 'plop', device1.id)
         assert ds2.key == 'val_char' and ds2.value == 'plop'
         self.db.add_device_stat(make_ts(2010, 04, 9, 12, 0), 'val2', 1, device1.id)
         self.db.add_device_stat(make_ts(2010, 04, 9, 12, 1), 'val1', 2, device1.id)
