@@ -1582,6 +1582,16 @@ class DbHelper():
         """
         return self.__session.query(DeviceStats).filter_by(device_id=ds_device_id).all()
 
+    def list_device_stats_by_key(self, ds_key, ds_device_id):
+        """Return a list of all stats for a key and a device
+
+        @param ds_key : the stat key
+        @param ds_device_id : the device id
+        @return a list of DeviceStats objects
+
+        """
+        return self.__session.query(DeviceStats).filter_by(device_id=ds_device_id).filter_by(key=ucode(ds_key)).all()
+
     def list_last_n_stats_of_device_by_key(self, ds_key, ds_device_id, ds_number):
         """Get the N latest statistics of a device for a given key
 
@@ -1747,13 +1757,15 @@ class DbHelper():
         """
         return self.__session.query(DeviceStats).filter_by(device_id=ds_device_id).count() > 0
 
-    def add_device_stat(self, ds_date, ds_key, ds_value, ds_device_id):
+    def add_device_stat(self, ds_date, ds_key, ds_value, ds_device_id, hist_size=0):
         """Add a device stat record
 
         @param ds_key : key for the stat
         @param ds_date : when the stat was gathered (timestamp)
         @param ds_value : stat value
         @param ds_device_id : device id
+        @param hist_size : keep only the last hist_size records after having inserted the item (default is 0 which
+        means to keep all values)
         @return the new DeviceStats object
 
         """
@@ -1769,6 +1781,24 @@ class DbHelper():
         except Exception, sql_exception:
             self.__session.rollback()
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
+        # Eventually remove old stats
+        if hist_size > 0:
+            stats_list = self.__session.query(DeviceStats).filter_by(device_id=ds_device_id)\
+                                                          .filter_by(key=ucode(ds_key))\
+                                                          .order_by(sqlalchemy.desc(DeviceStats.date))[:hist_size]
+            last_date_to_keep = stats_list[len(stats_list)-1].date
+            stats_list = self.__session.query(DeviceStats).filter_by(device_id=ds_device_id)\
+                                                          .filter_by(key=ucode(ds_key))\
+                                                          .filter("date < '" + _datetime_to_string(last_date_to_keep,
+                                                                                            self.get_db_type()) + "'")\
+                                                          .all()
+            for stat in stats_list:
+                self.__session.delete(stat)
+            try:
+                self.__session.commit()
+            except Exception, sql_exception:
+                self.__session.rollback()
+                raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return device_stat
 
     def del_device_stats(self, ds_device_id, ds_key=None):

@@ -944,6 +944,25 @@ class DeviceStatsTestCase(GenericTestCase):
         assert len(stats_l) == 3
         assert stats_l[0].get_date_as_timestamp() == 1270810800.0
 
+    def test_add_with_hist_size(self):
+        dt1 = self.db.add_device_technology('x10', 'x10', 'this is x10')
+        dty1 = self.db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
+        du1 = self.db.add_device_usage("lighting")
+        device1 = self.db.add_device(d_name='device1', d_address = "A1", d_type_id = dty1.id, d_usage_id = du1.id)
+        self.db.add_device_stat(make_ts(2010, 04, 9, 12, 0), 'val2', 1000, device1.id)
+        self.db.add_device_stat(make_ts(2010, 04, 9, 12, 1), 'val1', 1, device1.id)
+        self.db.add_device_stat(make_ts(2010, 04, 9, 12, 2), 'val1', 2, device1.id)
+        self.db.add_device_stat(make_ts(2010, 04, 9, 12, 3), 'val1', 3, device1.id)
+        self.db.add_device_stat(make_ts(2010, 04, 9, 12, 4), 'val1', 4, device1.id)
+        assert len(self.db.list_device_stats(device1.id)) == 5
+        assert len(self.db.list_device_stats_by_key('val1', device1.id)) == 4
+        self.db.add_device_stat(make_ts(2010, 04, 9, 12, 5), 'val1', 5, device1.id, 2)
+        stat_list = self.db.list_device_stats_by_key('val1', device1.id)
+        assert len(stat_list) == 2
+        for stat in stat_list:
+            assert stat.value in ['4', '5']
+        #assert len(self.db.list_device_stats(device1.id)) == 3
+
     def test_filter(self):
         dt1 = self.db.add_device_technology('x10', 'x10', 'this is x10')
         dty1 = self.db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
