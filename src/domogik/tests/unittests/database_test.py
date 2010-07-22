@@ -571,16 +571,20 @@ class DeviceFeatureAssociationTestCase(GenericTestCase):
         dfa1 = self.db.add_device_feature_association(d_feature_id=df1.id, d_place_type='house')
         df2 = self.db.get_device_feature(device2.id, afm2.id)
         dfa2 = self.db.add_device_feature_association(d_feature_id=df2.id, d_place_id=room1.id, d_place_type='room')
+        dfa3 = self.db.add_device_feature_association(d_feature_id=df2.id, d_place_id=area2.id, d_place_type='area')
         df3 = self.db.get_device_feature(device3.id, afm2.id)
-        dfa3 = self.db.add_device_feature_association(d_feature_id=df3.id, d_place_id=area1.id, d_place_type='area')
-        dfa4 = self.db.add_device_feature_association(d_feature_id=df3.id, d_place_type='house')
+        dfa4 = self.db.add_device_feature_association(d_feature_id=df3.id, d_place_id=area1.id, d_place_type='area')
+        dfa5 = self.db.add_device_feature_association(d_feature_id=df3.id, d_place_type='house')
+        assert len(self.db.list_device_feature_associations()) == 5
         dfa = self.db.del_device_feature_association(dfa1.id)
         assert dfa.id == dfa1.id
-        assert len(self.db.list_device_feature_associations()) == 3
+        assert len(self.db.list_device_feature_associations()) == 4
         assert len(self.db.list_device_feature_associations_by_room_id(room1.id)) == 1
         assert len(self.db.list_device_feature_associations_by_area_id(area1.id)) == 1
         assert len(self.db.del_device_feature_association_by_device_feature_id(df3.id)) == 2
-        assert len(self.db.list_device_feature_associations()) == 1
+        assert len(self.db.del_device_feature_association_by_place_id(area2.id)) == 1
+        assert len(self.db.del_device_feature_association_by_place_type('room')) == 1
+        assert len(self.db.list_device_feature_associations()) == 0
 
 class DeviceTechnologyTestCase(GenericTestCase):
     """Test device technologies"""
