@@ -961,7 +961,7 @@ class DeviceStatsTestCase(GenericTestCase):
         assert len(stat_list) == 2
         for stat in stat_list:
             assert stat.value in ['4', '5']
-        #assert len(self.db.list_device_stats(device1.id)) == 3
+        assert len(self.db.list_device_stats(device1.id)) == 3
 
     def test_filter(self):
         dt1 = self.db.add_device_technology('x10', 'x10', 'this is x10')
