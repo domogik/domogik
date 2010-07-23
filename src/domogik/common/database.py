@@ -1109,33 +1109,17 @@ class DbHelper():
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return dfa_list
 
-    def del_device_feature_association_by_place_id(self, dfa_place_id):
-        """Delete device feature associations for a given place id
+    def del_device_feature_association_by_place(self, dfa_place_id, dfa_place_type):
+        """Delete device feature associations for a given place
 
         @param dfa_place_id : place id
+        @param dfa_place_type : place type (house, area, room)
         @return the list of DeviceFeatureAssociation object which were deleted
 
         """
         dfa_list = self.__session.query(DeviceFeatureAssociation)\
+                                 .filter_by(place_type=dfa_place_type)\
                                  .filter_by(place_id=dfa_place_id).all()
-        for dfa in dfa_list:
-            self.__session.delete(dfa)
-        try:
-            self.__session.commit()
-        except Exception, sql_exception:
-            self.__session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-        return dfa_list
-
-    def del_device_feature_association_by_place_type(self, dfa_place_type):
-        """Delete device feature associations for a given place type
-
-        @param dfa_place_type : place type
-        @return the list of DeviceFeatureAssociation object which were deleted
-
-        """
-        dfa_list = self.__session.query(DeviceFeatureAssociation)\
-                                 .filter_by(place_type=dfa_place_type).all()
         for dfa in dfa_list:
             self.__session.delete(dfa)
         try:

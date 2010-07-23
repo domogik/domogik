@@ -582,9 +582,8 @@ class DeviceFeatureAssociationTestCase(GenericTestCase):
         assert len(self.db.list_device_feature_associations_by_room_id(room1.id)) == 1
         assert len(self.db.list_device_feature_associations_by_area_id(area1.id)) == 1
         assert len(self.db.del_device_feature_association_by_device_feature_id(df3.id)) == 2
-        assert len(self.db.del_device_feature_association_by_place_id(area2.id)) == 1
-        assert len(self.db.del_device_feature_association_by_place_type('room')) == 1
-        assert len(self.db.list_device_feature_associations()) == 0
+        assert len(self.db.del_device_feature_association_by_place(area2.id, 'area')) == 1
+        assert len(self.db.list_device_feature_associations()) == 1
 
 class DeviceTechnologyTestCase(GenericTestCase):
     """Test device technologies"""
