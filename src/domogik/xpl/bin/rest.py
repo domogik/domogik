@@ -3552,6 +3552,7 @@ class JSonHelper():
                      "plugin_config",  \
                      "plugin_config_param",  \
                      "device_type",  \
+                     "device_feature_model",  \
                      "uiitemconfig",  \
                      "room",  \
                      "useraccount",  \
@@ -3593,7 +3594,7 @@ class JSonHelper():
                    "DeviceType", "UIItemConfig", "Room", "UserAccount", \
                    "SensorReferenceData", "Person", "SystemConfig", \
                    "SystemStats", "SystemStatsValue", "Trigger", \
-                   "DeviceFeatureAssociation") 
+                   "DeviceFeatureAssociation", "DeviceFeatureModel") 
         instance_type = ("instance")
         num_type = ("int", "float")
         str_type = ("str", "unicode", "bool", "datetime", "date")
