@@ -1716,8 +1716,8 @@ target=*
                         self._rest_base_feature_association_list_by_room(self.rest_request[3])
                     elif self.rest_request[2] == "by-feature":
                         self._rest_base_feature_association_list_by_feature(self.rest_request[3])
-                    elif self.rest_request[2] == "by-device":
-                        self._rest_base_feature_association_list_by_device(self.rest_request[3])
+                    #elif self.rest_request[2] == "by-device":
+                    #    self._rest_base_feature_association_list_by_device(self.rest_request[3])
                     else:
                         self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                       self.jsonp, self.jsonp_cb)
@@ -2397,7 +2397,7 @@ target=*
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("feature_association")
-        for ass in self._db.list_device_feature_association():
+        for ass in self._db.list_device_feature_associations():
             json_data.add_data(ass)
         self.send_http_response_ok(json_data.get())
 
@@ -2409,7 +2409,7 @@ target=*
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("feature_association")
-        for ass in self._db.list_device_feature_association_by_house():
+        for ass in self._db.list_device_feature_associations_by_house():
             json_data.add_data(ass)
         self.send_http_response_ok(json_data.get())
 
@@ -2422,7 +2422,7 @@ target=*
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("feature_association")
-        for ass in self._db.list_device_feature_association_by_area_id(id):
+        for ass in self._db.list_device_feature_associations_by_area_id(id):
             json_data.add_data(ass)
         self.send_http_response_ok(json_data.get())
 
@@ -2435,7 +2435,7 @@ target=*
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("feature_association")
-        for ass in self._db.list_device_feature_association_by_room_id(id):
+        for ass in self._db.list_device_feature_associations_by_room_id(id):
             json_data.add_data(ass)
         self.send_http_response_ok(json_data.get())
 
@@ -2448,22 +2448,22 @@ target=*
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("feature_association")
-        for ass in self._db.list_device_feature_association_by_feature_id(id):
+        for ass in self._db.list_device_feature_associations_by_feature_id(id):
             json_data.add_data(ass)
         self.send_http_response_ok(json_data.get())
 
 
 
-    def _rest_base_feature_association_list_by_device(self, id):
-        """ list feature association by device
-            @param id : id of element
-        """
-        json_data = JSonHelper("OK")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("feature_association")
-        for ass in self._db.list_device_feature_association_by_device_id(id):
-            json_data.add_data(ass)
-        self.send_http_response_ok(json_data.get())
+    #def _rest_base_feature_association_list_by_device(self, id):
+    #    """ list feature association by device
+    #        @param id : id of element
+    #    """
+    #    json_data = JSonHelper("OK")
+    #    json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+    #    json_data.set_data_type("feature_association")
+    #    for ass in self._db.list_device_feature_associations_by_device_id(id):
+    #        json_data.add_data(ass)
+    #    self.send_http_response_ok(json_data.get())
 
 
 
