@@ -1481,7 +1481,7 @@ class DbHelper():
         @return A DeviceConfig object
 
         """
-        return self.__session.query(DeviceConfig).filter_by(key=dc_key, device_id=dc_device_id).first()
+        return self.__session.query(DeviceConfig).filter_by(key=ucode(dc_key), device_id=dc_device_id).first()
 
 
     def set_device_config(self, dc_key, dc_value, dc_device_id):
@@ -1495,7 +1495,7 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        device_config = self.__session.query(DeviceConfig).filter_by(key=dc_key, device_id=dc_device_id).first()
+        device_config = self.__session.query(DeviceConfig).filter_by(key=ucode(dc_key), device_id=dc_device_id).first()
         if device_config is None:
             device_config = DeviceConfig(key=dc_key, value=dc_value, device_id=dc_device_id)
         else:
@@ -1849,7 +1849,8 @@ class DbHelper():
         if trigger is None:
             raise DbHelperException("Trigger with id %s couldn't be found" % t_id)
         if t_description is not None:
-            if t_description == '': t_description = None
+            if t_description == '':
+                t_description = None
             trigger.description = ucode(t_description)
         if t_rule is not None:
             trigger.rule = ucode(t_rule)

@@ -449,7 +449,7 @@ class DeviceConfig(Base):
     """Device configuration"""
 
     __tablename__ = '%s_device_config' % _db_prefix
-    key = Column(String(30), primary_key=True)
+    key = Column(Unicode(30), primary_key=True)
     value = Column(Unicode(255), nullable=False)
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), primary_key=True)
     device = relation(Device)
@@ -462,7 +462,7 @@ class DeviceConfig(Base):
         @param device_id : device id
 
         """
-        self.key = key
+        self.key = ucode(key)
         self.value = ucode(value)
         self.device_id = device_id
 
@@ -528,8 +528,8 @@ class Trigger(Base):
     __tablename__ = '%s_trigger' % _db_prefix
     id = Column(Integer, primary_key=True)
     description = Column(UnicodeText())
-    rule = Column(Text, nullable=False)
-    result = Column(Text, nullable=False)
+    rule = Column(UnicodeText(), nullable=False)
+    result = Column(UnicodeText(), nullable=False)
 
     def __init__(self, rule, result, description=None):
         """Class constructor
@@ -539,8 +539,8 @@ class Trigger(Base):
         @param description : long description of the rule, optional
 
         """
-        self.rule = rule
-        self.result = result
+        self.rule = ucode(rule)
+        self.result = ucode(result)
         self.description = ucode(description)
 
     def __repr__(self):
