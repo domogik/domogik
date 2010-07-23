@@ -22,13 +22,13 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 Module purpose
 ==============
 
-Install the Domogik database based on config file values
+Miscellaneous utility functions
 
 Implements
 ==========
 
 
-@author: Maxence Dunnewind <maxence@dunnewind.net>
+@author: Marc SCHNEIDER <marc@mirelsol.org>
 @copyright: (C) 2007-2010 Domogik project
 @license: GPL(v3)
 @organization: Domogik
