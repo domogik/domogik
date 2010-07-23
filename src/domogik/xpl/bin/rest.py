@@ -1582,13 +1582,15 @@ target=*
                 return
 
 
-        ### device_feature ######################
-        elif self.rest_request[0] == "device_feature":
+        ### feature ######################
+        elif self.rest_request[0] == "feature":
 
             ### list
             if self.rest_request[1] == "list":
-                if len(self.rest_request) == 4 and self.rest_request[2] == "by-type_id":
-                    self._rest_base_device_feature_list(type_id = self.rest_request[3])
+                if len(self.rest_request) == 4 and self.rest_request[2] == "by-id":
+                    self._rest_base_feature_list(id = self.rest_request[3])
+                elif len(self.rest_request) == 4 and self.rest_request[2] == "by-device_id":
+                    self._rest_base_feature_list(device_id = self.rest_request[3])
                 else:
                     self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
@@ -2218,19 +2220,25 @@ target=*
 
 
 ######
-# /base/device_feature processing
+# /base/feature processing
 ######
 
-    def _rest_base_device_feature_list(self, type_id):
+    def _rest_base_feature_list(self, id = None, device_id = None):
         """ list device type features
-            @param id : id of device type id
+            @param id : feature id
+            @param device_id : id of device 
         """
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        json_data.set_data_type("device_feature")
-        for features in self._db.list_device_feature_by_device_type_id(type_id):
-            json_data.add_data(features)
+        json_data.set_data_type("feature")
+        if id != None:
+            feature = self._db.get_device_feature_by_id(id)
+            json_data.add_data(feature)
+        elif device_id != None:
+            for feature in self._db.list_device_features_by_device_id(device_id):
+                json_data.add_data(feature)
         self.send_http_response_ok(json_data.get())
+
 
 
 
