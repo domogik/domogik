@@ -1735,9 +1735,10 @@ target=*
 
             ### del
             elif self.rest_request[1] == "del":
-                if len(self.rest_request) == 6 and self.rest_request[2] == "device_id" and self.rest_request[4] == "feature_id":
-                    self._rest_base_feature_association_del(device_id=self.rest_request[3], 
-                                                            feature_id=self.rest_request[5])
+                if len(self.rest_request) == 4 and self.rest_request[2] == "id":
+                    self._rest_base_feature_association_del(id=self.rest_request[3])
+                elif len(self.rest_request) == 4 and self.rest_request[2] == "feature_id":
+                    self._rest_base_feature_association_del(feature_id=self.rest_request[3])
                 elif len(self.rest_request) == 6 and self.rest_request[2] == "association_type" and self.rest_request[4] == "association_id":
                     self._rest_base_feature_association_del(association_type=self.rest_request[3], 
                                                             association_id=self.rest_request[5])
@@ -2475,8 +2476,7 @@ target=*
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("feature_association")
         try:
-            ass = self._db.add_device_feature_association(self.get_parameters("device_id"), \
-                                                               self.get_parameters("feature_id"), \
+            ass = self._db.add_device_feature_association( self.get_parameters("feature_id"), \
                                                                self.get_parameters("association_type"), \
                                                                self.get_parameters("association_id"))
             json_data.add_data(ass)
@@ -2487,30 +2487,35 @@ target=*
 
 
 
-    def _rest_base_feature_association_del(self, device_id = None, 
+    def _rest_base_feature_association_del(self, id = None, 
                                           feature_id = None,
                                           association_type = None,
                                           association_id = None):
         """ delete feature association
-            @param device_id : device id
+            @param id : association id
             @param feature_id : feature id
-            @param association_type : type of association (room, area, etc)
-            @param association_id : association id
+            @param association_type : house, area, room...
+            @param association_id : area id, room id, etc
         """
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("feature_association")
-        if device_id != None:
+        if id != None:
             try:
-                device = self._db.del_device_feature_association(device_id, feature_id)
-                json_data.add_data(device)
+                fa = self._db.del_device_feature_association(id)
+                json_data.add_data(fa)
+            except:
+                json_data.set_error(code = 999, description = self.get_exception())
+        elif feature_id != None:
+            try:
+                for fa in self._db.del_device_feature_association_by_device_feature_id(feature_id):
+                    json_data.add_data(fa)
             except:
                 json_data.set_error(code = 999, description = self.get_exception())
         elif association_type != None:
             try:
-                device = ["TODO"]
-                #device = self._db.del_device_feature_association(device_id, feature_id)
-                json_data.add_data(device)
+                for fa in self._db.del_device_feature_association_by_place(association_id, association_type):
+                    json_data.add_data(fa)
             except:
                 json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
