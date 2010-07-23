@@ -38,6 +38,8 @@ Implements
 import socket
 import traceback
 import time
+import urllib
+from xml.dom import minidom
 
 
 # For searching IPX with UDP request
@@ -75,8 +77,52 @@ class IPX:
             @param ip : ip or dns of host
             @param port: port
         """
-        print "TODO"
-            
+        # try to get status.xml on given board.
+        # if it fails,raise an Exception
+        print("Opening board : %s:%s" % (host, port))
+        self.url = "http://%s:%s" % (host, port)
+        self.url_status = "%s/status.xml" % self.url
+
+        # setting status will raise an error if no access to status.xml
+        self.get_status(first = True)
+
+
+    def get_status(self, first = False):
+        """ Get status.xml content on board
+            @param first : optionnal : if True, first call so we will check
+                           number of relay, input (ana and digi)
+        """
+        # TODO : try... except
+        resp = urllib.urlopen(self.url_status)
+
+        xml = resp.read()
+        dom = minidom.parseString(xml)
+        response = dom.getElementsByTagName("response")[0]
+        
+        # First call : count items
+        if first == True:
+            self.get_count(response)
+
+        # List each relay status
+
+
+    def get_count(self, dom):
+        """ count umber of relay, input
+            @param dom : xml data
+        """
+        # number of relay
+        idx = 0
+        while True:
+            try:
+                elt = dom.getElementsByTagName("led%s" % str(idx))[0]
+            except IndexError:
+                print "!!"
+                break
+            idx += 1
+            time.sleep(1)
+        print("Number of relay : %s" % idx)
+        
+
     def find(self):
         """ Try to find availables IPX boards on network
         """
@@ -104,4 +150,5 @@ class IPX:
 
 if __name__ == "__main__":
     ipx = IPX(None, None)
-    print ipx.find()
+    #print ipx.find()
+    ipx.open("192.168.0.102", 80)
