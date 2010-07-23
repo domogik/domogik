@@ -61,7 +61,9 @@ from sqlalchemy.types import TIMESTAMP
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relation, backref
 
+from domogik.common.utils import ucode
 from domogik.common.configloader import Loader
+
 
 DEVICE_TYPE_LIST = ['appliance', 'lamp', 'music', 'sensor']
 ACTUATOR_VALUE_TYPE_LIST = ['binary', 'range', 'list', 'trigger', 'number', 'string', 'complex',]
@@ -97,8 +99,8 @@ class Area(Base):
         @param description : extended description, optional
 
         """
-        self.name = name
-        self.description = description
+        self.name = ucode(name)
+        self.description = ucode(description)
 
     def __repr__(self):
         """Return an internal representation of the class"""
@@ -128,8 +130,8 @@ class Room(Base):
         @param area_id : id of the area where the room is, optional
 
         """
-        self.name = name
-        self.description = description
+        self.name = ucode(name)
+        self.description = ucode(description)
         self.area_id = area_id
 
     def __repr__(self):
@@ -159,9 +161,9 @@ class DeviceUsage(Base):
         @param default_options : default options, optional
 
         """
-        self.name = name
-        self.description = description
-        self.default_options = default_options
+        self.name = ucode(name)
+        self.description = ucode(description)
+        self.default_options = ucode(default_options)
 
     def __repr__(self):
         """Return an internal representation of the class"""
@@ -190,9 +192,9 @@ class DeviceTechnology(Base):
         @param description : extended description, optional
 
         """
-        self.id = id
-        self.name = name
-        self.description = description
+        self.id = ucode(id)
+        self.name = ucode(name)
+        self.description = ucode(description)
 
     def __repr__(self):
         """Return an internal representation of the class"""
@@ -222,10 +224,10 @@ class PluginConfig(Base):
         @param value : value
 
         """
-        self.name = name
-        self.hostname = hostname
-        self.key = key
-        self.value = value
+        self.name = ucode(name)
+        self.hostname = ucode(hostname)
+        self.key = ucode(key)
+        self.value = ucode(value)
 
     def __repr__(self):
         """Return an internal representation of the class"""
@@ -242,8 +244,7 @@ class DeviceType(Base):
 
     __tablename__ = '%s_device_type' % _db_prefix
     id = Column(Integer, primary_key=True)
-    device_technology_id = Column(Unicode(30), ForeignKey('%s.id' % \
-                           DeviceTechnology.get_tablename()), nullable=False)
+    device_technology_id = Column(Unicode(30), ForeignKey('%s.id' % DeviceTechnology.get_tablename()), nullable=False)
     device_technology = relation(DeviceTechnology)
     name = Column(Unicode(30), nullable=False)
     description = Column(UnicodeText())
@@ -256,9 +257,9 @@ class DeviceType(Base):
         @param device_technology_id : technology id
 
         """
-        self.name = name
-        self.description = description
-        self.device_technology_id = device_technology_id
+        self.name = ucode(name)
+        self.description = ucode(description)
+        self.device_technology_id = ucode(device_technology_id)
 
     def __repr__(self):
         """Return an internal representation of the class"""
@@ -297,12 +298,12 @@ class Device(Base):
         @param description : extended description, optional
 
         """
-        self.name = name
-        self.address = address
-        self.reference = reference
+        self.name = ucode(name)
+        self.address = ucode(address)
+        self.reference = ucode(reference)
         self.device_type_id = device_type_id
         self.device_usage_id = device_usage_id
-        self.description = description
+        self.description = ucode(description)
 
     def __repr__(self):
         """Return an internal representation of the class"""
@@ -344,7 +345,7 @@ class DeviceFeatureModel(Base):
                                      Only relevant for actuators
 
         """
-        self.name = name
+        self.name = ucode(name)
         if feature_type not in ('actuator', 'sensor'):
             raise Exception("Feature type must me either 'actuator' or 'sensor' but NOT %s" % feature_type)
         self.feature_type = feature_type
@@ -355,9 +356,9 @@ class DeviceFeatureModel(Base):
             raise Exception("Can't add value type %s to a sensor it doesn't belong to list %s" \
                             % (value_type, SENSOR_VALUE_TYPE_LIST))
         self.device_type_id = device_type_id
-        self.value_type = value_type
-        self.parameters = parameters
-        self.stat_key = stat_key
+        self.value_type = ucode(value_type)
+        self.parameters = ucode(parameters)
+        self.stat_key = ucode(stat_key)
         self.return_confirmation = return_confirmation
 
     def __repr__(self):
@@ -448,7 +449,7 @@ class DeviceConfig(Base):
     """Device configuration"""
 
     __tablename__ = '%s_device_config' % _db_prefix
-    key = Column(String(30), primary_key=True)
+    key = Column(Unicode(30), primary_key=True)
     value = Column(Unicode(255), nullable=False)
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), primary_key=True)
     device = relation(Device)
@@ -461,8 +462,8 @@ class DeviceConfig(Base):
         @param device_id : device id
 
         """
-        self.key = key
-        self.value = value
+        self.key = ucode(key)
+        self.value = ucode(value)
         self.device_id = device_id
 
     def __repr__(self):
@@ -499,12 +500,12 @@ class DeviceStats(Base):
 
         """
         self.date = date
-        self.key = key
+        self.key = ucode(key)
         try:
             self.__value_num = float(value)
         except ValueError:
             pass
-        self.value = value
+        self.value = ucode(value)
         self.device_id = device_id
 
     def get_date_as_timestamp(self):
@@ -527,8 +528,8 @@ class Trigger(Base):
     __tablename__ = '%s_trigger' % _db_prefix
     id = Column(Integer, primary_key=True)
     description = Column(UnicodeText())
-    rule = Column(Text, nullable=False)
-    result = Column(Text, nullable=False)
+    rule = Column(UnicodeText(), nullable=False)
+    result = Column(UnicodeText(), nullable=False)
 
     def __init__(self, rule, result, description=None):
         """Class constructor
@@ -538,9 +539,9 @@ class Trigger(Base):
         @param description : long description of the rule, optional
 
         """
-        self.rule = rule
-        self.result = result
-        self.description = description
+        self.rule = ucode(rule)
+        self.result = ucode(result)
+        self.description = ucode(description)
 
     def __repr__(self):
         """Return an internal representation of the class"""
@@ -570,8 +571,8 @@ class Person(Base):
         @param birthdate : birthdate
 
         """
-        self.first_name = first_name
-        self.last_name = last_name
+        self.first_name = ucode(first_name)
+        self.last_name = ucode(last_name)
         self.birthdate = birthdate
 
     def __repr__(self):
@@ -607,15 +608,15 @@ class UserAccount(Base):
         @param skin_used : skin used in the UI (default value = 'default')
 
         """
-        self.login = login
-        self.__password = password
+        self.login = ucode(login)
+        self.__password = ucode(password)
         self.person_id = person_id
         self.is_admin = is_admin
-        self.skin_used = skin_used
+        self.skin_used = ucode(skin_used)
 
     def set_password(self, password):
         """Set a password for the user"""
-        self.__password = password
+        self.__password = ucode(password)
 
     def __repr__(self):
         """Return an internal representation of the class"""
@@ -646,10 +647,10 @@ class UIItemConfig(Base):
         @param value : associated value (ex. basement)
 
         """
-        self.name = name
-        self.reference = reference
-        self.key = key
-        self.value = value
+        self.name = ucode(name)
+        self.reference = ucode(reference)
+        self.key = ucode(key)
+        self.value = ucode(value)
 
     def __repr__(self):
         """Return an internal representation of the class"""

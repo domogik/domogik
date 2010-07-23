@@ -48,6 +48,7 @@ from sqlalchemy.sql.expression import func
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
+from domogik.common.utils import ucode
 from domogik.common.configloader import Loader
 from domogik.common.sql_schema import ACTUATOR_VALUE_TYPE_LIST, Area, Device, DeviceFeature, DeviceFeatureModel,\
                                       DeviceUsage, DeviceFeatureAssociation,\
@@ -55,18 +56,6 @@ from domogik.common.sql_schema import ACTUATOR_VALUE_TYPE_LIST, Area, Device, De
                                       DeviceType, UIItemConfig, Room, Person, UserAccount, SENSOR_VALUE_TYPE_LIST,\
                                       SystemConfig, Trigger
 
-
-def ucode(my_string):
-    """Convert a string into unicode or return None if None value is passed
-
-    @param my_string : string value to convert
-    @return a unicode string
-
-    """
-    if my_string is not None:
-        return unicode(my_string)
-    else:
-        return None
 
 def _make_crypted_password(clear_text_password):
     """Make a crypted password (using sha256)
@@ -251,7 +240,7 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        area = Area(name=ucode(a_name), description=ucode(a_description))
+        area = Area(name=a_name, description=a_description)
         self.__session.add(area)
         try:
             self.__session.commit()
@@ -374,7 +363,7 @@ class DbHelper():
         if r_area_id != None:
             if not self.__session.query(Area).filter_by(id=r_area_id).first():
                 raise DbHelperException("Couldn't add room with area id %s. It does not exist" % r_area_id)
-        room = Room(name=ucode(r_name), description=ucode(r_description), area_id=r_area_id)
+        room = Room(r_name, description=r_description, area_id=r_area_id)
         self.__session.add(room)
         try:
             self.__session.commit()
@@ -480,8 +469,7 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        du = DeviceUsage(name=ucode(du_name), description=ucode(du_description),
-                         default_options=ucode(du_default_options))
+        du = DeviceUsage(name=du_name, description=du_description, default_options=du_default_options)
         self.__session.add(du)
         try:
             self.__session.commit()
@@ -583,7 +571,7 @@ class DbHelper():
         self.__session.expire_all()
         if not self.__session.query(DeviceTechnology).filter_by(id=dt_id).first():
             raise DbHelperException("Couldn't add device type with technology id %s. It does not exist" % dt_id)
-        dty = DeviceType(name=ucode(dty_name), description=ucode(dty_description), device_technology_id=dt_id)
+        dty = DeviceType(name=dty_name, description=dty_description, device_technology_id=dt_id)
         self.__session.add(dty)
         try:
             self.__session.commit()
@@ -764,10 +752,10 @@ class DbHelper():
         if self.__session.query(DeviceType).filter_by(id=af_device_type_id).first() is None:
             raise DbHelperException("Can't add actuator feature : device type id '%s' doesn't exist" \
                                     % dtf_device_type_id)
-        device_feature_m = DeviceFeatureModel(name=ucode(af_name), feature_type=u'actuator',
-                                              device_type_id=af_device_type_id, value_type=ucode(af_value_type),
+        device_feature_m = DeviceFeatureModel(name=af_name, feature_type=u'actuator',
+                                              device_type_id=af_device_type_id, value_type=af_value_type,
                                               return_confirmation=af_return_confirmation,
-                                              parameters=ucode(af_parameters), stat_key=ucode(af_stat_key))
+                                              parameters=af_parameters, stat_key=af_stat_key)
         self.__session.add(device_feature_m)
         try:
             self.__session.commit()
@@ -1061,7 +1049,7 @@ class DbHelper():
                 if not self.__session.query(Area).filter_by(id=d_place_id).first():
                     raise DbHelperException("Couldn't add device with area id %s It does not exist" % d_place_id)
 
-        device_feature_asso = DeviceFeatureAssociation(device_feature_id=d_feature_id, place_type=ucode(d_place_type),
+        device_feature_asso = DeviceFeatureAssociation(device_feature_id=d_feature_id, place_type=d_place_type,
                                                        place_id=d_place_id)
         self.__session.add(device_feature_asso)
         try:
@@ -1159,7 +1147,7 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        dt = DeviceTechnology(id=ucode(dt_id), name=ucode(dt_name), description=ucode(dt_description))
+        dt = DeviceTechnology(id=dt_id, name=dt_name, description=dt_description)
         self.__session.add(dt)
         try:
             self.__session.commit()
@@ -1280,8 +1268,7 @@ class DbHelper():
                                       .filter_by(hostname=ucode(pl_hostname))\
                                       .filter_by(key=ucode(pl_key)).first()
         if not plugin_config:
-            plugin_config = PluginConfig(name=ucode(pl_name), hostname=ucode(pl_hostname),
-                                         key=ucode(pl_key), value=ucode(pl_value))
+            plugin_config = PluginConfig(name=pl_name, hostname=pl_hostname, key=pl_key, value=pl_value)
         else:
             plugin_config.value = ucode(pl_value)
         self.__session.add(plugin_config)
@@ -1388,10 +1375,8 @@ class DbHelper():
             raise DbHelperException("Couldn't add device with device type id %s It does not exist" % d_type_id)
         if not self.__session.query(DeviceUsage).filter_by(id=d_usage_id).first():
             raise DbHelperException("Couldn't add device with device usage id %s It does not exist" % d_usage_id)
-        device = Device(name=ucode(d_name), address=ucode(d_address),
-                        description=ucode(d_description),
-                        reference=ucode(d_reference), device_type_id=d_type_id,
-                        device_usage_id=d_usage_id)
+        device = Device(name=d_name, address=d_address, description=d_description, reference=d_reference,
+                        device_type_id=d_type_id, device_usage_id=d_usage_id)
         self.__session.add(device)
         try:
             self.__session.commit()
@@ -1496,7 +1481,7 @@ class DbHelper():
         @return A DeviceConfig object
 
         """
-        return self.__session.query(DeviceConfig).filter_by(key=dc_key, device_id=dc_device_id).first()
+        return self.__session.query(DeviceConfig).filter_by(key=ucode(dc_key), device_id=dc_device_id).first()
 
 
     def set_device_config(self, dc_key, dc_value, dc_device_id):
@@ -1510,9 +1495,9 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        device_config = self.__session.query(DeviceConfig).filter_by(key=dc_key, device_id=dc_device_id).first()
+        device_config = self.__session.query(DeviceConfig).filter_by(key=ucode(dc_key), device_id=dc_device_id).first()
         if device_config is None:
-            device_config = DeviceConfig(key=dc_key, value=ucode(dc_value), device_id=dc_device_id)
+            device_config = DeviceConfig(key=dc_key, value=dc_value, device_id=dc_device_id)
         else:
             device_config.value = ucode(dc_value)
         self.__session.add(device_config)
@@ -1757,8 +1742,8 @@ class DbHelper():
         self.__session.expire_all()
         if not self.__session.query(Device).filter_by(id=ds_device_id).first():
             raise DbHelperException("Couldn't add device stat with device id %s. It does not exist" % ds_device_id)
-        device_stat = DeviceStats(date=datetime.datetime.fromtimestamp(ds_date), key=ucode(ds_key),
-                                  value=ucode(ds_value), device_id=ds_device_id)
+        device_stat = DeviceStats(date=datetime.datetime.fromtimestamp(ds_date), key=ds_key, value=ds_value,
+                                  device_id=ds_device_id)
         self.__session.add(device_stat)
         try:
             self.__session.commit()
@@ -1839,7 +1824,7 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        trigger = Trigger(description=ucode(t_description), rule=ucode(t_rule), result=ucode(';'.join(t_result)))
+        trigger = Trigger(description=t_description, rule=t_rule, result=';'.join(t_result))
         self.__session.add(trigger)
         try:
             self.__session.commit()
@@ -1864,7 +1849,8 @@ class DbHelper():
         if trigger is None:
             raise DbHelperException("Trigger with id %s couldn't be found" % t_id)
         if t_description is not None:
-            if t_description == '': t_description = None
+            if t_description == '':
+                t_description = None
             trigger.description = ucode(t_description)
         if t_rule is not None:
             trigger.rule = ucode(t_rule)
@@ -1972,8 +1958,8 @@ class DbHelper():
         person = self.__session.query(Person).filter_by(id=a_person_id).first()
         if person is None:
             raise DbHelperException("Person id '%s' does not exist" % a_person_id)
-        user_account = UserAccount(login=ucode(a_login), password=ucode(_make_crypted_password(a_password)),
-                                   person_id=a_person_id, is_admin=a_is_admin, skin_used=ucode(a_skin_used))
+        user_account = UserAccount(login=a_login, password=_make_crypted_password(a_password),
+                                   person_id=a_person_id, is_admin=a_is_admin, skin_used=a_skin_used)
         self.__session.add(user_account)
         try:
             self.__session.commit()
@@ -2155,7 +2141,7 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        person = Person(first_name=ucode(p_first_name), last_name=ucode(p_last_name), birthdate=p_birthdate)
+        person = Person(first_name=p_first_name, last_name=p_last_name, birthdate=p_birthdate)
         self.__session.add(person)
         try:
             self.__session.commit()
@@ -2242,8 +2228,8 @@ class DbHelper():
         self.__session.expire_all()
         ui_item_config = self.get_ui_item_config(ui_item_name, ui_item_reference, ui_item_key)
         if ui_item_config is None:
-            ui_item_config = UIItemConfig(name=ucode(ui_item_name), reference=ucode(ui_item_reference),
-                                          key=ucode(ui_item_key), value=ucode(ui_item_value))
+            ui_item_config = UIItemConfig(name=ui_item_name, reference=ui_item_reference, key=ui_item_key,
+                                          value=ui_item_value)
         else:
             ui_item_config.value = ucode(ui_item_value)
         self.__session.add(ui_item_config)
