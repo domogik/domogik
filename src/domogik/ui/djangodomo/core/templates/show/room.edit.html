@@ -199,16 +199,16 @@
         $(".feature").click(function(){
             $(".selected").removeClass('selected');
             $(this).addClass('selected');
+            var type = $(this).attr('type');
             var featurevalue = $(this).attr('featurevalue');
             var featurename = $(this).attr('featurename');
-            var devicevalue = $(this).attr('devicevalue');
             var devicename = $(this).attr('devicename');
             $("#widgetslist").empty();
             $("#widgets").show();
             $("#widgetslist").widget_models({
+                type: type,
                 featurevalue: featurevalue,
                 featurename: featurename,
-                devicevalue: devicevalue,
                 devicename: devicename
             });
         });
@@ -299,7 +299,7 @@
                         {% for device in usage.list %}
                         <li><div class='device icon16-technology-{{ device.device_type.device_technology_id }}'>{{ device.name }} ({{ device.address }})</div>
                             <ul>
-                                {% for feature in device.feature %}
+                                {% for feature in device.features %}
                                 <li><div class='feature' featurevalue='{{ feature.id }}' devicename='{{device.name }}' featurename='{{ feature.device_feature_model.name }}' type='{{ feature.device_feature_model.feature_type }}.{{ feature.device_feature_model.value_type }}'>{{ feature.device_feature_model.name }}</div></li>
                                 {% endfor %}
                             </ul>

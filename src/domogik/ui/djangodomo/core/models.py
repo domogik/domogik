@@ -49,23 +49,25 @@ def unescape(s):
 
 class House(object):
     def __init__(self):
-        print(self)
         self.config = UIConfigs.get_by_reference('house', '0')
         if self.config.has_key('name') :
             self.name = self.config['name']
 
-    def merge_feature_associations(self):
+    def merge_features(self):
+        # Find all features associated with the House
         associations = FeatureAssociations.get_by_house()
-        self.feature_association = associations.feature_association
-        if self.config.has_key('widgets'):
-            for association in self.feature_association:
-                print association
+        self.features = []
+        # For each association get the feature detail
+        for association in associations.feature_association:
+            resp = Features.get_by_id(association.device_feature_id)
+            feature = resp.feature[0]
+            # Add the linked widget (from ui_config)
+            if self.config.has_key('widgets'):
                 for widget in self.config['widgets']['list']:
-                    print widget
-                    if int(association.device_feature_id) == int(widget['feature']):
-                        association['widget_id'] = widget['widget']
+                    if int(feature.id) == int(widget['feature']):
+                        feature['widget_id'] = widget['widget']
+            self.features.append(feature)
 
-        
 class Areas(pipes.DmgPipe):
     uri = settings.REST_URL + "/base/area"
 
@@ -95,10 +97,21 @@ class Areas(pipes.DmgPipe):
                 for room in area.room:
                     room.config = UIConfigs.get_by_reference('room', room.id)
 
-    def merge_feature_associations(self):
+    def merge_features(self):
         for area in self.area:
+            # Find all features associated with the Area
             associations = FeatureAssociations.get_by_area(area.id)
-            area.feature_association = associations.feature_association
+            area.features = []
+            # For each association get the feature detail
+            for association in associations.feature_association:
+                resp = Features.get_by_id(association.device_feature_id)
+                feature = resp.feature[0]
+                # Add the linked widget (from ui_config)
+                if area.config.has_key('widgets'):
+                    for widget in area.config['widgets']['list']:
+                        if int(feature.id) == int(widget['feature']):
+                            feature['widget_id'] = widget['widget']
+                area.features.append(feature)
 
 class Rooms(pipes.DmgPipe):
     uri = settings.REST_URL + "/base/room"
@@ -135,10 +148,21 @@ class Rooms(pipes.DmgPipe):
             if hasattr(room, 'area') and (room.area != 'None') :
                 room.area.config = UIConfigs.get_by_reference('area', room.area.id)
 
-    def merge_feature_associations(self):
+    def merge_features(self):
         for room in self.room:
+            # Find all features associated with the Room
             associations = FeatureAssociations.get_by_room(room.id)
-            room.feature_association = associations.feature_association
+            room.features = []
+            # For each association get the feature detail
+            for association in associations.feature_association:
+                resp = Features.get_by_id(association.device_feature_id)
+                feature = resp.feature[0]
+                # Add the linked widget (from ui_config)
+                if room.config.has_key('widgets'):
+                    for widget in room.config['widgets']['list']:
+                        if int(feature.id) == int(widget['feature']):
+                            feature['widget_id'] = widget['widget']
+                room.features.append(feature)
 
 class Devices(pipes.DmgPipe):
     uri = settings.REST_URL + "/base/device"
@@ -230,6 +254,12 @@ class DeviceUsages(pipes.DmgPipe):
 
 class Features(pipes.DmgPipe):
     uri = settings.REST_URL + "/base/feature"
+
+    @staticmethod
+    def get_by_id(id):
+        resp = Features.objects.get({'parameters':"list/by-id/" + str(id)})
+        if resp :
+            return resp
 
     @staticmethod
     def get_by_device(device_id):

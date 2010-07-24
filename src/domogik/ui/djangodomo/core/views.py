@@ -86,14 +86,9 @@ def index(request):
         result_all_areas.merge_rooms()
         result_all_areas.merge_uiconfig()
         result_house = House()
-        result_house.merge_feature_associations()
+        result_house.merge_features()
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
-    """
-    device_list = []
-    for device in __db.list_devices():
-        device_list.append({'room': device.room_id, 'device': device})
-    """
     return __go_to_page(request, 'index.html',
         page_title,
         widgets=widgets_list,
@@ -449,7 +444,7 @@ def show_house(request):
         result_all_areas.merge_uiconfig()
 
         result_house = House()
-        result_house.merge_feature_associations()
+        result_house.merge_features()
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
     return __go_to_page(
@@ -472,11 +467,11 @@ def show_house_edit(request):
 
     try:
         result_house = House()
-        result_house.merge_feature_associations()
 
         result_all_devices = Devices.get_all()
         result_all_devices.merge_uiconfig()
         result_all_devices.merge_features()
+
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
     return __go_to_page(
@@ -499,7 +494,7 @@ def show_area(request, area_id):
     try:
         result_area_by_id = Areas.get_by_id(area_id)
         result_area_by_id.merge_uiconfig()
-        result_area_by_id.merge_feature_associations()
+        result_area_by_id.merge_features()
 
         result_rooms_by_area = Rooms.get_by_area(area_id)
         result_rooms_by_area.merge_uiconfig()
@@ -529,12 +524,12 @@ def show_area_edit(request, area_id):
     try:
         result_area_by_id = Areas.get_by_id(area_id)
         result_area_by_id.merge_uiconfig()
-        result_area_by_id.merge_feature_associations()
         result_house = House()
         
         result_all_devices = Devices.get_all()
         result_all_devices.merge_uiconfig()
         result_all_devices.merge_features()
+        print result_all_devices.device
 
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
@@ -561,7 +556,7 @@ def show_room(request, room_id):
     try:
         result_room_by_id = Rooms.get_by_id(room_id)
         result_room_by_id.merge_uiconfig()
-        result_room_by_id.merge_feature_associations()
+        result_room_by_id.merge_features()
 
         result_house = House()
     except ResourceNotAvailableException:
@@ -588,7 +583,6 @@ def show_room_edit(request, room_id):
     try:
         result_room_by_id = Rooms.get_by_id(room_id)
         result_room_by_id.merge_uiconfig()
-        result_room_by_id.merge_feature_associations()
 
         result_house = House()
 

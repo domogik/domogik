@@ -43,7 +43,7 @@ def unescape(s):
 class GetCommandBinary(Node):
     @staticmethod
     def get_widget(feature, device_type, device_usage, parameters_type, parameters_usage):
-        script = """$('#widget_%s_%s').%s().%s('widget',{
+        script = """$('#widget_%s').%s().%s('widget',{
                         usage: %s,
                         devicename: '%s',
                         featurename: '%s',
@@ -55,24 +55,25 @@ class GetCommandBinary(Node):
                         deviceaddress: '%s',
                         featureconfirmation: '%s'
                     });
-                    """ % (feature.device_id, feature.device_feature_id, feature.widget_id,
+                    """ % (feature.id, feature.widget_id,
                            feature.widget_id, feature.device.device_usage_id,
-                           feature.device.name, feature.device_feature.name,
+                           feature.device.name, feature.device_feature_model.name,
                            parameters_type['value0'], parameters_type['value1'],
                            parameters_usage['binary']['state0'], parameters_usage['binary']['state1'],
-                           device_type.device_technology_id, feature.device.address, feature.device_feature.return_confirmation)
+                           device_type.device_technology_id, feature.device.address,
+                           feature.device_feature_model.return_confirmation)
         return script
 
     @staticmethod
     def get_setValue(feature, value):
-        script = """$("#widget_%s_%s").%s('setValue', %s);
-                    """ % (feature.device_id, feature.device_feature_id, feature.widget_id, value)
+        script = """$("#widget_%s").%s('setValue', %s);
+                    """ % (feature.id, feature.widget_id, value)
         return script
 
 class GetCommandRange(Node):
     @staticmethod
     def get_widget(feature, device_type, device_usage, parameters_type, parameters_usage):
-        script = """$("#widget_%s_%s").%s().%s('widget',{
+        script = """$("#widget_%s").%s().%s('widget',{
                         usage: %s,
                         devicename: '%s',
                         featurename: '%s',
@@ -85,25 +86,25 @@ class GetCommandRange(Node):
                         featurecommand: '%s',
                         featureconfirmation: '%s'
                     });
-                    """ % (feature.device_id, feature.device_feature_id, feature.widget_id,
+                    """ % (feature.id, feature.widget_id,
                            feature.widget_id, feature.device.device_usage_id,
-                           feature.device.name, feature.device_feature.name,
+                           feature.device.name, feature.device_feature_model.name,
                            parameters_type['valueMin'], parameters_type['valueMax'],
                            parameters_usage['range']['step'], parameters_usage['range']['unit'],
                            device_type.device_technology_id, feature.device.address,
-                           parameters_type['command'], feature.device_feature.return_confirmation)
+                           parameters_type['command'], feature.device_feature_model.return_confirmation)
         return script
 
     @staticmethod
     def get_setValue(feature, value):
-        script = """$("#widget_%s_%s").%s('setValue', %s);
-                    """ % (feature.device_id, feature.device_feature_id, feature.widget_id, value)
+        script = """$("#widget_%s").%s('setValue', %s);
+                    """ % (feature.id, feature.widget_id, value)
         return script
 
 class GetCommandTrigger():
     @staticmethod
     def get_widget(feature, device_type, device_usage, parameters_type, parameters_usage):
-        script = """$('#widget_%s_%s').%s().%s('widget',{
+        script = """$('#widget_%s').%s().%s('widget',{
                         usage: %s,
                         devicename: '%s',
                         featurename: '%s',
@@ -112,41 +113,40 @@ class GetCommandTrigger():
                         featurecommand: '%s',
                         featureconfirmation: '%s'
                     });
-                    """ % (feature.device_id, feature.device_feature_id, feature.widget_id,
+                    """ % (feature.id, feature.widget_id,
                            feature.widget_id, feature.device.device_usage_id,
-                           feature.device.name, feature.device_feature.name,
+                           feature.device.name, feature.device_feature_model.name,
                            device_type.device_technology_id, feature.device.address,
-                           parameters_type['command'], feature.device_feature.return_confirmation)
+                           parameters_type['command'], feature.device_feature_model.return_confirmation)
         return script
 
 class GetInfoBoolean():
     @staticmethod
     def get_widget(feature, device_type, device_usage, parameters_type, parameters_usage):
-        script = """$("#widget_%s_%s").%s().%s('widget',{
+        script = """$("#widget_%s").%s().%s('widget',{
                             usage: %s,
                             devicename: '%s',
                             featurename: '%s',
                             deviceid: %s,
                             key: '%s'
                         });
-                 """ % (feature.device_id, feature.device_feature_id, feature.widget_id,
+                 """ % (feature.id, feature.widget_id,
                         feature.widget_id, feature.device.device_usage_id,
-                        feature.device.name, feature.device_feature.name,
-                        feature.device_id, feature.device_feature.stat_key)
+                        feature.device.name, feature.device_feature_model.name,
+                        feature.device_id, feature.device_feature_model.stat_key)
         return script
 
     @staticmethod
     def get_setValue(feature, value):
-        script = """$("#widget_%s_%s").%s('setValue', %s);
-                 """ % (feature.device_id, feature.device_feature_id,
-                        feature.widget_id, value)
+        script = """$("#widget_%s").%s('setValue', %s);
+                 """ % (feature.id, feature.widget_id, value)
 
         return script
     
 class GetInfoNumber():
     @staticmethod
     def get_widget(feature, device_type, device_usage, parameters_type, parameters_usage):
-        script = """$("#widget_%s_%s").%s().%s('widget',{
+        script = """$("#widget_%s").%s().%s('widget',{
                             usage: %s,
                             devicename: '%s',
                             featurename: '%s',
@@ -154,17 +154,16 @@ class GetInfoNumber():
                             deviceid: %s,
                             key: '%s'
                         });
-                 """ % (feature.device_id, feature.device_feature_id, feature.widget_id,
+                 """ % (feature.id, feature.widget_id,
                         feature.widget_id, feature.device.device_usage_id,
-                        feature.device.name, feature.device_feature.name,
-                        parameters_type['unit'], feature.device_id, feature.device_feature.stat_key)
+                        feature.device.name, feature.device_feature_model.name,
+                        parameters_type['unit'], feature.device_id, feature.device_feature_model.stat_key)
         return script
 
     @staticmethod
     def get_setValue(feature, value):
-        script = """$("#widget_%s_%s").%s('setValue', %s);
-                 """ % (feature.device_id, feature.device_feature_id,
-                        feature.widget_id, value)
+        script = """$("#widget_%s").%s('setValue', %s);
+                 """ % (feature.id, feature.widget_id, value)
 
         return script
 
@@ -186,30 +185,30 @@ class GetWidget(Node):
 
     def render(self, context):
         feature = self.feature.resolve(context)
-
+        print feature
         device_type = DeviceTypes.get_dict_item(feature.device.device_type_id)
         device_usage = DeviceUsages.get_dict_item(feature.device.device_usage_id)
 
         parameters_type = None;
-        if feature.device_feature.parameters != 'None':
-            parameters_type = simplejson.loads(unescape(feature.device_feature.parameters))
+        if feature.device_feature_model.parameters != 'None':
+            parameters_type = simplejson.loads(unescape(feature.device_feature_model.parameters))
         parameters_usage = None;
         if device_usage.default_options != 'None':
             parameters_usage = simplejson.loads(unescape(device_usage.default_options))
         
-        if feature.device_feature.feature_type == "actuator":
-            if feature.device_feature.value_type == "binary":
+        if feature.device_feature_model.feature_type == "actuator":
+            if feature.device_feature_model.value_type == "binary":
                 script = GetCommandBinary.get_widget(feature, device_type, device_usage, parameters_type, parameters_usage)
-            if feature.device_feature.value_type == "range":
+            if feature.device_feature_model.value_type == "range":
                 script = GetCommandRange.get_widget(feature, device_type, device_usage, parameters_type, parameters_usage)
-            if feature.device_feature.value_type == "trigger":
+            if feature.device_feature_model.value_type == "trigger":
                 script = GetCommandTrigger.get_widget(feature, device_type, device_usage, parameters_type, parameters_usage)
         else : # 'Sensor'
-            if feature.device_feature.value_type == "boolean":
+            if feature.device_feature_model.value_type == "boolean":
                 script = GetInfoBoolean.get_widget(feature, device_type, device_usage, parameters_type, parameters_usage)
-            if feature.device_feature.value_type == "number":
+            if feature.device_feature_model.value_type == "number":
                 script = GetInfoNumber.get_widget(feature, device_type, device_usage, parameters_type, parameters_usage)
-            if feature.device_feature.value_type == "string":
+            if feature.device_feature_model.value_type == "string":
                 script = GetInfoString.get_widget(feature, device_type, device_usage, parameters_type, parameters_usage)
         return script
 
@@ -219,20 +218,20 @@ class GetWidgetInit(Node):
 
     def render(self, context):
         feature = self.feature.resolve(context)
-        stat = Stats.get_latest(feature.device_id, feature.device_feature.stat_key)
+        stat = Stats.get_latest(feature.device_id, feature.device_feature_model.stat_key)
         script = ""
         if len(stat.stats) > 0 :
-            if feature.device_feature.feature_type == "actuator":
-                if feature.device_feature.value_type == "binary":
+            if feature.device_feature_model.feature_type == "actuator":
+                if feature.device_feature_model.value_type == "binary":
                     script = GetCommandBinary.get_setValue(feature, "'" + stat.stats[0].value + "'")
-                if feature.device_feature.value_type == "range":
+                if feature.device_feature_model.value_type == "range":
                     script = GetCommandRange.get_setValue(feature, "'" + stat.stats[0].value + "'")
             else: # 'Sensor'
-                if feature.device_feature.value_type == "boolean":
+                if feature.device_feature_model.value_type == "boolean":
                     script = GetInfoBoolean.get_setValue(feature, "'" + stat.stats[0].value + "'")
-                if feature.device_feature.value_type == "number":
+                if feature.device_feature_model.value_type == "number":
                     script = GetInfoNumber.get_setValue(feature, "'" + stat.stats[0].value + "'")
-                if feature.device_feature.value_type == "string":
+                if feature.device_feature_model.value_type == "string":
                     script = GetInfoString.get_setValue(feature, "'" + stat.stats[0].value + "'")
         return script
 
@@ -245,17 +244,17 @@ class GetWidgetUpdate(Node):
         feature = self.feature.resolve(context)
         value = self.value.resolve(context)
         script = ""
-        if feature.device_feature.feature_type == "actuator":
-            if feature.device_feature.value_type == "binary":
+        if feature.device_feature_model.feature_type == "actuator":
+            if feature.device_feature_model.value_type == "binary":
                 script = GetCommandBinary.get_setValue(feature, value)
-            if feature.device_feature.value_type == "range":
+            if feature.device_feature_model.value_type == "range":
                 script = GetCommandRange.get_setValue(feature, value)
         else: # 'Sensor'
-            if feature.device_feature.value_type == "boolean":
+            if feature.device_feature_model.value_type == "boolean":
                 script = GetInfoBoolean.get_setValue(feature, value)
-            if feature.device_feature.value_type == "number":
+            if feature.device_feature_model.value_type == "number":
                 script = GetInfoNumber.get_setValue(feature, value)
-            if feature.device_feature.value_type == "string":
+            if feature.device_feature_model.value_type == "string":
                 script = GetInfoString.get_setValue(feature, value)
         return script
     
