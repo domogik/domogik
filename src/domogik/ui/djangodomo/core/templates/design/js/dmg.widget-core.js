@@ -59,7 +59,6 @@ function get_widgets(type) {
 			    .attr("widgetid", o.id)
 				.addClass('size' + o.width + 'x' + o.height)
                 .attr("tabindex", 0)
-				.attr('devicevalue', params.devicevalue)
 	            .attr('featurevalue', params.featurevalue);
 			this._identity = $("<canvas class='identity' width='60' height='60'></canvas>")
 			this.element.append(this._identity);				

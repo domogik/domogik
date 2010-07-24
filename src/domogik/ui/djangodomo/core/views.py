@@ -42,7 +42,7 @@ from django.conf import settings
 
 from domogik.common import database
 from domogik.ui.djangodomo.core.models import House, Areas, Rooms, Devices, DeviceUsages, DeviceTechnologies, DeviceTypes, \
-                                   DeviceFeatures, FeatureAssociations, Plugins, Accounts
+                                   Features, FeatureAssociations, Plugins, Accounts
 
 from domogik.ui.djangodomo.core.sample_data_helper import SampleDataHelper
 

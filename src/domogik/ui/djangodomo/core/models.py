@@ -62,9 +62,7 @@ class House(object):
                 print association
                 for widget in self.config['widgets']['list']:
                     print widget
-                    print association.device_id, " == ", widget['device']
-                    print int(association.device_id) == int(widget['device'])
-                    if int(association.device_id) == int(widget['device']) and int(association.device_feature_id) == int(widget['feature']):
+                    if int(association.device_feature_id) == int(widget['feature']):
                         association['widget_id'] = widget['widget']
 
         
@@ -159,13 +157,13 @@ class Devices(pipes.DmgPipe):
 
     def merge_features(self):
         for device in self.device:
-            features = DeviceFeatures.get_by_type(device.device_type_id)
-            associations = FeatureAssociations.get_by_device(device.id)
-            device.feature = features.device_feature
-            for feature in device.feature:
-                for association in associations.feature_association:
-                    if (feature.id == association.device_feature_id):
-                        feature.association = association
+            features = Features.get_by_device(device.id)
+            device.features = features.feature
+#            associations = FeatureAssociations.get_by_feature(feature.id)
+#            for feature in device.feature:
+#                for association in associations.feature_association:
+#                    if (feature.id == association.device_feature_id):
+#                        feature.association = association
 
 class DeviceTechnologies(pipes.DmgPipe):
     uri = settings.REST_URL + "/base/device_technology"
@@ -230,12 +228,12 @@ class DeviceUsages(pipes.DmgPipe):
         dict = DeviceUsages.get_dict()
         return dict[key]
 
-class DeviceFeatures(pipes.DmgPipe):
-    uri = settings.REST_URL + "/base/device_feature"
+class Features(pipes.DmgPipe):
+    uri = settings.REST_URL + "/base/feature"
 
     @staticmethod
-    def get_by_type(type_id):
-        resp = DeviceFeatures.objects.get({'parameters':"list/by-type_id/" + str(type_id)})
+    def get_by_device(device_id):
+        resp = Features.objects.get({'parameters':"list/by-device_id/" + str(device_id)})
         if resp :
             return resp
 
@@ -261,8 +259,8 @@ class FeatureAssociations(pipes.DmgPipe):
             return resp
         
     @staticmethod
-    def get_by_device(device_id):
-        resp = FeatureAssociations.objects.get({'parameters':"list/by-device/" + str(device_id)})
+    def get_by_feature(feature_id):
+        resp = FeatureAssociations.objects.get({'parameters':"list/by-feature/" + str(feature_id)})
         if resp :
             return resp
     

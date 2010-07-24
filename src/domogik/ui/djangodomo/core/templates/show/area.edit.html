@@ -35,28 +35,41 @@
             finishactions = 0;
             savetries = 0;
         
-            json = {};
+            $.getREST(['base', 'feature_association', 'del', 'association_type', 'area', 'association_id', '{{ area.id }}'],
+                function(data) {
+                    var status = (data.status).toLowerCase();
+                    if (status != 'ok') {
+                        $.notification('error', data.description);                                          
+                    }
+                }
+            );
 
+            json = {};
+            json.list = []
             // Main info
             $(".maininfo li:first").each(function(index) {
-                json.maininfo = {device:$(this).attr('devicevalue'), feature:$(this).attr('featurevalue')};
-                addAssociation($(this).attr('devicevalue'), $(this).attr('featurevalue'));
+                var action = {widget:$(this).attr('widgetid'), feature:$(this).attr('featurevalue')};
+                json.maininfo = action;
+                json.list.push(action);
+                addAssociation($(this).attr('featurevalue'));
             });
 
             // Main actions
             json.mainactions = [];
             $(".mainactions li").each(function(index) {
-                var action = {device:$(this).attr('devicevalue'), feature:$(this).attr('featurevalue')};
+                var action = {widget:$(this).attr('widgetid'), feature:$(this).attr('featurevalue')};
                 json.mainactions.push(action);
-                addAssociation($(this).attr('devicevalue'), $(this).attr('featurevalue'));
+                json.list.push(action);
+                addAssociation($(this).attr('featurevalue'));
             });
             
             // Other actions
             json.otheractions = [];
             $(".otheractions li").each(function(index) {
-                var action = {device:$(this).attr('devicevalue'), feature:$(this).attr('featurevalue')};
+                var action = {widget:$(this).attr('widgetid'), feature:$(this).attr('featurevalue')};
                 json.otheractions.push(action);
-                addAssociation($(this).attr('devicevalue'), $(this).attr('featurevalue'));
+                json.list.push(action);
+                addAssociation($(this).attr('featurevalue'));
             });
             
             // Save ui config
@@ -86,21 +99,12 @@
             }
         }
         
-        function addAssociation(deviceid, featureid) {
-            $.getREST(['base', 'feature_association', 'del', 'device_id', deviceid, 'feature_id', featureid],
+        function addAssociation(featureid) {
+            $.getREST(['base', 'feature_association', 'add', 'feature_id', featureid, 'association_type', 'area', 'association_id', '{{ area.id }}'],
                 function(data) {
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
-                        $.getREST(['base', 'feature_association', 'add', 'device_id', deviceid, 'feature_id', featureid, 'association_type', 'area', 'association_id', '{{ area.id }}'],
-                            function(data) {
-                                var status = (data.status).toLowerCase();
-                                if (status == 'ok') {
-                                    finishactions++;
-                                } else {
-                                    $.notification('error', data.description);                                          
-                                }
-                            }
-                        );
+                        finishactions++;
                     } else {
                         $.notification('error', data.description);                                          
                     }
@@ -109,12 +113,13 @@
         }
         
         {% if area.config.widgets.maininfo %}
-            $(".maininfo ul").widget_model({
-                featurevalue: '{{ area.config.widgets.maininfo.feature }}',
-                featurename: 'featurename',
-                devicevalue: '{{ area.config.widgets.maininfo.device }}',
-                devicename: 'devicename',
-                draggable: {
+            var li = $("<li>1x1</li>").{{ area.config.widgets.maininfo.widget }}()
+                .{{ area.config.widgets.maininfo.widget }}('model', {
+                    featurevalue: '{{ area.config.widgets.maininfo.feature }}',
+                    featurename: 'featurename',
+                    devicename: 'devicename'
+                })
+                .draggable({
                     helper: false,
                     revert: false,
                     appendTo: 'body',
@@ -130,60 +135,64 @@
                             $(this).remove();			
                         }
                     }
-                }
-            });
+                });
+            $(".maininfo ul").append(li);
         {% endif %}
         
         {% for action in area.config.widgets.mainactions %}
-            $(".mainactions ul").widget_model({
-                featurevalue: '{{ action.feature }}',
-                featurename: 'featurename',
-                devicevalue: '{{ action.device }}',
-                devicename: 'devicename',
-                draggable: {
+            var li = $("<li>1x1</li>")
+                .{{ action.widget }}()
+                .{{ action.widget }}('model', {
+                    featurevalue: '{{ action.feature }}',
+                    featurename: 'featurename',
+                    devicename: 'devicename'
+                })
+                .draggable({
                     helper: false,
                     revert: false,
                     appendTo: 'body',
-		    drag: function(event, ui) {
-			$("#panel").hide();
-		    },
-		    stop: function(event, ui) {
-			$("#panel").show();
+                    drag: function(event, ui) {
+                        $("#panel").hide();
+                    },
+                    stop: function(event, ui) {
+                        $("#panel").show();
                         $("#widgetslist").widget_models('update');
-			if($(this).hasClass("success")) {
-			    $(this).removeClass("success");
-			} else {
-			    $(this).remove();			
-			}
-		    }
-                }
-            });
+                        if($(this).hasClass("success")) {
+                            $(this).removeClass("success");
+                        } else {
+                            $(this).remove();			
+                        }
+                    }
+                });
+            $(".mainactions ul").append(li);
         {% endfor %}
         
         {% for action in area.config.widgets.otheractions %}
-            $(".otheractions ul").widget_model({
-                featurevalue: '{{ action.feature }}',
-                featurename: 'featurename',
-                devicevalue: '{{ action.device }}',
-                devicename: 'devicename',
-                draggable: {
+            var li = $("<li>1x1</li>")
+                .{{ action.widget }}()
+                .{{ action.widget }}('model', {
+                    featurevalue: '{{ action.feature }}',
+                    featurename: 'featurename',
+                    devicename: 'devicename'
+                })
+                .draggable({
                     helper: false,
                     revert: false,
                     appendTo: 'body',
-		    drag: function(event, ui) {
-			$("#panel").hide();
-		    },
-		    stop: function(event, ui) {
-			$("#panel").show();
+                    drag: function(event, ui) {
+                        $("#panel").hide();
+                    },
+                    stop: function(event, ui) {
+                        $("#panel").show();
                         $("#widgetslist").widget_models('update');
-			if($(this).hasClass("success")) {
-			    $(this).removeClass("success");
-			} else {
-			    $(this).remove();			
-			}
-		    }
-                }
-            });
+                        if($(this).hasClass("success")) {
+                            $(this).removeClass("success");
+                        } else {
+                            $(this).remove();			
+                        }
+                    }
+                });
+            $(".otheractions ul").append(li);
         {% endfor %}
         
         $(".feature").click(function(){
@@ -290,7 +299,7 @@
                         <li><div class='device icon16-technology-{{ device.device_type.device_technology_id }}'>{{ device.name }} ({{ device.address }})</div>
                             <ul>
                                 {% for feature in device.feature %}
-                                <li><div class='feature' devicevalue='{{ device.id }}' featurevalue='{{ feature.id }}' devicename='{{device.name }}' featurename='{{ feature.name }}'>{{ feature.name }}</div></li>
+                                <li><div class='feature' featurevalue='{{ feature.id }}' devicename='{{device.name }}' featurename='{{ feature.device_feature_model.name }}' type='{{ feature.device_feature_model.feature_type }}.{{ feature.device_feature_model.value_type }}'>{{ feature.device_feature_model.name }}</div></li>
                                 {% endfor %}
                             </ul>
                         </li>

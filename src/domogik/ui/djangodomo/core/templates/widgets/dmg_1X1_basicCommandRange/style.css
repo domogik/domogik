@@ -1,0 +1,21 @@
+.dmg_1x1_basicCommandRange .widget_value {
+    float:left;
+    display:inline-block;
+    width: 45px;
+    height: 45px;
+    text-align:right;
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+
+.dmg_1x1_basicCommandRange .indicator {
+	position:absolute;
+	top:-33px;
+	left:-32px;
+    display:none;
+    z-index:21;
+}
+
+.dmg_1x1_basicCommandRange.opened .indicator {
+    display:block;
+}
