@@ -31,7 +31,7 @@
         var json = {};
         
         $("#customize a").click(function() {
-            $.getREST(['base', 'feature_association', 'del', 'association_type', 'house', 'association_id', '{{ room.id }}'],
+            $.getREST(['base', 'feature_association', 'del', 'association_type', 'room', 'association_id', '{{ room.id }}'],
                 function(data) {
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
@@ -89,13 +89,31 @@
                             if (status == 'ok') {
                                 $.loadPage('{% url show_room_view room.id %}', {'status': 'ok', 'msg': '{% trans "Page successfully configured" %}'});
                             } else {
-                                $.notification('error', data.description);                                          
+                                $.notification('error', data.description);
+                                // If error clean the association table
+                                $.getREST(['base', 'feature_association', 'del', 'association_type', 'room', 'association_id', '{{ room.id }}'],
+                                    function(data) {
+                                        var status = (data.status).toLowerCase();
+                                        if (status != 'ok') {
+                                            $.notification('error', data.description);                                          
+                                        }
+                                    }
+                                );
                             }
                         }
                     );                    
                 }
             } else {
-                $.notification('error', 'Impossible to save everything : some widgets returned errors');                                                      
+                $.notification('error', 'Impossible to save everything : some widgets returned errors');
+                // If error clean the association table
+                $.getREST(['base', 'feature_association', 'del', 'association_type', 'room', 'association_id', '{{ room.id }}'],
+                    function(data) {
+                        var status = (data.status).toLowerCase();
+                        if (status != 'ok') {
+                            $.notification('error', data.description);                                          
+                        }
+                    }
+                ); 
             }
         }
         

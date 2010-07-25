@@ -89,13 +89,31 @@
                             if (status == 'ok') {
                                 $.loadPage('{% url show_house_view %}', {'status': 'ok', 'msg': '{% trans "Page successfully configured" %}'});
                             } else {
-                                $.notification('error', data.description);                                          
+                                $.notification('error', data.description);
+                                // If error clean the association table
+                                $.getREST(['base', 'feature_association', 'del', 'association_type', 'house', 'association_id', '0'],
+                                    function(data) {
+                                        var status = (data.status).toLowerCase();
+                                        if (status != 'ok') {
+                                            $.notification('error', data.description);                                          
+                                        }
+                                    }
+                                );
                             }
                         }
                     );                    
                 }
             } else {
-                $.notification('error', 'Impossible to save everything : some widgets returned errors');                                                      
+                $.notification('error', 'Impossible to save everything : some widgets returned errors');
+                // If error clean the association table
+                $.getREST(['base', 'feature_association', 'del', 'association_type', 'house', 'association_id', '0'],
+                    function(data) {
+                        var status = (data.status).toLowerCase();
+                        if (status != 'ok') {
+                            $.notification('error', data.description);                                          
+                        }
+                    }
+                ); 
             }
         }
         
