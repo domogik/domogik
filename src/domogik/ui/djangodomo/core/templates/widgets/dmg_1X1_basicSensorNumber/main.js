@@ -31,7 +31,7 @@
             var self = this, o = this.options, p = this.params;
             if (value) {
                 this._displayIcon('number');             
-                this._elementValue.html(value + '<br />' + p.unit)
+                this._elementValue.html(value + '<br />' + p.model_parameters.unit)
                 if (this.previousValue) {
                     if (value == this.previousValue) {
                         this._elementStatus.attr('class', 'status icon8-status-equal')
@@ -46,7 +46,7 @@
                 }
             } else { // Unknown
                 this._displayIcon('unknown');             
-                this._elementValue.html('--<br />' + p.unit)
+                this._elementValue.html('--<br />' + p.model_parameters.unit)
             }
             this.previousValue = value;
         },

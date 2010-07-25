@@ -24,7 +24,7 @@
         action: function() {
             var self = this, o = this.options, p = this.params;
             this._startProcessingState();
-            $.getREST(['command', p.devicetechnology, p.deviceaddress, p.featurecommand],
+            $.getREST(['command', p.devicetechnology, p.deviceaddress, p.model_parameters.command],
                 function(data) {
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {

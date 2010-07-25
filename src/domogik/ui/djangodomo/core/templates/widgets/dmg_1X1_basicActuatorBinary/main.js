@@ -19,8 +19,8 @@
         widget: function(params) {
             this._super(params);
             var self = this, o = this.options, p = this.params;
-            this.values = [p.value0, p.value1];
-            this.texts = [p.text0, p.text1];
+            this.values = [p.model_parameters.value0, p.model_parameters.value1];
+            this.texts = [p.usage_parameters.text0, p.usage_parameters.text1];
             this.setValue(null);
         },
         

@@ -18,9 +18,10 @@
         widget: function(params) {
             this._super(params);
             var self = this, o = this.options, p = this.params;
-            this.min_value = parseInt(p.min_value);
-            this.max_value = parseInt(p.max_value);
-            this.step = parseInt(p.step);
+            this.min_value = parseInt(p.model_parameters.valueMin);
+            this.max_value = parseInt(p.model_parameters.valueMax);
+            this.step = parseInt(p.usage_parameters.step);
+            this.unit = p.usage_parameters.unit
             this._indicator = $("<canvas class='indicator' width='110' height='110'></canvas>");
             this.element.append(this._indicator);
             this._button_max = this._addButtonIcon("range_max", "upright", "icon16-action-max", function (e) {self.max_range();e.stopPropagation();});
@@ -60,7 +61,7 @@
         action: function() {
             var self = this, o = this.options, p = this.params;
             if (this._processingValue != this.currentValue) {
-                $.getREST(['command', p.devicetechnology, p.deviceaddress, p.featurecommand, this._processingValue],
+                $.getREST(['command', p.devicetechnology, p.deviceaddress, p.model_parameters.command, this._processingValue],
                     function(data) {
                         var status = (data.status).toLowerCase();
                         if (status == 'ok') {
@@ -148,9 +149,9 @@
         _displayValue: function(value) {
             var self = this, o = this.options, p = this.params;
             if (value) {
-    			this._writeStatus(value + p.unit);                
+    			this._writeStatus(value + this.unit);                
             } else { // Unknown
-    			this._writeStatus('---' + p.unit);                                
+    			this._writeStatus('---' + this.unit);                                
             }
         },
         
@@ -163,10 +164,8 @@
 			} else if (value > this.max_value) {
 				this._processingValue = this.max_value
 			}
-                                    console.log("a"+this._processingValue);
-
 			var percent = (this._processingValue / (this.max_value - this.min_value)) * 100;
-            this._writeStatus(this._processingValue + p.unit);
+            this._writeStatus(this._processingValue + this.unit);
             this._displayProcessingRange(percent);
 		},
 
