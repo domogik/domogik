@@ -59,7 +59,7 @@ class GetCommandBinary(Node):
                            feature.widget_id, feature.device.device_usage_id,
                            feature.device.name, feature.device_feature_model.name,
                            parameters_type['value0'], parameters_type['value1'],
-                           parameters_usage['binary']['state0'], parameters_usage['binary']['state1'],
+                           parameters_usage['actuator']['binary']['state0'], parameters_usage['actuator']['binary']['state1'],
                            device_type.device_technology_id, feature.device.address,
                            feature.device_feature_model.return_confirmation)
         return script
@@ -90,7 +90,7 @@ class GetCommandRange(Node):
                            feature.widget_id, feature.device.device_usage_id,
                            feature.device.name, feature.device_feature_model.name,
                            parameters_type['valueMin'], parameters_type['valueMax'],
-                           parameters_usage['range']['step'], parameters_usage['range']['unit'],
+                           parameters_usage['actuator']['range']['step'], parameters_usage['actuator']['range']['unit'],
                            device_type.device_technology_id, feature.device.address,
                            parameters_type['command'], feature.device_feature_model.return_confirmation)
         return script
