@@ -31,49 +31,49 @@
         var json = {};
         
         $("#customize a").click(function() {
-            totalactions = $(".maininfo li:first, .mainactions li, .otheractions li").length;
-            finishactions = 0;
-            savetries = 0;
-
             $.getREST(['base', 'feature_association', 'del', 'association_type', 'house', 'association_id', '0'],
                 function(data) {
                     var status = (data.status).toLowerCase();
-                    if (status != 'ok') {
-                        $.notification('error', data.description);                                          
+                    if (status == 'ok') {
+                        totalactions = $(".maininfo li:first, .mainactions li, .otheractions li").length;
+                        finishactions = 0;
+                        savetries = 0;
+
+                        json = {};
+                        json.list = []
+                        // Main info
+                        $(".maininfo li:first").each(function(index) {
+                            var action = {widget:$(this).attr('widgetid'), feature:$(this).attr('featurevalue')};
+                            json.maininfo = action;
+                            json.list.push(action);
+                            addAssociation($(this).attr('featurevalue'));
+                        });
+            
+                        // Main actions
+                        json.mainactions = [];
+                        $(".mainactions li").each(function(index) {
+                            var action = {widget:$(this).attr('widgetid'), feature:$(this).attr('featurevalue')};
+                            json.mainactions.push(action);
+                            json.list.push(action);
+                            addAssociation($(this).attr('featurevalue'));
+                        });
+                        
+                        // Other actions
+                        json.otheractions = [];
+                        $(".otheractions li").each(function(index) {
+                            var action = {widget:$(this).attr('widgetid'), feature:$(this).attr('featurevalue')};
+                            json.otheractions.push(action);
+                            json.list.push(action);
+                            addAssociation($(this).attr('featurevalue'));
+                        });
+                        
+                        // Save ui config
+                        saveUIConfig();
+                    } else {
+                        $.notification('error', data.description);                                                              
                     }
                 }
             );
-
-            json = {};
-            json.list = []
-            // Main info
-            $(".maininfo li:first").each(function(index) {
-                var action = {widget:$(this).attr('widgetid'), feature:$(this).attr('featurevalue')};
-                json.maininfo = action;
-                json.list.push(action);
-                addAssociation($(this).attr('featurevalue'));
-            });
-
-            // Main actions
-            json.mainactions = [];
-            $(".mainactions li").each(function(index) {
-                var action = {widget:$(this).attr('widgetid'), feature:$(this).attr('featurevalue')};
-                json.mainactions.push(action);
-                json.list.push(action);
-                addAssociation($(this).attr('featurevalue'));
-            });
-            
-            // Other actions
-            json.otheractions = [];
-            $(".otheractions li").each(function(index) {
-                var action = {widget:$(this).attr('widgetid'), feature:$(this).attr('featurevalue')};
-                json.otheractions.push(action);
-                json.list.push(action);
-                addAssociation($(this).attr('featurevalue'));
-            });
-            
-            // Save ui config
-            saveUIConfig();
         });
 
         function saveUIConfig() {
