@@ -53,7 +53,7 @@ const state_reset_status = 4000; // 4 seconds
             }
         },
 
-        open: function() {
+        _open: function() {
             var self = this, o = this.options;
             if (!this.isOpen) {
                 // Close all openned widgets
@@ -66,8 +66,8 @@ const state_reset_status = 4000; // 4 seconds
                 });
             }
         },
-
-        close: function() {
+        
+        _close: function() {
             if (this.isOpen) {
                 this.isOpen = false;
                 this.element.removeClass('opened')
@@ -76,6 +76,13 @@ const state_reset_status = 4000; // 4 seconds
             this.element.doTimeout( 'timeout');
         },
 
+        open: function() {
+            this._open();
+	},
+		
+	close: function() {
+            this._close();
+	},
         _addButtonIcon: function(css, position, icon, action) {
             var element = $("<div class='widget_button_icon " + css + " " + position + " " + icon + "'></div>")
                 .click(action);

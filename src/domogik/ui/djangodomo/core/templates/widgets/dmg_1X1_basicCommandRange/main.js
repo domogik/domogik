@@ -18,9 +18,9 @@
         widget: function(params) {
             this._super(params);
             var self = this, o = this.options, p = this.params;
-                        this.min_value = parseInt(o.min_value);
-            this.max_value = parseInt(o.max_value);
-            this.step = parseInt(o.step);
+            this.min_value = parseInt(p.min_value);
+            this.max_value = parseInt(p.max_value);
+            this.step = parseInt(p.step);
             this._indicator = $("<canvas class='indicator' width='110' height='110'></canvas>");
             this.element.append(this._indicator);
             this._button_max = this._addButtonIcon("range_max", "upright", "icon16-action-max", function (e) {self.max_range();e.stopPropagation();});
@@ -68,6 +68,7 @@
                         } else {
                             /* Error */
                             self.cancel();
+                            $.notification('error', data.description);
                         }
                     }
                 );
@@ -90,7 +91,7 @@
         },
         
         setValue: function(value) {
-            var self = this, o = this.options;
+            var self = this, o = this.options, p = this.params;
             if (value) {
                 if (value >= this.min_value && value <= this.max_value) {
                     this.currentValue = value;
@@ -101,7 +102,7 @@
                 }
                 this._processingValue = this.currentValue;
                 var percent = (this.currentValue / (this.max_value - this.min_value)) * 100;
-                this._displayIcon('range_' + findRangeIcon(o.usage, percent));
+                this._displayIcon('range_' + findRangeIcon(p.usage, percent));
                 this._displayValue(this.currentValue);
             } else { // unknown
                 this._processingValue = 0;
@@ -111,27 +112,27 @@
         },
 
 		plus_range: function() {
-            var self = this, o = this.options;
+            var self = this, o = this.options, p = this.params;
 			var value = ((this._processingValue + this.step) / this.step) * this.step;
       		this._resetAutoClose();
 			this._setProcessingValue(value);
 		},
 		
 		minus_range: function() {
-            var self = this, o = this.options;
+            var self = this, o = this.options, p = this.params;
 			var value = ((this._processingValue - this.step) / this.step) * this.step;
       		this._resetAutoClose();
 			this._setProcessingValue(value);
 		},
 		
 		max_range: function() {
-            var self = this, o = this.options;
+            var self = this, o = this.options, p = this.params;
       		this._resetAutoClose();
 			this._setProcessingValue(this.max_value);
 		},
 		
 		min_range: function() {
-            var self = this, o = this.options;
+            var self = this, o = this.options, p = this.params;
       		this._resetAutoClose();
 			this._setProcessingValue(this.min_value);
 		},
@@ -139,22 +140,22 @@
 		_resetAutoClose: function() {
 			var self = this;
 			this.element.doTimeout( 'timeout', close_with_change, function(){
+				self.action();
                 self.close();
-				self._processValue();
 			});	
 		},
         
         _displayValue: function(value) {
-            var self = this, o = this.options;
+            var self = this, o = this.options, p = this.params;
             if (value) {
-    			this._writeStatus(value + o.unit);                
+    			this._writeStatus(value + p.unit);                
             } else { // Unknown
-    			this._writeStatus('---' + o.unit);                                
+    			this._writeStatus('---' + p.unit);                                
             }
         },
         
 		_setProcessingValue: function(value) {
-            var self = this, o = this.options;
+            var self = this, o = this.options, p = this.params;
 			if (value >= this.min_value && value <= this.max_value) {
 				this._processingValue = value;
 			} else if (value < this.min_value) {
@@ -162,13 +163,15 @@
 			} else if (value > this.max_value) {
 				this._processingValue = this.max_value
 			}
+                                    console.log("a"+this._processingValue);
+
 			var percent = (this._processingValue / (this.max_value - this.min_value)) * 100;
-            this._writeStatus(this._processingValue + o.unit);
+            this._writeStatus(this._processingValue + p.unit);
             this._displayProcessingRange(percent);
 		},
 
         _displayProcessingRange: function(percent) {
-            var self = this, o = this.options;
+            var self = this, o = this.options, p = this.params;
             this._processing_percent_final = percent;
             if (!this._processing_animation) {
                 this._animateProcessingRange();
@@ -176,7 +179,7 @@
         },
 
         _animateProcessingRange: function() {
-            var self = this, o = this.options;            
+            var self = this, o = this.options, p = this.params;
             this._processing_animation = true;
             if (this._processing_percent_final < this._processing_percent_current) {
                 this._processing_percent_current--;
@@ -204,7 +207,7 @@
             if (this._processing_percent_final == this._processing_percent_current) { // End animation
                 this._processing_animation = false;
             } else {
-                setTimeout(function() {self._animateProcessingRange();}, 30);
+                setTimeout(function() {self._animateProcessingRange();}, 5);
             }
         },
         

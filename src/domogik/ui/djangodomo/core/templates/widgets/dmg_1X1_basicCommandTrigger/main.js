@@ -32,6 +32,7 @@
                     } else {
                         /* Error */
                         self.cancel();
+                        $.notification('error', data.description);
                     }
                 }
             );
