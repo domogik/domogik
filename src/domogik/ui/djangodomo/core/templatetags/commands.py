@@ -53,7 +53,8 @@ class GetCommandBinary(Node):
                         text1: '%s',
                         devicetechnology: '%s',
                         deviceaddress: '%s',
-                        featureconfirmation: '%s'
+                        featureconfirmation: '%s',
+                        usage_parameters: %s
                     });
                     """ % (feature.id, feature.widget_id,
                            feature.widget_id, feature.device.device_usage_id,
@@ -61,7 +62,8 @@ class GetCommandBinary(Node):
                            parameters_type['value0'], parameters_type['value1'],
                            parameters_usage['actuator']['binary']['state0'], parameters_usage['actuator']['binary']['state1'],
                            device_type.device_technology_id, feature.device.address,
-                           feature.device_feature_model.return_confirmation)
+                           feature.device_feature_model.return_confirmation,
+                           simplejson.dumps(parameters_usage['actuator']['binary']))
         return script
 
     @staticmethod
@@ -84,7 +86,8 @@ class GetCommandRange(Node):
                         devicetechnology: '%s',
                         deviceaddress: '%s',
                         featurecommand: '%s',
-                        featureconfirmation: '%s'
+                        featureconfirmation: '%s',
+                        usage_parameters: %s
                     });
                     """ % (feature.id, feature.widget_id,
                            feature.widget_id, feature.device.device_usage_id,
@@ -92,7 +95,8 @@ class GetCommandRange(Node):
                            parameters_type['valueMin'], parameters_type['valueMax'],
                            parameters_usage['actuator']['range']['step'], parameters_usage['actuator']['range']['unit'],
                            device_type.device_technology_id, feature.device.address,
-                           parameters_type['command'], feature.device_feature_model.return_confirmation)
+                           parameters_type['command'], feature.device_feature_model.return_confirmation,
+                           simplejson.dumps(parameters_usage['actuator']['range']))
         return script
 
     @staticmethod
@@ -111,13 +115,15 @@ class GetCommandTrigger():
                         devicetechnology: '%s',
                         deviceaddress: '%s',
                         featurecommand: '%s',
-                        featureconfirmation: '%s'
+                        featureconfirmation: '%s',
+                        usage_parameters: %s
                     });
                     """ % (feature.id, feature.widget_id,
                            feature.widget_id, feature.device.device_usage_id,
                            feature.device.name, feature.device_feature_model.name,
                            device_type.device_technology_id, feature.device.address,
-                           parameters_type['command'], feature.device_feature_model.return_confirmation)
+                           parameters_type['command'], feature.device_feature_model.return_confirmation,
+                           simplejson.dumps(parameters_usage['actuator']['trigger']))
         return script
 
 class GetInfoBoolean():
