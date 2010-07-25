@@ -467,6 +467,7 @@ def show_house_edit(request):
 
     try:
         result_house = House()
+        result_house.merge_features()
 
         result_all_devices = Devices.get_all()
         result_all_devices.merge_uiconfig()
@@ -524,6 +525,8 @@ def show_area_edit(request, area_id):
     try:
         result_area_by_id = Areas.get_by_id(area_id)
         result_area_by_id.merge_uiconfig()
+        result_area_by_id.merge_features()
+
         result_house = House()
         
         result_all_devices = Devices.get_all()
@@ -583,6 +586,7 @@ def show_room_edit(request, room_id):
     try:
         result_room_by_id = Rooms.get_by_id(room_id)
         result_room_by_id.merge_uiconfig()
+        result_room_by_id.merge_features()
 
         result_house = House()
 

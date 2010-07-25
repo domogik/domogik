@@ -113,12 +113,12 @@
             );
         }
         
-        {% if room.config.widgets.maininfo %}
-            var li = $("<li>1x1</li>").{{ room.config.widgets.maininfo.widget }}()
-                .{{ room.config.widgets.maininfo.widget }}('model', {
-                    featurevalue: '{{ room.config.widgets.maininfo.feature }}',
-                    featurename: 'featurename',
-                    devicename: 'devicename'
+        {% for feature in room.features %}
+            $("#model_{{ feature.id }}").{{ feature.widget_id }}()
+                .{{ feature.widget_id }}('model', {
+                    featurevalue: '{{ feature.id }}',
+                    featurename: '{{ feature.device_feature_model.name }}',
+                    devicename: '{{ feature.device.name }}'
                 })
                 .draggable({
                     helper: false,
@@ -137,63 +137,6 @@
                         }
                     }
                 });
-            $(".maininfo ul").append(li);
-        {% endif %}
-        
-        {% for action in room.config.widgets.mainactions %}
-            var li = $("<li>1x1</li>")
-                .{{ action.widget }}()
-                .{{ action.widget }}('model', {
-                    featurevalue: '{{ action.feature }}',
-                    featurename: 'featurename',
-                    devicename: 'devicename'
-                })
-                .draggable({
-                    helper: false,
-                    revert: false,
-                    appendTo: 'body',
-                    drag: function(event, ui) {
-                        $("#panel").hide();
-                    },
-                    stop: function(event, ui) {
-                        $("#panel").show();
-                        $("#widgetslist").widget_models('update');
-                        if($(this).hasClass("success")) {
-                            $(this).removeClass("success");
-                        } else {
-                            $(this).remove();			
-                        }
-                    }
-                });
-            $(".mainactions ul").append(li);
-        {% endfor %}
-        
-        {% for action in room.config.widgets.otheractions %}
-            var li = $("<li>1x1</li>")
-                .{{ action.widget }}()
-                .{{ action.widget }}('model', {
-                    featurevalue: '{{ action.feature }}',
-                    featurename: 'featurename',
-                    devicename: 'devicename'
-                })
-                .draggable({
-                    helper: false,
-                    revert: false,
-                    appendTo: 'body',
-                    drag: function(event, ui) {
-                        $("#panel").hide();
-                    },
-                    stop: function(event, ui) {
-                        $("#panel").show();
-                        $("#widgetslist").widget_models('update');
-                        if($(this).hasClass("success")) {
-                            $(this).removeClass("success");
-                        } else {
-                            $(this).remove();			
-                        }
-                    }
-                });
-            $(".otheractions ul").append(li);
         {% endfor %}
         
         $(".feature").click(function(){
@@ -271,21 +214,31 @@
     <h1 class="ident icon64-room-{{ room.config.icon }}"><span class="title">{{ room.name }}</span></h1>
     <div class="maininfo" ddvalue='maininfo' ddname='Main info'>
         <span class='offscreen'>{% trans "Main info" %}</span>
-        <ul></ul>
+        <ul>
+        {% if room.config.widgets.maininfo %}
+            <li id="model_{{ room.config.widgets.maininfo.feature }}">1x1</li>
+        {% endif %}
+        </ul>
     </div>
 {% endblock %}
 
 {% block contentleft %}
     <div class='actions'>
         <div class='mainactions'>
-            <span class='offscreen'>{% trans "Main actions" %}</span>
             <ul>
+            {% for action in room.config.widgets.mainactions %}
+                <li id="model_{{ action.feature }}">1x1</li>
+            {% endfor %}
             </ul>
         </div>
         <div class='otheractions'>
             <ul>
+            {% for action in room.config.widgets.otheractions %}
+                <li id="model_{{ action.feature }}">1x1</li>
+            {% endfor %}
             </ul>
         </div>
+
     </div>
     
     <div id='panel'>

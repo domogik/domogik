@@ -31,7 +31,7 @@
         {% endfor %}
 
         {% if room.features %}
-            {% regroup room.feature_association|dictsort:"device_id" by device as devices %}
+            {% regroup room.features|dictsort:"device_id" by device as devices %}
             var devices = [{% for device in devices %}{{ device.grouper.id }}{% if not forloop.last %},{% endif %}{% endfor %}];
             
             $.eventRequest(devices, function(event) {
