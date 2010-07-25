@@ -1,10 +1,10 @@
 (function($) {
-    $.ui.widget_1x1_extended.subclass ('ui.dmg_1x1_basicCommandBinary', {
+    $.ui.widget_1x1_extended.subclass ('ui.dmg_1x1_basicActuatorBinary', {
         // default options
         options: {
             version: 0.1,
             creator: 'Domogik',
-            id: 'dmg_1x1_basicCommandBinary',
+            id: 'dmg_1x1_basicActuatorBinary',
             name: 'Basic widget',
             description: 'Basic widget with border and name',
             type: 'actuator.binary',
@@ -88,5 +88,5 @@
         }
 
     });
-    register_widget('actuator.binary', 'dmg_1x1_basicCommandBinary');
+    register_widget('actuator.binary', 'dmg_1x1_basicActuatorBinary');
 })(jQuery);

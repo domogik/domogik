@@ -1,10 +1,10 @@
 (function($) {
-    $.ui.widget_1x1_extended.subclass ('ui.dmg_1x1_basicInfoBoolean', {
+    $.ui.widget_1x1_extended.subclass ('ui.dmg_1x1_basicSensorBoolean', {
         // default options
         options: {
             version: 0.1,
             creator: 'Domogik',
-            id: 'dmg_1x1_basicInfoBoolean',
+            id: 'dmg_1x1_basicSensorBoolean',
             name: 'Basic widget',
             description: 'Basic widget with border and name',
             type: 'sensor.boolean',
@@ -40,5 +40,5 @@
             this.previousValue = value;
         }
     });
-    register_widget('sensor.boolean', 'dmg_1x1_basicInfoBoolean');
+    register_widget('sensor.boolean', 'dmg_1x1_basicSensorBoolean');
 })(jQuery);

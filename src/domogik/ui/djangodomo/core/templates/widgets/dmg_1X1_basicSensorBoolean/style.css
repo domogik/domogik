@@ -1,4 +1,4 @@
-.dmg_1x1_basicInfoBoolean .status {
+.dmg_1x1_basicSensorBoolean .status {
     height:14px;
     min-width:2em;
     padding:0;
@@ -6,7 +6,7 @@
     background-repeat: no-repeat; 
 }
 
-.dmg_1x1_basicInfoBoolean .widget_value {
+.dmg_1x1_basicSensorBoolean .widget_value {
     position:absolute;
     background-position: 50% 50%;
     background-repeat: no-repeat;

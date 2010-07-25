@@ -1,10 +1,10 @@
 (function($) {
-    $.ui.widget_1x1_extended.subclass ('ui.dmg_1x1_basicCommandRange', {
+    $.ui.widget_1x1_extended.subclass ('ui.dmg_1x1_basicActuatorRange', {
         // default options
         options: {
             version: 0.1,
             creator: 'Domogik',
-            id: 'dmg_1x1_basicCommandRange',
+            id: 'dmg_1x1_basicActuatorRange',
             name: 'Basic widget',
             description: 'Basic widget with border and name',
             type: 'actuator.range',
@@ -223,5 +223,5 @@
         }
         
     });
-    register_widget('actuator.range', 'dmg_1x1_basicCommandRange');
+    register_widget('actuator.range', 'dmg_1x1_basicActuatorRange');
 })(jQuery);

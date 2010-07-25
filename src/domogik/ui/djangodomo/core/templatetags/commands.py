@@ -40,7 +40,7 @@ def unescape(s):
     return re.sub('&(%s);' % '|'.join(name2codepoint),
               lambda m: unichr(name2codepoint[m.group(1)]), s)
 
-class GetCommandBinary(Node):
+class GetActuatorBinary(Node):
     @staticmethod
     def get_widget(feature, device_type, device_usage, parameters_type, parameters_usage):
         script = """$('#widget_%s').%s().%s('widget',{
@@ -72,7 +72,7 @@ class GetCommandBinary(Node):
                     """ % (feature.id, feature.widget_id, value)
         return script
 
-class GetCommandRange(Node):
+class GetActuatorRange(Node):
     @staticmethod
     def get_widget(feature, device_type, device_usage, parameters_type, parameters_usage):
         script = """$("#widget_%s").%s().%s('widget',{
@@ -105,7 +105,7 @@ class GetCommandRange(Node):
                     """ % (feature.id, feature.widget_id, value)
         return script
 
-class GetCommandTrigger():
+class GetActuatorTrigger():
     @staticmethod
     def get_widget(feature, device_type, device_usage, parameters_type, parameters_usage):
         script = """$('#widget_%s').%s().%s('widget',{
@@ -126,7 +126,7 @@ class GetCommandTrigger():
                            simplejson.dumps(parameters_usage['actuator']['trigger']))
         return script
 
-class GetInfoBoolean():
+class GetSensorBoolean():
     @staticmethod
     def get_widget(feature, device_type, device_usage, parameters_type, parameters_usage):
         script = """$("#widget_%s").%s().%s('widget',{
@@ -134,12 +134,14 @@ class GetInfoBoolean():
                             devicename: '%s',
                             featurename: '%s',
                             deviceid: %s,
-                            key: '%s'
+                            key: '%s',
+                            usage_parameters: %s
                         });
                  """ % (feature.id, feature.widget_id,
                         feature.widget_id, feature.device.device_usage_id,
                         feature.device.name, feature.device_feature_model.name,
-                        feature.device_id, feature.device_feature_model.stat_key)
+                        feature.device_id, feature.device_feature_model.stat_key,
+                        simplejson.dumps(parameters_usage['sensor']['boolean']))
         return script
 
     @staticmethod
@@ -149,7 +151,7 @@ class GetInfoBoolean():
 
         return script
     
-class GetInfoNumber():
+class GetSensorNumber():
     @staticmethod
     def get_widget(feature, device_type, device_usage, parameters_type, parameters_usage):
         script = """$("#widget_%s").%s().%s('widget',{
@@ -158,12 +160,14 @@ class GetInfoNumber():
                             featurename: '%s',
                             unit: '%s',
                             deviceid: %s,
-                            key: '%s'
+                            key: '%s',
+                            usage_parameters: %s
                         });
                  """ % (feature.id, feature.widget_id,
                         feature.widget_id, feature.device.device_usage_id,
                         feature.device.name, feature.device_feature_model.name,
-                        parameters_type['unit'], feature.device_id, feature.device_feature_model.stat_key)
+                        parameters_type['unit'], feature.device_id, feature.device_feature_model.stat_key,
+                        simplejson.dumps(parameters_usage['sensor']['number']))
         return script
 
     @staticmethod
@@ -173,7 +177,7 @@ class GetInfoNumber():
 
         return script
 
-class GetInfoString():
+class GetSensorString():
     @staticmethod
     def get_widget_mini(feature, device_type, device_usage, parameters_type, parameters_usage):
         script = ""
@@ -204,18 +208,18 @@ class GetWidget(Node):
         
         if feature.device_feature_model.feature_type == "actuator":
             if feature.device_feature_model.value_type == "binary":
-                script = GetCommandBinary.get_widget(feature, device_type, device_usage, parameters_type, parameters_usage)
+                script = GetActuatorBinary.get_widget(feature, device_type, device_usage, parameters_type, parameters_usage)
             if feature.device_feature_model.value_type == "range":
-                script = GetCommandRange.get_widget(feature, device_type, device_usage, parameters_type, parameters_usage)
+                script = GetActuatorRange.get_widget(feature, device_type, device_usage, parameters_type, parameters_usage)
             if feature.device_feature_model.value_type == "trigger":
-                script = GetCommandTrigger.get_widget(feature, device_type, device_usage, parameters_type, parameters_usage)
+                script = GetActuatorTrigger.get_widget(feature, device_type, device_usage, parameters_type, parameters_usage)
         else : # 'Sensor'
             if feature.device_feature_model.value_type == "boolean":
-                script = GetInfoBoolean.get_widget(feature, device_type, device_usage, parameters_type, parameters_usage)
+                script = GetSensorBoolean.get_widget(feature, device_type, device_usage, parameters_type, parameters_usage)
             if feature.device_feature_model.value_type == "number":
-                script = GetInfoNumber.get_widget(feature, device_type, device_usage, parameters_type, parameters_usage)
+                script = GetSensorNumber.get_widget(feature, device_type, device_usage, parameters_type, parameters_usage)
             if feature.device_feature_model.value_type == "string":
-                script = GetInfoString.get_widget(feature, device_type, device_usage, parameters_type, parameters_usage)
+                script = GetSensorString.get_widget(feature, device_type, device_usage, parameters_type, parameters_usage)
         return script
 
 class GetWidgetInit(Node):
@@ -229,16 +233,16 @@ class GetWidgetInit(Node):
         if len(stat.stats) > 0 :
             if feature.device_feature_model.feature_type == "actuator":
                 if feature.device_feature_model.value_type == "binary":
-                    script = GetCommandBinary.get_setValue(feature, "'" + stat.stats[0].value + "'")
+                    script = GetActuatorBinary.get_setValue(feature, "'" + stat.stats[0].value + "'")
                 if feature.device_feature_model.value_type == "range":
-                    script = GetCommandRange.get_setValue(feature, "'" + stat.stats[0].value + "'")
+                    script = GetActuatorRange.get_setValue(feature, "'" + stat.stats[0].value + "'")
             else: # 'Sensor'
                 if feature.device_feature_model.value_type == "boolean":
-                    script = GetInfoBoolean.get_setValue(feature, "'" + stat.stats[0].value + "'")
+                    script = GetSensorBoolean.get_setValue(feature, "'" + stat.stats[0].value + "'")
                 if feature.device_feature_model.value_type == "number":
-                    script = GetInfoNumber.get_setValue(feature, "'" + stat.stats[0].value + "'")
+                    script = GetSensorNumber.get_setValue(feature, "'" + stat.stats[0].value + "'")
                 if feature.device_feature_model.value_type == "string":
-                    script = GetInfoString.get_setValue(feature, "'" + stat.stats[0].value + "'")
+                    script = GetSensorString.get_setValue(feature, "'" + stat.stats[0].value + "'")
         return script
 
 class GetWidgetUpdate(Node):
@@ -252,16 +256,16 @@ class GetWidgetUpdate(Node):
         script = ""
         if feature.device_feature_model.feature_type == "actuator":
             if feature.device_feature_model.value_type == "binary":
-                script = GetCommandBinary.get_setValue(feature, value)
+                script = GetActuatorBinary.get_setValue(feature, value)
             if feature.device_feature_model.value_type == "range":
-                script = GetCommandRange.get_setValue(feature, value)
+                script = GetActuatorRange.get_setValue(feature, value)
         else: # 'Sensor'
             if feature.device_feature_model.value_type == "boolean":
-                script = GetInfoBoolean.get_setValue(feature, value)
+                script = GetSensorBoolean.get_setValue(feature, value)
             if feature.device_feature_model.value_type == "number":
-                script = GetInfoNumber.get_setValue(feature, value)
+                script = GetSensorNumber.get_setValue(feature, value)
             if feature.device_feature_model.value_type == "string":
-                script = GetInfoString.get_setValue(feature, value)
+                script = GetSensorString.get_setValue(feature, value)
         return script
     
 def do_get_widget(parser, token):

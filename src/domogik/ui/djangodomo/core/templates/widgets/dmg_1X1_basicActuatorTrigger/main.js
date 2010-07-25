@@ -1,10 +1,10 @@
 (function($) {
-    $.ui.widget_1x1_extended.subclass ('ui.dmg_1x1_basicCommandTrigger', {
+    $.ui.widget_1x1_extended.subclass ('ui.dmg_1x1_basicActuatorTrigger', {
         // default options
         options: {
             version: 0.1,
             creator: 'Domogik',
-            id: 'dmg_1x1_basicCommandTrigger',
+            id: 'dmg_1x1_basicActuatorTrigger',
             name: 'Basic widget',
             description: 'Basic widget with border and name',
             type: 'actuator.trigger',
@@ -38,5 +38,5 @@
             );
         }
     });
-    register_widget('actuator.trigger', 'dmg_1x1_basicCommandTrigger');
+    register_widget('actuator.trigger', 'dmg_1x1_basicActuatorTrigger');
 })(jQuery);

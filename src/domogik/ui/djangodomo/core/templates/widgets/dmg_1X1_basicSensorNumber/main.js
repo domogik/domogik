@@ -1,10 +1,10 @@
 (function($) {
-    $.ui.widget_1x1_extended.subclass ('ui.dmg_1x1_basicInfoNumber', {
+    $.ui.widget_1x1_extended.subclass ('ui.dmg_1x1_basicSensorNumber', {
         // default options
         options: {
             version: 0.1,
             creator: 'Domogik',
-            id: 'dmg_1x1_basicInfoNumber',
+            id: 'dmg_1x1_basicSensorNumber',
             name: 'Basic widget',
             description: 'Basic widget with border and name',
             type: 'sensor.number',
@@ -169,7 +169,7 @@
             );
         }
     });
-    register_widget('sensor.number', 'dmg_1x1_basicInfoNumber');
+    register_widget('sensor.number', 'dmg_1x1_basicSensorNumber');
 })(jQuery);
 
 /*
