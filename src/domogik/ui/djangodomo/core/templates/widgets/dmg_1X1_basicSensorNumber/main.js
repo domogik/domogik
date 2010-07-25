@@ -11,8 +11,9 @@
             height: 1,
             width: 1,
             // For 1x1 Extended widget
-            isOpenable: true,
+            isOpenable: false,
             hasStatus: true,
+            hasAction: false,
             namePosition: 'nametopleft'
         },
 

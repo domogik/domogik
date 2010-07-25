@@ -8,6 +8,7 @@ const state_reset_status = 4000; // 4 seconds
         // default options
         options: {
             isOpenable: true,
+            hasAction: true,
             hasStatus: true,
             namePosition: 'nametopleft'
         },
@@ -29,18 +30,22 @@ const state_reset_status = 4000; // 4 seconds
                 this._elementClose = this._addButtonIcon("widget_close", "left", "icon32-action-cancel", function (e) {self.close();e.stopPropagation();});
                 this._elementName = $("<span class='name " + o.namePosition + "'>" + p.devicename + "<br/>" + p.featurename + "</span>");
                 this.element.append(this._elementName);
+                this.element.addClass('clickable');
                 this.element.click(function (e) {self._onclick();e.stopPropagation();})
                     .keypress(function (e) {if (e.which == 13 || e.which == 32) {self._onclick(); e.stopPropagation();}
                               else if (e.keyCode == 27) {self.close(); e.stopPropagation();}});
             } else {
-                this.element.click(function (e) {self.action();e.stopPropagation();})
-                    .keypress(function (e) {if (e.which == 13 || e.which == 32) {self._action; e.stopPropagation();}});
+                if (o.hasAction) {
+                    this.element.addClass('clickable');
+                    this.element.click(function (e) {self.action();e.stopPropagation();})
+                        .keypress(function (e) {if (e.which == 13 || e.which == 32) {self._action; e.stopPropagation();}});                    
+                }
             }
             if(o.hasStatus) {
                 this._elementStatus = $("<div class='status'></div>");
                 this.element.append(this._elementStatus);                
             }
-            },
+        },
 
         _onclick: function() {
             var self = this, o = this.options;
@@ -78,11 +83,12 @@ const state_reset_status = 4000; // 4 seconds
 
         open: function() {
             this._open();
-	},
-		
-	close: function() {
-            this._close();
-	},
+        },
+            
+        close: function() {
+                this._close();
+        },
+        
         _addButtonIcon: function(css, position, icon, action) {
             var element = $("<div class='widget_button_icon " + css + " " + position + " " + icon + "'></div>")
                 .click(action);

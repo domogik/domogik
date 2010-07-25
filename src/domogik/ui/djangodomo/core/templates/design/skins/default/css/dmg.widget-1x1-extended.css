@@ -10,13 +10,13 @@
     width:5em;
 }
 
-.widget_1x1_extended:hover,
+.widget_1x1_extended.clickable:hover,
 .widget_1x1_extended:focus,
 .widget_1x1_extended.opened {
     background-color:#FFFFFF;
 }
 
-.widget_1x1_extended:hover {
+.widget_1x1_extended.clickable:hover {
     cursor: pointer;
 }
 

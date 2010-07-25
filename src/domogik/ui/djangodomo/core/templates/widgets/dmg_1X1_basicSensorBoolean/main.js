@@ -12,6 +12,7 @@
             width: 1,
             // For 1x1 Extended widget
             isOpenable: false,
+            hasAction: false,
             hasStatus: true
         },
 
