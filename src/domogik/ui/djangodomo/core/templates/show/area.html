@@ -30,19 +30,19 @@
 			{% get_widget_init feature %}
         {% endfor %}
         
-        {% if area.feature_association %}
-            {% regroup area.feature_association|dictsort:"device_id" by device as devices %}
+        {% if area.features %}
+            {% regroup area.features|dictsort:"device_id" by device as devices %}
             var devices = [{% for device in devices %}{{ device.grouper.id }}{% if not forloop.last %},{% endif %}{% endfor %}];
         
             $.eventRequest(devices, function(event) {
                 switch(event.device_id) {
-                {% regroup area.feature_association|dictsort:"device_id" by device as devices %}
+                {% regroup area.features|dictsort:"device_id" by device as devices %}
                 {% for device in devices %}
                     case {{ device.grouper.id }}:
                         $.each(event.data, function(index, item) {
                             switch (item.key) {                        
                             {% for association in device.list %}
-                                case '{{ association.device_feature.stat_key }}':
+                                case '{{ association.device_feature_model.stat_key }}':
                                     {% get_widget_update association 'item.value' %}
                                     break;
                             {% endfor %}                    

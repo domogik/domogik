@@ -41,7 +41,7 @@
                         $.each(event.data, function(index, item) {
                             switch (item.key) {                        
                             {% for association in device.list %}
-                                case '{{ association.device_feature.stat_key }}':
+                                case '{{ association.device_feature_model.stat_key }}':
                                     {% get_widget_update association 'item.value' %}
                                     break;
                             {% endfor %}                    
