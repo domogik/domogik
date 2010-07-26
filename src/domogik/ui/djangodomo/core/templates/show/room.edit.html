@@ -26,18 +26,18 @@
 {% block js_script %}
     $(function() {
         var totalactions = 0;
-        var finishactions = 0;
-        var savetries = 0;
+        var finishedactions = 0;
+        var erroractions = 0;
         var json = {};
         
-        $("#customize a").click(function() {
+        $("#customize a").click(function() {        
             $.getREST(['base', 'feature_association', 'del', 'association_type', 'room', 'association_id', '{{ room.id }}'],
                 function(data) {
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
                         totalactions = $(".maininfo li:first, .mainactions li, .otheractions li").length;
-                        finishactions = 0;
-                        savetries = 0;
+                        finishedactions = 0;
+                        erroractions = 0;
 
                         json = {};
                         json.list = []
@@ -77,11 +77,8 @@
         });
 
         function saveUIConfig() {
-            savetries++;
-            if (savetries < 5) {
-                if (finishactions < totalactions) {
-                    window.setTimeout(saveUIConfig, 1000);
-                } else {
+            if (finishedactions == totalactions) {
+                if (erroractions == 0) {
                     var jsonstr = JSON.stringify(json).replace(/"/g, '&quot;');
                     $.getREST(['base', 'ui_config', 'set', 'name', 'room', 'reference', '{{ room.id }}', 'key', 'widgets', 'value', jsonstr],
                         function(data) {
@@ -89,41 +86,43 @@
                             if (status == 'ok') {
                                 $.loadPage('{% url show_room_view room.id %}', {'status': 'ok', 'msg': '{% trans "Page successfully configured" %}'});
                             } else {
-                                $.notification('error', data.description);
+                                $.notification('error', data.description);                                          
                                 // If error clean the association table
-                                $.getREST(['base', 'feature_association', 'del', 'association_type', 'room', 'association_id', '{{ room.id }}'],
+                                $.getREST(['base', 'feature_association', 'del', 'association_type', 'room', 'association_id', {{ room.id }}],
                                     function(data) {
                                         var status = (data.status).toLowerCase();
                                         if (status != 'ok') {
                                             $.notification('error', data.description);                                          
                                         }
                                     }
-                                );
+                                ); 
                             }
                         }
-                    );                    
-                }
-            } else {
-                $.notification('error', 'Impossible to save everything : some widgets returned errors');
-                // If error clean the association table
-                $.getREST(['base', 'feature_association', 'del', 'association_type', 'room', 'association_id', '{{ room.id }}'],
-                    function(data) {
-                        var status = (data.status).toLowerCase();
-                        if (status != 'ok') {
-                            $.notification('error', data.description);                                          
+                    );   
+                } else { // Errors
+                    $.notification('error', 'Impossible to save everything : some widgets returned errors');
+                    // If error clean the association table
+                    $.getREST(['base', 'feature_association', 'del', 'association_type', 'room', 'association_id', {{ room.id }}],
+                        function(data) {
+                            var status = (data.status).toLowerCase();
+                            if (status != 'ok') {
+                                $.notification('error', data.description);                                          
+                            }
                         }
-                    }
-                ); 
+                    ); 
+                }
             }
         }
         
         function addAssociation(featureid) {
             $.getREST(['base', 'feature_association', 'add', 'feature_id', featureid, 'association_type', 'room', 'association_id', '{{ room.id }}'],
                 function(data) {
+                    finishedactions++;
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
-                        finishactions++;
+                        saveUIConfig();
                     } else {
+                        erroractions++;
                         $.notification('error', data.description);                                          
                     }
                 }

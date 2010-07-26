@@ -26,8 +26,8 @@
 {% block js_script %}
     $(function() {
         var totalactions = 0;
-        var finishactions = 0;
-        var savetries = 0;
+        var finishedactions = 0;
+        var erroractions = 0;
         var json = {};
         
         $("#customize a").click(function() {        
@@ -36,9 +36,8 @@
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
                         totalactions = $(".maininfo li:first, .mainactions li, .otheractions li").length;
-                        console.log(totalactions + " elements à sauvegarder");
-                        finishactions = 0;
-                        savetries = 0;
+                        finishedactions = 0;
+                        erroractions = 0;
 
                         json = {};
                         json.list = []
@@ -78,61 +77,52 @@
         });
 
         function saveUIConfig() {
-            savetries++;
-                console.log("essai sauvegarde (" + savetries + " sur 5)");
-            if (savetries <= 5) {
-                console.log("finish(" + finishactions + ") < total(" + totalactions + ")");
-                if (finishactions < totalactions) {
-                    console.log("sauvegarde wait 2000");
-                    window.setTimeout(saveUIConfig, 2000);
-                } else {
-                        console.log("sauvegarde ui_config");
+            if (finishedactions == totalactions) {
+                if (erroractions == 0) {
                     var jsonstr = JSON.stringify(json).replace(/"/g, '&quot;');
                     $.getREST(['base', 'ui_config', 'set', 'name', 'area', 'reference', '{{ area.id }}', 'key', 'widgets', 'value', jsonstr],
                         function(data) {
                             var status = (data.status).toLowerCase();
                             if (status == 'ok') {
-
-//                                $.loadPage('{% url show_area_view area.id %}', {'status': 'ok', 'msg': '{% trans "Page successfully configured" %}'});
+                                $.loadPage('{% url show_area_view area.id %}', {'status': 'ok', 'msg': '{% trans "Page successfully configured" %}'});
                             } else {
                                 $.notification('error', data.description);                                          
                                 // If error clean the association table
-/*                                $.getREST(['base', 'feature_association', 'del', 'association_type', 'area', 'association_id', {{ area.id }}],
+                                $.getREST(['base', 'feature_association', 'del', 'association_type', 'area', 'association_id', {{ area.id }}],
                                     function(data) {
                                         var status = (data.status).toLowerCase();
                                         if (status != 'ok') {
                                             $.notification('error', data.description);                                          
                                         }
                                     }
-                               ); */
+                                ); 
                             }
                         }
-                    );                    
-                }
-            } else {
-                        console.log("sauvegarde too many tries");
-                $.notification('error', 'Impossible to save everything : some widgets returned errors');
-                // If error clean the association table
-                $.getREST(['base', 'feature_association', 'del', 'association_type', 'area', 'association_id', {{ area.id }}],
-                    function(data) {
-                        var status = (data.status).toLowerCase();
-                        if (status != 'ok') {
-                            $.notification('error', data.description);                                          
+                    );   
+                } else { // Errors
+                    $.notification('error', 'Impossible to save everything : some widgets returned errors');
+                    // If error clean the association table
+                    $.getREST(['base', 'feature_association', 'del', 'association_type', 'area', 'association_id', {{ area.id }}],
+                        function(data) {
+                            var status = (data.status).toLowerCase();
+                            if (status != 'ok') {
+                                $.notification('error', data.description);                                          
+                            }
                         }
-                    }
-                ); 
+                    ); 
+                }
             }
         }
         
         function addAssociation(featureid) {
             $.getREST(['base', 'feature_association', 'add', 'feature_id', featureid, 'association_type', 'area', 'association_id', '{{ area.id }}'],
                 function(data) {
+                    finishedactions++;
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
-                        finishactions++;
-                        console.log("element " + featureid + " OK [" + finishactions + "]");
+                        saveUIConfig();
                     } else {
-                        console.log("element " + featureid + " ERREUR [" + finishactions + "] " + data.description);
+                        erroractions++;
                         $.notification('error', data.description);                                          
                     }
                 }
