@@ -23,9 +23,14 @@ header#contentheader {
     -webkit-box-shadow: 1px 0 5px #000000;
 }
 
+.subsection {
+	position:relative;
+}
+
 /* Actions section */
 
-#mainsection .maininfo {
+#mainsection .maininfo,
+.subsection .maininfo {
     height:45px;
     width:45px;
     display:block;
@@ -46,8 +51,17 @@ header#contentheader {
     text-align:center;
 }
 
+.subsection .mainactions {
+    margin:0;
+    padding:1em;
+    height:6em;
+    border-top: #cccccc 1px dashed;
+    text-align:center;
+}
+
 #mainsection .mainactions ul > li,
-#mainsection .otheractions ul > li {
+#mainsection .otheractions ul > li,
+.subsection .mainactions ul > li {
     display:inline-block;
     margin:1em;
 }

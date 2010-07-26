@@ -43,28 +43,28 @@
                         json.list = []
                         // Main info
                         $(".maininfo li:first").each(function(index) {
-                            var action = {widget:$(this).attr('widgetid'), feature:$(this).attr('featurevalue')};
-                            json.maininfo = action;
-                            json.list.push(action);
-                            addAssociation($(this).attr('featurevalue'));
+                            addAssociation($(this).attr('widgetid'), $(this).attr('featurevalue'), function(obj) {
+                                json.maininfo = obj;
+                                json.list.push(obj);
+                            });
                         });
             
                         // Main actions
                         json.mainactions = [];
                         $(".mainactions li").each(function(index) {
-                            var action = {widget:$(this).attr('widgetid'), feature:$(this).attr('featurevalue')};
-                            json.mainactions.push(action);
-                            json.list.push(action);
-                            addAssociation($(this).attr('featurevalue'));
+                            addAssociation($(this).attr('widgetid'), $(this).attr('featurevalue'), function(obj) {
+                                json.mainactions.push(obj);
+                                json.list.push(obj);
+                            });
                         });
                         
                         // Other actions
                         json.otheractions = [];
                         $(".otheractions li").each(function(index) {
-                            var action = {widget:$(this).attr('widgetid'), feature:$(this).attr('featurevalue')};
-                            json.otheractions.push(action);
-                            json.list.push(action);
-                            addAssociation($(this).attr('featurevalue'));
+                            addAssociation($(this).attr('widgetid'), $(this).attr('featurevalue'), function(obj) {
+                                json.otheractions.push(obj);
+                                json.list.push(obj);
+                            });
                         });
                         
                         // Save ui config
@@ -114,12 +114,15 @@
             }
         }
         
-        function addAssociation(featureid) {
+        function addAssociation(widgetid, featureid, funct) {
             $.getREST(['base', 'feature_association', 'add', 'feature_id', featureid, 'association_type', 'room', 'association_id', '{{ room.id }}'],
                 function(data) {
                     finishedactions++;
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
+                        var action = {widget:widgetid, feature:featureid, association: data.feature_association[0].id};
+                        console.log(action);
+                        funct(action);
                         saveUIConfig();
                     } else {
                         erroractions++;
@@ -129,12 +132,12 @@
             );
         }
         
-        {% for feature in room.features %}
-            $("#model_{{ feature.id }}").{{ feature.widget_id }}()
-                .{{ feature.widget_id }}('model', {
-                    featurevalue: '{{ feature.id }}',
-                    featurename: '{{ feature.device_feature_model.name }}',
-                    devicename: '{{ feature.device.name }}'
+        {% for association in room.associations %}
+            $("#model_{{ association.id }}").{{ association.widget_id }}()
+                .{{ association.widget_id }}('model', {
+                    featurevalue: '{{ association.feature.id }}',
+                    featurename: '{{ association.feature.device_feature_model.name }}',
+                    devicename: '{{ association.feature.device.name }}'
                 })
                 .draggable({
                     helper: false,
@@ -232,7 +235,7 @@
         <span class='offscreen'>{% trans "Main info" %}</span>
         <ul>
         {% if room.config.widgets.maininfo %}
-            <li id="model_{{ room.config.widgets.maininfo.feature }}">1x1</li>
+            <li id="model_{{ room.config.widgets.maininfo.association }}">1x1</li>
         {% endif %}
         </ul>
     </div>
@@ -243,14 +246,14 @@
         <div class='mainactions'>
             <ul>
             {% for action in room.config.widgets.mainactions %}
-                <li id="model_{{ action.feature }}">1x1</li>
+                <li id="model_{{ action.association }}">1x1</li>
             {% endfor %}
             </ul>
         </div>
         <div class='otheractions'>
             <ul>
             {% for action in room.config.widgets.otheractions %}
-                <li id="model_{{ action.feature }}">1x1</li>
+                <li id="model_{{ action.association }}">1x1</li>
             {% endfor %}
             </ul>
         </div>

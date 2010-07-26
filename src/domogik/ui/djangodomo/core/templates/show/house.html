@@ -25,24 +25,24 @@
 
 {% block js_script %}
     $(function() {
-        {% for feature in house.features %}
-            {% get_widget feature %}
-            {% get_widget_init feature %}
+        {% for association in house.associations %}
+            {% get_widget association.id association.widget_id association.feature %}
+            {% get_widget_init association.id association.widget_id association.feature %}
         {% endfor %}
 
-        {% if house.features %}
-            {% regroup house.features|dictsort:"device_id" by device as devices %}
+        {% if house.associations %}
+            {% regroup house.associations|dictsort:"feature.device_id" by feature.device as devices %}
             var devices = [{% for device in devices %}{{ device.grouper.id }}{% if not forloop.last %},{% endif %}{% endfor %}];
             $.eventRequest(devices, function(event) {
                 switch(event.device_id) {
-                {% regroup house.features|dictsort:"device_id" by device as devices %}
+                {% regroup house.associations|dictsort:"feature.device_id" by feature.device as devices %}
                 {% for device in devices %}
                     case {{ device.grouper.id }}:
                         $.each(event.data, function(index, item) {
                             switch (item.key) {                        
                             {% for association in device.list %}
-                                case '{{ association.device_feature_model.stat_key }}':
-                                    {% get_widget_update association 'item.value' %}
+                                case '{{ association.feature.device_feature_model.stat_key }}':
+                                    {% get_widget_update association.id association.widget_id association.feature 'item.value' %}
                                     break;
                             {% endfor %}                    
                             }
@@ -72,7 +72,7 @@
     <div class="maininfo">
         <ul>
         {% if house.config.widgets.maininfo %}
-            <li><div id="widget_{{ house.config.widgets.maininfo.feature }}"></div></li>
+            <li><div id="widget_{{ house.config.widgets.maininfo.association }}"></div></li>
         {% endif %}    
         </ul>
     </div>
@@ -83,14 +83,14 @@
         <div class='mainactions'>
             <ul>
             {% for action in house.config.widgets.mainactions %}
-                <li><div id="widget_{{ action.feature }}"></div></li>
+                <li><div id="widget_{{ action.association }}"></div></li>
             {% endfor %}
             </ul>
         </div>
         <div class='otheractions'>
             <ul>
             {% for action in house.config.widgets.otheractions %}
-                <li><div id="widget_{{ action.feature }}"></div></li>
+                <li><div id="widget_{{ action.association }}"></div></li>
             {% endfor %}
             </ul>
         </div>
@@ -99,31 +99,36 @@
 
 {% block contentright %}
     {% for area in areas_list %}
-	    {% if forloop.counter0|divisibleby:"3" %}
-		    <!--div class='row'-->
-	    {% endif %}
-			    <!--div class='column'-->
-				    <div class='block'>
-					    <h2 class='header icon64-area-{{ area.config.icon}}'>
-						    <a href='{% url show_area_view area.id %}' class="ident">
-							    <span class="title">{{ area.name }}</span>
-							    <br />
-							    <span class="subtitle">{{ area.description }}</span>
-						    </a>
-						    <!--span class='temp icon32-device-temp'>21 &#176;C</span-->
-					    </h2>
-                        <div class='actions'>
-                        </div>
-            		    <!--div class='footer'><button class='button_bottomright' id='openextended_{{ area.id }}'>Full commands</button></div-->
-				    </div>
-				    <!--div class='extended' id='extended_{{ area.id }}'>
-                        <h3>Commandes</h3>
-                        <ul class='commands'>
-                        </ul>
-                    </div-->
-			    <!--/div-->
-	    {% if forloop.counter0|divisibleby:"3" %}
-		    <!--/div-->
-	    {% endif %}
+        <div class='block subsection'>
+            <script type="text/javascript">
+                $(function() {
+                {% for association in area.associations %}
+                    {% get_widget association.id association.widget_id association.feature %}
+                    {% get_widget_init association.id association.widget_id association.feature %}
+                {% endfor %}
+                });
+            </script>
+            <h2 class='header icon64-area-{{ area.config.icon}}'>
+                <a href='{% url show_area_view area.id %}' class="ident">
+                    <span class="title">{{ area.name }}</span>
+                    <br />
+                    <span class="subtitle">{{ area.description }}</span>
+                </a>
+            </h2>
+            <div class="maininfo">
+                <ul>
+                {% if area.config.widgets.maininfo %}
+                    <li><div id="widget_{{ area.config.widgets.maininfo.association }}"></div></li>
+                {% endif %}    
+                </ul>
+            </div>
+            <div class='mainactions'>
+                <ul>
+                {% for action in area.config.widgets.mainactions %}
+                    <li><div id="widget_{{ action.association }}"></div></li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
     {% endfor %}
 {% endblock %}

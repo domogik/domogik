@@ -42,7 +42,7 @@ def unescape(s):
 
 class GetActuator(Node):
     @staticmethod
-    def get_widget(feature, device_type, device_usage, parameters_type, parameters_usage):
+    def get_widget(associationid, widgetid, feature, device_type, device_usage, parameters_type, parameters_usage):
         script = """$('#widget_%s').%s().%s('widget',{
                         usage: %s,
                         devicename: '%s',
@@ -53,8 +53,8 @@ class GetActuator(Node):
                         usage_parameters: %s,
                         model_parameters: %s
                     });
-                    """ % (feature.id, feature.widget_id,
-                           feature.widget_id, feature.device.device_usage_id,
+                    """ % (associationid, widgetid,
+                           widgetid, feature.device.device_usage_id,
                            feature.device.name, feature.device_feature_model.name,
                            device_type.device_technology_id, feature.device.address,
                            feature.device_feature_model.return_confirmation,
@@ -63,14 +63,14 @@ class GetActuator(Node):
         return script
 
     @staticmethod
-    def get_setValue(feature, value):
+    def get_setValue(associationid, widgetid, feature, value):
         script = """$("#widget_%s").%s('setValue', %s);
-                    """ % (feature.id, feature.widget_id, value)
+                    """ % (associationid, widgetid, value)
         return script
 
 class GetSensor():
     @staticmethod
-    def get_widget(feature, device_type, device_usage, parameters_type, parameters_usage):
+    def get_widget(associationid, widgetid, feature, device_type, device_usage, parameters_type, parameters_usage):
         script = """$("#widget_%s").%s().%s('widget',{
                             usage: %s,
                             devicename: '%s',
@@ -80,8 +80,8 @@ class GetSensor():
                             usage_parameters: %s,
                             model_parameters: %s
                         });
-                 """ % (feature.id, feature.widget_id,
-                        feature.widget_id, feature.device.device_usage_id,
+                 """ % (associationid, widgetid,
+                        widgetid, feature.device.device_usage_id,
                         feature.device.name, feature.device_feature_model.name,
                         feature.device_id, feature.device_feature_model.stat_key,
                         simplejson.dumps(parameters_usage['sensor'][feature.device_feature_model.value_type]),
@@ -89,19 +89,23 @@ class GetSensor():
         return script
 
     @staticmethod
-    def get_setValue(feature, value):
+    def get_setValue(associationid, widgetid, feature, value):
         script = """$("#widget_%s").%s('setValue', %s);
-                 """ % (feature.id, feature.widget_id, value)
+                 """ % (associationid, widgetid, value)
 
         return script
     
 class GetWidget(Node):
-    def __init__(self, feature):
+    def __init__(self, associationid, widgetid, feature):
+        self.associationid = template.Variable(associationid)
+        self.widgetid = template.Variable(widgetid)
         self.feature = template.Variable(feature)
 
     def render(self, context):
+        associationid = self.associationid.resolve(context)
+        widgetid = self.widgetid.resolve(context)
         feature = self.feature.resolve(context)
-        print feature
+
         device_type = DeviceTypes.get_dict_item(feature.device.device_type_id)
         device_usage = DeviceUsages.get_dict_item(feature.device.device_usage_id)
 
@@ -113,39 +117,47 @@ class GetWidget(Node):
             parameters_usage = simplejson.loads(unescape(device_usage.default_options))
         
         if feature.device_feature_model.feature_type == "actuator":
-            script = GetActuator.get_widget(feature, device_type, device_usage, parameters_type, parameters_usage)            
+            script = GetActuator.get_widget(associationid, widgetid, feature, device_type, device_usage, parameters_type, parameters_usage)            
         else : # 'Sensor'
-            script = GetSensor.get_widget(feature, device_type, device_usage, parameters_type, parameters_usage)
+            script = GetSensor.get_widget(associationid, widgetid, feature, device_type, device_usage, parameters_type, parameters_usage)
         return script
 
 class GetWidgetInit(Node):
-    def __init__(self, feature):
+    def __init__(self, associationid, widgetid, feature):
+        self.associationid = template.Variable(associationid)
+        self.widgetid = template.Variable(widgetid)
         self.feature = template.Variable(feature)
 
     def render(self, context):
+        associationid = self.associationid.resolve(context)
+        widgetid = self.widgetid.resolve(context)
         feature = self.feature.resolve(context)
         stat = Stats.get_latest(feature.device_id, feature.device_feature_model.stat_key)
         script = ""
         if len(stat.stats) > 0 :
             if feature.device_feature_model.feature_type == "actuator":
-                script = GetActuator.get_setValue(feature, "'" + stat.stats[0].value + "'")
+                script = GetActuator.get_setValue(associationid, widgetid, feature, "'" + stat.stats[0].value + "'")
             else: # 'Sensor'
-                script = GetSensor.get_setValue(feature, "'" + stat.stats[0].value + "'")
+                script = GetSensor.get_setValue(associationid, widgetid, feature, "'" + stat.stats[0].value + "'")
         return script
 
 class GetWidgetUpdate(Node):
-    def __init__(self, feature, value):
+    def __init__(self, associationid, widgetid, feature, value):
+        self.associationid = template.Variable(associationid)
+        self.widgetid = template.Variable(widgetid)
         self.feature = template.Variable(feature)
         self.value = template.Variable(value)
 
     def render(self, context):
+        associationid = self.associationid.resolve(context)
+        widgetid = self.widgetid.resolve(context)
         feature = self.feature.resolve(context)
         value = self.value.resolve(context)
         script = ""
         if feature.device_feature_model.feature_type == "actuator":
-            script = GetActuator.get_setValue(feature, value)
+            script = GetActuator.get_setValue(associationid, widgetid, feature, value)
         else: # 'Sensor'
-            script = GetSensor.get_setValue(feature, value)
+            script = GetSensor.get_setValue(associationid, widgetid, feature, value)
         return script
     
 def do_get_widget(parser, token):
@@ -154,12 +166,12 @@ def do_get_widget(parser, token):
 
     Usage::
 
-        {% get_widget feature %}
+        {% get_widget associationid widgetid feature %}
     """
     args = token.contents.split()
-    if len(args) != 2:
-        raise TemplateSyntaxError, "'get_widget' requires 'feature' argument"
-    return GetWidget(args[1])
+    if len(args) != 4:
+        raise TemplateSyntaxError, "'get_widget' requires arguments"
+    return GetWidget(args[1], args[2], args[3])
 
 register.tag('get_widget', do_get_widget)
         
@@ -169,12 +181,12 @@ def do_get_widget_init(parser, token):
 
     Usage::
 
-        {% get_widget_init feature %}
+        {% get_widget_init associationid widgetid feature %}
     """
     args = token.contents.split()
-    if len(args) != 2:
-        raise TemplateSyntaxError, "'get_widget_init' requires 'feature' argument"
-    return GetWidgetInit(args[1])
+    if len(args) != 4:
+        raise TemplateSyntaxError, "'get_widget_init' requires arguments"
+    return GetWidgetInit(args[1], args[2], args[3])
 
 register.tag('get_widget_init', do_get_widget_init)
 
@@ -184,11 +196,11 @@ def do_get_widget_update(parser, token):
 
     Usage::
 
-        {% get_widget_update feature js_var %}
+        {% get_widget_update associationid widgetid feature js_var %}
     """
     args = token.contents.split()
-    if len(args) != 3:
-        raise TemplateSyntaxError, "'get_widget_update' requires 'feature' argument and the js var name for value"
-    return GetWidgetUpdate(args[1], args[2])
+    if len(args) != 5:
+        raise TemplateSyntaxError, "'get_widget_update' requires arguments and the js var name for value"
+    return GetWidgetUpdate(args[1], args[2], args[3], args[4])
 
 register.tag('get_widget_update', do_get_widget_update)

@@ -14,7 +14,6 @@
                 var woptions = {
                     featurevalue: o.featurevalue,
                     featurename: o.featurename,
-                    devicevalue: o.devicevalue,
                     devicename: o.devicename
                 }
                 eval("model." + id + "();");

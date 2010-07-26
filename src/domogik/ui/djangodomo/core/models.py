@@ -56,17 +56,16 @@ class House(object):
     def merge_features(self):
         # Find all features associated with the House
         associations = FeatureAssociations.get_by_house()
-        self.features = []
+        self.associations = associations.feature_association
         # For each association get the feature detail
-        for association in associations.feature_association:
+        for association in self.associations:
             resp = Features.get_by_id(association.device_feature_id)
-            feature = resp.feature[0]
+            association.feature = resp.feature[0]
             # Add the linked widget (from ui_config)
             if self.config.has_key('widgets'):
                 for widget in self.config['widgets']['list']:
-                    if int(feature.id) == int(widget['feature']):
-                        feature['widget_id'] = widget['widget']
-            self.features.append(feature)
+                    if int(association.feature.id) == int(widget['feature']):
+                        association.widget_id = widget['widget']
 
 class Areas(pipes.DmgPipe):
     uri = settings.REST_URL + "/base/area"
@@ -101,17 +100,16 @@ class Areas(pipes.DmgPipe):
         for area in self.area:
             # Find all features associated with the Area
             associations = FeatureAssociations.get_by_area(area.id)
-            area.features = []
+            area.associations = associations.feature_association
             # For each association get the feature detail
-            for association in associations.feature_association:
+            for association in area.associations:
                 resp = Features.get_by_id(association.device_feature_id)
-                feature = resp.feature[0]
+                association.feature = resp.feature[0]
                 # Add the linked widget (from ui_config)
                 if area.config.has_key('widgets'):
                     for widget in area.config['widgets']['list']:
-                        if int(feature.id) == int(widget['feature']):
-                            feature['widget_id'] = widget['widget']
-                area.features.append(feature)
+                        if int(association.feature.id) == int(widget['feature']):
+                            association.widget_id = widget['widget']
 
 class Rooms(pipes.DmgPipe):
     uri = settings.REST_URL + "/base/room"
@@ -152,17 +150,16 @@ class Rooms(pipes.DmgPipe):
         for room in self.room:
             # Find all features associated with the Room
             associations = FeatureAssociations.get_by_room(room.id)
-            room.features = []
+            room.associations = associations.feature_association
             # For each association get the feature detail
-            for association in associations.feature_association:
+            for association in room.associations:
                 resp = Features.get_by_id(association.device_feature_id)
-                feature = resp.feature[0]
+                association.feature = resp.feature[0]
                 # Add the linked widget (from ui_config)
                 if room.config.has_key('widgets'):
                     for widget in room.config['widgets']['list']:
-                        if int(feature.id) == int(widget['feature']):
-                            feature['widget_id'] = widget['widget']
-                room.features.append(feature)
+                        if int(association.feature.id) == int(widget['feature']):
+                            association.widget_id = widget['widget']
 
 class Devices(pipes.DmgPipe):
     uri = settings.REST_URL + "/base/device"

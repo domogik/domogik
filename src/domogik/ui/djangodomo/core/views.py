@@ -442,6 +442,7 @@ def show_house(request):
     try:
         result_all_areas = Areas.get_all()
         result_all_areas.merge_uiconfig()
+        result_all_areas.merge_features()
 
         result_house = House()
         result_house.merge_features()
@@ -499,6 +500,8 @@ def show_area(request, area_id):
 
         result_rooms_by_area = Rooms.get_by_area(area_id)
         result_rooms_by_area.merge_uiconfig()
+        result_rooms_by_area.merge_features()
+        
         result_house = House()
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
