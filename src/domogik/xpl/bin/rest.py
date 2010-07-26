@@ -603,10 +603,13 @@ class RestHandler(BaseHTTPRequestHandler):
         self.server.handler_params[0]._log.debug("Send HTTP header for OK")
         try:
             self.send_response(200)
-        except BrokenPipe:
-            # [Errno 32] Broken pipe : client closed connexion
-            self.server.handler_params[0]._log.debug("It seems that socket has closed on client side (the browser may have change of the page displayed")
-            return
+        except IOError as e: 
+            if e.errno == errno.EPIPE:
+                # [Errno 32] Broken pipe : client closed connexion
+                self.server.handler_params[0]._log.debug("It seems that socket has closed on client side (the browser may have change of the page displayed")
+                return
+            else:
+                raise e
         self.send_header('Content-type',  'application/json')
         self.send_header('Expires', '-1')
         self.send_header('Cache-control', 'no-cache')
