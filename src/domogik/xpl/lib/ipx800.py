@@ -48,6 +48,11 @@ IPX_UDP_PORT = 30303
 IPX_SEARCH_REQ = "Discovery: Who is out there?"
 IPX_SEARCH_TIMEOUT = 5
 
+# status
+IPX_LED_HIGH = "1"
+IPX_LED_LOW = "0"
+IPX_BTN_HIGH = "up"
+IPX_BTN_LOW = "down"
 
 class IPXException:                                                         
     """                                                                         
@@ -79,13 +84,14 @@ class IPX:
             @param ip : ip or dns of host
             @param port: port
         """
-        # try to get status.xml on given board.
-        # if it fails,raise an Exception
-        print("Opening board : %s:%s" % (host, port))
+        # define all urls
         self.url = "http://%s:%s" % (host, port)
         self.url_status = "%s/status.xml" % self.url
+        self.url_cgi_change = "%s/leds.cgi?led=" % self.url
+        self.url_cgi_pulse = "%s/rlyfs.cgi?rlyf=" % self.url
 
         # setting status will raise an error if no access to status.xml
+        print("Opening board : %s:%s" % (host, port))
         self.get_status(first = True)
 
 
@@ -103,7 +109,29 @@ class IPX:
              @param num : relay number (0, 1, 2,....)
              @param state : HIGH, LOW
         """
-        print "TODO"
+        # we get instant status of board
+        self.get_status()
+        actual = self.led[num]
+        print "ACT=%s" % actual
+        print "TYPE=%s" % type(actual)
+        # do we need to change status ?
+        if actual == IPX_LED_HIGH and state == "HIGH" or \
+           actual == IPX_LED_LOW and state == "LOW":
+            # no need to change status
+            print("No need to change 'led%s' status to '%s'" % (num, state))
+            return
+
+        # change status
+        url = self.url_cgi_change + str(num)
+        try:
+            resp = urllib.urlopen(url)
+        except IOError as e:
+            error = "Error while accessing to '%s' : %s" % (self.url_status, traceback.format_exc())
+            print(error)
+            raise IPXException(error)
+            return
+
+        print resp.read()
 
 
     def pule_relay(self, num):
@@ -122,7 +150,10 @@ class IPX:
         try:
             resp = urllib.urlopen(self.url_status)
         except IOError as e:
-            raise IPXException("Error while accessing to '%s' : %s" % (self.url_status, traceback.format_exc())) 
+            error = "Error while accessing to '%s' : %s" % (self.url_status, traceback.format_exc())
+            print(error)
+            raise IPXException(error)
+            return
 
         xml = resp.read()
         dom = minidom.parseString(xml)
@@ -146,11 +177,12 @@ class IPX:
             @param dom : xml data
             @param elt : led, btn, an
         """
-        start = eval("self.start_" + elt)
+        start = getattr(self, "start_" + elt)
         end = eval("self.nb_" + elt) + start 
         for idx in range(start, end):
             resp = dom.getElementsByTagName("%s%s" % (elt, idx))[0].firstChild.nodeValue
-            setattr("self.%s[%s]" % (elt, idx), resp)
+            foo = getattr(self, elt)
+            foo[idx] = resp
 
 
     def get_count(self, dom):
@@ -223,6 +255,8 @@ if __name__ == "__main__":
         ipx = IPX(None, None)
         #print ipx.find()
         ipx.open("192.168.0.102", 80)
-        ipx.listen(10)
+        print "----"
+        ipx.set_relay(0, "HIGH")
+        ipx.get_status()
     except IPXException as e:
         print e.value
