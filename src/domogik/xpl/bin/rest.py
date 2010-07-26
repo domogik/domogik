@@ -70,6 +70,7 @@ import uuid
 import stat
 import shutil
 import mimetypes
+import errno
 
 
 
