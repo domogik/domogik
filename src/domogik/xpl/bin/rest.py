@@ -601,12 +601,12 @@ class RestHandler(BaseHTTPRequestHandler):
             @param data : json data to display
         """
         self.server.handler_params[0]._log.debug("Send HTTP header for OK")
-        self.send_response(200)
-        print "---- debug ----"
-        print "DATA      =%s" % data
-        print "DATA(utf8)=%s" % data.encode("utf-8")
-        print "len(data.enc(utf-8))=%s" % str(len(data.encode("utf-8")))
-        print "---- end debug ----"
+        try:
+            self.send_response(200)
+        except BrokenPipe:
+            # [Errno 32] Broken pipe : client closed connexion
+            self.server.handler_params[0]._log.debug("It seems that socket has closed on client side (the browser may have change of the page displayed")
+            return
         self.send_header('Content-type',  'application/json')
         self.send_header('Expires', '-1')
         self.send_header('Cache-control', 'no-cache')
