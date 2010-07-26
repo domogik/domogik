@@ -2082,10 +2082,13 @@ target=*
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("ui_config")
-        for ui_item_config in self._db.delete_ui_item_config(ui_item_name = name,
+        try:
+            for ui_item_config in self._db.delete_ui_item_config(ui_item_name = name,
                                                              ui_item_reference = reference,
                                                              ui_item_key = key):
-            json_data.add_data(ui_item_config)
+                json_data.add_data(ui_item_config)
+        except:
+            json_data.set_error(code = 999, description = self.get_exception())
         self.send_http_response_ok(json_data.get())
 
 
