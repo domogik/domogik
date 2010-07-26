@@ -603,6 +603,19 @@ class RestHandler(BaseHTTPRequestHandler):
         self.server.handler_params[0]._log.debug("Send HTTP header for OK")
         try:
             self.send_response(200)
+            self.send_header('Content-type',  'application/json')
+            self.send_header('Expires', '-1')
+            self.send_header('Cache-control', 'no-cache')
+            self.send_header('Content-Length', len(data.encode("utf-8")))
+            self.end_headers()
+            if data:
+                # if big data, log only start of data
+                if len(data) > 1000:
+                    self.server.handler_params[0]._log.debug("Send HTTP data : %s... [truncated because data too long for logs]" % data[0:1000].encode("utf-8"))
+                # else log all data
+                else:
+                    self.server.handler_params[0]._log.debug("Send HTTP data : %s" % data.encode("utf-8"))
+                self.wfile.write(data.encode("utf-8"))
         except IOError as e: 
             if e.errno == errno.EPIPE:
                 # [Errno 32] Broken pipe : client closed connexion
@@ -610,19 +623,6 @@ class RestHandler(BaseHTTPRequestHandler):
                 return
             else:
                 raise e
-        self.send_header('Content-type',  'application/json')
-        self.send_header('Expires', '-1')
-        self.send_header('Cache-control', 'no-cache')
-        self.send_header('Content-Length', len(data.encode("utf-8")))
-        self.end_headers()
-        if data:
-            # if big data, log only start of data
-            if len(data) > 1000:
-                self.server.handler_params[0]._log.debug("Send HTTP data : %s... [truncated because data too long for logs]" % data[0:1000].encode("utf-8"))
-            # else log all data
-            else:
-                self.server.handler_params[0]._log.debug("Send HTTP data : %s" % data.encode("utf-8"))
-            self.wfile.write(data.encode("utf-8"))
 
 
     def send_http_response_error(self, err_code, err_msg, jsonp, jsonp_cb):
