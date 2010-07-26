@@ -403,6 +403,9 @@ class Rest(XplPlugin):
     def _put_in_queue(self, my_queue, message):
         self._log_queue.debug("Put in queue %s : %s" % (str(my_queue), str(message)))
         my_queue.put((time.time(), message), True, self._queue_timeout) 
+        # todo : except Full:
+        #           call a "clean" function
+        #           put again in queue
 
 
 
