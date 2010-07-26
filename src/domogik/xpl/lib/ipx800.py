@@ -70,6 +70,9 @@ class IPX:
         """
         self._log = log
         self._cb = cb
+        self.led = {}  # relays
+        self.btn = {}  # digital input
+        self.an = {}   # analogic input
 
     def open(self, host, port):
         """ Try to access to IPX board and return error if not possible
@@ -86,13 +89,40 @@ class IPX:
         self.get_status(first = True)
 
 
+    def listen(self, interval):
+        """ Listen for relay board in background
+            @param interval : interval between each read of status
+        """
+        while True:
+            self.get_status()
+            time.sleep(interval)
+
+
+    def set_relay(self, num, state):
+        """" Set relay <num> to state <state>
+             @param num : relay number (0, 1, 2,....)
+             @param state : HIGH, LOW
+        """
+        print "TODO"
+
+
+    def pule_relay(self, num):
+        """" Send a pulse on relay <num>
+             @param num : relay number (0, 1, 2,....)
+        """
+        print "TODO"
+
+
+
     def get_status(self, first = False):
         """ Get status.xml content on board
             @param first : optionnal : if True, first call so we will check
                            number of relay, input (ana and digi)
         """
-        # TODO : try... except
-        resp = urllib.urlopen(self.url_status)
+        try:
+            resp = urllib.urlopen(self.url_status)
+        except IOError as e:
+            raise IPXException("Error while accessing to '%s' : %s" % (self.url_status, traceback.format_exc())) 
 
         xml = resp.read()
         dom = minidom.parseString(xml)
@@ -103,22 +133,64 @@ class IPX:
             self.get_count(response)
 
         # List each relay status
+        self.get_status_of(dom, "led")
+        print "LED=%s" % self.led
+        self.get_status_of(dom, "btn")
+        print "BTN=%s" % self.btn
+        self.get_status_of(dom, "an")
+        print "AN=%s" % self.an
+
+
+    def get_status_of(self, dom, elt):
+        """ get value for <eltX> in <dom> and store then in self.<elt>[X]
+            @param dom : xml data
+            @param elt : led, btn, an
+        """
+        start = eval("self.start_" + elt)
+        end = eval("self.nb_" + elt) + start 
+        for idx in range(start, end):
+            resp = dom.getElementsByTagName("%s%s" % (elt, idx))[0].firstChild.nodeValue
+            setattr("self.%s[%s]" % (elt, idx), resp)
 
 
     def get_count(self, dom):
-        """ count umber of relay, input
+        """ count number of relay, input
             @param dom : xml data
         """
-        # number of relay
-        idx = 0
+        print dom.toxml()
+        self.start_led, self.nb_led = self.get_count_of(dom, "led")
+        print("Number of relay : %s (start at %s)" % (self.nb_led, self.start_led))
+        self.start_btn, self.nb_btn = self.get_count_of(dom, "btn")
+        print("Number of digital input : %s (start at %s)" % (self.nb_btn, self.start_btn))
+        self.start_an, self.nb_an = self.get_count_of(dom, "an")
+        print("Number of anal input : %s (start at %s)" % (self.nb_an, self.start_an))
+
+
+    def get_count_of(self, dom, elt):
+        """ count number of <eltX> in <dom>
+            @param dom : xml data
+            @param elt : start of tag name
+        """
+        # start at 0 or 1 ?
+        try:
+            foo = dom.getElementsByTagName("%s0" % elt)[0]
+            start = 0
+        except IndexError:
+            try:
+                foo = dom.getElementsByTagName("%s1" % elt)[0]
+                start = 1
+            except IndexError:
+                return 0, 0
+        
+        # count
+        idx = start
         while True:
             try:
-                elt = dom.getElementsByTagName("led%s" % str(idx))[0]
+                foo = dom.getElementsByTagName("%s%s" % (elt, str(idx)))[0]
             except IndexError:
-                print "!!"
                 break
             idx += 1
-        print("Number of relay : %s" % idx)
+        return start, idx - start
         
 
     def find(self):
@@ -147,6 +219,10 @@ class IPX:
         return ipx_list
 
 if __name__ == "__main__":
-    ipx = IPX(None, None)
-    print ipx.find()
-    ipx.open("192.168.0.102", 80)
+    try:
+        ipx = IPX(None, None)
+        #print ipx.find()
+        ipx.open("192.168.0.102", 80)
+        ipx.listen(10)
+    except IPXException as e:
+        print e.value
