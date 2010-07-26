@@ -620,7 +620,7 @@ class RestHandler(BaseHTTPRequestHandler):
         except IOError as e: 
             if e.errno == errno.EPIPE:
                 # [Errno 32] Broken pipe : client closed connexion
-                self.server.handler_params[0]._log.debug("It seems that socket has closed on client side (the browser may have change of the page displayed")
+                self.server.handler_params[0]._log.debug("It seems that socket has closed on client side (the browser may have change the page displayed")
                 return
             else:
                 raise e
