@@ -36,6 +36,7 @@
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
                         totalactions = $(".maininfo li:first, .mainactions li, .otheractions li").length;
+                        console.log(totalactions + " elements à sauvegarder");
                         finishactions = 0;
                         savetries = 0;
 
@@ -79,6 +80,8 @@
         function saveUIConfig() {
             savetries++;
             if (savetries < 5) {
+                console.log("essai sauvegarde (" + savetries + " sur 5)");
+                console.log("finish(" + finishactions + ") < total(" + totalactions + ")");
                 if (finishactions < totalactions) {
                     window.setTimeout(saveUIConfig, 1000);
                 } else {
@@ -87,18 +90,20 @@
                         function(data) {
                             var status = (data.status).toLowerCase();
                             if (status == 'ok') {
-                                $.loadPage('{% url show_area_view area.id %}', {'status': 'ok', 'msg': '{% trans "Page successfully configured" %}'});
+                        console.log("sauvegarde ui_config");
+
+//                                $.loadPage('{% url show_area_view area.id %}', {'status': 'ok', 'msg': '{% trans "Page successfully configured" %}'});
                             } else {
                                 $.notification('error', data.description);                                          
                                 // If error clean the association table
-                                $.getREST(['base', 'feature_association', 'del', 'association_type', 'area', 'association_id', {{ area.id }}],
+/*                                $.getREST(['base', 'feature_association', 'del', 'association_type', 'area', 'association_id', {{ area.id }}],
                                     function(data) {
                                         var status = (data.status).toLowerCase();
                                         if (status != 'ok') {
                                             $.notification('error', data.description);                                          
                                         }
                                     }
-                                ); 
+                               ); */
                             }
                         }
                     );                    
@@ -123,7 +128,9 @@
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
                         finishactions++;
+                        console.log("element " + featureid + " OK [" + finishactions + "]");
                     } else {
+                        console.log("element " + featureid + " ERREUR [" + finishactions + "] " + data.description);
                         $.notification('error', data.description);                                          
                     }
                 }
