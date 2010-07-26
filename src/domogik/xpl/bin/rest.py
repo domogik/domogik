@@ -403,6 +403,9 @@ class Rest(XplPlugin):
     def _put_in_queue(self, my_queue, message):
         self._log_queue.debug("Put in queue %s : %s" % (str(my_queue), str(message)))
         my_queue.put((time.time(), message), True, self._queue_timeout) 
+        # todo : except Full:
+        #           call a "clean" function
+        #           put again in queue
 
 
 
@@ -599,6 +602,11 @@ class RestHandler(BaseHTTPRequestHandler):
         """
         self.server.handler_params[0]._log.debug("Send HTTP header for OK")
         self.send_response(200)
+        print "---- debug ----"
+        print "DATA      =%s" % data
+        print "DATA(utf8)=%s" % data.encode("utf-8")
+        print "len(data.enc(utf-8))=%s" % str(len(data.encode("utf-8")))
+        print "---- end debug ----"
         self.send_header('Content-type',  'application/json')
         self.send_header('Expires', '-1')
         self.send_header('Cache-control', 'no-cache')

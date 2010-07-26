@@ -46,7 +46,6 @@ from xml.dom import minidom
 IPX_UDP_HOST = ''
 IPX_UDP_PORT = 30303
 IPX_SEARCH_REQ = "Discovery: Who is out there?"
-IPX_SEARCH_RESP = "RELAYBOARD"
 IPX_SEARCH_TIMEOUT = 5
 
 
@@ -119,7 +118,6 @@ class IPX:
                 print "!!"
                 break
             idx += 1
-            time.sleep(1)
         print("Number of relay : %s" % idx)
         
 
@@ -140,9 +138,9 @@ class IPX:
         while 1:
             try:
                 message, address = s.recvfrom(8192)
-                if message.split("\n")[0].strip() == IPX_SEARCH_RESP:
-                    print address[0]
-                    ipx_list.append(address[0])
+                name = message.split("\n")[0].strip()
+                print address[0]
+                ipx_list.append((address[0], name))
             except socket.timeout:
                 break
     
@@ -150,5 +148,5 @@ class IPX:
 
 if __name__ == "__main__":
     ipx = IPX(None, None)
-    #print ipx.find()
+    print ipx.find()
     ipx.open("192.168.0.102", 80)
