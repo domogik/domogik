@@ -79,18 +79,19 @@
 
         function saveUIConfig() {
             savetries++;
-            if (savetries < 5) {
                 console.log("essai sauvegarde (" + savetries + " sur 5)");
+            if (savetries <= 5) {
                 console.log("finish(" + finishactions + ") < total(" + totalactions + ")");
                 if (finishactions < totalactions) {
-                    window.setTimeout(saveUIConfig, 1000);
+                    console.log("sauvegarde wait 2000");
+                    window.setTimeout(saveUIConfig, 2000);
                 } else {
+                        console.log("sauvegarde ui_config");
                     var jsonstr = JSON.stringify(json).replace(/"/g, '&quot;');
                     $.getREST(['base', 'ui_config', 'set', 'name', 'area', 'reference', '{{ area.id }}', 'key', 'widgets', 'value', jsonstr],
                         function(data) {
                             var status = (data.status).toLowerCase();
                             if (status == 'ok') {
-                        console.log("sauvegarde ui_config");
 
 //                                $.loadPage('{% url show_area_view area.id %}', {'status': 'ok', 'msg': '{% trans "Page successfully configured" %}'});
                             } else {
@@ -109,6 +110,7 @@
                     );                    
                 }
             } else {
+                        console.log("sauvegarde too many tries");
                 $.notification('error', 'Impossible to save everything : some widgets returned errors');
                 // If error clean the association table
                 $.getREST(['base', 'feature_association', 'del', 'association_type', 'area', 'association_id', {{ area.id }}],
