@@ -368,3 +368,14 @@ class Stats(pipes.DmgPipe):
         resp = Stats.objects.get({'parameters':str(id) + "/" + key + "/latest"})
         if resp :
             return resp
+
+class Events(object):
+    def __init__(self):
+        self.events = []
+    
+    def add(self, association):
+        event = {'device_id': association.feature.device.id, 'association_id': association.id, 'stat_key': association.feature.device_feature_model.stat_key, 'widget_id': str(association.widget_id)}
+        self.events.append(event)
+
+    def get_list(self):
+        return self.events

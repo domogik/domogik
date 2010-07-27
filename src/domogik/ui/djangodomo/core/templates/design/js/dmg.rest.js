@@ -88,7 +88,7 @@ $.extend({
         });
     },
 
-    eventRequest: function(devices, callback) {
+    eventRequest: function(devices, events) {
         url = rest_url + '/events/request/new/' + devices.join('/') + '/';
         $.jsonp({
             cache: false,
@@ -99,7 +99,7 @@ $.extend({
             timeout: 120000, // 2 minute
             error: function (xOptions, textStatus) {
                 if (textStatus == 'timeout') {
-                    $.eventRequest(devices, callback);                    
+                    $.eventRequest(devices, events);                    
                 } else {
                     $.notification('error', 'Event update : Lost REST server connection');
                 }
@@ -109,8 +109,8 @@ $.extend({
                 if (status == 'ok') {
                     // Free the ticket when page unload
                     $(window).unload( function () { $.eventCancel(data.event[0].ticket_id); } );
-                    callback(data.event[0]);
-                    $.eventUpdate(data.event[0].ticket_id, callback);
+                    $.eventProcess(events, data.event[0]);
+                    $.eventUpdate(data.event[0].ticket_id, events);
                 } else {
                     $.notification('error', 'Event request  : ' + data.description);
                 }
@@ -118,7 +118,7 @@ $.extend({
         });
     },
     
-    eventUpdate: function(ticket, callback) {
+    eventUpdate: function(ticket, events) {
         url = rest_url + '/events/request/get/' + ticket + '/';
         $.jsonp({
             cache: false,
@@ -129,7 +129,7 @@ $.extend({
             timeout: 120000, // 2 minute
             error: function (xOptions, textStatus) {
                 if (textStatus == 'timeout') {
-                    $.eventUpdate(devices, callback);                    
+                    $.eventUpdate(ticket, events);                    
                 } else {
                     $.notification('error', 'Event update : Lost REST server connection');
                 }
@@ -137,8 +137,8 @@ $.extend({
             success: function (data) {
                 var status = (data.status).toLowerCase();
                 if (status == 'ok') {
-                    callback(data.event[0]);
-                    $.eventUpdate(data.event[0].ticket_id, callback);
+                    $.eventProcess(events, data.event[0]);
+                    $.eventUpdate(data.event[0].ticket_id, events);
                 } else {
                     $.notification('error', 'Event update : ' + data.description);
                 }
@@ -153,6 +153,16 @@ $.extend({
             type: "GET",
             url: url,
             dataType: "jsonp"
+        });
+    },
+    
+    eventProcess: function(events, data) {
+        $.each(data.data, function(index, item) {
+            $.each(events, function(index, event) {
+                if (event.device_id == data.device_id && event.stat_key == item.key) {
+                    eval("$('#widget_" + event.association_id + "')." + event.widget_id + "('setValue','" + item.value + "')");
+                }
+            });            
         });
     }
 });

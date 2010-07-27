@@ -121,7 +121,6 @@
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
                         var action = {widget:widgetid, feature:featureid, association: data.feature_association[0].id};
-                        console.log(action);
                         funct(action);
                         saveUIConfig();
                     } else {

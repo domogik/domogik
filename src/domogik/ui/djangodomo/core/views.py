@@ -42,7 +42,7 @@ from django.conf import settings
 
 from domogik.common import database
 from domogik.ui.djangodomo.core.models import House, Areas, Rooms, Devices, DeviceUsages, DeviceTechnologies, DeviceTypes, \
-                                   Features, FeatureAssociations, Plugins, Accounts
+                                   Features, FeatureAssociations, Plugins, Accounts, Events
 
 from domogik.ui.djangodomo.core.sample_data_helper import SampleDataHelper
 
@@ -446,6 +446,14 @@ def show_house(request):
 
         result_house = House()
         result_house.merge_features()
+        
+        events = Events()
+        for association in result_house.associations:
+            events.add(association)
+        for area in result_all_areas.area:
+            for association in area.associations:
+                events.add(association)
+        events_list = events.get_list()
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
     return __go_to_page(
@@ -454,7 +462,8 @@ def show_house(request):
         widgets=widgets_list,
         nav1_show = "selected",
         areas_list=result_all_areas.area,
-        house=result_house
+        house=result_house,
+        events=events_list
     )
 
 def show_house_edit(request):
@@ -503,6 +512,15 @@ def show_area(request, area_id):
         result_rooms_by_area.merge_features()
         
         result_house = House()
+        
+        events = Events()
+        for association in result_area_by_id.associations:
+            events.add(association)
+        for room in result_rooms_by_area.room:
+            for association in room.associations:
+                events.add(association)
+        events_list = events.get_list()
+
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
 
@@ -514,7 +532,8 @@ def show_area(request, area_id):
         nav1_show = "selected",
         area=result_area_by_id.area[0],
         rooms_list=result_rooms_by_area.room,
-        house=result_house
+        house=result_house,
+        events=events_list
     )
 
 def show_area_edit(request, area_id):
@@ -565,6 +584,12 @@ def show_room(request, room_id):
         result_room_by_id.merge_features()
 
         result_house = House()
+        
+        events = Events()
+        for association in result_room_by_id.associations:
+            events.add(association)
+        events_list = events.get_list()
+
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
 
@@ -575,7 +600,8 @@ def show_room(request, room_id):
         widgets=widgets_list,
         nav1_show = "selected",
         room=result_room_by_id.room[0],
-        house=result_house
+        house=result_house,
+        events=events_list
     )
 
 def show_room_edit(request, room_id):

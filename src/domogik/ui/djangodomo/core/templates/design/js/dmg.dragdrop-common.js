@@ -11,7 +11,6 @@
 
         _init:function() {
             var self = this, o = this.options;
-            console.log("a");
             this.zones = new Array;
             // Find all zones
             $.each(o.zones, function(index, value) {
