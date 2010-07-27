@@ -382,7 +382,7 @@ class Rest(XplPlugin):
                             keep_data = False
                     # normal search
                     else:
-                        if message.data[key] != filter[key]:
+                        if message.data[key].lower() != filter[key].lower():
                             keep_data = False
 
                 # if message is ok for us, return it
@@ -575,7 +575,8 @@ class RestHandler(BaseHTTPRequestHandler):
         """ Create an object for each request. This object will process 
             the REST url
         """
-        request = ProcessRequest(self.server.handler_params, self.path, \
+        try:
+            request = ProcessRequest(self.server.handler_params, self.path, \
                                  self.command, \
                                  self.headers, \
                                  self.send_response, \
@@ -585,7 +586,9 @@ class RestHandler(BaseHTTPRequestHandler):
                                  self.rfile, \
                                  self.send_http_response_ok, \
                                  self.send_http_response_error)
-        request.do_for_all_methods()
+            request.do_for_all_methods()
+        except:
+            self.server.handler_params[0]._log.error("%s" % self.server.handler_params[0].get_exception())
         
 
 
