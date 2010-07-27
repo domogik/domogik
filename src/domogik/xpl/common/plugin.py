@@ -216,6 +216,11 @@ class XplPlugin():
             @param message : the Xpl message received
             """
 
+        def wait(self):
+	    """ Wait until someone ask the plugin to stop
+            """
+            self._myxpl._network.join()
+
         def force_leave(self):
             '''
             Leave threads & timers

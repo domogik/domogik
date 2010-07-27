@@ -180,6 +180,7 @@ class SysManager(XplPlugin):
                                              {})
                         ping_thread[name].start()
 
+            self.wait()
         except:
             self._log.error("%s" % sys.exc_info()[1])
             print("%s" % sys.exc_info()[1])
