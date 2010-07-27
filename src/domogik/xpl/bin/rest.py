@@ -447,7 +447,7 @@ class Rest(XplPlugin):
             for command in os.listdir(self._xml_directory + "/" + techno):
                 xml_file = self._xml_directory + "/" + techno + "/" + command
                 self._log.info("Load XML file for %s>%s : %s" % (techno, command, xml_file))
-                self.xml["%s-%s" % (techno, command)] = minidom.parse(xml_file)
+                self.xml["%s/%s" % (techno, command)] = minidom.parse(xml_file)
         self.xml_date = datetime.datetime.now()
 
 
@@ -958,7 +958,7 @@ class ProcessRequest():
 
 
     def _rest_command_get_message(self, techno, address, command, params):
-        ref = "%s-%s.xml" % (techno,command)
+        ref = "%s/%s.xml" % (techno,command)
         try:
             xml_data = self.xml[ref]
         except KeyError:
@@ -1028,7 +1028,7 @@ target=*
 
 
     def _rest_command_get_listener(self, techno, address, command, params):
-        xml_data = self.xml["%s-%s.xml" % (techno,command)]
+        xml_data = self.xml["%s/%s.xml" % (techno,command)]
 
         ### Get only <command...> part
         # nothing to do, tests have be done in get_command
