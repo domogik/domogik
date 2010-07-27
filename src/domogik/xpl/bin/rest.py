@@ -382,7 +382,7 @@ class Rest(XplPlugin):
                             keep_data = False
                     # normal search
                     else:
-                        if message.data[key] != filter[key]:
+                        if message.data[key].lower() != filter[key].lower():
                             keep_data = False
 
                 # if message is ok for us, return it
