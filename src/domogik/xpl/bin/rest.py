@@ -643,13 +643,21 @@ class RestHandler(BaseHTTPRequestHandler):
         self.server.handler_params[0]._log.warning("Send HTTP header for ERROR : code=%s ; msg=%s" % (err_code, err_msg))
         json_data = JSonHelper("ERROR", err_code, err_msg)
         json_data.set_jsonp(jsonp, jsonp_cb)
-        self.send_response(200)
-        self.send_header('Content-type',    'text/html')
-        self.send_header('Expires', '-1')
-        self.send_header('Cache-control', 'no-cache')
-        self.send_header('Content-Length', len(json_data.get().encode("utf-8")))
-        self.end_headers()
-        self.wfile.write(json_data.get())
+        try:
+            self.send_response(200)
+            self.send_header('Content-type',    'text/html')
+            self.send_header('Expires', '-1')
+            self.send_header('Cache-control', 'no-cache')
+            self.send_header('Content-Length', len(json_data.get().encode("utf-8")))
+            self.end_headers()
+            self.wfile.write(json_data.get())
+        except IOError as e: 
+            if e.errno == errno.EPIPE:
+                # [Errno 32] Broken pipe : client closed connexion
+                self.server.handler_params[0]._log.debug("It seems that socket has closed on client side (the browser may have change the page displayed")
+                return
+            else:
+                raise e
 
 
 
