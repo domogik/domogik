@@ -447,7 +447,7 @@ class Rest(XplPlugin):
             for command in os.listdir(self._xml_directory + "/" + techno):
                 xml_file = self._xml_directory + "/" + techno + "/" + command
                 self._log.info("Load XML file for %s>%s : %s" % (techno, command, xml_file))
-                self.xml["%s-%s" % (techno, command)] = minidom.parse(xml_file)
+                self.xml["%s/%s" % (techno, command)] = minidom.parse(xml_file)
         self.xml_date = datetime.datetime.now()
 
 
@@ -643,13 +643,21 @@ class RestHandler(BaseHTTPRequestHandler):
         self.server.handler_params[0]._log.warning("Send HTTP header for ERROR : code=%s ; msg=%s" % (err_code, err_msg))
         json_data = JSonHelper("ERROR", err_code, err_msg)
         json_data.set_jsonp(jsonp, jsonp_cb)
-        self.send_response(200)
-        self.send_header('Content-type',    'text/html')
-        self.send_header('Expires', '-1')
-        self.send_header('Cache-control', 'no-cache')
-        self.send_header('Content-Length', len(json_data.get().encode("utf-8")))
-        self.end_headers()
-        self.wfile.write(json_data.get())
+        try:
+            self.send_response(200)
+            self.send_header('Content-type',    'text/html')
+            self.send_header('Expires', '-1')
+            self.send_header('Cache-control', 'no-cache')
+            self.send_header('Content-Length', len(json_data.get().encode("utf-8")))
+            self.end_headers()
+            self.wfile.write(json_data.get())
+        except IOError as e: 
+            if e.errno == errno.EPIPE:
+                # [Errno 32] Broken pipe : client closed connexion
+                self.server.handler_params[0]._log.debug("It seems that socket has closed on client side (the browser may have change the page displayed")
+                return
+            else:
+                raise e
 
 
 
@@ -958,7 +966,7 @@ class ProcessRequest():
 
 
     def _rest_command_get_message(self, techno, address, command, params):
-        ref = "%s-%s.xml" % (techno,command)
+        ref = "%s/%s.xml" % (techno,command)
         try:
             xml_data = self.xml[ref]
         except KeyError:
@@ -1028,7 +1036,7 @@ target=*
 
 
     def _rest_command_get_listener(self, techno, address, command, params):
-        xml_data = self.xml["%s-%s.xml" % (techno,command)]
+        xml_data = self.xml["%s/%s.xml" % (techno,command)]
 
         ### Get only <command...> part
         # nothing to do, tests have be done in get_command
