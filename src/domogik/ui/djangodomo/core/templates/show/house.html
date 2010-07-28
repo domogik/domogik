@@ -82,6 +82,39 @@
 {% endblock %}
 
 {% block contentright %}
+    {% for room in rooms_list %}
+        <div class='block subsection'>
+            <script type="text/javascript">
+                $(function() {
+                {% for association in room.associations %}
+                    {% get_widget association.id association.widget_id association.feature %}
+                    {% get_widget_init association.id association.widget_id association.feature %}
+                {% endfor %}
+                });
+            </script>
+            <h2 class='header icon64-room-{{ room.config.icon }}'>
+                <a href='{% url show_room_view room.id %}' class="ident">
+                    <span class="title">{{ room.name }}</span>
+                    <br />
+                    <span class="subtitle">{{ room.description }}</span>
+                </a>
+            </h2>
+            <div class="maininfo">
+                <ul>
+                {% if room.config.widgets.maininfo %}
+                    <li><div id="widget_{{ room.config.widgets.maininfo.association }}"></div></li>
+                {% endif %}    
+                </ul>
+            </div>
+            <div class='mainactions'>
+                <ul>
+                {% for action in room.config.widgets.mainactions %}
+                    <li><div id="widget_{{ action.association }}"></div></li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endfor %}
     {% for area in areas_list %}
         <div class='block subsection'>
             <script type="text/javascript">

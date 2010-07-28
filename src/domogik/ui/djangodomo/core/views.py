@@ -71,30 +71,6 @@ def __go_to_page(request, html_page, page_title, **attribute_list):
         response_attr_list[attribute] = attribute_list[attribute]
     return render_to_response(html_page, response_attr_list,
                               context_instance=RequestContext(request))
-    
-def index(request):
-    """
-    Method called when the main page is accessed
-    @param request : the HTTP request
-    @return an HttpResponse object
-    """
-    page_title = _("Domogik Homepage")
-    widgets_list = settings.WIDGETS_LIST
-
-    try:
-        result_all_areas = Areas.get_all()
-        result_all_areas.merge_rooms()
-        result_all_areas.merge_uiconfig()
-        result_house = House()
-        result_house.merge_features()
-    except ResourceNotAvailableException:
-        return render_to_response('error/ResourceNotAvailableException.html')
-    return __go_to_page(request, 'index.html',
-        page_title,
-        widgets=widgets_list,
-        areas_list=result_all_areas.area,
-        house=result_house
-    )
 
 def login(request):
     """
@@ -264,7 +240,7 @@ def admin_organization_rooms(request):
     try:
         result_all_rooms = Rooms.get_all()
         result_all_rooms.merge_uiconfig()
-        result_unattributed_rooms = Rooms.get_without_area()
+        result_house_rooms = Rooms.get_without_area()
         result_all_areas = Areas.get_all()
         result_all_areas.merge_rooms()
         result_all_areas.merge_uiconfig()
@@ -280,7 +256,7 @@ def admin_organization_rooms(request):
         status=status,
         msg=msg,
         rooms_list=result_all_rooms.room,
-        unattribued_rooms=result_unattributed_rooms.room,
+        house_rooms=result_house_rooms.room,
         areas_list=result_all_areas.area
     )
 
@@ -429,7 +405,42 @@ def admin_tools_helpers(request):
         status=status,
         msg=msg
 	)
-	
+
+def index(request):
+    """
+    Method called when the main page is accessed
+    @param request : the HTTP request
+    @return an HttpResponse object
+    """
+    page_title = _("Domogik Homepage")
+    widgets_list = settings.WIDGETS_LIST
+
+    try:
+        result_all_areas = Areas.get_all()
+        result_all_areas.merge_rooms()
+        result_all_areas.merge_uiconfig()
+
+        result_house = House()
+        result_house.merge_features()
+        
+        result_house_rooms = Rooms.get_without_area()
+        result_house_rooms.merge_uiconfig()
+
+        events = Events()
+        for association in result_house.associations:
+            events.add(association)
+        events_list = events.get_list()
+    except ResourceNotAvailableException:
+        return render_to_response('error/ResourceNotAvailableException.html')
+    return __go_to_page(request, 'index.html',
+        page_title,
+        widgets=widgets_list,
+        areas_list=result_all_areas.area,
+        rooms_list=result_house_rooms.room,
+        house=result_house,
+        events=events_list
+    )
+    
 def show_house(request):
     """
     Method called when the show index page is accessed
@@ -447,9 +458,16 @@ def show_house(request):
         result_house = House()
         result_house.merge_features()
         
+        result_house_rooms = Rooms.get_without_area()
+        result_house_rooms.merge_uiconfig()
+        result_house_rooms.merge_features()
+
         events = Events()
         for association in result_house.associations:
             events.add(association)
+        for room in result_house_rooms.room:
+            for association in room.associations:
+                events.add(association)
         for area in result_all_areas.area:
             for association in area.associations:
                 events.add(association)
@@ -462,6 +480,7 @@ def show_house(request):
         widgets=widgets_list,
         nav1_show = "selected",
         areas_list=result_all_areas.area,
+        rooms_list=result_house_rooms.room,
         house=result_house,
         events=events_list
     )
