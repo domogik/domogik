@@ -65,6 +65,26 @@
     margin-right:1em;
 }
 
+#widgetslist > li {
+    margin:1em 1em 0 1em;
+    border: 1px solid #cccccc;
+    -moz-border-radius: 0.8em;
+    -webkit-border-radius: 0.8em;
+    padding:0 1em 1em 1em;
+}
+
+#widgetslist .model {
+    margin-top:1em;
+}
+
+#widgetslist .name {
+}
+
+#widgetslist .description {
+    padding-left:1em;
+    font-style: italic;
+}
+
 .mainactions li, .actions li {
     display:inline-block;
 }
