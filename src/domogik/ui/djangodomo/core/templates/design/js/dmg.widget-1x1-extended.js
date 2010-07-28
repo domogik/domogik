@@ -118,14 +118,17 @@ const state_reset_status = 4000; // 4 seconds
                 this.element.doTimeout( 'resetStatus', state_reset_status, function(){
                     self._displayResetStatus();
                 });
+            } else {
+                self._displayResetStatus();                
             }
         },
 
-        _displayIcon: function(newIcon, previousIcon) {
-            if (previousIcon) {
-                this.element.removeClass(previousIcon);
+        _displayIcon: function(icon) {
+            if (this.previousIcon) {
+                this.element.removeClass(this.previousIcon);
             }
-            this.element.addClass(newIcon);
+            this.previousIcon = icon;
+            this.element.addClass(icon);
         },
 
         _startProcessingState: function() {
@@ -147,6 +150,7 @@ const state_reset_status = 4000; // 4 seconds
         _displayStatusError: function() {
             var self = this, o = this.options;
             if(o.hasStatus) {
+                this._elementStatus.removeClass('ok');
                 this._elementStatus.addClass('error');
             }
         },
@@ -155,6 +159,7 @@ const state_reset_status = 4000; // 4 seconds
             var self = this, o = this.options;
             if(o.hasStatus) {
                 this._elementStatus.addClass('ok');
+                this._elementStatus.removeClass('error');
             }
         },
 
@@ -162,6 +167,7 @@ const state_reset_status = 4000; // 4 seconds
             var self = this, o = this.options;
             if(o.hasStatus) {
                 this._elementStatus.removeClass('ok');
+                this._elementStatus.removeClass('error');
             }
         }
     });

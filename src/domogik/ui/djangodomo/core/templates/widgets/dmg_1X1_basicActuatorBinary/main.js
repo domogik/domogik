@@ -20,8 +20,8 @@
             this._super(params);
             var self = this, o = this.options, p = this.params;
             this.values = [p.model_parameters.value0, p.model_parameters.value1];
-            this.texts = [p.usage_parameters.text0, p.usage_parameters.text1];
-            this.setValue(null);
+            this.texts = [p.usage_parameters.state0, p.usage_parameters.state1];
+            this.setValue(null);            
         },
         
         action: function() {
@@ -48,7 +48,7 @@
         },
 
         setValue: function(value) {
-            if (value) {
+            if (value != null) {
                 if (value == 1 || value.toLowerCase() == this.values[1]) {
                     this.currentValue = 1;
                 } else {
@@ -63,13 +63,13 @@
 
         displayValue: function(value) {
             var self = this, o = this.options;
-            if (value) {
+            if (value != null) {
                 if (value == 1) {
                     this._displayIcon('binary_1');             
                 } else {
                     this._displayIcon('binary_0');             
                 }
-                this._writeStatus(o.texts[value]);
+                this._writeStatus(this.texts[value]);
             } else { // Unknown
                 this._displayIcon('unknown');                             
                 this._writeStatus('---');
@@ -84,7 +84,6 @@
         /* Valid the processing state */
         valid: function(confirmed) {
             this._super();
-            this.setvalue(this.processingValue);
         }
 
     });
