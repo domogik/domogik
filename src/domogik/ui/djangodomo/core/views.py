@@ -514,7 +514,7 @@ def show_area(request, area_id):
         result_house = House()
         
         events = Events()
-        for association in result_area_by_id.associations:
+        for association in result_area_by_id.area[0].associations:
             events.add(association)
         for room in result_rooms_by_area.room:
             for association in room.associations:
@@ -586,7 +586,7 @@ def show_room(request, room_id):
         result_house = House()
         
         events = Events()
-        for association in result_room_by_id.associations:
+        for association in result_room_by_id.room[0].associations:
             events.add(association)
         events_list = events.get_list()
 
