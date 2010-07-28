@@ -2,12 +2,17 @@
     display:block;
     outline: none;
     position:relative;
-    border: 1px solid #cccccc;
-    -moz-border-radius: 0.8em;
-    -webkit-border-radius: 0.8em;
     margin:0;
     -moz-user-select:none;
     -webkit-user-select:none;
+    -moz-box-sizing:border-box;
+    -webkit-box-sizing:border-box;
+}
+
+.widget.border {
+    border: 1px solid #cccccc;
+    -moz-border-radius: 0.8em;
+    -webkit-border-radius: 0.8em;
 }
 
 .widget .identity, .model .identity {

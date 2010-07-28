@@ -55,6 +55,9 @@ function get_widgets_options(id) {
 				.addClass(o.id)
 				.addClass('size' + o.width + 'x' + o.height)
                 .attr("tabindex", 0);
+            if (o.displayborder) {
+                this.element.addClass('border')
+            }
 			if (o.displayname) {
 	            this._identity = $("<canvas class='identity' width='60' height='60'></canvas>")
 	            this.element.append(this._identity);				
