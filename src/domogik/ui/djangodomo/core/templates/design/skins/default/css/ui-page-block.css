@@ -1,4 +1,5 @@
 .block {
+	display:inline-block;
     background-color:#eeeeee;
     width:32em;
     margin:1em 0 1em 1em;
