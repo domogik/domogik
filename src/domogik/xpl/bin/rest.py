@@ -3806,62 +3806,66 @@ class StatsManager(XplPlugin):
     Listen on the xPL network and keep stats of device and system state
     """
     def __init__(self, handler_params):
-        XplPlugin.__init__(self, 'statmgr')
-        cfg = Loader('domogik')
-        config = cfg.load()
-        cfg_db = dict(config[1])
-        directory = "%s/share/domogik/stats/" % cfg_db['custom_prefix']
 
-        # logging initialization
-        log = logger.Logger('rest-stat')
-        self._log_stats = log.get_logger()
-        self._log_stats.info("Rest Stat Manager initialisation...")
-
-        # logging initialization for unkwnon devices
-        log_unknown = logger.Logger('rest-stat-unknown-devices')
-        self._log_stats_unknown = log_unknown.get_logger()
-
-        files = glob.glob("%s/*/*xml" % directory)
-        stats = {}
-        self._db = DbHelper()
-
-        ### Rest data
-        self.handler_params = handler_params
-
-        self._event_requests = self.handler_params[0]._event_requests
-
-        ### Read xml files
-        res = {}
-        for _file in files :
-            self._log_stats.info("Parse file %s" % _file)
-            doc = minidom.parse(_file)
-            #Statistic/root node
-            technology = doc.documentElement.attributes.get("technology").value
-            schema_types = self.get_schemas_and_types(doc.documentElement)
-            self._log_stats.debug("Parsed : %s" % schema_types)
-            for schema in schema_types:
-                for type in schema_types[schema]:
-                    is_uniq = self.check_config_uniqueness(res, schema, type)
-                    if not is_uniq:
-                        self._log_stats.warning("Schema %s, type %s is already defined ! check your config." % (schema, type))
-                        self.force_leave()
-            if technology not in res:
-                res[technology] = {}
-                stats[technology] = {}
-            
-            for schema in schema_types:
-                if schema not in res[technology]:
-                    res[technology][schema] = {}
-                    stats[technology][schema] = {}
-                for type in schema_types[schema]:
-                    device, mapping, static_device = self.parse_mapping(doc.documentElement.getElementsByTagName("mapping")[0])
-                    res[technology][schema][type] = {"filter": 
-                            self.parse_listener(schema_types[schema][type].getElementsByTagName("listener")[0]),
-                            "mapping": mapping,
-                            "device": device,
-                            "static_device": static_device}
-            
-                    stats[technology][schema][type] = self._Stat(self._myxpl, res[technology][schema][type], technology, schema, type, self.handler_params)
+        try:
+            XplPlugin.__init__(self, 'statmgr')
+            cfg = Loader('domogik')
+            config = cfg.load()
+            cfg_db = dict(config[1])
+            directory = "%s/share/domogik/stats/" % cfg_db['custom_prefix']
+    
+            # logging initialization
+            log = logger.Logger('rest-stat')
+            self._log_stats = log.get_logger()
+            self._log_stats.info("Rest Stat Manager initialisation...")
+    
+            # logging initialization for unkwnon devices
+            log_unknown = logger.Logger('rest-stat-unknown-devices')
+            self._log_stats_unknown = log_unknown.get_logger()
+    
+            files = glob.glob("%s/*/*xml" % directory)
+            stats = {}
+            self._db = DbHelper()
+    
+            ### Rest data
+            self.handler_params = handler_params
+    
+            self._event_requests = self.handler_params[0]._event_requests
+    
+            ### Read xml files
+            res = {}
+            for _file in files :
+                self._log_stats.info("Parse file %s" % _file)
+                doc = minidom.parse(_file)
+                #Statistic/root node
+                technology = doc.documentElement.attributes.get("technology").value
+                schema_types = self.get_schemas_and_types(doc.documentElement)
+                self._log_stats.debug("Parsed : %s" % schema_types)
+                for schema in schema_types:
+                    for type in schema_types[schema]:
+                        is_uniq = self.check_config_uniqueness(res, schema, type)
+                        if not is_uniq:
+                            self._log_stats.warning("Schema %s, type %s is already defined ! check your config." % (schema, type))
+                            self.force_leave()
+                if technology not in res:
+                    res[technology] = {}
+                    stats[technology] = {}
+                
+                for schema in schema_types:
+                    if schema not in res[technology]:
+                        res[technology][schema] = {}
+                        stats[technology][schema] = {}
+                    for type in schema_types[schema]:
+                        device, mapping, static_device = self.parse_mapping(doc.documentElement.getElementsByTagName("mapping")[0])
+                        res[technology][schema][type] = {"filter": 
+                                self.parse_listener(schema_types[schema][type].getElementsByTagName("listener")[0]),
+                                "mapping": mapping,
+                                "device": device,
+                                "static_device": static_device}
+                
+                        stats[technology][schema][type] = self._Stat(self._myxpl, res[technology][schema][type], technology, schema, type, self.handler_params)
+        except :
+            self._log.error("%s" % self.get_exception())
 
     def get_schemas_and_types(self, node):
         """ Get the schema and the xpl message type
@@ -4010,23 +4014,32 @@ class StatsManager(XplPlugin):
 
             ### mapping processing
             for map in self._res["mapping"]:
+                print "MAP=%s" % map
+                print "MSG=%s" % message.data
                 # first : get value and default key
                 key = map["name"]
-                value = message.data[map["name"]]
-                if map["filter_key"] == None:
-                    key = map["name"]
-                    device_data.append({"key" : key, "value" : value})
-                    self._db.add_device_stat(current_date, key, value, d_id)
-                else:
-                    if map["filter_value"] != None and \
-                       map["filter_value"] == message.data[map["filter_key"]]:
-                        key = map["new_name"]
+                print "K=%s" % key
+                try:
+                    value = message.data[map["name"]]
+                    print "K/V=%s/%s" % (key, value)
+                    if map["filter_key"] == None:
+                        key = map["name"]
                         device_data.append({"key" : key, "value" : value})
                         self._db.add_device_stat(current_date, key, value, d_id)
                     else:
-                        if map["filter_value"] == None:
-                            self._log_stats.warning ("Stats : no filter_value defined in map : %s" % str(map))
-
+                        if map["filter_value"] != None and \
+                           map["filter_value"] == message.data[map["filter_key"]]:
+                            key = map["new_name"]
+                            device_data.append({"key" : key, "value" : value})
+                            self._db.add_device_stat(current_date, key, value, d_id)
+                        else:
+                            if map["filter_value"] == None:
+                                self._log_stats.warning ("Stats : no filter_value defined in map : %s" % str(map))
+                except KeyError:
+                    # no value in message for key
+                    # example : a x10 command = ON has no level value
+                    pass
+    
             # Put data in events queues
             self._event_requests.add_in_queues(d_id, 
                     {"device_id" : d_id, "data" : device_data})
