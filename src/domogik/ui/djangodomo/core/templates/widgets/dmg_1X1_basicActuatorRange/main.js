@@ -1,5 +1,5 @@
 (function($) {
-    $.ui.widget_1x1_extended.subclass ('ui.dmg_1x1_basicActuatorRange', {
+    $.create_widget_1x1_extended({
         // default options
         options: {
             version: 0.1,
@@ -15,13 +15,12 @@
             hasStatus: true
         },
 
-        widget: function(params) {
-            this._super(params);
-            var self = this, o = this.options, p = this.params;
-            this.min_value = parseInt(p.model_parameters.valueMin);
-            this.max_value = parseInt(p.model_parameters.valueMax);
-            this.step = parseInt(p.usage_parameters.step);
-            this.unit = p.usage_parameters.unit
+        _init: function() {
+            var self = this, o = this.options;
+            this.min_value = parseInt(o.model_parameters.valueMin);
+            this.max_value = parseInt(o.model_parameters.valueMax);
+            this.step = parseInt(o.usage_parameters.step);
+            this.unit = o.usage_parameters.unit
             this._indicator = $("<canvas class='indicator' width='110' height='110'></canvas>");
             this.element.append(this._indicator);
             this._button_max = this._addButtonIcon("range_max", "upright", "icon16-action-max", function (e) {self.max_range();e.stopPropagation();});
@@ -59,13 +58,13 @@
         },
         
         action: function() {
-            var self = this, o = this.options, p = this.params;
+            var self = this, o = this.options;
             if (this._processingValue != this.currentValue) {
-                $.getREST(['command', p.devicetechnology, p.deviceaddress, p.model_parameters.command, this._processingValue],
+                $.getREST(['command', o.devicetechnology, o.deviceaddress, o.model_parameters.command, this._processingValue],
                     function(data) {
                         var status = (data.status).toLowerCase();
                         if (status == 'ok') {
-                            self.valid(p.featureconfirmation);
+                            self.valid(o.featureconfirmation);
                         } else {
                             /* Error */
                             self.cancel();
@@ -92,7 +91,7 @@
         },
         
         setValue: function(value) {
-            var self = this, o = this.options, p = this.params;
+            var self = this, o = this.options;
             if (value) {
                 if (value >= this.min_value && value <= this.max_value) {
                     this.currentValue = value;
@@ -103,7 +102,7 @@
                 }
                 this._processingValue = this.currentValue;
                 var percent = (this.currentValue / (this.max_value - this.min_value)) * 100;
-                this._displayIcon('range_' + findRangeIcon(p.usage, percent));
+                this._displayIcon('range_' + findRangeIcon(o.usage, percent));
                 this._displayValue(this.currentValue);
             } else { // unknown
                 this._processingValue = 0;
@@ -113,27 +112,27 @@
         },
 
 		plus_range: function() {
-            var self = this, o = this.options, p = this.params;
+            var self = this, o = this.options;
 			var value = ((this._processingValue + this.step) / this.step) * this.step;
       		this._resetAutoClose();
 			this._setProcessingValue(value);
 		},
 		
 		minus_range: function() {
-            var self = this, o = this.options, p = this.params;
+            var self = this, o = this.options;
 			var value = ((this._processingValue - this.step) / this.step) * this.step;
       		this._resetAutoClose();
 			this._setProcessingValue(value);
 		},
 		
 		max_range: function() {
-            var self = this, o = this.options, p = this.params;
+            var self = this, o = this.options;
       		this._resetAutoClose();
 			this._setProcessingValue(this.max_value);
 		},
 		
 		min_range: function() {
-            var self = this, o = this.options, p = this.params;
+            var self = this, o = this.options;
       		this._resetAutoClose();
 			this._setProcessingValue(this.min_value);
 		},
@@ -147,7 +146,7 @@
 		},
         
         _displayValue: function(value) {
-            var self = this, o = this.options, p = this.params;
+            var self = this, o = this.options;
             if (value) {
     			this._writeStatus(value + this.unit);                
             } else { // Unknown
@@ -156,7 +155,7 @@
         },
         
 		_setProcessingValue: function(value) {
-            var self = this, o = this.options, p = this.params;
+            var self = this, o = this.options;
 			if (value >= this.min_value && value <= this.max_value) {
 				this._processingValue = value;
 			} else if (value < this.min_value) {
@@ -170,7 +169,7 @@
 		},
 
         _displayProcessingRange: function(percent) {
-            var self = this, o = this.options, p = this.params;
+            var self = this, o = this.options;
             this._processing_percent_final = percent;
             if (!this._processing_animation) {
                 this._animateProcessingRange();
@@ -178,7 +177,7 @@
         },
 
         _animateProcessingRange: function() {
-            var self = this, o = this.options, p = this.params;
+            var self = this, o = this.options;
             this._processing_animation = true;
             if (this._processing_percent_final < this._processing_percent_current) {
                 this._processing_percent_current--;
@@ -222,5 +221,4 @@
         }
         
     });
-    register_widget('actuator.range', 'dmg_1x1_basicActuatorRange');
 })(jQuery);

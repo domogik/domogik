@@ -1,5 +1,5 @@
 (function($) {
-    $.ui.widget_1x1_extended.subclass ('ui.dmg_1x1_basicSensorNumber', {
+    $.create_widget_1x1_extended({
         // default options
         options: {
             version: 0.1,
@@ -17,8 +17,7 @@
             namePosition: 'nametopleft'
         },
 
-        widget: function(params) {
-            this._super(params);
+        _init: function() {
             var self = this, o = this.options;
             /*            
             this._button_day = this._addButtonText("graph_day", "upright", "icon16-action-graph", "Day", function (e) {self._showGraphDay();e.stopPropagation();});
@@ -29,10 +28,10 @@
         },
 
         setValue: function(value, previous) {
-            var self = this, o = this.options, p = this.params;
+            var self = this, o = this.options;
             if (value) {
                 this._displayIcon('number');             
-                this._elementValue.html(value + '<br />' + p.model_parameters.unit)
+                this._elementValue.html(value + '<br />' + o.model_parameters.unit)
                 if (this.previousValue) {
                     if (value == this.previousValue) {
                         this._elementStatus.attr('class', 'status icon8-status-equal')
@@ -47,7 +46,7 @@
                 }
             } else { // Unknown
                 this._displayIcon('unknown');             
-                this._elementValue.html('--<br />' + p.model_parameters.unit)
+                this._elementValue.html('--<br />' + o.model_parameters.unit)
             }
             this.previousValue = value;
         },
@@ -170,7 +169,6 @@
             );
         }
     });
-    register_widget('sensor.number', 'dmg_1x1_basicSensorNumber');
 })(jQuery);
 
 /*

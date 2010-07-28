@@ -13,12 +13,11 @@ const state_reset_status = 4000; // 4 seconds
             namePosition: 'nametopleft'
         },
 
-        widget: function(params) {
-            this._super(params);
-            var self = this, o = this.options, p = this.params;
+        _init: function() {
+            var self = this, o = this.options;
             this.isOpen = false;
             this.element.addClass("widget_1x1_extended")
-                .addClass("icon32-usage-" + params.usage)
+                .addClass("icon32-usage-" + o.usage)
                 .processing();
             this._elementValue =  $("<div class='widget_value'></div>");
             this.element.append(this._elementValue);
@@ -28,7 +27,7 @@ const state_reset_status = 4000; // 4 seconds
                 this.element.append(this._elementBlur);
                 this.element.blur(function () {self.close();});                
                 this._elementClose = this._addButtonIcon("widget_close", "left", "icon32-action-cancel", function (e) {self.close();e.stopPropagation();});
-                this._elementName = $("<span class='name " + o.namePosition + "'>" + p.devicename + "<br/>" + p.featurename + "</span>");
+                this._elementName = $("<span class='name " + o.namePosition + "'>" + o.devicename + "<br/>" + o.featurename + "</span>");
                 this.element.append(this._elementName);
                 this.element.addClass('clickable');
                 this.element.click(function (e) {self._onclick();e.stopPropagation();})

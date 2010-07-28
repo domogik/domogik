@@ -1,5 +1,5 @@
 (function($) {
-    $.ui.widget_1x1_extended.subclass ('ui.dmg_1x1_basicActuatorBinary', {
+    $.create_widget_1x1_extended({
         // default options
         options: {
             version: 0.1,
@@ -16,16 +16,15 @@
             namePosition: 'nametop'
         },
 
-        widget: function(params) {
-            this._super(params);
-            var self = this, o = this.options, p = this.params;
-            this.values = [p.model_parameters.value0, p.model_parameters.value1];
-            this.texts = [p.usage_parameters.state0, p.usage_parameters.state1];
+        _init: function() {
+            var self = this, o = this.options;
+            this.values = [o.model_parameters.value0, o.model_parameters.value1];
+            this.texts = [o.usage_parameters.state0, o.usage_parameters.state1];
             this.setValue(null);            
         },
         
         action: function() {
-            var self = this, o = this.options, p = this.params;
+            var self = this, o = this.options;
             this._startProcessingState();
             if (this.currentValue) {
                 this.processingValue = (this.currentValue == 0)?1:0;                
@@ -33,11 +32,11 @@
                 // Suppose the switch currently off
                 this.processingValue = 1;
             }
-            $.getREST(['command', p.devicetechnology, p.deviceaddress, this.values[this.processingValue]],
+            $.getREST(['command', o.devicetechnology, o.deviceaddress, this.values[this.processingValue]],
                 function(data) {
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
-                        self.valid(p.featureconfirmation);
+                        self.valid(o.featureconfirmation);
                     } else {
                         /* Error */
                         self.cancel();
@@ -85,7 +84,5 @@
         valid: function(confirmed) {
             this._super();
         }
-
     });
-    register_widget('actuator.binary', 'dmg_1x1_basicActuatorBinary');
 })(jQuery);

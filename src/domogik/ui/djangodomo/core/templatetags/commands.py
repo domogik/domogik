@@ -43,7 +43,7 @@ def unescape(s):
 class GetActuator(Node):
     @staticmethod
     def get_widget(associationid, widgetid, feature, device_type, device_usage, parameters_type, parameters_usage):
-        script = """$('#widget_%s').%s().%s('widget',{
+        script = """$('#widget_%s').%s({
                         usage: %s,
                         devicename: '%s',
                         featurename: '%s',
@@ -54,7 +54,7 @@ class GetActuator(Node):
                         model_parameters: %s
                     });
                     """ % (associationid, widgetid,
-                           widgetid, feature.device.device_usage_id,
+                           feature.device.device_usage_id,
                            feature.device.name, feature.device_feature_model.name,
                            device_type.device_technology_id, feature.device.address,
                            feature.device_feature_model.return_confirmation,
@@ -71,7 +71,7 @@ class GetActuator(Node):
 class GetSensor():
     @staticmethod
     def get_widget(associationid, widgetid, feature, device_type, device_usage, parameters_type, parameters_usage):
-        script = """$("#widget_%s").%s().%s('widget',{
+        script = """$("#widget_%s").%s({
                             usage: %s,
                             devicename: '%s',
                             featurename: '%s',
@@ -81,7 +81,7 @@ class GetSensor():
                             model_parameters: %s
                         });
                  """ % (associationid, widgetid,
-                        widgetid, feature.device.device_usage_id,
+                        feature.device.device_usage_id,
                         feature.device.name, feature.device_feature_model.name,
                         feature.device_id, feature.device_feature_model.stat_key,
                         simplejson.dumps(parameters_usage['sensor'][feature.device_feature_model.value_type]),
