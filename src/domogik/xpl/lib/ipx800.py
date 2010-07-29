@@ -133,7 +133,7 @@ class IPX:
         # change status
         url = self.url_cgi_change + str(num)
         try:
-            tricky = urllib2.urlopen("http://192.168.0.10/")
+            #tricky = urllib2.urlopen("http://192.168.0.10/")
             resp = urllib2.urlopen(url)
         except IOError as e:
             error = "Error while accessing to '%s' : %s" % (self.url_status, traceback.format_exc())
@@ -160,7 +160,7 @@ class IPX:
         # send pulse
         url = self.url_cgi_pulse + str(num)
         try:
-            tricky = urllib2.urlopen("http://192.168.0.10/")
+            #tricky = urllib2.urlopen("http://192.168.0.10/")
             resp = urllib2.urlopen(url)
         except IOError as e:
             error = "Error while accessing to '%s' : %s" % (self.url_status, traceback.format_exc())
@@ -189,7 +189,7 @@ class IPX:
         # send reset order
         url = self.url_cgi_reset_counter + str(num)
         try:
-            tricky = urllib2.urlopen("http://192.168.0.10/")
+            #tricky = urllib2.urlopen("http://192.168.0.10/")
             resp = urllib2.urlopen(url)
         except IOError as e:
             error = "Error while accessing to '%s' : %s" % (self.url_status, traceback.format_exc())
@@ -244,7 +244,7 @@ class IPX:
                            number of relay, input (ana and digi)
         """
         try:
-            tricky = urllib2.urlopen("http://192.168.0.10/")
+            #tricky = urllib2.urlopen("http://192.168.0.10/")
             resp = urllib2.urlopen(self.url_status)
         except IOError as e:
             error = "Error while accessing to '%s' : %s" % (self.url_status, traceback.format_exc())
