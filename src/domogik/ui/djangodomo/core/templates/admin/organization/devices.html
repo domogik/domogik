@@ -53,17 +53,9 @@
             tipsid: 'tipsAddDevice',
             fields: [
                 {name : 'adddevicename', type:'text', label:'Name', required: true, option: {min: 1, max: 80}},
-                {name : 'adddevicedescription', type:'text', label:'Description', required: false, option: {min: 1, max: 80}},
                 {name : 'adddeviceaddress', type:'text', label:'Address', required: true, option: {min: 1, max: 80}},
+                {name : 'adddevicedescription', type:'text', label:'Description', required: false, option: {min: 1, max: 80}},
                 {name : 'adddevicereference', type:'text', label:'Reference', required: false, option: {min: 1, max: 80}},
-                {name : 'adddeviceusage', type:'select', label:'Usage', required: true, option: {
-                    initial: {value:'0', label:'Choose a usage'},
-                    options: [
-                    {% for usage in usages_list %}
-                        {value:'{{ usage.id }}', label: '{{ usage.name }}'},
-                    {% endfor %}
-                    ]
-                }},
                 {name : 'adddevicetype', type:'selectipod', label:'Type', required: true, option: {
                     initial: {value:'0', label:'Choose a device type'},
                     options: [
@@ -79,6 +71,14 @@
                         {% endfor %}
                     ]
                 }}
+                {name : 'adddeviceusage', type:'select', label:'Usage', required: true, option: {
+                    initial: {value:'0', label:'Choose a usage'},
+                    options: [
+                    {% for usage in usages_list %}
+                        {value:'{{ usage.id }}', label: '{{ usage.name }}'},
+                    {% endfor %}
+                    ]
+                }},
             ]
         });
 
@@ -87,8 +87,8 @@
             tipsid: 'tipsUpdDevice',
             fields: [
                 {name : 'upddevicename', type:'text', label:'Name', required: true, option: {min: 1, max: 80}},
-                {name : 'upddevicedescription', type:'text', label:'Description', required: false, option: {min: 1, max: 80}},
                 {name : 'upddeviceaddress', type:'text', label:'Address', required: true, option: {min: 1, max: 80}},
+                {name : 'upddevicedescription', type:'text', label:'Description', required: false, option: {min: 1, max: 80}},
                 {name : 'upddevicereference', type:'text', label:'Reference', required: false, option: {min: 1, max: 80}},
                 {name : 'upddeviceusage', type:'select', label:'Usage', required: true, option: {
                     initial: {value:'0', label:'Choose a usage'},

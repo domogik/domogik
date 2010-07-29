@@ -44,6 +44,7 @@ header#contentheader {
 }
 
 #mainsection .mainactions {
+    position:relative;
     margin:0;
     padding:1em;
     height:6em;
@@ -52,6 +53,7 @@ header#contentheader {
 }
 
 .subsection .mainactions {
+    position:relative;
     margin:0;
     padding:1em;
     height:6em;

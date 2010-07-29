@@ -5,4 +5,5 @@
 .dmg_1x1_minimalSensorNumber .widget_value{
     font-size:1.4em;
     font-weight:bold;
+    position:absolute;
 }
