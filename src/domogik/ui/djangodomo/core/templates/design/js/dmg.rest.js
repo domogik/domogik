@@ -96,13 +96,8 @@ $.extend({
             type: "GET",
             url: url,
             dataType: "jsonp",
-            timeout: 120000, // 2 minute
             error: function (xOptions, textStatus) {
-                if (textStatus == 'timeout') {
-                    $.eventRequest(devices, events);                    
-                } else {
-                    $.notification('error', 'Event update : Lost REST server connection');
-                }
+                $.notification('error', 'Event update : Lost REST server connection');
             },
             success: function (data) {
                 var status = (data.status).toLowerCase();
@@ -126,13 +121,8 @@ $.extend({
             type: "GET",
             url: url,
             dataType: "jsonp",
-            timeout: 120000, // 2 minute
             error: function (xOptions, textStatus) {
-                if (textStatus == 'timeout') {
-                    $.eventUpdate(ticket, events);                    
-                } else {
-                    $.notification('error', 'Event update : Lost REST server connection');
-                }
+                $.notification('error', 'Event update : Lost REST server connection');
             },
             success: function (data) {
                 var status = (data.status).toLowerCase();
