@@ -1,8 +1,18 @@
+#contentheader {
+    text-align:right;
+}
+
+h1 {
+    float:left;
+}
+
 ul.infos {
     border:1px solid #cccccc;
     -moz-border-radius: 0.8em;
     -webkit-border-radius: 0.8em;
     padding:1em;
+    display: inline-block;
+    text-align:left;
 }
 
 ul.infos .label {

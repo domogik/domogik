@@ -79,7 +79,6 @@
         function saveUIConfig() {
             if (finishedactions == totalactions) {
                 if (erroractions == 0) {
-                console.log(json);
                     var jsonstr = JSON.stringify(json).replace(/"/g, '&quot;');
                     $.getREST(['base', 'ui_config', 'set', 'name', 'house', 'reference', '0', 'key', 'widgets', 'value', jsonstr],
                         function(data) {

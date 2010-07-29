@@ -192,22 +192,21 @@ $(function(){
         <br />
         <span class="subtitle">{{ plugin.description }}</span>
     </h1>
-        <ul class='infos'>
-            <li><span class='label'>{% trans "Version" %}:</span> {{ plugin.version }}</li>
-            <li><span class='label'>{% trans "Documentation" %}:</span> <a href='{{ plugin.documentation }}'>Wiki</a></li>
-            <li><span class='label'>{% trans "Host" %}:</span> {{ plugin.host }}</li>
-            {% ifnotequal plugin.name "rest" %}
-                <li><span class='label'>{% trans "Technology" %}:</span> {{ plugin.technology }}</li>
-                <li>
-                {% ifequal plugin.status "ON" %}
-                    <div class='icon16-text-right icon16-status-active'><span class='label'>{% trans "Status" %}:</span><span class='offscreen'>{% trans "Running" %}</span></div>
-                {% else %}
-                    <div class='icon16-text-right icon16-status-inactive'><span class='label'>{% trans "Status" %}:</span><span class='offscreen'>{% trans "Stopped" %}</span></div>                        
-                {% endifequal %}
-                </li>
-            {% endifnotequal %}
-        </ul>
-    <div class='clear'></div>
+    <ul class='infos'>
+        <li><span class='label'>{% trans "Version" %}:</span> {{ plugin.version }}</li>
+        <li><span class='label'>{% trans "Documentation" %}:</span> <a href='{{ plugin.documentation }}'>Wiki</a></li>
+        <li><span class='label'>{% trans "Host" %}:</span> {{ plugin.host }}</li>
+        {% ifnotequal plugin.name "rest" %}
+            <li><span class='label'>{% trans "Technology" %}:</span> {{ plugin.technology }}</li>
+            <li>
+            {% ifequal plugin.status "ON" %}
+                <div class='icon16-text-right icon16-status-active'><span class='label'>{% trans "Status" %}:</span><span class='offscreen'>{% trans "Running" %}</span></div>
+            {% else %}
+                <div class='icon16-text-right icon16-status-inactive'><span class='label'>{% trans "Status" %}:</span><span class='offscreen'>{% trans "Stopped" %}</span></div>                        
+            {% endifequal %}
+            </li>
+        {% endifnotequal %}
+    </ul>
 {% endblock %}
 
 {% block right %}
