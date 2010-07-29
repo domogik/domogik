@@ -33,7 +33,7 @@ $(function(){
                 function(data) {
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
-                        $.reloadPage({'status': 'ok', 'msg': '{% trans "Plugin" %}\'{{ plugin.name }}\' {% trans "successfully stopped" %}'});
+//                        $.reloadPage({'status': 'ok', 'msg': '{% trans "Plugin" %}\'{{ plugin.name }}\' {% trans "successfully stopped" %}'});
                     } else {
                         $.notification('error', '{% trans "Plugin not stopped" %} (' + data.description + ')');
                     }
@@ -47,7 +47,7 @@ $(function(){
                 function(data) {
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
-                        $.reloadPage({'status': 'ok', 'msg': '{% trans "Plugin" %}\'{{ plugin.name }}\' {% trans "successfully started" %}'});
+//                        $.reloadPage({'status': 'ok', 'msg': '{% trans "Plugin" %}\'{{ plugin.name }}\' {% trans "successfully started" %}'});
                     } else {
                         $.notification('error', '{% trans "Plugin not started" %} (' + data.description + ')');
                     }
@@ -179,6 +179,7 @@ $(function(){
 });
 {% endblock %}
 {% block css %}
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/page-admin-plugins.css" rel="stylesheet" type="text/css" />
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-tables.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block js_include %}
@@ -191,31 +192,32 @@ $(function(){
         <br />
         <span class="subtitle">{{ plugin.description }}</span>
     </h1>
+        <ul class='infos'>
+            <li><span class='label'>{% trans "Version" %}:</span> {{ plugin.version }}</li>
+            <li><span class='label'>{% trans "Documentation" %}:</span> <a href='{{ plugin.documentation }}'>Wiki</a></li>
+            <li><span class='label'>{% trans "Host" %}:</span> {{ plugin.host }}</li>
+            {% ifnotequal plugin.name "rest" %}
+                <li><span class='label'>{% trans "Technology" %}:</span> {{ plugin.technology }}</li>
+                <li>
+                {% ifequal plugin.status "ON" %}
+                    <div class='icon16-text-right icon16-status-active'><span class='label'>{% trans "Status" %}:</span><span class='offscreen'>{% trans "Running" %}</span></div>
+                {% else %}
+                    <div class='icon16-text-right icon16-status-inactive'><span class='label'>{% trans "Status" %}:</span><span class='offscreen'>{% trans "Stopped" %}</span></div>                        
+                {% endifequal %}
+                </li>
+            {% endifnotequal %}
+        </ul>
+    <div class='clear'></div>
 {% endblock %}
 
 {% block right %}
     <section class="subsection">
         <h2>{% trans "Basic Control" %}</h2>
-        <ul>
-            <li>{% trans "Version" %}: {{ plugin.version }}</li>
-            <li>{% trans "Documentation" %}: <a href='{{ plugin.documentation }}'>Wiki</a></li>
-            <li>{% trans "Host" %}: {{ plugin.host }}</li>
-            {% ifnotequal plugin.name "rest" %}
-                <li>{% trans "Technology" %}: {{ plugin.technology }}</li>
-                <li>
-                {% ifequal plugin.status "ON" %}
-                    <div class='icon16-text-right icon16-status-active'>{% trans "Status" %}:<span class='offscreen'>{% trans "Running" %}</span></div>
-                {% else %}
-                    <div class='icon16-text-right icon16-status-inactive'>{% trans "Status" %}:<span class='offscreen'>{% trans "Stopped" %}</span></div>                        
-                {% endifequal %}
-                </li>
-            {% endifnotequal %}
-        </ul>
         {% ifnotequal plugin.name "rest" %}
             {% ifequal plugin.status "ON" %}
-                <button id='buttonstatus' class='button icon16-status-inactive'>{% trans "Stop" %}</button>
+                <button id='buttonstatus' class='button icon16-status-inactive'>{% trans "Stop plugin" %}</button>
             {% else %}
-                <button id='buttonstatus' class='button icon16-status-active'>{% trans "Start" %}</button>
+                <button id='buttonstatus' class='button icon16-status-active'>{% trans "Start plugin" %}</button>
             {% endifequal %}
         {% endifnotequal %}
     </section>
