@@ -28,7 +28,7 @@ $(function(){
     
     {% ifequal plugin.status "ON" %}
         $("#buttonstatus").click(function() {
-            $("#buttonstatus").attr('className', 'button icon16-action-loading');
+            $("#buttonstatus").attr('className', 'button icon16-action-processing_f6f6f6');
             $.getREST(['plugin', 'stop', '{{ plugin.name }}'],
                 function(data) {
                     var status = (data.status).toLowerCase();
@@ -42,7 +42,7 @@ $(function(){
         });
     {% else %}
         $("#buttonstatus").click(function() {
-            $("#buttonstatus").attr('className', 'button icon16-action-loading');
+            $("#buttonstatus").attr('className', 'button icon16-action-processing_f6f6f6');
             $.getREST(['plugin', 'start', '{{ plugin.name }}'],
                 function(data) {
                     var status = (data.status).toLowerCase();

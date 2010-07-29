@@ -328,8 +328,6 @@
 .icon16-action-add { background-image:url(../images/action/plus_16.png);}
 .icon16-action-del { background-image:url(../images/action/minus_16.png);}
 .icon16-action-update { background-image:url(../images/action/pen_16.png);}
-.icon16-action-next { background-image:url(../images/action/right_16.png);}
-.icon16-action-previous { background-image:url(../images/action/left_16.png);}
 .icon16-action-submit { background-image:url(../images/status/check_16.png);}
 .icon32-action-submit { background-image:url(../images/status/check_32.png);}
 .icon16-action-cancel { background-image:url(../images/status/wrong_16.png);}
@@ -337,12 +335,24 @@
 .icon16-action-password { background-image:url(../images/action/key_16.png);}
 .icon16-action-save { background-image:url(../images/action/save_16.png);}
 .icon16-action-reset { background-image:url(../images/action/refresh_16.png);}
-.icon16-action-loading { background-image:url(../images/action/loading_16.gif);}
 .icon16-action-graph { background-image:url(../images/action/graph_16.png);}
 .icon16-action-menu { background-image:url(../images/action/menu_16.png);}
 .icon16-action-customize { background-image:url(../images/action/customize_16.png);}
 .icon32-action-customize { background-image:url(../images/action/customize_32.png);}
 .icon64-action-customize { background-image:url(../images/action/customize_64.png);}
+
+.icon16-action-next { background-image:url(../images/action/right_16.png);}
+.icon16-action-previous { background-image:url(../images/action/left_16.png);}
+.icon16-action-up { background-image:url(../images/action/up_16.png);}
+.icon16-action-down { background-image:url(../images/action/down_16.png);}
+
+.icon16-action-processing_f6f6f6 { background-image:url(../images/action/processing_f6f6f6_16.gif);}
+.icon32-action-processing_f6f6f6 { background-image:url(../images/action/processing_f6f6f6_32.gif);}
+.icon64-action-processing_f6f6f6 { background-image:url(../images/action/processing_f6f6f6_64.gif);}
+
+.icon16-action-processing_ffffff { background-image:url(../images/action/processing_ffffff_16.gif);}
+.icon32-action-processing_ffffff { background-image:url(../images/action/processing_ffffff_32.gif);}
+.icon64-action-processing_ffffff { background-image:url(../images/action/processing_ffffff_64.gif);}
 
 /* technology icons */
 .icon64-technology-x10 {background-image:url(../../../images/technologies/x10_64.png);}

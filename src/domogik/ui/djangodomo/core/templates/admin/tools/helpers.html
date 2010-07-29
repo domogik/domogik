@@ -33,6 +33,9 @@
 		function sendfunction() {
             var commandline = $("#commandline").val();
             if (commandline) {
+                $("#commandsubmit").attr('className', 'button icon16-action-processing_ffffff')
+                    .attr('disabled', 'disabled');
+                $("#commandline").attr('disabled', 'disabled');
 				var li = $("<li class='command'>" + commandline + "</li>");
 				var last = li;
 				li.focus();
@@ -44,7 +47,9 @@
                 $.getREST(command,
                     function(data) {
                         var status = (data.status).toLowerCase();
-//                      $("#housename").addClass('icon16-status-true');
+                        $("#commandsubmit").attr('className', 'button icon16-action-down')
+                            .removeAttr('disabled');
+                        $("#commandline").removeAttr('disabled');
 						if (status == 'ok') {
 							$.each(data.helper, function(index, value) {
 								var text = $("<div/>").text(value).html();
