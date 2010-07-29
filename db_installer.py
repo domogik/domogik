@@ -146,6 +146,9 @@ db.add_actuator_feature_model(af_name='Switch', af_device_type_id=device_type.id
                               af_parameters='{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;low&quot;, &quot;value1&quot;:&quot;high&quot;}',
                               af_value_type='binary', af_stat_key='command',
                               af_return_confirmation=True)
+db.add_actuator_feature_model(af_name='Trigger', af_device_type_id=device_type.id,
+                              af_parameters='{&quot;command&quot;:&quot;pulse&quot;}',af_value_type='trigger',
+                              af_return_confirmation=True)
 # TODO : voltmeter, logical_input, counter
 
 # Create device technology features for Computer
