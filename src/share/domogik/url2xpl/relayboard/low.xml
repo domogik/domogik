@@ -1,9 +1,9 @@
 <technology id="relayboard">
-  <command name="on">
+  <command name="low">
     <schema>control.basic</schema>
     <command-key>current</command-key>    
     <address-key>device</address-key>    
-    <command-xpl-value>HIGH</command-xpl-value>
+    <command-xpl-value>LOW</command-xpl-value>
     <parameters>
       <parameter key="type" value="output"/>          
     </parameters>
@@ -13,7 +13,7 @@
     <xpltype>xpl-trig</xpltype>
     <filter>
       <key name="type" value="output" />
-      <key name="current" value="HIGH" />
+      <key name="current" value="LOW" />
       <key name="device" value="@address@"/>
     </filter>
   </listener>

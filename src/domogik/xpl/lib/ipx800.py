@@ -100,7 +100,6 @@ class IPX:
         # setting status will raise an error if no access to status.xml
         print("Opening board : %s" % (host))
         self.get_status(first = True)
-        print "tic!"
 
 
     def listen(self, interval):
@@ -108,7 +107,6 @@ class IPX:
             @param interval : interval between each read of status
         """
         while True:
-            print "tac! %s" % interval
             self.get_status()
             time.sleep(interval)
 
@@ -126,6 +124,10 @@ class IPX:
            actual == IPX_LED_LOW and state == "LOW":
             # no need to change status
             print("No need to change 'led%s' status to '%s'" % (num, state))
+            # no change but you should send a xpl-trig to tell that the order was received
+            self.send_change({'elt' : 'led',
+                              'num' : num,
+                              'value' : actual})
             return
 
         # change status
@@ -263,7 +265,7 @@ class IPX:
 
         # List each status
         self.get_status_of(dom, "led", first)
-        print "LED=%s" % self.led
+        #print "LED=%s" % self.led
         self.get_status_of(dom, "btn", first)
         #print "BTN=%s" % self.btn
         self.get_status_of(dom, "an", first)
