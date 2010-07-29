@@ -117,7 +117,7 @@ class IPXManager(XplPlugin):
         self._log.info("Plugin ready :)")
 
 
-    def send_xpl(self, device, type, current):
+    def send_xpl(self, device, current, type):
         # Send xpl-trig to give status change
         msg = XplMessage()
         msg.set_type("xpl-trig")
@@ -142,9 +142,8 @@ class IPXManager(XplPlugin):
         elt = data_name[1][0:-1]
         num = int(data_name[1][-1])
 
-        if not hasattr(self.ipx_list, ipx_name):
+        if not ipx_name in self.ipx_list:
             self._log.warning("No IPX800 board called '%s' defined" % ipx_name)
-            print "perdu"
             return
 
         # check data
