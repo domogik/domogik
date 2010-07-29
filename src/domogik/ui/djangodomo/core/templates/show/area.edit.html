@@ -132,8 +132,8 @@
         }
         
         {% for association in area.associations %}
-            $("#model_{{ association.id }}").{{ association.widget_id }}()
-                .{{ association.widget_id }}('model', {
+            $("#model_{{ association.id }}").widget_model({
+                    id: '{{ association.widget_id }}',
                     featurevalue: '{{ association.feature.id }}',
                     featurename: '{{ association.feature.device_feature_model.name }}',
                     devicename: '{{ association.feature.device.name }}'

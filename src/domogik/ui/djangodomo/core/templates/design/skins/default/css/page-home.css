@@ -45,6 +45,10 @@ ul.roomslist {
     margin-left:240px;
 }
 
+ul.houselist {
+    display:inline-block;
+}
+
 li.areaitem {
     background-color:#eeeeee;
     margin:1em;

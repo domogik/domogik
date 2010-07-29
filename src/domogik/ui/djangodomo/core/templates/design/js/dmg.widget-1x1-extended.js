@@ -13,12 +13,11 @@ const state_reset_status = 4000; // 4 seconds
             namePosition: 'nametopleft'
         },
 
-        widget: function(params) {
-            this._super(params);
-            var self = this, o = this.options, p = this.params;
+        _init: function() {
+            var self = this, o = this.options;
             this.isOpen = false;
             this.element.addClass("widget_1x1_extended")
-                .addClass("icon32-usage-" + params.usage)
+                .addClass("icon32-usage-" + o.usage)
                 .processing();
             this._elementValue =  $("<div class='widget_value'></div>");
             this.element.append(this._elementValue);
@@ -28,7 +27,7 @@ const state_reset_status = 4000; // 4 seconds
                 this.element.append(this._elementBlur);
                 this.element.blur(function () {self.close();});                
                 this._elementClose = this._addButtonIcon("widget_close", "left", "icon32-action-cancel", function (e) {self.close();e.stopPropagation();});
-                this._elementName = $("<span class='name " + o.namePosition + "'>" + p.devicename + "<br/>" + p.featurename + "</span>");
+                this._elementName = $("<span class='name " + o.namePosition + "'>" + o.devicename + "<br/>" + o.featurename + "</span>");
                 this.element.append(this._elementName);
                 this.element.addClass('clickable');
                 this.element.click(function (e) {self._onclick();e.stopPropagation();})
@@ -118,14 +117,17 @@ const state_reset_status = 4000; // 4 seconds
                 this.element.doTimeout( 'resetStatus', state_reset_status, function(){
                     self._displayResetStatus();
                 });
+            } else {
+                self._displayResetStatus();                
             }
         },
 
-        _displayIcon: function(newIcon, previousIcon) {
-            if (previousIcon) {
-                this.element.removeClass(previousIcon);
+        _displayIcon: function(icon) {
+            if (this.previousIcon) {
+                this.element.removeClass(this.previousIcon);
             }
-            this.element.addClass(newIcon);
+            this.previousIcon = icon;
+            this.element.addClass(icon);
         },
 
         _startProcessingState: function() {
@@ -147,6 +149,7 @@ const state_reset_status = 4000; // 4 seconds
         _displayStatusError: function() {
             var self = this, o = this.options;
             if(o.hasStatus) {
+                this._elementStatus.removeClass('ok');
                 this._elementStatus.addClass('error');
             }
         },
@@ -155,6 +158,7 @@ const state_reset_status = 4000; // 4 seconds
             var self = this, o = this.options;
             if(o.hasStatus) {
                 this._elementStatus.addClass('ok');
+                this._elementStatus.removeClass('error');
             }
         },
 
@@ -162,6 +166,7 @@ const state_reset_status = 4000; // 4 seconds
             var self = this, o = this.options;
             if(o.hasStatus) {
                 this._elementStatus.removeClass('ok');
+                this._elementStatus.removeClass('error');
             }
         }
     });

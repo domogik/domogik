@@ -9,15 +9,22 @@
             var self = this, o = this.options;
             this.element.empty();
             var widgets = get_widgets(o.type);
-            $.each(widgets, function(index, id){
-                var model = $("<li>1x1</li>");
-                var woptions = {
+            $.each(widgets, function(index, id) {
+                var woptions = get_widgets_options(id);
+                var widget = $("<li></li>");
+                var name = $("<div class='name'>" + woptions.name + "</div>");
+                widget.append(name);
+                var name = $("<div class='description'>" + woptions.description + "</div>");
+                widget.append(name);
+                var ul = $("<ul></ul>");
+                widget.append(ul);                
+                var model = $("<li></li>");
+                model.widget_model({
+                    id: id,
                     featurevalue: o.featurevalue,
                     featurename: o.featurename,
                     devicename: o.devicename
-                }
-                eval("model." + id + "();");
-                eval("model." + id + "('model', woptions);");
+                });
                 model.draggable({
                     helper: "clone",
                     revert: 'invalid',
@@ -35,12 +42,47 @@
                         }
                     }
                 });
-                self.element.append(model); 
+                ul.append(model);
+                self.element.append(widget); 
             });
         },
 	
         update: function() {
             this._init();
+        }
+    });
+    
+    $.ui.widget.subclass("ui.widget_model", {
+        // default options
+        options: {
+        },
+
+        _init: function() {
+            var self = this, o = this.options;
+            var woptions = get_widgets_options(o.id)
+            if (woptions) {
+                o = $.extend ({}, woptions, o);
+            }
+
+            this.element.addClass('model')
+			    .attr("widgetid", o.id)
+				.addClass('size' + o.width + 'x' + o.height)
+                .attr("tabindex", 0)
+	            .attr('featurevalue', o.featurevalue)
+                .text(o.width + 'x' + o.height);
+			this._identity = $("<canvas class='identity' width='60' height='60'></canvas>")
+			this.element.append(this._identity);				
+			var canvas = this._identity.get(0);
+			if (canvas.getContext){
+				var ctx = canvas.getContext('2d');
+				ctx.beginPath();
+				ctx.font = "6pt Arial";
+				ctx.textBaseline = "top"
+				ctx.fillText(o.devicename, 15, 5);
+				ctx.translate(5,60);
+				ctx.rotate(-(Math.PI/2));
+				ctx.fillText(o.featurename, 0, 0);  
+			}
         }
     });
 })(jQuery);

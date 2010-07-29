@@ -57,27 +57,11 @@
             {% get_widget_init association.id association.widget_id association.feature %}
         {% endfor %}
 
-        {% if house.associations %}
-            {% regroup house.associations|dictsort:"feature.device_id" by feature.device as devices %}
-            var devices = [{% for device in devices %}{{ device.grouper.id }}{% if not forloop.last %},{% endif %}{% endfor %}];
-            $.eventRequest(devices, function(event) {
-                switch(event.device_id) {
-                {% regroup house.associations|dictsort:"feature.device_id" by feature.device as devices %}
-                {% for device in devices %}
-                    case {{ device.grouper.id }}:
-                        $.each(event.data, function(index, item) {
-                            switch (item.key) {                        
-                            {% for association in device.list %}
-                                case '{{ association.feature.device_feature_model.stat_key }}':
-                                    {% get_widget_update association.id association.widget_id association.feature 'item.value' %}
-                                    break;
-                            {% endfor %}                    
-                            }
-                        });
-                        break;
-                {% endfor %}
-                }
-            });
+        {% regroup events|dictsort:"device_id" by device_id as devices %}
+        {% if devices %}
+            var devices = [{% for device in devices %}{{ device.grouper }}{% if not forloop.last %},{% endif %}{% endfor %}];
+            var events = [{% for event in events %}{%autoescape off%}{{ event }}{%endautoescape%}{% if not forloop.last %},{% endif %}{% endfor %}];
+            $.eventRequest(devices, events);
         {% endif %}
     });
 {% endblock %}
@@ -113,25 +97,35 @@
         </section>
     </div>
     <div class="columnright">
+    <ul class='areaslist'>
+		<li class='areaitem'>
+			<ul class='houselist'>
+				{% for room in rooms_list %}
+					<li class='roomitem'>
+						<a href='{% url show_room_view room.id %}' class="identelement icon64-room-{{ room.config.icon }}">
+							<span class="title">{{ room.name }}</span>
+						</a>
+					</li>
+				{% endfor %}
+			</ul>
+		</li>
     {% for area in areas_list %}
-        <ul class='areaslist'>
-            <li class='areaitem'>
-                <a href='{% url show_area_view area.id %}' class="identelement icon64-area-{{ area.config.icon }}">
-                    <span class="title">{{ area.name }}</span>
-                </a>
-                <ul class='roomslist'>
-                    {% for room in area.room %}
-                        <li class='roomitem'>
-                            <a href='{% url show_room_view room.id %}' class="identelement icon64-room-{{ room.config.icon }}">
-                                <span class="title">{{ room.name }}</span>
-                            </a>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </li>
-        </ul>
+		<li class='areaitem'>
+			<a href='{% url show_area_view area.id %}' class="identelement icon64-area-{{ area.config.icon }}">
+				<span class="title">{{ area.name }}</span>
+			</a>
+			<ul class='roomslist'>
+				{% for room in area.room %}
+					<li class='roomitem'>
+						<a href='{% url show_room_view room.id %}' class="identelement icon64-room-{{ room.config.icon }}">
+							<span class="title">{{ room.name }}</span>
+						</a>
+					</li>
+				{% endfor %}
+			</ul>
+		</li>
     {% empty %}
-        <p>{% trans "No areas or rooms configured yet" %}</p>
+        <li>{% trans "No areas or rooms configured yet" %}</li>
     {% endfor %}
     </div>
     <div class='clear'></div>

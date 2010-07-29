@@ -1,5 +1,5 @@
 (function($) {
-    $.ui.widget_1x1_extended.subclass ('ui.dmg_1x1_basicActuatorBinary', {
+    $.create_widget_1x1_extended({
         // default options
         options: {
             version: 0.1,
@@ -16,16 +16,15 @@
             namePosition: 'nametop'
         },
 
-        widget: function(params) {
-            this._super(params);
-            var self = this, o = this.options, p = this.params;
-            this.values = [p.model_parameters.value0, p.model_parameters.value1];
-            this.texts = [p.usage_parameters.text0, p.usage_parameters.text1];
-            this.setValue(null);
+        _init: function() {
+            var self = this, o = this.options;
+            this.values = [o.model_parameters.value0, o.model_parameters.value1];
+            this.texts = [o.usage_parameters.state0, o.usage_parameters.state1];
+            this.setValue(null);            
         },
         
         action: function() {
-            var self = this, o = this.options, p = this.params;
+            var self = this, o = this.options;
             this._startProcessingState();
             if (this.currentValue) {
                 this.processingValue = (this.currentValue == 0)?1:0;                
@@ -33,11 +32,11 @@
                 // Suppose the switch currently off
                 this.processingValue = 1;
             }
-            $.getREST(['command', p.devicetechnology, p.deviceaddress, this.values[this.processingValue]],
+            $.getREST(['command', o.devicetechnology, o.deviceaddress, this.values[this.processingValue]],
                 function(data) {
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
-                        self.valid(p.featureconfirmation);
+                        self.valid(o.featureconfirmation);
                     } else {
                         /* Error */
                         self.cancel();
@@ -48,7 +47,7 @@
         },
 
         setValue: function(value) {
-            if (value) {
+            if (value != null) {
                 if (value == 1 || value.toLowerCase() == this.values[1]) {
                     this.currentValue = 1;
                 } else {
@@ -63,13 +62,13 @@
 
         displayValue: function(value) {
             var self = this, o = this.options;
-            if (value) {
+            if (value != null) {
                 if (value == 1) {
                     this._displayIcon('binary_1');             
                 } else {
                     this._displayIcon('binary_0');             
                 }
-                this._writeStatus(o.texts[value]);
+                this._writeStatus(this.texts[value]);
             } else { // Unknown
                 this._displayIcon('unknown');                             
                 this._writeStatus('---');
@@ -84,9 +83,6 @@
         /* Valid the processing state */
         valid: function(confirmed) {
             this._super();
-            this.setvalue(this.processingValue);
         }
-
     });
-    register_widget('actuator.binary', 'dmg_1x1_basicActuatorBinary');
 })(jQuery);

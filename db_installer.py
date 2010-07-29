@@ -83,14 +83,14 @@ device_technology = db.add_device_technology(dt_id='plcbus', dt_name='PLCBus', d
 device_type = db.add_device_type(dty_name='Switch', dt_id=device_technology.id)
 db.add_actuator_feature_model(af_name='Switch', af_device_type_id=device_type.id,
                               af_parameters='{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}',
-                              af_value_type='binary', af_return_confirmation=True)
+                              af_value_type='binary', af_stat_key='command', af_return_confirmation=True)
 device_type = db.add_device_type(dty_name='Dimmer', dt_id=device_technology.id)
 db.add_actuator_feature_model(af_name='Switch', af_device_type_id=device_type.id,
                               af_parameters='{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}',
-                              af_value_type='binary', af_return_confirmation=True)
+                              af_value_type='binary', af_stat_key='command', af_return_confirmation=True)
 db.add_actuator_feature_model(af_name='Dimmer', af_device_type_id=device_type.id,
                               af_parameters='{&quot;command&quot;:&quot;dim&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:100}',
-                              af_value_type='range', af_return_confirmation=True)
+                              af_value_type='range', af_stat_key='level', af_return_confirmation=True)
 
 # Create device technology features for EIB/KNX
 db.add_device_technology(dt_id='eibknx', dt_name='EIB/KNX', dt_description='')

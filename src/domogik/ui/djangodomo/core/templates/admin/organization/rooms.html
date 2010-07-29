@@ -255,9 +255,9 @@
     <section class="subsection" id="dragdroprooms">
         <h2 class='help' id='help_dragdrop'>{% trans "Rooms organisation" %} <span class='offscreen'>{% trans "Drag &amp; Drop instructions" %}</span></h2>
         <fieldset class="targetdrop" ddvalue="None" ddname="{% trans 'Unattributed rooms' %}">
-            <legend>{% trans "Unattributed rooms" %}</legend>
+            <legend class='icon16-house-default'>{% trans "House" %}</legend>
             <ul class="roomslist">
-                {% for room in unattribued_rooms %}
+                {% for room in house_rooms %}
                 <li class="roomitem icon32-room-{{ room.config.icon }}" ddvalue="{{ room.id }}" ddname='{{ room.description }}'>{{ room.name }}<span class="description">{{ room.description }}</span></li>
                 {% empty %}
                 <li class="empty">{% trans "Empty" %}</li>

@@ -1,5 +1,5 @@
 (function($) {
-    $.ui.widget_1x1_extended.subclass ('ui.dmg_1x1_basicActuatorTrigger', {
+    $.create_widget_1x1_extended({
         // default options
         options: {
             version: 0.1,
@@ -15,20 +15,19 @@
             hasStatus: false
         },
 
-        widget: function(params) {
-            this._super(params);
-            var self = this, o = this.options, p = this.params;
+        _init: function() {
+            var self = this, o = this.options;
             this._displayIcon('unknown');
         },
         
         action: function() {
-            var self = this, o = this.options, p = this.params;
+            var self = this, o = this.options;
             this._startProcessingState();
-            $.getREST(['command', p.devicetechnology, p.deviceaddress, p.model_parameters.command],
+            $.getREST(['command', o.devicetechnology, o.deviceaddress, o.model_parameters.command],
                 function(data) {
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
-                        self.valid(p.featureconfirmation);
+                        self.valid(o.featureconfirmation);
                     } else {
                         /* Error */
                         self.cancel();
@@ -38,5 +37,4 @@
             );
         }
     });
-    register_widget('actuator.trigger', 'dmg_1x1_basicActuatorTrigger');
 })(jQuery);

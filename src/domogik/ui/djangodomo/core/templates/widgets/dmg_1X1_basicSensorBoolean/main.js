@@ -1,5 +1,5 @@
 (function($) {
-    $.ui.widget_1x1_extended.subclass ('ui.dmg_1x1_basicSensorBoolean', {
+    $.create_widget_1x1_extended({
         // default options
         options: {
             version: 0.1,
@@ -16,8 +16,7 @@
             hasStatus: true
         },
 
-        widget: function(params) {
-            this._super(params);
+        _init: function() {
             var self = this, o = this.options;
             this.setValue(null);
         },
@@ -41,5 +40,4 @@
             this.previousValue = value;
         }
     });
-    register_widget('sensor.boolean', 'dmg_1x1_basicSensorBoolean');
 })(jQuery);

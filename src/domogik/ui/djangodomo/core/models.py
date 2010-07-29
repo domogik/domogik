@@ -64,7 +64,7 @@ class House(object):
             # Add the linked widget (from ui_config)
             if self.config.has_key('widgets'):
                 for widget in self.config['widgets']['list']:
-                    if int(association.feature.id) == int(widget['feature']):
+                    if int(association.id) == int(widget['association']):
                         association.widget_id = widget['widget']
 
 class Areas(pipes.DmgPipe):
@@ -108,7 +108,7 @@ class Areas(pipes.DmgPipe):
                 # Add the linked widget (from ui_config)
                 if area.config.has_key('widgets'):
                     for widget in area.config['widgets']['list']:
-                        if int(association.feature.id) == int(widget['feature']):
+                        if int(association.id) == int(widget['association']):
                             association.widget_id = widget['widget']
 
 class Rooms(pipes.DmgPipe):
@@ -158,7 +158,7 @@ class Rooms(pipes.DmgPipe):
                 # Add the linked widget (from ui_config)
                 if room.config.has_key('widgets'):
                     for widget in room.config['widgets']['list']:
-                        if int(association.feature.id) == int(widget['feature']):
+                        if int(association.id) == int(widget['association']):
                             association.widget_id = widget['widget']
 
 class Devices(pipes.DmgPipe):
