@@ -144,7 +144,6 @@ class IPXManager(XplPlugin):
 
         if not ipx_name in self.ipx_list:
             self._log.warning("No IPX800 board called '%s' defined" % ipx_name)
-            print "perdu"
             return
 
         # check data
