@@ -174,7 +174,9 @@ class IPX:
         else:
             print("Changing 'led%s' to 'PULSE' successfully" % num)
             # refresh status (for sending a xpl-trig)
-            self.get_status()
+            self.send_change({'elt' : 'led',
+                              'num' : num,
+                              'value' : IPX_LED_HIGH})
 
 
     def reset_counter(self, num):

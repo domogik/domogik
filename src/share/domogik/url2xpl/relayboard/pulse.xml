@@ -13,7 +13,6 @@
     <xpltype>xpl-trig</xpltype>
     <filter>
       <key name="type" value="output" />
-      <key name="current" value="PULSE" />
       <key name="device" value="@address@"/>
     </filter>
   </listener>
