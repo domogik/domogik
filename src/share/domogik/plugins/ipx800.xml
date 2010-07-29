@@ -1,0 +1,58 @@
+<plugin>
+  <name>ipx800</name>
+  <technology>relayboard</technology>
+  <description>IPX800 support</description>
+  <version>0.1</version>
+  <documentation>http://wiki.domogik.org/tiki-index.php?page=plugins/Ipx800</documentation>
+  <configuration-keys>
+    <key>
+      <order-id>0</order-id>
+      <name>startup-plugin</name>
+      <type>boolean</type>
+      <description>Automatically start plugin at Domogik startup</description>
+      <default-value>False</default-value>
+    </key>
+    <key>
+      <order-id>1</order-id>
+      <name>ipx-1-name</name>
+      <type>string</type>
+      <description>Relay Board 1 : name</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>2</order-id>
+      <name>ipx-1-ip</name>
+      <type>string</type>
+      <description>Relay Board 1 : ip</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>3</order-id>
+      <name>ipx-1-int</name>
+      <type>string</type>
+      <description>Relay Board 1 : interval between each poll</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>4</order-id>
+      <name>ipx-2-name</name>
+      <type>string</type>
+      <description>Relay Board 2 : name</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>5</order-id>
+      <name>ipx-2-ip</name>
+      <type>string</type>
+      <description>Relay Board 2 : ip</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>6</order-id>
+      <name>ipx-2-int</name>
+      <type>string</type>
+      <description>Relay Board 2 : interval between each poll</description>
+      <default-value></default-value>
+    </key>
+  </configuration-keys>
+</plugin>

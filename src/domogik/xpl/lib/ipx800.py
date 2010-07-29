@@ -85,22 +85,22 @@ class IPX:
         self.an = {}   # analogic input
         self.count = {}# counters
 
-    def open(self, name, host, port):
+    def open(self, name, host):
         """ Try to access to IPX board and return error if not possible
             @param ip : ip or dns of host
-            @param port: port
         """
-        self.ipx_name = name
+        self.name= name
         # define all urls
-        self.url = "http://%s:%s" % (host, port)
+        self.url = "http://%s" % (host)
         self.url_status = "%s/status.xml" % self.url
         self.url_cgi_change = "%s/leds.cgi?led=" % self.url
         self.url_cgi_pulse = "%s/rlyfs.cgi?rlyf=" % self.url
         self.url_cgi_reset_counter = "%s/counter.cgi?count=" % self.url
 
         # setting status will raise an error if no access to status.xml
-        print("Opening board : %s:%s" % (host, port))
+        print("Opening board : %s" % (host))
         self.get_status(first = True)
+        print "tic!"
 
 
     def listen(self, interval):
@@ -108,6 +108,7 @@ class IPX:
             @param interval : interval between each read of status
         """
         while True:
+            print "tac! %s" % interval
             self.get_status()
             time.sleep(interval)
 
@@ -204,7 +205,8 @@ class IPX:
             Notice that 'pulse' status is never sent as it has no sense for UI :
             we send HIGH or LOW (or value for anal/counter)
         """
-        device = "%s-%s%s" % (self.ipx_name, data['elt'], data['num'])
+        print("Status changed : %s" % data)
+        device = "%s-%s%s" % (self.name, data['elt'], data['num'])
 
         # translate values
         if data['elt'] == "led" and data['value'] == IPX_LED_HIGH:
@@ -227,6 +229,7 @@ class IPX:
             type = 'count'
          
         print "%s / %s / %s" % (device, current, type)
+        self._cb(device, current, type)
 
 
     def get_status(self, first = False):
@@ -364,7 +367,7 @@ if __name__ == "__main__":
     try:
         ipx = IPX(None, None)
         #print ipx.find()
-        ipx.open("ipxboard", "192.168.0.102", 80)
+        ipx.open("ipxboard", "192.168.0.102")
         #print "----"
         ipx.set_relay(0, "HIGH")
         time.sleep(5)

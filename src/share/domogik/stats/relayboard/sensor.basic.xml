@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<statistic technology="relayboard">
+    <schema name="sensor.basic">
+        <xpltype type="xpl-trig">
+            <listener>
+                <filter>
+                    <key name="type" value="output"/>
+                </filter>
+            </listener>
+            <mapping>
+                <device field="device"/>
+                <value field="current" new_name="command"
+                       filter_key="type" filter_value="output" />
+            </mapping>
+        </xpltype>
+        <xpltype type="xpl-stat">
+            <listener>
+                <filter>
+                    <key name="type" value="output"/>
+                </filter>
+            </listener>
+            <mapping>
+                <device field="device"/>
+                <value field="current" new_name="command"
+                       filter_key="type" filter_value="output" />
+            </mapping>
+        </xpltype>
+    </schema>
+</statistic>
