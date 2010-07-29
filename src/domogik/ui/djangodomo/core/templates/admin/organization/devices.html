@@ -70,7 +70,7 @@
                             },
                         {% endfor %}
                     ]
-                }}
+                }},
                 {name : 'adddeviceusage', type:'select', label:'Usage', required: true, option: {
                     initial: {value:'0', label:'Choose a usage'},
                     options: [
@@ -78,7 +78,7 @@
                         {value:'{{ usage.id }}', label: '{{ usage.name }}'},
                     {% endfor %}
                     ]
-                }},
+                }}
             ]
         });
 
