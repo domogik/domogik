@@ -175,6 +175,10 @@ class serialHandler():
             for ack in self._ack:
                 if self._is_ack_for_message(ack, hexlify(message)):
                     self._ack.remove(ack)
+                    for ack in self._ack:
+                        if self._is_ack_for_message(ack, hexlify(message)):
+                            print "1 more ack for message"
+
                     return True
             return False
 
@@ -193,7 +197,6 @@ class serialHandler():
             self._send(self._send_queue.get())
             while not self._send_queue.empty():
                 self._send(self._send_queue.get())
-
         
         def _basic_write(self, frame):
             """Write a frame on serial port
