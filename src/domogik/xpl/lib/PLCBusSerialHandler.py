@@ -175,9 +175,7 @@ class serialHandler():
             for ack in self._ack:
                 if self._is_ack_for_message(ack, hexlify(message)):
                     self._ack.remove(ack)
-                    for ack in self._ack:
-                        if self._is_ack_for_message(ack, hexlify(message)):
-                            print "1 more ack for message"
+                    print "Acks : %s" % self._ack
 
                     return True
             return False
