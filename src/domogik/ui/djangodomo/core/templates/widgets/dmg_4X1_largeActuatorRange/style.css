@@ -1,0 +1,91 @@
+.dmg_4X1_largeActuatorRange .ident {
+    position:absolute;
+    top:-0.3em;
+    left:0;
+}
+
+.dmg_4X1_largeActuatorRange:focus .main {
+/*    border:2px solid #FF5C13;    */
+}
+
+.dmg_4X1_largeActuatorRange .main {
+    position:absolute;
+    bottom:0;
+    left:0;
+    height:4em;
+    background-color:#434343;
+    width:100%;
+    -moz-border-radius: 2em;
+    -webkit-border-radius: 2em;
+    -moz-box-sizing:border-box;
+    -webkit-box-sizing:border-box;
+    text-align:center;
+}
+
+.dmg_4X1_largeActuatorRange .value {
+    background-color:rgba(0,0,0,0.8);
+    color:#ffffff;
+    width:3em;
+    height:2em;
+    -moz-border-radius: 1em;
+    -webkit-border-radius: 1em;
+    line-height:2em;
+    margin:1em auto;
+    position:relative;
+}
+
+.dmg_4X1_largeActuatorRange .value.processing {
+    background-color:#ffffff;
+    background-image:url('images/processing.gif');
+    background-position:50% 50%;
+    background-repeat:no-repeat;
+}
+
+.dmg_4X1_largeActuatorRange .indicator {
+    margin:1em 1.5em 1em 1.5em;
+    height:2em;
+    line-height:2em;
+    position:absolute;
+    top:0;
+    left:0;
+    -moz-box-sizing:border-box;
+    -webkit-box-sizing:border-box;
+    background-position: 0 0;
+    background-repeat: repeat-x;
+    background-image: url('images/indicator.png');
+}
+
+.dmg_4X1_largeActuatorRange .command {
+    height:3em;
+    width:4em;
+    -moz-border-radius: 2em;
+    -webkit-border-radius: 2em;
+    position:absolute;
+    bottom:0.5em;
+    -moz-box-sizing:border-box;
+    -webkit-box-sizing:border-box;
+    background-color:rgba(0,0,0,0.8);
+    background-position: 50% 50%;
+    background-repeat:no-repeat;
+}
+
+.dmg_4X1_largeActuatorRange .command:hover {
+    border:2px solid #ffffff;
+}
+
+.dmg_4X1_largeActuatorRange .min {
+    left: 1em;
+    background-image:url('images/min.png');
+}
+.dmg_4X1_largeActuatorRange .minus {
+    left: 6em;
+    background-image:url('images/minus.png');
+}
+.dmg_4X1_largeActuatorRange .plus {
+    right: 6em;
+    background-image:url('images/plus.png');
+}
+.dmg_4X1_largeActuatorRange .max {
+    right: 1em;
+    background-image:url('images/max.png');
+}

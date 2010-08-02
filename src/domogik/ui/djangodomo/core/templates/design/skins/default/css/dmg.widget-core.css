@@ -24,6 +24,9 @@
 .size1x1 { width:5em; height:5em;}
 .model.size1x1 { line-height:5em;}
 
+.size4x1 { width:26em; height:5em;}
+.model.size4x1 { line-height:5em;}
+
 .model {
     text-align:center;
     display:block;
