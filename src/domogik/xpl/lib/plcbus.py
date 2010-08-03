@@ -116,6 +116,7 @@ class PLCBUSAPI:
             'REPORT_ONLY_ON_PULSE': '1f'}
         #instead of using serial directly, use serialHandler
         self._ser_handler = serialHandler(serial_port_no, command_cb, message_cb)
+        self._ser_handler.start()
 
     def _valid_item(self, item):
         '''

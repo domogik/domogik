@@ -67,6 +67,7 @@ class PlcBusMain(XplPlugin):
         # Create log instance
         self._log = self.get_my_logger()
         self.api = PLCBUSAPI(self._log, device, self._command_cb, self._message_cb)
+        print "API : %s" % self.api
 
     def _plcbus_cmnd_cb(self, message):
         '''
