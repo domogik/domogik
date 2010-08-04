@@ -76,6 +76,7 @@ class serialHandler(threading.Thread):
         self._mutex = mutex.mutex()
         self._send_queue = Queue.Queue()
         self._cb = command_cb
+        self._msg_cb = message_cb
         #self._reader = self.__Reader(self.__myser, self._want_lock, self._mutex, self._ack, message_cb)
         #self._reader.start()
         #self._writer = self.__Writer(self.__myser, self._want_lock, self._mutex, self._ack, command_cb, self._reader)
@@ -84,26 +85,9 @@ class serialHandler(threading.Thread):
     def get_from_answer_queue(self):
         '''Calls self._reader.get_from_answer_queue
         '''
-        return self._reader.get_from_answer_queue()
-
-    def add_to_send_queue(self, frame):
-        self._writer.add_to_send_queue(frame)
-
-
-#            self.__myser = serial
-#            self._has_message_to_send = lock
-#            self._mutex = mutex
-#            self._ack = ack_lock
-#            self._send_queue = Queue.Queue()
-#            self._stop = threading.Event()
-#            self._cb = command_callback
-#            self._reader = reader
+        return self.get_from_answer_queue()
 
     def _send(self, plcbus_frame):
-        #seems to work OK, but is all this retransmission process needed ?
-        #frame should already be properly formated.
-#                time.sleep(0.4)
-        #print 'sent 2 times'
         #Resend if proper ACK not received
         #check for ack pulse
         if (int(plcbus_frame[8:10], 16) >> 5) & 1: #ACK pulse bit set to 1
@@ -144,33 +128,9 @@ class serialHandler(threading.Thread):
                     break #2s
         else:
             #No ACK asked, we consider that the message has been correctly sent
+            self._basic_write(plcbus_frame)
             self._cb(self.explicit_message(plcbus_frame))
 
-
-    def stop(self):
-        self._stop.set()
-        self.__myser.close()
-
-#        def _has_ack_received(self, message):
-#            """ Check if an ack has been received for a message 
-#            Remove the ack from list if there is one received
-#            @param check ack against this message
-#            """
-#            for ack in self._ack:
-#                if self._is_ack_for_message(ack, hexlify(message)):
-#                    self._ack.remove(ack)
-#                    print "Acks : %s" % self._ack
-#
-#                    return True
-#            return False
-
-    def _flush_queue(self):
-        """Send all frame in the queue
-        """
-        self._send(self._send_queue.get())
-        while not self._send_queue.empty():
-            self._send(self._send_queue.get())
-    
     def _basic_write(self, frame):
         """Write a frame on serial port
         This method should only be called as mutex.lock() parameter
@@ -182,15 +142,6 @@ class serialHandler(threading.Thread):
     def add_to_send_queue(self, trame):
         print "add_to_send_queue"
         self._send_queue.put(trame)
-
-#    def run(self):
-#        """ Start writer thread 
-#        """
-#        while not self._stop.isSet():
-#            self._send(self._send_queue.get())
-#    print "==> size : %s" % self._send_queue.qsize()
-#        while not self._send_queue.empty():
-#            self._send(self._send_queue.get())
 
     def needs_ack_for(self, frame):
         """ Called by the Writer to let Reader knows that a ACK is waited
@@ -272,8 +223,10 @@ class serialHandler(threading.Thread):
             return r
 
     def receive(self):
-        message = self.__myser.read(9)
-        #put frame_PLCbus in receivedqueue
+        #Avoid to wait if there is nothing to read
+        if self.__myser.inWaiting() < 9:
+            return
+        message = self.__myser.read(9) #wait for max 400ms if nothing to read
         if(message):
             m_string = hexlify(message)
             #self.explicit_message(m_string)
@@ -328,14 +281,6 @@ class serialHandler(threading.Thread):
             @param message : message to check
         """
         return int(message[14:16], 16) & 0x10
-
-    def get_from_receive_queue(self):
-        trame = self._receive_queue.get_nowait()
-        return trame
-
-    def get_from_answer_queue(self):
-        trame = self._answer_queue.get(True, 2) #do not wait for more than 2s
-        return trame
 
 #a = serialHandler()
 #a.start()
