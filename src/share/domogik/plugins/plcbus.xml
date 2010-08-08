@@ -17,7 +17,7 @@
       <name>device</name>
       <type>string</type>
       <description>Plcbus device</description>
-      <default-value>/dev/ttyUSB0</default-value>
+      <default-value>/dev/plcbus</default-value>
     </key>
     <key>
       <order-id>2</order-id>
@@ -26,5 +26,19 @@
       <description>Usercode value (between 00 and FF), defaults to FF</description>
       <default-value>FF</default-value>
     </key>
+    <key>
+      <order-id>3</order-id>
+      <name>probe-interval</name>
+      <type>string</type>
+      <description>Interval between 2 probes to discover devices and check their state (0 = don't do probing).</description>
+      <default-value>30</default-value>
+     </key>
+    <key>
+      <order-id>4</order-id>
+      <name>probe-list</name>
+      <type>string</type>
+      <description>List of housecode to probe. If you know you don't use an house code remove it from the list.</description>
+      <default-value>ABCDEFGHIJKLMNOP</default-value>
+     </key>
   </configuration-keys>
 </plugin>
