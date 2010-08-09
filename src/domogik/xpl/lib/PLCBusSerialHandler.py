@@ -213,8 +213,8 @@ class serialHandler(threading.Thread):
             r["d_user_code"] = r["data"][0:2]
             r["d_home_unit"] = "%s%s" % (home[int(r["data"][2:3], 16)],int(r["data"][3:4], 16)+1)
             r["d_command"] = cmdplcbus[r["data"][4:6]]
-            r["d_data1"] = r["data"][6:8]
-            r["d_data2"] = r["data"][8:10]
+            r["d_data1"] = int(r["data"][6:8],16)
+            r["d_data2"] = int(r["data"][8:10],16)
             if r["data_length"] == 6:
                 r["rx_tw_switch"] = r["data"][11:]
             r["end_bit"] = message[-2:]
