@@ -221,6 +221,8 @@ class PLCBUSAPI:
         """
         self._ser_handler.stop()
 
+
+
 ##test
 #a = PLCBUSAPI("/dev/ttyUSB0")
 ##a.get_all_on_id("00","B")

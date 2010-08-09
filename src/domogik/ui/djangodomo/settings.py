@@ -198,3 +198,4 @@ for file in os.listdir(WIDGETS_PATH):
     if os.path.isfile(main):
         WIDGETS_LIST.append(file)
 print WIDGETS_LIST
+CACHE_BACKEND = 'memcached://127.0.0.1:11211/'

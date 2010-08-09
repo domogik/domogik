@@ -1,0 +1,19 @@
+<technology id="plcbus">
+  <command name="dim">
+    <schema>plcbus.basic</schema>
+    <command-key>command</command-key>	
+    <address-key>device</address-key>	
+    <command-xpl-value>PRESET_DIM</command-xpl-value>  
+    <parameters>                                                                                            
+      <parameter key="data1" location="1"/>                                                           
+    </parameters>                                                                                           
+  </command>	
+  <listener>
+    <schema>plcbus.basic</schema>
+    <xpltype>xpl-trig</xpltype>
+    <filter>
+      <key name="command" value="PRESET_DIM" />
+      <key name="device" value="@address@"/>
+    </filter>
+  </listener>
+</technology>
