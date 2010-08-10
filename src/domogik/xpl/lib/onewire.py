@@ -38,6 +38,7 @@ TODO
 import ow
 import time
 import threading
+import traceback
 
 
 
@@ -178,7 +179,7 @@ class OneWireNetwork:
             else:
                 self._root = ow.Sensor('/uncached')
         except:
-            raise OneWireException("Access to onewire device is not possible. Does your user have the good permissions ? If so, check that you stopped onewire module and you don't have OWFS mounted")
+            raise OneWireException("Access to onewire device is not possible. Does your user have the good permissions ? If so, check that you stopped onewire module and you don't have OWFS mounted : %s" % traceback.format_exc())
 
     def get_root(self):
         """
