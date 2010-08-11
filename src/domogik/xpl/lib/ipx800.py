@@ -101,6 +101,25 @@ class IPX:
         self._log.info("Opening board : %s" % (host))
         self.get_status(first = True)
 
+    def get_status_for_helper(self):
+        """ Return status for helper
+        """
+        status = []
+        status.append("List of relay :")
+        for idx in self.led:
+            status.append(" - led%s : %s" % (idx, self.led[idx]))
+        status.append("List of digital input :")
+        for idx in self.btn:
+            status.append(" - btn%s : %s" % (idx, self.btn[idx]))
+        status.append("List of analog input :")
+        for idx in self.an:
+            status.append(" - an%s : %s" % (idx, self.an[idx]))
+        status.append("List of counters :")
+        for idx in self.count:
+            status.append(" - count%s : %s" % (idx, self.count[idx]))
+        return status
+            
+
 
     def listen(self, interval):
         """ Listen for relay board in background
