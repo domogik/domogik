@@ -2319,17 +2319,15 @@ class DbHelper():
             if ui_item_config is not None:
                 ui_item_config_list.append(ui_item_config)
 
-        if len(ui_item_config_list) == 0:
-            raise DbHelperException("Can't find item for (%s, %s, %s)" % (ui_item_name, ui_item_reference, ui_item_key))
-        ui_item_config_list_d = ui_item_config_list
         for item in ui_item_config_list:
             self.__session.delete(item)
-        try:
-            self.__session.commit()
-        except Exception, sql_exception:
-            self.__session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-        return ui_item_config_list_d
+        if len(ui_item_config_list) > 0:
+            try:
+                self.__session.commit()
+            except Exception, sql_exception:
+                self.__session.rollback()
+                raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
+        return ui_item_config_list
 
 ###
 # SystemConfig

@@ -1433,6 +1433,7 @@ class UIItemConfigTestCase(GenericTestCase):
         ui_item_list = self.db.list_ui_item_config(ui_item_name='room')
         assert len(ui_item_list) == 1
         assert ui_item_list[0].key == 'pr1'
+        assert len(self.db.delete_ui_item_config(ui_item_name='room', ui_item_key='icon2')) == 0
 
 
 class SystemConfigTestCase(GenericTestCase):
