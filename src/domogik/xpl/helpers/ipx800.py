@@ -58,7 +58,9 @@ class ipx800(Helper):
                  "status" :
                   {
                     "cb" : self.status,
-                    "desc" : "Display all IPX800 elements status"
+                    "desc" : "Display all IPX800 elements status",
+                    "min_args" : 1,
+                    "usage" : "status <IPX 800 ip>"
                   }
                 }
 
@@ -78,7 +80,7 @@ class ipx800(Helper):
         data.append("List of all IPX800 boards found :")
         try:
             for ipx in ipx.find():
-                data.append(ipx)
+                data.append("%s : %s" % (ipx[0], ipx[1]))
         except IPXException as e:
             return [e.value]
         print data
