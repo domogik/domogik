@@ -152,7 +152,7 @@ class IPXManager(XplPlugin):
             self._log.warning("Bad data : %s" % data)
             return
 
-        # TODO : other checks
+        # TODO : other checks : counter
   
         # action in function of type
         if elt == 'led' and type == 'output' and current in ['HIGH', 'LOW']:
@@ -160,7 +160,7 @@ class IPXManager(XplPlugin):
         elif elt == 'led' and type == 'output' and current== 'PULSE':
             self.ipx_list[ipx_name]['obj'].pulse_relay(num)
 
-        # TODO : other actions
+        # TODO : other actions : counter reset
 
 
 if __name__ == "__main__":
