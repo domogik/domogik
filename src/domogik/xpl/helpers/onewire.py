@@ -72,6 +72,13 @@ class onewire(Helper):
                     "min_args" : 1,
                     "usage" : "all <adaptator device>"
                   },
+                  "ds18s20" : 
+                  {
+                    "cb" : self.ds18s20,
+                    "desc" : "Show detail for all DS18S20 devices",
+                    "min_args" : 1,
+                    "usage" : "all <adaptator device>"
+                  },
                   "ds2401" : 
                   {
                     "cb" : self.ds2401,
@@ -104,6 +111,13 @@ class onewire(Helper):
         except OneWireException as e:
             raise HelperError(e.value)
         return self.ow.show_ds18b20_detail()
+
+    def ds18s20(self, args = None):
+        try:
+            self.ow = OneWireNetwork(args[0], self._log)
+        except OneWireException as e:
+            raise HelperError(e.value)
+        return self.ow.show_ds18s20_detail()
 
     def ds2401(self, args = None):
         try:
@@ -176,6 +190,16 @@ class OneWireNetwork:
         display = " - %-30s : %s"
         for comp in self._root.find(type = "DS18B20"):
             ret.append("DS18B20 : id=%s" % comp.id)
+            ret.append(display % ("Temperature", comp.temperature))
+            ret.append(display % ("Powered (1) / parasit (0)", comp.power))
+        return ret
+
+
+    def show_ds18s20_detail(self):
+        ret = []
+        display = " - %-30s : %s"
+        for comp in self._root.find(type = "DS18S20"):
+            ret.append("DS18S20 : id=%s" % comp.id)
             ret.append(display % ("Temperature", comp.temperature))
             ret.append(display % ("Powered (1) / parasit (0)", comp.power))
         return ret
