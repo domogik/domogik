@@ -1445,8 +1445,10 @@ class DbHelper():
             self.__session.delete(device_conf)
         for device_stats in self.__session.query(DeviceStats).filter_by(device_id=d_id).all():
             self.__session.delete(device_stats)
-        for device_feature in self.__session.query(DeviceFeature).filter_by(device_id=d_id).all():
-            self.__session.delete(device_feature)
+        for df in self.__session.query(DeviceFeature).filter_by(device_id=d_id).all():
+            for dfa in self.__session.query(DeviceFeatureAssociation).filter_by(device_feature_id=df.id).all():
+                self.__session.delete(dfa)
+            self.__session.delete(df)
         self.__session.delete(device)
         try:
             self.__session.commit()
