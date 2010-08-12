@@ -74,6 +74,7 @@ import errno
 
 
 
+
 REST_API_VERSION = "0.1"
 REST_DESCRIPTION = "REST plugin is part of Domogik project. See http://trac.domogik.org/domogik/wiki/modules/REST.en for REST API documentation"
 
