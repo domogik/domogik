@@ -57,6 +57,7 @@ class Helper():
         return self.commands
 
     def command(self, cmd, args = []):
+        cmd = cmd.lower()
         print "Helper : %s %s" % (cmd, str(args))
         if cmd == "help":
             return self.help()
