@@ -71,6 +71,8 @@ import stat
 import shutil
 import mimetypes
 import errno
+import pdb
+
 
 
 
@@ -606,11 +608,18 @@ class RestHandler(BaseHTTPRequestHandler):
         """
         self.server.handler_params[0]._log.debug("Send HTTP header for OK")
         try:
+            self.server.handler_params[0]._log.debug("==> 1")
+#            pdb.set_trace()
             self.send_response(200)
+            self.server.handler_params[0]._log.debug("==> 2")
             self.send_header('Content-type',  'application/json')
+            self.server.handler_params[0]._log.debug("==> 3")
             self.send_header('Expires', '-1')
+            self.server.handler_params[0]._log.debug("==> 4")
             self.send_header('Cache-control', 'no-cache')
+            self.server.handler_params[0]._log.debug("==> 5")
             self.send_header('Content-Length', len(data.encode("utf-8")))
+            self.server.handler_params[0]._log.debug("==> 6")
             self.end_headers()
             if data:
                 # if big data, log only start of data
