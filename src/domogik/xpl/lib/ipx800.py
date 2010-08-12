@@ -243,6 +243,8 @@ class IPX:
             current = "HIGH"
         elif data['elt'] == "btn" and data['value'] == IPX_BTN_LOW:
             current = "LOW"
+        else:
+            current = data['value']
 
         # translate type
         if data['elt'] == "led":
@@ -254,6 +256,7 @@ class IPX:
         if data['elt'] == "count":
             type = 'count'
          
+        print "%s-%s-%s"  % (device, current, type)
         self._cb(device, current, type)
 
 
@@ -313,7 +316,7 @@ class IPX:
             foo = getattr(self, elt)
             foo[idx] = resp
             # status of element changed : we will have to send a xPl message
-            if first == False and old_foo[idx] != foo[idx]:
+            if (first == True) or (first == False and old_foo[idx] != foo[idx]):
                 self.send_change({'elt' : elt,
                                   'num' : idx,
                                   'value' : resp})
