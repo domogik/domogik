@@ -1086,6 +1086,8 @@ class DbHelper():
         @return the list of DeviceFeatureAssociation object which were deleted
 
         """
+        # Make sure previously modified objects outer of this method won't be commited
+        self.__session.expire_all()
         dfa_list = self.__session.query(DeviceFeatureAssociation)\
                                  .filter_by(device_feature_id=dfa_device_feature_id).all()
         for dfa in dfa_list:
