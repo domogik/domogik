@@ -2296,7 +2296,7 @@ class DbHelper():
         """
         return self.__session.query(UIItemConfig).all()
 
-    def delete_ui_item_config(self, ui_item_name, ui_item_reference=None, ui_item_key=None):
+    def del_ui_item_config(self, ui_item_name, ui_item_reference=None, ui_item_key=None):
         """Delete a UI parameter of an item
 
         @param ui_item_name : item name

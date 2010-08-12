@@ -125,7 +125,7 @@ class GenericTestCase(unittest.TestCase):
 
     def remove_all_ui_item_config(self, db):
         for uic in db.list_all_ui_item_config():
-            db.delete_ui_item_config(uic.name, uic.reference, uic.key)
+            db.del_ui_item_config(uic.name, uic.reference, uic.key)
 
 
 class AreaTestCase(GenericTestCase):
@@ -1417,23 +1417,23 @@ class UIItemConfigTestCase(GenericTestCase):
         self.db.set_ui_item_config('area', 1, 'icon', 'basement')
         self.db.set_ui_item_config('room', 1, 'icon', 'bathroom')
         self.db.set_ui_item_config('room', 1, 'param_r2', 'value_r2')
-        self.db.delete_ui_item_config('area', 1, 'icon')
+        self.db.del_ui_item_config('area', 1, 'icon')
         assert len(self.db.list_all_ui_item_config()) == 2
         assert self.db.get_ui_item_config('room', 1, 'icon') is not None
-        self.db.delete_ui_item_config(ui_item_name='room', ui_item_reference=1)
+        self.db.del_ui_item_config(ui_item_name='room', ui_item_reference=1)
         assert len(self.db.list_all_ui_item_config()) == 0
         assert self.db.get_ui_item_config('area', 1, 'icon') is None
         self.db.set_ui_item_config('area', 2, 'icon', 'first_floor')
         self.db.set_ui_item_config('area', 2, 'pa1', 'va1')
         self.db.set_ui_item_config('room', 2, 'icon', 'kitchen')
         self.db.set_ui_item_config('room', 2, 'pr1', 'vr1')
-        self.db.delete_ui_item_config(ui_item_name='area', ui_item_reference=2)
+        self.db.del_ui_item_config(ui_item_name='area', ui_item_reference=2)
         assert len(self.db.list_ui_item_config(ui_item_name='area')) == 0
-        self.db.delete_ui_item_config(ui_item_name='room', ui_item_key='icon')
+        self.db.del_ui_item_config(ui_item_name='room', ui_item_key='icon')
         ui_item_list = self.db.list_ui_item_config(ui_item_name='room')
         assert len(ui_item_list) == 1
         assert ui_item_list[0].key == 'pr1'
-        assert len(self.db.delete_ui_item_config(ui_item_name='room', ui_item_key='icon2')) == 0
+        assert len(self.db.del_ui_item_config(ui_item_name='room', ui_item_key='icon2')) == 0
 
 
 class SystemConfigTestCase(GenericTestCase):
