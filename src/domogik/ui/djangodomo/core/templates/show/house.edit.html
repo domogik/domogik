@@ -181,7 +181,7 @@
                 activeClass: 'state-active',
                 hoverClass: 'state-hover',
                 accept: function(draggable) {
-                    return ($("li", this).length  < 1);
+                    return (($("li", this).length  < 1) && draggable.widget_model('hasSize', 1, 1));
                 },
                 drop: ondrop
         });
@@ -190,7 +190,7 @@
                 activeClass: 'state-active',
                 hoverClass: 'state-hover',
                 accept: function(draggable) {
-                    return ($("li", this).length  < 4);
+                    return (($("li", this).length  < 4) && draggable.widget_model('hasSize', 1, 1));
                 },
                 drop: ondrop
         });
