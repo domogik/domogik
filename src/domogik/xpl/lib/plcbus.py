@@ -154,9 +154,14 @@ class PLCBUSAPI:
             self._log.warning("Invalid user code %s, must be 'H' format, between 00 and FF" % h)
 
     def _convert_device_to_hex(self, item):
-        var1 = int(item[1:]) - 1
-        var2 = '%01X%01x' % (self._codevalue[item[0]], var1)
-        return var2
+        if item == None or len(item) == 0:
+            return "00"
+        elif len(item) == 1:
+            return '%01x0' % (self._codevalue[item[0]])
+        else: 
+            var1 = int(item[1:]) - 1
+            var2 = '%01X%01x' % (self._codevalue[item[0]], var1)
+            return var2
 
     def _convert_data(self, data):
         # result must have 2 caracters
@@ -206,20 +211,22 @@ class PLCBUSAPI:
         '''
         onlist = []
         self.send("GET_ALL_ON_ID_PULSE", housecode + "1", usercode)
-        response = self._ser_handler.get_from_answer_queue()
-        if(response):
-            print "Hoora response received", response
-            data = int(response[10:14], 16)
-            for i in range(0, 16):
-                if data >> i & 1:
-                    onlist.append(housecode + str(self._unitcodes[i]))
-        print "on :", onlist
-        return onlist
+#        response = self._ser_handler.get_from_answer_queue()
+#        if(response):
+#            print "Hoora response received", response
+#            data = int(response[10:14], 16)
+#            for i in range(0, 16):
+#                if data >> i & 1:
+#                    onlist.append(housecode + str(self._unitcodes[i]))
+#        print "on :", onlist
+#        return onlist
 
     def stop(self):
         """ Ask thread to stop
         """
         self._ser_handler.stop()
+
+
 
 ##test
 #a = PLCBUSAPI("/dev/ttyUSB0")

@@ -42,6 +42,7 @@ from domogik.xpl.common.queryconfig import Query
 from domogik.xpl.lib.onewire import OneWireException
 from domogik.xpl.lib.onewire import OneWireNetwork
 from domogik.xpl.lib.onewire import ComponentDs18b20
+from domogik.xpl.lib.onewire import ComponentDs18s20
 from domogik.xpl.lib.onewire import ComponentDs2401
 import ow
 import traceback
@@ -86,6 +87,17 @@ class OneWireManager(XplPlugin):
             self._config.query('onewire', 'ds18b20-res', res)
             ds18b20_resolution = res.get_value()['ds18b20-res']
     
+            ### DS18S20 config
+            self._config = Query(self._myxpl)
+            res = XplResult()
+            self._config.query('onewire', 'ds18s20-en', res)
+            ds18s20_enabled = res.get_value()['ds18s20-en']
+
+            self._config = Query(self._myxpl)
+            res = XplResult()
+            self._config.query('onewire', 'ds18s20-int', res)
+            ds18s20_interval = res.get_value()['ds18s20-int']
+    
             ### DS2401 config
             self._config = Query(self._myxpl)
             res = XplResult()
@@ -120,6 +132,19 @@ class OneWireManager(XplPlugin):
                                             self.send_xpl),
                                            {})
                 ds18b20.start()
+    
+            ### DS18S20 support
+            if ds18s20_enabled == "True":
+                self._log.info("DS18S20 support enabled")
+                ds18s20 = threading.Thread(None, 
+                                           ComponentDs18s20, 
+                                           None,
+                                           (self._log,
+                                            ow, 
+                                            float(ds18s20_interval), 
+                                            self.send_xpl),
+                                           {})
+                ds18s20.start()
     
             ### DS2401 support
             if ds2401_enabled == "True":

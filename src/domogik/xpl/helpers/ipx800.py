@@ -54,6 +54,13 @@ class ipx800(Helper):
                   {
                     "cb" : self.find,
                     "desc" : "Find IPX 800 relay boards"
+                  },
+                 "status" :
+                  {
+                    "cb" : self.status,
+                    "desc" : "Display all IPX800 elements status",
+                    "min_args" : 1,
+                    "usage" : "status <IPX 800 ip>"
                   }
                 }
 
@@ -73,12 +80,21 @@ class ipx800(Helper):
         data.append("List of all IPX800 boards found :")
         try:
             for ipx in ipx.find():
-                data.append(ipx)
+                data.append("%s : %s" % (ipx[0], ipx[1]))
         except IPXException as e:
             return [e.value]
         print data
         return data
+
+    def status(self, args = None):
+        """ Get status for relay, inputs, counter, etc
+        """
             
+        ipx = IPX(self._log, None)
+        ipx.open("foo", args[0])
+        data = ipx.get_status_for_helper()
+        print data
+        return data
 
 MY_CLASS = {"cb" : ipx800}
 

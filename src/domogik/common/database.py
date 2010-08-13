@@ -1086,6 +1086,8 @@ class DbHelper():
         @return the list of DeviceFeatureAssociation object which were deleted
 
         """
+        # Make sure previously modified objects outer of this method won't be commited
+        self.__session.expire_all()
         dfa_list = self.__session.query(DeviceFeatureAssociation)\
                                  .filter_by(device_feature_id=dfa_device_feature_id).all()
         for dfa in dfa_list:
@@ -1443,8 +1445,10 @@ class DbHelper():
             self.__session.delete(device_conf)
         for device_stats in self.__session.query(DeviceStats).filter_by(device_id=d_id).all():
             self.__session.delete(device_stats)
-        for device_feature in self.__session.query(DeviceFeature).filter_by(device_id=d_id).all():
-            self.__session.delete(device_feature)
+        for df in self.__session.query(DeviceFeature).filter_by(device_id=d_id).all():
+            for dfa in self.__session.query(DeviceFeatureAssociation).filter_by(device_feature_id=df.id).all():
+                self.__session.delete(dfa)
+            self.__session.delete(df)
         self.__session.delete(device)
         try:
             self.__session.commit()
@@ -2292,7 +2296,7 @@ class DbHelper():
         """
         return self.__session.query(UIItemConfig).all()
 
-    def delete_ui_item_config(self, ui_item_name, ui_item_reference=None, ui_item_key=None):
+    def del_ui_item_config(self, ui_item_name, ui_item_reference=None, ui_item_key=None):
         """Delete a UI parameter of an item
 
         @param ui_item_name : item name
@@ -2319,17 +2323,15 @@ class DbHelper():
             if ui_item_config is not None:
                 ui_item_config_list.append(ui_item_config)
 
-        if len(ui_item_config_list) == 0:
-            raise DbHelperException("Can't find item for (%s, %s, %s)" % (ui_item_name, ui_item_reference, ui_item_key))
-        ui_item_config_list_d = ui_item_config_list
         for item in ui_item_config_list:
             self.__session.delete(item)
-        try:
-            self.__session.commit()
-        except Exception, sql_exception:
-            self.__session.rollback()
-            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
-        return ui_item_config_list_d
+        if len(ui_item_config_list) > 0:
+            try:
+                self.__session.commit()
+            except Exception, sql_exception:
+                self.__session.rollback()
+                raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
+        return ui_item_config_list
 
 ###
 # SystemConfig

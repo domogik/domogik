@@ -5,24 +5,21 @@
             <listener>
                 <filter>
                     <key name="type" value="output"/>
+                    <key name="type" value="input"/>
+                    <key name="type" value="voltage"/>
+                    <key name="type" value="count"/>
                 </filter>
             </listener>
             <mapping>
                 <device field="device"/>
-                <value field="current" new_name="command"
+                <value field="current" new_name="output"
                        filter_key="type" filter_value="output" />
-            </mapping>
-        </xpltype>
-        <xpltype type="xpl-stat">
-            <listener>
-                <filter>
-                    <key name="type" value="output"/>
-                </filter>
-            </listener>
-            <mapping>
-                <device field="device"/>
-                <value field="current" new_name="command"
-                       filter_key="type" filter_value="output" />
+                <value field="current" new_name="input"
+                       filter_key="type" filter_value="input" />
+                <value field="current" new_name="voltage"
+                       filter_key="type" filter_value="voltage" />
+                <value field="current" new_name="count"
+                       filter_key="type" filter_value="count" />
             </mapping>
         </xpltype>
     </schema>

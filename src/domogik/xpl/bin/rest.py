@@ -74,6 +74,7 @@ import errno
 
 
 
+
 REST_API_VERSION = "0.1"
 REST_DESCRIPTION = "REST plugin is part of Domogik project. See http://trac.domogik.org/domogik/wiki/modules/REST.en for REST API documentation"
 
@@ -2094,7 +2095,7 @@ target=*
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("ui_config")
         try:
-            for ui_item_config in self._db.delete_ui_item_config(ui_item_name = name,
+            for ui_item_config in self._db.del_ui_item_config(ui_item_name = name,
                                                              ui_item_reference = reference,
                                                              ui_item_key = key):
                 json_data.add_data(ui_item_config)
@@ -3831,6 +3832,7 @@ class StatsManager(XplPlugin):
             self.handler_params = handler_params
     
             self._event_requests = self.handler_params[0]._event_requests
+            self.get_exception = self.handler_params[0].get_exception
     
             ### Read xml files
             res = {}
@@ -3865,7 +3867,7 @@ class StatsManager(XplPlugin):
                 
                         stats[technology][schema][type] = self._Stat(self._myxpl, res[technology][schema][type], technology, schema, type, self.handler_params)
         except :
-            self._log.error("%s" % self.get_exception())
+            self._log_stats.error("%s" % self.get_exception())
 
     def get_schemas_and_types(self, node):
         """ Get the schema and the xpl message type
@@ -4014,11 +4016,10 @@ class StatsManager(XplPlugin):
 
             ### mapping processing
             for map in self._res["mapping"]:
-                print "MAP=%s" % map
-                print "MSG=%s" % message.data
                 # first : get value and default key
                 key = map["name"]
-                print "K=%s" % key
+                print key
+                print map
                 try:
                     value = message.data[map["name"]]
                     print "K/V=%s/%s" % (key, value)
@@ -4026,18 +4027,21 @@ class StatsManager(XplPlugin):
                         key = map["name"]
                         device_data.append({"key" : key, "value" : value})
                         self._db.add_device_stat(current_date, key, value, d_id)
+                        print "In database :)"
                     else:
                         if map["filter_value"] != None and \
                            map["filter_value"] == message.data[map["filter_key"]]:
                             key = map["new_name"]
                             device_data.append({"key" : key, "value" : value})
                             self._db.add_device_stat(current_date, key, value, d_id)
+                            print "In database :)"
                         else:
                             if map["filter_value"] == None:
                                 self._log_stats.warning ("Stats : no filter_value defined in map : %s" % str(map))
                 except KeyError:
                     # no value in message for key
                     # example : a x10 command = ON has no level value
+                    print "No value in message for key"
                     pass
     
             # Put data in events queues

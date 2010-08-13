@@ -197,4 +197,3 @@ for file in os.listdir(WIDGETS_PATH):
     main = os.path.join(WIDGETS_PATH, file, "main.js")
     if os.path.isfile(main):
         WIDGETS_LIST.append(file)
-print WIDGETS_LIST

@@ -38,6 +38,7 @@ TODO
 import ow
 import time
 import threading
+import traceback
 
 
 
@@ -88,6 +89,56 @@ class ComponentDs18b20:
                     temperature = float(eval("comp.temperature"+self.resolution))
                 except AttributeError:
                     error = "DS18B20 : bad resolution : %s. Setting resolution to 12 for next iterations." % self.resolution
+                    self._log.error(error)
+                    print error
+                    self.resolution = "12"
+
+                else:
+
+                    if hasattr(self.old_temp, id) == False or temperature != self.old_temp[id]:
+                        type = "xpl-trig"
+                    else:
+                        type = "xpl-stat"
+                    self.old_temp[id] = temperature
+                    print "type=%s, id=%s, temp=%s" % (type, id, temperature)
+                    self.callback(type, {"device" : id,
+                                         "type" : "temp",
+                                         "current" : temperature})
+            time.sleep(self.interval)
+
+
+class ComponentDs18s20:
+    """
+    DS18S20 support
+    """
+
+    def __init__(self, log, onewire, interval, callback):
+        """
+        Return temperature each <interval> seconds
+        @param log : log instance
+        @param onewire : onewire network object
+        @param interval : interval between each data sent
+        @param callback : callback to return values
+        """
+        self._log = log
+        self.onewire = onewire
+        self.interval = interval
+        self.callback = callback
+        self.root = self.onewire.get_root()
+        self.old_temp = {}
+        self.start_listening()
+
+    def start_listening(self):
+        """ 
+        Start listening for onewire ds18s20
+        """
+        while True:
+            for comp in self.root.find(type = "DS18S20"):
+                id = comp.id
+                try:
+                    temperature = float(comp.temperature)
+                except AttributeError:
+                    error = "DS18S20 : error while reading value"
                     self._log.error(error)
                     print error
                     self.resolution = "12"
@@ -178,7 +229,7 @@ class OneWireNetwork:
             else:
                 self._root = ow.Sensor('/uncached')
         except:
-            raise OneWireException("Access to onewire device is not possible. Does your user have the good permissions ? If so, check that you stopped onewire module and you don't have OWFS mounted")
+            raise OneWireException("Access to onewire device is not possible. Does your user have the good permissions ? If so, check that you stopped onewire module and you don't have OWFS mounted : %s" % traceback.format_exc())
 
     def get_root(self):
         """

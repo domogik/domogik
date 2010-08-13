@@ -82,14 +82,10 @@ class serialHandler(threading.Thread):
         #self._writer = self.__Writer(self.__myser, self._want_lock, self._mutex, self._ack, command_cb, self._reader)
         #self._writer.start()
 
-    def get_from_answer_queue(self):
-        '''Calls self._reader.get_from_answer_queue
-        '''
-        return self.get_from_answer_queue()
-
     def _send(self, plcbus_frame):
         #Resend if proper ACK not received
         #check for ack pulse
+        explicit_frame = self.explicit_message(plcbus_frame)
         if (int(plcbus_frame[8:10], 16) >> 5) & 1: #ACK pulse bit set to 1
             #The ACK message take only 10ms + 10ms to bring it back to the computer.
             #Anyway, it seems that the mean time before reading the ack is about 
@@ -126,21 +122,23 @@ class serialHandler(threading.Thread):
                 elif(time1 + 3.1 < time.time()):
                     print "WARN : Message %s sent, but ack never received" % plcbus_frame
                     break #2s
-        else:
+        elif explicit_frame["d_command"] not in ['GET_ALL_ID_PULSE', 'GET_ALL_ON_ID_PULSE']:
             #No ACK asked, we consider that the message has been correctly sent
             self._basic_write(plcbus_frame)
-            self._cb(self.explicit_message(plcbus_frame))
+            self._cb(explicit_frame)
+        else:
+            self._basic_write(plcbus_frame)
 
     def _basic_write(self, frame):
         """Write a frame on serial port
         This method should only be called as mutex.lock() parameter
         @param frame : The frame to write 
         """
-        print "WAITING : %s" % self.__myser.inWaiting()
+        print "SEND : %s" % frame
         self.__myser.write(frame.decode("HEX"))
 
     def add_to_send_queue(self, trame):
-        print "add_to_send_queue"
+        print "add_to_send_queue : %s" % trame
         self._send_queue.put(trame)
 
     def needs_ack_for(self, frame):
@@ -215,8 +213,8 @@ class serialHandler(threading.Thread):
             r["d_user_code"] = r["data"][0:2]
             r["d_home_unit"] = "%s%s" % (home[int(r["data"][2:3], 16)],int(r["data"][3:4], 16)+1)
             r["d_command"] = cmdplcbus[r["data"][4:6]]
-            r["d_data1"] = r["data"][6:8]
-            r["d_data2"] = r["data"][8:10]
+            r["d_data1"] = int(r["data"][6:8],16)
+            r["d_data2"] = int(r["data"][8:10],16)
             if r["data_length"] == 6:
                 r["rx_tw_switch"] = r["data"][11:]
             r["end_bit"] = message[-2:]
@@ -233,16 +231,19 @@ class serialHandler(threading.Thread):
             #if message is likely to be an answer, put it in the right queue
             #First we check that the message is not from the adapter itself
             #And simply ignore it if it's the case 
+            print "str : %s" % m_string
             if self._is_from_myself(m_string):
                 return
             if self._is_answer(m_string):
-                self._answer_queue.put(m_string)
+                print "ANSWER : %s" % m_string
+                self._cb(self.explicit_message(m_string))
             elif self._is_ack(m_string):
                 print "IS ACK : %s, waited ack : %s" % (m_string, self._waited_ack)
                 if (self._waited_ack != None) and self._is_ack_for_message(m_string, self._waited_ack):
                     self._waited_ack = None
                     self._ack.set()
             else:
+                print "QUEUE : %s" % m_string
                 self._cb(self.explicit_message(m_string))
 
     def stop(self):

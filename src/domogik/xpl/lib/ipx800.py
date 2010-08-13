@@ -101,6 +101,25 @@ class IPX:
         self._log.info("Opening board : %s" % (host))
         self.get_status(first = True)
 
+    def get_status_for_helper(self):
+        """ Return status for helper
+        """
+        status = []
+        status.append("List of relay :")
+        for idx in self.led:
+            status.append(" - led%s : %s" % (idx, self.led[idx]))
+        status.append("List of digital input :")
+        for idx in self.btn:
+            status.append(" - btn%s : %s" % (idx, self.btn[idx]))
+        status.append("List of analog input :")
+        for idx in self.an:
+            status.append(" - an%s : %s" % (idx, self.an[idx]))
+        status.append("List of counters :")
+        for idx in self.count:
+            status.append(" - count%s : %s" % (idx, self.count[idx]))
+        return status
+            
+
 
     def listen(self, interval):
         """ Listen for relay board in background
@@ -224,6 +243,8 @@ class IPX:
             current = "HIGH"
         elif data['elt'] == "btn" and data['value'] == IPX_BTN_LOW:
             current = "LOW"
+        else:
+            current = data['value']
 
         # translate type
         if data['elt'] == "led":
@@ -235,6 +256,7 @@ class IPX:
         if data['elt'] == "count":
             type = 'count'
          
+        print "%s-%s-%s"  % (device, current, type)
         self._cb(device, current, type)
 
 
@@ -294,7 +316,7 @@ class IPX:
             foo = getattr(self, elt)
             foo[idx] = resp
             # status of element changed : we will have to send a xPl message
-            if first == False and old_foo[idx] != foo[idx]:
+            if (first == True) or (first == False and old_foo[idx] != foo[idx]):
                 self.send_change({'elt' : elt,
                                   'num' : idx,
                                   'value' : resp})

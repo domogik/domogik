@@ -141,7 +141,7 @@ db.add_sensor_feature_model(sf_name='Present', sf_device_type_id=device_type.id,
 # Create device technology features for Relay Board
 device_technology = db.add_device_technology(dt_id='relayboard', dt_name='Relay Board',
                                              dt_description='Relay boards monitoring and controling ')
-device_type = db.add_device_type(dty_name='Switch', dt_id=device_technology.id)
+device_type = db.add_device_type(dty_name='Relay', dt_id=device_technology.id)
 db.add_actuator_feature_model(af_name='Switch', af_device_type_id=device_type.id,
                               af_parameters='{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;low&quot;, &quot;value1&quot;:&quot;high&quot;}',
                               af_value_type='binary', af_stat_key='command',
@@ -149,7 +149,12 @@ db.add_actuator_feature_model(af_name='Switch', af_device_type_id=device_type.id
 db.add_actuator_feature_model(af_name='Trigger', af_device_type_id=device_type.id,
                               af_parameters='{&quot;command&quot;:&quot;pulse&quot;}',af_value_type='trigger',
                               af_return_confirmation=True)
-# TODO : voltmeter, logical_input, counter
+device_type = db.add_device_type(dty_name='Digital_Input', dt_id=device_technology.id)
+db.add_sensor_feature_model(sf_name='Digital Input', sf_device_type_id=device_type.id, sf_value_type='boolean', sf_parameters='{}', sf_stat_key='input')
+device_type = db.add_device_type(dty_name='Analog_Input', dt_id=device_technology.id)
+db.add_sensor_feature_model(sf_name='Analog Input', sf_device_type_id=device_type.id, sf_value_type='boolean', sf_parameters='{}', sf_stat_key='voltage')
+device_type = db.add_device_type(dty_name='Counter', dt_id=device_technology.id)
+db.add_sensor_feature_model(sf_name='Counter', sf_device_type_id=device_type.id, sf_value_type='boolean', sf_parameters='{}', sf_stat_key='count')
 
 # Create device technology features for Computer
 device_technology = db.add_device_technology(dt_id='computer', dt_name='Computer',
