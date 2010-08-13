@@ -53,7 +53,7 @@ IPX_SEARCH_TIMEOUT = 5
 IPX_LED_HIGH = "1"
 IPX_LED_LOW = "0"
 IPX_BTN_HIGH = "up"
-IPX_BTN_LOW = "down"
+IPX_BTN_LOW = "dn"
 
 # response
 IPX_SUCCESS = "Success!"
@@ -256,7 +256,7 @@ class IPX:
         if data['elt'] == "count":
             type = 'count'
          
-        print "%s-%s-%s"  % (device, current, type)
+        print "%s-%s(%s)-%s"  % (device, current, data['value'], type)
         self._cb(device, current, type)
 
 

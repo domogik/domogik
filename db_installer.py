@@ -143,7 +143,7 @@ device_technology = db.add_device_technology(dt_id='relayboard', dt_name='Relay 
                                              dt_description='Relay boards monitoring and controling ')
 device_type = db.add_device_type(dty_name='Relay', dt_id=device_technology.id)
 db.add_actuator_feature_model(af_name='Switch', af_device_type_id=device_type.id,
-                              af_parameters='{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;low&quot;, &quot;value1&quot;:&quot;high&quot;}',
+                              af_parameters='{&quot;output&quot;:&quot;&quot;,&quot;value0&quot;:&quot;low&quot;, &quot;value1&quot;:&quot;high&quot;}',
                               af_value_type='binary', af_stat_key='command',
                               af_return_confirmation=True)
 db.add_actuator_feature_model(af_name='Trigger', af_device_type_id=device_type.id,

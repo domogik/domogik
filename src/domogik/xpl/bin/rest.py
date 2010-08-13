@@ -3983,7 +3983,7 @@ class StatsManager(XplPlugin):
             @param message : the Xpl message received 
             """
 
-            print "MSG=%s" % message
+            #print "MSG=%s" % message
             ### we put data in database
             self._db = DbHelper()
             self._log_stats.debug("message catcher : %s" % message)
@@ -4018,14 +4018,12 @@ class StatsManager(XplPlugin):
             for map in self._res["mapping"]:
                 # first : get value and default key
                 key = map["name"]
-                print key
-                print map
                 try:
                     value = message.data[map["name"]]
-                    print "K/V=%s/%s" % (key, value)
                     if map["filter_key"] == None:
                         key = map["name"]
                         device_data.append({"key" : key, "value" : value})
+                        print ">>%s, %s, %s, %s" % (current_date, key, value, d_id)
                         self._db.add_device_stat(current_date, key, value, d_id)
                         print "In database :)"
                     else:
@@ -4033,6 +4031,7 @@ class StatsManager(XplPlugin):
                            map["filter_value"] == message.data[map["filter_key"]]:
                             key = map["new_name"]
                             device_data.append({"key" : key, "value" : value})
+                            print ">>%s, %s, %s, %s" % (current_date, key, value, d_id)
                             self._db.add_device_stat(current_date, key, value, d_id)
                             print "In database :)"
                         else:
@@ -4043,6 +4042,12 @@ class StatsManager(XplPlugin):
                     # example : a x10 command = ON has no level value
                     print "No value in message for key"
                     pass
+                except:
+                    error = "Error when processing stat : %s" % traceback.format_exc()
+                    print "==== Error in Stats ===="
+                    print error
+                    print "========================"
+                    self._log_stats.error(error)
     
             # Put data in events queues
             self._event_requests.add_in_queues(d_id, 
