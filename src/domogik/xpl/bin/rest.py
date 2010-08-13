@@ -3985,14 +3985,14 @@ class StatsManager(XplPlugin):
 
             #print "MSG=%s" % message
             ### we put data in database
-            self._db = DbHelper()
+            db = DbHelper()
             self._log_stats.debug("message catcher : %s" % message)
             try:
                 if self._res["device"] != None:
-                    d_id = self._db.get_device_by_technology_and_address(self._technology, \
+                    d_id = db.get_device_by_technology_and_address(self._technology, \
                         message.data[self._res["device"]]).id
                 elif self._res["static_device"] != None:
-                    d_id = self._db.get_device_by_technology_and_address(self._technology, \
+                    d_id = db.get_device_by_technology_and_address(self._technology, \
                         self._res["static_device"]).id
                 else:  # oups... something wrong in xml file ?
                     self._log_stats.error("Device has no name... is there a problem in xml file ?")
@@ -4024,7 +4024,7 @@ class StatsManager(XplPlugin):
                         key = map["name"]
                         device_data.append({"key" : key, "value" : value})
                         print ">>%s, %s, %s, %s" % (current_date, key, value, d_id)
-                        self._db.add_device_stat(current_date, key, value, d_id)
+                        db.add_device_stat(current_date, key, value, d_id)
                         print "In database :)"
                     else:
                         if map["filter_value"] != None and \
@@ -4032,7 +4032,7 @@ class StatsManager(XplPlugin):
                             key = map["new_name"]
                             device_data.append({"key" : key, "value" : value})
                             print ">>%s, %s, %s, %s" % (current_date, key, value, d_id)
-                            self._db.add_device_stat(current_date, key, value, d_id)
+                            db.add_device_stat(current_date, key, value, d_id)
                             print "In database :)"
                         else:
                             if map["filter_value"] == None:
