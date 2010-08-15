@@ -152,6 +152,7 @@ class AreaTestCase(GenericTestCase):
         print(area0)
         assert area0.name == 'area0'
         assert self.db.list_areas()[0].name == 'area0'
+        assert len(self.db.get_all_rooms_of_area(area0.id)) == 0
 
     def test_update(self):
         area = self.db.add_area('area0','description 0')
