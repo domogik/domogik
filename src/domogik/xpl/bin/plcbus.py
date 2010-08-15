@@ -129,7 +129,7 @@ class PlcBusMain(XplPlugin):
         @param : plcbus frame as an array
         '''
         if f["d_command"] == "GET_ALL_ID_PULSE":
-            data = int("%s%s" % (f["d_data1"], f["d_data2"]), 16)
+            data = int("%s%s" % (f["d_data1"], f["d_data2"]))
             house = f["d_home_unit"][0]
             for i in range(0,16):
                 unit = data >> i & 1
