@@ -52,7 +52,7 @@ class TeleInfo:
         """
         self._log = log
         self._stop = threading.Event()
-        self._thread = self.__TeleInfoHandler(serial_port, callback, float(interval), self._stop)
+        self._thread = self.__TeleInfoHandler(serial_port, callback, float(interval), self._stop, self._log)
 
     def start(self):
         """ Start the teleinfo handler thread
@@ -70,13 +70,14 @@ class TeleInfo:
         Read data on serial port
         """
 
-        def __init__(self, serial_port, callback, interval, lock):
+        def __init__(self, serial_port, callback, interval, lock, log):
             """ Initialize thread
             """
             threading.Thread.__init__(self)
             self._ser = serial.Serial(serial_port,
                 1200, bytesize=7, parity = 'E',stopbits=1)
             self._lock = lock
+            self._log = log
             self._interval = interval
             self._cb = callback
 
@@ -167,5 +168,5 @@ def cb( frame):
         print "%s : %s" % (entry["name"], entry["value"])
 
 if __name__ == "__main__":
-    tele = TeleInfo('/dev/ttyUSB1', cb, 5)
+    tele = TeleInfo('/dev/teleinfo', cb, 5)
     tele.start()
