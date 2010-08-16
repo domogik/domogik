@@ -3623,7 +3623,7 @@ class JSonHelper():
                    "SystemStats", "SystemStatsValue", "Trigger", \
                    "DeviceFeatureAssociation", "DeviceFeatureModel") 
         instance_type = ("instance")
-        num_type = ("int", "float")
+        num_type = ("int", "float", "long")
         str_type = ("str", "unicode", "bool", "datetime", "date")
         none_type = ("NoneType")
         tuple_type = ("tuple")
