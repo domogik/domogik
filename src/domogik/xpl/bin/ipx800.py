@@ -66,15 +66,16 @@ class IPXManager(XplPlugin):
             self._config = Query(self._myxpl)
             res = XplResult()
             self._config.query('ipx800', 'ipx-%s-ip' % str(num), res)
-            ip = res.get_value()['ipx-%s-ip' % str(num)]
+            address = res.get_value()['ipx-%s-ip' % str(num)]
             self._config = Query(self._myxpl)
             res = XplResult()
             self._config.query('ipx800', 'ipx-%s-int' % str(num), res)
-            int = res.get_value()['ipx-%s-int' % str(num)]
+            inter = res.get_value()['ipx-%s-int' % str(num)]
             if name != "None":
-                self._log.info("Configuration : name=%s, ip=%s, interval=%s" % (name, ip, int))
-                self.ipx_list[name] = {"ip" : ip,
-                                       "interval" : float(int)}
+                self._log.info("Configuration : name=%s, ip=%s, interval=%s" % 
+                               (name, address, inter))
+                self.ipx_list[name] = {"ip" : address,
+                                       "interval" : float(inter)}
             else:
                 loop = False
             num += 1
@@ -83,11 +84,12 @@ class IPXManager(XplPlugin):
         for ipx in self.ipx_list:
             self.ipx_list[ipx]['obj'] = IPX(self._log, self.send_xpl)
             try:
-                self._log.info("Opening IPX800 named '%s' (ip : %s)" % (ipx, self.ipx_list[ipx]['ip']))
+                self._log.info("Opening IPX800 named '%s' (ip : %s)" % 
+                               (ipx, self.ipx_list[ipx]['ip']))
                 self.ipx_list[ipx]['obj'].open(ipx, self.ipx_list[ipx]['ip'])
-            except IPXException as e:
-                self._log.error(e.value)
-                print e.value
+            except IPXException as err:
+                self._log.error(err.value)
+                print err.value
                 self.force_leave()
                 return
 
@@ -101,9 +103,9 @@ class IPXManager(XplPlugin):
                                               (self.ipx_list[ipx]['interval'],),
                                               {})
                 ipx_listen.start()
-            except IPXException as e:
-                self._log.error(e.value)
-                print e.value
+            except IPXException as err:
+                self._log.error(err.value)
+                print err.value
                 self.force_leave()
                 return
 
@@ -117,27 +119,34 @@ class IPXManager(XplPlugin):
         self._log.info("Plugin ready :)")
 
 
-    def send_xpl(self, device, current, type):
-        # Send xpl-trig to give status change
+    def send_xpl(self, msg_device, msg_current, msg_type):
+        """ Send xpl-trig to give status change
+            @param msg_device : device
+            @param msg_current : device's value
+            @param msg_type : device's type
+        """
         msg = XplMessage()
         msg.set_type("xpl-trig")
         msg.set_schema('sensor.basic')
-        msg.add_data({'device' :  device})
-        msg.add_data({'type' :  type})
-        msg.add_data({'current' :  current})
+        msg.add_data({'device' :  msg_device})
+        msg.add_data({'type' :  msg_type})
+        msg.add_data({'current' :  msg_current})
         self._myxpl.send(msg)
 
 
     def ipx_command(self, message):
+        """ Call ipx800 lib function in function of given xpl message
+            @param message : xpl message
+        """
         if 'device' in message.data:
-            device = message.data['device']
+            msg_device = message.data['device']
         if 'type' in message.data:
-            type = message.data['type'].lower()
+            msg_type = message.data['type'].lower()
         if 'current' in message.data:
-            current = message.data['current'].upper()
+            msg_current = message.data['current'].upper()
  
-        data = "device=%s, type=%s, current=%s" % (device, type, current)
-        data_name = device.split("-")
+        data = "device=%s, type=%s, current=%s" % (msg_device, msg_type, msg_current)
+        data_name = msg_device.split("-")
         ipx_name = data_name[0]
         elt = data_name[1][0:-1]
         num = int(data_name[1][-1])
@@ -147,22 +156,22 @@ class IPXManager(XplPlugin):
             return
 
         # check data
-        if elt == 'led' and current not in ['HIGH', 'LOW', 'PULSE'] \
-           and type != 'output':
+        if elt == 'led' and msg_current not in ['HIGH', 'LOW', 'PULSE'] \
+           and msg_type != 'output':
             self._log.warning("Bad data : %s" % data)
             return
 
-        # TODO : other checks : counter
+        # TODO in a next release : other checks : counter
   
         # action in function of type
-        if elt == 'led' and type == 'output' and current in ['HIGH', 'LOW']:
-            self.ipx_list[ipx_name]['obj'].set_relay(num, current)
-        elif elt == 'led' and type == 'output' and current== 'PULSE':
+        if elt == 'led' and msg_type == 'output' and msg_current in ['HIGH', 'LOW']:
+            self.ipx_list[ipx_name]['obj'].set_relay(num, msg_current)
+        elif elt == 'led' and msg_type == 'output' and msg_current == 'PULSE':
             self.ipx_list[ipx_name]['obj'].pulse_relay(num)
 
-        # TODO : other actions : counter reset
+        # TODO in a next release : other actions : counter reset
 
 
 if __name__ == "__main__":
-    inst = IPXManager()
+    INST = IPXManager()
 
