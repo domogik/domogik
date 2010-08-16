@@ -167,5 +167,5 @@ def cb( frame):
         print "%s : %s" % (entry["name"], entry["value"])
 
 if __name__ == "__main__":
-    tele = TeleInfo('/dev/ttyUSB1', cb, 5)
+    tele = TeleInfo('/dev/teleinfo', cb, 5)
     tele.start()
