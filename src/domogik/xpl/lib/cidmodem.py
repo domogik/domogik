@@ -47,16 +47,17 @@ NUM_START_LINE = "NMBR"
 NUM_PATTERN = "NMBR *= *"
 
 
-class CallerIdModemException:
+class CallerIdModemException(Exception):
     """
     OneWire exception
     """
 
     def __init__(self, value):
+        Exception.__init__(self)
         self.value = value
 
     def __str__(self):
-        return self.repr(self.value)
+        return repr(self.value)
 
 
 

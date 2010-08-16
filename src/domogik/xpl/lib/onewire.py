@@ -42,7 +42,7 @@ import traceback
 
 
 
-class OneWireException:
+class OneWireException(Exception):
     """
     OneWire exception
     """
@@ -51,7 +51,7 @@ class OneWireException:
         self.value = value
 
     def __str__(self):
-        return self.repr(self.value)
+        return repr(self.value)
 
 
 
