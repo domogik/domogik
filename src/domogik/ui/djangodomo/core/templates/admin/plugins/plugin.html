@@ -27,33 +27,9 @@ $(function(){
 	$("#nav2").accordion({ autoHeight: false, header: ".subnav2", active:2});
     
     {% ifequal plugin.status "ON" %}
-        $("#buttonstatus").click(function() {
-            $("#buttonstatus").attr('className', 'button icon16-action-processing_f6f6f6');
-            $.getREST(['plugin', 'stop', '{{ plugin.name }}'],
-                function(data) {
-                    var status = (data.status).toLowerCase();
-                    if (status == 'ok') {
-//                        $.reloadPage({'status': 'ok', 'msg': '{% trans "Plugin" %}\'{{ plugin.name }}\' {% trans "successfully stopped" %}'});
-                    } else {
-                        $.notification('error', '{% trans "Plugin not stopped" %} (' + data.description + ')');
-                    }
-                }
-            );
-        });
+        setStatus(true);
     {% else %}
-        $("#buttonstatus").click(function() {
-            $("#buttonstatus").attr('className', 'button icon16-action-processing_f6f6f6');
-            $.getREST(['plugin', 'start', '{{ plugin.name }}'],
-                function(data) {
-                    var status = (data.status).toLowerCase();
-                    if (status == 'ok') {
-//                        $.reloadPage({'status': 'ok', 'msg': '{% trans "Plugin" %}\'{{ plugin.name }}\' {% trans "successfully started" %}'});
-                    } else {
-                        $.notification('error', '{% trans "Plugin not started" %} (' + data.description + ')');
-                    }
-                }
-            );
-        });
+        setStatus(false);
     {% endifequal %}
     
     function resetKey(key, value) {
@@ -190,6 +166,52 @@ $(function(){
     $("#configurationdelete").click(function(event) {
         deleteConfig('{{ plugin.name }}', '{{ plugin.host }}');
     });
+    
+    function setStatus(status) {
+        if (status) { //active
+            strstatus = 'active';
+            textstatus = '{% trans "Running" %}';
+            btstrstatus = 'inactive';
+            bttextstatus = '{% trans "Stop plugin" %}';
+            btaction = 'stop';
+            btokmsg = '{% trans "Plugin successfully stopped" %}';
+            bterrormsg = '{% trans "Plugin not stopped" %}';
+        } else { //inactive
+            strstatus = 'inactive';
+            textstatus = '{% trans "Stopped" %}';
+            btstrstatus = 'active';
+            bttextstatus = '{% trans "Start plugin" %}';
+            btaction = 'start';
+            btokmsg = '{% trans "Plugin successfully started" %}';
+            bterrormsg = '{% trans "Plugin not started" %}';
+        }
+        btstatus = !status;
+
+        $("#iconstatus").empty()
+            .attr('class', "icon16-text-right icon16-status-" + strstatus)
+            .html("<span class='label'>{% trans "Status" %}:</span><span class='offscreen'>" + textstatus + "</span>");
+        $("#buttonstatus").attr('class', 'button icon16-status-' + btstrstatus)
+            .text(bttextstatus)
+            .unbind('click')
+            .click(function() {
+            $("#buttonstatus").attr('className', 'button icon16-action-processing_f6f6f6');
+            $.getREST(['plugin', btaction, '{{ plugin.name }}'],
+                function(data) {
+                    var status = (data.status).toLowerCase();
+                    $("#buttonstatus").removeClass('icon16-action-processing_f6f6f6');
+                    if (status == 'ok') {
+                        $.notification('ok', btokmsg);
+                        getPluginsList();
+                        setStatus(btstatus);
+                    } else {
+                        $.notification('error', bterrormsg + ' (' + data.description + ')');
+                        setStatus(!btstatus);
+                    }
+                }
+            );
+        });
+
+    }
 });
 {% endblock %}
 {% block css %}
@@ -212,13 +234,7 @@ $(function(){
         <li><span class='label'>{% trans "Host" %}:</span> {{ plugin.host }}</li>
         {% ifnotequal plugin.name "rest" %}
             <li><span class='label'>{% trans "Technology" %}:</span> {{ plugin.technology }}</li>
-            <li>
-            {% ifequal plugin.status "ON" %}
-                <div class='icon16-text-right icon16-status-active'><span class='label'>{% trans "Status" %}:</span><span class='offscreen'>{% trans "Running" %}</span></div>
-            {% else %}
-                <div class='icon16-text-right icon16-status-inactive'><span class='label'>{% trans "Status" %}:</span><span class='offscreen'>{% trans "Stopped" %}</span></div>                        
-            {% endifequal %}
-            </li>
+            <li><div id='iconstatus'></div></li>
         {% endifnotequal %}
     </ul>
 {% endblock %}
@@ -227,11 +243,7 @@ $(function(){
     <section class="subsection">
         <h2>{% trans "Basic Control" %}</h2>
         {% ifnotequal plugin.name "rest" %}
-            {% ifequal plugin.status "ON" %}
-                <button id='buttonstatus' class='button icon16-status-inactive'>{% trans "Stop plugin" %}</button>
-            {% else %}
-                <button id='buttonstatus' class='button icon16-status-active'>{% trans "Start plugin" %}</button>
-            {% endifequal %}
+            <button id='buttonstatus'></button>
         {% endifnotequal %}
     </section>
     <section class="subsection">
