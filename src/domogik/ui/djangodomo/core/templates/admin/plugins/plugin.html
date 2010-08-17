@@ -88,14 +88,14 @@ $(function(){
                 function(data) {
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
-                        $('#value_' + item.key).attr('class', 'medium icon16-status-true');
+                        $('#value_' + item.key).parent().attr('class', 'value icon16-status-true');
                         itemSaved++;
                         if (itemSaved == configuration.length) { // All saved without error
                             $.notification('ok', "Configuration saved successfully");
                         }
                     } else {
                         // Error
-                        $('#value_' + item.key).attr('class', 'medium icon16-status-false');
+                        $('#value_' + item.key).parent().attr('class', 'value icon16-status-false');
                         $.notification(data.status, data.description);
                     }
                 }
@@ -121,19 +121,30 @@ $(function(){
                                 var tr = $("<tr></tr>");
                                 tr.append("<td>" +  ikey + "</td><td><label for='value_" + ikey + "'>" +  idescription + "</label></td>");
                                 if (itype == 'boolean') {
-                                    $(tr).append("<td><input type='checkbox' name='value_" + ikey + "' id='value_" + ikey + "' /></td><td></td>");
+                                    var td = $("<td class='value'></td>");
+                                    td.append("<input type='checkbox' name='value_" + ikey + "' id='value_" + ikey + "' />");
                                     if (data.config.length > 0) { // If already configured
                                         if (data.config[0].value  == "True") {
                                             $("#value_" + ikey, tr).attr('checked', true);
                                         }
+                                    } else {
+                                        td.addClass('icon16-status-warning');
+                                        td.prepend("<span class='offscreen'>No configured</span>");
                                     }
+                                    tr.append(td);
+                                    tr.append("<td></td>");
                                 } else {
+                                    var td = $("<td class='value'></td>");
+
                                     if (data.config.length > 0) { // If already configured
-                                        $(tr).append("<td><input type='text' name='value_" + ikey + "' id='value_" + ikey + "' class='medium' value='" +  data.config[0].value + "' /></td>");                                                                            
+                                        td.append("<input type='text' name='value_" + ikey + "' id='value_" + ikey + "' class='medium' value='" +  data.config[0].value + "' />");                                                                            
                                     } else { // If not configured
-                                        $(tr).append("<td><input type='text' name='value_" + ikey + "' id='value_" + ikey + "' class='medium icon16-status-warning' title='Default value' value='" +  idefault + "' /></td>");
+                                        td.addClass('icon16-status-warning');
+                                        td.prepend("<span class='offscreen'>No configured</span>");
+                                        td.append("<input type='text' name='value_" + ikey + "' id='value_" + ikey + "' class='medium' title='Default value' value='" +  idefault + "' />");
                                     }
-                                    $(tr).append("<td><ul class='actions'><li><button id='reset" + ikey + "' class='icon16-action-reset buttonicon' title='{% trans "Reset" %} " + ikey + "'><span class='offscreen'>{% trans "Reset" %} " + ikey + "</span></button></li></ul></td>");                                    
+                                    tr.append(td);
+                                    tr.append("<td><ul class='actions'><li><button id='reset" + ikey + "' class='icon16-action-reset buttonicon' title='{% trans "Reset" %} " + ikey + "'><span class='offscreen'>{% trans "Reset" %} " + ikey + "</span></button></li></ul></td>");                                    
                                 }
                                 $("#configuration_items").append(tr);
                                 $("#reset" + ikey).click(function(event) {
