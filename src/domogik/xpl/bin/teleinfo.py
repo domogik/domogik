@@ -59,8 +59,7 @@ class TeleinfoManager(XplPlugin):
         device = res.get_value()['device']
         res = XplResult()
         self._config.query('teleinfo', 'interval', res)
-        interval = res.get_value()['interval']
-        self._device = device
+        interval = float(res.get_value()['interval'])
 
         # Init Teleinfo
         teleinfo  = Teleinfo(self._log, self.send_xpl)
@@ -95,7 +94,7 @@ class TeleinfoManager(XplPlugin):
 
         for entry in frame:
             my_temp_message.add_data({entry["name"].lower() : entry["value"]})
-        my_temp_message.add_data({"device": self._device})
+        my_temp_message.add_data({"device": "teleinfo"})
 
         self._myxpl.send(my_temp_message)
 
