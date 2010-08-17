@@ -37,8 +37,10 @@ Implements
 
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin, XplResult
-from domogik.xpl.lib.teleinfo import TeleInfo
+from domogik.xpl.lib.teleinfo import Teleinfo
+from domogik.xpl.lib.teleinfo import TeleinfoException
 from domogik.xpl.common.queryconfig import Query
+import threading
 
 
 class TeleinfoManager(XplPlugin):
@@ -59,11 +61,28 @@ class TeleinfoManager(XplPlugin):
         self._config.query('teleinfo', 'interval', res)
         interval = res.get_value()['interval']
         self._device = device
-        self._myteleinfo  = TeleInfo(self._log, device, self._broadcastframe, interval)
-        self.add_stop_cb(self._myteleinfo.stop)
-        self._myteleinfo.start()
 
-    def _broadcastframe(self, frame):
+        # Init Teleinfo
+        teleinfo  = Teleinfo(self._log, self.send_xpl)
+        
+        # Open Teleinfo modem
+        try:
+            teleinfo.open(device)
+        except TeleinfoException as err:
+            self._log.error(err.value)
+            print err.value
+            self.force_leave()
+            return
+            
+        # Start reading Teleinfo
+        teleinfo_process = threading.Thread(None,
+                                   teleinfo.listen,
+                                   None,
+                                   (interval),
+                                   {})                                  
+        teleinfo_process.start()                              
+
+    def send_xpl(self, frame):
         ''' Send a frame from teleinfo device to xpl
         @param frame : a dictionnary mapping teleinfo informations
         '''
