@@ -57,13 +57,14 @@ class Teleinfo:
     """
 
     def __init__(self, log, callback):
-        """ @param device : The full path or number of the device where teleinfo is connected
+        """ @param device : teleinfo modem device path
         @param log : log instance
         @param callback : method to call each time all data are collected
         The datas will be passed using a dictionnary
         """
         self._log = log
         self._callback = callback
+        self._ser = None
 
 
     def open(self, device):
@@ -100,55 +101,55 @@ class Teleinfo:
         """ Fetch one full frame for serial port
         If some part of the frame is corrupted,
         it waits until th enext one, so if you have corruption issue,
-        this method can take time, but it enures that the frame returned is valid
+        this method can take time but it enures that the frame returned is valid
         @return frame : list of dict {name, value, checksum}
         """
         #Get the begin of the frame, markde by \x02
-        fr = self._ser.readline()
-        ok = False
+        resp = self._ser.readline()
+        is_ok = False
         frame = []
-        while not ok:
+        while not is_ok:
             try:
-                while '\x02' not in fr:
-                    fr = self._ser.readline()
+                while '\x02' not in resp:
+                    resp = self._ser.readline()
                 #\x02 is in the last line of a frame, so go until the next one
-                fr = self._ser.readline()
+                resp = self._ser.readline()
                 #A new frame starts
                 #\x03 is the end of the frame
-                while '\x03' not in fr:
+                while '\x03' not in resp:
                     #Don't use strip() here because the checksum can be ' '
-                    if len(fr.replace('\r','').replace('\n','').split()) == 2:
+                    if len(resp.replace('\r','').replace('\n','').split()) == 2:
                         #The checksum char is ' '
-                        name, value = fr.replace('\r','').replace('\n','').split()
+                        name, value = resp.replace('\r','').replace('\n','').split()
                         checksum = ' '
                     else:
-                        name, value, checksum = fr.replace('\r','').replace('\n','').split()
-                    if self._is_valid(fr, checksum):
+                        name, value, checksum = resp.replace('\r','').replace('\n','').split()
+                    if self._is_valid(resp, checksum):
                         frame.append({"name" : name, "value" : value, "checksum" : checksum})
                     else:
                         #This frame is corrupted, we need to wait until the next one
                         frame = []
-                        while '\x02' not in fr:
-                            fr = self._ser.readline()
-                    fr = self._ser.readline()
+                        while '\x02' not in resp:
+                            resp = self._ser.readline()
+                    resp = self._ser.readline()
                 #\x03 has been detected, that's the last line of the frame
-                if len(fr.replace('\r','').replace('\n','').split()) == 2:
+                if len(resp.replace('\r','').replace('\n','').split()) == 2:
                     #The checksum char is ' '
-                    name, value = fr.replace('\r','').replace('\n','').replace('\x02','').replace('\x03','').split()
+                    name, value = resp.replace('\r','').replace('\n','').replace('\x02','').replace('\x03','').split()
                     checksum = ' '
                 else:
-                    name, value, checksum = fr.replace('\r','').replace('\n','').replace('\x02','').replace('\x03','').split()
-                if self._is_valid(fr, checksum):
+                    name, value, checksum = resp.replace('\r','').replace('\n','').replace('\x02','').replace('\x03','').split()
+                if self._is_valid(resp, checksum):
                     frame.append({"name" : name, "value" : value, "checksum" : checksum})
-                    ok = True
+                    is_ok = True
                 else:
-                    fr = self._ser.readline()
+                    resp = self._ser.readline()
             except ValueError:
                 #Badly formatted frame
                 #This frame is corrupted, we need to wait until the next one
                 frame = []
-                while '\x02' not in fr:
-                    fr = self._ser.readline()
+                while '\x02' not in resp:
+                    resp = self._ser.readline()
         return frame
 
     def _is_valid(self, frame, checksum):
@@ -158,18 +159,7 @@ class Teleinfo:
         """
         datas = ' '.join(frame.split()[0:2])
         my_sum = 0
-        for c in datas:
-            my_sum = my_sum + ord(c)
+        for cks in datas:
+            my_sum = my_sum + ord(cks)
         computed_checksum = ( my_sum & int("111111", 2) ) + 0x20
         return chr(computed_checksum) == checksum
-
-###Exemple
-def callback( frame):
-    """ Print a frame
-    """
-    for entry in frame :
-        print "%s : %s" % (entry["name"], entry["value"])
-
-if __name__ == "__main__":
-    tele = TeleInfo('/dev/teleinfo', callback, 5)
-    tele.start()
