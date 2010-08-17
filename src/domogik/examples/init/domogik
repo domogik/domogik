@@ -36,7 +36,7 @@ HUB_IFACE="lo"
 
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$CUSTOM_PATH:
 if [ $UID != 0 ];then
-    echo "Must be started with root privileges";
+    echo "Must be run with root privileges";
     exit 1;
 fi
 
