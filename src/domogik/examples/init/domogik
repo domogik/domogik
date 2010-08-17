@@ -91,6 +91,7 @@ function stop_django {
     for pid in `ps ax | grep "dmg_django runserver" | grep -v grep | awk '{print $1}'`; do
         kill -15 $pid 2>/dev/null 1>&2
     done
+    echo " Done."
 }
 
 function stop_xpl {
@@ -99,6 +100,7 @@ function stop_xpl {
         kill -15 $pid 2>/dev/null 1>&2
         kill -9 $pid 2>/dev/null 1>&2
     done
+    echo " Done."
 }
 
 function stop_manager {
@@ -106,6 +108,7 @@ function stop_manager {
     for pid in `ps ax | grep "dmg_manager" | grep -v grep | awk '{print $1}'`; do
         kill -15 $pid 2>/dev/null 1>&2
     done
+    echo " Done."
 }
 
 function stop_plugins {
@@ -115,6 +118,7 @@ function stop_plugins {
     for pid in `ps ax | egrep "domogik.*\.pyc$" | grep -v grep | awk '{print $1}'`; do
         kill -15 $pid 2>/dev/null 1>&2
     done
+    echo " Done."
 }
 
 # Check if the directory for lock exists
