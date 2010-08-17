@@ -165,6 +165,7 @@ class X10Main(XplPlugin):
             level = message.data['level']
         self._log.debug("%s received : device = %s, house = %s, level = %s" % (cmd, dev, house, level))
         commands[cmd](dev, house, level)
+        self.x10_monitor_cb(dev, cmd)
 
     def x10_monitor_cb(self, unit, order, args = None):
         """
