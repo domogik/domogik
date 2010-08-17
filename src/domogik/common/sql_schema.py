@@ -636,7 +636,7 @@ class UIItemConfig(Base):
     name =  Column(Unicode(30), primary_key=True)
     reference = Column(Unicode(30), primary_key=True)
     key = Column(Unicode(30), primary_key=True)
-    value = Column(Unicode(255), nullable=False)
+    value = Column(UnicodeText(), nullable=False)
 
     def __init__(self, name, reference, key, value):
         """Class constructor
