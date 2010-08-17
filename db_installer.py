@@ -122,19 +122,19 @@ def install(only_unit_tests=False):
     device_technology = db.add_device_technology(dt_id='service', dt_name='Service',
                                              dt_description='Distributed services, water, gas, electricity')
     device_type = db.add_device_type(dty_name='Teleinfo', dt_id=device_technology.id)
-    db.add_sensor_feature_model(sf_name='Instantaneous intensity', sf_device_type_id=device_type.id, sf_value_type='number',
+    db.add_sensor_feature_model(sf_name='Intensité instantanée', sf_device_type_id=device_type.id, sf_value_type='number',
                             sf_parameters='{&quot;unit&quot;:&quot;A&quot;}', sf_stat_key='iinst')
-    db.add_sensor_feature_model(sf_name='Off peak', sf_device_type_id=device_type.id, sf_value_type='number',
+    db.add_sensor_feature_model(sf_name='Heures creuses', sf_device_type_id=device_type.id, sf_value_type='number',
                             sf_parameters='{&quot;unit&quot;:&quot;Wh&quot;}', sf_stat_key='hchc')
-    db.add_sensor_feature_model(sf_name='Maximum intensity', sf_device_type_id=device_type.id, sf_value_type='number',
+    db.add_sensor_feature_model(sf_name='Intensité maximale', sf_device_type_id=device_type.id, sf_value_type='number',
                             sf_parameters='{&quot;unit&quot;:&quot;A&quot;}', sf_stat_key='imax')
-    db.add_sensor_feature_model(sf_name='Tariff Period', sf_device_type_id=device_type.id, sf_value_type='string',
+    db.add_sensor_feature_model(sf_name='Période tarifaire', sf_device_type_id=device_type.id, sf_value_type='string',
                             sf_parameters=None, sf_stat_key='ptec')
-    db.add_sensor_feature_model(sf_name='Power', sf_device_type_id=device_type.id, sf_value_type='number',
+    db.add_sensor_feature_model(sf_name='Puissance apparente', sf_device_type_id=device_type.id, sf_value_type='number',
                             sf_parameters='{&quot;unit&quot;:&quot;Va&quot;}', sf_stat_key='papp')
-    db.add_sensor_feature_model(sf_name='Group schedule', sf_device_type_id=device_type.id, sf_value_type='string',
+    db.add_sensor_feature_model(sf_name='Groupe horaire', sf_device_type_id=device_type.id, sf_value_type='string',
                             sf_parameters=None, sf_stat_key='hhphc')
-    db.add_sensor_feature_model(sf_name='On Peak', sf_device_type_id=device_type.id, sf_value_type='number',
+    db.add_sensor_feature_model(sf_name='Heures pleines', sf_device_type_id=device_type.id, sf_value_type='number',
                             sf_parameters='{&quot;unit&quot;:&quot;Wh&quot;}', sf_stat_key='hchp')
 
     # Create device technology features for RFID
