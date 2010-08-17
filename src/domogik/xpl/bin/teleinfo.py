@@ -78,7 +78,7 @@ class TeleinfoManager(XplPlugin):
         teleinfo_process = threading.Thread(None,
                                    teleinfo.listen,
                                    None,
-                                   (interval),
+                                   (interval,),
                                    {})                                  
         teleinfo_process.start()                              
 
