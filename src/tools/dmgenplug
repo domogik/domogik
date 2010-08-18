@@ -25,7 +25,11 @@
 # Enable a plugin
 
 function get_user {
-    eval $(grep USER /etc/default/domogik)
+    if [ -f /etc/default/domogik];then
+        eval $(grep USER /etc/default/domogik)
+    elif [ -f /etc/conf.d/domogik];then
+        eval $(grep USER /etc/conf.d/domogik)
+    fi
     DMG_HOME=$(getent passwd $DOMOGIK_USER|cut -d ":" -f 6)
 }
 

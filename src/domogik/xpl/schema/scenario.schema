@@ -1,0 +1,55 @@
+""" This file is part of B{Domogik} project (U{http://www.domogik.org}).
+
+License
+=======
+
+B{Domogik} is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+B{Domogik} is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Domogik. If not, see U{http://www.gnu.org/licenses}.
+
+@author: Maxence Dunnewind <maxence@dunnewind.net>
+@copyright: (C) 2007-2009 Domogik project
+@license: GPL(v3)
+@organization: Domogik
+"""
+
+SCENARIO.BASIC
+
+    * Class : SCENARIO
+    * Type : BASIC
+
+=== XPL-CMND Structure ===
+Sends a request to create an instance of some scenario.
+The only mandatory parameters are the scenario name and the action (start/stop), all other key/value will be the parameters defined by the user if SCEACTION == START.
+
+SCENARIO.BASIC
+{
+SCENAME=<scenario name>
+SCEACTION=START|STOP
+[INSTID=<if SCEACTION is STOP, the unique id of the instance>]
+[KEY1=VAL1]
+[...=...]
+[KEYN=VALN]
+}
+
+=== XPL-TRIG Structure ===
+Used to send a confirmation that instance is correctly loaded
+
+SCENARIO.BASIC
+{
+SCENAME=<scenario name>
+SCEACTION=START|STOP
+RESULT=0|1
+[INSTID=<unique ID of the instance>]
+[ERROR=<error message if RESULT is 0]
+}
+
