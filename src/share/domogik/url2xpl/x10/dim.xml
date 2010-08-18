@@ -1,13 +1,13 @@
 <technology id="x10">
   <command name="dim">
     <schema>x10.basic</schema>
-    <command-key>command</command-key>	
-    <address-key>device</address-key>	
-    <command-xpl-value>dim</command-xpl-value>  
-    <parameters>                                                                                            
-      <parameter key="value" location="1"/>                                                           
-    </parameters>                                                                                           
-  </command>	
+    <command-key>command</command-key>
+    <address-key>device</address-key>
+    <command-xpl-value>dim</command-xpl-value>
+    <parameters>
+      <parameter key="value" location="1"/>
+    </parameters>
+  </command>
   <listener>
     <schema>x10.basic</schema>
     <xpltype>xpl-trig</xpltype>

@@ -235,7 +235,10 @@ class XplPlugin():
                 cb()
             for t in self._threads:
                 self._log.debug("Try to stop thread %s" % t)
-                t.join()
+                try:
+                    t.join()
+                except RuntimeError:
+                    pass
                 self._log.debug("Thread stopped %s" % t)
                 #t._Thread__stop()
 
