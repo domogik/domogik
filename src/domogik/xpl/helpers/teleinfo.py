@@ -80,8 +80,10 @@ class teleinfo(Helper):
         except TeleinfoException as e:
             return [e.value]
 
-        print data
-        return [data]
+        resp = []
+        for entry in data:
+            resp.append("%-10s : %-15s" % (entry["name"], entry["value"]))
+        return resp
 
 MY_CLASS = {"cb" : teleinfo}
 
