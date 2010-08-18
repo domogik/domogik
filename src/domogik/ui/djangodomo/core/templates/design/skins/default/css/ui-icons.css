@@ -404,16 +404,24 @@
 
 .icon16-text {
     display:inline-block;
-    background-position: 50% left;
+    background-position: 0% 50%;
     background-repeat:no-repeat;
     min-height:16px;
     padding-left:18px;
     line-height:16px;
 }
 
+.icon16-image {
+    display:inline-block;
+    background-position: 50% 50%;
+    background-repeat:no-repeat;
+    height:16px;
+    width:16px;
+}
+
 .icon16-text-right {
     display:inline-block;
-    background-position: right 50%;
+    background-position: 100% 50%;
     background-repeat:no-repeat;
     min-height:16px;
     padding-right:18px;
@@ -422,7 +430,7 @@
 
 .icon32-text {
     display:inline-block;
-    background-position: 50% left;
+    background-position: 0% 50%;
     background-repeat:no-repeat;
     min-height:32px;
     padding-left:34px;

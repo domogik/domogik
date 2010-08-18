@@ -36,7 +36,7 @@ HUB_IFACE="lo"
 
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$CUSTOM_PATH:
 if [ $UID != 0 ];then
-    echo "Must be started with root privileges";
+    echo "Must be run with root privileges";
     exit 1;
 fi
 
@@ -51,7 +51,7 @@ function start_django {
     if [ -z ${DJANGO_SERVER_PORT} ] ; then
         DJANGO_SERVER_PORT=8000
     fi
-    /bin/su - ${DOMOGIK_USER} -c "dmg_django runserver ${DJANGO_SERVER_IP}:${DJANGO_SERVER_PORT}>/dev/null 2>&1 &"
+    /bin/su - ${DOMOGIK_USER} -c "dmg_django runserver ${DJANGO_SERVER_IP}:${DJANGO_SERVER_PORT}>/tmp/django.log 2>&1 &"
     if [ $? -gt 0 ]; then
         echo " An error occured during Django startup."
         exit 1
@@ -91,6 +91,7 @@ function stop_django {
     for pid in `ps ax | grep "dmg_django runserver" | grep -v grep | awk '{print $1}'`; do
         kill -15 $pid 2>/dev/null 1>&2
     done
+    echo " Done."
 }
 
 function stop_xpl {
@@ -99,6 +100,7 @@ function stop_xpl {
         kill -15 $pid 2>/dev/null 1>&2
         kill -9 $pid 2>/dev/null 1>&2
     done
+    echo " Done."
 }
 
 function stop_manager {
@@ -106,6 +108,7 @@ function stop_manager {
     for pid in `ps ax | grep "dmg_manager" | grep -v grep | awk '{print $1}'`; do
         kill -15 $pid 2>/dev/null 1>&2
     done
+    echo " Done."
 }
 
 function stop_plugins {
@@ -115,6 +118,7 @@ function stop_plugins {
     for pid in `ps ax | egrep "domogik.*\.pyc$" | grep -v grep | awk '{print $1}'`; do
         kill -15 $pid 2>/dev/null 1>&2
     done
+    echo " Done."
 }
 
 # Check if the directory for lock exists

@@ -59,37 +59,57 @@ IPX_BTN_LOW = "dn"
 IPX_SUCCESS = "Success!"
 
 
-class IPXException:                                                         
-    """                                                                         
-    Ipx exception                                                           
-    """                                                                         
-                                                                                
-    def __init__(self, value):                                                  
-        self.value = value                                                      
-                                                                                
-    def __str__(self):                                                          
-        return self.repr(self.value)           
-        
-        
-class IPX:
+class IPXException(Exception):
+    """
+    Ipx exception
+    """
 
-    def __init__(self, log, cb):
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return repr(self.value)
+
+
+class IPX:
+    """ Library to use IXP800 board
+    """
+
+    def __init__(self, log, callback):
         """ Init IPX object
             @param log : log instance
-            @param cb : callback
+            @param callback : callback
         """
         self._log = log
-        self._cb = cb
-        self.led = {}  # relays
-        self.btn = {}  # digital input
-        self.an = {}   # analogic input
-        self.count = {}# counters
+        self._callback = callback
+        self.name = ""
+        self.url = ""
+        self.url_status = ""
+        self.url_cgi_change = ""
+        self.url_cgi_pulse = ""
+        self.url_cgi_reset_counter = ""
+        self.ipx_led = {}  # relays
+        self.ipx_btn = {}  # digital input
+        self.ipx_an = {}   # analogic input
+        self.ipx_count = {}# counters
+        self.start_led = {}  # relays
+        self.start_btn = {}  # digital input
+        self.start_an = {}   # analogic input
+        self.start_count = {}# counters
+        self.nb_led = {}  # relays
+        self.nb_btn = {}  # digital input
+        self.nb_an = {}   # analogic input
+        self.nb_count = {}# counters
+        self.ipx_old_led = {}  # relays
+        self.ipx_old_btn = {}  # digital input
+        self.ipx_old_an = {}   # analogic input
+        self.ipx_old_count = {}# counters
 
     def open(self, name, host):
         """ Try to access to IPX board and return error if not possible
             @param ip : ip or dns of host
         """
-        self.name= name
+        self.name = name
         # define all urls
         self.url = "http://%s" % (host)
         self.url_status = "%s/status.xml" % self.url
@@ -106,19 +126,19 @@ class IPX:
         """
         status = []
         status.append("List of relay :")
-        for idx in self.led:
-            status.append(" - led%s : %s" % (idx, self.led[idx]))
+        for idx in self.ipx_led:
+            status.append(" - led%s : %s" % (idx, self.ipx_led[idx]))
         status.append("List of digital input :")
-        for idx in self.btn:
-            status.append(" - btn%s : %s" % (idx, self.btn[idx]))
+        for idx in self.ipx_btn:
+            status.append(" - btn%s : %s" % (idx, self.ipx_btn[idx]))
         status.append("List of analog input :")
-        for idx in self.an:
-            status.append(" - an%s : %s" % (idx, self.an[idx]))
+        for idx in self.ipx_an:
+            status.append(" - an%s : %s" % (idx, self.ipx_an[idx]))
         status.append("List of counters :")
-        for idx in self.count:
-            status.append(" - count%s : %s" % (idx, self.count[idx]))
+        for idx in self.ipx_count:
+            status.append(" - count%s : %s" % (idx, self.ipx_count[idx]))
         return status
-            
+
 
 
     def listen(self, interval):
@@ -137,13 +157,15 @@ class IPX:
         """
         # we get instant status of board
         self.get_status()
-        actual = self.led[num]
+        actual = self.ipx_led[num]
         # do we need to change status ?
         if actual == IPX_LED_HIGH and state == "HIGH" or \
            actual == IPX_LED_LOW and state == "LOW":
             # no need to change status
-            self._log.debug("No need to change 'led%s' status to '%s'" % (num, state))
-            # no change but you should send a xpl-trig to tell that the order was received
+            self._log.debug("No need to change 'led%s' status to '%s'" % 
+                            (num, state))
+            # no change but you should send a xpl-trig to tell that 
+            # the order was received
             self.send_change({'elt' : 'led',
                               'num' : num,
                               'value' : actual})
@@ -154,17 +176,20 @@ class IPX:
         try:
             #tricky = urllib2.urlopen("http://192.168.0.10/")
             resp = urllib2.urlopen(url)
-        except IOError as e:
-            error = "Error while accessing to '%s' : %s" % (self.url_status, traceback.format_exc())
+        except IOError:
+            error = "Error while accessing to '%s' : %s" %  \
+                     (self.url_status, traceback.format_exc())
             print error
             self._log.error(error)
             raise IPXException(error)
             return
         res  = resp.read()
         if res[0:8] != IPX_SUCCESS:
-            self._log.error("Error while changing 'led%s' to '%s'" % (num, state))
+            self._log.error("Error while changing 'led%s' to '%s'" % 
+                            (num, state))
         else:
-            self._log.debug("Changing 'led%s' to '%s' successfully" % (num, state))
+            self._log.debug("Changing 'led%s' to '%s' successfully" % 
+                            (num, state))
             # refresh status (for sending a xpl-trig)
             self.get_status()
 
@@ -181,8 +206,9 @@ class IPX:
         try:
             #tricky = urllib2.urlopen("http://192.168.0.10/")
             resp = urllib2.urlopen(url)
-        except IOError as e:
-            error = "Error while accessing to '%s' : %s" % (self.url_status, traceback.format_exc())
+        except IOError:
+            error = "Error while accessing to '%s' : %s" % \
+                     (self.url_status, traceback.format_exc())
             print error
             self._log.error(error)
             raise IPXException(error)
@@ -210,15 +236,16 @@ class IPX:
         try:
             #tricky = urllib2.urlopen("http://192.168.0.10/")
             resp = urllib2.urlopen(url)
-        except IOError as e:
-            error = "Error while accessing to '%s' : %s" % (self.url_status, traceback.format_exc())
+        except IOError:
+            error = "Error while accessing to '%s' : %s" % \
+                     (self.url_status, traceback.format_exc())
             print(error)
-            send._log.error(error)
+            self._log.error(error)
             raise IPXException(error)
             return
         res  = resp.read()
         if res[0:8] != IPX_SUCCESS:
-            send._log.error("Error while reseting 'count%s'" % num)
+            self._log.error("Error while reseting 'count%s'" % num)
         else:
             self._log.debug("Reseting 'count%s' successfully" % num)
             # refresh status (for sending a xpl-trig)
@@ -248,16 +275,16 @@ class IPX:
 
         # translate type
         if data['elt'] == "led":
-            type = 'output'
+            elt_type = 'output'
         if data['elt'] == "btn":
-            type = 'input'
+            elt_type = 'input'
         if data['elt'] == "an":
-            type = 'voltage'
+            elt_type = 'voltage'
         if data['elt'] == "count":
-            type = 'count'
-         
-        print "%s-%s(%s)-%s"  % (device, current, data['value'], type)
-        self._cb(device, current, type)
+            elt_type = 'count'
+
+        print "%s-%s(%s)-%s"  % (device, current, data['value'], elt_type)
+        self._callback(device, current, elt_type)
 
 
     def get_status(self, first = False):
@@ -268,8 +295,9 @@ class IPX:
         try:
             #tricky = urllib2.urlopen("http://192.168.0.10/")
             resp = urllib2.urlopen(self.url_status)
-        except IOError as e:
-            error = "Error while accessing to '%s' : %s" % (self.url_status, traceback.format_exc())
+        except IOError:
+            error = "Error while accessing to '%s' : %s" % \
+                     (self.url_status, traceback.format_exc())
             print(error)
             self._log.error(error)
             raise IPXException(error)
@@ -278,27 +306,27 @@ class IPX:
         xml = resp.read()
         dom = minidom.parseString(xml)
         response = dom.getElementsByTagName("response")[0]
-        
+
         # First call : count items
         if first == True:
             self.get_count(response)
 
         # Save old status
         else:
-           self.old_led = copy.copy(self.led)
-           self.old_btn = copy.copy(self.btn)
-           self.old_an = copy.copy(self.an)
-           self.old_count = copy.copy(self.count)
+            self.ipx_old_led = copy.copy(self.ipx_led)
+            self.ipx_old_btn = copy.copy(self.ipx_btn)
+            self.ipx_old_an = copy.copy(self.ipx_an)
+            self.ipx_old_count = copy.copy(self.ipx_count)
 
         # List each status
         self.get_status_of(dom, "led", first)
-        #print "LED=%s" % self.led
+        #print "LED=%s" % self.ipx_led
         self.get_status_of(dom, "btn", first)
-        #print "BTN=%s" % self.btn
+        #print "BTN=%s" % self.ipx_btn
         self.get_status_of(dom, "an", first)
-        #print "AN=%s" % self.an
+        #print "AN=%s" % self.ipx_an
         self.get_status_of(dom, "count", first)
-        #print "COUNT=%s" % self.count
+        #print "COUNT=%s" % self.ipx_count
 
 
     def get_status_of(self, dom, elt, first = False):
@@ -308,15 +336,16 @@ class IPX:
             @param first : first launch ?
         """
         if first == False:
-            old_foo = getattr(self, "old_" + elt)
+            old_data = getattr(self, "old_" + elt)
         start = getattr(self, "start_" + elt)
-        end = getattr(self, "nb_" + elt) + start 
+        end = getattr(self, "nb_" + elt) + start
         for idx in range(start, end):
-            resp = dom.getElementsByTagName("%s%s" % (elt, idx))[0].firstChild.nodeValue
-            foo = getattr(self, elt)
-            foo[idx] = resp
+            resp = dom.getElementsByTagName("%s%s" % 
+                                           (elt, idx))[0].firstChild.nodeValue
+            data = getattr(self, elt)
+            data[idx] = resp
             # status of element changed : we will have to send a xPl message
-            if (first == True) or (first == False and old_foo[idx] != foo[idx]):
+            if first == True or (first == False and old_data[idx] != data[idx]):
                 self.send_change({'elt' : elt,
                                   'num' : idx,
                                   'value' : resp})
@@ -328,13 +357,17 @@ class IPX:
         """
         print dom.toxml()
         self.start_led, self.nb_led = self.get_count_of(dom, "led")
-        self._log.info("Number of relay : %s (start at %s)" % (self.nb_led, self.start_led))
+        self._log.info("Number of relay : %s (start at %s)" % 
+                       (self.nb_led, self.start_led))
         self.start_btn, self.nb_btn = self.get_count_of(dom, "btn")
-        self._log.info("Number of digital input : %s (start at %s)" % (self.nb_btn, self.start_btn))
+        self._log.info("Number of digital input : %s (start at %s)" % 
+                       (self.nb_btn, self.start_btn))
         self.start_an, self.nb_an = self.get_count_of(dom, "an")
-        self._log.info("Number of anal input : %s (start at %s)" % (self.nb_an, self.start_an))
+        self._log.info("Number of anal input : %s (start at %s)" % 
+                       (self.nb_an, self.start_an))
         self.start_count, self.nb_count = self.get_count_of(dom, "count")
-        self._log.info("Number of counters : %s (start at %s)" % (self.nb_count, self.start_count))
+        self._log.info("Number of counters : %s (start at %s)" % 
+                       (self.nb_count, self.start_count))
 
 
     def get_count_of(self, dom, elt):
@@ -344,62 +377,48 @@ class IPX:
         """
         # start at 0 or 1 ?
         try:
-            foo = dom.getElementsByTagName("%s0" % elt)[0]
+            data = dom.getElementsByTagName("%s0" % elt)[0]
             start = 0
         except IndexError:
             try:
-                foo = dom.getElementsByTagName("%s1" % elt)[0]
+                data = dom.getElementsByTagName("%s1" % elt)[0]
                 start = 1
             except IndexError:
                 return 0, 0
-        
+
         # count
         idx = start
         while True:
             try:
-                foo = dom.getElementsByTagName("%s%s" % (elt, str(idx)))[0]
+                data = dom.getElementsByTagName("%s%s" % (elt, str(idx)))[0]
             except IndexError:
                 break
             idx += 1
         return start, idx - start
-        
+
 
     def find(self):
         """ Try to find availables IPX boards on network
         """
         # open socket
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        s.settimeout(IPX_SEARCH_TIMEOUT)
+        my_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        my_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        my_sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        my_sock.settimeout(IPX_SEARCH_TIMEOUT)
 
         # send Discover Message
-        s.sendto(IPX_SEARCH_REQ, ('<broadcast>', IPX_UDP_PORT))
+        my_sock.sendto(IPX_SEARCH_REQ, ('<broadcast>', IPX_UDP_PORT))
 
         # wait for answer until IPX_SEARCH_TIMEOUT expires
         ipx_list = []
         while 1:
             try:
-                message, address = s.recvfrom(8192)
+                message, address = my_sock.recvfrom(8192)
                 name = message.split("\n")[0].strip()
                 self._log.info("Find IPX board : %s" % address[0])
                 ipx_list.append((address[0], name))
             except socket.timeout:
                 break
-    
+
         return ipx_list
 
-if __name__ == "__main__":
-    try:
-        ipx = IPX(None, None)
-        #print ipx.find()
-        ipx.open("ipxboard", "192.168.0.102")
-        #print "----"
-        ipx.set_relay(0, "HIGH")
-        time.sleep(5)
-        ipx.set_relay(0, "LOW")
-        #ipx.set_relay(0, "HIGH")
-        #ipx.set_relay(0, "LOW")
-        #ipx.pulse_relay(0)
-    except IPXException as e:
-        print e.value

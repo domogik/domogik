@@ -1,9 +1,9 @@
 <technology id="plcbus">
-  <command name="preset_dim">
+  <command name="bright">
     <schema>plcbus.basic</schema>
     <command-key>command</command-key>	
     <address-key>device</address-key>	
-    <command-xpl-value>PRESET_DIM</command-xpl-value>  
+    <command-xpl-value>BRIGHT</command-xpl-value>  
     <parameters>                                                                                            
       <parameter key="data1" location="1"/>                                                           
     </parameters>                                                                                           
@@ -12,7 +12,7 @@
     <schema>plcbus.basic</schema>
     <xpltype>xpl-trig</xpltype>
     <filter>
-      <key name="command" value="PRESET_DIM" />
+      <key name="command" value="BRIGHT" />
       <key name="device" value="@address@"/>
     </filter>
   </listener>

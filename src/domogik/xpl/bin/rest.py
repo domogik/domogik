@@ -865,36 +865,40 @@ class ProcessRequest():
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
 
         # Description and parameters
-        json_data.add_data({"Version" : REST_API_VERSION})
-        json_data.add_data({"Description" : REST_DESCRIPTION})
-        json_data.add_data({"SSL" : self.use_ssl})
+        info = {}
+        info["Version"] = REST_API_VERSION
+        info["SSL"] = self.use_ssl
 
         # Xml data
-        xml_info = ""
+        command = {}
+        xml_info = []
         for key in self.xml:
-            xml_info += key + ", "
-        xml_info = xml_info[0:len(xml_info)-2]
-        json_data.add_data({"/command : XML files loaded" : xml_info})
-        json_data.add_data({"/command : XML files last load" : self.xml_date})
+            xml_info.append(key)
+        command["/command : XML files loaded"] = xml_info
+        command["/command : XML files last load"] = self.xml_date
 
         # Queues stats
-
-        json_data.add_data({"Queue 'system_list' usage" : "%s/%s" \
-            % (self._queue_system_list.qsize(), int(self._queue_size))})
-        json_data.add_data({"Queue 'system_detail' usage" : "%s/%s" \
-            % (self._queue_system_detail.qsize(), int(self._queue_size))})
-        json_data.add_data({"Queue 'system_start' usage" : "%s/%s" \
-            % (self._queue_system_start.qsize(), int(self._queue_size))})
-        json_data.add_data({"Queue 'system_stop' usage" : "%s/%s" \
-            % (self._queue_system_stop.qsize(), int(self._queue_size))})
-        json_data.add_data({"Queue 'command' usage" : "%s/%s" \
-            % (self._queue_command.qsize(), int(self._queue_command_size))})
+        queues = {}
+        queues["Queue 'system_list' usage"] = "%s/%s" \
+            % (self._queue_system_list.qsize(), int(self._queue_size))
+        queues["Queue 'system_detail' usage"] = "%s/%s" \
+            % (self._queue_system_detail.qsize(), int(self._queue_size))
+        queues["Queue 'system_start' usage"] = "%s/%s" \
+            % (self._queue_system_start.qsize(), int(self._queue_size))
+        queues["Queue 'system_stop' usage"] = "%s/%s" \
+            % (self._queue_system_stop.qsize(), int(self._queue_size))
+        queues["Queue 'command' usage"] = "%s/%s" \
+            % (self._queue_command.qsize(), int(self._queue_command_size))
 
         # Events stats
-        json_data.add_data({"Events requests count" : self._event_requests.count()})
-        json_data.add_data({"Events queues max size count" : int(self._queue_event_size)})
-        json_data.add_data({"Events requests" : self._event_requests.list()})
+        events = {}
+        events["Events requests number"] = self._event_requests.count()
+        events["Events max size for requet's queues"] = int(self._queue_event_size)
+        events["Events requests"] = self._event_requests.list()
 
+        data = {"info" : info, "command" : command,
+                "queue" : queues, "event" : events}
+        json_data.add_data(data)
         self.send_http_response_ok(json_data.get())
 
 
@@ -3611,7 +3615,7 @@ class JSonHelper():
         #print "==== PROCESS DATA " + str(idx) + " ===="
 
         # check deepth in recursivity
-        if idx > 2:
+        if idx > 4:
             return "#MAX_DEPTH# "
 
         # define data types
@@ -3623,7 +3627,7 @@ class JSonHelper():
                    "SystemStats", "SystemStatsValue", "Trigger", \
                    "DeviceFeatureAssociation", "DeviceFeatureModel") 
         instance_type = ("instance")
-        num_type = ("int", "float")
+        num_type = ("int", "float", "long")
         str_type = ("str", "unicode", "bool", "datetime", "date")
         none_type = ("NoneType")
         tuple_type = ("tuple")
@@ -3643,8 +3647,8 @@ class JSonHelper():
             try:
                 sub_data_type = data._type.lower()
             except:
-                sub_data_type = "???"
-            #print "SUB TYPE = %s" % sub_data_type
+                sub_data_type = "instance"
+            print "SUB TYPE = %s" % sub_data_type
 
             if idx == 0:
                 data_json += "{"
@@ -3702,7 +3706,8 @@ class JSonHelper():
                 return data_json
 
             # start table
-            if sub_data_elt0_type == "dict":
+            print "SUBDE0=%s " % sub_data_elt0_type
+            if sub_data_elt0_type in ("dict", "str", "int"):
                 data_json += '"%s" : [' % key
             else:
                 display_sub_data_elt0_type = re.sub(r"([^^])([A-Z][a-z])",
@@ -3712,7 +3717,7 @@ class JSonHelper():
 
             # process each data
             for sub_data in data:
-                sub_data_key  = "???(2)"
+                sub_data_key  = "NOKEY"
                 sub_data_type = type(sub_data).__name__
                 #print "    DATA KEY : " + str(sub_data_key)
                 #print "    DATA : " + str(sub_data)
@@ -3724,7 +3729,13 @@ class JSonHelper():
 
         ### type : dict
         elif data_type in dict_type:
-            data_json += "{"
+            print "KEY=%s/" % key
+            if key != None:
+                data_json += '"%s" : {' % key
+                print "*"
+            else:
+                print "!"
+                data_json += "{"
             for key in data:
                 sub_data_key = key
                 sub_data = data[key]
@@ -3759,13 +3770,22 @@ class JSonHelper():
         elif sub_data_type in list_type:
             data_tmp += self._process_data(sub_data, idx, sub_data_key)
         elif sub_data_type in dict_type:
-            data_tmp += self._process_data(sub_data, idx)
+            data_tmp += self._process_data(sub_data, idx, sub_data_key)
         elif sub_data_type in num_type:
-            data_tmp = '"%s" : %s,' % (sub_data_key, sub_data)
+            if sub_data_key == "NOKEY":
+                data_tmp = '%s,' % sub_data
+            else:
+                data_tmp = '"%s" : %s,' % (sub_data_key, sub_data)
         elif sub_data_type in str_type:
-            data_tmp = '"%s" : "%s",' % (sub_data_key, sub_data)
+            if sub_data_key == "NOKEY":
+                data_tmp = '"%s",' % sub_data
+            else:
+                data_tmp = '"%s" : "%s",' % (sub_data_key, sub_data)
         elif sub_data_type in none_type:
-            data_tmp = '"%s" : "None",' % (sub_data_key)
+            if sub_data_key == "NOKEY":
+                data_tmp = '"None",'
+            else:
+                data_tmp = '"%s" : "None",' % (sub_data_key)
         else: 
             data_tmp = ""
         
@@ -4198,7 +4218,7 @@ class EventRequests():
     def list(self):
         """ List queues (used by rest status)
         """
-        return str(self.requests)
+        return self.requests
 
 
 

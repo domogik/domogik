@@ -56,10 +56,10 @@ class X10Main(XplPlugin):
     '''
 
     def __init__(self):
-        '''
+        """
         Create the X10Main class
         This class is used to connect x10 (through heyu) to the xPL Network
-        '''
+        """
         XplPlugin.__init__(self, name = 'x10_heyu')
         self._heyu_cfg_path_res = ""
         self._config = Query(self._myxpl)
@@ -87,11 +87,12 @@ class X10Main(XplPlugin):
         self._log.debug("Heyu correctly started")
 
     def heyu_reload_config(self, message):
-        '''
+        """
         Regenerate the heyu config file
         First, it needs to get all config items, then rewrite the config file
         and finally restart heyu
-        '''
+        @param message : an XplMessage object
+        """
         #Heyu config items
         res = XplResult()
 #        self._config = Query(self._myxpl)
@@ -115,9 +116,10 @@ class X10Main(XplPlugin):
             print "empty res"
 
     def heyu_dump_config(self, message):
-        '''
+        """
         Send the heyu config file on the network
-        '''
+        @param message : an XplMessage object
+        """
         #Heyu path
         myheyu = HeyuManager(self._heyu_cfg_path_res)
         lines = myheyu.load()
@@ -133,10 +135,10 @@ class X10Main(XplPlugin):
         self._myxpl.send(mess)
 
     def x10_cmnd_cb(self, message):
-        '''
+        """
         General callback for all command messages
         @param message : an XplMessage object
-        '''
+        """
         commands = {
             'on': lambda d, h, l: self.__myx10.on(d),
             'off': lambda d, h, l: self.__myx10.off(d),
@@ -163,6 +165,7 @@ class X10Main(XplPlugin):
             level = message.data['level']
         self._log.debug("%s received : device = %s, house = %s, level = %s" % (cmd, dev, house, level))
         commands[cmd](dev, house, level)
+        self.x10_monitor_cb(dev, cmd)
 
     def x10_monitor_cb(self, unit, order, args = None):
         """

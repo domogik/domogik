@@ -47,12 +47,13 @@ Implements
 from domogik.xpl.lib.PLCBusSerialHandler import serialHandler
 
 
-class PLCBUSException:
+class PLCBUSException(Exception):
     '''
     PLCBUS Exception
     '''
 
     def __init__(self, value):
+        Exception.__init__(self)
         self.value = value
 
     def __str__(self):
