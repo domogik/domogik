@@ -291,6 +291,8 @@ class Rest(XplPlugin):
 
             self._log.info("REST Initialisation OK")
 
+            self.add_stop_cb(self.stop_http)
+
 
             self.start_stats()
             self.start_http()
@@ -418,14 +420,20 @@ class Rest(XplPlugin):
         self._log.info("Start HTTP Server on %s:%s..." % (self.server_ip, self.server_port))
 
         if self.use_ssl:
-            server = HTTPSServerWithParam((self.server_ip, int(self.server_port)), RestHandler, \
+            self.server = HTTPSServerWithParam((self.server_ip, int(self.server_port)), RestHandler, \
                                          handler_params = [self])
         else:
-            server = HTTPServerWithParam((self.server_ip, int(self.server_port)), RestHandler, \
+            self.server = HTTPServerWithParam((self.server_ip, int(self.server_port)), RestHandler, \
                                          handler_params = [self])
 
-        server.serve_forever()
+        self.server.serve_forever()
 
+
+
+    def stop_http(self):
+        """ Stop HTTP Server
+        """
+        self.server.stop_handling()
 
 
 
@@ -476,9 +484,26 @@ class HTTPServerWithParam(SocketServer.ThreadingMixIn, HTTPServer):
                  bind_and_activate=True, handler_params = []):
         HTTPServer.__init__(self, server_address, request_handler_class, \
                             bind_and_activate)
+        self.address = server_address
         self.handler_params = handler_params
         # dirty issue
         #self.timeout = None
+
+
+    def serve_forever(self):
+        """ we rewrite this fucntion to make HTTP Server shutable
+        """
+        self.stop = False
+        while not self.stop:
+            self.handle_request()
+
+
+    def stop_handling(self):
+        """ put the stop flag to True in order stopping handling requests
+        """
+        self.stop = True
+        # we do a last request to terminate server
+        resp = urllib.urlopen("http://%s:%s" % (self.address[0], self.address[1]))
 
 
 
@@ -492,6 +517,7 @@ class HTTPSServerWithParam(SocketServer.ThreadingMixIn, HTTPServer):
                  bind_and_activate=True, handler_params = []):
         HTTPServer.__init__(self, server_address, request_handler_class, \
                             bind_and_activate)
+        self.address = server_address
         self.handler_params = handler_params
         # dirty issue
         #self.timeout = None
@@ -515,6 +541,21 @@ class HTTPSServerWithParam(SocketServer.ThreadingMixIn, HTTPServer):
         self.server_bind()
         self.server_activate()
 
+
+    def serve_forever(self):
+        """ we rewrite this fucntion to make HTTP Server shutable
+        """
+        self.stop = False
+        while not self.stop:
+            self.handle_request()
+
+
+    def stop_handling(self):
+        """ put the stop flag to True in order stopping handling requests
+        """
+        self.stop = True
+        # we do a last request to terminate server
+        resp = urllib.urlopen("http://%s:%s" % (self.address[0], self.address[1]))
 
 
 
@@ -3648,7 +3689,7 @@ class JSonHelper():
                 sub_data_type = data._type.lower()
             except:
                 sub_data_type = "instance"
-            print "SUB TYPE = %s" % sub_data_type
+            #print "SUB TYPE = %s" % sub_data_type
 
             if idx == 0:
                 data_json += "{"
@@ -3706,7 +3747,6 @@ class JSonHelper():
                 return data_json
 
             # start table
-            print "SUBDE0=%s " % sub_data_elt0_type
             if sub_data_elt0_type in ("dict", "str", "int"):
                 data_json += '"%s" : [' % key
             else:
@@ -3729,12 +3769,9 @@ class JSonHelper():
 
         ### type : dict
         elif data_type in dict_type:
-            print "KEY=%s/" % key
             if key != None:
                 data_json += '"%s" : {' % key
-                print "*"
             else:
-                print "!"
                 data_json += "{"
             for key in data:
                 sub_data_key = key
