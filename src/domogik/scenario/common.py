@@ -30,13 +30,6 @@ Implements
 - Condition.__init__(self, cond1=None, cond2=None)
 - Condition.run(self, statedic)
 - Condition.parse(self, listelem)
-- OR.__init__(self, cond1, cond2)
-- OR.run(self, statedic)
-- AND.__init__(self, cond1, cond2)
-- AND.run(self, statedic)
-- NOT.__init__(self, cond1)
-- NOT.run(self, statedic)
-- NOT.parse(self, listelem)
 - TimeCond.__init__(self, year, month, day, daynumber, hour, minute)
 - TimeCond._check_time(self, timeunit, value)
 - TimeCond._check_time_int(self, unit, value)
@@ -68,93 +61,7 @@ from domogik.xpl.common.xplmessage import XplMessage
 from domogik.common.configloader import Loader
 from domogik.common import logger
 
-
-class Condition():
-    '''
-    Parent class for each condition
-    A condition can be a node : it store 1 or 2 other conditions, or a final
-    node : it just implements some eval of the condition
-    '''
-
-    def __init__(self, cond1=None, cond2=None):
-        self.cond1 = cond1
-        self.cond2 = cond2
-
-    def run(self, statedic):
-        '''
-        Eval the condition
-        @raise NotImplementedException
-        '''
-        raise NotImplementedException
-
-    def parse(self, listelem):
-        '''
-        Parse the expression to find item and store them
-        '''
-        res1 = self.cond1.parse(listelem)
-        res2 = self.cond2.parse(listelem)
-        for k in res2:
-            res1[k].update(res2[k])
-        return res1
-
-#####
-# Classes représentant les conditions (noeuds de l'arbre)
-#####
-
-class OR(Condition):
-    '''
-    Implementation for the OR operator
-    '''
-
-    def __init__(self, cond1, cond2):
-        '''
-        @param cond1 : first condition of the OR
-        @param cond2 : secondcondition of the OR
-        '''
-        Condition.__init__(self, cond1, cond2)
-
-    def run(self, statedic):
-        return self.cond1.run(statedic) or self.cond2.run(statedic)
-
-
-class AND(Condition):
-    '''
-    Implementation for the AND operator
-    '''
-
-    def __init__(self, cond1, cond2):
-        '''
-        @param cond1 : first condition of the AND
-        @param cond2 : secondcondition of the AND
-        '''
-        Condition.__init__(self, cond1, cond2)
-
-    def run(self, statedic):
-        return self.cond1.run(statedic) and self.cond2.run(statedic)
-
-
-class NOT(Condition):
-    '''
-    Implementation for the NOT operator
-    '''
-
-    def __init__(self, cond1):
-        '''
-        @param cond1 : condition to use for negation
-        '''
-        Condition.__init__(self, cond1)
-
-    def run(self, statedic):
-        return not self.cond1.run(statedic)
-
-    def parse(self, listelem):
-        return self.cond1.parse(listelem)
-
-#####
-# Classes représentant les feuilles (conditions de temps ou d'état)
-#####
-
-class TimeCond(Condition):
+class TimeCond:
     '''
     Implementation of the time condition
     This allows user to describe time periods like cron
@@ -266,7 +173,7 @@ class TimeCond(Condition):
         return listelem
 
 
-class StateCond(Condition):
+class StateCond:
     '''
     Implementation of the state condition
     This allows user to describe a condition on any item of the system
