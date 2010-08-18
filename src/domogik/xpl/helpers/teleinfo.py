@@ -81,7 +81,7 @@ class teleinfo(Helper):
             return [e.value]
 
         resp = []
-        resp.append("Eelctric meter data : ")
+        resp.append("Electric meter data : ")
         for entry in data:
             resp.append("%-10s : %-15s" % (entry["name"], entry["value"]))
         return resp
