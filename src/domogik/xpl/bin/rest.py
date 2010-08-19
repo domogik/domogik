@@ -915,8 +915,8 @@ class ProcessRequest():
         xml_info = []
         for key in self.xml:
             xml_info.append(key)
-        command["XML files loaded"] = xml_info
-        command["XML files last load"] = self.xml_date
+        command["XML_files_loaded"] = xml_info
+        command["XML_files_last_load"] = self.xml_date
 
         # Queues stats
         queues = {}
