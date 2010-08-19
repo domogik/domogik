@@ -59,7 +59,7 @@ class TeleinfoManager(XplPlugin):
         device = res.get_value()['device']
         res = XplResult()
         self._config.query('teleinfo', 'interval', res)
-        interval = float(res.get_value()['interval'])
+        interval = res.get_value()['interval']
 
         # Init Teleinfo
         teleinfo  = Teleinfo(self._log, self.send_xpl)
@@ -77,7 +77,7 @@ class TeleinfoManager(XplPlugin):
         teleinfo_process = threading.Thread(None,
                                    teleinfo.listen,
                                    None,
-                                   (interval,),
+                                   (float(interval),),
                                    {})                                  
         teleinfo_process.start()                              
 
