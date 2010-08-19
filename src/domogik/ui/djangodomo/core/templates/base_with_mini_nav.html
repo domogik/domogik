@@ -47,6 +47,7 @@
 <script type="text/javascript" src="/design/js/main.js"></script>
 <script type="text/javascript" src="/design/js/dmg.rest.js"></script>
 <script type="text/javascript" src="/design/js/ui.icons.js"></script>
+<script type="text/javascript" src="/design/js/ui.tooltips.js"></script>
 <script type="text/javascript" src="/design/js/dmg.notifications.js"></script>
 <script type="text/javascript" src="/design/js/dmg.browser.js"></script>
 
@@ -59,6 +60,7 @@
         $("li#showmenu").click(function(){
             $("#mainbar").toggle(500);        
         });
+		$("#nav1 a").tooltip_bottom();
     });
     {% block js_script %}{% endblock %}
     {% if status %}
@@ -74,16 +76,17 @@
     <div id="mainbar">
         <nav id="nav1">
             <ul>
-                <li><a href="{% url show_view %}" class="{{ nav1_show_class }}">{% trans "Visualization" %}</a></li>
+                <li><a href="{% url show_view %}" class="{{ nav1_show_class }}" title="{% trans "View, Control your house" %}">{% trans "Visualization" %}</a></li>
                 {% if is_user_connected %}
                     <!--li><a href="#">Programmation</a></li-->
-                    <li><a href="{% url admin_view %}">{% trans "Administration" %}</a></li>
+                    <li><a href="{% url admin_view %}" title="{% trans "Configure, Manage" %}">{% trans "Administration" %}</a></li>
                 {% endif %}
+				<li class='help'><a href="http://wiki.domogik.org/tiki-index.php?page=EndUserDocumentation&bl=y" title="{% trans "External Wiki page" %}" target='_blank'>{% trans "Help" %}</a></li>
                 <li class="login">
                     {% if not is_user_connected %}
-                        <a href="{% url login_view %}">{% trans "Log in" %}</a>
+                        <a href="{% url login_view %}" title="{% trans "Identify yourself" %}">{% trans "Log in" %}</a>
                     {% else %}
-                        <a href="{% url logout_view %}">{% trans "Log out" %} {{ request.session.user.first_name }}</a>
+                        <a href="{% url logout_view %}" title="{% trans "Deconnect" %} {{ request.session.user.first_name }}">{% trans "Log out" %} {{ request.session.user.first_name }}</a>
                     {% endif %}
                 </li>
             </ul>

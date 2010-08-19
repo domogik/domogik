@@ -77,6 +77,7 @@
                 <!--li><a href="#">Programmation</a></li-->
                 <li><a href="{% url admin_view %}" class="{{ nav1_admin }}">{% trans "Administration" %}<span class='description'>{% trans "Configure, Manage" %}</span></a></li>
             {% endif %}
+            <li class='help'><a href="http://wiki.domogik.org/tiki-index.php?page=EndUserDocumentation&bl=y" target='_blank'>{% trans "Help" %}<span class='description'>{% trans "External Wiki page" %}</span></a></li>
             <li class="login">
                 {% if not is_user_connected %}
                     <a href="{% url login_view %}">{% trans "Log in" %}<span class='description'>{% trans "Identify yourself" %}</span></a>

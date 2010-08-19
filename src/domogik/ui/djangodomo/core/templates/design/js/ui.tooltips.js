@@ -74,6 +74,31 @@ $(function(){
         });
         return this;
     };
+
+    $.fn.tooltip_bottom = function (){
+        this.qtip({
+            position: {
+                corner: {
+                    target: 'bottomMiddle',
+                    tooltip: 'topMiddle'
+                }
+            },
+            style: {
+                padding: 5,
+                background: '#A2D959',
+                color: 'black',
+                textAlign: 'center',
+                border: {
+                    width: 7,
+                    radius: 5,
+                    color: '#A2D959'
+                },
+                tip: 'topMiddle',
+                name: 'dark' // Inherit the rest of the attributes from the preset dark style
+            }
+        });
+        return this;
+    };
     
     $.fn.tooltip_content_right = function (opts){
         this.qtip({

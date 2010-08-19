@@ -57,7 +57,7 @@ header#mainheader {
     background: url(../images/decoration/nav1_selector_green.png) 50% 100% no-repeat;
 }
 
-#nav1 .login {
+#nav1 .login, #nav1 .help {
     float:none;
 }
 
