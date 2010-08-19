@@ -6,6 +6,7 @@
             var header = null;
             var theme = status;
             var sticky = false;
+            var msgformated = msg.replace( /\n/g, '<br />\n' );
             switch (theme) {
                 case 'ok':
                     header = "Confirmation";
@@ -23,7 +24,7 @@
                     sticky = true;
                     break;
             }    
-            $.jGrowl(msg, { header: header, sticky: sticky, theme: theme });
+            $.jGrowl(msgformated, { header: header, sticky: sticky, theme: theme });
         }
     });
 })(jQuery);
