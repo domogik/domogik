@@ -3744,6 +3744,7 @@ class JSonHelper():
             if len(data) > 0:
                 sub_data_elt0_type = type(data[0]).__name__
             else:
+                data_json = "[]"
                 return data_json
             # start table
             if sub_data_elt0_type in ("dict", "str", "int"):
