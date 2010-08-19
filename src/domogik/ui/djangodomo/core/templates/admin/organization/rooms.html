@@ -201,6 +201,9 @@
                                             self.valid();
                                             $("#tab{{ room.id }}").removeClass();
                                             $("#tab{{ room.id }}").addClass("icon16-room-" + icon);
+
+                                            // association section
+                                            $("li.roomitem[ddvalue='{{ room.id }}']").attr('class', 'roomitem icon32-room-' + icon);
                                         } else {
                                             self.cancel();
                                             $.notification('error', data.description);                                          
