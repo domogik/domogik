@@ -167,7 +167,7 @@
                         $('#updaccountdialog').dialog_form('updbutton', {
                             title: "{% trans "Update account" %} '{{ account.login }}'",
                             button: "#updateaccount{{ account.id }}",
-                            values: {updlogin : '{{ account.login }}', updadmin : {{ account.is_admin|lower }} },
+                            values: {upduserlogin : "{{ account.login }}", upduserfirstname: "{{account.person.first_name}}", upduserlastname: "{{account.person.last_name}}", upduseradmin : {{ account.is_admin|lower }} },
                             onok: function(values) {
                                 // Submit form
                                 $.getREST(['account', 'user', 'update', 'id', '{{ account.id }}', 'login', values.upduserlogin, 'is_admin', values.upduseradmin, 'skin_used', '', 'first_name', values.upduserfirstname, 'last_name', values.upduserlastname],
@@ -248,7 +248,7 @@
                                         if (status == 'ok') {
                                             $.reloadPage({'status': 'ok', 'msg': '{% trans "Person" %} \'' + data.person[0].first_name + ' ' + data.person[0].last_name + '\' {% trans "successfully deleted" %}'});
                                         } else {
-                                            $.notification({'error', '{% trans "Person not deleted" %} (' + data.description + ')');
+                                            $.notification('error', '{% trans "Person not deleted" %} (' + data.description + ')');
                                         }
                                     }
                                 );
