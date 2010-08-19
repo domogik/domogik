@@ -296,6 +296,9 @@ function numbersonly(e) {
                 jQuery.each(o.fields, function(index, value) {
                     switch(value.type) {
                     case 'text':
+                        var decoded = $("<div/>").html(ops.values[value.name]).text();
+                        $('#' + value.name).val(decoded);
+                        break;
                     case 'select':
                         $('#' + value.name).val(ops.values[value.name]);
                         break;
