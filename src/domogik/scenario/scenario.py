@@ -55,8 +55,13 @@ class Scenario:
         """
         self._mgr = manager
         self._log = log
+        #Contains a list of (time|state) conditions identified by a unique ID
         self._cond = {}
+        #Contains the list of item we want to listen to
+        #This dictionnary will be populated by (time|state) methods during init phase
+        #and will be fetch by the manager
         self._items = {}
+        #Will be set by the manager when new data will arrive
         self._result_value = {}
         self._uid = uid
 
@@ -157,3 +162,11 @@ class Scenario:
             else:
                 return self._cond[h].run(self._result_value)
                 
+    def add_to_listener_list(self, technology, device):
+        """ Add a technology + device item to the list that will be used to create 
+        listeners. This method is called by time_cond and state_cond.
+        @param technology : the technology name
+        @param device : the device name
+
+        """
+
