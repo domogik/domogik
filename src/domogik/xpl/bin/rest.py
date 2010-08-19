@@ -920,15 +920,15 @@ class ProcessRequest():
 
         # Queues stats
         queues = {}
-        queues["'system_list'_usage"] = "%s/%s" \
+        queues["system_list_usage"] = "%s/%s" \
             % (self._queue_system_list.qsize(), int(self._queue_size))
-        queues["'system_detail'_usage"] = "%s/%s" \
+        queues["system_detail_usage"] = "%s/%s" \
             % (self._queue_system_detail.qsize(), int(self._queue_size))
-        queues["'system_start'_usage"] = "%s/%s" \
+        queues["system_start_usage"] = "%s/%s" \
             % (self._queue_system_start.qsize(), int(self._queue_size))
-        queues["'system_stop'_usage"] = "%s/%s" \
+        queues["system_stop_usage"] = "%s/%s" \
             % (self._queue_system_stop.qsize(), int(self._queue_size))
-        queues["'command'_usage"] = "%s/%s" \
+        queues["command_usage"] = "%s/%s" \
             % (self._queue_command.qsize(), int(self._queue_command_size))
 
         # Events stats
