@@ -915,27 +915,27 @@ class ProcessRequest():
         xml_info = []
         for key in self.xml:
             xml_info.append(key)
-        command["/command : XML files loaded"] = xml_info
-        command["/command : XML files last load"] = self.xml_date
+        command["XML files loaded"] = xml_info
+        command["XML files last load"] = self.xml_date
 
         # Queues stats
         queues = {}
-        queues["Queue 'system_list' usage"] = "%s/%s" \
+        queues["'system_list'_usage"] = "%s/%s" \
             % (self._queue_system_list.qsize(), int(self._queue_size))
-        queues["Queue 'system_detail' usage"] = "%s/%s" \
+        queues["'system_detail'_usage"] = "%s/%s" \
             % (self._queue_system_detail.qsize(), int(self._queue_size))
-        queues["Queue 'system_start' usage"] = "%s/%s" \
+        queues["'system_start'_usage"] = "%s/%s" \
             % (self._queue_system_start.qsize(), int(self._queue_size))
-        queues["Queue 'system_stop' usage"] = "%s/%s" \
+        queues["'system_stop'_usage"] = "%s/%s" \
             % (self._queue_system_stop.qsize(), int(self._queue_size))
-        queues["Queue 'command' usage"] = "%s/%s" \
+        queues["'command'_usage"] = "%s/%s" \
             % (self._queue_command.qsize(), int(self._queue_command_size))
 
         # Events stats
         events = {}
-        events["Events requests number"] = self._event_requests.count()
-        events["Events max size for requet's queues"] = int(self._queue_event_size)
-        events["Events requests"] = self._event_requests.list()
+        events["Number_of_requests"] = self._event_requests.count()
+        events["Max_size_for_request_queues"] = int(self._queue_event_size)
+        events["Requests"] = self._event_requests.list()
 
         data = {"info" : info, "command" : command,
                 "queue" : queues, "event" : events}
