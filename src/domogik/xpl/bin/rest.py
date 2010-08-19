@@ -3745,7 +3745,6 @@ class JSonHelper():
                 sub_data_elt0_type = type(data[0]).__name__
             else:
                 return data_json
-
             # start table
             if sub_data_elt0_type in ("dict", "str", "int"):
                 data_json += '"%s" : [' % key
@@ -3769,7 +3768,7 @@ class JSonHelper():
 
         ### type : dict
         elif data_type in dict_type:
-            if key != None:
+            if key != None and key != "NOKEY":
                 data_json += '"%s" : {' % key
             else:
                 data_json += "{"
@@ -3800,7 +3799,8 @@ class JSonHelper():
                 display_sub_data_type = re.sub(r"([^^])([A-Z][a-z])",
                              r"\1_\2",
                              sub_data_type).lower()
-                data_tmp = '"%s" : ' % display_sub_data_type
+                if display_sub_data_type != "NOKEY":
+                    data_tmp = '"%s" : ' % display_sub_data_type
             data_tmp += self._process_data(sub_data, idx)
         elif sub_data_type in instance_type:
             data_tmp += self._process_data(sub_data, idx)
