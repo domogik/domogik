@@ -47,6 +47,15 @@ def unescape(s):
     return re.sub('&(%s);' % '|'.join(name2codepoint),
               lambda m: unichr(name2codepoint[m.group(1)]), s)
 
+class Rest(pipes.DmgPipe):
+    uri = settings.REST_URL + "/"
+
+    @staticmethod
+    def get_info():
+        resp = Rest.objects.get()
+        if resp :
+            return resp
+        
 class House(object):
     def __init__(self):
         self.config = UIConfigs.get_by_reference('house', '0')

@@ -38,3 +38,6 @@ def truncchar(value, arg):
     else:
         return value[:arg] + '.'
 
+@register.filter
+def switchUnderscore(value):
+    return value.replace('_', ' ')

@@ -42,14 +42,12 @@ from django.conf import settings
 
 from domogik.common import database
 from domogik.ui.djangodomo.core.models import House, Areas, Rooms, Devices, DeviceUsages, DeviceTechnologies, DeviceTypes, \
-                                   Features, FeatureAssociations, Plugins, Accounts, Events
+                                   Features, FeatureAssociations, Plugins, Accounts, Events, Rest
 
 from domogik.ui.djangodomo.core.sample_data_helper import SampleDataHelper
 
 from django_pipes.exceptions import ResourceNotAvailableException
 
-
-__ADMIN_MANAGEMENT_DOMOGIK = 'admin/management/domogik.html'
 __db = database.DbHelper()
 
 def __go_to_page(request, html_page, page_title, **attribute_list):
@@ -163,7 +161,7 @@ def __is_user_admin(request):
     """
     user = __get_user_connected(request)
     return user is not None and user['is_admin']
-
+    
 def admin_management_accounts(request):
     """
     Method called when the admin accounts page is accessed
@@ -406,6 +404,29 @@ def admin_tools_helpers(request):
         msg=msg
 	)
 
+def admin_tools_rest(request):
+    """
+    Method called when the admin index page is accessed
+    @param request : HTTP request
+    @return an HttpResponse object
+    """
+    if not __is_user_admin(request):
+        return index(request)
+
+    status = request.GET.get('status', '')
+    msg = request.GET.get('msg', '')
+    page_title = _("Rest informations")
+    rest_result = Rest.get_info()
+    return __go_to_page(
+        request, 'admin/tools/rest.html',
+        page_title,
+        nav1_admin = "selected",
+        nav2_tools_rest = "selected",
+        status=status,
+        msg=msg,
+        rest=rest_result.rest[0]
+    )
+    
 def index(request):
     """
     Method called when the main page is accessed

@@ -53,6 +53,7 @@ urlpatterns = patterns('domogik.ui.djangodomo.core.views',
     url(r'admin/organization/features/$', 'admin_organization_features', name="admin_organization_features_view"),
     url(r'admin/plugin/(?P<plugin_name>\w+)/$', 'admin_plugins_plugin', name="admin_plugins_plugin_view"),
     url(r'admin/tools/helpers/$', 'admin_tools_helpers', name="admin_tools_helpers_view"),
+    url(r'admin/tools/rest/$', 'admin_tools_rest', name="admin_tools_rest_view"),
 
     url(r'show/$', 'show_house', name="show_view"),
     url(r'show/house/$', 'show_house', name="show_house_view"),
