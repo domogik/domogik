@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<scenario name="basic_exemple" description="A basic scenario to check something is over some value">
+    <param name="techno" type="technology"/>
+    <param name="device" type="string" description="Device address" default="A3" />
+    <param name="oper" type="operator" description="Comparison" />
+    <param name="value" type="combo" default="10">
+        <value>2</value>
+        <value>4</value>
+        <value>7</value>
+        <value>10</value>
+        <value>15</value>
+        <value>17</value>
+     </param>
+</scenario>
