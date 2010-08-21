@@ -49,7 +49,7 @@
 
 {% block breadcrumb %}
 	<li><a href='{% url show_view %}' class='house'>{{ house.name|default:'House' }}</a></li>
-	<li id='customize'><a href='{% url show_area_edit_view area.id %}' class='icon16-action-customize'>{% trans 'Customize' %}</a></li>
+	<li id='customize'><a href='{% url show_area_edit_view area.id %}' class='icon16-action-customize admin_required'>{% trans 'Customize' %}</a></li>
 {% endblock %}
 
 {% block banner %}

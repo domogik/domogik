@@ -29,12 +29,12 @@ Implements
 
 
 @author: Domogik project
-@copyright: (C) 2007-2009 Domogik project
+@copyright: (C) 2007-2010 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """
-
-from django.http import QueryDict
+from django.utils.http import urlquote
+from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.utils.translation import ugettext_lazy as _
@@ -76,41 +76,14 @@ def login(request):
     @param request : HTTP request
     @return an HttpResponse object
     """
+    next = request.GET.get('next', '')
+    status = request.GET.get('status', '')
+    msg = request.GET.get('msg', '')
+
     page_title = _("Login page")
     if request.method == 'POST':
-        # An action was submitted => login action
-        user_login = QueryDict.get(request.POST, "login", False)
-        user_password = QueryDict.get(request.POST, "password", False)
-        try:
-            result_auth = Accounts.auth(user_login, user_password)
-        except ResourceNotAvailableException:
-            return render_to_response('error/ResourceNotAvailableException.html')
-
-        if result_auth.status == 'OK':
-            account = result_auth.account[0]
-            request.session['user'] = {
-                'login': account.login,
-                'is_admin': (account.is_admin == "True"),
-                'first_name': account.person.first_name,
-                'last_name': account.person.last_name,
-                'skin_used': account.skin_used
-            }
-            return index(request)
-        else:
-            # User not found, ask again to log in
-            error_msg = _("Sorry unable to log in. Please check login name / password and try again.")
-            try:
-                result_all_accounts = Accounts.get_all_users()
-            except ResourceNotAvailableException:
-                return render_to_response('error/ResourceNotAvailableException.html')
-            return __go_to_page(
-                request, 'login.html',
-                page_title,
-                error_msg=error_msg,
-                account_list=result_all_accounts.account
-            )
+        return auth(request, next)
     else:
-        # User asked to log in
         try:
             result_all_accounts = Accounts.get_all_users()
         except ResourceNotAvailableException:
@@ -118,9 +91,12 @@ def login(request):
         return __go_to_page(
             request, 'login.html',
             page_title,
+            next=next,
+            status=status,
+            msg=msg,
             account_list=result_all_accounts.account
         )
-
+        
 def logout(request):
     """
     Logout process
@@ -128,7 +104,43 @@ def logout(request):
     @return an HttpResponse object
     """
     request.session.clear()
-    return index(request)
+    return HttpResponseRedirect('/domogik/')
+
+def auth(request, next):
+    # An action was submitted => login action
+    user_login = request.POST.get("login",'')
+    user_password = request.POST.get("password",'')
+    try:
+        result_auth = Accounts.auth(user_login, user_password)
+    except ResourceNotAvailableException:
+        return render_to_response('error/ResourceNotAvailableException.html')
+    if result_auth.status == 'OK':
+        account = result_auth.account[0]
+        request.session['user'] = {
+            'login': account.login,
+            'is_admin': (account.is_admin == "True"),
+            'first_name': account.person.first_name,
+            'last_name': account.person.last_name,
+            'skin_used': account.skin_used
+        }
+        if next != '':
+            return HttpResponseRedirect(next)
+        else:
+            return HttpResponseRedirect('/domogik/')
+    else:
+        # User not found, ask again to log in
+        return HttpResponseRedirect('/domogik/login/?status=error&msg=Sorry unable to log in. Please check login name / password and try again.')
+
+def admin_required(f):
+    def wrap(request, *args, **kwargs):
+        #this check the session if userid key exist, if not it will redirect to login page
+        if not __is_user_admin(request):
+            path = urlquote(request.get_full_path())
+            return HttpResponseRedirect("/domogik/login/?next=%s" % path)
+        return f(request, *args, **kwargs)
+    wrap.__doc__=f.__doc__
+    wrap.__name__=f.__name__
+    return wrap
 
 def __get_user_connected(request):
     """
@@ -161,15 +173,14 @@ def __is_user_admin(request):
     """
     user = __get_user_connected(request)
     return user is not None and user['is_admin']
-    
+
+@admin_required
 def admin_management_accounts(request):
     """
     Method called when the admin accounts page is accessed
     @param request : HTTP request
     @return an HttpResponse object
     """
-    if not __is_user_admin(request):
-        return index(request)
 
     status = request.GET.get('status', '')
     msg = request.GET.get('msg', '')
@@ -190,14 +201,13 @@ def admin_management_accounts(request):
         people_list=result_all_people.person
     )
 
+@admin_required
 def admin_organization_devices(request):
     """
     Method called when the admin devices organization page is accessed
     @param request : HTTP request
     @return an HttpResponse object
     """
-    if not __is_user_admin(request):
-        return index(request)
 
     status = request.GET.get('status', '')
     msg = request.GET.get('msg', '')
@@ -224,14 +234,13 @@ def admin_organization_devices(request):
         types_list=result_all_types.device_type
     )
 
+@admin_required
 def admin_organization_rooms(request):
     """
     Method called when the admin rooms organization page is accessed
     @param request : HTTP request
     @return an HttpResponse object
     """
-    if not __is_user_admin(request):
-        return index(request)
 
     status = request.GET.get('status', '')
     msg = request.GET.get('msg', '')
@@ -258,14 +267,13 @@ def admin_organization_rooms(request):
         areas_list=result_all_areas.area
     )
 
+@admin_required
 def admin_organization_areas(request):
     """
     Method called when the admin areas organization page is accessed
     @param request : HTTP request
     @return an HttpResponse object
     """
-    if not __is_user_admin(request):
-        return index(request)
 
     status = request.GET.get('status', '')
     msg = request.GET.get('msg', '')
@@ -285,15 +293,14 @@ def admin_organization_areas(request):
         areas_list=result_all_areas.area
     )
 
+@admin_required
 def admin_organization_house(request):
     """
     Method called when the admin house organization page is accessed
     @param request : HTTP request
     @return an HttpResponse object
     """
-    if not __is_user_admin(request):
-        return index(request)
-
+    
     status = request.GET.get('status', '')
     msg = request.GET.get('msg', '')
     try:
@@ -311,15 +318,14 @@ def admin_organization_house(request):
         house=result_house
     )
 
+@admin_required
 def admin_organization_features(request):
     """
     Method called when the admin features organization page is accessed
     @param request : HTTP request
     @return an HttpResponse object
     """
-    if not __is_user_admin(request):
-        return index(request)
-
+    
     status = request.GET.get('status', '')
     msg = request.GET.get('msg', '')
 
@@ -354,15 +360,14 @@ def admin_organization_features(request):
         house=result_house,
         house_features_associations=result_house_features_associations.feature_association
     )
-    
+
+@admin_required
 def admin_plugins_plugin(request, plugin_name):
     """
     Method called when the admin plugin command page is accessed
     @param request : HTTP request
     @return an HttpResponse object
     """
-    if not __is_user_admin(request):
-        return index(request)
 
     status = request.GET.get('status', '')
     msg = request.GET.get('msg', '')
@@ -383,14 +388,13 @@ def admin_plugins_plugin(request, plugin_name):
         plugin=result_plugin_detail.plugin[0]
     )
 
+@admin_required
 def admin_tools_helpers(request):
     """
     Method called when the admin helpers tool page is accessed
     @param request : HTTP request
     @return an HttpResponse object
     """
-    if not __is_user_admin(request):
-        return index(request)
 
     status = request.GET.get('status', '')
     msg = request.GET.get('msg', '')
@@ -404,14 +408,13 @@ def admin_tools_helpers(request):
         msg=msg
 	)
 
+@admin_required
 def admin_tools_rest(request):
     """
     Method called when the admin index page is accessed
     @param request : HTTP request
     @return an HttpResponse object
     """
-    if not __is_user_admin(request):
-        return index(request)
 
     status = request.GET.get('status', '')
     msg = request.GET.get('msg', '')
@@ -506,6 +509,7 @@ def show_house(request):
         events=events_list
     )
 
+@admin_required
 def show_house_edit(request):
     """
     Method called when the show index page is accessed
@@ -576,6 +580,7 @@ def show_area(request, area_id):
         events=events_list
     )
 
+@admin_required
 def show_area_edit(request, area_id):
     """
     Method called when the show area page is accessed
@@ -643,7 +648,8 @@ def show_room(request, room_id):
         house=result_house,
         events=events_list
     )
-
+    
+@admin_required
 def show_room_edit(request, room_id):
     """
     Method called when the show room page is accessed

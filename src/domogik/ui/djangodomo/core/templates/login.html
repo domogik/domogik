@@ -24,27 +24,25 @@
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/layout.content.css" rel="stylesheet" type="text/css" />
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-buttons.css" rel="stylesheet" type="text/css" />
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/page-login.css" rel="stylesheet" type="text/css" />
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.login.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block js_include %}
-    <script type="text/javascript" src="/design/js/page-login.js"></script>
+    <script type="text/javascript" src="/design/js/dmg.login.js"></script>
 {% endblock %}
 {% block title %}{% trans page_title %}{% endblock %}
 
 {% block content %}
-
         <h1>{% trans "Identification" %}</h1>
-        {% ifnotequal status "" %}
-        <div id='messages' class='{{status}}'>{{msg}}</div>
-        {% endifnotequal %}
-        <form name="loginForm" method="POST" action="{% url login_view %}"/>
+        <form id="loginForm" method="POST" action="{% url login_view %}?next={{next}}">
             <div class="columnleft">
                 <h2>1. {% trans "Select a user" %}</h2>
+                <div id='resetLogin' class='buttontext'>Change User</div>
                 <input id="loginname" name="login" type="text" />
                 <ul id="users">
                     {% for account in account_list %}
                         <li>
                             <a href="#" id="id{{ account.login }}" onclick="chooseUser('id{{ account.login }}', '{{ account.login }}');">
-                                <img src="/design/skins/{{ request.session.user.skin_used|default:'default' }}/images/userid.jpg" alt="" width="64" height="64" />{{ account.person.first_name }}
+                                <img src="/design/images/userid.jpg" alt="" width="64" height="64" />{{ account.person.first_name }}
                             </a>
                         </li>
                     {% endfor %}
@@ -55,7 +53,7 @@
                 {% spaceless %}
                 <div id="code">
                     <input id="logincode" name="password" type="password" value="" />
-                    <input name="update" type="submit" class="buttonok" value="Ok" />
+                    <div id='submit' class="buttonok">Ok</div>
                 </div>
                 {% endspaceless %}
                 <ul id="digits">
@@ -69,7 +67,7 @@
                     <li><a href="#" onclick="addDigit('7');">7</a></li>
                     <li><a href="#" onclick="addDigit('8');">8</a></li>
                     <li><a href="#" onclick="addDigit('9');">9</a></li>
-                    <li><a href="#" onclick="removeLastDigit();"><-</a></li>
+                    <li><a href="#" onclick="removeLastDigit();">C</a></li>
                     <li><a href="#" onclick="resetDigit();">{% trans "Del." %}</a></li>
                 </ul>
             </div>

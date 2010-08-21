@@ -197,3 +197,9 @@ for file in os.listdir(WIDGETS_PATH):
     main = os.path.join(WIDGETS_PATH, file, "main.js")
     if os.path.isfile(main):
         WIDGETS_LIST.append(file)
+
+# For login Auth
+AUTHENTICATION_BACKENDS = ('domogik.ui.djangodomo.core.backends.RestBackend',)
+LOGIN_URL = '/domogik/login'
+LOGOUT_URL = '/domogik/logout'
+LOGIN_REDIRECT_URL = '/domogik'

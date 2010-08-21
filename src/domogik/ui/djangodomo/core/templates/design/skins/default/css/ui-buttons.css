@@ -34,6 +34,7 @@ input::-moz-focus-inner { border: 0; }
 .buttontext {
 	border: 1px solid #cccccc;
 	height:2em;
+    line-height:2em;
 	-moz-border-radius: 1.4em;
     -webkit-border-radius: 1.4em;
 	background-color:#f6f6f6;

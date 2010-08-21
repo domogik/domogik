@@ -54,7 +54,7 @@
     {% if room.area.id %}
     <li><a href='{% url show_area_view room.area.id %}' class='icon16-area-{{ room.area.config.icon }}'>{{ room.area.name }}</a></li>
     {% endif %}
-    <li id='customize'><a href='{% url show_room_edit_view room.id %}' class='icon16-action-customize'>{% trans 'Customize' %}</a></li>
+    <li id='customize'><a href='{% url show_room_edit_view room.id %}' class='icon16-action-customize admin_required'>{% trans 'Customize' %}</a></li>
 {% endblock %}
 
 {% block banner %}

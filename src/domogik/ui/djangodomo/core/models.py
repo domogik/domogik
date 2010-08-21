@@ -358,6 +358,12 @@ class Accounts(pipes.DmgPipe):
             return resp
 
     @staticmethod
+    def get_user(id):
+        resp = Accounts.objects.get({'parameters':"user/list/by-id/" + id})
+        if resp :
+            return resp
+
+    @staticmethod
     def get_all_users():
         resp = Accounts.objects.get({'parameters':"user/list"})
         if resp :
