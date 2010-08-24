@@ -88,22 +88,29 @@ $.extend({
         });
     },
 
+    cancelRequest: function() {
+        if (this.request_ticketid)
+            $.eventCancel(this.request_ticketid);
+        if (this.request_xOptions)
+            this.request_xOptions.abort();
+    },
+    
     eventRequest: function(devices, events) {
         url = rest_url + '/events/request/new/' + devices.join('/') + '/';
-        $.jsonp({
+        this.request_xOptions = $.jsonp({
             cache: false,
             callbackParameter: "callback",
             type: "GET",
             url: url,
             dataType: "jsonp",
             error: function (xOptions, textStatus) {
-                $.notification('error', 'Event update : Lost REST server connection');
+                $.notification('error', 'Event request : Lost REST server connection');
             },
             success: function (data) {
                 var status = (data.status).toLowerCase();
                 if (status == 'ok') {
                     // Free the ticket when page unload
-                    $(window).unload( function () { $.eventCancel(data.event[0].ticket_id); } );
+                    this.request_ticketid = data.event[0].ticket_id;
                     $.eventProcess(events, data.event[0]);
                     $.eventUpdate(data.event[0].ticket_id, events);
                 } else {
@@ -115,7 +122,7 @@ $.extend({
     
     eventUpdate: function(ticket, events) {
         url = rest_url + '/events/request/get/' + ticket + '/';
-        $.jsonp({
+        this.request_xOptions = $.jsonp({
             cache: false,
             callbackParameter: "callback",
             type: "GET",
