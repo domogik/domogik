@@ -406,12 +406,12 @@ def admin_tools_helpers(request):
         nav2_tools_helpers = "selected",
         status=status,
         msg=msg
-	)
+    )
 
 @admin_required
 def admin_tools_rest(request):
     """
-    Method called when the admin index page is accessed
+    Method called when the admin rest page is accessed
     @param request : HTTP request
     @return an HttpResponse object
     """

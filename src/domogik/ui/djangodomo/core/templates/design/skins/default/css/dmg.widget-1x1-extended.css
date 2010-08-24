@@ -16,7 +16,7 @@
     background-color:#FFFFFF;
 }
 
-.widget_1x1_extended.clickable:hover {
+.widget_1x1_extended.clickable {
     cursor: pointer;
 }
 

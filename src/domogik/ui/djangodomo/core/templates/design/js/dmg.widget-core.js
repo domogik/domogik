@@ -4,6 +4,7 @@ var widgets_list = {
 	'sensor.string': [],
 	'actuator.binary': [],
 	'actuator.range': [],
+	'actuator.number': [],
 	'actuator.trigger': []
 };
 

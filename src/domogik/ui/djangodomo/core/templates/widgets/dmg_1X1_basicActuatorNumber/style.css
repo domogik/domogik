@@ -1,0 +1,85 @@
+.dmg_1x1_basicActuatorNumber {
+    background-color:#eeeeee;
+}
+
+.dmg_1x1_basicActuatorNumber .openpanel {
+    width:5em;
+    height:5em;
+    position:absolute;
+    text-align:center;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    cursor: pointer;
+}
+
+.dmg_1x1_basicActuatorNumber:hover,
+.dmg_1x1_basicActuatorNumber:focus,
+.dmg_1x1_basicActuatorNumber.opened {
+    background-color:#FFFFFF;
+}
+
+.dmg_1x1_basicActuatorNumber_commandpanel {
+    position:absolute;
+    margin:-48px 0 0 -7px;
+}
+
+.dmg_1x1_basicActuatorNumber_commandpanel .deco {
+    float:left;
+    position:relative;
+    top:9px;
+}
+
+.dmg_1x1_basicActuatorNumber_commandpanel .commands {
+    width:5em;
+    height:10em;
+    float:left;
+    position:relative;
+    background-color:#000000;
+    -moz-border-radius: 0.8em 0.8em 0.8em 0;
+    -webkit-border-radius: 0.8em 0.8em 0.8em 0;
+    margin-bottom:-1px; 
+}
+
+.dmg_1x1_basicActuatorNumber_commandpanel .command {
+    cursor: pointer;
+    height:3em;
+    width:4em;
+    background-color:#cccccc;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    -moz-border-radius: 0.8em;
+    -webkit-border-radius: 0.8em;
+    position:absolute;
+    left:0.5em;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;    
+}
+
+.dmg_1x1_basicActuatorNumber_commandpanel .command.increase {
+    background-image: url("images/up_16.png");
+    top:0.5em;
+}
+
+.dmg_1x1_basicActuatorNumber_commandpanel .command.decrease {
+    background-image: url("images/down_16.png");
+    bottom:0.5em;
+}
+
+.dmg_1x1_basicActuatorNumber_commandpanel .value {
+    color:#ffffff;
+    text-align:center;
+    line-height:2em;
+    height:2em;
+    width:4em;
+    border:1px solid #cccccc;
+    -moz-border-radius: 0.8em;
+    -webkit-border-radius: 0.8em;    
+    position:absolute;
+    top:4em;
+    left:0.5em;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    font-weight:bold;
+    -moz-user-select:none;
+    -webkit-user-select:none;
+}
