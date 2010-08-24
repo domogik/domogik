@@ -42,8 +42,10 @@ function closelogin() {
 
 function initLogin() {
     $("#loginForm .columnright").hide();
-    $("#resetLogin").click(function(){resetLogin();});
-    $("#submit").click(function(){$("#loginForm").submit();});
+    $("#resetLogin").click(function(e){resetLogin(); e.stopPropagation();});
+    $("#submit").click(function(e){$("#loginForm").submit(); e.stopPropagation();})
+        .keypress(function (e) {if (e.which == 13 || e.which == 32) {$("#loginForm").submit(); e.stopPropagation();}});    
+    $("#logincode").keypress(function (e) {if (e.which == 13 || e.which == 32) {$("#loginForm").submit(); e.stopPropagation();}});
     $("#loginname").addClass("hidden");
     resetLogin();
 }
