@@ -3679,7 +3679,7 @@ class JSonHelper():
 
         # get data type
         data_type = type(data).__name__
-        #print "TYPE=%s" % data_type
+        print "TYPE=%s" % data_type
         #print data
 
         ### type instance (sql object)
@@ -3743,7 +3743,9 @@ class JSonHelper():
             # get first data type
             if len(data) > 0:
                 sub_data_elt0_type = type(data[0]).__name__
+                print "DATA=%s" % data
             else:
+                print "DATA vide=%s" % data
                 data_json = "[]"
                 return data_json
             # start table
@@ -3769,6 +3771,7 @@ class JSonHelper():
 
         ### type : dict
         elif data_type in dict_type:
+            print "DICT=%s" % data
             if key != None and key != "NOKEY":
                 data_json += '"%s" : {' % key
             else:
@@ -3781,7 +3784,10 @@ class JSonHelper():
                 #print "    DATA : " + str(sub_data)
                 #print "    DATA TYPE : " + str(sub_data_type)
                 data_json += self._process_sub_data(idx + 1, False, sub_data_key, sub_data, sub_data_type, db_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type)
-            data_json = data_json[0:len(data_json)-1] + "},"
+            if data == {}:
+                data_json += "},"
+            else:
+                data_json = data_json[0:len(data_json)-1] + "},"
 
         ### type : str
         elif data_type in str_type:
