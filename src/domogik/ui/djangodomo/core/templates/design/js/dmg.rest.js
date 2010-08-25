@@ -1,3 +1,7 @@
+$(function(){
+	$(window).bind('beforeunload', function () { $.cancelRequest(); });
+});
+
 $.extend({
     URLEncode: function(c) {
         var o = '';
