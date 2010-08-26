@@ -121,7 +121,13 @@
 			</ul>
 		</li>
     {% empty %}
-        <li>{% trans "No areas or rooms configured yet" %}</li>
+	<script type="text/javascript">
+    // <![CDATA[
+        $(function(){ 
+        	$.notification("info", "{% trans "No areas or rooms configured yet" %}");
+        });
+    // ]]>
+	</script>
     {% endfor %}
     </div>
     <div class='clear'></div>
