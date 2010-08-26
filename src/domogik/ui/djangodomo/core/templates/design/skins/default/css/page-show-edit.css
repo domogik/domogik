@@ -7,7 +7,8 @@
     top:90px;
     height:80%;
     background-color:#ffffff;
-    background:rgba(255,255,255,0.8);
+    background:rgba(255,255,255,0.9);
+    border:1px solid #cccccc;
     -moz-border-radius: 0.8em 0 0 0.8em;
     -webkit-border-radius: 0.8em 0 0 0.8em;
     padding:1em 0 1em 0;

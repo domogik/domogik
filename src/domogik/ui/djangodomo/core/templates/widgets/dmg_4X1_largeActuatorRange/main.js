@@ -65,10 +65,10 @@ const auto_send = 3000; // 3 seconds
 						break;
 					}
 				});
-            this.initValues(1);
+            this._initValues(1);
         },
 
-        statsHandler: function(stats) {
+        _statsHandler: function(stats) {
             if (stats && stats.length > 0) {
                 this.setValue(stats[0].value);
             } else {
@@ -76,7 +76,7 @@ const auto_send = 3000; // 3 seconds
             }
         },
         
-        eventHandler: function(date, value) {
+        _eventHandler: function(date, value) {
             this.setValue(value);
         },
 

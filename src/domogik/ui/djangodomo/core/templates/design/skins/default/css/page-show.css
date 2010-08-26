@@ -12,6 +12,7 @@
 
 
 header#contentheader {
+	height:7em;
 	-moz-border-radius: 0.8em 0 0 0;
     -webkit-border-radius: 0.8em 0 0 0;
     border-right: #979387 1px solid;
