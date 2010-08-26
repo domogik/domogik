@@ -27,7 +27,7 @@
             $(".increase", this._panel).click(function(e){self.increase();e.stopPropagation();});
             $(".decrease", this._panel).click(function(e){self.decrease();e.stopPropagation();});
             var value = (o.model_parameters.valueMax - o.model_parameters.valueMin) / 2;
-            this._setValue(value);
+            this._setValue(null);
             
             var canvas = $(".deco", this._panel).get(0);
             if (canvas.getContext) {
@@ -41,6 +41,12 @@
             }
         },
 
+        _statsHandler: function(stats) {
+        },
+        
+        _eventHandler: function(date, value) {
+        },
+        
         _setValue: function(value) {
             var self = this, o = this.options;
             if (value != null) {

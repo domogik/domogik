@@ -99,7 +99,7 @@ $.extend({
             this.request_xOptions.abort();
     },
     
-    eventRequest: function(devices, events) {
+    eventRequest: function(devices) {
         url = rest_url + '/events/request/new/' + devices.join('/') + '/';
         this.request_xOptions = $.jsonp({
             cache: false,
@@ -115,8 +115,8 @@ $.extend({
                 if (status == 'ok') {
                     // Free the ticket when page unload
                     this.request_ticketid = data.event[0].ticket_id;
-                    $.eventProcess(events, data.event[0]);
-                    $.eventUpdate(data.event[0].ticket_id, events);
+                    $(document).trigger('dmg_event', [data.event[0]]);
+                    $.eventUpdate(data.event[0].ticket_id);
                 } else {
                     $.notification('error', 'Event request  : ' + data.description);
                 }
@@ -124,7 +124,7 @@ $.extend({
         });
     },
     
-    eventUpdate: function(ticket, events) {
+    eventUpdate: function(ticket) {
         url = rest_url + '/events/request/get/' + ticket + '/';
         this.request_xOptions = $.jsonp({
             cache: false,
@@ -138,8 +138,8 @@ $.extend({
             success: function (data) {
                 var status = (data.status).toLowerCase();
                 if (status == 'ok') {
-                    $.eventProcess(events, data.event[0]);
-                    $.eventUpdate(data.event[0].ticket_id, events);
+                    $(document).trigger('dmg_event', [data.event[0]]);
+                    $.eventUpdate(ticket);
                 } else {
                     $.notification('error', 'Event update : ' + data.description);
                 }
@@ -154,16 +154,6 @@ $.extend({
             type: "GET",
             url: url,
             dataType: "jsonp"
-        });
-    },
-    
-    eventProcess: function(events, data) {
-        $.each(data.data, function(index, item) {
-            $.each(events, function(index, event) {
-                if (event.device_id == data.device_id && event.stat_key == item.key) {
-                    eval("$('#widget_" + event.association_id + "')." + event.widget_id + "('setValue','" + item.value + "')");
-                }
-            });            
         });
     }
 });

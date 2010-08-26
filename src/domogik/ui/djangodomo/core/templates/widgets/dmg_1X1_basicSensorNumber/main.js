@@ -24,7 +24,19 @@
             this._button_month = this._addButtonText("graph_month", "rightup", "icon16-action-graph", "Month", function (e) {self._showGraphMonth();e.stopPropagation();});
             this._button_year = this._addButtonText("graph_year", "right", "icon16-action-graph", "Year", function (e) {self._showGraphYear();e.stopPropagation();});
             */
-            this.setValue(null);
+            this._initValues(1);
+        },
+
+        _statsHandler: function(stats) {
+            if (stats && stats.length > 0) {
+                this.setValue(stats[0].value);
+            } else {
+                this.setValue(null);
+            }
+        },
+        
+        _eventHandler: function(date, value) {
+            this.setValue(value);
         },
 
         setValue: function(value, previous) {

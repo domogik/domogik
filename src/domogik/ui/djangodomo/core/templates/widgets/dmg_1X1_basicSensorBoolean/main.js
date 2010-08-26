@@ -18,7 +18,19 @@
 
         _init: function() {
             var self = this, o = this.options;
-            this.setValue(null);
+            this._initValues(1);
+        },
+
+        _statsHandler: function(stats) {
+            if (stats && stats.length > 0) {
+                this.setValue(stats[0].value);
+            } else {
+                this.setValue(null);
+            }
+        },
+        
+        _eventHandler: function(date, value) {
+            this.setValue(value);
         },
 
         setValue: function(value, unit, previous) {

@@ -54,9 +54,21 @@
 					}
 					e.stopPropagation();
 				});
-            this.setValue(null);
+            this._initValues(1);
+        },
+
+        _statsHandler: function(stats) {
+            if (stats && stats.length > 0) {
+                this.setValue(stats[0].value);
+            } else {
+                this.setValue(null);
+            }
         },
         
+        _eventHandler: function(date, value) {
+            this.setValue(value);
+        },
+
         action: function() {
             var self = this, o = this.options;
             if (this._processingValue != this.currentValue) {

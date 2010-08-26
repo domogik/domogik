@@ -42,7 +42,7 @@ from django.conf import settings
 
 from domogik.common import database
 from domogik.ui.djangodomo.core.models import House, Areas, Rooms, Devices, DeviceUsages, DeviceTechnologies, DeviceTypes, \
-                                   Features, FeatureAssociations, Plugins, Accounts, Events, Rest
+                                   Features, FeatureAssociations, Plugins, Accounts, Rest
 
 from domogik.ui.djangodomo.core.sample_data_helper import SampleDataHelper
 
@@ -450,10 +450,10 @@ def index(request):
         result_house_rooms = Rooms.get_without_area()
         result_house_rooms.merge_uiconfig()
 
-        events = Events()
+        associated_devices_list = []
         for association in result_house.associations:
-            events.add(association)
-        events_list = events.get_list()
+            associated_devices_list.append(association.feature.device.id)
+
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
     return __go_to_page(request, 'index.html',
@@ -462,7 +462,7 @@ def index(request):
         areas_list=result_all_areas.area,
         rooms_list=result_house_rooms.room,
         house=result_house,
-        events=events_list
+        associated_devices=list(set(associated_devices_list)) #remove duplicates
     )
     
 def show_house(request):
@@ -486,16 +486,15 @@ def show_house(request):
         result_house_rooms.merge_uiconfig()
         result_house_rooms.merge_features()
 
-        events = Events()
+        associated_devices_list = []
         for association in result_house.associations:
-            events.add(association)
+            associated_devices_list.append(association.feature.device.id)
         for room in result_house_rooms.room:
             for association in room.associations:
-                events.add(association)
+                associated_devices_list.append(association.feature.device.id)
         for area in result_all_areas.area:
             for association in area.associations:
-                events.add(association)
-        events_list = events.get_list()
+                associated_devices_list.append(association.feature.device.id)
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
     return __go_to_page(
@@ -506,7 +505,7 @@ def show_house(request):
         areas_list=result_all_areas.area,
         rooms_list=result_house_rooms.room,
         house=result_house,
-        events=events_list
+        associated_devices=list(set(associated_devices_list)) #remove duplicates
     )
 
 @admin_required
@@ -557,13 +556,12 @@ def show_area(request, area_id):
         
         result_house = House()
         
-        events = Events()
+        associated_devices_list = []
         for association in result_area_by_id.area[0].associations:
-            events.add(association)
+            associated_devices_list.append(association.feature.device.id)
         for room in result_rooms_by_area.room:
             for association in room.associations:
-                events.add(association)
-        events_list = events.get_list()
+                associated_devices_list.append(association.feature.device.id)
 
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
@@ -577,7 +575,7 @@ def show_area(request, area_id):
         area=result_area_by_id.area[0],
         rooms_list=result_rooms_by_area.room,
         house=result_house,
-        events=events_list
+        associated_devices=list(set(associated_devices_list)) #remove duplicates
     )
 
 @admin_required
@@ -599,7 +597,6 @@ def show_area_edit(request, area_id):
         result_all_devices = Devices.get_all()
         result_all_devices.merge_uiconfig()
         result_all_devices.merge_features()
-        print result_all_devices.device
 
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
@@ -630,10 +627,9 @@ def show_room(request, room_id):
 
         result_house = House()
         
-        events = Events()
+        associated_devices_list = []
         for association in result_room_by_id.room[0].associations:
-            events.add(association)
-        events_list = events.get_list()
+            associated_devices_list.append(association.feature.device.id)
 
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
@@ -646,7 +642,7 @@ def show_room(request, room_id):
         nav1_show = "selected",
         room=result_room_by_id.room[0],
         house=result_house,
-        events=events_list
+        associated_devices=list(set(associated_devices_list)) #remove duplicates
     )
     
 @admin_required

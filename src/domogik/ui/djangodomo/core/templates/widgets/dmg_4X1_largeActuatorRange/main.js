@@ -65,9 +65,21 @@ const auto_send = 3000; // 3 seconds
 						break;
 					}
 				});
-            this.setValue(null);
+            this.initValues(1);
+        },
+
+        statsHandler: function(stats) {
+            if (stats && stats.length > 0) {
+                this.setValue(stats[0].value);
+            } else {
+                this.setValue(null);
+            }
         },
         
+        eventHandler: function(date, value) {
+            this.setValue(value);
+        },
+
         setValue: function(value) {
             var self = this, o = this.options;
             if (value) {

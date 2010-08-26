@@ -27,16 +27,11 @@
     $(function() {
         {% for association in room.associations %}
             {% get_widget association.id association.widget_id association.feature %}
-            {% get_widget_init association.id association.widget_id association.feature %}
         {% endfor %}
 
-        {% regroup events|dictsort:"device_id" by device_id as devices %}
-        {% if devices %}
-            var devices = [{% for device in devices %}{{ device.grouper }}{% if not forloop.last %},{% endif %}{% endfor %}];
-            var events = [{% for event in events %}{%autoescape off%}{{ event }}{%endautoescape%}{% if not forloop.last %},{% endif %}{% endfor %}];
-            $.eventRequest(devices, events);
+        {% if associated_devices %}
+            $.eventRequest({{associated_devices}});
         {% endif %}
-
     });
 {% endblock %}
 

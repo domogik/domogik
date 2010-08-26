@@ -20,7 +20,19 @@
             var self = this, o = this.options;
             this.values = [o.model_parameters.value0, o.model_parameters.value1];
             this.texts = [o.usage_parameters.state0, o.usage_parameters.state1];
-            this.setValue(null);            
+            this._initValues(1);
+        },
+        
+        _statsHandler: function(stats) {
+            if (stats && stats.length > 0) {
+                this.setValue(stats[0].value);
+            } else {
+                this.setValue(null);
+            }
+        },
+        
+        _eventHandler: function(date, value) {
+            this.setValue(value);
         },
         
         action: function() {

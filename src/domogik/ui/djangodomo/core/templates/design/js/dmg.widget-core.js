@@ -46,6 +46,7 @@ function get_widgets_options(id) {
             filter: {techno:'',device:'',feature:''},
             width: 1,
             height: 1,
+            key: '',
 			displayname: true,
 			displayborder: true
         },
@@ -74,6 +75,41 @@ function get_widgets_options(id) {
 					ctx.fillText(o.featurename, 0, 0);  
 				}
 			}
-		}
+            
+            $(document).bind('dmg_event', function(event, data) {
+                self._eventsHandler(data);
+            });
+		},
+        
+        _initValues: function(nb) {
+            var self = this, o = this.options;
+            $.getREST(['stats', o.deviceid, o.key, 'last', nb],
+                function(data) {
+                    var status = (data.status).toLowerCase();
+                    if (status == 'ok') {
+                        self._statsHandler(data.stats);
+                    } else {
+                        $.notification('error', '{% trans "Getting stats failed" %} (' + data.description + ')');
+                    }
+                }
+            );
+        },
+        
+        _eventsHandler: function(events) {
+            var self = this, o = this.options;
+            if (events.device_id == o.deviceid) {
+                $.each(events.data, function(index, data) {
+                    if (data.key == o.key) {
+                        self._eventHandler(null, data.value);
+                    }
+                });
+            }
+        },
+        
+        _statsHandler: function(stats) {
+        },
+        
+        _eventHandler: function(date, value) {
+        }
     });
 })(jQuery);

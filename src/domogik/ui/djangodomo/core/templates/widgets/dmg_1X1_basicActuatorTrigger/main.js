@@ -20,6 +20,12 @@
             this._displayIcon('unknown');
         },
         
+        _statsHandler: function(stats) {
+        },
+
+        _eventHandler: function(date, value) {
+        },
+
         action: function() {
             var self = this, o = this.options;
             this._startProcessingState();
