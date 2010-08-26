@@ -84,7 +84,6 @@
                 $(function() {
                 {% for association in room.associations %}
                     {% get_widget association.id association.widget_id association.feature %}
-                    {% get_widget_init association.id association.widget_id association.feature %}
                 {% endfor %}
                 });
             </script>
@@ -117,7 +116,6 @@
                 $(function() {
                 {% for association in area.associations %}
                     {% get_widget association.id association.widget_id association.feature %}
-                    {% get_widget_init association.id association.widget_id association.feature %}
                 {% endfor %}
                 });
             </script>

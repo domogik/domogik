@@ -85,7 +85,6 @@
                 $(function() {
                 {% for association in room.associations %}
                     {% get_widget association.id association.widget_id association.feature %}
-                    {% get_widget_init association.id association.widget_id association.feature %}
                 {% endfor %}
                 });
             </script>
