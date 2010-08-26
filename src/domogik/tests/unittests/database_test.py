@@ -37,9 +37,11 @@ import time
 import datetime
 
 from domogik.common.database import DbHelper, DbHelperException
-from domogik.common.sql_schema import Area, Device, DeviceFeatureModel, DeviceUsage, DeviceConfig, DeviceStats, \
-                                      DeviceFeatureAssociation, DeviceTechnology, PluginConfig, \
-                                      DeviceType, UIItemConfig, Room, UserAccount, SystemConfig, Trigger, Person
+from domogik.common.sql_schema import (
+    Area, Device, DeviceFeatureModel, DeviceUsage, DeviceConfig, DeviceStats,
+    DeviceFeatureAssociation, DeviceTechnology, PluginConfig,
+    DeviceType, UIItemConfig, Room, UserAccount, SystemConfig, Trigger, Person
+)
 
 
 def make_ts(year, month, day, hours=0, minutes=0, seconds=0):
@@ -409,7 +411,7 @@ class DeviceFeatureModelTestCase(GenericTestCase):
         dty2 = db.add_device_type(dty_name='x10 Dimmer', dty_description='desc2', dt_id=dt1.id)
         dty3 = db.add_device_type(dty_name='1wire.Temperature', dty_description='desc3', dt_id=dt2.id)
         afm1 = db.add_actuator_feature_model(af_name='Switch', af_device_type_id=dty1.id, af_parameters='myparams1',
-                                                 af_value_type='binary', af_return_confirmation=True)
+                                             af_value_type='binary', af_return_confirmation=True)
         print(afm1)
         assert afm1.name == 'Switch'
         assert afm1.device_type_id == dty1.id
@@ -418,9 +420,9 @@ class DeviceFeatureModelTestCase(GenericTestCase):
         assert afm1.return_confirmation
         assert db.get_device_feature_model_by_id(afm1.id).name == 'Switch'
         afm2 = db.add_actuator_feature_model(af_name='Dimmer', af_device_type_id=dty2.id, af_parameters='myparams2',
-                                                  af_value_type='number', af_return_confirmation=True)
+                                             af_value_type='number', af_return_confirmation=True)
         sfm1 = db.add_sensor_feature_model(sf_name='Thermometer', sf_device_type_id=dty3.id,
-                                                sf_parameters='myparams3', sf_value_type='number')
+                                           sf_parameters='myparams3', sf_value_type='number')
         print(sfm1)
         assert sfm1.name == 'Thermometer'
         assert sfm1.device_type_id == dty3.id
@@ -441,15 +443,15 @@ class DeviceFeatureModelTestCase(GenericTestCase):
         dty1 = db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
         dty2 = db.add_device_type(dty_name='1wire.Temperature', dty_description='desc3', dt_id=dt2.id)
         af1 = db.add_actuator_feature_model(af_name='Switch', af_device_type_id=dty1.id, af_value_type='number',
-                                                 af_parameters='myparams1')
+                                            af_parameters='myparams1')
         af1_u = db.update_actuator_feature_model(af_id=af1.id, af_name='Big switch',
-                                                      af_parameters='myparams_u', af_return_confirmation=True)
+                                                 af_parameters='myparams_u', af_return_confirmation=True)
         assert af1_u.name == 'Big switch'
         assert af1_u.parameters == 'myparams_u'
         assert af1_u.value_type == 'number'
         assert af1_u.return_confirmation
         sf1 = db.add_sensor_feature_model(sf_name='Thermometer', sf_device_type_id=dty2.id,
-                                               sf_parameters='myparams2', sf_value_type='number')
+                                          sf_parameters='myparams2', sf_value_type='number')
         sf1_u = db.update_sensor_feature_model(sf_id=sf1.id, sf_value_type='string')
         assert sf1_u.value_type == 'string'
 
@@ -460,11 +462,11 @@ class DeviceFeatureModelTestCase(GenericTestCase):
         dty2 = db.add_device_type(dty_name='x10 Dimmer', dty_description='desc2', dt_id=dt1.id)
         dty3 = db.add_device_type(dty_name='1wire.Temperature', dty_description='desc3', dt_id=dt2.id)
         af1 = db.add_actuator_feature_model(af_name='Switch', af_device_type_id=dty1.id, af_parameters='myparams1',
-                                                 af_value_type='binary', af_return_confirmation=True)
+                                            af_value_type='binary', af_return_confirmation=True)
         af2 = db.add_actuator_feature_model(af_name='Dimmer', af_device_type_id=dty2.id, af_parameters='myparams2',
-                                                 af_value_type='number', af_return_confirmation=True)
+                                            af_value_type='number', af_return_confirmation=True)
         sf1 = db.add_sensor_feature_model(sf_name='Thermometer', sf_device_type_id=dty3.id,
-                                               sf_parameters='myparams3', sf_value_type='number')
+                                          sf_parameters='myparams3', sf_value_type='number')
         af_d = db.del_actuator_feature_model(af1.id)
         assert af_d.id == af1.id
         assert len(db.list_device_feature_associations_by_feature_id(af_d.id)) == 0
@@ -503,17 +505,17 @@ class DeviceFeatureAssociationTestCase(GenericTestCase):
         dty1 = db.add_device_type(dty_name='x10 Switch', dt_id=dt1.id, dty_description='My beautiful switch')
         dty2 = db.add_device_type(dty_name='PLCBus Lamp', dt_id=dt2.id)
         af1 = db.add_actuator_feature_model(af_name='Switch', af_device_type_id=dty1.id, af_parameters='myparams1',
-                                                 af_value_type='binary')
+                                            af_value_type='binary')
         af2 = db.add_actuator_feature_model(af_name='Dimmer', af_device_type_id=dty2.id, af_parameters='myparams2',
-                                                 af_value_type='number')
+                                            af_value_type='number')
         af3 = db.add_actuator_feature_model(af_name='Switch', af_device_type_id=dty2.id, af_parameters='myparams3',
-                                                 af_value_type='number')
+                                            af_value_type='number')
         device1 = db.add_device(d_name='Toaster', d_address='A1', d_type_id=dty1.id, d_usage_id=du1.id)
         #assert db.get_device_feature_by_id(
         device2 = db.add_device(d_name='Air conditioning', d_address='A2', d_type_id=dty1.id, d_usage_id=du1.id,
-                                     d_description='Cold thing')
+                                d_description='Cold thing')
         device3 = db.add_device(d_name='Lamp', d_address='A1', d_type_id=dty2.id, d_usage_id=du2.id,
-                                     d_description='')
+                                d_description='')
         df_list = db.list_device_features_by_device_id(device3.id)
         assert len(df_list) == 2
         assert db.get_device_feature_by_id(df_list[0].id) is not None
@@ -543,19 +545,19 @@ class DeviceFeatureAssociationTestCase(GenericTestCase):
         dt2 = db.add_device_technology('plcbus', 'PLCBus', 'PLCBus device type')
         du1 = db.add_device_usage('Appliance')
         dty1 = db.add_device_type(dty_name='x10 Switch', dt_id=dt1.id,
-                                       dty_description='My beautiful switch')
+                                  dty_description='My beautiful switch')
         dty2 = db.add_device_type(dty_name='PLCBus Switch', dt_id=dt2.id,
-                                       dty_description='Another beautiful switch')
+                                  dty_description='Another beautiful switch')
         afm1 = db.add_actuator_feature_model(af_name='Switch', af_device_type_id=dty1.id, af_value_type='binary',
-                                                  af_parameters='myparams1')
+                                             af_parameters='myparams1')
         afm2 = db.add_actuator_feature_model(af_name='Dimmer', af_device_type_id=dty2.id, af_value_type='number',
-                                                  af_parameters='myparams2')
+                                             af_parameters='myparams2')
         device1 = db.add_device(d_name='Toaster', d_address='A1', d_type_id=dty1.id, d_usage_id=du1.id,
-                                     d_description='My new toaster')
+                                d_description='My new toaster')
         device2 = db.add_device(d_name='Washing machine', d_address='A1', d_type_id=dty2.id, d_usage_id=du1.id,
-                                     d_description='Laden')
+                                d_description='Laden')
         device3 = db.add_device(d_name='Mixer', d_address='A2', d_type_id=dty2.id, d_usage_id=du1.id,
-                                     d_description='Moulinex')
+                                d_description='Moulinex')
         df1 = db.get_device_feature(device1.id, afm1.id)
         dfa1 = db.add_device_feature_association(d_feature_id=df1.id, d_place_type='house')
         df2 = db.get_device_feature(device2.id, afm2.id)
@@ -642,11 +644,11 @@ class PluginConfigTestCase(GenericTestCase):
         assert pc1_1.value == 'val1_1'
         pc1_2 = db.set_plugin_config(pl_name='x10', pl_hostname='192.168.0.1', pl_key='key1_2', pl_value='val1_2')
         pc3_1 = db.set_plugin_config(pl_name='plcbus', pl_hostname='192.168.0.1', pl_key='key3_1',
-                                          pl_value='val3_1')
+                                     pl_value='val3_1')
         pc3_2 = db.set_plugin_config(pl_name='plcbus', pl_hostname='192.168.0.1', pl_key='key3_2',
-                                          pl_value='val3_2')
+                                     pl_value='val3_2')
         pc3_3 = db.set_plugin_config(pl_name='plcbus', pl_hostname='192.168.0.1', pl_key='key3_3',
-                                          pl_value='val3_3')
+                                     pl_value='val3_3')
         pc4_1 = db.set_plugin_config(pl_name='x10', pl_hostname='192.168.0.2', pl_key='key4_1', pl_value='val4_1')
         assert len(db.list_all_plugin_config()) == 6
         assert len(db.list_plugin_config('x10', '192.168.0.1')) == 2
@@ -666,11 +668,11 @@ class PluginConfigTestCase(GenericTestCase):
         plc1_1 = db.set_plugin_config(pl_name='x10', pl_hostname='192.168.0.1', pl_key='key1_1', pl_value='val1_1')
         plc1_2 = db.set_plugin_config(pl_name='x10', pl_hostname='192.168.0.1', pl_key='key1_2', pl_value='val1_2')
         plc3_1 = db.set_plugin_config(pl_name='plcbus', pl_hostname='192.168.0.1', pl_key='key3_1',
-                                           pl_value='val3_1')
+                                      pl_value='val3_1')
         plc3_2 = db.set_plugin_config(pl_name='plcbus', pl_hostname='192.168.0.1', pl_key='key3_2',
-                                           pl_value='val3_2')
+                                      pl_value='val3_2')
         plc3_3 = db.set_plugin_config(pl_name='plcbus', pl_hostname='192.168.0.1', pl_key='key3_3',
-                                           pl_value='val3_3')
+                                      pl_value='val3_3')
         pc4_1 = db.set_plugin_config(pl_name='x10', pl_hostname='192.168.0.2', pl_key='key4_1', pl_value='val4_1')
         assert len(db.del_plugin_config('x10', '192.168.0.1')) == 2
         assert len(db.list_plugin_config('x10', '192.168.0.1')) == 0
@@ -696,8 +698,7 @@ class DeviceTestCase(GenericTestCase):
         room1 = db.add_room('room1', area1.id)
         dt1 = db.add_device_technology('x10', 'x10', 'desc dt1')
         du1 = db.add_device_usage('du1')
-        dty1 = db.add_device_type(dty_name='x10 Switch',
-                                       dty_description='desc1', dt_id=dt1.id)
+        dty1 = db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
         try:
             db.add_device(d_name='device1', d_address = 'A1', d_type_id = 9999999999, d_usage_id = du1.id)
             TestCase.fail(self, "Device type does not exist, an exception should have been raised")
@@ -706,7 +707,7 @@ class DeviceTestCase(GenericTestCase):
         except DbHelperException:
             pass
         device1 = db.add_device(d_name='device1', d_address='A1',
-                                     d_type_id=dty1.id, d_usage_id=du1.id, d_description='desc1')
+                                d_type_id=dty1.id, d_usage_id=du1.id, d_description='desc1')
         assert device1.name == 'device1' and device1.description == 'desc1'
         print(device1)
         assert len(db.list_devices()) == 1
@@ -722,15 +723,15 @@ class DeviceTestCase(GenericTestCase):
         dt2 = db.add_device_technology('plcbus', 'PLCBus', 'PLCBus device type')
         du1 = db.add_device_usage('Appliance')
         dty1 = db.add_device_type(dty_name='x10 Switch', dt_id=dt1.id,
-                                       dty_description='My beautiful switch')
+                                  dty_description='My beautiful switch')
         dty2 = db.add_device_type(dty_name='PLCBus Switch', dt_id=dt2.id,
-                                       dty_description='Another beautiful switch')
+                                  dty_description='Another beautiful switch')
         device1 = db.add_device(d_name='Toaster', d_address='A1',
-                                     d_type_id=dty1.id, d_usage_id=du1.id, d_description='My new toaster')
+                                d_type_id=dty1.id, d_usage_id=du1.id, d_description='My new toaster')
         device2 = db.add_device(d_name='Washing machine', d_address='A1',
-                                     d_type_id=dty2.id, d_usage_id=du1.id, d_description='Laden')
+                                d_type_id=dty2.id, d_usage_id=du1.id, d_description='Laden')
         device3 = db.add_device(d_name='Mixer', d_address='A2',
-                                     d_type_id=dty2.id, d_usage_id=du1.id, d_description='Moulinex')
+                                d_type_id=dty2.id, d_usage_id=du1.id, d_description='Moulinex')
         search_dev1 = db.get_device_by_technology_and_address(dt1.id, 'A1')
         assert search_dev1.name == 'Toaster'
         search_dev2 = db.get_device_by_technology_and_address(dt1.id, 'A2')
@@ -744,7 +745,7 @@ class DeviceTestCase(GenericTestCase):
         dty1 = db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
         du1 = db.add_device_usage('du1')
         device1 = db.add_device(d_name='device1', d_address='A1',
-                    d_type_id=dty1.id, d_usage_id=du1.id, d_description='desc1')
+                                d_type_id=dty1.id, d_usage_id=du1.id, d_description='desc1')
         device_id = device1.id
         try:
             db.update_device(d_id=device1.id, d_usage_id=9999999999999)
@@ -768,9 +769,9 @@ class DeviceTestCase(GenericTestCase):
         du1 = db.add_device_usage('du1')
         du2 = db.add_device_usage('du2')
         device1 = db.add_device(d_name='device1', d_address='A1',
-                                     d_type_id=dty1.id, d_usage_id=du1.id, d_description='desc1')
+                                d_type_id=dty1.id, d_usage_id=du1.id, d_description='desc1')
         device2 = db.add_device(d_name='device2', d_address='A2',
-                                     d_type_id=dty1.id, d_usage_id=du1.id, d_description='desc1')
+                                d_type_id=dty1.id, d_usage_id=du1.id, d_description='desc1')
         device3 = db.add_device(d_name='device3', d_address='A3', d_type_id=dty1.id, d_usage_id=du1.id)
         device_del = device2
         device2_id = device2.id
@@ -910,15 +911,15 @@ class DeviceStatsTestCase(GenericTestCase):
         assert stats_l[0].value == '4' and stats_l[1].value == '6' and stats_l[2].value == '8'
 
         stats_l = db.list_stats_of_device_between_by_key('val1', device1.id, make_ts(2010, 04, 9, 12, 2),
-                                                              make_ts(2010, 04, 9, 12, 4))
+                                                         make_ts(2010, 04, 9, 12, 4))
         assert len(stats_l) == 3
         assert stats_l[0].value == '4' and stats_l[1].value == '6' and stats_l[2].value == '8'
         stats_l = db.list_stats_of_device_between_by_key('val1', device1.id,
-                                                              make_ts(2010, 04, 9, 12, 3))
+                                                         make_ts(2010, 04, 9, 12, 3))
         assert len(stats_l) == 2
         assert stats_l[0].value == '6' and stats_l[1].value == '8'
         stats_l = db.list_stats_of_device_between_by_key('val1', device1.id,
-                                                              end_date_ts=make_ts(2010, 04, 9, 12, 2))
+                                                         end_date_ts=make_ts(2010, 04, 9, 12, 2))
         assert len(stats_l) == 3
         assert stats_l[0].get_date_as_timestamp() == 1270810800.0
 
@@ -971,9 +972,9 @@ class DeviceStatsTestCase(GenericTestCase):
         for func in ('avg', 'min', 'max'):
             start_t = time.time()
             results = db.filter_stats_of_device_by_key(ds_key='valm', ds_device_id=device1.id,
-                                                            start_date_ts=make_ts(2010, 2, 21, 15, 57, 0),
-                                                            end_date_ts=make_ts(2010, 2, 21, 16, 3, 0),
-                                                            step_used='minute', function_used=func)
+                                                       start_date_ts=make_ts(2010, 2, 21, 15, 57, 0),
+                                                       end_date_ts=make_ts(2010, 2, 21, 16, 3, 0),
+                                                       step_used='minute', function_used=func)
             assert results == expected_results[func]
 
         start_p = make_ts(2010, 6, 21, 15, 48, 0)
@@ -1001,9 +1002,9 @@ class DeviceStatsTestCase(GenericTestCase):
         for func in ('avg', 'min', 'max'):
             start_t = time.time()
             results = db.filter_stats_of_device_by_key(ds_key='valh', ds_device_id=device1.id,
-                                                            start_date_ts=make_ts(2010, 6, 22, 17, 48, 0),
-                                                            end_date_ts=make_ts(2010, 6, 23, 1, 48, 0),
-                                                            step_used='hour', function_used=func)
+                                                       start_date_ts=make_ts(2010, 6, 22, 17, 48, 0),
+                                                       end_date_ts=make_ts(2010, 6, 23, 1, 48, 0),
+                                                       step_used='hour', function_used=func)
             assert results == expected_results[func]
 
         # Days
@@ -1028,9 +1029,9 @@ class DeviceStatsTestCase(GenericTestCase):
         for func in ('avg', 'min', 'max'):
             start_t = time.time()
             results = db.filter_stats_of_device_by_key(ds_key='vald', ds_device_id=device1.id,
-                                                            start_date_ts=make_ts(2010, 6, 22, 15, 48, 0),
-                                                            end_date_ts=make_ts(2010, 7, 26, 15, 48, 0),
-                                                            step_used='day', function_used=func)
+                                                       start_date_ts=make_ts(2010, 6, 22, 15, 48, 0),
+                                                       end_date_ts=make_ts(2010, 7, 26, 15, 48, 0),
+                                                       step_used='day', function_used=func)
             assert results == expected_results[func]
 
         # Weeks
@@ -1057,9 +1058,9 @@ class DeviceStatsTestCase(GenericTestCase):
             for func in ('avg', 'min', 'max'):
                 start_t = time.time()
                 results = db.filter_stats_of_device_by_key(ds_key='valw', ds_device_id=device1.id,
-                                                                start_date_ts=make_ts(2010, 7, 22, 15, 48, 0),
-                                                                end_date_ts=make_ts(2010, 8, 26, 15, 48, 0),
-                                                                step_used='week', function_used=func)
+                                                           start_date_ts=make_ts(2010, 7, 22, 15, 48, 0),
+                                                           end_date_ts=make_ts(2010, 8, 26, 15, 48, 0),
+                                                           step_used='week', function_used=func)
                 assert results == expected_results[func]
 
         # Months
@@ -1086,9 +1087,9 @@ class DeviceStatsTestCase(GenericTestCase):
         for func in ('avg', 'min', 'max'):
             start_t = time.time()
             results =  db.filter_stats_of_device_by_key(ds_key='valmy', ds_device_id=device1.id,
-                                                             start_date_ts=make_ts(2010, 6, 25, 15, 48, 0),
-                                                             end_date_ts=make_ts(2011, 7, 29, 15, 48, 0),
-                                                             step_used='month', function_used=func)
+                                                        start_date_ts=make_ts(2010, 6, 25, 15, 48, 0),
+                                                        end_date_ts=make_ts(2011, 7, 29, 15, 48, 0),
+                                                        step_used='month', function_used=func)
             assert results == expected_results[func]
 
         # Years
@@ -1100,9 +1101,9 @@ class DeviceStatsTestCase(GenericTestCase):
         for func in ('avg', 'min', 'max'):
             start_t = time.time()
             results=  db.filter_stats_of_device_by_key(ds_key='valmy', ds_device_id=device1.id,
-                                                            start_date_ts=make_ts(2010, 6, 21, 15, 48, 0),
-                                                            end_date_ts=make_ts(2012, 6, 21, 15, 48, 0),
-                                                            step_used='year', function_used=func)
+                                                       start_date_ts=make_ts(2010, 6, 21, 15, 48, 0),
+                                                       end_date_ts=make_ts(2012, 6, 21, 15, 48, 0),
+                                                       step_used='year', function_used=func)
             assert results == expected_results[func]
 
     def test_del(self):
@@ -1149,18 +1150,18 @@ class TriggersTestCase(GenericTestCase):
 
     def test_add(self):
         trigger1 = db.add_trigger(t_description='desc1', t_rule='AND(x,OR(y,z))',
-                                       t_result=['x10_on("a3")', '1wire()'])
+                                  t_result=['x10_on("a3")', '1wire()'])
         print(trigger1)
         assert trigger1.description == 'desc1'
         assert trigger1.rule == 'AND(x,OR(y,z))'
         trigger2 = db.add_trigger(t_description = 'desc2', t_rule='OR(x,AND(y,z))',
-                                       t_result=['x10_on("a2")', '1wire()'])
+                                  t_result=['x10_on("a2")', '1wire()'])
         assert len(db.list_triggers()) == 2
         assert db.get_trigger(trigger1.id).description == 'desc1'
 
     def test_update(self):
         trigger = db.add_trigger(t_description='desc1', t_rule='AND(x,OR(y,z))',
-                                      t_result=['x10_on("a3")', '1wire()'])
+                                 t_result=['x10_on("a3")', '1wire()'])
         trigger_u = db.update_trigger(t_id=trigger.id, t_description='desc2', t_rule='OR(x,AND(y,z))',
                                       t_result=['x10_on("a2")', '1wire()'])
         assert trigger_u.description == 'desc2'
@@ -1169,7 +1170,7 @@ class TriggersTestCase(GenericTestCase):
 
     def test_del(self):
         trigger1 = db.add_trigger(t_description = 'desc1', t_rule = 'AND(x,OR(y,z))',
-                                       t_result= ['x10_on("a3")', '1wire()'])
+                                  t_result= ['x10_on("a3")', '1wire()'])
         trigger2 = db.add_trigger(t_description = 'desc2', t_rule = 'OR(x,AND(y,z))',
                                        t_result= ['x10_on("a2")', '1wire()'])
         for trigger in db.list_triggers():
@@ -1200,11 +1201,11 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
 
     def test_add(self):
         person1 = db.add_person(p_first_name='Marc', p_last_name='SCHNEIDER',
-                                     p_birthdate=datetime.date(1973, 4, 24))
+                                p_birthdate=datetime.date(1973, 4, 24))
         assert person1.last_name == 'SCHNEIDER'
         print(person1)
         user1 = db.add_user_account(a_login='mschneider', a_password='IwontGiveIt',
-                                         a_person_id=person1.id, a_is_admin=True)
+                                    a_person_id=person1.id, a_is_admin=True)
         print(user1)
         assert user1.person.first_name == 'Marc'
         assert db.authenticate('mschneider', 'IwontGiveIt')
@@ -1221,7 +1222,7 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
         except DbHelperException:
             pass
         person2 = db.add_person(p_first_name='Marc', p_last_name='DELAMAIN',
-                                     p_birthdate=datetime.date(1981, 4, 24))
+                                p_birthdate=datetime.date(1981, 4, 24))
         user2 = db.add_user_account(a_login='lonely', a_password='boy', a_person_id=person2.id, a_is_admin=True)
         person3 = db.add_person(p_first_name='Ali', p_last_name='CANTE')
         assert len(db.list_persons()) == 3
@@ -1237,14 +1238,14 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
 
     def test_update(self):
         person = db.add_person(p_first_name='Marc', p_last_name='SCHNEIDER',
-                                    p_birthdate=datetime.date(1973, 4, 24))
+                               p_birthdate=datetime.date(1973, 4, 24))
         person_u = db.update_person(p_id=person.id, p_first_name='Marco', p_last_name='SCHNEIDERO',
-                                         p_birthdate=datetime.date(1981, 4, 24))
+                                    p_birthdate=datetime.date(1981, 4, 24))
         assert str(person_u.birthdate) == str(datetime.date(1981, 4, 24))
         assert person_u.last_name == 'SCHNEIDERO'
         assert person_u.first_name == 'Marco'
         user_acc = db.add_user_account(a_login='mschneider', a_password='IwontGiveIt',
-                                            a_person_id=person_u.id, a_is_admin=True)
+                                       a_person_id=person_u.id, a_is_admin=True)
         assert not db.change_password(999999999, 'IwontGiveIt', 'foo')
         assert db.change_password(user_acc.id, 'IwontGiveIt', 'OkIWill')
         assert not db.change_password(user_acc.id, 'DontKnow', 'foo')
@@ -1257,9 +1258,9 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
         except DbHelperException:
             pass
         user_acc_u = db.update_user_account_with_person(a_id=user_acc.id, a_login='mschneider3',
-                                                             p_first_name='Bob', p_last_name='Marley',
-                                                             p_birthdate=datetime.date(1991, 4, 24),
-                                                             a_is_admin=True, a_skin_used='skins/crocodile')
+                                                        p_first_name='Bob', p_last_name='Marley',
+                                                        p_birthdate=datetime.date(1991, 4, 24),
+                                                        a_is_admin=True, a_skin_used='skins/crocodile')
         assert user_acc_u.login == 'mschneider3'
         assert user_acc_u.person.first_name == 'Bob'
         assert user_acc_u.person.last_name == 'Marley'
@@ -1269,15 +1270,15 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
 
     def testGet(self):
         person1 = db.add_person(p_first_name='Marc', p_last_name='SCHNEIDER',
-                                     p_birthdate=datetime.date(1973, 4, 24))
+                                p_birthdate=datetime.date(1973, 4, 24))
         person2 = db.add_person(p_first_name='Monthy', p_last_name='PYTHON',
-                                     p_birthdate=datetime.date(1981, 4, 24))
+                                p_birthdate=datetime.date(1981, 4, 24))
         person3 = db.add_person(p_first_name='Alberto', p_last_name='MATE',
-                                     p_birthdate=datetime.date(1947, 8, 6))
+                                p_birthdate=datetime.date(1947, 8, 6))
         user1 = db.add_user_account(a_login='mschneider', a_password='IwontGiveIt',
-                                         a_person_id=person1.id, a_is_admin=True)
+                                    a_person_id=person1.id, a_is_admin=True)
         user2 = db.add_user_account(a_login='lonely', a_password='boy',
-                                         a_person_id=person2.id, a_is_admin=True)
+                                    a_person_id=person2.id, a_is_admin=True)
         assert db.get_user_account_by_person(person3.id) is None
         user_acc = db.get_user_account(user1.id)
         assert user_acc.login == 'mschneider'
@@ -1294,11 +1295,11 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
 
     def test_del(self):
         person1 = db.add_person(p_first_name='Marc', p_last_name='SCHNEIDER',
-                                     p_birthdate=datetime.date(1973, 4, 24))
+                                p_birthdate=datetime.date(1973, 4, 24))
         person2 = db.add_person(p_first_name='Monthy', p_last_name='PYTHON',
-                                     p_birthdate=datetime.date(1981, 4, 24))
+                                p_birthdate=datetime.date(1981, 4, 24))
         person3 = db.add_person(p_first_name='Alberto', p_last_name='MATE',
-                                     p_birthdate=datetime.date(1947, 8, 6))
+                                p_birthdate=datetime.date(1947, 8, 6))
         user1 = db.add_user_account(a_login='mschneider', a_password='IwontGiveIt', a_person_id=person1.id)
         user2 = db.add_user_account(a_login='lonely', a_password='boy', a_person_id=person2.id)
         user3 = db.add_user_account(a_login='domo', a_password='gik', a_person_id=person3.id)
