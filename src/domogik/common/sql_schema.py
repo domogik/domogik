@@ -55,8 +55,11 @@ Implements
 import time, sys
 from exceptions import AssertionError
 
-from sqlalchemy import types, create_engine, Table, Column, Integer, Float, String, Enum, \
-                       MetaData, ForeignKey, Boolean, DateTime, Date, Text, Unicode, UnicodeText, UniqueConstraint
+from sqlalchemy import (
+        types, create_engine, Table, Column, Integer, Float, String, Enum,
+        MetaData, ForeignKey, Boolean, DateTime, Date, Text,
+        Unicode, UnicodeText, UniqueConstraint
+)
 from sqlalchemy.types import TIMESTAMP
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relation, backref
@@ -167,8 +170,8 @@ class DeviceUsage(Base):
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<DeviceUsage(id=%s, name='%s', desc='%s', default opt='%s')>" \
-               % (self.id, self.name, self.description, self.default_options)
+        return "<DeviceUsage(id=%s, name='%s', desc='%s', default opt='%s')>"\
+                % (self.id, self.name, self.description, self.default_options)
 
     @staticmethod
     def get_tablename():
@@ -263,7 +266,7 @@ class DeviceType(Base):
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<DeviceType(id=%s, name='%s', desc='%s', device techno='%s')>" \
+        return "<DeviceType(id=%s, name='%s', desc='%s', device techno='%s')>"\
                % (self.id, self.name, self.description, self.device_technology)
 
     @staticmethod
@@ -307,8 +310,8 @@ class Device(Base):
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<Device(id=%s, name='%s', addr='%s', desc='%s', ref='%s', type='%s', usage=%s)>" \
-               % (self.id, self.name, self.address, self.description, self.reference, \
+        return "<Device(id=%s, name='%s', addr='%s', desc='%s', ref='%s', type='%s', usage=%s)>"\
+               % (self.id, self.name, self.address, self.description, self.reference,\
                   self.device_type, self.device_usage)
 
     @staticmethod
@@ -341,7 +344,7 @@ class DeviceFeatureModel(Base):
         @param value_type : value type the actuator can accept / the sensor can return
         @param parameters : parameters about the command or the returned data associated to the device, optional
         @param stat_key : key reference in the core_device_stats table, optional
-        @param return_confirmation : True if the device returns a confirmation after having executed a command ,optional (default False)
+        @param return_confirmation : True if the device returns a confirmation after having executed a command, optional (default False)
                                      Only relevant for actuators
 
         """
@@ -350,10 +353,10 @@ class DeviceFeatureModel(Base):
             raise Exception("Feature type must me either 'actuator' or 'sensor' but NOT %s" % feature_type)
         self.feature_type = feature_type
         if self.feature_type == 'actuator' and value_type not in ACTUATOR_VALUE_TYPE_LIST:
-            raise Exception("Can't add value type %s to an actuator it doesn't belong to list %s" \
+            raise Exception("Can't add value type %s to an actuator it doesn't belong to list %s"
                             % (value_type, ACTUATOR_VALUE_TYPE_LIST))
         elif self.feature_type == 'sensor' and value_type not in SENSOR_VALUE_TYPE_LIST:
-            raise Exception("Can't add value type %s to a sensor it doesn't belong to list %s" \
+            raise Exception("Can't add value type %s to a sensor it doesn't belong to list %s"
                             % (value_type, SENSOR_VALUE_TYPE_LIST))
         self.device_type_id = device_type_id
         self.value_type = ucode(value_type)
@@ -363,8 +366,8 @@ class DeviceFeatureModel(Base):
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<DeviceFeatureModel(%s, %s, device_type=%s, param=%s, value_type=%s, stat_key=%s, return_conf=%s)>" \
-               % (self.id, self.feature_type, self.device_type, self.parameters, self.value_type, \
+        return "<DeviceFeatureModel(%s, %s, device_type=%s, param=%s, value_type=%s, stat_key=%s, return_conf=%s)>"\
+               % (self.id, self.feature_type, self.device_type, self.parameters, self.value_type,\
                   self.stat_key, self.return_confirmation)
 
     @staticmethod
@@ -436,7 +439,7 @@ class DeviceFeatureAssociation(Base):
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<DeviceFeatureAssociation(%s, %s, %s, place_id=%s)>" \
+        return "<DeviceFeatureAssociation(%s, %s, %s, place_id=%s)>"\
                % (self.id, self.device_feature, self.place_type, self.place_id)
 
     @staticmethod
@@ -545,8 +548,8 @@ class Trigger(Base):
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<Trigger(id=%s, desc='%s', rule='%s', result='%s')>" \
-                % (self.id, self.description, self.rule, self.result)
+        return "<Trigger(id=%s, desc='%s', rule='%s', result='%s')>"\
+               % (self.id, self.description, self.rule, self.result)
 
     @staticmethod
     def get_tablename():
@@ -577,7 +580,7 @@ class Person(Base):
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<Person(id=%s, first_name='%s', last_name='%s', birthdate='%s')>" \
+        return "<Person(id=%s, first_name='%s', last_name='%s', birthdate='%s')>"\
                % (self.id, self.first_name, self.last_name, self.birthdate)
 
     @staticmethod
@@ -620,8 +623,8 @@ class UserAccount(Base):
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<UserAccount(id=%s, login='%s', is_admin=%s, person=%s)>" \
-                % (self.id, self.login, self.is_admin, self.person)
+        return "<UserAccount(id=%s, login='%s', is_admin=%s, person=%s)>"\
+               % (self.id, self.login, self.is_admin, self.person)
 
     @staticmethod
     def get_tablename():
@@ -654,7 +657,8 @@ class UIItemConfig(Base):
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<UIItemConfig(name='%s' reference='%s', key='%s', value='%s')>" % (self.name, self.reference, self.key, self.value)
+        return "<UIItemConfig(name='%s' reference='%s', key='%s', value='%s')>"\
+               % (self.name, self.reference, self.key, self.value)
 
     @staticmethod
     def get_tablename():
