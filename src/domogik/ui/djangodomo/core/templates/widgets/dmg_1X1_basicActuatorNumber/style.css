@@ -17,6 +17,7 @@
     position:absolute;
     top:-70px;
     left:-70px;
+    z-index:10;
 }
 
 .dmg_1x1_basicActuatorNumber .panel .deco {

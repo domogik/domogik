@@ -1,8 +1,8 @@
 .widget {
-    display:block;
+    display:inline-block;
     outline: none;
-    position:relative;
     margin:0;
+    position:relative;
     -moz-user-select:none;
     -webkit-user-select:none;
     -moz-box-sizing:border-box;
