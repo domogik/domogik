@@ -48,29 +48,6 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-#DATABASE_ENGINE = 'mysql'   # 'postgresql_psycopg2', 'postgresql', 'mysql',
-                            # 'sqlite3' or 'oracle'.
-#DATABASE_NAME = 'domogik'   # Or path to database file if using sqlite3.
-
-#DATABASE_ENGINE = 'sqlite3'
-#DATABASE_NAME = "db.sqlite"
-
-#DATABASE_USER = 'domogik'   # Not used with sqlite3.
-#DATABASE_PASSWORD = ''      # Not used with sqlite3.
-#DATABASE_HOST = ''          # Set to empty string for localhost.
-                            # ( Not used with sqlite3. )
-#DATABASE_PORT = ''          # Set to empty string for default.
-                            # ( Not used with sqlite3. )
-
-DATABASES = {
-    'default': {
-        'NAME': 'db.sqlite',
-        'ENGINE': 'django.db.backends.sqlite3',
-        'USER': '',
-        'PASSWORD': '',
-    }
-}
-
 ### Proxy settings
 try:
     cfg_rest = Loader('django')
@@ -79,10 +56,10 @@ try:
     REST_IP = conf_django['django_rest_server_ip']
     REST_PORT = conf_django['django_rest_server_port']
     REST_PREFIX = conf_django['django_rest_server_prefix']
-    if ('django_rest_server_prefix' in conf_django) and (conf_django['django_rest_server_prefix'] != ''): 
+    if ('django_rest_server_prefix' in conf_django) and (conf_django['django_rest_server_prefix'] != ''):
         REST_PREFIX = conf_django['django_rest_server_prefix']
         REST_URL = "http://" + REST_IP + ":" + REST_PORT + "/" + REST_PREFIX
-    else: 
+    else:
         REST_PREFIX = ''
         REST_URL = "http://" + REST_IP + ":" + REST_PORT
 
@@ -170,7 +147,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.admin',
-    'django_pipes',
+    'django_pipes', # Used to create Django's model using REST
     'domogik.ui.djangodomo.core',
 )
 
@@ -178,7 +155,7 @@ STATIC_DESIGN_ROOT = '%s/core/templates/design' % PROJECT_PATH
 STATIC_WIDGETS_ROOT = '%s/core/templates/widgets' % PROJECT_PATH
 
 # Session stuff
-# Other options are : 
+# Other options are :
 ### 'django.contrib.sessions.backends.db'
 ### 'django.contrib.sessions.backends.file'
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
