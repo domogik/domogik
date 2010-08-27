@@ -96,7 +96,7 @@ def login(request):
             msg=msg,
             account_list=result_all_accounts.account
         )
-        
+
 def logout(request):
     """
     Logout process
@@ -129,6 +129,7 @@ def auth(request, next):
             return HttpResponseRedirect('/domogik/')
     else:
         # User not found, ask again to log in
+        # TODO : use translation mechanism
         return HttpResponseRedirect('/domogik/login/?status=error&msg=Sorry unable to log in. Please check login name / password and try again.')
 
 def admin_required(f):
@@ -300,7 +301,7 @@ def admin_organization_house(request):
     @param request : HTTP request
     @return an HttpResponse object
     """
-    
+
     status = request.GET.get('status', '')
     msg = request.GET.get('msg', '')
     try:
@@ -325,7 +326,7 @@ def admin_organization_features(request):
     @param request : HTTP request
     @return an HttpResponse object
     """
-    
+
     status = request.GET.get('status', '')
     msg = request.GET.get('msg', '')
 
@@ -339,10 +340,10 @@ def admin_organization_features(request):
         result_all_areas = Areas.get_all()
         result_all_areas.merge_uiconfig()
         result_all_areas.merge_feature_associations()
-        
+
         result_house = UIConfigs.get_general('house')
         result_house_features_associations = FeatureAssociations.get_by_house()
-        
+
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
 
@@ -429,7 +430,7 @@ def admin_tools_rest(request):
         msg=msg,
         rest=rest_result.rest[0]
     )
-    
+
 def index(request):
     """
     Method called when the main page is accessed
@@ -446,7 +447,7 @@ def index(request):
 
         result_house = House()
         result_house.merge_features()
-        
+
         result_house_rooms = Rooms.get_without_area()
         result_house_rooms.merge_uiconfig()
 
@@ -464,7 +465,7 @@ def index(request):
         house=result_house,
         associated_devices=list(set(associated_devices_list)) #remove duplicates
     )
-    
+
 def show_house(request):
     """
     Method called when the show index page is accessed
@@ -481,7 +482,7 @@ def show_house(request):
 
         result_house = House()
         result_house.merge_features()
-        
+
         result_house_rooms = Rooms.get_without_area()
         result_house_rooms.merge_uiconfig()
         result_house_rooms.merge_features()
@@ -536,7 +537,7 @@ def show_house_edit(request):
         house=result_house,
         devices_list=result_all_devices.device
     )
-    
+
 def show_area(request, area_id):
     """
     Method called when the show area page is accessed
@@ -553,9 +554,9 @@ def show_area(request, area_id):
         result_rooms_by_area = Rooms.get_by_area(area_id)
         result_rooms_by_area.merge_uiconfig()
         result_rooms_by_area.merge_features()
-        
+
         result_house = House()
-        
+
         associated_devices_list = []
         for association in result_area_by_id.area[0].associations:
             associated_devices_list.append(association.feature.device.id)
@@ -593,7 +594,7 @@ def show_area_edit(request, area_id):
         result_area_by_id.merge_features()
 
         result_house = House()
-        
+
         result_all_devices = Devices.get_all()
         result_all_devices.merge_uiconfig()
         result_all_devices.merge_features()
@@ -611,7 +612,7 @@ def show_area_edit(request, area_id):
         house=result_house,
         devices_list=result_all_devices.device
     )
-    
+
 def show_room(request, room_id):
     """
     Method called when the show room page is accessed
@@ -626,7 +627,7 @@ def show_room(request, room_id):
         result_room_by_id.merge_features()
 
         result_house = House()
-        
+
         associated_devices_list = []
         for association in result_room_by_id.room[0].associations:
             associated_devices_list.append(association.feature.device.id)
@@ -644,7 +645,7 @@ def show_room(request, room_id):
         house=result_house,
         associated_devices=list(set(associated_devices_list)) #remove duplicates
     )
-    
+
 @admin_required
 def show_room_edit(request, room_id):
     """
