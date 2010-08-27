@@ -48,6 +48,8 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
+# Note that we use our own Database model and not Django's one.
+
 ### Proxy settings
 try:
     cfg_rest = Loader('django')
