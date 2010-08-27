@@ -61,6 +61,7 @@
                         
                         // Request list
                         $('table#request_list tbody').empty();
+                        console.log(data.rest[0].event.Requests);
                         $.each(data.rest[0].event.Requests, function(index, request) {
                             $('table#request_list tbody').append("<tr><td>"
                                 + index + "</td><td>"

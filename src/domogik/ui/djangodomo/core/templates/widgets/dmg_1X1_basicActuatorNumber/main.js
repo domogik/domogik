@@ -20,25 +20,52 @@
             this.element.processing();
             this.element.append("<div class='openpanel'></div>");
             $(".openpanel", this.element).addClass("icon32-usage-" + o.usage)
-                .click(function(e){self.onclick();e.stopPropagation();});
-            this._panel = $("<div class='dmg_1x1_basicActuatorNumber_commandpanel'><canvas class='deco' width='60' height='100'></canvas><div class='commands'><div class='value'></div><div class='command increase'></div><div class='command decrease'></div></div></div>");
-            this.element.before(this._panel);
-            this._panel.hide();
+                .click(1000, function(e){self._panel.show();e.stopPropagation();})
+                .click(function(e){self.action();e.stopPropagation();});
+            this._panel = $("<div class='panel' width='190' height='190'></div>");
+            this._panel.append("<canvas class='deco' width='190' height='190'></canvas>")
+            this._panel.append("<div class='value'></div>")
+            this._panel.append("<div class='command increase'></div>")
+            this._panel.append("<div class='command decrease'></div>")
+            this._panel.append("<div class='command close'></div>")
+            
             $(".increase", this._panel).click(function(e){self.increase();e.stopPropagation();});
             $(".decrease", this._panel).click(function(e){self.decrease();e.stopPropagation();});
+            $(".close", this._panel).click(function(e){self._panel.hide();e.stopPropagation();});
             var value = (o.model_parameters.valueMax - o.model_parameters.valueMin) / 2;
-            this._setValue(null);
-            
+
+            this.element.append(this._panel);
+            $(".value", this._panel).moveToCircleCoord({x:95, y:95, r:65, deg:80});
+            $(".command.increase", this._panel).moveToCircleCoord({x:95, y:95, r:70, deg:-20, rotate:true});
+            $(".command.decrease", this._panel).moveToCircleCoord({x:95, y:95, r:70, deg:20, rotate:true});
+            $(".command.close", this._panel).moveToCircleCoord({x:95, y:95, r:70, deg:150, rotate:true});
+            this._panel.hide();
             var canvas = $(".deco", this._panel).get(0);
             if (canvas.getContext) {
                 var ctx = canvas.getContext('2d');
                 ctx.beginPath();
-                ctx.moveTo(60, 95);
-                ctx.quadraticCurveTo(-5, 110, 0, 65);
-                ctx.quadraticCurveTo(-5, 30, 40, 30);
-                ctx.quadraticCurveTo(60, 30, 60, 0);
+                ctx.strokeStyle = "#BDCB2F";
+                ctx.lineWidth = 2;
+                ctx.arc(95,95,94,0,(Math.PI*2),true); // Outer circle  
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.strokeStyle = "#000000";
+                ctx.lineWidth = 36;
+                ctx.lineCap = 'round';
+                ctx.arc(95,95,70,(Math.PI/180)*150,(Math.PI/180)*80,false); // Main circle  
+                ctx.stroke();
+
+                var c = getCircleCoord(95, 95, 65, 80);
+                ctx.beginPath();
+                ctx.strokeStyle = "#000000";
+                ctx.fillStyle = "#eeeeee";
+                ctx.lineWidth = 5;
+                ctx.lineCap = 'butt';
+                ctx.arc(c.x,c.y,20,0,(Math.PI*2),true); // Value circle  
                 ctx.fill();
+                ctx.stroke();
             }
+            this.setParameter(value);
         },
 
         _statsHandler: function(stats) {
@@ -47,7 +74,7 @@
         _eventHandler: function(date, value) {
         },
         
-        _setValue: function(value) {
+        setParameter: function(value) {
             var self = this, o = this.options;
             if (value != null) {
                 this.value = value;
@@ -67,8 +94,7 @@
             var self = this, o = this.options;
             if (this.value < o.model_parameters.valueMax) {
     			this.value++;
-                this._resetAutoClose();
-    			this._setValue(this.value);                
+    			this.setParameter(this.value);                
             }
 		},
 		
@@ -76,34 +102,10 @@
             var self = this, o = this.options;
             if (this.value > o.model_parameters.valueMin) {
     			this.value--;
-                this._resetAutoClose();
-    			this._setValue(this.value);                
+    			this.setParameter(this.value);                
             }
 		},
-        
-        onclick: function() {
-            if (this.isOpen) {
-                this.action();
-            }
-            this.switchPanel();
-        },
-        
-        switchPanel: function() {
-            var self = this, o = this.options;
-            if (this.isOpen) {
-                this._panel.hide();
-                this.element.doTimeout( 'timeout');
-                this.element.removeClass('opened');
-            } else {
-                this._panel.show();
-//                this.element.doTimeout( 'timeout', close_without_change, function(){
-//                    self.switchPanel();
-//                });
-                this.element.addClass('opened');
-            }
-            this.isOpen = !this.isOpen;
-        },
-        
+
         action: function() {
             var self = this, o = this.options;
             self._startProcessingState();
@@ -125,14 +127,6 @@
 
         _stopProcessingState: function() {
             this.element.processing('stop');
-        },
-        
-        _resetAutoClose: function() {
-			var self = this;
-			this.element.doTimeout( 'timeout', close_with_change, function(){
-                self.action();
-                self.switchPanel();
-			});	
-		}
+        }
     });
 })(jQuery);
