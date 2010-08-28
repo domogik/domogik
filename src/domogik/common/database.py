@@ -207,8 +207,8 @@ class DbHelper():
         if type(filters) is not DictType:
             raise DbHelperException("Wrong type of 'filters', Should be a dictionnary")
         area_list = self.__session.query(Area)
-        for filter in filters:
-            filter_arg = "%s = '%s'" % (filter, ucode(filters[filter]))
+        for f in filters:
+            filter_arg = "%s = '%s'" % (f, ucode(filters[f]))
             area_list = area_list.filter(filter_arg)
         return area_list.all()
 
