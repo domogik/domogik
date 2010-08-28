@@ -1,0 +1,36 @@
+.widget_1x1_panel {
+    position:absolute;
+    z-index:10;
+}
+
+.widget_1x1_panel .deco {
+    position:absolute;
+    top:0;
+    left:0;
+}
+
+.widget_1x1_panel .text {
+    position:absolute;
+    height:20px;
+    width:20px;
+    line-height:20px;
+    text-align:center;
+    font-weight:bold;
+    font-size:1.2em;
+    -moz-user-select:none;
+    -webkit-user-select:none;
+}
+
+.widget_1x1_panel .command {
+    cursor: pointer;
+    height:34px;
+    width:34px;
+    background-color:#BDCB2F;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    -moz-border-radius: 17px;
+    -webkit-border-radius: 17px;
+    position:absolute;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;    
+}

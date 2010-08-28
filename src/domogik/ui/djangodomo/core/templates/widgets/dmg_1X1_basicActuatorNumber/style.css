@@ -12,53 +12,15 @@
     cursor: pointer;
 }
 
-
-.dmg_1x1_basicActuatorNumber .panel {
-    position:absolute;
-    top:-70px;
-    left:-70px;
-    z-index:10;
-}
-
-.dmg_1x1_basicActuatorNumber .panel .deco {
-    position:absolute;
-}
-
-.dmg_1x1_basicActuatorNumber .panel .value {
-    position:absolute;
-    height:20px;
-    width:20px;
-    line-height:20px;
-    text-align:center;
-    font-weight:bold;
-    font-size:1.2em;
-    -moz-user-select:none;
-    -webkit-user-select:none;
-}
-
-.dmg_1x1_basicActuatorNumber .panel .command {
-    cursor: pointer;
-    height:34px;
-    width:34px;
-    background-color:#BDCB2F;
-    background-position: 50% 50%;
-    background-repeat: no-repeat;
-    -moz-border-radius: 17px;
-    -webkit-border-radius: 17px;
-    position:absolute;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;    
-}
-
-.dmg_1x1_basicActuatorNumber .panel .command.increase {
+.dmg_1x1_basicActuatorNumber .command.increase {
     background-image: url("images/up_16.png");
 }
 
-.dmg_1x1_basicActuatorNumber .panel .command.decrease {
+.dmg_1x1_basicActuatorNumber .command.decrease {
     background-image: url("images/down_16.png");
 }
 
-.dmg_1x1_basicActuatorNumber .panel .command.close {
+.dmg_1x1_basicActuatorNumber .command.close {
     background-color:transparent;
     background-image: url("images/close_36.png");
 }
