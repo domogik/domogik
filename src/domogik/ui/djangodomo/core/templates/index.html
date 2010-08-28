@@ -60,7 +60,11 @@
         {% endfor %}
 
         {% if associated_devices %}
-            $.eventRequest({{associated_devices}});
+        $.eventRequest({{associated_devices}});
+        {% endif %}
+
+        {% if not rooms_list and not areas_list %}
+		$.notification("info", "{% trans "No areas or rooms configured yet" %}");
         {% endif %}
     });
 {% endblock %}
@@ -123,14 +127,6 @@
 				{% endfor %}
 			</ul>
 		</li>
-    {% empty %}
-	<script type="text/javascript">
-    // <![CDATA[
-        $(function(){ 
-        	$.notification("info", "{% trans "No areas or rooms configured yet" %}");
-        });
-    // ]]>
-	</script>
     {% endfor %}
     </div>
     <div class='clear'></div>
