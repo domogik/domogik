@@ -51,7 +51,7 @@ class plcbus(Helper):
         self._usercode = '00'
         self.api1.send("GET_ALL_ID_PULSE", args[0] , self._usercode )
         time.sleep(1)
-        self.api1.send("GET_ALL_ID_PULSE", args[0] , self._usercode )
+        self.api1.send("GET_ALL_ON_ID_PULSE", args[0] , self._usercode )
 
         return self.Ma_Queue.get()
 
