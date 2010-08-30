@@ -48,26 +48,18 @@ class plcbus(Helper):
 		self.api1 = PLCBUSAPI(self._log, device, self._command_cb, self._message_cb)
 
 	def all(self, args = None):
-		
 		self._usercode = '00'
 		self.api1.send("GET_ALL_ID_PULSE", args[0] , self._usercode )
-		
 		time.sleep(1)
 		self.api1.send("GET_ALL_ID_PULSE", args[0] , self._usercode )
 
-		self.Ma_Queue.put(self.liste_trouve)
-
-        #Affiche le resultat
-		self.Ma_Queue.put(self.liste_trouve)
 		return self.Ma_Queue.get()
 
 	def _command_cb(self, f):
-
+        print "command : %s" % f["d_command"]
 		if f["d_command"] == "GET_ALL_ID_PULSE":
-			#print f
 			data = int("%s%s" % (f["d_data1"], f["d_data2"]))
 			house = f["d_home_unit"][0]
-			#self.Ma_Queue.put("toto")
 
 			for i in range(0,16):
 				unit = data >> i & 1
@@ -90,6 +82,7 @@ class plcbus(Helper):
 					self.liste_trouve.append("%s%s" % (code,"ON"))
 				else:
 					self.liste_trouve.append("%s%s" % (code,"OFF"))
+            self.Ma_Queue.put(liste_trouve)
 
 	def _message_cb(self, message):
 		print "Message : %s " % message
