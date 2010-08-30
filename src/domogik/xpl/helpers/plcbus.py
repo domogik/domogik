@@ -29,63 +29,63 @@ import time
 ACCESS_ERROR = "Access to PLCBUS device is not possible. Does your user have the good permissions ? " 
 
 class plcbus(Helper):
-	def __init__(self):
+    def __init__(self):
 
-		self.Ma_Queue = Queue.Queue()
-		self.liste_trouve = []
-		self.commands = \
-			{ "all" :
-				{
-				"cb" : self.all,
-				"desc" : "Show all devices found on plcbus network",
-				"min_args" : 1,
-				"usage" : "find device for specified  house code <house code>"
-				}
-			}
-		log = logger.Logger('plcbus-helper')
-		self._log = log.get_logger()
-		device = '/dev/plcbus'
-		self.api1 = PLCBUSAPI(self._log, device, self._command_cb, self._message_cb)
+        self.Ma_Queue = Queue.Queue()
+        self.liste_trouve = []
+        self.commands = \
+            { "all" :
+                {
+                "cb" : self.all,
+                "desc" : "Show all devices found on plcbus network",
+                "min_args" : 1,
+                "usage" : "find device for specified  house code <house code>"
+                }
+            }
+        log = logger.Logger('plcbus-helper')
+        self._log = log.get_logger()
+        device = '/dev/plcbus'
+        self.api1 = PLCBUSAPI(self._log, device, self._command_cb, self._message_cb)
 
-	def all(self, args = None):
-		self._usercode = '00'
-		self.api1.send("GET_ALL_ID_PULSE", args[0] , self._usercode )
-		time.sleep(1)
-		self.api1.send("GET_ALL_ID_PULSE", args[0] , self._usercode )
+    def all(self, args = None):
+        self._usercode = '00'
+        self.api1.send("GET_ALL_ID_PULSE", args[0] , self._usercode )
+        time.sleep(1)
+        self.api1.send("GET_ALL_ID_PULSE", args[0] , self._usercode )
 
-		return self.Ma_Queue.get()
+        return self.Ma_Queue.get()
 
-	def _command_cb(self, f):
+    def _command_cb(self, f):
         print "command : %s" % f["d_command"]
-		if f["d_command"] == "GET_ALL_ID_PULSE":
-			data = int("%s%s" % (f["d_data1"], f["d_data2"]))
-			house = f["d_home_unit"][0]
+        if f["d_command"] == "GET_ALL_ID_PULSE":
+            data = int("%s%s" % (f["d_data1"], f["d_data2"]))
+            house = f["d_home_unit"][0]
 
-			for i in range(0,16):
-				unit = data >> i & 1
-				code = "%s%s" % (house, i+1)
-				if unit == 1 :
-					self.liste_trouve.append("%s%s" % (code,"trouve"))
+            for i in range(0,16):
+                unit = data >> i & 1
+                code = "%s%s" % (house, i+1)
+                if unit == 1 :
+                    self.liste_trouve.append("%s%s" % (code,"trouve"))
 
-		if f["d_command"] == "GET_ALL_ON_ID_PULSE":
-			data = int("%s%s" % (f["d_data1"], f["d_data2"]))
-			house = f["d_home_unit"][0]
-			#self.liste_trouve.append("%s%s" % (house,data))
-			print data
-			for i in range(0,16):
-				unit = data >> i & 1
-				code = "%s%s" % (house, i+1)
-				
-				#if code in self.api._probe_status and (self.api._probe_status[code] != str(unit)):
-				#	self.api._probe_status[code] = str(unit)
-				if unit == 1:
-					self.liste_trouve.append("%s%s" % (code,"ON"))
-				else:
-					self.liste_trouve.append("%s%s" % (code,"OFF"))
-            self.Ma_Queue.put(liste_trouve)
+        if f["d_command"] == "GET_ALL_ON_ID_PULSE":
+            data = int("%s%s" % (f["d_data1"], f["d_data2"]))
+            house = f["d_home_unit"][0]
+            #self.liste_trouve.append("%s%s" % (house,data))
+            print data
+            for i in range(0,16):
+                unit = data >> i & 1
+                code = "%s%s" % (house, i+1)
+                
+                #if code in self.api._probe_status and (self.api._probe_status[code] != str(unit)):
+                #    self.api._probe_status[code] = str(unit)
+                if unit == 1:
+                    self.liste_trouve.append("%s%s" % (code,"ON"))
+                else:
+                    self.liste_trouve.append("%s%s" % (code,"OFF"))
+            self.Ma_Queue.put(self.liste_trouve)
 
-	def _message_cb(self, message):
-		print "Message : %s " % message
+    def _message_cb(self, message):
+        print "Message : %s " % message
 
 MY_CLASS = {"cb" : plcbus}
 
