@@ -145,6 +145,7 @@ class PlcBusMain(XplPlugin):
             for i in range(0,16):
                 unit = data >> i & 1
                 code = "%s%s" % (house, i+1)
+                print  "Etat : %s " % code, unit
                 if code in self._probe_status and (self._probe_status[code] != str(unit)):
                     self._probe_status[code] = str(unit)
                     if unit == 1:

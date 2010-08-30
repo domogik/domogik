@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>  
+?xml version="1.0" encoding="UTF-8"?>  
 <statistic technology="plcbus">
     <schema name="plcbus.basic">
         <xpltype type="xpl-trig">
@@ -8,7 +8,7 @@
             <mapping>
                 <device field="device"/>
                 <value field="command"/>
-                <value field="level" />
+                <value field="data1" />
             </mapping>
         </xpltype>
 	<xpltype type="xpl-stat">
@@ -18,7 +18,7 @@
             <mapping>
                 <device field="device"/>
                 <value field="command"/>
-                <value field="level" />
+                <value field="data1" />
             </mapping>
         </xpltype>
 
@@ -29,7 +29,7 @@
             <mapping>
                 <device field="device"/>
                 <value field="command"/>
-                <value field="level" />
+                <value field="data1" />
             </mapping>
         </xpltype>
 
@@ -40,10 +40,9 @@
             <mapping>
                 <device field="device"/>
                 <value field="command"/>
-                <value field="level" />
+                <value field="data1" />
             </mapping>
         </xpltype>
     </schema>
 </statistic>
-
 
