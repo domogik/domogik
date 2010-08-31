@@ -1,5 +1,5 @@
 (function($) {
-    $.create_widget_1x1_extended({
+    $.create_widget({
         // default options
         options: {
             version: 0.1,
@@ -10,14 +10,20 @@
             type: 'sensor.boolean',
             height: 1,
             width: 1,
-            // For 1x1 Extended widget
-            isOpenable: false,
-            hasAction: false,
-            hasStatus: true
+            displayname: true,
+			displayborder: true
         },
 
         _init: function() {
             var self = this, o = this.options;
+            this.element.addClass("icon32-usage-" + o.usage)
+
+            this._value =  $("<div class='value'></div>");
+            this.element.append(this._value);
+
+            this._status = $.getStatus();
+            this.element.append(this._status);
+
             this._initValues(1);
         },
 
@@ -37,17 +43,17 @@
             var self = this, o = this.options;
             if (value) {
                 value = value.toLowerCase();
-                this._displayIcon('boolean');
+                this.element.displayIcon('boolean');
                 if (value == "high") {
-                    this._elementValue.attr('class' ,'widget_value icon32-status-active');
+                    this._value.attr('class' ,'value icon32-status-active');
                 } else { // low
-                    this._elementValue.attr('class' ,'widget_value icon32-status-inactive');
+                    this._value.attr('class' ,'value icon32-status-inactive');
                 }
-                this._elementStatus.html(value);
+                this._status.html(value);
             } else { // Unknown
-                this._displayIcon('unknown');             
-                this._elementValue.attr('class' ,'widget_value icon32-status-unknown');
-                this._elementStatus.html("--");
+                this.element.displayIcon('unknown');             
+                this._value.attr('class' ,'value icon32-status-unknown');
+                this._status.html("--");
             }
             this.previousValue = value;
         }

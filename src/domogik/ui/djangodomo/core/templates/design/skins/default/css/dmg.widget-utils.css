@@ -1,3 +1,13 @@
+.widget.clickable:hover,
+.widget:focus,
+.widget.opened {
+    background-color:#FFFFFF;
+}
+
+.widget.clickable {
+    cursor: pointer;
+}
+
 .widget_1x1_panel {
     position:absolute;
     z-index:10;
@@ -34,3 +44,29 @@
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;    
 }
+
+.widget_status {
+    position:absolute;
+    display:block;
+    border-top: 1px solid #cccccc;
+    border-left: 1px solid #cccccc;
+    background-color:rgba(255,255,255,0.6);
+    bottom:0;
+    right:0;
+    vertical-align:text-bottom;
+    height:10px;
+    -moz-border-radius: 0.8em 0 0.8em 0;
+    -webkit-border-radius: 0.8em 0 0.8em 0;
+    padding: 0.2em 0.5em 0.2em 0.5em;
+    -moz-user-select:none;
+    -webkit-user-select:none;
+}
+
+.widget_status.error {
+    background-color:rgba(191,84,46,0.6);
+}
+
+.widget_status.ok {
+    background-color:rgba(144,178,71,0.6);
+}
+
