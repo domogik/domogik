@@ -41,8 +41,10 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
 from domogik.common import database
-from domogik.ui.djangodomo.core.models import House, Areas, Rooms, Devices, DeviceUsages, DeviceTechnologies, DeviceTypes, \
-                                   Features, FeatureAssociations, Plugins, Accounts, Rest
+from domogik.ui.djangodomo.core.models import (
+    House, Areas, Rooms, Devices, DeviceUsages, DeviceTechnologies, DeviceTypes,
+    Features, FeatureAssociations, Plugins, Accounts, Rest
+)
 
 from domogik.ui.djangodomo.core.sample_data_helper import SampleDataHelper
 
@@ -457,7 +459,8 @@ def index(request):
 
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
-    return __go_to_page(request, 'index.html',
+    return __go_to_page(
+        request, 'index.html',
         page_title,
         widgets=widgets_list,
         areas_list=result_all_areas.area,
