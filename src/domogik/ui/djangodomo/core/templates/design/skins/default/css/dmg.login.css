@@ -1,4 +1,13 @@
-#body-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index:1;background: #666666 url(../images/decoration/ui-bg_diagonals-thick_20_666666_40x40.png) 50% 50% repeat; opacity: .50; }
+#body-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index:1;
+    background: #666666 url(../images/decoration/ui-bg_diagonals-thick_20_666666_40x40.png) 50% 50% repeat;
+    opacity: .50;
+}
 
 #login {
     z-index:2;
@@ -14,7 +23,7 @@
 }
 
 #login h1 {
-    color:#ffffff;    
+    color:#ffffff;
 }
 
 #login #close {
