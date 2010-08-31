@@ -43,7 +43,7 @@
             this.setValue(value);
         },
 
-        setValue: function(value, previous) {
+        setValue: function(value) {
             var self = this, o = this.options;
             if (value) {
                 this.element.displayIcon('number');             

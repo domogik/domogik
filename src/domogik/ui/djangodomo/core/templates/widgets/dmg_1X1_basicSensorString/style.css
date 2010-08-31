@@ -1,0 +1,17 @@
+.dmg_1x1_basicSensorString {    
+    text-align:center;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+}
+
+.dmg_1x1_basicSensorString .value {
+    font-weight:bold;
+    position:absolute;
+    text-align:center;
+    width:100%;
+    line-height:5em;
+    font-family: Courier, monospace;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -moz-binding: url( 'bindings.xml#ellipsis' );
+}
