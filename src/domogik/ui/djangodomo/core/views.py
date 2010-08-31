@@ -38,6 +38,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext
 from django.conf import settings
 
 from domogik.common import database
@@ -131,8 +132,8 @@ def auth(request, next):
             return HttpResponseRedirect('/domogik/')
     else:
         # User not found, ask again to log in
-        # TODO : use translation mechanism
-        return HttpResponseRedirect('/domogik/login/?status=error&msg=Sorry unable to log in. Please check login name / password and try again.')
+        error_msg = ugettext(u"Sorry unable to log in. Please check login name / password and try again.")
+        return HttpResponseRedirect('/domogik/login/?status=error&msg=%s' % error_msg)
 
 def admin_required(f):
     def wrap(request, *args, **kwargs):
