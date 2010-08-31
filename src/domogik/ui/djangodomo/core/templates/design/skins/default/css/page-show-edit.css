@@ -4,8 +4,7 @@
 #panel {
     position:absolute;
     right:0;
-    top:90px;
-    height:80%;
+    top:50px;
     background-color:#ffffff;
     background:rgba(255,255,255,0.9);
     border:1px solid #cccccc;
@@ -21,8 +20,11 @@
 
 #features {
     width:30em;
+    height:55em;
     float:right;
+    overflow-y:scroll;    
 }
+
 
 #featureslist .usage { /* Usage level */
     border-top: #cccccc solid 1px;
