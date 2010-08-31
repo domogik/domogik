@@ -1,5 +1,7 @@
 .dmg_1x1_basicActuatorNumber {
     background-color:#eeeeee;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
 }
 
 .dmg_1x1_basicActuatorNumber .openpanel {
@@ -7,8 +9,6 @@
     height:5em;
     position:absolute;
     text-align:center;
-    background-position: 50% 50%;
-    background-repeat: no-repeat;
     cursor: pointer;
 }
 
