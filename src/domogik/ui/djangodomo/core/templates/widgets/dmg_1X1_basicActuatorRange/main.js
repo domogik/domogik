@@ -140,7 +140,7 @@
                 }
                 this._processingValue = this.currentValue;
                 var percent = (this.currentValue / (this.max_value - this.min_value)) * 100;
-                this.element.displayIcon('range_' + findRangeIcon(o.usage, percent));
+                this.element.displayIcon('value_' + findRangeIcon(o.usage, percent));
                 this._displayValue(this.currentValue);
             } else { // unknown
                 this._processingValue = 0;

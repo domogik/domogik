@@ -53,8 +53,11 @@ function get_widgets_options(id) {
 		
 		_init: function() {
 			var self = this, o = this.options;
+            var types = o.type.split('.');
             this.element.addClass('widget')
 				.addClass(o.id)
+                .addClass(types[0])
+                .addClass(types[1])
 				.addClass('size' + o.width + 'x' + o.height)
                 .attr("tabindex", 0);
             if (o.displayborder) {

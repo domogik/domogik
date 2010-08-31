@@ -21,7 +21,6 @@
                 .processing();
             this._status = $.getStatus();
             this.element.append(this._status);
-            this.element.displayIcon('unknown');
             this.element.click(function (e) {self.action();e.stopPropagation();})
                 .keypress(function (e) {if (e.which == 13 || e.which == 32) {self.action; e.stopPropagation();}});                    
         },

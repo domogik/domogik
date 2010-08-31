@@ -39,7 +39,7 @@
         setValue: function(value) {
             var self = this, o = this.options;
             if (value) {
-                this.element.displayIcon('string');             
+                this.element.displayIcon('known');             
                 this._value.html(value);
             } else { // Unknown
                 this.element.displayIcon('unknown');             

@@ -103,9 +103,9 @@
             var self = this, o = this.options;
             if (value != null) {
                 if (value == 1) {
-                    this.element.displayIcon('binary_1');             
+                    this.element.displayIcon('value_1');             
                 } else {
-                    this.element.displayIcon('binary_0');             
+                    this.element.displayIcon('value_0');             
                 }
                 this._status.writeStatus(this.texts[value]);
             } else { // Unknown

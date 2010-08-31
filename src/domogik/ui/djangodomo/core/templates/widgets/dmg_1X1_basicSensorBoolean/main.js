@@ -42,8 +42,8 @@
         setValue: function(value, unit, previous) {
             var self = this, o = this.options;
             if (value) {
+                this.element.displayIcon('known');             
                 value = value.toLowerCase();
-                this.element.displayIcon('boolean');
                 if (value == "high") {
                     this._value.attr('class' ,'value icon32-status-active');
                 } else { // low
