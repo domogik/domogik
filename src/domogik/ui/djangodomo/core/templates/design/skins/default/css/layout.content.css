@@ -35,7 +35,6 @@ header#contentheader .ident {
     padding:0 0 0 70px;
     background-position:top left;
     background-repeat:no-repeat;
-    -webkit-box-reflect:below -30px -webkit-gradient(linear, left top, left bottom, from(transparent), color-stop(0.5, transparent), to(white));
     min-height:64px;
 }
 

@@ -54,8 +54,6 @@
             fields: [
                 {name : 'adddevicename', type:'text', label:'Name', required: true, option: {min: 1, max: 80}},
                 {name : 'adddeviceaddress', type:'text', label:'Address', required: true, option: {min: 1, max: 80}},
-                {name : 'adddevicedescription', type:'text', label:'Description', required: false, option: {min: 1, max: 80}},
-                {name : 'adddevicereference', type:'text', label:'Reference', required: false, option: {min: 1, max: 80}},
                 {name : 'adddevicetype', type:'selectipod', label:'Type', required: true, option: {
                     initial: {value:'0', label:'Choose a device type', icone:''},
                     options: [
@@ -78,7 +76,9 @@
                         {value:'{{ usage.id }}', label: '{{ usage.name }}', icon: 'icon16-usage-{{ usage.id }}'},
                     {% endfor %}
                     ]
-                }}
+                }},
+                {name : 'adddevicedescription', type:'text', label:'Description', required: false, option: {min: 1, max: 80}},
+                {name : 'adddevicereference', type:'text', label:'Reference', required: false, option: {min: 1, max: 80}}
             ]
         });
 
@@ -88,8 +88,6 @@
             fields: [
                 {name : 'upddevicename', type:'text', label:'Name', required: true, option: {min: 1, max: 80}},
                 {name : 'upddeviceaddress', type:'text', label:'Address', required: true, option: {min: 1, max: 80}},
-                {name : 'upddevicedescription', type:'text', label:'Description', required: false, option: {min: 1, max: 80}},
-                {name : 'upddevicereference', type:'text', label:'Reference', required: false, option: {min: 1, max: 80}},
                 {name : 'upddeviceusage', type:'selectipod', label:'Usage', required: true, option: {
                     initial: {value:'0', label:'Choose a usage', icone:''},
                     options: [
@@ -97,7 +95,9 @@
                         {value:'{{ usage.id }}', label: '{{ usage.name }}', icon: 'icon16-usage-{{ usage.id }}'},
                     {% endfor %}
                     ]
-                }}
+                }},
+                {name : 'upddevicedescription', type:'text', label:'Description', required: false, option: {min: 1, max: 80}},
+                {name : 'upddevicereference', type:'text', label:'Reference', required: false, option: {min: 1, max: 80}}
             ]
         });
         
