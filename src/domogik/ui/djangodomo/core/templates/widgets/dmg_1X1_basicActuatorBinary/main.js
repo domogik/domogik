@@ -1,5 +1,5 @@
 (function($) {
-    $.create_widget_1x1_extended({
+    $.create_widget({
         // default options
         options: {
             version: 0.1,
@@ -10,14 +10,20 @@
             type: 'actuator.binary',
             height: 1,
             width: 1,
-            // For 1x1 Extended widget
-            isOpenable: false,
-            hasStatus: true,
-            namePosition: 'nametop'
+            displayname: true,
+			displayborder: true
         },
 
         _init: function() {
             var self = this, o = this.options;
+            this.element.addClass("icon32-usage-" + o.usage)
+                .addClass('clickable')
+                .processing();
+            this._status = $.getStatus();
+            this.element.append(this._status);
+            this.element.click(function (e) {self.action();e.stopPropagation();})
+                .keypress(function (e) {if (e.which == 13 || e.which == 32) {self.action; e.stopPropagation();}});                    
+
             this.values = [o.model_parameters.value0, o.model_parameters.value1];
             this.texts = [o.usage_parameters.state0, o.usage_parameters.state1];
             this._initValues(1);
@@ -37,7 +43,7 @@
         
         action: function() {
             var self = this, o = this.options;
-            this._startProcessingState();
+            this.element.startProcessingState();
             if (this.currentValue) {
                 this.processingValue = (this.currentValue == 0)?1:0;                
             } else { // Current state unknown
@@ -58,6 +64,27 @@
             );
         },
 
+        cancel: function() {
+            var self = this, o = this.options;
+            this.element.stopProcessingState();
+            this._status.displayStatusError();
+        },
+
+        /* Valid the processing state */
+        valid: function(confirmed) {
+            var self = this, o = this.options;
+            this.processingValue = null;
+            this.element.stopProcessingState();
+            if (confirmed) {
+                this._status.displayStatusOk();
+                this.element.doTimeout( 'resetStatus', state_reset_status, function(){
+                    self._status.displayResetStatus();
+                });
+            } else {
+                self._status.displayResetStatus();                
+            }
+        },
+        
         setValue: function(value) {
             if (value != null) {
                 if (value == 1 || value.toLowerCase() == this.values[1]) {
@@ -76,25 +103,15 @@
             var self = this, o = this.options;
             if (value != null) {
                 if (value == 1) {
-                    this._displayIcon('binary_1');             
+                    this.element.displayIcon('value_1');             
                 } else {
-                    this._displayIcon('binary_0');             
+                    this.element.displayIcon('value_0');             
                 }
-                this._writeStatus(this.texts[value]);
+                this._status.writeStatus(this.texts[value]);
             } else { // Unknown
-                this._displayIcon('unknown');                             
-                this._writeStatus('---');
+                this.element.displayIcon('unknown');                             
+                this._status.writeStatus('---');
             }
-        },
-        
-        cancel: function() {
-            this.processingValue = null;
-            this._super();
-        },
-
-        /* Valid the processing state */
-        valid: function(confirmed) {
-            this._super();
         }
     });
 })(jQuery);

@@ -1,5 +1,5 @@
 (function($) {
-    $.create_widget_1x1_extended({
+    $.create_widget({
         // default options
         options: {
             version: 0.1,
@@ -10,29 +10,39 @@
             type: 'actuator.range',
             height: 1,
             width: 1,
-            // For 1x1 Extended widget
-            isOpenable: true,
-            hasStatus: true
-        },
+            displayname: true,
+			displayborder: true        },
 
         _init: function() {
             var self = this, o = this.options;
+            this.isOpen = false;
             this.min_value = parseInt(o.model_parameters.valueMin);
             this.max_value = parseInt(o.model_parameters.valueMax);
             this.step = parseInt(o.usage_parameters.step);
             this.unit = o.usage_parameters.unit
-            this._indicator = $("<canvas class='indicator' width='110' height='110'></canvas>");
-            this.element.append(this._indicator);
-            this._button_max = this._addButtonIcon("range_max", "upright", "icon16-action-max", function (e) {self.max_range();e.stopPropagation();});
-            this._button_plus = this._addButtonIcon("range_plus", "rightup", "icon16-action-up", function (e) {self.plus_range();e.stopPropagation();});
-            this._button_minus = this._addButtonIcon("range_minus", "rightdown", "icon16-action-down", function (e) {self.minus_range();e.stopPropagation();});
-            this._button_min = this._addButtonIcon("range_min", "downright", "icon16-action-min", function (e) {self.min_range();e.stopPropagation();});
+            this.element.addClass("icon32-usage-" + o.usage)
+                .addClass('clickable')
+                .processing();
+                
+            this._panel = $.getPanel({width:190, height:190, circle: {start:140, end:90}});
+            this.element.append(this._panel);
+            this._panel.panelAddCommand({class:'increase', r:70, deg:-20, rotate:true, click:function(e){self.plus_range();e.stopPropagation();}});
+            this._panel.panelAddCommand({class:'decrease', r:70, deg:20, rotate:true, click:function(e){self.minus_range();e.stopPropagation();}});
+            this._panel.panelAddCommand({class:'close', r:70, deg:140, rotate:true, click:function(e){self.close();e.stopPropagation();}});
+            this._panel.panelAddCommand({class:'max', r:70, deg:-50, rotate:true, click:function(e){self.max_range();e.stopPropagation();}});
+            this._panel.panelAddCommand({class:'min', r:70, deg:50, rotate:true, click:function(e){self.min_range();e.stopPropagation();}});
+            this._panel.panelAddText({class:'value', r:65, deg:90});
+            this._panel.hide();
+            this._indicator = $("<canvas class='indicator' width='190' height='190'></canvas>");
+            this._panel.prepend(this._indicator);
 
-			this.element.addClass('closed');
-			this.element.append(this._button_plus)
-				.append(this._button_minus)
-				.append(this._button_max)
-				.append(this._button_min);
+            this._status = $.getStatus();
+            this.element.append(this._status);
+
+            this.element.click(function (e) {self._onclick();e.stopPropagation();})
+                .keypress(function (e) {if (e.which == 13 || e.which == 32) {self._onclick(); e.stopPropagation();}
+                          else if (e.keyCode == 27) {self.close(); e.stopPropagation();}});
+
 			this.element.keypress(function (e) {
 					switch(e.keyCode) { 
 					// User pressed "home" key
@@ -72,7 +82,7 @@
         action: function() {
             var self = this, o = this.options;
             if (this._processingValue != this.currentValue) {
-                this._startProcessingState();
+                this.element.startProcessingState();
                 $.getREST(['command', o.devicetechnology, o.deviceaddress, o.model_parameters.command, this._processingValue],
                     function(data) {
                         var status = (data.status).toLowerCase();
@@ -88,9 +98,22 @@
 			}
         },
 
+        _onclick: function() {
+            var self = this, o = this.options;
+            if (this.isOpen) {
+                this.close();
+            } else {
+                this.open();
+            }
+        },
+
         open: function() {
             if (!this.isOpen) {
-                this._open();
+                this.isOpen = true;
+                this._panel.show();  
+                this.element.doTimeout( 'timeout', close_without_change, function(){
+                    self.close();
+                });
                 this._processing_percent_current = 0;
                 this._setProcessingValue(this._processingValue);
             }
@@ -98,9 +121,11 @@
             
         close: function() {
             if (this.isOpen) {
-                this._close();
+                this.isOpen = false;
+                this._panel.hide();              
                 this.setValue(this.currentValue);
             }
+            this.element.doTimeout( 'timeout');
         },
         
         setValue: function(value) {
@@ -115,11 +140,11 @@
                 }
                 this._processingValue = this.currentValue;
                 var percent = (this.currentValue / (this.max_value - this.min_value)) * 100;
-                this._displayIcon('range_' + findRangeIcon(o.usage, percent));
+                this.element.displayIcon('value_' + findRangeIcon(o.usage, percent));
                 this._displayValue(this.currentValue);
             } else { // unknown
                 this._processingValue = 0;
-                this._displayIcon('unknown');
+                this.element.displayIcon('unknown');
                 this._displayValue(null);
             }
         },
@@ -161,9 +186,9 @@
         _displayValue: function(value) {
             var self = this, o = this.options;
             if (value) {
-    			this._writeStatus(value + this.unit);                
+    			this._status.writeStatus(value + this.unit);                
             } else { // Unknown
-    			this._writeStatus('---' + this.unit);                                
+    			this._status.writeStatus('---' + this.unit);                                
             }
         },
         
@@ -177,7 +202,7 @@
 				this._processingValue = this.max_value
 			}
 			var percent = (this._processingValue / (this.max_value - this.min_value)) * 100;
-            this._writeStatus(this._processingValue + this.unit);
+            $('.value', this._panel).text(this._processingValue + this.unit);
             this._displayProcessingRange(percent);
 		},
 
@@ -197,7 +222,6 @@
             } else if (this._processing_percent_final > this._processing_percent_current) {
                 this._processing_percent_current++;                
             }
-            
             var canvas = this._indicator.get(0);
             if (canvas.getContext){
                 var ctx = canvas.getContext('2d');
@@ -206,15 +230,14 @@
                 ctx.clearRect(0,0, canvas.width, canvas.height);
 
                 if (this._processing_percent_current > 0) {
-                    ctx.lineWidth = 10;
+                    ctx.lineWidth = 11;
                     ctx.strokeStyle = "#BDCB2F";
                     var deg = ((this._processing_percent_current * 360) / 100) - 90;
                     var angle = (Math.PI/180) * deg; // radian
-                    ctx.arc(55,55,50,(Math.PI/2),-angle, true);
+                    ctx.arc(95,95,46,(Math.PI/2),-angle, true);
                     ctx.stroke();                
                 }
             }
-            
             if (this._processing_percent_final == this._processing_percent_current) { // End animation
                 this._processing_animation = false;
             } else {
@@ -223,14 +246,24 @@
         },
         
         cancel: function() {
+            var self = this, o = this.options;
             this.setValue(this.currentValue);
-            this._super();
+            this.element.stopProcessingState();
+            this.element.displayStatusError();
         },
-        
+
         /* Valid the processing state */
         valid: function(confirmed) {
-            this._super();
+            var self = this, o = this.options;
+            this.element.stopProcessingState();
+            if (confirmed) {
+                this._displayStatusOk();
+                this.element.doTimeout( 'resetStatus', state_reset_status, function(){
+                    self._status.displayResetStatus();
+                });
+            } else {
+                self._status.displayResetStatus();                
+            }
         }
-        
     });
 })(jQuery);

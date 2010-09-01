@@ -1,5 +1,5 @@
 (function($) {
-    $.create_widget_1x1_extended({
+    $.create_widget({
         // default options
         options: {
             version: 0.1,
@@ -10,15 +10,19 @@
             type: 'sensor.number',
             height: 1,
             width: 1,
-            // For 1x1 Extended widget
-            isOpenable: false,
-            hasStatus: true,
-            hasAction: false,
-            namePosition: 'nametopleft'
+            displayname: true,
+			displayborder: true
         },
 
         _init: function() {
             var self = this, o = this.options;
+            this.element.addClass("icon32-usage-" + o.usage)
+
+            this._value =  $("<div class='value'></div>");
+            this.element.append(this._value);
+
+            this._status = $.getStatus();
+            this.element.append(this._status);
             /*            
             this._button_day = this._addButtonText("graph_day", "upright", "icon16-action-graph", "Day", function (e) {self._showGraphDay();e.stopPropagation();});
             this._button_month = this._addButtonText("graph_month", "rightup", "icon16-action-graph", "Month", function (e) {self._showGraphMonth();e.stopPropagation();});
@@ -39,30 +43,30 @@
             this.setValue(value);
         },
 
-        setValue: function(value, previous) {
+        setValue: function(value) {
             var self = this, o = this.options;
             if (value) {
-                this._displayIcon('number');             
-                this._elementValue.html(value + '<br />' + o.model_parameters.unit)
+                this.element.displayIcon('known');             
+                this._value.html(value + '<br />' + o.model_parameters.unit)
                 if (this.previousValue) {
                     if (value == this.previousValue) {
-                        this._elementStatus.attr('class', 'status icon8-status-equal')
-                        this._elementStatus.html("<span class='offscreen'>linear</span>");
+                        this._status.attr('class', 'widget_status icon8-status-equal')
+                        this._status.html("<span class='offscreen'>linear</span>");
                     } else if (value > this.previousValue) {
-                        this._elementStatus.attr('class', 'status icon8-status-up')
-                        this._elementStatus.html("<span class='offscreen'>going up</span>");
+                        this._status.attr('class', 'widget_status icon8-status-up')
+                        this._status.html("<span class='offscreen'>going up</span>");
                     } else {
-                        this._elementStatus.attr('class', 'status icon8-status-down')
-                        this._elementStatus.html("<span class='offscreen'>going down</span>");
+                        this._status.attr('class', 'widget_status icon8-status-down')
+                        this._status.html("<span class='offscreen'>going down</span>");
                     }
                 }
             } else { // Unknown
-                this._displayIcon('unknown');             
-                this._elementValue.html('--<br />' + o.model_parameters.unit)
+                this.element.displayIcon('unknown');             
+                this._value.html('--<br />' + o.model_parameters.unit)
             }
             this.previousValue = value;
-        },
-
+        }
+/*
         _showGraphDay: function() {
             var self = this, o = this.options;
             this.close();
@@ -180,6 +184,7 @@
                 }
             );
         }
+*/
     });
 })(jQuery);
 

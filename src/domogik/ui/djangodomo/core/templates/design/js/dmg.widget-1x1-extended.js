@@ -1,6 +1,4 @@
-const close_without_change = 10000; // 10 seconds
-const close_with_change = 3000; // 3 seconds
-const state_reset_status = 4000; // 4 seconds
+
 
 (function($) {
     /* Mini Widget */
@@ -85,7 +83,7 @@ const state_reset_status = 4000; // 4 seconds
         },
             
         close: function() {
-                this._close();
+            this._close();
         },
         
         _addButtonIcon: function(css, position, icon, action) {
@@ -120,14 +118,6 @@ const state_reset_status = 4000; // 4 seconds
             } else {
                 self._displayResetStatus();                
             }
-        },
-
-        _displayIcon: function(icon) {
-            if (this.previousIcon) {
-                this.element.removeClass(this.previousIcon);
-            }
-            this.previousIcon = icon;
-            this.element.addClass(icon);
         },
 
         _startProcessingState: function() {

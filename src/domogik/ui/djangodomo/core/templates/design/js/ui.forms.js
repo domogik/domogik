@@ -132,7 +132,7 @@ function numbersonly(e) {
             }
             this._content.append(labelitem);
             this._content.append(inputitem);
-            var button = $("<a tabindex='0' href='#" + name + "_list' class='fg-button' id='" + name + "_button'>" + initial.label + "</a>");
+            var button = $("<a tabindex='0' href='#" + name + "_list' class='fg-button' id='" + name + "_button'><div class='" + initial.icon + "'>" + initial.label + "</div></a>");
             if (required) {
                 button.addClass('required');
             }
@@ -142,11 +142,11 @@ function numbersonly(e) {
                 var ul = $("<ul></ul>");
                 jQuery.each(options, function(index, option) {
                     var li = $("<li></li>");
-                    li.append("<a href='#'><div class='icon16-text " + option.icon + "'>" + option.label + "</div></a>");
+                    li.append("<a href='#' value='" + option.value + "' valuetxt='" + option.label + "' valueicon='" + option.icon + "'><div class='icon16-text " + option.icon + "'>" + option.label + "</div></a>");
                     if(option.submenu) {
                         var subul = $("<ul></ul>");
                         jQuery.each(option.submenu, function(index, suboption) {
-                            subul.append("<li><a href='#' value='" + suboption.value + "' valuetxt='" + option.label + "." + suboption.label + "'>" + suboption.label + "</a></li>");
+                            subul.append("<li><a href='#' value='" + suboption.value + "' valuetxt='" + option.label + "." + suboption.label + "' valueicon='" + option.icon + "'>" + suboption.label + "</a></li>");
                         });
                         li.append(subul);
                     }
@@ -310,7 +310,8 @@ function numbersonly(e) {
                     case 'selectipod':
                         $('#' + value.name).val(ops.values[value.name]);
                         var valuetxt = $('#' + value.name + "_list a[value = '" + ops.values[value.name] + "']").attr('valuetxt');
-                        $('#' + value.name + '_button').text(valuetxt);
+                        var valueicon = $('#' + value.name + "_list a[value = '" + ops.values[value.name] + "']").attr('valueicon');
+                        $('#' + value.name + '_button').html("<div class='" + valueicon + "'>" + valuetxt + "<div>");
                         break;
                     }
                 });

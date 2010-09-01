@@ -1,4 +1,8 @@
 // <![CDATA[
+const close_without_change = 10000; // 10 seconds
+const close_with_change = 3000; // 3 seconds
+const state_reset_status = 4000; // 4 seconds
+
 $(function(){
     $.fn.extend({
         moveToCircleCoord: function (options) {
@@ -22,10 +26,60 @@ $(function(){
         panelAddText: function(options) {
             var cx = this.width()/2;
             var cy = this.height()/2;
+            var canvas = $('.deco', this).get(0);
+            if (canvas.getContext) {
+                var c = getCircleCoord(cx, cy, options.r, options.deg);
+                var ctx = canvas.getContext('2d');
+                ctx.beginPath();
+                ctx.strokeStyle = "#000000";
+                ctx.fillStyle = "#eeeeee";
+                ctx.lineWidth = 5;
+                ctx.lineCap = 'butt';
+                ctx.arc(c.x,c.y,20,0,(Math.PI*2),true); // Value circle  
+                ctx.fill();
+                ctx.stroke();
+            }
             var text = $("<div class='text'></div>");
             text.addClass(options.class);
             this.append(text);
             text.moveToCircleCoord({x:cx, y:cy, r:options.r, deg:options.deg, rotate:options.rotate}); // ! Need to be after append
+        },
+        
+        displayIcon: function(icon) {
+            if (this.previousIcon) {
+                this.removeClass(this.previousIcon);
+            }
+            this.previousIcon = icon;
+            this.addClass(icon);
+        },
+        
+        /* Processing */
+        startProcessingState: function() {
+            this.processing('start');
+        },
+
+        stopProcessingState: function() {
+            this.processing('stop');
+        },
+        
+        /* Status */
+        writeStatus: function(text) {
+            this.text(text);
+        },
+
+        displayStatusError: function() {
+            this.removeClass('ok');
+            this.addClass('error');
+        },
+
+        displayStatusOk: function() {
+            this.addClass('ok');
+            this.removeClass('error');
+        },
+
+        displayResetStatus: function() {
+            this.removeClass('ok');
+            this.removeClass('error');
         }
     });
     
@@ -44,27 +98,20 @@ $(function(){
                 ctx.beginPath();
                 ctx.strokeStyle = "#BDCB2F";
                 ctx.lineWidth = 2;
-                ctx.arc(95,95,94,0,(Math.PI*2),true); // Outer circle  
+                ctx.arc((options.width/2), (options.height/2), 94, 0, (Math.PI*2), true); // Outer circle  
                 ctx.stroke();
                 ctx.beginPath();
                 ctx.strokeStyle = "#000000";
                 ctx.lineWidth = 36;
                 ctx.lineCap = 'round';
-                ctx.arc(95,95,70,(Math.PI/180)*150,(Math.PI/180)*80,false); // Main circle  
-                ctx.stroke();
-
-                var c = getCircleCoord(95, 95, 65, 80);
-                ctx.beginPath();
-                ctx.strokeStyle = "#000000";
-                ctx.fillStyle = "#eeeeee";
-                ctx.lineWidth = 5;
-                ctx.lineCap = 'butt';
-                ctx.arc(c.x,c.y,20,0,(Math.PI*2),true); // Value circle  
-                ctx.fill();
+                ctx.arc((options.width/2), (options.height/2), 70, (Math.PI/180)*options.circle.start, (Math.PI/180)*options.circle.end, false); // Main circle  
                 ctx.stroke();
             }
-
             return panel;
+        },
+        getStatus: function(options) {
+            var status = $("<div class='widget_status'></div>");
+            return status;
         }
     });
 });

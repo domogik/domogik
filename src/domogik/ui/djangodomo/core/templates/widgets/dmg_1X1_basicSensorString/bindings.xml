@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+    <bindings xmlns="http://www.mozilla.org/xbl" xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+    <binding id="none">
+        <content><children/></content>
+    </binding>
+
+    <binding id="ellipsis">
+        <content>
+            <xul:label crop="end"><children/></xul:label>
+        </content>
+        <implementation>
+            <field name="label"> document.getAnonymousNodes( this )[ 0 ] </field>
+            <field name="style"> this.label.style </field>
+            <property name="display">
+                <getter> this.style.display </getter>
+                <setter> if( this.style.display != val ) this.style.display= val </setter>
+            </property>
+            <property name="value">
+                <getter> this.label.value </getter>
+                <setter> if( this.label.value != val ) this.label.value= val </setter>
+            </property>
+            <method name="update">
+                <body>
+                    var strings= this.textContent.split( /\s+/g )
+                    if( !strings[ 0 ] ) strings.shift()
+                    if( !strings[ strings.length - 1 ] ) strings.pop()
+                    this.value= strings.join( ' ' )
+                    this.display= strings.length ? '' : 'none'
+                </body>
+            </method>
+            <constructor> this.update() </constructor>
+        </implementation>
+        <handlers>
+            <handler event="DOMSubtreeModified"> this.update() </handler>
+        </handlers>
+    </binding>
+
+    </bindings>

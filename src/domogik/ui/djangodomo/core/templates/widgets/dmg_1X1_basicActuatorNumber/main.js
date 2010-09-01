@@ -17,13 +17,13 @@
         _init: function() {
             var self = this, o = this.options;
             this.isOpen = false;
-            this.element.processing();
+            this.element.addClass("icon32-usage-" + o.usage)
+                .processing();
             this.element.append("<div class='openpanel'></div>");
-            $(".openpanel", this.element).addClass("icon32-usage-" + o.usage)
-                .click(1000, function(e){self._panel.show();e.stopPropagation();})
+            $(".openpanel", this.element).click(1000, function(e){self._panel.show();e.stopPropagation();})
                 .click(function(e){self.action();e.stopPropagation();});
                 
-            this._panel = $.getPanel({width:190, height:190});
+            this._panel = $.getPanel({width:190, height:190, circle: {start:150, end:80}});
             this.element.append(this._panel);
             this._panel.panelAddCommand({class:'increase', r:70, deg:-20, rotate:true, click:function(e){self.increase();e.stopPropagation();}});
             this._panel.panelAddCommand({class:'decrease', r:70, deg:20, rotate:true, click:function(e){self.decrease();e.stopPropagation();}});

@@ -4,10 +4,10 @@
         options: {
             version: 0.1,
             creator: 'Domogik',
-            id: 'dmg_1x1_basicSensorBoolean',
+            id: 'dmg_1x1_basicSensorString',
             name: 'Basic widget',
             description: 'Basic widget with border and name',
-            type: 'sensor.boolean',
+            type: 'sensor.string',
             height: 1,
             width: 1,
             displayname: true,
@@ -20,9 +20,6 @@
 
             this._value =  $("<div class='value'></div>");
             this.element.append(this._value);
-
-            this._status = $.getStatus();
-            this.element.append(this._status);
 
             this._initValues(1);
         },
@@ -39,23 +36,15 @@
             this.setValue(value);
         },
 
-        setValue: function(value, unit, previous) {
+        setValue: function(value) {
             var self = this, o = this.options;
             if (value) {
                 this.element.displayIcon('known');             
-                value = value.toLowerCase();
-                if (value == "high") {
-                    this._value.attr('class' ,'value icon32-status-active');
-                } else { // low
-                    this._value.attr('class' ,'value icon32-status-inactive');
-                }
-                this._status.html(value);
+                this._value.html(value);
             } else { // Unknown
                 this.element.displayIcon('unknown');             
-                this._value.attr('class' ,'value icon32-status-unknown');
-                this._status.html("--");
+                this._value.html('---');
             }
-            this.previousValue = value;
         }
     });
 })(jQuery);
