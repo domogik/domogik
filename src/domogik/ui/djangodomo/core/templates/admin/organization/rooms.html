@@ -165,22 +165,34 @@
                             button: "#del{{ room.id }}",
                             name: "'{{ room.name }}'",
                             onok: function() {
+                                // Delete ui configuration
                                 $.getREST(['base', 'ui_config', 'del', 'by-reference', 'room', '{{ room.id }}'],
                                     function(data) {
                                         var status = (data.status).toLowerCase();
                                         if (status == 'ok') {
-                                            $.getREST(['base', 'room', 'del', '{{ room.id }}'],
+                                            // Delete associated features
+                                            $.getREST(['base', 'feature_association', 'del', 'association_type', 'room', 'association_id', '{{ room.id }}'],
                                                 function(data) {
                                                     var status = (data.status).toLowerCase();
                                                     if (status == 'ok') {
-                                                        $.reloadPage({'status': 'ok', 'msg': '{% trans "Room" %} \'' + data.room[0].name + '\' {% trans "successfully deleted" %}'});                                   
+                                                        // Delete room
+                                                        $.getREST(['base', 'room', 'del', '{{ room.id }}'],
+                                                            function(data) {
+                                                                var status = (data.status).toLowerCase();
+                                                                if (status == 'ok') {
+                                                                    $.reloadPage({'status': 'ok', 'msg': '{% trans "Room" %} \'' + data.room[0].name + '\' {% trans "successfully deleted" %}'});                                   
+                                                                } else {
+                                                                    $.notification('error', '{% trans "Room not deleted" %} (' + data.description + ')');                                                                      
+                                                                }
+                                                            }
+                                                        );
                                                     } else {
-                                                        $.notification('error', '{% trans "Room not deleted" %} (' + data.description + ')');                                                                      
+                                                        $.notification('error', '{% trans "features associations for Room not deleted" %} (' + data.description + ')');                                                                      
                                                     }
                                                 }
                                             );
                                         } else {
-                                            $.notification('error', '{% trans "Room not deleted" %} (' + data.description + ')');                                                                      
+                                            $.notification('error', '{% trans "ui-config for Room not deleted" %} (' + data.description + ')');                                                                      
                                         }
                                     }
                                 );
