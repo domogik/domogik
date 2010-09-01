@@ -209,6 +209,8 @@ function Menu(caller, options){
 				menu.chooseItem(this);
 				return false;
 			});
+            if (container.height() > options.maxHeight) { container.addClass('fg-menu-scroll') };	
+    		container.css({ height: options.maxHeight });
 		};	
 		
 		if (options.linkHover) {
@@ -244,7 +246,7 @@ function Menu(caller, options){
 
 		// edit this for your own custom function/callback:
         $(options.resultValueField).val($(item).attr('value'));
-        $(options.resultTextElement).text($(item).attr('valuetxt'));
+        $(options.resultTextElement).html("<div class='" + $(item).attr('valueicon') + "'>" + $(item).attr('valuetxt') + "</div>");
         menu.kill();
 	};
 };
