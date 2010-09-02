@@ -137,7 +137,8 @@ function numbersonly(e) {
                 button.addClass('required');
             }
             this._content.append(button);
-            var list = $("<div id='" + name + "_list' class='offscreen'></div>");
+            var list = $("<div id='" + name + "_list'></div>");
+            list.hide();
             if (options) {
                 var ul = $("<ul></ul>");
                 jQuery.each(options, function(index, option) {

@@ -99,7 +99,7 @@ a.fg-button div {
 /* REQUIRED LINK STYLES: links are "display:block" by default; if the menu options are split into 
 	selectable node links and 'next' links, the script floats the node links left and floats the 'next' links to the right	*/
 
-.fg-menu a:hover {
+.fg-menu a:hover, .fg-menu a:focus {
     outline: 0 !important;
     border: 1px solid #979387;
 	background-image: -webkit-gradient(linear, 0% 0%, 0% 60%, from(#BDCB2F), to(#9BB528));
