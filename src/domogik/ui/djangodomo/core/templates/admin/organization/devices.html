@@ -20,6 +20,8 @@
 
 
 {% load i18n %}
+{% load text %}
+
 {% block css %}
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-tables.css" rel="stylesheet" type="text/css" />
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/page-admin-organization.css" rel="stylesheet" type="text/css" />
@@ -33,7 +35,8 @@
         // Accordion
         $("#nav2").accordion({ autoHeight: false, header: ".subnav2", active:0});
         
-        $("#tabs").tabs().domogik_tabs({
+        {% regroup devices_list|dictsort:"device_usage_id" by device_usage as grouped_usages_list %}
+        $("#tabs").tabs({'selected': {% get_position grouped_usages_list id 1 %}}).domogik_tabs({
             addTitle: "{% trans "Add new device" %}",
             addId: "addDialogButton"
         });
@@ -112,7 +115,7 @@
                     function(data) {
                         var status = (data.status).toLowerCase();
                         if (status == 'ok') {
-                            $.reloadPage({'status': 'ok', 'msg': '{% trans "New device added" %} \'' + data.device[0].name + '\''});                                   
+                            $.reloadPage({'status': 'ok', 'msg': '{% trans "New device added" %} \'' + data.device[0].name + '\'', 'id': data.device[0].device_usage_id});                                   
                         } else {
                             $.notification('error', '{% trans "device not created" %} (' + data.description + ')');                                                                      
                         }
@@ -134,8 +137,8 @@
         <div id="tabs">
             {% spaceless %}
             <ul>
-                {% regroup devices_list|dictsort:"device_usage_id" by device_usage as usages_list %}
-                {% for usage in usages_list %}
+                {% regroup devices_list|dictsort:"device_usage_id" by device_usage as grouped_usages_list %}
+                {% for usage in grouped_usages_list %}
                     {% if usage.grouper.id %}
                         <li><a id="tab{{ usage.grouper.id }}" href="#element{{ usage.grouper.id }}" class="icon16-usage-{{ usage.grouper.id }}">{{ usage.grouper.name }}</a></li>
                     {% endif %}

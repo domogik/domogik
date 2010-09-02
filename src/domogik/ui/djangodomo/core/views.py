@@ -215,7 +215,7 @@ def admin_organization_devices(request):
 
     status = request.GET.get('status', '')
     msg = request.GET.get('msg', '')
-
+    id = request.GET.get('id', 0)
     try:
         result_all_devices = Devices.get_all()
         result_all_devices.merge_uiconfig()
@@ -233,6 +233,7 @@ def admin_organization_devices(request):
         nav2_organization_devices = "selected",
         status=status,
         msg=msg,
+        id=id,
         devices_list=result_all_devices.device,
         usages_list=result_all_usages.device_usage,
         types_list=result_all_types.device_type
@@ -248,6 +249,7 @@ def admin_organization_rooms(request):
 
     status = request.GET.get('status', '')
     msg = request.GET.get('msg', '')
+    id = request.GET.get('id', 0)
     try:
         result_all_rooms = Rooms.get_all()
         result_all_rooms.merge_uiconfig()
@@ -266,6 +268,7 @@ def admin_organization_rooms(request):
         nav2_organization_rooms = "selected",
         status=status,
         msg=msg,
+        id=id,
         rooms_list=result_all_rooms.room,
         house_rooms=result_house_rooms.room,
         areas_list=result_all_areas.area
@@ -281,11 +284,13 @@ def admin_organization_areas(request):
 
     status = request.GET.get('status', '')
     msg = request.GET.get('msg', '')
+    id = request.GET.get('id', 0)
     try:
         result_all_areas = Areas.get_all()
         result_all_areas.merge_uiconfig()
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
+
     page_title = _("Areas organization")
     return __go_to_page(
         request, 'admin/organization/areas.html',
@@ -294,6 +299,7 @@ def admin_organization_areas(request):
         nav2_organization_areas = "selected",
         status=status,
         msg=msg,
+        id=id,
         areas_list=result_all_areas.area
     )
 

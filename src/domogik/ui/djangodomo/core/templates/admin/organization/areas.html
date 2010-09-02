@@ -21,6 +21,8 @@
 
 
 {% load i18n %}
+{% load text %}
+
 {% block css %}
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/page-admin-organization.css" rel="stylesheet" type="text/css" />
 {% endblock %}
@@ -28,10 +30,10 @@
 {% endblock %}
 {% block js_script %}
     $(function(){
-        // Accordion
+        // Accordion}
         $("#nav2").accordion({ autoHeight: false, header: ".subnav2", active:0});
 
-        $("#tabs").tabs().domogik_tabs({
+        $("#tabs").tabs({'selected':{% get_position areas_list id 0 %}}).domogik_tabs({
             addTitle: "{% trans "Add new area" %}",
             addId: "addDialogButton"
         });
@@ -64,7 +66,7 @@
                     function(data) {
                         var status = (data.status).toLowerCase();
                         if (status == 'ok') {
-                            $.reloadPage({'status': 'ok', 'msg': '{% trans "New area added" %} \'' + data.area[0].name + '\''});
+                            $.reloadPage({'status': 'ok', 'msg': '{% trans "New area added" %} \'' + data.area[0].name + '\'', 'id': data.area[0].id});
                         } else {
                             $.notification('error', '{% trans "Area not created" %} (' + data.description + ')');
                         }
