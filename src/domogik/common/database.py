@@ -289,9 +289,13 @@ class DbHelper():
         self.__session.expire_all()
         area = self.__session.query(Area).filter_by(id=area_del_id).first()
         if area:
-            if cascade_delete:
-                for room in self.__session.query(Room).filter_by(area_id=area_del_id).all():
+            for room in self.__session.query(Room).filter_by(area_id=area_del_id).all():
+                if cascade_delete:
                     self.del_room(room.id, True)
+                else:
+                    # Just unlink the room from the area
+                    room.area_id = None
+                    self.__session.add(room)
             dfa_list = self.__session.query(
                                 DeviceFeatureAssociation
                             ).filter_by(place_id=area.id, place_type=u'area'
