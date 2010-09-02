@@ -197,6 +197,10 @@ class AreaTestCase(GenericTestCase):
                 assert room.area_id is None
         assert len(db.list_device_feature_associations_by_area_id(area_d.id)) == 0
 
+        db.del_area(area1.id, cascade_delete=True)
+        lst_rooms = db.list_rooms()
+        assert len(lst_rooms) == 2
+        assert room3.id not in lst_rooms
 
         try:
             db.del_area(12345678910)

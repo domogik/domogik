@@ -291,7 +291,7 @@ class DbHelper():
         if area:
             for room in self.__session.query(Room).filter_by(area_id=area_del_id).all():
                 if cascade_delete:
-                    self.del_room(room.id, True)
+                    self.del_room(room.id)
                 else:
                     # Just unlink the room from the area
                     room.area_id = None
@@ -414,14 +414,17 @@ class DbHelper():
             raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return room
 
-    def del_room(self, r_id, cascade_delete=False):
+    def del_room(self, r_id):
+        """ Delete a room with a given id
+
+        @param r_id : room id
+        @return the deleted room object
+
+        """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
         room = self.__session.query(Room).filter_by(id=r_id).first()
         if room:
-            if cascade_delete:
-                for device in self.__session.query(Device).filter_by(room_id=r_id).all():
-                    self.del_device(device.id)
             dfa_list = self.__session.query(
                                 DeviceFeatureAssociation
                             ).filter_by(place_id=room.id, place_type=u'room'
