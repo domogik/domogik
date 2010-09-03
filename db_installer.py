@@ -154,6 +154,7 @@ def install(only_unit_tests=False):
     device_type = db.add_device_type(dty_name='Mirror_Tag', dt_id=device_technology.id)
     db.add_sensor_feature_model(sf_name='Present', sf_device_type_id=device_type.id, sf_value_type='boolean',
                             sf_parameters='{}', sf_stat_key='present')
+
     # Create device technology features for Relay Board
     device_technology = db.add_device_technology(dt_id='relayboard', dt_name='Relay Board',
                                              dt_description='Relay boards monitoring and controling ')
@@ -182,10 +183,13 @@ def install(only_unit_tests=False):
     db.add_sensor_feature_model(sf_name='Ping', sf_device_type_id=device_type.id, sf_value_type='boolean',
                             sf_parameters='{}', sf_stat_key='ping')
     # Create device technologie features for MultiMedia
-    db.add_device_technology(dt_id='multimedia', dt_name='MultiMedia', dt_description='Music, Video')
-    # Create device technologie features for Communication
-    db.add_device_technology(dt_id='communication', dt_name='Communication',
+    device_technology = db.add_device_technology(dt_id='multimedia', dt_name='MultiMedia', dt_description='Music, Video')
+
+    # Create device technologie features for communication
+    device_technology = db.add_device_technology(dt_id='communication', dt_name='Communication',
                          dt_description='Telephony, videophone, mails, messaging')
+    device_type = db.add_device_type(dty_name='Caller_Id', dt_id=device_technology.id)
+    db.add_sensor_feature_model(sf_name='Caller Id', sf_device_type_id=device_type.id, sf_value_type='string', sf_parameters='{}', sf_stat_key='phone')
 
     # Create device usages
     db.add_device_usage(du_name='Light', du_description='Lamp, light usage',
