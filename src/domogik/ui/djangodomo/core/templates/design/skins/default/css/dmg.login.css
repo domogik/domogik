@@ -52,6 +52,7 @@
 
 #loginForm .columnleft {
     width:12em;
+    float:left !important;
 }
 
 #loginForm .columnright {

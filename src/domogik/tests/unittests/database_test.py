@@ -183,11 +183,25 @@ class AreaTestCase(GenericTestCase):
 
     def test_del(self):
         area0 = db.add_area('area0','description 0')
-        area0_id = area0.id
+        area1 = db.add_area('area1', 'description 1')
+        room1 = db.add_room(r_name='Bedroom1', r_area_id=area0.id)
+        room2 = db.add_room(r_name='Bedroom2', r_area_id=area0.id)
+        room3 = db.add_room(r_name='Kitchen', r_area_id=area1.id)
         area_d = db.del_area(area0.id)
         assert not self.has_item(db.list_areas(), ['area0'])
         assert area_d.id == area0.id
+        lst_rooms = db.list_rooms()
+        assert len(lst_rooms) == 3
+        for room in lst_rooms:
+            if room.id == room1.id or room.id == room2.id:
+                assert room.area_id is None
         assert len(db.list_device_feature_associations_by_area_id(area_d.id)) == 0
+
+        db.del_area(area1.id, cascade_delete=True)
+        lst_rooms = db.list_rooms()
+        assert len(lst_rooms) == 2
+        assert room3.id not in lst_rooms
+
         try:
             db.del_area(12345678910)
             TestCase.fail(self, "Area does not exist, an exception should have been raised")

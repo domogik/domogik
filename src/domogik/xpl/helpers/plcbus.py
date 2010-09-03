@@ -24,7 +24,7 @@ Plugin purpose
 
 Get informations about plcbus
 
-@author: Capof <capof@wanadoo.fr> 
+@author: Capof <capof@wanadoo.fr> and Sp4rKy help
 @copyright:(C) 2007-2009 Domogik project 
 @license: GPL(v3) 
 @organization: Domogik 
@@ -81,27 +81,28 @@ class plcbus(Helper):
                 unit = data >> i & 1
                 code = "%s%s" % (house, i+1)
                 if unit == 1 :
-                    self.liste_trouve.append("%s%s" % (code,"trouve"))
+                    self.liste_trouve.append("%s" % (code))
 
         if f["d_command"] == "GET_ALL_ON_ID_PULSE":
             data = int("%s%s" % (f["d_data1"], f["d_data2"]))
             house = f["d_home_unit"][0]
-            #self.liste_trouve.append("%s%s" % (house,data))
-            print data
             for i in range(0,16):
                 unit = data >> i & 1
                 code = "%s%s" % (house, i+1)
-                
-                #if code in self.api._probe_status and (self.api._probe_status[code] != str(unit)):
-                #    self.api._probe_status[code] = str(unit)
-                if unit == 1:
-                    self.liste_trouve.append("%s%s" % (code,"ON"))
-                else:
-                    self.liste_trouve.append("%s%s" % (code,"OFF"))
-            self._event.set()
+                if code in self.liste_trouve:
+                    j = self.liste_trouve.index(code)
+                    #self.liste_trouve.append("%s%s" % (j," index"))
+                    if unit == 1:
+                        #self.liste_trouve.append("%s%s" % (code," ONNNNNN"))
+                        self.liste_trouve[j] = ("%s%s" % (self.liste_trouve[j]," ON"))
+                    else:
+                        #self.liste_trouve.append("%s%s" % (code," OFFFFFF"))
+                        self.liste_trouve[j] = ("%s%s" % (self.liste_trouve[j]," OFF"))
+                self._event.set()
 
     def _message_cb(self, message):
         print "Message : %s " % message
 
 MY_CLASS = {"cb" : plcbus}
+
 

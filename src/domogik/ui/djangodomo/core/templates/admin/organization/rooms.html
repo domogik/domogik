@@ -21,6 +21,8 @@
 
 
 {% load i18n %}
+{% load text %}
+
 {% block css %}
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/page-admin-organization.css" rel="stylesheet" type="text/css" />
 {% endblock %}
@@ -31,8 +33,8 @@
     $(function(){
         // Accordion
         $("#nav2").accordion({ autoHeight: false, header: ".subnav2", active:0});
-        
-        $("#tabs").tabs().domogik_tabs({
+
+        $("#tabs").tabs({'selected': {% get_position rooms_list id 0 %}}).domogik_tabs({
             addTitle: "{% trans "Add new room" %}",
             addId: "addDialogButton"
         });
@@ -126,7 +128,7 @@
                     function(data) {
                         var status = (data.status).toLowerCase();
                         if (status == 'ok') {
-                            $.reloadPage({'status': 'ok', 'msg': '{% trans "New room added" %} \'' + data.room[0].name + '\''});                                   
+                            $.reloadPage({'status': 'ok', 'msg': '{% trans "New room added" %} \'' + data.room[0].name + '\'', 'id': data.room[0].id});                                   
                         } else {
                             $.notification('error', '{% trans "Room not created" %} (' + data.description + ')');                                                                      
                         }
