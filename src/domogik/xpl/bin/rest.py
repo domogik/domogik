@@ -1206,14 +1206,27 @@ target=*
              @param others params : will be get with get_parameters (dynamic params)
         """
 
-        st_from = self.get_parameters("from")
-        st_to = self.get_parameters("to")
+        st_from = float(self.get_parameters("from"))
+        st_to = float(self.get_parameters("to"))
+        st_interval = self.get_parameters("interval")
+        st_selector = self.get_parameters("selector")
 
         json_data = JSonHelper("OK")
         json_data.set_data_type("stats")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        for data in self._db.list_stats_of_device_between_by_key(key, device_id, st_from, st_to):
-            json_data.add_data(data)
+        if st_interval != None and st_selector != None:
+            print "étendue"
+            for data in self._db.filter_stats_of_device_by_key(key,
+                                                               device_id,
+                                                               st_from,
+                                                               st_to,
+                                                               st_interval,
+                                                               st_selector):
+                json_data.add_data(data)
+        else:
+            print "classique"
+            for data in self._db.list_stats_of_device_between_by_key(key, device_id, st_from, st_to):
+                json_data.add_data(data)
         self.send_http_response_ok(json_data.get())
     
 
