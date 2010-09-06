@@ -2037,8 +2037,13 @@ target=*
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("room")
         try:
+            if self.get_parameters("area_id") == "None":
+                area_id = None
+            else:
+               area_id = self.get_parameters("area_id")
+
             room = self._db.update_room(self.get_parameters("id"), self.get_parameters("name"), \
-                                        self.get_parameters("area_id"), self.get_parameters("description"))
+                                        area_id, self.get_parameters("description"))
             json_data.add_data(room)
         except:
             json_data.set_error(code = 999, description = self.get_exception())
