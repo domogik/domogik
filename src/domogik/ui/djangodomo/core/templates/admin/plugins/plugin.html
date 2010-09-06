@@ -103,7 +103,7 @@ $(function(){
                                     td.append("<input type='checkbox' name='value_" + ikey + "' id='value_" + ikey + "' />");
                                     if (data.config.length > 0) { // If already configured
                                         if (data.config[0].value  == "True") {
-                                            $("#value_" + ikey, tr).attr('checked', true);
+                                            $("#value_" + ikey, td).attr('checked', true);
                                         }
                                     } else {
                                         td.addClass('icon16-status-warning');
