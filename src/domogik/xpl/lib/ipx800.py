@@ -38,7 +38,7 @@ Implements
 import socket
 import traceback
 import time
-import urllib2
+from urllib import FancyURLopener
 from xml.dom import minidom
 import copy
 
@@ -69,6 +69,27 @@ class IPXException(Exception):
 
     def __str__(self):
         return repr(self.value)
+
+
+class MyOpener(FancyURLopener):
+    """
+    Opener to allow http authentication
+    """
+
+    def set_auth(self, login, password):
+        """
+        Set login and password
+        @param login : login
+        @param password : password
+        """
+        self.my_login = login
+        self.my_password = password
+
+    def prompt_user_passwd(self, host, realm):
+        """
+        HTTP authentication
+        """
+        return (self.my_login, self.my_password)
 
 
 class IPX:
@@ -105,13 +126,15 @@ class IPX:
         self.ipx_old_an = {}   # analogic input
         self.ipx_old_count = {}# counters
 
-    def open(self, name, host):
+    def open(self, name, host, login, password):
         """ Try to access to IPX board and return error if not possible
             @param ip : ip or dns of host
         """
         self.name = name
         # define all urls
         self.url = "http://%s" % (host)
+        self.login = login
+        self.password = password
         self.url_status = "%s/status.xml" % self.url
         self.url_cgi_change = "%s/leds.cgi?led=" % self.url
         self.url_cgi_pulse = "%s/rlyfs.cgi?rlyf=" % self.url
@@ -174,9 +197,17 @@ class IPX:
         # change status
         url = self.url_cgi_change + str(num)
         try:
-            #tricky = urllib2.urlopen("http://192.168.0.10/")
-            resp = urllib2.urlopen(url)
+            opener = MyOpener()
+            opener.set_auth(self.login, self.password)
+            resp = opener.open(url)
         except IOError:
+            error = "Error while accessing to '%s' : %s" %  \
+                     (self.url_status, traceback.format_exc())
+            print error
+            self._log.error(error)
+            raise IPXException(error)
+            return
+        except HTTPError:
             error = "Error while accessing to '%s' : %s" %  \
                      (self.url_status, traceback.format_exc())
             print error
@@ -204,8 +235,9 @@ class IPX:
         # send pulse
         url = self.url_cgi_pulse + str(num)
         try:
-            #tricky = urllib2.urlopen("http://192.168.0.10/")
-            resp = urllib2.urlopen(url)
+            opener = MyOpener()
+            opener.set_auth(self.login, self.password)
+            resp = opener.open(url)
         except IOError:
             error = "Error while accessing to '%s' : %s" % \
                      (self.url_status, traceback.format_exc())
@@ -234,8 +266,9 @@ class IPX:
         # send reset order
         url = self.url_cgi_reset_counter + str(num)
         try:
-            #tricky = urllib2.urlopen("http://192.168.0.10/")
-            resp = urllib2.urlopen(url)
+            opener = MyOpener()
+            opener.set_auth(self.login, self.password)
+            resp = opener.open(url)
         except IOError:
             error = "Error while accessing to '%s' : %s" % \
                      (self.url_status, traceback.format_exc())
@@ -293,8 +326,9 @@ class IPX:
                            number of relay, input (ana and digi)
         """
         try:
-            #tricky = urllib2.urlopen("http://192.168.0.10/")
-            resp = urllib2.urlopen(self.url_status)
+            opener = MyOpener()
+            opener.set_auth(self.login, self.password)
+            resp = opener.open(self.url_status)
         except IOError:
             error = "Error while accessing to '%s' : %s" % \
                      (self.url_status, traceback.format_exc())
@@ -336,13 +370,13 @@ class IPX:
             @param first : first launch ?
         """
         if first == False:
-            old_data = getattr(self, "old_" + elt)
+            old_data = getattr(self, "ipx_old_%s" % elt)
         start = getattr(self, "start_" + elt)
         end = getattr(self, "nb_" + elt) + start
         for idx in range(start, end):
             resp = dom.getElementsByTagName("%s%s" % 
                                            (elt, idx))[0].firstChild.nodeValue
-            data = getattr(self, elt)
+            data = getattr(self, "ipx_%s" % elt)
             data[idx] = resp
             # status of element changed : we will have to send a xPl message
             if first == True or (first == False and old_data[idx] != data[idx]):

@@ -1226,7 +1226,6 @@ target=*
         json_data.set_data_type("stats")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         if st_interval != None and st_selector != None:
-            print "étendue"
             for data in self._db.filter_stats_of_device_by_key(key,
                                                                device_id,
                                                                st_from,
@@ -1235,7 +1234,6 @@ target=*
                                                                st_selector):
                 json_data.add_data(data)
         else:
-            print "classique"
             for data in self._db.list_stats_of_device_between_by_key(key, device_id, st_from, st_to):
                 json_data.add_data(data)
         self.send_http_response_ok(json_data.get())

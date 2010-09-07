@@ -61,6 +61,16 @@ class IPXManager(XplPlugin):
         while loop == True:
             self._config = Query(self._myxpl)
             res = XplResult()
+            self._config.query('ipx800', 'ipx-%s-login' % str(num), res)
+            login = res.get_value()['ipx-%s-login' % str(num)]
+            if login == "None":
+                login = None
+            self._config = Query(self._myxpl)
+            res = XplResult()
+            self._config.query('ipx800', 'ipx-%s-password' % str(num), res)
+            password = res.get_value()['ipx-%s-password' % str(num)]
+            self._config = Query(self._myxpl)
+            res = XplResult()
             self._config.query('ipx800', 'ipx-%s-name' % str(num), res)
             name = res.get_value()['ipx-%s-name' % str(num)]
             self._config = Query(self._myxpl)
@@ -72,9 +82,11 @@ class IPXManager(XplPlugin):
             self._config.query('ipx800', 'ipx-%s-int' % str(num), res)
             inter = res.get_value()['ipx-%s-int' % str(num)]
             if name != "None":
-                self._log.info("Configuration : name=%s, ip=%s, interval=%s" % 
-                               (name, address, inter))
-                self.ipx_list[name] = {"ip" : address,
+                self._log.info("Configuration : login=%s, password=***, name=%s, ip=%s, interval=%s" % 
+                               (login, name, address, inter))
+                self.ipx_list[name] = {"login" : login,
+                                       "password" : password,
+                                       "ip" : address,
                                        "interval" : float(inter)}
             else:
                 loop = False
@@ -86,7 +98,9 @@ class IPXManager(XplPlugin):
             try:
                 self._log.info("Opening IPX800 named '%s' (ip : %s)" % 
                                (ipx, self.ipx_list[ipx]['ip']))
-                self.ipx_list[ipx]['obj'].open(ipx, self.ipx_list[ipx]['ip'])
+                self.ipx_list[ipx]['obj'].open(ipx, self.ipx_list[ipx]['ip'],
+                                               self.ipx_list[ipx]['login'],
+                                               self.ipx_list[ipx]['password'])
             except IPXException as err:
                 self._log.error(err.value)
                 print err.value
