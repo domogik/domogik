@@ -1894,6 +1894,10 @@ target=*
             data = self.parameters[name]
             if data == None:
                 return None
+            elif data == "True":
+                return True
+            elif data == "False":
+                return False
             else:
                 #return unicode(urllib.unquote(data), sys.stdin.encoding)
                 return unicode(urllib.unquote(data), "UTF-8")
