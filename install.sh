@@ -194,6 +194,7 @@ update_user_config
 copy_tools
 call_db_installer
 modify_hosts
+chown -R $USER: $HOME/.python-eggs/ 
 
 echo "Everything seems to be good, Domogik should be installed correctly."
 echo "I will start the test_config.py script to check it."
