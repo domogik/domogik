@@ -71,6 +71,8 @@ import stat
 import shutil
 import mimetypes
 import errno
+from threading import Event, currentThread, Thread
+
 
 
 
@@ -98,6 +100,10 @@ QUEUE_EVENT_SIZE = 50
 
 # Repository
 DEFAULT_REPO_DIR = "/tmp/"
+
+#### TEMPORARY DATA FOR TEMPORARY FUNCTIONS ############
+PING_DURATION = 2
+#### END TEMPORARY DATA ################################
 
 ################################################################################
 class Rest(XplPlugin):
@@ -814,6 +820,11 @@ class ProcessRequest():
 
         # DB Helper
         self._db = DbHelper()
+
+        #### TEMPORARY DATA FOR TEMPORARY FUNCTIONS ############
+        self._pinglist = {}
+
+        #### END TEMPORARY DATA ################################
 
 
 
@@ -3421,6 +3432,13 @@ target=*
 
         else:
             print "command=%s" % command
+            ### check is plugin is shut
+            if self._check_component_is_running(command):
+                self.send_http_response_error(999, 
+                                             "Warning : plugin '%s' is currently running. Actually, helpers usage are not allowed while associated plugin is running : you should stop the plugin to use helper. In next releases, helpers will be implemented in a different way, so that they should be used while associated plugin is running" % command,
+                                              self.jsonp, self.jsonp_cb)
+                return
+
             ### load helper and create object
             try:
                 for importer, plgname, ispkg in pkgutil.iter_modules(package.__path__):
@@ -3573,6 +3591,54 @@ target=*
         f.close(
 
     )
+
+
+    ##### TEMPORARY FUNCTION THAT WILL NOT BE USED (AND DELETED)
+    ##### IN NEXT RELEASES
+
+    def _check_component_is_running(self, name, foo = None):
+        ''' This method will send a ping request to a component
+        and wait for the answer (max 5 seconds).
+        @param name : component name
+       
+        Notice : sort of a copy of this function is used in rest.py to check 
+                 if a plugin is on before using a helper
+                 Helpers will change in future, so the other function should
+                 disappear. There is no need for the moment to put this function
+                 in a library
+        '''
+        self._log.info("Check if '%s' is running... (thread)" % name)
+        self._pinglist[name] = Event()
+        mess = XplMessage()
+        mess.set_type('xpl-cmnd')
+        mess.set_schema('domogik.system')
+        mess.add_data({'command' : 'ping'})
+        mess.add_data({'host' : gethostname()})
+        mess.add_data({'plugin' : name})
+        Listener(self._cb_check_component_is_running, self._myxpl, {'schema':'domogik.system', \
+                'xpltype':'xpl-trig','command':'ping','plugin':name,'host':gethostname()}, \
+                cb_params = {'name' : name})
+        max = PING_DURATION
+        while max != 0:
+            self._myxpl.send(mess)
+            time.sleep(1)
+            max = max - 1
+            if self._pinglist[name].isSet():
+                break
+        if self._pinglist[name].isSet():
+            self._log.info("'%s' is running" % name)
+            return True
+        else:
+            self._log.info("'%s' is not running" % name)
+            return False
+
+
+    def _cb_check_component_is_running(self, message, args):
+        ''' Set the Event to true if an answer was received
+        '''
+        self._pinglist[args["name"]].set()
+
+    ##### END OF TEMPORARY FUNCTIONS
 
 
 ################################################################################

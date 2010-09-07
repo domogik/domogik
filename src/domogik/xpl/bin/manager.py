@@ -208,8 +208,10 @@ class SysManager(XplPlugin):
 
         # error if no plugin in list
         error = ""
-        if self._is_component(plg) == False and plg != "*":
-            self._invalid_component(cmd, plg, host)
+        if plg != "*":
+            if self._is_component(plg) == False:
+                self._invalid_component(cmd, plg, host)
+                return
 
         # if no error at this point, process
         if error == "":
@@ -346,6 +348,12 @@ class SysManager(XplPlugin):
         ''' This method will send a ping request to a component
         and wait for the answer (max 5 seconds).
         @param name : component name
+       
+        Notice : sort of a copy of this function is used in rest.py to check 
+                 if a plugin is on before using a helper
+                 Helpers will change in future, so the other function should
+                 disappear. There is no need for the moment to put this function
+                 in a library
         '''
         self._log.info("Check if '%s' is running... (thread)" % name)
         self._pinglist[name] = Event()
