@@ -57,23 +57,12 @@ class mirror(Helper):
                     "desc" : "Wait for a Mir:ror event",
                     "min_args" : 1,
                     "usage" : "read <device>"
-                  },
-                 "find" : 
-                  {
-                    "cb" : self.find,
-                    "desc" : "Find Mir:ror device"
                   }
                 }
 
         log = logger.Logger('mirror-helper')
         self._log = log.get_logger()
           
-
-
-    def find(self, args = None):
-        """ Try to find Mir:ror device
-        """
-        return ["TODO"]
 
     def read(self, args = None):
         """ Read Mir:ror device until an event occurs
