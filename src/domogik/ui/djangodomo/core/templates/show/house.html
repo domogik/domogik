@@ -20,18 +20,13 @@
 {% endcomment %}
 
 {% load i18n %}
-{% load commands %}
 {% load text %}
 
 {% block js_script %}
+    var device_types = {{ device_types|safe }};
+    var device_usages = {{ device_usages|safe }};
     $(function() {
-        {% for association in house.associations %}
-            {% get_widget association.id association.widget_id association.feature %}
-        {% endfor %}
-
-        {% if associated_devices %}
-            $.eventRequest({{associated_devices}});
-        {% endif %}
+        $.initAssociations('house', 0, device_usages, device_types);
     });
 {% endblock %}
 
@@ -39,6 +34,7 @@
 {% endblock %}
 
 {% block js_include %}
+    <script type="text/javascript" src="/design/js/page-show.js"></script>
 {% endblock %}
 
 {% block title %}{% trans page_title %}{% endblock %}
@@ -47,44 +43,27 @@
         <li id='customize'><a href='{% url show_house_edit_view %}' class='icon16-action-customize{% if not is_user_connected %} admin_required{% endif %}'>{% trans "Customize" %}</a></li>
 {% endblock %}
 
-{% block banner %}
-    <h1 class="ident icon64-house-default"><span class="title">{{ house.name }}</span></h1>
-    <div class="maininfo">
-        <ul>
-        {% if house.config.widgets.maininfo %}
-            <li><div id="widget_{{ house.config.widgets.maininfo.association }}"></div></li>
-        {% endif %}    
-        </ul>
-    </div>
-{% endblock %}
-
 {% block contentleft %}
-    <div class='actions'>
-        <div class='mainactions'>
-            <ul>
-            {% for action in house.config.widgets.mainactions %}
-                <li><div id="widget_{{ action.association }}"></div></li>
-            {% endfor %}
-            </ul>
+    <section id="mainsection">
+        <div id='house_0'>
+            <header>
+                <h1 class="ident icon64-house-default"><span class="title">{{ house.name }}</span></h1>
+                <div class="maininfo" role='list'></div>
+            </header>
+            <div class='actions'>
+                <div class='mainactions' role='list'></div>
+                <div class='otheractions' role='list'></div>
+            </div>
         </div>
-        <div class='otheractions'>
-            <ul>
-            {% for action in house.config.widgets.otheractions %}
-                <li><div id="widget_{{ action.association }}"></div></li>
-            {% endfor %}
-            </ul>
-        </div>
-    </div>
+    </section>
 {% endblock %}
 
 {% block contentright %}
     {% for room in rooms_list %}
-        <div class='block subsection'>
+        <div id='room_{{ room.id }}' class='block subsection'>
             <script type="text/javascript">
                 $(function() {
-                {% for association in room.associations %}
-                    {% get_widget association.id association.widget_id association.feature %}
-                {% endfor %}
+                    $.initSubAssociations('room', {{ room.id }}, device_usages, device_types);
                 });
             </script>
             <h2 class='header icon64-room-{{ room.config.icon }}'>
@@ -94,29 +73,15 @@
                     <span class="subtitle">{{ room.description }}</span>
                 </a>
             </h2>
-            <div class="maininfo">
-                <ul>
-                {% if room.config.widgets.maininfo %}
-                    <li><div id="widget_{{ room.config.widgets.maininfo.association }}"></div></li>
-                {% endif %}    
-                </ul>
-            </div>
-            <div class='mainactions'>
-                <ul>
-                {% for action in room.config.widgets.mainactions %}
-                    <li><div id="widget_{{ action.association }}"></div></li>
-                {% endfor %}
-                </ul>
-            </div>
+            <div class="maininfo" role='list'></div>
+            <div class='mainactions' role='list'></div>
         </div>
     {% endfor %}
     {% for area in areas_list %}
-        <div class='block subsection'>
+        <div id='area_{{ area.id }}' class='block subsection'>
             <script type="text/javascript">
                 $(function() {
-                {% for association in area.associations %}
-                    {% get_widget association.id association.widget_id association.feature %}
-                {% endfor %}
+                    $.initSubAssociations('area', {{ area.id }}, device_usages, device_types);
                 });
             </script>
             <h2 class='header icon64-area-{{ area.config.icon}}'>
@@ -126,20 +91,8 @@
                     <span class="subtitle">{{ area.description }}</span>
                 </a>
             </h2>
-            <div class="maininfo">
-                <ul>
-                {% if area.config.widgets.maininfo %}
-                    <li><div id="widget_{{ area.config.widgets.maininfo.association }}"></div></li>
-                {% endif %}    
-                </ul>
-            </div>
-            <div class='mainactions'>
-                <ul>
-                {% for action in area.config.widgets.mainactions %}
-                    <li><div id="widget_{{ action.association }}"></div></li>
-                {% endfor %}
-                </ul>
-            </div>
+            <div class="maininfo" role='list'></div>
+            <div class='mainactions' role='list'></div>
         </div>
     {% endfor %}
 {% endblock %}

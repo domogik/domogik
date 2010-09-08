@@ -11,7 +11,7 @@
 }
 
 
-header#contentheader {
+#mainsection header {
 	height:7em;
 	-moz-border-radius: 0.8em 0 0 0;
     -webkit-border-radius: 0.8em 0 0 0;
@@ -62,9 +62,9 @@ header#contentheader {
     text-align:center;
 }
 
-#mainsection .mainactions ul > li,
-#mainsection .otheractions ul > li,
-.subsection .mainactions ul > li {
+#mainsection .mainactions .widget,
+#mainsection .otheractions .widget,
+.subsection .mainactions .widget {
     display:inline-block;
     margin:1em;
 }

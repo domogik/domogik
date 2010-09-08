@@ -20,198 +20,11 @@
 {% endcomment %}
 
 {% load i18n %}
-{% load commands %}
 {% load text %}
 
 {% block js_script %}
     $(function() {
-        var totalactions = 0;
-        var finishedactions = 0;
-        var erroractions = 0;
-        var json = {};
-        
-        $("#customize a").click(function() {        
-            $.getREST(['base', 'feature_association', 'del', 'association_type', 'room', 'association_id', '{{ room.id }}'],
-                function(data) {
-                    var status = (data.status).toLowerCase();
-                    if (status == 'ok') {
-                        totalactions = $(".maininfo li:first, .mainactions li, .otheractions li").length;
-                        finishedactions = 0;
-                        erroractions = 0;
-
-                        json = {};
-                        json.list = []
-                        // Main info
-                        $(".maininfo li:first").each(function(index) {
-                            addAssociation($(this).attr('widgetid'), $(this).attr('featurevalue'), function(obj) {
-                                json.maininfo = obj;
-                                json.list.push(obj);
-                            });
-                        });
-            
-                        // Main actions
-                        json.mainactions = [];
-                        $(".mainactions li").each(function(index) {
-                            addAssociation($(this).attr('widgetid'), $(this).attr('featurevalue'), function(obj) {
-                                json.mainactions.push(obj);
-                                json.list.push(obj);
-                            });
-                        });
-                        
-                        // Other actions
-                        json.otheractions = [];
-                        $(".otheractions li").each(function(index) {
-                            addAssociation($(this).attr('widgetid'), $(this).attr('featurevalue'), function(obj) {
-                                json.otheractions.push(obj);
-                                json.list.push(obj);
-                            });
-                        });
-                        
-                        // Save ui config
-                        saveUIConfig();
-                    } else {
-                        $.notification('error', data.description);                                                              
-                    }
-                }
-            );
-        });
-
-        function saveUIConfig() {
-            if (finishedactions == totalactions) {
-                if (erroractions == 0) {
-                    var jsonstr = JSON.stringify(json).replace(/"/g, '&quot;');
-                    $.getREST(['base', 'ui_config', 'set', 'name', 'room', 'reference', '{{ room.id }}', 'key', 'widgets', 'value', jsonstr],
-                        function(data) {
-                            var status = (data.status).toLowerCase();
-                            if (status == 'ok') {
-                                $.loadPage('{% url show_room_view room.id %}', {'status': 'ok', 'msg': '{% trans "Page successfully configured" %}'});
-                            } else {
-                                $.notification('error', data.description);                                          
-                                // If error clean the association table
-                                $.getREST(['base', 'feature_association', 'del', 'association_type', 'room', 'association_id', {{ room.id }}],
-                                    function(data) {
-                                        var status = (data.status).toLowerCase();
-                                        if (status != 'ok') {
-                                            $.notification('error', data.description);                                          
-                                        }
-                                    }
-                                ); 
-                            }
-                        }
-                    );   
-                } else { // Errors
-                    $.notification('error', 'Impossible to save everything : some widgets returned errors');
-                    // If error clean the association table
-                    $.getREST(['base', 'feature_association', 'del', 'association_type', 'room', 'association_id', {{ room.id }}],
-                        function(data) {
-                            var status = (data.status).toLowerCase();
-                            if (status != 'ok') {
-                                $.notification('error', data.description);                                          
-                            }
-                        }
-                    ); 
-                }
-            }
-        }
-        
-        function addAssociation(widgetid, featureid, funct) {
-            $.getREST(['base', 'feature_association', 'add', 'feature_id', featureid, 'association_type', 'room', 'association_id', '{{ room.id }}'],
-                function(data) {
-                    finishedactions++;
-                    var status = (data.status).toLowerCase();
-                    if (status == 'ok') {
-                        var action = {widget:widgetid, feature:featureid, association: data.feature_association[0].id};
-                        funct(action);
-                        saveUIConfig();
-                    } else {
-                        erroractions++;
-                        $.notification('error', data.description);                                          
-                    }
-                }
-            );
-        }
-        
-        {% for association in room.associations %}
-            $("#model_{{ association.id }}").widget_model({
-                    id: '{{ association.widget_id }}',
-                    featurevalue: '{{ association.feature.id }}',
-                    featurename: '{{ association.feature.device_feature_model.name }}',
-                    devicename: '{{ association.feature.device.name }}'
-                })
-                .draggable({
-                    helper: false,
-                    revert: false,
-                    appendTo: 'body',
-                    drag: function(event, ui) {
-                        $("#panel").hide();
-                    },
-                    stop: function(event, ui) {
-                        $("#panel").show();
-                        $("#widgetslist").widget_models('update');
-                        if($(this).hasClass("success")) {
-                            $(this).removeClass("success");
-                        } else {
-                            $(this).remove();			
-                        }
-                    }
-                });
-        {% endfor %}
-        
-        $(".feature").click(function(){
-            $(".selected").removeClass('selected');
-            $(this).addClass('selected');
-            var type = $(this).attr('type');
-            var featurevalue = $(this).attr('featurevalue');
-            var featurename = $(this).attr('featurename');
-            var devicename = $(this).attr('devicename');
-            $("#widgetslist").empty();
-            $("#widgets").show();
-            $("#widgetslist").widget_models({
-                type: type,
-                featurevalue: featurevalue,
-                featurename: featurename,
-                devicename: devicename
-            });
-        });
-        
-        $("#widgets").hide();
-        
-        /* Drag & Drop */
-        $('.maininfo').droppable({
-                activeClass: 'state-active',
-                hoverClass: 'state-hover',
-                accept: function(draggable) {
-                    return (($("li", this).length  < 1) && draggable.widget_model('hasSize', 1, 1));
-                },
-                drop: ondrop
-        });
-        
-        $('.mainactions').droppable({
-                activeClass: 'state-active',
-                hoverClass: 'state-hover',
-                accept: function(draggable) {
-                    return (($("li", this).length  < 4) && draggable.widget_model('hasSize', 1, 1));
-                },
-                drop: ondrop
-        });
-        
-        $('.otheractions').droppable({
-                activeClass: 'state-active',
-                hoverClass: 'state-hover',
-                drop: ondrop
-        });
-        
-        function ondrop(event, ui) {
-            var item = ui.draggable.detach();
-            item.removeAttr('style');
-            item.addClass('success');
-            item.draggable({
-                helper: false,
-                revert: false
-            });
-            $("ul", this).append(item);
-            return false;
-        }
+        $.initAssociations('room', {{ room.id }});
     });
 {% endblock %}
 
@@ -221,43 +34,29 @@
 {% endblock %}
 
 {% block js_include %}
+    <script type="text/javascript" src="/design/js/dmg.dragdrop.js"></script>
+    <script type="text/javascript" src="/design/js/page-show-edit.js"></script>
 {% endblock %}
 
 {% block title %}{% trans page_title %}{% endblock %}
 
 {% block breadcrumb %}
-        <li id='customize'><a href='#' class='icon16-action-submit'>{% trans "Finish" %}</a></li>
-{% endblock %}
-
-{% block banner %}
-    <h1 class="ident icon64-room-{{ room.config.icon }}"><span class="title">{{ room.name }}</span></h1>
-    <div class="maininfo" ddvalue='maininfo' ddname='Main info'>
-        <span class='offscreen'>{% trans "Main info" %}</span>
-        <ul>
-        {% if room.config.widgets.maininfo %}
-            <li id="model_{{ room.config.widgets.maininfo.association }}">1x1</li>
-        {% endif %}
-        </ul>
-    </div>
+        <li id='customize'><a href='{% url show_room_view room.id %}' class='icon16-action-submit'>{% trans "Finish" %}</a></li>
 {% endblock %}
 
 {% block contentleft %}
-    <div class='actions'>
-        <div class='mainactions'>
-            <ul>
-            {% for action in room.config.widgets.mainactions %}
-                <li id="model_{{ action.association }}">1x1</li>
-            {% endfor %}
-            </ul>
+    <section id="mainsection">
+        <div id='room_{{ room.id }}'>
+            <header>
+                <h1 class="ident icon64-room-{{ room.config.icon }}"><span class="title">{{ room.name }}</span></h1>
+                <div class="maininfo" role='list'></div>
+            </header>
+            <div class='actions'>
+                <div class='mainactions' role='list'></div>
+                <div class='otheractions' role='list'></div>
+            </div>
         </div>
-        <div class='otheractions'>
-            <ul>
-            {% for action in room.config.widgets.otheractions %}
-                <li id="model_{{ action.association }}">1x1</li>
-            {% endfor %}
-            </ul>
-        </div>
-    </div>
+    </section>
 {% endblock %}
 
 {% block contentright %}

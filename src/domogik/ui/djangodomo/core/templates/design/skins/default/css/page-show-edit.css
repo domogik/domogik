@@ -88,8 +88,9 @@
     font-style: italic;
 }
 
-.mainactions li, .actions li {
+.mainactions .model, .actions .model {
     display:inline-block;
+    margin:1em;
 }
 
 .state-active {

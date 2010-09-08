@@ -99,13 +99,10 @@
     </ul>
 	<div id="content-bgnd">
         <div class="columnleft">
-            <section id="mainsection">
-                <header id="contentheader">{% block banner %}{% endblock %}</header>
-                {% block contentleft %}{% endblock %}
-            </section>
+            {% block contentleft %}{% endblock %}
         </div>
         <div class="columnright">
-                {% block contentright %}{% endblock %}
+            {% block contentright %}{% endblock %}
         </div>
         <div class='clear'></div>
 	</div>

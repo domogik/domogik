@@ -20,18 +20,13 @@
 {% endcomment %}
 
 {% load i18n %}
-{% load commands %}
 {% load text %}
 
 {% block js_script %}
+    var device_types = {{ device_types|safe }};
+    var device_usages = {{ device_usages|safe }};
     $(function() {
-        {% for association in room.associations %}
-            {% get_widget association.id association.widget_id association.feature %}
-        {% endfor %}
-
-        {% if associated_devices %}
-            $.eventRequest({{associated_devices}});
-        {% endif %}
+        $.initAssociations('room', {{ room.id }}, device_usages, device_types);
     });
 {% endblock %}
 
@@ -40,6 +35,7 @@
 {% endblock %}
 
 {% block js_include %}
+    <script type="text/javascript" src="/design/js/page-show.js"></script>
 {% endblock %}
 
 {% block title %}{% trans page_title %}{% endblock %}
@@ -52,32 +48,17 @@
     <li id='customize'><a href='{% url show_room_edit_view room.id %}' class='icon16-action-customize{% if not is_user_connected %} admin_required{% endif %}'>{% trans 'Customize' %}</a></li>
 {% endblock %}
 
-{% block banner %}
-    <h1 class="ident icon64-room-{{ room.config.icon }}"><span class="title">{{ room.name }}</span></h1>
-    <div class="maininfo">
-        <ul>
-        {% if room.config.widgets.maininfo %}
-            <li><div id="widget_{{ room.config.widgets.maininfo.association }}"></div></li>
-        {% endif %}    
-        </ul>
-    </div>
-{% endblock %}
-
 {% block contentleft %}
-    <div class='actions'>
-        <div class='mainactions'>
-            <ul>
-            {% for action in room.config.widgets.mainactions %}
-                <li><div id="widget_{{ action.association }}"></div></li>
-            {% endfor %}
-            </ul>
+    <section id="mainsection">
+        <div id='room_{{ room.id }}'>
+            <header>
+                <h1 class="ident icon64-room-{{ room.config.icon }}"><span class="title">{{ room.name }}</span></h1>
+                <div class="maininfo" role='list'></div>
+            </header>
+            <div class='actions'>
+                <div class='mainactions' role='list'></div>
+                <div class='otheractions' role='list'></div>
+            </div>
         </div>
-        <div class='otheractions'>
-            <ul>
-            {% for action in room.config.widgets.otheractions %}
-                <li><div id="widget_{{ action.association }}"></div></li>
-            {% endfor %}
-            </ul>
-        </div>
-    </div>
+    </section>
 {% endblock %}

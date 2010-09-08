@@ -450,19 +450,17 @@ def index(request):
     widgets_list = settings.WIDGETS_LIST
 
     try:
+        device_types =  DeviceTypes.get_dict()
+        device_usages =  DeviceUsages.get_dict()
+
         result_all_areas = Areas.get_all()
         result_all_areas.merge_rooms()
         result_all_areas.merge_uiconfig()
 
         result_house = House()
-        result_house.merge_features()
 
         result_house_rooms = Rooms.get_without_area()
         result_house_rooms.merge_uiconfig()
-
-        associated_devices_list = []
-        for association in result_house.associations:
-            associated_devices_list.append(association.feature.device.id)
 
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
@@ -470,10 +468,11 @@ def index(request):
         request, 'index.html',
         page_title,
         widgets=widgets_list,
+        device_types=device_types,
+        device_usages=device_usages,
         areas_list=result_all_areas.area,
         rooms_list=result_house_rooms.room,
-        house=result_house,
-        associated_devices=list(set(associated_devices_list)) #remove duplicates
+        house=result_house
     )
 
 def show_house(request):
@@ -486,26 +485,17 @@ def show_house(request):
     widgets_list = settings.WIDGETS_LIST
 
     try:
+        device_types =  DeviceTypes.get_dict()
+        device_usages =  DeviceUsages.get_dict()
+        
         result_all_areas = Areas.get_all()
         result_all_areas.merge_uiconfig()
-        result_all_areas.merge_features()
 
         result_house = House()
-        result_house.merge_features()
 
         result_house_rooms = Rooms.get_without_area()
         result_house_rooms.merge_uiconfig()
-        result_house_rooms.merge_features()
 
-        associated_devices_list = []
-        for association in result_house.associations:
-            associated_devices_list.append(association.feature.device.id)
-        for room in result_house_rooms.room:
-            for association in room.associations:
-                associated_devices_list.append(association.feature.device.id)
-        for area in result_all_areas.area:
-            for association in area.associations:
-                associated_devices_list.append(association.feature.device.id)
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
     return __go_to_page(
@@ -513,10 +503,11 @@ def show_house(request):
         page_title,
         widgets=widgets_list,
         nav1_show = "selected",
+        device_types=device_types,
+        device_usages=device_usages,
         areas_list=result_all_areas.area,
         rooms_list=result_house_rooms.room,
-        house=result_house,
-        associated_devices=list(set(associated_devices_list)) #remove duplicates
+        house=result_house
     )
 
 @admin_required
@@ -531,7 +522,6 @@ def show_house_edit(request):
 
     try:
         result_house = House()
-        result_house.merge_features()
 
         result_all_devices = Devices.get_all()
         result_all_devices.merge_uiconfig()
@@ -557,22 +547,16 @@ def show_area(request, area_id):
     widgets_list = settings.WIDGETS_LIST
 
     try:
+        device_types =  DeviceTypes.get_dict()
+        device_usages =  DeviceUsages.get_dict()
+
         result_area_by_id = Areas.get_by_id(area_id)
         result_area_by_id.merge_uiconfig()
-        result_area_by_id.merge_features()
 
         result_rooms_by_area = Rooms.get_by_area(area_id)
         result_rooms_by_area.merge_uiconfig()
-        result_rooms_by_area.merge_features()
 
         result_house = House()
-
-        associated_devices_list = []
-        for association in result_area_by_id.area[0].associations:
-            associated_devices_list.append(association.feature.device.id)
-        for room in result_rooms_by_area.room:
-            for association in room.associations:
-                associated_devices_list.append(association.feature.device.id)
 
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
@@ -583,10 +567,11 @@ def show_area(request, area_id):
         page_title,
         widgets=widgets_list,
         nav1_show = "selected",
+        device_types=device_types,
+        device_usages=device_usages,
         area=result_area_by_id.area[0],
         rooms_list=result_rooms_by_area.room,
-        house=result_house,
-        associated_devices=list(set(associated_devices_list)) #remove duplicates
+        house=result_house
     )
 
 @admin_required
@@ -601,7 +586,6 @@ def show_area_edit(request, area_id):
     try:
         result_area_by_id = Areas.get_by_id(area_id)
         result_area_by_id.merge_uiconfig()
-        result_area_by_id.merge_features()
 
         result_house = House()
 
@@ -632,15 +616,13 @@ def show_room(request, room_id):
     widgets_list = settings.WIDGETS_LIST
 
     try:
+        device_types =  DeviceTypes.get_dict()
+        device_usages =  DeviceUsages.get_dict()
+
         result_room_by_id = Rooms.get_by_id(room_id)
         result_room_by_id.merge_uiconfig()
-        result_room_by_id.merge_features()
 
         result_house = House()
-
-        associated_devices_list = []
-        for association in result_room_by_id.room[0].associations:
-            associated_devices_list.append(association.feature.device.id)
 
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
@@ -651,9 +633,10 @@ def show_room(request, room_id):
         page_title,
         widgets=widgets_list,
         nav1_show = "selected",
+        device_types=device_types,
+        device_usages=device_usages,
         room=result_room_by_id.room[0],
-        house=result_house,
-        associated_devices=list(set(associated_devices_list)) #remove duplicates
+        house=result_house
     )
 
 @admin_required
@@ -668,7 +651,6 @@ def show_room_edit(request, room_id):
     try:
         result_room_by_id = Rooms.get_by_id(room_id)
         result_room_by_id.merge_uiconfig()
-        result_room_by_id.merge_features()
 
         result_house = House()
 

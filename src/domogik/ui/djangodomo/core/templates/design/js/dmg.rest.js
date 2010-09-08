@@ -1,7 +1,3 @@
-$(function(){
-	$(window).bind('beforeunload', function () { $.cancelRequest(); });
-});
-
 $.extend({
     URLEncode: function(c) {
         var o = '';
@@ -89,71 +85,6 @@ $.extend({
                 function(XMLHttpRequest, textStatus, errorThrown) {
                     $.notification('error', 'Event request  :' + XMLHttpRequest.readyState + ' ' + XMLHttpRequest.status + ' ' + textStatus + ' ' + errorThrown);
                 }
-        });
-    },
-
-    cancelRequest: function() {
-        if (this.request_ticketid)
-            $.eventCancel(this.request_ticketid);
-        if (this.request_xOptions)
-            this.request_xOptions.abort();
-    },
-    
-    eventRequest: function(devices) {
-        url = rest_url + '/events/request/new/' + devices.join('/') + '/';
-        this.request_xOptions = $.jsonp({
-            cache: false,
-            callbackParameter: "callback",
-            type: "GET",
-            url: url,
-            dataType: "jsonp",
-            error: function (xOptions, textStatus) {
-                $.notification('error', 'Event request : Lost REST server connection');
-            },
-            success: function (data) {
-                var status = (data.status).toLowerCase();
-                if (status == 'ok') {
-                    // Free the ticket when page unload
-                    this.request_ticketid = data.event[0].ticket_id;
-                    $(document).trigger('dmg_event', [data.event[0]]);
-                    $.eventUpdate(data.event[0].ticket_id);
-                } else {
-                    $.notification('error', 'Event request  : ' + data.description);
-                }
-            }
-        });
-    },
-    
-    eventUpdate: function(ticket) {
-        url = rest_url + '/events/request/get/' + ticket + '/';
-        this.request_xOptions = $.jsonp({
-            cache: false,
-            callbackParameter: "callback",
-            type: "GET",
-            url: url,
-            dataType: "jsonp",
-            error: function (xOptions, textStatus) {
-                $.notification('error', 'Event update : Lost REST server connection');
-            },
-            success: function (data) {
-                var status = (data.status).toLowerCase();
-                if (status == 'ok') {
-                    $(document).trigger('dmg_event', [data.event[0]]);
-                    $.eventUpdate(ticket);
-                } else {
-                    $.notification('error', 'Event update : ' + data.description);
-                }
-            }
-        });
-    },
-    
-    eventCancel: function(ticket) {
-        url = rest_url + '/events/request/free/' + ticket + '/';
-        $.jsonp({
-            cache: false,
-            type: "GET",
-            url: url,
-            dataType: "jsonp"
         });
     }
 });
