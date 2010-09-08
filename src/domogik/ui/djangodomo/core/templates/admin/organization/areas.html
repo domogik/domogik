@@ -107,24 +107,47 @@
                                     function(data) {
                                         var status = (data.status).toLowerCase();
                                         if (status == 'ok') {
-                                            // Delete associated features
-                                            $.getREST(['base', 'feature_association', 'del', 'association_type', 'area', 'association_id', '{{ area.id }}'],
+                                            // delete ui_config associations
+                                            $.getREST(['base', 'feature_association', 'list', 'by-area', '{{ area.id }}'],
                                                 function(data) {
                                                     var status = (data.status).toLowerCase();
                                                     if (status == 'ok') {
-                                                        // Delete area
-                                                        $.getREST(['base', 'area', 'del', '{{ area.id }}'],
+                                                        // Delete ui_config
+                                                        $.each(data.feature_association, function(index, association){
+                                                            $.getREST(['base', 'ui_config', 'del', 'by-reference', 'association', association.id],
+                                                                function(data) {
+                                                                    var status = (data.status).toLowerCase();
+                                                                    if (status == 'ok') {
+                                                                    } else {
+                                                                        $.notification('error', '{% trans "ui-config for Area features not deleted" %} (' + data.description + ')');                                                                      
+                                                                    }
+                                                                }
+                                                            );
+                                                        });
+
+                                                        // Delete associated features
+                                                        $.getREST(['base', 'feature_association', 'del', 'association_type', 'area', 'association_id', '{{ area.id }}'],
                                                             function(data) {
                                                                 var status = (data.status).toLowerCase();
                                                                 if (status == 'ok') {
-                                                                    $.reloadPage({'status': 'ok', 'msg': '{% trans "Area" %}\'' + data.area[0].name + '\' {% trans "successfully deleted" %}'});
+                                                                    // Delete area
+                                                                    $.getREST(['base', 'area', 'del', '{{ area.id }}'],
+                                                                        function(data) {
+                                                                            var status = (data.status).toLowerCase();
+                                                                            if (status == 'ok') {
+                                                                                $.reloadPage({'status': 'ok', 'msg': '{% trans "Area" %}\'' + data.area[0].name + '\' {% trans "successfully deleted" %}'});
+                                                                            } else {
+                                                                                $.notification('error', '{% trans "Area not deleted" %} (' + data.description + ')');
+                                                                            }
+                                                                        }
+                                                                    );
                                                                 } else {
-                                                                    $.notification('error', '{% trans "Area not deleted" %} (' + data.description + ')');
+                                                                    $.notification('error', '{% trans "features associations for Area not deleted" %} (' + data.description + ')');                                                                      
                                                                 }
                                                             }
                                                         );
                                                     } else {
-                                                        $.notification('error', '{% trans "features associations for Area not deleted" %} (' + data.description + ')');                                                                      
+                                                        $.notification('error', '{% trans "Get features associations for Area" %} (' + data.description + ')');                                                                      
                                                     }
                                                 }
                                             );

@@ -168,6 +168,48 @@
                                 button: "#del{{ device.id }}",
                                 name: "'{{ device.name }}'",
                                 onok: function() {
+                                    $.getREST(['base', 'feature', 'list', 'by-device_id', '{{ device.id }}'],
+                                        function(data) {
+                                            var status = (data.status).toLowerCase();
+                                            if (status == 'ok') {
+                                                $.each(data.feature, function(index, feature){
+                                                    $.getREST(['base', 'feature_association', 'list', 'by-feature', feature.id],
+                                                        function(data) {
+                                                            var status = (data.status).toLowerCase();
+                                                            if (status == 'ok') {
+                                                                $.each(data.feature_association, function(index, association){
+                                                                    $.getREST(['base', 'ui_config', 'del', 'by-reference', 'association', association.id],
+                                                                        function(data) {
+                                                                            var status = (data.status).toLowerCase();
+                                                                            if (status == 'ok') {
+                                                                            } else {
+                                                                                $.notification('error', '{% trans "ui-config for features not deleted" %} (' + data.description + ')');                                                                      
+                                                                            }
+                                                                        }
+                                                                    );
+                                                                });
+                                                                $.getREST(['base', 'feature_association', 'del', 'feature_id', feature.id],
+                                                                    function(data) {
+                                                                        var status = (data.status).toLowerCase();
+                                                                        if (status == 'ok') {
+                                                                        } else {
+                                                                            $.notification('error', '{% trans "feature_association not deleted" %} (' + data.description + ')');                                                                      
+                                                                        }
+                                                                    }
+                                                                );
+                                                            } else {
+                                                                $.notification('error', '{% trans "Can not get feature_association list for feature" %} (' + data.description + ')');
+                                                            }
+                                                        }
+                                                    );
+                                                });
+                                                
+                                            } else {
+                                                $.notification('error', '{% trans "Can not get feature list for device" %} (' + data.description + ')');
+                                            }
+                                        }
+                                    );
+
                                     $.getREST(['base', 'device', 'del', '{{ device.id }}'],
                                         function(data) {
                                             var status = (data.status).toLowerCase();
