@@ -103,6 +103,8 @@ class IPX:
         """
         self._log = log
         self._callback = callback
+        self.login = None
+        self.password = None
         self.name = ""
         self.url = ""
         self.url_status = ""
@@ -206,14 +208,12 @@ class IPX:
             print error
             self._log.error(error)
             raise IPXException(error)
-            return
         except HTTPError:
             error = "Error while accessing to '%s' : %s" %  \
                      (self.url_status, traceback.format_exc())
             print error
             self._log.error(error)
             raise IPXException(error)
-            return
         res  = resp.read()
         if res[0:8] != IPX_SUCCESS:
             self._log.error("Error while changing 'led%s' to '%s'" % 
@@ -244,7 +244,6 @@ class IPX:
             print error
             self._log.error(error)
             raise IPXException(error)
-            return
         res  = resp.read()
         if res[0:8] != IPX_SUCCESS:
             self._log.error("Error while changing 'led%s' to 'PULSE'" % num)
@@ -275,7 +274,6 @@ class IPX:
             print(error)
             self._log.error(error)
             raise IPXException(error)
-            return
         res  = resp.read()
         if res[0:8] != IPX_SUCCESS:
             self._log.error("Error while reseting 'count%s'" % num)
@@ -335,7 +333,6 @@ class IPX:
             print(error)
             self._log.error(error)
             raise IPXException(error)
-            return
 
         xml = resp.read()
         dom = minidom.parseString(xml)
