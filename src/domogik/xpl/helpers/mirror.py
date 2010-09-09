@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-                                                                           
+# -*- coding: utf-8 -*-  
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -27,7 +27,7 @@ Get informations about mirror and ztamps
 Implements
 ==========
 
-TODO
+class Mirror(Helper)
 
 @author: Fritz SMH <fritz.smh@gmail.com>
 @copyright: (C) 2007-2009 Domogik project
@@ -40,11 +40,11 @@ from domogik.xpl.common.helper import HelperError
 from domogik.xpl.lib.mirror import Mirror
 from domogik.xpl.lib.mirror import MirrorException
 from domogik.common import logger
-import binascii
 
 
-class mirror(Helper):
-
+class MirrorHelper(Helper):
+    """ Mir:ror helpers
+    """
 
     def __init__(self):
         """ Init Mir:ror helper
@@ -74,29 +74,26 @@ class mirror(Helper):
         # Open Mir:ror
         try:
             mirror.open(args[0])
-        except MirrorException as e:
-            return [e.value]
+        except MirrorException as err:
+            return [err.value]
             
         # read Mir:ror
         while True:
-            device, type, current = mirror.read()
+            device, my_type, current = mirror.read()
             if device != None:
                 return ["Device : %s" % device,
-                        "Type : %s" % type,
+                        "Type : %s" % my_type,
                         "Current : %s" % current]
 
         # Close Mir:ror
         try:
             mirror.close()
-        except MirrorException as e:
-            return [e.value]
+        except MirrorException as err:
+            return [err.value]
 
 
-MY_CLASS = {"cb" : mirror}
+MY_CLASS = {"cb" : MirrorHelper}
 
-if __name__ == "__main__":
-    mir = mirror()
-    mir.command("read", "%E9dev%E9hidraw1")
 
 
 
