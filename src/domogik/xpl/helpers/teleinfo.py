@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-                                                                           
+# -*- coding: utf-8 -*-  
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -27,7 +27,7 @@ Get informations about IPX800
 Implements
 ==========
 
-TODO
+class teleinfo(Helper)
 
 @author: Fritz SMH <fritz.smh@gmail.com>
 @copyright: (C) 2007-2009 Domogik project
@@ -42,8 +42,9 @@ from domogik.xpl.lib.teleinfo import TeleinfoException
 from domogik.common import logger
 
 
-class teleinfo(Helper):
-
+class TeleinfoHelper(Helper):
+    """ Teleinfo helpers
+    """
 
     def __init__(self):
         """ Init Teleinfo helper
@@ -70,15 +71,15 @@ class teleinfo(Helper):
         tele = Teleinfo(self._log, None)
         try:
             tele.open(args[0])
-        except TeleinfoException as e:
-            return [e.value]
+        except TeleinfoException as err:
+            return [err.value]
 
         data = tele.read()
 
         try:
             tele.close()
-        except TeleinfoException as e:
-            return [e.value]
+        except TeleinfoException as err:
+            return [err.value]
 
         resp = []
         resp.append("Electric meter data : ")
@@ -86,7 +87,7 @@ class teleinfo(Helper):
             resp.append("%-10s : %-15s" % (entry["name"], entry["value"]))
         return resp
 
-MY_CLASS = {"cb" : teleinfo}
+MY_CLASS = {"cb" : TeleinfoHelper}
 
 
 
