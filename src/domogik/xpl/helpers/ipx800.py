@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-                                                                           
+# -*- coding: utf-8 -*- 
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -27,7 +27,7 @@ Get informations about IPX800
 Implements
 ==========
 
-TODO
+class Ipx800(Helper)
 
 @author: Fritz SMH <fritz.smh@gmail.com>
 @copyright: (C) 2007-2009 Domogik project
@@ -42,8 +42,9 @@ from domogik.xpl.lib.ipx800 import IPXException
 from domogik.common import logger
 
 
-class ipx800(Helper):
-
+class Ipx800(Helper):
+    """ IPX800 helpers
+    """
 
     def __init__(self):
         """ Init IPX 800 helper
@@ -81,8 +82,8 @@ class ipx800(Helper):
         try:
             for ipx in ipx.find():
                 data.append("%s : %s" % (ipx[0], ipx[1]))
-        except IPXException as e:
-            return [e.value]
+        except IPXException as err:
+            return [err.value]
         print data
         return data
 
@@ -91,12 +92,12 @@ class ipx800(Helper):
         """
             
         ipx = IPX(self._log, None)
-        ipx.open("foo", args[0])
+        ipx.open("foo", args[0], args[1], args[2])
         data = ipx.get_status_for_helper()
         print data
         return data
 
-MY_CLASS = {"cb" : ipx800}
+MY_CLASS = {"cb" : Ipx800}
 
 
 
