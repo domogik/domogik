@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-                                                                           
+# -*- coding: utf-8 -*-  
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -27,7 +27,7 @@ Get informations about mirror and ztamps
 Implements
 ==========
 
-TODO
+class cidmodem(Helper)
 
 @author: Fritz SMH <fritz.smh@gmail.com>
 @copyright: (C) 2007-2009 Domogik project
@@ -42,7 +42,9 @@ from domogik.xpl.lib.cidmodem import CallerIdModemException
 from domogik.common import logger
 
 
-class cidmodem(Helper):
+class Cidmodem(Helper):
+    """ cidmodem helpers
+    """
 
 
     def __init__(self):
@@ -64,11 +66,6 @@ class cidmodem(Helper):
           
 
 
-    def find(self, args = None):
-        """ Try to find Mir:ror device
-        """
-        return ["TODO"]
-
     def read(self, args = None):
         """ Read Modem until an inbound call
         """
@@ -79,8 +76,8 @@ class cidmodem(Helper):
         # Open Modem
         try:
             cid.open(args[0])
-        except CallerIdModemException as e:
-            return [e.value]
+        except CallerIdModemException as err:
+            return [err.value]
             
         # read Modem
         while True:
@@ -91,12 +88,12 @@ class cidmodem(Helper):
         # Close Modem
         try:
             cid.close()
-        except CallerIdModemException as e:
-            return [e.value]
+        except CallerIdModemException as err:
+            return [err.value]
 
         return ["Phone number : %s" % num]
 
-MY_CLASS = {"cb" : cidmodem}
+MY_CLASS = {"cb" : Cidmodem}
 
 
 
