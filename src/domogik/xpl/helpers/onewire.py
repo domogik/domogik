@@ -43,8 +43,9 @@ import traceback
 
 ACCESS_ERROR = "Access to onewire device is not possible. Does your user have the good permissions ? If so, check that you stopped onewire module and you don't have OWFS mounted"
 
-class onewire(Helper):
-
+class Onewire(Helper):
+    """ Onewire helpers
+    """
 
     def __init__(self):
         """ Init onewire helper
@@ -90,41 +91,52 @@ class onewire(Helper):
 
         log = logger.Logger('onewire-helper')
         self._log = log.get_logger()
+        self.my_ow = None
 
     def all(self, args = None):
+        """ show all components
+        """
         try:
-            self.ow = OneWireNetwork(args[0], self._log)
-        except OneWireException as e:
-            raise HelperError(e.value)
-        return self.ow.show_all_components()
+            self.my_ow = OneWireNetwork(args[0], self._log)
+        except OneWireException as err:
+            raise HelperError(err.value)
+        return self.my_ow.show_all_components()
 
     def detail(self, args = None):
+        """ show one component detail
+        """
         try:
-            self.ow = OneWireNetwork(args[0], self._log)
-        except OneWireException as e:
-            raise HelperError(e.value)
-        return self.ow.show_component_detail(args[1])
+            self.my_ow = OneWireNetwork(args[0], self._log)
+        except OneWireException as err:
+            raise HelperError(err.value)
+        return self.my_ow.show_component_detail(args[1])
 
     def ds18b20(self, args = None):
+        """ show ds18b20 components
+        """
         try:
-            self.ow = OneWireNetwork(args[0], self._log)
-        except OneWireException as e:
-            raise HelperError(e.value)
-        return self.ow.show_ds18b20_detail()
+            self.my_ow = OneWireNetwork(args[0], self._log)
+        except OneWireException as err:
+            raise HelperError(err.value)
+        return self.my_ow.show_ds18b20_detail()
 
     def ds18s20(self, args = None):
+        """ show ds18s20 components
+        """
         try:
-            self.ow = OneWireNetwork(args[0], self._log)
-        except OneWireException as e:
-            raise HelperError(e.value)
-        return self.ow.show_ds18s20_detail()
+            self.my_ow = OneWireNetwork(args[0], self._log)
+        except OneWireException as err:
+            raise HelperError(err.value)
+        return self.my_ow.show_ds18s20_detail()
 
     def ds2401(self, args = None):
+        """ show ds2401 components
+        """
         try:
-            self.ow = OneWireNetwork(args[0], self._log)
-        except OneWireException as e:
-            raise HelperError(e.value)
-        return self.ow.show_ds2401_detail()
+            self.my_ow = OneWireNetwork(args[0], self._log)
+        except OneWireException as err:
+            raise HelperError(err.value)
+        return self.my_ow.show_ds2401_detail()
 
 
 class OneWireException:
@@ -164,6 +176,8 @@ class OneWireNetwork:
 
 
     def show_all_components(self):
+        """ show all components
+        """
         ret = []
         display = "| %-6s | %-12s | %-10s |"
         sep = "--------------------------------------"
@@ -174,18 +188,22 @@ class OneWireNetwork:
         return ret
 
 
-    def show_component_detail(self, id):
+    def show_component_detail(self, my_id):
+        """ show one component detail
+        """
         ret = []
-        for comp in self._root.find(id = id):
+        for comp in self._root.find(id = my_id):
             # component detail
             display = " - %-20s : %s"
-            ret.append("%s attributes :" % id)
+            ret.append("%s attributes :" % my_id)
             for attr in comp.entryList():
                 ret.append(display % (attr, comp.__getattr__(attr)))
         return ret
 
 
     def show_ds18b20_detail(self):
+        """ show ds18b20 components
+        """
         ret = []
         display = " - %-30s : %s"
         for comp in self._root.find(type = "DS18B20"):
@@ -196,6 +214,8 @@ class OneWireNetwork:
 
 
     def show_ds18s20_detail(self):
+        """ show ds18s20 components
+        """
         ret = []
         display = " - %-30s : %s"
         for comp in self._root.find(type = "DS18S20"):
@@ -206,6 +226,8 @@ class OneWireNetwork:
 
 
     def show_ds2401_detail(self):
+        """ show ds2401 components
+        """
         ret = []
         display = " - %-30s : %s"
         for comp in self._root.find(type = "DS2401"):
@@ -214,9 +236,5 @@ class OneWireNetwork:
         return ret
 
 
-MY_CLASS = {"cb" : onewire}
+MY_CLASS = {"cb" : Onewire}
 
-if __name__ == "__main__":
-    #my_onewire = OneWireNetwork()
-    ow = onewire()
-    ow.command("all")
