@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-                                                                           
+# -*- coding: utf-8 -*- 
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -27,7 +27,11 @@ Get informations about one wire network
 Implements
 ==========
 
-TODO
+class OneWireException(Exception)
+class ComponentDs18b20
+class ComponentDs18s20
+class ComponentDs2401
+class OneWireNetwork
 
 @author: Fritz SMH <fritz.smh@gmail.com>
 @copyright: (C) 2007-2009 Domogik project
@@ -37,7 +41,6 @@ TODO
 
 import ow
 import time
-import threading
 import traceback
 
 
@@ -84,7 +87,7 @@ class ComponentDs18b20:
         """
         while True:
             for comp in self.root.find(type = "DS18B20"):
-                id = comp.id
+                my_id = comp.id
                 try:
                     temperature = float(eval("comp.temperature"+self.resolution))
                 except AttributeError:
@@ -95,13 +98,14 @@ class ComponentDs18b20:
 
                 else:
 
-                    if hasattr(self.old_temp, id) == False or temperature != self.old_temp[id]:
-                        type = "xpl-trig"
+                    if hasattr(self.old_temp, my_id) == False \
+                       or temperature != self.old_temp[my_id]:
+                        my_type = "xpl-trig"
                     else:
-                        type = "xpl-stat"
-                    self.old_temp[id] = temperature
-                    print "type=%s, id=%s, temp=%s" % (type, id, temperature)
-                    self.callback(type, {"device" : id,
+                        my_type = "xpl-stat"
+                    self.old_temp[my_id] = temperature
+                    print "type=%s, id=%s, temp=%s" % (my_type, my_id, temperature)
+                    self.callback(my_type, {"device" : my_id,
                                          "type" : "temp",
                                          "current" : temperature})
             time.sleep(self.interval)
@@ -127,6 +131,7 @@ class ComponentDs18s20:
         self.root = self.onewire.get_root()
         self.old_temp = {}
         self.start_listening()
+        self.resolution = 12
 
     def start_listening(self):
         """ 
@@ -134,7 +139,7 @@ class ComponentDs18s20:
         """
         while True:
             for comp in self.root.find(type = "DS18S20"):
-                id = comp.id
+                my_id = comp.id
                 try:
                     temperature = float(comp.temperature)
                 except AttributeError:
@@ -145,13 +150,14 @@ class ComponentDs18s20:
 
                 else:
 
-                    if hasattr(self.old_temp, id) == False or temperature != self.old_temp[id]:
-                        type = "xpl-trig"
+                    if hasattr(self.old_temp, my_id) == False \
+                       or temperature != self.old_temp[my_id]:
+                        my_type = "xpl-trig"
                     else:
-                        type = "xpl-stat"
-                    self.old_temp[id] = temperature
-                    print "type=%s, id=%s, temp=%s" % (type, id, temperature)
-                    self.callback(type, {"device" : id,
+                        my_type = "xpl-stat"
+                    self.old_temp[my_id] = temperature
+                    print "type=%s, id=%s, temp=%s" % (my_type, my_id, temperature)
+                    self.callback(my_type, {"device" : my_id,
                                          "type" : "temp",
                                          "current" : temperature})
             time.sleep(self.interval)
@@ -177,6 +183,7 @@ class ComponentDs2401:
         self.root = self.onewire.get_root()
         self.old_present = {}
         self.start_listening()
+        self.actual_present = None
 
     def start_listening(self):
         """ 
@@ -185,19 +192,20 @@ class ComponentDs2401:
         while True:
             self.actual_present = []
             for comp in self.root.find(type = "DS2401"):
-                id = comp.id
+                my_id = comp.id
                 present = int(comp.present)
-                self.actual_present.append(id)
-                if hasattr(self.old_present, id) == False or present != self.old_present[id]:
+                self.actual_present.append(my_id)
+                if hasattr(self.old_present, my_id) == False \
+                   or present != self.old_present[my_id]:
                     if present == 1:
                         status = "HIGH"
                     else:
                         status = "LOW"
-                    print "id=%s, status=%s" % (id, status)
-                    self.callback("xpl-trig", {"device" : id,
+                    print "id=%s, status=%s" % (my_id, status)
+                    self.callback("xpl-trig", {"device" : my_id,
                                          "type" : "input",
                                          "current" : status})
-                    self.old_present[id] = present
+                    self.old_present[my_id] = present
             for comp_id in self.old_present:
                 if comp_id not in self.actual_present:
                     print "id=%s, status=LOW component disappeared)" % (comp_id)
