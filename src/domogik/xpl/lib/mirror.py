@@ -52,14 +52,17 @@ class MirrorException(Exception):
         
         
 class Mirror:
+    """ Helpers for Mir:ror
+    """
 
-    def __init__(self, log, cb):
+    def __init__(self, log, callback):
         """ Init Mirror object
             @param log : log instance
-            @param cb : callback
+            @param callback : callback
         """
         self._log = log
-        self._cb = cb
+        self._callback = callback
+        self._mirror = None
 
     def open(self, device):
         """ Open Mir:ror device
@@ -84,15 +87,15 @@ class Mirror:
             raise MirrorException(error)
 
     def listen(self):
-            """ Start listening to Mir:ror
-            """
-            # listen to mir:ror
-            self._log.info("Start listening Mir:ror")
-            # infinite 
-            while True:
-                device, type, current = self.read()
-                if device != None:
-                    self._cb(device, type, current)
+        """ Start listening to Mir:ror
+        """
+        # listen to mir:ror
+        self._log.info("Start listening Mir:ror")
+        # infinite 
+        while True:
+            device, my_type, current = self.read()
+            if device != None:
+                self._callback(device, my_type, current)
             
     def read(self):        
         """ Read Mir:ror device once
