@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-                                                                           
+# -*- coding: utf-8 -*-  
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -27,7 +27,8 @@ Get informations about one wire network
 Implements
 ==========
 
-TODO
+class HelperError(Exception)
+class Helper()
 
 @author: Fritz <fritz.smh@gmail.com>
 @copyright: (C) 2007-2009 Domogik project
@@ -38,6 +39,8 @@ TODO
 import urllib
 
 class HelperError(Exception):
+    """ Helper exceptions
+    """
     def __init__(self, value):
         self.value = value
 
@@ -46,6 +49,8 @@ class HelperError(Exception):
 
 
 class Helper():
+    """ Generic class for helpers
+    """
 
     def __init__(self):
         """ Init helper
@@ -54,9 +59,17 @@ class Helper():
         self.commands =   {}
 
     def help(self):
+        """ Display help
+        """
         return self.commands
 
-    def command(self, cmd, args = []):
+    def command(self, cmd, args = None):
+        """ Execute helper command
+            @param cmd : command
+            @param args : table containing args
+        """
+        if args == None:
+            args = []
         cmd = cmd.lower()
         print "Helper : %s %s" % (cmd, str(args))
         if cmd == "help":
@@ -67,11 +80,13 @@ class Helper():
         # unquote parameters
         for idx, val in enumerate(args):
             args[idx] = unicode(urllib.unquote(val), "UTF-8")
-            print "%s - %s - %s" % (str(idx), args[idx], unicode(urllib.unquote(val), "UTF-8"))
+            print "%s - %s - %s" % (str(idx), args[idx], 
+                                    unicode(urllib.unquote(val), "UTF-8"))
 
         try:
             if len(args) < self.commands[cmd]["min_args"]:
-                return ["Missing parameters.", "Usage : %s" % self.commands[cmd]["usage"]]
+                return ["Missing parameters.", 
+                        "Usage : %s" % self.commands[cmd]["usage"]]
         except KeyError:
             # no min_args defined : it is not a problem :)
             pass
