@@ -54,7 +54,7 @@ def list_all_files(path, dst):
             files.append(os.path.join(path, i))
         else:
             d.extend(list_all_files(os.path.join(path, i), os.path.join(dst, i)))
-    d.extend((dst, files))
+    d.append((dst, files))
     return d
 
 d_files = [
@@ -64,12 +64,12 @@ d_files = [
         ('/etc/init.d/', ['src/domogik/examples/init/domogik']),
         ('/etc/default/', ['src/domogik/examples/default/domogik'])
 ]
-d_files.append(list_all_files('src/share/domogik/stats/', '/usr/local/share/domogik/listeners/'))
-d_files.append(list_all_files('src/share/domogik/url2xpl/', '/usr/local/share/domogik/url2xpl/'))
-d_files.append(list_all_files('src/domogik/xpl/schema/', '/usr/local/share/doc/domogik/schemas/'))
-d_files.append(list_all_files('src/domogik/ui/djangodomo/core/templates/', '/usr/local/share/domogik/ui/djangodomo/core/templates/')),
-d_files.append(list_all_files('src/domogik/ui/djangodomo/locale/', '/usr/local/share/domogik/ui/djangodomo/locale/')),
-d_files.append(list_all_files('src/domogik/ui/djangodomo/apache/', '/usr/local/share/doc/domogik/examples/apache/')),
+d_files.extend(list_all_files('src/share/domogik/stats/', '/usr/local/share/domogik/listeners/'))
+d_files.extend(list_all_files('src/share/domogik/url2xpl/', '/usr/local/share/domogik/url2xpl/'))
+d_files.extend(list_all_files('src/domogik/xpl/schema/', '/usr/local/share/doc/domogik/schemas/'))
+d_files.extend(list_all_files('src/domogik/ui/djangodomo/core/templates/', '/usr/local/share/domogik/ui/djangodomo/core/templates/')),
+d_files.extend(list_all_files('src/domogik/ui/djangodomo/locale/', '/usr/local/share/domogik/ui/djangodomo/locale/')),
+d_files.extend(list_all_files('src/domogik/ui/djangodomo/apache/', '/usr/local/share/doc/domogik/examples/apache/')),
 
 print d_files
 setup(

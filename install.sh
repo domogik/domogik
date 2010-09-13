@@ -134,6 +134,7 @@ function update_user_config {
     sed -i "s/^rest_server_ip.*$/rest_server_ip = $bind_addr/" $d_home/.domogik.cfg
     sed -i "s/^django_server_ip.*$/django_server_ip = $bind_addr/" $d_home/.domogik.cfg
     sed -i "s/^django_rest_server_ip.*$/django_rest_server_ip = $bind_addr/" $d_home/.domogik.cfg
+    replace="y"
     if [ -f "$d_home/.domogik.sqlite" ];then
         read -p "A database already exists. Do you want to remove it and recreate it from scratch ? [N/y]" replace
         if [ "$replace" = "y" -o "$replace" = "Y" ];then

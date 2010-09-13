@@ -154,8 +154,6 @@ INSTALLED_APPS = (
     'domogik.ui.djangodomo.core',
 )
 
-STATIC_DESIGN_ROOT = '%s/core/templates/design' % PROJECT_PATH
-STATIC_WIDGETS_ROOT = '%s/core/templates/widgets' % PROJECT_PATH
 
 # Session stuff
 # Other options are :
@@ -172,15 +170,20 @@ except ImportError:
 
 # List the availables widgets
 WIDGETS_LIST = []
+STATIC_WIDGETS_ROOT = None
+STATIC_DESIGN_ROOT = None 
+
 #Only loads the widgets from the FIRST existing directory in TEMPLATE_DIRS
 for t_path in TEMPLATE_DIRS:
     if os.path.isdir(t_path):
         w_path = os.path.join(t_path, "widgets")
         if os.path.isdir(w_path):
             for file in os.listdir(w_path):
-                main = os.path.join(WIDGETS_PATH, file, "main.js")
+                main = os.path.join(w_path, file, "main.js")
                 if os.path.isfile(main):
                     WIDGETS_LIST.append(file)
+        STATIC_WIDGETS_ROOT = w_path
+        STATIC_DESIGN_ROOT = '%s/design' % t_path
         break
 
 # For login Auth
