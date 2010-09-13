@@ -71,21 +71,21 @@ class Onewire(Helper):
                     "cb" : self.ds18b20,
                     "desc" : "Show detail for all DS18B20 devices",
                     "min_args" : 1,
-                    "usage" : "all <adaptator device>"
+                    "usage" : "ds18b20 <adaptator device>"
                   },
                   "ds18s20" : 
                   {
                     "cb" : self.ds18s20,
                     "desc" : "Show detail for all DS18S20 devices",
                     "min_args" : 1,
-                    "usage" : "all <adaptator device>"
+                    "usage" : "ds18s20 <adaptator device>"
                   },
                   "ds2401" : 
                   {
                     "cb" : self.ds2401,
                     "desc" : "Show detail for all DS2401 devices",
                     "min_args" : 1,
-                    "usage" : "all <adaptator device>"
+                    "usage" : "ds2401 <adaptator device>"
                   }
                 }
 

@@ -61,7 +61,12 @@ class Helper():
     def help(self):
         """ Display help
         """
-        return self.commands
+        data = []
+        for cmd in self.commands:
+            data.append("%s : %s" % (cmd, self.commands[cmd]["desc"]))
+            if self.commands[cmd]["min_args"] > 0:
+                data.append("  Usage : %s" % self.commands[cmd]["usage"])
+        return data
 
     def command(self, cmd, args = None):
         """ Execute helper command
