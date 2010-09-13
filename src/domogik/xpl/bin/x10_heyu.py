@@ -66,6 +66,7 @@ class X10Main(XplPlugin):
         res = XplResult()
         self._config.query('x10_heyu', 'heyu-cfg-path', res)
         self._heyu_cfg_path_res = res.get_value()['heyu-cfg-path']
+        self._log = self.get_my_logger()
         try:
             self.__myx10 = X10API(self._heyu_cfg_path_res)
         except Exception:
@@ -80,7 +81,6 @@ class X10Main(XplPlugin):
         #One listener for system schema, allowing to dump config
         Listener(self.heyu_dump_config, self._myxpl, {'schema': 'domogik.system', 'xpltype': 'xpl-cmnd',
                                                       'command': 'push_config', 'plugin': 'x10'})
-        self._log = self.get_my_logger()
 #        self._monitor = X10Monitor(self._heyu_cfg_path_res)
 #        self._monitor.get_monitor().add_cb(self.x10_monitor_cb)
 #        self._monitor.get_monitor().start()
