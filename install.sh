@@ -134,12 +134,20 @@ function update_user_config {
     sed -i "s/^rest_server_ip.*$/rest_server_ip = $bind_addr/" $d_home/.domogik.cfg
     sed -i "s/^django_server_ip.*$/django_server_ip = $bind_addr/" $d_home/.domogik.cfg
     sed -i "s/^django_rest_server_ip.*$/django_rest_server_ip = $bind_addr/" $d_home/.domogik.cfg
+    if [ -f "$d_home/.domogik.sqlite" ];then
+        read -p "A database already exists. Do you want to remove it and recreate it from scratch ? [N/y]" replace
+        if [ "$replace" = "y" -o "$replace" = "Y" ];then
+            rm -f $d_home/.domogik.sqlite
+        fi
+    fi
     echo "Info : Database will be created in $d_home/.domogik.sqlite"
     sed -i "s;^db_path.*$;db_path = $d_home/.domogik.sqlite;" $d_home/.domogik.cfg
 }
 
 function call_db_installer {
-    /bin/su -c $DOMOGIK_USER "python ./db_installer.py $d_home/.domogik.cfg"
+    if [ "$replace" = "y" -o "$replace" = "Y" ];then 
+        /bin/su -c $DOMOGIK_USER "python ./db_installer.py $d_home/.domogik.cfg"
+    fi
     chown $d_user: $d_home/.domogik.sqlite
 }
 
@@ -194,7 +202,7 @@ update_user_config
 copy_tools
 call_db_installer
 modify_hosts
-chown -R $USER: $HOME/.python-eggs/ 
+[ -d $HOME/.python-eggs ] && chown -R $USER: $HOME/.python-eggs/ 
 
 echo "Everything seems to be good, Domogik should be installed correctly."
 echo "I will start the test_config.py script to check it."

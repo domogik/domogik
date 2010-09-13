@@ -40,19 +40,38 @@ ez_setup.use_setuptools()
 import os
 from setuptools import setup, find_packages
 
-def list_all_files(path):
+def list_all_files(path, dst):
     """
     List all files and subdirectories contained in a path
     @param path : the path from where to get files and subdirectories
+    @param dst : The based destination path
+    @return : a list of tuples for each directory in path (including path itself)
     """
-    d=[]
+    d = []
+    files = []
     for i in os.listdir(path):
-        if not os.path.isdir(path+i):
-            d.append(path+'/'+i)
+        if not os.path.isdir(os.path.join(path, i)):
+            files.append(os.path.join(path, i))
         else:
-            d.extend(list_all_files(path+'/'+i))
+            d.extend(list_all_files(os.path.join(path, i), os.path.join(dst, i)))
+    d.extend((dst, files))
     return d
 
+d_files = [
+        ('/usr/local/bin/', ['src/domogik/xpl/tools/xPL_Hub']),
+        ('/usr/local/bin/', ['src/tools/dmgenplug']),
+        ('/usr/local/bin/', ['src/tools/dmgdisplug']),
+        ('/etc/init.d/', ['src/domogik/examples/init/domogik']),
+        ('/etc/default/', ['src/domogik/examples/default/domogik'])
+]
+d_files.append(list_all_files('src/share/domogik/stats/', '/usr/local/share/domogik/listeners/'))
+d_files.append(list_all_files('src/share/domogik/url2xpl/', '/usr/local/share/domogik/url2xpl/'))
+d_files.append(list_all_files('src/domogik/xpl/schema/', '/usr/local/share/doc/domogik/schemas/'))
+d_files.append(list_all_files('src/domogik/ui/djangodomo/core/templates/', '/usr/local/share/domogik/ui/djangodomo/core/templates/')),
+d_files.append(list_all_files('src/domogik/ui/djangodomo/locale/', '/usr/local/share/domogik/ui/djangodomo/locale/')),
+d_files.append(list_all_files('src/domogik/ui/djangodomo/apache/', '/usr/local/share/doc/domogik/examples/apache/')),
+
+print d_files
 setup(
     name = 'Domogik',
     version = '0.1.0',
@@ -74,20 +93,11 @@ setup(
     # Include all files of the ui/djangodomo directory
     # in data files.
     package_data = {
-        'domogik.ui.djangodomo': list_all_files('src/domogik/ui/djangodomo/'),
+        'domogik.ui.djangodomo': list_all_files('src/domogik/ui/djangodomo/','.')[0][1],
         'domogik.ui.djangodomo': ['locale/*.po', 'locale/*.mo'],
 #        'domogik.ui.djangodomo.core': list_all_files('src/domogik/ui/djangodomo/core/templates/'),
     },
-    data_files = [
-        ('/usr/local/share/domogik/listeners/', list_all_files('src/share/domogik/stats/')),
-        ('/usr/local/share/domogik/rest/', list_all_files('src/share/domogik/url2xpl/')),
-        ('/usr/local/share/doc/schemas', list_all_files('src/domogik/xpl/schema/')),
-        ('/usr/local/bin/', ['src/domogik/xpl/tools/xPL_Hub']),
-        ('/usr/local/bin/', ['src/tools/dmgenplug']),
-        ('/usr/local/bin/', ['src/tools/dmgdisplug']),
-        ('/etc/init.d/', ['src/domogik/examples/init/domogik']),
-        ('/etc/default/', ['src/domogik/examples/default/domogik'])
-    ],
+    data_files = d_files,
 
     entry_points = {
         'console_scripts': [

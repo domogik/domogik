@@ -132,6 +132,7 @@ TEMPLATE_DIRS = (
     # "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+    '/usr/local/share/domogik/ui/djangodomo/core/templates/',
     '%s/templates/' % PROJECT_PATH,
     '%s/core/templates/' % PROJECT_PATH,
 )
@@ -170,12 +171,17 @@ except ImportError:
     pass
 
 # List the availables widgets
-WIDGETS_PATH = '%s/core/templates/widgets/' % PROJECT_PATH
 WIDGETS_LIST = []
-for file in os.listdir(WIDGETS_PATH):
-    main = os.path.join(WIDGETS_PATH, file, "main.js")
-    if os.path.isfile(main):
-        WIDGETS_LIST.append(file)
+#Only loads the widgets from the FIRST existing directory in TEMPLATE_DIRS
+for t_path in TEMPLATE_DIRS:
+    if os.path.isdir(t_path):
+        w_path = os.path.join(t_path, "widgets")
+        if os.path.isdir(w_path):
+            for file in os.listdir(w_path):
+                main = os.path.join(WIDGETS_PATH, file, "main.js")
+                if os.path.isfile(main):
+                    WIDGETS_LIST.append(file)
+        break
 
 # For login Auth
 AUTHENTICATION_BACKENDS = ('domogik.ui.djangodomo.core.backends.RestBackend',)
