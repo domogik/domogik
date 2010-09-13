@@ -78,7 +78,7 @@ from threading import Event, currentThread, Thread
 
 
 REST_API_VERSION = "0.1"
-REST_DESCRIPTION = "REST plugin is part of Domogik project. See http://trac.domogik.org/domogik/wiki/modules/REST.en for REST API documentation"
+#REST_DESCRIPTION = "REST plugin is part of Domogik project. See http://trac.domogik.org/domogik/wiki/modules/REST.en for REST API documentation"
 
 ### parameters that can be overidden by Domogik config file
 USE_SSL = False
@@ -94,6 +94,8 @@ QUEUE_SLEEP = 0.1 # sleep time between reading all queue content
 QUEUE_COMMAND_SIZE = 1000
 
 # /event queue config
+EVENT_TIMEOUT = 300  # must be superior than QUEUE_EVENT_TIMEOUT
+                     # Value should be > 2*x QUEUE_EVENT_TIMEOUT
 QUEUE_EVENT_TIMEOUT = 120   # If 0, no timeout is set
 QUEUE_EVENT_LIFE_EXPECTANCY = 5
 QUEUE_EVENT_SIZE = 50
@@ -231,6 +233,13 @@ class Rest(XplPlugin):
             # /event Queues config
             self._config = Query(self._myxpl)
             res = XplResult()
+            self._config.query('rest', 'evt-timeout', res)
+            self._event_timeout = res.get_value()['evt-timeout']
+            if self._event_timeout == "None":
+                self._event_timeout = EVENT_TIMEOUT
+            self._event_timeout = float(self._event_timeout)
+            self._config = Query(self._myxpl)
+            res = XplResult()
             self._config.query('rest', 'q-evt-size', res)
             self._queue_event_size = res.get_value()['q-evt-size']
             if self._queue_event_size == "None":
@@ -263,6 +272,7 @@ class Rest(XplPlugin):
             # Queues for /event
             # this queue will be fill by stat manager
             self._event_requests = EventRequests(self._log,
+                                                 self._event_timeout,
                                                  self._queue_event_size,
                                                  self._queue_event_timeout,
                                                  self._queue_event_life_expectancy)
@@ -3765,7 +3775,7 @@ class JSonHelper():
 
         # get data type
         data_type = type(data).__name__
-        print "TYPE=%s" % data_type
+        #print "TYPE=%s" % data_type
         #print data
 
         ### type instance (sql object)
@@ -3829,9 +3839,9 @@ class JSonHelper():
             # get first data type
             if len(data) > 0:
                 sub_data_elt0_type = type(data[0]).__name__
-                print "DATA=%s" % data
+                #print "DATA=%s" % data
             else:
-                print "DATA vide=%s" % data
+                #print "DATA vide=%s" % data
                 data_json = "[]"
                 return data_json
             # start table
@@ -3857,7 +3867,6 @@ class JSonHelper():
 
         ### type : dict
         elif data_type in dict_type:
-            print "DICT=%s" % data
             if key != None and key != "NOKEY":
                 data_json += '"%s" : {' % key
             else:
@@ -4173,17 +4182,13 @@ class StatsManager(XplPlugin):
                     if map["filter_key"] == None:
                         key = map["name"]
                         device_data.append({"key" : key, "value" : value})
-                        print ">>%s, %s, %s, %s" % (current_date, key, value, d_id)
                         db.add_device_stat(current_date, key, value, d_id)
-                        print "In database :)"
                     else:
                         if map["filter_value"] != None and \
                            map["filter_value"] == message.data[map["filter_key"]]:
                             key = map["new_name"]
                             device_data.append({"key" : key, "value" : value})
-                            print ">>%s, %s, %s, %s" % (current_date, key, value, d_id)
                             db.add_device_stat(current_date, key, value, d_id)
-                            print "In database :)"
                         else:
                             if map["filter_value"] == None:
                                 self._log_stats.warning ("Stats : no filter_value defined in map : %s" % str(map))
@@ -4213,12 +4218,13 @@ class EventRequests():
     """
     Object where all events queues and ticket id will be stored
     """
-    def __init__(self, log, queue_size, queue_timeout, queue_life_expectancy):
+    def __init__(self, log, event_timeout, queue_size, queue_timeout, queue_life_expectancy):
         """ Init Event Requests
             @param queue_size : size of queues for events
         """
         self.requests = {}
         self._log = log
+        self.event_timeout = event_timeout
         self.queue_size = queue_size
         if queue_timeout == 0:
             self.queue_timeout = None
@@ -4228,6 +4234,25 @@ class EventRequests():
         self.ticket = 0
         self.count_request = 0
 
+        # Launch background cleaning function
+        bg_clean = Thread(None, self.bg_clean_event_requests, None, (), {})
+        bg_clean.start()
+
+    def bg_clean_event_requests(self):
+        """ Function to use in background. It will check for each request to see
+            if it has not be forgoten to clean
+        """
+        while 1:
+            clean_list = []
+            for req in self.requests:
+                if time.time() - self.requests[req]["last_access_date"] > self.event_timeout:
+                     print "Ticket number '%s' expires : it will be deleted" % req
+                     clean_list.append(req)
+            for req in clean_list:
+                del self.requests[req]
+                self.count_request -= 1
+            time.sleep(30)
+
     def new(self, device_id_list):
         """ Add a new queue and ticket id for a new event
             @param device_id : id of device to get events from
@@ -4236,7 +4261,9 @@ class EventRequests():
         print "---- NEW ----"
         new_queue = Queue(self.queue_size)
         ticket_id = self.generate_ticket()
-        new_data = {"creation_date" :  datetime.datetime.now(),
+        cur_date = time.time()
+        new_data = {"creation_date" :  cur_date,
+                    "last_access_date" : cur_date,
                     "device_id_list" : device_id_list,
                     "queue" : new_queue,
                     "queue_size" : 0}
@@ -4262,7 +4289,7 @@ class EventRequests():
     def generate_ticket(self):
         """ Generate a ticket id for an event request
         """
-        # TODO : make something random for ticket generation
+        # TODO : make something random for ticket generation after 0.1.0
         self.ticket += 1
         return str(self.ticket)
  
@@ -4333,15 +4360,21 @@ class EventRequests():
             # Add ticket id to answer
             elt_data["ticket_id"] = str(ticket_id)
 
+            # Update access date
+            self.requests[ticket_id]["last_access_date"] = time.time()
+
         # Timeout
         except Empty:
             # Add ticket id to answer
             elt_data = {}
             elt_data["ticket_id"] = str(ticket_id)
 
+            # Update access date
+            self.requests[ticket_id]["last_access_date"] = time.time()
+
         # Ticket doesn't exists
         except KeyError:
-            self._log.warning("Trying to get an unknown event request (ticket_id=%s)" % ticket_id)
+            self._log.warning("Trying to get an unknown event request (ticket_id=%s). Maybe your ticket expires ?" % ticket_id)
             return False
         return elt_data
 
