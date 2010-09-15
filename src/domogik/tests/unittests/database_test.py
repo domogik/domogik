@@ -37,11 +37,7 @@ import time
 import datetime
 
 from domogik.common.database import DbHelper, DbHelperException
-from domogik.common.sql_schema import (
-    Area, Device, DeviceFeatureModel, DeviceUsage, DeviceConfig, DeviceStats,
-    DeviceFeatureAssociation, DeviceTechnology, PluginConfig,
-    DeviceType, UIItemConfig, Room, UserAccount, SystemConfig, Trigger, Person
-)
+from domogik.common.sql_schema import DeviceStats
 
 
 def make_ts(year, month, day, hours=0, minutes=0, seconds=0):
