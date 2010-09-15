@@ -18,6 +18,7 @@ ul#result li {
 	color:#cccccc;
 	padding:5px 2em 0 2em;
 	font-family:Consolas,"Lucida Console",monospace,Verdana,sans-serif,"sans serif";
+    font-size:1.2em;
 	white-space: pre;
 }
 
