@@ -781,7 +781,7 @@ class DbHelper():
                                     % (af_value_type, ACTUATOR_VALUE_TYPE_LIST))
         if self.__session.query(DeviceType).filter_by(id=af_device_type_id).first() is None:
             raise DbHelperException("Can't add actuator feature : device type id '%s' doesn't exist"
-                                    % dtf_device_type_id)
+                                    % af_device_type_id)
         device_feature_m = DeviceFeatureModel(name=af_name, feature_type=u'actuator',
                                               device_type_id=af_device_type_id, value_type=af_value_type,
                                               return_confirmation=af_return_confirmation,
@@ -916,7 +916,7 @@ class DbHelper():
             raise DbHelperException("Value type (%s) is not in the allowed item list : %s"
                                     % (sf_value_type, SENSOR_VALUE_TYPE_LIST))
         if self.__session.query(DeviceType).filter_by(id=sf_device_type_id).first() is None:
-            raise DbHelperException("Can't add sensor : device type id '%s' doesn't exist" % dtf_device_type_id)
+            raise DbHelperException("Can't add sensor : device type id '%s' doesn't exist" % sf_device_type_id)
         device_feature_m = DeviceFeatureModel(name=ucode(sf_name), feature_type=u'sensor',
                                               device_type_id=sf_device_type_id, value_type=ucode(sf_value_type),
                                               parameters=ucode(sf_parameters), stat_key=ucode(sf_stat_key))
@@ -948,7 +948,7 @@ class DbHelper():
                                 ).filter_by(feature_type=u'sensor'
                                 ).first()
         if device_feature_m is None:
-            raise DbHelperException("DeviceFeatureModel with id %s couldn't be found - can't update it" % dtf_id)
+            raise DbHelperException("DeviceFeatureModel with id %s couldn't be found - can't update it" % sf_id)
         if sf_name is not None:
             device_feature_m.name = ucode(sf_name)
         if sf_parameters is not None:
@@ -985,7 +985,7 @@ class DbHelper():
                     ).filter_by(feature_type=u'sensor'
                     ).first()
         if not dfm:
-            raise DbHelperException("Can't delete device feature model %s (actuator) : it doesn't exist" % afm_id)
+            raise DbHelperException("Can't delete device feature model %s (actuator) : it doesn't exist" % sfm_id)
         df_list = self.__session.query(
                             DeviceFeature
                         ).filter_by(device_feature_model_id=dfm.id
