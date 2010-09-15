@@ -53,15 +53,12 @@
                         });
                         
                         // Events {{rest.event.Number_of_requests}} / {{rest.event.Max_size_for_request_queues}}
-                        var valuewidth = data.rest[0].event.Number_of_requests * 100 / data.rest[0].event.Max_size_for_request_queues;
-                        $("#request_number .valuetxt")
-                            .text(data.rest[0].event.Number_of_requests + '/' + data.rest[0].event.Max_size_for_request_queues);
-                        $("#request_number .valuegraph")
-                            .width(valuewidth);
+                        $("#request_number").empty();
+                        $("#request_number").append("<li><span class='label'>Number of requests: </span>" + data.rest[0].event.Number_of_requests + "</li>")
+                        $("#request_number").append("<li><span class='label'>Max size for request queues: </span>" + data.rest[0].event.Max_size_for_request_queues + "</li>")
                         
                         // Request list
                         $('table#request_list tbody').empty();
-                        console.log(data.rest[0].event.Requests);
                         $.each(data.rest[0].event.Requests, function(index, request) {
                             $('table#request_list tbody').append("<tr><td>"
                                 + index + "</td><td>"
@@ -122,7 +119,8 @@
     <section class="subsection">
         <h2>{% trans "Events status" %}</h2>
         <h3>{% trans "Requests" %}</h3>
-        <div id='request_number' class='indicator'><div class='valuegraph'></div><div class='valuetxtframe'><div class='valuetxt'></div></div></div>
+        <ul id='request_number'></ul>
+        <br />
         <table id='request_list'>
             <thead>
                 <tr>
