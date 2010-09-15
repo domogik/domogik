@@ -1,10 +1,10 @@
 
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-""" This file is part of B{Domogik} project (U{http://www.domogik.org}). 
+""" This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
-License 
-======= 
+License
+=======
 
 B{Domogik} is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -25,28 +25,28 @@ Plugin purpose
 Get informations about plcbus
 
 @author: Capof <capof@wanadoo.fr> and Sp4rKy help
-@copyright:(C) 2007-2009 Domogik project 
-@license: GPL(v3) 
-@organization: Domogik 
+@copyright:(C) 2007-2009 Domogik project
+@license: GPL(v3)
+@organization: Domogik
 """
 from threading import Event
 import traceback
 import time
 
 from domogik.xpl.common.helper import Helper
-from domogik.xpl.common.helper import HelperError 
-from domogik.common import logger 
-from domogik.xpl.lib.plcbus import PLCBUSException 
-from domogik.xpl.lib.plcbus import PLCBUSAPI 
+from domogik.xpl.common.helper import HelperError
+from domogik.common import logger
+from domogik.xpl.lib.plcbus import PLCBUSException
+from domogik.xpl.lib.plcbus import PLCBUSAPI
 from domogik.xpl.lib.PLCBusSerialHandler import serialHandler
 
 
-ACCESS_ERROR = "Access to PLCBUS device is not possible. Does your user have the good permissions ? " 
+ACCESS_ERROR = "Access to PLCBUS device is not possible. Does your user have the good permissions ? "
 
 class plcbus(Helper):
     def __init__(self):
         self._event = Event()
-        self.liste_trouve = []
+        self.liste_found = []
         self.commands = \
             { "all" :
                 {
@@ -66,10 +66,10 @@ class plcbus(Helper):
         self.api1.send("GET_ALL_ID_PULSE", args[0] , self._usercode )
         time.sleep(1)
         self.api1.send("GET_ALL_ON_ID_PULSE", args[0] , self._usercode )
-        
+
         self._event.wait()
         self._event.clear()
-        return self.liste_trouve
+        return self.liste_found
 
     def _command_cb(self, f):
         print "command : %s" % f["d_command"]
@@ -81,7 +81,7 @@ class plcbus(Helper):
                 unit = data >> i & 1
                 code = "%s%s" % (house, i+1)
                 if unit == 1 :
-                    self.liste_trouve.append("%s" % (code))
+                    self.liste_found.append("%s" % (code))
 
         if f["d_command"] == "GET_ALL_ON_ID_PULSE":
             data = int("%s%s" % (f["d_data1"], f["d_data2"]))
@@ -89,20 +89,18 @@ class plcbus(Helper):
             for i in range(0,16):
                 unit = data >> i & 1
                 code = "%s%s" % (house, i+1)
-                if code in self.liste_trouve:
-                    j = self.liste_trouve.index(code)
-                    #self.liste_trouve.append("%s%s" % (j," index"))
+                if code in self.liste_found:
+                    j = self.liste_found.index(code)
+                    #self.liste_found.append("%s%s" % (j," index"))
                     if unit == 1:
-                        #self.liste_trouve.append("%s%s" % (code," ONNNNNN"))
-                        self.liste_trouve[j] = ("%s%s" % (self.liste_trouve[j]," ON"))
+                        #self.liste_found.append("%s%s" % (code," ONNNNNN"))
+                        self.liste_found[j] = ("%s%s" % (self.liste_found[j]," ON"))
                     else:
-                        #self.liste_trouve.append("%s%s" % (code," OFFFFFF"))
-                        self.liste_trouve[j] = ("%s%s" % (self.liste_trouve[j]," OFF"))
+                        #self.liste_found.append("%s%s" % (code," OFFFFFF"))
+                        self.liste_found[j] = ("%s%s" % (self.liste_found[j]," OFF"))
                 self._event.set()
 
     def _message_cb(self, message):
         print "Message : %s " % message
 
 MY_CLASS = {"cb" : plcbus}
-
-
