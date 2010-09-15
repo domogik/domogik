@@ -82,7 +82,7 @@
                 {% if not is_user_connected %}
                     <a href="{% url login_view %}">{% trans "Log in" %}<span class='description'>{% trans "Identify yourself" %}</span></a>
                 {% else %}
-                    <a href="{% url logout_view %}">{% trans "Log out" %}<span class='description'>{% trans "Deconnect" %} {{ request.session.user.first_name }}</span></a>
+                    <a href="{% url logout_view %}">{% trans "Log out" %}<span class='description'>{% trans "Disconnect" %} {{ request.session.user.first_name }}</span></a>
                 {% endif %}
             </li>
         </ul>
