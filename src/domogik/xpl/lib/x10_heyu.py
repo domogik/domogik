@@ -311,7 +311,7 @@ class X10Monitor:
     """
 
     def __init__(self, heyuconf):
-        res = Popen(["heyu","-c",heyuconf,"monitor"], stdout=PIPE)
+        res = Popen(["heyu", "-c", heyuconf, "monitor"], stdout=PIPE)
         self._reader = self.__x10MonitorThread(res)
 
     def get_monitor(self):
@@ -383,7 +383,6 @@ class X10Monitor:
             except ValueError:
                 #The pipe is closed
                 self._log.warning("The heyu-monitor pipe is closed. Finish silently.")
-                pass
 
         def _call_cbs(self, units, order, arg):
             """
@@ -400,16 +399,16 @@ class HeyuManager:
     """
 
     ITEMS_SECTION = OrderedDict()
-    ITEMS_SECTION['general'] = ['TTY','TTY_AUX','LOG_DIR', 'HOUSECODE', 'REPORT_PATH',
-                                'DEFAULT_MODULE','START_ENGINE','DATE_FORMAT','LOGDATE_YEAR','TAILPATH',
-                                'HEYU_UMASK', 'STATUS_TIMEOUT', 'SPF_TIMEOUT','TRANS_DIMLEVEL']
+    ITEMS_SECTION['general'] = ['TTY', 'TTY_AUX', 'LOG_DIR', 'HOUSECODE', 'REPORT_PATH',
+                                'DEFAULT_MODULE', 'START_ENGINE', 'DATE_FORMAT', 'LOGDATE_YEAR', 'TAILPATH',
+                                'HEYU_UMASK', 'STATUS_TIMEOUT', 'SPF_TIMEOUT', 'TRANS_DIMLEVEL']
     ITEMS_SECTION['aliases'] = ['ALIAS']
     ITEMS_SECTION['scenes'] = ['SCENE', 'USERSYN', 'MAX_PPARMS']
-    ITEMS_SECTION['scripts'] = ['SCRIPT','SCRIPT_MODE', 'SCRIPT_CTRL']
-    ITEMS_SECTION['scheduler'] = ['SCHEDULE_FILE','MODE','PROGRAM_DAYS','COMBINE_EVENTS',
-                                  'COMPRESS_MACROS','REPL_DELAYED_MACROS', 'WRITE_CHECK_FILES']
-    ITEMS_SECTION['dawnduk'] = ['LONGITUDE','LATITUDE','DAWN_OPTION','DUSK_OPTION',
-                                'MIN_DAWN','MAX_DAWN','MIN_DUSK','MAX_DUSK']
+    ITEMS_SECTION['scripts'] = ['SCRIPT', 'SCRIPT_MODE', 'SCRIPT_CTRL']
+    ITEMS_SECTION['scheduler'] = ['SCHEDULE_FILE', 'MODE', 'PROGRAM_DAYS', 'COMBINE_EVENTS',
+                                  'COMPRESS_MACROS', 'REPL_DELAYED_MACROS', 'WRITE_CHECK_FILES']
+    ITEMS_SECTION['dawnduk'] = ['LONGITUDE', 'LATITUDE', 'DAWN_OPTION', 'DUSK_OPTION',
+                                'MIN_DAWN', 'MAX_DAWN', 'MIN_DUSK', 'MAX_DUSK']
 
     def __init__(self, path):
         """
