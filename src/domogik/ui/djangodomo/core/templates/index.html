@@ -80,6 +80,7 @@
     </div>
     <div class="columnright">
     <ul class='areaslist'>
+		{% if rooms_list %}
 		<li class='areaitem'>
 			<ul class='houselist'>
 				{% for room in rooms_list %}
@@ -91,6 +92,7 @@
 				{% endfor %}
 			</ul>
 		</li>
+	    {% endif %}
     {% for area in areas_list %}
 		<li class='areaitem'>
 			<a href='{% url show_area_view area.id %}' class="identelement icon64-area-{{ area.config.icon }}">
