@@ -102,6 +102,7 @@ class DbHelperException(Exception):
         @param value : value of the exception
 
         """
+        Exception.__init__(self, value)
         self.value = value
 
     def __str__(self):
