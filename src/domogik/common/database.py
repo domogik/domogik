@@ -1545,6 +1545,12 @@ class DbHelper():
         return device
 
     def del_device(self, d_id):
+        """Delete a device
+
+        @param d_id : device id
+        @return the deleted device
+
+        """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
         device = self.__session.query(Device).filter_by(id=d_id).first()
