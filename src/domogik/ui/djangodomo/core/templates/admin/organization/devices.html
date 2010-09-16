@@ -57,8 +57,8 @@
             fields: [
                 {name : 'adddevicename', type:'text', label:'Name', required: true, option: {min: 1, max: 80}},
                 {name : 'adddeviceaddress', type:'text', label:'Address', required: true, option: {min: 1, max: 80}},
-                {name : 'adddevicetype', type:'selectipod', label:'Type', required: true, option: {
-                    initial: {value:'0', label:'Choose a device type', icone:''},
+                {name : 'adddevicetype', type:'selectipod', label:'Feature', required: true, option: {
+                    initial: {value:'0', label:'Choose a device feature', icone:''},
                     options: [
                         {% regroup types_list|dictsort:"device_technology_id" by device_technology as technologies_list %}
                         {% for technology in technologies_list %}
