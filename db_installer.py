@@ -47,20 +47,23 @@ from domogik.common.configloader import Loader
 # Installer
 ###
 
-def install(only_unit_tests=False):
+def install(create_prod_db, create_test_db):
     db = database.DbHelper()
     print "Using database", db.get_db_type()
     url = db.get_url_connection_string()
 
     # For unit tests
-    test_url = '%s_test' % url
-    engine_test = create_engine(test_url)
-    sql_schema.metadata.create_all(engine_test)
+    if create_test_db:
+        print "Creating test database..."
+        test_url = '%s_test' % url
+        engine_test = create_engine(test_url)
+        sql_schema.metadata.create_all(engine_test)
 
-    if only_unit_tests:
+    if not create_prod_db:
         return
 
     # Production database
+    print "Creating production database..."
     engine = create_engine(url)
     sql_schema.metadata.create_all(engine)
 
@@ -220,13 +223,15 @@ def install(only_unit_tests=False):
                     du_default_options='{&quot;actuator&quot;: { &quot;binary&quot;: {}, &quot;range&quot;: {}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} }}')
 
 def usage():
-    print "Usage : db_installer [-t, --test]"
-    print "When using -t or --test only the database for unit tests is created"
+    print "Usage : db_installer [-t, --test] [-P, --no-prod]"
+    print "-t or --test : database for unit tests will created (default is False)"
+    print "-P or --no-prod : no production database will be created (default is True)"
 
 if __name__ == "__main__":
-    utests = False
+    create_prod_db = True
+    create_test_db = False
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "ht", ["help", "test"])
+        opts, args = getopt.getopt(sys.argv[1:], "hPt", ["help", "no-prod", "test"])
     except getopt.GetoptError:
         usage()
         sys.exit(2)
@@ -234,11 +239,12 @@ if __name__ == "__main__":
         if opt in ('-h', '--help'):
             usage()
             sys.exit()
+        elif opt in ('-P', '--no-prod'):
+            create_prod_db = False
         elif opt in ('-t', '--test'):
-            utests = True
-    if utests:
-        print "Creating database for unit tests"
-        install(True)
-    else:
-        print "Creating unit tests and production databases"
-        install(False)
+            create_test_db = True
+    if not create_test_db and not create_prod_db:
+        print "You must create either a production database or a test database"
+        usage()
+        sys.exit(2)
+    install(create_prod_db, create_test_db)
