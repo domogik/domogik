@@ -1900,7 +1900,7 @@ target=*
         """
         try:
             data = self.parameters[name]
-            if data == None:
+            if data == None or data == "None":
                 return None
             elif data == "True":
                 return True
@@ -3922,9 +3922,9 @@ class JSonHelper():
                 data_tmp = '"%s" : "%s",' % (sub_data_key, sub_data)
         elif sub_data_type in none_type:
             if sub_data_key == "NOKEY":
-                data_tmp = '"None",'
+                data_tmp = '"",'
             else:
-                data_tmp = '"%s" : "None",' % (sub_data_key)
+                data_tmp = '"%s" : "",' % (sub_data_key)
         else: 
             data_tmp = ""
         
