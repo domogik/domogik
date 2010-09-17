@@ -74,11 +74,12 @@ $.extend({
         $.each(parameters, function(){
             url += encodeURIComponent(this) + '/';     
         });
-        $.ajax({
+        $.jsonp({
             cache: false,
             type: "GET",
             url: url,
             dataType: "jsonp",
+            callbackParameter: "callback",
             success:
                 callback,
             error:

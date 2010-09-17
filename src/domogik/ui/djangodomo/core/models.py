@@ -265,10 +265,11 @@ class UIConfigs(pipes.DmgPipe):
         uiconfigs = UIConfigs.objects.get({'parameters':"list/by-key/" + name + "/" + key})
         if uiconfigs :
             for uiconfig in uiconfigs.ui_config:
-                if (uiconfig.value[0] == '{') : # json structure 
-                    resp[uiconfig.key] = simplejson.loads(unescape(uiconfig.value))
-                else :
-                    resp[uiconfig.key] = uiconfig.value
+                if (uiconfig.value != "") :
+                    if (uiconfig.value[0] == '{') : # json structure 
+                        resp[uiconfig.key] = simplejson.loads(unescape(uiconfig.value))
+                    else :
+                        resp[uiconfig.key] = uiconfig.value
             return resp
 
     @staticmethod
@@ -277,10 +278,11 @@ class UIConfigs(pipes.DmgPipe):
         uiconfigs = UIConfigs.objects.get({'parameters':"list/by-reference/" + name + "/" + str(reference)})
         if uiconfigs :
             for uiconfig in uiconfigs.ui_config:
-                if (uiconfig.value[0] == '{') : # json structure 
-                    resp[uiconfig.key] = simplejson.loads(unescape(uiconfig.value))
-                else :
-                    resp[uiconfig.key] = uiconfig.value
+                if (uiconfig.value != "") :
+                    if (uiconfig.value[0] == '{') : # json structure 
+                        resp[uiconfig.key] = simplejson.loads(unescape(uiconfig.value))
+                    else :
+                        resp[uiconfig.key] = uiconfig.value
             return resp
     
 class Plugins(pipes.DmgPipe):
