@@ -87,7 +87,7 @@ class Areas(pipes.DmgPipe):
             area.config = UIConfigs.get_by_reference('area', area.id)
 
             # If has rooms
-            if hasattr(area, 'room') and (area.room != 'None'):
+            if hasattr(area, 'room') and (area.room):
                 for room in area.room:
                     room.config = UIConfigs.get_by_reference('room', room.id)
 
@@ -123,7 +123,7 @@ class Rooms(pipes.DmgPipe):
             room.config = UIConfigs.get_by_reference('room', room.id)
 
             # If is associated with area
-            if hasattr(room, 'area') and (room.area != 'None') :
+            if hasattr(room, 'area') and (room.area) :
                 room.area.config = UIConfigs.get_by_reference('area', room.area.id)
 
 class Devices(pipes.DmgPipe):
@@ -138,7 +138,7 @@ class Devices(pipes.DmgPipe):
     def merge_uiconfig(self):
         for device in self.device:
             # If is associated with room
-            if hasattr(device, 'room') and (device.room != 'None') :
+            if hasattr(device, 'room') and (device.room) :
                 device.room.config = UIConfigs.get_by_reference('room', device.room.id)
 
     def merge_features(self):
@@ -265,7 +265,7 @@ class UIConfigs(pipes.DmgPipe):
         uiconfigs = UIConfigs.objects.get({'parameters':"list/by-key/" + name + "/" + key})
         if uiconfigs :
             for uiconfig in uiconfigs.ui_config:
-                if (uiconfig.value != "") :
+                if (uiconfig.value) :
                     if (uiconfig.value[0] == '{') : # json structure 
                         resp[uiconfig.key] = simplejson.loads(unescape(uiconfig.value))
                     else :
@@ -278,7 +278,7 @@ class UIConfigs(pipes.DmgPipe):
         uiconfigs = UIConfigs.objects.get({'parameters':"list/by-reference/" + name + "/" + str(reference)})
         if uiconfigs :
             for uiconfig in uiconfigs.ui_config:
-                if (uiconfig.value != "") :
+                if (uiconfig.value) :
                     if (uiconfig.value[0] == '{') : # json structure 
                         resp[uiconfig.key] = simplejson.loads(unescape(uiconfig.value))
                     else :
