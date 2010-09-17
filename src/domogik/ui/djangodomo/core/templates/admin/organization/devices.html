@@ -225,7 +225,7 @@
                             
                             /* Add a function to create a device */
                             $('#upddevicedialog').dialog_form('updbutton', {
-                                title: "{% trans "Add new device" %}",
+                                title: "{% trans 'Update new device' %}",
                                 button: "#update{{ device.id }}",
                                 values: {upddevicename : '{{ device.name }}', upddevicedescription : '{{ device.description }}', upddeviceaddress : '{{ device.address }}', upddevicereference : '{{ device.reference }}', upddeviceusage : '{{ device.device_usage_id }}'},
                                 onok: function(values) {
