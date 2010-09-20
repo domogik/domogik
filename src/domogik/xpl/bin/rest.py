@@ -3782,7 +3782,6 @@ class JSonHelper():
         # get data type
         data_type = type(data).__name__
         #print "TYPE=%s" % data_type
-        print ("%s process DATA=%s" % (datetime.datetime.now(), data))
         #print data
 
         ### type instance (sql object)
@@ -3811,21 +3810,19 @@ class JSonHelper():
 
         ### type : SQL table
         elif data_type in db_type: 
-            print "DT=%s, i=%s" % (data_type, idx)
-            if not (data_type == "DeviceStats" and idx > 0):
-                data_json += "{" 
-                for key in data.__dict__: 
-                    sub_data_key = key 
-                    sub_data = data.__dict__[key] 
-                    sub_data_type = type(sub_data).__name__ 
-                    #print "    DATA KEY : " + str(sub_data_key) 
-                    #print "    DATA : " + unicode(sub_data) 
-                    #print "    DATA TYPE : " + str(sub_data_type) 
-                    buffer = self._process_sub_data(idx + 1, False, sub_data_key, sub_data, sub_data_type, db_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type) 
-                    # if max depth in recursivity, we don't display "foo : {}"
-                    if re.match(".*#MAX_DEPTH#.*", buffer) is None:
-                        data_json += buffer
-                data_json = data_json[0:len(data_json)-1] + "}," 
+            data_json += "{" 
+            for key in data.__dict__: 
+                sub_data_key = key 
+                sub_data = data.__dict__[key] 
+                sub_data_type = type(sub_data).__name__ 
+                #print "    DATA KEY : " + str(sub_data_key) 
+                #print "    DATA : " + unicode(sub_data) 
+                #print "    DATA TYPE : " + str(sub_data_type) 
+                buffer = self._process_sub_data(idx + 1, False, sub_data_key, sub_data, sub_data_type, db_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type) 
+                # if max depth in recursivity, we don't display "foo : {}"
+                if re.match(".*#MAX_DEPTH#.*", buffer) is None:
+                    data_json += buffer
+            data_json = data_json[0:len(data_json)-1] + "}," 
 
         ### type : tuple
         elif data_type in tuple_type:
@@ -3902,7 +3899,8 @@ class JSonHelper():
 
 
     def _process_sub_data(self, idx, is_table, sub_data_key, sub_data, sub_data_type, db_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type):
-        print ("%s psub rocess K=%s, D=%s" % (datetime.datetime.now(), sub_data_key, sub_data))
+        if (idx != 0 and sub_data_key == "device_stats"):
+            return "#MAX_DEPTH# "
         if sub_data_key[0] == "_":
             return ""
         data_tmp = ""
