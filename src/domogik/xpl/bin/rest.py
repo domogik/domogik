@@ -2443,6 +2443,7 @@ target=*
         self._log.debug("!!2")
         for device in self._db.list_devices():
             self._log.debug("!!3(for before)")
+            self._log.debug("device=%s" % device)
             json_data.add_data(device)
             self._log.debug("!!3(for after)")
         self._log.debug("!!4")
