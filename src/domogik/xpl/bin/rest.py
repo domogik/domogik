@@ -3811,19 +3811,20 @@ class JSonHelper():
 
         ### type : SQL table
         elif data_type in db_type: 
-            data_json += "{" 
-            for key in data.__dict__: 
-                sub_data_key = key 
-                sub_data = data.__dict__[key] 
-                sub_data_type = type(sub_data).__name__ 
-                #print "    DATA KEY : " + str(sub_data_key) 
-                #print "    DATA : " + unicode(sub_data) 
-                #print "    DATA TYPE : " + str(sub_data_type) 
-                buffer = self._process_sub_data(idx + 1, False, sub_data_key, sub_data, sub_data_type, db_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type) 
-                # if max depth in recursivity, we don't display "foo : {}"
-                if re.match(".*#MAX_DEPTH#.*", buffer) is None:
-                    data_json += buffer
-            data_json = data_json[0:len(data_json)-1] + "}," 
+            if not (data_type == "DeviceStats" and idx > 0):
+                data_json += "{" 
+                for key in data.__dict__: 
+                    sub_data_key = key 
+                    sub_data = data.__dict__[key] 
+                    sub_data_type = type(sub_data).__name__ 
+                    #print "    DATA KEY : " + str(sub_data_key) 
+                    #print "    DATA : " + unicode(sub_data) 
+                    #print "    DATA TYPE : " + str(sub_data_type) 
+                    buffer = self._process_sub_data(idx + 1, False, sub_data_key, sub_data, sub_data_type, db_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type) 
+                    # if max depth in recursivity, we don't display "foo : {}"
+                    if re.match(".*#MAX_DEPTH#.*", buffer) is None:
+                        data_json += buffer
+                data_json = data_json[0:len(data_json)-1] + "}," 
 
         ### type : tuple
         elif data_type in tuple_type:
