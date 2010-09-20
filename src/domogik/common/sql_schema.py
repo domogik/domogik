@@ -288,7 +288,7 @@ class Device(Base):
     device_usage = relation(DeviceUsage)
     device_type_id = Column(Integer, ForeignKey('%s.id' % DeviceType.get_tablename()), nullable=False)
     device_type = relation(DeviceType)
-    device_stats = relation("DeviceStats", order_by="DeviceStats.date.desc()", backref=__tablename__)
+    #device_stats = relation("DeviceStats", order_by="DeviceStats.date.desc()", backref=__tablename__)
 
     def __init__(self, name, address, reference, device_usage_id, device_type_id, description=None):
         """Class constructor
