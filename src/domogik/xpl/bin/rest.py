@@ -4186,14 +4186,14 @@ class StatsManager(XplPlugin):
                 # first : get value and default key
                 key = map["name"]
                 try:
-                    value = message.data[map["name"]]
+                    value = message.data[map["name"]].lower()
                     if map["filter_key"] == None:
                         key = map["name"]
                         device_data.append({"key" : key, "value" : value})
                         db.add_device_stat(current_date, key, value, d_id)
                     else:
                         if map["filter_value"] != None and \
-                           map["filter_value"] == message.data[map["filter_key"]]:
+                           map["filter_value"].lower() == message.data[map["filter_key"]].lower():
                             key = map["new_name"]
                             device_data.append({"key" : key, "value" : value})
                             db.add_device_stat(current_date, key, value, d_id)
