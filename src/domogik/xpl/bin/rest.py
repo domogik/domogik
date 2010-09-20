@@ -3811,6 +3811,7 @@ class JSonHelper():
 
         ### type : SQL table
         elif data_type in db_type: 
+            print "DT=%s, i=%s" % (data_type, idx)
             if not (data_type == "DeviceStats" and idx > 0):
                 data_json += "{" 
                 for key in data.__dict__: 
