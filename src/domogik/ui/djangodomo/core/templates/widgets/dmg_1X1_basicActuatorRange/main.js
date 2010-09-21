@@ -69,14 +69,14 @@
 
         _statsHandler: function(stats) {
             if (stats && stats.length > 0) {
-                this.setValue(stats[0].value);
+                this.setValue(parseInt(stats[0].value));
             } else {
                 this.setValue(null);
             }
         },
         
         _eventHandler: function(date, value) {
-            this.setValue(value);
+            this.setValue(parseInt(value));
         },
 
         action: function() {
@@ -257,7 +257,7 @@
             var self = this, o = this.options;
             this.element.stopProcessingState();
             if (confirmed) {
-                this._displayStatusOk();
+                this.element.displayStatusOk();
                 this.element.doTimeout( 'resetStatus', state_reset_status, function(){
                     self._status.displayResetStatus();
                 });
