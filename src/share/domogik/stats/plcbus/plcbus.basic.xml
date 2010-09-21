@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>  
+<?xml version="1.0" encoding="UTF-8"?>
 <statistic technology="plcbus">
     <schema name="plcbus.basic">
         <xpltype type="xpl-trig">
@@ -8,31 +8,9 @@
             <mapping>
                 <device field="device"/>
                 <value field="command"/>
-                <value field="level" />
+                <value field="data1" new_name="level" filter_key="command" filter_value="preset_dim"/>
             </mapping>
         </xpltype>
-	<xpltype type="xpl-stat">
-            <listener>
-                <filter/>
-            </listener>
-            <mapping>
-                <device field="device"/>
-                <value field="command"/>
-                <value field="level" />
-            </mapping>
-        </xpltype>
-
-	<xpltype type="xpl-trig">
-            <listener>
-                <filter/>
-            </listener>
-            <mapping>
-                <device field="device"/>
-                <value field="command"/>
-                <value field="level" />
-            </mapping>
-        </xpltype>
-
         <xpltype type="xpl-stat">
             <listener>
                 <filter/>
@@ -45,5 +23,3 @@
         </xpltype>
     </schema>
 </statistic>
-
-
