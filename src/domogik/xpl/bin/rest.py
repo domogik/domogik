@@ -397,18 +397,19 @@ class Rest(XplPlugin):
                 if filter_schema.lower() == message.schema.lower():
                     print "Filter on schema %s vs %s ok" % (filter_schema, message.schema)
                     # data
-                    for key in filter:
-                        # take care of final "%" in order to search data starting by filter[key]
-                        if filter[key][-1] == "%":
-                            msg_data = str(message.data[key])
-                            filter_data = str(filter[key])
-                            len_data = len(filter_data) - 1
-                            if msg_data[0:len_data] != filter_data[0:-1]:
-                                keep_data = False
-                        # normal search
-                        else:
-                            if message.data[key].lower() != filter[key].lower():
-                                keep_data = False
+                    if filter != None:
+                        for key in filter:
+                            # take care of final "%" in order to search data starting by filter[key]
+                            if filter[key][-1] == "%":
+                                msg_data = str(message.data[key])
+                                filter_data = str(filter[key])
+                                len_data = len(filter_data) - 1
+                                if msg_data[0:len_data] != filter_data[0:-1]:
+                                    keep_data = False
+                            # normal search
+                            else:
+                                if message.data[key].lower() != filter[key].lower():
+                                    keep_data = False
     
                 # if message is ok for us, return it
                 if keep_data == True:
