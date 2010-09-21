@@ -70,14 +70,14 @@ const auto_send = 3000; // 3 seconds
 
         _statsHandler: function(stats) {
             if (stats && stats.length > 0) {
-                this.setValue(stats[0].value);
+                this.setValue(parseInt(stats[0].value));
             } else {
                 this.setValue(null);
             }
         },
         
         _eventHandler: function(date, value) {
-            this.setValue(value);
+            this.setValue(parseInt(value));
         },
 
         setValue: function(value) {
@@ -130,6 +130,7 @@ const auto_send = 3000; // 3 seconds
 		minus_range: function() {
             var self = this, o = this.options;
 			var value = ((this._processingValue - this.step) / this.step) * this.step;
+            console.log(value);
 			this._setProcessingValue(value);
             this._resetAutoSend();
 		},
