@@ -337,7 +337,7 @@ class Rest(XplPlugin):
     def _add_to_queue_command(self, message):
         self._put_in_queue(self._queue_command, message)
 
-    def _get_from_queue(self, my_queue, filter = None, nb_rec = 0):
+    def _get_from_queue(self, my_queue, filter_schema = None, filter = None, nb_rec = 0):
         """ Encapsulation for _get_from_queue_in
             If timeout not elapsed and _get_from_queue didn't find a valid data
             call again _get_from_queue until timeout
@@ -348,7 +348,7 @@ class Rest(XplPlugin):
         ok = False
         while time.time() - start_time < self._queue_timeout:
             try:
-                return self._get_from_queue_without_waiting(my_queue, filter, nb_rec)
+                return self._get_from_queue_without_waiting(my_queue, filter_schema, filter, nb_rec)
             except Empty:
                 # no data in queue for us.... let's continue until time elapsed
                 # in order not rest not working so much, let it make a pause
@@ -358,7 +358,7 @@ class Rest(XplPlugin):
 
 
 
-    def _get_from_queue_without_waiting(self, my_queue, filter = None, nb_rec = 0):
+    def _get_from_queue_without_waiting(self, my_queue, filter_schema = None, filter = None, nb_rec = 0):
         """ Get an item from queue (recursive function)
             Checks are made on : 
             - life expectancy of message
@@ -366,12 +366,13 @@ class Rest(XplPlugin):
             - size of queue
             If necessary, each item of queue is read.
             @param my_queue : queue to get data from
+            @param filter_schema : filter on a specific schema
             @param filter : dictionnay of filters. Examples :
                 - {"command" : "start", ...}
                 - {"plugin" : "wol%", ...} : here "%" indicate that we search for something starting with "wol"
             @param nb_rec : internal parameter (do not use it for first call). Used to check recursivity VS queue size
         """
-        print "FILTER=%s" % filter
+        print "FILTER=%s/%s" % (filter_schema, filter)
         self._log_queue.debug("Get from queue : %s (recursivity deepth : %s)" % (str(my_queue), nb_rec))
         # check if recursivity doesn't exceed queue size
         if nb_rec > my_queue.qsize():
@@ -385,26 +386,30 @@ class Rest(XplPlugin):
         # if message not too old, we process it
         if time.time() - msg_time < self._queue_life_expectancy:
             # no filter defined
-            if filter == None: 
+            if filter_schema == None and filter == None: 
                 self._log_queue.debug("Get from queue %s : return %s" % (str(my_queue), str(message)))
                 return message
 
             # we want to filter data
             else:
                 keep_data = True
-                for key in filter:
-                    # take care of final "%" in order to search data starting by filter[key]
-                    if filter[key][-1] == "%":
-                        msg_data = str(message.data[key])
-                        filter_data = str(filter[key])
-                        len_data = len(filter_data) - 1
-                        if msg_data[0:len_data] != filter_data[0:-1]:
-                            keep_data = False
-                    # normal search
-                    else:
-                        if message.data[key].lower() != filter[key].lower():
-                            keep_data = False
-
+                # schema
+                if filter_schema.lower() == message.schema.lower():
+                    print "Filter on schema %s vs %s ok" % (filter_schema, message.schema)
+                    # data
+                    for key in filter:
+                        # take care of final "%" in order to search data starting by filter[key]
+                        if filter[key][-1] == "%":
+                            msg_data = str(message.data[key])
+                            filter_data = str(filter[key])
+                            len_data = len(filter_data) - 1
+                            if msg_data[0:len_data] != filter_data[0:-1]:
+                                keep_data = False
+                        # normal search
+                        else:
+                            if message.data[key].lower() != filter[key].lower():
+                                keep_data = False
+    
                 # if message is ok for us, return it
                 if keep_data == True:
                     self._log_queue.debug("Get from queue %s : return %s" % (str(my_queue), str(message)))
@@ -414,12 +419,12 @@ class Rest(XplPlugin):
                 else:
                     self._log_queue.debug("Get from queue %s : bad data, check another one..." % (str(my_queue)))
                     self._put_in_queue(my_queue, message)
-                    return self._get_from_queue_without_waiting(my_queue, filter, nb_rec + 1)
+                    return self._get_from_queue_without_waiting(my_queue, filter_schema, filter, nb_rec + 1)
 
         # if message too old : get an other message
         else:
             self._log_queue.debug("Get from queue %s : data too old, check another one..." % (str(my_queue)))
-            return self._get_from_queue_without_waiting(my_queue, filter, nb_rec + 1)
+            return self._get_from_queue_without_waiting(my_queue, filter_schema, filter, nb_rec + 1)
 
     def _put_in_queue(self, my_queue, message):
         self._log_queue.debug("Put in queue %s : %s" % (str(my_queue), str(message)))
@@ -1012,7 +1017,7 @@ class ProcessRequest():
         # get xpl message from queue
         try:
             self._log.debug("Command : wait for answer...")
-            msg_cmd = self._get_from_queue(self._queue_command, filters)
+            msg_cmd = self._get_from_queue(self._queue_command, schema, filters)
         except Empty:
             self._log.debug("Command (%s, %s, %s, %s) : no answer" % (techno, address, command, params))
             json_data = JSonHelper("ERROR", 999, "No data or timeout on getting command response")
@@ -2776,7 +2781,7 @@ target=*
         # get xpl message from queue
         try:
             self._log.debug("Plugin : wait for answer...")
-            message = self._get_from_queue(self._queue_system_list)
+            message = self._get_from_queue(self._queue_system_list, "domogik.system")
         except Empty:
             self._log.debug("Plugin : no answer")
             json_data = JSonHelper("ERROR", 999, "No data or timeout on getting plugin list")
@@ -2834,7 +2839,7 @@ target=*
         try:
             self._log.debug("Plugin : wait for answer...")
             # in filter, "%" means, that we check for something starting with name
-            message = self._get_from_queue(self._queue_system_detail, filter = {"command" : "detail", "plugin" : name + "%"})
+            message = self._get_from_queue(self._queue_system_detail, "domogik.system", filter = {"command" : "detail", "plugin" : name + "%"})
         except Empty:
             json_data = JSonHelper("ERROR", 999, "No data or timeout on getting plugin detail for %s" % name)
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
@@ -2907,9 +2912,9 @@ target=*
         try:
             self._log.debug("Plugin : wait for answer...")
             if command == "start":
-                message = self._get_from_queue(self._queue_system_start, filter = {"command" : "start", "plugin" : plugin})
+                message = self._get_from_queue(self._queue_system_start, "domogik.system", filter = {"command" : "start", "plugin" : plugin})
             elif command == "stop":
-                message = self._get_from_queue(self._queue_system_stop, filter= {"command" : "stop", "plugin" : plugin})
+                message = self._get_from_queue(self._queue_system_stop, "domogik.system", filter= {"command" : "stop", "plugin" : plugin})
         except Empty:
             json_data = JSonHelper("ERROR", 999, "No data or timeout on %s plugin %s" % (command, plugin))
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
