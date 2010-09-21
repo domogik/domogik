@@ -4143,6 +4143,7 @@ class StatsManager(XplPlugin):
             params = {'schema':schema, 'xpltype': type}
             params.update(res["filter"])
             self._listener = Listener(self._callback, xpl, params)
+            print "AJOUT LISTENER DE STATS : %s" % params
             self._technology = technology
 
         def _callback(self, message):
