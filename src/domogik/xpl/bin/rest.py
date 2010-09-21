@@ -371,6 +371,7 @@ class Rest(XplPlugin):
                 - {"plugin" : "wol%", ...} : here "%" indicate that we search for something starting with "wol"
             @param nb_rec : internal parameter (do not use it for first call). Used to check recursivity VS queue size
         """
+        print "FILTER=%s" % filter
         self._log_queue.debug("Get from queue : %s (recursivity deepth : %s)" % (str(my_queue), nb_rec))
         # check if recursivity doesn't exceed queue size
         if nb_rec > my_queue.qsize():
