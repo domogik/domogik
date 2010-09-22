@@ -48,10 +48,9 @@ from domogik.common.configloader import Loader
 from xml.dom import minidom
 import time
 import urllib
-import sys
 import locale
 from socket import gethostname
-from Queue import *
+from Queue import Queue, Empty, Full
 from domogik.xpl.common.queryconfig import Query
 from domogik.xpl.common.plugin import XplResult
 import re
@@ -71,7 +70,7 @@ import stat
 import shutil
 import mimetypes
 import errno
-from threading import Event, currentThread, Thread
+from threading import Event, Thread
 
 
 
@@ -323,18 +322,28 @@ class Rest(XplPlugin):
 
 
     def _add_to_queue_system_list(self, message):
+        """ Add data in a queue
+        """
         self._put_in_queue(self._queue_system_list, message)
 
     def _add_to_queue_system_detail(self, message):
+        """ Add data in a queue
+        """
         self._put_in_queue(self._queue_system_detail, message)
 
     def _add_to_queue_system_start(self, message):
+        """ Add data in a queue
+        """
         self._put_in_queue(self._queue_system_start, message)
 
     def _add_to_queue_system_stop(self, message):
+        """ Add data in a queue
+        """
         self._put_in_queue(self._queue_system_stop, message)
 
     def _add_to_queue_command(self, message):
+        """ Add data in a queue
+        """
         self._put_in_queue(self._queue_command, message)
 
     def _get_from_queue(self, my_queue, filter_schema = None, filter_data = None, nb_rec = 0):
@@ -426,9 +435,13 @@ class Rest(XplPlugin):
             return self._get_from_queue_without_waiting(my_queue, filter_schema, filter_data, nb_rec + 1)
 
     def _put_in_queue(self, my_queue, message):
+        """ put a message in a named queue
+            @param my_queue : queue 
+            @param message : data to put in queue
+        """
         self._log_queue.debug("Put in queue %s : %s" % (str(my_queue), str(message)))
         my_queue.put((time.time(), message), True, self._queue_timeout) 
-        # todo : except Full:
+        # TODO : except Full:
         #           call a "clean" function
         #           put again in queue
 
@@ -927,6 +940,8 @@ class ProcessRequest():
 ######
 
     def rest_status(self):
+        """ Send REST status informations
+        """
         json_data = JSonHelper("OK", 0, "REST server available")
         json_data.set_data_type("rest")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
@@ -2081,7 +2096,7 @@ target=*
             if self.get_parameters("area_id") == "None":
                 area_id = None
             else:
-               area_id = self.get_parameters("area_id")
+                area_id = self.get_parameters("area_id")
 
             room = self._db.update_room(self.get_parameters("id"), self.get_parameters("name"), \
                                         area_id, self.get_parameters("description"))
@@ -4074,7 +4089,7 @@ class StatsManager(XplPlugin):
         for _filter in node.getElementsByTagName("filter")[0].getElementsByTagName("key"):
             if _filter.attributes["name"].value in filters:
                 if not isinstance(filters[_filter.attributes["name"].value], list):
-                        filters[_filter.attributes["name"].value] = \
+                    filters[_filter.attributes["name"].value] = \
                             [filters[_filter.attributes["name"].value]]
                 filters[_filter.attributes["name"].value].append(_filter.attributes["value"].value)
             else:
