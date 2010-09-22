@@ -4161,13 +4161,13 @@ class StatsManager(XplPlugin):
             my_db = DbHelper()
             self._log_stats.debug("message catcher : %s" % message)
             try:
-                print "RES=%s" % self._res
                 if self._res["device"] != None:
                     d_id = my_db.get_device_by_technology_and_address(self._technology, \
                         message.data[self._res["device"]]).id
                 elif self._res["static_device"] != None:
                     d_id = my_db.get_device_by_technology_and_address(self._technology, \
                         self._res["static_device"]).id
+                    self._res["device"] = self._res["static_device"]
                 else:  # oups... something wrong in xml file ?
                     self._log_stats.error("Device has no name... is there a problem in xml file ?")
                     raise AttributeError
