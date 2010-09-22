@@ -372,7 +372,6 @@ class Rest(XplPlugin):
                 - {"plugin" : "wol%", ...} : here "%" indicate that we search for something starting with "wol"
             @param nb_rec : internal parameter (do not use it for first call). Used to check recursivity VS queue size
         """
-        print "FILTER=%s/%s" % (filter_schema, filter)
         self._log_queue.debug("Get from queue : %s (recursivity deepth : %s)" % (str(my_queue), nb_rec))
         # check if recursivity doesn't exceed queue size
         if nb_rec > my_queue.qsize():
@@ -395,7 +394,6 @@ class Rest(XplPlugin):
                 keep_data = True
                 # schema
                 if filter_schema.lower() == message.schema.lower():
-                    print "Filter on schema %s vs %s ok" % (filter_schema, message.schema)
                     # data
                     if filter != None:
                         for key in filter:
@@ -3456,7 +3454,6 @@ target=*
 
 
         else:
-            print "command=%s" % command
             ### check is plugin is shut
             if self._check_component_is_running(command):
                 self.send_http_response_error(999, 
@@ -3467,9 +3464,7 @@ target=*
             ### load helper and create object
             try:
                 for importer, plgname, ispkg in pkgutil.iter_modules(package.__path__):
-                    print "%s / %s" % (plgname, command)
                     if plgname == command:
-                        print "Import..."
                         helper = __import__('domogik.xpl.helpers.%s' % plgname, fromlist="dummy")
                         try:
                             helper_object = helper.MY_CLASS["cb"]()
@@ -4150,7 +4145,6 @@ class StatsManager(XplPlugin):
             params = {'schema':schema, 'xpltype': type}
             params.update(res["filter"])
             self._listener = Listener(self._callback, xpl, params)
-            print "AJOUT LISTENER DE STATS : %s" % params
             self._technology = technology
 
         def _callback(self, message):
