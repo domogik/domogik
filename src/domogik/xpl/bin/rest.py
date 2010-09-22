@@ -3698,9 +3698,9 @@ class JSonHelper():
         self._data_type = ""
         self._data_values = ""
         self._nb_data_values = 0
-        self._jsonp = None
-        self._jsonp_cb = None
-        self._status = None
+        #self._jsonp = ""
+        #self._jsonp_cb = ""
+        #self._status = ""
 
     def set_jsonp(self, jsonp, jsonp_cb):
         """ define jsonp mode
@@ -4161,6 +4161,7 @@ class StatsManager(XplPlugin):
             my_db = DbHelper()
             self._log_stats.debug("message catcher : %s" % message)
             try:
+                print "RES=%s" % self._res
                 if self._res["device"] != None:
                     d_id = my_db.get_device_by_technology_and_address(self._technology, \
                         message.data[self._res["device"]]).id
