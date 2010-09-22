@@ -4164,14 +4164,16 @@ class StatsManager(XplPlugin):
                 if self._res["device"] != None:
                     d_id = my_db.get_device_by_technology_and_address(self._technology, \
                         message.data[self._res["device"]]).id
+                    device = message.data[self._res["device"]]
                 elif self._res["static_device"] != None:
                     d_id = my_db.get_device_by_technology_and_address(self._technology, \
                         self._res["static_device"]).id
-                    self._res["device"] = self._res["static_device"]
+                    device = self._res["static_device"]
                 else:  # oups... something wrong in xml file ?
                     self._log_stats.error("Device has no name... is there a problem in xml file ?")
                     raise AttributeError
-                print "Stat for techno '%s' / adress '%s' / id '%s'" % (self._technology, message.data[self._res["device"]], d_id)
+                #print "Stat for techno '%s' / adress '%s' / id '%s'" % (self._technology, message.data[self._res["device"]], d_id)
+                print "Stat for techno '%s' / adress '%s' / id '%s'" % (self._technology, device, d_id)
             except AttributeError:
                 if self._res["device"] != None:
                     self._log_stats_unknown.warning("Received a stat for an unreferenced device : %s - %s" \
@@ -4181,8 +4183,10 @@ class StatsManager(XplPlugin):
                         % (self._technology, self._res["static_device"]))
                 print "=> unknown device"
                 return
+            #self._log_stats.debug("Stat received for %s - %s." \
+            #        % (self._technology, message.data[self._res["device"]]))
             self._log_stats.debug("Stat received for %s - %s." \
-                    % (self._technology, message.data[self._res["device"]]))
+                    % (self._technology, device))
             #current_date = time.mktime(calendar.timegm(datetime.datetime.now().timetuple()))
             current_date = calendar.timegm(datetime.datetime.now().timetuple())
             #current_date = datetime.datetime.now()
