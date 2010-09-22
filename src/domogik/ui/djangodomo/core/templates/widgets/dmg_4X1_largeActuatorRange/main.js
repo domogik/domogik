@@ -82,7 +82,7 @@ const auto_send = 3000; // 3 seconds
 
         setValue: function(value) {
             var self = this, o = this.options;
-            if (value) {
+            if (value != null) {
                 if (value >= this.min_value && value <= this.max_value) {
                     this.currentValue = value;
                 } else if (value < this.min_value) {
@@ -130,7 +130,6 @@ const auto_send = 3000; // 3 seconds
 		minus_range: function() {
             var self = this, o = this.options;
 			var value = ((this._processingValue - this.step) / this.step) * this.step;
-            console.log(value);
 			this._setProcessingValue(value);
             this._resetAutoSend();
 		},

@@ -130,7 +130,7 @@
         
         setValue: function(value) {
             var self = this, o = this.options;
-            if (value) {
+            if (value != null) {
                 if (value >= this.min_value && value <= this.max_value) {
                     this.currentValue = value;
                 } else if (value < this.min_value) {
@@ -185,7 +185,7 @@
         
         _displayValue: function(value) {
             var self = this, o = this.options;
-            if (value) {
+            if (value != null) {
     			this._status.writeStatus(value + this.unit);                
             } else { // Unknown
     			this._status.writeStatus('---' + this.unit);                                

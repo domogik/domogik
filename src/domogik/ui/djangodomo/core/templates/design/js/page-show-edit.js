@@ -45,6 +45,7 @@ $(function(){
             var widgets = get_widgets(o.type);
             $.each(widgets, function(index, id) {
                 var woptions = get_widgets_options(id);
+//                var filter = woptions.filter
                 var widget = $("<li></li>");
                 var name = $("<div class='name'>" + woptions.name + "</div>");
                 widget.append(name);

@@ -1,0 +1,41 @@
+.dmg_3x2_communicationCallerId {    
+    text-align:center;
+    background-position: 5px 5px;
+    background-repeat: no-repeat;
+    background-color:#ffffff;
+}
+
+.dmg_3x2_communicationCallerId ul {
+    font-size:1.1em;
+    position:absolute;
+    bottom:0;
+    left:0;
+    width:100%;
+}
+
+.dmg_3x2_communicationCallerId li {
+    padding-bottom:0.3em;
+    border-top: 1px solid #cccccc;
+}
+
+.dmg_3x2_communicationCallerId .new {
+    font-size:1.2em;
+    position:absolute;
+    top:0.5em;
+    right:0.5em;
+    border: 1px solid #cccccc;
+    -moz-border-radius: 2em;
+    -webkit-border-radius: 2em;
+    line-height:2em;
+    width:13em;
+    height:2em;
+    text-align:center;
+    background-color:#eeeeee;
+}
+
+.dmg_3x2_communicationCallerId .new.receiving {
+    background-color:#BDCB2F;
+    background-position: 5px 50%;
+    background-repeat: no-repeat;
+    background-image: url(images/phone_16.png);
+}

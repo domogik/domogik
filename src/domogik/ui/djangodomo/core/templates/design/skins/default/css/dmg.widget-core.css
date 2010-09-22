@@ -24,6 +24,12 @@
 .size1x1 { width:5em; height:5em;}
 .model.size1x1 { line-height:5em;}
 
+.size3x2 { width:21em; height:14em;}
+.model.size3x2 { line-height:14em;}
+
+.size3x3 { width:21em; height:21em;}
+.model.size3x3 { line-height:21em;}
+
 .size4x1 { width:26em; height:5em;}
 .model.size4x1 { line-height:5em;}
 

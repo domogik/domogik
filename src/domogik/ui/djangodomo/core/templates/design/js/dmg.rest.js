@@ -83,8 +83,8 @@ $.extend({
             success:
                 callback,
             error:
-                function(XMLHttpRequest, textStatus, errorThrown) {
-                    $.notification('error', 'Event request  :' + XMLHttpRequest.readyState + ' ' + XMLHttpRequest.status + ' ' + textStatus + ' ' + errorThrown);
+                function(xOptions, textStatus) {
+                    $.notification('error', 'REST communication : ' + textStatus + ' (' + url + ')');
                 }
         });
     }
