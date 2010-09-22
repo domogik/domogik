@@ -337,7 +337,7 @@ class Rest(XplPlugin):
     def _add_to_queue_command(self, message):
         self._put_in_queue(self._queue_command, message)
 
-    def _get_from_queue(self, my_queue, filter_schema = None, filter = None, nb_rec = 0):
+    def _get_from_queue(self, my_queue, filter_schema = None, filter_data = None, nb_rec = 0):
         """ Encapsulation for _get_from_queue_in
             If timeout not elapsed and _get_from_queue didn't find a valid data
             call again _get_from_queue until timeout
@@ -348,7 +348,7 @@ class Rest(XplPlugin):
         ok = False
         while time.time() - start_time < self._queue_timeout:
             try:
-                return self._get_from_queue_without_waiting(my_queue, filter_schema, filter, nb_rec)
+                return self._get_from_queue_without_waiting(my_queue, filter_schema, filter_data, nb_rec)
             except Empty:
                 # no data in queue for us.... let's continue until time elapsed
                 # in order not rest not working so much, let it make a pause
@@ -358,7 +358,7 @@ class Rest(XplPlugin):
 
 
 
-    def _get_from_queue_without_waiting(self, my_queue, filter_schema = None, filter = None, nb_rec = 0):
+    def _get_from_queue_without_waiting(self, my_queue, filter_schema = None, filter_data = None, nb_rec = 0):
         """ Get an item from queue (recursive function)
             Checks are made on : 
             - life expectancy of message
@@ -367,7 +367,7 @@ class Rest(XplPlugin):
             If necessary, each item of queue is read.
             @param my_queue : queue to get data from
             @param filter_schema : filter on a specific schema
-            @param filter : dictionnay of filters. Examples :
+            @param filter_data : dictionnay of filters. Examples :
                 - {"command" : "start", ...}
                 - {"plugin" : "wol%", ...} : here "%" indicate that we search for something starting with "wol"
             @param nb_rec : internal parameter (do not use it for first call). Used to check recursivity VS queue size
@@ -385,7 +385,7 @@ class Rest(XplPlugin):
         # if message not too old, we process it
         if time.time() - msg_time < self._queue_life_expectancy:
             # no filter defined
-            if filter_schema == None and filter == None: 
+            if filter_schema == None and filter_data == None: 
                 self._log_queue.debug("Get from queue %s : return %s" % (str(my_queue), str(message)))
                 return message
 
@@ -395,18 +395,18 @@ class Rest(XplPlugin):
                 # schema
                 if filter_schema.lower() == message.schema.lower():
                     # data
-                    if filter != None:
-                        for key in filter:
-                            # take care of final "%" in order to search data starting by filter[key]
-                            if filter[key][-1] == "%":
+                    if filter_data != None:
+                        for key in filter_data:
+                            # take care of final "%" in order to search data starting by filter_data[key]
+                            if filter_data[key][-1] == "%":
                                 msg_data = str(message.data[key])
-                                filter_data = str(filter[key])
-                                len_data = len(filter_data) - 1
-                                if msg_data[0:len_data] != filter_data[0:-1]:
+                                my_filter_data = str(filter_data[key])
+                                len_data = len(my_filter_data) - 1
+                                if msg_data[0:len_data] != my_filter_data[0:-1]:
                                     keep_data = False
                             # normal search
                             else:
-                                if message.data[key].lower() != filter[key].lower():
+                                if message.data[key].lower() != filter_data[key].lower():
                                     keep_data = False
     
                 # if message is ok for us, return it
@@ -418,12 +418,12 @@ class Rest(XplPlugin):
                 else:
                     self._log_queue.debug("Get from queue %s : bad data, check another one..." % (str(my_queue)))
                     self._put_in_queue(my_queue, message)
-                    return self._get_from_queue_without_waiting(my_queue, filter_schema, filter, nb_rec + 1)
+                    return self._get_from_queue_without_waiting(my_queue, filter_schema, filter_data, nb_rec + 1)
 
         # if message too old : get an other message
         else:
             self._log_queue.debug("Get from queue %s : data too old, check another one..." % (str(my_queue)))
-            return self._get_from_queue_without_waiting(my_queue, filter_schema, filter, nb_rec + 1)
+            return self._get_from_queue_without_waiting(my_queue, filter_schema, filter_data, nb_rec + 1)
 
     def _put_in_queue(self, my_queue, message):
         self._log_queue.debug("Put in queue %s : %s" % (str(my_queue), str(message)))
@@ -1124,9 +1124,9 @@ target=*
         # Filters
         filters = xml_listener.getElementsByTagName("filter")[0]
         filters_value = {}
-        for filter in filters.getElementsByTagName("key"):
-            name = filter.attributes.get("name").value
-            value = filter.attributes.get("value").value
+        for my_filter in filters.getElementsByTagName("key"):
+            name = my_filter.attributes.get("name").value
+            value = my_filter.attributes.get("value").value
             if value == "@address@":
                 value = address
             filters_value[name] = value
@@ -2838,7 +2838,7 @@ target=*
         try:
             self._log.debug("Plugin : wait for answer...")
             # in filter, "%" means, that we check for something starting with name
-            message = self._get_from_queue(self._queue_system_detail, "domogik.system", filter = {"command" : "detail", "plugin" : name + "%"})
+            message = self._get_from_queue(self._queue_system_detail, "domogik.system", filter_data = {"command" : "detail", "plugin" : name + "%"})
         except Empty:
             json_data = JSonHelper("ERROR", 999, "No data or timeout on getting plugin detail for %s" % name)
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
@@ -2911,9 +2911,9 @@ target=*
         try:
             self._log.debug("Plugin : wait for answer...")
             if command == "start":
-                message = self._get_from_queue(self._queue_system_start, "domogik.system", filter = {"command" : "start", "plugin" : plugin})
+                message = self._get_from_queue(self._queue_system_start, "domogik.system", filter_data = {"command" : "start", "plugin" : plugin})
             elif command == "stop":
-                message = self._get_from_queue(self._queue_system_stop, "domogik.system", filter= {"command" : "stop", "plugin" : plugin})
+                message = self._get_from_queue(self._queue_system_stop, "domogik.system", filter_data= {"command" : "stop", "plugin" : plugin})
         except Empty:
             json_data = JSonHelper("ERROR", 999, "No data or timeout on %s plugin %s" % (command, plugin))
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
@@ -4184,24 +4184,24 @@ class StatsManager(XplPlugin):
             device_data = []
 
             ### mapping processing
-            for map in self._res["mapping"]:
+            for my_map in self._res["mapping"]:
                 # first : get value and default key
-                key = map["name"]
+                key = my_map["name"]
                 try:
-                    value = message.data[map["name"]].lower()
-                    if map["filter_key"] == None:
-                        key = map["name"]
+                    value = message.data[my_map["name"]].lower()
+                    if my_map["filter_key"] == None:
+                        key = my_map["name"]
                         device_data.append({"key" : key, "value" : value})
                         db.add_device_stat(current_date, key, value, d_id)
                     else:
-                        if map["filter_value"] != None and \
-                           map["filter_value"].lower() == message.data[map["filter_key"]].lower():
-                            key = map["new_name"]
+                        if my_map["filter_value"] != None and \
+                           my_map["filter_value"].lower() == message.data[my_map["filter_key"]].lower():
+                            key = my_map["new_name"]
                             device_data.append({"key" : key, "value" : value})
                             db.add_device_stat(current_date, key, value, d_id)
                         else:
-                            if map["filter_value"] == None:
-                                self._log_stats.warning ("Stats : no filter_value defined in map : %s" % str(map))
+                            if my_map["filter_value"] == None:
+                                self._log_stats.warning ("Stats : no filter_value defined in map : %s" % str(my_map))
                 except KeyError:
                     # no value in message for key
                     # example : a x10 command = ON has no level value
