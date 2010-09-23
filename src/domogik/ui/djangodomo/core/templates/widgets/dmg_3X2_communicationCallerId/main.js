@@ -21,18 +21,32 @@
 
             this._new =  $("<div class='new'></div>");
             this.element.append(this._new);
+            this._new.hide();
             this._list =  $("<ul></ul>");
             this.element.append(this._list);
 
-            this._initValues(5);
+            this._initValues(10);
         },
 
         _statsHandler: function(stats) {
+            var self = this, o = this.options;
+            this.values = [];
             if (stats && stats.length > 0) {
-                this.values = stats;
+                this.previous = null;
+                $.each(stats, function(index, stat){
+                    self.addCall(stat);
+                });
                 this.displayList();
+            }
+        },
+        
+        addCall: function(stat) {
+            if (stat.value != this.previous) {
+                stat.number = 1;
+                this.values.unshift(stat);
+                this.previous = stat.value;
             } else {
-                this.values = null;
+                this.values[0].number++;
             }
         },
         
@@ -40,13 +54,11 @@
             var self = this, o = this.options;
             var date = new Date();
             this._new.text(value);
-            this._new.addClass("receiving");
+            this.addCall({date:date.format("yyyy-mm-dd H:MM:ss"), value:value});
+            this._new.show();
             $.doTimeout('callerIdReceiveing', 30000, function() {
-                self.values.pop();
-                self.values.unshift({date:date.format("yyyy-mm-dd H:MM:ss"), value:value});
                 self.displayList();
-                self._new.text('');
-                self._new.removeClass("receiving");
+                self._new.hide();
             });
         },
 
@@ -55,8 +67,11 @@
             if (this.values) {
                 this._list.empty();
                 $.each(this.values, function(index, stat){
-                    
-                    self._list.append("<li>" + stat.date + " " + stat.value + "</li>");
+                    if (stat.number > 1) {
+                        self._list.append("<li>" + stat.value + " (" + stat.number + ")</li>");                        
+                    } else {
+                        self._list.append("<li>" + stat.value + "</li>");
+                    }
                 });
             } else { // Unknown
             }
