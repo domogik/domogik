@@ -63,6 +63,7 @@
                             $('table#request_list tbody').append("<tr><td>"
                                 + index + "</td><td>"
                                 + request.creation_date + "</td><td>"
+                                + request.last_access_date + "</td><td>"
                                 + request.device_id_list + "</td><td>"
                                 + request.queue_size + "</td><td>"
                                 + request.instance.unfinished_tasks + "</td><td>"
@@ -126,6 +127,7 @@
                 <tr>
                     <th scope='col'>ID</th>
                     <th scope='col'>Created</th>
+                    <th scope='col'>Last access</th>
                     <th scope='col'>Device id list</th>
                     <th scope='col'>Queue size</th>                    
                     <th scope='col'>Instance Unfinished Tasks</th>
