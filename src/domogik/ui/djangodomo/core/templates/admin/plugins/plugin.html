@@ -87,16 +87,19 @@ $(function(){
             if (status == 'ok') {
                 // Check configuration items
                 var num_items = data.plugin[0].configuration.length;
-                $.each(data.plugin[0].configuration, function(index, item) {
+                var options = data.plugin[0].configuration.sort(sortOptions);
+                $.each(options, function(index, item) {
+                    var iid = item.id;
                     var ikey = item.key;
                     var idescription = item.description;
                     var idefault = item['default'];
                     var itype = item.type;
+                    $("#configuration_items tbody").append("<tr id='" + item.id + "'></tr>");
                     $.getREST(['plugin', 'config', 'list', 'by-name' , '{{ plugin.name }}', '{{ plugin.host }}' , 'by-key', ikey],
                         function(data) {
                             var status = (data.status).toLowerCase();
                             if (status == 'ok') {
-                                var tr = $("<tr></tr>");
+                                var tr = $("tr#"+iid);
                                 tr.append("<td>" +  ikey + "</td><td><label for='value_" + ikey + "'>" +  idescription + "</label></td>");
                                 if (itype == 'boolean') {
                                     var td = $("<td class='value'></td>");
@@ -124,7 +127,6 @@ $(function(){
                                     tr.append(td);
                                     tr.append("<td><ul class='actions'><li><button id='reset" + ikey + "' class='icon16-action-reset buttonicon' title='{% trans "Reset" %} " + ikey + "'><span class='offscreen'>{% trans "Reset" %} " + ikey + "</span></button></li></ul></td>");                                    
                                 }
-                                $("#configuration_items").append(tr);
                                 $("#reset" + ikey).click(function(event) {
                                     resetKey(ikey, idefault);
                                     event.stopPropagation();
@@ -213,6 +215,10 @@ $(function(){
 
     }
 });
+
+function sortOptions(a, b){
+    return (a.id - b.id) //causes an array to be sorted numerically and ascending
+}
 {% endblock %}
 {% block css %}
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/page-admin-plugins.css" rel="stylesheet" type="text/css" />
@@ -251,7 +257,11 @@ $(function(){
         <div id='configuration'>
             <p><button id='configurationdelete' class='button icon16-action-del'>{% trans 'Delete configuration' %}</button></p>
             <table id='configuration_items' class='simple'>
-                <tr><th scope='col'>{% trans "Key" %}</th><th scope='col'>{% trans "Description" %}</th><th scope='col'>{% trans "value" %}</th><th>{% trans "Actions" %}</th></tr>
+                <thead>
+                    <tr><th scope='col'>{% trans "Key" %}</th><th scope='col'>{% trans "Description" %}</th><th scope='col'>{% trans "value" %}</th><th>{% trans "Actions" %}</th></tr>
+                </thead>
+                <tbody>
+                </tbody>
             </table>
         </div>
     </section>
