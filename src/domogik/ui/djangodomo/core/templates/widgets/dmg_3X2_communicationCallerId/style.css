@@ -19,10 +19,17 @@
     text-align:left;
 }
 
+.dmg_3x2_communicationCallerId .newbg {
+    position:absolute;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.8);
+    -moz-border-radius: 0.8em;
+    -webkit-border-radius: 0.8em;
+}
+
 .dmg_3x2_communicationCallerId .new {
     font-size:1.2em;
-    -moz-box-shadow: 10px 10px 5px #888;
-    -webkit-box-shadow: 10px 10px 5px #888;
     position:absolute;
     top:4em;
     left:2em;

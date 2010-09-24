@@ -18,9 +18,11 @@
         _init: function() {
             var self = this, o = this.options;
             this.element.addClass("icon32-usage-" + o.usage)
-
+            this._newbg =  $("<div class='newbg'></div>");
+            this.element.append(this._newbg);
             this._new =  $("<div class='new'></div>");
             this.element.append(this._new);
+            this._newbg.hide();
             this._new.hide();
             this._list =  $("<ul></ul>");
             this.element.append(this._list);
@@ -55,9 +57,11 @@
             this._new.text(value);
             this.addCall({timestamp:timestamp, value:value});
             this._new.show();
+            this._newbg.show();
             $.doTimeout('callerIdReceiveing', 30000, function() {
                 self.displayList();
                 self._new.hide();
+                self._newbg.hide();
             });
         },
 
