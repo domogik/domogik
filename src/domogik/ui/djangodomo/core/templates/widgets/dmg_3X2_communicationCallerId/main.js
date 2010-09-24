@@ -50,11 +50,10 @@
             }
         },
         
-        _eventHandler: function(d, value) {
+        _eventHandler: function(timestamp, value) {
             var self = this, o = this.options;
-            var date = new Date();
             this._new.text(value);
-            this.addCall({date:date.format("yyyy-mm-dd H:MM:ss"), value:value});
+            this.addCall({timestamp:timestamp, value:value});
             this._new.show();
             $.doTimeout('callerIdReceiveing', 30000, function() {
                 self.displayList();

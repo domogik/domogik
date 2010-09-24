@@ -37,7 +37,7 @@
             }
         },
         
-        _eventHandler: function(date, value) {
+        _eventHandler: function(timestamp, value) {
             this.setValue(value);
         },
         

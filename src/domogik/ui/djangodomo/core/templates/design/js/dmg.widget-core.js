@@ -103,7 +103,7 @@ function get_widgets_options(id) {
             if (events.device_id == o.deviceid) {
                 $.each(events.data, function(index, data) {
                     if (data.key == o.key) {
-                        self._eventHandler(null, data.value);
+                        self._eventHandler(events.timestamp, data.value);
                     }
                 });
             }
@@ -112,7 +112,7 @@ function get_widgets_options(id) {
         _statsHandler: function(stats) {
         },
         
-        _eventHandler: function(date, value) {
+        _eventHandler: function(timestamp, value) {
         }
     });
 })(jQuery);

@@ -38,7 +38,7 @@
         _statsHandler: function(stats) {
         },
         
-        _eventHandler: function(date, value) {
+        _eventHandler: function(timestamp, value) {
         },
         
         setParameter: function(value) {
