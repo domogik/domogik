@@ -28,15 +28,18 @@
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-tables.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block js_include %}
+    <script type="text/javascript" src="/design/js/jquery.tablesorter.min.js"></script>
 {% endblock %}
 {% block js_script %}
+
     $(function(){
         // Accordion
         $("#nav2").accordion({ autoHeight: false, header: ".subnav2", active:3});
+        $.tablesorter.defaults.headers = { 3:{sorter: false} }; 
+        $("#request_list").tablesorter();
         $("#force_refresh").click(function() {refresh()});
         refresh();
         $('body').everyTime('10s', function() {refresh()});
-        
         function refresh() {
             $.getREST([],
                 function(data) {
@@ -71,8 +74,8 @@
                                 + request.instance.unfinished_tasks + "</td><td>"
                                 + request.instance.maxsize + "</td></tr>");
                         });
-                        $('table#request_list tr:even').attr('class', 'even');
-                        $('table#request_list tr:odd').attr('class', 'odd');
+                        $('#request_list').trigger("update");
+                        $('#request_list').trigger("sorton", [[[0,0]]]);
                     } else {
                         /* Error retreving plugin config */
                         $.notification(data.status, data.description);
@@ -124,7 +127,7 @@
         <h3>{% trans "Requests" %}</h3>
         <ul id='request_number'></ul>
         <br />
-        <table id='request_list'>
+        <table id='request_list' class='tablesorter' cellspacing="1">
             <thead>
                 <tr>
                     <th scope='col'>ID</th>
@@ -139,5 +142,6 @@
             <tbody>
             </tbody>
         </table>
+</table>
     </section>
 {% endblock %}
