@@ -4229,7 +4229,7 @@ class StatsManager(XplPlugin):
     
             # Put data in events queues
             self._event_requests.add_in_queues(d_id, 
-                    {"device_id" : d_id, "data" : device_data})
+                    {"timestamp" : current_date, "device_id" : d_id, "data" : device_data})
 
 
 
