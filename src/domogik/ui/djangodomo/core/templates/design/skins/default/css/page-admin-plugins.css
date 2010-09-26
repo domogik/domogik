@@ -19,8 +19,12 @@ ul.infos .label {
     font-weight:bold;
 }
 
-td.value {
+table.simple td.value {
     padding-left:20px;
     background-position: 0% 50%;
     background-repeat:no-repeat;
+}
+
+table.simple td {
+    text-align:left !important;
 }
