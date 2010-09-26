@@ -18,9 +18,6 @@
             var self = this, o = this.options;
             this.element.addClass("icon32-usage-" + o.usage)
 
-            this._value =  $("<div class='value'></div>");
-            this.element.append(this._value);
-
             this._status = $.getStatus();
             this.element.append(this._status);
 
@@ -42,18 +39,19 @@
         setValue: function(value, unit, previous) {
             var self = this, o = this.options;
             if (value) {
-                this.element.displayIcon('known');             
                 value = value.toLowerCase();
                 if (value == "high") {
-                    this._value.attr('class' ,'value icon32-status-active');
+                    this.element.displayIcon('value_true');             
+                    this._status.removeClass('icon16-status-unknown icon16-status-inactive').addClass('icon16-status-active');
                 } else { // low
-                    this._value.attr('class' ,'value icon32-status-inactive');
+                    this.element.displayIcon('value_false');             
+                    this._status.removeClass('icon16-status-unknown icon16-status-active').addClass('icon16-status-inactive');
                 }
-                this._status.html(value);
+                this._status.html("<div class='offscreen'>"+value+"</div>");
             } else { // Unknown
                 this.element.displayIcon('unknown');             
-                this._value.attr('class' ,'value icon32-status-unknown');
-                this._status.html("--");
+                this._status.removeClass('icon16-status-active icon16-status-inactive').addClass('icon16-status-unknown');
+                this._status.html("<div class='offscreen'>Unknown</div>");
             }
             this.previousValue = value;
         }

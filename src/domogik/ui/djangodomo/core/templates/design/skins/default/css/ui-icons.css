@@ -112,7 +112,8 @@
 .icon32-usage-1.actuator.range.value_90 { background-image:url(../images/device_usage/1.light/90_32.png);}
 .icon32-usage-1.actuator.range.value_100 { background-image:url(../images/device_usage/1.light/100_32.png);}
 .icon32-usage-1.sensor.boolean.unknown { background-image:url(../images/device_usage/1.light/undefined_32.png);}
-.icon32-usage-1.sensor.boolean.known { background-image:url(../images/device_usage/1.light/100_32.png);}
+.icon32-usage-1.sensor.boolean.value_true { background-image:url(../images/device_usage/1.light/100_32.png);}
+.icon32-usage-1.sensor.boolean.value_false { background-image:url(../images/device_usage/1.light/0_32.png);}
 .icon32-usage-1.sensor.number.unknown { background-image:url(../images/device_usage/1.light/undefined_32.png);}
 .icon32-usage-1.sensor.number.known { background-image:url(../images/device_usage/1.light/100_32.png);}
 .icon32-usage-1.sensor.string.unknown { background-image:url(../images/device_usage/1.light/undefined_32.png);}
@@ -136,7 +137,8 @@
 .icon32-usage-2.actuator.range.value_90 { background-image:url(../images/device_usage/2.appliance/90_32.png);}
 .icon32-usage-2.actuator.range.value_100 { background-image:url(../images/device_usage/2.appliance/100_32.png);}
 .icon32-usage-2.sensor.boolean.unknown { background-image:url(../images/device_usage/2.appliance/undefined_32.png);}
-.icon32-usage-2.sensor.boolean.known { background-image:url(../images/device_usage/2.appliance/100_32.png);}
+.icon32-usage-2.sensor.boolean.value_true { background-image:url(../images/device_usage/2.appliance/100_32.png);}
+.icon32-usage-2.sensor.boolean.value_false { background-image:url(../images/device_usage/2.appliance/0_32.png);}
 .icon32-usage-2.sensor.number.unknown { background-image:url(../images/device_usage/2.appliance/undefined_32.png);}
 .icon32-usage-2.sensor.number.known { background-image:url(../images/device_usage/2.appliance/100_32.png);}
 .icon32-usage-2.sensor.string.unknown { background-image:url(../images/device_usage/2.appliance/undefined_32.png);}
@@ -160,7 +162,8 @@
 .icon32-usage-3.actuator.range.value_90 { background-image:url(../images/device_usage/3.shutter/90_32.png);}
 .icon32-usage-3.actuator.range.value_100 { background-image:url(../images/device_usage/3.shutter/100_32.png);}
 .icon32-usage-3.sensor.boolean.unknown { background-image:url(../images/device_usage/3.shutter/undefined_32.png);}
-.icon32-usage-3.sensor.boolean.known { background-image:url(../images/device_usage/3.shutter/100_32.png);}
+.icon32-usage-3.sensor.boolean.value_true { background-image:url(../images/device_usage/3.shutter/100_32.png);}
+.icon32-usage-3.sensor.boolean.value_false { background-image:url(../images/device_usage/3.shutter/0_32.png);}
 .icon32-usage-3.sensor.number.unknown { background-image:url(../images/device_usage/3.shutter/undefined_32.png);}
 .icon32-usage-3.sensor.number.known { background-image:url(../images/device_usage/3.shutter/100_32.png);}
 .icon32-usage-3.sensor.string.unknown { background-image:url(../images/device_usage/3.shutter/undefined_32.png);}
@@ -186,7 +189,8 @@
 .icon32-usage-4.sensor.boolean.unknown { background-image:url(../images/device_usage/4.airconditionning/undefined_32.png);}
 .icon32-usage-4.sensor.boolean.known { background-image:url(../images/device_usage/4.airconditionning/100_32.png);}
 .icon32-usage-4.sensor.number.unknown { background-image:url(../images/device_usage/4.airconditionning/undefined_32.png);}
-.icon32-usage-4.sensor.number.known { background-image:url(../images/device_usage/4.airconditionning/100_32.png);}
+.icon32-usage-4.sensor.number.value_true { background-image:url(../images/device_usage/4.airconditionning/100_32.png);}
+.icon32-usage-4.sensor.number.value_false { background-image:url(../images/device_usage/4.airconditionning/0_32.png);}
 .icon32-usage-4.sensor.string.unknown { background-image:url(../images/device_usage/4.airconditionning/undefined_32.png);}
 .icon32-usage-4.sensor.string.known { background-image:url(../images/device_usage/4.airconditionning/100_32.png);}
 
@@ -208,7 +212,8 @@
 .icon32-usage-5.actuator.range.value_90 { background-image:url(../images/device_usage/5.ventilation/90_32.png);}
 .icon32-usage-5.actuator.range.value_100 { background-image:url(../images/device_usage/5.ventilation/100_32.png);}
 .icon32-usage-5.sensor.boolean.unknown { background-image:url(../images/device_usage/5.ventilation/undefined_32.png);}
-.icon32-usage-5.sensor.boolean.known { background-image:url(../images/device_usage/5.ventilation/100_32.png);}
+.icon32-usage-5.sensor.boolean.value_true { background-image:url(../images/device_usage/5.ventilation/100_32.png);}
+.icon32-usage-5.sensor.boolean.value_false { background-image:url(../images/device_usage/5.ventilation/0_32.png);}
 .icon32-usage-5.sensor.number.unknown { background-image:url(../images/device_usage/5.ventilation/undefined_32.png);}
 .icon32-usage-5.sensor.number.known { background-image:url(../images/device_usage/5.ventilation/100_32.png);}
 .icon32-usage-5.sensor.string.unknown { background-image:url(../images/device_usage/5.ventilation/undefined_32.png);}
