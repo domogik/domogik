@@ -43,7 +43,7 @@ function get_widgets_options(id) {
 			creator: 'Unknown',
             name: 'Unknown',
 			description: 'Unknown',
-            filter: {techno:'',device:'',feature:''},
+            filters: null,
             width: 1,
             height: 1,
             key: '',

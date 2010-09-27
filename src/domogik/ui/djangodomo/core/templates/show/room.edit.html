@@ -72,7 +72,7 @@
                         <li><div class='device icon16-technology-{{ device.device_type.device_technology_id }}'>{{ device.name }} ({{ device.address }})</div>
                             <ul>
                                 {% for feature in device.features %}
-                                <li><div class='feature' featurevalue='{{ feature.id }}' devicename='{{device.name }}' featurename='{{ feature.device_feature_model.name }}' type='{{ feature.device_feature_model.feature_type }}.{{ feature.device_feature_model.value_type }}'>{{ feature.device_feature_model.name }}</div></li>
+                                <li><div class='feature' featureid='{{ feature.id }}' devicename='{{device.name }}' featuremodel='{{ feature.device_feature_model.id }}' featurename='{{ feature.device_feature_model.name }}' type='{{ feature.device_feature_model.feature_type }}.{{ feature.device_feature_model.value_type }}'>{{ feature.device_feature_model.name }}</div></li>
                                 {% endfor %}
                             </ul>
                         </li>

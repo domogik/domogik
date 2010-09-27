@@ -3,14 +3,16 @@ $(function(){
         $(".selected").removeClass('selected');
         $(this).addClass('selected');
         var type = $(this).attr('type');
-        var featurevalue = $(this).attr('featurevalue');
+        var featureid = $(this).attr('featureid');
+        var featuremodel = $(this).attr('featuremodel');
         var featurename = $(this).attr('featurename');
         var devicename = $(this).attr('devicename');
         $("#widgetslist").empty();
         $("#widgets").show();
         $("#widgetslist").widget_models({
             type: type,
-            featurevalue: featurevalue,
+            featureid: featureid,
+            featuremodel: featuremodel,
             featurename: featurename,
             devicename: devicename
         });
@@ -20,6 +22,20 @@ $(function(){
 });
 
 (function($) {
+    function matchFilter(filters, id) {
+        var res = false;
+        if (filters) {
+            $.each(filters, function(index, filter){
+                var afilter = filter.split('.');
+                var aid = id.split('.');
+                res =  (afilter[0] == aid[0] || afilter[0] == '*') && (afilter[1] == aid[1] || afilter[1] == '*') && (afilter[2] == aid[2] || afilter[2] == '*');
+            });
+        } else {
+            res = true;
+        }
+        return res;
+    }
+    
     function ondrop(event, ui) {
         var item = ui.draggable.detach();
         item.removeAttr('style');
@@ -45,59 +61,61 @@ $(function(){
             var widgets = get_widgets(o.type);
             $.each(widgets, function(index, id) {
                 var woptions = get_widgets_options(id);
-//                var filter = woptions.filter
-                var widget = $("<li></li>");
-                var name = $("<div class='name'>" + woptions.name + "</div>");
-                widget.append(name);
-                var name = $("<div class='description'>" + woptions.description + "</div>");
-                widget.append(name);
-                var model = $("<div></div>");
-                model.widget_model({
-                    id: id,
-                    featurevalue: o.featurevalue,
-                    featurename: o.featurename,
-                    devicename: o.devicename
-                });
-                model.draggable({
-                    helper: "clone",
-                    revert: 'invalid',
-                    appendTo: 'body',
-                    drag: function(event, ui) {
-                        $("#panel").hide();
-                        var association = $(this).attr('id');
-                        if (association) {
-                            $.getREST(['base', 'feature_association', 'del', association],
-                                function(data) {
-                                    var status = (data.status).toLowerCase();
-                                    if (status == 'ok') {
-                                        $.getREST(['base', 'ui_config', 'del', 'by-reference', 'association', association],
-                                            function(data) {
-                                                var status = (data.status).toLowerCase();
-                                                if (status == 'ok') {
-                                                } else {
-                                                    $.notification('error', data.description);                                          
+                if (matchFilter(woptions.filters, o.featuremodel)) {
+                    var widget = $("<li></li>");
+                    var name = $("<div class='name'>" + woptions.name + "</div>");
+                    widget.append(name);
+                    var name = $("<div class='description'>" + woptions.description + "</div>");
+                    widget.append(name);
+                    var model = $("<div></div>");
+                    model.widget_model({
+                        id: id,
+                        featureid: o.featureid,
+                        featuremodel: o.featuremodel,
+                        featurename: o.featurename,
+                        devicename: o.devicename
+                    });
+                    model.draggable({
+                        helper: "clone",
+                        revert: 'invalid',
+                        appendTo: 'body',
+                        drag: function(event, ui) {
+                            $("#panel").hide();
+                            var association = $(this).attr('id');
+                            if (association) {
+                                $.getREST(['base', 'feature_association', 'del', association],
+                                    function(data) {
+                                        var status = (data.status).toLowerCase();
+                                        if (status == 'ok') {
+                                            $.getREST(['base', 'ui_config', 'del', 'by-reference', 'association', association],
+                                                function(data) {
+                                                    var status = (data.status).toLowerCase();
+                                                    if (status == 'ok') {
+                                                    } else {
+                                                        $.notification('error', data.description);                                          
+                                                    }
                                                 }
-                                            }
-                                        );
-                                    } else {
-                                        $.notification('error', data.description);                                          
+                                            );
+                                        } else {
+                                            $.notification('error', data.description);                                          
+                                        }
                                     }
-                                }
-                            );
+                                );
+                            }
+                        },
+                        stop: function(event, ui) {
+                            $("#panel").show();
+                            self._init();
+                            if($(this).hasClass("success")) {
+                                $(this).removeClass("success");
+                            } else {
+                                $(this).remove();			
+                            }
                         }
-                    },
-                    stop: function(event, ui) {
-                        $("#panel").show();
-                        self._init();
-                        if($(this).hasClass("success")) {
-                            $(this).removeClass("success");
-                        } else {
-                            $(this).remove();			
-                        }
-                    }
-                });
-                widget.append(model);
-                self.element.append(widget); 
+                    });
+                    widget.append(model);
+                    self.element.append(widget); 
+                }
             });
         },
 	
@@ -123,7 +141,7 @@ $(function(){
 			    .attr("widgetid", o.id)
 				.addClass('size' + o.width + 'x' + o.height)
                 .attr("tabindex", 0)
-	            .attr('featurevalue', o.featurevalue)
+	            .attr('featureid', o.featureid)
                 .text(o.width + 'x' + o.height);
 			this._identity = $("<canvas class='identity' width='60' height='60'></canvas>")
 			this.element.append(this._identity);				
@@ -152,7 +170,7 @@ $(function(){
             var page_id = zone.attr('page_id');
             var widget_id = model.attr('widgetid');
             var place_id = zone.attr('place');
-            $.getREST(['base', 'feature_association', 'add', 'feature_id', model.attr('featurevalue'), 'association_type', page_type, 'association_id', page_id],
+            $.getREST(['base', 'feature_association', 'add', 'feature_id', model.attr('featureid'), 'association_type', page_type, 'association_id', page_id],
                 function(data) {
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
@@ -242,7 +260,8 @@ $(function(){
                                                     model.attr('association', association.id);
                                                     model.widget_model({
                                                         id: widget,
-                                                        featurevalue: association.device_feature_id,
+                                                        featureid: association.device_feature_id,
+                                                        featuremodel: data.feature[0].device_feature_model.id,
                                                         featurename: data.feature[0].device_feature_model.name,
                                                         devicename: data.feature[0].device.name
                                                     })
