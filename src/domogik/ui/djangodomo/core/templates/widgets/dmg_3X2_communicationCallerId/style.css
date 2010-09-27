@@ -19,6 +19,13 @@
     text-align:left;
 }
 
+.dmg_3x2_communicationCallerId li .date {
+    font-size:0.8em;
+    color:#004BB9;
+    float:right;
+    padding-right:1em;
+}
+
 .dmg_3x2_communicationCallerId .newbg {
     position:absolute;
     width:100%;

@@ -67,13 +67,16 @@
 
         displayList: function() {
             var self = this, o = this.options;
+            this.values.sort(sortDate);
             if (this.values) {
                 this._list.empty();
                 $.each(this.values, function(index, stat){
+                    var date = new Date(stat.timestamp * 1000);
+                    date = date.format('HH:MM');
                     if (stat.number > 1) {
-                        self._list.append("<li>" + stat.value + " (" + stat.number + ")</li>");                        
+                        self._list.append("<li>" + stat.value + " <span class='date'>" + date + "</span> (" + stat.number + ")</li>");                        
                     } else {
-                        self._list.append("<li>" + stat.value + "</li>");
+                        self._list.append("<li>" + stat.value + " <span class='date'>" + date + "</span></li>");
                     }
                 });
             } else { // Unknown
@@ -83,6 +86,5 @@
 })(jQuery);
 
 function sortDate(a, b) {
-    var aDate = new Date(a.date);
-    var bDate = new Date(b.date);
+    return b.timestamp - a.timestamp;
 }
