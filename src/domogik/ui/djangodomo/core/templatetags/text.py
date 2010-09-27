@@ -56,10 +56,10 @@ class GetPosition(Node):
         grouper = self.grouper.resolve(context)
         for i in range(len(array)):
             if grouper == 1:
-                if int(array[i]['grouper'].id) == int(id):
+                if array[i]['grouper'].id == id:
                     res = i                
             else:
-                if int(array[i].id) == int(id):
+                if array[i].id == id:
                     res = i
         return res
     

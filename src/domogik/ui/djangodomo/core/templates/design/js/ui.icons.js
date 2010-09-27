@@ -3,19 +3,20 @@ var room_icons = ["kitchen", "bedroom", "tvlounge", "bathroom", "office", 'kidsr
 
 /* Define range how many icon in various ranges */
 var range = [];
-range[1] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
-range[2] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
-range[3] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
-range[4] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
-range[5] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
-range[6] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
-range[7] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
-range[8] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
-range[9] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
-range[10] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
-range[11] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
-range[12] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
-range[13] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+range['light'] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+range['appliance'] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+range['shutter'] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+range['air_conditionning'] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+range['ventilation'] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+range['heating'] = [0, 100];
+range['workstation'] = [0, 100];
+range['server'] = [0, 100];
+range['phone'] = [0, 100];
+range['tv'] = [0, 100];
+range['water'] = [0, 100];
+range['gas'] = [0, 100];
+range['electricity'] = [0, 100];
+range['temperature'] = [0, 100];
 
 function findRangeIcon(usage, percent) {
 	var nearest, last_d_memorized = 101;
