@@ -76,11 +76,11 @@ def install(create_prod_db, create_test_db):
     # Create device technologie features for X10
 
     device_technology = db.add_device_technology(dt_id='x10', dt_name='X10', dt_description='')
-    device_type = db.add_device_type(dty_name='Switch', dt_id=device_technology.id)
+    device_type = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dt_id=device_technology.id)
     db.add_actuator_feature_model(af_name='Switch', af_device_type_id=device_type.id,
                               af_parameters='{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}',
                               af_value_type='binary', af_stat_key='command')
-    device_type = db.add_device_type(dty_name='Dimmer', dt_id=device_technology.id)
+    device_type = db.add_device_type(dty_id='x10.dimmer', dty_name='Dimmer', dt_id=device_technology.id)
     db.add_actuator_feature_model(af_name='Switch', af_device_type_id=device_type.id,
                               af_parameters='{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}',
                               af_value_type='binary', af_stat_key='command')
@@ -93,11 +93,11 @@ def install(create_prod_db, create_test_db):
 
     # Create device technologie features for PLCBus
     device_technology = db.add_device_technology(dt_id='plcbus', dt_name='PLCBus', dt_description='')
-    device_type = db.add_device_type(dty_name='Switch', dt_id=device_technology.id)
+    device_type = db.add_device_type(dty_id='xplcbus.switch', dty_name='Switch', dt_id=device_technology.id)
     db.add_actuator_feature_model(af_name='Switch', af_device_type_id=device_type.id,
                               af_parameters='{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}',
                               af_value_type='binary', af_stat_key='command', af_return_confirmation=True)
-    device_type = db.add_device_type(dty_name='Dimmer', dt_id=device_technology.id)
+    device_type = db.add_device_type(dty_id='plcbus.dimmer', dty_name='Dimmer', dt_id=device_technology.id)
     db.add_actuator_feature_model(af_name='Switch', af_device_type_id=device_type.id,
                               af_parameters='{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}',
                               af_value_type='binary', af_stat_key='command', af_return_confirmation=True)
@@ -116,11 +116,11 @@ def install(create_prod_db, create_test_db):
 
     # Create device technology features for 1wire
     device_technology = db.add_device_technology(dt_id='onewire', dt_name='1-Wire', dt_description='')
-    device_type = db.add_device_type(dty_name='Temperature', dt_id=device_technology.id)
+    device_type = db.add_device_type(dty_id='onewire.temperature', dty_name='Temperature', dt_id=device_technology.id)
     db.add_sensor_feature_model(sf_name='Temperature',
                             sf_device_type_id=device_type.id, sf_value_type='number',
                             sf_parameters='{&quot;unit&quot;:&quot;&deg;C&quot;}', sf_stat_key='temperature')
-    device_type = db.add_device_type(dty_name='ID', dt_id=device_technology.id)
+    device_type = db.add_device_type(dty_id='onewire.id', dty_name='ID', dt_id=device_technology.id)
     db.add_sensor_feature_model(sf_name='ID',
                             sf_device_type_id=device_type.id, sf_value_type='boolean', sf_parameters='{}',
                             sf_stat_key='present')
@@ -132,8 +132,8 @@ def install(create_prod_db, create_test_db):
 
     # Create device technology features for Service
     device_technology = db.add_device_technology(dt_id='service', dt_name='Service',
-                                             dt_description='Distributed services, water, gas, electricity')
-    device_type = db.add_device_type(dty_name='Teleinfo', dt_id=device_technology.id)
+                                                 dt_description='Distributed services, water, gas, electricity')
+    device_type = db.add_device_type(dty_id='service.teleinfo', dty_name='Teleinfo', dt_id=device_technology.id)
     db.add_sensor_feature_model(sf_name=u'Intensité instantanée', sf_device_type_id=device_type.id, sf_value_type='number',
                             sf_parameters='{&quot;unit&quot;:&quot;A&quot;}', sf_stat_key='iinst')
     db.add_sensor_feature_model(sf_name='Heures creuses', sf_device_type_id=device_type.id, sf_value_type='number',
@@ -151,17 +151,17 @@ def install(create_prod_db, create_test_db):
 
     # Create device technology features for RFID
     device_technology = db.add_device_technology(dt_id='rfid', dt_name='RFID', dt_description='')
-    device_type = db.add_device_type(dty_name='Mirror_Base', dt_id=device_technology.id)
+    device_type = db.add_device_type(dty_id='rfid.mirror_base', dty_name='Mirror_Base', dt_id=device_technology.id)
     db.add_sensor_feature_model(sf_name='Activated', sf_device_type_id=device_type.id, sf_value_type='boolean',
                             sf_parameters='{}', sf_stat_key='activated')
-    device_type = db.add_device_type(dty_name='Mirror_Tag', dt_id=device_technology.id)
+    device_type = db.add_device_type(dty_id='rfid.mirror_tag', dty_name='Mirror_Tag', dt_id=device_technology.id)
     db.add_sensor_feature_model(sf_name='Present', sf_device_type_id=device_type.id, sf_value_type='boolean',
                             sf_parameters='{}', sf_stat_key='present')
 
     # Create device technology features for Relay Board
     device_technology = db.add_device_technology(dt_id='relayboard', dt_name='Relay Board',
                                              dt_description='Relay boards monitoring and controling ')
-    device_type = db.add_device_type(dty_name='Relay', dt_id=device_technology.id)
+    device_type = db.add_device_type(dty_id='relayboard.relay', dty_name='Relay', dt_id=device_technology.id)
     db.add_actuator_feature_model(af_name='Switch', af_device_type_id=device_type.id,
                               af_parameters='{&quot;output&quot;:&quot;&quot;,&quot;value0&quot;:&quot;low&quot;, &quot;value1&quot;:&quot;high&quot;}',
                               af_value_type='binary', af_stat_key='output',
@@ -169,20 +169,25 @@ def install(create_prod_db, create_test_db):
     db.add_actuator_feature_model(af_name='Trigger', af_device_type_id=device_type.id,
                               af_parameters='{&quot;command&quot;:&quot;pulse&quot;}',af_value_type='trigger',
                               af_return_confirmation=True)
-    device_type = db.add_device_type(dty_name='Digital_Input', dt_id=device_technology.id)
-    db.add_sensor_feature_model(sf_name='Digital Input', sf_device_type_id=device_type.id, sf_value_type='boolean', sf_parameters='{}', sf_stat_key='input')
-    device_type = db.add_device_type(dty_name='Analog_Input', dt_id=device_technology.id)
-    db.add_sensor_feature_model(sf_name='Analog Input', sf_device_type_id=device_type.id, sf_value_type='boolean', sf_parameters='{}', sf_stat_key='voltage')
-    device_type = db.add_device_type(dty_name='Counter', dt_id=device_technology.id)
-    db.add_sensor_feature_model(sf_name='Counter', sf_device_type_id=device_type.id, sf_value_type='boolean', sf_parameters='{}', sf_stat_key='count')
+    device_type = db.add_device_type(dty_id='relayboard.digital_input', dty_name='Digital_Input',
+                                     dt_id=device_technology.id)
+    db.add_sensor_feature_model(sf_name='Digital Input', sf_device_type_id=device_type.id, sf_value_type='boolean',
+                                sf_parameters='{}', sf_stat_key='input')
+    device_type = db.add_device_type(dty_id='relayboard.analog_input', dty_name='Analog_Input',
+                                     dt_id=device_technology.id)
+    db.add_sensor_feature_model(sf_name='Analog Input', sf_device_type_id=device_type.id, sf_value_type='boolean',
+                                sf_parameters='{}', sf_stat_key='voltage')
+    device_type = db.add_device_type(dty_id='relayboard.counter', dty_name='Counter', dt_id=device_technology.id)
+    db.add_sensor_feature_model(sf_name='Counter', sf_device_type_id=device_type.id, sf_value_type='boolean',
+                                sf_parameters='{}', sf_stat_key='count')
 
     # Create device technology features for Computer
     device_technology = db.add_device_technology(dt_id='computer', dt_name='Computer',
                                              dt_description='Computers monitoring and controling ')
-    device_type = db.add_device_type(dty_name='Control', dt_id=device_technology.id)
+    device_type = db.add_device_type(dty_id='computer.control', dty_name='Control', dt_id=device_technology.id)
     db.add_actuator_feature_model(af_name='WOL', af_device_type_id=device_type.id,
-                              af_parameters='{&quot;command&quot;:&quot;wol&quot;}',af_value_type='trigger',
-                              af_return_confirmation=False)
+                                  af_parameters='{&quot;command&quot;:&quot;wol&quot;}',af_value_type='trigger',
+                                  af_return_confirmation=False)
     db.add_sensor_feature_model(sf_name='Ping', sf_device_type_id=device_type.id, sf_value_type='boolean',
                             sf_parameters='{}', sf_stat_key='ping')
     # Create device technologie features for MultiMedia
@@ -191,8 +196,9 @@ def install(create_prod_db, create_test_db):
     # Create device technologie features for communication
     device_technology = db.add_device_technology(dt_id='communication', dt_name='Communication',
                          dt_description='Telephony, videophone, mails, messaging')
-    device_type = db.add_device_type(dty_name='Caller_Id', dt_id=device_technology.id)
-    db.add_sensor_feature_model(sf_name='Caller Id', sf_device_type_id=device_type.id, sf_value_type='string', sf_parameters='{}', sf_stat_key='phone')
+    device_type = db.add_device_type(dty_id='communication.caller_id', dty_name='Caller_Id', dt_id=device_technology.id)
+    db.add_sensor_feature_model(sf_name='Caller Id', sf_device_type_id=device_type.id, sf_value_type='string',
+                                sf_parameters='{}', sf_stat_key='phone')
 
     # Create device usages
     db.add_device_usage(du_name='Light', du_description='Lamp, light usage',
