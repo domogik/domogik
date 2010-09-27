@@ -577,9 +577,10 @@ class DbHelper():
                     ).filter(func.lower(DeviceType.name)==ucode(dty_name.lower())
                     ).first()
 
-    def add_device_type(self, dty_name, dt_id, dty_description=None):
-        """Add a device_type (x10.Switch, x10.Dimmer, Computer.WOL...)
+    def add_device_type(self, dty_id, dty_name, dt_id, dty_description=None):
+        """Add a device_type (Switch, Dimmer, WOL...)
 
+        @param dty_id : device type id
         @param dty_name : device type name
         @param dt_id : technology id (x10, plcbus,...)
         @param dty_description : device type description (optional)
@@ -590,7 +591,8 @@ class DbHelper():
         self.__session.expire_all()
         if not self.__session.query(DeviceTechnology).filter_by(id=dt_id).first():
             raise DbHelperException("Couldn't add device type with technology id %s. It does not exist" % dt_id)
-        dty = DeviceType(name=dty_name, description=dty_description, device_technology_id=dt_id)
+        dty = DeviceType(id=ucode(dty_id), name=ucode(dty_name), description=ucode(dty_description),
+                         device_technology_id=dt_id)
         self.__session.add(dty)
         try:
             self.__session.commit()
@@ -614,6 +616,8 @@ class DbHelper():
         device_type = self.__session.query(DeviceType).filter_by(id=dty_id).first()
         if device_type is None:
             raise DbHelperException("DeviceType with id %s couldn't be found" % dty_id)
+        if dty_id is not None:
+            device_type.id = ucode(dty_id)
         if dty_name is not None:
             device_type.name = ucode(dty_name)
         if dt_id is not None:
@@ -641,21 +645,21 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        dty = self.__session.query(DeviceType).filter_by(id=dty_id).first()
+        dty = self.__session.query(DeviceType).filter_by(id=ucode(dty_id)).first()
         if dty:
             if cascade_delete:
-                for device in self.__session.query(Device).filter_by(device_type_id=dty.id).all():
+                for device in self.__session.query(Device).filter_by(device_type_id=ucode(dty.id)).all():
                     self.del_device(device.id)
-                for df in self.__session.query(DeviceFeatureModel).filter_by(device_type_id=dty.id).all():
+                for df in self.__session.query(DeviceFeatureModel).filter_by(device_type_id=ucode(dty.id)).all():
                     if df.feature_type == 'actuator':
                         self.del_actuator_feature_model(df.id)
                     elif df.feature_type == 'sensor':
                         self.del_sensor_feature_model(df.id)
             else:
-                device_list = self.__session.query(Device).filter_by(device_type_id=dty.id).all()
+                device_list = self.__session.query(Device).filter_by(device_type_id=ucode(dty.id)).all()
                 if len(device_list) > 0:
                     raise DbHelperException("Couldn't delete device type %s : there are associated device(s)" % dty_id)
-                df_list = self.__session.query(DeviceFeatureModel).filter_by(device_type_id=dty.id).all()
+                df_list = self.__session.query(DeviceFeatureModel).filter_by(device_type_id=ucode(dty.id)).all()
                 if len(df_list) > 0:
                     raise DbHelperException("Couldn't delete device type %s : there are associated device type "
                                             + "feature(s)" % dty_id)
@@ -1893,11 +1897,11 @@ class DbHelper():
                     ).filter_by(device_id=ds_device_id
                     ).count() > 0
 
-    def add_device_stat(self, ds_date, ds_key, ds_value, ds_device_id, hist_size=0):
+    def add_device_stat(self, ds_timestamp, ds_key, ds_value, ds_device_id, hist_size=0):
         """Add a device stat record
 
         @param ds_key : key for the stat
-        @param ds_date : when the stat was gathered (timestamp)
+        @param ds_timestamp : when the stat was gathered
         @param ds_value : stat value
         @param ds_device_id : device id
         @param hist_size : keep only the last hist_size records after having inserted the item (default is 0 which
@@ -1909,8 +1913,8 @@ class DbHelper():
         self.__session.expire_all()
         if not self.__session.query(Device).filter_by(id=ds_device_id).first():
             raise DbHelperException("Couldn't add device stat with device id %s. It does not exist" % ds_device_id)
-        device_stat = DeviceStats(date=datetime.datetime.fromtimestamp(ds_date), key=ds_key, value=ds_value,
-                                  device_id=ds_device_id)
+        device_stat = DeviceStats(date=datetime.datetime.fromtimestamp(ds_timestamp), timestamp=ds_timestamp,
+                                  key=ds_key, value=ds_value, device_id=ds_device_id)
         self.__session.add(device_stat)
         try:
             self.__session.commit()

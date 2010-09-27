@@ -246,27 +246,29 @@ class DeviceType(Base):
     """Type of a device (x10.Switch, x10.Dimmer, Computer.WOL...)"""
 
     __tablename__ = '%s_device_type' % _db_prefix
-    id = Column(Integer, primary_key=True)
+    id = Column(Unicode(80), primary_key=True)
     device_technology_id = Column(Unicode(30), ForeignKey('%s.id' % DeviceTechnology.get_tablename()), nullable=False)
     device_technology = relation(DeviceTechnology)
     name = Column(Unicode(30), nullable=False)
     description = Column(UnicodeText())
 
-    def __init__(self, name, device_technology_id, description=None):
+    def __init__(self, id, name, device_technology_id, description=None):
         """Class constructor
 
+        @paral id : device type id
         @param name : short name of the type
         @param description : extended description, optional
         @param device_technology_id : technology id
 
         """
+        self.id = ucode(id)
         self.name = ucode(name)
         self.description = ucode(description)
         self.device_technology_id = ucode(device_technology_id)
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<DeviceType(id=%s, name='%s', desc='%s', device techno='%s')>"\
+        return "<DeviceType(id='%s', name='%s', desc='%s', device techno='%s')>"\
                % (self.id, self.name, self.description, self.device_technology)
 
     @staticmethod
@@ -286,7 +288,7 @@ class Device(Base):
     reference = Column(Unicode(30))
     device_usage_id = Column(Integer, ForeignKey('%s.id' % DeviceUsage.get_tablename()), nullable=False)
     device_usage = relation(DeviceUsage)
-    device_type_id = Column(Integer, ForeignKey('%s.id' % DeviceType.get_tablename()), nullable=False)
+    device_type_id = Column(Unicode(80), ForeignKey('%s.id' % DeviceType.get_tablename()), nullable=False)
     device_type = relation(DeviceType)
     #device_stats = relation("DeviceStats", order_by="DeviceStats.date.desc()", backref=__tablename__)
 
@@ -327,7 +329,7 @@ class DeviceFeatureModel(Base):
     id = Column(Integer, primary_key=True)
     name = Column(Unicode(30), nullable=False)
     feature_type = Column(Enum('actuator', 'sensor', name='feature_type_list'), nullable=False)
-    device_type_id = Column(Integer, ForeignKey('%s.id' % DeviceType.get_tablename()), nullable=False)
+    device_type_id = Column(Unicode(80), ForeignKey('%s.id' % DeviceType.get_tablename()), nullable=False)
     device_type = relation(DeviceType)
     parameters = Column(UnicodeText())
     value_type = Column(Unicode(30), nullable=False)
@@ -484,6 +486,8 @@ class DeviceStats(Base):
 
     __tablename__ = '%s_device_stats' % _db_prefix
     date = Column(DateTime, primary_key=True)
+    # This is used for mysql compatibility reasons as timestamps are NOT handled in Unix Time format
+    timestamp = Column(Integer, nullable=False)
     key = Column(Unicode(30), primary_key=True)
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), nullable=False, primary_key=True)
     device = relation(Device)
@@ -493,16 +497,18 @@ class DeviceStats(Base):
     __value_num = Column('value_num', Float)
     value = Column('value_str', Unicode(255))
 
-    def __init__(self, date, key, device_id, value):
+    def __init__(self, date, timestamp, key, device_id, value):
         """Class constructor
 
-        @param date : timestamp when the stat was recorded
+        @param date : date when the stat was recorded
+        @param timestamp : corresponding timestamp
         @param key : key
         @param device_id : device id
         @param value : stat value (numerical or string)
 
         """
         self.date = date
+        self.timestamp = timestamp
         self.key = ucode(key)
         try:
             self.__value_num = float(value)

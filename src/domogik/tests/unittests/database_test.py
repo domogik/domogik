@@ -353,23 +353,23 @@ class DeviceTypeTestCase(GenericTestCase):
     def test_add(self):
         dt1 = db.add_device_technology('x10', 'x10', 'desc dt1')
         try:
-            db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=u'99999999999')
+            db.add_device_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=u'99999999999')
             TestCase.fail(self, "An exception should have been raised : device techno id does not exist")
         except DbHelperException:
             pass
-        dty1 = db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
+        dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
         print(dty1)
-        assert dty1.name == 'x10 Switch'
+        assert dty1.name == 'Switch'
         assert dty1.description == 'desc1'
         assert dty1.device_technology_id == dt1.id
-        dty2 = db.add_device_type(dty_name='x10 Dimmer', dty_description='desc2', dt_id=dt1.id)
+        dty2 = db.add_device_type(dty_id='x10.dimmer', dty_name='Dimmer', dty_description='desc2', dt_id=dt1.id)
         assert len(db.list_device_types()) == 2
-        assert self.has_item(db.list_device_types(), ['x10 Switch', 'x10 Dimmer'])
+        assert self.has_item(db.list_device_types(), ['Switch', 'Dimmer'])
 
     def test_update(self):
         dt1 = db.add_device_technology('x10', 'x10', 'desc dt1')
         dt2 = db.add_device_technology('plcbus', 'PLCBus', 'desc dt2')
-        dty = db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
+        dty = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
         try:
             db.update_device_type(dty_id=dty.id, dty_name='x10 Dimmer', dt_id=u'99999999999')
             TestCase.fail(self, "An exception should have been raised : device techno id does not exist")
@@ -382,16 +382,16 @@ class DeviceTypeTestCase(GenericTestCase):
 
     def test_list_and_get(self):
         dt1 = db.add_device_technology('x10', 'x10', 'desc dt1')
-        dty1 = db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
-        assert db.get_device_type_by_name('x10 switch').name == 'x10 Switch'
+        dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
+        assert db.get_device_type_by_name('Switch').name == 'Switch'
 
     def test_del(self):
         dt1 = db.add_device_technology('x10', 'x10', 'desc dt1')
-        dty1 = db.add_device_type(dty_name='x10 Switch', dt_id=dt1.id)
-        dty2 = db.add_device_type(dty_name='x10 Dimmer', dt_id=dt1.id)
+        dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dt_id=dt1.id)
+        dty2 = db.add_device_type(dty_id='x10.dimmer', dty_name='Dimmer', dt_id=dt1.id)
         dty2_id = dty2.id
         dty_del = db.del_device_type(dty2.id)
-        assert self.has_item(db.list_device_types(), ['x10 Switch'])
+        assert self.has_item(db.list_device_types(), ['Switch'])
         assert not self.has_item(db.list_device_usages(), ['x10 Dimmer'])
         assert dty_del.id == dty2_id
         try:
@@ -417,9 +417,10 @@ class DeviceFeatureModelTestCase(GenericTestCase):
     def test_add_get_list(self):
         dt1 = db.add_device_technology('x10', 'x10', 'desc dt1')
         dt2 = db.add_device_technology('1wire', '1-Wire', 'desc dt2')
-        dty1 = db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
-        dty2 = db.add_device_type(dty_name='x10 Dimmer', dty_description='desc2', dt_id=dt1.id)
-        dty3 = db.add_device_type(dty_name='1wire.Temperature', dty_description='desc3', dt_id=dt2.id)
+        dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
+        dty2 = db.add_device_type(dty_id='x10.dimmer', dty_name='Dimmer', dty_description='desc2', dt_id=dt1.id)
+        dty3 = db.add_device_type(dty_id='1wire.temperature', dty_name='Temperature', dty_description='desc3',
+                                  dt_id=dt2.id)
         afm1 = db.add_actuator_feature_model(af_name='Switch', af_device_type_id=dty1.id, af_parameters='myparams1',
                                              af_value_type='binary', af_return_confirmation=True)
         print(afm1)
@@ -450,8 +451,8 @@ class DeviceFeatureModelTestCase(GenericTestCase):
     def test_update(self):
         dt1 = db.add_device_technology('x10', 'x10', 'desc dt1')
         dt2 = db.add_device_technology('1wire', '1-Wire', 'desc dt2')
-        dty1 = db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
-        dty2 = db.add_device_type(dty_name='1wire.Temperature', dty_description='desc3', dt_id=dt2.id)
+        dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
+        dty2 = db.add_device_type(dty_id='1wire.Temperature', dty_name='Temp.', dty_description='desc3', dt_id=dt2.id)
         af1 = db.add_actuator_feature_model(af_name='Switch', af_device_type_id=dty1.id, af_value_type='number',
                                             af_parameters='myparams1')
         af1_u = db.update_actuator_feature_model(af_id=af1.id, af_name='Big switch',
@@ -468,9 +469,9 @@ class DeviceFeatureModelTestCase(GenericTestCase):
     def test_del(self):
         dt1 = db.add_device_technology('x10', 'x10', 'desc dt1')
         dt2 = db.add_device_technology('1wire', '1-Wire', 'desc dt2')
-        dty1 = db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
-        dty2 = db.add_device_type(dty_name='x10 Dimmer', dty_description='desc2', dt_id=dt1.id)
-        dty3 = db.add_device_type(dty_name='1wire.Temperature', dty_description='desc3', dt_id=dt2.id)
+        dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
+        dty2 = db.add_device_type(dty_id='x10.dimmer', dty_name='Dimmer', dty_description='desc2', dt_id=dt1.id)
+        dty3 = db.add_device_type(dty_id='1wire.temperature', dty_name='Temp.', dty_description='desc3', dt_id=dt2.id)
         af1 = db.add_actuator_feature_model(af_name='Switch', af_device_type_id=dty1.id, af_parameters='myparams1',
                                             af_value_type='binary', af_return_confirmation=True)
         af2 = db.add_actuator_feature_model(af_name='Dimmer', af_device_type_id=dty2.id, af_parameters='myparams2',
@@ -512,8 +513,8 @@ class DeviceFeatureAssociationTestCase(GenericTestCase):
         dt2 = db.add_device_technology('plcbus', 'PLCBus', 'PLCBus device type')
         du1 = db.add_device_usage('Appliance')
         du2 = db.add_device_usage('Lamp')
-        dty1 = db.add_device_type(dty_name='x10 Switch', dt_id=dt1.id, dty_description='My beautiful switch')
-        dty2 = db.add_device_type(dty_name='PLCBus Lamp', dt_id=dt2.id)
+        dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dt_id=dt1.id, dty_description='My switch')
+        dty2 = db.add_device_type(dty_id='plcbus.lamp', dty_name='Lamp', dt_id=dt2.id)
         af1 = db.add_actuator_feature_model(af_name='Switch', af_device_type_id=dty1.id, af_parameters='myparams1',
                                             af_value_type='binary')
         af2 = db.add_actuator_feature_model(af_name='Dimmer', af_device_type_id=dty2.id, af_parameters='myparams2',
@@ -554,9 +555,9 @@ class DeviceFeatureAssociationTestCase(GenericTestCase):
         dt1 = db.add_device_technology('x10', 'x10', 'x10 device type')
         dt2 = db.add_device_technology('plcbus', 'PLCBus', 'PLCBus device type')
         du1 = db.add_device_usage('Appliance')
-        dty1 = db.add_device_type(dty_name='x10 Switch', dt_id=dt1.id,
+        dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dt_id=dt1.id,
                                   dty_description='My beautiful switch')
-        dty2 = db.add_device_type(dty_name='PLCBus Switch', dt_id=dt2.id,
+        dty2 = db.add_device_type(dty_id='plcbus.switch', dty_name='Switch', dt_id=dt2.id,
                                   dty_description='Another beautiful switch')
         afm1 = db.add_actuator_feature_model(af_name='Switch', af_device_type_id=dty1.id, af_value_type='binary',
                                              af_parameters='myparams1')
@@ -708,7 +709,7 @@ class DeviceTestCase(GenericTestCase):
         room1 = db.add_room('room1', area1.id)
         dt1 = db.add_device_technology('x10', 'x10', 'desc dt1')
         du1 = db.add_device_usage('du1')
-        dty1 = db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
+        dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
         try:
             db.add_device(d_name='device1', d_address = 'A1', d_type_id = 9999999999, d_usage_id = du1.id)
             TestCase.fail(self, "Device type does not exist, an exception should have been raised")
@@ -732,9 +733,9 @@ class DeviceTestCase(GenericTestCase):
         dt1 = db.add_device_technology('x10', 'x10', 'x10 device type')
         dt2 = db.add_device_technology('plcbus', 'PLCBus', 'PLCBus device type')
         du1 = db.add_device_usage('Appliance')
-        dty1 = db.add_device_type(dty_name='x10 Switch', dt_id=dt1.id,
+        dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dt_id=dt1.id,
                                   dty_description='My beautiful switch')
-        dty2 = db.add_device_type(dty_name='PLCBus Switch', dt_id=dt2.id,
+        dty2 = db.add_device_type(dty_id='plcbus.switch', dty_name='Switch', dt_id=dt2.id,
                                   dty_description='Another beautiful switch')
         device1 = db.add_device(d_name='Toaster', d_address='A1',
                                 d_type_id=dty1.id, d_usage_id=du1.id, d_description='My new toaster')
@@ -752,7 +753,7 @@ class DeviceTestCase(GenericTestCase):
         room1 = db.add_room('room1', area1.id)
         room2 = db.add_room('room2', area1.id)
         dt1 = db.add_device_technology('x10', 'x10', 'desc dt1')
-        dty1 = db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
+        dty1 = db.add_device_type(dty_id='x10.switch', dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
         du1 = db.add_device_usage('du1')
         device1 = db.add_device(d_name='device1', d_address='A1',
                                 d_type_id=dty1.id, d_usage_id=du1.id, d_description='desc1')
@@ -775,7 +776,7 @@ class DeviceTestCase(GenericTestCase):
         room1 = db.add_room('room1', area1.id)
         room2 = db.add_room('room2', area2.id)
         dt1 = db.add_device_technology('x10', 'x10', 'desc dt1')
-        dty1 = db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
+        dty1 = db.add_device_type(dty_id='x10.switch', dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
         du1 = db.add_device_usage('du1')
         du2 = db.add_device_usage('du2')
         device1 = db.add_device(d_name='device1', d_address='A1',
@@ -804,7 +805,7 @@ class DeviceConfigTestCase(GenericTestCase):
     def __create_sample_device(self, device_name, device_technology_name):
         dt = db.add_device_technology(device_technology_name, 'a name', 'this is my device tech')
         du = db.add_device_usage("lighting")
-        dty = db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt.id)
+        dty = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt.id)
         area = db.add_area('area1','description 1')
         room = db.add_room('room1', area.id)
         device = db.add_device(d_name=device_name, d_address = "A1", d_type_id=dty.id, d_usage_id=du.id)
@@ -886,7 +887,7 @@ class DeviceStatsTestCase(GenericTestCase):
 
     def test_add_list_get(self):
         dt1 = db.add_device_technology('x10', 'x10', 'this is x10')
-        dty1 = db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
+        dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
         du1 = db.add_device_usage("lighting")
         area1 = db.add_area('area1','description 1')
         room1 = db.add_room('room1', area1.id)
@@ -895,6 +896,7 @@ class DeviceStatsTestCase(GenericTestCase):
         ds1 = db.add_device_stat(make_ts(2010, 04, 9, 12, 0), 'val1', 0, device1.id)
         print(ds1)
         assert ds1.key == 'val1' and ds1.value == '0'
+        assert ds1.timestamp == make_ts(2010, 04, 9, 12, 0)
         ds2 = db.add_device_stat(make_ts(2010, 04, 9, 12, 0), 'val_char', 'plop', device1.id)
         assert ds2.key == 'val_char' and ds2.value == 'plop'
         db.add_device_stat(make_ts(2010, 04, 9, 12, 0), 'val2', 1, device1.id)
@@ -935,7 +937,7 @@ class DeviceStatsTestCase(GenericTestCase):
 
     def test_add_with_hist_size(self):
         dt1 = db.add_device_technology('x10', 'x10', 'this is x10')
-        dty1 = db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
+        dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
         du1 = db.add_device_usage("lighting")
         device1 = db.add_device(d_name='device1', d_address = "A1", d_type_id = dty1.id, d_usage_id = du1.id)
         db.add_device_stat(make_ts(2010, 04, 9, 12, 0), 'val2', 1000, device1.id)
@@ -954,7 +956,7 @@ class DeviceStatsTestCase(GenericTestCase):
 
     def test_filter(self):
         dt1 = db.add_device_technology('x10', 'x10', 'this is x10')
-        dty1 = db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
+        dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
         du1 = db.add_device_usage("lighting")
         area1 = db.add_area('area1','description 1')
         room1 = db.add_room('room1', area1.id)
@@ -966,7 +968,7 @@ class DeviceStatsTestCase(GenericTestCase):
         insert_step = 10
         for i in range(0, int(end_p - start_p), insert_step):
             db._DbHelper__session.add(
-                DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i),
+                DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i), timestamp=start_p + i,
                             key=u'valm', value=(i/insert_step), device_id=device1.id)
             )
         db._DbHelper__session.commit()
@@ -992,7 +994,7 @@ class DeviceStatsTestCase(GenericTestCase):
         insert_step = 2500
         for i in range(0, int(end_p - start_p), insert_step):
             db._DbHelper__session.add(
-                DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i),
+                DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i), timestamp=start_p + i,
                             key=u'valh', value=i/insert_step, device_id=device1.id)
             )
         db._DbHelper__session.commit()
@@ -1023,7 +1025,7 @@ class DeviceStatsTestCase(GenericTestCase):
         insert_step = 28000
         for i in range(0, int(end_p - start_p), insert_step):
             db._DbHelper__session.add(
-                DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i),
+                DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i), timestamp=start_p + i,
                             key=u'vald', value=i/insert_step, device_id=device1.id)
             )
         db._DbHelper__session.commit()
@@ -1050,7 +1052,7 @@ class DeviceStatsTestCase(GenericTestCase):
         insert_step = 12 * 3600
         for i in range(0, int(end_p - start_p), insert_step):
             db._DbHelper__session.add(
-                DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i),
+                DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i), timestamp=start_p + i,
                             key=u'valw', value=i/insert_step, device_id=device1.id)
             )
         db._DbHelper__session.commit()
@@ -1077,7 +1079,7 @@ class DeviceStatsTestCase(GenericTestCase):
         insert_step = 3600 * 24 * 15
         for i in range(0, int(end_p - start_p), insert_step):
             db._DbHelper__session.add(
-                DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i),
+                DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i), timestamp=start_p + i,
                             key=u'valmy', value=i/insert_step, device_id=device1.id)
             )
         db._DbHelper__session.commit()
@@ -1116,7 +1118,7 @@ class DeviceStatsTestCase(GenericTestCase):
 
     def test_del(self):
         dt1 = db.add_device_technology('x10', 'x10', 'this is x10')
-        dty1 = db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
+        dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
         du1 = db.add_device_usage("lighting")
         area1 = db.add_area('area1','description 1')
         room1 = db.add_room('room1', area1.id)
