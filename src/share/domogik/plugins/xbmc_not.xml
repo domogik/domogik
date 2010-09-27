@@ -3,7 +3,7 @@
   <technology>multimedia</technology>
   <description>Send notifications to XBMC</description>
   <version>0.1</version>
-  <documentation>http://wiki.domogik.org/tiki-index.php?page=plugins/XBMCNotification</documentation>
+  <documentation>http://wiki.domogik.org/tiki-index.php?page=plugins/xbmc_not</documentation>
   <configuration-keys>
     <key>
       <order-id>0</order-id>

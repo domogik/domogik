@@ -3,7 +3,7 @@
   <technology>communication</technology>
   <description>Get events from a Google agenda</description>
   <version>0.1</version>
-  <documentation>http://wiki.domogik.org/tiki-index.php?page=plugins/GoogleAgenda</documentation>
+  <documentation>http://wiki.domogik.org/tiki-index.php?page=plugins/gagenda</documentation>
   <configuration-keys>
     <key>
       <order-id>0</order-id>

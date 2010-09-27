@@ -3,7 +3,7 @@
   <technology>plcbus</technology>
   <description>Manage Plcbus devices</description>
   <version>0.1</version>
-  <documentation>http://wiki.domogik.org/tiki-index.php?page=plugins/Plcbus</documentation>
+<documentation>http://wiki.domogik.org/tiki-index.php?page=plugins/plcbus</documentation>
   <configuration-keys>
     <key>
       <order-id>0</order-id>

@@ -3,7 +3,7 @@
   <technology>x10</technology>
   <description>Manage x10 devices with Heyu</description>
   <version>0.1</version>
-  <documentation>http://wiki.domogik.org/tiki-index.php?page=plugins/X10</documentation>
+  <documentation>http://wiki.domogik.org/tiki-index.php?page=plugins/x10_heyu</documentation>
   <configuration-keys>
     <key>
       <order-id>0</order-id>

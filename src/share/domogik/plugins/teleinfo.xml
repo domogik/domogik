@@ -3,7 +3,7 @@
   <technology>service</technology>
   <description>Get power consumption with teleinfo</description>
   <version>0.1</version>
-  <documentation>http://wiki.domogik.org/tiki-index.php?page=plugins/Teleinfo</documentation>
+  <documentation>http://wiki.domogik.org/tiki-index.php?page=plugins/teleinfo</documentation>
   <configuration-keys>
     <key>
       <order-id>0</order-id>
