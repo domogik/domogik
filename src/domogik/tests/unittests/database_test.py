@@ -895,6 +895,7 @@ class DeviceStatsTestCase(GenericTestCase):
         ds1 = db.add_device_stat(make_ts(2010, 04, 9, 12, 0), 'val1', 0, device1.id)
         print(ds1)
         assert ds1.key == 'val1' and ds1.value == '0'
+        assert ds1.timestamp == make_ts(2010, 04, 9, 12, 0)
         ds2 = db.add_device_stat(make_ts(2010, 04, 9, 12, 0), 'val_char', 'plop', device1.id)
         assert ds2.key == 'val_char' and ds2.value == 'plop'
         db.add_device_stat(make_ts(2010, 04, 9, 12, 0), 'val2', 1, device1.id)
