@@ -2242,7 +2242,8 @@ target=*
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("device_usage")
         try:
-            device_usage = self._db.add_device_usage(self.get_parameters("name"), \
+            device_usage = self._db.add_device_usage(self.get_parameters("id"), \
+                                                     self.get_parameters("name"), \
                                                      self.get_parameters("description"), \
                                                      self.get_parameters("default_options"))
             json_data.add_data(device_usage)
@@ -2309,7 +2310,8 @@ target=*
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("device_type")
         try:
-            device_type = self._db.add_device_type(self.get_parameters("name"), \
+            device_type = self._db.add_device_type(self.get_parameters("id"), \
+                                                   self.get_parameters("name"), \
                                                    self.get_parameters("technology_id"), \
                                                    self.get_parameters("description"))
             json_data.add_data(device_type)
