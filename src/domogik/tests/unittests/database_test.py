@@ -421,7 +421,8 @@ class DeviceFeatureModelTestCase(GenericTestCase):
         dty2 = db.add_device_type(dty_id='x10.dimmer', dty_name='Dimmer', dty_description='desc2', dt_id=dt1.id)
         dty3 = db.add_device_type(dty_id='1wire.temperature', dty_name='Temperature', dty_description='desc3',
                                   dt_id=dt2.id)
-        afm1 = db.add_actuator_feature_model(af_name='Switch', af_device_type_id=dty1.id, af_parameters='myparams1',
+        afm1 = db.add_actuator_feature_model(af_id='x10.switch.switch', af_name='Switch', af_device_type_id=dty1.id,
+                                             af_parameters='myparams1',
                                              af_value_type='binary', af_return_confirmation=True)
         print(afm1)
         assert afm1.name == 'Switch'
@@ -430,9 +431,11 @@ class DeviceFeatureModelTestCase(GenericTestCase):
         assert afm1.value_type == 'binary'
         assert afm1.return_confirmation
         assert db.get_device_feature_model_by_id(afm1.id).name == 'Switch'
-        afm2 = db.add_actuator_feature_model(af_name='Dimmer', af_device_type_id=dty2.id, af_parameters='myparams2',
+        afm2 = db.add_actuator_feature_model(af_id='x10.dimmer.dimmer', af_name='Dimmer', af_device_type_id=dty2.id,
+                                             af_parameters='myparams2',
                                              af_value_type='number', af_return_confirmation=True)
-        sfm1 = db.add_sensor_feature_model(sf_name='Thermometer', sf_device_type_id=dty3.id,
+        sfm1 = db.add_sensor_feature_model(sf_id='1wire.temperature.thermometer', sf_name='Thermometer',
+                                           sf_device_type_id=dty3.id,
                                            sf_parameters='myparams3', sf_value_type='number')
         print(sfm1)
         assert sfm1.name == 'Thermometer'
@@ -453,15 +456,16 @@ class DeviceFeatureModelTestCase(GenericTestCase):
         dt2 = db.add_device_technology('1wire', '1-Wire', 'desc dt2')
         dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
         dty2 = db.add_device_type(dty_id='1wire.Temperature', dty_name='Temp.', dty_description='desc3', dt_id=dt2.id)
-        af1 = db.add_actuator_feature_model(af_name='Switch', af_device_type_id=dty1.id, af_value_type='number',
-                                            af_parameters='myparams1')
+        af1 = db.add_actuator_feature_model(af_id='x10.switch.switch', af_name='Switch', af_device_type_id=dty1.id,
+                                            af_value_type='number', af_parameters='myparams1')
         af1_u = db.update_actuator_feature_model(af_id=af1.id, af_name='Big switch',
                                                  af_parameters='myparams_u', af_return_confirmation=True)
         assert af1_u.name == 'Big switch'
         assert af1_u.parameters == 'myparams_u'
         assert af1_u.value_type == 'number'
         assert af1_u.return_confirmation
-        sf1 = db.add_sensor_feature_model(sf_name='Thermometer', sf_device_type_id=dty2.id,
+        sf1 = db.add_sensor_feature_model(sf_id='1wire.temperature.thermometer', sf_name='Thermometer',
+                                          sf_device_type_id=dty2.id,
                                           sf_parameters='myparams2', sf_value_type='number')
         sf1_u = db.update_sensor_feature_model(sf_id=sf1.id, sf_value_type='string')
         assert sf1_u.value_type == 'string'
@@ -472,12 +476,14 @@ class DeviceFeatureModelTestCase(GenericTestCase):
         dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
         dty2 = db.add_device_type(dty_id='x10.dimmer', dty_name='Dimmer', dty_description='desc2', dt_id=dt1.id)
         dty3 = db.add_device_type(dty_id='1wire.temperature', dty_name='Temp.', dty_description='desc3', dt_id=dt2.id)
-        af1 = db.add_actuator_feature_model(af_name='Switch', af_device_type_id=dty1.id, af_parameters='myparams1',
+        af1 = db.add_actuator_feature_model(af_id='x10.switch.switch', af_name='Switch', af_device_type_id=dty1.id,
+                                            af_parameters='myparams1',
                                             af_value_type='binary', af_return_confirmation=True)
-        af2 = db.add_actuator_feature_model(af_name='Dimmer', af_device_type_id=dty2.id, af_parameters='myparams2',
+        af2 = db.add_actuator_feature_model(af_id='x10.dimmer.dimmer', af_name='Dimmer', af_device_type_id=dty2.id,
+                                            af_parameters='myparams2',
                                             af_value_type='number', af_return_confirmation=True)
-        sf1 = db.add_sensor_feature_model(sf_name='Thermometer', sf_device_type_id=dty3.id,
-                                          sf_parameters='myparams3', sf_value_type='number')
+        sf1 = db.add_sensor_feature_model(sf_id='1wire.temperature.thermometer', sf_name='Thermometer',
+                                          sf_device_type_id=dty3.id, sf_parameters='myparams3', sf_value_type='number')
         af_d = db.del_actuator_feature_model(af1.id)
         assert af_d.id == af1.id
         assert len(db.list_device_feature_associations_by_feature_id(af_d.id)) == 0
@@ -515,12 +521,12 @@ class DeviceFeatureAssociationTestCase(GenericTestCase):
         du2 = db.add_device_usage('Lamp')
         dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dt_id=dt1.id, dty_description='My switch')
         dty2 = db.add_device_type(dty_id='plcbus.lamp', dty_name='Lamp', dt_id=dt2.id)
-        af1 = db.add_actuator_feature_model(af_name='Switch', af_device_type_id=dty1.id, af_parameters='myparams1',
-                                            af_value_type='binary')
-        af2 = db.add_actuator_feature_model(af_name='Dimmer', af_device_type_id=dty2.id, af_parameters='myparams2',
-                                            af_value_type='number')
-        af3 = db.add_actuator_feature_model(af_name='Switch', af_device_type_id=dty2.id, af_parameters='myparams3',
-                                            af_value_type='number')
+        af1 = db.add_actuator_feature_model(af_id='x10.switch.switch', af_name='Switch', af_device_type_id=dty1.id,
+                                            af_parameters='myparams1', af_value_type='binary')
+        af2 = db.add_actuator_feature_model(af_id='x10.dimmer.dimmer', af_name='Dimmer', af_device_type_id=dty2.id,
+                                            af_parameters='myparams2', af_value_type='number')
+        af3 = db.add_actuator_feature_model(af_id='x10.dimmer.switch', af_name='Switch', af_device_type_id=dty2.id,
+                                            af_parameters='myparams3', af_value_type='number')
         device1 = db.add_device(d_name='Toaster', d_address='A1', d_type_id=dty1.id, d_usage_id=du1.id)
         #assert db.get_device_feature_by_id(
         device2 = db.add_device(d_name='Air conditioning', d_address='A2', d_type_id=dty1.id, d_usage_id=du1.id,
@@ -559,10 +565,10 @@ class DeviceFeatureAssociationTestCase(GenericTestCase):
                                   dty_description='My beautiful switch')
         dty2 = db.add_device_type(dty_id='plcbus.switch', dty_name='Switch', dt_id=dt2.id,
                                   dty_description='Another beautiful switch')
-        afm1 = db.add_actuator_feature_model(af_name='Switch', af_device_type_id=dty1.id, af_value_type='binary',
-                                             af_parameters='myparams1')
-        afm2 = db.add_actuator_feature_model(af_name='Dimmer', af_device_type_id=dty2.id, af_value_type='number',
-                                             af_parameters='myparams2')
+        afm1 = db.add_actuator_feature_model(af_id='x10.switch.switch', af_name='Switch', af_device_type_id=dty1.id,
+                                             af_value_type='binary', af_parameters='myparams1')
+        afm2 = db.add_actuator_feature_model(af_id='x10.dimmer.switch', af_name='Dimmer', af_device_type_id=dty2.id,
+                                             af_value_type='number', af_parameters='myparams2')
         device1 = db.add_device(d_name='Toaster', d_address='A1', d_type_id=dty1.id, d_usage_id=du1.id,
                                 d_description='My new toaster')
         device2 = db.add_device(d_name='Washing machine', d_address='A1', d_type_id=dty2.id, d_usage_id=du1.id,

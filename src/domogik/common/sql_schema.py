@@ -326,7 +326,7 @@ class DeviceFeatureModel(Base):
     """Device features that can be associated to a device (type) : switch, dimmer, temperature..."""
 
     __tablename__ = '%s_device_feature_model' % _db_prefix
-    id = Column(Integer, primary_key=True)
+    id = Column(Unicode(80), primary_key=True)
     name = Column(Unicode(30), nullable=False)
     feature_type = Column(Enum('actuator', 'sensor', name='feature_type_list'), nullable=False)
     device_type_id = Column(Unicode(80), ForeignKey('%s.id' % DeviceType.get_tablename()), nullable=False)
@@ -336,10 +336,11 @@ class DeviceFeatureModel(Base):
     stat_key = Column(Unicode(30))
     return_confirmation = Column(Boolean, nullable=False)
 
-    def __init__(self, name, feature_type, device_type_id, value_type, parameters=None, stat_key=None,
+    def __init__(self, id, name, feature_type, device_type_id, value_type, parameters=None, stat_key=None,
                 return_confirmation=False):
         """Class constructor
 
+        @param id : device feature id
         @param name : device feature name (Switch, Dimmer, Thermometer, Voltmeter...)
         @param feature_type : device feature type (actuator / sensor)
         @param device_type_id : device type id
@@ -350,6 +351,7 @@ class DeviceFeatureModel(Base):
                                      Only relevant for actuators
 
         """
+        self.id = ucode(id)
         self.name = ucode(name)
         if feature_type not in ('actuator', 'sensor'):
             raise Exception("Feature type must me either 'actuator' or 'sensor' but NOT %s" % feature_type)
@@ -385,7 +387,7 @@ class DeviceFeature(Base):
     id = Column(Integer, primary_key=True)
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()))
     device = relation(Device, backref=backref(__tablename__))
-    device_feature_model_id = Column(Integer, ForeignKey('%s.id' % DeviceFeatureModel.get_tablename()))
+    device_feature_model_id = Column(Unicode(80), ForeignKey('%s.id' % DeviceFeatureModel.get_tablename()))
     device_feature_model = relation(DeviceFeatureModel)
 
     UniqueConstraint(device_id, device_feature_model_id)
