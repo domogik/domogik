@@ -966,7 +966,7 @@ class DeviceStatsTestCase(GenericTestCase):
         insert_step = 10
         for i in range(0, int(end_p - start_p), insert_step):
             db._DbHelper__session.add(
-                DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i),
+                DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i), timestamp=start_p + i,
                             key=u'valm', value=(i/insert_step), device_id=device1.id)
             )
         db._DbHelper__session.commit()
@@ -992,7 +992,7 @@ class DeviceStatsTestCase(GenericTestCase):
         insert_step = 2500
         for i in range(0, int(end_p - start_p), insert_step):
             db._DbHelper__session.add(
-                DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i),
+                DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i), timestamp=start_p + i,
                             key=u'valh', value=i/insert_step, device_id=device1.id)
             )
         db._DbHelper__session.commit()
@@ -1023,7 +1023,7 @@ class DeviceStatsTestCase(GenericTestCase):
         insert_step = 28000
         for i in range(0, int(end_p - start_p), insert_step):
             db._DbHelper__session.add(
-                DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i),
+                DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i), timestamp=start_p + i,
                             key=u'vald', value=i/insert_step, device_id=device1.id)
             )
         db._DbHelper__session.commit()
@@ -1050,7 +1050,7 @@ class DeviceStatsTestCase(GenericTestCase):
         insert_step = 12 * 3600
         for i in range(0, int(end_p - start_p), insert_step):
             db._DbHelper__session.add(
-                DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i),
+                DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i), timestamp=start_p + i,
                             key=u'valw', value=i/insert_step, device_id=device1.id)
             )
         db._DbHelper__session.commit()
@@ -1077,7 +1077,7 @@ class DeviceStatsTestCase(GenericTestCase):
         insert_step = 3600 * 24 * 15
         for i in range(0, int(end_p - start_p), insert_step):
             db._DbHelper__session.add(
-                DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i),
+                DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i), timestamp=start_p + i,
                             key=u'valmy', value=i/insert_step, device_id=device1.id)
             )
         db._DbHelper__session.commit()

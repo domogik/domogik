@@ -1893,11 +1893,11 @@ class DbHelper():
                     ).filter_by(device_id=ds_device_id
                     ).count() > 0
 
-    def add_device_stat(self, ds_date, ds_key, ds_value, ds_device_id, hist_size=0):
+    def add_device_stat(self, ds_timestamp, ds_key, ds_value, ds_device_id, hist_size=0):
         """Add a device stat record
 
         @param ds_key : key for the stat
-        @param ds_date : when the stat was gathered (timestamp)
+        @param ds_timestamp : when the stat was gathered
         @param ds_value : stat value
         @param ds_device_id : device id
         @param hist_size : keep only the last hist_size records after having inserted the item (default is 0 which
@@ -1909,8 +1909,8 @@ class DbHelper():
         self.__session.expire_all()
         if not self.__session.query(Device).filter_by(id=ds_device_id).first():
             raise DbHelperException("Couldn't add device stat with device id %s. It does not exist" % ds_device_id)
-        device_stat = DeviceStats(date=datetime.datetime.fromtimestamp(ds_date), key=ds_key, value=ds_value,
-                                  device_id=ds_device_id)
+        device_stat = DeviceStats(date=datetime.datetime.fromtimestamp(ds_timestamp), timestamp=ds_timestamp,
+                                  key=ds_key, value=ds_value, device_id=ds_device_id)
         self.__session.add(device_stat)
         try:
             self.__session.commit()

@@ -97,7 +97,7 @@ class X10API:
         res.stderr.close()
         if output:
             self._log.error("Output was : %s\nHeyu config file path is : %s" % (output, heyuconf))
-            raise X10Exception("Something went wrong with heyu. check logs")
+            raise X10Exception("Something went wrong with heyu. Please check logs")
         self._housecodes = list('ABCDEFGHIJKLMNOP')
         self._unitcodes = range(1, 17)
         self._heyuconf = heyuconf
