@@ -474,9 +474,10 @@ class DbHelper():
                     ).filter(func.lower(DeviceUsage.name)==ucode(du_name.lower())
                     ).first()
 
-    def add_device_usage(self, du_name, du_description=None, du_default_options=None):
+    def add_device_usage(self, du_id, du_name, du_description=None, du_default_options=None):
         """Add a device_usage (temperature, heating, lighting, music, ...)
 
+        @param du_id : device id
         @param du_name : device usage name
         @param du_description : device usage description (optional)
         @param du_default_options : default options (optional)
@@ -485,7 +486,8 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        du = DeviceUsage(name=du_name, description=du_description, default_options=du_default_options)
+        du = DeviceUsage(id=ucode(du_id), name=ucode(du_name), description=du_description,
+                         default_options=du_default_options)
         self.__session.add(du)
         try:
             self.__session.commit()
@@ -509,6 +511,8 @@ class DbHelper():
         device_usage = self.__session.query(DeviceUsage).filter_by(id=du_id).first()
         if device_usage is None:
             raise DbHelperException("DeviceUsage with id %s couldn't be found" % du_id)
+        if du_id is not None:
+            device_usage.id = ucode(du_id)
         if du_name is not None:
             device_usage.name = ucode(du_name)
         if du_description is not None:
@@ -534,13 +538,13 @@ class DbHelper():
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        du = self.__session.query(DeviceUsage).filter_by(id=du_id).first()
+        du = self.__session.query(DeviceUsage).filter_by(id=ucode(du_id)).first()
         if du:
             if cascade_delete:
-                for device in self.__session.query(Device).filter_by(device_usage_id=du.id).all():
+                for device in self.__session.query(Device).filter_by(device_usage_id=ucode(du.id)).all():
                     self.del_device(device.id)
             else:
-                device_list = self.__session.query(Device).filter_by(device_usage_id=du.id).all()
+                device_list = self.__session.query(Device).filter_by(device_usage_id=ucode(du.id)).all()
                 if len(device_list) > 0:
                     raise DbHelperException("Couldn't delete device usage %s : there are associated devices" % du_id)
 

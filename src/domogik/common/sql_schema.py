@@ -151,19 +151,21 @@ class DeviceUsage(Base):
     """Usage of a device (temperature, heating, lighting, music...)"""
 
     __tablename__ = '%s_device_usage' % _db_prefix
-    id = Column(Integer, primary_key=True)
+    id = Column(Unicode(80), primary_key=True)
     name = Column(Unicode(30), nullable=False)
     description = Column(UnicodeText())
     default_options = Column(UnicodeText())
 
-    def __init__(self, name, description=None, default_options=None):
+    def __init__(self, id, name, description=None, default_options=None):
         """Class constructor
 
+        @param id : usage id
         @param name : short name of the usage
         @param description : extended description, optional
         @param default_options : default options, optional
 
         """
+        self.id = ucode(id)
         self.name = ucode(name)
         self.description = ucode(description)
         self.default_options = ucode(default_options)
@@ -286,7 +288,7 @@ class Device(Base):
     description = Column(UnicodeText())
     address = Column(Unicode(30), nullable=False)
     reference = Column(Unicode(30))
-    device_usage_id = Column(Integer, ForeignKey('%s.id' % DeviceUsage.get_tablename()), nullable=False)
+    device_usage_id = Column(Unicode(80), ForeignKey('%s.id' % DeviceUsage.get_tablename()), nullable=False)
     device_usage = relation(DeviceUsage)
     device_type_id = Column(Unicode(80), ForeignKey('%s.id' % DeviceType.get_tablename()), nullable=False)
     device_type = relation(DeviceType)

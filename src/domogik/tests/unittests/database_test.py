@@ -298,20 +298,20 @@ class DeviceUsageTestCase(GenericTestCase):
         assert len(db.list_device_usages()) == 0
 
     def test_add(self):
-        du1 = db.add_device_usage(du_name='du1', du_description='desc1', du_default_options='def opt1')
+        du1 = db.add_device_usage(du_id='du1_id', du_name='du1', du_description='desc1',
+                                  du_default_options='def opt1')
         print(du1)
         assert du1.name == 'du1'
         assert du1.description == 'desc1'
         assert du1.default_options == 'def opt1'
-        du2 = db.add_device_usage('du2')
+        du2 = db.add_device_usage(du_id='du2_id', du_name='du2')
         assert len(db.list_device_usages()) == 2
         assert self.has_item(db.list_device_usages(), ['du1', 'du2'])
 
     def test_update(self):
-        du = db.add_device_usage('du1')
-        du_u = db.update_device_usage(du_id=du.id, du_name='du2',
-                                           du_description='description 2',
-                                           du_default_options='def opt2')
+        du = db.add_device_usage(du_id='du1_id', du_name='du1')
+        du_u = db.update_device_usage(du_id=du.id, du_name='du2', du_description='description 2',
+                                      du_default_options='def opt2')
         assert du_u.name == 'du2'
         assert du_u.description == 'description 2'
         assert du_u.default_options == 'def opt2'
@@ -320,12 +320,12 @@ class DeviceUsageTestCase(GenericTestCase):
         assert du_u.default_options is None
 
     def test_list_and_get(self):
-        du1 = db.add_device_usage('du1')
+        du1 = db.add_device_usage(du_id='du1_id', du_name='du1')
         assert db.get_device_usage_by_name('Du1').name == 'du1'
 
     def test_del(self):
-        du1 = db.add_device_usage('du1')
-        du2 = db.add_device_usage('du2')
+        du1 = db.add_device_usage(du_id='du1_id', du_name='du1')
+        du2 = db.add_device_usage(du_id='du2_id', du_name='du2')
         du2_id = du2.id
         du_del = db.del_device_usage(du2.id)
         assert self.has_item(db.list_device_usages(), ['du1'])
