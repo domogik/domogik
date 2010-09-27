@@ -84,12 +84,15 @@ def install(create_prod_db, create_test_db):
     db.add_actuator_feature_model(af_id='x10.dimmer.switch', af_name='Switch', af_device_type_id=device_type.id,
                               af_parameters='{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}',
                               af_value_type='binary', af_stat_key='command')
-    db.add_actuator_feature_model(af_id='x10.dimmer.reduce', af_name='Reduce', af_device_type_id=device_type.id,
-                              af_parameters='{&quot;command&quot;:&quot;dim&quot;,&quot;valueMin&quot;:1, &quot;valueMax&quot;:22}',
-                              af_value_type='number', af_stat_key='level')
-    db.add_actuator_feature_model(af_id='x10.dimmer.increase', af_name='Increase', af_device_type_id=device_type.id,
-                              af_parameters='{&quot;command&quot;:&quot;bright&quot;,&quot;valueMin&quot;:1, &quot;valueMax&quot;:22}',
-                              af_value_type='number', af_stat_key='level')
+    db.add_actuator_feature_model(af_id='x10.dimmer.dim', af_name='Dim', af_device_type_id=device_type.id,
+                              af_parameters='{&quot;command&quot;:&quot;dim&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:100}',
+                              af_value_type='range', af_stat_key='level')
+#    db.add_actuator_feature_model(af_id='x10.dimmer.reduce', af_name='Reduce', af_device_type_id=device_type.id,
+#                              af_parameters='{&quot;command&quot;:&quot;dim&quot;,&quot;valueMin&quot;:1, &quot;valueMax&quot;:22}',
+#                              af_value_type='number', af_stat_key='level')
+#    db.add_actuator_feature_model(af_id='x10.dimmer.increase', af_name='Increase', af_device_type_id=device_type.id,
+#                              af_parameters='{&quot;command&quot;:&quot;bright&quot;,&quot;valueMin&quot;:1, &quot;valueMax&quot;:22}',
+#                              af_value_type='number', af_stat_key='level')
 
     # Create device technologie features for PLCBus
     device_technology = db.add_device_technology(dt_id='plcbus', dt_name='PLCBus', dt_description='')
@@ -101,27 +104,27 @@ def install(create_prod_db, create_test_db):
     db.add_actuator_feature_model(af_id='plcbus.dimmer.switch', af_name='Switch', af_device_type_id=device_type.id,
                               af_parameters='{&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}',
                               af_value_type='binary', af_stat_key='command', af_return_confirmation=True)
-    db.add_actuator_feature_model(af_id='plcbus.dimmer.dimmer', af_name='Dimmer', af_device_type_id=device_type.id,
+    db.add_actuator_feature_model(af_id='plcbus.dimmer.dim', af_name='Dim', af_device_type_id=device_type.id,
                               af_parameters='{&quot;command&quot;:&quot;preset_dim&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:100}',
                               af_value_type='range', af_stat_key='level', af_return_confirmation=True)
-    db.add_actuator_feature_model(af_id='plcbus.dimmer.reduce', af_name='Reduce', af_device_type_id=device_type.id,
-                              af_parameters='{&quot;command&quot;:&quot;dim&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:22}',
-                              af_value_type='number', af_stat_key='level', af_return_confirmation=True)
-    db.add_actuator_feature_model(af_id='plcbus.dimmer.increase', af_name='Increase', af_device_type_id=device_type.id,
-                              af_parameters='{&quot;command&quot;:&quot;bright&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:22}',
-                              af_value_type='number', af_stat_key='level', af_return_confirmation=True)
+#   db.add_actuator_feature_model(af_id='plcbus.dimmer.reduce', af_name='Reduce', af_device_type_id=device_type.id,
+#                              af_parameters='{&quot;command&quot;:&quot;dim&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:22}',
+#                              af_value_type='number', af_stat_key='level', af_return_confirmation=True)
+#    db.add_actuator_feature_model(af_id='plcbus.dimmer.increase', af_name='Increase', af_device_type_id=device_type.id,
+#                              af_parameters='{&quot;command&quot;:&quot;bright&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:22}',
+#                              af_value_type='number', af_stat_key='level', af_return_confirmation=True)
 
     # Create device technology features for EIB/KNX
     db.add_device_technology(dt_id='eibknx', dt_name='EIB/KNX', dt_description='')
 
     # Create device technology features for 1wire
     device_technology = db.add_device_technology(dt_id='onewire', dt_name='1-Wire', dt_description='')
-    device_type = db.add_device_type(dty_id='onewire.temperature', dty_name='Temperature', dt_id=device_technology.id)
-    db.add_sensor_feature_model(sf_id='onewire.temperature.temperature', sf_name='Temperature',
+    device_type = db.add_device_type(dty_id='onewire.thermometer', dty_name='Thermometer', dt_id=device_technology.id)
+    db.add_sensor_feature_model(sf_id='onewire.thermometer.temperature', sf_name='Temperature',
                                 sf_device_type_id=device_type.id, sf_value_type='number',
                                 sf_parameters='{&quot;unit&quot;:&quot;&deg;C&quot;}', sf_stat_key='temperature')
-    device_type = db.add_device_type(dty_id='onewire.id', dty_name='ID', dt_id=device_technology.id)
-    db.add_sensor_feature_model(sf_id='onewire.id.id', sf_name='ID',
+    device_type = db.add_device_type(dty_id='onewire.serial_number', dty_name='Serial Number', dt_id=device_technology.id)
+    db.add_sensor_feature_model(sf_id='onewire.serial_number.connected', sf_name='Connected',
                                 sf_device_type_id=device_type.id, sf_value_type='boolean', sf_parameters='{}',
                                 sf_stat_key='present')
 
@@ -158,11 +161,11 @@ def install(create_prod_db, create_test_db):
 
     # Create device technology features for RFID
     device_technology = db.add_device_technology(dt_id='rfid', dt_name='RFID', dt_description='')
-    device_type = db.add_device_type(dty_id='rfid.mirror_base', dty_name='Mirror_Base', dt_id=device_technology.id)
+    device_type = db.add_device_type(dty_id='rfid.mirror_base', dty_name='Mirror Base', dt_id=device_technology.id)
     db.add_sensor_feature_model(sf_id='rfid.mirror_base.activated', sf_name='Activated',
                                 sf_device_type_id=device_type.id, sf_value_type='boolean',
                                 sf_parameters='{}', sf_stat_key='activated')
-    device_type = db.add_device_type(dty_id='rfid.mirror_tag', dty_name='Mirror_Tag', dt_id=device_technology.id)
+    device_type = db.add_device_type(dty_id='rfid.mirror_tag', dty_name='Mirror Tag', dt_id=device_technology.id)
     db.add_sensor_feature_model(sf_id='rfid.mirror_tag.present', sf_name='Present', sf_device_type_id=device_type.id,
                                 sf_value_type='boolean', sf_parameters='{}', sf_stat_key='present')
 
@@ -177,12 +180,12 @@ def install(create_prod_db, create_test_db):
     db.add_actuator_feature_model(af_id='relayboard.relay.trigger', af_name='Trigger', af_device_type_id=device_type.id,
                               af_parameters='{&quot;command&quot;:&quot;pulse&quot;}',af_value_type='trigger',
                               af_return_confirmation=True)
-    device_type = db.add_device_type(dty_id='relayboard.digital_input', dty_name='Digital_Input',
+    device_type = db.add_device_type(dty_id='relayboard.digital_input', dty_name='Digital Input',
                                      dt_id=device_technology.id)
     db.add_sensor_feature_model(sf_id='relayboard.digital_input.digital_input', sf_name='Digital Input',
                                 sf_device_type_id=device_type.id, sf_value_type='boolean',
                                 sf_parameters='{}', sf_stat_key='input')
-    device_type = db.add_device_type(dty_id='relayboard.analog_input', dty_name='Analog_Input',
+    device_type = db.add_device_type(dty_id='relayboard.analog_input', dty_name='Analog Input',
                                      dt_id=device_technology.id)
     db.add_sensor_feature_model(sf_id='relayboard.analog_input.analog_input', sf_name='Analog Input',
                                 sf_device_type_id=device_type.id, sf_value_type='boolean',
@@ -195,7 +198,7 @@ def install(create_prod_db, create_test_db):
     device_technology = db.add_device_technology(dt_id='computer', dt_name='Computer',
                                              dt_description='Computers monitoring and controling ')
     device_type = db.add_device_type(dty_id='computer.control', dty_name='Control', dt_id=device_technology.id)
-    db.add_actuator_feature_model(af_id='computer.control.wol', af_name='WOL', af_device_type_id=device_type.id,
+    db.add_actuator_feature_model(af_id='computer.control.wol', af_name='Wake on Lan', af_device_type_id=device_type.id,
                                   af_parameters='{&quot;command&quot;:&quot;wol&quot;}',af_value_type='trigger',
                                   af_return_confirmation=False)
     db.add_sensor_feature_model(sf_id='computer.control.ping', sf_name='Ping', sf_device_type_id=device_type.id,
@@ -206,8 +209,8 @@ def install(create_prod_db, create_test_db):
     # Create device technologie features for communication
     device_technology = db.add_device_technology(dt_id='communication', dt_name='Communication',
                          dt_description='Telephony, videophone, mails, messaging')
-    device_type = db.add_device_type(dty_id='communication.caller_id', dty_name='Caller_Id', dt_id=device_technology.id)
-    db.add_sensor_feature_model(sf_id='communication.caller_id.caller_id', sf_name='Caller Id',
+    device_type = db.add_device_type(dty_id='communication.caller_id', dty_name='Caller Id', dt_id=device_technology.id)
+    db.add_sensor_feature_model(sf_id='communication.caller_id.number', sf_name='Number',
                                 sf_device_type_id=device_type.id, sf_value_type='string',
                                 sf_parameters='{}', sf_stat_key='phone')
 
