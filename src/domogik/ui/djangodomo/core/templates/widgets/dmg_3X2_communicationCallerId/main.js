@@ -49,6 +49,7 @@
                 this.previous = stat.value;
             } else {
                 this.values[0].number++;
+                this.values[0].timestamp = stat.timestamp;                
             }
         },
         
