@@ -179,7 +179,7 @@ case "$1" in
     ;;
     restart)
     $0 stop $2
-    sleep 2
+    sleep 5
     $0 start $2
     ;;
     *)
