@@ -102,6 +102,18 @@
         </ul>
     </section>
     <section class="subsection">
+        <h2>{% trans "Statistics" %}</h2>
+        <ul class='stats'>
+            <li><span class='label'>XML files loaded: </span>
+                <ul id='fileslist'>
+                {% for file in rest.stats.XML_files %}
+                    <li>{{ file }}</li>
+                {% endfor %}
+                </ul>
+            </li>
+        </ul>
+    </section>
+    <section class="subsection">
         <h2>{% trans "Commands" %}</h2>
         <ul class='commands'>
             <li><span class='label'>XML files last load: </span>{{rest.command.XML_files_last_load}}</li>
