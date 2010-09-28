@@ -500,10 +500,12 @@ class DeviceFeatureAssociationTestCase(GenericTestCase):
     """Test device / feature association"""
 
     def setUp(self):
+        self.remove_all_device_usages()
         self.remove_all_device_feature_associations()
         self.remove_all_device_technologies()
 
     def tearDown(self):
+        self.remove_all_device_usages()
         self.remove_all_device_feature_associations()
         self.remove_all_device_technologies()
 
@@ -517,8 +519,8 @@ class DeviceFeatureAssociationTestCase(GenericTestCase):
         room2 = db.add_room('Room', area1.id)
         dt1 = db.add_device_technology('x10', 'x10', 'x10 device type')
         dt2 = db.add_device_technology('plcbus', 'PLCBus', 'PLCBus device type')
-        du1 = db.add_device_usage('Appliance')
-        du2 = db.add_device_usage('Lamp')
+        du1 = db.add_device_usage('appliance', 'Appliance')
+        du2 = db.add_device_usage('lamp', 'Lamp')
         dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dt_id=dt1.id, dty_description='My switch')
         dty2 = db.add_device_type(dty_id='plcbus.lamp', dty_name='Lamp', dt_id=dt2.id)
         af1 = db.add_actuator_feature_model(af_id='x10.switch.switch', af_name='Switch', af_device_type_id=dty1.id,
@@ -560,7 +562,7 @@ class DeviceFeatureAssociationTestCase(GenericTestCase):
         room2 = db.add_room('Room', area1.id)
         dt1 = db.add_device_technology('x10', 'x10', 'x10 device type')
         dt2 = db.add_device_technology('plcbus', 'PLCBus', 'PLCBus device type')
-        du1 = db.add_device_usage('Appliance')
+        du1 = db.add_device_usage('appliance', 'Appliance')
         dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dt_id=dt1.id,
                                   dty_description='My beautiful switch')
         dty2 = db.add_device_type(dty_id='plcbus.switch', dty_name='Switch', dt_id=dt2.id,
@@ -701,11 +703,14 @@ class DeviceTestCase(GenericTestCase):
     """Test device"""
 
     def setUp(self):
+        self.remove_all_device_usages()
         self.remove_all_devices()
         self.remove_all_device_technologies()
 
     def tearDown(self):
+        self.remove_all_device_usages()
         self.remove_all_devices()
+        self.remove_all_device_technologies()
 
     def test_empty_list(self):
         assert len(db.list_devices()) == 0
@@ -714,7 +719,7 @@ class DeviceTestCase(GenericTestCase):
         area1 = db.add_area('area1','description 1')
         room1 = db.add_room('room1', area1.id)
         dt1 = db.add_device_technology('x10', 'x10', 'desc dt1')
-        du1 = db.add_device_usage('du1')
+        du1 = db.add_device_usage('du1_id', 'du1')
         dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
         try:
             db.add_device(d_name='device1', d_address = 'A1', d_type_id = 9999999999, d_usage_id = du1.id)
@@ -738,7 +743,7 @@ class DeviceTestCase(GenericTestCase):
         room2 = db.add_room('Bathroom', area1.id)
         dt1 = db.add_device_technology('x10', 'x10', 'x10 device type')
         dt2 = db.add_device_technology('plcbus', 'PLCBus', 'PLCBus device type')
-        du1 = db.add_device_usage('Appliance')
+        du1 = db.add_device_usage('appliance', 'Appliance')
         dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dt_id=dt1.id,
                                   dty_description='My beautiful switch')
         dty2 = db.add_device_type(dty_id='plcbus.switch', dty_name='Switch', dt_id=dt2.id,
@@ -760,7 +765,7 @@ class DeviceTestCase(GenericTestCase):
         room2 = db.add_room('room2', area1.id)
         dt1 = db.add_device_technology('x10', 'x10', 'desc dt1')
         dty1 = db.add_device_type(dty_id='x10.switch', dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
-        du1 = db.add_device_usage('du1')
+        du1 = db.add_device_usage('du1_id', 'du1')
         device1 = db.add_device(d_name='device1', d_address='A1',
                                 d_type_id=dty1.id, d_usage_id=du1.id, d_description='desc1')
         device_id = device1.id
@@ -783,8 +788,8 @@ class DeviceTestCase(GenericTestCase):
         room2 = db.add_room('room2', area2.id)
         dt1 = db.add_device_technology('x10', 'x10', 'desc dt1')
         dty1 = db.add_device_type(dty_id='x10.switch', dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
-        du1 = db.add_device_usage('du1')
-        du2 = db.add_device_usage('du2')
+        du1 = db.add_device_usage('du1_id', 'du1')
+        du2 = db.add_device_usage('du2_id', 'du2')
         device1 = db.add_device(d_name='device1', d_address='A1',
                                 d_type_id=dty1.id, d_usage_id=du1.id, d_description='desc1')
         device2 = db.add_device(d_name='device2', d_address='A2',
@@ -808,28 +813,33 @@ class DeviceTestCase(GenericTestCase):
 class DeviceConfigTestCase(GenericTestCase):
     """Test Device config"""
 
-    def __create_sample_device(self, device_name, device_technology_name):
+    def __create_sample_device(self, device_name, device_technology_name, id=1):
         dt = db.add_device_technology(device_technology_name, 'a name', 'this is my device tech')
-        du = db.add_device_usage("lighting")
-        dty = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt.id)
+        # Using id avoids duplicate keys
+        du = db.add_device_usage('lighting'+str(id), 'Lighting'+str(id))
+        dty = db.add_device_type(dty_id='x10.switch'+str(id), dty_name='Switch'+str(id),
+                                 dty_description='desc1', dt_id=dt.id)
         area = db.add_area('area1','description 1')
         room = db.add_room('room1', area.id)
         device = db.add_device(d_name=device_name, d_address = "A1", d_type_id=dty.id, d_usage_id=du.id)
         return device
 
     def setUp(self):
+        self.remove_all_device_usages()
         self.remove_all_device_config()
         self.remove_all_device_technologies()
 
     def tearDown(self):
+        self.remove_all_device_usages()
         self.remove_all_device_config()
+        self.remove_all_device_technologies()
 
     def test_empty_list(self):
         assert len(db.list_all_device_config()) == 0
 
     def test_add(self):
-        device1 = self.__create_sample_device('device1', 'dt1')
-        device2 = self.__create_sample_device('device2', 'dt2')
+        device1 = self.__create_sample_device('device1', 'dt1', 1)
+        device2 = self.__create_sample_device('device2', 'dt2', 2)
         device_config1_1 = db.set_device_config('key1_1', 'val1_1', device1.id)
         print(device_config1_1)
         assert device_config1_1.key == 'key1_1'
@@ -848,8 +858,8 @@ class DeviceConfigTestCase(GenericTestCase):
         assert device_config1_1.value == 'val1_1_u'
 
     def test_get(self):
-        device1 = self.__create_sample_device('device1', 'dt1')
-        device2 = self.__create_sample_device('device2', 'dt2')
+        device1 = self.__create_sample_device('device1', 'dt1', 1)
+        device2 = self.__create_sample_device('device2', 'dt2', 2)
         device_config1_1 = db.set_device_config('key1_1', 'val1_1', device1.id)
         device_config2_1 = db.set_device_config('key2_1', 'val2_1', device1.id)
         device_config3_1 = db.set_device_config('key3_1', 'val3_1', device1.id)
@@ -859,8 +869,8 @@ class DeviceConfigTestCase(GenericTestCase):
         assert db.get_device_config_by_key('key1_2', device2.id).value == 'val1_2'
 
     def test_del(self):
-        device1 = self.__create_sample_device('device1', 'dt1')
-        device2 = self.__create_sample_device('device2', 'dt2')
+        device1 = self.__create_sample_device('device1', 'dt1', 1)
+        device2 = self.__create_sample_device('device2', 'dt2', 2)
         device_config1_1 = db.set_device_config('key1_1', 'val1_1', device1.id)
         device_config2_1 = db.set_device_config('key2_1', 'val2_1', device1.id)
         device_config3_1 = db.set_device_config('key3_1', 'val3_1', device1.id)
@@ -876,10 +886,13 @@ class DeviceStatsTestCase(GenericTestCase):
     """Test device stats"""
 
     def setUp(self):
-        self.remove_all_device_stats()
+        self.remove_all_device_usages()
         self.remove_all_device_technologies()
+        self.remove_all_device_stats()
 
     def tearDown(self):
+        self.remove_all_device_usages()
+        self.remove_all_device_technologies()
         self.remove_all_device_stats()
 
     def test_empty_list(self):
@@ -894,7 +907,7 @@ class DeviceStatsTestCase(GenericTestCase):
     def test_add_list_get(self):
         dt1 = db.add_device_technology('x10', 'x10', 'this is x10')
         dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
-        du1 = db.add_device_usage("lighting")
+        du1 = db.add_device_usage('lighting', 'Lighting')
         area1 = db.add_area('area1','description 1')
         room1 = db.add_room('room1', area1.id)
         device1 = db.add_device(d_name='device1', d_address = "A1", d_type_id = dty1.id, d_usage_id = du1.id)
@@ -944,7 +957,7 @@ class DeviceStatsTestCase(GenericTestCase):
     def test_add_with_hist_size(self):
         dt1 = db.add_device_technology('x10', 'x10', 'this is x10')
         dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
-        du1 = db.add_device_usage("lighting")
+        du1 = db.add_device_usage('lighting', 'Lighting')
         device1 = db.add_device(d_name='device1', d_address = "A1", d_type_id = dty1.id, d_usage_id = du1.id)
         db.add_device_stat(make_ts(2010, 04, 9, 12, 0), 'val2', 1000, device1.id)
         db.add_device_stat(make_ts(2010, 04, 9, 12, 1), 'val1', 1, device1.id)
@@ -963,7 +976,7 @@ class DeviceStatsTestCase(GenericTestCase):
     def test_filter(self):
         dt1 = db.add_device_technology('x10', 'x10', 'this is x10')
         dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
-        du1 = db.add_device_usage("lighting")
+        du1 = db.add_device_usage('lighting', 'Lighting')
         area1 = db.add_area('area1','description 1')
         room1 = db.add_room('room1', area1.id)
         device1 = db.add_device(d_name='device1', d_address = "A1", d_type_id = dty1.id, d_usage_id = du1.id)
@@ -1125,7 +1138,7 @@ class DeviceStatsTestCase(GenericTestCase):
     def test_del(self):
         dt1 = db.add_device_technology('x10', 'x10', 'this is x10')
         dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
-        du1 = db.add_device_usage("lighting")
+        du1 = db.add_device_usage('lighting', 'Lighting')
         area1 = db.add_area('area1','description 1')
         room1 = db.add_room('room1', area1.id)
         device1 = db.add_device(d_name='device1', d_address='A1', d_type_id=dty1.id, d_usage_id=du1.id)
