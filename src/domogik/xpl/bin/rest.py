@@ -1263,7 +1263,9 @@ target=*
         """
 
         st_from = float(self.get_parameters("from"))
-        st_to = float(self.get_parameters("to"))
+        st_to = self.get_parameters("to")
+        if st_to != None:
+            st_to = float(st_to)
         st_interval = self.get_parameters("interval")
         st_selector = self.get_parameters("selector")
 
