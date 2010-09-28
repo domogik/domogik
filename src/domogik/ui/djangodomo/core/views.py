@@ -50,6 +50,7 @@ from domogik.ui.djangodomo.core.models import (
 from domogik.ui.djangodomo.core.sample_data_helper import SampleDataHelper
 
 from django_pipes.exceptions import ResourceNotAvailableException
+from httplib import BadStatusLine
 
 __db = database.DbHelper()
 
@@ -89,6 +90,8 @@ def login(request):
     else:
         try:
             result_all_accounts = Accounts.get_all_users()
+        except BadStatusLine:
+            return render_to_response('error/BadStatusLine.html')
         except ResourceNotAvailableException:
             return render_to_response('error/ResourceNotAvailableException.html')
         return __go_to_page(
@@ -115,6 +118,8 @@ def auth(request, next):
     user_password = request.POST.get("password",'')
     try:
         result_auth = Accounts.auth(user_login, user_password)
+    except BadStatusLine:
+        return render_to_response('error/BadStatusLine.html')
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
     if result_auth.status == 'OK':
@@ -191,6 +196,8 @@ def admin_management_accounts(request):
     try:
         result_all_accounts = Accounts.get_all_users()
         result_all_people = Accounts.get_all_people()
+    except BadStatusLine:
+        return render_to_response('error/BadStatusLine.html')
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
     page_title = _("Accounts management")
@@ -221,7 +228,8 @@ def admin_organization_devices(request):
         result_all_devices.merge_uiconfig()
         result_all_usages = DeviceUsages.get_all()
         result_all_types = DeviceTypes.get_all()
-
+    except BadStatusLine:
+        return render_to_response('error/BadStatusLine.html')
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
 
@@ -257,6 +265,8 @@ def admin_organization_rooms(request):
         result_all_areas = Areas.get_all()
         result_all_areas.merge_rooms()
         result_all_areas.merge_uiconfig()
+    except BadStatusLine:
+        return render_to_response('error/BadStatusLine.html')
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
 
@@ -288,6 +298,8 @@ def admin_organization_areas(request):
     try:
         result_all_areas = Areas.get_all()
         result_all_areas.merge_uiconfig()
+    except BadStatusLine:
+        return render_to_response('error/BadStatusLine.html')
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
 
@@ -315,6 +327,8 @@ def admin_organization_house(request):
     msg = request.GET.get('msg', '')
     try:
         result_house = House()
+    except BadStatusLine:
+        return render_to_response('error/BadStatusLine.html')
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
     page_title = _("House organization")
@@ -353,6 +367,8 @@ def admin_organization_features(request):
         result_house = UIConfigs.get_general('house')
         result_house_features_associations = FeatureAssociations.get_by_house()
 
+    except BadStatusLine:
+        return render_to_response('error/BadStatusLine.html')
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
 
@@ -384,6 +400,8 @@ def admin_plugins_plugin(request, plugin_name):
     try:
         result_plugin_detail = Plugins.get_detail(plugin_name)
         result_all_plugins = Plugins.get_all()
+    except BadStatusLine:
+        return render_to_response('error/BadStatusLine.html')
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
     page_title = _("Plugin")
@@ -429,7 +447,12 @@ def admin_tools_rest(request):
     status = request.GET.get('status', '')
     msg = request.GET.get('msg', '')
     page_title = _("Rest informations")
-    rest_result = Rest.get_info()
+    try:
+        rest_result = Rest.get_info()
+    except BadStatusLine:
+        return render_to_response('error/BadStatusLine.html')
+    except ResourceNotAvailableException:
+        return render_to_response('error/ResourceNotAvailableException.html')
     return __go_to_page(
         request, 'admin/tools/rest.html',
         page_title,
@@ -462,8 +485,11 @@ def index(request):
         result_house_rooms = Rooms.get_without_area()
         result_house_rooms.merge_uiconfig()
 
+    except BadStatusLine:
+        return render_to_response('error/BadStatusLine.html')
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
+
     return __go_to_page(
         request, 'index.html',
         page_title,
@@ -496,6 +522,8 @@ def show_house(request):
         result_house_rooms = Rooms.get_without_area()
         result_house_rooms.merge_uiconfig()
 
+    except BadStatusLine:
+        return render_to_response('error/BadStatusLine.html')
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
     return __go_to_page(
@@ -527,6 +555,8 @@ def show_house_edit(request):
         result_all_devices.merge_uiconfig()
         result_all_devices.merge_features()
 
+    except BadStatusLine:
+        return render_to_response('error/BadStatusLine.html')
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
     return __go_to_page(
@@ -558,6 +588,8 @@ def show_area(request, area_id):
 
         result_house = House()
 
+    except BadStatusLine:
+        return render_to_response('error/BadStatusLine.html')
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
 
@@ -593,6 +625,8 @@ def show_area_edit(request, area_id):
         result_all_devices.merge_uiconfig()
         result_all_devices.merge_features()
 
+    except BadStatusLine:
+        return render_to_response('error/BadStatusLine.html')
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
 
@@ -624,6 +658,8 @@ def show_room(request, room_id):
 
         result_house = House()
 
+    except BadStatusLine:
+        return render_to_response('error/BadStatusLine.html')
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
 
@@ -658,6 +694,8 @@ def show_room_edit(request, room_id):
         result_all_devices.merge_uiconfig()
         result_all_devices.merge_features()
 
+    except BadStatusLine:
+        return render_to_response('error/BadStatusLine.html')
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
 
