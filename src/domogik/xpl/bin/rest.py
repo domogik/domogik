@@ -144,7 +144,8 @@ class Rest(XplPlugin):
             cfg = Loader('domogik')
             config = cfg.load()
             conf = dict(config[1])
-            self._xml_directory = "%s/share/domogik/url2xpl/" % conf['custom_prefix']
+            self._xml_cmd_dir = "%s/share/domogik/url2xpl/" % conf['custom_prefix']
+            self._xml_stat_dir = "%s/share/domogik/stats/" % conf['custom_prefix']
     
             # HTTP server ip and port
             try:
@@ -485,9 +486,9 @@ class Rest(XplPlugin):
         """
         # list technologies folders
         self.xml = {}
-        for techno in os.listdir(self._xml_directory):
-            for command in os.listdir(self._xml_directory + "/" + techno):
-                xml_file = self._xml_directory + "/" + techno + "/" + command
+        for techno in os.listdir(self._xml_cmd_dir):
+            for command in os.listdir(self._xml_cmd_dir + "/" + techno):
+                xml_file = self._xml_cmd_dir + "/" + techno + "/" + command
                 self._log.info("Load XML file for %s>%s : %s" % (techno, command, xml_file))
                 self.xml["%s/%s" % (techno, command)] = minidom.parse(xml_file)
         self.xml_date = datetime.datetime.now()
@@ -783,7 +784,8 @@ class ProcessRequest():
         self._myxpl = self.handler_params[0]._myxpl
         self._log = self.handler_params[0]._log
         self._log_dm = self.handler_params[0]._log_dm
-        self._xml_directory = self.handler_params[0]._xml_directory
+        self._xml_cmd_dir = self.handler_params[0]._xml_cmd_dir
+        self._xml_stat_dir = self.handler_params[0]._xml_stat_dir
         self.repo_dir = self.handler_params[0].repo_dir
         self.use_ssl = self.handler_params[0].use_ssl
         self.get_exception = self.handler_params[0].get_exception
@@ -950,13 +952,23 @@ class ProcessRequest():
         info["Version"] = REST_API_VERSION
         info["SSL"] = self.use_ssl
 
-        # Xml data
+        # Xml command files
         command = {}
         xml_info = []
         for key in self.xml:
             xml_info.append(key)
         command["XML_files_loaded"] = xml_info
         command["XML_files_last_load"] = self.xml_date
+
+        # Xml stat files
+        # TODO : make a nicer way : in StatsManager class, create a function
+        # that return list of xml files and detail of filters/mappings
+        stats = {}
+        xml_stats = []
+        files = glob.glob("%s/*/*xml" % self._xml_stat_dir)
+        for _file in files :
+            xml_stats.append(_file)
+        stats["XML_files"] = xml_stats
 
         # Queues stats
         queues = {}
@@ -978,6 +990,7 @@ class ProcessRequest():
         events["Requests"] = self._event_requests.list()
 
         data = {"info" : info, "command" : command,
+                "stats" : stats,
                 "queue" : queues, "event" : events}
         json_data.add_data(data)
         self.send_http_response_ok(json_data.get())
