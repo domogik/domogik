@@ -4207,9 +4207,7 @@ class StatsManager(XplPlugin):
             #        % (self._technology, message.data[self._res["device"]]))
             self._log_stats.debug("Stat received for %s - %s." \
                     % (self._technology, device))
-            #current_date = time.mktime(calendar.timegm(datetime.datetime.now().timetuple()))
-            current_date = calendar.timegm(datetime.datetime.now().timetuple())
-            #current_date = datetime.datetime.now()
+            current_date = calendar.timegm(time.gmtime())
             device_data = []
 
             ### mapping processing
