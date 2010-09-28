@@ -108,11 +108,11 @@ PING_DURATION = 2
 
 ################################################################################
 class Rest(XplPlugin):
-    """ REST Server 
-        - create a HTTP server 
+    """ REST Server
+        - create a HTTP server
         - process REST requests
     """
-        
+
 
     def __init__(self, server_ip, server_port):
         """ Initiate DbHelper, Logs and config
@@ -130,22 +130,22 @@ class Rest(XplPlugin):
         log_queue = logger.Logger('rest-queues')
         self._log_queue = log_queue.get_logger()
         self._log_queue.info("Rest's queues activities...")
-    
+
         # logging data manipulation initialization
         log_dm = logger.Logger('rest-dm')
         self._log_dm = log_dm.get_logger()
         self._log_dm.info("Rest Server Data Manipulation...")
-    
+
         try:
-    
+
             ### Config
-    
+
             # directory data in ~/.domogik.cfg
             cfg = Loader('domogik')
             config = cfg.load()
             conf = dict(config[1])
             self._xml_directory = "%s/share/domogik/url2xpl/" % conf['custom_prefix']
-    
+
             # HTTP server ip and port
             try:
                 cfg_rest = Loader('rest')
@@ -158,7 +158,7 @@ class Rest(XplPlugin):
                 self.server_ip = server_ip
                 self.server_port = server_port
             self._log.info("Configuration : ip:port = %s:%s" % (self.server_ip, self.server_port))
-    
+
             # SSL configuration
             try:
                 cfg_rest = Loader('rest')
@@ -178,7 +178,7 @@ class Rest(XplPlugin):
                 self._log.info("Configuration : SSL support activated (certificate : %s)" % self.ssl_certificate)
             else:
                 self._log.info("Configuration : SSL support not activated")
-    
+
             # File repository
             try:
                 cfg_rest = Loader('rest')
@@ -258,7 +258,7 @@ class Rest(XplPlugin):
             if self._queue_event_life_expectancy == "None":
                 self._queue_event_life_expectancy = QUEUE_EVENT_LIFE_EXPECTANCY
             self._queue_event_life_expectancy = float(self._queue_event_life_expectancy)
-    
+
             # Queues for xPL
             self._queue_system_list = Queue(self._queue_size)
             self._queue_system_detail = Queue(self._queue_size)
@@ -267,7 +267,7 @@ class Rest(XplPlugin):
 
             # Queues for /command
             self._queue_command = Queue(self._queue_command_size)
-    
+
             # Queues for /event
             # this queue will be fill by stat manager
             self._event_requests = EventRequests(self._log,
@@ -275,7 +275,7 @@ class Rest(XplPlugin):
                                                  self._queue_event_size,
                                                  self._queue_event_timeout,
                                                  self._queue_event_life_expectancy)
-    
+
             # define listeners for queues
             self._log.debug("Create listeners")
             Listener(self._add_to_queue_system_list, self._myxpl, \
@@ -300,7 +300,7 @@ class Rest(XplPlugin):
                       'host' : gethostname()})
             Listener(self._add_to_queue_command, self._myxpl, \
                      {'xpltype': 'xpl-trig'})
-    
+
             # Load xml files for /command
             self.xml = {}
             self.xml_date = None
@@ -364,7 +364,7 @@ class Rest(XplPlugin):
 
     def _get_from_queue_without_waiting(self, my_queue, filter_type = None, filter_schema = None, filter_data = None, nb_rec = 0):
         """ Get an item from queue (recursive function)
-            Checks are made on : 
+            Checks are made on :
             - life expectancy of message
             - filter given
             - size of queue
@@ -390,7 +390,7 @@ class Rest(XplPlugin):
         # if message not too old, we process it
         if time.time() - msg_time < self._queue_life_expectancy:
             # no filter defined
-            if filter_type == None and filter_schema == None and filter_data == None: 
+            if filter_type == None and filter_schema == None and filter_data == None:
                 self._log_queue.debug("Get from queue %s : return %s" % (str(my_queue), str(message)))
                 return message
 
@@ -416,7 +416,7 @@ class Rest(XplPlugin):
                         else:
                             if message.data[key].lower() != filter_data[key].lower():
                                 keep_data = False
-    
+
                 # if message is ok for us, return it
                 if keep_data == True:
                     self._log_queue.debug("Get from queue %s : return %s" % (str(my_queue), str(message)))
@@ -435,11 +435,11 @@ class Rest(XplPlugin):
 
     def _put_in_queue(self, my_queue, message):
         """ put a message in a named queue
-            @param my_queue : queue 
+            @param my_queue : queue
             @param message : data to put in queue
         """
         self._log_queue.debug("Put in queue %s : %s" % (str(my_queue), str(message)))
-        my_queue.put((time.time(), message), True, self._queue_timeout) 
+        my_queue.put((time.time(), message), True, self._queue_timeout)
         # TODO : except Full:
         #           call a "clean" function
         #           put again in queue
@@ -598,7 +598,7 @@ class HTTPSServerWithParam(SocketServer.ThreadingMixIn, HTTPServer):
 ################################################################################
 class RestHandler(BaseHTTPRequestHandler):
     """ Class/object called for each request to HTTP server
-        Here we will process use GET/POST/OPTION HTTP methods 
+        Here we will process use GET/POST/OPTION HTTP methods
         and then create a REST request
     """
 
@@ -645,7 +645,7 @@ class RestHandler(BaseHTTPRequestHandler):
         self.do_for_all_methods()
 
     def do_for_all_methods(self):
-        """ Create an object for each request. This object will process 
+        """ Create an object for each request. This object will process
             the REST url
         """
         try:
@@ -662,7 +662,7 @@ class RestHandler(BaseHTTPRequestHandler):
             request.do_for_all_methods()
         except:
             self.server.handler_params[0]._log.error("%s" % self.server.handler_params[0].get_exception())
-        
+
 
 
 
@@ -693,7 +693,7 @@ class RestHandler(BaseHTTPRequestHandler):
                 else:
                     self.server.handler_params[0]._log.debug("Send HTTP data : %s" % data.encode("utf-8"))
                 self.wfile.write(data.encode("utf-8"))
-        except IOError as err: 
+        except IOError as err:
             if err.errno == errno.EPIPE:
                 # [Errno 32] Broken pipe : client closed connexion
                 self.server.handler_params[0]._log.debug("It seems that socket has closed on client side (the browser may have change the page displayed")
@@ -704,13 +704,13 @@ class RestHandler(BaseHTTPRequestHandler):
 
     def send_http_response_error(self, err_code, err_msg, jsonp, jsonp_cb):
         """ Send to browser a HTTP 200 responde
-            200 is the code for "no problem" but we send error status in 
+            200 is the code for "no problem" but we send error status in
             json data, so we use 200 code
             Send also json data
-            @param err_code : error code. 999 : generic error 
+            @param err_code : error code. 999 : generic error
             @param err_msg : error description
             @param jsonp : True/False. True : use jsonp format
-            @param jsonp_cb : if jsonp is True, name of callback to use 
+            @param jsonp_cb : if jsonp is True, name of callback to use
                               in jsonp format
         """
         self.server.handler_params[0]._log.warning("Send HTTP header for ERROR : code=%s ; msg=%s" % (err_code, err_msg))
@@ -759,9 +759,9 @@ class ProcessRequest():
             @param path : path given to HTTP server : /base/area/... for example
             @param command : GET, POST, PUT, OPTIONS, etc
             @param cb_send_http_response_ok : callback for function
-                                              REST.send_http_response_ok 
+                                              REST.send_http_response_ok
             @param cb_send_http_response_error : callback for function
-                                              REST.send_http_response_error 
+                                              REST.send_http_response_error
         """
 
         self.handler_params = handler_params
@@ -816,7 +816,7 @@ class ProcessRequest():
         # url processing
         #self.path = urllib.unquote(unicode(self.path))
 
-        # replace password by "***". 
+        # replace password by "***".
         path_without_passwd = re.sub("password/[^/]+/", "password/***/", self.path + "/")
         self._log.info("Request : %s" % path_without_passwd)
 
@@ -1017,7 +1017,7 @@ class ProcessRequest():
         self._log.debug("Command : %s" % command)
         self._log.debug("Params  : %s" % str(params))
 
-        ### Get message 
+        ### Get message
         message = self._rest_command_get_message(techno, address, command, params)
 
         ### Get listener
@@ -1053,7 +1053,7 @@ class ProcessRequest():
 
     def _rest_command_get_message(self, techno, address, command, params):
         """ Generate xpl message for /command
-        """ 
+        """
         ref = "%s/%s.xml" % (techno, command)
         try:
             xml_data = self.xml[ref]
@@ -1078,7 +1078,7 @@ class ProcessRequest():
         ### Get data from xml
         # Schema
         schema = xml_command.getElementsByTagName("schema")[0].firstChild.nodeValue
-        # command key name 
+        # command key name
         command_key = xml_command.getElementsByTagName("command-key")[0].firstChild.nodeValue
         #address key name (device)
         address_key = xml_command.getElementsByTagName("address-key")[0].firstChild.nodeValue
@@ -1123,7 +1123,7 @@ target=*
 
 
     def _rest_command_get_listener(self, techno, address, command):
-        """ Create listener for /command 
+        """ Create listener for /command
         """
         xml_data = self.xml["%s/%s.xml" % (techno, command)]
 
@@ -1269,7 +1269,7 @@ target=*
             for data in self._db.list_stats_of_device_between_by_key(key, device_id, st_from, st_to):
                 json_data.add_data(data)
         self.send_http_response_ok(json_data.get())
-    
+
 
 
 
@@ -1300,7 +1300,7 @@ target=*
                     except ValueError:
                         self.send_http_response_error(999, "Bad value for device id '%s'" % self.rest_request[new_idx], self.jsonp, self.jsonp_cb)
                         return
-                        
+
                     new_idx += 1
                 if new_idx == 2:
                     self.send_http_response_error(999, "No device id given", self.jsonp, self.jsonp_cb)
@@ -1391,7 +1391,7 @@ target=*
         message = XplMessage()
         message.set_type('xpl-cmnd')
         message.set_schema(self.xpl_cmnd_schema)
-  
+
         iii = 0
         for val in self.rest_request:
             # We pass target and schema
@@ -1863,7 +1863,7 @@ target=*
                 elif len(self.rest_request) == 4 and self.rest_request[2] == "feature_id":
                     self._rest_base_feature_association_del(feature_id=self.rest_request[3])
                 elif len(self.rest_request) == 6 and self.rest_request[2] == "association_type" and self.rest_request[4] == "association_id":
-                    self._rest_base_feature_association_del(association_type=self.rest_request[3], 
+                    self._rest_base_feature_association_del(association_type=self.rest_request[3],
                                                             association_id=self.rest_request[5])
                 else:
                     self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
@@ -2364,7 +2364,7 @@ target=*
     def _rest_base_feature_list(self, id = None, device_id = None):
         """ list device type features
             @param id : feature id
-            @param device_id : id of device 
+            @param device_id : id of device
         """
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
@@ -2514,7 +2514,7 @@ target=*
 
 
     def _rest_base_device_del(self, id):
-        """ delete device 
+        """ delete device
             @param id : device id
         """
         json_data = JSonHelper("OK")
@@ -2630,7 +2630,7 @@ target=*
 
 
 
-    def _rest_base_feature_association_del(self, id = None, 
+    def _rest_base_feature_association_del(self, id = None,
                                           feature_id = None,
                                           association_type = None,
                                           association_id = None):
@@ -2813,7 +2813,7 @@ target=*
         # process message
         cmd = message.data['command']
         host = message.data["host"]
-    
+
 
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
@@ -2878,7 +2878,7 @@ target=*
             return
         except:
             # no error, everything is alright
-            pass 
+            pass
         description = message.data["description"]
         technology = message.data["technology"]
         status = message.data["status"]
@@ -3052,11 +3052,11 @@ target=*
                 self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
                                                   self.jsonp, self.jsonp_cb)
                 return
-    
+
         ### user #####################################
         if self.rest_request[0] == "user":
 
-            ### list 
+            ### list
             if self.rest_request[1] == "list":
                 if len(self.rest_request) == 2:
                     self._rest_account_user_list()
@@ -3069,7 +3069,7 @@ target=*
                     else:
                         self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
-    
+
             ### add
             elif self.rest_request[1] == "add":
                 offset = 2
@@ -3077,7 +3077,7 @@ target=*
                     self._rest_account_user_add()
                 else:
                     self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
-    
+
             ### update
             elif self.rest_request[1] == "update":
                 offset = 2
@@ -3085,7 +3085,7 @@ target=*
                     self._rest_account_user_update()
                 else:
                     self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
-    
+
             ### password
             elif self.rest_request[1] == "password":
                 offset = 2
@@ -3093,7 +3093,7 @@ target=*
                     self._rest_account_password()
                 else:
                     self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
-    
+
             ### del
             elif self.rest_request[1] == "del":
                 if len(self.rest_request) == 3:
@@ -3123,7 +3123,7 @@ target=*
                     else:
                         self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
-    
+
             ### add
             elif self.rest_request[1] == "add":
                 offset = 2
@@ -3131,7 +3131,7 @@ target=*
                     self._rest_account_person_add()
                 else:
                     self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
-    
+
             ### update
             elif self.rest_request[1] == "update":
                 offset = 2
@@ -3139,7 +3139,7 @@ target=*
                     self._rest_account_person_update()
                 else:
                     self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
-    
+
             ### del
             elif self.rest_request[1] == "del":
                 if len(self.rest_request) == 3:
@@ -3176,7 +3176,7 @@ target=*
                 json_data.add_data(account)
         self.send_http_response_ok(json_data.get())
 
-        
+
     def _rest_account_auth(self, login, password):
         """ check authentification
             @param login : login
@@ -3383,7 +3383,7 @@ target=*
         """ Display a queue content
         """
         self._log.debug("Display queue content")
-        
+
         # Check url length
         if len(self.rest_request) != 1:
             self.send_http_response_error(999, "Bad url", self.jsonp, self.jsonp_cb)
@@ -3461,11 +3461,11 @@ target=*
         json_data = JSonHelper("OK")
         json_data.set_data_type("helper")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-        
+
         command = self.rest_request[0]
         if len(self.rest_request) <= 1 and command != "help":
-            self.send_http_response_error(999, 
-                                         "Bad command, no command given or missing first option", 
+            self.send_http_response_error(999,
+                                         "Bad command, no command given or missing first option",
                                          self.jsonp, self.jsonp_cb)
             return
 
@@ -3481,7 +3481,7 @@ target=*
         else:
             ### check is plugin is shut
             if self._check_component_is_running(command):
-                self.send_http_response_error(999, 
+                self.send_http_response_error(999,
                                              "Warning : plugin '%s' is currently running. Actually, helpers usage are not allowed while associated plugin is running : you should stop the plugin to use helper. In next releases, helpers will be implemented in a different way, so that they should be used while associated plugin is running" % command,
                                               self.jsonp, self.jsonp_cb)
                 return
@@ -3499,12 +3499,12 @@ target=*
                                 output = helper_object.command(self.rest_request[1], \
                                                                self.rest_request[2:])
                         except HelperError as err:
-                            self.send_http_response_error(999, 
+                            self.send_http_response_error(999,
                                                       "Error : %s" % err.value,
                                                       self.jsonp, self.jsonp_cb)
                             return
-                    
-                        
+
+
 
             except:
                 json_data.add_data(self.get_exception())
@@ -3545,7 +3545,7 @@ target=*
                                           self.jsonp, self.jsonp_cb)
             else:
                 self._rest_repo_get(self.rest_request[1])
-            
+
         ### others ##################################
         else:
             self.send_http_response_error(999, self.rest_request[0] + " not allowed", self.jsonp, self.jsonp_cb)
@@ -3570,7 +3570,7 @@ target=*
         # replace name (without extension) with an unique id
         basename, extension = os.path.splitext(self._put_filename)
         file_id = str(uuid.uuid4())
-        file_name = "%s/%s%s" % (self.repo_dir, 
+        file_name = "%s/%s%s" % (self.repo_dir,
                              file_id,
                              extension)
 
@@ -3619,13 +3619,13 @@ target=*
                 '.py' : 'text/plain'})
         basename, extension = os.path.splitext(file)
         if extension in extension_map:
-            ctype = extension_map[extension] 
+            ctype = extension_map[extension]
         else:
             extension = extension.lower()
             if extension in extension_map:
-                ctype = extension_map[extension] 
+                ctype = extension_map[extension]
             else:
-                ctype = extension_map[''] 
+                ctype = extension_map['']
 
         # Send file
         self.send_response(200)
@@ -3646,8 +3646,8 @@ target=*
         ''' This method will send a ping request to a component
         and wait for the answer (max 5 seconds).
         @param name : component name
-       
-        Notice : sort of a copy of this function is used in rest.py to check 
+
+        Notice : sort of a copy of this function is used in rest.py to check
                  if a plugin is on before using a helper
                  Helpers will change in future, so the other function should
                  disappear. There is no need for the moment to put this function
@@ -3773,14 +3773,14 @@ class JSonHelper():
         for table in table_list:
             if hasattr(data, table):
                 pass
-      
+
         if data == None:
             return
 
         data_out += self._process_data(data)
         data_out = data_out.replace('\n', "\\n")
         self._data_values += data_out
-            
+
 
 
 
@@ -3801,7 +3801,7 @@ class JSonHelper():
                    "DeviceType", "UIItemConfig", "Room", "UserAccount", \
                    "SensorReferenceData", "Person", "SystemConfig", \
                    "SystemStats", "SystemStatsValue", "Trigger", \
-                   "DeviceFeatureAssociation", "DeviceFeatureModel") 
+                   "DeviceFeatureAssociation", "DeviceFeatureModel")
         instance_type = ("instance")
         num_type = ("int", "float", "long")
         str_type = ("str", "unicode", "bool", "datetime", "date")
@@ -3842,20 +3842,20 @@ class JSonHelper():
             data_json = data_json[0:len(data_json)-1] + "},"
 
         ### type : SQL table
-        elif data_type in db_type: 
-            data_json += "{" 
-            for key in data.__dict__: 
-                sub_data_key = key 
-                sub_data = data.__dict__[key] 
-                sub_data_type = type(sub_data).__name__ 
-                #print "    DATA KEY : " + str(sub_data_key) 
-                #print "    DATA : " + unicode(sub_data) 
-                #print "    DATA TYPE : " + str(sub_data_type) 
-                my_buffer = self._process_sub_data(idx + 1, False, sub_data_key, sub_data, sub_data_type, db_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type) 
+        elif data_type in db_type:
+            data_json += "{"
+            for key in data.__dict__:
+                sub_data_key = key
+                sub_data = data.__dict__[key]
+                sub_data_type = type(sub_data).__name__
+                #print "    DATA KEY : " + str(sub_data_key)
+                #print "    DATA : " + unicode(sub_data)
+                #print "    DATA TYPE : " + str(sub_data_type)
+                my_buffer = self._process_sub_data(idx + 1, False, sub_data_key, sub_data, sub_data_type, db_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type)
                 # if max depth in recursivity, we don't display "foo : {}"
                 if re.match(".*#MAX_DEPTH#.*", my_buffer) is None:
                     data_json += my_buffer
-            data_json = data_json[0:len(data_json)-1] + "}," 
+            data_json = data_json[0:len(data_json)-1] + "},"
 
         ### type : tuple
         elif data_type in tuple_type:
@@ -3939,8 +3939,8 @@ class JSonHelper():
         if sub_data_key[0] == "_":
             return ""
         data_tmp = ""
-        if sub_data_type in db_type: 
-            if is_table is False:  # and idx != 0: 
+        if sub_data_type in db_type:
+            if is_table is False:  # and idx != 0:
                 display_sub_data_type = re.sub(r"([^^])([A-Z][a-z])",
                              r"\1_\2",
                              sub_data_type).lower()
@@ -3968,15 +3968,15 @@ class JSonHelper():
                 data_tmp = '"",'
             else:
                 data_tmp = '"%s" : "",' % (sub_data_key)
-        else: 
+        else:
             data_tmp = ""
-        
+
         return data_tmp
 
 
 
 
-        
+
 
     def get(self):
         """ getter for all json data created
@@ -3995,8 +3995,8 @@ class JSonHelper():
         if self._jsonp is True and self._jsonp_cb != "":
             json_buf += ")"
         return json_buf
-        
-    
+
+
 
 
 
@@ -4016,26 +4016,26 @@ class StatsManager(XplPlugin):
             config = cfg.load()
             cfg_db = dict(config[1])
             directory = "%s/share/domogik/stats/" % cfg_db['custom_prefix']
-    
+
             # logging initialization
             log = logger.Logger('rest-stat')
             self._log_stats = log.get_logger()
             self._log_stats.info("Rest Stat Manager initialisation...")
-    
+
             # logging initialization for unkwnon devices
             log_unknown = logger.Logger('rest-stat-unknown-devices')
             self._log_stats_unknown = log_unknown.get_logger()
-    
+
             files = glob.glob("%s/*/*xml" % directory)
             stats = {}
             self._db = DbHelper()
-    
+
             ### Rest data
             self.handler_params = handler_params
-    
+
             self._event_requests = self.handler_params[0]._event_requests
             self.get_exception = self.handler_params[0].get_exception
-    
+
             ### Read xml files
             res = {}
             for _file in files :
@@ -4048,19 +4048,19 @@ class StatsManager(XplPlugin):
                 if technology not in res:
                     res[technology] = {}
                     stats[technology] = {}
-                
+
                 for schema in schema_types:
                     if schema not in res[technology]:
                         res[technology][schema] = {}
                         stats[technology][schema] = {}
                     for xpl_type in schema_types[schema]:
                         device, mapping, static_device = self.parse_mapping(doc.documentElement.getElementsByTagName("mapping")[0])
-                        res[technology][schema][xpl_type] = {"filter": 
+                        res[technology][schema][xpl_type] = {"filter":
                                 self.parse_listener(schema_types[schema][xpl_type].getElementsByTagName("listener")[0]),
                                 "mapping": mapping,
                                 "device": device,
                                 "static_device": static_device}
-                
+
                         stats[technology][schema][xpl_type] = self._Stat(self._myxpl, res[technology][schema][xpl_type], technology, schema, xpl_type, self.handler_params)
         except :
             self._log_stats.error("%s" % self.get_exception())
@@ -4095,7 +4095,7 @@ class StatsManager(XplPlugin):
     def parse_mapping(self, node):
         """ Parse the "mapping" node
         """
-         
+
         values = []
         device_node = node.getElementsByTagName("device")[0]
         device = None
@@ -4104,7 +4104,7 @@ class StatsManager(XplPlugin):
             device = device_node.attributes["field"].value.lower()
         elif device_node.attributes.has_key("static_name"):
             static_device = device_node.attributes["static_name"].value.lower()
- 
+
         #device = node.getElementsByTagName("device")[0].attributes["field"].value.lower()
         for value in node.getElementsByTagName("value"):
             name = value.attributes["field"].value
@@ -4136,7 +4136,7 @@ class StatsManager(XplPlugin):
         """
 
         def __init__(self, xpl, res, technology, schema, xpl_type, handler_params):
-            """ Initialize a stat instance 
+            """ Initialize a stat instance
             @param xpl : A xpl manager instance
             @param res : The result of xml parsing for this techno/schema/type
             @params technology : The technology monitored
@@ -4160,7 +4160,7 @@ class StatsManager(XplPlugin):
 
         def _callback(self, message):
             """ Callback for the xpl message
-            @param message : the Xpl message received 
+            @param message : the Xpl message received
             """
 
             #print "MSG=%s" % message
@@ -4195,7 +4195,7 @@ class StatsManager(XplPlugin):
             self._log_stats.debug("Stat received for %s - %s." \
                     % (self._technology, device))
             #current_date = time.mktime(calendar.timegm(datetime.datetime.now().timetuple()))
-            current_date = calendar.timegm(datetime.datetime.now().timetuple())
+            current_date = calendar.timegm(time.gmtime())
             #current_date = datetime.datetime.now()
             device_data = []
 
@@ -4228,9 +4228,9 @@ class StatsManager(XplPlugin):
                     print error
                     print "========================"
                     self._log_stats.error(error)
-    
+
             # Put data in events queues
-            self._event_requests.add_in_queues(d_id, 
+            self._event_requests.add_in_queues(d_id,
                     {"timestamp" : current_date, "device_id" : d_id, "data" : device_data})
 
 
@@ -4317,7 +4317,7 @@ class EventRequests():
         # TODO : make something random for ticket generation after 0.1.0
         self.ticket += 1
         return str(self.ticket)
- 
+
     def count(self):
         """ Return number of event requests
         """
@@ -4339,11 +4339,11 @@ class EventRequests():
                         (elt_time, elt_data) = self.requests[req]["queue"].get_nowait()
                         # if there is already data about device_id, we clean it (we don't put it back in queue)
                         # or if data is too old
-                        # Note : if we get new stats only each 2 minutes, 
-                        #     cleaning about life expectancy will only happen 
+                        # Note : if we get new stats only each 2 minutes,
+                        #     cleaning about life expectancy will only happen
                         #     every 2 minutes instead of every 'life_expectancy'
-                        #     seconds. I supposed that when you got several 
-                        #     technologies, you pass throug this code several 
+                        #     seconds. I supposed that when you got several
+                        #     technologies, you pass throug this code several
                         #     times in a minute. More over,  events are
                         #     actually (0.1) used only by UI and when you use
                         #     UI, events are read immediatly. So, I think
@@ -4354,24 +4354,24 @@ class EventRequests():
                            actual_time - elt_time < self.queue_life_expectancy:
 
                             self.requests[req]["queue"].put((elt_time, elt_data),
-                                                            True, self.queue_timeout) 
+                                                            True, self.queue_timeout)
                         else:
                             # one data suppressed from queue
                             self.requests[req]["queue_size"] -= 1
-                        
+
                     idx += 1
 
                 ### put data in queue
                 try:
-                    self.requests[req]["queue"].put((time.time(), data), 
-                                                    True, self.queue_timeout) 
+                    self.requests[req]["queue"].put((time.time(), data),
+                                                    True, self.queue_timeout)
                     self.requests[req]["queue_size"] += 1
                 except Full:
                     self._log.error("Queue for ticket_id '%s' is full. Feel free to adjust Event queues size" % req)
 
 
     def get(self, ticket_id):
-        """ Get data from queue linked to ticket id. 
+        """ Get data from queue linked to ticket id.
             If no data, wait until queue timeout
             @param ticket_id : id of ticket
             @return data in queue or False if ticket doesn't exists
@@ -4417,4 +4417,3 @@ if __name__ == '__main__':
     rest_server = Rest("127.0.0.1", "8080")
     #rest_server.start_stats()
     #rest_server.start_http()
-
