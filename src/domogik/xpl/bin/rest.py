@@ -71,6 +71,7 @@ import shutil
 import mimetypes
 import errno
 from threading import Event, Thread
+import json
 
 
 
@@ -1272,6 +1273,7 @@ target=*
         json_data = JSonHelper("OK")
         json_data.set_data_type("stats")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        values = []
         if st_interval != None and st_selector != None:
             for data in self._db.filter_stats_of_device_by_key(key,
                                                                device_id,
@@ -1279,10 +1281,11 @@ target=*
                                                                st_to,
                                                                st_interval,
                                                                st_selector):
-                json_data.add_data(data)
+                values.append(data) 
         else:
             for data in self._db.list_stats_of_device_between_by_key(key, device_id, st_from, st_to):
-                json_data.add_data(data)
+                values.append(data) 
+        json_data.add_data({"values" : values, "key" : key, "device_id" : device_id})
         self.send_http_response_ok(json_data.get())
     
 
@@ -3873,19 +3876,21 @@ class JSonHelper():
             data_json = data_json[0:len(data_json)-1] + "}," 
 
         ### type : tuple
-        elif data_type in tuple_type:
-            if idx > 0:
-                data_json += "{"
-            for idy in range(len(data)):
-                sub_data_key = "???"
-                sub_data = data[idy]
-                sub_data_type = type(data[idy]).__name__
-                #print "    DATA KEY : " + str(sub_data_key)
-                #print "    DATA : " + str(sub_data)
-                #print "    DATA TYPE : " + str(sub_data_type)
-                data_json += self._process_sub_data(idx + 1, False, sub_data_key, sub_data, sub_data_type, db_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type)
-            if idx > 0:
-                data_json = data_json[0:len(data_json)-1] + "},"
+        #elif data_type in tuple_type:
+        #     print "DATA (t) = %s" % data
+        #     data_json = "##" + str(data) + ","
+        #    if idx > 0:
+        #        data_json += "{"
+        #    for idy in range(len(data)):
+        #        sub_data_key = "???"
+        #        sub_data = data[idy]
+        #        sub_data_type = type(data[idy]).__name__
+        #        #print "    DATA KEY : " + str(sub_data_key)
+        #        #print "    DATA : " + str(sub_data)
+        #        #print "    DATA TYPE : " + str(sub_data_type)
+        #        data_json += self._process_sub_data(idx + 1, False, sub_data_key, sub_data, sub_data_type, db_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type)
+        #    if idx > 0:
+        #        data_json = data_json[0:len(data_json)-1] + "},"
 
 
         ### type : list
@@ -3899,7 +3904,7 @@ class JSonHelper():
                 data_json = "[]"
                 return data_json
             # start table
-            if sub_data_elt0_type in ("dict", "str", "int"):
+            if sub_data_elt0_type in ("dict", "str", "int", "tuple"):
                 data_json += '"%s" : [' % key
             else:
                 display_sub_data_elt0_type = re.sub(r"([^^])([A-Z][a-z])",
@@ -3968,6 +3973,8 @@ class JSonHelper():
             data_tmp += self._process_data(sub_data, idx, sub_data_key)
         elif sub_data_type in dict_type:
             data_tmp += self._process_data(sub_data, idx, sub_data_key)
+        elif sub_data_type in tuple_type:
+            data_tmp += '%s,' % json.dumps(sub_data)
         elif sub_data_type in num_type:
             if sub_data_key == "NOKEY":
                 data_tmp = '%s,' % sub_data
