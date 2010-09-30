@@ -130,9 +130,11 @@ class AreaTestCase(GenericTestCase):
     """Test areas"""
 
     def setUp(self):
+        self.remove_all_rooms()
         self.remove_all_areas()
 
     def tearDown(self):
+        self.remove_all_rooms()
         self.remove_all_areas()
 
     def test_empty_list(self):
