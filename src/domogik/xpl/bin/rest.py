@@ -1862,6 +1862,21 @@ target=*
                     else:
                         self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                       self.jsonp, self.jsonp_cb)
+
+            ### listdeep
+            elif self.rest_request[1] == "listdeep":
+                if len(self.rest_request) == 3:
+                    if self.rest_request[2] == "by-house":
+                        self._rest_base_feature_association_listdeep_by_house()
+                    else:
+                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                      self.jsonp, self.jsonp_cb)
+                elif len(self.rest_request) == 4:
+                    if self.rest_request[2] == "by-area":
+                        self._rest_base_feature_association_listdeep_by_area(self.rest_request[3])
+                    else:
+                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                      self.jsonp, self.jsonp_cb)
                 else:
                     self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
@@ -2626,6 +2641,35 @@ target=*
     #    for ass in self._db.list_device_feature_associations_by_device_id(id):
     #        json_data.add_data(ass)
     #    self.send_http_response_ok(json_data.get())
+
+
+
+
+    def _rest_base_feature_association_listdeep_by_house(self):
+        """ list feature association by house andthings under house
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("feature_association")
+        for ass in self._db.list_deep_device_feature_associations_by_house():
+            json_data.add_data(ass)
+        self.send_http_response_ok(json_data.get())
+
+
+
+    def _rest_base_feature_association_listdeep_by_area(self, id):
+        """ list feature association by area
+            @param id : id of element
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("feature_association")
+        for ass in self._db.list_deep_device_feature_associations_by_area_id(id):
+            json_data.add_data(ass)
+        self.send_http_response_ok(json_data.get())
+
+
+
 
 
 
