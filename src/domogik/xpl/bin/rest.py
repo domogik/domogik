@@ -4241,7 +4241,7 @@ class StatsManager(XplPlugin):
                 except KeyError:
                     # no value in message for key
                     # example : a x10 command = ON has no level value
-                    print "No value in message for key"
+                    print "No param value in message for key"
                 except:
                     error = "Error when processing stat : %s" % traceback.format_exc()
                     print "==== Error in Stats ===="
