@@ -729,9 +729,9 @@ class DeviceTestCase(GenericTestCase):
         du1 = db.add_device_usage('du1_id', 'du1')
         dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
         try:
-            db.add_device(d_name='device1', d_address = 'A1', d_type_id = 9999999999, d_usage_id = du1.id)
+            db.add_device(d_name='device1', d_address = 'A1', d_type_id = u'9999999999', d_usage_id = du1.id)
             TestCase.fail(self, "Device type does not exist, an exception should have been raised")
-            db.add_device(d_name='device1', d_address = 'A1', d_type_id = dty1.id, d_usage_id = 9999999999999)
+            db.add_device(d_name='device1', d_address = 'A1', d_type_id = dty1.id, d_usage_id = u'9999999999999')
             TestCase.fail(self, "Device usage does not exist, an exception should have been raised")
         except DbHelperException:
             pass
@@ -777,7 +777,7 @@ class DeviceTestCase(GenericTestCase):
                                 d_type_id=dty1.id, d_usage_id=du1.id, d_description='desc1')
         device_id = device1.id
         try:
-            db.update_device(d_id=device1.id, d_usage_id=9999999999999)
+            db.update_device(d_id=device1.id, d_usage_id=u'9999999999999')
             TestCase.fail(self, "Device usage does not exist, an exception should have been raised")
         except DbHelperException:
             pass
