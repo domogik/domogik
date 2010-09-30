@@ -35,7 +35,7 @@ import datetime, time
 from domogik.common.database import DbHelper, DbHelperException
 from domogik.common.sql_schema import DeviceStats
 from domogik.tests.unittests.database_test import make_ts
-
+import benchmarks_config as config
 
 _db = None
 _device1 = None
@@ -51,8 +51,8 @@ def run_stats_filter(period_filter_list):
     if _insert_data:
         remove_all_stats()
         init_required_data_for_stats()
-        add_data(start_p=make_ts(2010, 1, 1, 15, 48, 0), end_p=make_ts(2015, 6, 21, 15, 48, 0), insert_step=30,
-                 key='keysample')
+        add_data(start_p=time.mktime(config.DATA_START_DATE), end_p=time.mktime(config.DATA_END_DATE),
+                 insert_step=config.DATA_INSERT_STEP, key='keysample')
     else:
         # Just get device id that was used to record stats
         global _device1
@@ -61,8 +61,8 @@ def run_stats_filter(period_filter_list):
         _device1 = _db.get_device(ds.device_id)
 
     # Minutes
-    start_p = make_ts(2010, 1, 1, 15, 48, 0)
-    end_p = make_ts(2010, 1, 31, 16, 8, 0)
+    start_p = time.mktime(config.MINUTE_START_PERIOD)
+    end_p = time.mktime(config.MINUTE_END_PERIOD)
     if 'minute' in period_filter_list:
         print "Executing minute filter : period = %s / %s" % (datetime.datetime.utcfromtimestamp(start_p),
                                                               datetime.datetime.utcfromtimestamp(end_p))
@@ -72,8 +72,8 @@ def run_stats_filter(period_filter_list):
         print "\tExecution time = %s" % (time.time() - start_t)
 
     # Hours
-    start_p = make_ts(2010, 1, 1, 15, 48, 0)
-    end_p = make_ts(2010, 3, 31, 16, 8, 0)
+    start_p = time.mktime(config.HOUR_START_PERIOD)
+    end_p = time.mktime(config.HOUR_END_PERIOD)
     if 'hour' in period_filter_list:
         print "Executing hour filter : period = %s / %s" % (datetime.datetime.utcfromtimestamp(start_p),
                                                             datetime.datetime.utcfromtimestamp(end_p))
@@ -83,8 +83,8 @@ def run_stats_filter(period_filter_list):
         print "\tExecution time = %s" % (time.time() - start_t)
 
     # Days
-    start_p = make_ts(2010, 1, 1, 15, 4, 0)
-    end_p = make_ts(2010, 12, 31, 21, 48, 0)
+    start_p = time.mktime(config.DAY_START_PERIOD)
+    end_p = time.mktime(config.DAY_END_PERIOD)
     if 'day' in period_filter_list:
         print "Executing day filter : period = %s / %s" % (datetime.datetime.utcfromtimestamp(start_p),
                                                            datetime.datetime.utcfromtimestamp(end_p))
@@ -94,8 +94,8 @@ def run_stats_filter(period_filter_list):
         print "\tExecution time = %s" % (time.time() - start_t)
 
     # Weeks
-    start_p = make_ts(2010, 1, 1, 15, 4, 0)
-    end_p = make_ts(2012, 1, 1, 21, 48, 0)
+    start_p = time.mktime(config.WEEK_START_PERIOD)
+    end_p = time.mktime(config.WEEK_END_PERIOD)
     if 'week' in period_filter_list:
         print "Executing week filter : period = %s / %s" % (datetime.datetime.utcfromtimestamp(start_p),
                                                             datetime.datetime.utcfromtimestamp(end_p))
@@ -105,8 +105,8 @@ def run_stats_filter(period_filter_list):
         print "\tExecution time = %s" % (time.time() - start_t)
 
     # Months
-    start_p = make_ts(2010, 6, 21, 15, 48, 0)
-    end_p = make_ts(2015, 6, 21, 15, 48, 0)
+    start_p = time.mktime(config.MONTH_START_PERIOD)
+    end_p = time.mktime(config.MONTH_END_PERIOD)
     if 'month' in period_filter_list:
         print "Executing month filter : period = %s / %s" % (datetime.datetime.utcfromtimestamp(start_p),
                                                              datetime.datetime.utcfromtimestamp(end_p))
@@ -116,6 +116,8 @@ def run_stats_filter(period_filter_list):
         print "\tExecution time = %s" % (time.time() - start_t)
 
     # Years
+    start_p = time.mktime(config.YEAR_START_PERIOD)
+    end_p = time.mktime(config.YEAR_END_PERIOD)
     if 'year' in period_filter_list:
         print "Executing year filter : period = %s / %s" % (datetime.datetime.utcfromtimestamp(start_p),
                                                             datetime.datetime.utcfromtimestamp(end_p))
@@ -144,8 +146,8 @@ def add_data(start_p, end_p, insert_step, key):
     for i in range(0, int(end_p - start_p), insert_step):
         count += 1
         cur_date = start_p + i
-        ins = ds_table.insert().values(date=datetime.datetime.utcfromtimestamp(cur_date), key=u'val',
-                                       value=i/insert_step, value_num=i/insert_step, device_id=_device1.id)
+        ins = ds_table.insert().values(date=datetime.datetime.utcfromtimestamp(cur_date), timestamp=cur_date,
+                                       key=u'val', value=i/insert_step, value_num=i/insert_step, device_id=_device1.id)
         conn.execute(ins)
         """
         if (count % 50000 == 0):
@@ -159,8 +161,8 @@ def init_required_data_for_stats():
     print init_required_data_for_stats.__doc__
     global _device1
     dt1 = _db.add_device_technology('x10', 'x10', 'this is x10')
-    dty1 = _db.add_device_type(dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
-    du1 = _db.add_device_usage("lighting")
+    dty1 = _db.add_device_type(dty_id='x10.switch', dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
+    du1 = _db.add_device_usage('lighting', 'Lighting')
     area1 = _db.add_area('area1','description 1')
     room1 = _db.add_room('room1', area1.id)
     _device1 = _db.add_device(d_name='device1', d_address = "A1", d_type_id = dty1.id, d_usage_id = du1.id)

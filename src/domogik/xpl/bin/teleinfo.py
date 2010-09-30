@@ -93,7 +93,7 @@ class TeleinfoManager(XplPlugin):
             my_temp_message.set_schema("teleinfo.basic")
 
         for entry in frame:
-            my_temp_message.add_data({entry["name"].lower() : entry["value"]})
+            my_temp_message.add_data({entry["name"].lower().strip("\x00\x10") : entry["value"].strip("\x00\x10")})
         my_temp_message.add_data({"device": "teleinfo"})
 
         self._myxpl.send(my_temp_message)
