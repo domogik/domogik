@@ -1068,6 +1068,27 @@ class DbHelper():
                     ).filter_by(place_type=u'house'
                     ).all()
 
+    def list_deep_device_feature_associations_by_house(self):
+        """List device / feature association for the house : house, areas and non-affected rooms
+
+        @return a list of DeviceFeatureAssociation objects
+
+        """
+        # Get all non-affected rooms which are part of a device feature association
+        dfa_list= self.__session.query(
+                    DeviceFeatureAssociation
+                  ).filter(Room.id == DeviceFeatureAssociation.place_id
+                  ).filter(DeviceFeatureAssociation.place_type == u'room'
+                  ).filter(Room.area_id == None
+                  ).all()
+        # Get all areas which are part of a device feature association
+        dfa_list.append(self.__session.query(
+                            DeviceFeatureAssociation
+                        ).filter_by(place_type=u'area'
+                        ).all())
+        dfa_list.append(self.list_device_feature_associations_by_house())
+        return dfa_list
+
     def list_device_feature_associations_by_room_id(self, room_id):
         """List device / feature association for a room
 
@@ -1091,6 +1112,19 @@ class DbHelper():
                         DeviceFeatureAssociation
                     ).filter_by(place_id=area_id, place_type=u'area'
                     ).all()
+
+    def list_deep_device_feature_associations_by_area_id(self, area_id):
+        """List device / feature association for an area and its associated rooms
+
+        @param area_id : area id
+        @return a list of DeviceFeatureAssociation objects
+
+        """
+        dfa_list = self.list_device_feature_associations_by_area_id(area_id)
+        room_list = self.__session.query(Room).filter_by(area_id=area_id).all()
+        for room in room_list:
+            dfa_list.append(self.list_device_feature_associations_by_room_id(room.id))
+        return dfa_list
 
     def list_device_feature_associations_by_feature_id(self, dfa_device_feature_id):
         """List device / feature association for a device feature id
