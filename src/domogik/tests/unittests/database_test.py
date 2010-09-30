@@ -488,7 +488,6 @@ class DeviceFeatureModelTestCase(GenericTestCase):
                                           sf_device_type_id=dty3.id, sf_parameters='myparams3', sf_value_type='number')
         af_d = db.del_actuator_feature_model(af1.id)
         assert af_d.id == af1.id
-        assert len(db.list_device_feature_associations_by_feature_id(af_d.id)) == 0
         assert len(db.list_device_feature_models()) == 2
         assert len(db.list_actuator_feature_models()) == 1
         assert len(db.list_sensor_feature_models()) == 1
@@ -496,7 +495,6 @@ class DeviceFeatureModelTestCase(GenericTestCase):
         assert len(db.list_actuator_feature_models()) == 0
         sf_d = db.del_sensor_feature_model(sf1.id)
         assert len(db.list_sensor_feature_models()) == 0
-
 
 class DeviceFeatureAssociationTestCase(GenericTestCase):
     """Test device / feature association"""
@@ -547,6 +545,7 @@ class DeviceFeatureAssociationTestCase(GenericTestCase):
         print(dfa)
         db.add_device_feature_association(d_feature_id=df_list[0].id, d_place_id=room3.id, d_place_type='room')
         db.add_device_feature_association(d_feature_id=df_list[0].id, d_place_id=room4.id, d_place_type='room')
+        assert len(db.list_device_feature_associations_by_feature_id(df_list[0].id)) == 3
         df_list = db.list_device_feature_by_device_feature_model_id(af2.id)
         db.add_device_feature_association(d_feature_id=df_list[0].id, d_place_id=room1.id, d_place_type='room')
         df_list = db.list_device_feature_by_device_feature_model_id(af3.id)
