@@ -2652,8 +2652,12 @@ target=*
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("feature_association")
+        print "Appel list_deep....by_house"
         for ass in self._db.list_deep_device_feature_associations_by_house():
+            print "type=%s" % type(ass).__name__
+            print "ass=%s" % ass
             json_data.add_data(ass)
+        print "fin"
         self.send_http_response_ok(json_data.get())
 
 
