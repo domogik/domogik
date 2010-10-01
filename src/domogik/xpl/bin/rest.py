@@ -406,6 +406,7 @@ class Rest(XplPlugin):
 
                 if filter_data != None:
                     # data
+                    self._log_queue.debug("Filter on message %s WITH %s" % (message.data, filter_data))
                     for key in filter_data:
                         # take care of final "%" in order to search data starting by filter_data[key]
                         if filter_data[key][-1] == "%":
@@ -428,7 +429,7 @@ class Rest(XplPlugin):
                 else:
                     self._log_queue.debug("Get from queue %s : bad data, check another one..." % (str(my_queue)))
                     self._put_in_queue(my_queue, message)
-                    return self._get_from_queue_without_waiting(my_queue, filter_type,ilter_schema, filter_data, nb_rec + 1)
+                    return self._get_from_queue_without_waiting(my_queue, filter_type, filter_schema, filter_data, nb_rec + 1)
 
         # if message too old : get an other message
         else:
