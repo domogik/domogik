@@ -164,5 +164,5 @@ class Teleinfo:
         for cks in datas:
             my_sum = my_sum + ord(cks)
         computed_checksum = ( my_sum & int("111111", 2) ) + 0x20
-        print "computed_checksum = %s" % computed_checksum
+        print "computed_checksum = %s" % chr(computed_checksum)
         return chr(computed_checksum) == checksum
