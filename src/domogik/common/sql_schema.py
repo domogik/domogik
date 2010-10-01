@@ -579,6 +579,7 @@ class Person(Base):
     first_name = Column(Unicode(20), nullable=False)
     last_name = Column(Unicode(20), nullable=False)
     birthdate = Column(Date)
+    user_accounts = relation("UserAccount", backref=__tablename__, cascade="all, delete")
 
     def __init__(self, first_name, last_name, birthdate):
         """Class constructor

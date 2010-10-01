@@ -2399,14 +2399,6 @@ class DbHelper():
         self.__session.expire_all()
         person = self.__session.query(Person).filter_by(id=p_id).first()
         if person is not None:
-            user = self.__session.query(UserAccount).filter_by(person_id=p_id).first()
-            if user is not None:
-                self.__session.delete(user)
-                try:
-                    self.__session.commit()
-                except Exception, sql_exception:
-                    self.__session.rollback()
-                    raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
             self.__session.delete(person)
             try:
                 self.__session.commit()
