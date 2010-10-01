@@ -801,10 +801,17 @@ class DeviceTestCase(GenericTestCase):
                                 d_type_id=dty1.id, d_usage_id=du1.id, d_description='desc1')
         device2 = db.add_device(d_name='device2', d_address='A2',
                                 d_type_id=dty1.id, d_usage_id=du1.id, d_description='desc1')
+
+        db.add_device_stat(make_ts(2010, 04, 9, 12, 0), 'val2', 1, device2.id)
+        db.add_device_stat(make_ts(2010, 04, 9, 12, 1), 'val1', 2, device2.id)
+        assert len(db.list_device_stats(device2.id)) == 2
+
         device3 = db.add_device(d_name='device3', d_address='A3', d_type_id=dty1.id, d_usage_id=du1.id)
         device_del = device2
         device2_id = device2.id
         db.del_device(device2.id)
+        # Check cascade deletion
+        assert len(db.list_device_stats(device2.id)) == 0
         assert len(db.list_devices()) == 2
         for dev in db.list_devices():
             assert dev.address in ('A1', 'A3')

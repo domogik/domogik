@@ -292,7 +292,9 @@ class Device(Base):
     device_usage = relation(DeviceUsage)
     device_type_id = Column(Unicode(80), ForeignKey('%s.id' % DeviceType.get_tablename()), nullable=False)
     device_type = relation(DeviceType)
-    #device_stats = relation("DeviceStats", order_by="DeviceStats.date.desc()", backref=__tablename__)
+    device_stats = relation("DeviceStats", backref=__tablename__, cascade="all, delete")
+    device_configs = relation("DeviceConfig", backref=__tablename__, cascade="all, delete")
+    device_features = relation("DeviceFeature", backref=__tablename__, cascade="all, delete")
 
     def __init__(self, name, address, reference, device_usage_id, device_type_id, description=None):
         """Class constructor
@@ -391,6 +393,7 @@ class DeviceFeature(Base):
     device = relation(Device, backref=backref(__tablename__))
     device_feature_model_id = Column(Unicode(80), ForeignKey('%s.id' % DeviceFeatureModel.get_tablename()))
     device_feature_model = relation(DeviceFeatureModel)
+    device_feature_associations = relation("DeviceFeatureAssociation", backref=__tablename__, cascade="all, delete")
 
     UniqueConstraint(device_id, device_feature_model_id)
 

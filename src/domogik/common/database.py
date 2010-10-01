@@ -1606,14 +1606,6 @@ class DbHelper():
         device = self.__session.query(Device).filter_by(id=d_id).first()
         if device is None:
             raise DbHelperException("Device with id %s couldn't be found" % d_id)
-        for device_conf in self.__session.query(DeviceConfig).filter_by(device_id=d_id).all():
-            self.__session.delete(device_conf)
-        for device_stats in self.__session.query(DeviceStats).filter_by(device_id=d_id).all():
-            self.__session.delete(device_stats)
-        for df in self.__session.query(DeviceFeature).filter_by(device_id=d_id).all():
-            for dfa in self.__session.query(DeviceFeatureAssociation).filter_by(device_feature_id=df.id).all():
-                self.__session.delete(dfa)
-            self.__session.delete(df)
         self.__session.delete(device)
         try:
             self.__session.commit()
