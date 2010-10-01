@@ -61,11 +61,6 @@
 {% block contentright %}
     {% for room in rooms_list %}
         <div id='room_{{ room.id }}' class='block subsection'>
-            <script type="text/javascript">
-                $(function() {
-                    $.initSubAssociations('room', {{ room.id }}, device_usages, device_types);
-                });
-            </script>
             <h2 class='header icon64-room-{{ room.config.icon }}'>
                 <a href='{% url show_room_view room.id %}' class="ident">
                     <span class="title">{{ room.name }}</span>
@@ -79,11 +74,6 @@
     {% endfor %}
     {% for area in areas_list %}
         <div id='area_{{ area.id }}' class='block subsection'>
-            <script type="text/javascript">
-                $(function() {
-                    $.initSubAssociations('area', {{ area.id }}, device_usages, device_types);
-                });
-            </script>
             <h2 class='header icon64-area-{{ area.config.icon}}'>
                 <a href='{% url show_area_view area.id %}' class="ident">
                     <span class="title">{{ area.name }}</span>
