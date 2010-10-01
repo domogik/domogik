@@ -1325,6 +1325,7 @@ class DbHelper():
         """Delete a device technology record
 
         @param dt_id : id of the device technology to delete
+        @param cascade_delete : True if related objects should be deleted, optional default set to False
         @return the deleted DeviceTechnology object
 
         """
