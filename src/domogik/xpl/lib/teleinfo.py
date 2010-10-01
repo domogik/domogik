@@ -124,6 +124,7 @@ class Teleinfo:
                         checksum = ' '
                     else:
                         name, value, checksum = resp.replace('\r','').replace('\n','').split()
+                        print "name : %s, value : %s, checksum : %s" % (name, value, checksum)
                     if self._is_valid(resp, checksum):
                         frame.append({"name" : name, "value" : value, "checksum" : checksum})
                     else:
@@ -157,9 +158,11 @@ class Teleinfo:
         @param frame : the full frame
         @param checksum : the frame checksum
         """
+        print "Check checksum : f = %s, chk = %s" % (frame, checksum)
         datas = ' '.join(frame.split()[0:2])
         my_sum = 0
         for cks in datas:
             my_sum = my_sum + ord(cks)
         computed_checksum = ( my_sum & int("111111", 2) ) + 0x20
+        print "computed_checksum = %s" % computed_checksum
         return chr(computed_checksum) == checksum
