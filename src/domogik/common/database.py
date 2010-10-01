@@ -1066,11 +1066,11 @@ class DbHelper():
                   ).filter(Room.area_id == None
                   ).all()
         # Get all areas which are part of a device feature association
-        dfa_list.append(self.__session.query(
+        dfa_list.extend(self.__session.query(
                             DeviceFeatureAssociation
                         ).filter_by(place_type=u'area'
                         ).all())
-        dfa_list.append(self.list_device_feature_associations_by_house())
+        dfa_list.extend(self.list_device_feature_associations_by_house())
         return dfa_list
 
     def list_device_feature_associations_by_room_id(self, room_id):
@@ -1107,7 +1107,7 @@ class DbHelper():
         dfa_list = self.list_device_feature_associations_by_area_id(area_id)
         room_list = self.__session.query(Room).filter_by(area_id=area_id).all()
         for room in room_list:
-            dfa_list.append(self.list_device_feature_associations_by_room_id(room.id))
+            dfa_list.extend(self.list_device_feature_associations_by_room_id(room.id))
         return dfa_list
 
     def list_device_feature_associations_by_feature_id(self, dfa_device_feature_id):
