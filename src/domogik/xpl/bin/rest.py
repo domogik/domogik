@@ -404,7 +404,7 @@ class Rest(XplPlugin):
                 if filter_schema != None and filter_schema.lower() != message.schema.lower():
                     keep_data = False
 
-                if filter_data != None and keep_data = True:
+                if filter_data != None and keep_data == True:
                     # data
                     self._log_queue.debug("Filter on message %s WITH %s" % (message.data, filter_data))
                     for key in filter_data:
