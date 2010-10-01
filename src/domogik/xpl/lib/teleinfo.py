@@ -113,6 +113,7 @@ class Teleinfo:
                 while '\x02' not in resp:
                     resp = self._ser.readline()
                 #\x02 is in the last line of a frame, so go until the next one
+                print "* Begin frame"
                 resp = self._ser.readline()
                 #A new frame starts
                 #\x03 is the end of the frame
@@ -128,13 +129,16 @@ class Teleinfo:
                     if self._is_valid(resp, checksum):
                         frame.append({"name" : name, "value" : value, "checksum" : checksum})
                     else:
+                        print "** FRAME CORRUPTED !"
                         #This frame is corrupted, we need to wait until the next one
                         frame = []
                         while '\x02' not in resp:
                             resp = self._ser.readline()
+                        print "* New frame after corrupted"
                     resp = self._ser.readline()
                 #\x03 has been detected, that's the last line of the frame
                 if len(resp.replace('\r','').replace('\n','').split()) == 2:
+                    print "* End frame"
                     #The checksum char is ' '
                     name, value = resp.replace('\r','').replace('\n','').replace('\x02','').replace('\x03','').split()
                     checksum = ' '
@@ -142,8 +146,10 @@ class Teleinfo:
                     name, value, checksum = resp.replace('\r','').replace('\n','').replace('\x02','').replace('\x03','').split()
                 if self._is_valid(resp, checksum):
                     frame.append({"name" : name, "value" : value, "checksum" : checksum})
+                    print "* End frame, is valid : %s" % frame
                     is_ok = True
                 else:
+                    print "** Last frame invalid"
                     resp = self._ser.readline()
             except ValueError:
                 #Badly formatted frame
