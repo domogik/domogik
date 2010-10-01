@@ -339,6 +339,7 @@ class DeviceFeatureModel(Base):
     value_type = Column(Unicode(30), nullable=False)
     stat_key = Column(Unicode(30))
     return_confirmation = Column(Boolean, nullable=False)
+    device_features = relation("DeviceFeature", backref=__tablename__, cascade="all, delete")
 
     def __init__(self, id, name, feature_type, device_type_id, value_type, parameters=None, stat_key=None,
                 return_confirmation=False):

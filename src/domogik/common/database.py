@@ -868,14 +868,6 @@ class DbHelper():
                     ).first()
         if not dfm:
             raise DbHelperException("Can't delete device feature model %s (actuator) : it doesn't exist" % afm_id)
-        df_list = self.__session.query(
-                            DeviceFeature
-                        ).filter_by(device_feature_model_id=dfm.id
-                        ).all()
-        for df in df_list:
-            for dfa in self.__session.query(DeviceFeatureAssociation).filter_by(device_feature_id=df.id).all():
-                self.__session.delete(dfa)
-            self.__session.delete(df)
         self.__session.delete(dfm)
         try:
             self.__session.commit()
@@ -1002,14 +994,6 @@ class DbHelper():
                     ).first()
         if not dfm:
             raise DbHelperException("Can't delete device feature model %s (actuator) : it doesn't exist" % sfm_id)
-        df_list = self.__session.query(
-                            DeviceFeature
-                        ).filter_by(device_feature_model_id=dfm.id
-                        ).all()
-        for df in df_list:
-            for dfa in self.__session.query(DeviceFeatureAssociation).filter_by(device_feature_id=df.id).all():
-                self.__session.delete(dfa)
-            self.__session.delete(df)
         self.__session.delete(dfm)
         try:
             self.__session.commit()
