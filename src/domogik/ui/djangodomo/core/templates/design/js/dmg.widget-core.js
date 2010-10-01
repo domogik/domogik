@@ -102,7 +102,7 @@ function get_widgets_options(id) {
             var self = this, o = this.options;
             if (events.device_id == o.deviceid) {
                 $.each(events.data, function(index, data) {
-                    if (data.key == o.key) {
+                    if (data.key.toLowerCase() == o.key.toLowerCase()) {
                         self._eventHandler(events.timestamp, data.value);
                     }
                 });
