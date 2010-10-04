@@ -3749,7 +3749,8 @@ target=*
     def _cb_check_component_is_running(self, message, args):
         ''' Set the Event to true if an answer was received
         '''
-        self._pinglist[args["name"]].set()
+        if not "error" in message.data:
+            self._pinglist[args["name"]].set()
 
     ##### END OF TEMPORARY FUNCTIONS
 
