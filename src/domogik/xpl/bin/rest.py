@@ -3951,7 +3951,7 @@ class JSonHelper():
                 #print "DATA=%s" % data
             else:
                 #print "DATA vide=%s" % data
-                data_json = "[]"
+                data_json = '"%s" : [],' % key
                 return data_json
             # start table
             if sub_data_elt0_type in ("dict", "str", "int", "tuple"):
