@@ -92,6 +92,7 @@ class WOL:
             self._log.debug("!!!!!!3")
             sock.sendto(magic_hexa, ('<broadcast>', port))
             self._log.info("Magic packet send")
+            sock.close()
             return True
         except:
             self._log.error("Fail to send magic packet : %s" % traceback.format_exc())
@@ -140,6 +141,7 @@ class Ping:
                            "old_status" : old_status})
             #Wait until worker threads are done to exit    
             queue.join()
+            worker.join()
 
             # interval between each ping
             time.sleep(self._interval)
@@ -150,27 +152,26 @@ class Ping:
         @param idx : thread number
         @param ping_queue : queue for ping
         """
-        while True:
-            data = ping_queue.get()
-            print "Thread %s: Pinging %s" % (idx, data["ip"])
-            ret = subprocess.call("ping -c 1 %s" % data["ip"],
-                            shell=True,
-                            stdout=open('/dev/null', 'w'),
-                            stderr=subprocess.STDOUT)
-            if ret == 0:
-                print "%s: is alive" % data["name"]
-                status = "HIGH"
-            else:
-                print "%s: did not respond" % data["name"]
-                status = "LOW"
+        data = ping_queue.get()
+        print "Thread %s: Pinging %s" % (idx, data["ip"])
+        ret = subprocess.call("ping -c 1 %s" % data["ip"],
+                        shell=True,
+                        stdout=open('/dev/null', 'w'),
+                        stderr=subprocess.STDOUT)
+        if ret == 0:
+            print "%s: is alive" % data["name"]
+            status = "HIGH"
+        else:
+            print "%s: did not respond" % data["name"]
+            status = "LOW"
 
-            if status != data["old_status"]:
-                type = "xpl-trig"
-            else:
-                type = "xpl-stat"
-            self._computers[data["name"]]["old_status"] = status
+        if status != data["old_status"]:
+            type = "xpl-trig"
+        else:
+            type = "xpl-stat"
+        self._computers[data["name"]]["old_status"] = status
   
-            # call callback
-            self._cb(type, data["name"], status)
-            ping_queue.task_done()
+        # call callback
+        ping_queue.task_done()
+        self._cb(type, data["name"], status)
 
