@@ -442,10 +442,27 @@ class Rest(XplPlugin):
             @param message : data to put in queue
         """
         self._log_queue.debug("Put in queue %s : %s" % (str(my_queue), str(message)))
-        my_queue.put((time.time(), message), True, self._queue_timeout) 
+        try:
+            my_queue.put((time.time(), message), True, self._queue_timeout) 
         # TODO : except Full:
         #           call a "clean" function
         #           put again in queue
+        except Full:
+            msg = "Queue '%s' is full : cleaning it to make some space..." % my_queue
+            self._log_queue.debug(msg)
+            print msg
+            # queue is full : start cleaning it
+            nb_ck = 0
+            while nb_ck < my_queue.qsize():
+                (q_time, q_data) = my_queue.get()
+                # data to keep
+                if time.time() - self._queue_life_expectancy < q_time:
+                    my_queue.put((q_time, q_data), True, self._queue_timeout)
+                nb_ck += 1
+            my_queue.put((time.time(), message), True, self._queue_timeout) 
+            self._log_queue.debug("Cleaning finished")
+              
+                
 
 
 
