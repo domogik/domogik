@@ -122,7 +122,7 @@ def install(create_prod_db, create_test_db):
     device_type = db.add_device_type(dty_id='onewire.thermometer', dty_name='Thermometer', dt_id=device_technology.id)
     db.add_sensor_feature_model(sf_id='onewire.thermometer.temperature', sf_name='Temperature',
                                 sf_device_type_id=device_type.id, sf_value_type='number',
-                                sf_parameters='{&quot;unit&quot;:&quot;&deg;C&quot;}', sf_stat_key='temperature')
+                                sf_parameters='{&quot;unit&quot;:&quot;\u00B0C&quot;}', sf_stat_key='temperature')
     device_type = db.add_device_type(dty_id='onewire.serial_number', dty_name='Serial Number', dt_id=device_technology.id)
     db.add_sensor_feature_model(sf_id='onewire.serial_number.connected', sf_name='Connected',
                                 sf_device_type_id=device_type.id, sf_value_type='boolean', sf_parameters='{}',

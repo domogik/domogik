@@ -26,11 +26,11 @@
                 
             this._panel = $.getPanel({width:190, height:190, circle: {start:140, end:90}});
             this.element.append(this._panel);
-            this._panel.panelAddCommand({class:'increase', r:70, deg:-20, rotate:true, click:function(e){self.plus_range();e.stopPropagation();}});
-            this._panel.panelAddCommand({class:'decrease', r:70, deg:20, rotate:true, click:function(e){self.minus_range();e.stopPropagation();}});
-            this._panel.panelAddCommand({class:'close', r:70, deg:140, rotate:true, click:function(e){self.close();e.stopPropagation();}});
-            this._panel.panelAddCommand({class:'max', r:70, deg:-50, rotate:true, click:function(e){self.max_range();e.stopPropagation();}});
-            this._panel.panelAddCommand({class:'min', r:70, deg:50, rotate:true, click:function(e){self.min_range();e.stopPropagation();}});
+            this._panel.panelAddCommand({label:'Increase', showlabel: false, class:'increase', r:70, deg:-20, rotate:true, click:function(e){self.plus_range();e.stopPropagation();}});
+            this._panel.panelAddCommand({label:'Decrease', showlabel: false, class:'decrease', r:70, deg:20, rotate:true, click:function(e){self.minus_range();e.stopPropagation();}});
+            this._panel.panelAddCommand({label:'Close', showlabel: false, class:'close', r:70, deg:140, rotate:false, click:function(e){self.close();e.stopPropagation();}});
+            this._panel.panelAddCommand({label:'Max', showlabel: false, class:'max', r:70, deg:-50, rotate:true, click:function(e){self.max_range();e.stopPropagation();}});
+            this._panel.panelAddCommand({label:'Min', showlabel: false, class:'min', r:70, deg:50, rotate:true, click:function(e){self.min_range();e.stopPropagation();}});
             this._panel.panelAddText({class:'value', r:65, deg:90});
             this._panel.hide();
             this._indicator = $("<canvas class='indicator' width='190' height='190'></canvas>");

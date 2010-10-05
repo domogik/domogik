@@ -45,6 +45,15 @@
     -webkit-box-sizing: border-box;    
 }
 
+.widget_1x1_panel .command.label {
+    width:auto;
+    line-height:34px;
+    padding: 0 1em 0 20px;
+    font-weight:bold;
+    background-position: 5% 50%;
+    border:1px solid #000000;
+}
+
 .widget_status {
     position:absolute;
     display:block;

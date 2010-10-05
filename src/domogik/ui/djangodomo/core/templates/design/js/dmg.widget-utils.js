@@ -21,6 +21,14 @@ $(function(){
                 .click(options.click);
             this.append(command);
             command.moveToCircleCoord({x:cx, y:cy, r:options.r, deg:options.deg, rotate:options.rotate}); // ! Need to be after append
+            if (options.label) {
+                if (options.showlabel) {
+                    command.addClass('label');
+                    command.text(options.label);
+                } else {
+                    command.html("<span class='offscreen'>" + options.label + "</span>");                    
+                }
+            }
         },
         
         panelAddText: function(options) {

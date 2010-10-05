@@ -25,9 +25,9 @@
                 
             this._panel = $.getPanel({width:190, height:190, circle: {start:150, end:80}});
             this.element.append(this._panel);
-            this._panel.panelAddCommand({class:'increase', r:70, deg:-20, rotate:true, click:function(e){self.increase();e.stopPropagation();}});
-            this._panel.panelAddCommand({class:'decrease', r:70, deg:20, rotate:true, click:function(e){self.decrease();e.stopPropagation();}});
-            this._panel.panelAddCommand({class:'close', r:70, deg:150, rotate:true, click:function(e){self._panel.hide();e.stopPropagation();}});
+            this._panel.panelAddCommand({label:'Increase', showlabel: false, class:'increase', r:70, deg:-20, rotate:true, click:function(e){self.increase();e.stopPropagation();}});
+            this._panel.panelAddCommand({label:'Decrease', showlabel: false, class:'decrease', r:70, deg:20, rotate:true, click:function(e){self.decrease();e.stopPropagation();}});
+            this._panel.panelAddCommand({label:'Close', showlabel: false, class:'close', r:70, deg:150, rotate:true, click:function(e){self._panel.hide();e.stopPropagation();}});
             this._panel.panelAddText({class:'value', r:65, deg:80});
             this._panel.hide();
 
