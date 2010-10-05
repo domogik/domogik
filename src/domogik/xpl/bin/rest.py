@@ -3892,7 +3892,7 @@ class JSonHelper():
         num_type = ("int", "float", "long")
         str_type = ("str", "unicode", "bool", "datetime", "date")
         none_type = ("NoneType")
-        tuple_type = ("tuple")
+        tuple_type = ("tuple", "NamedTuple")
         list_type = ("list")
         dict_type = ("dict")
 
@@ -3972,7 +3972,7 @@ class JSonHelper():
                 data_json = '"%s" : [],' % key
                 return data_json
             # start table
-            if sub_data_elt0_type in ("dict", "str", "int", "tuple"):
+            if sub_data_elt0_type in ("dict", "str", "int", "tuple", "NamedTuple"):
                 data_json += '"%s" : [' % key
             else:
                 display_sub_data_elt0_type = re.sub(r"([^^])([A-Z][a-z])",
