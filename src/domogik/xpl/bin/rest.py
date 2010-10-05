@@ -555,6 +555,7 @@ class HTTPServerWithParam(SocketServer.ThreadingMixIn, HTTPServer):
         """
         self.stop = True
         # we do a last request to terminate server
+        print "Make a last request to HTTP server to stop it"
         resp = urllib.urlopen("http://%s:%s" % (self.address[0], self.address[1]))
 
 
@@ -606,7 +607,7 @@ class HTTPSServerWithParam(SocketServer.ThreadingMixIn, HTTPServer):
         """
         self.stop = True
         # we do a last request to terminate server
-        resp = urllib.urlopen("http://%s:%s" % (self.address[0], self.address[1]))
+        resp = urllib.urlopen("https://%s:%s" % (self.address[0], self.address[1]))
 
 
 

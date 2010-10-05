@@ -118,6 +118,10 @@ function stop_plugins {
     for pid in `ps ax | egrep "domogik.*\.pyc$" | grep -v grep | awk '{print $1}'`; do
         kill -15 $pid 2>/dev/null 1>&2
     done
+    sleep 2
+    for pid in `ps ax | egrep "domogik.*\.pyc$" | grep -v grep | awk '{print $1}'`; do
+        kill -9 $pid 2>/dev/null 1>&2
+    done
     echo " Done."
 }
 
