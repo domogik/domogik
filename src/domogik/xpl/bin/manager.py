@@ -106,7 +106,7 @@ class SysManager(XplPlugin):
                 if self._check_component_is_running("dbmgr"):
                     self._log.warning("Manager started with -d, but a database manager is already running")
                 else:
-                    self._start_plugin("dbmgr", gethostname(), 1)
+                    self._start_plugin("dbmgr", gethostname())
                     if not self._check_component_is_running("dbmgr"):
                         self._log.error("Manager started with -d, but database manager not available after a startup.\
                                 Please check dbmgr.log file")
@@ -116,7 +116,7 @@ class SysManager(XplPlugin):
                 if self._check_component_is_running("rest"):
                     self._log.warning("Manager started with -r, but a REST manager is already running")
                 else:
-                    self._start_plugin("rest", gethostname(), 1)
+                    self._start_plugin("rest", gethostname())
                     if not self._check_component_is_running("rest"):
                         self._log.error("Manager started with -r, but REST manager not available after a startup.\
                                 Please check rest.log file")
@@ -126,7 +126,7 @@ class SysManager(XplPlugin):
                 if self._check_component_is_running("trigger"):
                     self._log.warning("Manager started with -t, but a trigger manager is already running")
                 else:
-                    self._start_plugin("trigger", gethostname(), 1)
+                    self._start_plugin("trigger", gethostname())
                     if not self._check_component_is_running("trigger"):
                         self._log.error("Manager started with -t, but trigger manager not available after a startup.\
                                 Please check trigger.log file")
@@ -145,15 +145,11 @@ class SysManager(XplPlugin):
                 if startup == 'True':
                     self._log.debug("            starting")
                     self._log.debug("Starting %s" % name)
-                    ### old version : non threaded startup
-                    #self._start_plugin(name, gethostname(), 0)
-                    ### new version : thread
                     comp_thread[name] = Thread(None,
                                                    self._start_plugin,
                                                    None,
                                                    (name,
-                                                    gethostname(),
-                                                    0),
+                                                    gethostname()),
                                                    {})
                     comp_thread[name].start()
             
@@ -201,11 +197,6 @@ class SysManager(XplPlugin):
            plg = "*"
         host = message.data["host"]
 
-        # force command indicator
-        force = 0
-        if "force" in message.data:
-            force = int(message.data['force'])
-
         # error if no plugin in list
         error = ""
         if plg != "*":
@@ -219,15 +210,11 @@ class SysManager(XplPlugin):
 
             # start plugin
             if cmd == "start" and host == gethostname() and plg != "rest":
-                self._start_plugin(plg, host, force)
+                self._start_plugin(plg, host) 
 
             # stop plugin
             if cmd == "stop" and host == gethostname() and plg != "rest":
-                try:
-                    error_msg = message.data["error"]
-                except KeyError:
-                    error_msg = ""
-                self._stop_plugin(plg, host, force, error_msg)
+                self._stop_plugin(plg, host)
 
             # list plugin
             elif cmd == "list" and host == gethostname():
@@ -246,6 +233,11 @@ class SysManager(XplPlugin):
             self._log.info("Error detected : %s, request %s has been cancelled" % (error, cmd))
 
     def _invalid_component(self, cmd, plg, host):
+        """ send an invalid component message
+             @param cmd : command
+             @param plg : plugin name
+             @param host : computer on which action was tried
+        """
         error = "Component %s doesn't exists on %s" % (plg, host)
         self._log.debug(error)
         mess = XplMessage()
@@ -257,7 +249,11 @@ class SysManager(XplPlugin):
         mess.add_data({'error' :  error})
         self._myxpl.send(mess)
 
-    def _start_plugin(self, plg, host, force):
+    def _start_plugin(self, plg, host):
+        """ Start a plugin
+            @param plg : plugin name
+            @param host : computer on which plugin should be started
+        """
         error = ""
         self._log.debug("Ask to start %s on %s" % (plg, host))
         mess = XplMessage()
@@ -266,7 +262,7 @@ class SysManager(XplPlugin):
         mess.add_data({'host' : host})
         mess.add_data({'command' :  'start'})
         mess.add_data({'plugin' :  plg})
-        if not force and self._check_component_is_running(plg):
+        if self._check_component_is_running(plg):
             error = "Component %s is already running on %s" % (plg, host)
             self._log.info(error)
             mess.add_data({'error' : error})
@@ -285,14 +281,17 @@ class SysManager(XplPlugin):
                     error = "Component %s failed to start. Please look in this component logs files" % plg
                     self._log.error(error)
                     self._delete_pid_file(plg)
-                mess.add_data({'force' :  force})
                 if error != "":
                     mess.add_data({'error' :  error})
         self._myxpl.send(mess)
 
-    def _stop_plugin(self, plg, host, force, error):
+    def _stop_plugin(self, plg, host):
+        """ stop a plugin
+            @param plg : plugin name
+            @param host : computer on which we want to stop plugin
+        """
         self._log.debug("Check plugin stops : %s on %s" % (plg, host))
-        if not force and self._check_component_is_running(plg) == False:
+        if self._check_component_is_running(plg) == False:
             error = "Component %s is not running on %s" % (plg, host)
             self._log.info(error)
             mess = XplMessage()
@@ -336,12 +335,15 @@ class SysManager(XplPlugin):
 
 
     def _ping(self, host):
+        """ Send a ping xpl message
+            @param : host to ping
+        """
         self._log.debug("Ask to ping on %s" % (host))
         mess = XplMessage()
         mess.set_type('xpl-trig')
         mess.set_schema('domogik.system')
         mess.add_data({'command' : 'host-ping'})
-        mess.add_data({'host' : gethostname()})
+        mess.add_data({'host' : host})
         self._myxpl.send(mess)
 
     def _check_component_is_running(self, name, foo = None):
@@ -519,6 +521,8 @@ class SysManager(XplPlugin):
         return False
 
     def _send_component_list(self):
+        """ send compoennt list
+        """
         mess = XplMessage()
         mess.set_type('xpl-trig')
         mess.set_schema('domogik.system')
@@ -535,6 +539,10 @@ class SysManager(XplPlugin):
         self._myxpl.send(mess)
 
     def _send_component_detail(self, plg, host):
+        """ send details about a component 
+            @param plg : plugin name
+            @param host : computer on which is plugin
+        """
         mess = XplMessage()
         mess.set_type('xpl-trig')
         mess.set_schema('domogik.system')

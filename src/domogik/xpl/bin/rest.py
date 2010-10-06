@@ -2990,14 +2990,13 @@ target=*
 
 
 
-    def _rest_plugin_start_stop(self, command, host = gethostname(), plugin = None, force = 0):
+    def _rest_plugin_start_stop(self, command, host = gethostname(), plugin = None):
         """ Send start xpl message to manager
             Then, listen for a response
             @param host : host to which we send command
             @param plugin : name of plugin
-            @param force : force (or not) action. 0/1. 1 : force
         """
-        self._log.debug("Plugin : ask for %s %s on %s (force=%s)" % (command, plugin, host, force))
+        self._log.debug("Plugin : ask for %s %s on %s " % (command, plugin, host))
 
         ### Send xpl message
         cmd_message = XplMessage()
@@ -3006,7 +3005,6 @@ target=*
         cmd_message.add_data({"command" : command})
         cmd_message.add_data({"host" : host})
         cmd_message.add_data({"plugin" : plugin})
-        cmd_message.add_data({"force" : force})
         self._myxpl.send(cmd_message)
         self._log.debug("Plugin : send message : %s" % str(cmd_message))
 
