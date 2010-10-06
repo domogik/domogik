@@ -4201,6 +4201,10 @@ class StatsManager(XplPlugin):
             data = {}
             data["name"] = name
             #If a "name" attribute is defined, use it as vallue, else value is empty
+            if value.attributes.has_key("history_size"):
+                data["history_size"] = int(value.attributes["history_size"].value)
+            else:
+                data["history_size"] = 0
             if value.attributes.has_key("new_name"):
                 data["new_name"] = value.attributes["new_name"].value.lower()
                 if value.attributes.has_key("filter_key"):
@@ -4291,18 +4295,21 @@ class StatsManager(XplPlugin):
             for my_map in self._res["mapping"]:
                 # first : get value and default key
                 key = my_map["name"]
+                history_size = my_map["history_size"]
                 try:
                     value = message.data[my_map["name"]].lower()
                     if my_map["filter_key"] == None:
                         key = my_map["name"]
                         device_data.append({"key" : key, "value" : value})
-                        my_db.add_device_stat(current_date, key, value, d_id)
+                        my_db.add_device_stat(current_date, key, value, d_id, \
+                                              history_size)
                     else:
                         if my_map["filter_value"] != None and \
                            my_map["filter_value"].lower() == message.data[my_map["filter_key"]].lower():
                             key = my_map["new_name"]
                             device_data.append({"key" : key, "value" : value})
-                            my_db.add_device_stat(current_date, key, value, d_id)
+                            my_db.add_device_stat(current_date, key, value, \
+                                                  d_id, history_size)
                         else:
                             if my_map["filter_value"] == None:
                                 self._log_stats.warning ("Stats : no filter_value defined in map : %s" % str(my_map))
