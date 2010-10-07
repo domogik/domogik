@@ -197,7 +197,7 @@ $(function(){
             .unbind('click')
             .click(function() {
             $("#buttonstatus").attr('className', 'button icon16-action-processing_f6f6f6');
-            $.getREST(['plugin', btaction, '{{ plugin.name }}'],
+            $.getREST(['plugin', btaction, '{{ plugin.name }}', '{{ plugin.host }}'],
                 function(data) {
                     var status = (data.status).toLowerCase();
                     $("#buttonstatus").removeClass('icon16-action-processing_f6f6f6');

@@ -2909,7 +2909,7 @@ target=*
                 return
             self._rest_plugin_start_stop(plugin =  self.rest_request[1], \
                                    command = "start", \
-                                   host = self.rest_request[3])
+                                   host = self.rest_request[2])
 
         ### stop ######################################
         elif self.rest_request[0] == "stop":
@@ -2918,7 +2918,7 @@ target=*
                 return
             self._rest_plugin_start_stop(plugin =  self.rest_request[1], \
                                    command = "stop", \
-                                   host = self.rest_request[3])
+                                   host = self.rest_request[2])
 
 
         ### plugin config ############################
