@@ -288,23 +288,19 @@ class Rest(XplPlugin):
             Listener(self._add_to_queue_system_list, self._myxpl, \
                      {'schema': 'domogik.system',
                       'xpltype': 'xpl-trig',
-                      'command' : 'list',
-                      'host' : gethostname()})
+                      'command' : 'list'})
             Listener(self._add_to_queue_system_detail, self._myxpl, \
                      {'schema': 'domogik.system',
                       'xpltype': 'xpl-trig',
-                      'command' : 'detail',
-                      'host' : gethostname()})
+                      'command' : 'detail'})
             Listener(self._add_to_queue_system_start, self._myxpl, \
                      {'schema': 'domogik.system',
                       'xpltype': 'xpl-trig',
-                      'command' : 'start',
-                      'host' : gethostname()})
+                      'command' : 'start'})
             Listener(self._add_to_queue_system_stop, self._myxpl, \
                      {'schema': 'domogik.system',
                       'xpltype': 'xpl-trig',
-                      'command' : 'stop',
-                      'host' : gethostname()})
+                      'command' : 'stop'})
             Listener(self._add_to_queue_command, self._myxpl, \
                      {'xpltype': 'xpl-trig'})
     
@@ -361,7 +357,7 @@ class Rest(XplPlugin):
         start_time = time.time()
         while time.time() - start_time < timeout:
             try:
-                return self._get_from_queue_without_waiting(my_queue, filter_type, filter_schema, filter_data, nb_rec)
+                return self._get_from_queue_without_waiting(my_queue, filter_type, filter_schema, filter_data, nb_rec, timeout)
             except Empty:
                 # no data in queue for us.... let's continue until time elapsed
                 # in order not rest not working so much, let it make a pause
@@ -439,12 +435,12 @@ class Rest(XplPlugin):
                 else:
                     self._log_queue.debug("Get from queue %s : bad data, check another one..." % (str(my_queue)))
                     self._put_in_queue(my_queue, message)
-                    return self._get_from_queue_without_waiting(my_queue, filter_type, filter_schema, filter_data, nb_rec + 1)
+                    return self._get_from_queue_without_waiting(my_queue, filter_type, filter_schema, filter_data, nb_rec + 1, timeout)
 
         # if message too old : get an other message
         else:
             self._log_queue.debug("Get from queue %s : data too old, check another one..." % (str(my_queue)))
-            return self._get_from_queue_without_waiting(my_queue, filter_type, filter_schema, filter_data, nb_rec + 1)
+            return self._get_from_queue_without_waiting(my_queue, filter_type, filter_schema, filter_data, nb_rec + 1, timeout)
 
     def _put_in_queue(self, my_queue, message):
         """ put a message in a named queue
@@ -3012,8 +3008,11 @@ target=*
             max_time = time.time() + WAIT_FOR_LIST_ANSWERS
             while time.time() < max_time:
                 try:
-                    messages.append(self._get_from_queue(self._queue_system_list, "xpl-trig", "domogik.system", timeout = WAIT_FOR_LIST_ANSWERS))
+                    message = self._get_from_queue(self._queue_system_list, "xpl-trig", "domogik.system", timeout = WAIT_FOR_LIST_ANSWERS)
+                    messages.append(message)
+                    self._log.debug("Plugin list : get one answer from '%s'" % message.data["host"])
                 except Empty:
+                    self._log.debug("Plugin list : empty queue")
                     pass
             self._log.debug("Plugin list : end waiting for answers")
         except Empty:
