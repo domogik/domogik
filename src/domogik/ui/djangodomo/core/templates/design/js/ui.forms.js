@@ -15,7 +15,7 @@ function numbersonly(e) {
         _init: function() {
             var dialogheight = 110;
             var self = this, o = this.options;
-            this.element.append("<span class='tip'>" + o.tips + "</span><ul id='" + o.tipsid + "'></ul>");
+            this.element.append("<div class='tip'>" + o.tips + "</div><ul class='tip' id='" + o.tipsid + "'></ul>");
             var form = $("<form></form>");
             this._content = $("<fieldset></fieldset>");
             this._allFields = [];

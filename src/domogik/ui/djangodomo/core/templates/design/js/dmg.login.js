@@ -8,14 +8,15 @@ function openlogin(path) {
 		function(data) {
 			var status = (data.status).toLowerCase();
 			if (status == 'ok') {
-                var overlay = $("<div id='body-overlay'></div>");
-                $('body').append(overlay);
-                var login = $("<div id='login'></div>");
-                login.append("<h1>Identification</h1>");
-                login.append("<button id='close'><span class='offscreen'>Close</span></button>");
-                $('#close', login).click(function(){
-                    closelogin();
-                });
+                var dialog = $("<div id='login' title='Identification'></div>");
+                $('body').append(dialog);
+                dialog.dialog({ width:'40em', resizable: false,
+                                modal: true,
+                                close: function(ev, ui) {
+                                    $(this).remove();
+                                }
+                            });
+
                 var form = $("<form id='loginForm' method='POST' action='/domogik/login/?next=" + path + "'></form>");
                 form.append("<div class='columnleft'><h2>1. Select a user</h2><div id='resetLogin' class='buttontext'>Change User</div><input id='loginname' name='login' type='text' /><ul id='users'></ul></div>");
                 $.each(data.account, function() {
@@ -25,8 +26,7 @@ function openlogin(path) {
                 });
                 
                 form.append("<div class='columnright'><h2>2. Enter your code</h2><div id='code'><input id='logincode' name='password' type='password' value='' /><div id='submit' class='buttonok'>Ok</div></div><ul id='digits'><li><a href='#' onclick='addDigit(0);'>0</a></li><li><a href='#' onclick='addDigit(1);'>1</a></li><li><a href='#' onclick='addDigit(2);'>2</a></li><li><a href='#' onclick='addDigit(3);'>3</a></li><li><a href='#' onclick='addDigit(4);'>4</a></li><li><a href='#' onclick='addDigit(5);'>5</a></li><li><a href='#' onclick='addDigit(6);'>6</a></li><li><a href='#' onclick='addDigit(7);'>7</a></li><li><a href='#' onclick='addDigit(8);'>8</a></li><li><a href='#' onclick='addDigit(9);'>9</a></li><li><a href='#' onclick='removeLastDigit();'>C</a></li><li><a href='#' onclick='resetDigit();'>Del.</a></li></ul></div>");
-                login.append(form);
-                $('body').append(login);
+                dialog.append(form);
                 initLogin();
             } else {
                 $.notification('error', 'Impossible to list Accounts (' + data.description + ')');

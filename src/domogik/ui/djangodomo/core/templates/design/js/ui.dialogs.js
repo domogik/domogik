@@ -3,7 +3,6 @@
     $.widget("ui.dialog_confirmation", {
         _init: function() {
             var self = this, o = this.options;
-            this.element.append("<p></p>");
             this.element.dialog({
                 bgiframe: true,
                 autoOpen: false,
@@ -33,7 +32,7 @@
                     $(this).dialog('close');
                 }
             });
-            $("p", this.element).text(o.content + ' ' + ops.name);
+            this.element.text(o.content + ' ' + ops.name);
             this.element.dialog('open');
         }
     });
