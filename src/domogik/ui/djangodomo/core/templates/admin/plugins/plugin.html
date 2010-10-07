@@ -81,7 +81,7 @@ $(function(){
     }
 
     /* Get the list of configuration items */
-    $.getREST(['plugin', 'detail', '{{ plugin.name }}'],
+    $.getREST(['plugin', 'detail', '{{ plugin.name }}', '{{ plugin.host }}'],
         function(data) {
             var status = (data.status).toLowerCase();
             if (status == 'ok') {

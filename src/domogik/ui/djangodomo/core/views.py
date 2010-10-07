@@ -388,7 +388,7 @@ def admin_organization_features(request):
     )
 
 @admin_required
-def admin_plugins_plugin(request, plugin_name):
+def admin_plugins_plugin(request, plugin_name, plugin_host):
     """
     Method called when the admin plugin command page is accessed
     @param request : HTTP request
@@ -398,7 +398,7 @@ def admin_plugins_plugin(request, plugin_name):
     status = request.GET.get('status', '')
     msg = request.GET.get('msg', '')
     try:
-        result_plugin_detail = Plugins.get_detail(plugin_name)
+        result_plugin_detail = Plugins.get_detail(plugin_name, plugin_host)
         result_all_plugins = Plugins.get_all()
     except BadStatusLine:
         return render_to_response('error/BadStatusLine.html')

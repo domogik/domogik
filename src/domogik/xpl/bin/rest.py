@@ -898,7 +898,7 @@ class ProcessRequest():
         elif self.rest_type == "base":
             self.rest_base()
         elif self.rest_type == "plugin":
-            self.rest_plugin()
+            self.rest_plugin2()
         elif self.rest_type == "plugin2":
             self.rest_plugin2()
         elif self.rest_type == "account":

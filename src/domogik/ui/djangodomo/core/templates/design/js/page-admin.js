@@ -12,7 +12,7 @@ function getPluginsList() {
                         }
                         var li = $("<li></li>");
                         var a = $("<a></a>");
-                        a.attr('href', '/domogik/admin/plugin/' + this.name)
+                        a.attr('href', '/domogik/admin/plugin/' + this.name + "/" + this.host)
                             .attr('title', this.description)
                             .tooltip_right();
                         var status = $("<div>" + this.name + " - " + this.host + "</div>");
