@@ -217,7 +217,7 @@ class SysManager(XplPlugin):
                 self._stop_plugin(plg, host)
 
             # list plugin
-            elif cmd == "list" and host == gethostname():
+            elif cmd == "list" and (host == gethostname() or host == "*"):
                 self._send_component_list()
 
             # detail plugin

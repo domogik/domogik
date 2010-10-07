@@ -103,6 +103,11 @@ QUEUE_EVENT_SIZE = 50
 # Repository
 DEFAULT_REPO_DIR = "/tmp/"
 
+# Wait time to get answers from xpl-cmnd domogik.system command=list
+# TODO : make it a parameter ?
+WAIT_FOR_LIST_ANSWERS = 1
+
+
 #### TEMPORARY DATA FOR TEMPORARY FUNCTIONS ############
 PING_DURATION = 2
 #### END TEMPORARY DATA ################################
@@ -344,15 +349,17 @@ class Rest(XplPlugin):
         """
         self._put_in_queue(self._queue_command, message)
 
-    def _get_from_queue(self, my_queue, filter_type = None, filter_schema = None, filter_data = None, nb_rec = 0):
+    def _get_from_queue(self, my_queue, filter_type = None, filter_schema = None, filter_data = None, nb_rec = 0, timeout = None):
         """ Encapsulation for _get_from_queue_in
             If timeout not elapsed and _get_from_queue didn't find a valid data
             call again _get_from_queue until timeout
             This encapsulation is used to process case where queue is not empty but there is
             no valid data in it and we want to wait for timeout
         """
+        if timeout == None:
+            timeout = self._queue_timeout
         start_time = time.time()
-        while time.time() - start_time < self._queue_timeout:
+        while time.time() - start_time < timeout:
             try:
                 return self._get_from_queue_without_waiting(my_queue, filter_type, filter_schema, filter_data, nb_rec)
             except Empty:
@@ -364,7 +371,7 @@ class Rest(XplPlugin):
 
 
 
-    def _get_from_queue_without_waiting(self, my_queue, filter_type = None, filter_schema = None, filter_data = None, nb_rec = 0):
+    def _get_from_queue_without_waiting(self, my_queue, filter_type = None, filter_schema = None, filter_data = None, nb_rec = 0, timeout = None):
         """ Get an item from queue (recursive function)
             Checks are made on : 
             - life expectancy of message
@@ -378,7 +385,10 @@ class Rest(XplPlugin):
                 - {"command" : "start", ...}
                 - {"plugin" : "wol%", ...} : here "%" indicate that we search for something starting with "wol"
             @param nb_rec : internal parameter (do not use it for first call). Used to check recursivity VS queue size
+            @param timeout : to use a different timeout from default one
         """
+        if timeout == None:
+            timeout = self._queue_timeout
         self._log_queue.debug("Get from queue : %s (recursivity deepth : %s)" % (str(my_queue), nb_rec))
         # check if recursivity doesn't exceed queue size
         if nb_rec > my_queue.qsize():
@@ -387,7 +397,7 @@ class Rest(XplPlugin):
             # the good data, it is as if it was "empty"
             raise Empty
 
-        msg_time, message = my_queue.get(True, self._queue_timeout)
+        msg_time, message = my_queue.get(True, timeout)
 
         # if message not too old, we process it
         if time.time() - msg_time < self._queue_life_expectancy:
@@ -893,6 +903,8 @@ class ProcessRequest():
             self.rest_base()
         elif self.rest_type == "plugin":
             self.rest_plugin()
+        elif self.rest_type == "plugin2":
+            self.rest_plugin2()
         elif self.rest_type == "account":
             self.rest_account()
         elif self.rest_type == "queuecontent":
@@ -2863,6 +2875,112 @@ target=*
 
 
 
+
+    def rest_plugin2(self):
+        """ /plugin processing
+        """
+        self._log.debug("Plugin action")
+
+        # parameters initialisation
+        self.parameters = {}
+
+        if len(self.rest_request) < 1:
+            self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
+            return
+
+        ### list ######################################
+        if self.rest_request[0] == "list":
+
+            if len(self.rest_request) == 1:
+                self._rest_plugin_list()
+            else:
+                self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
+                                              self.jsonp, self.jsonp_cb)
+                return
+
+        ### detail ####################################
+        elif self.rest_request[0] == "detail":
+            if len(self.rest_request) < 3:
+                self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
+                return
+            self._rest_plugin_detail(self.rest_request[1], self.rest_request[2])
+
+
+        ### start #####################################
+        elif self.rest_request[0] == "start":
+            if len(self.rest_request) < 3:
+                self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
+                return
+            self._rest_plugin_start_stop(plugin =  self.rest_request[1], \
+                                   command = "start", \
+                                   host = self.rest_request[3])
+
+        ### stop ######################################
+        elif self.rest_request[0] == "stop":
+            if len(self.rest_request) < 3:
+                self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
+                return
+            self._rest_plugin_start_stop(plugin =  self.rest_request[1], \
+                                   command = "stop", \
+                                   host = self.rest_request[3])
+
+
+        ### plugin config ############################
+        elif self.rest_request[0] == "config":
+
+            ### list
+            if self.rest_request[1] == "list":
+                if len(self.rest_request) == 2:
+                    self._rest_plugin_config_list()
+                elif len(self.rest_request) == 4 or len(self.rest_request) == 6:
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
+                elif len(self.rest_request) == 5:
+                    if self.rest_request[2] == "by-name":
+                        self._rest_plugin_config_list(name=self.rest_request[3], hostname=self.rest_request[4])
+                elif len(self.rest_request) == 7:
+                    if self.rest_request[2] == "by-name" and self.rest_request[5] == "by-key":
+                        self._rest_plugin_config_list(name = self.rest_request[3], hostname=self.rest_request[4], key = self.rest_request[6])
+                    else:
+                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
+                else:
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
+
+            ### set
+            elif self.rest_request[1] == "set":
+                offset = 2
+                if self.set_parameters(offset):
+                    self._rest_plugin_config_set()
+                else:
+                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
+
+
+            ### del
+            elif self.rest_request[1] == "del":
+                if len(self.rest_request) == 4:
+                    self._rest_plugin_config_del(name=self.rest_request[2], hostname=self.rest_request[3])
+                else:
+                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
+                                                  self.jsonp, self.jsonp_cb)
+
+
+            ### others
+            else:
+                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], \
+                                                  self.jsonp, self.jsonp_cb)
+                return
+
+        ### others ####################################
+        else:
+            self.send_http_response_error(999, "Bad operation for /plugin", self.jsonp, self.jsonp_cb)
+            return
+
+
+
+
+
     def _rest_plugin_list(self, name = None, host = gethostname()):
         """ Send a xpl message to manager to get plugin list
             Display this list as json
@@ -2876,45 +2994,58 @@ target=*
         message.set_schema("domogik.system")
         message.add_data({"command" : "list"})
         # TODO : ask for good host
-        message.add_data({"host" : gethostname()})
+        #message.add_data({"host" : gethostname()})
+        message.add_data({"host" : "*"})
         self._myxpl.send(message)
         self._log.debug("Plugin : send message : %s" % str(message))
 
         ### Wait for answer
         # get xpl message from queue
+        # TODO : make a time loop of one second after first xpl-trig reception
+        messages = []
         try:
-            self._log.debug("Plugin : wait for answer...")
-            message = self._get_from_queue(self._queue_system_list, "xpl-trig", "domogik.system")
+            # Get first answer for command
+            self._log.debug("Plugin list : wait for first answer...")
+            messages.append(self._get_from_queue(self._queue_system_list, "xpl-trig", "domogik.system"))
+            # after first message, we start to listen for other messages 
+            self._log.debug("Plugin list : wait for other answers during '%s' seconds..." % WAIT_FOR_LIST_ANSWERS)
+            max_time = time.time() + WAIT_FOR_LIST_ANSWERS
+            while time.time() < max_time:
+                try:
+                    messages.append(self._get_from_queue(self._queue_system_list, "xpl-trig", "domogik.system", timeout = WAIT_FOR_LIST_ANSWERS))
+                except Empty:
+                    pass
+            self._log.debug("Plugin list : end waiting for answers")
         except Empty:
-            self._log.debug("Plugin : no answer")
+            self._log.debug("Plugin list : no answer")
             json_data = JSonHelper("ERROR", 999, "No data or timeout on getting plugin list")
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
             json_data.set_data_type("plugin")
             self.send_http_response_ok(json_data.get())
             return
 
-        self._log.debug("Plugin : message received : %s" % str(message))
-
-        # process message
-        cmd = message.data['command']
-        host = message.data["host"]
-    
-
+        self._log.debug("Plugin list : messages received : %s" % str(messages))
+        
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("plugin")
 
-        idx = 0
-        loop_again = True
-        while loop_again:
-            try:
-                data = message.data["plugin"+str(idx)].split(",")
-                if name == None or name == data[0]:
-                    json_data.add_data({"name" : data[0], "technology" : data[1], "description" : data[3], "status" : data[2], "host" : host})
-                idx += 1
-            except:
-                loop_again = False
-
+        # process messages
+        for message in messages:
+            cmd = message.data['command']
+            host = message.data["host"]
+    
+            idx = 0
+            loop_again = True
+            while loop_again:
+                try:
+                    data = message.data["plugin"+str(idx)].split(",")
+                    if name == None or name == data[0]:
+                        json_data.add_data({"name" : data[0], "technology" : data[1], "description" : data[3], "status" : data[2], "host" : host})
+                    idx += 1
+                except:
+                    loop_again = False
+    
         self.send_http_response_ok(json_data.get())
 
 
