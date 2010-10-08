@@ -36,40 +36,7 @@ JSonHelper object
 @license: GPL(v3)
 @organization: Domogik
 """
-from domogik.xpl.common.xplconnector import Listener
-from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.common.plugin import XplPlugin
-from domogik.common import logger
-from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
-from domogik.common.database import DbHelper
-from domogik.xpl.common.helper import HelperError
-from domogik.common.configloader import Loader
-from xml.dom import minidom
-import time
-import urllib
-import locale
-from socket import gethostname
-from Queue import Queue, Empty, Full
-from domogik.xpl.common.queryconfig import Query
-from domogik.xpl.common.plugin import XplResult
 import re
-import traceback
-import datetime
-import socket
-from OpenSSL import SSL
-import SocketServer
-import os
-import glob
-import random
-import calendar
-import domogik.xpl.helpers
-import pkgutil
-import uuid
-import stat
-import shutil
-import mimetypes
-import errno
-from threading import Event, Thread
 import json
 
 
