@@ -4272,12 +4272,13 @@ class StatsManager(XplPlugin):
                         res[technology][schema] = {}
                         stats[technology][schema] = {}
                     for xpl_type in schema_types[schema]:
-                        device, mapping, static_device = self.parse_mapping(doc.documentElement.getElementsByTagName("mapping")[0])
+                        device, mapping, static_device, device_type = self.parse_mapping(doc.documentElement.getElementsByTagName("mapping")[0])
                         res[technology][schema][xpl_type] = {"filter": 
                                 self.parse_listener(schema_types[schema][xpl_type].getElementsByTagName("listener")[0]),
                                 "mapping": mapping,
                                 "device": device,
-                                "static_device": static_device}
+                                "static_device": static_device,
+                                "device_type": device_type}
                 
                         stats[technology][schema][xpl_type] = self._Stat(self._myxpl, res[technology][schema][xpl_type], technology, schema, xpl_type, self.handler_params)
         except :
@@ -4318,10 +4319,13 @@ class StatsManager(XplPlugin):
         device_node = node.getElementsByTagName("device")[0]
         device = None
         static_device = None
+        device_type = None
         if device_node.attributes.has_key("field"):
             device = device_node.attributes["field"].value.lower()
         elif device_node.attributes.has_key("static_name"):
             static_device = device_node.attributes["static_name"].value.lower()
+        elif device_node.attributes.has_key("type"):
+            device_type = device_node.attributes["type"].value.lower()
  
         #device = node.getElementsByTagName("device")[0].attributes["field"].value.lower()
         for value in node.getElementsByTagName("value"):
@@ -4349,7 +4353,7 @@ class StatsManager(XplPlugin):
                 data["filter_key"] = None
                 data["filter_value"] = None
             values.append(data)
-        return device, values, static_device
+        return device, values, static_device, device_type
 
 
     class _Stat:
@@ -4398,6 +4402,11 @@ class StatsManager(XplPlugin):
                     d_id = my_db.get_device_by_technology_and_address(self._technology, \
                         self._res["static_device"]).id
                     device = self._res["static_device"]
+                elif self._res["device_type"] != None:
+                    # device id equals 0 for a notification
+                    if self._res["device_type"] == "notification":
+                        d_id = 0
+                        device = "notification"
                 else:  # oups... something wrong in xml file ?
                     self._log_stats.error("Device has no name... is there a problem in xml file ?")
                     raise AttributeError
@@ -4429,14 +4438,20 @@ class StatsManager(XplPlugin):
                     if my_map["filter_key"] == None:
                         key = my_map["name"]
                         device_data.append({"key" : key, "value" : value})
-                        my_db.add_device_stat(current_date, key, value, d_id, \
-                                              history_size)
+                        # we don't insert notifications
+                        if d_id != 0:
+                            my_db.add_device_stat(current_date, key, value, \
+                                                  d_id, \
+                                                  history_size)
                     else:
                         if my_map["filter_value"] != None and \
                            my_map["filter_value"].lower() == message.data[my_map["filter_key"]].lower():
                             key = my_map["new_name"]
                             device_data.append({"key" : key, "value" : value})
-                            my_db.add_device_stat(current_date, key, value, \
+                            # we don't insert notifications
+                            if d_id != 0:
+                                my_db.add_device_stat(current_date, key, \
+                                                  value, \
                                                   d_id, history_size)
                         else:
                             if my_map["filter_value"] == None:
