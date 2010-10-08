@@ -46,6 +46,7 @@ from domogik.common.database import DbHelper
 from domogik.xpl.common.helper import HelperError
 from domogik.xpl.lib.rest_json import JSonHelper
 from domogik.xpl.lib.rest_event import EventRequests
+from domogik.xpl.lib.rest_stat import StatsManager
 from domogik.common.configloader import Loader
 from xml.dom import minidom
 import time
@@ -4224,7 +4225,7 @@ class MOVED_JSonHelper():
 
 
 ################################################################################
-class StatsManager(XplPlugin):
+class MOVED_StatsManager(XplPlugin):
     """
     Listen on the xPL network and keep stats of device and system state
     """
