@@ -108,7 +108,8 @@
             this.close();
             var dialog = $("<div id='dialog' title='Graph " + type + "'><div id='graph' style='width:100%;height:100%;'></div></div>");
             $('body').append(dialog);
-            dialog.dialog({ height: 330, width:630,
+            dialog.dialog({ width:'90%',
+                            position: ['middle', 50],
                             resizable: false,
                             modal: true,
                             close: function(ev, ui) {
@@ -202,10 +203,11 @@
             var from = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay(),0,0,0);
             var to = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay() + 6,23,59,59);
 
-            graph_options.title.text = Highcharts.dateFormat('%A %d %B %Y', now.getTime());
+            graph_options.title.text = Highcharts.dateFormat('%d/%m/%Y', from.getTime()) + " - " + Highcharts.dateFormat('%d/%m/%Y', to.getTime());
             graph_options.xAxis.min = Date.UTC(from.getFullYear(), from.getMonth(), from.getDate());
             graph_options.xAxis.max = Date.UTC(to.getFullYear(), to.getMonth(), to.getDate(),23,59,59);
             graph_options.xAxis.dateTimeLabelFormats = {day: '%A %e'};
+            graph_options.xAxis.tickInterval = 24 * 3600 * 1000; // a day
             graph_options.tooltip.formatter = function() {
 			                return Highcharts.dateFormat('%d/%m/%Y %Hh', this.x) +'<br/>'
                                 + "<strong>" + Highcharts.numberFormat(this.y, 2, ',') +" " + o.model_parameters.unit + "</strong>";
