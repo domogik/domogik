@@ -98,14 +98,7 @@ QUEUE_EVENT_SIZE = 50
 # Repository
 DEFAULT_REPO_DIR = "/tmp/"
 
-# Wait time to get answers from xpl-cmnd domogik.system command=list
-# TODO : make it a parameter ?
-WAIT_FOR_LIST_ANSWERS = 1
 
-
-#### TEMPORARY DATA FOR TEMPORARY FUNCTIONS ############
-PING_DURATION = 2
-#### END TEMPORARY DATA ################################
 
 ################################################################################
 class Rest(XplPlugin):
@@ -136,6 +129,9 @@ class Rest(XplPlugin):
         log_dm = logger.Logger('rest-dm')
         self._log_dm = log_dm.get_logger()
         self._log_dm.info("Rest Server Data Manipulation...")
+
+        # API version
+        self._rest_api_version = REST_API_VERSION
     
         try:
     

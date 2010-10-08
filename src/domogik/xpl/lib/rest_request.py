@@ -38,43 +38,34 @@ ProcessRequest object
 """
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.common.plugin import XplPlugin
-from domogik.common import logger
-from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from domogik.common.database import DbHelper
 from domogik.xpl.common.helper import HelperError
 from domogik.xpl.lib.rest_json import JSonHelper
-from domogik.xpl.lib.rest_event import EventRequests
-from domogik.xpl.lib.rest_stat import StatsManager
-from domogik.common.configloader import Loader
-from xml.dom import minidom
 import time
 import urllib
-import locale
 from socket import gethostname
-from Queue import Queue, Empty, Full
-from domogik.xpl.common.queryconfig import Query
-from domogik.xpl.common.plugin import XplResult
 import re
 import traceback
 import datetime
-import socket
-from OpenSSL import SSL
-import SocketServer
 import os
 import glob
 import random
-import calendar
 import domogik.xpl.helpers
 import pkgutil
 import uuid
 import stat
 import shutil
 import mimetypes
-import errno
-from threading import Event, Thread
-import json
+from threading import Event
 
+
+# Time we wait for answers after a /list command
+WAIT_FOR_LIST_ANSWERS = 1
+
+
+#### TEMPORARY DATA FOR TEMPORARY FUNCTIONS ############
+PING_DURATION = 2
+#### END TEMPORARY DATA ################################
 
 
 class ProcessRequest():
@@ -121,6 +112,7 @@ class ProcessRequest():
         self._put_filename = None
 
         # shorter access
+        self._rest_api_version = self.handler_params[0]._rest_api_version
         self._myxpl = self.handler_params[0]._myxpl
         self._log = self.handler_params[0]._log
         self._log_dm = self.handler_params[0]._log_dm
@@ -291,7 +283,7 @@ class ProcessRequest():
 
         # Description and parameters
         info = {}
-        info["Version"] = REST_API_VERSION
+        info["Version"] = self._rest_api_version
         info["SSL"] = self.use_ssl
 
         # Xml command files
@@ -1526,7 +1518,7 @@ target=*
         elif name != None and key != None and reference != None:
             # by-element
             ui_item_config = self._db.get_ui_item_config(self, ui_item_name = name, \
-                                                         ui_item_reference = reference, ui_key = key)
+                                                         ui_item_reference = reference, ui_item_key = key)
             if ui_item_config is not None:
                 json_data.add_data(ui_item_config)
         self.send_http_response_ok(json_data.get())
