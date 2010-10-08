@@ -1,36 +1,37 @@
 @charset "UTF-8";
 /* CSS Document */
 
-.ui-widget-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-.ui-widget-overlay { background: #666666 url(../images/decoration/ui-bg_diagonals-thick_20_666666_40x40.png) 50% 50% repeat; opacity: .50; }
+.ui-widget-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(255,255,255,0.7);
+    }
 
 .ui-dialog {
-	position: absolute; padding: .2em; width: 300px;
-	border: 1px solid #979387;
-	background-color: #eeeeee;
-	background-image: -webkit-gradient(linear, 0% 0%, 0% 84%, from(#eeeeee), to(#C9C9C9));
-	background-image: -moz-linear-gradient(35% 84% 90deg,#eeeeee, #C9C9C9);
+	position: absolute;
+	background-color: #1e1e1e;
 	color: #333333;
 	-moz-border-radius: 0.8em;
     -webkit-border-radius: 0.8em;
 	overflow: visible;
+    -webkit-box-shadow: 2px 2px 10px ;
+    -moz-box-shadow: 2px 2px 10px ;
+    box-shadow: 2px 2px 10px ;
+    padding-bottom:2em;
 }
 .ui-dialog .ui-dialog-titlebar {
-	padding: .5em .3em .3em 1em;
-	position: relative;
-	border: 1px solid #979387;
-    background-color:#9BB528;
-	background-image: -webkit-gradient(linear, 0% 0%, 0% 60%, from(#BDCB2F), to(#9BB528));
-    background-image: -moz-linear-gradient(100% 60% 270deg, #BDCB2F, #9BB528);
-	color: #000000; font-weight: bold;
-	-moz-border-radius: 0.8em;
-    -webkit-border-radius: 0.8em;
+	padding: 1em;
+    font-size:1.4em;
+	color: #ffffff; font-weight: bold;
+    text-align:left;
 }
 
-.ui-dialog .ui-dialog-titlebar-close { position: absolute; right: .3em; top: 50%; width: 19px; margin: -10px 0 0 0; padding: 0; height: 18px; }
-.ui-dialog .ui-dialog-titlebar-close span { display: block; margin: 1px; }
+.ui-dialog-titlebar-close .ui-icon-closethick { background: transparent url('../images/action/close_36.png') 50% 50% no-repeat !important;}
+.ui-dialog .ui-dialog-titlebar-close { position: absolute; right: 0; top: 0; }
+.ui-dialog .ui-dialog-titlebar-close span { display: block; width: 36px; height: 36px;}
 .ui-dialog .ui-dialog-titlebar-close:hover, .ui-dialog .ui-dialog-titlebar-close:focus { }
-.ui-dialog .ui-dialog-content { border: 0; padding: .5em 1em; background: none; overflow: auto }
+.ui-dialog .ui-dialog-content { border: 0; padding: 1em; background: #eeeeee; overflow: auto }
 .ui-dialog .ui-dialog-buttonpane { text-align: left; border-width: 1px 0 0 0; background-image: none; margin: .5em 0 0 0; padding: .3em 1em .5em .4em; }
 
 .ui-dialog .ui-dialog-buttonpane button {

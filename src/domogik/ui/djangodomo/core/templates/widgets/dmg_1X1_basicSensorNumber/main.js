@@ -106,7 +106,7 @@
         show_graph: function(type) {
             var self = this, o = this.options;
             this.close();
-            var dialog = $("<div id='dialog' title='Graph Year'><div id='graph' style='width:600px;height:300px;'></div></div>");
+            var dialog = $("<div id='dialog' title='Graph " + type + "'><div id='graph' style='width:100%;height:100%;'></div></div>");
             $('body').append(dialog);
             dialog.dialog({ height: 330, width:630,
                             resizable: false,
@@ -121,8 +121,9 @@
             var graph_options = {
                 chart: {
                    renderTo: 'graph',
-                   backgroundColor: 'transparent',
-                   defaultSeriesType: 'spline'
+                   defaultSeriesType: 'spline',
+                   borderRadius: null,
+                   backgroundColor:'#eeeeee'
                 },
                 credits:{
                     enabled : false
@@ -133,9 +134,7 @@
                 xAxis: {
                     min: null,
                     max: null,
-                    type: 'datetime',
-                    startOnTick: true,
-                    endOnTick: true,
+                    type: 'datetime'
                 },
                 yAxis: {
                    title: {
