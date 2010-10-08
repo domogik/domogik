@@ -45,6 +45,7 @@ from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from domogik.common.database import DbHelper
 from domogik.xpl.common.helper import HelperError
 from domogik.xpl.lib.rest_json import JSonHelper
+from domogik.xpl.lib.rest_event import EventRequests
 from domogik.common.configloader import Loader
 from xml.dom import minidom
 import time
@@ -4478,7 +4479,7 @@ class StatsManager(XplPlugin):
 
 
 ################################################################################
-class EventRequests():
+class MOVED_EventRequests():
     """
     Object where all events queues and ticket id will be stored
     """

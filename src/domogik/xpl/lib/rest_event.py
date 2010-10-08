@@ -1,0 +1,246 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+""" This file is part of B{Domogik} project (U{http://www.domogik.org}).
+
+License
+=======
+
+B{Domogik} is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+B{Domogik} is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Domogik. If not, see U{http://www.gnu.org/licenses}.
+
+Plugin purpose
+=============
+
+- Events requests management
+
+Implements
+==========
+
+EventRequests object
+
+
+
+@author: Friz <fritz.smh@gmail.com>
+@copyright: (C) 2007-2009 Domogik project
+@license: GPL(v3)
+@organization: Domogik
+"""
+from domogik.xpl.common.xplconnector import Listener
+from domogik.xpl.common.xplmessage import XplMessage
+from domogik.xpl.common.plugin import XplPlugin
+from domogik.common import logger
+from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
+from domogik.common.database import DbHelper
+from domogik.xpl.common.helper import HelperError
+from domogik.xpl.lib.rest_json import JSonHelper
+from domogik.common.configloader import Loader
+from xml.dom import minidom
+import time
+import urllib
+import locale
+from socket import gethostname
+from Queue import Queue, Empty, Full
+from domogik.xpl.common.queryconfig import Query
+from domogik.xpl.common.plugin import XplResult
+import re
+import traceback
+import datetime
+import socket
+from OpenSSL import SSL
+import SocketServer
+import os
+import glob
+import random
+import calendar
+import domogik.xpl.helpers
+import pkgutil
+import uuid
+import stat
+import shutil
+import mimetypes
+import errno
+from threading import Event, Thread
+import json
+
+
+
+class EventRequests():
+    """
+    Object where all events queues and ticket id will be stored
+    """
+    def __init__(self, log, event_timeout, queue_size, queue_timeout, queue_life_expectancy):
+        """ Init Event Requests
+            @param queue_size : size of queues for events
+        """
+        self.requests = {}
+        self._log = log
+        self.event_timeout = event_timeout
+        self.queue_size = queue_size
+        if queue_timeout == 0:
+            self.queue_timeout = None
+        else:
+            self.queue_timeout = queue_timeout
+        self.queue_life_expectancy = queue_life_expectancy
+        self.ticket = 0
+        self.count_request = 0
+
+        # Launch background cleaning function
+        bg_clean = Thread(None, self.bg_clean_event_requests, None, (), {})
+        bg_clean.start()
+
+    def bg_clean_event_requests(self):
+        """ Function to use in background. It will check for each request to see
+            if it has not be forgoten to clean
+        """
+        while 1:
+            clean_list = []
+            for req in self.requests:
+                if time.time() - self.requests[req]["last_access_date"] > self.event_timeout:
+                     print "Ticket number '%s' expires : it will be deleted" % req
+                     clean_list.append(req)
+            for req in clean_list:
+                del self.requests[req]
+                self.count_request -= 1
+            time.sleep(30)
+
+    def new(self, device_id_list):
+        """ Add a new queue and ticket id for a new event
+            @param device_id : id of device to get events from
+            @return ticket_id : ticket id
+        """
+        print "---- NEW ----"
+        new_queue = Queue(self.queue_size)
+        ticket_id = self.generate_ticket()
+        cur_date = time.time()
+        new_data = {"creation_date" :  cur_date,
+                    "last_access_date" : cur_date,
+                    "device_id_list" : device_id_list,
+                    "queue" : new_queue,
+                    "queue_size" : 0}
+        self.requests[ticket_id] = new_data
+        self.count_request += 1
+        self._log.debug("New event request created (ticket_id=%s) for device(s) : %s" % (ticket_id, str(device_id_list)))
+        return ticket_id
+
+    def free(self, ticket_id):
+        """ End request for a ticket id : remove queue
+            @param ticket_id : ticket id of queue to remove
+            @return True if succcess, False if ticket doesn't exists
+        """
+        try:
+            del self.requests[ticket_id]
+        # ticket doesn't exists
+        except KeyError:
+            self._log.warning("Trying to free an unknown event request (ticket_id=%s)" % ticket_id)
+            return False
+        self.count_request -= 1
+        return True
+
+    def generate_ticket(self):
+        """ Generate a ticket id for an event request
+        """
+        # TODO : make something random for ticket generation after 0.1.0
+        self.ticket += 1
+        return str(self.ticket)
+ 
+    def count(self):
+        """ Return number of event requests
+        """
+        return self.count_request
+
+    def add_in_queues(self, device_id, data):
+        """ Add data in each queue linked to device id
+            @param data : data to put in queues
+        """
+        print "---- ADD ----"
+        for req in self.requests:
+            if device_id in self.requests[req]["device_id_list"]:
+                ### clean queue
+                idx = 0
+                queue_size = self.requests[req]["queue"].qsize()
+                actual_time = time.time()
+                while idx < queue_size:
+                    if self.requests[req]["queue"].empty() == False:
+                        (elt_time, elt_data) = self.requests[req]["queue"].get_nowait()
+                        # if there is already data about device_id, we clean it (we don't put it back in queue)
+                        # or if data is too old
+                        # Note : if we get new stats only each 2 minutes, 
+                        #     cleaning about life expectancy will only happen 
+                        #     every 2 minutes instead of every 'life_expectancy'
+                        #     seconds. I supposed that when you got several 
+                        #     technologies, you pass throug this code several 
+                        #     times in a minute. More over,  events are
+                        #     actually (0.1) used only by UI and when you use
+                        #     UI, events are read immediatly. So, I think
+                        #     that cleaning queues here instead of creating
+                        #     a dedicated process which will run in background
+                        #     is a good thing for the moment
+                        if elt_data["device_id"] != device_id and \
+                           actual_time - elt_time < self.queue_life_expectancy:
+
+                            self.requests[req]["queue"].put((elt_time, elt_data),
+                                                            True, self.queue_timeout) 
+                        else:
+                            # one data suppressed from queue
+                            self.requests[req]["queue_size"] -= 1
+                        
+                    idx += 1
+
+                ### put data in queue
+                try:
+                    self.requests[req]["queue"].put((time.time(), data), 
+                                                    True, self.queue_timeout) 
+                    self.requests[req]["queue_size"] += 1
+                except Full:
+                    self._log.error("Queue for ticket_id '%s' is full. Feel free to adjust Event queues size" % req)
+
+
+    def get(self, ticket_id):
+        """ Get data from queue linked to ticket id. 
+            If no data, wait until queue timeout
+            @param ticket_id : id of ticket
+            @return data in queue or False if ticket doesn't exists
+        """
+        print "---- GET ----"
+        try:
+            (elt_time, elt_data) = self.requests[ticket_id]["queue"].get(True, self.queue_timeout)
+            self.requests[ticket_id]["queue_size"] -= 1
+            # TODO : use queue_life_expectancy in order not to get old data
+
+            # Add ticket id to answer
+            elt_data["ticket_id"] = str(ticket_id)
+
+            # Update access date
+            self.requests[ticket_id]["last_access_date"] = time.time()
+
+        # Timeout
+        except Empty:
+            # Add ticket id to answer
+            elt_data = {}
+            elt_data["ticket_id"] = str(ticket_id)
+
+            # Update access date
+            self.requests[ticket_id]["last_access_date"] = time.time()
+
+        # Ticket doesn't exists
+        except KeyError:
+            self._log.warning("Trying to get an unknown event request (ticket_id=%s). Maybe your ticket expires ?" % ticket_id)
+            return False
+        return elt_data
+
+    def list(self):
+        """ List queues (used by rest status)
+        """
+        return self.requests
+
