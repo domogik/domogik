@@ -12,6 +12,7 @@ function openlogin(path) {
                 $('body').append(dialog);
                 dialog.dialog({ width:'40em', resizable: false,
                                 modal: true,
+                                position: ['middle',50],
                                 close: function(ev, ui) {
                                     $(this).remove();
                                 }
