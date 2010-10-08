@@ -57,6 +57,7 @@ import stat
 import shutil
 import mimetypes
 from threading import Event
+from Queue import Empty
 
 
 # Time we wait for answers after a /list command
@@ -2977,6 +2978,7 @@ target=*
         """
         print "Helper action"
 
+        output = None
         json_data = JSonHelper("OK")
         json_data.set_data_type("helper")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
