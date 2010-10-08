@@ -44,6 +44,7 @@ from domogik.common import logger
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from domogik.common.database import DbHelper
 from domogik.xpl.common.helper import HelperError
+from domogik.xpl.lib.rest_json import JSonHelper
 from domogik.common.configloader import Loader
 from xml.dom import minidom
 import time
@@ -3902,7 +3903,7 @@ target=*
 
 
 ################################################################################
-class JSonHelper():
+class MOVED_JSonHelper():
     """ Easy way to create a json or jsonp structure
     """
 
