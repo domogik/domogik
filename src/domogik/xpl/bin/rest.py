@@ -28,7 +28,14 @@ Plugin purpose
 Implements
 ==========
 
-TODO when finished ;)
+class Rest(XplPlugin):
+class HTTPServerWithParam(SocketServer.ThreadingMixIn, HTTPServer):
+    def __init__(self, server_address, request_handler_class, \
+        HTTPServer.__init__(self, server_address, request_handler_class, \
+class HTTPSServerWithParam(SocketServer.ThreadingMixIn, HTTPServer):
+    def __init__(self, server_address, request_handler_class, \
+        HTTPServer.__init__(self, server_address, request_handler_class, \
+class RestHandler(BaseHTTPRequestHandler):
 
 
 
@@ -38,12 +45,9 @@ TODO when finished ;)
 @organization: Domogik
 """
 from domogik.xpl.common.xplconnector import Listener
-from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.common import logger
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
-from domogik.common.database import DbHelper
-from domogik.xpl.common.helper import HelperError
 from domogik.xpl.lib.rest_json import JSonHelper
 from domogik.xpl.lib.rest_event import EventRequests
 from domogik.xpl.lib.rest_stat import StatsManager
@@ -53,29 +57,16 @@ from xml.dom import minidom
 import time
 import urllib
 import locale
-from socket import gethostname
 from Queue import Queue, Empty, Full
 from domogik.xpl.common.queryconfig import Query
 from domogik.xpl.common.plugin import XplResult
-import re
 import traceback
 import datetime
 import socket
 from OpenSSL import SSL
 import SocketServer
 import os
-import glob
-import random
-import calendar
-import domogik.xpl.helpers
-import pkgutil
-import uuid
-import stat
-import shutil
-import mimetypes
 import errno
-from threading import Event, Thread
-import json
 
 
 
@@ -454,9 +445,8 @@ class Rest(XplPlugin):
         self._log_queue.debug("Put in queue %s : %s" % (str(my_queue), str(message)))
         try:
             my_queue.put((time.time(), message), True, self._queue_timeout) 
-        # TODO : except Full:
-        #           call a "clean" function
-        #           put again in queue
+
+        # Clean queue to make space
         except Full:
             msg = "Queue '%s' is full : cleaning it to make some space..." % my_queue
             self._log_queue.debug(msg)
@@ -769,5 +759,5 @@ class RestHandler(BaseHTTPRequestHandler):
 
 if __name__ == '__main__':
     # Create REST server with default values (overriden by ~/.domogik.cfg)
-    rest = Rest("127.0.0.1", "8080")
+    REST = Rest("127.0.0.1", "8080")
 
