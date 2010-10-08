@@ -74,7 +74,7 @@ $.extend({
         $.each(parameters, function(){
             url += encodeURIComponent(this) + '/';     
         });
-        $.jsonp({
+        return $.jsonp({
             cache: false,
             type: "GET",
             url: url,

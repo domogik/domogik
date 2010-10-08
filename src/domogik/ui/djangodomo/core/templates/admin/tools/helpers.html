@@ -30,11 +30,13 @@
     $(function(){
         // Accordion
         $("#nav2").accordion({ autoHeight: false, header: ".subnav2", active:3});
+        var send_xOptions = null;
+        
 		function sendfunction() {
             var commandline = $("#commandline").val();
             if (commandline) {
-                $("#commandsubmit").attr('className', 'button icon16-action-processing_ffffff')
-                    .attr('disabled', 'disabled');
+                $("#commandsubmit").hide();
+                $("#commandstop").show();
                 $("#commandline").attr('disabled', 'disabled');
 				var li = $("<li class='command'>" + commandline + "</li>");
 				var last = li;
@@ -44,11 +46,11 @@
 				var commandarray = commandline.split(' ')
 				var command = ['helper'];
 				command = command.concat(commandarray);
-                $.getREST(command,
+                send_xOptions = $.getREST(command,
                     function(data) {
                         var status = (data.status).toLowerCase();
-                        $("#commandsubmit").attr('className', 'button icon16-action-down')
-                            .removeAttr('disabled');
+                        $("#commandsubmit").show();
+                        $("#commandstop").hide();
                         $("#commandline").removeAttr('disabled');
 						if (status == 'ok') {
 							$.each(data.helper, function(index, value) {
@@ -65,10 +67,22 @@
 							last = li;						
 						}
                     }
-                );            
+                );
+                console.log(ticket);
+            }
+        }
+        function stopfunction() {
+            if (send_xOptions) {
+                send_xOptions.abort();
+                send_xOptions = null;
+                $("#commandsubmit").show();
+                $("#commandstop").hide();
+                $("#commandline").val('');
+                $("#commandline").removeAttr('disabled');
             }
         }
         $("#commandsubmit").click(sendfunction);
+        $("#commandstop").click(stopfunction).hide();
 		$("#commandline").keypress(function(e){
 			if (e.keyCode == 13) {
 		        sendfunction();
@@ -97,6 +111,7 @@
             <label for='commandline'>{% trans "Command" %}</label>
             <input type='text' id='commandline' name='commandline'>
             <button id='commandsubmit' class='button icon16-action-down'>{% trans "Send" %}</button>
+            <button id='commandstop' class='button icon16-action-processing_ffffff'>{% trans "Stop" %}</button>
             <button id='resultclear' class='button icon16-action-reset'>{% trans "clear" %}</button>
 		<ul id='result'>
 		</ul>
