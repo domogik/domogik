@@ -157,7 +157,7 @@ $(function(){
 				ctx.fillText(o.featurename, 0, 0);  
 			}
         },
-        
+
         hasSize: function(width, height) {
             var woptions = get_widgets_options(this.options.id)
             return (width == woptions.width && height == woptions.height);
