@@ -19,6 +19,10 @@ $(function(){
     });
 
     $("#widgets").hide();
+    
+    $("li#showmenu").click(function(){
+        $("#panel").toggle();      
+    });
 });
 
 (function($) {
