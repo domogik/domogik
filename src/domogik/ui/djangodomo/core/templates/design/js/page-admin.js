@@ -15,7 +15,7 @@ function getPluginsList() {
                         a.attr('href', '/domogik/admin/plugin/' + this.name + "/" + this.host)
                             .attr('title', this.description)
                             .tooltip_right();
-                        var status = $("<div>" + this.name + " - " + this.host + "</div>");
+                        var status = $("<div><div class='host'>" + this.host + "</div>" + this.name + "</div>");
                         if (this.name != 'rest') {
                             status.addClass("menu-indicator")
                             if (this.status == 'ON') {
