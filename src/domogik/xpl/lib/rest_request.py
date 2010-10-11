@@ -1286,7 +1286,7 @@ target=*
             @return parameter value or None if parameter doesn't exist
         """
         try:
-            data = self.parameters[name]
+            data = self.parameters[name].strip()
             if data == None or data == "None":
                 return None
             elif data == "True":
