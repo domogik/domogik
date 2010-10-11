@@ -205,9 +205,7 @@ class ProcessRequest():
         elif self.rest_type == "base":
             self.rest_base()
         elif self.rest_type == "plugin":
-            self.rest_plugin2()
-        elif self.rest_type == "plugin2":
-            self.rest_plugin2()
+            self.rest_plugin()
         elif self.rest_type == "account":
             self.rest_account()
         elif self.rest_type == "queuecontent":
@@ -1835,6 +1833,7 @@ target=*
         for device in self._db.list_devices():
             self._log.debug("!!3(for before)")
             self._log.debug("device=%s" % device)
+            #self._log.debug("DS=%s" % device.device_stats)
             json_data.add_data(device)
             self._log.debug("!!3(for after)")
         self._log.debug("!!4")
@@ -2072,114 +2071,6 @@ target=*
 ######
 
     def rest_plugin(self):
-        """ /plugin processing
-        """
-        self._log.debug("Plugin action")
-
-        # parameters initialisation
-        self.parameters = {}
-
-        if len(self.rest_request) < 1:
-            self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
-            return
-
-        ### list ######################################
-        if self.rest_request[0] == "list":
-
-            if len(self.rest_request) == 1:
-                self._rest_plugin_list()
-            elif len(self.rest_request) == 2:
-                self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
-                                              self.jsonp, self.jsonp_cb)
-            else:
-                if self.rest_request[1] == "by-name":
-                    self._rest_plugin_list(name=self.rest_request[2])
-                else:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                              self.jsonp, self.jsonp_cb)
-                    return
-
-        ### detail ####################################
-        elif self.rest_request[0] == "detail":
-            if len(self.rest_request) < 2:
-                self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
-                return
-            self._rest_plugin_detail(self.rest_request[1])
-
-
-        ### start #####################################
-        elif self.rest_request[0] == "start":
-            if len(self.rest_request) < 2:
-                self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
-                return
-            self._rest_plugin_start_stop(plugin =  self.rest_request[1], \
-                                   command = "start")
-
-        ### stop ######################################
-        elif self.rest_request[0] == "stop":
-            if len(self.rest_request) < 2:
-                self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
-                return
-            self._rest_plugin_start_stop(plugin =  self.rest_request[1], \
-                                   command = "stop")
-
-
-        ### plugin config ############################
-        elif self.rest_request[0] == "config":
-
-            ### list
-            if self.rest_request[1] == "list":
-                if len(self.rest_request) == 2:
-                    self._rest_plugin_config_list()
-                elif len(self.rest_request) == 4 or len(self.rest_request) == 6:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-                elif len(self.rest_request) == 5:
-                    if self.rest_request[2] == "by-name":
-                        self._rest_plugin_config_list(name=self.rest_request[3], hostname=self.rest_request[4])
-                elif len(self.rest_request) == 7:
-                    if self.rest_request[2] == "by-name" and self.rest_request[5] == "by-key":
-                        self._rest_plugin_config_list(name = self.rest_request[3], hostname=self.rest_request[4], key = self.rest_request[6])
-                    else:
-                        self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-                else:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-
-            ### set
-            elif self.rest_request[1] == "set":
-                offset = 2
-                if self.set_parameters(offset):
-                    self._rest_plugin_config_set()
-                else:
-                    self.send_http_response_error(999, "Error in parameters", self.jsonp, self.jsonp_cb)
-
-
-            ### del
-            elif self.rest_request[1] == "del":
-                if len(self.rest_request) == 4:
-                    self._rest_plugin_config_del(name=self.rest_request[2], hostname=self.rest_request[3])
-                else:
-                    self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
-                                                  self.jsonp, self.jsonp_cb)
-
-
-            ### others
-            else:
-                self.send_http_response_error(999, self.rest_request[1] + " not allowed for " + self.rest_request[0], \
-                                                  self.jsonp, self.jsonp_cb)
-                return
-
-        ### others ####################################
-        else:
-            self.send_http_response_error(999, "Bad operation for /plugin", self.jsonp, self.jsonp_cb)
-            return
-
-
-
-
-    def rest_plugin2(self):
         """ /plugin processing
         """
         self._log.debug("Plugin action")
