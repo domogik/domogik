@@ -128,9 +128,10 @@ class JSonHelper():
         if data == None:
             return
 
-        for table in table_list:
-            if hasattr(data, table):
-                pass
+        if max_depth > 0:
+            for table in table_list:
+                if hasattr(data, table):
+                    pass
       
         data_out = self._process_data(data, max_depth = max_depth)
         data_out = data_out.replace('\n', "\\n")
