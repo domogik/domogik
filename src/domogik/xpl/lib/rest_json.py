@@ -122,14 +122,14 @@ class JSonHelper():
                      "device_id", \
                      "name"]
 
+        if data == None:
+            return
+
         for table in table_list:
             if hasattr(data, table):
                 pass
       
-        if data == None:
-            return
-
-        data_out += self._process_data(data)
+        data_out = self._process_data(data)
         data_out = data_out.replace('\n', "\\n")
         self._data_values += data_out
             
@@ -212,33 +212,32 @@ class JSonHelper():
         ### type : list
         elif data_type in list_type:
             # get first data type
-            if len(data) > 0:
-                sub_data_elt0_type = type(data[0]).__name__
-                #print "DATA=%s" % data
-            else:
+            if len(data) == 0:
                 #print "DATA vide=%s" % data
                 data_json = '"%s" : [],' % key
-                return data_json
-            # start table
-            if sub_data_elt0_type in ("dict", "str", "int", "tuple", "NamedTuple"):
-                data_json += '"%s" : [' % key
             else:
-                display_sub_data_elt0_type = re.sub(r"([^^])([A-Z][a-z])",
-                             r"\1_\2",
-                             sub_data_elt0_type).lower()
-                data_json += '"%s" : [' % display_sub_data_elt0_type
-
-            # process each data
-            for sub_data in data:
-                sub_data_key  = "NOKEY"
-                sub_data_type = type(sub_data).__name__
-                #print "    DATA KEY : " + str(sub_data_key)
-                #print "    DATA : " + str(sub_data)
-                #print "    DATA TYPE : " + str(sub_data_type)
-                data_json += self._process_sub_data(idx + 1, True, sub_data_key, sub_data, sub_data_type, db_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type)
-            # finish table
-            data_json = data_json[0:len(data_json)-1] + "],"
-
+                sub_data_elt0_type = type(data[0]).__name__
+                #print "DATA=%s" % data
+                # start table
+                if sub_data_elt0_type in ("dict", "str", "int", "tuple", "NamedTuple"):
+                    data_json += '"%s" : [' % key
+                else:
+                    display_sub_data_elt0_type = re.sub(r"([^^])([A-Z][a-z])",
+                                 r"\1_\2",
+                                 sub_data_elt0_type).lower()
+                    data_json += '"%s" : [' % display_sub_data_elt0_type
+    
+                # process each data
+                for sub_data in data:
+                    sub_data_key  = "NOKEY"
+                    sub_data_type = type(sub_data).__name__
+                    #print "    DATA KEY : " + str(sub_data_key)
+                    #print "    DATA : " + str(sub_data)
+                    #print "    DATA TYPE : " + str(sub_data_type)
+                    data_json += self._process_sub_data(idx + 1, True, sub_data_key, sub_data, sub_data_type, db_type, instance_type, num_type, str_type, none_type, tuple_type, list_type, dict_type)
+                # finish table
+                data_json = data_json[0:len(data_json)-1] + "],"
+    
 
         ### type : dict
         elif data_type in dict_type:
@@ -309,6 +308,7 @@ class JSonHelper():
         else: 
             data_tmp = ""
         
+        del(sub_data)
         return data_tmp
 
 
