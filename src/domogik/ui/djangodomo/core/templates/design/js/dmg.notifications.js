@@ -21,7 +21,6 @@
                     break;
                 case 'warning':
                     header = "Warning";
-                    sticky = true;
                     break;
             }    
             $.jGrowl(msgformated, { header: header, sticky: sticky, theme: theme });
