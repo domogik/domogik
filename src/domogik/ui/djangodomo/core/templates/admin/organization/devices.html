@@ -111,7 +111,7 @@
             onok: function(values) {
                 var self = this;
                 // Submit form
-                $.getREST(['base', 'device', 'add', 'name', values.adddevicename, 'address', values.adddeviceaddress, 'type_id', values.adddevicetype, 'usage_id', values.adddeviceusage, 'description', values.adddevicedescription, 'reference', values.adddevicereference],
+                rest.get(['base', 'device', 'add', 'name', values.adddevicename, 'address', values.adddeviceaddress, 'type_id', values.adddevicetype, 'usage_id', values.adddeviceusage, 'description', values.adddevicedescription, 'reference', values.adddevicereference],
                     function(data) {
                         var status = (data.status).toLowerCase();
                         if (status == 'ok') {
@@ -168,17 +168,17 @@
                                 button: "#del{{ device.id }}",
                                 name: "'{{ device.name }}'",
                                 onok: function() {
-                                    $.getREST(['base', 'feature', 'list', 'by-device_id', '{{ device.id }}'],
+                                    rest.get(['base', 'feature', 'list', 'by-device_id', '{{ device.id }}'],
                                         function(data) {
                                             var status = (data.status).toLowerCase();
                                             if (status == 'ok') {
                                                 $.each(data.feature, function(index, feature){
-                                                    $.getREST(['base', 'feature_association', 'list', 'by-feature', feature.id],
+                                                    rest.get(['base', 'feature_association', 'list', 'by-feature', feature.id],
                                                         function(data) {
                                                             var status = (data.status).toLowerCase();
                                                             if (status == 'ok') {
                                                                 $.each(data.feature_association, function(index, association){
-                                                                    $.getREST(['base', 'ui_config', 'del', 'by-reference', 'association', association.id],
+                                                                    rest.get(['base', 'ui_config', 'del', 'by-reference', 'association', association.id],
                                                                         function(data) {
                                                                             var status = (data.status).toLowerCase();
                                                                             if (status == 'ok') {
@@ -188,7 +188,7 @@
                                                                         }
                                                                     );
                                                                 });
-                                                                $.getREST(['base', 'feature_association', 'del', 'feature_id', feature.id],
+                                                                rest.get(['base', 'feature_association', 'del', 'feature_id', feature.id],
                                                                     function(data) {
                                                                         var status = (data.status).toLowerCase();
                                                                         if (status == 'ok') {
@@ -210,7 +210,7 @@
                                         }
                                     );
 
-                                    $.getREST(['base', 'device', 'del', '{{ device.id }}'],
+                                    rest.get(['base', 'device', 'del', '{{ device.id }}'],
                                         function(data) {
                                             var status = (data.status).toLowerCase();
                                             if (status == 'ok') {
@@ -230,7 +230,7 @@
                                 values: {upddevicename : '{{ device.name }}', upddevicedescription : '{{ device.description }}', upddeviceaddress : '{{ device.address }}', upddevicereference : '{{ device.reference }}', upddeviceusage : '{{ device.device_usage_id }}'},
                                 onok: function(values) {
                                     // Submit form
-                                    $.getREST(['base', 'device', 'update', 'id', '{{ device.id }}', 'name', values.upddevicename, 'address', values.upddeviceaddress, 'type_id', values.upddeviceusage, 'description', values.upddevicedescription, 'reference', values.upddevicereference],
+                                    rest.get(['base', 'device', 'update', 'id', '{{ device.id }}', 'name', values.upddevicename, 'address', values.upddeviceaddress, 'type_id', values.upddeviceusage, 'description', values.upddevicedescription, 'reference', values.upddevicereference],
                                         function(data) {
                                             var status = (data.status).toLowerCase();
                                             if (status == 'ok') {

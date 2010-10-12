@@ -30,7 +30,7 @@
     $(function(){
         // Accordion
         $("#nav2").accordion({ autoHeight: false, header: ".subnav2", active:3});
-        var send_xOptions = null;
+        var send_id = null;
         
 		function sendfunction() {
             var commandline = $("#commandline").val();
@@ -46,7 +46,7 @@
 				var commandarray = commandline.split(' ')
 				var command = ['helper'];
 				command = command.concat(commandarray);
-                send_xOptions = $.getREST(command,
+                send_id = rest.get(command,
                     function(data) {
                         var status = (data.status).toLowerCase();
                         $("#commandsubmit").show();
@@ -72,9 +72,9 @@
             }
         }
         function stopfunction() {
-            if (send_xOptions) {
-                send_xOptions.abort();
-                send_xOptions = null;
+            if (send_id) {
+                rest.cancel(send_id);
+                send_id = null;
                 $("#commandsubmit").show();
                 $("#commandstop").hide();
                 $("#commandline").val('');

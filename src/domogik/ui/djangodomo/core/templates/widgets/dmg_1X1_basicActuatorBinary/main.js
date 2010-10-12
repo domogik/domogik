@@ -50,7 +50,7 @@
                 // Suppose the switch currently off
                 this.processingValue = 1;
             }
-            $.getREST(['command', o.devicetechnology, o.deviceaddress, this.values[this.processingValue]],
+            rest.get(['command', o.devicetechnology, o.deviceaddress, this.values[this.processingValue]],
                 function(data) {
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {

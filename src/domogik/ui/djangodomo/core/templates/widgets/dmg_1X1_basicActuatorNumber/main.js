@@ -76,7 +76,7 @@
         action: function() {
             var self = this, o = this.options;
             self._startProcessingState();
-            $.getREST(['command', o.devicetechnology, o.deviceaddress, o.model_parameters.command, self.value],
+            rest.get(['command', o.devicetechnology, o.deviceaddress, o.model_parameters.command, self.value],
                 function(data) {
                     self._stopProcessingState();
                     var status = (data.status).toLowerCase();

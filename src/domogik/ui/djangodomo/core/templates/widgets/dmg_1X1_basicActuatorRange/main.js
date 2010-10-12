@@ -83,7 +83,7 @@
             var self = this, o = this.options;
             if (this._processingValue != this.currentValue) {
                 this.element.startProcessingState();
-                $.getREST(['command', o.devicetechnology, o.deviceaddress, o.model_parameters.command, this._processingValue],
+                rest.get(['command', o.devicetechnology, o.deviceaddress, o.model_parameters.command, this._processingValue],
                     function(data) {
                         var status = (data.status).toLowerCase();
                         if (status == 'ok') {

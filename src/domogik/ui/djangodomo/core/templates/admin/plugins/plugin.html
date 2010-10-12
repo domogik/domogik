@@ -38,7 +38,7 @@ $(function(){
     }
     
     function deleteConfig(name, host) {
-        $.getREST(['plugin', 'config', 'del', name, host],
+        rest.get(['plugin', 'config', 'del', name, host],
             function(data) {
                 var status = (data.status).toLowerCase();
                 if (status == 'ok') {
@@ -60,7 +60,7 @@ $(function(){
             } else {
                 value = $('#value_' + item.key).val();
             }
-            $.getREST(['plugin', 'config', 'set', 'name', name, 'hostname', host, 'key', item.key, 'value', value],
+            rest.get(['plugin', 'config', 'set', 'name', name, 'hostname', host, 'key', item.key, 'value', value],
                 function(data) {
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
@@ -81,7 +81,7 @@ $(function(){
     }
 
     /* Get the list of configuration items */
-    $.getREST(['plugin', 'detail', '{{ plugin.name }}', '{{ plugin.host }}'],
+    rest.get(['plugin', 'detail', '{{ plugin.name }}', '{{ plugin.host }}'],
         function(data) {
             var status = (data.status).toLowerCase();
             if (status == 'ok') {
@@ -95,7 +95,7 @@ $(function(){
                     var idefault = item['default'];
                     var itype = item.type;
                     $("#configuration_items tbody").append("<tr id='" + item.id + "'></tr>");
-                    $.getREST(['plugin', 'config', 'list', 'by-name' , '{{ plugin.name }}', '{{ plugin.host }}' , 'by-key', ikey],
+                    rest.get(['plugin', 'config', 'list', 'by-name' , '{{ plugin.name }}', '{{ plugin.host }}' , 'by-key', ikey],
                         function(data) {
                             var status = (data.status).toLowerCase();
                             if (status == 'ok') {
@@ -139,7 +139,7 @@ $(function(){
                     );
                 });
                 
-                $.getREST(['plugin', 'config', 'list' ,'by-name', '{{ plugin.name }}', '{{ plugin.host }}'],
+                rest.get(['plugin', 'config', 'list' ,'by-name', '{{ plugin.name }}', '{{ plugin.host }}'],
                     function(data) {
                         var status = (data.status).toLowerCase();
                         if (status == 'ok') {
@@ -197,7 +197,7 @@ $(function(){
             .unbind('click')
             .click(function() {
             $("#buttonstatus").attr('className', 'button icon16-action-processing_f6f6f6');
-            $.getREST(['plugin', btaction, '{{ plugin.name }}', '{{ plugin.host }}'],
+            rest.get(['plugin', btaction, '{{ plugin.name }}', '{{ plugin.host }}'],
                 function(data) {
                     var status = (data.status).toLowerCase();
                     $("#buttonstatus").removeClass('icon16-action-processing_f6f6f6');

@@ -4,7 +4,7 @@ $(function() {
 });
 
 function openlogin(path) {
-    $.getREST(['account', 'user', 'list'],
+    rest.get(['account', 'user', 'list'],
 		function(data) {
 			var status = (data.status).toLowerCase();
 			if (status == 'ok') {

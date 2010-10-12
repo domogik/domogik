@@ -55,7 +55,7 @@
                 ui.draggable.dmg_draggable("option", "waitValidation", true);
                 var itemid = ui.draggable.attr('ddvalue');
                 var targetid = $(this).attr('ddvalue');
-                $.getREST(['base', 'room', 'update', 'id', itemid, 'area_id', targetid],
+                rest.get(['base', 'room', 'update', 'id', itemid, 'area_id', targetid],
                     function(data) {
                         var status = (data.status).toLowerCase();
                         if (status == 'ok') {
@@ -124,7 +124,7 @@
             button: "#addDialogButton",
             onok: function(values) {
                 // Submit form
-                $.getREST(['base', 'room', 'add', 'name', values.roomname, 'description', values.roomdescription],
+                rest.get(['base', 'room', 'add', 'name', values.roomname, 'description', values.roomdescription],
                     function(data) {
                         var status = (data.status).toLowerCase();
                         if (status == 'ok') {
@@ -168,18 +168,18 @@
                             name: "'{{ room.name }}'",
                             onok: function() {
                                 // Delete ui configuration
-                                $.getREST(['base', 'ui_config', 'del', 'by-reference', 'room', '{{ room.id }}'],
+                                rest.get(['base', 'ui_config', 'del', 'by-reference', 'room', '{{ room.id }}'],
                                     function(data) {
                                         var status = (data.status).toLowerCase();
                                         if (status == 'ok') {
                                             // delete ui_config associations
-                                            $.getREST(['base', 'feature_association', 'list', 'by-room', '{{ room.id }}'],
+                                            rest.get(['base', 'feature_association', 'list', 'by-room', '{{ room.id }}'],
                                                 function(data) {
                                                     var status = (data.status).toLowerCase();
                                                     if (status == 'ok') {
                                                         // Delete ui_config
                                                         $.each(data.feature_association, function(index, association){
-                                                            $.getREST(['base', 'ui_config', 'del', 'by-reference', 'association', association.id],
+                                                            rest.get(['base', 'ui_config', 'del', 'by-reference', 'association', association.id],
                                                                 function(data) {
                                                                     var status = (data.status).toLowerCase();
                                                                     if (status == 'ok') {
@@ -191,12 +191,12 @@
                                                         });
                                                         
                                                         // Delete associated features
-                                                        $.getREST(['base', 'feature_association', 'del', 'association_type', 'room', 'association_id', '{{ room.id }}'],
+                                                        rest.get(['base', 'feature_association', 'del', 'association_type', 'room', 'association_id', '{{ room.id }}'],
                                                             function(data) {
                                                                 var status = (data.status).toLowerCase();
                                                                 if (status == 'ok') {
                                                                     // Delete room
-                                                                    $.getREST(['base', 'room', 'del', '{{ room.id }}'],
+                                                                    rest.get(['base', 'room', 'del', '{{ room.id }}'],
                                                                         function(data) {
                                                                             var status = (data.status).toLowerCase();
                                                                             if (status == 'ok') {
@@ -230,7 +230,7 @@
                             icon: "{{ room.config.icon }}",
                             validCallback: function(self, icon) {
                                 $('#icon{{ room.id }}').processing('start');
-                                $.getREST(['base', 'ui_config', 'set', 'name', 'room', 'reference', '{{ room.id }}', 'key', 'icon', 'value', icon],
+                                rest.get(['base', 'ui_config', 'set', 'name', 'room', 'reference', '{{ room.id }}', 'key', 'icon', 'value', icon],
                                     function(data) {
                                         $('#icon{{ room.id }}').processing('stop');
                                         var status = (data.status).toLowerCase();
@@ -259,7 +259,7 @@
                             values: {roomname : '{{ room.name }}', roomdescription : '{{ room.description }}'},
                             onok: function(values) {
                                 // Submit form
-                                $.getREST(['base', 'room', 'update', 'id', '{{ room.id }}', 'name', values.roomname, 'description', values.roomdescription],
+                                rest.get(['base', 'room', 'update', 'id', '{{ room.id }}', 'name', values.roomname, 'description', values.roomdescription],
                                     function(data) {
                                         var status = (data.status).toLowerCase();
                                         if (status == 'ok') {

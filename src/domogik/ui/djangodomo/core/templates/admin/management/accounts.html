@@ -61,7 +61,7 @@
             button: "#addaccountButton",
             onok: function(values) {
                 // Submit form
-                $.getREST(['account', 'user', 'add', 'login', values.adduserlogin, 'password', values.adduserpassword, 'is_admin', values.adduseradmin, 'skin_used', '', 'first_name', values.adduserfirstname, 'last_name', values.adduserlastname],
+                rest.get(['account', 'user', 'add', 'login', values.adduserlogin, 'password', values.adduserpassword, 'is_admin', values.adduseradmin, 'skin_used', '', 'first_name', values.adduserfirstname, 'last_name', values.adduserlastname],
                     function(data) {
                         var status = (data.status).toLowerCase();
                         if (status == 'ok') {
@@ -80,7 +80,7 @@
             button: "#addpersonButton",
             onok: function(values) {
                 // Submit form
-                $.getREST(['account', 'person', 'add', 'first_name', values.personfirstname, 'last_name', values.personlastname],
+                rest.get(['account', 'person', 'add', 'first_name', values.personfirstname, 'last_name', values.personlastname],
                     function(data) {
                         var status = (data.status).toLowerCase();
                         if (status == 'ok') {
@@ -150,7 +150,7 @@
                             button: "#delaccount{{ account.id }}",
                             name: "'{{ account.login }}'",
                             onok: function() {
-                                $.getREST(['account', 'user', 'del', '{{ account.id }}'],
+                                rest.get(['account', 'user', 'del', '{{ account.id }}'],
                                     function(data) {
                                         var status = (data.status).toLowerCase();
                                         if (status == 'ok') {
@@ -170,7 +170,7 @@
                             values: {upduserlogin : "{{ account.login }}", upduserfirstname: "{{account.person.first_name}}", upduserlastname: "{{account.person.last_name}}", upduseradmin : {{ account.is_admin|lower }} },
                             onok: function(values) {
                                 // Submit form
-                                $.getREST(['account', 'user', 'update', 'id', '{{ account.id }}', 'login', values.upduserlogin, 'is_admin', values.upduseradmin, 'skin_used', '', 'first_name', values.upduserfirstname, 'last_name', values.upduserlastname],
+                                rest.get(['account', 'user', 'update', 'id', '{{ account.id }}', 'login', values.upduserlogin, 'is_admin', values.upduseradmin, 'skin_used', '', 'first_name', values.upduserfirstname, 'last_name', values.upduserlastname],
                                     function(data) {
                                         var status = (data.status).toLowerCase();
                                         if (status == 'ok') {
@@ -189,7 +189,7 @@
                             button: "#password{{ account.id }}",
                             onok: function(values) {
                                 // Submit form
-                                $.getREST(['account', 'user', 'password', 'id', '{{ account.id }}', 'old', values.oldpassword, 'new', values.newpassword],
+                                rest.get(['account', 'user', 'password', 'id', '{{ account.id }}', 'old', values.oldpassword, 'new', values.newpassword],
                                     function(data) {
                                         var status = (data.status).toLowerCase();
                                         if (status == 'ok') {
@@ -242,7 +242,7 @@
                             button: "#delperson{{ person.id }}",
                             name: "'{{ person.first_name }} {{ person.last_name }}'",
                             onok: function() {
-                                $.getREST(['account', 'person', 'del', '{{ person.id }}'],
+                                rest.get(['account', 'person', 'del', '{{ person.id }}'],
                                     function(data) {
                                         var status = (data.status).toLowerCase();
                                         if (status == 'ok') {
@@ -262,7 +262,7 @@
                             values: {personfirstname : '{{ person.first_name }}', personlastname : '{{ person.last_name }}' },
                             onok: function(values) {
                                 // Submit form
-                                $.getREST(['account', 'person', 'update', 'id', '{{ person.id }}', 'first_name', values.personfirstname, 'last_name', values.personlastname],
+                                rest.get(['account', 'person', 'update', 'id', '{{ person.id }}', 'first_name', values.personfirstname, 'last_name', values.personlastname],
                                     function(data) {
                                         var status = (data.status).toLowerCase();
                                         if (status == 'ok') {

@@ -86,7 +86,7 @@ function get_widgets_options(id) {
         
         _initValues: function(nb) {
             var self = this, o = this.options;
-            $.getREST(['stats', o.deviceid, o.key, 'last', nb],
+            rest.get(['stats', o.deviceid, o.key, 'last', nb],
                 function(data) {
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {

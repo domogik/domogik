@@ -41,7 +41,7 @@
         refresh();
         $('body').everyTime('10s', function() {refresh()});
         function refresh() {
-            $.getREST([],
+            rest.get([],
                 function(data) {
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {

@@ -14,13 +14,13 @@ $(function(){
             } else { // room
                 options = ['base', 'feature_association', 'list', 'by-room', page_id];
             }
-            $.getREST(options,
+            rest.get(options,
                 function(data) {
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
                         $.each(data.feature_association, function(index, association) {
                             devices.push(association.device_feature.device_id);
-                            $.getREST(['base', 'ui_config', 'list', 'by-reference', 'association', association.id],
+                            rest.get(['base', 'ui_config', 'list', 'by-reference', 'association', association.id],
                                 function(data) {
                                     var status = (data.status).toLowerCase();
                                     if (status == 'ok') {
@@ -31,7 +31,7 @@ $(function(){
                                             if (item.key == 'place') place = item.value;
                                         });
                                         if (association.place_type == page_type || (association.place_type != page_type && place != 'otheractions')) {
-                                            $.getREST(['base', 'feature', 'list', 'by-id', association.device_feature_id],
+                                            rest.get(['base', 'feature', 'list', 'by-id', association.device_feature_id],
                                                 function(data) {
                                                     var status = (data.status).toLowerCase();
                                                     if (status == 'ok') {
@@ -79,22 +79,12 @@ $(function(){
         cancelRequest: function() {
             if (this.request_ticketid)
                 $.eventCancel(this.request_ticketid);
-            if (this.request_xOptions)
-                this.request_xOptions.abort();
         },
         
         eventRequest: function(devices) {
             url = rest_url + '/events/request/new/' + devices.join('/') + '/';
-            this.request_xOptions = $.jsonp({
-                cache: false,
-                callbackParameter: "callback",
-                type: "GET",
-                url: url,
-                dataType: "jsonp",
-                error: function (xOptions, textStatus) {
-                    $.notification('error', 'Event request : Lost REST server connection');
-                },
-                success: function (data) {
+            rest.jsonp(url,
+                function (data) {
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
                         // Free the ticket when page unload
@@ -104,22 +94,17 @@ $(function(){
                     } else {
                         $.notification('error', 'Event request  : ' + data.description);
                     }
+                },
+                function (xOptions, textStatus) {
+                    $.notification('error', 'Event request : Lost REST server connection');
                 }
-            });
+            );
         },
         
         eventUpdate: function(ticket) {
             url = rest_url + '/events/request/get/' + ticket + '/';
-            this.request_xOptions = $.jsonp({
-                cache: false,
-                callbackParameter: "callback",
-                type: "GET",
-                url: url,
-                dataType: "jsonp",
-                error: function (xOptions, textStatus) {
-                    $.notification('error', 'Event update : Lost REST server connection');
-                },
-                success: function (data) {
+            rest.jsonp(url,
+                function (data) {
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
                         $(document).trigger('dmg_event', [data.event[0]]);
@@ -127,8 +112,11 @@ $(function(){
                     } else {
                         $.notification('error', 'Event update : ' + data.description);
                     }
+                },
+                function (xOptions, textStatus) {
+                    $.notification('error', 'Event request : Lost REST server connection');
                 }
-            });
+            );
         },
         
         eventCancel: function(ticket) {

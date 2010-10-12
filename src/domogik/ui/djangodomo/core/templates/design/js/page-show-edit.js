@@ -87,11 +87,11 @@ $(function(){
                             $("#panel").hide();
                             var association = $(this).attr('id');
                             if (association) {
-                                $.getREST(['base', 'feature_association', 'del', association],
+                                rest.get(['base', 'feature_association', 'del', association],
                                     function(data) {
                                         var status = (data.status).toLowerCase();
                                         if (status == 'ok') {
-                                            $.getREST(['base', 'ui_config', 'del', 'by-reference', 'association', association],
+                                            rest.get(['base', 'ui_config', 'del', 'by-reference', 'association', association],
                                                 function(data) {
                                                     var status = (data.status).toLowerCase();
                                                     if (status == 'ok') {
@@ -174,16 +174,16 @@ $(function(){
             var page_id = zone.attr('page_id');
             var widget_id = model.attr('widgetid');
             var place_id = zone.attr('place');
-            $.getREST(['base', 'feature_association', 'add', 'feature_id', model.attr('featureid'), 'association_type', page_type, 'association_id', page_id],
+            rest.get(['base', 'feature_association', 'add', 'feature_id', model.attr('featureid'), 'association_type', page_type, 'association_id', page_id],
                 function(data) {
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
                         var id = data.feature_association[0].id;
-                        $.getREST(['base', 'ui_config', 'set', 'name', 'association', 'reference', id, 'key', 'widget', 'value', widget_id],
+                        rest.get(['base', 'ui_config', 'set', 'name', 'association', 'reference', id, 'key', 'widget', 'value', widget_id],
                             function(data) {
                                 var status = (data.status).toLowerCase();
                                 if (status == 'ok') {
-                                    $.getREST(['base', 'ui_config', 'set', 'name', 'association', 'reference', id, 'key', 'place', 'value', place_id],
+                                    rest.get(['base', 'ui_config', 'set', 'name', 'association', 'reference', id, 'key', 'place', 'value', place_id],
                                         function(data) {
                                             var status = (data.status).toLowerCase();
                                             if (status == 'ok') {
@@ -241,12 +241,12 @@ $(function(){
             } else {
                 options = ['base', 'feature_association', 'list', 'by-' + page_type, page_id];
             }
-            $.getREST(options,
+            rest.get(options,
                 function(data) {
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
                         $.each(data.feature_association, function(index, association) {
-                            $.getREST(['base', 'ui_config', 'list', 'by-reference', 'association', association.id],
+                            rest.get(['base', 'ui_config', 'list', 'by-reference', 'association', association.id],
                                 function(data) {
                                     var status = (data.status).toLowerCase();
                                     if (status == 'ok') {
@@ -256,7 +256,7 @@ $(function(){
                                             if (item.key == 'widget') widget = item.value;
                                             if (item.key == 'place') place = item.value;
                                         });
-                                        $.getREST(['base', 'feature', 'list', 'by-id', association.device_feature_id],
+                                        rest.get(['base', 'feature', 'list', 'by-id', association.device_feature_id],
                                             function(data) {
                                                 var status = (data.status).toLowerCase();
                                                 if (status == 'ok') {
@@ -277,11 +277,11 @@ $(function(){
                                                             $("#panel").hide();
                                                             var association = $(this).attr('id');
                                                             if (association) {
-                                                                $.getREST(['base', 'feature_association', 'del', 'id', association],
+                                                                rest.get(['base', 'feature_association', 'del', 'id', association],
                                                                     function(data) {
                                                                         var status = (data.status).toLowerCase();
                                                                         if (status == 'ok') {
-                                                                            $.getREST(['base', 'ui_config', 'del', 'by-reference', 'association', association],
+                                                                            rest.get(['base', 'ui_config', 'del', 'by-reference', 'association', association],
                                                                                 function(data) {
                                                                                     var status = (data.status).toLowerCase();
                                                                                     if (status == 'ok') {
