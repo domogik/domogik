@@ -160,6 +160,7 @@ class DbHelper():
         return self.__engine
 
     def __del__(self):
+        self.__session.close()
         self.__engine.dispose()
 
     def __rollback(self):
