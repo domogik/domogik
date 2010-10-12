@@ -91,9 +91,11 @@ class JSonHelper():
         """
         self._data_type = data_type
 
-    def add_data(self, data, max_depth = MAX_DEPTH):
+    def add_data(self, data, max_depth = MAX_DEPTH, exclude = []):
         """ add data to json structure in 'type' table
             @param data : data to add
+            @param max_depth : max depth for introspection
+            @param exclude : list of data to exclude from introspection
         """
         data_out = ""
         self._nb_data_values += 1
@@ -130,8 +132,9 @@ class JSonHelper():
 
         if max_depth > 0:
             for table in table_list:
-                if hasattr(data, table):
-                    pass
+                if table not in exclude:
+                    if hasattr(data, table):
+                        pass
       
         data_out = self._process_data(data, max_depth = max_depth)
         data_out = data_out.replace('\n', "\\n")
