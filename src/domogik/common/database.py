@@ -1444,12 +1444,6 @@ class DbHelper():
         """
         return self.__session.query(Device).all()
 
-    def list_devices_without_stats(self):
-        device_list = self.__session.query(Device).all()
-        for device in device_list:
-            device.device_stats = None
-        return device_list
-
     def get_device(self, d_id):
         """Return a device by its id
 
