@@ -122,7 +122,6 @@ class DbHelper():
     The user should only use methods from this class and don't access the database directly
 
     """
-    __dbprefix = None
     __engine = None
     __session = None
 
@@ -144,7 +143,6 @@ class DbHelper():
         if use_test_db:
             url = '%s_test' % url
         # Connecting to the database
-        self.__dbprefix = _db_config['db_prefix']
         if engine != None:
             self.__engine = engine
         else:
