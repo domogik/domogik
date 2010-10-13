@@ -58,6 +58,8 @@ from domogik.common.sql_schema import (
 )
 
 
+_db_config = None
+
 def _make_crypted_password(clear_text_password):
     """Make a crypted password (using sha256)
 
@@ -132,15 +134,17 @@ class DbHelper():
         @param engine : an existing engine, if not provided, a new one will be created
 
         """
-        cfg = Loader('database')
-        config = cfg.load()
-        self.__db_config = dict(config[1])
+        global _db_config
+        if _db_config is None:
+            cfg = Loader('database')
+            config = cfg.load()
+            _db_config = dict(config[1])
 
         url = self.get_url_connection_string()
         if use_test_db:
             url = '%s_test' % url
         # Connecting to the database
-        self.__dbprefix = self.__db_config['db_prefix']
+        self.__dbprefix = _db_config['db_prefix']
         if engine != None:
             self.__engine = engine
         else:
@@ -167,22 +171,21 @@ class DbHelper():
 
     def get_url_connection_string(self):
         """Get url connection string to the database reading the configuration file"""
-        url = "%s://" % self.__db_config['db_type']
-        if self.__db_config['db_type'] == 'sqlite':
-            url = "%s/%s" % (url, self.__db_config['db_path'])
+        url = "%s://" % _db_config['db_type']
+        if _db_config['db_type'] == 'sqlite':
+            url = "%s/%s" % (url, _db_config['db_path'])
         else:
-            if self.__db_config['db_port'] != '':
-                url = "%s%s:%s@%s:%s/%s" % (url, self.__db_config['db_user'], self.__db_config['db_password'],
-                                            self.__db_config['db_host'], self.__db_config['db_port'],
-                                            self.__db_config['db_name'])
+            if _db_config['db_port'] != '':
+                url = "%s%s:%s@%s:%s/%s" % (url, _db_config['db_user'], _db_config['db_password'],
+                                            _db_config['db_host'], _db_config['db_port'], _db_config['db_name'])
             else:
-                url = "%s%s:%s@%s/%s" % (url, self.__db_config['db_user'], self.__db_config['db_password'],
-                                         self.__db_config['db_host'], self.__db_config['db_name'])
+                url = "%s%s:%s@%s/%s" % (url, _db_config['db_user'], _db_config['db_password'],
+                                         _db_config['db_host'], _db_config['db_name'])
         return url
 
     def get_db_type(self):
         """Return DB type which is currently used (sqlite, mysql, postgresql)"""
-        return self.__db_config['db_type'].lower()
+        return _db_config['db_type'].lower()
 
 ####
 # Areas
