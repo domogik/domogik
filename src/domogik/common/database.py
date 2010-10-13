@@ -133,11 +133,7 @@ class DbHelper():
 
         """
         cfg = Loader('database')
-        config = None
-        if len(sys.argv) > 1:
-            config = cfg.load(sys.argv[1])
-        else:
-            config = cfg.load()
+        config = cfg.load()
         self.__db_config = dict(config[1])
 
         url = self.get_url_connection_string()
