@@ -42,13 +42,11 @@ $(function(){
     
     function ondrop(event, ui) {
         var item = ui.draggable.detach();
-        item.removeAttr('style');
-        item.addClass('success');
-        item.dmg_draggable({
-            helper: false,
-            revert: false
-        });
         $(this).append(item);
+        item.removeAttr('style')
+            .addClass('success')
+            .draggable("option", 'helper', false)
+            .draggable("option", 'revert', false);
         $.addAssociation(item, $(this), 'house', 0);            
         return false;
     }
