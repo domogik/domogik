@@ -5,7 +5,7 @@
     <address-key>device</address-key>
     <command-xpl-value>dim</command-xpl-value>
     <parameters>
-      <parameter key="value" location="1"/>
+      <parameter key="level" location="1"/>
     </parameters>
   </command>
   <listener>
