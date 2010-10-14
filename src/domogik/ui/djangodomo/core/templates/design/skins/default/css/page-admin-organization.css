@@ -62,7 +62,7 @@ li.roomitem {
     color: #000;
     border: 1px solid #666666;
     cursor: move;
-    background-position: left 50%;
+    background-position: 0 50%;
     background-repeat: no-repeat;
 }
 
@@ -79,4 +79,18 @@ li.empty {
     background-color: #fff;
     color: #000;
     border: 1px dashed #cccccc;
+}
+
+ul.customize_list li a {
+    padding:0.5em 0.5em 0.5em 20px;
+    background-color: #fff;
+    color: #000;
+    border: 1px solid #666666;
+    background-position: 0 50%;
+    background-repeat: no-repeat;
+    display:inline-block;
+    margin:0.2em;
+    text-decoration:none;
+    -moz-border-radius: 0 0.8em 0.8em 0;
+    -webkit-border-radius: 0 0.8em 0.8em 0;
 }

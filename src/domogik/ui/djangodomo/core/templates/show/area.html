@@ -41,7 +41,7 @@
 
 {% block breadcrumb %}
 	<li><a href='{% url show_view %}' class='house'>{{ house.name|default:'House' }}</a></li>
-	<li id='customize'><a href='{% url show_area_edit_view area.id %}' class='icon16-action-customize{% if not is_user_connected %} admin_required{% endif %}'>{% trans 'Customize' %}</a></li>
+	<li id='customize'><a href='{% url show_area_edit_view area.id 'show_page' %}' class='icon16-action-customize{% if not is_user_connected %} admin_required{% endif %}'>{% trans 'Customize' %}</a></li>
 {% endblock %}
 
 {% block contentleft %}

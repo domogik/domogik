@@ -40,7 +40,7 @@
 {% block title %}{% trans page_title %}{% endblock %}
 
 {% block breadcrumb %}
-        <li id='customize'><a href='{% url show_house_edit_view %}' class='icon16-action-customize{% if not is_user_connected %} admin_required{% endif %}'>{% trans "Customize" %}</a></li>
+        <li id='customize'><a href='{% url show_house_edit_view 'show_page' %}' class='icon16-action-customize{% if not is_user_connected %} admin_required{% endif %}'>{% trans "Customize" %}</a></li>
 {% endblock %}
 
 {% block contentleft %}

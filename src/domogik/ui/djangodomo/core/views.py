@@ -337,9 +337,9 @@ def admin_organization_house(request):
     )
 
 @admin_required
-def admin_organization_features(request):
+def admin_organization_widgets(request):
     """
-    Method called when the admin features organization page is accessed
+    Method called when the admin widgets organization page is accessed
     @param request : HTTP request
     @return an HttpResponse object
     """
@@ -348,37 +348,27 @@ def admin_organization_features(request):
     msg = request.GET.get('msg', '')
 
     try:
-        result_all_devices = Devices.get_all()
-        result_all_devices.merge_uiconfig()
-        result_all_devices.merge_features()
         result_all_rooms = Rooms.get_all()
         result_all_rooms.merge_uiconfig()
-        result_all_rooms.merge_feature_associations()
         result_all_areas = Areas.get_all()
         result_all_areas.merge_uiconfig()
-        result_all_areas.merge_feature_associations()
 
-        result_house = UIConfigs.get_general('house')
-        result_house_features_associations = FeatureAssociations.get_by_house()
 
     except BadStatusLine:
         return render_to_response('error/BadStatusLine.html')
     except ResourceNotAvailableException:
         return render_to_response('error/ResourceNotAvailableException.html')
 
-    page_title = _("Features organization")
+    page_title = _("Widgets organization")
     return __go_to_page(
-        request, 'admin/organization/features.html',
+        request, 'admin/organization/widgets.html',
         page_title,
         nav1_admin = "selected",
-        nav2_organization_features = "selected",
+        nav2_organization_widgets = "selected",
         status=status,
         msg=msg,
         areas_list=result_all_areas.area,
-        rooms_list=result_all_rooms.room,
-        devices_list=result_all_devices.device,
-        house=result_house,
-        house_features_associations=result_house_features_associations.feature_association
+        rooms_list=result_all_rooms.room
     )
 
 @admin_required
@@ -533,7 +523,7 @@ def show_house(request):
     )
 
 @admin_required
-def show_house_edit(request):
+def show_house_edit(request, from_page):
     """
     Method called when the show index page is accessed
     @param request : HTTP request
@@ -558,6 +548,7 @@ def show_house_edit(request):
         page_title,
         widgets=widgets_list,
         nav1_show = "selected",
+        from_page = from_page,
         house=result_house,
         devices_list=result_all_devices.device
     )
@@ -601,7 +592,7 @@ def show_area(request, area_id):
     )
 
 @admin_required
-def show_area_edit(request, area_id):
+def show_area_edit(request, area_id, from_page):
     """
     Method called when the show area page is accessed
     @param request : HTTP request
@@ -630,6 +621,7 @@ def show_area_edit(request, area_id):
         page_title,
         widgets=widgets_list,
         nav1_show = "selected",
+        from_page = from_page,
         area=result_area_by_id.area[0],
         house=result_house,
         devices_list=result_all_devices.device
@@ -670,7 +662,7 @@ def show_room(request, room_id):
     )
 
 @admin_required
-def show_room_edit(request, room_id):
+def show_room_edit(request, room_id, from_page):
     """
     Method called when the show room page is accessed
     @param request : HTTP request
@@ -699,6 +691,7 @@ def show_room_edit(request, room_id):
         page_title,
         widgets=widgets_list,
         nav1_show = "selected",
+        from_page = from_page,
         room=result_room_by_id.room[0],
         house=result_house,
         devices_list=result_all_devices.device

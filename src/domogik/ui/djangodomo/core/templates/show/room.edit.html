@@ -41,7 +41,11 @@
 {% block title %}{% trans page_title %}{% endblock %}
 
 {% block breadcrumb %}
+    {% if from_page == 'admin_page' %}
+        <li id='customize'><a href='{% url admin_organization_widgets_view %}' class='icon16-action-submit'>{% trans "Finish" %}</a></li>
+    {% else %}
         <li id='customize'><a href='{% url show_room_view room.id %}' class='icon16-action-submit'>{% trans "Finish" %}</a></li>
+    {% endif %}
 {% endblock %}
 
 {% block contentleft %}
