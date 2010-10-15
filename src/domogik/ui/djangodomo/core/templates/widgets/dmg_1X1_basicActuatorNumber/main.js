@@ -31,7 +31,7 @@
             this._panel.panelAddText({class:'value', r:65, deg:80});
             this._panel.hide();
 
-            var value = (o.model_parameters.valueMax - o.model_parameters.valueMin) / 2;
+            var value = Math.round((o.model_parameters.valueMax - o.model_parameters.valueMin) / 2);
             this.setParameter(value);
         },
 
@@ -60,7 +60,7 @@
         increase: function() {
             var self = this, o = this.options;
             if (this.value < o.model_parameters.valueMax) {
-    			this.value++;
+    			Math.round(this.value++);
     			this.setParameter(this.value);                
             }
 		},
@@ -68,7 +68,7 @@
 		decrease: function() {
             var self = this, o = this.options;
             if (this.value > o.model_parameters.valueMin) {
-    			this.value--;
+    			Math.round(this.value--);
     			this.setParameter(this.value);                
             }
 		},
