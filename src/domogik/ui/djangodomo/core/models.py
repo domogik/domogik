@@ -48,7 +48,7 @@ def unescape(s):
               lambda m: unichr(name2codepoint[m.group(1)]), s)
 
 class Rest(pipes.DmgPipe):
-    uri = settings.EXTERNAL_REST_URL + "/"
+    uri = settings.INTERNAL_REST_URL + "/"
 
     @staticmethod
     def get_info():
@@ -63,7 +63,7 @@ class House(object):
             self.name = self.config['name']
 
 class Areas(pipes.DmgPipe):
-    uri = settings.EXTERNAL_REST_URL + "/base/area"
+    uri = settings.INTERNAL_REST_URL + "/base/area"
 
     @staticmethod
     def get_all():
@@ -92,7 +92,7 @@ class Areas(pipes.DmgPipe):
                     room.config = UIConfigs.get_by_reference('room', room.id)
 
 class Rooms(pipes.DmgPipe):
-    uri = settings.EXTERNAL_REST_URL + "/base/room"
+    uri = settings.INTERNAL_REST_URL + "/base/room"
 
     @staticmethod
     def get_all():
@@ -127,7 +127,7 @@ class Rooms(pipes.DmgPipe):
                 room.area.config = UIConfigs.get_by_reference('area', room.area.id)
 
 class Devices(pipes.DmgPipe):
-    uri = settings.EXTERNAL_REST_URL + "/base/device"
+    uri = settings.INTERNAL_REST_URL + "/base/device"
 
     @staticmethod
     def get_all():
@@ -152,7 +152,7 @@ class Devices(pipes.DmgPipe):
 #                        feature.association = association
 
 class DeviceTechnologies(pipes.DmgPipe):
-    uri = settings.EXTERNAL_REST_URL + "/base/device_technology"
+    uri = settings.INTERNAL_REST_URL + "/base/device_technology"
 
     @staticmethod
     def get_all():
@@ -161,7 +161,7 @@ class DeviceTechnologies(pipes.DmgPipe):
             return resp
 
 class DeviceTypes(pipes.DmgPipe):
-    uri = settings.EXTERNAL_REST_URL + "/base/device_type"
+    uri = settings.INTERNAL_REST_URL + "/base/device_type"
     _dict = None
     
     @staticmethod
@@ -188,7 +188,7 @@ class DeviceTypes(pipes.DmgPipe):
         return dict[key]
 
 class DeviceUsages(pipes.DmgPipe):
-    uri = settings.EXTERNAL_REST_URL + "/base/device_usage"
+    uri = settings.INTERNAL_REST_URL + "/base/device_usage"
     _dict = None
 
     @staticmethod
@@ -215,7 +215,7 @@ class DeviceUsages(pipes.DmgPipe):
         return dict[key]
 
 class Features(pipes.DmgPipe):
-    uri = settings.EXTERNAL_REST_URL + "/base/feature"
+    uri = settings.INTERNAL_REST_URL + "/base/feature"
 
     @staticmethod
     def get_by_id(id):
@@ -230,7 +230,7 @@ class Features(pipes.DmgPipe):
             return resp
 
 class FeatureAssociations(pipes.DmgPipe):
-    uri = settings.EXTERNAL_REST_URL + "/base/feature_association"
+    uri = settings.INTERNAL_REST_URL + "/base/feature_association"
 
     @staticmethod
     def get_by_house():
@@ -257,7 +257,7 @@ class FeatureAssociations(pipes.DmgPipe):
             return resp
     
 class UIConfigs(pipes.DmgPipe):
-    uri = settings.EXTERNAL_REST_URL + "/base/ui_config"
+    uri = settings.INTERNAL_REST_URL + "/base/ui_config"
 
     @staticmethod
     def get_by_key(name, key):
@@ -286,7 +286,7 @@ class UIConfigs(pipes.DmgPipe):
             return resp
     
 class Plugins(pipes.DmgPipe):
-    uri = settings.EXTERNAL_REST_URL + "/plugin"
+    uri = settings.INTERNAL_REST_URL + "/plugin"
 
     @staticmethod
     def get_all():
@@ -307,7 +307,7 @@ class Plugins(pipes.DmgPipe):
             return resp
 
 class Accounts(pipes.DmgPipe):
-    uri = settings.EXTERNAL_REST_URL + "/account"
+    uri = settings.INTERNAL_REST_URL + "/account"
 
     @staticmethod
     def auth(login, password):
@@ -334,7 +334,7 @@ class Accounts(pipes.DmgPipe):
             return resp
 
 class Stats(pipes.DmgPipe):
-    uri = settings.EXTERNAL_REST_URL + "/stats"
+    uri = settings.INTERNAL_REST_URL + "/stats"
 
     @staticmethod
     def get_latest(id, key):
