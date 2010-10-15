@@ -61,7 +61,7 @@ def __go_to_page(request, html_page, page_title, **attribute_list):
     """
     response_attr_list = {}
     response_attr_list['page_title'] = page_title
-    response_attr_list['rest_url'] = settings.REST_URL
+    response_attr_list['rest_url'] = settings.EXTERNAL_REST_URL
     response_attr_list['is_user_connected'] = __is_user_connected(request)
     for attribute in attribute_list:
         response_attr_list[attribute] = attribute_list[attribute]
