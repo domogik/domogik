@@ -55,32 +55,35 @@ cfg_rest = Loader('django')
 config_django = cfg_rest.load()
 conf_django = dict(config_django[1])
 
-try:
+if ('internal_rest_server_ip' in conf_django) and (conf_django['internal_rest_server_ip'] != ''):
     INTERNAL_REST_IP = conf_django['internal_rest_server_ip']
-except KeyError:
-    # default parameters
+else:    # default parameters
     INTERNAL_REST_IP = "127.0.0.1"
-try:
+
+if ('internal_rest_server_port' in conf_django) and (conf_django['internal_rest_server_port'] != ''):
     INTERNAL_REST_PORT = conf_django['internal_rest_server_port']
-except KeyError:
+else:
     # default parameters
     INTERNAL_REST_PORT = "8080"
+
 if ('internal_rest_server_prefix' in conf_django) and (conf_django['internal_rest_server_prefix'] != ''):
     INTERNAL_REST_PREFIX = conf_django['internal_rest_server_prefix']
     INTERNAL_REST_URL = "http://" + INTERNAL_REST_IP + ":" + INTERNAL_REST_PORT + "/" + INTERNAL_REST_PREFIX
 else:
     INTERNAL_REST_URL = "http://" + INTERNAL_REST_IP + ":" + INTERNAL_REST_PORT
 
-try:
+if ('external_rest_server_ip' in conf_django) and (conf_django['external_rest_server_ip'] != ''):
     EXTERNAL_REST_IP = conf_django['external_rest_server_ip']
-except KeyError:
+else:
     # default parameters
     EXTERNAL_REST_IP = INTERNAL_REST_IP
-try:
+
+if ('external_rest_server_port' in conf_django) and (conf_django['external_rest_server_port'] != ''):
     EXTERNAL_REST_PORT = conf_django['external_rest_server_port']
-except KeyError:
+else:
     # default parameters
     EXTERNAL_REST_PORT = INTERNAL_REST_PORT
+
 if ('external_rest_server_prefix' in conf_django) and (conf_django['external_rest_server_prefix'] != ''):
     EXTERNAL_REST_PREFIX = conf_django['external_rest_server_prefix']
     EXTERNAL_REST_URL = "http://" + EXTERNAL_REST_IP + ":" + EXTERNAL_REST_PORT + "/" + EXTERNAL_REST_PREFIX
