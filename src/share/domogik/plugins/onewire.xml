@@ -3,7 +3,7 @@
   <technology>1wire</technology>
   <description>Manage 1-wire devices</description>
   <version>0.1</version>
-  <documentation>http://wiki.domogik.org/tiki-index.php?page=plugins/onewire</documentation>
+  <documentation>http://wiki.domogik.org/tiki-index.php?page=plugin_onewire</documentation>
   <configuration-keys>
     <key>
       <order-id>0</order-id>

@@ -3,7 +3,7 @@
   <technology>relayboard</technology>
   <description>IPX800 support</description>
   <version>0.1</version>
-  <documentation>http://wiki.domogik.org/tiki-index.php?page=plugins/ipx800</documentation>
+  <documentation>http://wiki.domogik.org/tiki-index.php?page=plugin_ipx800</documentation>
   <configuration-keys>
     <key>
       <order-id>0</order-id>
