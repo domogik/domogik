@@ -152,7 +152,7 @@ function update_user_config {
 
 function call_db_installer {
     if [ "$replace" = "y" -o "$replace" = "Y" ];then 
-        /bin/su -c $d_user "python ./db_installer.py $d_home/.domogik.cfg"
+        /bin/su -c "python ./db_installer.py $d_home/.domogik.cfg" $d_user
     fi
     chown $d_user: $d_home/.domogik.sqlite
 }
