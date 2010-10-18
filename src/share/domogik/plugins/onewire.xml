@@ -2,6 +2,11 @@
   <name>onewire</name>
   <technology>1wire</technology>
   <description>Manage 1-wire devices</description>
+  <detail>This is some long description about the plugin. this ca be very very very very very very long and can go
+on several lines to explain :
+* this
+* that
+* etc</detail>
   <version>0.1</version>
   <documentation>http://wiki.domogik.org/tiki-index.php?page=plugin_onewire</documentation>
   <configuration-keys>
@@ -82,4 +87,10 @@
       <default-value>5</default-value>
     </key>
   </configuration-keys>
+  <files>
+    <file path="src/share/domogik/plugins/onewire.xml"/>
+    <file path="src/share/domogik/stats/1wire/sensor.basic.xml"/>
+    <file path="domogik/xpl/bin/onewire.py"/>
+    <file path="domogik/xpl/lib/onewire.py"/>
+  </files>
 </plugin>
