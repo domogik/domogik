@@ -142,7 +142,7 @@ function update_user_config {
         read -p "A database already exists. Do you want to remove it and recreate it from scratch ? [N/y]" replace
         if [ "$replace" = "y" -o "$replace" = "Y" ];then
             rm -f $d_home/.domogik.sqlite
-        elif
+        else
             replace="n"
         fi
     fi
