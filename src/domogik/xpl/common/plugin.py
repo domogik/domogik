@@ -138,9 +138,6 @@ class XplPlugin():
             self._dump_cb = dump_cb
             self._log.debug("end single xpl plugin")
 
-	def __del__(self):
-		self._log.shutdown()
-
         def _get_pid(self):
             """ Get current pid and write it to a file
             """
@@ -241,6 +238,13 @@ class XplPlugin():
                     pass
                 self._log.debug("Thread stopped %s" % t)
                 #t._Thread__stop()
+            #Finally, we try to delete all remaining threads
+            for t in threading.enumerate():
+                if t != threading.current_thread() and t.__class__ != threading._MainThread:
+                    self._log.info("The thread %s was not registered, killing it" % t.name)
+                    t.join()
+            if threading.activeCount() > 1:
+                self._log.warn("There are more than 1 thread remaining : %s" % threading.enumerate())
 
 
 class XplResult():
