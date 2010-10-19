@@ -9,6 +9,8 @@ on several lines to explain :
 * etc</detail>
   <version>0.1</version>
   <documentation>http://wiki.domogik.org/tiki-index.php?page=plugin_onewire</documentation>
+  <author>Fritz</author>
+  <author-email>fritz.smh at gmail.com</author-email>
   <configuration-keys>
     <key>
       <order-id>0</order-id>
@@ -90,7 +92,10 @@ on several lines to explain :
   <files>
     <file path="src/share/domogik/plugins/onewire.xml"/>
     <file path="src/share/domogik/stats/1wire/sensor.basic.xml"/>
-    <file path="domogik/xpl/bin/onewire.py"/>
-    <file path="domogik/xpl/lib/onewire.py"/>
+    <file path="src/domogik/xpl/bin/onewire.py"/>
+    <file path="src/domogik/xpl/lib/onewire.py"/>
   </files>
+  <depandancies>
+    <dep name="pyowfs >= 0.1.3"/>
+  </depandancies>
 </plugin>
