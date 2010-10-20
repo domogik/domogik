@@ -44,11 +44,13 @@ import tarfile
 import tempfile
 import os
 from subprocess import Popen
+import urllib
 
 
 PACKAGE_TYPES = ['plugin']
 SETUP_PLUGIN_TPL = "pkg-mgr-setup-plugin.tpl"
 TMP_EXTRACT_DIR = "domogik-pkg-mgr" # used with /tmp (or assimilated) before
+REP0_SRC_FILE = "/etc/domogik/sources.list"
 
 class PackageException(Exception):
     """
@@ -227,33 +229,47 @@ class PackageManager():
 
     def _install_package(self, path):
         """ Install a package
+            0. Eventually download package
             1. Extract tar.gz
             2. Launch ez_setup.py
             3. Launch setup install.py
             @param path : path for tar.gz
         """
         # get plugin name
-        name = os.path.basename(path)
+        full_name = os.path.basename(path)
         # twice to remove first .gz and then .tar
-        name =  os.path.splitext(name)[0]
+        name =  os.path.splitext(full_name)[0]
         name =  os.path.splitext(name)[0] 
         print("Plugin name : %s" % name)
 
         # get temp dir to extract data
-        my_tmp_dir = "%s/%s/%s" % (tempfile.gettempdir(), TMP_EXTRACT_DIR, name)
-        print("Extracting to temporary directory : %s" % my_tmp_dir)
+        my_tmp_dir_dl = "%s/%s" % (tempfile.gettempdir(), TMP_EXTRACT_DIR)
+        my_tmp_dir = "%s/%s" % (my_tmp_dir_dl, name)
+        print("Creating temporary directory : %s" % my_tmp_dir)
         try:
             if os.path.isdir(my_tmp_dir) == False:
                 os.makedirs(my_tmp_dir)
         except:
             raise PackageException("Error while creating temporary folder '%s' : %s" % (my_tmp_dir, traceback.format_exc()))
 
+        # Check if we need to download package
+        if path[0:4] == "http":
+            print("Downloading package : %s" % path)
+            dl_path = "%s/%s" % (my_tmp_dir_dl, full_name)
+            urllib.urlretrieve(path, dl_path)
+            path = dl_path
+            print("Package downloaded : %s" % path)
+
         # extract
+        print("Extracting package...")
         try:
             self._extract_package(path, my_tmp_dir)
         except:
             raise PackageException("Error while extracting package '%s' : %s" % (path, traceback.format_exc()))
         print("Package successfully extracted.")
+
+
+        print"TMP=%s" % my_tmp_dir
 
         # launch package installation
         print("Starting installation...")
@@ -281,8 +297,8 @@ class PackageManager():
         """
         subp = Popen("/usr/bin/python setup.py install", 
                       cwd = path, 
-                      shell=True)
-        print "pid=%s" % subp.pid
+                      shell = True)
+        subp.wait()
         return subp.pid
 
 
