@@ -48,7 +48,8 @@ import urllib
 
 
 PACKAGE_TYPES = ['plugin']
-SETUP_PLUGIN_TPL = "pkg-mgr-setup-plugin.tpl"
+SRC_PATH = "../../../"
+SETUP_PLUGIN_TPL = "./templates/setup-plugin.tpl"
 TMP_EXTRACT_DIR = "domogik-pkg-mgr" # used with /tmp (or assimilated) before
 REP0_SRC_FILE = "/etc/domogik/sources.list"
 
@@ -166,7 +167,7 @@ class PackageManager():
         self._create_tar_gz(plg_xml.name, 
                             plg_xml.files, 
                             setup_file = setup_file,
-                            ez_setup_file = "ez_setup.py")
+                            ez_setup_file = SRC_PATH + "ez_setup.py")
 
 
     def _create_plugin_setup(self, plg_xml):
@@ -214,7 +215,7 @@ class PackageManager():
             for my_file in files:
                 path =  str(my_file["path"])
                 print("- %s" % path)
-                tar.add(path)
+                tar.add(SRC_PATH + path, arcname = path)
             if setup_file != None:
                 print("- setup.py")
                 tar.add(setup_file, arcname="setup.py")

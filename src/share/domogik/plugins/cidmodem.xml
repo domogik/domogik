@@ -33,7 +33,7 @@
   </configuration-keys>
   <files>
     <file path="src/share/domogik/plugins/cidmodem.xml"/>
-    <file path="src/share/domogik/stats/communication/cidbasic.xml"/>
+    <file path="src/share/domogik/stats/communication/cid.basic.xml"/>
     <file path="src/domogik/xpl/bin/cidmodem.py"/>
     <file path="src/domogik/xpl/lib/cidmodem.py"/>
   </files>
