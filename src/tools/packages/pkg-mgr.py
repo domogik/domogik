@@ -154,6 +154,11 @@ class PackageManager():
             print("- %s" % my_file["path"])
         print("---------------------------------------------------------")
 
+        # check file existence
+        if plg_xml.files == []:
+            print("There is no file defined : the package won't be created")
+            return
+
         print("\nAre these informations OK ?")
         resp = raw_input("[o/N]")
         if resp.lower() != "o":
@@ -195,7 +200,7 @@ class PackageManager():
         data = data.replace("%depandancies%", dep_list)
 
         output_file = open(output_path, "w")
-        output_file.write(data)
+        output_file.write(data.encode("utf-8"))
         output_file.close()
  
         return output_path
