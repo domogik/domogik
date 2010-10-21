@@ -133,12 +133,17 @@ function update_user_config {
     sed -i "s/^HUB_IFACE.*$/HUB_IFACE=$bind_iface/" /etc/default/domogik
     sed -i "s/^rest_server_ip.*$/rest_server_ip = $bind_addr/" $d_home/.domogik.cfg
     sed -i "s/^django_server_ip.*$/django_server_ip = $bind_addr/" $d_home/.domogik.cfg
-    sed -i "s/^django_rest_server_ip.*$/django_rest_server_ip = $bind_addr/" $d_home/.domogik.cfg
+    sed -i "s/^internal_rest_server_ip.*$/django_rest_server_ip = $bind_addr/" $d_home/.domogik.cfg
+    read -p "If you need to reach REST  from outside, you can specify an IP now : " out_bind_addr
+    sed -i "s/^external_rest_server_ip.*$/external_rest_server_ip = $out_bind_addr/" $d_home/.domogik.cfg
+    
     replace="y"
     if [ -f "$d_home/.domogik.sqlite" ];then
         read -p "A database already exists. Do you want to remove it and recreate it from scratch ? [N/y]" replace
         if [ "$replace" = "y" -o "$replace" = "Y" ];then
             rm -f $d_home/.domogik.sqlite
+        else
+            replace="n"
         fi
     fi
     echo "Info : Database will be created in $d_home/.domogik.sqlite"
@@ -147,7 +152,7 @@ function update_user_config {
 
 function call_db_installer {
     if [ "$replace" = "y" -o "$replace" = "Y" ];then 
-        /bin/su -c $DOMOGIK_USER "python ./db_installer.py $d_home/.domogik.cfg"
+        /bin/su -c "python ./db_installer.py $d_home/.domogik.cfg" $d_user
     fi
     chown $d_user: $d_home/.domogik.sqlite
 }
@@ -196,6 +201,8 @@ read -p "If you want to use a proxy, please set it now. It will only be used dur
 if [ "x$http_proxy" != "x" ];then
     export http_proxy
 fi
+trap "chown -R $USER: $HOME/.python-eggs" EXIT
+
 run_setup_py $MODE
 copy_sample_files
 update_default_config

@@ -71,7 +71,6 @@ d_files.extend(list_all_files('src/domogik/ui/djangodomo/core/templates/', '/usr
 d_files.extend(list_all_files('src/domogik/ui/djangodomo/locale/', '/usr/local/share/domogik/ui/djangodomo/locale/')),
 d_files.extend(list_all_files('src/domogik/ui/djangodomo/apache/', '/usr/local/share/doc/domogik/examples/apache/')),
 
-print d_files
 setup(
     name = 'Domogik',
     version = '0.1.0',

@@ -50,32 +50,52 @@ MANAGERS = ADMINS
 
 # Note that we use our own Database model and not Django's one.
 
-### Proxy settings
-try:
-    cfg_rest = Loader('django')
-    config_django = cfg_rest.load()
-    conf_django = dict(config_django[1])
-    REST_IP = conf_django['django_rest_server_ip']
-    REST_PORT = conf_django['django_rest_server_port']
-    REST_PREFIX = conf_django['django_rest_server_prefix']
-    if ('django_rest_server_prefix' in conf_django) and (conf_django['django_rest_server_prefix'] != ''):
-        REST_PREFIX = conf_django['django_rest_server_prefix']
-        REST_URL = "http://" + REST_IP + ":" + REST_PORT + "/" + REST_PREFIX
-    else:
-        REST_PREFIX = ''
-        REST_URL = "http://" + REST_IP + ":" + REST_PORT
+### Rest settings
+cfg_rest = Loader('django')
+config_django = cfg_rest.load()
+conf_django = dict(config_django[1])
 
-except KeyError:
+if ('internal_rest_server_ip' in conf_django) and (conf_django['internal_rest_server_ip'] != ''):
+    INTERNAL_REST_IP = conf_django['internal_rest_server_ip']
+else:    # default parameters
+    INTERNAL_REST_IP = "127.0.0.1"
+
+if ('internal_rest_server_port' in conf_django) and (conf_django['internal_rest_server_port'] != ''):
+    INTERNAL_REST_PORT = conf_django['internal_rest_server_port']
+else:
     # default parameters
-    REST_IP = "127.0.0.1"
-    REST_PORT = "8080"
-    REST_PREFIX = ''
-    REST_URL = "http://" + REST_IP + ":" + REST_PORT
+    INTERNAL_REST_PORT = "8080"
 
-print "using REST url : " + REST_URL
+if ('internal_rest_server_prefix' in conf_django) and (conf_django['internal_rest_server_prefix'] != ''):
+    INTERNAL_REST_PREFIX = conf_django['internal_rest_server_prefix']
+    INTERNAL_REST_URL = "http://" + INTERNAL_REST_IP + ":" + INTERNAL_REST_PORT + "/" + INTERNAL_REST_PREFIX
+else:
+    INTERNAL_REST_URL = "http://" + INTERNAL_REST_IP + ":" + INTERNAL_REST_PORT
 
-PROXY_DOMAIN = REST_IP
-PROXY_PORT = int(REST_PORT)
+if ('external_rest_server_ip' in conf_django) and (conf_django['external_rest_server_ip'] != ''):
+    EXTERNAL_REST_IP = conf_django['external_rest_server_ip']
+else:
+    # default parameters
+    EXTERNAL_REST_IP = INTERNAL_REST_IP
+
+if ('external_rest_server_port' in conf_django) and (conf_django['external_rest_server_port'] != ''):
+    EXTERNAL_REST_PORT = conf_django['external_rest_server_port']
+else:
+    # default parameters
+    EXTERNAL_REST_PORT = INTERNAL_REST_PORT
+
+if ('external_rest_server_prefix' in conf_django) and (conf_django['external_rest_server_prefix'] != ''):
+    EXTERNAL_REST_PREFIX = conf_django['external_rest_server_prefix']
+    EXTERNAL_REST_URL = "http://" + EXTERNAL_REST_IP + ":" + EXTERNAL_REST_PORT + "/" + EXTERNAL_REST_PREFIX
+else:
+    EXTERNAL_REST_URL = "http://" + EXTERNAL_REST_IP + ":" + EXTERNAL_REST_PORT
+
+print "DJANGO REST url : " + INTERNAL_REST_URL
+print "JQUERY REST url : " + EXTERNAL_REST_URL
+
+
+PROXY_DOMAIN = INTERNAL_REST_IP
+PROXY_PORT = int(INTERNAL_REST_PORT)
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
