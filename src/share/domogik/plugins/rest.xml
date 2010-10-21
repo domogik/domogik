@@ -2,8 +2,13 @@
   <name>rest</name>
   <technology>domogik</technology>
   <description>REST server</description>
-  <version>0.1</version>
+  <detail>REST is the entry point for :
+- UIs
+- Stats</detail>
+  <version>0.1.0</version>
   <documentation>http://wiki.domogik.org/tiki-index.php?page=plugin_REST</documentation>
+  <author>Fritz</author>
+  <author-email>fritz.smh at gmail.com</author-email>
   <configuration-keys>
     <key>
       <order-id>0</order-id>
@@ -69,4 +74,6 @@
       <default-value>5</default-value>
     </key>
   </configuration-keys>
+  <files/>
+  <depandancies/>
 </plugin>

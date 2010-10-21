@@ -2,8 +2,19 @@
   <name>ipx800</name>
   <technology>relayboard</technology>
   <description>IPX800 support</description>
-  <version>0.1</version>
+  <detail>IPX800 relayboard support.
+Supported  models :
+- IPX 800
+- IPX 800 pro
+- IPX 800 v2
+Supported features :
+- Relay : set and get state
+- Digital input 
+- Analog input </detail>
+  <version>0.1.0</version>
   <documentation>http://wiki.domogik.org/tiki-index.php?page=plugin_ipx800</documentation>
+  <author>Fritz</author>
+  <author-email>fritz.smh at gmail.com</author-email>
   <configuration-keys>
     <key>
       <order-id>0</order-id>
@@ -118,4 +129,14 @@
       <default-value></default-value>
     </key>
   </configuration-keys>
+  <files>
+    <file path="src/share/domogik/plugins/ipx800.xml"/>
+    <file path="src/share/domogik/stats/relayboard/sensor.basic.xml"/>
+    <file path="src/share/domogik/url2xpl/relayboard/high.xml"/>
+    <file path="src/share/domogik/url2xpl/relayboard/low.xml"/>
+    <file path="src/share/domogik/url2xpl/relayboard/pulse.xml"/>
+    <file path="src/domogik/xpl/bin/ipx800.py"/>
+    <file path="src/domogik/xpl/lib/ipx800.py"/>
+  </files>
+  <depandancies/>
 </plugin>

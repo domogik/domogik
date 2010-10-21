@@ -2,8 +2,11 @@
   <name>plcbus</name>
   <technology>plcbus</technology>
   <description>Manage Plcbus devices</description>
-  <version>0.1</version>
+  <detail>Plcbus is a CPL based protocol to control lights, appliances and others things in your house</detail>
+  <version>0.1.0</version>
 <documentation>http://wiki.domogik.org/tiki-index.php?page=plugin_plcbus</documentation>
+  <author>François Pinet, Maxence Dunnewind</author>
+  <author-email>domopyx at gmail.com ; maxence at dunnewind.net</author-email>
   <configuration-keys>
     <key>
       <order-id>0</order-id>
@@ -41,4 +44,20 @@
       <default-value>ABCDEFGHIJKLMNOP</default-value>
      </key>
   </configuration-keys>
+  <files>
+    <file path="src/share/domogik/plugins/plcbus.xml"/>
+    <file path="src/share/domogik/stats/plcbus/plcbus.basic.xml"/>
+    <file path="src/share/domogik/url2xpl/plcbus/all_lights_off.xml"/>
+    <file path="src/share/domogik/url2xpl/plcbus/all_lights_on.xml"/>
+    <file path="src/share/domogik/url2xpl/plcbus/bright.xml"/>
+    <file path="src/share/domogik/url2xpl/plcbus/dim.xml"/>
+    <file path="src/share/domogik/url2xpl/plcbus/on.xml"/>
+    <file path="src/share/domogik/url2xpl/plcbus/off.xml"/>
+    <file path="src/share/domogik/url2xpl/plcbus/preset_dim.xml"/>
+    <file path="src/domogik/xpl/bin/plcbus.py"/>
+    <file path="src/domogik/xpl/lib/plcbus.py"/>
+  </files>
+  <depandancies>
+    <dep name="pySerial > 2.4"/>
+  </depandancies>
 </plugin>

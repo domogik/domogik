@@ -2,8 +2,11 @@
   <name>teleinfo</name>
   <technology>service</technology>
   <description>Get power consumption with teleinfo</description>
-  <version>0.1</version>
+  <detail>Teleinfo is a french method to get power related informations.</detail>
+  <version>0.1.0</version>
   <documentation>http://wiki.domogik.org/tiki-index.php?page=plugin_teleinfo</documentation>
+  <author>Maxence Dunnewind</author>
+  <author-email>maxence at dunnewind.net</author-email>
   <configuration-keys>
     <key>
       <order-id>0</order-id>
@@ -27,4 +30,14 @@
       <default-value>60</default-value>
     </key>
   </configuration-keys>
+  <files>
+    <file path="src/share/domogik/plugins/teleinfo.xml"/>
+    <file path="src/share/domogik/stats/teleinfo/teleinfo.basic.xml"/>
+    <file path="src/share/domogik/stats/teleinfo/teleinfo.short.xml"/>
+    <file path="src/domogik/xpl/bin/teleinfo.py"/>
+    <file path="src/domogik/xpl/lib/teleinfo.py"/>
+  </files>
+  <depandancies>
+    <dep name="pySerial > 2.4"/>
+  </depandancies>
 </plugin>

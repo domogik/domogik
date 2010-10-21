@@ -2,8 +2,11 @@
   <name>x10_heyu</name>
   <technology>x10</technology>
   <description>Manage x10 devices with Heyu</description>
-  <version>0.1</version>
+  <detail>X10 is a CPL based protocol to control lights, appliances, etc. This plugin needs Heyu to work</detail>
+  <version>0.1.0</version>
   <documentation>http://wiki.domogik.org/tiki-index.php?page=plugin_x10_heyu</documentation>
+  <author>Maxence Dunnewind, Mirelsol</author>
+  <author-email>maxence at dunnewind.net; ??? email mirelsol ???</author-email>
   <configuration-keys>
     <key>
       <order-id>0</order-id>
@@ -20,4 +23,15 @@
       <default-value>/etc/heyu/x10.conf</default-value>
     </key>
   </configuration-keys>
+  <files>
+    <file path="src/share/domogik/plugins/x10_heyu.xml"/>
+    <file path="src/share/domogik/stats/x10/x10.basic.xml"/>
+    <file path="src/share/domogik/url2xpl/x10/bright.xml"/>
+    <file path="src/share/domogik/url2xpl/x10/dim.xml"/>
+    <file path="src/share/domogik/url2xpl/x10/on.xml"/>
+    <file path="src/share/domogik/url2xpl/x10/off.xml"/>
+    <file path="src/domogik/xpl/bin/x10_heyu.py"/>
+    <file path="src/domogik/xpl/lib/x10_heyu.py"/>
+  </files>
+  <depandancies/>
 </plugin>

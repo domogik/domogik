@@ -1,9 +1,13 @@
 <plugin>
   <name>cidmodem</name>
   <technology>communication</technology>
-  <description>Set caller id with a modem</description>
-  <version>0.1</version>
+  <description>Get caller id with a modem</description>
+  <version>0.1.0</version>
+  <detail>When receiving an incoming call on a classic telephonic line, this plugin gets the incoming call number and send it on xPL.
+  </detail>
   <documentation>http://wiki.domogik.org/tiki-index.php?page=plugin_cidmodem</documentation>
+  <author>Fritz</author>
+  <author-email>fritz.smh at gmail.com</author-email>
   <configuration-keys>
     <key>
       <order-id>0</order-id>
@@ -27,4 +31,13 @@
       <default-value>AT#CID=1</default-value>
     </key>
   </configuration-keys>
+  <files>
+    <file path="src/share/domogik/plugins/cidmodem.xml"/>
+    <file path="src/share/domogik/stats/communication/cidbasic.xml"/>
+    <file path="src/domogik/xpl/bin/cidmodem.py"/>
+    <file path="src/domogik/xpl/lib/cidmodem.py"/>
+  </files>
+  <depandancies>
+    <dep name="pySerial > 2.4"/>
+  </depandancies>
 </plugin>
