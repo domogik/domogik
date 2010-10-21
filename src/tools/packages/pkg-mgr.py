@@ -91,6 +91,10 @@ class PackageManager():
                           action = "store", 
                           dest = "package_type",
                           help = "Package type : %s" % PACKAGE_TYPES)
+        parser.add_option("-o", "--output-dir",
+                          action = "store", 
+                          dest = "output_dir",
+                          help = "Directory where you want to create packages")
 
         (self.options, self.args) = parser.parse_args()
 
@@ -108,20 +112,23 @@ class PackageManager():
 
             # plugin
             if self.options.package_type == "plugin":
-                self._create_package_for_plugin(self.args[0])
+                self._create_package_for_plugin(self.args[0], self.options.output_dir)
 
         # package installation
         if self.options.action_install == True:
-            # check package type
+            # check package type and -o
             if self.options.package_type != None:
                 print("Error : --type should not be used with install option")
+                return
+            if self.options.output_dir != None:
+                print("Error : --output-dir should not be used with install option")
                 return
 
             # install
             self._install_package(self.args[0])
         
 
-    def _create_package_for_plugin(self, name):
+    def _create_package_for_plugin(self, name, output_dir):
         """ Create package for a plugin
             1. read xml file to get informations and list of files
             2. generate package
@@ -169,7 +176,8 @@ class PackageManager():
         setup_file = self._create_plugin_setup(plg_xml)
 
         # Create .tar.gz
-        self._create_tar_gz(plg_xml.name, 
+        self._create_tar_gz("%s-%s" % (plg_xml.name, plg_xml.version), 
+                            output_dir,
                             plg_xml.files, 
                             setup_file = setup_file,
                             ez_setup_file = SRC_PATH + "ez_setup.py")
@@ -206,14 +214,18 @@ class PackageManager():
         return output_path
 
 
-    def _create_tar_gz(self, name, files, 
+    def _create_tar_gz(self, name, output_dir, files, 
                        setup_file = None, ez_setup_file = None):
         """ Create a .tar.gz file anmmed <name.tgz> which contains <files>
             @param name : file name
+            @param output_dir : if != None, the path to put .tar.gz
             @param files : table of file names to add in tar.gz
             @param setup_file : path for setup.py file
         """
-        my_tar = "%s/%s.tar.gz" % (tempfile.gettempdir(), name)
+        if output_dir == None:
+            my_tar = "%s/%s.tar.gz" % (tempfile.gettempdir(), name)
+        else:
+            my_tar = "%s/%s.tar.gz" % (output_dir, name)
         print("Generating package : '%s'" % my_tar)
         try:
             tar = tarfile.open(my_tar, "w:gz")
