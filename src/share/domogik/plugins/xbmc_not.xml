@@ -2,8 +2,11 @@
   <name>xbmc_not</name>
   <technology>multimedia</technology>
   <description>Send notifications to XBMC</description>
+  <detail/>
   <version>0.1</version>
   <documentation>http://wiki.domogik.org/tiki-index.php?page=plugin_xbmc_not</documentation>
+  <author>Fritz</author>
+  <author-email>fritz.smh at gmail.com</author-email>
   <configuration-keys>
     <key>
       <order-id>0</order-id>
@@ -34,4 +37,6 @@
       <default-value>10</default-value>
     </key>
   </configuration-keys>
+  <files/>
+  <depandancies/>
 </plugin>

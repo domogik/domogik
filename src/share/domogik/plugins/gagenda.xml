@@ -2,8 +2,11 @@
   <name>gagenda</name>
   <technology>communication</technology>
   <description>Get events from a Google agenda</description>
+  <detail/>
   <version>0.1</version>
   <documentation>http://wiki.domogik.org/tiki-index.php?page=plugin_gagenda</documentation>
+  <author>Fritz</author>
+  <author-email>fritz.smh at gmail.com</author-email>
   <configuration-keys>
     <key>
       <order-id>0</order-id>
@@ -34,4 +37,6 @@
       <default-value>john.doe@gmail.com</default-value>
     </key>
   </configuration-keys>
+  <files/>
+  <depandancies/>
 </plugin>
