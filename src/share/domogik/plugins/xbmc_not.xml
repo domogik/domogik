@@ -2,7 +2,7 @@
   <name>xbmc_not</name>
   <technology>multimedia</technology>
   <description>Send notifications to XBMC</description>
-  <detail><detail/>
+  <detail></detail>
   <version>0.1</version>
   <documentation>http://wiki.domogik.org/tiki-index.php?page=plugin_xbmc_not</documentation>
   <author>Fritz</author>

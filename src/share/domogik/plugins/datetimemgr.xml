@@ -2,7 +2,7 @@
   <name>datetimemgr</name>
   <technology>service</technology>
   <description>Send date and time on the xPL network every minute</description>
-  <detail><detail/>
+  <detail></detail>
   <version>0.1</version>
   <documentation>#TODO#</documentation>
   <author>Fritz</author>
