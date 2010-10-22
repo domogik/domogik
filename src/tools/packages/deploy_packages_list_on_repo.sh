@@ -20,7 +20,7 @@
 #Module purpose
 #==============
 #
-# Generate all packages from sources
+# This script generates package list
 #
 #Implements
 #==========
@@ -31,32 +31,49 @@
 #@license: GPL(v3)
 #@organization: Domogik
 
-SRC_PATH="../../../"
-PLG_XML_PATH="src/share/domogik/plugins/"
+
+TMP_DIR=/tmp/domogik-repo
+FILENAME=packages.lst
 
 if [[ $# -ne 1 ]] ; then
     echo "Usage : $0 <directory>"
-    echo "Create al packages in a directory"
+    echo "For each package in directory, generate package list"
     exit 1
 fi
 
 FOLDER=$1
 
-for fic in $(find $SRC_PATH/$PLG_XML_PATH -name "*.xml")
-  do
-    plugin=$(basename $fic | sed "s/\.xml//")
-    echo "********************************************************"
-    echo "*    Generating package for $plugin"
-    echo "********************************************************"
-  
-    ./pkg-mgr.py -f -c -t plugin -o $FOLDER $plugin
+mkdir -p $TMP_DIR
+if [[ $? -ne 0 ]] ; then
+    echo "Error while creating temporary directory <$TMP_DIR>"
+    exit 1
+fi
 
-    #echo "Continue with next plugin ?"
-    #read resp
-    #if [[ $resp == "o" || $resp == "O" ]] ; then
-    #    echo ""
-    #else
-    #    echo "Exit..."
-    #    exit 0 
-    #fi
+if [[ ! -d $1 ]] ; then
+    echo "<$INPUT> is not a directory"
+    exit 1
+fi
+
+rm -f $TMP_DIR/FILENAME
+if [[ $? -ne 0 ]] ; then
+    echo "Could not delete file $TMP_DIR/$FILENAME"
+    exit 1
+fi
+
+cd $FOLDER
+for fic in $FOLDER/*.xml
+  do
+    package_name=$(basename $fic | sed "s/.xml//")
+    echo "- $package_name"
+    echo $package_name >> $TMP_DIR/$FILENAME
+    if [[ $? -ne 0 ]] ; then
+        echo "Could not write in file $TMP_DIR/$FILENAME"
+        exit 1
+    fi
 done
+
+mv $TMP_DIR/$FILENAME $FOLDER
+if [[ $? -ne 0 ]] ; then
+    echo "Could not move file $TMP_DIR/$FILENAME to $FOLDER"
+    exit 1
+fi

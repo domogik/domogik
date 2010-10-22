@@ -32,8 +32,6 @@
 #@organization: Domogik
 
 
-TMP_DIR=/tmp/domogik-pkg-mgr
-
 if [[ $# -ne 2 ]] ; then
     echo "Usage : $0 <input directory> <repository directory>"
     echo "This script move a package from input_directory to repository and extract info.xml file to put it on repository with package name"
@@ -42,12 +40,6 @@ fi
 
 INPUT=$1
 OUTPUT=$2
-
-mkdir -p $TMP_DIR
-if [[ $? -ne 0 ]] ; then
-    echo "Error while creating temporary directory <$TMP_DIR>"
-    exit 1
-fi
 
 if [[ ! -d $1 ]] ; then
     echo "<$INPUT> is not a directory"

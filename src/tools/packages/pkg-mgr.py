@@ -83,6 +83,11 @@ class PackageManager():
                           dest = "action_create",
                           default = False,
                           help = "Create a new package")
+        parser.add_option("-f", "--force",
+                          action = "store_true", 
+                          dest = "force",
+                          default = False,
+                          help = "Script won't ask user to continue or not")
         parser.add_option("-i", "--install",
                           action = "store_true", 
                           dest = "action_install",
@@ -167,17 +172,18 @@ class PackageManager():
             print("There is no file defined : the package won't be created")
             return
 
-        print("\nAre these informations OK ?")
-        resp = raw_input("[o/N]")
-        if resp.lower() != "o":
-            print("Exiting...")
-            return
+        if self.options.force == False:
+            print("\nAre these informations OK ?")
+            resp = raw_input("[o/N]")
+            if resp.lower() != "o":
+                print("Exiting...")
+                return
 
         # Create setup.py file
         setup_file = self._create_plugin_setup(plg_xml)
 
         # Create .tar.gz
-        self._create_tar_gz("%s-%s" % (plg_xml.name, plg_xml.version), 
+        self._create_tar_gz("plugin-%s-%s" % (plg_xml.name, plg_xml.version), 
                             output_dir,
                             plg_xml.files, 
                             plg_xml.info_file,
