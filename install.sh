@@ -133,7 +133,7 @@ function update_user_config {
     sed -i "s/^HUB_IFACE.*$/HUB_IFACE=$bind_iface/" /etc/default/domogik
     sed -i "s/^rest_server_ip.*$/rest_server_ip = $bind_addr/" $d_home/.domogik.cfg
     sed -i "s/^django_server_ip.*$/django_server_ip = $bind_addr/" $d_home/.domogik.cfg
-    sed -i "s/^internal_rest_server_ip.*$/django_rest_server_ip = $bind_addr/" $d_home/.domogik.cfg
+    sed -i "s/^internal_rest_server_ip.*$/internal_rest_server_ip = $bind_addr/" $d_home/.domogik.cfg
     read -p "If you need to reach REST  from outside, you can specify an IP now : " out_bind_addr
     sed -i "s/^external_rest_server_ip.*$/external_rest_server_ip = $out_bind_addr/" $d_home/.domogik.cfg
     
