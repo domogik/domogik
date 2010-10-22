@@ -2,7 +2,7 @@
   <name>gagenda</name>
   <technology>communication</technology>
   <description>Get events from a Google agenda</description>
-  <detail></detail>
+  <detail>Connect to a google agenda to get events</detail>
   <version>0.1</version>
   <documentation>http://wiki.domogik.org/tiki-index.php?page=plugin_gagenda</documentation>
   <author>Fritz</author>
