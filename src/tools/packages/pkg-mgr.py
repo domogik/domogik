@@ -49,6 +49,7 @@ import urllib
 
 PACKAGE_TYPES = ['plugin']
 SRC_PATH = "../../../"
+PLG_XML_PATH = "src/share/domogik/plugins/"
 SETUP_PLUGIN_TPL = "./templates/setup-plugin.tpl"
 TMP_EXTRACT_DIR = "domogik-pkg-mgr" # used with /tmp (or assimilated) before
 REP0_SRC_FILE = "/etc/domogik/sources.list"
@@ -179,6 +180,7 @@ class PackageManager():
         self._create_tar_gz("%s-%s" % (plg_xml.name, plg_xml.version), 
                             output_dir,
                             plg_xml.files, 
+                            plg_xml.info_file,
                             setup_file = setup_file,
                             ez_setup_file = SRC_PATH + "ez_setup.py")
 
@@ -214,13 +216,15 @@ class PackageManager():
         return output_path
 
 
-    def _create_tar_gz(self, name, output_dir, files, 
+    def _create_tar_gz(self, name, output_dir, files, info_file = None,
                        setup_file = None, ez_setup_file = None):
         """ Create a .tar.gz file anmmed <name.tgz> which contains <files>
             @param name : file name
             @param output_dir : if != None, the path to put .tar.gz
             @param files : table of file names to add in tar.gz
+            @param info_file : path for info.xml file
             @param setup_file : path for setup.py file
+            @param ez_setup_file : path for ez_setup.py file
         """
         if output_dir == None:
             my_tar = "%s/%s.tar.gz" % (tempfile.gettempdir(), name)
@@ -233,6 +237,9 @@ class PackageManager():
                 path =  str(my_file["path"])
                 print("- %s" % path)
                 tar.add(SRC_PATH + path, arcname = path)
+            if info_file != None:
+                print("- info.xml")
+                tar.add(info_file, arcname="info.xml")
             if setup_file != None:
                 print("- setup.py")
                 tar.add(setup_file, arcname="setup.py")
@@ -330,8 +337,9 @@ class PluginXml():
         cfg = Loader('domogik')
         config = cfg.load()
         conf = dict(config[1])
-        xml_plugin_directory = "%s/share/domogik/plugins/" % conf['custom_prefix']
+        xml_plugin_directory = "%s/%s" % (SRC_PATH, PLG_XML_PATH)
         xml_file = "%s/%s.xml" % (xml_plugin_directory, name)
+        self.info_file = xml_file
 
         # read xml file
         try:
