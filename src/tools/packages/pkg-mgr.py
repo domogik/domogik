@@ -45,6 +45,7 @@ import tempfile
 import os
 from subprocess import Popen
 import urllib
+from operator import attrgetter
 
 
 PACKAGE_TYPES = ['plugin']
@@ -52,7 +53,8 @@ SRC_PATH = "../../../"
 PLG_XML_PATH = "src/share/domogik/plugins/"
 SETUP_PLUGIN_TPL = "./templates/setup-plugin.tpl"
 TMP_EXTRACT_DIR = "domogik-pkg-mgr" # used with /tmp (or assimilated) before
-REP0_SRC_FILE = "/etc/domogik/sources.list"
+REPO_SRC_FILE = "/etc/domogik/sources.list"
+REPO_LST_FILE = "packages.lst"
 
 class PackageException(Exception):
     """
@@ -83,11 +85,21 @@ class PackageManager():
                           dest = "action_create",
                           default = False,
                           help = "Create a new package")
+        parser.add_option("-f", "--force",
+                          action = "store_true", 
+                          dest = "force",
+                          default = False,
+                          help = "Script won't ask user to continue or not")
         parser.add_option("-i", "--install",
                           action = "store_true", 
                           dest = "action_install",
                           default = False,
                           help = "Install a package")
+        parser.add_option("-u", "--update",
+                          action = "store_true", 
+                          dest = "action_update",
+                          default = False,
+                          help = "Update packages list")
         parser.add_option("-t", "--type",
                           action = "store", 
                           dest = "package_type",
@@ -100,7 +112,7 @@ class PackageManager():
         (self.options, self.args) = parser.parse_args()
 
         # check args
-        if len(self.args) != 1:
+        if self.options.action_update == False and len(self.args) != 1:
             print("Error : missing argument : plugin name")
             return
   
@@ -127,6 +139,19 @@ class PackageManager():
 
             # install
             self._install_package(self.args[0])
+
+        # packages list update
+        if self.options.action_update == True:
+            # check package type and -o
+            if self.options.package_type != None:
+                print("Error : --type should not be used with install option")
+                return
+            if self.options.output_dir != None:
+                print("Error : --output-dir should not be used with install option")
+                return
+
+            # update list
+            self._update_list()
         
 
     def _create_package_for_plugin(self, name, output_dir):
@@ -167,17 +192,18 @@ class PackageManager():
             print("There is no file defined : the package won't be created")
             return
 
-        print("\nAre these informations OK ?")
-        resp = raw_input("[o/N]")
-        if resp.lower() != "o":
-            print("Exiting...")
-            return
+        if self.options.force == False:
+            print("\nAre these informations OK ?")
+            resp = raw_input("[o/N]")
+            if resp.lower() != "o":
+                print("Exiting...")
+                return
 
         # Create setup.py file
         setup_file = self._create_plugin_setup(plg_xml)
 
         # Create .tar.gz
-        self._create_tar_gz("%s-%s" % (plg_xml.name, plg_xml.version), 
+        self._create_tar_gz("plugin-%s-%s" % (plg_xml.name, plg_xml.version), 
                             output_dir,
                             plg_xml.files, 
                             plg_xml.info_file,
@@ -326,6 +352,39 @@ class PackageManager():
         subp.wait()
         return subp.pid
 
+
+    def _update_list(self):
+        """ update local package list
+        """
+        print "update action"
+        try:
+            # Read repository source file and generate repositories list
+            repo_list = self._get_repositories_list(REPO_SRC_FILE)
+            print repo_list
+        except:
+            print(str(traceback.format_exc()))
+            return
+             
+        # TODO : sort list
+        print sorted(repo_list, key = attrgetter("priority"))
+
+        # for each list, get files and associated xml
+
+
+    def _get_repositories_list(self, filename):
+        """ Read repository source file and return list
+            @param filename : source file
+        """
+        try:
+            repo_list = []
+            src_file = open(filename, "r")
+            for line in src_file.readlines():
+                repo_list.append({"priority" : line.split()[0],
+                                  "url" : line.split()[1]})
+            src_file.close()
+        except:
+            raise PackageException("Error reading source file : %s : %s" % (REPO_SRC_FILE, str(traceback.format_exc())))
+        return repo_list
 
 
 class PluginXml():
