@@ -225,7 +225,7 @@ class XplPlugin():
             self._log.debug("force_leave called")
             self.get_stop().set()
             for t in self._timers:
-                self._log.debug("Try to stop timer %s" : % t)
+                self._log.debug("Try to stop timer %s"  % t)
                 t.stop()
                 self._log.debug("Timer stopped %s" % t)
             for cb in self._stop_cb:
