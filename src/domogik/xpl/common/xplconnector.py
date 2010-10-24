@@ -8,6 +8,7 @@ License
 
 B{Domogik} is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
+A
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
@@ -120,7 +121,7 @@ class Manager(BasePlugin):
         #xPL plugins only needs to connect on local xPL Hub on localhost
         addr = (ip, port)
 
-        self._log = self.get_my_logger()
+        self._log = self.et_my_logger()
         #Define locks
         self._lock_send = threading.Semaphore()
         self._lock_list = threading.Semaphore()
@@ -388,8 +389,7 @@ class XplTimer():
         """
         self._timer = self.__InternalTimer(time, cb, stop, manager._log)
         self._manager = manager
-        lg = logger.Logger(self.__class__.__name__)
-        self._log = lg.get_logger()
+        self._log = manager.get_my_logger()
         manager.register_timer(self)
         manager.register_thread(self._timer)
         self._log.debug("New timer created : %s " % self)
