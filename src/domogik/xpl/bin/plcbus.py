@@ -31,7 +31,7 @@ Implements
 - plcbusMain.plcbus_cmnd_cb(self, message)
 - plcbusMain.plcbus_send_ack(self, message)
 
-@author: François PINET <domopyx@gmail.com>
+@author: FranÃ§ois PINET <domopyx@gmail.com>
 @copyright: (C) 2007-2009 Domogik project
 @license: GPL(v3)
 @organization: Domogik
@@ -122,6 +122,11 @@ class PlcBusMain(XplPlugin):
 #            self.api.get_all_on_id(user, dev)
 #        else:
         self.api.send(cmd.upper(), dev, user, level, rate)
+#       Workaround to send an OFF command when dimmer = 0
+        if cmd == 'PRESET_DIM' and level == 0:
+            print "cmd : %s " % cmd
+            print "level : %s " % level     
+            self.api.send("OFF", dev, user)
 
     def _command_cb(self, f):
         ''' Called by the plcbus library when a command has been sent.
