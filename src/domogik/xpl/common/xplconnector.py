@@ -392,11 +392,12 @@ class XplTimer():
         self._log = lg.get_logger()
         manager.register_timer(self)
         manager.register_thread(self._timer)
+        self._log.debug("New timer created : %s " % self)
 
-    def __repr__(self):
-        """ Representation of the Timer
-        """
-        return "<domogik.xpl.lib.xplconnector.XplTimer> name : %s" % self._timer.name
+#    def __repr__(self):
+#        """ Representation of the Timer
+#        """
+#        return "<domogik.xpl.lib.xplconnector.XplTimer> name : %s" % self._timer.name
 
     def start(self):
         """
@@ -418,7 +419,9 @@ class XplTimer():
         """
         Stop the timer
         """
+        self._log.debug("Timer : stop, try to join() internal thread")
         self._timer.join()
+        self._log.debug("Timer : stop, internal thread joined, unregister it")
         self._manager.unregister_timer(self._timer)
 
     class __InternalTimer(threading.Thread):

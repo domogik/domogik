@@ -183,6 +183,7 @@ class BasePlugin():
             Should be the last action of each timer
             @param timer : the timer to remove
             '''
+            self._log.debug('ASk for timer unregister : %s' % timer)
             self._lock_add_timer.acquire()
             if timer in self._timers:
                 self._log.debug('Unregister timer')
