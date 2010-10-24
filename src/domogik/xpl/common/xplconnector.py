@@ -121,7 +121,7 @@ class Manager(BasePlugin):
         #xPL plugins only needs to connect on local xPL Hub on localhost
         addr = (ip, port)
 
-        self._log = self.et_my_logger()
+        self._log = self.get_my_logger()
         #Define locks
         self._lock_send = threading.Semaphore()
         self._lock_list = threading.Semaphore()
