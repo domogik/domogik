@@ -45,6 +45,7 @@ import tempfile
 import os
 from subprocess import Popen
 import urllib
+from operator import attrgetter
 
 
 PACKAGE_TYPES = ['plugin']
@@ -52,7 +53,8 @@ SRC_PATH = "../../../"
 PLG_XML_PATH = "src/share/domogik/plugins/"
 SETUP_PLUGIN_TPL = "./templates/setup-plugin.tpl"
 TMP_EXTRACT_DIR = "domogik-pkg-mgr" # used with /tmp (or assimilated) before
-REP0_SRC_FILE = "/etc/domogik/sources.list"
+REPO_SRC_FILE = "/etc/domogik/sources.list"
+REPO_LST_FILE = "packages.lst"
 
 class PackageException(Exception):
     """
@@ -93,6 +95,11 @@ class PackageManager():
                           dest = "action_install",
                           default = False,
                           help = "Install a package")
+        parser.add_option("-u", "--update",
+                          action = "store_true", 
+                          dest = "action_update",
+                          default = False,
+                          help = "Update packages list")
         parser.add_option("-t", "--type",
                           action = "store", 
                           dest = "package_type",
@@ -105,7 +112,7 @@ class PackageManager():
         (self.options, self.args) = parser.parse_args()
 
         # check args
-        if len(self.args) != 1:
+        if self.options.action_update == False and len(self.args) != 1:
             print("Error : missing argument : plugin name")
             return
   
@@ -132,6 +139,19 @@ class PackageManager():
 
             # install
             self._install_package(self.args[0])
+
+        # packages list update
+        if self.options.action_update == True:
+            # check package type and -o
+            if self.options.package_type != None:
+                print("Error : --type should not be used with install option")
+                return
+            if self.options.output_dir != None:
+                print("Error : --output-dir should not be used with install option")
+                return
+
+            # update list
+            self._update_list()
         
 
     def _create_package_for_plugin(self, name, output_dir):
@@ -332,6 +352,39 @@ class PackageManager():
         subp.wait()
         return subp.pid
 
+
+    def _update_list(self):
+        """ update local package list
+        """
+        print "update action"
+        try:
+            # Read repository source file and generate repositories list
+            repo_list = self._get_repositories_list(REPO_SRC_FILE)
+            print repo_list
+        except:
+            print(str(traceback.format_exc()))
+            return
+             
+        # TODO : sort list
+        print sorted(repo_list, key = attrgetter("priority"))
+
+        # for each list, get files and associated xml
+
+
+    def _get_repositories_list(self, filename):
+        """ Read repository source file and return list
+            @param filename : source file
+        """
+        try:
+            repo_list = []
+            src_file = open(filename, "r")
+            for line in src_file.readlines():
+                repo_list.append({"priority" : line.split()[0],
+                                  "url" : line.split()[1]})
+            src_file.close()
+        except:
+            raise PackageException("Error reading source file : %s : %s" % (REPO_SRC_FILE, str(traceback.format_exc())))
+        return repo_list
 
 
 class PluginXml():
