@@ -143,14 +143,17 @@ class BasePlugin():
             Should be called by each thread at start
             @param thread : the thread to add
             '''
-            self._lock_add_thread.acquire()
             # self._log.debug('New thread registered : %s' % thread)
             #Remove all stopped thread from the list
             for t in self._threads:
                 if not  t.isAlive():
                     self._threads.remove(t)
-            self._threads.append(thread)
-            self._lock_add_thread.release()
+            if thread in self._threads:
+                self._log.info("Try to register a thread twice :" % thread)
+            else:
+                self._lock_add_thread.acquire()
+                self._threads.append(thread)
+                self._lock_add_thread.release()
 
         def unregister_thread(self, thread):
             '''
@@ -172,10 +175,13 @@ class BasePlugin():
             Should be called by each timer
             @param timer : the timer to add
             '''
-            self._lock_add_timer.acquire()
-            self._log.debug('New timer registered : %s' % timer)
-            self._timers.append(timer)
-            self._lock_add_timer.release()
+            if timer in self._timers:
+                self._log.info("Try to register a timer twice : %s" % timer)
+            else:
+                self._log.debug('New timer registered : %s' % timer)
+                self._lock_add_timer.acquire()
+                self._timers.append(timer)
+                self._lock_add_timer.release()
 
         def unregister_timer(self, timer):
             '''
