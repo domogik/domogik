@@ -1,4 +1,4 @@
-<plugin>
+<package type="plugin">
   <name>cidmodem</name>
   <technology>communication</technology>
   <description>Get caller id with a modem</description>
@@ -40,4 +40,4 @@
   <depandancies>
     <dep name="pySerial > 2.4"/>
   </depandancies>
-</plugin>
+</package>

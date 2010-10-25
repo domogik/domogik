@@ -1,4 +1,4 @@
-<plugin>
+<package type="plugin">
   <name>rest</name>
   <technology>domogik</technology>
   <description>REST server</description>
@@ -76,4 +76,4 @@
   </configuration-keys>
   <files/>
   <depandancies/>
-</plugin>
+</package>

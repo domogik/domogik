@@ -1,4 +1,4 @@
-<plugin>
+<package type="plugin">
   <name>x10_heyu</name>
   <technology>x10</technology>
   <description>Manage x10 devices with Heyu</description>
@@ -34,4 +34,4 @@
     <file path="src/domogik/xpl/lib/x10_heyu.py"/>
   </files>
   <depandancies/>
-</plugin>
+</package>

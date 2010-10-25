@@ -1,4 +1,4 @@
-<plugin>
+<package type="plugin">
   <name>xbmc_not</name>
   <technology>multimedia</technology>
   <description>Send notifications to XBMC</description>
@@ -39,4 +39,4 @@
   </configuration-keys>
   <files/>
   <depandancies/>
-</plugin>
+</package>

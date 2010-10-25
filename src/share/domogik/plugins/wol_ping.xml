@@ -1,4 +1,4 @@
-<plugin>
+<package type="plugin">
   <name>wol_ping</name>
   <technology>computer</technology>
   <description>Wake on lan and ping computers</description>
@@ -115,4 +115,4 @@
     <file path="src/domogik/xpl/lib/wol_ping.py"/>
   </files>
   <depandancies/>
-</plugin>
+</package>

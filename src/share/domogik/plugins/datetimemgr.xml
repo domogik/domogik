@@ -1,4 +1,4 @@
-<plugin>
+<package type="plugin">
   <name>datetimemgr</name>
   <technology>service</technology>
   <description>Send date and time on the xPL network every minute</description>
@@ -18,4 +18,4 @@
   </configuration-keys>
   <files/>
   <depandancies/>
-</plugin>
+</package>

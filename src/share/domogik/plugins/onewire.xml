@@ -1,4 +1,4 @@
-<plugin>
+<package type="plugin">
   <name>onewire</name>
   <technology>1wire</technology>
   <description>Manage 1-wire devices</description>
@@ -98,4 +98,4 @@ List of supported devices :
   <depandancies>
     <dep name="pyowfs >= 0.1.3"/>
   </depandancies>
-</plugin>
+</package>

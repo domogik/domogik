@@ -1,4 +1,4 @@
-<plugin>
+<package type="plugin">
   <name>plcbus</name>
   <technology>plcbus</technology>
   <description>Manage Plcbus devices</description>
@@ -60,4 +60,4 @@
   <depandancies>
     <dep name="pySerial > 2.4"/>
   </depandancies>
-</plugin>
+</package>

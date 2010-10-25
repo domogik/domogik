@@ -1,4 +1,4 @@
-<plugin>
+<package type="plugin">
   <name>mirror</name>
   <technology>rfid</technology>
   <description>Use Mir:ror device</description>
@@ -32,4 +32,4 @@
   <depandancies>
     <dep name="pySerial > 2.4"/>
   </depandancies>
-</plugin>
+</package>
