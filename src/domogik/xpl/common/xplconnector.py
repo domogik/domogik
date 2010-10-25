@@ -388,6 +388,7 @@ class XplTimer():
         @param cb : callback function which will be call eact 'time' seconds
         """
         self._timer = self.__InternalTimer(time, cb, stop, manager._log)
+        self._stop = stop
         self._manager = manager
         self._log = manager.get_my_logger()
         manager.register_timer(self)
@@ -420,6 +421,7 @@ class XplTimer():
         Stop the timer
         """
         self._log.debug("Timer : stop, try to join() internal thread")
+        self._stop.set()
         self._timer.join()
         self._log.debug("Timer : stop, internal thread joined, unregister it")
         self._manager.unregister_timer(self._timer)
