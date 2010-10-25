@@ -46,6 +46,7 @@ import os
 from subprocess import Popen
 import urllib
 from operator import attrgetter
+import shutil
 
 
 PACKAGE_TYPES = ['plugin']
@@ -55,6 +56,8 @@ SETUP_PLUGIN_TPL = "./templates/setup-plugin.tpl"
 TMP_EXTRACT_DIR = "domogik-pkg-mgr" # used with /tmp (or assimilated) before
 REPO_SRC_FILE = "/etc/domogik/sources.list"
 REPO_LST_FILE = "packages.lst"
+REPO_LST_FILE_HEADER = "Domogik repository"
+REPO_CACHE_DIR = "/var/cache/domogik"
 
 class PackageException(Exception):
     """
@@ -163,7 +166,7 @@ class PackageManager():
         print("Plugin nam : %s" % name)
 
         try:
-            plg_xml = PluginXml(name)
+            plg_xml = PackageXml(name)
         except:
             print(str(traceback.format_exc()))
             return
@@ -356,19 +359,27 @@ class PackageManager():
     def _update_list(self):
         """ update local package list
         """
-        print "update action"
+        # Get repositories list
         try:
             # Read repository source file and generate repositories list
             repo_list = self._get_repositories_list(REPO_SRC_FILE)
-            print repo_list
         except:
             print(str(traceback.format_exc()))
             return
              
-        # TODO : sort list
-        print sorted(repo_list, key = attrgetter("priority"))
-
+        # Clean cache folder
+        try:
+            self._clean_cache(REPO_CACHE_DIR)
+        except:
+            print(str(traceback.format_exc()))
+            return
+             
         # for each list, get files and associated xml
+        try:
+            self._parse_repository(repo_list, REPO_CACHE_DIR)
+        except:
+            print(str(traceback.format_exc()))
+            return
 
 
     def _get_repositories_list(self, filename):
@@ -384,52 +395,143 @@ class PackageManager():
             src_file.close()
         except:
             raise PackageException("Error reading source file : %s : %s" % (REPO_SRC_FILE, str(traceback.format_exc())))
-        return repo_list
+        # return sorted list
+        return sorted(repo_list, key = lambda k: k['priority'], reverse = True)
 
 
-class PluginXml():
-    def __init__(self, name):
+    def _clean_cache(self, folder):
+        """ If not exists, create <folfer>
+            Then, clean this folder
+            @param folder : cache folder to empty
+        """
+        # Create folder
+        try:
+            if os.path.isdir(folder) == False:
+                os.makedirs(folder)
+        except:
+            raise PackageException("Error while creating cache folder '%s' : %s" % (folder, traceback.format_exc()))
+
+        # Clean folder
+        try:
+            for root, dirs, files in os.walk(folder):
+                for f in files:
+                    os.unlink(os.path.join(root, f))
+                for d in dirs:
+                    shutil.rmtree(os.path.join(root, d))
+        except:
+            raise PackageException("Error while cleaning cache folder '%s' : %s" % (folder, traceback.format_exc()))
+
+
+    def _parse_repository(self, repo_list, cache_folder):
+        """ For each repo, get file list, check if it is higher version and
+            get package's xml
+            @param repo_list : repositories list
+            @param cache_folder : package cache folder
+        """
+        package_list = []
+
+        # get all packages url
+        file_list = []
+        for repo in repo_list:
+            file_list.extend(self._get_files_list_from_repository(repo["url"]))
+
+        # for each package, put it in cache if higher version
+        for url_prefix in file_list:
+            pkg_xml = PackageXml(url = "%s.xml" % url_prefix)
+            print("Add '%s (%s)' in cache" % (pkg_xml.name, pkg_xml.version))
+            pkg_xml.cache_package(cache_folder, url_prefix)
+
+
+    def _get_files_list_from_repository(self, url):
+        """ Read packages.xml on repository
+            @param url : repo url
+        """
+        try:
+            resp = urllib.urlopen("%s/%s" % (url, REPO_LST_FILE))
+            my_list = []
+            first_line = True
+            for data in resp.readlines():
+                if first_line == True:
+                    first_line = False
+                    if data.strip() != REPO_LST_FILE_HEADER:
+                        print("This is not a Domogik repository : '%s/%s'" %
+                                   (url, REPO_LST_FILE))
+                        break
+                else:
+                    my_list.append("%s/%s" % (url, data.strip()))
+            return my_list
+        except IOError:
+            print("Bad url :'%s/%s'" % (url, REPO_LST_FILE))
+            return []
+
+
+
+class PackageXml():
+    def __init__(self, name = None, url = None):
         """ Read xml file of a plugin and make an object from it
             @param name : name of plugin
+            @param url : url of xml file
         """
-        # get config
-        cfg = Loader('domogik')
-        config = cfg.load()
-        conf = dict(config[1])
-        xml_plugin_directory = "%s/%s" % (SRC_PATH, PLG_XML_PATH)
-        xml_file = "%s/%s.xml" % (xml_plugin_directory, name)
-        self.info_file = xml_file
-
-        # read xml file
         try:
-            xml_content = minidom.parse(xml_file)
-            self.name = xml_content.getElementsByTagName("name")[0].firstChild.nodeValue
-            self.desc = xml_content.getElementsByTagName("description")[0].firstChild.nodeValue
-            self.detail = xml_content.getElementsByTagName("detail")[0].firstChild.nodeValue
-            self.techno = xml_content.getElementsByTagName("technology")[0].firstChild.nodeValue
-            self.version = xml_content.getElementsByTagName("version")[0].firstChild.nodeValue
-            self.doc = xml_content.getElementsByTagName("documentation")[0].firstChild.nodeValue
-            self.author = xml_content.getElementsByTagName("author")[0].firstChild.nodeValue
-            self.email = xml_content.getElementsByTagName("author-email")[0].firstChild.nodeValue
+            if name != None:
+                # get config
+                cfg = Loader('domogik')
+                config = cfg.load()
+                conf = dict(config[1])
+                xml_plugin_directory = "%s/%s" % (SRC_PATH, PLG_XML_PATH)
+                xml_file = "%s/%s.xml" % (xml_plugin_directory, name)
+                self.info_file = xml_file
+                self.xml_content = minidom.parse(xml_file)
+    
+            if url != None:
+                xml_file = url
+                self.info_file = xml_file
+                xml_data = urllib.urlopen(xml_file)
+                self.xml_content = minidom.parseString(xml_data.read())
+
+            # read xml file
+            self.name = self.xml_content.getElementsByTagName("name")[0].firstChild.nodeValue
+            self.desc = self.xml_content.getElementsByTagName("description")[0].firstChild.nodeValue
+            self.detail = self.xml_content.getElementsByTagName("detail")[0].firstChild.nodeValue
+            self.techno = self.xml_content.getElementsByTagName("technology")[0].firstChild.nodeValue
+            self.version = self.xml_content.getElementsByTagName("version")[0].firstChild.nodeValue
+            self.doc = self.xml_content.getElementsByTagName("documentation")[0].firstChild.nodeValue
+            self.author = self.xml_content.getElementsByTagName("author")[0].firstChild.nodeValue
+            self.email = self.xml_content.getElementsByTagName("author-email")[0].firstChild.nodeValue
             # list of files
             self.files = []
-            xml_data = xml_content.getElementsByTagName("files")[0]
+            xml_data = self.xml_content.getElementsByTagName("files")[0]
             for my_file in xml_data.getElementsByTagName("file"):
                data = {"path" :  my_file.attributes.get("path").value}
                self.files.append(data)
             # list of depandancies
             self.depandancies = []
-            xml_data = xml_content.getElementsByTagName("depandancies")[0]
+            xml_data = self.xml_content.getElementsByTagName("depandancies")[0]
             for dep in xml_data.getElementsByTagName("dep"):
                data = {"name" :  dep.attributes.get("name").value}
                self.depandancies.append(data)
 
+            # construct filenames
+            ### TODO : replace "plugin" by in-xml value
+            self.xml_filename = "%s-%s-%s.xml" % ("plugin", self.name, self.version)
+            self.pkg_filename = "%s-%s-%s.tar.gz" % ("plugin", self.name, self.version)
         except:
             raise PackageException("Error reading xml file : %s : %s" % (xml_file, str(traceback.format_exc())))
 
 
-
-
+    def cache_package(self, cache_folder, url_prefix):
+        """ Add url_prefix info in xml data
+            Store xml in a file in cache_folder
+            @param cache_folder : folder to put xml file
+            @param url_prefix : http://.../pluginname-version
+        """
+        top_elt = self.xml_content.documentElement
+        new_elt = self.xml_content.createElementNS(None, 'repository')
+        new_elt.setAttribute("url_prefix", url_prefix)
+        top_elt.appendChild(new_elt)
+        cache_file = open("%s/%s" % (cache_folder, self.xml_filename), "w") 
+        cache_file.write(self.xml_content.toxml().encode("utf-8"))
+        cache_file.close()
 
 
 

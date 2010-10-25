@@ -60,6 +60,12 @@ if [[ $? -ne 0 ]] ; then
     exit 1
 fi
 
+echo "Domogik repository" > $TMP_DIR/$FILENAME
+if [[ $? -ne 0 ]] ; then
+    echo "Could not write in file $TMP_DIR/$FILENAME"
+    exit 1
+fi
+
 cd $FOLDER
 for fic in $FOLDER/*.xml
   do
