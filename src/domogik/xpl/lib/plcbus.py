@@ -225,6 +225,7 @@ class PLCBUSAPI:
     def stop(self):
         """ Ask thread to stop
         """
+        self._log.debug("Stopping plcbus serial library")
         self._ser_handler.stop()
 
 

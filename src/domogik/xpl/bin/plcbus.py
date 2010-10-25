@@ -78,6 +78,7 @@ class PlcBusMain(XplPlugin):
         # Create log instance
         self._log = self.get_my_logger()
         self.api = PLCBUSAPI(self._log, device, self._command_cb, self._message_cb)
+        self.add_stop_cb(self.api.stop)
         if self._probe_inter != 0:
             self._probe_status = {}
             self._probe_stop = threading.Event()
