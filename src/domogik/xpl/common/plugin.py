@@ -244,6 +244,7 @@ class XplPlugin():
                 if t != threading.current_thread() and t.__class__ != threading._MainThread:
                     self._log.info("The thread %s was not registered, killing it" % t.name)
                     t.join()
+                    self._log.info("Thread %s stopped." % t.name)
             if threading.activeCount() > 1:
                 self._log.warn("There are more than 1 thread remaining : %s" % threading.enumerate())
 
