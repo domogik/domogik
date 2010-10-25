@@ -83,7 +83,7 @@ class PlcBusMain(XplPlugin):
             self._probe_stop = threading.Event()
             self._probe_thr = XplTimer(self._probe_inter, self._send_probe, self._probe_stop, self._myxpl)
             self._probe_thr.start()
-            self.register_timer(self._probe_thr)
+#            self.register_timer(self._probe_thr)
 
     def _send_probe(self):
         """ Send probe message 
