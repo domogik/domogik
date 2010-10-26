@@ -46,7 +46,7 @@
   </configuration-keys>
   <files>
     <file path="src/share/domogik/plugins/plcbus.xml"/>
-    <file path="src/share/domogik/stats/plcbus/plcbus.basic.xml"/>
+    <file path="src/share/domogik/stats/plcbus/plcbus.basic-plcbus.xml"/>
     <file path="src/share/domogik/url2xpl/plcbus/all_lights_off.xml"/>
     <file path="src/share/domogik/url2xpl/plcbus/all_lights_on.xml"/>
     <file path="src/share/domogik/url2xpl/plcbus/bright.xml"/>

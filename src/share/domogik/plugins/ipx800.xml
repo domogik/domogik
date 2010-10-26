@@ -131,7 +131,7 @@ Supported features :
   </configuration-keys>
   <files>
     <file path="src/share/domogik/plugins/ipx800.xml"/>
-    <file path="src/share/domogik/stats/relayboard/sensor.basic.xml"/>
+    <file path="src/share/domogik/stats/relayboard/sensor.basic-ipx800.xml"/>
     <file path="src/share/domogik/url2xpl/relayboard/high.xml"/>
     <file path="src/share/domogik/url2xpl/relayboard/low.xml"/>
     <file path="src/share/domogik/url2xpl/relayboard/pulse.xml"/>

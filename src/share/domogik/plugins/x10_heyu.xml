@@ -25,7 +25,7 @@
   </configuration-keys>
   <files>
     <file path="src/share/domogik/plugins/x10_heyu.xml"/>
-    <file path="src/share/domogik/stats/x10/x10.basic.xml"/>
+    <file path="src/share/domogik/stats/x10/x10.basic-x10_heyu.xml"/>
     <file path="src/share/domogik/url2xpl/x10/bright.xml"/>
     <file path="src/share/domogik/url2xpl/x10/dim.xml"/>
     <file path="src/share/domogik/url2xpl/x10/on.xml"/>
