@@ -222,9 +222,12 @@ class serialHandler(threading.Thread):
 
     def receive(self):
         #Avoid to wait if there is nothing to read
-        if self.__myser.inWaiting() < 9:
-            return
-        message = self.__myser.read(9) #wait for max 400ms if nothing to read
+        try:
+            if self.__myser.inWaiting() < 9:
+                return
+            message = self.__myser.read(9) #wait for max 400ms if nothing to read
+        except IOError:
+            pass
         if(message):
             m_string = hexlify(message)
             #self.explicit_message(m_string)

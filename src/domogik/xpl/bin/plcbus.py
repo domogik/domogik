@@ -91,8 +91,10 @@ class PlcBusMain(XplPlugin):
 
         """
         for h in self._probe_list:
+            self._log.debug("send get_all_id")
             self.api.send("GET_ALL_ID_PULSE", h, self._usercode, 0, 0)
             time.sleep(1)
+            self._log.debug("send get_all_on_id")
             self.api.send("GET_ALL_ON_ID_PULSE", h, self._usercode, 0, 0)
             time.sleep(1)
 
