@@ -1,4 +1,4 @@
-<plugin>
+<package type="plugin">
   <name>onewire</name>
   <technology>1wire</technology>
   <description>Manage 1-wire devices</description>
@@ -91,11 +91,11 @@ List of supported devices :
   </configuration-keys>
   <files>
     <file path="src/share/domogik/plugins/onewire.xml"/>
-    <file path="src/share/domogik/stats/1wire/sensor.basic.xml"/>
+    <file path="src/share/domogik/stats/1wire/sensor.basic-onewire.xml"/>
     <file path="src/domogik/xpl/bin/onewire.py"/>
     <file path="src/domogik/xpl/lib/onewire.py"/>
   </files>
   <depandancies>
     <dep name="pyowfs >= 0.1.3"/>
   </depandancies>
-</plugin>
+</package>

@@ -1,4 +1,4 @@
-<plugin>
+<package type="plugin">
   <name>wol_ping</name>
   <technology>computer</technology>
   <description>Wake on lan and ping computers</description>
@@ -109,10 +109,10 @@
   </configuration-keys>
   <files>
     <file path="src/share/domogik/plugins/wol_ping.xml"/>
-    <file path="src/share/domogik/stats/computer/sensor.basic.xml"/>
+    <file path="src/share/domogik/stats/computer/sensor.basic-wol_ping.xml"/>
     <file path="src/share/domogik/url2xpl/computer/wol.xml"/>
     <file path="src/domogik/xpl/bin/wol_ping.py"/>
     <file path="src/domogik/xpl/lib/wol_ping.py"/>
   </files>
   <depandancies/>
-</plugin>
+</package>

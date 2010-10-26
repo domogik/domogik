@@ -1,4 +1,4 @@
-<plugin>
+<package type="plugin">
   <name>ipx800</name>
   <technology>relayboard</technology>
   <description>IPX800 support</description>
@@ -131,7 +131,7 @@ Supported features :
   </configuration-keys>
   <files>
     <file path="src/share/domogik/plugins/ipx800.xml"/>
-    <file path="src/share/domogik/stats/relayboard/sensor.basic.xml"/>
+    <file path="src/share/domogik/stats/relayboard/sensor.basic-ipx800.xml"/>
     <file path="src/share/domogik/url2xpl/relayboard/high.xml"/>
     <file path="src/share/domogik/url2xpl/relayboard/low.xml"/>
     <file path="src/share/domogik/url2xpl/relayboard/pulse.xml"/>
@@ -139,4 +139,4 @@ Supported features :
     <file path="src/domogik/xpl/lib/ipx800.py"/>
   </files>
   <depandancies/>
-</plugin>
+</package>

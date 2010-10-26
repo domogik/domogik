@@ -1,4 +1,4 @@
-<plugin>
+<package type="plugin">
   <name>cidmodem</name>
   <technology>communication</technology>
   <description>Get caller id with a modem</description>
@@ -33,11 +33,11 @@
   </configuration-keys>
   <files>
     <file path="src/share/domogik/plugins/cidmodem.xml"/>
-    <file path="src/share/domogik/stats/communication/cid.basic.xml"/>
+    <file path="src/share/domogik/stats/communication/cid.basic-cidmodem.xml"/>
     <file path="src/domogik/xpl/bin/cidmodem.py"/>
     <file path="src/domogik/xpl/lib/cidmodem.py"/>
   </files>
   <depandancies>
     <dep name="pySerial > 2.4"/>
   </depandancies>
-</plugin>
+</package>

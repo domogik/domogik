@@ -1,4 +1,4 @@
-<plugin>
+<package type="plugin">
   <name>gagenda</name>
   <technology>communication</technology>
   <description>Get events from a Google agenda</description>
@@ -39,4 +39,4 @@
   </configuration-keys>
   <files/>
   <depandancies/>
-</plugin>
+</package>

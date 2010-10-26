@@ -1,4 +1,4 @@
-<plugin>
+<package type="plugin">
   <name>mirror</name>
   <technology>rfid</technology>
   <description>Use Mir:ror device</description>
@@ -25,11 +25,11 @@
   </configuration-keys>
   <files>
     <file path="src/share/domogik/plugins/mirror.xml"/>
-    <file path="src/share/domogik/stats/rfid/sensor.basic.xml"/>
+    <file path="src/share/domogik/stats/rfid/sensor.basic-mirror.xml"/>
     <file path="src/domogik/xpl/bin/mirror.py"/>
     <file path="src/domogik/xpl/lib/mirror.py"/>
   </files>
   <depandancies>
     <dep name="pySerial > 2.4"/>
   </depandancies>
-</plugin>
+</package>
