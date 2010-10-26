@@ -56,6 +56,7 @@
     <file path="src/share/domogik/url2xpl/plcbus/preset_dim.xml"/>
     <file path="src/domogik/xpl/bin/plcbus.py"/>
     <file path="src/domogik/xpl/lib/plcbus.py"/>
+    <file path="src/domogik/xpl/lib/PLCBusSerialHandler.py"/>
   </files>
   <depandancies>
     <dep name="pySerial > 2.4"/>

@@ -172,6 +172,8 @@ class PackageManager():
             return
         print("Xml file OK")
 
+        # TODO : add a check on type = "plugin"
+
         # display plugin informations
         print("---- Plugin informations --------------------------------")
         print("Name           : %s" % plg_xml.name)
@@ -490,6 +492,7 @@ class PackageXml():
                 self.xml_content = minidom.parseString(xml_data.read())
 
             # read xml file
+            self.type = self.xml_content.getElementsByTagName("package")[0].attributes.get("type").value
             self.name = self.xml_content.getElementsByTagName("name")[0].firstChild.nodeValue
             self.desc = self.xml_content.getElementsByTagName("description")[0].firstChild.nodeValue
             self.detail = self.xml_content.getElementsByTagName("detail")[0].firstChild.nodeValue
@@ -512,9 +515,8 @@ class PackageXml():
                self.depandancies.append(data)
 
             # construct filenames
-            ### TODO : replace "plugin" by in-xml value
-            self.xml_filename = "%s-%s-%s.xml" % ("plugin", self.name, self.version)
-            self.pkg_filename = "%s-%s-%s.tar.gz" % ("plugin", self.name, self.version)
+            self.xml_filename = "%s-%s-%s.xml" % (self.type, self.name, self.version)
+            self.pkg_filename = "%s-%s-%s.tar.gz" % (self.type, self.name, self.version)
         except:
             raise PackageException("Error reading xml file : %s : %s" % (xml_file, str(traceback.format_exc())))
 
