@@ -52,8 +52,8 @@ class plcbus(Helper):
                 {
                 "cb" : self.all,
                 "desc" : "Show all devices found on plcbus network",
-                "min_args" : 1,
-                "usage" : "find device for specified  house code <house code>"
+                "min_args" : 2,
+                "usage" : "find device for specified  house code <house code> and user code <user code>."
                 }
             }
         log = logger.Logger('plcbus-helper')
@@ -62,10 +62,11 @@ class plcbus(Helper):
         self.api1 = PLCBUSAPI(self._log, device, self._command_cb, self._message_cb)
 
     def all(self, args = None):
-        self._usercode = '00'
-        self.api1.send("GET_ALL_ID_PULSE", args[0] , self._usercode )
+        self._usercode = args[1]
+        self._homecode = args[0].upper()
+        self.api1.send("GET_ALL_ID_PULSE", self._homecode , self._usercode )
         time.sleep(1)
-        self.api1.send("GET_ALL_ON_ID_PULSE", args[0] , self._usercode )
+        self.api1.send("GET_ALL_ON_ID_PULSE", self._homecode , self._usercode )
 
         self._event.wait()
         self._event.clear()
