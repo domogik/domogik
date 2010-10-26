@@ -69,6 +69,7 @@ class plcbus(Helper):
 
         self._event.wait()
         self._event.clear()
+        self.api1.stop()
         return self.liste_found
 
     def _command_cb(self, f):
@@ -98,7 +99,7 @@ class plcbus(Helper):
                     else:
                         #self.liste_found.append("%s%s" % (code," OFFFFFF"))
                         self.liste_found[j] = ("%s%s" % (self.liste_found[j]," OFF"))
-                self._event.set()
+            self._event.set()
 
     def _message_cb(self, message):
         print "Message : %s " % message
