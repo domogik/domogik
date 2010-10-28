@@ -60,7 +60,7 @@ import pkgutil
 
 KILL_TIMEOUT = 2
 PING_DURATION = 5
-WAIT_TIME_BETWEEN_PING = 15
+WAIT_TIME_BETWEEN_PING = 30
 
 
 class SysManager(XplPlugin):
