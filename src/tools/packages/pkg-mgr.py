@@ -177,25 +177,13 @@ class PackageManager():
             return
         print("Xml file OK")
 
-        # TODO : add a check on type = "plugin"
+        # check type == plugin
+        if plg_xml.type != "plugin":
+            print("Error : this package is not a plugin")
+            return
 
         # display plugin informations
-        print("---- Plugin informations --------------------------------")
-        print("Name           : %s" % plg_xml.name)
-        print("Version        : %s" % plg_xml.version)
-        print("Technology     : %s" % plg_xml.techno)
-        print("Link for doc   : %s" % plg_xml.doc)
-        print("Description    : %s" % plg_xml.desc)
-        print("Detail         : %s" % plg_xml.detail)
-        print("Author         : %s" % plg_xml.author)
-        print("Author's email : %s" % plg_xml.email)
-        print("----- Plugin depandancies -------------------------------")
-        for dep in plg_xml.depandancies:
-            print("- %s" % dep["name"])
-        print("----- Plugin files --------------------------------------")
-        for my_file in plg_xml.files:
-            print("- %s" % my_file["path"])
-        print("---------------------------------------------------------")
+        plg_xml.display()
 
         # check file existence
         if plg_xml.files == []:
