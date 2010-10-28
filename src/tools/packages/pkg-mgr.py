@@ -494,19 +494,24 @@ class PackageManager():
         for root, dirs, files in os.walk(REPO_CACHE_DIR):
             for f in files:
                 pkg_xml = PackageXml(path = "%s/%s" % (root, f))
-                pkg_list.append({"name" : pkg_xml.name,
-                                 "type" : pkg_xml.type,
+                pkg_list.append({"fullname" : pkg_xml.fullname,
                                  "version" : pkg_xml.version,
                                  "desc" : pkg_xml.desc})
-        pkg_list =  sorted(pkg_list, key = lambda k: (k['type'], 
-                                                      k['name'],
+        pkg_list =  sorted(pkg_list, key = lambda k: (k['fullname'], 
                                                       k['version']))
         for pkg in pkg_list:
-             print("%s : %-8s (%s) : %s" % (pkg["type"], 
-                                          pkg["name"], 
-                                          pkg["version"], 
-                                          pkg["desc"]))
+             print("%s (%s) : %s" % (pkg["fullname"], 
+                                     pkg["version"], 
+                                     pkg["desc"]))
 
+    def _show_packages(self, name, version = None):
+        """ Show a package description
+        """
+        pkg_list = []
+        for root, dirs, files in os.walk(REPO_CACHE_DIR):
+            for f in files:
+                pkg_xml = PackageXml(path = "%s/%s" % (root, f))
+              
 
 
 class PackageXml():
@@ -562,6 +567,7 @@ class PackageXml():
                self.depandancies.append(data)
 
             # construct filenames
+            self.fullname = "%s-%s" % (self.type, self.name)
             self.xml_filename = "%s-%s-%s.xml" % (self.type, self.name, self.version)
             self.pkg_filename = "%s-%s-%s.tar.gz" % (self.type, self.name, self.version)
         except:
