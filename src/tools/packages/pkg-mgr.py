@@ -103,6 +103,11 @@ class PackageManager():
                           dest = "action_update",
                           default = False,
                           help = "Update packages list")
+        parser.add_option("-l", "--list",
+                          action = "store_true", 
+                          dest = "action_list",
+                          default = False,
+                          help = "Display cache's package list")
         parser.add_option("-t", "--type",
                           action = "store", 
                           dest = "package_type",
@@ -115,7 +120,9 @@ class PackageManager():
         (self.options, self.args) = parser.parse_args()
 
         # check args
-        if self.options.action_update == False and len(self.args) != 1:
+        if (self.options.action_update == False \
+                and self.options.action_list == False )\
+                and len(self.args) != 1:
             print("Error : missing argument : plugin name")
             return
   
@@ -147,14 +154,27 @@ class PackageManager():
         if self.options.action_update == True:
             # check package type and -o
             if self.options.package_type != None:
-                print("Error : --type should not be used with install option")
+                print("Error : --type should not be used with update option")
                 return
             if self.options.output_dir != None:
-                print("Error : --output-dir should not be used with install option")
+                print("Error : --output-dir should not be used with update option")
                 return
 
             # update list
             self._update_list()
+
+        # list packages in cache
+        if self.options.action_list == True:
+            # check package type and -o
+            if self.options.package_type != None:
+                print("Error : --type should not be used with list option")
+                return
+            if self.options.output_dir != None:
+                print("Error : --output-dir should not be used with list option")
+                return
+
+            # update list
+            self._list_packages()
         
 
     def _create_package_for_plugin(self, name, output_dir):
@@ -467,12 +487,34 @@ class PackageManager():
             return []
 
 
+    def _list_packages(self):
+        """ List all packages in cache folder 
+        """
+        pkg_list = []
+        for root, dirs, files in os.walk(REPO_CACHE_DIR):
+            for f in files:
+                pkg_xml = PackageXml(path = "%s/%s" % (root, f))
+                pkg_list.append({"name" : pkg_xml.name,
+                                 "type" : pkg_xml.type,
+                                 "version" : pkg_xml.version,
+                                 "desc" : pkg_xml.desc})
+        pkg_list =  sorted(pkg_list, key = lambda k: (k['type'], 
+                                                      k['name'],
+                                                      k['version']))
+        for pkg in pkg_list:
+             print("%s : %-8s (%s) : %s" % (pkg["type"], 
+                                          pkg["name"], 
+                                          pkg["version"], 
+                                          pkg["desc"]))
+
+
 
 class PackageXml():
-    def __init__(self, name = None, url = None):
+    def __init__(self, name = None, url = None, path = None):
         """ Read xml file of a plugin and make an object from it
             @param name : name of plugin
             @param url : url of xml file
+            @param path : path of xml file
         """
         try:
             if name != None:
@@ -485,6 +527,11 @@ class PackageXml():
                 self.info_file = xml_file
                 self.xml_content = minidom.parse(xml_file)
     
+            if path != None:
+                xml_file = path
+                self.info_file = xml_file
+                self.xml_content = minidom.parse(xml_file)
+
             if url != None:
                 xml_file = url
                 self.info_file = xml_file
