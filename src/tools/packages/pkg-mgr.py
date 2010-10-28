@@ -144,7 +144,10 @@ class PackageManager():
 
         # package installation
         if self.options.action_install == True:
-            self._install_package(self.args[0])
+            if len(self.args) == 1:
+                self._install_package(self.args[0])
+            if len(self.args) == 2:
+                self._install_package(self.args[0], self.args[1])
 
         # packages list update
         if self.options.action_update == True:
@@ -276,7 +279,7 @@ class PackageManager():
         print("OK")
     
 
-    def _install_package(self, path):
+    def _install_package(self, path, version = None):
         """ Install a package
             0. Eventually download package
             1. Extract tar.gz
@@ -284,8 +287,16 @@ class PackageManager():
             3. Launch setup install.py
             @param path : path for tar.gz
         """
+        # package from repository
+        if path[0:5] == "repo:":
+            pkg = self._find_package(path[5:], version)
+            if pkg == None:
+                return
+            path = pkg.package_url
+
         # get plugin name
         full_name = os.path.basename(path)
+
         # twice to remove first .gz and then .tar
         name =  os.path.splitext(full_name)[0]
         name =  os.path.splitext(name)[0] 
@@ -482,6 +493,16 @@ class PackageManager():
             @param fullname : fullname of package (type-name)
             @param version : optionnal : version to display (if several)
         """
+        pkg = self._find_package(fullname, version)
+        if pkg != None:
+            pkg.display()
+
+
+    def _find_package(self, fullname, version = None):
+        """ Find a package and return xml data or None if not found
+            @param fullname : fullname of package (type-name)
+            @param version : optionnal : version to display (if several)
+        """
         pkg_list = []
         for root, dirs, files in os.walk(REPO_CACHE_DIR):
             for f in files:
@@ -497,16 +518,18 @@ class PackageManager():
                                          "version" : pkg_xml.version,
                                          "xml" : pkg_xml})
         if len(pkg_list) == 0:
+            if version == None:
+                version = "*"
             print("No package corresponding to '%s' in version '%s'" % (fullname, version))
-            return
+            return None
         if len(pkg_list) > 1:
             print("Several packages are available for '%s'. Please specify which version to display" % fullname)
             for pkg in pkg_list:
                  print("%s (%s)" % (pkg["fullname"], 
                                     pkg["version"]))
-            return
+            return None
 
-        pkg_list[0]["xml"].display()
+        return pkg_list[0]["xml"]
               
 
 
