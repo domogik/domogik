@@ -109,7 +109,7 @@ class OneWireManager(XplPlugin):
             self._config.query('onewire', 'ds2401-int', res)
             ds2401_interval = res.get_value()['ds2401-int']
     
-            ### Open one wire entwork
+            ### Open one wire network
             try:
                 ow = OneWireNetwork(self._log, device, cache)
             except OneWireException as e:
