@@ -62,4 +62,5 @@ for fic in $INPUT/*.tar.gz
     fi
     mv info.xml $package_name.xml
     cp $fic .
+    rm -f $fic
 done
