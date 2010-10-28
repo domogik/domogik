@@ -108,6 +108,11 @@ class PackageManager():
                           dest = "action_list",
                           default = False,
                           help = "Display cache's package list")
+        parser.add_option("-s", "--show",
+                          action = "store_true", 
+                          dest = "action_show",
+                          default = False,
+                          help = "Display cache's package list")
         parser.add_option("-t", "--type",
                           action = "store", 
                           dest = "package_type",
@@ -122,7 +127,7 @@ class PackageManager():
         # check args
         if (self.options.action_update == False \
                 and self.options.action_list == False )\
-                and len(self.args) != 1:
+                and len(self.args) < 1:
             print("Error : missing argument : plugin name")
             return
   
@@ -139,42 +144,22 @@ class PackageManager():
 
         # package installation
         if self.options.action_install == True:
-            # check package type and -o
-            if self.options.package_type != None:
-                print("Error : --type should not be used with install option")
-                return
-            if self.options.output_dir != None:
-                print("Error : --output-dir should not be used with install option")
-                return
-
-            # install
             self._install_package(self.args[0])
 
         # packages list update
         if self.options.action_update == True:
-            # check package type and -o
-            if self.options.package_type != None:
-                print("Error : --type should not be used with update option")
-                return
-            if self.options.output_dir != None:
-                print("Error : --output-dir should not be used with update option")
-                return
-
-            # update list
             self._update_list()
 
         # list packages in cache
         if self.options.action_list == True:
-            # check package type and -o
-            if self.options.package_type != None:
-                print("Error : --type should not be used with list option")
-                return
-            if self.options.output_dir != None:
-                print("Error : --output-dir should not be used with list option")
-                return
-
-            # update list
             self._list_packages()
+        
+        # show packages in cache
+        if self.options.action_show == True:
+            if len(self.args) == 1:
+                self._show_packages(self.args[0])
+            if len(self.args) == 2:
+                self._show_packages(self.args[0], self.args[1])
         
 
     def _create_package_for_plugin(self, name, output_dir):
@@ -504,13 +489,36 @@ class PackageManager():
                                      pkg["version"], 
                                      pkg["desc"]))
 
-    def _show_packages(self, name, version = None):
+    def _show_packages(self, fullname, version = None):
         """ Show a package description
+            @param fullname : fullname of package (type-name)
+            @param version : optionnal : version to display (if several)
         """
         pkg_list = []
         for root, dirs, files in os.walk(REPO_CACHE_DIR):
             for f in files:
                 pkg_xml = PackageXml(path = "%s/%s" % (root, f))
+                if version == None:
+                    if fullname == pkg_xml.fullname:
+                        pkg_list.append({"fullname" : pkg_xml.fullname,
+                                         "version" : pkg_xml.version,
+                                         "xml" : pkg_xml})
+                else:
+                    if fullname == pkg_xml.fullname and version == pkg_xml.version:
+                        pkg_list.append({"fullname" : pkg_xml.fullname,
+                                         "version" : pkg_xml.version,
+                                         "xml" : pkg_xml})
+        if len(pkg_list) == 0:
+            print("No package corresponding to '%s' in version '%s'" % (fullname, version))
+            return
+        if len(pkg_list) > 1:
+            print("Several packages are available for '%s'. Please specify which version to display" % fullname)
+            for pkg in pkg_list:
+                 print("%s (%s)" % (pkg["fullname"], 
+                                    pkg["version"]))
+            return
+
+        pkg_list[0]["xml"].display()
               
 
 
@@ -570,6 +578,17 @@ class PackageXml():
             self.fullname = "%s-%s" % (self.type, self.name)
             self.xml_filename = "%s-%s-%s.xml" % (self.type, self.name, self.version)
             self.pkg_filename = "%s-%s-%s.tar.gz" % (self.type, self.name, self.version)
+
+            # repository specifics
+            rep = self.xml_content.getElementsByTagName("repository")
+            if len(rep) == 0:
+                self.package_url = None
+                self.xml_url = None
+            else:
+                url_prefix = rep[0].attributes.get("url_prefix").value
+                self.package_url = "%s.tar.gz" % url_prefix
+                self.xml_url = "%s.xml" % url_prefix
+
         except:
             raise PackageException("Error reading xml file : %s : %s" % (xml_file, str(traceback.format_exc())))
 
@@ -587,6 +606,32 @@ class PackageXml():
         cache_file = open("%s/%s" % (cache_folder, self.xml_filename), "w") 
         cache_file.write(self.xml_content.toxml().encode("utf-8"))
         cache_file.close()
+
+    def display(self):
+        """ Display xml data in a fine way
+        """
+        print("---- Plugin informations --------------------------------")
+        print("Type           : %s" % self.type)
+        print("Name           : %s" % self.name)
+        print("Full name      : %s" % self.fullname)
+        print("Version        : %s" % self.version)
+        print("Technology     : %s" % self.techno)
+        print("Link for doc   : %s" % self.doc)
+        print("Description    : %s" % self.desc)
+        print("Detail         : %s" % self.detail)
+        print("Author         : %s" % self.author)
+        print("Author's email : %s" % self.email)
+        print("----- Plugin depandancies -------------------------------")
+        for dep in self.depandancies:
+            print("- %s" % dep["name"])
+        print("----- Plugin files --------------------------------------")
+        for my_file in self.files:
+            print("- %s" % my_file["path"])
+        if self.package_url != None:
+            print("----- Repository informations ---------------------------")
+            print("Package path   : %s" % self.package_url)
+            print("Xml path       : %s" % self.xml_url)
+        print("---------------------------------------------------------")
 
 
 
