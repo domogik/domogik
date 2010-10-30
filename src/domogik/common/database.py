@@ -1751,6 +1751,9 @@ class DbHelper():
         @return a list of DeviceStats objects (older records first)
 
         """
+        if start_date_ts and end_date_ts:
+            if end_date_ts < start_date_ts:
+                raise DbHelperException("'end_date' can't be prior to 'start_date'")
         query = self.__session.query(
                         DeviceStats
                     ).filter_by(key=ucode(ds_key)
