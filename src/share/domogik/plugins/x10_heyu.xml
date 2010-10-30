@@ -6,7 +6,7 @@
   <version>0.1.0</version>
   <documentation>http://wiki.domogik.org/tiki-index.php?page=plugin_x10_heyu</documentation>
   <author>Maxence Dunnewind, Mirelsol</author>
-  <author-email>maxence at dunnewind.net; ??? email mirelsol ???</author-email>
+  <author-email>maxence at dunnewind.net; marc at mirelsol.org</author-email>
   <configuration-keys>
     <key>
       <order-id>0</order-id>
