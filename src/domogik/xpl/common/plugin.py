@@ -304,7 +304,7 @@ class Watcher:
             return
         else:
             self._plugin = plugin
-            self._plugin._log.debug("watcher fork")
+            self._plugin.log.debug("watcher fork")
             signal.signal(signal.SIGTERM, self._signal_handler)
             self.watch()
 
@@ -312,7 +312,7 @@ class Watcher:
         """ Handler called when a SIGTERM is received
         Stop the plugin
         """
-        self._plugin._log.info("SIGTERM receive, stopping plugin")
+        self._plugin.log.info("SIGTERM receive, stopping plugin")
         self._plugin.force_leave()
         self.kill()
 
@@ -321,7 +321,7 @@ class Watcher:
             os.wait()
         except KeyboardInterrupt:
             print 'KeyBoardInterrupt'
-            self._plugin._log.info("Keyoard Interrupt detected, leave now.")
+            self._plugin.log.info("Keyoard Interrupt detected, leave now.")
             self._plugin.force_leave()
             self.kill()
         except OSError:

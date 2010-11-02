@@ -284,7 +284,7 @@ class Listener:
         @param filter : dictionnary { key : value }. If value is a list, then the 
         listener will check if the key equals any of these values
         """
-        manager._log.debug("New listener, filter : %s" % filter)
+        manager.log.debug("New listener, filter : %s" % filter)
         self._callback = cb
         self._filter = filter
         self._manager = manager
@@ -386,7 +386,7 @@ class XplTimer():
         @param time : time of loop in second
         @param cb : callback function which will be call eact 'time' seconds
         """
-        self._timer = self.__InternalTimer(time, cb, stop, manager._log)
+        self._timer = self.__InternalTimer(time, cb, stop, manager.log)
         self._stop = stop
         self._manager = manager
         self.log = manager.log
