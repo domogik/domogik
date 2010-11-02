@@ -114,7 +114,7 @@ class ProcessRequest():
 
         # shorter access
         self._rest_api_version = self.handler_params[0]._rest_api_version
-        self._myxpl = self.handler_params[0]._myxpl
+        self.myxpl = self.handler_params[0]._myxpl
         self._log = self.handler_params[0]._log
         self._log_dm = self.handler_params[0]._log_dm
         self._xml_cmd_dir = self.handler_params[0]._xml_cmd_dir
@@ -370,7 +370,7 @@ class ProcessRequest():
         (schema, xpl_type, filters) = self._rest_command_get_listener(techno, address, command)
 
         ### Send xpl message
-        self._myxpl.send(XplMessage(message))
+        self.myxpl.send(XplMessage(message))
 
         ### Wait for answer
         # get xpl message from queue
@@ -765,7 +765,7 @@ target=*
             return
 
         self._log.debug("Send message : %s" % str(message))
-        self._myxpl.send(message)
+        self.myxpl.send(message)
 
         # REST processing finished and OK
         json_data = JSonHelper("OK")
@@ -2183,7 +2183,7 @@ target=*
         # TODO : ask for good host
         #message.add_data({"host" : gethostname()})
         message.add_data({"host" : "*"})
-        self._myxpl.send(message)
+        self.myxpl.send(message)
         self._log.debug("Plugin : send message : %s" % str(message))
 
         ### Wait for answer
@@ -2255,7 +2255,7 @@ target=*
         message.add_data({"plugin" : name})
         # TODO : ask for good host
         message.add_data({"host" : host})
-        self._myxpl.send(message)
+        self.myxpl.send(message)
         self._log.debug("Plugin : send message : %s" % str(message))
 
         ### Wait for answer
@@ -2326,7 +2326,7 @@ target=*
         cmd_message.add_data({"command" : command})
         cmd_message.add_data({"host" : host})
         cmd_message.add_data({"plugin" : plugin})
-        self._myxpl.send(cmd_message)
+        self.myxpl.send(cmd_message)
         self._log.debug("Plugin : send message : %s" % str(cmd_message))
 
         ### Listen for response
@@ -3066,12 +3066,12 @@ target=*
         mess.add_data({'command' : 'ping'})
         mess.add_data({'host' : gethostname()})
         mess.add_data({'plugin' : name})
-        Listener(self._cb_check_component_is_running, self._myxpl, {'schema':'domogik.system', \
+        Listener(self._cb_check_component_is_running, self.myxpl, {'schema':'domogik.system', \
                 'xpltype':'xpl-trig','command':'ping','plugin':name,'host':gethostname()}, \
                 cb_params = {'name' : name})
         max_time = PING_DURATION
         while max_time != 0:
-            self._myxpl.send(mess)
+            self.myxpl.send(mess)
             time.sleep(1)
             max_time = max_time - 1
             if self._pinglist[name].isSet():

@@ -81,7 +81,7 @@ class XplPlugin():
             self.__dict__['_XplPlugin__instance'] = XplPlugin.__instance
         elif stop_cb is not None:
             XplPlugin.__instance.add_stop_cb(stop_cb)
-        self._log.debug("after watcher")
+        self.log.debug("after watcher")
 
     def __getattr__(self, attr):
         """ Delegate access to implementation """
@@ -113,8 +113,8 @@ class XplPlugin():
             '''
             BasePlugin.__init__(self, name, stop_cb, parser, daemonize)
             Watcher(self)
-            self._log.info("----------------------------------")
-            self._log.info("Starting plugin '%s' (new manager instance)" % name)
+            self.log.info("----------------------------------")
+            self.log.info("Starting plugin '%s' (new manager instance)" % name)
             self._is_manager = is_manager
             self._name = name
             cfg = Loader('domogik')
@@ -129,14 +129,14 @@ class XplPlugin():
             else:
                 broadcast = "255.255.255.255"
             if 'bind_interface' in config:
-                self._myxpl = Manager(config['bind_interface'], broadcast = broadcast)
+                self.myxpl = Manager(config['bind_interface'], broadcast = broadcast)
             else:
-                self._myxpl = Manager(broadcast = broadcast)
-            self._l = Listener(self._system_handler, self._myxpl, {'schema' : 'domogik.system',
+                self.myxpl = Manager(broadcast = broadcast)
+            self._l = Listener(self._system_handler, self.myxpl, {'schema' : 'domogik.system',
                                                                    'xpltype':'xpl-cmnd'})
             self._reload_cb = reload_cb
             self._dump_cb = dump_cb
-            self._log.debug("end single xpl plugin")
+            self.log.debug("end single xpl plugin")
 
         def _get_pid(self):
             """ Get current pid and write it to a file
@@ -144,7 +144,7 @@ class XplPlugin():
             pid = os.getpid()
             pid_file = os.path.join(self._pid_dir_path, 
                                     self._name + ".pid")
-            self._log.debug("Write pid file for pid '%s' in file '%s'" % (str(pid), pid_file))
+            self.log.debug("Write pid file for pid '%s' in file '%s'" % (str(pid), pid_file))
             fil = open(pid_file, "w")
             fil.write(str(pid))
             fil.close()
@@ -165,18 +165,18 @@ class XplPlugin():
             cmd = message.data["command"]
             plugin = message.data["plugin"]
             if cmd == "stop" and plugin in ['*', self.get_plugin_name()]:
-                self._log.info("Someone asked to stop %s, doing." % self.get_plugin_name())
+                self.log.info("Someone asked to stop %s, doing." % self.get_plugin_name())
                 self._answer_stop()
                 self.force_leave()
             elif cmd == "reload":
                 if self._reload_cb is None:
-                    self._log.info("Someone asked to reload config of %s, but the plugin \
+                    self.log.info("Someone asked to reload config of %s, but the plugin \
                     isn't able to do it." % self.get_plugin_name())
                 else:
                     self._reload_cb()
             elif cmd == "dump":
                 if self._dump_cb is None:
-                    self._log.info("Someone asked to dump config of %s, but the plugin \
+                    self.log.info("Someone asked to dump config of %s, but the plugin \
                     isn't able to do it." % self.get_plugin_name())
                 else:
                     self._dump_cb()
@@ -185,7 +185,7 @@ class XplPlugin():
                     self._answer_ping()
 
         def __del__(self):
-            self._log.debug("__del__ Single xpl plugin")
+            self.log.debug("__del__ Single xpl plugin")
             self.force_leave()
 
         def _answer_stop(self):
@@ -196,7 +196,7 @@ class XplPlugin():
             mess.set_schema("domogik.system")
             mess.add_data({"command":"stop", "plugin": self.get_plugin_name(),
                 "host": gethostname()})
-            self._myxpl.send(mess)
+            self.myxpl.send(mess)
 
         def _answer_ping(self):
             """ Send a ping reply
@@ -206,7 +206,7 @@ class XplPlugin():
             mess.set_schema("domogik.system")
             mess.add_data({"command":"ping", "plugin": self.get_plugin_name(),
                 "host": gethostname()})
-            self._myxpl.send(mess)
+            self.myxpl.send(mess)
 
         def _manager_handler(self, message):
             """ Handle domogik system request for the Domogik manager
@@ -216,37 +216,37 @@ class XplPlugin():
         def wait(self):
 	    """ Wait until someone ask the plugin to stop
             """
-            self._myxpl._network.join()
+            self.myxpl._network.join()
 
         def force_leave(self):
             '''
             Leave threads & timers
             '''
-            self._log.debug("force_leave called")
+            self.log.debug("force_leave called")
             self.get_stop().set()
             for t in self._timers:
-                self._log.debug("Try to stop timer %s"  % t)
+                self.log.debug("Try to stop timer %s"  % t)
                 t.stop()
-                self._log.debug("Timer stopped %s" % t)
+                self.log.debug("Timer stopped %s" % t)
             for cb in self._stop_cb:
-                self._log.debug("Calling stop additionnal method : %s " % cb.__name__)
+                self.log.debug("Calling stop additionnal method : %s " % cb.__name__)
                 cb()
             for t in self._threads:
-                self._log.debug("Try to stop thread %s" % t)
+                self.log.debug("Try to stop thread %s" % t)
                 try:
                     t.join()
                 except RuntimeError:
                     pass
-                self._log.debug("Thread stopped %s" % t)
+                self.log.debug("Thread stopped %s" % t)
                 #t._Thread__stop()
             #Finally, we try to delete all remaining threads
             for t in threading.enumerate():
                 if t != threading.current_thread() and t.__class__ != threading._MainThread:
-                    self._log.info("The thread %s was not registered, killing it" % t.name)
+                    self.log.info("The thread %s was not registered, killing it" % t.name)
                     t.join()
-                    self._log.info("Thread %s stopped." % t.name)
+                    self.log.info("Thread %s stopped." % t.name)
             if threading.activeCount() > 1:
-                self._log.warn("There are more than 1 thread remaining : %s" % threading.enumerate())
+                self.log.warn("There are more than 1 thread remaining : %s" % threading.enumerate())
 
 
 class XplResult():

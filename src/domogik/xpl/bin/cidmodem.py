@@ -54,24 +54,24 @@ class CIDManager(XplPlugin):
         XplPlugin.__init__(self, name='cidmodem')
 
         # Configuration
-        self._config = Query(self._myxpl, self.get_my_logger())
+        self._config = Query(self.myxpl, self.get_my_logger())
         res = XplResult()
         self._config.query('cidmodem', 'device', res)
         device = res.get_value()['device']
 
-        self._config = Query(self._myxpl, self.get_my_logger())
+        self._config = Query(self.myxpl, self.get_my_logger())
         res = XplResult()
         self._config.query('cidmodem', 'cid-command', res)
         cid_command = res.get_value()['cid-command']
 
         # Init Modem
-        cid  = CallerIdModem(self._log, self.send_xpl)
+        cid  = CallerIdModem(self.log, self.send_xpl)
         
         # Open Modem
         try:
             cid.open(device, cid_command)
         except CallerIdModemException as e:
-            self._log.error(e.value)
+            self.log.error(e.value)
             print e.value
             self.force_leave()
             return
@@ -94,7 +94,7 @@ class CIDManager(XplPlugin):
         msg.set_schema("cid.basic")
         msg.add_data({"calltype" : "INBOUND"})
         msg.add_data({"phone" : num})
-        self._myxpl.send(msg)
+        self.myxpl.send(msg)
 
 
 if __name__ == "__main__":

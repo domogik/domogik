@@ -52,7 +52,7 @@ class WolPing(XplPlugin):
         XplPlugin.__init__(self, name = 'wol_ping')
 
         # Configuration : interval between each ping
-        self._config = Query(self._myxpl, self._log)
+        self._config = Query(self.myxpl, self.log)
         res = XplResult()
         self._config.query('wol_ping', 'ping-interval', res)
         interval = res.get_value()['ping-interval']
@@ -64,24 +64,24 @@ class WolPing(XplPlugin):
         num = 1
         loop = True
         while loop == True:
-            self._config = Query(self._myxpl, self._log)
+            self._config = Query(self.myxpl, self.log)
             res = XplResult()
             self._config.query('wol_ping', 'cmp-%s-name' % str(num), res)
             name = res.get_value()['cmp-%s-name' % str(num)]
-            self._config = Query(self._myxpl, self._log)
+            self._config = Query(self.myxpl, self.log)
             res = XplResult()
             self._config.query('wol_ping', 'cmp-%s-ip' % str(num), res)
             ip = res.get_value()['cmp-%s-ip' % str(num)]
-            self._config = Query(self._myxpl, self._log)
+            self._config = Query(self.myxpl, self.log)
             res = XplResult()
             self._config.query('wol_ping', 'cmp-%s-mac' % str(num), res)
             mac = res.get_value()['cmp-%s-mac' % str(num)]
-            self._config = Query(self._myxpl, self._log)
+            self._config = Query(self.myxpl, self.log)
             res = XplResult()
             self._config.query('wol_ping', 'cmp-%s-macport' % str(num), res)
             mac_port = res.get_value()['cmp-%s-macport' % str(num)]
             if name != "None":
-                self._log.info("Configuration : name=%s, ip=%s, mac=%s, mac port=%s" % (name, ip, mac, mac_port))
+                self.log.info("Configuration : name=%s, ip=%s, mac=%s, mac port=%s" % (name, ip, mac, mac_port))
                 self.computers[name] = {"ip" : ip, "mac" : mac, 
                                         "mac_port" : mac_port}
             else:
@@ -89,14 +89,14 @@ class WolPing(XplPlugin):
             num += 1
 
         ### Create WOL object
-        self._wolmanager = WOL(self._log)
+        self._wolmanager = WOL(self.log)
         # Create listeners
-        Listener(self.wol_cb, self._myxpl, {'schema': 'control.basic',
+        Listener(self.wol_cb, self.myxpl, {'schema': 'control.basic',
                 'xpltype': 'xpl-cmnd', 'type': 'wakeonlan', 'current': 'HIGH'})
-        self._log.debug("Listener for wake on lan created")
+        self.log.debug("Listener for wake on lan created")
 
         ### Create Ping object
-        self._pingmanager = Ping(self._log, self.ping_cb, float(interval),
+        self._pingmanager = Ping(self.log, self.ping_cb, float(interval),
                                  self.computers)
         self._pingmanager.ping()
 
@@ -111,10 +111,10 @@ class WolPing(XplPlugin):
             mac = self.computers[device]["mac"]
             port = int(self.computers[device]["mac_port"])
         except KeyError:
-            self._log.warning("Computer named '%s' is not defined" % device)
+            self.log.warning("Computer named '%s' is not defined" % device)
             return
         
-        self._log.info("Wake on lan command received for '%s' on port '%s'" %
+        self.log.info("Wake on lan command received for '%s' on port '%s'" %
                        (mac, port))
         #status = self._wolmanager.wake_up(mac, port)
         status = self._wolmanager.wake_up(mac, port)
@@ -127,7 +127,7 @@ class WolPing(XplPlugin):
             mess.add_data({'device' :  device})
             mess.add_data({'type' :  'wakeonlan'})
             mess.add_data({'current' :  'HIGH'})
-            self._myxpl.send(mess)
+            self.myxpl.send(mess)
 
 
     def ping_cb(self, type, computer, status):
@@ -138,7 +138,7 @@ class WolPing(XplPlugin):
         msg.add_data({'device' :  computer})
         msg.add_data({'type' :  'ping'})
         msg.add_data({'current' :  status})
-        self._myxpl.send(msg)
+        self.myxpl.send(msg)
 
 
 if __name__ == "__main__":

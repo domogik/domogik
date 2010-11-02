@@ -80,7 +80,7 @@ class XPLDateTime(XplPlugin):
         mess.add_data({"time" :  time})
         mess.add_data({"datetime" :  datetime})
         mess.add_data({"format1" :  datetimedaynumber})
-        self._myxpl.send(mess)
+        self.myxpl.send(mess)
 
 if __name__ == "__main__":
     XPLDateTime()

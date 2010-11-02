@@ -56,9 +56,9 @@ class PlcBusMain(XplPlugin):
         '''
         # Load config
         XplPlugin.__init__(self, name = 'plcbus')
-        self._config = Query(self._myxpl, self._log)
+        self._config = Query(self.myxpl, self.log)
         # Create listeners
-        Listener(self._plcbus_cmnd_cb, self._myxpl, {
+        Listener(self._plcbus_cmnd_cb, self.myxpl, {
             'schema': 'plcbus.basic',
             'xpltype': 'xpl-cmnd',
         })
@@ -76,13 +76,13 @@ class PlcBusMain(XplPlugin):
         self._probe_list = res.get_value()['probe-list']
 
         # Create log instance
-        self._log = self.get_my_logger()
-        self.api = PLCBUSAPI(self._log, device, self._command_cb, self._message_cb)
+        self.log = self.get_my_logger()
+        self.api = PLCBUSAPI(self.log, device, self._command_cb, self._message_cb)
         self.add_stop_cb(self.api.stop)
         if self._probe_inter != 0:
             self._probe_status = {}
             self._probe_stop = threading.Event()
-            self._probe_thr = XplTimer(self._probe_inter, self._send_probe, self._probe_stop, self._myxpl)
+            self._probe_thr = XplTimer(self._probe_inter, self._send_probe, self._probe_stop, self.myxpl)
             self._probe_thr.start()
 #            self.register_timer(self._probe_thr)
 
@@ -91,10 +91,10 @@ class PlcBusMain(XplPlugin):
 
         """
         for h in self._probe_list:
-            self._log.debug("send get_all_id")
+            self.log.debug("send get_all_id")
             self.api.send("GET_ALL_ID_PULSE", h, self._usercode, 0, 0)
             time.sleep(1)
-            self._log.debug("send get_all_on_id")
+            self.log.debug("send get_all_on_id")
             self.api.send("GET_ALL_ON_ID_PULSE", h, self._usercode, 0, 0)
             time.sleep(1)
 
@@ -119,7 +119,7 @@ class PlcBusMain(XplPlugin):
             level = message.data['data1']
         if 'data2' in message.data:
             rate = message.data['data2']
-        self._log.debug("%s received : device = %s, user code = %s, level = "\
+        self.log.debug("%s received : device = %s, user code = %s, level = "\
                 "%s, rate = %s" % (cmd.upper(), dev, user, level, rate))
 #        if cmd == 'GET_ALL_ON_ID_PULSE':
 #            self.api.get_all_on_id(user, dev)
@@ -144,7 +144,7 @@ class PlcBusMain(XplPlugin):
                 code = "%s%s" % (house, i+1)
                 if unit and not code in self._probe_status:
                     self._probe_status[code] = ""
-                    self._log.info("New device discovered : %s" % code)
+                    self.log.info("New device discovered : %s" % code)
                 elif (not unit) and code in self._probe_status:
                     del self._probe_status[code]
         elif f["d_command"] == "GET_ALL_ON_ID_PULSE":
@@ -165,14 +165,14 @@ class PlcBusMain(XplPlugin):
                     mess.set_schema('plcbus.basic')
                     mess.add_data({"usercode" : f["d_user_code"], "device": code,
                                    "command": command})
-                    self._myxpl.send(mess)
+                    self.myxpl.send(mess)
         else:
             mess = XplMessage()
             mess.set_type('xpl-trig')
             mess.set_schema('plcbus.basic')
             mess.add_data({"usercode" : f["d_user_code"], "device": f["d_home_unit"],
                            "command": f["d_command"], "data1": f["d_data1"], "data2": f["d_data2"]})
-            self._myxpl.send(mess)
+            self.myxpl.send(mess)
 
     def _message_cb(self, message):
         print "Message : %s " % message

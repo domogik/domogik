@@ -117,8 +117,8 @@ class Rest(XplPlugin):
 
         XplPlugin.__init__(self, name = 'rest')
         # logging initialization
-        self._log.info("Rest Server initialisation...")
-        self._log.debug("locale : %s %s" % locale.getdefaultlocale())
+        self.log.info("Rest Server initialisation...")
+        self.log.debug("locale : %s %s" % locale.getdefaultlocale())
 
         # logging Queue activities
         log_queue = logger.Logger('rest-queues')
@@ -155,7 +155,7 @@ class Rest(XplPlugin):
                 # default parameters
                 self.server_ip = server_ip
                 self.server_port = server_port
-            self._log.info("Configuration : ip:port = %s:%s" % (self.server_ip, self.server_port))
+            self.log.info("Configuration : ip:port = %s:%s" % (self.server_ip, self.server_port))
     
             # SSL configuration
             try:
@@ -173,9 +173,9 @@ class Rest(XplPlugin):
                 self.use_ssl = USE_SSL
                 self.ssl_certificate = SSL_CERTIFICATE
             if self.use_ssl == True:
-                self._log.info("Configuration : SSL support activated (certificate : %s)" % self.ssl_certificate)
+                self.log.info("Configuration : SSL support activated (certificate : %s)" % self.ssl_certificate)
             else:
-                self._log.info("Configuration : SSL support not activated")
+                self.log.info("Configuration : SSL support not activated")
     
             # File repository
             try:
@@ -188,29 +188,29 @@ class Rest(XplPlugin):
                 self.repo_dir = DEFAULT_REPO_DIR
 
             # Gloal Queues config
-            self._log.debug("Get queues configuration")
-            self._config = Query(self._myxpl, self._log)
+            self.log.debug("Get queues configuration")
+            self._config = Query(self.myxpl, self.log)
             res = XplResult()
             self._config.query('rest', 'q-timeout', res)
             self._queue_timeout = res.get_value()['q-timeout']
             if self._queue_timeout == "None":
                 self._queue_timeout = QUEUE_TIMEOUT
             self._queue_timeout = float(self._queue_timeout)
-            self._config = Query(self._myxpl, self._log)
+            self._config = Query(self.myxpl, self.log)
             res = XplResult()
             self._config.query('rest', 'q-size', res)
             self._queue_size = res.get_value()['q-size']
             if self._queue_size == "None":
                 self._queue_size = QUEUE_SIZE
             self._queue_size = float(self._queue_size)
-            self._config = Query(self._myxpl, self._log)
+            self._config = Query(self.myxpl, self.log)
             res = XplResult()
             self._config.query('rest', 'q-life-exp', res)
             self._queue_life_expectancy = res.get_value()['q-life-exp']
             if self._queue_life_expectancy == "None":
                 self._queue_life_expectancy = QUEUE_LIFE_EXPECTANCY
             self._queue_life_expectancy = float(self._queue_life_expectancy)
-            self._config = Query(self._myxpl, self._log)
+            self._config = Query(self.myxpl, self.log)
             res = XplResult()
             self._config.query('rest', 'q-sleep', res)
             self._queue_sleep = res.get_value()['q-sleep']
@@ -219,7 +219,7 @@ class Rest(XplPlugin):
             self._queue_sleep = float(self._queue_sleep)
 
             # /command Queues config
-            self._config = Query(self._myxpl, self._log)
+            self._config = Query(self.myxpl, self.log)
             res = XplResult()
             self._config.query('rest', 'q-cmd-size', res)
             self._queue_command_size = res.get_value()['q-cmd-size']
@@ -228,28 +228,28 @@ class Rest(XplPlugin):
             self._queue_command_size = float(self._queue_command_size)
 
             # /event Queues config
-            self._config = Query(self._myxpl, self._log)
+            self._config = Query(self.myxpl, self.log)
             res = XplResult()
             self._config.query('rest', 'evt-timeout', res)
             self._event_timeout = res.get_value()['evt-timeout']
             if self._event_timeout == "None":
                 self._event_timeout = EVENT_TIMEOUT
             self._event_timeout = float(self._event_timeout)
-            self._config = Query(self._myxpl, self._log)
+            self._config = Query(self.myxpl, self.log)
             res = XplResult()
             self._config.query('rest', 'q-evt-size', res)
             self._queue_event_size = res.get_value()['q-evt-size']
             if self._queue_event_size == "None":
                 self._queue_event_size = QUEUE_EVENT_SIZE
             self._queue_event_size = float(self._queue_event_size)
-            self._config = Query(self._myxpl, self._log)
+            self._config = Query(self.myxpl, self.log)
             res = XplResult()
             self._config.query('rest', 'q-evt-timeout', res)
             self._queue_event_timeout = res.get_value()['q-evt-timeout']
             if self._queue_event_timeout == "None":
                 self._queue_event_timeout = QUEUE_EVENT_TIMEOUT
             self._queue_event_timeout = float(self._queue_event_timeout)
-            self._config = Query(self._myxpl, self._log)
+            self._config = Query(self.myxpl, self.log)
             res = XplResult()
             self._config.query('rest', 'q-evt-life-exp', res)
             self._queue_event_life_expectancy = res.get_value()['q-evt-life-exp']
@@ -268,31 +268,31 @@ class Rest(XplPlugin):
     
             # Queues for /event
             # this queue will be fill by stat manager
-            self._event_requests = EventRequests(self._log,
+            self._event_requests = EventRequests(self.log,
                                                  self._event_timeout,
                                                  self._queue_event_size,
                                                  self._queue_event_timeout,
                                                  self._queue_event_life_expectancy)
     
             # define listeners for queues
-            self._log.debug("Create listeners")
-            Listener(self._add_to_queue_system_list, self._myxpl, \
+            self.log.debug("Create listeners")
+            Listener(self._add_to_queue_system_list, self.myxpl, \
                      {'schema': 'domogik.system',
                       'xpltype': 'xpl-trig',
                       'command' : 'list'})
-            Listener(self._add_to_queue_system_detail, self._myxpl, \
+            Listener(self._add_to_queue_system_detail, self.myxpl, \
                      {'schema': 'domogik.system',
                       'xpltype': 'xpl-trig',
                       'command' : 'detail'})
-            Listener(self._add_to_queue_system_start, self._myxpl, \
+            Listener(self._add_to_queue_system_start, self.myxpl, \
                      {'schema': 'domogik.system',
                       'xpltype': 'xpl-trig',
                       'command' : 'start'})
-            Listener(self._add_to_queue_system_stop, self._myxpl, \
+            Listener(self._add_to_queue_system_stop, self.myxpl, \
                      {'schema': 'domogik.system',
                       'xpltype': 'xpl-trig',
                       'command' : 'stop'})
-            Listener(self._add_to_queue_command, self._myxpl, \
+            Listener(self._add_to_queue_command, self.myxpl, \
                      {'xpltype': 'xpl-trig'})
     
             # Load xml files for /command
@@ -300,7 +300,7 @@ class Rest(XplPlugin):
             self.xml_date = None
             self.load_xml()
 
-            self._log.info("REST Initialisation OK")
+            self.log.info("REST Initialisation OK")
 
             self.add_stop_cb(self.stop_http)
 
@@ -308,7 +308,7 @@ class Rest(XplPlugin):
             self.start_stats()
             self.start_http()
         except :
-            self._log.error("%s" % self.get_exception())
+            self.log.error("%s" % self.get_exception())
 
 
     def _add_to_queue_system_list(self, message):
@@ -466,7 +466,7 @@ class Rest(XplPlugin):
         """ Start HTTP Server
         """
         # Start HTTP server
-        self._log.info("Start HTTP Server on %s:%s..." % (self.server_ip, self.server_port))
+        self.log.info("Start HTTP Server on %s:%s..." % (self.server_ip, self.server_port))
 
         if self.use_ssl:
             self.server = HTTPSServerWithParam((self.server_ip, int(self.server_port)), RestHandler, \
@@ -490,7 +490,7 @@ class Rest(XplPlugin):
         """ Start Statistics manager
         """
         print "Start Stats"
-        self._log.info("Starting statistics manager. His logs will be in a dedicated log file")
+        self.log.info("Starting statistics manager. His logs will be in a dedicated log file")
         StatsManager(handler_params = [self])
 
 
@@ -504,7 +504,7 @@ class Rest(XplPlugin):
         for techno in os.listdir(self._xml_cmd_dir):
             for command in os.listdir(self._xml_cmd_dir + "/" + techno):
                 xml_file = self._xml_cmd_dir + "/" + techno + "/" + command
-                self._log.info("Load XML file for %s>%s : %s" % (techno, command, xml_file))
+                self.log.info("Load XML file for %s>%s : %s" % (techno, command, xml_file))
                 self.xml["%s/%s" % (techno, command)] = minidom.parse(xml_file)
         self.xml_date = datetime.datetime.now()
 

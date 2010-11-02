@@ -51,12 +51,12 @@ class Query():
     def __init__(self, xpl, log):
         '''
         Init the query system and connect it to xPL network
-        @param xpl : the XplManager instance (usually self._myxpl)
+        @param xpl : the XplManager instance (usually self.myxpl)
         @param log : a Logger instance (usually took from self.get_my_logger())
         '''
-        self._log = log
+        self.log = log
         self.__myxpl = xpl
-        self._log.debug("Init config query instance")
+        self.log.debug("Init config query instance")
         self._keys = {}
 
     def __del__(self):
@@ -102,7 +102,7 @@ class Query():
         result = message.data
         for r in self._keys:
             if r in result:
-                self._log.debug("Config value received : %s : %s" % (r, result[r]))
+                self.log.debug("Config value received : %s : %s" % (r, result[r]))
                 res = self._keys.pop(r)
                 res.set_value(result)
                 res.get_lock().set()

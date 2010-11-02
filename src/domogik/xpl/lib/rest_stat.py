@@ -108,7 +108,7 @@ class StatsManager(XplPlugin):
                                 "static_device": static_device,
                                 "device_type": device_type}
                 
-                        stats[technology][schema][xpl_type] = self._Stat(self._myxpl, res[technology][schema][xpl_type], technology, schema, xpl_type, self.handler_params)
+                        stats[technology][schema][xpl_type] = self._Stat(self.myxpl, res[technology][schema][xpl_type], technology, schema, xpl_type, self.handler_params)
         except :
             self._log_stats.error("%s" % self.get_exception())
 

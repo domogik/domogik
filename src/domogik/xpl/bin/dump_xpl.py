@@ -48,7 +48,7 @@ class Sniffer(XplPlugin):
 
     def __init__(self):
         XplPlugin.__init__(self, name='sniffer', daemonize=False)
-        Listener(self._sniffer_cb, self._myxpl)
+        Listener(self._sniffer_cb, self.myxpl)
 
     def _sniffer_cb(self, message):
         '''

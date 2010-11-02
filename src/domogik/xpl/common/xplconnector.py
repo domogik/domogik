@@ -121,7 +121,7 @@ class Manager(BasePlugin):
         #xPL plugins only needs to connect on local xPL Hub on localhost
         addr = (ip, port)
 
-        self._log = self.get_my_logger()
+        self.log = self.get_my_logger()
         #Define locks
         self._lock_send = threading.Semaphore()
         self._lock_list = threading.Semaphore()
@@ -131,14 +131,14 @@ class Manager(BasePlugin):
             self._UDPSock.bind(addr)
         except:
             # Smthg is already running on this port
-            self._log.error("Can't bind to the interface %s, port %i" % (ip, port))
+            self.log.error("Can't bind to the interface %s, port %i" % (ip, port))
             exit(1)
         else:
             self.add_stop_cb(self.leave)
             self._port = self._UDPSock.getsockname()[1]
             #Get the port number assigned by the system
             self._ip, self._port = self._UDPSock.getsockname()
-            self._log.debug("xPL plugin %s socket bound to %s, port %s" \
+            self.log.debug("xPL plugin %s socket bound to %s, port %s" \
                             % (self.get_plugin_name(), self._ip, self._port))
             # All is good, we start sending Heartbeat every 5 minutes using
             # XplTimer
@@ -153,14 +153,14 @@ class Manager(BasePlugin):
                     "thread-monitor", (), {})
             self.register_thread(self._network)
             self._network.start()
-            self._log.debug("xPL thread started for %s " % self.get_plugin_name())
+            self.log.debug("xPL thread started for %s " % self.get_plugin_name())
 
     def leave(self):
         """
         Stop threads and leave the Manager
         """
         self._UDPSock.close()
-        self._log.debug("xPL thread stopped")
+        self.log.debug("xPL thread stopped")
 
     def send(self, message):
         """
@@ -178,10 +178,10 @@ class Manager(BasePlugin):
             if not message.target:
                 message.set_target("*")
             self._UDPSock.sendto(message.__str__(), (self._broadcast, 3865))
-            self._log.debug("xPL Message sent by thread %s : %s" % (threading.currentThread().getName(), message))
+            self.log.debug("xPL Message sent by thread %s : %s" % (threading.currentThread().getName(), message))
         except:
-            self._log.warning("Error during send of message")
-            self._log.debug(traceback.format_exc())
+            self.log.warning("Error during send of message")
+            self.log.debug(traceback.format_exc())
         self._lock_send.release()
 
     def _SendHeartbeat(self, target='*', test=""):
@@ -226,13 +226,13 @@ remote-ip=%s
             try:
                 readable, writeable, errored = select.select([self._UDPSock], [], [], READ_NETWORK_TIMEOUT)
             except:
-                self._log.info("Error during the read of the socket : %s" % traceback.format_exc())
+                self.log.info("Error during the read of the socket : %s" % traceback.format_exc())
             else:
                 if len(readable) == 1:
                     try:
                         data, addr = self._UDPSock.recvfrom(self._buff)
                     except:
-                        self._log.debug("bad data received")
+                        self.log.debug("bad data received")
                     else:
                         try:
                             mess = XplMessage(data)
@@ -241,13 +241,13 @@ remote-ip=%s
                                 for l in self._listeners:
                                     l.new_message(mess)
                                 #Enabling this debug will really polute your logs
-                                #self._log.debug("New message received : %s" % \
+                                #self.log.debug("New message received : %s" % \
                                 #        mess.get_type())
                         except XPLException:
-                            self._log.warning("XPL Exception occured in : %s" % sys.exc_info()[2])
+                            self.log.warning("XPL Exception occured in : %s" % sys.exc_info()[2])
                         except XplMessageError:
-                            self._log.warning("Malformated message received, ignoring it.")
-        self._log.info("self._should_stop set, leave.")
+                            self.log.warning("Malformated message received, ignoring it.")
+        self.log.info("self._should_stop set, leave.")
 
     def add_listener(self, listener):
         """
@@ -390,10 +390,10 @@ class XplTimer():
         self._timer = self.__InternalTimer(time, cb, stop, manager._log)
         self._stop = stop
         self._manager = manager
-        self._log = manager.get_my_logger()
+        self.log = manager.get_my_logger()
         manager.register_timer(self)
         manager.register_thread(self._timer)
-        self._log.debug("New timer created : %s " % self)
+        self.log.debug("New timer created : %s " % self)
 
 #    def __repr__(self):
 #        """ Representation of the Timer
@@ -413,17 +413,17 @@ class XplTimer():
         return self._timer
 
     def __del__(self):
-        self._log.debug("__del__ Manager")
+        self.log.debug("__del__ Manager")
         self.stop()
 
     def stop(self):
         """
         Stop the timer
         """
-        self._log.debug("Timer : stop, try to join() internal thread")
+        self.log.debug("Timer : stop, try to join() internal thread")
         self._stop.set()
         self._timer.join()
-        self._log.debug("Timer : stop, internal thread joined, unregister it")
+        self.log.debug("Timer : stop, internal thread joined, unregister it")
         self._manager.unregister_timer(self._timer)
 
     class __InternalTimer(threading.Thread):
@@ -441,7 +441,7 @@ class XplTimer():
             self._cb = cb
             self._stop = stop
             self.name = "internal-timer"
-            self._log = log
+            self.log = log
 
         def run(self):
             '''

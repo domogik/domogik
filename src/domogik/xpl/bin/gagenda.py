@@ -54,38 +54,38 @@ class GAgendaListener(XplPlugin):
         XplPlugin.__init__(self, name = 'gagenda')
 
         # Create logger
-        self._log.debug("Listener for Google agenda created")
+        self.log.debug("Listener for Google agenda created")
 
         # Get config
-        self._config = Query(self._myxpl, self._log)
+        self._config = Query(self.myxpl, self.log)
         res = XplResult()
         self._config.query('gagenda', 'email', res)
         self._email = res.get_value()['email']
-        self._config = Query(self._myxpl, self._log)
+        self._config = Query(self.myxpl, self.log)
         res = XplResult()
         self._config.query('gagenda', 'password', res)
         self._password = res.get_value()['password']
-        self._config = Query(self._myxpl, self._log)
+        self._config = Query(self.myxpl, self.log)
         res = XplResult()
         self._config.query('gagenda', 'calendarname', res)
         self._calendar_name = res.get_value()['calendarname']
 
         # Create object
-        self._gagenda_manager = GAgenda(self._log, \
+        self._gagenda_manager = GAgenda(self.log, \
                                        self._email, \
                                        self._password, \
                                        self._calendar_name, \
                                        self._broadcast_events)
 
         # Create listener for today
-        Listener(self.gagenda_cb, self._myxpl, {'schema': 'calendar.request',
+        Listener(self.gagenda_cb, self.myxpl, {'schema': 'calendar.request',
                 'xpltype': 'xpl-cmnd', 'command': 'REQUEST'})
 
     def gagenda_cb(self, message):
         """ Call google agenda lib
             @param message : xlp message received
         """
-        self._log.debug("Call gagenda_cb")
+        self.log.debug("Call gagenda_cb")
         if 'command' in message.data:
             command = message.data['command']
         if 'date' in message.data:
@@ -93,7 +93,7 @@ class GAgendaListener(XplPlugin):
 
         # if it is a request command
         if command == "REQUEST":
-            self._log.debug("Google agende request command received for " + \
+            self.log.debug("Google agende request command received for " + \
                             str(date))
             if date == "TODAY":
                 self._gagenda_manager.get_today_events()
@@ -115,7 +115,7 @@ class GAgendaListener(XplPlugin):
             print entry
             my_temp_message.add_data({"object" : entry["object"]})
             my_temp_message.add_data({"startdate" : entry["startdate"]})
-            self._myxpl.send(my_temp_message)
+            self.myxpl.send(my_temp_message)
 
 
 if __name__ == "__main__":

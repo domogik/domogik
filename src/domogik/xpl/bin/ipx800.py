@@ -59,30 +59,30 @@ class IPXManager(XplPlugin):
         num = 1
         loop = True
         while loop == True:
-            self._config = Query(self._myxpl, self._log)
+            self._config = Query(self.myxpl, self.log)
             res = XplResult()
             self._config.query('ipx800', 'ipx-%s-login' % str(num), res)
             login = res.get_value()['ipx-%s-login' % str(num)]
             if login == "None":
                 login = None
-            self._config = Query(self._myxpl, self._log)
+            self._config = Query(self.myxpl, self.log)
             res = XplResult()
             self._config.query('ipx800', 'ipx-%s-password' % str(num), res)
             password = res.get_value()['ipx-%s-password' % str(num)]
-            self._config = Query(self._myxpl, self._log)
+            self._config = Query(self.myxpl, self.log)
             res = XplResult()
             self._config.query('ipx800', 'ipx-%s-name' % str(num), res)
             name = res.get_value()['ipx-%s-name' % str(num)]
-            self._config = Query(self._myxpl, self._log)
+            self._config = Query(self.myxpl, self.log)
             res = XplResult()
             self._config.query('ipx800', 'ipx-%s-ip' % str(num), res)
             address = res.get_value()['ipx-%s-ip' % str(num)]
-            self._config = Query(self._myxpl, self._log)
+            self._config = Query(self.myxpl, self.log)
             res = XplResult()
             self._config.query('ipx800', 'ipx-%s-int' % str(num), res)
             inter = res.get_value()['ipx-%s-int' % str(num)]
             if name != "None":
-                self._log.info("Configuration : login=%s, password=***, name=%s, ip=%s, interval=%s" % 
+                self.log.info("Configuration : login=%s, password=***, name=%s, ip=%s, interval=%s" % 
                                (login, name, address, inter))
                 self.ipx_list[name] = {"login" : login,
                                        "password" : password,
@@ -94,15 +94,15 @@ class IPXManager(XplPlugin):
 
         ### Create IPX objects
         for ipx in self.ipx_list:
-            self.ipx_list[ipx]['obj'] = IPX(self._log, self.send_xpl)
+            self.ipx_list[ipx]['obj'] = IPX(self.log, self.send_xpl)
             try:
-                self._log.info("Opening IPX800 named '%s' (ip : %s)" % 
+                self.log.info("Opening IPX800 named '%s' (ip : %s)" % 
                                (ipx, self.ipx_list[ipx]['ip']))
                 self.ipx_list[ipx]['obj'].open(ipx, self.ipx_list[ipx]['ip'],
                                                self.ipx_list[ipx]['login'],
                                                self.ipx_list[ipx]['password'])
             except IPXException as err:
-                self._log.error(err.value)
+                self.log.error(err.value)
                 print err.value
                 self.force_leave()
                 return
@@ -110,7 +110,7 @@ class IPXManager(XplPlugin):
         ### Start listening each IPX800
         for ipx in self.ipx_list:
             try:
-                self._log.info("Start listening to IPX800 named '%s'" % ipx)
+                self.log.info("Start listening to IPX800 named '%s'" % ipx)
                 ipx_listen = threading.Thread(None,
                                               self.ipx_list[ipx]['obj'].listen,
                                               None,
@@ -118,19 +118,19 @@ class IPXManager(XplPlugin):
                                               {})
                 ipx_listen.start()
             except IPXException as err:
-                self._log.error(err.value)
+                self.log.error(err.value)
                 print err.value
                 self.force_leave()
                 return
 
         ### Create listeners for commands
-        self._log.info("Creating listener for IPX 800")
-        #Listener(self.ipx_command, self._myxpl, {'schema': 'control.basic',
+        self.log.info("Creating listener for IPX 800")
+        #Listener(self.ipx_command, self.myxpl, {'schema': 'control.basic',
         #        'xpltype': 'xpl-cmnd', 'type': ['output', 'count']})
-        Listener(self.ipx_command, self._myxpl, {'schema': 'control.basic',
+        Listener(self.ipx_command, self.myxpl, {'schema': 'control.basic',
                 'xpltype': 'xpl-cmnd', 'type': 'output'})
 
-        self._log.info("Plugin ready :)")
+        self.log.info("Plugin ready :)")
 
 
     def send_xpl(self, msg_device, msg_current, msg_type):
@@ -145,7 +145,7 @@ class IPXManager(XplPlugin):
         msg.add_data({'device' :  msg_device})
         msg.add_data({'type' :  msg_type})
         msg.add_data({'current' :  msg_current})
-        self._myxpl.send(msg)
+        self.myxpl.send(msg)
 
 
     def ipx_command(self, message):
@@ -166,13 +166,13 @@ class IPXManager(XplPlugin):
         num = int(data_name[1][-1])
 
         if not ipx_name in self.ipx_list:
-            self._log.warning("No IPX800 board called '%s' defined" % ipx_name)
+            self.log.warning("No IPX800 board called '%s' defined" % ipx_name)
             return
 
         # check data
         if elt == 'led' and msg_current not in ['HIGH', 'LOW', 'PULSE'] \
            and msg_type != 'output':
-            self._log.warning("Bad data : %s" % data)
+            self.log.warning("Bad data : %s" % data)
             return
 
         # TODO in a next release : other checks : counter

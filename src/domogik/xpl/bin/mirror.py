@@ -54,19 +54,19 @@ class MirrorManager(XplPlugin):
         XplPlugin.__init__(self, name='mirror')
         # Get config
         #   - device
-        self._config = Query(self._myxpl, self._log)
+        self._config = Query(self.myxpl, self.log)
         res = XplResult()
         self._config.query('mirror', 'device', res)
         device = res.get_value()['device']
 
         # Init Mir:ror
-        mirror  = Mirror(self._log, self.send_xpl)
+        mirror  = Mirror(self.log, self.send_xpl)
         
         # Open Mir:ror
         try:
             mirror.open(device)
         except MirrorException as e:
-            self._log.error(e.value)
+            self.log.error(e.value)
             print e.value
             self.force_leave()
             return
@@ -91,7 +91,7 @@ class MirrorManager(XplPlugin):
         msg.add_data({"device" : device})
         msg.add_data({"type" : type})
         msg.add_data({"current" : current})
-        self._myxpl.send(msg)
+        self.myxpl.send(msg)
 
 
 if __name__ == "__main__":

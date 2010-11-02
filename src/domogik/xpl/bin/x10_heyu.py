@@ -62,29 +62,29 @@ class X10Main(XplPlugin):
         """
         XplPlugin.__init__(self, name = 'x10_heyu')
         self._heyu_cfg_path_res = ""
-        self._config = Query(self._myxpl, self._log)
+        self._config = Query(self.myxpl, self.log)
         res = XplResult()
         self._config.query('x10_heyu', 'heyu-cfg-path', res)
         self._heyu_cfg_path_res = res.get_value()['heyu-cfg-path']
-        self._log = self.get_my_logger()
+        self.log = self.get_my_logger()
         try:
             self.__myx10 = X10API(self._heyu_cfg_path_res)
         except Exception:
             print "Something went wrong during heyu init, check logs"
-            self._log.debug("Exception : %s" % traceback.format_exc())
+            self.log.debug("Exception : %s" % traceback.format_exc())
             exit(1)
         #Create listeners
-        Listener(self.x10_cmnd_cb, self._myxpl, {'schema': 'x10.basic', 'xpltype': 'xpl-cmnd'})
+        Listener(self.x10_cmnd_cb, self.myxpl, {'schema': 'x10.basic', 'xpltype': 'xpl-cmnd'})
         #One listener for system schema, allowing to reload config
-        Listener(self.heyu_reload_config, self._myxpl, {'schema': 'domogik.system', 'xpltype': 'xpl-cmnd',
+        Listener(self.heyu_reload_config, self.myxpl, {'schema': 'domogik.system', 'xpltype': 'xpl-cmnd',
                                                         'command': 'reload', 'plugin': 'x10'})
         #One listener for system schema, allowing to dump config
-        Listener(self.heyu_dump_config, self._myxpl, {'schema': 'domogik.system', 'xpltype': 'xpl-cmnd',
+        Listener(self.heyu_dump_config, self.myxpl, {'schema': 'domogik.system', 'xpltype': 'xpl-cmnd',
                                                       'command': 'push_config', 'plugin': 'x10'})
 #        self._monitor = X10Monitor(self._heyu_cfg_path_res)
 #        self._monitor.get_monitor().add_cb(self.x10_monitor_cb)
 #        self._monitor.get_monitor().start()
-        self._log.debug("Heyu correctly started")
+        self.log.debug("Heyu correctly started")
 
     def heyu_reload_config(self, message):
         """
@@ -95,7 +95,7 @@ class X10Main(XplPlugin):
         """
         #Heyu config items
         res = XplResult()
-#        self._config = Query(self._myxpl)
+#        self._config = Query(self.myxpl)
         self._config.query('x10', '', res)
         result = res.get_value()
         if result is not None:
@@ -108,10 +108,10 @@ class X10Main(XplPlugin):
             try:
                 myheyu.write(heyu_config_values)
             except IOError:
-                self._log.warning("Heyu config file can't be opened")
+                self.log.warning("Heyu config file can't be opened")
             res = myheyu.restart()
             if res:
-                self._log.warning("Error during heyu restart : %s" % res)
+                self.log.warning("Error during heyu restart : %s" % res)
         else:
             print "empty res"
 
@@ -132,7 +132,7 @@ class X10Main(XplPlugin):
             count = count + 1
             mess.add_data({key :  line})
         #print "Message is : %s" % m
-        self._myxpl.send(mess)
+        self.myxpl.send(mess)
 
     def x10_cmnd_cb(self, message):
         """
@@ -163,7 +163,7 @@ class X10Main(XplPlugin):
             house = message.data['house']
         if 'level' in message.data:
             level = message.data['level']
-        self._log.debug("%s received : device = %s, house = %s, level = %s" % (cmd, dev, house, level))
+        self.log.debug("%s received : device = %s, house = %s, level = %s" % (cmd, dev, house, level))
         commands[cmd](dev, house, level)
         self.x10_monitor_cb(dev, cmd)
 
@@ -173,7 +173,7 @@ class X10Main(XplPlugin):
         @param unit : the unit of the element controled
         @param order : the order sent to the unit
         """
-        self._log.debug("X10 Callback for %s" % unit)
+        self.log.debug("X10 Callback for %s" % unit)
         mess = XplMessage()
         mess.set_type("xpl-trig")
         mess.set_schema("x10.basic")
@@ -181,7 +181,7 @@ class X10Main(XplPlugin):
         mess.add_data({"command" :  order})
         if args:
             mess.add_data({"level" : args})
-        self._myxpl.send(mess)
+        self.myxpl.send(mess)
 
 
 if __name__ == "__main__":

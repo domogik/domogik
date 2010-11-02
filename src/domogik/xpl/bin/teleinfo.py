@@ -53,7 +53,7 @@ class TeleinfoManager(XplPlugin):
         Start teleinfo device handler
         '''
         XplPlugin.__init__(self, name='teleinfo')
-        self._config = Query(self._myxpl, self._log)
+        self._config = Query(self.myxpl, self.log)
         res = XplResult()
         self._config.query('teleinfo', 'device', res)
         device = res.get_value()['device']
@@ -62,13 +62,13 @@ class TeleinfoManager(XplPlugin):
         interval = res.get_value()['interval']
 
         # Init Teleinfo
-        teleinfo  = Teleinfo(self._log, self.send_xpl)
+        teleinfo  = Teleinfo(self.log, self.send_xpl)
         
         # Open Teleinfo modem
         try:
             teleinfo.open(device)
         except TeleinfoException as err:
-            self._log.error(err.value)
+            self.log.error(err.value)
             print err.value
             self.force_leave()
             return
@@ -96,7 +96,7 @@ class TeleinfoManager(XplPlugin):
             my_temp_message.add_data({entry["name"].lower().strip("\x00\x10") : entry["value"].strip("\x00\x10")})
         my_temp_message.add_data({"device": "teleinfo"})
 
-        self._myxpl.send(my_temp_message)
+        self.myxpl.send(my_temp_message)
 
 if __name__ == "__main__":
     TeleinfoManager()

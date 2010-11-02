@@ -58,12 +58,12 @@ class OneWireManager(XplPlugin):
         XplPlugin.__init__(self, name='onewire')
         try:
             ### get all config keys
-            self._config = Query(self._myxpl, self._log)
+            self._config = Query(self.myxpl, self.log)
             res = XplResult()
             self._config.query('onewire', 'device', res)
             device = res.get_value()['device']
 
-            self._config = Query(self._myxpl, self._log)
+            self._config = Query(self.myxpl, self.log)
             res = XplResult()
             self._config.query('onewire', 'cache', res)
             if res.get_value()['cache'] == "True":
@@ -72,48 +72,48 @@ class OneWireManager(XplPlugin):
                 cache = False
 
             ### DS18B20 config
-            self._config = Query(self._myxpl, self._log)
+            self._config = Query(self.myxpl, self.log)
             res = XplResult()
             self._config.query('onewire', 'ds18b20-en', res)
             ds18b20_enabled = res.get_value()['ds18b20-en']
 
-            self._config = Query(self._myxpl, self._log)
+            self._config = Query(self.myxpl, self.log)
             res = XplResult()
             self._config.query('onewire', 'ds18b20-int', res)
             ds18b20_interval = res.get_value()['ds18b20-int']
     
-            self._config = Query(self._myxpl, self._log)
+            self._config = Query(self.myxpl, self.log)
             res = XplResult()
             self._config.query('onewire', 'ds18b20-res', res)
             ds18b20_resolution = res.get_value()['ds18b20-res']
     
             ### DS18S20 config
-            self._config = Query(self._myxpl, self._log)
+            self._config = Query(self.myxpl, self.log)
             res = XplResult()
             self._config.query('onewire', 'ds18s20-en', res)
             ds18s20_enabled = res.get_value()['ds18s20-en']
 
-            self._config = Query(self._myxpl, self._log)
+            self._config = Query(self.myxpl, self.log)
             res = XplResult()
             self._config.query('onewire', 'ds18s20-int', res)
             ds18s20_interval = res.get_value()['ds18s20-int']
     
             ### DS2401 config
-            self._config = Query(self._myxpl, self._log)
+            self._config = Query(self.myxpl, self.log)
             res = XplResult()
             self._config.query('onewire', 'ds2401-en', res)
             ds2401_enabled = res.get_value()['ds2401-en']
 
-            self._config = Query(self._myxpl, self._log)
+            self._config = Query(self.myxpl, self.log)
             res = XplResult()
             self._config.query('onewire', 'ds2401-int', res)
             ds2401_interval = res.get_value()['ds2401-int']
     
             ### Open one wire network
             try:
-                ow = OneWireNetwork(self._log, device, cache)
+                ow = OneWireNetwork(self.log, device, cache)
             except OneWireException as e:
-                self._log.error(e.value)
+                self.log.error(e.value)
                 print e.value
                 self.force_leave()
                 return
@@ -121,11 +121,11 @@ class OneWireManager(XplPlugin):
     
             ### DS18B20 support
             if ds18b20_enabled == "True":
-                self._log.info("DS18B20 support enabled")
+                self.log.info("DS18B20 support enabled")
                 ds18b20 = threading.Thread(None, 
                                            ComponentDs18b20, 
                                            None,
-                                           (self._log,
+                                           (self.log,
                                             ow, 
                                             float(ds18b20_interval), 
                                             ds18b20_resolution,
@@ -135,11 +135,11 @@ class OneWireManager(XplPlugin):
     
             ### DS18S20 support
             if ds18s20_enabled == "True":
-                self._log.info("DS18S20 support enabled")
+                self.log.info("DS18S20 support enabled")
                 ds18s20 = threading.Thread(None, 
                                            ComponentDs18s20, 
                                            None,
-                                           (self._log,
+                                           (self.log,
                                             ow, 
                                             float(ds18s20_interval), 
                                             self.send_xpl),
@@ -148,11 +148,11 @@ class OneWireManager(XplPlugin):
     
             ### DS2401 support
             if ds2401_enabled == "True":
-                self._log.info("DS2401 support enabled")
+                self.log.info("DS2401 support enabled")
                 ds2401 = threading.Thread(None, 
                                            ComponentDs2401, 
                                            None,
-                                           (self._log,
+                                           (self.log,
                                             ow, 
                                             float(ds2401_interval), 
                                             self.send_xpl),
@@ -160,7 +160,7 @@ class OneWireManager(XplPlugin):
                 ds2401.start()
     
         except:
-            self._log.error("Plugin error : stopping plugin... Trace : %s" % traceback.format_exc())
+            self.log.error("Plugin error : stopping plugin... Trace : %s" % traceback.format_exc())
             print traceback.format_exc()
             self.force_leave()
 
@@ -175,8 +175,8 @@ class OneWireManager(XplPlugin):
         msg.set_schema("sensor.basic")
         for element in data:
             msg.add_data({element : data[element]})
-        self._log.debug("Send xpl message...")
-        self._myxpl.send(msg)
+        self.log.debug("Send xpl message...")
+        self.myxpl.send(msg)
 
 
 
