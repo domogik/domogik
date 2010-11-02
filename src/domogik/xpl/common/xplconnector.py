@@ -121,7 +121,6 @@ class Manager(BasePlugin):
         #xPL plugins only needs to connect on local xPL Hub on localhost
         addr = (ip, port)
 
-        self.log = self.get_my_logger()
         #Define locks
         self._lock_send = threading.Semaphore()
         self._lock_list = threading.Semaphore()
@@ -390,7 +389,7 @@ class XplTimer():
         self._timer = self.__InternalTimer(time, cb, stop, manager._log)
         self._stop = stop
         self._manager = manager
-        self.log = manager.get_my_logger()
+        self.log = manager.log
         manager.register_timer(self)
         manager.register_thread(self._timer)
         self.log.debug("New timer created : %s " % self)

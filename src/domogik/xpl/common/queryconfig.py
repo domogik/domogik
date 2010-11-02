@@ -52,7 +52,7 @@ class Query():
         '''
         Init the query system and connect it to xPL network
         @param xpl : the XplManager instance (usually self.myxpl)
-        @param log : a Logger instance (usually took from self.get_my_logger())
+        @param log : a Logger instance (usually took from self.log))
         '''
         self.log = log
         self.__myxpl = xpl

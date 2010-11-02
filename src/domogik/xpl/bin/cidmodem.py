@@ -54,12 +54,12 @@ class CIDManager(XplPlugin):
         XplPlugin.__init__(self, name='cidmodem')
 
         # Configuration
-        self._config = Query(self.myxpl, self.get_my_logger())
+        self._config = Query(self.myxpl, self.log)
         res = XplResult()
         self._config.query('cidmodem', 'device', res)
         device = res.get_value()['device']
 
-        self._config = Query(self.myxpl, self.get_my_logger())
+        self._config = Query(self.myxpl, self.log)
         res = XplResult()
         self._config.query('cidmodem', 'cid-command', res)
         cid_command = res.get_value()['cid-command']

@@ -112,12 +112,6 @@ class BasePlugin():
             else:
                 self._stop_cb = []
 
-        def get_my_logger(self):
-            """
-            Returns the associated logger instance
-            """
-            return self._log
-
         def should_stop(self):
             '''
             Check if the plugin should stop

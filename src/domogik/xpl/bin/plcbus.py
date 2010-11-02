@@ -76,7 +76,7 @@ class PlcBusMain(XplPlugin):
         self._probe_list = res.get_value()['probe-list']
 
         # Create log instance
-        self.log = self.get_my_logger()
+        self.log = self.log
         self.api = PLCBUSAPI(self.log, device, self._command_cb, self._message_cb)
         self.add_stop_cb(self.api.stop)
         if self._probe_inter != 0:
