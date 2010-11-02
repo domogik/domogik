@@ -86,7 +86,6 @@ class SysManager(XplPlugin):
         XplPlugin.__init__(self, name = 'manager', parser=parser)
 
         # Logger init
-        self.log = self.log
         self.log.info("Host : %s" % gethostname())
     
         # Get config

@@ -57,7 +57,6 @@ class Sender(XplPlugin):
         XplPlugin.__init__(self, name = 'send', daemonize = False)
         self._schema = schema
         self._message = message
-        self.log = self.log
         self._args = []
         self._options = None
         self.parse_parameters()
