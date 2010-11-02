@@ -62,7 +62,7 @@ class X10Main(XplPlugin):
         """
         XplPlugin.__init__(self, name = 'x10_heyu')
         self._heyu_cfg_path_res = ""
-        self._config = Query(self._myxpl)
+        self._config = Query(self._myxpl, self._log)
         res = XplResult()
         self._config.query('x10_heyu', 'heyu-cfg-path', res)
         self._heyu_cfg_path_res = res.get_value()['heyu-cfg-path']

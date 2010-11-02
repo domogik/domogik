@@ -54,15 +54,15 @@ class XBMCNotificationListener(XplPlugin):
         self._log.debug("Listener for XBMC notifications created")
 
         # Get configuration
-        self._config = Query(self._myxpl)
+        self._config = Query(self._myxpl, self._log)
         res = XplResult()
         self._config.query('xbmc_not', 'address', res)
         address = res.get_value()['address']
-        self._config = Query(self._myxpl)
+        self._config = Query(self._myxpl, self._log)
         res = XplResult()
         self._config.query('xbmc_not', 'delay', res)
         delay = res.get_value()['delay']
-        self._config = Query(self._myxpl)
+        self._config = Query(self._myxpl, self._log)
         res = XplResult()
         self._config.query('xbmc_not', 'maxdelay', res)
         maxdelay = res.get_value()['maxdelay']

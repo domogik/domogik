@@ -137,7 +137,7 @@ class SysManager(XplPlugin):
             for component in self._components:
                 name = component["name"]
                 self._log.debug("%s..." % name)
-                self._config = Query(self._myxpl)
+                self._config = Query(self._myxpl, self._log)
                 res = XplResult()
                 self._config.query(name, 'startup-plugin', res)
                 startup = res.get_value()['startup-plugin']

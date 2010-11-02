@@ -189,28 +189,28 @@ class Rest(XplPlugin):
 
             # Gloal Queues config
             self._log.debug("Get queues configuration")
-            self._config = Query(self._myxpl)
+            self._config = Query(self._myxpl, self._log)
             res = XplResult()
             self._config.query('rest', 'q-timeout', res)
             self._queue_timeout = res.get_value()['q-timeout']
             if self._queue_timeout == "None":
                 self._queue_timeout = QUEUE_TIMEOUT
             self._queue_timeout = float(self._queue_timeout)
-            self._config = Query(self._myxpl)
+            self._config = Query(self._myxpl, self._log)
             res = XplResult()
             self._config.query('rest', 'q-size', res)
             self._queue_size = res.get_value()['q-size']
             if self._queue_size == "None":
                 self._queue_size = QUEUE_SIZE
             self._queue_size = float(self._queue_size)
-            self._config = Query(self._myxpl)
+            self._config = Query(self._myxpl, self._log)
             res = XplResult()
             self._config.query('rest', 'q-life-exp', res)
             self._queue_life_expectancy = res.get_value()['q-life-exp']
             if self._queue_life_expectancy == "None":
                 self._queue_life_expectancy = QUEUE_LIFE_EXPECTANCY
             self._queue_life_expectancy = float(self._queue_life_expectancy)
-            self._config = Query(self._myxpl)
+            self._config = Query(self._myxpl, self._log)
             res = XplResult()
             self._config.query('rest', 'q-sleep', res)
             self._queue_sleep = res.get_value()['q-sleep']
@@ -219,7 +219,7 @@ class Rest(XplPlugin):
             self._queue_sleep = float(self._queue_sleep)
 
             # /command Queues config
-            self._config = Query(self._myxpl)
+            self._config = Query(self._myxpl, self._log)
             res = XplResult()
             self._config.query('rest', 'q-cmd-size', res)
             self._queue_command_size = res.get_value()['q-cmd-size']
@@ -228,28 +228,28 @@ class Rest(XplPlugin):
             self._queue_command_size = float(self._queue_command_size)
 
             # /event Queues config
-            self._config = Query(self._myxpl)
+            self._config = Query(self._myxpl, self._log)
             res = XplResult()
             self._config.query('rest', 'evt-timeout', res)
             self._event_timeout = res.get_value()['evt-timeout']
             if self._event_timeout == "None":
                 self._event_timeout = EVENT_TIMEOUT
             self._event_timeout = float(self._event_timeout)
-            self._config = Query(self._myxpl)
+            self._config = Query(self._myxpl, self._log)
             res = XplResult()
             self._config.query('rest', 'q-evt-size', res)
             self._queue_event_size = res.get_value()['q-evt-size']
             if self._queue_event_size == "None":
                 self._queue_event_size = QUEUE_EVENT_SIZE
             self._queue_event_size = float(self._queue_event_size)
-            self._config = Query(self._myxpl)
+            self._config = Query(self._myxpl, self._log)
             res = XplResult()
             self._config.query('rest', 'q-evt-timeout', res)
             self._queue_event_timeout = res.get_value()['q-evt-timeout']
             if self._queue_event_timeout == "None":
                 self._queue_event_timeout = QUEUE_EVENT_TIMEOUT
             self._queue_event_timeout = float(self._queue_event_timeout)
-            self._config = Query(self._myxpl)
+            self._config = Query(self._myxpl, self._log)
             res = XplResult()
             self._config.query('rest', 'q-evt-life-exp', res)
             self._queue_event_life_expectancy = res.get_value()['q-evt-life-exp']

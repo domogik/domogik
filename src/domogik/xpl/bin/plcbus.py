@@ -56,7 +56,7 @@ class PlcBusMain(XplPlugin):
         '''
         # Load config
         XplPlugin.__init__(self, name = 'plcbus')
-        self._config = Query(self._myxpl)
+        self._config = Query(self._myxpl, self._log)
         # Create listeners
         Listener(self._plcbus_cmnd_cb, self._myxpl, {
             'schema': 'plcbus.basic',

@@ -52,7 +52,7 @@ class WolPing(XplPlugin):
         XplPlugin.__init__(self, name = 'wol_ping')
 
         # Configuration : interval between each ping
-        self._config = Query(self._myxpl)
+        self._config = Query(self._myxpl, self._log)
         res = XplResult()
         self._config.query('wol_ping', 'ping-interval', res)
         interval = res.get_value()['ping-interval']
@@ -64,19 +64,19 @@ class WolPing(XplPlugin):
         num = 1
         loop = True
         while loop == True:
-            self._config = Query(self._myxpl)
+            self._config = Query(self._myxpl, self._log)
             res = XplResult()
             self._config.query('wol_ping', 'cmp-%s-name' % str(num), res)
             name = res.get_value()['cmp-%s-name' % str(num)]
-            self._config = Query(self._myxpl)
+            self._config = Query(self._myxpl, self._log)
             res = XplResult()
             self._config.query('wol_ping', 'cmp-%s-ip' % str(num), res)
             ip = res.get_value()['cmp-%s-ip' % str(num)]
-            self._config = Query(self._myxpl)
+            self._config = Query(self._myxpl, self._log)
             res = XplResult()
             self._config.query('wol_ping', 'cmp-%s-mac' % str(num), res)
             mac = res.get_value()['cmp-%s-mac' % str(num)]
-            self._config = Query(self._myxpl)
+            self._config = Query(self._myxpl, self._log)
             res = XplResult()
             self._config.query('wol_ping', 'cmp-%s-macport' % str(num), res)
             mac_port = res.get_value()['cmp-%s-macport' % str(num)]

@@ -54,7 +54,7 @@ class MirrorManager(XplPlugin):
         XplPlugin.__init__(self, name='mirror')
         # Get config
         #   - device
-        self._config = Query(self._myxpl)
+        self._config = Query(self._myxpl, self._log)
         res = XplResult()
         self._config.query('mirror', 'device', res)
         device = res.get_value()['device']

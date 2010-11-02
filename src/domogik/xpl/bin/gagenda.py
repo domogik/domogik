@@ -57,15 +57,15 @@ class GAgendaListener(XplPlugin):
         self._log.debug("Listener for Google agenda created")
 
         # Get config
-        self._config = Query(self._myxpl)
+        self._config = Query(self._myxpl, self._log)
         res = XplResult()
         self._config.query('gagenda', 'email', res)
         self._email = res.get_value()['email']
-        self._config = Query(self._myxpl)
+        self._config = Query(self._myxpl, self._log)
         res = XplResult()
         self._config.query('gagenda', 'password', res)
         self._password = res.get_value()['password']
-        self._config = Query(self._myxpl)
+        self._config = Query(self._myxpl, self._log)
         res = XplResult()
         self._config.query('gagenda', 'calendarname', res)
         self._calendar_name = res.get_value()['calendarname']

@@ -58,12 +58,12 @@ class OneWireManager(XplPlugin):
         XplPlugin.__init__(self, name='onewire')
         try:
             ### get all config keys
-            self._config = Query(self._myxpl)
+            self._config = Query(self._myxpl, self._log)
             res = XplResult()
             self._config.query('onewire', 'device', res)
             device = res.get_value()['device']
 
-            self._config = Query(self._myxpl)
+            self._config = Query(self._myxpl, self._log)
             res = XplResult()
             self._config.query('onewire', 'cache', res)
             if res.get_value()['cache'] == "True":
@@ -72,39 +72,39 @@ class OneWireManager(XplPlugin):
                 cache = False
 
             ### DS18B20 config
-            self._config = Query(self._myxpl)
+            self._config = Query(self._myxpl, self._log)
             res = XplResult()
             self._config.query('onewire', 'ds18b20-en', res)
             ds18b20_enabled = res.get_value()['ds18b20-en']
 
-            self._config = Query(self._myxpl)
+            self._config = Query(self._myxpl, self._log)
             res = XplResult()
             self._config.query('onewire', 'ds18b20-int', res)
             ds18b20_interval = res.get_value()['ds18b20-int']
     
-            self._config = Query(self._myxpl)
+            self._config = Query(self._myxpl, self._log)
             res = XplResult()
             self._config.query('onewire', 'ds18b20-res', res)
             ds18b20_resolution = res.get_value()['ds18b20-res']
     
             ### DS18S20 config
-            self._config = Query(self._myxpl)
+            self._config = Query(self._myxpl, self._log)
             res = XplResult()
             self._config.query('onewire', 'ds18s20-en', res)
             ds18s20_enabled = res.get_value()['ds18s20-en']
 
-            self._config = Query(self._myxpl)
+            self._config = Query(self._myxpl, self._log)
             res = XplResult()
             self._config.query('onewire', 'ds18s20-int', res)
             ds18s20_interval = res.get_value()['ds18s20-int']
     
             ### DS2401 config
-            self._config = Query(self._myxpl)
+            self._config = Query(self._myxpl, self._log)
             res = XplResult()
             self._config.query('onewire', 'ds2401-en', res)
             ds2401_enabled = res.get_value()['ds2401-en']
 
-            self._config = Query(self._myxpl)
+            self._config = Query(self._myxpl, self._log)
             res = XplResult()
             self._config.query('onewire', 'ds2401-int', res)
             ds2401_interval = res.get_value()['ds2401-int']

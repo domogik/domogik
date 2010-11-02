@@ -48,12 +48,13 @@ class Query():
     Query throw xPL network to get a config item
     '''
 
-    def __init__(self, xpl):
+    def __init__(self, xpl, log):
         '''
         Init the query system and connect it to xPL network
+        @param xpl : the XplManager instance (usually self._myxpl)
+        @param log : a Logger instance (usually took from self.get_my_logger())
         '''
-        l = logger.Logger('queryconfig')
-        self._log = l.get_logger()
+        self._log = log
         self.__myxpl = xpl
         self._log.debug("Init config query instance")
         self._keys = {}
@@ -71,7 +72,7 @@ class Query():
         @param key : the key to fetch corresponding value, if it's an empty string,
         all the config items for this technology will be fetched
         '''
-        print "new query"
+        print "new query for t = %s, k = %s" % (technology, key)
         Listener(self._query_cb, self.__myxpl, {'schema': 'domogik.config', 'xpltype': 'xpl-stat',
                                                 'technology': technology, 'hostname' : gethostname()})
         self._keys[key] = result

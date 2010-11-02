@@ -53,7 +53,7 @@ class TeleinfoManager(XplPlugin):
         Start teleinfo device handler
         '''
         XplPlugin.__init__(self, name='teleinfo')
-        self._config = Query(self._myxpl)
+        self._config = Query(self._myxpl, self._log)
         res = XplResult()
         self._config.query('teleinfo', 'device', res)
         device = res.get_value()['device']
