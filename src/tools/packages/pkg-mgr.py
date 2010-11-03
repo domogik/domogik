@@ -439,18 +439,19 @@ class PackageManager():
         # get all packages url
         file_list = []
         for repo in repo_list:
-            file_list.extend(self._get_files_list_from_repository(repo["url"]))
+            file_list.extend(self._get_files_list_from_repository(repo["url"], repo["priority"]))
 
         # for each package, put it in cache if higher version
-        for url_prefix in file_list:
-            pkg_xml = PackageXml(url = "%s.xml" % url_prefix)
+        for file_info in file_list:
+            pkg_xml = PackageXml(url = "%s.xml" % file_info["file"])
             print("Add '%s (%s)' in cache" % (pkg_xml.name, pkg_xml.version))
-            pkg_xml.cache_package(cache_folder, url_prefix)
+            pkg_xml.cache_package(cache_folder, file_info["file"], file_info["priority"])
 
 
-    def _get_files_list_from_repository(self, url):
+    def _get_files_list_from_repository(self, url, priority):
         """ Read packages.xml on repository
             @param url : repo url
+            @param prioriry : repo priority
         """
         try:
             resp = urllib.urlopen("%s/%s" % (url, REPO_LST_FILE))
@@ -464,7 +465,8 @@ class PackageManager():
                                    (url, REPO_LST_FILE))
                         break
                 else:
-                    my_list.append("%s/%s" % (url, data.strip()))
+                    my_list.append({"file" : "%s/%s" % (url, data.strip()),
+                                    "priority" : priority})
             return my_list
         except IOError:
             print("Bad url :'%s/%s'" % (url, REPO_LST_FILE))
@@ -480,13 +482,15 @@ class PackageManager():
                 pkg_xml = PackageXml(path = "%s/%s" % (root, f))
                 pkg_list.append({"fullname" : pkg_xml.fullname,
                                  "version" : pkg_xml.version,
+                                 "priority" : pkg_xml.priority,
                                  "desc" : pkg_xml.desc})
         pkg_list =  sorted(pkg_list, key = lambda k: (k['fullname'], 
                                                       k['version']))
         for pkg in pkg_list:
-             print("%s (%s) : %s" % (pkg["fullname"], 
-                                     pkg["version"], 
-                                     pkg["desc"]))
+             print("%s (%s, prio: %s) : %s" % (pkg["fullname"], 
+                                               pkg["version"], 
+                                               pkg["priority"], 
+                                               pkg["desc"]))
 
     def _show_packages(self, fullname, version = None):
         """ Show a package description
@@ -511,11 +515,13 @@ class PackageManager():
                     if fullname == pkg_xml.fullname:
                         pkg_list.append({"fullname" : pkg_xml.fullname,
                                          "version" : pkg_xml.version,
+                                         "priority" : pkg_xml.priority,
                                          "xml" : pkg_xml})
                 else:
                     if fullname == pkg_xml.fullname and version == pkg_xml.version:
                         pkg_list.append({"fullname" : pkg_xml.fullname,
                                          "version" : pkg_xml.version,
+                                         "priority" : pkg_xml.priority,
                                          "xml" : pkg_xml})
         if len(pkg_list) == 0:
             if version == None:
@@ -523,10 +529,11 @@ class PackageManager():
             print("No package corresponding to '%s' in version '%s'" % (fullname, version))
             return None
         if len(pkg_list) > 1:
-            print("Several packages are available for '%s'. Please specify which version to display" % fullname)
+            print("Several packages are available for '%s'. Please specify which version you choose" % fullname)
             for pkg in pkg_list:
-                 print("%s (%s)" % (pkg["fullname"], 
-                                    pkg["version"]))
+                 print("%s (%s, prio: %s)" % (pkg["fullname"], 
+                                              pkg["version"],
+                                              pkg["priority"]))
             return None
 
         return pkg_list[0]["xml"]
@@ -595,24 +602,28 @@ class PackageXml():
             if len(rep) == 0:
                 self.package_url = None
                 self.xml_url = None
+                self.priority = None
             else:
                 url_prefix = rep[0].attributes.get("url_prefix").value
                 self.package_url = "%s.tar.gz" % url_prefix
                 self.xml_url = "%s.xml" % url_prefix
+                self.priority = rep[0].attributes.get("priority").value
 
         except:
             raise PackageException("Error reading xml file : %s : %s" % (xml_file, str(traceback.format_exc())))
 
 
-    def cache_package(self, cache_folder, url_prefix):
+    def cache_package(self, cache_folder, url_prefix, priority):
         """ Add url_prefix info in xml data
             Store xml in a file in cache_folder
             @param cache_folder : folder to put xml file
             @param url_prefix : http://.../pluginname-version
+            @param priority : repository priority
         """
         top_elt = self.xml_content.documentElement
         new_elt = self.xml_content.createElementNS(None, 'repository')
         new_elt.setAttribute("url_prefix", url_prefix)
+        new_elt.setAttribute("priority", priority)
         top_elt.appendChild(new_elt)
         cache_file = open("%s/%s" % (cache_folder, self.xml_filename), "w") 
         cache_file.write(self.xml_content.toxml().encode("utf-8"))
@@ -642,6 +653,7 @@ class PackageXml():
             print("----- Repository informations ---------------------------")
             print("Package path   : %s" % self.package_url)
             print("Xml path       : %s" % self.xml_url)
+            print("Priority       : %s" % self.priority)
         print("---------------------------------------------------------")
 
 
