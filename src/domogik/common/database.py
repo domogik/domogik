@@ -40,7 +40,7 @@ Implements
 """
 
 import sys
-import calendar, datetime, hashlib
+import calendar, datetime, hashlib, time
 from types import DictType
 
 import sqlalchemy
@@ -1798,6 +1798,9 @@ class DbHelper():
         if end_date_ts:
             if start_date_ts > end_date_ts:
                 raise DbHelperException("'end_date' can't be prior to 'start_date'")
+        else:
+            end_date_ts = time.mktime(datetime.datetime.now().timetuple())
+
         if function_used is None or function_used.lower() not in ('min', 'max', 'avg'):
             raise DbHelperException("'function_used' parameter should be one of : min, max, avg")
         if step_used is None or step_used.lower() not in ('minute', 'hour', 'day', 'week', 'month', 'year'):
@@ -1888,9 +1891,8 @@ class DbHelper():
         if self.get_db_type() == 'mysql':
             query = step[step_used][0]
             query = query.filter_by(key=ucode(ds_key)).filter_by(device_id=ds_device_id
-                        ).filter("date >= '" + _datetime_string_from_tstamp(start_date_ts, self.get_db_type()) + "'")
-            if end_date_ts:
-                query = query.filter("date < '" + _datetime_string_from_tstamp(end_date_ts, self.get_db_type()) + "'")
+                        ).filter("date >= '" + _datetime_string_from_tstamp(start_date_ts, self.get_db_type()) + "'"
+                        ).filter("date < '" + _datetime_string_from_tstamp(end_date_ts, self.get_db_type()) + "'")
             result_list = query.all()
         else:
             datetime_cursor = datetime.datetime.fromtimestamp(start_date_ts)
