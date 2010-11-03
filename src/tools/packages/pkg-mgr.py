@@ -328,9 +328,6 @@ class PackageManager():
             raise PackageException("Error while extracting package '%s' : %s" % (path, traceback.format_exc()))
         print("Package successfully extracted.")
 
-
-        print"TMP=%s" % my_tmp_dir
-
         # launch package installation
         print("Starting installation...")
         try:
@@ -346,7 +343,10 @@ class PackageManager():
             @param extract_path : path for extraction
         """
         tar = tarfile.open(pkg_path)
-        # TODO : check if there is no .. or / in files path
+        # check if there is no .. or / in files path
+        for fic in tar.getnames():
+            if fic[0:1] == "/" or fic[0:2] == "..":
+                raise PackageException("Error while extracting package '%s' : filename '%s' not allowed" % (pkg_path, fic))
         tar.extractall(path = extract_path)
         tar.close()
 
