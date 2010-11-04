@@ -114,16 +114,16 @@ class ProcessRequest():
 
         # shorter access
         self._rest_api_version = self.handler_params[0]._rest_api_version
-        self.myxpl = self.handler_params[0]._myxpl
-        self._log = self.handler_params[0]._log
-        self._log_dm = self.handler_params[0]._log_dm
+        self.myxpl = self.handler_params[0].myxpl
+        self.log = self.handler_params[0].log
+        self.log_dm = self.handler_params[0].log_dm
         self._xml_cmd_dir = self.handler_params[0]._xml_cmd_dir
         self._xml_stat_dir = self.handler_params[0]._xml_stat_dir
         self.repo_dir = self.handler_params[0].repo_dir
         self.use_ssl = self.handler_params[0].use_ssl
         self.get_exception = self.handler_params[0].get_exception
 
-        self._log.debug("Process request : init")
+        self.log.debug("Process request : init")
 
         self._queue_timeout =  self.handler_params[0]._queue_timeout
         self._queue_size =  self.handler_params[0]._queue_size
@@ -153,11 +153,11 @@ class ProcessRequest():
 
         # replace password by "***". 
         path_without_passwd = re.sub("password/[^/]+/", "password/***/", self.path + "/")
-        self._log.info("Request : %s" % path_without_passwd)
+        self.log.info("Request : %s" % path_without_passwd)
 
         # log data manipulation here
         if re.match(".*(add|update|del|set).*", path_without_passwd) is not None:
-            self._log_dm.info("REQUEST=%s" % path_without_passwd)
+            self.log_dm.info("REQUEST=%s" % path_without_passwd)
 
         tab_url = self.path.split("?")
         self.path = tab_url[0]
@@ -227,14 +227,14 @@ class ProcessRequest():
     def _parse_options(self):
         """ Process parameters : ...?param1=val1&param2=val2&....
         """
-        self._log.debug("Parse request options : %s" % self.parameters)
+        self.log.debug("Parse request options : %s" % self.parameters)
 
         if self.parameters[-1:] == "/":
             self.parameters = self.parameters[0:len(self.parameters)-1]
 
         # for each debug option
         for opt in self.parameters.split("&"):
-            self._log.debug("OPT : %s" % opt)
+            self.log.debug("OPT : %s" % opt)
             tab_opt = opt.split("=")
             opt_key = tab_opt[0]
             if len(tab_opt) > 1:
@@ -244,7 +244,7 @@ class ProcessRequest():
 
             # call json specific options
             if opt_key == "callback" and opt_value != None:
-                self._log.debug("Option : jsonp mode")
+                self.log.debug("Option : jsonp mode")
                 self.jsonp = True
                 self.jsonp_cb = opt_value
 
@@ -261,9 +261,9 @@ class ProcessRequest():
     def _debug_sleep(self, duration):
         """ Sleep process for 15 seconds
         """
-        self._log.debug("Start sleeping for " + str(duration))
+        self.log.debug("Start sleeping for " + str(duration))
         time.sleep(float(duration))
-        self._log.debug("End sleeping")
+        self.log.debug("End sleeping")
 
 
 
@@ -340,7 +340,7 @@ class ProcessRequest():
             - call a xml parser for the technology (self.rest_request[0])
            - send appropriate xPL message on network
         """
-        self._log.debug("Process /command")
+        self.log.debug("Process /command")
 
         ### Check url length
         if len(self.rest_request) < 3:
@@ -358,10 +358,10 @@ class ProcessRequest():
         else:
             params = None
 
-        self._log.debug("Techno  : %s" % techno)
-        self._log.debug("Address : %s" % address)
-        self._log.debug("Command : %s" % command)
-        self._log.debug("Params  : %s" % str(params))
+        self.log.debug("Techno  : %s" % techno)
+        self.log.debug("Address : %s" % address)
+        self.log.debug("Command : %s" % command)
+        self.log.debug("Params  : %s" % str(params))
 
         ### Get message 
         message = self._rest_command_get_message(techno, address, command, params)
@@ -375,17 +375,17 @@ class ProcessRequest():
         ### Wait for answer
         # get xpl message from queue
         try:
-            self._log.debug("Command : wait for answer...")
+            self.log.debug("Command : wait for answer...")
             msg_cmd = self._get_from_queue(self._queue_command, xpl_type, schema, filters)
         except Empty:
-            self._log.debug("Command (%s, %s, %s, %s) : no answer" % (techno, address, command, params))
+            self.log.debug("Command (%s, %s, %s, %s) : no answer" % (techno, address, command, params))
             json_data = JSonHelper("ERROR", 999, "No data or timeout on getting command response")
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
             json_data.set_data_type("response")
             self.send_http_response_ok(json_data.get())
             return
 
-        self._log.debug("Command : message received : %s" % str(msg_cmd))
+        self.log.debug("Command : message received : %s" % str(msg_cmd))
 
         ### REST processing finished and OK
         json_data = JSonHelper("OK")
@@ -508,7 +508,7 @@ target=*
             - Decode and check URL format
             - call the good fonction to get stats from database
         """
-        self._log.debug("Process stats request")
+        self.log.debug("Process stats request")
         # parameters initialisation
         self.parameters = {}
 
@@ -630,7 +630,7 @@ target=*
     def rest_events(self):
         """ Events processing
         """
-        self._log.debug("Process events request")
+        self.log.debug("Process events request")
 
         # Check url length
         if len(self.rest_request) < 2:
@@ -730,7 +730,7 @@ target=*
             - Decode and check URL
             - Send message
         """
-        self._log.debug("Send xpl message")
+        self.log.debug("Send xpl message")
 
         if len(self.rest_request) == 0:
             self.send_http_response_error(999, "Schema not given", self.jsonp, self.jsonp_cb)
@@ -764,7 +764,7 @@ target=*
             self.send_http_response_error(999, "Value missing for last parameter", self.jsonp, self.jsonp_cb)
             return
 
-        self._log.debug("Send message : %s" % str(message))
+        self.log.debug("Send message : %s" % str(message))
         self.myxpl.send(message)
 
         # REST processing finished and OK
@@ -784,7 +784,7 @@ target=*
             - Decode and check URL format
             - call the good fonction to get data from database
         """
-        self._log.debug("Process base request")
+        self.log.debug("Process base request")
         # parameters initialisation
         self.parameters = {}
 
@@ -1434,7 +1434,7 @@ target=*
                     json_data.add_data(room)
             self.send_http_response_ok(json_data.get())
         except:
-            self._log.error("Exception : %s" % traceback.format_exc())
+            self.log.error("Exception : %s" % traceback.format_exc())
 
 
     def _rest_base_room_add(self):
@@ -2066,7 +2066,7 @@ target=*
     def rest_plugin(self):
         """ /plugin processing
         """
-        self._log.debug("Plugin action")
+        self.log.debug("Plugin action")
 
         # parameters initialisation
         self.parameters = {}
@@ -2173,7 +2173,7 @@ target=*
             Display this list as json
             @param name : name of plugin
         """
-        self._log.debug("Plugin : ask for plugin list on %s." % host)
+        self.log.debug("Plugin : ask for plugin list on %s." % host)
 
         ### Send xpl message to get list
         message = XplMessage()
@@ -2184,7 +2184,7 @@ target=*
         #message.add_data({"host" : gethostname()})
         message.add_data({"host" : "*"})
         self.myxpl.send(message)
-        self._log.debug("Plugin : send message : %s" % str(message))
+        self.log.debug("Plugin : send message : %s" % str(message))
 
         ### Wait for answer
         # get xpl message from queue
@@ -2192,29 +2192,29 @@ target=*
         messages = []
         try:
             # Get first answer for command
-            self._log.debug("Plugin list : wait for first answer...")
+            self.log.debug("Plugin list : wait for first answer...")
             messages.append(self._get_from_queue(self._queue_system_list, "xpl-trig", "domogik.system"))
             # after first message, we start to listen for other messages 
-            self._log.debug("Plugin list : wait for other answers during '%s' seconds..." % WAIT_FOR_LIST_ANSWERS)
+            self.log.debug("Plugin list : wait for other answers during '%s' seconds..." % WAIT_FOR_LIST_ANSWERS)
             max_time = time.time() + WAIT_FOR_LIST_ANSWERS
             while time.time() < max_time:
                 try:
                     message = self._get_from_queue(self._queue_system_list, "xpl-trig", "domogik.system", timeout = WAIT_FOR_LIST_ANSWERS)
                     messages.append(message)
-                    self._log.debug("Plugin list : get one answer from '%s'" % message.data["host"])
+                    self.log.debug("Plugin list : get one answer from '%s'" % message.data["host"])
                 except Empty:
-                    self._log.debug("Plugin list : empty queue")
+                    self.log.debug("Plugin list : empty queue")
                     pass
-            self._log.debug("Plugin list : end waiting for answers")
+            self.log.debug("Plugin list : end waiting for answers")
         except Empty:
-            self._log.debug("Plugin list : no answer")
+            self.log.debug("Plugin list : no answer")
             json_data = JSonHelper("ERROR", 999, "No data or timeout on getting plugin list")
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
             json_data.set_data_type("plugin")
             self.send_http_response_ok(json_data.get())
             return
 
-        self._log.debug("Plugin list : messages received : %s" % str(messages))
+        self.log.debug("Plugin list : messages received : %s" % str(messages))
         
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
@@ -2245,7 +2245,7 @@ target=*
             Display this list as json
             @param name : name of plugin
         """
-        self._log.debug("Plugin : ask for plugin detail : %s on %s." % (name, host))
+        self.log.debug("Plugin : ask for plugin detail : %s on %s." % (name, host))
 
         ### Send xpl message to get detail
         message = XplMessage()
@@ -2256,12 +2256,12 @@ target=*
         # TODO : ask for good host
         message.add_data({"host" : host})
         self.myxpl.send(message)
-        self._log.debug("Plugin : send message : %s" % str(message))
+        self.log.debug("Plugin : send message : %s" % str(message))
 
         ### Wait for answer
         # get xpl message from queue
         try:
-            self._log.debug("Plugin : wait for answer...")
+            self.log.debug("Plugin : wait for answer...")
             # in filter, "%" means, that we check for something starting with name
             message = self._get_from_queue(self._queue_system_detail, "xpl-trig", "domogik.system", filter_data = {"command" : "detail", "plugin" : name + "%"})
         except Empty:
@@ -2271,7 +2271,7 @@ target=*
             self.send_http_response_ok(json_data.get())
             return
 
-        self._log.debug("Plugin : message received : %s" % str(message))
+        self.log.debug("Plugin : message received : %s" % str(message))
 
         # process message
         cmd = message.data['command']
@@ -2317,7 +2317,7 @@ target=*
             @param host : host to which we send command
             @param plugin : name of plugin
         """
-        self._log.debug("Plugin : ask for %s %s on %s " % (command, plugin, host))
+        self.log.debug("Plugin : ask for %s %s on %s " % (command, plugin, host))
 
         ### Send xpl message
         cmd_message = XplMessage()
@@ -2327,12 +2327,12 @@ target=*
         cmd_message.add_data({"host" : host})
         cmd_message.add_data({"plugin" : plugin})
         self.myxpl.send(cmd_message)
-        self._log.debug("Plugin : send message : %s" % str(cmd_message))
+        self.log.debug("Plugin : send message : %s" % str(cmd_message))
 
         ### Listen for response
         # get xpl message from queue
         try:
-            self._log.debug("Plugin : wait for answer...")
+            self.log.debug("Plugin : wait for answer...")
             if command == "start":
                 message = self._get_from_queue(self._queue_system_start, "xpl-trig", "domogik.system", filter_data = {"command" : "start", "plugin" : plugin})
             elif command == "stop":
@@ -2344,7 +2344,7 @@ target=*
             self.send_http_response_ok(json_data.get())
             return
 
-        self._log.debug("Plugin : message received : %s" % str(message))
+        self.log.debug("Plugin : message received : %s" % str(message))
 
         # an error happens
         if 'error' in message.data:
@@ -2438,7 +2438,7 @@ target=*
     def rest_account(self):
         """ REST account management
         """
-        self._log.debug("Account action")
+        self.log.debug("Account action")
 
         # Check url length
         if len(self.rest_request) < 2:
@@ -2586,19 +2586,19 @@ target=*
             @param login : login
             @param password : password
         """
-        self._log.info("Try to authenticate as %s" % login)
+        self.log.info("Try to authenticate as %s" % login)
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         login_ok = self._db.authenticate(login, password)
         if login_ok == True:
-            self._log.info("Authentication OK")
+            self.log.info("Authentication OK")
             json_data.set_ok(description = "Authentification granted")
             json_data.set_data_type("account")
             account = self._db.get_user_account_by_login(login)
             if account is not None:
                 json_data.add_data(account)
         else:
-            self._log.warning("Authentication refused")
+            self.log.warning("Authentication refused")
             json_data.set_error(999, "Authentification refused")
         self.send_http_response_ok(json_data.get())
 
@@ -2668,7 +2668,7 @@ target=*
     def _rest_account_password(self):
         """ update user password
         """
-        self._log.info("Try to change password for account id %s" % self.get_parameters("id"))
+        self.log.info("Try to change password for account id %s" % self.get_parameters("id"))
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("account")
@@ -2676,14 +2676,14 @@ target=*
                                           self.get_parameters("old"), \
                                           self.get_parameters("new"))
         if change_ok == True:
-            self._log.info("Password updated")
+            self.log.info("Password updated")
             json_data.set_ok(description = "Password updated")
             json_data.set_data_type("account")
             account = self._db.get_user_account(self.get_parameters("id"))
             if account is not None:
                 json_data.add_data(account)
         else:
-            self._log.warning("Password not updated : error")
+            self.log.warning("Password not updated : error")
             json_data.set_error(999, "Error in updating password")
         self.send_http_response_ok(json_data.get())
 
@@ -2786,7 +2786,7 @@ target=*
     def rest_queuecontent(self):
         """ Display a queue content
         """
-        self._log.debug("Display queue content")
+        self.log.debug("Display queue content")
         
         # Check url length
         if len(self.rest_request) != 1:
@@ -2838,7 +2838,7 @@ target=*
     def rest_testlongpoll(self):
         """ REST function to test longpoll feature
         """
-        self._log.debug("Testing long poll action")
+        self.log.debug("Testing long poll action")
         num = random.randint(1, 15)
         time.sleep(num)
         data = {"number" : num}
@@ -2968,7 +2968,7 @@ target=*
             self.send_http_response_error(999, "You must give a file name : ?filename=foo.txt",
                                           self.jsonp, self.jsonp_cb)
             return
-        self._log.info("PUT : uploading %s" % self._put_filename)
+        self.log.info("PUT : uploading %s" % self._put_filename)
 
         # TODO : check filename value (extension, etc)
 
@@ -2984,13 +2984,13 @@ target=*
             up_file.write(self.rfile.read(content_length))
             up_file.close()
         except IOError:
-            self._log.error("PUT : failed to upload '%s' : %s" % (self._put_filename, traceback.format_exc()))
+            self.log.error("PUT : failed to upload '%s' : %s" % (self._put_filename, traceback.format_exc()))
             print traceback.format_exc()
             self.send_http_response_error(999, "Error while writing '%s' : %s" % (file, traceback.format_exc()),
                                           self.jsonp, self.jsonp_cb)
             return
 
-        self._log.info("PUT : %s uploaded as %s%s" % (self._put_filename,
+        self.log.info("PUT : %s uploaded as %s%s" % (self._put_filename,
                                                    file_id, extension))
         json_data = JSonHelper("OK")
         json_data.set_data_type("repository")
@@ -3058,7 +3058,7 @@ target=*
                  disappear. There is no need for the moment to put this function
                  in a library
         '''
-        self._log.info("Check if '%s' is running... (thread)" % name)
+        self.log.info("Check if '%s' is running... (thread)" % name)
         self._pinglist[name] = Event()
         mess = XplMessage()
         mess.set_type('xpl-cmnd')
@@ -3077,10 +3077,10 @@ target=*
             if self._pinglist[name].isSet():
                 break
         if self._pinglist[name].isSet():
-            self._log.info("'%s' is running" % name)
+            self.log.info("'%s' is running" % name)
             return True
         else:
-            self._log.info("'%s' is not running" % name)
+            self.log.info("'%s' is not running" % name)
             return False
 
 

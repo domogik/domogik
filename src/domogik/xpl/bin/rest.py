@@ -122,13 +122,13 @@ class Rest(XplPlugin):
 
         # logging Queue activities
         log_queue = logger.Logger('rest-queues')
-        self._log_queue = log_queue.get_logger()
-        self._log_queue.info("Rest's queues activities...")
+        self.log_queue = log_queue.get_logger()
+        self.log_queue.info("Rest's queues activities...")
     
         # logging data manipulation initialization
         log_dm = logger.Logger('rest-dm')
-        self._log_dm = log_dm.get_logger()
-        self._log_dm.info("Rest Server Data Manipulation...")
+        self.log_dm = log_dm.get_logger()
+        self.log_dm.info("Rest Server Data Manipulation...")
 
         # API version
         self._rest_api_version = REST_API_VERSION
@@ -376,10 +376,10 @@ class Rest(XplPlugin):
         """
         if timeout == None:
             timeout = self._queue_timeout
-        self._log_queue.debug("Get from queue : %s (recursivity deepth : %s)" % (str(my_queue), nb_rec))
+        self.log_queue.debug("Get from queue : %s (recursivity deepth : %s)" % (str(my_queue), nb_rec))
         # check if recursivity doesn't exceed queue size
         if nb_rec > my_queue.qsize():
-            self._log_queue.warning("Get from queue %s : number of call exceed queue size (%s) : return None" % (str(my_queue), my_queue.qsize()))
+            self.log_queue.warning("Get from queue %s : number of call exceed queue size (%s) : return None" % (str(my_queue), my_queue.qsize()))
             # we raise an "Empty" exception because we consider that if we don't find
             # the good data, it is as if it was "empty"
             raise Empty
@@ -390,7 +390,7 @@ class Rest(XplPlugin):
         if time.time() - msg_time < self._queue_life_expectancy:
             # no filter defined
             if filter_type == None and filter_schema == None and filter_data == None: 
-                self._log_queue.debug("Get from queue %s : return %s" % (str(my_queue), str(message)))
+                self.log_queue.debug("Get from queue %s : return %s" % (str(my_queue), str(message)))
                 return message
 
             # we want to filter data
@@ -403,7 +403,7 @@ class Rest(XplPlugin):
 
                 if filter_data != None and keep_data == True:
                     # data
-                    self._log_queue.debug("Filter on message %s WITH %s" % (message.data, filter_data))
+                    self.log_queue.debug("Filter on message %s WITH %s" % (message.data, filter_data))
                     for key in filter_data:
                         # take care of final "%" in order to search data starting by filter_data[key]
                         if filter_data[key][-1] == "%":
@@ -419,18 +419,18 @@ class Rest(XplPlugin):
     
                 # if message is ok for us, return it
                 if keep_data == True:
-                    self._log_queue.debug("Get from queue %s : return %s" % (str(my_queue), str(message)))
+                    self.log_queue.debug("Get from queue %s : return %s" % (str(my_queue), str(message)))
                     return message
 
                 # else, message get back in queue and get another one
                 else:
-                    self._log_queue.debug("Get from queue %s : bad data, check another one..." % (str(my_queue)))
+                    self.log_queue.debug("Get from queue %s : bad data, check another one..." % (str(my_queue)))
                     self._put_in_queue(my_queue, message)
                     return self._get_from_queue_without_waiting(my_queue, filter_type, filter_schema, filter_data, nb_rec + 1, timeout)
 
         # if message too old : get an other message
         else:
-            self._log_queue.debug("Get from queue %s : data too old, check another one..." % (str(my_queue)))
+            self.log_queue.debug("Get from queue %s : data too old, check another one..." % (str(my_queue)))
             return self._get_from_queue_without_waiting(my_queue, filter_type, filter_schema, filter_data, nb_rec + 1, timeout)
 
     def _put_in_queue(self, my_queue, message):
@@ -438,14 +438,14 @@ class Rest(XplPlugin):
             @param my_queue : queue 
             @param message : data to put in queue
         """
-        self._log_queue.debug("Put in queue %s : %s" % (str(my_queue), str(message)))
+        self.log_queue.debug("Put in queue %s : %s" % (str(my_queue), str(message)))
         try:
             my_queue.put((time.time(), message), True, self._queue_timeout) 
 
         # Clean queue to make space
         except Full:
             msg = "Queue '%s' is full : cleaning it to make some space..." % my_queue
-            self._log_queue.debug(msg)
+            self.log_queue.debug(msg)
             print msg
             # queue is full : start cleaning it
             nb_ck = 0
@@ -456,7 +456,7 @@ class Rest(XplPlugin):
                     my_queue.put((q_time, q_data), True, self._queue_timeout)
                 nb_ck += 1
             my_queue.put((time.time(), message), True, self._queue_timeout) 
-            self._log_queue.debug("Cleaning finished")
+            self.log_queue.debug("Cleaning finished")
               
                 
 
@@ -582,7 +582,7 @@ class HTTPSServerWithParam(SocketServer.ThreadingMixIn, HTTPServer):
         except:
             error = "SSL error : %s. Did you generate certificate ?" % self.handler_params[0].get_exception()
             print error
-            self.handler_params[0]._log.error(error)
+            self.handler_params[0].log.error(error)
             # force exiting
             self.handler_params[0].force_leave()
             return
@@ -678,7 +678,7 @@ class RestHandler(BaseHTTPRequestHandler):
                                  self.send_http_response_error)
             request.do_for_all_methods()
         except:
-            self.server.handler_params[0]._log.error("%s" % self.server.handler_params[0].get_exception())
+            self.server.handler_params[0].log.error("%s" % self.server.handler_params[0].get_exception())
         
 
 
@@ -694,7 +694,7 @@ class RestHandler(BaseHTTPRequestHandler):
             Send also json data
             @param data : json data to display
         """
-        self.server.handler_params[0]._log.debug("Send HTTP header for OK")
+        self.server.handler_params[0].log.debug("Send HTTP header for OK")
         try:
             self.send_response(200)
             self.send_header('Content-type',  'application/json')
@@ -705,15 +705,15 @@ class RestHandler(BaseHTTPRequestHandler):
             if data:
                 # if big data, log only start of data
                 if len(data) > 1000:
-                    self.server.handler_params[0]._log.debug("Send HTTP data : %s... [truncated because data too long for logs]" % data[0:1000].encode("utf-8"))
+                    self.server.handler_params[0].log.debug("Send HTTP data : %s... [truncated because data too long for logs]" % data[0:1000].encode("utf-8"))
                 # else log all data
                 else:
-                    self.server.handler_params[0]._log.debug("Send HTTP data : %s" % data.encode("utf-8"))
+                    self.server.handler_params[0].log.debug("Send HTTP data : %s" % data.encode("utf-8"))
                 self.wfile.write(data.encode("utf-8"))
         except IOError as err: 
             if err.errno == errno.EPIPE:
                 # [Errno 32] Broken pipe : client closed connexion
-                self.server.handler_params[0]._log.debug("It seems that socket has closed on client side (the browser may have change the page displayed")
+                self.server.handler_params[0].log.debug("It seems that socket has closed on client side (the browser may have change the page displayed")
                 return
             else:
                 raise err
@@ -730,7 +730,7 @@ class RestHandler(BaseHTTPRequestHandler):
             @param jsonp_cb : if jsonp is True, name of callback to use 
                               in jsonp format
         """
-        self.server.handler_params[0]._log.warning("Send HTTP header for ERROR : code=%s ; msg=%s" % (err_code, err_msg))
+        self.server.handler_params[0].log.warning("Send HTTP header for ERROR : code=%s ; msg=%s" % (err_code, err_msg))
         json_data = JSonHelper("ERROR", err_code, err_msg)
         json_data.set_jsonp(jsonp, jsonp_cb)
         try:
@@ -744,7 +744,7 @@ class RestHandler(BaseHTTPRequestHandler):
         except IOError as err:
             if err.errno == errno.EPIPE:
                 # [Errno 32] Broken pipe : client closed connexion
-                self.server.handler_params[0]._log.debug("It seems that socket has closed on client side (the browser may have change the page displayed")
+                self.server.handler_params[0].log.debug("It seems that socket has closed on client side (the browser may have change the page displayed")
                 return
             else:
                 raise err
