@@ -153,7 +153,7 @@ class XplPlugin():
             """ Handler for domogik system messages
             """
             cmd = message.data['command']
-            if not self._is_manager and cmd in ["stop", "reload", "dump", "ping"]:
+            if not self._is_manager and cmd in ["stop", "reload", "dump"]:
                 self._client_handler(message)
             else:
                 self._manager_handler(message)
@@ -180,9 +180,8 @@ class XplPlugin():
                     isn't able to do it." % self.get_plugin_name())
                 else:
                     self._dump_cb()
-            else: #cmd == ping
-                if message.data["plugin"] in [self.get_plugin_name(), "*"]:
-                    self._answer_ping()
+            else: #Command not known
+                self.log.info("domogik.system command not recognized : %s" % cmd)
 
         def __del__(self):
             self.log.debug("__del__ Single xpl plugin")
@@ -195,16 +194,6 @@ class XplPlugin():
             mess.set_type("xpl-trig")
             mess.set_schema("domogik.system")
             mess.add_data({"command":"stop", "plugin": self.get_plugin_name(),
-                "host": gethostname()})
-            self.myxpl.send(mess)
-
-        def _answer_ping(self):
-            """ Send a ping reply
-            """
-            mess = XplMessage()
-            mess.set_type("xpl-trig")
-            mess.set_schema("domogik.system")
-            mess.add_data({"command":"ping", "plugin": self.get_plugin_name(),
                 "host": gethostname()})
             self.myxpl.send(mess)
 
@@ -312,7 +301,7 @@ class Watcher:
         """ Handler called when a SIGTERM is received
         Stop the plugin
         """
-        self._plugin.log.info("SIGTERM receive, stopping plugin")
+        self._plugin.log.info("SIGTERM receive, stop plugin")
         self._plugin.force_leave()
         self.kill()
 
