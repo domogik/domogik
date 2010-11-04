@@ -145,7 +145,7 @@ class Manager(BasePlugin):
             self._h_timer = XplTimer(300, self._SendHeartbeat, self.get_stop(), self)
             self._h_timer.start()
             #We add a listener in order to answer to the hbeat requests
-            Listener(cb = self.got_hbeat, manager = self, filter = {'schema':'hbeat.app', 'xpltype':'xpl-stat'})
+            Listener(cb = self.got_hbeat, manager = self, filter = {'schema':'hbeat.request', 'xpltype':'xpl-cmnd'})
             #And finally we start network listener in a thread
             self._stop_thread = False
             self._network = threading.Thread(None, self._run_thread_monitor,
@@ -211,7 +211,7 @@ remote-ip=%s
                 self._UDPSock.sendto(mess, (self._broadcast, 3865))
 
     def got_hbeat(self, message):
-        if(message.target != self._source ):
+        if(message.target == self._source ):
             self._SendHeartbeat(message.source)
 
     def _run_thread_monitor(self):
