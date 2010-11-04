@@ -44,6 +44,10 @@ from socket import gethostname
 from domogik.xpl.common.xplconnector import XplMessage, Manager, Listener
 from domogik.xpl.common.baseplugin import BasePlugin
 from domogik.common.configloader import Loader
+from domogik.common.processinfo import ProcessInfo
+
+# time between each read of cpu/memory usage for process
+TIME_BETWEEN_EACH_PROCESS_STATUS = 60
 
 class XplPlugin():
     '''
@@ -136,7 +140,23 @@ class XplPlugin():
                                                                    'xpltype':'xpl-cmnd'})
             self._reload_cb = reload_cb
             self._dump_cb = dump_cb
+
+            # Create object which get process informations (cpu, memory, etc)
+            self._process_info = ProcessInfo(os.getpid(),
+                                             TIME_BETWEEN_EACH_PROCESS_STATUS,
+                                             self._send_process_info,
+                                             self.log,
+                                             self.myxpl)
+            self._process_info.start()
+
             self.log.debug("end single xpl plugin")
+
+        def _send_process_info(self, pid, data):
+            """ Send process info (cpu, memory) on xpl
+                @param : process pid
+                @param data : dictionnary of process informations
+            """
+            print "PROCESS INFO : %s : %s" % (pid, str(data))
 
         def _get_pid(self):
             """ Get current pid and write it to a file
