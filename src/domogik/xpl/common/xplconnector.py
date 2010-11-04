@@ -211,7 +211,7 @@ remote-ip=%s
                 self._UDPSock.sendto(mess, (self._broadcast, 3865))
 
     def got_hbeat(self, message):
-        if(message.target == self._source ):
+        if(message.target == self._source or message.target == "*"):
             self._SendHeartbeat(message.source)
 
     def _run_thread_monitor(self):
