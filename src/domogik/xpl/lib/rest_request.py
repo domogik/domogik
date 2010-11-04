@@ -3062,18 +3062,20 @@ target=*
         self._pinglist[name] = Event()
         mess = XplMessage()
         mess.set_type('xpl-cmnd')
-        mess.set_schema('domogik.system')
-        mess.add_data({'command' : 'ping'})
-        mess.add_data({'host' : gethostname()})
-        mess.add_data({'plugin' : name})
-        Listener(self._cb_check_component_is_running, self.myxpl, {'schema':'domogik.system', \
-                'xpltype':'xpl-trig','command':'ping','plugin':name,'host':gethostname()}, \
+        mess.set_target("xpl-%s.%s" % (name, gethostname()))
+        mess.set_schema('hbeat.request')
+        mess.add_data({'command' : 'request'})
+        Listener(self._cb_check_component_is_running, 
+                 self.myxpl, 
+                 {'schema':'hbeat.app', 
+                  'xpltype':'xpl-stat', 
+                  'xplsource':"xpl-%s.%s" % (name, gethostname())},
                 cb_params = {'name' : name})
-        max_time = PING_DURATION
-        while max_time != 0:
+        max = PING_DURATION
+        while max != 0:
             self.myxpl.send(mess)
             time.sleep(1)
-            max_time = max_time - 1
+            max = max - 1
             if self._pinglist[name].isSet():
                 break
         if self._pinglist[name].isSet():
@@ -3087,8 +3089,7 @@ target=*
     def _cb_check_component_is_running(self, message, args):
         ''' Set the Event to true if an answer was received
         '''
-        if not "error" in message.data:
-            self._pinglist[args["name"]].set()
+        self._pinglist[args["name"]].set()
 
     ##### END OF TEMPORARY FUNCTIONS
 
