@@ -223,10 +223,6 @@ class SysManager(XplPlugin):
             elif cmd == "detail" and host == gethostname():
                 self._send_component_detail(plg, host)
 
-            # host ping
-            elif cmd == "host-ping":
-                self._ping(host)
-
         # if error
         else:
             self.log.info("Error detected : %s, request %s has been cancelled" % (error, cmd))
@@ -331,22 +327,8 @@ class SysManager(XplPlugin):
                 self.log.warning("Pid file contains no pid!")
 
 
-
-
-    def _ping(self, host):
-        """ Send a ping xpl message
-            @param : host to ping
-        """
-        self.log.debug("Ask to ping on %s" % (host))
-        mess = XplMessage()
-        mess.set_type('xpl-trig')
-        mess.set_schema('domogik.system')
-        mess.add_data({'command' : 'host-ping'})
-        mess.add_data({'host' : host})
-        self.myxpl.send(mess)
-
     def _check_component_is_running(self, name, foo = None):
-        ''' This method will send a ping request to a component
+        ''' This method will send a ping request to a component on localhost
         and wait for the answer (max 5 seconds).
         @param name : component name
        
@@ -360,15 +342,16 @@ class SysManager(XplPlugin):
         self._pinglist[name] = Event()
         mess = XplMessage()
         mess.set_type('xpl-cmnd')
-        mess.set_schema('domogik.system')
-        mess.add_data({'command' : 'ping'})
-        mess.add_data({'host' : gethostname()})
-        mess.add_data({'plugin' : name})
-        Listener(self._cb_check_component_is_running, self.myxpl, {'schema':'domogik.system', \
-                'xpltype':'xpl-trig','command':'ping','plugin':name,'host':gethostname()}, \
+        mess.set_target("xpl-%s.%s" % (name, gethostname()))
+        mess.set_schema('hbeat.request')
+        mess.add_data({'command' : 'request'})
+        Listener(self._cb_check_component_is_running, 
+                 self.myxpl, 
+                 {'schema':'hbeat.app', 
+                  'xpltype':'xpl-stat', 
+                  'xplsource':"xpl-%s.%s" % (name, gethostname())},
                 cb_params = {'name' : name})
         max = PING_DURATION
-        self._set_status(name, "OFF")
         while max != 0:
             self.myxpl.send(mess)
             time.sleep(1)
@@ -387,8 +370,7 @@ class SysManager(XplPlugin):
     def _cb_check_component_is_running(self, message, args):
         ''' Set the Event to true if an answer was received
         '''
-        if not "error" in message.data:
-            self._pinglist[args["name"]].set()
+        self._pinglist[args["name"]].set()
 
     def _start_comp(self, name):
         '''

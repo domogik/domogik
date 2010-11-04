@@ -327,6 +327,8 @@ class Listener:
                 ok = ok and (self._filter[key] == message.schema)
             elif key == "xpltype":
                 ok = ok and (self._filter[key] == message.type)
+            elif key == "xplsource":
+                ok = ok and (self._filter[key] == message.source)
             elif not (key in message.data or key in ("xpltype", "schema")):
                 ok = False
         #The message match the filter, we can call  the callback function
