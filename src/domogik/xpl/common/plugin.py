@@ -147,12 +147,12 @@ class XplPlugin():
             self._dump_cb = dump_cb
 
             # Create object which get process informations (cpu, memory, etc)
-            self._process_info = ProcessInfo(os.getpid(),
-                                             TIME_BETWEEN_EACH_PROCESS_STATUS,
-                                             self._send_process_info,
-                                             self.log,
-                                             self.myxpl)
-            self._process_info.start()
+            #self._process_info = ProcessInfo(os.getpid(),
+            #                                 TIME_BETWEEN_EACH_PROCESS_STATUS,
+            #                                 self._send_process_info,
+            #                                 self.log,
+            #                                 self.myxpl)
+            #self._process_info.start()
 
             self.log.debug("end single xpl plugin")
 
