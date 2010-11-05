@@ -86,7 +86,7 @@ class SysManager(XplPlugin):
         XplPlugin.__init__(self, name = 'manager', parser=parser)
 
         # Logger init
-        self.log.info("Host : %s" % gethostname())
+        self.log.info("Host : %s" % gethostname().lower())
     
         # Get config
         cfg = Loader('domogik')
@@ -98,14 +98,14 @@ class SysManager(XplPlugin):
         self._pinglist = {}
         try:
             # Get components
-            self._list_components(gethostname())
+            self._list_components(gethostname().lower())
     
             #Start dbmgr
             if self.options.start_dbmgr:
                 if self._check_component_is_running("dbmgr"):
                     self.log.warning("Manager started with -d, but a database manager is already running")
                 else:
-                    self._start_plugin("dbmgr", gethostname())
+                    self._start_plugin("dbmgr", gethostname().lower())
                     if not self._check_component_is_running("dbmgr"):
                         self.log.error("Manager started with -d, but database manager not available after a startup.\
                                 Please check dbmgr.log file")
@@ -115,7 +115,7 @@ class SysManager(XplPlugin):
                 if self._check_component_is_running("rest"):
                     self.log.warning("Manager started with -r, but a REST manager is already running")
                 else:
-                    self._start_plugin("rest", gethostname())
+                    self._start_plugin("rest", gethostname().lower())
                     if not self._check_component_is_running("rest"):
                         self.log.error("Manager started with -r, but REST manager not available after a startup.\
                                 Please check rest.log file")
@@ -125,7 +125,7 @@ class SysManager(XplPlugin):
                 if self._check_component_is_running("trigger"):
                     self.log.warning("Manager started with -t, but a trigger manager is already running")
                 else:
-                    self._start_plugin("trigger", gethostname())
+                    self._start_plugin("trigger", gethostname().lower())
                     if not self._check_component_is_running("trigger"):
                         self.log.error("Manager started with -t, but trigger manager not available after a startup.\
                                 Please check trigger.log file")
@@ -148,7 +148,7 @@ class SysManager(XplPlugin):
                                                    self._start_plugin,
                                                    None,
                                                    (name,
-                                                    gethostname()),
+                                                    gethostname().lower()),
                                                    {})
                     comp_thread[name].start()
             
@@ -205,22 +205,22 @@ class SysManager(XplPlugin):
 
         # if no error at this point, process
         if error == "":
-            self.log.debug("System request %s for host %s, plugin %s. current hostname : %s" % (cmd, host, plg, gethostname()))
+            self.log.debug("System request %s for host %s, plugin %s. current hostname : %s" % (cmd, host, plg, gethostname().lower()))
 
             # start plugin
-            if cmd == "start" and host == gethostname() and plg != "rest":
+            if cmd == "start" and host == gethostname().lower() and plg != "rest":
                 self._start_plugin(plg, host) 
 
             # stop plugin
-            if cmd == "stop" and host == gethostname() and plg != "rest":
+            if cmd == "stop" and host == gethostname().lower() and plg != "rest":
                 self._stop_plugin(plg, host)
 
             # list plugin
-            elif cmd == "list" and (host == gethostname() or host == "*"):
+            elif cmd == "list" and (host == gethostname().lower() or host == "*"):
                 self._send_component_list()
 
             # detail plugin
-            elif cmd == "detail" and host == gethostname():
+            elif cmd == "detail" and host == gethostname().lower():
                 self._send_component_detail(plg, host)
 
         # if error
@@ -342,14 +342,14 @@ class SysManager(XplPlugin):
         self._pinglist[name] = Event()
         mess = XplMessage()
         mess.set_type('xpl-cmnd')
-        mess.set_target("xpl-%s.%s" % (name, gethostname()))
+        mess.set_target("xpl-%s.%s" % (name, gethostname().lower()))
         mess.set_schema('hbeat.request')
         mess.add_data({'command' : 'request'})
         Listener(self._cb_check_component_is_running, 
                  self.myxpl, 
                  {'schema':'hbeat.app', 
                   'xpltype':'xpl-stat', 
-                  'xplsource':"xpl-%s.%s" % (name, gethostname())},
+                  'xplsource':"xpl-%s.%s" % (name, gethostname().lower())},
                 cb_params = {'name' : name})
         max = PING_DURATION
         while max != 0:
@@ -470,7 +470,7 @@ class SysManager(XplPlugin):
                                              "description" : plgdesc, 
                                              "technology" : plgtech, 
                                              "status" : "OFF",
-                                             "host" : gethostname(), 
+                                             "host" : gethostname().lower(), 
                                              "version" : plgver,
                                              "documentation" : plgdoc,
                                              "configuration" : plgconf})
@@ -516,7 +516,7 @@ class SysManager(XplPlugin):
                                         component["description"])
             mess.add_data({'plugin'+str(idx) : plg_content})
             idx += 1
-        mess.add_data({'host' : gethostname()})
+        mess.add_data({'host' : gethostname().lower()})
         self.myxpl.send(mess)
 
     def _send_component_detail(self, plg, host):
@@ -542,7 +542,7 @@ class SysManager(XplPlugin):
                 mess.add_data({'status' :  component["status"]})
                 mess.add_data({'version' :  component["version"]})
                 mess.add_data({'documentation' :  component["documentation"]})
-                mess.add_data({'host' : gethostname()})
+                mess.add_data({'host' : gethostname().lower()})
 
         self.myxpl.send(mess)
 

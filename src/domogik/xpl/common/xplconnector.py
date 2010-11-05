@@ -98,7 +98,7 @@ class Manager(BasePlugin):
     # _network = None
     # _UDPSock = None
 
-    def __init__(self, ip=gethostbyname(gethostname()), port=0, broadcast="255.255.255.255"):
+    def __init__(self, ip=gethostbyname(gethostname().lower()), port=0, broadcast="255.255.255.255"):
         """
         Create a new manager instance
         @param ip : IP to listen to (default real ip address)

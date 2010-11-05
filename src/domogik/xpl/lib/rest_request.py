@@ -2168,7 +2168,7 @@ target=*
 
 
 
-    def _rest_plugin_list(self, name = None, host = gethostname()):
+    def _rest_plugin_list(self, name = None, host = gethostname().lower()):
         """ Send a xpl message to manager to get plugin list
             Display this list as json
             @param name : name of plugin
@@ -2181,7 +2181,7 @@ target=*
         message.set_schema("domogik.system")
         message.add_data({"command" : "list"})
         # TODO : ask for good host
-        #message.add_data({"host" : gethostname()})
+        #message.add_data({"host" : gethostname().lower()})
         message.add_data({"host" : "*"})
         self.myxpl.send(message)
         self.log.debug("Plugin : send message : %s" % str(message))
@@ -2240,7 +2240,7 @@ target=*
 
 
 
-    def _rest_plugin_detail(self, name, host = gethostname()):
+    def _rest_plugin_detail(self, name, host = gethostname().lower()):
         """ Send a xpl message to manager to get plugin list
             Display this list as json
             @param name : name of plugin
@@ -2311,7 +2311,7 @@ target=*
 
 
 
-    def _rest_plugin_start_stop(self, command, host = gethostname(), plugin = None):
+    def _rest_plugin_start_stop(self, command, host = gethostname().lower(), plugin = None):
         """ Send start xpl message to manager
             Then, listen for a response
             @param host : host to which we send command
@@ -3062,14 +3062,14 @@ target=*
         self._pinglist[name] = Event()
         mess = XplMessage()
         mess.set_type('xpl-cmnd')
-        mess.set_target("xpl-%s.%s" % (name, gethostname()))
+        mess.set_target("xpl-%s.%s" % (name, gethostname().lower()))
         mess.set_schema('hbeat.request')
         mess.add_data({'command' : 'request'})
         Listener(self._cb_check_component_is_running, 
                  self.myxpl, 
                  {'schema':'hbeat.app', 
                   'xpltype':'xpl-stat', 
-                  'xplsource':"xpl-%s.%s" % (name, gethostname())},
+                  'xplsource':"xpl-%s.%s" % (name, gethostname().lower())},
                 cb_params = {'name' : name})
         max = PING_DURATION
         while max != 0:

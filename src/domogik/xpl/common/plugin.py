@@ -164,7 +164,7 @@ class XplPlugin():
             mess = XplMessage()
             mess.set_type("xpl-stat")
             mess.set_schema("domogik.usage")
-            mess.add_data({"name" : "%s.%s" % (self.get_plugin_name(), gethostname()),
+            mess.add_data({"name" : "%s.%s" % (self.get_plugin_name(), gethostname().lower()),
                            "pid" : pid,
                            "cpu-percent" : data["cpu_percent"],
                            "memory-percent" : data["memory_percent"],
@@ -228,7 +228,7 @@ class XplPlugin():
             mess.set_type("xpl-trig")
             mess.set_schema("domogik.system")
             mess.add_data({"command":"stop", "plugin": self.get_plugin_name(),
-                "host": gethostname()})
+                "host": gethostname().lower()})
             self.myxpl.send(mess)
 
         def _manager_handler(self, message):
