@@ -105,7 +105,7 @@ class Manager(BasePlugin):
         @param port : port to listen to (default 0)
         """
         BasePlugin.__init__(self, stop_cb = self.leave)
-        source = "xpl-%s.%s" % (self.get_plugin_name(), gethostname())
+        source = "xpl-%s.%s" % (self.get_plugin_name(), gethostname().lower())
         # Define maximum xPL message size
         self._buff = 1500
         # Define xPL base port
