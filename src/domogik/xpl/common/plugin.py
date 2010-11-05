@@ -156,7 +156,16 @@ class XplPlugin():
                 @param : process pid
                 @param data : dictionnary of process informations
             """
-            print "PROCESS INFO : %s : %s" % (pid, str(data))
+            mess = XplMessage()
+            mess.set_type("xpl-stat")
+            mess.set_schema("domogik.usage")
+            mess.add_data({"name" : "%s.%s" % (self.get_plugin_name(), gethostname()),
+                           "pid" : pid,
+                           "cpu-percent" : data["cpu_percent"],
+                           "memory-percent" : data["memory_percent"],
+                           "memory-rss" : data["memory_rss"],
+                           "memory-vsz" : data["memory_vsz"]})
+            self.myxpl.send(mess)
 
         def _get_pid(self):
             """ Get current pid and write it to a file
