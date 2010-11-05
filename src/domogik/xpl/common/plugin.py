@@ -128,6 +128,11 @@ class XplPlugin():
             self._pid_dir_path = config['pid_dir_path']
             self._get_pid()
            
+            if len(gethostname()) > 16:
+                self.log.error("You must use 16 char max hostnames ! %s is %s long" % (gethostname(), len(gethostname())))
+                self.force_leave()
+                return
+
             if 'broadcast' in config:
                 broadcast = config['broadcast']
             else:
