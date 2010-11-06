@@ -127,11 +127,12 @@ class Mirror:
                 ### action on mir:ror
                 # Only the data[0] and data[1] are used in this case
                 # The others are nulls
-                self._log.debug("Action on : mir:ror")
                 if data[1] == '\x04':
+                    self._log.debug("Action on : mir:ror")
                     self._log.debug("mir:ror faced up")
                     return "mirror", "activated", "HIGH"
                 if data[1] == '\x05':
+                    self._log.debug("Action on : mir:ror")
                     self._log.debug("mir:ror faced down")
                     return "mirror", "activated", "LOW"
         return None, None, None
