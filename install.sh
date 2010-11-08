@@ -181,6 +181,11 @@ function modify_hosts {
     fi
 }
 
+function create_log_dir {
+    mkdir -p /var/log/domogik
+    chown $d_user: /var/log/domogik 
+}
+
 #Main part
 if [ $UID -ne 0 ];then
     echo "Please restart this script as root!"
@@ -210,6 +215,7 @@ update_user_config
 copy_tools
 call_db_installer
 modify_hosts
+create_log_dir
 [ -d $HOME/.python-eggs ] && chown -R $USER: $HOME/.python-eggs/ 
 
 echo "Everything seems to be good, Domogik should be installed correctly."
