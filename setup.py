@@ -39,6 +39,7 @@ ez_setup.use_setuptools()
 
 import os
 from setuptools import setup, find_packages
+import platform
 
 def list_all_files(path, dst):
     """
@@ -57,6 +58,12 @@ def list_all_files(path, dst):
     d.append((dst, files))
     return d
 
+arch = platform.architecture()
+hub = {'64bit' : 'src/domogik/xpl/tools/xPL_Hub',
+        '32bit' : 'src/domogik/xpl/tools/32bit/xPL_Hub',
+        'arm' : 'src/domogik/xpl/tools/arm/xPL_Hub'}
+
+    
 d_files = [
         ('/usr/local/bin/', ['src/domogik/xpl/tools/xPL_Hub']),
         ('/usr/local/bin/', ['src/tools/dmgenplug']),
@@ -64,6 +71,17 @@ d_files = [
         ('/etc/init.d/', ['src/domogik/examples/init/domogik']),
         ('/etc/default/', ['src/domogik/examples/default/domogik'])
 ]
+
+if arch[0] in hub.keys():
+    d_files.append(('/usr/local/bin/', [hub[arch[0]]]))
+else:
+    print "*************** WARNING ***************"
+    print "* Can't find an xPL Hub for your arch *"
+    print "* Please check documentation in :     *"
+    print "*  src/domogik/xpl/tools/COMPILE.txt  *"
+    print "* to get the sources and compile them.*"
+    print "***************************************"
+
 d_files.extend(list_all_files('src/share/domogik/stats/', '/usr/local/share/domogik/listeners/'))
 d_files.extend(list_all_files('src/share/domogik/url2xpl/', '/usr/local/share/domogik/url2xpl/'))
 d_files.extend(list_all_files('src/share/domogik/plugins/', '/usr/local/share/domogik/plugins/'))
