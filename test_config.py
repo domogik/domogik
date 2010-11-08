@@ -81,8 +81,11 @@ def test_imports():
     try:
         import sqlite3
     except ImportError:
-        warning("Can't import sqlite3, please install it by hand (>= 1.1) or exec ./setup.py develop or ./setup.py install")
-        good = False
+        try:
+            import MySQLdb
+        except ImportError:
+            warning("Can't import sqlite3 neither MySQLdb, please install one of them (depend of your setup) by hand or exec ./setup.py develop or ./setup.py install")
+            good = False
     try:
         import httplib
     except ImportError:
@@ -220,15 +223,21 @@ def test_user_config_file(user_home, user_entry):
 
     # check [database] section
     info("Parse [database] section")
-    assert database['db_type'] == 'sqlite', "Only sqlite database type is supported at the moment"
+    assert database['db_type'] == 'sqlite' or database['db_type'] == 'mysql', "Only sqlite and mysql database type are supported at the moment"
 
-    parent_conn, child_conn = Pipe()
-    p = Process(target=_test_user_can_write, args=(child_conn, database['db_path'] ,user_entry,))
-    p.start()
-    p.join()
-    assert parent_conn.recv(), "The database file does not exists or domogik user can't write on it. \
-                Did you exec db_installer.py ?\n\
-                Are you sure you have define the full path, including filename, without ~ ?"
+    if database['db_type'] == 'sqlite':
+        parent_conn, child_conn = Pipe()
+        p = Process(target=_test_user_can_write, args=(child_conn, database['db_path'] ,user_entry,))
+        p.start()
+        p.join()
+        assert parent_conn.recv(), "The database file does not exists or domogik user can't write on it. \
+                    Did you exec db_installer.py ?\n\
+                    Are you sure you have define the full path, including filename, without ~ ?"
+    else:
+        from domogik.common.database import DbHelper
+        d = DbHelper()
+        assert d.get_engine() != None, "Engine is not set, it seems something went wrong during connection to the database"
+        
     ok("[database] section seems good")
     
     # Check [rest] section
