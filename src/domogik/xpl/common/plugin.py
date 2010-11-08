@@ -196,8 +196,12 @@ class XplPlugin():
             """ Handle domogik system request for an xpl client
             @param message : the Xpl message received
             """
-            cmd = message.data["command"]
-            plugin = message.data["plugin"]
+            try:
+                cmd = message.data["command"]
+                plugin = message.data["plugin"]
+            except KeyError, e:
+                self.log.error("command or plugin key does not exist : %s", e)
+                return
             if cmd == "stop" and plugin in ['*', self.get_plugin_name()]:
                 self.log.info("Someone asked to stop %s, doing." % self.get_plugin_name())
                 self._answer_stop()
