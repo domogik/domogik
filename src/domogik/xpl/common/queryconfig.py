@@ -88,10 +88,12 @@ class Query():
         # The key may already be removed if the network is really fast
         if key in self._keys:
             try:
-                self._keys[key].get_lock().wait()
+                self._keys[key].get_lock().wait(10)
+                if not self._keys[key].get_lock().is_set():
+                    self.log.error("No answer received for t = %s, k = %s" % (technology, key))
+                    raise RuntimeError("No answer received for t = %s, k = %s, check your xpl setup" % (technology, key))
             except KeyError:
                 pass
-        print "finish query"
 
     def _query_cb(self, message):
         '''
