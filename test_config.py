@@ -102,12 +102,10 @@ def test_imports():
 def test_config_files():
     info("Test global config file")
     assert os.path.isfile("/etc/conf.d/domogik") or os.path.isfile("/etc/default/domogik"), \
-            "No global config file found, please take src/domogik/examples/default/domogik \
-            on your domogik repository and put it on /etc/default/domogik or /etc/conf.d/domogik \
-            (depending of your system)."
+            "No global config file found, please exec install.sh if you did not exec it before."
     assert not (os.path.isfile("/etc/conf.d/domogik") and os.path.isfile("/etc/default/domogik")), \
             "Global config file found at 2 locations. Please put it only at /etc/default/domogik or \
-            /etc/conf.d/domogik."
+            /etc/conf.d/domogik then restart test_config.py as root"
     if os.path.isfile("/etc/default/domogik"):
         file = "/etc/default/domogik"
     else:
@@ -151,7 +149,7 @@ def test_config_files():
     path = os.environ['PATH'].split(':')
     path.append(custom_path)
     l = [p for p in path if os.path.exists(os.path.join(p, 'xPL_Hub'))]
-    assert l != [], "xPL_Hub can't be found, please double check CUSTOM_PATH is correctly defined."
+    assert l != [], "xPL_Hub can't be found, please double check CUSTOM_PATH is correctly defined if you are in development mode. In install mode, check your architecture is supported or check src/domogik/xpl/tools/COMPILE.txt, then restart test_config.py"
     ok("xPL_Hub found in the path")
     
     info("Test user / config file")
@@ -161,10 +159,9 @@ def test_config_files():
     try:
         user_entry = pwd.getpwnam(user)
     except KeyError:
-        raise KeyError("The user %s does not exists, you MUST create it or change the DOMOGIK_USER parameter in %s" % (user, file))
+        raise KeyError("The user %s does not exists, you MUST create it or change the DOMOGIK_USER parameter in %s. Please report this as a bug if you used install.sh." % (user, file))
     user_home = user_entry.pw_dir
-    assert os.path.isfile("%s/.domogik.cfg" % user_home), "The domogik config file %s/.domogik does not exists. \
-            Please copy it from src/domogik/examples/config/domogik and update it." % user_home
+    assert os.path.isfile("%s/.domogik.cfg" % user_home), "The domogik config file %s/.domogik.cfg does not exist. Please report this as a bug if you used install.sh." % user_home
     ok("Domogik's user exists and has a config file")
     
     test_user_config_file(user_home, user_entry)
@@ -189,7 +186,7 @@ def _check_port_availability(s_ip, s_port):
         d_ip = data[1].split(':')[0]
         d_port = data[1].split(':')[1]
         if d_port == port:
-            assert d_ip != ip and ip != "00000000", "A service already listen on ip %s and port %s." % (s_ip, s_port)
+            assert d_ip != ip and ip != "00000000", "A service already listen on ip %s and port %s. Stop it and restart test_config.py" % (s_ip, s_port)
 
 def test_user_config_file(user_home, user_entry):
     info("Check user config file contents")
