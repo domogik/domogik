@@ -40,7 +40,7 @@ import os
 import sys
 import time
 from socket import gethostname
-from threading import Event, currentThread, Thread
+from threading import Event, currentThread, Thread, enumerate
 from optparse import OptionParser
 import traceback
 from subprocess import Popen
@@ -60,7 +60,7 @@ import pkgutil
 
 KILL_TIMEOUT = 2
 PING_DURATION = 5
-WAIT_TIME_BETWEEN_PING = 30
+WAIT_TIME_BETWEEN_PING = 15
 
 
 class SysManager(XplPlugin):
@@ -345,7 +345,7 @@ class SysManager(XplPlugin):
         mess.set_target("xpl-%s.%s" % (name, gethostname().lower()))
         mess.set_schema('hbeat.request')
         mess.add_data({'command' : 'request'})
-        Listener(self._cb_check_component_is_running, 
+        my_listener = Listener(self._cb_check_component_is_running, 
                  self.myxpl, 
                  {'schema':'hbeat.app', 
                   'xpltype':'xpl-stat', 
@@ -358,6 +358,7 @@ class SysManager(XplPlugin):
             max = max - 1
             if self._pinglist[name].isSet():
                 break
+        my_listener.unregister()
         if self._pinglist[name].isSet():
             self.log.info("'%s' is running" % name)
             self._set_status(name, "ON")
@@ -370,7 +371,8 @@ class SysManager(XplPlugin):
     def _cb_check_component_is_running(self, message, args):
         ''' Set the Event to true if an answer was received
         '''
-        self._pinglist[args["name"]].set()
+        #self._pinglist[args["name"]].set()
+        pass
 
     def _start_comp(self, name):
         '''
