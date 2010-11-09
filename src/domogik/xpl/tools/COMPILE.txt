@@ -1,0 +1,26 @@
+If xPL_Hub is not available for your architecture, you can compile it by hand.
+You first need to have compilation tools available. On debian-like systems, you can install them using :
+
+ apt-get install build-essential
+
+Then :
+
+ cd /tmp
+ wget http://www.xpl4java.org/xPL4Linux/downloads/xPLLib.tgz
+ cd xPLLib
+ make
+ cd examples
+ make
+ 
+At this step, you may get some warning about 'getprotobyname', ignore them. 
+Check the hub correctly compiled : 
+
+  file xPL_Hub
+
+You shoud see some informations like :
+
+ xPL_Hub: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked (uses shared libs), for GNU/Linux 2.6.18, not stripped
+
+Copy it into /usr/local/bin (or anywhere else in your path) :
+
+ cp xPL_Hub /usr/local/bin

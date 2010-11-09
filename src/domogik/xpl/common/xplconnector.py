@@ -295,9 +295,9 @@ class Listener:
         """ Unregister the listener from manager when it is deleted
         """
         self._manager.debug("Asked to delete the listener")
-        self._unregister()
+        self.unregister()
 
-    def _unregister(self):
+    def unregister(self):
         self._manager.del_listener(self)
 
     def __str__(self):
