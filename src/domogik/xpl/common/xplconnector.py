@@ -291,12 +291,6 @@ class Listener:
         manager.add_listener(self)
         self._cb_params = cb_params
 
-    def __del__(self):
-        """ Unregister the listener from manager when it is deleted
-        """
-        self._manager.debug("Asked to delete the listener")
-        self.unregister()
-
     def unregister(self):
         self._manager.del_listener(self)
 
