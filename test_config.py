@@ -224,9 +224,12 @@ def test_user_config_file(user_home, user_entry):
 
     uid = user_entry.pw_uid
     os.setreuid(0,uid)
+    old_home = os.environ['HOME']
+    os.environ['HOME'] = user_home
     from domogik.common.database import DbHelper
     d = DbHelper()
     os.setreuid(0,0)
+    os.environ['HOME'] = old_home
     assert d.get_engine() != None, "Engine is not set, it seems something went wrong during connection to the database"
         
     ok("[database] section seems good")
