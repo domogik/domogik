@@ -59,7 +59,7 @@ def list_all_files(path, dst):
     return d
 
 arch = platform.architecture()
-hub = {'64bit' : 'src/domogik/xpl/tools/xPL_Hub',
+hub = {'64bit' : 'src/domogik/xpl/tools/64bit/xPL_Hub',
         '32bit' : 'src/domogik/xpl/tools/32bit/xPL_Hub',
         'arm' : 'src/domogik/xpl/tools/arm/xPL_Hub'}
 
