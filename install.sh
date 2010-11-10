@@ -201,7 +201,7 @@ read -p "If you want to use a proxy, please set it now. It will only be used dur
 if [ "x$http_proxy" != "x" ];then
     export http_proxy
 fi
-trap "chown -R $USER: $HOME/.python-eggs" EXIT
+trap "[ -d $HOME/.python-eggs ] && chown -R $USER: $HOME/.python-eggs" EXIT
 
 run_setup_py $MODE
 copy_sample_files
