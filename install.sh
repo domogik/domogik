@@ -156,7 +156,10 @@ function update_user_config {
         if [ "$db_host" = "" ];then 
             db_host="localhost"
         fi
-        read -p "Database name : " db_name
+        read -p "Database name [domogik]: " db_name
+        if [ "$db_name" = "" ];then 
+            db_name="domogik"
+        fi
         mysql_client=$(which mysql)
         while [ ! -f "$mysql_client" ];do
             read -p "Mysql client not installed, please install it and press a key."
@@ -175,11 +178,20 @@ function update_user_config {
             sed -i "s;^db_name.*$;db_name = $db_name;" $d_home/.domogik.cfg
             sed -i "s;^db_host.*$;db_host = $db_host;" $d_home/.domogik.cfg
         fi
+        nb_tables=$(echo "SHOW TABLES;"|mysql -h$db_host -P$db_port -u$db_user -p$db_password $db_name |grep -vc ^Tables)
+        if [ $nb_tables -ne 0 ];then
+            read -p "Your database already contains some tables, do you want to drop them. If you choose No, new items will *NOT* be installed ? [Y/n]" drop_db
+            if [ "$drop_db" = "" -o "$drop_db" = "y" -o "$drop_db" = "Y" ];then
+                echo "SHOW TABLES;"|mysql -h$db_host -P$db_port -u$db_user -p$db_password $db_name |grep -v ^Tables|while read table;do
+                    echo "DROP TABLE $table;"|mysql -h$db_host -P$db_port -u$db_user -p$db_password $db_name > /dev/null
+                done
+            fi
+        fi
     done
 }
 
 function call_db_installer {
-    if [ "$replace" = "y" -o "$replace" = "Y" -o $mysql_ok ];then 
+    if [ "$drop_db" = "y" -o "$replace" = "Y" -o "$drop_db" = "" ];then 
         /bin/su -c "python ./db_installer.py $d_home/.domogik.cfg" $d_user
     fi
 }
