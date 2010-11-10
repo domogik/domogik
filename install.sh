@@ -134,27 +134,70 @@ function update_user_config {
     sed -i "s/^rest_server_ip.*$/rest_server_ip = $bind_addr/" $d_home/.domogik.cfg
     sed -i "s/^django_server_ip.*$/django_server_ip = $bind_addr/" $d_home/.domogik.cfg
     sed -i "s/^internal_rest_server_ip.*$/internal_rest_server_ip = $bind_addr/" $d_home/.domogik.cfg
-    read -p "If you need to reach Domogik  from outside, you can specify an IP now : " out_bind_addr
+    read -p "If you need to reach Domogik from outside, you can specify an IP now : " out_bind_addr
     sed -i "s/^external_rest_server_ip.*$/external_rest_server_ip = $out_bind_addr/" $d_home/.domogik.cfg
     
-    replace="y"
-    if [ -f "$d_home/.domogik.sqlite" ];then
-        read -p "A database already exists. Do you want to remove it and recreate it from scratch ? [N/y]" replace
-        if [ "$replace" = "y" -o "$replace" = "Y" ];then
-            rm -f $d_home/.domogik.sqlite
-        else
-            replace="n"
+    #Mysql config 
+    read -p "Do you want to use Mysql database system (really recommended, if not, sqlite will be used) ? [Y/n]" use_mysql
+    if  [ "$use_mysql" = "n" -o "$use_mysql" = "N" ];then
+        replace="y"
+        if [ -f "$d_home/.domogik.sqlite" ];then
+            read -p "A database already exists. Do you want to remove it and recreate it from scratch ? [N/y]" replace
+            if [ "$replace" = "y" -o "$replace" = "Y" ];then
+                rm -f $d_home/.domogik.sqlite
+            else
+                replace="n"
+            fi
         fi
+        echo "Info : Database will be created in $d_home/.domogik.sqlite"
+        sed -i "s;^db_path.*$;db_path = $d_home/.domogik.sqlite;" $d_home/.domogik.cfg
+    else
+        echo "You need to have a working Mysql server with a domogik user and database."
+        echo "You can create it using these commands (as mysql admin user) :"
+        echo " > CREATE DATABASE domogik;"
+        echo -e " > GRANT ALL PRIVILEGES ON domogik.* to domogik@localhost IDENTIFIED BY 'randompassword';"
+        read -p "Press a key to continue the installation when your setup is ok. "
+        mysql_ok=false
+        while ! $mysql_ok;do 
+            echo "Please set your mysql parameters."
+            read -p "Username : " db_user
+            read -p "Password : " db_password
+            read -p "Port [3306] : " db_port
+            if [ "$db_port" = "" ];then 
+                db_port=3306 
+            fi
+            read -p "Host [localhost] :" db_host
+            if [ "$db_host" = "" ];then 
+                db_host="localhost"
+            fi
+            read -p "Database name : " db_name
+            mysql_client=$(which mysql)
+            while [ ! -f "$mysql_client" ];do
+                read -p "Mysql client not installed, please install it and press a key."
+                mysql_client=$(which mysql)
+            done
+            echo "SELECT 1;"|mysql -h$db_host -P$db_port -u$db_user -p$db_password $db_name > /dev/null
+            if [ $? -ne 0 ];then
+                read -p "Something was wrong, can't access to the database, please check your setup and press a key to retry."
+            else
+                mysql_ok=true
+                echo "Connection test OK"
+                sed -i "s;^db_type.*$;db_type = mysql;" $d_home/.domogik.cfg
+                sed -i "s;^db_user.*$;db_user = $db_user;" $d_home/.domogik.cfg
+                sed -i "s;^db_password.*$;db_password = $db_password;" $d_home/.domogik.cfg
+                sed -i "s;^db_port.*$;db_port = $db_port;" $d_home/.domogik.cfg
+                sed -i "s;^db_name.*$;db_name = $db_name;" $d_home/.domogik.cfg
+                sed -i "s;^db_host.*$;db_host = $db_host;" $d_home/.domogik.cfg
+            fi
+        done
     fi
-    echo "Info : Database will be created in $d_home/.domogik.sqlite"
-    sed -i "s;^db_path.*$;db_path = $d_home/.domogik.sqlite;" $d_home/.domogik.cfg
 }
 
 function call_db_installer {
-    if [ "$replace" = "y" -o "$replace" = "Y" ];then 
+    if [ "$replace" = "y" -o "$replace" = "Y" -o $mysql_ok ];then 
         /bin/su -c "python ./db_installer.py $d_home/.domogik.cfg" $d_user
     fi
-    chown $d_user: $d_home/.domogik.sqlite
+    [ -f "$d_home/.domogik.sqlite" ] && chown $d_user: $d_home/.domogik.sqlite
 }
 
 function check_python {
@@ -181,6 +224,11 @@ function modify_hosts {
     fi
 }
 
+function create_log_dir {
+    mkdir -p /var/log/domogik
+    chown $d_user: /var/log/domogik 
+}
+
 #Main part
 if [ $UID -ne 0 ];then
     echo "Please restart this script as root!"
@@ -201,7 +249,7 @@ read -p "If you want to use a proxy, please set it now. It will only be used dur
 if [ "x$http_proxy" != "x" ];then
     export http_proxy
 fi
-trap "[ -d $HOME/.python-eggs ] && chown -R $USER: $HOME/.python-eggs" EXIT
+trap "[ -d "$HOME/.python-eggs" ] && chown -R $USER: $HOME/.python-eggs" EXIT
 
 run_setup_py $MODE
 copy_sample_files
@@ -210,6 +258,8 @@ update_user_config
 copy_tools
 call_db_installer
 modify_hosts
+create_log_dir
+
 [ -d $HOME/.python-eggs ] && chown -R $USER: $HOME/.python-eggs/ 
 
 echo "Everything seems to be good, Domogik should be installed correctly."
