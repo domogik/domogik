@@ -40,7 +40,6 @@ Implements
 from domogik.common import logger
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
-from socket import gethostname
 
 
 class Query():
@@ -74,13 +73,13 @@ class Query():
         '''
         print "new query for t = %s, k = %s" % (technology, key)
         Listener(self._query_cb, self.__myxpl, {'schema': 'domogik.config', 'xpltype': 'xpl-stat',
-                                                'technology': technology, 'hostname' : gethostname().lower()})
+                                                'technology': technology, 'hostname' : self.__myxpl.get_sanitized_hostname()})
         self._keys[key] = result
         mess = XplMessage()
         mess.set_type('xpl-cmnd')
         mess.set_schema('domogik.config')
         mess.add_data({'technology': technology})
-        mess.add_data({'hostname': gethostname().lower()})
+        mess.add_data({'hostname': self.__myxpl.get_sanitized_hostname()})
         if element:
             mess.add_data({'element': element})
         mess.add_data({'key': key})

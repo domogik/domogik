@@ -36,6 +36,7 @@ Implements
 """
 
 import threading
+from socket import gethostname 
 
 from domogik.common import logger
 from optparse import OptionParser
@@ -197,6 +198,13 @@ class BasePlugin():
             self._lock_add_cb.acquire()
             self._stop_cb.append(cb)
             self._lock_add_cb.release()
+
+        def get_sanitized_hostname(self):
+            """ Get the sanitized hostname of the host 
+            This will lower it and keep only the part before the first dot
+
+            """
+            return gethostname().lower().split('.')[0]
 
         def __del__(self):
             self.log.debug("__del__ baseplugin")

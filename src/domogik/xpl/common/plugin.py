@@ -40,7 +40,6 @@ import signal
 import threading
 import os
 import sys
-from socket import gethostname
 from domogik.xpl.common.xplconnector import XplMessage, Manager, Listener
 from domogik.xpl.common.baseplugin import BasePlugin
 from domogik.common.configloader import Loader
@@ -128,8 +127,8 @@ class XplPlugin():
             self._pid_dir_path = config['pid_dir_path']
             self._get_pid()
            
-            if len(gethostname()) > 16:
-                self.log.error("You must use 16 char max hostnames ! %s is %s long" % (gethostname(), len(gethostname())))
+            if len(self.get_sanitized_hostname()) > 16:
+                self.log.error("You must use 16 char max hostnames ! %s is %s long" % (self.get_sanitized_hostname(), len(self.get_sanitized_hostname())))
                 self.force_leave()
                 return
 
@@ -164,7 +163,7 @@ class XplPlugin():
             mess = XplMessage()
             mess.set_type("xpl-stat")
             mess.set_schema("domogik.usage")
-            mess.add_data({"name" : "%s.%s" % (self.get_plugin_name(), gethostname().lower()),
+            mess.add_data({"name" : "%s.%s" % (self.get_plugin_name(), self.get_sanitized_hostname()),
                            "pid" : pid,
                            "cpu-percent" : data["cpu_percent"],
                            "memory-percent" : data["memory_percent"],
@@ -232,7 +231,7 @@ class XplPlugin():
             mess.set_type("xpl-trig")
             mess.set_schema("domogik.system")
             mess.add_data({"command":"stop", "plugin": self.get_plugin_name(),
-                "host": gethostname().lower()})
+                "host": self.get_sanitized_hostname()})
             self.myxpl.send(mess)
 
         def _manager_handler(self, message):

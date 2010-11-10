@@ -98,14 +98,16 @@ class Manager(BasePlugin):
     # _network = None
     # _UDPSock = None
 
-    def __init__(self, ip=gethostbyname(gethostname().lower()), port=0, broadcast="255.255.255.255"):
+    def __init__(self, ip=None, port=0, broadcast="255.255.255.255"):
         """
         Create a new manager instance
         @param ip : IP to listen to (default real ip address)
         @param port : port to listen to (default 0)
         """
         BasePlugin.__init__(self, stop_cb = self.leave)
-        source = "xpl-%s.%s" % (self.get_plugin_name(), gethostname().lower())
+        if ip == None:
+            ip = self.get_sanitized_hostname()
+        source = "xpl-%s.%s" % (self.get_plugin_name(), self.get_sanitized_hostname())
         # Define maximum xPL message size
         self._buff = 1500
         # Define xPL base port
