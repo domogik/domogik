@@ -65,7 +65,6 @@ hub = {'64bit' : 'src/domogik/xpl/tools/64bit/xPL_Hub',
 
     
 d_files = [
-        ('/usr/local/bin/', ['src/domogik/xpl/tools/xPL_Hub']),
         ('/usr/local/bin/', ['src/tools/dmgenplug']),
         ('/usr/local/bin/', ['src/tools/dmgdisplug']),
         ('/etc/init.d/', ['src/domogik/examples/init/domogik']),
