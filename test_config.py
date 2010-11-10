@@ -35,6 +35,7 @@ Implements
 """
 
 import os
+import pwd
 import sys
 from multiprocessing import Process, Pipe
 from socket import gethostbyname
@@ -155,7 +156,6 @@ def test_config_files():
     info("Test user / config file")
 
     #Check user config file
-    import pwd
     try:
         user_entry = pwd.getpwnam(user)
     except KeyError:
@@ -220,20 +220,14 @@ def test_user_config_file(user_home, user_entry):
 
     # check [database] section
     info("Parse [database] section")
-    assert database['db_type'] == 'sqlite' or database['db_type'] == 'mysql', "Only sqlite and mysql database type are supported at the moment"
+    assert database['db_type'] == 'mysql', "Only mysql database type is supported at the moment"
 
-    if database['db_type'] == 'sqlite':
-        parent_conn, child_conn = Pipe()
-        p = Process(target=_test_user_can_write, args=(child_conn, database['db_path'] ,user_entry,))
-        p.start()
-        p.join()
-        assert parent_conn.recv(), "The database file does not exists or domogik user can't write on it. \
-                    Did you exec db_installer.py ?\n\
-                    Are you sure you have define the full path, including filename, without ~ ?"
-    else:
-        from domogik.common.database import DbHelper
-        d = DbHelper()
-        assert d.get_engine() != None, "Engine is not set, it seems something went wrong during connection to the database"
+    uid = user_entry.pw_uid
+    os.setreuid(0,uid)
+    from domogik.common.database import DbHelper
+    d = DbHelper()
+    os.setreuid(0,0)
+    assert d.get_engine() != None, "Engine is not set, it seems something went wrong during connection to the database"
         
     ok("[database] section seems good")
     

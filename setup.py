@@ -96,7 +96,7 @@ setup(
     author = 'Domogik team',
     author_email = 'domogik-general@lists.labs.libre-entreprise.org',
     install_requires=['setuptools', 'django >=1.2','sqlalchemy >= 0.6.4', 'simplejson >= 1.9.2',
-                      'pyOpenSSL == 0.10', 'httplib2 >= 0.6.0', 'django-pipes >= 0.2', 'psutil >= 0.1.3', 'MySQL-python'],
+                      'pyOpenSSL == 0.10', 'httplib2 >= 0.6.0', 'django-pipes >= 0.2', 'psutil >= 0.1.3', 'MySQL-python >= 1.2.2'],
 #                   deprecated, keep for info
 #                   'pySerial > 2.4', 'pyowfs >= 0.1.3'],
     zip_safe = False,
