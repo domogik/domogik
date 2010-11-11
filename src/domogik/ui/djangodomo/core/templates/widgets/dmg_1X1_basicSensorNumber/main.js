@@ -27,8 +27,8 @@
             this._panel = $.getPanel({width:190, height:190, circle: {start:140, end:90}});
             this.element.append(this._panel);
             this._panel.panelAddCommand({label:'Close', showlabel: false, class:'close', r:70, deg:140, rotate:false, click:function(e){self.close();e.stopPropagation();}});
-            this._panel.panelAddCommand({label:'Today', showlabel: true, class:'graph', r:70, deg:50, rotate:false, click:function(e){self.show_graph('day');e.stopPropagation();}});
-            this._panel.panelAddCommand({label:'Week', showlabel: true, class:'graph', r:70, deg:10, rotate:false, click:function(e){self.show_graph('week');e.stopPropagation();}});
+            this._panel.panelAddCommand({label:'Last 24h', showlabel: true, class:'graph', r:70, deg:50, rotate:false, click:function(e){self.show_graph('24h');e.stopPropagation();}});
+            this._panel.panelAddCommand({label:'Last 7days', showlabel: true, class:'graph', r:70, deg:10, rotate:false, click:function(e){self.show_graph('7d');e.stopPropagation();}});
             this._panel.panelAddCommand({label:'Month', showlabel: true, class:'graph', r:70, deg:-30, rotate:false, click:function(e){self.show_graph('month');e.stopPropagation();}});
             this._panel.panelAddCommand({label:'Year', showlabel: true, class:'graph', r:70, deg:-70, rotate:false, click:function(e){self.show_graph('year');e.stopPropagation();}});
             this._panel.hide();
@@ -152,11 +152,11 @@
              };
 
             switch(type) {
-                case 'day':
-                    self.show_graph_day(now, graph_options);
+                case '24h':
+                    self.show_graph_24h(now, graph_options);
                     break;
-                case 'week':
-                    self.show_graph_week(now, graph_options);
+                case '7d':
+                    self.show_graph_7d(now, graph_options);
                     break;
                 case 'month':
                     self.show_graph_month(now, graph_options);
@@ -167,6 +167,37 @@
             }
         },
 
+        show_graph_24h: function(now, graph_options) {
+            var self = this, o = this.options;
+            var from = new Date(now.getFullYear(), now.getMonth(), now.getDate()-1,now.getHours(),0,0);
+            var to = new Date(now.getFullYear(), now.getMonth(), now.getDate(),now.getHours()+1,0,0);
+
+            graph_options.title.text = Highcharts.dateFormat('%A %d %B %Y', now.getTime());
+            graph_options.xAxis.min = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()-1,now.getHours(),0,0);
+            graph_options.xAxis.max = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(),now.getHours()+1,0,0);
+            graph_options.tooltip.formatter = function() {
+			                return Highcharts.dateFormat('%d/%m/%Y %Hh', this.x) +'<br/>'
+                                + "<strong>" + Highcharts.numberFormat(this.y, 2, ',') +" " + o.model_parameters.unit + "</strong>";
+                        }
+
+            rest.get(['stats', o.deviceid, o.key, 'from', Math.round(from.getTime() / 1000), 'to', Math.round(to.getTime() / 1000),'interval', 'hour', 'selector', 'avg'],
+                function(data) {
+                    var status = (data.status).toLowerCase();
+                    if (status == 'ok') {
+                        var d = [];
+                        var values = data.stats[0].values;
+                        $.each(values, function(index, stat) {
+                            d.push([(Date.UTC(stat[0], stat[1]-1, stat[3], stat[4], 0, 0)), stat[5]]);
+                        });
+                        graph_options.series.push({name:o.featurename,data: d});
+                        var chart = new Highcharts.Chart(graph_options);
+                    } else {
+                        $.notification('error', '{% trans "data creation failed" %} (' + data.description + ')');                                                                      
+                    }
+                }
+            );
+        },
+
         show_graph_day: function(now, graph_options) {
             var self = this, o = this.options;
             var from = new Date(now.getFullYear(), now.getMonth(), now.getDate(),0,0,0);
@@ -175,6 +206,39 @@
             graph_options.title.text = Highcharts.dateFormat('%A %d %B %Y', now.getTime());
             graph_options.xAxis.min = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
             graph_options.xAxis.max = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), 23,59,59);
+            graph_options.tooltip.formatter = function() {
+			                return Highcharts.dateFormat('%d/%m/%Y %Hh', this.x) +'<br/>'
+                                + "<strong>" + Highcharts.numberFormat(this.y, 2, ',') +" " + o.model_parameters.unit + "</strong>";
+                        }
+
+            rest.get(['stats', o.deviceid, o.key, 'from', Math.round(from.getTime() / 1000), 'to', Math.round(to.getTime() / 1000),'interval', 'hour', 'selector', 'avg'],
+                function(data) {
+                    var status = (data.status).toLowerCase();
+                    if (status == 'ok') {
+                        var d = [];
+                        var values = data.stats[0].values;
+                        $.each(values, function(index, stat) {
+                            d.push([(Date.UTC(stat[0], stat[1]-1, stat[3], stat[4], 0, 0)), stat[5]]);
+                        });
+                        graph_options.series.push({name:o.featurename,data: d});
+                        var chart = new Highcharts.Chart(graph_options);
+                    } else {
+                        $.notification('error', '{% trans "data creation failed" %} (' + data.description + ')');                                                                      
+                    }
+                }
+            );
+        },
+
+        show_graph_7d: function(now, graph_options) {
+            var self = this, o = this.options;
+            var from =new Date(now.getFullYear(), now.getMonth(), now.getDate()-7,now.getHours(),0,0);
+            var to = new Date(now.getFullYear(), now.getMonth(), now.getDate(),now.getHours()+1,0,0);
+
+            graph_options.title.text = Highcharts.dateFormat('%d/%m/%Y', from.getTime()) + " - " + Highcharts.dateFormat('%d/%m/%Y', to.getTime());
+            graph_options.xAxis.min = Date.UTC(from.getFullYear(), from.getMonth(), from.getDate(),now.getHours(),0,0);
+            graph_options.xAxis.max = Date.UTC(to.getFullYear(), to.getMonth(), to.getDate(),now.getHours()+1,0,0);
+            graph_options.xAxis.dateTimeLabelFormats = {day: '%A %e'};
+            graph_options.xAxis.tickInterval = 24 * 3600 * 1000; // a day
             graph_options.tooltip.formatter = function() {
 			                return Highcharts.dateFormat('%d/%m/%Y %Hh', this.x) +'<br/>'
                                 + "<strong>" + Highcharts.numberFormat(this.y, 2, ',') +" " + o.model_parameters.unit + "</strong>";
