@@ -131,6 +131,93 @@ def install(create_prod_db, create_test_db):
     db.add_device_technology(dt_id='ir', dt_name='Infra Red', dt_description='')
 
     # Create device technology features for Service
+    device_technology = db.add_device_technology(dt_id='online_service', dt_name='Online service',
+                                                 dt_description='Online services : weather API, etc')
+
+    device_type = db.add_device_type(dty_id='online_service.weather', dty_name='Weather', dt_id=device_technology.id)
+    db.add_sensor_feature_model(sf_id='online_service.weather.temperature', 
+                                sf_name=u'Temperature',
+                                sf_device_type_id=device_type.id, 
+                                sf_value_type='number',
+                                sf_parameters='{}',
+                                sf_stat_key='temperature')
+    db.add_sensor_feature_model(sf_id='online_service.weather.pressure', 
+                                sf_name=u'Pressure',
+                                sf_device_type_id=device_type.id, 
+                                sf_value_type='number',
+                                sf_parameters='{}',
+                                sf_stat_key='pressure')
+    db.add_sensor_feature_model(sf_id='online_service.weather.humidity', 
+                                sf_name=u'Humidity',
+                                sf_device_type_id=device_type.id, 
+                                sf_value_type='number',
+                                sf_parameters='{}',
+                                sf_stat_key='humidity')
+    db.add_sensor_feature_model(sf_id='online_service.weather.visibility', 
+                                sf_name=u'Visibility',
+                                sf_device_type_id=device_type.id, 
+                                sf_value_type='number',
+                                sf_parameters='{}',
+                                sf_stat_key='visibility')
+    db.add_sensor_feature_model(sf_id='online_service.weather.rising', 
+                                sf_name=u'Rising',
+                                sf_device_type_id=device_type.id, 
+                                sf_value_type='number',
+                                sf_parameters='{}',
+                                sf_stat_key='rising')
+    db.add_sensor_feature_model(sf_id='online_service.weather.chill', 
+                                sf_name=u'Chill',
+                                sf_device_type_id=device_type.id, 
+                                sf_value_type='number',
+                                sf_parameters='{}',
+                                sf_stat_key='chill')
+    db.add_sensor_feature_model(sf_id='online_service.weather.direction', 
+                                sf_name=u'Direction',
+                                sf_device_type_id=device_type.id, 
+                                sf_value_type='number',
+                                sf_parameters='{}',
+                                sf_stat_key='direction')
+    db.add_sensor_feature_model(sf_id='online_service.weather.speed', 
+                                sf_name=u'Speed',
+                                sf_device_type_id=device_type.id, 
+                                sf_value_type='number',
+                                sf_parameters='{}',
+                                sf_stat_key='speed')
+    db.add_sensor_feature_model(sf_id='online_service.weather.uv', 
+                                sf_name=u'UV index',
+                                sf_device_type_id=device_type.id, 
+                                sf_value_type='number',
+                                sf_parameters='{}',
+                                sf_stat_key='uv')
+    db.add_sensor_feature_model(sf_id='online_service.weather.rainfall', 
+                                sf_name=u'Rain fall',
+                                sf_device_type_id=device_type.id, 
+                                sf_value_type='number',
+                                sf_parameters='{}',
+                                sf_stat_key='rainfall')
+    db.add_sensor_feature_model(sf_id='online_service.weather.drewpoint', 
+                                sf_name=u'Drew point',
+                                sf_device_type_id=device_type.id, 
+                                sf_value_type='number',
+                                sf_parameters='{}',
+                                sf_stat_key='drewpoint')
+    db.add_sensor_feature_model(sf_id='online_service.weather.condition_code', 
+                                sf_name=u'Condition code',
+                                sf_device_type_id=device_type.id, 
+                                sf_value_type='number',
+                                sf_parameters='{}',
+                                sf_stat_key='condition-code')
+    db.add_sensor_feature_model(sf_id='online_service.weather.condition_text', 
+                                sf_name=u'Condition text',
+                                sf_device_type_id=device_type.id, 
+                                sf_value_type='number',
+                                sf_parameters='{}',
+                                sf_stat_key='condition-text')
+
+
+
+
+    # Create device technology features for Service
     device_technology = db.add_device_technology(dt_id='service', dt_name='Service',
                                                  dt_description='Distributed services, water, gas, electricity')
     device_type = db.add_device_type(dty_id='service.teleinfo', dty_name='Teleinfo', dt_id=device_technology.id)
