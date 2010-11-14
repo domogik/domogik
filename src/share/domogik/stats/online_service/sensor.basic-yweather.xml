@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>  
-<statistic technology="online_services">
+<statistic technology="online_service">
     <schema name="sensor.basic">
         <xpltype type="xpl-stat">
             <listener>
@@ -21,6 +21,7 @@
             </listener>
             <mapping>
                 <device field="device"/>
+                <value field="units"/>
                 <value field="current" new_name="temperature" 
                        filter_key="type" filter_value="temp" />
                 <value field="current" new_name="pressure" 
