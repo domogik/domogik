@@ -58,7 +58,7 @@ import pkgutil
 
 
 KILL_TIMEOUT = 2
-PING_DURATION = 5
+PING_DURATION = 3
 WAIT_TIME_BETWEEN_PING = 15
 
 
@@ -104,30 +104,54 @@ class SysManager(XplPlugin):
                 if self._check_component_is_running("dbmgr"):
                     self.log.warning("Manager started with -d, but a database manager is already running")
                 else:
-                    self._start_plugin("dbmgr", self.get_sanitized_hostname())
-                    if not self._check_component_is_running("dbmgr"):
-                        self.log.error("Manager started with -d, but database manager not available after a startup.\
-                                Please check dbmgr.log file")
+                    thr_dbmgr = Thread(None,
+                                       self._start_plugin,
+                                       None,
+                                       ("dbmgr",
+                                        self.get_sanitized_hostname()),
+                                        {"ping" : False})
+                    thr_dbmgr.start()
+                    #self._start_plugin("dbmgr", self.get_sanitized_hostname(), ping = False)
+                    # TODO : delete
+                    #if not self._check_component_is_running("dbmgr"):
+                    #    self.log.error("Manager started with -d, but database manager not available after a startup.\
+                    #            Please check dbmgr.log file")
     
             #Start rest
             if self.options.start_rest:
                 if self._check_component_is_running("rest"):
                     self.log.warning("Manager started with -r, but a REST manager is already running")
                 else:
-                    self._start_plugin("rest", self.get_sanitized_hostname())
-                    if not self._check_component_is_running("rest"):
-                        self.log.error("Manager started with -r, but REST manager not available after a startup.\
-                                Please check rest.log file")
+                    thr_rest = Thread(None,
+                                       self._start_plugin,
+                                       None,
+                                       ("rest",
+                                        self.get_sanitized_hostname()),
+                                        {"ping" : False})
+                    thr_rest.start()
+                    #self._start_plugin("rest", self.get_sanitized_hostname(), ping = False)
+                    # TODO : delete
+                    #if not self._check_component_is_running("rest"):
+                    #    self.log.error("Manager started with -r, but REST manager not available after a startup.\
+                    #            Please check rest.log file")
     
             #Start trigger
             if self.options.start_trigger:
                 if self._check_component_is_running("trigger"):
                     self.log.warning("Manager started with -t, but a trigger manager is already running")
                 else:
-                    self._start_plugin("trigger", self.get_sanitized_hostname())
-                    if not self._check_component_is_running("trigger"):
-                        self.log.error("Manager started with -t, but trigger manager not available after a startup.\
-                                Please check trigger.log file")
+                    thr_trigger = Thread(None,
+                                       self._start_plugin,
+                                       None,
+                                       ("trigger",
+                                        self.get_sanitized_hostname()),
+                                        {"ping" : False})
+                    thr_trigger.start()
+                    #self._start_plugin("trigger", self.get_sanitized_hostname(), ping = False)
+                    # TODO : delete
+                    #if not self._check_component_is_running("trigger"):
+                    #    self.log.error("Manager started with -t, but trigger manager not available after a startup.\
+                    #            Please check trigger.log file")
 
             # Start plugins at manager startup
             self.log.debug("Check non-system plugins to start at manager startup...")
@@ -243,7 +267,7 @@ class SysManager(XplPlugin):
         mess.add_data({'error' :  error})
         self.myxpl.send(mess)
 
-    def _start_plugin(self, plg, host):
+    def _start_plugin(self, plg, host, ping = True):
         """ Start a plugin
             @param plg : plugin name
             @param host : computer on which plugin should be started
@@ -256,27 +280,29 @@ class SysManager(XplPlugin):
         mess.add_data({'host' : host})
         mess.add_data({'command' :  'start'})
         mess.add_data({'plugin' :  plg})
-        if self._check_component_is_running(plg):
-            error = "Component %s is already running on %s" % (plg, host)
-            self.log.info(error)
-            mess.add_data({'error' : error})
-        else:
-            pid = self._start_comp(plg)
-            if pid:
-                # let's check if component successfully started
-                time.sleep(READ_NETWORK_TIMEOUT + 0.5) # time a plugin took to die.
-                # component started
-                if self._check_component_is_running(plg):
-                    self.log.debug("Component %s started with pid %s" % (plg,
-                            pid))
+        if ping == True:
+            if self._check_component_is_running(plg):
+                error = "Component %s is already running on %s" % (plg, host)
+                self.log.info(error)
+                mess.add_data({'error' : error})
+                self.myxpl.send(mess)
+                return
+        pid = self._start_comp(plg)
+        if pid:
+            # let's check if component successfully started
+            time.sleep(READ_NETWORK_TIMEOUT + 0.5) # time a plugin took to die.
+            # component started
+            if self._check_component_is_running(plg):
+                self.log.debug("Component %s started with pid %s" % (plg,
+                        pid))
 
-                # component failed to start
-                else:
-                    error = "Component %s failed to start. Please look in this component logs files" % plg
-                    self.log.error(error)
-                    self._delete_pid_file(plg)
-                if error != "":
-                    mess.add_data({'error' :  error})
+            # component failed to start
+            else:
+                error = "Component %s failed to start. Please look in this component logs files" % plg
+                self.log.error(error)
+                self._delete_pid_file(plg)
+            if error != "":
+                mess.add_data({'error' :  error})
         self.myxpl.send(mess)
 
     def _stop_plugin(self, plg, host):
@@ -370,7 +396,7 @@ class SysManager(XplPlugin):
     def _cb_check_component_is_running(self, message, args):
         ''' Set the Event to true if an answer was received
         '''
-        #self._pinglist[args["name"]].set()
+        self._pinglist[args["name"]].set()
         pass
 
     def _start_comp(self, name):
