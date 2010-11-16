@@ -105,7 +105,8 @@ function update_default_config {
     [ -f $d_home/.domogik.cfg ] && rm -f $d_home/.domogik.cfg
 
     if [ "$MODE" = "develop" ];then
-        d_custom_path=$PWD/src/domogik/xpl/tools/
+        arch=$(python -c 'import platform;print platform.architecture()[0]')
+        d_custom_path=$PWD/src/domogik/xpl/tools/$arch/
         [ -f /etc/default/domogik ] &&  sed -i "s;^CUSTOM_PATH.*$;CUSTOM_PATH=$d_custom_path;" /etc/default/domogik
     fi
 }
