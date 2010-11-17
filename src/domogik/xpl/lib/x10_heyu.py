@@ -213,15 +213,12 @@ class X10API:
         '''
         Send bright command
         @param item : item to send brigth order
-        @param lvl : bright level in percent
+        @param lvl : bright level (1-22)
         @Return True if order was sent, False in case of errors
         '''
         try:
             self._valid_item(item)
-            level = int(int(lvl) * 0.22)
-            if level == 0:
-                level = 1
-            self._send_lvl("bright", item, level)
+            self._send_lvl("bright", item, lvl)
         except:
             return False
         else:
@@ -231,15 +228,12 @@ class X10API:
         '''
         Send bright command after full brigth
         @param item : item to send bright order
-        @param lvl : bright level in percent
+        @param lvl : bright level (1-22)
         @Return True if order was sent, False in case of errors
         '''
         try:
             self._valid_item(item)
-            level = int(int(lvl) * 0.22)
-            if level == 0:
-                level = 1
-            self._send_lvl("brightb", item, level)
+            self._send_lvl("brightb", item, lvl)
         except:
             return False
         else:
@@ -249,27 +243,21 @@ class X10API:
         '''
         Send dim command
         @param item : item to send brigth order
-        @param lvl : dim level in percent
+        @param lvl : dim level (1-22)
         @Return True if order was sent, False in case of errors
         '''
         self._valid_item(item)
-        level = int(int(lvl) * 0.22)
-        if level == 0:
-            level = 1
-        self._send_lvl("dim", item, level)
+        self._send_lvl("dim", item, lvl)
 
     def dimb(self, item, lvl):
         '''
         Send dim command after full brigth
         @param item : item to send dim order
-        @param lvl : dim level in percent
+        @param lvl : dim level (1-22)
         @Return True if order was sent, False in case of errors
         '''
         try:
             self._valid_item(item)
-            level = int(int(lvl) * 0.22)
-            if level == 0:
-                level = 1
             self._send_lvl("dimb", item, level)
         except:
             return False
