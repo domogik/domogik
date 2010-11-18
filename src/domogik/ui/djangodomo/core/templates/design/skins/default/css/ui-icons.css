@@ -77,9 +77,9 @@
 .icon64-usage-server { background-image:url(../images/device_usage/todo_64.png);}
 .icon32-usage-server { background-image:url(../images/device_usage/todo_32.png);}
 .icon16-usage-server { background-image:url(../images/device_usage/todo_16.png);}
-.icon64-usage-phone { background-image:url(../images/device_usage/todo_64.png);}
-.icon32-usage-phone { background-image:url(../images/device_usage/todo_32.png);}
-.icon16-usage-phone { background-image:url(../images/device_usage/todo_16.png);}
+.icon64-usage-telephony { background-image:url(../images/device_usage/telephony/usage_64.png);}
+.icon32-usage-telephony { background-image:url(../images/device_usage/telephony/usage_32.png);}
+.icon16-usage-telephony { background-image:url(../images/device_usage/telephony/usage_16.png);}
 .icon64-usage-tv { background-image:url(../images/device_usage/todo_64.png);}
 .icon32-usage-tv { background-image:url(../images/device_usage/todo_32.png);}
 .icon16-usage-tv { background-image:url(../images/device_usage/todo_16.png);}
@@ -243,12 +243,12 @@
 .icon32-usage-server.range_0 { background-image:url(../images/device_usage/todo_32.png);}
 .icon32-usage-server.range_100 { background-image:url(../images/device_usage/todo_32.png);}
 
-.icon32-usage-phone.unknown { background-image:url(../images/device_usage/todo_32.png);}
-.icon32-usage-phone.trigger { background-image:url(../images/device_usage/todo_32.png);}
-.icon32-usage-phone.binary_0 { background-image:url(../images/device_usage/todo_32.png);}
-.icon32-usage-phone.binary_1 { background-image:url(../images/device_usage/todo_32.png);}
-.icon32-usage-phone.range_0 { background-image:url(../images/device_usage/todo_32.png);}
-.icon32-usage-phone.range_100 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-telephony.unknown { background-image:url(../images/device_usage/telephony/undefined_32.png);}
+.icon32-usage-telephony.trigger { background-image:url(../images/device_usage/telephony/100_32.png);}
+.icon32-usage-telephony.binary_0 { background-image:url(../images/device_usage/telephony/0_32.png);}
+.icon32-usage-telephony.binary_1 { background-image:url(../images/device_usage/telephony/100_32.png);}
+.icon32-usage-telephony.range_0 { background-image:url(../images/device_usage/telephony/0_32.png);}
+.icon32-usage-telephony.range_100 { background-image:url(../images/device_usage/telephony/100_32.png);}
 
 .icon32-usage-tv.unknown { background-image:url(../images/device_usage/todo_32.png);}
 .icon32-usage-tv.trigger { background-image:url(../images/device_usage/todo_32.png);}
