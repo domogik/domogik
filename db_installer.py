@@ -210,7 +210,7 @@ def install(create_prod_db, create_test_db):
     db.add_sensor_feature_model(sf_id='online_service.weather.condition_text', 
                                 sf_name=u'Condition text',
                                 sf_device_type_id=device_type.id, 
-                                sf_value_type='number',
+                                sf_value_type='string',
                                 sf_parameters='{}',
                                 sf_stat_key='condition-text')
 
