@@ -68,9 +68,9 @@
 .icon64-usage-ventilation { background-image:url(../images/device_usage/ventilation/usage_64.png);}
 .icon32-usage-ventilation { background-image:url(../images/device_usage/ventilation/usage_32.png);}
 .icon16-usage-ventilation { background-image:url(../images/device_usage/ventilation/usage_16.png);}
-.icon64-usage-heating { background-image:url(../images/device_usage/todo_64.png);}
-.icon32-usage-heating { background-image:url(../images/device_usage/todo_32.png);}
-.icon16-usage-heating { background-image:url(../images/device_usage/todo_16.png);}
+.icon64-usage-heating { background-image:url(../images/device_usage/heating/usage_64.png);}
+.icon32-usage-heating { background-image:url(../images/device_usage/heating/usage_32.png);}
+.icon16-usage-heating { background-image:url(../images/device_usage/heating/usage_16.png);}
 .icon64-usage-workstation { background-image:url(../images/device_usage/todo_64.png);}
 .icon32-usage-workstation { background-image:url(../images/device_usage/todo_32.png);}
 .icon16-usage-workstation { background-image:url(../images/device_usage/todo_16.png);}
@@ -222,12 +222,12 @@
 .icon32-usage-ventilation.sensor.string.unknown { background-image:url(../images/device_usage/ventilation/undefined_32.png);}
 .icon32-usage-ventilation.sensor.string.known { background-image:url(../images/device_usage/ventilation/100_32.png);}
 
-.icon32-usage-heating.unknown { background-image:url(../images/device_usage/todo_32.png);}
-.icon32-usage-heating.trigger { background-image:url(../images/device_usage/todo_32.png);}
-.icon32-usage-heating.binary_0 { background-image:url(../images/device_usage/todo_32.png);}
-.icon32-usage-heating.binary_1 { background-image:url(../images/device_usage/todo_32.png);}
-.icon32-usage-heating.range_0 { background-image:url(../images/device_usage/todo_32.png);}
-.icon32-usage-heating.range_100 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-heating.unknown { background-image:url(../images/device_usage/heating/undefined_32.png);}
+.icon32-usage-heating.trigger { background-image:url(../images/device_usage/heating/100_32.png);}
+.icon32-usage-heating.binary_0 { background-image:url(../images/device_usage/heating/0_32.png);}
+.icon32-usage-heating.binary_1 { background-image:url(../images/device_usage/heating/100_32.png);}
+.icon32-usage-heating.range_0 { background-image:url(../images/device_usage/heating/0_32.png);}
+.icon32-usage-heating.range_100 { background-image:url(../images/device_usage/heating/100_32.png);}
 
 .icon32-usage-workstation.unknown { background-image:url(../images/device_usage/todo_32.png);}
 .icon32-usage-workstation.trigger { background-image:url(../images/device_usage/todo_32.png);}
