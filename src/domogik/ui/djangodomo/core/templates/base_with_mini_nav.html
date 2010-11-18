@@ -37,43 +37,6 @@
 <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.login.css" rel="stylesheet" type="text/css" />
 {% block global_css %}{% endblock %}
 {% block css %}{% endblock %}
-
-<title>{% block title %}Domogik{% endblock %}</title>
-</head>
-<body>
-    <div id="mainbar">
-        <nav id="nav1">
-            <ul>
-                <li><a href="{% url show_view %}" class="{{ nav1_show_class }}" title="{% trans "View, Control your house" %}">{% trans "Visualization" %}</a></li>
-                <li><a href="{% url admin_view %}" class="{% if not is_user_connected %}admin_required{% endif %}" title="{% trans "Configure, Manage" %}">{% trans "Administration" %}</a></li>
-				<li class='help'><a href="http://wiki.domogik.org/tiki-index.php?page=EndUserDocumentation&bl=y" title="{% trans "External Wiki page" %}" target='_blank'>{% trans "Help" %}</a></li>
-                <li class="login">
-                    {% if not is_user_connected %}
-                        <a href="{% url login_view %}" title="{% trans "Identify yourself" %}">{% trans "Log in" %}</a>
-                    {% else %}
-                        <a href="{% url logout_view %}" title="{% trans "Disconnect" %} {{ request.session.user.first_name }}">{% trans "Log out" %} {{ request.session.user.first_name }}</a>
-                    {% endif %}
-                </li>
-            </ul>
-        </nav>
-    </div>
-	<ul class="breadcrumb">
-        	<li><a href='{% url index_view %}' class='homepage'>&nbsp;<span class='offscreen'>Domogik homepage</span></a></li>
-            {% block breadcrumb %}{% endblock %}
-        	<li id='showmenu'><a href='#' class='icon16-action-menu'>Menu</a></li>
-    </ul>
-	<div id="content-bgnd">
-        <div class="columnleft">
-            {% block contentleft %}{% endblock %}
-        </div>
-        <div class="columnright">
-            {% block contentright %}{% endblock %}
-        </div>
-        <div class='clear'></div>
-	</div>
-	<footer>Copyright 2010 Domogik project - GNU/GPL v3 license</footer>
-</body>
-
 <script type="text/javascript">  
     var rest_url = "{{ rest_url }}"; 
 </script> 
@@ -110,5 +73,39 @@
     {% endif %}   
     // ]]>
 </script>
-
+<title>{% block title %}Domogik{% endblock %}</title>
+</head>
+<body>
+    <div id="mainbar">
+        <nav id="nav1">
+            <ul>
+                <li><a href="{% url show_view %}" class="{{ nav1_show_class }}" title="{% trans "View, Control your house" %}">{% trans "Visualization" %}</a></li>
+                <li><a href="{% url admin_view %}" class="{% if not is_user_connected %}admin_required{% endif %}" title="{% trans "Configure, Manage" %}">{% trans "Administration" %}</a></li>
+				<li class='help'><a href="http://wiki.domogik.org/tiki-index.php?page=EndUserDocumentation&bl=y" title="{% trans "External Wiki page" %}" target='_blank'>{% trans "Help" %}</a></li>
+                <li class="login">
+                    {% if not is_user_connected %}
+                        <a href="{% url login_view %}" title="{% trans "Identify yourself" %}">{% trans "Log in" %}</a>
+                    {% else %}
+                        <a href="{% url logout_view %}" title="{% trans "Disconnect" %} {{ request.session.user.first_name }}">{% trans "Log out" %} {{ request.session.user.first_name }}</a>
+                    {% endif %}
+                </li>
+            </ul>
+        </nav>
+    </div>
+	<ul class="breadcrumb">
+        	<li><a href='{% url index_view %}' class='homepage'>&nbsp;<span class='offscreen'>Domogik homepage</span></a></li>
+            {% block breadcrumb %}{% endblock %}
+        	<li id='showmenu'><a href='#' class='icon16-action-menu'>Menu</a></li>
+    </ul>
+	<div id="content-bgnd">
+        <div class="columnleft">
+            {% block contentleft %}{% endblock %}
+        </div>
+        <div class="columnright">
+            {% block contentright %}{% endblock %}
+        </div>
+        <div class='clear'></div>
+	</div>
+	<footer>Copyright 2010 Domogik project - GNU/GPL v3 license</footer>
+</body>
 </html>

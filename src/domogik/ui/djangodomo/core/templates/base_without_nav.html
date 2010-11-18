@@ -34,22 +34,6 @@
 <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.notifications.css" rel="stylesheet" type="text/css" />
 {% block global_css %}{% endblock %}
 {% block css %}{% endblock %}
-
-<title>{% block title %}Domogik{% endblock %}</title>
-</head>
-<body>
-    <div id="content-bgnd">
-        <header id="mainheader">
-            <a href="/domogik" id="logo"><img src="/design/images/logo_domogik.png" width="131" height="37" alt="Domogik logo" /></a>
-            <div id="title">{% trans "Free home automation under Linux" %}</div>
-        </header>
-        <section id="mainsection">
-            {% block content %}{% endblock %}
-        </section>
-		<footer>Copyright 2010 Domogik project - GNU/GPL v3 license</footer>
-	</div>
-</body>
-
 <script type="text/javascript">  
     var rest_url = "{{ rest_url }}"; 
 </script> 
@@ -76,5 +60,18 @@
     {% endif %}   
     // ]]>
 </script>
-
+<title>{% block title %}Domogik{% endblock %}</title>
+</head>
+<body>
+    <div id="content-bgnd">
+        <header id="mainheader">
+            <a href="/domogik" id="logo"><img src="/design/images/logo_domogik.png" width="131" height="37" alt="Domogik logo" /></a>
+            <div id="title">{% trans "Free home automation under Linux" %}</div>
+        </header>
+        <section id="mainsection">
+            {% block content %}{% endblock %}
+        </section>
+		<footer>Copyright 2010 Domogik project - GNU/GPL v3 license</footer>
+	</div>
+</body>
 </html>
