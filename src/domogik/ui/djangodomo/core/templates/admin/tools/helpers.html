@@ -33,7 +33,7 @@
         var send_id = null;
         
 		function sendfunction() {
-            var commandline = $("#commandline").val();
+            var commandline = $.trim($("#commandline").val());
             if (commandline) {
                 $("#commandsubmit").hide();
                 $("#commandstop").show();
