@@ -92,7 +92,12 @@ class Ipx800(Helper):
         """
             
         ipx = IPX(self._log, None)
-        ipx.open("foo", args[0], args[1], args[2])
+        if len(args) == 1:
+            ipx.open("foo", args[0])
+        elif len(args) == 3:
+            ipx.open("foo", args[0], args[1], args[2])
+        else:
+            return ["Bad usage of this helper"]
         data = ipx.get_status_for_helper()
         print data
         return data

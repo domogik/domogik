@@ -128,7 +128,7 @@ class IPX:
         self.ipx_old_an = {}   # analogic input
         self.ipx_old_count = {}# counters
 
-    def open(self, name, host, login, password):
+    def open(self, name, host, login = None, password = None):
         """ Try to access to IPX board and return error if not possible
             @param ip : ip or dns of host
         """
@@ -289,6 +289,10 @@ class IPX:
             Notice that 'pulse' status is never sent as it has no sense for UI :
             we send HIGH or LOW (or value for anal/counter)
         """
+        # if no callback defined (used by helper for example), don't send changes
+        if self._callback == None:
+            return
+
         self._log.debug("Status changed : %s" % data)
         device = "%s-%s%s" % (self.name, data['elt'], data['num'])
 
@@ -327,6 +331,13 @@ class IPX:
             opener = MyOpener()
             opener.set_auth(self.login, self.password)
             resp = opener.open(self.url_status)
+            xml = resp.read()
+            if xml[0:3] == "401":
+                error = "Error : bad login/password for IPX board"
+                print(error)
+                self._log.error(error)
+                raise IPXException(error)
+
         except IOError:
             error = "Error while accessing to '%s' : %s" % \
                      (self.url_status, traceback.format_exc())
@@ -334,7 +345,7 @@ class IPX:
             self._log.error(error)
             raise IPXException(error)
 
-        xml = resp.read()
+        #xml = resp.read()
         dom = minidom.parseString(xml)
         response = dom.getElementsByTagName("response")[0]
 
