@@ -1,0 +1,38 @@
+@charset "UTF-8";
+/* CSS Document */
+
+.highlight
+{
+    background-color: #DFFFB3;
+}
+
+ul#popup
+{
+    list-style:none;
+    position: absolute;
+    width: 10em;
+    padding: 0.3em;
+    color: #000;
+    border: #979387 1px solid;
+    background-color: #D2CDBC;
+    top: 1em;
+    left: 1em;
+    cursor: default;
+    z-index: 40;
+    -moz-border-radius: 0.5em;
+    -webkit-border-radius: 0.5em;
+}
+
+ul#popup li {
+    text-align: left;
+    margin: 0.3em 0;
+    padding: 0.4em;
+}
+
+ul#popup li:focus {
+    background-color: #f6a828;
+}
+
+ul#popup li:hover {
+    background-color: #BDCB2F;
+}

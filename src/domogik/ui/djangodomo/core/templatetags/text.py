@@ -27,6 +27,7 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 """
 
 from django import template
+from django.template import Node
 
 register = template.Library()
 
@@ -38,3 +39,41 @@ def truncchar(value, arg):
     else:
         return value[:arg] + '.'
 
+@register.filter
+def switchUnderscore(value):
+    return value.replace('_', ' ')
+
+class GetPosition(Node):
+    def __init__(self, array, id, grouper):
+        self.array = template.Variable(array)
+        self.id = template.Variable(id)
+        self.grouper = template.Variable(grouper)
+
+    def render(self, context):
+        res = 0
+        array = self.array.resolve(context)
+        id = self.id.resolve(context)
+        grouper = self.grouper.resolve(context)
+        for i in range(len(array)):
+            if grouper == 1:
+                if array[i]['grouper'].id == id:
+                    res = i                
+            else:
+                if array[i].id == id:
+                    res = i
+        return res
+    
+def do_get_position(parser, token):
+    """
+    This returns the position.
+
+    Usage::
+
+        {% get_position array id grouper %}
+    """
+    args = token.contents.split()
+    if len(args) != 4:
+        raise TemplateSyntaxError, "'get_position' requires arguments"
+    return GetPosition(args[1], args[2], args[3])
+
+register.tag('get_position', do_get_position)

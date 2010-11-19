@@ -3,7 +3,6 @@
 	src: url('impact.ttf');
 }
 
-
 img {
     border:none;
 }
@@ -59,13 +58,6 @@ h2 {
 
 h2.splitter, h3.splitter {
     border-top:1px solid #999;
-}
-
-.help {
-	display:inline-block;
-	line-height:32px;
-	background: url(../images/action/help_32.png) right 50% no-repeat;
-	padding-right:32px;
 }
 
 .capitalletter {

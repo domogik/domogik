@@ -8,6 +8,7 @@ License
 
 B{Domogik} is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
+A
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
@@ -79,6 +80,9 @@ from socket import socket, gethostbyname, gethostname, AF_INET, SOCK_DGRAM, SOL_
 from domogik.common import logger
 from domogik.xpl.common.baseplugin import BasePlugin
 from domogik.xpl.common.xplmessage import XplMessage
+from domogik.common.dmg_exceptions import XplMessageError
+
+READ_NETWORK_TIMEOUT = 2
 
 class Manager(BasePlugin):
     """
@@ -94,14 +98,16 @@ class Manager(BasePlugin):
     # _network = None
     # _UDPSock = None
 
-    def __init__(self, ip=gethostbyname(gethostname()), port=0, broadcast="255.255.255.255"):
+    def __init__(self, ip=None, port=0, broadcast="255.255.255.255"):
         """
         Create a new manager instance
         @param ip : IP to listen to (default real ip address)
         @param port : port to listen to (default 0)
         """
         BasePlugin.__init__(self, stop_cb = self.leave)
-        source = "xpl-%s.domogik" % self.get_plugin_name()
+        if ip == None:
+            ip = self.get_sanitized_hostname()
+        source = "xpl-%s.%s" % (self.get_plugin_name(), self.get_sanitized_hostname())
         # Define maximum xPL message size
         self._buff = 1500
         # Define xPL base port
@@ -117,7 +123,6 @@ class Manager(BasePlugin):
         #xPL plugins only needs to connect on local xPL Hub on localhost
         addr = (ip, port)
 
-        self._log = self.get_my_logger()
         #Define locks
         self._lock_send = threading.Semaphore()
         self._lock_list = threading.Semaphore()
@@ -127,14 +132,14 @@ class Manager(BasePlugin):
             self._UDPSock.bind(addr)
         except:
             # Smthg is already running on this port
-            self._log.error("Can't bind to the interface %s, port %i" % (ip, port))
+            self.log.error("Can't bind to the interface %s, port %i" % (ip, port))
             exit(1)
         else:
             self.add_stop_cb(self.leave)
             self._port = self._UDPSock.getsockname()[1]
             #Get the port number assigned by the system
             self._ip, self._port = self._UDPSock.getsockname()
-            self._log.debug("xPL plugin %s socket bound to %s, port %s" \
+            self.log.debug("xPL plugin %s socket bound to %s, port %s" \
                             % (self.get_plugin_name(), self._ip, self._port))
             # All is good, we start sending Heartbeat every 5 minutes using
             # XplTimer
@@ -142,21 +147,21 @@ class Manager(BasePlugin):
             self._h_timer = XplTimer(300, self._SendHeartbeat, self.get_stop(), self)
             self._h_timer.start()
             #We add a listener in order to answer to the hbeat requests
-            Listener(cb = self.got_hbeat, manager = self, filter = {'schema':'hbeat.app', 'xpltype':'xpl-stat'})
+            Listener(cb = self.got_hbeat, manager = self, filter = {'schema':'hbeat.request', 'xpltype':'xpl-cmnd'})
             #And finally we start network listener in a thread
             self._stop_thread = False
             self._network = threading.Thread(None, self._run_thread_monitor,
                     "thread-monitor", (), {})
             self.register_thread(self._network)
             self._network.start()
-            self._log.debug("xPL thread started for %s " % self.get_plugin_name())
+            self.log.debug("xPL thread started for %s " % self.get_plugin_name())
 
     def leave(self):
         """
         Stop threads and leave the Manager
         """
         self._UDPSock.close()
-        self._log.debug("xPL thread stopped")
+        self.log.debug("xPL thread stopped")
 
     def send(self, message):
         """
@@ -174,10 +179,10 @@ class Manager(BasePlugin):
             if not message.target:
                 message.set_target("*")
             self._UDPSock.sendto(message.__str__(), (self._broadcast, 3865))
-            self._log.debug("xPL Message sent by thread %s : %s" % (threading.currentThread().getName(), message))
+            self.log.debug("xPL Message sent by thread %s : %s" % (threading.currentThread().getName(), message))
         except:
-            self._log.warning("Error during send of message")
-            self._log.debug(traceback.format_exc())
+            self.log.warning("Error during send of message")
+            self.log.debug(traceback.format_exc())
         self._lock_send.release()
 
     def _SendHeartbeat(self, target='*', test=""):
@@ -208,7 +213,7 @@ remote-ip=%s
                 self._UDPSock.sendto(mess, (self._broadcast, 3865))
 
     def got_hbeat(self, message):
-        if(message.target != self._source ):
+        if(message.target == self._source or message.target == "*"):
             self._SendHeartbeat(message.source)
 
     def _run_thread_monitor(self):
@@ -220,27 +225,30 @@ remote-ip=%s
         """
         while not self.should_stop():
             try:
-                readable, writeable, errored = select.select([self._UDPSock], [], [], 10)
+                readable, writeable, errored = select.select([self._UDPSock], [], [], READ_NETWORK_TIMEOUT)
             except:
-                self._log.info("Error during the read of the socket : %s" % traceback.format_exc())
+                self.log.info("Error during the read of the socket : %s" % traceback.format_exc())
             else:
                 if len(readable) == 1:
                     try:
                         data, addr = self._UDPSock.recvfrom(self._buff)
                     except:
-                        self._log.debug("bad data received")
+                        self.log.debug("bad data received")
                     else:
                         try:
                             mess = XplMessage(data)
-                            if mess.target == "*" or (
-                                    mess.target == self._source):
-                                [l.new_message(mess) for l in self._listeners]
+                            if (mess.target == "*" or (mess.target == self._source)) and\
+                                (self._source != mess.source):
+                                for l in self._listeners:
+                                    l.new_message(mess)
                                 #Enabling this debug will really polute your logs
-                                #self._log.debug("New message received : %s" % \
+                                #self.log.debug("New message received : %s" % \
                                 #        mess.get_type())
                         except XPLException:
-                            self._log.warning("XPL Exception occured in : %s" % sys.exc_info()[2])
-        self._log.info("self._should_stop set, leave")
+                            self.log.warning("XPL Exception occured in : %s" % sys.exc_info()[2])
+                        except XplMessageError:
+                            self.log.warning("Malformated message received, ignoring it.")
+        self.log.info("self._should_stop set, leave.")
 
     def add_listener(self, listener):
         """
@@ -251,6 +259,14 @@ remote-ip=%s
         self._listeners.append(listener)
         self._lock_list.release()
 
+    def del_listener(self, listener):
+        """
+        del a listener on the list of the manager
+        @param listener : the listener instance
+        """
+        self._lock_list.acquire()
+        self._listeners.remove(listener)
+        self._lock_list.release()
 
 class Listener:
     """
@@ -260,20 +276,25 @@ class Listener:
     # _callback = None
     # _filter = None
 
-    def __init__(self, cb, manager, filter = {}):
+    def __init__(self, cb, manager, filter = {}, cb_params = {}):
         """
         The listener will get all messages from the manager and parse them.
         If a message match the filter, then the callback function will be
         called with the message as parameter
         @param cb : the callback function
         @param manager : the manager instance
-        @param filter : dictionnary { key : value }
+        @param filter : dictionnary { key : value }. If value is a list, then the 
+        listener will check if the key equals any of these values
         """
-        manager._log.debug("New listener, filter : %s" % filter)
+        manager.log.debug("New listener, filter : %s" % filter)
         self._callback = cb
         self._filter = filter
         self._manager = manager
         manager.add_listener(self)
+        self._cb_params = cb_params
+
+    def unregister(self):
+        self._manager.del_listener(self)
 
     def __str__(self):
         return "Listener<%s>" % (self._filter)
@@ -294,18 +315,24 @@ class Listener:
         ok = True
         for key in self._filter:
             if key in message.data:
-                if (message.data[key] != self._filter[key]):
+                if isinstance(self._filter[key], list) and not (message.data[key].lower() in [s.lower() for s in self._filter[key]]):
+                    ok = False
+                elif not isinstance(self._filter[key], list) and (message.data[key].lower() != self._filter[key].lower()):
                     ok = False
             elif key == "schema":
                 ok = ok and (self._filter[key] == message.schema)
-
             elif key == "xpltype":
                 ok = ok and (self._filter[key] == message.type)
+            elif key == "xplsource":
+                ok = ok and (self._filter[key] == message.source)
             elif not (key in message.data or key in ("xpltype", "schema")):
                 ok = False
         #The message match the filter, we can call  the callback function
         if ok:
-            thread = threading.Thread(target=self._callback, args = (message,), name="Manager-new-message-cb")
+            if self._cb_params != {} and self._callback.func_code.co_argcount > 1:  
+                thread = threading.Thread(target=self._callback, args = (message, self._cb_params), name="Manager-new-message-cb")
+            else:
+                thread = threading.Thread(target=self._callback, args = (message,), name="Manager-new-message-cb")
             self._manager.register_thread(thread)
             thread.start()
 
@@ -357,17 +384,18 @@ class XplTimer():
         @param time : time of loop in second
         @param cb : callback function which will be call eact 'time' seconds
         """
-        self._timer = self.__InternalTimer(time, cb, stop, manager._log)
+        self._timer = self.__InternalTimer(time, cb, stop, manager.log)
+        self._stop = stop
         self._manager = manager
-        lg = logger.Logger(self.__class__.__name__)
-        self._log = lg.get_logger()
+        self.log = manager.log
         manager.register_timer(self)
         manager.register_thread(self._timer)
+        self.log.debug("New timer created : %s " % self)
 
-    def __repr__(self):
-        """ Representation of the Timer
-        """
-        return "<domogik.xpl.lib.xplconnector.XplTimer> name : %s" % self._timer.name
+#    def __repr__(self):
+#        """ Representation of the Timer
+#        """
+#        return "<domogik.xpl.lib.xplconnector.XplTimer> name : %s" % self._timer.name
 
     def start(self):
         """
@@ -382,14 +410,17 @@ class XplTimer():
         return self._timer
 
     def __del__(self):
-        self._log.debug("__del__ Manager")
+        self.log.debug("__del__ Manager")
         self.stop()
 
     def stop(self):
         """
         Stop the timer
         """
+        self.log.debug("Timer : stop, try to join() internal thread")
+        self._stop.set()
         self._timer.join()
+        self.log.debug("Timer : stop, internal thread joined, unregister it")
         self._manager.unregister_timer(self._timer)
 
     class __InternalTimer(threading.Thread):
@@ -407,7 +438,7 @@ class XplTimer():
             self._cb = cb
             self._stop = stop
             self.name = "internal-timer"
-            self._log = log
+            self.log = log
 
         def run(self):
             '''

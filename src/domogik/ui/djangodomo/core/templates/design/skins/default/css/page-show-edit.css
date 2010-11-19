@@ -1,0 +1,98 @@
+@charset "UTF-8";
+/* CSS Document */
+
+#panel {
+    position:absolute;
+    right:0;
+    top:50px;
+    background-color:#ffffff;
+    background:rgba(255,255,255,0.9);
+    border:1px solid #cccccc;
+    -moz-border-radius: 0.8em 0 0 0.8em;
+    -webkit-border-radius: 0.8em 0 0 0.8em;
+    padding:1em 0 1em 0;
+    color:#000000;
+}
+
+#panel h2 {
+    margin-left:1em;
+}
+
+#features {
+    width:30em;
+    height:55em;
+    float:right;
+    overflow-y:scroll;    
+}
+
+
+#featureslist .usage { /* Usage level */
+    border-top: #cccccc solid 1px;
+    border-bottom: #cccccc solid 1px;
+    padding: 0.4em 0 0.4em 0;
+    background-color:#ffffff;
+    background-position: 3px 50%;
+    background-repeat:no-repeat;
+    text-align:center;
+    font-weight:bold;
+}
+
+#featureslist .device { /* Device level */
+    margin-left:10px;
+    padding: 0.4em 0 0.4em 25px;
+    background-position: 0% 50%;
+    background-repeat:no-repeat;
+}
+
+#featureslist .feature { /* Feature level */
+    margin-left:35px;
+    padding: 0.4em 0 0.4em 25px;
+    background-position: 0% 50%;
+    background-repeat:no-repeat;
+    cursor: pointer;
+}
+
+#featureslist .selected { /* Feature level */
+    background-color:#BDCB2F;
+}
+
+.ui-draggable {
+    cursor: move;
+    position: relative;
+}
+
+#widgets {
+    width:30em;
+    float:right;
+    border-right: 1px dashed #cccccc;
+    margin-right:1em;
+}
+
+#widgetslist > li {
+    margin:1em 1em 0 1em;
+    border: 1px solid #cccccc;
+    -moz-border-radius: 0.8em;
+    -webkit-border-radius: 0.8em;
+    padding:0 1em 1em 1em;
+}
+
+#widgetslist .model {
+    margin-top:1em;
+}
+
+#widgetslist .name {
+}
+
+#widgetslist .description {
+    padding-left:1em;
+    font-style: italic;
+}
+
+.mainactions .model, .actions .model {
+    display:inline-block;
+    margin:1em;
+}
+
+.state-active {
+    background-color: #DFFFB3;
+}

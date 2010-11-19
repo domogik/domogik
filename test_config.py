@@ -35,6 +35,7 @@ Implements
 """
 
 import os
+import pwd
 import sys
 from multiprocessing import Process, Pipe
 from socket import gethostbyname
@@ -81,8 +82,11 @@ def test_imports():
     try:
         import sqlite3
     except ImportError:
-        warning("Can't import sqlite3, please install it by hand (>= 1.1) or exec ./setup.py develop or ./setup.py install")
-        good = False
+        try:
+            import MySQLdb
+        except ImportError:
+            warning("Can't import sqlite3 neither MySQLdb, please install one of them (depend of your setup) by hand or exec ./setup.py develop or ./setup.py install")
+            good = False
     try:
         import httplib
     except ImportError:
@@ -99,12 +103,10 @@ def test_imports():
 def test_config_files():
     info("Test global config file")
     assert os.path.isfile("/etc/conf.d/domogik") or os.path.isfile("/etc/default/domogik"), \
-            "No global config file found, please take src/domogik/examples/default/domogik \
-            on your domogik repository and put it on /etc/default/domogik or /etc/conf.d/domogik \
-            (depending of your system)."
+            "No global config file found, please exec install.sh if you did not exec it before."
     assert not (os.path.isfile("/etc/conf.d/domogik") and os.path.isfile("/etc/default/domogik")), \
             "Global config file found at 2 locations. Please put it only at /etc/default/domogik or \
-            /etc/conf.d/domogik."
+            /etc/conf.d/domogik then restart test_config.py as root"
     if os.path.isfile("/etc/default/domogik"):
         file = "/etc/default/domogik"
     else:
@@ -116,6 +118,7 @@ def test_config_files():
     user = ''
     manager_params = ''
     custom_path = ''
+    hub_iface = ''
     for line in lines:
         item,value = line.strip().split("=")
         if item.strip() == "DOMOGIK_USER":
@@ -124,6 +127,8 @@ def test_config_files():
             manager_params = value
         elif item.strip() == "CUSTOM_PATH":
             custom_path = value
+        elif item.strip() == "HUB_IFACE":
+            hub_iface = value
         else:
             warning("Unknown config value in the main config file : %s" % item)
     ok("Global config file exists and contains right stuff")
@@ -145,20 +150,18 @@ def test_config_files():
     path = os.environ['PATH'].split(':')
     path.append(custom_path)
     l = [p for p in path if os.path.exists(os.path.join(p, 'xPL_Hub'))]
-    assert l != [], "xPL_Hub can't be found, please double check CUSTOM_PATH is correctly defined."
+    assert l != [], "xPL_Hub can't be found, please double check CUSTOM_PATH is correctly defined if you are in development mode. In install mode, check your architecture is supported or check src/domogik/xpl/tools/COMPILE.txt, then restart test_config.py"
     ok("xPL_Hub found in the path")
     
     info("Test user / config file")
 
     #Check user config file
-    import pwd
     try:
         user_entry = pwd.getpwnam(user)
     except KeyError:
-        raise KeyError("The user %s does not exists, you MUST create it or change the DOMOGIK_USER parameter in %s" % (user, file))
+        raise KeyError("The user %s does not exists, you MUST create it or change the DOMOGIK_USER parameter in %s. Please report this as a bug if you used install.sh." % (user, file))
     user_home = user_entry.pw_dir
-    assert os.path.isfile("%s/.domogik.cfg" % user_home), "The domogik config file %s/.domogik does not exists. \
-            Please copy it from src/domogik/examples/config/domogik and update it." % user_home
+    assert os.path.isfile("%s/.domogik.cfg" % user_home), "The domogik config file %s/.domogik.cfg does not exist. Please report this as a bug if you used install.sh." % user_home
     ok("Domogik's user exists and has a config file")
     
     test_user_config_file(user_home, user_entry)
@@ -183,7 +186,7 @@ def _check_port_availability(s_ip, s_port):
         d_ip = data[1].split(':')[0]
         d_port = data[1].split(':')[1]
         if d_port == port:
-            assert d_ip != ip and ip != "00000000", "A service already listen on ip %s and port %s." % (s_ip, s_port)
+            assert d_ip != ip and ip != "00000000", "A service already listen on ip %s and port %s. Stop it and restart test_config.py" % (s_ip, s_port)
 
 def test_user_config_file(user_home, user_entry):
     info("Check user config file contents")
@@ -195,6 +198,7 @@ def test_user_config_file(user_home, user_entry):
     dmg = dict(config.items('domogik'))
     database = dict(config.items('database'))
     rest = dict(config.items('rest'))
+    django = dict(config.items('django'))
     ok("Config file correctly loaded")
 
     info("Parse [domogik] section")
@@ -216,22 +220,25 @@ def test_user_config_file(user_home, user_entry):
 
     # check [database] section
     info("Parse [database] section")
-    assert database['db_type'] == 'sqlite', "Only sqlite database type is supported at the moment"
+    assert database['db_type'] == 'mysql', "Only mysql database type is supported at the moment"
 
-    parent_conn, child_conn = Pipe()
-    p = Process(target=_test_user_can_write, args=(child_conn, database['db_path'] ,user_entry,))
-    p.start()
-    p.join()
-    assert parent_conn.recv(), "The database file does not exists or domogik user can't write on it. \
-                Did you exec db_installer.py ?\n\
-                Are you sure you have define the full path, including filename, without ~ ?"
+    uid = user_entry.pw_uid
+    os.setreuid(0,uid)
+    old_home = os.environ['HOME']
+    os.environ['HOME'] = user_home
+    from domogik.common.database import DbHelper
+    d = DbHelper()
+    os.setreuid(0,0)
+    os.environ['HOME'] = old_home
+    assert d.get_engine() != None, "Engine is not set, it seems something went wrong during connection to the database"
+        
     ok("[database] section seems good")
     
     # Check [rest] section
     info("Parse [rest] section")
     _check_port_availability(rest['rest_server_ip'], rest['rest_server_port'])
     ok("Rest server IP/port is not bound by anything else")
-    _check_port_availability(rest['django_server_ip'], rest['django_server_port'])
+    _check_port_availability(django['django_server_ip'], django['django_server_port'])
     ok("Django server IP/port is not bound by anything else")
 
 def test_init():
@@ -241,11 +248,18 @@ def test_init():
             Please copy src/domogik/examples/init/domogik to /etc/init.d or /etc/rc.d depending on your system, and chmod +x /etc/init.d/domogik"
     ok("/etc/init.d/domogik or /etc/rc.d/domogik found with good permissions")
 
+def test_version():
+    info("Check python version")
+    v = sys.version_info
+    assert not (v[0] == 2 and v[1] < 6), "Python version is %s.%s, it must be >= 2.6, please upgrade" % (v[0], v[1])
+    ok("Python version is >= 2.6")
+
 try:
     am_i_root()
     test_imports()
     test_config_files()
     test_init()
+    test_version()
     print "\n\n"
     ok("================================================== <==")
     ok(" Everything seems ok, you should be able to start  <==")

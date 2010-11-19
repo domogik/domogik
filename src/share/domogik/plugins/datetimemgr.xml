@@ -1,0 +1,21 @@
+<package type="plugin">
+  <name>datetimemgr</name>
+  <technology>service</technology>
+  <description>Send date and time on the xPL network every minute</description>
+  <detail>This plugin sends date and time over xPL network each minute</detail>
+  <version>0.1</version>
+  <documentation>#TODO#</documentation>
+  <author>Fritz</author>
+  <author-email>fritz.smh at gmail.com</author-email>
+  <configuration-keys>
+    <key>
+      <order-id>0</order-id>
+      <name>startup-plugin</name>
+      <type>boolean</type>
+      <description>Automatically start plugin at Domogik startup</description>
+      <default-value>False</default-value>
+    </key>
+  </configuration-keys>
+  <files/>
+  <depandancies/>
+</package>

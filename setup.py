@@ -39,19 +39,54 @@ ez_setup.use_setuptools()
 
 import os
 from setuptools import setup, find_packages
+import platform
 
-def list_all_files(path):
+def list_all_files(path, dst):
     """
     List all files and subdirectories contained in a path
     @param path : the path from where to get files and subdirectories
+    @param dst : The based destination path
+    @return : a list of tuples for each directory in path (including path itself)
     """
-    d=[]
+    d = []
+    files = []
     for i in os.listdir(path):
-        if not os.path.isdir(path+i):
-            d.append(path+i)
+        if not os.path.isdir(os.path.join(path, i)):
+            files.append(os.path.join(path, i))
         else:
-            d.extend(list_all_files(path+i))
+            d.extend(list_all_files(os.path.join(path, i), os.path.join(dst, i)))
+    d.append((dst, files))
     return d
+
+arch = platform.architecture()
+hub = {'64bit' : 'src/domogik/xpl/tools/64bit/xPL_Hub',
+        '32bit' : 'src/domogik/xpl/tools/32bit/xPL_Hub',
+        'arm' : 'src/domogik/xpl/tools/arm/xPL_Hub'}
+
+    
+d_files = [
+        ('/usr/local/bin/', ['src/tools/dmgenplug']),
+        ('/usr/local/bin/', ['src/tools/dmgdisplug']),
+        ('/etc/init.d/', ['src/domogik/examples/init/domogik']),
+        ('/etc/default/', ['src/domogik/examples/default/domogik'])
+]
+
+if arch[0] in hub.keys():
+    d_files.append(('/usr/local/bin/', [hub[arch[0]]]))
+else:
+    print "*************** WARNING ***************"
+    print "* Can't find an xPL Hub for your arch *"
+    print "* Please check documentation in :     *"
+    print "*  src/domogik/xpl/tools/COMPILE.txt  *"
+    print "* to get the sources and compile them.*"
+    print "***************************************"
+
+d_files.extend(list_all_files('src/share/domogik/stats/', '/usr/local/share/domogik/listeners/'))
+d_files.extend(list_all_files('src/share/domogik/url2xpl/', '/usr/local/share/domogik/url2xpl/'))
+d_files.extend(list_all_files('src/share/domogik/plugins/', '/usr/local/share/domogik/plugins/'))
+d_files.extend(list_all_files('src/domogik/ui/djangodomo/core/templates/', '/usr/local/share/domogik/ui/djangodomo/core/templates/')),
+d_files.extend(list_all_files('src/domogik/ui/djangodomo/locale/', '/usr/local/share/domogik/ui/djangodomo/locale/')),
+d_files.extend(list_all_files('src/domogik/ui/djangodomo/apache/', '/usr/local/share/doc/domogik/examples/apache/')),
 
 setup(
     name = 'Domogik',
@@ -60,9 +95,10 @@ setup(
     description = 'OpenSource home automation software',
     author = 'Domogik team',
     author_email = 'domogik-general@lists.labs.libre-entreprise.org',
-    install_requires=['setuptools', 'django >=1.2','sqlalchemy >= 0.6.1', 'pysqlite >= 2.6.0', 'simplejson >= 1.9.2',
-                      'pyOpenSSL >= 0.10', 'django-http-proxy >= 0.3.2', 'httplib2 >= 0.6.0', 'django-pipes >= 0.2',
-                      'pySerial > 2.4', 'pyowfs >= 0.1.3'],
+    install_requires=['setuptools', 'django >=1.2','sqlalchemy >= 0.6.4', 'simplejson >= 1.9.2',
+                      'pyOpenSSL == 0.10', 'httplib2 >= 0.6.0', 'django-pipes >= 0.2', 'psutil >= 0.1.3', 'MySQL-python >= 1.2.3c'],
+#                   deprecated, keep for info
+#                   'pySerial > 2.4', 'pyowfs >= 0.1.3'],
     zip_safe = False,
     license = 'GPL v3',
     # namespace_packages = ['domogik', 'mpris', 'tools'],
@@ -73,18 +109,11 @@ setup(
     # Include all files of the ui/djangodomo directory
     # in data files.
     package_data = {
-        'domogik.ui.djangodomo': list_all_files('src/domogik/ui/djangodomo/'),
+        'domogik.ui.djangodomo': list_all_files('src/domogik/ui/djangodomo/','.')[0][1],
         'domogik.ui.djangodomo': ['locale/*.po', 'locale/*.mo'],
-        'domogik.ui.djangodomo.core': list_all_files('src/domogik/ui/djangodomo/core/templates/'),
+#        'domogik.ui.djangodomo.core': list_all_files('src/domogik/ui/djangodomo/core/templates/'),
     },
-    data_files = [
-        ('share/domogik/listeners/', list_all_files('src/share/domogik/listeners/')),
-        ('share/domogik/rest/', list_all_files('src/share/domogik/rest/')),
-        ('share/doc/schemas', list_all_files('src/domogik/xpl/schema/')),
-        ('bin/', ['src/domogik/xpl/tools/xPL_Hub']),
-        ('/etc/init.d/', ['src/domogik/examples/init/domogik']),
-        ('/etc/default/', ['src/domogik/examples/default/domogik'])
-    ],
+    data_files = d_files,
 
     entry_points = {
         'console_scripts': [

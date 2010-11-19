@@ -57,14 +57,15 @@ class Loader():
         self.main_conf_name = "domogik.cfg"
         self.plugin_name = plugin_name
 
-    def load(self):
+    def load(self, custom_path = ""):
         '''
         Parse the config
+        @param custom_path : Custom path to config file, will superseed others
         @return pair (main_config, plugin_config)
         '''
         main_result = {}
         config = ConfigParser.ConfigParser()
-        config.read([os.getenv("HOME") + "/." + self.main_conf_name,
+        config.read([custom_path, os.getenv("HOME") + "/." + self.main_conf_name,
             '/etc/' + self.main_conf_name,
             '/usr/local/etc/' + self.main_conf_name])
         result = config.items('domogik')

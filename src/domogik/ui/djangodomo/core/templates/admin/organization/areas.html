@@ -21,6 +21,8 @@
 
 
 {% load i18n %}
+{% load text %}
+
 {% block css %}
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/page-admin-organization.css" rel="stylesheet" type="text/css" />
 {% endblock %}
@@ -28,10 +30,10 @@
 {% endblock %}
 {% block js_script %}
     $(function(){
-        // Accordion
+        // Accordion}
         $("#nav2").accordion({ autoHeight: false, header: ".subnav2", active:0});
 
-        $("#tabs").tabs().domogik_tabs({
+        $("#tabs").tabs({'selected':{% get_position areas_list id 0 %}}).domogik_tabs({
             addTitle: "{% trans "Add new area" %}",
             addId: "addDialogButton"
         });
@@ -60,11 +62,11 @@
             button: "#addDialogButton",
             onok: function(values) {
                 // Submit form
-                $.getREST(['base', 'area', 'add', 'name', values.areaname, 'description', values.areadescription],
+                rest.get(['base', 'area', 'add', 'name', values.areaname, 'description', values.areadescription],
                     function(data) {
                         var status = (data.status).toLowerCase();
                         if (status == 'ok') {
-                            $.reloadPage({'status': 'ok', 'msg': '{% trans "New area added" %} \'' + data.area[0].name + '\''});
+                            $.reloadPage({'status': 'ok', 'msg': '{% trans "New area added" %} \'' + data.area[0].name + '\'', 'id': data.area[0].id});
                         } else {
                             $.notification('error', '{% trans "Area not created" %} (' + data.description + ')');
                         }
@@ -101,13 +103,56 @@
                             button: "#del{{ area.id }}",
                             name: "'{{ area.name }}'",
                             onok: function() {
-                                $.getREST(['base', 'area', 'del', '{{ area.id }}'],
+                                rest.get(['base', 'ui_config', 'del', 'by-reference', 'area', '{{ area.id }}'],
                                     function(data) {
                                         var status = (data.status).toLowerCase();
                                         if (status == 'ok') {
-                                            $.reloadPage({'status': 'ok', 'msg': '{% trans "Area" %}\'' + data.area[0].name + '\' {% trans "successfully deleted" %}'});
+                                            // delete ui_config associations
+                                            rest.get(['base', 'feature_association', 'list', 'by-area', '{{ area.id }}'],
+                                                function(data) {
+                                                    var status = (data.status).toLowerCase();
+                                                    if (status == 'ok') {
+                                                        // Delete ui_config
+                                                        $.each(data.feature_association, function(index, association){
+                                                            rest.get(['base', 'ui_config', 'del', 'by-reference', 'association', association.id],
+                                                                function(data) {
+                                                                    var status = (data.status).toLowerCase();
+                                                                    if (status == 'ok') {
+                                                                    } else {
+                                                                        $.notification('error', '{% trans "ui-config for Area features not deleted" %} (' + data.description + ')');                                                                      
+                                                                    }
+                                                                }
+                                                            );
+                                                        });
+
+                                                        // Delete associated features
+                                                        rest.get(['base', 'feature_association', 'del', 'association_type', 'area', 'association_id', '{{ area.id }}'],
+                                                            function(data) {
+                                                                var status = (data.status).toLowerCase();
+                                                                if (status == 'ok') {
+                                                                    // Delete area
+                                                                    rest.get(['base', 'area', 'del', '{{ area.id }}'],
+                                                                        function(data) {
+                                                                            var status = (data.status).toLowerCase();
+                                                                            if (status == 'ok') {
+                                                                                $.reloadPage({'status': 'ok', 'msg': '{% trans "Area" %}\'' + data.area[0].name + '\' {% trans "successfully deleted" %}'});
+                                                                            } else {
+                                                                                $.notification('error', '{% trans "Area not deleted" %} (' + data.description + ')');
+                                                                            }
+                                                                        }
+                                                                    );
+                                                                } else {
+                                                                    $.notification('error', '{% trans "features associations for Area not deleted" %} (' + data.description + ')');                                                                      
+                                                                }
+                                                            }
+                                                        );
+                                                    } else {
+                                                        $.notification('error', '{% trans "Get features associations for Area" %} (' + data.description + ')');                                                                      
+                                                    }
+                                                }
+                                            );
                                         } else {
-                                            $.notification('error', '{% trans "Area not deleted" %} (' + data.description + ')');
+                                            $.notification('error', '{% trans "ui_config for Area not deleted" %} (' + data.description + ')');
                                         }
                                     }
                                 );
@@ -120,7 +165,7 @@
                             icon: '{{ area.config.icon }}',
                             validCallback: function(self, icon) {
                                 $('#icon{{ area.id }}').processing('start');
-                                $.getREST(['base', 'ui_config', 'set', 'name', 'area', 'reference', '{{ area.id }}', 'key', 'icon', 'value', icon],
+                                rest.get(['base', 'ui_config', 'set', 'name', 'area', 'reference', '{{ area.id }}', 'key', 'icon', 'value', icon],
                                     function(data) {
                                         $('#icon{{ area.id }}').processing('stop');
                                         var status = (data.status).toLowerCase();
@@ -146,7 +191,7 @@
                             values: {areaname : '{{ area.name }}', areadescription : '{{ area.description }}'},
                             onok: function(values) {
                                 // Submit form
-                                $.getREST(['base', 'area', 'update', 'id', '{{ area.id }}', 'name', values.areaname, 'description', values.areadescription],
+                                rest.get(['base', 'area', 'update', 'id', '{{ area.id }}', 'name', values.areaname, 'description', values.areadescription],
                                     function(data) {
                                         var status = (data.status).toLowerCase();
                                         if (status == 'ok') {

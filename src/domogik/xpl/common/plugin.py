@@ -40,10 +40,13 @@ import signal
 import threading
 import os
 import sys
-from socket import gethostname
 from domogik.xpl.common.xplconnector import XplMessage, Manager, Listener
 from domogik.xpl.common.baseplugin import BasePlugin
 from domogik.common.configloader import Loader
+from domogik.common.processinfo import ProcessInfo
+
+# time between each read of cpu/memory usage for process
+TIME_BETWEEN_EACH_PROCESS_STATUS = 60
 
 class XplPlugin():
     '''
@@ -81,7 +84,7 @@ class XplPlugin():
             self.__dict__['_XplPlugin__instance'] = XplPlugin.__instance
         elif stop_cb is not None:
             XplPlugin.__instance.add_stop_cb(stop_cb)
-        self._log.debug("after watcher")
+        self.log.debug("after watcher")
 
     def __getattr__(self, attr):
         """ Delegate access to implementation """
@@ -113,29 +116,77 @@ class XplPlugin():
             '''
             BasePlugin.__init__(self, name, stop_cb, parser, daemonize)
             Watcher(self)
-            self._log.debug("New system manager instance for %s" % name)
+            self.log.info("----------------------------------")
+            self.log.info("Starting plugin '%s' (new manager instance)" % name)
             self._is_manager = is_manager
+            self._name = name
             cfg = Loader('domogik')
             config = dict(cfg.load()[1])
+
+            # Get pid and write it in a file
+            self._pid_dir_path = config['pid_dir_path']
+            self._get_pid()
+           
+            if len(self.get_sanitized_hostname()) > 16:
+                self.log.error("You must use 16 char max hostnames ! %s is %s long" % (self.get_sanitized_hostname(), len(self.get_sanitized_hostname())))
+                self.force_leave()
+                return
+
             if 'broadcast' in config:
                 broadcast = config['broadcast']
             else:
                 broadcast = "255.255.255.255"
             if 'bind_interface' in config:
-                self._myxpl = Manager(config['bind_interface'], broadcast = broadcast)
+                self.myxpl = Manager(config['bind_interface'], broadcast = broadcast)
             else:
-                self._myxpl = Manager(broadcast = broadcast)
-            self._l = Listener(self._system_handler, self._myxpl, {'schema' : 'domogik.system',
+                self.myxpl = Manager(broadcast = broadcast)
+            self._l = Listener(self._system_handler, self.myxpl, {'schema' : 'domogik.system',
                                                                    'xpltype':'xpl-cmnd'})
             self._reload_cb = reload_cb
             self._dump_cb = dump_cb
-            self._log.debug("end single xpl plugin")
+
+            # Create object which get process informations (cpu, memory, etc)
+            #self._process_info = ProcessInfo(os.getpid(),
+            #                                 TIME_BETWEEN_EACH_PROCESS_STATUS,
+            #                                 self._send_process_info,
+            #                                 self.log,
+            #                                 self.myxpl)
+            #self._process_info.start()
+
+            self.log.debug("end single xpl plugin")
+
+        def _send_process_info(self, pid, data):
+            """ Send process info (cpu, memory) on xpl
+                @param : process pid
+                @param data : dictionnary of process informations
+            """
+            mess = XplMessage()
+            mess.set_type("xpl-stat")
+            mess.set_schema("domogik.usage")
+            mess.add_data({"name" : "%s.%s" % (self.get_plugin_name(), self.get_sanitized_hostname()),
+                           "pid" : pid,
+                           "cpu-percent" : data["cpu_percent"],
+                           "memory-percent" : data["memory_percent"],
+                           "memory-rss" : data["memory_rss"],
+                           "memory-vsz" : data["memory_vsz"]})
+            self.myxpl.send(mess)
+
+        def _get_pid(self):
+            """ Get current pid and write it to a file
+            """
+            pid = os.getpid()
+            pid_file = os.path.join(self._pid_dir_path, 
+                                    self._name + ".pid")
+            self.log.debug("Write pid file for pid '%s' in file '%s'" % (str(pid), pid_file))
+            fil = open(pid_file, "w")
+            fil.write(str(pid))
+            fil.close()
 
         def _system_handler(self, message):
             """ Handler for domogik system messages
             """
             cmd = message.data['command']
-            if not self._is_manager and cmd in ["stop", "reload", "dump", "ping"]:
+            if not self._is_manager and cmd in ["stop", "reload", "dump"]:
                 self._client_handler(message)
             else:
                 self._manager_handler(message)
@@ -144,30 +195,33 @@ class XplPlugin():
             """ Handle domogik system request for an xpl client
             @param message : the Xpl message received
             """
-            cmd = message.data["command"]
-            plugin = message.data["plugin"]
+            try:
+                cmd = message.data["command"]
+                plugin = message.data["plugin"]
+            except KeyError, e:
+                self.log.error("command or plugin key does not exist : %s", e)
+                return
             if cmd == "stop" and plugin in ['*', self.get_plugin_name()]:
-                self._log.info("Someone asked to stop %s, doing." % self.get_plugin_name())
+                self.log.info("Someone asked to stop %s, doing." % self.get_plugin_name())
                 self._answer_stop()
                 self.force_leave()
             elif cmd == "reload":
                 if self._reload_cb is None:
-                    self._log.info("Someone asked to reload config of %s, but the plugin \
+                    self.log.info("Someone asked to reload config of %s, but the plugin \
                     isn't able to do it." % self.get_plugin_name())
                 else:
                     self._reload_cb()
             elif cmd == "dump":
                 if self._dump_cb is None:
-                    self._log.info("Someone asked to dump config of %s, but the plugin \
+                    self.log.info("Someone asked to dump config of %s, but the plugin \
                     isn't able to do it." % self.get_plugin_name())
                 else:
                     self._dump_cb()
-            else: #cmd == ping
-                if message.data["plugin"] in [self.get_plugin_name(), "*"]:
-                    self._answer_ping()
+            else: #Command not known
+                self.log.info("domogik.system command not recognized : %s" % cmd)
 
         def __del__(self):
-            self._log.debug("__del__ Single xpl plugin")
+            self.log.debug("__del__ Single xpl plugin")
             self.force_leave()
 
         def _answer_stop(self):
@@ -177,41 +231,48 @@ class XplPlugin():
             mess.set_type("xpl-trig")
             mess.set_schema("domogik.system")
             mess.add_data({"command":"stop", "plugin": self.get_plugin_name(),
-                "host": gethostname()})
-            self._myxpl.send(mess)
-
-        def _answer_ping(self):
-            """ Send a ping reply
-            """
-            mess = XplMessage()
-            mess.set_type("xpl-trig")
-            mess.set_schema("domogik.system")
-            mess.add_data({"command":"ping", "plugin": self.get_plugin_name(),
-                "host": gethostname()})
-            self._myxpl.send(mess)
+                "host": self.get_sanitized_hostname()})
+            self.myxpl.send(mess)
 
         def _manager_handler(self, message):
             """ Handle domogik system request for the Domogik manager
             @param message : the Xpl message received
             """
 
+        def wait(self):
+	    """ Wait until someone ask the plugin to stop
+            """
+            self.myxpl._network.join()
+
         def force_leave(self):
             '''
             Leave threads & timers
             '''
-            self._log.debug("force_leave called")
+            self.log.debug("force_leave called")
             self.get_stop().set()
             for t in self._timers:
+                self.log.debug("Try to stop timer %s"  % t)
                 t.stop()
-                self._log.debug("Timer stopped %s" % t)
-            for t in self._threads:
-                self._log.debug("Try to stop thread %s" % t)
-                t.join()
-                self._log.debug("Thread stopped %s" % t)
-                #t._Thread__stop()
+                self.log.debug("Timer stopped %s" % t)
             for cb in self._stop_cb:
-                self._log.debug("Calling stop additionnal method : %s " % cb.__name__)
+                self.log.debug("Calling stop additionnal method : %s " % cb.__name__)
                 cb()
+            for t in self._threads:
+                self.log.debug("Try to stop thread %s" % t)
+                try:
+                    t.join()
+                except RuntimeError:
+                    pass
+                self.log.debug("Thread stopped %s" % t)
+                #t._Thread__stop()
+            #Finally, we try to delete all remaining threads
+            for t in threading.enumerate():
+                if t != threading.current_thread() and t.__class__ != threading._MainThread:
+                    self.log.info("The thread %s was not registered, killing it" % t.name)
+                    t.join()
+                    self.log.info("Thread %s stopped." % t.name)
+            if threading.activeCount() > 1:
+                self.log.warn("There are more than 1 thread remaining : %s" % threading.enumerate())
 
 
 class XplResult():
@@ -269,7 +330,7 @@ class Watcher:
             return
         else:
             self._plugin = plugin
-            self._plugin._log.debug("watcher fork")
+            self._plugin.log.debug("watcher fork")
             signal.signal(signal.SIGTERM, self._signal_handler)
             self.watch()
 
@@ -277,7 +338,7 @@ class Watcher:
         """ Handler called when a SIGTERM is received
         Stop the plugin
         """
-        self._plugin._log.info("SIGTERM receive, stopping plugin")
+        self._plugin.log.info("SIGTERM receive, stop plugin")
         self._plugin.force_leave()
         self.kill()
 
@@ -286,7 +347,7 @@ class Watcher:
             os.wait()
         except KeyboardInterrupt:
             print 'KeyBoardInterrupt'
-            self._plugin._log.info("Keyoard Interrupt detected, leave now.")
+            self._plugin.log.info("Keyoard Interrupt detected, leave now.")
             self._plugin.force_leave()
             self.kill()
         except OSError:

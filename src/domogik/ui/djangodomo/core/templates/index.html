@@ -20,125 +20,95 @@
 {% endcomment %}
 
 {% load i18n %}
-{% load commands %}
 {% load text %}
 
 {% block title %}{% trans page_title %}{% endblock %}
 {% block css %}
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-processing.css" rel="stylesheet" type="text/css" />
-    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.widget-common.css" rel="stylesheet" type="text/css" />
-    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.command-binary.css" rel="stylesheet" type="text/css" />
-    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.command-range.css" rel="stylesheet" type="text/css" />
-    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.command-trigger.css" rel="stylesheet" type="text/css" />
-    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.info-number.css" rel="stylesheet" type="text/css" />
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.widget-core.css" rel="stylesheet" type="text/css" />
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.widget-utils.css" rel="stylesheet" type="text/css" />
+
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-page-section.css" rel="stylesheet" type="text/css" />
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-dialog.css" rel="stylesheet" type="text/css" />
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/page-show.css" rel="stylesheet" type="text/css" />
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/page-home.css" rel="stylesheet" type="text/css" />
+	{% for widget in widgets %}
+    <link href="/widgets/{{ widget }}/style.css" rel="stylesheet" type="text/css" />
+    {% endfor %}
+
 {% endblock %}
 {% block js_include %}
     <script type="text/javascript" src="/design/js/jquery.timers-1.2.js"></script>
     <script type="text/javascript" src="/design/js/jquery.ba-dotimeout.min.js"></script>
-	<script type="text/javascript" src="/design/js/jquery.flot.js"></script>
-    <script type="text/javascript" src="/design/js/ui.processing.js"></script>
-    <script type="text/javascript" src="/design/js/dmg.jquery-subclass.js"></script>
-    <script type="text/javascript" src="/design/js/dmg.widget-common.js"></script>
-    <script type="text/javascript" src="/design/js/dmg.command-binary.js"></script>
-    <script type="text/javascript" src="/design/js/dmg.command-range.js"></script>
-    <script type="text/javascript" src="/design/js/dmg.command-trigger.js"></script>
-    <script type="text/javascript" src="/design/js/dmg.info-number.js"></script>
+    <script type="text/javascript" src="/design/js/highcharts-2.0.5.js"></script>
+    <script type="text/javascript" src="/design/js/highcharts-exporting-2.0.5.js"></script>
+    <script type="text/javascript" src="/design/js/jquery.longclick-0.3.3.min.js"></script>
+    <script type="text/javascript" src="/design/js/dmg.processing.js"></script>
+    <script type="text/javascript" src="/design/js/dmg.widget-core.js"></script>
+    <script type="text/javascript" src="/design/js/dmg.widget-utils.js"></script>
+    <script type="text/javascript" src="/design/js/page-show.js"></script>
+
+	{% for widget in widgets %}
+    <script type="text/javascript" src="/widgets/{{ widget }}/main.js"></script>	
+    {% endfor %}
 {% endblock %}
 {% block js_script %}
-    $(function() {
-        {% for association in house_features_associations %}
-            {% ifequal association.device_type_feature.feature_type "actuator" %}
-                {% get_command_widget association %}
-                {% get_command_init association %}
-            {% endifequal %}
-            {% ifequal association.device_type_feature.feature_type "sensor" %}
-                {% get_info_widget association %}
-                {% get_info_init association %}
-            {% endifequal %}
-        {% endfor %}
+    var device_types = {{ device_types|safe }};
+    var device_usages = {{ device_usages|safe }};
 
-        {% if house_features_associations %}
-            {% regroup house_features_associations|dictsort:"device_id" by device as devices %}
-            var devices = [{% for device in devices %}{{ device.grouper.id }}{% if not forloop.last %},{% endif %}{% endfor %}];
-            $.eventRequest(devices, function(event) {
-                switch(event.device_id) {
-                {% regroup house_features_associations|dictsort:"device_id" by device as devices %}
-                {% for device in devices %}
-                    case {{ device.grouper.id }}:
-                        $.each(event.data, function(index, item) {
-                            switch (item.key) {                        
-                            {% for association in device.list %}
-                                case '{{ association.device_type_feature.stat_key }}':
-                                    {% ifequal association.device_type_feature.feature_type "actuator" %}
-                                        {% get_command_update association 'item.value' %}
-                                    {% endifequal %}
-                                    {% ifequal association.device_type_feature.feature_type "sensor" %}
-                                        {% get_info_update association 'item.value' %}
-                                    {% endifequal %}                            
-                                    break;
-                            {% endfor %}                    
-                            }
-                        });
-                        break;
-                {% endfor %}
-                }
-            });
+    $(function() {
+        $.initAssociations('house', 0, device_usages, device_types);
+
+        {% if not rooms_list and not areas_list %}
+		$.notification("info", "{% trans "No areas or rooms configured yet" %}");
         {% endif %}
     });
 {% endblock %}
 {% block content %}
-        <!--div id="general-temp">
-            <div class="widget">
-                <div id="general-tempcurrent">9&deg;</div>
-                <div id="general-templocation">Paris</div>
-                <div id="general-tempmax">Max: 18&deg;</div>
-                <div id="general-tempmin">Min: 7&deg;</div>
-            </div>
-            <img id="general-tempicon" class="icon-weather-sun" src="/design/skins/{{ request.session.user.skin_used|default:'default' }}/images/weather/sun.png" alt="Soleil"/>
-        </div>
-        <div id="general-datetime" class="widget">
-            <span id="general-date">{% now "l j F Y" %}</span>
-            <span id="general-time">{% now "H:i" %}</span>
-        </div-->
     <div class="columnleft">
         <section id="mainsection">
-            <header id="contentheader"><h1 class="ident icon64-house-default"><span class="title">{{ house.name }}</span></h1></header>
-            <div class='mainactions'>
-                <ul>
-                </ul>
-            </div>
-            <div class='actions'>
-                <ul>
-                    {% for association in house_features_associations %}
-                        <li><div id="widget_{{ association.device_id }}_{{ association.device_type_feature_id }}"></div></li>
-                    {% endfor %}
-                </ul>
-            </div>
+			<div id='house_0'>
+				<header>
+					<h1 class="ident icon64-house-default"><span class="title">{{ house.name }}</span></h1>
+					<div class="maininfo" role='list'></div>
+				</header>
+				<div class='actions'>
+					<div class='mainactions' role='list'></div>
+					<div class='otheractions' role='list'></div>
+				</div>
+			</div>
         </section>
     </div>
     <div class="columnright">
+    <ul class='areaslist'>
+		{% if rooms_list %}
+		<li class='areaitem'>
+			<ul class='houselist'>
+				{% for room in rooms_list %}
+					<li class='roomitem'>
+						<a href='{% url show_room_view room.id %}' class="identelement icon64-room-{{ room.config.icon }}">
+							<span class="title">{{ room.name }}</span>
+						</a>
+					</li>
+				{% endfor %}
+			</ul>
+		</li>
+	    {% endif %}
     {% for area in areas_list %}
-        <ul class='areaslist'>
-            <li class='areaitem'>
-                <a href='{% url show_area_view area.id %}' class="identelement icon64-area-{{ area.config.icon }}">
-                    <span class="title">{{ area.name }}</span>
-                </a>
-                <ul class='roomslist'>
-                    {% for room in area.room %}
-                        <li class='roomitem'>
-                            <a href='{% url show_room_view room.id %}' class="identelement icon64-room-{{ room.config.icon }}">
-                                <span class="title">{{ room.name }}</span>
-                            </a>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </li>
-        </ul>
-    {% empty %}
-        <p>{% trans "No areas or rooms configured yet" %}</p>
+		<li class='areaitem'>
+			<a href='{% url show_area_view area.id %}' class="identelement icon64-area-{{ area.config.icon }}">
+				<span class="title">{{ area.name }}</span>
+			</a>
+			<ul class='roomslist'>
+				{% for room in area.room %}
+					<li class='roomitem'>
+						<a href='{% url show_room_view room.id %}' class="identelement icon64-room-{{ room.config.icon }}">
+							<span class="title">{{ room.name }}</span>
+						</a>
+					</li>
+				{% endfor %}
+			</ul>
+		</li>
     {% endfor %}
     </div>
     <div class='clear'></div>

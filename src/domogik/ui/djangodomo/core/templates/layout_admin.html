@@ -22,6 +22,7 @@
 {% load i18n %}
 
 {% block global_css %}
+    <link rel="icon shortcut" type="image/png" href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/images/device_usage/todo_16.png" />
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-buttons.css" rel="stylesheet" type="text/css" />
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-forms.css" rel="stylesheet" type="text/css" />
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.editable-icon.css" rel="stylesheet" type="text/css" />
@@ -34,12 +35,12 @@
 {% block global_js_include %}
     <script type="text/javascript" src="/design/js/jquery.timers-1.2.js"></script>
     <script type="text/javascript" src="/design/js/dmg.external-links.js"></script>
-    <script type="text/javascript" src="/design/js/ui.tabs.js"></script>
-    <script type="text/javascript" src="/design/js/ui.forms.js"></script>
+    <script type="text/javascript" src="/design/js/dmg.tabs.js"></script>
+    <script type="text/javascript" src="/design/js/dmg.forms.js"></script>
     <script type="text/javascript" src="/design/js/dmg.editable-icon.js"></script>
-    <script type="text/javascript" src="/design/js/ui.processing.js"></script>
-    <script type="text/javascript" src="/design/js/ui.tooltips.js"></script>
-    <script type="text/javascript" src="/design/js/ui.dialogs.js"></script>
+    <script type="text/javascript" src="/design/js/dmg.processing.js"></script>
+    <script type="text/javascript" src="/design/js/dmg.tooltips.js"></script>
+    <script type="text/javascript" src="/design/js/dmg.dialogs.js"></script>
     <script type="text/javascript" src="/design/js/page-admin.js"></script>
     <script type="text/javascript">
         // <![CDATA[
@@ -61,7 +62,7 @@
                     <li><a href="{% url admin_organization_areas_view %}" class='{{ nav2_organization_areas }}'>{% trans "Areas" %}</a></li>
                     <li><a href="{% url admin_organization_rooms_view %}" class='{{ nav2_organization_rooms }}'>{% trans "Rooms" %}</a></li>
                     <li><a href="{% url admin_organization_devices_view %}" class='{{ nav2_organization_devices }}'>{% trans "Devices" %}</a></li>
-                    <li><a href="{% url admin_organization_features_view %}" class='{{ nav2_organization_features }}'>{% trans "Features" %}</a></li>
+                    <li><a href="{% url admin_organization_widgets_view %}" class='{{ nav2_organization_widgets }}'>{% trans "Widgets" %}</a></li>
                 </ul>
                 <div class="subnav2"><a href="#">{% trans "Management" %}</a></div>
                 <ul>
@@ -69,6 +70,11 @@
                 </ul>
                 <div class="subnav2"><a href="#">{% trans "Plugins" %}</a></div>
                 <ul id="plugins_list">
+                </ul>
+                <div class="subnav2"><a href="#">{% trans "Tools" %}</a></div>
+                <ul>
+                    <li><a href="{% url admin_tools_helpers_view %}" class='icon32-menu-helpers {{ nav2_tools_helpers }}'>{% trans "Helpers" %}</a></li>
+                    <li><a href="{% url admin_tools_rest_view %}" class='icon32-menu-rest {{ nav2_tools_rest }}'>{% trans "Rest" %}</a></li>
                 </ul>
             </nav>
         </div>

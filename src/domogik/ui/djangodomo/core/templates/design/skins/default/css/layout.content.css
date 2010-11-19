@@ -18,7 +18,7 @@
 	clear:both;
 }
 
-header#contentheader {
+#mainsection header {
     display:block;
     position:relative;
     border: #B9C248 1px solid;
@@ -30,20 +30,19 @@ header#contentheader {
     -webkit-border-radius: 0.8em;
 }
 
-header#contentheader .ident {
+#mainsection header .ident {
     margin:0;   
     padding:0 0 0 70px;
     background-position:top left;
     background-repeat:no-repeat;
-    -webkit-box-reflect:below -30px -webkit-gradient(linear, left top, left bottom, from(transparent), color-stop(0.5, transparent), to(white));
     min-height:64px;
 }
 
-header#contentheader .title {
+#mainsection header .title {
     color:#000000;
 }
 
-header#contentheader .subtitle {
+#mainsection header .subtitle {
     font-style:italic;
     color:#666;
     padding-left:20px;

@@ -1,0 +1,142 @@
+<package type="plugin">
+  <name>ipx800</name>
+  <technology>relayboard</technology>
+  <description>IPX800 support</description>
+  <detail>IPX800 relayboard support.
+Supported  models :
+- IPX 800
+- IPX 800 pro
+- IPX 800 v2
+Supported features :
+- Relay : set and get state
+- Digital input 
+- Analog input </detail>
+  <version>0.1.0</version>
+  <documentation>http://wiki.domogik.org/tiki-index.php?page=plugin_ipx800</documentation>
+  <author>Fritz</author>
+  <author-email>fritz.smh at gmail.com</author-email>
+  <configuration-keys>
+    <key>
+      <order-id>0</order-id>
+      <name>startup-plugin</name>
+      <type>boolean</type>
+      <description>Automatically start plugin at Domogik startup</description>
+      <default-value>False</default-value>
+    </key>
+    <key>
+      <order-id>1</order-id>
+      <name>ipx-1-login</name>
+      <type>string</type>
+      <description>Relay Board 1 : login</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>2</order-id>
+      <name>ipx-1-password</name>
+      <type>string</type>
+      <description>Relay Board 1 : password</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>3</order-id>
+      <name>ipx-1-name</name>
+      <type>string</type>
+      <description>Relay Board 1 : name</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>4</order-id>
+      <name>ipx-1-ip</name>
+      <type>string</type>
+      <description>Relay Board 1 : ip</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>5</order-id>
+      <name>ipx-1-int</name>
+      <type>string</type>
+      <description>Relay Board 1 : interval between each poll</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>6</order-id>
+      <name>ipx-2-login</name>
+      <type>string</type>
+      <description>Relay Board 2 : login</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>7</order-id>
+      <name>ipx-2-password</name>
+      <type>string</type>
+      <description>Relay Board 2 : password</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>8</order-id>
+      <name>ipx-2-name</name>
+      <type>string</type>
+      <description>Relay Board 2 : name</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>9</order-id>
+      <name>ipx-2-ip</name>
+      <type>string</type>
+      <description>Relay Board 2 : ip</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>10</order-id>
+      <name>ipx-2-int</name>
+      <type>string</type>
+      <description>Relay Board 2 : interval between each poll</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>11</order-id>
+      <name>ipx-3-login</name>
+      <type>string</type>
+      <description>Relay Board 3 : login</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>12</order-id>
+      <name>ipx-3-password</name>
+      <type>string</type>
+      <description>Relay Board 3 : password</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>13</order-id>
+      <name>ipx-3-name</name>
+      <type>string</type>
+      <description>Relay Board 3 : name</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>14</order-id>
+      <name>ipx-3-ip</name>
+      <type>string</type>
+      <description>Relay Board 3 : ip</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>15</order-id>
+      <name>ipx-3-int</name>
+      <type>string</type>
+      <description>Relay Board 3 : interval between each poll</description>
+      <default-value></default-value>
+    </key>
+  </configuration-keys>
+  <files>
+    <file path="src/share/domogik/plugins/ipx800.xml"/>
+    <file path="src/share/domogik/stats/relayboard/sensor.basic-ipx800.xml"/>
+    <file path="src/share/domogik/url2xpl/relayboard/high.xml"/>
+    <file path="src/share/domogik/url2xpl/relayboard/low.xml"/>
+    <file path="src/share/domogik/url2xpl/relayboard/pulse.xml"/>
+    <file path="src/domogik/xpl/bin/ipx800.py"/>
+    <file path="src/domogik/xpl/lib/ipx800.py"/>
+  </files>
+  <depandancies/>
+</package>

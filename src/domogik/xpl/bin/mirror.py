@@ -38,36 +38,10 @@ Implements
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.plugin import XplResult
-from domogik.xpl.lib.mirror import Mirror
 from domogik.xpl.common.queryconfig import Query
-
-IS_DOMOGIK_PLUGIN = True
-DOMOGIK_PLUGIN_TECHNOLOGY = "rfid"
-DOMOGIK_PLUGIN_DESCRIPTION = "Use Mir:ror device"
-DOMOGIK_PLUGIN_VERSION = "0.1"
-DOMOGIK_PLUGIN_DOCUMENTATION_LINK = "http://wiki.domogik.org/tiki-index.php?page=plugins/Mirror"
-DOMOGIK_PLUGIN_CONFIGURATION = [
-      {"id" : 0,
-       "key" : "startup-plugin",
-       "type" : "boolean",
-       "description" : "Automatically start plugin at Domogik startup",
-       "default" : "False"},
-      {"id" : 1,
-       "key" : "device",
-       "type" : "string",
-       "description" : "Mir:ror device (ex : /dev/hidraw0)",
-       "default" : "/dev/hidraw0"},
-      {"id" : 2,
-       "key" : "nbmaxtry",
-       "type" : "number",
-       "description" : "Max number of tries to open Mir:ror device",
-       "default" : 5},
-      {"id" : 3,
-       "key" : "interval",
-       "type" : "number",
-       "description" : "Delay between each try to open Mir:ror device",
-       "default" : 10}]
-
+from domogik.xpl.lib.mirror import Mirror
+from domogik.xpl.lib.mirror import MirrorException
+import threading
 
 
 class MirrorManager(XplPlugin):
@@ -80,34 +54,44 @@ class MirrorManager(XplPlugin):
         XplPlugin.__init__(self, name='mirror')
         # Get config
         #   - device
-        self._config = Query(self._myxpl)
+        self._config = Query(self.myxpl, self.log)
         res = XplResult()
         self._config.query('mirror', 'device', res)
         device = res.get_value()['device']
-        self._config = Query(self._myxpl)
-        res = XplResult()
-        self._config.query('mirror', 'interval', res)
-        interval = res.get_value()['interval']
-        self._config = Query(self._myxpl)
-        res = XplResult()
-        self._config.query('mirror', 'nbmaxtry', res)
-        nbmaxtry = res.get_value()['nbmaxtry']
-        # Call Library
-        self._mymirror  = Mirror(device, nbmaxtry, interval, self._broadcastframe)
-        self._mymirror.start()
 
-    def _broadcastframe(self, action, ztamp_id):
+        # Init Mir:ror
+        mirror  = Mirror(self.log, self.send_xpl)
+        
+        # Open Mir:ror
+        try:
+            mirror.open(device)
+        except MirrorException as e:
+            self.log.error(e.value)
+            print e.value
+            self.force_leave()
+            return
+            
+        # Start reading Mir:ror
+        mirror_process = threading.Thread(None,
+                                   mirror.listen,
+                                   None,
+                                   (),
+                                   {})                                  
+        mirror_process.start()                              
+
+    def send_xpl(self, device, type, current):
         """ Send xPL message on network
             @param action : action done on mir:ror device
             @param ztamp_id : id of ztamp put on mir:ror
         """
-        my_temp_message = XplMessage()
-        my_temp_message.set_type("xpl-trig")
-        my_temp_message.set_schema("sensor.basic")
-        my_temp_message.add_data({"device" : "mirror"})
-        my_temp_message.add_data({"type" : action})
-        my_temp_message.add_data({"current" : ztamp_id})
-        self._myxpl.send(my_temp_message)
+        print "device:%s, type:%s, current:%s" % (device, type, current)
+        msg = XplMessage()
+        msg.set_type("xpl-trig")
+        msg.set_schema("sensor.basic")
+        msg.add_data({"device" : device})
+        msg.add_data({"type" : type})
+        msg.add_data({"current" : current})
+        self.myxpl.send(msg)
 
 
 if __name__ == "__main__":

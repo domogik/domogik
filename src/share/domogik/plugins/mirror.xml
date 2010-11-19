@@ -1,0 +1,35 @@
+<package type="plugin">
+  <name>mirror</name>
+  <technology>rfid</technology>
+  <description>Use Mir:ror device</description>
+  <detail>Mir:ror device allow to detect RFID devices</detail>
+  <version>0.1.0</version>
+  <documentation>http://wiki.domogik.org/tiki-index.php?page=plugin_mirror</documentation>
+  <author>Fritz</author>
+  <author-email>fritz.smh at gmail.com</author-email>
+  <configuration-keys>
+    <key>
+      <order-id>0</order-id>
+      <name>startup-plugin</name>
+      <type>boolean</type>
+      <description>Automatically start plugin at Domogik startup</description>
+      <default-value>False</default-value>
+    </key>
+    <key>
+      <order-id>1</order-id>
+      <name>device</name>
+      <type>string</type>
+      <description>Mir:ror device</description>
+      <default-value>/dev/mirror</default-value>
+    </key>
+  </configuration-keys>
+  <files>
+    <file path="src/share/domogik/plugins/mirror.xml"/>
+    <file path="src/share/domogik/stats/rfid/sensor.basic-mirror.xml"/>
+    <file path="src/domogik/xpl/bin/mirror.py"/>
+    <file path="src/domogik/xpl/lib/mirror.py"/>
+  </files>
+  <depandancies>
+    <dep name="pySerial > 2.4"/>
+  </depandancies>
+</package>

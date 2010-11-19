@@ -1,0 +1,17 @@
+<technology id="plcbus">
+  <command name="off">
+    <schema>plcbus.basic</schema>
+    <command-key>command</command-key>	
+    <address-key>device</address-key>	
+    <command-xpl-value>off</command-xpl-value>
+    <parameters/>                                                                                          
+  </command>	
+  <listener>
+    <schema>plcbus.basic</schema>
+    <xpltype>xpl-trig</xpltype>
+    <filter>
+      <key name="command" value="OFF" />
+      <key name="device" value="@address@"/>
+    </filter>
+  </listener>
+</technology>

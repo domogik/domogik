@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*- 
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -22,29 +22,28 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 Plugin purpose
 ==============
 
-Support One-Wire bus
+Get informations about one wire network
 
 Implements
 ==========
 
-- OneWireException:.__init__(self, value)
-- OneWireException:.__str__(self)
-- OneWire:.__init__(self, dev = 'u')
-- OneWire:.set_cache_use(self, use)
-- OneWire:.exec_type(self, t = '')
-- OneWire:.exec_name(self, n = '')
-- OneWire:.exec_family(self, f = '')
-- OneWire:.get_temperature(self)
-- OneWire:.get_temperatures(t)
-- OneWire:.is_present(self, item)
+class OneWireException(Exception)
+class ComponentDs18b20
+class ComponentDs18s20
+class ComponentDs2401
+class OneWireNetwork
 
-@author: Maxence Dunnewind <maxence@dunnewind.net>
+@author: Fritz SMH <fritz.smh@gmail.com>
 @copyright: (C) 2007-2009 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """
 
 import ow
+import time
+import traceback
+
+
 
 
 class OneWireException(Exception):
@@ -53,85 +52,199 @@ class OneWireException(Exception):
     """
 
     def __init__(self, value):
+        Exception.__init__(self)
         self.value = value
 
     def __str__(self):
-        return self.repr(self.value)
+        return repr(self.value)
 
 
-class OneWire:
+
+
+class ComponentDs18b20:
     """
-    Manage OneWire
+    DS18B20 support
     """
 
-    def __init__(self, dev = 'u'):
+    def __init__(self, log, onewire, interval, resolution, callback):
+        """
+        Return temperature each <interval> seconds
+        @param log : log instance
+        @param onewire : onewire network object
+        @param interval : interval between each data sent
+        @param resolution : resolution of data to read
+        @param callback : callback to return values
+        """
+        self._log = log
+        self.onewire = onewire
+        self.interval = interval
+        self.resolution = resolution
+        self.callback = callback
+        self.root = self.onewire.get_root()
+        self.old_temp = {}
+        self.start_listening()
+
+    def start_listening(self):
+        """ 
+        Start listening for onewire ds18b20
+        """
+        while True:
+            for comp in self.root.find(type = "DS18B20"):
+                my_id = comp.id
+                try:
+                    temperature = float(eval("comp.temperature"+self.resolution))
+                except AttributeError:
+                    error = "DS18B20 : bad resolution : %s. Setting resolution to 12 for next iterations." % self.resolution
+                    self._log.error(error)
+                    print error
+                    self.resolution = "12"
+
+                else:
+
+                    if hasattr(self.old_temp, my_id) == False \
+                       or temperature != self.old_temp[my_id]:
+                        my_type = "xpl-trig"
+                    else:
+                        my_type = "xpl-stat"
+                    self.old_temp[my_id] = temperature
+                    print "type=%s, id=%s, temp=%s" % (my_type, my_id, temperature)
+                    self.callback(my_type, {"device" : my_id,
+                                         "type" : "temp",
+                                         "current" : temperature})
+            time.sleep(self.interval)
+
+
+class ComponentDs18s20:
+    """
+    DS18S20 support
+    """
+
+    def __init__(self, log, onewire, interval, callback):
+        """
+        Return temperature each <interval> seconds
+        @param log : log instance
+        @param onewire : onewire network object
+        @param interval : interval between each data sent
+        @param callback : callback to return values
+        """
+        self._log = log
+        self.onewire = onewire
+        self.interval = interval
+        self.callback = callback
+        self.root = self.onewire.get_root()
+        self.old_temp = {}
+        self.start_listening()
+        self.resolution = 12
+
+    def start_listening(self):
+        """ 
+        Start listening for onewire ds18s20
+        """
+        while True:
+            for comp in self.root.find(type = "DS18S20"):
+                my_id = comp.id
+                try:
+                    temperature = float(comp.temperature)
+                except AttributeError:
+                    error = "DS18S20 : error while reading value"
+                    self._log.error(error)
+                    print error
+                    self.resolution = "12"
+
+                else:
+
+                    if hasattr(self.old_temp, my_id) == False \
+                       or temperature != self.old_temp[my_id]:
+                        my_type = "xpl-trig"
+                    else:
+                        my_type = "xpl-stat"
+                    self.old_temp[my_id] = temperature
+                    print "type=%s, id=%s, temp=%s" % (my_type, my_id, temperature)
+                    self.callback(my_type, {"device" : my_id,
+                                         "type" : "temp",
+                                         "current" : temperature})
+            time.sleep(self.interval)
+
+
+class ComponentDs2401:
+    """
+    DS2401 support
+    """
+
+    def __init__(self, log, onewire, interval, callback):
+        """
+        Check component presence each <interval> seconds
+        @param log : log instance
+        @param onewire : onewire network object
+        @param interval : interval between each data sent
+        @param callback : callback to return values
+        """
+        self._log = log
+        self.onewire = onewire
+        self.interval = interval
+        self.callback = callback
+        self.root = self.onewire.get_root()
+        self.old_present = {}
+        self.start_listening()
+        self.actual_present = None
+
+    def start_listening(self):
+        """ 
+        Start listening for onewire ds2401
+        """
+        while True:
+            self.actual_present = []
+            for comp in self.root.find(type = "DS2401"):
+                my_id = comp.id
+                present = int(comp.present)
+                self.actual_present.append(my_id)
+                if hasattr(self.old_present, my_id) == False \
+                   or present != self.old_present[my_id]:
+                    if present == 1:
+                        status = "HIGH"
+                    else:
+                        status = "LOW"
+                    print "id=%s, status=%s" % (my_id, status)
+                    self.callback("xpl-trig", {"device" : my_id,
+                                         "type" : "input",
+                                         "current" : status})
+                    self.old_present[my_id] = present
+            for comp_id in self.old_present:
+                if comp_id not in self.actual_present:
+                    print "id=%s, status=LOW component disappeared)" % (comp_id)
+                    self.callback("xpl-trig", {"device" : comp_id,
+                                         "type" : "input",
+                                         "current" : "LOW"})
+                    
+            time.sleep(self.interval)
+ 
+    
+
+class OneWireNetwork:
+    """
+    Get informations about 1wire network
+    """
+
+    def __init__(self, log, dev = 'u', cache = False):
         """
         Create OneWire instance, allowing to use OneWire Network
         @param dev : device where the interface is connected to,
         default 'u' for USB
         """
+        self._log = log
         try:
             ow.init(dev)
-            self._root_cached = ow.Sensor('/')
-            self._root_uncached = ow.Sensor('/uncached')
+            self._cache = cache
+            if cache == True:
+                self._root = ow.Sensor('/')
+            else:
+                self._root = ow.Sensor('/uncached')
         except:
-            raise OneWireException("Can't access device")
-        else:
-            self._cache = True
-            self._root = self._root_cached
+            raise OneWireException("Access to onewire device is not possible. Does your user have the good permissions ? If so, check that you stopped onewire module and you don't have OWFS mounted : %s" % traceback.format_exc())
 
-    def set_cache_use(self, use):
+    def get_root(self):
         """
-        Define use of cache.
-        If it's set to False, information will be reactualised each time a
-        request is done
-        If it's true, the OWFS cache will be used (from 15s to 2 minutes of
-        cache)
+        Getter for self._root
         """
-        self._cache = use
-        if self._cache:
-            self._root = self._root_cached
-        else:
-            self._root = self._root_uncached
+        return self._root 
 
-    def exec_type(self, t = ''):
-        """
-        Find all sensors matching a type
-        """
-        return self._root.find(type = t)
-
-    def exec_name(self, n = ''):
-        """
-        Find all sensors matching a name
-        """
-        return self._root.find(name = n)
-
-    def exec_family(self, f = ''):
-        """
-        Find all sensors matching a family
-        """
-        return self._root.find(family = f)
-
-    def get_temperatures(self):
-        """
-        Return list of all temperature indicated by DS18B20 and DS18S20 sensors
-        @return list of (id, temperature)
-        """
-        return self.get_temperature('DS18S20') + self.get_temperature('DS18B20')
-
-    def get_temperature(self, t):
-        return [(i.id, i.type, i.temperature.replace(" ", "")) for i in
-                self.exec_type(t=t)]
-
-    def is_present(self, item):
-        """
-        Check if an item is on the network, and if it is, check if the present
-        property is set to 1
-        """
-        if item[0] != '/':
-            item = '/%s' % item
-        try:
-            i = exec_name(item)
-            return i[0].present
-        except:
-            return False

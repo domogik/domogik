@@ -33,22 +33,26 @@
 <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/layout.content.css" rel="stylesheet" type="text/css" />
 <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-icons.css" rel="stylesheet" type="text/css" />
 <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.notifications.css" rel="stylesheet" type="text/css" />
+<link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-buttons.css" rel="stylesheet" type="text/css" />
+<link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.login.css" rel="stylesheet" type="text/css" />
 
 {% block global_css %}{% endblock %}
 {% block css %}{% endblock %}
 <script type="text/javascript">  
     var rest_url = "{{ rest_url }}"; 
 </script> 
-<script type="text/javascript" src="/design/js/jquery-1.4.2.min.js"></script>
+<script type="text/javascript" src="/design/js/jquery-1.4.3.min.js"></script>
 <script type="text/javascript" src="/design/js/jquery-ui-1.8.custom.min.js"></script>
 <script type="text/javascript" src="/design/js/jquery.qtip-1.0.0-rc3.min.js"></script>
 <script type="text/javascript" src="/design/js/jquery.jgrowl_minimized.js"></script>
-<script type="text/javascript" src="/design/js/jquery.jsonp-2.0.2.min.js"></script>
+<script type="text/javascript" src="/design/js/jquery.jsonp-2.1.2.min.js"></script>
+<script type="text/javascript" src="/design/js/jquery.ui.subclass.js"></script>
 <script type="text/javascript" src="/design/js/main.js"></script>
 <script type="text/javascript" src="/design/js/dmg.rest.js"></script>
-<script type="text/javascript" src="/design/js/ui.icons.js"></script>
+<script type="text/javascript" src="/design/js/dmg.icons.js"></script>
 <script type="text/javascript" src="/design/js/dmg.notifications.js"></script>
 <script type="text/javascript" src="/design/js/dmg.browser.js"></script>
+<script type="text/javascript" src="/design/js/dmg.login.js"></script>
 
 {% block global_js_include %}{% endblock %}
 {% block js_include %}{% endblock %}
@@ -59,7 +63,7 @@
         $(function(){ 
         	$.notification("{{status}}", "{{msg}}");
         });
-    {% endif %}   
+    {% endif %}
     // ]]>
 </script>
 <title>{% block title %}Domogik{% endblock %}</title>
@@ -72,15 +76,13 @@
     <nav id="nav1">
         <ul>
             <li><a href="{% url show_view %}" class="{{ nav1_show }}">{% trans "Visualization" %}<span class='description'>{% trans "View, Control your house" %}</span></a></li>
-            {% if is_user_connected %}
-                <!--li><a href="#">Programmation</a></li-->
-                <li><a href="{% url admin_view %}" class="{{ nav1_admin }}">{% trans "Administration" %}<span class='description'>{% trans "Configure, Manage" %}</span></a></li>
-            {% endif %}
+            <li><a href="{% url admin_view %}" class="{% if not is_user_connected %}admin_required {% endif %}{{ nav1_admin }}">{% trans "Administration" %}<span class='description'>{% trans "Configure, Manage" %}</span></a></li>
+            <li class='help'><a href="http://wiki.domogik.org/tiki-index.php?page=EndUserDocumentation&bl=y" target='_blank'>{% trans "Help" %}<span class='description'>{% trans "External Wiki page" %}</span></a></li>
             <li class="login">
                 {% if not is_user_connected %}
                     <a href="{% url login_view %}">{% trans "Log in" %}<span class='description'>{% trans "Identify yourself" %}</span></a>
                 {% else %}
-                    <a href="{% url logout_view %}">{% trans "Log out" %}<span class='description'>{% trans "Deconnect" %} {{ request.session.user.first_name }}</span></a>
+                    <a href="{% url logout_view %}">{% trans "Log out" %}<span class='description'>{% trans "Disconnect" %} {{ request.session.user.first_name }}</span></a>
                 {% endif %}
             </li>
         </ul>

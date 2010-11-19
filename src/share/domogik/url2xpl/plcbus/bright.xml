@@ -1,0 +1,19 @@
+<technology id="plcbus">
+  <command name="bright">
+    <schema>plcbus.basic</schema>
+    <command-key>command</command-key>	
+    <address-key>device</address-key>	
+    <command-xpl-value>BRIGHT</command-xpl-value>  
+    <parameters>                                                                                            
+      <parameter key="data1" location="1"/>                                                           
+    </parameters>                                                                                           
+  </command>	
+  <listener>
+    <schema>plcbus.basic</schema>
+    <xpltype>xpl-trig</xpltype>
+    <filter>
+      <key name="command" value="BRIGHT" />
+      <key name="device" value="@address@"/>
+    </filter>
+  </listener>
+</technology>

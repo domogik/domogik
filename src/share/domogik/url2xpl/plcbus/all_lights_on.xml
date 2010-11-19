@@ -1,0 +1,17 @@
+<technology id="plcbus">
+  <command name="all_lights_on">
+    <schema>plcbus.basic</schema>
+    <command-key>command</command-key>	
+    <address-key>device</address-key>	
+    <command-xpl-value>ALL_LIGHTS_ON</command-xpl-value>
+    <parameters/>                                                                                          
+  </command>	
+  <listener>
+    <schema>plcbus.basic</schema>
+    <xpltype>xpl-trig</xpltype>
+    <filter>
+      <key name="command" value="ALL_LIGHTS_ON" />
+      <key name="device" value="@address@"/>
+    </filter>
+  </listener>
+</technology>

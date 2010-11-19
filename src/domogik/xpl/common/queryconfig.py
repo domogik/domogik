@@ -40,7 +40,6 @@ Implements
 from domogik.common import logger
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
-from socket import gethostname
 
 
 class Query():
@@ -48,14 +47,15 @@ class Query():
     Query throw xPL network to get a config item
     '''
 
-    def __init__(self, xpl):
+    def __init__(self, xpl, log):
         '''
         Init the query system and connect it to xPL network
+        @param xpl : the XplManager instance (usually self.myxpl)
+        @param log : a Logger instance (usually took from self.log))
         '''
-        l = logger.Logger('queryconfig')
-        self._log = l.get_logger()
+        self.log = log
         self.__myxpl = xpl
-        self._log.debug("Init config query instance")
+        self.log.debug("Init config query instance")
         self._keys = {}
 
     def __del__(self):
@@ -71,15 +71,15 @@ class Query():
         @param key : the key to fetch corresponding value, if it's an empty string,
         all the config items for this technology will be fetched
         '''
-        print "new query"
+        print "new query for t = %s, k = %s" % (technology, key)
         Listener(self._query_cb, self.__myxpl, {'schema': 'domogik.config', 'xpltype': 'xpl-stat',
-                                                'technology': technology, 'hostname' : gethostname()})
+                                                'technology': technology, 'hostname' : self.__myxpl.get_sanitized_hostname()})
         self._keys[key] = result
         mess = XplMessage()
         mess.set_type('xpl-cmnd')
         mess.set_schema('domogik.config')
         mess.add_data({'technology': technology})
-        mess.add_data({'hostname': gethostname()})
+        mess.add_data({'hostname': self.__myxpl.get_sanitized_hostname()})
         if element:
             mess.add_data({'element': element})
         mess.add_data({'key': key})
@@ -87,10 +87,12 @@ class Query():
         # The key may already be removed if the network is really fast
         if key in self._keys:
             try:
-                self._keys[key].get_lock().wait()
+                self._keys[key].get_lock().wait(10)
+                if not self._keys[key].get_lock().is_set():
+                    self.log.error("No answer received for t = %s, k = %s" % (technology, key))
+                    raise RuntimeError("No answer received for t = %s, k = %s, check your xpl setup" % (technology, key))
             except KeyError:
                 pass
-        print "finish query"
 
     def _query_cb(self, message):
         '''
@@ -101,7 +103,7 @@ class Query():
         result = message.data
         for r in self._keys:
             if r in result:
-                self._log.debug("Config value received : %s : %s" % (r, result[r]))
+                self.log.debug("Config value received : %s : %s" % (r, result[r]))
                 res = self._keys.pop(r)
                 res.set_value(result)
                 res.get_lock().set()

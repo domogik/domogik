@@ -30,11 +30,11 @@
     $(function(){
         // Accordion
         $("#nav2").accordion({ autoHeight: false, header: ".subnav2", active:0});
-        $("#housename").val('{{ house.name }}');
+        $("#housename").val($("<div/>").html('{{ house.name }}').text());
         $("#generalsubmit").click(function(){
             var name = $("#housename").val();
             if (name) {
-                $.getREST(['base', 'ui_config', 'set', 'name', 'general', 'reference', 'house', 'key', 'name', 'value', name],
+                rest.get(['base', 'ui_config', 'set', 'name', 'house', 'reference', '0', 'key', 'name', 'value', name],
                     function(data) {
                         var status = (data.status).toLowerCase();
                         if (status == 'ok') {
@@ -58,21 +58,15 @@
 {% block title %}{% trans page_title %}{% endblock %}
 
 {% block banner %}
-    <h1 class="ident"><span class="title">{% trans "Home" %}</span></h1>
-    {% ifnotequal status "" %}
-    <div id='messages' class='{{status}}'>{{msg}}</div>
-    {% endifnotequal %}
+    <h1 class="ident"><span class="title">{% trans "House" %}</span></h1>
 {% endblock %}
 
 {% block right %}
     <section class="subsection">
         <h2>{% trans "Configuration" %}</h2>
         <form id='generalhouse'>
-            <fieldset>
-                <legend>House</legend>
-                <label for='housename'>{% trans "Name" %}</label>
-                <input type='text' id='housename' name='housename'>
-            </fieldset>
+            <label for='housename'>{% trans "House name" %}</label>
+            <input type='text' id='housename' name='housename' />
         </form>
         <p>
             <button id='generalsubmit' class='button icon16-action-save'>{% trans "Save" %}</button>

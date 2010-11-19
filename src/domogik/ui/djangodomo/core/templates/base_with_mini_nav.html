@@ -33,21 +33,26 @@
 <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/layout.content.css" rel="stylesheet" type="text/css" />
 <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-icons.css" rel="stylesheet" type="text/css" />
 <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.notifications.css" rel="stylesheet" type="text/css" />
+<link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-buttons.css" rel="stylesheet" type="text/css" />
+<link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.login.css" rel="stylesheet" type="text/css" />
 {% block global_css %}{% endblock %}
 {% block css %}{% endblock %}
 <script type="text/javascript">  
     var rest_url = "{{ rest_url }}"; 
 </script> 
-<script type="text/javascript" src="/design/js/jquery-1.4.2.min.js"></script>
+<script type="text/javascript" src="/design/js/jquery-1.4.3.min.js"></script>
 <script type="text/javascript" src="/design/js/jquery-ui-1.8.custom.min.js"></script>
 <script type="text/javascript" src="/design/js/jquery.qtip-1.0.0-rc3.min.js"></script>
 <script type="text/javascript" src="/design/js/jquery.jgrowl_minimized.js"></script>
-<script type="text/javascript" src="/design/js/jquery.jsonp-2.0.2.min.js"></script>
+<script type="text/javascript" src="/design/js/jquery.jsonp-2.1.2.min.js"></script>
+<script type="text/javascript" src="/design/js/jquery.ui.subclass.js"></script>
 <script type="text/javascript" src="/design/js/main.js"></script>
 <script type="text/javascript" src="/design/js/dmg.rest.js"></script>
-<script type="text/javascript" src="/design/js/ui.icons.js"></script>
+<script type="text/javascript" src="/design/js/dmg.icons.js"></script>
+<script type="text/javascript" src="/design/js/dmg.tooltips.js"></script>
 <script type="text/javascript" src="/design/js/dmg.notifications.js"></script>
 <script type="text/javascript" src="/design/js/dmg.browser.js"></script>
+<script type="text/javascript" src="/design/js/dmg.login.js"></script>
 
 {% block global_js_include %}{% endblock %}
 {% block js_include %}{% endblock %}
@@ -58,6 +63,7 @@
         $("li#showmenu").click(function(){
             $("#mainbar").toggle(500);        
         });
+		$("#nav1 a").tooltip_bottom();
     });
     {% block js_script %}{% endblock %}
     {% if status %}
@@ -73,16 +79,14 @@
     <div id="mainbar">
         <nav id="nav1">
             <ul>
-                <li><a href="{% url show_view %}" class="{{ nav1_show_class }}">{% trans "Visualization" %}</a></li>
-                {% if is_user_connected %}
-                    <!--li><a href="#">Programmation</a></li-->
-                    <li><a href="{% url admin_view %}">{% trans "Administration" %}</a></li>
-                {% endif %}
+                <li><a href="{% url show_view %}" class="{{ nav1_show_class }}" title="{% trans "View, Control your house" %}">{% trans "Visualization" %}</a></li>
+                <li><a href="{% url admin_view %}" class="{% if not is_user_connected %}admin_required{% endif %}" title="{% trans "Configure, Manage" %}">{% trans "Administration" %}</a></li>
+				<li class='help'><a href="http://wiki.domogik.org/tiki-index.php?page=EndUserDocumentation&bl=y" title="{% trans "External Wiki page" %}" target='_blank'>{% trans "Help" %}</a></li>
                 <li class="login">
                     {% if not is_user_connected %}
-                        <a href="{% url login_view %}">{% trans "Log in" %}</a>
+                        <a href="{% url login_view %}" title="{% trans "Identify yourself" %}">{% trans "Log in" %}</a>
                     {% else %}
-                        <a href="{% url logout_view %}">{% trans "Log out" %} {{ request.session.user.first_name }}</a>
+                        <a href="{% url logout_view %}" title="{% trans "Disconnect" %} {{ request.session.user.first_name }}">{% trans "Log out" %} {{ request.session.user.first_name }}</a>
                     {% endif %}
                 </li>
             </ul>
@@ -91,18 +95,14 @@
 	<ul class="breadcrumb">
         	<li><a href='{% url index_view %}' class='homepage'>&nbsp;<span class='offscreen'>Domogik homepage</span></a></li>
             {% block breadcrumb %}{% endblock %}
-        	<li id='customize'><a href='#' class='icon16-action-customize'>Customize</a></li>
         	<li id='showmenu'><a href='#' class='icon16-action-menu'>Menu</a></li>
     </ul>
 	<div id="content-bgnd">
         <div class="columnleft">
-            <section id="mainsection">
-                <header id="contentheader">{% block banner %}{% endblock %}</header>
-                {% block contentleft %}{% endblock %}
-            </section>
+            {% block contentleft %}{% endblock %}
         </div>
         <div class="columnright">
-                {% block contentright %}{% endblock %}
+            {% block contentright %}{% endblock %}
         </div>
         <div class='clear'></div>
 	</div>

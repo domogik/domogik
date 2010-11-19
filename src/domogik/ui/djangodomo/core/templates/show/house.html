@@ -20,98 +20,13 @@
 {% endcomment %}
 
 {% load i18n %}
-{% load commands %}
 {% load text %}
 
 {% block js_script %}
+    var device_types = {{ device_types|safe }};
+    var device_usages = {{ device_usages|safe }};
     $(function() {
-        {% for association in house_features_associations %}
-            {% ifequal association.device_type_feature.feature_type "actuator" %}
-                {% get_command_widget association %}
-                {% get_command_init association %}
-            {% endifequal %}
-            {% ifequal association.device_type_feature.feature_type "sensor" %}
-                {% get_info_widget association %}
-                {% get_info_init association %}
-            {% endifequal %}
-        {% endfor %}
-
-        {% if house_features_associations %}
-            {% regroup house_features_associations|dictsort:"device_id" by device as devices %}
-            var devices = [{% for device in devices %}{{ device.grouper.id }}{% if not forloop.last %},{% endif %}{% endfor %}];
-            $.eventRequest(devices, function(event) {
-                switch(event.device_id) {
-                {% regroup house_features_associations|dictsort:"device_id" by device as devices %}
-                {% for device in devices %}
-                    case {{ device.grouper.id }}:
-                        $.each(event.data, function(index, item) {
-                            switch (item.key) {                        
-                            {% for association in device.list %}
-                                case '{{ association.device_type_feature.stat_key }}':
-                                    {% ifequal association.device_type_feature.feature_type "actuator" %}
-                                        {% get_command_update association 'item.value' %}
-                                    {% endifequal %}
-                                    {% ifequal association.device_type_feature.feature_type "sensor" %}
-                                        {% get_info_update association 'item.value' %}
-                                    {% endifequal %}                            
-                                    break;
-                            {% endfor %}                    
-                            }
-                        });
-                        break;
-                {% endfor %}
-                }
-            });
-        {% endif %}
-        
-        /* Drag & Drop */
-        /*
-        $('#dragdropwidgets').dragdrop({
-            zones: [
-                {
-                    id: "#maininfo",
-                    format: "mini",
-                    size: "1",
-                    name: "Main info",
-                    dropcallback: function(self, element, target) {}
-                },
-                {
-                    id: "#mainaction1",
-                    format: "mini",
-                    size: "1",
-                    name: "Main action 1",
-                    dropcallback: function(self, element, target) {}
-                },
-                {
-                    id: "#mainaction2",
-                    format: "mini",
-                    size: "1",
-                    name: "Main action 2",
-                    dropcallback: function(self, element, target) {}
-                },
-                {
-                    id: "#mainaction3",
-                    format: "mini",
-                    size: "1",
-                    name: "Main action 3",
-                    dropcallback: function(self, element, target) {}
-                },
-                {
-                    id: "#mainaction4",
-                    format: "mini",
-                    size: "1",
-                    name: "Main action 4",
-                    dropcallback: function(self, element, target) {}
-                }
-            ],
-            elements: [
-                {
-                    id: ".widget_mini"
-                
-                }
-            ]
-        });
-        */
+        $.initAssociations('house', 0, device_usages, device_types);
     });
 {% endblock %}
 
@@ -119,71 +34,55 @@
 {% endblock %}
 
 {% block js_include %}
+    <script type="text/javascript" src="/design/js/page-show.js"></script>
 {% endblock %}
 
 {% block title %}{% trans page_title %}{% endblock %}
 
-{% block banner %}
-<div id="dragdropwidgets"></div>
-<h1 class="ident icon64-house-default"><span class="title">{{ house.name }}</span></h1>
-<div id="maininfo" class="maininfo"></div>
+{% block breadcrumb %}
+        <li id='customize'><a href='{% url show_house_edit_view 'show_page' %}' class='icon16-action-customize{% if not is_user_connected %} admin_required{% endif %}'>{% trans "Customize" %}</a></li>
 {% endblock %}
+
 {% block contentleft %}
-    <div class='mainactions'>
-        <ul>
-            <li id="mainaction1"></li>
-            <li id="mainaction2"></li>
-            <li id="mainaction3"></li>
-            <li id="mainaction4"></li>
-        </ul>
-    </div>
-    <div class='actions'>
-        <ul>
-            {% for association in house_features_associations %}
-                <li><div id="widget_{{ association.device_id }}_{{ association.device_type_feature_id }}"></div></li>
-            {% endfor %}
-        </ul>
-    </div>
+    <section id="mainsection">
+        <div id='house_0'>
+            <header>
+                <h1 class="ident icon64-house-default"><span class="title">{{ house.name }}</span></h1>
+                <div class="maininfo" role='list'></div>
+            </header>
+            <div class='actions'>
+                <div class='mainactions' role='list'></div>
+                <div class='otheractions' role='list'></div>
+            </div>
+        </div>
+    </section>
 {% endblock %}
 
 {% block contentright %}
+    {% for room in rooms_list %}
+        <div id='room_{{ room.id }}' class='block subsection'>
+            <h2 class='header icon64-room-{{ room.config.icon }}'>
+                <a href='{% url show_room_view room.id %}' class="ident">
+                    <span class="title">{{ room.name }}</span>
+                    <br />
+                    <span class="subtitle">{{ room.description }}</span>
+                </a>
+            </h2>
+            <div class="maininfo" role='list'></div>
+            <div class='mainactions' role='list'></div>
+        </div>
+    {% endfor %}
     {% for area in areas_list %}
-	    {% if forloop.counter0|divisibleby:"3" %}
-		    <!--div class='row'-->
-	    {% endif %}
-			    <!--div class='column'-->
-				    <script type="text/javascript">
-				    // <![CDATA[
-					    $(function() {
-						    /*$("#extended_{{ area.id }}").leftpanel({
-							    closetext: "Close",
-							    openbutton: "#openextended_{{ area.id }}",
-						    });*/
-					    });
-				    // ]]>
-				    </script>
-
-				    <div class='block'>
-					    <h2 class='header icon64-area-{{ area.config.icon}}'>
-						    <a href='{% url show_area_view area.id %}' class="ident">
-							    <span class="title">{{ area.name }}</span>
-							    <br />
-							    <span class="subtitle">{{ area.description }}</span>
-						    </a>
-						    <!--span class='temp icon32-device-temp'>21 &#176;C</span-->
-					    </h2>
-                        <div class='actions'>
-                        </div>
-            		    <!--div class='footer'><button class='button_bottomright' id='openextended_{{ area.id }}'>Full commands</button></div-->
-				    </div>
-				    <!--div class='extended' id='extended_{{ area.id }}'>
-                        <h3>Commandes</h3>
-                        <ul class='commands'>
-                        </ul>
-                    </div-->
-			    <!--/div-->
-	    {% if forloop.counter0|divisibleby:"3" %}
-		    <!--/div-->
-	    {% endif %}
+        <div id='area_{{ area.id }}' class='block subsection'>
+            <h2 class='header icon64-area-{{ area.config.icon}}'>
+                <a href='{% url show_area_view area.id %}' class="ident">
+                    <span class="title">{{ area.name }}</span>
+                    <br />
+                    <span class="subtitle">{{ area.description }}</span>
+                </a>
+            </h2>
+            <div class="maininfo" role='list'></div>
+            <div class='mainactions' role='list'></div>
+        </div>
     {% endfor %}
 {% endblock %}

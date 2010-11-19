@@ -1,5 +1,10 @@
 @charset "UTF-8";
 /* CSS Document */
+.tip {
+    display:block;
+    background:#eeeeee;
+    margin:0;
+}
 
 label {
     display:block;
@@ -50,9 +55,8 @@ select.large {
 }
 
 fieldset {
-    border:1px solid #999;
-    -moz-border-radius: 0.4em;
-    -webkit-border-radius: 0.4em;
+    margin:0;
+    border:none;
 }
 
 input[type='text'].required {

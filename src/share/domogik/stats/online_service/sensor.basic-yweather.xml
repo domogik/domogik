@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<statistic technology="online_service">
+    <schema name="sensor.basic">
+        <xpltype type="xpl-stat">
+            <listener>
+                <filter>
+                    <key name="type" value="temp"/>
+                    <key name="type" value="pressure"/>
+                    <key name="type" value="humidity"/>
+                    <key name="type" value="visibility"/>
+                    <key name="type" value="rising"/>
+                    <key name="type" value="chill"/>
+                    <key name="type" value="direction"/>
+                    <key name="type" value="speed"/>
+                    <key name="type" value="uv"/>
+                    <key name="type" value="rainfall"/>
+                    <key name="type" value="drewpoint"/>
+                    <key name="type" value="condition-code"/>
+                    <key name="type" value="condition-text"/>
+                </filter>
+            </listener>
+            <mapping>
+                <device field="device"/>
+                <value field="units"/>
+                <value field="current" new_name="temperature" 
+                       filter_key="type" filter_value="temp" />
+                <value field="current" new_name="pressure" 
+                       filter_key="type" filter_value="pressure" />
+                <value field="current" new_name="humidity" 
+                       filter_key="type" filter_value="humidity" />
+                <value field="current" new_name="visibility" 
+                       filter_key="type" filter_value="visibility" />
+                <value field="current" new_name="rising" 
+                       filter_key="type" filter_value="rising" />
+                <value field="current" new_name="chill" 
+                       filter_key="type" filter_value="chill" />
+                <value field="current" new_name="direction" 
+                       filter_key="type" filter_value="direction" />
+                <value field="current" new_name="speed" 
+                       filter_key="type" filter_value="speed" />
+                <value field="current" new_name="uv" 
+                       filter_key="type" filter_value="uv" />
+                <value field="current" new_name="rainfall" 
+                       filter_key="type" filter_value="rainfall" />
+                <value field="current" new_name="drewpoint" 
+                       filter_key="type" filter_value="drewpoint" />
+                <value field="current" new_name="condition-text" 
+                       filter_key="type" filter_value="condition-text" />
+                <value field="current" new_name="condition-code" 
+                       filter_key="type" filter_value="condition-code" />
+            </mapping>
+        </xpltype>
+    </schema>
+</statistic>
+

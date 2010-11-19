@@ -1,0 +1,43 @@
+<package type="plugin">
+  <name>cidmodem</name>
+  <technology>communication</technology>
+  <description>Get caller id with a modem</description>
+  <version>0.1.0</version>
+  <detail>When receiving an incoming call on a classic telephonic line, this plugin gets the incoming call number and send it on xPL.
+  </detail>
+  <documentation>http://wiki.domogik.org/tiki-index.php?page=plugin_cidmodem</documentation>
+  <author>Fritz</author>
+  <author-email>fritz.smh at gmail.com</author-email>
+  <configuration-keys>
+    <key>
+      <order-id>0</order-id>
+      <name>startup-plugin</name>
+      <type>boolean</type>
+      <description>Automatically start plugin at Domogik startup</description>
+      <default-value>False</default-value>
+    </key>
+    <key>
+      <order-id>1</order-id>
+      <name>device</name>
+      <type>string</type>
+      <description>Modem device (ex: /dev/ttyUSB0 for an usb modem)</description>
+      <default-value>/dev/modem</default-value>
+    </key>
+    <key>
+      <order-id>2</order-id>
+      <name>cid-command</name>
+      <type>string</type>
+      <description>AT CID command to be used by plugin to activate Caller Id mode on modem.</description>
+      <default-value>AT#CID=1</default-value>
+    </key>
+  </configuration-keys>
+  <files>
+    <file path="src/share/domogik/plugins/cidmodem.xml"/>
+    <file path="src/share/domogik/stats/communication/cid.basic-cidmodem.xml"/>
+    <file path="src/domogik/xpl/bin/cidmodem.py"/>
+    <file path="src/domogik/xpl/lib/cidmodem.py"/>
+  </files>
+  <depandancies>
+    <dep name="pySerial > 2.4"/>
+  </depandancies>
+</package>

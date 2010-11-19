@@ -48,55 +48,54 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-#DATABASE_ENGINE = 'mysql'   # 'postgresql_psycopg2', 'postgresql', 'mysql',
-                            # 'sqlite3' or 'oracle'.
-#DATABASE_NAME = 'domogik'   # Or path to database file if using sqlite3.
+# Note that we use our own Database model and not Django's one.
 
-#DATABASE_ENGINE = 'sqlite3'
-#DATABASE_NAME = "db.sqlite"
+### Rest settings
+cfg_rest = Loader('django')
+config_django = cfg_rest.load()
+conf_django = dict(config_django[1])
 
-#DATABASE_USER = 'domogik'   # Not used with sqlite3.
-#DATABASE_PASSWORD = ''      # Not used with sqlite3.
-#DATABASE_HOST = ''          # Set to empty string for localhost.
-                            # ( Not used with sqlite3. )
-#DATABASE_PORT = ''          # Set to empty string for default.
-                            # ( Not used with sqlite3. )
+if ('internal_rest_server_ip' in conf_django) and (conf_django['internal_rest_server_ip'] != ''):
+    INTERNAL_REST_IP = conf_django['internal_rest_server_ip']
+else:    # default parameters
+    INTERNAL_REST_IP = "127.0.0.1"
 
-DATABASES = {
-    'default': {
-        'NAME': 'db.sqlite',
-        'ENGINE': 'django.db.backends.sqlite3',
-        'USER': '',
-        'PASSWORD': '',
-    }
-}
-
-### Proxy settings
-try:
-    cfg_rest = Loader('django')
-    config_django = cfg_rest.load()
-    conf_django = dict(config_django[1])
-    REST_IP = conf_django['django_rest_server_ip']
-    REST_PORT = conf_django['django_rest_server_port']
-    REST_PREFIX = conf_django['django_rest_server_prefix']
-    if ('django_rest_server_prefix' in conf_django) and (conf_django['django_rest_server_prefix'] != ''): 
-        REST_PREFIX = conf_django['django_rest_server_prefix']
-        REST_URL = "http://" + REST_IP + ":" + REST_PORT + "/" + REST_PREFIX
-    else: 
-        REST_PREFIX = ''
-        REST_URL = "http://" + REST_IP + ":" + REST_PORT
-
-except KeyError:
+if ('internal_rest_server_port' in conf_django) and (conf_django['internal_rest_server_port'] != ''):
+    INTERNAL_REST_PORT = conf_django['internal_rest_server_port']
+else:
     # default parameters
-    REST_IP = "127.0.0.1"
-    REST_PORT = "8080"
-    REST_PREFIX = ''
-    REST_URL = "http://" + REST_IP + ":" + REST_PORT
+    INTERNAL_REST_PORT = "8080"
 
-print "using REST url : " + REST_URL
+if ('internal_rest_server_prefix' in conf_django) and (conf_django['internal_rest_server_prefix'] != ''):
+    INTERNAL_REST_PREFIX = conf_django['internal_rest_server_prefix']
+    INTERNAL_REST_URL = "http://" + INTERNAL_REST_IP + ":" + INTERNAL_REST_PORT + "/" + INTERNAL_REST_PREFIX
+else:
+    INTERNAL_REST_URL = "http://" + INTERNAL_REST_IP + ":" + INTERNAL_REST_PORT
 
-PROXY_DOMAIN = REST_IP
-PROXY_PORT = int(REST_PORT)
+if ('external_rest_server_ip' in conf_django) and (conf_django['external_rest_server_ip'] != ''):
+    EXTERNAL_REST_IP = conf_django['external_rest_server_ip']
+else:
+    # default parameters
+    EXTERNAL_REST_IP = INTERNAL_REST_IP
+
+if ('external_rest_server_port' in conf_django) and (conf_django['external_rest_server_port'] != ''):
+    EXTERNAL_REST_PORT = conf_django['external_rest_server_port']
+else:
+    # default parameters
+    EXTERNAL_REST_PORT = INTERNAL_REST_PORT
+
+if ('external_rest_server_prefix' in conf_django) and (conf_django['external_rest_server_prefix'] != ''):
+    EXTERNAL_REST_PREFIX = conf_django['external_rest_server_prefix']
+    EXTERNAL_REST_URL = "http://" + EXTERNAL_REST_IP + ":" + EXTERNAL_REST_PORT + "/" + EXTERNAL_REST_PREFIX
+else:
+    EXTERNAL_REST_URL = "http://" + EXTERNAL_REST_IP + ":" + EXTERNAL_REST_PORT
+
+print "DJANGO REST url : " + INTERNAL_REST_URL
+print "JQUERY REST url : " + EXTERNAL_REST_URL
+
+
+PROXY_DOMAIN = INTERNAL_REST_IP
+PROXY_PORT = int(INTERNAL_REST_PORT)
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -153,7 +152,9 @@ TEMPLATE_DIRS = (
     # "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+    '/usr/local/share/domogik/ui/djangodomo/core/templates/',
     '%s/templates/' % PROJECT_PATH,
+    '%s/core/templates/' % PROJECT_PATH,
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -169,14 +170,13 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.admin',
-    'django_pipes',
-    'djangodomo.core',
+    'django_pipes', # Used to create Django's model using REST
+    'domogik.ui.djangodomo.core',
 )
 
-STATIC_DOC_ROOT = '%s/core/templates/design' % PROJECT_PATH
 
 # Session stuff
-# Other options are : 
+# Other options are :
 ### 'django.contrib.sessions.backends.db'
 ### 'django.contrib.sessions.backends.file'
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
@@ -187,3 +187,27 @@ try:
     from settings_local import *
 except ImportError:
     pass
+
+# List the availables widgets
+WIDGETS_LIST = []
+STATIC_WIDGETS_ROOT = None
+STATIC_DESIGN_ROOT = None 
+
+#Only loads the widgets from the FIRST existing directory in TEMPLATE_DIRS
+for t_path in TEMPLATE_DIRS:
+    if os.path.isdir(t_path):
+        w_path = os.path.join(t_path, "widgets")
+        if os.path.isdir(w_path):
+            for file in os.listdir(w_path):
+                main = os.path.join(w_path, file, "main.js")
+                if os.path.isfile(main):
+                    WIDGETS_LIST.append(file)
+        STATIC_WIDGETS_ROOT = w_path
+        STATIC_DESIGN_ROOT = '%s/design' % t_path
+        break
+
+# For login Auth
+AUTHENTICATION_BACKENDS = ('domogik.ui.djangodomo.core.backends.RestBackend',)
+LOGIN_URL = '/domogik/login'
+LOGOUT_URL = '/domogik/logout'
+LOGIN_REDIRECT_URL = '/domogik'

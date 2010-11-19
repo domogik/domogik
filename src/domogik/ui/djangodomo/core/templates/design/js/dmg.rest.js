@@ -1,3 +1,9 @@
+var rest = new REST();
+
+$(function(){
+	$(window).bind('beforeunload', function () { rest.cancelAll(); });
+});
+
 $.extend({
     URLEncode: function(c) {
         var o = '';
@@ -59,92 +65,80 @@ $.extend({
         window.location = newlocation;
     },
 
-    getREST: function(parameters, callback) {
-        url = rest_url + '/';
-        // Build the REST url
-        $.each(parameters, function(){
-            url += encodeURIComponent(this) + '/';     
+    loadPage: function(url, data) {
+        var newlocation = url;
+        newlocation += "?";
+        $.each(data, function(key, value) {
+            newlocation += key + "=" + value + "&";
         });
-        
-        $.ajax({
-            cache: false,
-            type: "GET",
-            url: url,
-            dataType: "jsonp",
-            success:
-                callback,
-            error:
-                function(XMLHttpRequest, textStatus, errorThrown) {
-                    $.notification('error', 'Event request  :' + XMLHttpRequest.readyState + ' ' + XMLHttpRequest.status + ' ' + textStatus + ' ' + errorThrown);
-                }
-        });
-    },
-
-    eventRequest: function(devices, callback) {
-        url = rest_url + '/events/request/new/' + devices.join('/') + '/';
-        $.jsonp({
-            cache: false,
-            callbackParameter: "callback",
-            type: "GET",
-            url: url,
-            dataType: "jsonp",
-            timeout: 120000, // 2 minute
-            error: function (xOptions, textStatus) {
-                if (textStatus == 'timeout') {
-                    $.eventRequest(devices, callback);                    
-                } else {
-                    $.notification('error', 'Event update : Lost REST server connection');
-                }
-            },
-            success: function (data) {
-                var status = (data.status).toLowerCase();
-                if (status == 'ok') {
-                    // Free the ticket when page unload
-                    $(window).unload( function () { $.eventCancel(data.event[0].ticket_id); } );
-                    callback(data.event[0]);
-                    $.eventUpdate(data.event[0].ticket_id, callback);
-                } else {
-                    $.notification('error', 'Event request  : ' + data.description);
-                }
-            }
-        });
-    },
-    
-    eventUpdate: function(ticket, callback) {
-        url = rest_url + '/events/request/get/' + ticket + '/';
-        $.jsonp({
-            cache: false,
-            callbackParameter: "callback",
-            type: "GET",
-            url: url,
-            dataType: "jsonp",
-            timeout: 120000, // 2 minute
-            error: function (xOptions, textStatus) {
-                if (textStatus == 'timeout') {
-                    $.eventUpdate(devices, callback);                    
-                } else {
-                    $.notification('error', 'Event update : Lost REST server connection');
-                }
-            },
-            success: function (data) {
-                var status = (data.status).toLowerCase();
-                if (status == 'ok') {
-                    callback(data.event[0]);
-                    $.eventUpdate(data.event[0].ticket_id, callback);
-                } else {
-                    $.notification('error', 'Event update : ' + data.description);
-                }
-            }
-        });
-    },
-    
-    eventCancel: function(ticket) {
-        url = rest_url + '/events/request/free/' + ticket + '/';
-        $.jsonp({
-            cache: false,
-            type: "GET",
-            url: url,
-            dataType: "jsonp"
-        });
+        window.location = newlocation;
     }
 });
+
+function REST() {
+    this.uid = 0;
+    this.processing = new Array();
+}
+
+REST.prototype.get = function(parameters, callback) {
+    var self = this;
+    url = rest_url + '/';
+    // Build the REST url
+    $.each(parameters, function(){
+        url += encodeURIComponent(this) + '/';     
+    });
+    return this.jsonp(url, callback,
+                      function(xOptions, textStatus) {$.notification('error', 'REST communication : ' + textStatus + ' (' + url + ')');}
+            );
+}
+
+REST.prototype.jsonp = function(url, successCallback, errorCallback) {
+    var self = this;
+    return $.jsonp({
+        cache: false,
+        type: "GET",
+        url: url,
+        dataType: "jsonp",
+        callback: "_" + self.getuid(),
+        callbackParameter: "callback",
+        beforeSend: function(xOptions) {
+            self.register(xOptions);
+        },
+        complete: function(xOptions) {
+            self.unregister(xOptions);
+        },
+        success:
+            successCallback,
+        error:
+            errorCallback
+    });
+}
+
+REST.prototype.register = function(xOptions) {
+    this.processing[xOptions.callback] = xOptions;
+    return xOptions.callback;
+}
+
+REST.prototype.unregister = function(xOptions) {
+    delete this.processing[xOptions.callback];
+}
+
+REST.prototype.getuid = function() {
+    return this.uid++;
+}
+
+REST.prototype.cancel = function(id) {
+    if (id) {
+        xOptions = this.processing[id];
+        if (xOptions) {
+            xOptions.abort();
+            this.unregister(id);
+        }        
+    }
+}
+
+REST.prototype.cancelAll = function(id) {
+    for (var i in this.processing) {
+        this.processing[i].abort();
+    }
+}

@@ -1,0 +1,118 @@
+<package type="plugin">
+  <name>wol_ping</name>
+  <technology>computer</technology>
+  <description>Wake on lan and ping computers</description>
+  <detail>This plugin allows to wake up computers on a LAN and to ping them to check if they are alive</detail>
+  <version>0.1.0</version>
+  <documentation>http://wiki.domogik.org/tiki-index.php?page=plugin_wol_ping</documentation>
+  <author>Fritz</author>
+  <author-email>fritz.smh at gmail.com</author-email>
+  <configuration-keys>
+    <key>
+      <order-id>0</order-id>
+      <name>startup-plugin</name>
+      <type>boolean</type>
+      <description>Automatically start plugin at Domogik startup</description>
+      <default-value>False</default-value>
+    </key>
+    <key>
+      <order-id>1</order-id>
+      <name>ping-interval</name>
+      <type>string</type>
+      <description>Interval between each ping</description>
+      <default-value>60</default-value>
+    </key>
+    <key>
+      <order-id>2</order-id>
+      <name>cmp-1-name</name>
+      <type>string</type>
+      <description>Computer 1 name</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>3</order-id>
+      <name>cmp-1-ip</name>
+      <type>string</type>
+      <description>Computer 1 ip or dns</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>4</order-id>
+      <name>cmp-1-mac</name>
+      <type>string</type>
+      <description>Computer 1 mac address</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>5</order-id>
+      <name>cmp-1-macport</name>
+      <type>string</type>
+      <description>Computer 1 port used for WOL</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>6</order-id>
+      <name>cmp-2-name</name>
+      <type>string</type>
+      <description>Computer 2 name</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>7</order-id>
+      <name>cmp-2-ip</name>
+      <type>string</type>
+      <description>Computer 2 ip or dns</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>8</order-id>
+      <name>cmp-2-mac</name>
+      <type>string</type>
+      <description>Computer 2 mac address</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>9</order-id>
+      <name>cmp-2-macport</name>
+      <type>string</type>
+      <description>Computer 2 port used for WOL</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>10</order-id>
+      <name>cmp-3-name</name>
+      <type>string</type>
+      <description>Computer 3 name</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>11</order-id>
+      <name>cmp-3-ip</name>
+      <type>string</type>
+      <description>Computer 3 ip or dns</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>12</order-id>
+      <name>cmp-3-mac</name>
+      <type>string</type>
+      <description>Computer 3 mac address</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>13</order-id>
+      <name>cmp-3-macport</name>
+      <type>string</type>
+      <description>Computer 3 port used for WOL</description>
+      <default-value></default-value>
+    </key>
+  </configuration-keys>
+  <files>
+    <file path="src/share/domogik/plugins/wol_ping.xml"/>
+    <file path="src/share/domogik/stats/computer/sensor.basic-wol_ping.xml"/>
+    <file path="src/share/domogik/url2xpl/computer/wol.xml"/>
+    <file path="src/domogik/xpl/bin/wol_ping.py"/>
+    <file path="src/domogik/xpl/lib/wol_ping.py"/>
+  </files>
+  <depandancies/>
+</package>

@@ -41,34 +41,6 @@ from domogik.xpl.lib.xbmc_not import XBMCNotification
 from domogik.xpl.common.plugin import XplResult
 from domogik.xpl.common.queryconfig import Query
 
-IS_DOMOGIK_PLUGIN = True
-DOMOGIK_PLUGIN_TECHNOLOGY = "multimedia"
-DOMOGIK_PLUGIN_DESCRIPTION = "Send notifications to XBMC"
-DOMOGIK_PLUGIN_VERSION = "0.1"
-DOMOGIK_PLUGIN_DOCUMENTATION_LINK = "http://wiki.domogik.org/tiki-index.php?page=plugins/XBMCNotification"
-DOMOGIK_PLUGIN_CONFIGURATION=[
-      {"id" : 0,
-       "key" : "startup-plugin",
-       "type" : "boolean",
-       "description" : "Automatically start plugin at Domogik startup",
-       "default" : "False"},
-      {"id" : 1,
-       "key" : "address",
-       "type" : "string",
-       "description" : "XBMC Media center HTTP API address(ip:port)",)
-       "default" : ""},
-      {"id" : 2,
-       "key" : "delay",
-       "type" : "number",
-       "description" : "Default delay for displaying a notification (seconds)",
-       "default" : 15},
-      {"id" : 3,
-       "key" : "maxdelay",
-       "type" : "number",
-       "description" : "Max delay between sending title and message with osd.basic xpl message (seconds)",
-       "default" : 10}]
-
-
 
 class XBMCNotificationListener(XplPlugin):
     """ Create listener for xPL messages about xbmc notifications
@@ -79,32 +51,32 @@ class XBMCNotificationListener(XplPlugin):
         """
         XplPlugin.__init__(self, name = 'xbmc_not')
         # Create logger
-        self._log.debug("Listener for XBMC notifications created")
+        self.log.debug("Listener for XBMC notifications created")
 
         # Get configuration
-        self._config = Query(self._myxpl)
+        self._config = Query(self.myxpl, self.log)
         res = XplResult()
         self._config.query('xbmc_not', 'address', res)
         address = res.get_value()['address']
-        self._config = Query(self._myxpl)
+        self._config = Query(self.myxpl, self.log)
         res = XplResult()
         self._config.query('xbmc_not', 'delay', res)
         delay = res.get_value()['delay']
-        self._config = Query(self._myxpl)
+        self._config = Query(self.myxpl, self.log)
         res = XplResult()
         self._config.query('xbmc_not', 'maxdelay', res)
         maxdelay = res.get_value()['maxdelay']
 
-        self._log.debug("Config : address = " + address)
-        self._log.debug("Config : delay = " + delay)
-        self._log.debug("Config : maxdelay = " + maxdelay)
+        self.log.debug("Config : address = " + address)
+        self.log.debug("Config : delay = " + delay)
+        self.log.debug("Config : maxdelay = " + maxdelay)
 
         # Create XBMCNotification object
-        self.xbmc_notification_manager = XBMCNotification(address, delay, \
+        self.xbmc_notification_manager = XBMCNotification(self.log, address, delay, \
                                                          maxdelay)
 
         # Create listeners
-        Listener(self.xbmc_notification_cb, self._myxpl, {'schema': 'osd.basic',
+        Listener(self.xbmc_notification_cb, self.myxpl, {'schema': 'osd.basic',
                 'xpltype': 'xpl-cmnd'})
 
 
@@ -112,7 +84,7 @@ class XBMCNotificationListener(XplPlugin):
         """ Call XBMC notification lib
             @param message : message to send
         """
-        self._log.debug("Call xbmc_notification_cb")
+        self.log.debug("Call xbmc_notification_cb")
 
         if 'command' in message.data:
             command = message.data['command']
@@ -123,7 +95,7 @@ class XBMCNotificationListener(XplPlugin):
         if 'delay' in message.data:
             delay = message.data['delay']
 
-        self._log.debug("Call _notify")
+        self.log.debug("Call _notify")
         self.xbmc_notification_manager.notify(command, text, row, delay)
 
 

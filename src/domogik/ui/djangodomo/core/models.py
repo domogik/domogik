@@ -37,11 +37,33 @@ Implements
 from django.db import models
 from domogik.common.configloader import Loader
 from django.conf import settings
-
+from htmlentitydefs import name2codepoint
+import re
+import simplejson
 import dmg_pipes as pipes
-    
+
+def unescape(s):
+    "unescape HTML code refs; c.f. http://wiki.python.org/moin/EscapingHtml"
+    return re.sub('&(%s);' % '|'.join(name2codepoint),
+              lambda m: unichr(name2codepoint[m.group(1)]), s)
+
+class Rest(pipes.DmgPipe):
+    uri = settings.INTERNAL_REST_URL + "/"
+
+    @staticmethod
+    def get_info():
+        resp = Rest.objects.get()
+        if resp :
+            return resp
+        
+class House(object):
+    def __init__(self):
+        self.config = UIConfigs.get_by_reference('house', '0')
+        if self.config.has_key('name') :
+            self.name = self.config['name']
+
 class Areas(pipes.DmgPipe):
-    uri = settings.REST_URL + "/base/area"
+    uri = settings.INTERNAL_REST_URL + "/base/area"
 
     @staticmethod
     def get_all():
@@ -62,26 +84,15 @@ class Areas(pipes.DmgPipe):
             
     def merge_uiconfig(self):
         for area in self.area:
-            uiconfigs = UIConfigs.get_by_reference('area', area.id)
-            area.config = {}
-            for uiconfig in uiconfigs.ui_config:
-                area.config[uiconfig.key] = uiconfig.value
+            area.config = UIConfigs.get_by_reference('area', area.id)
 
             # If has rooms
-            if hasattr(area, 'room') and (area.room != 'None'):
+            if hasattr(area, 'room') and (area.room):
                 for room in area.room:
-                    uiconfigs = UIConfigs.get_by_reference('room', room.id)
-                    room.config = {}
-                    for uiconfig in uiconfigs.ui_config:
-                        room.config[uiconfig.key] = uiconfig.value
-
-    def merge_feature_associations(self):
-        for area in self.area:
-            associations = FeatureAssociations.get_by_area(area.id)
-            area.feature_association = associations.feature_association
+                    room.config = UIConfigs.get_by_reference('room', room.id)
 
 class Rooms(pipes.DmgPipe):
-    uri = settings.REST_URL + "/base/room"
+    uri = settings.INTERNAL_REST_URL + "/base/room"
 
     @staticmethod
     def get_all():
@@ -109,25 +120,14 @@ class Rooms(pipes.DmgPipe):
 
     def merge_uiconfig(self):
         for room in self.room:
-            uiconfigs = UIConfigs.get_by_reference('room', room.id)
-            room.config = {}
-            for uiconfig in uiconfigs.ui_config:
-                room.config[uiconfig.key] = uiconfig.value
+            room.config = UIConfigs.get_by_reference('room', room.id)
 
             # If is associated with area
-            if hasattr(room, 'area') and (room.area != 'None') :
-                uiconfigs = UIConfigs.get_by_reference('area', room.area.id)
-                room.area.config = {}
-                for uiconfig in uiconfigs.ui_config:
-                    room.area.config[uiconfig.key] = uiconfig.value
-
-    def merge_feature_associations(self):
-        for room in self.room:
-            associations = FeatureAssociations.get_by_room(room.id)
-            room.feature_association = associations.feature_association
+            if hasattr(room, 'area') and (room.area) :
+                room.area.config = UIConfigs.get_by_reference('area', room.area.id)
 
 class Devices(pipes.DmgPipe):
-    uri = settings.REST_URL + "/base/device"
+    uri = settings.INTERNAL_REST_URL + "/base/device"
 
     @staticmethod
     def get_all():
@@ -138,24 +138,21 @@ class Devices(pipes.DmgPipe):
     def merge_uiconfig(self):
         for device in self.device:
             # If is associated with room
-            if hasattr(device, 'room') and (device.room != 'None') :
-                uiconfigs = UIConfigs.get_by_reference('room', device.room.id)
-                device.room.config = {}
-                for uiconfig in uiconfigs.ui_config:
-                    device.room.config[uiconfig.key] = uiconfig.value
+            if hasattr(device, 'room') and (device.room) :
+                device.room.config = UIConfigs.get_by_reference('room', device.room.id)
 
     def merge_features(self):
         for device in self.device:
-            features = DeviceFeatures.get_by_type(device.device_type_id)
-            associations = FeatureAssociations.get_by_device(device.id)
-            device.feature = features.device_type_feature
-            for feature in device.feature:
-                for association in associations.feature_association:
-                    if (feature.id == association.device_type_feature_id):
-                        feature.association = association
+            features = Features.get_by_device(device.id)
+            device.features = features.feature
+#            associations = FeatureAssociations.get_by_feature(feature.id)
+#            for feature in device.feature:
+#                for association in associations.feature_association:
+#                    if (feature.id == association.device_feature_id):
+#                        feature.association = association
 
 class DeviceTechnologies(pipes.DmgPipe):
-    uri = settings.REST_URL + "/base/device_technology"
+    uri = settings.INTERNAL_REST_URL + "/base/device_technology"
 
     @staticmethod
     def get_all():
@@ -164,7 +161,7 @@ class DeviceTechnologies(pipes.DmgPipe):
             return resp
 
 class DeviceTypes(pipes.DmgPipe):
-    uri = settings.REST_URL + "/base/device_type"
+    uri = settings.INTERNAL_REST_URL + "/base/device_type"
     _dict = None
     
     @staticmethod
@@ -191,7 +188,7 @@ class DeviceTypes(pipes.DmgPipe):
         return dict[key]
 
 class DeviceUsages(pipes.DmgPipe):
-    uri = settings.REST_URL + "/base/device_usage"
+    uri = settings.INTERNAL_REST_URL + "/base/device_usage"
     _dict = None
 
     @staticmethod
@@ -217,17 +214,23 @@ class DeviceUsages(pipes.DmgPipe):
         dict = DeviceUsages.get_dict()
         return dict[key]
 
-class DeviceFeatures(pipes.DmgPipe):
-    uri = settings.REST_URL + "/base/device_type_feature"
+class Features(pipes.DmgPipe):
+    uri = settings.INTERNAL_REST_URL + "/base/feature"
 
     @staticmethod
-    def get_by_type(type_id):
-        resp = DeviceFeatures.objects.get({'parameters':"list/by-type_id/" + str(type_id)})
+    def get_by_id(id):
+        resp = Features.objects.get({'parameters':"list/by-id/" + str(id)})
+        if resp :
+            return resp
+
+    @staticmethod
+    def get_by_device(device_id):
+        resp = Features.objects.get({'parameters':"list/by-device_id/" + str(device_id)})
         if resp :
             return resp
 
 class FeatureAssociations(pipes.DmgPipe):
-    uri = settings.REST_URL + "/base/feature_association"
+    uri = settings.INTERNAL_REST_URL + "/base/feature_association"
 
     @staticmethod
     def get_by_house():
@@ -248,37 +251,42 @@ class FeatureAssociations(pipes.DmgPipe):
             return resp
         
     @staticmethod
-    def get_by_device(device_id):
-        resp = FeatureAssociations.objects.get({'parameters':"list/by-device/" + str(device_id)})
+    def get_by_feature(feature_id):
+        resp = FeatureAssociations.objects.get({'parameters':"list/by-feature/" + str(feature_id)})
         if resp :
             return resp
     
 class UIConfigs(pipes.DmgPipe):
-    uri = settings.REST_URL + "/base/ui_config"
+    uri = settings.INTERNAL_REST_URL + "/base/ui_config"
 
     @staticmethod
     def get_by_key(name, key):
-        resp = UIConfigs.objects.get({'parameters':"list/by-key/" + name + "/" + key})
-        if resp :
+        resp = {}
+        uiconfigs = UIConfigs.objects.get({'parameters':"list/by-key/" + name + "/" + key})
+        if uiconfigs :
+            for uiconfig in uiconfigs.ui_config:
+                if (uiconfig.value) :
+                    if (uiconfig.value[0] == '{') : # json structure 
+                        resp[uiconfig.key] = simplejson.loads(unescape(uiconfig.value))
+                    else :
+                        resp[uiconfig.key] = uiconfig.value
             return resp
 
     @staticmethod
     def get_by_reference(name, reference):
-        resp = UIConfigs.objects.get({'parameters':"list/by-reference/" + name + "/" + str(reference)})
-        if resp :
-            return resp
-
-    @staticmethod
-    def get_general(reference):
         resp = {}
-        uiconfigs = UIConfigs.objects.get({'parameters':"list/by-reference/general/" + str(reference)})
+        uiconfigs = UIConfigs.objects.get({'parameters':"list/by-reference/" + name + "/" + str(reference)})
         if uiconfigs :
             for uiconfig in uiconfigs.ui_config:
-                resp[uiconfig.key] = uiconfig.value
+                if (uiconfig.value) :
+                    if (uiconfig.value[0] == '{') : # json structure 
+                        resp[uiconfig.key] = simplejson.loads(unescape(uiconfig.value))
+                    else :
+                        resp[uiconfig.key] = uiconfig.value
             return resp
-
+    
 class Plugins(pipes.DmgPipe):
-    uri = settings.REST_URL + "/plugin"
+    uri = settings.INTERNAL_REST_URL + "/plugin"
 
     @staticmethod
     def get_all():
@@ -293,17 +301,23 @@ class Plugins(pipes.DmgPipe):
             return resp
 
     @staticmethod
-    def get_detail(name):
-        resp = Plugins.objects.get({'parameters':"detail/" + name})
+    def get_detail(name, host):
+        resp = Plugins.objects.get({'parameters':"detail/" + name + "/" + host})
         if resp :
             return resp
 
 class Accounts(pipes.DmgPipe):
-    uri = settings.REST_URL + "/account"
+    uri = settings.INTERNAL_REST_URL + "/account"
 
     @staticmethod
     def auth(login, password):
         resp = Accounts.objects.get({'parameters':"auth/" + login + "/" + password})
+        if resp :
+            return resp
+
+    @staticmethod
+    def get_user(id):
+        resp = Accounts.objects.get({'parameters':"user/list/by-id/" + id})
         if resp :
             return resp
 
@@ -320,7 +334,7 @@ class Accounts(pipes.DmgPipe):
             return resp
 
 class Stats(pipes.DmgPipe):
-    uri = settings.REST_URL + "/stats"
+    uri = settings.INTERNAL_REST_URL + "/stats"
 
     @staticmethod
     def get_latest(id, key):

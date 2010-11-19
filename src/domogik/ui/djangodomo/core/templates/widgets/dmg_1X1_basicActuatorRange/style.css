@@ -1,0 +1,21 @@
+.dmg_1x1_basicActuatorRange {
+    text-align:center;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+}
+
+.dmg_1x1_basicActuatorRange .indicator {
+	position:absolute;
+    top:0;
+    left:0;
+}
+
+.dmg_1x1_basicActuatorRange .command.increase {background-image: url("images/up_16.png");}
+.dmg_1x1_basicActuatorRange .command.decrease {background-image: url("images/down_16.png");}
+.dmg_1x1_basicActuatorRange .command.max {background-image: url("images/max_16.png");}
+.dmg_1x1_basicActuatorRange .command.min {background-image: url("images/min_16.png");}
+
+.dmg_1x1_basicActuatorRange .command.close {
+    background-color:transparent;
+    background-image: url("images/close_36.png");
+}

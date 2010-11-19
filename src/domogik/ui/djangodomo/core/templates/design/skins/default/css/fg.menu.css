@@ -3,17 +3,27 @@ a.fg-button {
     cursor:pointer;
     position: relative;
     display:inline-block;
-  	border: 1px solid #979387;
-    background-color: #BDCB2F;
+  	border: 1px solid #999999;
+    background-color: #ffffff;
     background-position: 99% 50%;
     background-repeat: no-repeat;
     background-image: url(../images/decoration/arrow_down_36372e.png);
 	color: #000000;
 	-moz-border-radius: 4px;
     -webkit-border-radius: 4px;
-    line-height:1.2em;
     text-align:center;
-    padding:0.4em 2em 0.4em 1em;
+    padding:0.4em 2em 0.4em 2px;
+}
+
+a.fg-button:hover, a.fg-button:focus, a.fg-button:active {
+    background-color: #BDCB2F;
+}
+
+a.fg-button div {
+    background-position: 0% 50%;
+    background-repeat: no-repeat;
+    padding-left:18px;
+    line-height:1.4em;
 }
 
 /* REQUIRED STYLES - the menus will only render correctly with these rules */	
@@ -89,7 +99,7 @@ a.fg-button {
 /* REQUIRED LINK STYLES: links are "display:block" by default; if the menu options are split into 
 	selectable node links and 'next' links, the script floats the node links left and floats the 'next' links to the right	*/
 
-.fg-menu a:hover {
+.fg-menu a:hover, .fg-menu a:focus {
     outline: 0 !important;
     border: 1px solid #979387;
 	background-image: -webkit-gradient(linear, 0% 0%, 0% 60%, from(#BDCB2F), to(#9BB528));

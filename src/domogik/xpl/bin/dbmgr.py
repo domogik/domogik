@@ -58,10 +58,11 @@ class DBConnector(XplPlugin):
         Initialize database and xPL connection
         '''
         XplPlugin.__init__(self, 'dbmgr')
-        self._log = self.get_my_logger()
-        self._log.debug("Init database_manager instance")
+        self.log.debug("Init database_manager instance")
+        self._db = DbHelper()
+        self._engine = self._db.get_engine()
 
-        Listener(self._request_config_cb, self._myxpl, {'schema': 'domogik.config', 'xpltype': 'xpl-cmnd'})
+        Listener(self._request_config_cb, self.myxpl, {'schema': 'domogik.config', 'xpltype': 'xpl-cmnd'})
 
     def _request_config_cb(self, message):
         '''
@@ -69,7 +70,7 @@ class DBConnector(XplPlugin):
         @param message : the xPL message
         '''
         #try:
-        self._db = DbHelper()
+        self._db = DbHelper(engine=self._engine)
         techno = message.data['technology']
         hostname = message.data['hostname']
         key = message.data['key']
@@ -78,9 +79,9 @@ class DBConnector(XplPlugin):
         else:
             element = None
         if not key:
-            self._log.debug("New request config received for %s : asked for all config items" % (techno))
+            self.log.debug("New request config received for %s : asked for all config items" % (techno))
         else:
-            self._log.debug("New request config received for %s : %s" % (techno, key))
+            self.log.debug("New request config received for %s : %s" % (techno, key))
         if element:
             self._send_config(techno, hostname, key, self._fetch_elmt_config(techno, element, key), element)
         else:
@@ -91,7 +92,7 @@ class DBConnector(XplPlugin):
             else:
                 self._send_config(techno, hostname, key, self._fetch_techno_config(techno, hostname, key))
         #except KeyError:
-        #    self._log.warning("A request for configuration has been received, but it was misformatted")
+        #    self.log.warning("A request for configuration has been received, but it was misformatted")
 
     def _send_config(self, technology, hostname, key, value, element = None):
         '''
@@ -102,7 +103,7 @@ class DBConnector(XplPlugin):
         @param key : the key or list of keys of the config tuple(s) to fetch
         @param value : the value or list of values corresponding to the key(s)
         '''
-        self._log.debug("Send config response for %s on %s : %s = %s" % (technology, hostname, key, value))
+        self.log.debug("Send config response for %s on %s : %s = %s" % (technology, hostname, key, value))
         mess = XplMessage()
         mess.set_type('xpl-stat')
         mess.set_schema('domogik.config')
@@ -117,7 +118,7 @@ class DBConnector(XplPlugin):
         else:
             mess.add_data({key :  value})
         # mess.set_conf_key('target', plugin)
-        self._myxpl.send(mess)
+        self.myxpl.send(mess)
 
     def _fetch_elmt_config(self, techno, element, key):
         '''
@@ -171,6 +172,8 @@ class DBConnector(XplPlugin):
             if key:
                 try:
                     val = self._db.get_plugin_config(techno, hostname, key).value
+                    if val == '':
+                        val = "None"
                     return val
                 except AttributeError:
                     return "None"
@@ -178,12 +181,15 @@ class DBConnector(XplPlugin):
                 vals = self._db.list_plugin_config(techno, hostname)
                 res = {}
                 for val in vals:
-                    res[val.key] = val.value
+                    if val == '':
+                        res[val.key] = "None"
+                    else:
+                        res[val.key] = val.value
                 return res
         except:
             traceback.print_exc()
-            self._log.warn("No config found for technolgy %s on %s, key %s" % (techno, hostname, key))
-            return None
+            self.log.warn("No config found for technolgy %s on %s, key %s" % (techno, hostname, key))
+            return "None"
 
 if __name__ == "__main__":
     DBC = DBConnector()

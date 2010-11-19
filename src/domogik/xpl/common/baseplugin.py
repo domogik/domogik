@@ -36,6 +36,7 @@ Implements
 """
 
 import threading
+from socket import gethostname 
 
 from domogik.common import logger
 from optparse import OptionParser
@@ -92,12 +93,12 @@ class BasePlugin():
             if not self.options.run_in_foreground and daemonize:
                 createDaemon()
                 l = logger.Logger(name)
-                self._log = l.get_logger()
-                self._log.info("Daemonize plugin %s" % name)
+                self.log = l.get_logger()
+                self.log.info("Daemonize plugin %s" % name)
                 self.is_daemon = True
             else:
                 l = logger.Logger(name)
-                self._log = l.get_logger()
+                self.log = l.get_logger()
                 self.is_daemon = False
             self._threads = []
             self._timers = []
@@ -111,12 +112,6 @@ class BasePlugin():
                 self._stop_cb = [stop_cb]
             else:
                 self._stop_cb = []
-
-        def get_my_logger(self):
-            """
-            Returns the associated logger instance
-            """
-            return self._log
 
         def should_stop(self):
             '''
@@ -143,10 +138,17 @@ class BasePlugin():
             Should be called by each thread at start
             @param thread : the thread to add
             '''
-            self._lock_add_thread.acquire()
-            # self._log.debug('New thread registered : %s' % thread)
-            self._threads.append(thread)
-            self._lock_add_thread.release()
+            # self.log.debug('New thread registered : %s' % thread)
+            #Remove all stopped thread from the list
+            for t in self._threads:
+                if not  t.isAlive():
+                    self._threads.remove(t)
+            if thread in self._threads:
+                self.log.info("Try to register a thread twice :" % thread)
+            else:
+                self._lock_add_thread.acquire()
+                self._threads.append(thread)
+                self._lock_add_thread.release()
 
         def unregister_thread(self, thread):
             '''
@@ -156,8 +158,10 @@ class BasePlugin():
             '''
             self._lock_add_thread.acquire()
             if thread in self._threads:
-                self._log.debug('Unregister thread')
+                self.log.debug('Unregister thread')
                 self._threads.remove(thread)
+            else:
+                self.log.warn('Asked to remove a thread not in the list')
             self._lock_add_thread.release()
 
         def register_timer(self, timer):
@@ -166,21 +170,24 @@ class BasePlugin():
             Should be called by each timer
             @param timer : the timer to add
             '''
-            self._lock_add_timer.acquire()
-            self._log.debug('New timer registered : %s' % timer)
-            self._timers.append(timer)
-            self._lock_add_timer.release()
+            if timer in self._timers:
+                self.log.info("Try to register a timer twice : %s" % timer)
+            else:
+                self.log.debug('New timer registered : %s' % timer)
+                self._lock_add_timer.acquire()
+                self._timers.append(timer)
+                self._lock_add_timer.release()
 
         def unregister_timer(self, timer):
-
             '''
             Unregister a timer in the current instance
             Should be the last action of each timer
             @param timer : the timer to remove
             '''
+            self.log.debug('ASk for timer unregister : %s' % timer)
             self._lock_add_timer.acquire()
             if timer in self._timers:
-                self._log.debug('Unregister timer')
+                self.log.debug('Unregister timer')
                 self._timers.remove(timer)
             self._lock_add_timer.release()
 
@@ -192,5 +199,13 @@ class BasePlugin():
             self._stop_cb.append(cb)
             self._lock_add_cb.release()
 
+        def get_sanitized_hostname(self):
+            """ Get the sanitized hostname of the host 
+            This will lower it and keep only the part before the first dot
+
+            """
+            return gethostname().lower().split('.')[0]
+
         def __del__(self):
-            self._log.debug("__del__ baseplugin")
+            self.log.debug("__del__ baseplugin")
+

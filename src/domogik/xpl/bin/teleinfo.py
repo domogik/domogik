@@ -37,30 +37,11 @@ Implements
 
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin, XplResult
-from domogik.xpl.lib.teleinfo import TeleInfo
+from domogik.xpl.lib.teleinfo import Teleinfo
+from domogik.xpl.lib.teleinfo import TeleinfoException
 from domogik.xpl.common.queryconfig import Query
+import threading
 
-IS_DOMOGIK_PLUGIN = True
-DOMOGIK_PLUGIN_TECHNOLOGY = "service"
-DOMOGIK_PLUGIN_DESCRIPTION = "Get power consumption with teleinfo"
-DOMOGIK_PLUGIN_VERSION = "0.1"
-DOMOGIK_PLUGIN_DOCUMENTATION_LINK = "http://wiki.domogik.org/tiki-index.php?page=plugins/Teleinfo"
-DOMOGIK_PLUGIN_CONFIGURATION = [
-      {"id" : 0,
-       "key" : "startup-plugin",
-       "type" : "boolean",
-       "description" : "Automatically start plugin at Domogik startup",
-       "default" : "False"},
-      {"id" : 1,
-       "key" : "device",
-       "type" : "string",
-       "description" : "Teleinfo device (ex : /dev/ttyUSB0 for an usb model)",
-       "default" : "/dev/teleinfo"},
-      {"id" : 2,
-       "key" : "interval",
-       "type" : "number",
-       "description" : "Interval between each request (seconds)",
-       "default" : 60}]
 
 class TeleinfoManager(XplPlugin):
     '''
@@ -72,19 +53,35 @@ class TeleinfoManager(XplPlugin):
         Start teleinfo device handler
         '''
         XplPlugin.__init__(self, name='teleinfo')
-        self._config = Query(self._myxpl)
+        self._config = Query(self.myxpl, self.log)
         res = XplResult()
         self._config.query('teleinfo', 'device', res)
         device = res.get_value()['device']
         res = XplResult()
         self._config.query('teleinfo', 'interval', res)
         interval = res.get_value()['interval']
-        self._device = device
-        self._myteleinfo  = TeleInfo(device, self._broadcastframe, interval)
-        self.add_stop_cb(self._myteleinfo.stop)
-        self._myteleinfo.start()
 
-    def _broadcastframe(self, frame):
+        # Init Teleinfo
+        teleinfo  = Teleinfo(self.log, self.send_xpl)
+        
+        # Open Teleinfo modem
+        try:
+            teleinfo.open(device)
+        except TeleinfoException as err:
+            self.log.error(err.value)
+            print err.value
+            self.force_leave()
+            return
+            
+        # Start reading Teleinfo
+        teleinfo_process = threading.Thread(None,
+                                   teleinfo.listen,
+                                   None,
+                                   (float(interval),),
+                                   {})                                  
+        teleinfo_process.start()                              
+
+    def send_xpl(self, frame):
         ''' Send a frame from teleinfo device to xpl
         @param frame : a dictionnary mapping teleinfo informations
         '''
@@ -96,10 +93,10 @@ class TeleinfoManager(XplPlugin):
             my_temp_message.set_schema("teleinfo.basic")
 
         for entry in frame:
-            my_temp_message.add_data({entry["name"].lower() : entry["value"]})
-        my_temp_message.add_data({"device": self._device})
+            my_temp_message.add_data({entry["name"].lower().strip("\x00\x10") : entry["value"].strip("\x00\x10")})
+        my_temp_message.add_data({"device": "teleinfo"})
 
-        self._myxpl.send(my_temp_message)
+        self.myxpl.send(my_temp_message)
 
 if __name__ == "__main__":
     TeleinfoManager()

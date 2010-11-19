@@ -20,6 +20,8 @@
 
 
 {% load i18n %}
+{% load text %}
+
 {% block css %}
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-tables.css" rel="stylesheet" type="text/css" />
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/page-admin-organization.css" rel="stylesheet" type="text/css" />
@@ -33,7 +35,8 @@
         // Accordion
         $("#nav2").accordion({ autoHeight: false, header: ".subnav2", active:0});
         
-        $("#tabs").tabs().domogik_tabs({
+        {% regroup devices_list|dictsort:"device_usage_id" by device_usage as grouped_usages_list %}
+        $("#tabs").tabs({'selected': {% get_position grouped_usages_list id 1 %}}).domogik_tabs({
             addTitle: "{% trans "Add new device" %}",
             addId: "addDialogButton"
         });
@@ -53,23 +56,13 @@
             tipsid: 'tipsAddDevice',
             fields: [
                 {name : 'adddevicename', type:'text', label:'Name', required: true, option: {min: 1, max: 80}},
-                {name : 'adddevicedescription', type:'text', label:'Description', required: false, option: {min: 1, max: 80}},
                 {name : 'adddeviceaddress', type:'text', label:'Address', required: true, option: {min: 1, max: 80}},
-                {name : 'adddevicereference', type:'text', label:'Reference', required: false, option: {min: 1, max: 80}},
-                {name : 'adddeviceusage', type:'select', label:'Usage', required: true, option: {
-                    initial: {value:'0', label:'Choose a usage'},
-                    options: [
-                    {% for usage in usages_list %}
-                        {value:'{{ usage.id }}', label: '{{ usage.name }}'},
-                    {% endfor %}
-                    ]
-                }},
-                {name : 'adddevicetype', type:'selectipod', label:'Type', required: true, option: {
-                    initial: {value:'0', label:'Choose a device type'},
+                {name : 'adddevicetype', type:'selectipod', label:'Feature', required: true, option: {
+                    initial: {value:'0', label:'Choose a device feature', icone:''},
                     options: [
                         {% regroup types_list|dictsort:"device_technology_id" by device_technology as technologies_list %}
                         {% for technology in technologies_list %}
-                            { label: '{{ technology.grouper.name }}', icon:'icon16-technology-{{ technology.grouper.name|lower }}',
+                            { label: '{{ technology.grouper.name }}', icon:'icon16-technology-{{ technology.grouper.id }}',
                                 submenu: [
                                 {% for type in technology.list %}
                                     {value:'{{ type.id }}', label:'{{ type.name }}'},
@@ -78,7 +71,17 @@
                             },
                         {% endfor %}
                     ]
-                }}
+                }},
+                {name : 'adddeviceusage', type:'selectipod', label:'Usage', required: true, option: {
+                    initial: {value:'0', label:'Choose a usage', icone:''},
+                    options: [
+                    {% for usage in usages_list %}
+                        {value:'{{ usage.id }}', label: '{{ usage.name }}', icon: 'icon16-usage-{{ usage.id }}'},
+                    {% endfor %}
+                    ]
+                }},
+                {name : 'adddevicedescription', type:'text', label:'Description', required: false, option: {min: 1, max: 80}},
+                {name : 'adddevicereference', type:'text', label:'Reference', required: false, option: {min: 1, max: 80}}
             ]
         });
 
@@ -87,17 +90,17 @@
             tipsid: 'tipsUpdDevice',
             fields: [
                 {name : 'upddevicename', type:'text', label:'Name', required: true, option: {min: 1, max: 80}},
-                {name : 'upddevicedescription', type:'text', label:'Description', required: false, option: {min: 1, max: 80}},
                 {name : 'upddeviceaddress', type:'text', label:'Address', required: true, option: {min: 1, max: 80}},
-                {name : 'upddevicereference', type:'text', label:'Reference', required: false, option: {min: 1, max: 80}},
-                {name : 'upddeviceusage', type:'select', label:'Usage', required: true, option: {
-                    initial: {value:'0', label:'Choose a usage'},
+                {name : 'upddeviceusage', type:'selectipod', label:'Usage', required: true, option: {
+                    initial: {value:'0', label:'Choose a usage', icone:''},
                     options: [
                     {% for usage in usages_list %}
-                        {value:'{{ usage.id }}', label: '{{ usage.name }}'},
+                        {value:'{{ usage.id }}', label: '{{ usage.name }}', icon: 'icon16-usage-{{ usage.id }}'},
                     {% endfor %}
                     ]
-                }}
+                }},
+                {name : 'upddevicedescription', type:'text', label:'Description', required: false, option: {min: 1, max: 80}},
+                {name : 'upddevicereference', type:'text', label:'Reference', required: false, option: {min: 1, max: 80}}
             ]
         });
         
@@ -108,11 +111,11 @@
             onok: function(values) {
                 var self = this;
                 // Submit form
-                $.getREST(['base', 'device', 'add', 'name', values.adddevicename, 'address', values.adddeviceaddress, 'type_id', values.adddevicetype, 'usage_id', values.adddeviceusage, 'description', values.adddevicedescription, 'reference', values.adddevicereference],
+                rest.get(['base', 'device', 'add', 'name', values.adddevicename, 'address', values.adddeviceaddress, 'type_id', values.adddevicetype, 'usage_id', values.adddeviceusage, 'description', values.adddevicedescription, 'reference', values.adddevicereference],
                     function(data) {
                         var status = (data.status).toLowerCase();
                         if (status == 'ok') {
-                            $.reloadPage({'status': 'ok', 'msg': '{% trans "New device added" %} \'' + data.device[0].name + '\''});                                   
+                            $.reloadPage({'status': 'ok', 'msg': '{% trans "New device added" %} \'' + data.device[0].name + '\'', 'id': data.device[0].device_usage_id});                                   
                         } else {
                             $.notification('error', '{% trans "device not created" %} (' + data.description + ')');                                                                      
                         }
@@ -134,8 +137,8 @@
         <div id="tabs">
             {% spaceless %}
             <ul>
-                {% regroup devices_list|dictsort:"device_usage_id" by device_usage as usages_list %}
-                {% for usage in usages_list %}
+                {% regroup devices_list|dictsort:"device_usage_id" by device_usage as grouped_usages_list %}
+                {% for usage in grouped_usages_list %}
                     {% if usage.grouper.id %}
                         <li><a id="tab{{ usage.grouper.id }}" href="#element{{ usage.grouper.id }}" class="icon16-usage-{{ usage.grouper.id }}">{{ usage.grouper.name }}</a></li>
                     {% endif %}
@@ -147,7 +150,7 @@
                 {% if usage.grouper.id %}
                     <div id="element{{ usage.grouper.id }}" class="tabelement">
                 {% endif %}
-                <table>
+                <table class='simple'>
                     <tr>
                         <th>{% trans "Name" %}</th>
                         <th>{% trans "Description" %}</th>
@@ -165,7 +168,49 @@
                                 button: "#del{{ device.id }}",
                                 name: "'{{ device.name }}'",
                                 onok: function() {
-                                    $.getREST(['base', 'device', 'del', '{{ device.id }}'],
+                                    rest.get(['base', 'feature', 'list', 'by-device_id', '{{ device.id }}'],
+                                        function(data) {
+                                            var status = (data.status).toLowerCase();
+                                            if (status == 'ok') {
+                                                $.each(data.feature, function(index, feature){
+                                                    rest.get(['base', 'feature_association', 'list', 'by-feature', feature.id],
+                                                        function(data) {
+                                                            var status = (data.status).toLowerCase();
+                                                            if (status == 'ok') {
+                                                                $.each(data.feature_association, function(index, association){
+                                                                    rest.get(['base', 'ui_config', 'del', 'by-reference', 'association', association.id],
+                                                                        function(data) {
+                                                                            var status = (data.status).toLowerCase();
+                                                                            if (status == 'ok') {
+                                                                            } else {
+                                                                                $.notification('error', '{% trans "ui-config for features not deleted" %} (' + data.description + ')');                                                                      
+                                                                            }
+                                                                        }
+                                                                    );
+                                                                });
+                                                                rest.get(['base', 'feature_association', 'del', 'feature_id', feature.id],
+                                                                    function(data) {
+                                                                        var status = (data.status).toLowerCase();
+                                                                        if (status == 'ok') {
+                                                                        } else {
+                                                                            $.notification('error', '{% trans "feature_association not deleted" %} (' + data.description + ')');                                                                      
+                                                                        }
+                                                                    }
+                                                                );
+                                                            } else {
+                                                                $.notification('error', '{% trans "Can not get feature_association list for feature" %} (' + data.description + ')');
+                                                            }
+                                                        }
+                                                    );
+                                                });
+                                                
+                                            } else {
+                                                $.notification('error', '{% trans "Can not get feature list for device" %} (' + data.description + ')');
+                                            }
+                                        }
+                                    );
+
+                                    rest.get(['base', 'device', 'del', '{{ device.id }}'],
                                         function(data) {
                                             var status = (data.status).toLowerCase();
                                             if (status == 'ok') {
@@ -180,12 +225,12 @@
                             
                             /* Add a function to create a device */
                             $('#upddevicedialog').dialog_form('updbutton', {
-                                title: "{% trans "Add new device" %}",
+                                title: "{% trans 'Update new device' %}",
                                 button: "#update{{ device.id }}",
                                 values: {upddevicename : '{{ device.name }}', upddevicedescription : '{{ device.description }}', upddeviceaddress : '{{ device.address }}', upddevicereference : '{{ device.reference }}', upddeviceusage : '{{ device.device_usage_id }}'},
                                 onok: function(values) {
                                     // Submit form
-                                    $.getREST(['base', 'device', 'update', 'id', '{{ device.id }}', 'name', values.upddevicename, 'address', values.upddeviceaddress, 'type_id', values.upddeviceusage, 'description', values.upddevicedescription, 'reference', values.upddevicereference],
+                                    rest.get(['base', 'device', 'update', 'id', '{{ device.id }}', 'name', values.upddevicename, 'address', values.upddeviceaddress, 'type_id', values.upddeviceusage, 'description', values.upddevicedescription, 'reference', values.upddevicereference],
                                         function(data) {
                                             var status = (data.status).toLowerCase();
                                             if (status == 'ok') {

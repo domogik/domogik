@@ -74,6 +74,7 @@ function Menu(caller, options){
 		$.each(allUIMenus, function(i){
 			if (allUIMenus[i].menuOpen) { allUIMenus[i].kill(); };	
 		});
+        caller.focus();
 	};
 	
 	this.kill = function(){
@@ -126,12 +127,11 @@ function Menu(caller, options){
 					
 					if (menuType == 'ipod') {
 						$(event.target).trigger('mouseout');
-						if ($('.fg-menu-footer').find('a').size() > 0) { $('.fg-menu-footer').find('a').trigger('click'); };
-						if ($('.fg-menu-header').find('a').size() > 0) { $('.fg-menu-current-crumb').prev().find('a').trigger('click'); };
+						if ($('.fg-menu-footer').find('a').size() > 0) { $('.fg-menu-footer').find('a').trigger('click');};
+						if ($('.fg-menu-header').find('a').size() > 0) { $('.fg-menu-current-crumb').prev().find('a').trigger('click');};
 						if ($('.fg-menu-current').prev().is('.fg-menu-indicator')) {
-							$('.fg-menu-current').prev().trigger('mouseover');							
-						};						
-					};
+							$('.fg-menu-current').prev().trigger('mouseover');};						
+                        };
 					return false;
 					break;
 					
@@ -209,6 +209,8 @@ function Menu(caller, options){
 				menu.chooseItem(this);
 				return false;
 			});
+            if (container.height() > options.maxHeight) { container.addClass('fg-menu-scroll') };	
+    		container.css({ height: options.maxHeight });
 		};	
 		
 		if (options.linkHover) {
@@ -241,11 +243,11 @@ function Menu(caller, options){
 	};
 	
 	this.chooseItem = function(item){
-
 		// edit this for your own custom function/callback:
         $(options.resultValueField).val($(item).attr('value'));
-        $(options.resultTextElement).text($(item).attr('valuetxt'));
+        $(options.resultTextElement).html("<div class='" + $(item).attr('valueicon') + "'>" + $(item).attr('valuetxt') + "</div>");
         menu.kill();
+        caller.focus();
 	};
 };
 

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<statistic technology="rfid">
+    <schema name="sensor.basic">
+        <xpltype type="xpl-trig">
+            <listener>
+                <filter>
+                    <key name="type" value="present"/>
+                    <key name="type" value="activated"/>
+                </filter>
+            </listener>
+            <mapping>
+                <device field="device"/>
+                <value field="current" new_name="present"
+                       filter_key="type" filter_value="present" />
+                <value field="current" new_name="activated"
+                       filter_key="type" filter_value="activated" />
+            </mapping>
+        </xpltype>
+    </schema>
+</statistic>

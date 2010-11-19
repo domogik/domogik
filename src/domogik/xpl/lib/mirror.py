@@ -28,135 +28,113 @@ Implements
 ==========
 
 - Mirror
--   _MirrorHandler
 
-@author: Friz <fritz.smh@gmail.com>
+@author: Fritz <fritz.smh@gmail.com>
 @copyright: (C) 2007-2009 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """
-import threading
+
 import binascii
-import time
-from domogik.common import logger
 
+
+class MirrorException(Exception):  
+    """                                                                         
+    Mirror exception                                                           
+    """                                                                         
+                                                                                
+    def __init__(self, value):                                                  
+        Exception.__init__(self)
+        self.value = value                                                      
+                                                                                
+    def __str__(self):                                                          
+        return repr(self.value)           
+        
+        
 class Mirror:
-    """ Listen to mir:ror
+    """ Helpers for Mir:ror
     """
 
-    def __init__(self, mirror_device, nb_max_try, interval, callback):
-        """ @param mirror_device : device of mir:ror (/dev/hidrawX)
-        @param callback : method to call each time all data are collected
+    def __init__(self, log, callback):
+        """ Init Mirror object
+            @param log : log instance
+            @param callback : callback
         """
-        self._stop = threading.Event()
-        self._thread = self._MirrorHandler(mirror_device, int(nb_max_try), \
-                                            float(interval), callback,
-                                            self._stop)
+        self._log = log
+        self._callback = callback
+        self._mirror = None
 
-    def start(self):
-        """ Start the mirror handler thread
+    def open(self, device):
+        """ Open Mir:ror device
+            @param device : mir:ror device (/dev/hidrawX)
         """
-        self._thread.start()
-
-    def stop(self):
-        """ Ask the thread to stop, it can take times
+        try:
+            self._log.info("Try to open Mir:ror device : %s" % device)
+            self._mirror = open(device, "rb")
+            self._log.info("Mir:ror device opened")
+        except:
+            error = "Error while opening Mir:ror device : %s. Check if it is the good device or if you have the good permissions on it." % device
+            raise MirrorException(error)
+            
+    def close(self):
+        """ close Mir:ror device
         """
-        self._stop.set()
+        self._log.info("Close Mir:ror device")
+        try:
+            self._mirror.close()
+        except:
+            error = "Error while closing modem device"
+            raise MirrorException(error)
 
-
-    class _MirrorHandler(threading.Thread):
-        """ Internal class
-        Read data mir:ror device
+    def listen(self):
+        """ Start listening to Mir:ror
         """
+        # listen to mir:ror
+        self._log.info("Start listening Mir:ror")
+        # infinite 
+        while True:
+            device, my_type, current = self.read()
+            if device != None:
+                self._callback(device, my_type, current)
+            
+    def read(self):        
+        """ Read Mir:ror device once
+        """        
+        # We read 16 byte
+        data = self._mirror.read(16)
+        # if the first byte is not null, this is a message
+        if data[0] != '\x00':
+            # first byte : action type : ztamp or action on mir:ror
+            if data[0] == '\x02':
+                ### action on ztamp
+                # data[0] and data[1] : action type
+                # data[2...15] : ztamp identifier
+                #        (it seems that 2,3, 14,15 are always nulls)
+                self._log.debug("Action on : ztamp")
+                ztamp_id = binascii.hexlify(data[2]+data[3]+ \
+                                 data[4]+data[5]+data[6]+ \
+                                 data[7]+data[8]+data[9]+ \
+                                 data[10]+data[11]+data[12]+ \
+                                 data[13]+data[14]+data[15])
+                if data[1] == '\x01':
+                    self._log.debug("ztamp near from mir:ror : "+ ztamp_id)
+                    return ztamp_id, "present", "HIGH"
+                if data[1] == '\x02':
+                    self._log.debug("ztamp far from mir:ror : "+ ztamp_id)
+                    return ztamp_id, "present", "LOW"
 
-        def __init__(self, mirror_device, nb_max_try, interval, callback, lock):
+            if data[0] == '\x01':
+                ### action on mir:ror
+                # Only the data[0] and data[1] are used in this case
+                # The others are nulls
+                if data[1] == '\x04':
+                    self._log.debug("Action on : mir:ror")
+                    self._log.debug("mir:ror faced up")
+                    return "mirror", "activated", "HIGH"
+                if data[1] == '\x05':
+                    self._log.debug("Action on : mir:ror")
+                    self._log.debug("mir:ror faced down")
+                    return "mirror", "activated", "LOW"
+        return None, None, None
 
-            # logging initialization
-            my_logger = logger.Logger('Mirror')
-            self._log = my_logger.get_logger()
-
-            self._log.info("mir:ror initialisation...")
-            self._lock = lock
-            self.mirror_device = mirror_device
-            self._cb = callback
-            self._device_not_open = 1
-            nb_try = 0
-            while self._device_not_open and nb_try < nb_max_try:
-                self._log.debug("- open " + self.mirror_device)
-                try:
-                    self._mirror = open(self.mirror_device, "rb")
-                    self._device_not_open = 0
-                    self._log.debug("- mir:ror open")
-                except:
-                    self._log.error("- error while opening " + \
-                                    self.mirror_device + \
-                                    "(" + str(nb_try+1) + "/" + \
-                                    str(nb_max_try) + \
-                                    "). Next try in 15s")
-                    # device is not connected : we wait for 15s before next try
-                    time.sleep(interval)
-                    nb_try = nb_try + 1
-
-            # Initialize thread
-            threading.Thread.__init__(self)
-
-        def __del__(self):
-            if self._mirror.isOpen():
-                self._log.debug("Close " + self.mirror_device)
-                self._mirror.close()
-
-        def run(self):
-            """ Start listening to mir:ror
-            """
-            # listen to mir:ror
-            if self._device_not_open == 0:
-                self._log.info("Start listening mirror")
-                while not self._lock.isSet():
-                    # We read 16 byte
-                    data = self._mirror.read(16)
-                    # if the first byte is not null, this is a message
-                    if data[0] != '\x00':
-                        # first byte : action type : ztamp or action on mir:ror
-                        if data[0] == '\x02':
-                            ### action on ztamp
-                            # data[0] and data[1] : action type
-                            # data[2...15] : ztamp identifier
-                            #        (it seems that 2,3, 14,15 are always nulls)
-                            self._log.debug("Action on : ztamp")
-                            ztamp_id = binascii.hexlify(data[2]+data[3]+ \
-                                             data[4]+data[5]+data[6]+ \
-                                             data[7]+data[8]+data[9]+ \
-                                             data[10]+data[11]+data[12]+ \
-                                             data[13]+data[14]+data[15])
-                            if data[1] == '\x01':
-                                self._log.debug("ztamp near from mir:ror : "+ ztamp_id)
-                                self._cb("ztamp_in", ztamp_id)
-                            if data[1] == '\x02':
-                                self._log.debug("ztamp far from mir:ror : "+ ztamp_id)
-                                self._cb("ztamp_out", ztamp_id)
-
-                        if data[0] == '\x01':
-                            ### action on mir:ror
-                            # Only the data[0] and data[1] are used in this case
-                            # The others are nulls
-                            self._log.debug("Action on : mir:ror")
-                            if data[1] == '\x04':
-                                self._log.debug("mir:ror faced up")
-                                self._cb("mirror_up", "0")
-                            if data[1] == '\x05':
-                                self._log.debug("mir:ror faced down")
-                                self._cb("mirror_down", "0")
-            else:
-                self._log.error("No mirror detected")
-
-
-###Exemple
-def cb_print(action, ztamp_id):
-    """ Test fucntion
-    """
-    print "ACTION : %s" % action
-    print "ZTAMPID : %s" % ztamp_id
-
-if __name__ == "__main__":
-    MIRROR = Mirror('/dev/hidraw0', 15, 10, cb_print)
-    MIRROR.start()
+                    

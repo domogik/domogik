@@ -27,7 +27,6 @@ Defines the sql schema used by Domogik
 Implements
 ==========
 
-- class Enum
 - class Area
 - class Room
 - class DeviceUsage
@@ -35,7 +34,7 @@ Implements
 - class PluginConfig
 - class DeviceType(Base):
 - class Device
-- class DeviceTypeFeature
+- class DeviceFeature
 - class DeviceFeatureAssociation
 - class DeviceConfig
 - class DeviceStats
@@ -53,68 +52,36 @@ Implements
 @organization: Domogik
 """
 
+import time, sys
 from exceptions import AssertionError
 
-from sqlalchemy import types, create_engine, Table, Column, Integer, String, \
-                       MetaData, ForeignKey, Boolean, DateTime, Date, Text, Unicode, UnicodeText, UniqueConstraint
+from sqlalchemy import (
+        types, create_engine, Table, Column, Integer, Float, String, Enum,
+        MetaData, ForeignKey, Boolean, DateTime, Date, Text,
+        Unicode, UnicodeText, UniqueConstraint
+)
 from sqlalchemy.types import TIMESTAMP
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relation, backref
 
+from domogik.common.utils import ucode
 from domogik.common.configloader import Loader
 
+
 DEVICE_TYPE_LIST = ['appliance', 'lamp', 'music', 'sensor']
-DEVICE_FEATURE_ASSOCIATION_LIST = [None, 'room', 'area', 'house']
-FEATURE_TYPE_LIST = ['actuator', 'sensor']
-ACTUATOR_VALUE_TYPE_LIST = ['binary', 'complex', 'list', 'number', 'range', 'string', 'trigger']
-SENSOR_VALUE_TYPE_LIST = ['binary', 'complex', 'number', 'string', 'trigger']
+ACTUATOR_VALUE_TYPE_LIST = ['binary', 'range', 'list', 'trigger', 'number', 'string', 'complex',]
+SENSOR_VALUE_TYPE_LIST = ['boolean', 'number', 'string']
 
 Base = declarative_base()
 metadata = Base.metadata
 
 _cfg = Loader('database')
-_config = _cfg.load()
+_config = None
+if len(sys.argv) > 1:
+    _config = _cfg.load(sys.argv[1])
+else:
+    _config = _cfg.load()
 _db_prefix = dict(_config[1])['db_prefix']
-
-
-class Enum(types.TypeDecorator):
-    """Emulate an Enum type (see http://www.sqlalchemy.org/trac/wiki/UsageRecipes/Enum)"""
-    impl = types.Unicode
-
-    def __init__(self, values, empty_to_none=True, strict=False):
-        """Class constructor
-
-        @param values : a list of valid values for this column
-        @param empty_to_none : treat the empty string '' as None (optional default = False)
-        @param strict : also insist that columns read from the database are in the
-                        list of valid values.  Note that, with strict=True, you won't
-                        be able to clean out bad data from the database through your
-                        code. (optional default = False)
-
-        """
-
-        if values is None or len(values) is 0:
-            raise AssertionError('Enum requires a list of values')
-        self.empty_to_none = empty_to_none
-        self.strict = strict
-        self.values = values[:]
-
-        # The length of the string/unicode column should be the longest string
-        # in values
-        size = max([len(v) for v in values if v is not None])
-        super(Enum, self).__init__(size)
-
-    def process_bind_param(self, value, dialect):
-        if self.empty_to_none and value is '':
-            value = None
-        if value not in self.values:
-            raise AssertionError('"%s" not in Enum.values' % value)
-        return value
-
-    def process_result_value(self, value, dialect):
-        if self.strict and value not in self.values:
-            raise AssertionError('"%s" not in Enum.values' % value)
-        return value
 
 
 # Define objects
@@ -135,8 +102,8 @@ class Area(Base):
         @param description : extended description, optional
 
         """
-        self.name = name
-        self.description = description
+        self.name = ucode(name)
+        self.description = ucode(description)
 
     def __repr__(self):
         """Return an internal representation of the class"""
@@ -166,8 +133,8 @@ class Room(Base):
         @param area_id : id of the area where the room is, optional
 
         """
-        self.name = name
-        self.description = description
+        self.name = ucode(name)
+        self.description = ucode(description)
         self.area_id = area_id
 
     def __repr__(self):
@@ -184,27 +151,29 @@ class DeviceUsage(Base):
     """Usage of a device (temperature, heating, lighting, music...)"""
 
     __tablename__ = '%s_device_usage' % _db_prefix
-    id = Column(Integer, primary_key=True)
+    id = Column(Unicode(80), primary_key=True)
     name = Column(Unicode(30), nullable=False)
     description = Column(UnicodeText())
     default_options = Column(UnicodeText())
 
-    def __init__(self, name, description=None, default_options=None):
+    def __init__(self, id, name, description=None, default_options=None):
         """Class constructor
 
+        @param id : usage id
         @param name : short name of the usage
         @param description : extended description, optional
         @param default_options : default options, optional
 
         """
-        self.name = name
-        self.description = description
-        self.default_options = default_options
+        self.id = ucode(id)
+        self.name = ucode(name)
+        self.description = ucode(description)
+        self.default_options = ucode(default_options)
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<DeviceUsage(id=%s, name='%s', desc='%s', default opt='%s')>" \
-               % (self.id, self.name, self.description, self.default_options)
+        return "<DeviceUsage(id=%s, name='%s', desc='%s', default opt='%s')>"\
+                % (self.id, self.name, self.description, self.default_options)
 
     @staticmethod
     def get_tablename():
@@ -216,7 +185,7 @@ class DeviceTechnology(Base):
     """Technology of a device (X10, PLCBus, 1wire, RFXCOM,...)"""
 
     __tablename__ = '%s_device_technology' % _db_prefix
-    id = Column(String(30), primary_key=True)
+    id = Column(Unicode(30), primary_key=True)
     name = Column(Unicode(30), nullable=False)
     description = Column(UnicodeText())
 
@@ -228,9 +197,9 @@ class DeviceTechnology(Base):
         @param description : extended description, optional
 
         """
-        self.id = id
-        self.name = name
-        self.description = description
+        self.id = ucode(id)
+        self.name = ucode(name)
+        self.description = ucode(description)
 
     def __repr__(self):
         """Return an internal representation of the class"""
@@ -260,10 +229,10 @@ class PluginConfig(Base):
         @param value : value
 
         """
-        self.name = name
-        self.hostname = hostname
-        self.key = key
-        self.value = value
+        self.name = ucode(name)
+        self.hostname = ucode(hostname)
+        self.key = ucode(key)
+        self.value = ucode(value)
 
     def __repr__(self):
         """Return an internal representation of the class"""
@@ -279,28 +248,29 @@ class DeviceType(Base):
     """Type of a device (x10.Switch, x10.Dimmer, Computer.WOL...)"""
 
     __tablename__ = '%s_device_type' % _db_prefix
-    id = Column(Integer, primary_key=True)
-    device_technology_id = Column(Unicode(30), ForeignKey('%s.id' % \
-                           DeviceTechnology.get_tablename()), nullable=False)
+    id = Column(Unicode(80), primary_key=True)
+    device_technology_id = Column(Unicode(30), ForeignKey('%s.id' % DeviceTechnology.get_tablename()), nullable=False)
     device_technology = relation(DeviceTechnology)
     name = Column(Unicode(30), nullable=False)
     description = Column(UnicodeText())
 
-    def __init__(self, name, device_technology_id, description=None):
+    def __init__(self, id, name, device_technology_id, description=None):
         """Class constructor
 
+        @paral id : device type id
         @param name : short name of the type
         @param description : extended description, optional
         @param device_technology_id : technology id
 
         """
-        self.name = name
-        self.description = description
-        self.device_technology_id = device_technology_id
+        self.id = ucode(id)
+        self.name = ucode(name)
+        self.description = ucode(description)
+        self.device_technology_id = ucode(device_technology_id)
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<DeviceType(id=%s, name='%s', desc='%s', device techno='%s')>" \
+        return "<DeviceType(id='%s', name='%s', desc='%s', device techno='%s')>"\
                % (self.id, self.name, self.description, self.device_technology)
 
     @staticmethod
@@ -318,11 +288,13 @@ class Device(Base):
     description = Column(UnicodeText())
     address = Column(Unicode(30), nullable=False)
     reference = Column(Unicode(30))
-    device_usage_id = Column(Integer, ForeignKey('%s.id' % DeviceUsage.get_tablename()), nullable=False)
+    device_usage_id = Column(Unicode(80), ForeignKey('%s.id' % DeviceUsage.get_tablename()), nullable=False)
     device_usage = relation(DeviceUsage)
-    device_type_id = Column(Integer, ForeignKey('%s.id' % DeviceType.get_tablename()), nullable=False)
+    device_type_id = Column(Unicode(80), ForeignKey('%s.id' % DeviceType.get_tablename()), nullable=False)
     device_type = relation(DeviceType)
-    device_stats = relation("DeviceStats", order_by="DeviceStats.date.desc()", backref=__tablename__)
+    device_stats = relation("DeviceStats", backref=__tablename__, cascade="all, delete")
+    device_configs = relation("DeviceConfig", backref=__tablename__, cascade="all, delete")
+    device_features = relation("DeviceFeature", backref=__tablename__, cascade="all, delete")
 
     def __init__(self, name, address, reference, device_usage_id, device_type_id, description=None):
         """Class constructor
@@ -335,17 +307,17 @@ class Device(Base):
         @param description : extended description, optional
 
         """
-        self.name = name
-        self.address = address
-        self.reference = reference
+        self.name = ucode(name)
+        self.address = ucode(address)
+        self.reference = ucode(reference)
         self.device_type_id = device_type_id
         self.device_usage_id = device_usage_id
-        self.description = description
+        self.description = ucode(description)
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<Device(id=%s, name='%s', addr='%s', desc='%s', ref='%s', type='%s', usage=%s)>" \
-               % (self.id, self.name, self.address, self.description, self.reference, \
+        return "<Device(id=%s, name='%s', addr='%s', desc='%s', ref='%s', type='%s', usage=%s)>"\
+               % (self.id, self.name, self.address, self.description, self.reference,\
                   self.device_type, self.device_usage)
 
     @staticmethod
@@ -354,91 +326,131 @@ class Device(Base):
         return Device.__tablename__
 
 
-class DeviceTypeFeature(Base):
-    """Device type features (actuator, sensor)"""
+class DeviceFeatureModel(Base):
+    """Device features that can be associated to a device (type) : switch, dimmer, temperature..."""
 
-    __tablename__ = '%s_device_type_feature' % _db_prefix
-    id = Column(Integer, primary_key=True)
+    __tablename__ = '%s_device_feature_model' % _db_prefix
+    id = Column(Unicode(80), primary_key=True)
     name = Column(Unicode(30), nullable=False)
-    feature_type = Column(Enum(FEATURE_TYPE_LIST), nullable=False)
-    device_type_id = Column(Integer, ForeignKey('%s.id' % DeviceType.get_tablename()), nullable=False)
+    feature_type = Column(Enum('actuator', 'sensor', name='feature_type_list'), nullable=False)
+    device_type_id = Column(Unicode(80), ForeignKey('%s.id' % DeviceType.get_tablename()), nullable=False)
     device_type = relation(DeviceType)
     parameters = Column(UnicodeText())
     value_type = Column(Unicode(30), nullable=False)
     stat_key = Column(Unicode(30))
     return_confirmation = Column(Boolean, nullable=False)
+    device_features = relation("DeviceFeature", backref=__tablename__, cascade="all, delete")
 
-    def __init__(self, name, feature_type, device_type_id, value_type, parameters=None, stat_key=None,
+    def __init__(self, id, name, feature_type, device_type_id, value_type, parameters=None, stat_key=None,
                 return_confirmation=False):
         """Class constructor
 
+        @param id : device feature id
         @param name : device feature name (Switch, Dimmer, Thermometer, Voltmeter...)
-        @param feature_type : device feature type
+        @param feature_type : device feature type (actuator / sensor)
         @param device_type_id : device type id
         @param value_type : value type the actuator can accept / the sensor can return
         @param parameters : parameters about the command or the returned data associated to the device, optional
         @param stat_key : key reference in the core_device_stats table, optional
-        @param return_confirmation : True if the device returns a confirmation after having executed a command ,optional (default False)
+        @param return_confirmation : True if the device returns a confirmation after having executed a command, optional (default False)
                                      Only relevant for actuators
 
         """
-        self.name = name
-        if feature_type != 'actuator' and feature_type != 'sensor':
+        self.id = ucode(id)
+        self.name = ucode(name)
+        if feature_type not in ('actuator', 'sensor'):
             raise Exception("Feature type must me either 'actuator' or 'sensor' but NOT %s" % feature_type)
         self.feature_type = feature_type
         if self.feature_type == 'actuator' and value_type not in ACTUATOR_VALUE_TYPE_LIST:
-            raise Exception("Can't add value type %s to an actuator it doesn't belong to list %s" \
+            raise Exception("Can't add value type %s to an actuator it doesn't belong to list %s"
                             % (value_type, ACTUATOR_VALUE_TYPE_LIST))
         elif self.feature_type == 'sensor' and value_type not in SENSOR_VALUE_TYPE_LIST:
-            raise Exception("Can't add value type %s to a sensor it doesn't belong to list %s" \
+            raise Exception("Can't add value type %s to a sensor it doesn't belong to list %s"
                             % (value_type, SENSOR_VALUE_TYPE_LIST))
         self.device_type_id = device_type_id
-        self.value_type = value_type
-        self.parameters = parameters
-        self.stat_key = stat_key
+        self.value_type = ucode(value_type)
+        self.parameters = ucode(parameters)
+        self.stat_key = ucode(stat_key)
         self.return_confirmation = return_confirmation
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<DeviceTypeFeature(%s, %s, device_type=%s, param=%s, value_type=%s, stat_key=%s, return_conf=%s)>" \
-               % (self.id, self.feature_type, self.device_type, self.parameters, self.value_type, \
+        return "<DeviceFeatureModel(%s, %s, device_type=%s, param=%s, value_type=%s, stat_key=%s, return_conf=%s)>"\
+               % (self.id, self.feature_type, self.device_type, self.parameters, self.value_type,\
                   self.stat_key, self.return_confirmation)
 
     @staticmethod
     def get_tablename():
         """Return the table name associated to the class"""
-        return DeviceTypeFeature.__tablename__
+        return DeviceFeatureModel.__tablename__
+
+
+class DeviceFeature(Base):
+    """Association between Device and DeviceFeatureModel entities"""
+
+    __tablename__ = '%s_device_feature' % _db_prefix
+    id = Column(Integer, primary_key=True)
+    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()))
+    device = relation(Device, backref=backref(__tablename__))
+    device_feature_model_id = Column(Unicode(80), ForeignKey('%s.id' % DeviceFeatureModel.get_tablename()))
+    device_feature_model = relation(DeviceFeatureModel)
+    device_feature_associations = relation("DeviceFeatureAssociation", backref=__tablename__, cascade="all, delete")
+
+    UniqueConstraint(device_id, device_feature_model_id)
+
+    def __init__(self, device_id, device_feature_model_id):
+        """Class constructor
+
+        @param device_id : device id
+        @param device_feature_model_id : device feature model id
+
+        """
+        self.device_id = device_id
+        self.device_feature_model_id = device_feature_model_id
+
+    def __repr__(self):
+        """Return an internal representation of the class"""
+        return "<DeviceFeature(%s, %s, %s)>" % (self.id, self.device, self.device_feature_model)
+
+    @staticmethod
+    def get_tablename():
+        """Return the table name associated to the class"""
+        return DeviceFeature.__tablename__
 
 
 class DeviceFeatureAssociation(Base):
     """Association between devices, features and an item (room, area, house)"""
 
     __tablename__ = '%s_device_feature_association' % _db_prefix
-    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), primary_key=True)
-    device = relation(Device, backref=backref(__tablename__))
-    device_type_feature_id = Column(Integer, ForeignKey('%s.id' % DeviceTypeFeature.get_tablename()), primary_key=True)
-    device_type_feature = relation(DeviceTypeFeature)
-    place_type = Column(Enum(DEVICE_FEATURE_ASSOCIATION_LIST), nullable=True)
+    id = Column(Integer, primary_key=True)
+    device_feature_id = Column(Integer, ForeignKey('%s.id' % DeviceFeature.get_tablename()))
+    device_feature = relation(DeviceFeature)
+    place_type = Column(Enum('room', 'area', 'house', name='place_type_list'), nullable=True)
     place_id = Column(Integer, nullable=True)
 
-    def __init__(self, device_id, device_type_feature_id, place_type=None, place_id=None):
+    def __init__(self, device_feature_id, place_type=None, place_id=None):
         """Class constructor
 
-        @param device_id : device id
-        @param device_type_feature_id : id of device type feature
+        @param device_feature_id : device feature id
         @param place_type : room, area or house, optional (None if the feature is not associated to one of the places)
         @param place_id : place id (None if it is the house, or if the feature is not associated to one of the places)
 
         """
-        self.device_id = device_id
-        self.device_type_feature_id = device_type_feature_id
+        device_feat_ass_list = [None, 'room', 'area', 'house']
+        if place_type not in device_feat_ass_list:
+            raise DbHelperException("Place type should be one of : %s" % device_feat_ass_list)
+        if place_type is None and place_id is not None:
+            raise DbHelperException("Place id should be None as item type is None")
+        if (place_type == 'room' or place_type == 'area') and place_id is None:
+            raise DbHelperException("A place id should have been provided, place type is %s" % place_type)
+        self.device_feature_id = device_feature_id
         self.place_type = place_type
         self.place_id = place_id
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<DeviceFeatureAssociation(%s, %s, %s, place_id=%s)>" \
-               % (self.device, self.device_type_feature, self.place_type, self.place_id)
+        return "<DeviceFeatureAssociation(%s, %s, %s, place_id=%s)>"\
+               % (self.id, self.device_feature, self.place_type, self.place_id)
 
     @staticmethod
     def get_tablename():
@@ -450,7 +462,7 @@ class DeviceConfig(Base):
     """Device configuration"""
 
     __tablename__ = '%s_device_config' % _db_prefix
-    key = Column(String(30), primary_key=True)
+    key = Column(Unicode(30), primary_key=True)
     value = Column(Unicode(255), nullable=False)
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), primary_key=True)
     device = relation(Device)
@@ -463,8 +475,8 @@ class DeviceConfig(Base):
         @param device_id : device id
 
         """
-        self.key = key
-        self.value = value
+        self.key = ucode(key)
+        self.value = ucode(value)
         self.device_id = device_id
 
     def __repr__(self):
@@ -481,25 +493,41 @@ class DeviceStats(Base):
     """Device stats (values that were associated to the device)"""
 
     __tablename__ = '%s_device_stats' % _db_prefix
-    date = Column(TIMESTAMP, primary_key=True)
+    date = Column(DateTime, primary_key=True)
+    # This is used for mysql compatibility reasons as timestamps are NOT handled in Unix Time format
+    timestamp = Column(Integer, nullable=False)
     key = Column(Unicode(30), primary_key=True)
-    value = Column(Unicode(255), nullable=False)
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), nullable=False, primary_key=True)
     device = relation(Device)
+    # We have both types for value field because we need an explicit numerical field in case we want to compute
+    # arithmetical operations (min/max/avg etc.). If it is a numerical value, both fields are filled in. If it is a
+    # character value only 'value' field is filled in.
+    __value_num = Column('value_num', Float)
+    value = Column('value_str', Unicode(255))
 
-    def __init__(self, date, key, value, device_id):
+    def __init__(self, date, timestamp, key, device_id, value):
         """Class constructor
 
-        @param device_id : device id
-        @param date : timestamp when the stat was recorded
+        @param date : date when the stat was recorded
+        @param timestamp : corresponding timestamp
         @param key : key
-        @param value : value
+        @param device_id : device id
+        @param value : stat value (numerical or string)
 
         """
         self.date = date
-        self.key = key
-        self.value = value
+        self.timestamp = timestamp
+        self.key = ucode(key)
+        try:
+            self.__value_num = float(value)
+        except ValueError:
+            pass
+        self.value = ucode(value)
         self.device_id = device_id
+
+    def get_date_as_timestamp(self):
+        """Convert DateTime value to timestamp"""
+        return time.mktime(self.date.timetuple())
 
     def __repr__(self):
         """Return an internal representation of the class"""
@@ -517,8 +545,8 @@ class Trigger(Base):
     __tablename__ = '%s_trigger' % _db_prefix
     id = Column(Integer, primary_key=True)
     description = Column(UnicodeText())
-    rule = Column(Text, nullable=False)
-    result = Column(Text, nullable=False)
+    rule = Column(UnicodeText(), nullable=False)
+    result = Column(UnicodeText(), nullable=False)
 
     def __init__(self, rule, result, description=None):
         """Class constructor
@@ -528,14 +556,14 @@ class Trigger(Base):
         @param description : long description of the rule, optional
 
         """
-        self.rule = rule
-        self.result = result
-        self.description = description
+        self.rule = ucode(rule)
+        self.result = ucode(result)
+        self.description = ucode(description)
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<Trigger(id=%s, desc='%s', rule='%s', result='%s')>" \
-                % (self.id, self.description, self.rule, self.result)
+        return "<Trigger(id=%s, desc='%s', rule='%s', result='%s')>"\
+               % (self.id, self.description, self.rule, self.result)
 
     @staticmethod
     def get_tablename():
@@ -551,6 +579,7 @@ class Person(Base):
     first_name = Column(Unicode(20), nullable=False)
     last_name = Column(Unicode(20), nullable=False)
     birthdate = Column(Date)
+    user_accounts = relation("UserAccount", backref=__tablename__, cascade="all, delete")
 
     def __init__(self, first_name, last_name, birthdate):
         """Class constructor
@@ -560,13 +589,13 @@ class Person(Base):
         @param birthdate : birthdate
 
         """
-        self.first_name = first_name
-        self.last_name = last_name
+        self.first_name = ucode(first_name)
+        self.last_name = ucode(last_name)
         self.birthdate = birthdate
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<Person(id=%s, first_name='%s', last_name='%s', birthdate='%s')>" \
+        return "<Person(id=%s, first_name='%s', last_name='%s', birthdate='%s')>"\
                % (self.id, self.first_name, self.last_name, self.birthdate)
 
     @staticmethod
@@ -581,7 +610,7 @@ class UserAccount(Base):
     __tablename__ = '%s_user_account' % _db_prefix
     id = Column(Integer, primary_key=True)
     login = Column(Unicode(20), nullable=False, unique=True)
-    password = Column(Unicode(255), nullable=False)
+    __password = Column("password", Unicode(255), nullable=False)
     person_id = Column(Integer, ForeignKey('%s.id' % Person.get_tablename()))
     person = relation(Person)
     is_admin = Column(Boolean, nullable=False, default=False)
@@ -597,84 +626,25 @@ class UserAccount(Base):
         @param skin_used : skin used in the UI (default value = 'default')
 
         """
-        self.login = login
-        self.password = password
+        self.login = ucode(login)
+        self.__password = ucode(password)
         self.person_id = person_id
         self.is_admin = is_admin
-        self.skin_used = skin_used
+        self.skin_used = ucode(skin_used)
+
+    def set_password(self, password):
+        """Set a password for the user"""
+        self.__password = ucode(password)
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<UserAccount(id=%s, login='%s', is_admin=%s, person=%s)>" \
-                % (self.id, self.login, self.is_admin, self.person)
+        return "<UserAccount(id=%s, login='%s', is_admin=%s, person=%s)>"\
+               % (self.id, self.login, self.is_admin, self.person)
 
     @staticmethod
     def get_tablename():
         """Return the table name associated to the class"""
         return UserAccount.__tablename__
-
-
-class SystemStats(Base):
-    """Statistics for the system"""
-
-    __tablename__ = '%s_system_stats' % _db_prefix
-    id = Column(Integer, primary_key=True)
-    name = Column(Unicode(30), nullable=False)
-    hostname = Column(Unicode(40), nullable=False)
-    date = Column(DateTime, nullable=False)
-
-    def __init__(self, plugin_name, host_name, date):
-        """Class constructor
-
-        @param plugin_name : plugin name
-        @param host_name : host name
-        @param date : datetime when the statistic was recorded
-
-        """
-        self.name = plugin_name
-        self.hostname = host_name
-        self.date = date
-
-    def __repr__(self):
-        """Return an internal representation of the class"""
-        return "<SystemStats(id=%s, plugin_name=%s, host_name=%s, date=%s)>" % (self.id, self.name, self.hostname, self.date)
-
-    @staticmethod
-    def get_tablename():
-        """Return the table name associated to the class"""
-        return SystemStats.__tablename__
-
-
-class SystemStatsValue(Base):
-    """Value(s) associated to a system statistic"""
-
-    __tablename__ = '%s_system_stats_value' % _db_prefix
-    id = Column(Integer, primary_key=True)
-    system_stats_id = Column(Integer, ForeignKey('%s.id' % SystemStats.get_tablename()), nullable=False)
-    system_stats = relation(SystemStats)
-    name = Column(Unicode(30), nullable=False)
-    value = Column(Unicode(255), nullable=False)
-
-    def __init__(self, name, value, system_stats_id):
-        """Class constructor
-
-        @param name : value name
-        @param value : value
-        @param system_stats_id : statistic id
-
-        """
-        self.name = name
-        self.value = value
-        self.system_stats_id = system_stats_id
-
-    def __repr__(self):
-        """Return an internal representation of the class"""
-        return "<SystemStatsValue(id=%s, name=%s, value=%s, stat_id=%s)>" % (self.id, self.name, self.value, self.system_stats)
-
-    @staticmethod
-    def get_tablename():
-        """Return the table name associated to the class"""
-        return SystemStatsValue.__tablename__
 
 
 class UIItemConfig(Base):
@@ -684,7 +654,7 @@ class UIItemConfig(Base):
     name =  Column(Unicode(30), primary_key=True)
     reference = Column(Unicode(30), primary_key=True)
     key = Column(Unicode(30), primary_key=True)
-    value = Column(Unicode(255), nullable=False)
+    value = Column(UnicodeText(), nullable=False)
 
     def __init__(self, name, reference, key, value):
         """Class constructor
@@ -695,14 +665,15 @@ class UIItemConfig(Base):
         @param value : associated value (ex. basement)
 
         """
-        self.name = name
-        self.reference = reference
-        self.key = key
-        self.value = value
+        self.name = ucode(name)
+        self.reference = ucode(reference)
+        self.key = ucode(key)
+        self.value = ucode(value)
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<UIItemConfig(name='%s' reference='%s', key='%s', value='%s')>" % (self.name, self.reference, self.key, self.value)
+        return "<UIItemConfig(name='%s' reference='%s', key='%s', value='%s')>"\
+               % (self.name, self.reference, self.key, self.value)
 
     @staticmethod
     def get_tablename():

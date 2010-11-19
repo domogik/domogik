@@ -1,0 +1,82 @@
+#commandline {
+	width:70%;
+}
+
+ul#result {
+    list-style:none;
+    margin:0;
+    padding:0;
+	background-color:#000000;
+	height:40em;
+	overflow-y:scroll;
+}
+
+ul#result li {
+    display:block;
+    margin: 0;
+    padding: 0;
+	color:#cccccc;
+	padding:5px 2em 0 2em;
+	font-family:Consolas,"Lucida Console",monospace,Verdana,sans-serif,"sans serif";
+    font-size:1.2em;
+	white-space: pre;
+}
+
+ul#result li.command {
+	border-top: #cccccc 1px dashed;
+	color:#ffffff;
+	font-weight:bold;
+	font-style: italic;
+	list-style-type:disc;
+	margin-top:10px;
+}
+
+ul#result li.error {
+	color:red;
+}
+
+/* REST tool */
+li .label {
+    font-weight:bold;
+}
+
+ul#fileslist {
+    margin-left:5em;
+    list-style: disc;		
+}
+
+.indicator {
+    position:relative;
+    width:30em;
+    height:2em;
+    background-color:#18CB46;
+    border:1px solid #5D5D5D;
+    -moz-border-radius: 0.5em;
+    -webkit-border-radius: 0.5em;
+    margin: 0 0 1em 1em;
+}
+
+.indicator .valuegraph {
+    position:absolute;
+    width:0;
+    height:2em;
+    background-color:#EB3222;
+}
+
+.indicator .valuetxtframe {
+    width:100%;
+    height:100%;
+    position:absolute;
+    text-align:center;
+    padding-top:0.2em;
+}
+
+.indicator .valuetxt {
+    display:inline-block;
+    line-height:1em;
+    padding: 0.3em 1em 0.3em 1em;
+    background-color:rgba(0,0,0,0.7);
+    color:#ffffff;
+    -moz-border-radius: 0.5em;
+    -webkit-border-radius: 0.5em;
+}

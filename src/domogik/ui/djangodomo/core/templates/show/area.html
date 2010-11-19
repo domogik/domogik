@@ -20,50 +20,13 @@
 {% endcomment %}
 
 {% load i18n %}
-{% load commands %}
 {% load text %}
 
 {% block js_script %}
+    var device_types = {{ device_types|safe }};
+    var device_usages = {{ device_usages|safe }};
     $(function() {
-        {% for feature in area.feature_association %}        
-            {% ifequal feature.device_type_feature.feature_type "actuator" %}
-                {% get_command_widget feature %}
-                {% get_command_init feature %}
-            {% endifequal %}
-            {% ifequal feature.device_type_feature.feature_type "sensor" %}
-                {% get_info_widget feature %}
-                {% get_info_init feature %}
-            {% endifequal %}
-        {% endfor %}
-        
-        {% if area.feature_association %}
-            {% regroup area.feature_association|dictsort:"device_id" by device as devices %}
-            var devices = [{% for device in devices %}{{ device.grouper.id }}{% if not forloop.last %},{% endif %}{% endfor %}];
-        
-            $.eventRequest(devices, function(event) {
-                switch(event.device_id) {
-                {% regroup area.feature_association|dictsort:"device_id" by device as devices %}
-                {% for device in devices %}
-                    case {{ device.grouper.id }}:
-                        $.each(event.data, function(index, item) {
-                            switch (item.key) {                        
-                            {% for association in device.list %}
-                                case '{{ association.device_type_feature.stat_key }}':
-                                    {% ifequal association.device_type_feature.feature_type "actuator" %}
-                                        {% get_command_update association 'item.value' %}
-                                    {% endifequal %}
-                                    {% ifequal association.device_type_feature.feature_type "sensor" %}
-                                        {% get_info_update association 'item.value' %}
-                                    {% endifequal %}                            
-                                    break;
-                            {% endfor %}                    
-                            }
-                        });
-                        break;
-                {% endfor %}
-                }
-            });
-        {% endif %}        
+        $.initAssociations('area', {{ area.id }}, device_usages, device_types);
     });
 {% endblock %}
 
@@ -71,51 +34,43 @@
 {% endblock %}
 
 {% block js_include %}
+    <script type="text/javascript" src="/design/js/page-show.js"></script>
 {% endblock %}
 
 {% block title %}{% trans page_title %}{% endblock %}
 
 {% block breadcrumb %}
 	<li><a href='{% url show_view %}' class='house'>{{ house.name|default:'House' }}</a></li>
-{% endblock %}
-
-{% block banner %}
-    <h1 class="ident icon64-area-{{ area.config.icon }}"><span class="title">{{ area.name }}</span></h1>
+	<li id='customize'><a href='{% url show_area_edit_view area.id 'show_page' %}' class='icon16-action-customize{% if not is_user_connected %} admin_required{% endif %}'>{% trans 'Customize' %}</a></li>
 {% endblock %}
 
 {% block contentleft %}
-    <div class='mainactions'>
-        <ul>
-        </ul>
-    </div>
-    <div class='actions'>
-        <ul>
-            {% for association in area.feature_association %}
-                <li><div id="widget_{{ association.device_id }}_{{ association.device_type_feature_id }}"></div></li>
-            {% endfor %}
-        </ul>
-    </div>
+    <section id="mainsection">
+        <div id='area_{{ area.id }}'>
+            <header>
+			    <h1 class="ident icon64-area-{{ area.config.icon }}"><span class="title">{{ area.name }}</span></h1>
+                <div class="maininfo" role='list'></div>
+            </header>
+            <div class='actions'>
+                <div class='mainactions' role='list'></div>
+                <div class='otheractions' role='list'></div>
+            </div>
+        </div>
+    </section>
 {% endblock %}
 
 {% block contentright %}
     {% for room in rooms_list %}
-		{% if forloop.counter0|divisibleby:"3" %}
-            <!--div class='row'-->
-        {% endif %}
-				<!--div class='column'-->
-					<div class='block'>
-						<h2 class='header icon64-room-{{ room.config.icon }}'>
-							<a href='{% url show_room_view room.id %}' class="ident">
-								<span class="title">{{ room.name }}</span>
-								<br />
-								<span class="subtitle">{{ room.description }}</span>
-							</a>
-						</h2>
-							<!--span class='temp icon32-device-temp'>21 &#176;C</span-->
-					</div>
-				<!--/div-->
-		{% if forloop.counter0|divisibleby:"3" %}
-            <!--/div-->
-		{% endif %}
+	    <div id='room_{{ room.id }}' class='block subsection'>
+            <h2 class='header icon64-room-{{ room.config.icon }}'>
+                <a href='{% url show_room_view room.id %}' class="ident">
+                    <span class="title">{{ room.name }}</span>
+                    <br />
+                    <span class="subtitle">{{ room.description }}</span>
+                </a>
+            </h2>
+            <div class="maininfo" role='list'></div>
+            <div class='mainactions' role='list'></div>
+        </div>
 	{% endfor %}
 {% endblock %}

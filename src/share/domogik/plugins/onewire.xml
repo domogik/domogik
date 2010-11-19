@@ -1,0 +1,101 @@
+<package type="plugin">
+  <name>onewire</name>
+  <technology>1wire</technology>
+  <description>Manage 1-wire devices</description>
+  <detail>Manage 1-wire devices.
+List of supported devices : 
+- DS18B20
+- DS18S20
+- DS2401</detail>
+  <version>0.1.0</version>
+  <documentation>http://wiki.domogik.org/tiki-index.php?page=plugin_onewire</documentation>
+  <author>Fritz</author>
+  <author-email>fritz.smh at gmail.com</author-email>
+  <configuration-keys>
+    <key>
+      <order-id>0</order-id>
+      <name>startup-plugin</name>
+      <type>boolean</type>
+      <description>Automatically start plugin at Domogik startup</description>
+      <default-value>False</default-value>
+    </key>
+    <key>
+      <order-id>1</order-id>
+      <name>device</name>
+      <type>string</type>
+      <description>1-Wire adapter device. For usb : 'u'</description>
+      <default-value>u</default-value>
+    </key>
+    <key>
+      <order-id>2</order-id>
+      <name>cache</name>
+      <type>boolean</type>
+      <description>Use of cache</description>
+      <default-value>False</default-value>
+    </key>
+    <key>
+      <order-id>3</order-id>
+      <name>ds18b20-en</name>
+      <type>boolean</type>
+      <description>Enable DS18B20 components</description>
+      <default-value>False</default-value>
+    </key>
+    <key>
+      <order-id>4</order-id>
+      <name>ds18b20-int</name>
+      <type>number</type>
+      <description>Interval between each data reading for DS18b20 components</description>
+      <default-value>60</default-value>
+    </key>
+    <key>
+      <order-id>5</order-id>
+      <name>ds18b20-res</name>
+      <type>list</type>
+      <list>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+      </list>
+      <description>Resolution to use in data reading for DS18B20 components</description>
+      <default-value>12</default-value>
+    </key>
+    <key>
+      <order-id>6</order-id>
+      <name>ds18s20-en</name>
+      <type>boolean</type>
+      <description>Enable DS18S20 components</description>
+      <default-value>False</default-value>
+    </key>
+    <key>
+      <order-id>7</order-id>
+      <name>ds18s20-int</name>
+      <type>number</type>
+      <description>Interval between each data reading for DS18S20 components</description>
+      <default-value>60</default-value>
+    </key>
+    <key>
+      <order-id>8</order-id>
+      <name>ds2401-en</name>
+      <type>boolean</type>
+      <description>Enable DS2401 components</description>
+      <default-value>False</default-value>
+    </key>
+    <key>
+      <order-id>9</order-id>
+      <name>ds2401-int</name>
+      <type>number</type>
+      <description>Interval between each data reading for DS2401 components</description>
+      <default-value>5</default-value>
+    </key>
+  </configuration-keys>
+  <files>
+    <file path="src/share/domogik/plugins/onewire.xml"/>
+    <file path="src/share/domogik/stats/1wire/sensor.basic-onewire.xml"/>
+    <file path="src/domogik/xpl/bin/onewire.py"/>
+    <file path="src/domogik/xpl/lib/onewire.py"/>
+  </files>
+  <depandancies>
+    <dep name="pyowfs >= 0.1.3"/>
+  </depandancies>
+</package>

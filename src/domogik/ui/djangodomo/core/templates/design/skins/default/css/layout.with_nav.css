@@ -111,10 +111,9 @@ header#mainheader #subtitle {
     color: #FFFFFF;
 }
 
-#nav1 .login {
+#nav1 .login, #nav1 .help {
     float:none;
 }
-
 /* Main section */
 
 #content-bgnd {

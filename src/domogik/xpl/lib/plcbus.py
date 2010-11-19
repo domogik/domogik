@@ -44,16 +44,16 @@ Implements
 @organization: Domogik
 """
 
-from domogik.common import logger
 from domogik.xpl.lib.PLCBusSerialHandler import serialHandler
 
 
-class PLCBUSException:
+class PLCBUSException(Exception):
     '''
     PLCBUS Exception
     '''
 
     def __init__(self, value):
+        Exception.__init__(self)
         self.value = value
 
     def __str__(self):
@@ -66,15 +66,15 @@ class PLCBUSAPI:
     ALL_USER_UNIT_OFF must be with home unit=00.
     '''
 
-    def __init__(self, serial_port_no, command_cb, message_cb):
+    def __init__(self, log, serial_port_no, command_cb, message_cb):
         """ Main PLCBus manager
         Use serialHandler for low-level serial management
+        @param log : log instance
         @param serial_port_no : Number or path of the serial port
         @param command_cb: callback called when a command has been succesfully sent
         @param message_cb: called when a message is received from somewhere else on the network
         """
-        log = logger.Logger(self.__class__.__name__)
-        self._log = log.get_logger()
+        self._log = log
         #For these 2 callbacks, the param is sent as an array
         self._housecodes = list('ABCDEFGHIJKLMNOP')
         self._valuecode = enumerate(self._housecodes)
@@ -117,6 +117,7 @@ class PLCBUSAPI:
             'REPORT_ONLY_ON_PULSE': '1f'}
         #instead of using serial directly, use serialHandler
         self._ser_handler = serialHandler(serial_port_no, command_cb, message_cb)
+        self._ser_handler.start()
 
     def _valid_item(self, item):
         '''
@@ -154,9 +155,14 @@ class PLCBUSAPI:
             self._log.warning("Invalid user code %s, must be 'H' format, between 00 and FF" % h)
 
     def _convert_device_to_hex(self, item):
-        var1 = int(item[1:]) - 1
-        var2 = '%01X%01x' % (self._codevalue[item[0]], var1)
-        return var2
+        if item == None or len(item) == 0:
+            return "00"
+        elif len(item) == 1:
+            return '%01x0' % (self._codevalue[item[0]])
+        else: 
+            var1 = int(item[1:]) - 1
+            var2 = '%01X%01x' % (self._codevalue[item[0]], var1)
+            return var2
 
     def _convert_data(self, data):
         # result must have 2 caracters
@@ -206,20 +212,23 @@ class PLCBUSAPI:
         '''
         onlist = []
         self.send("GET_ALL_ON_ID_PULSE", housecode + "1", usercode)
-        response = self._ser_handler.get_from_answer_queue()
-        if(response):
-            print "Hoora response received", response
-            data = int(response[10:14], 16)
-            for i in range(0, 16):
-                if data >> i & 1:
-                    onlist.append(housecode + str(self._unitcodes[i]))
-        print "on :", onlist
-        return onlist
+#        response = self._ser_handler.get_from_answer_queue()
+#        if(response):
+#            print "Hoora response received", response
+#            data = int(response[10:14], 16)
+#            for i in range(0, 16):
+#                if data >> i & 1:
+#                    onlist.append(housecode + str(self._unitcodes[i]))
+#        print "on :", onlist
+#        return onlist
 
     def stop(self):
         """ Ask thread to stop
         """
+        self._log.debug("Stopping plcbus serial library")
         self._ser_handler.stop()
+
+
 
 ##test
 #a = PLCBUSAPI("/dev/ttyUSB0")

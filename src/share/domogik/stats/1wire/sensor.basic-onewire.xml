@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<statistic technology="onewire">
+    <schema name="sensor.basic">
+        <xpltype type="xpl-trig">
+            <listener>
+                <filter>
+                    <key name="type" value="temp"/>
+                    <key name="type" value="input"/>
+                </filter>
+            </listener>
+            <mapping>
+                <device field="device"/>
+                <value field="current" new_name="temperature" 
+                       filter_key="type" filter_value="temp" />
+                <value field="current" new_name="present" 
+                       filter_key="type" filter_value="input" />
+            </mapping>
+        </xpltype>
+        <xpltype type="xpl-stat">
+            <listener>
+                <filter>
+                    <key name="type" value="temp"/>
+                </filter>
+            </listener>
+            <mapping>
+                <device field="device"/>
+                <value field="current" new_name="temperature" 
+                       filter_key="type" filter_value="temp" />
+            </mapping>
+        </xpltype>
+    </schema>
+</statistic>
+

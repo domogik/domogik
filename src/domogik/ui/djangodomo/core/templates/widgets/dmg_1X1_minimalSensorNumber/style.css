@@ -1,0 +1,9 @@
+.dmg_1x1_minimalSensorNumber {
+    text-align:center;
+    line-height:5em;
+}
+.dmg_1x1_minimalSensorNumber .widget_value{
+    font-size:1.4em;
+    font-weight:bold;
+    position:absolute;
+}

@@ -24,7 +24,7 @@
 {% load text %}
 
 {% block css %}
-    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg-dragdrop.css" rel="stylesheet" type="text/css" />
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.dragdrop-basic.css" rel="stylesheet" type="text/css" />
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-tables.css" rel="stylesheet" type="text/css" />
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/page-admin-organization.css" rel="stylesheet" type="text/css" />
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/dmg.collabsible-list.css" rel="stylesheet" type="text/css" />
@@ -57,7 +57,7 @@
             keeptrace: true,
             dropcallback: function(self, element, target) {
                 var subelement = element.split('-');
-                $.getREST(['base', 'feature_association', 'del', 'device_id', subelement[1], 'feature_id', subelement[2]],
+                rest.get(['base', 'feature_association', 'del', 'device_id', subelement[1], 'feature_id', subelement[2]],
                     function(data) {
                         var status = (data.status).toLowerCase();
                         if (status == 'ok') {
@@ -80,11 +80,11 @@
             dropcallback: function(self, element, target) {
                 var subelement = element.split('-');
                 var subtarget = target.split('-');
-                $.getREST(['base', 'feature_association', 'del', 'device_id', subelement[1], 'feature_id', subelement[2]],
+                rest.get(['base', 'feature_association', 'del', 'device_id', subelement[1], 'feature_id', subelement[2]],
                     function(data) {
                         var status = (data.status).toLowerCase();
                         if (status == 'ok') {
-                            $.getREST(['base', 'feature_association', 'add', 'device_id', subelement[1], 'feature_id', subelement[2], 'association_type', subtarget[0], 'association_id', subtarget[1]],
+                            rest.get(['base', 'feature_association', 'add', 'device_id', subelement[1], 'feature_id', subelement[2], 'association_type', subtarget[0], 'association_id', subtarget[1]],
                                 function(data) {
                                     var status = (data.status).toLowerCase();
                                     if (status == 'ok') {
@@ -161,9 +161,9 @@
                     <legend class="choice icon16-house-default">{{ house.name }}</legend>
                     <ul class="draggables">
                         {% for association in house_features_associations %}
-                            <li class="draggable icon32-usage-{{ association.device.device_usage_id }} unknown" value="feature-{{ association.device_id }}-{{ association.device_type_feature_id }}" zoneorigin='target_device-{{ association.device_id }}'>
-                                <div id="feature_{{ association.device_id }}_{{ association.device_type_feature_id }}">
-                                    <span class='name'>{{ association.device.name|truncchar:10 }}<br/>{{ association.device_type_feature.name|truncchar:10 }}</span></div></li>
+                            <li class="draggable icon32-usage-{{ association.device.device_usage_id }} unknown" value="feature-{{ association.device_id }}-{{ association.device_feature_id }}" zoneorigin='target_device-{{ association.device_id }}'>
+                                <div id="feature_{{ association.device_id }}_{{ association.device_feature_id }}">
+                                    <span class='name'>{{ association.device.name|truncchar:10 }}<br/>{{ association.device_feature.name|truncchar:10 }}</span></div></li>
                         {% endfor %}
                     </ul>
                 </fieldset>
@@ -174,9 +174,9 @@
                     <legend class="choice icon16-area-{{ area.config.icon }}">{{ area.name }}</legend>
                     <ul class="draggables">
                         {% for association in area.feature_association %}
-                            <li class="draggable icon32-usage-{{ association.device.device_usage_id }} unknown" value="feature-{{ association.device_id }}-{{ association.device_type_feature_id }}" zoneorigin='target_device-{{ association.device_id }}'>
-                                <div id="feature_{{ association.device_id }}_{{ association.device_type_feature_id }}">
-                                    <span class='name'>{{ association.device.name|truncchar:10 }}<br/>{{ association.device_type_feature.name|truncchar:10 }}</span></div></li>
+                            <li class="draggable icon32-usage-{{ association.device.device_usage_id }} unknown" value="feature-{{ association.device_id }}-{{ association.device_feature_id }}" zoneorigin='target_device-{{ association.device_id }}'>
+                                <div id="feature_{{ association.device_id }}_{{ association.device_feature_id }}">
+                                    <span class='name'>{{ association.device.name|truncchar:10 }}<br/>{{ association.device_feature.name|truncchar:10 }}</span></div></li>
                         {% endfor %}
                     </ul>
                 </fieldset>
@@ -188,9 +188,9 @@
                     <legend class="choice icon16-room-{{ room.config.icon }}">{{ room.name }}</legend>
                     <ul class="draggables">
                         {% for association in room.feature_association %}
-                            <li class="draggable icon32-usage-{{ association.device.device_usage_id }} unknown" value="feature-{{ association.device_id }}-{{ association.device_type_feature_id }}" zoneorigin='target_device-{{ association.device_id }}'>
-                                <div id="feature_{{ association.device_id }}_{{ association.device_type_feature_id }}">
-                                    <span class='name'>{{ association.device.name }}<br/>{{ association.device_type_feature.name }}</span></div></li>
+                            <li class="draggable icon32-usage-{{ association.device.device_usage_id }} unknown" value="feature-{{ association.device_id }}-{{ association.device_feature_id }}" zoneorigin='target_device-{{ association.device_id }}'>
+                                <div id="feature_{{ association.device_id }}_{{ association.device_feature_id }}">
+                                    <span class='name'>{{ association.device.name }}<br/>{{ association.device_feature.name }}</span></div></li>
                         {% endfor %}
                     </ul>
                 </fieldset>

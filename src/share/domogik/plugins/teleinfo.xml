@@ -1,0 +1,43 @@
+<package type="plugin">
+  <name>teleinfo</name>
+  <technology>service</technology>
+  <description>Get power consumption with teleinfo</description>
+  <detail>Teleinfo is a french method to get power related informations.</detail>
+  <version>0.1.0</version>
+  <documentation>http://wiki.domogik.org/tiki-index.php?page=plugin_teleinfo</documentation>
+  <author>Maxence Dunnewind</author>
+  <author-email>maxence at dunnewind.net</author-email>
+  <configuration-keys>
+    <key>
+      <order-id>0</order-id>
+      <name>startup-plugin</name>
+      <type>boolean</type>
+      <description>Automatically start plugin at Domogik startup</description>
+      <default-value>False</default-value>
+    </key>
+    <key>
+      <order-id>1</order-id>
+      <name>device</name>
+      <type>string</type>
+      <description>Teleinfo device (ex : /dev/ttyUSB0 for an usb model)</description>
+      <default-value>/dev/teleinfo</default-value>
+    </key>
+    <key>
+      <order-id>2</order-id>
+      <name>interval</name>
+      <type>number</type>
+      <description>Interval between each request (seconds)</description>
+      <default-value>60</default-value>
+    </key>
+  </configuration-keys>
+  <files>
+    <file path="src/share/domogik/plugins/teleinfo.xml"/>
+    <file path="src/share/domogik/stats/teleinfo/teleinfo.basic-teleinfo.xml"/>
+    <file path="src/share/domogik/stats/teleinfo/teleinfo.short-teleinfo.xml"/>
+    <file path="src/domogik/xpl/bin/teleinfo.py"/>
+    <file path="src/domogik/xpl/lib/teleinfo.py"/>
+  </files>
+  <depandancies>
+    <dep name="pySerial > 2.4"/>
+  </depandancies>
+</package>

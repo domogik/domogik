@@ -57,13 +57,12 @@ class Sender(XplPlugin):
         XplPlugin.__init__(self, name = 'send', daemonize = False)
         self._schema = schema
         self._message = message
-        self._log = self.get_my_logger()
         self._args = []
         self._options = None
         self.parse_parameters()
         mess = self.forge_message()
-        self._log.debug("Send message : %s" % mess)
-        self._myxpl.send(mess)
+        self.log.debug("Send message : %s" % mess)
+        self.myxpl.send(mess)
         self.force_leave()
 
     def parse_parameters(self):
@@ -85,7 +84,7 @@ class Sender(XplPlugin):
             exit(1)
 
        # if self._args[1] not in self.supported_schemas:
-       #     self._log.error("Schema %s not supported" % self._args[0])
+       #     self.log.error("Schema %s not supported" % self._args[0])
        #     self.usage()
        #     exit(2)
 
@@ -99,7 +98,7 @@ class Sender(XplPlugin):
         datas = self._args[2].split(',')
         for data in datas:
             if "=" not in data:
-                self._log.error("Bad formatted commands. Must be key=value")
+                self.log.error("Bad formatted commands. Must be key=value")
                 self.usage()
                 exit(4)
             else:
@@ -114,7 +113,7 @@ usage : sendXPL.py message_type message_contents"
 \tmessage_type: Type of the message, must correspond to one of the supported \
 schemas
 \tmessage_contents: comma separated pairs key=value that will be put in message
-\tExample (x10): ./sendXPL.py xpl-cmnd x10.basic "device=a1,command=on"
+\tExample (x10): ./send.py xpl-cmnd x10.basic "device=a1,command=on"
 """
 
 def main():

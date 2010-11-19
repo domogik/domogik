@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<statistic technology="notification">
+    <schema name="notify.basic">
+        <xpltype type="xpl-trig">
+            <listener>
+                <filter/>
+            </listener>
+            <mapping>
+                <device type="notification"/>
+                <value field="title" />
+                <value field="message" />
+                <value field="type" />
+                <value field="timestamp" />
+            </mapping>
+        </xpltype>
+    </schema>
+</statistic>
+

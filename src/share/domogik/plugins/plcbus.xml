@@ -1,0 +1,64 @@
+<package type="plugin">
+  <name>plcbus</name>
+  <technology>plcbus</technology>
+  <description>Manage Plcbus devices</description>
+  <detail>Plcbus is a CPL based protocol to control lights, appliances and others things in your house</detail>
+  <version>0.1.0</version>
+<documentation>http://wiki.domogik.org/tiki-index.php?page=plugin_plcbus</documentation>
+  <author>François Pinet, Maxence Dunnewind</author>
+  <author-email>domopyx at gmail.com ; maxence at dunnewind.net</author-email>
+  <configuration-keys>
+    <key>
+      <order-id>0</order-id>
+      <name>startup-plugin</name>
+      <type>boolean</type>
+      <description>Automatically start plugin at Domogik startup</description>
+      <default-value>False</default-value>
+    </key>
+    <key>
+      <order-id>1</order-id>
+      <name>device</name>
+      <type>string</type>
+      <description>Plcbus device</description>
+      <default-value>/dev/plcbus</default-value>
+    </key>
+    <key>
+      <order-id>2</order-id>
+      <name>usercode</name>
+      <type>string</type>
+      <description>Usercode value (between 00 and FF), defaults to FF</description>
+      <default-value>FF</default-value>
+    </key>
+    <key>
+      <order-id>3</order-id>
+      <name>probe-interval</name>
+      <type>string</type>
+      <description>Interval between 2 probes to discover devices and check their state (0 = don't do probing).</description>
+      <default-value>30</default-value>
+     </key>
+    <key>
+      <order-id>4</order-id>
+      <name>probe-list</name>
+      <type>string</type>
+      <description>List of housecode to probe. If you know you don't use an house code remove it from the list.</description>
+      <default-value>ABCDEFGHIJKLMNOP</default-value>
+     </key>
+  </configuration-keys>
+  <files>
+    <file path="src/share/domogik/plugins/plcbus.xml"/>
+    <file path="src/share/domogik/stats/plcbus/plcbus.basic-plcbus.xml"/>
+    <file path="src/share/domogik/url2xpl/plcbus/all_lights_off.xml"/>
+    <file path="src/share/domogik/url2xpl/plcbus/all_lights_on.xml"/>
+    <file path="src/share/domogik/url2xpl/plcbus/bright.xml"/>
+    <file path="src/share/domogik/url2xpl/plcbus/dim.xml"/>
+    <file path="src/share/domogik/url2xpl/plcbus/on.xml"/>
+    <file path="src/share/domogik/url2xpl/plcbus/off.xml"/>
+    <file path="src/share/domogik/url2xpl/plcbus/preset_dim.xml"/>
+    <file path="src/domogik/xpl/bin/plcbus.py"/>
+    <file path="src/domogik/xpl/lib/plcbus.py"/>
+    <file path="src/domogik/xpl/lib/PLCBusSerialHandler.py"/>
+  </files>
+  <depandancies>
+    <dep name="pySerial > 2.4"/>
+  </depandancies>
+</package>

@@ -69,6 +69,7 @@
     text-decoration:none;
     background-position:left 50%;
     background-repeat:no-repeat;
+    position:relative;
 }
 
 #nav2 .titlenav2 {
@@ -98,6 +99,18 @@
     background-position: right 50%;
     background-repeat:no-repeat;
     min-height:16px;
-    padding-right:18px;
+    padding:0 18px 0 3em;
     line-height:16px;
+}
+
+.host {
+    padding: 0 0.5em 0 0.5em;
+    position:absolute;
+    top:0;
+    left:0;
+    font-size:0.8em;
+    font-style:italic;
+    border-bottom:1px solid #cccccc;
+    border-right:1px solid #cccccc;
+    -moz-border-radius: 0 0 0.8em 0;
 }

@@ -42,33 +42,6 @@ from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.plugin import XplResult
 from domogik.xpl.common.queryconfig import Query
 
-IS_DOMOGIK_PLUGIN = True
-DOMOGIK_PLUGIN_TECHNOLOGY = "communication"
-DOMOGIK_PLUGIN_DESCRIPTION = "Get events from a Google agenda"
-DOMOGIK_PLUGIN_VERSION = "0.1"
-DOMOGIK_PLUGIN_DOCUMENTATION_LINK = "http://wiki.domogik.org/tiki-index.php?page=plugins/GoogleAgenda"
-DOMOGIK_PLUGIN_CONFIGURATION = [
-      {"id" : 0,
-       "key" : "startup-plugin",
-       "type" : "boolean",
-       "description" : "Automatically start plugin at Domogik startup",
-       "default" : "False"},
-      {"id" : 1,
-       "key" : "email",
-       "type" : "string",
-       "description" : "Google email account",
-       "default" : ""},
-      {"id" : 2,
-       "key" : "password",
-       "type" : "string",
-       "description" : "Password for email account",
-       "default" : ""},
-      {"id" : 3,
-       "key" : "calendarname",
-       "type" : "string",
-       "description" : "Calendar name (default : your email)",
-       "default" : ""}]
-
 
 
 class GAgendaListener(XplPlugin):
@@ -81,37 +54,38 @@ class GAgendaListener(XplPlugin):
         XplPlugin.__init__(self, name = 'gagenda')
 
         # Create logger
-        self._log.debug("Listener for Google agenda created")
+        self.log.debug("Listener for Google agenda created")
 
         # Get config
-        self._config = Query(self._myxpl)
+        self._config = Query(self.myxpl, self.log)
         res = XplResult()
         self._config.query('gagenda', 'email', res)
         self._email = res.get_value()['email']
-        self._config = Query(self._myxpl)
+        self._config = Query(self.myxpl, self.log)
         res = XplResult()
         self._config.query('gagenda', 'password', res)
         self._password = res.get_value()['password']
-        self._config = Query(self._myxpl)
+        self._config = Query(self.myxpl, self.log)
         res = XplResult()
         self._config.query('gagenda', 'calendarname', res)
         self._calendar_name = res.get_value()['calendarname']
 
         # Create object
-        self._gagenda_manager = GAgenda(self._email, \
+        self._gagenda_manager = GAgenda(self.log, \
+                                       self._email, \
                                        self._password, \
                                        self._calendar_name, \
                                        self._broadcast_events)
 
         # Create listener for today
-        Listener(self.gagenda_cb, self._myxpl, {'schema': 'calendar.request',
+        Listener(self.gagenda_cb, self.myxpl, {'schema': 'calendar.request',
                 'xpltype': 'xpl-cmnd', 'command': 'REQUEST'})
 
     def gagenda_cb(self, message):
         """ Call google agenda lib
             @param message : xlp message received
         """
-        self._log.debug("Call gagenda_cb")
+        self.log.debug("Call gagenda_cb")
         if 'command' in message.data:
             command = message.data['command']
         if 'date' in message.data:
@@ -119,7 +93,7 @@ class GAgendaListener(XplPlugin):
 
         # if it is a request command
         if command == "REQUEST":
-            self._log.debug("Google agende request command received for " + \
+            self.log.debug("Google agende request command received for " + \
                             str(date))
             if date == "TODAY":
                 self._gagenda_manager.get_today_events()
@@ -141,7 +115,7 @@ class GAgendaListener(XplPlugin):
             print entry
             my_temp_message.add_data({"object" : entry["object"]})
             my_temp_message.add_data({"startdate" : entry["startdate"]})
-            self._myxpl.send(my_temp_message)
+            self.myxpl.send(my_temp_message)
 
 
 if __name__ == "__main__":
