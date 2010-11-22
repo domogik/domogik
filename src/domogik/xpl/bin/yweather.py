@@ -111,7 +111,7 @@ class YWeatherManager(XplPlugin):
                                             self._listen_stop, \
                                             self.myxpl)
                 self._listen_thr.start()
-               
+                self.enable_hbeat()               
             except YWeatherException as err:
                 self.log.error(err.value)
                 print err.value

@@ -80,6 +80,7 @@ class GAgendaListener(XplPlugin):
         # Create listener for today
         Listener(self.gagenda_cb, self.myxpl, {'schema': 'calendar.request',
                 'xpltype': 'xpl-cmnd', 'command': 'REQUEST'})
+        self.enable_hbeat()
 
     def gagenda_cb(self, message):
         """ Call google agenda lib

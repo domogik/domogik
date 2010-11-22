@@ -132,6 +132,9 @@ class Rest(XplPlugin):
 
         # API version
         self._rest_api_version = REST_API_VERSION
+
+        #Enable heartbeat
+        self.enable_hbeat()
     
         try:
     

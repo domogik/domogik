@@ -84,6 +84,7 @@ class SysManager(XplPlugin):
             help="Activate background ping for all plugins.")
         XplPlugin.__init__(self, name = 'manager', parser=parser)
 
+        self.enable_hbeat()
         # Logger init
         self.log.info("Host : %s" % self.get_sanitized_hostname())
     

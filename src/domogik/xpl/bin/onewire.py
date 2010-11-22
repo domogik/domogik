@@ -163,6 +163,7 @@ class OneWireManager(XplPlugin):
             self.log.error("Plugin error : stopping plugin... Trace : %s" % traceback.format_exc())
             print traceback.format_exc()
             self.force_leave()
+        self.enable_hbeat()
 
 
 

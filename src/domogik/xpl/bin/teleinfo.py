@@ -80,6 +80,7 @@ class TeleinfoManager(XplPlugin):
                                    (float(interval),),
                                    {})                                  
         teleinfo_process.start()                              
+        self.enable_hbeat()
 
     def send_xpl(self, frame):
         ''' Send a frame from teleinfo device to xpl

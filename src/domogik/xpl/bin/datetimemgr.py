@@ -54,6 +54,7 @@ class XPLDateTime(XplPlugin):
         self._timer = XplTimer(10, self._send_datetime, self.get_stop())
         self.register_timer(self._timer)
         self._timer.start()
+        self.enable_hbeat()
 
     def _format(self, number):
         '''

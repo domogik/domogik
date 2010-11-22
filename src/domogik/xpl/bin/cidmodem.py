@@ -83,6 +83,7 @@ class CIDManager(XplPlugin):
                                    (),
                                    {})                                  
         cid_process.start()                              
+        self.enable_hbeat()
 
     def send_xpl(self, num):
         """ Send xPL message on network

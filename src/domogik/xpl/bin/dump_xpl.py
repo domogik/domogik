@@ -49,6 +49,7 @@ class Sniffer(XplPlugin):
     def __init__(self):
         XplPlugin.__init__(self, name='sniffer', daemonize=False)
         Listener(self._sniffer_cb, self.myxpl)
+        self.enable_hbeat()
 
     def _sniffer_cb(self, message):
         '''
