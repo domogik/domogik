@@ -141,13 +141,7 @@ class Manager(BasePlugin):
             self._ip, self._port = self._UDPSock.getsockname()
             self.log.debug("xPL plugin %s socket bound to %s, port %s" \
                             % (self.get_plugin_name(), self._ip, self._port))
-            # All is good, we start sending Heartbeat every 5 minutes using
-            # XplTimer
-            self._SendHeartbeat()
-            self._h_timer = XplTimer(300, self._SendHeartbeat, self.get_stop(), self)
-            self._h_timer.start()
-            #We add a listener in order to answer to the hbeat requests
-            Listener(cb = self.got_hbeat, manager = self, filter = {'schema':'hbeat.request', 'xpltype':'xpl-cmnd'})
+            self._h_timer = None
             #And finally we start network listener in a thread
             self._stop_thread = False
             self._network = threading.Thread(None, self._run_thread_monitor,
@@ -155,6 +149,16 @@ class Manager(BasePlugin):
             self.register_thread(self._network)
             self._network.start()
             self.log.debug("xPL thread started for %s " % self.get_plugin_name())
+
+    def enable_hbeat(self):
+        """ Enable the answer to hbeat request 
+        """
+        if self._h_timer == None:
+            self._SendHeartbeat()
+            self._h_timer = XplTimer(300, self._SendHeartbeat, self.get_stop(), self)
+            self._h_timer.start()
+            #We add a listener in order to answer to the hbeat requests
+            Listener(cb = self.got_hbeat, manager = self, filter = {'schema':'hbeat.request', 'xpltype':'xpl-cmnd'})
 
     def leave(self):
         """

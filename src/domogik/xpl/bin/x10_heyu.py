@@ -60,7 +60,7 @@ class X10Main(XplPlugin):
         Create the X10Main class
         This class is used to connect x10 (through heyu) to the xPL Network
         """
-        XplPlugin.__init__(self, name = 'x10_heyu')
+        XplPlugin.__init__(self, name = 'x10_heyu', enable_hbeat = False)
         self._heyu_cfg_path_res = ""
         self._config = Query(self.myxpl, self.log)
         res = XplResult()
@@ -83,6 +83,7 @@ class X10Main(XplPlugin):
 #        self._monitor = X10Monitor(self._heyu_cfg_path_res)
 #        self._monitor.get_monitor().add_cb(self.x10_monitor_cb)
 #        self._monitor.get_monitor().start()
+        self.enable_hbeat()
         self.log.debug("Heyu correctly started")
 
     def heyu_reload_config(self, message):
