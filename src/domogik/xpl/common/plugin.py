@@ -57,7 +57,7 @@ class XplPlugin():
     __instance = None
 
     def __init__(self, name = None, stop_cb = None, is_manager = False, reload_cb = None, dump_cb = None, parser = None,
-                 daemonize = True):
+                 daemonize = True, enable_hbeat = True):
         '''
         Create XplPlugin instance, which defines signal handlers
         @param name : The n,ame of the current plugin
@@ -80,7 +80,7 @@ class XplPlugin():
             raise AttributeError, "'name' attribute is mandatory for the first instance"
         if XplPlugin.__instance is None:
             XplPlugin.__instance = XplPlugin.__Singl_XplPlugin(name, stop_cb, is_manager, reload_cb, dump_cb, parser,
-                                                               daemonize)
+                                                               daemonize, enable_hbeat)
             self.__dict__['_XplPlugin__instance'] = XplPlugin.__instance
         elif stop_cb is not None:
             XplPlugin.__instance.add_stop_cb(stop_cb)
@@ -97,7 +97,7 @@ class XplPlugin():
     class __Singl_XplPlugin(BasePlugin):
 
         def __init__(self, name, stop_cb = None, is_manager = False, reload_cb = None, dump_cb = None, parser = None,
-                     daemonize = True):
+                     daemonize = True, enable_hbeat = True):
             '''
             Create XplPlugin instance, which defines system handlers
             @param name : The name of the current plugin
@@ -137,9 +137,9 @@ class XplPlugin():
             else:
                 broadcast = "255.255.255.255"
             if 'bind_interface' in config:
-                self.myxpl = Manager(config['bind_interface'], broadcast = broadcast)
+                self.myxpl = Manager(config['bind_interface'], broadcast = broadcast, enable_hbeat = enable_hbeat)
             else:
-                self.myxpl = Manager(broadcast = broadcast)
+                self.myxpl = Manager(broadcast = broadcast, enable_hbeat = enable_hbeat)
             self._l = Listener(self._system_handler, self.myxpl, {'schema' : 'domogik.system',
                                                                    'xpltype':'xpl-cmnd'})
             self._reload_cb = reload_cb

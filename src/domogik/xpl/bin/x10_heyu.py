@@ -60,7 +60,7 @@ class X10Main(XplPlugin):
         Create the X10Main class
         This class is used to connect x10 (through heyu) to the xPL Network
         """
-        XplPlugin.__init__(self, name = 'x10_heyu')
+        XplPlugin.__init__(self, name = 'x10_heyu', enable_hbeat = False)
         self._heyu_cfg_path_res = ""
         self._config = Query(self.myxpl, self.log)
         res = XplResult()

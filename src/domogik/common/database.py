@@ -39,7 +39,6 @@ Implements
 @organization: Domogik
 """
 
-import sys
 import calendar, datetime, hashlib, time
 from types import DictType
 
@@ -1057,7 +1056,7 @@ class DbHelper():
 
         """
         # Get all non-affected rooms which are part of a device feature association
-        dfa_list= self.__session.query(
+        dfa_list = self.__session.query(
                     DeviceFeatureAssociation
                   ).filter(Room.id == DeviceFeatureAssociation.place_id
                   ).filter(DeviceFeatureAssociation.place_type == u'room'
