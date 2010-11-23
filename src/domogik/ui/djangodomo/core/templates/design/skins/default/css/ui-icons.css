@@ -98,6 +98,9 @@
 .icon64-usage-mirror { background-image:url(../images/device_usage/mirror/usage_64.png);}
 .icon32-usage-mirror { background-image:url(../images/device_usage/mirror/usage_32.png);}
 .icon16-usage-mirror { background-image:url(../images/device_usage/mirror/usage_16.png);}
+.icon64-usage-nabaztag { background-image:url(../images/device_usage/nabaztag/usage_64.png);}
+.icon32-usage-nabaztag { background-image:url(../images/device_usage/nabaztag/usage_32.png);}
+.icon16-usage-nabaztag { background-image:url(../images/device_usage/nabaztag/usage_16.png);}
 
 /* State icons */
 .icon32-usage-light.actuator.binary.unknown { background-image:url(../images/device_usage/light/undefined_32.png);}
@@ -294,6 +297,13 @@
 .icon32-usage-mirror.binary_1 { background-image:url(../images/device_usage/mirror/100_32.png);}
 .icon32-usage-mirror.range_0 { background-image:url(../images/device_usage/mirror/0_32.png);}
 .icon32-usage-mirror.range_100 { background-image:url(../images/device_usage/mirror/100_32.png);}
+
+.icon32-usage-nabaztag.unknown { background-image:url(../images/device_usage/nabaztag/undefined_32.png);}
+.icon32-usage-nabaztag.trigger { background-image:url(../images/device_usage/nabaztag/100_32.png);}
+.icon32-usage-nabaztag.binary_0 { background-image:url(../images/device_usage/nabaztag/0_32.png);}
+.icon32-usage-nabaztag.binary_1 { background-image:url(../images/device_usage/nabaztag/100_32.png);}
+.icon32-usage-nabaztag.range_0 { background-image:url(../images/device_usage/nabaztag/0_32.png);}
+.icon32-usage-nabaztag.range_100 { background-image:url(../images/device_usage/nabaztag/100_32.png);}
 
 /* Menu */
 .icon32-menu-helpers { background-image:url(../images/menu/terminal_32.png);}
