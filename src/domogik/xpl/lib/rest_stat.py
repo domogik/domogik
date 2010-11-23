@@ -47,17 +47,18 @@ import glob
 import calendar
 
 
-
-
-
-class StatsManager(XplPlugin):
+class StatsManager:
     """
     Listen on the xPL network and keep stats of device and system state
     """
-    def __init__(self, handler_params):
+    def __init__(self, handler_params, xpl):
+        """ 
+        @param handler_params : The server params 
+        @param xpl : A xPL Manager instance 
+        """
 
         try:
-            XplPlugin.__init__(self, 'statmgr')
+            self.myxpl = xpl
             cfg = Loader('domogik')
             config = cfg.load()
             cfg_db = dict(config[1])
@@ -112,8 +113,9 @@ class StatsManager(XplPlugin):
                                 "device_type": device_type}
                 
                         stats[technology][schema][xpl_type] = self._Stat(self.myxpl, res[technology][schema][xpl_type], technology, schema, xpl_type, self._log_stats, self._log_stats_unknown, self._db, self._event_requests)
+                        self._log_stats.info("Stat manager starter 1")
         except :
-            self._log_stats.error("%s" % self.get_exception())
+            self._log_stats.error("%s" % traceback.format_exc())
 
     def get_schemas_and_types(self, node):
         """ Get the schema and the xpl message type

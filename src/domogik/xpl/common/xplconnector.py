@@ -152,8 +152,9 @@ class Manager:
             self._network.start()
             self.p.log.debug("xPL thread started for %s " % self.p.get_plugin_name())
 
-    def enable_hbeat(self):
+    def enable_hbeat(self, lock = False):
         """ Enable the answer to hbeat request 
+        @param lock : If set to True, the process will lock  on 'should_stop'
         """
         if self._h_timer == None:
             self._SendHeartbeat()
@@ -161,6 +162,9 @@ class Manager:
             self._h_timer.start()
             #We add a listener in order to answer to the hbeat requests
             Listener(cb = self.got_hbeat, manager = self, filter = {'schema':'hbeat.request', 'xpltype':'xpl-cmnd'})
+            self.p.log.debug("Lock ? %s" % lock)
+            if lock:
+                self.get_stop().wait()
 
     def leave(self):
         """

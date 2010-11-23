@@ -308,7 +308,7 @@ class Rest(XplPlugin):
             self.start_http()
 
             # Enable hbeat
-            self.enable_hbeat()
+            self.enable_hbeat(lock = True)
         except :
             self.log.error("%s" % self.get_exception())
 
@@ -493,7 +493,8 @@ class Rest(XplPlugin):
         """
         print "Start Stats"
         self.log.info("Starting statistics manager. His logs will be in a dedicated log file")
-        StatsManager(handler_params = [self])
+        StatsManager(handler_params = [self], xpl = self.myxpl)
+        self.log.info("Stat manager started")
 
 
 

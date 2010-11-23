@@ -113,10 +113,10 @@ class XplPlugin(BasePlugin):
 
         self.log.debug("end single xpl plugin")
 
-    def enable_hbeat(self):
+    def enable_hbeat(self, lock):
         """ Wrapper for xplconnector.enable_hbeat()
         """
-        self.myxpl.enable_hbeat()
+        self.myxpl.enable_hbeat(lock)
 
     def _send_process_info(self, pid, data):
         """ Send process info (cpu, memory) on xpl
