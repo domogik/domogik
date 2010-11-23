@@ -48,22 +48,20 @@ from domogik.common.processinfo import ProcessInfo
 # time between each read of cpu/memory usage for process
 TIME_BETWEEN_EACH_PROCESS_STATUS = 60
 
-class XplPlugin():
+class XplPlugin(BasePlugin):
     '''
     Global plugin class, manage signal handlers.
     This class shouldn't be used as-it but should be extended by xPL plugin
     This class is a Singleton
     '''
-    __instance = None
-
-    def __init__(self, name = None, stop_cb = None, is_manager = False, reload_cb = None, dump_cb = None, parser = None,
-                 daemonize = True, enable_hbeat = True):
+    def __init__(self, name, stop_cb = None, is_manager = False, reload_cb = None, dump_cb = None, parser = None,
+                 daemonize = True):
         '''
-        Create XplPlugin instance, which defines signal handlers
-        @param name : The n,ame of the current plugin
-        @param stop_cb : Method to call when a stop request is received
+        Create XplPlugin instance, which defines system handlers
+        @param name : The name of the current plugin
+        @param stop_cb : Additionnal method to call when a stop request is received
         @param is_manager : Must be True if the child script is a Domogik Manager process
-        You should never need to set it to True
+        You should never need to set it to True unless you develop your own manager
         @param reload_cb : Callback to call when a "RELOAD" order is received, if None,
         nothing will happen
         @param dump_cb : Callback to call when a "DUMP" order is received, if None,
@@ -74,205 +72,170 @@ class XplPlugin():
         @param daemonize : If set to False, force the instance *not* to daemonize, even if '-f' is not passed
         on the command line. If set to True (default), will check if -f was added.
         '''
-        if len(name) > 8:
-            raise IOError, "The name must be 8 chars max"
-        if XplPlugin.__instance is None and name is None:
-            raise AttributeError, "'name' attribute is mandatory for the first instance"
-        if XplPlugin.__instance is None:
-            XplPlugin.__instance = XplPlugin.__Singl_XplPlugin(name, stop_cb, is_manager, reload_cb, dump_cb, parser,
-                                                               daemonize, enable_hbeat)
-            self.__dict__['_XplPlugin__instance'] = XplPlugin.__instance
-        elif stop_cb is not None:
-            XplPlugin.__instance.add_stop_cb(stop_cb)
-        self.log.debug("after watcher")
+        BasePlugin.__init__(self, name, stop_cb, parser, daemonize)
+        Watcher(self)
+        self.log.info("----------------------------------")
+        self.log.info("Starting plugin '%s' (new manager instance)" % name)
+        self._is_manager = is_manager
+        self._name = name
+        cfg = Loader('domogik')
+        config = dict(cfg.load()[1])
 
-    def __getattr__(self, attr):
-        """ Delegate access to implementation """
-        return getattr(self.__instance, attr)
-
-    def __setattr__(self, attr, value):
-        """ Delegate access to implementation """
-        return setattr(self.__instance, attr, value)
-
-    class __Singl_XplPlugin(BasePlugin):
-
-        def __init__(self, name, stop_cb = None, is_manager = False, reload_cb = None, dump_cb = None, parser = None,
-                     daemonize = True, enable_hbeat = True):
-            '''
-            Create XplPlugin instance, which defines system handlers
-            @param name : The name of the current plugin
-            @param stop_cb : Additionnal method to call when a stop request is received
-            @param is_manager : Must be True if the child script is a Domogik Manager process
-            You should never need to set it to True unless you develop your own manager
-            @param reload_cb : Callback to call when a "RELOAD" order is received, if None,
-            nothing will happen
-            @param dump_cb : Callback to call when a "DUMP" order is received, if None,
-            nothing will happen
-            @param parser : An instance of OptionParser. If you want to add extra options to the generic option parser,
-            create your own optionparser instance, use parser.addoption and then pass your parser instance as parameter.
-            Your options/params will then be available on self.options and self.params
-            @param daemonize : If set to False, force the instance *not* to daemonize, even if '-f' is not passed
-            on the command line. If set to True (default), will check if -f was added.
-            '''
-            BasePlugin.__init__(self, name, stop_cb, parser, daemonize)
-            Watcher(self)
-            self.log.info("----------------------------------")
-            self.log.info("Starting plugin '%s' (new manager instance)" % name)
-            self._is_manager = is_manager
-            self._name = name
-            cfg = Loader('domogik')
-            config = dict(cfg.load()[1])
-
-            # Get pid and write it in a file
-            self._pid_dir_path = config['pid_dir_path']
-            self._get_pid()
-           
-            if len(self.get_sanitized_hostname()) > 16:
-                self.log.error("You must use 16 char max hostnames ! %s is %s long" % (self.get_sanitized_hostname(), len(self.get_sanitized_hostname())))
-                self.force_leave()
-                return
-
-            if 'broadcast' in config:
-                broadcast = config['broadcast']
-            else:
-                broadcast = "255.255.255.255"
-            if 'bind_interface' in config:
-                self.myxpl = Manager(config['bind_interface'], broadcast = broadcast, enable_hbeat = enable_hbeat)
-            else:
-                self.myxpl = Manager(broadcast = broadcast, enable_hbeat = enable_hbeat)
-            self._l = Listener(self._system_handler, self.myxpl, {'schema' : 'domogik.system',
-                                                                   'xpltype':'xpl-cmnd'})
-            self._reload_cb = reload_cb
-            self._dump_cb = dump_cb
-
-            # Create object which get process informations (cpu, memory, etc)
-            #self._process_info = ProcessInfo(os.getpid(),
-            #                                 TIME_BETWEEN_EACH_PROCESS_STATUS,
-            #                                 self._send_process_info,
-            #                                 self.log,
-            #                                 self.myxpl)
-            #self._process_info.start()
-
-            self.log.debug("end single xpl plugin")
-
-        def _send_process_info(self, pid, data):
-            """ Send process info (cpu, memory) on xpl
-                @param : process pid
-                @param data : dictionnary of process informations
-            """
-            mess = XplMessage()
-            mess.set_type("xpl-stat")
-            mess.set_schema("domogik.usage")
-            mess.add_data({"name" : "%s.%s" % (self.get_plugin_name(), self.get_sanitized_hostname()),
-                           "pid" : pid,
-                           "cpu-percent" : data["cpu_percent"],
-                           "memory-percent" : data["memory_percent"],
-                           "memory-rss" : data["memory_rss"],
-                           "memory-vsz" : data["memory_vsz"]})
-            self.myxpl.send(mess)
-
-        def _get_pid(self):
-            """ Get current pid and write it to a file
-            """
-            pid = os.getpid()
-            pid_file = os.path.join(self._pid_dir_path, 
-                                    self._name + ".pid")
-            self.log.debug("Write pid file for pid '%s' in file '%s'" % (str(pid), pid_file))
-            fil = open(pid_file, "w")
-            fil.write(str(pid))
-            fil.close()
-
-        def _system_handler(self, message):
-            """ Handler for domogik system messages
-            """
-            cmd = message.data['command']
-            if not self._is_manager and cmd in ["stop", "reload", "dump"]:
-                self._client_handler(message)
-            else:
-                self._manager_handler(message)
-
-        def _client_handler(self, message):
-            """ Handle domogik system request for an xpl client
-            @param message : the Xpl message received
-            """
-            try:
-                cmd = message.data["command"]
-                plugin = message.data["plugin"]
-            except KeyError, e:
-                self.log.error("command or plugin key does not exist : %s", e)
-                return
-            if cmd == "stop" and plugin in ['*', self.get_plugin_name()]:
-                self.log.info("Someone asked to stop %s, doing." % self.get_plugin_name())
-                self._answer_stop()
-                self.force_leave()
-            elif cmd == "reload":
-                if self._reload_cb is None:
-                    self.log.info("Someone asked to reload config of %s, but the plugin \
-                    isn't able to do it." % self.get_plugin_name())
-                else:
-                    self._reload_cb()
-            elif cmd == "dump":
-                if self._dump_cb is None:
-                    self.log.info("Someone asked to dump config of %s, but the plugin \
-                    isn't able to do it." % self.get_plugin_name())
-                else:
-                    self._dump_cb()
-            else: #Command not known
-                self.log.info("domogik.system command not recognized : %s" % cmd)
-
-        def __del__(self):
-            self.log.debug("__del__ Single xpl plugin")
+        # Get pid and write it in a file
+        self._pid_dir_path = config['pid_dir_path']
+        self._get_pid()
+       
+        if len(self.get_sanitized_hostname()) > 16:
+            self.log.error("You must use 16 char max hostnames ! %s is %s long" % (self.get_sanitized_hostname(), len(self.get_sanitized_hostname())))
             self.force_leave()
+            return
 
-        def _answer_stop(self):
-            """ Ack a stop request
-            """
-            mess = XplMessage()
-            mess.set_type("xpl-trig")
-            mess.set_schema("domogik.system")
-            mess.add_data({"command":"stop", "plugin": self.get_plugin_name(),
-                "host": self.get_sanitized_hostname()})
-            self.myxpl.send(mess)
+        if 'broadcast' in config:
+            broadcast = config['broadcast']
+        else:
+            broadcast = "255.255.255.255"
+        if 'bind_interface' in config:
+            self.myxpl = Manager(config['bind_interface'], broadcast = broadcast, plugin = self)
+        else:
+            self.myxpl = Manager(broadcast = broadcast, plugin = self)
+        self._l = Listener(self._system_handler, self.myxpl, {'schema' : 'domogik.system',
+                                                               'xpltype':'xpl-cmnd'})
+        self._reload_cb = reload_cb
+        self._dump_cb = dump_cb
 
-        def _manager_handler(self, message):
-            """ Handle domogik system request for the Domogik manager
-            @param message : the Xpl message received
-            """
+        # Create object which get process informations (cpu, memory, etc)
+        #self._process_info = ProcessInfo(os.getpid(),
+        #                                 TIME_BETWEEN_EACH_PROCESS_STATUS,
+        #                                 self._send_process_info,
+        #                                 self.log,
+        #                                 self.myxpl)
+        #self._process_info.start()
 
-        def wait(self):
-	    """ Wait until someone ask the plugin to stop
-            """
-            self.myxpl._network.join()
+        self.log.debug("end single xpl plugin")
 
-        def force_leave(self):
-            '''
-            Leave threads & timers
-            '''
-            self.log.debug("force_leave called")
-            self.get_stop().set()
-            for t in self._timers:
-                self.log.debug("Try to stop timer %s"  % t)
-                t.stop()
-                self.log.debug("Timer stopped %s" % t)
-            for cb in self._stop_cb:
-                self.log.debug("Calling stop additionnal method : %s " % cb.__name__)
-                cb()
-            for t in self._threads:
-                self.log.debug("Try to stop thread %s" % t)
-                try:
-                    t.join()
-                except RuntimeError:
-                    pass
-                self.log.debug("Thread stopped %s" % t)
-                #t._Thread__stop()
-            #Finally, we try to delete all remaining threads
-            for t in threading.enumerate():
-                if t != threading.current_thread() and t.__class__ != threading._MainThread:
-                    self.log.info("The thread %s was not registered, killing it" % t.name)
-                    t.join()
-                    self.log.info("Thread %s stopped." % t.name)
-            if threading.activeCount() > 1:
-                self.log.warn("There are more than 1 thread remaining : %s" % threading.enumerate())
+    def enable_hbeat(self):
+        """ Wrapper for xplconnector.enable_hbeat()
+        """
+        self.myxpl.enable_hbeat()
+
+    def _send_process_info(self, pid, data):
+        """ Send process info (cpu, memory) on xpl
+            @param : process pid
+            @param data : dictionnary of process informations
+        """
+        mess = XplMessage()
+        mess.set_type("xpl-stat")
+        mess.set_schema("domogik.usage")
+        mess.add_data({"name" : "%s.%s" % (self.get_plugin_name(), self.get_sanitized_hostname()),
+                       "pid" : pid,
+                       "cpu-percent" : data["cpu_percent"],
+                       "memory-percent" : data["memory_percent"],
+                       "memory-rss" : data["memory_rss"],
+                       "memory-vsz" : data["memory_vsz"]})
+        self.myxpl.send(mess)
+
+    def _get_pid(self):
+        """ Get current pid and write it to a file
+        """
+        pid = os.getpid()
+        pid_file = os.path.join(self._pid_dir_path, 
+                                self._name + ".pid")
+        self.log.debug("Write pid file for pid '%s' in file '%s'" % (str(pid), pid_file))
+        fil = open(pid_file, "w")
+        fil.write(str(pid))
+        fil.close()
+
+    def _system_handler(self, message):
+        """ Handler for domogik system messages
+        """
+        cmd = message.data['command']
+        if not self._is_manager and cmd in ["stop", "reload", "dump"]:
+            self._client_handler(message)
+        else:
+            self._manager_handler(message)
+
+    def _client_handler(self, message):
+        """ Handle domogik system request for an xpl client
+        @param message : the Xpl message received
+        """
+        try:
+            cmd = message.data["command"]
+            plugin = message.data["plugin"]
+        except KeyError, e:
+            self.log.error("command or plugin key does not exist : %s", e)
+            return
+        if cmd == "stop" and plugin in ['*', self.get_plugin_name()]:
+            self.log.info("Someone asked to stop %s, doing." % self.get_plugin_name())
+            self._answer_stop()
+            self.force_leave()
+        elif cmd == "reload":
+            if self._reload_cb is None:
+                self.log.info("Someone asked to reload config of %s, but the plugin \
+                isn't able to do it." % self.get_plugin_name())
+            else:
+                self._reload_cb()
+        elif cmd == "dump":
+            if self._dump_cb is None:
+                self.log.info("Someone asked to dump config of %s, but the plugin \
+                isn't able to do it." % self.get_plugin_name())
+            else:
+                self._dump_cb()
+        else: #Command not known
+            self.log.info("domogik.system command not recognized : %s" % cmd)
+
+    def __del__(self):
+        self.log.debug("__del__ Single xpl plugin")
+        self.force_leave()
+
+    def _answer_stop(self):
+        """ Ack a stop request
+        """
+        mess = XplMessage()
+        mess.set_type("xpl-trig")
+        mess.set_schema("domogik.system")
+        mess.add_data({"command":"stop", "plugin": self.get_plugin_name(),
+            "host": self.get_sanitized_hostname()})
+        self.myxpl.send(mess)
+
+    def _manager_handler(self, message):
+        """ Handle domogik system request for the Domogik manager
+        @param message : the Xpl message received
+        """
+
+    def wait(self):
+        """ Wait until someone ask the plugin to stop
+        """
+        self.myxpl._network.join()
+
+    def force_leave(self):
+        '''
+        Leave threads & timers
+        '''
+        self.log.debug("force_leave called")
+        self.get_stop().set()
+        for t in self._timers:
+            self.log.debug("Try to stop timer %s"  % t)
+            t.stop()
+            self.log.debug("Timer stopped %s" % t)
+        for cb in self._stop_cb:
+            self.log.debug("Calling stop additionnal method : %s " % cb.__name__)
+            cb()
+        for t in self._threads:
+            self.log.debug("Try to stop thread %s" % t)
+            try:
+                t.join()
+            except RuntimeError:
+                pass
+            self.log.debug("Thread stopped %s" % t)
+            #t._Thread__stop()
+        #Finally, we try to delete all remaining threads
+        for t in threading.enumerate():
+            if t != threading.current_thread() and t.__class__ != threading._MainThread:
+                self.log.info("The thread %s was not registered, killing it" % t.name)
+                t.join()
+                self.log.info("Thread %s stopped." % t.name)
+        if threading.activeCount() > 1:
+            self.log.warn("There are more than 1 thread remaining : %s" % threading.enumerate())
 
 
 class XplResult():

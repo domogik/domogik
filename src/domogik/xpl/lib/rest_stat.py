@@ -205,9 +205,9 @@ class StatsManager(XplPlugin):
             self.handler_params = handler_params
 
             self._event_requests = self.handler_params[0]._event_requests
-            self._log_stats = self.handler_params[1]
-            self._log_stats_unknown = self.handler_params[2]
-            self._db = self.handler_params[3]
+            self._log_stats = self.handler_params[0]._log_stats
+            self._log_stats_unknown = self.handler_params[0]._log_stats_unknown
+            self._db = self.handler_params[0]._db
 
             self._res = res
             params = {'schema':schema, 'xpltype': xpl_type}
