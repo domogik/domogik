@@ -38,7 +38,7 @@ EventRequests object
 """
 import time
 from Queue import Queue, Empty, Full
-from threading import Thread
+from threading import Thread, Event
 
 
 
@@ -63,14 +63,15 @@ class EventRequests():
         self.count_request = 0
 
         # Launch background cleaning function
-        bg_clean = Thread(None, self.bg_clean_event_requests, None, (), {})
+        self._stop_clean = Event()
+        bg_clean = Thread(None, self.bg_clean_event_requests, 'rest_clean_event', (), {})
         bg_clean.start()
 
     def bg_clean_event_requests(self):
         """ Function to use in background. It will check for each request to see
             if it has not be forgoten to clean
         """
-        while 1:
+        while not self._stop_clean.isSet():
             clean_list = []
             for req in self.requests:
                 if time.time() - self.requests[req]["last_access_date"] > self.event_timeout:
@@ -79,7 +80,12 @@ class EventRequests():
             for req in clean_list:
                 del self.requests[req]
                 self.count_request -= 1
-            time.sleep(30)
+            self._stop_clean.wait(30)
+
+    def set_stop_clean(self):
+        """ Set the event use by bg_clean_event_requests to stop it 
+        """
+        self._stop_clean.set()
 
     def new(self, device_id_list):
         """ Add a new queue and ticket id for a new event

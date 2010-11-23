@@ -273,6 +273,7 @@ class Rest(XplPlugin):
                                                  self._queue_event_size,
                                                  self._queue_event_timeout,
                                                  self._queue_event_life_expectancy)
+            self.add_stop_cb(self._event_requests.set_stop_clean)
     
             # define listeners for queues
             self.log.debug("Create listeners")
