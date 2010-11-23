@@ -67,7 +67,7 @@ class X10Main(XplPlugin):
         self._config.query('x10_heyu', 'heyu-cfg-path', res)
         self._heyu_cfg_path_res = res.get_value()['heyu-cfg-path']
         try:
-            self.__myx10 = X10API(self._heyu_cfg_path_res)
+            self.__myx10 = X10API(self._heyu_cfg_path_res, self.log)
         except Exception:
             print "Something went wrong during heyu init, check logs"
             self.log.debug("Exception : %s" % traceback.format_exc())

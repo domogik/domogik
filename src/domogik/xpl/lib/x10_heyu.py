@@ -89,9 +89,8 @@ class X10API:
     and heyu binaries must be in your PATH
     """
 
-    def __init__(self, heyuconf):
-        l = logger.Logger('x10API')
-        self._log = l.get_logger()
+    def __init__(self, heyuconf, log):
+        self._log = log
         res = Popen("heyu -c " + heyuconf + " start", shell=True, stderr=PIPE)
         output = res.stderr.read()
         res.stderr.close()
