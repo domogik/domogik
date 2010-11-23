@@ -117,6 +117,7 @@ class YWeatherManager(XplPlugin):
                 print err.value
                 self.force_leave()
                 return
+        self.enable_hbeat()
 
 
 

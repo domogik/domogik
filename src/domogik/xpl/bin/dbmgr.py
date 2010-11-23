@@ -63,6 +63,7 @@ class DBConnector(XplPlugin):
         self._engine = self._db.get_engine()
 
         Listener(self._request_config_cb, self.myxpl, {'schema': 'domogik.config', 'xpltype': 'xpl-cmnd'})
+        self.enable_hbeat()
 
     def _request_config_cb(self, message):
         '''

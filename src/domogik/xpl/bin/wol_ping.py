@@ -99,6 +99,7 @@ class WolPing(XplPlugin):
         self._pingmanager = Ping(self.log, self.ping_cb, float(interval),
                                  self.computers)
         self._pingmanager.ping()
+        self.enable_hbeat()
 
     def wol_cb(self, message):
         """ Call wake on lan lib

@@ -45,167 +45,139 @@ from domogik.common.daemonize import createDaemon
 class BasePlugin():
     """ Basic plugin class, manage common part of all plugins.
     For all xPL plugins, the XplPlugin class must be use as a basis, not this one.
-    This class is a Singleton
     """
+    def __init__(self, name, stop_cb = None, p = None, daemonize = True):
+        ''' 
+        @param p : An instance of OptionParser. If you want to add extra options to the generic option parser,
+        create your own optionparser instance, use parser.addoption and then pass your parser instance as parameter.
+        Your options/params will then be available on self.options and self.params
+        @param daemonize : If set to False, force the instance *not* to daemonize, even if '-f' is not passed
+        on the command line. If set to True (default), will check if -f was added.
+        '''
+        print "create Base plugin instance"
+        if p is not None and isinstance(p, OptionParser):
+            parser = p
+        else:
+            parser = OptionParser()
+        parser.add_option("-f", action="store_true", dest="run_in_foreground", default=False, \
+                          help="Run the plugin in foreground, default to background.")
+        (self.options, self.args) = parser.parse_args()
+        if not self.options.run_in_foreground and daemonize:
+            createDaemon()
+            l = logger.Logger(name)
+            self.log = l.get_logger()
+            self.log.info("Daemonize plugin %s" % name)
+            self.is_daemon = True
+        else:
+            l = logger.Logger(name)
+            self.log = l.get_logger()
+            self.is_daemon = False
+        self._threads = []
+        self._timers = []
+        if name is not None:
+            self._plugin_name = name
+        self._stop = threading.Event()
+        self._lock_add_thread = threading.Semaphore()
+        self._lock_add_timer = threading.Semaphore()
+        self._lock_add_cb = threading.Semaphore()
+        if stop_cb is not None:
+            self._stop_cb = [stop_cb]
+        else:
+            self._stop_cb = []
 
-    __instance = None
+    def should_stop(self):
+        '''
+        Check if the plugin should stop
+        This method should be called to check loop condition in threads
+        '''
+        return self._stop.isSet()
 
-    def __init__(self, name = None, stop_cb = None, parser = None, daemonize = True):
-        """ @param name : Name of current plugin
-            @param parser : An instance of OptionParser. If you want to add extra options to the generic option parser,
-            create your own optionparser instance, use parser.addoption and then pass your parser instance as parameter.
-            Your options/params will then be available on self.options and self.params
-            @param daemonize : If set to False, force the instance *not* to daemonize, even if '-f' is not passed
-            on the command line. If set to True (default), will check if -f was added.
+    def get_stop(self):
+        '''
+        Returns the Event instance
+        '''
+        return self._stop
+
+    def get_plugin_name(self):
         """
-        if BasePlugin.__instance is None:
-            BasePlugin.__instance = BasePlugin.__SinglBasePlugin(name, stop_cb, parser, daemonize)
+        Returns the name of the current plugin
+        """
+        return self._plugin_name
 
-    def __getattr__(self, attr):
-        """ Delegate access to implementation """
-        try:
-            return getattr(self.__instance, attr)
-        except:
-            pass
-
-    def __setattr__(self, attr, value):
-        """ Delegate access to implementation """
-        return setattr(self.__instance, attr, value)
-
-    class __SinglBasePlugin:
-
-        def __init__(self, name, stop_cb = None, p = None, daemonize = True):
-            ''' singleton instance
-            @param p : An instance of OptionParser. If you want to add extra options to the generic option parser,
-            create your own optionparser instance, use parser.addoption and then pass your parser instance as parameter.
-            Your options/params will then be available on self.options and self.params
-            @param daemonize : If set to False, force the instance *not* to daemonize, even if '-f' is not passed
-            on the command line. If set to True (default), will check if -f was added.
-            '''
-            print "create Base plugin instance"
-            if p is not None and isinstance(p, OptionParser):
-                parser = p
-            else:
-                parser = OptionParser()
-            parser.add_option("-f", action="store_true", dest="run_in_foreground", default=False, \
-                              help="Run the plugin in foreground, default to background.")
-            (self.options, self.args) = parser.parse_args()
-            if not self.options.run_in_foreground and daemonize:
-                createDaemon()
-                l = logger.Logger(name)
-                self.log = l.get_logger()
-                self.log.info("Daemonize plugin %s" % name)
-                self.is_daemon = True
-            else:
-                l = logger.Logger(name)
-                self.log = l.get_logger()
-                self.is_daemon = False
-            self._threads = []
-            self._timers = []
-            if name is not None:
-                self._plugin_name = name
-            self._stop = threading.Event()
-            self._lock_add_thread = threading.Semaphore()
-            self._lock_add_timer = threading.Semaphore()
-            self._lock_add_cb = threading.Semaphore()
-            if stop_cb is not None:
-                self._stop_cb = [stop_cb]
-            else:
-                self._stop_cb = []
-
-        def should_stop(self):
-            '''
-            Check if the plugin should stop
-            This method should be called to check loop condition in threads
-            '''
-            return self._stop.isSet()
-
-        def get_stop(self):
-            '''
-            Returns the Event instance
-            '''
-            return self._stop
-
-        def get_plugin_name(self):
-            """
-            Returns the name of the current plugin
-            """
-            return self._plugin_name
-
-        def register_thread(self, thread):
-            '''
-            Register a thread in the current instance
-            Should be called by each thread at start
-            @param thread : the thread to add
-            '''
-            # self.log.debug('New thread registered : %s' % thread)
-            #Remove all stopped thread from the list
-            for t in self._threads:
-                if not  t.isAlive():
-                    self._threads.remove(t)
-            if thread in self._threads:
-                self.log.info("Try to register a thread twice :" % thread)
-            else:
-                self._lock_add_thread.acquire()
-                self._threads.append(thread)
-                self._lock_add_thread.release()
-
-        def unregister_thread(self, thread):
-            '''
-            Unregister a thread in the current instance
-            Should be the last action of each thread
-            @param thread : the thread to remove
-            '''
+    def register_thread(self, thread):
+        '''
+        Register a thread in the current instance
+        Should be called by each thread at start
+        @param thread : the thread to add
+        '''
+        # self.log.debug('New thread registered : %s' % thread)
+        #Remove all stopped thread from the list
+        for t in self._threads:
+            if not  t.isAlive():
+                self._threads.remove(t)
+        if thread in self._threads:
+            self.log.info("Try to register a thread twice :" % thread)
+        else:
             self._lock_add_thread.acquire()
-            if thread in self._threads:
-                self.log.debug('Unregister thread')
-                self._threads.remove(thread)
-            else:
-                self.log.warn('Asked to remove a thread not in the list')
+            self._threads.append(thread)
             self._lock_add_thread.release()
 
-        def register_timer(self, timer):
-            '''
-            Register a time in the current instance
-            Should be called by each timer
-            @param timer : the timer to add
-            '''
-            if timer in self._timers:
-                self.log.info("Try to register a timer twice : %s" % timer)
-            else:
-                self.log.debug('New timer registered : %s' % timer)
-                self._lock_add_timer.acquire()
-                self._timers.append(timer)
-                self._lock_add_timer.release()
+    def unregister_thread(self, thread):
+        '''
+        Unregister a thread in the current instance
+        Should be the last action of each thread
+        @param thread : the thread to remove
+        '''
+        self._lock_add_thread.acquire()
+        if thread in self._threads:
+            self.log.debug('Unregister thread')
+            self._threads.remove(thread)
+        else:
+            self.log.warn('Asked to remove a thread not in the list')
+        self._lock_add_thread.release()
 
-        def unregister_timer(self, timer):
-            '''
-            Unregister a timer in the current instance
-            Should be the last action of each timer
-            @param timer : the timer to remove
-            '''
-            self.log.debug('ASk for timer unregister : %s' % timer)
+    def register_timer(self, timer):
+        '''
+        Register a time in the current instance
+        Should be called by each timer
+        @param timer : the timer to add
+        '''
+        if timer in self._timers:
+            self.log.info("Try to register a timer twice : %s" % timer)
+        else:
+            self.log.debug('New timer registered : %s' % timer)
             self._lock_add_timer.acquire()
-            if timer in self._timers:
-                self.log.debug('Unregister timer')
-                self._timers.remove(timer)
+            self._timers.append(timer)
             self._lock_add_timer.release()
 
-        def add_stop_cb(self, cb):
-            '''
-            Add an additionnal callback to call when a stop request is received
-            '''
-            self._lock_add_cb.acquire()
-            self._stop_cb.append(cb)
-            self._lock_add_cb.release()
+    def unregister_timer(self, timer):
+        '''
+        Unregister a timer in the current instance
+        Should be the last action of each timer
+        @param timer : the timer to remove
+        '''
+        self.log.debug('ASk for timer unregister : %s' % timer)
+        self._lock_add_timer.acquire()
+        if timer in self._timers:
+            self.log.debug('Unregister timer')
+            self._timers.remove(timer)
+        self._lock_add_timer.release()
 
-        def get_sanitized_hostname(self):
-            """ Get the sanitized hostname of the host 
-            This will lower it and keep only the part before the first dot
+    def add_stop_cb(self, cb):
+        '''
+        Add an additionnal callback to call when a stop request is received
+        '''
+        self._lock_add_cb.acquire()
+        self._stop_cb.append(cb)
+        self._lock_add_cb.release()
 
-            """
-            return gethostname().lower().split('.')[0]
+    def get_sanitized_hostname(self):
+        """ Get the sanitized hostname of the host 
+        This will lower it and keep only the part before the first dot
 
-        def __del__(self):
-            self.log.debug("__del__ baseplugin")
+        """
+        return gethostname().lower().split('.')[0]
+
+    def __del__(self):
+        self.log.debug("__del__ baseplugin")
 

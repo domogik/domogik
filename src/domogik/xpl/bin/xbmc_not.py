@@ -79,6 +79,7 @@ class XBMCNotificationListener(XplPlugin):
         Listener(self.xbmc_notification_cb, self.myxpl, {'schema': 'osd.basic',
                 'xpltype': 'xpl-cmnd'})
 
+        self.enable_hbeat()
 
     def xbmc_notification_cb(self, message):
         """ Call XBMC notification lib

@@ -78,6 +78,7 @@ class MirrorManager(XplPlugin):
                                    (),
                                    {})                                  
         mirror_process.start()                              
+        self.enable_hbeat()
 
     def send_xpl(self, device, type, current):
         """ Send xPL message on network

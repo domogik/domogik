@@ -73,13 +73,13 @@ class Query():
         '''
         print "new query for t = %s, k = %s" % (technology, key)
         Listener(self._query_cb, self.__myxpl, {'schema': 'domogik.config', 'xpltype': 'xpl-stat',
-                                                'technology': technology, 'hostname' : self.__myxpl.get_sanitized_hostname()})
+                                                'technology': technology, 'hostname' : self.__myxpl.p.get_sanitized_hostname()})
         self._keys[key] = result
         mess = XplMessage()
         mess.set_type('xpl-cmnd')
         mess.set_schema('domogik.config')
         mess.add_data({'technology': technology})
-        mess.add_data({'hostname': self.__myxpl.get_sanitized_hostname()})
+        mess.add_data({'hostname': self.__myxpl.p.get_sanitized_hostname()})
         if element:
             mess.add_data({'element': element})
         mess.add_data({'key': key})

@@ -84,6 +84,7 @@ class PlcBusMain(XplPlugin):
             self._probe_thr = XplTimer(self._probe_inter, self._send_probe, self._probe_stop, self.myxpl)
             self._probe_thr.start()
 #            self.register_timer(self._probe_thr)
+        self.enable_hbeat()
 
     def _send_probe(self):
         """ Send probe message 

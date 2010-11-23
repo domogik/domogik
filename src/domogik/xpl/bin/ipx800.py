@@ -130,6 +130,7 @@ class IPXManager(XplPlugin):
         Listener(self.ipx_command, self.myxpl, {'schema': 'control.basic',
                 'xpltype': 'xpl-cmnd', 'type': 'output'})
 
+        self.enable_hbeat()
         self.log.info("Plugin ready :)")
 
 
