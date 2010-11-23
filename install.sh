@@ -143,7 +143,7 @@ function update_user_config {
     echo "You can create it using these commands (as mysql admin user) :"
     echo " > CREATE DATABASE domogik;"
     echo " > GRANT ALL PRIVILEGES ON domogik.* to domogik@localhost IDENTIFIED BY 'randompassword';"
-    read -p "Press a key to continue the installation when your setup is ok. "
+    read -p "Press Enter to continue the installation when your setup is ok. "
     mysql_ok=false
     while ! $mysql_ok;do 
         echo "Please set your mysql parameters."
@@ -163,12 +163,12 @@ function update_user_config {
         fi
         mysql_client=$(which mysql)
         while [ ! -f "$mysql_client" ];do
-            read -p "Mysql client not installed, please install it and press a key."
+            read -p "Mysql client not installed, please install it and press Enter."
             mysql_client=$(which mysql)
         done
         echo "SELECT 1;"|mysql -h$db_host -P$db_port -u$db_user -p$db_password $db_name > /dev/null
         if [ $? -ne 0 ];then
-            read -p "Something was wrong, can't access to the database, please check your setup and press a key to retry."
+            read -p "Something was wrong, can't access to the database, please check your setup and press Enter to retry."
         else
             mysql_ok=true
             echo "Connection test OK"
@@ -261,5 +261,5 @@ create_log_dir
 
 echo "Everything seems to be good, Domogik should be installed correctly."
 echo "I will start the test_config.py script to check it."
-read -p "Please press a key when ready."
+read -p "Please press Enter when ready."
 chmod +x ./test_config.py && ./test_config.py
