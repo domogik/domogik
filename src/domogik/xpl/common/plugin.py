@@ -113,7 +113,7 @@ class XplPlugin(BasePlugin):
 
         self.log.debug("end single xpl plugin")
 
-    def enable_hbeat(self, lock):
+    def enable_hbeat(self, lock = False):
         """ Wrapper for xplconnector.enable_hbeat()
         """
         self.myxpl.enable_hbeat(lock)

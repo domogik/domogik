@@ -308,7 +308,7 @@ class Rest(XplPlugin):
             self.start_http()
 
             # Enable hbeat
-            self.enable_hbeat(lock = True)
+            self.enable_hbeat()
         except :
             self.log.error("%s" % self.get_exception())
 
