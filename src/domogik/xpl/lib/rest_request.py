@@ -104,7 +104,8 @@ class ProcessRequest():
         self.send_response = send_response
         self.send_header = send_header
         self.end_headers = end_headers
-        self.copyfile = self.handler_params[0].copyfile
+        # Is there a need for this ?
+        #self.copyfile = self.handler_params[0].copyfile
         self.wfile = wfile
         self.rfile = rfile
         self.send_http_response_ok = cb_send_http_response_ok

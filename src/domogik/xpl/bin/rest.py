@@ -130,14 +130,9 @@ class Rest(XplPlugin):
         self.log_dm = log_dm.get_logger()
         self.log_dm.info("Rest Server Data Manipulation...")
 
-        self.enable_hbeat()
-
         # API version
         self._rest_api_version = REST_API_VERSION
 
-        #Enable heartbeat
-        self.enable_hbeat()
-    
         try:
     
             ### Config
@@ -308,10 +303,12 @@ class Rest(XplPlugin):
             self.log.info("REST Initialisation OK")
 
             self.add_stop_cb(self.stop_http)
-
             self.server = None
             self.start_stats()
             self.start_http()
+
+            # Enable hbeat
+            self.enable_hbeat()
         except :
             self.log.error("%s" % self.get_exception())
 

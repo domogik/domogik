@@ -143,6 +143,7 @@ class Manager:
             self.p.log.debug("xPL plugin %s socket bound to %s, port %s" \
                             % (self.p.get_plugin_name(), self._ip, self._port))
             self._h_timer = None
+            self._SendHeartbeat()
             #And finally we start network listener in a thread
             self._stop_thread = False
             self._network = threading.Thread(None, self._run_thread_monitor,

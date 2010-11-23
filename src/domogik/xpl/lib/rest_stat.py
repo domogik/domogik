@@ -111,7 +111,7 @@ class StatsManager(XplPlugin):
                                 "static_device": static_device,
                                 "device_type": device_type}
                 
-                        stats[technology][schema][xpl_type] = self._Stat(self.myxpl, res[technology][schema][xpl_type], technology, schema, xpl_type, self.handler_params)
+                        stats[technology][schema][xpl_type] = self._Stat(self.myxpl, res[technology][schema][xpl_type], technology, schema, xpl_type, self._log_stats, self._log_stats_unknown, self._db, self._event_requests)
         except :
             self._log_stats.error("%s" % self.get_exception())
 
@@ -192,7 +192,7 @@ class StatsManager(XplPlugin):
         Each instance create a Listener and the associated callbacks
         """
 
-        def __init__(self, xpl, res, technology, schema, xpl_type, handler_params):
+        def __init__(self, xpl, res, technology, schema, xpl_type, log_stats, log_stats_unknown, db, event_requests):
             """ Initialize a stat instance 
             @param xpl : A xpl manager instance
             @param res : The result of xml parsing for this techno/schema/type
@@ -202,12 +202,10 @@ class StatsManager(XplPlugin):
             @param handler_params : handler_params from rest
             """
             ### Rest data
-            self.handler_params = handler_params
-
-            self._event_requests = self.handler_params[0]._event_requests
-            self._log_stats = self.handler_params[0]._log_stats
-            self._log_stats_unknown = self.handler_params[0]._log_stats_unknown
-            self._db = self.handler_params[0]._db
+            self._event_requests = event_requests
+            self._db = db
+            self._log_stats = log_stats
+            self._log_stats_unknown = log_stats_unknown
 
             self._res = res
             params = {'schema':schema, 'xpltype': xpl_type}
