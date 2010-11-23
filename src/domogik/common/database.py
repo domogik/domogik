@@ -1854,12 +1854,11 @@ class DbHelper():
                 ),
             'week' :
                 (self.__session.query(
-                            func.year(DeviceStats.date), func.month(DeviceStats.date),
-                            func.week(DeviceStats.date, 3), function[function_used]
+                            func.year(DeviceStats.date), func.week(DeviceStats.date, 3), function[function_used]
                         ).group_by(
                             func.year(DeviceStats.date), func.week(DeviceStats.date, 3)
                         ),
-                 lambda dt : [dt.year, dt.month, _get_week_nb(dt)],
+                 lambda dt : [dt.year, _get_week_nb(dt)],
                  lambda dt : datetime.datetime(dt.year, dt.month, dt.day, 23, 59, 59)
                              + datetime.timedelta(days=6-dt.weekday()),
                 ),
