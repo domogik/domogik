@@ -71,9 +71,9 @@
 .icon64-usage-heating { background-image:url(../images/device_usage/heating/usage_64.png);}
 .icon32-usage-heating { background-image:url(../images/device_usage/heating/usage_32.png);}
 .icon16-usage-heating { background-image:url(../images/device_usage/heating/usage_16.png);}
-.icon64-usage-workstation { background-image:url(../images/device_usage/workstation/usage_64.png);}
-.icon32-usage-workstation { background-image:url(../images/device_usage/workstation/usage_32.png);}
-.icon16-usage-workstation { background-image:url(../images/device_usage/workstation/usage_16.png);}
+.icon64-usage-computer { background-image:url(../images/device_usage/computer/usage_64.png);}
+.icon32-usage-computer { background-image:url(../images/device_usage/computer/usage_32.png);}
+.icon16-usage-computer { background-image:url(../images/device_usage/computer/usage_16.png);}
 .icon64-usage-server { background-image:url(../images/device_usage/todo_64.png);}
 .icon32-usage-server { background-image:url(../images/device_usage/todo_32.png);}
 .icon16-usage-server { background-image:url(../images/device_usage/todo_16.png);}
@@ -235,12 +235,12 @@
 .icon32-usage-heating.range_0 { background-image:url(../images/device_usage/heating/0_32.png);}
 .icon32-usage-heating.range_100 { background-image:url(../images/device_usage/heating/100_32.png);}
 
-.icon32-usage-workstation.unknown { background-image:url(../images/device_usage/workstation/undefined_32.png);}
-.icon32-usage-workstation.trigger { background-image:url(../images/device_usage/workstation/100_32.png);}
-.icon32-usage-workstation.binary_0 { background-image:url(../images/device_usage/workstation/0_32.png);}
-.icon32-usage-workstation.binary_1 { background-image:url(../images/device_usage/workstation/100_32.png);}
-.icon32-usage-workstation.range_0 { background-image:url(../images/device_usage/workstation/0_32.png);}
-.icon32-usage-workstation.range_100 { background-image:url(../images/device_usage/workstation/100_32.png);}
+.icon32-usage-computer.unknown { background-image:url(../images/device_usage/computer/undefined_32.png);}
+.icon32-usage-computer.trigger { background-image:url(../images/device_usage/computer/100_32.png);}
+.icon32-usage-computer.binary_0 { background-image:url(../images/device_usage/computer/0_32.png);}
+.icon32-usage-computer.binary_1 { background-image:url(../images/device_usage/computer/100_32.png);}
+.icon32-usage-computer.range_0 { background-image:url(../images/device_usage/computer/0_32.png);}
+.icon32-usage-computer.range_100 { background-image:url(../images/device_usage/computer/100_32.png);}
 
 .icon32-usage-server.unknown { background-image:url(../images/device_usage/todo_32.png);}
 .icon32-usage-server.trigger { background-image:url(../images/device_usage/todo_32.png);}
