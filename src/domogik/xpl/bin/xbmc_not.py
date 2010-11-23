@@ -80,6 +80,7 @@ class XBMCNotificationListener(XplPlugin):
                 'xpltype': 'xpl-cmnd'})
         self.enable_hbeat()
 
+        self.enable_hbeat()
 
     def xbmc_notification_cb(self, message):
         """ Call XBMC notification lib

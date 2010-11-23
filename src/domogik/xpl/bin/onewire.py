@@ -165,6 +165,7 @@ class OneWireManager(XplPlugin):
             self.force_leave()
         self.enable_hbeat()
 
+        self.enable_hbeat()
 
 
     def send_xpl(self, type, data):
