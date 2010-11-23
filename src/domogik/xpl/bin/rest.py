@@ -130,6 +130,8 @@ class Rest(XplPlugin):
         self.log_dm = log_dm.get_logger()
         self.log_dm.info("Rest Server Data Manipulation...")
 
+        self.enable_hbeat()
+
         # API version
         self._rest_api_version = REST_API_VERSION
 

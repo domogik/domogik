@@ -96,6 +96,7 @@ class SysManager(XplPlugin):
     
         self._xml_plugin_directory = "%s/share/domogik/plugins/" % conf['custom_prefix']
         self._pinglist = {}
+        self.enable_hbeat()
         try:
             # Get components
             self._list_components(self.get_sanitized_hostname())

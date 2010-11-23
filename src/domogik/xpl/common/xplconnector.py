@@ -84,7 +84,7 @@ from domogik.common.dmg_exceptions import XplMessageError
 
 READ_NETWORK_TIMEOUT = 2
 
-class Manager(BasePlugin):
+class Manager:
     """
     Manager is the main component of the system
     You can run many managers on different port
@@ -98,23 +98,24 @@ class Manager(BasePlugin):
     # _network = None
     # _UDPSock = None
 
-    def __init__(self, ip=None, port=0, broadcast="255.255.255.255"):
+    def __init__(self, ip=None, port=0, broadcast="255.255.255.255", plugin = None):
         """
         Create a new manager instance
         @param ip : IP to listen to (default real ip address)
         @param port : port to listen to (default 0)
+        @param plugin : The plugin associated with this xpl instance
         """
-        BasePlugin.__init__(self, stop_cb = self.leave)
         if ip == None:
             ip = self.get_sanitized_hostname()
-        source = "xpl-%s.%s" % (self.get_plugin_name(), self.get_sanitized_hostname())
+        self.p = plugin
+        source = "xpl-%s.%s" % (self.p.get_plugin_name(), self.p.get_sanitized_hostname())
         # Define maximum xPL message size
         self._buff = 1500
         # Define xPL base port
         self._source = source
         self._listeners = []
         #Not really usefull
-        #self._port = port
+        #self.port = port
         # Initialise the socket
         self._UDPSock = socket(AF_INET, SOCK_DGRAM)
         #Set broadcast flag
@@ -135,27 +136,27 @@ class Manager(BasePlugin):
             self.log.error("Can't bind to the interface %s, port %i" % (ip, port))
             exit(1)
         else:
-            self.add_stop_cb(self.leave)
-            self._port = self._UDPSock.getsockname()[1]
+            self.p.add_stop_cb(self.leave)
+            self.port = self._UDPSock.getsockname()[1]
             #Get the port number assigned by the system
             self._ip, self._port = self._UDPSock.getsockname()
-            self.log.debug("xPL plugin %s socket bound to %s, port %s" \
-                            % (self.get_plugin_name(), self._ip, self._port))
+            self.p.log.debug("xPL plugin %s socket bound to %s, port %s" \
+                            % (self.p.get_plugin_name(), self._ip, self._port))
             self._h_timer = None
             #And finally we start network listener in a thread
             self._stop_thread = False
             self._network = threading.Thread(None, self._run_thread_monitor,
                     "thread-monitor", (), {})
-            self.register_thread(self._network)
+            self.p.register_thread(self._network)
             self._network.start()
-            self.log.debug("xPL thread started for %s " % self.get_plugin_name())
+            self.p.log.debug("xPL thread started for %s " % self.p.get_plugin_name())
 
     def enable_hbeat(self):
         """ Enable the answer to hbeat request 
         """
         if self._h_timer == None:
             self._SendHeartbeat()
-            self._h_timer = XplTimer(300, self._SendHeartbeat, self.get_stop(), self)
+            self._h_timer = XplTimer(300, self._SendHeartbeat, self.p.get_stop(), self)
             self._h_timer.start()
             #We add a listener in order to answer to the hbeat requests
             Listener(cb = self.got_hbeat, manager = self, filter = {'schema':'hbeat.request', 'xpltype':'xpl-cmnd'})
@@ -165,7 +166,7 @@ class Manager(BasePlugin):
         Stop threads and leave the Manager
         """
         self._UDPSock.close()
-        self.log.debug("xPL thread stopped")
+        self.p.log.debug("xPL thread stopped")
 
     def send(self, message):
         """
@@ -183,10 +184,10 @@ class Manager(BasePlugin):
             if not message.target:
                 message.set_target("*")
             self._UDPSock.sendto(message.__str__(), (self._broadcast, 3865))
-            self.log.debug("xPL Message sent by thread %s : %s" % (threading.currentThread().getName(), message))
+            self.p.log.debug("xPL Message sent by thread %s : %s" % (threading.currentThread().getName(), message))
         except:
-            self.log.warning("Error during send of message")
-            self.log.debug(traceback.format_exc())
+            self.p.log.warning("Error during send of message")
+            self.p.log.debug(traceback.format_exc())
         self._lock_send.release()
 
     def _SendHeartbeat(self, target='*', test=""):
@@ -211,9 +212,9 @@ interval=5
 port=%s
 remote-ip=%s
 }
-""" % (self._source, target, self._port, self._ip)
+""" % (self._source, target, self.port, self._ip)
         if self is not None:
-            if not self.should_stop():
+            if not self.p.should_stop():
                 self._UDPSock.sendto(mess, (self._broadcast, 3865))
 
     def got_hbeat(self, message):
@@ -227,17 +228,17 @@ remote-ip=%s
         If it is, call all listeners
         This method is not called by childs, so no need to protect it.
         """
-        while not self.should_stop():
+        while not self.p.should_stop():
             try:
                 readable, writeable, errored = select.select([self._UDPSock], [], [], READ_NETWORK_TIMEOUT)
             except:
-                self.log.info("Error during the read of the socket : %s" % traceback.format_exc())
+                self.p.log.info("Error during the read of the socket : %s" % traceback.format_exc())
             else:
                 if len(readable) == 1:
                     try:
                         data, addr = self._UDPSock.recvfrom(self._buff)
                     except:
-                        self.log.debug("bad data received")
+                        self.p.log.debug("bad data received")
                     else:
                         try:
                             mess = XplMessage(data)
@@ -249,10 +250,10 @@ remote-ip=%s
                                 #self.log.debug("New message received : %s" % \
                                 #        mess.get_type())
                         except XPLException:
-                            self.log.warning("XPL Exception occured in : %s" % sys.exc_info()[2])
+                            self.p.log.warning("XPL Exception occured in : %s" % sys.exc_info()[2])
                         except XplMessageError:
-                            self.log.warning("Malformated message received, ignoring it.")
-        self.log.info("self._should_stop set, leave.")
+                            self.p.log.warning("Malformated message received, ignoring it.")
+        self.p.log.info("self._should_stop set, leave.")
 
     def add_listener(self, listener):
         """
@@ -290,7 +291,7 @@ class Listener:
         @param filter : dictionnary { key : value }. If value is a list, then the 
         listener will check if the key equals any of these values
         """
-        manager.log.debug("New listener, filter : %s" % filter)
+        manager.p.log.debug("New listener, filter : %s" % filter)
         self._callback = cb
         self._filter = filter
         self._manager = manager
@@ -337,7 +338,7 @@ class Listener:
                 thread = threading.Thread(target=self._callback, args = (message, self._cb_params), name="Manager-new-message-cb")
             else:
                 thread = threading.Thread(target=self._callback, args = (message,), name="Manager-new-message-cb")
-            self._manager.register_thread(thread)
+            self._manager.p.register_thread(thread)
             thread.start()
 
     def add_filter(self, key, value):
@@ -388,12 +389,12 @@ class XplTimer():
         @param time : time of loop in second
         @param cb : callback function which will be call eact 'time' seconds
         """
-        self._timer = self.__InternalTimer(time, cb, stop, manager.log)
+        self._timer = self.__InternalTimer(time, cb, stop, manager.p.log)
         self._stop = stop
         self._manager = manager
-        self.log = manager.log
-        manager.register_timer(self)
-        manager.register_thread(self._timer)
+        self.log = manager.p.log
+        manager.p.register_timer(self)
+        manager.p.register_thread(self._timer)
         self.log.debug("New timer created : %s " % self)
 
 #    def __repr__(self):
@@ -425,7 +426,7 @@ class XplTimer():
         self._stop.set()
         self._timer.join()
         self.log.debug("Timer : stop, internal thread joined, unregister it")
-        self._manager.unregister_timer(self._timer)
+        self._manager.p.unregister_timer(self._timer)
 
     class __InternalTimer(threading.Thread):
         '''
