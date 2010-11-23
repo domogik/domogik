@@ -18,7 +18,7 @@ range['gas'] = [0, 100];
 range['electricity'] = [0, 100];
 range['temperature'] = [0, 100];
 range['mirror'] = [0, 100];
-range['nabaztag'] = [0, 100];
+range['nanoztag'] = [0, 100];
 
 function findRangeIcon(usage, percent) {
 	var nearest, last_d_memorized = 101;
