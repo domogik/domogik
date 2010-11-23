@@ -89,9 +89,9 @@
 .icon64-usage-gas { background-image:url(../images/device_usage/todo_64.png);}
 .icon32-usage-gas { background-image:url(../images/device_usage/todo_32.png);}
 .icon16-usage-gas { background-image:url(../images/device_usage/todo_16.png);}
-.icon64-usage-electricity { background-image:url(../images/device_usage/todo_64.png);}
-.icon32-usage-electricity { background-image:url(../images/device_usage/todo_32.png);}
-.icon16-usage-electricity { background-image:url(../images/device_usage/todo_16.png);}
+.icon64-usage-electricity { background-image:url(../images/device_usage/electricity/usage_64.png);}
+.icon32-usage-electricity { background-image:url(../images/device_usage/electricity/usage_32.png);}
+.icon16-usage-electricity { background-image:url(../images/device_usage/electricity/usage_16.png);}
 .icon64-usage-temperature { background-image:url(../images/device_usage/todo_64.png);}
 .icon32-usage-temperature { background-image:url(../images/device_usage/todo_32.png);}
 .icon16-usage-temperature { background-image:url(../images/device_usage/todo_16.png);}
@@ -271,12 +271,12 @@
 .icon32-usage-gas.range_0 { background-image:url(../images/device_usage/todo_32.png);}
 .icon32-usage-gas.range_100 { background-image:url(../images/device_usage/todo_32.png);}
 
-.icon32-usage-electricity.unknown { background-image:url(../images/device_usage/todo_32.png);}
-.icon32-usage-electricity.trigger { background-image:url(../images/device_usage/todo_32.png);}
-.icon32-usage-electricity.binary_0 { background-image:url(../images/device_usage/todo_32.png);}
-.icon32-usage-electricity.binary_1 { background-image:url(../images/device_usage/todo_32.png);}
-.icon32-usage-electricity.range_0 { background-image:url(../images/device_usage/todo_32.png);}
-.icon32-usage-electricity.range_100 { background-image:url(../images/device_usage/todo_32.png);}
+.icon32-usage-electricity.unknown { background-image:url(../images/device_usage/electricity/undefined_32.png);}
+.icon32-usage-electricity.trigger { background-image:url(../images/device_usage/electricity/100_32.png);}
+.icon32-usage-electricity.binary_0 { background-image:url(../images/device_usage/electricity/0_32.png);}
+.icon32-usage-electricity.binary_1 { background-image:url(../images/device_usage/electricity/100_32.png);}
+.icon32-usage-electricity.range_0 { background-image:url(../images/device_usage/electricity/0_32.png);}
+.icon32-usage-electricity.range_100 { background-image:url(../images/device_usage/electricity/100_32.png);}
 
 .icon32-usage-temperature.unknown { background-image:url(../images/device_usage/todo_32.png);}
 .icon32-usage-temperature.trigger { background-image:url(../images/device_usage/todo_32.png);}
