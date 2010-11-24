@@ -69,8 +69,8 @@ class X10Main(XplPlugin):
         try:
             self.__myx10 = X10API(self._heyu_cfg_path_res, self.log)
         except Exception:
-            print "Something went wrong during heyu init, check logs"
-            self.log.debug("Exception : %s" % traceback.format_exc())
+            self.log.error("Something went wrong during heyu init, check logs")
+            self.log.error("Exception : %s" % traceback.format_exc())
             exit(1)
         #Create listeners
         Listener(self.x10_cmnd_cb, self.myxpl, {'schema': 'x10.basic', 'xpltype': 'xpl-cmnd'})
@@ -131,7 +131,6 @@ class X10Main(XplPlugin):
             key = "heyu_file_%s" % count
             count = count + 1
             mess.add_data({key :  line})
-        #print "Message is : %s" % m
         self.myxpl.send(mess)
 
     def x10_cmnd_cb(self, message):
