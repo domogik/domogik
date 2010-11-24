@@ -16,6 +16,9 @@
 
         _init: function() {
             var self = this, o = this.options;
+            
+            if (!o.model_parameters.unit) o.model_parameters.unit = ''; // if unit not defined, display ''
+            
             this.element.addClass("icon32-usage-" + o.usage)
                 .addClass('clickable');
             this._value =  $("<div class='value'></div>");

@@ -16,6 +16,9 @@
 
         _init: function() {
             var self = this, o = this.options;
+            
+            if (!o.model_parameters.unit) o.model_parameters.unit = ''; // if unit not defined, display ''
+
             this._elementValue =  $("<div class='widget_value'></div>");
             this.element.append(this._elementValue);
             this._initValues(1);
