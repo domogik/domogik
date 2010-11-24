@@ -107,8 +107,8 @@ class Query():
             if r in result:
                 self.log.debug("Config value received : %s : %s" % (r, result[r]))
                 res = self._keys.pop(r)
-                self._l[key].unregister()
-                del self._l[key]
+                self._l[r].unregister()
+                del self._l[r]
                 res.set_value(result)
                 res.get_lock().set()
                 break
