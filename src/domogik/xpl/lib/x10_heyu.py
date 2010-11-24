@@ -399,7 +399,7 @@ class HeyuManager:
     ITEMS_SECTION['scripts'] = ['SCRIPT', 'SCRIPT_MODE', 'SCRIPT_CTRL']
     ITEMS_SECTION['scheduler'] = ['SCHEDULE_FILE', 'MODE', 'PROGRAM_DAYS', 'COMBINE_EVENTS',
                                   'COMPRESS_MACROS', 'REPL_DELAYED_MACROS', 'WRITE_CHECK_FILES']
-    ITEMS_SECTION['dawnduk'] = ['LONGITUDE', 'LATITUDE', 'DAWN_OPTION', 'DUSK_OPTION',
+    ITEMS_SECTION['dawndusk'] = ['LONGITUDE', 'LATITUDE', 'DAWN_OPTION', 'DUSK_OPTION',
                                 'MIN_DAWN', 'MAX_DAWN', 'MIN_DUSK', 'MAX_DUSK']
 
     def __init__(self, path):
