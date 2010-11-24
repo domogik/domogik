@@ -63,6 +63,7 @@ Implements
 """
 
 import re
+import os.path
 from subprocess import Popen, PIPE
 import threading
 from domogik.common import logger
@@ -90,11 +91,15 @@ class X10API:
     """
 
     def __init__(self, heyuconf, log):
+        if not os.path.isfile(heyuconf):
+            raise X10Exception("Config file %s does not exist, can't start heyu" % heyuconf)
         self._log = log
-        res = Popen("heyu -c " + heyuconf + " start", shell=True, stderr=PIPE)
+        cmd = "heyu -c " + heyuconf + " start"
+        res = Popen(cmd, shell=True, stderr=PIPE)
         output = res.stderr.read()
         res.stderr.close()
         if output:
+            self._log.error("Can't run : %s" % cmd)
             self._log.error("Output was : %s\nHeyu config file path is : %s" % (output, heyuconf))
             raise X10Exception("Something went wrong with heyu. Please check Heyu log files")
         self._housecodes = list('ABCDEFGHIJKLMNOP')
