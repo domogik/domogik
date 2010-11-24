@@ -57,6 +57,7 @@ class Query():
         self.__myxpl = xpl
         self.log.debug("Init config query instance")
         self._keys = {}
+        self._l = {}
 
     def __del__(self):
         print "End query"
@@ -72,9 +73,10 @@ class Query():
         all the config items for this technology will be fetched
         '''
         print "new query for t = %s, k = %s" % (technology, key)
-        Listener(self._query_cb, self.__myxpl, {'schema': 'domogik.config', 'xpltype': 'xpl-stat',
+        l = Listener(self._query_cb, self.__myxpl, {'schema': 'domogik.config', 'xpltype': 'xpl-stat',
                                                 'technology': technology, 'hostname' : self.__myxpl.p.get_sanitized_hostname()})
         self._keys[key] = result
+        self._l[key] = l
         mess = XplMessage()
         mess.set_type('xpl-cmnd')
         mess.set_schema('domogik.config')
@@ -105,6 +107,8 @@ class Query():
             if r in result:
                 self.log.debug("Config value received : %s : %s" % (r, result[r]))
                 res = self._keys.pop(r)
+                self._l[key].unregister()
+                del self._l[key]
                 res.set_value(result)
                 res.get_lock().set()
                 break
