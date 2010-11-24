@@ -1964,7 +1964,6 @@ class DbHelper():
             query = query.filter_by(key=ucode(ds_key)).filter_by(device_id=ds_device_id
                         ).filter("date >= '" + _datetime_string_from_tstamp(start_date_ts, self.get_db_type()) + "'"
                         ).filter("date < '" + _datetime_string_from_tstamp(end_date_ts, self.get_db_type()) + "'")
-            
             result_list = query.all()
         else:
             datetime_cursor = datetime.datetime.fromtimestamp(start_date_ts)

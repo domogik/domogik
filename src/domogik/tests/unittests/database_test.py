@@ -1135,6 +1135,16 @@ class DeviceStatsTestCase(GenericTestCase):
                                                         step_used='month', function_used=func)
             assert results == expected_results[func]
 
+        # Test with no end date
+        results =  db.filter_stats_of_device_by_key(ds_key='valmy', ds_device_id=device1.id,
+                                                    start_date_ts=make_ts(2010, 6, 21, 15, 48, 0),
+                                                    end_date_ts=None,
+                                                    step_used='month', function_used='avg')
+        ym_list = [(r[0], r[1]) for r in results]
+        now = datetime.datetime.now()
+        assert (2010, 6) in ym_list
+        assert (now.year, now.month) in ym_list
+
         # Years
         expected_results = {
             'avg': [(2010, 6.0), (2011, 25.0), (2012, 43.0)],
