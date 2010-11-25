@@ -43,9 +43,7 @@ import calendar, datetime, hashlib, time
 from types import DictType
 
 import sqlalchemy
-from sqlalchemy.sql.expression import func
-from sqlalchemy.sql.expression import extract
-from sqlalchemy.sql.expression import alias
+from sqlalchemy.sql.expression import func, extract, alias
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
