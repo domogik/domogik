@@ -48,10 +48,10 @@ from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.common import logger
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
-from domogik.xpl.lib.rest_json import JSonHelper
-from domogik.xpl.lib.rest_event import EventRequests
-from domogik.xpl.lib.rest_stat import StatsManager
-from domogik.xpl.lib.rest_request import ProcessRequest
+from domogik.xpl.lib.rest.json import JSonHelper
+from domogik.xpl.lib.rest.event import EventRequests
+from domogik.xpl.lib.rest.stat import StatsManager
+from domogik.xpl.lib.rest.request import ProcessRequest
 from domogik.common.configloader import Loader
 from xml.dom import minidom
 import time

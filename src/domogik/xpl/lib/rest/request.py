@@ -40,7 +40,7 @@ from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.common.database import DbHelper
 from domogik.xpl.common.helper import HelperError
-from domogik.xpl.lib.rest_json import JSonHelper
+from domogik.xpl.lib.rest.json import JSonHelper
 import time
 import urllib
 from socket import gethostname
