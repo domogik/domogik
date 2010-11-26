@@ -91,7 +91,8 @@ class PackageXml():
             self.name = self.xml_content.getElementsByTagName("name")[0].firstChild.nodeValue
             self.desc = self.xml_content.getElementsByTagName("description")[0].firstChild.nodeValue
             self.detail = self.xml_content.getElementsByTagName("detail")[0].firstChild.nodeValue
-            self.techno = self.xml_content.getElementsByTagName("technology")[0].firstChild.nodeValue
+            # TODO : remove
+            #self.techno = self.xml_content.getElementsByTagName("technology")[0].firstChild.nodeValue
             self.version = self.xml_content.getElementsByTagName("version")[0].firstChild.nodeValue
             self.doc = self.xml_content.getElementsByTagName("documentation")[0].firstChild.nodeValue
             self.author = self.xml_content.getElementsByTagName("author")[0].firstChild.nodeValue
@@ -125,6 +126,49 @@ class PackageXml():
                 self.package_url = "%s.tar.gz" % url_prefix
                 self.xml_url = "%s.xml" % url_prefix
                 self.priority = rep[0].attributes.get("priority").value
+
+            # data for database
+            dtec = self.xml_content.getElementsByTagName("device_technology")[0]
+            self.technology = {}
+            self.technology["id"] = dtec.getElementsByTagName("id")[0].firstChild.nodeValue
+            self.techno = self.technology["id"]
+            self.technology["name"] = dtec.getElementsByTagName("name")[0].firstChild.nodeValue
+            self.technology["description"] = dtec.getElementsByTagName("description")[0].firstChild.nodeValue
+            
+            dtypes = self.xml_content.getElementsByTagName("device_types")[0]
+            self.device_types = []
+            for dtype in dtypes.getElementsByTagName("device_type"):
+                self.device_types.append({
+                        "id" : dtype.getElementsByTagName("id")[0].firstChild.nodeValue,
+                        "name" : dtype.getElementsByTagName("name")[0].firstChild.nodeValue,
+                        "description" : dtype.getElementsByTagName("description")[0].firstChild.nodeValue
+                        })
+            
+            dusages = self.xml_content.getElementsByTagName("device_usages")[0]
+            self.device_usages = []
+            for dusage in dusages.getElementsByTagName("device_usage"):
+                self.device_usages.append({
+                        "id" : dusage.getElementsByTagName("id")[0].firstChild.nodeValue,
+                        "name" : dusage.getElementsByTagName("name")[0].firstChild.nodeValue,
+                        "description" : dusage.getElementsByTagName("description")[0].firstChild.nodeValue,
+                        "default_options" : dusage.getElementsByTagName("default_options")[0].firstChild.nodeValue
+                        })
+            
+            dfms = self.xml_content.getElementsByTagName("device_feature_models")[0]
+            self.device_feature_models = []
+            for dfm in dusages.getElementsByTagName("dfms"):
+                self.device_feature_models.append({
+                        "id" : dfm.getElementsByTagName("id")[0].firstChild.nodeValue,
+                        "name" : dfm.getElementsByTagName("name")[0].firstChild.nodeValue,
+                        "feature_type" : dfm.getElementsByTagName("feature_type")[0].firstChild.nodeValue,
+                        "device_type_id" : dfm.getElementsByTagName("device_type_id")[0].firstChild.nodeValue,
+                        "parameters" : dfm.getElementsByTagName("parameters")[0].firstChild.nodeValue
+                        })
+
+            print self.technology
+            print self.device_types
+            print self.device_usages
+            print self.device_feature_models
 
         except:
             raise PackageException("Error reading xml file : %s : %s" % (xml_file, str(traceback.format_exc())))
@@ -173,4 +217,5 @@ class PackageXml():
             print("Priority       : %s" % self.priority)
         print("---------------------------------------------------------")
 
-
+if __name__ == "__main__":
+    PX = PackageXml("x10_heyu")
