@@ -39,4 +39,12 @@
   </configuration-keys>
   <files/>
   <depandancies/>
+  <device_technology>
+      <id>communication</id>
+      <name>Communication</name>
+      <description>Messaging</description>
+  </device_technology>
+  <device_types/>
+  <device_types/>
+  <device_feature_models/>
 </package>

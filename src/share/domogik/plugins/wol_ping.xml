@@ -115,4 +115,55 @@
     <file path="src/domogik/xpl/lib/wol_ping.py"/>
   </files>
   <depandancies/>
+  <device_technology>
+      <id>computer</id>
+      <name>Computer</name>
+      <description>Computer</description>
+  </device_technology>
+  <device_types>
+      <device_type>
+          <id>computer.control</id>
+          <device_technology_id>computer</device_technology_id>
+          <name>Control</name>
+          <description>Control</description>
+      </device_type>
+  </device_types>
+  <device_feature_models>
+      <device_feature_model>
+          <id>computer.control.wol</id>
+          <name>Wake on lan</name>
+          <feature_type>actuator</feature_type>
+          <device_type_id>computer.control</device_type_id>
+          <parameters>
+              {&quot;command&quot;:&quot;wol&quot;}
+          </parameters>
+          <value_type>trigger</value_type>
+          <stat_key/>
+          <return_confirmation>1</return_confirmation>
+      </device_feature_model>
+      <device_feature_model>
+          <id>computer.control.ping</id>
+          <name>Ping</name>
+          <feature_type>sensor</feature_type>
+          <device_type_id>computer.control</device_type_id>
+          <parameters>
+              {}
+          </parameters>
+          <value_type>boolean</value_type>
+          <stat_key>ping</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+      <device_feature_model>
+          <id>plcbus.dimmer.change</id>
+          <name></name>
+          <feature_type>actuator</feature_type>
+          <device_type_id>plcbus.dimmer</device_type_id>
+          <parameters>
+              {&quot;command&quot;:&quot;preset_dim&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:100}{&quot;command&quot;:&quot;preset_dim&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:100}
+          </parameters>
+          <value_type>range</value_type>
+          <stat_key>level</stat_key>
+          <return_confirmation>1</return_confirmation>
+      </device_feature_model>
+  </device_feature_models>
 </package>
