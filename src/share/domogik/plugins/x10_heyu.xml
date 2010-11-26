@@ -37,20 +37,20 @@
   <device_technology>
       <id>x10</id>
       <name>X10</name>
-      <description>X10</description>
-  </devices_technology>
+      <description>X10 technology</description>
+  </device_technology>
   <device_types>
       <device_type>
           <id>x10.switch</id>
-          <device_technology_id>x10</device_technology_id>
           <name>Switch</name>
-          <description></description>
+          <description>Switch</description>
+          <device_technology_id>x10</device_technology_id>
       </device_type>
       <device_type>
           <id>x10.dimmer</id>
-          <device_technology_id>x10</device_technology_id>
           <name>Dimmer</name>
-          <description></description>
+          <description>Dimmer</description>
+          <device_technology_id>x10</device_technology_id>
       </device_type>
   </device_types>
   <device_feature_models>
