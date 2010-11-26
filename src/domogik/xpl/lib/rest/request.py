@@ -3095,3 +3095,49 @@ target=*
     ##### END OF TEMPORARY FUNCTIONS
 
 
+#####
+# /scenario processing
+#####
+
+    def rest_scenario(self):
+        """ REST scenario 
+        """
+        print "Scenario action"
+
+        ### list-templates #####################################
+        if self.rest_request[0] == "list-templates":
+            if len(self.rest_request) != 1:
+                self.send_http_response_error(999, "Wrong number of parameters for %s" % self.rest_request[0],
+                                          self.jsonp, self.jsonp_cb)
+            else:
+                self._rest_scenario_list_templates()
+
+        ### detail-templates #####################################
+        elif self.rest_request[0] == "detail-templates":
+            if len(self.rest_request) != 2:
+                self.send_http_response_error(999, "Wrong number of parameters for %s" % self.rest_request[0],
+                                          self.jsonp, self.jsonp_cb)
+            else:
+                self._rest_scenario_detail_templates(self.rest_request[1])
+
+        ### list-instances #####################################
+        elif self.rest_request[0] == "list-instances":
+            if len(self.rest_request) != 1:
+                self.send_http_response_error(999, "Wrong number of parameters for %s" % self.rest_request[0],
+                                          self.jsonp, self.jsonp_cb)
+            else:
+                self._rest_scenario_list_instances()
+            
+        ### detail-instances #####################################
+        elif self.rest_request[0] == "detail-instances":
+            if len(self.rest_request) != 2:
+                self.send_http_response_error(999, "Wrong number of parameters for %s" % self.rest_request[0],
+                                          self.jsonp, self.jsonp_cb)
+            else:
+                self._rest_scenario_detail_instances(self.rest_request[1])
+            
+        ### others ##################################
+        else:
+            self.send_http_response_error(999, self.rest_request[0] + " not allowed", self.jsonp, self.jsonp_cb)
+
+
