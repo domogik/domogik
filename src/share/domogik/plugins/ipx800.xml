@@ -139,4 +139,97 @@ Supported features :
     <file path="src/domogik/xpl/lib/ipx800.py"/>
   </files>
   <depandancies/>
+  <device_technology>
+      <id>relayboard</id>
+      <name>Relay board</name>
+      <description>Relay boards monitoring and controlling</description>
+  </device_technology>
+  <device_types>
+      <device_type>
+          <id>relayboard.relay</id>
+          <device_technology_id>relayboard</device_technology_id>
+          <name>Relay</name>
+          <description>Relay</description>
+      </device_type>
+      <device_type>
+          <id>relayboard.digital_input</id>
+          <device_technology_id>relayboard</device_technology_id>
+          <name>Digital input</name>
+          <description>Digital input</description>
+      </device_type>
+      <device_type>
+          <id>relayboard.analog_input</id>
+          <device_technology_id>relayboard</device_technology_id>
+          <name>Analog input</name>
+          <description>Analog input</description>
+      </device_type>
+      <device_type>
+          <id>relayboard.counter</id>
+          <device_technology_id>relayboard</device_technology_id>
+          <name>Counter</name>
+          <description>Counter</description>
+      </device_type>
+  </device_types>
+  <device_feature_models>
+      <device_feature_model>
+          <id>relayboard.relay.switch</id>
+          <name>Switch</name>
+          <feature_type>actuator</feature_type>
+          <device_type_id>relayboard.relay</device_type_id>
+          <parameters>
+              {&quot;output&quot;:&quot;&quot;,&quot;value0&quot;:&quot;low&quot;, &quot;value1&quot;:&quot;high&quot;}
+          </parameters>
+          <value_type>binary</value_type>
+          <stat_key>output</stat_key>
+          <return_confirmation>1</return_confirmation>
+      </device_feature_model>
+      <device_feature_model>
+          <id>relayboard.relay.trigger</id>
+          <name>Trigger</name>
+          <feature_type>actuator</feature_type>
+          <device_type_id>relayboard.relay</device_type_id>
+          <parameters>
+              {&quot;command&quot;:&quot;pulse&quot;}
+          </parameters>
+          <value_type>trigger</value_type>
+          <stat_key/>
+          <return_confirmation>1</return_confirmation>
+      </device_feature_model>
+      <device_feature_model>
+          <id>relayboard.digital_input.digital_input</id>
+          <name>Digital input</name>
+          <feature_type>sensor</feature_type>
+          <device_type_id>relayboard.digital_input</device_type_id>
+          <parameters>
+              {}
+          </parameters>
+          <value_type>boolean</value_type>
+          <stat_key>input</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+      <device_feature_model>
+          <id>relayboard.analog_input.analog_input</id>
+          <name>Analog input</name>
+          <feature_type>sensor</feature_type>
+          <device_type_id>relayboard.analog_input</device_type_id>
+          <parameters>
+              {}
+          </parameters>
+          <value_type>boolean</value_type>
+          <stat_key>voltage</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+      <device_feature_model>
+          <id>relayboard.counter.counter</id>
+          <name>Counter</name>
+          <feature_type>sensor</feature_type>
+          <device_type_id>relayboard.counter</device_type_id>
+          <parameters>
+              {}
+          </parameters>
+          <value_type>boolean</value_type>
+          <stat_key>counter</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+  </device_feature_models>
 </package>

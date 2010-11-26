@@ -40,4 +40,101 @@
   <depandancies>
     <dep name="pySerial > 2.4"/>
   </depandancies>
+  <device_technology>
+      <id>service</id>
+      <name>Service</name>
+      <description>Distributed services, water, gas, electricity</description>
+  </device_technology>
+  <device_types>
+      <device_type>
+          <id>service.teleinfo</id>
+          <device_technology_id>service</device_technology_id>
+          <name>Teleinfo</name>
+          <description>Teleinfo</description>
+      </device_type>
+  </device_types>
+  <device_feature_models>
+      <device_feature_model>
+          <id>service.teleinfo.max_power</id>
+          <name>Maximum power</name>
+          <feature_type>sensor</feature_type>
+          <device_type_id>service.teleinfo</device_type_id>
+          <parameters>
+              {&quot;unit&quot;:&quot;A&quot;} 
+          </parameters>
+          <value_type>number</value_type>
+          <stat_key>imax</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+      <device_feature_model>
+          <id>service.teleinfo.instant_power</id>
+          <name>Instant power</name>
+          <feature_type>sensor</feature_type>
+          <device_type_id>service.teleinfo</device_type_id>
+          <parameters>
+              {&quot;unit&quot;:&quot;A&quot;}
+          </parameters>
+          <value_type>number</value_type>
+          <stat_key>iinst</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+      <device_feature_model>
+          <id>service.teleinfo.off_peak_hours</id>
+          <name>Off peak hours</name>
+          <feature_type>sensor</feature_type>
+          <device_type_id>service.teleinfo</device_type_id>
+          <parameters>
+              {&quot;unit&quot;:&quot;Wh&quot;} 
+          </parameters>
+          <value_type>number</value_type>
+          <stat_key>hchc</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+      <device_feature_model>
+          <id>service.teleinfo.peak_hours</id>
+          <name>Peak hours</name>
+          <feature_type>sensor</feature_type>
+          <device_type_id>service.teleinfo</device_type_id>
+          <parameters>
+              {&quot;unit&quot;:&quot;Wh&quot;} 
+          </parameters>
+          <value_type>number</value_type>
+          <stat_key>hchp</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+      <device_feature_model>
+          <id>service.teleinfo.tariff_period</id>
+          <name>Tariff period</name>
+          <feature_type>sensor</feature_type>
+          <device_type_id>service.teleinfo</device_type_id>
+          <parameters/>
+          <value_type>string</value_type>
+          <stat_key>ptec</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+      <device_feature_model>
+          <id>service.teleinfo.apparent_power</id>
+          <name>Apparent power</name>
+          <feature_type>sensor</feature_type>
+          <device_type_id>service.teleinfo</device_type_id>
+          <parameters>
+              {&quot;unit&quot;:&quot;Va&quot;}
+          </parameters>
+          <value_type>number</value_type>
+          <stat_key>papp</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+      <device_feature_model>
+          <id>service.teleinfo.hourly_group</id>
+          <name>Hourly group</name>
+          <feature_type>sensor</feature_type>
+          <device_type_id>service.teleinfo</device_type_id>
+          <parameters/>
+          <value_type>string</value_type>
+          <stat_key>hhphc</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+  </device_feature_models>
+</package>
+  </device_feature_models>
 </package>

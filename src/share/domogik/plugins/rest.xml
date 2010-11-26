@@ -76,4 +76,11 @@
   </configuration-keys>
   <files/>
   <depandancies/>
+  <device_technology>
+      <id>domogik</id>
+      <name>Domogik</name>
+      <description>Domogik</description>
+  </device_technology>
+  <device_types/>
+  <device_feature_models/>
 </package>

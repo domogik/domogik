@@ -32,4 +32,49 @@
   <depandancies>
     <dep name="pySerial > 2.4"/>
   </depandancies>
+  <device_technology>
+      <id>rfid</id>
+      <name>RFID</name>
+      <description>RFID</description>
+  </device_technology>
+  <device_types>
+      <device_type>
+          <id>rfid.mirror_base</id>
+          <device_technology_id>rfid</device_technology_id>
+          <name>Mirror base</name>
+          <description>Mirror base</description>
+      </device_type>
+      <device_type>
+          <id>rfid.mirror_tag</id>
+          <device_technology_id>rfid</device_technology_id>
+          <name>Mirror tag</name>
+          <description>Mirror tag</description>
+      </device_type>
+  </device_types>
+  <device_feature_models>
+      <device_feature_model>
+          <id>rfid.mirror_base.activated</id>
+          <name>Activated</name>
+          <feature_type>sensor</feature_type>
+          <device_type_id>rfid.mirror_base</device_type_id>
+          <parameters>
+              {}
+          </parameters>
+          <value_type>boolean</value_type>
+          <stat_key>activated</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+      <device_feature_model>
+          <id>rfid.mirror_tag.present</id>
+          <name>Present</name>
+          <feature_type>sensor</feature_type>
+          <device_type_id>rfid.mirror_tag</device_type_id>
+          <parameters>
+              {}
+          </parameters>
+          <value_type>boolean</value_type>
+          <stat_key>present</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+  </device_feature_models>
 </package>
