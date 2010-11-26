@@ -61,4 +61,70 @@
   <depandancies>
     <dep name="pySerial > 2.4"/>
   </depandancies>
+  <device_technology>
+      <id>plcbus</id>
+      <name>PLCBus</name>
+      <description></description>
+  </devices_technology>
+  <device_types>
+      <device_type>
+          <id>plcbus.switch</id>
+          <device_technology_id>plcbus</device_technology_id>
+          <name>Switch</name>
+          <description></description>
+      </device_type>
+      <device_type>
+          <id>plcbus.dimmer</id>
+          <device_technology_id>plcbus</device_technology_id>
+          <name>Dimmer</name>
+          <description></description>
+      </device_type>
+  </device_types>
+  <device_usages>
+      <device_usage>
+          <id>light</id>
+          <name>Light</name>
+          <description>Lamp, light usage</description>
+          <default_options>
+              { &quot;actuator&quot;: { &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;}, &quot;range&quot;: {&quot;step&quot;:10, &quot;unit&quot;:&quot;%&quot;}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} } }
+          </default_options>
+      </device_usage>
+      <device_usage>
+          <id>appliance</id>
+          <name>Appliance</name>
+          <description>Appliance usage</description>
+          <default_options>
+              { &quot;actuator&quot;: { &quot;binary&quot;: {&quot;state0&quot;:&quot;Off&quot;, &quot;state1&quot;:&quot;On&quot;}, &quot;range&quot;: {&quot;step&quot;:10, &quot;unit&quot;:&quot;%&quot;}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} } }
+          </default_options>
+      </device_usage>
+  </device_usages>
+  <device_feature_models>
+      <device_feature_model>
+          <id>plcbus.switch.switch</id>
+          <name>Switch</name>
+          <feature_type>actuator</feature_type>
+          <device_type_id>plcbus.switch</device_type_id>
+          <parameters>
+              {&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}
+          </parameters>
+      </device_feature_model>
+      <device_feature_model>
+          <id>plcbus.dimmer.switch</id>
+          <name>Dimmer</name>
+          <feature_type>actuator</feature_type>
+          <device_type_id>plcbus.dimmer</device_type_id>
+          <parameters>
+              {&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}
+          </parameters>
+      </device_feature_model>
+      <device_feature_model>
+          <id>plcbus.dimmer.change</id>
+          <name></name>
+          <feature_type>actuator</feature_type>
+          <device_type_id>plcbus.dimmer</device_type_id>
+          <parameters>
+              {&quot;command&quot;:&quot;preset_dim&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:100}{&quot;command&quot;:&quot;preset_dim&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:100}
+          </parameters>
+      </device_feature_model>
+  </device_feature_models>
 </package>
