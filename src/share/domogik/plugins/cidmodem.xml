@@ -43,7 +43,7 @@
   <device_technology>
       <id>communication</id>
       <name>Communication</name>
-      <description>Telephony</description>
+      <description>Telephony, videophone, mails, messaging</description>
   </device_technology>
   <device_types>
       <device_type>

@@ -107,7 +107,7 @@
       </device_feature_model>
       <device_feature_model>
           <id>plcbus.dimmer.change</id>
-          <name></name>
+          <name>Change</name>
           <feature_type>actuator</feature_type>
           <device_type_id>plcbus.dimmer</device_type_id>
           <parameters>

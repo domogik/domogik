@@ -19,9 +19,9 @@
   <files/>
   <depandancies/>
   <device_technology>
-      <id>service</id>
-      <name>Service</name>
-      <description>Time</description>
+      <id>domogik</id>
+      <name>Domogik</name>
+      <description>Domogik</description>
   </device_technology>
   <device_types/>
   <device_feature_models/>
