@@ -144,30 +144,32 @@ class PackageXml():
                         "description" : dtype.getElementsByTagName("description")[0].firstChild.nodeValue
                         })
             
-            dusages = self.xml_content.getElementsByTagName("device_usages")[0]
-            self.device_usages = []
-            for dusage in dusages.getElementsByTagName("device_usage"):
-                self.device_usages.append({
-                        "id" : dusage.getElementsByTagName("id")[0].firstChild.nodeValue,
-                        "name" : dusage.getElementsByTagName("name")[0].firstChild.nodeValue,
-                        "description" : dusage.getElementsByTagName("description")[0].firstChild.nodeValue,
-                        "default_options" : dusage.getElementsByTagName("default_options")[0].firstChild.nodeValue
-                        })
+            #dusages = self.xml_content.getElementsByTagName("device_usages")[0]
+            #self.device_usages = []
+            #for dusage in dusages.getElementsByTagName("device_usage"):
+            #    self.device_usages.append({
+            #            "id" : dusage.getElementsByTagName("id")[0].firstChild.nodeValue,
+            #            "name" : dusage.getElementsByTagName("name")[0].firstChild.nodeValue,
+            #            "description" : dusage.getElementsByTagName("description")[0].firstChild.nodeValue,
+            #            "default_options" : dusage.getElementsByTagName("default_options")[0].firstChild.nodeValue
+            #            })
             
             dfms = self.xml_content.getElementsByTagName("device_feature_models")[0]
             self.device_feature_models = []
-            for dfm in dusages.getElementsByTagName("dfms"):
+            for dfm in dfms.getElementsByTagName("device_feature_model"):
                 self.device_feature_models.append({
                         "id" : dfm.getElementsByTagName("id")[0].firstChild.nodeValue,
                         "name" : dfm.getElementsByTagName("name")[0].firstChild.nodeValue,
                         "feature_type" : dfm.getElementsByTagName("feature_type")[0].firstChild.nodeValue,
                         "device_type_id" : dfm.getElementsByTagName("device_type_id")[0].firstChild.nodeValue,
-                        "parameters" : dfm.getElementsByTagName("parameters")[0].firstChild.nodeValue
+                        "value_type" : dfm.getElementsByTagName("value_type")[0].firstChild.nodeValue,
+                        "stat_key" : dfm.getElementsByTagName("stat_key")[0].firstChild.nodeValue,
+                        "return_confirmation" : dfm.getElementsByTagName("return_confirmation")[0].firstChild.nodeValue
                         })
 
             print self.technology
             print self.device_types
-            print self.device_usages
+            #print self.device_usages
             print self.device_feature_models
 
         except:
