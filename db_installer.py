@@ -333,9 +333,9 @@ def install(create_prod_db, create_test_db):
                     du_default_options='{&quot;actuator&quot;: { &quot;binary&quot;: {}, &quot;range&quot;: {}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} }}')
 
 def usage():
-    print "Usage : db_installer [-t, --test] [-P, --no-prod]"
-    print "-t or --test : database for unit tests will created (default is False)"
-    print "-P or --no-prod : no production database will be created (default is True)"
+    print("Usage : db_installer [-t, --test] [-P, --no-prod]")
+    print("-t or --test : database for unit tests will created (default is False)")
+    print("-P or --no-prod : no production database will be created (default is True)")
 
 if __name__ == "__main__":
     create_prod_db = True
