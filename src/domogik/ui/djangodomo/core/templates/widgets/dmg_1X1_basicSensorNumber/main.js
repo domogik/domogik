@@ -151,6 +151,10 @@
 				tooltip: {
 					formatter: null
 				},
+                plotOptions: {
+                    spline: {
+                    }
+                },
                 series: []
              };
 
@@ -182,15 +186,23 @@
 			                return Highcharts.dateFormat('%d/%m/%Y %Hh', this.x) +'<br/>'
                                 + "<strong>" + Highcharts.numberFormat(this.y, 2, ',') +" " + o.model_parameters.unit + "</strong>";
                         }
+            graph_options.plotOptions.spline.marker = {
+                            enabled: false,
+                            states: {
+                               hover: {
+                                  enabled: true
+                               }
+                            }   
+                         };
 
-            rest.get(['stats', o.deviceid, o.key, 'from', Math.round(from.getTime() / 1000), 'to', Math.round(to.getTime() / 1000),'interval', 'hour', 'selector', 'avg'],
+            rest.get(['stats', o.deviceid, o.key, 'from', Math.round(from.getTime() / 1000), 'to', Math.round(to.getTime() / 1000),'interval', 'minute', 'selector', 'avg'],
                 function(data) {
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
                         var d = [];
                         var values = data.stats[0].values;
                         $.each(values, function(index, stat) {
-                            d.push([(Date.UTC(stat[0], stat[1]-1, stat[3], stat[4], 0, 0)), stat[5]]);
+                            d.push([(Date.UTC(stat[0], stat[1]-1, stat[3], stat[4], stat[5], 0)), stat[6]]);
                         });
                         graph_options.series.push({name:o.featurename,data: d});
                         var chart = new Highcharts.Chart(graph_options);
