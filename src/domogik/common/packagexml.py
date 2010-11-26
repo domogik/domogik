@@ -157,13 +157,18 @@ class PackageXml():
             dfms = self.xml_content.getElementsByTagName("device_feature_models")[0]
             self.device_feature_models = []
             for dfm in dfms.getElementsByTagName("device_feature_model"):
+                try:
+                    stat_key = dfm.getElementsByTagName("stat_key")[0].firstChild.nodeValue
+                except AttributeError:
+                    stat_key = ""
                 self.device_feature_models.append({
                         "id" : dfm.getElementsByTagName("id")[0].firstChild.nodeValue,
                         "name" : dfm.getElementsByTagName("name")[0].firstChild.nodeValue,
                         "feature_type" : dfm.getElementsByTagName("feature_type")[0].firstChild.nodeValue,
                         "device_type_id" : dfm.getElementsByTagName("device_type_id")[0].firstChild.nodeValue,
                         "value_type" : dfm.getElementsByTagName("value_type")[0].firstChild.nodeValue,
-                        "stat_key" : dfm.getElementsByTagName("stat_key")[0].firstChild.nodeValue,
+                        "stat_key" : stat_key,
+                        "parameters" : dfm.getElementsByTagName("parameters")[0].firstChild.nodeValue,
                         "return_confirmation" : dfm.getElementsByTagName("return_confirmation")[0].firstChild.nodeValue
                         })
 

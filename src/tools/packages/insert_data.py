@@ -107,14 +107,14 @@ class PackageData():
             if self._db.get_device_feature_model_by_id(device_feature_model["id"]) == None:
                 # add if not exists
                 print("add...")
-                if device_feature_model["type"] == "sensor":
+                if device_feature_model["feature_type"] == "sensor":
                     self._db.add_sensor_feature_model(device_feature_model["id"],
                                                       device_feature_model["name"],
                                                       device_feature_model["device_type_id"],
                                                       device_feature_model["value_type"],
                                                       device_feature_model["parameters"],
                                                       device_feature_model["stat_key"])
-                elif device_feature_model["type"] == "actuator":
+                elif device_feature_model["feature_type"] == "actuator":
                     self._db.add_actuator_feature_model(device_feature_model["id"],
                                                         device_feature_model["name"],
                                                         device_feature_model["device_type_id"],
@@ -125,13 +125,13 @@ class PackageData():
             else:
                 # update if exists
                 print("update...")
-                if device_feature_model["type"] == "sensor":
+                if device_feature_model["feature_type"] == "sensor":
                     self._db.update_sensor_feature_model(device_feature_model["id"],
                                                       device_feature_model["name"],
                                                       device_feature_model["parameters"],
                                                       device_feature_model["value_type"],
                                                       device_feature_model["stat_key"])
-                elif device_feature_model["type"] == "actuator":
+                elif device_feature_model["feature_type"] == "actuator":
                     self._db.update_actuator_feature_model(device_feature_model["id"],
                                                         device_feature_model["name"],
                                                         device_feature_model["parameters"],

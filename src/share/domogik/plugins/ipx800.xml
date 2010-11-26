@@ -192,7 +192,7 @@ Supported features :
               {&quot;command&quot;:&quot;pulse&quot;}
           </parameters>
           <value_type>trigger</value_type>
-          <stat_key/>
+          <stat_key>output</stat_key>
           <return_confirmation>1</return_confirmation>
       </device_feature_model>
       <device_feature_model>
