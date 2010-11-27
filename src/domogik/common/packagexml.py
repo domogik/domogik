@@ -172,11 +172,6 @@ class PackageXml():
                         "return_confirmation" : dfm.getElementsByTagName("return_confirmation")[0].firstChild.nodeValue
                         })
 
-            print self.technology
-            print self.device_types
-            #print self.device_usages
-            print self.device_feature_models
-
         except:
             raise PackageException("Error reading xml file : %s : %s" % (xml_file, str(traceback.format_exc())))
 

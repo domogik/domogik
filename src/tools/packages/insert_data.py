@@ -63,7 +63,7 @@ class PackageData():
             return
 
         # display plugin informations
-        self.plg.display()
+        #self.plg.display()
 
     def insert(self):
         """ Insert data for plugin
