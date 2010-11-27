@@ -38,6 +38,8 @@ PackageXml
 from domogik.common.configloader import Loader
 from xml.dom import minidom
 import traceback
+from xml.sax.saxutils import escape
+
 
 
 PLG_XML_PATH = "share/domogik/plugins/"
@@ -87,27 +89,27 @@ class PackageXml():
                 self.xml_content = minidom.parseString(xml_data.read())
 
             # read xml file
-            self.type = self.xml_content.getElementsByTagName("package")[0].attributes.get("type").value
-            self.name = self.xml_content.getElementsByTagName("name")[0].firstChild.nodeValue
-            self.desc = self.xml_content.getElementsByTagName("description")[0].firstChild.nodeValue
-            self.detail = self.xml_content.getElementsByTagName("detail")[0].firstChild.nodeValue
+            self.type = self.xml_content.getElementsByTagName("package")[0].attributes.get("type").value.strip()
+            self.name = self.xml_content.getElementsByTagName("name")[0].firstChild.nodeValue.strip()
+            self.desc = self.xml_content.getElementsByTagName("description")[0].firstChild.nodeValue.strip()
+            self.detail = self.xml_content.getElementsByTagName("detail")[0].firstChild.nodeValue.strip()
             # TODO : remove
-            #self.techno = self.xml_content.getElementsByTagName("technology")[0].firstChild.nodeValue
-            self.version = self.xml_content.getElementsByTagName("version")[0].firstChild.nodeValue
-            self.doc = self.xml_content.getElementsByTagName("documentation")[0].firstChild.nodeValue
-            self.author = self.xml_content.getElementsByTagName("author")[0].firstChild.nodeValue
-            self.email = self.xml_content.getElementsByTagName("author-email")[0].firstChild.nodeValue
+            #self.techno = self.xml_content.getElementsByTagName("technology")[0].firstChild.nodeValue.strip()
+            self.version = self.xml_content.getElementsByTagName("version")[0].firstChild.nodeValue.strip()
+            self.doc = self.xml_content.getElementsByTagName("documentation")[0].firstChild.nodeValue.strip()
+            self.author = self.xml_content.getElementsByTagName("author")[0].firstChild.nodeValue.strip()
+            self.email = self.xml_content.getElementsByTagName("author-email")[0].firstChild.nodeValue.strip()
             # list of files
             self.files = []
             xml_data = self.xml_content.getElementsByTagName("files")[0]
             for my_file in xml_data.getElementsByTagName("file"):
-               data = {"path" :  my_file.attributes.get("path").value}
+               data = {"path" :  my_file.attributes.get("path").value.strip()}
                self.files.append(data)
             # list of depandancies
             self.depandancies = []
             xml_data = self.xml_content.getElementsByTagName("depandancies")[0]
             for dep in xml_data.getElementsByTagName("dep"):
-               data = {"name" :  dep.attributes.get("name").value}
+               data = {"name" :  dep.attributes.get("name").value.strip()}
                self.depandancies.append(data)
 
             # construct filenames
@@ -122,26 +124,26 @@ class PackageXml():
                 self.xml_url = None
                 self.priority = None
             else:
-                url_prefix = rep[0].attributes.get("url_prefix").value
+                url_prefix = rep[0].attributes.get("url_prefix").value.strip()
                 self.package_url = "%s.tar.gz" % url_prefix
                 self.xml_url = "%s.xml" % url_prefix
-                self.priority = rep[0].attributes.get("priority").value
+                self.priority = rep[0].attributes.get("priority").value.strip()
 
             # data for database
             dtec = self.xml_content.getElementsByTagName("device_technology")[0]
             self.technology = {}
-            self.technology["id"] = dtec.getElementsByTagName("id")[0].firstChild.nodeValue
+            self.technology["id"] = dtec.getElementsByTagName("id")[0].firstChild.nodeValue.strip()
             self.techno = self.technology["id"]
-            self.technology["name"] = dtec.getElementsByTagName("name")[0].firstChild.nodeValue
-            self.technology["description"] = dtec.getElementsByTagName("description")[0].firstChild.nodeValue
+            self.technology["name"] = dtec.getElementsByTagName("name")[0].firstChild.nodeValue.strip()
+            self.technology["description"] = dtec.getElementsByTagName("description")[0].firstChild.nodeValue.strip()
             
             dtypes = self.xml_content.getElementsByTagName("device_types")[0]
             self.device_types = []
             for dtype in dtypes.getElementsByTagName("device_type"):
                 self.device_types.append({
-                        "id" : dtype.getElementsByTagName("id")[0].firstChild.nodeValue,
-                        "name" : dtype.getElementsByTagName("name")[0].firstChild.nodeValue,
-                        "description" : dtype.getElementsByTagName("description")[0].firstChild.nodeValue
+                        "id" : dtype.getElementsByTagName("id")[0].firstChild.nodeValue.strip(),
+                        "name" : dtype.getElementsByTagName("name")[0].firstChild.nodeValue.strip(),
+                        "description" : dtype.getElementsByTagName("description")[0].firstChild.nodeValue.strip()
                         })
             
             #dusages = self.xml_content.getElementsByTagName("device_usages")[0]
@@ -158,18 +160,18 @@ class PackageXml():
             self.device_feature_models = []
             for dfm in dfms.getElementsByTagName("device_feature_model"):
                 try:
-                    stat_key = dfm.getElementsByTagName("stat_key")[0].firstChild.nodeValue
+                    stat_key = dfm.getElementsByTagName("stat_key")[0].firstChild.nodeValue.strip()
                 except AttributeError:
                     stat_key = ""
                 self.device_feature_models.append({
-                        "id" : dfm.getElementsByTagName("id")[0].firstChild.nodeValue,
-                        "name" : dfm.getElementsByTagName("name")[0].firstChild.nodeValue,
-                        "feature_type" : dfm.getElementsByTagName("feature_type")[0].firstChild.nodeValue,
-                        "device_type_id" : dfm.getElementsByTagName("device_type_id")[0].firstChild.nodeValue,
-                        "value_type" : dfm.getElementsByTagName("value_type")[0].firstChild.nodeValue,
+                        "id" : dfm.getElementsByTagName("id")[0].firstChild.nodeValue.strip(),
+                        "name" : dfm.getElementsByTagName("name")[0].firstChild.nodeValue.strip(),
+                        "feature_type" : dfm.getElementsByTagName("feature_type")[0].firstChild.nodeValue.strip(),
+                        "device_type_id" : dfm.getElementsByTagName("device_type_id")[0].firstChild.nodeValue.strip(),
+                        "value_type" : dfm.getElementsByTagName("value_type")[0].firstChild.nodeValue.strip(),
                         "stat_key" : stat_key,
-                        "parameters" : dfm.getElementsByTagName("parameters")[0].firstChild.nodeValue,
-                        "return_confirmation" : dfm.getElementsByTagName("return_confirmation")[0].firstChild.nodeValue
+                        "parameters" : dfm.getElementsByTagName("parameters")[0].firstChild.toxml().strip(),
+                        "return_confirmation" : dfm.getElementsByTagName("return_confirmation")[0].firstChild.nodeValue.strip()
                         })
 
         except:

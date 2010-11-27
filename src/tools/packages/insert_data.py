@@ -104,6 +104,7 @@ class PackageData():
         ### Device feature model
         for device_feature_model in self.plg.device_feature_models:
             print("Device feature model %s" % device_feature_model["id"])
+            print "M.P=%s" % device_feature_model["parameters"]
             if self._db.get_device_feature_model_by_id(device_feature_model["id"]) == None:
                 # add if not exists
                 print("add...")
