@@ -42,12 +42,15 @@ global config_path
 ####################################################
 import os
 import ConfigParser
+import threading
 
 
 class Loader():
     '''
     Parse Domogik config files
     '''
+
+    config = None 
 
     def __init__(self, plugin_name=None):
         '''
@@ -64,11 +67,20 @@ class Loader():
         @return pair (main_config, plugin_config)
         '''
         main_result = {}
-        config = ConfigParser.ConfigParser()
-        config.read([custom_path, os.getenv("HOME") + "/." + self.main_conf_name,
-            '/etc/' + self.main_conf_name,
-            '/usr/local/etc/' + self.main_conf_name])
-        result = config.items('domogik')
+        if self.__class__.config == None:
+            self.__class__.config = ConfigParser.ConfigParser()
+            print "list : %s" % [custom_path, os.getenv("HOME") + "/." + self.main_conf_name,
+                '/etc/' + self.main_conf_name,
+                '/usr/local/etc/' + self.main_conf_name]
+            print "threads : %s" % threading.enumerate()
+            files = self.__class__.config.read([custom_path, os.getenv("HOME") + "/." + self.main_conf_name,
+                '/etc/' + self.main_conf_name,
+                '/usr/local/etc/' + self.main_conf_name])
+            print "Files parsed : %s" % files
+            print "Sections : %s" % self.__class__.config.sections()
+        else:
+            print "config already loaded"
+        result = self.__class__.config.items('domogik')
         main_result = {}
         for k, v in result:
             main_result[k] = v
@@ -77,7 +89,7 @@ class Loader():
             return (main_result, None)
 
         if self.plugin_name:
-            return (main_result, config.items(self.plugin_name))
+            return (main_result, self.__class__.config.items(self.plugin_name))
         else:
             #If we're here, there is no plugin config
             return (main_result, None)
