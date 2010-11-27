@@ -98,4 +98,49 @@ List of supported devices :
   <depandancies>
     <dep name="pyowfs >= 0.1.3"/>
   </depandancies>
+  <device_technology>
+      <id>onewire</id>
+      <name>1-wire</name>
+      <description>1-wire</description>
+  </device_technology>
+  <device_types>
+      <device_type>
+          <id>onewire.thermometer</id>
+          <device_technology_id>onewire</device_technology_id>
+          <name>Thermometer</name>
+          <description>Thermometer</description>
+      </device_type>
+      <device_type>
+          <id>onewire.serial_number</id>
+          <device_technology_id>onewire</device_technology_id>
+          <name>Serial number</name>
+          <description>Serial number</description>
+      </device_type>
+  </device_types>
+  <device_feature_models>
+      <device_feature_model>
+          <id>onewire.thermometer.temperature</id>
+          <name>Temperature</name>
+          <feature_type>sensor</feature_type>
+          <device_type_id>onewire.thermometer</device_type_id>
+          <parameters>
+              {&quot;unit&quot;:&quot;\u00B0C&quot;}
+          </parameters>
+          <value_type>number</value_type>
+          <stat_key>temperature</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+      <device_feature_model>
+          <id>onewire.serial_number.connected</id>
+          <name>Connected</name>
+          <feature_type>sensor</feature_type>
+          <device_type_id>onewire.serial_number</device_type_id>
+          <parameters>
+              {}
+          </parameters>
+          <value_type>boolean</value_type>
+          <stat_key>present</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+  </device_feature_models>
 </package>

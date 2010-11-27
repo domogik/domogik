@@ -40,4 +40,31 @@
   <depandancies>
     <dep name="pySerial > 2.4"/>
   </depandancies>
+  <device_technology>
+      <id>communication</id>
+      <name>Communication</name>
+      <description>Telephony, videophone, mails, messaging</description>
+  </device_technology>
+  <device_types>
+      <device_type>
+          <id>communication.caller_id</id>
+          <device_technology_id>communication</device_technology_id>
+          <name>Caller id</name>
+          <description>Caller id</description>
+      </device_type>
+  </device_types>
+  <device_feature_models>
+      <device_feature_model>
+          <id>communication.caller_id.number</id>
+          <name>Number</name>
+          <feature_type>sensor</feature_type>
+          <device_type_id>communication.caller_id</device_type_id>
+          <parameters>
+              {}
+          </parameters>
+          <value_type>string</value_type>
+          <stat_key>phone</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+  </device_feature_models>
 </package>

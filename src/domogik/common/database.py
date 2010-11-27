@@ -570,6 +570,18 @@ class DbHelper():
                         DeviceType
                     ).filter(func.lower(DeviceType.name)==ucode(dty_name.lower())
                     ).first()
+    
+    def get_device_type_by_id(self, dty_id):
+        """Return information about a device type
+
+        @param dty_id : The device type id
+        @return a DeviceType object
+
+        """
+        return self.__session.query(
+                        DeviceType
+                    ).filter(func.lower(DeviceType.id)==ucode(dty_id)
+                    ).first()
 
     def add_device_type(self, dty_id, dty_name, dt_id, dty_description=None):
         """Add a device_type (Switch, Dimmer, WOL...)

@@ -385,6 +385,7 @@ class DeviceTypeTestCase(GenericTestCase):
     def test_list_and_get(self):
         dt1 = db.add_device_technology('x10', 'x10', 'desc dt1')
         dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
+        assert db.get_device_type_by_id('x10.switch').name == 'Switch'
         assert db.get_device_type_by_name('Switch').name == 'Switch'
 
     def test_del(self):
