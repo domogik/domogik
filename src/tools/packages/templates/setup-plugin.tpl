@@ -75,7 +75,7 @@ setup(
     description = '%desc%',
     author = '%author%',
     author_email = '%email%',
-    install_requires=[%depandancies%],
+    install_requires=[%dependencies%],
     zip_safe = False,
     license = 'GPL v3',
     packages = find_packages('src'),

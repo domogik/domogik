@@ -70,9 +70,9 @@
     <file path="src/domogik/xpl/bin/yweather.py"/>
     <file path="src/domogik/xpl/lib/yweather.py"/>
   </files>
-  <depandancies>
+  <dependencies>
     <dep name="pySerial > 2.4"/>
-  </depandancies>
+  </dependencies>
   <device_technology>
       <id>online_service</id>
       <name>Online service</name>

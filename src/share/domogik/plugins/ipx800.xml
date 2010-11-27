@@ -138,7 +138,7 @@ Supported features :
     <file path="src/domogik/xpl/bin/ipx800.py"/>
     <file path="src/domogik/xpl/lib/ipx800.py"/>
   </files>
-  <depandancies/>
+  <dependencies/>
   <device_technology>
       <id>relayboard</id>
       <name>Relay board</name>

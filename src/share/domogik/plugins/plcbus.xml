@@ -58,9 +58,9 @@
     <file path="src/domogik/xpl/lib/plcbus.py"/>
     <file path="src/domogik/xpl/lib/PLCBusSerialHandler.py"/>
   </files>
-  <depandancies>
+  <dependencies>
     <dep name="pySerial > 2.4"/>
-  </depandancies>
+  </dependencies>
   <device_technology>
       <id>plcbus</id>
       <name>PLCBus</name>

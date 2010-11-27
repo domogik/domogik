@@ -231,10 +231,10 @@ class PackageManager():
         data = data.replace("%author%", plg_xml.author)
         data = data.replace("%email%", plg_xml.email)
         dep_list = ""
-        for dep in plg_xml.depandancies:
+        for dep in plg_xml.dependencies:
             dep_list += "'%s'," % dep["name"]
         dep_list = dep_list[0:-1]
-        data = data.replace("%depandancies%", dep_list)
+        data = data.replace("%dependencies%", dep_list)
 
         output_file = open(output_path, "w")
         output_file.write(data.encode("utf-8"))
@@ -585,12 +585,12 @@ class PackageXml():
             for my_file in xml_data.getElementsByTagName("file"):
                data = {"path" :  my_file.attributes.get("path").value}
                self.files.append(data)
-            # list of depandancies
-            self.depandancies = []
-            xml_data = self.xml_content.getElementsByTagName("depandancies")[0]
+            # list of dependencies
+            self.dependencies = []
+            xml_data = self.xml_content.getElementsByTagName("dependencies")[0]
             for dep in xml_data.getElementsByTagName("dep"):
                data = {"name" :  dep.attributes.get("name").value}
-               self.depandancies.append(data)
+               self.dependencies.append(data)
 
             # construct filenames
             self.fullname = "%s-%s" % (self.type, self.name)
@@ -643,8 +643,8 @@ class PackageXml():
         print("Detail         : %s" % self.detail)
         print("Author         : %s" % self.author)
         print("Author's email : %s" % self.email)
-        print("----- Plugin depandancies -------------------------------")
-        for dep in self.depandancies:
+        print("----- Plugin dependencies -------------------------------")
+        for dep in self.dependencies:
             print("- %s" % dep["name"])
         print("----- Plugin files --------------------------------------")
         for my_file in self.files:

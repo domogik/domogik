@@ -38,7 +38,7 @@
     </key>
   </configuration-keys>
   <files/>
-  <depandancies/>
+  <dependencies/>
   <device_technology>
       <id>communication</id>
       <name>Communication</name>

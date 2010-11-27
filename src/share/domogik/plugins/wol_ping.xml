@@ -114,7 +114,7 @@
     <file path="src/domogik/xpl/bin/wol_ping.py"/>
     <file path="src/domogik/xpl/lib/wol_ping.py"/>
   </files>
-  <depandancies/>
+  <dependencies/>
   <device_technology>
       <id>computer</id>
       <name>Computer</name>
