@@ -107,7 +107,9 @@
           <name>Tariff period</name>
           <feature_type>sensor</feature_type>
           <device_type_id>service.teleinfo</device_type_id>
-          <parameters/>
+          <parameters>
+              {} 
+          </parameters>
           <value_type>string</value_type>
           <stat_key>ptec</stat_key>
           <return_confirmation>0</return_confirmation>
@@ -129,12 +131,12 @@
           <name>Hourly group</name>
           <feature_type>sensor</feature_type>
           <device_type_id>service.teleinfo</device_type_id>
-          <parameters/>
+          <parameters>
+              {} 
+          </parameters>
           <value_type>string</value_type>
           <stat_key>hhphc</stat_key>
           <return_confirmation>0</return_confirmation>
       </device_feature_model>
-  </device_feature_models>
-</package>
   </device_feature_models>
 </package>

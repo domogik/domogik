@@ -43,7 +43,7 @@
       <id>multimedia</id>
       <name>Multimedia</name>
       <description>Multimedia</description>
-  </devices_technology>
+  </device_technology>
   <device_types/>
   <device_feature_models/>
 </package>

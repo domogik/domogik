@@ -36,6 +36,7 @@ TODO
 @organization: Domogik
 """
 
+from domogik.common.packagexml import PackageXml, PackageException
 from domogik.common.configloader import Loader
 from optparse import OptionParser
 from xml.dom import minidom
@@ -58,18 +59,6 @@ REPO_SRC_FILE = "/etc/domogik/sources.list"
 REPO_LST_FILE = "packages.lst"
 REPO_LST_FILE_HEADER = "Domogik repository"
 REPO_CACHE_DIR = "/var/cache/domogik"
-
-class PackageException(Exception):
-    """
-    Package exception
-    """
-
-    def __init__(self, value):
-        Exception.__init__(self)
-        self.value = value
-
-    def __str__(self):
-        return repr(self.value)
 
 
 class PackageManager():
@@ -655,7 +644,6 @@ class PackageXml():
             print("Xml path       : %s" % self.xml_url)
             print("Priority       : %s" % self.priority)
         print("---------------------------------------------------------")
-
 
 
 

@@ -153,17 +153,5 @@
           <stat_key>ping</stat_key>
           <return_confirmation>0</return_confirmation>
       </device_feature_model>
-      <device_feature_model>
-          <id>plcbus.dimmer.change</id>
-          <name></name>
-          <feature_type>actuator</feature_type>
-          <device_type_id>plcbus.dimmer</device_type_id>
-          <parameters>
-              {&quot;command&quot;:&quot;preset_dim&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:100}{&quot;command&quot;:&quot;preset_dim&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:100}
-          </parameters>
-          <value_type>range</value_type>
-          <stat_key>level</stat_key>
-          <return_confirmation>1</return_confirmation>
-      </device_feature_model>
   </device_feature_models>
 </package>
