@@ -105,12 +105,12 @@ class PackageXml():
             for my_file in xml_data.getElementsByTagName("file"):
                data = {"path" :  my_file.attributes.get("path").value.strip()}
                self.files.append(data)
-            # list of depandancies
-            self.depandancies = []
-            xml_data = self.xml_content.getElementsByTagName("depandancies")[0]
+            # list of dependencies
+            self.dependencies = []
+            xml_data = self.xml_content.getElementsByTagName("dependencies")[0]
             for dep in xml_data.getElementsByTagName("dep"):
                data = {"name" :  dep.attributes.get("name").value.strip()}
-               self.depandancies.append(data)
+               self.dependencies.append(data)
 
             # construct filenames
             self.fullname = "%s-%s" % (self.type, self.name)
@@ -208,8 +208,8 @@ class PackageXml():
         print("Detail         : %s" % self.detail)
         print("Author         : %s" % self.author)
         print("Author's email : %s" % self.email)
-        print("----- Plugin depandancies -------------------------------")
-        for dep in self.depandancies:
+        print("----- Plugin dependencies -------------------------------")
+        for dep in self.dependencies:
             print("- %s" % dep["name"])
         print("----- Plugin files --------------------------------------")
         for my_file in self.files:
