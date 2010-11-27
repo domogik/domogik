@@ -217,6 +217,8 @@ class ProcessRequest():
             self.rest_testlongpoll()
         elif self.rest_type == "repo":
             self.rest_repo()
+        elif self.rest_type == "scenario":
+            self.rest_scenario()
         elif self.rest_type == None:
             self.rest_status()
         else:
@@ -3135,6 +3137,48 @@ target=*
                                           self.jsonp, self.jsonp_cb)
             else:
                 self._rest_scenario_detail_instances(self.rest_request[1])
+            
+        ### add #####################################
+        elif self.rest_request[0] == "add":
+            offset = 2
+            if len(self.rest_request) < 2:
+                self.send_http_response_error(999, "Wrong number of parameters for %s" % self.rest_request[0],
+                                          self.jsonp, self.jsonp_cb)
+            else:
+                self._rest_scenario_add()
+
+        ### update #####################################
+        elif self.rest_request[0] == "update":
+            offset = 2
+            if len(self.rest_request) < 2:
+                self.send_http_response_error(999, "Wrong number of parameters for %s" % self.rest_request[0],
+                                          self.jsonp, self.jsonp_cb)
+            else:
+                self._rest_scenario_update()
+            
+        ### del #####################################
+        elif self.rest_request[0] == "del":
+            if len(self.rest_request) != 2:
+                self.send_http_response_error(999, "Wrong number of parameters for %s" % self.rest_request[0],
+                                          self.jsonp, self.jsonp_cb)
+            else:
+                self._rest_scenario_del(self.rest_request[1])
+            
+        ### start #####################################
+        elif self.rest_request[0] == "start":
+            if len(self.rest_request) != 2:
+                self.send_http_response_error(999, "Wrong number of parameters for %s" % self.rest_request[0],
+                                          self.jsonp, self.jsonp_cb)
+            else:
+                self._rest_scenario_start(self.rest_request[1])
+            
+        ### stop #####################################
+        elif self.rest_request[0] == "stop":
+            if len(self.rest_request) != 2:
+                self.send_http_response_error(999, "Wrong number of parameters for %s" % self.rest_request[0],
+                                          self.jsonp, self.jsonp_cb)
+            else:
+                self._rest_scenario_stop(self.rest_request[1])
             
         ### others ##################################
         else:
