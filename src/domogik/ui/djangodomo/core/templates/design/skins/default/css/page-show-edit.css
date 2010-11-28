@@ -96,3 +96,14 @@
 .state-active {
     background-color: #DFFFB3;
 }
+
+.deletable button {
+    position:absolute;
+    top:-8px;
+    right:-8px;
+    width:16px;
+    height:16px;
+    background: transparent url(../images/action/delete_16.png) 50% 50% no-repeat;
+    border:none;
+    cursor: pointer;
+}
