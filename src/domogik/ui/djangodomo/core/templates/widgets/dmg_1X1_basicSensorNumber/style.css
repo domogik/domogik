@@ -30,3 +30,15 @@
 }
 
 .dmg_1x1_basicSensorNumber .command.graph {background-image: url("images/graph_16.png");}
+
+ul#dialog-nav1 {
+    display:table;
+    padding:0;
+    width:80%;
+    margin:auto;
+}
+
+ul#dialog-nav1 li {
+    display:table-cell;
+    text-align:center;
+}

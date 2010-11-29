@@ -35,7 +35,10 @@
 .ui-dialog .ui-dialog-buttonpane { text-align: left; border-width: 1px 0 0 0; background-image: none; margin: .5em 0 0 0; padding: .3em 1em .5em .4em; }
 
 .ui-dialog .ui-dialog-buttonpane button {
-	float: right;
+	float: right;    
+}
+
+.ui-dialog button {
 	margin: .5em .4em .5em 0;
 	cursor: pointer;
 	padding: .2em .6em .3em .6em;
@@ -46,12 +49,17 @@
 	background-color: #f6f6f6;
 	font-weight: bold;
 	color: #000000; outline: none;
+    border-radius: 0.4em;
 	-moz-border-radius: 0.4em;
     -webkit-border-radius: 0.4em;
 }
 
-.ui-dialog .ui-dialog-buttonpane button:hover,
-.ui-dialog .ui-dialog-buttonpane button:focus {
+.ui-dialog button[disabled], .ui-dialog button[disabled]:hover {
+    background-color: #f6f6f6;
+    color: #AEAEAE;
+}
+.ui-dialog button:hover,
+.ui-dialog button:focus {
 	border: 1px solid #979387;
 	background-color: #BDCB2F;
 	font-weight: bold;
