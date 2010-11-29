@@ -599,7 +599,7 @@ class DbHelper():
         try:
             self.__session.commit()
         except Exception, sql_exception:
-            raise DbHelperException("SQL exception (commit) : %s" % sql_exception, True)
+            raise DbHelperException("SQL exception (commit) : %s" % sql_exception)
         return dty
 
     def update_device_type(self, dty_id, dty_name=None, dt_id=None, dty_description=None):
@@ -632,7 +632,7 @@ class DbHelper():
         try:
             self.__session.commit()
         except Exception, sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception)
         return device_type
 
     def del_device_type(self, dty_id, cascade_delete=False):

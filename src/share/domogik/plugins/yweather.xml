@@ -77,7 +77,7 @@
       <id>online_service</id>
       <name>Online service</name>
       <description>Online services : weather API, etc.</description>
-  </devices_technology>
+  </device_technology>
   <device_types>
       <device_type>
           <id>online_service.weather</id>
