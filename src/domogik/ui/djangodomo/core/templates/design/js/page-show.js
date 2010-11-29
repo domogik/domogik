@@ -36,10 +36,8 @@ $(function(){
                                                     var status = (data.status).toLowerCase();
                                                     if (status == 'ok') {
                                                         var feature = data.feature[0];
-                                                        var usage_options = device_usages[feature.device.device_usage_id].default_options.replace(/&quot;/g,'"');
-                                                        var parameters_usage = JSON.parse(usage_options);
-                                                        var type_options = feature.device_feature_model.parameters.replace(/&quot;/g,'"');
-                                                        var parameters_type = JSON.parse(type_options);
+                                                        var parameters_usage = $.stringToJSON(device_usages[feature.device.device_usage_id].default_options);
+                                                        var parameters_type = $.stringToJSON(feature.device_feature_model.parameters);
                                                         var div = $("<div id='widget_" + association.id + "' role='listitem'></div>");
                                                         var options = {
                                                             usage: feature.device.device_usage_id,
@@ -127,6 +125,16 @@ $(function(){
                 url: url,
                 dataType: "jsonp"
             });
+        },
+        
+        stringToJSON: function(string) {
+            var str = string;
+            if (str) {
+                str = string.replace(/&quot;/g,'"');
+            } else {
+                str = '{}';
+            }
+            return JSON.parse(str);
         }
     });
 })(jQuery);
