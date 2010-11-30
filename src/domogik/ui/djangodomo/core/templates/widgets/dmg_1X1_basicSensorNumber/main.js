@@ -248,7 +248,6 @@
                                 d = self.get_graph_year(data.stats[0].values);
                                 break;
                         }
-                        console.log(d.length);
                         self.graph.addSeries({name:o.featurename,data: d});
                     } else {
                         $.notification('error', '{% trans "data creation failed" %} (' + data.description + ')');                                                                      
