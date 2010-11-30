@@ -15,6 +15,8 @@
         },
 
         graph: null,
+        graph_options: null,
+        now : null,
         
         _init: function() {
             var self = this, o = this.options;
@@ -32,7 +34,7 @@
             this._panel = $.getPanel({width:190, height:190, circle: {start:140, end:90}});
             this.element.append(this._panel);
             this._panel.panelAddCommand({label:'Close', showlabel: false, class:'close', r:70, deg:140, rotate:false, click:function(e){self.close();e.stopPropagation();}});
-            this._panel.panelAddCommand({label:'Charts', showlabel: true, class:'graph', r:70, deg:-30, rotate:false, click:function(e){self.show_graph();e.stopPropagation();}});
+            this._panel.panelAddCommand({label:'Charts', showlabel: true, class:'graph', r:70, deg:-30, rotate:false, click:function(e){self.open_graph();e.stopPropagation();}});
             this._panel.hide();
             
             this.element.click(function (e) {self._onclick();e.stopPropagation();})
@@ -105,12 +107,13 @@
             this.element.doTimeout( 'timeout');
         },
 
-        show_graph: function() {
+        open_graph: function() {
             var self = this, o = this.options;
             this.close();
-            
-            var now = new Date();
-            var graph_options = {
+    
+            this.now = new Date();
+
+            this.graph_options = {
                 chart: {
                    renderTo: 'dialog-graph',
                    defaultSeriesType: 'spline',
@@ -136,9 +139,9 @@
                 legend: {
                     enabled: false
                 },
-				tooltip: {
-					formatter: null
-				},
+                tooltip: {
+                    formatter: null
+                },
                 plotOptions: {
                     spline: {
                         marker: {
@@ -150,33 +153,37 @@
                             }   
                         }
                     }
-                },
-                series: []
-             };
+                }
+            };
 
-            var dialog = $("<div id='dialog' title='Charts'><ul id='dialog-nav1'></ul><div id='dialog-graph' style='width:100%;height:100%;'></div></div>");
-            var year = $('<li><button>Year</button></li>');
+            var dialog = $("<div id='dialog' title='Charts'><ul id='dialog-nav'></ul><div id='dialog-graph' style='width:100%;height:100%;'></div></div>");
+            var year = $("<li class='btyear'><button>Year</button></li>");
             year.click(function() {
-                self.show_graph_year(now, graph_options);
+                self.show_graph('year', 0);
             });
-            var month = $('<li><button>Month</button></li>');
+            var month = $("<li class='btmonth'><button>Month</button></li>");
             month.click(function() {
-                self.show_graph_month(now, graph_options);
+                self.show_graph('month', 0);
             });
-            var week = $('<li><button>Last 7 days</button></li>');
+            var week = $("<li class='bt7d'><button>Last 7 days</button></li>");
             week.click(function() {
-                self.show_graph_7d(now, graph_options);
+                self.show_graph('7d', 0);
             });
-            var day = $('<li><button>Last 24 hours</button></li>');
+            var day = $("<li class='bt24d'><button>Last 24 hours</button></li>");
             day.click(function() {
-                self.show_graph_24h(now, graph_options);
-            });
-            
-            dialog.find('#dialog-nav1')
+                self.show_graph('24h', 0);
+            });            
+            var previous = $("<li class='previous'><button disabled='disabled'>Previous</button></li>");
+            var next = $("<li class='next'><button disabled='disabled'>Next</button></li>");
+
+            dialog.find('#dialog-nav')
+                .append(previous)
+                .append(next)
                 .append(year)
                 .append(month)
                 .append(week)
                 .append(day);
+
             $('body').append(dialog);
             dialog.dialog({ width:'90%',
                 position: ['middle', 50],
@@ -185,164 +192,176 @@
                 close: function(ev, ui) {
                     $(this).remove();
                 }
-            });
+            });            
         },
-
-        show_graph_24h: function(now, graph_options) {
+        
+        show_graph: function(type, shift) {
             var self = this, o = this.options;
             if (this.graph) this.graph.destroy();
-            $('#dialog-nav1 button').attr('disabled', 'disabled');
-
-            var from = new Date(now.getFullYear(), now.getMonth(), now.getDate()-1,now.getHours(),0,0);
-            var to = new Date(now.getFullYear(), now.getMonth(), now.getDate(),now.getHours()+1,0,0);
-
-            graph_options.title.text = Highcharts.dateFormat('%A %d %B %Y', now.getTime());
-            graph_options.xAxis.min = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()-1,now.getHours(),0,0);
-            graph_options.xAxis.max = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(),now.getHours()+1,0,0);
-            graph_options.xAxis.dateTimeLabelFormats = {hour: '%H:%M'};
-            graph_options.xAxis.tickInterval = null;
-            graph_options.tooltip.formatter = function() {
-			                return Highcharts.dateFormat('%d/%m/%Y %Hh', this.x) +'<br/>'
-                                + "<strong>" + Highcharts.numberFormat(this.y, 2, ',') +" " + o.model_parameters.unit + "</strong>";
-                        };
-            this.graph = new Highcharts.Chart(graph_options);
-            this.graph.showLoading();
-
-            rest.get(['stats', o.deviceid, o.key, 'from', Math.round(from.getTime() / 1000), 'to', Math.round(to.getTime() / 1000),'interval', 'minute', 'selector', 'avg'],
-                function(data) {
-                    var status = (data.status).toLowerCase();
-                    if (status == 'ok') {
-                        var d = [];
-                        var values = data.stats[0].values;
-                        $.each(values, function(index, stat) {
-                            d.push([(Date.UTC(stat[0], stat[1]-1, stat[3], stat[4], stat[5], 0)), stat[6]]);
-                        });
-                        self.graph.addSeries({name:o.featurename,data: d});
-                    } else {
-                        $.notification('error', '{% trans "data creation failed" %} (' + data.description + ')');                                                                      
-                    }
-                    self.graph.hideLoading();
-                    $('#dialog-nav1 button').removeAttr('disabled');
-                }
-            );
-        },
-
-        show_graph_7d: function(now, graph_options) {
-            var self = this, o = this.options;
-            if (this.graph) this.graph.destroy();
-            $('#dialog-nav1 button').attr('disabled', 'disabled');
-
-            var from =new Date(now.getFullYear(), now.getMonth(), now.getDate()-7,now.getHours(),0,0);
-            var to = new Date(now.getFullYear(), now.getMonth(), now.getDate(),now.getHours()+1,0,0);
-
-            graph_options.title.text = Highcharts.dateFormat('%d/%m/%Y', from.getTime()) + " - " + Highcharts.dateFormat('%d/%m/%Y', to.getTime());
-            graph_options.xAxis.min = Date.UTC(from.getFullYear(), from.getMonth(), from.getDate(),now.getHours(),0,0);
-            graph_options.xAxis.max = Date.UTC(to.getFullYear(), to.getMonth(), to.getDate(),now.getHours()+1,0,0);
-            graph_options.xAxis.dateTimeLabelFormats = {day: '%A %e'};
-            graph_options.xAxis.tickInterval = 24 * 3600 * 1000; // a day
-            graph_options.tooltip.formatter = function() {
-			                return Highcharts.dateFormat('%d/%m/%Y %Hh', this.x) +'<br/>'
-                                + "<strong>" + Highcharts.numberFormat(this.y, 2, ',') +" " + o.model_parameters.unit + "</strong>";
-                        };
-            this.graph = new Highcharts.Chart(graph_options);
-            this.graph.showLoading();
-
-            rest.get(['stats', o.deviceid, o.key, 'from', Math.round(from.getTime() / 1000), 'to', Math.round(to.getTime() / 1000),'interval', 'hour', 'selector', 'avg'],
-                function(data) {
-                    var status = (data.status).toLowerCase();
-                    if (status == 'ok') {
-                        var d = [];
-                        var values = data.stats[0].values;
-                        $.each(values, function(index, stat) {
-                            d.push([(Date.UTC(stat[0], stat[1]-1, stat[3], stat[4], 0, 0)), stat[5]]);
-                        });
-                        self.graph.addSeries({name:o.featurename,data: d});
-                    } else {
-                        $.notification('error', '{% trans "data creation failed" %} (' + data.description + ')');                                                                      
-                    }
-                    self.graph.hideLoading();
-                    $('#dialog-nav1 button').removeAttr('disabled');
-                }
-            );
-        },
-
-        show_graph_month: function(now, graph_options) {
-            var self = this, o = this.options;
-            if (this.graph) this.graph.destroy();
-            $('#dialog-nav1 button').attr('disabled', 'disabled');
-
-            var from = new Date(now.getFullYear(), now.getMonth(), 1,0,0,0);
-            var to = new Date(now.getFullYear(), now.getMonth(), 31,23,59,59);
-
-            graph_options.title.text = Highcharts.dateFormat('%B %Y', now.getTime())
-            graph_options.xAxis.min = Date.UTC(now.getFullYear(), now.getMonth(), 1);
-            graph_options.xAxis.max = Date.UTC(now.getFullYear(), now.getMonth(), 31, 23,59,59);
-            graph_options.xAxis.dateTimeLabelFormats = {day: '%e. %b'};
-            graph_options.xAxis.tickInterval = null;
-            graph_options.tooltip.formatter = function() {
-			                return Highcharts.dateFormat('%d/%m/%Y', this.x) +'<br/>'
-                                + "<strong>" + Highcharts.numberFormat(this.y, 2, ',') +" " + o.model_parameters.unit + "</strong>";
-                        };
-            this.graph = new Highcharts.Chart(graph_options);
-            this.graph.showLoading();
-
-            rest.get(['stats', o.deviceid, o.key, 'from', Math.round(from.getTime() / 1000), 'to', Math.round(to.getTime() / 1000),'interval', 'day', 'selector', 'avg'],
-                function(data) {
-                    var status = (data.status).toLowerCase();
-                    if (status == 'ok') {
-                        var d = [];
-                        var values = data.stats[0].values;
-                        $.each(values, function(index, stat) {
-                            d.push([(Date.UTC(stat[0], stat[1]-1, stat[3], 0, 0, 0)), stat[4]]);
-                        });
-                        self.graph.addSeries({name:o.featurename,data: d});
-                    } else {
-                        $.notification('error', '{% trans "data creation failed" %} (' + data.description + ')');                                                                      
-                    }
-                    self.graph.hideLoading();
-                    $('#dialog-nav1 button').removeAttr('disabled');
-                }
-            );
-        },
-
-        show_graph_year: function(now, graph_options) {
-            var self = this, o = this.options;
-            if (this.graph) this.graph.destroy();
-            $('#dialog-nav1 button').attr('disabled', 'disabled');
-
-            var from = new Date(now.getFullYear(), 0, 1,0,0,0);
-            var to = new Date(now.getFullYear(), 11, 31,23,59,59);
+            $('#dialog-nav button').attr('disabled', 'disabled');
+            $('#dialog-nav button.active').removeClass('active');
+            $('#dialog-nav li.bt' + type + ' button').addClass('active');
             
-            graph_options.title.text = Highcharts.dateFormat('%Y', now.getTime())
-            graph_options.xAxis.min = Date.UTC(now.getFullYear(), 0, 1);
-            graph_options.xAxis.max = Date.UTC(now.getFullYear(), 11, 31, 23,59,59);
-            graph_options.xAxis.dateTimeLabelFormats = {month: '%b %y'};
-            graph_options.xAxis.tickInterval = null;
-            graph_options.tooltip.formatter = function() {
-			                return Highcharts.dateFormat('%d/%m/%Y', this.x) +'<br/>'
-                                + "<strong>" + Highcharts.numberFormat(this.y, 2, ',') +" " + o.model_parameters.unit + "</strong>";
-                        };
+            $('#dialog-nav li.previous button').unbind('click').click(function() {
+                self.show_graph(type, shift+1);
+            });
+            if (shift > 0) {
+                $('#dialog-nav li.next button').unbind('click').click(function() {
+                    self.show_graph(type, shift-1);
+                });
+            }
 
-            this.graph = new Highcharts.Chart(graph_options);
+            var restparams = null
+            switch(type) {
+                case '24h':
+                    restparams = this.init_graph_24h(shift);
+                    break;
+                case '7d':
+                    restparams = this.init_graph_7d(shift);
+                    break;
+                case 'month':
+                    restparams = this.init_graph_month(shift);
+                    break;
+                case 'year':
+                    restparams = this.init_graph_year(shift);
+                    break;
+            }
+            this.graph = new Highcharts.Chart(this.graph_options);
             this.graph.showLoading();
 
-            rest.get(['stats', o.deviceid, o.key, 'from', Math.round(from.getTime() / 1000), 'to', Math.round(to.getTime() / 1000),'interval', 'day', 'selector', 'avg'],
+            rest.get(restparams,
                 function(data) {
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
-                        var d = [];
-                        var values = data.stats[0].values;
-                        $.each(values, function(index, stat) {
-                            d.push([(Date.UTC(stat[0], stat[1]-1, stat[3], 0, 0, 0)), stat[4]]);
-                        });
+                        var d = null;
+                        switch(type) {
+                            case '24h':
+                                d = self.get_graph_24h(data.stats[0].values);
+                                break;
+                            case '7d':
+                                d = self.get_graph_7d(data.stats[0].values);
+                                break;
+                            case 'month':
+                                d = self.get_graph_month(data.stats[0].values);
+                                break;
+                            case 'year':
+                                d = self.get_graph_year(data.stats[0].values);
+                                break;
+                        }
+                        console.log(d.length);
                         self.graph.addSeries({name:o.featurename,data: d});
                     } else {
                         $.notification('error', '{% trans "data creation failed" %} (' + data.description + ')');                                                                      
                     }
                     self.graph.hideLoading();
-                    $('#dialog-nav1 button').removeAttr('disabled');
+                    $('#dialog-nav button').removeAttr('disabled');
+                    if (shift == 0) $('#dialog-nav li.next button').attr('disabled', 'disabled');
                 }
             );
+        },
+
+        init_graph_24h: function(shift) {
+            var self = this, o = this.options;
+
+            var from = new Date(this.now.getFullYear(), this.now.getMonth(), this.now.getDate()-1-shift,this.now.getHours(),0,0);
+            var to = new Date(this.now.getFullYear(), this.now.getMonth(), this.now.getDate()-shift,this.now.getHours()+1,0,0);
+
+            this.graph_options.title.text = Highcharts.dateFormat('%A %d %B %Y', to.getTime());
+            this.graph_options.xAxis.min = Date.UTC(from.getFullYear(), from.getMonth(), from.getDate(),from.getHours(),0,0);
+            this.graph_options.xAxis.max = Date.UTC(to.getFullYear(), to.getMonth(), to.getDate(),to.getHours(),0,0);
+            this.graph_options.xAxis.dateTimeLabelFormats = {hour: '%H:%M'};
+            this.graph_options.xAxis.tickInterval = null;
+            this.graph_options.tooltip.formatter = function() {
+			                return Highcharts.dateFormat('%d/%m/%Y %Hh', this.x) +'<br/>'
+                                + "<strong>" + Highcharts.numberFormat(this.y, 2, ',') +" " + o.model_parameters.unit + "</strong>";
+                        };
+            return ['stats', o.deviceid, o.key, 'from', Math.round(from.getTime() / 1000), 'to', Math.round(to.getTime() / 1000),'interval', 'minute', 'selector', 'avg'];
+        },
+        
+        get_graph_24h: function(values) {
+            var d = [];
+            $.each(values, function(index, stat) {
+                d.push([(Date.UTC(stat[0], stat[1]-1, stat[3], stat[4], stat[5], 0)), stat[6]]);
+            });
+            return d;
+        },
+
+        init_graph_7d: function(shift, now) {
+            var self = this, o = this.options;
+
+            var from =new Date(this.now.getFullYear(), this.now.getMonth(), this.now.getDate()-(7*(shift+1)),this.now.getHours(),0,0);
+            var to = new Date(this.now.getFullYear(), this.now.getMonth(), this.now.getDate()-(7*shift),this.now.getHours()+1,0,0);
+
+            this.graph_options.title.text = Highcharts.dateFormat('%d/%m/%Y', from.getTime()) + " - " + Highcharts.dateFormat('%d/%m/%Y', to.getTime());
+            this.graph_options.xAxis.min = Date.UTC(from.getFullYear(), from.getMonth(), from.getDate(), from.getHours(),0,0);
+            this.graph_options.xAxis.max = Date.UTC(to.getFullYear(), to.getMonth(), to.getDate(), to.getHours()+1,0,0);
+            this.graph_options.xAxis.dateTimeLabelFormats = {day: '%A %e'};
+            this.graph_options.xAxis.tickInterval = 24 * 3600 * 1000; // a day
+            this.graph_options.tooltip.formatter = function() {
+			                return Highcharts.dateFormat('%d/%m/%Y %Hh', this.x) +'<br/>'
+                                + "<strong>" + Highcharts.numberFormat(this.y, 2, ',') +" " + o.model_parameters.unit + "</strong>";
+                        };
+            return ['stats', o.deviceid, o.key, 'from', Math.round(from.getTime() / 1000), 'to', Math.round(to.getTime() / 1000),'interval', 'hour', 'selector', 'avg'];
+        },
+
+        get_graph_7d: function(values) {
+            var d = [];
+            $.each(values, function(index, stat) {
+                d.push([(Date.UTC(stat[0], stat[1]-1, stat[3], stat[4], 0, 0)), stat[5]]);
+            });
+            return d;
+        },
+
+        init_graph_month: function(shift) {
+            var self = this, o = this.options;
+
+            var from = new Date(this.now.getFullYear(), this.now.getMonth()-shift, 1,0,0,0);
+            var to = new Date(this.now.getFullYear(), this.now.getMonth()-shift, 31,23,59,59);
+
+            this.graph_options.title.text = Highcharts.dateFormat('%B %Y', to.getTime())
+            this.graph_options.xAxis.min = Date.UTC(from.getFullYear(), from.getMonth(), 1);
+            this.graph_options.xAxis.max = Date.UTC(to.getFullYear(), to.getMonth(), 31, 23,59,59);
+            this.graph_options.xAxis.dateTimeLabelFormats = {day: '%e. %b'};
+            this.graph_options.xAxis.tickInterval = null;
+            this.graph_options.tooltip.formatter = function() {
+			                return Highcharts.dateFormat('%d/%m/%Y', this.x) +'<br/>'
+                                + "<strong>" + Highcharts.numberFormat(this.y, 2, ',') +" " + o.model_parameters.unit + "</strong>";
+                        };
+            return ['stats', o.deviceid, o.key, 'from', Math.round(from.getTime() / 1000), 'to', Math.round(to.getTime() / 1000),'interval', 'day', 'selector', 'avg'];
+        },
+
+        get_graph_month: function(values) {
+            var d = [];
+            $.each(values, function(index, stat) {
+                d.push([(Date.UTC(stat[0], stat[1]-1, stat[3], 0, 0, 0)), stat[4]]);
+            });
+            return d;
+        },
+        
+        init_graph_year: function(shift) {
+            var self = this, o = this.options;
+
+            var from = new Date(this.now.getFullYear()-shift, 0, 1,0,0,0);
+            var to = new Date(this.now.getFullYear()-shift, 11, 31,23,59,59);
+            
+            this.graph_options.title.text = Highcharts.dateFormat('%Y', to.getTime())
+            this.graph_options.xAxis.min = Date.UTC(from.getFullYear(), 0, 1);
+            this.graph_options.xAxis.max = Date.UTC(to.getFullYear(), 11, 31, 23,59,59);
+            this.graph_options.xAxis.dateTimeLabelFormats = {month: '%b %y'};
+            this.graph_options.xAxis.tickInterval = null;
+            this.graph_options.tooltip.formatter = function() {
+			                return Highcharts.dateFormat('%d/%m/%Y', this.x) +'<br/>'
+                                + "<strong>" + Highcharts.numberFormat(this.y, 2, ',') +" " + o.model_parameters.unit + "</strong>";
+                        };
+            return ['stats', o.deviceid, o.key, 'from', Math.round(from.getTime() / 1000), 'to', Math.round(to.getTime() / 1000),'interval', 'day', 'selector', 'avg'];
+        },
+
+        get_graph_year: function(values) {
+            var d = [];
+            $.each(values, function(index, stat) {
+                d.push([(Date.UTC(stat[0], stat[1]-1, stat[3], 0, 0, 0)), stat[4]]);
+            });
+            return d;
         }
     });
 })(jQuery);

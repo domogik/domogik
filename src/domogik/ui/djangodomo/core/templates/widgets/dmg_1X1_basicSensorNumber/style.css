@@ -31,14 +31,22 @@
 
 .dmg_1x1_basicSensorNumber .command.graph {background-image: url("images/graph_16.png");}
 
-ul#dialog-nav1 {
+ul#dialog-nav {
     display:table;
     padding:0;
     width:80%;
     margin:auto;
 }
 
-ul#dialog-nav1 li {
+ul#dialog-nav li {
     display:table-cell;
     text-align:center;
+}
+
+ul#dialog-nav li.previous {
+    text-align:right;
+}
+
+ul#dialog-nav li.next {
+    text-align:left;
 }

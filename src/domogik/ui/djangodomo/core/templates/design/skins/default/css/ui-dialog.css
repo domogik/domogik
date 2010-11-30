@@ -48,7 +48,8 @@
 	border: 1px solid #cccccc;
 	background-color: #f6f6f6;
 	font-weight: bold;
-	color: #000000; outline: none;
+	color: #000000;
+    outline: none;
     border-radius: 0.4em;
 	-moz-border-radius: 0.4em;
     -webkit-border-radius: 0.4em;
@@ -57,14 +58,17 @@
 .ui-dialog button[disabled], .ui-dialog button[disabled]:hover {
     background-color: #f6f6f6;
     color: #AEAEAE;
+    cursor: default;
 }
 .ui-dialog button:hover,
 .ui-dialog button:focus {
 	border: 1px solid #979387;
 	background-color: #BDCB2F;
-	font-weight: bold;
-	color: #000000;
-	outline: none;
+}
+
+.ui-dialog button.active {
+	border: 1px solid #979387;
+	background-color: #CBAC3B;
 }
 
 .ui-dialog .ui-resizable-se { width: 14px; height: 14px; right: 3px; bottom: 3px; }
