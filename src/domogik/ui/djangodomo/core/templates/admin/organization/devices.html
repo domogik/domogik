@@ -230,7 +230,7 @@
                                 values: {upddevicename : '{{ device.name }}', upddevicedescription : '{{ device.description }}', upddeviceaddress : '{{ device.address }}', upddevicereference : '{{ device.reference }}', upddeviceusage : '{{ device.device_usage_id }}'},
                                 onok: function(values) {
                                     // Submit form
-                                    rest.get(['base', 'device', 'update', 'id', '{{ device.id }}', 'name', values.upddevicename, 'address', values.upddeviceaddress, 'type_id', values.upddeviceusage, 'description', values.upddevicedescription, 'reference', values.upddevicereference],
+                                    rest.get(['base', 'device', 'update', 'id', '{{ device.id }}', 'name', values.upddevicename, 'address', values.upddeviceaddress, 'usage_id', values.upddeviceusage, 'description', values.upddevicedescription, 'reference', values.upddevicereference],
                                         function(data) {
                                             var status = (data.status).toLowerCase();
                                             if (status == 'ok') {
