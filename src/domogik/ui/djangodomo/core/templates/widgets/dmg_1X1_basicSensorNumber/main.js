@@ -116,9 +116,10 @@
             this.graph_options = {
                 chart: {
                    renderTo: 'dialog-graph',
-                   defaultSeriesType: 'spline',
+                   defaultSeriesType: 'line',
                    borderRadius: null,
-                   backgroundColor:'#eeeeee'
+                   backgroundColor:'#eeeeee',
+                   type: 'line'
                 },
                 credits:{
                     enabled : false
@@ -132,9 +133,10 @@
                     type: 'datetime'
                 },
                 yAxis: {
-                   title: {
-                      text: o.featurename + ' (' + o.model_parameters.unit + ')'
-                   }
+                    min: 0,
+                    title: {
+                        text: o.featurename + ' (' + o.model_parameters.unit + ')'
+                    }
                 },
                 legend: {
                     enabled: false
@@ -143,7 +145,7 @@
                     formatter: null
                 },
                 plotOptions: {
-                    spline: {
+                    line: {
                         marker: {
                             enabled: false,
                             states: {
@@ -313,9 +315,11 @@
 
         init_graph_month: function(shift) {
             var self = this, o = this.options;
-
+            
+            var lastDayMonth = (new Date((new Date(this.now.getFullYear(), this.now.getMonth()-shift+1,1))-1)).getDate();
+            
             var from = new Date(this.now.getFullYear(), this.now.getMonth()-shift, 1,0,0,0);
-            var to = new Date(this.now.getFullYear(), this.now.getMonth()-shift, 31,23,59,59);
+            var to = new Date(this.now.getFullYear(), this.now.getMonth()-shift, lastDayMonth,23,59,59);
 
             this.graph_options.title.text = Highcharts.dateFormat('%B %Y', to.getTime())
             this.graph_options.xAxis.min = Date.UTC(from.getFullYear(), from.getMonth(), 1);
