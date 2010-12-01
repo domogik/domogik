@@ -171,7 +171,7 @@
             week.click(function() {
                 self.show_graph('7d', 0);
             });
-            var day = $("<li class='bt24d'><button>Last 24 hours</button></li>");
+            var day = $("<li class='bt24h'><button>Last 24 hours</button></li>");
             day.click(function() {
                 self.show_graph('24h', 0);
             });            
@@ -194,7 +194,9 @@
                 close: function(ev, ui) {
                     $(this).remove();
                 }
-            });            
+            });
+            day.find('button').focus();
+            this.show_graph('24h', 0);
         },
         
         show_graph: function(type, shift) {
