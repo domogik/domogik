@@ -9,7 +9,7 @@
     }
 
 .ui-dialog {
-	position: absolute;
+	position: absolute !important;
 	background-color: #1e1e1e;
 	color: #333333;
 	-moz-border-radius: 0.8em;
@@ -66,7 +66,7 @@
 	background-color: #BDCB2F;
 }
 
-.ui-dialog button.active {
+.ui-dialog button.active, .ui-dialog button.selected {
 	border: 1px solid #979387;
 	background-color: #CBAC3B;
 }

@@ -11,7 +11,8 @@
             height: 1,
             width: 1,
             displayname: false,
-			displayborder: true
+			displayborder: true,
+			screenshot: 'images/screenshot.png'
         },
 
         _init: function() {
