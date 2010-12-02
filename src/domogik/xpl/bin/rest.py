@@ -507,8 +507,9 @@ class Rest(XplPlugin):
         for techno in os.listdir(self._xml_cmd_dir):
             for command in os.listdir(self._xml_cmd_dir + "/" + techno):
                 xml_file = self._xml_cmd_dir + "/" + techno + "/" + command
-                self.log.info("Load XML file for %s>%s : %s" % (techno, command, xml_file))
-                self.xml["%s/%s" % (techno, command)] = minidom.parse(xml_file)
+                if xml_file[-4:] == ".xml":
+                    self.log.info("Load XML file for %s>%s : %s" % (techno, command, xml_file))
+                    self.xml["%s/%s" % (techno, command)] = minidom.parse(xml_file)
         self.xml_date = datetime.datetime.now()
 
 

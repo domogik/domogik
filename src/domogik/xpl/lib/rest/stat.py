@@ -89,31 +89,32 @@ class StatsManager:
             ### Read xml files
             res = {}
             for _file in files :
-                self._log_stats.info("Parse file %s" % _file)
-                doc = minidom.parse(_file)
-                #Statistic/root node
-                technology = doc.documentElement.attributes.get("technology").value
-                schema_types = self.get_schemas_and_types(doc.documentElement)
-                self._log_stats.debug("Parsed : %s" % schema_types)
-                if technology not in res:
-                    res[technology] = {}
-                    stats[technology] = {}
-                
-                for schema in schema_types:
-                    if schema not in res[technology]:
-                        res[technology][schema] = {}
-                        stats[technology][schema] = {}
-                    for xpl_type in schema_types[schema]:
-                        device, mapping, static_device, device_type = self.parse_mapping(doc.documentElement.getElementsByTagName("mapping")[0])
-                        res[technology][schema][xpl_type] = {"filter": 
-                                self.parse_listener(schema_types[schema][xpl_type].getElementsByTagName("listener")[0]),
-                                "mapping": mapping,
-                                "device": device,
-                                "static_device": static_device,
-                                "device_type": device_type}
-                
-                        stats[technology][schema][xpl_type] = self._Stat(self.myxpl, res[technology][schema][xpl_type], technology, schema, xpl_type, self._log_stats, self._log_stats_unknown, self._db, self._event_requests)
-                        self._log_stats.info("Stat manager starter 1")
+                if _file[-4:] == ".xml":
+                    self._log_stats.info("Parse file %s" % _file)
+                    doc = minidom.parse(_file)
+                    #Statistic/root node
+                    technology = doc.documentElement.attributes.get("technology").value
+                    schema_types = self.get_schemas_and_types(doc.documentElement)
+                    self._log_stats.debug("Parsed : %s" % schema_types)
+                    if technology not in res:
+                        res[technology] = {}
+                        stats[technology] = {}
+                    
+                    for schema in schema_types:
+                        if schema not in res[technology]:
+                            res[technology][schema] = {}
+                            stats[technology][schema] = {}
+                        for xpl_type in schema_types[schema]:
+                            device, mapping, static_device, device_type = self.parse_mapping(doc.documentElement.getElementsByTagName("mapping")[0])
+                            res[technology][schema][xpl_type] = {"filter": 
+                                    self.parse_listener(schema_types[schema][xpl_type].getElementsByTagName("listener")[0]),
+                                    "mapping": mapping,
+                                    "device": device,
+                                    "static_device": static_device,
+                                    "device_type": device_type}
+                    
+                            stats[technology][schema][xpl_type] = self._Stat(self.myxpl, res[technology][schema][xpl_type], technology, schema, xpl_type, self._log_stats, self._log_stats_unknown, self._db, self._event_requests)
+                            self._log_stats.info("Stat manager starter 1")
         except :
             self._log_stats.error("%s" % traceback.format_exc())
 
