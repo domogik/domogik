@@ -4,7 +4,7 @@
   <description>Manage x10 devices with Heyu</description>
   <detail>X10 is a CPL based protocol to control lights, appliances, etc. This plugin needs Heyu to work</detail>
   <version>0.1.0</version>
-  <documentation>http://wiki.domogik.org/tiki-index.php?page=plugin_x10_heyu</documentation>
+  <documentation>http://wiki.domogik.org/plugin_x10_heyu</documentation>
   <author>Maxence Dunnewind, Mirelsol</author>
   <author-email>maxence at dunnewind.net; marc at mirelsol.org</author-email>
   <configuration-keys>

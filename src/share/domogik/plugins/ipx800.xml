@@ -12,7 +12,7 @@ Supported features :
 - Digital input 
 - Analog input </detail>
   <version>0.1.0</version>
-  <documentation>http://wiki.domogik.org/tiki-index.php?page=plugin_ipx800</documentation>
+  <documentation>http://wiki.domogik.org/plugin_ipx800</documentation>
   <author>Fritz</author>
   <author-email>fritz.smh at gmail.com</author-email>
   <configuration-keys>

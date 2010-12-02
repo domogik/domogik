@@ -4,7 +4,7 @@
   <description>Use Mir:ror device</description>
   <detail>Mir:ror device allow to detect RFID devices</detail>
   <version>0.1.0</version>
-  <documentation>http://wiki.domogik.org/tiki-index.php?page=plugin_mirror</documentation>
+  <documentation>http://wiki.domogik.org/plugin_mirror</documentation>
   <author>Fritz</author>
   <author-email>fritz.smh at gmail.com</author-email>
   <configuration-keys>

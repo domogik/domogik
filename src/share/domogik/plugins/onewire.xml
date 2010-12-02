@@ -8,7 +8,7 @@ List of supported devices :
 - DS18S20
 - DS2401</detail>
   <version>0.1.0</version>
-  <documentation>http://wiki.domogik.org/tiki-index.php?page=plugin_onewire</documentation>
+  <documentation>http://wiki.domogik.org/plugin_onewire</documentation>
   <author>Fritz</author>
   <author-email>fritz.smh at gmail.com</author-email>
   <configuration-keys>
