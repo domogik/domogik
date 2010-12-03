@@ -226,6 +226,15 @@ function create_log_dir {
     chown $d_user: /var/log/domogik 
 }
 
+function install_plugins {
+    chmod +x src/tools/packages/insert_data.py 
+    for file in src/share/domogik/plugins/*.xml;do
+        echo "** Parse $file"
+        su -c "src/tools/packages/insert_data.py $file" $d_user
+        echo "** File $file parsed"
+    done
+}
+
 #Main part
 if [ $UID -ne 0 ];then
     echo "Please restart this script as root!"
@@ -254,6 +263,7 @@ update_default_config
 update_user_config
 copy_tools
 call_db_installer
+install_plugins
 modify_hosts
 create_log_dir
 

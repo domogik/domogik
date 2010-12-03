@@ -69,15 +69,11 @@ class Loader():
         main_result = {}
         if self.__class__.config == None:
             self.__class__.config = ConfigParser.ConfigParser()
-            print "list : %s" % [custom_path, os.getenv("HOME") + "/." + self.main_conf_name,
                 '/etc/' + self.main_conf_name,
                 '/usr/local/etc/' + self.main_conf_name]
-            print "threads : %s" % threading.enumerate()
             files = self.__class__.config.read([custom_path, os.getenv("HOME") + "/." + self.main_conf_name,
                 '/etc/' + self.main_conf_name,
                 '/usr/local/etc/' + self.main_conf_name])
-            print "Files parsed : %s" % files
-            print "Sections : %s" % self.__class__.config.sections()
         else:
             print "config already loaded"
         result = self.__class__.config.items('domogik')
