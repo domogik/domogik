@@ -69,8 +69,6 @@ class Loader():
         main_result = {}
         if self.__class__.config == None:
             self.__class__.config = ConfigParser.ConfigParser()
-                '/etc/' + self.main_conf_name,
-                '/usr/local/etc/' + self.main_conf_name]
             files = self.__class__.config.read([custom_path, os.getenv("HOME") + "/." + self.main_conf_name,
                 '/etc/' + self.main_conf_name,
                 '/usr/local/etc/' + self.main_conf_name])
