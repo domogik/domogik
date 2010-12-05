@@ -54,12 +54,30 @@ class plcbus(Helper):
                 "desc" : "Show all devices found on plcbus network",
                 "min_args" : 2,
                 "usage" : "find device for specified  house code <house code> and user code <user code>."
+                },
+              "detail" :
+                {
+                "cb" : self.detail,
+                "desc" : "Show device detail ",
+                "min_args" : 2,
+                "usage" : "show status for specified device <device code> and user code <user code>"
                 }
             }
         log = logger.Logger('plcbus-helper')
         self._log = log.get_logger()
         device = '/dev/plcbus'
         self.api1 = PLCBUSAPI(self._log, device, self._command_cb, self._message_cb)
+
+    def detail(self, args = None):
+        self._usercode = args[1]
+        self._devicecode = args[0].upper()
+        self.api1.send("STATUS_REQUEST", self._devicecode , self._usercode )
+        #time.sleep(3)
+        self._event.wait()
+        self._event.clear()
+        self.api1.stop()
+        return self.liste_found
+
 
     def all(self, args = None):
         self._usercode = args[1]
@@ -74,7 +92,9 @@ class plcbus(Helper):
         return self.liste_found
 
     def _command_cb(self, f):
-        print "command : %s" % f["d_command"]
+        #print "DEBUG command : %s" % f["d_command"]
+        #print "DEBUG data1 : %s" % f["d_data1"]
+        #print "DEBUG data3 : %s" % f["d_data2"]
         if f["d_command"] == "GET_ALL_ID_PULSE":
             data = int("%s%s" % (f["d_data1"], f["d_data2"]))
             house = f["d_home_unit"][0]
@@ -93,14 +113,20 @@ class plcbus(Helper):
                 code = "%s%s" % (house, i+1)
                 if code in self.liste_found:
                     j = self.liste_found.index(code)
-                    #self.liste_found.append("%s%s" % (j," index"))
+                    #self.liste_found.append("%s%s" % (j,"DEBUG index"))
                     if unit == 1:
-                        #self.liste_found.append("%s%s" % (code," ONNNNNN"))
+                        #self.liste_found.append("%s%s" % (code,"DEBUG ONNNNNN"))
                         self.liste_found[j] = ("%s%s" % (self.liste_found[j]," ON"))
                     else:
-                        #self.liste_found.append("%s%s" % (code," OFFFFFF"))
+                        #self.liste_found.append("%s%s" % (code,"DEBG OFFFFFF"))
                         self.liste_found[j] = ("%s%s" % (self.liste_found[j]," OFF"))
             self._event.set()
+
+        
+        if f["d_command"] == "STATUS_ON":
+           print "command StatusRequest : %s" % f["d_command"]
+           self.liste_found.append("%s%s%s%s%s" % (self._devicecode, " | Dimmer : ", f["d_data1"], " | Fading : ", f["d_data2"]))
+           self._event.set()
 
     def _message_cb(self, message):
         print "Message : %s " % message
