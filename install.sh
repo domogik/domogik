@@ -263,10 +263,10 @@ copy_sample_files
 update_default_config
 update_user_config
 copy_tools
+create_log_dir
 call_db_installer
 install_plugins
 modify_hosts
-create_log_dir
 
 [ -d $HOME/.python-eggs ] && chown -R $USER: $HOME/.python-eggs/ 
 
