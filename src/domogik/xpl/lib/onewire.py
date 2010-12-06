@@ -232,6 +232,7 @@ class OneWireNetwork:
         default 'u' for USB
         """
         self._log = log
+        self._log.info("OWFS version : %s" % ow.__version__)
         try:
             ow.init(dev)
             self._cache = cache
