@@ -47,7 +47,7 @@ class WolPing(XplPlugin):
     """
 
     def __init__(self):
-        """ Create lister for wake on lan
+        """ Create listener for wake on lan
         """
         XplPlugin.__init__(self, name = 'wol_ping')
 
