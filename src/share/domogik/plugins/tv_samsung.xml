@@ -1,0 +1,73 @@
+<package type="plugin">
+  <name>tv_samsung</name>
+  <technology>multimedia</technology>
+  <description>Samsung televisions control</description>
+  <detail>Control Samsung televisions :
+- Channel up/down
+- Volume up/down
+- 16/9, 4/3
+- input
+- ... </detail>
+  <version>0.1.0</version>
+  <documentation>http://wiki.domogik.org/plugin_tsamsun</documentation>
+  <author>Fritz</author>
+  <author-email>fritz.smh at gmail.com</author-email>
+  <configuration-keys>
+    <key>
+      <order-id>0</order-id>
+      <name>startup-plugin</name>
+      <type>boolean</type>
+      <description>Automatically start plugin at Domogik startup</description>
+      <default-value>False</default-value>
+    </key>
+    <key>
+      <order-id>1</order-id>
+      <name>tv-1-name</name>
+      <type>string</type>
+      <description>Television 1 : name</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>2</order-id>
+      <name>tv-1-device</name>
+      <type>string</type>
+      <description>Television 1 : device (serial port for EX-link)</description>
+      <default-value></default-value>
+    </key>
+  </configuration-keys>
+  <files>
+    <file path="src/share/domogik/plugins/tv_samsung.xml"/>
+    <file path="src/share/domogik/url2xpl/multimedia/channel_up.xml"/>
+    <file path="src/domogik/xpl/bin/tv_samsung.py"/>
+    <file path="src/domogik/xpl/lib/tv_samsung.py"/>
+    <file path="src/domogik/xpl/lib/tv_samsung_led.py"/>
+  </files>
+  <dependencies/>
+  <device_technology>
+      <id>multimedia</id>
+      <name>Multimedia</name>
+      <description>Multimedia features</description>
+  </device_technology>
+  <device_types>
+      <device_type>
+          <id>multimedia.television</id>
+          <device_technology_id>multimedia</device_technology_id>
+          <name>Television</name>
+          <description>Television</description>
+      </device_type>
+  </device_types>
+  <device_feature_models>
+      <device_feature_model>
+          <id>multimedia.television.channel_up</id>
+          <name>Channel up</name>
+          <feature_type>actuator</feature_type>
+          <device_type_id>multimedia.television</device_type_id>
+          <parameters>
+              {&quot;command&quot;:&quot;channel_up&quot;}
+          </parameters>
+          <value_type>trigger</value_type>
+          <stat_key/>
+          <return_confirmation>1</return_confirmation>
+      </device_feature_model>
+  </device_feature_models>
+</package>
