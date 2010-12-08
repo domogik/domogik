@@ -1901,7 +1901,10 @@ class DbHelper():
                         ).order_by(
                             sqlalchemy.asc('year_c')
                         )
-            }
+            },
+            'global' : self.__session.query(
+                            function['min'], function['max'], function['avg']
+                        )
         }
 
         step = {
@@ -1936,11 +1939,15 @@ class DbHelper():
 
         result_list = []
         if self.get_db_type() in ('mysql', 'postgresql'):
+            cond_min = "date >= '" + _datetime_string_from_tstamp(start_date_ts, self.get_db_type()) + "'"
+            cond_max = "date < '" + _datetime_string_from_tstamp(end_date_ts, self.get_db_type()) + "'"
             query = sql_query[step_used][self.get_db_type()]
             query = query.filter_by(key=ucode(ds_key)).filter_by(device_id=ds_device_id
-                        ).filter("date >= '" + _datetime_string_from_tstamp(start_date_ts, self.get_db_type()) + "'"
-                        ).filter("date < '" + _datetime_string_from_tstamp(end_date_ts, self.get_db_type()) + "'")
+                        ).filter(cond_min
+                        ).filter(cond_max)
             result_list = query.all()
+            query_global = sql_query['global'].filter(cond_min).filter(cond_max)
+            result_list.extend(query_global.all())
         else:
             datetime_cursor = datetime.datetime.fromtimestamp(start_date_ts)
             end_datetime = datetime.datetime.fromtimestamp(end_date_ts)
