@@ -256,9 +256,11 @@ def admin_organization_rooms(request):
         result_all_rooms = Rooms.get_all()
         result_all_rooms.merge_uiconfig()
         result_house_rooms = Rooms.get_without_area()
+        result_house_rooms.merge_uiconfig()
         result_all_areas = Areas.get_all()
         result_all_areas.merge_rooms()
         result_all_areas.merge_uiconfig()
+        
     except BadStatusLine:
         return render_to_response('error/BadStatusLine.html')
     except ResourceNotAvailableException:

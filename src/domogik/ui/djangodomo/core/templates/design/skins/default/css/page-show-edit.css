@@ -1,32 +1,23 @@
 @charset "UTF-8";
 /* CSS Document */
-
-#panel {
-    position:absolute;
-    right:0;
-    top:50px;
-    background-color:#ffffff;
-    background:rgba(255,255,255,0.9);
-    border:1px solid #cccccc;
-    -moz-border-radius: 0.8em 0 0 0.8em;
-    -webkit-border-radius: 0.8em 0 0 0.8em;
-    padding:1em 0 1em 0;
-    color:#000000;
+#dialog {
+    padding:0 !important;
 }
 
-#panel h2 {
+#devices, #features, #widgets, #model {
+    display:table-cell;
+    border-right:1px solid #cccccc;
+    min-width:22em;
+}
+
+#devices button, #features button, #widgets button {
     margin-left:1em;
+    padding: 0.4em 0 0.4em 0;
+    width:90%;
+    text-align:left;
 }
 
-#features {
-    width:30em;
-    height:55em;
-    float:right;
-    overflow-y:scroll;    
-}
-
-
-#featureslist .usage { /* Usage level */
+#devices .usage { /* Usage level */
     border-top: #cccccc solid 1px;
     border-bottom: #cccccc solid 1px;
     padding: 0.4em 0 0.4em 0;
@@ -37,58 +28,52 @@
     font-weight:bold;
 }
 
-#featureslist .device { /* Device level */
-    margin-left:10px;
+#devices .device { /* Device level */
     padding: 0.4em 0 0.4em 25px;
     background-position: 0% 50%;
     background-repeat:no-repeat;
 }
 
-#featureslist .feature { /* Feature level */
-    margin-left:35px;
-    padding: 0.4em 0 0.4em 25px;
-    background-position: 0% 50%;
-    background-repeat:no-repeat;
-    cursor: pointer;
+#features .feature { /* Feature level */
+    padding: 0.4em 0 0.4em 0;
 }
 
-#featureslist .selected { /* Feature level */
-    background-color:#BDCB2F;
+#model dt {
+    font-weight:bold;
+    padding-left:1em;
 }
 
-.ui-draggable {
-    cursor: move;
-    position: relative;
-}
-
-#widgets {
-    width:30em;
-    float:right;
-    border-right: 1px dashed #cccccc;
-    margin-right:1em;
-}
-
-#widgetslist > li {
-    margin:1em 1em 0 1em;
-    border: 1px solid #cccccc;
-    -moz-border-radius: 0.8em;
-    -webkit-border-radius: 0.8em;
+#model dd {
     padding:0 1em 1em 1em;
 }
 
-#widgetslist .model {
-    margin-top:1em;
+#model dd.model {
+    margin:1em;
+    padding-top:2em;
+    padding-bottom:1em;
+    text-align:center;
+    border: 1px dashed #cccccc;
+    border-radius: 0.8em;
+    -moz-border-radius: 0.8em;
+    -webkit-border-radius: 0.8em;
+    background-color:#DDFFD9;
 }
 
-#widgetslist .name {
+#model dd.description {
+    font-style:italic;
 }
 
-#widgetslist .description {
-    padding-left:1em;
-    font-style: italic;
+#model dd.dragdrop, #model dd.screenshot {
+    margin:0;
+    padding:1em 0 0 0;
+    text-align:center;
 }
 
-.mainactions .model, .actions .model {
+#model dd.screenshot img {
+    border: 1px dashed #cccccc;    
+}
+
+.mainactions .shape, .actions .shape {
     display:inline-block;
     margin:1em;
 }

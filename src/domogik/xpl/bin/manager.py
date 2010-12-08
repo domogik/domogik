@@ -224,7 +224,8 @@ class SysManager(XplPlugin):
         # error if no plugin in list
         error = ""
         if plg != "*":
-            if self._is_component(plg) == False:
+            if self.get_sanitized_hostname() == host and \
+               self._is_component(plg) == False:
                 self._invalid_component(cmd, plg, host)
                 return
 

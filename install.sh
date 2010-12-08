@@ -192,7 +192,8 @@ function update_user_config {
 }
 
 function call_db_installer {
-    if [ "$drop_db" = "y" -o "$replace" = "Y" -o "$drop_db" = "" ];then 
+    if [ "$drop_db" = "y" -o "$drop_db" = "Y" -o "$drop_db" = "" ];then 
+        echo "** Call DB Installer"
         /bin/su -c "python ./db_installer.py $d_home/.domogik.cfg" $d_user
     fi
 }
@@ -226,6 +227,15 @@ function create_log_dir {
     chown $d_user: /var/log/domogik 
 }
 
+function install_plugins {
+    chmod +x src/tools/packages/insert_data.py 
+    for file in src/share/domogik/plugins/*.xml;do
+        echo "** Parse $file"
+        su -c "src/tools/packages/insert_data.py $file" $d_user
+        echo "** File $file parsed"
+    done
+}
+
 #Main part
 if [ $UID -ne 0 ];then
     echo "Please restart this script as root!"
@@ -253,9 +263,10 @@ copy_sample_files
 update_default_config
 update_user_config
 copy_tools
-call_db_installer
-modify_hosts
 create_log_dir
+call_db_installer
+install_plugins
+modify_hosts
 
 [ -d $HOME/.python-eggs ] && chown -R $USER: $HOME/.python-eggs/ 
 

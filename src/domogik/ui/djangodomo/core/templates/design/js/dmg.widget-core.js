@@ -48,7 +48,8 @@ function get_widgets_options(id) {
             height: 1,
             key: '',
 			displayname: true,
-			displayborder: true
+			displayborder: true,
+			screenshot: null
         },
 		
 		_init: function() {

@@ -5,7 +5,7 @@
   <version>0.1.0</version>
   <detail>When receiving an incoming call on a classic telephonic line, this plugin gets the incoming call number and send it on xPL.
   </detail>
-  <documentation>http://wiki.domogik.org/tiki-index.php?page=plugin_cidmodem</documentation>
+  <documentation>http://wiki.domogik.org/plugin_cidmodem</documentation>
   <author>Fritz</author>
   <author-email>fritz.smh at gmail.com</author-email>
   <configuration-keys>

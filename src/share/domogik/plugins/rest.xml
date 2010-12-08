@@ -6,7 +6,7 @@
 - UIs
 - Stats</detail>
   <version>0.1.0</version>
-  <documentation>http://wiki.domogik.org/tiki-index.php?page=plugin_REST</documentation>
+  <documentation>http://wiki.domogik.org/REST</documentation>
   <author>Fritz</author>
   <author-email>fritz.smh at gmail.com</author-email>
   <configuration-keys>

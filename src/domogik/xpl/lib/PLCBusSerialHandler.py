@@ -223,6 +223,8 @@ class serialHandler(threading.Thread):
     def receive(self):
         #Avoid to wait if there is nothing to read
 #        try:
+        if self._stop.isSet():
+            return
         if self.__myser.inWaiting() < 9:
              return
         message = self.__myser.read(9) #wait for max 400ms if nothing to read

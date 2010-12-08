@@ -15,25 +15,25 @@
     -webkit-border-radius: 0.8em;
 }
 
-.widget .identity, .model .identity {
+.widget .identity, .shape .identity {
     position:absolute;
     top: -15px;
     left: -15px;
 }
 
 .size1x1 { width:5em; height:5em;}
-.model.size1x1 { line-height:5em;}
+.shape.size1x1 { line-height:5em;}
 
 .size3x2 { width:21em; height:14em;}
-.model.size3x2 { line-height:14em;}
+.shape.size3x2 { line-height:14em;}
 
 .size3x3 { width:21em; height:21em;}
-.model.size3x3 { line-height:21em;}
+.shape.size3x3 { line-height:21em;}
 
 .size4x1 { width:26em; height:5em;}
-.model.size4x1 { line-height:5em;}
+.shape.size4x1 { line-height:5em;}
 
-.model {
+.shape {
     text-align:center;
     display:block;
     outline: none;
@@ -46,4 +46,5 @@
     -webkit-user-select:none;
     color:#ffffff;
     background-color:#000000;
+    cursor:pointer;
 }

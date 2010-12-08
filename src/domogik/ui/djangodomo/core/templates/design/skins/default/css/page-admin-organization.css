@@ -64,6 +64,7 @@ li.roomitem {
     cursor: move;
     background-position: 0 50%;
     background-repeat: no-repeat;
+    z-index:2;
 }
 
 li.roomitem:focus {
@@ -79,6 +80,7 @@ li.empty {
     background-color: #fff;
     color: #000;
     border: 1px dashed #cccccc;
+    z-index:1;
 }
 
 ul.customize_list li a {

@@ -1,28 +1,46 @@
-$(function(){
-    $(".feature").click(function(){
-        $(".selected").removeClass('selected');
+$(function(){    
+    $('#dialog').dialog({ width:'auto',
+        position: ['middle', 100],
+        resizable: true,
+        modal: false
+    });
+
+    $("li#showmenu a").click(function(){
+        $("#panel").toggle();      
+    });
+    $("li#showmodels a").click(function(){
+        $('#dialog').dialog('open');
+    });
+    
+    $('.features, #widgets ul, #model dl').hide();
+    
+    $('button.device').click(function() {
+        $('button.device, button.feature').removeClass('selected');
+        $(this).addClass('selected');
+        $('.features, #widgets ul, #model dl').hide();
+        var deviceid = $(this).attr('deviceid');
+        $('#features' + deviceid).show().focus();
+    });
+    
+    $("button.feature").click(function(){
+        $('button.feature').removeClass('selected');
         $(this).addClass('selected');
         var type = $(this).attr('type');
         var featureid = $(this).attr('featureid');
         var featuremodel = $(this).attr('featuremodel');
         var featurename = $(this).attr('featurename');
         var devicename = $(this).attr('devicename');
-        $("#widgetslist").empty();
-        $("#widgets").show();
-        $("#widgetslist").widget_models({
+        $("#model dl").hide();
+        $("#widgets ul").widget_models({
             type: type,
             featureid: featureid,
             featuremodel: featuremodel,
             featurename: featurename,
             devicename: devicename
         });
+        $("#widgets ul").show();
     });
 
-    $("#widgets").hide();
-    
-    $("li#showmenu").click(function(){
-        $("#panel").toggle();      
-    });
 });
 
 (function($) {
@@ -34,7 +52,7 @@ $(function(){
             item = $(ui.helper).clone();
 
             $(this).append(item);
-            item.widget_model({
+            item.widget_shape({
                 widgetid: ui.draggable.data('widgetid'),
                 featureid: ui.draggable.data('featureid'),
                 featurename: ui.draggable.data('featurename'),
@@ -58,11 +76,11 @@ $(function(){
     }
     
     function onstop(event, ui) {
-        $("#panel").show();
+        $(".ui-dialog").show();
     }
     
     function ondrag(event, ui) {
-        $("#panel").hide();
+        $(".ui-dialog").hide();
     }
     
     $.fn.extend({
@@ -136,27 +154,18 @@ $(function(){
             $.each(widgets, function(index, id) {
                 var woptions = get_widgets_options(id);
                 if (matchFilter(woptions.filters, o.featuremodel)) {
-                    var widget = $("<li></li>");
-                    var name = $("<div class='name'>" + woptions.name + "</div>");
-                    widget.append(name);
-                    var name = $("<div class='description'>" + woptions.description + "</div>");
-                    widget.append(name);
-                    var model = $("<div></div>");
-                    model.widget_model({
-                        widgetid: id,
-                        featureid: o.featureid,
-//                        featuremodel: o.featuremodel,
-                        featurename: o.featurename,
-                        devicename: o.devicename,
-                        draggable: {
-                            helper: "clone",
-                            revert: 'invalid',
-                            appendTo: 'body',
-                            drag: ondrag,
-                            stop: onstop
-                        }
+                    var widget = $("<li><button class='widget'>" + woptions.name + "</button></li>");
+                    widget.find('button').click(function() {
+                        $('.widget').removeClass('selected');
+                        $(this).addClass('selected');
+                        $('#model').widget_model({
+                            widgetid: id,
+                            featureid: o.featureid,
+                            featurename: o.featurename,
+                            devicename: o.devicename
+                        });
+                        $("#model dl").show();
                     });
-                    widget.append(model);
                     self.element.append(widget); 
                 }
             });
@@ -170,6 +179,44 @@ $(function(){
     $.ui.widget.subclass("ui.widget_model", {
         // default options
         options: {
+        },
+
+        _init: function() {
+            var self = this, o = this.options;
+            var woptions = get_widgets_options(o.widgetid)
+            if (woptions) {
+                o = $.extend ({}, woptions, o);
+            }
+            this.element.find('dt.model').text(woptions.name);
+            this.element.find('dd.version').text(woptions.version);
+            this.element.find('dd.author').text(woptions.creator);
+            this.element.find('dd.description').text(woptions.description);
+            if (woptions.screenshot) {
+                this.element.find('dd.screenshot').html("<img src='/widgets/" + woptions.id + "/" + woptions.screenshot + "' />");
+            }
+            var model = $('<div></div>');
+            model.widget_shape({
+                widgetid: o.widgetid,
+                featureid: o.featureid,
+                featurename: o.featurename,
+                devicename: o.devicename,
+                draggable: {
+                    helper: "clone",
+                    revert: 'invalid',
+                    appendTo: 'body',
+                    drag: ondrag,
+                    stop: onstop
+                }
+            });
+            this.element.find('dd.model')
+                .empty()
+                .append(model);
+        }
+    });
+    
+    $.ui.widget.subclass("ui.widget_shape", {
+        // default options
+        options: {
             deletable: false
         },
 
@@ -179,8 +226,7 @@ $(function(){
             if (woptions) {
                 o = $.extend ({}, woptions, o);
             }
-
-            this.element.addClass('model');
+            this.element.addClass('shape');
             this.element.removeAttr('style');
             this.element.attr('role', 'listitem');
 			this.element.addClass('size' + o.width + 'x' + o.height);
@@ -195,10 +241,10 @@ $(function(){
             });
             this.element.displayName();
             this.element.draggable(o.draggable);
-            if (o.deletable) this.element.deletable();
+            if (o.deletable) this.element.deletable();            
         }
     });
-    
+ 
     $.extend({
         addAssociation: function(model, zone) {
             var page_type = zone.data('page_type');
@@ -262,6 +308,9 @@ $(function(){
             $('.otheractions').droppable({
                     activeClass: 'state-active',
                     hoverClass: 'state-hover',
+                    accept: function(draggable) {
+                        return (draggable.hasClass('shape'));
+                    },
                     drop: ondrop
             })
                 .data({'place':'otheractions','page_type': page_type,'page_id':page_id});
@@ -292,7 +341,7 @@ $(function(){
                                                 var status = (data.status).toLowerCase();
                                                 if (status == 'ok') {
                                                     var model = $("<div id='" + association.id + "' role='listitem'>1x1</div>");
-                                                    model.widget_model({
+                                                    model.widget_shape({
                                                         widgetid: widget,
                                                         featureid: association.device_feature_id,
 //                                                            featuremodel: data.feature[0].device_feature_model.id,
