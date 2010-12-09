@@ -682,6 +682,31 @@ class UIItemConfig(Base):
         return UIItemConfig.__tablename__
 
 
+class SystemInfo(Base):
+    """General information about the system"""
+
+    __tablename__ = '%s_system_info' % _db_prefix
+    id = Column(Integer, primary_key=True)
+    version = Column(Unicode(30))
+
+    def __init__(self, version):
+        """Class constructor
+
+        @param version : version of the application
+
+        """
+        self.version = version
+
+    def __repr__(self):
+        """Return an internal representation of the class"""
+        return "<SystemInfo(version='%s')>" % (self.version)
+
+    @staticmethod
+    def get_tablename():
+        """Return the table name associated to the class"""
+        return SystemInfo.__tablename__
+
+
 class SystemConfig(Base):
     """Configuration parameters for the system. This object contains only one record"""
 

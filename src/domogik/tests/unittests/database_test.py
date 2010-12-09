@@ -1489,6 +1489,23 @@ class UIItemConfigTestCase(GenericTestCase):
         assert len(db.del_ui_item_config(ui_item_name='room', ui_item_key='icon2')) == 0
 
 
+class SystemInfoTestCase(GenericTestCase):
+    """Test system information"""
+
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_update(self):
+        system_info = db.update_system_info(si_version=u'0.1.0')
+        print system_info
+        assert system_info.version == '0.1.0'
+        db.update_system_info(si_version=u'0.1.1')
+        assert db.get_system_info().version == u'0.1.1'
+
+
 class SystemConfigTestCase(GenericTestCase):
     """Test system config"""
 

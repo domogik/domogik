@@ -1,5 +1,3 @@
-
-
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
 License
@@ -53,7 +51,7 @@ from domogik.common.sql_schema import (
         ACTUATOR_VALUE_TYPE_LIST, Area, Device, DeviceFeature, DeviceFeatureModel,
         DeviceUsage, DeviceFeatureAssociation, DeviceConfig, DeviceStats,
         DeviceTechnology, PluginConfig, DeviceType, UIItemConfig, Room, Person,
-        UserAccount, SENSOR_VALUE_TYPE_LIST, SystemConfig, Trigger
+        UserAccount, SENSOR_VALUE_TYPE_LIST, SystemConfig, SystemInfo, Trigger
 )
 
 
@@ -2597,6 +2595,39 @@ class DbHelper():
             except Exception, sql_exception:
                 self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return ui_item_config_list
+
+###
+# SystemInfo
+###
+
+    def update_system_info(self, si_version):
+        """Update system information
+
+        @param si_version : version of the application
+        @return a SystemInfo object
+
+        """
+        # Make sure previously modified objects outer of this method won't be commited
+        self.__session.expire_all()
+        sys_info = self.__session.query(SystemInfo).first()
+        if sys_info is None:
+            sys_info = SystemInfo(version=u'0.1.0')
+        else:
+            sys_info.version = si_version
+        self.__session.add(sys_info)
+        try:
+            self.__session.commit()
+        except Exception, sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+        return sys_info
+
+    def get_system_info(self):
+        """Get current system information
+
+        @return a SystemInfo object
+
+        """
+        return self.__session.query(SystemInfo).first()
 
 ###
 # SystemConfig
