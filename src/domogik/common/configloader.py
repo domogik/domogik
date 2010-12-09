@@ -72,8 +72,6 @@ class Loader():
             files = self.__class__.config.read([custom_path, os.getenv("HOME") + "/." + self.main_conf_name,
                 '/etc/' + self.main_conf_name,
                 '/usr/local/etc/' + self.main_conf_name])
-        else:
-            print "config already loaded"
         result = self.__class__.config.items('domogik')
         main_result = {}
         for k, v in result:
