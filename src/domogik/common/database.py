@@ -1948,8 +1948,15 @@ class DbHelper():
             query = query.filter_by(key=ucode(ds_key)).filter_by(device_id=ds_device_id
                         ).filter(cond_min
                         ).filter(cond_max)
-            query_global = sql_query['global'].filter(cond_min).filter(cond_max)
-            return (query.all(), query_global.first())
+            results_global = sql_query['global'].filter(cond_min).filter(cond_max).first()
+            return {
+                'values': query.all(),
+                'global_values': {
+                    'min': results_global[0],
+                    'max': results_global[1],
+                    'avg': results_global[2]
+                }
+            }
         """
         else:
             datetime_cursor = datetime.datetime.fromtimestamp(start_date_ts)
