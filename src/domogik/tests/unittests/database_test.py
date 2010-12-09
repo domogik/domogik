@@ -1017,13 +1017,14 @@ class DeviceStatsTestCase(GenericTestCase):
         }
         for func in ('avg', 'min', 'max'):
             start_t = time.time()
-            results = db.filter_stats_of_device_by_key(ds_key='valm', ds_device_id=device1.id,
-                                                       start_date_ts=make_ts(2010, 2, 21, 15, 57, 0),
-                                                       end_date_ts=make_ts(2010, 2, 21, 16, 3, 0),
-                                                       step_used='minute', function_used=func)
-            assert results[:-1] == expected_results[func]
+            (detailed_results, global_results) = db.filter_stats_of_device_by_key(ds_key='valm', 
+                                                            ds_device_id=device1.id,
+                                                            start_date_ts=make_ts(2010, 2, 21, 15, 57, 0),
+                                                            end_date_ts=make_ts(2010, 2, 21, 16, 3, 0),
+                                                            step_used='minute', function_used=func)
+            assert detailed_results == expected_results[func]
             # These are computed values for the whole period (min, max, avg)
-            assert results[-1:][0][0] == 54 and results[-1:][0][1] == 89 and results[-1:][0][2] == 71.5
+            assert global_results == (54, 89, 71.5)
 
         start_p = make_ts(2010, 6, 21, 15, 48, 0)
         end_p = make_ts(2010, 6, 25, 21, 48, 0)
@@ -1049,13 +1050,14 @@ class DeviceStatsTestCase(GenericTestCase):
         }
         for func in ('avg', 'min', 'max'):
             start_t = time.time()
-            results = db.filter_stats_of_device_by_key(ds_key='valh', ds_device_id=device1.id,
-                                                       start_date_ts=make_ts(2010, 6, 22, 17, 48, 0),
-                                                       end_date_ts=make_ts(2010, 6, 23, 1, 48, 0),
-                                                       step_used='hour', function_used=func)
-            assert results[:-1] == expected_results[func]
+            (detailed_results, global_results) = db.filter_stats_of_device_by_key(ds_key='valh', 
+                                                                    ds_device_id=device1.id,
+                                                                    start_date_ts=make_ts(2010, 6, 22, 17, 48, 0),
+                                                                    end_date_ts=make_ts(2010, 6, 23, 1, 48, 0),
+                                                                    step_used='hour', function_used=func)
+            assert detailed_results == expected_results[func]
             # These are computed values for the whole period (min, max, avg)
-            assert results[-1:][0][0] == 38 and results[-1:][0][1] == 48 and results[-1:][0][2] == 43
+            assert global_results == (38, 48, 43)
 
         # Days
         start_p = make_ts(2010, 6, 21, 15, 48, 0)
@@ -1078,13 +1080,14 @@ class DeviceStatsTestCase(GenericTestCase):
         }
         for func in ('avg', 'min', 'max'):
             start_t = time.time()
-            results = db.filter_stats_of_device_by_key(ds_key='vald', ds_device_id=device1.id,
-                                                       start_date_ts=make_ts(2010, 6, 22, 15, 48, 0),
-                                                       end_date_ts=make_ts(2010, 7, 26, 15, 48, 0),
-                                                       step_used='day', function_used=func)
-            assert results[:-1] == expected_results[func]
+            (detailed_results, global_results) = db.filter_stats_of_device_by_key(ds_key='vald', 
+                                                               ds_device_id=device1.id,
+                                                               start_date_ts=make_ts(2010, 6, 22, 15, 48, 0),
+                                                               end_date_ts=make_ts(2010, 7, 26, 15, 48, 0),
+                                                               step_used='day', function_used=func)
+            assert detailed_results == expected_results[func]
             # These are computed values for the whole period (min, max, avg)
-            assert results[-1:][0][0] == 4 and results[-1:][0][1] == 146 and round(results[-1:][0][2], 2) == 79.26
+            assert global_results[0] == 4 and global_results[1] == 146 and round(global_results[2], 2) == 79.26
 
         # Weeks
         start_p = make_ts(2010, 7, 11, 15, 48, 0)
@@ -1107,13 +1110,14 @@ class DeviceStatsTestCase(GenericTestCase):
         }
         for func in ('avg', 'min', 'max'):
             start_t = time.time()
-            results = db.filter_stats_of_device_by_key(ds_key='valw', ds_device_id=device1.id,
-                                                       start_date_ts=make_ts(2010, 7, 22, 15, 48, 0),
-                                                       end_date_ts=make_ts(2010, 8, 26, 15, 48, 0),
-                                                       step_used='week', function_used=func)
-            assert results[:-1] == expected_results[func]
+            (detailed_results, global_results) = db.filter_stats_of_device_by_key(ds_key='valw', 
+                                                               ds_device_id=device1.id,
+                                                               start_date_ts=make_ts(2010, 7, 22, 15, 48, 0),
+                                                               end_date_ts=make_ts(2010, 8, 26, 15, 48, 0),
+                                                               step_used='week', function_used=func)
+            assert detailed_results == expected_results[func]
             # These are computed values for the whole period (min, max, avg)
-            assert results[-1:][0][0] == 22 and results[-1:][0][1] == 91 and results[-1:][0][2] == 56.5
+            assert global_results == (22, 91, 56.5)
 
         # Months
         start_p = make_ts(2010, 6, 21, 15, 48, 0)
@@ -1138,20 +1142,21 @@ class DeviceStatsTestCase(GenericTestCase):
         }
         for func in ('avg', 'min', 'max'):
             start_t = time.time()
-            results =  db.filter_stats_of_device_by_key(ds_key='valmy', ds_device_id=device1.id,
-                                                        start_date_ts=make_ts(2010, 6, 25, 15, 48, 0),
-                                                        end_date_ts=make_ts(2011, 7, 29, 15, 48, 0),
-                                                        step_used='month', function_used=func)
-            assert results[:-1] == expected_results[func]
+            (detailed_results, global_results) =  db.filter_stats_of_device_by_key(ds_key='valmy', 
+                                                                ds_device_id=device1.id,
+                                                                start_date_ts=make_ts(2010, 6, 25, 15, 48, 0),
+                                                                end_date_ts=make_ts(2011, 7, 29, 15, 48, 0),
+                                                                step_used='month', function_used=func)
+            assert detailed_results == expected_results[func]
             # These are computed values for the whole period (min, max, avg)
-            assert results[-1:][0][0] == 0 and results[-1:][0][1] == 146 and round(results[-1:][0][2], 2) == 44.84
+            assert global_results[0] == 0 and global_results[1] == 146 and round(global_results[2], 2) == 44.84
 
         # Test with no end date
-        results =  db.filter_stats_of_device_by_key(ds_key='valmy', ds_device_id=device1.id,
-                                                    start_date_ts=make_ts(2010, 6, 21, 15, 48, 0),
-                                                    end_date_ts=None,
-                                                    step_used='month', function_used='avg')
-        ym_list = [(r[0], r[1]) for r in results[:-1]]
+        (detailed_results, global_results) =  db.filter_stats_of_device_by_key(ds_key='valmy', ds_device_id=device1.id,
+                                                                        start_date_ts=make_ts(2010, 6, 21, 15, 48, 0),
+                                                                        end_date_ts=None,
+                                                                        step_used='month', function_used='avg')
+        ym_list = [(r[0], r[1]) for r in detailed_results]
         now = datetime.datetime.now()
         assert (2010, 6) in ym_list
         assert (now.year, now.month) in ym_list
@@ -1164,13 +1169,14 @@ class DeviceStatsTestCase(GenericTestCase):
         }
         for func in ('avg', 'min', 'max'):
             start_t = time.time()
-            results=  db.filter_stats_of_device_by_key(ds_key='valmy', ds_device_id=device1.id,
-                                                       start_date_ts=make_ts(2010, 6, 21, 15, 48, 0),
-                                                       end_date_ts=make_ts(2012, 6, 21, 15, 48, 0),
-                                                       step_used='year', function_used=func)
-            assert results[:-1] == expected_results[func]
+            (detailed_results, global_results)=  db.filter_stats_of_device_by_key(ds_key='valmy', 
+                                                            ds_device_id=device1.id,
+                                                            start_date_ts=make_ts(2010, 6, 21, 15, 48, 0),
+                                                            end_date_ts=make_ts(2012, 6, 21, 15, 48, 0),
+                                                            step_used='year', function_used=func)
+            assert detailed_results == expected_results[func]
             # These are computed values for the whole period (min, max, avg)
-            assert results[-1:][0][0] == 0 and results[-1:][0][1] == 146 and round(results[-1:][0][2], 2) == 53.22
+            assert global_results[0] == 0 and global_results[1] == 146 and round(global_results[2], 2) == 53.22
 
     def test_del(self):
         dt1 = db.add_device_technology('x10', 'x10', 'this is x10')

@@ -1948,9 +1948,9 @@ class DbHelper():
             query = query.filter_by(key=ucode(ds_key)).filter_by(device_id=ds_device_id
                         ).filter(cond_min
                         ).filter(cond_max)
-            result_list = query.all()
             query_global = sql_query['global'].filter(cond_min).filter(cond_max)
-            result_list.extend(query_global.all())
+            return (query.all(), query_global.first())
+        """
         else:
             datetime_cursor = datetime.datetime.fromtimestamp(start_date_ts)
             end_datetime = datetime.datetime.fromtimestamp(end_date_ts)
@@ -1969,7 +1969,7 @@ class DbHelper():
                     values_returned.append(result[1])
                     result_list.append(tuple(values_returned))
                 datetime_cursor = datetime_sup + datetime.timedelta(seconds=1)
-        return result_list
+        """
 
     def device_has_stats(self, ds_device_id):
         """Check if the device has stats that were recorded
