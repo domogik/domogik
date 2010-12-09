@@ -122,18 +122,21 @@ class DbHelper():
     __engine = None
     __session = None
 
-    def __init__(self, echo_output=False, use_test_db=False, engine=None):
+    def __init__(self, echo_output=False, use_test_db=False, engine=None, custom_path = None):
         """Class constructor
 
         @param echo_output : if True displays sqlAlchemy queries (optional, default False)
         @param use_test_db : if True use a test database (optional, default False)
         @param engine : an existing engine, if not provided, a new one will be created
-
+        @param custom_path : full path to domogik config file
         """
         l = logger.Logger('db_api')
         self.log = l.get_logger()
         cfg = Loader('database')
-        config = cfg.load()
+        if custom_path == None:
+            config = cfg.load()
+        else:
+            config = cfg.load(custom_path = custom_path)
         self.__db_config = dict(config[1])
 
         url = self.get_url_connection_string()

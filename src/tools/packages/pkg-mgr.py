@@ -37,6 +37,7 @@ TODO
 """
 
 from domogik.common.packagexml import PackageXml, PackageException
+from insert_data import PackageData
 from domogik.common.configloader import Loader
 from optparse import OptionParser
 from xml.dom import minidom
@@ -44,6 +45,7 @@ import traceback
 import tarfile
 import tempfile
 import os
+import pwd
 from subprocess import Popen
 import urllib
 from operator import attrgetter
@@ -59,6 +61,7 @@ REPO_SRC_FILE = "/etc/domogik/sources.list"
 REPO_LST_FILE = "packages.lst"
 REPO_LST_FILE_HEADER = "Domogik repository"
 REPO_CACHE_DIR = "/var/cache/domogik"
+DOMOGIK_DEFAULT = "/etc/default/domogik"
 
 
 class PackageManager():
@@ -68,6 +71,7 @@ class PackageManager():
     def __init__(self):
         """ Init tool
         """
+        self.dmg_user = self.get_config_path()
 
         # Options management
         usage = "usage: %prog [options] <plugin name>"
@@ -274,8 +278,12 @@ class PackageManager():
             1. Extract tar.gz
             2. Launch ez_setup.py
             3. Launch setup install.py
+            4. Insert data in database
             @param path : path for tar.gz
         """
+        if self.is_root() == False:
+            print("-i option must be used as root")
+            return
         # package from repository
         if path[0:5] == "repo:":
             pkg = self._find_package(path[5:], version)
@@ -323,6 +331,11 @@ class PackageManager():
             self._launch_setup_py(my_tmp_dir)
         except:
             raise PackageException("Error while installing package '%s' : %s" % (path, traceback.format_exc()))
+
+        # insert data in database
+        pkg_data = PackageData("%s/info.xml" % my_tmp_dir, custom_path = "/home/%s/.domogik.cfg" % self.dmg_user)
+        pkg_data.insert()
+
         print("Package installation finished")
 
 
@@ -526,10 +539,31 @@ class PackageManager():
             return None
 
         return pkg_list[0]["xml"]
+
+    def is_root(self):
+        """ return True is current user is root
+        """
+        if pwd.getpwuid(os.getuid())[0] == "root":
+            return True
+        return False
+
+    def get_config_path(self):
+        """ get .domogik.cfg full path
+        """
+        try:
+            file = open(DOMOGIK_DEFAULT, "r")
+            for line in file.readlines():
+                elt = line.split("=")
+                if elt[0] == "DOMOGIK_USER":
+                    dmg_user = elt[1].strip()
+            file.close()
+        except:
+            raise PackageException("Error reading default file : %s : %s" % (DOMOGIK_DEFAULT, str(traceback.format_exc())))
+        return dmg_user
               
 
 
-class PackageXml():
+class OLD_PackageXml():
     def __init__(self, name = None, url = None, path = None):
         """ Read xml file of a plugin and make an object from it
             @param name : name of plugin
