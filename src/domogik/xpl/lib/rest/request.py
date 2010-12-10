@@ -610,17 +610,19 @@ target=*
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         values = []
         if st_interval != None and st_selector != None:
-            for data in self._db.filter_stats_of_device_by_key(key,
+            data = self._db.filter_stats_of_device_by_key(key,
                                                                device_id,
                                                                st_from,
                                                                st_to,
                                                                st_interval,
-                                                               st_selector):
-                values.append(data) 
+                                                               st_selector)
+            json_data.add_data({"values" : data["values"],
+                                "global_values" : data["global_values"],
+                                "key" : key, "device_id" : device_id})
         else:
             for data in self._db.list_stats_of_device_between_by_key(key, device_id, st_from, st_to):
                 values.append(data) 
-        json_data.add_data({"values" : values, "key" : key, "device_id" : device_id})
+            json_data.add_data({"values" : values, "key" : key, "device_id" : device_id})
         self.send_http_response_ok(json_data.get())
     
 
