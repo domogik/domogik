@@ -995,6 +995,7 @@ class DeviceStatsTestCase(GenericTestCase):
         area1 = db.add_area('area1','description 1')
         room1 = db.add_room('room1', area1.id)
         device1 = db.add_device(d_name='device1', d_address = "A1", d_type_id = dty1.id, d_usage_id = du1.id)
+        device2 = db.add_device(d_name='device2', d_address = "A2", d_type_id = dty1.id, d_usage_id = du1.id)
 
         # Minutes
         start_p = make_ts(2010, 2, 21, 15, 48, 0)
@@ -1004,6 +1005,10 @@ class DeviceStatsTestCase(GenericTestCase):
             db._DbHelper__session.add(
                 DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i), timestamp=start_p + i,
                             key=u'valm', value=(i/insert_step), device_id=device1.id)
+            )
+            db._DbHelper__session.add(
+                DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i), timestamp=start_p + i,
+                            key=u'valm', value=(i/insert_step+100), device_id=device2.id)
             )
         db._DbHelper__session.commit()
 

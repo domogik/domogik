@@ -1946,7 +1946,10 @@ class DbHelper():
             query = query.filter_by(key=ucode(ds_key)).filter_by(device_id=ds_device_id
                         ).filter(cond_min
                         ).filter(cond_max)
-            results_global = sql_query['global'].filter(cond_min).filter(cond_max).first()
+            results_global = sql_query['global'].filter_by(device_id=ds_device_id
+                                               ).filter(cond_min
+                                               ).filter(cond_max
+                                               ).first()
             return {
                 'values': query.all(),
                 'global_values': {
