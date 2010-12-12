@@ -116,7 +116,6 @@
             this.graph_options = {
                 chart: {
                    renderTo: 'dialog-graph',
-                   defaultSeriesType: 'line',
                    borderRadius: null,
                    backgroundColor:'#eeeeee',
                    type: 'line'
@@ -133,7 +132,7 @@
                     type: 'datetime'
                 },
                 yAxis: {
-                    min: 0,
+                    min: null,
                     title: {
                         text: o.featurename + ' (' + o.model_parameters.unit + ')'
                     }
@@ -252,7 +251,35 @@
                                 d = self.get_graph_year(data.stats[0].values);
                                 break;
                         }
-                        self.graph.addSeries({name:o.featurename,data: d});
+                        self.graph.yAxis[0].addPlotLine({
+                            value: data.stats[0].global_values.avg,
+                            color: '#660099',
+                            width: 1,
+                            label:{
+                                     text: 'Avg: ' + Highcharts.numberFormat(data.stats[0].global_values.avg, 2) +" " + o.model_parameters.unit,
+                                     align: 'right'
+                                 }
+                        });
+                        self.graph.yAxis[0].addPlotLine({
+                            value: data.stats[0].global_values.min,
+                            color: '#0000cc',
+                            width: 1,
+                            label:{
+                                     text: 'Min: ' + Highcharts.numberFormat(data.stats[0].global_values.min, 2) +" " + o.model_parameters.unit,
+                                     align: 'right'
+                                 }
+                        });
+                        self.graph.yAxis[0].addPlotLine({
+                            value: data.stats[0].global_values.max,
+                            color: '#cc0000',
+                            width: 1,
+                            label:{
+                                     text: 'Max: ' + Highcharts.numberFormat(data.stats[0].global_values.max, 2) +" " + o.model_parameters.unit,
+                                     align: 'right'
+                                 }
+                        });                        self.graph.addSeries({name:o.featurename,data: d});
+                        self.graph.addSeries({data: [0]}); // for min
+                        self.graph.addSeries({data: [data.stats[0].global_values.max]}); // for max
                     } else {
                         $.notification('error', '{% trans "data creation failed" %} (' + data.description + ')');                                                                      
                     }
@@ -275,7 +302,7 @@
             this.graph_options.xAxis.dateTimeLabelFormats = {hour: '%H:%M'};
             this.graph_options.xAxis.tickInterval = null;
             this.graph_options.tooltip.formatter = function() {
-			                return Highcharts.dateFormat('%d/%m/%Y %Hh', this.x) +'<br/>'
+			                return Highcharts.dateFormat('%d/%m/%Y %Hh%M', this.x) +'<br/>'
                                 + "<strong>" + Highcharts.numberFormat(this.y, 2, ',') +" " + o.model_parameters.unit + "</strong>";
                         };
             return ['stats', o.deviceid, o.key, 'from', Math.round(from.getTime() / 1000), 'to', Math.round(to.getTime() / 1000),'interval', 'minute', 'selector', 'avg'];
