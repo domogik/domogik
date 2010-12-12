@@ -73,7 +73,7 @@
                 this._list.empty();
                 $.each(this.values, function(index, stat){
                     var date = new Date(stat.timestamp * 1000);
-                    date = date.getHours() + ":" + date.getMinutes();
+                    date = date.format('H:i');
                     if (stat.number > 1) {
                         self._list.append("<li>" + stat.value + " <span class='date'>" + date + "</span> (" + stat.number + ")</li>");                        
                     } else {
