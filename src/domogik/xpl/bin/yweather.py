@@ -60,7 +60,7 @@ class YWeatherManager(XplPlugin):
         self._config = Query(self.myxpl, self.log)
         res = XplResult()
         self._config.query('yweather', 'unit' , res)
-        unit = res.get_value()['unit']
+        unit = res.get_value()['unit'].lower()
         self._config = Query(self.myxpl, self.log)
         res = XplResult()
         self._config.query('yweather', 'en-current' , res)
