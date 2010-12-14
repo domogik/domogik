@@ -786,8 +786,11 @@ class DeviceTestCase(GenericTestCase):
         device1 = db.get_device(device_id)
         assert device1.description == 'desc2'
         assert device1.reference == 'A1'
-        device1 = db.update_device(d_id=device1.id, d_reference='')
+        assert device1.device_usage_id == du1.id
+        du2 = db.add_device_usage('du2_id', 'du2')
+        device1 = db.update_device(d_id=device1.id, d_reference='', d_usage_id=du2.id)
         assert device1.reference == None
+        assert device1.device_usage_id == du2.id
 
     def test_del(self):
         area1 = db.add_area('area1','description 1')

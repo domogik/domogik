@@ -1549,7 +1549,7 @@ class DbHelper():
         if d_usage_id is not None:
             if not self.__session.query(DeviceUsage).filter_by(id=d_usage_id).first():
                 self.__raise_dbhelper_exception("Couldn't find device usage id %s. It does not exist" % d_usage_id)
-            device.device_usage = d_usage_id
+            device.device_usage_id = d_usage_id
         self.__session.add(device)
         try:
             self.__session.commit()
