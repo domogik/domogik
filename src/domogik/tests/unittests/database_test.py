@@ -1011,6 +1011,10 @@ class DeviceStatsTestCase(GenericTestCase):
             )
             db._DbHelper__session.add(
                 DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i), timestamp=start_p + i,
+                            key=u'valm2', value=(i/insert_step+200), device_id=device1.id)
+            )
+            db._DbHelper__session.add(
+                DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i), timestamp=start_p + i,
                             key=u'valm', value=(i/insert_step+100), device_id=device2.id)
             )
         db._DbHelper__session.commit()
@@ -1097,8 +1101,8 @@ class DeviceStatsTestCase(GenericTestCase):
                                                        step_used='day', function_used=func)
             assert results['values'] == expected_results[func]
             # These are computed values for the whole period (min, max, avg)
-            assert results['global_values']['min'] == 4 and results['global_values']['max'] == 146\
-                                                         and round(results['global_values']['avg'], 2) == 79.26
+            assert results['global_values']['min'] == 4 and results['global_values']['max'] == 22\
+                                                        and results['global_values']['avg'] == 13
 
         # Weeks
         start_p = make_ts(2010, 7, 11, 15, 48, 0)
@@ -1161,8 +1165,8 @@ class DeviceStatsTestCase(GenericTestCase):
                                                         step_used='month', function_used=func)
             assert results['values'] == expected_results[func]
             # These are computed values for the whole period (min, max, avg)
-            assert results['global_values']['min'] == 0 and results['global_values']['max'] == 146\
-                                                         and round(results['global_values']['avg'], 2) == 44.84
+            assert results['global_values']['min'] == 1 and results['global_values']['max'] == 26\
+                                                        and results['global_values']['avg'] == 13.5
 
         # Test with no end date
         results =  db.filter_stats_of_device_by_key(ds_key='valmy', ds_device_id=device1.id,
@@ -1188,8 +1192,8 @@ class DeviceStatsTestCase(GenericTestCase):
                                                         step_used='year', function_used=func)
             assert results['values'] == expected_results[func]
             # These are computed values for the whole period (min, max, avg)
-            assert results['global_values']['min'] == 0 and results['global_values']['max'] == 146\
-                                                         and round(results['global_values']['avg'], 2) == 53.22
+            assert results['global_values']['min'] == 0 and results['global_values']['max'] == 48\
+                                                        and results['global_values']['avg'] == 24
 
     def test_del(self):
         dt1 = db.add_device_technology('x10', 'x10', 'this is x10')

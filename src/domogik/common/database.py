@@ -1943,10 +1943,12 @@ class DbHelper():
             cond_min = "date >= '" + _datetime_string_from_tstamp(start_date_ts, self.get_db_type()) + "'"
             cond_max = "date < '" + _datetime_string_from_tstamp(end_date_ts, self.get_db_type()) + "'"
             query = sql_query[step_used][self.get_db_type()]
-            query = query.filter_by(key=ucode(ds_key)).filter_by(device_id=ds_device_id
+            query = query.filter_by(key=ucode(ds_key)
+                        ).filter_by(device_id=ds_device_id
                         ).filter(cond_min
                         ).filter(cond_max)
-            results_global = sql_query['global'].filter_by(device_id=ds_device_id
+            results_global = sql_query['global'].filter_by(key=ucode(ds_key)
+                                               ).filter_by(device_id=ds_device_id
                                                ).filter(cond_min
                                                ).filter(cond_max
                                                ).first()
