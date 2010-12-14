@@ -33,8 +33,13 @@
 
 SRC_PATH="../../../"
 PLG_XML_PATH="src/share/domogik/plugins/"
-
+CUR_DIR=`pwd`
+FULL_PATH=$0
+PROG_NAME=${FULL_PATH##*/}
+APP_DIR=${FULL_PATH%%$PROG_NAME}
+cd $APP_DIR
 for fic in $SRC_PATH/$PLG_XML_PATH/*xml
-  do
+do
     ./insert_data.py $fic
 done
+cd $CUR_DIR
