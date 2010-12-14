@@ -1,0 +1,40 @@
+<package type="plugin">
+  <name>knx</name>
+  <technology>knx</technology>
+  <description>KNX management with Eibd</description>
+  <detail>KNS is...</detail>
+  <version>0.1.0</version>
+<documentation>http://wiki.domogik.org/plugin_knx</documentation>
+  <author>Basilic</author>
+  <author-email>foof@fuu.bar</author-email>
+  <configuration-keys>
+    <key>
+      <order-id>0</order-id>
+      <name>startup-plugin</name>
+      <type>boolean</type>
+      <description>Automatically start plugin at Domogik startup</description>
+      <default-value>False</default-value>
+    </key>
+    <key>
+      <order-id>1</order-id>
+      <name>device</name>
+      <type>string</type>
+      <description>KNX device (IP addres)</description>
+      <default-value></default-value>
+    </key>
+  </configuration-keys>
+  <files>
+    <file path="src/share/domogik/plugins/knx.xml"/>
+    <file path="src/domogik/xpl/bin/knx.py"/>
+    <file path="src/domogik/xpl/lib/knx.py"/>
+  </files>
+  <dependencies/>
+  <device_technology>
+      <id>knx</id>
+      <name>KNX</name>
+      <description>KNX with Eibd</description>
+  </device_technology>
+  <device_types/>
+  <device_feature_models/>
+</package>
+
