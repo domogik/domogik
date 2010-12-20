@@ -4,11 +4,8 @@
         _init: function() {
             var self = this, o = this.options;
             this.element.dialog({
-                bgiframe: true,
                 autoOpen: false,
-                height: 100,
-                modal: true,
-                close: function() {}
+                modal: true
             });
         return this;
         },
