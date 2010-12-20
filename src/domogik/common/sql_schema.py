@@ -687,19 +687,19 @@ class SystemInfo(Base):
 
     __tablename__ = '%s_system_info' % _db_prefix
     id = Column(Integer, primary_key=True)
-    version = Column(Unicode(30))
+    db_version = Column(Unicode(30))
 
-    def __init__(self, version):
+    def __init__(self, db_version):
         """Class constructor
 
-        @param version : version of the application
+        @param db_version : version of the database
 
         """
-        self.version = version
+        self.db_version = db_version
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<SystemInfo(version='%s')>" % (self.version)
+        return "<SystemInfo(db_version='%s')>" % (self.db_version)
 
     @staticmethod
     def get_tablename():

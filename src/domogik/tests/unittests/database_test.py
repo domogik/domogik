@@ -1511,11 +1511,11 @@ class SystemInfoTestCase(GenericTestCase):
         pass
 
     def test_update(self):
-        system_info = db.update_system_info(si_version=u'0.1.0')
+        system_info = db.update_system_info(si_db_version=u'0.1.0')
         print system_info
-        assert system_info.version == '0.1.0'
-        db.update_system_info(si_version=u'0.1.1')
-        assert db.get_system_info().version == u'0.1.1'
+        assert system_info.db_version == '0.1.0'
+        db.update_system_info(si_db_version=u'0.1.1')
+        assert db.get_system_info().db_version == u'0.1.1'
 
 
 class SystemConfigTestCase(GenericTestCase):

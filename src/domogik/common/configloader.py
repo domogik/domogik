@@ -70,8 +70,8 @@ class Loader():
         sys_file = ''
         if os.path.isfile('/etc/default/domogik'):
             sys_file = '/etc/default/domogik'
-        elif os.path.isfile('/etc/rc.d/domogik'):
-            sys_file = '/etc/rc.d/domogik'
+        elif os.path.isfile('/etc/conf.d/domogik'):
+            sys_file = '/etc/conf.d/domogik'
         homedir = os.getenv('HOME')
         if sys_file != '':
             f = open(sys_file)

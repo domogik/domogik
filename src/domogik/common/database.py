@@ -2605,10 +2605,10 @@ class DbHelper():
 # SystemInfo
 ###
 
-    def update_system_info(self, si_version):
+    def update_system_info(self, si_db_version):
         """Update system information
 
-        @param si_version : version of the application
+        @param si_db_version : version of the database
         @return a SystemInfo object
 
         """
@@ -2616,9 +2616,9 @@ class DbHelper():
         self.__session.expire_all()
         sys_info = self.__session.query(SystemInfo).first()
         if sys_info is None:
-            sys_info = SystemInfo(version=u'0.1.0')
+            sys_info = SystemInfo(db_version=u'0.1.0')
         else:
-            sys_info.version = si_version
+            sys_info.db_version = si_db_version
         self.__session.add(sys_info)
         try:
             self.__session.commit()
