@@ -651,6 +651,34 @@ class RestHandler(BaseHTTPRequestHandler):
         """ Process POST requests
             Call directly .do_for_all_methods()
         """
+        # get type to see if we had to make tricky action for TinyWebDb
+        # notice : this code is duplicated from request.py : ProcessRequest
+        if self.path[-1:] == "/":
+            self.path = self.path[0:len(self.path)-1]
+        tab_path = self.path.split("/")
+
+        # Get type of request : /command, /xpl-cmnd, /base, etc
+        if len(tab_path) < 2:
+            rest_type = None
+            # Display an information json if no request done in do_for_all_methods
+            return
+        rest_type = tab_path[1].lower()
+
+        # tricky usage for TinyWebDb in order to use Google appinventor
+        if rest_type == "getvalue":
+            if self.headers.has_key("content-length"):
+                post_length = int(self.headers['content-length'])
+                post_data = self.rfile.read(post_length)
+                post_tab = post_data.split("&")
+                for data in post_tab:
+                    if data[0:3] == "tag":
+                        tag = data[4:]
+                tag = unicode(urllib.unquote(tag), "UTF-8")
+            else:
+                tag = None
+            # replace self.path with tag value
+            self.path = tag
+
         self.do_for_all_methods()
 
     def do_PUT(self):
