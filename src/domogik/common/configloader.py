@@ -41,6 +41,7 @@ global config_path
 #       DON'T CHANGE ANYTHING AFTER THIS LINE      #
 ####################################################
 import os
+import pwd 
 import ConfigParser
 import threading
 
@@ -66,10 +67,21 @@ class Loader():
         @param custom_path : Custom path to config file, will superseed others
         @return pair (main_config, plugin_config)
         '''
+        sys_file = ''
+        if os.path.isfile('/etc/default/domogik'):
+            sys_file = '/etc/default/domogik'
+        elif os.path.isfile('/etc/rc.d/domogik'):
+            sys_file = '/etc/rc.d/domogik'
+        homedir = os.getenv('HOME')
+        if sys_file != '':
+            f = open(sys_file)
+            data = f.readlines()
+            data = filter(lambda s:s.startswith('DOMOGIK_USER'), data)[0]
+            homedir = pwd.getpwnam(data.strip().split('=')[1]).pw_dir
         main_result = {}
         if self.__class__.config == None:
             self.__class__.config = ConfigParser.ConfigParser()
-            files = self.__class__.config.read([custom_path, os.getenv("HOME") + "/." + self.main_conf_name,
+            files = self.__class__.config.read([custom_path, homedir + "/." + self.main_conf_name,
                 '/etc/' + self.main_conf_name,
                 '/usr/local/etc/' + self.main_conf_name])
         result = self.__class__.config.items('domogik')
