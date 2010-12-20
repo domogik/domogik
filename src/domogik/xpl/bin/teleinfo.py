@@ -97,7 +97,11 @@ class TeleinfoManager(XplPlugin):
             my_temp_message.add_data({entry["name"].lower().strip("\x00\x10") : entry["value"].strip("\x00\x10")})
         my_temp_message.add_data({"device": "teleinfo"})
 
-        self.myxpl.send(my_temp_message)
+        try:
+            self.myxpl.send(my_temp_message)
+        except XplMessageError:
+            #We ignore the message if some values are not correct because it can happen with teleinfo ...
+            pass
 
 if __name__ == "__main__":
     TeleinfoManager()
