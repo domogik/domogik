@@ -41,6 +41,7 @@ from domogik.xpl.common.xplmessage import XplMessage
 from domogik.common.database import DbHelper
 from domogik.xpl.common.helper import HelperError
 from domogik.xpl.lib.rest.jsondata import JSonHelper
+from domogik.xpl.lib.rest.csvdata import CsvHelper
 import time
 import urllib
 from socket import gethostname
@@ -148,6 +149,7 @@ class ProcessRequest():
         # global init
         self.jsonp = False
         self.jsonp_cb = ""
+        self.csv_export = False
 
         # url processing
         #self.path = urllib.unquote(unicode(self.path))
@@ -250,6 +252,11 @@ class ProcessRequest():
                 self.log.debug("Option : jsonp mode")
                 self.jsonp = True
                 self.jsonp_cb = opt_value
+
+            # CSV export format (if available in functions)
+            if opt_key == "export" and opt_value == "csv":
+                self.log.debug("Option : CSV export")
+                self.csv_export = True
 
             # call debug functions
             if opt_key == "debug-sleep" and opt_value != None:
@@ -605,9 +612,12 @@ target=*
         st_interval = self.get_parameters("interval")
         st_selector = self.get_parameters("selector")
 
-        json_data = JSonHelper("OK")
-        json_data.set_data_type("stats")
-        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        if self.csv_export == False:
+            json_data = JSonHelper("OK")
+            json_data.set_data_type("stats")
+            json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        else:
+            csv_data = CsvHelper()
         values = []
         if st_interval != None and st_selector != None:
             data = self._db.filter_stats_of_device_by_key(key,
@@ -616,14 +626,27 @@ target=*
                                                                st_to,
                                                                st_interval,
                                                                st_selector)
-            json_data.add_data({"values" : data["values"],
-                                "global_values" : data["global_values"],
-                                "key" : key, "device_id" : device_id})
+            if self.csv_export == False:
+                json_data.add_data({"values" : data["values"],
+                                    "global_values" : data["global_values"],
+                                    "key" : key, "device_id" : device_id})
+            else:
+                print data["values"]
+                for my_tuple in data["values"]:
+                    csv_data.add_data("%s/%s/%s %s:%s;%s" % (my_tuple[0],
+                                                 my_tuple[1],
+                                                 my_tuple[3],
+                                                 my_tuple[4],
+                                                 my_tuple[5],
+                                                 my_tuple[6]))
         else:
             for data in self._db.list_stats_of_device_between_by_key(key, device_id, st_from, st_to):
                 values.append(data) 
             json_data.add_data({"values" : values, "key" : key, "device_id" : device_id})
-        self.send_http_response_ok(json_data.get())
+        if self.csv_export == False:
+            self.send_http_response_ok(json_data.get())
+        else:
+            self.send_http_response_ok(csv_data.get())
     
 
 
