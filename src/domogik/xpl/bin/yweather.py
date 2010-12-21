@@ -45,7 +45,7 @@ from domogik.xpl.lib.yweather import YWeatherException
 import threading
 import datetime
 
-TIME_BETWEEN_EACH_WEATHER_READ = 2*3600 # 2 hours
+TIME_BETWEEN_EACH_WEATHER_READ = 0.5*3600 # 2 hours
 
 class YWeatherManager(XplPlugin):
     """ Get data from Yahoo weather and send them on xPL
