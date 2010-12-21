@@ -631,9 +631,8 @@ target=*
                                     "global_values" : data["global_values"],
                                     "key" : key, "device_id" : device_id})
             else:
-                print data["values"]
                 for my_tuple in data["values"]:
-                    csv_data.add_data("%s/%s/%s %s:%s;%s" % (my_tuple[0],
+                    csv_data.add_data("%s-%s-%s %s:%s;%s" % (my_tuple[0],
                                                  my_tuple[1],
                                                  my_tuple[3],
                                                  my_tuple[4],
@@ -642,7 +641,13 @@ target=*
         else:
             for data in self._db.list_stats_of_device_between_by_key(key, device_id, st_from, st_to):
                 values.append(data) 
-            json_data.add_data({"values" : values, "key" : key, "device_id" : device_id})
+            if self.csv_export == False:
+                json_data.add_data({"values" : values, "key" : key, "device_id" : device_id})
+            else:
+                for my_value in values:
+                    csv_data.add_data("%s;%s" % (my_value.date,
+                                                 my_value.value))
+
         if self.csv_export == False:
             self.send_http_response_ok(json_data.get())
         else:
