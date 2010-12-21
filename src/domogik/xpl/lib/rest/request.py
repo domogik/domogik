@@ -609,8 +609,8 @@ target=*
         st_to = self.get_parameters("to")
         if st_to != None:
             st_to = float(st_to)
-        st_interval = self.get_parameters("interval")
-        st_selector = self.get_parameters("selector")
+        st_interval = self.get_parameters("interval").lower()
+        st_selector = self.get_parameters("selector").lower()
 
         if self.csv_export == False:
             json_data = JSonHelper("OK")
@@ -632,12 +632,35 @@ target=*
                                     "key" : key, "device_id" : device_id})
             else:
                 for my_tuple in data["values"]:
-                    csv_data.add_data("%s-%s-%s %s:%s;%s" % (my_tuple[0],
-                                                 my_tuple[1],
-                                                 my_tuple[3],
-                                                 my_tuple[4],
-                                                 my_tuple[5],
-                                                 my_tuple[6]))
+                    if st_interval == "year":
+                        csv_data.add_data("%s;%s" % (my_tuple[0],
+                                                                 my_tuple[1]))
+                    elif st_interval == "month":
+                        csv_data.add_data("%s-%s;%s" % (my_tuple[0],
+                                                                 my_tuple[1],
+                                                                 my_tuple[2]))
+                    elif st_interval == "week":
+                        csv_data.add_data("%s-%s;%s" % (my_tuple[0],
+                                                                 my_tuple[1],
+                                                                 my_tuple[2]))
+                    elif st_interval == "day":
+                        csv_data.add_data("%s-%s-%s;%s" % (my_tuple[0],
+                                                                 my_tuple[1],
+                                                                 my_tuple[3],
+                                                                 my_tuple[4]))
+                    elif st_interval == "hour":
+                        csv_data.add_data("%s-%s-%s %s;%s" % (my_tuple[0],
+                                                                 my_tuple[1],
+                                                                 my_tuple[3],
+                                                                 my_tuple[4],
+                                                                 my_tuple[5]))
+                    elif st_interval == "minute":
+                        csv_data.add_data("%s-%s-%s %s:%s;%s" % (my_tuple[0],
+                                                                 my_tuple[1],
+                                                                 my_tuple[3],
+                                                                 my_tuple[4],
+                                                                 my_tuple[5],
+                                                                 my_tuple[6]))
         else:
             for data in self._db.list_stats_of_device_between_by_key(key, device_id, st_from, st_to):
                 values.append(data) 
