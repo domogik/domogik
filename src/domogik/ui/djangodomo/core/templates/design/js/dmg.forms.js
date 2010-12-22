@@ -13,7 +13,6 @@ function numbersonly(e) {
 (function($) {
     $.widget("ui.dialog_form", {
         _init: function() {
-            var dialogheight = 110;
             var self = this, o = this.options;
             this.element.append("<div class='tip'>" + o.tips + "</div><ul class='tip' id='" + o.tipsid + "'></ul>");
             var form = $("<form></form>");
@@ -26,32 +25,25 @@ function numbersonly(e) {
                 switch(value.type) {
                 case 'text':
                     field = self._addTextField(value.name, value.label, value.required);
-                    dialogheight += 50;
                     break;
                 case 'numericpassword':
                     field = self._addNumericPasswordField(value.name, value.label, value.required);
-                    dialogheight += 50;
                     break;
                 case 'checkbox':
                     field = self._addCheckboxField(value.name, value.label, value.required);
-                    dialogheight += 50;
                     break;
                 case 'select':
                     field = self._addSelectField(value.name, value.label, value.required, value.option.initial, value.option.options);
-                    dialogheight += 50;
                     break;
                 case 'selectipod':
                     field = self._addSelectIpodField(value.name, value.label, value.required, value.option.initial, value.option.options);
-                    dialogheight += 50;
                     break;
                 }
                 self._allFields.push(field);
             });
             
             this.element.dialog({
-                bgiframe: true,
                 autoOpen: false,
-                height: dialogheight,
                 modal: true,
                 buttons: {
                     'OK': function() {
