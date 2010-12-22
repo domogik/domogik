@@ -33,6 +33,9 @@
 .size4x1 { width:26em; height:5em;}
 .shape.size4x1 { line-height:5em;}
 
+.size4x2 { width:26em; height:14em;}
+.shape.size4x2 { line-height:14em;}
+
 .shape {
     text-align:center;
     display:block;

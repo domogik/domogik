@@ -4,12 +4,12 @@
         options: {
             version: 0.1,
             creator: 'Domogik',
-            id: 'dmg_3x2_communicationCallerId',
+            id: 'dmg_4x2_communicationCallerId',
             name: 'Caller Id',
             description: 'Specific widget for Caller Id',
             type: 'sensor.string',
             height: 2,
-            width: 3,
+            width: 4,
             filters:['communication.caller_id.number'],
             displayname: true,
 			displayborder: true
@@ -73,7 +73,7 @@
                 this._list.empty();
                 $.each(this.values, function(index, stat){
                     var date = new Date(stat.timestamp * 1000);
-                    date = date.format('H:i');
+                    date = date.format('H:i j/m');
                     if (stat.number > 1) {
                         self._list.append("<li>" + stat.value + " <span class='date'>" + date + "</span> (" + stat.number + ")</li>");                        
                     } else {
