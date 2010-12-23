@@ -59,11 +59,12 @@ def list_all_files(path, dst):
     return d
 
 arch = platform.architecture()
-hub = {'64bit' : 'src/domogik/xpl/tools/64bit/xPL_Hub',
-        '32bit' : 'src/domogik/xpl/tools/32bit/xPL_Hub',
-        'arm' : 'src/domogik/xpl/tools/arm/xPL_Hub'}
+hub = {
+    '64bit' : 'src/domogik/xpl/tools/64bit/xPL_Hub',
+    '32bit' : 'src/domogik/xpl/tools/32bit/xPL_Hub',
+    'arm' : 'src/domogik/xpl/tools/arm/xPL_Hub'
+}
 
-    
 d_files = [
         ('/usr/local/bin/', ['src/tools/dmgenplug']),
         ('/usr/local/bin/', ['src/tools/dmgdisplug']),
@@ -81,7 +82,6 @@ else:
     print "* to get the sources and compile them.*"
     print "***************************************"
 
-
 d_files.extend(list_all_files('src/share/domogik/stats/', '/usr/local/share/domogik/listeners/'))
 d_files.extend(list_all_files('src/share/domogik/url2xpl/', '/usr/local/share/domogik/url2xpl/'))
 d_files.extend(list_all_files('src/share/domogik/plugins/', '/usr/local/share/domogik/plugins/'))
@@ -97,7 +97,8 @@ setup(
     author = 'Domogik team',
     author_email = 'domogik-general@lists.labs.libre-entreprise.org',
     install_requires=['setuptools', 'django >=1.2','sqlalchemy >= 0.6.5', 'simplejson >= 1.9.2',
-                      'pyOpenSSL == 0.10', 'httplib2 >= 0.6.0', 'django-pipes >= 0.2', 'psutil >= 0.1.3', 'MySQL-python >= 1.2.3c'],
+                      'pyOpenSSL == 0.10', 'httplib2 >= 0.6.0', 'django-pipes >= 0.2', 'psutil >= 0.1.3', 
+                      'MySQL-python >= 1.2.3c'],
 #                   deprecated, keep for info
 #                   'pySerial > 2.4', 'pyowfs >= 0.1.3'],
     zip_safe = False,
