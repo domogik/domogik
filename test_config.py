@@ -80,13 +80,10 @@ def test_imports():
         warning("Can't import django, please install it by hand (>= 1.1) or exec ./setup.py develop or ./setup.py install")
         good = False
     try:
-        import sqlite3
+        import MySQLdb
     except ImportError:
-        try:
-            import MySQLdb
-        except ImportError:
-            warning("Can't import sqlite3 neither MySQLdb, please install one of them (depend of your setup) by hand or exec ./setup.py develop or ./setup.py install")
-            good = False
+        warning("Can't import MySQLdb, please install one of them (depend of your setup) by hand or exec ./setup.py develop or ./setup.py install")
+        good = False
     try:
         import httplib
     except ImportError:
