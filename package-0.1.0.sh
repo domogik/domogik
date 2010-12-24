@@ -92,7 +92,25 @@ function force_info_log_level() {
     echo "domogik.cfg updated : force info log level"
 }
 
-create_final_pkg() {
+
+function set_release_number() {
+    FILE=$POST_PROCESSING/$ARCHIVE_NAME/setup.py
+    FILE2=$POST_PROCESSING/$ARCHIVE_NAME/release
+    sed -i "s/version = '.*',/version = '"$RELEASE"',/" $FILE
+    if [ $? -ne 0 ] ; then
+        echo "Error... exiting"
+        exit 1
+    fi
+    echo $RELEASE > $FILE2
+    if [ $? -ne 0 ] ; then
+        echo "Error... exiting"
+        exit 1
+    fi
+    echo "setup.py, release : release number updated"
+}
+
+
+function create_final_pkg() {
     cd $POST_PROCESSING/$ARCHIVE_NAME
     tar czf $FINAL_ARCHIVE *
     if [ $? -ne 0 ] ; then
@@ -103,7 +121,7 @@ create_final_pkg() {
 }
 
 
-clean() {
+function clean() {
     rm -Rf $POST_PROCESSING
 }
 
@@ -112,5 +130,6 @@ generate_pkg
 extract
 force_install_mode
 force_info_log_level
+set_release_number
 create_final_pkg
 clean
