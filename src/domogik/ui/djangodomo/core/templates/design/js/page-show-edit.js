@@ -193,6 +193,8 @@ $(function(){
             this.element.find('dd.description').text(woptions.description);
             if (woptions.screenshot) {
                 this.element.find('dd.screenshot').html("<img src='/widgets/" + woptions.id + "/" + woptions.screenshot + "' />");
+            } else {
+                this.element.find('dd.screenshot').empty();                
             }
             var model = $('<div></div>');
             model.widget_shape({
