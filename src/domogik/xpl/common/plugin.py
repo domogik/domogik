@@ -104,6 +104,7 @@ class XplPlugin(BasePlugin):
         self._dump_cb = dump_cb
 
         # Create object which get process informations (cpu, memory, etc)
+        # TODO : activate
         #self._process_info = ProcessInfo(os.getpid(),
         #                                 TIME_BETWEEN_EACH_PROCESS_STATUS,
         #                                 self._send_process_info,
