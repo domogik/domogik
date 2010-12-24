@@ -1,6 +1,7 @@
 #!/bin/bash
 
-RELEASE=0.1.0-alpha1
+REVISION=3205
+RELEASE=0.1.0-alpha1-$REVISION
 
 ARCHIVE_NAME=domogik-temp
 ARCHIVE=/tmp/$ARCHIVE_NAME.tgz
@@ -10,6 +11,7 @@ FINAL_ARCHIVE=/tmp/domogik-$RELEASE.tgz
 function generate_pkg() {
     echo "Generate package..."
     hg archive \
+    -r $REVISION \
     -X .hg_archival.txt  \
     -X .coverage  \
     -X .hgignore  \
