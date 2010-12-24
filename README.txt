@@ -19,4 +19,4 @@ along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
 @license: GPL(v3)
 @organization: Domogik
 
-See : http://wiki.domogik.org/tiki-index.php?page=Install
+See : http://wiki.domogik.org/EndUserDocumentation
