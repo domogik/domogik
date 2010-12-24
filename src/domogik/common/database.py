@@ -66,22 +66,9 @@ def _make_crypted_password(clear_text_password):
     password.update(clear_text_password)
     return password.hexdigest()
 
-def _datetime_to_string(dt, db_used):
-    """Convert a date to a string according to the DB used"""
-    date = str(dt)
-    if db_used == 'sqlite':
-        # This is a hack to perform exact date comparisons
-        # sqlAlchemy 0.6.1 doc : "In the case of SQLite, date and time types are stored as strings which are then
-        # converted back to datetime objects when rows are returned."
-        # With sqllite, DATETIME data is stored in this format : 2010-06-23 15:15:00.000000 (mysql:2010-06-23 15:15:00)
-        # If you don't add this string performing 'date <= 2010-06-23 15:15:00' will exlude 2010-06-23 15:15:00.000000
-        # values as they are considered as bigger
-        date += ".000000"
-    return date
-
-def _datetime_string_from_tstamp(ts, db_used):
-    """Make a date from a timestamp according to the DB used"""
-    return _datetime_to_string(datetime.datetime.fromtimestamp(ts), db_used)
+def _datetime_string_from_tstamp(ts):
+    """Make a date from a timestamp"""
+    return str(datetime.datetime.fromtimestamp(ts))
 
 def _get_week_nb(dt):
     """Return the week number of a datetime expression"""
@@ -168,19 +155,16 @@ class DbHelper():
     def get_url_connection_string(self):
         """Get url connection string to the database reading the configuration file"""
         url = "%s://" % self.__db_config['db_type']
-        if self.__db_config['db_type'] == 'sqlite':
-            url = "%s/%s" % (url, self.__db_config['db_path'])
+        if self.__db_config['db_port'] != '':
+            url = "%s%s:%s@%s:%s/%s" % (url, self.__db_config['db_user'], self.__db_config['db_password'],
+                                        self.__db_config['db_host'], self.__db_config['db_port'], self.__db_config['db_name'])
         else:
-            if self.__db_config['db_port'] != '':
-                url = "%s%s:%s@%s:%s/%s" % (url, self.__db_config['db_user'], self.__db_config['db_password'],
-                                            self.__db_config['db_host'], self.__db_config['db_port'], self.__db_config['db_name'])
-            else:
-                url = "%s%s:%s@%s/%s" % (url, self.__db_config['db_user'], self.__db_config['db_password'],
-                                         self.__db_config['db_host'], self.__db_config['db_name'])
+            url = "%s%s:%s@%s/%s" % (url, self.__db_config['db_user'], self.__db_config['db_password'],
+                                     self.__db_config['db_host'], self.__db_config['db_name'])
         return url
 
     def get_db_type(self):
-        """Return DB type which is currently used (sqlite, mysql, postgresql)"""
+        """Return DB type which is currently used (mysql, postgresql)"""
         return self.__db_config['db_type'].lower()
 
 ####
@@ -1737,9 +1721,9 @@ class DbHelper():
                     ).filter_by(key=ucode(ds_key)
                     ).filter_by(device_id=ds_device_id)
         if start_date_ts:
-            query = query.filter("date >= '" + str(_datetime_string_from_tstamp(start_date_ts, self.get_db_type()))+"'")
+            query = query.filter("date >= '" + _datetime_string_from_tstamp(start_date_ts)+"'")
         if end_date_ts:
-            query = query.filter("date <= '" + str(_datetime_string_from_tstamp(end_date_ts, self.get_db_type())) + "'")
+            query = query.filter("date <= '" + _datetime_string_from_tstamp(end_date_ts) + "'")
         list_s = query.order_by(sqlalchemy.asc(DeviceStats.date)).all()
         return list_s
 
@@ -1940,8 +1924,8 @@ class DbHelper():
 
         result_list = []
         if self.get_db_type() in ('mysql', 'postgresql'):
-            cond_min = "date >= '" + _datetime_string_from_tstamp(start_date_ts, self.get_db_type()) + "'"
-            cond_max = "date < '" + _datetime_string_from_tstamp(end_date_ts, self.get_db_type()) + "'"
+            cond_min = "date >= '" + _datetime_string_from_tstamp(start_date_ts) + "'"
+            cond_max = "date < '" + _datetime_string_from_tstamp(end_date_ts) + "'"
             query = sql_query[step_used][self.get_db_type()]
             query = query.filter_by(key=ucode(ds_key)
                         ).filter_by(device_id=ds_device_id
@@ -1960,26 +1944,6 @@ class DbHelper():
                     'avg': results_global[2]
                 }
             }
-        """
-        else:
-            datetime_cursor = datetime.datetime.fromtimestamp(start_date_ts)
-            end_datetime = datetime.datetime.fromtimestamp(end_date_ts)
-            while (datetime_cursor < end_datetime):
-                datetime_max_in_the_period = step[step_used][1](datetime_cursor)
-                datetime_sup = min(datetime_max_in_the_period, end_datetime)
-                query = self.__session.query(
-                                func.min(DeviceStats.date), function[function_used]
-                            ).filter_by(key=ucode(ds_key)).filter_by(device_id=ds_device_id
-                            ).filter("date >= '" + _datetime_to_string(datetime_cursor, self.get_db_type()) + "'"
-                            ).filter("date < '" + _datetime_to_string(datetime_sup, self.get_db_type()) + "'")
-                result = query.first()
-                cur_date = result[0]
-                if cur_date is not None:
-                    values_returned = step[step_used][0](datetime_cursor)
-                    values_returned.append(result[1])
-                    result_list.append(tuple(values_returned))
-                datetime_cursor = datetime_sup + datetime.timedelta(seconds=1)
-        """
 
     def device_has_stats(self, ds_device_id):
         """Check if the device has stats that were recorded
@@ -2028,8 +1992,7 @@ class DbHelper():
                                     DeviceStats
                                 ).filter_by(device_id=ds_device_id
                                 ).filter_by(key=ucode(ds_key)
-                                ).filter("date < '" + _datetime_to_string(last_date_to_keep,
-                                         self.get_db_type()) + "'"
+                                ).filter("date < '" + str(last_date_to_keep) + "'"
                                 ).all()
             for stat in stats_list:
                 self.__session.delete(stat)
