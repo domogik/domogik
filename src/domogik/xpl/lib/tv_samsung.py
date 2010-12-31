@@ -91,13 +91,16 @@ class SamsungTV:
             print("Command not known : '%s'" % cmd_alias)
             return
         cmd = self.generate_command(COMMANDS[cmd_alias], param)
-        print("Code for command : '%'" % cmd)
+        print("Code for command : '%s'" % cmd)
         data = binascii.unhexlify(cmd)
         self._samsung.write("%s" % data)
-        # TODO : get return for command
-        #res = ser.read(16)
-        #print("res=%s" % res)
-        return True
+        res = binascii.hexlify(self._samsung.read(3))
+        if res == "030cf1":
+            print("Command is OK")
+            return True
+        else:
+            print("Error on command")
+            return False
 
     def generate_command(self, cmd, param = None):
         """ Generate command with header and checksum
@@ -119,7 +122,7 @@ class SamsungTV:
         """
         self._samsung.close()
 
-    def get_checksum(value):
+    def get_checksum(self, value):
         """ Generate checksum
             @param value : value for which we want a checksum
         """
@@ -135,6 +138,6 @@ class SamsungTV:
 
 if __name__ == "__main__":
     my_tv = SamsungTV(None)
-    my_tv.open(0)
+    my_tv.open("/dev/ttyUSB0")
     my_tv.send(sys.argv[1])
     my_tv.close()
