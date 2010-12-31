@@ -7,19 +7,43 @@
 
 /* Area icons */
 .icon64-area- { background-image:url(../images/unknown_64.png);}
-.icon64-area-grndfloor { background-image:url(../images/area/groundfloor_white_64.png);}
-.icon64-area-firstfloor { background-image:url(../images/area/floor1_white_64.png);}
-.icon64-area-basement { background-image:url(../images/area/basement_white_64.png);}
+.icon64-area-area { background-image:url(../images/area/area_64.png);}
+.icon64-area-attic { background-image:url(../images/area/attic_64.png);}
+.icon64-area-basement { background-image:url(../images/area/basement_64.png);}
+.icon64-area-basement2 { background-image:url(../images/area/basement_2_64.png);}
+.icon64-area-firstfloor { background-image:url(../images/area/first_floor_64.png);}
+.icon64-area-firstfloor2 { background-image:url(../images/area/first_floor_2_64.png);}
+.icon64-area-garden { background-image:url(../images/area/garden_64.png);}
+.icon64-area-secondfloor { background-image:url(../images/area/second_floor_64.png);}
+.icon64-area-secondfloor2 { background-image:url(../images/area/second_floor_2_64.png);}
+.icon64-area-groundfloor { background-image:url(../images/area/ground_floor_64.png);}
+.icon64-area-groundfloor2 { background-image:url(../images/area/ground_floor_2_64.png);}
 
 .icon32-area- { background-image:url(../images/unknown_32.png);}
-.icon32-area-grndfloor { background-image:url(../images/area/groundfloor_white_32.png);}
-.icon32-area-firstfloor { background-image:url(../images/area/floor1_white_32.png);}
-.icon32-area-basement { background-image:url(../images/area/basement_white_32.png);}
+.icon32-area-area { background-image:url(../images/area/area_32.png);}
+.icon32-area-attic { background-image:url(../images/area/attic_32.png);}
+.icon32-area-basement { background-image:url(../images/area/basement_32.png);}
+.icon32-area-basement2 { background-image:url(../images/area/basement_2_32.png);}
+.icon32-area-firstfloor { background-image:url(../images/area/first_floor_32.png);}
+.icon32-area-firstfloor2 { background-image:url(../images/area/first_floor_2_32.png);}
+.icon32-area-garden { background-image:url(../images/area/garden_32.png);}
+.icon32-area-secondfloor { background-image:url(../images/area/second_floor_32.png);}
+.icon32-area-secondfloor2 { background-image:url(../images/area/second_floor_2_32.png);}
+.icon32-area-groundfloor { background-image:url(../images/area/ground_floor_32.png);}
+.icon32-area-groundfloor2 { background-image:url(../images/area/ground_floor_2_32.png);}
 
 .icon16-area- { background-image:url(../images/unknown_16.png);}
-.icon16-area-grndfloor { background-image:url(../images/area/groundfloor_white_16.png);}
-.icon16-area-firstfloor { background-image:url(../images/area/floor1_white_16.png);}
-.icon16-area-basement { background-image:url(../images/area/basement_white_16.png);}
+.icon16-area-area { background-image:url(../images/area/area_16.png);}
+.icon16-area-attic { background-image:url(../images/area/attic_16.png);}
+.icon16-area-basement { background-image:url(../images/area/basement_16.png);}
+.icon16-area-basement2 { background-image:url(../images/area/basement_2_16.png);}
+.icon16-area-firstfloor { background-image:url(../images/area/first_floor_16.png);}
+.icon16-area-firstfloor2 { background-image:url(../images/area/first_floor_2_16.png);}
+.icon16-area-garden { background-image:url(../images/area/garden_16.png);}
+.icon16-area-secondfloor { background-image:url(../images/area/second_floor_16.png);}
+.icon16-area-secondfloor2 { background-image:url(../images/area/second_floor_2_16.png);}
+.icon16-area-groundfloor { background-image:url(../images/area/ground_floor_16.png);}
+.icon16-area-groundfloor2 { background-image:url(../images/area/ground_floor_2_16.png);}
 
 /* Room icons */
 .icon64-room- { background-image:url(../images/unknown_64.png);}
@@ -80,9 +104,9 @@
 .icon64-usage-telephony { background-image:url(../images/device_usage/telephony/usage_64.png);}
 .icon32-usage-telephony { background-image:url(../images/device_usage/telephony/usage_32.png);}
 .icon16-usage-telephony { background-image:url(../images/device_usage/telephony/usage_16.png);}
-.icon64-usage-tv { background-image:url(../images/device_usage/default/0_64.png);}
-.icon32-usage-tv { background-image:url(../images/device_usage/default/0_32.png);}
-.icon16-usage-tv { background-image:url(../images/device_usage/default/0_16.png);}
+.icon64-usage-tv { background-image:url(../images/device_usage/tv/usage_64.png);}
+.icon32-usage-tv { background-image:url(../images/device_usage/tv/usage_32.png);}
+.icon16-usage-tv { background-image:url(../images/device_usage/tv/usage_16.png);}
 .icon64-usage-water { background-image:url(../images/device_usage/default/0_64.png);}
 .icon32-usage-water { background-image:url(../images/device_usage/default/0_32.png);}
 .icon16-usage-water { background-image:url(../images/device_usage/default/0_16.png);}
@@ -292,21 +316,21 @@
 .icon32-usage-telephony.sensor.string.unknown { background-image:url(../images/device_usage/telephony/undefined_32.png);}
 .icon32-usage-telephony.sensor.string.known { background-image:url(../images/device_usage/telephony/100_32.png);}
 
-.icon32-usage-tv.actuator.binary.unknown { background-image:url(../images/device_usage/default/undefined_32.png);}
-.icon32-usage-tv.actuator.binary.value_0 { background-image:url(../images/device_usage/default/0_32.png);}
-.icon32-usage-tv.actuator.binary.value_1 { background-image:url(../images/device_usage/default/100_32.png);}
-.icon32-usage-tv.actuator.trigger { background-image:url(../images/device_usage/default/100_32.png);}
-.icon32-usage-tv.actuator.number { background-image:url(../images/device_usage/default/100_32.png);}
-.icon32-usage-tv.actuator.range.unknown { background-image:url(../images/device_usage/default/undefined_32.png);}
-.icon32-usage-tv.actuator.range.value_0 { background-image:url(../images/device_usage/default/0_32.png);}
-.icon32-usage-tv.actuator.range.value_100 { background-image:url(../images/device_usage/default/100_32.png);}
-.icon32-usage-tv.sensor.boolean.unknown { background-image:url(../images/device_usage/default/undefined_32.png);}
-.icon32-usage-tv.sensor.boolean.value_true { background-image:url(../images/device_usage/default/100_32.png);}
-.icon32-usage-tv.sensor.boolean.value_false { background-image:url(../images/device_usage/default/0_32.png);}
-.icon32-usage-tv.sensor.number.unknown { background-image:url(../images/device_usage/default/undefined_32.png);}
-.icon32-usage-tv.sensor.number.known { background-image:url(../images/device_usage/default/100_32.png);}
-.icon32-usage-tv.sensor.string.unknown { background-image:url(../images/device_usage/default/undefined_32.png);}
-.icon32-usage-tv.sensor.string.known { background-image:url(../images/device_usage/default/100_32.png);}
+.icon32-usage-tv.actuator.binary.unknown { background-image:url(../images/device_usage/tv/undefined_32.png);}
+.icon32-usage-tv.actuator.binary.value_0 { background-image:url(../images/device_usage/tv/0_32.png);}
+.icon32-usage-tv.actuator.binary.value_1 { background-image:url(../images/device_usage/tv/100_32.png);}
+.icon32-usage-tv.actuator.trigger { background-image:url(../images/device_usage/tv/100_32.png);}
+.icon32-usage-tv.actuator.number { background-image:url(../images/device_usage/tv/100_32.png);}
+.icon32-usage-tv.actuator.range.unknown { background-image:url(../images/device_usage/tv/undefined_32.png);}
+.icon32-usage-tv.actuator.range.value_0 { background-image:url(../images/device_usage/tv/0_32.png);}
+.icon32-usage-tv.actuator.range.value_100 { background-image:url(../images/device_usage/tv/100_32.png);}
+.icon32-usage-tv.sensor.boolean.unknown { background-image:url(../images/device_usage/tv/undefined_32.png);}
+.icon32-usage-tv.sensor.boolean.value_true { background-image:url(../images/device_usage/tv/100_32.png);}
+.icon32-usage-tv.sensor.boolean.value_false { background-image:url(../images/device_usage/tv/0_32.png);}
+.icon32-usage-tv.sensor.number.unknown { background-image:url(../images/device_usage/tv/undefined_32.png);}
+.icon32-usage-tv.sensor.number.known { background-image:url(../images/device_usage/tv/100_32.png);}
+.icon32-usage-tv.sensor.string.unknown { background-image:url(../images/device_usage/tv/undefined_32.png);}
+.icon32-usage-tv.sensor.string.known { background-image:url(../images/device_usage/tv/100_32.png);}
 
 .icon32-usage-water.actuator.binary.unknown { background-image:url(../images/device_usage/default/undefined_32.png);}
 .icon32-usage-water.actuator.binary.value_0 { background-image:url(../images/device_usage/default/0_32.png);}
