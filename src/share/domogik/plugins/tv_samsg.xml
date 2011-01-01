@@ -1,5 +1,5 @@
 <package type="plugin">
-  <name>tv_samsung</name>
+  <name>tv_samsg</name>
   <technology>multimedia</technology>
   <description>Samsung televisions control</description>
   <detail>Control Samsung televisions :
@@ -9,7 +9,7 @@
 - input
 - ... </detail>
   <version>0.1.0</version>
-  <documentation>http://wiki.domogik.org/plugin_tsamsun</documentation>
+  <documentation>http://wiki.domogik.org/plugin_tv_samsg</documentation>
   <author>Fritz</author>
   <author-email>fritz.smh at gmail.com</author-email>
   <configuration-keys>
@@ -36,11 +36,13 @@
     </key>
   </configuration-keys>
   <files>
-    <file path="src/share/domogik/plugins/tv_samsung.xml"/>
+    <file path="src/share/domogik/plugins/tv_samsg.xml"/>
+    <file path="src/share/domogik/url2xpl/multimedia/power_on.xml"/>
+    <file path="src/share/domogik/url2xpl/multimedia/power_standby.xml"/>
     <file path="src/share/domogik/url2xpl/multimedia/channel_up.xml"/>
-    <file path="src/domogik/xpl/bin/tv_samsung.py"/>
-    <file path="src/domogik/xpl/lib/tv_samsung.py"/>
-    <file path="src/domogik/xpl/lib/tv_samsung_led.py"/>
+    <file path="src/domogik/xpl/bin/tv_samsg.py"/>
+    <file path="src/domogik/xpl/lib/tv_samsg.py"/>
+    <file path="src/domogik/xpl/lib/tv_samsg_led.py"/>
   </files>
   <dependencies/>
   <device_technology>

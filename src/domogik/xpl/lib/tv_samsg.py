@@ -74,7 +74,9 @@ class SamsungTV:
             self._samsung = serial.Serial(device, 9600, 
                                 parity=serial.PARITY_NONE,
                                 stopbits=serial.STOPBITS_ONE,
-                                xonxoff=serial.XOFF)
+                                xonxoff=serial.XOFF,
+                                timeout=1)
+            # timeout = 1 : wait 1 second for timeout when reading serial port
             print("EX Link device opened")
         except:
             error = "Error while opening EX Link device : %s. Check if it is the good device or if you have the good permissions on it." % device

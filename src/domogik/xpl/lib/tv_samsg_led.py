@@ -1,7 +1,7 @@
 COMMANDS = {
 "power_standby" : "00000001", # Power Standby    ### OK
 "power_on" : "00000002", # Power On              ### OK
-"get_power_status" : "00000000", # Get power status   ### ?????
+# "get_power_status" : "00000000", # Get power status   ### doesn't work
 "mute_toggle" : "02000000", # Mute toggle        ### OK
 "volume_up" : "01000100", # Master Volume Up     ### OK
 "volume_down" : "01000200", # Master Volume Down     ### OK

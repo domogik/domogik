@@ -39,7 +39,7 @@ from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.plugin import XplPlugin, XplResult
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.queryconfig import Query
-from domogik.xpl.lib.tv_samsung import SamsungTV, SamsungTVException
+from domogik.xpl.lib.tv_samsg import SamsungTV, SamsungTVException
 
 
 class SamsungTVManager(XplPlugin):
@@ -49,7 +49,7 @@ class SamsungTVManager(XplPlugin):
     def __init__(self):
         """ Init manager
         """
-        XplPlugin.__init__(self, name = 'tv_samsung')
+        XplPlugin.__init__(self, name = 'tv_samsg')
 
         # Configuration : list of televisions
         self.televisions = {}
@@ -58,11 +58,11 @@ class SamsungTVManager(XplPlugin):
         while loop == True:
             self._config = Query(self.myxpl, self.log)
             res = XplResult()
-            self._config.query('tv_samsung', 'tv-%s-name' % str(num), res)
+            self._config.query('tv_samsg', 'tv-%s-name' % str(num), res)
             name = res.get_value()['tv-%s-name' % str(num)]
             self._config = Query(self.myxpl, self.log)
             res = XplResult()
-            self._config.query('tv_samsung', 'tv-%s-device' % str(num), res)
+            self._config.query('tv_samsg', 'tv-%s-device' % str(num), res)
             device = res.get_value()['tv-%s-device' % str(num)]
             if name != "None":
                 self.log.info("Configuration : name=%s, device=%s" % (name, device))
@@ -87,12 +87,12 @@ class SamsungTVManager(XplPlugin):
         # Create listener
         Listener(self.television_cb, self.myxpl, {'schema': 'control.basic',
                 'xpltype': 'xpl-cmnd', 'type': 'television'})
-        self.log.debug("Listener for tv_samsung created")
+        self.log.debug("Listener for tv_samsg created")
 
         self.enable_hbeat()
 
     def television_cb(self, message):
-        """ Call tv_samsung lib
+        """ Call tv_samsg lib
             @param message : xPL message detected by listener
         """
         # device contains name of television which will be used to get device
