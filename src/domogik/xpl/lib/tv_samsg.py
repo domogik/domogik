@@ -37,7 +37,7 @@ Implements
 
 import binascii
 import serial
-from tv_samsung_led import COMMANDS
+from tv_samsg_led import COMMANDS
 import sys
 
 
