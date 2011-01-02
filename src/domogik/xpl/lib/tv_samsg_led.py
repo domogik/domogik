@@ -63,6 +63,9 @@ COMMANDS = {
 "sound_multi_track_stereo" : "0c040001", # Multi-Track Stereo
 "sound_multi_track_sap" : "0c040002", # Multi-Track SAP
 
+# Commands with parameters
+"volume" : "010000", # Set sound level 
+
 # Tests
 "test" : "01000005", # Sound level 5/100
 #"test" : "04010002", # Channel 2 on TNT

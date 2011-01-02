@@ -72,4 +72,18 @@
           <return_confirmation>1</return_confirmation>
       </device_feature_model>
   </device_feature_models>
+  <device_feature_models>
+      <device_feature_model>
+          <id>multimedia.television.volume</id>
+          <name>Volume</name>
+          <feature_type>actuator</feature_type>
+          <device_type_id>multimedia.television</device_type_id>
+          <parameters>
+              {&quot;command&quot;:&quot;volume&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:100}
+          </parameters>
+          <value_type>range</value_type>
+          <stat_key/>
+          <return_confirmation>1</return_confirmation>
+      </device_feature_model>
+  </device_feature_models>
 </package>

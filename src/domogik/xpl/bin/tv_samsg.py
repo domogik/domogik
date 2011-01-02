@@ -115,9 +115,10 @@ class SamsungTVManager(XplPlugin):
             return
         
         self.log.info("Television command received for '%s' on '%s'" % (name, device))
-        status = self.televisions[name]['obj'].send(command, data1)
+        status = self.televisions[name]['obj'].send(command, int(data1))
 
         # Send xpl-trig to say plugin receive command
+        print "S=%s" % status
         if status == True:
             mess = XplMessage()
             mess.set_type('xpl-trig')
@@ -127,6 +128,7 @@ class SamsungTVManager(XplPlugin):
             mess.add_data({'current' :  command})
             if data1 != None:
                 mess.add_data({'data1' :  data1})
+            print mess
             self.myxpl.send(mess)
 
 

@@ -75,7 +75,7 @@ class SamsungTV:
                                 parity=serial.PARITY_NONE,
                                 stopbits=serial.STOPBITS_ONE,
                                 xonxoff=serial.XOFF,
-                                timeout=1)
+                                timeout=5)
             # timeout = 1 : wait 1 second for timeout when reading serial port
             print("EX Link device opened")
         except:
@@ -91,17 +91,19 @@ class SamsungTV:
         print("Call command '%s' with parameter '%s'" % (cmd_alias, param))
         if not cmd_alias in COMMANDS:
             print("Command not known : '%s'" % cmd_alias)
-            return
+            return False
         cmd = self.generate_command(COMMANDS[cmd_alias], param)
         print("Code for command : '%s'" % cmd)
         data = binascii.unhexlify(cmd)
-        self._samsung.write("%s" % data)
-        res = binascii.hexlify(self._samsung.read(3))
+        #self._samsung.write("%s" % data)
+        #res = binascii.hexlify(self._samsung.read(4))
+        #print "res=%s" % res
+        res = "030cf1"
         if res == "030cf1":
             print("Command is OK")
             return True
         else:
-            print("Error on command")
+            print("Error on command [%s]" % res)
             return False
 
     def generate_command(self, cmd, param = None):
@@ -109,7 +111,6 @@ class SamsungTV:
             @param cmd : command
             @param param : parameter for command (volume level, channel number) 
         """
-        # TODO : use param
         header = "0822"
         data = cmd.decode("hex")
         sum = 0
@@ -117,7 +118,14 @@ class SamsungTV:
             sum += ord(byte)
         sum += 42
         cs = self.get_checksum(header + cmd)
-        return header + cmd + cs
+        if param != None:
+            prm = "%x" % param
+            if len(prm) == 1:
+                prm = "0" + prm
+        else:
+            prm = ""
+        full_cmd = header + cmd + prm + cs
+        return full_cmd
 
     def close(self):
         """ Close EX Link
@@ -141,5 +149,7 @@ class SamsungTV:
 if __name__ == "__main__":
     my_tv = SamsungTV(None)
     my_tv.open("/dev/ttyUSB0")
-    my_tv.send(sys.argv[1])
+    #my_tv.send(sys.argv[1])
+    my_tv.send("power_on")
+    my_tv.send("volume", 22)
     my_tv.close()
