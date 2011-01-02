@@ -75,7 +75,7 @@ class SamsungTV:
                                 parity=serial.PARITY_NONE,
                                 stopbits=serial.STOPBITS_ONE,
                                 xonxoff=serial.XOFF,
-                                timeout=5)
+                                timeout=0.5)
             # timeout = 1 : wait 1 second for timeout when reading serial port
             print("EX Link device opened")
         except:
@@ -95,11 +95,10 @@ class SamsungTV:
         cmd = self.generate_command(COMMANDS[cmd_alias], param)
         print("Code for command : '%s'" % cmd)
         data = binascii.unhexlify(cmd)
-        #self._samsung.write("%s" % data)
-        #res = binascii.hexlify(self._samsung.read(4))
-        #print "res=%s" % res
-        res = "030cf1"
-        if res == "030cf1":
+        self._samsung.write("%s" % data)
+        res = binascii.hexlify(self._samsung.readline())
+        print "res=%s" % res
+        if res == "030cf100":
             print("Command is OK")
             return True
         else:
@@ -117,13 +116,13 @@ class SamsungTV:
         for byte in data:
             sum += ord(byte)
         sum += 42
-        cs = self.get_checksum(header + cmd)
         if param != None:
             prm = "%x" % param
             if len(prm) == 1:
                 prm = "0" + prm
         else:
             prm = ""
+        cs = self.get_checksum(header + cmd + prm)
         full_cmd = header + cmd + prm + cs
         return full_cmd
 

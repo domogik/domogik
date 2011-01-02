@@ -6,7 +6,7 @@ COMMANDS = {
 "volume_up" : "01000100", # Master Volume Up     ### OK
 "volume_down" : "01000200", # Master Volume Down     ### OK
 "channel_up" : "03000100", # Channel Up    ### OK
-"channel_down" : "03000200", # Channel Down  ### ERR
+"channel_down" : "03000200", # Channel Down  ### OK
 "tv" : "0a000000", # TV       ### OK
 "av1" : "0a000100", # AV 1       ### OK
 "av2" : "0a000101", # AV 2       ### OK
@@ -24,6 +24,8 @@ COMMANDS = {
 "dvi1" : "0a000600", # DVI 1   ### OK
 "dvi2" : "0a000601", # DVI 2   ### OK
 "dvi3" : "0a000602", # DVI 3   ### OK
+
+# Options 
 "dynamic" : "0b000000", # Dynamic
 "standard" : "0c000000", # Standard
 "wide" : "0b000002", # Wide
@@ -65,9 +67,7 @@ COMMANDS = {
 
 # Commands with parameters
 "volume" : "010000", # Set sound level 
+"channel" : "040100", # Set channel on TNT
+"channel_ana" : "040000", # Set Channel on Classical TV
 
-# Tests
-"test" : "01000005", # Sound level 5/100
-#"test" : "04010002", # Channel 2 on TNT
-#"test" : "04000002", # Channel 2 on Classical TV
 }

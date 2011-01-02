@@ -104,7 +104,7 @@ class SamsungTVManager(XplPlugin):
             self._log.warning("Xpl message : missing 'current' attribute")
             return
         if 'data1' in message.data:
-            data1 = message.data['data1']
+            data1 = int(message.data['data1'])
         else:
             data1 = None
 
@@ -115,7 +115,7 @@ class SamsungTVManager(XplPlugin):
             return
         
         self.log.info("Television command received for '%s' on '%s'" % (name, device))
-        status = self.televisions[name]['obj'].send(command, int(data1))
+        status = self.televisions[name]['obj'].send(command, data1)
 
         # Send xpl-trig to say plugin receive command
         print "S=%s" % status
