@@ -21,14 +21,14 @@ function generate_pkg() {
     -X src/domogik/xpl/bin/gagenda.py  \
     -X src/domogik/xpl/bin/knx.py  \
     -X src/domogik/xpl/bin/module_sample.py  \
-    -X src/domogik/xpl/bin/tv_samsung.py  \
+    -X src/domogik/xpl/bin/tv_samsg.py  \
     -X src/domogik/xpl/bin/xbmc_not.py  \
     -X src/domogik/xpl/bin/yweather.py  \
     -X src/domogik/xpl/lib/dawndusk.py  \
     -X src/domogik/xpl/lib/gagenda.py  \
     -X src/domogik/xpl/lib/knx.py  \
-    -X src/domogik/xpl/lib/tv_samsung.py  \
-    -X src/domogik/xpl/lib/tv_samsung_led.py  \
+    -X src/domogik/xpl/lib/tv_samsg.py  \
+    -X src/domogik/xpl/lib/tv_samsg_led.py  \
     -X src/domogik/xpl/lib/xbmc_not.py  \
     -X src/domogik/xpl/lib/yweather.py  \
     -X src/domogik/xpl/mocks/  \
