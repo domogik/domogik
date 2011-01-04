@@ -50,7 +50,7 @@ function generate_pkg() {
     -X src/share/domogik/stats/notification/notify.basic.xml  \
     -X src/share/domogik/stats/online_service/sensor.basic-yweather.xml  \
     -X src/share/domogik/stats/sample_databasemanager.xml  \
-    -X src/share/domogik/url2xpl/multimedia/channel_up.xml  \
+    -X src/share/domogik/url2xpl/multimedia/  \
     -X src/tools/demo/ \
     -t tgz $ARCHIVE 
 
