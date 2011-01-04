@@ -18,6 +18,7 @@
 .icon64-area-secondfloor2 { background-image:url(../images/area/second_floor_2_64.png);}
 .icon64-area-groundfloor { background-image:url(../images/area/ground_floor_64.png);}
 .icon64-area-groundfloor2 { background-image:url(../images/area/ground_floor_2_64.png);}
+.icon64-area-garage { background-image:url(../images/area/garage_64.png);}
 
 .icon32-area- { background-image:url(../images/unknown_32.png);}
 .icon32-area-area { background-image:url(../images/area/area_32.png);}
@@ -31,6 +32,7 @@
 .icon32-area-secondfloor2 { background-image:url(../images/area/second_floor_2_32.png);}
 .icon32-area-groundfloor { background-image:url(../images/area/ground_floor_32.png);}
 .icon32-area-groundfloor2 { background-image:url(../images/area/ground_floor_2_32.png);}
+.icon32-area-garage { background-image:url(../images/area/garage_32.png);}
 
 .icon16-area- { background-image:url(../images/unknown_16.png);}
 .icon16-area-area { background-image:url(../images/area/area_16.png);}
@@ -44,6 +46,7 @@
 .icon16-area-secondfloor2 { background-image:url(../images/area/second_floor_2_16.png);}
 .icon16-area-groundfloor { background-image:url(../images/area/ground_floor_16.png);}
 .icon16-area-groundfloor2 { background-image:url(../images/area/ground_floor_2_16.png);}
+.icon16-area-garage { background-image:url(../images/area/garage_16.png);}
 
 /* Room icons */
 .icon64-room- { background-image:url(../images/unknown_64.png);}

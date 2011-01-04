@@ -1,4 +1,4 @@
-var area_icons = ["area", "attic", "basement", "basement2", "firstfloor", "firstfloor2", "secondfloor", "secondfloor2", "groundfloor", "groundfloor2", "garden"];
+var area_icons = ["area", "attic", "basement", "basement2", "firstfloor", "firstfloor2", "secondfloor", "secondfloor2", "groundfloor", "groundfloor2", "garden", "garage"];
 var room_icons = ["kitchen", "bedroom", "tvlounge", "bathroom", "office", 'kidsroom', 'garage'];
 
 /* Define range how many icon in various ranges */
