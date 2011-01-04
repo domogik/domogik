@@ -128,6 +128,9 @@
 .icon64-usage-nanoztag { background-image:url(../images/device_usage/nanoztag/usage_64.png);}
 .icon32-usage-nanoztag { background-image:url(../images/device_usage/nanoztag/usage_32.png);}
 .icon16-usage-nanoztag { background-image:url(../images/device_usage/nanoztag/usage_16.png);}
+.icon64-usage-music { background-image:url(../images/device_usage/music/usage_64.png);}
+.icon32-usage-music { background-image:url(../images/device_usage/music/usage_32.png);}
+.icon16-usage-music { background-image:url(../images/device_usage/music/usage_16.png);}
 
 /* State icons */
 .icon32-usage-light.actuator.binary.unknown { background-image:url(../images/device_usage/light/undefined_32.png);}
@@ -431,6 +434,21 @@
 .icon32-usage-nanoztag.sensor.string.unknown { background-image:url(../images/device_usage/nanoztag/undefined_32.png);}
 .icon32-usage-nanoztag.sensor.string.known { background-image:url(../images/device_usage/nanoztag/100_32.png);}
 
+.icon32-usage-music.actuator.binary.unknown { background-image:url(../images/device_usage/music/undefined_32.png);}
+.icon32-usage-music.actuator.binary.value_0 { background-image:url(../images/device_usage/music/0_32.png);}
+.icon32-usage-music.actuator.binary.value_1 { background-image:url(../images/device_usage/music/100_32.png);}
+.icon32-usage-music.actuator.trigger { background-image:url(../images/device_usage/music/100_32.png);}
+.icon32-usage-music.actuator.number { background-image:url(../images/device_usage/music/100_32.png);}
+.icon32-usage-music.actuator.range.unknown { background-image:url(../images/device_usage/music/undefined_32.png);}
+.icon32-usage-music.actuator.range.value_0 { background-image:url(../images/device_usage/music/0_32.png);}
+.icon32-usage-music.actuator.range.value_100 { background-image:url(../images/device_usage/music/100_32.png);}
+.icon32-usage-music.sensor.boolean.unknown { background-image:url(../images/device_usage/music/undefined_32.png);}
+.icon32-usage-music.sensor.boolean.value_true { background-image:url(../images/device_usage/music/100_32.png);}
+.icon32-usage-music.sensor.boolean.value_false { background-image:url(../images/device_usage/music/0_32.png);}
+.icon32-usage-music.sensor.number.unknown { background-image:url(../images/device_usage/music/undefined_32.png);}
+.icon32-usage-music.sensor.number.known { background-image:url(../images/device_usage/music/100_32.png);}
+.icon32-usage-music.sensor.string.unknown { background-image:url(../images/device_usage/music/undefined_32.png);}
+.icon32-usage-music.sensor.string.known { background-image:url(../images/device_usage/music/100_32.png);}
 
 /* Menu */
 .icon32-menu-helpers { background-image:url(../images/menu/terminal_32.png);}
