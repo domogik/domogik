@@ -1,6 +1,6 @@
 #!/bin/bash
 
-REVISION=3205
+REVISION=5a8ac552482e
 RELEASE=0.1.0-alpha1-$REVISION
 
 ARCHIVE_NAME=domogik-temp
@@ -12,6 +12,7 @@ function generate_pkg() {
     echo "Generate package..."
     hg archive \
     -r $REVISION \
+    -X re:package.*.sh \
     -X .hg_archival.txt  \
     -X .coverage  \
     -X .hgignore  \
