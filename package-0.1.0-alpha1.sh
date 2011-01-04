@@ -1,17 +1,20 @@
 #!/bin/bash
 
-REVISION=3205
+REVISION=5a8ac552482e
 RELEASE=0.1.0-alpha1-$REVISION
+SHORT_RELEASE=0.1.0-alpha1  # for base directory
 
 ARCHIVE_NAME=domogik-temp
 ARCHIVE=/tmp/$ARCHIVE_NAME.tgz
 POST_PROCESSING=/tmp/domogik-post-$$
-FINAL_ARCHIVE=/tmp/domogik-$RELEASE.tgz
+FINAL_ARCHIVE=/tmp/domogik-$SHORT_RELEASE.tgz
 
 function generate_pkg() {
     echo "Generate package..."
     hg archive \
+    -p domogik-$SHORT_RELEASE \
     -r $REVISION \
+    -X re:package.*.sh \
     -X .hg_archival.txt  \
     -X .coverage  \
     -X .hgignore  \
@@ -49,7 +52,7 @@ function generate_pkg() {
     -X src/share/domogik/stats/notification/notify.basic.xml  \
     -X src/share/domogik/stats/online_service/sensor.basic-yweather.xml  \
     -X src/share/domogik/stats/sample_databasemanager.xml  \
-    -X src/share/domogik/url2xpl/multimedia/channel_up.xml  \
+    -X src/share/domogik/url2xpl/multimedia/  \
     -X src/tools/demo/ \
     -t tgz $ARCHIVE 
 
@@ -74,7 +77,7 @@ function extract() {
 
 
 function force_install_mode() {
-    FILE=$POST_PROCESSING/$ARCHIVE_NAME/install.sh
+    FILE=$POST_PROCESSING/domogik-$SHORT_RELEASE/install.sh
     sed -i "s/^.*Which install mode do you want.*$/MODE=install/" $FILE
     if [ $? -ne 0 ] ; then
         echo "Error... exiting"
@@ -85,7 +88,7 @@ function force_install_mode() {
 
 
 function force_info_log_level() {
-    FILE=$POST_PROCESSING/$ARCHIVE_NAME/src/domogik/examples/config/domogik.cfg
+    FILE=$POST_PROCESSING/domogik-$SHORT_RELEASE/src/domogik/examples/config/domogik.cfg
     sed -i "s/^log_level *=.*$/log_level = info/" $FILE
     if [ $? -ne 0 ] ; then
         echo "Error... exiting"
@@ -96,14 +99,14 @@ function force_info_log_level() {
 
 
 function set_release_number() {
-    FILE=$POST_PROCESSING/$ARCHIVE_NAME/setup.py
-    FILE2=$POST_PROCESSING/$ARCHIVE_NAME/release
-    sed -i "s/version = '.*',/version = '"$RELEASE"',/" $FILE
+    FILE=$POST_PROCESSING/domogik-$SHORT_RELEASE/setup.py
+    FILE2=$POST_PROCESSING/release
+    sed -i "s/version = '.*',/version = '"$SHORT_RELEASE"',/" $FILE
     if [ $? -ne 0 ] ; then
         echo "Error... exiting"
         exit 1
     fi
-    echo $RELEASE > $FILE2
+    echo $SHORT_RELEASE > $FILE2
     if [ $? -ne 0 ] ; then
         echo "Error... exiting"
         exit 1
@@ -113,7 +116,7 @@ function set_release_number() {
 
 
 function create_final_pkg() {
-    cd $POST_PROCESSING/$ARCHIVE_NAME
+    cd $POST_PROCESSING/
     tar czf $FINAL_ARCHIVE *
     if [ $? -ne 0 ] ; then
         echo "Error... exiting"
