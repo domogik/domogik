@@ -100,7 +100,7 @@ function force_info_log_level() {
 
 function set_release_number() {
     FILE=$POST_PROCESSING/domogik-$SHORT_RELEASE/setup.py
-    FILE2=$POST_PROCESSING/release
+    FILE2=$POST_PROCESSING/domogik-$SHORT_RELEASE/release
     sed -i "s/version = '.*',/version = '"$SHORT_RELEASE"',/" $FILE
     if [ $? -ne 0 ] ; then
         echo "Error... exiting"
