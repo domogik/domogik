@@ -63,7 +63,7 @@ def list_all_files(path, dst):
 
 d_files = []
 
-d_files.extend(list_all_files('src/share/domogik/stats/', '/usr/local/share/domogik/listeners/'))
+d_files.extend(list_all_files('src/share/domogik/stats/', '/usr/local/share/domogik/stats/'))
 d_files.extend(list_all_files('src/share/domogik/url2xpl/', '/usr/local/share/domogik/url2xpl/'))
 d_files.extend(list_all_files('src/share/domogik/plugins/', '/usr/local/share/domogik/plugins/'))
 
