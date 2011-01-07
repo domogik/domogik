@@ -1,0 +1,100 @@
+<package type="plugin">
+  <name>zwave</name>
+  <technology>zwave</technology>
+  <description>Manage Z-wave devices</description>
+  <detail>Z-wave is a radio based protocol to control lights, appliances and others things in your house</detail>
+  <version>0.1.0</version>
+<documentation>http://wiki.domogik.org/tiki-index.php?page=plugin_zwave</documentation>
+  <author>Michael Ricart</author>
+  <author-email>ricart.michael at gmail.com</author-email>
+  <configuration-keys>
+    <key>
+      <order-id>0</order-id>
+      <name>startup-plugin</name>
+      <type>boolean</type>
+      <description>Automatically start plugin at Domogik startup</description>
+      <default-value>False</default-value>
+    </key>
+    <key>
+      <order-id>1</order-id>
+      <name>device</name>
+      <type>string</type>
+      <description>Z-wave device</description>
+      <default-value>/dev/zwave</default-value>
+    </key>
+    <key>
+      <order-id>2</order-id>
+      <name>speed</name>
+      <type>string</type>
+      <description>Serial speed</description>
+      <default-value>115200</default-value>
+      </key>
+  </configuration-keys>
+  <files>
+    <file path="src/share/domogik/plugins/zwave.xml"/>
+    <file path="src/share/domogik/stats/zwave/zwave.basic-zwave.xml"/>
+    <file path="src/share/domogik/url2xpl/zwave/level.xml"/>
+    <file path="src/domogik/xpl/bin/zwave.py"/>
+    <file path="src/domogik/xpl/lib/zwave.py"/>
+  </files>
+  <dependencies>
+    <dep name="pySerial > 2.4"/>
+  </dependencies>
+  <device_technology>
+      <id>zwave</id>
+      <name>Z-wave</name>
+      <description>Z-wave</description>
+  </device_technology>
+  <device_types>
+      <device_type>
+          <id>zwave.switch</id>
+          <device_technology_id>zwave</device_technology_id>
+          <name>Switch</name>
+          <description>Switch</description>
+      </device_type>
+      <device_type>
+          <id>zwave.dimmer</id>
+          <device_technology_id>zwave</device_technology_id>
+          <name>Dimmer</name>
+          <description>Dimmer</description>
+      </device_type>
+  </device_types>
+  <device_feature_models>
+      <device_feature_model>
+          <id>zwave.switch.switch</id>
+          <name>Switch</name>
+          <feature_type>actuator</feature_type>
+          <device_type_id>zwave.switch</device_type_id>
+          <parameters>
+              {&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}
+          </parameters>
+          <value_type>binary</value_type>
+          <stat_key>command</stat_key>
+          <return_confirmation>1</return_confirmation>
+      </device_feature_model>
+      <device_feature_model>
+          <id>zwave.dimmer.switch</id>
+          <name>Dimmer</name>
+          <feature_type>actuator</feature_type>
+          <device_type_id>zwave.dimmer</device_type_id>
+          <parameters>
+              {&quot;command&quot;:&quot;&quot;,&quot;value0&quot;:&quot;off&quot;, &quot;value1&quot;:&quot;on&quot;}
+          </parameters>
+          <value_type>binary</value_type>
+          <stat_key>command</stat_key>
+          <return_confirmation>1</return_confirmation>
+      </device_feature_model>
+      <device_feature_model>
+          <id>zwave.dimmer.change</id>
+          <name>Change</name>
+          <feature_type>actuator</feature_type>
+          <device_type_id>zwave.dimmer</device_type_id>
+          <parameters>
+              {&quot;command&quot;:&quot;preset_dim&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:100}{&quot;command&quot;:&quot;preset_dim&quot;,&quot;valueMin&quot;:0, &quot;valueMax&quot;:100}
+          </parameters>
+          <value_type>range</value_type>
+          <stat_key>level</stat_key>
+          <return_confirmation>1</return_confirmation>
+      </device_feature_model>
+  </device_feature_models>
+</package>
