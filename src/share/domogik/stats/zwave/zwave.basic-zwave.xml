@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<statistic technology="zwave">
+    <schema name="zwave.basic">
+        <xpltype type="xpl-trig">
+            <listener>	
+                <filter/>
+            </listener>
+            <mapping>
+                <device field="node"/>
+                <value field="command"/>
+                <value field="level" filter_key="event" filter_value="level"/>
+            </mapping>
+        </xpltype>
+    </schema>
+</statistic>
