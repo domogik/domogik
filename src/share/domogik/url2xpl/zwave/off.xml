@@ -1,0 +1,17 @@
+<technology id="zwave">
+  <command name="off">
+    <schema>zwave.basic</schema>
+    <command-key>command</command-key>	
+    <address-key>node</address-key>	
+    <command-xpl-value>off</command-xpl-value>
+    <parameters/>                                                                                                                                                                                      
+</command>	
+<listener>
+    <schema>zwave.basic</schema>
+    <xpltype>xpl-trig</xpltype>
+    <filter>
+      <key name="command" value="level" />
+      <key name="node" value="@address@"/>
+    </filter>
+  </listener>
+</technology>
