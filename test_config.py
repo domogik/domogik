@@ -46,6 +46,8 @@ WARNING = '\033[93m'
 FAIL = '\033[91m'
 ENDC = '\033[0m'
 
+user = ''
+
 def info(msg):
     print "%s [ %s ] %s" % (BLUE,msg,ENDC)
 def ok(msg):
@@ -98,6 +100,7 @@ def test_imports():
     ok("Imports are good")
 
 def test_config_files():
+    global user
     info("Test global config file")
     assert os.path.isfile("/etc/conf.d/domogik") or os.path.isfile("/etc/default/domogik"), \
             "No global config file found, please exec install.sh if you did not exec it before."
@@ -112,7 +115,7 @@ def test_config_files():
     r = f.readlines()
     lines = filter(lambda x: not x.startswith('#') and x != '\n',r)
     f.close()
-    user = ''
+    #user = ''
     manager_params = ''
     custom_path = ''
     hub_iface = ''
@@ -251,17 +254,31 @@ def test_version():
     assert not (v[0] == 2 and v[1] < 6), "Python version is %s.%s, it must be >= 2.6, please upgrade" % (v[0], v[1])
     ok("Python version is >= 2.6")
 
+def get_django_url():
+    user_entry = pwd.getpwnam(user)
+    user_home = user_entry.pw_dir
+    import ConfigParser
+    config = ConfigParser.ConfigParser()
+    config.read("%s/.domogik.cfg" % user_home)
+    django = dict(config.items('django'))
+    return "http://%s:%s/domogik" % (django['django_server_ip'], django['django_server_port'])
+
+
 try:
     am_i_root()
     test_imports()
     test_config_files()
     test_init()
     test_version()
+    django_url = get_django_url()
     print "\n\n"
     ok("================================================== <==")
     ok(" Everything seems ok, you should be able to start  <==")
     ok("      Domogik with /etc/init.d/domogik start       <==")
     ok("            or /etc/rc.d/domogik start             <==")
+    ok(" Domogik UI is available on                        <==")
+    ok(" %49s <==" % django_url)
+    ok(" Default login is 'admin', password is '123'       <==") 
     ok("================================================== <==")
 except:
     fail(sys.exc_info()[1])

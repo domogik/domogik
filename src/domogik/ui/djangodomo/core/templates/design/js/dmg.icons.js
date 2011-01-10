@@ -1,4 +1,4 @@
-var area_icons = ["area", "attic", "basement", "basement2", "firstfloor", "firstfloor2", "secondfloor", "secondfloor2", "groundfloor", "groundfloor2", "garden"];
+var area_icons = ["area", "attic", "basement", "basement2", "firstfloor", "firstfloor2", "secondfloor", "secondfloor2", "groundfloor", "groundfloor2", "garden", "garage"];
 var room_icons = ["kitchen", "bedroom", "tvlounge", "bathroom", "office", 'kidsroom', 'garage'];
 
 /* Define range how many icon in various ranges */
@@ -19,6 +19,7 @@ range['electricity'] = [0, 100];
 range['temperature'] = [0, 100];
 range['mirror'] = [0, 100];
 range['nanoztag'] = [0, 100];
+range['music'] = [0, 100];
 
 function findRangeIcon(usage, percent) {
 	var nearest, last_d_memorized = 101;
