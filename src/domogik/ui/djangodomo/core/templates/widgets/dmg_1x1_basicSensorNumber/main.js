@@ -33,8 +33,8 @@
             
             this._panel = $.getPanel({width:190, height:190, circle: {start:140, end:90}});
             this.element.append(this._panel);
-            this._panel.panelAddCommand({label:'Close', showlabel: false, class:'close', r:70, deg:140, rotate:false, click:function(e){self.close();e.stopPropagation();}});
-            this._panel.panelAddCommand({label:'Charts', showlabel: true, class:'graph', r:70, deg:-30, rotate:false, click:function(e){self.open_graph();e.stopPropagation();}});
+            this._panel.panelAddCommand({label:'Close', showlabel: false, className:'close', r:70, deg:140, rotate:false, click:function(e){self.close();e.stopPropagation();}});
+            this._panel.panelAddCommand({label:'Charts', showlabel: true, className:'graph', r:70, deg:-30, rotate:false, click:function(e){self.open_graph();e.stopPropagation();}});
             this._panel.hide();
             
             this.element.click(function (e) {self._onclick();e.stopPropagation();})

@@ -17,7 +17,7 @@ $(function(){
             var cx = this.width()/2;
             var cy = this.height()/2;
             var command = $("<div class='command'></div>");
-            command.addClass(options.class)
+            command.addClass(options.className)
                 .click(options.click);
             this.append(command);
             command.moveToCircleCoord({x:cx, y:cy, r:options.r, deg:options.deg, rotate:options.rotate}); // ! Need to be after append
@@ -48,7 +48,7 @@ $(function(){
                 ctx.stroke();
             }
             var text = $("<div class='text'></div>");
-            text.addClass(options.class);
+            text.addClass(options.className);
             this.append(text);
             text.moveToCircleCoord({x:cx, y:cy, r:options.r, deg:options.deg, rotate:options.rotate}); // ! Need to be after append
         },
