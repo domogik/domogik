@@ -76,14 +76,18 @@ function start_xpl {
 }
 
 function start_manager {
+    [ -p /tmp/dmg-manager-state ] && rm -f /tmp/dmg-manager-state
+    mkfifo /tmp/dmg-manager-state
+    chown ${DOMOGIK_USER}: /tmp/dmg-manager-state
     echo -n "* Starting Manager (with $MANAGER_PARAMS)..."
     /bin/su - ${DOMOGIK_USER} -c "dmg_manager $MANAGER_PARAMS"
     if [ $? -gt 0 ]; then
         echo " An error occured during manager startup."
         exit 1
-    else
-        echo " Done."
     fi
+    #Get the startup status
+    cat < /tmp/dmg-manager-state
+    rm -f /tmp/dmg-manager-state
 }
 
 function stop_django {
