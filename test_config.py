@@ -38,7 +38,7 @@ import os
 import pwd
 import sys
 from multiprocessing import Process, Pipe
-from socket import gethostbyname
+from socket import gethostbyname, gethostname
 
 BLUE = '\033[94m'
 OK = '\033[92m'
@@ -254,6 +254,12 @@ def test_version():
     assert not (v[0] == 2 and v[1] < 6), "Python version is %s.%s, it must be >= 2.6, please upgrade" % (v[0], v[1])
     ok("Python version is >= 2.6")
 
+def test_hostname_length():
+    info("Check hostname length")
+    assert len(gethostname()) < 16, "Your hostname length si > 16, because it is used into xpl messages, it must be < 16).\
+            Please change it in /etc/hostname and /etc/hosts, logout and login, then run ./test_config.py again."
+    ok("Hostname length is < 16.")
+
 def get_django_url():
     user_entry = pwd.getpwnam(user)
     user_home = user_entry.pw_dir
@@ -262,11 +268,11 @@ def get_django_url():
     config.read("%s/.domogik.cfg" % user_home)
     django = dict(config.items('django'))
     return "http://%s:%s/domogik" % (django['django_server_ip'], django['django_server_port'])
-
-
+     
 try:
     am_i_root()
     test_imports()
+    test_hostname_length()
     test_config_files()
     test_init()
     test_version()
