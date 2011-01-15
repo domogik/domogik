@@ -194,10 +194,21 @@ class OneWireNetwork:
         ret = []
         for comp in self._root.find(id = my_id):
             # component detail
-            display = " - %-20s : %s"
+            print "C=%s" % comp
+            display = " - %-20s : %s" 
             ret.append("%s attributes :" % my_id)
             for attr in comp.entryList():
-                ret.append(display % (attr, comp.__getattr__(attr)))
+                try:
+                    print "ATTR=%s" % attr
+                    ret.append(display % (attr, comp.__getattr__(attr)))
+                # Patch with owfs 2.8p4 : the 2 following excepts weren't needed
+                # with a previous owfs release (2.7 maybe)
+                # It would be interesting to comment this to test in following 
+                # releases
+                except ow.exUnknownSensor:
+                    pass
+                except AttributeError:
+                    pass
         return ret
 
 
