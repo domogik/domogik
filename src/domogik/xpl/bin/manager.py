@@ -39,7 +39,7 @@ Implements
 import os
 import sys
 import time
-from threading import Event, currentThread, Thread, enumerate
+from threading import Event, currentThread, Thread, enumerate, Lock
 from optparse import OptionParser
 import traceback
 from subprocess import Popen
@@ -87,7 +87,13 @@ class SysManager(XplPlugin):
         self.enable_hbeat()
         # Logger init
         self.log.info("Host : %s" % self.get_sanitized_hostname())
-    
+
+        # Fifo to communicate with the init script
+        self._state_fifo = open("/tmp/dmg-manager-state","w")    
+        self._startup_count = 0
+        self._startup_count_lock = Lock()
+        self._write_fifo("NONE","\n")
+
         # Get config
         cfg = Loader('domogik')
         config = cfg.load()
@@ -103,15 +109,17 @@ class SysManager(XplPlugin):
     
             #Start dbmgr
             if self.options.start_dbmgr:
-                if self._check_component_is_running("dbmgr"):
+                self._inc_startup_lock()
+                if self._check_component_is_running("dbmgr", True):
                     self.log.warning("Manager started with -d, but a database manager is already running")
+                    self._write_fifo("WARN", "Manager started with -d, but a database manager is already running\n")
                 else:
                     thr_dbmgr = Thread(None,
                                        self._start_plugin,
                                        None,
                                        ("dbmgr",
                                         self.get_sanitized_hostname()),
-                                        {"ping" : False})
+                                       {"ping" : False, "startup" : True})
                     thr_dbmgr.start()
                     #self._start_plugin("dbmgr", self.get_sanitized_hostname(), ping = False)
                     # TODO : delete
@@ -121,15 +129,17 @@ class SysManager(XplPlugin):
     
             #Start rest
             if self.options.start_rest:
-                if self._check_component_is_running("rest"):
+                self._inc_startup_lock()
+                if self._check_component_is_running("rest", True):
                     self.log.warning("Manager started with -r, but a REST manager is already running")
+                    self._write_fifo("WARN", "Manager started with -r, but a REST manager is already running\n")
                 else:
                     thr_rest = Thread(None,
                                        self._start_plugin,
                                        None,
                                        ("rest",
                                         self.get_sanitized_hostname()),
-                                        {"ping" : False})
+                                       {"ping" : False, "startup" : True})
                     thr_rest.start()
                     #self._start_plugin("rest", self.get_sanitized_hostname(), ping = False)
                     # TODO : delete
@@ -139,15 +149,17 @@ class SysManager(XplPlugin):
     
             #Start trigger
             if self.options.start_trigger:
+                self._inc_startup_lock()
                 if self._check_component_is_running("trigger"):
                     self.log.warning("Manager started with -t, but a trigger manager is already running")
+                    self._write_fifo("WARN", "Manager started with -t, but a trigger manager is already running\n")
                 else:
                     thr_trigger = Thread(None,
                                        self._start_plugin,
                                        None,
                                        ("trigger",
                                         self.get_sanitized_hostname()),
-                                        {"ping" : False})
+                                       {"ping" : False, "startup" : True})
                     thr_trigger.start()
                     #self._start_plugin("trigger", self.get_sanitized_hostname(), ping = False)
                     # TODO : delete
@@ -157,6 +169,7 @@ class SysManager(XplPlugin):
 
             # Start plugins at manager startup
             self.log.debug("Check non-system plugins to start at manager startup...")
+            self._write_fifo("INFO", "Check non-system plugins to start at manager startup.\n")
             comp_thread = {}
             for component in self._components:
                 name = component["name"]
@@ -169,12 +182,14 @@ class SysManager(XplPlugin):
                 if startup == 'True':
                     self.log.debug("            starting")
                     self.log.debug("Starting %s" % name)
+                    self._inc_startup_lock()
+                    self._write_fifo("INFO", "Starting %s\n" % name)
                     comp_thread[name] = Thread(None,
                                                    self._start_plugin,
                                                    None,
                                                    (name,
                                                     self.get_sanitized_hostname()),
-                                                   {})
+                                                   {"startup" : True})
                     comp_thread[name].start()
             
             # Define listener
@@ -183,7 +198,11 @@ class SysManager(XplPlugin):
                 'xpltype': 'xpl-cmnd',
             })
     
+            while self._startup_count > 0:
+                time.sleep(1)
             self.log.info("System manager initialized")
+            self._write_fifo("OK", "System manager initialized.\n")
+            self._state_fifo.close()
 
             ### make an eternal loop to ping plugins
             # the goal is to detect manually launched plugins
@@ -205,7 +224,44 @@ class SysManager(XplPlugin):
             self.log.error("%s" % sys.exc_info()[1])
             print("%s" % sys.exc_info()[1])
 
-
+    def _write_fifo(self, level, message):
+        ''' Write the message into _state_fifo fifo, with ansi color
+        @param level : one of OK,INFO,WARN,ERROR,NONE
+        @param message : the message to write
+        '''
+        colors = {
+            "OK" : '\033[92m',
+            "INFO" : '\033[94m',
+            "WARN" : '\033[93m',
+            "ERROR" : '\033[91m',
+            "ENDC" : '\033[0m'
+        }
+        if level not in colors.keys() and level != "NONE":
+            level = "INFO"
+        if not self._state_fifo.closed:
+            if level == "NONE":
+                self._state_fifo.write(message)
+            else:
+                self._state_fifo.write("%s[%s] %s %s" % (colors[level], level, message, colors["ENDC"]))
+            self._state_fifo.flush()
+    
+    def _inc_startup_lock(self):
+        ''' Increment self._startup_count
+        '''
+        self.log.info("lock++ acquire : %s" % self._startup_count)
+        self._startup_count_lock.acquire()
+        self._startup_count = self._startup_count + 1
+        self._startup_count_lock.release()
+        self.log.info("lock++ released: %s" % self._startup_count)
+    
+    def _dec_startup_lock(self):
+        ''' Decrement self._startup_count
+        '''
+        self.log.info("lock++ acquire : %s" % self._startup_count)
+        self._startup_count_lock.acquire()
+        self._startup_count = self._startup_count - 1
+        self._startup_count_lock.release()
+        self.log.info("lock++ released: %s" % self._startup_count)
 
     def _sys_cb(self, message):
         '''
@@ -270,13 +326,16 @@ class SysManager(XplPlugin):
         mess.add_data({'error' :  error})
         self.myxpl.send(mess)
 
-    def _start_plugin(self, plg, host, ping = True):
+    def _start_plugin(self, plg, host, ping = True, startup = False):
         """ Start a plugin
             @param plg : plugin name
             @param host : computer on which plugin should be started
+            @param startup : set it to True if you call _start_plugin during manager start
         """
         error = ""
         self.log.debug("Ask to start %s on %s" % (plg, host))
+        if startup:
+            self._write_fifo("INFO", "Start %s on %s\n" % (plg, host))
         mess = XplMessage()
         mess.set_type('xpl-trig')
         mess.set_schema('domogik.system')
@@ -287,6 +346,8 @@ class SysManager(XplPlugin):
             if self._check_component_is_running(plg):
                 error = "Component %s is already running on %s" % (plg, host)
                 self.log.info(error)
+                if startup:
+                    self._write_fifo("ERROR", "Component %s is already running\n" % plg)
                 mess.add_data({'error' : error})
                 self.myxpl.send(mess)
                 return
@@ -298,14 +359,21 @@ class SysManager(XplPlugin):
             if self._check_component_is_running(plg):
                 self.log.debug("Component %s started with pid %s" % (plg,
                         pid))
+                if startup:
+                    self._write_fifo("OK", "Component %s started with pid %s\n" % (plg,
+                            pid))
 
             # component failed to start
             else:
-                error = "Component %s failed to start. Please look in this component logs files" % plg
+                error = "Component %s failed to start. Please look in this component log files" % plg
                 self.log.error(error)
+                if startup:
+                    self._write_fifo("ERROR", error + "\n")
                 self._delete_pid_file(plg)
             if error != "":
                 mess.add_data({'error' :  error})
+        if startup:
+            self._dec_startup_lock()
         self.myxpl.send(mess)
 
     def _stop_plugin(self, plg, host):
@@ -355,11 +423,11 @@ class SysManager(XplPlugin):
                 self.log.warning("Pid file contains no pid!")
 
 
-    def _check_component_is_running(self, name, foo = None):
+    def _check_component_is_running(self, name, startup = False):
         ''' This method will send a ping request to a component on localhost
         and wait for the answer (max 5 seconds).
         @param name : component name
-       
+        @param startup : set to True if the method is called during manager startup 
         Notice : sort of a copy of this function is used in rest.py to check 
                  if a plugin is on before using a helper
                  Helpers will change in future, so the other function should
@@ -367,6 +435,8 @@ class SysManager(XplPlugin):
                  in a library
         '''
         self.log.info("Check if '%s' is running... (thread)" % name)
+        if startup:
+            self._write_fifo("INFO", "Check if %s is running.\n" % name)
         self._pinglist[name] = Event()
         mess = XplMessage()
         mess.set_type('xpl-cmnd')
@@ -378,7 +448,7 @@ class SysManager(XplPlugin):
                  {'schema':'hbeat.app', 
                   'xpltype':'xpl-stat', 
                   'xplsource':"xpl-%s.%s" % (name, self.get_sanitized_hostname())},
-                cb_params = {'name' : name})
+                 cb_params = {'name' : name})
         max = PING_DURATION
         while max != 0:
             self.myxpl.send(mess)
@@ -400,7 +470,7 @@ class SysManager(XplPlugin):
         ''' Set the Event to true if an answer was received
         '''
         self._pinglist[args["name"]].set()
-        pass
+
 
     def _start_comp(self, name):
         '''
