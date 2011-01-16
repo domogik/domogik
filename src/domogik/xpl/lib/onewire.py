@@ -101,11 +101,13 @@ class ComponentDs18b20:
 
                 else:
 
-                    if hasattr(self.old_temp, my_id) == False \
-                       or temperature != self.old_temp[my_id]:
-                        my_type = "xpl-trig"
+                    if my_id in self.old_temp:
+                        if temperature != self.old_temp[my_id]:
+                            my_type = "xpl-trig"
+                        else:
+                            my_type = "xpl-stat"
                     else:
-                        my_type = "xpl-stat"
+                        my_type = "xpl-trig"
                     self.old_temp[my_id] = temperature
                     print "type=%s, id=%s, temp=%s" % (my_type, my_id, temperature)
                     self.callback(my_type, {"device" : my_id,
@@ -153,11 +155,13 @@ class ComponentDs18s20:
 
                 else:
 
-                    if hasattr(self.old_temp, my_id) == False \
-                       or temperature != self.old_temp[my_id]:
-                        my_type = "xpl-trig"
+                    if my_id in self.old_temp:
+                        if temperature != self.old_temp[my_id]:
+                            my_type = "xpl-trig"
+                        else:
+                            my_type = "xpl-stat"
                     else:
-                        my_type = "xpl-stat"
+                        my_type = "xpl-trig"
                     self.old_temp[my_id] = temperature
                     print "type=%s, id=%s, temp=%s" % (my_type, my_id, temperature)
                     self.callback(my_type, {"device" : my_id,
