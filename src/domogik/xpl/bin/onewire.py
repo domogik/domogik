@@ -114,7 +114,7 @@ class OneWireManager(XplPlugin):
                 ow = OneWireNetwork(self.log, device, cache)
             except OneWireException as e:
                 self.log.error(e.value)
-                print e.value
+                print(e.value)
                 self.force_leave()
                 return
             
@@ -161,7 +161,7 @@ class OneWireManager(XplPlugin):
     
         except:
             self.log.error("Plugin error : stopping plugin... Trace : %s" % traceback.format_exc())
-            print traceback.format_exc()
+            print(traceback.format_exc())
             self.force_leave()
         self.enable_hbeat()
 

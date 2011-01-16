@@ -96,7 +96,7 @@ class ComponentDs18b20:
                 except AttributeError:
                     error = "DS18B20 : bad resolution : %s. Setting resolution to 12 for next iterations." % self.resolution
                     self._log.error(error)
-                    print error
+                    print(error)
                     self.resolution = "12"
 
                 else:
@@ -109,7 +109,7 @@ class ComponentDs18b20:
                     else:
                         my_type = "xpl-trig"
                     self.old_temp[my_id] = temperature
-                    print "type=%s, id=%s, temp=%s" % (my_type, my_id, temperature)
+                    print("type=%s, id=%s, temp=%s" % (my_type, my_id, temperature))
                     self.callback(my_type, {"device" : my_id,
                                          "type" : "temp",
                                          "current" : temperature})
@@ -150,7 +150,7 @@ class ComponentDs18s20:
                 except AttributeError:
                     error = "DS18S20 : error while reading value"
                     self._log.error(error)
-                    print error
+                    print(error)
                     self.resolution = "12"
 
                 else:
@@ -163,7 +163,7 @@ class ComponentDs18s20:
                     else:
                         my_type = "xpl-trig"
                     self.old_temp[my_id] = temperature
-                    print "type=%s, id=%s, temp=%s" % (my_type, my_id, temperature)
+                    print("type=%s, id=%s, temp=%s" % (my_type, my_id, temperature))
                     self.callback(my_type, {"device" : my_id,
                                          "type" : "temp",
                                          "current" : temperature})
@@ -188,34 +188,38 @@ class ComponentDs2401:
         self.interval = interval
         self.callback = callback
         self.root = self.onewire.get_root()
-        self.old_present = {}
+        self.all_ds2401 = {}
         self.start_listening()
-        self.actual_present = None
 
     def start_listening(self):
         """ 
         Start listening for onewire ds2401
         """
         while True:
-            self.actual_present = []
+            actual_ds2401 = {}
             for comp in self.root.find(type = "DS2401"):
                 my_id = comp.id
-                present = int(comp.present)
-                self.actual_present.append(my_id)
-                if hasattr(self.old_present, my_id) == False \
-                   or present != self.old_present[my_id]:
-                    if present == 1:
-                        status = "HIGH"
-                    else:
-                        status = "LOW"
-                    print "id=%s, status=%s" % (my_id, status)
+      
+                if my_id in self.all_ds2401:
+                    actual_ds2401[my_id] = "HIGH"
+                    if self.all_ds2401[my_id] != "HIGH":
+                        print("id=%s, status=HIGH" % my_id)
+                        self.all_ds2401[my_id] = "HIGH"
+                        self.callback("xpl-trig", {"device" : my_id,
+                                             "type" : "input",
+                                             "current" : "HIGH"})
+                else:
+                    print("id=%s, status=HIGH" % my_id)
+                    self.all_ds2401[my_id] = "HIGH"
+                    actual_ds2401[my_id] = "HIGH"
                     self.callback("xpl-trig", {"device" : my_id,
                                          "type" : "input",
-                                         "current" : status})
-                    self.old_present[my_id] = present
-            for comp_id in self.old_present:
-                if comp_id not in self.actual_present:
-                    print "id=%s, status=LOW component disappeared)" % (comp_id)
+                                         "current" : "HIGH"})
+
+            for comp_id in self.all_ds2401:
+                if comp_id not in actual_ds2401 and self.all_ds2401[comp_id] == "HIGH":
+                    print("id=%s, status=LOW component disappeared)" % (comp_id))
+                    self.all_ds2401[my_id] = "LOW"
                     self.callback("xpl-trig", {"device" : comp_id,
                                          "type" : "input",
                                          "current" : "LOW"})
