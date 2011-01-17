@@ -89,10 +89,12 @@ class SysManager(XplPlugin):
         self.log.info("Host : %s" % self.get_sanitized_hostname())
 
         # Fifo to communicate with the init script
-        self._state_fifo = open("/tmp/dmg-manager-state","w")    
-        self._startup_count = 0
-        self._startup_count_lock = Lock()
-        self._write_fifo("NONE","\n")
+        self._state_fifo = None
+        if os.path.exists("/tmp/dmg-manager-state"):
+            self._state_fifo = open("/tmp/dmg-manager-state","w")    
+            self._startup_count = 0
+            self._startup_count_lock = Lock()
+            self._write_fifo("NONE","\n")
 
         # Get config
         cfg = Loader('domogik')
@@ -229,6 +231,8 @@ class SysManager(XplPlugin):
         @param level : one of OK,INFO,WARN,ERROR,NONE
         @param message : the message to write
         '''
+        if self._state_fifo == None:
+            return
         colors = {
             "OK" : '\033[92m',
             "INFO" : '\033[94m',
@@ -248,6 +252,8 @@ class SysManager(XplPlugin):
     def _inc_startup_lock(self):
         ''' Increment self._startup_count
         '''
+        if self._state_fifo == None:
+            return
         self.log.info("lock++ acquire : %s" % self._startup_count)
         self._startup_count_lock.acquire()
         self._startup_count = self._startup_count + 1
@@ -257,6 +263,8 @@ class SysManager(XplPlugin):
     def _dec_startup_lock(self):
         ''' Decrement self._startup_count
         '''
+        if self._state_fifo == None:
+            return
         self.log.info("lock++ acquire : %s" % self._startup_count)
         self._startup_count_lock.acquire()
         self._startup_count = self._startup_count - 1
