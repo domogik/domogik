@@ -162,7 +162,6 @@ class Manager:
             self._h_timer.start()
             #We add a listener in order to answer to the hbeat requests
             Listener(cb = self.got_hbeat, manager = self, filter = {'schema':'hbeat.request', 'xpltype':'xpl-cmnd'})
-            self.p.log.debug("Lock ? %s" % lock)
             if lock:
                 self.get_stop().wait()
 
