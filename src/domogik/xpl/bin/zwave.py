@@ -41,7 +41,7 @@ from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.plugin import XplPlugin, XplResult
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.queryconfig import Query
-from domogik.xpl.lib.zwave import zwave
+from domogik.xpl.lib.zwave import ZWave
 from time import sleep
 
 class Zwave(XplPlugin):
@@ -58,7 +58,7 @@ class Zwave(XplPlugin):
         speed = res.get_value()['speed']
         print device, '  ', speed
 #        device='/dev/ttyUSB0'
-        self.myzwave = zwave(device, speed, self.zwave_cb, self.log)
+        self.myzwave = ZWave(device, speed, self.zwave_cb, self.log)
         self.myzwave.start()
         self.enable_hbeat()
         self.myzwave.send('Network Discovery')

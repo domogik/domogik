@@ -54,9 +54,9 @@ class ZwaveException(Exception):
         return repr(self.value)
                                             
 
-class zwave(threading.Thread):
+class ZWave(threading.Thread):
     """
-    zwave class test
+    ZWave class test
     """
 
     def __init__(self, serial_port_no, speed, read,log):
@@ -87,7 +87,7 @@ class zwave(threading.Thread):
         self.ready = False
 
     def run(self):
-        """ Start Class zwave
+        """ Start Class ZWave
         """
         while True :        
             self.com()

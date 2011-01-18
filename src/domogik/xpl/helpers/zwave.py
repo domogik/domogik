@@ -27,7 +27,7 @@ Support Z-wave technology
 Implements
 ==========
 
--Zwave
+-zwave
 
 @author: Mika64 <ricart.michael@gmail.com>
 @copyright: (C) 2007-2009 Domogik project
@@ -44,7 +44,7 @@ from time import sleep
 from threading import Event
 
 
-class Zwave(Helper):
+class zwave(Helper):
     def __init__(self):
 	self._event = Event()
         self.message = []
@@ -64,13 +64,12 @@ class Zwave(Helper):
             }
         log = logger.Logger('zwave-helper')
         self._log = log.get_logger()
-	self._log.error("WAAARRRRNIIIIING")
-        device = '/dev/ttyUSB0'
-        self.myzwave = zwave(device, '115200', self._cb, self._log)
-	self._log.error("juste avant le start")
-        self.myzwave.start()
                 
     def find(self, args = None):
+        # Open device to find
+        device = args[0]
+        return ["Device = %s" % device]
+        self.myzwave = ZWave(device, '115200', self._cb, self._log)
         self._log.error("Envoie de la trame")
         self.myzwave.send('Network Discovery')
         self._log.error("Trame envoyee, wait")
@@ -102,5 +101,5 @@ class Zwave(Helper):
             self._event.set()
 
 
-MY_CLASS = {"cb" : Zwave}
+MY_CLASS = {"cb" : zwave}
 
