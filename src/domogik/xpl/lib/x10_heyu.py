@@ -146,8 +146,9 @@ class X10API:
     def _send_lvl(self, cmd, item, lvl):
         """
         Send a command trought heyu
-        @param cmd : Command to send ('ON','OFF', etc)
+        @param cmd : Command to send ('dim','bright', etc)
         @param item : Item to send order to (Can be HU or H form)
+        @param lvl : level of light intensity (1-22), this is a relative value
         """
         heyucmd = "heyu -c %s %s %s %s" % (self._heyuconf, cmd, item, lvl)
         self._log.debug("Heyu command : %s" % heyucmd)
