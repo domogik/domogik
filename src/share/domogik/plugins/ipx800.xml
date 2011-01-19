@@ -23,6 +23,7 @@ Supported features :
       <description>Automatically start plugin at Domogik startup</description>
       <default-value>False</default-value>
     </key>
+
     <key>
       <order-id>1</order-id>
       <name>ipx-1-login</name>
@@ -58,6 +59,7 @@ Supported features :
       <description>Relay Board 1 : interval between each poll</description>
       <default-value></default-value>
     </key>
+
     <key>
       <order-id>6</order-id>
       <name>ipx-2-login</name>
@@ -93,6 +95,7 @@ Supported features :
       <description>Relay Board 2 : interval between each poll</description>
       <default-value></default-value>
     </key>
+
     <key>
       <order-id>11</order-id>
       <name>ipx-3-login</name>
@@ -126,6 +129,216 @@ Supported features :
       <name>ipx-3-int</name>
       <type>string</type>
       <description>Relay Board 3 : interval between each poll</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>16</order-id>
+      <name>ipx-4-login</name>
+      <type>string</type>
+      <description>Relay Board 4 : login</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>17</order-id>
+      <name>ipx-4-password</name>
+      <type>string</type>
+      <description>Relay Board 4 : password</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>18</order-id>
+      <name>ipx-4-name</name>
+      <type>string</type>
+      <description>Relay Board 4 : name</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>19</order-id>
+      <name>ipx-4-ip</name>
+      <type>string</type>
+      <description>Relay Board 4 : ip</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>20</order-id>
+      <name>ipx-4-int</name>
+      <type>string</type>
+      <description>Relay Board 4 : interval between each poll</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>21</order-id>
+      <name>ipx-5-login</name>
+      <type>string</type>
+      <description>Relay Board 5 : login</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>22</order-id>
+      <name>ipx-5-password</name>
+      <type>string</type>
+      <description>Relay Board 5 : password</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>23</order-id>
+      <name>ipx-5-name</name>
+      <type>string</type>
+      <description>Relay Board 5 : name</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>24</order-id>
+      <name>ipx-5-ip</name>
+      <type>string</type>
+      <description>Relay Board 5 : ip</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>25</order-id>
+      <name>ipx-5-int</name>
+      <type>string</type>
+      <description>Relay Board 5 : interval between each poll</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>26</order-id>
+      <name>ipx-6-login</name>
+      <type>string</type>
+      <description>Relay Board 6 : login</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>27</order-id>
+      <name>ipx-6-password</name>
+      <type>string</type>
+      <description>Relay Board 6 : password</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>28</order-id>
+      <name>ipx-6-name</name>
+      <type>string</type>
+      <description>Relay Board 6 : name</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>29</order-id>
+      <name>ipx-6-ip</name>
+      <type>string</type>
+      <description>Relay Board 6 : ip</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>30</order-id>
+      <name>ipx-6-int</name>
+      <type>string</type>
+      <description>Relay Board 6 : interval between each poll</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>31</order-id>
+      <name>ipx-7-login</name>
+      <type>string</type>
+      <description>Relay Board 7 : login</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>32</order-id>
+      <name>ipx-7-password</name>
+      <type>string</type>
+      <description>Relay Board 7 : password</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>33</order-id>
+      <name>ipx-7-name</name>
+      <type>string</type>
+      <description>Relay Board 7 : name</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>34</order-id>
+      <name>ipx-7-ip</name>
+      <type>string</type>
+      <description>Relay Board 7 : ip</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>35</order-id>
+      <name>ipx-7-int</name>
+      <type>string</type>
+      <description>Relay Board 7 : interval between each poll</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>36</order-id>
+      <name>ipx-8-login</name>
+      <type>string</type>
+      <description>Relay Board 8 : login</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>37</order-id>
+      <name>ipx-8-password</name>
+      <type>string</type>
+      <description>Relay Board 8 : password</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>38</order-id>
+      <name>ipx-8-name</name>
+      <type>string</type>
+      <description>Relay Board 8 : name</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>39</order-id>
+      <name>ipx-8-ip</name>
+      <type>string</type>
+      <description>Relay Board 8 : ip</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>40</order-id>
+      <name>ipx-8-int</name>
+      <type>string</type>
+      <description>Relay Board 8 : interval between each poll</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>41</order-id>
+      <name>ipx-9-login</name>
+      <type>string</type>
+      <description>Relay Board 9 : login</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>42</order-id>
+      <name>ipx-9-password</name>
+      <type>string</type>
+      <description>Relay Board 9 : password</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>43</order-id>
+      <name>ipx-9-name</name>
+      <type>string</type>
+      <description>Relay Board 9 : name</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>44</order-id>
+      <name>ipx-9-ip</name>
+      <type>string</type>
+      <description>Relay Board 9 : ip</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <order-id>45</order-id>
+      <name>ipx-9-int</name>
+      <type>string</type>
+      <description>Relay Board 9 : interval between each poll</description>
       <default-value></default-value>
     </key>
   </configuration-keys>
