@@ -85,11 +85,8 @@ class WOL:
         # Send magic packet
         self._log.debug("Send magic packet to broadcast")
         try:
-            self._log.debug("!!!!!1")
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            self._log.debug("!!!!!2")
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-            self._log.debug("!!!!!!3")
             sock.sendto(magic_hexa, ('<broadcast>', port))
             self._log.info("Magic packet send")
             sock.close()
@@ -105,7 +102,7 @@ class Ping:
     This class allow to ping a computer
     """
 
-    def __init__(self, log, cb, interval, computers):
+    def __init__(self, log, cb, interval, computers, stop):
         """
         Init object
         @param log : logger instance
@@ -114,6 +111,7 @@ class Ping:
         self._cb = cb
         self._interval = interval
         self._computers = computers
+        self._stop = stop
 
     def ping(self):
         """ 
@@ -121,14 +119,16 @@ class Ping:
         """
         num_threads = len(self._computers)
         queue = Queue()
+        workers = []
+        #Spawn thread pool
+        for idx in range(num_threads):
+            worker = Thread(target=self.pinger, args=(idx, queue))
+            worker.setDaemon(True)
+            worker.start()
+            workers.append(worker)
 
-        while True:
+        while not self._stop.isSet():
             #wraps system ping command
-            #Spawn thread pool
-            for idx in range(num_threads):
-                worker = Thread(target=self.pinger, args=(idx, queue))
-                worker.setDaemon(True)
-                worker.start()
             #Place work in queue
             for computer in self._computers:
                 try:
@@ -141,10 +141,9 @@ class Ping:
                            "old_status" : old_status})
             #Wait until worker threads are done to exit    
             queue.join()
-            worker.join()
 
             # interval between each ping
-            time.sleep(self._interval)
+            self._stop.wait(self._interval)
 
     def pinger(self, idx, ping_queue):
         """
@@ -152,26 +151,31 @@ class Ping:
         @param idx : thread number
         @param ping_queue : queue for ping
         """
-        data = ping_queue.get()
-        print "Thread %s: Pinging %s" % (idx, data["ip"])
-        ret = subprocess.call("ping -c 1 %s" % data["ip"],
-                        shell=True,
-                        stdout=open('/dev/null', 'w'),
-                        stderr=subprocess.STDOUT)
-        if ret == 0:
-            print "%s: is alive" % data["name"]
-            status = "HIGH"
-        else:
-            print "%s: did not respond" % data["name"]
-            status = "LOW"
+        while not self._stop.isSet():
+            if not ping_queue.empty():
+                try:
+                    data = ping_queue.get(timeout = self._interval / len(self.computers))
+                except Empty:
+                    continue
+                self._log.debug("Thread %s: Pinging %s" % (idx, data["ip"]))
+                ret = subprocess.call("ping -c 1 %s" % data["ip"],
+                                shell=True,
+                                stdout=open('/dev/null', 'w'),
+                                stderr=subprocess.STDOUT)
+                if ret == 0:
+                    self._log.debug("%s: is alive" % data["name"])
+                    status = "HIGH"
+                else:
+                    self._log.debug("%s: did not respond" % data["name"])
+                    status = "LOW"
 
-        if status != data["old_status"]:
-            type = "xpl-trig"
-        else:
-            type = "xpl-stat"
-        self._computers[data["name"]]["old_status"] = status
-  
-        # call callback
-        ping_queue.task_done()
-        self._cb(type, data["name"], status)
+                if status != data["old_status"]:
+                    type = "xpl-trig"
+                else:
+                    type = "xpl-stat"
+                self._computers[data["name"]]["old_status"] = status
+          
+                # call callback
+                ping_queue.task_done()
+                self._cb(type, data["name"], status)
 
