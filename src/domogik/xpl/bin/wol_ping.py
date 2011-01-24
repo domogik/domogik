@@ -35,6 +35,8 @@ Implements
 @organization: Domogik
 """
 
+from threading import Event
+
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.plugin import XplPlugin, XplResult
 from domogik.xpl.common.xplmessage import XplMessage
@@ -50,6 +52,9 @@ class WolPing(XplPlugin):
         """ Create listener for wake on lan
         """
         XplPlugin.__init__(self, name = 'wol_ping')
+
+        self._stop = Event() 
+        self.add_stop_cb(self.stop)
 
         # Configuration : interval between each ping
         self._config = Query(self.myxpl, self.log)
@@ -97,9 +102,14 @@ class WolPing(XplPlugin):
 
         ### Create Ping object
         self._pingmanager = Ping(self.log, self.ping_cb, float(interval),
-                                 self.computers)
-        self._pingmanager.ping()
+                                 self.computers, self._stop)
         self.enable_hbeat()
+        self._pingmanager.ping()
+
+    def stop(self):
+        ''' Set the internal flag to stop the plugin
+        '''
+        self._stop.set() 
 
     def wol_cb(self, message):
         """ Call wake on lan lib

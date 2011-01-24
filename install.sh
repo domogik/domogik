@@ -102,7 +102,7 @@ function update_default_config {
 
     d_home=$(getent passwd $d_user |cut -d ':' -f 6)
 
-    [ -f $d_home/.domogik.cfg ] && rm -f $d_home/.domogik.cfg
+    #[ -f $d_home/.domogik.cfg ] && rm -f $d_home/.domogik.cfg
 
     if [ "$MODE" = "develop" ];then
         arch=$(python -c 'import platform;print platform.architecture()[0]')
@@ -112,40 +112,64 @@ function update_default_config {
 }
 
 function update_user_config {
+    keep="n"
     if [ ! -f $d_home/.domogik.cfg ];then
         cp -f src/domogik/examples/config/domogik.cfg $d_home/.domogik.cfg
         chown $d_user: src/domogik/examples/config/domogik.cfg $d_home/.domogik.cfg
-    fi
-    if [ "$MODE" = "install" ];then
-        prefix="/usr/local"
     else
-        prefix=$PWD/src
+        keep="y"
+        read -p "You already have a .domogik.cfg file. Do you want to keep it ? [Y/n]" keep
+        if [ "x$keep" = "x" ];then
+            keep="y"
+        fi
+        if [ "$keep" = "n" -o "$keep" = "N" ];then
+            cp -f src/domogik/examples/config/domogik.cfg $d_home/.domogik.cfg
+            chown $d_user: src/domogik/examples/config/domogik.cfg $d_home/.domogik.cfg
+        fi
     fi
-    sed -i "s;^custom_prefix.*$;custom_prefix=$prefix;" $d_home/.domogik.cfg
+            
+    if [ "$keep" = "n" -o "$keep" = "N" ];then
+        if [ "$MODE" = "install" ];then
+            prefix="/usr/local"
+        else
+            prefix=$PWD/src
+        fi
+        sed -i "s;^custom_prefix.*$;custom_prefix=$prefix;" $d_home/.domogik.cfg
 
-    read -p "Which interface do you want to bind to? (default : lo) : " bind_iface
-    bind_iface=${bind_iface:-lo}
-    bind_addr=$(ifconfig $bind_iface|egrep -o "[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}"|head -1)
-    if [ "x$bind_addr" = "x" ];then
-        echo "Can't find the address associated to the interface!"
-        exit 20
+        read -p "Which interface do you want to bind to? (default : lo) : " bind_iface
+        bind_iface=${bind_iface:-lo}
+        bind_addr=$(ifconfig $bind_iface|egrep -o "[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}"|head -1)
+        if [ "x$bind_addr" = "x" ];then
+            echo "Can't find the address associated to the interface!"
+            exit 20
+        fi
+        sed -i "s/^bind_interface.*$/bind_interface = $bind_addr/" $d_home/.domogik.cfg
+        sed -i "s/^HUB_IFACE.*$/HUB_IFACE=$bind_iface/" /etc/default/domogik
+        sed -i "s/^rest_server_ip.*$/rest_server_ip = $bind_addr/" $d_home/.domogik.cfg
+        sed -i "s/^django_server_ip.*$/django_server_ip = $bind_addr/" $d_home/.domogik.cfg
+        sed -i "s/^internal_rest_server_ip.*$/internal_rest_server_ip = $bind_addr/" $d_home/.domogik.cfg
+        read -p "If you need to reach Domogik from outside, you can specify an IP now : " out_bind_addr
+        sed -i "s/^external_rest_server_ip.*$/external_rest_server_ip = $out_bind_addr/" $d_home/.domogik.cfg
+        
+        #Mysql config 
+        echo "You need to have a working Mysql server with a domogik user and database."
+        echo "You can create it using these commands (as mysql admin user) :"
+        echo " > CREATE DATABASE domogik;"
+        echo " > GRANT ALL PRIVILEGES ON domogik.* to domogik@localhost IDENTIFIED BY 'randompassword';"
+        read -p "Press Enter to continue the installation when your setup is ok. "
     fi
-    sed -i "s/^bind_interface.*$/bind_interface = $bind_addr/" $d_home/.domogik.cfg
-    sed -i "s/^HUB_IFACE.*$/HUB_IFACE=$bind_iface/" /etc/default/domogik
-    sed -i "s/^rest_server_ip.*$/rest_server_ip = $bind_addr/" $d_home/.domogik.cfg
-    sed -i "s/^django_server_ip.*$/django_server_ip = $bind_addr/" $d_home/.domogik.cfg
-    sed -i "s/^internal_rest_server_ip.*$/internal_rest_server_ip = $bind_addr/" $d_home/.domogik.cfg
-    read -p "If you need to reach Domogik from outside, you can specify an IP now : " out_bind_addr
-    sed -i "s/^external_rest_server_ip.*$/external_rest_server_ip = $out_bind_addr/" $d_home/.domogik.cfg
-    
-    #Mysql config 
-    echo "You need to have a working Mysql server with a domogik user and database."
-    echo "You can create it using these commands (as mysql admin user) :"
-    echo " > CREATE DATABASE domogik;"
-    echo " > GRANT ALL PRIVILEGES ON domogik.* to domogik@localhost IDENTIFIED BY 'randompassword';"
-    read -p "Press Enter to continue the installation when your setup is ok. "
+    upgrade_sql="n"
+    if [ "$keep" = "y" -o "$keep" = "Y" ];then
+        read -p "Do you want to upgrade your SQL database ? [y/N]" upgrade_sql
+    else
+        upgrade_sql="y"
+    fi
+    if [ "$upgrade_sql" = "n" -o "$upgrade_sql" = "N" ];then
+        return
+    fi
+
     mysql_ok=false
-    while ! $mysql_ok;do 
+    while [ ! $mysql_ok ];do 
         echo "Please set your mysql parameters."
         read -p "Username : " db_user
         read -p "Password : " db_password
@@ -192,9 +216,11 @@ function update_user_config {
 }
 
 function call_db_installer {
-    if [ "$drop_db" = "y" -o "$drop_db" = "Y" -o "$drop_db" = "" ];then 
-        echo "** Call DB Installer"
-        /bin/su -c "python ./db_installer.py $d_home/.domogik.cfg" $d_user
+    if [ "$upgrade_sql" = "n" -o "$upgrade_sql" = "N" ];then
+        if [ "$drop_db" = "y" -o "$drop_db" = "Y" -o "$drop_db" = "" ];then 
+            echo "** Call DB Installer"
+            /bin/su -c "python ./db_installer.py $d_home/.domogik.cfg" $d_user
+        fi
     fi
 }
 
