@@ -166,6 +166,7 @@ Supported features :
       <description>Relay Board 4 : interval between each poll</description>
       <default-value></default-value>
     </key>
+<!-- COMMENTED BECAUSE OF BUG #704
     <key>
       <order-id>21</order-id>
       <name>ipx-5-login</name>
@@ -341,6 +342,7 @@ Supported features :
       <description>Relay Board 9 : interval between each poll</description>
       <default-value></default-value>
     </key>
+-->
   </configuration-keys>
   <files>
     <file path="src/share/domogik/plugins/ipx800.xml"/>
