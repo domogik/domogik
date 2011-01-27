@@ -230,7 +230,8 @@ class IPX:
              @param num : relay number (0, 1, 2,....)
         """
         # we get instant status of board
-        self.get_status()
+        # finally no need to get status here (because we don't test old values)
+        #self.get_status()
 
         # send pulse
         url = self.url_cgi_pulse + str(num)
@@ -249,11 +250,8 @@ class IPX:
             self._log.error("Error while changing 'led%s' to 'PULSE'" % num)
         else:
             print("Changing 'led%s' to 'PULSE' successfully" % num)
-            # refresh status (for sending a xpl-trig)
-            self.send_change({'elt' : 'led',
-                              'num' : num,
-                              'value' : IPX_LED_HIGH})
-        self.get_status()
+            # send change of status
+            self.get_status()
 
 
     def reset_counter(self, num):
