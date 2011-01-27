@@ -303,7 +303,8 @@ class JSonHelper():
             else:
                 data_tmp = '"%s" : %s,' % (sub_data_key, sub_data)
         elif sub_data_type in str_type:
-            sub_data = re.sub('"', '\\"', sub_data)
+            if type(sub_data).__name__ in ("str", "unicode"):
+                sub_data = re.sub('"', '\\"', sub_data)
             if sub_data_key == "NOKEY":
                 data_tmp = '"%s",' % sub_data
             else:
