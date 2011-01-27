@@ -53,7 +53,7 @@ IPX_SEARCH_TIMEOUT = 5
 IPX_LED_HIGH = "1"
 IPX_LED_LOW = "0"
 IPX_BTN_HIGH = "up"
-IPX_BTN_LOW = "dn"
+IPX_BTN_LOW = "down"
 
 # response
 IPX_SUCCESS = "Success!"
@@ -253,6 +253,7 @@ class IPX:
             self.send_change({'elt' : 'led',
                               'num' : num,
                               'value' : IPX_LED_HIGH})
+        self.get_status()
 
 
     def reset_counter(self, num):

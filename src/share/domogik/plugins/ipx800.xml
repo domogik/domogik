@@ -430,7 +430,7 @@ Supported features :
           <parameters>
               {}
           </parameters>
-          <value_type>boolean</value_type>
+          <value_type>number</value_type>
           <stat_key>voltage</stat_key>
           <return_confirmation>0</return_confirmation>
       </device_feature_model>
