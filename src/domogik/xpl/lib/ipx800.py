@@ -38,9 +38,9 @@ Implements
 import socket
 import traceback
 import time
-from urllib import FancyURLopener
 from xml.dom import minidom
 import copy
+import urllib2
 
 
 # For searching IPX with UDP request
@@ -69,27 +69,6 @@ class IPXException(Exception):
 
     def __str__(self):
         return repr(self.value)
-
-
-class MyOpener(FancyURLopener):
-    """
-    Opener to allow http authentication
-    """
-
-    def set_auth(self, login, password):
-        """
-        Set login and password
-        @param login : login
-        @param password : password
-        """
-        self.my_login = login
-        self.my_password = password
-
-    def prompt_user_passwd(self, host, realm):
-        """
-        HTTP authentication
-        """
-        return (self.my_login, self.my_password)
 
 
 class IPX:
@@ -146,6 +125,17 @@ class IPX:
         self._log.info("Opening board : %s" % (host))
         self.get_status(first = True)
 
+    def urlopen(self, url):
+        # Login/password management
+        # description about all this can be found here : 
+        # http://www.voidspace.org.uk/python/articles/authentication.shtml
+        passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
+        passman.add_password(None, url, self.login, self.password)
+        authhandler = urllib2.HTTPBasicAuthHandler(passman)
+        opener = urllib2.build_opener(authhandler)
+        urllib2.install_opener(opener)
+        return urllib2.urlopen(url)
+
     def get_status_for_helper(self):
         """ Return status for helper
         """
@@ -199,9 +189,7 @@ class IPX:
         # change status
         url = self.url_cgi_change + str(num)
         try:
-            opener = MyOpener()
-            opener.set_auth(self.login, self.password)
-            resp = opener.open(url)
+            resp = self.urlopen(url)
         except IOError:
             error = "Error while accessing to '%s' : %s" %  \
                      (self.url_status, traceback.format_exc())
@@ -236,9 +224,7 @@ class IPX:
         # send pulse
         url = self.url_cgi_pulse + str(num)
         try:
-            opener = MyOpener()
-            opener.set_auth(self.login, self.password)
-            resp = opener.open(url)
+            resp = self.urlopen(url)
         except IOError:
             error = "Error while accessing to '%s' : %s" % \
                      (self.url_status, traceback.format_exc())
@@ -264,9 +250,7 @@ class IPX:
         # send reset order
         url = self.url_cgi_reset_counter + str(num)
         try:
-            opener = MyOpener()
-            opener.set_auth(self.login, self.password)
-            resp = opener.open(url)
+            resp = self.urlopen(url)
         except IOError:
             error = "Error while accessing to '%s' : %s" % \
                      (self.url_status, traceback.format_exc())
@@ -327,24 +311,23 @@ class IPX:
                            number of relay, input (ana and digi)
         """
         try:
-            opener = MyOpener()
-            opener.set_auth(self.login, self.password)
-            resp = opener.open(self.url_status)
+            resp = self.urlopen(self.url_status)
             xml = resp.read()
-            if xml[0:3] == "401":
-                error = "Error : bad login/password for IPX board"
-                print(error)
-                self._log.error(error)
-                raise IPXException(error)
 
         except IOError:
+            error = "IO Error while accessing to '%s' : %s" % \
+                     (self.url_status, traceback.format_exc())
+            print(error)
+            self._log.error(error)
+            raise IPXException(error)
+
+        except:
             error = "Error while accessing to '%s' : %s" % \
                      (self.url_status, traceback.format_exc())
             print(error)
             self._log.error(error)
             raise IPXException(error)
 
-        #xml = resp.read()
         dom = minidom.parseString(xml)
         response = dom.getElementsByTagName("response")[0]
 
