@@ -50,7 +50,7 @@ class Logger():
     with a minimum of config
     '''
 
-    logger = None
+    logger = {}
 
     def __init__(self, plugin_name):
         '''
@@ -59,7 +59,7 @@ class Logger():
         @param level : min level of the message to record, can be one of
         'debug', 'info', 'warning', 'error', 'critical'
         '''
-        if self.__class__.logger == None:
+        if plugin_name not in self.__class__.logger:
             LEVELS = {'debug': logging.DEBUG,
                   'info': logging.INFO,
                   'warning': logging.WARNING,
@@ -82,10 +82,17 @@ class Logger():
             logger.addHandler(hdlr)
             logger.setLevel(LEVELS[level])
 
-            self.__class__.logger = logger
+            self.__class__.logger[plugin_name] = logger
 
-    def get_logger(self):
+    def get_logger(self, logger_name = None):
         '''
         returns the configured logger instance
+        @param logger_name : The name of the logger you want to get.
+        If not provided, return the logger if only one exists
         '''
-        return self.__class__.logger
+        if logger_name is not None:
+            return self.__class__.logger[logger_name]
+        elif len(self.__class__.logger.keys()) == 1:
+            return self.__class__.logger[self.__class__.logger.keys()[0]]
+        else:
+            raise AttributeError, "You must specify a loggger name"

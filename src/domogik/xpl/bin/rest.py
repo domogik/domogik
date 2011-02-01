@@ -122,12 +122,12 @@ class Rest(XplPlugin):
 
         # logging Queue activities
         log_queue = logger.Logger('rest-queues')
-        self.log_queue = log_queue.get_logger()
+        self.log_queue = log_queue.get_logger('rest-queues')
         self.log_queue.info("Rest's queues activities...")
     
         # logging data manipulation initialization
         log_dm = logger.Logger('rest-dm')
-        self.log_dm = log_dm.get_logger()
+        self.log_dm = log_dm.get_logger('rest-dm')
         self.log_dm.info("Rest Server Data Manipulation...")
 
         # API version
