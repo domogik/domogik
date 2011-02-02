@@ -203,8 +203,9 @@ class SysManager(XplPlugin):
                 'xpltype': 'xpl-cmnd',
             })
     
-            while self._startup_count > 0:
-                time.sleep(1)
+            if self._state_fifo != None:
+                while self._startup_count > 0:
+                    time.sleep(1)
             self.log.info("System manager initialized")
             self._write_fifo("OK", "System manager initialized.\n")
             self._state_fifo.close()
