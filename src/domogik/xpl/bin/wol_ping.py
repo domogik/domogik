@@ -109,6 +109,7 @@ class WolPing(XplPlugin):
     def stop(self):
         ''' Set the internal flag to stop the plugin
         '''
+        self.log.debug("Set stop flag")
         self._stop.set() 
 
     def wol_cb(self, message):

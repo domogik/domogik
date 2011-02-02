@@ -72,13 +72,21 @@ class MirrorManager(XplPlugin):
             return
             
         # Start reading Mir:ror
+        self._stop = threading.Event()
         mirror_process = threading.Thread(None,
                                    mirror.listen,
-                                   None,
-                                   (),
-                                   {})                                  
-        mirror_process.start()                              
+                                   "mirror-process-reader",
+                                   (self._stop),
+                                   {})
+        self.register_thread(mirror_process)
+        mirror_process.start()
         self.enable_hbeat()
+
+
+    def stop(self):
+        """ Set the internal event to stop
+        """
+        self._stop.set()
 
     def send_xpl(self, device, type, current):
         """ Send xPL message on network

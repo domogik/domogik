@@ -38,19 +38,19 @@ Implements
 import binascii
 
 
-class MirrorException(Exception):  
-    """                                                                         
-    Mirror exception                                                           
-    """                                                                         
-                                                                                
-    def __init__(self, value):                                                  
+class MirrorException(Exception):
+    """
+    Mirror exception
+    """
+
+    def __init__(self, value):
         Exception.__init__(self)
-        self.value = value                                                      
-                                                                                
-    def __str__(self):                                                          
-        return repr(self.value)           
-        
-        
+        self.value = value
+
+    def __str__(self):
+        return repr(self.value)
+
+
 class Mirror:
     """ Helpers for Mir:ror
     """
@@ -75,7 +75,7 @@ class Mirror:
         except:
             error = "Error while opening Mir:ror device : %s. Check if it is the good device or if you have the good permissions on it." % device
             raise MirrorException(error)
-            
+
     def close(self):
         """ close Mir:ror device
         """
@@ -86,20 +86,21 @@ class Mirror:
             error = "Error while closing modem device"
             raise MirrorException(error)
 
-    def listen(self):
+    def listen(self, stop):
         """ Start listening to Mir:ror
+        @param stop : an Event to wait for stop request
         """
         # listen to mir:ror
         self._log.info("Start listening Mir:ror")
-        # infinite 
-        while True:
+        # infinite
+        while not stop.isSet():
             device, my_type, current = self.read()
             if device != None:
                 self._callback(device, my_type, current)
-            
-    def read(self):        
+
+    def read(self):
         """ Read Mir:ror device once
-        """        
+        """
         # We read 16 byte
         data = self._mirror.read(16)
         # if the first byte is not null, this is a message
@@ -137,4 +138,4 @@ class Mirror:
                     return "mirror", "activated", "LOW"
         return None, None, None
 
-                    
+

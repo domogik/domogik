@@ -54,7 +54,6 @@ class BasePlugin():
         @param daemonize : If set to False, force the instance *not* to daemonize, even if '-f' is not passed
         on the command line. If set to True (default), will check if -f was added.
         '''
-        print "create Base plugin instance"
         if p is not None and isinstance(p, OptionParser):
             parser = p
         else:
