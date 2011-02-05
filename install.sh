@@ -216,7 +216,7 @@ function update_user_config {
 }
 
 function call_db_installer {
-    if [ "$upgrade_sql" = "n" -o "$upgrade_sql" = "N" ];then
+    if [ "$upgrade_sql" = "y" -o "$upgrade_sql" = "Y" ];then
         if [ "$drop_db" = "y" -o "$drop_db" = "Y" -o "$drop_db" = "" ];then 
             echo "** Call DB Installer"
             /bin/su -c "python ./db_installer.py $d_home/.domogik.cfg" $d_user
