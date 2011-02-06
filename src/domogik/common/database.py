@@ -2315,12 +2315,20 @@ class DbHelper():
 
     def add_default_user_account(self):
         """Add a default user account (login = admin, password = domogik, is_admin = True)
+        if there isn't already one
 
         @return a UserAccount object
 
         """
-        person = self.add_person(p_first_name='Admin', p_last_name='Admin', p_birthdate=datetime.date(1900, 01, 01))
-        return self.add_user_account(a_login='admin', a_password='123', a_person_id=person.id, a_is_admin=True)
+        default_person_fname = "Admin"
+        default_person_lname = "Admin"
+        default_user_account_login = "admin"
+        if self.__session.query(UserAccount).count() > 0:
+            return None
+        person = self.add_person(p_first_name=default_person_fname, p_last_name=default_person_lname, 
+                                 p_birthdate=datetime.date(1900, 01, 01))
+        return self.add_user_account(a_login=default_user_account_login, a_password='123', a_person_id=person.id, 
+                                     a_is_admin=True)
 
     def del_user_account(self, a_id):
         """Delete a user account

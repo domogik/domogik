@@ -1293,6 +1293,10 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
                                 p_birthdate=datetime.date(1973, 4, 24))
         assert person1.last_name == 'SCHNEIDER'
         print(person1)
+        default_user = db.add_default_user_account()
+        assert default_user is not None
+        # Make sure we can't add twice a default account
+        assert db.add_default_user_account() is None
         user1 = db.add_user_account(a_login='mschneider', a_password='IwontGiveIt',
                                     a_person_id=person1.id, a_is_admin=True)
         print(user1)
@@ -1314,7 +1318,7 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
                                 p_birthdate=datetime.date(1981, 4, 24))
         user2 = db.add_user_account(a_login='lonely', a_password='boy', a_person_id=person2.id, a_is_admin=True)
         person3 = db.add_person(p_first_name='Ali', p_last_name='CANTE')
-        assert len(db.list_persons()) == 3
+        assert len(db.list_persons()) == 4
         user3 = db.add_user_account(a_login='domo', a_password='gik', a_person_id=person3.id, a_is_admin=True)
         user4 = db.add_user_account_with_person(
                             a_login='jsteed', a_password='theavengers', a_person_first_name='John',
@@ -1323,7 +1327,7 @@ class PersonAndUserAccountsTestCase(GenericTestCase):
         assert user4.login == 'jsteed'
         assert user4.person.first_name == 'John'
         assert user4.person.last_name == 'STEED'
-        assert len(db.list_user_accounts()) == 4
+        assert len(db.list_user_accounts()) == 5
 
     def test_update(self):
         person = db.add_person(p_first_name='Marc', p_last_name='SCHNEIDER',
