@@ -64,7 +64,9 @@ function test_sources {
 
 function copy_sample_files {
     if [ -d "/etc/default/" ];then
-        cp src/domogik/examples/default/domogik /etc/default/
+        if [ "$keep" = "n" -o "$keep" = "N" ];then
+            cp src/domogik/examples/default/domogik /etc/default/
+        fi
     else
         echo "Can't find the directory where I can copy system-wide config. Usually it is /etc/default/"
         exit 6
