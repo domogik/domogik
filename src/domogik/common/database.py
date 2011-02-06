@@ -116,7 +116,7 @@ class DbHelper():
         @param custom_path : full path to domogik config file
         """
         l = logger.Logger('db_api')
-        self.log = l.get_logger()
+        self.log = l.get_logger('db_api')
         cfg = Loader('database')
         if custom_path == None:
             config = cfg.load()
