@@ -156,14 +156,19 @@ class Manager:
         """ Enable the answer to hbeat request 
         @param lock : If set to True, the process will lock  on 'should_stop'
         """
+        self.p.log.debug("Try to enable Heartbeat")
         if self._h_timer == None:
             self._SendHeartbeat()
             self._h_timer = XplTimer(300, self._SendHeartbeat, self.p.get_stop(), self)
             self._h_timer.start()
             #We add a listener in order to answer to the hbeat requests
             Listener(cb = self.got_hbeat, manager = self, filter = {'schema':'hbeat.request', 'xpltype':'xpl-cmnd'})
+            self.p.log.debug("Heartbeat enabled")
             if lock:
+                self.p.log.debug("Hbeat : Wait for stop flag")
                 self.get_stop().wait()
+        else:
+            self.p.log.warning("_h_timer is not None, don't create another Hbeat process")
 
     def leave(self):
         """
