@@ -90,7 +90,7 @@ class Onewire(Helper):
                 }
 
         log = logger.Logger('onewire-helper')
-        self._log = log.get_logger()
+        self._log = log.get_logger('onewire-helper')
         self.my_ow = None
 
     def all(self, args = None):

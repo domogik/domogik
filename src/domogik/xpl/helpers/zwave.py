@@ -63,7 +63,7 @@ class zwave(Helper):
                 }
             }
         log = logger.Logger('zwave-helper')
-        self._log = log.get_logger()
+        self._log = log.get_logger('zwave-helper')
                 
     def find(self, args = None):
         # Open device to find

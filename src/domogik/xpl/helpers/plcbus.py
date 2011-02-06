@@ -64,7 +64,7 @@ class plcbus(Helper):
                 }
             }
         log = logger.Logger('plcbus-helper')
-        self._log = log.get_logger()
+        self._log = log.get_logger('plcbus-helper')
         device = '/dev/plcbus'
         self.api1 = PLCBUSAPI(self._log, device, self._command_cb, self._message_cb)
 

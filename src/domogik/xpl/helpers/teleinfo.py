@@ -61,7 +61,7 @@ class TeleinfoHelper(Helper):
                 }
 
         log = logger.Logger('teleinfo-helper')
-        self._log = log.get_logger()
+        self._log = log.get_logger('teleinfo-helper')
           
 
     def read(self, args = None):

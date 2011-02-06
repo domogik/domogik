@@ -62,7 +62,7 @@ class Cidmodem(Helper):
                 }
 
         log = logger.Logger('cidmodem-helper')
-        self._log = log.get_logger()
+        self._log = log.get_logger('cidmodem-helper')
           
 
 

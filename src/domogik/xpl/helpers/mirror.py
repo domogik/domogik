@@ -61,7 +61,7 @@ class MirrorHelper(Helper):
                 }
 
         log = logger.Logger('mirror-helper')
-        self._log = log.get_logger()
+        self._log = log.get_logger('mirror-helper')
           
 
     def read(self, args = None):

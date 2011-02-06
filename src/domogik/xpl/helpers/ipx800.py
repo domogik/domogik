@@ -66,7 +66,7 @@ class Ipx800(Helper):
                 }
 
         log = logger.Logger('ipx800-helper')
-        self._log = log.get_logger()
+        self._log = log.get_logger('ipx800-helper')
           
 
 
