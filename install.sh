@@ -115,11 +115,13 @@ function update_default_config {
 
 function update_user_config {
     keep="n"
+    already_cfg=
     if [ ! -f $d_home/.domogik.cfg ];then
         cp -f src/domogik/examples/config/domogik.cfg $d_home/.domogik.cfg
         chown $d_user: src/domogik/examples/config/domogik.cfg $d_home/.domogik.cfg
     else
         keep="y"
+        already_cfg=1
         read -p "You already have a .domogik.cfg file. Do you want to keep it ? [Y/n]" keep
         if [ "x$keep" = "x" ];then
             keep="y"
@@ -161,15 +163,15 @@ function update_user_config {
         read -p "Press Enter to continue the installation when your setup is ok. "
     fi
     upgrade_sql="n"
-    if [ "$keep" = "y" -o "$keep" = "Y" ];then
+    if [ $already_cfg ];then
         read -p "Do you want to upgrade your SQL database ? [y/N]" upgrade_sql
     else
         upgrade_sql="y"
     fi
-    if [ "$upgrade_sql" = "n" -o "$upgrade_sql" = "N" ];then
-        return
-    fi
 
+    if [ "$keep" = "y" -o "$keep" = "Y" ];then
+            return
+    fi
     mysql_ok=false
     while [ ! $mysql_ok ];do 
         echo "Please set your mysql parameters."
