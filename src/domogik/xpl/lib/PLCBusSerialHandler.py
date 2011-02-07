@@ -72,8 +72,8 @@ class serialHandler(threading.Thread):
         self.__myser = serial.Serial(serial_port_no, 9600, timeout = 0.4,
                 parity = serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE,
                 xonxoff = 0) #, rtscts=1)
-        self._want_lock = threading.Event()
-        self._mutex = mutex.mutex()
+#        self._want_lock = threading.Event()
+#        self._mutex = mutex.mutex()
         self._send_queue = Queue.Queue()
         self._cb = command_cb
         self._msg_cb = message_cb
@@ -94,8 +94,7 @@ class serialHandler(threading.Thread):
             ACK_received = 0
             # like a timer, does not wait for more than 2seconds for example
             time1 = time.time()
-            while 1:
-              #  message = self.__myser.read(size=9) #timeout is 400ms
+            while not self._stop.isSet():
                 #The ack message is sent immediately after the message has been received 
                 #and transmission time is 20mS (10ms for message propagation to adapter,
                 #and 10ms between adapter and computer
@@ -104,7 +103,7 @@ class serialHandler(threading.Thread):
                 self._basic_write(plcbus_frame)
                 time.sleep(0.6)
                 print "time before wait : %s" % time.time()
-                for i in range(2):
+                for i in range(3):
                     self.receive()
                     if self._ack.isSet():
                         print "got ack in first read"
@@ -169,64 +168,67 @@ class serialHandler(threading.Thread):
         return False
 
     def explicit_message(self, message):
-            """ Parse a frame 
-            """
-            cmdplcbus = {
-            '00': 'ALL_UNITS_OFF',
-            '01': 'ALL_LIGHTS_ON',
-            '22': 'ON', #ON and ask to send ACK (instead of '02')
-            '23': 'OFF', #OFF and send ACK
-            '24': 'DIM',
-            '25': 'BRIGHT',
-            '06': 'ALL_LIGHTS_OFF',
-            '07': 'ALL_USER_LTS_ON',
-            '08': 'ALL_USER_UNIT_OFF',
-            '09': 'ALL_USER_LIGHT_OFF',
-            '2a': 'BLINK',
-            '2b': 'FADE_STOP',
-            '2c': 'PRESET_DIM',
-            '0d': 'STATUS_ON',
-            '0e': 'STATUS_OFF',
-            '0f': 'STATUS_REQUEST',
-            '30': 'REC_MASTER_ADD_SETUP',
-            '31': 'TRA_MASTER_ADD_SETUP',
-            '12': 'SCENE_ADR_SETUP',
-            '13': 'SCENE_ADR_ERASE',
-            '34': 'ALL_SCENES_ADD_ERASE',
-            '15': 'FOR FUTURE',
-            '16': 'FOR FUTURE',
-            '17': 'FOR FUTURE',
-            '18': 'GET_SIGNAL_STRENGTH',
-            '19': 'GET_NOISE_STRENGTH',
-            '1a': 'REPORT_SIGNAL_STREN',
-            '1b': 'REPORT_NOISE_STREN',
-            '1c': 'GET_ALL_ID_PULSE',
-            '1d': 'GET_ALL_ON_ID_PULSE',
-            '1e': 'REPORT_ALL_ID_PULSE',
-            '1f': 'REPORT_ONLY_ON_PULSE'}
-            home = "ABCDEFGHIJKLMNOP"
-            r = {}
-            r["start_bit"] = message[0:2]
-            r["data_length"] = int(message[2:4])
-            int_length = int(message[2:4])*2
-            r["data"] = message[4:5+int_length]
-            r["d_user_code"] = r["data"][0:2]
-            r["d_home_unit"] = "%s%s" % (home[int(r["data"][2:3], 16)],int(r["data"][3:4], 16)+1)
-            r["d_command"] = cmdplcbus[r["data"][4:6]]
-            r["d_data1"] = int(r["data"][6:8],16)
-            r["d_data2"] = int(r["data"][8:10],16)
-            if r["data_length"] == 6:
-                r["rx_tw_switch"] = r["data"][11:]
-            r["end_bit"] = message[-2:]
-            return r
+        """ Parse a frame 
+        """
+        cmdplcbus = {
+        '00': 'ALL_UNITS_OFF',
+        '01': 'ALL_LIGHTS_ON',
+        '22': 'ON', #ON and ask to send ACK (instead of '02')
+        '23': 'OFF', #OFF and send ACK
+        '24': 'DIM',
+        '25': 'BRIGHT',
+        '06': 'ALL_LIGHTS_OFF',
+        '07': 'ALL_USER_LTS_ON',
+        '08': 'ALL_USER_UNIT_OFF',
+        '09': 'ALL_USER_LIGHT_OFF',
+        '2a': 'BLINK',
+        '2b': 'FADE_STOP',
+        '2c': 'PRESET_DIM',
+        '0d': 'STATUS_ON',
+        '0e': 'STATUS_OFF',
+        '0f': 'STATUS_REQUEST',
+        '30': 'REC_MASTER_ADD_SETUP',
+        '31': 'TRA_MASTER_ADD_SETUP',
+        '12': 'SCENE_ADR_SETUP',
+        '13': 'SCENE_ADR_ERASE',
+        '34': 'ALL_SCENES_ADD_ERASE',
+        '15': 'FOR FUTURE',
+        '16': 'FOR FUTURE',
+        '17': 'FOR FUTURE',
+        '18': 'GET_SIGNAL_STRENGTH',
+        '19': 'GET_NOISE_STRENGTH',
+        '1a': 'REPORT_SIGNAL_STREN',
+        '1b': 'REPORT_NOISE_STREN',
+        '1c': 'GET_ALL_ID_PULSE',
+        '1d': 'GET_ALL_ON_ID_PULSE',
+        '1e': 'REPORT_ALL_ID_PULSE',
+        '1f': 'REPORT_ONLY_ON_PULSE'}
+        home = "ABCDEFGHIJKLMNOP"
+        r = {}
+        r["start_bit"] = message[0:2]
+        r["data_length"] = int(message[2:4])
+        int_length = int(message[2:4])*2
+        r["data"] = message[4:5+int_length]
+        r["d_user_code"] = r["data"][0:2]
+        r["d_home_unit"] = "%s%s" % (home[int(r["data"][2:3], 16)],int(r["data"][3:4], 16)+1)
+        r["d_command"] = cmdplcbus[r["data"][4:6]]
+        r["d_data1"] = int(r["data"][6:8],16)
+        r["d_data2"] = int(r["data"][8:10],16)
+        if r["data_length"] == 6:
+            r["rx_tw_switch"] = r["data"][11:]
+        r["end_bit"] = message[-2:]
+        return r
 
     def receive(self):
+        print "receive"
         #Avoid to wait if there is nothing to read
 #        try:
         if self._stop.isSet():
+            print "stop set"
             return
         if self.__myser.inWaiting() < 9:
-             return
+            print "not enough data"
+            return
         message = self.__myser.read(9) #wait for max 400ms if nothing to read
 #        except IOError:
 #            pass
@@ -238,6 +240,7 @@ class serialHandler(threading.Thread):
             #And simply ignore it if it's the case 
             print "str : %s" % m_string
             if self._is_from_myself(m_string):
+                print "from myself"
                 return
             if self._is_answer(m_string):
                 print "ANSWER : %s" % m_string
@@ -261,18 +264,21 @@ class serialHandler(threading.Thread):
 
     def run(self):
         #serial handler main thread
-        self._mutex.testandset()
+#        self._mutex.testandset()
         while not self._stop.isSet():
             #The Event _has_message_to_send is only used to optimize
             #The test isSet is much faster than the empty() test 
-            count = self._send_queue.qsize()
-            if count > 0:
-                #If _has_message_to_send is locked, then there is at least 1 lock(function)
-                #in the queue, so the unlock() will just do this call, 
-                #not really unlock the mutex.
-                self._send(self._send_queue.get_nowait())
-                self._mutex.unlock()
-                self._mutex.testandset()
+            #If _has_message_to_send is locked, then there is at least 1 lock(function)
+            #in the queue, so the unlock() will just do this call, 
+            #not really unlock the mutex.
+            try:
+                item = self._send_queue.get_nowait()
+            except Queue.Empty:
+                pass
+            else:
+                self._send(item)
+#                self._mutex.unlock()
+#                self._mutex.testandset()
             #print "receiving"
             self.receive()
 
