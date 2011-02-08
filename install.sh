@@ -172,7 +172,7 @@ function update_user_config {
     if [ "$keep" = "y" -o "$keep" = "Y" ];then
             return
     fi
-    mysql_ok=false
+    mysql_ok=
     while [ ! $mysql_ok ];do 
         echo "Please set your mysql parameters."
         read -p "Username : " db_user
