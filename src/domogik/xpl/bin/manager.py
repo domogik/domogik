@@ -51,6 +51,7 @@ from domogik.xpl.common.xplconnector import READ_NETWORK_TIMEOUT
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin, XplResult
 from domogik.xpl.common.queryconfig import Query
+from domogik.common.packagexml import PackageXml, PackageException
 from xml.dom import minidom
 
 
@@ -64,14 +65,12 @@ WAIT_TIME_BETWEEN_PING = 15
 
 
 class SysManager(XplPlugin):
-    '''
-    System management from domogik
-    '''
+    """ System management from domogik
+    """
 
     def __init__(self):
-        '''
-        Init manager and start listeners
-        '''
+        """ Init manager and start listeners
+        """
 
         # Check parameters 
         parser = OptionParser()
@@ -113,7 +112,7 @@ class SysManager(XplPlugin):
         self.enable_hbeat()
         try:
             # Get components
-            self._list_components(self.get_sanitized_hostname())
+            self._list_plugins()
  
             # TODO : if -m call _list_hardware()
             #        call _refresh_hardware() every minute
@@ -132,11 +131,6 @@ class SysManager(XplPlugin):
                                         self.get_sanitized_hostname()),
                                        {"ping" : False, "startup" : True})
                     thr_dbmgr.start()
-                    #self._start_plugin("dbmgr", self.get_sanitized_hostname(), ping = False)
-                    # TODO : delete
-                    #if not self._check_component_is_running("dbmgr"):
-                    #    self.log.error("Manager started with -d, but database manager not available after a startup.\
-                    #            Please check dbmgr.log file")
     
             #Start rest
             if self.options.start_rest:
@@ -152,11 +146,6 @@ class SysManager(XplPlugin):
                                         self.get_sanitized_hostname()),
                                        {"ping" : False, "startup" : True})
                     thr_rest.start()
-                    #self._start_plugin("rest", self.get_sanitized_hostname(), ping = False)
-                    # TODO : delete
-                    #if not self._check_component_is_running("rest"):
-                    #    self.log.error("Manager started with -r, but REST manager not available after a startup.\
-                    #            Please check rest.log file")
     
             #Start trigger
             if self.options.start_trigger:
@@ -172,18 +161,13 @@ class SysManager(XplPlugin):
                                         self.get_sanitized_hostname()),
                                        {"ping" : False, "startup" : True})
                     thr_trigger.start()
-                    #self._start_plugin("trigger", self.get_sanitized_hostname(), ping = False)
-                    # TODO : delete
-                    #if not self._check_component_is_running("trigger"):
-                    #    self.log.error("Manager started with -t, but trigger manager not available after a startup.\
-                    #            Please check trigger.log file")
 
             # Start plugins at manager startup
             self.log.debug("Check non-system plugins to start at manager startup...")
             self._write_fifo("INFO", "Check non-system plugins to start at manager startup.\n")
             comp_thread = {}
-            for component in self._components:
-                name = component["name"]
+            for plugin in self._plugins:
+                name = plugin["name"]
                 self.log.debug("%s..." % name)
                 self._config = Query(self.myxpl, self.log)
                 res = XplResult()
@@ -222,8 +206,8 @@ class SysManager(XplPlugin):
                 while True:
                     time.sleep(WAIT_TIME_BETWEEN_PING)
                     ping_thread = {}
-                    for component in self._components:
-                        name = component["name"]
+                    for plugin in self._plugins:
+                        name = plugin["name"]
                         ping_thread[name] = Thread(None,
                                              self._check_component_is_running,
                                              None,
@@ -237,10 +221,10 @@ class SysManager(XplPlugin):
             print("%s" % sys.exc_info()[1])
 
     def _write_fifo(self, level, message):
-        ''' Write the message into _state_fifo fifo, with ansi color
+        """ Write the message into _state_fifo fifo, with ansi color
         @param level : one of OK,INFO,WARN,ERROR,NONE
         @param message : the message to write
-        '''
+        """
         if self._state_fifo == None:
             return
         colors = {
@@ -260,8 +244,8 @@ class SysManager(XplPlugin):
             self._state_fifo.flush()
     
     def _inc_startup_lock(self):
-        ''' Increment self._startup_count
-        '''
+        """ Increment self._startup_count
+        """
         if self._state_fifo == None:
             return
         self.log.info("lock++ acquire : %s" % self._startup_count)
@@ -271,8 +255,8 @@ class SysManager(XplPlugin):
         self.log.info("lock++ released: %s" % self._startup_count)
     
     def _dec_startup_lock(self):
-        ''' Decrement self._startup_count
-        '''
+        """ Decrement self._startup_count
+        """
         if self._state_fifo == None:
             return
         self.log.info("lock++ acquire : %s" % self._startup_count)
@@ -282,10 +266,9 @@ class SysManager(XplPlugin):
         self.log.info("lock++ released: %s" % self._startup_count)
 
     def _sys_cb(self, message):
-        '''
-        Internal callback for receiving system messages
+        """ Internal callback for receiving system messages
         @param message : xpl message received
-        '''
+        """
         self.log.debug("Call _sys_cb")
 
         cmd = message.data['command']
@@ -299,8 +282,8 @@ class SysManager(XplPlugin):
         error = ""
         if plg != "*":
             if self.get_sanitized_hostname() == host and \
-               self._is_component(plg) == False:
-                self._invalid_component(cmd, plg, host)
+               self._is_plugin(plg) == False:
+                self._invalid_plugin(cmd, plg, host)
                 return
 
         # if no error at this point, process
@@ -317,18 +300,18 @@ class SysManager(XplPlugin):
 
             # list plugin
             elif cmd == "list" and (host == self.get_sanitized_hostname() or host == "*"):
-                self._send_component_list()
+                self._send_plugin_list()
 
             # detail plugin
             elif cmd == "detail" and host == self.get_sanitized_hostname():
-                self._send_component_detail(plg, host)
+                self._send_plugin_detail(plg)
 
         # if error
         else:
             self.log.info("Error detected : %s, request %s has been cancelled" % (error, cmd))
 
-    def _invalid_component(self, cmd, plg, host):
-        """ send an invalid component message
+    def _invalid_plugin(self, cmd, plg, host):
+        """ send an invalid plugin message
              @param cmd : command
              @param plg : plugin name
              @param host : computer on which action was tried
@@ -369,7 +352,7 @@ class SysManager(XplPlugin):
                 mess.add_data({'error' : error})
                 self.myxpl.send(mess)
                 return
-        pid = self._start_comp(plg)
+        pid = self._exec_plugin(plg)
         if pid:
             # let's check if component successfully started
             time.sleep(READ_NETWORK_TIMEOUT + 0.5) # time a plugin took to die.
@@ -442,7 +425,7 @@ class SysManager(XplPlugin):
 
 
     def _check_component_is_running(self, name, startup = False):
-        ''' This method will send a ping request to a component on localhost
+        """ This method will send a ping request to a component on localhost
         and wait for the answer (max 5 seconds).
         @param name : component name
         @param startup : set to True if the method is called during manager startup 
@@ -451,7 +434,7 @@ class SysManager(XplPlugin):
                  Helpers will change in future, so the other function should
                  disappear. There is no need for the moment to put this function
                  in a library
-        '''
+        """
         self.log.info("Check if '%s' is running... (thread)" % name)
         if startup:
             self._write_fifo("INFO", "Check if %s is running.\n" % name)
@@ -485,18 +468,17 @@ class SysManager(XplPlugin):
             return False
 
     def _cb_check_component_is_running(self, message, args):
-        ''' Set the Event to true if an answer was received
-        '''
+        """ Set the Event to true if an answer was received
+        """
         self._pinglist[args["name"]].set()
 
 
-    def _start_comp(self, name):
-        '''
-        Internal method
-        Fork the process then start the component
+    def _exec_plugin(self, name):
+        """ Internal method
+        Start the plugin
         @param name : the name of the component to start
         This method does *not* check if the component exists
-        '''
+        """
         self.log.info("Start the component %s" % name)
         plg_path = "domogik.xpl.bin." + name
         __import__(plg_path)
@@ -504,21 +486,21 @@ class SysManager(XplPlugin):
         subp = Popen("/usr/bin/python %s" % plugin.__file__, shell=True)
         return subp.pid
 
-    def _delete_pid_file(self, component):
-        '''
-        Delete pid file
-        '''
+    def _delete_pid_file(self, plg):
+        """ Delete pid file
+        @param plg : plugin name
+        """
         self.log.debug("Delete pid file")
         pidfile = os.path.join(self._pid_dir_path,
-                component + ".pid")
+                plg + ".pid")
         return os.remove(pidfile)
 
-    def _read_pid_file(self, component):
-        '''
-        Read the pid in a file
-        '''
+    def _read_pid_file(self, plg):
+        """ Read the pid in a file
+        @param plg : plugin name
+        """
         pidfile = os.path.join(self._pid_dir_path,
-                component + ".pid")
+                plg + ".pid")
         try:
             fil = open(pidfile, "r")
             return fil.read()
@@ -526,20 +508,17 @@ class SysManager(XplPlugin):
             return 0
 
     def _set_status(self, plg, state):
-        """
-        Set status for a component
+        """ Set status for a component
+        @param plg : plugin name
+        @param state : status
         """ 
-        for comp in self._components:
-            if comp["name"] == plg:
-                comp["status"] = state
-
-
-
+        for plugin in self._plugins:
+            if plugin["name"] == plg:
+                plugin["status"] = state
 
     def _list_hardware(self):
-        '''
-        List domogik hardware
-        '''
+        """ List domogik hardware
+        """
         self.log.debug("Start listing available hardware")
 
         self._hardware = []
@@ -550,18 +529,19 @@ class SysManager(XplPlugin):
 
 
     def _refresh_hardware_list(self):
+        """ Refresh hardware list
+        """
         pass
         # TODO : for each hardware, check if last hbeat.* is still valid. if not, set status to off
         # call this function every minute
 
 
-    def _list_components(self, host):
-        '''
-        List domogik plugins
-        '''
+    def _list_plugins(self):
+        """ List domogik plugins
+        """
         self.log.debug("Start listing available plugins")
 
-        self._components = []
+        self._plugins = []
 
         # Getplugin list
         plugins = Loader('plugins')
@@ -575,42 +555,18 @@ class SysManager(XplPlugin):
                 xml_file = "%s/%s.xml" % (self._xml_plugin_directory, plugin)
                 try:
                     # get data for plugin
-                    xml_content = minidom.parse(xml_file)
-                    plgname = xml_content.getElementsByTagName("name")[0].firstChild.nodeValue
-                    plgdesc = xml_content.getElementsByTagName("description")[0].firstChild.nodeValue
-                    plgtech = xml_content.getElementsByTagName("technology")[0].firstChild.nodeValue
-                    plgver = xml_content.getElementsByTagName("version")[0].firstChild.nodeValue
-                    plgdoc = xml_content.getElementsByTagName("documentation")[0].firstChild.nodeValue
-
-                    # config part
-                    config = xml_content.getElementsByTagName("configuration-keys")[0]
-                    plgconf = []
-                    for key in config.getElementsByTagName("key"):
-                        k_id = key.getElementsByTagName("order-id")[0].firstChild.nodeValue
-                        k_key = key.getElementsByTagName("name")[0].firstChild.nodeValue
-                        k_description = key.getElementsByTagName("description")[0].firstChild.nodeValue
-                        k_type = key.getElementsByTagName("type")[0].firstChild.nodeValue
-                        try:
-                            k_default = key.getElementsByTagName("default-value")[0].firstChild.nodeValue
-                        except AttributeError:
-                            # no value in default
-                            k_default = ""
-                        plgconf.append({"id" : k_id,
-                                        "key" : k_key,
-                                        "description" : k_description,
-                                        "type" : k_type,
-                                        "default" : k_default})
-                    self.log.debug("  All elements from xml file found")
+                    plg_xml = PackageXml(path = xml_file)
 
                     # register plugin
-                    self._components.append({"name" : plgname, 
-                                             "description" : plgdesc, 
-                                             "technology" : plgtech, 
-                                             "status" : "OFF",
-                                             "host" : self.get_sanitized_hostname(), 
-                                             "version" : plgver,
-                                             "documentation" : plgdoc,
-                                             "configuration" : plgconf})
+                    self._plugins.append({"type" : plg_xml.type,
+                                      "name" : plg_xml.name, 
+                                      "description" : plg_xml.desc, 
+                                      "technology" : plg_xml.techno,
+                                      "status" : "OFF",
+                                      "host" : self.get_sanitized_hostname(), 
+                                      "version" : plg_xml.version,
+                                      "documentation" : plg_xml.doc,
+                                      "configuration" : plg_xml.configuration})
 
                     # check plugin state (will update component status)
                     state_thread[plgname] = Thread(None,
@@ -628,17 +584,16 @@ class SysManager(XplPlugin):
         return
 
 
-    def _is_component(self, name):
-        '''
-        Is a component a plugin ?
+    def _is_plugin(self, name):
+        """ Is a component a plugin ?
         @param name : component name to check
-        '''
-        for component in self._components:
-            if component["name"] == name:
+        """
+        for plugin in self._plugins:
+            if plugin["name"] == name:
                 return True
         return False
 
-    def _send_component_list(self):
+    def _send_plugin_list(self):
         """ send compoennt list
         """
         mess = XplMessage()
@@ -646,39 +601,41 @@ class SysManager(XplPlugin):
         mess.set_schema('domogik.system')
         mess.add_data({'command' :  'list'})
         idx = 0
-        for component in self._components:
-            plg_content = "%s,%s,%s,%s" % (component["name"],
-                                        component["technology"],
-                                        component["status"],
-                                        component["description"])
+        for plugin in self._plugins:
+            # TODO : revoir format du message xpl
+            #        ajouter le type (plugin["type"])
+            plg_content = "%s,%s,%s,%s" % (plugin["name"],
+                                        plugin["technology"],
+                                        plugin["status"],
+                                        plugin["description"])
             mess.add_data({'plugin'+str(idx) : plg_content})
             idx += 1
         mess.add_data({'host' : self.get_sanitized_hostname()})
         self.myxpl.send(mess)
 
-    def _send_component_detail(self, plg, host):
+    def _send_plugin_detail(self, plg):
         """ send details about a component 
             @param plg : plugin name
-            @param host : computer on which is plugin
         """
         mess = XplMessage()
         mess.set_type('xpl-trig')
         mess.set_schema('domogik.system')
         mess.add_data({'command' :  'detail'})
-        for component in self._components:
-            if component["name"] == plg:
-                for conf in component["configuration"]:
+        for plugin in self._plugins:
+            if plugin["name"] == plg:
+                for conf in plugin["configuration"]:
                     conf_content = "%s,%s,%s,%s" % (conf["key"],
                                                 conf["type"],
                                                 conf["description"],
                                                 conf["default"])
                     mess.add_data({'config'+str(conf["id"]) : conf_content})
-                mess.add_data({'plugin' :  component["name"]})
-                mess.add_data({'description' :  component["description"]})
-                mess.add_data({'technology' :  component["technology"]})
-                mess.add_data({'status' :  component["status"]})
-                mess.add_data({'version' :  component["version"]})
-                mess.add_data({'documentation' :  component["documentation"]})
+                mess.add_data({'type' :  plugin["type"]})
+                mess.add_data({'plugin' :  plugin["name"]})
+                mess.add_data({'description' :  plugin["description"]})
+                mess.add_data({'technology' :  plugin["technology"]})
+                mess.add_data({'status' :  plugin["status"]})
+                mess.add_data({'version' :  plugin["version"]})
+                mess.add_data({'documentation' :  plugin["documentation"]})
                 mess.add_data({'host' : self.get_sanitized_hostname()})
 
         self.myxpl.send(mess)

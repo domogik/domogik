@@ -99,6 +99,26 @@ class PackageXml():
             self.doc = self.xml_content.getElementsByTagName("documentation")[0].firstChild.nodeValue.strip()
             self.author = self.xml_content.getElementsByTagName("author")[0].firstChild.nodeValue.strip()
             self.email = self.xml_content.getElementsByTagName("author-email")[0].firstChild.nodeValue.strip()
+
+            # list of configurations keys
+            self.configuration = []
+            config = self.xml_content.getElementsByTagName("configuration-keys")[0]
+            for key in config.getElementsByTagName("key"):
+                k_id = key.getElementsByTagName("order-id")[0].firstChild.nodeValue
+                k_key = key.getElementsByTagName("name")[0].firstChild.nodeValue
+                k_desc = key.getElementsByTagName("description")[0].firstChild.nodeValue
+                k_type = key.getElementsByTagName("type")[0].firstChild.nodeValue
+                try:
+                    k_default = key.getElementsByTagName("default-value")[0].firstChild.nodeValue
+                except AttributeError:
+                    # no value in default
+                    k_default = ""
+                self.configuration.append({"id" : k_id,
+                                           "key" : k_key,
+                                           "desc" : k_desc,
+                                           "type" : k_type,
+                                           "default" : k_default})
+
             # list of files
             self.files = []
             xml_data = self.xml_content.getElementsByTagName("files")[0]
