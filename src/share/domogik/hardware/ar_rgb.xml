@@ -1,0 +1,44 @@
+<package type="hardware">
+  <name>ar_rgb</name>
+  <technology>arduino</technology>
+  <description>Control RGB leds with an arduino and an ethernet shield</description>
+  <detail>control RGB leds. This requires : 
+- Arduino Uno or similar
+- Official ethernet shield </detail>
+  <version>0.1.0</version>
+  <documentation>http://wiki.domogik.org/hardware_ar_rgb</documentation>
+  <author>Fritz</author>
+  <author-email>fritz.smh at gmail.com</author-email>
+  <configuration-keys/>
+  <files>
+    <file path="src/share/domogik/hardware/ar_rgb.xml"/>
+  </files>
+  <dependencies/>
+  <device_technology>
+      <id>arduino</id>
+      <name>Arduino</name>
+      <description>Arduino</description>
+  </device_technology>
+  <device_types>
+      <device_type>
+          <id>arduino.rgb_leds</id>
+          <device_technology_id>arduino</device_technology_id>
+          <name>RGB leds controller</name>
+          <description>RGB leds controller</description>
+      </device_type>
+  </device_types>
+  <device_feature_models>
+      <device_feature_model>
+          <id>arduino.rgb_leds.code</id>
+          <name>Code</name>
+          <feature_type>actuator</feature_type>
+          <device_type_id>arduino.rgb_leds</device_type_id>
+          <parameters>
+              {&quot;output&quot;:&quot;&quot;,&quot;value0&quot;:&quot;low&quot;, &quot;value1&quot;:&quot;high&quot;}
+          </parameters>
+          <value_type>string</value_type>
+          <stat_key>color</stat_key>
+          <return_confirmation>1</return_confirmation>
+      </device_feature_model>
+  </device_feature_models>
+</package>

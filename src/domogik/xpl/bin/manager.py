@@ -83,6 +83,8 @@ class SysManager(XplPlugin):
             help="Start scenario manager if not already running.")
         parser.add_option("-p", action="store_true", dest="allow_ping", default=False, \
             help="Activate background ping for all plugins.")
+        parser.add_option("-m", action="store_true", dest="is_master", default=False, \
+            help="This manager is the Master.")
         XplPlugin.__init__(self, name = 'manager', parser=parser)
 
         self.enable_hbeat()
@@ -106,11 +108,15 @@ class SysManager(XplPlugin):
         self._pid_dir_path = conf['pid_dir_path']
     
         self._xml_plugin_directory = "%s/share/domogik/plugins/" % conf['custom_prefix']
+        self._xml_hardware_directory = "%s/share/domogik/hardware/" % conf['custom_prefix']
         self._pinglist = {}
         self.enable_hbeat()
         try:
             # Get components
             self._list_components(self.get_sanitized_hostname())
+ 
+            # TODO : if -m call _list_hardware()
+            #        call _refresh_hardware() every minute
     
             #Start dbmgr
             if self.options.start_dbmgr:
@@ -528,6 +534,25 @@ class SysManager(XplPlugin):
                 comp["status"] = state
 
 
+
+
+    def _list_hardware(self):
+        '''
+        List domogik hardware
+        '''
+        self.log.debug("Start listing available hardware")
+
+        self._hardware = []
+
+        # TODO : read all xml files
+        # for each xml file create a listener on source pattern
+        # create a callback function to add hardware in the list
+
+
+    def _refresh_hardware_list(self):
+        pass
+        # TODO : for each hardware, check if last hbeat.* is still valid. if not, set status to off
+        # call this function every minute
 
 
     def _list_components(self, host):

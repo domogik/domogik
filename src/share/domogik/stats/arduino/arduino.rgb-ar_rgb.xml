@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<statistic technology="arduino">
+    <schema name="arduino.rgb">
+        <xpltype type="xpl-trig">
+            <listener>
+                <filter/>
+            </listener>
+            <mapping>
+                <device field="device"/>
+                <value field=color"/>
+            </mapping>
+        </xpltype>
+    </schema>
+</statistic>
