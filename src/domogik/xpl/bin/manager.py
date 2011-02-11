@@ -196,10 +196,11 @@ class SysManager(XplPlugin):
                 'xpltype': 'xpl-cmnd',
             })
     
-            Listener(self._foooooo, self.myxpl, {
-                'schema': 'hbeat.app',
-                'xpltype': 'xpl-stat',
-            })
+            if self.options.check_hardware:
+                Listener(self._foooooo, self.myxpl, {
+                    'schema': 'hbeat.app',
+                    'xpltype': 'xpl-stat',
+                })
     
             if self._state_fifo != None:
                 while self._startup_count > 0:
