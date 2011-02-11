@@ -136,7 +136,7 @@
 .icon32-usage-light.actuator.binary.unknown { background-image:url(../images/device_usage/light/undefined_32.png);}
 .icon32-usage-light.actuator.binary.value_0 { background-image:url(../images/device_usage/light/0_32.png);}
 .icon32-usage-light.actuator.binary.value_1 { background-image:url(../images/device_usage/light/100_32.png);}
-.icon32-usage-light.actuator.trigger { background-image:url(../images/device_usage/light/100_32.png);}
+.icon32-usage-light.actuator.trigger { background-image:url(../images/device_usage/light/undefined_32.png);}
 .icon32-usage-light.actuator.number { background-image:url(../images/device_usage/light/100_32.png);}
 .icon32-usage-light.actuator.range.unknown { background-image:url(../images/device_usage/light/undefined_32.png);}
 .icon32-usage-light.actuator.range.value_0 { background-image:url(../images/device_usage/light/0_32.png);}
@@ -161,7 +161,7 @@
 .icon32-usage-appliance.actuator.binary.unknown { background-image:url(../images/device_usage/appliance/undefined_32.png);}
 .icon32-usage-appliance.actuator.binary.value_0 { background-image:url(../images/device_usage/appliance/0_32.png);}
 .icon32-usage-appliance.actuator.binary.value_1 { background-image:url(../images/device_usage/appliance/100_32.png);}
-.icon32-usage-appliance.actuator.trigger { background-image:url(../images/device_usage/appliance/100_32.png);}
+.icon32-usage-appliance.actuator.trigger { background-image:url(../images/device_usage/appliance/undefined_32.png);}
 .icon32-usage-appliance.actuator.number { background-image:url(../images/device_usage/appliance/100_32.png);}
 .icon32-usage-appliance.actuator.range.unknown { background-image:url(../images/device_usage/appliance/undefined_32.png);}
 .icon32-usage-appliance.actuator.range.value_0 { background-image:url(../images/device_usage/appliance/0_32.png);}
@@ -186,7 +186,7 @@
 .icon32-usage-shutter.actuator.binary.unknown { background-image:url(../images/device_usage/shutter/undefined_32.png);}
 .icon32-usage-shutter.actuator.binary.value_0 { background-image:url(../images/device_usage/shutter/0_32.png);}
 .icon32-usage-shutter.actuator.binary.value_1 { background-image:url(../images/device_usage/shutter/100_32.png);}
-.icon32-usage-shutter.actuator.trigger { background-image:url(../images/device_usage/shutter/100_32.png);}
+.icon32-usage-shutter.actuator.trigger { background-image:url(../images/device_usage/shutter/undefined_32.png);}
 .icon32-usage-shutter.actuator.number { background-image:url(../images/device_usage/shutter/100_32.png);}
 .icon32-usage-shutter.actuator.range.unknown { background-image:url(../images/device_usage/shutter/undefined_32.png);}
 .icon32-usage-shutter.actuator.range.value_0 { background-image:url(../images/device_usage/shutter/0_32.png);}
@@ -211,7 +211,7 @@
 .icon32-usage-air_conditionning.actuator.binary.unknown { background-image:url(../images/device_usage/air_conditionning/undefined_32.png);}
 .icon32-usage-air_conditionning.actuator.binary.value_0 { background-image:url(../images/device_usage/air_conditionning/0_32.png);}
 .icon32-usage-air_conditionning.actuator.binary.value_1 { background-image:url(../images/device_usage/air_conditionning/100_32.png);}
-.icon32-usage-air_conditionning.actuator.trigger { background-image:url(../images/device_usage/air_conditionning/100_32.png);}
+.icon32-usage-air_conditionning.actuator.trigger { background-image:url(../images/device_usage/air_conditionning/undefined_32.png);}
 .icon32-usage-air_conditionning.actuator.number { background-image:url(../images/device_usage/air_conditionning/100_32.png);}
 .icon32-usage-air_conditionning.actuator.range.unknown { background-image:url(../images/device_usage/air_conditionning/undefined_32.png);}
 .icon32-usage-air_conditionning.actuator.range.value_0 { background-image:url(../images/device_usage/air_conditionning/0_32.png);}
@@ -236,7 +236,7 @@
 .icon32-usage-ventilation.actuator.binary.unknown { background-image:url(../images/device_usage/ventilation/undefined_32.png);}
 .icon32-usage-ventilation.actuator.binary.value_0 { background-image:url(../images/device_usage/ventilation/0_32.png);}
 .icon32-usage-ventilation.actuator.binary.value_1 { background-image:url(../images/device_usage/ventilation/100_32.png);}
-.icon32-usage-ventilation.actuator.trigger { background-image:url(../images/device_usage/ventilation/100_32.png);}
+.icon32-usage-ventilation.actuator.trigger { background-image:url(../images/device_usage/ventilation/undefined_32.png);}
 .icon32-usage-ventilation.actuator.number { background-image:url(../images/device_usage/ventilation/100_32.png);}
 .icon32-usage-ventilation.actuator.range.unknown { background-image:url(../images/device_usage/ventilation/undefined_32.png);}
 .icon32-usage-ventilation.actuator.range.value_0 { background-image:url(../images/device_usage/ventilation/0_32.png);}
@@ -261,7 +261,7 @@
 .icon32-usage-heating.actuator.binary.unknown { background-image:url(../images/device_usage/heating/undefined_32.png);}
 .icon32-usage-heating.actuator.binary.value_0 { background-image:url(../images/device_usage/heating/0_32.png);}
 .icon32-usage-heating.actuator.binary.value_1 { background-image:url(../images/device_usage/heating/100_32.png);}
-.icon32-usage-heating.actuator.trigger { background-image:url(../images/device_usage/heating/100_32.png);}
+.icon32-usage-heating.actuator.trigger { background-image:url(../images/device_usage/heating/undefined_32.png);}
 .icon32-usage-heating.actuator.number { background-image:url(../images/device_usage/heating/100_32.png);}
 .icon32-usage-heating.actuator.range.unknown { background-image:url(../images/device_usage/heating/undefined_32.png);}
 .icon32-usage-heating.actuator.range.value_0 { background-image:url(../images/device_usage/heating/0_32.png);}
@@ -277,7 +277,7 @@
 .icon32-usage-computer.actuator.binary.unknown { background-image:url(../images/device_usage/computer/undefined_32.png);}
 .icon32-usage-computer.actuator.binary.value_0 { background-image:url(../images/device_usage/computer/0_32.png);}
 .icon32-usage-computer.actuator.binary.value_1 { background-image:url(../images/device_usage/computer/100_32.png);}
-.icon32-usage-computer.actuator.trigger { background-image:url(../images/device_usage/computer/100_32.png);}
+.icon32-usage-computer.actuator.trigger { background-image:url(../images/device_usage/computer/undefined_32.png);}
 .icon32-usage-computer.actuator.number { background-image:url(../images/device_usage/computer/100_32.png);}
 .icon32-usage-computer.actuator.range.unknown { background-image:url(../images/device_usage/computer/undefined_32.png);}
 .icon32-usage-computer.actuator.range.value_0 { background-image:url(../images/device_usage/computer/0_32.png);}
@@ -293,7 +293,7 @@
 .icon32-usage-server.actuator.binary.unknown { background-image:url(../images/device_usage/server/undefined_32.png);}
 .icon32-usage-server.actuator.binary.value_0 { background-image:url(../images/device_usage/server/0_32.png);}
 .icon32-usage-server.actuator.binary.value_1 { background-image:url(../images/device_usage/server/100_32.png);}
-.icon32-usage-server.actuator.trigger { background-image:url(../images/device_usage/server/100_32.png);}
+.icon32-usage-server.actuator.trigger { background-image:url(../images/device_usage/server/undefined_32.png);}
 .icon32-usage-server.actuator.number { background-image:url(../images/device_usage/server/100_32.png);}
 .icon32-usage-server.actuator.range.unknown { background-image:url(../images/device_usage/server/undefined_32.png);}
 .icon32-usage-server.actuator.range.value_0 { background-image:url(../images/device_usage/server/0_32.png);}
@@ -309,7 +309,7 @@
 .icon32-usage-telephony.actuator.binary.unknown { background-image:url(../images/device_usage/telephony/undefined_32.png);}
 .icon32-usage-telephony.actuator.binary.value_0 { background-image:url(../images/device_usage/telephony/0_32.png);}
 .icon32-usage-telephony.actuator.binary.value_1 { background-image:url(../images/device_usage/telephony/100_32.png);}
-.icon32-usage-telephony.actuator.trigger { background-image:url(../images/device_usage/telephony/100_32.png);}
+.icon32-usage-telephony.actuator.trigger { background-image:url(../images/device_usage/telephony/undefined_32.png);}
 .icon32-usage-telephony.actuator.number { background-image:url(../images/device_usage/telephony/100_32.png);}
 .icon32-usage-telephony.actuator.range.unknown { background-image:url(../images/device_usage/telephony/undefined_32.png);}
 .icon32-usage-telephony.actuator.range.value_0 { background-image:url(../images/device_usage/telephony/0_32.png);}
@@ -325,7 +325,7 @@
 .icon32-usage-tv.actuator.binary.unknown { background-image:url(../images/device_usage/tv/undefined_32.png);}
 .icon32-usage-tv.actuator.binary.value_0 { background-image:url(../images/device_usage/tv/0_32.png);}
 .icon32-usage-tv.actuator.binary.value_1 { background-image:url(../images/device_usage/tv/100_32.png);}
-.icon32-usage-tv.actuator.trigger { background-image:url(../images/device_usage/tv/100_32.png);}
+.icon32-usage-tv.actuator.trigger { background-image:url(../images/device_usage/tv/undefined_32.png);}
 .icon32-usage-tv.actuator.number { background-image:url(../images/device_usage/tv/100_32.png);}
 .icon32-usage-tv.actuator.range.unknown { background-image:url(../images/device_usage/tv/undefined_32.png);}
 .icon32-usage-tv.actuator.range.value_0 { background-image:url(../images/device_usage/tv/0_32.png);}
@@ -341,7 +341,7 @@
 .icon32-usage-water.actuator.binary.unknown { background-image:url(../images/device_usage/water/undefined_32.png);}
 .icon32-usage-water.actuator.binary.value_0 { background-image:url(../images/device_usage/water/0_32.png);}
 .icon32-usage-water.actuator.binary.value_1 { background-image:url(../images/device_usage/water/100_32.png);}
-.icon32-usage-water.actuator.trigger { background-image:url(../images/device_usage/water/100_32.png);}
+.icon32-usage-water.actuator.trigger { background-image:url(../images/device_usage/water/undefined_32.png);}
 .icon32-usage-water.actuator.number { background-image:url(../images/device_usage/water/100_32.png);}
 .icon32-usage-water.actuator.range.unknown { background-image:url(../images/device_usage/water/undefined_32.png);}
 .icon32-usage-water.actuator.range.value_0 { background-image:url(../images/device_usage/water/0_32.png);}
@@ -357,7 +357,7 @@
 .icon32-usage-gas.actuator.binary.unknown { background-image:url(../images/device_usage/default/undefined_32.png);}
 .icon32-usage-gas.actuator.binary.value_0 { background-image:url(../images/device_usage/default/0_32.png);}
 .icon32-usage-gas.actuator.binary.value_1 { background-image:url(../images/device_usage/default/100_32.png);}
-.icon32-usage-gas.actuator.trigger { background-image:url(../images/device_usage/default/100_32.png);}
+.icon32-usage-gas.actuator.trigger { background-image:url(../images/device_usage/default/undefined_32.png);}
 .icon32-usage-gas.actuator.number { background-image:url(../images/device_usage/default/100_32.png);}
 .icon32-usage-gas.actuator.range.unknown { background-image:url(../images/device_usage/default/undefined_32.png);}
 .icon32-usage-gas.actuator.range.value_0 { background-image:url(../images/device_usage/default/0_32.png);}
@@ -373,7 +373,7 @@
 .icon32-usage-electricity.actuator.binary.unknown { background-image:url(../images/device_usage/electricity/undefined_32.png);}
 .icon32-usage-electricity.actuator.binary.value_0 { background-image:url(../images/device_usage/electricity/0_32.png);}
 .icon32-usage-electricity.actuator.binary.value_1 { background-image:url(../images/device_usage/electricity/100_32.png);}
-.icon32-usage-electricity.actuator.trigger { background-image:url(../images/device_usage/electricity/100_32.png);}
+.icon32-usage-electricity.actuator.trigger { background-image:url(../images/device_usage/electricity/undefined_32.png);}
 .icon32-usage-electricity.actuator.number { background-image:url(../images/device_usage/electricity/100_32.png);}
 .icon32-usage-electricity.actuator.range.unknown { background-image:url(../images/device_usage/electricity/undefined_32.png);}
 .icon32-usage-electricity.actuator.range.value_0 { background-image:url(../images/device_usage/electricity/0_32.png);}
@@ -389,7 +389,7 @@
 .icon32-usage-temperature.actuator.binary.unknown { background-image:url(../images/device_usage/temperature/undefined_32.png);}
 .icon32-usage-temperature.actuator.binary.value_0 { background-image:url(../images/device_usage/temperature/0_32.png);}
 .icon32-usage-temperature.actuator.binary.value_1 { background-image:url(../images/device_usage/temperature/100_32.png);}
-.icon32-usage-temperature.actuator.trigger { background-image:url(../images/device_usage/temperature/100_32.png);}
+.icon32-usage-temperature.actuator.trigger { background-image:url(../images/device_usage/temperature/undefined_32.png);}
 .icon32-usage-temperature.actuator.number { background-image:url(../images/device_usage/temperature/100_32.png);}
 .icon32-usage-temperature.actuator.range.unknown { background-image:url(../images/device_usage/temperature/undefined_32.png);}
 .icon32-usage-temperature.actuator.range.value_0 { background-image:url(../images/device_usage/temperature/0_32.png);}
@@ -405,7 +405,7 @@
 .icon32-usage-mirror.actuator.binary.unknown { background-image:url(../images/device_usage/mirror/undefined_32.png);}
 .icon32-usage-mirror.actuator.binary.value_0 { background-image:url(../images/device_usage/mirror/0_32.png);}
 .icon32-usage-mirror.actuator.binary.value_1 { background-image:url(../images/device_usage/mirror/100_32.png);}
-.icon32-usage-mirror.actuator.trigger { background-image:url(../images/device_usage/mirror/100_32.png);}
+.icon32-usage-mirror.actuator.trigger { background-image:url(../images/device_usage/mirror/undefined_32.png);}
 .icon32-usage-mirror.actuator.number { background-image:url(../images/device_usage/mirror/100_32.png);}
 .icon32-usage-mirror.actuator.range.unknown { background-image:url(../images/device_usage/mirror/undefined_32.png);}
 .icon32-usage-mirror.actuator.range.value_0 { background-image:url(../images/device_usage/mirror/0_32.png);}
@@ -421,7 +421,7 @@
 .icon32-usage-nanoztag.actuator.binary.unknown { background-image:url(../images/device_usage/nanoztag/undefined_32.png);}
 .icon32-usage-nanoztag.actuator.binary.value_0 { background-image:url(../images/device_usage/nanoztag/0_32.png);}
 .icon32-usage-nanoztag.actuator.binary.value_1 { background-image:url(../images/device_usage/nanoztag/100_32.png);}
-.icon32-usage-nanoztag.actuator.trigger { background-image:url(../images/device_usage/nanoztag/100_32.png);}
+.icon32-usage-nanoztag.actuator.trigger { background-image:url(../images/device_usage/nanoztag/undefined_32.png);}
 .icon32-usage-nanoztag.actuator.number { background-image:url(../images/device_usage/nanoztag/100_32.png);}
 .icon32-usage-nanoztag.actuator.range.unknown { background-image:url(../images/device_usage/nanoztag/undefined_32.png);}
 .icon32-usage-nanoztag.actuator.range.value_0 { background-image:url(../images/device_usage/nanoztag/0_32.png);}
@@ -437,7 +437,7 @@
 .icon32-usage-music.actuator.binary.unknown { background-image:url(../images/device_usage/music/undefined_32.png);}
 .icon32-usage-music.actuator.binary.value_0 { background-image:url(../images/device_usage/music/0_32.png);}
 .icon32-usage-music.actuator.binary.value_1 { background-image:url(../images/device_usage/music/100_32.png);}
-.icon32-usage-music.actuator.trigger { background-image:url(../images/device_usage/music/100_32.png);}
+.icon32-usage-music.actuator.trigger { background-image:url(../images/device_usage/music/undefined_32.png);}
 .icon32-usage-music.actuator.number { background-image:url(../images/device_usage/music/100_32.png);}
 .icon32-usage-music.actuator.range.unknown { background-image:url(../images/device_usage/music/undefined_32.png);}
 .icon32-usage-music.actuator.range.value_0 { background-image:url(../images/device_usage/music/0_32.png);}
