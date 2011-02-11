@@ -71,7 +71,7 @@ class StatsManager:
     
             # logging initialization for unkwnon devices
             log_unknown = logger.Logger('rest-stat-unknown-devices')
-            self._log_stats_unknown = log_unknown.get_logger('rest-stat-unknown-device')
+            self._log_stats_unknown = log_unknown.get_logger('rest-stat-unknown-devices')
     
             files = glob.glob("%s/*/*xml" % directory)
             stats = {}
