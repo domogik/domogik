@@ -52,6 +52,7 @@ from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin, XplResult
 from domogik.xpl.common.queryconfig import Query
 from domogik.common.packagexml import PackageXml, PackageException
+from domogik.xpl.common.xplconnector import XplTimer 
 from xml.dom import minidom
 
 
@@ -110,12 +111,12 @@ class SysManager(XplPlugin):
         self._pinglist = {}
         self._plugins = []
         self._hardwares = []
-        self.enable_hbeat()
+        self._hardware_models = []
         try:
             # Get components
             self._list_plugins()
             if self.options.check_hardware == True:
-                self._list_hardware()
+                self._list_hardware_models()
  
             # TODO : if -m call _list_hardware()
             #        call _refresh_hardware() every minute
@@ -201,6 +202,17 @@ class SysManager(XplPlugin):
                     'schema': 'hbeat.app',
                     'xpltype': 'xpl-stat',
                 })
+
+            # define timers
+            if self.options.check_hardware:
+                hardware_stop = Event()
+                hardware_timer = XplTimer(20, 
+                                          self._check_hardware_status, 
+                                          hardware_stop,
+                                          self.myxpl)
+                hardware_timer.start()
+
+            self.enable_hbeat()
     
             if self._state_fifo != None:
                 while self._startup_count > 0:
@@ -528,12 +540,12 @@ class SysManager(XplPlugin):
             if plugin["name"] == plg:
                 plugin["status"] = state
 
-    def _list_hardware(self):
-        """ List domogik hardware
+    def _list_hardware_models(self):
+        """ List domogik hardware models
         """
-        self.log.debug("Start listing available hardware")
+        self.log.debug("Start listing available hardware models")
 
-        self._hardwares = []
+        self._hardware_models = []
 
         # Get hardware list
         hardwares = Loader('hardwares')
@@ -550,30 +562,19 @@ class SysManager(XplPlugin):
                     plg_xml = PackageXml(path = xml_file)
 
                     # register plugin
-                    self._hardwares.append({"type" : plg_xml.type,
+                    self._hardware_models.append({"type" : plg_xml.type,
                                       "name" : plg_xml.name, 
                                       "description" : plg_xml.desc, 
                                       "technology" : plg_xml.techno,
-                                      "status" : "OFF",
-                                      "host" : "TODO",
                                       "version" : plg_xml.version,
                                       "documentation" : plg_xml.doc,
-                                      "configuration" : plg_xml.configuration})
-
-                    # TODO : call appropriate function
-                    # check plugin state (will update component status)
-                    #state_thread[plg_xml.name] = Thread(None,
-                    #                               self._check_component_is_running,
-                    #                               None,
-                    #                               (plg_xml.name, None),
-                    #                               {})
-                    #state_thread[plg_xml.name].start()
+                                      "vendor_id" : plg_xml.vendor_id,
+                                      "device_id" : plg_xml.device_id})
 
                 except:
                     print("Error reading xml file : %s\n%s" % (xml_file, str(traceback.format_exc())))
                     self.log.error("Error reading xml file : %s. Detail : \n%s" % (xml_file, str(traceback.format_exc())))
 
-                # get data from xml file
         return
 
 
@@ -581,9 +582,49 @@ class SysManager(XplPlugin):
         """ Refresh hardware list
             @param message : xpl message
         """
-        print message.source
-        # TODO : for each hardware, check if last hbeat.* is still valid. if not, set status to off
-        # call this function every minute
+        vendor_device = message.source.split(".")[0]
+        instance = message.source.split(".")[1]
+        for hardware_model in self._hardware_models:
+            msg_vendor_device = "%s-%s" % (hardware_model["vendor_id"], 
+                                           hardware_model["device_id"])
+            if vendor_device == msg_vendor_device:
+                found = False
+                for hardware in self._hardwares:
+                    if hardware["host"] == instance:
+                        hardware["status"] = "ON"
+                        hardware["last_seen"] = time.time()
+                        # interval converted from minutes to seconds : *60
+                        hardware["interval"] = int(message.data["interval"])*60
+                        found = True
+                        self.log.info("Set hardware status ON : %s on %s" % \
+                                                   (hardware["name"], instance))
+                     
+                if found == False:
+                    self._hardwares.append({"type" : hardware_model["type"],
+                              "name" : hardware_model["name"], 
+                              "description" : hardware_model["description"], 
+                              "technology" : hardware_model["technology"],
+                              "status" : "ON",
+                              "host" : instance,
+                              "version" : hardware_model["version"],
+                              "documentation" : hardware_model["documentation"],
+                              "vendor_id" : hardware_model["vendor_id"],
+                              "device_id" : hardware_model["device_id"],
+                              "interval" : int(message.data["interval"]) * 60,
+                              "last_seen" : time.time()})
+                    self.log.info("Add hardware : %s on %s" % \
+                                             (hardware_model["name"], instance))
+
+    def _check_hardware_status(self):
+        """ Check if hardwares are always present
+        """
+        for hardware in self._hardwares:
+            # if hardware was not seen in the interval its tells, 
+            # we consider it as OFF
+            if time.time() - hardware["last_seen"] > hardware["interval"]:
+                hardware["status"] = "OFF"
+                self.log.info("Set hardware status OFF : %s on %s" % \
+                                       (hardware["name"], hardware["host"]))
 
 
     def _list_plugins(self):

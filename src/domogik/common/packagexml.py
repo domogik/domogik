@@ -93,12 +93,19 @@ class PackageXml():
             self.name = self.xml_content.getElementsByTagName("name")[0].firstChild.nodeValue.strip()
             self.desc = self.xml_content.getElementsByTagName("description")[0].firstChild.nodeValue.strip()
             self.detail = self.xml_content.getElementsByTagName("detail")[0].firstChild.nodeValue.strip()
-            # TODO : remove
-            #self.techno = self.xml_content.getElementsByTagName("technology")[0].firstChild.nodeValue.strip()
             self.version = self.xml_content.getElementsByTagName("version")[0].firstChild.nodeValue.strip()
             self.doc = self.xml_content.getElementsByTagName("documentation")[0].firstChild.nodeValue.strip()
             self.author = self.xml_content.getElementsByTagName("author")[0].firstChild.nodeValue.strip()
             self.email = self.xml_content.getElementsByTagName("author-email")[0].firstChild.nodeValue.strip()
+
+            # hardware specific
+            if self.type == "hardware":
+                self.vendor_id = self.xml_content.getElementsByTagName("vendor-id")[0].firstChild.nodeValue.strip()
+                self.device_id = self.xml_content.getElementsByTagName("device-id")[0].firstChild.nodeValue.strip()
+            else:
+                self.vendor_id = None
+                self.device_id = None
+
 
             # list of configurations keys
             self.configuration = []
