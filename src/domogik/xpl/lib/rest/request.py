@@ -2272,7 +2272,7 @@ target=*
         # process messages
         for message in messages:
             cmd = message.data['command']
-            host = message.data["host"]
+            #host = message.data["host"]
     
             idx = 0
             loop_again = True
@@ -2283,12 +2283,13 @@ target=*
                     plg_description = message.data["plugin"+str(idx)+"-desc"]
                     plg_technology = message.data["plugin"+str(idx)+"-techno"]
                     plg_status = message.data["plugin"+str(idx)+"-status"]
+                    plg_host = message.data["plugin"+str(idx)+"-host"]
                     json_data.add_data({"name" : plg_name, 
                                         "technology" : plg_technology, 
                                         "description" : plg_description, 
                                         "status" : plg_status, 
                                         "type" : plg_type, 
-                                        "host" : host})
+                                        "host" : plg_host})
                     idx += 1
                 except:
                     loop_again = False

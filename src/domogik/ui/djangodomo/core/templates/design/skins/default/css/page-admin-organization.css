@@ -21,6 +21,15 @@ a.customicons {
     left: 0pt;
 }
 
+/* Plugin menu */
+li.hardware {
+    background-color: #ff0000;
+}
+
+li.plugin {
+    background-color: #0000ff;
+}
+
 /* Room page */
 .targetdrop {
     margin:0.2em;

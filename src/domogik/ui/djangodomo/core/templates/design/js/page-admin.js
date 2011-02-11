@@ -10,7 +10,7 @@ function getPluginsList() {
                         if ($("#plugins_list ul#menu_" + technology).length == 0) {
                             $("#plugins_list").append("<li><div class='titlenav2 icon16-technology-" + technology + "'>" + technology + "</div><ul id='menu_" + technology + "'></ul></li>")
                         }
-                        var li = $("<li></li>");
+                        var li = $("<li class='" + this.type + "'></li>");
                         var a = $("<a></a>");
                         a.attr('href', '/domogik/admin/plugin/' + this.name + "/" + this.host)
                             .attr('title', this.description)

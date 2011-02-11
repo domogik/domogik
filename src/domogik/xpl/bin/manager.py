@@ -82,11 +82,10 @@ class SysManager(XplPlugin):
             help="Start scenario manager if not already running.")
         parser.add_option("-p", action="store_true", dest="allow_ping", default=False, \
             help="Activate background ping for all plugins.")
-        parser.add_option("-m", action="store_true", dest="is_master", default=False, \
-            help="This manager is the Master.")
+        parser.add_option("-H", action="store_true", dest="check_hardware", default=False, \
+            help="This manager is the one who looks for harware.")
         XplPlugin.__init__(self, name = 'manager', parser=parser)
 
-        self.enable_hbeat()
         # Logger init
         self.log.info("Host : %s" % self.get_sanitized_hostname())
 
@@ -109,10 +108,14 @@ class SysManager(XplPlugin):
         self._xml_plugin_directory = "%s/share/domogik/plugins/" % conf['custom_prefix']
         self._xml_hardware_directory = "%s/share/domogik/hardware/" % conf['custom_prefix']
         self._pinglist = {}
+        self._plugins = []
+        self._hardwares = []
         self.enable_hbeat()
         try:
             # Get components
             self._list_plugins()
+            if self.options.check_hardware == True:
+                self._list_hardware()
  
             # TODO : if -m call _list_hardware()
             #        call _refresh_hardware() every minute
@@ -187,10 +190,15 @@ class SysManager(XplPlugin):
                                                    {"startup" : True})
                     comp_thread[name].start()
             
-            # Define listener
+            # Define listeners
             Listener(self._sys_cb, self.myxpl, {
                 'schema': 'domogik.system',
                 'xpltype': 'xpl-cmnd',
+            })
+    
+            Listener(self._foooooo, self.myxpl, {
+                'schema': 'hbeat.app',
+                'xpltype': 'xpl-stat',
             })
     
             if self._state_fifo != None:
@@ -524,11 +532,48 @@ class SysManager(XplPlugin):
         """
         self.log.debug("Start listing available hardware")
 
-        self._hardware = []
+        self._hardwares = []
 
-        # TODO : read all xml files
-        # for each xml file create a listener on source pattern
-        # create a callback function to add hardware in the list
+        # Get hardware list
+        hardwares = Loader('hardwares')
+        hardware_list = dict(hardwares.load()[1])
+        state_thread = {}
+        for hardware in hardware_list:
+            print hardware
+            self.log.info("==> %s (%s)" % (hardware, hardware_list[hardware]))
+            if hardware_list[hardware] == "enabled":
+                # try open xml file
+                xml_file = "%s/%s.xml" % (self._xml_hardware_directory, hardware)
+                try:
+                    # get data for hardware
+                    plg_xml = PackageXml(path = xml_file)
+
+                    # register plugin
+                    self._hardwares.append({"type" : plg_xml.type,
+                                      "name" : plg_xml.name, 
+                                      "description" : plg_xml.desc, 
+                                      "technology" : plg_xml.techno,
+                                      "status" : "OFF",
+                                      "host" : "TODO",
+                                      "version" : plg_xml.version,
+                                      "documentation" : plg_xml.doc,
+                                      "configuration" : plg_xml.configuration})
+
+                    # TODO : call appropriate function
+                    # check plugin state (will update component status)
+                    #state_thread[plg_xml.name] = Thread(None,
+                    #                               self._check_component_is_running,
+                    #                               None,
+                    #                               (plg_xml.name, None),
+                    #                               {})
+                    #state_thread[plg_xml.name].start()
+
+                except:
+                    print("Error reading xml file : %s\n%s" % (xml_file, str(traceback.format_exc())))
+                    self.log.error("Error reading xml file : %s. Detail : \n%s" % (xml_file, str(traceback.format_exc())))
+
+                # get data from xml file
+        return
 
 
     def _refresh_hardware_list(self):
@@ -603,6 +648,7 @@ class SysManager(XplPlugin):
         mess.set_type('xpl-trig')
         mess.set_schema('domogik.system')
         mess.add_data({'command' :  'list'})
+        # plugins
         idx = 0
         for plugin in self._plugins:
             mess.add_data({'plugin'+str(idx)+'-name' : plugin["name"]})
@@ -610,8 +656,20 @@ class SysManager(XplPlugin):
             mess.add_data({'plugin'+str(idx)+'-techno' : plugin["technology"]})
             mess.add_data({'plugin'+str(idx)+'-desc' : plugin["description"]})
             mess.add_data({'plugin'+str(idx)+'-status' : plugin["status"]})
+            mess.add_data({'plugin'+str(idx)+'-host' : plugin["host"]})
             idx += 1
-        mess.add_data({'host' : self.get_sanitized_hostname()})
+        # hardwares
+        # TODO : separate ? or keep same prefix (pluginN-...)
+        idx = 0
+        for hardware in self._hardwares:
+            mess.add_data({'plugin'+str(idx)+'-name' : hardware["name"]})
+            mess.add_data({'plugin'+str(idx)+'-type' : hardware["type"]})
+            mess.add_data({'plugin'+str(idx)+'-techno' : hardware["technology"]})
+            mess.add_data({'plugin'+str(idx)+'-desc' : hardware["description"]})
+            mess.add_data({'plugin'+str(idx)+'-status' : hardware["status"]})
+            mess.add_data({'plugin'+str(idx)+'-host' : hardware["host"]})
+            idx += 1
+        # mess.add_data({'host' : self.get_sanitized_hostname()})
         self.myxpl.send(mess)
 
     def _send_plugin_detail(self, plg):
