@@ -569,12 +569,12 @@ class SysManager(XplPlugin):
                                       "configuration" : plg_xml.configuration})
 
                     # check plugin state (will update component status)
-                    state_thread[plgname] = Thread(None,
+                    state_thread[plg_xml.name] = Thread(None,
                                                    self._check_component_is_running,
                                                    None,
-                                                   (plgname, None),
+                                                   (plg_xml.name, None),
                                                    {})
-                    state_thread[plgname].start()
+                    state_thread[plg_xml.name].start()
 
                 except:
                     print("Error reading xml file : %s\n%s" % (xml_file, str(traceback.format_exc())))
@@ -626,7 +626,7 @@ class SysManager(XplPlugin):
                 for conf in plugin["configuration"]:
                     conf_content = "%s,%s,%s,%s" % (conf["key"],
                                                 conf["type"],
-                                                conf["description"],
+                                                conf["desc"],
                                                 conf["default"])
                     mess.add_data({'config'+str(conf["id"]) : conf_content})
                 mess.add_data({'type' :  plugin["type"]})
