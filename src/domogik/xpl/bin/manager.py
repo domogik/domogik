@@ -276,7 +276,10 @@ class SysManager(XplPlugin):
            plg = message.data['plugin']
         except KeyError:
            plg = "*"
-        host = message.data["host"]
+        try:
+            host = message.data["host"]
+        except KeyError:
+           host = "*"
 
         # error if no plugin in list
         error = ""
@@ -602,13 +605,11 @@ class SysManager(XplPlugin):
         mess.add_data({'command' :  'list'})
         idx = 0
         for plugin in self._plugins:
-            # TODO : revoir format du message xpl
-            #        ajouter le type (plugin["type"])
-            plg_content = "%s,%s,%s,%s" % (plugin["name"],
-                                        plugin["technology"],
-                                        plugin["status"],
-                                        plugin["description"])
-            mess.add_data({'plugin'+str(idx) : plg_content})
+            mess.add_data({'plugin'+str(idx)+'-name' : plugin["name"]})
+            mess.add_data({'plugin'+str(idx)+'-type' : plugin["type"]})
+            mess.add_data({'plugin'+str(idx)+'-techno' : plugin["technology"]})
+            mess.add_data({'plugin'+str(idx)+'-desc' : plugin["description"]})
+            mess.add_data({'plugin'+str(idx)+'-status' : plugin["status"]})
             idx += 1
         mess.add_data({'host' : self.get_sanitized_hostname()})
         self.myxpl.send(mess)
