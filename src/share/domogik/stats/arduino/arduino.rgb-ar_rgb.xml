@@ -7,7 +7,7 @@
             </listener>
             <mapping>
                 <device field="device"/>
-                <value field=color"/>
+                <value field="color"/>
             </mapping>
         </xpltype>
     </schema>
