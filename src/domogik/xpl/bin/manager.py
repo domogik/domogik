@@ -197,7 +197,7 @@ class SysManager(XplPlugin):
             })
     
             if self.options.check_hardware:
-                Listener(self._foooooo, self.myxpl, {
+                Listener(self._refresh_hardware_list, self.myxpl, {
                     'schema': 'hbeat.app',
                     'xpltype': 'xpl-stat',
                 })
@@ -577,10 +577,11 @@ class SysManager(XplPlugin):
         return
 
 
-    def _refresh_hardware_list(self):
+    def _refresh_hardware_list(self, message):
         """ Refresh hardware list
+            @param message : xpl message
         """
-        pass
+        print message.source
         # TODO : for each hardware, check if last hbeat.* is still valid. if not, set status to off
         # call this function every minute
 

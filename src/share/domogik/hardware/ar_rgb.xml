@@ -9,6 +9,8 @@
   <documentation>http://wiki.domogik.org/hardware_ar_rgb</documentation>
   <author>Fritz</author>
   <author-email>fritz.smh at gmail.com</author-email>
+  <vendor-id>arduino</vendor-id>
+  <device-id>rgb</device-id>
   <configuration-keys/>
   <files>
     <file path="src/share/domogik/hardware/ar_rgb.xml"/>
