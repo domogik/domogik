@@ -19,11 +19,21 @@ function getPluginsList() {
                         if (this.name != 'rest') {
                             status.addClass("menu-indicator")
                             if (this.status == 'ON') {
-                                status.addClass("icon16-status-active");
-                                status.append("<span class='offscreen'>Running</span>");
+                                if (this.type == 'plugin') {
+                                    status.addClass("icon16-status-software-up");
+                                    status.append("<span class='offscreen'>Software Running</span>");                                    
+                                } else { // hardware
+                                    status.addClass("icon16-status-hardware-up");
+                                    status.append("<span class='offscreen'>Hardware Running</span>");                                                                        
+                                }
                             } else {
-                                status.addClass("icon16-status-inactive");
-                                status.append("<span class='offscreen'>Stopped</span>");
+                                if (this.type == 'plugin') {
+                                    status.addClass("icon16-status-software-down");
+                                    status.append("<span class='offscreen'>Software Stopped</span>");
+                                } else { // hardware
+                                    status.addClass("icon16-status-hardware-down");
+                                    status.append("<span class='offscreen'>Hardware Stopped</span>");
+                                }
                             }
                         }
                         a.append(status);

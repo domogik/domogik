@@ -531,6 +531,11 @@
 .icon16-status-info {background-image:url(../images/status/info_16.png);}
 .icon16-status-warning {background-image:url(../images/status/warning_16.png);}
 
+.icon16-status-software-up {background-image:url(../images/status/software_up_16.png);}
+.icon16-status-software-down {background-image:url(../images/status/software_down_16.png);}
+.icon16-status-hardware-up {background-image:url(../images/status/hardware_up_16.png);}
+.icon16-status-hardware-down {background-image:url(../images/status/hardware_down_16.png);}
+
 .icon16-text {
     display:inline-block;
     background-position: 0% 50%;
