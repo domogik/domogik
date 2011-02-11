@@ -29,7 +29,7 @@
                     $(this).dialog('close');
                 }
             });
-            this.element.text(o.content + ' ' + ops.name);
+            this.element.html(o.content + ' ' + ops.name);
             this.element.dialog('open');
         }
     });
