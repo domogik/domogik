@@ -2220,27 +2220,24 @@ target=*
 
 
 
-    def _rest_plugin_list(self, name = None, host = gethostname().lower()):
+    def _rest_plugin_list(self):
         """ Send a xpl message to manager to get plugin list
             Display this list as json
-            @param name : name of plugin
         """
-        self.log.debug("Plugin : ask for plugin list on %s." % host)
+        self.log.debug("Plugin : ask for plugin list")
 
         ### Send xpl message to get list
         message = XplMessage()
         message.set_type("xpl-cmnd")
         message.set_schema("domogik.system")
         message.add_data({"command" : "list"})
-        # TODO : ask for good host
-        #message.add_data({"host" : gethostname().lower()})
         message.add_data({"host" : "*"})
         self.myxpl.send(message)
         self.log.debug("Plugin : send message : %s" % str(message))
 
         ### Wait for answer
         # get xpl message from queue
-        # TODO : make a time loop of one second after first xpl-trig reception
+        # make a time loop of one second after first xpl-trig reception
         messages = []
         try:
             # Get first answer for command
@@ -2281,9 +2278,17 @@ target=*
             loop_again = True
             while loop_again:
                 try:
-                    data = message.data["plugin"+str(idx)].split(",")
-                    if name == None or name == data[0]:
-                        json_data.add_data({"name" : data[0], "technology" : data[1], "description" : data[3], "status" : data[2], "host" : host})
+                    plg_name = message.data["plugin"+str(idx)+"-name"]
+                    plg_type = message.data["plugin"+str(idx)+"-type"]
+                    plg_description = message.data["plugin"+str(idx)+"-desc"]
+                    plg_technology = message.data["plugin"+str(idx)+"-techno"]
+                    plg_status = message.data["plugin"+str(idx)+"-status"]
+                    json_data.add_data({"name" : plg_name, 
+                                        "technology" : plg_technology, 
+                                        "description" : plg_description, 
+                                        "status" : plg_status, 
+                                        "type" : plg_type, 
+                                        "host" : host})
                     idx += 1
                 except:
                     loop_again = False
