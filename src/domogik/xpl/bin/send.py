@@ -53,49 +53,28 @@ class Sender(XplPlugin):
     supported_schemas = ["datetime.basic", "dawndusk.request", "x10.basic",
                          "sensor.basic", "domogik.system","domogik.config"]
 
-    def __init__(self, schema=None, message=None):
-        XplPlugin.__init__(self, name = 'send', daemonize = False)
-        self._schema = schema
-        self._message = message
-        self._args = []
-        self._options = None
-        self.parse_parameters()
+    def __init__(self):
+        parser = optparse.OptionParser()
+        parser.add_option("-s", "--source", type="string",
+                dest="source", default=None)
+        XplPlugin.__init__(self, name = 'send', daemonize = False, parser = parser)
         mess = self.forge_message()
         self.log.debug("Send message : %s" % mess)
         self.myxpl.send(mess)
         self.force_leave()
 
-    def parse_parameters(self):
-        '''
-        Read parameters from command line and parse them
-        '''
-        if self._message != None and self._schema != None:
-            self._options = None
-            self._args = [self._schema, self._message]
-        else:
-            parser = optparse.OptionParser()
-            parser.add_option("-d", "--dest", type="string",
-                    dest="message_dest", default="broadcast")
-            (self._options, self._args) = parser.parse_args()
-
-        #Parsing of args
-        if len(self._args) != 3:
-            self.usage()
-            exit(1)
-
-       # if self._args[1] not in self.supported_schemas:
-       #     self.log.error("Schema %s not supported" % self._args[0])
-       #     self.usage()
-       #     exit(2)
 
     def forge_message(self):
         '''
         Create the message based on script arguments
         '''
         message = XplMessage()
-        message.set_type(self._args[0])
-        message.set_schema(self._args[1])
-        datas = self._args[2].split(',')
+        message.set_type(self.args[0])
+        if self.options.source != None:
+            print("Source forced : %s" % self.options.source)
+            message.set_source(self.options.source)
+        message.set_schema(self.args[1])
+        datas = self.args[2].split(',')
         for data in datas:
             if "=" not in data:
                 self.log.error("Bad formatted commands. Must be key=value")
