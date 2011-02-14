@@ -213,6 +213,7 @@ class SysManager(XplPlugin):
                 hardware_timer.start()
 
             self.enable_hbeat()
+            print("Ready!")
     
             if self._state_fifo != None:
                 while self._startup_count > 0:
@@ -327,7 +328,8 @@ class SysManager(XplPlugin):
                 self._send_plugin_list()
 
             # detail plugin
-            elif cmd == "detail" and host == self.get_sanitized_hostname():
+            elif cmd == "detail": # and host == self.get_sanitized_hostname():
+                                  # no check on host for hardware
                 self._send_plugin_detail(plg)
 
         # if error
@@ -598,8 +600,14 @@ class SysManager(XplPlugin):
                         found = True
                         self.log.info("Set hardware status ON : %s on %s" % \
                                                    (hardware["name"], instance))
+                        # hardware config part
+                        # - hardware configuration is given in hbeat.app body
+                        hardware["configuration"] = self._get_hardware_configuration(message)
                      
                 if found == False:
+                    # hardware config part
+                    # - hardware configuration is given in hbeat.app body
+                    configuration = self._get_hardware_configuration(message)
                     self._hardwares.append({"type" : hardware_model["type"],
                               "name" : hardware_model["name"], 
                               "description" : hardware_model["description"], 
@@ -610,10 +618,28 @@ class SysManager(XplPlugin):
                               "documentation" : hardware_model["documentation"],
                               "vendor_id" : hardware_model["vendor_id"],
                               "device_id" : hardware_model["device_id"],
+                              "configuration" : configuration,
                               "interval" : int(message.data["interval"]) * 60,
                               "last_seen" : time.time()})
                     self.log.info("Add hardware : %s on %s" % \
                                              (hardware_model["name"], instance))
+
+    def _get_hardware_configuration(self, message):
+        """ Get hardware configuration from hbeat message
+        @param message : hbeat message
+        """
+        config = []
+        idx = 0
+        for conf in message.data:
+            # we take all keys, except interval
+            if conf == "interval":
+                pass
+            else:
+                config.append( {"id" : idx,
+                                "key" : conf,
+                                "value" : message.data[conf]})
+                idx += 1
+        return config
 
     def _check_hardware_status(self):
         """ Check if hardwares are always present
@@ -676,11 +702,15 @@ class SysManager(XplPlugin):
 
 
     def _is_plugin(self, name):
-        """ Is a component a plugin ?
+        """ Is a component a plugin or hardware?
         @param name : component name to check
         """
         for plugin in self._plugins:
             if plugin["name"] == name:
+                return True
+        for hardware in self._hardwares:
+            print "is : %s" % hardware
+            if hardware["name"] == name:
                 return True
         return False
 
@@ -738,6 +768,20 @@ class SysManager(XplPlugin):
                 mess.add_data({'status' :  plugin["status"]})
                 mess.add_data({'version' :  plugin["version"]})
                 mess.add_data({'documentation' :  plugin["documentation"]})
+                mess.add_data({'host' : self.get_sanitized_hostname()})
+        for hardware in self._hardwares:
+            if hardware["name"] == plg:
+                for conf in hardware["configuration"]:
+                    mess.add_data({'config'+str(conf["id"])+'-id' : conf["id"]})
+                    mess.add_data({'config'+str(conf["id"])+'-key' : conf["key"]})
+                    mess.add_data({'config'+str(conf["id"])+'-value' : conf["value"]})
+                mess.add_data({'type' :  hardware["type"]})
+                mess.add_data({'plugin' :  hardware["name"]})
+                mess.add_data({'description' :  hardware["description"]})
+                mess.add_data({'technology' :  hardware["technology"]})
+                mess.add_data({'status' :  hardware["status"]})
+                mess.add_data({'version' :  hardware["version"]})
+                mess.add_data({'documentation' :  hardware["documentation"]})
                 mess.add_data({'host' : self.get_sanitized_hostname()})
 
         self.myxpl.send(mess)

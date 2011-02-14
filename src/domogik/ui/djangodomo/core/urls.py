@@ -51,7 +51,7 @@ urlpatterns = patterns('domogik.ui.djangodomo.core.views',
     url(r'admin/organization/rooms/$', 'admin_organization_rooms', name="admin_organization_rooms_view"),
     url(r'admin/organization/devices/$', 'admin_organization_devices', name="admin_organization_devices_view"),
     url(r'admin/organization/widgets/$', 'admin_organization_widgets', name="admin_organization_widgets_view"),
-    url(r'admin/plugin/(?P<plugin_name>\w+)/(?P<plugin_host>[a-zA-Z0-9_.-]+)/$', 'admin_plugins_plugin', name="admin_plugins_plugin_view"),
+    url(r'admin/plugin/(?P<plugin_name>\w+)/(?P<plugin_host>[a-zA-Z0-9_.-]+)/(?P<plugin_type>\w+)/$', 'admin_plugins_plugin', name="admin_plugins_plugin_view"),
     url(r'admin/tools/helpers/$', 'admin_tools_helpers', name="admin_tools_helpers_view"),
     url(r'admin/tools/rest/$', 'admin_tools_rest', name="admin_tools_rest_view"),
 

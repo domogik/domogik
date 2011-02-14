@@ -91,9 +91,7 @@ $(function(){
                 $.each(options, function(index, item) {
                     var iid = item.id;
                     var ikey = item.key;
-                    var idescription = item.description;
-                    var idefault = item['default'];
-                    var itype = item.type;
+                    var idescription = item.dvalue;
                     $("#configuration_items tbody").append("<tr id='" + item.id + "'></tr>");
                     rest.get(['plugin', 'config', 'list', 'by-name' , '{{ plugin.name }}', '{{ plugin.host }}' , 'by-key', ikey],
                         function(data) {

@@ -2311,7 +2311,6 @@ target=*
         message.set_schema("domogik.system")
         message.add_data({"command" : "detail"})
         message.add_data({"plugin" : name})
-        # TODO : ask for good host
         message.add_data({"host" : host})
         self.myxpl.send(message)
         self.log.debug("Plugin : send message : %s" % str(message))
@@ -2335,6 +2334,7 @@ target=*
         cmd = message.data['command']
         host = message.data["host"]
         name = message.data["plugin"]
+        my_type = message.data["type"]
         try:
             error = message.data["error"]
             self.send_http_response_error(999, "Error on detail request : %s" % error,
@@ -2355,13 +2355,29 @@ target=*
         idx = 0
         loop_again = True
         config_data = []
-        while loop_again:
-            try:
-                data_conf = message.data["config"+str(idx)].split(",")
-                config_data.append({"id" : idx+1, "key" : data_conf[0], "type" : data_conf[1], "description" : data_conf[2], "default" : data_conf[3]})
-                idx += 1
-            except:
-                loop_again = False
+        ### configuration for type = plugin
+        if my_type == "plugin":
+            while loop_again:
+                try:
+                    data_conf = message.data["config"+str(idx)].split(",")
+                    config_data.append({"id" : idx+1, "key" : data_conf[0], "type" : data_conf[1], "description" : data_conf[2], "default" : data_conf[3]})
+                    idx += 1
+                except:
+                    loop_again = False
+
+        ### configuration for type = hardware
+        if my_type == "hardware":
+            while loop_again:
+                try:
+                    #id = message.data["config"+str(idx)+"-id"]
+                    key = message.data["config"+str(idx)+"-key"]
+                    value = message.data["config"+str(idx)+"-value"]
+                    config_data.append({"id" : idx+1, 
+                                        "key" : key,
+                                        "value" : value})
+                    idx += 1
+                except:
+                    loop_again = False
 
         json_data.add_data({"name" : name, "technology" : technology, "description" : description, "status" : status, "host" : host, "version" : version, "documentation" : documentation, "configuration" : config_data})
         self.send_http_response_ok(json_data.get())
