@@ -50,7 +50,7 @@ class BasePlugin():
         ''' 
         @param p : An instance of OptionParser. If you want to add extra options to the generic option parser,
         create your own optionparser instance, use parser.addoption and then pass your parser instance as parameter.
-        Your options/params will then be available on self.options and self.params
+        Your options/params will then be available on self.options and self.args
         @param daemonize : If set to False, force the instance *not* to daemonize, even if '-f' is not passed
         on the command line. If set to True (default), will check if -f was added.
         '''
