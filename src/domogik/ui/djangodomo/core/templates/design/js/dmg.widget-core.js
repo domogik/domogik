@@ -5,7 +5,8 @@ var widgets_list = {
 	'actuator.binary': [],
 	'actuator.range': [],
 	'actuator.number': [],
-	'actuator.trigger': []
+	'actuator.trigger': [],
+	'actuator.string': []
 };
 
 var widgets_options = {};

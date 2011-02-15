@@ -32,6 +32,7 @@
 
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-page-block.css" rel="stylesheet" type="text/css" />
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-dialog.css" rel="stylesheet" type="text/css" />
+    <link href="/widgets/dmg_4x3_colorPicker/farbtastic.css" rel="stylesheet" type="text/css" />
 	{% for widget in widgets %}
     <link href="/widgets/{{ widget }}/style.css" rel="stylesheet" type="text/css" />
     {% endfor %}
@@ -46,6 +47,7 @@
     <script type="text/javascript" src="/design/js/dmg.processing.js"></script>
     <script type="text/javascript" src="/design/js/dmg.widget-core.js"></script>
     <script type="text/javascript" src="/design/js/dmg.widget-utils.js"></script>
+    <script type="text/javascript" src="/widgets/dmg_4x3_colorPicker/farbtastic.js"></script>
     {% for widget in widgets %}
     <script type="text/javascript" src="/widgets/{{ widget }}/main.js"></script>	
     {% endfor %}

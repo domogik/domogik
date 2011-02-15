@@ -59,9 +59,9 @@ class PackageData():
         print("Xml file OK")
 
         # check type == plugin
-        if self.plg.type != "plugin":
+        if self.plg.type not in ["plugin", "hardware"]:
             print("Error : this package is not a plugin")
-            return
+            exit()
 
         # display plugin informations
         #self.plg.display()

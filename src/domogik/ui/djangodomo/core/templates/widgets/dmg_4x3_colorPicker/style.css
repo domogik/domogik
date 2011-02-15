@@ -1,0 +1,17 @@
+.dmg_4x3_colorPicker {    
+    background-position: 5px 5px;
+    background-repeat: no-repeat;
+    background-color:#ffffff;
+    padding: 1em;
+}
+
+.dmg_4x3_colorPicker .preview {
+    width: 4em;
+    height: 14em;
+    margin-top: 4em;
+}
+
+.dmg_4x3_colorPicker .colorpicker {
+    width: 75%%;
+    float: right;
+}
