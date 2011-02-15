@@ -124,7 +124,7 @@ class SysManager(XplPlugin):
         self._pid_dir_path = conf['pid_dir_path']
     
         self._xml_plugin_directory = "%s/share/domogik/plugins/" % conf['custom_prefix']
-        self._xml_hardware_directory = "%s/share/domogik/hardware/" % conf['custom_prefix']
+        self._xml_hardware_directory = "%s/share/domogik/hardwares/" % conf['custom_prefix']
         self._pinglist = {}
         self._plugins = []
         self._hardwares = []
