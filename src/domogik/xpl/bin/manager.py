@@ -782,7 +782,7 @@ class SysManager(XplPlugin):
                 mess.add_data({'status' :  hardware["status"]})
                 mess.add_data({'version' :  hardware["version"]})
                 mess.add_data({'documentation' :  hardware["documentation"]})
-                mess.add_data({'host' : self.get_sanitized_hostname()})
+                mess.add_data({'host' : hardware["host"]})
 
         self.myxpl.send(mess)
 
