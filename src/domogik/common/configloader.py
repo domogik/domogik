@@ -59,12 +59,20 @@ class Loader():
         @param plugin_name name of the plugin to load config from
         '''
         self.main_conf_name = "domogik.cfg"
+        self.valid_files = None
         self.plugin_name = plugin_name
 
-    def load(self, custom_path = ""):
+    def get_config_files_path(self):
+        '''
+        Return config file path
+        '''
+        return self.__class__.valid_files
+
+    def load(self, custom_path = "", refresh = False):
         '''
         Parse the config
         @param custom_path : Custom path to config file, will superseed others
+        @param refresh : force refreshing config
         @return pair (main_config, plugin_config)
         '''
         sys_file = ''
@@ -79,11 +87,12 @@ class Loader():
             data = filter(lambda s:s.startswith('DOMOGIK_USER'), data)[0]
             homedir = pwd.getpwnam(data.strip().split('=')[1]).pw_dir
         main_result = {}
-        if self.__class__.config == None:
+        if self.__class__.config == None or refresh == True:
             self.__class__.config = ConfigParser.ConfigParser()
             files = self.__class__.config.read([custom_path, homedir + "/." + self.main_conf_name,
                 '/etc/' + self.main_conf_name,
                 '/usr/local/etc/' + self.main_conf_name])
+            self.__class__.valid_files = files
         result = self.__class__.config.items('domogik')
         main_result = {}
         for k, v in result:

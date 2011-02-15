@@ -79,7 +79,9 @@ class XplPlugin(BasePlugin):
         self._is_manager = is_manager
         self._name = name
         cfg = Loader('domogik')
-        config = dict(cfg.load()[1])
+        my_conf = cfg.load()
+        self._config_files = cfg.get_config_files_path()
+        config = dict(my_conf[1])
 
         # Get pid and write it in a file
         self._pid_dir_path = config['pid_dir_path']
@@ -113,6 +115,11 @@ class XplPlugin(BasePlugin):
         #self._process_info.start()
 
         self.log.debug("end single xpl plugin")
+
+    def get_config_files(self):
+       """ Return list of config files
+       """
+       return self._config_files
 
     def enable_hbeat(self, lock = False):
         """ Wrapper for xplconnector.enable_hbeat()

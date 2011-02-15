@@ -36,6 +36,7 @@ Implements
 @organization: Domogik
 """
 
+import pyinotify
 import os
 import sys
 import time
@@ -64,6 +65,22 @@ KILL_TIMEOUT = 2
 PING_DURATION = 10
 WAIT_TIME_BETWEEN_PING = 15
 
+
+class EventHandler(pyinotify.ProcessEvent):
+    """ Check a file for any event (creation, modification, etc)
+    """
+    
+    def set_callback(self, callback):
+        """ set callback to launch external stuff
+        @param callback : callback function
+        """
+        self.my_callback = callback
+
+    def process_IN_MODIFY(self, event):
+        """ A file is modified
+        """
+        print("File modified : %s" % event.pathname)
+        self.my_callback()
 
 class SysManager(XplPlugin):
     """ System management from domogik
@@ -118,9 +135,6 @@ class SysManager(XplPlugin):
             if self.options.check_hardware == True:
                 self._list_hardware_models()
  
-            # TODO : if -m call _list_hardware()
-            #        call _refresh_hardware() every minute
-    
             #Start dbmgr
             if self.options.start_dbmgr:
                 self._inc_startup_lock()
@@ -212,6 +226,16 @@ class SysManager(XplPlugin):
                                           self.myxpl)
                 hardware_timer.start()
 
+            # inotify 
+            wm = pyinotify.WatchManager() # Watch manager
+            mask = pyinotify.IN_MODIFY # watched events
+            notify_handler = EventHandler()
+            notify_handler.set_callback(self._reload_configuration_file)
+            notifier = pyinotify.Notifier(wm, notify_handler)
+            for fic in  self.get_config_files():
+                wdd = wm.add_watch(fic, mask, rec = True)
+            notifier.loop()
+
             self.enable_hbeat()
             print("Ready!")
     
@@ -241,6 +265,14 @@ class SysManager(XplPlugin):
         except:
             self.log.error("%s" % sys.exc_info()[1])
             print("%s" % sys.exc_info()[1])
+
+    def _reload_configuration_file(self):
+        """ reload all plugins and hardware list
+        """
+        print("Reloading plugin and hardware model lists")
+        self.log.info("Reloading plugin and hardware model lists")
+        self._list_plugins()
+        self._list_hardware_models()
 
     def _write_fifo(self, level, message):
         """ Write the message into _state_fifo fifo, with ansi color
@@ -662,7 +694,7 @@ class SysManager(XplPlugin):
 
         # Getplugin list
         plugins = Loader('plugins')
-        plugin_list = dict(plugins.load()[1])
+        plugin_list = dict(plugins.load(refresh = True)[1])
         state_thread = {}
         for plugin in plugin_list:
             print plugin
@@ -732,7 +764,6 @@ class SysManager(XplPlugin):
             mess.add_data({'plugin'+str(idx)+'-host' : plugin["host"]})
             idx += 1
         # hardwares
-        # TODO : separate ? or keep same prefix (pluginN-...)
         idx = 0
         for hardware in self._hardwares:
             mess.add_data({'plugin'+str(idx)+'-name' : hardware["name"]})
