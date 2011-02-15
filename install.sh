@@ -268,6 +268,11 @@ function install_plugins {
         su -c "src/tools/packages/insert_data.py $file" $d_user
         echo "** File $file parsed"
     done
+    for file in src/share/domogik/hardwares/*.xml;do
+        echo "** Parse $file"
+        su -c "src/tools/packages/insert_data.py $file" $d_user
+        echo "** File $file parsed"
+    done
 }
 
 #Main part
