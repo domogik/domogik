@@ -24,7 +24,7 @@
             this.element.append(this._picker);
             this.element.append(this._preview);
             $('#colorpicker').farbtastic('#colorpicker');
-            $.farbtastic('#colorpicker').linkTo(this.setColor);
+            $.farbtastic('#colorpicker').linkTo(self.setColor);
             this._initValues(1);
         },
 
