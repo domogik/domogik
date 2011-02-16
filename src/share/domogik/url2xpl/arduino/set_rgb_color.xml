@@ -1,0 +1,19 @@
+<technology id="arduino">
+  <command name="set_rgb_color">
+    <schema>arduino.rgb</schema>
+    <command-key>command</command-key>	
+    <address-key>device</address-key>	
+    <command-xpl-value>setcolor</command-xpl-value>  
+    <parameters> 
+      <parameter key="color" location="1"/>
+    </parameters>      
+  </command>	
+  <listener>
+    <schema>arduino.rgb</schema>
+    <xpltype>xpl-trig</xpltype>
+    <filter>
+      <key name="command" value="setcolor" />
+      <key name="device" value="@address@"/>
+    </filter>
+  </listener>
+</technology>

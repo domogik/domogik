@@ -88,13 +88,16 @@ jQuery._farbtastic = function (container, callback) {
   /**
    * Change color with HTML syntax #123456
    */
-  fb.setColor = function (color) {
+  /*** DOMOGIK ADAPTATION ***/
+  //fb.setColor = function (color) {
+  fb.setColor = function (color, dontMakeAction) {
+  /**************************/
     var unpack = fb.unpack(color);
     if (fb.color != color && unpack) {
       fb.color = color;
       fb.rgb = unpack;
       fb.hsl = fb.RGBToHSL(fb.rgb);
-      fb.updateDisplay();
+      fb.updateDisplay(dontMakeAction);
     }
     return this;
   }
@@ -220,7 +223,10 @@ jQuery._farbtastic = function (container, callback) {
   /**
    * Update the markers and styles
    */
-  fb.updateDisplay = function () {
+  /*** DOMOGIK ADAPTATION ***/
+  //$fb.updateDisplay = function () {
+  fb.updateDisplay = function (dontMakeAction) {
+  /**************************/
     // Markers
     var angle = fb.hsl[0] * 6.28;
     $('.h-marker', e).css({
@@ -253,9 +259,11 @@ jQuery._farbtastic = function (container, callback) {
         }
       });
     }
+    /*** DOMOGIK ADAPATATION ***/
     else if (typeof fb.callback == 'function') {
-      fb.callback.call(fb, fb.color);
+      fb.callback.call(fb, fb.color, dontMakeAction);
     }
+    /***************************/
   }
 
   /**

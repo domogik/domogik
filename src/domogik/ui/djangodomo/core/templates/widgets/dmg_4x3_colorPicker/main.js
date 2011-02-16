@@ -24,27 +24,28 @@
             this.element.append(this._picker);
             this.element.append(this._preview);
             $('#colorpicker').farbtastic('#colorpicker');
-            $.farbtastic('#colorpicker').linkTo(self.setColor);
+            $.farbtastic('#colorpicker').linkTo(function(color, dontCallCmd){self.setColor(color, dontCallCmd)});
             this._initValues(1);
         },
 
-        setColor: function(color) {
+        setColor: function(color, dontCallCmd) {
             var self = this, o = this.options;
-            // TODO : pourquoi ça marche pas la récup de o ????
             // change preview color
             $('#preview').css({
                 backgroundColor: color,
             });
             // call command
-            rest.get(['command', o.devicetechnology, o.deviceaddress, color],
-                function(data) {
-                    var status = (data.status).toLowerCase();
-                    if (status != 'ok') {
-                        /* Error */
-                        $.notification('error', data.description);
+            if (dontCallCmd != 1) {
+                rest.get(['command', o.devicetechnology, o.deviceaddress, 'set_rgb_color', color],
+                    function(data) {
+                        var status = (data.status).toLowerCase();
+                        if (status != 'ok') {
+                            /* Error */
+                            $.notification('error', data.description);
+                        }
                     }
-                }
-            );
+                );
+            }
         },
 
         _statsHandler: function(stats) {
@@ -53,13 +54,14 @@
             if (stats && stats.length > 0) {
                 this.previous = null;
                 $.each(stats, function(index, stat){
-                    alert(stat);
+                    $.farbtastic('#colorpicker').setColor(stat.value, 1);
                 });
             }
         },
         
         _eventHandler: function(timestamp, value) {
             var self = this, o = this.options;
+            $.farbtastic('#colorpicker').setColor(value, 1);
         },
 
     });
