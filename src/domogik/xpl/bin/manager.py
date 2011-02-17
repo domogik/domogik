@@ -231,10 +231,10 @@ class SysManager(XplPlugin):
             mask = pyinotify.IN_MODIFY # watched events
             notify_handler = EventHandler()
             notify_handler.set_callback(self._reload_configuration_file)
-            notifier = pyinotify.Notifier(wm, notify_handler)
+            notifier = pyinotify.ThreadedNotifier(wm, notify_handler)
+            notifier.start()
             for fic in  self.get_config_files():
                 wdd = wm.add_watch(fic, mask, rec = True)
-            notifier.loop()
 
             self.enable_hbeat()
             print("Ready!")
