@@ -787,11 +787,11 @@ class SysManager(XplPlugin):
         for plugin in self._plugins:
             if plugin["name"] == plg:
                 for conf in plugin["configuration"]:
-                    conf_content = "%s,%s,%s,%s" % (conf["key"],
-                                                conf["type"],
-                                                conf["desc"],
-                                                conf["default"])
-                    mess.add_data({'config'+str(conf["id"]) : conf_content})
+                    mess.add_data({'cfg'+str(conf["id"])+'-key' : conf["key"]})
+                    mess.add_data({'cfg'+str(conf["id"])+'-type' : conf["type"]})
+                    mess.add_data({'cfg'+str(conf["id"])+'-desc' : conf["desc"]})
+                    mess.add_data({'cfg'+str(conf["id"])+'-default' : conf["default"]})
+                    mess.add_data({'cfg'+str(conf["id"])+'-group' : conf["group_id"]})
                 mess.add_data({'type' :  plugin["type"]})
                 mess.add_data({'plugin' :  plugin["name"]})
                 mess.add_data({'description' :  plugin["description"]})

@@ -2360,8 +2360,40 @@ target=*
         if my_type == "plugin":
             while loop_again:
                 try:
-                    data_conf = message.data["config"+str(idx)].split(",")
-                    config_data.append({"id" : idx+1, "key" : data_conf[0], "type" : data_conf[1], "description" : data_conf[2], "default" : data_conf[3]})
+                    my_group_id = message.data["cfg"+str(idx)+"-group"]
+                    my_key = message.data["cfg"+str(idx)+"-key"]
+                    my_type = message.data["cfg"+str(idx)+"-type"]
+                    my_desc = message.data["cfg"+str(idx)+"-desc"]
+                    my_default = message.data["cfg"+str(idx)+"-default"]
+                    # simple configuration element. 
+                    #   "None" because it cames from xpl message
+                    if my_group_id == "None":
+                        config_data.append({"id" : idx+1, 
+                                            "element-type" : "item",
+                                            "key" : my_key,
+                                            "type" : my_type,
+                                            "description" : my_desc,
+                                            "default" : my_default})
+                    # 'in group' configuration element
+                    else:
+                        # search if group already defined
+                        found = False
+                        for group in config_data:
+                            # found
+                            if group["element-type"] == "group" and \
+                               group["group-id"] == my_group_id:
+                                found = True
+                                group["elements"].append({"id" : idx+1, 
+                                              "key" : my_key,
+                                              "type" : my_type,
+                                              "description" : my_desc,
+                                              "default" : my_default})
+                        # not found
+                        if found == False:
+                            config_data.append({"element-type" : "group",
+                                                  "group-id" : my_group_id,
+                                                  "group-name" : "name" + my_group_id,
+                                                  "elements" : []})
                     idx += 1
                 except:
                     loop_again = False
