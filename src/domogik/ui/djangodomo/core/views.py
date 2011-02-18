@@ -415,6 +415,49 @@ def admin_plugins_plugin(request, plugin_name, plugin_host, plugin_type):
             plugin=result_plugin_detail.plugin[0]
         )
 
+# temporary function for test of new plugin page
+@admin_required
+def admin_plugins_plugin2(request, plugin_name, plugin_host, plugin_type):
+    """
+    Method called when the admin plugin command page is accessed
+    @param request : HTTP request
+    @return an HttpResponse object
+    """
+
+    status = request.GET.get('status', '')
+    msg = request.GET.get('msg', '')
+    try:
+        result_plugin_detail = Plugins.get_detail(plugin_name, plugin_host)
+        result_all_plugins = Plugins.get_all()
+    except BadStatusLine:
+        return render_to_response('error/BadStatusLine.html')
+    except ResourceNotAvailableException:
+        return render_to_response('error/ResourceNotAvailableException.html')
+    if plugin_type == "plugin":
+        page_title = _("Plugin")
+        return __go_to_page(
+            request, 'admin/plugins/plugin2.html',
+            page_title,
+            nav1_admin = "selected",
+            nav2_plugins_plugin = "selected",
+            plugins_list=result_all_plugins.plugin,
+            status=status,
+            msg=msg,
+            plugin=result_plugin_detail.plugin[0]
+        )
+    if plugin_type == "hardware":
+        page_title = _("Hardware")
+        return __go_to_page(
+            request, 'admin/plugins/hardware.html',
+            page_title,
+            nav1_admin = "selected",
+            nav2_plugins_plugin = "selected",
+            plugins_list=result_all_plugins.plugin,
+            status=status,
+            msg=msg,
+            plugin=result_plugin_detail.plugin[0]
+        )
+
 @admin_required
 def admin_tools_helpers(request):
     """
