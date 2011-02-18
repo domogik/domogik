@@ -220,14 +220,11 @@ class serialHandler(threading.Thread):
         return r
 
     def receive(self):
-        print "receive"
         #Avoid to wait if there is nothing to read
 #        try:
         if self._stop.isSet():
-            print "stop set"
             return
         if self.__myser.inWaiting() < 9:
-            print "not enough data"
             return
         message = self.__myser.read(9) #wait for max 400ms if nothing to read
 #        except IOError:
