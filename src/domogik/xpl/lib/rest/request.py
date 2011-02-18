@@ -2369,7 +2369,7 @@ target=*
                     #   "None" because it cames from xpl message
                     if my_group_id == "None":
                         config_data.append({"id" : idx+1, 
-                                            "element-type" : "item",
+                                            "element_type" : "item",
                                             "key" : my_key,
                                             "type" : my_type,
                                             "description" : my_desc,
@@ -2380,8 +2380,8 @@ target=*
                         found = False
                         for group in config_data:
                             # found
-                            if group["element-type"] == "group" and \
-                               group["group-id"] == my_group_id:
+                            if group["element_type"] == "group" and \
+                               group["group_id"] == my_group_id:
                                 found = True
                                 group["elements"].append({"id" : idx+1, 
                                               "key" : my_key,
@@ -2390,9 +2390,9 @@ target=*
                                               "default" : my_default})
                         # not found
                         if found == False:
-                            config_data.append({"element-type" : "group",
-                                                  "group-id" : my_group_id,
-                                                  "group-name" : "name" + my_group_id,
+                            config_data.append({"element_type" : "group",
+                                                  "group_id" : my_group_id,
+                                                  "group_name" : "name" + my_group_id,
                                                   "elements" : []})
                     idx += 1
                 except:
