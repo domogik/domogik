@@ -225,6 +225,7 @@ class serialHandler(threading.Thread):
         if self._stop.isSet():
             return
         if self.__myser.inWaiting() < 9:
+            time.sleep(0.4)
             return
         message = self.__myser.read(9) #wait for max 400ms if nothing to read
 #        except IOError:
