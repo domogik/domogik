@@ -55,6 +55,8 @@ class Sender(XplPlugin):
 
     def __init__(self):
         parser = optparse.OptionParser()
+        parser.add_option("-t", "--target", type="string",
+                dest="target", default=None)
         parser.add_option("-s", "--source", type="string",
                 dest="source", default=None)
         XplPlugin.__init__(self, name = 'send', daemonize = False, parser = parser)
@@ -73,6 +75,9 @@ class Sender(XplPlugin):
         if self.options.source != None:
             print("Source forced : %s" % self.options.source)
             message.set_source(self.options.source)
+        if self.options.target != None:
+            print("Target forced : %s" % self.options.target)
+            message.set_target(self.options.target)
         message.set_schema(self.args[1])
         datas = self.args[2].split(',')
         for data in datas:
