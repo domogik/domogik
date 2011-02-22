@@ -34,6 +34,72 @@ $(function(){
     {% else %}
         setStatus(false);
     {% endifequal %}
+
+    $.fn.extend({
+        setItemContent: function (item) {
+            var ikey = item.key;
+            var iid = item.id 
+            var idescription = item.description;
+            var idefault = item['default'];
+            var itype = item.type;
+            var iprefix = item.prefix;
+            rest.get(['plugin', 'config', 'list', 'by-name' , '{{ plugin.name }}', '{{ plugin.host }}' , 'by-key', ikey],
+                function(data) {
+                    var status = (data.status).toLowerCase();
+                    if (status == 'ok') {
+                        var tr = $("tr#"+ikey);
+                        tr.attr('key_prefix', iprefix);
+                        tr.append("<td>" +  ikey + "</td><td><label for='value_" + ikey + "'>" +  idescription + "</label></td>");
+                        if (itype == 'boolean') {
+                            var td = $("<td class='value'></td>");
+                            td.append("<input type='checkbox' name='value_" + ikey + "' id='value_" + ikey + "' />");
+                            if (data.config.length > 0) { // If already configured
+                                if (data.config[0].value  == "True") {
+                                    $("#value_" + ikey, td).attr('checked', true);
+                                }
+                            } else {
+                                td.addClass('icon16-status-warning');
+                                td.prepend("<span class='offscreen'>No configured</span>");
+                            }
+                            tr.append(td);
+                            tr.append("<td></td>");
+                        } else {
+                            var td = $("<td class='value'></td>");
+    
+                            if (data.config.length > 0) { // If already configured
+                                td.append("<input type='text' name='value_" + ikey + "' id='value_" + ikey + "' class='medium' value='" +  data.config[0].value + "' />");                                                                            
+                            } else { // If not configured
+                                td.addClass('icon16-status-warning');
+                                td.prepend("<span class='offscreen'>No configured</span>");
+                                if (idefault == "None")
+                                    idefault = "";
+                                td.append("<input type='text' name='value_" + ikey + "' id='value_" + ikey + "' class='medium' title='Default value' value='" +  idefault + "' />");
+                            }
+                            tr.append(td);
+                            tr.append("<td><ul class='actions'><li><button id='reset" + ikey + "' class='icon16-action-reset buttonicon' title='{% trans "Reset" %} " + ikey + "'><span class='offscreen'>{% trans "Reset" %} " + ikey + "</span></button></li></ul></td>");                                    
+                        }
+                        $("#reset" + ikey).click(function(event) {
+                            resetKey(ikey, idefault);
+                            event.stopPropagation();
+                        });
+                    } else {
+                        // Error retreving plugin item config 
+                        $.notification(data.status, data.description);
+                    }
+                }
+            );
+        },
+
+        createConfigurationTable: function (idName) {
+            this.append("<table id='" + idName +"' class='simple'> \
+                         <thead> \
+                         <tr><th scope='col'>{% trans 'Key' %}</th><th scope='col'>{% trans 'Description' %}</th><th scope='col'>{% trans 'value' %}</th><th>{% trans 'Actions' %}</th></tr> \
+                         </thead> \
+                         <tbody> \
+                         </tbody> \
+                         </table>");
+        },
+    });
     
     function resetKey(key, value) {
         $("#value_" + key).val(value);
@@ -83,6 +149,9 @@ $(function(){
         });
     }
 
+    /* init table for simple configuration items */
+    $('#simple_configuration_items').createConfigurationTable('configuration_items');
+
     /* Get the list of configuration items */
     rest.get(['plugin', 'detail', '{{ plugin.name }}', '{{ plugin.host }}'],
         function(data) {
@@ -91,59 +160,79 @@ $(function(){
                 // Check configuration items
                 var num_items = data.plugin[0].configuration.length;
                 var options = data.plugin[0].configuration.sort(sortOptions);
+                var pluginCfg = [];
+                var nbPluginCfg = 0;
                 $.each(options, function(index, item) {
-                    var ieltType = item.element_type;
-                    if (ieltType == "item") {
-                        // ENTRE ICI
-                        var iid = item.id;
-                        var ikey = item.key 
-                        var idescription = item.description;
-                        var idefault = item['default'];
-                        var itype = item.type;
-                        $("#configuration_items tbody").append("<tr id='" + item.id + "'></tr>");
-                        rest.get(['plugin', 'config', 'list', 'by-name' , '{{ plugin.name }}', '{{ plugin.host }}' , 'by-key', ikey],
+                    if (item.element_type == "item") {
+                        item.prefix = item.key
+                        pluginCfg[nbPluginCfg] = item;
+                        nbPluginCfg++;
+                        $("#configuration_items tbody").append("<tr id='" + item.key + "'></tr>");
+                        $(item.key).setItemContent(item);
+                    }
+                    else {
+                        var addInterfaceButton = $("<button class='button icon16-action-add'>{% trans "Add interface" %}</button>");
+                        $('#group_buttons').append(addInterfaceButton);
+
+                        var delInterfaceButton = $("<button class='button icon16-action-del'>{% trans "Delete interface" %}</button>");
+                        $('#group_buttons').append(delInterfaceButton);
+
+                        // get number of registered interfaces
+                        rest.get(['plugin', 'config', 'list', 'by-name' , '{{ plugin.name }}', '{{ plugin.host }}' , 'by-key', 'nb-int'],
                             function(data) {
                                 var status = (data.status).toLowerCase();
                                 if (status == 'ok') {
-                                    var tr = $("tr#"+iid);
-                                    tr.append("<td>" +  ikey + "</td><td><label for='value_" + ikey + "'>" +  idescription + "</label></td>");
-                                    if (itype == 'boolean') {
-                                        var td = $("<td class='value'></td>");
-                                        td.append("<input type='checkbox' name='value_" + ikey + "' id='value_" + ikey + "' />");
-                                        if (data.config.length > 0) { // If already configured
-                                            if (data.config[0].value  == "True") {
-                                                $("#value_" + ikey, td).attr('checked', true);
-                                            }
-                                        } else {
-                                            td.addClass('icon16-status-warning');
-                                            td.prepend("<span class='offscreen'>No configured</span>");
-                                        }
-                                        tr.append(td);
-                                        tr.append("<td></td>");
-                                    } else {
-                                        var td = $("<td class='value'></td>");
-    
-                                        if (data.config.length > 0) { // If already configured
-                                            td.append("<input type='text' name='value_" + ikey + "' id='value_" + ikey + "' class='medium' value='" +  data.config[0].value + "' />");                                                                            
-                                        } else { // If not configured
-                                            td.addClass('icon16-status-warning');
-                                            td.prepend("<span class='offscreen'>No configured</span>");
-                                            td.append("<input type='text' name='value_" + ikey + "' id='value_" + ikey + "' class='medium' title='Default value' value='" +  idefault + "' />");
-                                        }
-                                        tr.append(td);
-                                        tr.append("<td><ul class='actions'><li><button id='reset" + ikey + "' class='icon16-action-reset buttonicon' title='{% trans "Reset" %} " + ikey + "'><span class='offscreen'>{% trans "Reset" %} " + ikey + "</span></button></li></ul></td>");                                    
+                                    if (data.config.length > 0)  // If already configured
+                                        nbInterface = data.config[0].value;
+                                    else
+                                        nbInterface = 1;
+                                    // display interfaces
+                                    for(interfaceNumber=1;interfaceNumber<=nbInterface;interfaceNumber++) {
+                                        $('#grouped_configuration_items').createConfigurationTable('configuration_items_'+interfaceNumber);
+                                        $.each(item.elements, function(group_index, group_item) {
+                                            group_item.prefix = group_item.key
+                                            group_item.key = group_item.key + "-" + interfaceNumber;
+                                            pluginCfg[nbPluginCfg] = group_item;
+                                            nbPluginCfg++;
+                                            $('#configuration_items_' + interfaceNumber + ' tbody').append("<tr id='" + group_item.key + "' class='item'></tr>");
+                                            $(group_item.key).setItemContent(group_item); 
+                                        });
                                     }
-                                    $("#reset" + ikey).click(function(event) {
-                                        resetKey(ikey, idefault);
-                                        event.stopPropagation();
-                                    });
+                                     if (nbInterface == 1)
+                                         delInterfaceButton.hide();
                                 } else {
-                                    /* Error retreving plugin item config */
+                                    // Error
                                     $.notification(data.status, data.description);
                                 }
+                            });
+
+
+                        addInterfaceButton.click( function() {
+                            interfaceNumber++;
+                            var divCloned= $('#configuration_items' + "_1").clone();
+                            $('#grouped_configuration_items').append(divCloned);
+                            divCloned.attr('id', 'configuration_items' + '_' + interfaceNumber);
+
+                            $('tr', divCloned).each(function(index, item) {
+                                $(item).attr('id', $(item).attr('key_prefix') + '-' + interfaceNumber);
+                                // ICI : comment je vide le formulaire pour cet id ?
+                            });
+                            
+                            delInterfaceButton.show();
+                        });
+
+                        delInterfaceButton.click( function() {
+                            interfaceNumber--;
+                            interfaceToDelete = interfaceNumber;
+                            // hide/delete interface display
+                            $('#grouped_configuration_items .simple:last').remove();
+                            // delete config data
+
+                            // hide delete button
+                            if (interfaceToDelete == 2) {
+                                delInterfaceButton.hide();
                             }
-                        );
-                        // ET ENTRE LA
+                        });
                     }
                      
                 });
@@ -164,7 +253,7 @@ $(function(){
                     });
                 $("#configuration").append("<p><button id='configurationsubmit' class='button icon16-action-save'>{% trans "Save" %}</button></p>");
                 $("#configurationsubmit").click(function(event) {
-                    saveConfig('{{ plugin.name }}', '{{ plugin.host }}', data.plugin[0].configuration);
+                    saveConfig('{{ plugin.name }}', '{{ plugin.host }}', pluginCfg);
                     event.stopPropagation();
                 });
             } else {
@@ -177,7 +266,7 @@ $(function(){
     $("#configurationdelete").click(function(event) {
         deleteConfig('{{ plugin.name }}', '{{ plugin.host }}');
     });
-    
+
     function setStatus(status) {
         if (status) { //active
             strstatus = 'up';
@@ -230,7 +319,7 @@ function sortOptions(a, b){
 }
 {% endblock %}
 {% block css %}
-    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/page-admin-plugins.css" rel="stylesheet" type="text/css" />
+    <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/page-admin-plugins2.css" rel="stylesheet" type="text/css" />
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-tables.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block js_include %}
@@ -259,8 +348,10 @@ function sortOptions(a, b){
     <div id="tabs">
         <ul>
             <li><a href="#tabs-1">{% trans "Configuration" %}</a></li>
+            <!-- for next releases 
             <li><a href="#tabs-2">{% trans "Helpers" %}</a></li>
             <li><a href="#tabs-3">{% trans "Resources" %}</a></li>
+            -->
         </ul>
         <div id="tabs-1">
             <section class="subsection">
@@ -273,21 +364,21 @@ function sortOptions(a, b){
                 <h2>{% trans "Configuration" %}</h2>
                 <div id='configuration'>
                     <p><button id='configurationdelete' class='button icon16-action-del'>{% trans 'Delete configuration' %}</button></p>
-                    <table id='configuration_items' class='simple'>
-                        <thead>
-                            <tr><th scope='col'>{% trans "Key" %}</th><th scope='col'>{% trans "Description" %}</th><th scope='col'>{% trans "value" %}</th><th>{% trans "Actions" %}</th></tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
+                    <div id='simple_configuration_items'>
+                    </div>
+                    <div id='grouped_configuration_items'>
+                    </div>
+                    <p id='group_buttons'></p> 
                 </div>
             </section>
         </div>
+        <!-- for next releases 
         <div id="tabs-2">
             Helpers
         </div>
         <div id="tabs-3">
             Resources
         </div>
+        -->
     </div>
 {% endblock %}
