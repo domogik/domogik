@@ -1516,7 +1516,7 @@ class SystemInfoTestCase(GenericTestCase):
 
     def test_update(self):
         system_info = db.update_system_info(si_db_version=u'0.1.0')
-        print system_info
+        print(system_info)
         assert system_info.db_version == '0.1.0'
         db.update_system_info(si_db_version=u'0.1.1')
         assert db.get_system_info().db_version == u'0.1.1'
@@ -1533,7 +1533,7 @@ class SystemConfigTestCase(GenericTestCase):
 
     def test_update(self):
         system_config = db.update_system_config(s_simulation_mode=True, s_debug_mode=True)
-        print system_config
+        print(system_config)
         assert system_config.simulation_mode
         assert system_config.debug_mode
         system_config = db.update_system_config(s_simulation_mode=False)
@@ -1544,5 +1544,5 @@ class SystemConfigTestCase(GenericTestCase):
 
 if __name__ == "__main__":
     db = DbHelper(use_test_db=True)
-    print "*** Using database %s ***\n" % db.get_db_type()
+    print("*** Using database %s ***\n" % db.get_db_type())
     unittest.main()
