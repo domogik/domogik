@@ -36,7 +36,7 @@ Implements
 @organization: Domogik
 """
 
-import calendar, datetime, hashlib, time
+import datetime, hashlib, time
 from types import DictType
 
 import sqlalchemy
