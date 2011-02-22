@@ -1892,37 +1892,6 @@ class DbHelper():
                         )
         }
 
-        step = {
-            'minute' : (
-                 # Get result format of the query
-                 lambda dt : [dt.year, dt.month, _get_week_nb(dt), dt.day, dt.hour, dt.minute],
-                 # Get max date of the period
-                 lambda dt : datetime.datetime(dt.year, dt.month, dt.day, dt.hour, dt.minute, 59),
-            ),
-            'hour' : (
-                 lambda dt : [dt.year, dt.month, _get_week_nb(dt), dt.day, dt.hour],
-                 lambda dt : datetime.datetime(dt.year, dt.month, dt.day, dt.hour, 59, 59),
-            ),
-            'day' : (
-                 lambda dt : [dt.year, dt.month, _get_week_nb(dt), dt.day],
-                 lambda dt : datetime.datetime(dt.year, dt.month, dt.day, 23, 59, 59),
-            ),
-            'week' : (
-                 lambda dt : [dt.year, _get_week_nb(dt)],
-                 lambda dt : datetime.datetime(dt.year, dt.month, dt.day, 23, 59, 59)
-                             + datetime.timedelta(days=6-dt.weekday()),
-            ),
-            'month' : (
-                 lambda dt : [dt.year, dt.month],
-                 lambda dt : datetime.datetime(dt.year, dt.month, calendar.monthrange(dt.year, dt.month)[1]),
-            ),
-            'year' : (
-                 lambda dt : [dt.year,],
-                 lambda dt : datetime.datetime(dt.year, 12, 31, 23, 59, 59),
-            ),
-        }
-
-        result_list = []
         if self.get_db_type() in ('mysql', 'postgresql'):
             cond_min = "date >= '" + _datetime_string_from_tstamp(start_date_ts) + "'"
             cond_max = "date < '" + _datetime_string_from_tstamp(end_date_ts) + "'"

@@ -31,6 +31,7 @@
 #@license: GPL(v3)
 #@organization: Domogik
 
+set -x
 
 function run_setup_py {
     MODE=$1
