@@ -205,6 +205,9 @@ function update_user_config {
             sed -i "s;^db_port.*$;db_port = $db_port;" $d_home/.domogik.cfg
             sed -i "s;^db_name.*$;db_name = $db_name;" $d_home/.domogik.cfg
             sed -i "s;^db_host.*$;db_host = $db_host;" $d_home/.domogik.cfg
+            if [ "$upgrade_sql" = "n" -o "$upgrade_sql" = "N" ];then
+                    return
+            fi
         fi
         nb_tables=$(echo "SHOW TABLES;"|mysql -h$db_host -P$db_port -u$db_user -p$db_password $db_name |grep -vc ^Tables)
         if [ $nb_tables -ne 0 ];then
