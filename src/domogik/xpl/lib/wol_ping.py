@@ -40,7 +40,7 @@ import socket
 import struct
 from threading import Thread
 import subprocess
-from Queue import Queue
+from Queue import Queue, Empty
 import time
 import traceback
 
@@ -154,7 +154,7 @@ class Ping:
         while not self._stop.isSet():
             if not ping_queue.empty():
                 try:
-                    data = ping_queue.get(timeout = self._interval / len(self.computers))
+                    data = ping_queue.get(timeout = self._interval / len(self._computers))
                 except Empty:
                     continue
                 self._log.debug("Thread %s: Pinging %s" % (idx, data["ip"]))
