@@ -1948,7 +1948,7 @@ class DbHelper():
         try:
             self.__session.commit()
         except Exception, sql_exception:
-           self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         # Eventually remove old stats
         if hist_size > 0:
             stats_list = self.__session.query(
