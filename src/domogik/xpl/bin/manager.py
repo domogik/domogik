@@ -791,7 +791,7 @@ class SysManager(XplPlugin):
                     mess.add_data({'cfg'+str(conf["id"])+'-type' : conf["type"]})
                     mess.add_data({'cfg'+str(conf["id"])+'-desc' : conf["desc"]})
                     mess.add_data({'cfg'+str(conf["id"])+'-default' : conf["default"]})
-                    mess.add_data({'cfg'+str(conf["id"])+'-group' : conf["group_id"]})
+                    mess.add_data({'cfg'+str(conf["id"])+'-int' : conf["interface"]})
                 mess.add_data({'type' :  plugin["type"]})
                 mess.add_data({'plugin' :  plugin["name"]})
                 mess.add_data({'description' :  plugin["description"]})

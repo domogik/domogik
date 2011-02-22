@@ -2360,28 +2360,27 @@ target=*
         if my_type == "plugin":
             while loop_again:
                 try:
-                    my_group_id = message.data["cfg"+str(idx)+"-group"]
+                    my_interface = message.data["cfg"+str(idx)+"-int"]
                     my_key = message.data["cfg"+str(idx)+"-key"]
                     my_type = message.data["cfg"+str(idx)+"-type"]
                     my_desc = message.data["cfg"+str(idx)+"-desc"]
                     my_default = message.data["cfg"+str(idx)+"-default"]
                     # simple configuration element. 
                     #   "None" because it cames from xpl message
-                    if my_group_id == "None":
+                    if my_interface == "no":
                         config_data.append({"id" : idx+1, 
                                             "element_type" : "item",
                                             "key" : my_key,
                                             "type" : my_type,
                                             "description" : my_desc,
                                             "default" : my_default})
-                    # 'in group' configuration element
+                    # interface configuration element
                     else:
                         # search if group already defined
                         found = False
                         for group in config_data:
                             # found
-                            if group["element_type"] == "group" and \
-                               group["group_id"] == my_group_id:
+                            if group["element_type"] == "group":
                                 found = True
                                 group["elements"].append({"id" : idx+1, 
                                               "key" : my_key,
@@ -2391,9 +2390,13 @@ target=*
                         # not found
                         if found == False:
                             config_data.append({"element_type" : "group",
-                                                  "group_id" : my_group_id,
-                                                  "group_name" : "name" + my_group_id,
-                                                  "elements" : []})
+                                                "elements" : [
+                                                       {"id" : idx+1,
+                                                        "key" : my_key,
+                                                        "type" : my_type,
+                                                        "description" : my_desc,
+                                                        "default" : my_default
+                                                       }]})
                     idx += 1
                 except:
                     loop_again = False

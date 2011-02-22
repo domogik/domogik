@@ -112,10 +112,10 @@ class PackageXml():
             config = self.xml_content.getElementsByTagName("configuration-keys")[0]
             for key in config.getElementsByTagName("key"):
                 try:
-                    k_group_id = key.getElementsByTagName("group-id")[0].firstChild.nodeValue
+                    k_interface = key.getElementsByTagName("interface")[0].firstChild.nodeValue
                 except IndexError:
-                    # no value in group id
-                    k_group_id = None
+                    # no value in interface
+                    k_interface = "no"
                 k_id = key.getElementsByTagName("order-id")[0].firstChild.nodeValue
                 k_key = key.getElementsByTagName("name")[0].firstChild.nodeValue
                 k_desc = key.getElementsByTagName("description")[0].firstChild.nodeValue
@@ -126,7 +126,7 @@ class PackageXml():
                     # no value in default
                     k_default = None
                 self.configuration.append({"id" : k_id,
-                                           "group_id" : k_group_id,
+                                           "interface" : k_interface,
                                            "key" : k_key,
                                            "desc" : k_desc,
                                            "type" : k_type,

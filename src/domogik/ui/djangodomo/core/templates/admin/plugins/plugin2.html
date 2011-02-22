@@ -45,7 +45,7 @@ $(function(){
             var iprefix = item.prefix;
             var tr = $("<tr id='" + item.key + "'></tr>");
             tr.attr('key_prefix', iprefix);
-            tr.append("<td>" +  ikey + "</td><td><label for='value_" + ikey + "'>" +  idescription + "</label></td>");
+            tr.append("<td class='key'>" +  ikey + "</td><td><label for='value_" + ikey + "'>" +  idescription + "</label></td>");
             var td = $("<td class='value'></td>");
             if (itype == 'boolean') {
                 td.append("<input type='checkbox' name='value_" + ikey + "' id='value_" + ikey + "' />");
@@ -138,7 +138,7 @@ $(function(){
         );
     }
     
-    function saveConfig(name, host, configuration) {
+    function saveConfig(name, host, configuration, nbInterface) {
         var itemSaved = 0;
         $.each(configuration, function(index, item) {
             var value = null;
@@ -165,6 +165,17 @@ $(function(){
                 }
             );
         });
+        if (nbInterface != undefined) {
+            rest.get(['plugin', 'config', 'set', 'name', name, 'hostname', host, 'key', 'nb-int', 'value', nbInterface],
+                function(data) {
+                    var status = (data.status).toLowerCase();
+                    if (status != 'ok') {
+                        // Error
+                        $.notification(data.status, data.description);
+                    }
+                }
+            );
+        }
     }
 
     /* init table for simple configuration items */
@@ -205,15 +216,17 @@ $(function(){
                                     else
                                         nbInterface = 1;
                                     // display interfaces
-                                    for(interfaceNumber=1;interfaceNumber<=nbInterface;interfaceNumber++) {
-                                        $('#grouped_configuration_items').createConfigurationTable('configuration_items_'+interfaceNumber);
-                                        $.each(item.elements, function(group_index, group_item) {
-                                            group_item.prefix = group_item.key
-                                            group_item.key = group_item.key + "-" + interfaceNumber;
-                                            pluginCfg[nbPluginCfg] = group_item;
+                                    for(i=1;i<=nbInterface;i++) {
+                                        $('#grouped_configuration_items').createConfigurationTable('configuration_items_'+i);
+                                        var options = item.elements.sort(sortOptions);
+                                        $.each(options, function(group_index, group_item) {
+                                            if (i == 1)
+                                                group_item.prefix = group_item.key;
+                                            group_item.key = group_item.prefix + "-" + i;
+                                            pluginCfg[nbPluginCfg] = clone(group_item);
                                             nbPluginCfg++;
-                                            $('#configuration_items_' + interfaceNumber).createItemContent(group_item); 
-                                            $('#configuration_items_' + interfaceNumber).configureItemContent(group_item); 
+                                            $('#configuration_items_' + i).createItemContent(group_item); 
+                                            $('#configuration_items_' + i).configureItemContent(group_item); 
                                         });
                                     }
                                      if (nbInterface == 1)
@@ -226,29 +239,38 @@ $(function(){
 
 
                         addInterfaceButton.click( function() {
-                            interfaceNumber++;
+                            nbInterface++;
                             var divCloned= $('#configuration_items' + "_1").clone();
                             $('#grouped_configuration_items').append(divCloned);
-                            divCloned.attr('id', 'configuration_items' + '_' + interfaceNumber);
+                            divCloned.attr('id', 'configuration_items' + '_' + nbInterface);
 
                             $('tr', divCloned).each(function(index, item) {
-                                $(item).attr('id', $(item).attr('key_prefix') + '-' + interfaceNumber);
-                                $(" .value", $(item)).setNotConfigured();
-                                // ICI : comment je vide le formulaire pour cet id ?
+                                newKey = $(item).attr('key_prefix') + '-' + nbInterface;
+                                // todo : why have we to test about undefined here ?
+                                if ($(item).attr('key_prefix') != undefined) {
+                                    $(item).attr('id', newKey);
+                                    $(".value", $(item)).setNotConfigured();
+                                    $(".key", this).text(newKey);
+                                    $("label", this).attr('for', 'value_' + newKey);
+                                    $("input", this).attr('id', 'value_' + newKey);
+                                    addedGroup = {};
+                                    addedGroup.key = newKey;
+                                    pluginCfg[nbPluginCfg] = addedGroup;
+                                    nbPluginCfg++;
+                                }
                             });
                             
                             delInterfaceButton.show();
                         });
 
                         delInterfaceButton.click( function() {
-                            interfaceNumber--;
-                            interfaceToDelete = interfaceNumber;
+                            nbInterface--;
                             // hide/delete interface display
                             $('#grouped_configuration_items .simple:last').remove();
                             // delete config data
 
                             // hide delete button
-                            if (interfaceToDelete == 2) {
+                            if (nbInterface == 2) {
                                 delInterfaceButton.hide();
                             }
                         });
@@ -272,7 +294,7 @@ $(function(){
                     });
                 $("#configuration").append("<p><button id='configurationsubmit' class='button icon16-action-save'>{% trans "Save" %}</button></p>");
                 $("#configurationsubmit").click(function(event) {
-                    saveConfig('{{ plugin.name }}', '{{ plugin.host }}', pluginCfg);
+                    saveConfig('{{ plugin.name }}', '{{ plugin.host }}', pluginCfg, nbInterface);
                     event.stopPropagation();
                 });
             } else {
@@ -336,6 +358,18 @@ $(function(){
 function sortOptions(a, b){
     return (a.id - b.id) //causes an array to be sorted numerically and ascending
 }
+
+function clone(obj){
+    if(obj == null || typeof(obj) != 'object')
+        return obj;
+
+    var temp = new obj.constructor(); 
+    for(var key in obj)
+        temp[key] = clone(obj[key]);
+
+    return temp;
+}
+
 {% endblock %}
 {% block css %}
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/page-admin-plugins2.css" rel="stylesheet" type="text/css" />
