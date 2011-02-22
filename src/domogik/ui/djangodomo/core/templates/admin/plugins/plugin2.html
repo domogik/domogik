@@ -36,52 +36,65 @@ $(function(){
     {% endifequal %}
 
     $.fn.extend({
-        setItemContent: function (item) {
+        createItemContent: function (item) {
             var ikey = item.key;
-            var iid = item.id 
+            var iid = item.id;
             var idescription = item.description;
             var idefault = item['default'];
             var itype = item.type;
             var iprefix = item.prefix;
+            var tr = $("<tr id='" + item.key + "'></tr>");
+            tr.attr('key_prefix', iprefix);
+            tr.append("<td>" +  ikey + "</td><td><label for='value_" + ikey + "'>" +  idescription + "</label></td>");
+            var td = $("<td class='value'></td>");
+            if (itype == 'boolean') {
+                td.append("<input type='checkbox' name='value_" + ikey + "' id='value_" + ikey + "' />");
+                tr.append(td);
+                tr.append("<td></td>");
+            } else {
+                td.append("<input type='text' name='value_" + ikey + "' id='value_" + ikey + "' class='medium' value='' />");                                                                            
+                tr.append(td);
+                var resetButton = $("<button id='reset" + ikey + "' class='icon16-action-reset buttonicon' title='{% trans "Reset" %} " + ikey + "'><span class='offscreen'>{% trans "Reset" %} " + ikey + "</span></button>");
+                resetButton.click(function(event) {
+                    $("tr#" + ikey +" .value").setNotConfigured(idefault);
+                    event.stopPropagation();
+                });
+                var td = $("<td><ul class='actions'><li></li></ul></td>");
+                $("li", td).append(resetButton);
+                tr.append(td);                                    
+            }
+            this.append(tr);
+        },
+
+        configureItemContent: function (item) {
+            var ikey = item.key;
+            var iid = item.id 
+            var idefault = item['default'];
+            var itype = item.type;
+            var iprefix = item.prefix;
+            
             rest.get(['plugin', 'config', 'list', 'by-name' , '{{ plugin.name }}', '{{ plugin.host }}' , 'by-key', ikey],
                 function(data) {
                     var status = (data.status).toLowerCase();
                     if (status == 'ok') {
-                        var tr = $("tr#"+ikey);
-                        tr.attr('key_prefix', iprefix);
-                        tr.append("<td>" +  ikey + "</td><td><label for='value_" + ikey + "'>" +  idescription + "</label></td>");
+                        var td = $("tr#" + ikey +" .value");
                         if (itype == 'boolean') {
-                            var td = $("<td class='value'></td>");
-                            td.append("<input type='checkbox' name='value_" + ikey + "' id='value_" + ikey + "' />");
                             if (data.config.length > 0) { // If already configured
                                 if (data.config[0].value  == "True") {
-                                    $("#value_" + ikey, td).attr('checked', true);
+                                    $("input", td).attr('checked', true);
                                 }
                             } else {
-                                td.addClass('icon16-status-warning');
-                                td.prepend("<span class='offscreen'>No configured</span>");
+                                td.setNotConfigured();
                             }
-                            tr.append(td);
-                            tr.append("<td></td>");
-                        } else {
-                            var td = $("<td class='value'></td>");
-    
+                        } else {    
                             if (data.config.length > 0) { // If already configured
-                                td.append("<input type='text' name='value_" + ikey + "' id='value_" + ikey + "' class='medium' value='" +  data.config[0].value + "' />");                                                                            
+                                $("input", td).val(data.config[0].value);
                             } else { // If not configured
-                                td.addClass('icon16-status-warning');
-                                td.prepend("<span class='offscreen'>No configured</span>");
                                 if (idefault == "None")
-                                    idefault = "";
-                                td.append("<input type='text' name='value_" + ikey + "' id='value_" + ikey + "' class='medium' title='Default value' value='" +  idefault + "' />");
+                                    idefault = null;
+                                td.setNotConfigured(idefault);
                             }
-                            tr.append(td);
-                            tr.append("<td><ul class='actions'><li><button id='reset" + ikey + "' class='icon16-action-reset buttonicon' title='{% trans "Reset" %} " + ikey + "'><span class='offscreen'>{% trans "Reset" %} " + ikey + "</span></button></li></ul></td>");                                    
                         }
-                        $("#reset" + ikey).click(function(event) {
-                            resetKey(ikey, idefault);
-                            event.stopPropagation();
-                        });
                     } else {
                         // Error retreving plugin item config 
                         $.notification(data.status, data.description);
@@ -89,7 +102,17 @@ $(function(){
                 }
             );
         },
-
+        
+        setNotConfigured: function(defaultValue) {
+            this.addClass('icon16-status-warning');
+            this.prepend("<span class='offscreen'>No configured</span>");
+            if (defaultValue) {
+                $("input", this).val(defaultValue);            
+            } else {
+                $("input", this).val("");                        
+            }
+        },
+        
         createConfigurationTable: function (idName) {
             this.append("<table id='" + idName +"' class='simple'> \
                          <thead> \
@@ -100,11 +123,6 @@ $(function(){
                          </table>");
         },
     });
-    
-    function resetKey(key, value) {
-        $("#value_" + key).val(value);
-        $("#value_" + key).attr('class', 'medium icon16-status-warning');
-    }
     
     function deleteConfig(name, host) {
         rest.get(['plugin', 'config', 'del', name, host],
@@ -167,8 +185,8 @@ $(function(){
                         item.prefix = item.key
                         pluginCfg[nbPluginCfg] = item;
                         nbPluginCfg++;
-                        $("#configuration_items tbody").append("<tr id='" + item.key + "'></tr>");
-                        $(item.key).setItemContent(item);
+                        $("#configuration_items").createItemContent(item);
+                        $("#configuration_items").configureItemContent(item);
                     }
                     else {
                         var addInterfaceButton = $("<button class='button icon16-action-add'>{% trans "Add interface" %}</button>");
@@ -194,8 +212,8 @@ $(function(){
                                             group_item.key = group_item.key + "-" + interfaceNumber;
                                             pluginCfg[nbPluginCfg] = group_item;
                                             nbPluginCfg++;
-                                            $('#configuration_items_' + interfaceNumber + ' tbody').append("<tr id='" + group_item.key + "' class='item'></tr>");
-                                            $(group_item.key).setItemContent(group_item); 
+                                            $('#configuration_items_' + interfaceNumber).createItemContent(group_item); 
+                                            $('#configuration_items_' + interfaceNumber).configureItemContent(group_item); 
                                         });
                                     }
                                      if (nbInterface == 1)
@@ -215,6 +233,7 @@ $(function(){
 
                             $('tr', divCloned).each(function(index, item) {
                                 $(item).attr('id', $(item).attr('key_prefix') + '-' + interfaceNumber);
+                                $(" .value", $(item)).setNotConfigured();
                                 // ICI : comment je vide le formulaire pour cet id ?
                             });
                             
