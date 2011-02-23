@@ -704,6 +704,10 @@ class PluginConfigTestCase(GenericTestCase):
         assert len(db.del_plugin_config('x10', '192.168.0.1')) == 2
         assert len(db.list_plugin_config('x10', '192.168.0.1')) == 0
         assert len(db.list_plugin_config('plcbus', '192.168.0.1')) == 3
+        plugin_config = db.del_plugin_config_key('plcbus', '192.168.0.1', 'key3_2')
+        assert plugin_config.key == 'key3_2'
+        assert db.del_plugin_config_key('plcbus', '192.168.0.1', 'foo') is None
+        assert len(db.list_plugin_config('plcbus', '192.168.0.1')) == 2
         assert len(db.list_plugin_config('x10', '192.168.0.2')) == 1
 
 

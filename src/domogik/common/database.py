@@ -1398,6 +1398,30 @@ class DbHelper():
             self.__raise_dbhelper_exception("SQL exception (commit) : " % sql_exception, True)
         return plugin_config_list
 
+    def del_plugin_config_key(self, pl_name, pl_hostname, pl_key):
+        """Delete a key of a plugin config
+
+        @param pl_name : plugin name
+        @param pl_hostname : hostname the plugin is installed on
+        @param pl_key : key of the plugin config
+        @return the deleted PluginConfig object
+
+        """        
+        # Make sure previously modified objects outer of this method won't be commited
+        self.__session.expire_all()
+        plugin_config = self.__session.query(
+                               PluginConfig
+                           ).filter_by(name=ucode(pl_name)
+                           ).filter_by(hostname=ucode(pl_hostname)
+                           ).filter_by(key=ucode(pl_key)).first()
+        if plugin_config is not None:
+            self.__session.delete(plugin_config)
+            try:
+                self.__session.commit()
+            except Exception, sql_exception:
+                self.__raise_dbhelper_exception("SQL exception (commit) : " % sql_exception, True)
+        return plugin_config
+        
 ###
 # Devices
 ###
