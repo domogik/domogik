@@ -2201,6 +2201,9 @@ target=*
             elif self.rest_request[1] == "del":
                 if len(self.rest_request) == 4:
                     self._rest_plugin_config_del(name=self.rest_request[2], hostname=self.rest_request[3])
+                elif len(self.rest_request) == 6:
+                    if self.rest_request[4] == "by-key":
+                        self._rest_plugin_config_del_key(name=self.rest_request[2], hostname=self.rest_request[3], key=self.rest_request[5])
                 else:
                     self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[1], \
                                                   self.jsonp, self.jsonp_cb)
@@ -2516,16 +2519,34 @@ target=*
         self.send_http_response_ok(json_data.get())
 
 
-
     def _rest_plugin_config_del(self, name, hostname):
         """ delete device technology config
             @param name : module name
+            @param hostname : host
         """
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("config")
         try:
             for plugin in self._db.del_plugin_config(name, hostname):
+                json_data.add_data(plugin)
+        except:
+            json_data.set_error(code = 999, description = self.get_exception())
+        self.send_http_response_ok(json_data.get())
+
+
+    def _rest_plugin_config_del_key(self, name, hostname, key):
+        """ delete device technology config
+            @param name : module name
+            @param hostname : host
+            @param key : key to delete
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("config")
+        try:
+            plugin = self._db.del_plugin_config_key(name, hostname, key)
+            if plugin is not None:
                 json_data.add_data(plugin)
         except:
             json_data.set_error(code = 999, description = self.get_exception())
