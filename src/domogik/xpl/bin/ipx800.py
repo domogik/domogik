@@ -61,26 +61,26 @@ class IPXManager(XplPlugin):
         while loop == True:
             self._config = Query(self.myxpl, self.log)
             res = XplResult()
-            self._config.query('ipx800', 'ipx-%s-login' % str(num), res)
-            login = res.get_value()['ipx-%s-login' % str(num)]
+            self._config.query('ipx800', 'login-%s' % str(num), res)
+            login = res.get_value()['login-%s' % str(num)]
             if login == "None":
                 login = None
             self._config = Query(self.myxpl, self.log)
             res = XplResult()
-            self._config.query('ipx800', 'ipx-%s-password' % str(num), res)
-            password = res.get_value()['ipx-%s-password' % str(num)]
+            self._config.query('ipx800', 'password-%s' % str(num), res)
+            password = res.get_value()['password-%s' % str(num)]
             self._config = Query(self.myxpl, self.log)
             res = XplResult()
-            self._config.query('ipx800', 'ipx-%s-name' % str(num), res)
-            name = res.get_value()['ipx-%s-name' % str(num)]
+            self._config.query('ipx800', 'name-%s' % str(num), res)
+            name = res.get_value()['name-%s' % str(num)]
             self._config = Query(self.myxpl, self.log)
             res = XplResult()
-            self._config.query('ipx800', 'ipx-%s-ip' % str(num), res)
-            address = res.get_value()['ipx-%s-ip' % str(num)]
+            self._config.query('ipx800', 'ip-%s' % str(num), res)
+            address = res.get_value()['ip-%s' % str(num)]
             self._config = Query(self.myxpl, self.log)
             res = XplResult()
-            self._config.query('ipx800', 'ipx-%s-int' % str(num), res)
-            inter = res.get_value()['ipx-%s-int' % str(num)]
+            self._config.query('ipx800', 'int-%s' % str(num), res)
+            inter = res.get_value()['int-%s' % str(num)]
             if name != "None":
                 self.log.info("Configuration : login=%s, password=***, name=%s, ip=%s, interval=%s" % 
                                (login, name, address, inter))

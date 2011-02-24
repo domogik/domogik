@@ -1,3 +1,16 @@
+/*
+#mainsection header {
+    background-color: #4478AC;
+    background-image: url(/design/images/plugins/ar_rgb.png);
+    background-repeat: no-repeat;
+    height: 100px;
+    border: none;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
+*/
+
 #contentheader {
     text-align:right;
 }
@@ -28,3 +41,16 @@ table.simple td.value {
 table.simple td {
     text-align:left !important;
 }
+
+#group_buttons {
+    margin-top: 0;
+    border-left: 1em solid #534F45;
+    padding-left: 1em;
+}
+
+#grouped_configuration_items {
+    margin-top: 1em;
+    border-left: 1em solid #534F45;
+    padding-left: 1em;
+}
+

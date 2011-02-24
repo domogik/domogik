@@ -71,20 +71,20 @@ class WolPing(XplPlugin):
         while loop == True:
             self._config = Query(self.myxpl, self.log)
             res = XplResult()
-            self._config.query('wol_ping', 'cmp-%s-name' % str(num), res)
-            name = res.get_value()['cmp-%s-name' % str(num)]
+            self._config.query('wol_ping', 'name-%s' % str(num), res)
+            name = res.get_value()['name-%s' % str(num)]
             self._config = Query(self.myxpl, self.log)
             res = XplResult()
-            self._config.query('wol_ping', 'cmp-%s-ip' % str(num), res)
-            ip = res.get_value()['cmp-%s-ip' % str(num)]
+            self._config.query('wol_ping', 'ip-%s' % str(num), res)
+            ip = res.get_value()['ip-%s' % str(num)]
             self._config = Query(self.myxpl, self.log)
             res = XplResult()
-            self._config.query('wol_ping', 'cmp-%s-mac' % str(num), res)
-            mac = res.get_value()['cmp-%s-mac' % str(num)]
+            self._config.query('wol_ping', 'mac-%s' % str(num), res)
+            mac = res.get_value()['mac-%s' % str(num)]
             self._config = Query(self.myxpl, self.log)
             res = XplResult()
-            self._config.query('wol_ping', 'cmp-%s-macport' % str(num), res)
-            mac_port = res.get_value()['cmp-%s-macport' % str(num)]
+            self._config.query('wol_ping', 'wol-port-%s' % str(num), res)
+            mac_port = res.get_value()['wol-port-%s' % str(num)]
             if name != "None":
                 self.log.info("Configuration : name=%s, ip=%s, mac=%s, mac port=%s" % (name, ip, mac, mac_port))
                 self.computers[name] = {"ip" : ip, "mac" : mac, 
