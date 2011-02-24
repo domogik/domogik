@@ -456,7 +456,8 @@ class ProcessRequest():
                 value = params[int(loc.value) - 1]
             else:
                 value = static_value.value
-            value = unicode(urllib.unquote(value), "UTF-8")
+            if type(value).__name__ == "str":
+                value = unicode(urllib.unquote(value), "UTF-8")
             parameters_value[key] = value
 
         ### Create xpl message
