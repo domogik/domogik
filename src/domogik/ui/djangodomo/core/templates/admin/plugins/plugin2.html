@@ -46,7 +46,7 @@ $(function(){
             var tr = $("<tr id='" + item.key + "'></tr>");
             tr.attr('key_prefix', iprefix);
             tr.append("<td class='key'>" +  ikey + "</td><td><label for='value_" + ikey + "'>" +  idescription + "</label></td>");
-            var td = $("<td class='value'></td>");
+            var td = $("<td class='value' type='" + item.type + "'></td>");
             if (itype == 'boolean') {
                 td.append("<input type='checkbox' name='value_" + ikey + "' id='value_" + ikey + "' />");
                 tr.append(td);
@@ -123,6 +123,18 @@ $(function(){
                          </table>");
         },
     });
+    
+    function deleteConfigKey(name, host, key) {
+        rest.get(['plugin', 'config', 'del', name, host, 'by-key', key],
+            function(data) {
+                var status = (data.status).toLowerCase();
+                if (status != 'ok') {
+                    /* Error */
+                    $.notification(data.status, data.description);
+                }
+            }
+        );
+    }
     
     function deleteConfig(name, host) {
         rest.get(['plugin', 'config', 'del', name, host],
@@ -223,6 +235,7 @@ $(function(){
                                             if (i == 1)
                                                 group_item.prefix = group_item.key;
                                             group_item.key = group_item.prefix + "-" + i;
+                                            group_item.nbInterface = nbInterface
                                             pluginCfg[nbPluginCfg] = clone(group_item);
                                             nbPluginCfg++;
                                             $('#configuration_items_' + i).createItemContent(group_item); 
@@ -255,6 +268,9 @@ $(function(){
                                     $("input", this).attr('id', 'value_' + newKey);
                                     addedGroup = {};
                                     addedGroup.key = newKey;
+                                    addedGroup.type = $(".value", $(item)).attr('type');
+                                    // ICI!! Add .type here
+                                    addedGroup.nbInterface = nbInterface;
                                     pluginCfg[nbPluginCfg] = addedGroup;
                                     nbPluginCfg++;
                                 }
@@ -264,13 +280,40 @@ $(function(){
                         });
 
                         delInterfaceButton.click( function() {
+                            // delete config data
+                            $('tr', '#configuration_items_' + nbInterface).each(function(index, item) {
+                                deleteConfigKey('{{ plugin.name }}', '{{ plugin.host }}', item.id);
+                            });
+                            // delete elements from pluginCfg
+                            var k = 0;
+                            var pluginCfg2 = [];
+                            for(var j=0;j<pluginCfg.length;j++) {
+                                if (pluginCfg[j].nbInterface != nbInterface) {
+                                    pluginCfg2[k] = clone(pluginCfg[j]);
+                                     k++;
+                                }
+                                else {
+                                    nbPluginCfg--;
+                                }
+                            }
+                            pluginCfg = pluginCfg2
+                                
+                            // save new nbInterface
                             nbInterface--;
+                            rest.get(['plugin', 'config', 'set', 'name', '{{ plugin.name }}', 'hostname', '{{ plugin.host }}', 'key', 'nb-int', 'value', nbInterface],
+                                function(data) {
+                                    var status = (data.status).toLowerCase();
+                                    if (status != 'ok') {
+                                        // Error
+                                        $.notification(data.status, data.description);
+                                    }
+                                }
+                            );
+
                             // hide/delete interface display
                             $('#grouped_configuration_items .simple:last').remove();
-                            // delete config data
-
                             // hide delete button
-                            if (nbInterface == 2) {
+                            if (nbInterface == 1) {
                                 delInterfaceButton.hide();
                             }
                         });
