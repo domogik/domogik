@@ -25,14 +25,14 @@ $(function(){
     $("button.feature").click(function(){
         $('button.feature').removeClass('selected');
         $(this).addClass('selected');
-        var type = $(this).attr('type');
+        var featuretype = $(this).attr('featuretype');
         var featureid = $(this).attr('featureid');
         var featuremodel = $(this).attr('featuremodel');
         var featurename = $(this).attr('featurename');
         var devicename = $(this).attr('devicename');
         $("#model dl").hide();
         $("#widgets ul").widget_models({
-            type: type,
+            featuretype: featuretype,
             featureid: featureid,
             featuremodel: featuremodel,
             featurename: featurename,
@@ -150,7 +150,7 @@ $(function(){
         _init: function() {
             var self = this, o = this.options;
             this.element.empty();
-            var widgets = get_widgets(o.type);
+            var widgets = get_widgets(o.featuretype);
             $.each(widgets, function(index, id) {
                 var woptions = get_widgets_options(id);
                 if (matchFilter(woptions.filters, o.featuremodel)) {

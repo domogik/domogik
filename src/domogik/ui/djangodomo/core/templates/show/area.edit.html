@@ -82,7 +82,7 @@
             {% for device in devices_list %}
             <ul id="features{{device.id}}" class='features'>
                 {% for feature in device.features %}
-                <li><button id='showfeature{{feature.id}}' class='feature' featureid='{{ feature.id }}' devicename='{{device.name }}' featuremodel='{{ feature.device_feature_model.id }}' featurename='{{ feature.device_feature_model.name }}' type='{{ feature.device_feature_model.feature_type }}.{{ feature.device_feature_model.value_type }}'>{{ feature.device_feature_model.name }}</button></li>
+                <li><button id='showfeature{{feature.id}}' class='feature' featureid='{{ feature.id }}' devicename='{{device.name }}' featuremodel='{{ feature.device_feature_model.id }}' featurename='{{ feature.device_feature_model.name }}' featuretype='{{ feature.device_feature_model.feature_type }}.{{ feature.device_feature_model.value_type }}'>{{ feature.device_feature_model.name }}</button></li>
                 {% endfor %}
             </ul>
             {% endfor %}
