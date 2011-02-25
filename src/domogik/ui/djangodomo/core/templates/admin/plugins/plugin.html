@@ -55,8 +55,10 @@ $(function(){
                 td.append("<input type='text' name='value_" + ikey + "' id='value_" + ikey + "' class='medium' value='' />");                                                                            
                 tr.append(td);
                 var resetButton = $("<button id='reset" + ikey + "' class='icon16-action-reset buttonicon' title='{% trans "Reset" %} " + ikey + "'><span class='offscreen'>{% trans "Reset" %} " + ikey + "</span></button>");
+                resetButton.data('tr_id', ikey);
+                resetButton.data('default', idefault);
                 resetButton.click(function(event) {
-                    $("tr#" + ikey +" .value").setNotConfigured(idefault);
+                    $("tr#" + $(this).data('tr_id') +" .value").setNotConfigured($(this).data('default'));
                     event.stopPropagation();
                 });
                 var td = $("<td><ul class='actions'><li></li></ul></td>");
@@ -106,7 +108,7 @@ $(function(){
         setNotConfigured: function(defaultValue) {
             this.addClass('icon16-status-warning');
             this.prepend("<span class='offscreen'>No configured</span>");
-            if (defaultValue) {
+            if ((defaultValue) && (defaultValue != "None")) {
                 $("input", this).val(defaultValue);            
             } else {
                 $("input", this).val("");                        
@@ -267,6 +269,10 @@ $(function(){
                                     $(".key", this).text(newKey);
                                     $("label", this).attr('for', 'value_' + newKey);
                                     $("input", this).attr('id', 'value_' + newKey);
+                                    $("button", this).attr('id', 'reset' + newKey);
+                                    $("button", this).data('tr_id', newKey);
+                                    $("button", this).attr('title', '{% trans "Reset" %} ' + newKey);
+                                    $(".offscreen", this).text('{% trans "Reset" %} ' + newKey);
                                     addedGroup = {};
                                     addedGroup.key = newKey;
                                     addedGroup.type = $(".value", $(item)).attr('type');
