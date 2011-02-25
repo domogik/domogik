@@ -21,13 +21,9 @@
 
 ul#users {
     list-style:none;
-    text-align:center;
     margin:0;
     padding:0;
-    -moz-column-width: 6em;
-    -webkit-column-width: 6em;
-    -moz-column-gap: 1em;
-    -webkit-column-gap: 1em;
+    text-align:center
 }
 
 ul#users li a {
