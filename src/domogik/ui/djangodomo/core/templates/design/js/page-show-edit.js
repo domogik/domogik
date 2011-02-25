@@ -50,7 +50,7 @@ $(function(){
         var item = null;
         if (helper == 'clone') {
             item = $(ui.helper).clone();
-
+            item.removeAttr('style');
             $(this).append(item);
             item.widget_shape({
                 widgetid: ui.draggable.data('widgetid'),
@@ -68,8 +68,8 @@ $(function(){
             });            
         } else {
             item = ui.draggable.detach();
+            item.removeAttr('style');
             $(this).append(item);
-            item.removeAttr('style');    
         }
         $.addAssociation(item, $(this));            
         return false;
