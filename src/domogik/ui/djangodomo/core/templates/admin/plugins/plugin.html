@@ -44,7 +44,7 @@ $(function(){
             var itype = item.type;
             var iprefix = item.prefix;
             var tr = $("<tr id='" + item.key + "'></tr>");
-            tr.attr('key_prefix', iprefix);
+            tr.data('key_prefix', iprefix);
             tr.append("<td class='key'>" +  ikey + "</td><td><label for='value_" + ikey + "'>" +  idescription + "</label></td>");
             var td = $("<td class='value' type='" + item.type + "'></td>");
             if (itype == 'boolean') {
@@ -261,9 +261,9 @@ $(function(){
                             divCloned.attr('id', 'configuration_items' + '_' + nbInterface);
 
                             $('tr', divCloned).each(function(index, item) {
-                                newKey = $(item).attr('key_prefix') + '-' + nbInterface;
+                                newKey = $(item).data('key_prefix') + '-' + nbInterface;
                                 // todo : why have we to test about undefined here ?
-                                if ($(item).attr('key_prefix') != undefined) {
+                                if ($(item).data('key_prefix') != undefined) {
                                     $(item).attr('id', newKey);
                                     $(".value", $(item)).setNotConfigured();
                                     $(".key", this).text(newKey);
