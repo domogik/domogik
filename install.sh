@@ -168,9 +168,6 @@ function update_user_config {
         upgrade_sql="y"
     fi
 
-    if [ "$keep" = "y" -o "$keep" = "Y" ];then
-            return
-    fi
     mysql_ok=
     while [ ! $mysql_ok ];do 
         echo "Please set your mysql parameters."
