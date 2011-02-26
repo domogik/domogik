@@ -212,7 +212,14 @@ def test_user_config_file(user_home, user_entry):
 
     assert dmg['log_level'] in ['debug','info','warning','error','critical'], "The log_level parameter does not have a good value. Must \
             be one of debug,info,warning,error,critical"
-    assert os.path.isdir(dmg['custom_prefix'] + '/share/domogik'), "Custom prefix parameter is wrong. Unless you have modified your setup.py, data files should be installed into /usr/local/share/domogik, and custom_prefix should be /usr/local"
+    #assert os.path.isdir(dmg['custom_prefix'] + '/share/domogik'), "Custom prefix parameter is wrong. Unless you have modified your setup.py, data files should be installed into /usr/local/share/domogik, and custom_prefix should be /usr/local"
+    if not os.path.isdir(dmg['custom_prefix'] + '/share/domogik'):
+        try:
+            f = os.listdir("%s/share/domogik" % dmg['custom_prefix'])
+            f.close()
+        except OSError:
+            fail("Can't access %s/share/domogik. Check %s is available for domogik user (if you are in development mode, be sure the directory which contains the sources is available for domogik user)." % (dmg['custom_prefix'],dmg['custom_prefix']))
+            exit()
     ok("[domogik] section seems good")
 
     # check [database] section
