@@ -244,7 +244,8 @@ class SysManager(XplPlugin):
                     time.sleep(1)
             self.log.info("System manager initialized")
             self._write_fifo("OK", "System manager initialized.\n")
-            self._state_fifo.close()
+            if self._state_fifo != None:
+                self._state_fifo.close()
 
             ### make an eternal loop to ping plugins
             # the goal is to detect manually launched plugins
