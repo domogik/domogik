@@ -74,6 +74,7 @@ function copy_sample_files {
             exit 9
         fi
     fi
+    d_home=$(getent passwd $d_user |cut -d ':' -f 6)
     keep="n"
     already_cfg=
     if [ ! -f $d_home/.domogik.cfg ];then
@@ -118,7 +119,6 @@ function update_default_config {
     fi
     [ -f /etc/default/domogik ] &&  sed -i "s;^DOMOGIK_USER.*$;DOMOGIK_USER=$d_user;" /etc/default/domogik
 
-    d_home=$(getent passwd $d_user |cut -d ':' -f 6)
 
     #[ -f $d_home/.domogik.cfg ] && rm -f $d_home/.domogik.cfg
 
