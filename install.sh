@@ -62,6 +62,35 @@ function test_sources {
 }
 
 function copy_sample_files {
+    read -p "Which user will run domogik, it will be created if it does not exist yet? (default : domogik) " d_user
+    d_user=${d_user:-domogik}
+    if ! getent passwd $d_user >/dev/null;then
+        echo "I can't find informations about this user !"
+        read -p "Do you want to create it ? (y/n) " create
+        if [ "$create" = "y" ];then
+            adduser $d_user
+        else
+            echo "Please restart this script when the user $d_user will exist."
+            exit 9
+        fi
+    fi
+    keep="n"
+    already_cfg=
+    if [ ! -f $d_home/.domogik.cfg ];then
+        cp -f src/domogik/examples/config/domogik.cfg $d_home/.domogik.cfg
+        chown $d_user: src/domogik/examples/config/domogik.cfg $d_home/.domogik.cfg
+    else
+        keep="y"
+        already_cfg=1
+        read -p "You already have a .domogik.cfg file. Do you want to keep it ? [Y/n]" keep
+        if [ "x$keep" = "x" ];then
+            keep="y"
+        fi
+        if [ "$keep" = "n" -o "$keep" = "N" ];then
+            cp -f src/domogik/examples/config/domogik.cfg $d_home/.domogik.cfg
+            chown $d_user: src/domogik/examples/config/domogik.cfg $d_home/.domogik.cfg
+        fi
+    fi
     if [ -d "/etc/default/" ];then
         if [ "$keep" = "n" -o "$keep" = "N" ];then
             cp src/domogik/examples/default/domogik /etc/default/
@@ -87,18 +116,6 @@ function update_default_config {
         echo "Can't find /etc/default/domogik!"
         exit 8
     fi
-    read -p "Which user will run domogik, it will be created if it does not exist yet? (default : domogik) " d_user
-    d_user=${d_user:-domogik}
-    if ! getent passwd $d_user >/dev/null;then
-        echo "I can't find informations about this user !"
-        read -p "Do you want to create it ? (y/n) " create
-        if [ "$create" = "y" ];then
-            adduser $d_user
-        else
-            echo "Please restart this script when the user $d_user will exist."
-            exit 9
-        fi
-    fi
     [ -f /etc/default/domogik ] &&  sed -i "s;^DOMOGIK_USER.*$;DOMOGIK_USER=$d_user;" /etc/default/domogik
 
     d_home=$(getent passwd $d_user |cut -d ':' -f 6)
@@ -113,23 +130,6 @@ function update_default_config {
 }
 
 function update_user_config {
-    keep="n"
-    already_cfg=
-    if [ ! -f $d_home/.domogik.cfg ];then
-        cp -f src/domogik/examples/config/domogik.cfg $d_home/.domogik.cfg
-        chown $d_user: src/domogik/examples/config/domogik.cfg $d_home/.domogik.cfg
-    else
-        keep="y"
-        already_cfg=1
-        read -p "You already have a .domogik.cfg file. Do you want to keep it ? [Y/n]" keep
-        if [ "x$keep" = "x" ];then
-            keep="y"
-        fi
-        if [ "$keep" = "n" -o "$keep" = "N" ];then
-            cp -f src/domogik/examples/config/domogik.cfg $d_home/.domogik.cfg
-            chown $d_user: src/domogik/examples/config/domogik.cfg $d_home/.domogik.cfg
-        fi
-    fi
             
     if [ "$keep" = "n" -o "$keep" = "N" ];then
         if [ "$MODE" = "install" ];then
