@@ -130,7 +130,7 @@ class SysManager(XplPlugin):
         self._hardwares = []
         self._hardware_models = []
         try:
-            # Get components
+            # Get components:
             self._list_plugins()
             if self.options.check_hardware == True:
                 self._list_hardware_models()
@@ -543,7 +543,9 @@ class SysManager(XplPlugin):
         __import__(plg_path)
         plugin = sys.modules[plg_path]
         subp = Popen("/usr/bin/python %s" % plugin.__file__, shell=True)
-        return subp.pid
+        pid = subp.pid
+        subp.communicate()
+        return pid
 
     def _delete_pid_file(self, plg):
         """ Delete pid file
