@@ -40,6 +40,7 @@ Implements
 from domogik.common import logger
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
+from domogik.xpl.common.plugin import XplResult
 
 
 class Query():
@@ -62,9 +63,11 @@ class Query():
     def __del__(self):
         print "End query"
 
-    def query(self, technology, key, result, element = ''):
+    def query(self, technology, key, element = ''):
         '''
-        Ask the config system for the value
+        Ask the config system for the value. Calling this function will make 
+        your program wait until it got an answer 
+    
         @param technology : the technology of the item requesting the value,
         must exists in the config database
         @param element : the name of the element which requests config, None if
@@ -73,9 +76,11 @@ class Query():
         all the config items for this technology will be fetched
         '''
         print "new query for t = %s, k = %s" % (technology, key)
-        l = Listener(self._query_cb, self.__myxpl, {'schema': 'domogik.config', 'xpltype': 'xpl-stat',
-                                                'technology': technology, 'hostname' : self.__myxpl.p.get_sanitized_hostname()})
-        self._keys[key] = result
+        l = Listener(self._query_cb, self.__myxpl, {'schema': 'domogik.config',
+                                                    'xpltype': 'xpl-stat',
+                                                    'technology': technology,
+                                                    'hostname' : self.__myxpl.p.get_sanitized_hostname()})
+        self._keys[key] = XplResult()
         self._l[key] = l
         mess = XplMessage()
         mess.set_type('xpl-cmnd')
@@ -93,6 +98,7 @@ class Query():
                 if not self._keys[key].get_lock().is_set():
                     self.log.error("No answer received for t = %s, k = %s" % (technology, key))
                     raise RuntimeError("No answer received for t = %s, k = %s, check your xpl setup" % (technology, key))
+                return self._keys[key]
             except KeyError:
                 pass
 
@@ -102,6 +108,7 @@ class Query():
         @param message : the message received
         '''
         print "Answer received"
+        res = XplResult()
         result = message.data
         for r in self._keys:
             if r in result:

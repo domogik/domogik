@@ -36,7 +36,7 @@ Implements
 """
 
 from domogik.xpl.common.xplconnector import Listener
-from domogik.xpl.common.plugin import XplPlugin, XplResult
+from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.queryconfig import Query
 from domogik.xpl.lib.knx import KNXException
@@ -56,9 +56,7 @@ class KNXManager(XplPlugin):
 
         # Configuration : KNX device
         self._config = Query(self.myxpl, self.log)
-        res = XplResult()
-        self._config.query('knx', 'device', res)
-        device = res.get_value()['device']
+        device = self._config.query('knx', 'device')
 
         ### Create KNX object
         try:

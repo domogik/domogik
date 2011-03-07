@@ -36,7 +36,7 @@ Implements
 """
 
 from domogik.xpl.common.xplconnector import Listener
-from domogik.xpl.common.plugin import XplPlugin, XplResult
+from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.queryconfig import Query
 from domogik.xpl.lib.ipx800 import IPXException
@@ -58,30 +58,14 @@ class IPXManager(XplPlugin):
         self.ipx_list = {}
         num = 1
         loop = True
+        self._config = Query(self.myxpl, self.log)
         while loop == True:
-            self._config = Query(self.myxpl, self.log)
-            res = XplResult()
-            self._config.query('ipx800', 'login-%s' % str(num), res)
-            login = res.get_value()['login-%s' % str(num)]
-            if login == "None":
-                login = None
-            self._config = Query(self.myxpl, self.log)
-            res = XplResult()
-            self._config.query('ipx800', 'password-%s' % str(num), res)
-            password = res.get_value()['password-%s' % str(num)]
-            self._config = Query(self.myxpl, self.log)
-            res = XplResult()
-            self._config.query('ipx800', 'name-%s' % str(num), res)
-            name = res.get_value()['name-%s' % str(num)]
-            self._config = Query(self.myxpl, self.log)
-            res = XplResult()
-            self._config.query('ipx800', 'ip-%s' % str(num), res)
-            address = res.get_value()['ip-%s' % str(num)]
-            self._config = Query(self.myxpl, self.log)
-            res = XplResult()
-            self._config.query('ipx800', 'int-%s' % str(num), res)
-            inter = res.get_value()['int-%s' % str(num)]
-            if name != "None":
+            login = self._config.query('ipx800', 'login-%s' % str(num))
+            password = self._config.query('ipx800', 'password-%s' % str(num))
+            name = self._config.query('ipx800', 'name-%s' % str(num))
+            address = self._config.query('ipx800', 'ip-%s' % str(num))
+            inter = self._config.query('ipx800', 'int-%s' % str(num))
+            if name != None:
                 self.log.info("Configuration : login=%s, password=***, name=%s, ip=%s, interval=%s" % 
                                (login, name, address, inter))
                 self.ipx_list[name] = {"login" : login,

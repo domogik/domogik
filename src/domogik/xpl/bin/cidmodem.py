@@ -37,7 +37,6 @@ Implements
 
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin
-from domogik.xpl.common.plugin import XplResult
 from domogik.xpl.common.queryconfig import Query
 from domogik.xpl.lib.cidmodem import CallerIdModem
 from domogik.xpl.lib.cidmodem import CallerIdModemException
@@ -55,14 +54,9 @@ class CIDManager(XplPlugin):
 
         # Configuration
         self._config = Query(self.myxpl, self.log)
-        res = XplResult()
-        self._config.query('cidmodem', 'device', res)
-        device = res.get_value()['device']
+        device = self._config.query('cidmodem', 'device')
 
-        self._config = Query(self.myxpl, self.log)
-        res = XplResult()
-        self._config.query('cidmodem', 'cid-command', res)
-        cid_command = res.get_value()['cid-command']
+        cid_command = self._config.query('cidmodem', 'cid-command')
 
         # Init Modem
         cid  = CallerIdModem(self.log, self.send_xpl)

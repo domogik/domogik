@@ -38,7 +38,7 @@ Implements
 from threading import Event
 
 from domogik.xpl.common.xplconnector import Listener
-from domogik.xpl.common.plugin import XplPlugin, XplResult
+from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.queryconfig import Query
 from domogik.xpl.lib.wol_ping import WOL, Ping
@@ -58,10 +58,8 @@ class WolPing(XplPlugin):
 
         # Configuration : interval between each ping
         self._config = Query(self.myxpl, self.log)
-        res = XplResult()
-        self._config.query('wol_ping', 'ping-interval', res)
-        interval = res.get_value()['ping-interval']
-        if interval == "None":
+        interval = self._config.query('wol_ping', 'ping-interval')
+        if interval == None:
             interval = 60
 
         # Configuration : list of computers
@@ -69,23 +67,11 @@ class WolPing(XplPlugin):
         num = 1
         loop = True
         while loop == True:
-            self._config = Query(self.myxpl, self.log)
-            res = XplResult()
-            self._config.query('wol_ping', 'name-%s' % str(num), res)
-            name = res.get_value()['name-%s' % str(num)]
-            self._config = Query(self.myxpl, self.log)
-            res = XplResult()
-            self._config.query('wol_ping', 'ip-%s' % str(num), res)
-            ip = res.get_value()['ip-%s' % str(num)]
-            self._config = Query(self.myxpl, self.log)
-            res = XplResult()
-            self._config.query('wol_ping', 'mac-%s' % str(num), res)
-            mac = res.get_value()['mac-%s' % str(num)]
-            self._config = Query(self.myxpl, self.log)
-            res = XplResult()
-            self._config.query('wol_ping', 'wol-port-%s' % str(num), res)
-            mac_port = res.get_value()['wol-port-%s' % str(num)]
-            if name != "None":
+            name = self._config.query('wol_ping', 'name-%s' % str(num))
+            ip = self._config.query('wol_ping', 'ip-%s' % str(num))
+            mac = self._config.query('wol_ping', 'mac-%s' % str(num))
+            mac_port = self._config.query('wol_ping', 'wol-port-%s' % str(num))
+            if name != None:
                 self.log.info("Configuration : name=%s, ip=%s, mac=%s, mac port=%s" % (name, ip, mac, mac_port))
                 self.computers[name] = {"ip" : ip, "mac" : mac, 
                                         "mac_port" : mac_port}

@@ -38,7 +38,7 @@ Implements
 """
 
 from domogik.xpl.common.xplconnector import Listener, XplTimer
-from domogik.xpl.common.plugin import XplPlugin, XplResult
+from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.lib.plcbus import PLCBUSAPI
 from domogik.xpl.common.queryconfig import Query
@@ -56,24 +56,16 @@ class PlcBusMain(XplPlugin):
         '''
         # Load config
         XplPlugin.__init__(self, name = 'plcbus')
-        self._config = Query(self.myxpl, self.log)
         # Create listeners
         Listener(self._plcbus_cmnd_cb, self.myxpl, {
             'schema': 'plcbus.basic',
             'xpltype': 'xpl-cmnd',
         })
-        res = XplResult()
-        self._config.query('plcbus', 'device', res)
-        device = res.get_value()['device']
-        res = XplResult()
-        self._config.query('plcbus', 'usercode', res)
-        self._usercode = res.get_value()['usercode']
-        res = XplResult()
-        self._config.query('plcbus', 'probe-interval', res)
-        self._probe_inter = int(res.get_value()['probe-interval'])
-        res = XplResult()
-        self._config.query('plcbus', 'probe-list', res)
-        self._probe_list = res.get_value()['probe-list']
+        self._config = Query(self.myxpl, self.log)
+        device = self._config.query('plcbus', 'device')
+        self._usercode = self._config.query('plcbus', 'usercode')
+        self._probe_inter = int( self._config.query('plcbus', 'probe-interval'))
+        self._probe_list = self._config.query('plcbus', 'probe-list')
 
         # Create log instance
         self.api = PLCBUSAPI(self.log, device, self._command_cb, self._message_cb)

@@ -37,7 +37,6 @@ Implements
 
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin
-from domogik.xpl.common.plugin import XplResult
 from domogik.xpl.common.queryconfig import Query
 from domogik.xpl.lib.mirror import Mirror
 from domogik.xpl.lib.mirror import MirrorException
@@ -55,9 +54,7 @@ class MirrorManager(XplPlugin):
         # Get config
         #   - device
         self._config = Query(self.myxpl, self.log)
-        res = XplResult()
-        self._config.query('mirror', 'device', res)
-        device = res.get_value()['device']
+        device = self._config.query('mirror', 'device')
 
         # Init Mir:ror
         mirror  = Mirror(self.log, self.send_xpl)

@@ -36,7 +36,7 @@ Implements
 """
 
 from domogik.xpl.common.xplconnector import Listener
-from domogik.xpl.common.plugin import XplPlugin, XplResult
+from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.queryconfig import Query
 from domogik.xpl.lib.tv_samsg import SamsungTV, SamsungTVException
@@ -55,16 +55,11 @@ class SamsungTVManager(XplPlugin):
         self.televisions = {}
         num = 1
         loop = True
+        self._config = Query(self.myxpl, self.log)
         while loop == True:
-            self._config = Query(self.myxpl, self.log)
-            res = XplResult()
-            self._config.query('tv_samsg', 'tv-%s-name' % str(num), res)
-            name = res.get_value()['tv-%s-name' % str(num)]
-            self._config = Query(self.myxpl, self.log)
-            res = XplResult()
-            self._config.query('tv_samsg', 'tv-%s-device' % str(num), res)
-            device = res.get_value()['tv-%s-device' % str(num)]
-            if name != "None":
+            name = self._config.query('tv_samsg', 'tv-%s-name' % str(num))
+            device = self._config.query('tv_samsg', 'tv-%s-device' % str(num))
+            if name != None:
                 self.log.info("Configuration : name=%s, device=%s" % (name, device))
                 self.televisions[name] = {"device" : device}
             else:

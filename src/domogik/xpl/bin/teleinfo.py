@@ -36,7 +36,7 @@ Implements
 """
 
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.common.plugin import XplPlugin, XplResult
+from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.lib.teleinfo import Teleinfo
 from domogik.xpl.lib.teleinfo import TeleinfoException
 from domogik.xpl.common.queryconfig import Query
@@ -54,12 +54,8 @@ class TeleinfoManager(XplPlugin):
         '''
         XplPlugin.__init__(self, name='teleinfo')
         self._config = Query(self.myxpl, self.log)
-        res = XplResult()
-        self._config.query('teleinfo', 'device', res)
-        device = res.get_value()['device']
-        res = XplResult()
-        self._config.query('teleinfo', 'interval', res)
-        interval = res.get_value()['interval']
+        device = self._config.query('teleinfo', 'device')
+        interval = self._config.query('teleinfo', 'interval')
 
         # Init Teleinfo
         teleinfo  = Teleinfo(self.log, self.send_xpl)

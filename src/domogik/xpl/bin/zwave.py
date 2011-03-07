@@ -38,7 +38,7 @@ Implements
 
 
 from domogik.xpl.common.xplconnector import Listener
-from domogik.xpl.common.plugin import XplPlugin, XplResult
+from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.queryconfig import Query
 from domogik.xpl.lib.zwave import ZWave
@@ -47,15 +47,11 @@ from time import sleep
 class Zwave(XplPlugin):
     def __init__(self):
         XplPlugin.__init__(self, name = 'zwave')
-        self._config = Query(self.myxpl, self.log)
         Listener(self.zwave_cmd_cb, self.myxpl,{'schema': 'zwave.basic',
                                                  'xpltype': 'xpl-cmnd'})
-        res = XplResult()
-        self._config.query('zwave', 'device', res)
-        device = res.get_value()['device']
-        res = XplResult()
-        self._config.query('zwave', 'speed', res)
-        speed = res.get_value()['speed']
+        self._config = Query(self.myxpl, self.log)
+        device = self._config.query('zwave', 'device')
+        speed = self._config.query('zwave', 'speed')
         print device, '  ', speed
 #        device='/dev/ttyUSB0'
         self.myzwave = ZWave(device, speed, self.zwave_cb, self.log)

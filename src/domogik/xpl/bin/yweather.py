@@ -38,7 +38,6 @@ Implements
 from domogik.xpl.common.xplconnector import XplTimer
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin
-from domogik.xpl.common.plugin import XplResult
 from domogik.xpl.common.queryconfig import Query
 from domogik.xpl.lib.yweather import YWeather
 from domogik.xpl.lib.yweather import YWeatherException
@@ -58,31 +57,17 @@ class YWeatherManager(XplPlugin):
 
         # Get config
         self._config = Query(self.myxpl, self.log)
-        res = XplResult()
-        self._config.query('yweather', 'unit' , res)
-        unit = res.get_value()['unit'].lower()
-        self._config = Query(self.myxpl, self.log)
-        res = XplResult()
-        self._config.query('yweather', 'en-current' , res)
-        self.enable_current = res.get_value()['en-current']
-        self._config = Query(self.myxpl, self.log)
-        res = XplResult()
-        self._config.query('yweather', 'en-prev' , res)
-        self.enable_previsionnal = res.get_value()['en-prev']
+        unit = self._config.query('yweather', 'unit' ).lower()
+        self.enable_current = self._config.query('yweather', 'en-current' )
+        self.enable_previsionnal = self._config.query('yweather', 'en-prev' )
 
         self.cities = {}
         num = 1
         loop = True
         while loop == True:
-            self._config = Query(self.myxpl, self.log)
-            res = XplResult()
-            self._config.query('yweather', 'city-%s' % str(num), res)
-            city_code = res.get_value()['city-%s' % str(num)]
-            self._config = Query(self.myxpl, self.log)
-            res = XplResult()
-            self._config.query('yweather', 'device-%s' % str(num), res)
-            device = res.get_value()['device-%s' % str(num)]
-            if city_code != 'None':
+            city_code = self._config.query('yweather', 'city-%s' % str(num))
+            device = self._config.query('yweather', 'device-%s' % str(num))
+            if city_code != None:
                 self.cities[city_code] = { "device" : device }
                 num = num + 1
             else:

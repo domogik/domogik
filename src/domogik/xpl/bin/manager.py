@@ -50,7 +50,7 @@ from domogik.common.configloader import Loader
 from domogik.xpl.common.xplconnector import Listener 
 from domogik.xpl.common.xplconnector import READ_NETWORK_TIMEOUT
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.common.plugin import XplPlugin, XplResult
+from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.queryconfig import Query
 from domogik.common.packagexml import PackageXml, PackageException
 from domogik.xpl.common.xplconnector import XplTimer 
@@ -188,9 +188,7 @@ class SysManager(XplPlugin):
                 name = plugin["name"]
                 self.log.debug("%s..." % name)
                 self._config = Query(self.myxpl, self.log)
-                res = XplResult()
-                self._config.query(name, 'startup-plugin', res)
-                startup = res.get_value()['startup-plugin']
+                startup = self._config.query(name, 'startup-plugin')
                 # start plugin
                 if startup == 'True':
                     self.log.debug("            starting")

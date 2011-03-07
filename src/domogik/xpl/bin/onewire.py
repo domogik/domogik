@@ -37,7 +37,6 @@ TODO
 
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin
-from domogik.xpl.common.plugin import XplResult
 from domogik.xpl.common.queryconfig import Query
 from domogik.xpl.lib.onewire import OneWireException
 from domogik.xpl.lib.onewire import OneWireNetwork
@@ -59,55 +58,30 @@ class OneWireManager(XplPlugin):
         try:
             ### get all config keys
             self._config = Query(self.myxpl, self.log)
-            res = XplResult()
-            self._config.query('onewire', 'device', res)
-            device = res.get_value()['device']
+            device = self._config.query('onewire', 'device')
 
-            self._config = Query(self.myxpl, self.log)
-            res = XplResult()
-            self._config.query('onewire', 'cache', res)
-            if res.get_value()['cache'] == "True":
+            cache = self._config.query('onewire', 'cache')
+            if cache == "True":
                 cache = True
             else:
                 cache = False
 
             ### DS18B20 config
-            self._config = Query(self.myxpl, self.log)
-            res = XplResult()
-            self._config.query('onewire', 'ds18b20-en', res)
-            ds18b20_enabled = res.get_value()['ds18b20-en']
+            ds18b20_enabled = self._config.query('onewire', 'ds18b20-en')
 
-            self._config = Query(self.myxpl, self.log)
-            res = XplResult()
-            self._config.query('onewire', 'ds18b20-int', res)
-            ds18b20_interval = res.get_value()['ds18b20-int']
+            ds18b20_interval = self._config.query('onewire', 'ds18b20-int')
     
-            self._config = Query(self.myxpl, self.log)
-            res = XplResult()
-            self._config.query('onewire', 'ds18b20-res', res)
-            ds18b20_resolution = res.get_value()['ds18b20-res']
+            ds18b20_resolution = self._config.query('onewire', 'ds18b20-res')
     
             ### DS18S20 config
-            self._config = Query(self.myxpl, self.log)
-            res = XplResult()
-            self._config.query('onewire', 'ds18s20-en', res)
-            ds18s20_enabled = res.get_value()['ds18s20-en']
+            ds18s20_enabled = self._config.query('onewire', 'ds18s20-en')
 
-            self._config = Query(self.myxpl, self.log)
-            res = XplResult()
-            self._config.query('onewire', 'ds18s20-int', res)
-            ds18s20_interval = res.get_value()['ds18s20-int']
+            ds18s20_interval = self._config.query('onewire', 'ds18s20-int')
     
             ### DS2401 config
-            self._config = Query(self.myxpl, self.log)
-            res = XplResult()
-            self._config.query('onewire', 'ds2401-en', res)
-            ds2401_enabled = res.get_value()['ds2401-en']
+            ds2401_enabled = self._config.query('onewire', 'ds2401-en')
 
-            self._config = Query(self.myxpl, self.log)
-            res = XplResult()
-            self._config.query('onewire', 'ds2401-int', res)
-            ds2401_interval = res.get_value()['ds2401-int']
+            ds2401_interval = self._config.query('onewire', 'ds2401-int')
     
             ### Open one wire network
             try:
