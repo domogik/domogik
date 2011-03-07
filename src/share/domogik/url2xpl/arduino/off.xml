@@ -1,0 +1,17 @@
+<technology id="arduino">
+  <command name="off">
+    <schema>arduino.rgb</schema>
+    <command-key>command</command-key>	
+    <address-key>device</address-key>	
+    <command-xpl-value>off</command-xpl-value>  
+    <parameters/>
+  </command>	
+  <listener>
+    <schema>arduino.rgb</schema>
+    <xpltype>xpl-trig</xpltype>
+    <filter>
+      <key name="command" value="off" />
+      <key name="device" value="@address@"/>
+    </filter>
+  </listener>
+</technology>

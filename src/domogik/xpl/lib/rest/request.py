@@ -453,7 +453,11 @@ class ProcessRequest():
             if static_value is None:
                 if loc is None:
                     loc.value = 0
-                value = params[int(loc.value) - 1]
+                if params == None:
+                    value = None
+                else:
+                    value = params[int(loc.value) - 1]
+                print "V=%s" % value
             else:
                 value = static_value.value
             if type(value).__name__ == "str":

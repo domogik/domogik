@@ -36,7 +36,7 @@
             });
             // call command
             if (dontCallCmd != 1) {
-                rest.get(['command', o.devicetechnology, o.deviceaddress, 'set_rgb_color', color],
+                rest.get(['command', o.devicetechnology, o.deviceaddress, 'setcolor', color],
                     function(data) {
                         var status = (data.status).toLowerCase();
                         if (status != 'ok') {
