@@ -75,25 +75,34 @@ class DBConnector(XplPlugin):
         techno = message.data['technology']
         hostname = message.data['hostname']
         key = message.data['key']
+        if "value" in message.data:
+            new_value = message.data['value']
+        else:
+            new_value = None
         if "element" in message.data:
             element = message.data['element']
         else:
             element = None
-        if not key:
-            self.log.debug("New request config received for %s : asked for all config items" % (techno))
+
+        # Set configuration
+        if new_value:
+            self.log.debug("New set config received for %s : %s : %s" % (techno, key, new_value))
+            self._set_config(techno, hostname, key, new_value)
+
+        # Send configuration
         else:
-            self.log.debug("New request config received for %s : %s" % (techno, key))
-        if element:
-            self._send_config(techno, hostname, key, self._fetch_elmt_config(techno, element, key), element)
-        else:
-            if not key:
-                keys = self._fetch_techno_config(techno, hostname, key).keys()
-                values = self._fetch_techno_config(techno, hostname, key).values()
-                self._send_config(techno, hostname, keys, values)
+            if element:
+                self.log.debug("New request config received for %s : %s : %s" % (techno, key, element))
+                self._send_config(techno, hostname, key, self._fetch_elmt_config(techno, element, key), element)
             else:
-                self._send_config(techno, hostname, key, self._fetch_techno_config(techno, hostname, key))
-        #except KeyError:
-        #    self.log.warning("A request for configuration has been received, but it was misformatted")
+                if not key:
+                    self.log.debug("New request config received for %s : asked for all config items" % (techno))
+                    keys = self._fetch_techno_config(techno, hostname, key).keys()
+                    values = self._fetch_techno_config(techno, hostname, key).values()
+                    self._send_config(techno, hostname, keys, values)
+                else:
+                    self.log.debug("New request config received for %s : %s" % (techno, key))
+                    self._send_config(techno, hostname, key, self._fetch_techno_config(techno, hostname, key))
 
     def _send_config(self, technology, hostname, key, value, element = None):
         '''
@@ -191,6 +200,35 @@ class DBConnector(XplPlugin):
             traceback.print_exc()
             self.log.warn("No config found for technolgy %s on %s, key %s" % (techno, hostname, key))
             return "None"
+
+
+
+    def _set_config(self, technology, hostname, key, value):
+        '''
+        Send a config value message for an element's config item
+        @param technology : the technology of the element
+        @param hostname : hostname
+        @param key : the key to set
+        @param value : the value to set
+        '''
+        self.log.debug("Set config response for %s on %s : %s = %s" % (technology, hostname, key, value))
+
+        try:
+            self._db.set_plugin_config(techno, hostname, key, value)
+    
+            mess = XplMessage()
+            mess.set_type('xpl-stat')
+            mess.set_schema('domogik.config')
+            mess.add_data({'technology' :  technology})
+            mess.add_data({'hostname' :  hostname})
+            mess.add_data({'key' :  key})
+            mess.add_data({'value' :  value})
+            self.myxpl.send(mess)
+        except:
+            traceback.print_exc()
+            self.log.warn("Error while setting %s on %s, key %s" % (techno, hostname, key))
+            return "None"
+
 
 if __name__ == "__main__":
     DBC = DBConnector()

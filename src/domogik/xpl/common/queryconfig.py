@@ -63,6 +63,23 @@ class Query():
     def __del__(self):
         print "End query"
 
+    def set(self, technology, key, value):
+        '''
+        Send a xpl message to set value for a param
+    
+        @param technology : the technology of the item 
+        @param key : the key to set corresponding value,
+        @param value : the value to set
+        '''
+        mess = XplMessage()
+        mess.set_type('xpl-cmnd')
+        mess.set_schema('domogik.config')
+        mess.add_data({'technology': technology})
+        mess.add_data({'hostname': self.__myxpl.p.get_sanitized_hostname()})
+        mess.add_data({'key': key})
+        mess.add_data({'value': value})
+        self.__myxpl.send(mess)
+
     def query(self, technology, key, element = ''):
         '''
         Ask the config system for the value. Calling this function will make 
