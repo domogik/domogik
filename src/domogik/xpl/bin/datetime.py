@@ -85,7 +85,8 @@ class XPLDateTime(XplPlugin):
         mess.add_data({"datetime" :  datetime})
         mess.add_data({"date" :  date})
         mess.add_data({"time" :  time})
-        mess.add_data({"format1" :  ldt[6]}) # weekday
+        # datetime + weekday
+        mess.add_data({"format1" :  "%s%s" % (datetime, ldt[6])}) 
         print mess
         self.myxpl.send(mess)
 
