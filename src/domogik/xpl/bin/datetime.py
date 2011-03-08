@@ -41,6 +41,9 @@ from time import localtime
 from domogik.xpl.common.xplconnector import XplTimer
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.xplmessage import XplMessage
+import threading
+
+TIME_BETWEEN_EACH_MESSAGE = 30
 
 
 class XPLDateTime(XplPlugin):
@@ -49,11 +52,14 @@ class XPLDateTime(XplPlugin):
     '''
 
     def __init__(self):
-        XplPlugin.__init__(self, name = 'ldtmgr')
+        XplPlugin.__init__(self, name = 'datetime')
         
-        self._timer = XplTimer(10, self._send_datetime, self.get_stop())
-        self.register_timer(self._timer)
-        self._timer.start()
+        self._listen_stop = threading.Event()
+        self._listen_thr = XplTimer(TIME_BETWEEN_EACH_MESSAGE, \
+                                    self._send_datetime,
+                                    self._listen_stop, \
+                                    self.myxpl)
+        self._listen_thr.start()
         self.enable_hbeat()
 
     def _format(self, number):
@@ -73,14 +79,14 @@ class XPLDateTime(XplPlugin):
         date = "%s%s%s" % (ldt[0], self._format(ldt[1]), self._format(ldt[2]))
         time = "%s%s%s" % (self._format(ldt[3]), self._format(ldt[4]), self._format(ldt[5]))
         datetime = "%s%s" % (date, time)
-        datetimedaynumber = "%s%s" % (datetime, ldt[6])
         mess = XplMessage()
         mess.set_type("xpl-trig")
         mess.set_schema("datetime.basic")
+        mess.add_data({"datetime" :  datetime})
         mess.add_data({"date" :  date})
         mess.add_data({"time" :  time})
-        mess.add_data({"datetime" :  datetime})
-        mess.add_data({"format1" :  datetimedaynumber})
+        mess.add_data({"format1" :  ldt[6]}) # weekday
+        print mess
         self.myxpl.send(mess)
 
 if __name__ == "__main__":
