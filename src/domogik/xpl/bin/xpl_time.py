@@ -43,7 +43,7 @@ from domogik.xpl.common.plugin import XplPlugin
 from domogik.xpl.common.xplmessage import XplMessage
 import threading
 
-TIME_BETWEEN_EACH_MESSAGE = 30
+TIME_BETWEEN_EACH_MESSAGE = 60
 
 
 class XPLDateTime(XplPlugin):
@@ -52,7 +52,7 @@ class XPLDateTime(XplPlugin):
     '''
 
     def __init__(self):
-        XplPlugin.__init__(self, name = 'datetime')
+        XplPlugin.__init__(self, name = 'xpl_time')
         
         self._listen_stop = threading.Event()
         self._listen_thr = XplTimer(TIME_BETWEEN_EACH_MESSAGE, \

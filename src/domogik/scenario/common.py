@@ -30,7 +30,7 @@ Implements
 - Condition.__init__(self, cond1=None, cond2=None)
 - Condition.run(self, statedic)
 - Condition.parse(self, listelem)
-- TimeCond.__init__(self, year, month, day, daynumber, hour, minute)
+- TimeCond.__init__(self, minute, hour, day, month, daynumber, year)
 - TimeCond._check_time(self, timeunit, value)
 - TimeCond._check_time_int(self, unit, value)
 - TimeCond._check_time_tuple(self, unit, value)
@@ -67,7 +67,7 @@ class TimeCond:
     This allows user to describe time periods like cron
     '''
 
-    def __init__(self, year, month, day, daynumber, hour, minute):
+    def __init__(self, minute, hour, day, month, daynumber, year):
         '''
         Create a time condition
         Each param can be :
@@ -90,7 +90,7 @@ class TimeCond:
         self.minute = minute
         self.daynumber = daynumber
         l = logger.Logger('trigger')
-        self._log = l.get_logger()
+        self._log = l.get_logger('trigger')
 
     def _check_time(self, timeunit, value):
         '''
@@ -308,7 +308,7 @@ def main():
     state1 = "StateCond('x10','a1','==','on')"
     state2 = "StateCond('1wire','X23329500234','<','20')"
     state3 = "StateCond('x10','c3','==','off')"
-    time1 = "TimeCond(2009, 02,(2,15),'*',10,'*/3')"
+    time1 = "TimeCond('*/3', 10, (2,15), 02, '*', 2009)"
     expr1 = "AND(%s, OR(%s, %s))" % (state1, time1, state2)
 
     liste = {}
