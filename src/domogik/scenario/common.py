@@ -292,7 +292,7 @@ class ListenerBuilder(XplPlugin):
             'year': dt[0:4],
             'month': dt[4:6],
             'day': dt[6:8],
-            'daynumber': dt[11],
+            'daynumber': dt[12],
             'hour': dt[8:10],
             'minute': dt[10:12],
         }
