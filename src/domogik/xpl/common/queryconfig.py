@@ -37,10 +37,11 @@ Implements
 @organization: Domogik
 """
 
+from threading import Event
+
 from domogik.common import logger
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.xpl.common.plugin import XplResult
 
 
 class Query():
@@ -59,6 +60,7 @@ class Query():
         self.log.debug("Init config query instance")
         self._keys = {}
         self._l = {}
+        self._result = None
 
     def __del__(self):
         print "End query"
@@ -97,7 +99,7 @@ class Query():
                                                     'xpltype': 'xpl-stat',
                                                     'technology': technology,
                                                     'hostname' : self.__myxpl.p.get_sanitized_hostname()})
-        self._keys[key] = XplResult()
+        self._keys[key] = Event()
         self._l[key] = l
         mess = XplMessage()
         mess.set_type('xpl-cmnd')
@@ -111,13 +113,14 @@ class Query():
         # The key may already be removed if the network is really fast
         if key in self._keys:
             try:
-                self._keys[key].get_lock().wait(10)
-                if not self._keys[key].get_lock().is_set():
+                self._keys[key].wait(10)
+                if not self._keys[key].is_set():
                     self.log.error("No answer received for t = %s, k = %s" % (technology, key))
                     raise RuntimeError("No answer received for t = %s, k = %s, check your xpl setup" % (technology, key))
-                return self._keys[key]
+                    return None
             except KeyError:
                 pass
+        return self._result
 
     def _query_cb(self, message):
         '''
@@ -125,7 +128,6 @@ class Query():
         @param message : the message received
         '''
         print "Answer received"
-        res = XplResult()
         result = message.data
         for r in self._keys:
             if r in result:
@@ -133,6 +135,6 @@ class Query():
                 res = self._keys.pop(r)
                 self._l[r].unregister()
                 del self._l[r]
-                res.set_value(result)
-                res.get_lock().set()
+                self._result = result
+                res.set()
                 break
