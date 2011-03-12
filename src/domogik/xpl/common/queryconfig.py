@@ -120,7 +120,10 @@ class Query():
                     return None
             except KeyError:
                 pass
-        return self._result
+        if self._result[key] != "None":
+            return self._result[key]
+        else:
+            return None
 
     def _query_cb(self, message):
         '''
