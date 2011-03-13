@@ -73,7 +73,7 @@ class MirrorManager(XplPlugin):
         mirror_process = threading.Thread(None,
                                    mirror.listen,
                                    "mirror-process-reader",
-                                   (self._stop),
+                                   (self._stop,),
                                    {})
         self.register_thread(mirror_process)
         mirror_process.start()
