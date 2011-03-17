@@ -36,11 +36,11 @@ Implements
 @organization: Domogik
 """
 
+from domogik.xpl.common.xplconnector import XplTimer
 import socket
 import struct
-from threading import Thread
+from threading import Thread, Event
 import subprocess
-from Queue import Queue, Empty
 import time
 import traceback
 
@@ -102,80 +102,56 @@ class Ping:
     This class allow to ping a computer
     """
 
-    def __init__(self, log, cb, interval, computers, stop):
+    def __init__(self, myxpl, log, cb, interval, computers):
         """
         Init object
         @param log : logger instance
         """
+        self.myxpl = myxpl
         self._log = log
         self._cb = cb
         self._interval = interval
         self._computers = computers
-        self._stop = stop
 
     def ping(self):
-        """ 
-        Ping computers
+        """ Ping computers
         """
-        num_threads = len(self._computers)
-        queue = Queue()
-        workers = []
-        #Spawn thread pool
-        for idx in range(num_threads):
-            worker = Thread(target=self.pinger, args=(idx, queue))
-            worker.setDaemon(True)
-            worker.start()
-            workers.append(worker)
+        self._ping_stop = Event()
+        self._ping_thr = XplTimer(self._interval, \
+                                  self.ping_list,
+                                  self._ping_stop, \
+                                  self.myxpl)
+        self._ping_thr.start()
 
-        while not self._stop.isSet():
-            #wraps system ping command
-            #Place work in queue
-            for computer in self._computers:
-                try:
-                    old_status = self._computers[computer]["old_status"]
-                except KeyError:
-                    # First ping, no old status for ping
-                    old_status = None
-                queue.put({"name" : computer, 
-                           "ip" : self._computers[computer]["ip"], 
-                           "old_status" : old_status})
-            #Wait until worker threads are done to exit    
-            queue.join()
-
-            # interval between each ping
-            self._stop.wait(self._interval)
-
-    def pinger(self, idx, ping_queue):
+    def ping_list(self):
+        """ Ping list of computers
         """
-        Pings subnet
-        @param idx : thread number
-        @param ping_queue : queue for ping
-        """
-        while not self._stop.isSet():
-            if not ping_queue.empty():
-                try:
-                    data = ping_queue.get(timeout = self._interval / len(self._computers))
-                except Empty:
-                    continue
-                self._log.debug("Thread %s: Pinging %s" % (idx, data["ip"]))
-                ret = subprocess.call("ping -c 1 %s" % data["ip"],
-                                shell=True,
-                                stdout=open('/dev/null', 'w'),
-                                stderr=subprocess.STDOUT)
-                if ret == 0:
-                    self._log.debug("%s: is alive" % data["name"])
-                    status = "HIGH"
-                else:
-                    self._log.debug("%s: did not respond" % data["name"])
-                    status = "LOW"
+        for computer in self._computers:
+            try:
+                old_status = self._computers[computer]["old_status"]
+            except KeyError:
+                # First ping, no old status for ping
+                old_status = None
+            self._log.debug("Pinging %s (%s)" % (computer, self._computers[computer]["ip"]))
+            print("Pinging %s (%s)" % (computer, self._computers[computer]["ip"]))
+            ret = subprocess.call("ping -c 1 %s" % self._computers[computer]["ip"],
+                            shell=True,
+                            stdout=open('/dev/null', 'w'),
+                            stderr=subprocess.STDOUT)
+            if ret == 0:
+                self._log.debug("%s: is alive" % computer)
+                print("%s: is alive" % computer)
+                status = "HIGH"
+            else:
+                self._log.debug("%s: did not respond" % computer)
+                print("%s: did not respond" % computer)
+                status = "LOW"
 
-                if status != data["old_status"]:
-                    type = "xpl-trig"
-                else:
-                    type = "xpl-stat"
-                self._computers[data["name"]]["old_status"] = status
-          
-                # call callback
-                ping_queue.task_done()
-                self._cb(type, data["name"], status)
+            if status != old_status:
+                type = "xpl-trig"
+            else:
+                type = "xpl-stat"
+            self._computers[computer]["old_status"] = status
+      
+            self._cb(type, computer, status)
 
