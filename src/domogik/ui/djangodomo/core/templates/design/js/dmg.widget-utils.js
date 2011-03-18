@@ -2,6 +2,7 @@
 const close_without_change = 10000; // 10 seconds
 const close_with_change = 3000; // 3 seconds
 const state_reset_status = 4000; // 4 seconds
+const timer_on_command = 1500; // 1.5 seconds
 
 $(function(){
     $.fn.extend({
