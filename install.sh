@@ -168,6 +168,25 @@ function update_user_config {
         upgrade_sql="y"
     fi
 
+    if [ "$keep" = "y" -o "$keep" = "Y" ];then
+        db_user=$(grep "^db_user" $d_home/.domogik.cfg|cut -d'=' -f2|tr -d ' ')
+        db_type=$(grep "^db_type" $d_home/.domogik.cfg|cut -d'=' -f2|tr -d ' ')
+        db_password=$(grep "^db_password" $d_home/.domogik.cfg|cut -d'=' -f2|tr -d ' ')
+        db_port=$(grep "^db_port" $d_home/.domogik.cfg|cut -d'=' -f2|tr -d ' ')
+        db_name=$(grep "^db_name" $d_home/.domogik.cfg|cut -d'=' -f2|tr -d ' ')
+        db_host=$(grep "^db_host" $d_home/.domogik.cfg|cut -d'=' -f2|tr -d ' ')
+        mysql_client=$(which mysql)
+        while [ ! -f "$mysql_client" ];do
+            read -p "Mysql client not installed, please install it and press Enter."
+            mysql_client=$(which mysql)
+        done
+        echo "SELECT 1;"|mysql -h$db_host -P$db_port -u$db_user -p$db_password $db_name > /dev/null
+        if [ $? -ne 0 ];then
+            read -p "Something was wrong, can't access to the database, please check your setup and press Enter to retry."
+        else
+            mysql_ok=true
+        fi
+    fi
     mysql_ok=
     while [ ! $mysql_ok ];do 
         echo "Please set your mysql parameters."
