@@ -287,9 +287,11 @@ function install_plugins {
         echo "** File $file parsed"
     done
     for file in src/share/domogik/hardwares/*.xml;do
-        echo "** Parse $file"
-        su -c "src/tools/packages/insert_data.py $file" $d_user
-        echo "** File $file parsed"
+        if [[ $file != "src/share/domogik/hardwares/*.xml" ]] ; then
+            echo "** Parse $file"
+            su -c "src/tools/packages/insert_data.py $file" $d_user
+            echo "** File $file parsed"
+        fi
     done
 }
 
