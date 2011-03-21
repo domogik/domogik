@@ -167,6 +167,7 @@ function update_user_config {
     else
         upgrade_sql="y"
     fi
+    mysql_ok=
 
     if [ "$keep" = "y" -o "$keep" = "Y" ];then
         db_user=$(grep "^db_user" $d_home/.domogik.cfg|cut -d'=' -f2|tr -d ' ')
@@ -187,7 +188,6 @@ function update_user_config {
             mysql_ok=true
         fi
     fi
-    mysql_ok=
     while [ ! $mysql_ok ];do 
         echo "Please set your mysql parameters."
         read -p "Username : " db_user
