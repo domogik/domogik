@@ -44,7 +44,7 @@ $(function(){
             var itype = item.type;
             var iprefix = item.prefix;
             var tr = $("<tr id='" + item.key + "'></tr>");
-            tr.data('key_prefix', iprefix);
+            tr.attr('key_prefix', iprefix);
             tr.append("<td class='key'>" +  ikey + "</td><td><label for='value_" + ikey + "'>" +  idescription + "</label></td>");
             var td = $("<td class='value' type='" + item.type + "'></td>");
             if (itype == 'boolean') {
@@ -55,10 +55,10 @@ $(function(){
                 td.append("<input type='text' name='value_" + ikey + "' id='value_" + ikey + "' class='medium' value='' />");                                                                            
                 tr.append(td);
                 var resetButton = $("<button id='reset" + ikey + "' class='icon16-action-reset buttonicon' title='{% trans "Reset" %} " + ikey + "'><span class='offscreen'>{% trans "Reset" %} " + ikey + "</span></button>");
-                resetButton.data('tr_id', ikey);
-                resetButton.data('default', idefault);
+                resetButton.attr('tr_id', ikey);
+                resetButton.attr('default', idefault);
                 resetButton.click(function(event) {
-                    $("tr#" + $(this).data('tr_id') +" .value").setNotConfigured($(this).data('default'));
+                    $("tr#" + $(this).attr('tr_id') +" .value").setNotConfigured($(this).attr('default'));
                     event.stopPropagation();
                 });
                 var td = $("<td><ul class='actions'><li></li></ul></td>");
@@ -261,9 +261,11 @@ $(function(){
                             divCloned.attr('id', 'configuration_items' + '_' + nbInterface);
 
                             $('tr', divCloned).each(function(index, item) {
-                                newKey = $(item).data('key_prefix') + '-' + nbInterface;
+                                newKey = $(item).attr('key_prefix') + '-' + nbInterface;
                                 // todo : why have we to test about undefined here ?
-                                if ($(item).data('key_prefix') != undefined) {
+                                console.log('nk=' + newKey);
+                                console.log($(item).attr('key_prefix'));
+                                if ($(item).attr('key_prefix') != undefined) {
                                     $(item).attr('id', newKey);
                                     $(".value", $(item)).setNotConfigured();
                                     $(".key", this).text(newKey);
