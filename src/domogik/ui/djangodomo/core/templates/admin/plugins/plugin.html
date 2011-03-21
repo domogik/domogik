@@ -263,8 +263,6 @@ $(function(){
                             $('tr', divCloned).each(function(index, item) {
                                 newKey = $(item).attr('key_prefix') + '-' + nbInterface;
                                 // todo : why have we to test about undefined here ?
-                                console.log('nk=' + newKey);
-                                console.log($(item).attr('key_prefix'));
                                 if ($(item).attr('key_prefix') != undefined) {
                                     $(item).attr('id', newKey);
                                     $(".value", $(item)).setNotConfigured();
@@ -272,7 +270,7 @@ $(function(){
                                     $("label", this).attr('for', 'value_' + newKey);
                                     $("input", this).attr('id', 'value_' + newKey);
                                     $("button", this).attr('id', 'reset' + newKey);
-                                    $("button", this).data('tr_id', newKey);
+                                    $("button", this).attr('tr_id', newKey);
                                     $("button", this).attr('title', '{% trans "Reset" %} ' + newKey);
                                     $(".offscreen", this).text('{% trans "Reset" %} ' + newKey);
                                     addedGroup = {};
