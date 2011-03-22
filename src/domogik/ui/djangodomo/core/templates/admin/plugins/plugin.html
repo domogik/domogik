@@ -270,9 +270,14 @@ $(function(){
                                     $(".key", this).text(newKey);
                                     $("label", this).attr('for', 'value_' + newKey);
                                     $("input", this).attr('id', 'value_' + newKey);
+                                    $("input", this).attr('name', 'value_' + newKey);
                                     $("button", this).attr('id', 'reset' + newKey);
                                     $("button", this).attr('tr_id', newKey);
                                     $("button", this).attr('title', '{% trans "Reset" %} ' + newKey);
+                                    $("button", this).click(function(event) {
+                                        $("tr#" + $(this).attr('tr_id') +" .value").setNotConfigured($(this).attr('default'));
+                                        event.stopPropagation();
+                                    });
                                     $(".offscreen", this).text('{% trans "Reset" %} ' + newKey);
                                     addedGroup = {};
                                     addedGroup.key = newKey;
