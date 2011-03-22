@@ -55,6 +55,7 @@ from domogik.xpl.common.queryconfig import Query
 from domogik.common.packagexml import PackageXml, PackageException
 from domogik.xpl.common.xplconnector import XplTimer 
 from xml.dom import minidom
+from ConfigParser import NoSectionError
 
 
 import domogik.xpl.bin
@@ -583,32 +584,35 @@ class SysManager(XplPlugin):
         self._hardware_models = []
 
         # Get hardware list
-        hardwares = Loader('hardwares')
-        hardware_list = dict(hardwares.load()[1])
-        state_thread = {}
-        for hardware in hardware_list:
-            print hardware
-            self.log.info("==> %s (%s)" % (hardware, hardware_list[hardware]))
-            if hardware_list[hardware] == "enabled":
-                # try open xml file
-                xml_file = "%s/%s.xml" % (self._xml_hardware_directory, hardware)
-                try:
-                    # get data for hardware
-                    plg_xml = PackageXml(path = xml_file)
-
-                    # register plugin
-                    self._hardware_models.append({"type" : plg_xml.type,
-                                      "name" : plg_xml.name, 
-                                      "description" : plg_xml.desc, 
-                                      "technology" : plg_xml.techno,
-                                      "version" : plg_xml.version,
-                                      "documentation" : plg_xml.doc,
-                                      "vendor_id" : plg_xml.vendor_id,
-                                      "device_id" : plg_xml.device_id})
-
-                except:
-                    print("Error reading xml file : %s\n%s" % (xml_file, str(traceback.format_exc())))
-                    self.log.error("Error reading xml file : %s. Detail : \n%s" % (xml_file, str(traceback.format_exc())))
+        try:
+            hardwares = Loader('hardwares')
+            hardware_list = dict(hardwares.load()[1])
+            state_thread = {}
+            for hardware in hardware_list:
+                print hardware
+                self.log.info("==> %s (%s)" % (hardware, hardware_list[hardware]))
+                if hardware_list[hardware] == "enabled":
+                    # try open xml file
+                    xml_file = "%s/%s.xml" % (self._xml_hardware_directory, hardware)
+                    try:
+                        # get data for hardware
+                        plg_xml = PackageXml(path = xml_file)
+    
+                        # register plugin
+                        self._hardware_models.append({"type" : plg_xml.type,
+                                          "name" : plg_xml.name, 
+                                          "description" : plg_xml.desc, 
+                                          "technology" : plg_xml.techno,
+                                          "version" : plg_xml.version,
+                                          "documentation" : plg_xml.doc,
+                                          "vendor_id" : plg_xml.vendor_id,
+                                          "device_id" : plg_xml.device_id})
+    
+                    except:
+                        print("Error reading xml file : %s\n%s" % (xml_file, str(traceback.format_exc())))
+                        self.log.error("Error reading xml file : %s. Detail : \n%s" % (xml_file, str(traceback.format_exc())))
+        except NoSectionError:
+            pass 
 
         return
 
