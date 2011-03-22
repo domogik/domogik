@@ -365,7 +365,7 @@ class SysManager(XplPlugin):
 
         # if error
         else:
-            self.log.info("Error detected : %s, request %s has been cancelled" % (error, cmd))
+            self.log.error("Error detected : %s, request %s has been cancelled" % (error, cmd))
 
     def _invalid_plugin(self, cmd, plg, host):
         """ send an invalid plugin message
@@ -403,7 +403,7 @@ class SysManager(XplPlugin):
         if ping == True:
             if self._check_component_is_running(plg):
                 error = "Component %s is already running on %s" % (plg, host)
-                self.log.info(error)
+                self.log.warning(error)
                 if startup:
                     self._write_fifo("ERROR", "Component %s is already running\n" % plg)
                 mess.add_data({'error' : error})
@@ -442,7 +442,7 @@ class SysManager(XplPlugin):
         self.log.debug("Check plugin stops : %s on %s" % (plg, host))
         if self._check_component_is_running(plg) == False:
             error = "Component %s is not running on %s" % (plg, host)
-            self.log.info(error)
+            self.log.warning(error)
             mess = XplMessage()
             mess.set_type('xpl-trig')
             mess.set_schema('domogik.system')
@@ -492,7 +492,7 @@ class SysManager(XplPlugin):
                  disappear. There is no need for the moment to put this function
                  in a library
         """
-        self.log.info("Check if '%s' is running... (thread)" % name)
+        self.log.debug("Check if '%s' is running... (thread)" % name)
         if startup:
             self._write_fifo("INFO", "Check if %s is running.\n" % name)
         self._pinglist[name] = Event()
@@ -516,11 +516,11 @@ class SysManager(XplPlugin):
                 break
         my_listener.unregister()
         if self._pinglist[name].isSet():
-            self.log.info("'%s' is running" % name)
+            self.log.debug("'%s' is running" % name)
             self._set_status(name, "ON")
             return True
         else:
-            self.log.info("'%s' is not running" % name)
+            self.log.debug("'%s' is not running" % name)
             self._set_status(name, "OFF")
             return False
 
