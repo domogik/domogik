@@ -175,7 +175,7 @@ class BasePlugin():
         This will lower it and keep only the part before the first dot
 
         """
-        return gethostname().lower().split('.')[0][0:16]
+        return gethostname().lower().split('.')[0].replace('-','')[0:16]
 
     def __del__(self):
         self.log.debug("__del__ baseplugin")
