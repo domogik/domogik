@@ -37,6 +37,7 @@ Implements
 import serial
 import time
 import traceback
+from threading import Event
 
 class TeleinfoException(Exception):
     """
@@ -65,7 +66,7 @@ class Teleinfo:
         self._log = log
         self._callback = callback
         self._ser = None
-        self._stop = False
+        self._stop = Event()
 
 
     def open(self, device):
@@ -85,7 +86,7 @@ class Teleinfo:
     def close(self):
         """ close telinfo modem
         """
-        self._stop = True
+        self._stop.set()
         if self._ser.isOpen():
             self._ser.close()
 
@@ -94,13 +95,13 @@ class Teleinfo:
             @param interval : time between each read
         """
         try:
-            while not self._stop:
+            while not self._stop.isSet():
                 frame = self.read()
                 self._log.debug("Frame received : %s" % frame)
                 self._callback(frame)
-                time.sleep(interval)
+                self._stop.wait(interval)
         except serial.SerialException as e:
-            if self._stop:
+            if self._stop.isSet():
                 pass
             else:
                 raise e
