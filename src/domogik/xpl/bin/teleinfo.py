@@ -69,10 +69,11 @@ class TeleinfoManager(XplPlugin):
             self.force_leave()
             return
             
+        self.add_stop_cb(teleinfo.close)
         # Start reading Teleinfo
         teleinfo_process = threading.Thread(None,
                                    teleinfo.listen,
-                                   None,
+                                   'teleinfo-listen',
                                    (float(interval),),
                                    {})                                  
         teleinfo_process.start()                              

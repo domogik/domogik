@@ -65,6 +65,7 @@ class Teleinfo:
         self._log = log
         self._callback = callback
         self._ser = None
+        self._stop = False
 
 
     def open(self, device):
@@ -84,6 +85,7 @@ class Teleinfo:
     def close(self):
         """ close telinfo modem
         """
+        self._stop = True
         if self._ser.isOpen():
             self._ser.close()
 
@@ -91,11 +93,17 @@ class Teleinfo:
         """ Start the main loop
             @param interval : time between each read
         """
-        while True:
-            frame = self.read()
-            self._log.debug("Frame received : %s" % frame)
-            self._callback(frame)
-            time.sleep(interval)
+        try:
+            while not self._stop:
+                frame = self.read()
+                self._log.debug("Frame received : %s" % frame)
+                self._callback(frame)
+                time.sleep(interval)
+        except serial.SerialException as e:
+            if self._stop:
+                pass
+            else:
+                raise e
 
     def read(self):
         """ Fetch one full frame for serial port
