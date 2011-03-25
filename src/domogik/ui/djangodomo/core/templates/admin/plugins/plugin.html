@@ -397,7 +397,9 @@ $(function(){
                     $("#buttonstatus").removeClass('icon16-action-processing_f6f6f6');
                     if (status == 'ok') {
                         $.notification('ok', btokmsg);
-                        getPluginsList();
+                        $.doTimeout( 'list', 5000, function(){
+                            getPluginsList();
+                        });
                         setStatus(btstatus);
                     } else {
                         $.notification('error', bterrormsg + ' (' + data.description + ')');
@@ -431,6 +433,8 @@ function clone(obj){
     <link href="/design/skins/{{ request.session.user.skin_used|default:'default' }}/css/ui-tables.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block js_include %}
+    <script type="text/javascript" src="/design/js/jquery.timers-1.2.js"></script>
+    <script type="text/javascript" src="/design/js/jquery.ba-dotimeout.min.js"></script>
 {% endblock %}
 {% block title %}{% trans page_title %}{% endblock %}
 
