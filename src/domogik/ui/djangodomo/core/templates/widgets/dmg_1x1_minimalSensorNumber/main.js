@@ -19,9 +19,10 @@
             var self = this, o = this.options;
             
             if (!o.model_parameters.unit) o.model_parameters.unit = ''; // if unit not defined, display ''
-
+            var cell = $("<div class='cell'></div>")
             this._elementValue =  $("<div class='widget_value'></div>");
-            this.element.append(this._elementValue);
+            cell.append(this._elementValue);
+            this.element.append(cell);
             this._initValues(1);
         },
 
