@@ -77,11 +77,18 @@ class EventHandler(pyinotify.ProcessEvent):
         """
         self.my_callback = callback
 
-    def process_IN_MODIFY(self, event):
+    def set_config_files(self, config_files):
+        """ set the list of config files
+        @param list of the monitored config files
+        """
+        self._cfg_files = config_files 
+
+    def process_default(self, event):
         """ A file is modified
         """
-        print("File modified : %s" % event.pathname)
-        self.my_callback()
+        if event.pathname in self._cfg_files:
+            print("File modified : %s" % event.pathname)
+            self.my_callback()
 
 class SysManager(XplPlugin):
     """ System management from domogik
@@ -227,13 +234,17 @@ class SysManager(XplPlugin):
 
             # inotify 
             wm = pyinotify.WatchManager() # Watch manager
-            mask = pyinotify.IN_MODIFY # watched events
+            mask = pyinotify.IN_MODIFY | pyinotify.IN_MOVED_TO # watched events
             notify_handler = EventHandler()
             notify_handler.set_callback(self._reload_configuration_file)
+            notify_handler.set_config_files(self.get_config_files())
             notifier = pyinotify.ThreadedNotifier(wm, notify_handler)
             notifier.start()
+            config_files_dir = []
             for fic in  self.get_config_files():
-                wdd = wm.add_watch(fic, mask, rec = True)
+                config_files_dir.append(os.path.dirname(fic))
+            for direc in set(config_files_dir):
+                wdd = wm.add_watch(direc, mask, rec = True)
 
             self.enable_hbeat()
             print("Ready!")
