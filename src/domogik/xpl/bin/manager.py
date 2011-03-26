@@ -149,6 +149,7 @@ class SysManager(XplPlugin):
                 if self._check_component_is_running("dbmgr", True):
                     self.log.warning("Manager started with -d, but a database manager is already running")
                     self._write_fifo("WARN", "Manager started with -d, but a database manager is already running\n")
+                    self._dec_startup_lock()
                 else:
                     thr_dbmgr = Thread(None,
                                        self._start_plugin,
@@ -164,6 +165,7 @@ class SysManager(XplPlugin):
                 if self._check_component_is_running("rest", True):
                     self.log.warning("Manager started with -r, but a REST manager is already running")
                     self._write_fifo("WARN", "Manager started with -r, but a REST manager is already running\n")
+                    elf._dec_startup_lock()
                 else:
                     thr_rest = Thread(None,
                                        self._start_plugin,
@@ -324,11 +326,11 @@ class SysManager(XplPlugin):
         """
         if self._state_fifo == None:
             return
-        self.log.info("lock++ acquire : %s" % self._startup_count)
+        self.log.info("lock-- acquire : %s" % self._startup_count)
         self._startup_count_lock.acquire()
         self._startup_count = self._startup_count - 1
         self._startup_count_lock.release()
-        self.log.info("lock++ released: %s" % self._startup_count)
+        self.log.info("lock-- released: %s" % self._startup_count)
 
     def _sys_cb(self, message):
         """ Internal callback for receiving system messages
