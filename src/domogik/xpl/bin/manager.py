@@ -165,7 +165,7 @@ class SysManager(XplPlugin):
                 if self._check_component_is_running("rest", True):
                     self.log.warning("Manager started with -r, but a REST manager is already running")
                     self._write_fifo("WARN", "Manager started with -r, but a REST manager is already running\n")
-                    elf._dec_startup_lock()
+                    self._dec_startup_lock()
                 else:
                     thr_rest = Thread(None,
                                        self._start_plugin,
