@@ -37,29 +37,17 @@
       <default-value>c</default-value>
     </key>
     <key>
+      <interface>yes</interface>
       <order-id>4</order-id>
-      <name>city-1</name>
+      <name>city</name>
       <type>string</type>
       <description>City code. See http://weather.yahoo.com to find code</description>
       <default-value></default-value>
     </key>
     <key>
+      <interface>yes</interface>
       <order-id>5</order-id>
-      <name>device-1</name>
-      <type>string</type>
-      <description>Device address for this city (ex : weather_home)</description>
-      <default-value>weather_home</default-value>
-    </key>
-    <key>
-      <order-id>6</order-id>
-      <name>city-2</name>
-      <type>string</type>
-      <description>Second city code. See http://weather.yahoo.com to find code</description>
-      <default-value></default-value>
-    </key>
-    <key>
-      <order-id>7</order-id>
-      <name>device-2</name>
+      <name>device</name>
       <type>string</type>
       <description>Device address for this city (ex : weather_home)</description>
       <default-value></default-value>
