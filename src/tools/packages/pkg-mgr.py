@@ -217,7 +217,9 @@ class PackageManager():
         for buf in input_file.readlines():
             data = data + buf 
 
-        data = data.replace("%name%", plg_xml.name)
+        # TEMPORARY COMMENT FOR FORCING Domogik instead of plugin name
+        data = data.replace("%name%", "Domogik")
+        #data = data.replace("%name%", plg_xml.name)
         data = data.replace("%version%", plg_xml.version)
         data = data.replace("%doc%", plg_xml.doc)
         data = data.replace("%desc%", plg_xml.desc)
@@ -681,4 +683,5 @@ class OLD_PackageXml():
 
 
 
-PM = PackageManager()
+if __name__ == "__main__":
+    PM = PackageManager()

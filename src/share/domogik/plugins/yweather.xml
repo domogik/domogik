@@ -3,7 +3,7 @@
   <technology>online_service</technology>
   <description>Get weather informations from Yahoo! Weather</description>
   <detail>Get current weather informations about your town and give predictions about tomorrow</detail>
-  <version>0.1.0</version>
+  <version>0.1.0_beta2</version>
   <documentation>http://wiki.domogik.org/plugin_yweather</documentation>
   <author>Fritz</author>
   <author-email>fritz.smh at gmail.com</author-email>
@@ -69,10 +69,9 @@
     <file path="src/share/domogik/plugins/yweather.xml"/>
     <file path="src/domogik/xpl/bin/yweather.py"/>
     <file path="src/domogik/xpl/lib/yweather.py"/>
+    <file path="src/share/domogik/stats/online_service/sensor.basic-yweather.xml"/>
   </files>
-  <dependencies>
-    <dep name="pySerial > 2.4"/>
-  </dependencies>
+  <dependencies/>
   <device_technology>
       <id>online_service</id>
       <name>Online service</name>
