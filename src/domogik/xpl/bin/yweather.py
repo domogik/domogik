@@ -57,7 +57,14 @@ class YWeatherManager(XplPlugin):
 
         # Get config
         self._config = Query(self.myxpl, self.log)
-        unit = self._config.query('yweather', 'unit' ).lower()
+        unit = self._config.query('yweather', 'unit' )
+        if unit == None:
+            self.log.error("Unit not configured : exiting")
+            print("Unit not configured : exiting")
+            self.force_leave()
+            return
+        unit = unit.lower()
+        
         self.enable_current = self._config.query('yweather', 'en-current' )
         self.enable_previsionnal = self._config.query('yweather', 'en-prev' )
 
