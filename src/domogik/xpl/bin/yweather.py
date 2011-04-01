@@ -44,7 +44,7 @@ from domogik.xpl.lib.yweather import YWeatherException
 import threading
 import datetime
 
-TIME_BETWEEN_EACH_WEATHER_READ = 0.5*3600 # 2 hours
+TIME_BETWEEN_EACH_WEATHER_READ = 30*60 # 30 minutes
 
 class YWeatherManager(XplPlugin):
     """ Get data from Yahoo weather and send them on xPL
@@ -119,7 +119,7 @@ class YWeatherManager(XplPlugin):
             @param weather : weather data
         """
         # current part (sensor.basic)
-        if self.enable_current:
+        if self.enable_current == 'True':
             self._send_current(device, weather, 
                                "current", "temperature", "temp",
                                units = weather["units"]["temperature"])
@@ -148,7 +148,7 @@ class YWeatherManager(XplPlugin):
 
 
         # previsionnal part
-        if self.enable_previsionnal:
+        if self.enable_previsionnal == 'True':
             common = {
                       "city" : weather["location"]["city"],
                       "region" : weather["location"]["region"],
