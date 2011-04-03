@@ -771,6 +771,9 @@ class SysManager(XplPlugin):
         mess.set_type('xpl-trig')
         mess.set_schema('domogik.system')
         mess.add_data({'command' :  'list'})
+        # notice : this entry seems to be duplicate because of pluginX-host
+        # entries. But this is need by rest in /plugin/list for multi hosts
+        mess.add_data({'host' :  self.get_sanitized_hostname()})
         # plugins
         idx = 0
         for plugin in self._plugins:
