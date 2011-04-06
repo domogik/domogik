@@ -158,7 +158,7 @@ function update_user_config {
         echo "You need to have a working Mysql server with a domogik user and database."
         echo "You can create it using these commands (as mysql admin user) :"
         echo " > CREATE DATABASE domogik;"
-        echo " > GRANT ALL PRIVILEGES ON domogik.* to domogik@localhost IDENTIFIED BY 'randompassword';"
+        echo " > GRANT ALL PRIVILEGES ON domogik.* to domogik@127.0.0.1 IDENTIFIED BY 'randompassword';"
         read -p "Press Enter to continue the installation when your setup is ok. "
     fi
     upgrade_sql="n"
@@ -196,9 +196,9 @@ function update_user_config {
         if [ "$db_port" = "" ];then 
             db_port=3306 
         fi
-        read -p "Host [localhost] :" db_host
+        read -p "Host [127.0.0.1] :" db_host
         if [ "$db_host" = "" ];then 
-            db_host="localhost"
+            db_host="127.0.0.1"
         fi
         read -p "Database name [domogik]: " db_name
         if [ "$db_name" = "" ];then 
