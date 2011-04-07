@@ -6,6 +6,7 @@
                 <filter>
                     <key name="type" value="temp"/>
                     <key name="type" value="input"/>
+                    <key name="type" value="humidity"/>
                 </filter>
             </listener>
             <mapping>
@@ -14,6 +15,8 @@
                        filter_key="type" filter_value="temp" />
                 <value field="current" new_name="present" 
                        filter_key="type" filter_value="input" />
+                <value field="current" new_name="humidity" 
+                       filter_key="type" filter_value="humidity" />
             </mapping>
         </xpltype>
         <xpltype type="xpl-stat">
@@ -24,6 +27,8 @@
             </listener>
             <mapping>
                 <device field="device"/>
+                <value field="current" new_name="temperature" 
+                       filter_key="type" filter_value="temp" />
                 <value field="current" new_name="temperature" 
                        filter_key="type" filter_value="temp" />
             </mapping>

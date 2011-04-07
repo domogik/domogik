@@ -31,6 +31,7 @@ class OneWireException(Exception)
 class ComponentDs18b20
 class ComponentDs18s20
 class ComponentDs2401
+class ComponentDs2438
 class OneWireNetwork
 
 @author: Fritz SMH <fritz.smh@gmail.com>
@@ -230,6 +231,77 @@ class ComponentDs2401:
             self._stop.wait(self.interval)
  
     
+class ComponentDs2438:
+    """
+    DS2438 support
+    """
+
+    def __init__(self, log, onewire, interval, callback):
+        """
+        Return temperature each <interval> seconds
+        @param log : log instance
+        @param onewire : onewire network object
+        @param interval : interval between each data sent
+        @param callback : callback to return values
+        """
+        self._log = log
+        self.onewire = onewire
+        self.interval = interval
+        self.callback = callback
+        self.root = self.onewire.get_root()
+        self.old_temp = {}
+        self.old_humidity = {}
+        self.start_listening()
+
+    def start_listening(self):
+        """ 
+        Start listening for onewire ds2438
+        """
+        while True:
+            for comp in self.root.find(type = "DS2438"):
+                my_id = comp.id
+                try:
+                    temperature = float(comp.temperature)
+                    humidity = float(comp.humidity)
+                    print "T=%s" % temperature
+                    print "H=%s" % humidity
+                except AttributeError:
+                    error = "DS2438 : error while reading value"
+                    self._log.error(error)
+                    print(error)
+
+                else:
+
+                    # temperature
+                    if my_id in self.old_temp:
+                        if temperature != self.old_temp[my_id]:
+                            my_type = "xpl-trig"
+                        else:
+                            my_type = "xpl-stat"
+                    else:
+                        my_type = "xpl-trig"
+                    self.old_temp[my_id] = temperature
+                    print("type=%s, id=%s, temp=%s" % (my_type, my_id, temperature))
+                    self.callback(my_type, {"device" : my_id,
+                                         "type" : "temp",
+                                         "current" : temperature})
+
+                    # humidity
+                    if my_id in self.old_humidity:
+                        if humidity != self.old_humidity[my_id]:
+                            my_type = "xpl-trig"
+                        else:
+                            my_type = "xpl-stat"
+                    else:
+                        my_type = "xpl-trig"
+                    self.old_humidity[my_id] = humidity
+                    print("type=%s, id=%s, humidity=%s" % (my_type, my_id, humidity))
+                    self.callback(my_type, {"device" : my_id,
+                                         "type" : "humidity",
+                                         "current" : humidity})
+            time.sleep(self.interval)
+
+
 
 class OneWireNetwork:
     """
