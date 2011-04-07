@@ -43,6 +43,7 @@ from domogik.xpl.lib.onewire import OneWireNetwork
 from domogik.xpl.lib.onewire import ComponentDs18b20
 from domogik.xpl.lib.onewire import ComponentDs18s20
 from domogik.xpl.lib.onewire import ComponentDs2401
+from domogik.xpl.lib.onewire import ComponentDs2438
 import ow
 import traceback
 import time
@@ -82,6 +83,11 @@ class OneWireManager(XplPlugin):
             ds2401_enabled = self._config.query('onewire', 'ds2401-en')
 
             ds2401_interval = self._config.query('onewire', 'ds2401-int')
+    
+            ### DS2438 config
+            ds2438_enabled = self._config.query('onewire', 'ds2438-en')
+
+            ds2438_interval = self._config.query('onewire', 'ds2438-int')
     
             ### Open one wire network
             try:
@@ -132,6 +138,19 @@ class OneWireManager(XplPlugin):
                                             self.send_xpl),
                                            {})
                 ds2401.start()
+    
+            ### DS2438 support
+            if ds2438_enabled == "True":
+                self.log.info("DS2438 support enabled")
+                ds2438 = threading.Thread(None, 
+                                           ComponentDs2438, 
+                                           None,
+                                           (self.log,
+                                            ow, 
+                                            float(ds2438_interval), 
+                                            self.send_xpl),
+                                           {})
+                ds2438.start()
     
         except:
             self.log.error("Plugin error : stopping plugin... Trace : %s" % traceback.format_exc())

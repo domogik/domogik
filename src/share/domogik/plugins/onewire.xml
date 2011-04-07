@@ -37,14 +37,14 @@ List of supported devices :
       <order-id>3</order-id>
       <name>ds18b20-en</name>
       <type>boolean</type>
-      <description>Enable DS18B20 components</description>
+      <description>Enable DS18B20</description>
       <default-value>False</default-value>
     </key>
     <key>
       <order-id>4</order-id>
       <name>ds18b20-int</name>
       <type>number</type>
-      <description>Interval between each data reading for DS18b20 components</description>
+      <description>Interval</description>
       <default-value>60</default-value>
     </key>
     <key>
@@ -57,36 +57,50 @@ List of supported devices :
         <item>11</item>
         <item>12</item>
       </list>
-      <description>Resolution to use in data reading for DS18B20 components</description>
+      <description>Temperature resolution</description>
       <default-value>12</default-value>
     </key>
     <key>
       <order-id>6</order-id>
       <name>ds18s20-en</name>
       <type>boolean</type>
-      <description>Enable DS18S20 components</description>
+      <description>Enable DS18S20</description>
       <default-value>False</default-value>
     </key>
     <key>
       <order-id>7</order-id>
       <name>ds18s20-int</name>
       <type>number</type>
-      <description>Interval between each data reading for DS18S20 components</description>
+      <description>Interval</description>
       <default-value>60</default-value>
     </key>
     <key>
       <order-id>8</order-id>
       <name>ds2401-en</name>
       <type>boolean</type>
-      <description>Enable DS2401 components</description>
+      <description>Enable DS2401</description>
       <default-value>False</default-value>
     </key>
     <key>
       <order-id>9</order-id>
       <name>ds2401-int</name>
       <type>number</type>
-      <description>Interval between each data reading for DS2401 components</description>
+      <description>Interval</description>
       <default-value>5</default-value>
+    </key>
+    <key>
+      <order-id>10</order-id>
+      <name>ds2438-en</name>
+      <type>boolean</type>
+      <description>Enable DS2438</description>
+      <default-value>False</default-value>
+    </key>
+    <key>
+      <order-id>11</order-id>
+      <name>ds2438-int</name>
+      <type>number</type>
+      <description>Interval</description>
+      <default-value>60</default-value>
     </key>
   </configuration-keys>
   <files>
@@ -111,6 +125,12 @@ List of supported devices :
           <description>Thermometer</description>
       </device_type>
       <device_type>
+          <id>onewire.temperature_and_humidity</id>
+          <device_technology_id>onewire</device_technology_id>
+          <name>Temperature and Humidity</name>
+          <description>Temperature and Humidity</description>
+      </device_type>
+      <device_type>
           <id>onewire.serial_number</id>
           <device_technology_id>onewire</device_technology_id>
           <name>Serial number</name>
@@ -128,6 +148,30 @@ List of supported devices :
           </parameters>
           <value_type>number</value_type>
           <stat_key>temperature</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+      <device_feature_model>
+          <id>onewire.temperature_and_humidity.temperature</id>
+          <name>Temperature</name>
+          <feature_type>sensor</feature_type>
+          <device_type_id>onewire.temperature_and_humidity</device_type_id>
+          <parameters>
+              {&quot;unit&quot;:&quot;\u00B0C&quot;}
+          </parameters>
+          <value_type>number</value_type>
+          <stat_key>temperature</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+      <device_feature_model>
+          <id>onewire.temperature_and_humidity.humidity</id>
+          <name>Humidity</name>
+          <feature_type>sensor</feature_type>
+          <device_type_id>onewire.temperature_and_humidity</device_type_id>
+          <parameters>
+              {}
+          </parameters>
+          <value_type>number</value_type>
+          <stat_key>humidity</stat_key>
           <return_confirmation>0</return_confirmation>
       </device_feature_model>
       <device_feature_model>
