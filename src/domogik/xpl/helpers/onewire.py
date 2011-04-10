@@ -243,7 +243,7 @@ class OneWireNetwork:
         display = " - %-30s : %s"
         for comp in self._root.find(type = "DS2401"):
             ret.append("DS2401 : id=%s" % comp.id)
-            ret.append(display % ("Present", comp.present))
+            ret.append(display % ("Present", "yes"))
         return ret
 
 
