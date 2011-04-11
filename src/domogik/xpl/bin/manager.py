@@ -201,10 +201,8 @@ class SysManager(XplPlugin):
                 startup = self._config.query(name, 'startup-plugin')
                 # start plugin
                 if startup == 'True':
-                    self.log.debug("            starting")
                     self.log.debug("Starting %s" % name)
                     self._inc_startup_lock()
-                    self._write_fifo("INFO", "Starting %s\n" % name)
                     comp_thread[name] = Thread(None,
                                                    self._start_plugin,
                                                    None,
