@@ -59,8 +59,13 @@ class DBConnector(XplPlugin):
         '''
         XplPlugin.__init__(self, 'dbmgr')
         self.log.debug("Init database_manager instance")
-        self._db = DbHelper()
-        self._engine = self._db.get_engine()
+        try:
+            self._db = DbHelper()
+            self._engine = self._db.get_engine()
+        except:
+            self.log.error("Error while starting database engine : %s" % traceback.format_exc())
+            self.force_leave()
+            return
 
         Listener(self._request_config_cb, self.myxpl, {'schema': 'domogik.config', 'xpltype': 'xpl-cmnd'})
         self.enable_hbeat()
@@ -197,7 +202,6 @@ class DBConnector(XplPlugin):
                         res[val.key] = val.value
                 return res
         except:
-            traceback.print_exc()
             self.log.warn("No config found for technolgy %s on %s, key %s" % (techno, hostname, key))
             return "None"
 
