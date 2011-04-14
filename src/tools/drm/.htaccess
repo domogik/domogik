@@ -1,0 +1,5 @@
+AuthUserFile /root/.htpasswd
+AuthGroupFile /dev/null
+AuthType Basic
+AuthName "DRM"
+Require valid-user
