@@ -86,6 +86,13 @@ class Onewire(Helper):
                     "desc" : "Show detail for all DS2401 devices",
                     "min_args" : 1,
                     "usage" : "ds2401 <adaptator device>"
+                  },
+                  "ds2438" : 
+                  {
+                    "cb" : self.ds2438,
+                    "desc" : "Show detail for all DS2438 devices",
+                    "min_args" : 1,
+                    "usage" : "ds2438 <adaptator device>"
                   }
                 }
 
@@ -137,6 +144,15 @@ class Onewire(Helper):
         except OneWireException as err:
             raise HelperError(err.value)
         return self.my_ow.show_ds2401_detail()
+
+    def ds2438(self, args = None):
+        """ show ds2438 components
+        """
+        try:
+            self.my_ow = OneWireNetwork(args[0], self._log)
+        except OneWireException as err:
+            raise HelperError(err.value)
+        return self.my_ow.show_ds2438_detail()
 
 
 class OneWireException:
@@ -243,7 +259,19 @@ class OneWireNetwork:
         display = " - %-30s : %s"
         for comp in self._root.find(type = "DS2401"):
             ret.append("DS2401 : id=%s" % comp.id)
-            ret.append(display % ("Present", comp.present))
+            ret.append(display % ("Present", "yes"))
+        return ret
+
+
+    def show_ds2438_detail(self):
+        """ show ds2438 components
+        """
+        ret = []
+        display = " - %-30s : %s"
+        for comp in self._root.find(type = "DS2438"):
+            ret.append("DS2438 : id=%s" % comp.id)
+            ret.append(display % ("Temperature", comp.temperature))
+            ret.append(display % ("Humidity", comp.humidity))
         return ret
 
 

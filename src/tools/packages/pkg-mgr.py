@@ -196,7 +196,7 @@ class PackageManager():
         # Create setup.py file
         setup_file = self._create_plugin_setup(plg_xml)
 
-        # Create .tar.gz
+        # Create .tgz
         self._create_tar_gz("plugin-%s-%s" % (plg_xml.name, plg_xml.version), 
                             output_dir,
                             plg_xml.files, 
@@ -249,9 +249,9 @@ class PackageManager():
             @param ez_setup_file : path for ez_setup.py file
         """
         if output_dir == None:
-            my_tar = "%s/%s.tar.gz" % (tempfile.gettempdir(), name)
+            my_tar = "%s/%s.tgz" % (tempfile.gettempdir(), name)
         else:
-            my_tar = "%s/%s.tar.gz" % (output_dir, name)
+            my_tar = "%s/%s.tgz" % (output_dir, name)
         print("Generating package : '%s'" % my_tar)
         try:
             tar = tarfile.open(my_tar, "w:gz")
@@ -620,7 +620,7 @@ class OLD_PackageXml():
             # construct filenames
             self.fullname = "%s-%s" % (self.type, self.name)
             self.xml_filename = "%s-%s-%s.xml" % (self.type, self.name, self.version)
-            self.pkg_filename = "%s-%s-%s.tar.gz" % (self.type, self.name, self.version)
+            self.pkg_filename = "%s-%s-%s.tgz" % (self.type, self.name, self.version)
 
             # repository specifics
             rep = self.xml_content.getElementsByTagName("repository")
@@ -630,7 +630,7 @@ class OLD_PackageXml():
                 self.priority = None
             else:
                 url_prefix = rep[0].attributes.get("url_prefix").value
-                self.package_url = "%s.tar.gz" % url_prefix
+                self.package_url = "%s.tgz" % url_prefix
                 self.xml_url = "%s.xml" % url_prefix
                 self.priority = rep[0].attributes.get("priority").value
 
