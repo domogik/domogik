@@ -39,6 +39,10 @@ ez_setup.use_setuptools()
 
 import os
 from setuptools import setup, find_packages
+import time
+
+print "PKG-PATH=%s" % pkg_path
+time.sleep(10)
 
 def list_all_files(path, dst):
     """

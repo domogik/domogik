@@ -283,9 +283,9 @@ class PackageManager():
             4. Insert data in database
             @param path : path for tar.gz
         """
-        if self.is_root() == False:
-            print("-i option must be used as root")
-            return
+        #if self.is_root() == False:
+        #    print("-i option must be used as root")
+        #    return
         # package from repository
         if path[0:5] == "repo:":
             pkg = self._find_package(path[5:], version)
@@ -330,7 +330,7 @@ class PackageManager():
         # launch package installation
         print("Starting installation...")
         try:
-            self._launch_setup_py(my_tmp_dir)
+            self._launch_setup_py(my_tmp_dir, os.environ['HOME'])
         except:
             raise PackageException("Error while installing package '%s' : %s" % (path, traceback.format_exc()))
 
@@ -355,11 +355,12 @@ class PackageManager():
         tar.close()
 
 
-    def _launch_setup_py(self, path):
+    def _launch_setup_py(self, path, install_path):
         """ Launch setup.py install in <path>
             @param path : path where is located setup.py
+            @param installPath : path in which we install package
         """
-        subp = Popen("/usr/bin/python setup.py install", 
+        subp = Popen("/usr/bin/python setup.py install --pkg-path=%s" % install_path, 
                       cwd = path, 
                       shell = True)
         subp.wait()
