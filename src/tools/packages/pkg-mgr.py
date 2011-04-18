@@ -330,7 +330,7 @@ class PackageManager():
         # launch package installation
         print("Starting installation...")
         try:
-            self._launch_setup_py(my_tmp_dir, os.environ['HOME'])
+            self._launch_setup_py(my_tmp_dir)
         except:
             raise PackageException("Error while installing package '%s' : %s" % (path, traceback.format_exc()))
 
@@ -355,12 +355,11 @@ class PackageManager():
         tar.close()
 
 
-    def _launch_setup_py(self, path, install_path):
+    def _launch_setup_py(self, path):
         """ Launch setup.py install in <path>
             @param path : path where is located setup.py
-            @param installPath : path in which we install package
         """
-        subp = Popen("/usr/bin/python setup.py install --pkg-path=%s" % install_path, 
+        subp = Popen("/usr/bin/python setup.py install",
                       cwd = path, 
                       shell = True)
         subp.wait()

@@ -41,8 +41,8 @@ import os
 from setuptools import setup, find_packages
 import time
 
-print "PKG-PATH=%s" % pkg_path
-time.sleep(10)
+# install folder
+install_folder = os.getenv('HOME')
 
 def list_all_files(path, dst):
     """
@@ -67,9 +67,9 @@ def list_all_files(path, dst):
 
 d_files = []
 
-d_files.extend(list_all_files('src/share/domogik/stats/', '/usr/local/share/domogik/stats/'))
-d_files.extend(list_all_files('src/share/domogik/url2xpl/', '/usr/local/share/domogik/url2xpl/'))
-d_files.extend(list_all_files('src/share/domogik/plugins/', '/usr/local/share/domogik/plugins/'))
+d_files.extend(list_all_files('src/share/domogik/stats/', "%s/share/domogik/stats/" % install_folder))
+d_files.extend(list_all_files('src/share/domogik/url2xpl/', "%s/share/domogik/url2xpl/" % install_folder))
+d_files.extend(list_all_files('src/share/domogik/plugins/', "%s/share/domogik/plugins/" % install_folder))
 
 print d_files
 setup(
