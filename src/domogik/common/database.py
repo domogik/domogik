@@ -682,6 +682,14 @@ class DbHelper():
         """
         return self.__session.query(DeviceFeature).filter_by(id=df_id).first()
 
+    def list_device_features(self):
+        """List device features
+
+        @return a list of DeviceFeature objects
+
+        """
+        return self.__session.query(DeviceFeature).all()
+
     def list_device_features_by_device_id(self, df_device_id):
         """List device features for a device
 
