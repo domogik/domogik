@@ -1122,7 +1122,9 @@ target=*
 
             ### list
             if self.rest_request[1] == "list":
-                if len(self.rest_request) == 4 and self.rest_request[2] == "by-id":
+                if len(self.rest_request) == 2:
+                    self._rest_base_feature_list()
+                elif len(self.rest_request) == 4 and self.rest_request[2] == "by-id":
                     self._rest_base_feature_list(id = self.rest_request[3])
                 elif len(self.rest_request) == 4 and self.rest_request[2] == "by-device_id":
                     self._rest_base_feature_list(device_id = self.rest_request[3])
@@ -1796,7 +1798,10 @@ target=*
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("feature")
-        if id != None:
+        if id == None and device_id == None:
+            for feature in self._db.list_device_features():
+                json_data.add_data(feature)
+        elif id != None:
             feature = self._db.get_device_feature_by_id(id)
             json_data.add_data(feature)
         elif device_id != None:
