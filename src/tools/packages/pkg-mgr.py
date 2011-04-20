@@ -55,13 +55,13 @@ import shutil
 PACKAGE_TYPES = ['plugin']
 SRC_PATH = "../../../"
 PLG_XML_PATH = "src/share/domogik/plugins/"
-SETUP_PLUGIN_TPL = "./templates/setup-plugin.tpl"
 TMP_EXTRACT_DIR = "domogik-pkg-mgr" # used with /tmp (or assimilated) before
 REPO_SRC_FILE = "/etc/domogik/sources.list"
 REPO_LST_FILE = "packages.lst"
 REPO_LST_FILE_HEADER = "Domogik repository"
 REPO_CACHE_DIR = "/var/cache/domogik"
 DOMOGIK_DEFAULT = "/etc/default/domogik"
+INSTALL_PATH = "%s/.domogik/" % os.getenv("HOME")
 
 
 class PackageManager():
@@ -193,60 +193,19 @@ class PackageManager():
                 print("Exiting...")
                 return
 
-        # Create setup.py file
-        setup_file = self._create_plugin_setup(plg_xml)
-
         # Create .tgz
         self._create_tar_gz("plugin-%s-%s" % (plg_xml.name, plg_xml.version), 
                             output_dir,
                             plg_xml.files, 
-                            plg_xml.info_file,
-                            setup_file = setup_file,
-                            ez_setup_file = SRC_PATH + "ez_setup.py")
+                            plg_xml.info_file)
 
 
-    def _create_plugin_setup(self, plg_xml):
-        """ Create setup.py file for package
-            @param plg_xml : plugin data (from xml file)
-        """
-        output_path = "%s/setup_%s.py" % (tempfile.gettempdir(), plg_xml.name)
-        print("Generating '%s'" % output_path)
-        input_file = open(SETUP_PLUGIN_TPL, "r")
-
-        data = ""
-        for buf in input_file.readlines():
-            data = data + buf 
-
-        # TEMPORARY COMMENT FOR FORCING Domogik instead of plugin name
-        data = data.replace("%name%", "Domogik")
-        #data = data.replace("%name%", plg_xml.name)
-        data = data.replace("%version%", plg_xml.version)
-        data = data.replace("%doc%", plg_xml.doc)
-        data = data.replace("%desc%", plg_xml.desc)
-        data = data.replace("%author%", plg_xml.author)
-        data = data.replace("%email%", plg_xml.email)
-        dep_list = ""
-        for dep in plg_xml.dependencies:
-            dep_list += "'%s'," % dep["name"]
-        dep_list = dep_list[0:-1]
-        data = data.replace("%dependencies%", dep_list)
-
-        output_file = open(output_path, "w")
-        output_file.write(data.encode("utf-8"))
-        output_file.close()
- 
-        return output_path
-
-
-    def _create_tar_gz(self, name, output_dir, files, info_file = None,
-                       setup_file = None, ez_setup_file = None):
+    def _create_tar_gz(self, name, output_dir, files, info_file = None):
         """ Create a .tar.gz file anmmed <name.tgz> which contains <files>
             @param name : file name
             @param output_dir : if != None, the path to put .tar.gz
             @param files : table of file names to add in tar.gz
             @param info_file : path for info.xml file
-            @param setup_file : path for setup.py file
-            @param ez_setup_file : path for ez_setup.py file
         """
         if output_dir == None:
             my_tar = "%s/%s.tgz" % (tempfile.gettempdir(), name)
@@ -262,12 +221,6 @@ class PackageManager():
             if info_file != None:
                 print("- info.xml")
                 tar.add(info_file, arcname="info.xml")
-            if setup_file != None:
-                print("- setup.py")
-                tar.add(setup_file, arcname="setup.py")
-            if ez_setup_file != None:
-                print("- ez_setup.py")
-                tar.add(ez_setup_file, arcname="ez_setup.py")
             tar.close()
         except: 
             raise PackageException("Error generating package : %s : %s" % (my_tar, traceback.format_exc()))
@@ -278,9 +231,8 @@ class PackageManager():
         """ Install a package
             0. Eventually download package
             1. Extract tar.gz
-            2. Launch ez_setup.py
-            3. Launch setup install.py
-            4. Insert data in database
+            2. Install package
+            3. Insert data in database
             @param path : path for tar.gz
         """
         #if self.is_root() == False:
@@ -309,7 +261,7 @@ class PackageManager():
             if os.path.isdir(my_tmp_dir) == False:
                 os.makedirs(my_tmp_dir)
         except:
-            raise PackageException("Error while creating temporary folder '%s' : %s" % (my_tmp_dir, traceback.format_exc()))
+            raise PackageException("Error while creating temporary folder '%s' : %s" % (INSTALL_PATH, traceback.format_exc()))
 
         # Check if we need to download package
         if path[0:4] == "http":
@@ -319,7 +271,7 @@ class PackageManager():
             path = dl_path
             print("Package downloaded : %s" % path)
 
-        # extract
+        # extract in tmp directory
         print("Extracting package...")
         try:
             self._extract_package(path, my_tmp_dir)
@@ -327,12 +279,21 @@ class PackageManager():
             raise PackageException("Error while extracting package '%s' : %s" % (path, traceback.format_exc()))
         print("Package successfully extracted.")
 
-        # launch package installation
-        print("Starting installation...")
+        # create install directory
+        print("Creating install directory : %s" % INSTALL_PATH)
         try:
-            self._launch_setup_py(my_tmp_dir)
+            if os.path.isdir(INSTALL_PATH) == False:
+                os.makedirs(INSTALL_PATH)
         except:
-            raise PackageException("Error while installing package '%s' : %s" % (path, traceback.format_exc()))
+            raise PackageException("Error while creating installation folder '%s' : %s" % (INSTALL_PATH, traceback.format_exc()))
+
+        # install plugin in $HOME
+        print("Installing package (plugin)...")
+        try:
+            self._install_plugin(my_tmp_dir, INSTALL_PATH)
+        except:
+            raise PackageException("Error while installing package : %s" % (traceback.format_exc()))
+        print("Package successfully extracted.")
 
         # insert data in database
         pkg_data = PackageData("%s/info.xml" % my_tmp_dir, custom_path = "/home/%s/.domogik.cfg" % self.dmg_user)
@@ -355,15 +316,31 @@ class PackageManager():
         tar.close()
 
 
-    def _launch_setup_py(self, path):
-        """ Launch setup.py install in <path>
-            @param path : path where is located setup.py
+    def _install_plugin(self, pkg_dir, install_path):
+        """ Install plugin
+            @param pkg_dir : directory where package is extracted
+            @param install_path : path where we install packages
         """
-        subp = Popen("/usr/bin/python setup.py install",
-                      cwd = path, 
-                      shell = True)
-        subp.wait()
-        return subp.pid
+
+        ### create needed directories
+        # create install directory
+        print("Creating directories for plugin...")
+        plg_path = "%s/plugins/" % install_path
+        try:
+            if os.path.isdir(plg_path) == False:
+                os.makedirs(plg_path)
+        except:
+            raise PackageException("Error while creating plugin folder '%s' : %s" % (plg_path, traceback.format_exc()))
+
+        ### copy files
+        print("Copying files for plugin...")
+        try:
+            copytree("%s/src/domogik/xpl" % pkg_dir, "%s/xpl" % plg_path)
+            copytree("%s/src/share" % pkg_dir, "%s/share" % plg_path)
+        except:
+            raise PackageException("Error while copying plugin files : %s" % (traceback.format_exc()))
+
+
 
 
     def _update_list(self):
@@ -683,5 +660,82 @@ class OLD_PackageXml():
 
 
 
+##### shutil.copytree fork #####
+# the fork is necessary because original function raise an error if a directory
+# already exists. In our case, some directories will exists!
+
+class Error(EnvironmentError):
+    pass
+
+try:
+    WindowsError
+except NameError:
+    WindowsError = None
+
+
+def copytree(src, dst):
+    """Recursively copy a directory tree using copy2().
+
+    The destination directory must not already exist.
+    If exception(s) occur, an Error is raised with a list of reasons.
+
+    If the optional symlinks flag is true, symbolic links in the
+    source tree result in symbolic links in the destination tree; if
+    it is false, the contents of the files pointed to by symbolic
+    links are copied.
+
+    The optional ignore argument is a callable. If given, it
+    is called with the `src` parameter, which is the directory
+    being visited by copytree(), and `names` which is the list of
+    `src` contents, as returned by os.listdir():
+
+        callable(src, names) -> ignored_names
+
+    Since copytree() is called recursively, the callable will be
+    called once for each directory that is copied. It returns a
+    list of names relative to the `src` directory that should
+    not be copied.
+
+    XXX Consider this example code rather than the ultimate tool.
+
+    """
+    names = os.listdir(src)
+
+    try:
+        os.makedirs(dst)
+    except OSError as (errno, strerror):
+        if errno == 17:
+            pass
+        else:
+            raise
+    errors = []
+    for name in names:
+        srcname = os.path.join(src, name)
+        dstname = os.path.join(dst, name)
+        print("%s => %s" % (srcname, dstname))
+        try:
+            if os.path.isdir(srcname):
+                copytree(srcname, dstname)
+            else:
+                shutil.copy2(srcname, dstname)
+            # XXX What about devices, sockets etc.?
+        except (IOError, os.error), why:
+            errors.append((srcname, dstname, str(why)))
+        # catch the Error from the recursive copytree so that we can
+        # continue with other files
+        except Error, err:
+            errors.extend(err.args[0])
+    try:
+        shutil.copystat(src, dst)
+    except OSError, why:
+        if WindowsError is not None and isinstance(why, WindowsError):
+            # Copying file access times may fail on Windows
+            pass
+        else:
+            errors.extend((src, dst, str(why)))
+    if errors:
+        raise Error, errors
+
+################################
 if __name__ == "__main__":
     PM = PackageManager()
