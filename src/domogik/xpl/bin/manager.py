@@ -561,9 +561,15 @@ class SysManager(XplPlugin):
         This method does *not* check if the component exists
         """
         self.log.info("Start the component %s" % name)
-        plg_path = "domogik.xpl.bin." + name
+        print("Start %s" % name)
+        print sys.path
+        if self._plugin_path == None:
+            plg_path = "domogik.xpl.bin." + name
+        else:
+            plg_path = "plugins.xpl.bin." + name
         __import__(plg_path)
         plugin = sys.modules[plg_path]
+        self.log.debug("Component path : %s" % plugin.__file__)
         subp = Popen("/usr/bin/python %s" % plugin.__file__, shell=True)
         pid = subp.pid
         subp.communicate()

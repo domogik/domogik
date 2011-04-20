@@ -335,11 +335,23 @@ class PackageManager():
         ### copy files
         print("Copying files for plugin...")
         try:
-            copytree("%s/src/domogik" % pkg_dir, "%s/domogik" % plg_path)
+            copytree("%s/src/domogik/xpl" % pkg_dir, "%s/xpl" % plg_path)
+            self._create_init_py("%s/xpl/" % plg_path)
+            self._create_init_py("%s/xpl/bin/" % plg_path)
+            self._create_init_py("%s/xpl/lib/" % plg_path)
             copytree("%s/src/share" % pkg_dir, "%s/share" % plg_path)
         except:
             raise PackageException("Error while copying plugin files : %s" % (traceback.format_exc()))
 
+    def _create_init_py(self, path):
+        """ Create __init__.py file in path
+            param path : path where we wan to create the file
+        """
+        try:
+            print("Create __init__.py file in %s" % path)
+            open("%s/__init__.py" % path, "a").close()
+        except:
+            raise PackageException("Error while crating __init__.py file in %s : %s" % (path, traceback.format_exc()))
 
 
 
