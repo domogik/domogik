@@ -335,7 +335,7 @@ class PackageManager():
         ### copy files
         print("Copying files for plugin...")
         try:
-            copytree("%s/src/domogik/xpl" % pkg_dir, "%s/xpl" % plg_path)
+            copytree("%s/src/domogik" % pkg_dir, "%s/domogik" % plg_path)
             copytree("%s/src/share" % pkg_dir, "%s/share" % plg_path)
         except:
             raise PackageException("Error while copying plugin files : %s" % (traceback.format_exc()))
