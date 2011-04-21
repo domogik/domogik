@@ -130,20 +130,19 @@ class SysManager(XplPlugin):
         config = cfg.load()
         conf = dict(config[1])
         self._pid_dir_path = conf['pid_dir_path']
-        # temporary config for plugin/core separation
+        # plugin installation path
         if conf.has_key('plugin_path'):
             self._plugin_path = conf['plugin_path']
             self.log.info("Set plugin path to '%s' " % self._plugin_path)
             print("Set plugin path to '%s' " % self._plugin_path)
-            tmp_sys_path = [self._plugin_path]
-            tmp_sys_path.extend(sys.path)
-            sys.path = tmp_sys_path
+            sys.path.append(self._plugin_path)
+            self._xml_plugin_directory = "%s/plugins/plugins/" % self._plugin_path
+            self._xml_hardware_directory = "%s/plugins/hardwares/" % self._plugin_path
         else:
             self.log.info("No plugin path defined in config file")
             self._plugin_path = None
-    
-        self._xml_plugin_directory = "%s/share/domogik/plugins/" % conf['custom_prefix']
-        self._xml_hardware_directory = "%s/share/domogik/hardwares/" % conf['custom_prefix']
+            self._xml_plugin_directory = "%s/share/domogik/plugins/" % conf['custom_prefix']
+            self._xml_hardware_directory = "%s/share/domogik/hardwares/" % conf['custom_prefix']
 
         self._pinglist = {}
         self._plugins = []

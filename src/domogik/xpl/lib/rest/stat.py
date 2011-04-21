@@ -59,11 +59,7 @@ class StatsManager:
 
         try:
             self.myxpl = xpl
-            cfg = Loader('domogik')
-            config = cfg.load()
-            cfg_db = dict(config[1])
-            directory = "%s/share/domogik/stats/" % cfg_db['custom_prefix']
-    
+
             # logging initialization
             log = logger.Logger('rest-stat')
             self._log_stats = log.get_logger('rest-stat')
@@ -72,6 +68,21 @@ class StatsManager:
             # logging initialization for unkwnon devices
             log_unknown = logger.Logger('rest-stat-unknown-devices')
             self._log_stats_unknown = log_unknown.get_logger('rest-stat-unknown-devices')
+    
+            # config
+            cfg = Loader('domogik')
+            config = cfg.load()
+            cfg_db = dict(config[1])
+            # plugin installation path
+            if conf.has_key('plugin_path'):
+                self._plugin_path = conf['plugin_path']
+                self._log_stats.info("Set plugin path to '%s' " % self._plugin_path)
+                print("Set plugin path to '%s' " % self._plugin_path)
+                directory = "%s/plugins/stats/" % self._plugin_path
+            else:
+                self._log_stats.info("No plugin path defined in config file")
+                self._plugin_path = None
+                directory = "%s/share/domogik/stats/" % cfg_db['custom_prefix']
     
             files = glob.glob("%s/*/*xml" % directory)
             stats = {}

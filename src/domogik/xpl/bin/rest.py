@@ -140,8 +140,18 @@ class Rest(XplPlugin):
             cfg = Loader('domogik')
             config = cfg.load()
             conf = dict(config[1])
-            self._xml_cmd_dir = "%s/share/domogik/url2xpl/" % conf['custom_prefix']
-            self._xml_stat_dir = "%s/share/domogik/stats/" % conf['custom_prefix']
+            # plugin installation path
+            if conf.has_key('plugin_path'):
+                self._plugin_path = conf['plugin_path']
+                self.log.info("Set plugin path to '%s' " % self._plugin_path)
+                print("Set plugin path to '%s' " % self._plugin_path)
+                self._xml_cmd_dir = "%s/plugins/url2xpl/" % self._plugin_path
+                self._xml_stat_dir = "%s/plugins/stats/" % self._plugin_path
+            else:
+                self.log.info("No plugin path defined in config file")
+                self._plugin_path = None
+                self._xml_cmd_dir = "%s/share/domogik/url2xpl/" % conf['custom_prefix']
+                self._xml_stat_dir = "%s/share/domogik/stats/" % conf['custom_prefix']
     
             # HTTP server ip and port
             try:

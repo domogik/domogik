@@ -339,7 +339,7 @@ class PackageManager():
             self._create_init_py("%s/xpl/" % plg_path)
             self._create_init_py("%s/xpl/bin/" % plg_path)
             self._create_init_py("%s/xpl/lib/" % plg_path)
-            copytree("%s/src/share" % pkg_dir, "%s/share" % plg_path)
+            copytree("%s/src/share/domogik" % pkg_dir, "%s/" % plg_path)
         except:
             raise PackageException("Error while copying plugin files : %s" % (traceback.format_exc()))
 
