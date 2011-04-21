@@ -2599,7 +2599,7 @@ target=*
                 return
     
         ### user #####################################
-        if self.rest_request[0] == "user":
+        elif self.rest_request[0] == "user":
 
             ### list 
             if self.rest_request[1] == "list":
