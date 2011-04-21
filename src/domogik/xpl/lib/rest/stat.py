@@ -74,14 +74,14 @@ class StatsManager:
             config = cfg.load()
             cfg_db = dict(config[1])
             # plugin installation path
-            if conf.has_key('plugin_path'):
-                self._plugin_path = conf['plugin_path']
-                self._log_stats.info("Set plugin path to '%s' " % self._plugin_path)
-                print("Set plugin path to '%s' " % self._plugin_path)
-                directory = "%s/plugins/stats/" % self._plugin_path
+            if conf.has_key('package_path'):
+                self._package_path = conf['package_path']
+                self._log_stats.info("Set package path to '%s' " % self._package_path)
+                print("Set package path to '%s' " % self._package_path)
+                directory = "%s/plugins/stats/" % self._package_path
             else:
-                self._log_stats.info("No plugin path defined in config file")
-                self._plugin_path = None
+                self._log_stats.info("No package path defined in config file")
+                self._package_path = None
                 directory = "%s/share/domogik/stats/" % cfg_db['custom_prefix']
     
             files = glob.glob("%s/*/*xml" % directory)

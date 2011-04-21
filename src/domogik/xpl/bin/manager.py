@@ -131,16 +131,16 @@ class SysManager(XplPlugin):
         conf = dict(config[1])
         self._pid_dir_path = conf['pid_dir_path']
         # plugin installation path
-        if conf.has_key('plugin_path'):
-            self._plugin_path = conf['plugin_path']
-            self.log.info("Set plugin path to '%s' " % self._plugin_path)
-            print("Set plugin path to '%s' " % self._plugin_path)
-            sys.path.append(self._plugin_path)
-            self._xml_plugin_directory = "%s/plugins/plugins/" % self._plugin_path
-            self._xml_hardware_directory = "%s/plugins/hardwares/" % self._plugin_path
+        if conf.has_key('package_path'):
+            self._package_path = conf['package_path']
+            self.log.info("Set package path to '%s' " % self._package_path)
+            print("Set package path to '%s' " % self._package_path)
+            sys.path.append(self._package_path)
+            self._xml_plugin_directory = "%s/plugins/plugins/" % self._package_path
+            self._xml_hardware_directory = "%s/plugins/hardwares/" % self._package_path
         else:
-            self.log.info("No plugin path defined in config file")
-            self._plugin_path = None
+            self.log.info("No package path defined in config file")
+            self._package_path = None
             self._xml_plugin_directory = "%s/share/domogik/plugins/" % conf['custom_prefix']
             self._xml_hardware_directory = "%s/share/domogik/hardwares/" % conf['custom_prefix']
 
@@ -562,7 +562,7 @@ class SysManager(XplPlugin):
         self.log.info("Start the component %s" % name)
         print("Start %s" % name)
         print sys.path
-        if self._plugin_path == None:
+        if self._package_path == None:
             plg_path = "domogik.xpl.bin." + name
         else:
             plg_path = "plugins.xpl.bin." + name
