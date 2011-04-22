@@ -41,7 +41,7 @@ function Menu(caller, options){
 	var options = jQuery.extend({
 		content: null,
 		width: 180, // width of menu container, must be set or passed in to calculate widths of child menus
-		maxHeight: 180, // max height of menu (if a drilldown: height does not include breadcrumb)
+		maxHeight: 350, // max height of menu (if a drilldown: height does not include breadcrumb)
 		positionOpts: {
 			posX: 'left', 
 			posY: 'bottom',
@@ -472,7 +472,7 @@ Menu.prototype.setPosition = function(widget, caller, options) {
 	var xVal, yVal;
 	
 	var helper = $('<div class="positionHelper"></div>');
-	helper.css({ position: 'absolute', left: dims.refX, top: dims.refY, width: dims.refW, height: dims.refH });
+	helper.css({ position: 'relative', left: dims.refX, top: 0, width: dims.refW, height: dims.refH });
 	el.wrap(helper);
 	
 	// get X pos
