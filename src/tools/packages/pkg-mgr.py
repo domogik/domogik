@@ -61,7 +61,7 @@ parser.add_option("-i", "--install",
                   action = "store_true", 
                   dest = "action_install",
                   default = False,
-                  help = "Install a package")
+                  help = "Install a package (<package> [version])")
 parser.add_option("-u", "--update",
                   action = "store_true", 
                   dest = "action_update",
