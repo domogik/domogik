@@ -561,7 +561,6 @@ class SysManager(XplPlugin):
         """
         self.log.info("Start the component %s" % name)
         print("Start %s" % name)
-        print sys.path
         if self._package_path == None:
             plg_path = "domogik.xpl.bin." + name
         else:
