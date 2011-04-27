@@ -53,11 +53,11 @@ import shutil
 SRC_PATH = "../../../"
 PLG_XML_PATH = "src/share/domogik/plugins/"
 TMP_EXTRACT_DIR = "domogik-pkg-mgr" # used with /tmp (or assimilated) before
-REPO_SRC_FILE = "/etc/domogik/sources.list"
+CONFIG_FILE = "%s/.domogik/domogik.cfg" % os.getenv("HOME")
+REPO_SRC_FILE = "%s/.domogik/sources.list" % os.getenv("HOME")
 REPO_LST_FILE = "packages.lst"
 REPO_LST_FILE_HEADER = "Domogik repository"
-REPO_CACHE_DIR = "/var/cache/domogik"
-DOMOGIK_DEFAULT = "/etc/default/domogik"
+REPO_CACHE_DIR = "%s/.domogik/cache" % os.getenv("HOME")
 INSTALL_PATH = "%s/.domogik/" % os.getenv("HOME")
 
 
@@ -68,7 +68,6 @@ class PackageManager():
     def __init__(self):
         """ Init tool
         """
-        self.dmg_user = self.get_config_path()
 
 
     def _create_package_for_plugin(self, name, output_dir, force):
@@ -211,7 +210,7 @@ class PackageManager():
         print("Package successfully extracted.")
 
         # insert data in database
-        pkg_data = PackageData("%s/info.xml" % my_tmp_dir, custom_path = "/home/%s/.domogik.cfg" % self.dmg_user)
+        pkg_data = PackageData("%s/info.xml" % my_tmp_dir, custom_path = CONFIG_FILE)
         pkg_data.insert()
 
         print("Package installation finished")
@@ -453,139 +452,6 @@ class PackageManager():
             return True
         return False
 
-    def get_config_path(self):
-        """ get .domogik.cfg full path
-        """
-        try:
-            file = open(DOMOGIK_DEFAULT, "r")
-            for line in file.readlines():
-                elt = line.split("=")
-                if elt[0] == "DOMOGIK_USER":
-                    dmg_user = elt[1].strip()
-            file.close()
-        except:
-            raise PackageException("Error reading default file : %s : %s" % (DOMOGIK_DEFAULT, str(traceback.format_exc())))
-        return dmg_user
-              
-
-
-class OLD_PackageXml():
-    def __init__(self, name = None, url = None, path = None):
-        """ Read xml file of a plugin and make an object from it
-            @param name : name of plugin
-            @param url : url of xml file
-            @param path : path of xml file
-        """
-        try:
-            if name != None:
-                # get config
-                cfg = Loader('domogik')
-                config = cfg.load()
-                conf = dict(config[1])
-                xml_plugin_directory = "%s/%s" % (SRC_PATH, PLG_XML_PATH)
-                xml_file = "%s/%s.xml" % (xml_plugin_directory, name)
-                self.info_file = xml_file
-                self.xml_content = minidom.parse(xml_file)
-    
-            if path != None:
-                xml_file = path
-                self.info_file = xml_file
-                self.xml_content = minidom.parse(xml_file)
-
-            if url != None:
-                xml_file = url
-                self.info_file = xml_file
-                xml_data = urllib.urlopen(xml_file)
-                self.xml_content = minidom.parseString(xml_data.read())
-
-            # read xml file
-            self.type = self.xml_content.getElementsByTagName("package")[0].attributes.get("type").value
-            self.name = self.xml_content.getElementsByTagName("name")[0].firstChild.nodeValue
-            self.desc = self.xml_content.getElementsByTagName("description")[0].firstChild.nodeValue
-            self.detail = self.xml_content.getElementsByTagName("detail")[0].firstChild.nodeValue
-            self.techno = self.xml_content.getElementsByTagName("technology")[0].firstChild.nodeValue
-            self.version = self.xml_content.getElementsByTagName("version")[0].firstChild.nodeValue
-            self.doc = self.xml_content.getElementsByTagName("documentation")[0].firstChild.nodeValue
-            self.author = self.xml_content.getElementsByTagName("author")[0].firstChild.nodeValue
-            self.email = self.xml_content.getElementsByTagName("author-email")[0].firstChild.nodeValue
-            # list of files
-            self.files = []
-            xml_data = self.xml_content.getElementsByTagName("files")[0]
-            for my_file in xml_data.getElementsByTagName("file"):
-               data = {"path" :  my_file.attributes.get("path").value}
-               self.files.append(data)
-            # list of dependencies
-            self.dependencies = []
-            xml_data = self.xml_content.getElementsByTagName("dependencies")[0]
-            for dep in xml_data.getElementsByTagName("dep"):
-               data = {"name" :  dep.attributes.get("name").value}
-               self.dependencies.append(data)
-
-            # construct filenames
-            self.fullname = "%s-%s" % (self.type, self.name)
-            self.xml_filename = "%s-%s-%s.xml" % (self.type, self.name, self.version)
-            self.pkg_filename = "%s-%s-%s.tgz" % (self.type, self.name, self.version)
-
-            # repository specifics
-            rep = self.xml_content.getElementsByTagName("repository")
-            if len(rep) == 0:
-                self.package_url = None
-                self.xml_url = None
-                self.priority = None
-            else:
-                url_prefix = rep[0].attributes.get("url_prefix").value
-                self.package_url = "%s.tgz" % url_prefix
-                self.xml_url = "%s.xml" % url_prefix
-                self.priority = rep[0].attributes.get("priority").value
-
-        except:
-            raise PackageException("Error reading xml file : %s : %s" % (xml_file, str(traceback.format_exc())))
-
-
-    def cache_package(self, cache_folder, url_prefix, priority):
-        """ Add url_prefix info in xml data
-            Store xml in a file in cache_folder
-            @param cache_folder : folder to put xml file
-            @param url_prefix : http://.../pluginname-version
-            @param priority : repository priority
-        """
-        top_elt = self.xml_content.documentElement
-        new_elt = self.xml_content.createElementNS(None, 'repository')
-        new_elt.setAttribute("url_prefix", url_prefix)
-        new_elt.setAttribute("priority", priority)
-        top_elt.appendChild(new_elt)
-        cache_file = open("%s/%s" % (cache_folder, self.xml_filename), "w") 
-        cache_file.write(self.xml_content.toxml().encode("utf-8"))
-        cache_file.close()
-
-    def display(self):
-        """ Display xml data in a fine way
-        """
-        print("---- Plugin informations --------------------------------")
-        print("Type           : %s" % self.type)
-        print("Name           : %s" % self.name)
-        print("Full name      : %s" % self.fullname)
-        print("Version        : %s" % self.version)
-        print("Technology     : %s" % self.techno)
-        print("Link for doc   : %s" % self.doc)
-        print("Description    : %s" % self.desc)
-        print("Detail         : %s" % self.detail)
-        print("Author         : %s" % self.author)
-        print("Author's email : %s" % self.email)
-        print("----- Plugin dependencies -------------------------------")
-        for dep in self.dependencies:
-            print("- %s" % dep["name"])
-        print("----- Plugin files --------------------------------------")
-        for my_file in self.files:
-            print("- %s" % my_file["path"])
-        if self.package_url != None:
-            print("----- Repository informations ---------------------------")
-            print("Package path   : %s" % self.package_url)
-            print("Xml path       : %s" % self.xml_url)
-            print("Priority       : %s" % self.priority)
-        print("---------------------------------------------------------")
-
-
 
 ##### shutil.copytree fork #####
 # the fork is necessary because original function raise an error if a directory
@@ -662,7 +528,7 @@ def copytree(src, dst):
             errors.extend((src, dst, str(why)))
     if errors:
         raise Error, errors
+    
 
-################################
-if __name__ == "__main__":
-    PM = PackageManager()
+
+
