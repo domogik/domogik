@@ -803,6 +803,7 @@ class SysManager(XplPlugin):
         mess.set_type('xpl-trig')
         mess.set_schema('domogik.system')
         mess.add_data({'command' :  'detail'})
+        host_in_msg = False
         for plugin in self._plugins:
             if plugin["name"] == plg:
                 for conf in plugin["configuration"]:
@@ -819,6 +820,7 @@ class SysManager(XplPlugin):
                 mess.add_data({'version' :  plugin["version"]})
                 mess.add_data({'documentation' :  plugin["documentation"]})
                 mess.add_data({'host' : self.get_sanitized_hostname()})
+                host_in_msg = True
         for hardware in self._hardwares:
             if hardware["name"] == plg:
                 for conf in hardware["configuration"]:
@@ -833,6 +835,10 @@ class SysManager(XplPlugin):
                 mess.add_data({'version' :  hardware["version"]})
                 mess.add_data({'documentation' :  hardware["documentation"]})
                 mess.add_data({'host' : hardware["host"]})
+                host_in_msg = True
+        if host_in_msg == False:
+            mess.add_data({'host' : self.get_sanitized_hostname()})
+
 
         self.myxpl.send(mess)
 
