@@ -48,6 +48,7 @@ import pwd
 from subprocess import Popen
 import urllib
 import shutil
+from domogik.common import logger
 
 
 SRC_PATH = "../../../"
@@ -68,6 +69,15 @@ class PackageManager():
     def __init__(self):
         """ Init tool
         """
+        l = logger.Logger("package-manager")
+        self._log = l.get_logger()
+
+    def log(self, message):
+        """ Log and print message
+            @param message : data to log
+        """
+        self._log.info(message)
+        print(message)
 
 
     def _create_package_for_plugin(self, name, output_dir, force):
@@ -78,18 +88,18 @@ class PackageManager():
             @param output_dir : target directory for package
             @param force : False : ask for confirmation
         """
-        print("Plugin nam : %s" % name)
+        self.log("Plugin name : %s" % name)
 
         try:
             plg_xml = PackageXml(name)
         except:
-            print(str(traceback.format_exc()))
+            self.log(str(traceback.format_exc()))
             return
-        print("Xml file OK")
+        self.log("Xml file OK")
 
         # check type == plugin
         if plg_xml.type != "plugin":
-            print("Error : this package is not a plugin")
+            self.log("Error : this package is not a plugin")
             return
 
         # display plugin informations
@@ -97,14 +107,14 @@ class PackageManager():
 
         # check file existence
         if plg_xml.files == []:
-            print("There is no file defined : the package won't be created")
+            self.log("There is no file defined : the package won't be created")
             return
 
         if force == False:
-            print("\nAre these informations OK ?")
+            self.log("\nAre these informations OK ?")
             resp = raw_input("[o/N]")
             if resp.lower() != "o":
-                print("Exiting...")
+                self.log("Exiting...")
                 return
 
         # Create .tgz
@@ -125,20 +135,20 @@ class PackageManager():
             my_tar = "%s/%s.tgz" % (tempfile.gettempdir(), name)
         else:
             my_tar = "%s/%s.tgz" % (output_dir, name)
-        print("Generating package : '%s'" % my_tar)
+        self.log("Generating package : '%s'" % my_tar)
         try:
             tar = tarfile.open(my_tar, "w:gz")
             for my_file in files:
                 path =  str(my_file["path"])
-                print("- %s" % path)
+                self.log("- %s" % path)
                 tar.add(SRC_PATH + path, arcname = path)
             if info_file != None:
-                print("- info.xml")
+                self.log("- info.xml")
                 tar.add(info_file, arcname="info.xml")
             tar.close()
         except: 
             raise PackageException("Error generating package : %s : %s" % (my_tar, traceback.format_exc()))
-        print("OK")
+        self.log("OK")
     
 
     def _install_package(self, path, version = None):
@@ -150,7 +160,7 @@ class PackageManager():
             @param path : path for tar.gz
         """
         #if self.is_root() == False:
-        #    print("-i option must be used as root")
+        #    self.log("-i option must be used as root")
         #    return
         # package from repository
         if path[0:5] == "repo:":
@@ -165,12 +175,12 @@ class PackageManager():
         # twice to remove first .gz and then .tar
         name =  os.path.splitext(full_name)[0]
         name =  os.path.splitext(name)[0] 
-        print("Plugin name : %s" % name)
+        self.log("Plugin name : %s" % name)
 
         # get temp dir to extract data
         my_tmp_dir_dl = "%s/%s" % (tempfile.gettempdir(), TMP_EXTRACT_DIR)
         my_tmp_dir = "%s/%s" % (my_tmp_dir_dl, name)
-        print("Creating temporary directory : %s" % my_tmp_dir)
+        self.log("Creating temporary directory : %s" % my_tmp_dir)
         try:
             if os.path.isdir(my_tmp_dir) == False:
                 os.makedirs(my_tmp_dir)
@@ -179,22 +189,22 @@ class PackageManager():
 
         # Check if we need to download package
         if path[0:4] == "http":
-            print("Downloading package : %s" % path)
+            self.log("Downloading package : %s" % path)
             dl_path = "%s/%s" % (my_tmp_dir_dl, full_name)
             urllib.urlretrieve(path, dl_path)
             path = dl_path
-            print("Package downloaded : %s" % path)
+            self.log("Package downloaded : %s" % path)
 
         # extract in tmp directory
-        print("Extracting package...")
+        self.log("Extracting package...")
         try:
             self._extract_package(path, my_tmp_dir)
         except:
             raise PackageException("Error while extracting package '%s' : %s" % (path, traceback.format_exc()))
-        print("Package successfully extracted.")
+        self.log("Package successfully extracted.")
 
         # create install directory
-        print("Creating install directory : %s" % INSTALL_PATH)
+        self.log("Creating install directory : %s" % INSTALL_PATH)
         try:
             if os.path.isdir(INSTALL_PATH) == False:
                 os.makedirs(INSTALL_PATH)
@@ -202,18 +212,18 @@ class PackageManager():
             raise PackageException("Error while creating installation folder '%s' : %s" % (INSTALL_PATH, traceback.format_exc()))
 
         # install plugin in $HOME
-        print("Installing package (plugin)...")
+        self.log("Installing package (plugin)...")
         try:
             self._install_plugin(my_tmp_dir, INSTALL_PATH)
         except:
             raise PackageException("Error while installing package : %s" % (traceback.format_exc()))
-        print("Package successfully extracted.")
+        self.log("Package successfully extracted.")
 
         # insert data in database
         pkg_data = PackageData("%s/info.xml" % my_tmp_dir, custom_path = CONFIG_FILE)
         pkg_data.insert()
 
-        print("Package installation finished")
+        self.log("Package installation finished")
 
 
     def _extract_package(self, pkg_path, extract_path):
@@ -238,7 +248,7 @@ class PackageManager():
 
         ### create needed directories
         # create install directory
-        print("Creating directories for plugin...")
+        self.log("Creating directories for plugin...")
         plg_path = "%s/plugins/" % install_path
         try:
             if os.path.isdir(plg_path) == False:
@@ -247,13 +257,13 @@ class PackageManager():
             raise PackageException("Error while creating plugin folder '%s' : %s" % (plg_path, traceback.format_exc()))
 
         ### copy files
-        print("Copying files for plugin...")
+        self.log("Copying files for plugin...")
         try:
-            copytree("%s/src/domogik/xpl" % pkg_dir, "%s/xpl" % plg_path)
+            copytree("%s/src/domogik/xpl" % pkg_dir, "%s/xpl" % plg_path, self.log)
             self._create_init_py("%s/xpl/" % plg_path)
             self._create_init_py("%s/xpl/bin/" % plg_path)
             self._create_init_py("%s/xpl/lib/" % plg_path)
-            copytree("%s/src/share/domogik" % pkg_dir, "%s/" % plg_path)
+            copytree("%s/src/share/domogik" % pkg_dir, "%s/" % plg_path, self.log)
         except:
             raise PackageException("Error while copying plugin files : %s" % (traceback.format_exc()))
 
@@ -262,7 +272,7 @@ class PackageManager():
             param path : path where we wan to create the file
         """
         try:
-            print("Create __init__.py file in %s" % path)
+            self.log("Create __init__.py file in %s" % path)
             open("%s/__init__.py" % path, "a").close()
         except:
             raise PackageException("Error while crating __init__.py file in %s : %s" % (path, traceback.format_exc()))
@@ -277,21 +287,21 @@ class PackageManager():
             # Read repository source file and generate repositories list
             repo_list = self._get_repositories_list(REPO_SRC_FILE)
         except:
-            print(str(traceback.format_exc()))
+            self.log(str(traceback.format_exc()))
             return
              
         # Clean cache folder
         try:
             self._clean_cache(REPO_CACHE_DIR)
         except:
-            print(str(traceback.format_exc()))
+            self.log(str(traceback.format_exc()))
             return
              
         # for each list, get files and associated xml
         try:
             self._parse_repository(repo_list, REPO_CACHE_DIR)
         except:
-            print(str(traceback.format_exc()))
+            self.log(str(traceback.format_exc()))
             return
 
 
@@ -351,7 +361,7 @@ class PackageManager():
         # for each package, put it in cache if higher version
         for file_info in file_list:
             pkg_xml = PackageXml(url = "%s.xml" % file_info["file"])
-            print("Add '%s (%s)' in cache" % (pkg_xml.name, pkg_xml.version))
+            self.log("Add '%s (%s)' in cache" % (pkg_xml.name, pkg_xml.version))
             pkg_xml.cache_package(cache_folder, file_info["file"], file_info["priority"])
 
 
@@ -368,7 +378,7 @@ class PackageManager():
                 if first_line == True:
                     first_line = False
                     if data.strip() != REPO_LST_FILE_HEADER:
-                        print("This is not a Domogik repository : '%s/%s'" %
+                        self.log("This is not a Domogik repository : '%s/%s'" %
                                    (url, REPO_LST_FILE))
                         break
                 else:
@@ -376,7 +386,7 @@ class PackageManager():
                                     "priority" : priority})
             return my_list
         except IOError:
-            print("Bad url :'%s/%s'" % (url, REPO_LST_FILE))
+            self.log("Bad url :'%s/%s'" % (url, REPO_LST_FILE))
             return []
 
 
@@ -394,7 +404,7 @@ class PackageManager():
         pkg_list =  sorted(pkg_list, key = lambda k: (k['fullname'], 
                                                       k['version']))
         for pkg in pkg_list:
-             print("%s (%s, prio: %s) : %s" % (pkg["fullname"], 
+             self.log("%s (%s, prio: %s) : %s" % (pkg["fullname"], 
                                                pkg["version"], 
                                                pkg["priority"], 
                                                pkg["desc"]))
@@ -433,12 +443,12 @@ class PackageManager():
         if len(pkg_list) == 0:
             if version == None:
                 version = "*"
-            print("No package corresponding to '%s' in version '%s'" % (fullname, version))
+            self.log("No package corresponding to '%s' in version '%s'" % (fullname, version))
             return None
         if len(pkg_list) > 1:
-            print("Several packages are available for '%s'. Please specify which version you choose" % fullname)
+            self.log("Several packages are available for '%s'. Please specify which version you choose" % fullname)
             for pkg in pkg_list:
-                 print("%s (%s, prio: %s)" % (pkg["fullname"], 
+                 self.log("%s (%s, prio: %s)" % (pkg["fullname"], 
                                               pkg["version"],
                                               pkg["priority"]))
             return None
@@ -466,7 +476,7 @@ except NameError:
     WindowsError = None
 
 
-def copytree(src, dst):
+def copytree(src, dst, cb_log):
     """Recursively copy a directory tree using copy2().
 
     The destination directory must not already exist.
@@ -505,10 +515,10 @@ def copytree(src, dst):
     for name in names:
         srcname = os.path.join(src, name)
         dstname = os.path.join(dst, name)
-        print("%s => %s" % (srcname, dstname))
+        cb_log("%s => %s" % (srcname, dstname))
         try:
             if os.path.isdir(srcname):
-                copytree(srcname, dstname)
+                copytree(srcname, dstname, cb_log)
             else:
                 shutil.copy2(srcname, dstname)
             # XXX What about devices, sockets etc.?
