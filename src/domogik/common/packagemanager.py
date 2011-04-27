@@ -361,7 +361,7 @@ class PackageManager():
         # for each package, put it in cache if higher version
         for file_info in file_list:
             pkg_xml = PackageXml(url = "%s.xml" % file_info["file"])
-            self.log("Add '%s (%s)' in cache" % (pkg_xml.name, pkg_xml.version))
+            self.log("Add '%s (%s)' in cache from %s" % (pkg_xml.name, pkg_xml.version, file_info["repo_url"]))
             pkg_xml.cache_package(cache_folder, file_info["file"], file_info["priority"])
 
 
@@ -383,7 +383,8 @@ class PackageManager():
                         break
                 else:
                     my_list.append({"file" : "%s/%s" % (url, data.strip()),
-                                    "priority" : priority})
+                                    "priority" : priority,
+                                    "repo_url" : url})
             return my_list
         except IOError:
             self.log("Bad url :'%s/%s'" % (url, REPO_LST_FILE))
