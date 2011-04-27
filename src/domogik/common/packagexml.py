@@ -39,6 +39,7 @@ from domogik.common.configloader import Loader
 from xml.dom import minidom
 import traceback
 from xml.sax.saxutils import escape
+import urllib2
 
 
 
@@ -85,7 +86,7 @@ class PackageXml():
             if url != None:
                 xml_file = url
                 self.info_file = xml_file
-                xml_data = urllib.urlopen(xml_file)
+                xml_data = urllib2.urlopen(xml_file)
                 self.xml_content = minidom.parseString(xml_data.read())
 
             # read xml file
