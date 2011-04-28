@@ -203,8 +203,9 @@ class ProcessRequest():
             self.rest_stats()
         elif self.rest_type == "events":
             self.rest_events()
-        elif self.rest_type == "xpl-cmnd":
-            self.rest_xpl_cmnd()
+        # commented for security reasons
+        #elif self.rest_type == "xpl-cmnd":
+        #    self.rest_xpl_cmnd()
         elif self.rest_type == "base":
             self.rest_base()
         elif self.rest_type == "plugin":
