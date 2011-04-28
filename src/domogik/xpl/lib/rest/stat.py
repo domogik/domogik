@@ -74,8 +74,8 @@ class StatsManager:
             config = cfg.load()
             cfg_db = dict(config[1])
             # plugin installation path
-            if conf.has_key('package_path'):
-                self._package_path = conf['package_path']
+            if cfg_db.has_key('package_path'):
+                self._package_path = cfg_db['package_path']
                 self._log_stats.info("Set package path to '%s' " % self._package_path)
                 print("Set package path to '%s' " % self._package_path)
                 directory = "%s/plugins/stats/" % self._package_path
