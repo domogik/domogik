@@ -285,7 +285,7 @@ class PackageManager():
         # Get repositories list
         try:
             # Read repository source file and generate repositories list
-            repo_list = self._get_repositories_list(REPO_SRC_FILE)
+            repo_list = self._get_repositories_list()
         except:
             self.log(str(traceback.format_exc()))
             return
@@ -305,13 +305,12 @@ class PackageManager():
             return
 
 
-    def _get_repositories_list(self, filename):
+    def _get_repositories_list(self):
         """ Read repository source file and return list
-            @param filename : source file
         """
         try:
             repo_list = []
-            src_file = open(filename, "r")
+            src_file = open(REPO_SRC_FILE, "r")
             for line in src_file.readlines():
                 repo_list.append({"priority" : line.split()[0],
                                   "url" : line.split()[1]})
