@@ -229,6 +229,15 @@ class SysManager(XplPlugin):
                 'xpltype': 'xpl-cmnd',
             })
     
+            # Define listeners for packages
+            Listener(self._package_cb, self.myxpl, {
+                'schema': 'domogik.package',
+                'xpltype': 'xpl-cmnd',
+            })
+
+            # PackageManager instance
+            self.pkg_mgr = PackageManager()
+    
             if self.options.check_hardware:
                 Listener(self._refresh_hardware_list, self.myxpl, {
                     'schema': 'hbeat.app',
@@ -858,6 +867,47 @@ class SysManager(XplPlugin):
 
 
         self.myxpl.send(mess)
+
+
+
+
+    def _package_cb(self, message):
+        """ Internal callback for receiving packages related messages
+        @param message : xpl message received
+        """
+        self.log.debug("Call _packagge_cb")
+
+        command = message.data['command']
+        try:
+            host = message.data['host']
+        except KeyError:
+           host = "*"
+
+        # check if message is for us
+        if self.get_sanitized_hostname() != host and host != "*":
+            return
+
+        if command == "list-repo":
+            self._pkg_list_repo()
+
+
+    def _pkg_list_repo(self):
+        """ List repositories and send them on xpl
+        """
+        mess = XplMessage()
+        mess.set_type('xpl-trig')
+        mess.set_schema('domogik.package')
+        mess.add_data({'command' :  'list-repo'})
+        mess.add_data({'host' :  self.get_sanitized_hostname()})
+        idx = 0
+        for repo in self.pkg_mgr.get_repositories_list():
+            mess.add_data({"repo-%s-url" % idx : repo['url'],
+                           "repo-%s-priority" % idx : repo['priority']})
+            idx += 1
+        self.myxpl.send(mess)
+                
+
+
 
 
 def main():

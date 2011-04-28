@@ -70,7 +70,7 @@ class PackageManager():
         """ Init tool
         """
         l = logger.Logger("package-manager")
-        self._log = l.get_logger()
+        self._log = l.get_logger("package-manager")
 
     def log(self, message):
         """ Log and print message
@@ -285,7 +285,7 @@ class PackageManager():
         # Get repositories list
         try:
             # Read repository source file and generate repositories list
-            repo_list = self._get_repositories_list()
+            repo_list = self.get_repositories_list()
         except:
             self.log(str(traceback.format_exc()))
             return
@@ -305,7 +305,7 @@ class PackageManager():
             return
 
 
-    def _get_repositories_list(self):
+    def get_repositories_list(self):
         """ Read repository source file and return list
         """
         try:
