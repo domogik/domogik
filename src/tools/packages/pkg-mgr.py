@@ -115,7 +115,7 @@ if options.action_install == True:
 
 # packages list update
 if options.action_update == True:
-    mgr._update_list()
+    mgr.update_cache()
 
 # list packages in cache
 if options.action_list == True:

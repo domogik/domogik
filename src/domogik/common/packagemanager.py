@@ -279,8 +279,8 @@ class PackageManager():
 
 
 
-    def _update_list(self):
-        """ update local package list
+    def update_cache(self):
+        """ update local package cache
         """
         # Get repositories list
         try:
@@ -288,22 +288,23 @@ class PackageManager():
             repo_list = self.get_repositories_list()
         except:
             self.log(str(traceback.format_exc()))
-            return
+            return False
              
         # Clean cache folder
         try:
             self._clean_cache(REPO_CACHE_DIR)
         except:
             self.log(str(traceback.format_exc()))
-            return
+            return False
              
         # for each list, get files and associated xml
         try:
             self._parse_repository(repo_list, REPO_CACHE_DIR)
         except:
             self.log(str(traceback.format_exc()))
-            return
+            return False
 
+        return True
 
     def get_repositories_list(self):
         """ Read repository source file and return list

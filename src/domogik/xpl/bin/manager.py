@@ -626,7 +626,7 @@ class SysManager(XplPlugin):
             hardware_list = dict(hardwares.load()[1])
             state_thread = {}
             for hardware in hardware_list:
-                print hardware
+                print(hardware)
                 self.log.info("==> %s (%s)" % (hardware, hardware_list[hardware]))
                 if hardware_list[hardware] == "enabled":
                     # try open xml file
@@ -739,7 +739,7 @@ class SysManager(XplPlugin):
         plugin_list = dict(plugins.load(refresh = True)[1])
         state_thread = {}
         for plugin in plugin_list:
-            print plugin
+            print(plugin)
             self.log.info("==> %s (%s)" % (plugin, plugin_list[plugin]))
             if plugin_list[plugin] == "enabled":
                 # try open xml file
@@ -783,7 +783,6 @@ class SysManager(XplPlugin):
             if plugin["name"] == name:
                 return True
         for hardware in self._hardwares:
-            print "is : %s" % hardware
             if hardware["name"] == name:
                 return True
         return False
@@ -890,6 +889,9 @@ class SysManager(XplPlugin):
         if command == "list-repo":
             self._pkg_list_repo()
 
+        if command == "update-cache" and host != "*":
+            self._pkg_update_cache()
+
 
     def _pkg_list_repo(self):
         """ List repositories and send them on xpl
@@ -901,9 +903,21 @@ class SysManager(XplPlugin):
         mess.add_data({'host' :  self.get_sanitized_hostname()})
         idx = 0
         for repo in self.pkg_mgr.get_repositories_list():
-            mess.add_data({"repo-%s-url" % idx : repo['url'],
-                           "repo-%s-priority" % idx : repo['priority']})
+            mess.add_data({"repo%s-url" % idx : repo['url'],
+                           "repo%s-priority" % idx : repo['priority']})
             idx += 1
+        self.myxpl.send(mess)
+
+    def _pkg_update_cache(self):
+        """ update cache
+        """
+        mess = XplMessage()
+        mess.set_type('xpl-trig')
+        mess.set_schema('domogik.package')
+        mess.add_data({'command' :  'update-cache'})
+        mess.add_data({'host' :  self.get_sanitized_hostname()})
+        if self.pkg_mgr.update_cache() == False:
+            mess.add_data({'error' : 'Error while updating cache. Check package manager logs'})
         self.myxpl.send(mess)
                 
 
