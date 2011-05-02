@@ -28,7 +28,7 @@ Implements
 ==========
 
 
-@author: Maxence Dunnewind <maxence@dunnewind.net>
+@author: Maxence Dunnewind <maxence@dunnewind.net>, Marc Schneider <marc@mirelsol.org>
 @copyright: (C) 2007-2010 Domogik project
 @license: GPL(v3)
 @organization: Domogik
@@ -47,24 +47,13 @@ from domogik.common.configloader import Loader
 # Installer
 ###
 
-def install(create_prod_db, create_test_db):
+def create_database_from_scratch(url):
     db = database.DbHelper()
-    print "Using database", db.get_db_type()
-    url = db.get_url_connection_string()
-
-    # For unit tests
-    if create_test_db:
-        print "Creating test database..."
-        test_url = '%s_test' % url
-        engine_test = create_engine(test_url)
-        sql_schema.metadata.create_all(engine_test)
-
-    if not create_prod_db:
-        return
-
-    # Production database
-    print "Creating production database..."
+    print("Creating production database")
     engine = create_engine(url)
+    print("Droping all existing tables...")
+    sql_schema.metadata.drop_all(engine)
+    print("Creating all tables...")
     sql_schema.metadata.create_all(engine)
 
     # Initialize default system configuration
@@ -108,17 +97,35 @@ def install(create_prod_db, create_test_db):
                         du_default_options='{&quot;actuator&quot;: { &quot;binary&quot;: {}, &quot;range&quot;: {}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} }}')
     db.add_device_usage(du_id='music', du_name='Music', du_description='Music usage',
                         du_default_options='{&quot;actuator&quot;: { &quot;binary&quot;: {}, &quot;range&quot;: {}, &quot;trigger&quot;: {}, &quot;number&quot;: {} }, &quot;sensor&quot;: {&quot;boolean&quot;: {}, &quot;number&quot;: {}, &quot;string&quot;: {} }}')
+    print("Done.")
+
+def install(create_prod_db, create_test_db):
+    db = database.DbHelper()
+    print "Using database", db.get_db_type()
+    url = db.get_url_connection_string()
+
+    # For unit tests
+    if create_test_db:
+        print("Creating test database...")
+        test_url = '%s_test' % url
+        engine_test = create_engine(test_url)
+        sql_schema.metadata.drop_all(engine_test)
+        sql_schema.metadata.create_all(engine_test)
+
+    if not create_prod_db:
+        return
+    create_database_from_scratch(url)
 
 def usage():
-    print("Usage : db_installer [-t, --test] [-P, --no-prod]")
+    print("Usage : db_installer [-t, --test] [-p, --prod]")
     print("-t or --test : database for unit tests will created (default is False)")
-    print("-P or --no-prod : no production database will be created (default is True)")
+    print("-p or --prod : production database will be created (default is False)")
 
 if __name__ == "__main__":
-    create_prod_db = True
+    create_prod_db = False
     create_test_db = False
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hPt", ["help", "no-prod", "test"])
+        opts, args = getopt.getopt(sys.argv[1:], "hpt", ["help", "prod", "test"])
     except getopt.GetoptError:
         usage()
         sys.exit(2)
@@ -126,8 +133,8 @@ if __name__ == "__main__":
         if opt in ('-h', '--help'):
             usage()
             sys.exit()
-        elif opt in ('-P', '--no-prod'):
-            create_prod_db = False
+        elif opt in ('-p', '--prod'):
+            create_prod_db = True
         elif opt in ('-t', '--test'):
             create_test_db = True
     if not create_test_db and not create_prod_db:
