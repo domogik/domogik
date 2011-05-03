@@ -78,6 +78,9 @@ REST_API_VERSION = "0.1"
 USE_SSL = False
 SSL_CERTIFICATE = "/dev/null"
 
+# packages queues config
+QUEUE_PACKAGE_SIZE = 10
+
 # global queues config (plugins, etc)
 QUEUE_TIMEOUT = 15
 QUEUE_SIZE = 10
@@ -205,6 +208,11 @@ class Rest(XplPlugin):
                 self._queue_timeout = QUEUE_TIMEOUT
             self._queue_timeout = float(self._queue_timeout)
 
+            self._queue_package_size = self._config.query('rest', 'q-pkg-size')
+            if self._queue_package_size == None:
+                self._queue_package_size = QUEUE_PACKAGE_SIZE
+            self._queue_package_size = float(self._queue_package_size)
+
             self._queue_size = self._config.query('rest', 'q-size')
             if self._queue_size == None:
                 self._queue_size = QUEUE_SIZE
@@ -248,6 +256,10 @@ class Rest(XplPlugin):
             self._queue_event_life_expectancy = float(self._queue_event_life_expectancy)
     
             # Queues for xPL
+            # Queues for packages management
+            self._queue_package = Queue(self._queue_package_size)
+
+            # Queues for domogik system actions
             self._queue_system_list = Queue(self._queue_size)
             self._queue_system_detail = Queue(self._queue_size)
             self._queue_system_start = Queue(self._queue_size)
@@ -267,6 +279,9 @@ class Rest(XplPlugin):
     
             # define listeners for queues
             self.log.debug("Create listeners")
+            Listener(self._add_to_queue_package, self.myxpl, \
+                     {'schema': 'domogik.package',
+                      'xpltype': 'xpl-trig'})
             Listener(self._add_to_queue_system_list, self.myxpl, \
                      {'schema': 'domogik.system',
                       'xpltype': 'xpl-trig',
@@ -302,6 +317,11 @@ class Rest(XplPlugin):
         except :
             self.log.error("%s" % self.get_exception())
 
+
+    def _add_to_queue_package(self, message):
+        """ Add data in a queue
+        """
+        self._put_in_queue(self._queue_package, message)
 
     def _add_to_queue_system_list(self, message):
         """ Add data in a queue

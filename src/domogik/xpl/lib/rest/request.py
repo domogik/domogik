@@ -61,7 +61,7 @@ from threading import Event
 from Queue import Empty
 
 
-# Time we wait for answers after a /list command
+# Time we wait for answers after a multi host list command
 WAIT_FOR_LIST_ANSWERS = 1
 
 
@@ -130,10 +130,13 @@ class ProcessRequest():
         self._queue_timeout =  self.handler_params[0]._queue_timeout
         self._queue_size =  self.handler_params[0]._queue_size
         self._queue_command_size =  self.handler_params[0]._queue_command_size
+        self._queue_package_size =  self.handler_params[0]._queue_package_size
         self._queue_life_expectancy = self.handler_params[0]._queue_life_expectancy
         self._queue_event_size =  self.handler_params[0]._queue_event_size
         self._get_from_queue = self.handler_params[0]._get_from_queue
         self._put_in_queue = self.handler_params[0]._put_in_queue
+
+        self._queue_package =  self.handler_params[0]._queue_package
 
         self._queue_system_list =  self.handler_params[0]._queue_system_list
         self._queue_system_detail =  self.handler_params[0]._queue_system_detail
@@ -203,8 +206,9 @@ class ProcessRequest():
             self.rest_stats()
         elif self.rest_type == "events":
             self.rest_events()
-        elif self.rest_type == "xpl-cmnd":
-            self.rest_xpl_cmnd()
+        # commented for security reasons
+        #elif self.rest_type == "xpl-cmnd":
+        #    self.rest_xpl_cmnd()
         elif self.rest_type == "base":
             self.rest_base()
         elif self.rest_type == "plugin":
@@ -221,6 +225,8 @@ class ProcessRequest():
             self.rest_repo()
         elif self.rest_type == "scenario":
             self.rest_scenario()
+        elif self.rest_type == "package":
+            self.rest_package()
         elif self.rest_type == None:
             self.rest_status()
         else:
@@ -315,6 +321,8 @@ class ProcessRequest():
 
         # Queues stats
         queues = {}
+        queues["package_usage"] = "%s/%s" \
+            % (self._queue_package.qsize(), int(self._queue_package_size))
         queues["system_list_usage"] = "%s/%s" \
             % (self._queue_system_list.qsize(), int(self._queue_size))
         queues["system_detail_usage"] = "%s/%s" \
@@ -3321,5 +3329,173 @@ target=*
         ### others ##################################
         else:
             self.send_http_response_error(999, self.rest_request[0] + " not allowed", self.jsonp, self.jsonp_cb)
+
+
+######
+# /package processing
+######
+
+    def rest_package(self):
+        """ /package processing
+        """
+        self.log.debug("Package action")
+
+        # parameters initialisation
+        self.parameters = {}
+
+        if len(self.rest_request) < 1:
+            self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
+            return
+
+        ### list-repo #################################
+        if self.rest_request[0] == "list-repo":
+
+            if len(self.rest_request) == 1:
+                self._rest_package_list_repo()
+            else:
+                self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
+                                              self.jsonp, self.jsonp_cb)
+                return
+
+        ### update-cache #############################
+        if self.rest_request[0] == "update-cache":
+            if len(self.rest_request) == 2:
+                self._rest_package_update_cache(self.rest_request[1])
+            else:
+                self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
+                                              self.jsonp, self.jsonp_cb)
+                return
+
+        ### others ####################################
+        else:
+            self.send_http_response_error(999, "Bad operation for /package", self.jsonp, self.jsonp_cb)
+            return
+
+
+
+
+
+    def _rest_package_list_repo(self):
+        """ Send a xpl message to manager to get repositories list
+            Display this list as json
+        """
+        self.log.debug("Package : ask for repositories list")
+
+        ### Send xpl message to get list
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("domogik.package")
+        message.add_data({"command" : "list-repo"})
+        message.add_data({"host" : "*"})
+        self.myxpl.send(message)
+        self.log.debug("Package : send message : %s" % str(message))
+
+        ### Wait for answer
+        # get xpl message from queue
+        # make a time loop of one second after first xpl-trig reception
+        messages = []
+        try:
+            # Get first answer for command
+            self.log.debug("Package repository list : wait for first answer...")
+            messages.append(self._get_from_queue(self._queue_package, 
+                                                 "xpl-trig", 
+                                                 "domogik.package",
+                                                 filter_data = {"command" : "list-repo"}))
+            # after first message, we start to listen for other messages 
+            self.log.debug("Package repository list : wait for other answers during '%s' seconds..." % WAIT_FOR_LIST_ANSWERS)
+            max_time = time.time() + WAIT_FOR_LIST_ANSWERS
+            while time.time() < max_time:
+                try:
+                    message = self._get_from_queue(self._queue_package, 
+                                                   "xpl-trig", 
+                                                   "domogik.package", 
+                                                   filter_data = {"command" : "list-repo"},
+                                                   timeout = WAIT_FOR_LIST_ANSWERS)
+                    messages.append(message)
+                    self.log.debug("Package repository list : get one answer from '%s'" % message.data["host"])
+                except Empty:
+                    self.log.debug("Package repository list : empty queue")
+                    pass
+            self.log.debug("Package repository list : end waiting for answers")
+        except Empty:
+            self.log.debug("Package repository list : no answer")
+            json_data = JSonHelper("ERROR", 999, "No data or timeout on getting package repository list")
+            json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+            json_data.set_data_type("repository")
+            self.send_http_response_ok(json_data.get())
+            return
+
+        self.log.debug("Package repository list : messages received : %s" % str(messages))
+        
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("repository")
+
+        # process messages
+        for message in messages:
+            cmd = message.data['command']
+            host = message.data["host"]
+    
+            idx = 0
+            loop_again = True
+            while loop_again:
+                try:
+                    repo_url = message.data["repo"+str(idx)+"-url"]
+                    repo_priority = message.data["repo"+str(idx)+"-priority"]
+                    json_data.add_data({"url" : repo_url, 
+                                        "prioriry" : repo_priority, 
+                                        "host" : host})
+                    idx += 1
+                except:
+                    loop_again = False
+    
+        self.send_http_response_ok(json_data.get())
+
+    def _rest_package_update_cache(self, host):
+        """ Send a xpl message to manager to update cache
+            @param host : host targetted
+            Return ok/ko as json
+        """
+        self.log.debug("Package : ask for updating cache")
+
+        ### Send xpl message to get list
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("domogik.package")
+        message.add_data({"command" : "update-cache"})
+        message.add_data({"host" : host})
+        self.myxpl.send(message)
+        self.log.debug("Package : send message : %s" % str(message))
+
+        ### Wait for answer
+        # get xpl message from queue
+        # make a time loop of one second after first xpl-trig reception
+        messages = []
+        try:
+            self.log.debug("Package update cache : wait for answer...")
+            message = self._get_from_queue(self._queue_package, 
+                                           "xpl-trig", 
+                                           "domogik.package", 
+                                           filter_data = {"command" : "update-cache"})
+        except Empty:
+            self.log.debug("Package update cache : no answer")
+            json_data = JSonHelper("ERROR", 999, "No data or timeout on updating cache")
+            json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+            json_data.set_data_type("cache")
+            self.send_http_response_ok(json_data.get())
+            return
+
+        self.log.debug("Package update cache : message receive : %s" % str(message))
+        
+
+        # process message
+        if message.data.has_key('error'):
+            self.send_http_response_error(999, "Error while updating cache : %s" % message.data['error'])
+        else:
+            json_data = JSonHelper("OK")
+            json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+            json_data.set_data_type("cache")
+            self.send_http_response_ok(json_data.get())
+
 
 
