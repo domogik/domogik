@@ -70,7 +70,7 @@ class PackageManager():
         """ Init tool
         """
         l = logger.Logger("package-manager")
-        self._log = l.get_logger()
+        self._log = l.get_logger("package-manager")
 
     def log(self, message):
         """ Log and print message
@@ -279,33 +279,34 @@ class PackageManager():
 
 
 
-    def _update_list(self):
-        """ update local package list
+    def update_cache(self):
+        """ update local package cache
         """
         # Get repositories list
         try:
             # Read repository source file and generate repositories list
-            repo_list = self._get_repositories_list()
+            repo_list = self.get_repositories_list()
         except:
             self.log(str(traceback.format_exc()))
-            return
+            return False
              
         # Clean cache folder
         try:
             self._clean_cache(REPO_CACHE_DIR)
         except:
             self.log(str(traceback.format_exc()))
-            return
+            return False
              
         # for each list, get files and associated xml
         try:
             self._parse_repository(repo_list, REPO_CACHE_DIR)
         except:
             self.log(str(traceback.format_exc()))
-            return
+            return False
 
+        return True
 
-    def _get_repositories_list(self):
+    def get_repositories_list(self):
         """ Read repository source file and return list
         """
         try:
@@ -408,6 +409,28 @@ class PackageManager():
                                                pkg["version"], 
                                                pkg["priority"], 
                                                pkg["desc"]))
+
+    def get_packages_list(self):
+        """ List all packages in cache folder 
+            and return a detailed list
+        """
+        pkg_list = []
+        for root, dirs, files in os.walk(REPO_CACHE_DIR):
+            for f in files:
+                pkg_xml = PackageXml(path = "%s/%s" % (root, f))
+                pkg_list.append({"name" : pkg_xml.name,
+                                 "type" : pkg_xml.type,
+                                 "fullname" : pkg_xml.fullname,
+                                 "version" : pkg_xml.version,
+                                 "techno" : pkg_xml.techno,
+                                 "doc" : pkg_xml.doc,
+                                 "desc" : pkg_xml.desc,
+                                 "detail" : pkg_xml.detail,
+                                 "author" : pkg_xml.author,
+                                 "email" : pkg_xml.email,
+                                 "priority" : pkg_xml.priority,
+                                 "package-url" : pkg_xml.package_url})
+        return sorted(pkg_list, key = lambda k: (k['name']))
 
     def _show_packages(self, fullname, version = None):
         """ Show a package description

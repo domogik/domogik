@@ -229,6 +229,15 @@ class SysManager(XplPlugin):
                 'xpltype': 'xpl-cmnd',
             })
     
+            # Define listeners for packages
+            Listener(self._package_cb, self.myxpl, {
+                'schema': 'domogik.package',
+                'xpltype': 'xpl-cmnd',
+            })
+
+            # PackageManager instance
+            self.pkg_mgr = PackageManager()
+    
             if self.options.check_hardware:
                 Listener(self._refresh_hardware_list, self.myxpl, {
                     'schema': 'hbeat.app',
@@ -617,7 +626,7 @@ class SysManager(XplPlugin):
             hardware_list = dict(hardwares.load()[1])
             state_thread = {}
             for hardware in hardware_list:
-                print hardware
+                print(hardware)
                 self.log.info("==> %s (%s)" % (hardware, hardware_list[hardware]))
                 if hardware_list[hardware] == "enabled":
                     # try open xml file
@@ -730,7 +739,7 @@ class SysManager(XplPlugin):
         plugin_list = dict(plugins.load(refresh = True)[1])
         state_thread = {}
         for plugin in plugin_list:
-            print plugin
+            print(plugin)
             self.log.info("==> %s (%s)" % (plugin, plugin_list[plugin]))
             if plugin_list[plugin] == "enabled":
                 # try open xml file
@@ -774,7 +783,6 @@ class SysManager(XplPlugin):
             if plugin["name"] == name:
                 return True
         for hardware in self._hardwares:
-            print "is : %s" % hardware
             if hardware["name"] == name:
                 return True
         return False
@@ -858,6 +866,37 @@ class SysManager(XplPlugin):
 
 
         self.myxpl.send(mess)
+
+
+
+
+    def _package_cb(self, message):
+        """ Internal callback for receiving packages related messages
+        @param message : xpl message received
+        """
+        self.log.debug("Call _packagge_cb")
+
+        command = message.data['command']
+        try:
+            host = message.data['host']
+        except KeyError:
+           host = "*"
+
+        # check if message is for us
+        if self.get_sanitized_hostname() != host and host != "*":
+            return
+
+        if command == "install" and host != "*":
+            self._pkg_install()
+
+
+    def _pkg_install(self):
+        """ Install a package
+        """
+        pass
+                
+
+
 
 
 def main():

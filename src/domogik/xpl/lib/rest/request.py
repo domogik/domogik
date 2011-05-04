@@ -42,6 +42,7 @@ from domogik.common.database import DbHelper
 from domogik.xpl.common.helper import HelperError
 from domogik.xpl.lib.rest.jsondata import JSonHelper
 from domogik.xpl.lib.rest.csvdata import CsvHelper
+from domogik.common.packagemanager import PackageManager
 import time
 import urllib
 from socket import gethostname
@@ -61,7 +62,7 @@ from threading import Event
 from Queue import Empty
 
 
-# Time we wait for answers after a /list command
+# Time we wait for answers after a multi host list command
 WAIT_FOR_LIST_ANSWERS = 1
 
 
@@ -130,10 +131,13 @@ class ProcessRequest():
         self._queue_timeout =  self.handler_params[0]._queue_timeout
         self._queue_size =  self.handler_params[0]._queue_size
         self._queue_command_size =  self.handler_params[0]._queue_command_size
+        self._queue_package_size =  self.handler_params[0]._queue_package_size
         self._queue_life_expectancy = self.handler_params[0]._queue_life_expectancy
         self._queue_event_size =  self.handler_params[0]._queue_event_size
         self._get_from_queue = self.handler_params[0]._get_from_queue
         self._put_in_queue = self.handler_params[0]._put_in_queue
+
+        self._queue_package =  self.handler_params[0]._queue_package
 
         self._queue_system_list =  self.handler_params[0]._queue_system_list
         self._queue_system_detail =  self.handler_params[0]._queue_system_detail
@@ -203,8 +207,9 @@ class ProcessRequest():
             self.rest_stats()
         elif self.rest_type == "events":
             self.rest_events()
-        elif self.rest_type == "xpl-cmnd":
-            self.rest_xpl_cmnd()
+        # commented for security reasons
+        #elif self.rest_type == "xpl-cmnd":
+        #    self.rest_xpl_cmnd()
         elif self.rest_type == "base":
             self.rest_base()
         elif self.rest_type == "plugin":
@@ -221,6 +226,8 @@ class ProcessRequest():
             self.rest_repo()
         elif self.rest_type == "scenario":
             self.rest_scenario()
+        elif self.rest_type == "package":
+            self.rest_package()
         elif self.rest_type == None:
             self.rest_status()
         else:
@@ -315,6 +322,8 @@ class ProcessRequest():
 
         # Queues stats
         queues = {}
+        queues["package_usage"] = "%s/%s" \
+            % (self._queue_package.qsize(), int(self._queue_package_size))
         queues["system_list_usage"] = "%s/%s" \
             % (self._queue_system_list.qsize(), int(self._queue_size))
         queues["system_detail_usage"] = "%s/%s" \
@@ -3321,5 +3330,106 @@ target=*
         ### others ##################################
         else:
             self.send_http_response_error(999, self.rest_request[0] + " not allowed", self.jsonp, self.jsonp_cb)
+
+
+######
+# /package processing
+######
+
+    def rest_package(self):
+        """ /package processing
+        """
+        self.log.debug("Package action")
+
+        # parameters initialisation
+        self.parameters = {}
+
+        if len(self.rest_request) < 1:
+            self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
+            return
+
+        ### list-repo #################################
+        if self.rest_request[0] == "list-repo":
+
+            if len(self.rest_request) == 1:
+                self._rest_package_list_repo()
+            else:
+                self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
+                                              self.jsonp, self.jsonp_cb)
+                return
+
+        ### update-cache #############################
+        if self.rest_request[0] == "update-cache":
+            if len(self.rest_request) == 1:
+                self._rest_package_update_cache()
+            else:
+                self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
+                                              self.jsonp, self.jsonp_cb)
+                return
+
+        ### list #####################################
+        if self.rest_request[0] == "list":
+            if len(self.rest_request) == 1:
+                self._rest_package_list()
+            else:
+                self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
+                                              self.jsonp, self.jsonp_cb)
+                return
+
+        ### others ####################################
+        else:
+            self.send_http_response_error(999, "Bad operation for /package", self.jsonp, self.jsonp_cb)
+            return
+
+
+
+
+
+    def _rest_package_list_repo(self):
+        """ Get repositories list
+            Display this list as json
+        """
+        self.log.debug("Package : ask for repositories list")
+
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("repository")
+
+        pkg_mgr = PackageManager()
+        for repo in pkg_mgr.get_repositories_list():
+            json_data.add_data({"url" : repo['url'],
+                           "priority" : repo['priority']})
+    
+        self.send_http_response_ok(json_data.get())
+
+    def _rest_package_update_cache(self):
+        """ Update cache
+        """
+        self.log.debug("Package : ask for updating cache")
+
+        self.pkg_mgr = PackageManager()
+        if self.pkg_mgr.update_cache() == False:
+            self.send_http_response_error(999, "Error while updating cache")
+        else:
+            json_data = JSonHelper("OK")
+            json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+            json_data.set_data_type("cache")
+            self.send_http_response_ok(json_data.get())
+
+    def _rest_package_list(self):
+        """ Get packages list
+            Display this list as json
+        """
+        self.log.debug("Package : ask for packages list")
+
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("package")
+
+        pkg_mgr = PackageManager()
+        for data in pkg_mgr.get_packages_list():
+            json_data.add_data(data)
+    
+        self.send_http_response_ok(json_data.get())
 
 
