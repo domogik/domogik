@@ -3367,6 +3367,15 @@ target=*
                                               self.jsonp, self.jsonp_cb)
                 return
 
+        ### list #####################################
+        if self.rest_request[0] == "list":
+            if len(self.rest_request) == 1:
+                self._rest_package_list()
+            else:
+                self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
+                                              self.jsonp, self.jsonp_cb)
+                return
+
         ### others ####################################
         else:
             self.send_http_response_error(999, "Bad operation for /package", self.jsonp, self.jsonp_cb)
@@ -3407,5 +3416,20 @@ target=*
             json_data.set_data_type("cache")
             self.send_http_response_ok(json_data.get())
 
+    def _rest_package_list(self):
+        """ Get packages list
+            Display this list as json
+        """
+        self.log.debug("Package : ask for packages list")
+
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("package")
+
+        pkg_mgr = PackageManager()
+        for data in pkg_mgr.get_packages_list():
+            json_data.add_data(data)
+    
+        self.send_http_response_ok(json_data.get())
 
 

@@ -410,6 +410,28 @@ class PackageManager():
                                                pkg["priority"], 
                                                pkg["desc"]))
 
+    def get_packages_list(self):
+        """ List all packages in cache folder 
+            and return a detailed list
+        """
+        pkg_list = []
+        for root, dirs, files in os.walk(REPO_CACHE_DIR):
+            for f in files:
+                pkg_xml = PackageXml(path = "%s/%s" % (root, f))
+                pkg_list.append({"name" : pkg_xml.name,
+                                 "type" : pkg_xml.type,
+                                 "fullname" : pkg_xml.fullname,
+                                 "version" : pkg_xml.version,
+                                 "techno" : pkg_xml.techno,
+                                 "doc" : pkg_xml.doc,
+                                 "desc" : pkg_xml.desc,
+                                 "detail" : pkg_xml.detail,
+                                 "author" : pkg_xml.author,
+                                 "email" : pkg_xml.email,
+                                 "priority" : pkg_xml.priority,
+                                 "package-url" : pkg_xml.package_url})
+        return sorted(pkg_list, key = lambda k: (k['name']))
+
     def _show_packages(self, fullname, version = None):
         """ Show a package description
             @param fullname : fullname of package (type-name)
