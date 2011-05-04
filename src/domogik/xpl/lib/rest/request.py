@@ -42,6 +42,7 @@ from domogik.common.database import DbHelper
 from domogik.xpl.common.helper import HelperError
 from domogik.xpl.lib.rest.jsondata import JSonHelper
 from domogik.xpl.lib.rest.csvdata import CsvHelper
+from domogik.common.packagemanager import PackageManager
 import time
 import urllib
 from socket import gethostname
@@ -3359,8 +3360,8 @@ target=*
 
         ### update-cache #############################
         if self.rest_request[0] == "update-cache":
-            if len(self.rest_request) == 2:
-                self._rest_package_update_cache(self.rest_request[1])
+            if len(self.rest_request) == 1:
+                self._rest_package_update_cache()
             else:
                 self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
                                               self.jsonp, self.jsonp_cb)
@@ -3376,121 +3377,30 @@ target=*
 
 
     def _rest_package_list_repo(self):
-        """ Send a xpl message to manager to get repositories list
+        """ Get repositories list
             Display this list as json
         """
         self.log.debug("Package : ask for repositories list")
 
-        ### Send xpl message to get list
-        message = XplMessage()
-        message.set_type("xpl-cmnd")
-        message.set_schema("domogik.package")
-        message.add_data({"command" : "list-repo"})
-        message.add_data({"host" : "*"})
-        self.myxpl.send(message)
-        self.log.debug("Package : send message : %s" % str(message))
-
-        ### Wait for answer
-        # get xpl message from queue
-        # make a time loop of one second after first xpl-trig reception
-        messages = []
-        try:
-            # Get first answer for command
-            self.log.debug("Package repository list : wait for first answer...")
-            messages.append(self._get_from_queue(self._queue_package, 
-                                                 "xpl-trig", 
-                                                 "domogik.package",
-                                                 filter_data = {"command" : "list-repo"}))
-            # after first message, we start to listen for other messages 
-            self.log.debug("Package repository list : wait for other answers during '%s' seconds..." % WAIT_FOR_LIST_ANSWERS)
-            max_time = time.time() + WAIT_FOR_LIST_ANSWERS
-            while time.time() < max_time:
-                try:
-                    message = self._get_from_queue(self._queue_package, 
-                                                   "xpl-trig", 
-                                                   "domogik.package", 
-                                                   filter_data = {"command" : "list-repo"},
-                                                   timeout = WAIT_FOR_LIST_ANSWERS)
-                    messages.append(message)
-                    self.log.debug("Package repository list : get one answer from '%s'" % message.data["host"])
-                except Empty:
-                    self.log.debug("Package repository list : empty queue")
-                    pass
-            self.log.debug("Package repository list : end waiting for answers")
-        except Empty:
-            self.log.debug("Package repository list : no answer")
-            json_data = JSonHelper("ERROR", 999, "No data or timeout on getting package repository list")
-            json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-            json_data.set_data_type("repository")
-            self.send_http_response_ok(json_data.get())
-            return
-
-        self.log.debug("Package repository list : messages received : %s" % str(messages))
-        
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("repository")
 
-        # process messages
-        for message in messages:
-            cmd = message.data['command']
-            host = message.data["host"]
-    
-            idx = 0
-            loop_again = True
-            while loop_again:
-                try:
-                    repo_url = message.data["repo"+str(idx)+"-url"]
-                    repo_priority = message.data["repo"+str(idx)+"-priority"]
-                    json_data.add_data({"url" : repo_url, 
-                                        "prioriry" : repo_priority, 
-                                        "host" : host})
-                    idx += 1
-                except:
-                    loop_again = False
+        pkg_mgr = PackageManager()
+        for repo in pkg_mgr.get_repositories_list():
+            json_data.add_data({"url" : repo['url'],
+                           "priority" : repo['priority']})
     
         self.send_http_response_ok(json_data.get())
 
-    def _rest_package_update_cache(self, host):
-        """ Send a xpl message to manager to update cache
-            @param host : host targetted
-            Return ok/ko as json
+    def _rest_package_update_cache(self):
+        """ Update cache
         """
         self.log.debug("Package : ask for updating cache")
 
-        ### Send xpl message to get list
-        message = XplMessage()
-        message.set_type("xpl-cmnd")
-        message.set_schema("domogik.package")
-        message.add_data({"command" : "update-cache"})
-        message.add_data({"host" : host})
-        self.myxpl.send(message)
-        self.log.debug("Package : send message : %s" % str(message))
-
-        ### Wait for answer
-        # get xpl message from queue
-        # make a time loop of one second after first xpl-trig reception
-        messages = []
-        try:
-            self.log.debug("Package update cache : wait for answer...")
-            message = self._get_from_queue(self._queue_package, 
-                                           "xpl-trig", 
-                                           "domogik.package", 
-                                           filter_data = {"command" : "update-cache"})
-        except Empty:
-            self.log.debug("Package update cache : no answer")
-            json_data = JSonHelper("ERROR", 999, "No data or timeout on updating cache")
-            json_data.set_jsonp(self.jsonp, self.jsonp_cb)
-            json_data.set_data_type("cache")
-            self.send_http_response_ok(json_data.get())
-            return
-
-        self.log.debug("Package update cache : message receive : %s" % str(message))
-        
-
-        # process message
-        if message.data.has_key('error'):
-            self.send_http_response_error(999, "Error while updating cache : %s" % message.data['error'])
+        self.pkg_mgr = PackageManager()
+        if self.pkg_mgr.update_cache() == False:
+            self.send_http_response_error(999, "Error while updating cache")
         else:
             json_data = JSonHelper("OK")
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
