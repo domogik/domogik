@@ -3372,8 +3372,12 @@ target=*
             if len(self.rest_request) == 1:
                 self._rest_package_list()
             else:
-                self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
-                                              self.jsonp, self.jsonp_cb)
+                offset = 1
+                if self.set_parameters(offset):
+                    self._rest_package_list()
+                else:
+                    self.send_http_response_error(999, "Error in parameters", \
+                                                  self.jsonp, self.jsonp_cb)
                 return
 
         ### others ####################################
@@ -3426,9 +3430,13 @@ target=*
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
         json_data.set_data_type("package")
 
+        by_type = self.get_parameters("by-type")
+        by_repo = self.get_parameters("by-repo")
         pkg_mgr = PackageManager()
         for data in pkg_mgr.get_packages_list():
-            json_data.add_data(data)
+            if (by_type == None or by_type == data['type']) \
+                and (by_repo == None or by_repo == data['package-url'][0:len(by_repo)]):
+                json_data.add_data(data)
     
         self.send_http_response_ok(json_data.get())
 
