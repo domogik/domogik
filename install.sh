@@ -276,7 +276,7 @@ function modify_hosts {
 
 function create_log_dir {
     mkdir -p /var/log/domogik
-    chown $d_user: /var/log/domogik 
+    chown -R $d_user: /var/log/domogik 
 }
 
 function install_plugins {
@@ -315,7 +315,14 @@ read -p "If you want to use a proxy, please set it now. It will only be used dur
 if [ "x$http_proxy" != "x" ];then
     export http_proxy
 fi
-trap "[ -d "$HOME/.python-eggs" ] && chown -R $USER: $HOME/.python-eggs" EXIT
+#this is needed now only because of old bug (#792) and should be useless for new install
+if [ "$SUDO_USER" ];then
+    trap "[ -d \"$HOME/.python-eggs\" ] && chown -R $SUDO_USER: $HOME/.python-eggs" EXIT
+    [ -d "$HOME/.python-eggs" ] && chown -R $SUDO_USER: $HOME/.python-eggs/ 
+else
+    trap "[ -d \"$HOME/.python-eggs\" ] && chown -R $USER: $HOME/.python-eggs" EXIT
+    [ -d "$HOME/.python-eggs" ] && chown -R $USER: $HOME/.python-eggs/ 
+fi
 
 run_setup_py $MODE
 copy_sample_files
@@ -327,9 +334,15 @@ call_db_installer
 install_plugins
 modify_hosts
 
-[ -d $HOME/.python-eggs ] && chown -R $USER: $HOME/.python-eggs/ 
 
 echo "Everything seems to be good, Domogik should be installed correctly."
 echo "I will start the test_config.py script to check it."
 read -p "Please press Enter when ready."
+set -x
 chmod +x ./test_config.py && ./test_config.py
+if [ "$SUDO_USER" ];then
+    [ -d "$HOME/.python-eggs" ] && chown -R $SUDO_USER: $HOME/.python-eggs/ 
+else
+    [ -d "$HOME/.python-eggs" ] && chown -R $USER: $HOME/.python-eggs/ 
+fi
+trap - EXIT
