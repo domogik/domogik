@@ -877,6 +877,7 @@ class SysManager(XplPlugin):
         self.log.debug("Call _packagge_cb")
 
         command = message.data['command']
+        print("Package action : %s" % command)
         try:
             host = message.data['host']
         except KeyError:
@@ -886,9 +887,29 @@ class SysManager(XplPlugin):
         if self.get_sanitized_hostname() != host and host != "*":
             return
 
+        if command == "installed-packages-list":
+            self._pkg_list_installed()
+
         if command == "install" and host != "*":
             self._pkg_install()
 
+
+    def _pkg_list_installed(self):
+        """ List packages installed on host
+        """
+        mess = XplMessage()
+        mess.set_type('xpl-trig')
+        mess.set_schema('domogik.package')
+        mess.add_data({'command' : 'list-packages-installed'})
+        mess.add_data({'host' : self.get_sanitized_hostname()})
+        idx = 0
+        for package in self.pkg_mgr.get_installed_packages_list():
+            mess.add_data({'name%s' % idx : package['name'],
+                           'fullname%s' % idx : package['fullname'],
+                           'version%s' % idx : package['version'],
+                           'type%s' % idx : package['type']})
+            idx += 1
+        self.myxpl.send(mess)
 
     def _pkg_install(self):
         """ Install a package

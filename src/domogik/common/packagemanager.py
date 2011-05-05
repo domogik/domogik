@@ -60,6 +60,7 @@ REPO_LST_FILE = "packages.lst"
 REPO_LST_FILE_HEADER = "Domogik repository"
 REPO_CACHE_DIR = "%s/.domogik/cache" % os.getenv("HOME")
 INSTALL_PATH = "%s/.domogik/" % os.getenv("HOME")
+PLUGIN_XML_PATH = "%s/plugins/plugins" % INSTALL_PATH
 
 
 class PackageManager():
@@ -410,27 +411,21 @@ class PackageManager():
                                                pkg["priority"], 
                                                pkg["desc"]))
 
-    def get_packages_list(self):
-        """ List all packages in cache folder 
+    def get_installed_packages_list(self):
+        """ List all packages in install folder 
             and return a detailed list
         """
         pkg_list = []
-        for root, dirs, files in os.walk(REPO_CACHE_DIR):
+        for root, dirs, files in os.walk(PLUGIN_XML_PATH):
             for f in files:
                 pkg_xml = PackageXml(path = "%s/%s" % (root, f))
-                pkg_list.append({"name" : pkg_xml.name,
-                                 "type" : pkg_xml.type,
-                                 "fullname" : pkg_xml.fullname,
+                pkg_list.append({"fullname" : pkg_xml.fullname,
+                                 "name" : pkg_xml.name,
                                  "version" : pkg_xml.version,
-                                 "techno" : pkg_xml.techno,
-                                 "doc" : pkg_xml.doc,
-                                 "desc" : pkg_xml.desc,
-                                 "detail" : pkg_xml.detail,
-                                 "author" : pkg_xml.author,
-                                 "email" : pkg_xml.email,
-                                 "priority" : pkg_xml.priority,
+                                 "type" : pkg_xml.type,
                                  "package-url" : pkg_xml.package_url})
-        return sorted(pkg_list, key = lambda k: (k['name']))
+        return sorted(pkg_list, key = lambda k: (k['fullname'], 
+                                                 k['version']))
 
     def _show_packages(self, fullname, version = None):
         """ Show a package description

@@ -3359,7 +3359,7 @@ target=*
                 return
 
         ### update-cache #############################
-        if self.rest_request[0] == "update-cache":
+        elif self.rest_request[0] == "update-cache":
             if len(self.rest_request) == 1:
                 self._rest_package_update_cache()
             else:
@@ -3368,7 +3368,7 @@ target=*
                 return
 
         ### list #####################################
-        if self.rest_request[0] == "list":
+        elif self.rest_request[0] == "list":
             if len(self.rest_request) == 1:
                 self._rest_package_list()
             else:
@@ -3378,6 +3378,15 @@ target=*
                 else:
                     self.send_http_response_error(999, "Error in parameters", \
                                                   self.jsonp, self.jsonp_cb)
+                return
+
+        ### list-installed ###########################
+        elif self.rest_request[0] == "list-installed":
+            if len(self.rest_request) == 1:
+                self._rest_package_list_installed()
+            else:
+                self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
+                                              self.jsonp, self.jsonp_cb)
                 return
 
         ### others ####################################
@@ -3440,4 +3449,80 @@ target=*
     
         self.send_http_response_ok(json_data.get())
 
+
+    def _rest_package_list_installed(self):
+        """ Send a xpl message to manager to get installed packages list
+            Display this list as json
+        """
+        self.log.debug("Package : ask for installed packages list")
+
+        ### Send xpl message to get list
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("domogik.package")
+        message.add_data({"command" : "installed-packages-list"})
+        message.add_data({"host" : "*"})
+        self.myxpl.send(message)
+        self.log.debug("Package : send message : %s" % str(message))
+
+        ### Wait for answer
+        # get xpl message from queue
+        # make a time loop of one second after first xpl-trig reception
+        messages = []
+        try:
+            # Get first answer for command
+            self.log.debug("Package repository list : wait for first answer...")
+            messages.append(self._get_from_queue(self._queue_package, 
+                                                 "xpl-trig", 
+                                                 "domogik.package",
+                                                 filter_data = {"command" : "list-packages-installed"}))
+            # after first message, we start to listen for other messages 
+            self.log.debug("Installed package list : wait for other answers during '%s' seconds..." % WAIT_FOR_LIST_ANSWERS)
+            max_time = time.time() + WAIT_FOR_LIST_ANSWERS
+            while time.time() < max_time:
+                try:
+                    message = self._get_from_queue(self._queue_package, 
+                                                   "xpl-trig", 
+                                                   "domogik.package", 
+                                                   filter_data = {"command" : "list-packages-installed"},
+                                                   timeout = WAIT_FOR_LIST_ANSWERS)
+                    messages.append(message)
+                    self.log.debug("Installed packages list : get one answer from '%s'" % message.data["host"])
+                except Empty:
+                    self.log.debug("Installed packages list : empty queue")
+                    pass
+            self.log.debug("Installed packages list : end waiting for answers")
+        except Empty:
+            self.log.debug("Installed packages list : no answer")
+            json_data = JSonHelper("ERROR", 999, "No data or timeout on getting installed packages list")
+            json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+            json_data.set_data_type("package")
+            self.send_http_response_ok(json_data.get())
+            return
+
+        self.log.debug("Installed packages list : messages received : %s" % str(messages))
+        
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("package")
+
+        # process messages
+        for message in messages:
+            cmd = message.data['command']
+            host = message.data["host"]
+    
+            idx = 0
+            loop_again = True
+            while loop_again:
+                try:
+                    json_data.add_data({"fullname" : message.data["fullname"+str(idx)],
+                                        "name" : message.data["name"+str(idx)],
+                                        "version" : message.data["version"+str(idx)],
+                                        "type" : message.data["type"+str(idx)],
+                                        "host" : host})
+                    idx += 1
+                except:
+                    loop_again = False
+    
+        self.send_http_response_ok(json_data.get())
 
