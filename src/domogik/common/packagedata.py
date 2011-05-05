@@ -47,7 +47,7 @@ class PackageData():
     def __init__(self, xml_path, custom_path = None):
         """ Init tool
             @param plugin_name : plugin name
-            @param custom_path : full path to .domogik.cfg file
+            @param custom_path : full path to domogik.cfg file
         """
 
         self._db = DbHelper(custom_path)

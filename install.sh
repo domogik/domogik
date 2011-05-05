@@ -31,6 +31,8 @@
 #@license: GPL(v3)
 #@organization: Domogik
 
+DMG_HOME=
+
 function run_setup_py {
     MODE=$1
     case $MODE in
@@ -75,21 +77,31 @@ function copy_sample_files {
         fi
     fi
     d_home=$(getent passwd $d_user |cut -d ':' -f 6)
+    dmg_home=$d_home/.domogik
     keep="n"
     already_cfg=
-    if [ ! -f $d_home/.domogik.cfg ];then
-        cp -f src/domogik/examples/config/domogik.cfg $d_home/.domogik.cfg
-        chown $d_user: src/domogik/examples/config/domogik.cfg $d_home/.domogik.cfg
+    if [ ! -d $dmg_home ];then
+        mkdir $dmg_home
+        chown $d_user $dmg_home
+    fi
+    # Check for old version when .domogik.cfg was in $HOME
+    if [ -f $d_home/.domogik.cfg ];then
+        mv $d_home/.domogik.cfg $dmg_home/domogik.cfg
+        chown $d_user $dmg_home/domogik.cfg
+    fi
+    if [ ! -f $dmg_home/domogik.cfg ];then
+        cp -f src/domogik/examples/config/domogik.cfg $dmg_home/domogik.cfg
+        chown $d_user: src/domogik/examples/config/domogik.cfg $dmg_home/domogik.cfg
     else
         keep="y"
         already_cfg=1
-        read -p "You already have a .domogik.cfg file. Do you want to keep it ? [Y/n]" keep
+        read -p "You already have a domogik.cfg file. Do you want to keep it ? [Y/n]" keep
         if [ "x$keep" = "x" ];then
             keep="y"
         fi
         if [ "$keep" = "n" -o "$keep" = "N" ];then
-            cp -f src/domogik/examples/config/domogik.cfg $d_home/.domogik.cfg
-            chown $d_user: src/domogik/examples/config/domogik.cfg $d_home/.domogik.cfg
+            cp -f src/domogik/examples/config/domogik.cfg $dmg_home/domogik.cfg
+            chown $d_user: src/domogik/examples/config/domogik.cfg $dmg_home/domogik.cfg
         fi
     fi
     if [ -d "/etc/default/" ];then
@@ -137,7 +149,7 @@ function update_user_config {
         else
             prefix=$PWD/src
         fi
-        sed -i "s;^custom_prefix.*$;custom_prefix=$prefix;" $d_home/.domogik.cfg
+        sed -i "s;^custom_prefix.*$;custom_prefix=$prefix;" $dmg_home/domogik.cfg
 
         read -p "Which interface do you want to bind to? (default : lo) : " bind_iface
         bind_iface=${bind_iface:-lo}
@@ -146,13 +158,13 @@ function update_user_config {
             echo "Can't find the address associated to the interface!"
             exit 20
         fi
-        sed -i "s/^bind_interface.*$/bind_interface = $bind_addr/" $d_home/.domogik.cfg
+        sed -i "s/^bind_interface.*$/bind_interface = $bind_addr/" $dmg_home/domogik.cfg
         sed -i "s/^HUB_IFACE.*$/HUB_IFACE=$bind_iface/" /etc/default/domogik
-        sed -i "s/^rest_server_ip.*$/rest_server_ip = $bind_addr/" $d_home/.domogik.cfg
-        sed -i "s/^django_server_ip.*$/django_server_ip = $bind_addr/" $d_home/.domogik.cfg
-        sed -i "s/^internal_rest_server_ip.*$/internal_rest_server_ip = $bind_addr/" $d_home/.domogik.cfg
+        sed -i "s/^rest_server_ip.*$/rest_server_ip = $bind_addr/" $dmg_home/domogik.cfg
+        sed -i "s/^django_server_ip.*$/django_server_ip = $bind_addr/" $dmg_home/domogik.cfg
+        sed -i "s/^internal_rest_server_ip.*$/internal_rest_server_ip = $bind_addr/" $dmg_home/domogik.cfg
         read -p "If you need to reach Domogik from outside, you can specify an IP now : " out_bind_addr
-        sed -i "s/^external_rest_server_ip.*$/external_rest_server_ip = $out_bind_addr/" $d_home/.domogik.cfg
+        sed -i "s/^external_rest_server_ip.*$/external_rest_server_ip = $out_bind_addr/" $dmg_home/domogik.cfg
         
         #Mysql config 
         echo "You need to have a working Mysql server with a domogik user and database."
@@ -170,12 +182,12 @@ function update_user_config {
     mysql_ok=
 
     if [ "$keep" = "y" -o "$keep" = "Y" ];then
-        db_user=$(grep "^db_user" $d_home/.domogik.cfg|cut -d'=' -f2|tr -d ' ')
-        db_type=$(grep "^db_type" $d_home/.domogik.cfg|cut -d'=' -f2|tr -d ' ')
-        db_password=$(grep "^db_password" $d_home/.domogik.cfg|cut -d'=' -f2|tr -d ' ')
-        db_port=$(grep "^db_port" $d_home/.domogik.cfg|cut -d'=' -f2|tr -d ' ')
-        db_name=$(grep "^db_name" $d_home/.domogik.cfg|cut -d'=' -f2|tr -d ' ')
-        db_host=$(grep "^db_host" $d_home/.domogik.cfg|cut -d'=' -f2|tr -d ' ')
+        db_user=$(grep "^db_user" $dmg_home/domogik.cfg|cut -d'=' -f2|tr -d ' ')
+        db_type=$(grep "^db_type" $dmg_home/domogik.cfg|cut -d'=' -f2|tr -d ' ')
+        db_password=$(grep "^db_password" $dmg_home/domogik.cfg|cut -d'=' -f2|tr -d ' ')
+        db_port=$(grep "^db_port" $dmg_home/domogik.cfg|cut -d'=' -f2|tr -d ' ')
+        db_name=$(grep "^db_name" $dmg_home/domogik.cfg|cut -d'=' -f2|tr -d ' ')
+        db_host=$(grep "^db_host" $dmg_home/domogik.cfg|cut -d'=' -f2|tr -d ' ')
         mysql_client=$(which mysql)
         while [ ! -f "$mysql_client" ];do
             read -p "Mysql client not installed, please install it and press Enter."
@@ -215,12 +227,12 @@ function update_user_config {
         else
             mysql_ok=true
             echo "Connection test OK"
-            sed -i "s;^db_type.*$;db_type = mysql;" $d_home/.domogik.cfg
-            sed -i "s;^db_user.*$;db_user = $db_user;" $d_home/.domogik.cfg
-            sed -i "s;^db_password.*$;db_password = $db_password;" $d_home/.domogik.cfg
-            sed -i "s;^db_port.*$;db_port = $db_port;" $d_home/.domogik.cfg
-            sed -i "s;^db_name.*$;db_name = $db_name;" $d_home/.domogik.cfg
-            sed -i "s;^db_host.*$;db_host = $db_host;" $d_home/.domogik.cfg
+            sed -i "s;^db_type.*$;db_type = mysql;" $dmg_home/domogik.cfg
+            sed -i "s;^db_user.*$;db_user = $db_user;" $dmg_home/domogik.cfg
+            sed -i "s;^db_password.*$;db_password = $db_password;" $dmg_home/domogik.cfg
+            sed -i "s;^db_port.*$;db_port = $db_port;" $dmg_home/domogik.cfg
+            sed -i "s;^db_name.*$;db_name = $db_name;" $dmg_home/domogik.cfg
+            sed -i "s;^db_host.*$;db_host = $db_host;" $dmg_home/domogik.cfg
             if [ "$upgrade_sql" = "n" -o "$upgrade_sql" = "N" ];then
                     return
             fi

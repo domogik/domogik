@@ -43,11 +43,11 @@ fi
 function start_django {
     echo -n " * Starting Django..."
     USER_HOME=$(grep $DOMOGIK_USER /etc/passwd | cut -d":" -f6)
-    DJANGO_SERVER_IP=$(grep "^django_server_ip" ${USER_HOME}/.domogik.cfg | cut -d " " -f 3)
+    DJANGO_SERVER_IP=$(grep "^django_server_ip" ${USER_HOME}/.domogik/domogik.cfg | cut -d " " -f 3)
     if [ -z ${DJANGO_SERVER_IP} ] ; then
         DJANGO_SERVER_IP=127.0.0.1
     fi
-    DJANGO_SERVER_PORT=$(grep "^django_server_port" ${USER_HOME}/.domogik.cfg | cut -d " " -f 3)
+    DJANGO_SERVER_PORT=$(grep "^django_server_port" ${USER_HOME}/.domogik/domogik.cfg | cut -d " " -f 3)
     if [ -z ${DJANGO_SERVER_PORT} ] ; then
         DJANGO_SERVER_PORT=8000
     fi
@@ -132,7 +132,7 @@ function stop_plugins {
 # Check if the directory for lock exists
 function check_lock_dir {
     USER_HOME=$(grep $DOMOGIK_USER /etc/passwd | cut -d":" -f6)
-    DIRECTORY=$(grep "^pid_dir_path" ${USER_HOME}/.domogik.cfg | cut -d " " -f 3)
+    DIRECTORY=$(grep "^pid_dir_path" ${USER_HOME}/.domogik/domogik.cfg | cut -d " " -f 3)
     if [ ! -d $DIRECTORY ];then
         mkdir $DIRECTORY
     fi
