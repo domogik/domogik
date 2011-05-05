@@ -338,7 +338,6 @@ modify_hosts
 echo "Everything seems to be good, Domogik should be installed correctly."
 echo "I will start the test_config.py script to check it."
 read -p "Please press Enter when ready."
-set -x
 chmod +x ./test_config.py && ./test_config.py
 if [ "$SUDO_USER" ];then
     [ -d "$HOME/.python-eggs" ] && chown -R $SUDO_USER: $HOME/.python-eggs/ 
