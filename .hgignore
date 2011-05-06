@@ -4,7 +4,7 @@ syntax: glob
 *.rej
 .DS_Store
 :2e*
-.AppleDouble
+.Apple*
 *.pyc
 *.pyoeggs/*
 eggs

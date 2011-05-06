@@ -35,13 +35,11 @@ class SiteController extends Controller
                     'repositoryid' => $name,
                     'repository' => $detail['label'],
                     'filename' => $file->basename,
-                    'xml' => null,
+                    'deployed' => false,
                     'date' => Yii::app()->dateFormatter->formatDateTime($file->timeModified,'medium',null),
                     'size' => $file->size,
                 );
-                $xmlfile = Yii::app()->file->set(substr($filepath, 0, -4) . ".xml", true);
-                if ($xmlfile->exists)
-                    $package['xml'] = $xmlfile->basename;
+                $package['deployed'] = Yii::app()->file->set(substr($filepath, 0, -4) . ".xml", true)->exists;
                 array_push($packages, $package);                        
             }            
         }
@@ -147,6 +145,20 @@ class SiteController extends Controller
                         'repositories'=>$repositories));
 	}
 
+	public function actionPackageView($repo, $package)
+	{
+        $srcpath = yii::app()->params['repositories'][$repo]['path'];
+        $package = substr($package, 0, -4);
+        $xmlfile = Yii::app()->file->set($srcpath . '/' . $package . ".xml", true);
+        if ($xmlfile->exists) {
+            $content = file_get_contents($xmlfile->realpath);
+        } else {
+            $content = "No Data";
+        }
+		$this->render('packageView', array('package'=>$package,
+                        'xml'=>$content));
+    }
+    
 	public function actionPackageUpload()
 	{
         $packageUpload=new PackageUpload;
