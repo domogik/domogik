@@ -640,7 +640,7 @@ class SysManager(XplPlugin):
                                           "name" : plg_xml.name, 
                                           "description" : plg_xml.desc, 
                                           "technology" : plg_xml.techno,
-                                          "version" : plg_xml.version,
+                                          "release" : plg_xml.release,
                                           "documentation" : plg_xml.doc,
                                           "vendor_id" : plg_xml.vendor_id,
                                           "device_id" : plg_xml.device_id})
@@ -688,7 +688,7 @@ class SysManager(XplPlugin):
                               "technology" : hardware_model["technology"],
                               "status" : "ON",
                               "host" : instance,
-                              "version" : hardware_model["version"],
+                              "release" : hardware_model["release"],
                               "documentation" : hardware_model["documentation"],
                               "vendor_id" : hardware_model["vendor_id"],
                               "device_id" : hardware_model["device_id"],
@@ -755,7 +755,7 @@ class SysManager(XplPlugin):
                                       "technology" : plg_xml.techno,
                                       "status" : "OFF",
                                       "host" : self.get_sanitized_hostname(), 
-                                      "version" : plg_xml.version,
+                                      "release" : plg_xml.release,
                                       "documentation" : plg_xml.doc,
                                       "configuration" : plg_xml.configuration})
 
@@ -842,7 +842,7 @@ class SysManager(XplPlugin):
                 mess.add_data({'description' :  plugin["description"]})
                 mess.add_data({'technology' :  plugin["technology"]})
                 mess.add_data({'status' :  plugin["status"]})
-                mess.add_data({'version' :  plugin["version"]})
+                mess.add_data({'release' :  plugin["release"]})
                 mess.add_data({'documentation' :  plugin["documentation"]})
                 mess.add_data({'host' : self.get_sanitized_hostname()})
                 host_in_msg = True
@@ -857,7 +857,7 @@ class SysManager(XplPlugin):
                 mess.add_data({'description' :  hardware["description"]})
                 mess.add_data({'technology' :  hardware["technology"]})
                 mess.add_data({'status' :  hardware["status"]})
-                mess.add_data({'version' :  hardware["version"]})
+                mess.add_data({'release' :  hardware["release"]})
                 mess.add_data({'documentation' :  hardware["documentation"]})
                 mess.add_data({'host' : hardware["host"]})
                 host_in_msg = True
@@ -881,7 +881,7 @@ class SysManager(XplPlugin):
         try:
             host = message.data['host']
         except KeyError:
-           host = "*"
+            host = "*"
 
         # check if message is for us
         if self.get_sanitized_hostname() != host and host != "*":
@@ -891,7 +891,7 @@ class SysManager(XplPlugin):
             self._pkg_list_installed()
 
         if command == "install" and host != "*":
-            self._pkg_install()
+            self._pkg_install(message)
 
 
     def _pkg_list_installed(self):
@@ -906,16 +906,40 @@ class SysManager(XplPlugin):
         for package in self.pkg_mgr.get_installed_packages_list():
             mess.add_data({'name%s' % idx : package['name'],
                            'fullname%s' % idx : package['fullname'],
-                           'version%s' % idx : package['version'],
+                           'release%s' % idx : package['release'],
                            'type%s' % idx : package['type']})
             idx += 1
         self.myxpl.send(mess)
 
-    def _pkg_install(self):
+    def _pkg_install(self, message):
         """ Install a package
+            @param message : xpl message received
         """
-        pass
-                
+        mess = XplMessage()
+        mess.set_type('xpl-trig')
+        mess.set_schema('domogik.package')
+        mess.add_data({'command' : 'install'})
+        mess.add_data({'host' : self.get_sanitized_hostname()})
+
+        try:
+            package = message.data['package']
+            release = message.data['release']
+        except KeyError:
+            mess.add_data({'error' : 'incomplete xpl message'})
+            self.myxpl.send(mess)
+            return
+
+        mess.add_data({'package' : package})
+        mess.add_data({'release' : release})
+
+        try:
+            status = self.pkg_mgr.install_package("repo:%s" % package, release)
+            if status != True:
+                mess.add_data({'error' : status})
+        except:
+            mess.add_data({'error' : 'Error while installing package. Check log file : packagemanager.log and manager.log'})
+            self.log.error("Error while installing package '%s (%s)' : %s" % (package, release, traceback.format_exc()))
+        self.myxpl.send(mess)          
 
 
 

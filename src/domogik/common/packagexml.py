@@ -94,7 +94,7 @@ class PackageXml():
             self.name = self.xml_content.getElementsByTagName("name")[0].firstChild.nodeValue.strip()
             self.desc = self.xml_content.getElementsByTagName("description")[0].firstChild.nodeValue.strip()
             self.detail = self.xml_content.getElementsByTagName("detail")[0].firstChild.nodeValue.strip()
-            self.version = self.xml_content.getElementsByTagName("version")[0].firstChild.nodeValue.strip()
+            self.release = self.xml_content.getElementsByTagName("version")[0].firstChild.nodeValue.strip()
             self.doc = self.xml_content.getElementsByTagName("documentation")[0].firstChild.nodeValue.strip()
             self.author = self.xml_content.getElementsByTagName("author")[0].firstChild.nodeValue.strip()
             self.email = self.xml_content.getElementsByTagName("author-email")[0].firstChild.nodeValue.strip()
@@ -148,8 +148,8 @@ class PackageXml():
 
             # construct filenames
             self.fullname = "%s-%s" % (self.type, self.name)
-            self.xml_filename = "%s-%s-%s.xml" % (self.type, self.name, self.version)
-            self.pkg_filename = "%s-%s-%s.tar.gz" % (self.type, self.name, self.version)
+            self.xml_filename = "%s-%s-%s.xml" % (self.type, self.name, self.release)
+            self.pkg_filename = "%s-%s-%s.tgz" % (self.type, self.name, self.release)
 
             # repository specifics
             rep = self.xml_content.getElementsByTagName("repository")
@@ -159,7 +159,7 @@ class PackageXml():
                 self.priority = None
             else:
                 url_prefix = rep[0].attributes.get("url_prefix").value.strip()
-                self.package_url = "%s.tar.gz" % url_prefix
+                self.package_url = "%s.tgz" % url_prefix
                 self.xml_url = "%s.xml" % url_prefix
                 self.priority = rep[0].attributes.get("priority").value.strip()
 
@@ -216,7 +216,7 @@ class PackageXml():
         """ Add url_prefix info in xml data
             Store xml in a file in cache_folder
             @param cache_folder : folder to put xml file
-            @param url_prefix : http://.../pluginname-version
+            @param url_prefix : http://.../pluginname-release
             @param priority : repository priority
         """
         top_elt = self.xml_content.documentElement
@@ -235,7 +235,7 @@ class PackageXml():
         print("Type           : %s" % self.type)
         print("Name           : %s" % self.name)
         print("Full name      : %s" % self.fullname)
-        print("Version        : %s" % self.version)
+        print("Release        : %s" % self.release)
         print("Technology     : %s" % self.techno)
         print("Link for doc   : %s" % self.doc)
         print("Description    : %s" % self.desc)

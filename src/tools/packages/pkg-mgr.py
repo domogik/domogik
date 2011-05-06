@@ -109,9 +109,9 @@ if options.action_create == True:
 # package installation
 if options.action_install == True:
     if len(args) == 1:
-        mgr._install_package(args[0])
+        mgr.install_package(args[0])
     if len(args) == 2:
-        mgr._install_package(args[0], args[1])
+        mgr.install_package(args[0], args[1])
 
 # packages list update
 if options.action_update == True:
@@ -119,13 +119,13 @@ if options.action_update == True:
 
 # list packages in cache
 if options.action_list == True:
-    mgr._list_packages()
+    mgr.list_packages()
 
 # show packages in cache
 if options.action_show == True:
     if len(args) == 1:
-        mgr._show_packages(args[0])
+        mgr.show_packages(args[0])
     if len(args) == 2:
-        mgr._show_packages(args[0], args[1])
+        mgr.show_packages(args[0], args[1])
 
 

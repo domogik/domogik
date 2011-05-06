@@ -2369,7 +2369,7 @@ target=*
         description = message.data["description"]
         technology = message.data["technology"]
         status = message.data["status"]
-        version = message.data["version"]
+        release = message.data["release"]
         documentation = message.data["documentation"]
         json_data = JSonHelper("OK")
         json_data.set_jsonp(self.jsonp, self.jsonp_cb)
@@ -2437,7 +2437,7 @@ target=*
                 except:
                     loop_again = False
 
-        json_data.add_data({"name" : name, "technology" : technology, "description" : description, "status" : status, "host" : host, "version" : version, "documentation" : documentation, "configuration" : config_data})
+        json_data.add_data({"name" : name, "technology" : technology, "description" : description, "status" : status, "host" : host, "version" : release, "documentation" : documentation, "configuration" : config_data})
         self.send_http_response_ok(json_data.get())
 
 
@@ -3389,6 +3389,17 @@ target=*
                                               self.jsonp, self.jsonp_cb)
                 return
 
+        ### install ##################################
+        elif self.rest_request[0] == "install":
+            if len(self.rest_request) == 4:
+                self._rest_package_install(self.rest_request[1],
+                                           self.rest_request[2],
+                                           self.rest_request[3])
+            else:
+                self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
+                                              self.jsonp, self.jsonp_cb)
+                return
+
         ### others ####################################
         else:
             self.send_http_response_error(999, "Bad operation for /package", self.jsonp, self.jsonp_cb)
@@ -3422,7 +3433,8 @@ target=*
 
         self.pkg_mgr = PackageManager()
         if self.pkg_mgr.update_cache() == False:
-            self.send_http_response_error(999, "Error while updating cache")
+            self.send_http_response_error(999, "Error while updating cache",
+                                          self.jsonp, self.jsonp_cb)
         else:
             json_data = JSonHelper("OK")
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
@@ -3517,7 +3529,7 @@ target=*
                 try:
                     json_data.add_data({"fullname" : message.data["fullname"+str(idx)],
                                         "name" : message.data["name"+str(idx)],
-                                        "version" : message.data["version"+str(idx)],
+                                        "release" : message.data["release"+str(idx)],
                                         "type" : message.data["type"+str(idx)],
                                         "host" : host})
                     idx += 1
@@ -3525,4 +3537,56 @@ target=*
                     loop_again = False
     
         self.send_http_response_ok(json_data.get())
+
+    def _rest_package_install(self, host, package, release):
+        """ Send a xpl message to install a package
+            @param host : host targetted
+            @param package : fullname of package (type-name)
+            @param release : package release
+            Return ok/ko as json
+        """
+        self.log.debug("Package : ask for installing a package")
+
+        ### Send xpl message to install package
+        message = XplMessage()
+        message.set_type("xpl-cmnd")
+        message.set_schema("domogik.package")
+        message.add_data({"command" : "install"})
+        message.add_data({"host" : host})
+        message.add_data({"package" : package})
+        message.add_data({"release" : release})
+        self.myxpl.send(message)
+        self.log.debug("Package : send message : %s" % str(message))
+
+        ### Wait for answer
+        # get xpl message from queue
+        # make a time loop of one second after first xpl-trig reception
+        messages = []
+        try:
+            self.log.debug("Package install : wait for answer...")
+            message = self._get_from_queue(self._queue_package, 
+                                           "xpl-trig", 
+                                           "domogik.package", 
+                                           filter_data = {"command" : "install"})
+        except Empty:
+            self.log.debug("Package install : no answer")
+            json_data = JSonHelper("ERROR", 999, "No data or timeout on installing package")
+            json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+            json_data.set_data_type("install")
+            self.send_http_response_ok(json_data.get())
+            return
+
+        self.log.debug("Package install : message receive : %s" % str(message))
+        
+
+        # process message
+        if message.data.has_key('error'):
+            self.send_http_response_error(999, "Error : %s" % message.data['error'], self.jsonp, self.jsonp_cb)
+        else:
+            json_data = JSonHelper("OK")
+            json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+            json_data.set_data_type("install")
+            self.send_http_response_ok(json_data.get())
+
+
 

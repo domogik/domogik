@@ -119,7 +119,7 @@ class PackageManager():
                 return
 
         # Create .tgz
-        self._create_tar_gz("plugin-%s-%s" % (plg_xml.name, plg_xml.version), 
+        self._create_tar_gz("plugin-%s-%s" % (plg_xml.name, plg_xml.release), 
                             output_dir,
                             plg_xml.files, 
                             plg_xml.info_file)
@@ -148,11 +148,13 @@ class PackageManager():
                 tar.add(info_file, arcname="info.xml")
             tar.close()
         except: 
-            raise PackageException("Error generating package : %s : %s" % (my_tar, traceback.format_exc()))
+            msg = "Error generating package : %s : %s" % (my_tar, traceback.format_exc())
+            self.log(msg)
+            raise PackageException(msg)
         self.log("OK")
     
 
-    def _install_package(self, path, version = None):
+    def install_package(self, path, release = None):
         """ Install a package
             0. Eventually download package
             1. Extract tar.gz
@@ -165,9 +167,9 @@ class PackageManager():
         #    return
         # package from repository
         if path[0:5] == "repo:":
-            pkg = self._find_package(path[5:], version)
-            if pkg == None:
-                return
+            pkg, status = self._find_package(path[5:], release)
+            if status != True:
+                return status
             path = pkg.package_url
 
         # get plugin name
@@ -186,7 +188,9 @@ class PackageManager():
             if os.path.isdir(my_tmp_dir) == False:
                 os.makedirs(my_tmp_dir)
         except:
-            raise PackageException("Error while creating temporary folder '%s' : %s" % (INSTALL_PATH, traceback.format_exc()))
+            msg = "Error while creating temporary folder '%s' : %s" % (INSTALL_PATH, traceback.format_exc())
+            self.log(msg)
+            raise PackageException(msg)
 
         # Check if we need to download package
         if path[0:4] == "http":
@@ -201,7 +205,9 @@ class PackageManager():
         try:
             self._extract_package(path, my_tmp_dir)
         except:
-            raise PackageException("Error while extracting package '%s' : %s" % (path, traceback.format_exc()))
+            msg = "Error while extracting package '%s' : %s" % (path, traceback.format_exc())
+            self.log(msg)
+            raise PackageException(msg)
         self.log("Package successfully extracted.")
 
         # create install directory
@@ -210,14 +216,18 @@ class PackageManager():
             if os.path.isdir(INSTALL_PATH) == False:
                 os.makedirs(INSTALL_PATH)
         except:
-            raise PackageException("Error while creating installation folder '%s' : %s" % (INSTALL_PATH, traceback.format_exc()))
+            msg = "Error while creating installation folder '%s' : %s" % (INSTALL_PATH, traceback.format_exc())
+            self.log(msg)
+            raise PackageException(msg)
 
         # install plugin in $HOME
         self.log("Installing package (plugin)...")
         try:
             self._install_plugin(my_tmp_dir, INSTALL_PATH)
         except:
-            raise PackageException("Error while installing package : %s" % (traceback.format_exc()))
+            msg = "Error while installing package : %s" % (traceback.format_exc())
+            self.log(msg)
+            raise PackageException(msg)
         self.log("Package successfully extracted.")
 
         # insert data in database
@@ -225,6 +235,7 @@ class PackageManager():
         pkg_data.insert()
 
         self.log("Package installation finished")
+        return True
 
 
     def _extract_package(self, pkg_path, extract_path):
@@ -236,7 +247,9 @@ class PackageManager():
         # check if there is no .. or / in files path
         for fic in tar.getnames():
             if fic[0:1] == "/" or fic[0:2] == "..":
-                raise PackageException("Error while extracting package '%s' : filename '%s' not allowed" % (pkg_path, fic))
+                msg = "Error while extracting package '%s' : filename '%s' not allowed" % (pkg_path, fic)
+                self.log(msg)
+                raise PackageException(msg)
         tar.extractall(path = extract_path)
         tar.close()
 
@@ -255,7 +268,9 @@ class PackageManager():
             if os.path.isdir(plg_path) == False:
                 os.makedirs(plg_path)
         except:
-            raise PackageException("Error while creating plugin folder '%s' : %s" % (plg_path, traceback.format_exc()))
+            msg = "Error while creating plugin folder '%s' : %s" % (plg_path, traceback.format_exc())
+            self.log(msg)
+            raise PackageException(msg)
 
         ### copy files
         self.log("Copying files for plugin...")
@@ -266,7 +281,9 @@ class PackageManager():
             self._create_init_py("%s/xpl/lib/" % plg_path)
             copytree("%s/src/share/domogik" % pkg_dir, "%s/" % plg_path, self.log)
         except:
-            raise PackageException("Error while copying plugin files : %s" % (traceback.format_exc()))
+            msg = "Error while copying plugin files : %s" % (traceback.format_exc())
+            self.log(msg)
+            raise PackageException(msg)
 
     def _create_init_py(self, path):
         """ Create __init__.py file in path
@@ -276,7 +293,9 @@ class PackageManager():
             self.log("Create __init__.py file in %s" % path)
             open("%s/__init__.py" % path, "a").close()
         except:
-            raise PackageException("Error while crating __init__.py file in %s : %s" % (path, traceback.format_exc()))
+            msg = "Error while crating __init__.py file in %s : %s" % (path, traceback.format_exc())
+            self.log(msg)
+            raise PackageException(msg)
 
 
 
@@ -318,7 +337,9 @@ class PackageManager():
                                   "url" : line.split()[1]})
             src_file.close()
         except:
-            raise PackageException("Error reading source file : %s : %s" % (REPO_SRC_FILE, str(traceback.format_exc())))
+            msg = "Error reading source file : %s : %s" % (REPO_SRC_FILE, str(traceback.format_exc()))
+            self.log(msg)
+            raise PackageException(msg)
         # return sorted list
         return sorted(repo_list, key = lambda k: k['priority'], reverse = True)
 
@@ -333,7 +354,9 @@ class PackageManager():
             if os.path.isdir(folder) == False:
                 os.makedirs(folder)
         except:
-            raise PackageException("Error while creating cache folder '%s' : %s" % (folder, traceback.format_exc()))
+            msg = "Error while creating cache folder '%s' : %s" % (folder, traceback.format_exc())
+            self.log(msg)
+            raise PackageException(msg)
 
         # Clean folder
         try:
@@ -343,11 +366,13 @@ class PackageManager():
                 for d in dirs:
                     shutil.rmtree(os.path.join(root, d))
         except:
-            raise PackageException("Error while cleaning cache folder '%s' : %s" % (folder, traceback.format_exc()))
+            msg = "Error while cleaning cache folder '%s' : %s" % (folder, traceback.format_exc())
+            self.log(msg)
+            raise PackageException(msg)
 
 
     def _parse_repository(self, repo_list, cache_folder):
-        """ For each repo, get file list, check if it is higher version and
+        """ For each repo, get file list, check if it is higher release and
             get package's xml
             @param repo_list : repositories list
             @param cache_folder : package cache folder
@@ -359,10 +384,10 @@ class PackageManager():
         for repo in repo_list:
             file_list.extend(self._get_files_list_from_repository(repo["url"], repo["priority"]))
 
-        # for each package, put it in cache if higher version
+        # for each package, put it in cache if higher release
         for file_info in file_list:
             pkg_xml = PackageXml(url = "%s.xml" % file_info["file"])
-            self.log("Add '%s (%s)' in cache from %s" % (pkg_xml.name, pkg_xml.version, file_info["repo_url"]))
+            self.log("Add '%s (%s)' in cache from %s" % (pkg_xml.name, pkg_xml.release, file_info["repo_url"]))
             pkg_xml.cache_package(cache_folder, file_info["file"], file_info["priority"])
 
 
@@ -392,7 +417,7 @@ class PackageManager():
             return []
 
 
-    def _list_packages(self):
+    def list_packages(self):
         """ List all packages in cache folder 
         """
         pkg_list = []
@@ -400,16 +425,38 @@ class PackageManager():
             for f in files:
                 pkg_xml = PackageXml(path = "%s/%s" % (root, f))
                 pkg_list.append({"fullname" : pkg_xml.fullname,
-                                 "version" : pkg_xml.version,
+                                 "release" : pkg_xml.release,
                                  "priority" : pkg_xml.priority,
                                  "desc" : pkg_xml.desc})
         pkg_list =  sorted(pkg_list, key = lambda k: (k['fullname'], 
-                                                      k['version']))
+                                                      k['release']))
         for pkg in pkg_list:
              self.log("%s (%s, prio: %s) : %s" % (pkg["fullname"], 
-                                               pkg["version"], 
+                                               pkg["release"], 
                                                pkg["priority"], 
                                                pkg["desc"]))
+
+    def get_packages_list(self):
+        """ List all packages in cache folder 
+            and return a detailed list
+        """
+        pkg_list = []
+        for root, dirs, files in os.walk(REPO_CACHE_DIR):
+            for f in files:
+                pkg_xml = PackageXml(path = "%s/%s" % (root, f))
+                pkg_list.append({"name" : pkg_xml.name,
+                                 "type" : pkg_xml.type,
+                                 "fullname" : pkg_xml.fullname,
+                                 "release" : pkg_xml.release,
+                                 "techno" : pkg_xml.techno,
+                                 "doc" : pkg_xml.doc,
+                                 "desc" : pkg_xml.desc,
+                                 "detail" : pkg_xml.detail,
+                                 "author" : pkg_xml.author,
+                                 "email" : pkg_xml.email,
+                                 "priority" : pkg_xml.priority,
+                                 "package-url" : pkg_xml.package_url})
+        return sorted(pkg_list, key = lambda k: (k['name']))
 
     def get_installed_packages_list(self):
         """ List all packages in install folder 
@@ -421,57 +468,61 @@ class PackageManager():
                 pkg_xml = PackageXml(path = "%s/%s" % (root, f))
                 pkg_list.append({"fullname" : pkg_xml.fullname,
                                  "name" : pkg_xml.name,
-                                 "version" : pkg_xml.version,
+                                 "release" : pkg_xml.release,
                                  "type" : pkg_xml.type,
                                  "package-url" : pkg_xml.package_url})
         return sorted(pkg_list, key = lambda k: (k['fullname'], 
-                                                 k['version']))
+                                                 k['release']))
 
-    def _show_packages(self, fullname, version = None):
+    def show_packages(self, fullname, release = None):
         """ Show a package description
             @param fullname : fullname of package (type-name)
-            @param version : optionnal : version to display (if several)
+            @param release : optionnal : release to display (if several)
         """
-        pkg = self._find_package(fullname, version)
-        if pkg != None:
+        pkg, status = self._find_package(fullname, release)
+        if status == True:
             pkg.display()
 
 
-    def _find_package(self, fullname, version = None):
-        """ Find a package and return xml data or None if not found
+    def _find_package(self, fullname, release = None):
+        """ Find a package and return 
+                               - xml data or None if not found
+                               - a status : True if ok, a message elsewhere
             @param fullname : fullname of package (type-name)
-            @param version : optionnal : version to display (if several)
+            @param release : optionnal : release to display (if several)
         """
         pkg_list = []
         for root, dirs, files in os.walk(REPO_CACHE_DIR):
             for f in files:
                 pkg_xml = PackageXml(path = "%s/%s" % (root, f))
-                if version == None:
+                if release == None:
                     if fullname == pkg_xml.fullname:
                         pkg_list.append({"fullname" : pkg_xml.fullname,
-                                         "version" : pkg_xml.version,
+                                         "release" : pkg_xml.release,
                                          "priority" : pkg_xml.priority,
                                          "xml" : pkg_xml})
                 else:
-                    if fullname == pkg_xml.fullname and version == pkg_xml.version:
+                    if fullname == pkg_xml.fullname and release == pkg_xml.release:
                         pkg_list.append({"fullname" : pkg_xml.fullname,
-                                         "version" : pkg_xml.version,
+                                         "release" : pkg_xml.release,
                                          "priority" : pkg_xml.priority,
                                          "xml" : pkg_xml})
         if len(pkg_list) == 0:
-            if version == None:
-                version = "*"
-            self.log("No package corresponding to '%s' in version '%s'" % (fullname, version))
-            return None
+            if release == None:
+                release = "*"
+            msg = "No package corresponding to '%s' in release '%s'" % (fullname, release)
+            self.log(msg)
+            return [], msg
         if len(pkg_list) > 1:
-            self.log("Several packages are available for '%s'. Please specify which version you choose" % fullname)
+            msg = "Several packages are available for '%s'. Please specify which release you choose" % fullname
+            self.log(msg)
             for pkg in pkg_list:
                  self.log("%s (%s, prio: %s)" % (pkg["fullname"], 
-                                              pkg["version"],
+                                              pkg["release"],
                                               pkg["priority"]))
-            return None
+            return [], msg
 
-        return pkg_list[0]["xml"]
+        return pkg_list[0]["xml"], True
 
     def is_root(self):
         """ return True is current user is root
