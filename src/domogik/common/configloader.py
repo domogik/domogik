@@ -91,7 +91,6 @@ class Loader():
             self.__class__.config = ConfigParser.ConfigParser()
             files = self.__class__.config.read([custom_path, 
                 homedir + "/.domogik/" + self.main_conf_name,
-                homedir + "/." + self.main_conf_name,
                 '/etc/' + self.main_conf_name,
                 '/usr/local/etc/' + self.main_conf_name])
             self.__class__.valid_files = files

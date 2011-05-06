@@ -41,7 +41,7 @@ if sys.version_info[0] < 2 or (sys.version_info[0] == 2 and sys.version_info[1] 
 import os
 import ConfigParser
 config = ConfigParser.ConfigParser()
-config.read("%s/.domogik.cfg" % os.getenv("HOME"))
+config.read("%s/.domogik/domogik.cfg" % os.getenv("HOME"))
 python_path = config.get("python","path")
 sys.path.extend(eval(python_path))
 #add non-default include path

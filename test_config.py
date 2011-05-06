@@ -161,7 +161,7 @@ def test_config_files():
     except KeyError:
         raise KeyError("The user %s does not exists, you MUST create it or change the DOMOGIK_USER parameter in %s. Please report this as a bug if you used install.sh." % (user, file))
     user_home = user_entry.pw_dir
-    assert os.path.isfile("%s/.domogik.cfg" % user_home), "The domogik config file %s/.domogik.cfg does not exist. Please report this as a bug if you used install.sh." % user_home
+    assert os.path.isfile("%s/.domogik/domogik.cfg" % user_home), "The domogik config file %s/.domogik/domogik.cfg does not exist. Please report this as a bug if you used install.sh." % user_home
     ok("Domogik's user exists and has a config file")
     
     test_user_config_file(user_home, user_entry)
@@ -192,7 +192,7 @@ def test_user_config_file(user_home, user_entry):
     info("Check user config file contents")
     import ConfigParser
     config = ConfigParser.ConfigParser()
-    config.read("%s/.domogik.cfg" % user_home)
+    config.read("%s/.domogik/domogik.cfg" % user_home)
     
     #check [domogik] section
     dmg = dict(config.items('domogik'))
@@ -269,7 +269,7 @@ def get_django_url():
     user_home = user_entry.pw_dir
     import ConfigParser
     config = ConfigParser.ConfigParser()
-    config.read("%s/.domogik.cfg" % user_home)
+    config.read("%s/.domogik/domogik.cfg" % user_home)
     django = dict(config.items('django'))
     return "http://%s:%s/domogik" % (django['django_server_ip'], django['django_server_port'])
      

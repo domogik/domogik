@@ -30,11 +30,11 @@ function get_user {
     elif [ -f "/etc/conf.d/domogik" ];then
         eval $(grep USER /etc/conf.d/domogik)
     fi
-    DMG_HOME=$(getent passwd $DOMOGIK_USER|cut -d ":" -f 6)
+    DMG_HOME=$(getent passwd $DOMOGIK_USER|cut -d ":" -f 6)/.domogik
 }
 
 function plugin_exists {
-    grep -qs "^$PLUGIN *=" $DMG_HOME/.domogik.cfg
+    grep -qs "^$PLUGIN *=" $DMG_HOME/domogik.cfg
     EXISTS=$?
 }
 
@@ -45,7 +45,7 @@ Disables a plugin."
 }
 
 function disable {
-    sed -i "s/^$PLUGIN *=.*$/$PLUGIN =/" $DMG_HOME/.domogik.cfg
+    sed -i "s/^$PLUGIN *=.*$/$PLUGIN =/" $DMG_HOME/domogik.cfg
 }
 
 #check params
