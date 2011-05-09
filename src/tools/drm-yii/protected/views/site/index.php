@@ -51,10 +51,11 @@
     <div class='content'>
 <?php
     echo CHtml::beginForm(array('site/packagesAction'));
-
+    $formatter = new MyFormatter();
     $this->widget('zii.widgets.grid.CGridView', array(
         'id'=>'forms-grid',
         'dataProvider'=>$packages,
+        'formatter'=>$formatter,
         'rowCssClassExpression'=>'($data["repositoryid"] == "trash" || $data["repositoryid"] == "sas")? $data["repositoryid"]: "std"',
         'columns'=>array(
             array(
@@ -63,9 +64,23 @@
             ),
             'repository',
             array(
-                'header'=>'Filename',
-                'value'=>'($data["xml"])?"<div class=\"package\">" . $data["filename"] . "</div><div class=\"xml\">" . $data["xml"] . "</div>":"<div class=\"package\">" . $data["filename"] . "</div>"',
-                'type'=>'html',
+                'htmlOptions'=>array('class'=>'package'),
+                'name'=>'filename',
+            ),
+            array('name'=>'deployed',
+                'type'=>'booleanIcon',
+                'htmlOptions' => array('style' => 'text-align: center;'),
+            ),
+            array(
+                'class'=>'CButtonColumn',
+                'template'=>'{viewpkg}',
+                'buttons'=>array(
+                    'viewpkg'=>array(
+                        'label'=>'View',
+                        'visible'=>'($data["deployed"] == 1)',
+                        'url'=>'Yii::app()->createUrl("/site/packageView",array("package"=>$data["filename"], "repo"=>$data["repositoryid"]))',
+                    ),                    
+                ),
             ),
             'date',
             'size',

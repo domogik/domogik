@@ -90,10 +90,10 @@ return array(
 		// this is used in contact page
 		'adminEmail'=>'webmaster@example.com',
         'repositories' => array(
-            'sas' => array('label'=>'Sas', 'path'=>'/srv/http/domogikpkg/repositories/sas'),
-            'repo1' => array('label'=>'Repo 1', 'path'=>'/srv/http/domogikpkg/repositories/repo1'),
-            'repo2' => array('label'=>'Repo 2', 'path'=>'/srv/http/domogikpkg/repositories/repo2'),
-            'trash' => array('label'=>'Trash', 'path'=>'/srv/http/domogikpkg/repositories/trash'),
+            'sas' => array('label'=>'Sas', 'path'=>'/domogikpkg/sas'),
+            'repo1' => array('label'=>'Repo 1', 'path'=>'/domogikpkg/repo1'),
+            'repo2' => array('label'=>'Repo 2', 'path'=>'/domogikpkg/repo2'),
+            'trash' => array('label'=>'Trash', 'path'=>'/domogikpkg/trash'),
         ),
 	),
 );
