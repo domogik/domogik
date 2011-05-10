@@ -137,13 +137,13 @@ class SysManager(XplPlugin):
             self.log.info("Set package path to '%s' " % self._package_path)
             print("Set package path to '%s' " % self._package_path)
             sys.path.append(self._package_path)
-            self._xml_plugin_directory = "%s/plugins/plugins/" % self._package_path
-            self._xml_hardware_directory = "%s/plugins/hardwares/" % self._package_path
+            self._xml_plugin_directory = os.path.join(self._package_path, "plugins/plugins/")
+            self._xml_hardware_directory = os.path.join(self._package_path, "plugins/hardwares/")
         else:
             self.log.info("No package path defined in config file")
             self._package_path = None
-            self._xml_plugin_directory = "%s/share/domogik/plugins/" % conf['custom_prefix']
-            self._xml_hardware_directory = "%s/share/domogik/hardwares/" % conf['custom_prefix']
+            self._xml_plugin_directory = os.path.join(conf['custom_prefix'], "share/domogik/plugins/")
+            self._xml_hardware_directory = os.path.join(conf['custom_prefix'], "share/domogik/hardwares/")
 
         self._pinglist = {}
         self._plugins = []
@@ -371,6 +371,7 @@ class SysManager(XplPlugin):
         error = ""
         if plg != "*":
             if self.get_sanitized_hostname() == host and \
+               (cmd != "enable" and cmd != "disable") and \
                self._is_plugin(plg) == False:
                 self._invalid_plugin(cmd, plg, host)
                 return
@@ -386,6 +387,14 @@ class SysManager(XplPlugin):
             # stop plugin
             if cmd == "stop" and host == self.get_sanitized_hostname() and plg != "rest":
                 self._stop_plugin(plg, host)
+
+            # enable plugin
+            if cmd == "enable" and host == self.get_sanitized_hostname() and plg != "rest":
+                self._enable_plugin(plg)
+
+            # disable plugin
+            if cmd == "disable" and host == self.get_sanitized_hostname() and plg != "rest":
+                self._disable_plugin(plg)
 
             # list plugin
             elif cmd == "list" and (host == self.get_sanitized_hostname() or host == "*"):
@@ -868,6 +877,37 @@ class SysManager(XplPlugin):
         self.myxpl.send(mess)
 
 
+    def _enable_plugin(self, name):
+        """ Enable a plugin in domogik.cfg file
+            @param name : plugin to enable
+        """
+        mess = XplMessage()
+        mess.set_type('xpl-trig')
+        mess.set_schema('domogik.system')
+        mess.add_data({'command' : 'enable'})
+        mess.add_data({'host' : self.get_sanitized_hostname()})
+        mess.add_data({'plugin' : name})
+
+        subp = Popen("dmgenplug -f %s" % name, shell=True)
+        pid = subp.pid
+        subp.communicate()
+        self.myxpl.send(mess)          
+
+    def _disable_plugin(self, name):
+        """ Disable a plugin in domogik.cfg file
+            @param name : plugin to disable
+        """
+        mess = XplMessage()
+        mess.set_type('xpl-trig')
+        mess.set_schema('domogik.system')
+        mess.add_data({'command' : 'disable'})
+        mess.add_data({'host' : self.get_sanitized_hostname()})
+        mess.add_data({'plugin' : name})
+
+        subp = Popen("dmgdisplug %s" % name, shell=True)
+        pid = subp.pid
+        subp.communicate()
+        self.myxpl.send(mess)          
 
 
     def _package_cb(self, message):

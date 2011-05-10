@@ -2165,22 +2165,24 @@ target=*
             self._rest_plugin_detail(self.rest_request[1], self.rest_request[2])
 
 
-        ### start #####################################
-        elif self.rest_request[0] == "start":
+        ### enable ####################################
+        elif self.rest_request[0] == "enable" \
+          or self.rest_request[0] == "disable":
             if len(self.rest_request) < 3:
                 self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
                 return
-            self._rest_plugin_start_stop(plugin =  self.rest_request[1], \
-                                   command = "start", \
-                                   host = self.rest_request[2])
+            self._rest_plugin_enable_disable(host =  self.rest_request[1], \
+                                   plugin = self.rest_request[2],
+                                   command = self.rest_request[0])
 
-        ### stop ######################################
-        elif self.rest_request[0] == "stop":
+        ### start / stop ##############################
+        elif self.rest_request[0] == "start" \
+          or self.rest_request[0] == "stop":
             if len(self.rest_request) < 3:
                 self.send_http_response_error(999, "Url too short", self.jsonp, self.jsonp_cb)
                 return
             self._rest_plugin_start_stop(plugin =  self.rest_request[1], \
-                                   command = "stop", \
+                                   command = self.rest_request[0],
                                    host = self.rest_request[2])
 
 
@@ -2485,6 +2487,51 @@ target=*
             json_data.set_jsonp(self.jsonp, self.jsonp_cb)
             self.send_http_response_ok(json_data.get())
 
+
+        # no error
+        else:
+            json_data = JSonHelper("OK")
+            json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+            self.send_http_response_ok(json_data.get())
+
+    def _rest_plugin_enable_disable(self, command, host, plugin):
+        """ Send enable/disable xpl message to manager
+            Then, listen for a response
+            @param host : host to which we send command
+            @param plugin : name of plugin
+        """
+        self.log.debug("Plugin : ask for %s %s on %s " % (command, plugin, host))
+
+        ### Send xpl message
+        cmd_message = XplMessage()
+        cmd_message.set_type("xpl-cmnd")
+        cmd_message.set_schema("domogik.system")
+        cmd_message.add_data({"command" : command})
+        cmd_message.add_data({"host" : host})
+        cmd_message.add_data({"plugin" : plugin})
+        self.myxpl.send(cmd_message)
+        self.log.debug("Plugin : send message : %s" % str(cmd_message))
+
+        ### Listen for response
+        # get xpl message from queue
+        try:
+            self.log.debug("Plugin : wait for answer...")
+            message = self._get_from_queue(self._queue_system_list, "xpl-trig", "domogik.system", filter_data = {"command" : command, "plugin" : plugin})
+        except Empty:
+            json_data = JSonHelper("ERROR", 999, "No data or timeout on %s plugin %s" % (command, plugin))
+            json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+            json_data.set_data_type("plugin")
+            self.send_http_response_ok(json_data.get())
+            return
+
+        self.log.debug("Plugin : message received : %s" % str(message))
+
+        # an error happens
+        if 'error' in message.data:
+            error_msg = message.data['error']
+            json_data = JSonHelper("ERROR", 999, error_msg)
+            json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+            self.send_http_response_ok(json_data.get())
 
         # no error
         else:

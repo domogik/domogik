@@ -286,6 +286,14 @@ class Rest(XplPlugin):
                      {'schema': 'domogik.system',
                       'xpltype': 'xpl-trig',
                       'command' : 'list'})
+            Listener(self._add_to_queue_system_list, self.myxpl, \
+                     {'schema': 'domogik.system',
+                      'xpltype': 'xpl-trig',
+                      'command' : 'enable'})
+            Listener(self._add_to_queue_system_list, self.myxpl, \
+                     {'schema': 'domogik.system',
+                      'xpltype': 'xpl-trig',
+                      'command' : 'disable'})
             Listener(self._add_to_queue_system_detail, self.myxpl, \
                      {'schema': 'domogik.system',
                       'xpltype': 'xpl-trig',
