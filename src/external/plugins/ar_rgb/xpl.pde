@@ -1,0 +1,272 @@
+
+/*
+
+
+*/
+
+// caracter codes 
+#define END_OF_LINE     10       // \n
+#define OPEN_BRACKET    "{"
+#define CLOSE_BRACKET   "}"
+
+// xpl message type
+#define XPL_TYPE_LINE 1          // xpl type is on first line
+
+
+
+/***********************************************
+   sendHbeat
+   Send a xPL hbeat message
+   Input : n/a
+   Output : n/a
+***********************************************/
+void sendHbeat() {
+    Serial.println("call sendHbeat");
+    char buffer[200];
+
+    /**** header ****/
+    
+    sprintf(buffer, "xpl-stat\n{\n");
+    sprintf(buffer, "%shop=1\n", buffer);
+    sprintf(buffer, "%ssource=%s\n", buffer, MY_SOURCE);
+    sprintf(buffer, "%starget=*\n}\n", buffer);
+
+    /**** body : specification part ****/
+    
+    sprintf(buffer, "%shbeat.app\n{\n", buffer);
+    sprintf(buffer, "%sinterval=%i\n", buffer, HBEAT_INTERVAL);
+    sprintf(buffer, "%sport=%u\n", buffer, localPort);
+    sprintf(buffer, "%sremote-ip=%i.%i.%i.%i\n", buffer, ip[0], ip[1], ip[2], ip[3]);
+
+    /**** body : developper part ***/
+    
+    // mac address
+    sprintf(buffer, "%smac=%x:%x:%x:%x:%x:%x\n", buffer, mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+    // current color
+    sprintf(buffer, "%scolor=#%02x%02x%02x\n", buffer, currentColor[0], currentColor[1], currentColor[2]);
+
+    sprintf(buffer, "%s}\n", buffer);
+    
+    Serial.println(buffer);  
+
+    /**** Send it ****/
+    Udp.sendPacket(buffer, broadCastIp, xplPort);   
+}
+
+
+
+
+
+/***********************************************
+   sendXplTrigForSetColor
+   Send a xPL Trig message after setting a color
+   Input : color code (#rrggbb format)
+   Output : n/a
+   
+***********************************************/
+void sendXplTrigForSetColor(char color[8]) {
+    Serial.println("call sendXplTrigForSetColor");
+  
+    Serial.println(color);
+    char buffer[150];
+
+    /**** header ****/
+        
+    sprintf(buffer, "xpl-trig\n{\n");
+    sprintf(buffer, "%shop=1\n", buffer);
+    sprintf(buffer, "%ssource=%s\n", buffer, MY_SOURCE);
+    sprintf(buffer, "%starget=*\n}\n", buffer);
+
+    /**** body ****/
+    
+    sprintf(buffer, "%sarduino.rgb\n{\n", buffer);
+    sprintf(buffer, "%scommand=setcolor\n", buffer);
+    sprintf(buffer, "%sdevice=%s\n", buffer, MY_DEVICE);
+    sprintf(buffer, "%scolor=%s\n", buffer, color);
+
+    sprintf(buffer, "%s}\n", buffer);
+
+    /**** Send it ****/
+    Serial.println(buffer);
+    Udp.sendPacket(buffer, broadCastIp, xplPort);   
+    Serial.println("sent!");
+    
+    Serial.print("freeMemory()=");
+    Serial.println(freeMemory());
+
+}
+
+
+
+
+
+/***********************************************
+   parseXpl
+   parse a xpl message
+   Input : message (byte)
+           message size (int)
+   Output : code (int) : 0 = success
+                         not 0 = not a valid message
+***********************************************/
+int parseXpl(byte *received, int len)
+{
+    Serial.println("call parseXpl");
+
+    /* specification values */
+    //char buffer[144+1+1]; //16+'='+128 : format : "key=value"
+    //char key[16+1];
+    //char value[128+1]; 
+    
+    /* optimised values for arduino.rgb message */
+    char buffer[36+1+1]; //16+'='+20 : format : "key=value"
+    char key[16+1];
+    char value[20+1]; 
+
+    /**** specific to arduino.rgb message processing ****/
+    char myDevice[16+1];  // in practice, this could be sized up to 128, but here device should be the same as the instance (max : 16)
+    char myCommand[16+1]; // setcolor, etc... could be sized up to 128, but we use short commands here
+    char myColor[7+1];    // format : #rrggbb
+    // Init color to 'None' value
+    sprintf(myColor, "%s", "None");
+    
+    int j=0;
+    int line=0;
+    int result=0;
+    
+    int xpl_part = 0;  // 0 : message type
+                       // 1 : bracket
+                       // 2 : header
+                       // 3 : bracket
+                       // 4 : schema
+                       // 5 : bracket
+                       // 6 : body
+                       // 7 : final bracket
+    int item_body = 0;
+                       
+    // Message processing
+    // Read each character of the message
+    for(int i=0; i<len; i++){
+        // load byte by byte in 'line' buffer, until '\n' is detected
+
+        if(received[i]== END_OF_LINE) { // is it a linefeed (ASCII: 10 decimal)
+            buffer[j]='\0';    // add the end of string id
+            Serial.print("line=");
+            //Serial.println(line);
+            Serial.println(buffer);
+            line++;
+
+            // xpl type (first line)
+            if (line == XPL_TYPE_LINE) {
+                Serial.print("Message type : ");
+                Serial.println(buffer);
+                xpl_part = 1; // next : open bracket for header
+                
+                // eventually add a filter here on xpl type
+                if (strcmp(buffer, "xpl-cmnd")  != 0) {
+                    //Serial.println("Filtered!");
+                    return 1;
+                }
+                
+            }
+            // header content            
+            else {
+                if (strcmp(buffer, OPEN_BRACKET) == 0) {
+                    //Serial.println ("Open bracket");
+                    xpl_part++; 
+                } 
+                else if (strcmp(buffer, CLOSE_BRACKET) == 0) {
+                    //Serial.println("Close bracket");                
+                    xpl_part++; 
+                }
+                else {
+            
+                    if (xpl_part == 2) {
+                        //TODO : header processing
+                        xpl_part = 3; // next : close bracket for header
+                    }
+                    // schema
+                    else if (xpl_part == 4) {
+                        Serial.print("schema : ");
+                        Serial.println(buffer);
+                        
+                        xpl_part = 5; // next : open bracket for body
+        
+                        // eventually add a filter here on schema
+                        // warning : if you test on "foo.basic", "foo.basicx" will be accepted unless you add a dedicated test on length
+                        if (strcmp(buffer, "arduino.rgb")  != 0) {
+                            //Serial.println("Filtered!");
+                            return 2;                
+                        }
+                    }
+                    // body
+                    else if (xpl_part == 6) {
+                        //sscanf(buffer, "%[^'=']=%s", &command[item_body].name, &command[item_body].value);
+                        sscanf(buffer, "%[^'=']=%s", key, value);
+                        Serial.print("Key : value =");
+                        Serial.print(key);
+                        Serial.print(" : ");
+                        Serial.println(value);
+                        item_body++;
+                        
+                        // Here, store data in appropriate vars for final processing
+                        // TODO : si command = "setcolor"... command = "device", etc...
+                        if (strcmp(key, "device")  == 0) {
+                            sprintf(myDevice, "%s", value);
+                        }
+                        if (strcmp(key, "command")  == 0) {
+                            sprintf(myCommand, "%s", value);
+                        }
+                        if (strcmp(key, "color")  == 0) {
+                            sprintf(myColor, "%s", value);
+                        }
+                    }
+                    
+                }
+            }              
+            
+            j=0; // reset the buffer pointer
+            //clearStr(buffer); // clear the buffer
+        }
+        else {
+            // put next character in buffer
+            buffer[j]=received[i];
+            j=j++;
+        }
+    }
+    Serial.print("xpl_part=");
+    Serial.println(xpl_part);
+    // End of message
+    if (xpl_part >= 7) {
+        Serial.println("Parsing finished");
+
+        // Add here processing about xpl message
+
+        /**** First, check device targetted ****/
+        // TODO
+        
+        /**** Set color ****/
+        if (strcmp(myCommand, "setcolor")  == 0) {
+            /**** Set on ****/
+            if (strcmp(myColor, "on")  == 0) {
+                setColorOn();
+                Serial.println("After calling for on");
+            }
+            /**** Set off ****/
+            else if (strcmp(myColor, "off")  == 0) {
+                setColorOff();
+            }
+            /**** Set color to color ****/
+            else {
+                setColorFromRGBCode(myColor);
+            }
+        }     
+        Serial.println("Before return");
+
+        return 0;
+    }
+    else {
+        return 3;
+    }
+    
+}
+
