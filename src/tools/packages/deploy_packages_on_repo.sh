@@ -51,9 +51,9 @@ if [[ ! -d $2 ]] ; then
 fi
 
 cd $OUTPUT
-for fic in $INPUT/*.tar.gz
+for fic in $INPUT/*.tgz
   do
-    package_name=$(basename $fic | sed "s/.tar.gz//")
+    package_name=$(basename $fic | sed "s/.tgz//")
     echo "==== $package_name ===="
     tar xvzf $fic info.xml
     if [[ $? -ne 0 ]] ; then
