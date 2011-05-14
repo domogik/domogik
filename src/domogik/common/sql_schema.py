@@ -494,11 +494,12 @@ class DeviceStats(Base):
     """Device stats (values that were associated to the device)"""
 
     __tablename__ = '%s_device_stats' % _db_prefix
-    date = Column(DateTime, primary_key=True)
+    id = Column(Integer, primary_key=True)
+    date = Column(DateTime, nullable=False)
     # This is used for mysql compatibility reasons as timestamps are NOT handled in Unix Time format
     timestamp = Column(Integer, nullable=False)
-    skey = Column(Unicode(30), primary_key=True)
-    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), nullable=False, primary_key=True)
+    skey = Column(Unicode(30), nullable=False)
+    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), nullable=False)
     device = relation(Device)
     # We have both types for value field because we need an explicit numerical field in case we want to compute
     # arithmetical operations (min/max/avg etc.). If it is a numerical value, both fields are filled in. If it is a
@@ -532,7 +533,8 @@ class DeviceStats(Base):
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<DeviceStats(date='%s', (%s, %s), device=%s)>" % (self.date, self.skey, self.value, self.device)
+        return "<DeviceStats(%s, date='%s', (%s, %s), device=%s)>" % (self.id, self.date, self.skey, self.value,
+                                                                      self.device)
 
     @staticmethod
     def get_tablename():
