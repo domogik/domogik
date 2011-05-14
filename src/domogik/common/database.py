@@ -1705,7 +1705,7 @@ class DbHelper():
         return self.__session.query(
                         DeviceStats
                     ).filter_by(device_id=ds_device_id
-                    ).filter_by(key=ucode(ds_key)
+                    ).filter_by(skey=ucode(ds_key)
                     ).all()
 
     def list_last_n_stats_of_device_by_key(self, ds_key, ds_device_id, ds_number):
@@ -1719,7 +1719,7 @@ class DbHelper():
         """
         list_s = self.__session.query(
                             DeviceStats
-                        ).filter_by(key=ucode(ds_key)
+                        ).filter_by(skey=ucode(ds_key)
                         ).filter_by(device_id=ds_device_id
                         ).order_by(sqlalchemy.desc(DeviceStats.date)
                         ).limit(ds_number
@@ -1742,7 +1742,7 @@ class DbHelper():
                 self.__raise_dbhelper_exception("'end_date' can't be prior to 'start_date'")
         query = self.__session.query(
                         DeviceStats
-                    ).filter_by(key=ucode(ds_key)
+                    ).filter_by(skey=ucode(ds_key)
                     ).filter_by(device_id=ds_device_id)
         if start_date_ts:
             query = query.filter("date >= '" + _datetime_string_from_tstamp(start_date_ts)+"'")
@@ -1761,7 +1761,7 @@ class DbHelper():
         """
         return self.__session.query(
                         DeviceStats
-                    ).filter_by(key=ucode(ds_key)
+                    ).filter_by(skey=ucode(ds_key)
                     ).filter_by(device_id=ds_device_id
                     ).order_by(sqlalchemy.desc(DeviceStats.date)
                     ).first()
@@ -1920,11 +1920,11 @@ class DbHelper():
             cond_min = "date >= '" + _datetime_string_from_tstamp(start_date_ts) + "'"
             cond_max = "date < '" + _datetime_string_from_tstamp(end_date_ts) + "'"
             query = sql_query[step_used][self.get_db_type()]
-            query = query.filter_by(key=ucode(ds_key)
+            query = query.filter_by(skey=ucode(ds_key)
                         ).filter_by(device_id=ds_device_id
                         ).filter(cond_min
                         ).filter(cond_max)
-            results_global = sql_query['global'].filter_by(key=ucode(ds_key)
+            results_global = sql_query['global'].filter_by(skey=ucode(ds_key)
                                                ).filter_by(device_id=ds_device_id
                                                ).filter(cond_min
                                                ).filter(cond_max
@@ -1967,7 +1967,7 @@ class DbHelper():
         if not self.__session.query(Device).filter_by(id=ds_device_id).first():
             self.__raise_dbhelper_exception("Couldn't add device stat with device id %s. It does not exist" % ds_device_id)
         device_stat = DeviceStats(date=datetime.datetime.fromtimestamp(ds_timestamp), timestamp=ds_timestamp,
-                                  key=ds_key, value=ds_value, device_id=ds_device_id)
+                                  skey=ds_key, value=ds_value, device_id=ds_device_id)
         self.__session.add(device_stat)
         try:
             self.__session.commit()
@@ -1978,13 +1978,13 @@ class DbHelper():
             stats_list = self.__session.query(
                                     DeviceStats
                                 ).filter_by(device_id=ds_device_id
-                                ).filter_by(key=ucode(ds_key)
+                                ).filter_by(skey=ucode(ds_key)
                                 ).order_by(sqlalchemy.desc(DeviceStats.date))[:hist_size]
             last_date_to_keep = stats_list[len(stats_list)-1].date
             stats_list = self.__session.query(
                                     DeviceStats
                                 ).filter_by(device_id=ds_device_id
-                                ).filter_by(key=ucode(ds_key)
+                                ).filter_by(skey=ucode(ds_key)
                                 ).filter("date < '" + str(last_date_to_keep) + "'"
                                 ).all()
             for stat in stats_list:
@@ -2007,7 +2007,7 @@ class DbHelper():
         self.__session.expire_all()
         query = self.__session.query(DeviceStats).filter_by(device_id=ds_device_id)
         if ds_key:
-            query = query.filter_by(key=ucode(ds_key))
+            query = query.filter_by(skey=ucode(ds_key))
         device_stats_l = query.all()
         for ds in device_stats_l:
             self.__session.delete(ds)
