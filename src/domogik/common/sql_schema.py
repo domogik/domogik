@@ -497,7 +497,7 @@ class DeviceStats(Base):
     date = Column(DateTime, primary_key=True)
     # This is used for mysql compatibility reasons as timestamps are NOT handled in Unix Time format
     timestamp = Column(Integer, nullable=False)
-    key = Column(Unicode(30), primary_key=True)
+    skey = Column(Unicode(30), primary_key=True)
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), nullable=False, primary_key=True)
     device = relation(Device)
     # We have both types for value field because we need an explicit numerical field in case we want to compute
@@ -506,19 +506,19 @@ class DeviceStats(Base):
     __value_num = Column('value_num', Float)
     value = Column('value_str', Unicode(255))
 
-    def __init__(self, date, timestamp, key, device_id, value):
+    def __init__(self, date, timestamp, skey, device_id, value):
         """Class constructor
 
         @param date : date when the stat was recorded
         @param timestamp : corresponding timestamp
-        @param key : key
+        @param skey : key for the stat
         @param device_id : device id
         @param value : stat value (numerical or string)
 
         """
         self.date = date
         self.timestamp = timestamp
-        self.key = ucode(key)
+        self.skey = ucode(skey)
         try:
             self.__value_num = float(value)
         except ValueError:
@@ -532,7 +532,7 @@ class DeviceStats(Base):
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<DeviceStats(date='%s', (%s, %s), device=%s)>" % (self.date, self.key, self.value, self.device)
+        return "<DeviceStats(date='%s', (%s, %s), device=%s)>" % (self.date, self.skey, self.value, self.device)
 
     @staticmethod
     def get_tablename():

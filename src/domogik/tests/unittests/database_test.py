@@ -936,10 +936,10 @@ class DeviceStatsTestCase(GenericTestCase):
         device2 = db.add_device(d_name='device2', d_address='A2', d_type_id=dty1.id, d_usage_id=du1.id)
         ds1 = db.add_device_stat(make_ts(2010, 04, 9, 12, 0), 'val1', 0, device1.id)
         print(ds1)
-        assert ds1.key == 'val1' and ds1.value == '0'
+        assert ds1.skey == 'val1' and ds1.value == '0'
         assert ds1.timestamp == make_ts(2010, 04, 9, 12, 0)
         ds2 = db.add_device_stat(make_ts(2010, 04, 9, 12, 0), 'val_char', 'plop', device1.id)
-        assert ds2.key == 'val_char' and ds2.value == 'plop'
+        assert ds2.skey == 'val_char' and ds2.value == 'plop'
         db.add_device_stat(make_ts(2010, 04, 9, 12, 0), 'val2', 1, device1.id)
         db.add_device_stat(make_ts(2010, 04, 9, 12, 1), 'val1', 2, device1.id)
         db.add_device_stat(make_ts(2010, 04, 9, 12, 1), 'val2', 3, device1.id)
@@ -1011,15 +1011,15 @@ class DeviceStatsTestCase(GenericTestCase):
         for i in range(0, int(end_p - start_p), insert_step):
             db._DbHelper__session.add(
                 DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i), timestamp=start_p + i,
-                            key=u'valm', value=(i/insert_step), device_id=device1.id)
+                            skey=u'valm', value=(i/insert_step), device_id=device1.id)
             )
             db._DbHelper__session.add(
                 DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i), timestamp=start_p + i,
-                            key=u'valm2', value=(i/insert_step+200), device_id=device1.id)
+                            skey=u'valm2', value=(i/insert_step+200), device_id=device1.id)
             )
             db._DbHelper__session.add(
                 DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i), timestamp=start_p + i,
-                            key=u'valm', value=(i/insert_step+100), device_id=device2.id)
+                            skey=u'valm', value=(i/insert_step+100), device_id=device2.id)
             )
         db._DbHelper__session.commit()
 
@@ -1049,7 +1049,7 @@ class DeviceStatsTestCase(GenericTestCase):
         for i in range(0, int(end_p - start_p), insert_step):
             db._DbHelper__session.add(
                 DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i), timestamp=start_p + i,
-                            key=u'valh', value=i/insert_step, device_id=device1.id)
+                            skey=u'valh', value=i/insert_step, device_id=device1.id)
             )
         db._DbHelper__session.commit()
 
@@ -1084,7 +1084,7 @@ class DeviceStatsTestCase(GenericTestCase):
         for i in range(0, int(end_p - start_p), insert_step):
             db._DbHelper__session.add(
                 DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i), timestamp=start_p + i,
-                            key=u'vald', value=i/insert_step, device_id=device1.id)
+                            skey=u'vald', value=i/insert_step, device_id=device1.id)
             )
         db._DbHelper__session.commit()
 
@@ -1115,7 +1115,7 @@ class DeviceStatsTestCase(GenericTestCase):
         for i in range(0, int(end_p - start_p), insert_step):
             db._DbHelper__session.add(
                 DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i), timestamp=start_p + i,
-                            key=u'valw', value=i/insert_step, device_id=device1.id)
+                            skey=u'valw', value=i/insert_step, device_id=device1.id)
             )
         db._DbHelper__session.commit()
 
@@ -1146,7 +1146,7 @@ class DeviceStatsTestCase(GenericTestCase):
         for i in range(0, int(end_p - start_p), insert_step):
             db._DbHelper__session.add(
                 DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i), timestamp=start_p + i,
-                            key=u'valmy', value=i/insert_step, device_id=device1.id)
+                            skey=u'valmy', value=i/insert_step, device_id=device1.id)
             )
         db._DbHelper__session.commit()
         expected_results = {
