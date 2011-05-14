@@ -47,12 +47,35 @@ from domogik.common.configloader import Loader
 # Installer
 ###
 
+def __drop_all_tables(engine):
+    print("Droping all existing tables...")
+    # Only drop the table if it exists
+    sql_schema.DeviceFeatureAssociation.__table__.drop(bind=engine, checkfirst=True)
+    sql_schema.DeviceFeature.__table__.drop(bind=engine, checkfirst=True)    
+    sql_schema.DeviceFeatureModel.__table__.drop(bind=engine, checkfirst=True)
+    sql_schema.DeviceStats.__table__.drop(bind=engine, checkfirst=True)
+    sql_schema.DeviceConfig.__table__.drop(bind=engine, checkfirst=True)
+    sql_schema.Device.__table__.drop(bind=engine, checkfirst=True)
+    sql_schema.DeviceType.__table__.drop(bind=engine, checkfirst=True)
+    sql_schema.DeviceTechnology.__table__.drop(bind=engine, checkfirst=True)
+    sql_schema.DeviceUsage.__table__.drop(bind=engine, checkfirst=True)
+    sql_schema.Room.__table__.drop(bind=engine, checkfirst=True)
+    sql_schema.Area.__table__.drop(bind=engine, checkfirst=True)
+    sql_schema.UserAccount.__table__.drop(bind=engine, checkfirst=True)
+    sql_schema.Person.__table__.drop(bind=engine, checkfirst=True)
+    # Standalone tables (no foreign keys)
+    sql_schema.PluginConfig.__table__.drop(bind=engine, checkfirst=True)
+    sql_schema.SystemConfig.__table__.drop(bind=engine, checkfirst=True)
+    sql_schema.SystemInfo.__table__.drop(bind=engine, checkfirst=True)
+    sql_schema.Trigger.__table__.drop(bind=engine, checkfirst=True)
+    sql_schema.UIItemConfig.__table__.drop(bind=engine, checkfirst=True)
+
 def create_database_from_scratch(url):
     db = database.DbHelper()
     print("Creating production database")
     engine = create_engine(url)
-    print("Droping all existing tables...")
-    sql_schema.metadata.drop_all(engine)
+    #sql_schema.metadata.drop_all(engine)
+    __drop_all_tables(engine)
     print("Creating all tables...")
     sql_schema.metadata.create_all(engine)
 
@@ -101,7 +124,7 @@ def create_database_from_scratch(url):
 
 def install(create_prod_db, create_test_db):
     db = database.DbHelper()
-    print "Using database", db.get_db_type()
+    print("Using database", db.get_db_type())
     url = db.get_url_connection_string()
 
     # For unit tests
@@ -109,6 +132,7 @@ def install(create_prod_db, create_test_db):
         print("Creating test database...")
         test_url = '%s_test' % url
         engine_test = create_engine(test_url)
+        __drop_all_tables(engine_test)
         sql_schema.metadata.drop_all(engine_test)
         sql_schema.metadata.create_all(engine_test)
 
