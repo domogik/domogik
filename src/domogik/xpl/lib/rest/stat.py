@@ -257,10 +257,10 @@ class StatsManager:
                 print "Stat for techno '%s' / adress '%s' / id '%s'" % (self._technology, device, d_id)
             except AttributeError:
                 if self._res["device"] != None:
-                    self._log_stats_unknown.info("Received a stat for an unreferenced device : %s - %s" \
+                    self._log_stats_unknown.debug("Received a stat for an unreferenced device : %s - %s" \
                         % (self._technology, message.data[self._res["device"]]))
                 else:
-                    self._log_stats_unknown.info("Received a stat for an unreferenced device : %s - %s" \
+                    self._log_stats_unknown.debug("Received a stat for an unreferenced device : %s - %s" \
                         % (self._technology, self._res["static_device"]))
                 print "=> unknown device"
                 return
