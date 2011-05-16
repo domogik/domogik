@@ -40,6 +40,7 @@ from xml.dom import minidom
 import traceback
 from xml.sax.saxutils import escape
 import urllib2
+import datetime
 
 
 
@@ -95,6 +96,10 @@ class PackageXml():
             self.desc = self.xml_content.getElementsByTagName("description")[0].firstChild.nodeValue.strip()
             self.detail = self.xml_content.getElementsByTagName("detail")[0].firstChild.nodeValue.strip()
             self.release = self.xml_content.getElementsByTagName("version")[0].firstChild.nodeValue.strip()
+            try:
+                self.generated = self.xml_content.getElementsByTagName("generated")[0].firstChild.nodeValue.strip()
+            except:
+                self.generated = "n/a"
             self.doc = self.xml_content.getElementsByTagName("documentation")[0].firstChild.nodeValue.strip()
             self.author = self.xml_content.getElementsByTagName("author")[0].firstChild.nodeValue.strip()
             self.email = self.xml_content.getElementsByTagName("author-email")[0].firstChild.nodeValue.strip()
@@ -225,6 +230,19 @@ class PackageXml():
         new_elt.setAttribute("priority", priority)
         top_elt.appendChild(new_elt)
         cache_file = open("%s/%s" % (cache_folder, self.xml_filename), "w") 
+        cache_file.write(self.xml_content.toxml().encode("utf-8"))
+        cache_file.close()
+
+    def set_generated(self, xml_path):
+        """ Add generation date info in xml data
+            @param xml_path : path to xml file
+        """
+        top_elt = self.xml_content.documentElement
+        new_elt = self.xml_content.createElement('generated')
+        text = self.xml_content.createTextNode(str(datetime.datetime.now()))
+        new_elt.appendChild(text)
+        top_elt.appendChild(new_elt)
+        cache_file = open(xml_path, "w") 
         cache_file.write(self.xml_content.toxml().encode("utf-8"))
         cache_file.close()
 

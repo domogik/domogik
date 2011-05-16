@@ -118,11 +118,20 @@ class PackageManager():
                 self.log("Exiting...")
                 return
 
+        # Copy xml file in a temporary location in order to complete it
+        xml_tmp_file = "%s/plugin-%s-%s.xml" % (tempfile.gettempdir(),
+                                                plg_xml.name,
+                                                plg_xml.release)
+        shutil.copyfile(plg_xml.info_file, xml_tmp_file)
+        
+        # Update info.xml with generation date
+        plg_xml.set_generated(xml_tmp_file)
+
         # Create .tgz
         self._create_tar_gz("plugin-%s-%s" % (plg_xml.name, plg_xml.release), 
                             output_dir,
                             plg_xml.files, 
-                            plg_xml.info_file)
+                            xml_tmp_file)
 
 
     def _create_tar_gz(self, name, output_dir, files, info_file = None):
@@ -419,6 +428,7 @@ class PackageManager():
 
     def list_packages(self):
         """ List all packages in cache folder 
+            Used for printing on command line
         """
         pkg_list = []
         for root, dirs, files in os.walk(REPO_CACHE_DIR):
@@ -439,6 +449,7 @@ class PackageManager():
     def get_packages_list(self):
         """ List all packages in cache folder 
             and return a detailed list
+            Used by Rest
         """
         pkg_list = []
         for root, dirs, files in os.walk(REPO_CACHE_DIR):
@@ -448,6 +459,7 @@ class PackageManager():
                                  "type" : pkg_xml.type,
                                  "fullname" : pkg_xml.fullname,
                                  "release" : pkg_xml.release,
+                                 "genrated" : pkg_xml.generated,
                                  "techno" : pkg_xml.techno,
                                  "doc" : pkg_xml.doc,
                                  "desc" : pkg_xml.desc,
