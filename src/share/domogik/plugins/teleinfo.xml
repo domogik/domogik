@@ -7,6 +7,7 @@
   <documentation>http://wiki.domogik.org/plugin_teleinfo</documentation>
   <author>Maxence Dunnewind</author>
   <author-email>maxence at dunnewind.net</author-email>
+  <domogik-min-version>0.1.0</domogik-min-version>
   <configuration-keys>
     <key>
       <order-id>0</order-id>

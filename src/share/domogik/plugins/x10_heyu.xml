@@ -7,6 +7,7 @@
   <documentation>http://wiki.domogik.org/plugin_x10_heyu</documentation>
   <author>Maxence Dunnewind, Mirelsol</author>
   <author-email>maxence at dunnewind.net; marc at mirelsol.org</author-email>
+  <domogik-min-version>0.1.0</domogik-min-version>
   <configuration-keys>
     <key>
       <order-id>0</order-id>

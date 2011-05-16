@@ -7,6 +7,7 @@
   <documentation>https://wiki.domogik.org/plugin_xpl_time</documentation>
   <author>Fritz</author>
   <author-email>fritz.smh at gmail.com</author-email>
+  <domogik-min-version>0.1.0</domogik-min-version>
   <configuration-keys>
     <key>
       <order-id>0</order-id>
