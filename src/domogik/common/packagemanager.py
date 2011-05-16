@@ -419,6 +419,7 @@ class PackageManager():
 
     def list_packages(self):
         """ List all packages in cache folder 
+            Used for printing on command line
         """
         pkg_list = []
         for root, dirs, files in os.walk(REPO_CACHE_DIR):
@@ -439,6 +440,7 @@ class PackageManager():
     def get_packages_list(self):
         """ List all packages in cache folder 
             and return a detailed list
+            Used by Rest
         """
         pkg_list = []
         for root, dirs, files in os.walk(REPO_CACHE_DIR):
@@ -448,6 +450,7 @@ class PackageManager():
                                  "type" : pkg_xml.type,
                                  "fullname" : pkg_xml.fullname,
                                  "release" : pkg_xml.release,
+                                 "genrated" : pkg_xml.generated,
                                  "techno" : pkg_xml.techno,
                                  "doc" : pkg_xml.doc,
                                  "desc" : pkg_xml.desc,

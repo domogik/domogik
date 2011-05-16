@@ -95,6 +95,10 @@ class PackageXml():
             self.desc = self.xml_content.getElementsByTagName("description")[0].firstChild.nodeValue.strip()
             self.detail = self.xml_content.getElementsByTagName("detail")[0].firstChild.nodeValue.strip()
             self.release = self.xml_content.getElementsByTagName("version")[0].firstChild.nodeValue.strip()
+            try:
+                self.generated = self.xml_content.getElementsByTagName("generated")[0].firstChild.nodeValue.strip()
+            except:
+                self.generated = "n/a"
             self.doc = self.xml_content.getElementsByTagName("documentation")[0].firstChild.nodeValue.strip()
             self.author = self.xml_content.getElementsByTagName("author")[0].firstChild.nodeValue.strip()
             self.email = self.xml_content.getElementsByTagName("author-email")[0].firstChild.nodeValue.strip()
