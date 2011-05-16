@@ -103,6 +103,11 @@ class PackageXml():
             self.doc = self.xml_content.getElementsByTagName("documentation")[0].firstChild.nodeValue.strip()
             self.author = self.xml_content.getElementsByTagName("author")[0].firstChild.nodeValue.strip()
             self.email = self.xml_content.getElementsByTagName("author-email")[0].firstChild.nodeValue.strip()
+            try:
+                self.domogik_min_release = self.xml_content.getElementsByTagName("domogik-min-release")[0].firstChild.nodeValue.strip()
+            except:
+                # if no restriction, compatible since 0.1.0 (first release)
+                self.domogik_min_release = "0.1.0"
 
             # hardware specific
             if self.type == "hardware":
@@ -250,17 +255,18 @@ class PackageXml():
         """ Display xml data in a fine way
         """
         print("---- Plugin informations --------------------------------")
-        print("Type           : %s" % self.type)
-        print("Name           : %s" % self.name)
-        print("Full name      : %s" % self.fullname)
-        print("Release        : %s" % self.release)
-        print("Technology     : %s" % self.techno)
-        print("Link for doc   : %s" % self.doc)
-        print("Description    : %s" % self.desc)
-        print("Detail         : %s" % self.detail)
-        print("Author         : %s" % self.author)
-        print("Author's email : %s" % self.email)
-        print("----- Plugin dependencies -------------------------------")
+        print("Type                : %s" % self.type)
+        print("Name                : %s" % self.name)
+        print("Full name           : %s" % self.fullname)
+        print("Release             : %s" % self.release)
+        print("Technology          : %s" % self.techno)
+        print("Link for doc        : %s" % self.doc)
+        print("Description         : %s" % self.desc)
+        print("Detail              : %s" % self.detail)
+        print("Author              : %s" % self.author)
+        print("Author's email      : %s" % self.email)
+        print("Domogik min release : %s" % self.domogik_min_release)
+        print("----- Python dependencies -------------------------------")
         for dep in self.dependencies:
             print("- %s" % dep["name"])
         print("----- Plugin files --------------------------------------")
@@ -268,9 +274,9 @@ class PackageXml():
             print("- %s" % my_file["path"])
         if self.package_url != None:
             print("----- Repository informations ---------------------------")
-            print("Package path   : %s" % self.package_url)
-            print("Xml path       : %s" % self.xml_url)
-            print("Priority       : %s" % self.priority)
+            print("Package path        : %s" % self.package_url)
+            print("Xml path            : %s" % self.xml_url)
+            print("Priority            : %s" % self.priority)
         print("---------------------------------------------------------")
 
 if __name__ == "__main__":
