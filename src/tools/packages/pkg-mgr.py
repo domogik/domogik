@@ -333,7 +333,7 @@ class PackageManager():
             raise PackageException("Error while installing package '%s' : %s" % (path, traceback.format_exc()))
 
         # insert data in database
-        pkg_data = PackageData("%s/info.xml" % my_tmp_dir, custom_path = "/home/%s/.domogik.cfg" % self.dmg_user)
+        pkg_data = PackageData("%s/info.xml" % my_tmp_dir, custom_path = "/home/%s/.domogik/domogik.cfg" % self.dmg_user)
         pkg_data.insert()
 
         print("Package installation finished")
@@ -548,7 +548,7 @@ class PackageManager():
         return False
 
     def get_config_path(self):
-        """ get .domogik.cfg full path
+        """ get .domogik/domogik.cfg full path
         """
         try:
             file = open(DOMOGIK_DEFAULT, "r")

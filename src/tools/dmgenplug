@@ -25,7 +25,7 @@
 # Enable a plugin
 
 function get_user {
-if [ -f "/etc/default/domogik" ];then
+    if [ -f "/etc/default/domogik" ];then
         eval $(grep USER /etc/default/domogik)
     elif [ -f "/etc/conf.d/domogik" ];then
         eval $(grep USER /etc/conf.d/domogik)
@@ -34,7 +34,7 @@ if [ -f "/etc/default/domogik" ];then
 }
 
 function plugin_exists {
-    grep -qs "^$PLUGIN *=" $DMG_HOME/.domogik.cfg
+    grep -qs "^$PLUGIN *=" $DMG_HOME/.domogik/domogik.cfg
     EXISTS=$?
 }
 
@@ -47,9 +47,9 @@ Enables a plugin.\n
 
 function enable {
     if [ $EXISTS -eq 1 ];then
-        sed -i "s/^\[plugins\].*$/[plugins]\n$PLUGIN = enabled/" $DMG_HOME/.domogik.cfg
+        sed -i "s/^\[plugins\].*$/[plugins]\n$PLUGIN = enabled/" $DMG_HOME/.domogik/domogik.cfg
     else
-        sed -i "s/^$PLUGIN *=.*$/$PLUGIN = enabled/" $DMG_HOME/.domogik.cfg
+        sed -i "s/^$PLUGIN *=.*$/$PLUGIN = enabled/" $DMG_HOME/.domogik/domogik.cfg
     fi
 }
 

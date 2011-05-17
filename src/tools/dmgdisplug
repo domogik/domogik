@@ -34,7 +34,7 @@ function get_user {
 }
 
 function plugin_exists {
-    grep -qs "^$PLUGIN *=" $DMG_HOME/.domogik.cfg
+    grep -qs "^$PLUGIN *=" $DMG_HOME/.domogik/domogik.cfg
     EXISTS=$?
 }
 
@@ -45,7 +45,7 @@ Disables a plugin."
 }
 
 function disable {
-    sed -i "s/^$PLUGIN *=.*$/$PLUGIN =/" $DMG_HOME/.domogik.cfg
+    sed -i "s/^$PLUGIN *=.*$/$PLUGIN =/" $DMG_HOME/.domogik/domogik.cfg
 }
 
 #check params

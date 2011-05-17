@@ -136,7 +136,7 @@ class Rest(XplPlugin):
     
             ### Config
     
-            # directory data in ~/.domogik.cfg
+            # directory data in ~/.domogik/domogik.cfg
             cfg = Loader('domogik')
             config = cfg.load()
             conf = dict(config[1])
@@ -766,6 +766,6 @@ class RestHandler(BaseHTTPRequestHandler):
 
 
 if __name__ == '__main__':
-    # Create REST server with default values (overriden by ~/.domogik.cfg)
+    # Create REST server with default values (overriden by ~/.domogik/domogik.cfg)
     REST = Rest("127.0.0.1", "8080")
 

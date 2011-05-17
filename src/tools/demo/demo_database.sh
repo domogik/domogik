@@ -6,8 +6,8 @@
 #
 
 
-db_type=$(grep db_type ~/.domogik.cfg | cut -d"=" -f2 -s | sed "s/ //g")
-db_path=$(grep db_path ~/.domogik.cfg | cut -d"=" -f2 -s | sed "s/ //g")
+db_type=$(grep db_type ~/.domogik/domogik.cfg | cut -d"=" -f2 -s | sed "s/ //g")
+db_path=$(grep db_path ~/.domogik/domogik.cfg | cut -d"=" -f2 -s | sed "s/ //g")
 timestamp=$(date +"%Y%m%d-%H%M")
 file_in=./demo-data.txt
 
