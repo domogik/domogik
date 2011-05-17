@@ -41,6 +41,7 @@ void setColorOff() {
     Serial.println("call setColorOff");
     Serial.println("Off");
     setColorFromRGB(0, 0, 0);
+    isOff = true;
 }
 
 
@@ -102,6 +103,7 @@ void setColorFromRGB(int redValue, int greenValue, int blueValue) {
     Serial.print("i have set color : ");
     Serial.println(color);
     sendXplTrigForSetColor(color);
+    isOff = false;
     delay(100);
     return;   
 }

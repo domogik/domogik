@@ -68,7 +68,9 @@ unsigned int xplPort = 3865;
 #define ANALOG_CONTROL A0
 
 // define button pin
-#define BUTTON_CONTROL 1
+#define BUTTON_CONTROL 8
+
+int isOff = true;
 
 /********************* time management **********************/
 
@@ -87,7 +89,6 @@ float hue = 0;
 
 // button control value
 int buttonControlValue = 0;
-int oldButtonControlValue = 0;
 
 
 // UDP related vars
@@ -128,7 +129,6 @@ void setup() {
     pinMode(BLUE_PIN, OUTPUT);
 
     pinMode(BUTTON_CONTROL, INPUT);
-    buttonControlValue = 
     
     // read anallog control value
     analogControlValue = analogRead(ANALOG_CONTROL);
@@ -164,15 +164,16 @@ void loop() {
  
     /**** switch management ****/
     buttonControlValue = digitalRead(BUTTON_CONTROL);
-    if (buttonControlValue != oldButtonControlValue) {
-        if (buttonControlValue == LOW) {
+    if (buttonControlValue == HIGH) {
+        if (isOff == true) {
             setColorOn();
+            Serial.println("button on");
         }
         else {
             setColorOff();
+            Serial.println("button off");
         }
-        oldButtonControlValue = buttonControlValue;
-        delay(100);
+        delay(300);
       
     }
  
