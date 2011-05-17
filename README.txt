@@ -22,6 +22,5 @@ along with Domogik.  If not, see <http://www.gnu.org/licenses/>.
 See : http://wiki.domogik.org/EndUserDocumentation
 
 *** IMPORTANT NOTE TO beta users ***
-If you are upgrading from a previous beta version to the current rc1, 
-then you have to run the upgrade_to_rc1.sql script before starting Domogik
-It will ensure to keep your stats values.
+1) run ./install.sh. Don't upgrade your database, if you wan't to keep your data!!!
+2) run the upgrade_to_rc1.sql script before starting Domogik. It will ensure to keep your stats values.
