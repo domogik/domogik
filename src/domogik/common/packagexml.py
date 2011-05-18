@@ -44,7 +44,8 @@ import datetime
 
 
 
-PLG_XML_PATH = "share/domogik/plugins/"
+PLUGIN_XML_PATH = "share/domogik/plugins/"
+HARDWARE_XML_PATH = "share/domogik/hardwares/"
 
 class PackageException(Exception):
     """
@@ -60,11 +61,13 @@ class PackageException(Exception):
 
 
 class PackageXml():
-    def __init__(self, name = None, url = None, path = None):
+    def __init__(self, name = None, url = None, path = None, type = "plugin"):
         """ Read xml file of a plugin and make an object from it
             @param name : name of plugin
             @param url : url of xml file
             @param path : path of xml file
+            @param type : package type (default : 'plugin')
+                          To use only with name != None
         """
         xml_file = None
         try:
@@ -74,17 +77,23 @@ class PackageXml():
                 config = cfg.load()
                 conf = dict(config[1])
 
-                xml_plugin_directory = "%s/%s" % (conf['custom_prefix'], PLG_XML_PATH)
-                xml_file = "%s/%s.xml" % (xml_plugin_directory, name)
+                if type == "plugin":
+                    xml_directory = "%s/%s" % (conf['custom_prefix'], PLUGIN_XML_PATH)
+                elif type == "hardware":
+                    xml_directory = "%s/%s" % (conf['custom_prefix'], HARDWARE_XML_PATH)
+                else:
+                    raise PackageException("Type '%s' doesn't exists" % type)
+                xml_file = "%s/%s.xml" % (xml_directory, name)
+
                 self.info_file = xml_file
                 self.xml_content = minidom.parse(xml_file)
     
-            if path != None:
+            elif path != None:
                 xml_file = path
                 self.info_file = xml_file
                 self.xml_content = minidom.parse(xml_file)
 
-            if url != None:
+            elif url != None:
                 xml_file = url
                 self.info_file = xml_file
                 xml_data = urllib2.urlopen(xml_file)
@@ -149,6 +158,21 @@ class PackageXml():
             for my_file in xml_data.getElementsByTagName("file"):
                data = {"path" :  my_file.attributes.get("path").value.strip()}
                self.files.append(data)
+
+            # list of external files
+            self.external_files = []
+            try:
+                xml_data = self.xml_content.getElementsByTagName("external_files")[0]
+                for my_file in xml_data.getElementsByTagName("file"):
+                   data = {"path" :  my_file.attributes.get("path").value.strip()}
+                   self.external_files.append(data)
+            except:
+                pass
+
+            # all files
+            self.all_files = list(self.files)
+            self.all_files.extend(self.external_files)
+
             # list of dependencies
             self.dependencies = []
             xml_data = self.xml_content.getElementsByTagName("dependencies")[0]
@@ -254,12 +278,15 @@ class PackageXml():
     def display(self):
         """ Display xml data in a fine way
         """
-        print("---- Plugin informations --------------------------------")
+        print("---- Package informations -------------------------------")
         print("Type                : %s" % self.type)
         print("Name                : %s" % self.name)
         print("Full name           : %s" % self.fullname)
         print("Release             : %s" % self.release)
         print("Technology          : %s" % self.techno)
+        if self.type == "hardware":
+            print("xPL vendor id       : %s" % self.vendor_id)
+            print("xPL device id       : %s" % self.device_id)
         print("Link for doc        : %s" % self.doc)
         print("Description         : %s" % self.desc)
         print("Detail              : %s" % self.detail)
@@ -269,8 +296,11 @@ class PackageXml():
         print("----- Python dependencies -------------------------------")
         for dep in self.dependencies:
             print("- %s" % dep["name"])
-        print("----- Plugin files --------------------------------------")
+        print("----- Package files -------------------------------------")
         for my_file in self.files:
+            print("- %s" % my_file["path"])
+        print("----- Package external files ----------------------------")
+        for my_file in self.external_files:
             print("- %s" % my_file["path"])
         if self.package_url != None:
             print("----- Repository informations ---------------------------")

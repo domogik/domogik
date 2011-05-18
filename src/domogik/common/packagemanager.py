@@ -138,7 +138,59 @@ class PackageManager():
         # Create .tgz
         self._create_tar_gz("plugin-%s-%s" % (plg_xml.name, plg_xml.release), 
                             output_dir,
-                            plg_xml.files, 
+                            plg_xml.all_files, 
+                            xml_tmp_file)
+
+    def _create_package_for_hardware(self, name, output_dir, force):
+        """ Create package for a hardware
+            1. read xml file to get informations and list of files
+            2. generate package
+            @param name : name of hardware
+            @param output_dir : target directory for package
+            @param force : False : ask for confirmation
+        """
+        self.log("Hardware name : %s" % name)
+
+        try:
+            plg_xml = PackageXml(name, type = "hardware")
+        except:
+            self.log(str(traceback.format_exc()))
+            return
+        self.log("Xml file OK")
+
+        # check type == hardware
+        if plg_xml.type != "hardware":
+            self.log("Error : this package is not a hardware")
+            return
+
+        # display hardware informations
+        plg_xml.display()
+
+        # check file existence
+        if plg_xml.files == []:
+            self.log("There is no file defined : the package won't be created")
+            return
+
+        if force == False:
+            self.log("\nAre these informations OK ?")
+            resp = raw_input("[o/N]")
+            if resp.lower() != "o":
+                self.log("Exiting...")
+                return
+
+        # Copy xml file in a temporary location in order to complete it
+        xml_tmp_file = "%s/hardware-%s-%s.xml" % (tempfile.gettempdir(),
+                                                plg_xml.name,
+                                                plg_xml.release)
+        shutil.copyfile(plg_xml.info_file, xml_tmp_file)
+        
+        # Update info.xml with generation date
+        plg_xml.set_generated(xml_tmp_file)
+
+        # Create .tgz
+        self._create_tar_gz("hardware-%s-%s" % (plg_xml.name, plg_xml.release), 
+                            output_dir,
+                            plg_xml.all_files, 
                             xml_tmp_file)
 
 
@@ -189,13 +241,13 @@ class PackageManager():
                 return status
             path = pkg.package_url
 
-        # get plugin name
+        # get package name
         full_name = os.path.basename(path)
 
         # twice to remove first .gz and then .tar
         name =  os.path.splitext(full_name)[0]
         name =  os.path.splitext(name)[0] 
-        self.log("Plugin name : %s" % name)
+        self.log("hardware name : %s" % name)
 
         # get temp dir to extract data
         my_tmp_dir_dl = "%s/%s" % (tempfile.gettempdir(), TMP_EXTRACT_DIR)
@@ -253,7 +305,10 @@ class PackageManager():
         # install plugin in $HOME
         self.log("Installing package (plugin)...")
         try:
-            self._install_plugin(my_tmp_dir, INSTALL_PATH)
+            if pkg_xml.type in ('plugin', 'hardware'):
+                self._install_plugin_or_hardware(my_tmp_dir, INSTALL_PATH, pkg_xml.type)
+            else:
+                raise "Package type '%s' not installable" % pkg_xml.type
         except:
             msg = "Error while installing package : %s" % (traceback.format_exc())
             self.log(msg)
@@ -284,36 +339,39 @@ class PackageManager():
         tar.close()
 
 
-    def _install_plugin(self, pkg_dir, install_path):
+    def _install_plugin_or_hardware(self, pkg_dir, install_path, type):
         """ Install plugin
             @param pkg_dir : directory where package is extracted
             @param install_path : path where we install packages
+            @param type : plugin, hardware
         """
 
         ### create needed directories
         # create install directory
-        self.log("Creating directories for plugin...")
-        plg_path = "%s/plugins/" % install_path
+        self.log("Creating directories for %s..." % type)
+        plg_path = "%s/%ss/" % (install_path, type)
         try:
             if os.path.isdir(plg_path) == False:
                 os.makedirs(plg_path)
         except:
-            msg = "Error while creating plugin folder '%s' : %s" % (plg_path, traceback.format_exc())
+            msg = "Error while creating %s folder '%s' : %s" % (type, plg_path, traceback.format_exc())
             self.log(msg)
             raise PackageException(msg)
 
         ### copy files
-        self.log("Copying files for plugin...")
+        self.log("Copying files for %s..." % type)
         try:
             copytree("%s/src/domogik/xpl" % pkg_dir, "%s/xpl" % plg_path, self.log)
             self._create_init_py("%s/xpl/" % plg_path)
             self._create_init_py("%s/xpl/bin/" % plg_path)
             self._create_init_py("%s/xpl/lib/" % plg_path)
             copytree("%s/src/share/domogik" % pkg_dir, "%s/" % plg_path, self.log)
+            copytree("%s/src/external/" % pkg_dir, "%s/external" % plg_path, self.log)
         except:
-            msg = "Error while copying plugin files : %s" % (traceback.format_exc())
+            msg = "Error while copying %s files : %s" % (type, traceback.format_exc())
             self.log(msg)
             raise PackageException(msg)
+
 
     def _create_init_py(self, path):
         """ Create __init__.py file in path
@@ -322,8 +380,13 @@ class PackageManager():
         try:
             self.log("Create __init__.py file in %s" % path)
             open("%s/__init__.py" % path, "a").close()
+        except IOError as (errno, strerror):
+            if errno == 2:
+                self.log("No directory '%s'" % path)
+                return
+            raise
         except:
-            msg = "Error while crating __init__.py file in %s : %s" % (path, traceback.format_exc())
+            msg = "Error while creating __init__.py file in %s : %s" % (path, traceback.format_exc())
             self.log(msg)
             raise PackageException(msg)
 
@@ -605,7 +668,13 @@ def copytree(src, dst, cb_log):
     XXX Consider this example code rather than the ultimate tool.
 
     """
-    names = os.listdir(src)
+    try:
+        names = os.listdir(src)
+    except OSError as (errno, strerror):
+        if errno == 2:
+            cb_log("No data for '%s'" % src)
+            return
+        raise
 
     try:
         os.makedirs(dst)
