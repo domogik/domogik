@@ -60,6 +60,7 @@ import shutil
 import mimetypes
 from threading import Event
 from Queue import Empty
+import sys
 
 
 # Time we wait for answers after a multi host list command
@@ -299,8 +300,11 @@ class ProcessRequest():
 
         # Description and parameters
         info = {}
-        info["Version"] = self._rest_api_version
+        info["REST API release"] = self._rest_api_version
         info["SSL"] = self.use_ssl
+        __import__("domogik")
+        dmg = sys.modules["domogik"]
+        info["Domogik release"] = dmg.__version__
 
         # Xml command files
         command = {}
