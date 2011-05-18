@@ -192,7 +192,7 @@ class JSonHelper():
 
             for key in data.__dict__:
                 sub_data_key = key
-                sub_data = getattr(dict, key)
+                sub_data = getattr(data, key)
                 sub_data_type = type(sub_data).__name__
                 #print "    DATA KEY : " + str(sub_data_key)
                 #print "    DATA : " + str(sub_data)
@@ -205,7 +205,7 @@ class JSonHelper():
             data_json += "{" 
             for key in data.__dict__: 
                 sub_data_key = key 
-                sub_data = getattr(dict, key)
+                sub_data = getattr(data, key)
                 sub_data_type = type(sub_data).__name__ 
                 #print "    DATA KEY : " + str(sub_data_key) 
                 #print "    DATA : " + unicode(sub_data) 
