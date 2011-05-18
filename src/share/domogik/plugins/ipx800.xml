@@ -15,7 +15,7 @@ Supported features :
   <documentation>http://wiki.domogik.org/plugin_ipx800</documentation>
   <author>Fritz</author>
   <author-email>fritz.smh at gmail.com</author-email>
-  <domogik-min-version>0.1.0</domogik-min-version>
+  <domogik-min-version>0.1.1</domogik-min-version>
   <configuration-keys>
     <key>
       <order-id>0</order-id>

@@ -104,7 +104,7 @@ class PackageXml():
             self.author = self.xml_content.getElementsByTagName("author")[0].firstChild.nodeValue.strip()
             self.email = self.xml_content.getElementsByTagName("author-email")[0].firstChild.nodeValue.strip()
             try:
-                self.domogik_min_release = self.xml_content.getElementsByTagName("domogik-min-release")[0].firstChild.nodeValue.strip()
+                self.domogik_min_release = self.xml_content.getElementsByTagName("domogik-min-version")[0].firstChild.nodeValue.strip()
             except:
                 # if no restriction, compatible since 0.1.0 (first release)
                 self.domogik_min_release = "0.1.0"

@@ -48,6 +48,7 @@ import pwd
 from subprocess import Popen
 import urllib
 import shutil
+import sys
 from domogik.common import logger
 
 
@@ -59,9 +60,16 @@ REPO_SRC_FILE = "%s/.domogik/sources.list" % os.getenv("HOME")
 REPO_LST_FILE = "packages.lst"
 REPO_LST_FILE_HEADER = "Domogik repository"
 REPO_CACHE_DIR = "%s/.domogik/cache" % os.getenv("HOME")
-INSTALL_PATH = "%s/.domogik/" % os.getenv("HOME")
-PLUGIN_XML_PATH = "%s/plugins/plugins" % INSTALL_PATH
 
+cfg = Loader('domogik')
+config = cfg.load()
+conf = dict(config[1])
+if conf.has_key('package_path'):
+    INSTALL_PATH = conf['package_path']
+else:
+    INSTALL_PATH = "%s/.domogik/" % os.getenv("HOME")
+
+PLUGIN_XML_PATH = "%s/plugins/plugins" % INSTALL_PATH
 
 class PackageManager():
     """ Tool to create packages
@@ -218,6 +226,19 @@ class PackageManager():
             self.log(msg)
             raise PackageException(msg)
         self.log("Package successfully extracted.")
+
+        # get xml informations
+        pkg_xml = PackageXml(path = "%s/info.xml" % my_tmp_dir)
+
+        # check compatibility with domogik installed release
+        __import__("domogik")
+        dmg = sys.modules["domogik"]
+        self.log("Domogik release = %s" % dmg.__version__)
+        self.log("Package compatibility = %s" % pkg_xml.domogik_min_release)
+        if pkg_xml.domogik_min_release < dmg.__version__:
+            msg = "This package needs a Domogik release >= %s. Actual is %s. Installation ABORTED!" % (pkg_xml.domogik_min_release, dmg.__version__)
+            self.log(msg)
+            raise PackageException(msg)
 
         # create install directory
         self.log("Creating install directory : %s" % INSTALL_PATH)
