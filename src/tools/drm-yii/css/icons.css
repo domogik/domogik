@@ -1,0 +1,10 @@
+.icon16 {
+    display:inline-block;
+    height:16px;
+    width:16px;
+    background-position: 50% 50%;
+    background-repeat:no-repeat;
+}
+
+.icon16-true { background-image:url(../images/true_16.png);}
+.icon16-false { background-image:url(../images/false_16.png);}
