@@ -4,7 +4,7 @@ ADOUBLE_VER:v2
 CNIDBACKEND:dbd
 CNIDDBDHOST:localhost
 CNIDDBDPORT:4700
-CNID_DBPATH:/domogik/src/tools/drm-yii
+CNID_DBPATH:/domogik/repository/src/tools/drm-yii
 VOLUME_OPTS:CACHEID 
 VOLCASEFOLD:
 EXTATTRTYPE:AFPVOL_EA_AD
