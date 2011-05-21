@@ -1,0 +1,46 @@
+<package type="hardware">
+  <name>rfxcom_xpl</name>
+  <technology>rfxcom</technology>
+  <description>RFXCOM with xpl support</description>
+  <detail></detail>
+  <version>0.1.0</version>
+  <documentation>http://wiki.domogik.org/</documentation>
+  <author>Ferllings</author>
+  <author-email>ferllings at gmail.com</author-email>
+  <vendor-id>rfxcom</vendor-id>
+  <device-id>lan</device-id>
+  <domogik-min-version>0.1.0</domogik-min-version>
+  <configuration-keys/>
+  <files>
+    <file path="src/share/domogik/hardwares/rfxcom_xpl.xml"/>
+    <file path="src/share/domogik/stats/rfxcom/sensor.basic-rfxcom"/>
+  </files>
+  <dependencies/>
+  <device_technology>
+      <id>rfxcom</id>
+      <name>RFXCom</name>
+      <description>RFXCom</description>
+  </device_technology>
+  <device_types>
+      <device_type>
+          <id>rfxcom.th2</id>
+          <device_technology_id>rfxcom</device_technology_id>
+          <name>Inside Temp-Hygro</name>
+          <description>Oregon-THGR810</description>
+      </device_type>
+  </device_types>
+  <device_feature_models>
+      <device_feature_model>
+          <id>rfxcom.th2.temperature</id>
+          <name>Temperature</name>
+          <feature_type>sensor</feature_type>
+          <device_type_id>rfxcom.th2</device_type_id>
+          <parameters>
+              {&quot;unit&quot;:&quot;\u00B0C&quot;}
+          </parameters>
+          <value_type>number</value_type>
+          <stat_key>temperature</stat_key>
+          <return_confirmation>0</return_confirmation>
+      </device_feature_model>
+  </device_feature_models>
+</package>

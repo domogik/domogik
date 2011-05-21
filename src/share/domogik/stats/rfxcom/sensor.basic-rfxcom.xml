@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<statistic technology="rfxcom">
+    <schema name="sensor.basic">
+        <xpltype type="xpl-trig">
+            <listener>
+                <filter>
+                    <key name="type" value="temp"/>
+                    <key name="type" value="humidity"/>
+                </filter>
+            </listener>
+            <mapping>
+                <device field="device"/>
+                <value field="current" new_name="temperature" 
+                       filter_key="type" filter_value="temp" />
+                <value field="current" new_name="humidity" 
+                       filter_key="type" filter_value="humidity" />
+            </mapping>
+        </xpltype>
+    </schema>
+</statistic>
+
