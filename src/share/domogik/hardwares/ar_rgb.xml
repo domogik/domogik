@@ -26,6 +26,25 @@
     <file path="src/external/hardwares/ar_rgb/time.pde"/>
     <file path="src/external/hardwares/ar_rgb/xpl.pde"/>
   </external_files>
+  <external_description>
+This hardware plugin is a xPL program for arduino which manage RGB led strips.
+
+Open the following files as a sketchbook with the Arduino Java IDE :
+- ar_rgb.pde
+- rgb.pde
+- time.pde
+- xpl.pde
+- memoryfree.cpp
+- memoryfree.h
+
+Configure parameters in ar_rgb.pde
+- network 
+- used pins
+
+Upload project to Arduino with the IDE
+
+Test it with the manual controllers (push button and potentiometer) and then create a device and test it with Domogik
+  </external_description>
   <dependencies/>
   <device_technology>
       <id>arduino</id>
