@@ -4,16 +4,71 @@
         <xpltype type="xpl-trig">
             <listener>
                 <filter>
+                    <key name="type" value="battery"/>
                     <key name="type" value="temp"/>
                     <key name="type" value="humidity"/>
+                    <key name="type" value="pressure"/>
+                    <key name="type" value="gust"/>
+                    <key name="type" value="average-speed"/>
+                    <key name="type" value="direction"/>
+                    <key name="type" value="uv"/>
+                    <key name="type" value="rainrate"/>
+                    <key name="type" value="raintotal"/>
+                    <key name="type" value="current"/>
+                    <key name="type" value="power"/>
+                    <key name="type" value="energy"/>
+                    <key name="type" value="temp"/>
+                    <key name="type" value="voltage"/>
+                    <key name="type" value="count"/>
+                    <key name="type" value="temp"/>
+                    <key name="type" value="setpoint"/>
+                    <key name="type" value="demand"/>
                 </filter>
             </listener>
             <mapping>
                 <device field="device"/>
+                <value field="current" new_name="battery" 
+                       filter_key="type" filter_value="battery" />
                 <value field="current" new_name="temperature" 
                        filter_key="type" filter_value="temp" />
                 <value field="current" new_name="humidity" 
                        filter_key="type" filter_value="humidity" />
+                <value field="description" new_name="humidity-desc" 
+                       filter_key="type" filter_value="humidity" />
+                <value field="current" new_name="pressure" 
+                       filter_key="type" filter_value="pressure" />
+                <value field="forcast" new_name="forcast" 
+                       filter_key="type" filter_value="pressure" />
+                <value field="current" new_name="gust" 
+                       filter_key="type" filter_value="gust" />
+                <value field="current" new_name="average-speed" 
+                       filter_key="type" filter_value="average-speed" />
+                <value field="current" new_name="direction" 
+                       filter_key="type" filter_value="direction" />
+                <value field="current" new_name="uv" 
+                       filter_key="type" filter_value="uv" />
+                <value field="current" new_name="rainrate" 
+                       filter_key="type" filter_value="rainrate" />
+                <value field="current" new_name="raintotal" 
+                       filter_key="type" filter_value="raintotal" />
+                <value field="current" new_name="current" 
+                       filter_key="type" filter_value="current" />
+                <value field="current" new_name="power" 
+                       filter_key="type" filter_value="power" />
+                <value field="current" new_name="energy" 
+                       filter_key="type" filter_value="energy" />
+                <value field="current" new_name="temperature" 
+                       filter_key="type" filter_value="temp" />
+                <value field="current" new_name="voltage" 
+                       filter_key="type" filter_value="voltage" />
+                <value field="current" new_name="count" 
+                       filter_key="type" filter_value="count" />
+                <value field="current" new_name="temperature" 
+                       filter_key="type" filter_value="temp" />
+                <value field="current" new_name="setpoint" 
+                       filter_key="type" filter_value="setpoint" />
+                <value field="current" new_name="demand" 
+                       filter_key="type" filter_value="demand" />
             </mapping>
         </xpltype>
     </schema>
