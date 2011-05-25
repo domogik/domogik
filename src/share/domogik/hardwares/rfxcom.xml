@@ -13,7 +13,7 @@
   <domogik-min-version>0.1.0</domogik-min-version>
   <configuration-keys/>
   <files>
-    <file path="src/share/domogik/hardwares/rfxcom_xpl.xml"/>
+    <file path="src/share/domogik/hardwares/rfxcom.xml"/>
     <file path="src/share/domogik/stats/rfxcom/sensor.basic-rfxcom"/>
   </files>
   <dependencies/>
@@ -81,19 +81,19 @@
           <id>rfxcom.rfxsensor</id>
           <device_technology_id>rfxcom</device_technology_id>
           <name>RFXSensor</name>
-          <description></description>
+          <description>RFXSensor</description>
       </device_type>
       <device_type>
           <id>rfxcom.rfxmeter</id>
           <device_technology_id>rfxcom</device_technology_id>
           <name>RFXMeter</name>
-          <description></description>
+          <description>RFXMeter</description>
       </device_type>
       <device_type>
           <id>rfxcom.digimax</id>
           <device_technology_id>rfxcom</device_technology_id>
           <name>Digimax</name>
-          <description></description>
+          <description>Digimax</description>
       </device_type>
   </device_types>
   <device_feature_models>
