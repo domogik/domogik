@@ -243,6 +243,10 @@ class SysManager(XplPlugin):
                     'schema': 'hbeat.app',
                     'xpltype': 'xpl-stat',
                 })
+                Listener(self._refresh_hardware_list, self.myxpl, {
+                    'schema': 'hbeat.basic',
+                    'xpltype': 'xpl-stat',
+                })
 
             # define timers
             if self.options.check_hardware:

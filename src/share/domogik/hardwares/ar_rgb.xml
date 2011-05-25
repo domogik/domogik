@@ -5,6 +5,25 @@
   <detail>control RGB leds. This requires : 
 - Arduino Uno or similar
 - Official ethernet shield </detail>
+  <hardware-detail>
+This hardware plugin is a xPL program for arduino which manage RGB led strips.
+
+Open the following files as a sketchbook with the Arduino Java IDE :
+- ar_rgb.pde
+- rgb.pde
+- time.pde
+- xpl.pde
+- memoryfree.cpp
+- memoryfree.h
+
+Configure parameters in ar_rgb.pde
+- network 
+- used pins
+
+Upload project to Arduino with the IDE
+
+Test it with the manual controllers (push button and potentiometer) and then create a device and test it with Domogik
+  </hardware-detail>
   <version>0.1.0</version>
   <documentation>http://wiki.domogik.org/hardware_ar_rgb</documentation>
   <author>Fritz</author>

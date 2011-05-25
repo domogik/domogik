@@ -60,7 +60,7 @@ class PackageData():
 
         # check type == plugin
         if self.plg.type not in ["plugin", "hardware"]:
-            print("Error : this package is not a plugin")
+            print("Error : this package is not recognized")
             exit()
 
         # display plugin informations

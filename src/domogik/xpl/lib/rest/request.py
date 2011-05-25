@@ -43,6 +43,7 @@ from domogik.xpl.common.helper import HelperError
 from domogik.xpl.lib.rest.jsondata import JSonHelper
 from domogik.xpl.lib.rest.csvdata import CsvHelper
 from domogik.common.packagemanager import PackageManager
+from domogik.common.packagexml import PackageXml, PackageException
 import time
 import urllib
 from socket import gethostname
@@ -2240,6 +2241,15 @@ target=*
                                                   self.jsonp, self.jsonp_cb)
                 return
 
+        ### hardware-detail ##########################
+        elif self.rest_request[0] == "hardware-detail":
+            if len(self.rest_request) == 2:
+                self._rest_plugin_hardware_detail(self.rest_request[1])
+            else:
+                self.send_http_response_error(999, "Wrong syntax for " + self.rest_request[0], \
+                                              self.jsonp, self.jsonp_cb)
+                return
+
         ### others ####################################
         else:
             self.send_http_response_error(999, "Bad operation for /plugin", self.jsonp, self.jsonp_cb)
@@ -2620,6 +2630,17 @@ target=*
                 json_data.add_data(plugin)
         except:
             json_data.set_error(code = 999, description = self.get_exception())
+        self.send_http_response_ok(json_data.get())
+
+    def _rest_plugin_hardware_detail(self, name):
+        """ Get hardware detail info
+            @param name : hardware name
+        """
+        json_data = JSonHelper("OK")
+        json_data.set_jsonp(self.jsonp, self.jsonp_cb)
+        json_data.set_data_type("hardware")
+        plg_xml = PackageXml(name, type = "hardware")
+        json_data.add_data({"detail" : plg_xml.hardware_detail})
         self.send_http_response_ok(json_data.get())
 
 
