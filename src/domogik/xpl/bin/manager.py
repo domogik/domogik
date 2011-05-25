@@ -308,7 +308,9 @@ class SysManager(XplPlugin):
         print("Reloading plugin and hardware model lists")
         self.log.info("Reloading plugin and hardware model lists")
         self._list_plugins()
-        self._list_hardware_models()
+        self._list_hardware_models()  # still usefull ? TODO :check
+                                      # hardwares are automatically loaded by
+                                      # manager now...
 
     def _write_fifo(self, level, message):
         """ Write the message into _state_fifo fifo, with ansi color
@@ -635,32 +637,36 @@ class SysManager(XplPlugin):
 
         # Get hardware list
         try:
-            hardwares = Loader('hardwares')
-            hardware_list = dict(hardwares.load()[1])
+            #hardwares = Loader('hardwares')
+            #hardware_list = dict(hardwares.load()[1])
+
+            # list xml files
+            hardware_list = os.listdir(self._xml_hardware_directory)
+
             state_thread = {}
             for hardware in hardware_list:
+                hardware = hardware[0:-4]
                 print(hardware)
-                self.log.info("==> %s (%s)" % (hardware, hardware_list[hardware]))
-                if hardware_list[hardware] == "enabled":
-                    # try open xml file
-                    xml_file = "%s/%s.xml" % (self._xml_hardware_directory, hardware)
-                    try:
-                        # get data for hardware
-                        plg_xml = PackageXml(path = xml_file)
-    
-                        # register plugin
-                        self._hardware_models.append({"type" : plg_xml.type,
-                                          "name" : plg_xml.name, 
-                                          "description" : plg_xml.desc, 
-                                          "technology" : plg_xml.techno,
-                                          "release" : plg_xml.release,
-                                          "documentation" : plg_xml.doc,
-                                          "vendor_id" : plg_xml.vendor_id,
-                                          "device_id" : plg_xml.device_id})
-    
-                    except:
-                        print("Error reading xml file : %s\n%s" % (xml_file, str(traceback.format_exc())))
-                        self.log.error("Error reading xml file : %s. Detail : \n%s" % (xml_file, str(traceback.format_exc())))
+                self.log.info("==> %s" % (hardware))
+                # try open xml file
+                xml_file = "%s/%s.xml" % (self._xml_hardware_directory, hardware)
+                try:
+                    # get data for hardware
+                    plg_xml = PackageXml(path = xml_file)
+   
+                    # register plugin
+                    self._hardware_models.append({"type" : plg_xml.type,
+                                      "name" : plg_xml.name, 
+                                      "description" : plg_xml.desc, 
+                                      "technology" : plg_xml.techno,
+                                      "release" : plg_xml.release,
+                                      "documentation" : plg_xml.doc,
+                                      "vendor_id" : plg_xml.vendor_id,
+                                      "device_id" : plg_xml.device_id})
+
+                except:
+                    print("Error reading xml file : %s\n%s" % (xml_file, str(traceback.format_exc())))
+                    self.log.error("Error reading xml file : %s. Detail : \n%s" % (xml_file, str(traceback.format_exc())))
         except NoSectionError:
             pass 
 
