@@ -821,7 +821,6 @@ class SysManager(XplPlugin):
             mess.add_data({'plugin'+str(idx)+'-host' : plugin["host"]})
             idx += 1
         # hardwares
-        idx = 0
         for hardware in self._hardwares:
             mess.add_data({'plugin'+str(idx)+'-name' : hardware["name"]})
             mess.add_data({'plugin'+str(idx)+'-type' : hardware["type"]})
