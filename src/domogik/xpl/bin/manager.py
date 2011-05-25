@@ -251,7 +251,7 @@ class SysManager(XplPlugin):
             # define timers
             if self.options.check_hardware:
                 hardware_stop = Event()
-                hardware_timer = XplTimer(20, 
+                hardware_timer = XplTimer(15, 
                                           self._check_hardware_status, 
                                           hardware_stop,
                                           self.myxpl)
@@ -737,6 +737,13 @@ class SysManager(XplPlugin):
     def _check_hardware_status(self):
         """ Check if hardwares are always present
         """
+        # send a hbeat request
+        self._send_broadcast_hbeat()
+
+        # wait for answers
+        time.sleep(1)
+ 
+        # process
         for hardware in self._hardwares:
             # if hardware was not seen in the interval its tells, 
             # we consider it as OFF
@@ -918,6 +925,16 @@ class SysManager(XplPlugin):
         subp.communicate()
         self.myxpl.send(mess)          
 
+    def _send_broadcast_hbeat(self):
+        """ This method will send a ping request to everybody
+        """
+        self.log.debug("Send hbeat.request")
+        mess = XplMessage()
+        mess.set_type('xpl-cmnd')
+        mess.set_target("*")
+        mess.set_schema('hbeat.request')
+        mess.add_data({'command' : 'request'})
+        self.myxpl.send(mess)
 
     def _package_cb(self, message):
         """ Internal callback for receiving packages related messages
