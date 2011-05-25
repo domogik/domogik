@@ -72,10 +72,10 @@ function get_widgets_options(id) {
 				if (canvas.getContext){
 					var ctx = canvas.getContext('2d');
 					ctx.beginPath();
-					ctx.font = "6pt Arial";
+					ctx.font = "8pt Arial";
 					ctx.textBaseline = "top"
-					ctx.fillText(o.devicename, 15, 5);
-					ctx.translate(5,60);
+					ctx.fillText(o.devicename, 15, 0);
+					ctx.translate(0,60);
 					ctx.rotate(-(Math.PI/2));
 					ctx.fillText(o.featurename, 0, 0);  
 				}

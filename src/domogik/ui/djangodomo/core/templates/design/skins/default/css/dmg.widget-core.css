@@ -17,8 +17,8 @@
 
 .widget .identity, .shape .identity {
     position:absolute;
-    top: -15px;
-    left: -15px;
+    top: -12px;
+    left: -12px;
 }
 
 .size1x1 { width:5em; height:5em;}
