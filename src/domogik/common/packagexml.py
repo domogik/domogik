@@ -122,9 +122,11 @@ class PackageXml():
             if self.type == "hardware":
                 self.vendor_id = self.xml_content.getElementsByTagName("vendor-id")[0].firstChild.nodeValue.strip()
                 self.device_id = self.xml_content.getElementsByTagName("device-id")[0].firstChild.nodeValue.strip()
+                self.hardware_detail = self.xml_content.getElementsByTagName("hardware-detail")[0].firstChild.nodeValue.strip()
             else:
                 self.vendor_id = None
                 self.device_id = None
+                self.hardware_detail = None
 
 
             # list of configurations keys
