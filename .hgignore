@@ -5,6 +5,8 @@ syntax: glob
 .DS_Store
 :2e*
 .Apple*
+.AppleDouble/
+.AppleDB/
 *.pyc
 *.pyoeggs/*
 eggs
