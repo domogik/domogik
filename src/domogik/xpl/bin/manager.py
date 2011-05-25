@@ -677,6 +677,7 @@ class SysManager(XplPlugin):
         """ Refresh hardware list
             @param message : xpl message
         """
+        self.log.debug("Refresh hardware list with : %s" % str(message))
         vendor_device = message.source.split(".")[0]
         instance = message.source.split(".")[1]
         for hardware_model in self._hardware_models:
