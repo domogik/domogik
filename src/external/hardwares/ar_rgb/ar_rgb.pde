@@ -1,29 +1,45 @@
 /*
+This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
+License
+=======
+
+B{Domogik} is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+B{Domogik} is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Domogik. If not, see U{http://www.gnu.org/licenses}.
+
+Plugin purpose
+==============
+
+This file is part of 'ar_rgb' hardware plugin
+
+Control RGB led strip with an arduino and xPL protocol
+
+This arduino program may be used without Domogik with any xPL project
+
+@author: Fritz <fritz.smh@gmail.com>
+@copyright: (C) 2007-2011 Domogik project
+@license: GPL(v3)
+@organization: Domogik
 */
 
 #include <SPI.h>         // needed for Arduino versionslater than 0018
 #include <Ethernet.h>
 #include <Udp.h>
 
-
-
-#include "memoryfree.h"
-
-
-
-
-
-
-
-
-
-
-
+//TODO / DELETE //#include "memoryfree.h"
 
 
 /***************** Network configuration ********************/
-
 
 // Mac address : a mac address must be unique
 byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
@@ -35,7 +51,6 @@ byte broadCastIp[] = {192, 168, 1, 255};
 unsigned int localPort = 3865;  
 // xPL protocol port (keep default value unless you know what you are doing)
 unsigned int xplPort = 3865;  
-// !!!!!!!!!!!!!!!TODO : possible to use a define here for previous elements ?
 
 /***************** xPL configuration part *******************/
 
@@ -70,7 +85,8 @@ unsigned int xplPort = 3865;
 // define button pin
 #define BUTTON_CONTROL 8
 
-int isOff = true;
+/******************* END OF CONFIGURATION *******************/
+
 
 /********************* time management **********************/
 
@@ -80,6 +96,7 @@ int lastHbeat = 0;
 /*********************** Global vars ************************/
 
 // current color
+int isOff = true;
 byte currentColor[] = {0x00, 0x00, 0x00};
 
 // analog control value
@@ -103,10 +120,6 @@ byte packetBuffer[MAX_XPL_MESSAGE_SIZE];   // place to store received packet
 int result;
 
 
-
-
-
-
 /********************* Set up arduino ***********************/
 void setup() {
     // Wait before doing anything
@@ -116,8 +129,8 @@ void setup() {
     Serial.begin(115200);
     Serial.println("Setup arduino...");
     
-    Serial.print("freeMemory()=");
-    Serial.println(freeMemory());
+    //TODO / DELETE //Serial.print("freeMemory()=");
+    //TODO / DELETE //Serial.println(freeMemory());
 
     // Ethernet initialisation
     Ethernet.begin(mac, ip);
@@ -127,16 +140,15 @@ void setup() {
     pinMode(RED_PIN, OUTPUT);
     pinMode(GREEN_PIN, OUTPUT);
     pinMode(BLUE_PIN, OUTPUT);
-
     pinMode(BUTTON_CONTROL, INPUT);
     
-    // read anallog control value
+    // read analog control value
     analogControlValue = analogRead(ANALOG_CONTROL);
     oldAnalogControlValue = analogControlValue;
     
     // Send a hbeat message on startup
     sendHbeat();
-    delay(100);
+    //TODO : DELETE // delay(100);
     setColorOff();
 
     Serial.println("Setup arduino finished.");
@@ -173,32 +185,32 @@ void loop() {
             setColorOff();
             Serial.println("button off");
         }
-        delay(300);
-      
+        // wait to avoid changes due to rebound on button
+        delay(200);      
     }
  
     
     /**** pulse management ****/
     pulse();
+    // Each second, make a pulse
     if (second == 1) {
-        Serial.println("!!! PULSE !!!");
+        Serial.println("---- PULSE ----");
         
         // Hbeat
         lastHbeat += 1;
         
+        // Each N minute, send a hbeat xpl message
         if (lastHbeat == (60*HBEAT_INTERVAL)) {
-            Serial.println("----SH----");
             sendHbeat();
-            
-            delay(10);
             lastHbeat = 0;
+            //TODO : DELETE // delay(10);
         }
     }
 
-
     /**** Udp listening ****/
     packetSize = Udp.available(); // Size of detected packet
-    if (packetSize) { // packet detected
+    // packet detection
+    if (packetSize) { 
         Serial.print("UDP packet received of size : ");
         Serial.println(packetSize);
 
@@ -209,7 +221,6 @@ void loop() {
         if(abs(packetSize) < MAX_XPL_MESSAGE_SIZE) {
             Serial.println("Message of good size");
             result = parseXpl(packetBuffer,abs(packetSize));
-            Serial.println("After parsing");
         }
         else {
             Serial.println("Message to big to be parsed");
