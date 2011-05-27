@@ -27,22 +27,6 @@ Supported features :
     <key>
       <interface>yes</interface>
       <order-id>1</order-id>
-      <name>login</name>
-      <type>string</type>
-      <description>HTTP Login</description>
-      <default-value></default-value>
-    </key>
-    <key>
-      <interface>yes</interface>
-      <order-id>2</order-id>
-      <name>password</name>
-      <type>string</type>
-      <description>HTTP Password</description>
-      <default-value></default-value>
-    </key>
-    <key>
-      <interface>yes</interface>
-      <order-id>3</order-id>
       <name>name</name>
       <type>string</type>
       <description>Name</description>
@@ -50,7 +34,7 @@ Supported features :
     </key>
     <key>
       <interface>yes</interface>
-      <order-id>4</order-id>
+      <order-id>2</order-id>
       <name>ip</name>
       <type>string</type>
       <description>Ip</description>
@@ -58,10 +42,28 @@ Supported features :
     </key>
     <key>
       <interface>yes</interface>
-      <order-id>5</order-id>
+      <order-id>3</order-id>
       <name>int</name>
       <type>string</type>
       <description>Interval between each poll</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <interface>yes</interface>
+      <optionnal>yes</optionnal>
+      <order-id>4</order-id>
+      <name>login</name>
+      <type>string</type>
+      <description>HTTP Login</description>
+      <default-value></default-value>
+    </key>
+    <key>
+      <interface>yes</interface>
+      <optionnal>yes</optionnal>
+      <order-id>5</order-id>
+      <name>password</name>
+      <type>string</type>
+      <description>HTTP Password</description>
       <default-value></default-value>
     </key>
 
