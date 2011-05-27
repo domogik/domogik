@@ -109,9 +109,6 @@ void sendXplTrigForSetColor(char color[8]) {
     /**** Send it ****/
     //Serial.println(buffer);
     Udp.sendPacket(buffer, broadCastIp, xplPort);   
-    
-    //TODO / DELETE //Serial.print("freeMemory()=");
-    //TODO / DELETE //Serial.println(freeMemory());
 }
 
 

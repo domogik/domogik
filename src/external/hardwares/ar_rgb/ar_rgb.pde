@@ -36,8 +36,6 @@ This arduino program may be used without Domogik with any xPL project
 #include <Ethernet.h>
 #include <Udp.h>
 
-//TODO / DELETE //#include "memoryfree.h"
-
 
 /***************** Network configuration ********************/
 
@@ -67,7 +65,7 @@ unsigned int xplPort = 3865;
 
 // Maximal size of xPL messages that could be processed
 // This size should not be reduce unless you are sure of what you are doing
-#define MAX_XPL_MESSAGE_SIZE 150
+#define MAX_XPL_MESSAGE_SIZE 165
 
 // Heartbeat interval : time in minutes between 2 sends of a xpl hbeat message
 #define HBEAT_INTERVAL 1
@@ -129,9 +127,6 @@ void setup() {
     Serial.begin(115200);
     Serial.println("Setup arduino...");
     
-    //TODO / DELETE //Serial.print("freeMemory()=");
-    //TODO / DELETE //Serial.println(freeMemory());
-
     // Ethernet initialisation
     Ethernet.begin(mac, ip);
     Udp.begin(localPort);
@@ -148,7 +143,6 @@ void setup() {
     
     // Send a hbeat message on startup
     sendHbeat();
-    //TODO : DELETE // delay(100);
     setColorOff();
 
     Serial.println("Setup arduino finished.");
@@ -203,7 +197,6 @@ void loop() {
         if (lastHbeat == (60*HBEAT_INTERVAL)) {
             sendHbeat();
             lastHbeat = 0;
-            //TODO : DELETE // delay(10);
         }
     }
 
